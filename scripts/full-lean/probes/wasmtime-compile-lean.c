@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/resource.h>
+#define LASM_CANONICAL_IMPORTS_IMPLEMENTATION
+#include "wasmtime-canonical-imports.h"
 
 static int describe(wasmtime_error_t *failure, char *error, size_t capacity) {
     if (!failure) return 0;
@@ -41,7 +43,11 @@ int lasm_compile_lean_module(const uint8_t *bytes, size_t length, const char *ca
     wasm_engine_t *engine = wasm_engine_new_with_config(config);
     if (!engine) { snprintf(error, capacity, "engine creation failed"); return 1; }
     wasmtime_module_t *module = NULL, *restored = NULL;
-    int status = describe(wasmtime_module_new(engine, bytes, length, &module), error, capacity);
+    uint8_t *canonical = NULL; size_t canonical_length = 0; uint32_t added = 0;
+    int status = lasm_canonicalize_imports(bytes, length, &canonical, &canonical_length, &added, error, capacity);
+    if (!status) status = describe(wasmtime_module_new(engine, canonical ? canonical : bytes,
+        canonical ? canonical_length : length, &module), error, capacity);
+    free(canonical);
     if (status) goto done;
     wasm_importtype_vec_t imports;
     wasm_exporttype_vec_t exports;

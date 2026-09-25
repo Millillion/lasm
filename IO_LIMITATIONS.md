@@ -324,9 +324,21 @@ separately from the earlier runtime evidence below.
   guest environment lookups match the host snapshot, including Unicode.
   The successful guard peaks at 226 MiB. Earlier failures and a proactively
   stopped duplicate-toolchain installation remain recorded, with no OOM events.
-  Other imports still trap, six dynamic function globals remain unresolved,
+  At that checkpoint other imports trapped and six dynamic function globals were unresolved,
   and workers, the original application main/4 GiB stack case, installed-package
   integration and other platforms remain unfinished. This is component evidence.
+  The latest [function-global continuation](docs/evidence/wasmtime-function-globals-2026-09-25.json)
+  resolves those six globals in the private Lean 4.34.1 helper. A freshly compiled
+  ordinary application matches both native modes in all three engines. Six
+  console routes pass 14,184 indirect-call comparisons against the unchanged SDK
+  decoder, including malformed strings and pointers above 4 GiB. Original
+  pointer-equality assertions first exposed host/instance reference differences;
+  private import exports now preserve compiled table addresses and aliases.
+  Six transform controls preserve non-export sections and nine negative module
+  controls pass. Compilation peaks at 5.33 GiB and application execution at
+  0.54 GiB, without resource events. This does not establish general dynamic or
+  weak linking, native descriptor semantics, exact engine stack-trace rendering,
+  reusable disposal or shipping helper acceptance.
   A [real-allocator follow-up](docs/evidence/wasmtime-real-lean-high-allocation-2026-09-24.json)
   now allocates and frees 4 GiB plus 64 KiB twice per engine, growing actual
   shared memory to 4,433,838,080 bytes. Eight guest `memcpy` round trips per

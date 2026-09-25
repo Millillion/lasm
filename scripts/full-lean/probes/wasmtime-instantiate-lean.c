@@ -1,6 +1,6 @@
 #define _GNU_SOURCE
-// Private diagnostic only. Startup/clock/metadata are real; other imports trap. No
-// application-main/API acceptance may be inferred from pure export calls.
+// Private diagnostic only. Selected imports have real host implementations;
+// unimplemented imports trap. Pure exports do not establish full API acceptance.
 #include <wasmtime.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -12,12 +12,18 @@
 #include <errno.h>
 #include <pthread.h>
 #include <time.h>
+#include "wasmtime-canonical-imports.h"
 
 typedef double (*date_callback_t)(void);
 typedef int32_t (*mailbox_callback_t)(uint64_t, uint64_t);
 typedef int32_t (*spawn_callback_t)(uint64_t, uint64_t, uint64_t);
 typedef int32_t (*thread_event_callback_t)(uint32_t, uint64_t);
 typedef int32_t (*runtime_callback_t)(uint32_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t *);
+typedef struct {
+    char *name;
+    wasmtime_global_t global;
+    uint64_t pointer;
+} function_global_t;
 typedef struct {
     wasm_engine_t *engine;
     wasmtime_module_t *module;
@@ -47,6 +53,8 @@ typedef struct {
     spawn_callback_t spawn;
     thread_event_callback_t thread_event;
     runtime_callback_t runtime;
+    function_global_t *function_globals;
+    size_t function_global_count;
 } lean_probe_t;
 typedef struct { lean_probe_t *owner; char name[256]; } rejected_import_t;
 typedef struct { lean_probe_t *owner; uint32_t kind; wasm_valkind_t result_kind; char name[128]; } runtime_import_t;
@@ -84,6 +92,9 @@ static wasm_trap_t *runtime_import(void *data, wasmtime_caller_t *caller,
         args[1].kind != WASMTIME_I64 || args[2].kind != WASMTIME_I64 || args[3].kind != WASMTIME_I64 ||
         item->result_kind != WASM_I32))
         return wasmtime_trap_new("unexpected memory64 fd_write ABI", 32);
+    if (item->kind >= 11 && item->kind <= 16 &&
+        (nargs != 1 || nresults || args[0].kind != WASMTIME_I64))
+        return wasmtime_trap_new("unexpected memory64 console ABI", 31);
     uint64_t inputs[5] = {0}, result = 0;
     for (size_t i = 0; i < nargs; i++) {
         if (args[i].kind == WASMTIME_I64) inputs[i] = (uint64_t)args[i].of.i64;
@@ -102,6 +113,140 @@ static wasm_trap_t *runtime_import(void *data, wasmtime_caller_t *caller,
         else return wasmtime_trap_new("noninteger runtime result", 25);
     }
     return NULL;
+}
+static bool name_is(const wasm_name_t *name, const char *text) {
+    return name->size == strlen(text) && !memcmp(name->data, text, name->size);
+}
+static uint32_t console_import_kind(const wasm_name_t *name) {
+    const char *names[] = { "emscripten_console_log", "emscripten_console_error",
+        "emscripten_console_warn", "emscripten_console_trace", "emscripten_out", "emscripten_err" };
+    for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++)
+        if (name_is(name, names[i])) return (uint32_t)i + 11;
+    return 0;
+}
+static int console_import_new(lean_probe_t *probe, const wasm_name_t *name,
+    wasmtime_func_t *function, char *error, size_t capacity) {
+    uint32_t kind = console_import_kind(name);
+    if (!kind) {
+        snprintf(error, capacity, "unresolved GOT.func import: %.*s", (int)name->size, name->data);
+        return 1;
+    }
+    runtime_import_t *item = calloc(1, sizeof(*item));
+    if (!item) { snprintf(error, capacity, "console import allocation failed"); return 1; }
+    item->owner = probe; item->kind = kind;
+    snprintf(item->name, sizeof(item->name), "UNIMPLEMENTED IMPORT env.%.*s", (int)name->size, name->data);
+    wasm_functype_t *type = wasm_functype_new_1_0(wasm_valtype_new_i64());
+    wasmtime_func_new(probe_context(probe), type, runtime_import, item, free, function);
+    wasm_functype_delete(type);
+    return 0;
+}
+static int resolve_function_globals(lean_probe_t *probe, const wasm_importtype_vec_t *types,
+    const wasmtime_extern_t *imports, char *error, size_t capacity) {
+    size_t count = 0;
+    for (size_t i = 0; i < types->size; i++)
+        if (name_is(wasm_importtype_module(types->data[i]), "GOT.func")) count++;
+    if (!count) return 0;
+    // Resolve the main module's function globals before its explicit C/C++
+    // constructors run. This is not a side-module loader or a weak-symbol ABI.
+    if (probe->function_globals) { snprintf(error, capacity, "function globals already resolved"); return 1; }
+    probe->function_globals = calloc(count, sizeof(*probe->function_globals));
+    if (!probe->function_globals) { snprintf(error, capacity, "function-global allocation failed"); return 1; }
+    wasmtime_context_t *context = probe_context(probe);
+    wasmtime_extern_t table;
+    const char *table_name = "__indirect_function_table";
+    if (!wasmtime_instance_export_get(context, &probe->instance, table_name, strlen(table_name), &table)) {
+        snprintf(error, capacity, "missing GOT.func function table"); return 1;
+    }
+    int status = 0;
+    if (table.kind != WASMTIME_EXTERN_TABLE) {
+        snprintf(error, capacity, "GOT.func export is not a table"); status = 1; goto done;
+    }
+    wasm_tabletype_t *table_type = wasmtime_table_type(context, &table.of.table);
+    bool function_table = wasm_valtype_kind(wasm_tabletype_element(table_type)) == WASM_FUNCREF;
+    wasm_tabletype_delete(table_type);
+    if (!function_table) { snprintf(error, capacity, "GOT.func requires a function table"); status = 1; goto done; }
+    for (size_t i = 0; i < types->size; i++) {
+        if (!name_is(wasm_importtype_module(types->data[i]), "GOT.func")) continue;
+        const wasm_name_t *name = wasm_importtype_name(types->data[i]);
+        const wasm_externtype_t *type = wasm_importtype_type(types->data[i]);
+        const wasm_globaltype_t *global = wasm_externtype_as_globaltype_const(type);
+        if (!global || imports[i].kind != WASMTIME_EXTERN_GLOBAL ||
+            wasm_valtype_kind(wasm_globaltype_content(global)) != WASM_I64 ||
+            wasm_globaltype_mutability(global) != WASM_VAR || memchr(name->data, 0, name->size)) {
+            snprintf(error, capacity, "invalid memory64 GOT.func global"); status = 1; break;
+        }
+        wasmtime_func_t function;
+        bool found = false;
+        wasmtime_extern_t exported;
+        if (wasmtime_instance_export_get(context, &probe->instance, name->data, name->size, &exported)) {
+            if (exported.kind == WASMTIME_EXTERN_FUNC) { function = exported.of.func; found = true; }
+            wasmtime_extern_delete(&exported);
+            if (!found) { snprintf(error, capacity, "GOT.func symbol is not a function"); status = 1; break; }
+        }
+        for (size_t j = 0; !found && j < types->size; j++) {
+            const wasm_name_t *candidate = wasm_importtype_name(types->data[j]);
+            if (name_is(wasm_importtype_module(types->data[j]), "env") &&
+                imports[j].kind == WASMTIME_EXTERN_FUNC && candidate->size == name->size &&
+                !memcmp(candidate->data, name->data, name->size)) {
+                char canonical[64];
+                size_t length = lasm_canonical_import_name((uint32_t)j, canonical);
+                wasmtime_extern_t reference;
+                if (!wasmtime_instance_export_get(context, &probe->instance, canonical, length, &reference)) {
+                    snprintf(error, capacity, "missing canonical imported function export"); status = 1; break;
+                }
+                if (reference.kind == WASMTIME_EXTERN_FUNC) { function = reference.of.func; found = true; }
+                wasmtime_extern_delete(&reference);
+                if (!found) { snprintf(error, capacity, "canonical import export is not a function"); status = 1; break; }
+            }
+        }
+        if (status) break;
+        // Reuse a duplicate binding's actual function, including host-only
+        // symbols, so duplicate globals retain C function-pointer equality.
+        for (size_t j = 0; !found && j < probe->function_global_count; j++) {
+            function_global_t *binding = &probe->function_globals[j];
+            if (!name_is(name, binding->name)) continue;
+            wasmtime_val_t entry;
+            if (wasmtime_table_get(context, &table.of.table, binding->pointer, &entry)) {
+                if (entry.kind == WASMTIME_FUNCREF && !wasmtime_funcref_is_null(&entry.of.funcref)) {
+                    function = entry.of.funcref; found = true;
+                }
+                wasmtime_val_unroot(&entry);
+            }
+        }
+        if (!found && console_import_new(probe, name, &function, error, capacity)) { status = 1; break; }
+        uint64_t size = wasmtime_table_size(context, &table.of.table), pointer = size;
+        void *identity = wasmtime_func_to_raw(context, &function);
+        // Preserve an already-compiled table address. Comparing these opaque
+        // identities is confined to this Store; none crosses a JS worker.
+        for (uint64_t j = 0; j < size; j++) {
+            wasmtime_val_t entry;
+            if (!wasmtime_table_get(context, &table.of.table, j, &entry)) {
+                snprintf(error, capacity, "cannot inspect GOT.func table"); status = 1; break;
+            }
+            bool matches = entry.kind == WASMTIME_FUNCREF && !wasmtime_funcref_is_null(&entry.of.funcref) &&
+                wasmtime_func_to_raw(context, &entry.of.funcref) == identity;
+            wasmtime_val_unroot(&entry);
+            if (matches) { pointer = j; break; }
+        }
+        if (status) break;
+        if (pointer == size) {
+            wasmtime_val_t value = { .kind = WASMTIME_FUNCREF, .of.funcref = function };
+            status = failure(wasmtime_table_grow(context, &table.of.table, 1, &value, &pointer), NULL, error, capacity);
+            if (status) break;
+        }
+        wasmtime_val_t value = { .kind = WASMTIME_I64, .of.i64 = (int64_t)pointer };
+        status = failure(wasmtime_global_set(context, &imports[i].of.global, &value), NULL, error, capacity);
+        if (status) break;
+        function_global_t *binding = &probe->function_globals[probe->function_global_count];
+        binding->name = malloc(name->size + 1);
+        if (!binding->name) { snprintf(error, capacity, "function-global name allocation failed"); status = 1; break; }
+        memcpy(binding->name, name->data, name->size); binding->name[name->size] = 0;
+        binding->global = imports[i].of.global; binding->pointer = pointer;
+        probe->function_global_count++;
+    }
+done:
+    wasmtime_extern_delete(&table);
+    return status;
 }
 static wasm_trap_t *clock_import(void *data, wasmtime_caller_t *caller,
     const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
@@ -444,7 +589,23 @@ void lasm_lean_instance_delete(lean_probe_t *probe) {
     if (probe->engine) wasm_engine_delete(probe->engine);
     free(probe->environment);
     free(probe->program_name);
+    for (size_t i = 0; i < probe->function_global_count; i++) free(probe->function_globals[i].name);
+    free(probe->function_globals);
     free(probe);
+}
+static wasm_engine_t *create_engine(size_t wasm_stack_budget) {
+    wasm_config_t *config = wasm_config_new();
+    wasmtime_config_wasm_memory64_set(config, true);
+    wasmtime_config_wasm_threads_set(config, true);
+    wasmtime_config_shared_memory_set(config, true);
+    wasmtime_config_wasm_exceptions_set(config, true);
+    wasmtime_config_strategy_set(config, WASMTIME_STRATEGY_CRANELIFT);
+    wasmtime_config_parallel_compilation_set(config, false);
+    wasmtime_config_cranelift_opt_level_set(config, WASMTIME_OPT_LEVEL_NONE);
+    wasmtime_config_memory_reservation_set(config, UINT64_C(8589934592));
+    wasmtime_config_max_wasm_stack_set(config, wasm_stack_budget);
+    wasmtime_config_async_stack_size_set(config, 80 * 1024 * 1024);
+    return wasm_engine_new_with_config(config);
 }
 
 static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_cache, date_callback_t date_now,
@@ -494,20 +655,9 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
         probe->module = wasmtime_module_clone(parent->module);
         probe->memory = wasmtime_sharedmemory_clone(parent->memory);
     } else {
-    wasm_config_t *config = wasm_config_new();
-    wasmtime_config_wasm_memory64_set(config, true);
-    wasmtime_config_wasm_threads_set(config, true);
-    wasmtime_config_shared_memory_set(config, true);
-    wasmtime_config_wasm_exceptions_set(config, true);
-    wasmtime_config_strategy_set(config, WASMTIME_STRATEGY_CRANELIFT);
-    wasmtime_config_parallel_compilation_set(config, false);
-    wasmtime_config_cranelift_opt_level_set(config, WASMTIME_OPT_LEVEL_NONE);
-    wasmtime_config_memory_reservation_set(config, UINT64_C(8589934592));
     // The FFI driver uses 12 MiB below its 16 MiB reservation. The direct
     // Node-API driver verifies a larger native worker stack on every entry.
-    wasmtime_config_max_wasm_stack_set(config, wasm_stack_budget);
-    wasmtime_config_async_stack_size_set(config, 80 * 1024 * 1024);
-    probe->engine = wasm_engine_new_with_config(config);
+    probe->engine = create_engine(wasm_stack_budget);
     if (!probe->engine) { snprintf(error, capacity, "engine allocation failed"); goto failed; }
     // The JS harness verifies the locally-produced cache and its SDK before
     // this unsafe native-code deserializer. Never accept external cache bytes.
@@ -540,6 +690,7 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
                     "emscripten_runtime_keepalive_check", "exit" };
                 for (uint32_t k = 1; k < sizeof(names) / sizeof(names[0]); k++)
                     if (name->size == strlen(names[k]) && !memcmp(name->data, names[k], name->size)) runtime_kind = k;
+                if (!runtime_kind) runtime_kind = console_import_kind(name);
             }
             if (module->size == strlen("wasi_snapshot_preview1") &&
                 !memcmp(module->data, "wasi_snapshot_preview1", module->size)) {
@@ -547,10 +698,15 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
                 if (name->size == 8 && !memcmp(name->data, "fd_write", 8)) runtime_kind = 10;
             }
             if (runtime_kind) {
+                const wasm_functype_t *function = wasm_externtype_as_functype_const(type);
+                const wasm_valtype_vec_t *parameters = wasm_functype_params(function);
+                if (runtime_kind >= 11 && runtime_kind <= 16 && (parameters->size != 1 ||
+                    wasm_valtype_kind(parameters->data[0]) != WASM_I64 || wasm_functype_results(function)->size)) {
+                    snprintf(error, capacity, "unexpected memory64 console signature"); status = 1; break;
+                }
                 runtime_import_t *item = calloc(1, sizeof(*item));
                 if (!item) { snprintf(error, capacity, "runtime import allocation failed"); status = 1; break; }
                 item->owner = probe; item->kind = runtime_kind;
-                const wasm_functype_t *function = wasm_externtype_as_functype_const(type);
                 const wasm_valtype_vec_t *returns = wasm_functype_results(function);
                 if (returns->size == 1) item->result_kind = wasm_valtype_kind(returns->data[0]);
                 snprintf(item->name, sizeof(item->name), "UNIMPLEMENTED IMPORT %.*s.%.*s",
@@ -680,11 +836,12 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
         case WASM_EXTERN_GLOBAL: {
             const wasm_globaltype_t *global = wasm_externtype_as_globaltype_const(type);
             if (module->size != 8 || memcmp(module->data, "GOT.func", 8) ||
-                wasm_valtype_kind(wasm_globaltype_content(global)) != WASM_I64) {
+                wasm_valtype_kind(wasm_globaltype_content(global)) != WASM_I64 ||
+                wasm_globaltype_mutability(global) != WASM_VAR) {
                 snprintf(error, capacity, "unexpected global import"); status = 1; break;
             }
-            // Unresolved function-table globals are explicit invalid indices;
-            // pure operations must not inspect or call any of them.
+            // Invalid until resolve_function_globals publishes actual table
+            // addresses, before the generated loader calls any constructors.
             wasmtime_val_t value = { .kind = WASMTIME_I64, .of.i64 = -1 };
             imports[i].kind = WASMTIME_EXTERN_GLOBAL;
             status = failure(wasmtime_global_new(context, global, &value, &imports[i].of.global), NULL, error, capacity);
@@ -713,6 +870,18 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
         wasmtime_error_t *instance_error = wasmtime_instance_new(context, probe->module, imports,
             types.size, &probe->instance, &trap);
         status = failure(instance_error, trap, error, capacity);
+    }
+    if (!status) status = resolve_function_globals(probe, &types, imports, error, capacity);
+    if (!status && parent) {
+        if (probe->function_global_count != parent->function_global_count) {
+            snprintf(error, capacity, "worker GOT.func binding count mismatch"); status = 1;
+        }
+        for (size_t i = 0; !status && i < probe->function_global_count; i++) {
+            const function_global_t *own = &probe->function_globals[i], *peer = &parent->function_globals[i];
+            if (own->pointer != peer->pointer || strcmp(own->name, peer->name)) {
+                snprintf(error, capacity, "worker GOT.func pointer mismatch"); status = 1;
+            }
+        }
     }
     for (size_t i = 0; i < created; i++) wasmtime_extern_delete(&imports[i]);
     free(imports); wasm_importtype_vec_delete(&types);
@@ -952,6 +1121,23 @@ int lasm_lean_instance_function_pointer(lean_probe_t *probe, const char *name, u
     if (!status) *pointer = requested;
 done:
     wasmtime_extern_delete(&table); wasmtime_extern_delete(&function); return status;
+}
+uint64_t lasm_lean_instance_function_global_count(lean_probe_t *probe) {
+    return probe->function_global_count;
+}
+int lasm_lean_instance_function_global(lean_probe_t *probe, const char *name, uint64_t *pointer,
+    char *error, size_t capacity) {
+    for (size_t i = 0; i < probe->function_global_count; i++) {
+        const function_global_t *binding = &probe->function_globals[i];
+        if (strcmp(binding->name, name)) continue;
+        wasmtime_val_t value;
+        wasmtime_global_get(probe_context(probe), &binding->global, &value);
+        bool matches = value.kind == WASMTIME_I64 && (uint64_t)value.of.i64 == binding->pointer;
+        wasmtime_val_unroot(&value);
+        if (!matches) { snprintf(error, capacity, "GOT.func binding was changed"); return 1; }
+        *pointer = binding->pointer; return 0;
+    }
+    snprintf(error, capacity, "unknown GOT.func binding: %s", name); return 1;
 }
 int lasm_lean_instance_call_pointer(lean_probe_t *probe, uint64_t pointer, uint64_t argument,
     uint64_t *result, char *error, size_t capacity) {

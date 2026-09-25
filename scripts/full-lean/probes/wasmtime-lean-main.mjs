@@ -13,6 +13,7 @@ import nativeThreadId from '../../../src/thread-id.cjs';
 import { writeWasiStdio } from './wasmtime-wasi-stdio.mjs';
 import { processOutput } from '../../../integration/process-output.mjs';
 import { readGuestBytes, writeGuestBytes } from './wasmtime-guest-memory.mjs';
+import { invokeConsoleImport } from './wasmtime-console.mjs';
 
 const ffi = createRequire(import.meta.url)('koffi');
 ffi.config({ sync_stack_size: 16 * 1024 ** 2 });
@@ -49,6 +50,8 @@ const registerMailbox = library.func('int lasm_lean_instance_mailbox_register(vo
 const callPointer = library.func('int lasm_lean_instance_call_pointer(void *probe, uint64_t pointer, uint64_t argument, _Out_ uint64_t *result, char *error, size_t capacity)');
 const nativeStack = library.func('uint64_t lasm_lean_native_stack_bytes(void)');
 const setRuntime = library.func('void lasm_lean_instance_set_runtime(void *probe, void *callback)');
+const countGlobals = library.func('uint64_t lasm_lean_instance_function_global_count(void *probe)');
+const getGlobal = library.func('int lasm_lean_instance_function_global(void *probe, str name, _Out_ uint64_t *pointer, char *error, size_t capacity)');
 const signalLoad = library.func('uint32_t lasm_lean_signal_load(void *probe, uint64_t offset)');
 const signalStore = library.func('int lasm_lean_signal_store(void *probe, uint64_t offset, uint32_t value)');
 const signalWait = library.func('int lasm_lean_signal_wait(void *probe, uint64_t offset, uint32_t expected, double timeout, char *error, size_t capacity)');
@@ -59,7 +62,7 @@ let completionWaiter, response = new Uint8Array(0), requestedExit;
 let workerMessageListener;
 const host = isRuntimeRoot ? createNodeRuntimeHost({ leanVersion: check.lean, args: check.args, appPath: check.name,
   stdio: { stdout: bytes => stdout.push(Buffer.from(bytes)), stderr: bytes => stderr.push(Buffer.from(bytes)) } }) : null;
-let probe, closed = false, ownPthread, callbackError, settled = false;
+let probe, resolvedFunctionGlobals, closed = false, ownPthread, callbackError, settled = false;
 let resolveOutcome, rejectOutcome;
 const outcome = new Promise((resolve, reject) => { resolveOutcome = resolve; rejectOutcome = reject; });
 outcome.catch(() => {});
@@ -148,6 +151,12 @@ async function handleRpc({ request, signal, port, sender }) {
       assert.equal(captured.error, false); assert.equal(captured.bytes.length, 0);
       result = { errno: 0, written: bytes.length };
     }
+    else if (request.kind === 'emscripten-output') {
+      assert.ok(request.fd === 1 || request.fd === 2);
+      assert.equal(typeof request.text, 'string');
+      (request.fd === 1 ? stdout : stderr).push(Buffer.from(request.text + '\n'));
+      result = {};
+    }
     else if (request.kind === 'host') {
       const { operation, handle, argument, mode } = request;
       const bytes = new Uint8Array(request.byteBuffer, request.byteOffset, request.byteLength);
@@ -212,7 +221,10 @@ function spawnWorker(pthread, start, argument) {
         assert.equal(value.pthread, String(pthread));
         record.processExit = value.code;
         finishApplication(value.code).catch(fail);
-      } else if (value.kind === 'thread-ready') { record.ready = value; trace.push(value); }
+      } else if (value.kind === 'thread-ready') {
+        assert.deepEqual(value.resolvedFunctionGlobals, resolvedFunctionGlobals);
+        record.ready = value; trace.push(value);
+      }
       else if (value.kind === 'thread-result') {
         record.result = value; trace.push(value);
       } else if (value.kind !== 'mailbox') throw new Error(`Unknown worker message ${value.kind}`);
@@ -279,6 +291,11 @@ const runtime = callback((kind, a, b, c, d, e, output) => {
       memoryBytes: snapshot()[3], read: readGuest, write: writeGuest,
       sink: (fd, bytes) => rpc({ kind: 'wasi-stdio', fd,
         byteBuffer: bytes.buffer, byteOffset: bytes.byteOffset, byteLength: bytes.byteLength }) }));
+    else if (kind >= 11 && kind <= 16) invokeConsoleImport({ kind, pointer: a, memoryBytes: snapshot()[3], view,
+      out: text => isRuntimeRoot ? stdout.push(Buffer.from(text + '\n'))
+        : rpc({ kind: 'emscripten-output', fd: 1, text }),
+      err: text => isRuntimeRoot ? stderr.push(Buffer.from(text + '\n'))
+        : rpc({ kind: 'emscripten-output', fd: 2, text }) });
     else throw new Error(`Unknown runtime callback ${kind}`);
     ffi.encode(output, 'uint64_t', BigInt.asUintN(64, result));
     return 0;
@@ -308,7 +325,7 @@ async function finishApplication(code) {
     args: check.args, leanStackSizeKb: process.env.LEAN_STACK_SIZE_KB, ...observed,
     threads: threadResults, trace, hostOperations, sharedBytes: String(snapshot()[3]),
     wasmEntry: nativeDriver ? 'direct Node-API on verified worker stacks' : 'Koffi synchronous FFI',
-    controlStackBytes, nativeStackOverflowControl: !!nativeDriver,
+    controlStackBytes, nativeStackOverflowControl: !!nativeDriver, resolvedFunctionGlobals,
     termination: 'Native process exit reclaims remaining workers after host output is flushed' };
   if (!isMainThread) {
     parentPort.postMessage({ kind: 'application-result', result: output });
@@ -324,6 +341,13 @@ probe = create(isRuntimeRoot ? cache : null, clock, mailbox, bytes, bytes.length
 try {
   assert.ok(probe, message());
   setRuntime(probe, runtime);
+  assert.equal(BigInt(countGlobals(probe)), 6n, 'Pinned Lean module imports six console function globals');
+  resolvedFunctionGlobals = ['emscripten_console_log', 'emscripten_console_error', 'emscripten_console_warn',
+    'emscripten_console_trace', 'emscripten_out', 'emscripten_err'].map(name => {
+    const pointer = [0]; assert.equal(getGlobal(probe, name, pointer, error, error.length), 0, message());
+    assert.ok(BigInt(pointer[0]) > 0n);
+    return { name, pointer: String(pointer[0]) };
+  });
   if (!isRuntimeRoot) {
     const stackBytes = Number(nativeStack());
     assert.ok(stackBytes >= 80 * 1024 ** 2, `Native worker stack ${stackBytes} must preserve the JS callback reservation`);
@@ -343,7 +367,7 @@ try {
     parentPort.postMessage({ kind: 'thread-ready', pthread: String(pthread),
       guestStackBytes: String(size), nativeStackBytes: stackBytes,
       ffiStackBytes: ffi.config().sync_stack_size, wasmControlStackBudget: controlStackBytes,
-      wasmEntry: nativeDriver ? 'direct Node-API' : 'FFI' });
+      wasmEntry: nativeDriver ? 'direct Node-API' : 'FFI', resolvedFunctionGlobals });
     workerMessageListener = value => {
       if (value.kind === 'mailbox') scheduleMailbox(); else fail(new Error('Unknown thread command'));
     };

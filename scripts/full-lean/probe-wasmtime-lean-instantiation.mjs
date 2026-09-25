@@ -42,7 +42,9 @@ const inputs = ['scripts/full-lean/probes/wasmtime-instantiate-lean.c',
   'scripts/full-lean/probe-wasmtime-lean-instantiation.mjs', 'integration/fixtures/LeanPureExports.lean',
   'scripts/full-lean/probes/wasmtime-lean-workers.mjs',
   'scripts/full-lean/probes/wasmtime-lean-main.mjs', 'src/bun-stack.mjs', 'src/node-host.mjs',
-  'scripts/full-lean/probes/wasmtime-native-api.c', 'scripts/full-lean/probes/wasmtime-lean-supervisor.mjs'];
+  'scripts/full-lean/probes/wasmtime-native-api.c', 'scripts/full-lean/probes/wasmtime-lean-supervisor.mjs',
+  'scripts/full-lean/probes/wasmtime-console.mjs', 'scripts/full-lean/probes/wasmtime-guest-memory.mjs',
+  'scripts/full-lean/probes/wasmtime-canonical-imports.h'];
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 const report = { scope: runMain
   ? 'Unchanged const_fold main through a private Wasmtime integration and native Lean oracles; not shipping backend or general API acceptance'

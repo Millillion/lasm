@@ -1067,6 +1067,28 @@ restoration to the original paths before reuse. This recovers 712 MB without
 changing sources, results, failed experiments or the managed tool cache. The
 archival guard peaks below 0.8 GiB and releases without resource events.
 
+The [function-global continuation](evidence/wasmtime-function-globals-2026-09-25.json)
+now resolves the private helper's six console function pointers. Its initial
+controls found that an imported host function and the instance's table entry
+can have different Wasmtime references. A preparatory transform adds private
+exports for imported functions, exposing the instance's canonical references
+without changing code, element sections or existing export entries. The original
+pointer-equality, alias and worker assertions now pass; earlier failures remain
+recorded. Six additional transform controls cover section placement, LEB count
+boundaries, reserved names and malformed metadata, alongside nine rejected
+binding modules.
+
+All six SDK console routes match the unchanged generated decoder for 788 vectors
+per engine, totaling 14,184 indirect calls. These check method dispatch, strings
+and high addresses; exact engine stack-trace rendering is not claimed. A fresh
+canonicalized compilation of the ordinary Lean 4.34.1 application also matches
+interpreted and C-compiled native behavior in Node, Deno and Bun. Compilation
+peaks at 5.33 GiB and execution at 0.54 GiB, with no resource events. An application
+disk preflight refusal is retained; verified older installations were reclaimed
+only after matching their retained npm tarballs. General imports, dynamic/weak
+linking, real WASI descriptors, reusable runtime cleanup and managed shipping
+integration remain open.
+
 The subsequent [binary-console application comparison](evidence/lean-4.34.1-binary-console-2026-09-25.json)
 matches all 302 native output bytes through the private helper in Node, Deno and
 Bun, including invalid UTF-8 and byte-at-a-time flushing. The comparison keeps

@@ -36,8 +36,10 @@ const sources = ['scripts/full-lean/probe-wasmtime-application.mjs',
   'src/node-host.mjs', 'src/lean-io-errors.mjs', 'src/bun-stack.mjs',
   'scripts/full-lean/probes/wasmtime-wasi-stdio.mjs', 'integration/process-output.mjs',
   'scripts/full-lean/probes/wasmtime-guest-memory.mjs',
+  'scripts/full-lean/probes/wasmtime-console.mjs',
   'src/native-files.mjs', 'src/native-file-worker.mjs', 'src/native-file-worker-pool.mjs',
-  'src/native-file-worker-deno.mjs', 'src/native-file-message.mjs'];
+  'src/native-file-worker-deno.mjs', 'src/native-file-message.mjs',
+  'scripts/full-lean/probes/wasmtime-canonical-imports.h'];
 const hashes = Object.fromEntries(await Promise.all(sources.map(async path => [path, await hashFile(join(root, path))])));
 mkdirSync(output, { recursive: true });
 const report = { scope: 'Fresh native-interpreted/native-compiled and private Wasmtime helper comparisons; not installed backend or full API acceptance',
@@ -109,6 +111,8 @@ try {
       assert.equal(result.wasmEntry, 'direct Node-API on verified worker stacks');
       assert.equal(result.controlStackBytes, 64 * 1024 ** 2);
       assert.equal(result.nativeStackOverflowControl, true);
+      assert.equal(result.resolvedFunctionGlobals.length, 6);
+      for (const thread of result.threads) assert.deepEqual(thread.ready.resolvedFunctionGlobals, result.resolvedFunctionGlobals);
       report.results.push(result);
     } catch (error) { report.failures.push({ engine: name, message: error.message }); }
     save();

@@ -29,10 +29,13 @@ assert.ok(space.bavail * space.bsize >= 5 * 1024 ** 3, 'Keep four GiB free plus 
 mkdirSync(output, { recursive: true });
 const source = join(root, 'scripts/full-lean/probes/wasmtime-compile-lean.c');
 const harness = fileURLToPath(import.meta.url);
+const canonicalHeader = join(root, 'scripts/full-lean/probes/wasmtime-canonical-imports.h');
 const report = { scope: 'Single-worker compilation, serialization and trusted-cache reload of a real Lean module; no application instantiated or executed',
   input, inputSha256: previous.converted.sha256, inputBytes: previous.converted.bytes,
   precedingFormatProbe: previousFile, precedingResultSha256: await hashFile(previousFile),
-  build: previous.build, sourceSha256: await hashFile(source), harnessSha256: await hashFile(harness),
+  build: previous.build, canonicalImportsSha256: await hashFile(canonicalHeader),
+  importedFunctionIdentity: 'Add private canonical function exports; retain all original code, elements and export entries',
+  sourceSha256: await hashFile(source), harnessSha256: await hashFile(harness),
   configuration: { compiler: 'Cranelift', optimization: 'none', parallelCompilation: false,
     inputBoundBytes: 512 * 1024 * 1024, serializedBoundBytes: 640 * 1024 * 1024,
     memory64: true, threads: true, sharedMemory: true, exceptions: true,
@@ -80,7 +83,8 @@ try {
   report.error = { message: error.message, stack: error.stack }; throw error;
 } finally {
   report.inputUnchanged = await hashFile(input) === report.inputSha256;
-  report.harnessUnchanged = await hashFile(harness) === report.harnessSha256 && await hashFile(source) === report.sourceSha256;
+  report.harnessUnchanged = await hashFile(harness) === report.harnessSha256 && await hashFile(source) === report.sourceSha256
+    && await hashFile(canonicalHeader) === report.canonicalImportsSha256;
   report.finishedAt = new Date().toISOString(); save();
   assert.ok(report.inputUnchanged && report.harnessUnchanged);
 }
