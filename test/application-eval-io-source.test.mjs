@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createHash } from 'node:crypto';
-import { parallelEvalIOSource } from '../scripts/application-tests/eval-io-source.mjs';
+import { parallelEvalIOSource, reviewedEvalIOInput } from '../scripts/application-tests/eval-io-source.mjs';
+import { readFileSync } from 'node:fs';
 
 const name = 'elab/async_http_body.lean';
 const source = Buffer.from('import Std.Http\n/-! λ #eval inside a comment -/\n#eval IO.println "日本語"\n#eval do\n  assert! true\n');
@@ -38,4 +39,13 @@ test('parallel IO adapter rejects missing, overlapping or non-token syntax range
 test('parallel IO adapter rejects generated-name collisions', () => {
   const conflicting = Buffer.concat([source, Buffer.from('\n-- lasmParallelEval1\n')]);
   assert.throws(() => parallelEvalIOSource(conflicting, syntax, name), /identifier already exists/);
+});
+
+test('reviewed actions are tied to an exact release and immutable upstream source', () => {
+  const review = JSON.parse(readFileSync(new URL('../scripts/application-tests/eval-io-reviewed.json', import.meta.url)));
+  for (const [name, input] of Object.entries(review.tests)) {
+    assert.deepEqual(reviewedEvalIOInput(review.lean, name, input.sha256), input);
+    assert.throws(() => reviewedEvalIOInput(review.lean, name, '0'.repeat(64)), /differs from the reviewed/);
+    assert.throws(() => reviewedEvalIOInput('999.0.0', name, input.sha256), /Review the new release/);
+  }
 });

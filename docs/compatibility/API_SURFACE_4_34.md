@@ -26,6 +26,15 @@ comparisons match interpreted and compiled native exits and output. These are
 partial behavior observations, not individual declaration coverage or complete
 `Std.Http` equivalence; other input contexts remain unmapped by this adapter.
 
+The [expanded installed Node comparison](../evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
+passes twelve original HTTP IO inputs, totaling 148 actions. Nine additional
+inputs cover dispatch, expectations, incremental/fuzz parsing, keep-alive,
+replayable bodies, request lines, response framing and trailers. The original
+drivers and both native parallel modes pass before exact deployed comparison.
+The reviewed source hashes, action counts and five integrity controls are
+recorded; assertions and timeouts remain unchanged. Deno/Bun continuations,
+other upstream contexts and declaration-level coverage remain pending.
+
 ## Lean 4.34.0 application API inventory
 
 The [recorded audit](../evidence/application-api-inventory-2026-09-23.json) imports

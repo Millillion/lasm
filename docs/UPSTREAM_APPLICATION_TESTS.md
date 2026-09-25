@@ -40,6 +40,18 @@ All guards release successfully, with no memory-limit, OOM or swap events.
 The scope remains three reviewed HTTP inputs on Linux x64, with the original
 registration categories and broader suite/API gaps unchanged.
 
+The [expanded Node continuation](evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
+now passes twelve original HTTP IO inputs and all 148 actions. The nine new
+inputs cover dispatch, expectations, incremental parsing, parser fuzzing,
+keep-alive, replayable bodies, request lines, response framing and trailers.
+An explicit review ledger pins each input's release, source hash and action
+count. Five integrity controls pass; a new release or changed source cannot
+silently reuse an earlier review. All original native drivers, both native
+parallel modes and source-hidden installed Node deployments match, with no
+changed assertions/deadlines or resource stops. Deno/Bun runs of the nine new
+inputs continue separately; serial fuzz/hang tests and other contexts remain
+outside this adapter's verified scope.
+
 The results and checked items below retain their original **4.34.0** scope.
 
 The [product plan](PLAN.md) calls for ordinary native compilation followed by

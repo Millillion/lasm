@@ -41,6 +41,13 @@ separately from the earlier runtime evidence below.
   failures or skips. A disk preflight stops one Bun attempt before launch;
   verified archival supplies headroom for the successful unchanged-limit retry.
   This remains partial HTTP behavior coverage on Linux x64.
+  The [expanded Node HTTP IO continuation](docs/evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
+  now passes twelve original inputs and all 148 actions, including nine new
+  dispatch, expectation, parsing/fuzz, connection and framing cases. Every
+  original driver and both native parallel controls pass. Exact source hashes
+  and action counts gate adaptation; five integrity controls pass. No assertion,
+  timeout or original test is changed. Deno/Bun counterparts for those nine
+  inputs and other upstream contexts continue separately.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
   application path; earlier 4.32 results do not transfer automatically.

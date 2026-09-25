@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Shipping helper integration, full API parity and native platform acceptance lack defensible durations.
 
-**Changed:** [The private Wasmtime helper matches native Lean 4.34.1](evidence/wasmtime-lean-4.34.1-application-2026-09-25.json) in six ordinary IO/exception comparisons across the three stock engines. Real clock and captured WASI output repair missing imports. Four output controls and three prompt failure-shutdown controls pass; compilation peaks at 5.17 GiB and execution below 0.5 GiB without OOM. This is private-helper evidence, not shipping acceptance. Nine further upstream HTTP cases per engine are running sequentially. Pushes await restored SSH credentials.
+**Changed:** [Twelve upstream HTTP IO inputs pass through installed Node](evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json), exercising all 148 actions and matching both native controls. Nine new inputs cover dispatch, expectations, incremental/fuzz parsing, connections and framing. Exact release/source/action review and five integrity controls protect original assertions and deadlines. Peak memory is 4.58 GiB without resource stops. Deno/Bun continuations are running sequentially. These are partial Linux x64 API observations. Pushes await restored SSH credentials.
 
 **Remaining:** Complete latest-release suite/API coverage; shipping engine parity and callable bindings; six-platform native acceptance.
 

@@ -3,12 +3,19 @@
 // only each #eval token is replaced, and an ordinary main calls each action.
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 
-export const reviewedEvalIOTests = new Set([
-  'elab/async_http_body.lean',
-  'elab/async_http_body_framing.lean',
-  'elab/async_http_request_headers.lean',
-]);
+const review = JSON.parse(readFileSync(new URL('./eval-io-reviewed.json', import.meta.url)));
+assert.equal(review.schema, 1);
+export const reviewedEvalIOTests = new Set(Object.keys(review.tests));
+
+export function reviewedEvalIOInput(version, name, sourceSha256) {
+  assert.equal(version, review.lean, 'Review the new release before adapting its IO expressions');
+  const input = review.tests[name];
+  assert.ok(input, 'This source needs an explicit IO Unit/context review');
+  assert.equal(sourceSha256, input.sha256, 'Upstream source differs from the reviewed IO input');
+  return input;
+}
 
 export function parallelEvalIOSource(source, syntax, name) {
   assert.ok(reviewedEvalIOTests.has(name), 'This source needs an explicit IO Unit/context review');

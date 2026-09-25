@@ -63,15 +63,24 @@ requires Linux, Bash, GNU tar, CTest, Perl and diff, as used by the upstream
 drivers. End-user tool provisioning is tested separately.
 
 `integration/application-upstream-eval-io.mjs` adds parallel deployed checks for
-three reviewed HTTP tests whose original actions run through `#eval`:
-`async_http_body`, `async_http_body_framing` and `async_http_request_headers`.
+reviewed HTTP tests whose original actions run through `#eval`. The exact
+release, source hashes and action counts live in `eval-io-reviewed.json`.
+The initial three inputs are `async_http_body`, `async_http_body_framing` and
+`async_http_request_headers`; their three-engine results are recorded separately.
+Nine additional flat IO inputs cover dispatch, expectations, incremental parsing,
+parser fuzzing, keep-alive, replayable bodies, request lines, response framing
+and trailers. Their [twelve-input Node comparison](../../docs/evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
+now passes all 148 actions; other engines' continuations are recorded separately.
+Listing a new input permits validation attempts, not an execution pass.
 It first runs the original native elaboration driver and its assertions. The
 matching native Lean parser then identifies each unwrapped evaluation token.
 Only that token becomes a named `IO Unit` definition in a separate copy; every
 expression, assertion and timeout retains its original bytes. Reversing the
 edits must reproduce the complete original source. An ordinary main calls every
 action in source order. Parsing that generated file must find no remaining
-evaluation commands before native and installed AOT comparisons run.
+evaluation commands before native and installed AOT comparisons run. A new
+release or changed source hash requires a fresh review; filename reuse cannot
+silently carry an earlier review forward.
 
 Arguments are `NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE
 REVIEWED_TEST [LEAN_VERSION]`, where the reviewed name is, for example,

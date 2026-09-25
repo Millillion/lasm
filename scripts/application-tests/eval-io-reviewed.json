@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "lean": "4.34.1",
+  "review": "Flat unwrapped IO Unit actions with module comments, opens and ordinary declarations; parser context validation and native type checking are required before deployed execution. No sidecars or changed assertion/timeout bytes.",
+  "tests": {
+    "elab/async_http_body.lean": {
+      "sha256": "526c7bc0e86f13faaf7836d9dbf757abf8b218f6d5fe5a3edeeb236c51ab5f50",
+      "actions": 69
+    },
+    "elab/async_http_body_framing.lean": {
+      "sha256": "5f2afaf502d03d88af27527c7561dbb2e7edcb303daa6f3de31f32d399428ebd",
+      "actions": 12
+    },
+    "elab/async_http_request_headers.lean": {
+      "sha256": "0f70c9cd4267f2c47ad285b806ed40c4fb336612732859d1d20ccdc5d3ce16f0",
+      "actions": 4
+    },
+    "elab/async_http_dispatch.lean": {
+      "sha256": "0c0efd8472df0e93dde0e2aa9d120297c2239d1a411dcad6fcb86838e008475d",
+      "actions": 2
+    },
+    "elab/async_http_expect.lean": {
+      "sha256": "a9126465e1dcbc56d1bf908f219c8972de88c63a37af812e07a7ffa732a40565",
+      "actions": 5
+    },
+    "elab/async_http_h1_incremental.lean": {
+      "sha256": "e58511a83608ef50cf7fc04b92d75eb57aa11f3f9c13b0693e68a63d2a757269",
+      "actions": 6
+    },
+    "elab/async_http_h1_parser_fuzz.lean": {
+      "sha256": "f55c98e43646bfd6b38cc287667cc9882f78345f1a57d788f52d744161ed8484",
+      "actions": 4
+    },
+    "elab/async_http_keepalive.lean": {
+      "sha256": "c76c6717f8593179f2c22de29be12b4d0a6a79ef7225719c34205fde7208e1fb",
+      "actions": 5
+    },
+    "elab/async_http_replayable.lean": {
+      "sha256": "3eba8c240409484a9c1910d90d8f69e10f7d73ae37225c302040af1db54ad045",
+      "actions": 13
+    },
+    "elab/async_http_request_line.lean": {
+      "sha256": "83b3b71bceff873f957cce8b0e6dfe74214ea88933694ecc53bd195f6f36cdf1",
+      "actions": 7
+    },
+    "elab/async_http_response_framing.lean": {
+      "sha256": "7060468048cd67ce5fcc2eaea23ac13979848783b78330eb546a88649b9c7ef0",
+      "actions": 7
+    },
+    "elab/async_http_trailers.lean": {
+      "sha256": "f96ab03abd812d854471323973cffbbff1e1d11e26a80a41baf334489eec072b",
+      "actions": 14
+    }
+  }
+}

@@ -11,7 +11,7 @@ import { provisionLean } from '../src/managed-lean.mjs';
 import { nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { loadUpstreamEvidence } from '../scripts/application-tests/upstream-evidence.mjs';
-import { parallelEvalIOSource, reviewedEvalIOTests } from '../scripts/application-tests/eval-io-source.mjs';
+import { parallelEvalIOSource, reviewedEvalIOTests, reviewedEvalIOInput } from '../scripts/application-tests/eval-io-source.mjs';
 
 await ensureResourceGuard();
 const [outputArg, target, engineArg, compilerArg, referenceArg, name, version = '4.34.1', ...extra] = process.argv.slice(2);
@@ -23,15 +23,17 @@ const output = resolve(outputArg), engine = resolve(engineArg), compiler = resol
 assert.ok(!existsSync(output), 'Preserve preceding evidence');
 const { inventory, sources } = loadUpstreamEvidence(version);
 const test = inventory.tests.find(row => row.name === name);
+const review = reviewedEvalIOInput(version, name, sources[test.source].sha256);
 assert.equal(test.category, 'native-build-time');
 assert.equal(test.driver, 'tests/elab/run_test.sh');
 // Review sidecars before adding cases: do not silently drop per-file settings,
-// expected output, setup or teardown. These three original IO tests have none.
+// expected output, setup or teardown. The reviewed original IO tests have none.
 assert.deepEqual(Object.keys(sources).filter(path => path.startsWith('tests/' + name + '.')), []);
 const originals = [test.source, test.driver, 'tests/util.sh'];
 for (const path of originals) assert.equal(await hashFile(join(reference, path)), sources[path].sha256);
 const inputs = ['integration/application-upstream-eval-io.mjs', 'scripts/upstream/EvalCommandRanges.lean',
-  'scripts/application-tests/eval-io-source.mjs', 'scripts/application-tests/upstream-evidence.mjs'];
+  'scripts/application-tests/eval-io-source.mjs', 'scripts/application-tests/eval-io-reviewed.json',
+  'scripts/application-tests/upstream-evidence.mjs'];
 const inputHashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 mkdirSync(output, { recursive: true });
 writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
@@ -80,6 +82,7 @@ try {
     ['-j1', '--run', parser, file], output).stdout);
   const syntax = inspect(originalFile), source = readFileSync(originalFile);
   const parallel = parallelEvalIOSource(source, syntax, name), main = join(project, 'Main.lean');
+  assert.equal(parallel.expressions.length, review.actions, 'Every reviewed action must remain present');
   writeFileSync(main, parallel.generated);
   assert.deepEqual(inspect(main).ranges, [], 'No test body may execute only at build time');
   report.parallel = { syntax, expressions: parallel.expressions, actions: parallel.expressions.length,
