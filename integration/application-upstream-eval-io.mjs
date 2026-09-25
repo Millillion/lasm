@@ -12,6 +12,7 @@ import { nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { loadUpstreamEvidence } from '../scripts/application-tests/upstream-evidence.mjs';
 import { parallelEvalIOSource, reviewedEvalIOTests, reviewedEvalIOInput } from '../scripts/application-tests/eval-io-source.mjs';
+import { reviewedEvalIOSidecars } from '../scripts/application-tests/eval-io-sidecars.mjs';
 
 await ensureResourceGuard();
 const [outputArg, target, engineArg, compilerArg, referenceArg, name, version = '4.34.1', ...extra] = process.argv.slice(2);
@@ -26,13 +27,14 @@ const test = inventory.tests.find(row => row.name === name);
 const review = reviewedEvalIOInput(version, name, sources[test.source].sha256);
 assert.equal(test.category, 'native-build-time');
 assert.equal(test.driver, 'tests/elab/run_test.sh');
-// Review sidecars before adding cases: do not silently drop per-file settings,
-// expected output, setup or teardown. The reviewed original IO tests have none.
-assert.deepEqual(Object.keys(sources).filter(path => path.startsWith('tests/' + name + '.')), []);
-const originals = [test.source, test.driver, 'tests/util.sh'];
+// All subprocesses execute synchronously inside the single-workload resource
+// guard. This also preserves the reviewed CTest RUN_SERIAL marker semantics.
+const sidecars = reviewedEvalIOSidecars(sources, name, review, { sequential: true });
+const originals = [test.source, test.driver, 'tests/util.sh', 'tests/CMakeLists.txt', ...sidecars];
 for (const path of originals) assert.equal(await hashFile(join(reference, path)), sources[path].sha256);
 const inputs = ['integration/application-upstream-eval-io.mjs', 'scripts/upstream/EvalCommandRanges.lean',
   'scripts/application-tests/eval-io-source.mjs', 'scripts/application-tests/eval-io-reviewed.json',
+  'scripts/application-tests/eval-io-sidecars.mjs',
   'scripts/application-tests/upstream-evidence.mjs'];
 const inputHashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 mkdirSync(output, { recursive: true });
@@ -43,6 +45,7 @@ const env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '2' };
 const report = { scope: 'Original native driver plus separate byte-preserving IO-expression AOT comparisons; no full-suite or full API claim',
   name, version, leanCommit: lean.commit, target, compiler, engine, inputs: inputHashes,
   sourceSha256: sources[test.source].sha256, originals, commands: [], passed: false,
+  sidecars, upstreamSerialRequired: sidecars.length > 0, executionSequential: true,
   adaptations: [
     'Run the unchanged original elaboration driver, including its output and success assertions, in a separate exact source copy.',
     'A Lean syntax parser identifies only unwrapped top-level #eval tokens in explicitly reviewed, flat IO Unit tests.',
@@ -50,6 +53,7 @@ const report = { scope: 'Original native driver plus separate byte-preserving IO
     'An ordinary main calls every original action in source order and prints a completion marker. No evaluation action remains at compilation time.',
     'Compare interpreted-native, compiled-native and source-hidden relocated installed AOT execution of the same parallel main.',
     'The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately.',
+    'Copy and hash every reviewed CTest serial marker and its original CMake definition. Execute all phases sequentially under the single-workload guard; other sidecar kinds remain unsupported.',
   ], resourceReport: process.env.LASM_RESOURCE_REPORT };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 function run(label, program, args, cwd, environment = env, timeout = 900_000) {

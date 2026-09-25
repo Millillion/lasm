@@ -1,0 +1,345 @@
+{
+  "scope": "Additional byte-preserving IO-expression comparisons for original Lean 4.34.1 tests. Native original drivers run unchanged; parallel mains execute every reviewed IO action through native interpretation, native C compilation and installed .25 deployed AOT. Original registrations remain native-build-time, not reclassified as deployed compiler checks.",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "targets": [
+    "node"
+  ],
+  "reviewSha256": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+  "reviewedInputs": {
+    "elab/tempfile.lean": {
+      "sha256": "aaf51d63382e0aae22cb6ec054a34c96ae78b4b47f3eb5da1c0c6f7119c17e4e",
+      "actions": 4
+    },
+    "elab/async_http_fuzz.lean": {
+      "sha256": "d28901076d0af0f77f860777032bd01b486970d1d8fe017a9c7f14ce0daf2da2",
+      "actions": 10,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ]
+    }
+  },
+  "runs": [
+    {
+      "name": "elab/tempfile.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 4,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-tempfile-r1/result.json",
+      "resultSha256": "643f414767d29d1cae5983638af63d541fd68b7ba4adb6bf720984466f3d0937",
+      "sourceSha256": "aaf51d63382e0aae22cb6ec054a34c96ae78b4b47f3eb5da1c0c6f7119c17e4e",
+      "parallelSourceSha256": "29e35eb50fab55642128b0091ac9c4e7fd2bd107e95061b159492a4a50c0f70d",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/tempfile.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "e345cc81d5a3ccd8704a3dce4da9078897c0008cda1097e9026f9b8565df6f44",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "29e35eb50fab55642128b0091ac9c4e7fd2bd107e95061b159492a4a50c0f70d",
+            "cSha256": "e08f65e33464c242195e05da9e473097696a77649eff6f7f23b833d37b743b0c"
+          }
+        ],
+        "signature": "3e306562a9da10fe6ab2765428ed43321b0ab7d6f08a85f2c8191d18b5e5c306",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/tempfile.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/tempfile.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-tempfile-r1-resources.json",
+        "startedAt": "2026-09-25T07:59:30.977Z",
+        "finishedAt": "2026-09-25T08:01:01.146Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3546099712,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-tempfile-r1/binary-archive.json",
+      "retentionReceiptSha256": "ac31852fb6d6b9bceadc2604de4caeec7710c736e4f89c687b423cef8f83bccb",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-tempfile-r1-archive-resources.json",
+        "startedAt": "2026-09-25T08:01:29.251Z",
+        "finishedAt": "2026-09-25T08:01:35.334Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 209539072,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "verified lossless Wasm archival",
+      "minimumFreeDiskBytes": 5820936192
+    },
+    {
+      "name": "elab/async_http_fuzz.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 10,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-fuzz-r1/result.json",
+      "resultSha256": "aa2c9167626a0e9bb9854b22d30b07a609bdabce4d8fea4624d349643697f166",
+      "sourceSha256": "d28901076d0af0f77f860777032bd01b486970d1d8fe017a9c7f14ce0daf2da2",
+      "parallelSourceSha256": "edf51d80f163e5c5d766a637dc7ef5a370a259c9f65bd7a8139e2e33cf1d41d8",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_fuzz.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_fuzz.lean.serial"
+      ],
+      "wasmSha256": "2c5317ccb94120d1a64772b2c49d4917f33a373f599e00084b82042b6d203f3c",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "edf51d80f163e5c5d766a637dc7ef5a370a259c9f65bd7a8139e2e33cf1d41d8",
+            "cSha256": "88aa72873ee18f8785bd862b64087d8dfd3934b238962dbd79ddc700d3b1ead7"
+          }
+        ],
+        "signature": "25ac974221bfba6eb8ce00cbc3eff72bfb5265573301e87d7c23971a4fcac8c6",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-fuzz-r1-resources.json",
+        "startedAt": "2026-09-25T08:02:12.981Z",
+        "finishedAt": "2026-09-25T08:03:53.621Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3564113920,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-fuzz-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "4dc94d10fabc6b65978213b331bbb060979890768ef88fdc76d9b2ef5a9bf0f6",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-fuzz-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:05:28.832Z",
+        "finishedAt": "2026-09-25T08:05:31.430Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 171020288,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5735256064
+    }
+  ],
+  "comparisonsPassed": 2,
+  "comparisonsFailed": 0,
+  "deployedActions": 14,
+  "peakMemoryBytes": 3564113920,
+  "minimumFreeDiskBytes": 5735256064,
+  "recordedAt": "2026-09-25T08:07:53.793106+00:00",
+  "integrityControls": {
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/eval-io-serial-review-unit-r1.log",
+    "logSha256": "424703322ad8d9932d2cc8b3a7e19f227f281d04bc40e4414726c25c3b5e5f75",
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/eval-io-serial-review-unit-r1-resources.json",
+      "startedAt": "2026-09-25T07:59:10.206Z",
+      "finishedAt": "2026-09-25T07:59:10.456Z",
+      "limits": {
+        "memoryMax": 134217728,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 107374182,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 42565632,
+      "unitReleased": true,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "scope": "Source, context, range, UTF-8 and exact release/source review checks plus exact sidecar inventory/hash, unsupported sidecar rejection and sequential-execution requirements."
+  },
+  "limitations": [
+    "Linux x64 installed .25 comparisons only; full API, latest-release suite and six-platform acceptance remain incomplete.",
+    "Original expressions, assertions and deadlines retain their bytes. Source-hidden relocation with empty PATH is tested; no kernel source/tool denial here.",
+    "Original #eval registrations remain native-build-time; additional AOT API observations are separate.",
+    "async_tcp_half executes only upstream listenClose. Its unused acceptClose definition is not half-close assertion coverage.",
+    "Guarded/scoped/non-IO tests and unreviewed sidecar types remain unsupported by this narrow parallel adapter.",
+    "Successful generated outputs use the existing suite cleanup policy after recording hashes and exact results; only the Node tempfile binaries retain verified gzip archives. Failed outputs are preserved."
+  ]
+}

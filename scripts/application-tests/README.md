@@ -63,7 +63,7 @@ requires Linux, Bash, GNU tar, CTest, Perl and diff, as used by the upstream
 drivers. End-user tool provisioning is tested separately.
 
 `integration/application-upstream-eval-io.mjs` adds parallel deployed checks for
-reviewed HTTP tests whose original actions run through `#eval`. The exact
+reviewed IO tests whose original actions run through `#eval`. The exact
 release, source hashes and action counts live in `eval-io-reviewed.json`.
 The initial three inputs are `async_http_body`, `async_http_body_framing` and
 `async_http_request_headers`; their three-engine results are recorded separately.
@@ -71,6 +71,10 @@ Nine additional flat IO inputs cover dispatch, expectations, incremental parsing
 parser fuzzing, keep-alive, replayable bodies, request lines, response framing
 and trailers. Their [twelve-input three-engine comparison](../../docs/evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
 now passes all 148 actions per engine, for 444 deployed actions in total.
+Ten further reviewed inputs cover temporary files, TCP, UDP, cancellation,
+HTTP fuzzing and hang regressions. The [first Node checkpoint](../../docs/evidence/lean-4.34.1-upstream-io-stress-network-checkpoint-2026-09-25.json)
+passes temporary files and serial HTTP fuzzing, with fourteen deployed actions
+and eight integrity controls. The other new execution results remain pending.
 Listing a new input permits validation attempts, not an execution pass.
 It first runs the original native elaboration driver and its assertions. The
 matching native Lean parser then identifies each unwrapped evaluation token.
@@ -88,10 +92,18 @@ REVIEWED_TEST [LEAN_VERSION]`, where the reviewed name is, for example,
 The native interpreted, native C-compiled and source-hidden relocated deployed
 programs must have identical exits and output, including a completion marker.
 This adapter adds runtime API coverage without changing the original suite or
-reclassifying its native-build-time registrations. Guarded evaluations, other
-result types, scoped commands, sidecars and unreviewed inputs need separate
-adaptation; they are rejected rather than silently omitted. Its fresh execution
+reclassifying its native-build-time registrations. Reviewed `.serial` markers
+and their original CMake definition are copied and hash-verified. All phases
+execute sequentially under the single-workload guard, preserving CTest's
+`RUN_SERIAL` requirement without changing assertions or deadlines. Guarded
+evaluations, other result types, scoped commands, other sidecar kinds and
+unreviewed inputs need separate adaptation; they are rejected rather than silently omitted. Its fresh execution
 results are recorded separately from the historical 4.32 command adapter.
+The larger campaign applies the existing `case.mjs` successful-build cleanup
+policy after recording output hashes: preserve original and parallel sources,
+build identities, complete results, diagnostics and resource receipts, then
+retire reproducible deployment/cache/native outputs. Failed outputs remain
+available. This policy does not claim lossless archival of retired binaries.
 
 `integration/application-upstream-projects.mjs` handles the reviewed upstream
 `path with spaces` and `def_clash` Lake projects. Run each engine/project pair
