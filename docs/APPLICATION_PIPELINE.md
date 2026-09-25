@@ -71,6 +71,17 @@ raw bytes alongside readable text; a focused control proves that distinct
 invalid bytes can evade the preceding text-only comparison. Installed builds
 peak at 3.44 GiB. These Linux x64 observations do not establish other platforms.
 
+The [real-terminal continuation](evidence/lean-4.34.1-terminal-2026-09-25.json)
+passes nine installed `.27` executions and 18 interpreted/compiled native
+controls across the three engines. A real raw controlling terminal verifies
+standard handles and `/dev/tty`, a concurrent timer while input is blocked,
+Unicode lines and binary reads/writes. A separate 16 KiB write remains pending
+while the OS pipe is measured full at 4 KiB, then completes after the reader
+drains it. Seven bounded driver controls include negative failure, timeout,
+output-limit and false-handshake cases. Each deployment is relocated with source
+hidden and PATH empty. Guards release without resource events; peak memory is
+3.44 GiB. This does not establish cooked-terminal or Windows-console behavior.
+
 The [fresh Node HTTP comparison](evidence/lean-4.34.1-installed-http-node-2026-09-25.json)
 now passes all twenty unchanged Vitest checks, ten each against deployed Wasm
 and native Lean. This includes concurrent mutations, persistence, binary and

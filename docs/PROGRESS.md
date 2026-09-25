@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Shipping helper integration, full API parity and native platform acceptance lack defensible durations.
 
-**Changed:** [All 101 Node application registrations completed](evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json): 97 deployed passes, four original compilation-disabled cases, unchanged sources, no resource stops. A [Linux OS-information fix](evidence/lean-4.34.1-system-host-diagnosis-2026-09-25.json) matches native host calls in all three engines; three unit checks pass. The same diagnostic confirms incorrect available-memory reporting in Deno/Bun. Terminal tests are running. Pushes await restored SSH credentials.
+**Changed:** [Terminal and full-pipe tests pass in all three installed engines](evidence/lean-4.34.1-terminal-2026-09-25.json): nine deployed executions match 18 native controls; seven driver checks pass. Real terminal detection, binary input and concurrent completion under measured backpressure are verified on Linux x64. Peak memory is 3.44 GiB, with no resource events. Separate upstream compilation-disabled controls are running. Deno/Bun memory reporting still needs repair; pushes await restored SSH credentials.
 
 **Remaining:** Complete latest-release suite/API coverage; shipping engine parity and callable bindings; six-platform native acceptance.
 

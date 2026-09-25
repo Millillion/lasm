@@ -20,7 +20,15 @@ separately from the earlier runtime evidence below.
   [binary-console fixture](docs/evidence/lean-4.34.1-binary-console-2026-09-25.json)
   passes in every installed engine with byte-exact native output, including all
   byte values, split writes, invalid UTF-8 and shutdown flushing. The harness
-  now records raw bytes so decoding cannot hide binary differences. The
+  now records raw bytes so decoding cannot hide binary differences.
+  [Real raw-terminal and full-pipe comparisons](docs/evidence/lean-4.34.1-terminal-2026-09-25.json)
+  now add nine installed executions matching 18 native controls across the
+  three engines. They cover positive terminal detection, `/dev/tty`, concurrent
+  timers while stdin is blocked, buffered binary input, and a 16 KiB writer
+  remaining pending until a measured full 4 KiB pipe is drained. Seven driver
+  controls verify byte routing, failures, deadlines, output bounds and the pipe
+  handshake. Peak memory is 3.44 GiB with no resource events. Cooked terminals,
+  Windows consoles and broader IO lifetime behavior remain open. The
   [ordinary HTTP server](docs/evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json)
   passes sixty unchanged Vitest checks: thirty deployed and thirty native.
   Its retained Bun disk preflight refusal precedes a successful retry after
