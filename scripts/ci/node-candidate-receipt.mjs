@@ -5,7 +5,9 @@ import { execFileSync } from 'node:child_process';
 
 assert.equal(process.env.GITHUB_REPOSITORY, 'Millillion/lasm');
 assert.equal(process.env.GITHUB_REF, 'refs/heads/main');
-const filename = 'lasm-compiler-0.1.0-experimental.36.tgz';
+const version = process.env.LASM_CANDIDATE_VERSION ?? '0.1.0-experimental.36';
+assert.match(version, /^0\.1\.0-experimental\.\d+$/);
+const filename = `lasm-compiler-${version}.tgz`;
 const hash = createHash('sha256');
 for await (const chunk of createReadStream('.work/node-candidate/' + filename)) hash.update(chunk);
 const sha256 = hash.digest('hex');

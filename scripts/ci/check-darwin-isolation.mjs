@@ -1,11 +1,19 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, readFileSync, realpathSync, readdirSync, statSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, realpathSync, readdirSync, statSync, writeSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { tmpdir, homedir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { darwinSandbox, darwinSandboxRules } from './darwin-isolation.mjs';
 
 assert.equal(process.platform, 'darwin');
+const evidence = { platform: process.platform + '-' + process.arch, observations: [] };
+const emit = value => {
+  evidence.observations.push(value);
+  writeFileSync('.work/darwin-isolation-control.json', JSON.stringify(evidence, null, 2) + '\n');
+  // Uncaught assertion failures can discard queued stdout pipe writes. Keep
+  // diagnostics small, synchronous and independently recoverable from a file.
+  writeSync(1, JSON.stringify(value) + '\n');
+};
 const started = Date.now();
 const workspace = realpathSync(mkdtempSync(join(tmpdir(), 'lasm sandbox control λ-')));
 const profile = join(workspace, 'control.sb'), node = realpathSync(process.execPath);
@@ -19,8 +27,8 @@ await assert.rejects(fetch('https://127.0.0.1:443'),e=>e.cause?.code==='EPERM');
 console.log('macOS filesystem and network sandbox verified');`;
 const result = spawnSync('/usr/bin/sandbox-exec', ['-f', profile, node, '--input-type=module', '-e', source],
   { cwd: workspace, env: { PATH: dirname(node), HOME: workspace, TMPDIR: workspace, LANG: 'en_US.UTF-8' }, encoding: 'utf8', timeout: 30000 });
-console.log(JSON.stringify({ code: result.status, signal: result.signal, error: result.error?.message,
-  stdout: result.stdout, stderr: result.stderr }));
+emit({ code: result.status, signal: result.signal, error: result.error?.message,
+  stdout: result.stdout, stderr: result.stderr });
 if (result.status !== 0) {
   const dependencies = spawnSync('/usr/bin/otool', ['-L', node], { encoding: 'utf8', timeout: 10000 });
   console.log('Stock Node loader dependencies:\n' + dependencies.stdout);
@@ -32,7 +40,7 @@ if (result.status !== 0) {
   ]) {
     const probe = spawnSync('/usr/bin/sandbox-exec', ['-f', policy, executable, ...args],
       { cwd: workspace, env: process.env, encoding: 'utf8', timeout: 10000 });
-    console.log(JSON.stringify({ name, code: probe.status, signal: probe.signal, stdout: probe.stdout, stderr: probe.stderr }));
+    emit({ name, code: probe.status, signal: probe.signal, stdout: probe.stdout, stderr: probe.stderr });
   }
   // These diagnostic probes never count as an isolation pass. Use the actual
   // rule array so profile parsing cannot hide a missing diagnostic.
@@ -42,13 +50,14 @@ if (result.status !== 0) {
   forms.push(reading, mapping,
     forms[0].replace('(require-not', '(require-all (subpath "/") (require-not') + ')',
     '(deny file-read-data (subpath "/usr/bin") (subpath "/Applications") (subpath ' + JSON.stringify(process.cwd()) + '))');
-  console.log(JSON.stringify({ diagnosticRules: forms.length, profile: readFileSync(profile, 'utf8') }));
+  emit({ diagnosticRules: forms.length, profile: readFileSync(profile, 'utf8') });
   for (const [index, form] of forms.entries()) {
     const probeProfile = join(workspace, `rule-${index}.sb`);
     writeFileSync(probeProfile, '(version 1)\n(allow default)\n' + form + '\n');
     const probe = spawnSync('/usr/bin/sandbox-exec', ['-f', probeProfile, node, '--version'],
-      { cwd: workspace, env: { ...process.env, DYLD_PRINT_LIBRARIES: '1' }, encoding: 'utf8', timeout: 10000 });
-    console.log(JSON.stringify({ rule: form, code: probe.status, signal: probe.signal, stdout: probe.stdout, stderr: probe.stderr }));
+      { cwd: workspace, env: process.env, encoding: 'utf8', timeout: 10000 });
+    emit({ rule: form, code: probe.status, signal: probe.signal, error: probe.error?.message,
+      stdout: probe.stdout?.slice(-2000), stderr: probe.stderr?.slice(-2000) });
   }
   for (const directory of [join(homedir(), 'Library/Logs/DiagnosticReports'), join(workspace, 'Library/Logs/DiagnosticReports'), '/Library/Logs/DiagnosticReports']) {
     try { for (const name of readdirSync(directory).filter(name => /^(?:node|sandbox-exec)[-_]/.test(name))) {

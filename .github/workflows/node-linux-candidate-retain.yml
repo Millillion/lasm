@@ -2,6 +2,10 @@ name: Retain a verified Linux Node candidate
 on:
   workflow_dispatch:
     inputs:
+      candidate-version:
+        description: Exact version of the already tested candidate
+        required: true
+        type: string
       candidate-cache-key:
         description: Exact cache key of the already tested candidate
         required: true
@@ -32,6 +36,7 @@ jobs:
       contents: write
       actions: read
     env:
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
       LASM_CANDIDATE_SHA256: ${{ inputs.candidate-sha256 }}
       LASM_CANDIDATE_SOURCE_REVISION: ${{ inputs.candidate-source-revision }}
       LASM_ACCEPTANCE_RUN_ID: ${{ inputs.acceptance-run-id }}
@@ -47,7 +52,7 @@ jobs:
         run: node --max-old-space-size=128 scripts/ci/node-candidate-acceptance.mjs
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.36.tgz
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
           key: ${{ inputs.candidate-cache-key }}
           fail-on-cache-miss: true
       - name: Verify original archive identity and prepare its receipt
@@ -60,9 +65,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "node-linux-candidate-$GITHUB_RUN_ID" \
-            .work/node-candidate/lasm-compiler-0.1.0-experimental.36.tgz \
+            ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" \
             .work/node-candidate/SHA256SUMS.txt \
             .work/node-candidate/acceptance.json \
             --draft --prerelease --target "$GITHUB_SHA" \
-            --title 'Lasm Linux Node candidate 0.1.0-experimental.36' \
+            --title "Lasm Linux Node candidate $LASM_CANDIDATE_VERSION" \
             --notes-file .work/node-candidate/notes.md
