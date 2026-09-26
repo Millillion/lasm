@@ -1,0 +1,86 @@
+{
+  "recordedAt": "2026-09-26T19:33:50.222843+00:00",
+  "scope": "Read-only file-size inventory of the local pinned native Lean standard module-data tree; excludes project metadata. Not a runtime access trace or proof that any file can be removed.",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "nativeToolchainArtifactId": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+  "directory": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/lib/lean",
+  "standardModuleDataBytes": 2213191695,
+  "byExtension": {
+    ".ilean": {
+      "files": 2520,
+      "bytes": 87235439
+    },
+    ".ir": {
+      "files": 2518,
+      "bytes": 375733920
+    },
+    ".ir.sig": {
+      "files": 2518,
+      "bytes": 443168
+    },
+    ".olean": {
+      "files": 2520,
+      "bytes": 356396336
+    },
+    ".olean.private": {
+      "files": 2518,
+      "bytes": 1361249936
+    },
+    ".olean.server": {
+      "files": 2518,
+      "bytes": 32132896
+    }
+  },
+  "byTopLevelPath": {
+    "Init": {
+      "files": 3894,
+      "bytes": 410446145
+    },
+    "Lake": {
+      "files": 960,
+      "bytes": 110121112
+    },
+    "LakeMain": {
+      "files": 6,
+      "bytes": 21311
+    },
+    "Lean": {
+      "files": 7308,
+      "bytes": 1333640804
+    },
+    "LeanChecker": {
+      "files": 2,
+      "bytes": 448889
+    },
+    "LeanIR": {
+      "files": 6,
+      "bytes": 1533199
+    },
+    "Leanc": {
+      "files": 2,
+      "bytes": 264062
+    },
+    "Std": {
+      "files": 2934,
+      "bytes": 356716173
+    }
+  },
+  "recordedCandidateTotalModuleDataBytes": 2213311663,
+  "differenceFromCandidateTotalBytes": 119968,
+  "sources": {
+    "packager": "src/application-metadata.mjs",
+    "selection": "src/application-reachability.mjs",
+    "registry": "scripts/full-lean/generate-exports.mjs",
+    "leanEnvironment": "https://github.com/leanprover/lean4/blob/5045d0056413266e57c625dcd7c365b10e377c52/src/Lean/Environment.lean",
+    "leanInterpreter": "https://github.com/leanprover/lean4/blob/5045d0056413266e57c625dcd7c365b10e377c52/src/library/ir_interpreter.cpp"
+  },
+  "findings": [
+    "The current packager copies all recognized module-data files under lib/lean plus discovered package roots when runtime metadata is required.",
+    "The 4.34.1 default importModules level is private. The default module reader loads public, server and private serialized regions together, and the private region can reference the server region. Blind deletion of private/server files is unsafe.",
+    "The full symbol registry takes addresses of all available compiled Lean declarations, preserving their code during linking.",
+    "The two-architecture acceptance suite tests one standard-module import/evaluation program with seven inputs; this is not proof of arbitrary metaprogram compatibility."
+  ],
+  "implementationChanged": false,
+  "heavyBuildRun": false
+}

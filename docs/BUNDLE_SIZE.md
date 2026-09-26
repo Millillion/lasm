@@ -190,3 +190,74 @@ source identities before restoring the archive. The draft targets the retention
 commit; notes distinguish package, validation and retention revisions. The
 runner's newer GitHub CLI also required explicit handling of captured ANSI-bearing
 logs. Neither correction changed the package or repeated the native builds.
+
+## Unfinished runtime-evaluation packaging
+
+Jordan clarified that multi-gigabyte deployments are unacceptable. The ordinary
+application reduction remains verified, but the overall bundle-size checklist
+item is open until the broad fallback is replaced or substantially reduced.
+The investigation below changes no runtime behavior and adds no acceptance claim.
+
+The current fallback combines three distinct needs: compiler/kernel runtime
+initialization, names resolved dynamically to compiled symbols, and module files
+loaded at runtime. Any live stateful C++ dependency or dynamic lookup currently
+selects the complete runtime registry and module-data path. The registry takes
+addresses of all available compiled Lean declarations, rooting their code.
+`applicationMetadata` then inventories all matching files in `lib/lean` and all
+discovered package metadata roots, rather than computing a runtime module closure.
+
+A [read-only inventory](evidence/bundle-size-fallback-inventory-2026-09-26.json)
+of the pinned local standard library found 2,213,191,695 bytes. The CI deployment
+has 2,213,311,663 bytes of module data including project roots, so these inventories
+must not be presented as identical. The standard-library breakdown is:
+
+| Data | Bytes |
+| --- | ---: |
+| Private module data (`.olean.private`) | 1,361,249,936 |
+| Public/module environments (`.olean`) | 356,396,336 |
+| Interpreter IR (`.ir`) | 375,733,920 |
+| IR signatures (`.ir.sig`) | 443,168 |
+| Editor reference indexes (`.ilean`) | 87,235,439 |
+| Server module data (`.olean.server`) | 32,132,896 |
+
+The extension names alone do not prove removability. Lean's pinned default
+`importModules` uses the private level, and its default module reader loads public,
+server and private serialized regions together. Private regions can reference
+server regions. Removing a companion file or switching import levels without
+preserving observable environment behavior is not a valid optimization. The
+[upstream module documentation](https://lean-lang.org/doc/reference/latest/Source-Files-and-Modules/)
+and [pinned import implementation](https://github.com/leanprover/lean4/blob/5045d0056413266e57c625dcd7c365b10e377c52/src/Lean/Environment.lean)
+explain these distinct artifact roles and loading requirements.
+
+Proposed implementation order:
+
+1. Separate compiler/kernel initialization, module import, interpretation, dynamic
+   symbol lookup and language-server needs. A dependency on one capability should
+   not automatically root every other capability.
+2. Determine required module roots where provable and retain their transitive
+   imports, artifact parts, extensions and initializers. Preserve ordinary Lean
+   APIs. Runtime-computed module names require a separately specified deployment
+   dependency set or a module provider; source imports and execution traces alone
+   cannot prove the complete set.
+3. Replace the all-declarations registry with the compiled symbols required by
+   the supported deployment graph. Investigate using Lean's existing IR
+   interpreter for additional Lean bodies, retaining native externs and initialized
+   values. This requires differential tests of initialization, foreign calls,
+   interpreter behavior and reflection before claiming compatibility.
+4. Make truly open-ended module availability an explicit deployment concern.
+   An independently provisioned runtime/module pack, or an opt-in verified module
+   provider, can keep application artifacts smaller. Those bytes, startup costs
+   and deployment dependencies still exist; moving them is not total-size removal.
+   Offline self-contained delivery must carry the selected dependency set.
+5. Add component size reports, enforceable build size limits and CI budgets for
+   runtime import/evaluation on both native architectures. Expand beyond the
+   existing single import/evaluation program. Include runtime-selected names,
+   private imports, environment inspection, initializers, externs, absent modules,
+   and execution with original build caches denied. Retain ordinary-app budgets.
+
+Compression is a secondary option. A smaller archive does not by itself reduce
+materialized module data, startup work or disk requirements. Lazy decompression
+or loading needs a measured design compatible with Lean's file access and region
+lifetimes. No small universal size target for a complete compiler/proof service
+has been established. The 2.39 GB result is current packaging overhead, not a
+proven inherent floor of Lean or WebAssembly.
