@@ -5,8 +5,12 @@ import { join, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 
 const root = resolve(process.argv[2]);
+const version = process.argv[3] ?? '4.34.0';
+if (!['4.34.0', '4.34.1'].includes(version)) throw new Error('Unverified Windows manifest patch version');
 const inputs = {
-  'src/CMakeLists.txt': '037075df7198856d4b14095ebcde87733922c045a23c26b897e52cb6c5bda3a7',
+  'src/CMakeLists.txt': version === '4.34.0'
+    ? '037075df7198856d4b14095ebcde87733922c045a23c26b897e52cb6c5bda3a7'
+    : '1b84c50d9892f7ca5801d78ca0326c9107ea108a10f5c4617785cd06b1e99948',
   'stage0/src/CMakeLists.txt': '51a789a8bb01612cdb998aaad6a3bc6df31b5628c247745f81d94345e3e182fd',
 };
 const hash = text => createHash('sha256').update(text).digest('hex');

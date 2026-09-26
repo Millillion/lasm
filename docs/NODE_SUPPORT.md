@@ -1,4 +1,4 @@
-# Linux Node candidate support contract
+# Linux and macOS Node candidate support contract
 
 The first release contract is ordinary Lean `main`, console output, arguments,
 exit status, compilation diagnostics, and a tiny Lake project with local imports.
@@ -8,9 +8,9 @@ The exact [runtime exclusions are in the README](../README.md#lean-support-and-r
 Full standard-library compatibility is not claimed.
 
 The validated targets are Ubuntu 24.04.5 LTS (glibc 2.39) on native x86-64 and ARM64,
-Node 26.10.0 with its npm, and Lean 4.34.1. Use stock Node without special flags.
+plus macOS 15.7.9 (24G830) on native x86-64 and ARM64. All use Node 26.10.0 with its npm and Lean 4.34.1. Use stock Node without special flags.
 Other distributions, older system libraries, Node versions and Lean versions are
-unverified. This candidate requires glibc 2.39 or newer; musl-based distributions
+unverified. Linux requires glibc 2.39 or newer; musl-based distributions
 such as Alpine are unsupported. Linux builds require the standard OS shell, loader, libc and system
 libraries supplied by Ubuntu; no separately installed developer tools are required.
 See the [current acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
@@ -25,7 +25,8 @@ package's `src/*tools.json` and `src/toolchains.json`. No global configuration o
 administrator access is required.
 
 Pinned compressed tool downloads, including Git for a Lake project, total
-979,054,712 bytes on x86-64 and 910,904,894 bytes on ARM64. A standalone file skips
+979,054,712 bytes on Linux x86-64, 910,904,894 on Linux ARM64,
+919,472,748 on Intel Mac and 925,010,880 on Apple Silicon. A standalone file skips
 the Git download. These totals exclude the npm package and generated build files;
 unpacked tools and build caches occupy several GB. The acceptance report records
 observed disk usage, build times and deployment sizes separately. These are
@@ -37,9 +38,8 @@ fallback. The retained historical `.34` archive predates this restriction. See t
 [size report](https://github.com/Millillion/lasm/blob/main/docs/BUNDLE_SIZE.md).
 
 Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm` on Linux and
-`$HOME/Library/Caches/lasm` on macOS. Both native Mac architectures passed their complete installed/deployment checks
-with candidate `.37`; retention of the full-matrix candidate remains pending. The quick-start archive
-remains the retained Linux `.35` candidate. Set
+`$HOME/Library/Caches/lasm` on macOS. Candidate `.37` is retained and passed the complete installed/deployment checks
+on both Linux and both Mac architectures. Set
 `LASM_TOOLCHAIN_CACHE` to choose another directory. Compiled application caches
 live under the source project's `.lake/lasm/`. Hash checks detect changes to
 sources, tool descriptions, runtime inputs and generated outputs; an unchanged

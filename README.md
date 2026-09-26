@@ -8,12 +8,12 @@ The package is experimental and **has not been published to npm**.
 
 ## Get started
 
-The retained quick-start candidate currently targets Linux. Get the tested `.35` tarball identified in the
+On a supported Linux or Mac machine, get the tested `.37` tarball identified in the
 [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
 from a maintainer (repository access may be required). In an empty directory:
 
 ```sh
-npm install /path/to/lasm-compiler-0.1.0-experimental.35.tgz
+npm install /path/to/lasm-compiler-0.1.0-experimental.37.tgz
 ```
 
 Save this complete program as `Main.lean`:
@@ -78,9 +78,9 @@ compatibility launchers. These interfaces have no current release support guaran
 
 | Environment | Architectures | Current status |
 | --- | --- | --- |
-| Ubuntu 24.04.5 LTS, glibc 2.39, Node 26.10.0 | x86-64 and ARM64 | Native installed-package acceptance passed for candidates `.35` and `.36`. |
+| Ubuntu 24.04.5 LTS, glibc 2.39, Node 26.10.0 | x86-64 and ARM64 | Candidate `.37` passed native installed-package and copied-deployment acceptance. |
 | Other Linux distributions | x86-64 and ARM64 | Unverified; glibc 2.39 or newer is required. Alpine/musl is unsupported. |
-| macOS 15.7.9 | x86-64 and ARM64 | Candidate `.37` passed native installed-package and copied-deployment acceptance. Retention of the full-matrix candidate is pending. |
+| macOS 15.7.9 | x86-64 and ARM64 | Candidate `.37` passed native installed-package and copied-deployment acceptance. |
 | Windows | x86-64 and ARM64 | Implementation in progress; not yet supported. |
 | Deno, Bun, browsers, Cloudflare Workers | Any | Not supported by the release candidate. |
 | Lambda, Netlify, other serverless services | Any | No deployment adapter or platform acceptance yet. |
@@ -92,7 +92,7 @@ The [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_A
 
 ## Lean support and restrictions
 
-**Candidate `.35` and current source builds enforce ahead-of-time execution.**
+**Candidate `.37` and current source builds enforce ahead-of-time execution.**
 The older `.34` candidate predates these restrictions; do not use it to enforce
 this policy.
 
