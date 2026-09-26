@@ -37,3 +37,14 @@ export function darwinMemory() {
   return { total: totalmem(), available: pages('Pages free') + pages('Pages inactive') + pages('Pages speculative'),
     compressed: pages('Pages occupied by compressor') };
 }
+
+export function darwinStopReason(bytes, memory, initial, limits) {
+  if (bytes >= limits.stopMemoryBytes) return 'Workload reached its proactive RSS budget';
+  if (memory.available < limits.hostReserveBytes) return 'Host memory reserve';
+  // Compression is host-wide and can grow while available memory increases.
+  // Treat it as an early pressure signal near the reserve, not as allocation
+  // attributable to this process tree. This stops 512 MiB before the reserve.
+  if (memory.compressed - initial.compressed > limits.maximumCompressionGrowthBytes &&
+      memory.available < limits.compressionReserveBytes) return 'Host compression growth near reserve';
+  return null;
+}

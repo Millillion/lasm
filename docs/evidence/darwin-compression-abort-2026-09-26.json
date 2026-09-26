@@ -1,0 +1,110 @@
+{
+  "platform": "darwin-arm64",
+  "sourceRevision": "b14175d5bbfc566cfdf337068168f1d4731c5eeb",
+  "archiveSha256": "c71616146d9f3decf9b6a93d4a142f9cabae02ee63e2ec50f8d8cdd95827c5f7",
+  "node": "v26.10.0",
+  "osRelease": "ProductName:\t\tmacOS\nProductVersion:\t\t15.7.9\nBuildVersion:\t\t24G830\n",
+  "passed": false,
+  "runId": "36273151378",
+  "jobId": "108490794176",
+  "url": "https://github.com/Millillion/lasm/actions/runs/36273151378/job/108490794176",
+  "classification": "resource-aborted; not an application assertion failure",
+  "completedCommands": [
+    {
+      "label": "npm install candidate",
+      "seconds": 6.050685458,
+      "code": 0,
+      "stdout": "\nadded 7 packages in 6s\n"
+    },
+    {
+      "label": "npm version",
+      "seconds": 0.11985674999999991,
+      "code": 0,
+      "stdout": "11.19.1\n"
+    },
+    {
+      "label": "cold npx lasm Main.lean",
+      "seconds": 387.314383417,
+      "code": 0,
+      "stdout": "Hello from Lean! 2 + 3 = 5\n"
+    },
+    {
+      "label": "npx lasm build Main.lean",
+      "seconds": 18.291252584000002,
+      "code": 0,
+      "stdout": ""
+    }
+  ],
+  "resources": {
+    "unit": "b0eb9335-fb8e-44a3-8a23-025da1dab456",
+    "report": "/Users/runner/work/lasm/lasm/.work/node-darwin-resources.json",
+    "monitorPid": 6098,
+    "mechanism": "macOS process-tree RSS monitor",
+    "hardCap": false,
+    "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+    "limits": {
+      "memoryMax": null,
+      "stopMemoryBytes": 3006477107,
+      "hostReserveBytes": 1610612736,
+      "maximumCompressionGrowthBytes": 134217728,
+      "sampleMs": 250
+    },
+    "startedAt": "2026-09-26T21:30:45.585Z",
+    "hostAtStart": {
+      "total": 7516192768,
+      "available": 3239559168,
+      "compressed": 372572160
+    },
+    "minimumHostAvailable": 3076800512,
+    "peakMemoryBytes": 1653964800,
+    "peakTasks": 7,
+    "resourceLimited": true,
+    "unitReleased": true,
+    "status": "finished",
+    "updatedAt": "2026-09-26T21:37:53.114Z",
+    "processGroup": 6100,
+    "command": [
+      "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+      "scripts/check-node-darwin.mjs",
+      "/Users/runner/work/lasm/lasm/.work/node-darwin-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.36.tgz",
+      "c71616146d9f3decf9b6a93d4a142f9cabae02ee63e2ec50f8d8cdd95827c5f7"
+    ],
+    "lastSample": {
+      "bytes": 255410176,
+      "host": {
+        "total": 7516192768,
+        "available": 3527491584,
+        "compressed": 512573440
+      },
+      "processes": [
+        {
+          "pid": 6100,
+          "parent": 6098,
+          "group": 6100,
+          "bytes": 59932672,
+          "started": "Sat Sep 26 21:30:45 2026",
+          "identity": "6100:Sat Sep 26 21:30:45 2026",
+          "command": "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node"
+        },
+        {
+          "pid": 6109,
+          "parent": 6100,
+          "group": 6100,
+          "bytes": 195477504,
+          "started": "Sat Sep 26 21:30:45 2026",
+          "identity": "6109:Sat Sep 26 21:30:45 2026",
+          "command": "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node"
+        }
+      ]
+    },
+    "stoppedBecause": "Host compression growth",
+    "finishedAt": "2026-09-26T21:37:53.114Z",
+    "result": {
+      "code": null,
+      "signal": "SIGTERM"
+    }
+  },
+  "interpretation": "Host-wide compression grew while available memory increased and workload RSS fell. Preserve this abort. The next monitor treats compression growth as an early stop below a 2 GiB available reserve, while the independent 1.5 GiB reserve and 40 percent physical RAM RSS ceiling remain.",
+  "reference": "https://support.apple.com/guide/activity-monitor/view-memory-usage-actmntr1004/10.14/mac/15.0"
+}

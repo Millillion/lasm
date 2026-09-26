@@ -7,7 +7,7 @@ import { mkdirSync, existsSync, writeFileSync, rmSync, renameSync } from 'node:f
 import { dirname, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { darwinMemory, darwinProcesses, workloadProcesses } from './darwin-resources.mjs';
+import { darwinMemory, darwinProcesses, workloadProcesses, darwinStopReason } from './darwin-resources.mjs';
 
 assert.equal(process.platform, 'darwin');
 const args = process.argv.slice(2), separator = args.indexOf('--');
@@ -27,14 +27,14 @@ const unit = randomUUID(), host = darwinMemory(), reserve = 1536 * 1024 ** 2;
 // additional private allocation: subtracting the initial host reserve from RSS
 // stopped wasm-ld with 3.1 GB still available. Keep independent limits instead:
 // at most 40% of physical RAM in sampled aggregate RSS, plus the continuously
-// checked host reserve and compression-growth stop. No kernel cap is claimed.
+// checked host reserve and early compression-pressure stop. No kernel cap is claimed.
 const budget = Math.floor(Math.min(requested * 1024 ** 2, host.total / 2));
 const evidence = { unit, report, monitorPid: process.pid, mechanism: 'macOS process-tree RSS monitor', hardCap: false,
   limitations: 'Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.',
   limits: { memoryMax: null, stopMemoryBytes: Math.floor(budget * 0.8), hostReserveBytes: reserve,
-    maximumCompressionGrowthBytes: 128 * 1024 ** 2, sampleMs: 250 },
+    maximumCompressionGrowthBytes: 128 * 1024 ** 2, compressionReserveBytes: reserve + 512 * 1024 ** 2, sampleMs: 250 },
   startedAt: new Date().toISOString(), hostAtStart: host, minimumHostAvailable: host.available,
-  peakMemoryBytes: 0, peakTasks: 0, resourceLimited: false, unitReleased: false, status: 'starting' };
+  peakMemoryBytes: 0, peakCompressionGrowthBytes: 0, peakTasks: 0, resourceLimited: false, unitReleased: false, status: 'starting' };
 const save = () => { evidence.updatedAt = new Date().toISOString(); writeFileSync(report + '.tmp', JSON.stringify(evidence, null, 2) + '\n'); renameSync(report + '.tmp', report); };
 let child, timer, stopping, result, seen = new Set();
 const current = () => child?.pid ? workloadProcesses(darwinProcesses(), child.pid, seen) : [];
@@ -68,10 +68,10 @@ try {
       evidence.peakMemoryBytes = Math.max(evidence.peakMemoryBytes, bytes);
       evidence.peakTasks = Math.max(evidence.peakTasks, processes.length);
       evidence.minimumHostAvailable = Math.min(evidence.minimumHostAvailable, memory.available);
+      evidence.peakCompressionGrowthBytes = Math.max(evidence.peakCompressionGrowthBytes, memory.compressed - host.compressed);
       evidence.lastSample = { bytes, host: memory, processes };
-      if (bytes >= evidence.limits.stopMemoryBytes) stop('Workload reached its proactive RSS budget');
-      if (memory.available < reserve) stop('Host memory reserve');
-      if (memory.compressed - host.compressed > evidence.limits.maximumCompressionGrowthBytes) stop('Host compression growth');
+      const reason = darwinStopReason(bytes, memory, host, evidence.limits);
+      if (reason) stop(reason);
       if (stopping && Date.now() - stopping > 3000) terminate('SIGKILL');
       save();
     } catch (error) { evidence.monitorError = error.message; stop('Resource monitor failed'); }
