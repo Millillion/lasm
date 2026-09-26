@@ -1,5 +1,10 @@
 # Linux Node acceptance
 
+The newer `.34` candidate also passed on both native architectures, including
+size regression controls, broader language/filesystem fixtures and isolated
+runtime evaluation. See [the current size and acceptance report](BUNDLE_SIZE.md).
+The historical `.32` results below remain unchanged.
+
 Completed 2026-09-26: native Linux x86-64 and ARM64 passed the complete basic
 application workflow using the same npm tarball. The candidate remains unpublished
 to npm.

@@ -13,7 +13,12 @@ const packageSourceRevision = process.env.LASM_CANDIDATE_SOURCE_REVISION;
 assert.match(runId, /^\d+$/);
 assert.match(archiveSha256, /^[a-f0-9]{64}$/);
 assert.match(packageSourceRevision, /^[a-f0-9]{40}$/);
-const api = path => execFileSync('gh', ['api', `repos/${repository}/${path}`],
+// Newer gh versions reject ANSI-bearing job logs by default, even when captured
+// into a pipe. Raw logs are parsed here, never printed or executed in a terminal.
+const supportsRawLogs = execFileSync('gh', ['api', '--help'],
+  { encoding: 'utf8', timeout: 10_000 }).includes('--allow-escape-sequences');
+const api = path => execFileSync('gh', ['api', `repos/${repository}/${path}`,
+  ...(supportsRawLogs && path.endsWith('/logs') ? ['--allow-escape-sequences'] : [])],
   { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, timeout: 60_000 });
 const run = JSON.parse(api(`actions/runs/${runId}`));
 assert.equal(String(run.id), runId);
