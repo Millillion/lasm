@@ -107,9 +107,55 @@ These measurements are practical reductions, not a proof of a universal minimum.
 Live code, data, initialization and runtime evaluation legitimately increase size.
 The compiler-capable fallback is still large and has not been minimized here.
 
+The local Hello bundle contains 1,354,029 bytes of Wasm, 1,158,552 bytes
+of the selected native IO adapter, 242,484 bytes of JavaScript glue and 180,885
+bytes of third-party notices. The adapter already has no ELF debug/symbol-table
+payload to strip. Further substantial reductions to that fixed adapter would
+require an IO implementation change; removing it would break supported behavior.
+The size strategy is applied by default on every build, without a hand-maintained
+list of allowed Lean modules or user annotations.
+
 All local build campaigns use one workload, one linker/Binaryen worker, base
 pages and the existing memory/disk guards. The final static campaign peaked at
 1.16 GiB and the HTTP campaign at 1.06 GiB, with no OOM events. Earlier attempts
 that stopped at the disk reserve remain resource aborts, not behavior failures.
 See [recorded evidence](evidence/bundle-size-2026-09-26.json) for exact inputs,
 intermediate failures, resource reports and candidate acceptance status.
+
+## Installed candidate verification
+
+Candidate `0.1.0-experimental.34`, source
+`484f86c3ab688660c2707b865442130d784e818e`, packed reproducibly with SHA-256
+`8af35118e9919f7cd0529507ee7c693a78ba55064bbfefbea35237235e7cd027`.
+The archive is 65,335,003 bytes; deployment reduction does not remove the build
+libraries needed to compile different applications from the npm package.
+
+Native Linux x86-64 passed [installed-package CI](https://github.com/Millillion/lasm/actions/runs/36250526691/job/108427789071).
+Native ARM64 acceptance is running against that same archive; it is not yet a pass.
+The packaging job passed 113 Node tests and three Python cache-advice controls.
+The [x86-64 evidence](evidence/bundle-size-linux-x64-2026-09-26.json) records
+49 command checks, eight isolated deployments and nine execution cases. The
+runtime-evaluation output was moved instead of copied to avoid a duplicate large
+module-data tree; access to original source, package and tools was still denied.
+
+| Complete deployment | Linux x86-64, bytes |
+| --- | ---: |
+| Hello | 3,209,670 |
+| Hello plus 1,000 unused functions | 3,209,672 |
+| Tiny Lake project | 3,210,293 |
+| Language and JSON fixture | 2,881,825 |
+| Same fixture with legacy imports | 3,592,645 |
+| Filesystem fixture | 3,298,829 |
+| Runtime evaluation with full module data | 2,385,695,830 |
+
+Hello and the unused-function variant have exactly the same Wasm SHA-256.
+The recorded x86-64 cold build took 278.71 seconds, while median first stdout
+from plain Node was 0.268 seconds across three samples. These are observations
+from one runner and this candidate, not guarantees for other workloads or hosts.
+The expanded campaign peaked at 4.74 GiB with no OOM or resource abort.
+
+Full runtime evaluation remains a deliberately broad compatibility fallback,
+**not a minimized compiler distribution**. Its 2.39 GB output must not be confused
+with the small ordinary-application measurements. Further work on compiler/module
+packaging needs its own correctness evidence; application code elimination must
+not silently remove runtime-resolved declarations or change initializer effects.

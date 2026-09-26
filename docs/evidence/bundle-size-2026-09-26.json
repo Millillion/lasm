@@ -717,13 +717,36 @@
   ],
   "resourcePolicy": "One guarded local build at a time, 8 GiB cap, proactive stop below cap, no swap, one Binaryen worker, base pages, four-GiB disk reserve. No OOM events. Aborted duplicate metadata was hard-linked only after byte-identity verification; evidence paths and bytes preserved.",
   "installedCandidate": {
-    "status": "pending",
-    "version": "0.1.0-experimental.34",
-    "nativeArchitectures": [
-      "x64",
-      "arm64"
-    ],
-    "retainedPreviousCandidate": "0.1.0-experimental.32",
+    "status": "linux-x64 passed; native ARM64 running",
+    "candidate": {
+      "scope": "Reproducible local npm packing; native installed acceptance is separate",
+      "tarball": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz",
+      "sha256": "8af35118e9919f7cd0529507ee7c693a78ba55064bbfefbea35237235e7cd027",
+      "sourceRevision": "484f86c3ab688660c2707b865442130d784e818e",
+      "candidateVersion": "0.1.0-experimental.34",
+      "defaultLean": "4.34.1",
+      "node": "26.10.0",
+      "runtime": {
+        "identity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+        "name": "lean-4.34.1-wasm64"
+      },
+      "reproduciblePacking": true,
+      "compressedBytes": 65335003,
+      "installedBytes": 377760788,
+      "files": 232,
+      "resourceReport": "/home/runner/work/lasm/lasm/.work/node-package-resources.json",
+      "recordedAt": "2026-09-26T15:03:20.184Z"
+    },
+    "run": "https://github.com/Millillion/lasm/actions/runs/36250526691",
+    "linux-x64": {
+      "passed": true,
+      "evidence": "bundle-size-linux-x64-2026-09-26.json",
+      "jobId": 108427789071
+    },
+    "linux-arm64": {
+      "status": "running",
+      "jobId": 108431156365
+    },
     "npmPublished": false
   },
   "legacyImports": {
