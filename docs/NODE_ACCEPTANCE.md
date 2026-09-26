@@ -120,3 +120,5 @@ their disk reserves; Linux recorded zero OOM events.
 
 Intel Mac and Linux ARM64 are still running. Retention of `.37` waits for the
 whole matrix; this partial result does not replace the retained `.35` quick start.
+
+Both macOS 15.7.9 targets now pass candidate `.37` (SHA-256 `622abcb5fa5aac5887f31cd3cc776fc44fa087c55ce5ede54e75d40c2ee8b32e`). [Intel evidence](evidence/node37-darwin-x64-2026-09-26.json) records all eight isolated copied deployments, no resource abort, a 2,363,092,992-byte sampled RSS peak and a 7,815,147,520-byte minimum host availability. Mac monitoring is sampled, not a kernel memory cap. Linux ARM64 regression and full-matrix retention are still running.

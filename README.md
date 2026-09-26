@@ -80,9 +80,8 @@ compatibility launchers. These interfaces have no current release support guaran
 | --- | --- | --- |
 | Ubuntu 24.04.5 LTS, glibc 2.39, Node 26.10.0 | x86-64 and ARM64 | Native installed-package acceptance passed for candidates `.35` and `.36`. |
 | Other Linux distributions | x86-64 and ARM64 | Unverified; glibc 2.39 or newer is required. Alpine/musl is unsupported. |
-| macOS 15.7.9 | ARM64 | Candidate `.37` passed native installed-package and copied-deployment acceptance. Retention of the full-matrix candidate is pending. |
-| macOS 15 | x86-64 | Native validation is in progress. Not yet a supported release target. |
-| Windows | x86-64 and ARM64 | Follows macOS; not yet supported. |
+| macOS 15.7.9 | x86-64 and ARM64 | Candidate `.37` passed native installed-package and copied-deployment acceptance. Retention of the full-matrix candidate is pending. |
+| Windows | x86-64 and ARM64 | Implementation in progress; not yet supported. |
 | Deno, Bun, browsers, Cloudflare Workers | Any | Not supported by the release candidate. |
 | Lambda, Netlify, other serverless services | Any | No deployment adapter or platform acceptance yet. |
 

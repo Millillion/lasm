@@ -2,13 +2,13 @@ name: Native Windows ARM64 SDK bootstrap
 on:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: windows-arm64-sdk-bootstrap
   cancel-in-progress: false
 jobs:
   bootstrap:
-    if: github.event.repository.visibility == 'public'
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     runs-on: windows-11-arm
     timeout-minutes: 330
     env:
@@ -51,8 +51,12 @@ jobs:
           $bash = Join-Path $env:MSYS2_LOCATION 'usr/bin/bash.exe'
           $env:LASM_BOOTSTRAP_NODE = (Get-Command node).Source
           node scripts/full-lean/run-bounded.mjs --report .work/windows-arm64-sdk-resources.json -- $bash --login scripts/full-lean/bootstrap-windows-arm64-sdk.sh
+      - name: Retain verified SDK bytes in an unpublished draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node --max-old-space-size=128 scripts/ci/windows-bootstrap-retain.mjs sdk
       - name: Preserve bounded results in logs
         if: always()
         run: |
           node -e "const f=require('node:fs');for(const p of ['.work/windows-sdk-guard-control.json','.work/windows-arm64-sdk/result.json','.work/windows-arm64-sdk/distribution/result.json','.work/windows-arm64-sdk-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
-      # One free standard public-repository runner; no artifact or cache storage.
+      # Standard public runner; no paid Actions artifact or cache storage.
