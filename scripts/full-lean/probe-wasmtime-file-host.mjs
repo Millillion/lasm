@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync } from 'node:child_process';
 import { ensureResourceGuard } from './resource-guard.mjs';
 import { createWasmtimeFileHost } from '../../src/wasmtime-file-host.mjs';
+import { wasiErrno } from '../../src/wasmtime-native-stdio.mjs';
 
 await ensureResourceGuard();
 const [helperArg, outputArg, ...extra] = process.argv.slice(2);
@@ -75,6 +76,29 @@ try {
   assert.equal((await request({ operation: 'openat', directory: dir, path: Buffer.from('child'), flags: 0, mode: 0 })).errno, 8);
   fd = (await success({ operation: 'openat', directory: 9999, path, flags: 0, mode: 0 })).fd; await close(fd);
   report.checks.push('native ENOENT, EBADF and EISDIR; openat retains directory identity after rename; absolute paths ignore dirfd'); save();
+
+  // Python uses the native openat syscall independently of the adapter. Check
+  // competing errors, rather than assuming a missing dirfd always wins.
+  const nonDirectory = join(output, 'not-a-directory'); writeFileSync(nonDirectory, 'x');
+  const fileDirectory = await open(nonDirectory);
+  try {
+    for (const [directoryKind, guestDirectory, relativePath, flags] of [
+      ['invalid', 9999, '', 0], ['invalid', 9999, 'child', 0],
+      ['invalid', 9999, 'x'.repeat(4096), 0], ['invalid', 9999, 'child', 0x410000],
+      ['file', fileDirectory, '', 0], ['file', fileDirectory, 'child', 0],
+      ['file', fileDirectory, 'x'.repeat(4096), 0], ['file', fileDirectory, 'child', 0x410000],
+    ]) {
+      const native = spawnSync('python3', ['-I', '-B', '-c',
+        'import os,sys,errno\nd=-1 if sys.argv[1]=="invalid" else os.open(sys.argv[2],os.O_RDONLY)\ntry:\n f=os.open(sys.argv[3],int(sys.argv[4]),dir_fd=d)\n os.close(f)\n print("SUCCESS")\nexcept OSError as e: print(errno.errorcode[e.errno])\nfinally:\n if d>=0: os.close(d)',
+        directoryKind, join(output, 'not-a-directory'), relativePath, String(flags)], { encoding: 'utf8', timeout: 10_000 });
+      assert.equal(native.status, 0, native.stderr); assert.notEqual(native.stdout.trim(), 'SUCCESS');
+      const expected = wasiErrno({ code: native.stdout.trim() });
+      assert.equal((await request({ operation: 'openat', directory: guestDirectory,
+        path: Buffer.from(relativePath), flags, mode: 0 })).errno, expected,
+      `${directoryKind} directory, path length ${relativePath.length}, flags ${flags}`);
+    }
+  } finally { await close(fileDirectory); }
+  report.checks.push('eight native openat error-precedence comparisons: invalid/file dirfd, empty/long paths and invalid flags'); save();
 
   const concurrent = join(output, 'concurrent'); writeFileSync(concurrent, Buffer.from(Array.from({ length: 100 }, (_, index) => index)));
   fd = await open(concurrent);

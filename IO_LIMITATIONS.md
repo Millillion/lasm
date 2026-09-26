@@ -1,5 +1,13 @@
 # Current IO limitations in Lasm
 
+Broader API parity is deferred by the [current first milestone](docs/PLAN.md),
+which covers basic ordinary Lean programs installed and run in Node on Linux
+x86-64 and ARM64. This file preserves the wider compatibility backlog.
+The final [module-data repair](docs/evidence/wasmtime-module-data-repair-2026-09-26.json)
+passes the unchanged isolated import fixture in all three engines at the
+original 90-second deadline. The earlier timeout checkpoint below is retained
+as historical evidence. Follow-on helper and Deno/Bun investigations are paused.
+
 The [standalone module-data checkpoint](docs/evidence/wasmtime-module-data-checkpoint-2026-09-26.json)
 adds a native-matching isolated Node import of `Init` and seven runtime function
 evaluations. Real descriptor controls pass in Node, Deno and Bun, but the full

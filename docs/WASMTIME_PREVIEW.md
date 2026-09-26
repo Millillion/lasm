@@ -1,5 +1,15 @@
 # Standalone Wasmtime application preview
 
+This investigation is paused under the [current Node milestone](PLAN.md).
+The [last bounded operation completed successfully](evidence/wasmtime-module-data-repair-2026-09-26.json):
+Node, Deno and Bun each pass the unchanged isolated module import and seven
+runtime evaluations under the original 90-second deadline. Encoding binary
+worker messages as buffers fixes the Deno response stall. Forty-three focused
+checks and the native descriptor controls also pass, including eight new
+`openat` error-precedence cases per engine. Earlier timeout results below remain
+historical failures. Further helper, extreme-stack and engine work is deferred;
+it is not required for the basic Node installation milestone.
+
 The Linux x64 preview now runs a copied Lean 4.34.1 application in stock Node
 26.10.0, Deno 2.9.7 and Bun 1.4.2 with its source, build tools and original
 artifacts denied by Landlock. All 45 native/deployed comparisons pass across

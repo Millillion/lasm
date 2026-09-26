@@ -56,3 +56,23 @@ test('Deno-style message traversal has bounded overhead independent of byte leng
   assert.equal(properties(small), properties(large));
   assert.ok(properties(large) < 32);
 });
+
+test('RPC buffer envelopes preserve offsets, shared buffers and independent copies', () => {
+  const backing = new ArrayBuffer(32), shared = new SharedArrayBuffer(8);
+  new Uint8Array(backing).set([0xff, 0, 0xfe], 7);
+  const value = { byteBuffer: backing, byteOffset: 7, byteLength: 3, shared };
+  const reply = send(value);
+  assert.ok(reply.byteBuffer instanceof ArrayBuffer);
+  assert.deepEqual([...new Uint8Array(reply.byteBuffer, reply.byteOffset, reply.byteLength)], [0xff, 0, 0xfe]);
+  new Uint8Array(backing).fill(10); assert.equal(new Uint8Array(reply.byteBuffer)[7], 0xff);
+  new Uint8Array(reply.shared)[3] = 41; assert.equal(new Uint8Array(shared)[3], 41);
+});
+
+test('raw and viewed references transfer one allocation without detaching shared memory', () => {
+  const raw = new ArrayBuffer(8192), shared = new SharedArrayBuffer(16);
+  new Uint8Array(raw)[8191] = 93;
+  const reply = send({ raw, view: new Uint8Array(raw), shared }, { move: true });
+  assert.equal(raw.byteLength, 0); assert.equal(shared.byteLength, 16);
+  assert.equal(reply.raw, reply.view.buffer); assert.equal(reply.view[8191], 93);
+  assert.ok(reply.shared instanceof SharedArrayBuffer);
+});

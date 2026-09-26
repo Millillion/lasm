@@ -12,6 +12,7 @@ import nativeThreadId from './thread-id.cjs';
 import forwardWorkerStdio from './worker-stdio.cjs';
 import { writeWasiStdio } from './wasmtime-wasi-stdio.mjs';
 import { nativeFiles } from './native-files.mjs';
+import { encodeFileMessage, decodeFileMessage } from './native-file-message.mjs';
 import { readGuestBytes, writeGuestBytes } from './wasmtime-guest-memory.mjs';
 import { invokeConsoleImport } from './wasmtime-console.mjs';
 import { createWasmtimeFileHost } from './wasmtime-file-host.mjs';
@@ -112,7 +113,11 @@ function rpc(request) {
   const channel = new MessageChannel();
   try {
     assert.equal(signalStore(probe, signal, 0), 0);
-    parentPort.postMessage({ kind: 'rpc', request, signal, port: channel.port2, sender: ownPthread }, [channel.port2]);
+    // Deno's Node adapter scans every indexed property of a typed-array
+    // message. Encode binary payloads as buffers on both worker hops, including
+    // file-import replies, so traversal does not grow with the payload size.
+    parentPort.postMessage({ kind: 'rpc', request: encodeFileMessage(request).message,
+      signal, port: channel.port2, sender: ownPthread }, [channel.port2]);
     const deadline = diagnostic ? Date.now() + 15_000 : Infinity;
     while (signalLoad(probe, signal) === 0) {
       assert.ok(Date.now() < deadline, 'Guest RPC deadline');
@@ -124,8 +129,9 @@ function rpc(request) {
       assert.ok(Date.now() < deadline, 'RPC packet deadline');
       waitSignal(signal, 1, 1);
     }
-    if (packet.message.failure) throw new Error(packet.message.failure);
-    return packet.message;
+    const reply = decodeFileMessage(packet.message);
+    if (reply.failure) throw new Error(reply.failure);
+    return reply;
   } finally { channel.port1.close(); invoke('free', [signal], 0); }
 }
 async function cleanupThread(pthread) {
@@ -141,6 +147,7 @@ async function cleanupThread(pthread) {
 }
 async function handleRpc({ request, signal, port, sender }) {
   try {
+    request = decodeFileMessage(request);
     assert.ok(workers.has(String(sender)), 'RPC sender must be a known guest thread');
     let result;
     if (request.kind === 'spawn') result = { status: spawnWorker(request.pthread, request.start, request.argument) };
@@ -150,13 +157,15 @@ async function handleRpc({ request, signal, port, sender }) {
       try {
         const response = new Promise((resolve, reject) => {
           channel.port1.once('message', packet => {
+            packet = decodeFileMessage(packet);
             if (packet.exit) reject(new LeanExit(packet.exit.code, packet.exit.force));
             else if (packet.failure) reject(new Error(packet.failure));
             else resolve(packet.result);
           });
           channel.port1.once('messageerror', reject);
         });
-        parentPort.postMessage({ kind: 'host-request', request, sender, port: channel.port2 }, [channel.port2]);
+        parentPort.postMessage({ kind: 'host-request', request: encodeFileMessage(request).message,
+          sender, port: channel.port2 }, [channel.port2]);
         result = await response;
       } finally { channel.port1.close(); }
     }
@@ -199,10 +208,10 @@ async function handleRpc({ request, signal, port, sender }) {
         byteOffset: result.bytes.byteOffset, byteLength: result.bytes.byteLength };
     }
     else throw new Error(`Unknown RPC ${request.kind}`);
-    port.postMessage(result);
+    port.postMessage(encodeFileMessage(result).message);
   } catch (error) {
     if (error instanceof LeanExit && !diagnostic) { void finishApplication(error.code, error.force).catch(fail); return; }
-    port.postMessage({ failure: error.stack ?? String(error) }); fail(error);
+    port.postMessage(encodeFileMessage({ failure: error.stack ?? String(error) }).message); fail(error);
   }
   finally {
     assert.equal(signalStore(probe, signal, 1), 0);

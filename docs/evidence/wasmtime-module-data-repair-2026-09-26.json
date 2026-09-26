@@ -1,0 +1,491 @@
+{
+  "scope": "Completed checkpoint before adoption of the narrower Linux Node-only first milestone. Standalone Linux x64 supplementary module import and runtime evaluation; not installed CLI or full API acceptance.",
+  "recordedAt": "2026-09-26T02:53:55.355664+00:00",
+  "versions": {
+    "lean": "4.34.1",
+    "node": "26.10.0",
+    "deno": "2.9.7",
+    "bun": "1.4.2"
+  },
+  "fixture": {
+    "path": "integration/fixtures/StandaloneModuleData.lean",
+    "sha256": "0da5d93cd7026dd42076ebb32208b978967e46295a386c40a96f2c058b5c8c27"
+  },
+  "upstreamTestsChanged": false,
+  "campaign": {
+    "path": ".work/product-acceptance/wasmtime-standalone-module-data-4.34.1-r6.json",
+    "sha256": "26358f38f9aa8e7ad2fd66a16f5373d76f9087c23990b1ffcc54ecbd59c28aff"
+  },
+  "package": {
+    "path": ".work/wasmtime-standalone-module-data-4.34.1-package-r5/result.json",
+    "sha256": "abd01668f2b659cd8fdd7d84e00e04fade8b59a9dcd1ef7e40b7974b85755558"
+  },
+  "deployment": {
+    "path": ".work/wasmtime-standalone-module-data-4.34.1-deployment-r5/result.json",
+    "sha256": "1daac92689efb89e2e7b25869ad0154dcbe9d8f59272a8491323827e966edfd4"
+  },
+  "comparisons": [
+    {
+      "engine": "node",
+      "args": [],
+      "expected": {
+        "code": 0,
+        "stdout": "standard module data imported; seven runtime evaluations passed\n",
+        "stderr": "",
+        "stdoutBase64": "c3RhbmRhcmQgbW9kdWxlIGRhdGEgaW1wb3J0ZWQ7IHNldmVuIHJ1bnRpbWUgZXZhbHVhdGlvbnMgcGFzc2VkCg==",
+        "stderrBase64": ""
+      },
+      "actual": {
+        "code": 0,
+        "stdout": "standard module data imported; seven runtime evaluations passed\n",
+        "stderr": "",
+        "stdoutBase64": "c3RhbmRhcmQgbW9kdWxlIGRhdGEgaW1wb3J0ZWQ7IHNldmVuIHJ1bnRpbWUgZXZhbHVhdGlvbnMgcGFzc2VkCg==",
+        "stderrBase64": ""
+      }
+    },
+    {
+      "engine": "deno",
+      "args": [],
+      "expected": {
+        "code": 0,
+        "stdout": "standard module data imported; seven runtime evaluations passed\n",
+        "stderr": "",
+        "stdoutBase64": "c3RhbmRhcmQgbW9kdWxlIGRhdGEgaW1wb3J0ZWQ7IHNldmVuIHJ1bnRpbWUgZXZhbHVhdGlvbnMgcGFzc2VkCg==",
+        "stderrBase64": ""
+      },
+      "actual": {
+        "code": 0,
+        "stdout": "standard module data imported; seven runtime evaluations passed\n",
+        "stderr": "",
+        "stdoutBase64": "c3RhbmRhcmQgbW9kdWxlIGRhdGEgaW1wb3J0ZWQ7IHNldmVuIHJ1bnRpbWUgZXZhbHVhdGlvbnMgcGFzc2VkCg==",
+        "stderrBase64": ""
+      }
+    },
+    {
+      "engine": "bun",
+      "args": [],
+      "expected": {
+        "code": 0,
+        "stdout": "standard module data imported; seven runtime evaluations passed\n",
+        "stderr": "",
+        "stdoutBase64": "c3RhbmRhcmQgbW9kdWxlIGRhdGEgaW1wb3J0ZWQ7IHNldmVuIHJ1bnRpbWUgZXZhbHVhdGlvbnMgcGFzc2VkCg==",
+        "stderrBase64": ""
+      },
+      "actual": {
+        "code": 0,
+        "stdout": "standard module data imported; seven runtime evaluations passed\n",
+        "stderr": "",
+        "stdoutBase64": "c3RhbmRhcmQgbW9kdWxlIGRhdGEgaW1wb3J0ZWQ7IHNldmVuIHJ1bnRpbWUgZXZhbHVhdGlvbnMgcGFzc2VkCg==",
+        "stderrBase64": ""
+      }
+    }
+  ],
+  "denials": [
+    {
+      "engine": "node",
+      "control": {
+        "code": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdoutBase64": "",
+        "stderrBase64": ""
+      },
+      "executableSha256": "ab9c8eecf9f82d6693cdc3accced17034065c8d96213b0aa76a7e803d20ae1da",
+      "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-deployment-r5/node-rules.json"
+    },
+    {
+      "engine": "deno",
+      "control": {
+        "code": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdoutBase64": "",
+        "stderrBase64": ""
+      },
+      "executableSha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21",
+      "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-deployment-r5/deno-rules.json"
+    },
+    {
+      "engine": "bun",
+      "control": {
+        "code": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdoutBase64": "",
+        "stderrBase64": ""
+      },
+      "executableSha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+      "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-deployment-r5/bun-rules.json"
+    }
+  ],
+  "inputsUnchanged": true,
+  "repair": "Encode binary messages as ArrayBuffers on both worker hops; preserve raw/shared buffers and byte offsets. The native file read completed, but the old typed-array response stalled before the receiving worker reported it.",
+  "focusedControls": {
+    "receipt": {
+      "path": ".work/product-acceptance/wasmtime-rpc-controls-r1.json",
+      "sha256": "aa0c0d5a95d904e4cd1b62b9e9d44de75cab97c8e57fbc0f2f5dd1fcc07c157c"
+    },
+    "unitPasses": 43,
+    "nativeFileEngines": [
+      {
+        "name": "node",
+        "code": 0
+      },
+      {
+        "name": "deno",
+        "code": 0
+      },
+      {
+        "name": "bun",
+        "code": 0
+      }
+    ],
+    "newNativeOpenatErrorComparisonsPerEngine": 8
+  },
+  "diagnostics": [
+    {
+      "path": ".work/wasmtime-module-rpc-r1/result.json",
+      "sha256": "da45727e31273d587fafe7210ac1fc2fb382be58e0f6e16830f942a108ecff2f"
+    },
+    {
+      "path": ".work/wasmtime-module-rpc-r2/result.json",
+      "sha256": "aee5f7027df16695aa73cba730615737f2245a302131fa3ec237dc036da0298e"
+    },
+    {
+      "path": ".work/wasmtime-module-rpc-r3/result.json",
+      "sha256": "c1e47fc846e73539c9c98c343d14adc09878a3a56209664f71540038f11a5a64"
+    },
+    {
+      "path": ".work/wasmtime-module-rpc-r4/result.json",
+      "sha256": "9da56a712e03403a11cba5fa3e8f858b72f4215417621f7924ccc0a46c60d97c"
+    }
+  ],
+  "preservedFailures": {
+    "original90SecondTimeout": {
+      "path": ".work/wasmtime-standalone-module-data-4.34.1-deployment-r4/result.json",
+      "sha256": "65c8132cf8a9b5d8368e11fc8e920d2e05d7dc5397b2f66263c5d9073bedaf2c"
+    },
+    "parallel300SecondTimeout": {
+      "path": ".work/wasmtime-deno-module-duration-r1/result.json",
+      "sha256": "02be183c1ee4faa967e3611a2dab3954b0fbb12f1be655dc47c48e01dad3f935"
+    },
+    "diagnosticHarnessCorrections": "The first three timing probes allowed cwd/Node package lookups into the denied checkout. The second also limited a legitimate completion-queue wait. The fourth copied engine and cwd outside the checkout and excluded that legitimate wait."
+  },
+  "resources": {
+    "wasmtime-rpc-controls-r1": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-rpc-controls-r1-resources.json",
+        "sha256": "8e9a93f3d672666f17affb13dcdbfb6f09e25d31fff4e710c9b552b2c2cc4542"
+      },
+      "peakMemoryBytes": 57094144,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "disk": {
+        "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+        "minimumFreeBytes": 4294967296,
+        "preflightRequiredBytes": 5368709120,
+        "status": "passed",
+        "updatedAt": "2026-09-26T02:34:26.333613+00:00",
+        "freeAtStart": 6737297408,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "2048",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-rpc-controls-r1-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/product-acceptance/run-module-rpc-controls-r1.py"
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-rpc-controls-r1-resources.json",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-rpc-controls-r1.log",
+        "minimumObservedFreeBytes": 6737182720,
+        "exitCode": 0,
+        "freeAtEnd": 6737174528
+      }
+    },
+    "module-data-deduplication-r8": {
+      "receipt": {
+        "path": ".work/product-acceptance/module-data-deduplication-r8-resources.json",
+        "sha256": "2d87ec2384ac95b0456041d39fc0d018bfcf7f1740a1c91b2c9096e5ecc8a99c"
+      },
+      "peakMemoryBytes": 123203584,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "disk": {
+        "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+        "minimumFreeBytes": 4294967296,
+        "preflightRequiredBytes": 5368709120,
+        "status": "passed",
+        "updatedAt": "2026-09-26T02:37:43.468790+00:00",
+        "freeAtStart": 6736941056,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "1024",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-data-deduplication-r8-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/product-acceptance/deduplicate-module-data-r8.py"
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-data-deduplication-r8-resources.json",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-data-deduplication-r8.log",
+        "minimumObservedFreeBytes": 6731182080,
+        "exitCode": 0,
+        "freeAtEnd": 8992399360
+      }
+    },
+    "module-cache-deduplication-r3": {
+      "receipt": {
+        "path": ".work/product-acceptance/module-cache-deduplication-r3-resources.json",
+        "sha256": "cbec224af78ef8aa5c65073fb18fb98f6bac3a0676856060f21c75ccccc13467"
+      },
+      "peakMemoryBytes": 13971456,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "disk": {
+        "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+        "minimumFreeBytes": 4294967296,
+        "preflightRequiredBytes": 5368709120,
+        "status": "passed",
+        "updatedAt": "2026-09-26T02:38:02.546086+00:00",
+        "freeAtStart": 8992395264,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "1024",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-cache-deduplication-r3-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/product-acceptance/deduplicate-module-caches-r3.py"
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-cache-deduplication-r3-resources.json",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-cache-deduplication-r3.log",
+        "minimumObservedFreeBytes": 8992382976,
+        "exitCode": 0,
+        "freeAtEnd": 10214064128
+      }
+    },
+    "wasmtime-standalone-module-data-4.34.1-package-r5": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-module-data-4.34.1-package-r5-resources.json",
+        "sha256": "a27180268f3d368018fb38ddc5508ed08ae47075ad5ba95061de35057adeb848"
+      },
+      "peakMemoryBytes": 6069506048,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "disk": {
+        "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+        "minimumFreeBytes": 4294967296,
+        "preflightRequiredBytes": 9663676416,
+        "status": "passed",
+        "updatedAt": "2026-09-26T02:38:55.655223+00:00",
+        "freeAtStart": 10214060032,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "8192",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-standalone-module-data-4.34.1-package-r5-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=768",
+          "scripts/full-lean/package-wasmtime-application.mjs",
+          ".work/wasmtime-standalone-module-data-4.34.1-compilation-r1/result.json",
+          ".work/wasmtime-standalone-module-data-4.34.1-package-r5"
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-standalone-module-data-4.34.1-package-r5-resources.json",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-standalone-module-data-4.34.1-package-r5.log",
+        "minimumObservedFreeBytes": 7303151616,
+        "exitCode": 0,
+        "freeAtEnd": 7303163904
+      }
+    },
+    "module-data-deduplication-r9": {
+      "receipt": {
+        "path": ".work/product-acceptance/module-data-deduplication-r9-resources.json",
+        "sha256": "11899e7f7779289d79fe8f4d53ccf4ae00963ec993e135addb4dbfe9e7a1343b"
+      },
+      "peakMemoryBytes": 53399552,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "disk": {
+        "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+        "minimumFreeBytes": 4294967296,
+        "preflightRequiredBytes": 5368709120,
+        "status": "passed",
+        "updatedAt": "2026-09-26T02:39:32.761939+00:00",
+        "freeAtStart": 7303159808,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "1024",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-data-deduplication-r9-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/product-acceptance/deduplicate-module-data-r9.py"
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-data-deduplication-r9-resources.json",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-data-deduplication-r9.log",
+        "minimumObservedFreeBytes": 7302275072,
+        "exitCode": 0,
+        "freeAtEnd": 9553768448
+      }
+    },
+    "module-cache-deduplication-r4": {
+      "receipt": {
+        "path": ".work/product-acceptance/module-cache-deduplication-r4-resources.json",
+        "sha256": "879cf3adcc855164cbe553a81123b7dda1c2c58ed7bb46a5af6dc9f8b4c5f545"
+      },
+      "peakMemoryBytes": 13873152,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "disk": {
+        "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+        "minimumFreeBytes": 4294967296,
+        "preflightRequiredBytes": 5368709120,
+        "status": "passed",
+        "updatedAt": "2026-09-26T02:39:39.843371+00:00",
+        "freeAtStart": 9553764352,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "1024",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-cache-deduplication-r4-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/product-acceptance/deduplicate-module-caches-r4.py"
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-cache-deduplication-r4-resources.json",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/module-cache-deduplication-r4.log",
+        "minimumObservedFreeBytes": 9553747968,
+        "exitCode": 0,
+        "freeAtEnd": 10164588544
+      }
+    },
+    "wasmtime-standalone-module-data-4.34.1-deployment-r5": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-module-data-4.34.1-deployment-r5-resources.json",
+        "sha256": "995ae32697033e302e417f7a5d15b05cb16865b3608fbd629a5c46e0f64d7ba1"
+      },
+      "peakMemoryBytes": 6551461888,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "disk": {
+        "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+        "minimumFreeBytes": 4294967296,
+        "preflightRequiredBytes": 9663676416,
+        "status": "passed",
+        "updatedAt": "2026-09-26T02:41:31.004146+00:00",
+        "freeAtStart": 10164584448,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "8192",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-standalone-module-data-4.34.1-deployment-r5-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=768",
+          "integration/wasmtime-standalone.mjs",
+          ".work/wasmtime-standalone-module-data-4.34.1-package-r5",
+          "integration/fixtures/StandaloneModuleData.lean",
+          ".work/wasmtime-standalone-module-data-4.34.1-deployment-r5",
+          ".work/application-installed-r3/workspace/toolchains",
+          "module-data"
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-standalone-module-data-4.34.1-deployment-r5-resources.json",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-standalone-module-data-4.34.1-deployment-r5.log",
+        "minimumObservedFreeBytes": 6870179840,
+        "exitCode": 0,
+        "freeAtEnd": 9930760192
+      }
+    }
+  },
+  "pause": "Pending const_fold and lifecycle reruns, HTTP helper work, Deno/Bun investigations and managed helper integration are deferred by the new docs/PLAN.md. No deferred requirement is relabeled fundamental.",
+  "fundamentalLimitationsProven": []
+}

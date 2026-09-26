@@ -10,6 +10,7 @@ import { prepareApplicationMetadata } from './application-metadata-runtime.mjs';
 import forwardWorkerStdio from './worker-stdio.cjs';
 import { createWasmtimeProcessHost } from './wasmtime-process-host.mjs';
 import { LeanExit } from './node-host.mjs';
+import { encodeFileMessage, decodeFileMessage } from './native-file-message.mjs';
 import cwdFactory from './native-pthread-factory.cjs';
 
 // Standalone entry only. This function owns process termination; it is not an
@@ -59,8 +60,9 @@ export async function runWasmtimeApplication(entrypoint, args = process.argv.sli
       // operating system retains its exit-status bits, including 0xffffffff.
       host.finish(value.force).then(() => exit(value.code | 0)).catch(fail);
     } else if (value.kind === 'host-request') {
-      host.request(value.request, value.sender).then(result => value.port.postMessage({ result }), error =>
-        value.port.postMessage(error instanceof LeanExit ? { exit: { code: error.code, force: error.force } }
+      const reply = packet => value.port.postMessage(encodeFileMessage(packet).message);
+      host.request(decodeFileMessage(value.request), value.sender).then(result => reply({ result }), error =>
+        reply(error instanceof LeanExit ? { exit: { code: error.code, force: error.force } }
           : { failure: error.stack ?? String(error) })).finally(() => value.port.close()).catch(fail);
     } else if (value.kind === 'host-notification') {
       host.notify(value.request);

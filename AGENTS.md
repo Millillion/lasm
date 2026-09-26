@@ -6,16 +6,15 @@
 - The user authorized `origin` at `git@github.com:Millillion/lasm.git`. Push after
   every commit and keep `main` synchronized with `origin/main`; never force-push
   or discard remote work. Push failures must not pause development or local
-  commits. If SSH authentication expires, wait for restored credentials before
-  retrying authenticated pushes; then push accumulated commits. Other push
-  failures likewise must not block local progress. npm publication remains
-  unauthorized.
-- Prioritize complete Lean language and standard-library/API compatibility on
-  the latest stable published Lean, Node, Deno, and Bun releases across the six
-  required OS/architecture combinations. Recheck official releases before new
-  acceptance campaigns and pin exact versions within each campaign. Keep Lean
-  selectable through `lean-toolchain`; preserve older evidence with its original
-  versions. Browser work is deferred.
+  commits. Per the user's latest instruction, attempt a push at least once after
+  each commit; if it fails, retain the commit locally, continue work, and try
+  again after the next commit. npm publication remains unauthorized.
+- Prioritize the basic ordinary Lean-on-Node installed workflow in
+  `docs/PLAN.md`, on native Linux x86-64 and Linux ARM64 first. macOS, Windows,
+  broader language/API parity, other engines and experimental helper integration
+  are deferred. Preserve their source, tests, artifacts and failures. Recheck
+  official Node/Lean releases before a new acceptance campaign and pin exact
+  versions within it. Keep Lean selectable through `lean-toolchain`.
 - GitHub Actions CI/CD is authorized autonomously within the user's existing
   plan/public-repository allowances and with no additional costs. Configure and
   run workflows, inspect failures, and manage this repo's artifacts/caches as

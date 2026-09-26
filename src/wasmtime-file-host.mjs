@@ -35,7 +35,9 @@ export function createWasmtimeFileHost(helper) {
         if (request.operation === 'openat') {
           const bytes = Buffer.from(request.path);
           assert.ok(!bytes.includes(0));
-          const directory = bytes[0] === 47 || request.directory === -100 ? -100 : descriptor(request.directory);
+          // Let openat decide error precedence. For example, an empty path
+          // reports ENOENT even with an invalid directory descriptor.
+          const directory = bytes[0] === 47 || request.directory === -100 ? -100 : descriptors.get(request.directory) ?? -1;
           const native = await call(openat, directory, Buffer.concat([bytes, Buffer.from([0])]), request.flags, request.mode);
           let fd = 0; while (descriptors.has(fd)) fd++;
           descriptors.set(fd, native); return { errno: 0, fd };
@@ -52,8 +54,9 @@ export function createWasmtimeFileHost(helper) {
         if (request.operation === 'seek')
           return { errno: 0, offset: BigInt(await call(seek, native, BigInt(request.offset), request.whence)) };
         if (request.operation === 'close') {
-          // The descriptor number is reusable once close begins, just as in the
-          // kernel. An already pending native operation retains its own fd use.
+          // Release the guest number before awaiting the native close. Callers
+          // must synchronize close against operations that have not entered
+          // the kernel; this adapter does not provide cancellation or leases.
           descriptors.delete(request.fd); await call(close, native); return { errno: 0 };
         }
         throw new Error(`Unimplemented descriptor operation: ${request.operation}`);
