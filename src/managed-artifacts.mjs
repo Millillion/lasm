@@ -44,7 +44,7 @@ export function validateArtifact(artifact) {
   return digest(JSON.stringify(artifact));
 }
 
-async function download(artifact, destination, fetch_) {
+async function download(artifact, destination, fetch_, update) {
   let response;
   try { response = await fetch_(artifact.url, { signal: AbortSignal.timeout(15 * 60_000) }); }
   catch (cause) {
@@ -54,14 +54,17 @@ async function download(artifact, destination, fetch_) {
     throw new Error(`Download failed for ${artifact.name}: HTTP ${response.status} from ${new URL(artifact.url).hostname}. Check your connection or retry when the download is available.`);
   if (response.url && new URL(response.url).protocol !== 'https:') throw new Error('Artifact download redirected away from HTTPS');
   const hash = createHash('sha256');
-  let bytes = 0;
+  let bytes = 0, lastUpdate = 0;
   const check = new Transform({ transform(chunk, encoding, callback) {
     bytes += chunk.length;
     if (bytes > artifact.bytes) return callback(new Error(`Download size mismatch: ${artifact.name}`));
-    hash.update(chunk); callback(null, chunk);
+    hash.update(chunk);
+    if (Date.now() - lastUpdate >= 250) { update?.(bytes); lastUpdate = Date.now(); }
+    callback(null, chunk);
   } });
   await pipeline(Readable.fromWeb(response.body), check, createWriteStream(destination, { flags: 'wx', mode: 0o600 }));
   if (bytes !== artifact.bytes || hash.digest('hex') !== artifact.sha256) throw new Error(`Download checksum or size mismatch: ${artifact.name}`);
+  update?.(bytes, true);
 }
 
 function cleanArchivePath(name) {
@@ -202,7 +205,8 @@ async function verify(directory, identity) {
  * Concurrent processes may download twice but can never observe partial output.
  * No cache lock can be left behind by an interrupted process.
  */
-export async function provisionArtifact(artifact, { cache = managedCacheDirectory(), fetch: fetch_ = fetch, log = console.error, python } = {}) {
+export async function provisionArtifact(artifact, { cache = managedCacheDirectory(), fetch: fetch_ = fetch, log = console.error, python,
+  progress, label = artifact.name } = {}) {
   const identity = validateArtifact(artifact);
   if (['tar.xz', 'zip'].includes(artifact.format) && (!python || !isAbsolute(python)))
     throw new Error('SDK archives require the absolute path to a managed Python executable');
@@ -212,6 +216,7 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
   const operation = (async () => {
     try {
       await lstat(directory);
+      progress?.({ stage: `Verifying cached ${label}` });
       const receipt = await verify(directory, identity);
       return { directory, identity, receipt, cacheHit: true };
     } catch (error) {
@@ -225,10 +230,17 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
     let failure;
     try {
       const archive = join(staging, 'archive.' + artifact.format), tree = join(staging, 'tree');
-      log(`Downloading verified ${artifact.name}…`);
-      await download(artifact, archive, fetch_);
+      const downloadProgress = (receivedBytes = 0, complete = false) => progress?.({
+        stage: `Downloading ${label}`, receivedBytes, totalBytes: artifact.bytes,
+        download: true, cache: resolve(cache), complete,
+      });
+      if (!progress) log(`Downloading verified ${artifact.name}…`);
+      downloadProgress();
+      await download(artifact, archive, fetch_, downloadProgress);
+      progress?.({ stage: `Extracting ${label}` });
       await mkdir(tree);
       await extract(artifact, archive, tree, python);
+      progress?.({ stage: `Verifying installed ${label}` });
       const files = await inventory(tree);
       if (!Object.keys(files).length) throw new Error('Managed artifact is empty');
       const receipt = { schema: 1, identity, artifact, files };
@@ -239,6 +251,7 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
         // Another process won the atomic installation. Verify its complete tree.
         await verify(directory, identity);
       }
+      progress?.({ stage: `Finishing ${label} setup` });
       return { directory, identity, receipt, cacheHit: false };
     } catch (error) { failure = error; throw error; }
     finally {

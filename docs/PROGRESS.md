@@ -1,7 +1,5 @@
-**Milestone complete — 2026-09-26:** Basic ordinary Lean-on-Node installation and deployment passed on native Linux x86-64 and ARM64 in [CI](https://github.com/Millillion/lasm/actions/runs/36221743804).
+**First-build DX complete in source — 2026-09-26:** The CLI explains first-time setup, reports download bytes and phases, and emits elapsed-time updates every ten seconds while compilation runs in one worker. Status stays on stderr and stops before application execution.
 
-Both used the same reproducible candidate (`0b2451cd…9e9e9374`), Node 26.10.0/npm 11.19.1 and managed Lean 4.34.1. Each passed 24 command checks, three startup samples, six recovery controls and three independently copied deployments. All 83 focused controls passed. Peaks were 4.48/4.53 GiB; zero OOM or resource abort on either accepted run.
+**Verified:** 74 focused tests passed. A real Lean 4.34.1 build, cached deployment build, plain Node run, and corrected diagnostic check passed on Linux x86-64/Node 26.10.0. Peak was 3.54 GiB; zero OOM/resource aborts. The initial diagnostic-assertion mismatch is preserved in [evidence](evidence/first-build-progress-2026-09-26.json).
 
-The exact tested tarball is retained in an unpublished draft and downloaded locally with SHA-256 verification. [Acceptance report](NODE_ACCEPTANCE.md) records identities, measurements, isolation and prior failures. All 25 milestone checklist items are complete.
-
-No npm publication occurred. Broader language/library parity, filesystem/HTTP, other operating systems and engines remain deferred.
+The earlier Linux x86-64/ARM64 [milestone candidate](NODE_ACCEPTANCE.md) remains unchanged. New logging checks are wired into CI; repacking and native acceptance of these changes remain for the next candidate. No npm publication. Other Jordan checklist items remain open; ETA not yet estimable.

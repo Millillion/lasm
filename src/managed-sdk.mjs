@@ -17,8 +17,10 @@ export async function provisionSdk(options = {}) {
   const artifact = release.artifacts[host];
   if (!artifact) throw new Error(`Managed compiler SDK ${release.version} is not implemented for ${host}. ${release.unavailable?.[host] ?? ''}`);
   const cache = options.cache ?? managedCacheDirectory();
-  const python = await provisionPython({ cache, log: options.log });
-  const installed = await provisionArtifact(artifact, { ...options, cache, python: python.executable });
+  const python = await provisionPython({ cache, log: options.log, progress: options.progress });
+  const installed = await provisionArtifact(artifact, { ...options, cache, python: python.executable,
+    label: `compiler tools (Emscripten ${release.version})` });
+  options.progress?.({ stage: 'Preparing and checking compiler tools' });
   const prefix = installed.directory;
   const nativePrograms = {};
   for (const name of ['clang', 'wasm-ld', 'wasm-opt'])

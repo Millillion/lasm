@@ -54,6 +54,13 @@ External application assets are the application's responsibility.
 
 To diagnose a compilation error, start with the Lean filename and line printed by
 the CLI. Use `--verbose` for build details or `--rebuild` to force a fresh link.
+The current source CLI announces that first-time tool setup can take a few
+minutes and shows the cache location, downloaded bytes and percentages,
+extraction, verification, compilation, linking and completion. Long phases emit
+elapsed-time updates every ten seconds, including while the compiler is busy.
+Download waits report when no new bytes have arrived. Status goes to stderr, so
+the application's stdout remains usable in pipes. These logging improvements
+postdate the accepted `.32` archive; that retained archive is unchanged.
 The package is a private experimental candidate, not an npm publication or a
 claim that every Lean program works. macOS, Windows, Deno, Bun, HTTP/filesystem
 parity and broad third-party packages remain separate milestones.

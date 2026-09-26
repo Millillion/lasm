@@ -34,7 +34,7 @@ export async function provisionLean(file, options = {}) {
   const host = `${platform}-${arch}`;
   const artifact = release.artifacts[host];
   if (!artifact) throw new Error(`Managed Lean ${selection.version} is not implemented for ${host}. ${release.unavailable?.[host] ?? 'No matching native artifact is available.'} This platform remains an implementation gap.`);
-  const installed = await provisionArtifact(artifact, options);
+  const installed = await provisionArtifact(artifact, { ...options, label: `Lean ${selection.version} and Lake` });
   const lean = join(installed.directory, 'bin', executableName('lean', platform));
   const lake = join(installed.directory, 'bin', executableName('lake', platform));
   // An archive checksum is provenance; this check also prevents accidentally

@@ -59,12 +59,13 @@ export async function runApplicationCli(argv, { defaultTarget = 'node', targetEx
   // A run needs its engine. Diagnose that before creating caches or downloading
   // build tools; build-only commands do not inspect or require the target engine.
   if (options.command === 'run') requireApplicationEngine(executable, options.target);
-  const { buildApplication } = await import('./application-build.mjs');
-  const result = await buildApplication(options.input, options);
+  const { buildApplicationWithProgress } = await import('./application-build-client.mjs');
+  const result = await buildApplicationWithProgress(options.input, options);
   if (options.command === 'build') {
     console.error(`${result.cacheHit ? 'Reused' : 'Built'} Lean ${result.lean} for ${result.target}: ${result.output}`);
     return 0;
   }
+  console.error('[lasm] Running ' + options.input + '…');
   return runApplicationChild(executable,
     [...(options.target === 'deno' ? ['run', '-A'] : []), join(result.output, 'main.mjs'), ...options.args],
     `The selected ${options.target} engine is not installed or is not on PATH. Install it to run this target; building does not require it.`);

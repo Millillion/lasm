@@ -12,7 +12,7 @@ export async function provisionPython(options = {}) {
   const host = `${platform}-${arch}`, release = options.catalog ?? pythonCatalog;
   const artifact = release.artifacts[host];
   if (!artifact) throw new Error(`Managed build Python is not available for ${host}`);
-  const installed = await provisionArtifact(artifact, options);
+  const installed = await provisionArtifact(artifact, { ...options, label: `Python ${release.version}` });
   const executable = join(installed.directory, platform === 'win32' ? 'python.exe' : 'bin/python3');
   // Isolation ignores global PYTHONHOME/PYTHONPATH; -B keeps the verified cache
   // immutable when importing standard modules needed by the build tools.

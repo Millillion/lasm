@@ -54,6 +54,32 @@ test('streamed installation preserves executable files and notices; reuse verifi
   assert.equal(f.requests(), 1);
 });
 
+test('download progress uses actual bytes, reports extraction and verification, and distinguishes cache reuse', async t => {
+  const f = await fixture(t), events = [];
+  const options = { ...f.options, progress: event => events.push(event), label: 'test compiler' };
+  await provisionArtifact(f.artifact, options);
+  const downloads = events.filter(event => event.download);
+  assert.equal(downloads[0].receivedBytes, 0);
+  assert.equal(downloads.at(-1).receivedBytes, f.bytes.length);
+  assert.equal(downloads.at(-1).totalBytes, f.bytes.length);
+  assert.equal(downloads.at(-1).complete, true);
+  assert.ok(downloads.every((event, i) => event.receivedBytes <= event.totalBytes
+    && (!i || event.receivedBytes >= downloads[i - 1].receivedBytes)));
+  assert.ok(events.some(event => event.stage === 'Extracting test compiler'));
+  assert.ok(events.some(event => event.stage === 'Verifying installed test compiler'));
+  events.length = 0;
+  await provisionArtifact(f.artifact, options);
+  assert.deepEqual(events.map(event => event.stage), ['Verifying cached test compiler']);
+  assert.equal(f.requests(), 1);
+});
+
+test('a failed checksum cannot report a verified download or begin extraction', async t => {
+  const f = await fixture(t), events = [];
+  await assert.rejects(provisionArtifact({ ...f.artifact, sha256: '0'.repeat(64) },
+    { ...f.options, progress: event => events.push(event) }), /checksum/);
+  assert.equal(events.some(event => event.complete || event.stage.startsWith('Extracting')), false);
+});
+
 test('concurrent requests share an install; version identities never share directories', async t => {
   const f = await fixture(t);
   const [a, b] = await Promise.all([provisionArtifact(f.artifact, f.options), provisionArtifact(f.artifact, f.options)]);

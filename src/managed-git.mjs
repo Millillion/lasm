@@ -32,7 +32,7 @@ export async function provisionGit(options = {}) {
   const platform = options.platform ?? process.platform, arch = options.arch ?? process.arch;
   const host = platform + '-' + arch, artifact = catalog.artifacts[host];
   if (!artifact) throw new Error(`No managed Git distribution for ${host}`);
-  const installed = await provisionArtifact(artifact, options);
+  const installed = await provisionArtifact(artifact, { ...options, label: `Git ${catalog.version}` });
   const prefix = installed.directory;
   const windows = platform === 'win32', toolRoot = windows ? join(prefix, arch === 'arm64' ? 'clangarm64' : 'mingw64') : prefix;
   const executable = join(prefix, windows ? 'cmd/git.exe' : 'bin/git');

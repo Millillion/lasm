@@ -14,7 +14,7 @@ import { preserveWebWorker } from '../scripts/full-lean/preserve-web-worker.mjs'
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
-export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true }) {
+export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress }) {
   if (![1, 2].includes(memoryMode)) throw new Error('Invalid application memory mode');
   if (!Array.isArray(sources) || !sources.length) throw new Error('Application C sources are required');
   if (leanVersion !== runtime.manifest.lean) throw new Error('Application and runtime versions differ');
@@ -28,10 +28,12 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   });
   const objects = [];
   for (let index = 0; index < sources.length; index++) {
+    progress?.({ stage: `Compiling application module ${index + 1} of ${sources.length}` });
     const object = join(work, `module-${index}.o`);
     execute('emcc', [...compileFlags, '-c', sources[index], '-o', object]);
     objects.push(object);
   }
+  progress?.({ stage: 'Preparing application symbols' });
   const registry = readApplicationSymbols(sources, objects, join(sdk.prefix, 'bin', executableName('llvm-nm')),
     runtime.manifest.applicationSymbolHook);
   const registryC = join(work, 'application-symbols.c'), registryObject = join(work, 'application-symbols.o');
@@ -57,7 +59,9 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     '--pre-js', join(root, 'scripts/full-lean/host-pre.js'),
     '--js-library', join(root, 'scripts/full-lean/host-library.js'), '-o', join(dist, 'program.cjs')];
   const argumentsFile = join(work, 'link.rsp'); await writeFile(argumentsFile, responseFile(link));
+  progress?.({ stage: 'Linking application and Lean runtime' });
   execute('em++', ['@' + argumentsFile]);
+  progress?.({ stage: 'Preparing the application launcher' });
   const glue = join(dist, 'program.cjs');
   writeFileSync(glue, connectLeanSymbolLoader(readFileSync(glue, 'utf8'), true, { packageSymbols: true }));
   await indexFunctionTable(join(dist, 'program.wasm'), glue);

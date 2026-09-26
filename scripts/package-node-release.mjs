@@ -65,7 +65,8 @@ const second = pack();
 assert.equal(second.filename, packed.filename);
 assert.equal(await hashFile(archive), sha256, 'Two independent npm pack calls must produce identical bytes');
 const files = new Set(packed.files.map(file => file.path));
-for (const file of ['bin/lasm.mjs', 'src/application-support.mjs', 'src/native/node_modules/koffi/index.cjs',
+for (const file of ['bin/lasm.mjs', 'src/application-support.mjs', 'src/application-build-client.mjs',
+  'src/application-build-worker.mjs', 'src/build-progress.mjs', 'src/native/node_modules/koffi/index.cjs',
   'src/native/process/manifest.json', 'src/native/signals/manifest.json', 'src/native/bun-stack/manifest.json',
   'scripts/full-lean/host-library.js', 'application-support.json', 'provenance.json', 'THIRD_PARTY_NOTICES.txt',
   `targets/${runtime.manifest.name}/target.json`]) assert.ok(files.has(file), `npm pack omitted ${file}`);

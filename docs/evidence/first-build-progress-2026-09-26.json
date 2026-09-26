@@ -1,0 +1,343 @@
+{
+  "scope": "First-build terminal progress in current source; Linux x86-64, Node 26.10.0 and Lean 4.34.1. No new cold platform acceptance campaign or release archive.",
+  "baseRevision": "86fa6d97983f58c9040d28fcf5c3cc0260f28cfd",
+  "sourceFilesSha256": {
+    "src/application-build-client.mjs": "c2ade3116641407445bd88d0607155c292e59bdf2ce66be7300944c647a24629",
+    "src/application-build-worker.mjs": "6723c6f8db9c8462d18c9086cb5b01c84799372097fb4bff9c1b5378b96acef1",
+    "src/application-build.mjs": "294c5dda4b7b9a4083317cefee105a3efb5209f36c17df2b23a811558cae8974",
+    "src/application-cli.mjs": "0b7ab6727b653cfeb7b6175d8bc98f3fb747a2c0d36ac90db4dc6016a2cd103b",
+    "src/application-link.mjs": "25530dbcfc9e74dc8624d948e5f0f3c47a92402b5f11e2b3d366532a671971e4",
+    "src/application-lock.mjs": "cfde7dc0503e8e4bd04a0f857285b1f07048ac78e6ed2e20dbd8344f6ef3f5b6",
+    "src/build-progress.mjs": "cc9893083e4fc7ada7574965971d99eda945b75bc37c4cb2c0273a36ad94abb5",
+    "src/managed-artifacts.mjs": "9b7d3d50f41a7bfd99fbd9671d5b4bb2ef926cbe3174e16e3a11b74ca115e9bd",
+    "src/managed-git.mjs": "d6bc7e6a3ff6403167f578459822dfe8688e363a0c918d62296d74e8c219abad",
+    "src/managed-lean.mjs": "fbb9ce811c4b07c18f80c88f60df01b8b07b00fa7e319622a7536f1bccfd0388",
+    "src/managed-python.mjs": "20ac895345455fca134851df18269ebe51b6f7779c8b2a612956cad26a1aab45",
+    "src/managed-sdk.mjs": "4fb366625adfae1a14f298efd66b5a004633e75e6392df7748aa80c5bfd9dc59",
+    "test/build-progress.test.mjs": "4b2b1b047ddfe522a6a7a8aab7c5475f160c799f04cd79f4ccf101f11b9a037f",
+    "test/fixtures/build-progress-worker.mjs": "0a39ede2735e6fb522b94840385c2975d595bf9fea12fd5d20c578d8239bf08c",
+    "test/managed-artifacts.test.mjs": "75edd035d83870293efc982f600590c8f1d7168cf7680de9e020b4927db3be46"
+  },
+  "focusedTests": {
+    "passed": 74,
+    "resources": {
+      "startedAt": "2026-09-26T13:38:10.698Z",
+      "finishedAt": "2026-09-26T13:38:14.569Z",
+      "command": [
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=256",
+        "--test",
+        "--test-concurrency=1",
+        "test/build-progress.test.mjs",
+        "test/managed-artifacts.test.mjs",
+        "test/application-launcher.test.mjs",
+        "test/application-lock.test.mjs",
+        "test/cli-arguments.test.mjs",
+        "test/application-symbols.test.mjs",
+        "test/managed-git.test.mjs"
+      ],
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 71573504,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "coverage": [
+      "first-setup notice and cache location",
+      "measured download progress and idle waits",
+      "extraction and cache verification",
+      "heartbeat during a synchronously blocked build worker",
+      "stdout separation",
+      "completion and failure timer cleanup",
+      "compiler diagnostics",
+      "existing provisioning integrity, locks, argument and exit behavior"
+    ]
+  },
+  "realCli": {
+    "passed": true,
+    "tools": "Previously verified cached tools; source and linked application were newly built",
+    "steps": [
+      {
+        "label": "compile and run with progress",
+        "code": 0,
+        "signal": null,
+        "seconds": 61.310528525,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 8s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Verifying cached Python 3.13.15 — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 4s elapsed\n[lasm] Preparing and checking compiler tools — 0s elapsed\n[lasm] Compiling application module 1 of 1 — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Linking application and Lean runtime — 0s elapsed\n[lasm] Linking application and Lean runtime — 2s elapsed\n[lasm] Linking application and Lean runtime — 12s elapsed\n[lasm] Linking application and Lean runtime — 22s elapsed\n[lasm] Preparing the application launcher — 0s elapsed\n[lasm] Packaging the application and runtime support — 0s elapsed\n[lasm] Verifying and writing application output — 0s elapsed\n[lasm] Build ready (59s total).\n[lasm] Running Main.lean…\n",
+        "events": [
+          {
+            "seconds": 0.045572091999999995,
+            "stream": "stderr",
+            "text": "[lasm] Preparing Main.lean — 0s elapsed\n"
+          },
+          {
+            "seconds": 0.119904716,
+            "stream": "stderr",
+            "text": "[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n"
+          },
+          {
+            "seconds": 1.2194919300000002,
+            "stream": "stderr",
+            "text": "[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n"
+          },
+          {
+            "seconds": 10.052562401,
+            "stream": "stderr",
+            "text": "[lasm] Verifying cached Lean 4.34.1 and Lake — 8s elapsed\n"
+          },
+          {
+            "seconds": 13.835470524999998,
+            "stream": "stderr",
+            "text": "[lasm] Checking Lean sources and imports — 0s elapsed\n"
+          },
+          {
+            "seconds": 14.119965339999998,
+            "stream": "stderr",
+            "text": "[lasm] Checking application inputs and cached build — 0s elapsed\n"
+          },
+          {
+            "seconds": 14.234540970999998,
+            "stream": "stderr",
+            "text": "[lasm] Verifying cached Python 3.13.15 — 0s elapsed\n"
+          },
+          {
+            "seconds": 15.572838387,
+            "stream": "stderr",
+            "text": "[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 0s elapsed\n"
+          },
+          {
+            "seconds": 20.056558553,
+            "stream": "stderr",
+            "text": "[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 4s elapsed\n"
+          },
+          {
+            "seconds": 21.956234198999997,
+            "stream": "stderr",
+            "text": "[lasm] Preparing and checking compiler tools — 0s elapsed\n"
+          },
+          {
+            "seconds": 26.769547732,
+            "stream": "stderr",
+            "text": "[lasm] Compiling application module 1 of 1 — 0s elapsed\n"
+          },
+          {
+            "seconds": 27.236464132000002,
+            "stream": "stderr",
+            "text": "[lasm] Preparing application symbols — 0s elapsed\n"
+          },
+          {
+            "seconds": 27.710656892,
+            "stream": "stderr",
+            "text": "[lasm] Linking application and Lean runtime — 0s elapsed\n"
+          },
+          {
+            "seconds": 30.059226291999998,
+            "stream": "stderr",
+            "text": "[lasm] Linking application and Lean runtime — 2s elapsed\n"
+          },
+          {
+            "seconds": 40.059437984999995,
+            "stream": "stderr",
+            "text": "[lasm] Linking application and Lean runtime — 12s elapsed\n"
+          },
+          {
+            "seconds": 50.062527365,
+            "stream": "stderr",
+            "text": "[lasm] Linking application and Lean runtime — 22s elapsed\n"
+          },
+          {
+            "seconds": 58.205983638,
+            "stream": "stderr",
+            "text": "[lasm] Preparing the application launcher — 0s elapsed\n"
+          },
+          {
+            "seconds": 58.947798379,
+            "stream": "stderr",
+            "text": "[lasm] Packaging the application and runtime support — 0s elapsed\n"
+          },
+          {
+            "seconds": 59.518225607,
+            "stream": "stderr",
+            "text": "[lasm] Verifying and writing application output — 0s elapsed\n"
+          },
+          {
+            "seconds": 59.532587551999995,
+            "stream": "stderr",
+            "text": "[lasm] Build ready (59s total).\n"
+          },
+          {
+            "seconds": 59.532695942,
+            "stream": "stderr",
+            "text": "[lasm] Running Main.lean…\n"
+          },
+          {
+            "seconds": 61.178243699999996,
+            "stream": "stdout",
+            "text": "Hello from Lean! 2 + 3 = 5\n"
+          }
+        ]
+      },
+      {
+        "label": "reuse and copy deployment",
+        "code": 0,
+        "signal": null,
+        "seconds": 15.605480137999999,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 8s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Reusing verified application build — 0s elapsed\n[lasm] Reused cached build (15s total).\nReused Lean 4.34.1 for node: /home/lastmjs/development/lasm/compiler/.work/first-build-progress/smoke-r1/project λ/dist\n",
+        "events": [
+          {
+            "seconds": 0.04064784900000086,
+            "stream": "stderr",
+            "text": "[lasm] Preparing Main.lean — 0s elapsed\n"
+          },
+          {
+            "seconds": 0.10302915100000246,
+            "stream": "stderr",
+            "text": "[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n"
+          },
+          {
+            "seconds": 1.1368996689999986,
+            "stream": "stderr",
+            "text": "[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n"
+          },
+          {
+            "seconds": 10.048951176000003,
+            "stream": "stderr",
+            "text": "[lasm] Verifying cached Lean 4.34.1 and Lake — 8s elapsed\n"
+          },
+          {
+            "seconds": 14.274524122999996,
+            "stream": "stderr",
+            "text": "[lasm] Checking Lean sources and imports — 0s elapsed\n"
+          },
+          {
+            "seconds": 14.323624859000002,
+            "stream": "stderr",
+            "text": "[lasm] Checking application inputs and cached build — 0s elapsed\n"
+          },
+          {
+            "seconds": 14.963938456000003,
+            "stream": "stderr",
+            "text": "[lasm] Reusing verified application build — 0s elapsed\n"
+          },
+          {
+            "seconds": 15.592240021999999,
+            "stream": "stderr",
+            "text": "[lasm] Reused cached build (15s total).\nReused Lean 4.34.1 for node: /home/lastmjs/development/lasm/compiler/.work/first-build-progress/smoke-r1/project λ/dist\n"
+          }
+        ]
+      },
+      {
+        "label": "plain Node deployment",
+        "code": 0,
+        "signal": null,
+        "seconds": 1.7803013590000045,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "events": [
+          {
+            "seconds": 1.6541140200000082,
+            "stream": "stdout",
+            "text": "Hello from Lean! 2 + 3 = 5\n"
+          }
+        ]
+      }
+    ],
+    "initialHarnessFailure": "Expected error: but Lean 4.34.1 emits error(lean.unknownIdentifier):; production diagnostics were preserved correctly.",
+    "initialResources": {
+      "startedAt": "2026-09-26T13:40:32.924Z",
+      "finishedAt": "2026-09-26T13:42:06.423Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        ".work/first-build-progress/smoke.mjs"
+      ],
+      "limits": {
+        "memoryMax": 8589934592,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 6871947673,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 3797995520,
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "correctedDiagnosticRerun": {
+      "passed": true,
+      "scope": "Corrected diagnostic assertion; real compile, reuse and deployment results retained from smoke-r1",
+      "earlierHarnessFailure": "Expected error: but Lean 4.34.1 emits error(lean.unknownIdentifier):; production diagnostics were preserved correctly.",
+      "code": 1,
+      "stdout": "",
+      "stderr": "[lasm] Preparing Broken.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 8s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n/home/lastmjs/development/lasm/compiler/.work/first-build-progress/smoke-r1/project λ/Broken.lean:1:22: error(lean.unknownIdentifier): Unknown identifier `unknownGreeting`\n\n"
+    },
+    "diagnosticResources": {
+      "startedAt": "2026-09-26T13:43:32.185Z",
+      "finishedAt": "2026-09-26T13:43:46.241Z",
+      "command": [
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        ".work/first-build-progress/diagnostic-check.mjs"
+      ],
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 214364160,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "ci": "Focused progress tests and cold-install logging assertions added to the existing Linux acceptance workflow; not dispatched for this source change.",
+  "retainedCandidate": "The previously accepted .32 archive remains unchanged and does not contain these logging improvements."
+}

@@ -37,24 +37,29 @@ export async function buildApplication(file, options = {}) {
   const source = resolve(file);
   if (!source.endsWith('.lean') || !(await stat(source)).isFile()) throw new Error(`Expected an existing Lean source: ${source}`);
   const directory = findApplicationProject(source) ?? dirname(source);
-  return withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), () => buildLockedApplication(source, options));
+  return withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), () => buildLockedApplication(source, options), {
+    onWait: () => options.progress?.({ stage: 'Waiting for another build in this project to finish' }),
+  });
 }
 
 async function buildLockedApplication(source, { target = 'node', output, rebuild = false, verbose = false,
-  cache, runtimeDirectory, log = console.error } = {}) {
+  cache, runtimeDirectory, log = console.error, progress } = {}) {
   if (!['node', 'deno', 'bun'].includes(target)) throw new Error('Invalid application target');
   // Check the bundle before expensive tool provisioning; a missing package must
   // never make an otherwise pointless multi-gigabyte compiler download.
   const selection = await selectLeanVersion(source);
+  progress?.({ stage: `Checking Lean ${selection.version} runtime` });
   const runtime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit }, { directory: runtimeDirectory });
-  log(`Preparing Lean ${selection.version} for ${target}…`);
-  const lean = await provisionLean(source, { cache, log });
+  if (!progress) log(`Preparing Lean ${selection.version} for ${target}…`);
+  const lean = await provisionLean(source, { cache, log, progress });
   if (sdkCatalog.version !== runtime.manifest.emscripten) throw new Error('The managed SDK and application runtime do not match');
   const project = findApplicationProject(source), directory = project ?? dirname(source);
-  const git = project ? await provisionGit({ cache, log }) : undefined;
+  const git = project ? await provisionGit({ cache, log, progress }) : undefined;
   const work = join(directory, '.lake/lasm/applications', digest(source).slice(0, 16));
   await mkdir(work, { recursive: true });
+  progress?.({ stage: project ? 'Checking Lean sources and Lake dependencies' : 'Checking Lean sources and imports' });
   const generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
+  progress?.({ stage: 'Checking application inputs and cached build' });
   const metadata = await applicationMetadata(generated, lean);
   const modules = [];
   for (let i = 0; i < generated.sources.length; i++) modules.push({
@@ -74,18 +79,20 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)
     throw new Error('Output directory must not contain application sources or its build cache');
   if (!rebuild && await reusableOutput(cached, signature)) {
+    progress?.({ stage: 'Reusing verified application build' });
     await deliverOutput(cached, output, signature);
     return { ...JSON.parse(await readFile(join(cached, 'build-info.json'), 'utf8')), output, cached, signature, cacheHit: true };
   }
   // No compiler SDK code runs on an unchanged application. Its catalog and
   // reviewed driver repairs are still part of the cache identity. Revalidate
   // the full SDK/Python trees when compilation actually needs to execute them.
-  const sdk = await provisionSdk({ cache, log });
-  log(`Building ${relative(process.cwd(), source) || source} for ${target}…`);
+  const sdk = await provisionSdk({ cache, log, progress });
+  if (!progress) log(`Building ${relative(process.cwd(), source) || source} for ${target}…`);
   const temporary = join(work, '.build-' + randomUUID()), dist = join(temporary, 'dist');
   await mkdir(dist, { recursive: true });
   await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
-    leanVersion: lean.version, memoryMode, verbose });
+    leanVersion: lean.version, memoryMode, verbose, progress });
+  progress?.({ stage: 'Packaging the application and runtime support' });
   copyApplicationHost(dist); writeApplicationEntrypoint(dist, target, {
     node: applicationSupport()?.node, minimumGlibc: applicationSupport()?.minimumGlibc,
   });
@@ -102,6 +109,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
     if (existsSync(cached)) await rm(cached, { recursive: true });
     await rename(dist, cached);
   }
+  progress?.({ stage: 'Verifying and writing application output' });
   await deliverOutput(cached, output, signature);
   await rm(temporary, { recursive: true, force: true });
   return { ...buildInfo, output, cached, signature, cacheHit: false };
