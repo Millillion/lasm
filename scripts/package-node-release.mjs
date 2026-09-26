@@ -12,7 +12,7 @@ import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../', import.meta.url));
-const [outputArg, runtimeArg, nativeArg, manifestSha256, version = '0.1.0-experimental.35', ...extra] = process.argv.slice(2);
+const [outputArg, runtimeArg, nativeArg, manifestSha256, version = '0.1.0-experimental.36', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && runtimeArg && nativeArg && /^[a-f0-9]{64}$/.test(manifestSha256 ?? '') && !extra.length
   && /^0\.1\.0-experimental\.\d+$/.test(version),
 'Usage: package-node-release.mjs NEW_OUTPUT RUNTIME NATIVE_BUNDLE RUNTIME_MANIFEST_SHA256 [VERSION]');
@@ -45,13 +45,13 @@ cpSync(join(root, 'examples/hello'), join(staging, 'examples/hello'), { recursiv
 const json = (path, value) => writeFileSync(join(staging, path), JSON.stringify(value, null, 2) + '\n');
 json('src/toolchains.json', { ...toolchainCatalog, defaultLean: lean, lean: { [lean]: toolchainCatalog.lean[lean] } });
 json('src/application-runtimes.json', { schema: 1, lean: { [lean]: expected } });
-json('application-support.json', { schema: 1, platforms: ['linux-x64', 'linux-arm64'], node: pins.node, lean, minimumGlibc: '2.39' });
+json('application-support.json', { schema: 1, platforms: ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64'], node: pins.node, lean, minimumGlibc: '2.39' });
 json('provenance.json', { sourceRevision, runtimeManifestSha256: manifestSha256, lean, node: pins.node });
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json')));
 json('package.json', {
   name: sourcePackage.name, version, private: true, license: 'UNLICENSED', type: 'module',
-  description: 'Compile ordinary Lean applications to run in Node on Linux',
-  bin: sourcePackage.bin, engines: { node: pins.node }, os: ['linux'], cpu: ['x64', 'arm64'],
+  description: 'Compile ordinary Lean applications to run in Node on Linux and macOS',
+  bin: sourcePackage.bin, engines: { node: pins.node }, os: ['linux', 'darwin'], cpu: ['x64', 'arm64'],
   files: ['bin', 'src', 'scripts', 'targets', 'docs', 'examples', 'README.md',
     'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json'],
   dependencies: { tar: sourcePackage.dependencies.tar },

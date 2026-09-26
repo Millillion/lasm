@@ -11,6 +11,14 @@ import { completedCgroupRemoval } from './completed-cgroup.mjs';
 const args = process.argv.slice(2);
 const self = fileURLToPath(import.meta.url);
 const root = fileURLToPath(new URL('../../', import.meta.url));
+if (process.platform === 'darwin') {
+  const child = spawn(process.execPath, [join(root, 'scripts/full-lean/run-bounded-darwin.mjs'), ...args], { stdio: 'inherit' });
+  for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child.kill(signal));
+  const code = await new Promise((resolve, reject) => {
+    child.once('error', reject); child.once('exit', code => resolve(code ?? 1));
+  });
+  process.exit(code);
+}
 if (process.platform === 'win32') {
   // Native CI uses a Windows Job Object for the same process-tree boundary.
   // Python is provisioned privately; no system Python installation is needed.

@@ -36,7 +36,9 @@ interpreter, module-data and plugin dependencies; they never package the large
 fallback. The retained historical `.34` archive predates this restriction. See the
 [size report](https://github.com/Millillion/lasm/blob/main/docs/BUNDLE_SIZE.md).
 
-Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm`. Set
+Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm` on Linux and
+`$HOME/Library/Caches/lasm` on macOS. macOS support is being validated in candidate
+`.36`; the Linux measurements above do not establish a macOS pass. Set
 `LASM_TOOLCHAIN_CACHE` to choose another directory. Compiled application caches
 live under the source project's `.lake/lasm/`. Hash checks detect changes to
 sources, tool descriptions, runtime inputs and generated outputs; an unchanged
@@ -69,5 +71,6 @@ the application's stdout remains usable in pipes. These logging improvements
 are checked in installed-package acceptance. The historical `.32` archive
 predates these improvements and remains unchanged.
 The package is a private experimental candidate, not an npm publication or a
-claim that every Lean program works. macOS, Windows, Deno, Bun, HTTP/filesystem
-parity and broad third-party packages remain separate milestones.
+claim that every Lean program works. Native macOS x86-64 and ARM64 acceptance is
+in progress, followed by Windows. Deno, Bun, HTTP/filesystem parity and broad
+third-party packages remain separate milestones.

@@ -18,3 +18,8 @@ test('release diagnostics name unsupported hosts and the required Node version',
   assert.throws(() => requireApplicationSupport(support, { platform: 'darwin', arch: 'arm64' }), /Your host is darwin-arm64/);
   assert.throws(() => requireApplicationSupport(support, { platform: 'linux', arch: 'x64', versions: { node: '24.0.0' } }), /requires Node 26.10.0.*running Node 24.0.0/);
 });
+
+for (const arch of ['x64', 'arm64']) test(`macOS ${arch} does not inherit Linux glibc requirements`, () => {
+  requireApplicationSupport({ ...support, platforms: [...support.platforms, 'darwin-' + arch], minimumGlibc: '2.39' },
+    { platform: 'darwin', arch, versions: { node: support.node } });
+});

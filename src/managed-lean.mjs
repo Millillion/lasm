@@ -3,6 +3,7 @@ import { join, dirname, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { provisionArtifact } from './managed-artifacts.mjs';
 import { executableName } from './platform.mjs';
+import { verifyNativeProgram } from './native-program.mjs';
 
 export const toolchainCatalog = JSON.parse(await readFile(new URL('./toolchains.json', import.meta.url), 'utf8'));
 
@@ -37,9 +38,12 @@ export async function provisionLean(file, options = {}) {
   const installed = await provisionArtifact(artifact, { ...options, label: `Lean ${selection.version} and Lake` });
   const lean = join(installed.directory, 'bin', executableName('lean', platform));
   const lake = join(installed.directory, 'bin', executableName('lake', platform));
+  const nativePrograms = {};
+  for (const [name, program] of [['lean', lean], ['lake', lake]])
+    nativePrograms[name] = await verifyNativeProgram(program, platform, arch);
   // An archive checksum is provenance; this check also prevents accidentally
   // pairing a native compiler with another release's runtime/serialized files.
   const commit = execFileSync(lean, ['--githash'], { encoding: 'utf8', timeout: 30_000, windowsHide: true }).trim();
   if (commit !== release.commit) throw new Error(`Managed Lean identity mismatch: expected ${release.commit}, received ${commit}`);
-  return { ...selection, ...installed, prefix: installed.directory, lean, lake, commit, platform: host };
+  return { ...selection, ...installed, prefix: installed.directory, lean, lake, commit, platform: host, nativePrograms };
 }

@@ -55,7 +55,7 @@ jobs:
           package-manager-cache: false
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.35.tgz
+          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.36.tgz
           key: ${{ inputs.candidate-cache-key }}
           fail-on-cache-miss: true
       - name: Verify original candidate identity and record both native passes
@@ -65,8 +65,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "node-linux-candidate-$GITHUB_RUN_ID" \
-            .work/node-candidate/lasm-compiler-0.1.0-experimental.35.tgz \
+            .work/node-candidate/lasm-compiler-0.1.0-experimental.36.tgz \
             .work/node-candidate/SHA256SUMS.txt \
             --draft --prerelease --target "$GITHUB_SHA" \
-            --title 'Lasm Linux Node candidate 0.1.0-experimental.35' \
+            --title 'Lasm Linux Node candidate 0.1.0-experimental.36' \
             --notes-file .work/node-candidate/notes.md

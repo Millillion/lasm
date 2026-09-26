@@ -8,7 +8,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { cacheControls } from './node-cache-controls.mjs';
 
 const [phase, workspace, archive, hiddenCheckout] = process.argv.slice(2);
-const project = join(workspace, 'project space λ'), tools = join(workspace, 'cache/lasm');
+const project = join(workspace, 'project space λ'), tools = process.platform === 'darwin' ? join(workspace, 'home/Library/Caches/lasm') : join(workspace, 'cache/lasm');
 const compiler = join(project, 'node_modules/@lasm/compiler');
 const resultPath = join(workspace, 'result.json');
 const result = existsSync(resultPath) ? JSON.parse(readFileSync(resultPath)) : { steps: [], deployments: [], passedPhases: [] };
@@ -74,6 +74,15 @@ function cachedDist(directory, source) {
   return found[0];
 }
 async function oracle(file, args, directory = project, lake = false, compiled = false) {
+  if (compiled && process.platform === 'darwin') {
+    // Complex native controls need Apple's C SDK. The maintainer compiled them
+    // outside the consumer sandbox; the product cannot access that SDK/output.
+    const records = json(join(workspace, 'native-controls.json'));
+    const sourceSha256 = createHash('sha256').update(readFileSync(join(directory, file))).digest('hex');
+    const record = records.find(r => r.file === file && JSON.stringify(r.args) === JSON.stringify(args));
+    assert.equal(record?.sourceSha256, sourceSha256, 'Native oracle must use the identical fixture');
+    (result.nativeControls ??= []).push(record); save(); return record.result;
+  }
   const { provisionLean } = await import(pathToFileURL(join(compiler, 'src/managed-lean.mjs')));
   const { nativeLeanEnvironment, applicationSources } = await import(pathToFileURL(join(compiler, 'src/application-sources.mjs')));
   const lean = await provisionLean(join(directory, file));
@@ -118,11 +127,11 @@ async function deployment(name, output, file, cases, directory = project, lake =
 }
 
 try {
-  assert.throws(() => readFileSync(hiddenCheckout), { code: 'EACCES' });
+  assert.throws(() => readFileSync(hiddenCheckout), { code: process.platform === 'darwin' ? 'EPERM' : 'EACCES' });
   for (const executable of ['lean', 'lake', 'cc', 'clang', 'python3', 'git'])
     assert.equal(spawnSync(executable, ['--version']).error?.code, 'ENOENT', executable + ' absent from PATH');
   for (const file of ['/usr/bin/python3', '/usr/bin/git', '/usr/bin/cc']) if (existsSync(file))
-    assert.throws(() => readFileSync(file), { code: 'EACCES' }, 'Absolute preinstalled tool denied: ' + file);
+    assert.throws(() => readFileSync(file), { code: process.platform === 'darwin' ? 'EPERM' : 'EACCES' }, 'Absolute preinstalled tool denied: ' + file);
   if (phase === 'cold') {
     assert.equal(existsSync(tools), false, 'Cold tool cache starts absent');
     mkdirSync(project, { recursive: true });
@@ -171,7 +180,7 @@ try {
   } else if (phase === 'offline') {
     // Kernel network restrictions, inherited by npm and every build tool.
     await assert.rejects(fetch('https://127.0.0.1:443', { signal: AbortSignal.timeout(5000) }),
-      error => error.cause?.code === 'EACCES', 'Kernel must deny TCP, not merely encounter an unavailable network');
+      error => error.cause?.code === (process.platform === 'darwin' ? 'EPERM' : 'EACCES'), 'OS sandbox must deny TCP, not merely encounter an unavailable network');
     matchesCli(npx('offline cached npx run', ['Main.lean']), basic);
     assert.equal(statSync(join(result.cached, 'program.wasm')).mtimeMs, result.originalMtime);
     assert.equal(buildInfo(result.cached).signature, result.originalSignature);

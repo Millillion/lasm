@@ -20,8 +20,8 @@ export function copyApplicationHost(output, { target, platform = process.platfor
   const directory = join(resolve(output), 'host');
   mkdirSync(directory, { recursive: true });
   for (const name of applicationHostFiles) copyFileSync(join(root, 'src', name), join(directory, name));
-  if (target === 'node' && platform === 'linux' && glibc && ['x64', 'arm64'].includes(arch))
-    copyApplicationNativeBundle(root, directory, { arch });
+  if (target === 'node' && (platform === 'darwin' || platform === 'linux' && glibc) && ['x64', 'arm64'].includes(arch))
+    copyApplicationNativeBundle(root, directory, { platform, arch });
   else copyNativeBundle(root, directory);
 }
 
@@ -58,7 +58,7 @@ if (actual !== expected) {
 } else if (actual === 'node' && expectedNode && process.versions.node !== expectedNode) {
   console.error('This application requires Node ' + expectedNode + '; you are running Node ' + process.versions.node + '. Install the supported Node release.');
   process.exitCode = 1;
-} else if (minimumGlibc && !glibcAtLeast(process.report?.getReport().header.glibcVersionRuntime, minimumGlibc)) {
+} else if (process.platform === 'linux' && minimumGlibc && !glibcAtLeast(process.report?.getReport().header.glibcVersionRuntime, minimumGlibc)) {
   console.error('This application requires glibc ' + minimumGlibc + ' or newer. Use a supported Linux system; Ubuntu 24.04 is the tested distribution.');
   process.exitCode = 1;
 } else {

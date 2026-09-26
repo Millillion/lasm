@@ -11,7 +11,7 @@ function fixture(t) {
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const source = join(root, 'src/native');
   const put = (path, value) => { mkdirSync(dirname(join(source, path)), { recursive: true }); writeFileSync(join(source, path), value); };
-  const packages = ['koffi', '@koromix/koffi-linux-x64', '@koromix/koffi-linux-arm64', '@koromix/koffi-darwin-x64']
+  const packages = ['koffi', ...['linux', 'darwin'].flatMap(platform => ['x64', 'arm64'].map(arch => `@koromix/koffi-${platform}-${arch}`))]
     .map(name => ({ name, version: '3.3.0', integrity: 'preserved vendor identity' }));
   put('manifest.json', JSON.stringify({ nodeApi: 8, packages }));
   for (const name of ['index.cjs', 'src/koffi/index.cjs', 'src/koffi/src/static.cjs', 'package.json', 'LICENSE.txt'])
@@ -19,11 +19,18 @@ function fixture(t) {
   put('node_modules/koffi/src/koffi/src/huge-unused-source.cc', 'unused');
   for (const arch of ['x64', 'arm64']) for (const name of ['index.js', 'package.json', `linux_${arch}/koffi.node`, `musl_${arch}/koffi.node`])
     put(`node_modules/@koromix/koffi-linux-${arch}/${name}`, arch + name);
+  for (const arch of ['x64', 'arm64']) for (const name of ['index.js', 'package.json', `darwin_${arch}/koffi.node`])
+    put(`node_modules/@koromix/koffi-darwin-${arch}/${name}`, arch + name);
   for (const directory of ['process', 'signals']) {
     const files = {};
     for (const arch of ['x64', 'arm64']) for (const abi of ['gnu', 'musl']) {
       const name = `linux-${arch}-${abi}${directory === 'signals' ? '.so' : ''}`, bytes = Buffer.from(name);
       put(directory + '/' + name, bytes); chmodSync(join(source, directory, name), 0o755);
+      files[name] = { bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') };
+    }
+    if (directory === 'signals') for (const arch of ['x64', 'arm64']) {
+      const name = `darwin-${arch}.dylib`, bytes = Buffer.from(name);
+      put(directory + '/' + name, bytes);
       files[name] = { bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') };
     }
     put(directory + '/manifest.json', JSON.stringify({ protocol: 1, sourceSha256: 'retained provenance', files }));
@@ -40,7 +47,7 @@ function files(base) {
 
 for (const arch of ['x64', 'arm64']) test(`Linux ${arch} deployment keeps its loaders, licenses and authenticated helpers`, t => {
   const { root, source, output } = fixture(t);
-  copyApplicationNativeBundle(root, output, { arch });
+  copyApplicationNativeBundle(root, output, { platform: 'linux', arch });
   const base = join(output, 'native'), copied = files(base);
   assert.equal(copied.length, 15);
   assert.ok(copied.includes(`node_modules/@koromix/koffi-linux-${arch}/linux_${arch}/koffi.node`));
@@ -56,11 +63,23 @@ for (const arch of ['x64', 'arm64']) test(`Linux ${arch} deployment keeps its lo
   }
 });
 
+for (const arch of ['x64', 'arm64']) test(`macOS ${arch} copies only its native adapter and signal helper`, t => {
+  const { root, source, output } = fixture(t);
+  copyApplicationNativeBundle(root, output, { platform: 'darwin', arch });
+  const base = join(output, 'native'), copied = files(base);
+  assert.equal(copied.length, 12);
+  assert.ok(copied.includes(`node_modules/@koromix/koffi-darwin-${arch}/darwin_${arch}/koffi.node`));
+  assert.ok(copied.includes(`signals/darwin-${arch}.dylib`));
+  assert.equal(copied.some(name => /linux|musl|process|bun-stack|\.cc$/.test(name)), false);
+  for (const name of copied.filter(name => !name.endsWith('manifest.json')))
+    assert.deepEqual(readFileSync(join(base, name)), readFileSync(join(source, name)));
+});
+
 test('unknown vendor layouts, missing helpers and changed helper bytes fail the build', t => {
   const { root, output, put } = fixture(t);
   assert.throws(() => copyApplicationNativeBundle(root, output, { arch: 'other' }), /architecture/);
   put('process/linux-x64-gnu', 'changed');
-  assert.throws(() => copyApplicationNativeBundle(root, output, { arch: 'x64' }), /integrity mismatch/);
+  assert.throws(() => copyApplicationNativeBundle(root, output, { platform: 'linux', arch: 'x64' }), /integrity mismatch/);
   put('manifest.json', JSON.stringify({ nodeApi: 8, packages: [] }));
   assert.throws(() => copyApplicationNativeBundle(root, output, { arch: 'arm64' }), /layout/);
 });

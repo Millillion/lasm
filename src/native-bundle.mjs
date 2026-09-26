@@ -2,9 +2,10 @@ import { cpSync, copyFileSync, existsSync, readdirSync, mkdirSync, readFileSync,
 import { join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 
-/** Node deployments already require the builder's Linux architecture and glibc. */
-export function copyApplicationNativeBundle(root, output, { arch = process.arch } = {}) {
+/** Node deployments require the builder's native OS and architecture. */
+export function copyApplicationNativeBundle(root, output, { platform = process.platform, arch = process.arch } = {}) {
   if (!['x64', 'arm64'].includes(arch)) throw new Error('Unsupported Node application architecture');
+  if (!['linux', 'darwin'].includes(platform)) throw new Error('Unsupported Node application platform');
   const source = [join(root, 'src/native'), join(root, '.cache/native-host')].find(path => existsSync(join(path, 'manifest.json')));
   if (!source) throw new Error('Native Node file adapter is missing. Reinstall the complete Lasm package.');
   const destination = join(output, 'native');
@@ -19,17 +20,20 @@ export function copyApplicationNativeBundle(root, output, { arch = process.arch 
   };
   // Preserve the vendor's loaders and license, without its C++ source tree,
   // build scripts, other architectures, or the incompatible musl binary.
-  const packageName = `@koromix/koffi-linux-${arch}`;
+  const packageName = `@koromix/koffi-${platform}-${arch}`;
   const manifest = json('manifest.json');
   const packages = manifest.packages.filter(item => ['koffi', packageName].includes(item.name));
   if (manifest.nodeApi !== 8 || packages.length !== 2 || packages.some(item => item.version !== '3.3.0'))
     throw new Error('Unrecognized native application adapter layout');
   for (const name of ['index.cjs', 'src/koffi/index.cjs', 'src/koffi/src/static.cjs', 'package.json', 'LICENSE.txt'])
     copy('node_modules/koffi/' + name);
-  for (const name of ['index.js', 'package.json', `linux_${arch}/koffi.node`])
+  for (const name of ['index.js', 'package.json', `${platform}_${arch}/koffi.node`])
     copy(`node_modules/${packageName}/${name}`);
-  write('manifest.json', { ...manifest, packages, deployment: { target: 'node', platform: 'linux', arch, libc: 'glibc' } });
-  for (const [directory, name] of [['process', `linux-${arch}-gnu`], ['signals', `linux-${arch}-gnu.so`]]) {
+  write('manifest.json', { ...manifest, packages, deployment: { target: 'node', platform, arch, ...(platform === 'linux' ? { libc: 'glibc' } : {}) } });
+  const helpers = platform === 'linux'
+    ? [['process', `linux-${arch}-gnu`], ['signals', `linux-${arch}-gnu.so`]]
+    : [['signals', `darwin-${arch}.dylib`]];
+  for (const [directory, name] of helpers) {
     const manifest = json(directory + '/manifest.json'), record = manifest.files?.[name];
     const bytes = readFileSync(join(source, directory, name));
     if (manifest.protocol !== 1 || record?.bytes !== bytes.length

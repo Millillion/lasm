@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync } from 'node:child_process';
+import { darwinProcesses, workloadProcesses } from './darwin-resources.mjs';
 
 export const GiB = 1024 ** 3;
 export function hostMemory() {
@@ -16,6 +17,15 @@ export function currentCgroup() {
   return join('/sys/fs/cgroup', path);
 }
 export function hasResourceGuard() {
+  if (process.platform === 'darwin') {
+    try {
+      const report = JSON.parse(readFileSync(process.env.LASM_RESOURCE_REPORT, 'utf8'));
+      process.kill(report.monitorPid, 0);
+      return report.unit === process.env.LASM_RESOURCE_UNIT && report.status === 'running'
+        && report.hardCap === false && Date.now() - Date.parse(report.updatedAt) < 5000
+        && workloadProcesses(darwinProcesses(), report.processGroup).some(p => p.pid === process.pid);
+    } catch { return false; }
+  }
   if (process.platform === 'win32') {
     if (!process.env.LASM_RESOURCE_UNIT || !process.env.LASM_RESOURCE_PYTHON) return false;
     // Query the actual named Job Object and this descendant's membership.
@@ -36,7 +46,7 @@ export function hasResourceGuard() {
 }
 export async function ensureResourceGuard() {
   if (hasResourceGuard()) return;
-  if (!['linux', 'win32'].includes(process.platform)) throw new Error('This maintainer harness needs a Linux cgroup or Windows Job Object guard');
+  if (!['linux', 'win32', 'darwin'].includes(process.platform)) throw new Error('This maintainer harness needs a supported native resource guard');
   const runner = fileURLToPath(new URL('./run-bounded.mjs', import.meta.url));
   const report = process.platform === 'win32' ? ['--report', join(process.cwd(), '.work/resource-runs', `${Date.now()}-${process.pid}.json`)] : [];
   const child = spawn(process.execPath, [runner, ...report, '--', process.execPath, ...process.argv.slice(1)], { stdio: 'inherit' });

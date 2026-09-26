@@ -79,7 +79,7 @@ compatibility launchers. These interfaces have no current release support guaran
 | --- | --- | --- |
 | Ubuntu 24.04.5 LTS, glibc 2.39, Node 26.10.0 | x86-64 and ARM64 | Native installed-package acceptance passed for candidate `.34`. |
 | Other Linux distributions | x86-64 and ARM64 | Unverified; glibc 2.39 or newer is required. Alpine/musl is unsupported. |
-| macOS | x86-64 and ARM64 | Implementation and native acceptance next; not yet supported. |
+| macOS 15 | x86-64 and ARM64 | Candidate `.36` adds managed builds and deployment; native acceptance is pending. Not yet a verified release target. |
 | Windows | x86-64 and ARM64 | Follows macOS; not yet supported. |
 | Deno, Bun, browsers, Cloudflare Workers | Any | Not supported by the release candidate. |
 | Lambda, Netlify, other serverless services | Any | No deployment adapter or platform acceptance yet. |

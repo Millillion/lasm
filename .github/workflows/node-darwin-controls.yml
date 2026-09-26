@@ -1,0 +1,32 @@
+name: Native macOS resource and isolation controls
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  controls:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15-intel
+            architecture: x64
+          - runner: macos-15
+            architecture: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.architecture }}
+          package-manager-cache: false
+      - name: Verify guard, cleanup and below-cap proactive stop
+        run: node scripts/ci/check-darwin-guard.mjs
+      - name: Verify unavailable developer tools and network
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-isolation-resources.json -- node scripts/ci/check-darwin-isolation.mjs
+      - name: Preserve resource evidence
+        if: always()
+        run: node -e "const f=require('node:fs');for(const p of f.readdirSync('.work').filter(n=>n.startsWith('darwin-')&&n.endsWith('.json')))console.log(p+'\n'+f.readFileSync('.work/'+p,'utf8'))"

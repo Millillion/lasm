@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 
 assert.equal(process.env.GITHUB_REPOSITORY, 'Millillion/lasm');
 assert.equal(process.env.GITHUB_REF, 'refs/heads/main');
-const filename = 'lasm-compiler-0.1.0-experimental.35.tgz';
+const filename = 'lasm-compiler-0.1.0-experimental.36.tgz';
 const hash = createHash('sha256');
 for await (const chunk of createReadStream('.work/node-candidate/' + filename)) hash.update(chunk);
 const sha256 = hash.digest('hex');
@@ -35,7 +35,7 @@ assert.match(acceptance.runId, /^\d+$/);
 writeFileSync('.work/node-candidate/SHA256SUMS.txt', `${sha256}  ${filename}\n`);
 writeFileSync('.work/node-candidate/notes.md', `Unpublished, private npm candidate for the basic ordinary Lean-on-Node workflow.
 
-Both native Ubuntu 24.04 jobs (x86-64 and ARM64) passed the installed-package and independent-deployment controls using this exact archive.
+Native installed-package and independent-deployment controls passed for: ${process.env.LASM_ACCEPTANCE_PLATFORMS ?? "linux-x64,linux-arm64"}. These passes use this exact archive.
 
 Package source revision: ${provenance.sourceRevision}
 Validation controls revision: ${acceptance.sourceRevision}
