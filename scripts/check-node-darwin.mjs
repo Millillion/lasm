@@ -79,7 +79,7 @@ try {
     result.activePhase = phase; save();
     const profile = join(output, phase + '.sb');
     writeFileSync(profile, darwinSandbox({ reads: [archive], writes: [workspace],
-      executables: [nodePrefix, workspace, '/bin/sh', '/usr/bin/env'], offline: phase === 'offline' }));
+      executables: [nodePrefix, workspace, '/bin/sh', '/bin/bash', '/usr/bin/env'], offline: phase === 'offline' }));
     const actual = isolated(profile, [node, join(workspace, 'node-installed.mjs'), phase, workspace, archive, join(root, 'package.json')], workspace, environment);
     writeFileSync(join(output, phase + '.log'), actual.stdout + actual.stderr);
     (result.phaseExecutions ??= []).push({ phase, code: actual.code, diagnostic: actual.stderr.slice(-6000) });

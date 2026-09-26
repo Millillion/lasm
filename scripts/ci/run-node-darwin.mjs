@@ -6,6 +6,8 @@ import { resolve } from 'node:path';
 
 const output = resolve('.work/node-darwin-acceptance'), resources = resolve('.work/node-darwin-resources.json');
 const diskFile = resolve('.work/node-darwin-disk.json');
+const version = process.env.LASM_CANDIDATE_VERSION ?? '0.1.0-experimental.36';
+assert.match(version, /^0\.1\.0-experimental\.\d+$/);
 assert.ok(!existsSync(output) && !existsSync(resources) && !existsSync(diskFile));
 mkdirSync('.work', { recursive: true });
 const free = () => { const s = statfsSync('.'); return s.bavail * s.bsize; };
@@ -15,7 +17,7 @@ const save = () => writeFileSync(diskFile, JSON.stringify(result, null, 2) + '\n
 save(); assert.ok(result.freeAtStart >= result.preflightBytes, 'Need native tool headroom plus four-GiB disk reserve');
 const child = spawn(process.execPath, ['scripts/full-lean/run-bounded.mjs', '--memory-mib', '4096', '--report', resources,
   '--', process.execPath, 'scripts/check-node-darwin.mjs', output,
-  '.work/node-candidate/lasm-compiler-0.1.0-experimental.36.tgz', process.env.LASM_CANDIDATE_SHA256], { stdio: 'inherit' });
+  `.work/node-candidate/lasm-compiler-${version}.tgz`, process.env.LASM_CANDIDATE_SHA256], { stdio: 'inherit' });
 result.status = 'running'; result.minimumFreeBytes = result.freeAtStart; save();
 const timer = setInterval(() => {
   const available = free(); result.minimumFreeBytes = Math.min(result.minimumFreeBytes, available);

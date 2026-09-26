@@ -17,12 +17,14 @@ const emit = value => {
 const started = Date.now();
 const workspace = realpathSync(mkdtempSync(join(tmpdir(), 'lasm sandbox control λ-')));
 const profile = join(workspace, 'control.sb'), node = realpathSync(process.execPath);
-const policyOptions = { writes: [workspace], executables: [resolve(dirname(node), '..')], offline: true };
+const policyOptions = { writes: [workspace], executables: [resolve(dirname(node), '..'), '/bin/sh', '/bin/bash', '/usr/bin/env'], offline: true };
 writeFileSync(profile, darwinSandbox(policyOptions));
-const source = `import assert from 'node:assert/strict';import {readFileSync,writeFileSync} from 'node:fs';
+const source = `import assert from 'node:assert/strict';import {readFileSync,writeFileSync} from 'node:fs';import {spawnSync} from 'node:child_process';
 for(const p of ${JSON.stringify([join(process.cwd(), 'package.json'), '/usr/bin/git', '/usr/bin/python3', '/usr/bin/cc'])})
 assert.throws(()=>readFileSync(p),{code:'EPERM'});
 writeFileSync('allowed','workspace write works');
+const shell=spawnSync('/bin/sh',['-c','exec "$0" --version',process.execPath],{encoding:'utf8'});
+assert.equal(shell.status,0,shell.stderr);assert.equal(shell.stdout,process.version+'\\n');
 await assert.rejects(fetch('https://127.0.0.1:443'),e=>e.cause?.code==='EPERM');
 console.log('macOS filesystem and network sandbox verified');`;
 const result = spawnSync('/usr/bin/sandbox-exec', ['-f', profile, node, '--input-type=module', '-e', source],
