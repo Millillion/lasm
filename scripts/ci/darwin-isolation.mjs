@@ -14,6 +14,9 @@ export function darwinSandbox({ reads = [], writes = [], executables = [], offli
 (allow default)
 (deny file-read-data file-map-executable (require-not (require-any
   (subpath "/System/Library") (subpath "/usr/lib")
+  (subpath "/System/Volumes/Preboot/Cryptexes/OS/System/Library")
+  (subpath "/System/Volumes/Preboot/Cryptexes/OS/usr/lib")
+  (subpath "/Library/Apple/System/Library") (subpath "/usr/share")
   (subpath "/private/etc") (literal "/dev/null") (literal "/dev/urandom") (literal "/dev/random")
   ${ipc} ${subpaths([...reads, ...writes, ...executables])})))
 (deny file-write* (require-not (require-any ${ipc} ${subpaths(writes)})))
