@@ -1,0 +1,150 @@
+{
+  "scope": "LPAC alone allowed preinstalled Git under Program Files. The mandatory negative control refused acceptance. Added restricted traversal before any Lean consumer acceptance.",
+  "sourceRevision": "afb233c8335b8441d62ea5308ac933e0602371a6",
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36280824567/job/108512173953",
+      "phases": [
+        {
+          "phase": "online",
+          "code": 1,
+          "stdout": "",
+          "stderr": "node:internal/modules/run_main:111\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: Missing expected exception: C:\\Program Files\\Git\\bin\\git.exe\r\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-ObNc5d/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:10:34\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\r\n    at async node:internal/modules/esm/loader:650:26\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:105:5) {\r\n  generatedMessage: false,\r\n  code: 'ERR_ASSERTION',\r\n  actual: undefined,\r\n  expected: [Function (anonymous)],\r\n  operator: 'throws',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v26.10.0\r\n",
+          "isolation": {
+            "mechanism": "Windows Less Privileged AppContainer",
+            "profile": "Lasm.CI.21382380-a53f-4a1a-9b41-ea5459e6bab3",
+            "offline": false,
+            "status": "failed",
+            "startedAt": 1790466853.8898675,
+            "allPackagesOptOut": true,
+            "sid": "S-1-15-2-2177687459-2915975715-2653815899-3885723367-435156919-1371503650-2348857983",
+            "capabilities": [
+              "registryRead",
+              "internetClient"
+            ],
+            "ancestorMetadata": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ObNc5d",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+              "C:\\Users\\runneradmin\\AppData\\Local",
+              "C:\\Users\\runneradmin\\AppData",
+              "C:\\Users\\runneradmin",
+              "C:\\Users",
+              "C:\\"
+            ],
+            "grants": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ObNc5d\\stock Node",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ObNc5d\\readonly.txt",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ObNc5d\\writable \u65e5\u672c\u8a9e"
+            ],
+            "pid": 1304,
+            "token": {
+              "appContainer": true
+            },
+            "inheritedCappedJob": "Local\\LasmResource-3ea94462-db94-4954-a8fc-23de53b56fd1",
+            "exitCode": 1,
+            "finishedAt": 1790466858.4544256,
+            "descendantsReleased": true
+          }
+        }
+      ],
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14265729024
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 95711232,
+        "minimumHostAvailable": 14137028608,
+        "startedAt": 1790466842.8483632,
+        "unit": "Local\\LasmResource-3ea94462-db94-4954-a8fc-23de53b56fd1",
+        "pid": 7676,
+        "lastSampleAt": 1790466858.3069232,
+        "exitCode": 1,
+        "finishedAt": 1790466858.4702728
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36280824567/job/108512174094",
+      "phases": [
+        {
+          "phase": "online",
+          "code": 1,
+          "stdout": "",
+          "stderr": "node:internal/modules/run_main:111\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: Missing expected exception: C:\\Program Files\\Git\\bin\\git.exe\r\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-vilnv3/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:10:34\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:650:26)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:105:5) {\r\n  generatedMessage: false,\r\n  code: 'ERR_ASSERTION',\r\n  actual: undefined,\r\n  expected: [Function (anonymous)],\r\n  operator: 'throws',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v26.10.0\r\n",
+          "isolation": {
+            "mechanism": "Windows Less Privileged AppContainer",
+            "profile": "Lasm.CI.83a1f1d0-1591-45f0-a845-5430c27a8328",
+            "offline": false,
+            "status": "failed",
+            "startedAt": 1790466912.2162588,
+            "allPackagesOptOut": true,
+            "sid": "S-1-15-2-164535453-1731391729-573926343-3474757879-34921796-715237782-3870141329",
+            "capabilities": [
+              "registryRead",
+              "internetClient"
+            ],
+            "ancestorMetadata": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-vilnv3",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+              "C:\\Users\\runneradmin\\AppData\\Local",
+              "C:\\Users\\runneradmin\\AppData",
+              "C:\\Users\\runneradmin",
+              "C:\\Users",
+              "C:\\"
+            ],
+            "grants": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-vilnv3\\stock Node",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-vilnv3\\readonly.txt",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-vilnv3\\writable \u65e5\u672c\u8a9e"
+            ],
+            "pid": 4128,
+            "token": {
+              "appContainer": true
+            },
+            "inheritedCappedJob": "Local\\LasmResource-1fdb57a9-1cb1-4460-afea-f0066a3865fd",
+            "exitCode": 1,
+            "finishedAt": 1790466917.0693436,
+            "descendantsReleased": true
+          }
+        }
+      ],
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169428480,
+          "available": 13561081856
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 97206272,
+        "minimumHostAvailable": 13399195648,
+        "startedAt": 1790466903.1241517,
+        "unit": "Local\\LasmResource-1fdb57a9-1cb1-4460-afea-f0066a3865fd",
+        "pid": 9384,
+        "lastSampleAt": 1790466916.5252168,
+        "exitCode": 1,
+        "finishedAt": 1790466917.0929072
+      }
+    }
+  ]
+}

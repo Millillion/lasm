@@ -43,7 +43,9 @@ jobs:
           node integration/windows-guard-deadline.mjs
           node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --timeout-seconds 480 --report .work/windows-isolation-resources.json -- node scripts/ci/windows-isolation-controls.mjs
       - name: Focused host and bundle controls
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-focused-resources.json -- node --test --test-concurrency=1 test/native-application-bundle.test.mjs test/node-host.test.mjs test/platform.test.mjs
+        # The legacy platform suite needs an externally installed Lean compiler.
+        # Managed compiler/linker behavior is exercised by the consumer below.
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-focused-resources.json -- node --test --test-concurrency=1 test/native-application-bundle.test.mjs test/native-program.test.mjs test/node-host.test.mjs test/application-support.test.mjs test/cli-arguments.test.mjs
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz

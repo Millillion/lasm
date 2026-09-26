@@ -77,6 +77,18 @@ class SECURITY_DESCRIPTOR(C.Structure):
                 ("owner", P), ("group", P), ("sacl", P), ("dacl", P)]
 
 
+class LUID(C.Structure):
+    _fields_ = [("low", W.DWORD), ("high", W.LONG)]
+
+
+class LUID_ATTRIBUTES(C.Structure):
+    _fields_ = [("luid", LUID), ("attributes", W.DWORD)]
+
+
+class TOKEN_PRIVILEGES(C.Structure):
+    _fields_ = [("count", W.DWORD), ("privileges", LUID_ATTRIBUTES * 1)]
+
+
 def fn(lib, name, args, result=W.BOOL):
     value = getattr(lib, name)
     value.argtypes, value.restype = args, result
@@ -102,6 +114,8 @@ wait = fn(K, "WaitForSingleObject", [W.HANDLE, W.DWORD], W.DWORD)
 exit_code = fn(K, "GetExitCodeProcess", [W.HANDLE, C.POINTER(W.DWORD)])
 open_token = fn(A, "OpenProcessToken", [W.HANDLE, W.DWORD, C.POINTER(W.HANDLE)])
 token_info = fn(A, "GetTokenInformation", [W.HANDLE, C.c_int, P, W.DWORD, C.POINTER(W.DWORD)])
+lookup_privilege = fn(A, "LookupPrivilegeValueW", [W.LPCWSTR, W.LPCWSTR, C.POINTER(LUID)])
+adjust_privileges = fn(A, "AdjustTokenPrivileges", [W.HANDLE, W.BOOL, P, W.DWORD, P, P])
 job_open = fn(K, "OpenJobObjectW", [W.DWORD, W.BOOL, W.LPCWSTR], W.HANDLE)
 in_job = fn(K, "IsProcessInJob", [W.HANDLE, W.HANDLE, C.POINTER(W.BOOL)])
 job_create = fn(K, "CreateJobObjectW", [P, W.LPCWSTR], W.HANDLE)
@@ -160,7 +174,7 @@ assert re.fullmatch(r"Lasm\.CI\.[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", na
 sid, caps, attribute_buffer = P(), [], None
 child = PROCESS()
 inner = outer = token = None
-files, grants, parents = [], [], []
+files, grants, parents, blocked = [], [], [], []
 evidence = {"mechanism": "Windows Less Privileged AppContainer", "profile": name,
             "offline": bool(spec.get("offline")), "status": "starting", "startedAt": time.time()}
 less_privileged = spec.get("lessPrivileged", True)
@@ -177,7 +191,7 @@ def acl(path, *args):
                     str(path), *args], check=True, capture_output=True, timeout=180)
 
 
-def metadata_acl(path, grant):
+def directory_acl(path, permissions=0x1200a8, mode=1):
     # SetSecurityInfo propagates existing inheritable ACEs across the volume.
     # Its MAXIMUM_ALLOWED escape also requests DELETE, conflicting with live
     # directory handles. Use the documented object-level setter with exactly
@@ -195,7 +209,7 @@ def metadata_acl(path, grant):
         success(get_security(handle, 1, 4, None, None, C.byref(old_acl), None, C.byref(descriptor)))
         assert old_acl.value, "Ancestor directory must retain a non-null DACL"
         # READ_ATTRIBUTES | READ_EA | TRAVERSE | READ_CONTROL | SYNCHRONIZE.
-        entry = EXPLICIT_ACCESS(0x1200a8 if grant else 0, 1 if grant else 4, 0, TRUSTEE(None, 0, 0, 0, sid))
+        entry = EXPLICIT_ACCESS(permissions, mode, 0, TRUSTEE(None, 0, 0, 0, sid))
         success(acl_entries(1, C.byref(entry), old_acl, C.byref(new_acl)))
         control, revision = W.WORD(), W.DWORD()
         check(sd_get_control(descriptor, C.byref(control), C.byref(revision)))
@@ -235,9 +249,22 @@ try:
     # no file data, listing, inheritance or write access. Remove non-recursively.
     if less_privileged:
         for path in [allowed_root, *allowed_root.parents]:
-            metadata_acl(path, True)
+            directory_acl(path)
             parents.append(path)
         evidence["ancestorMetadata"] = [str(p) for p in parents]
+        # Program Files commonly grants ALL RESTRICTED APPLICATION PACKAGES
+        # access, including developer tools such as Git. A per-SID traversal
+        # deny plus removal of bypass-traversal privilege closes those trees
+        # without rewriting ACLs on their descendants. Ordinary OS files remain.
+        roots = [os.environ.get(k) for k in ("ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "RUNNER_TOOL_CACHE", "MSYS2_LOCATION")]
+        roots.append(str(Path(os.environ["SystemRoot"]).anchor + "msys64"))
+        for path in dict.fromkeys(Path(p).resolve() for p in roots if p):
+            if not path.is_dir():
+                continue
+            assert path != allowed_root and path not in allowed_root.parents and allowed_root not in path.parents
+            directory_acl(path, 0x21, 3)  # DENY_ACCESS: list directory + traverse.
+            blocked.append(path)
+        evidence["blockedDevelopmentDirectories"] = [str(p) for p in blocked]
     # File data/execute/write grants stay inside the disposable test root.
     for mode in ("reads", "writes"):
         for item in spec.get(mode, []):
@@ -286,7 +313,19 @@ try:
     check(job_set(inner, 9, C.byref(limits), C.sizeof(limits)))
     check(job_assign(inner, child.process))
     token = W.HANDLE()
-    check(open_token(child.process, 8, C.byref(token)))
+    check(open_token(child.process, 8 | (0x20 if less_privileged else 0), C.byref(token)))
+    if less_privileged:
+        luid = LUID()
+        check(lookup_privilege(None, "SeChangeNotifyPrivilege", C.byref(luid)))
+        remove = TOKEN_PRIVILEGES(1, (LUID_ATTRIBUTES * 1)(LUID_ATTRIBUTES(luid, 4)))
+        check(adjust_privileges(token, False, C.byref(remove), 0, None, None))
+        privileges, used = C.create_string_buffer(4096), W.DWORD()
+        check(token_info(token, 3, privileges, C.sizeof(privileges), C.byref(used)))
+        count = C.cast(privileges, C.POINTER(W.DWORD))[0]
+        assert count <= 128
+        entries = C.cast(C.addressof(privileges) + TOKEN_PRIVILEGES.privileges.offset, C.POINTER(LUID_ATTRIBUTES))
+        assert all((entries[i].luid.low, entries[i].luid.high) != (luid.low, luid.high) for i in range(count))
+        evidence["traverseBypassRemoved"] = True
     actual = {}
     # GetTokenInformation does not implement the SDK's reserved LPAC enum on
     # these hosts. Verify AppContainer here; native controls independently prove
@@ -331,9 +370,9 @@ finally:
             acl(path, "/remove:g", "*" + sid_text, "/T", "/Q")
         except Exception as error:
             evidence.setdefault("cleanupErrors", []).append(str(error))
-    for path in reversed(parents):
+    for path in reversed([*parents, *blocked]):
         try:
-            metadata_acl(path, False)
+            directory_acl(path, 0, 4)
         except Exception as error:
             evidence.setdefault("cleanupErrors", []).append(str(error))
     if sid:
