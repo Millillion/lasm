@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, statSync, rmSync, openSync, readSync, closeSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { cacheControls } from './node-cache-controls.mjs';
 
 const [phase, workspace, archive, hiddenCheckout] = process.argv.slice(2);
@@ -25,6 +25,30 @@ const npx = (label, args, cwd = project) => run(label, join(dirname(process.exec
 const json = path => JSON.parse(readFileSync(path, 'utf8'));
 const buildInfo = directory => json(join(directory, 'build-info.json'));
 const basic = { code: 0, stdout: 'Hello from Lean! 2 + 3 = 5\n', stderr: '' };
+async function measureStartup() {
+  const started = performance.now(); let firstOutputSeconds, stdout = '', stderr = '', outputLimitExceeded = false;
+  const child = spawn(process.execPath, ['dist/main.mjs'], { cwd: project, timeout: 120_000,
+    stdio: ['ignore', 'pipe', 'pipe'] });
+  child.stdout.setEncoding('utf8'); child.stderr.setEncoding('utf8');
+  const append = (stream, text) => {
+    if (outputLimitExceeded) return;
+    if (stdout.length + stderr.length + text.length > 1024 * 1024) {
+      outputLimitExceeded = true; child.kill('SIGTERM'); return;
+    }
+    if (stream === 'stdout') stdout += text; else stderr += text;
+  };
+  child.stdout.on('data', text => {
+    firstOutputSeconds ??= (performance.now() - started) / 1000; append('stdout', text);
+  });
+  child.stderr.on('data', text => { append('stderr', text); });
+  const [code, signal] = await new Promise((resolve, reject) => {
+    child.once('error', reject); child.once('close', (code, signal) => resolve([code, signal]));
+  });
+  const measurement = { firstOutputSeconds, totalSeconds: (performance.now() - started) / 1000, code, signal, stdout, stderr, outputLimitExceeded };
+  (result.startupMeasurements ??= []).push(measurement); save();
+  assert.equal(outputLimitExceeded, false); assert.equal(signal, null); assert.deepEqual({ code, stdout, stderr }, basic);
+  assert.ok(firstOutputSeconds > 0 && firstOutputSeconds <= measurement.totalSeconds);
+}
 const matchesCli = (actual, expected) => {
   assert.equal(actual.code, expected.code);
   assert.equal(actual.stdout, expected.stdout);
@@ -116,7 +140,9 @@ try {
     assert.equal(statSync(join(result.cached, 'program.wasm')).mtimeMs, result.originalMtime);
     assert.equal(buildInfo(result.cached).signature, result.originalSignature);
     result.offlineCacheReused = true;
-    for (let i = 0; i < 3; i++) assert.deepEqual(run('startup sample ' + (i + 1), process.execPath, ['dist/main.mjs']), basic);
+    // New stock Node process, warm filesystem cache. First stdout is measured
+    // separately from shutdown so the report does not call total runtime startup.
+    for (let i = 0; i < 3; i++) await measureStartup();
     writeFileSync(join(project, 'Broken.lean'), 'def main : IO Unit := IO.println unknownGreeting\n');
     const broken = npx('Lean diagnostic', ['Broken.lean']);
     assert.notEqual(broken.code, 0); assert.match(broken.stdout + broken.stderr, /unknownGreeting/);

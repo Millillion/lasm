@@ -154,5 +154,37 @@
     "stdout": "{\"verified\":true,\"glibc\":\"2.39\"}\n",
     "stderr": "[lasm] Landlock ABI 4: filesystem access restricted before execution\n",
     "passed": true
+  },
+  "firstOutputStartup": {
+    "scope": "Local x64 new-process startup measurement, warm file cache; earlier packed candidate",
+    "startupMeasurements": [
+      {
+        "firstOutputSeconds": 1.772881134,
+        "totalSeconds": 1.868260933,
+        "code": 0,
+        "signal": null,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "outputLimitExceeded": false
+      },
+      {
+        "firstOutputSeconds": 1.7173854540000002,
+        "totalSeconds": 1.8145593680000003,
+        "code": 0,
+        "signal": null,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "outputLimitExceeded": false
+      },
+      {
+        "firstOutputSeconds": 1.6893617840000001,
+        "totalSeconds": 1.7835019040000002,
+        "code": 0,
+        "signal": null,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "outputLimitExceeded": false
+      }
+    ]
   }
 }
