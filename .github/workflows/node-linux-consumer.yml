@@ -1,0 +1,52 @@
+name: Native installed Linux Node consumer
+on:
+  workflow_call:
+    inputs:
+      runner:
+        required: true
+        type: string
+      architecture:
+        required: true
+        type: string
+      cache-key:
+        required: true
+        type: string
+      sha256:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  installed:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 100
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      EXPECTED_ARCHITECTURE: ${{ inputs.architecture }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ inputs.architecture }}
+          package-manager-cache: false
+      - name: Install maintainer orchestration dependencies
+        run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.32.tgz
+          key: ${{ inputs.cache-key }}
+          fail-on-cache-miss: true
+      - name: Enable process-tree resource guard
+        run: |
+          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'linux-'+process.env.EXPECTED_ARCHITECTURE)"
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Cold npm install, real npx commands, offline reuse and independent deployment
+        run: node scripts/ci/run-node-linux.mjs
+      - name: Preserve acceptance evidence in logs and summary
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');for(const p of ['.work/node-linux-acceptance/result.json','.work/node-linux-resources.json','.work/node-linux-disk.json'])if(f.existsSync(p)){const s=f.readFileSync(p,'utf8');console.log(p+'\n'+s);if(process.env.GITHUB_STEP_SUMMARY)f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### '+p+'\n\n\x60\x60\x60json\n'+s+'\x60\x60\x60\n')}"

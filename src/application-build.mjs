@@ -15,6 +15,7 @@ import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './a
 import { withApplicationLock } from './application-lock.mjs';
 import { applicationMetadata, copyApplicationMetadata } from './application-metadata.mjs';
 import { insideDirectory } from './platform.mjs';
+import { applicationSupport, requireApplicationSupport } from './application-support.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const helpers = ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs',
@@ -32,6 +33,7 @@ async function buildDriverIdentity() {
 
 /** Managed native elaboration and AOT linking, with content-verified build reuse. */
 export async function buildApplication(file, options = {}) {
+  requireApplicationSupport();
   const source = resolve(file);
   if (!source.endsWith('.lean') || !(await stat(source)).isFile()) throw new Error(`Expected an existing Lean source: ${source}`);
   const directory = findApplicationProject(source) ?? dirname(source);
@@ -65,7 +67,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
     ...(metadata ? { moduleDataIdentity: metadata.identity, moduleDataBytes: metadata.manifest.bytes } : {}),
-    target, memoryMode, modules };
+    target, host: `${process.platform}-${process.arch}`, memoryMode, modules };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
   if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)
@@ -83,7 +85,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   await mkdir(dist, { recursive: true });
   await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
     leanVersion: lean.version, memoryMode });
-  copyApplicationHost(dist); writeApplicationEntrypoint(dist, target);
+  copyApplicationHost(dist); writeApplicationEntrypoint(dist, target, { node: applicationSupport()?.node });
   await copyApplicationMetadata(metadata, dist);
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));
   const buildInfo = { ...recipe, signature, sdkIdentity: sdk.identity, sdkDriverIdentity: sdk.driverIdentity };

@@ -3,6 +3,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { constants } from 'node:os';
 import { join } from 'node:path';
 import { engineName } from './js-engine.mjs';
+import { applicationSupport } from './application-support.mjs';
 
 /** Inherit terminal streams, forward interruption, and preserve the exit code. */
 export async function runApplicationChild(executable, args, missingMessage) {
@@ -38,7 +39,13 @@ function requireApplicationEngine(executable, target) {
 /** Shared by the primary CLI and the compatibility launchers. Builds use Node. */
 export async function runApplicationCli(argv, { defaultTarget = 'node', targetExecutable } = {}) {
   const options = parseLasmArguments(argv, { defaultTarget });
-  if (options.command === 'help') { console.log(cliUsage); return 0; }
+  const support = applicationSupport();
+  if (options.command === 'help') {
+    console.log(support ? 'Usage: lasm Main.lean [-- arguments…]\n       lasm build Main.lean [--output dist]\n\nOptions: --rebuild, --verbose, --help\nBuild and run ordinary Lean main in Node.' : cliUsage);
+    return 0;
+  }
+  if (support && (options.target !== 'node' || options.input.endsWith('.json')))
+    throw new Error('This Lasm candidate builds ordinary .lean applications for Node. Use lasm Main.lean or lasm build Main.lean.');
   if (engineName() !== 'node') throw new Error('Building Lean applications requires Node/npm. Run the primary lasm CLI with Node.');
   if (options.input.endsWith('.json')) {
     if (options.target !== 'node') throw new Error('Target selection for callable library bindings is not yet integrated with the full application runtime');

@@ -1,80 +1,56 @@
-# Lasm compiler
+# Lasm
 
-Lasm is building a managed compiler for ordinary Lean applications deployed in
-Node, Deno, and Bun. Native Lean/Lake compiles the application ahead of time;
-the deployed application contains WebAssembly, JavaScript loaders, and host
-support. Lean source uses ordinary APIs, including `IO.FS` and `Std.Http`.
+Write an ordinary Lean program. Compile and run it in Node.
 
-The [current product plan](docs/PLAN.md) targets full Lean compatibility and
-Node/npm-only installation on Linux, macOS, and Windows, each on x64 and ARM64.
-**That acceptance goal is not complete.** Nothing has been published to npm.
-See [implementation status](docs/APPLICATION_PIPELINE.md),
-[remaining IO work](IO_LIMITATIONS.md), and [next steps](NEXT_STEPS.md).
+This repository is preparing a local npm release candidate for **Ubuntu 24.04
+LTS, x86-64 and ARM64**, using **Node 26.10.0 with npm** and **Lean 4.34.1**.
+See the [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
+for verified platforms and the exact candidate. The package has not been published
+to npm. Complete Lean language and library compatibility is later work.
 
-## Application workflow
-
-The primary CLI now connects managed native tools to the full application
-runtime. It selects Lean using the ordinary `lean-toolchain` file, defaulting to
-the release's pinned version when there is no project pin. The current managed
-application version is Lean 4.34.0; unsupported pins fail without being changed.
-
-After installing a complete local compiler candidate:
+Create an empty directory and install the candidate tarball:
 
 ```sh
-lasm Main.lean -- hello
-lasm build Main.lean --target node
-node dist/main.mjs
-
-lasm build Main.lean --target deno
-deno run -A dist/main.mjs
-
-lasm build Main.lean --target bun
-bun dist/main.mjs
+npm install /path/to/lasm-compiler-0.1.0-experimental.32.tgz
 ```
 
-Standalone files and ordinary Lake projects use the same CLI. Lake owns module
-dependencies and compiler configuration. Application builds need no Lasm imports,
-annotations, or `lasm.json`. Deploy the complete `dist/` directory.
-Building a target does not require its execution engine to be installed.
+After a separately authorized npm release, installation will be
+`npm install @lasm/compiler`. You do not need to install Lean, Lake, Python, Git,
+or a C compiler. Lasm downloads and verifies its own matching build tools.
 
-The [ordinary Lean HTTP example](examples/lean-server-latest/README.md) exercises
-JSON CRUD, persistent files, concurrent requests, binary bodies, streaming,
-cancellation, and graceful shutdown. Its parallel Vitest suite compares deployed
-Wasm with native Lean. The primary managed CLI currently has separate Linux x64
-acceptance records; it must still pass clean package installation and the full
-native platform matrix. Native Windows ARM64 build tools remain unfinished.
+Save this as `Main.lean`:
 
-## Maintainer development
+```lean
+def main : IO Unit := do
+  IO.println s!"Hello from Lean! 2 + 3 = {2 + 3}"
+```
 
-Work stays on `main`, with unsigned commits pushed to the authorized GitHub
-repository. npm publication requires separate authorization. Keep downloaded
-tools and generated artifacts under ignored `.cache/` and `.work/` directories.
-Follow [AGENTS.md](AGENTS.md): one guarded heavy workload at a time, with base
-pages and one worker for full Wasm links. Earlier overlapping workloads caused
-host OOM kills.
+Run it:
 
-The application bundle is built with
-`scripts/full-lean/build-application-runtime.mjs` and assembled with
-`scripts/full-lean/package-application-runtime.mjs`. Maintainer builds can point
-`LASM_APPLICATION_RUNTIME` to the verified bundle. Local release candidates are
-assembled by `scripts/package-application-release.mjs`; installing users receive
-the bundle inside the package. `LASM_TOOLCHAIN_CACHE` can relocate managed tools.
+```sh
+npx lasm Main.lean
+```
 
-The repository's root `lean-toolchain` still pins the older compiler-development
-project. The current HTTP example has its own ordinary Lean 4.34.0 pin. Do not
-silently replace a project's toolchain to make a command succeed.
+The program prints `Hello from Lean! 2 + 3 = 5`. The first run needs internet
+access and downloads several gigabytes of build tools; later runs reuse verified
+tools and unchanged builds. See [requirements and cache details](docs/NODE_SUPPORT.md).
 
-## Preserved earlier work
+Build a deployment without running the program:
 
-The previous Lean 4.32.0 cooperative runtime, callable JavaScript/TypeScript
-bindings, Express example, browser/Workers adapters, and compiler-in-Wasm research
-remain available with their original scope. Their results do not establish
-compatibility of the current product. Latest-Lean callable bindings and Express
-acceptance remain open work.
+```sh
+npx lasm build Main.lean
+node dist/main.mjs
+```
 
-- [Callable libraries and Lake integration](docs/DEVELOPER_WORKFLOW.md)
-- [Express application with Lean endpoints](examples/express/README.md)
-- [Earlier release and installation evidence](docs/RELEASE.md)
-- [Unchanged latest upstream suite inventory](docs/UPSTREAM_APPLICATION_TESTS.md)
-- [Separate compiler-in-Wasm results](docs/FULL_SUITE_RESULTS.md)
-- [Initial discussion and tested design claims](docs/THREAD_REVIEW.md)
+Copy the **entire `dist/` directory** to another supported Linux machine with the
+same architecture and Node version. It needs no Lean source, npm installation,
+build tools, or development cache. Build separately on each architecture.
+
+Pass program arguments with `npx lasm Main.lean -- hello`. Existing Lean projects
+can use an ordinary `lean-toolchain` containing `leanprover/lean4:v4.34.1` and
+a normal Lake project with local imports. Unsupported Lean pins fail explicitly.
+
+The current milestone covers this basic application workflow. Broader libraries,
+filesystem/HTTP parity, other operating systems and other JavaScript engines are
+not release guarantees. The [current plan](https://github.com/Millillion/lasm/blob/main/docs/PLAN.md)
+records subsequent work; earlier experimental implementations remain in the repository.

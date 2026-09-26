@@ -42,6 +42,19 @@ test('wrong engines fail before executing the application payload', t => {
   assert.doesNotMatch(result.stderr, /PAYLOAD EXECUTED/);
 });
 
+for (const [name, support, message] of [
+  ['host', { platform: 'unsupported', arch: 'other' }, /built on unsupported-other.*Rebuild/],
+  ['Node version', { node: '0.0.0' }, /requires Node 0.0.0.*Install/],
+]) test(`incompatible deployment ${name} is rejected before loading host dependencies`, t => {
+  const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-platform-')));
+  t.after(() => rmSync(base, { recursive: true, force: true }));
+  writeApplicationEntrypoint(base, 'node', support);
+  const result = spawnSync(process.execPath, [join(base, 'main.mjs')], { encoding: 'utf8' });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, message);
+  assert.doesNotMatch(result.stderr, /ERR_MODULE_NOT_FOUND/);
+});
+
 test('all full-runtime host support files exist and target validation is strict', () => {
   assert.throws(() => applicationEntrypoint('browser'), /Invalid/);
   const names = new Set(applicationHostFiles);

@@ -62,8 +62,10 @@ jobs:
       - name: Compare relocated compiled Node output with native Lean
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/smoke-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/ci/application-runtime-source.mjs smoke
       - name: Assemble the authenticated runtime handoff
-        id: inputs
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/ci-application-runtime/handoff-resources.json -- node scripts/ci/node-runtime-inputs.mjs
+      - name: Export the handoff identity outside the isolated build environment
+        id: inputs
+        run: node -e "const f=require('node:fs'),r=JSON.parse(f.readFileSync('.work/node-runtime-inputs-result.json'));f.appendFileSync(process.env.GITHUB_OUTPUT,'sha256='+r.sha256+'\ncache-key='+r.cacheKey+'\n')"
       - name: Check the included cache storage budget
         id: budget
         env:

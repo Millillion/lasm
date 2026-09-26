@@ -20,7 +20,7 @@ export function copyApplicationHost(output) {
   copyNativeBundle(root, directory);
 }
 
-export function applicationEntrypoint(target) {
+export function applicationEntrypoint(target, { platform = process.platform, arch = process.arch, node } = {}) {
   if (!['node', 'deno', 'bun'].includes(target)) throw new Error('Invalid application deployment target');
   const shebang = target === 'deno' ? '/usr/bin/env -S deno run -A' : '/usr/bin/env ' + target;
   return `#!${shebang}
@@ -38,8 +38,17 @@ if (process.versions.deno && process.env.LASM_DENO_CHILD_ENV !== undefined) {
 }
 const expected = ${JSON.stringify(target)};
 const actual = process.versions.deno ? 'deno' : process.versions.bun ? 'bun' : 'node';
+const expectedHost = ${JSON.stringify(`${platform}-${arch}`)};
+const actualHost = process.platform + '-' + process.arch;
+const expectedNode = ${JSON.stringify(node ?? null)};
 if (actual !== expected) {
   console.error('This application was built for ' + expected + '; it is running in ' + actual + '. Rebuild with --target ' + actual + '.');
+  process.exitCode = 1;
+} else if (actualHost !== expectedHost) {
+  console.error('This application was built on ' + expectedHost + '; it is running on ' + actualHost + '. Rebuild the Lean source with Lasm on this platform.');
+  process.exitCode = 1;
+} else if (actual === 'node' && expectedNode && process.versions.node !== expectedNode) {
+  console.error('This application requires Node ' + expectedNode + '; you are running Node ' + process.versions.node + '. Install the supported Node release.');
   process.exitCode = 1;
 } else {
   if (actual === 'deno') (await import('./host/deno-stack.mjs')).prepareDenoStack(import.meta.url);
@@ -53,8 +62,8 @@ if (actual !== expected) {
 `;
 }
 
-export function writeApplicationEntrypoint(output, target) {
+export function writeApplicationEntrypoint(output, target, support) {
   mkdirSync(output, { recursive: true });
-  writeFileSync(join(output, 'main.mjs'), applicationEntrypoint(target), { mode: 0o755 });
+  writeFileSync(join(output, 'main.mjs'), applicationEntrypoint(target, support), { mode: 0o755 });
   writeFileSync(join(output, 'package.json'), JSON.stringify({ private: true, type: 'module' }) + '\n');
 }

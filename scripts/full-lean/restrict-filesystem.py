@@ -23,7 +23,7 @@ if abi < 3:
 
 
 class Ruleset(ctypes.Structure):
-    _fields_ = [('handled_access_fs', ctypes.c_uint64)]
+    _fields_ = [('handled_access_fs', ctypes.c_uint64), ('handled_access_net', ctypes.c_uint64)]
 
 
 class PathBeneath(ctypes.Structure):
@@ -41,8 +41,11 @@ def checked(result, action):
 # Network access is unchanged. The runtime controls exercise a permitted local
 # network separately; installation requires HTTPS to the pinned upstream URLs.
 handled = (1 << (16 if abi >= 5 else 15)) - 1
-ruleset = Ruleset(handled)
-descriptor = checked(libc.syscall(create_ruleset, ctypes.byref(ruleset), ctypes.sizeof(ruleset), 0), 'create Landlock ruleset')
+deny_tcp = config.get('denyTcp', False)
+if deny_tcp and abi < 4:
+    raise SystemExit('Offline controls require Landlock ABI 4 or newer')
+ruleset = Ruleset(handled, 3 if deny_tcp else 0)
+descriptor = checked(libc.syscall(create_ruleset, ctypes.byref(ruleset), ctypes.sizeof(ruleset) if abi >= 4 else 8, 0), 'create Landlock ruleset')
 try:
     for entry in config['allow']:
         path = os.path.realpath(entry['path'])

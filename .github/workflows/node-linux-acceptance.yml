@@ -1,0 +1,84 @@
+name: Linux Node installed-package acceptance
+on:
+  workflow_dispatch:
+    inputs:
+      runtime-cache-key:
+        description: Exact cache key emitted by Node Linux runtime inputs
+        required: true
+        type: string
+      runtime-sha256:
+        description: SHA-256 of the authenticated runtime handoff
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: lasm-cache-writer
+  cancel-in-progress: false
+jobs:
+  package:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    outputs:
+      sha256: ${{ steps.package.outputs.sha256 }}
+      cache-key: lasm-node-linux-candidate-${{ github.run_id }}-${{ steps.package.outputs.sha256 }}
+    env:
+      LASM_RUNTIME_ARCHIVE_SHA256: ${{ inputs.runtime-sha256 }}
+      LASM_CACHE_WRITER_GROUP: lasm-cache-writer
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Check Node and Lean acceptance pins
+        run: node scripts/ci/check-acceptance-versions.mjs .work/node-versions.json --node-only
+      - name: Focused application and packaging controls
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/node-unit-resources.json -- node --max-old-space-size=256 --test --test-concurrency=1 test/application-output.test.mjs test/application-support.test.mjs test/application-launcher.test.mjs test/cli-arguments.test.mjs test/application-files.test.mjs test/application-runtime.test.mjs test/node-cache-controls.test.mjs
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-runtime-inputs.tgz
+          key: ${{ inputs.runtime-cache-key }}
+          fail-on-cache-miss: true
+      - name: Verify runtime inputs and pack twice reproducibly
+        id: package
+        run: |
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- node scripts/ci/node-linux-candidate.mjs "$LASM_RUNTIME_ARCHIVE_SHA256"
+          node -e "const f=require('node:fs'),r=JSON.parse(f.readFileSync('.work/node-candidate/result.json'));f.appendFileSync(process.env.GITHUB_OUTPUT,'sha256='+r.sha256+'\n')"
+      - name: Check the included storage budget
+        id: budget
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/cache-budget.mjs .work/node-candidate/lasm-compiler-0.1.0-experimental.32.tgz .work/node-candidate-budget.json
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: steps.budget.outputs.allowed == 'true'
+        with:
+          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.32.tgz
+          key: lasm-node-linux-candidate-${{ github.run_id }}-${{ steps.package.outputs.sha256 }}
+      - name: Preserve candidate identity and packing measurements
+        if: always()
+        run: node -e "const f=require('node:fs');for(const p of ['.work/node-candidate/result.json','.work/node-candidate-budget.json','.work/node-package-resources.json','.work/node-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+  linux-x64:
+    needs: package
+    uses: ./.github/workflows/node-linux-consumer.yml
+    with:
+      runner: ubuntu-24.04
+      architecture: x64
+      sha256: ${{ needs.package.outputs.sha256 }}
+      cache-key: ${{ needs.package.outputs.cache-key }}
+  linux-arm64:
+    needs: [package, linux-x64]
+    uses: ./.github/workflows/node-linux-consumer.yml
+    with:
+      runner: ubuntu-24.04-arm
+      architecture: arm64
+      sha256: ${{ needs.package.outputs.sha256 }}
+      cache-key: ${{ needs.package.outputs.cache-key }}

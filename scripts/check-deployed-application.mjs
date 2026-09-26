@@ -12,8 +12,8 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 export const linuxIsolationFiles = () => [
-  { path: '/usr/lib/x86_64-linux-gnu', access: 'execute' },
-  { path: '/usr/lib64', access: 'execute' },
+  ...[`/usr/lib/${process.arch === 'arm64' ? 'aarch64' : 'x86_64'}-linux-gnu`, '/usr/lib64']
+    .filter(existsSync).map(path => ({ path, access: 'execute' })),
   { path: '/proc', access: 'read' },
   { path: '/sys/devices/system/cpu', access: 'read' },
   { path: '/dev', access: 'write' },
@@ -23,7 +23,7 @@ export const linuxIsolationFiles = () => [
 
 export async function checkDeployment(output, installed) {
   await ensureResourceGuard();
-  if (process.platform !== 'linux' || process.arch !== 'x64') throw new Error('This isolation control requires Linux x64');
+  if (process.platform !== 'linux' || !['x64', 'arm64'].includes(process.arch)) throw new Error('This isolation control requires Linux x64 or ARM64');
   if (existsSync(output)) throw new Error('Use a new deployment evidence directory');
   mkdirSync(output, { recursive: true });
   const installationFile = join(installed, 'workspace/result.json');

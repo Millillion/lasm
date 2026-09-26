@@ -33,7 +33,7 @@ const provenance = {
 writeFileSync(join(directory, 'provenance.json'), JSON.stringify(provenance, null, 2) + '\n');
 await tar({ cwd: directory, file: archive, gzip: true, portable: true, mtime: new Date(0) }, ['runtime', 'native', 'provenance.json']);
 const sha256 = await hashFile(archive);
-const cacheKey = `lasm-node-linux-inputs-${process.env.GITHUB_RUN_ID}-${sha256}`;
+const cacheKey = `lasm-node-linux-inputs-${provenance.sourceRevision}-${sha256}`;
 writeFileSync('.work/node-runtime-inputs-result.json', JSON.stringify({ archive, sha256, cacheKey, provenance }, null, 2) + '\n');
 if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `sha256=${sha256}\ncache-key=${cacheKey}\n`);
 console.log(JSON.stringify({ archive, sha256, cacheKey, sourceRevision: provenance.sourceRevision, runtimeManifestSha256: manifestSha256 }, null, 2));
