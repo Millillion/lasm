@@ -1,0 +1,146 @@
+{
+  "scope": "Ancestor grants and cleanup succeeded. Node control failed because AppContainer rewrites LOCALAPPDATA to its private AC path. Adapt only the CI cache expectation; Lasm still uses its ordinary platform cache.",
+  "sourceRevision": "a9b63be1c06f6d0b4519eeb9ea0ab0b5209dcfa2",
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36280623884/job/108511620892",
+      "phase": {
+        "phase": "online",
+        "code": 1,
+        "stdout": "",
+        "stderr": "node:internal/modules/run_main:111\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\r\n+ actual - expected\r\n\r\n+ 'C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-ptro5c\\\\writable \u65e5\u672c\u8a9e\\\\home\\\\AppData\\\\Local\\\\Packages\\\\lasm.ci.8138accf-6c80-4557-9636-0b7c2225848b\\\\AC'\r\n- 'C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-ptro5c\\\\writable \u65e5\u672c\u8a9e\\\\home\\\\AppData\\\\Local'\r\n\r\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-ptro5c/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:7:8\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\r\n    at async node:internal/modules/esm/loader:650:26\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:105:5) {\r\n  generatedMessage: true,\r\n  code: 'ERR_ASSERTION',\r\n  actual: 'C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-ptro5c\\\\writable \u65e5\u672c\u8a9e\\\\home\\\\AppData\\\\Local\\\\Packages\\\\lasm.ci.8138accf-6c80-4557-9636-0b7c2225848b\\\\AC',\r\n  expected: 'C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-ptro5c\\\\writable \u65e5\u672c\u8a9e\\\\home\\\\AppData\\\\Local',\r\n  operator: 'strictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v26.10.0\r\n",
+        "isolation": {
+          "mechanism": "Windows Less Privileged AppContainer",
+          "profile": "Lasm.CI.8138accf-6c80-4557-9636-0b7c2225848b",
+          "offline": false,
+          "status": "failed",
+          "startedAt": 1790466617.03959,
+          "allPackagesOptOut": true,
+          "sid": "S-1-15-2-355561805-3634910373-3151897085-3739851018-3542979911-2045562255-2644471696",
+          "capabilities": [
+            "registryRead",
+            "internetClient"
+          ],
+          "ancestorMetadata": [
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ptro5c",
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+            "C:\\Users\\runneradmin\\AppData\\Local",
+            "C:\\Users\\runneradmin\\AppData",
+            "C:\\Users\\runneradmin",
+            "C:\\Users",
+            "C:\\"
+          ],
+          "grants": [
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ptro5c\\stock Node",
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ptro5c\\readonly.txt",
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ptro5c\\writable \u65e5\u672c\u8a9e"
+          ],
+          "pid": 6656,
+          "token": {
+            "appContainer": true
+          },
+          "inheritedCappedJob": "Local\\LasmResource-5c08d501-ddf5-4041-8a11-0a9c63875b35",
+          "exitCode": 1,
+          "finishedAt": 1790466622.94035,
+          "descendantsReleased": true
+        }
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14197059584
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 95117312,
+        "minimumHostAvailable": 14070657024,
+        "startedAt": 1790466605.3656256,
+        "unit": "Local\\LasmResource-5c08d501-ddf5-4041-8a11-0a9c63875b35",
+        "pid": 9188,
+        "lastSampleAt": 1790466622.959298,
+        "exitCode": 1,
+        "finishedAt": 1790466622.9598813
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36280623884/job/108511621012",
+      "phase": {
+        "phase": "online",
+        "code": 1,
+        "stdout": "",
+        "stderr": "node:internal/modules/run_main:111\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\r\n+ actual - expected\r\n\r\n+ 'C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-3kRzkR\\\\writable \u65e5\u672c\u8a9e\\\\home\\\\AppData\\\\Local\\\\Packages\\\\lasm.ci.f1be0be3-a071-4974-bd48-b011a285bdb5\\\\AC'\r\n- 'C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-3kRzkR\\\\writable \u65e5\u672c\u8a9e\\\\home\\\\AppData\\\\Local'\r\n\r\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-3kRzkR/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:7:8\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:650:26)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:105:5) {\r\n  generatedMessage: true,\r\n  code: 'ERR_ASSERTION',\r\n  actual: 'C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-3kRzkR\\\\writable \u65e5\u672c\u8a9e\\\\home\\\\AppData\\\\Local\\\\Packages\\\\lasm.ci.f1be0be3-a071-4974-bd48-b011a285bdb5\\\\AC',\r\n  expected: 'C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-3kRzkR\\\\writable \u65e5\u672c\u8a9e\\\\home\\\\AppData\\\\Local',\r\n  operator: 'strictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v26.10.0\r\n",
+        "isolation": {
+          "mechanism": "Windows Less Privileged AppContainer",
+          "profile": "Lasm.CI.f1be0be3-a071-4974-bd48-b011a285bdb5",
+          "offline": false,
+          "status": "failed",
+          "startedAt": 1790466647.1285627,
+          "allPackagesOptOut": true,
+          "sid": "S-1-15-2-149293519-237860149-1678502320-41114324-2095019512-4190394028-3856136205",
+          "capabilities": [
+            "registryRead",
+            "internetClient"
+          ],
+          "ancestorMetadata": [
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-3kRzkR",
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+            "C:\\Users\\runneradmin\\AppData\\Local",
+            "C:\\Users\\runneradmin\\AppData",
+            "C:\\Users\\runneradmin",
+            "C:\\Users",
+            "C:\\"
+          ],
+          "grants": [
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-3kRzkR\\stock Node",
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-3kRzkR\\readonly.txt",
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-3kRzkR\\writable \u65e5\u672c\u8a9e"
+          ],
+          "pid": 7388,
+          "token": {
+            "appContainer": true
+          },
+          "inheritedCappedJob": "Local\\LasmResource-88731400-2423-423b-8b0c-0cd8c7aa49dc",
+          "exitCode": 1,
+          "finishedAt": 1790466651.3966548,
+          "descendantsReleased": true
+        }
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13595541504
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 95916032,
+        "minimumHostAvailable": 13417164800,
+        "startedAt": 1790466638.588378,
+        "unit": "Local\\LasmResource-88731400-2423-423b-8b0c-0cd8c7aa49dc",
+        "pid": 7320,
+        "lastSampleAt": 1790466651.3869545,
+        "exitCode": 1,
+        "finishedAt": 1790466651.4181378
+      }
+    }
+  ]
+}

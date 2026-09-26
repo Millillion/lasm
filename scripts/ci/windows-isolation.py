@@ -10,6 +10,7 @@ import json
 import msvcrt
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import time
@@ -154,7 +155,8 @@ assert command and all(isinstance(s, str) and "\0" not in s for s in command)
 assert Path(command[0]).is_absolute() and Path(cwd).is_dir()
 timeout = spec.get("timeoutSeconds", 3000)
 assert 1 <= timeout <= 3600
-name = "Lasm.CI." + str(uuid.uuid4())
+name = spec.get("profile", "Lasm.CI." + str(uuid.uuid4()))
+assert re.fullmatch(r"Lasm\.CI\.[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", name)
 sid, caps, attribute_buffer = P(), [], None
 child = PROCESS()
 inner = outer = token = None

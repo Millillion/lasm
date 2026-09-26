@@ -10,7 +10,7 @@ import { cacheControls } from './node-cache-controls.mjs';
 const [phase, workspace, archive, hiddenCheckout] = process.argv.slice(2);
 const project = join(workspace, 'project space λ'), tools = process.platform === 'darwin'
   ? join(workspace, 'home/Library/Caches/lasm') : process.platform === 'win32'
-    ? join(workspace, 'home/AppData/Local/lasm/Cache') : join(workspace, 'cache/lasm');
+    ? join(process.env.LOCALAPPDATA, 'lasm/Cache') : join(workspace, 'cache/lasm');
 const compiler = join(project, 'node_modules/@lasm/compiler');
 const resultPath = join(workspace, 'result.json');
 const result = existsSync(resultPath) ? JSON.parse(readFileSync(resultPath)) : { steps: [], deployments: [], passedPhases: [] };

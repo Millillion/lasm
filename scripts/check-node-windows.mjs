@@ -5,6 +5,7 @@ import { join, resolve, dirname } from 'node:path';
 import { tmpdir, release } from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync, execFileSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 import { windowsIsolated } from './ci/windows-isolation.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
@@ -19,6 +20,7 @@ const output = resolve(outputArg), originalArchive = resolve(archiveArg);
 assert.ok(!existsSync(output), 'Preserve earlier acceptance reports');
 assert.equal(await hashFile(originalArchive), expectedSha); mkdirSync(output, { recursive: true });
 const containerRoot = realpathSync(mkdtempSync(join(tmpdir(), 'lasm Node Windows λ-')));
+const profile = 'Lasm.CI.' + randomUUID();
 const workspace = join(containerRoot, 'consumer 日本語'); mkdirSync(workspace);
 const archive = join(containerRoot, 'candidate.tgz'); copyFileSync(originalArchive, archive);
 const stock = join(containerRoot, 'stock Node'); mkdirSync(stock);
@@ -44,7 +46,7 @@ const result = { scope: 'Native Windows installed Node/npm-only CLI and copied d
   platform: process.platform + '-' + process.arch, node: process.version, kernel: release(),
   osRelease: execFileSync('cmd.exe', ['/d', '/c', 'ver'], { encoding: 'utf8' }).trim(),
   sourceRevision: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),
-  archiveSha256: expectedSha, archiveBytes: statSync(archive).size, workspace, containerRoot,
+  archiveSha256: expectedSha, archiveBytes: statSync(archive).size, workspace, containerRoot, profile,
   resourceReport: process.env.LASM_RESOURCE_REPORT, startedAt: new Date().toISOString(), passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(result, null, 2) + '\n'); save();
 const behavior = ({ isolation, ...actual }) => actual;
@@ -85,7 +87,7 @@ try {
   for (const phase of ['cold', 'lake', 'offline']) {
     if (phase === 'offline') await nativeControls();
     result.activePhase = phase; save();
-    const actual = windowsIsolated({ disposableRoot: containerRoot, reads: [stock, archive], writes: [workspace],
+    const actual = windowsIsolated({ profile, disposableRoot: containerRoot, reads: [stock, archive], writes: [workspace],
       command: [node, join(workspace, 'node-installed.mjs'), phase, workspace, archive, join(root, 'package.json')],
       cwd: workspace, environment, offline: phase === 'offline', timeoutSeconds: 3300 }, join(output, phase + '.json'));
     (result.phaseExecutions ??= []).push({ phase, code: actual.code, diagnostic: actual.stderr.slice(-6000), isolation: actual.isolation });
