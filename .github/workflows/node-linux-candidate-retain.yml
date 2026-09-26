@@ -1,4 +1,4 @@
-name: Retain a verified Linux Node candidate
+name: Retain a verified Node candidate
 on:
   workflow_dispatch:
     inputs:
@@ -22,6 +22,12 @@ on:
         description: Completed workflow run with both native jobs successful
         required: true
         type: string
+      darwin-x64-acceptance-run-id:
+        description: Optional completed native Intel Mac run (requires ARM64 too)
+        type: string
+      darwin-arm64-acceptance-run-id:
+        description: Optional completed native Apple Silicon run (requires Intel too)
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -40,13 +46,15 @@ jobs:
       LASM_CANDIDATE_SHA256: ${{ inputs.candidate-sha256 }}
       LASM_CANDIDATE_SOURCE_REVISION: ${{ inputs.candidate-source-revision }}
       LASM_ACCEPTANCE_RUN_ID: ${{ inputs.acceptance-run-id }}
+      LASM_DARWIN_X64_ACCEPTANCE_RUN_ID: ${{ inputs.darwin-x64-acceptance-run-id }}
+      LASM_DARWIN_ARM64_ACCEPTANCE_RUN_ID: ${{ inputs.darwin-arm64-acceptance-run-id }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 26.10.0
           package-manager-cache: false
-      - name: Verify both prior native jobs and their exact candidate reports
+      - name: Verify prior native jobs and their exact candidate reports
         env:
           GH_TOKEN: ${{ github.token }}
         run: node --max-old-space-size=128 scripts/ci/node-candidate-acceptance.mjs
@@ -57,9 +65,9 @@ jobs:
           fail-on-cache-miss: true
       - name: Verify original archive identity and prepare its receipt
         run: node --max-old-space-size=128 scripts/ci/node-candidate-receipt.mjs
-      # The draft targets the retention commit. Notes preserve the actual package
-      # and test sources; no new tag at an unreferenced historical workflow commit
-      # or additional workflow-token scope is needed.
+      # Keep the unpublished draft on an existing ref even if main advances
+      # during CI. Notes and authenticated assets preserve exact package/test
+      # revisions; the draft target does not identify the artifact's source.
       - name: Retain the exact tested candidate in an unpublished draft
         env:
           GH_TOKEN: ${{ github.token }}
@@ -68,6 +76,6 @@ jobs:
             ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" \
             .work/node-candidate/SHA256SUMS.txt \
             .work/node-candidate/acceptance.json \
-            --draft --prerelease --target "$GITHUB_SHA" \
-            --title "Lasm Linux Node candidate $LASM_CANDIDATE_VERSION" \
+            --draft --prerelease --target main \
+            --title "Lasm Node candidate $LASM_CANDIDATE_VERSION" \
             --notes-file .work/node-candidate/notes.md

@@ -25,25 +25,30 @@ assert.equal(provenance.sourceRevision, process.env.LASM_CANDIDATE_SOURCE_REVISI
 assert.equal(provenance.node, '26.10.0'); assert.equal(provenance.lean, '4.34.1');
 const acceptance = process.env.LASM_ACCEPTANCE_RUN_ID
   ? JSON.parse(readFileSync('.work/node-candidate/acceptance.json', 'utf8'))
-  : { runId: process.env.GITHUB_RUN_ID, sourceRevision: process.env.GITHUB_SHA };
+  : { runId: process.env.GITHUB_RUN_ID, sourceRevision: process.env.GITHUB_SHA,
+    passedPlatforms: (process.env.LASM_ACCEPTANCE_PLATFORMS ?? 'linux-x64,linux-arm64').split(',') };
 if (process.env.LASM_ACCEPTANCE_RUN_ID) {
   assert.equal(acceptance.runId, process.env.LASM_ACCEPTANCE_RUN_ID);
   assert.equal(acceptance.archiveSha256, sha256);
   assert.equal(acceptance.packageSourceRevision, provenance.sourceRevision);
   assert.deepEqual(acceptance.passedArchitectures, ['x64', 'arm64']);
+  assert.deepEqual(acceptance.passedPlatforms, process.env.LASM_DARWIN_X64_ACCEPTANCE_RUN_ID
+    ? ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64'] : ['linux-x64', 'linux-arm64']);
 }
 assert.match(acceptance.sourceRevision, /^[a-f0-9]{40}$/);
 assert.match(acceptance.runId, /^\d+$/);
 writeFileSync('.work/node-candidate/SHA256SUMS.txt', `${sha256}  ${filename}\n`);
 writeFileSync('.work/node-candidate/notes.md', `Unpublished, private npm candidate for the basic ordinary Lean-on-Node workflow.
 
-Native installed-package and independent-deployment controls passed for: ${process.env.LASM_ACCEPTANCE_PLATFORMS ?? "linux-x64,linux-arm64"}. These passes use this exact archive.
+Native installed-package and independent-deployment controls passed for: ${acceptance.passedPlatforms.join(', ')}. These passes use this exact archive.
 
 Package source revision: ${provenance.sourceRevision}
 Validation controls revision: ${acceptance.sourceRevision}
-Retention revision: ${process.env.GITHUB_SHA}
+Retention workflow revision: ${process.env.GITHUB_SHA}
+The unpublished draft may target main; package provenance, not that ref, identifies these exact bytes.
 Package SHA-256: ${sha256}
 CI evidence: https://github.com/Millillion/lasm/actions/runs/${acceptance.runId}
+${(acceptance.nativeJobs ?? []).map(job => `${job.platform}: ${job.url} (controls ${job.controlsRevision})`).join('\n')}
 
 Requires Node 26.10.0 with npm; Lasm manages Lean 4.34.1 and its build tools. This is not full Lean language/library parity. No npm publication was performed.
 `);

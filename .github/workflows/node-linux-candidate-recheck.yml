@@ -67,6 +67,6 @@ jobs:
           gh release create "node-linux-candidate-$GITHUB_RUN_ID" \
             .work/node-candidate/lasm-compiler-0.1.0-experimental.36.tgz \
             .work/node-candidate/SHA256SUMS.txt \
-            --draft --prerelease --target "$GITHUB_SHA" \
+            --draft --prerelease --target main \
             --title 'Lasm Linux Node candidate 0.1.0-experimental.36' \
             --notes-file .work/node-candidate/notes.md
