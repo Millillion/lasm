@@ -1,7 +1,7 @@
-**Milestone:** Basic ordinary Lean-on-Node installation and deployment on native Linux x86-64 and ARM64. x86-64 complete; ARM64 running.
+**Milestone complete — 2026-09-26:** Basic ordinary Lean-on-Node installation and deployment passed on native Linux x86-64 and ARM64 in [CI](https://github.com/Millillion/lasm/actions/runs/36221743804).
 
-**Estimated finish:** Not yet estimable until the first complete ARM64 result; x86-64 acceptance took about twelve minutes.
+Both used the same reproducible candidate (`0b2451cd…9e9e9374`), Node 26.10.0/npm 11.19.1 and managed Lean 4.34.1. Each passed 24 command checks, three startup samples, six recovery controls and three independently copied deployments. All 83 focused controls passed. Peaks were 4.48/4.53 GiB; zero OOM or resource abort on either accepted run.
 
-**Verified:** [Native x86-64 acceptance passed](https://github.com/Millillion/lasm/actions/runs/36221743804/job/108348340717): all 24 command checks, three startup samples, six recovery controls and three independently copied deployments. Exact candidate SHA-256 is `0b2451cd8ef21ebd145a1da9214694cc1c2ea4f86843b5dae41cad4d9e9e9374`. Cold run 224.70 seconds; offline cached run 17.17 seconds; median first output 1.90 seconds. Peak 4.48 GiB, zero OOM/resource abort. CI memory advice and unchanged guards are recorded. All 83 focused controls pass.
+The exact tested tarball is retained in an unpublished draft and downloaded locally with SHA-256 verification. [Acceptance report](NODE_ACCEPTANCE.md) records identities, measurements, isolation and prior failures. All 25 milestone checklist items are complete.
 
-**Remaining:** ARM64 must pass this same tarball, then retain the tested draft candidate and finalize acceptance/support documentation. No npm publication is authorized.
+No npm publication occurred. Broader language/library parity, filesystem/HTTP, other operating systems and engines remain deferred.

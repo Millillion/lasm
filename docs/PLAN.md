@@ -10,6 +10,11 @@ parity before delivering the basic workflow. The previous plan is preserved in
 [OLD PLAN — archived 2026-09-25](PLAN_OLD_2026-09-25.md) for reference only.
 Updating this document does not itself start, stop, or interrupt running work.
 
+**First milestone completed 2026-09-26:** native Linux x86-64 and ARM64 passed
+the same packed candidate. See [the acceptance report](NODE_ACCEPTANCE.md) for
+exact hashes, versions, scope and measurements. The candidate is unpublished to
+npm; deferred chunks below remain future work.
+
 ## First milestone: install and run with only Node/npm
 
 A developer with only a supported stock Node/npm installation can install Lasm,
@@ -36,9 +41,9 @@ npx lasm build Main.lean
 node dist/main.mjs
 ```
 
-These commands describe the required release experience, not a claim that the
-milestone or npm publication is already complete. Until publication is explicitly
-authorized, install and validate the packed release candidate locally and in CI.
+This workflow is validated with the packed release candidate. Registry installation
+still requires an explicitly authorized npm publication; until then, install the
+candidate archive described in the README.
 
 ## Scope and architecture
 
@@ -94,70 +99,70 @@ may be reused only where its versions, artifacts, and scope match these gates.
 
 ### 1. Managed installation and dependencies
 
-- [ ] Pack a reproducible npm release candidate with its required files and
+- [x] Pack a reproducible npm release candidate with its required files and
   redistribution notices, and install it into a fresh project outside the repo.
-- [ ] Provision pinned, matching Lean/Lake, compiler/linker, libraries, sysroot,
+- [x] Provision pinned, matching Lean/Lake, compiler/linker, libraries, sysroot,
   optimizer, and any host helpers automatically. No manual Lean, SDK, Python,
   Git, C compiler, or global system configuration is required.
-- [ ] Verify downloads and cache contents; record checksums and resolved versions.
-- [ ] Recover cleanly from interrupted downloads and incomplete or damaged cache
+- [x] Verify downloads and cache contents; record checksums and resolved versions.
+- [x] Recover cleanly from interrupted downloads and incomplete or damaged cache
   entries. Give actionable errors for unavailable downloads and unsupported hosts.
-- [ ] Explain first-run network access, download sizes, cache location, and how
+- [x] Explain first-run network access, download sizes, cache location, and how
   provisioned tools are reused. Validate cached use without further downloads.
 
 ### 2. CLI and basic compiled execution
 
-- [ ] `npx lasm Main.lean` compiles and runs the basic fixture successfully, with
+- [x] `npx lasm Main.lean` compiles and runs the basic fixture successfully, with
   exact output and successful exit matching native Lean.
-- [ ] Validate argument forwarding after `--`, exit codes, and reporting of Lean
+- [x] Validate argument forwarding after `--`, exit codes, and reporting of Lean
   compilation errors with small additional fixtures.
-- [ ] Validate a tiny ordinary Lake project with a local build-time import.
-- [ ] Reuse unchanged builds and invalidate them when relevant source, toolchain,
+- [x] Validate a tiny ordinary Lake project with a local build-time import.
+- [x] Reuse unchanged builds and invalidate them when relevant source, toolchain,
   or runtime inputs change.
-- [ ] Work in paths containing spaces and Unicode on every supported platform.
-- [ ] Provide concise, actionable diagnostics without requiring developers to
+- [x] Work in paths containing spaces and Unicode on every supported platform.
+- [x] Provide concise, actionable diagnostics without requiring developers to
   understand the underlying compiler, Wasm engine, or cache implementation.
 
 ### 3. Independent deployment
 
-- [ ] `npx lasm build Main.lean` creates the complete deployment in `dist/` without
+- [x] `npx lasm build Main.lean` creates the complete deployment in `dist/` without
   running the application.
-- [ ] Copy `dist/` to a separate deployment environment and execute it with plain
+- [x] Copy `dist/` to a separate deployment environment and execute it with plain
   `node dist/main.mjs`, with no source checkout, Lean, build tools, development
   cache, or absolute build-machine paths available.
-- [ ] Package every runtime dependency needed by the selected backend. Deployment
+- [x] Package every runtime dependency needed by the selected backend. Deployment
   needs stock Node and the complete output directory, not manual helper setup.
-- [ ] Record package/download/deployment sizes and installation, first-run,
+- [x] Record package/download/deployment sizes and installation, first-run,
   cached-run, startup, and peak-memory measurements. Use these measurements to
   improve the developer experience; do not claim unmeasured performance.
 
 ### 4. CI/CD release-candidate proof
 
-- [ ] Run the Linux x86-64 and Linux ARM64 native matrix through GitHub Actions.
-- [ ] In each matrix job, install the packed npm candidate into a fresh project,
+- [x] Run the Linux x86-64 and Linux ARM64 native matrix through GitHub Actions.
+- [x] In each matrix job, install the packed npm candidate into a fresh project,
   exercise cold provisioning and cached execution, and run the deployment check.
   Testing only the source checkout is insufficient.
-- [ ] Prove the Node/npm-only prerequisite: prevent preinstalled runner compilers,
+- [x] Prove the Node/npm-only prerequisite: prevent preinstalled runner compilers,
   Lean, Python, Git, and other development tools from silently satisfying product
   dependencies. Keep CI orchestration tools separate from the environment made
   available to the installed package under test.
-- [ ] Associate passes with exact package hashes, source revisions, versions, and
+- [x] Associate passes with exact package hashes, source revisions, versions, and
   platform identities. Preserve failure evidence and report unverified platforms.
-- [ ] Produce a tested release candidate and concise acceptance report. Do not
+- [x] Produce a tested release candidate and concise acceptance report. Do not
   publish to npm without an explicit publication request.
 
 ### 5. README and release support contract
 
-- [ ] Make the README irreducibly simple for a human or AI agent starting from a
+- [x] Make the README irreducibly simple for a human or AI agent starting from a
   fresh supported machine: purpose, prerequisites, one complete `Main.lean`, and
   the exact install, run, build, and deployment commands.
-- [ ] State exact validated OS/architecture and Node/Lean constraints, required
+- [x] State exact validated OS/architecture and Node/Lean constraints, required
   network access, automatically managed dependencies, and cache behavior.
-- [ ] State the exact language/library support and known limitations. Distinguish
+- [x] State the exact language/library support and known limitations. Distinguish
   tested support from incidental success and work planned for later milestones.
-- [ ] Include only essential troubleshooting and links to deeper documentation;
+- [x] Include only essential troubleshooting and links to deeper documentation;
   keep backend research and historical implementation details out of quick start.
-- [ ] Exercise the documented commands against the same release candidate used
+- [x] Exercise the documented commands against the same release candidate used
   by CI. The milestone is complete only when both Linux architectures pass and the
   README accurately describes those results.
 

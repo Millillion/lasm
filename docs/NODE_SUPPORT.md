@@ -5,14 +5,14 @@ exit status, compilation diagnostics, and a tiny Lake project with local imports
 The compiler uses ordinary Lean; this is a tested application scope, not a new
 restricted language. Full standard-library compatibility is not claimed.
 
-The acceptance targets are Ubuntu 24.04 LTS (glibc 2.39) on native x86-64 and ARM64,
+The validated targets are Ubuntu 24.04.5 LTS (glibc 2.39) on native x86-64 and ARM64,
 Node 26.10.0 with its npm, and Lean 4.34.1. Use stock Node without special flags.
 Other distributions, older system libraries, Node versions and Lean versions are
 unverified. This candidate requires glibc 2.39 or newer; musl-based distributions
 such as Alpine are unsupported. Linux builds require the standard OS shell, loader, libc and system
 libraries supplied by Ubuntu; no separately installed developer tools are required.
 See the [current acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
-for exact artifact hashes, measurements and remaining gates.
+for exact artifact hashes, native CI results and measurements.
 
 The installed package contains the Lean Wasm runtime, standard-library archives,
 and host adapters. On the first build Lasm downloads pinned native Lean/Lake,
@@ -26,7 +26,9 @@ Pinned compressed tool downloads, including Git for a Lake project, total
 979,054,712 bytes on x86-64 and 910,904,894 bytes on ARM64. A standalone file skips
 the Git download. These totals exclude the npm package and generated build files;
 unpacked tools and build caches occupy several GB. The acceptance report records
-observed disk usage and build times separately.
+observed disk usage and build times separately. The tested cold build took about
+3.6–3.7 minutes on CI, with a roughly 180 MB Hello World deployment. These are
+current measured costs, not performance guarantees for other machines.
 
 Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm`. Set
 `LASM_TOOLCHAIN_CACHE` to choose another directory. Compiled application caches

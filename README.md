@@ -2,13 +2,14 @@
 
 Write an ordinary Lean program. Compile and run it in Node.
 
-This repository is preparing a local npm release candidate for **Ubuntu 24.04
-LTS, x86-64 and ARM64**, using **Node 26.10.0 with npm** and **Lean 4.34.1**.
+The tested local npm release candidate runs on **Ubuntu 24.04.5 LTS, x86-64
+and ARM64**, using **Node 26.10.0 with npm** and **Lean 4.34.1**.
 See the [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
 for verified platforms and the exact candidate. The package has not been published
 to npm. Complete Lean language and library compatibility is later work.
 
-Create an empty directory and install the candidate tarball:
+Download the candidate linked in the acceptance report, then create an empty
+directory and install the tarball:
 
 ```sh
 npm install /path/to/lasm-compiler-0.1.0-experimental.32.tgz

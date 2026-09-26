@@ -1,0 +1,77 @@
+{
+  "scope": "Exact tested tarball retained as an unpublished draft and downloaded locally with its checksum verified",
+  "candidate": {
+    "scope": "Reproducible local npm packing; native installed acceptance is separate",
+    "tarball": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.32.tgz",
+    "sha256": "0b2451cd8ef21ebd145a1da9214694cc1c2ea4f86843b5dae41cad4d9e9e9374",
+    "sourceRevision": "368d757c166c5fba5a4f658ed062ccc4a8684d64",
+    "candidateVersion": "0.1.0-experimental.32",
+    "defaultLean": "4.34.1",
+    "node": "26.10.0",
+    "runtime": {
+      "identity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+      "name": "lean-4.34.1-wasm64"
+    },
+    "reproduciblePacking": true,
+    "compressedBytes": 65325240,
+    "installedBytes": 377739519,
+    "files": 228,
+    "resourceReport": "/home/runner/work/lasm/lasm/.work/node-package-resources.json",
+    "recordedAt": "2026-09-26T05:46:38.711Z"
+  },
+  "release": {
+    "assets": [
+      {
+        "apiUrl": "https://api.github.com/repos/Millillion/lasm/releases/assets/590061930",
+        "contentType": "application/x-gtar",
+        "createdAt": "2026-09-26T06:09:51Z",
+        "downloadCount": 0,
+        "id": "RA_kwDOUnm2v84jK6Fq",
+        "label": "",
+        "name": "lasm-compiler-0.1.0-experimental.32.tgz",
+        "size": 65325240,
+        "state": "uploaded",
+        "updatedAt": "2026-09-26T06:09:53Z",
+        "url": "https://github.com/Millillion/lasm/releases/download/untagged-b7f976257db5637e4783/lasm-compiler-0.1.0-experimental.32.tgz"
+      },
+      {
+        "apiUrl": "https://api.github.com/repos/Millillion/lasm/releases/assets/590061931",
+        "contentType": "text/plain; charset=utf-8",
+        "createdAt": "2026-09-26T06:09:51Z",
+        "downloadCount": 0,
+        "id": "RA_kwDOUnm2v84jK6Fr",
+        "label": "",
+        "name": "SHA256SUMS.txt",
+        "size": 106,
+        "state": "uploaded",
+        "updatedAt": "2026-09-26T06:09:52Z",
+        "url": "https://github.com/Millillion/lasm/releases/download/untagged-b7f976257db5637e4783/SHA256SUMS.txt"
+      }
+    ],
+    "body": "Unpublished, private npm candidate for the basic ordinary Lean-on-Node workflow.\n\nBoth native Ubuntu 24.04 jobs (x86-64 and ARM64) passed the installed-package and independent-deployment controls using this exact archive.\n\nSource revision: 368d757c166c5fba5a4f658ed062ccc4a8684d64\nPackage SHA-256: 0b2451cd8ef21ebd145a1da9214694cc1c2ea4f86843b5dae41cad4d9e9e9374\nCI evidence: https://github.com/Millillion/lasm/actions/runs/36221743804\n\nRequires Node 26.10.0 with npm; Lasm manages Lean 4.34.1 and its build tools. This is not full Lean language/library parity. No npm publication was performed.\n",
+    "isDraft": true,
+    "isPrerelease": true,
+    "tagName": "node-linux-candidate-36221743804",
+    "targetCommitish": "368d757c166c5fba5a4f658ed062ccc4a8684d64",
+    "url": "https://github.com/Millillion/lasm/releases/tag/untagged-b7f976257db5637e4783"
+  },
+  "localVerification": {
+    "run": "https://github.com/Millillion/lasm/actions/runs/36221743804",
+    "draftTag": "node-linux-candidate-36221743804",
+    "sourceRevision": "368d757c166c5fba5a4f658ed062ccc4a8684d64",
+    "archive": "/home/lastmjs/development/lasm/compiler/.work/node-linux-tested-36221743804/lasm-compiler-0.1.0-experimental.32.tgz",
+    "sha256": "0b2451cd8ef21ebd145a1da9214694cc1c2ea4f86843b5dae41cad4d9e9e9374",
+    "bytes": 65325240,
+    "verified": true,
+    "publishedToNpm": false
+  },
+  "nativeJobs": {
+    "linux-x64": 108348340717,
+    "linux-arm64": 108349855894
+  },
+  "focusedControls": {
+    "node": 80,
+    "python": 3
+  },
+  "npmPublished": false
+}
