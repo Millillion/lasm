@@ -42,7 +42,7 @@ jobs:
       - name: Check Node and Lean acceptance pins
         run: node scripts/ci/check-acceptance-versions.mjs .work/node-versions.json --node-only
       - name: Focused application and packaging controls
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/node-unit-resources.json -- node --max-old-space-size=256 --test --test-concurrency=1 test/application-output.test.mjs test/application-support.test.mjs test/application-launcher.test.mjs test/cli-arguments.test.mjs test/application-files.test.mjs test/application-runtime.test.mjs test/node-cache-controls.test.mjs test/managed-artifacts.test.mjs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/node-unit-resources.json -- node --max-old-space-size=256 --test --test-concurrency=1 test/application-output.test.mjs test/application-support.test.mjs test/application-launcher.test.mjs test/cli-arguments.test.mjs test/application-files.test.mjs test/application-runtime.test.mjs test/node-cache-controls.test.mjs test/managed-artifacts.test.mjs test/managed-git.test.mjs
       - name: Completed tool cache advice preserves file contents and scope
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 256 --report .work/node-cache-advice-resources.json -- python3 -I -B test/tool-cache-advice.test.py
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

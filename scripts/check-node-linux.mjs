@@ -26,11 +26,15 @@ for (const name of ['node-linux-installed.mjs', 'node-cache-controls.mjs'])
   copyFileSync(join(root, 'integration', name), join(workspace, name));
 for (const path of ['home', 'tmp', 'os-bin']) mkdirSync(join(workspace, path));
 symlinkSync('/bin/sh', join(workspace, 'os-bin/sh'));
-for (const path of ['npm-user-config', 'npm-global-config']) writeFileSync(join(workspace, path), '');
+for (const path of ['npm-user-config', 'npm-global-config', 'git-system-config', 'git-global-config'])
+  writeFileSync(join(workspace, path), '');
 const environment = { PATH: dirname(process.execPath) + ':' + join(workspace, 'os-bin'), HOME: join(workspace, 'home'),
   XDG_CACHE_HOME: join(workspace, 'cache'), TMPDIR: join(workspace, 'tmp'), LANG: 'C.UTF-8',
   LEAN_NUM_THREADS: '2', BINARYEN_CORES: '1', EMCC_CORES: '1',
   npm_config_userconfig: join(workspace, 'npm-user-config'), npm_config_globalconfig: join(workspace, 'npm-global-config'),
+  // A runner's optional /etc/gitconfig is outside this fresh consumer. Treat it
+  // as absent using Git's documented private-config overrides, as with npm.
+  GIT_CONFIG_SYSTEM: join(workspace, 'git-system-config'), GIT_CONFIG_GLOBAL: join(workspace, 'git-global-config'),
   npm_config_cache: join(workspace, 'npm-cache'), npm_config_registry: 'https://registry.npmjs.org/',
   npm_config_audit: 'false', npm_config_fund: 'false', npm_config_update_notifier: 'false' };
 const restrict = join(root, 'scripts/full-lean/restrict-filesystem.py');

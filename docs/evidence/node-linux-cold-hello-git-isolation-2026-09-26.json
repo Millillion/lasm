@@ -1,0 +1,506 @@
+{
+  "scope": "Partial native x86-64 acceptance: cold install and Hello World passed; Lake failed because the isolated runner denied optional system Git config. This is not a full platform pass.",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36220144960",
+  "attempt": {
+    "scope": "Native Linux installed CLI, offline cache and copied deployment; preinstalled developer tools and checkout contents denied by Landlock",
+    "platform": "linux-x64",
+    "node": "v26.10.0",
+    "kernel": "6.17.0-1022-azure",
+    "osRelease": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+    "glibc": "2.39",
+    "sourceRevision": "789e814b56792ac4c9b8f973d34817fb8d1dd567",
+    "archiveSha256": "55b5e3e118d452b71a9715da25260afd10280a388cc153d26526fe2133c9724d",
+    "archiveBytes": 65325242,
+    "workspace": "/tmp/lasm node Linux \u03bb-MU3A7i",
+    "resourceReport": "/home/runner/work/lasm/lasm/.work/node-linux-resources.json",
+    "startedAt": "2026-09-26T05:14:40.844Z",
+    "passed": false,
+    "activePhase": "lake",
+    "phaseExecutions": [
+      {
+        "phase": "cold",
+        "code": 0,
+        "diagnostic": ""
+      },
+      {
+        "phase": "lake",
+        "code": 1,
+        "diagnostic": "node:internal/modules/run_main:111\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at matchesCli (file:///tmp/lasm%20node%20Linux%20%CE%BB-MU3A7i/node-linux-installed.mjs:55:10)\n    at file:///tmp/lasm%20node%20Linux%20%CE%BB-MU3A7i/node-linux-installed.mjs:134:5\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\n    at async node:internal/modules/esm/loader:650:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:105:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 0,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v26.10.0\n"
+      }
+    ],
+    "installation": {
+      "steps": [
+        {
+          "label": "npm install candidate",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/x64/bin/npm",
+            "install",
+            "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.32.tgz"
+          ],
+          "cwd": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb",
+          "seconds": 6.743854119,
+          "code": 0,
+          "stdout": "\nadded 7 packages in 7s\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "npm version",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/x64/bin/npm",
+            "--version"
+          ],
+          "cwd": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb",
+          "seconds": 0.08996661499999936,
+          "code": 0,
+          "stdout": "11.19.1\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "cold npx lasm Main.lean",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/x64/bin/npx",
+            "lasm",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb",
+          "seconds": 228.65965968499998,
+          "code": 0,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "Preparing Lean 4.34.1 for node\u2026\nDownloading verified lean-4.34.1-linux.tar.zst\u2026\nDownloading verified python-3.13.15-20260901-linux-x64\u2026\nDownloading verified emscripten-6.0.9-linux-x64\u2026\nBuilding Main.lean for node\u2026\n",
+          "signal": null
+        },
+        {
+          "label": "npx lasm build Main.lean",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/x64/bin/npx",
+            "lasm",
+            "build",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb",
+          "seconds": 16.263289299000025,
+          "code": 0,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for node\u2026\nReused Lean 4.34.1 for node: /tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb/dist\n",
+          "signal": null
+        },
+        {
+          "label": "native comparison: Main.lean",
+          "command": [
+            "/tmp/lasm node Linux \u03bb-MU3A7i/cache/lasm/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "--run",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb",
+          "seconds": 1.8222241210000356,
+          "code": 0,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "plain Node: hello",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/x64/bin/node",
+            "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb/dist/main.mjs"
+          ],
+          "cwd": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb",
+          "seconds": 2.054232706999988,
+          "code": 0,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "Lake local import",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/x64/bin/npx",
+            "lasm",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+          "seconds": 19.746770066,
+          "code": 1,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for node\u2026\nDownloading verified dugite-native-v2.53.0-4098283-ubuntu-x64.tar.gz\u2026\nwarning: unable to access '/etc/gitconfig': Permission denied\nfatal: bad config line 10 in file /tmp/lasm node Linux \u03bb-MU3A7i/cache/lasm/artifacts/fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6/etc/gitconfig\nwarning: unable to access '/etc/gitconfig': Permission denied\nfatal: bad config line 10 in file /tmp/lasm node Linux \u03bb-MU3A7i/cache/lasm/artifacts/fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6/etc/gitconfig\n\n",
+          "signal": null
+        }
+      ],
+      "deployments": [
+        {
+          "name": "hello",
+          "output": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb/dist",
+          "source": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb/Main.lean",
+          "build": {
+            "schema": 1,
+            "lean": "4.34.1",
+            "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+            "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+            "emscripten": "6.0.9",
+            "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+            "runtimeIdentity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+            "buildDriverIdentity": "09f3bf34c76de21cfedd336bbf977196ea39d9e5b694d955d2510f93fc6d657d",
+            "target": "node",
+            "host": "linux-x64",
+            "node": "26.10.0",
+            "minimumGlibc": "2.39",
+            "memoryMode": 1,
+            "modules": [
+              {
+                "module": "Main",
+                "sourceSha256": "2b0f501bc28cf8c4451b29af1506054a50be53b3410d309407f7841320c9edc6",
+                "cSha256": "f4a4b7d37a43e63ce90a7354bec4876e57cb326287781128e64149c0f792429f"
+              }
+            ],
+            "signature": "176f7dbf0135a04ffe7cc7ac0f8a22dcc8af60966d9d4aac36685516757d0d78",
+            "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+            "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+          },
+          "bytes": 180484156,
+          "checks": [
+            {
+              "args": [],
+              "expected": {
+                "code": 0,
+                "stdout": "Hello from Lean! 2 + 3 = 5\n",
+                "stderr": ""
+              }
+            }
+          ]
+        }
+      ],
+      "passedPhases": [
+        "cold"
+      ],
+      "npm": "11.19.1",
+      "provenance": {
+        "sourceRevision": "789e814b56792ac4c9b8f973d34817fb8d1dd567",
+        "runtimeManifestSha256": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+        "lean": "4.34.1",
+        "node": "26.10.0"
+      },
+      "packageVersion": "0.1.0-experimental.32",
+      "compiler": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb/node_modules/@lasm/compiler",
+      "project": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb",
+      "tools": "/tmp/lasm node Linux \u03bb-MU3A7i/cache/lasm",
+      "support": {
+        "schema": 1,
+        "platforms": [
+          "linux-x64",
+          "linux-arm64"
+        ],
+        "node": "26.10.0",
+        "lean": "4.34.1",
+        "minimumGlibc": "2.39"
+      },
+      "cached": "/tmp/lasm node Linux \u03bb-MU3A7i/project space \u03bb/.lake/lasm/applications/f9828d17d6edf8d8/176f7dbf0135a04ffe7cc7ac0f8a22dcc8af60966d9d4aac36685516757d0d78/dist",
+      "originalSignature": "176f7dbf0135a04ffe7cc7ac0f8a22dcc8af60966d9d4aac36685516757d0d78",
+      "originalMtime": 1790399905882.4805,
+      "installBytes": 380728839,
+      "coldToolsBytes": 5497397802,
+      "error": {
+        "phase": "lake",
+        "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at matchesCli (file:///tmp/lasm%20node%20Linux%20%CE%BB-MU3A7i/node-linux-installed.mjs:55:10)\n    at file:///tmp/lasm%20node%20Linux%20%CE%BB-MU3A7i/node-linux-installed.mjs:134:5\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\n    at async node:internal/modules/esm/loader:650:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:105:5)"
+      }
+    },
+    "error": "AssertionError [ERR_ASSERTION]: lake: node:internal/modules/run_main:111\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n    at matchesCli (file:///tmp/lasm%20node%20Linux%20%CE%BB-MU3A7i/node-linux-installed.mjs:55:10)\n    at file:///tmp/lasm%20node%20Linux%20%CE%BB-MU3A7i/node-linux-installed.mjs:134:5\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\n    at async node:internal/modules/esm/loader:650:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:105:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 0,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v26.10.0\n\n\n1 !== 0\n\n    at file:///home/runner/work/lasm/lasm/scripts/check-node-linux.mjs:75:12\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+    "finishedAt": "2026-09-26T05:19:31.395Z",
+    "toolCacheAdvisorExit": {
+      "code": 0,
+      "signal": null
+    },
+    "toolCacheAdvice": {
+      "method": "fdatasync once per published tool tree; repeated POSIX_FADV_DONTNEED",
+      "scope": "Completed immutable artifacts and derived tools only; no file changes, global cache drops or resource-limit changes",
+      "cache": "/tmp/lasm node Linux \u03bb-MU3A7i/cache/lasm",
+      "trees": {
+        "artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b": {
+          "files": 17739,
+          "bytes": 3071382584
+        },
+        "artifacts/fbb538cb832673bb66912d8b9df971453edf0503312cadc16037617f9779a47c": {
+          "files": 3479,
+          "bytes": 98996687
+        },
+        "artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6": {
+          "files": 12863,
+          "bytes": 1496470847
+        },
+        "derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7": {
+          "files": 12539,
+          "bytes": 795001158
+        }
+      },
+      "passes": 127,
+      "adviceCalls": 4049210,
+      "advisedBytesIncludingRepeats": 488360549526,
+      "status": "finished",
+      "fileBytesBeforeLastPass": 1094135808,
+      "fileBytesAfterLastPass": 1032155136
+    }
+  },
+  "resources": {
+    "startedAt": "2026-09-26T05:14:40.644Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "/opt/hostedtoolcache/node/26.10.0/x64/bin/node",
+      "scripts/check-node-linux.mjs",
+      "/home/runner/work/lasm/lasm/.work/node-linux-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.32.tgz",
+      "55b5e3e118d452b71a9715da25260afd10280a388cc153d26526fe2133c9724d"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "b0d6d65c-1022-4034-9ddf-f22ba41553c2",
+    "limits": {
+      "memoryMax": 6676283392,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 5341026713,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 16770748416,
+      "available": 15266721792
+    },
+    "minimumHostAvailable": 12036444160,
+    "peakMemoryBytes": 4639924224,
+    "peakTasks": 58,
+    "report": "/home/runner/work/lasm/lasm/.work/node-linux-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-26T05:19:33.355Z",
+      "memoryBytes": 1189634048,
+      "peakMemoryBytes": 4639924224,
+      "swapBytes": 0,
+      "tasks": 12,
+      "memoryBreakdown": {
+        "anon": 52076544,
+        "file": 1032167424,
+        "kernel": 105127936,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1032044544,
+        "slab": 103988024
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "highWaterProcesses": {
+      "at": "2026-09-26T05:15:24.816Z",
+      "processes": [
+        {
+          "pid": 2423,
+          "name": "node-MainThread",
+          "residentBytes": 237355008,
+          "threads": 11
+        },
+        {
+          "pid": 2410,
+          "name": "npm exec lasm M",
+          "residentBytes": 98746368,
+          "threads": 11
+        },
+        {
+          "pid": 2358,
+          "name": "node-MainThread",
+          "residentBytes": 94126080,
+          "threads": 11
+        },
+        {
+          "pid": 2371,
+          "name": "node-MainThread",
+          "residentBytes": 57937920,
+          "threads": 7
+        },
+        {
+          "pid": 2370,
+          "name": "python3",
+          "residentBytes": 12328960,
+          "threads": 1
+        },
+        {
+          "pid": 2422,
+          "name": "sh",
+          "residentBytes": 1957888,
+          "threads": 1
+        }
+      ]
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "exit-code",
+      "exitCode": "exited",
+      "exitStatus": "1",
+      "capturedAt": "2026-09-26T05:19:33.446Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 1150914560,
+      "peakMemoryBytes": 4639924224,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13664256,
+        "file": 1032167424,
+        "kernel": 104632320,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1032044544,
+        "slab": 103875296
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-26T05:19:33.467Z",
+    "result": {
+      "code": 1,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "disk": {
+    "reserveBytes": 4294967296,
+    "preflightBytes": 12884901888,
+    "freeAtStart": 91409367040,
+    "status": "failed",
+    "minimumFreeBytes": 84749680640,
+    "freeAtEnd": 84807499776
+  },
+  "correction": "Provide empty private system/global Git configuration in the CI consumer, matching the already-private npm configuration. The product continues to respect ordinary user Git settings.",
+  "realGitControl": {
+    "scope": "Real managed Git under Landlock reproduces denied included configuration; private empty configuration permits ordinary Git commands without changing tool bytes",
+    "denied": {
+      "code": 128,
+      "stdout": "",
+      "stderr": "warning: unable to access '/tmp/lasm git denied-aKwNmY/gitconfig': Permission denied\nfatal: bad config line 2 in file /tmp/lasm git config \u03bb-jQ6SWc/include-config\n"
+    },
+    "privateConfig": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "initialized": {
+      "code": 0,
+      "stdout": "Initialized empty Git repository in /tmp/lasm git config \u03bb-jQ6SWc/project/.git/\n",
+      "stderr": ""
+    },
+    "status": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "originalConfigSha256": "f37eb06cf8567109e92f5fe8db2f59ac16a93264970a5481696cbb8f1ee70e20",
+    "passed": true
+  },
+  "realGitControlResources": {
+    "startedAt": "2026-09-26T05:23:25.949Z",
+    "command": [
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      ".work/product-acceptance/node-git-isolation-r1.mjs"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "f64f2df7-7318-433e-8d77-b6e96a8f741d",
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 26599718912
+    },
+    "minimumHostAvailable": 26568994816,
+    "peakMemoryBytes": 21032960,
+    "peakTasks": 6,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/node-linux-git-isolation-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-26T05:23:26.181Z",
+      "memoryBytes": 3919872,
+      "peakMemoryBytes": 21032960,
+      "swapBytes": 0,
+      "tasks": 6,
+      "memoryBreakdown": {
+        "anon": 3014656,
+        "file": 57344,
+        "kernel": 610304,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 57344,
+        "slab": 127672
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-26T05:23:26.219Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 13545472,
+      "peakMemoryBytes": 21032960,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11636736,
+        "file": 57344,
+        "kernel": 1085440,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 57344,
+        "slab": 149800
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-26T05:23:26.242Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  }
+}
