@@ -1,0 +1,83 @@
+name: Node Linux runtime inputs
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: lasm-cache-writer
+  cancel-in-progress: false
+
+# Cold source build on a free standard public runner. A bounded cache carries
+# the verified runtime to the Linux installed-package campaign. No publication.
+jobs:
+  runtime:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    env:
+      LASM_CACHE_WRITER_GROUP: lasm-cache-writer
+      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/ci-application-tools
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      EMCC_CORES: '1'
+      CMAKE_BUILD_PARALLEL_LEVEL: '1'
+      MAKEFLAGS: '-j1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Confirm latest stable acceptance pins
+        run: node scripts/ci/check-acceptance-versions.mjs .work/ci-application-runtime/versions.json --node-only
+      - name: Enable process-tree guard
+        run: |
+          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'linux-x64')"
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: SDK integrity and ABI-cache controls
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/ci-application-runtime/units-resources.json -- node --max-old-space-size=128 --test --test-concurrency=1 test/sdk-repairs.test.mjs test/runtime-abi-cache.test.mjs test/maintainer-python.test.mjs
+      - name: Cold managed Lean provisioning
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/lean-resources.json -- node scripts/ci/application-runtime-source.mjs lean
+      - name: Cold managed SDK provisioning
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sdk-resources.json -- node scripts/ci/application-runtime-source.mjs sdk
+      - name: Download and verify pinned public sources
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+      - name: Build the pinned GMP dependency
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/gmp-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/ci/application-runtime-source.mjs gmp
+      - name: Build host support from pinned inputs
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      - name: Build runtime and Init Std application archives
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/init-std-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/build-application-runtime.mjs --lean-version "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" --archive-generated-c --managed-sdk --tool-cache .cache/ci-application-tools --output .work/ci-application-libraries --libraries Init,Std
+      - name: Build Lean application archives
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/lean-library-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/build-application-runtime.mjs --lean-version "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" --archive-generated-c --managed-sdk --tool-cache .cache/ci-application-tools --output .work/ci-application-libraries --libraries Lean
+      - name: Build Lake and verify all cached modules
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/all-libraries-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/build-application-runtime.mjs --lean-version "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" --archive-generated-c --managed-sdk --tool-cache .cache/ci-application-tools --output .work/ci-application-libraries
+      - name: Assemble the verified application runtime
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/bundle-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/package-application-runtime.mjs .work/ci-application-libraries .work/ci-application-bundle
+      - name: Compare relocated compiled Node output with native Lean
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/smoke-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/ci/application-runtime-source.mjs smoke
+      - name: Assemble the authenticated runtime handoff
+        id: inputs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/ci-application-runtime/handoff-resources.json -- node scripts/ci/node-runtime-inputs.mjs
+      - name: Check the included cache storage budget
+        id: budget
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/cache-budget.mjs .work/node-runtime-inputs.tgz .work/node-runtime-cache-budget.json
+      - name: Save runtime inputs for the native Linux package campaign
+        if: steps.budget.outputs.allowed == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-runtime-inputs.tgz
+          key: ${{ steps.inputs.outputs.cache-key }}
+      - name: Record the exact handoff
+        run: cat .work/node-runtime-inputs-result.json .work/node-runtime-cache-budget.json
+      - name: Preserve bounded build results in logs
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');for(const d of ['.work/ci-application-runtime','.work/ci-application-libraries','.work/ci-application-bundle'])if(f.existsSync(d))for(const n of f.readdirSync(d).filter(n=>n.endsWith('.json')&&n!=='standard-library-audit.json'))if(f.statSync(d+'/'+n).isFile())console.log(d+'/'+n+'\n'+f.readFileSync(d+'/'+n,'utf8'))"
