@@ -15,9 +15,18 @@ const result = existsSync(resultPath) ? JSON.parse(readFileSync(resultPath)) : {
 const save = () => writeFileSync(resultPath, JSON.stringify(result, null, 2) + '\n');
 const run = (label, executable, args, cwd = project, env = process.env) => {
   const start = performance.now();
-  result.activeCommand = { label, command: [executable, ...args], startedAt: new Date().toISOString() }; save();
-  const value = spawnSync(executable, args, { cwd, env, encoding: 'utf8', timeout: 1800_000, maxBuffer: 2 * 1024 * 1024 });
-  const observed = { code: value.status, stdout: value.stdout ?? '', stderr: value.stderr ?? '' };
+  const logs = process.platform === 'darwin' ? ['stdout', 'stderr'].map(stream => join(workspace, `command-${result.steps.length}-${stream}.log`)) : undefined;
+  result.activeCommand = { label, command: [executable, ...args], startedAt: new Date().toISOString(), logs }; save();
+  const descriptors = logs?.map(file => openSync(file, 'wx'));
+  let value;
+  try { value = spawnSync(executable, args, { cwd, env, encoding: 'utf8', timeout: 1800_000, maxBuffer: 2 * 1024 * 1024,
+    ...(descriptors ? { stdio: ['ignore', ...descriptors] } : {}) }); }
+  finally { for (const fd of descriptors ?? []) closeSync(fd); }
+  const output = logs?.map(file => {
+    assert.ok(statSync(file).size <= 2 * 1024 ** 2, 'Command output exceeds the acceptance log budget');
+    return readFileSync(file, 'utf8');
+  });
+  const observed = { code: value.status, stdout: output?.[0] ?? value.stdout ?? '', stderr: output?.[1] ?? value.stderr ?? '' };
   result.steps.push({ label, command: [executable, ...args], cwd, seconds: (performance.now() - start) / 1000,
     ...observed, signal: value.signal, error: value.error?.message }); save();
   delete result.activeCommand; save();

@@ -13,3 +13,10 @@ test('macOS monitor follows descendants, detached children and birth-stamped ide
   assert.deepEqual(workloadProcesses([{ ...orphan, identity: '12:new birth time' }], 10, seen), []);
   assert.throws(() => parseDarwinProcesses('unrecognized accounting'), /Cannot parse/);
 });
+
+test('process names with spaces do not change birth-stamped cleanup identities', () => {
+  const [before, after] = parseDarwinProcesses('12 11 12 40 Mon Sep 21 10:00:02 2026 /tools space λ/clang\n12 11 12 45 Mon Sep 21 10:00:02 2026 /other/program');
+  assert.equal(before.command, '/tools space λ/clang');
+  assert.equal(before.identity, after.identity);
+  assert.equal(before.identity, '12:Mon Sep 21 10:00:02 2026');
+});

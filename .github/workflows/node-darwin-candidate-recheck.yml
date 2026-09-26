@@ -2,6 +2,11 @@ name: Recheck unchanged candidate on native macOS
 on:
   workflow_dispatch:
     inputs:
+      architecture:
+        description: Native architectures to rerun
+        type: choice
+        options: [both, x64, arm64]
+        default: both
       candidate-version:
         description: Exact already packed package version
         type: string
@@ -18,6 +23,7 @@ permissions:
   contents: read
 jobs:
   darwin-x64:
+    if: inputs.architecture != 'arm64'
     uses: ./.github/workflows/node-darwin-consumer.yml
     with:
       runner: macos-15-intel
@@ -26,6 +32,7 @@ jobs:
       cache-key: ${{ inputs.candidate-cache-key }}
       sha256: ${{ inputs.candidate-sha256 }}
   darwin-arm64:
+    if: inputs.architecture != 'x64'
     uses: ./.github/workflows/node-darwin-consumer.yml
     with:
       runner: macos-15

@@ -1,6 +1,6 @@
 // Disk reserve is independent of the macOS process-tree monitor.
 import assert from 'node:assert/strict';
-import { mkdirSync, readFileSync, writeFileSync, statfsSync, existsSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, statfsSync, existsSync, statSync, openSync, readSync, closeSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
 
@@ -22,6 +22,12 @@ result.status = 'running'; result.minimumFreeBytes = result.freeAtStart; save();
 const timer = setInterval(() => {
   const available = free(); result.minimumFreeBytes = Math.min(result.minimumFreeBytes, available);
   if (available < reserve && !result.resourceAbort) { result.resourceAbort = 'disk-reserve'; child.kill('SIGTERM'); }
+  try {
+    const acceptance = JSON.parse(readFileSync(resolve(output, 'result.json')));
+    const consumer = JSON.parse(readFileSync(resolve(acceptance.workspace, 'result.json')));
+    if (consumer.activeCommand?.logs?.some(file => existsSync(file) && statSync(file).size > 2 * 1024 ** 2)
+        && !result.resourceAbort) { result.resourceAbort = 'command-output-budget'; child.kill('SIGTERM'); }
+  } catch { /* Reports may be between writes during a live command. */ }
   save();
 }, 1000);
 let code;
@@ -32,7 +38,15 @@ try {
   const file = resolve(output, 'result.json');
   if (existsSync(file)) {
     const acceptance = JSON.parse(readFileSync(file)), consumer = resolve(acceptance.workspace, 'result.json');
-    if (existsSync(consumer)) acceptance.installation = JSON.parse(readFileSync(consumer));
+    if (existsSync(consumer)) {
+      acceptance.installation = JSON.parse(readFileSync(consumer));
+      for (const path of acceptance.installation.activeCommand?.logs ?? []) {
+        if (!existsSync(path)) continue;
+        const fd = openSync(path, 'r'), length = Math.min(statSync(path).size, 12000), buffer = Buffer.alloc(length);
+        try { readSync(fd, buffer, 0, length, statSync(path).size - length); } finally { closeSync(fd); }
+        (acceptance.interruptedCommandLogs ??= []).push({ path, tail: buffer.toString('utf8') });
+      }
+    }
     writeFileSync(file, JSON.stringify(acceptance, null, 2) + '\n');
   }
 } catch (error) { result.evidenceRecoveryError = error.message; }
