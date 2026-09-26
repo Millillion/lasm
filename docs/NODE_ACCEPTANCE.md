@@ -82,3 +82,20 @@ build/Binaryen worker and scoped advice to release completed cache file pages.
 Historical reports remain under their original versions:
 [initial `.32` acceptance](NODE_ACCEPTANCE_32_2026-09-26.md),
 [`.34` size reduction and former fallback](BUNDLE_SIZE.md).
+
+## Candidate `.36` Linux regression — 2026-09-26
+
+The Mac-capable candidate `.36` also passed all eight installed and isolated
+deployment checks on both native Linux architectures. Its source is
+`0e66c4d46950c50b62bff158c47b9137cc695130`; its 65,336,536-byte archive has SHA-256
+`c71616146d9f3decf9b6a93d4a142f9cabae02ee63e2ec50f8d8cdd95827c5f7`.
+The [x86-64 evidence](evidence/node36-linux-x64-2026-09-26.json) and
+[ARM64 evidence](evidence/node36-linux-arm64-2026-09-26.json) preserve the exact
+reports. Peaks were 4,651,085,824 and 4,726,444,032 bytes, with no resource abort,
+zero OOM events, released guards and maintained disk reserves.
+
+[Run 36271563489](https://github.com/Millillion/lasm/actions/runs/36271563489)
+is red because its earlier Mac jobs failed; both Linux jobs succeeded. Mac
+rechecks use the unchanged archive with corrected validation controls. Native
+Mac acceptance and retention of a four-platform candidate remain pending.
+The quick start still uses retained candidate `.35` above.

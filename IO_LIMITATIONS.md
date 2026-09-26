@@ -3,7 +3,7 @@
 **Current release scope (2026-09-26):** ordinary ahead-of-time Lean applications
 in Node. Runtime compiler/interpreter, module-data access and executable plugin
 loading are explicitly excluded; see the [README's exact boundary](README.md#lean-support-and-restrictions).
-Linux x86-64/ARM64 have passed the earlier installed candidate; macOS then Windows
+Linux x86-64/ARM64 have passed candidate `.35`; macOS then Windows
 are the next native platform gates. The broader cross-engine results and goals
 below are historical research evidence, not the current release contract.
 
@@ -26,16 +26,17 @@ side-module loading, remaining descriptors, reusable cleanup and managed CLI
 integration remain unfinished. These are implementation or validation gaps,
 not demonstrated fundamental limitations.
 
-The [current product plan](docs/PLAN.md) now targets full ordinary Lean 4.34.1
-applications in stock Node 26.10.0, Deno 2.9.7 and Bun 1.4.2 on all six native
-build platforms. Its [application pipeline status](docs/APPLICATION_PIPELINE.md)
-and [unchanged upstream inventory](docs/UPSTREAM_APPLICATION_TESTS.md) are tracked
-separately from the earlier runtime evidence below.
+The [archived compatibility plan](docs/PLAN_OLD_2026-09-25.md) targeted full
+ordinary Lean applications in Node, Deno and Bun on all six native build
+platforms. Its [application pipeline status](docs/APPLICATION_PIPELINE.md) and
+[unchanged upstream inventory](docs/UPSTREAM_APPLICATION_TESTS.md) remain research
+records. The [current plan](docs/PLAN.md) narrows the release to ahead-of-time
+Node applications, with native platform acceptance before broader API work.
 
 The executable CLI and the earlier callable-library backend have different
 schedulers. Managed `.lean` executables already use the full Lean runtime and
 guest pthreads; callable `lasm.json` libraries retain the smaller cooperative
-runtime. Both remain within the product's compatibility goal. Items labeled
+runtime. Both remain preserved for future compatibility work. Items labeled
 callable below apply to that earlier path, not to all executable applications.
 See [the IO guide](docs/IO.md) for the interface-to-backend mapping.
 
