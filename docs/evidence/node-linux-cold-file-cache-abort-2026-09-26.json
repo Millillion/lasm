@@ -1,0 +1,368 @@
+{
+  "scope": "Cold x86-64 resource abort before acceptance; not a Lean correctness failure",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36219476165",
+  "package": {
+    "scope": "Reproducible local npm packing; native installed acceptance is separate",
+    "tarball": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.32.tgz",
+    "sha256": "ab8bfbd3074a97671cd76088a8fd9dd633997cc0a465d3cc4855cc72d534bc41",
+    "sourceRevision": "a83e67d234627fe5ccd1824dea12e4fe4274b725",
+    "candidateVersion": "0.1.0-experimental.32",
+    "defaultLean": "4.34.1",
+    "node": "26.10.0",
+    "runtime": {
+      "identity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+      "name": "lean-4.34.1-wasm64"
+    },
+    "reproduciblePacking": true,
+    "compressedBytes": 65325243,
+    "installedBytes": 377739519,
+    "files": 228,
+    "resourceReport": "/home/runner/work/lasm/lasm/.work/node-package-resources.json",
+    "recordedAt": "2026-09-26T05:01:13.564Z"
+  },
+  "packagingResources": {
+    "startedAt": "2026-09-26T05:00:31.804Z",
+    "command": [
+      "node",
+      "scripts/package-node-release.mjs",
+      ".work/node-candidate",
+      ".work/node-runtime-restored/runtime",
+      ".work/node-runtime-restored/native",
+      "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "9c9eb349-9546-4b79-acfc-e613dec4d60f",
+    "limits": {
+      "memoryMax": 2147483648,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 1717986918,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 16766414848,
+      "available": 15298637824
+    },
+    "minimumHostAvailable": 15093514240,
+    "peakMemoryBytes": 1081069568,
+    "peakTasks": 22,
+    "report": "/home/runner/work/lasm/lasm/.work/node-package-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-26T05:01:13.496Z",
+      "memoryBytes": 774385664,
+      "peakMemoryBytes": 1081069568,
+      "swapBytes": 0,
+      "tasks": 13,
+      "memoryBreakdown": {
+        "anon": 234975232,
+        "file": 509358080,
+        "kernel": 19501056,
+        "shmem": 0,
+        "file_mapped": 143360,
+        "inactive_file": 509358080,
+        "slab": 15856376
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-26T05:01:13.611Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 539951104,
+      "peakMemoryBytes": 1081069568,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13672448,
+        "file": 509362176,
+        "kernel": 16461824,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 509362176,
+        "slab": 15568520
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-26T05:01:13.634Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "attempt": {
+    "scope": "Native Linux installed CLI, offline cache and copied deployment; preinstalled developer tools and checkout contents denied by Landlock",
+    "platform": "linux-x64",
+    "node": "v26.10.0",
+    "kernel": "6.17.0-1022-azure",
+    "osRelease": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+    "glibc": "2.39",
+    "sourceRevision": "a83e67d234627fe5ccd1824dea12e4fe4274b725",
+    "archiveSha256": "ab8bfbd3074a97671cd76088a8fd9dd633997cc0a465d3cc4855cc72d534bc41",
+    "archiveBytes": 65325243,
+    "workspace": "/tmp/lasm node Linux \u03bb-5Gb4KP",
+    "resourceReport": "/home/runner/work/lasm/lasm/.work/node-linux-resources.json",
+    "startedAt": "2026-09-26T05:01:40.458Z",
+    "passed": false
+  },
+  "resources": {
+    "startedAt": "2026-09-26T05:01:40.246Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "/opt/hostedtoolcache/node/26.10.0/x64/bin/node",
+      "scripts/check-node-linux.mjs",
+      "/home/runner/work/lasm/lasm/.work/node-linux-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.32.tgz",
+      "ab8bfbd3074a97671cd76088a8fd9dd633997cc0a465d3cc4855cc72d534bc41"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "944513df-1791-4311-bb25-d47915c1cb59",
+    "limits": {
+      "memoryMax": 6867124224,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 5493699379,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 16765378560,
+      "available": 15457742848
+    },
+    "minimumHostAvailable": 14540300288,
+    "peakMemoryBytes": 5499850752,
+    "peakTasks": 46,
+    "report": "/home/runner/work/lasm/lasm/.work/node-linux-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-26T05:03:15.770Z",
+      "memoryBytes": 5496389632,
+      "peakMemoryBytes": 5496512512,
+      "swapBytes": 0,
+      "tasks": 42,
+      "memoryBreakdown": {
+        "anon": 342372352,
+        "file": 4937621504,
+        "kernel": 216006656,
+        "shmem": 0,
+        "file_mapped": 8671232,
+        "inactive_file": 4937478144,
+        "slab": 206575848
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "highWaterProcesses": {
+      "at": "2026-09-26T05:02:28.827Z",
+      "processes": [
+        {
+          "pid": 2399,
+          "name": "node-MainThread",
+          "residentBytes": 255332352,
+          "threads": 11
+        },
+        {
+          "pid": 2386,
+          "name": "npm exec lasm M",
+          "residentBytes": 99053568,
+          "threads": 11
+        },
+        {
+          "pid": 2333,
+          "name": "node-MainThread",
+          "residentBytes": 94191616,
+          "threads": 11
+        },
+        {
+          "pid": 2347,
+          "name": "node-MainThread",
+          "residentBytes": 56844288,
+          "threads": 7
+        },
+        {
+          "pid": 2398,
+          "name": "sh",
+          "residentBytes": 2027520,
+          "threads": 1
+        }
+      ]
+    },
+    "stoppedBecause": "Workload reached its proactive memory budget",
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "killed",
+      "exitStatus": "TERM",
+      "capturedAt": "2026-09-26T05:03:15.822Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 5161902080,
+      "peakMemoryBytes": 5499850752,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13684736,
+        "file": 4940857344,
+        "kernel": 206614528,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 4940734464,
+        "slab": 205692488
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-26T05:03:15.839Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": true,
+    "memoryThrottled": false
+  },
+  "disk": {
+    "reserveBytes": 4294967296,
+    "preflightBytes": 12884901888,
+    "freeAtStart": 91409453056,
+    "status": "resource-aborted",
+    "minimumFreeBytes": 86530088960,
+    "freeAtEnd": 86478680064
+  },
+  "correction": "A CI-only sidecar inside the same unchanged memory guard advises completed immutable tool-file pages as DONTNEED; does not modify file contents, user prerequisites, package isolation or global kernel settings. No program/package outputs are advised. All cold downloads still originate from the actual installed CLI.",
+  "adviceDocumentation": "https://man7.org/linux/man-pages/man2/posix_fadvise.2.html",
+  "smallControlResources": {
+    "startedAt": "2026-09-26T05:11:38.321Z",
+    "command": [
+      "python3",
+      "-I",
+      "-B",
+      "test/tool-cache-advice.test.py"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "387fec29-7092-4369-8b28-ca768519b9ae",
+    "limits": {
+      "memoryMax": 268435456,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 214748364,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 26591100928
+    },
+    "minimumHostAvailable": 26577227776,
+    "peakMemoryBytes": 22462464,
+    "peakTasks": 2,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/node-linux-tool-cache-advice-r2-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-26T05:11:40.534Z",
+      "memoryBytes": 90112,
+      "peakMemoryBytes": 22462464,
+      "swapBytes": 0,
+      "tasks": 1,
+      "memoryBreakdown": {
+        "anon": 0,
+        "file": 0,
+        "kernel": 53248,
+        "shmem": 0,
+        "file_mapped": 0,
+        "inactive_file": 0,
+        "slab": 41616
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-26T05:11:40.575Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 13926400,
+      "peakMemoryBytes": 22462464,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11649024,
+        "file": 0,
+        "kernel": 1073152,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 0,
+        "slab": 142296
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-26T05:11:40.601Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  }
+}

@@ -29,6 +29,17 @@ try { code = await new Promise((resolve, reject) => { child.on('error', reject);
 finally { clearInterval(timer); }
 const guard = JSON.parse(readFileSync(resources));
 assert.equal(guard.unitReleased, true);
+// A resource stop can terminate the orchestration process before it copies the
+// child report. Preserve the last completed command and active command as well.
+const acceptanceFile = resolve(output, 'result.json');
+try { if (existsSync(acceptanceFile)) {
+  const acceptance = JSON.parse(readFileSync(acceptanceFile));
+  const childReport = resolve(acceptance.workspace, 'result.json');
+  if (existsSync(childReport)) acceptance.installation = JSON.parse(readFileSync(childReport));
+  const advice = resolve(output, 'tool-cache-advice.json');
+  if (existsSync(advice)) acceptance.toolCacheAdvice = JSON.parse(readFileSync(advice));
+  writeFileSync(acceptanceFile, JSON.stringify(acceptance, null, 2) + '\n');
+} } catch (error) { result.evidenceRecoveryError = error.message; }
 result.status = result.resourceAbort || guard.resourceLimited ? 'resource-aborted' : code === 0 ? 'passed' : 'failed';
 result.freeAtEnd = free(); save();
 assert.equal(result.status, 'passed', 'Read the preserved product, memory and disk reports');

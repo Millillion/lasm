@@ -14,10 +14,12 @@ const result = existsSync(resultPath) ? JSON.parse(readFileSync(resultPath)) : {
 const save = () => writeFileSync(resultPath, JSON.stringify(result, null, 2) + '\n');
 const run = (label, executable, args, cwd = project, env = process.env) => {
   const start = performance.now();
+  result.activeCommand = { label, command: [executable, ...args], startedAt: new Date().toISOString() }; save();
   const value = spawnSync(executable, args, { cwd, env, encoding: 'utf8', timeout: 1800_000, maxBuffer: 2 * 1024 * 1024 });
   const observed = { code: value.status, stdout: value.stdout ?? '', stderr: value.stderr ?? '' };
   result.steps.push({ label, command: [executable, ...args], cwd, seconds: (performance.now() - start) / 1000,
     ...observed, signal: value.signal, error: value.error?.message }); save();
+  delete result.activeCommand; save();
   assert.ifError(value.error); assert.equal(value.signal, null, label + ': normal process exit');
   return observed;
 };

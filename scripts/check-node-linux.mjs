@@ -5,7 +5,7 @@ import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync,
 import { join, resolve, dirname } from 'node:path';
 import { tmpdir, release } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { spawnSync, execFileSync } from 'node:child_process';
+import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 import { linuxIsolationFiles } from './check-deployed-application.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
@@ -54,8 +54,16 @@ function isolated(rules, command, cwd, timeout) {
     stderr: actual.stderr.replace(/^\[lasm\] Landlock ABI \d+: filesystem access restricted before execution\n/, '') };
 }
 save();
+const adviceReport = join(output, 'tool-cache-advice.json'), adviceStop = join(output, 'stop-tool-cache-advice');
+const advisor = spawn('/usr/bin/python3', ['-I', '-B', join(root, 'scripts/full-lean/advise-tool-cache.py'),
+  join(workspace, 'cache/lasm'), adviceReport, adviceStop], { stdio: 'inherit' });
+const advisorExit = new Promise(resolve => {
+  advisor.once('error', error => resolve({ error: error.message }));
+  advisor.once('exit', (code, signal) => resolve({ code, signal }));
+});
 try {
   for (const phase of ['cold', 'lake', 'offline']) {
+    result.activePhase = phase; save();
     const rules = join(output, phase + '-rules.json');
     writeFileSync(rules, JSON.stringify({ allow, environment, denyTcp: phase === 'offline' }, null, 2) + '\n');
     const actual = isolated(rules, [process.execPath, control, phase, workspace, archive, join(root, 'package.json')], workspace, 3000_000);
@@ -102,7 +110,15 @@ try {
     result.deployment.programs.push({ name: program.name, bytes: program.bytes, wasmSha256: program.wasmSha256, checks }); save();
   }
   result.passed = true; result.finishedAt = new Date().toISOString(); save();
-  // Keep immutable measurements, not another multi-gigabyte successful cache.
-  rmSync(deploymentRoot, { recursive: true }); rmSync(workspace, { recursive: true });
-  console.log(JSON.stringify(result, null, 2));
 } catch (error) { result.error = error.stack; result.finishedAt = new Date().toISOString(); save(); throw error; }
+finally {
+  writeFileSync(adviceStop, 'stop\n');
+  result.toolCacheAdvisorExit = await advisorExit;
+  if (existsSync(adviceReport)) result.toolCacheAdvice = JSON.parse(readFileSync(adviceReport));
+  if (result.toolCacheAdvisorExit.code !== 0) result.passed = false;
+  save();
+  assert.deepEqual(result.toolCacheAdvisorExit, { code: 0, signal: null });
+}
+// Keep immutable measurements, not another multi-gigabyte successful cache.
+rmSync(result.deploymentRoot, { recursive: true }); rmSync(workspace, { recursive: true });
+console.log(JSON.stringify(result, null, 2));
