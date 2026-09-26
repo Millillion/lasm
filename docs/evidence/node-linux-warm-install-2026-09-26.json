@@ -138,5 +138,21 @@
     "wasmSha256": "ce535fb30b50355d663ba5f5dc8d9bafd536bc0983606eeb23e8bcbb3bbbe25a",
     "passed": true
   },
-  "offlineResourceReport": ".work/product-acceptance/node-linux-offline-deploy-r1-resources.json"
+  "offlineResourceReport": ".work/product-acceptance/node-linux-offline-deploy-r1-resources.json",
+  "emptyProjectInstall": {
+    "scope": "Actual npm install into an empty directory without a pre-created package.json, under filesystem isolation",
+    "packageJson": {
+      "dependencies": {
+        "@lasm/compiler": "file:../../../home/lastmjs/development/lasm/compiler/.work/node-linux-package-r1/lasm-compiler-0.1.0-experimental.32.tgz"
+      }
+    },
+    "help": "Usage: lasm Main.lean [-- arguments\u2026]\n       lasm build Main.lean [--output dist]\n\nOptions: --rebuild, --verbose, --help\nBuild and run ordinary Lean main in Node.\n",
+    "passed": true
+  },
+  "newGlibcCheckInIsolation": {
+    "code": 0,
+    "stdout": "{\"verified\":true,\"glibc\":\"2.39\"}\n",
+    "stderr": "[lasm] Landlock ABI 4: filesystem access restricted before execution\n",
+    "passed": true
+  }
 }

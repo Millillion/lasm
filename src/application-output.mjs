@@ -2,6 +2,7 @@ import { mkdirSync, copyFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { copyNativeBundle } from './native-bundle.mjs';
+import { glibcAtLeast } from './application-support.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 export const applicationHostFiles = [
@@ -20,7 +21,7 @@ export function copyApplicationHost(output) {
   copyNativeBundle(root, directory);
 }
 
-export function applicationEntrypoint(target, { platform = process.platform, arch = process.arch, node } = {}) {
+export function applicationEntrypoint(target, { platform = process.platform, arch = process.arch, node, minimumGlibc } = {}) {
   if (!['node', 'deno', 'bun'].includes(target)) throw new Error('Invalid application deployment target');
   const shebang = target === 'deno' ? '/usr/bin/env -S deno run -A' : '/usr/bin/env ' + target;
   return `#!${shebang}
@@ -41,6 +42,8 @@ const actual = process.versions.deno ? 'deno' : process.versions.bun ? 'bun' : '
 const expectedHost = ${JSON.stringify(`${platform}-${arch}`)};
 const actualHost = process.platform + '-' + process.arch;
 const expectedNode = ${JSON.stringify(node ?? null)};
+const minimumGlibc = ${JSON.stringify(minimumGlibc ?? null)};
+const glibcAtLeast = ${glibcAtLeast.toString()};
 if (actual !== expected) {
   console.error('This application was built for ' + expected + '; it is running in ' + actual + '. Rebuild with --target ' + actual + '.');
   process.exitCode = 1;
@@ -49,6 +52,9 @@ if (actual !== expected) {
   process.exitCode = 1;
 } else if (actual === 'node' && expectedNode && process.versions.node !== expectedNode) {
   console.error('This application requires Node ' + expectedNode + '; you are running Node ' + process.versions.node + '. Install the supported Node release.');
+  process.exitCode = 1;
+} else if (minimumGlibc && !glibcAtLeast(process.report?.getReport().header.glibcVersionRuntime, minimumGlibc)) {
+  console.error('This application requires glibc ' + minimumGlibc + ' or newer. Use a supported Linux system; Ubuntu 24.04 is the tested distribution.');
   process.exitCode = 1;
 } else {
   if (actual === 'deno') (await import('./host/deno-stack.mjs')).prepareDenoStack(import.meta.url);

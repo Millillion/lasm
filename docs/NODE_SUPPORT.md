@@ -8,7 +8,8 @@ restricted language. Full standard-library compatibility is not claimed.
 The acceptance targets are Ubuntu 24.04 LTS (glibc 2.39) on native x86-64 and ARM64,
 Node 26.10.0 with its npm, and Lean 4.34.1. Use stock Node without special flags.
 Other distributions, older system libraries, Node versions and Lean versions are
-unverified. Linux builds require the standard OS shell, loader, libc and system
+unverified. This candidate requires glibc 2.39 or newer; musl-based distributions
+such as Alpine are unsupported. Linux builds require the standard OS shell, loader, libc and system
 libraries supplied by Ubuntu; no separately installed developer tools are required.
 See the [current acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
 for exact artifact hashes, measurements and remaining gates.

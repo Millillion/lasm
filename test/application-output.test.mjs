@@ -45,6 +45,7 @@ test('wrong engines fail before executing the application payload', t => {
 for (const [name, support, message] of [
   ['host', { platform: 'unsupported', arch: 'other' }, /built on unsupported-other.*Rebuild/],
   ['Node version', { node: '0.0.0' }, /requires Node 0.0.0.*Install/],
+  ['system library', { minimumGlibc: '999.0' }, /requires glibc 999.0.*supported Linux system/],
 ]) test(`incompatible deployment ${name} is rejected before loading host dependencies`, t => {
   const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-platform-')));
   t.after(() => rmSync(base, { recursive: true, force: true }));

@@ -45,7 +45,7 @@ cpSync(join(root, 'examples/hello'), join(staging, 'examples/hello'), { recursiv
 const json = (path, value) => writeFileSync(join(staging, path), JSON.stringify(value, null, 2) + '\n');
 json('src/toolchains.json', { ...toolchainCatalog, defaultLean: lean, lean: { [lean]: toolchainCatalog.lean[lean] } });
 json('src/application-runtimes.json', { schema: 1, lean: { [lean]: expected } });
-json('application-support.json', { schema: 1, platforms: ['linux-x64', 'linux-arm64'], node: pins.node, lean });
+json('application-support.json', { schema: 1, platforms: ['linux-x64', 'linux-arm64'], node: pins.node, lean, minimumGlibc: '2.39' });
 json('provenance.json', { sourceRevision, runtimeManifestSha256: manifestSha256, lean, node: pins.node });
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json')));
 json('package.json', {

@@ -67,7 +67,8 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
     ...(metadata ? { moduleDataIdentity: metadata.identity, moduleDataBytes: metadata.manifest.bytes } : {}),
-    target, host: `${process.platform}-${process.arch}`, node: applicationSupport()?.node, memoryMode, modules };
+    target, host: `${process.platform}-${process.arch}`, node: applicationSupport()?.node,
+    minimumGlibc: applicationSupport()?.minimumGlibc, memoryMode, modules };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
   if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)
@@ -85,7 +86,9 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   await mkdir(dist, { recursive: true });
   await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
     leanVersion: lean.version, memoryMode, verbose });
-  copyApplicationHost(dist); writeApplicationEntrypoint(dist, target, { node: applicationSupport()?.node });
+  copyApplicationHost(dist); writeApplicationEntrypoint(dist, target, {
+    node: applicationSupport()?.node, minimumGlibc: applicationSupport()?.minimumGlibc,
+  });
   await copyApplicationMetadata(metadata, dist);
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));
   const buildInfo = { ...recipe, signature, sdkIdentity: sdk.identity, sdkDriverIdentity: sdk.driverIdentity };
