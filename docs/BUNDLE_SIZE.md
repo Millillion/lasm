@@ -175,11 +175,18 @@ with the small ordinary-application measurements. Further work on compiler/modul
 packaging needs its own correctness evidence; application code elimination must
 not silently remove runtime-resolved declarations or change initializer effects.
 
-Draft retention is being retried separately; both native test jobs passed. The
-original retention job returned HTTP 403 while targeting the older package-source
-commit. That matches GitHub's [workflow-commit permission rule](https://github.blog/changelog/2023-11-02-github-actions-enforcing-workflow-scope-when-creating-a-release/).
-The retention workflow verifies both native job results, their logged candidate
-hashes and original source identities, then creates an unpublished draft targeting
-the current retention commit. Its notes distinguish package, validation and
-retention revisions. No extra token permissions or repeated compiler campaign
-are needed.
+The exact tested archive, checksum and both native evidence records are retained
+in an [unpublished GitHub draft](https://github.com/Millillion/lasm/releases/tag/untagged-ebf705b7c6153959da56),
+accessible to repository maintainers. A local download matched the tested SHA-256.
+The [candidate receipt](evidence/bundle-size-candidate-2026-09-26.json) records
+asset identities, local verification and the earlier retention failures.
+No npm publication was performed.
+
+The first retention job returned HTTP 403 while targeting the older package-source
+commit, matching GitHub's [workflow-commit permission rule](https://github.blog/changelog/2023-11-02-github-actions-enforcing-workflow-scope-when-creating-a-release/).
+The separate [successful retention workflow](https://github.com/Millillion/lasm/actions/runs/36255764445)
+verified both native job results, their logged candidate hashes and original
+source identities before restoring the archive. The draft targets the retention
+commit; notes distinguish package, validation and retention revisions. The
+runner's newer GitHub CLI also required explicit handling of captured ANSI-bearing
+logs. Neither correction changed the package or repeated the native builds.

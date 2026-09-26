@@ -1,6 +1,7 @@
 # Linux Node acceptance
 
-The newer `.34` candidate also passed on both native architectures, including
+The latest candidate, [`.34` in an unpublished draft](https://github.com/Millillion/lasm/releases/tag/untagged-ebf705b7c6153959da56),
+passed on both native architectures, including
 size regression controls, broader language/filesystem fixtures and isolated
 runtime evaluation. See [the current size and acceptance report](BUNDLE_SIZE.md).
 The historical `.32` results below remain unchanged.

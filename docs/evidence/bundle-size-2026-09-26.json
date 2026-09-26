@@ -722,7 +722,7 @@
   ],
   "resourcePolicy": "One guarded local build at a time, 8 GiB cap, proactive stop below cap, no swap, one Binaryen worker, base pages, four-GiB disk reserve. No OOM events. Aborted duplicate metadata was hard-linked only after byte-identity verification; evidence paths and bytes preserved.",
   "installedCandidate": {
-    "status": "Same archive passed both native Linux architectures; draft retention pending",
+    "status": "Verified on both native Linux architectures; exact archive retained and downloaded with SHA-256 verification",
     "candidate": {
       "scope": "Reproducible local npm packing; native installed acceptance is separate",
       "tarball": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz",
@@ -775,6 +775,13 @@
         "nativeResultsUnaffected": true,
         "permissionRule": "https://github.blog/changelog/2023-11-02-github-actions-enforcing-workflow-scope-when-creating-a-release/"
       }
+    },
+    "retention": {
+      "passed": true,
+      "evidence": "bundle-size-candidate-2026-09-26.json",
+      "run": "https://github.com/Millillion/lasm/actions/runs/36255764445",
+      "draft": "https://github.com/Millillion/lasm/releases/tag/untagged-ebf705b7c6153959da56",
+      "npmPublished": false
     }
   },
   "legacyImports": {
