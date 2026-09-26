@@ -1,0 +1,240 @@
+{
+  "scope": "Focused native macOS directory and temporary-path regressions; not full installed-package acceptance",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36275945690",
+  "sourceRevision": "804d751d022ec914a389c81e023e2f9576ad0f85",
+  "platforms": {
+    "darwin-x64": {
+      "job": 108498603506,
+      "result": "passed",
+      "tests": {
+        "directory": {
+          "unit": "d1c2fa38-f8d2-4667-810c-2d10cf9d53e6",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-directory-resources.json",
+          "monitorPid": 74961,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 429496729,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "compressionReserveBytes": 2147483648,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T22:21:34.135Z",
+          "hostAtStart": {
+            "total": 15032385536,
+            "available": 9555451904,
+            "compressed": 0
+          },
+          "minimumHostAvailable": 9520128000,
+          "peakMemoryBytes": 94396416,
+          "peakCompressionGrowthBytes": 0,
+          "peakTasks": 2,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T22:21:35.700Z",
+          "processGroup": 74963,
+          "command": [
+            "node",
+            "--test",
+            "test/native-directory.test.mjs"
+          ],
+          "lastSample": {
+            "bytes": 94396416,
+            "host": {
+              "total": 15032385536,
+              "available": 9543385088,
+              "compressed": 0
+            },
+            "processes": [
+              {
+                "pid": 74963,
+                "parent": 74961,
+                "group": 74963,
+                "bytes": 44507136,
+                "started": "Sat Sep 26 22:21:34 2026",
+                "identity": "74963:Sat Sep 26 22:21:34 2026",
+                "command": "(node)"
+              },
+              {
+                "pid": 74964,
+                "parent": 74963,
+                "group": 74963,
+                "bytes": 49889280,
+                "started": "Sat Sep 26 22:21:34 2026",
+                "identity": "74964:Sat Sep 26 22:21:34 2026",
+                "command": "(node)"
+              }
+            ]
+          },
+          "finishedAt": "2026-09-26T22:21:35.700Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "temporary": {
+          "unit": "7a47b3c4-5b9e-4ce2-a574-0fb649d4307f",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-temporary-resources.json",
+          "monitorPid": 74978,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 429496729,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "compressionReserveBytes": 2147483648,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T22:21:36.041Z",
+          "hostAtStart": {
+            "total": 15032385536,
+            "available": 9547190272,
+            "compressed": 0
+          },
+          "minimumHostAvailable": 9547190272,
+          "peakMemoryBytes": 91852800,
+          "peakCompressionGrowthBytes": 0,
+          "peakTasks": 2,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T22:21:36.988Z",
+          "processGroup": 74980,
+          "command": [
+            "node",
+            "--test",
+            "test/native-temporary.test.mjs"
+          ],
+          "lastSample": {
+            "bytes": 91852800,
+            "host": {
+              "total": 15032385536,
+              "available": 9568518144,
+              "compressed": 0
+            },
+            "processes": [
+              {
+                "pid": 74980,
+                "parent": 74978,
+                "group": 74980,
+                "bytes": 44339200,
+                "started": "Sat Sep 26 22:21:36 2026",
+                "identity": "74980:Sat Sep 26 22:21:36 2026",
+                "command": "node"
+              },
+              {
+                "pid": 74982,
+                "parent": 74980,
+                "group": 74980,
+                "bytes": 47513600,
+                "started": "Sat Sep 26 22:21:36 2026",
+                "identity": "74982:Sat Sep 26 22:21:36 2026",
+                "command": "/Users/runner/hostedtoolcache/node/26.10.0/x64/bin/node"
+              }
+            ]
+          },
+          "finishedAt": "2026-09-26T22:21:36.988Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        }
+      }
+    },
+    "darwin-arm64": {
+      "job": 108498603600,
+      "result": "passed",
+      "tests": {
+        "directory": {
+          "unit": "28933876-f30b-4e35-bbef-ffc20cb3255e",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-directory-resources.json",
+          "monitorPid": 3908,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 429496729,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "compressionReserveBytes": 2147483648,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T22:20:43.757Z",
+          "hostAtStart": {
+            "total": 7516192768,
+            "available": 3249782784,
+            "compressed": 314507264
+          },
+          "minimumHostAvailable": 3249782784,
+          "peakMemoryBytes": 0,
+          "peakCompressionGrowthBytes": 0,
+          "peakTasks": 0,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T22:20:44.031Z",
+          "processGroup": 3910,
+          "command": [
+            "node",
+            "--test",
+            "test/native-directory.test.mjs"
+          ],
+          "finishedAt": "2026-09-26T22:20:44.031Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "temporary": {
+          "unit": "ad0de56e-3fe9-4d6b-a165-ee5087b80241",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-temporary-resources.json",
+          "monitorPid": 3920,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 429496729,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "compressionReserveBytes": 2147483648,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T22:20:44.131Z",
+          "hostAtStart": {
+            "total": 7516192768,
+            "available": 3225960448,
+            "compressed": 314474496
+          },
+          "minimumHostAvailable": 3225960448,
+          "peakMemoryBytes": 0,
+          "peakCompressionGrowthBytes": 0,
+          "peakTasks": 0,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T22:20:44.351Z",
+          "processGroup": 3922,
+          "command": [
+            "node",
+            "--test",
+            "test/native-temporary.test.mjs"
+          ],
+          "finishedAt": "2026-09-26T22:20:44.351Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        }
+      }
+    }
+  },
+  "samplingNote": "A zero sampled peak means the short control completed between monitor samples, not zero memory use."
+}

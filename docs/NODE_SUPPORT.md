@@ -38,7 +38,7 @@ fallback. The retained historical `.34` archive predates this restriction. See t
 
 Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm` on Linux and
 `$HOME/Library/Caches/lasm` on macOS. macOS support is being validated in candidate
-`.36`; the Linux measurements above do not establish a macOS pass. Set
+`.37`; the Linux measurements above do not establish a macOS pass. Set
 `LASM_TOOLCHAIN_CACHE` to choose another directory. Compiled application caches
 live under the source project's `.lake/lasm/`. Hash checks detect changes to
 sources, tool descriptions, runtime inputs and generated outputs; an unchanged
