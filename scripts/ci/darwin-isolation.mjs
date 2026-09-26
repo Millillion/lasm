@@ -10,7 +10,7 @@ export function darwinSandbox({ reads = [], writes = [], executables = [], offli
 (deny default)
 (allow process-fork process-info* signal sysctl-read mach-lookup)
 (allow file-read-metadata)
-(allow file-read* (subpath "/System/Library") (subpath "/usr/lib")
+(allow file-read* file-map-executable (subpath "/System/Library") (subpath "/usr/lib")
   (subpath "/private/etc") (literal "/dev/null") (literal "/dev/urandom") (literal "/dev/random")
   ${subpaths([...reads, ...writes, ...executables])})
 (allow file-write* (literal "/dev/null") ${subpaths(writes)})

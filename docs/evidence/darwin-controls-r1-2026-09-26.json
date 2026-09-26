@@ -1,0 +1,84 @@
+{
+  "run": "https://github.com/Millillion/lasm/actions/runs/36269105190",
+  "sourceRevision": "42118af623c5e7cba0f196a1b52e408912fd9f23",
+  "results": [
+    {
+      "platform": "darwin-x64",
+      "controls": {
+        "normal": {
+          "hardCap": false,
+          "peakMemoryBytes": 46333952,
+          "minimumHostAvailable": 9709363200,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "cleanup": {
+          "hardCap": false,
+          "peakMemoryBytes": 78073856,
+          "minimumHostAvailable": 9671798784,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "below-cap-stop": {
+          "hardCap": false,
+          "peakMemoryBytes": 113876992,
+          "minimumHostAvailable": 9589903360,
+          "resourceLimited": true,
+          "unitReleased": true,
+          "result": {
+            "code": null,
+            "signal": "SIGTERM"
+          }
+        }
+      },
+      "isolation": "failed before Node printed diagnostics; adding executable-map permission and signal logging"
+    },
+    {
+      "platform": "darwin-arm64",
+      "controls": {
+        "normal": {
+          "hardCap": false,
+          "peakMemoryBytes": 0,
+          "minimumHostAvailable": 3232677888,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "cleanup": {
+          "hardCap": false,
+          "peakMemoryBytes": 98140160,
+          "minimumHostAvailable": 3210772480,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "below-cap-stop": {
+          "hardCap": false,
+          "peakMemoryBytes": 115490816,
+          "minimumHostAvailable": 3167748096,
+          "resourceLimited": true,
+          "unitReleased": true,
+          "result": {
+            "code": null,
+            "signal": "SIGTERM"
+          }
+        }
+      },
+      "isolation": "failed before Node printed diagnostics; adding executable-map permission and signal logging"
+    }
+  ]
+}

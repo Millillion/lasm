@@ -36,7 +36,8 @@ export function nativeSignals() {
   const infoType = ffi.struct({ file: 'str', base: 'void *', name: 'str', address: 'void *' });
   const dladdr = libc.func('dladdr', 'int', ['void *', ffi.out(ffi.pointer(infoType))]);
   const engine = {};
-  if (!dladdr(libc.symbol('napi_get_version'), engine)) throw new Error('Cannot identify the engine signal-handler image');
+  // N-API belongs to the engine's global image, not Darwin's libSystem handle.
+  if (!dladdr(ffi.load(null).symbol('napi_get_version'), engine)) throw new Error('Cannot identify the engine signal-handler image');
   const failure = () => {
     const errno = ffi.errno();
     return Object.assign(new Error(strerror(errno)), { errno: -errno, nativeMessage: true,

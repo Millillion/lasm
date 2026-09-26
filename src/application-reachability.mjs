@@ -41,8 +41,8 @@ function linkMapReader({ initializationFreeCppSymbols = new Set() } = {}) {
     if (!header || !code || !entrypoints.some(name => symbols.has(name)))
       throw new Error('Application linker map has no executable entry point');
     // These mechanisms can ask for a name computed at runtime, or load a plugin
-    // whose imports are not available at build time. Keep the full authenticated
-    // ABI and both symbol registries whenever any such mechanism is reachable.
+    // whose imports are not available at build time. Record that requirement;
+    // the application policy rejects it rather than shipping the full compiler.
     const dynamic = dynamicSymbols.filter(name => symbols.has(name));
     const moduleData = [...metadata].sort();
     const cxxRuntime = [...cxx].sort();
@@ -67,7 +67,7 @@ export async function readApplicationLinkRequirements(path, options) {
 }
 
 // This definition is used only for the reachability link. If it survives GC,
-// that output is discarded and relinked with the complete runtime registry.
+// that output is discarded and the ahead-of-time application build is rejected.
 // It must never be present in a delivered static executable.
 export const reachabilityRegistry = 'void *lasm_lookup_lean_symbol(const char *name) { (void)name; return 0; }\n';
 
@@ -75,7 +75,7 @@ export const reachabilityRegistry = 'void *lasm_lookup_lean_symbol(const char *n
 // compiler for *any* Lean import. runtime/init_module.cpp supplies the ordinary
 // runtime on its own. Use that smaller initializer only when no stateful
 // libleancpp code or data survives linking. Shared inline helpers are classified
-// above. Otherwise relink with the untouched full initializer.
+// above. Applications retaining compiler state are rejected by the policy.
 // An updated runtime must be reviewed before it can use this specialization.
 export function canSpecializeInitialization(runtime) {
   return ['4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf',
