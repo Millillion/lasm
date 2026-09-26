@@ -4,18 +4,20 @@ Only add, remove, or change requirements when explicitly directed by Jordan. Mar
 items complete only with verified evidence. The order below reflects Jordan's
 priorities.
 
-- [ ] Reduce final deployable build size
+- [x] Reduce final deployable build size
 - [ ] Reduce `.cache` size
 - [x] Ensure good DX during first build that might take minutes
 - [ ] Create uninstall capabilities that completely remove everything Lasm installed globally
 - [ ] Create tests for all of the major Node server/serverless platforms if possible locally and in CI/CD
 
-Item 1 remains open: Jordan clarified that multi-gigabyte deployments are
-unacceptable. Candidate `.34` verifies the ordinary-application reduction on
-native Linux x86-64 and ARM64 (Hello 3.21–3.22 MB), but the 2.39 GB fallback means
-the broader bundle-size requirement is unfinished. See [the size report](BUNDLE_SIZE.md)
-for verified results and the proposed remaining work. Existing acceptance evidence
-is preserved.
+Item 1 is verified within Jordan's approved ahead-of-time scope. Candidate `.35`
+passed native Linux x86-64 and ARM64 with eight copied deployments of 2.67–3.61 MB.
+The former 2.39 GB fallback is removed; runtime compiler/module/evaluation
+dependencies fail during the build. Code elimination follows linker reachability
+and does not use a per-language-feature allowlist. This is not a fixed size limit
+or an absolute minimum for every application. See [current acceptance](NODE_ACCEPTANCE.md)
+and [the runtime exclusions](../README.md#lean-support-and-restrictions). Historical
+measurements and failures remain in [the size report](BUNDLE_SIZE.md).
 
 Item 3 is verified by focused progress/download tests, a guarded local Lean build,
 and the same candidate's cold installation/build on both architectures. The

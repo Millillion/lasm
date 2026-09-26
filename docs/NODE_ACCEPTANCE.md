@@ -27,6 +27,8 @@ after the original release step returned HTTP 403. The acceptance workflow's
 overall failure is that retention failure, not a product-test failure. Do not
 substitute the older `.34` archive for this policy; it allowed runtime evaluation
 and its large fallback.
+An independent local download matched the expected checksum; the
+[retention receipt](evidence/aot-candidate-2026-09-26.json) records its exact assets.
 
 ## Native evidence
 

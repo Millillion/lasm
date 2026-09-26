@@ -87,7 +87,7 @@ jobs:
       sha256: ${{ needs.package.outputs.sha256 }}
       cache-key: ${{ needs.package.outputs.cache-key }}
   darwin-x64:
-    needs: [package, linux-x64, linux-arm64]
+    needs: package
     uses: ./.github/workflows/node-darwin-consumer.yml
     with:
       runner: macos-15-intel
@@ -95,7 +95,7 @@ jobs:
       sha256: ${{ needs.package.outputs.sha256 }}
       cache-key: ${{ needs.package.outputs.cache-key }}
   darwin-arm64:
-    needs: [package, linux-x64, linux-arm64]
+    needs: package
     uses: ./.github/workflows/node-darwin-consumer.yml
     with:
       runner: macos-15

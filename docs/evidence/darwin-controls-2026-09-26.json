@@ -1,0 +1,505 @@
+{
+  "scope": "Native macOS maintainer resource and CI isolation controls, not application acceptance",
+  "runId": "36271364422",
+  "sourceRevision": "be0ddc4abd180395afd6e207c665bddfdad3cfc1",
+  "platforms": [
+    {
+      "architecture": "x64",
+      "jobId": 108485841014,
+      "reports": {
+        "darwin-guard-normal.json": {
+          "unit": "51bc7711-fb68-4289-a892-0feeb4cba1b5",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-guard-normal.json",
+          "monitorPid": 16523,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 429496729,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T20:59:55.645Z",
+          "hostAtStart": {
+            "total": 15032385536,
+            "available": 9663500288,
+            "compressed": 0
+          },
+          "minimumHostAvailable": 9662189568,
+          "peakMemoryBytes": 45998080,
+          "peakTasks": 2,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T20:59:56.283Z",
+          "processGroup": 16538,
+          "command": [
+            "/Users/runner/hostedtoolcache/node/26.10.0/x64/bin/node",
+            "--max-old-space-size=64",
+            "--input-type=module",
+            "-e",
+            "const {hasResourceGuard,ensureResourceGuard}=await import('./scripts/full-lean/resource-guard.mjs');if(!hasResourceGuard())throw Error('Missing monitor');await ensureResourceGuard();console.log('macOS monitor verified')"
+          ],
+          "lastSample": {
+            "bytes": 45998080,
+            "host": {
+              "total": 15032385536,
+              "available": 9662189568,
+              "compressed": 0
+            },
+            "processes": [
+              {
+                "pid": 16538,
+                "parent": 16523,
+                "group": 16538,
+                "bytes": 44818432,
+                "started": "Sat Sep 26 20:59:55 2026",
+                "identity": "16538:Sat Sep 26 20:59:55 2026"
+              },
+              {
+                "pid": 16545,
+                "parent": 16538,
+                "group": 16538,
+                "bytes": 1179648,
+                "started": "Sat Sep 26 20:59:55 2026",
+                "identity": "16545:Sat Sep 26 20:59:55 2026"
+              }
+            ]
+          },
+          "finishedAt": "2026-09-26T20:59:56.283Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "darwin-guard-cleanup.json": {
+          "unit": "6c09dddd-a9b1-4a34-ac5f-d81bd8f3e9eb",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-guard-cleanup.json",
+          "monitorPid": 16559,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 429496729,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T20:59:56.575Z",
+          "hostAtStart": {
+            "total": 15032385536,
+            "available": 9668800512,
+            "compressed": 0
+          },
+          "minimumHostAvailable": 9634242560,
+          "peakMemoryBytes": 77340672,
+          "peakTasks": 2,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T20:59:57.900Z",
+          "processGroup": 16561,
+          "command": [
+            "/Users/runner/hostedtoolcache/node/26.10.0/x64/bin/node",
+            "--max-old-space-size=64",
+            "--input-type=module",
+            "-e",
+            "const {spawn}=await import('node:child_process');const c=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'ignore'});c.unref();setTimeout(()=>process.exit(0),1000)"
+          ],
+          "lastSample": {
+            "bytes": 77340672,
+            "host": {
+              "total": 15032385536,
+              "available": 9634242560,
+              "compressed": 0
+            },
+            "processes": [
+              {
+                "pid": 16561,
+                "parent": 16559,
+                "group": 16561,
+                "bytes": 39735296,
+                "started": "Sat Sep 26 20:59:56 2026",
+                "identity": "16561:Sat Sep 26 20:59:56 2026"
+              },
+              {
+                "pid": 16564,
+                "parent": 16561,
+                "group": 16561,
+                "bytes": 37605376,
+                "started": "Sat Sep 26 20:59:56 2026",
+                "identity": "16564:Sat Sep 26 20:59:56 2026"
+              }
+            ]
+          },
+          "finishedAt": "2026-09-26T20:59:57.900Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "darwin-guard-below-cap-stop.json": {
+          "unit": "20173a88-4c2e-4db3-8511-ea8ca979d60a",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-guard-below-cap-stop.json",
+          "monitorPid": 16581,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 107374182,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T20:59:58.223Z",
+          "hostAtStart": {
+            "total": 15032385536,
+            "available": 9657204736,
+            "compressed": 0
+          },
+          "minimumHostAvailable": 9556332544,
+          "peakMemoryBytes": 113856512,
+          "peakTasks": 1,
+          "resourceLimited": true,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T21:00:01.089Z",
+          "processGroup": 16583,
+          "command": [
+            "/Users/runner/hostedtoolcache/node/26.10.0/x64/bin/node",
+            "--max-old-space-size=64",
+            "--input-type=module",
+            "-e",
+            "const b=[];let n=0;const t=setInterval(()=>{if(n++<12)b.push(Buffer.alloc(8*1024*1024,42));else clearInterval(t)},250);setTimeout(()=>process.exit(9),15000)"
+          ],
+          "lastSample": {
+            "bytes": 113856512,
+            "host": {
+              "total": 15032385536,
+              "available": 9556332544,
+              "compressed": 0
+            },
+            "processes": [
+              {
+                "pid": 16583,
+                "parent": 16581,
+                "group": 16583,
+                "bytes": 113856512,
+                "started": "Sat Sep 26 20:59:58 2026",
+                "identity": "16583:Sat Sep 26 20:59:58 2026"
+              }
+            ]
+          },
+          "stoppedBecause": "Workload reached its proactive RSS budget",
+          "finishedAt": "2026-09-26T21:00:01.089Z",
+          "result": {
+            "code": null,
+            "signal": "SIGTERM"
+          }
+        },
+        "darwin-isolation-resources.json": {
+          "unit": "c9c51893-4285-4e62-924a-d38b431a313a",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-isolation-resources.json",
+          "monitorPid": 16630,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 429496729,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T21:00:01.492Z",
+          "hostAtStart": {
+            "total": 15032385536,
+            "available": 9657495552,
+            "compressed": 0
+          },
+          "minimumHostAvailable": 9624338432,
+          "peakMemoryBytes": 82743296,
+          "peakTasks": 2,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T21:00:02.069Z",
+          "processGroup": 16646,
+          "command": [
+            "node",
+            "scripts/ci/check-darwin-isolation.mjs"
+          ],
+          "lastSample": {
+            "bytes": 82743296,
+            "host": {
+              "total": 15032385536,
+              "available": 9624338432,
+              "compressed": 0
+            },
+            "processes": [
+              {
+                "pid": 16646,
+                "parent": 16630,
+                "group": 16646,
+                "bytes": 43081728,
+                "started": "Sat Sep 26 21:00:01 2026",
+                "identity": "16646:Sat Sep 26 21:00:01 2026"
+              },
+              {
+                "pid": 16647,
+                "parent": 16646,
+                "group": 16646,
+                "bytes": 39661568,
+                "started": "Sat Sep 26 21:00:01 2026",
+                "identity": "16647:Sat Sep 26 21:00:01 2026"
+              }
+            ]
+          },
+          "finishedAt": "2026-09-26T21:00:02.069Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "darwin-isolation-control.json": {
+          "platform": "darwin-x64",
+          "observations": [
+            {
+              "code": 0,
+              "signal": null,
+              "stdout": "macOS filesystem and network sandbox verified\n",
+              "stderr": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "architecture": "arm64",
+      "jobId": 108485841161,
+      "reports": {
+        "darwin-guard-normal.json": {
+          "unit": "97243b28-afbc-4332-8334-72d8a9c7f531",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-guard-normal.json",
+          "monitorPid": 10532,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 429496729,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T20:59:32.110Z",
+          "hostAtStart": {
+            "total": 7516192768,
+            "available": 3198664704,
+            "compressed": 449495040
+          },
+          "minimumHostAvailable": 3198664704,
+          "peakMemoryBytes": 0,
+          "peakTasks": 0,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T20:59:32.357Z",
+          "processGroup": 10547,
+          "command": [
+            "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "--max-old-space-size=64",
+            "--input-type=module",
+            "-e",
+            "const {hasResourceGuard,ensureResourceGuard}=await import('./scripts/full-lean/resource-guard.mjs');if(!hasResourceGuard())throw Error('Missing monitor');await ensureResourceGuard();console.log('macOS monitor verified')"
+          ],
+          "finishedAt": "2026-09-26T20:59:32.356Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "darwin-guard-cleanup.json": {
+          "unit": "7e0ba58d-8e85-4560-ae8c-75734dcc594e",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-guard-cleanup.json",
+          "monitorPid": 10602,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 429496729,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T20:59:32.491Z",
+          "hostAtStart": {
+            "total": 7516192768,
+            "available": 3185328128,
+            "compressed": 449380352
+          },
+          "minimumHostAvailable": 3177562112,
+          "peakMemoryBytes": 98320384,
+          "peakTasks": 2,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T20:59:33.721Z",
+          "processGroup": 10615,
+          "command": [
+            "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "--max-old-space-size=64",
+            "--input-type=module",
+            "-e",
+            "const {spawn}=await import('node:child_process');const c=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'ignore'});c.unref();setTimeout(()=>process.exit(0),1000)"
+          ],
+          "lastSample": {
+            "bytes": 98320384,
+            "host": {
+              "total": 7516192768,
+              "available": 3189882880,
+              "compressed": 445300736
+            },
+            "processes": [
+              {
+                "pid": 10615,
+                "parent": 10602,
+                "group": 10615,
+                "bytes": 50282496,
+                "started": "Sat Sep 26 20:59:32 2026",
+                "identity": "10615:Sat Sep 26 20:59:32 2026"
+              },
+              {
+                "pid": 10622,
+                "parent": 10615,
+                "group": 10615,
+                "bytes": 48037888,
+                "started": "Sat Sep 26 20:59:32 2026",
+                "identity": "10622:Sat Sep 26 20:59:32 2026"
+              }
+            ]
+          },
+          "finishedAt": "2026-09-26T20:59:33.721Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "darwin-guard-below-cap-stop.json": {
+          "unit": "09525cfa-991e-44aa-ad4e-999548747e4b",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-guard-below-cap-stop.json",
+          "monitorPid": 10723,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 107374182,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T20:59:33.831Z",
+          "hostAtStart": {
+            "total": 7516192768,
+            "available": 3184082944,
+            "compressed": 444973056
+          },
+          "minimumHostAvailable": 3111485440,
+          "peakMemoryBytes": 115687424,
+          "peakTasks": 1,
+          "resourceLimited": true,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T20:59:36.221Z",
+          "processGroup": 10726,
+          "command": [
+            "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "--max-old-space-size=64",
+            "--input-type=module",
+            "-e",
+            "const b=[];let n=0;const t=setInterval(()=>{if(n++<12)b.push(Buffer.alloc(8*1024*1024,42));else clearInterval(t)},250);setTimeout(()=>process.exit(9),15000)"
+          ],
+          "lastSample": {
+            "bytes": 115687424,
+            "host": {
+              "total": 7516192768,
+              "available": 3111485440,
+              "compressed": 444563456
+            },
+            "processes": [
+              {
+                "pid": 10726,
+                "parent": 10723,
+                "group": 10726,
+                "bytes": 115687424,
+                "started": "Sat Sep 26 20:59:33 2026",
+                "identity": "10726:Sat Sep 26 20:59:33 2026"
+              }
+            ]
+          },
+          "stoppedBecause": "Workload reached its proactive RSS budget",
+          "finishedAt": "2026-09-26T20:59:36.221Z",
+          "result": {
+            "code": null,
+            "signal": "SIGTERM"
+          }
+        },
+        "darwin-isolation-resources.json": {
+          "unit": "08ae9b46-c1f5-4cf4-8071-548f3f1a5c95",
+          "report": "/Users/runner/work/lasm/lasm/.work/darwin-isolation-resources.json",
+          "monitorPid": 10756,
+          "mechanism": "macOS process-tree RSS monitor",
+          "hardCap": false,
+          "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+          "limits": {
+            "memoryMax": null,
+            "stopMemoryBytes": 429496729,
+            "hostReserveBytes": 1610612736,
+            "maximumCompressionGrowthBytes": 134217728,
+            "sampleMs": 250
+          },
+          "startedAt": "2026-09-26T20:59:36.370Z",
+          "hostAtStart": {
+            "total": 7516192768,
+            "available": 3184443392,
+            "compressed": 444563456
+          },
+          "minimumHostAvailable": 3184443392,
+          "peakMemoryBytes": 0,
+          "peakTasks": 0,
+          "resourceLimited": false,
+          "unitReleased": true,
+          "status": "finished",
+          "updatedAt": "2026-09-26T20:59:36.579Z",
+          "processGroup": 10758,
+          "command": [
+            "node",
+            "scripts/ci/check-darwin-isolation.mjs"
+          ],
+          "finishedAt": "2026-09-26T20:59:36.579Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          }
+        },
+        "darwin-isolation-control.json": {
+          "platform": "darwin-arm64",
+          "observations": [
+            {
+              "code": 0,
+              "signal": null,
+              "stdout": "macOS filesystem and network sandbox verified\n",
+              "stderr": ""
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
