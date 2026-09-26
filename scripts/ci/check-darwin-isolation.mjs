@@ -3,13 +3,14 @@ import { mkdtempSync, writeFileSync, readFileSync, realpathSync, readdirSync, st
 import { dirname, join, resolve } from 'node:path';
 import { tmpdir, homedir } from 'node:os';
 import { spawnSync } from 'node:child_process';
-import { darwinSandbox } from './darwin-isolation.mjs';
+import { darwinSandbox, darwinSandboxRules } from './darwin-isolation.mjs';
 
 assert.equal(process.platform, 'darwin');
 const started = Date.now();
 const workspace = realpathSync(mkdtempSync(join(tmpdir(), 'lasm sandbox control λ-')));
 const profile = join(workspace, 'control.sb'), node = realpathSync(process.execPath);
-writeFileSync(profile, darwinSandbox({ writes: [workspace], executables: [resolve(dirname(node), '..')], offline: true }));
+const policyOptions = { writes: [workspace], executables: [resolve(dirname(node), '..')], offline: true };
+writeFileSync(profile, darwinSandbox(policyOptions));
 const source = `import assert from 'node:assert/strict';import {readFileSync,writeFileSync} from 'node:fs';
 for(const p of ${JSON.stringify([join(process.cwd(), 'package.json'), '/usr/bin/git', '/usr/bin/python3', '/usr/bin/cc'])})
 assert.throws(()=>readFileSync(p),{code:'EPERM'});
@@ -33,26 +34,23 @@ if (result.status !== 0) {
       { cwd: workspace, env: process.env, encoding: 'utf8', timeout: 10000 });
     console.log(JSON.stringify({ name, code: probe.status, signal: probe.signal, stdout: probe.stdout, stderr: probe.stderr }));
   }
-  // Diagnose each complete top-level rule without claiming these permissive
-  // probes as an isolation pass. Respect parentheses inside quoted paths.
-  const policyText = readFileSync(profile, 'utf8'), forms = [];
-  let depth = 0, quoted = false, escaped = false, begin;
-  for (let i = 0; i < policyText.length; i++) {
-    const c = policyText[i];
-    if (quoted) { if (escaped) escaped = false; else if (c === '\\') escaped = true; else if (c === '"') quoted = false; }
-    else if (c === '"') quoted = true;
-    else if (c === '(') { if (depth++ === 0) begin = i; }
-    else if (c === ')' && --depth === 0) forms.push(policyText.slice(begin, i + 1));
-  }
+  // These diagnostic probes never count as an isolation pass. Use the actual
+  // rule array so profile parsing cannot hide a missing diagnostic.
+  const forms = darwinSandboxRules(policyOptions).filter(form => form.startsWith('(deny'));
+  const reading = forms[0].replace('file-read-data file-map-executable', 'file-read-data');
+  const mapping = forms[0].replace('file-read-data file-map-executable', 'file-map-executable');
+  forms.push(reading, mapping,
+    forms[0].replace('(require-not', '(require-all (subpath "/") (require-not') + ')',
+    '(deny file-read-data (subpath "/usr/bin") (subpath "/Applications") (subpath ' + JSON.stringify(process.cwd()) + '))');
+  console.log(JSON.stringify({ diagnosticRules: forms.length, profile: readFileSync(profile, 'utf8') }));
   for (const [index, form] of forms.entries()) {
-    if (!form.startsWith('(deny')) continue;
     const probeProfile = join(workspace, `rule-${index}.sb`);
     writeFileSync(probeProfile, '(version 1)\n(allow default)\n' + form + '\n');
     const probe = spawnSync('/usr/bin/sandbox-exec', ['-f', probeProfile, node, '--version'],
       { cwd: workspace, env: { ...process.env, DYLD_PRINT_LIBRARIES: '1' }, encoding: 'utf8', timeout: 10000 });
     console.log(JSON.stringify({ rule: form, code: probe.status, signal: probe.signal, stdout: probe.stdout, stderr: probe.stderr }));
   }
-  for (const directory of [join(homedir(), 'Library/Logs/DiagnosticReports'), '/Library/Logs/DiagnosticReports']) {
+  for (const directory of [join(homedir(), 'Library/Logs/DiagnosticReports'), join(workspace, 'Library/Logs/DiagnosticReports'), '/Library/Logs/DiagnosticReports']) {
     try { for (const name of readdirSync(directory).filter(name => /^(?:node|sandbox-exec)[-_]/.test(name))) {
       const file = join(directory, name);
       if (statSync(file).mtimeMs >= started) console.log(name + '\n' + readFileSync(file, 'utf8').slice(0, 16000));
