@@ -14,6 +14,35 @@ control['require_guard']()
 
 
 class ToolCacheAdvice(unittest.TestCase):
+    def test_only_complete_application_caches_are_advised_not_deployments_or_staging(self):
+        with tempfile.TemporaryDirectory(prefix='lasm-application-advice-') as directory:
+            project = Path(directory) / 'project'
+            def fixture(base, source='1' * 16, signature='2' * 64, complete=True):
+                tree = base / '.lake/lasm/applications' / source / signature / 'dist'
+                tree.mkdir(parents=True)
+                (tree / 'program.wasm').write_bytes(b'\0asm immutable output')
+                if complete:
+                    (tree / '.lasm-application.json').write_text('{}\n')
+                return tree
+            completed = fixture(project)
+            nested = fixture(project / 'Lake project λ')
+            fixture(project, signature='3' * 64, complete=False)
+            fixture(project, signature='.build-staging')
+            fixture(project / 'node_modules/dependency')
+            deployment = project / 'dist'
+            deployment.mkdir()
+            (deployment / '.lasm-application.json').write_text('{}\n')
+            (deployment / 'program.wasm').write_bytes(b'\0asm deployment stays warm')
+            (project / 'linked project').symlink_to(project / 'Lake project λ', target_is_directory=True)
+            evidence = {'trees': {}, 'adviceCalls': 0, 'advisedBytesIncludingRepeats': 0}
+            control['advise_applications'](project, set(), evidence)
+            self.assertEqual(evidence['adviceCalls'], 4)
+            self.assertEqual(set(evidence['trees']), {
+                'applications/' + str(completed.relative_to(project)),
+                'applications/' + str(nested.relative_to(project))})
+            self.assertEqual((completed / 'program.wasm').read_bytes(), b'\0asm immutable output')
+            self.assertEqual((deployment / 'program.wasm').read_bytes(), b'\0asm deployment stays warm')
+
     def test_monitor_reports_and_stops_inside_the_same_guard(self):
         with tempfile.TemporaryDirectory(prefix='lasm-advice-monitor-') as directory:
             root = Path(directory)
@@ -24,7 +53,7 @@ class ToolCacheAdvice(unittest.TestCase):
             report, stop = root / 'report.json', root / 'stop'
             process = subprocess.Popen([sys.executable, '-I', '-B',
                 str(Path(__file__).resolve().parents[1] / 'scripts/full-lean/advise-tool-cache.py'),
-                str(root / 'tools'), str(report), str(stop)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                str(root / 'tools'), str(report), str(stop), str(root / 'project')], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             try:
                 deadline = time.monotonic() + 10
                 while time.monotonic() < deadline:

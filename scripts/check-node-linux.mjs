@@ -60,7 +60,7 @@ function isolated(rules, command, cwd, timeout) {
 save();
 const adviceReport = join(output, 'tool-cache-advice.json'), adviceStop = join(output, 'stop-tool-cache-advice');
 const advisor = spawn('/usr/bin/python3', ['-I', '-B', join(root, 'scripts/full-lean/advise-tool-cache.py'),
-  join(workspace, 'cache/lasm'), adviceReport, adviceStop], { stdio: 'inherit' });
+  join(workspace, 'cache/lasm'), adviceReport, adviceStop, join(workspace, 'project space λ')], { stdio: 'inherit' });
 const advisorExit = new Promise(resolve => {
   advisor.once('error', error => resolve({ error: error.message }));
   advisor.once('exit', (code, signal) => resolve({ code, signal }));
