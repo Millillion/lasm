@@ -8,8 +8,10 @@ The package is experimental and **has not been published to npm**.
 
 ## Get started
 
-Download the candidate from the [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md).
-In an empty directory, install that archive (replace `VERSION` with its version):
+Get the candidate tarball from a maintainer or the private draft linked in the
+[acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
+(the draft requires repository access). In an empty directory, install that
+archive; replace `VERSION` with its version:
 
 ```sh
 npm install /path/to/lasm-compiler-VERSION.tgz
@@ -122,7 +124,7 @@ initialization-independent inline helpers and read-only data. A dependency may
 therefore need refactoring to keep compiler operations at build time.
 
 The launcher also rejects missing, stale, or incompatible capability records
-before loading the application. This catches mixed deployment files; it is not
+before loading the application. This checks the declared build capabilities; it is not
 a security sandbox against someone rewriting JavaScript or Wasm. There is **no
 large compatibility fallback** in current source builds.
 

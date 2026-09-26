@@ -5,7 +5,8 @@ export function parseDarwinProcesses(text) {
   return text.trim().split('\n').filter(Boolean).map(line => {
     const match = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(.+)$/.exec(line);
     if (!match) throw new Error('Cannot parse macOS process accounting');
-    const [, pid, parent, group, rss, started] = match;
+    const [, pid, parent, group, rss] = match;
+    const started = match[5].trim();
     return { pid: +pid, parent: +parent, group: +group, bytes: +rss * 1024, started, identity: pid + ':' + started };
   });
 }

@@ -6,15 +6,18 @@ import { realpathSync } from 'node:fs';
 export function darwinSandbox({ reads = [], writes = [], executables = [], offline = false }) {
   const path = value => JSON.stringify(realpathSync(value));
   const subpaths = values => values.map(value => `(subpath ${path(value)})`).join(' ');
+  // Restrict the capabilities this test proves, while preserving normal OS IPC,
+  // JIT and process services. A deny-default OS sandbox was aborting stock Node
+  // before JS startup. Anonymous pipes/local sockets are needed by spawnSync.
+  const ipc = '(vnode-type CHARACTER-DEVICE) (vnode-type FIFO) (vnode-type SOCKET)';
   return `(version 1)
-(deny default)
-(allow process-fork process-info* signal sysctl-read mach-lookup)
-(allow file-read-metadata)
-(allow file-read* file-map-executable (subpath "/System/Library") (subpath "/usr/lib")
+(allow default)
+(deny file-read-data file-map-executable (require-not (require-any
+  (subpath "/System/Library") (subpath "/usr/lib")
   (subpath "/private/etc") (literal "/dev/null") (literal "/dev/urandom") (literal "/dev/random")
-  ${subpaths([...reads, ...writes, ...executables])})
-(allow file-write* (literal "/dev/null") ${subpaths(writes)})
-(allow process-exec ${subpaths(executables)})
-${offline ? '' : '(allow network*)'}
+  ${ipc} ${subpaths([...reads, ...writes, ...executables])})))
+(deny file-write* (require-not (require-any ${ipc} ${subpaths(writes)})))
+(deny process-exec (require-not (require-any ${subpaths(executables)})))
+${offline ? '(deny network-outbound (remote ip "*:*"))\n(deny network-inbound (local ip "*:*"))' : ''}
 `;
 }
