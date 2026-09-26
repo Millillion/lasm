@@ -99,3 +99,24 @@ is red because its earlier Mac jobs failed; both Linux jobs succeeded. Mac
 rechecks use the unchanged archive with corrected validation controls. Native
 Mac acceptance and retention of a four-platform candidate remain pending.
 The quick start still uses retained candidate `.35` above.
+
+## Candidate `.37` partial matrix — 2026-09-26
+
+Candidate `.37` fixes the Mac directory ABI and temporary-name failures recorded
+above. Its source is `804d751d022ec914a389c81e023e2f9576ad0f85`; two independent
+packing runs produced the same 65,336,595-byte archive, SHA-256
+`622abcb5fa5aac5887f31cd3cc776fc44fa087c55ce5ede54e75d40c2ee8b32e`.
+All 132 focused controls passed before native acceptance.
+
+[Apple Silicon](evidence/node37-darwin-arm64-2026-09-26.json) and
+[Linux x86-64](evidence/node37-linux-x64-2026-09-26.json) passed all eight installed
+and isolated copied deployments in [run 36276053827](https://github.com/Millillion/lasm/actions/runs/36276053827).
+The Mac used macOS 15.7.9 (24G830), Node 26.10.0, npm 11.19.1 and Lean 4.34.1.
+Its complete deployments were 2,740,973–3,661,550 bytes. The sampled process-tree
+RSS peak was 2,561,228,800 bytes; host available memory stayed above 2,914,582,528
+bytes. Its monitor released all tracked processes with no resource abort. This
+Mac monitor is not a kernel-enforced aggregate memory cap. Both jobs maintained
+their disk reserves; Linux recorded zero OOM events.
+
+Intel Mac and Linux ARM64 are still running. Retention of `.37` waits for the
+whole matrix; this partial result does not replace the retained `.35` quick start.

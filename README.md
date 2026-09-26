@@ -8,7 +8,7 @@ The package is experimental and **has not been published to npm**.
 
 ## Get started
 
-Get the tested `.35` candidate tarball identified in the
+The retained quick-start candidate currently targets Linux. Get the tested `.35` tarball identified in the
 [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
 from a maintainer (repository access may be required). In an empty directory:
 
@@ -80,7 +80,8 @@ compatibility launchers. These interfaces have no current release support guaran
 | --- | --- | --- |
 | Ubuntu 24.04.5 LTS, glibc 2.39, Node 26.10.0 | x86-64 and ARM64 | Native installed-package acceptance passed for candidates `.35` and `.36`. |
 | Other Linux distributions | x86-64 and ARM64 | Unverified; glibc 2.39 or newer is required. Alpine/musl is unsupported. |
-| macOS 15 | x86-64 and ARM64 | Managed builds and deployment are under native validation. Not yet a supported release target. |
+| macOS 15.7.9 | ARM64 | Candidate `.37` passed native installed-package and copied-deployment acceptance. Retention of the full-matrix candidate is pending. |
+| macOS 15 | x86-64 | Native validation is in progress. Not yet a supported release target. |
 | Windows | x86-64 and ARM64 | Follows macOS; not yet supported. |
 | Deno, Bun, browsers, Cloudflare Workers | Any | Not supported by the release candidate. |
 | Lambda, Netlify, other serverless services | Any | No deployment adapter or platform acceptance yet. |
