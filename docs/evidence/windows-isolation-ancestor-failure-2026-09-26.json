@@ -1,0 +1,72 @@
+{
+  "scope": "LPAC launch works; Node absolute module loading failed on ancestor lstat. Ordinary AppContainer positive control passed. This is a maintainer isolation-control failure, not a Lean test failure.",
+  "job": "https://github.com/Millillion/lasm/actions/runs/36279510935/job/108508541430",
+  "result": {
+    "scope": "Native LPAC controls only; no Lean application acceptance",
+    "platform": "win32-x64",
+    "root": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-0v60s7",
+    "phases": [
+      {
+        "phase": "online",
+        "code": 1,
+        "stdout": "",
+        "stderr": "node:fs:3394\r\n    const out = binding.lstat(\r\n                        ^\r\n\r\nError: EPERM: operation not permitted, lstat 'C:\\'\r\n    at Object.realpathSync (node:fs:3394:25)\r\n    at realpathSync (node:internal/modules/helpers:77:37)\r\n    at Object.loaderMethodWrapper [as realpathSync] (node:internal/modules/helpers:123:12)\r\n    at Module._findPath (node:internal/modules/cjs/loader:861:36)\r\n    at resolveMainPath (node:internal/modules/run_main:37:21)\r\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:163:20)\r\n    at node:internal/main/run_main_module:33:47 {\r\n  errno: -4048,\r\n  code: 'EPERM',\r\n  syscall: 'lstat',\r\n  path: 'C:\\\\'\r\n}\r\n\r\nNode.js v26.10.0\r\n",
+        "isolation": {
+          "mechanism": "Windows Less Privileged AppContainer",
+          "profile": "Lasm.CI.34fcab61-55f7-4572-94d7-92306ad6c7d0",
+          "offline": false,
+          "status": "failed",
+          "startedAt": 1790465311.727421,
+          "allPackagesOptOut": true,
+          "sid": "S-1-15-2-559742206-50482021-373509147-3956059702-3403092507-602213628-1381295993",
+          "capabilities": [
+            "registryRead",
+            "internetClient"
+          ],
+          "grants": [
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-0v60s7\\stock Node",
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-0v60s7\\readonly.txt",
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-0v60s7\\writable \u65e5\u672c\u8a9e"
+          ],
+          "pid": 5000,
+          "token": {
+            "appContainer": true
+          },
+          "inheritedCappedJob": "Local\\LasmResource-88165aeb-3275-40ed-82dd-9690aa501bbc",
+          "exitCode": 1,
+          "finishedAt": 1790465318.1051457,
+          "descendantsReleased": true
+        }
+      }
+    ],
+    "ordinaryAppContainerSentinel": {
+      "code": 0,
+      "stdout": "",
+      "stderr": "",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.55b50a97-3b7f-4bcb-856a-27df5f41727f",
+        "offline": true,
+        "status": "passed",
+        "startedAt": 1790465305.9064667,
+        "allPackagesOptOut": false,
+        "sid": "S-1-15-2-3198251265-3620914602-2077658272-3535770610-3019897494-465763029-869660851",
+        "capabilities": [
+          "registryRead"
+        ],
+        "grants": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-0v60s7\\stock Node",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-0v60s7\\writable \u65e5\u672c\u8a9e"
+        ],
+        "pid": 1988,
+        "token": {
+          "appContainer": true
+        },
+        "inheritedCappedJob": "Local\\LasmResource-88165aeb-3275-40ed-82dd-9690aa501bbc",
+        "exitCode": 0,
+        "finishedAt": 1790465311.509324,
+        "descendantsReleased": true
+      }
+    }
+  }
+}

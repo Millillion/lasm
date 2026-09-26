@@ -135,7 +135,7 @@ name = "Lasm.CI." + str(uuid.uuid4())
 sid, caps, attribute_buffer = P(), [], None
 child = PROCESS()
 inner = outer = token = None
-files, grants = [], []
+files, grants, parents = [], [], []
 evidence = {"mechanism": "Windows Less Privileged AppContainer", "profile": name,
             "offline": bool(spec.get("offline")), "status": "starting", "startedAt": time.time()}
 less_privileged = spec.get("lessPrivileged", True)
@@ -168,7 +168,15 @@ try:
     evidence.update(sid=sid_text, capabilities=names)
     allowed_root = Path(spec["disposableRoot"]).resolve()
     assert allowed_root.is_dir() and allowed_root.name.startswith("lasm ")
-    # Never change permissions on system/developer installations or ancestors.
+    # Node resolves every parent component before loading an absolute module.
+    # Grant this disposable SID only attributes/traversal on ancestor directories:
+    # no file data, listing, inheritance or write access. Remove non-recursively.
+    if less_privileged:
+        for path in [allowed_root, *allowed_root.parents]:
+            acl(path, "/grant:r", f"*{sid_text}:(RA,REA,X,RC,S)", "/Q")
+            parents.append(path)
+        evidence["ancestorMetadata"] = [str(p) for p in parents]
+    # File data/execute/write grants stay inside the disposable test root.
     for mode in ("reads", "writes"):
         for item in spec.get(mode, []):
             path = Path(item).resolve()
@@ -259,6 +267,11 @@ finally:
     for path in reversed(grants):
         try:
             acl(path, "/remove:g", "*" + sid_text, "/T", "/Q")
+        except Exception as error:
+            evidence.setdefault("cleanupErrors", []).append(str(error))
+    for path in reversed(parents):
+        try:
+            acl(path, "/remove:g", "*" + sid_text, "/Q")
         except Exception as error:
             evidence.setdefault("cleanupErrors", []).append(str(error))
     if sid:
