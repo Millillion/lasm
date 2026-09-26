@@ -71,7 +71,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
     emscripten: sdkCatalog.version, sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)),
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
-    ...(metadata ? { moduleDataIdentity: metadata.identity, moduleDataBytes: metadata.manifest.bytes } : {}),
+    ...(metadata ? { metadataInputsIdentity: metadata.identity } : {}),
     target, host: `${process.platform}-${process.arch}`, node: applicationSupport()?.node,
     minimumGlibc: applicationSupport()?.minimumGlibc, memoryMode, modules };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
@@ -90,15 +90,21 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   if (!progress) log(`Building ${relative(process.cwd(), source) || source} for ${target}…`);
   const temporary = join(work, '.build-' + randomUUID()), dist = join(temporary, 'dist');
   await mkdir(dist, { recursive: true });
-  await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
+  const linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
     leanVersion: lean.version, memoryMode, verbose, progress });
   progress?.({ stage: 'Packaging the application and runtime support' });
-  copyApplicationHost(dist); writeApplicationEntrypoint(dist, target, {
+  copyApplicationHost(dist, { target }); writeApplicationEntrypoint(dist, target, {
     node: applicationSupport()?.node, minimumGlibc: applicationSupport()?.minimumGlibc,
   });
-  await copyApplicationMetadata(metadata, dist);
+  // JSON, parsers and other ordinary Lean library code do not need the
+  // compiler's on-disk environments. Retain those assets when the linked
+  // program can import/evaluate modules or use Lean's standard search paths.
+  await copyApplicationMetadata(linkRequirements.requiresModuleData ? metadata : null, dist);
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));
-  const buildInfo = { ...recipe, signature, sdkIdentity: sdk.identity, sdkDriverIdentity: sdk.driverIdentity };
+  const buildInfo = { ...recipe, signature, linkRequirements,
+    ...(linkRequirements.requiresModuleData && metadata
+      ? { moduleDataIdentity: metadata.identity, moduleDataBytes: metadata.manifest.bytes } : {}),
+    sdkIdentity: sdk.identity, sdkDriverIdentity: sdk.driverIdentity };
   await writeFile(join(dist, 'build-info.json'), JSON.stringify(buildInfo, null, 2) + '\n');
   await writeFile(join(dist, outputReceipt), JSON.stringify({ schema: 1, signature, files: await fileInventory(dist) }) + '\n');
   await mkdir(dirname(cached), { recursive: true });

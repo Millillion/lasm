@@ -35,7 +35,7 @@ jobs:
         run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.32.tgz
+          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.33.tgz
           key: ${{ inputs.cache-key }}
           fail-on-cache-miss: true
       - name: Enable process-tree resource guard

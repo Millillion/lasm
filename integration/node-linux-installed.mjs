@@ -1,6 +1,7 @@
 // Only Node built-ins and the installed product are available to this control.
 import assert from 'node:assert/strict';
-import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, statSync, rmSync, openSync, readSync, closeSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, statSync, rmSync, openSync, readSync, closeSync, renameSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join, resolve, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawn, spawnSync } from 'node:child_process';
@@ -61,37 +62,54 @@ function size(directory) {
     return total + (entry.isDirectory() ? size(path) : entry.isFile() ? statSync(path).size : 0);
   }, 0);
 }
-function cachedDist(directory) {
+function cachedDist(directory, source) {
   const base = join(directory, '.lake/lasm/applications');
+  const sourceKey = source && createHash('sha256').update(resolve(directory, source)).digest('hex').slice(0, 16);
   const found = [];
-  for (const name of readdirSync(base)) for (const signature of readdirSync(join(base, name))) {
+  for (const name of readdirSync(base).filter(name => !sourceKey || name === sourceKey)) for (const signature of readdirSync(join(base, name))) {
     const candidate = join(base, name, signature, 'dist');
     if (existsSync(join(candidate, 'build-info.json'))) found.push(candidate);
   }
-  assert.equal(found.length, 1, 'The first source has exactly one cached build');
+  assert.equal(found.length, 1, 'The selected source has exactly one cached build');
   return found[0];
 }
-async function oracle(file, args, directory = project, lake = false) {
+async function oracle(file, args, directory = project, lake = false, compiled = false) {
   const { provisionLean } = await import(pathToFileURL(join(compiler, 'src/managed-lean.mjs')));
-  const { nativeLeanEnvironment } = await import(pathToFileURL(join(compiler, 'src/application-sources.mjs')));
+  const { nativeLeanEnvironment, applicationSources } = await import(pathToFileURL(join(compiler, 'src/application-sources.mjs')));
   const lean = await provisionLean(join(directory, file));
   const env = nativeLeanEnvironment(lean);
+  if (compiled) {
+    const work = join(directory, '.native-control', file); mkdirSync(work, { recursive: true });
+    const generated = applicationSources(join(directory, file), lean, work);
+    const executable = join(work, 'program');
+    const built = run('compile native comparison: ' + file, join(lean.prefix, 'bin/leanc'),
+      ['-O2', '-rdynamic', ...generated.sources, '-o', executable], directory, env);
+    assert.equal(built.code, 0, built.stderr);
+    return run('native executable comparison: ' + file, executable, args, directory,
+      { ...env, LEAN_SYSROOT: lean.prefix, LEAN_PATH: generated.metadataRoots.join(':') });
+  }
   return run('native comparison: ' + file, lake ? lean.lake : lean.lean,
     [...(lake ? ['--keep-toolchain', 'env', lean.lean] : []), '--run', file, ...args], directory, env);
 }
-async function deployment(name, output, file, cases, directory = project, lake = false) {
+async function deployment(name, output, file, cases, directory = project, lake = false, compiled = false, mode = 'static') {
   const checks = [];
   const fd = openSync(join(output, 'program.wasm'), 'r'), magic = Buffer.alloc(4);
   try { assert.equal(readSync(fd, magic, 0, 4, 0), 4); } finally { closeSync(fd); }
   assert.deepEqual(magic, Buffer.from([0, 97, 115, 109]));
   for (const { args, expected } of cases) {
-    const native = await oracle(file, args, directory, lake);
+    const native = await oracle(file, args, directory, lake, compiled);
     assert.deepEqual(native, expected);
     const actual = run('plain Node: ' + name, process.execPath, [join(output, 'main.mjs'), ...args], directory);
     assert.deepEqual(actual, native);
     checks.push({ args, expected: native });
   }
-  result.deployments.push({ name, output, source: join(directory, file), build: buildInfo(output), bytes: size(output), checks }); save();
+  const bytes = size(output), budgetBytes = mode === 'dynamic' ? 3 * 1024 ** 3
+    : ['features', 'features-legacy', 'filesystem'].includes(name) ? 16 * 1024 ** 2 : 5 * 1024 ** 2;
+  assert.ok(bytes < budgetBytes, `${name}: deployment size regression (${bytes} bytes)`);
+  assert.equal(buildInfo(output).linkRequirements.mode, mode);
+  assert.equal(existsSync(join(output, 'lean')), mode === 'dynamic', 'Only runtime evaluation needs compiler metadata');
+  result.deployments.push({ name, output, source: join(directory, file), build: buildInfo(output), bytes, budgetBytes,
+    relocate: mode === 'dynamic', checks }); save();
 }
 
 try {
@@ -192,6 +210,37 @@ try {
     assert.notEqual(buildInfo(join(directory, 'dist')).signature, result.lake.signature);
     result.sourceInvalidation = true;
     await deployment('lake', join(directory, 'dist'), 'Main.lean', [{ args: [], expected }], directory, true);
+    // Fixtures run through the installed npx command, then again in the fully
+    // isolated copied deployment. Native Lean supplies their expected behavior.
+    for (const [name, fixture, args] of [
+      ['features', 'BundleFeatures.lean', ['123456789']],
+      ['features-legacy', 'BundleFeaturesLegacy.lean', ['17']],
+      ['filesystem', 'FilesystemSurface.lean', ['filesystem λ']],
+    ]) {
+      writeFileSync(join(project, fixture), readFileSync(join(workspace, 'fixtures', fixture)));
+      const output = join(project, name + ' dist');
+      assert.equal(npx(name + ' deployment', ['build', fixture, '--output', output]).code, 0);
+      const expected = await oracle(fixture, args, project, false, true); assert.equal(expected.code, 0);
+      await deployment(name, output, fixture, [{ args, expected }], project, false, true);
+    }
+    const unused = 'Unused.lean';
+    writeFileSync(join(project, unused), Array.from({ length: 1000 }, (_, i) =>
+      `def unused${i} (n : Nat) : Nat := (n + ${i}) * (n + ${i + 1})\n`).join('')
+      + readFileSync(join(compiler, 'examples/hello/Main.lean'), 'utf8'));
+    const unusedOutput = join(project, 'unused dist');
+    assert.equal(npx('unused definitions deployment', ['build', unused, '--output', unusedOutput]).code, 0);
+    assert.ok(statSync(join(unusedOutput, 'program.wasm')).size <= statSync(join(result.cached, 'program.wasm')).size + 4096,
+      'A thousand unreachable functions must not scale deployment size');
+    await deployment('unused', unusedOutput, unused, [{ args: [], expected: basic }]);
+    const reflection = 'StandaloneModuleData.lean';
+    writeFileSync(join(project, reflection), readFileSync(join(workspace, 'fixtures', reflection)));
+    const evaluated = { code: 0, stdout: 'standard module data imported; seven runtime evaluations passed\n', stderr: '' };
+    matchesCli(npx('runtime evaluation retains full support', [reflection]), evaluated);
+    // Runtime module data is large. Relocate the complete cache result instead
+    // of retaining redundant copies; the deployment's tools/cache are denied.
+    const reflectionOutput = join(project, 'reflection dist');
+    renameSync(cachedDist(project, reflection), reflectionOutput);
+    await deployment('reflection', reflectionOutput, reflection, [{ args: [], expected: evaluated }], project, false, true, 'dynamic');
     result.toolsBytes = size(tools);
     const host = process.platform + '-' + process.arch;
     result.downloads = [

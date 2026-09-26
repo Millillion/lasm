@@ -1,7 +1,7 @@
 import { mkdirSync, copyFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { copyNativeBundle } from './native-bundle.mjs';
+import { copyNativeBundle, copyApplicationNativeBundle } from './native-bundle.mjs';
 import { glibcAtLeast } from './application-support.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -14,11 +14,14 @@ export const applicationHostFiles = [
 ];
 
 /** Application output carries its host support, including native FFI and helpers. */
-export function copyApplicationHost(output) {
+export function copyApplicationHost(output, { target, platform = process.platform, arch = process.arch,
+  glibc = process.report?.getReport().header.glibcVersionRuntime } = {}) {
   const directory = join(resolve(output), 'host');
   mkdirSync(directory, { recursive: true });
   for (const name of applicationHostFiles) copyFileSync(join(root, 'src', name), join(directory, name));
-  copyNativeBundle(root, directory);
+  if (target === 'node' && platform === 'linux' && glibc && ['x64', 'arm64'].includes(arch))
+    copyApplicationNativeBundle(root, directory, { arch });
+  else copyNativeBundle(root, directory);
 }
 
 export function applicationEntrypoint(target, { platform = process.platform, arch = process.arch, node, minimumGlibc } = {}) {

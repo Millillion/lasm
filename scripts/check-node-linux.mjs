@@ -1,7 +1,7 @@
 // Native installed-package acceptance. Orchestration stays outside Landlock;
 // the package sees only stock Node/npm, OS facilities and its fresh workspace.
 import assert from 'node:assert/strict';
-import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync, statSync, symlinkSync } from 'node:fs';
+import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync, statSync, symlinkSync, renameSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { tmpdir, release } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -24,6 +24,9 @@ const workspace = mkdtempSync(join(tmpdir(), 'lasm node Linux λ-'));
 const control = join(workspace, 'node-linux-installed.mjs');
 for (const name of ['node-linux-installed.mjs', 'node-cache-controls.mjs'])
   copyFileSync(join(root, 'integration', name), join(workspace, name));
+mkdirSync(join(workspace, 'fixtures'));
+for (const name of ['BundleFeatures.lean', 'BundleFeaturesLegacy.lean', 'FilesystemSurface.lean', 'StandaloneModuleData.lean'])
+  copyFileSync(join(root, 'integration/fixtures', name), join(workspace, 'fixtures', name));
 for (const path of ['home', 'tmp', 'os-bin']) mkdirSync(join(workspace, path));
 symlinkSync('/bin/sh', join(workspace, 'os-bin/sh'));
 for (const path of ['npm-user-config', 'npm-global-config', 'git-system-config', 'git-global-config'])
@@ -88,7 +91,8 @@ try {
   const programs = [];
   for (const entry of result.installation.deployments) {
     const copied = join(deploymentRoot, entry.name, 'dist');
-    cpSync(entry.output, copied, { recursive: true });
+    if (entry.relocate) { mkdirSync(dirname(copied), { recursive: true }); renameSync(entry.output, copied); }
+    else cpSync(entry.output, copied, { recursive: true });
     deploymentAllow.push({ path: copied, access: 'execute' });
     programs.push({ ...entry, copied, wasmSha256: await hashFile(join(copied, 'program.wasm')) });
   }
@@ -96,7 +100,7 @@ try {
   writeFileSync(deploymentRules, JSON.stringify({ allow: deploymentAllow, denyTcp: true,
     environment: { PATH: '', HOME: cwd, LANG: 'C.UTF-8', TMPDIR: temporary, LEAN_NUM_THREADS: '2' } }, null, 2) + '\n');
   const denied = [join(root, 'package.json'), join(result.installation.compiler, 'bin/lasm.mjs'),
-    ...programs.flatMap(entry => [entry.source, join(entry.output, 'program.wasm')]),
+    ...programs.flatMap(entry => [entry.source, ...(!entry.relocate ? [join(entry.output, 'program.wasm')] : [])]),
     join(result.installation.tools, 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean')];
   const controlResult = isolated(deploymentRules, [engine, '--input-type=module', '-e',
     `import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs';
@@ -111,7 +115,8 @@ try {
       checks.push({ ...c, actual, seconds: (performance.now() - start) / 1000 });
       assert.deepEqual(actual, c.expected);
     }
-    result.deployment.programs.push({ name: program.name, bytes: program.bytes, wasmSha256: program.wasmSha256, checks }); save();
+    result.deployment.programs.push({ name: program.name, bytes: program.bytes, relocation: program.relocate ? 'moved' : 'copied',
+      wasmSha256: program.wasmSha256, checks }); save();
   }
   result.passed = true; result.finishedAt = new Date().toISOString(); save();
 } catch (error) { result.error = error.stack; result.finishedAt = new Date().toISOString(); save(); throw error; }

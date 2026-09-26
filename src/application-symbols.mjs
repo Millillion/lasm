@@ -10,12 +10,32 @@ export function parseDefinedSymbols(text) {
   });
 }
 
+// Inline C++/libc++ helpers use weak COMDAT definitions and may be selected
+// from any archive that happens to contain a copy. Their archive membership
+// alone does not imply a dependency on Lean's compiler initialization.
+export function initializationFreeCppSymbols(text) {
+  const types = new Map();
+  for (const { name, type } of parseDefinedSymbols(text)) {
+    if (!types.has(name)) types.set(name, new Set());
+    types.get(name).add(type);
+  }
+  return new Set([...types].filter(([, bindings]) => [...bindings].every(type => type === 'W' || type === 'V'))
+    .map(([name]) => name));
+}
+
+export function readInitializationFreeCppSymbols(archive, nm) {
+  return initializationFreeCppSymbols(execFileSync(nm, ['--defined-only', '--extern-only', '--format=posix', archive],
+    { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] }));
+}
+
 /** Preserve both code and initialized data addresses, using real C declarations. */
 export function applicationSymbolRegistry(sources, symbols, hook = 'lasm_lookup_application_symbol') {
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(hook)) throw new Error('Invalid application symbol hook');
   const names = [...new Set(symbols.map(symbol => symbol.name).filter(isLeanSymbol))].sort();
-  const defined = new Set(names), declarations = new Map();
+  const defined = new Set(names), declarations = new Map(), initializers = new Set();
   for (const source of sources) {
+    for (const match of source.matchAll(/^LEAN_EXPORT lean_object\* ([A-Za-z_][A-Za-z0-9_]*)\(uint8_t builtin\) \{/gm))
+      initializers.add(match[1]);
     for (const match of source.matchAll(/^(?:LEAN_EXPORT\s+)?(?:extern\s+)?((?:const\s+)?(?:lean_object\s*\*|uint\d+_t|size_t|double|float|void)\s+(lp?_[A-Za-z0-9_]+)(?:\([^\n;{}]*\))?)\s*[;{=]/gm))
       if (defined.has(match[2])) declarations.set(match[2], `extern ${match[1]};`);
   }
@@ -43,7 +63,8 @@ ${names.length ? `  size_t first = 0, end = sizeof(lasm_application_symbols) / s
   return NULL;
 }
 `;
-  return { source, exports, symbols: names.length };
+  return { source, exports, foreignExports: exports.filter(name => !isLeanSymbol(name.slice(1))
+    && !initializers.has(name.slice(1))), symbols: names.length };
 }
 
 export function readApplicationSymbols(sources, objects, nm, hook) {

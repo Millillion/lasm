@@ -1,0 +1,768 @@
+{
+  "recordedAt": "2026-09-26T14:58:15.186817+00:00",
+  "scope": "Generalized link reachability, size optimization and native host pruning. Current-source local proof; installed Linux candidate pending.",
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "expected": "v4.34.1",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "expected": "v26.10.0",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false
+    },
+    "checkedAt": "2026-09-26T14:12:40.319Z"
+  },
+  "baseline": {
+    "path": ".work/first-build-progress/smoke-r1/project λ/dist",
+    "bytes": 180485088,
+    "wasmBytes": 160426863,
+    "build": {
+      "schema": 1,
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "emscripten": "6.0.9",
+      "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+      "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+      "buildDriverIdentity": "ce4d12fc4e0f8c4710ab6d69afcd6a9afc0d654667e5413333e7780ffaa476de",
+      "target": "node",
+      "host": "linux-x64",
+      "memoryMode": 1,
+      "modules": [
+        {
+          "module": "Main",
+          "sourceSha256": "2b0f501bc28cf8c4451b29af1506054a50be53b3410d309407f7841320c9edc6",
+          "cSha256": "f4a4b7d37a43e63ce90a7354bec4876e57cb326287781128e64149c0f792429f"
+        }
+      ],
+      "signature": "ff6624c91a8bd7cf8df804cfdf438d90b9b920ae6be383dea684b0015eb37c8f",
+      "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+      "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+    },
+    "fileIdentities": {
+      "program.cjs": "d1dcb68c92949afb7fc2b2ff76d8789358299c3540d44012abee90be821a368b",
+      "program.wasm": "ce535fb30b50355d663ba5f5dc8d9bafd536bc0983606eeb23e8bcbb3bbbe25a"
+    }
+  },
+  "static": {
+    "report": ".work/bundle-size/static-r4/result.json",
+    "passed": true,
+    "harnessSha256": "576b430f066d1963e1f04fa88a78362821c63df81868e34d0015b7e265edabe2",
+    "cases": [
+      {
+        "name": "hello",
+        "sourceSha256": "2b0f501bc28cf8c4451b29af1506054a50be53b3410d309407f7841320c9edc6",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.1",
+          "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+          "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+          "buildDriverIdentity": "d23816f120996dc2e514271d0eff9249eb3a244fa8db25eef2957600209af5cd",
+          "target": "node",
+          "host": "linux-x64",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "2b0f501bc28cf8c4451b29af1506054a50be53b3410d309407f7841320c9edc6",
+              "cSha256": "f4a4b7d37a43e63ce90a7354bec4876e57cb326287781128e64149c0f792429f"
+            }
+          ],
+          "signature": "8f9a9553aeaf5e7c212e3d499af24e4294580326e2c5f392920ff50a91ac5d55",
+          "linkRequirements": {
+            "mode": "static",
+            "dynamic": [],
+            "cxxRuntime": [],
+            "moduleData": [],
+            "requiresModuleData": false,
+            "specializedInitialization": true
+          },
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+          "output": "/home/lastmjs/development/lasm/compiler/.work/bundle-size/static-r4/hello/.lake/lasm/applications/2476aedd2659b42c/8f9a9553aeaf5e7c212e3d499af24e4294580326e2c5f392920ff50a91ac5d55/dist",
+          "cached": "/home/lastmjs/development/lasm/compiler/.work/bundle-size/static-r4/hello/.lake/lasm/applications/2476aedd2659b42c/8f9a9553aeaf5e7c212e3d499af24e4294580326e2c5f392920ff50a91ac5d55/dist",
+          "cacheHit": false
+        },
+        "size": {
+          "total": 3209588,
+          "files": {
+            ".lasm-application.json": 5696,
+            "THIRD_PARTY_NOTICES.txt": 180885,
+            "build-info.json": 1225,
+            "host": 1422310,
+            "main.mjs": 2926,
+            "package.json": 33,
+            "program.cjs": 242484,
+            "program.wasm": 1354029
+          }
+        },
+        "buildSeconds": 45.055990505000004,
+        "runs": [
+          {
+            "label": "compile native executable",
+            "seconds": 0.3285127560000001,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native Lean executable",
+            "seconds": 0.007101743000001079,
+            "code": 0,
+            "signal": null,
+            "stdout": "Hello from Lean! 2 + 3 = 5\n",
+            "stderr": ""
+          },
+          {
+            "label": "relocated Node, no tools on PATH",
+            "seconds": 0.26135843000000025,
+            "code": 0,
+            "signal": null,
+            "stdout": "Hello from Lean! 2 + 3 = 5\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true
+      },
+      {
+        "name": "unused-definitions",
+        "sourceSha256": "80ea7b637a570ab81f5bef7cd6746a4326d5087726e682b6ad940731377412ee",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.1",
+          "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+          "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+          "buildDriverIdentity": "d23816f120996dc2e514271d0eff9249eb3a244fa8db25eef2957600209af5cd",
+          "target": "node",
+          "host": "linux-x64",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "80ea7b637a570ab81f5bef7cd6746a4326d5087726e682b6ad940731377412ee",
+              "cSha256": "2a973c15d7ba0c32e15f3128868ece8e7f5fc60437fde4b5e2f68c168709792e"
+            }
+          ],
+          "signature": "7ae3e0a58c773dc27d15159967a3aff825e6c4b57aefb29a9461511a31e9538e",
+          "linkRequirements": {
+            "mode": "static",
+            "dynamic": [],
+            "cxxRuntime": [],
+            "moduleData": [],
+            "requiresModuleData": false,
+            "specializedInitialization": true
+          },
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+          "output": "/home/lastmjs/development/lasm/compiler/.work/bundle-size/static-r4/unused-definitions/.lake/lasm/applications/c93d6c2eab49ce7a/7ae3e0a58c773dc27d15159967a3aff825e6c4b57aefb29a9461511a31e9538e/dist",
+          "cached": "/home/lastmjs/development/lasm/compiler/.work/bundle-size/static-r4/unused-definitions/.lake/lasm/applications/c93d6c2eab49ce7a/7ae3e0a58c773dc27d15159967a3aff825e6c4b57aefb29a9461511a31e9538e/dist",
+          "cacheHit": false
+        },
+        "size": {
+          "total": 3209614,
+          "files": {
+            ".lasm-application.json": 5696,
+            "THIRD_PARTY_NOTICES.txt": 180885,
+            "build-info.json": 1225,
+            "host": 1422310,
+            "main.mjs": 2926,
+            "package.json": 33,
+            "program.cjs": 242510,
+            "program.wasm": 1354029
+          }
+        },
+        "buildSeconds": 52.11137163200001,
+        "runs": [
+          {
+            "label": "compile native executable",
+            "seconds": 6.063442230999994,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native Lean executable",
+            "seconds": 0.007396844999995665,
+            "code": 0,
+            "signal": null,
+            "stdout": "Hello from Lean! 2 + 3 = 5\n",
+            "stderr": ""
+          },
+          {
+            "label": "relocated Node, no tools on PATH",
+            "seconds": 0.26202592400001595,
+            "code": 0,
+            "signal": null,
+            "stdout": "Hello from Lean! 2 + 3 = 5\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true
+      },
+      {
+        "name": "language-and-json",
+        "sourceSha256": "81bb017333f331ae4a902baa82f4cb9d1f874c0ab787d1510981135d06ab7b6d",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.1",
+          "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+          "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+          "buildDriverIdentity": "d23816f120996dc2e514271d0eff9249eb3a244fa8db25eef2957600209af5cd",
+          "metadataInputsIdentity": "7119a1fb8050eba0d1ad60e33c3cca731b5b93703888c565ec486341693138db",
+          "target": "node",
+          "host": "linux-x64",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "81bb017333f331ae4a902baa82f4cb9d1f874c0ab787d1510981135d06ab7b6d",
+              "cSha256": "8808b0e1bcde20464c85073a5404d7ba36fd1a5671391d5aa7ec8a9437db167e"
+            }
+          ],
+          "signature": "d4142521e098ecaa7552a251145f338e8c24aa82dd971bb2c747eb4292d922f3",
+          "linkRequirements": {
+            "mode": "static",
+            "dynamic": [],
+            "cxxRuntime": [],
+            "moduleData": [],
+            "requiresModuleData": false,
+            "specializedInitialization": true
+          },
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+          "output": "/home/lastmjs/development/lasm/compiler/.work/bundle-size/static-r4/language-and-json/.lake/lasm/applications/08d012ea2f5b12fd/d4142521e098ecaa7552a251145f338e8c24aa82dd971bb2c747eb4292d922f3/dist",
+          "cached": "/home/lastmjs/development/lasm/compiler/.work/bundle-size/static-r4/language-and-json/.lake/lasm/applications/08d012ea2f5b12fd/d4142521e098ecaa7552a251145f338e8c24aa82dd971bb2c747eb4292d922f3/dist",
+          "cacheHit": false
+        },
+        "size": {
+          "total": 2881757,
+          "files": {
+            ".lasm-application.json": 5696,
+            "THIRD_PARTY_NOTICES.txt": 180885,
+            "build-info.json": 1321,
+            "host": 1422310,
+            "main.mjs": 2926,
+            "package.json": 33,
+            "program.cjs": 242928,
+            "program.wasm": 1025658
+          }
+        },
+        "buildSeconds": 52.267380908999996,
+        "runs": [
+          {
+            "label": "compile native executable",
+            "seconds": 1.2442415909999982,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native Lean executable",
+            "seconds": 0.04316931300002034,
+            "code": 0,
+            "signal": null,
+            "stdout": "features passed: 0, 8, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301384}\n",
+            "stderr": ""
+          },
+          {
+            "label": "native Lean executable",
+            "seconds": 0.04372482699999818,
+            "code": 0,
+            "signal": null,
+            "stdout": "features passed: 17, 76, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+            "stderr": ""
+          },
+          {
+            "label": "native Lean executable",
+            "seconds": 0.053188763999991354,
+            "code": 0,
+            "signal": null,
+            "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+            "stderr": ""
+          },
+          {
+            "label": "relocated Node, no tools on PATH",
+            "seconds": 0.29682296200000563,
+            "code": 0,
+            "signal": null,
+            "stdout": "features passed: 0, 8, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301384}\n",
+            "stderr": ""
+          },
+          {
+            "label": "relocated Node, no tools on PATH",
+            "seconds": 0.30598399400000925,
+            "code": 0,
+            "signal": null,
+            "stdout": "features passed: 17, 76, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+            "stderr": ""
+          },
+          {
+            "label": "relocated Node, no tools on PATH",
+            "seconds": 0.2963646690000023,
+            "code": 0,
+            "signal": null,
+            "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true
+      },
+      {
+        "name": "filesystem",
+        "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.1",
+          "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+          "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+          "buildDriverIdentity": "d23816f120996dc2e514271d0eff9249eb3a244fa8db25eef2957600209af5cd",
+          "target": "node",
+          "host": "linux-x64",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+              "cSha256": "0133deba379bc20d3d2d4a46f1b0e3868529685a248920b4f1abe561c74a8e2c"
+            }
+          ],
+          "signature": "5257075987a64e73fa7c163399fad5c2c27989426befac42db95fd71df68ac15",
+          "linkRequirements": {
+            "mode": "static",
+            "dynamic": [],
+            "cxxRuntime": [],
+            "moduleData": [],
+            "requiresModuleData": false,
+            "specializedInitialization": true
+          },
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+          "output": "/home/lastmjs/development/lasm/compiler/.work/bundle-size/static-r4/filesystem/.lake/lasm/applications/c2ba23beb9d49760/5257075987a64e73fa7c163399fad5c2c27989426befac42db95fd71df68ac15/dist",
+          "cached": "/home/lastmjs/development/lasm/compiler/.work/bundle-size/static-r4/filesystem/.lake/lasm/applications/c2ba23beb9d49760/5257075987a64e73fa7c163399fad5c2c27989426befac42db95fd71df68ac15/dist",
+          "cacheHit": false
+        },
+        "size": {
+          "total": 3298744,
+          "files": {
+            ".lasm-application.json": 5696,
+            "THIRD_PARTY_NOTICES.txt": 180885,
+            "build-info.json": 1225,
+            "host": 1422310,
+            "main.mjs": 2926,
+            "package.json": 33,
+            "program.cjs": 242495,
+            "program.wasm": 1443174
+          }
+        },
+        "buildSeconds": 46.80119563099998,
+        "runs": [
+          {
+            "label": "compile native executable",
+            "seconds": 0.9520521280000103,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native Lean executable",
+            "seconds": 0.008524846999993315,
+            "code": 0,
+            "signal": null,
+            "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "relocated Node, no tools on PATH",
+            "seconds": 0.3687834049999947,
+            "code": 0,
+            "signal": null,
+            "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "resources": {
+      "path": ".work/product-acceptance/bundle-size-static-r4-resources.json",
+      "startedAt": "2026-09-26T14:46:28.707Z",
+      "finishedAt": "2026-09-26T14:50:51.256Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "/usr/bin/env",
+        "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+        "LASM_APPLICATION_RUNTIME=/home/lastmjs/development/lasm/compiler/.work/node-linux-package-r1/compiler/targets/lean-4.34.1-wasm64",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "integration/application-bundle-size.mjs",
+        ".work/bundle-size/static-r4",
+        "static"
+      ],
+      "peakMemoryBytes": 1244966912,
+      "minimumHostAvailable": 25887322112,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "http": {
+    "report": ".work/bundle-size/http-r1/result.json",
+    "scope": "Primary CLI with ordinary Lake dependency discovery and full HTTP differential checks",
+    "compiler": "/home/lastmjs/development/lasm/compiler",
+    "target": "node",
+    "engineVersion": "v26.10.0",
+    "build": {
+      "schema": 1,
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "emscripten": "6.0.9",
+      "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+      "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+      "buildDriverIdentity": "d23816f120996dc2e514271d0eff9249eb3a244fa8db25eef2957600209af5cd",
+      "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+      "gitVersion": "git version 2.53.0",
+      "metadataInputsIdentity": "ed05ff761a3187447091a3b781ffefe4028b9de24197bcb96002b785bb9e2b2a",
+      "target": "node",
+      "host": "linux-x64",
+      "memoryMode": 1,
+      "modules": [
+        {
+          "module": "+App.Model",
+          "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+          "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+        },
+        {
+          "module": "+App.Server",
+          "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+          "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+        },
+        {
+          "module": "/+Main",
+          "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+          "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+        }
+      ],
+      "signature": "90a0f55f1b0b5cbe15102fff06004a3688822025d4ce9043ae8543d92520f32e",
+      "linkRequirements": {
+        "mode": "static",
+        "dynamic": [],
+        "cxxRuntime": [],
+        "moduleData": [],
+        "requiresModuleData": false,
+        "specializedInitialization": true
+      },
+      "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+      "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+    },
+    "sourceHashes": {
+      "integration/managed-http.mjs": "899c975ece2aaf817c18a0ed8ce6136c1bfdb5c39af8e386200f10e739eb911e",
+      "examples/lean-server-latest/Main.lean": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+      "examples/lean-server-latest/App/Model.lean": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+      "examples/lean-server-latest/App/Server.lean": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+      "examples/lean-server-latest/test/server.test.mjs": "faa83f12123f666cb94febe6b6bf516c5e93064ac87c49e6c96a6712259a5b60",
+      "examples/lean-server-latest/vitest.config.mjs": "c4d2b3b802161b978c67724931cba0983c57293f4ad67d519140c5ef037661d7"
+    },
+    "sourcesUnchanged": true,
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0,
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundle-size-http-r1-resources.json",
+    "recordedAt": "2026-09-26T14:53:00.039Z",
+    "bytes": 4183268,
+    "wasmBytes": 2326274,
+    "resources": {
+      "path": ".work/product-acceptance/bundle-size-http-r1-resources.json",
+      "startedAt": "2026-09-26T14:51:35.733Z",
+      "finishedAt": "2026-09-26T14:53:00.156Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "/usr/bin/env",
+        "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+        "LASM_APPLICATION_RUNTIME=/home/lastmjs/development/lasm/compiler/.work/node-linux-package-r1/compiler/targets/lean-4.34.1-wasm64",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "integration/managed-http.mjs",
+        ".work/bundle-size/http-r1",
+        "node",
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "/home/lastmjs/development/lasm/compiler",
+        "4.34.1"
+      ],
+      "peakMemoryBytes": 1133637632,
+      "minimumHostAvailable": 25564692480,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "reflection": {
+    "report": ".work/bundle-size/reflection-r1/result.json",
+    "scope": "Link and native-AOT differential probe; any reflection module data is explicit verified external input, not a copied deployment claim",
+    "requirements": {
+      "mode": "dynamic",
+      "dynamic": [
+        "lasm_lookup_lean_symbol",
+        "dlopen",
+        "dlsym"
+      ],
+      "cxxRuntime": [
+        "abstract.cpp.o",
+        "cases_on.cpp.o",
+        "constants.cpp.o",
+        "declaration.cpp.o",
+        "dynlib.cpp.o",
+        "elab_environment.cpp.o",
+        "environment.cpp.o",
+        "expr.cpp.o",
+        "expr_eq_fn.cpp.o",
+        "expr_lt.cpp.o",
+        "ffi.cpp.o",
+        "for_each_fn.cpp.o",
+        "formatter.cpp.o",
+        "inductive.cpp.o",
+        "init_attribute.cpp.o",
+        "instantiate.cpp.o",
+        "instantiate_mvars.cpp.o",
+        "ir_interpreter.cpp.o",
+        "kvmap.cpp.o",
+        "level.cpp.o",
+        "local_ctx.cpp.o",
+        "module.cpp.o",
+        "name.cpp.o",
+        "name_generator.cpp.o",
+        "options.cpp.o",
+        "print.cpp.o",
+        "profiling.cpp.o",
+        "quot.cpp.o",
+        "replace_fn.cpp.o",
+        "time_task.cpp.o",
+        "timeit.cpp.o",
+        "trace.cpp.o",
+        "type_checker.cpp.o",
+        "util.cpp.o"
+      ],
+      "moduleData": [
+        "l_Lean_findSysroot",
+        "l_Lean_findSysroot___closed__0_value",
+        "l_Lean_findSysroot___closed__1_value",
+        "l_Lean_findSysroot___closed__2_value",
+        "l_Lean_findSysroot___closed__3_value",
+        "l_Lean_findSysroot___closed__4_value",
+        "l_Lean_initSearchPath"
+      ],
+      "requiresModuleData": true,
+      "specializedInitialization": false
+    },
+    "wasm": 160431952,
+    "js": 6336370,
+    "native": {
+      "code": 0,
+      "stdout": "standard module data imported; seven runtime evaluations passed\n",
+      "stderr": ""
+    },
+    "actual": {
+      "code": 0,
+      "stdout": "standard module data imported; seven runtime evaluations passed\n",
+      "stderr": ""
+    },
+    "resources": {
+      "path": ".work/product-acceptance/bundle-size-reflection-r1-resources.json",
+      "startedAt": "2026-09-26T14:53:33.019Z",
+      "finishedAt": "2026-09-26T14:54:54.850Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        ".work/bundle-size/link-only.mjs",
+        ".work/bundle-size/reflection-r1",
+        "integration/fixtures/StandaloneModuleData.lean"
+      ],
+      "peakMemoryBytes": 3640442880,
+      "minimumHostAvailable": 23484276736,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "unit": {
+    "log": ".work/bundle-size/unit-r3.log",
+    "passed": 113,
+    "failed": 0,
+    "resources": {
+      "path": ".work/bundle-size/unit-r3-resources.json",
+      "startedAt": "2026-09-26T14:56:24.097Z",
+      "finishedAt": "2026-09-26T14:56:28.595Z",
+      "command": [
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=256",
+        "--test",
+        "--test-concurrency=1",
+        "test/application-reachability.test.mjs",
+        "test/native-application-bundle.test.mjs",
+        "test/application-symbols.test.mjs",
+        "test/application-output.test.mjs",
+        "test/application-metadata.test.mjs",
+        "test/application-support.test.mjs",
+        "test/application-launcher.test.mjs",
+        "test/build-progress.test.mjs",
+        "test/cli-arguments.test.mjs",
+        "test/application-files.test.mjs",
+        "test/application-runtime.test.mjs",
+        "test/node-cache-controls.test.mjs",
+        "test/managed-artifacts.test.mjs",
+        "test/managed-git.test.mjs"
+      ],
+      "peakMemoryBytes": 56725504,
+      "minimumHostAvailable": 26742444032,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "earlierAttempts": [
+    {
+      "name": "static-r1",
+      "outcome": "Stopped after guard-filtered environment caused unintended default-cache provisioning. Only the identified partial archive was removed; receipt preserved."
+    },
+    {
+      "name": "static-r2",
+      "outcome": "Oracle failure: lean --run cannot initialize the fixture in its own module. Corrected harness to compiled native AOT; original fixture assertions retained."
+    },
+    {
+      "name": "static-r3",
+      "outcome": "Stopped inefficient full-compiler -Oz link caused by ordinary JSON imports; changed to unoptimized reachability classification before final optimization."
+    },
+    {
+      "name": "features-r1",
+      "outcome": "Disk reserve abort, not an API failure. Local runtime identity initially absent from initialization audit set."
+    },
+    {
+      "name": "features-r2",
+      "outcome": "Disk reserve abort, not an API failure. Weak shared C++ helpers were conservatively misclassified as compiler state; corrected with symbol bindings and live section evidence."
+    }
+  ],
+  "resourcePolicy": "One guarded local build at a time, 8 GiB cap, proactive stop below cap, no swap, one Binaryen worker, base pages, four-GiB disk reserve. No OOM events. Aborted duplicate metadata was hard-linked only after byte-identity verification; evidence paths and bytes preserved.",
+  "installedCandidate": {
+    "status": "pending",
+    "version": "0.1.0-experimental.33",
+    "nativeArchitectures": [
+      "x64",
+      "arm64"
+    ],
+    "retainedPreviousCandidate": "0.1.0-experimental.32",
+    "npmPublished": false
+  },
+  "legacyImports": {
+    "report": ".work/bundle-size/legacy-r1/result.json",
+    "scope": "Link and native-AOT differential probe; any reflection module data is explicit verified external input, not a copied deployment claim",
+    "requirements": {
+      "mode": "static",
+      "dynamic": [],
+      "cxxRuntime": [],
+      "moduleData": [],
+      "requiresModuleData": false,
+      "specializedInitialization": true
+    },
+    "wasm": 1736464,
+    "js": 242730,
+    "native": {
+      "code": 0,
+      "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+      "stderr": ""
+    },
+    "actual": {
+      "code": 0,
+      "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+      "stderr": ""
+    },
+    "resources": {
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        ".work/bundle-size/link-only.mjs",
+        ".work/bundle-size/legacy-r1",
+        "integration/fixtures/BundleFeaturesLegacy.lean",
+        "123456789"
+      ],
+      "startedAt": "2026-09-26T14:56:54.627Z",
+      "finishedAt": "2026-09-26T14:57:45.365Z",
+      "unitReleased": true,
+      "peakMemoryBytes": 1266876416,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      }
+    }
+  }
+}

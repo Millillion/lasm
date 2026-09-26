@@ -12,12 +12,12 @@ assert.ok(!existsSync(output) && !existsSync(resources) && !existsSync(diskFile)
 mkdirSync('.work', { recursive: true });
 const free = () => { const s = statfsSync('.'); return s.bavail * s.bsize; };
 const minimum = 4 * 1024 ** 3;
-const result = { reserveBytes: minimum, preflightBytes: 12 * 1024 ** 3, freeAtStart: free(), status: 'preflight' };
+const result = { reserveBytes: minimum, preflightBytes: 16 * 1024 ** 3, freeAtStart: free(), status: 'preflight' };
 const save = () => writeFileSync(diskFile, JSON.stringify(result, null, 2) + '\n');
 save(); assert.ok(result.freeAtStart >= result.preflightBytes, 'Need cold-tool headroom and the unchanged four-GiB reserve');
 const child = spawn(process.execPath, ['scripts/full-lean/run-bounded.mjs', '--memory-mib', '8192', '--report', resources,
   '--', 'python3', 'scripts/full-lean/base-pages.py', process.execPath, 'scripts/check-node-linux.mjs', output,
-  '.work/node-candidate/lasm-compiler-0.1.0-experimental.32.tgz', process.env.LASM_CANDIDATE_SHA256], { stdio: 'inherit' });
+  '.work/node-candidate/lasm-compiler-0.1.0-experimental.33.tgz', process.env.LASM_CANDIDATE_SHA256], { stdio: 'inherit' });
 result.status = 'running'; result.minimumFreeBytes = result.freeAtStart; save();
 const timer = setInterval(() => {
   const available = free(); result.minimumFreeBytes = Math.min(result.minimumFreeBytes, available);
