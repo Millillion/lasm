@@ -23,7 +23,12 @@ mkdirSync(dirname(report), { recursive: true });
 const lock = resolve('.work/resource-darwin.lock');
 mkdirSync(lock); // Refuse concurrent workloads; a stale lock requires inspection.
 const unit = randomUUID(), host = darwinMemory(), reserve = 1536 * 1024 ** 2;
-const budget = Math.floor(Math.min(requested * 1024 ** 2, host.total / 2, host.available - reserve));
+// RSS includes clean mapped compiler archives and shared libraries. It is not
+// additional private allocation: subtracting the initial host reserve from RSS
+// stopped wasm-ld with 3.1 GB still available. Keep independent limits instead:
+// at most 40% of physical RAM in sampled aggregate RSS, plus the continuously
+// checked host reserve and compression-growth stop. No kernel cap is claimed.
+const budget = Math.floor(Math.min(requested * 1024 ** 2, host.total / 2));
 const evidence = { unit, report, monitorPid: process.pid, mechanism: 'macOS process-tree RSS monitor', hardCap: false,
   limitations: 'Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.',
   limits: { memoryMax: null, stopMemoryBytes: Math.floor(budget * 0.8), hostReserveBytes: reserve,
@@ -47,7 +52,8 @@ function stop(reason) {
 }
 const handlers = new Map(['SIGINT', 'SIGTERM'].map(signal => [signal, () => stop(signal)]));
 try {
-  save(); assert.ok(budget >= 128 * 1024 ** 2, 'Insufficient host memory for the macOS reserve');
+  save(); assert.ok(budget >= 128 * 1024 ** 2 && host.available - reserve >= 128 * 1024 ** 2,
+    'Insufficient host memory for the macOS reserve');
   writeFileSync(resolve(lock, 'owner.json'), JSON.stringify({ unit, report, monitorPid: process.pid }));
   child = spawn(args[separator + 1], args.slice(separator + 2), { detached: true, stdio: 'inherit',
     env: { ...process.env, LASM_RESOURCE_UNIT: unit, LASM_RESOURCE_REPORT: report,

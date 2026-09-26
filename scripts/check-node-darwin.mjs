@@ -44,7 +44,7 @@ const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(res
 async function nativeControls() {
   const compiler = join(workspace, 'project space λ/node_modules/@lasm/compiler');
   const { provisionLean } = await import(pathToFileURL(join(compiler, 'src/managed-lean.mjs')));
-  const { nativeLeanEnvironment, applicationSources } = await import(pathToFileURL(join(compiler, 'src/application-sources.mjs')));
+  const { nativeLeanEnvironment } = await import(pathToFileURL(join(compiler, 'src/application-sources.mjs')));
   const appleSdk = execFileSync('/usr/bin/xcrun', ['--show-sdk-path'], { encoding: 'utf8' }).trim();
   const records = [];
   for (const [file, args] of [['BundleFeatures.lean', ['123456789']], ['BundleFeaturesLegacy.lean', ['17']],
@@ -53,9 +53,16 @@ async function nativeControls() {
     const source = join(work, file); copyFileSync(join(workspace, 'fixtures', file), source);
     writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v' + result.installation.support.lean + '\n');
     const lean = await provisionLean(source, { cache: result.installation.tools });
-    const generated = applicationSources(source, lean, work);
     const executable = join(work, 'program'), env = { ...nativeLeanEnvironment(lean), SDKROOT: appleSdk };
-    const build = spawnSync(join(lean.prefix, 'bin/leanc'), ['-O2', '-isysroot', appleSdk, ...generated.sources, '-o', executable],
+    // These unchanged fixtures import only standard libraries. Let native Lean
+    // compile them directly, independently of Lasm's dependency discovery. In
+    // particular, a generated `lean/` folder beside source shadows `Lean/` on
+    // the default case-insensitive macOS filesystem.
+    const generated = join(work, 'program.c');
+    const compile = spawnSync(lean.lean, ['-j1', '-s8192', '-Dcompiler.postponeCompile=false', '-c', generated, source],
+      { cwd: work, env, encoding: 'utf8', timeout: 300000, maxBuffer: 4 * 1024 ** 2 });
+    assert.ifError(compile.error); assert.equal(compile.status, 0, compile.stdout + compile.stderr);
+    const build = spawnSync(join(lean.prefix, 'bin/leanc'), ['-O2', '-isysroot', appleSdk, generated, '-o', executable],
       { cwd: work, env, encoding: 'utf8', timeout: 300000, maxBuffer: 4 * 1024 ** 2 });
     assert.ifError(build.error); assert.equal(build.status, 0, build.stderr);
     const actual = spawnSync(executable, args, { cwd: work, env, encoding: 'utf8', timeout: 120000, maxBuffer: 2 * 1024 ** 2 });

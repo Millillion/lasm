@@ -19,12 +19,18 @@ const child = spawn(process.execPath, ['scripts/full-lean/run-bounded.mjs', '--m
   '--', process.execPath, 'scripts/check-node-darwin.mjs', output,
   `.work/node-candidate/lasm-compiler-${version}.tgz`, process.env.LASM_CANDIDATE_SHA256], { stdio: 'inherit' });
 result.status = 'running'; result.minimumFreeBytes = result.freeAtStart; save();
+let lastCommand, lastProgress = 0;
 const timer = setInterval(() => {
   const available = free(); result.minimumFreeBytes = Math.min(result.minimumFreeBytes, available);
   if (available < reserve && !result.resourceAbort) { result.resourceAbort = 'disk-reserve'; child.kill('SIGTERM'); }
   try {
     const acceptance = JSON.parse(readFileSync(resolve(output, 'result.json')));
     const consumer = JSON.parse(readFileSync(resolve(acceptance.workspace, 'result.json')));
+    const command = consumer.activeCommand;
+    if (command && (command.startedAt !== lastCommand || Date.now() - lastProgress >= 30000)) {
+      console.log(`[lasm CI] ${command.label}: ${Math.round((Date.now() - Date.parse(command.startedAt)) / 1000)}s elapsed`);
+      lastCommand = command.startedAt; lastProgress = Date.now();
+    }
     if (consumer.activeCommand?.logs?.some(file => existsSync(file) && statSync(file).size > 2 * 1024 ** 2)
         && !result.resourceAbort) { result.resourceAbort = 'command-output-budget'; child.kill('SIGTERM'); }
   } catch { /* Reports may be between writes during a live command. */ }

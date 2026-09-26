@@ -1,0 +1,217 @@
+{
+  "scope": "Preserved ARM64 resource abort under initial RSS-headroom policy; not a Lean failure or acceptance pass",
+  "runId": "36272441720",
+  "jobId": 108488829148,
+  "sourceRevision": "d7da6b3199ea0afa096a338abef3661af4844cc6",
+  "archiveSha256": "c71616146d9f3decf9b6a93d4a142f9cabae02ee63e2ec50f8d8cdd95827c5f7",
+  "reports": {
+    ".work/node-darwin-acceptance/result.json": {
+      "scope": "Native macOS installed Node/npm-only CLI and relocated deployment; sandbox-exec denies preinstalled developer tools and checkout data",
+      "platform": "darwin-arm64",
+      "node": "v26.10.0",
+      "kernel": "24.6.0",
+      "osRelease": "ProductName:\t\tmacOS\nProductVersion:\t\t15.7.9\nBuildVersion:\t\t24G830\n",
+      "sourceRevision": "d7da6b3199ea0afa096a338abef3661af4844cc6",
+      "archiveSha256": "c71616146d9f3decf9b6a93d4a142f9cabae02ee63e2ec50f8d8cdd95827c5f7",
+      "archiveBytes": 65336536,
+      "workspace": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv",
+      "resourceReport": "/Users/runner/work/lasm/lasm/.work/node-darwin-resources.json",
+      "startedAt": "2026-09-26T21:18:18.223Z",
+      "passed": false,
+      "activePhase": "cold",
+      "installation": {
+        "steps": [
+          {
+            "label": "npm install candidate",
+            "command": [
+              "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npm",
+              "install",
+              "/Users/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.36.tgz"
+            ],
+            "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv/project space \u03bb",
+            "seconds": 6.945142583,
+            "code": 0,
+            "stdout": "\nadded 7 packages in 7s\n",
+            "stderr": "",
+            "signal": null
+          },
+          {
+            "label": "npm version",
+            "command": [
+              "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npm",
+              "--version"
+            ],
+            "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv/project space \u03bb",
+            "seconds": 0.12955812499999955,
+            "code": 0,
+            "stdout": "11.19.1\n",
+            "stderr": "",
+            "signal": null
+          }
+        ],
+        "deployments": [],
+        "passedPhases": [],
+        "npm": "11.19.1",
+        "provenance": {
+          "sourceRevision": "0e66c4d46950c50b62bff158c47b9137cc695130",
+          "runtimeManifestSha256": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+          "lean": "4.34.1",
+          "node": "26.10.0"
+        },
+        "packageVersion": "0.1.0-experimental.36",
+        "compiler": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv/project space \u03bb/node_modules/@lasm/compiler",
+        "project": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv/project space \u03bb",
+        "tools": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv/home/Library/Caches/lasm",
+        "support": {
+          "schema": 1,
+          "platforms": [
+            "linux-x64",
+            "linux-arm64",
+            "darwin-x64",
+            "darwin-arm64"
+          ],
+          "node": "26.10.0",
+          "lean": "4.34.1",
+          "minimumGlibc": "2.39"
+        },
+        "activeCommand": {
+          "label": "cold npx lasm Main.lean",
+          "command": [
+            "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Main.lean"
+          ],
+          "startedAt": "2026-09-26T21:18:25.350Z",
+          "logs": [
+            "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv/command-2-stdout.log",
+            "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv/command-2-stderr.log"
+          ]
+        }
+      },
+      "interruptedCommandLogs": [
+        {
+          "path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv/command-2-stdout.log",
+          "tail": ""
+        },
+        {
+          "path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv/command-2-stderr.log",
+          "tail": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] First-time tool setup can take a few minutes. Lasm downloads and verifies its tools automatically; later builds reuse them.\n[lasm] Tools cache: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-XMdNvv/home/Library/Caches/lasm\n[lasm] Downloading Lean 4.34.1 and Lake: 0 B / 562.0 MB (0%) \u2014 0s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 482.4 MB / 562.0 MB (85%) \u2014 9s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 562.0 MB / 562.0 MB (100%) \u2014 11s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 8s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 18s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake \u2014 7s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake \u2014 17s elapsed\n[lasm] Finishing Lean 4.34.1 and Lake setup \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Downloading Python 3.13.15: 0 B / 25.1 MB (0%) \u2014 0s elapsed\n[lasm] Downloading Python 3.13.15: 25.1 MB / 25.1 MB (100%) \u2014 0s elapsed\n[lasm] Extracting Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying installed Python 3.13.15 \u2014 0s elapsed\n[lasm] Finishing Python 3.13.15 setup \u2014 0s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 0 B / 275.5 MB (0%) \u2014 0s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 162.2 MB / 275.5 MB (58%) \u2014 3s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 275.5 MB / 275.5 MB (100%) \u2014 7s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 6s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 16s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 26s elapsed\n[lasm] Verifying installed compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying installed compiler tools (Emscripten 6.0.9) \u2014 2s elapsed\n[lasm] Verifying installed compiler tools (Emscripten 6.0.9) \u2014 12s elapsed\n[lasm] Finishing compiler tools (Emscripten 6.0.9) setup \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 8s elapsed\n[lasm] Preparing and checking compiler tools \u2014 18s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 3s elapsed\n[lasm] Checking required runtime code \u2014 13s elapsed\n[lasm] Checking required runtime code \u2014 23s elapsed\n[lasm] Checking required runtime code \u2014 33s elapsed\n[lasm] Checking required runtime code \u2014 43s elapsed\n[lasm] Checking required runtime code \u2014 53s elapsed\n[lasm] Checking required runtime code \u2014 1m 3s elapsed\n[lasm] Checking required runtime code \u2014 1m 13s elapsed\n[lasm] Checking required runtime code \u2014 1m 23s elapsed\n[lasm] Checking required runtime code \u2014 1m 33s elapsed\n[lasm] Checking required runtime code \u2014 1m 43s elapsed\n[lasm] Checking required runtime code \u2014 1m 53s elapsed\n[lasm] Checking required runtime code \u2014 2m 3s elapsed\n"
+        }
+      ]
+    },
+    ".work/node-darwin-resources.json": {
+      "unit": "b3668fd5-5560-4392-aa90-73ddb742b3e7",
+      "report": "/Users/runner/work/lasm/lasm/.work/node-darwin-resources.json",
+      "monitorPid": 3742,
+      "mechanism": "macOS process-tree RSS monitor",
+      "hardCap": false,
+      "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+      "limits": {
+        "memoryMax": null,
+        "stopMemoryBytes": 1315045376,
+        "hostReserveBytes": 1610612736,
+        "maximumCompressionGrowthBytes": 134217728,
+        "sampleMs": 250
+      },
+      "startedAt": "2026-09-26T21:18:18.024Z",
+      "hostAtStart": {
+        "total": 7516192768,
+        "available": 3254419456,
+        "compressed": 326893568
+      },
+      "minimumHostAvailable": 3091251200,
+      "peakMemoryBytes": 1353793536,
+      "peakTasks": 7,
+      "resourceLimited": true,
+      "unitReleased": true,
+      "status": "finished",
+      "updatedAt": "2026-09-26T21:22:49.433Z",
+      "processGroup": 3744,
+      "command": [
+        "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+        "scripts/check-node-darwin.mjs",
+        "/Users/runner/work/lasm/lasm/.work/node-darwin-acceptance",
+        ".work/node-candidate/lasm-compiler-0.1.0-experimental.36.tgz",
+        "c71616146d9f3decf9b6a93d4a142f9cabae02ee63e2ec50f8d8cdd95827c5f7"
+      ],
+      "lastSample": {
+        "bytes": 1353793536,
+        "host": {
+          "total": 7516192768,
+          "available": 3118825472,
+          "compressed": 406454272
+        },
+        "processes": [
+          {
+            "pid": 3744,
+            "parent": 3742,
+            "group": 3744,
+            "bytes": 60637184,
+            "started": "Sat Sep 26 21:18:18 2026",
+            "identity": "3744:Sat Sep 26 21:18:18 2026",
+            "command": "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node"
+          },
+          {
+            "pid": 3752,
+            "parent": 3744,
+            "group": 3744,
+            "bytes": 54329344,
+            "started": "Sat Sep 26 21:18:18 2026",
+            "identity": "3752:Sat Sep 26 21:18:18 2026",
+            "command": "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node"
+          },
+          {
+            "pid": 3989,
+            "parent": 3752,
+            "group": 3744,
+            "bytes": 89391104,
+            "started": "Sat Sep 26 21:18:25 2026",
+            "identity": "3989:Sat Sep 26 21:18:25 2026",
+            "command": "npm exec lasm Main.lean"
+          },
+          {
+            "pid": 4006,
+            "parent": 3989,
+            "group": 3744,
+            "bytes": 307085312,
+            "started": "Sat Sep 26 21:18:25 2026",
+            "identity": "4006:Sat Sep 26 21:18:25 2026",
+            "command": "node"
+          },
+          {
+            "pid": 7592,
+            "parent": 4006,
+            "group": 3744,
+            "bytes": 55754752,
+            "started": "Sat Sep 26 21:20:42 2026",
+            "identity": "7592:Sat Sep 26 21:20:42 2026",
+            "command": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac M-NM-;-XMdNvv/home/Library/Caches/lasm/artifacts/ae9e3f66aeda497552d2e55793d2fd9642d4bafb6b4467cc9f8d3cc9925f53a3/bin/python3"
+          },
+          {
+            "pid": 12470,
+            "parent": 7592,
+            "group": 3744,
+            "bytes": 786595840,
+            "started": "Sat Sep 26 21:22:45 2026",
+            "identity": "12470:Sat Sep 26 21:22:45 2026",
+            "command": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac M-NM-;-XMdNvv/home/Library/Caches/lasm/artifacts/cc3f0e82b5e58eb0336049fd442445e776dff590bfd3961feedf2ce4a73a0135/bin/wasm-ld"
+          }
+        ]
+      },
+      "stoppedBecause": "Workload reached its proactive RSS budget",
+      "finishedAt": "2026-09-26T21:22:49.433Z",
+      "result": {
+        "code": null,
+        "signal": "SIGTERM"
+      }
+    },
+    ".work/node-darwin-disk.json": {
+      "reserveBytes": 4294967296,
+      "preflightBytes": 12884901888,
+      "freeAtStart": 45323317248,
+      "status": "resource-aborted",
+      "minimumFreeBytes": 39073972224,
+      "freeAtEnd": 39079034880
+    }
+  }
+}
