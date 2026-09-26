@@ -80,7 +80,12 @@ export function nativeFiles({ synchronous = false } = {}) {
     if (value === undefined) return undefined;
     return original?.toString() === value ? original : Buffer.from(value);
   }
-  const scanDirectory = windows ? null : libc.func('int scandir(str path, _Out_ void **entries, void *filter, void *compare)');
+  // Match <dirent.h>'s __DARWIN_INODE64 alias. Intel macOS keeps the legacy
+  // 32-bit-inode ABI at plain scandir; ARM64 has only the modern layout.
+  // Both modern Darwin layouts put d_reclen at 16 and d_name at 21.
+  const scanSymbol = process.platform === 'darwin' && process.arch === 'x64' ? 'scandir$INODE64' : 'scandir';
+  const scanDirectory = windows ? null : libc.func(scanSymbol, 'int',
+    ['str', ffi.out(ffi.pointer('void *')), 'void *', 'void *']);
   const accessAt = windows ? null : libc.func('int faccessat(int directory, str path, int mode, int flags)');
   const getdelim = windows ? null : libc.func('intptr_t getdelim(_Inout_ void **line, _Inout_ size_t *capacity, int delimiter, void *stream)');
   const groupRecord = windows ? null : ffi.struct({ name: 'str', password: 'str', gid: 'uint32_t', members: 'void *' });
@@ -347,10 +352,12 @@ export function nativeFiles({ synchronous = false } = {}) {
         for (let i = 0; i < count; i++) {
           const entry = ffi.decode(output[0], i * ffi.sizeof('void *'), 'void *');
           const size = ffi.decode(entry, 16, 'uint16_t');
-          const record = Buffer.from(ffi.view(entry, size));
           const start = process.platform === 'darwin' ? 21 : 19;
+          if (size <= start) throw new Error('Invalid native directory record length');
+          const record = Buffer.from(ffi.view(entry, size));
           const end = record.indexOf(0, start);
-          const name = Buffer.from(record.subarray(start, end < 0 ? size : end));
+          if (end < 0) throw new Error('Unterminated native directory entry');
+          const name = Buffer.from(record.subarray(start, end));
           if (!name.equals(Buffer.from('.')) && !name.equals(Buffer.from('..'))) names.push(name);
         }
       } finally {

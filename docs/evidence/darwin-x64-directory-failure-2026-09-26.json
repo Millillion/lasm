@@ -1,0 +1,129 @@
+{
+  "scope": "Native macOS installed Node/npm-only CLI and relocated deployment; sandbox-exec denies preinstalled developer tools and checkout data",
+  "platform": "darwin-x64",
+  "node": "v26.10.0",
+  "osRelease": "ProductName:\t\tmacOS\nProductVersion:\t\t15.7.9\nBuildVersion:\t\t24G830\n",
+  "sourceRevision": "b14175d5bbfc566cfdf337068168f1d4731c5eeb",
+  "archiveSha256": "c71616146d9f3decf9b6a93d4a142f9cabae02ee63e2ec50f8d8cdd95827c5f7",
+  "passed": false,
+  "url": "https://github.com/Millillion/lasm/actions/runs/36273151378/job/108490794364",
+  "classification": "product failure: directory enumeration mismatch",
+  "native": {
+    "file": "FilesystemSurface.lean",
+    "args": [
+      "filesystem \u03bb"
+    ],
+    "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+    "lean": "4.34.1",
+    "nativePrograms": {
+      "lean": {
+        "platform": "darwin",
+        "architectures": [
+          "x64"
+        ]
+      },
+      "lake": {
+        "platform": "darwin",
+        "architectures": [
+          "x64"
+        ]
+      }
+    },
+    "scope": "Native AOT oracle only; Apple SDK and this output directory denied to installed product",
+    "executable": "/Users/runner/work/lasm/lasm/.work/node-darwin-acceptance/native-controls/FilesystemSurface.lean/program",
+    "result": {
+      "code": 0,
+      "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+      "stderr": ""
+    }
+  },
+  "actual": {
+    "label": "plain Node: filesystem",
+    "command": [
+      "/Users/runner/hostedtoolcache/node/26.10.0/x64/bin/node",
+      "/private/var/folders/20/jp1_0n3n7kndh6rnbqb5344m0000gn/T/lasm node Mac \u03bb-rpl1Li/project space \u03bb/filesystem dist/main.mjs",
+      "filesystem \u03bb"
+    ],
+    "cwd": "/private/var/folders/20/jp1_0n3n7kndh6rnbqb5344m0000gn/T/lasm node Mac \u03bb-rpl1Li/project space \u03bb",
+    "seconds": 0.5000417570000282,
+    "code": 1,
+    "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\n",
+    "stderr": "uncaught exception: directory entry count\n",
+    "signal": null
+  },
+  "resources": {
+    "unit": "f837052e-a2ae-4b39-8322-6e888c2eb4c7",
+    "report": "/Users/runner/work/lasm/lasm/.work/node-darwin-resources.json",
+    "monitorPid": 1955,
+    "mechanism": "macOS process-tree RSS monitor",
+    "hardCap": false,
+    "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+    "limits": {
+      "memoryMax": null,
+      "stopMemoryBytes": 3435973836,
+      "hostReserveBytes": 1610612736,
+      "maximumCompressionGrowthBytes": 134217728,
+      "sampleMs": 250
+    },
+    "startedAt": "2026-09-26T21:31:03.312Z",
+    "hostAtStart": {
+      "total": 15032385536,
+      "available": 10526138368,
+      "compressed": 0
+    },
+    "minimumHostAvailable": 8711225344,
+    "peakMemoryBytes": 1681264640,
+    "peakTasks": 7,
+    "resourceLimited": false,
+    "unitReleased": true,
+    "status": "finished",
+    "updatedAt": "2026-09-26T22:05:15.465Z",
+    "processGroup": 1957,
+    "command": [
+      "/Users/runner/hostedtoolcache/node/26.10.0/x64/bin/node",
+      "scripts/check-node-darwin.mjs",
+      "/Users/runner/work/lasm/lasm/.work/node-darwin-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.36.tgz",
+      "c71616146d9f3decf9b6a93d4a142f9cabae02ee63e2ec50f8d8cdd95827c5f7"
+    ],
+    "lastSample": {
+      "bytes": 203943936,
+      "host": {
+        "total": 15032385536,
+        "available": 10048995328,
+        "compressed": 3555328
+      },
+      "processes": [
+        {
+          "pid": 1957,
+          "parent": 1955,
+          "group": 1957,
+          "bytes": 104394752,
+          "started": "Sat Sep 26 21:31:03 2026",
+          "identity": "1957:Sat Sep 26 21:31:03 2026",
+          "command": "/Users/runner/hostedtoolcache/node/26.10.0/x64/bin/node"
+        },
+        {
+          "pid": 36345,
+          "parent": 1957,
+          "group": 1957,
+          "bytes": 99549184,
+          "started": "Sat Sep 26 21:51:00 2026",
+          "identity": "36345:Sat Sep 26 21:51:00 2026",
+          "command": "(node)"
+        }
+      ]
+    },
+    "finishedAt": "2026-09-26T22:05:15.463Z",
+    "result": {
+      "code": 1,
+      "signal": null
+    }
+  },
+  "diagnosis": "The plain Intel macOS scandir symbol uses legacy 32-bit-inode records, but the adapter decoded the modern layout. Bind scandir$INODE64 on Intel; ARM64 has only the modern layout. Preserve this failure and revalidate a newly packed archive.",
+  "sources": [
+    "https://github.com/apple-oss-distributions/Libc/blob/main/include/dirent.h",
+    "https://github.com/apple-oss-distributions/xnu/blob/main/bsd/sys/cdefs.h",
+    "https://github.com/apple-oss-distributions/xnu/blob/main/bsd/sys/dirent.h"
+  ]
+}

@@ -23,10 +23,13 @@ jobs:
           node-version: 26.10.0
           architecture: ${{ matrix.architecture }}
           package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Verify guard, cleanup and below-cap proactive stop
         run: node scripts/ci/check-darwin-guard.mjs
       - name: Verify unavailable developer tools and network
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-isolation-resources.json -- node scripts/ci/check-darwin-isolation.mjs
+      - name: Verify native directory records and worker boundary
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-directory-resources.json -- node --test test/native-directory.test.mjs
       - name: Preserve resource evidence
         if: always()
         run: node -e "const f=require('node:fs');for(const p of f.readdirSync('.work').filter(n=>n.startsWith('darwin-')&&n.endsWith('.json')))console.log(p+'\n'+f.readFileSync('.work/'+p,'utf8'))"
