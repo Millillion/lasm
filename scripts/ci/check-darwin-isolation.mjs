@@ -31,6 +31,25 @@ if (result.status !== 0) {
       { cwd: workspace, env: process.env, encoding: 'utf8', timeout: 10000 });
     console.log(JSON.stringify({ name, code: probe.status, signal: probe.signal, stdout: probe.stdout, stderr: probe.stderr }));
   }
+  // Diagnose each complete top-level rule without claiming these permissive
+  // probes as an isolation pass. Respect parentheses inside quoted paths.
+  const policyText = readFileSync(profile, 'utf8'), forms = [];
+  let depth = 0, quoted = false, escaped = false, begin;
+  for (let i = 0; i < policyText.length; i++) {
+    const c = policyText[i];
+    if (quoted) { if (escaped) escaped = false; else if (c === '\\') escaped = true; else if (c === '"') quoted = false; }
+    else if (c === '"') quoted = true;
+    else if (c === '(') { if (depth++ === 0) begin = i; }
+    else if (c === ')' && --depth === 0) forms.push(policyText.slice(begin, i + 1));
+  }
+  for (const [index, form] of forms.entries()) {
+    if (!form.startsWith('(deny')) continue;
+    const probeProfile = join(workspace, `rule-${index}.sb`);
+    writeFileSync(probeProfile, '(version 1)\n(allow default)\n' + form + '\n');
+    const probe = spawnSync('/usr/bin/sandbox-exec', ['-f', probeProfile, node, '--version'],
+      { cwd: workspace, env: process.env, encoding: 'utf8', timeout: 10000 });
+    console.log(JSON.stringify({ rule: form, code: probe.status, signal: probe.signal, stdout: probe.stdout, stderr: probe.stderr }));
+  }
   for (const directory of [join(homedir(), 'Library/Logs/DiagnosticReports'), '/Library/Logs/DiagnosticReports']) {
     try { for (const name of readdirSync(directory).filter(name => /^(?:node|sandbox-exec)[-_]/.test(name))) {
       const file = join(directory, name);
