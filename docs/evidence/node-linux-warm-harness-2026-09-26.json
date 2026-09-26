@@ -1,0 +1,829 @@
+{
+  "scope": "WARM DIAGNOSTIC ONLY; cached tools deliberately prefilled. Does not establish cold provisioning.",
+  "platform": "linux-x64",
+  "node": "v26.10.0",
+  "kernel": "6.8.0-139-generic",
+  "osRelease": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+  "glibc": "2.39",
+  "sourceRevision": "a909968d3bfb8362958c41bc01e719ebab1b9af7",
+  "archiveSha256": "d3776dd2597bd37fcc0177b9d6ad6066718cbe7a47c84440ae6fa6bcc5887580",
+  "archiveBytes": 65324978,
+  "workspace": "/tmp/lasm node Linux \u03bb-eNabIK",
+  "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/node-linux-warm-harness-r1-resources.json",
+  "startedAt": "2026-09-26T03:40:53.270Z",
+  "passed": true,
+  "phaseExecutions": [
+    {
+      "phase": "cold",
+      "code": 0,
+      "diagnostic": ""
+    },
+    {
+      "phase": "lake",
+      "code": 0,
+      "diagnostic": ""
+    },
+    {
+      "phase": "offline",
+      "code": 0,
+      "diagnostic": ""
+    }
+  ],
+  "installation": {
+    "steps": [
+      {
+        "label": "npm install candidate",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npm",
+          "install",
+          "/home/lastmjs/development/lasm/compiler/.work/node-linux-package-r1/lasm-compiler-0.1.0-experimental.32.tgz"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 6.663975063,
+        "code": 0,
+        "stdout": "\nadded 7 packages in 7s\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "npm version",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npm",
+          "--version"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 0.0967075759999998,
+        "code": 0,
+        "stdout": "11.19.1\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "cold npx lasm Main.lean",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 147.195163348,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\nBuilding Main.lean for node\u2026\nshared:INFO: (Emscripten: Running sanity checks)\ncache:INFO: generating system headers: sysroot_install.stamp... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot_install.stamp\" for subsequent builds)\ncache:INFO:  - ok\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\ncache:INFO: generating system asset: sysroot/lib/wasm64-emscripten/pic/crtbegin-mt.o... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/crtbegin-mt.o\" for subsequent builds)\nsystem_libs:INFO: compiled 1 inputs in 0.43s\ncache:INFO:  - ok\ncache:INFO: generating system asset: sysroot/lib/wasm64-emscripten/pic/crt1_proxy_main.o... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/crt1_proxy_main.o\" for subsequent builds)\nsystem_libs:INFO: compiled 1 inputs in 0.46s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libGL-mt-getprocaddr.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libGL-mt-getprocaddr.a\" for subsequent builds)\nsystem_libs:INFO: compiled 4 inputs in 1.00s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libal.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libal.a\" for subsequent builds)\nsystem_libs:INFO: compiled 1 inputs in 0.46s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libhtml5.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libhtml5.a\" for subsequent builds)\nsystem_libs:INFO: compiled 5 inputs in 1.49s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libstubs.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libstubs.a\" for subsequent builds)\nsystem_libs:INFO: compiled 2 inputs in 0.93s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libc-mt.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libc-mt.a\" for subsequent builds)\nsystem_libs:INFO: compiled 1141 inputs in 29.13s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libmimalloc-mt.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libmimalloc-mt.a\" for subsequent builds)\nsystem_libs:INFO: compiled 20 inputs in 3.23s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libclang_rt.builtins-legacysjlj-mt.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libclang_rt.builtins-legacysjlj-mt.a\" for subsequent builds)\nsystem_libs:INFO: compiled 184 inputs in 5.79s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libc++-mt-legacyexcept.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libc++-mt-legacyexcept.a\" for subsequent builds)\nsystem_libs:INFO: compiled 57 inputs in 32.52s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libc++abi-mt-legacyexcept.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libc++abi-mt-legacyexcept.a\" for subsequent builds)\nsystem_libs:INFO: compiled 18 inputs in 4.18s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libunwind-mt-legacyexcept.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libunwind-mt-legacyexcept.a\" for subsequent builds)\nsystem_libs:INFO: compiled 1 inputs in 0.43s\ncache:INFO:  - ok\ncache:INFO: generating system library: sysroot/lib/wasm64-emscripten/pic/libsockets-mt.a... (this will be cached in \"/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/sdk-state/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/cache/sysroot/lib/wasm64-emscripten/pic/libsockets-mt.a\" for subsequent builds)\nsystem_libs:INFO: compiled 27 inputs in 1.76s\ncache:INFO:  - ok\nwarning: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\n",
+        "signal": null
+      },
+      {
+        "label": "npx lasm build Main.lean",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "build",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 15.258134905000013,
+        "code": 0,
+        "stdout": "",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\nReused Lean 4.34.1 for node: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/dist\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Main.lean",
+        "command": [
+          "/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "--run",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 0.2299532570000156,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: hello",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/dist/main.mjs"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 1.7797698789999994,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "Lake local import",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 65.245098923,
+        "code": 0,
+        "stdout": "Lean module: 42\n",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\ninfo: greeting: no previous manifest, creating one from scratch\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\n",
+        "signal": null
+      },
+      {
+        "label": "Lake deployment build",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "build",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 17.303239678999997,
+        "code": 0,
+        "stdout": "",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\nReused Lean 4.34.1 for node: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e/dist\n",
+        "signal": null
+      },
+      {
+        "label": "offline cached npx run",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 16.744338824,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "startup sample 1",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "dist/main.mjs"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 1.7737018559999997,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "startup sample 2",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "dist/main.mjs"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 1.7716677120000022,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "startup sample 3",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "dist/main.mjs"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 1.7607947310000018,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "Lean diagnostic",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "Broken.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 14.562902475,
+        "code": 1,
+        "stdout": "",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\n/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/Broken.lean:1:33: error(lean.unknownIdentifier): Unknown identifier `unknownGreeting`\n\n",
+        "signal": null
+      },
+      {
+        "label": "unsupported Lean pin",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 0.3366556369999962,
+        "code": 1,
+        "stdout": "",
+        "stderr": "Unsupported Lean toolchain \"leanprover/lean4:v999.0.0\" in /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lean-toolchain. Supported managed versions: 4.34.1. The project pin was not changed.\n",
+        "signal": null
+      },
+      {
+        "label": "native tool drift cannot reuse cached output",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 13.892205779999996,
+        "code": 1,
+        "stdout": "",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\nManaged cache contents changed: /tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b. Changed entries (1): \"LICENSE\". Remove this toolchain directory to download a verified replacement.\n",
+        "signal": null
+      },
+      {
+        "label": "runtime drift cannot reuse cached output",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 0.34139258400000105,
+        "code": 1,
+        "stdout": "",
+        "stderr": "Application runtime integrity check failed: exports.json\n",
+        "signal": null
+      },
+      {
+        "label": "arguments and exit code",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "Args.lean",
+          "--",
+          "hello world",
+          "\u03bb \u65e5\u672c\u8a9e",
+          "",
+          "--target"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 62.185258706,
+        "code": 0,
+        "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\nBuilding Args.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\n",
+        "signal": null
+      },
+      {
+        "label": "arguments and exit code",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "Args.lean",
+          "--",
+          "fail"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 16.493215412999998,
+        "code": 23,
+        "stdout": "arg=fail\n",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "arguments deployment",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "build",
+          "Args.lean",
+          "--output",
+          "args dist \u03bb"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 15.646034967999993,
+        "code": 0,
+        "stdout": "",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\nReused Lean 4.34.1 for node: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/args dist \u03bb\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Args.lean",
+        "command": [
+          "/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "--run",
+          "Args.lean",
+          "hello world",
+          "\u03bb \u65e5\u672c\u8a9e",
+          "",
+          "--target"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 0.3147684929999814,
+        "code": 0,
+        "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: arguments",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/args dist \u03bb/main.mjs",
+          "hello world",
+          "\u03bb \u65e5\u672c\u8a9e",
+          "",
+          "--target"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 1.7379131630000193,
+        "code": 0,
+        "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Args.lean",
+        "command": [
+          "/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "--run",
+          "Args.lean",
+          "fail"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 0.2495819049999991,
+        "code": 23,
+        "stdout": "arg=fail\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: arguments",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/args dist \u03bb/main.mjs",
+          "fail"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+        "seconds": 1.76869862000001,
+        "code": 23,
+        "stdout": "arg=fail\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "changed imported source",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 64.45435628099999,
+        "code": 0,
+        "stdout": "Lean module: 43\n",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\n",
+        "signal": null
+      },
+      {
+        "label": "changed Lake deployment",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/npx",
+          "lasm",
+          "build",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 17.873312498000015,
+        "code": 0,
+        "stdout": "",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\nReused Lean 4.34.1 for node: /tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e/dist\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Main.lean",
+        "command": [
+          "/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lake",
+          "--keep-toolchain",
+          "env",
+          "/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "--run",
+          "Main.lean"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 0.27274696700001366,
+        "code": 0,
+        "stdout": "Lean module: 43\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: lake",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e/dist/main.mjs"
+        ],
+        "cwd": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 1.77225682400004,
+        "code": 0,
+        "stdout": "Lean module: 43\n",
+        "stderr": "",
+        "signal": null
+      }
+    ],
+    "deployments": [
+      {
+        "name": "hello",
+        "output": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/dist",
+        "source": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/Main.lean",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.1",
+          "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+          "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+          "buildDriverIdentity": "40d4ad287a95953d3c72721398b1c2c99679c11c9e52fa86595116063c6d4941",
+          "target": "node",
+          "host": "linux-x64",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "2b0f501bc28cf8c4451b29af1506054a50be53b3410d309407f7841320c9edc6",
+              "cSha256": "f4a4b7d37a43e63ce90a7354bec4876e57cb326287781128e64149c0f792429f"
+            }
+          ],
+          "signature": "02717949530167beba5d1585a29c24d6d0015c227f3b4012f7ae18a18742e87f",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "bytes": 180484541,
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "arguments",
+        "output": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/args dist \u03bb",
+        "source": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/Args.lean",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.1",
+          "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+          "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+          "buildDriverIdentity": "40d4ad287a95953d3c72721398b1c2c99679c11c9e52fa86595116063c6d4941",
+          "target": "node",
+          "host": "linux-x64",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Args",
+              "sourceSha256": "5ec14ef77d4a2f1af43f11486ba57f7e1714301c2fd7b568f356c68d0a2ad2ea",
+              "cSha256": "757dd5c75eda797451d599062af406f438d396acdb484d1bfe1617b2f938e195"
+            }
+          ],
+          "signature": "9c61ffc4a3cb0f89c62208d54ce21b89c39569805fb2bba05d763650471eab85",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "bytes": 180486941,
+        "checks": [
+          {
+            "args": [
+              "hello world",
+              "\u03bb \u65e5\u672c\u8a9e",
+              "",
+              "--target"
+            ],
+            "expected": {
+              "code": 0,
+              "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+              "stderr": ""
+            }
+          },
+          {
+            "args": [
+              "fail"
+            ],
+            "expected": {
+              "code": 23,
+              "stdout": "arg=fail\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "lake",
+        "output": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e/dist",
+        "source": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e/Main.lean",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.1",
+          "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+          "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+          "buildDriverIdentity": "40d4ad287a95953d3c72721398b1c2c99679c11c9e52fa86595116063c6d4941",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "node",
+          "host": "linux-x64",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+Greeting",
+              "sourceSha256": "761f41a28177d73a06ce6d04e276d6942e2abd09d1811c041ea36512d596ba4e",
+              "cSha256": "b7c8f461b746768183bbd81f223702476ade1f153a89ea63a6d7d55b482172a6"
+            },
+            {
+              "module": "/+Main",
+              "sourceSha256": "b2d2dfd2988f6d71200e8af6916bc6cc0b4a214577a1c7d4afad30cee839e3bc",
+              "cSha256": "de7ed3f60d3c1af6bcd5ad699d214bb217b75b42e9a5e3ba1a0a41cd2b1b0d50"
+            }
+          ],
+          "signature": "7f4f1732ffde27f2aa4c5bd8688b3de28feac06e3f3b54b02d164785e65f509d",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "bytes": 180485757,
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "Lean module: 43\n",
+              "stderr": ""
+            }
+          }
+        ]
+      }
+    ],
+    "passedPhases": [
+      "cold",
+      "lake",
+      "offline"
+    ],
+    "warmDiagnosticOnly": true,
+    "npm": "11.19.1",
+    "provenance": {
+      "sourceRevision": "3485d74917eb003718744b9a99793ef67ec60606",
+      "runtimeManifestSha256": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+      "lean": "4.34.1",
+      "node": "26.10.0"
+    },
+    "packageVersion": "0.1.0-experimental.32",
+    "compiler": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/node_modules/@lasm/compiler",
+    "project": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb",
+    "tools": "/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm",
+    "support": {
+      "schema": 1,
+      "platforms": [
+        "linux-x64",
+        "linux-arm64"
+      ],
+      "node": "26.10.0",
+      "lean": "4.34.1"
+    },
+    "cached": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/.lake/lasm/applications/4401404e603d7293/02717949530167beba5d1585a29c24d6d0015c227f3b4012f7ae18a18742e87f/dist",
+    "originalSignature": "02717949530167beba5d1585a29c24d6d0015c227f3b4012f7ae18a18742e87f",
+    "originalMtime": 1790394196011.4697,
+    "installBytes": 380728292,
+    "coldToolsBytes": 5649947674,
+    "lake": {
+      "directory": "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+      "signature": "d6cf2956acf56b4b953048e426f43a87087db974b2febff41c6b4898097dea84"
+    },
+    "offlineCacheReused": true,
+    "cacheRecovery": [
+      {
+        "failure": "interrupted",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "truncated",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "checksum",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "unavailable",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "incomplete-cache",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "damaged-cache",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      }
+    ],
+    "sourceInvalidation": true,
+    "toolsBytes": 5650308886,
+    "downloads": [
+      {
+        "tool": "Lean/Lake",
+        "name": "lean-4.34.1-linux.tar.zst",
+        "root": "lean-4.34.1-linux",
+        "url": "https://github.com/leanprover/lean4/releases/download/v4.34.1/lean-4.34.1-linux.tar.zst",
+        "sha256": "47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4",
+        "bytes": 580432872,
+        "format": "tar.zst",
+        "maximumExtractedBytes": 8589934592
+      },
+      {
+        "tool": "python",
+        "name": "python-3.13.15-20260901-linux-x64",
+        "root": "python",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+        "sha256": "8a689a077337bea6d1c4bc0b7df1d52fcaa28f5f67e50df8bf417c1e3f9d8874",
+        "bytes": 34810677,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 600000000
+      },
+      {
+        "tool": "sdk",
+        "name": "emscripten-6.0.9-linux-x64",
+        "root": "install",
+        "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/f04ea239d533260dd1db760dd2d668d5f9a88d6b/wasm-binaries.tar.xz",
+        "sha256": "d5c6c2917fbc1cae1a7d1e581f1c0b2817369dd57f94c7a0d05921476f1a7287",
+        "bytes": 298541944,
+        "format": "tar.xz",
+        "maximumExtractedBytes": 5000000000
+      },
+      {
+        "tool": "git",
+        "name": "dugite-native-v2.53.0-4098283-ubuntu-x64.tar.gz",
+        "root": ".",
+        "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-ubuntu-x64.tar.gz",
+        "sha256": "cca76aa31ad9e835e771ee7f55b73934777fbd8d16757a10d307ba06de860901",
+        "bytes": 65269219,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 536870912
+      }
+    ],
+    "downloadBytes": 979054712,
+    "receipts": [
+      {
+        "identity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "files": 18380,
+        "bytes": 3068313425
+      },
+      {
+        "identity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "files": 13626,
+        "bytes": 1494084337
+      },
+      {
+        "identity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "files": 332,
+        "bytes": 152517020
+      },
+      {
+        "identity": "fbb538cb832673bb66912d8b9df971453edf0503312cadc16037617f9779a47c",
+        "files": 4722,
+        "bytes": 98354555
+      }
+    ]
+  },
+  "deploymentRoot": "/tmp/lasm deployed \u65e5\u672c\u8a9e-lYHpjX",
+  "deployment": {
+    "denied": [
+      "/home/lastmjs/development/lasm/compiler/package.json",
+      "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/node_modules/@lasm/compiler/bin/lasm.mjs",
+      "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/Main.lean",
+      "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/dist/program.wasm",
+      "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/Args.lean",
+      "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/args dist \u03bb/program.wasm",
+      "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e/Main.lean",
+      "/tmp/lasm node Linux \u03bb-eNabIK/project space \u03bb/lake project \u65e5\u672c\u8a9e/dist/program.wasm",
+      "/tmp/lasm node Linux \u03bb-eNabIK/cache/lasm/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean"
+    ],
+    "controlResult": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "programs": [
+      {
+        "name": "hello",
+        "bytes": 180484541,
+        "wasmSha256": "5fda8eec7a6c36f7ce3fcf0397f8f5c5d9a78f2ec1fd62d16b79102d22cbeabb",
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            },
+            "seconds": 1.8195572500000707
+          }
+        ]
+      },
+      {
+        "name": "arguments",
+        "bytes": 180486941,
+        "wasmSha256": "818cf96f048a03b4502d60b8e643e86ab04070113e248a5bf18d387e395c44df",
+        "checks": [
+          {
+            "args": [
+              "hello world",
+              "\u03bb \u65e5\u672c\u8a9e",
+              "",
+              "--target"
+            ],
+            "expected": {
+              "code": 0,
+              "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+              "stderr": ""
+            },
+            "seconds": 1.8613902209999504
+          },
+          {
+            "args": [
+              "fail"
+            ],
+            "expected": {
+              "code": 23,
+              "stdout": "arg=fail\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 23,
+              "stdout": "arg=fail\n",
+              "stderr": ""
+            },
+            "seconds": 1.7645149939999683
+          }
+        ]
+      },
+      {
+        "name": "lake",
+        "bytes": 180485757,
+        "wasmSha256": "ec45401785e21b72777b02db1a774d2f34c662244d4b2c966578a46ed9c54ca4",
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "Lean module: 43\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "Lean module: 43\n",
+              "stderr": ""
+            },
+            "seconds": 1.7965578730000415
+          }
+        ]
+      }
+    ]
+  },
+  "finishedAt": "2026-09-26T03:50:04.357Z",
+  "resourceSummary": {
+    "peakMemoryBytes": 5462286336,
+    "unitReleased": true,
+    "resourceLimited": false,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "minimumFreeDiskBytes": 5325467648
+  },
+  "parallelHarnessExplanation": "Tools were deliberately pre-populated using private hardlinks to immutable verified artifacts; LICENSE files used separate copies before tamper tests. Only the cold-cache-absent assertion was replaced with a warm-cache-present assertion. Download sizes are catalog totals, not bytes fetched during this diagnostic. The actual cold CI harness is unchanged by this local adaptation."
+}

@@ -21,6 +21,12 @@ registry is needed. Downloads, sizes and SHA-256 checksums are pinned in the
 package's `src/*tools.json` and `src/toolchains.json`. No global configuration or
 administrator access is required.
 
+Pinned compressed tool downloads, including Git for a Lake project, total
+979,054,712 bytes on x86-64 and 910,904,894 bytes on ARM64. A standalone file skips
+the Git download. These totals exclude the npm package and generated build files;
+unpacked tools and build caches occupy several GB. The acceptance report records
+observed disk usage and build times separately.
+
 Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm`. Set
 `LASM_TOOLCHAIN_CACHE` to choose another directory. Compiled application caches
 live under the source project's `.lake/lasm/`. Hash checks detect changes to

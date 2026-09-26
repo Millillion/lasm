@@ -67,7 +67,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
     ...(metadata ? { moduleDataIdentity: metadata.identity, moduleDataBytes: metadata.manifest.bytes } : {}),
-    target, host: `${process.platform}-${process.arch}`, memoryMode, modules };
+    target, host: `${process.platform}-${process.arch}`, node: applicationSupport()?.node, memoryMode, modules };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
   if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)

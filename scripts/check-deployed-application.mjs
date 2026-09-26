@@ -14,6 +14,8 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 export const linuxIsolationFiles = () => [
   ...[`/usr/lib/${process.arch === 'arm64' ? 'aarch64' : 'x86_64'}-linux-gnu`, '/usr/lib64']
     .filter(existsSync).map(path => ({ path, access: 'execute' })),
+  ...['/lib/ld-linux-aarch64.so.1', '/lib64/ld-linux-x86-64.so.2']
+    .filter(existsSync).map(path => ({ path, access: 'execute' })),
   { path: '/proc', access: 'read' },
   { path: '/sys/devices/system/cpu', access: 'read' },
   { path: '/dev', access: 'write' },

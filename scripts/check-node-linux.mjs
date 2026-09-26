@@ -24,7 +24,6 @@ const workspace = mkdtempSync(join(tmpdir(), 'lasm node Linux λ-'));
 const control = join(workspace, 'node-linux-installed.mjs');
 for (const name of ['node-linux-installed.mjs', 'node-cache-controls.mjs'])
   copyFileSync(join(root, 'integration', name), join(workspace, name));
-writeFileSync(join(workspace, 'package.json'), '{"private":true,"type":"module"}\n');
 for (const path of ['home', 'tmp', 'os-bin']) mkdirSync(join(workspace, path));
 symlinkSync('/bin/sh', join(workspace, 'os-bin/sh'));
 for (const path of ['npm-user-config', 'npm-global-config']) writeFileSync(join(workspace, path), '');
@@ -61,7 +60,10 @@ try {
     writeFileSync(rules, JSON.stringify({ allow, environment, denyTcp: phase === 'offline' }, null, 2) + '\n');
     const actual = isolated(rules, [process.execPath, control, phase, workspace, archive, join(root, 'package.json')], workspace, 3000_000);
     writeFileSync(join(output, phase + '.log'), actual.stdout + actual.stderr);
-    result.installation = JSON.parse(readFileSync(join(workspace, 'result.json'))); save();
+    (result.phaseExecutions ??= []).push({ phase, code: actual.code, diagnostic: actual.stderr.slice(-6000) });
+    if (existsSync(join(workspace, 'result.json')))
+      result.installation = JSON.parse(readFileSync(join(workspace, 'result.json')));
+    save();
     assert.equal(actual.code, 0, `${phase}: ${actual.stderr.slice(-6000)}`);
     console.log(actual.stdout.trim());
   }

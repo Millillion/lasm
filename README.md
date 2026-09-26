@@ -32,8 +32,9 @@ npx lasm Main.lean
 ```
 
 The program prints `Hello from Lean! 2 + 3 = 5`. The first run needs internet
-access and downloads several gigabytes of build tools; later runs reuse verified
-tools and unchanged builds. See [requirements and cache details](docs/NODE_SUPPORT.md).
+access, downloads about 1 GB of build tools, and uses several GB of disk space.
+Later runs reuse verified tools and unchanged builds. See
+[requirements and cache details](docs/NODE_SUPPORT.md).
 
 Build a deployment without running the program:
 

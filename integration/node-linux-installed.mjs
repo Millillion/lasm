@@ -77,7 +77,7 @@ try {
   if (phase === 'cold') {
     assert.equal(existsSync(tools), false, 'Cold tool cache starts absent');
     mkdirSync(project, { recursive: true });
-    writeFileSync(join(project, 'package.json'), '{"private":true,"type":"module"}\n');
+    assert.deepEqual(readdirSync(project), [], 'The documented npm command must work in an empty directory');
     const installed = run('npm install candidate', join(dirname(process.execPath), 'npm'), ['install', archive]);
     assert.equal(installed.code, 0);
     result.npm = run('npm version', join(dirname(process.execPath), 'npm'), ['--version']).stdout.trim();
