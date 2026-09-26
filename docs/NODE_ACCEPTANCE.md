@@ -20,11 +20,13 @@ macOS and Windows are not accepted by this report. Nothing is published to npm.
 
 Two independent packing invocations produced identical archives. The runtime
 handoff is unchanged from [the original authenticated build](evidence/node-linux-ci-runtime-2026-09-26.json).
-The archive remains in the exact CI candidate cache. Draft retention is being
-retried separately: its first GitHub release step returned HTTP 403 after both
-native tests passed. The overall workflow's failure is a retention failure,
-not a product-test failure. Do not substitute the older `.34` archive for this
-policy; it allowed runtime evaluation and its large fallback.
+The exact archive, checksum and authenticated prior-job reports are retained in
+[an unpublished draft](https://github.com/Millillion/lasm/releases/tag/untagged-ddc65284c1ee0a0203ad)
+for repository maintainers. [Retention passed separately](https://github.com/Millillion/lasm/actions/runs/36271125055)
+after the original release step returned HTTP 403. The acceptance workflow's
+overall failure is that retention failure, not a product-test failure. Do not
+substitute the older `.34` archive for this policy; it allowed runtime evaluation
+and its large fallback.
 
 ## Native evidence
 

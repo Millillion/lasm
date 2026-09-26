@@ -10,8 +10,11 @@ has been removed from the current application linker. Ordinary build-time Lean
 features remain available; broad runtime imports may still bring forbidden
 initializers, so compiler-only dependencies should use Lean's `meta import`.
 See the [README](../README.md#lean-support-and-restrictions) for the exact policy.
-New native installed-package acceptance is required before claiming a replacement
-release candidate. Earlier measurements and failure evidence remain intact below.
+Replacement candidate `.35` passed native Linux x86-64 and ARM64, with eight
+copied deployments of 2.67–3.61 MB, positive build-time macro/proof controls and
+build-time rejection of runtime evaluation/module-data access. See
+[the current acceptance report](NODE_ACCEPTANCE.md). Earlier measurements and
+failure evidence remain intact below; they describe historical `.34` behavior.
 
 ## Earlier measurements and implementation
 
