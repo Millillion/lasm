@@ -1,5 +1,16 @@
 # Current IO limitations in Lasm
 
+The [standalone module-data checkpoint](docs/evidence/wasmtime-module-data-checkpoint-2026-09-26.json)
+adds a native-matching isolated Node import of `Init` and seven runtime function
+evaluations. Real descriptor controls pass in Node, Deno and Bun, but the full
+supplementary import application still times out in Deno at both the original
+90-second deadline and a separate 300-second diagnostic deadline. Bun's import
+application remains unattempted. Main-module symbols, verified metadata
+packaging and the exercised descriptor imports are implemented in the preview;
+side-module loading, remaining descriptors, reusable cleanup and managed CLI
+integration remain unfinished. These are implementation or validation gaps,
+not demonstrated fundamental limitations.
+
 The [current product plan](docs/PLAN.md) now targets full ordinary Lean 4.34.1
 applications in stock Node 26.10.0, Deno 2.9.7 and Bun 1.4.2 on all six native
 build platforms. Its [application pipeline status](docs/APPLICATION_PIPELINE.md)
@@ -267,6 +278,13 @@ general helper/API parity and the other native platforms remain unfinished.
   `DataCloneError` masks that exception when crossing the worker boundary.
   Omitting the setting succeeds; doubling the JavaScript execution stack does
   not. These controls diagnose the gap; they neither weaken the suite nor fix it.
+  The [baseline Wasmtime preview now passes the original 4.34.1 benchmark](docs/evidence/wasmtime-const-fold-2026-09-26.json)
+  in all three stock engines, with its original source, initialization sidecar,
+  argument and 4 GiB stack request. Three diagnostic runs verify the actual
+  computation stack and cleanup; three copied deployments deny original source,
+  tools and artifacts. Deployment peaks at 1.20 GiB without resource events.
+  The managed installed CLI still needs this backend; its existing Bun failure
+  remains open. No fundamental memory-capacity limitation is established.
   The [nineteen remaining Bun tests](docs/evidence/upstream-applications-bun-remaining-2026-09-24.json)
   now all pass in a fresh guarded continuation. Combined with the preserved
   disk-stopped run, coverage is 96 passes, four upstream compilation-disabled

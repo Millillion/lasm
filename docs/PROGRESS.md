@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable; complete suite/API coverage, shipping helper integration and five native platform validations remain unfinished.
 
-**Changed:** The [Bun continuation completes all previously unrun application registrations](evidence/lean-4.34.1-upstream-applications-bun-combined-2026-09-26.json). Its 25 passes and one original exclusion bring combined coverage to 96 passes, four exclusions and the preserved `const_fold` failure. All 7,673 original entries and the frozen harness remain unchanged. Peak memory is 5.58 GiB without resource events; minimum free disk is 4.48 GiB. This is combined coverage, not a complete category pass.
+**Changed:** The [standalone helper passes original `const_fold`](evidence/wasmtime-const-fold-2026-09-26.json) in all three engines. [Verified metadata packaging, main-module symbols and descriptor controls](evidence/wasmtime-module-data-checkpoint-2026-09-26.json) enable isolated Node imports and runtime evaluation; Deno still times out, and Bun's import check is pending. Forty-two unit checks and native symbol controls pass. The native bundle remains separate from installed CLI acceptance; original failures are preserved.
 
 **Remaining:** Complete language/API and callable-library parity; ship and validate general imports, descriptors and runtime cleanup; finish all six native build/install platforms.
 

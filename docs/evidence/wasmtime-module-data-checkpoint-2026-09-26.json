@@ -1,0 +1,681 @@
+{
+  "scope": "Standalone Linux x64 helper checkpoint: native descriptor controls in all three engines and an isolated Lean runtime import/evaluation PASS in Node. Deno remains a90s timeout; Bun is not yet attempted. No full module-import, shipping CLI, full IO or platform acceptance claim.",
+  "recordedAt": "2026-09-26T02:25:59.099642+00:00",
+  "platform": "linux-x64",
+  "versions": {
+    "lean": "4.34.1",
+    "node": "26.10.0",
+    "deno": "2.9.7",
+    "bun": "1.4.2",
+    "wasmtime": "49.0.0"
+  },
+  "fixture": {
+    "path": "integration/fixtures/StandaloneModuleData.lean",
+    "sha256": "0da5d93cd7026dd42076ebb32208b978967e46295a386c40a96f2c058b5c8c27"
+  },
+  "upstreamTestsChanged": false,
+  "native": {
+    "version": "4.34.1",
+    "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "identity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b"
+  },
+  "nativeControls": [
+    {
+      "label": "native interpreted main",
+      "code": 0,
+      "stdout": "standard module data imported; seven runtime evaluations passed\n",
+      "stderr": ""
+    },
+    {
+      "label": "native compiled main",
+      "code": 0,
+      "stdout": "standard module data imported; seven runtime evaluations passed\n",
+      "stderr": ""
+    }
+  ],
+  "build": {
+    "path": ".work/wasmtime-standalone-module-data-4.34.1-build-r1/result.json",
+    "sha256": "535a1157e775a5feb839e31f9361b81adaa52c3ea19c39ea99c8af01c515ceb5"
+  },
+  "compilation": {
+    "path": ".work/wasmtime-standalone-module-data-4.34.1-compilation-r1/result.json",
+    "sha256": "b9ab03280128edd648fafe6cca601ce8b2ffe445a25b7c7e12c377d995986076"
+  },
+  "package": {
+    "receipt": {
+      "path": ".work/wasmtime-standalone-module-data-4.34.1-package-r4/result.json",
+      "sha256": "496c7873f74d784e6e605e4c916d3fa22c9cfac681a3e5170c29fd5b50dc8ab4"
+    },
+    "moduleData": {
+      "identity": "9e1a4d8504a9005574ead373fb42c56e383db8036579036aa825c3b0d82f0c6f",
+      "bytes": 2213311647,
+      "files": 15113,
+      "roots": [
+        "packages/0"
+      ],
+      "originalDist": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-build-r1/dist"
+    },
+    "manifest": {
+      "schema": 2,
+      "backend": "wasmtime-49.0.0",
+      "leanVersion": "4.34.1",
+      "cpuTarget": "x86_64-unknown-linux-gnu",
+      "cpuFeatures": "baseline",
+      "moduleData": {
+        "identity": "9e1a4d8504a9005574ead373fb42c56e383db8036579036aa825c3b0d82f0c6f",
+        "bytes": 2213311647
+      },
+      "platform": "linux",
+      "arch": "x64",
+      "files": {
+        "program.cwasm": {
+          "bytes": 610840136,
+          "sha256": "3c5ae409d27ae7c19d476be3950f9a65418688e610bdb965984b746e32548f1d"
+        },
+        "host/instance.so": {
+          "bytes": 69296,
+          "sha256": "4a2d85ace24dd9a6fb95707b0e1aecf244ea21060cf1cf4fda2659eceee22a34"
+        },
+        "host/native-api.node": {
+          "bytes": 17040,
+          "sha256": "e6a6b5fd46aef1bd36136b30ecd2110afeab68237d586bfc819c4acad84b680d"
+        },
+        "host/libwasmtime.so": {
+          "bytes": 31590960,
+          "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+        }
+      }
+    },
+    "notices": {
+      "source": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-build-r1/dist/THIRD_PARTY_NOTICES.txt",
+      "sha256": "17a797829b1f09bb8e9096406ebae4dea7eba3be71d7cc3e4d5c0c75085dc040"
+    }
+  },
+  "deployment": {
+    "receipt": {
+      "path": ".work/wasmtime-standalone-module-data-4.34.1-deployment-r4/result.json",
+      "sha256": "65c8132cf8a9b5d8368e11fc8e920d2e05d7dc5397b2f66263c5d9073bedaf2c"
+    },
+    "node": {
+      "engine": "node",
+      "args": [],
+      "expected": {
+        "code": 0,
+        "stdout": "standard module data imported; seven runtime evaluations passed\n",
+        "stderr": "",
+        "stdoutBase64": "c3RhbmRhcmQgbW9kdWxlIGRhdGEgaW1wb3J0ZWQ7IHNldmVuIHJ1bnRpbWUgZXZhbHVhdGlvbnMgcGFzc2VkCg==",
+        "stderrBase64": ""
+      },
+      "actual": {
+        "code": 0,
+        "stdout": "standard module data imported; seven runtime evaluations passed\n",
+        "stderr": "",
+        "stdoutBase64": "c3RhbmRhcmQgbW9kdWxlIGRhdGEgaW1wb3J0ZWQ7IHNldmVuIHJ1bnRpbWUgZXZhbHVhdGlvbnMgcGFzc2VkCg==",
+        "stderrBase64": ""
+      }
+    },
+    "denials": [
+      {
+        "engine": "node",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "ab9c8eecf9f82d6693cdc3accced17034065c8d96213b0aa76a7e803d20ae1da",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-deployment-r4/node-rules.json"
+      },
+      {
+        "engine": "deno",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-deployment-r4/deno-rules.json"
+      }
+    ],
+    "deno": {
+      "label": "deno isolated application",
+      "code": null,
+      "signal": "SIGKILL",
+      "error": "spawnSync /usr/bin/python3 ETIMEDOUT",
+      "stdout": "",
+      "stderr": ""
+    },
+    "bun": "not attempted after Deno timeout"
+  },
+  "focusedUnits": {
+    "receipt": {
+      "path": ".work/product-acceptance/wasmtime-file-controls-r2.json",
+      "sha256": "85cdf82f81cbd04edbd5d7a5d16d4c49705a708d8d924a0761f4e16df10e0d3b"
+    },
+    "passed": 42,
+    "failed": 0,
+    "files": [
+      "test/wasmtime-file-imports.test.mjs",
+      "test/wasmtime-module-data.test.mjs",
+      "test/wasmtime-artifact.test.mjs",
+      "test/wasmtime-wasi-stdio.test.mjs",
+      "test/wasmtime-process-host.test.mjs"
+    ]
+  },
+  "realDescriptorControls": {
+    "receipt": {
+      "path": ".work/product-acceptance/wasmtime-file-controls-r4.json",
+      "sha256": "d9b87402d46f2ab3aa97ddde36ffcd1b6f51c2aecc99f8496ef065417c40c9b7"
+    },
+    "engines": [
+      {
+        "name": "node",
+        "code": 0,
+        "checks": [
+          "raw filenames; binary short reads; seek; EOF; exact stat and nanoseconds; close and descriptor reuse",
+          "native ENOENT, EBADF and EISDIR; openat retains directory identity after rename; absolute paths ignore dirfd",
+          "concurrent native reads share one kernel file cursor without duplication",
+          "blocking FIFO open and read preserve supervisor event-loop progress; ESPIPE retained"
+        ]
+      },
+      {
+        "name": "deno",
+        "code": 0,
+        "checks": [
+          "raw filenames; binary short reads; seek; EOF; exact stat and nanoseconds; close and descriptor reuse",
+          "native ENOENT, EBADF and EISDIR; openat retains directory identity after rename; absolute paths ignore dirfd",
+          "concurrent native reads share one kernel file cursor without duplication",
+          "blocking FIFO open and read preserve supervisor event-loop progress; ESPIPE retained"
+        ]
+      },
+      {
+        "name": "bun",
+        "code": 0,
+        "checks": [
+          "raw filenames; binary short reads; seek; EOF; exact stat and nanoseconds; close and descriptor reuse",
+          "native ENOENT, EBADF and EISDIR; openat retains directory identity after rename; absolute paths ignore dirfd",
+          "concurrent native reads share one kernel file cursor without duplication",
+          "blocking FIFO open and read preserve supervisor event-loop progress; ESPIPE retained"
+        ]
+      }
+    ]
+  },
+  "nativeSymbols": {
+    "receipt": {
+      "path": ".work/wasmtime-main-symbol-controls-r2/result.json",
+      "sha256": "cf5f5398b1c93cd3abc4ce28f7e2e7ec9560232f41ccab3af96eeeeea9fe4aef"
+    },
+    "undefinedBehaviorSanitizer": true,
+    "results": {
+      "main-symbols": {
+        "passed": true,
+        "existingAndAliasPointers": true,
+        "preseededWorkerPointers": true,
+        "dataAbove4GiB": true,
+        "registryLookup": true,
+        "missingSymbolErrors": 2,
+        "invalidLookups": 5,
+        "guestNamesAbove4GiB": true,
+        "workerIndirectCalls": 2
+      },
+      "function-globals": {
+        "passed": true,
+        "bindings": 9,
+        "existingTableAddressesPreserved": true,
+        "duplicateAndExportAliasesRetainPointerEquality": true,
+        "indirectConsoleCalls": 13,
+        "argumentsAbove4GiB": true,
+        "compiledIndirectCalls": 2,
+        "workerPointersMatch": true,
+        "missingCallbackTrapsAndRecovers": true,
+        "modifiedBindingRejected": true,
+        "negativeModules": 9,
+        "canonicalTransformControls": 6,
+        "nonExportSectionsUnchanged": true
+      },
+      "environment": {
+        "passed": true,
+        "validSnapshots": 6,
+        "malformedSnapshots": 7,
+        "guestBoundaryChecks": 16,
+        "largeSnapshotBytes": 1228800
+      }
+    }
+  },
+  "startup": {
+    "before": {
+      "path": ".work/wasmtime-module-startup-r1/result.json",
+      "sha256": "9e1887cba59bd9bd22dbcc49d7f090c4b52a3a8eeff104b721f7cbf638399e0e"
+    },
+    "after": {
+      "path": ".work/wasmtime-module-startup-r2/result.json",
+      "sha256": "7b4604bfe5aa5718e371928d0f5e86b2ffabc367bff4d08abd7b72c381c8a42d"
+    },
+    "beforeObserved": {
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-module-startup-r1/startup",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-compilation-r1/compiled.cwasm"
+      ],
+      "timeoutSeconds": 25,
+      "stdout": "",
+      "stderr": "starting main instance\nmain complete in 21.048 seconds, 27312 exports\n"
+    },
+    "afterObserved": {
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-module-startup-r2/startup",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-compilation-r1/compiled.cwasm"
+      ],
+      "code": 0,
+      "stdout": "",
+      "stderr": "starting main instance\nmain complete in 0.174 seconds, 27312 exports\nboth complete in 0.298 seconds\n"
+    },
+    "change": "Enumerate module export metadata once; grow the main function table once; preserve pointer ordering and aliases."
+  },
+  "nativeBundle": {
+    "receipt": {
+      "path": ".work/wasmtime-native-bundle-r2/result.json",
+      "sha256": "0f9cef15b319fe38e04ae5717b58975572ebe0c33605097e88e80b9eb6e5b747"
+    },
+    "manifest": {
+      "schema": 1,
+      "backend": "wasmtime-49.0.0",
+      "platform": "linux",
+      "arch": "x64",
+      "cpuTarget": "x86_64-unknown-linux-gnu",
+      "cpuFeatures": "baseline",
+      "files": {
+        "compiler.so": {
+          "bytes": 26104,
+          "sha256": "1219a7c73c485718fd910c926d666e56c865282d395be4fa3190d320d8e848fd"
+        },
+        "instance.so": {
+          "bytes": 69296,
+          "sha256": "4a2d85ace24dd9a6fb95707b0e1aecf244ea21060cf1cf4fda2659eceee22a34"
+        },
+        "native-api.node": {
+          "bytes": 17040,
+          "sha256": "e6a6b5fd46aef1bd36136b30ecd2110afeab68237d586bfc819c4acad84b680d"
+        },
+        "libwasmtime.so": {
+          "bytes": 31590960,
+          "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+        },
+        "LICENSE.wasmtime": {
+          "bytes": 12243,
+          "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+        }
+      },
+      "sources": {
+        "wasmtime-compile-lean.c": "8f4d4fd24ade65e3b3953be65e3e769e85403836a6ddfa0284210c493d13f950",
+        "wasmtime-instantiate-lean.c": "46e9e7009f9c946ae8f54e7d958613669aa85e60e84a84fd846a19665cca337a",
+        "wasmtime-native-api.c": "5042bdfcdf6096ccc9c0d8de415284a386b4ddccbd969d846a2a36e830fbdfc2",
+        "wasmtime-process-setup.c": "45f998846b30341a641dd2be7a3a20692f2e1240f393cec0de4f886352fe63cf",
+        "wasmtime-engine-config.h": "d2ef4c127c2cb22be76657c240d3e9f0099b38ce5d34fa95129f8ad7d7df155d",
+        "wasmtime-main-symbols.h": "e35badb89abc383343797bcc07c292341e540bc25b749ff48e1aacc15c331592",
+        "wasmtime-canonical-imports.h": "b34892bc581d519d9a066c987f97d9c157eaa8f6b4df373bbb75650da5dff72a"
+      },
+      "sdk": {
+        "archiveSha256": "8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131",
+        "url": "https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.0/wasmtime-v49.0.0-x86_64-linux-c-api.tar.xz"
+      }
+    },
+    "catalogEntry": {
+      "manifestSha256": "38115148bdb0a8857cf427f5e71e393347e1103e7be149a12ed5b1a2a63d81d0"
+    },
+    "installedCLIIntegration": false
+  },
+  "resources": {
+    "wasmtime-native-bundle-r2": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-native-bundle-r2-resources.json",
+        "sha256": "14bf2ee4c09bf3c85998d0ff8d1fc6136c418716bb0809c2e6f7d1489c6b8317"
+      },
+      "peakMemoryBytes": 86224896,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-file-controls-r2": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-file-controls-r2-resources.json",
+        "sha256": "29517631f943cc4e61c905779037e4ab9b7e17092eead2e42ddc77e78f6e0965"
+      },
+      "peakMemoryBytes": 170680320,
+      "resourceLimited": false,
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-file-controls-r4": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-file-controls-r4-resources.json",
+        "sha256": "c8f56a6b6902aec73c2b45e1fa436382e596cb7a8d7e8433388564d4237c81c3"
+      },
+      "peakMemoryBytes": 37642240,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-main-symbol-controls-r2": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-main-symbol-controls-r2-resources.json",
+        "sha256": "38f449b70bdbea75c552b53847445581d48d261bdcf5b16932ea24b9b1478e6d"
+      },
+      "peakMemoryBytes": 74076160,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-module-startup-r1": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-module-startup-r1-resources.json",
+        "sha256": "10eacc891605851079805d629b5fa1e7ed787f3ee491a7865046cc8c3cb092ec"
+      },
+      "peakMemoryBytes": 140115968,
+      "resourceLimited": false,
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-module-startup-r2": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-module-startup-r2-resources.json",
+        "sha256": "f63d75c87bf176aae28a2b31a05263a2dd02634c75efc0c808bdf9850b106445"
+      },
+      "peakMemoryBytes": 143294464,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-module-data-4.34.1-build-r1": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-module-data-4.34.1-build-r1-resources.json",
+        "sha256": "51e9c4ee80a612df1c3d5826476384ae90b73dcb892a7e216ab41e21f0f56bdf"
+      },
+      "peakMemoryBytes": 5384388608,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-module-data-4.34.1-format-r1": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-module-data-4.34.1-format-r1-resources.json",
+        "sha256": "72b90a21d609721a69598c062e63a52143cf14f8848999382adf24c63497c6fa"
+      },
+      "peakMemoryBytes": 3314720768,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-module-data-4.34.1-compilation-r1": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-module-data-4.34.1-compilation-r1-resources.json",
+        "sha256": "cc2d60cf403248b2d4b62ed6e2eecde3db6d16182cd650444cd8e8f7badd5726"
+      },
+      "peakMemoryBytes": 5691891712,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-module-data-4.34.1-package-r4": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-module-data-4.34.1-package-r4-resources.json",
+        "sha256": "5985c2a35cf730f200a5c66808632eeacefc27c2ebdeb27d694296e1159eeddf"
+      },
+      "peakMemoryBytes": 6069587968,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-module-data-4.34.1-deployment-r4": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-module-data-4.34.1-deployment-r4-resources.json",
+        "sha256": "e876923e74f9544fd3015e025468e1f37404e9bb04c92f45ac32b117b8d1f252"
+      },
+      "peakMemoryBytes": 6506004480,
+      "resourceLimited": false,
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  },
+  "preservedFailures": [
+    {
+      "receipt": {
+        "path": ".work/wasmtime-standalone-module-data-4.34.1-deployment-r1/result.json",
+        "sha256": "1d5981b34b62bfbb12f1b2f0f3ba0215b77443ec739bfaadd77abb052f05f4f1"
+      },
+      "reason": "Unimplemented env.__syscall_openat; fixed real descriptor path"
+    },
+    {
+      "receipt": {
+        "path": ".work/wasmtime-standalone-module-data-4.34.1-deployment-r2/result.json",
+        "sha256": "303b708b047fe087bdf1e774e963071aa9e7d3060abec2b854514aae96843183"
+      },
+      "reason": "Unimplemented env._dlsym_js; added real main-module symbols"
+    },
+    {
+      "receipt": {
+        "path": ".work/wasmtime-standalone-module-data-4.34.1-deployment-r3/result.json",
+        "sha256": "6958a49dc734febab52c960b14230a16d75c33928ed95af6f93d5d1539e0ccd5"
+      },
+      "reason": "Node90s timeout during repeated Store startup; startup batching repair follows"
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-file-controls-r1.json",
+        "sha256": "b63ca1a77c352453d78451cb8779a1ca2e8e7e554225a0f5216664c400a87306"
+      },
+      "reason": "New unknown-import unit exposed an early argument-decode error"
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-file-controls-r2.json",
+        "sha256": "85cdf82f81cbd04edbd5d7a5d16d4c49705a708d8d924a0761f4e16df10e0d3b"
+      },
+      "reason": "Unit checks passed; new native harness diagnostic could not serialize BigInt"
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-file-controls-r3.json",
+        "sha256": "f02ed334e4b686bb83a7707467133fedd713f250ad7ef3915ba724b3678a6c25"
+      },
+      "reason": "Deno node:fs changed the raw test filename. Independent Node setup/oracle now preserves bytes."
+    }
+  ],
+  "durationInvestigation": {
+    "trace": {
+      "path": ".work/wasmtime-deno-module-trace-r1/result.json",
+      "sha256": "702c9f02b85b197fdc5d83ebdf39b80126193e2c9b4d42a515a9597598ded5fd"
+    },
+    "durationControl": {
+      "path": ".work/wasmtime-deno-module-duration-r1/result.json",
+      "sha256": "02be183c1ee4faa967e3611a2dab3954b0fbb12f1be655dc47c48e01dad3f935"
+    },
+    "durationResult": {
+      "scope": "Parallel Deno duration control of the unchanged isolated deployment; does not relabel its original90s failure",
+      "adaptation": "Only supplemental subprocess timeout changes from90 to300seconds. Original Lean fixture, native expected bytes, deployed package and Landlock rules unchanged. Earlier trace showed continuing module reads.",
+      "baseline": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-deployment-r4/result.json",
+      "baselineSha256": "65c8132cf8a9b5d8368e11fc8e920d2e05d7dc5397b2f66263c5d9073bedaf2c",
+      "command": [
+        "/usr/bin/python3",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-module-data-4.34.1-deployment-r4/deno-rules.json",
+        "--",
+        "/tmp/lasm-wasmtime-deploy-d8qTs4/deno",
+        "run",
+        "--no-config",
+        "-A",
+        "--v8-flags=--max-old-space-size=128",
+        "/tmp/lasm-wasmtime-deploy-d8qTs4/deployment space \u03bb/main.mjs"
+      ],
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-deno-module-duration-r1-resources.json",
+      "passed": false,
+      "expected": {
+        "code": 0,
+        "stdout": "standard module data imported; seven runtime evaluations passed\n",
+        "stderr": ""
+      },
+      "startedAt": "2026-09-26T02:15:59.090674+00:00",
+      "pid": 298077,
+      "timeout": true,
+      "seconds": 300.1154604170006,
+      "isolationNotice": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+      "actual": {
+        "code": -15,
+        "stdout": "",
+        "stderr": ""
+      },
+      "finishedAt": "2026-09-26T02:20:59.206407+00:00"
+    },
+    "durationResources": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-deno-module-duration-r1-resources.json",
+        "sha256": "e9793b8751c2b4581d65693ece60a286f6021f0d16ef684a2623fe2a2b5997ec"
+      },
+      "peakMemoryBytes": 733016064,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "observation": "The short trace continued opening module files until deliberate diagnostic termination. A separate 300-second duration control also timed out with no output and no resource abort. Neither timeout is a pass."
+  },
+  "remaining": [
+    "Finish Deno and Bun isolated import/evaluation checks and investigate IO latency.",
+    "Complete side-module imports, WASI descriptors, lifetime/cancellation and the full standard API surface.",
+    "Integrate the helper and its native bundle into the installed managed CLI; complete all six native platforms."
+  ],
+  "fundamentalLimitationsProven": []
+}

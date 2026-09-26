@@ -6,7 +6,8 @@ export const wasmtimeCpuTarget = 'x86_64-unknown-linux-gnu';
 
 export const wasmtimeHostFiles = ['wasmtime-runtime.mjs', 'wasmtime-worker.mjs', 'wasmtime-standalone.mjs',
   'wasmtime-artifact.mjs', 'wasmtime-native-stdio.mjs', 'wasmtime-guest-memory.mjs',
-  'wasmtime-wasi-stdio.mjs', 'wasmtime-console.mjs', 'wasmtime-process-host.mjs'];
+  'wasmtime-wasi-stdio.mjs', 'wasmtime-console.mjs', 'wasmtime-process-host.mjs',
+  'wasmtime-file-host.mjs', 'wasmtime-file-imports.mjs'];
 
 export async function hashWasmtimeFile(file) {
   const hash = createHash('sha256');

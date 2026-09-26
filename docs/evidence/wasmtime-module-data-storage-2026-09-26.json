@@ -1,0 +1,1040 @@
+{
+  "scope": "Verified lossless storage reclamation for the runtime import acceptance campaign. This adds no compatibility passes. Current managed tools, stock engines, original source/tests and result logs are unchanged.",
+  "recordedAt": "2026-09-26T01:12:26.201147+00:00",
+  "archives": [
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/paused-bun-llvm-archive-r1.json",
+        "sha256": "abab12eb8279be34a0cd6146634059a0ef668a18cfdb9b57db3da3bd132256e5"
+      },
+      "guard": {
+        "path": ".work/product-acceptance/paused-bun-llvm-archive-r1-resources.json",
+        "sha256": "10c36aa366c3ff0aa80168fc35244141782f71b3b2a63428bff15d437b94287f"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/paused-bun-llvm-archive-r1-disk.json",
+        "sha256": "bfcf934ac9081bd6fcc630ae8d4952ca3e31e6d7293a5601465ff4da3aac0d5f"
+      },
+      "scope": "Reclaim extracted large LLVM files used only by paused custom-Bun engine research. Their exact ordinary files remain recoverable from the retained official LLVM archive; verify every selected member and source before removing its redundant extracted copy. Current managed application tools, stock engines, Lean originals and all test results remain unchanged.",
+      "restore": "Before resuming custom Bun builds, extract only each named member from the retained official tar.xz archive back beneath .cache/bun-build-tools/llvm, verify original SHA256 and length, and restore the recorded mode and mtimeNs. Keep the archive immutable.",
+      "files": [
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/c-index-test",
+          "member": "LLVM-21.1.8-Linux-X64/bin/c-index-test",
+          "originalSha256": "0de24b9da4366d7093dc7c255b1bff9e14309762192606089a867013b167aa72",
+          "originalBytes": 67612112,
+          "mode": 493,
+          "mtimeNs": 1765887113000000000,
+          "inode": 48281507,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-21",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-21",
+          "originalSha256": "d85d72c5c33bedce519504c4646b1356bf5205188ec60e4f753d1c4197cb0687",
+          "originalBytes": 253658304,
+          "mode": 493,
+          "mtimeNs": 1765885182000000000,
+          "inode": 48285571,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-change-namespace",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-change-namespace",
+          "originalSha256": "830f99a82c56acda898f29275b45c158a1dc89eedf0eac3dad7979b40111c941",
+          "originalBytes": 69578040,
+          "mode": 493,
+          "mtimeNs": 1765887375000000000,
+          "inode": 48285588,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-doc",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-doc",
+          "originalSha256": "3a968c6d0f40366e57acb94bf432d40f7620f41529c172df056dc67542d88c83",
+          "originalBytes": 69093744,
+          "mode": 493,
+          "mtimeNs": 1765887422000000000,
+          "inode": 48281531,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-extdef-mapping",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-extdef-mapping",
+          "originalSha256": "e055016fb693c7d7152d4a3c0d8d011631d3824bbeedca0cfbe6a753b064f740",
+          "originalBytes": 108676000,
+          "mode": 493,
+          "mtimeNs": 1765887241000000000,
+          "inode": 48281587,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-include-cleaner",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-include-cleaner",
+          "originalSha256": "c36a31da33328e8a6d35ca07f55dc5d175b7473f405e79eeaed0d3c9b1ef5529",
+          "originalBytes": 69530040,
+          "mode": 493,
+          "mtimeNs": 1765887511000000000,
+          "inode": 48281545,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-include-fixer",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-include-fixer",
+          "originalSha256": "87eddd9fcec83104f9352d51bb6e99e2845f3c599fcccab9b87e62445db9711d",
+          "originalBytes": 68248000,
+          "mode": 493,
+          "mtimeNs": 1765887446000000000,
+          "inode": 48285569,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-installapi",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-installapi",
+          "originalSha256": "1b012f991e51ed0ca66dc9c3038e9da688ea51c9f885e0e79f86cfff5360ccd6",
+          "originalBytes": 72565936,
+          "mode": 493,
+          "mtimeNs": 1765887054000000000,
+          "inode": 48281520,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-linker-wrapper",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-linker-wrapper",
+          "originalSha256": "15cbf9ef6f0be065762f0afb319bc02c87b64562e5a618fd3f24d0f5dbec8d62",
+          "originalBytes": 164999544,
+          "mode": 493,
+          "mtimeNs": 1765886931000000000,
+          "inode": 48281581,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-move",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-move",
+          "originalSha256": "c31a4ed1dfc494c2399348443507a9cc528b8fe906dea4ffa080d72279dc115d",
+          "originalBytes": 69542696,
+          "mode": 493,
+          "mtimeNs": 1765887464000000000,
+          "inode": 48285561,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-query",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-query",
+          "originalSha256": "79416e4f1eeb53afe9fba681eb8d5154b77f79ac97a502a3f9ba76004976146c",
+          "originalBytes": 72187040,
+          "mode": 493,
+          "mtimeNs": 1765887507000000000,
+          "inode": 48281510,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-refactor",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-refactor",
+          "originalSha256": "dfa796739aafad316451c36b823cf686df8a7d7795a5810ec444a8d92fe61a71",
+          "originalBytes": 70181904,
+          "mode": 493,
+          "mtimeNs": 1765887174000000000,
+          "inode": 48281503,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-reorder-fields",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-reorder-fields",
+          "originalSha256": "0cf6ef56181a80437c5fbf961dabb9c091eb1755163d739eefdf3ea5c3388ec1",
+          "originalBytes": 68321600,
+          "mode": 493,
+          "mtimeNs": 1765887291000000000,
+          "inode": 48285552,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clang-scan-deps",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clang-scan-deps",
+          "originalSha256": "2d7234fee9726099b0b21d74383225aba085a24e62777da87f63d8e6a9542608",
+          "originalBytes": 67834296,
+          "mode": 493,
+          "mtimeNs": 1765886995000000000,
+          "inode": 48281528,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/clangd",
+          "member": "LLVM-21.1.8-Linux-X64/bin/clangd",
+          "originalSha256": "7d7d4f746167e916a6ee3e9ecff93c9913e6851963323520016b88c22e716dfd",
+          "originalBytes": 98722568,
+          "mode": 493,
+          "mtimeNs": 1765887642000000000,
+          "inode": 48281571,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/find-all-symbols",
+          "member": "LLVM-21.1.8-Linux-X64/bin/find-all-symbols",
+          "originalSha256": "f1238435e4851deb2e409c945d24bf9fa5417bde6b4fa23803ee0476924ab09c",
+          "originalBytes": 68424440,
+          "mode": 493,
+          "mtimeNs": 1765887460000000000,
+          "inode": 48285534,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/fir-lsp-server",
+          "member": "LLVM-21.1.8-Linux-X64/bin/fir-lsp-server",
+          "originalSha256": "94f7c5de24146f8122a10d31c117dad543c425ff900e74e5ab7f5b8fcb59754c",
+          "originalBytes": 43748960,
+          "mode": 493,
+          "mtimeNs": 1765887844000000000,
+          "inode": 48281561,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/fir-opt",
+          "member": "LLVM-21.1.8-Linux-X64/bin/fir-opt",
+          "originalSha256": "42b61851cbab84683e76da288814a55506b88aedee9c9c241f0d2038253ae553",
+          "originalBytes": 66871664,
+          "mode": 493,
+          "mtimeNs": 1765887846000000000,
+          "inode": 48281589,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llc",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llc",
+          "originalSha256": "568de1f766ad2c2b919ad183d43c8e3f6961750fe3d4b8b64c5a81e62851f8fb",
+          "originalBytes": 168308792,
+          "mode": 493,
+          "mtimeNs": 1765888048000000000,
+          "inode": 48281515,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/lld",
+          "member": "LLVM-21.1.8-Linux-X64/bin/lld",
+          "originalSha256": "922a13f8292e30279beca3d3c0d4c4a0fd4f5f9d33ced0ea391179235b6fdd47",
+          "originalBytes": 188423352,
+          "mode": 493,
+          "mtimeNs": 1765884764000000000,
+          "inode": 48285576,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/lli",
+          "member": "LLVM-21.1.8-Linux-X64/bin/lli",
+          "originalSha256": "788e75d5de12819a819cb2e2649a7a22cac0249b985316aec4672066677d022e",
+          "originalBytes": 62697848,
+          "mode": 493,
+          "mtimeNs": 1765885339000000000,
+          "inode": 48281501,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-ar",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-ar",
+          "originalSha256": "2a69b1406070607c758117083752bd05597a5539ec13888a524b9aa4bdb85703",
+          "originalBytes": 49434288,
+          "mode": 493,
+          "mtimeNs": 1765884394000000000,
+          "inode": 48281592,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-bolt",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-bolt",
+          "originalSha256": "4d46f8fac04625f74602af56bfb02e9d9706dea728065870185dd5d8fa72f567",
+          "originalBytes": 81207160,
+          "mode": 493,
+          "mtimeNs": 1765884316000000000,
+          "inode": 48281554,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-bolt-binary-analysis",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-bolt-binary-analysis",
+          "originalSha256": "d04528fd609fd19d1025f2708b90cfeb2094589863f93e9bc81ff5f1306d47e6",
+          "originalBytes": 80787032,
+          "mode": 493,
+          "mtimeNs": 1765887998000000000,
+          "inode": 48285568,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-bolt-heatmap",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-bolt-heatmap",
+          "originalSha256": "a34ec66689d9411f6abab6fce14b41f99cc9fa6d6c198ffc6611b1a885e1847c",
+          "originalBytes": 81033752,
+          "mode": 493,
+          "mtimeNs": 1765887994000000000,
+          "inode": 48281537,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-cfi-verify",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-cfi-verify",
+          "originalSha256": "0c9017116e360fa857d796cfee16037646fff644f252d84414de1b90cf40524c",
+          "originalBytes": 59427456,
+          "mode": 493,
+          "mtimeNs": 1765888062000000000,
+          "inode": 48285573,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-debuginfo-analyzer",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-debuginfo-analyzer",
+          "originalSha256": "d09fd8087c70ca834eb0e260c1cdc7be78748df5af1ac9c6f50d92550be51e0c",
+          "originalBytes": 48796640,
+          "mode": 493,
+          "mtimeNs": 1765888136000000000,
+          "inode": 48281541,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-dwarfdump",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-dwarfdump",
+          "originalSha256": "023fb332d5a2517e8257930a65b84ade2d73fc166dd0cfcfa99c5e5605ac25e0",
+          "originalBytes": 38862040,
+          "mode": 493,
+          "mtimeNs": 1765886117000000000,
+          "inode": 48281557,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-exegesis",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-exegesis",
+          "originalSha256": "d7740e19d86a1554570d169d0beea5178531036d04659a7aec616513a269a783",
+          "originalBytes": 82255376,
+          "mode": 493,
+          "mtimeNs": 1765888130000000000,
+          "inode": 48281575,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-gsymutil",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-gsymutil",
+          "originalSha256": "e4ec2da2ff2bf8f90670bfef5b3710b278f16e06e0e6bf8e204e832cc36ea3dd",
+          "originalBytes": 111145008,
+          "mode": 493,
+          "mtimeNs": 1765888151000000000,
+          "inode": 48281548,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-jitlink",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-jitlink",
+          "originalSha256": "8433d0ab7ddf60f5b4d62842eaa1f9ce9e3c90b2051a8d22c87157a75face5cc",
+          "originalBytes": 66448624,
+          "mode": 493,
+          "mtimeNs": 1765885430000000000,
+          "inode": 48285531,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-libtool-darwin",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-libtool-darwin",
+          "originalSha256": "c0ed1318450a55802a5746faf6e338a5133d3c985897f8e4ad5282a2f2335b70",
+          "originalBytes": 49241600,
+          "mode": 493,
+          "mtimeNs": 1765888160000000000,
+          "inode": 48285560,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-lipo",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-lipo",
+          "originalSha256": "cc4eafa15155fac7da4198eee34072d4b3b39dc1bdddec3bab0547a5d56dedd2",
+          "originalBytes": 49130048,
+          "mode": 493,
+          "mtimeNs": 1765888172000000000,
+          "inode": 48281539,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-lto",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-lto",
+          "originalSha256": "d29bc23620df83701fefb8331ab1450015dcc05d5f1fb32f8c0f8c56db02ef41",
+          "originalBytes": 160799792,
+          "mode": 493,
+          "mtimeNs": 1765885264000000000,
+          "inode": 48285581,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-lto2",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-lto2",
+          "originalSha256": "020c7675992c568188b7fff1e6fa6d72b864388c9d7983c4bfe18cf05efecafc",
+          "originalBytes": 174647328,
+          "mode": 493,
+          "mtimeNs": 1765888208000000000,
+          "inode": 48285567,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-mc",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-mc",
+          "originalSha256": "bb5287fc029787cd83e147617f8b3cc70f98e86c94141d6daf80aea9bcebe74a",
+          "originalBytes": 52439504,
+          "mode": 493,
+          "mtimeNs": 1765888186000000000,
+          "inode": 48285589,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-mca",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-mca",
+          "originalSha256": "a41b90f3db66f00eb4e84d87e4df5e91b2d1ea73def9861a40964f0e8c928245",
+          "originalBytes": 45236296,
+          "mode": 493,
+          "mtimeNs": 1765888191000000000,
+          "inode": 48285530,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-ml",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-ml",
+          "originalSha256": "5e7ff657410a08882855d0c135359073a56599217358bf34bc8f412fdead8096",
+          "originalBytes": 51980736,
+          "mode": 493,
+          "mtimeNs": 1765886126000000000,
+          "inode": 48281546,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-nm",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-nm",
+          "originalSha256": "0e90ea2a14e47c09c672edf9498761abc2b616176bab13f2442a23cf175edf23",
+          "originalBytes": 51129736,
+          "mode": 493,
+          "mtimeNs": 1765884772000000000,
+          "inode": 48285585,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-objdump",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-objdump",
+          "originalSha256": "c9914fa812236159b40dfae3128e12d19dcf4fcf3f3bf9a746176c622b3cb71d",
+          "originalBytes": 49272160,
+          "mode": 493,
+          "mtimeNs": 1765884844000000000,
+          "inode": 48281534,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-profgen",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-profgen",
+          "originalSha256": "15fa8c8c161292ec9724a5c5ba0788b4f53262df795742b481e76cd0ae5d0037",
+          "originalBytes": 49743360,
+          "mode": 493,
+          "mtimeNs": 1765888225000000000,
+          "inode": 48281563,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-rtdyld",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-rtdyld",
+          "originalSha256": "46d00bccedbb0f5633c3ec45cc3373117d2eea3eb34d1356b2a2579402c3e24a",
+          "originalBytes": 42729912,
+          "mode": 493,
+          "mtimeNs": 1765888249000000000,
+          "inode": 48285563,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/llvm-split",
+          "member": "LLVM-21.1.8-Linux-X64/bin/llvm-split",
+          "originalSha256": "f70ea80e64dbeb39cbc4ceeb7b009d026f10898e641d0995ab1c9b0b497a0c9b",
+          "originalBytes": 121114368,
+          "mode": 493,
+          "mtimeNs": 1765888277000000000,
+          "inode": 48285572,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-runner",
+          "member": "LLVM-21.1.8-Linux-X64/bin/mlir-runner",
+          "originalSha256": "9eaeaf3a6dfccf51cdf71dac5d3142352a726bd4d8aca48deff0379b9e6af344",
+          "originalBytes": 117798024,
+          "mode": 493,
+          "mtimeNs": 1765886737000000000,
+          "inode": 48281521,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-translate",
+          "member": "LLVM-21.1.8-Linux-X64/bin/mlir-translate",
+          "originalSha256": "f93c91eb32b43b406a0a7610a698189b37a2e599b1ad699ebcca3054155c9725",
+          "originalBytes": 79381240,
+          "mode": 493,
+          "mtimeNs": 1765886663000000000,
+          "inode": 48281564,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/modularize",
+          "member": "LLVM-21.1.8-Linux-X64/bin/modularize",
+          "originalSha256": "9865740c17a67cdcde8d1b088e7108c56562a247ccddb56ae2e5d5106c958d43",
+          "originalBytes": 67199856,
+          "mode": 493,
+          "mtimeNs": 1765887318000000000,
+          "inode": 48281594,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/opt",
+          "member": "LLVM-21.1.8-Linux-X64/bin/opt",
+          "originalSha256": "59a40b903637da84f7ca6bec5fe36fee2d6d3bcdce04dbd7bd464a370564e6d8",
+          "originalBytes": 177793600,
+          "mode": 493,
+          "mtimeNs": 1765885573000000000,
+          "inode": 48281559,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/pp-trace",
+          "member": "LLVM-21.1.8-Linux-X64/bin/pp-trace",
+          "originalSha256": "94bb7086a4b9d5b9f63e23283cf09c514705ce86f2ab4a1ce26dc4cdb5839b1f",
+          "originalBytes": 67033600,
+          "mode": 493,
+          "mtimeNs": 1765887546000000000,
+          "inode": 48281529,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/sancov",
+          "member": "LLVM-21.1.8-Linux-X64/bin/sancov",
+          "originalSha256": "1959a5e30ac63f9f704753182b27173dc213874f4492fa720909acfebc3bcba0",
+          "originalBytes": 47763824,
+          "mode": 493,
+          "mtimeNs": 1765885521000000000,
+          "inode": 48281505,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/tco",
+          "member": "LLVM-21.1.8-Linux-X64/bin/tco",
+          "originalSha256": "0e04a54e4abe25d1cb1e4b012068d3323823c0a5a16dd0d364677ad542ec1bfb",
+          "originalBytes": 70873280,
+          "mode": 493,
+          "mtimeNs": 1765887768000000000,
+          "inode": 48281558,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libLTO.so.21.1",
+          "member": "LLVM-21.1.8-Linux-X64/lib/libLTO.so.21.1",
+          "originalSha256": "7579eef1aad0e7dbb075bfc20091aece74ca1b28d588c7594756488fb1f31bc8",
+          "originalBytes": 168167248,
+          "mode": 420,
+          "mtimeNs": 1765886109000000000,
+          "inode": 43565362,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libclang-cpp.so.21.1",
+          "member": "LLVM-21.1.8-Linux-X64/lib/libclang-cpp.so.21.1",
+          "originalSha256": "c7123b104ac5091ce6d57d48cacd054a7284cc7839217b66d17f7a89f37ec2ce",
+          "originalBytes": 180723792,
+          "mode": 420,
+          "mtimeNs": 1765886227000000000,
+          "inode": 43565302,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libclang.so.21.1.8",
+          "member": "LLVM-21.1.8-Linux-X64/lib/libclang.so.21.1.8",
+          "originalSha256": "e5120143e7f7dfd7394e23a39152a0138a112199bf0cfd8e85e70081f0e903be",
+          "originalBytes": 199446320,
+          "mode": 420,
+          "mtimeNs": 1765885951000000000,
+          "inode": 43565741,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libclangSema.a",
+          "member": "LLVM-21.1.8-Linux-X64/lib/libclangSema.a",
+          "originalSha256": "a27f5862e41c7bfa5b25005330b5f9a5bb0b24c9a2530fde2edc197dac868b44",
+          "originalBytes": 46233642,
+          "mode": 420,
+          "mtimeNs": 1765883504000000000,
+          "inode": 43565870,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/liblldb.so.21.1.8",
+          "member": "LLVM-21.1.8-Linux-X64/lib/liblldb.so.21.1.8",
+          "originalSha256": "db17a9b276d956891ea545120923542d9435c058ef4a26e52c7c09c6f300acd7",
+          "originalBytes": 263107728,
+          "mode": 420,
+          "mtimeNs": 1765885942000000000,
+          "inode": 43565723,
+          "phase": "archived"
+        }
+      ],
+      "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/LLVM-21.1.8-Linux-X64.tar.xz",
+      "archiveSha256": "b3b7f2801d15d50736acea3c73982994d025b01c2f035b91ae3b49d1b575732b",
+      "peakMemoryBytes": 52006912,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "recoveredBytes": 5071482880
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/paused-bun-build-intermediates-archive-r1.json",
+        "sha256": "d08c2e5ba70fc68c29e5a7818c6abd519c9367a6397dd8d67f73fb5f4c7e3f29"
+      },
+      "guard": {
+        "path": ".work/product-acceptance/paused-bun-build-intermediates-archive-r1-resources.json",
+        "sha256": "a11ed4f42b928e96528e4b7cb3d903895f41a04728e1a9bacfe993332d98b587"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/paused-bun-build-intermediates-archive-r1-disk.json",
+        "sha256": "301c7b91de0f784207d6aae6a61228a4fcc6c37721173289debd8d557a81cb0f"
+      },
+      "scope": "Lossless archival of large generated intermediate files from paused custom-Bun engine research. Five completed baseline lifecycle Wasm/native caches are included after their campaign and follow-up input controls released. Current managed application toolchains, stock engines, original Lean/Bun sources and all test results remain unchanged. Restore these files before resuming their historical builds.",
+      "restore": "Decompress each archive to its original path, verify originalSha256 and size, then restore recorded mode and mtimeNs. Archive files remain immutable.",
+      "files": [
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/pch/root-pch.h.hxx.pch",
+          "originalSha256": "9fb253305494843cf2660747e3b10c4f3acd9528275676ec4f20167f4500ffee",
+          "originalBytes": 165892068,
+          "mode": 436,
+          "mtimeNs": 1790019181008590346,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/pch/root-pch.h.hxx.pch.gz",
+          "archiveSha256": "0b560193ecf8a3b25973c99c14a5a589c1c8fe61cd4798b3ab1e13f9a1d980cb",
+          "archiveBytes": 66427789,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_bundler-a2044f8413f29cca.rlib",
+          "originalSha256": "1bfc5debe2cd547f8776393441e5c4d2a3663a3657b6ffe31c4da6f050504fac",
+          "originalBytes": 105012094,
+          "mode": 436,
+          "mtimeNs": 1790019363859433558,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_bundler-a2044f8413f29cca.rlib.gz",
+          "archiveSha256": "0c985dca65d10ce977aa5220b2e505c187bd90d4343741e1b757f4a019cfea42",
+          "archiveBytes": 27104834,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_css-402a2ac51c68b0b8.rlib",
+          "originalSha256": "253dbb10cd3f668049470d6a73fd74e2df018d48f4429a52a22023f8ca9f39b4",
+          "originalBytes": 86579426,
+          "mode": 436,
+          "mtimeNs": 1790019340142195791,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_css-402a2ac51c68b0b8.rlib.gz",
+          "archiveSha256": "5be2ff462126191dd8f66679a4b41077e227f99104bf34d15ac900bfed96dfa8",
+          "archiveBytes": 20139245,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_install-616d37cc623a4631.rlib",
+          "originalSha256": "3a14cef65f4d74e4b5bc4dde81731ae125f58bbc12f14491287e26b13eeb80fd",
+          "originalBytes": 116114020,
+          "mode": 436,
+          "mtimeNs": 1790019396251757746,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_install-616d37cc623a4631.rlib.gz",
+          "archiveSha256": "8be8ca5cf458557766161fce16bfa4880a0ce2c2ef7eadfa62e982a320b28079",
+          "archiveBytes": 29267985,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_js_parser-cb708c97d459c59f.rlib",
+          "originalSha256": "ba558fa23522a00df1d12d62391f7f6925fc2d3d12bfd2a73c73e6447b20dee5",
+          "originalBytes": 47375946,
+          "mode": 436,
+          "mtimeNs": 1790019308020873201,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_js_parser-cb708c97d459c59f.rlib.gz",
+          "archiveSha256": "2fd6ddbd026163ee786e86e87df6b56bb82c8398d40e40ede8fcd173524ba4d0",
+          "archiveBytes": 11495364,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_jsc-8d2157dfbc08494a.rlib",
+          "originalSha256": "9773b60248de0f2197b01804ff59b0cbdde30953597f9d93a50613949399f3a2",
+          "originalBytes": 58780824,
+          "mode": 436,
+          "mtimeNs": 1790019407976874944,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_jsc-8d2157dfbc08494a.rlib.gz",
+          "archiveSha256": "6f855682258f77304d9a72be8917cd1961c6142e6d4b2d07c23a2257b0d95876",
+          "archiveBytes": 17583336,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_react_compiler-f0bc003b52286153.rlib",
+          "originalSha256": "607b025f787c45ed3249ea035db9f6990fb14032431aaf901147b41054187bfe",
+          "originalBytes": 102749154,
+          "mode": 436,
+          "mtimeNs": 1790019297168764058,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_react_compiler-f0bc003b52286153.rlib.gz",
+          "archiveSha256": "5c1d9df5c2578ff6e274546a3676e216acf374f4a7c66bdb5b408f83882a728e",
+          "archiveBytes": 20260407,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_sql_jsc-bac4f0f95c764e6f.rlib",
+          "originalSha256": "d276f2af063de52514cc17d9b50d78eafe206134d49f4483c063eee0a8cb935f",
+          "originalBytes": 36993844,
+          "mode": 436,
+          "mtimeNs": 1790019421244007463,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libbun_sql_jsc-bac4f0f95c764e6f.rlib.gz",
+          "archiveSha256": "104f9787348a2b749fbc214481a7b8183ad382a985129a3e284a49144c30e3df",
+          "archiveBytes": 11738302,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libcore-0b6dd5d72a2718ec.rlib",
+          "originalSha256": "8b7d4b11522deb5187c28229c7104d798a16439c47fe58d64cc0aa0346c38893",
+          "originalBytes": 70172396,
+          "mode": 436,
+          "mtimeNs": 1790019200923792335,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libcore-0b6dd5d72a2718ec.rlib.gz",
+          "archiveSha256": "f76ca7dbbaf4f3233c0caa4e116c27322ac738a4e7105799a8091740cc67c1c0",
+          "archiveBytes": 20440002,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libcore-0b6dd5d72a2718ec.rmeta",
+          "originalSha256": "fb27822bf48cd8e1703084812fdb68150e7a779357fa94fcffd4c3759b1e4029",
+          "originalBytes": 63076213,
+          "mode": 436,
+          "mtimeNs": 1790019199705779991,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/deps/libcore-0b6dd5d72a2718ec.rmeta.gz",
+          "archiveSha256": "cd77c33da387c87d699c22daea65176fce542742871eeacc6c1a7a208bf074a3",
+          "archiveBytes": 18746366,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_bundler-1liowbiilivj4/s-hmibjakrqh-11xsv6k-a86ob447jwla5lh7alcnpqkur/dep-graph.bin",
+          "originalSha256": "58fd9e77b78c12412928ec2fe9c7ecae11d864cf3deb6bc030134e984ea04357",
+          "originalBytes": 60123656,
+          "mode": 436,
+          "mtimeNs": 1790019363755432516,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_bundler-1liowbiilivj4/s-hmibjakrqh-11xsv6k-a86ob447jwla5lh7alcnpqkur/dep-graph.bin.gz",
+          "archiveSha256": "efc8fe6a84e0e35ae96f902f371c27af2531a7ada9d842b945171bde30e8590c",
+          "archiveBytes": 35039938,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_core-3bifmbpq5lj65/s-hmibhhp5dm-1pr1jtq-7fx5ipz21xa2euwgehpggutfi/dep-graph.bin",
+          "originalSha256": "650b6d357df3db4b2868735296345826c66713b4d6e31f2e0b6b55bab4061acc",
+          "originalBytes": 35371214,
+          "mode": 436,
+          "mtimeNs": 1790019244145229586,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_core-3bifmbpq5lj65/s-hmibhhp5dm-1pr1jtq-7fx5ipz21xa2euwgehpggutfi/dep-graph.bin.gz",
+          "archiveSha256": "8f16a64cb553e45ee0df580e59b714536da381387116b5f448f684d7d3fabf4e",
+          "archiveBytes": 16610687,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_css-38gn7kqmi8d1t/s-hmibivrnas-04kdkk9-83i6tysrx35u5kcmnwycmoczj/dep-graph.bin",
+          "originalSha256": "e0fdf71a4ddfa0ed118e104479c090f9d75c8ce6ae21f607c870741637958d1d",
+          "originalBytes": 89528342,
+          "mode": 436,
+          "mtimeNs": 1790019340028194647,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_css-38gn7kqmi8d1t/s-hmibivrnas-04kdkk9-83i6tysrx35u5kcmnwycmoczj/dep-graph.bin.gz",
+          "archiveSha256": "0ca89140df1b0826ea40f519467780c2797f3aca2ed37d7fcc6ffd8edd3bd29d",
+          "archiveBytes": 45837850,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_css-38gn7kqmi8d1t/s-hmibivrnas-04kdkk9-83i6tysrx35u5kcmnwycmoczj/query-cache.bin",
+          "originalSha256": "441a2b7095e83b02ba517f36f11f5991baf334e34842be06ca16dfcf23e542da",
+          "originalBytes": 49895362,
+          "mode": 436,
+          "mtimeNs": 1790019340027194637,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_css-38gn7kqmi8d1t/s-hmibivrnas-04kdkk9-83i6tysrx35u5kcmnwycmoczj/query-cache.bin.gz",
+          "archiveSha256": "12d8691d097cc5d39149be3a4bd5be90f0ebbd2a32cdc38d883518753d100317",
+          "archiveBytes": 15103944,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_install-0zhrdutjhub1t/s-hmibjqrgtk-1p2uelc-07u3r9f8kb711vt6svxj7pz59/dep-graph.bin",
+          "originalSha256": "2a822e92e03560b76bbe30761551974179c22b236748e8d7c2758f870ba268ab",
+          "originalBytes": 76797573,
+          "mode": 436,
+          "mtimeNs": 1790019396132756556,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_install-0zhrdutjhub1t/s-hmibjqrgtk-1p2uelc-07u3r9f8kb711vt6svxj7pz59/dep-graph.bin.gz",
+          "archiveSha256": "a5cb43773f793cb0920fbe68d3394006a521826dd24e47d0224adfc27c5ec687",
+          "archiveBytes": 44025591,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_install-0zhrdutjhub1t/s-hmibjqrgtk-1p2uelc-07u3r9f8kb711vt6svxj7pz59/query-cache.bin",
+          "originalSha256": "314066c8ee70df4d7294ec04e0fa74ab038af35c1800f7fbf9e7298385613fe9",
+          "originalBytes": 50728833,
+          "mode": 436,
+          "mtimeNs": 1790019396131756546,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_install-0zhrdutjhub1t/s-hmibjqrgtk-1p2uelc-07u3r9f8kb711vt6svxj7pz59/query-cache.bin.gz",
+          "archiveSha256": "f94a8b57036ff9e4fca9ec1e9fcce749d3c8838d064d917c7d882312a39377af",
+          "archiveBytes": 16056553,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_jsc-2976eqb3rrhpn/s-hmibk465vh-1ancou9-9lm94hc3m3yjf0udwd0plyxjv/dep-graph.bin",
+          "originalSha256": "e4c6a535868641f818881e9d7ab19a97eb1a3ec9214e5354426ac83032c79efc",
+          "originalBytes": 55131028,
+          "mode": 436,
+          "mtimeNs": 1790019407902874204,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_jsc-2976eqb3rrhpn/s-hmibk465vh-1ancou9-9lm94hc3m3yjf0udwd0plyxjv/dep-graph.bin.gz",
+          "archiveSha256": "ce58839c62f203387fa6787c6fbad17f471dff20f846a9c051c95e2dc11dba41",
+          "archiveBytes": 29338430,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_react_compiler-1wpyve9dinpix/s-hmibi6s5du-1hxopkc-adolfpuz2veve5fepc2zymuz9/dep-graph.bin",
+          "originalSha256": "0dfa1ad46f88f329e2e542d1422fb3d4af89378e20533e33ffd4790a49fa8a72",
+          "originalBytes": 56507379,
+          "mode": 436,
+          "mtimeNs": 1790019297075763123,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_react_compiler-1wpyve9dinpix/s-hmibi6s5du-1hxopkc-adolfpuz2veve5fepc2zymuz9/dep-graph.bin.gz",
+          "archiveSha256": "4e59f867d858dd0a15d02ef17f425452b521c73c26c5692b4d18777e03825457",
+          "archiveBytes": 32776335,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_react_compiler-1wpyve9dinpix/s-hmibi6s5du-1hxopkc-adolfpuz2veve5fepc2zymuz9/query-cache.bin",
+          "originalSha256": "da4b24871b93787c706d42625ff46b654ac6c182f5b3ecae50423d921de0ea58",
+          "originalBytes": 34432915,
+          "mode": 436,
+          "mtimeNs": 1790019297074763113,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_react_compiler-1wpyve9dinpix/s-hmibi6s5du-1hxopkc-adolfpuz2veve5fepc2zymuz9/query-cache.bin.gz",
+          "archiveSha256": "a44ba5da99e9790e7c0848b5bc2ccbc826d7d089c8e98681e520acaf96a1ae67",
+          "archiveBytes": 10886110,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_runtime-28t2n7eap0xez/s-hmibknv2c6-1fq2ivu-clwdrkbsi48qvru2y67ulaqlq/dep-graph.bin",
+          "originalSha256": "6e6b6d624584001dcff16f075212289341d90e301f0ca931617335566ed53c76",
+          "originalBytes": 293784459,
+          "mode": 436,
+          "mtimeNs": 1790019510138893046,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_runtime-28t2n7eap0xez/s-hmibknv2c6-1fq2ivu-clwdrkbsi48qvru2y67ulaqlq/dep-graph.bin.gz",
+          "archiveSha256": "b6b21d7fbe1bb5c7945bbd9d662387d1b6ec5e7c0595bbbd891e07b4caec6510",
+          "archiveBytes": 162334444,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_runtime-28t2n7eap0xez/s-hmibknv2c6-1fq2ivu-clwdrkbsi48qvru2y67ulaqlq/query-cache.bin",
+          "originalSha256": "bdb917619dc0d1cf69ddbae9fe06a84ba936427e42a7c8c3d7ec8e4aa4696ecc",
+          "originalBytes": 182411401,
+          "mode": 436,
+          "mtimeNs": 1790019510137893036,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/rust-target/x86_64-unknown-linux-gnu/debug/incremental/bun_runtime-28t2n7eap0xez/s-hmibknv2c6-1fq2ivu-clwdrkbsi48qvru2y67ulaqlq/query-cache.bin.gz",
+          "archiveSha256": "14d42e553823e83e863cef8c253fb7ec2422cb3bd95282bcf391c1ebd0abf187",
+          "archiveBytes": 58304120,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release/pch/root-pch.h.hxx.pch",
+          "originalSha256": "30265134cc3ac020c6f47ae546dd0ec53d66b80dfe35e9da6352b86e8107ae1a",
+          "originalBytes": 155412468,
+          "mode": 436,
+          "mtimeNs": 1790023546114492580,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release/pch/root-pch.h.hxx.pch.gz",
+          "archiveSha256": "3918ebae355c176003d4c159fa7499e1ebe6eb57aafed8bb976a7f8f7caa61a2",
+          "archiveBytes": 61739619,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release/rust-target/x86_64-unknown-linux-gnu/release/deps/libcore-69ef496181d07ad5.rlib",
+          "originalSha256": "95dfa392913cf47201d395235d10ff0135484d81e2d0aa0aa2f92b704562b78e",
+          "originalBytes": 67669530,
+          "mode": 436,
+          "mtimeNs": 1790022939943109021,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release/rust-target/x86_64-unknown-linux-gnu/release/deps/libcore-69ef496181d07ad5.rlib.gz",
+          "archiveSha256": "c90b3e21e3da2551d99a9a87ee12953838b5080247fb6d8dc84a2df8923a4033",
+          "archiveBytes": 20999962,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release/rust-target/x86_64-unknown-linux-gnu/release/deps/libcore-69ef496181d07ad5.rmeta",
+          "originalSha256": "8156123c76d492af6d4531108698675339e637f0d5e7741e279f648c4440cd5e",
+          "originalBytes": 66229059,
+          "mode": 436,
+          "mtimeNs": 1790022938648094489,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release/rust-target/x86_64-unknown-linux-gnu/release/deps/libcore-69ef496181d07ad5.rmeta.gz",
+          "archiveSha256": "7b0b790ce7d7ec99a44f8294796d18bf2612ad8df11aacbeb25cbbd97e0a3a2c",
+          "archiveBytes": 20327981,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/deps/WebKit/Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/cmake_pch.hxx.pch",
+          "originalSha256": "9e47e145e0256197946c589730f521c9c097acb2a012e2e7988ff762b1226dbe",
+          "originalBytes": 152733484,
+          "mode": 436,
+          "mtimeNs": 1790033317806781892,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/deps/WebKit/Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/cmake_pch.hxx.pch.gz",
+          "archiveSha256": "9b7189db6c746a1ed42d91a13048de59ae59f3b4005f7f7fc952c98f3e66b60c",
+          "archiveBytes": 61098630,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/deps/WebKit/lib/libJavaScriptCore.a",
+          "originalSha256": "57092986e9e6b5a8d5aba6a225493057ba7b02d34176b76d087bb8ccb00a84e9",
+          "originalBytes": 607702802,
+          "mode": 436,
+          "mtimeNs": 1790034687512767169,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/deps/WebKit/lib/libJavaScriptCore.a.gz",
+          "archiveSha256": "099fc4df28583016cd4fc97e20d930157954108587507db1d8ff6602b9b41e61",
+          "archiveBytes": 167552201,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/deps/WebKit/lib/libWTF.a",
+          "originalSha256": "7f042c76919174802f7bbb8de08307cb02ed3ae23ffa4de20a1406376c537396",
+          "originalBytes": 48503130,
+          "mode": 436,
+          "mtimeNs": 1790033291432481267,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/deps/WebKit/lib/libWTF.a.gz",
+          "archiveSha256": "417d6fffcfdbfbd468da37a4d3eab7eda370b0e4ed21c0e632c0493b737ad1d1",
+          "archiveBytes": 14142978,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/pch/root-pch.h.hxx.pch",
+          "originalSha256": "0f3007cff98db4f9a0e57e35c5cca2016efcd00a2a483b9d0099094fe902e544",
+          "originalBytes": 155467216,
+          "mode": 436,
+          "mtimeNs": 1790035351181855199,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/pch/root-pch.h.hxx.pch.gz",
+          "archiveSha256": "a24ef6ac07e8e2ae69a7061c3851c6e01f41ff1ff1e9a59d36e59da1c7c16e0a",
+          "archiveBytes": 61728774,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/rust-target/x86_64-unknown-linux-gnu/release/deps/libcore-69ef496181d07ad5.rlib",
+          "originalSha256": "95dfa392913cf47201d395235d10ff0135484d81e2d0aa0aa2f92b704562b78e",
+          "originalBytes": 67669530,
+          "mode": 436,
+          "mtimeNs": 1790034738576223032,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/rust-target/x86_64-unknown-linux-gnu/release/deps/libcore-69ef496181d07ad5.rlib.gz",
+          "archiveSha256": "c90b3e21e3da2551d99a9a87ee12953838b5080247fb6d8dc84a2df8923a4033",
+          "archiveBytes": 20999962,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/rust-target/x86_64-unknown-linux-gnu/release/deps/libcore-69ef496181d07ad5.rmeta",
+          "originalSha256": "8156123c76d492af6d4531108698675339e637f0d5e7741e279f648c4440cd5e",
+          "originalBytes": 66229059,
+          "mode": 436,
+          "mtimeNs": 1790034737243211094,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release-memory64-capacity-8g/rust-target/x86_64-unknown-linux-gnu/release/deps/libcore-69ef496181d07ad5.rmeta.gz",
+          "archiveSha256": "7b0b790ce7d7ec99a44f8294796d18bf2612ad8df11aacbeb25cbbd97e0a3a2c",
+          "archiveBytes": 20327981,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-build-r2/dist/program.wasm",
+          "originalSha256": "946e0ce04cb88a4738db3ffc333753f2b4c90bdc774f3c626a31145fb485610f",
+          "originalBytes": 160459972,
+          "mode": 509,
+          "mtimeNs": 1790374329064849459,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-build-r2/dist/program.wasm.gz",
+          "archiveSha256": "9eb3cbb2aa1da3113f75d55fad8d6a56bee67cd52dd735e92e64f8fb487aea58",
+          "archiveBytes": 37254079,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-build-r2/project/.lake/lasm/applications/dcb0ef1f92f803ae/061eb0935737fa04253e46d1346a8c53430d05557f2294051f67751206fc5ad4/dist/program.wasm",
+          "originalSha256": "946e0ce04cb88a4738db3ffc333753f2b4c90bdc774f3c626a31145fb485610f",
+          "originalBytes": 160459972,
+          "mode": 509,
+          "mtimeNs": 1790374318773764242,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-build-r2/project/.lake/lasm/applications/dcb0ef1f92f803ae/061eb0935737fa04253e46d1346a8c53430d05557f2294051f67751206fc5ad4/dist/program.wasm.gz",
+          "archiveSha256": "9eb3cbb2aa1da3113f75d55fad8d6a56bee67cd52dd735e92e64f8fb487aea58",
+          "archiveBytes": 37254079,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-format-r2/converted.wasm",
+          "originalSha256": "5eecc8c5a8a7bfd668e7b5cd02c0549ae6091503666fcf8f24e3918851a39bca",
+          "originalBytes": 160535564,
+          "mode": 436,
+          "mtimeNs": 1790374360028106048,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-format-r2/converted.wasm.gz",
+          "archiveSha256": "94b87ca3fbce586ff8819e5a241bac0cd852f9eabe36ebe53cdba2dc44633479",
+          "archiveBytes": 37270073,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-compilation-r2/compiled.cwasm",
+          "originalSha256": "e705fcb99acda68535872e3520bac7efc5ed2b5525ade35de1824406577ea6c6",
+          "originalBytes": 610924384,
+          "mode": 436,
+          "mtimeNs": 1790374521843451103,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-compilation-r2/compiled.cwasm.gz",
+          "archiveSha256": "2b0daa43e07bbe4f78445dc2fbd029cd92ae64f6af369231b6253c8bb40ec298",
+          "archiveBytes": 182753214,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-package-r2/dist/program.cwasm",
+          "originalSha256": "e705fcb99acda68535872e3520bac7efc5ed2b5525ade35de1824406577ea6c6",
+          "originalBytes": 610924384,
+          "mode": 436,
+          "mtimeNs": 1790374528897509876,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-package-r2/dist/program.cwasm.gz",
+          "archiveSha256": "2b0daa43e07bbe4f78445dc2fbd029cd92ae64f6af369231b6253c8bb40ec298",
+          "archiveBytes": 182753214,
+          "verifiedDecompression": true,
+          "phase": "archived"
+        }
+      ],
+      "archive": null,
+      "archiveSha256": null,
+      "peakMemoryBytes": 50380800,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "recoveredBytes": 3292360704
+    }
+  ]
+}

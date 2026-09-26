@@ -8,10 +8,32 @@ See [the exact evidence and retained failures](evidence/wasmtime-standalone-prev
 The [baseline CPU follow-up](evidence/wasmtime-baseline-lifecycle-2026-09-25.json)
 adds 27 fresh lifecycle comparisons with explicit CPU settings, including
 completed recovery from a deleted working directory.
+The [unchanged `const_fold` benchmark also passes](evidence/wasmtime-const-fold-2026-09-26.json)
+in three fresh private runs and three isolated copied deployments. Original
+argument `15`, expected output and the 4 GiB Lean stack setting remain intact.
+The diagnostic runs verify a 4,295,098,368-byte guest computation stack, including
+Lean's 128 KiB buffer, followed by thread exit and cleanup. Actual shared memory
+grows beyond 4 GiB; deployment peaks at 1.20 GiB resident memory. This does not
+claim a dense 4 GiB memory workload.
 
 This is a maintainer preview. Automatic provisioning and backend selection in
 the managed `lasm` CLI remain unfinished. The existing installed Bun backend
 still [fails the original `const_fold` test](evidence/lean-4.34.1-upstream-applications-bun-interrupted-2026-09-25.json).
+
+A [module-data checkpoint](evidence/wasmtime-module-data-checkpoint-2026-09-26.json)
+now imports the deployed `Init` metadata and evaluates seven calls to
+`Nat.nextPowerOfTwo` in an isolated Node application, matching native Lean.
+Packaging verifies and copies the metadata inventory and redistribution notices.
+The helper resolves main-module functions and data and implements the exercised
+native open, read, stat, seek and close imports. Descriptor controls pass in all
+three engines; 42 focused unit checks and native symbol controls with undefined
+behavior checking also pass. Batched export indexing reduced measured startup
+from 21.05 seconds per instance to 0.30 seconds for a main and child pair.
+Deno's isolated application still times out after 90 seconds; a separate
+300-second duration control also times out. Bun's module-data application has
+not yet been attempted. Both failures remain recorded, and neither encountered
+a resource abort. Main-module symbol support does not implement side-module
+loading or the complete descriptor/API surface.
 
 The diagnostic runner and copied applications share the same runtime. Lean
 executes on guest pthreads; the main JavaScript thread handles asynchronous IO,
@@ -62,6 +84,10 @@ six target failures and two supplementary harness failures remain recorded.
   environment limit while preserving range and allocation checks.
 - [x] Select the explicit baseline CPU target consistently for compilation and
   loading, with actual SIMD/shared-memory64 execution and cache reload controls.
+- [x] Run the original large-stack benchmark through the baseline helper and
+  copied standalone deployments in all three engines. The first parallel
+  harness attempt reset the native stack setting and failed before helper
+  execution; its retained result and corrected native controls are recorded.
 - [ ] Verify deployment across different physical CPUs.
 - [ ] Complete general imports, WASI descriptors, runtime lifetime and Lean
   module-data support. The current loader resolves the pinned console globals;

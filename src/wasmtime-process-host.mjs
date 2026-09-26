@@ -2,19 +2,25 @@ import assert from 'node:assert/strict';
 import { createNodeRuntimeHost } from './node-host.mjs';
 import { nativeFiles } from './native-files.mjs';
 import { writeNativeWasiStdio } from './wasmtime-native-stdio.mjs';
+import { createWasmtimeFileHost } from './wasmtime-file-host.mjs';
 
 // Keep ordinary process operations on the supervisor's main JavaScript thread.
 // Node workers cannot call process.chdir, and Deno's exceptional-cwd workers
 // use a private filesystem context. Wasm stacks remain on separate workers.
-export function createWasmtimeProcessHost({ programName, leanVersion, args }) {
+export function createWasmtimeProcessHost({ programName, leanVersion, args, helper }) {
   const host = createNodeRuntimeHost({ leanVersion, args, appPath: programName,
     propagateCwd: true, applicationCommand: { executable: process.execPath,
       arguments: process.versions.deno ? ['run', '--no-config', '-A'] : [] } });
   const completions = [];
+  let files;
   let completionWaiter, failed;
   const pending = new Set();
   async function request(request, sender) {
     if (failed) throw failed;
+    if (request.kind === 'file-import') {
+      files ??= createWasmtimeFileHost(helper);
+      return files.request(request);
+    }
     if (request.kind === 'wasi-stdio') {
       const bytes = new Uint8Array(request.byteBuffer, request.byteOffset, request.byteLength);
       return writeNativeWasiStdio(request.fd, bytes);

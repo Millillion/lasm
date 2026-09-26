@@ -2,7 +2,7 @@
 // compares its byte output with fresh native runs outside the deployment sandbox.
 import assert from 'node:assert/strict';
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
-import { delimiter, join, resolve } from 'node:path';
+import { delimiter, dirname, join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -13,12 +13,13 @@ import { provisionLean } from '../src/managed-lean.mjs';
 import { nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { hashWasmtimeFile as hashFile } from '../src/wasmtime-artifact.mjs';
 import { processOutput } from './process-output.mjs';
+import { loadUpstreamEvidence } from '../scripts/application-tests/upstream-evidence.mjs';
 
 await ensureResourceGuard();
 const [packageArg, sourceArg, outputArg, cacheArg, profile = 'cold', ...extra] = process.argv.slice(2);
 assert.ok(packageArg && sourceArg && outputArg && cacheArg && !extra.length,
-  'Supply COMPLETED_PREVIEW_PACKAGE LEAN_SOURCE NEW_OUTPUT EXISTING_TOOLCHAIN_CACHE [cold|lifecycle|environment]');
-assert.ok(['cold', 'lifecycle', 'environment'].includes(profile));
+  'Supply COMPLETED_PREVIEW_PACKAGE LEAN_SOURCE NEW_OUTPUT EXISTING_TOOLCHAIN_CACHE [cold|lifecycle|environment|const-fold|module-data]');
+assert.ok(['cold', 'lifecycle', 'environment', 'const-fold', 'module-data'].includes(profile));
 assert.equal(process.platform + '-' + process.arch, 'linux-x64');
 const root = fileURLToPath(new URL('..', import.meta.url)), output = resolve(outputArg);
 assert.ok(!existsSync(output)); mkdirSync(output, { recursive: true });
@@ -33,13 +34,23 @@ const originalSource = resolve(sourceArg), sourceSha256 = await hashFile(origina
 assert.equal(compilation.build.modules.length, 1); assert.equal(compilation.build.modules[0].sourceSha256, sourceSha256);
 const inputs = ['integration/wasmtime-standalone.mjs', 'integration/process-output.mjs',
   'scripts/check-deployed-application.mjs', 'scripts/full-lean/restrict-filesystem.py'];
+inputs.push('scripts/application-tests/upstream-evidence.mjs');
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async name => [name, await hashFile(join(root, name))])));
 const isolated = mkdtempSync(join(tmpdir(), 'lasm-wasmtime-deploy-'));
 const report = { scope: 'Fresh native interpreted/compiled controls and copied standalone preview in stock engines with source, build tools and original artifacts denied by Landlock. Linux x64; not managed CLI or complete runtime acceptance.',
   packageFile, packageSha256: await hashFile(packageFile), originalSource, sourceSha256, inputs: hashes,
   resourceReport: process.env.LASM_RESOURCE_REPORT, profile, isolated, commands: [], comparisons: [], denials: [], passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
+let benchmark;
 function run(label, command, cwd, env, isolatedRun = false) {
+  if (benchmark) {
+    // Run the unchanged sidecar in the parent of both native and deployed
+    // commands. Its host-stack setting survives entry into filesystem isolation.
+    const setupLog = join(output, `upstream-init-${report.commands.length}.log`);
+    command = ['/bin/bash', '-c', 'source "$1" > "$3"; source "$2" >> "$3"; shift 3; "$@"',
+      'lasm-upstream-init', benchmark.util, benchmark.init, setupLog, ...command];
+    env = { ...env }; delete env.TEST_BENCH;
+  }
   const execution = spawnSync(command[0], command.slice(1), { cwd, env, timeout: 90_000,
     killSignal: 'SIGKILL', maxBuffer: 1024 * 1024 });
   let notice;
@@ -62,6 +73,34 @@ function observeFiles(cwd) {
 }
 save();
 try {
+  if (profile === 'const-fold') {
+    const evidence = loadUpstreamEvidence(pack.manifest.leanVersion);
+    const util = join(dirname(dirname(originalSource)), 'util.sh');
+    const init = originalSource + '.init.sh', expected = originalSource + '.out.expected';
+    const paths = [[originalSource, 'tests/compile_bench/const_fold.lean'],
+      [init, 'tests/compile_bench/const_fold.lean.init.sh'],
+      [expected, 'tests/compile_bench/const_fold.lean.out.expected'], [util, 'tests/util.sh']];
+    const identities = {};
+    for (const [path, name] of paths) {
+      const hash = await hashFile(path); assert.equal(hash, evidence.sources[name].sha256);
+      identities[path] = hash;
+    }
+    Object.assign(hashes, identities);
+    const setupLog = join(output, 'upstream-initial-setup.log');
+    const environment = { ...process.env }; delete environment.TEST_BENCH;
+    const initialized = run('read original upstream initialization', ['/bin/bash', '-c',
+      'source "$1" > "$3"; source "$2" >> "$3"; printf "%s\\0" "$LEAN_STACK_SIZE_KB" "$(ulimit -s)" "${TEST_ARGS[@]}"',
+      'lasm-upstream-init', util, init, setupLog], output, environment);
+    assert.equal(initialized.code, 0); assert.equal(initialized.stderr, '');
+    const fields = initialized.stdout.split('\0'); assert.equal(fields.pop(), '');
+    const [leanStackSizeKb, hostStackKiB, ...args] = fields;
+    assert.equal(leanStackSizeKb, '4194304'); assert.deepEqual(args, ['15']);
+    benchmark = { util, init, identities, args, leanStackSizeKb, hostStackKiB,
+      expected: readFileSync(expected, 'utf8') };
+    report.upstreamBenchmark = { ...benchmark, originalAssertions: 'Exact original expected output and successful exit',
+      adaptation: 'The unchanged init sidecar and util function set the native/deployed parent stack. No source, argument, stack size or expected output change. This preview is separate from installed CLI suite acceptance.' };
+    save();
+  }
   const project = join(output, 'native-source'); mkdirSync(project);
   writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${pack.manifest.leanVersion}\n`);
   const source = join(project, 'Main.lean'); copyFileSync(originalSource, source);
@@ -69,11 +108,13 @@ try {
   assert.equal(lean.commit, compilation.build.leanCommit);
   report.native = { version: lean.version, commit: lean.commit, identity: lean.identity };
   const nativeEnv = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '2' };
+  if (benchmark) nativeEnv.LEAN_STACK_SIZE_KB = benchmark.leanStackSizeKb;
   const native = join(project, 'native-main'), c = join(project, 'main.c');
   const moduleOutput = profile === 'lifecycle' ? ['-o', join(project, 'Main.olean')] : [];
   assert.equal(run('generate native application', [lean.lean, '-j1', '-Dlinter.all=false', '-Dcompiler.postponeCompile=false',
     ...moduleOutput, '-c', c, source], project, nativeEnv).code, 0);
-  assert.equal(run('compile native application', [join(lean.prefix, 'bin/leanc'), '-O2', '-DNDEBUG', '-o', native, c], project, nativeEnv).code, 0);
+  assert.equal(run('compile native application', [join(lean.prefix, 'bin/leanc'), '-O2', '-DNDEBUG',
+    ...(profile === 'module-data' ? ['-rdynamic'] : []), '-o', native, c], project, nativeEnv).code, 0);
   let interpretedSource = source, interpretedEnv = nativeEnv;
   if (profile === 'lifecycle') {
     // Native Lean cannot evaluate an initializer from the module currently
@@ -89,6 +130,8 @@ try {
   }
   const samples = profile === 'cold' ? [['hello λ', '', 'space argument'], ['fail'], [], ['line\nvalue', '🌉', '\t']]
     : profile === 'environment' ? [[], []]
+      : benchmark ? [benchmark.args]
+      : profile === 'module-data' ? [[]]
       : ['buffered', 'exit', 'forced', 'high-exit', 'error', 'stdio', 'cwd', 'removed-cwd', 'wait'].map(name => [name]);
   let sampleEnvironments;
   if (profile === 'environment') {
@@ -111,6 +154,15 @@ try {
     const interpreted = { ...run('native interpreted main', [lean.lean, '-Dlinter.all=false', '--run', interpretedSource, ...args], cwd1, sampleEnvironments?.[index] ?? interpretedEnv), ...observeFiles(cwd1) };
     const compiled = { ...run('native compiled main', [native, ...args], cwd2, sampleEnvironments?.[index] ?? nativeEnv), ...observeFiles(cwd2) };
     assert.deepEqual(compiled, interpreted); oracles.push(interpreted);
+    if (benchmark) {
+      assert.equal(compiled.code, 0); assert.equal(compiled.stdout, benchmark.expected);
+      assert.equal(compiled.stderr, '');
+    }
+    if (profile === 'module-data') {
+      assert.equal(compiled.code, 0);
+      assert.equal(compiled.stdout, 'standard module data imported; seven runtime evaluations passed\n');
+      assert.equal(compiled.stderr, '');
+    }
     if (profile === 'lifecycle') {
       const codes = { buffered: 7, exit: 19, forced: 23, 'high-exit': 255, error: 1,
         stdio: 0, cwd: 0, 'removed-cwd': 0, wait: 0 };
@@ -136,6 +188,11 @@ try {
   // Completed compiler caches may be archived for disk safety. The original
   // packaged cache is still present and must be unreadable from deployment.
   if (existsSync(pack.cache.file)) denied.push(pack.cache.file);
+  if (profile === 'module-data') {
+    assert.ok(pack.moduleData && pack.moduleData.files > 0);
+    denied.push(join(lean.prefix, 'lib/lean/Init.olean'),
+      join(pack.moduleData.originalDist, 'lean/lib/lean/Init.olean'));
+  }
   for (const path of denied) assert.ok(existsSync(path), 'Denial controls require an existing original file');
   const denialSource = join(data, 'deny.mjs');
   writeFileSync(denialSource, `import assert from 'node:assert/strict'; import { readFileSync } from 'node:fs';
@@ -151,6 +208,7 @@ for (const path of ${JSON.stringify(denied)}) assert.throws(() => readFileSync(p
     const ruleFile = join(output, engine + '-rules.json');
     const env = { PATH: '', LANG: 'C.UTF-8', TMPDIR: temporary, HOME: temporary,
       DENO_DIR: join(temporary, 'deno'), DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' };
+    if (benchmark) env.LEAN_STACK_SIZE_KB = benchmark.leanStackSizeKb;
     const rules = { allow: [...linuxIsolationFiles(),
       { path: executable, access: 'execute' }, { path: deployment, access: 'execute' },
       { path: data, access: 'write' }, { path: temporary, access: 'write' }], environment: env };
@@ -185,7 +243,7 @@ for (const path of ${JSON.stringify(denied)}) assert.throws(() => readFileSync(p
 } finally {
   report.inputsUnchanged = await hashFile(originalSource) === sourceSha256 && await hashFile(packageFile) === report.packageSha256;
   for (const [name, sha256] of Object.entries(hashes))
-    if (await hashFile(join(root, name)) !== sha256) report.inputsUnchanged = false;
+    if (await hashFile(resolve(root, name)) !== sha256) report.inputsUnchanged = false;
   report.finishedAt = new Date().toISOString(); save(); assert.ok(report.inputsUnchanged);
   if (report.passed) { rmSync(isolated, { recursive: true }); report.verifiedTemporaryDeploymentRemoved = true; save(); }
 }

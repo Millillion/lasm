@@ -14,6 +14,8 @@ import { writeWasiStdio } from './wasmtime-wasi-stdio.mjs';
 import { nativeFiles } from './native-files.mjs';
 import { readGuestBytes, writeGuestBytes } from './wasmtime-guest-memory.mjs';
 import { invokeConsoleImport } from './wasmtime-console.mjs';
+import { createWasmtimeFileHost } from './wasmtime-file-host.mjs';
+import { invokeFileImport } from './wasmtime-file-imports.mjs';
 import cwdFactory from './native-pthread-factory.cjs';
 
 export async function runWasmtimeMain(options) {
@@ -61,6 +63,7 @@ const stdout = [], stderr = [], hostOperations = diagnostic ? [] : quiet, comple
 let completionWaiter, response = new Uint8Array(0), requestedExit;
 let workerMessageListener;
 let cwdWorker;
+let files;
 const host = isRuntimeRoot && diagnostic ? createNodeRuntimeHost({ leanVersion: check.lean, args: check.args, appPath: check.name,
   stdio: { stdout: bytes => stdout.push(Buffer.from(bytes)), stderr: bytes => stderr.push(Buffer.from(bytes)) } }) : null;
 let probe, resolvedFunctionGlobals, closed = false, ownPthread, callbackError, settled = false;
@@ -142,7 +145,7 @@ async function handleRpc({ request, signal, port, sender }) {
     let result;
     if (request.kind === 'spawn') result = { status: spawnWorker(request.pthread, request.start, request.argument) };
     else if (request.kind === 'cleanup') { await cleanupThread(request.pthread); result = {}; }
-    else if (!diagnostic && ['wasi-stdio', 'emscripten-output', 'host'].includes(request.kind)) {
+    else if (!diagnostic && ['wasi-stdio', 'emscripten-output', 'host', 'file-import'].includes(request.kind)) {
       const channel = new MessageChannel();
       try {
         const response = new Promise((resolve, reject) => {
@@ -156,6 +159,10 @@ async function handleRpc({ request, signal, port, sender }) {
         parentPort.postMessage({ kind: 'host-request', request, sender, port: channel.port2 }, [channel.port2]);
         result = await response;
       } finally { channel.port1.close(); }
+    }
+    else if (request.kind === 'file-import') {
+      files ??= createWasmtimeFileHost(libraryPath);
+      result = await files.request(request);
     }
     else if (request.kind === 'wasi-stdio') {
       assert.ok(request.fd === 1 || request.fd === 2);
@@ -330,6 +337,9 @@ const runtime = callback((kind, a, b, c, d, e, output) => {
       err: text => isRuntimeRoot ? diagnostic ? stderr.push(Buffer.from(text + '\n'))
         : parentPort.postMessage({ kind: 'host-notification', request: { kind: 'emscripten-output', fd: 2, text } })
         : rpc({ kind: 'emscripten-output', fd: 2, text }) });
+    else if (kind >= 17 && kind <= 21) result = BigInt(invokeFileImport({ kind, args: [a, b, c, d, e],
+      memoryBytes: snapshot()[3], read: readGuest, write: writeGuest,
+      request: request => rpc({ ...request, kind: 'file-import' }) }));
     else throw new Error(`Unknown runtime callback ${kind}`);
     ffi.encode(output, 'uint64_t', BigInt.asUintN(64, result));
     return 0;

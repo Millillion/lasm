@@ -1,0 +1,1533 @@
+{
+  "scope": "Unchanged original Lean 4.34.1 const_fold source, init sidecar, argument15, expected output and 4GiB Lean computation stack through the standalone baseline-CPU helper. Three diagnostic runs verify actual stack allocation/cleanup; three copied deployments deny source, tools and original artifacts. This is not a shipping installed CLI repair or an upstream-suite pass.",
+  "recordedAt": "2026-09-26T01:06:43.764767+00:00",
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v4.34.1"
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "expected": "v26.10.0"
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v2.9.7"
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "expected": "bun-v1.4.2"
+    },
+    "checkedAt": "2026-09-26T00:59:19.852149+00:00"
+  },
+  "platform": "linux-x64",
+  "upstream": {
+    "util": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/source/tests/util.sh",
+    "init": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/source/tests/compile_bench/const_fold.lean.init.sh",
+    "identities": {
+      "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/source/tests/compile_bench/const_fold.lean": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+      "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/source/tests/compile_bench/const_fold.lean.init.sh": "c15b1a91cbc17816d7f85f5b0d04d58218bb22b0f6cc2f5801f720e6cb487544",
+      "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/source/tests/compile_bench/const_fold.lean.out.expected": "16c0b721eefd175389ccf4df69ad45a47dcc5366c1e78a663ecb2ac7ea7ba137",
+      "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/source/tests/util.sh": "d24761b6293f81cc74f672cfdd227f936fcafdc875a4eb363aba356c5b6ade26"
+    },
+    "args": [
+      "15"
+    ],
+    "leanStackSizeKb": "4194304",
+    "hostStackKiB": "unlimited",
+    "expected": "93011 93011\n",
+    "originalAssertions": "Exact original expected output and successful exit",
+    "adaptation": "The unchanged init sidecar and util function set the native/deployed parent stack. No source, argument, stack size or expected output change. This preview is separate from installed CLI suite acceptance."
+  },
+  "freshBuild": {
+    "path": ".work/wasmtime-standalone-const-fold-4.34.1-build-r1/result.json",
+    "sha256": "af977adabbb378e8d8355f220bd3f97e6fd39b5b73f079363be8b1f3290e28eb"
+  },
+  "format": {
+    "path": ".work/wasmtime-standalone-const-fold-4.34.1-format-r1/result.json",
+    "sha256": "114b49f33781e0c35921021944698c288398b2bf7479966196f9c231c547cbbb"
+  },
+  "compilation": {
+    "path": ".work/wasmtime-standalone-const-fold-4.34.1-compilation-r1/result.json",
+    "sha256": "8b43ba36976e67f37d4e575b52dad4fd7210a32c5210780b6edde4d455233d4a"
+  },
+  "diagnostic": {
+    "receipt": {
+      "path": ".work/wasmtime-standalone-const-fold-4.34.1-private-r2/result.json",
+      "sha256": "78417d9fd3aed29a96afa2d9916ce31221e7d1641291a7c24022f2b18d34ae4b"
+    },
+    "environment": {
+      "LEAN_NUM_THREADS": "1",
+      "LEAN_STACK_SIZE_KB": "4194304"
+    },
+    "native": {
+      "version": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "identity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b"
+    },
+    "oracle": {
+      "code": 0,
+      "stdout": "93011 93011\n",
+      "stderr": "",
+      "stdoutBase64": "OTMwMTEgOTMwMTEK",
+      "stderrBase64": ""
+    },
+    "results": [
+      {
+        "scope": "Verified application main through a private Wasmtime host integration; not shipping acceptance",
+        "application": "const_fold",
+        "lean": "4.34.1",
+        "engine": "node",
+        "version": "26.10.0",
+        "args": [
+          "15"
+        ],
+        "leanStackSizeKb": "4194304",
+        "code": 0,
+        "stdout": "93011 93011\n",
+        "stderr": "",
+        "stdoutBase64": "OTMwMTEgOTMwMTEK",
+        "stderrBase64": "",
+        "threads": [
+          {
+            "ready": {
+              "kind": "thread-ready",
+              "pthread": "138805248",
+              "guestStackBytes": "67108864",
+              "nativeStackBytes": 100663296,
+              "ffiStackBytes": 16777216,
+              "wasmControlStackBudget": 67108864,
+              "wasmEntry": "direct Node-API",
+              "resolvedFunctionGlobals": [
+                {
+                  "name": "emscripten_console_log",
+                  "pointer": "266506"
+                },
+                {
+                  "name": "emscripten_console_error",
+                  "pointer": "266507"
+                },
+                {
+                  "name": "emscripten_console_warn",
+                  "pointer": "266508"
+                },
+                {
+                  "name": "emscripten_console_trace",
+                  "pointer": "266509"
+                },
+                {
+                  "name": "emscripten_out",
+                  "pointer": "266510"
+                },
+                {
+                  "name": "emscripten_err",
+                  "pointer": "266511"
+                }
+              ]
+            },
+            "cleaned": false,
+            "exited": false,
+            "strongref": true
+          },
+          {
+            "ready": {
+              "kind": "thread-ready",
+              "pthread": "222756864",
+              "guestStackBytes": "8388608",
+              "nativeStackBytes": 100663296,
+              "ffiStackBytes": 16777216,
+              "wasmControlStackBudget": 67108864,
+              "wasmEntry": "direct Node-API",
+              "resolvedFunctionGlobals": [
+                {
+                  "name": "emscripten_console_log",
+                  "pointer": "266506"
+                },
+                {
+                  "name": "emscripten_console_error",
+                  "pointer": "266507"
+                },
+                {
+                  "name": "emscripten_console_warn",
+                  "pointer": "266508"
+                },
+                {
+                  "name": "emscripten_console_trace",
+                  "pointer": "266509"
+                },
+                {
+                  "name": "emscripten_out",
+                  "pointer": "266510"
+                },
+                {
+                  "name": "emscripten_err",
+                  "pointer": "266511"
+                }
+              ]
+            },
+            "cleaned": false,
+            "exited": false,
+            "strongref": false
+          },
+          {
+            "ready": {
+              "kind": "thread-ready",
+              "pthread": "239603712",
+              "guestStackBytes": "4295098368",
+              "nativeStackBytes": 100663296,
+              "ffiStackBytes": 16777216,
+              "wasmControlStackBudget": 67108864,
+              "wasmEntry": "direct Node-API",
+              "resolvedFunctionGlobals": [
+                {
+                  "name": "emscripten_console_log",
+                  "pointer": "266506"
+                },
+                {
+                  "name": "emscripten_console_error",
+                  "pointer": "266507"
+                },
+                {
+                  "name": "emscripten_console_warn",
+                  "pointer": "266508"
+                },
+                {
+                  "name": "emscripten_console_trace",
+                  "pointer": "266509"
+                },
+                {
+                  "name": "emscripten_out",
+                  "pointer": "266510"
+                },
+                {
+                  "name": "emscripten_err",
+                  "pointer": "266511"
+                }
+              ]
+            },
+            "result": {
+              "kind": "thread-result",
+              "pthread": "239603712",
+              "result": "0",
+              "guestStackBytes": "4295098368",
+              "nativeStackBytes": 100663296
+            },
+            "cleaned": true,
+            "exited": true,
+            "strongref": false
+          }
+        ],
+        "trace": [
+          {
+            "kind": "spawn",
+            "pthread": "138805248",
+            "start": "5843"
+          },
+          {
+            "kind": "thread-ready",
+            "pthread": "138805248",
+            "guestStackBytes": "67108864",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266506"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266507"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266508"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266509"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266510"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266511"
+              }
+            ]
+          },
+          {
+            "kind": "spawn",
+            "pthread": "222756864",
+            "start": "5750"
+          },
+          {
+            "kind": "thread-ready",
+            "pthread": "222756864",
+            "guestStackBytes": "8388608",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266506"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266507"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266508"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266509"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266510"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266511"
+              }
+            ]
+          },
+          {
+            "kind": "spawn",
+            "pthread": "239603712",
+            "start": "5750"
+          },
+          {
+            "kind": "thread-ready",
+            "pthread": "239603712",
+            "guestStackBytes": "4295098368",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266506"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266507"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266508"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266509"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266510"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266511"
+              }
+            ]
+          },
+          {
+            "kind": "thread-result",
+            "pthread": "239603712",
+            "result": "0",
+            "guestStackBytes": "4295098368",
+            "nativeStackBytes": 100663296
+          },
+          {
+            "kind": "cleanup",
+            "pthread": "239603712"
+          }
+        ],
+        "hostOperations": [
+          {
+            "operation": 23,
+            "handle": 0,
+            "mode": "request",
+            "inputBytes": 0,
+            "thread": "222756864"
+          },
+          {
+            "operation": 92,
+            "handle": 0,
+            "mode": "request",
+            "inputBytes": 0,
+            "thread": "222756864"
+          },
+          {
+            "operation": 28,
+            "handle": 0,
+            "mode": "request",
+            "inputBytes": 0,
+            "thread": "138805248"
+          },
+          {
+            "operation": 3,
+            "handle": 1,
+            "mode": "request",
+            "inputBytes": 12,
+            "thread": "239603712"
+          },
+          {
+            "operation": 0,
+            "handle": 1,
+            "mode": "release",
+            "inputBytes": 0,
+            "thread": "239603712"
+          }
+        ],
+        "sharedBytes": "4543021056",
+        "wasmEntry": "direct Node-API on verified worker stacks",
+        "controlStackBytes": 67108864,
+        "nativeStackOverflowControl": true,
+        "resolvedFunctionGlobals": [
+          {
+            "name": "emscripten_console_log",
+            "pointer": "266506"
+          },
+          {
+            "name": "emscripten_console_error",
+            "pointer": "266507"
+          },
+          {
+            "name": "emscripten_console_warn",
+            "pointer": "266508"
+          },
+          {
+            "name": "emscripten_console_trace",
+            "pointer": "266509"
+          },
+          {
+            "name": "emscripten_out",
+            "pointer": "266510"
+          },
+          {
+            "name": "emscripten_err",
+            "pointer": "266511"
+          }
+        ],
+        "termination": "Native process exit reclaims remaining workers after host output is flushed"
+      },
+      {
+        "scope": "Verified application main through a private Wasmtime host integration; not shipping acceptance",
+        "application": "const_fold",
+        "lean": "4.34.1",
+        "engine": "deno",
+        "version": "2.9.7",
+        "args": [
+          "15"
+        ],
+        "leanStackSizeKb": "4194304",
+        "code": 0,
+        "stdout": "93011 93011\n",
+        "stderr": "",
+        "stdoutBase64": "OTMwMTEgOTMwMTEK",
+        "stderrBase64": "",
+        "threads": [
+          {
+            "ready": {
+              "kind": "thread-ready",
+              "pthread": "138805248",
+              "guestStackBytes": "67108864",
+              "nativeStackBytes": 100663296,
+              "ffiStackBytes": 16777216,
+              "wasmControlStackBudget": 67108864,
+              "wasmEntry": "direct Node-API",
+              "resolvedFunctionGlobals": [
+                {
+                  "name": "emscripten_console_log",
+                  "pointer": "266506"
+                },
+                {
+                  "name": "emscripten_console_error",
+                  "pointer": "266507"
+                },
+                {
+                  "name": "emscripten_console_warn",
+                  "pointer": "266508"
+                },
+                {
+                  "name": "emscripten_console_trace",
+                  "pointer": "266509"
+                },
+                {
+                  "name": "emscripten_out",
+                  "pointer": "266510"
+                },
+                {
+                  "name": "emscripten_err",
+                  "pointer": "266511"
+                }
+              ]
+            },
+            "cleaned": false,
+            "exited": false,
+            "strongref": true
+          },
+          {
+            "ready": {
+              "kind": "thread-ready",
+              "pthread": "222756864",
+              "guestStackBytes": "8388608",
+              "nativeStackBytes": 100663296,
+              "ffiStackBytes": 16777216,
+              "wasmControlStackBudget": 67108864,
+              "wasmEntry": "direct Node-API",
+              "resolvedFunctionGlobals": [
+                {
+                  "name": "emscripten_console_log",
+                  "pointer": "266506"
+                },
+                {
+                  "name": "emscripten_console_error",
+                  "pointer": "266507"
+                },
+                {
+                  "name": "emscripten_console_warn",
+                  "pointer": "266508"
+                },
+                {
+                  "name": "emscripten_console_trace",
+                  "pointer": "266509"
+                },
+                {
+                  "name": "emscripten_out",
+                  "pointer": "266510"
+                },
+                {
+                  "name": "emscripten_err",
+                  "pointer": "266511"
+                }
+              ]
+            },
+            "cleaned": false,
+            "exited": false,
+            "strongref": false
+          },
+          {
+            "ready": {
+              "kind": "thread-ready",
+              "pthread": "239603712",
+              "guestStackBytes": "4295098368",
+              "nativeStackBytes": 100663296,
+              "ffiStackBytes": 16777216,
+              "wasmControlStackBudget": 67108864,
+              "wasmEntry": "direct Node-API",
+              "resolvedFunctionGlobals": [
+                {
+                  "name": "emscripten_console_log",
+                  "pointer": "266506"
+                },
+                {
+                  "name": "emscripten_console_error",
+                  "pointer": "266507"
+                },
+                {
+                  "name": "emscripten_console_warn",
+                  "pointer": "266508"
+                },
+                {
+                  "name": "emscripten_console_trace",
+                  "pointer": "266509"
+                },
+                {
+                  "name": "emscripten_out",
+                  "pointer": "266510"
+                },
+                {
+                  "name": "emscripten_err",
+                  "pointer": "266511"
+                }
+              ]
+            },
+            "result": {
+              "kind": "thread-result",
+              "pthread": "239603712",
+              "result": "0",
+              "guestStackBytes": "4295098368",
+              "nativeStackBytes": 100663296
+            },
+            "cleaned": true,
+            "exited": true,
+            "strongref": false
+          }
+        ],
+        "trace": [
+          {
+            "kind": "spawn",
+            "pthread": "138805248",
+            "start": "5843"
+          },
+          {
+            "kind": "thread-ready",
+            "pthread": "138805248",
+            "guestStackBytes": "67108864",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266506"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266507"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266508"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266509"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266510"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266511"
+              }
+            ]
+          },
+          {
+            "kind": "spawn",
+            "pthread": "222756864",
+            "start": "5750"
+          },
+          {
+            "kind": "thread-ready",
+            "pthread": "222756864",
+            "guestStackBytes": "8388608",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266506"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266507"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266508"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266509"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266510"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266511"
+              }
+            ]
+          },
+          {
+            "kind": "spawn",
+            "pthread": "239603712",
+            "start": "5750"
+          },
+          {
+            "kind": "thread-ready",
+            "pthread": "239603712",
+            "guestStackBytes": "4295098368",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266506"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266507"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266508"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266509"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266510"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266511"
+              }
+            ]
+          },
+          {
+            "kind": "thread-result",
+            "pthread": "239603712",
+            "result": "0",
+            "guestStackBytes": "4295098368",
+            "nativeStackBytes": 100663296
+          },
+          {
+            "kind": "cleanup",
+            "pthread": "239603712"
+          }
+        ],
+        "hostOperations": [
+          {
+            "operation": 23,
+            "handle": 0,
+            "mode": "request",
+            "inputBytes": 0,
+            "thread": "222756864"
+          },
+          {
+            "operation": 92,
+            "handle": 0,
+            "mode": "request",
+            "inputBytes": 0,
+            "thread": "222756864"
+          },
+          {
+            "operation": 28,
+            "handle": 0,
+            "mode": "request",
+            "inputBytes": 0,
+            "thread": "138805248"
+          },
+          {
+            "operation": 3,
+            "handle": 1,
+            "mode": "request",
+            "inputBytes": 12,
+            "thread": "239603712"
+          },
+          {
+            "operation": 0,
+            "handle": 1,
+            "mode": "release",
+            "inputBytes": 0,
+            "thread": "239603712"
+          }
+        ],
+        "sharedBytes": "4543021056",
+        "wasmEntry": "direct Node-API on verified worker stacks",
+        "controlStackBytes": 67108864,
+        "nativeStackOverflowControl": true,
+        "resolvedFunctionGlobals": [
+          {
+            "name": "emscripten_console_log",
+            "pointer": "266506"
+          },
+          {
+            "name": "emscripten_console_error",
+            "pointer": "266507"
+          },
+          {
+            "name": "emscripten_console_warn",
+            "pointer": "266508"
+          },
+          {
+            "name": "emscripten_console_trace",
+            "pointer": "266509"
+          },
+          {
+            "name": "emscripten_out",
+            "pointer": "266510"
+          },
+          {
+            "name": "emscripten_err",
+            "pointer": "266511"
+          }
+        ],
+        "termination": "Native process exit reclaims remaining workers after host output is flushed"
+      },
+      {
+        "scope": "Verified application main through a private Wasmtime host integration; not shipping acceptance",
+        "application": "const_fold",
+        "lean": "4.34.1",
+        "engine": "bun",
+        "version": "1.4.2",
+        "args": [
+          "15"
+        ],
+        "leanStackSizeKb": "4194304",
+        "code": 0,
+        "stdout": "93011 93011\n",
+        "stderr": "",
+        "stdoutBase64": "OTMwMTEgOTMwMTEK",
+        "stderrBase64": "",
+        "threads": [
+          {
+            "ready": {
+              "kind": "thread-ready",
+              "pthread": "138805248",
+              "guestStackBytes": "67108864",
+              "nativeStackBytes": 100663296,
+              "ffiStackBytes": 16777216,
+              "wasmControlStackBudget": 67108864,
+              "wasmEntry": "direct Node-API",
+              "resolvedFunctionGlobals": [
+                {
+                  "name": "emscripten_console_log",
+                  "pointer": "266506"
+                },
+                {
+                  "name": "emscripten_console_error",
+                  "pointer": "266507"
+                },
+                {
+                  "name": "emscripten_console_warn",
+                  "pointer": "266508"
+                },
+                {
+                  "name": "emscripten_console_trace",
+                  "pointer": "266509"
+                },
+                {
+                  "name": "emscripten_out",
+                  "pointer": "266510"
+                },
+                {
+                  "name": "emscripten_err",
+                  "pointer": "266511"
+                }
+              ]
+            },
+            "cleaned": false,
+            "exited": false,
+            "strongref": true
+          },
+          {
+            "ready": {
+              "kind": "thread-ready",
+              "pthread": "222756864",
+              "guestStackBytes": "8388608",
+              "nativeStackBytes": 100663296,
+              "ffiStackBytes": 16777216,
+              "wasmControlStackBudget": 67108864,
+              "wasmEntry": "direct Node-API",
+              "resolvedFunctionGlobals": [
+                {
+                  "name": "emscripten_console_log",
+                  "pointer": "266506"
+                },
+                {
+                  "name": "emscripten_console_error",
+                  "pointer": "266507"
+                },
+                {
+                  "name": "emscripten_console_warn",
+                  "pointer": "266508"
+                },
+                {
+                  "name": "emscripten_console_trace",
+                  "pointer": "266509"
+                },
+                {
+                  "name": "emscripten_out",
+                  "pointer": "266510"
+                },
+                {
+                  "name": "emscripten_err",
+                  "pointer": "266511"
+                }
+              ]
+            },
+            "cleaned": false,
+            "exited": false,
+            "strongref": false
+          },
+          {
+            "ready": {
+              "kind": "thread-ready",
+              "pthread": "239603712",
+              "guestStackBytes": "4295098368",
+              "nativeStackBytes": 100663296,
+              "ffiStackBytes": 16777216,
+              "wasmControlStackBudget": 67108864,
+              "wasmEntry": "direct Node-API",
+              "resolvedFunctionGlobals": [
+                {
+                  "name": "emscripten_console_log",
+                  "pointer": "266506"
+                },
+                {
+                  "name": "emscripten_console_error",
+                  "pointer": "266507"
+                },
+                {
+                  "name": "emscripten_console_warn",
+                  "pointer": "266508"
+                },
+                {
+                  "name": "emscripten_console_trace",
+                  "pointer": "266509"
+                },
+                {
+                  "name": "emscripten_out",
+                  "pointer": "266510"
+                },
+                {
+                  "name": "emscripten_err",
+                  "pointer": "266511"
+                }
+              ]
+            },
+            "result": {
+              "kind": "thread-result",
+              "pthread": "239603712",
+              "result": "0",
+              "guestStackBytes": "4295098368",
+              "nativeStackBytes": 100663296
+            },
+            "cleaned": true,
+            "exited": true,
+            "strongref": false
+          }
+        ],
+        "trace": [
+          {
+            "kind": "spawn",
+            "pthread": "138805248",
+            "start": "5843"
+          },
+          {
+            "kind": "thread-ready",
+            "pthread": "138805248",
+            "guestStackBytes": "67108864",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266506"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266507"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266508"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266509"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266510"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266511"
+              }
+            ]
+          },
+          {
+            "kind": "spawn",
+            "pthread": "222756864",
+            "start": "5750"
+          },
+          {
+            "kind": "thread-ready",
+            "pthread": "222756864",
+            "guestStackBytes": "8388608",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266506"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266507"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266508"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266509"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266510"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266511"
+              }
+            ]
+          },
+          {
+            "kind": "spawn",
+            "pthread": "239603712",
+            "start": "5750"
+          },
+          {
+            "kind": "thread-ready",
+            "pthread": "239603712",
+            "guestStackBytes": "4295098368",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266506"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266507"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266508"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266509"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266510"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266511"
+              }
+            ]
+          },
+          {
+            "kind": "thread-result",
+            "pthread": "239603712",
+            "result": "0",
+            "guestStackBytes": "4295098368",
+            "nativeStackBytes": 100663296
+          },
+          {
+            "kind": "cleanup",
+            "pthread": "239603712"
+          }
+        ],
+        "hostOperations": [
+          {
+            "operation": 23,
+            "handle": 0,
+            "mode": "request",
+            "inputBytes": 0,
+            "thread": "222756864"
+          },
+          {
+            "operation": 92,
+            "handle": 0,
+            "mode": "request",
+            "inputBytes": 0,
+            "thread": "222756864"
+          },
+          {
+            "operation": 28,
+            "handle": 0,
+            "mode": "request",
+            "inputBytes": 0,
+            "thread": "138805248"
+          },
+          {
+            "operation": 3,
+            "handle": 1,
+            "mode": "request",
+            "inputBytes": 12,
+            "thread": "239603712"
+          },
+          {
+            "operation": 0,
+            "handle": 1,
+            "mode": "release",
+            "inputBytes": 0,
+            "thread": "239603712"
+          }
+        ],
+        "sharedBytes": "4543021056",
+        "wasmEntry": "direct Node-API on verified worker stacks",
+        "controlStackBytes": 67108864,
+        "nativeStackOverflowControl": true,
+        "resolvedFunctionGlobals": [
+          {
+            "name": "emscripten_console_log",
+            "pointer": "266506"
+          },
+          {
+            "name": "emscripten_console_error",
+            "pointer": "266507"
+          },
+          {
+            "name": "emscripten_console_warn",
+            "pointer": "266508"
+          },
+          {
+            "name": "emscripten_console_trace",
+            "pointer": "266509"
+          },
+          {
+            "name": "emscripten_out",
+            "pointer": "266510"
+          },
+          {
+            "name": "emscripten_err",
+            "pointer": "266511"
+          }
+        ],
+        "termination": "Native process exit reclaims remaining workers after host output is flushed"
+      }
+    ],
+    "inputsUnchanged": true
+  },
+  "package": {
+    "receipt": {
+      "path": ".work/wasmtime-standalone-const-fold-4.34.1-package-r1/result.json",
+      "sha256": "39ecb5ac3ee6911747e72b3cf3f29492397c5bec8aa5c984261ae5e3e61fbd7d"
+    },
+    "manifest": {
+      "schema": 2,
+      "backend": "wasmtime-49.0.0",
+      "leanVersion": "4.34.1",
+      "cpuTarget": "x86_64-unknown-linux-gnu",
+      "cpuFeatures": "baseline",
+      "platform": "linux",
+      "arch": "x64",
+      "files": {
+        "program.cwasm": {
+          "bytes": 610872384,
+          "sha256": "2d05605bc5df8514074bbd3ff2c314b16fb2b32e1d11a85701ac6d4f93fdede4"
+        },
+        "host/instance.so": {
+          "bytes": 64872,
+          "sha256": "937de7e2cf98901539dccf4928cc78a32c27023a02e360a7deea681f57b675ef"
+        },
+        "host/native-api.node": {
+          "bytes": 17040,
+          "sha256": "e6a6b5fd46aef1bd36136b30ecd2110afeab68237d586bfc819c4acad84b680d"
+        },
+        "host/libwasmtime.so": {
+          "bytes": 31590960,
+          "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+        }
+      }
+    },
+    "redistributionNotices": {
+      "source": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-const-fold-4.34.1-build-r1/dist/THIRD_PARTY_NOTICES.txt",
+      "sha256": "17a797829b1f09bb8e9096406ebae4dea7eba3be71d7cc3e4d5c0c75085dc040"
+    },
+    "inputsUnchanged": true
+  },
+  "copiedDeployment": {
+    "receipt": {
+      "path": ".work/wasmtime-standalone-const-fold-4.34.1-deployment-r1/result.json",
+      "sha256": "d701f00984f2a25440232a9bfeaca502cd6fb8b544227e7d9701323a332d0db9"
+    },
+    "deployment": {
+      "directory": "/tmp/lasm-wasmtime-deploy-yo62bK/deployment space \u03bb",
+      "manifestSha256": "c87386fd5dc54f28f0f67ede21a43e8f9249b1d12b8acc6e4817a1c754db6d8f",
+      "deniedFiles": [
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/source/tests/compile_bench/const_fold.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-const-fold-4.34.1-deployment-r1/native-source/Main.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+        "/home/lastmjs/development/lasm/compiler/package.json",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-const-fold-4.34.1-package-r1/dist/program.cwasm",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-const-fold-4.34.1-package-r1/dist/host/instance.so",
+        "/home/lastmjs/development/lasm/compiler/src/wasmtime-runtime.mjs",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-const-fold-4.34.1-compilation-r1/compiled.cwasm"
+      ],
+      "path": "",
+      "sourceAndBuildContentsDenied": true,
+      "expectedResultsPresent": false
+    },
+    "comparisons": [
+      {
+        "engine": "node",
+        "args": [
+          "15"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "93011 93011\n",
+          "stderr": "",
+          "stdoutBase64": "OTMwMTEgOTMwMTEK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "93011 93011\n",
+          "stderr": "",
+          "stdoutBase64": "OTMwMTEgOTMwMTEK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "15"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "93011 93011\n",
+          "stderr": "",
+          "stdoutBase64": "OTMwMTEgOTMwMTEK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "93011 93011\n",
+          "stderr": "",
+          "stdoutBase64": "OTMwMTEgOTMwMTEK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "15"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "93011 93011\n",
+          "stderr": "",
+          "stdoutBase64": "OTMwMTEgOTMwMTEK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "93011 93011\n",
+          "stderr": "",
+          "stdoutBase64": "OTMwMTEgOTMwMTEK",
+          "stderrBase64": ""
+        }
+      }
+    ],
+    "denials": [
+      {
+        "engine": "node",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "ab9c8eecf9f82d6693cdc3accced17034065c8d96213b0aa76a7e803d20ae1da",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-const-fold-4.34.1-deployment-r1/node-rules.json"
+      },
+      {
+        "engine": "deno",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-const-fold-4.34.1-deployment-r1/deno-rules.json"
+      },
+      {
+        "engine": "bun",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-const-fold-4.34.1-deployment-r1/bun-rules.json"
+      }
+    ],
+    "inputsUnchanged": true
+  },
+  "preservedHarnessFailure": {
+    "receipt": {
+      "path": ".work/wasmtime-standalone-const-fold-4.34.1-private-r1/result.json",
+      "sha256": "0fc1888f413e4d29244ec0bb47a9aac37c061886565ae4430f0cf979eb1bf1f0"
+    },
+    "stage": "native control before any helper execution",
+    "code": 1,
+    "diagnostic": "deep recursion was detected at 'interpreter' (potential solution: increase elaboration stack size using the `lean --tstack` flag). This flag can be set in the `weakLeanArgs` field of the Lake configuration. Further details are available in the Lean reference manual at https://lean-lang.org/doc/reference/4.34.1/find/?domain=Verso.Genre.Manual.section&name=lake-config-toml",
+    "cause": "nativeLeanEnvironment replaced the original LEAN_STACK_SIZE_KB with its 8192 KiB build default.",
+    "correction": "Retain the caller stack setting after constructing the native build environment. No upstream source, sidecar, arguments, expected output, stack request, timeout or resource threshold was changed."
+  },
+  "resources": [
+    {
+      "name": "wasmtime-module-data-unit-r1",
+      "outcome": "passed",
+      "guard": {
+        "path": ".work/product-acceptance/wasmtime-module-data-unit-r1-resources.json",
+        "sha256": "f5cfd04a8e1ab5bc935a0019afd1230c897b8acd272842a5a32d784c15fe4da7"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/wasmtime-module-data-unit-r1-disk.json",
+        "sha256": "809d57abff43e436462c48c33da9689eabb17699f8b4571e07d69c88326f2710"
+      },
+      "peakMemoryBytes": 27320320,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 26998603776,
+      "minimumFreeDiskBytes": 9821519872
+    },
+    {
+      "name": "wasmtime-package-input-controls-r2",
+      "outcome": "passed",
+      "guard": {
+        "path": ".work/product-acceptance/wasmtime-package-input-controls-r2-resources.json",
+        "sha256": "7408aa43a572daea1af34e69fae1754a063118ca4a542d096d3f71aeeaeb3b55"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/wasmtime-package-input-controls-r2-disk.json",
+        "sha256": "d191294419251133b4fd4cef2e4140873550e3ab981e14e1dc726ee9427337ec"
+      },
+      "peakMemoryBytes": 31191040,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 26990497792,
+      "minimumFreeDiskBytes": 9821495296
+    },
+    {
+      "name": "wasmtime-standalone-const-fold-4.34.1-build-r1",
+      "outcome": "passed",
+      "guard": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-build-r1-resources.json",
+        "sha256": "c6b5f0e8b4dd0354c49f85a7e19d0ebab3d47b172b15967848557c20d61fb1c9"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-build-r1-disk.json",
+        "sha256": "791de9691cd3431bad1c7e3d42607a527d04f8d700357997992b51c645dead5a"
+      },
+      "peakMemoryBytes": 3434106880,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 23499022336,
+      "minimumFreeDiskBytes": 9610424320
+    },
+    {
+      "name": "wasmtime-standalone-const-fold-4.34.1-format-r1",
+      "outcome": "passed",
+      "guard": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-format-r1-resources.json",
+        "sha256": "f1d124a4e053eac70c7435d452661d40f945cb8c1146c870c1c8f067abc06b71"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-format-r1-disk.json",
+        "sha256": "cc295da30ea64d73018601dbfd2fb529cb1c515285407afc2410624d77caff1c"
+      },
+      "peakMemoryBytes": 3320926208,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 23545659392,
+      "minimumFreeDiskBytes": 9294598144
+    },
+    {
+      "name": "wasmtime-standalone-const-fold-4.34.1-compilation-r1",
+      "outcome": "passed",
+      "guard": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-compilation-r1-resources.json",
+        "sha256": "b5a6ef3a2ce60e1fd3f5460075998402b7541c1f33878ae16d8519d317612e75"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-compilation-r1-disk.json",
+        "sha256": "ac329f7363338fe5119e514afc16c773c772e3338925558a14f25c40e4b51f73"
+      },
+      "peakMemoryBytes": 5709123584,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 21428801536,
+      "minimumFreeDiskBytes": 8681226240
+    },
+    {
+      "name": "wasmtime-standalone-const-fold-4.34.1-private-r1",
+      "outcome": "failed",
+      "guard": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-private-r1-resources.json",
+        "sha256": "1ff6b77e2e28340935384cb676ec745b0359507f72d66ac2442dc992a47344f9"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-private-r1-disk.json",
+        "sha256": "1d2e3e1444b741f71314adeabdbb1a00ca3dbdfca675e6acdf38b32af1b65a2b"
+      },
+      "peakMemoryBytes": 231800832,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 26366304256,
+      "minimumFreeDiskBytes": 8680337408
+    },
+    {
+      "name": "wasmtime-standalone-const-fold-4.34.1-private-r2",
+      "outcome": "passed",
+      "guard": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-private-r2-resources.json",
+        "sha256": "2cedeeb78e2763587851272a54d4f8599c3b90c9ab238c5b15050d53927d5721"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-private-r2-disk.json",
+        "sha256": "12adc3f4e19959a4e21e4f19c85438de58dd60e659f3793531508060348d81db"
+      },
+      "peakMemoryBytes": 507969536,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 26207158272,
+      "minimumFreeDiskBytes": 8669724672
+    },
+    {
+      "name": "wasmtime-standalone-const-fold-4.34.1-package-r1",
+      "outcome": "passed",
+      "guard": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-package-r1-resources.json",
+        "sha256": "3b08bf787215345d4808e0873d7afc02aa670fc621793d62ecd6a976927fdb20"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-package-r1-disk.json",
+        "sha256": "8e7681b791666b5952c7970ce70ca8b6aab788c08800b5f0e7d88786b04b88e7"
+      },
+      "peakMemoryBytes": 772743168,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 26592002048,
+      "minimumFreeDiskBytes": 8012861440
+    },
+    {
+      "name": "wasmtime-standalone-const-fold-4.34.1-deployment-r1",
+      "outcome": "passed",
+      "guard": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-deployment-r1-resources.json",
+        "sha256": "66aae6878dda5dde513aa5a2a9fad86f3782b57a3b2b5b0b5e9ae0d6fa19cd8e"
+      },
+      "disk": {
+        "path": ".work/product-acceptance/wasmtime-standalone-const-fold-4.34.1-deployment-r1-disk.json",
+        "sha256": "fa99fe123aacbbde38e9074e92572c0a1c4afa8277e6fd19aa83dcb4686674a0"
+      },
+      "peakMemoryBytes": 1287966720,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 26341167104,
+      "minimumFreeDiskBytes": 7201734656
+    }
+  ],
+  "remaining": [
+    "Integrate and provision this backend through the managed installed CLI, then revalidate the original suite.",
+    "Complete runtime imports, general descriptors, API coverage and callable lifecycle behavior.",
+    "Validate different physical CPUs and the other five native platform combinations.",
+    "The benchmark exercises the requested allocation and actual recursion; it is not a dense 4GiB-write workload.",
+    "No fundamental limitation is established."
+  ]
+}

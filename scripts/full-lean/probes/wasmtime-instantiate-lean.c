@@ -9,10 +9,43 @@
 #include <sys/prctl.h>
 #include <sys/random.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <limits.h>
 #include <pthread.h>
 #include <time.h>
 #include "wasmtime-canonical-imports.h"
 #include "wasmtime-engine-config.h"
+
+// Fixed-argument entry point permits asynchronous FFI execution of openat,
+// whose variadic libc entry point cannot be called asynchronously by Koffi.
+int lasm_posix_openat(int directory, const uint8_t *path, int flags, uint32_t mode) {
+    return openat(directory, (const char *)path, flags, (mode_t)mode);
+}
+
+int lasm_posix_fstat(int fd, uint8_t *output) {
+    struct stat info;
+    if (fstat(fd, &info) != 0) return -1;
+    // The pinned wasm64 SDK stat ABI differs from this native libc ABI.
+    if (info.st_dev > UINT32_MAX || info.st_rdev > UINT32_MAX ||
+        info.st_blksize < INT32_MIN || info.st_blksize > INT32_MAX ||
+        info.st_blocks < INT32_MIN || info.st_blocks > INT32_MAX) {
+        errno = EOVERFLOW; return -1;
+    }
+    memset(output, 0, 104);
+#define LASM_STAT32(offset, value) do { uint32_t v = (uint32_t)(value); memcpy(output + (offset), &v, 4); } while (0)
+#define LASM_STAT64(offset, value) do { uint64_t v = (uint64_t)(value); memcpy(output + (offset), &v, 8); } while (0)
+    LASM_STAT32(0, info.st_dev); LASM_STAT32(4, info.st_mode); LASM_STAT64(8, info.st_nlink);
+    LASM_STAT32(16, info.st_uid); LASM_STAT32(20, info.st_gid); LASM_STAT32(24, info.st_rdev);
+    LASM_STAT64(32, info.st_size); LASM_STAT32(40, info.st_blksize); LASM_STAT32(44, info.st_blocks);
+    LASM_STAT64(48, info.st_atim.tv_sec); LASM_STAT64(56, info.st_atim.tv_nsec);
+    LASM_STAT64(64, info.st_mtim.tv_sec); LASM_STAT64(72, info.st_mtim.tv_nsec);
+    LASM_STAT64(80, info.st_ctim.tv_sec); LASM_STAT64(88, info.st_ctim.tv_nsec);
+    LASM_STAT64(96, info.st_ino);
+#undef LASM_STAT32
+#undef LASM_STAT64
+    return 0;
+}
 
 typedef double (*date_callback_t)(void);
 typedef int32_t (*mailbox_callback_t)(uint64_t, uint64_t);
@@ -24,6 +57,7 @@ typedef struct {
     wasmtime_global_t global;
     uint64_t pointer;
 } function_global_t;
+typedef struct { void *identity; uint64_t pointer; } main_function_t;
 typedef struct {
     wasm_engine_t *engine;
     wasmtime_module_t *module;
@@ -55,6 +89,10 @@ typedef struct {
     runtime_callback_t runtime;
     function_global_t *function_globals;
     size_t function_global_count;
+    main_function_t *main_functions;
+    size_t main_function_capacity;
+    uint64_t main_table_size;
+    bool needs_main_symbols;
 } lean_probe_t;
 typedef struct { lean_probe_t *owner; char name[256]; } rejected_import_t;
 typedef struct { lean_probe_t *owner; uint32_t kind; wasm_valkind_t result_kind; char name[128]; } runtime_import_t;
@@ -446,6 +484,8 @@ static wasm_trap_t *invoke_from_import(lean_probe_t *probe, wasmtime_context_t *
     char message[1024]; failure(error, trap, message, sizeof(message));
     return wasmtime_trap_new(message, strlen(message));
 }
+#include "wasmtime-main-symbols.h"
+
 static wasm_trap_t *main_thread_import(void *data, wasmtime_caller_t *caller,
     const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
     (void)results;
@@ -592,6 +632,7 @@ void lasm_lean_instance_delete(lean_probe_t *probe) {
     free(probe->program_name);
     for (size_t i = 0; i < probe->function_global_count; i++) free(probe->function_globals[i].name);
     free(probe->function_globals);
+    free(probe->main_functions);
     free(probe);
 }
 int lasm_lean_prepare_process(char *error, size_t capacity) {
@@ -695,15 +736,30 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
                 for (uint32_t k = 1; k < sizeof(names) / sizeof(names[0]); k++)
                     if (name->size == strlen(names[k]) && !memcmp(name->data, names[k], name->size)) runtime_kind = k;
                 if (!runtime_kind) runtime_kind = console_import_kind(name);
+                if (name_is(name, "__syscall_openat")) runtime_kind = 17;
+                if (name_is(name, "__syscall_fstat64")) runtime_kind = 18;
             }
             if (module->size == strlen("wasi_snapshot_preview1") &&
                 !memcmp(module->data, "wasi_snapshot_preview1", module->size)) {
                 if (name->size == 9 && !memcmp(name->data, "proc_exit", 9)) runtime_kind = 9;
                 if (name->size == 8 && !memcmp(name->data, "fd_write", 8)) runtime_kind = 10;
+                if (name_is(name, "fd_read")) runtime_kind = 19;
+                if (name_is(name, "fd_seek")) runtime_kind = 20;
+                if (name_is(name, "fd_close")) runtime_kind = 21;
             }
             if (runtime_kind) {
                 const wasm_functype_t *function = wasm_externtype_as_functype_const(type);
                 const wasm_valtype_vec_t *parameters = wasm_functype_params(function);
+                if (runtime_kind >= 17 && runtime_kind <= 21) {
+                    const char *signatures[] = { "ijij", "ij", "ijjj", "ijij", "i" };
+                    const char *signature = signatures[runtime_kind - 17];
+                    const wasm_valtype_vec_t *returns = wasm_functype_results(function);
+                    bool valid = parameters->size == strlen(signature) && returns->size == 1 &&
+                        wasm_valtype_kind(returns->data[0]) == WASM_I32;
+                    for (size_t j = 0; valid && j < parameters->size; j++)
+                        valid = wasm_valtype_kind(parameters->data[j]) == (signature[j] == 'i' ? WASM_I32 : WASM_I64);
+                    if (!valid) { snprintf(error, capacity, "unexpected memory64 file signature"); status = 1; break; }
+                }
                 if (runtime_kind >= 11 && runtime_kind <= 16 && (parameters->size != 1 ||
                     wasm_valtype_kind(parameters->data[0]) != WASM_I64 || wasm_functype_results(function)->size)) {
                     snprintf(error, capacity, "unexpected memory64 console signature"); status = 1; break;
@@ -732,6 +788,19 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
                     callback = pthread_strongref_import;
                 if (name->size == strlen("emscripten_check_blocking_allowed") && !memcmp(name->data, "emscripten_check_blocking_allowed", name->size))
                     callback = blocking_allowed_import;
+                if (name_is(name, "_dlsym_js")) {
+                    callback = main_dlsym_import;
+                    probe->needs_main_symbols = true;
+                    const wasm_functype_t *function = wasm_externtype_as_functype_const(type);
+                    const wasm_valtype_vec_t *parameters = wasm_functype_params(function), *returns = wasm_functype_results(function);
+                    if (parameters->size != 3 || returns->size != 1 ||
+                        wasm_valtype_kind(parameters->data[0]) != WASM_I64 ||
+                        wasm_valtype_kind(parameters->data[1]) != WASM_I64 ||
+                        wasm_valtype_kind(parameters->data[2]) != WASM_I64 ||
+                        wasm_valtype_kind(returns->data[0]) != WASM_I64) {
+                        snprintf(error, capacity, "unexpected memory64 dlsym signature"); status = 1; break;
+                    }
+                }
                 if (callback) {
                     imports[i].kind = WASMTIME_EXTERN_FUNC;
                     wasmtime_func_new(context, wasm_externtype_as_functype_const(type),
@@ -876,7 +945,11 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
         status = failure(instance_error, trap, error, capacity);
     }
     if (!status) status = resolve_function_globals(probe, &types, imports, error, capacity);
+    if (!status && probe->needs_main_symbols) status = prepare_main_symbols(probe, error, capacity);
     if (!status && parent) {
+        if (probe->main_table_size != parent->main_table_size) {
+            snprintf(error, capacity, "worker main-symbol table size mismatch"); status = 1;
+        }
         if (probe->function_global_count != parent->function_global_count) {
             snprintf(error, capacity, "worker GOT.func binding count mismatch"); status = 1;
         }

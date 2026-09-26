@@ -12,9 +12,10 @@ import { ensureResourceGuard } from './resource-guard.mjs';
 import { processOutput } from '../../integration/process-output.mjs';
 
 await ensureResourceGuard();
-const [compilationArg, sourceArg, outputArg, toolchainCacheArg, argumentsJson = '[]', ...extra] = process.argv.slice(2);
+const [compilationArg, sourceArg, outputArg, toolchainCacheArg, argumentsJson = '[]', expectedStackBytes, ...extra] = process.argv.slice(2);
 assert.ok(compilationArg && sourceArg && outputArg && toolchainCacheArg && !extra.length,
-  'Supply COMPLETED_COMPILATION LEAN_SOURCE NEW_OUTPUT EXISTING_TOOLCHAIN_CACHE [ARGUMENTS_JSON]');
+  'Supply COMPLETED_COMPILATION LEAN_SOURCE NEW_OUTPUT EXISTING_TOOLCHAIN_CACHE [ARGUMENTS_JSON [EXPECTED_GUEST_STACK_BYTES]]');
+if (expectedStackBytes !== undefined) assert.match(expectedStackBytes, /^[1-9][0-9]*$/);
 assert.equal(process.platform + '-' + process.arch, 'linux-x64');
 const root = fileURLToPath(new URL('../..', import.meta.url)), output = resolve(outputArg);
 assert.ok(!existsSync(output), 'Preserve earlier application runs');
@@ -41,7 +42,8 @@ const sources = ['scripts/full-lean/probe-wasmtime-application.mjs',
   'src/native-file-worker-deno.mjs', 'src/native-file-message.mjs',
   'scripts/full-lean/probes/wasmtime-canonical-imports.h'];
 sources.push('src/wasmtime-runtime.mjs', 'src/wasmtime-worker.mjs', 'src/wasmtime-artifact.mjs', 'src/wasmtime-native-stdio.mjs', 'src/wasmtime-guest-memory.mjs', 'src/wasmtime-console.mjs', 'src/wasmtime-wasi-stdio.mjs', 'src/worker-stdio.cjs', 'src/native-worker-cwd.cjs', 'src/native-pthread-factory.cjs', 'src/native-pthread-factory-deno.mjs');
-inputs.push('scripts/full-lean/probes/wasmtime-engine-config.h');
+sources.push('scripts/full-lean/probes/wasmtime-engine-config.h', 'scripts/full-lean/probes/wasmtime-main-symbols.h');
+sources.push('src/wasmtime-file-host.mjs', 'src/wasmtime-file-imports.mjs');
 const hashes = Object.fromEntries(await Promise.all(sources.map(async path => [path, await hashFile(join(root, path))])));
 mkdirSync(output, { recursive: true });
 const report = { scope: 'Fresh native-interpreted/native-compiled and private Wasmtime helper comparisons; not installed backend or full API acceptance',
@@ -67,9 +69,13 @@ try {
   assert.equal(lean.commit, compilation.build.leanCommit);
   report.native = { version: lean.version, commit: lean.commit, identity: lean.identity };
   const source = join(output, 'Main.lean'); copyFileSync(originalSource, source);
-  const env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '1' };
-  // Leave any caller-supplied Lean stack setting intact. No test-specific
-  // argument, timeout or allocation reduction is used to create a pass.
+  // The managed build environment normally supplies an 8 MiB default. Runtime
+  // controls must retain the caller's original stack setting after that reset.
+  const env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '1',
+    ...(process.env.LEAN_STACK_SIZE_KB !== undefined
+      ? { LEAN_STACK_SIZE_KB: process.env.LEAN_STACK_SIZE_KB } : {}) };
+  report.runtimeEnvironment = { LEAN_NUM_THREADS: env.LEAN_NUM_THREADS,
+    LEAN_STACK_SIZE_KB: env.LEAN_STACK_SIZE_KB };
   const interpretedCwd = join(output, 'native-interpreted'), compiledCwd = join(output, 'native-compiled');
   mkdirSync(interpretedCwd); mkdirSync(compiledCwd);
   const interpreted = run('native interpreted application', lean.lean, ['-Dlinter.all=false', '--run', source, ...args],
@@ -93,6 +99,7 @@ try {
   report.helperSha256 = await hashFile(helper); report.nativeApiSha256 = await hashFile(api);
   const check = { name: basename(originalSource, '.lean'), lean: lean.version, args, expected: interpreted };
   if (env.LEAN_STACK_SIZE_KB !== undefined) check.leanStackSizeKb = env.LEAN_STACK_SIZE_KB;
+  if (expectedStackBytes !== undefined) check.computationStackBytes = expectedStackBytes;
   const checkPath = join(output, 'application-check.json');
   writeFileSync(checkPath, JSON.stringify(check, null, 2) + '\n'); report.applicationCheckSha256 = await hashFile(checkPath);
   const engines = [
