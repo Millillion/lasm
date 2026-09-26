@@ -3,12 +3,13 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { copyNativeBundle, copyApplicationNativeBundle } from './native-bundle.mjs';
 import { glibcAtLeast } from './application-support.mjs';
+import { applicationPolicy, requireAotApplication, requireAotDeployment } from './application-policy.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 export const applicationHostFiles = [
   'node-host.mjs', 'lean-io-errors.mjs', 'deno-stack.mjs', 'bun-stack.mjs', 'posix-arguments.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs',
   'node-process.mjs', 'native-process.mjs', 'process-launcher.mjs', 'process-exec.mjs', 'node-udp.mjs',
-  'node-system.mjs', 'linux-memory.mjs', 'node-signal.mjs', 'deno-signals.mjs', 'native-signals.mjs', 'application-signals.mjs', 'application-metadata-runtime.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-pthread-factory-deno.mjs', 'native-files.mjs',
+  'node-system.mjs', 'linux-memory.mjs', 'node-signal.mjs', 'deno-signals.mjs', 'native-signals.mjs', 'application-signals.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-pthread-factory-deno.mjs', 'native-files.mjs',
   'native-clock.mjs', 'native-windows-timezone.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-file-message.mjs',
   'native-worker-cwd.cjs', 'worker-stdio.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native-abort.cjs',
 ];
@@ -29,6 +30,7 @@ export function applicationEntrypoint(target, { platform = process.platform, arc
   const shebang = target === 'deno' ? '/usr/bin/env -S deno run -A' : '/usr/bin/env ' + target;
   return `#!${shebang}
 import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 // A self-launch may temporarily disable Deno's automatic PATH shim. Restore
 // the caller's exact visible values before the program or its workers start.
@@ -60,10 +62,13 @@ if (actual !== expected) {
   console.error('This application requires glibc ' + minimumGlibc + ' or newer. Use a supported Linux system; Ubuntu 24.04 is the tested distribution.');
   process.exitCode = 1;
 } else {
+  const applicationPolicy = ${JSON.stringify(applicationPolicy)};
+  const requireAotApplication = ${requireAotApplication.toString()};
+  const requireAotDeployment = ${requireAotDeployment.toString()};
+  requireAotDeployment(JSON.parse(readFileSync(new URL('./build-info.json', import.meta.url), 'utf8')));
   if (actual === 'deno') (await import('./host/deno-stack.mjs')).prepareDenoStack(import.meta.url);
   if (actual === 'bun') (await import('./host/bun-stack.mjs')).prepareBunStack(import.meta.url);
   (await import('./host/application-signals.mjs')).prepareApplicationSignals();
-  (await import('./host/application-metadata-runtime.mjs')).prepareApplicationMetadata(import.meta.url);
   process.env.LASM_FULL_HOST_MODULE = new URL('./host/node-host.mjs', import.meta.url).href;
   process.env.LASM_FULL_APP_PATH = fileURLToPath(import.meta.url);
   createRequire(import.meta.url)('./program.cjs');

@@ -1,6 +1,21 @@
 # Application deployment size
 
-The shipping builder now follows linker reachability instead of exporting every
+## Current policy — 2026-09-26
+
+Jordan chose ahead-of-time applications without a runtime Lean compiler. Current
+source builds reject reachable runtime evaluation, compiler/kernel state,
+module-data access and dynamic executable plugins, before delivering output.
+The 2.39 GB fallback described below is historical candidate `.34` behavior and
+has been removed from the current application linker. Ordinary build-time Lean
+features remain available; broad runtime imports may still bring forbidden
+initializers, so compiler-only dependencies should use Lean's `meta import`.
+See the [README](../README.md#lean-support-and-restrictions) for the exact policy.
+New native installed-package acceptance is required before claiming a replacement
+release candidate. Earlier measurements and failure evidence remain intact below.
+
+## Earlier measurements and implementation
+
+Historical candidate `.34` introduced linker reachability instead of exporting every
 Lean, Std and Lake declaration for every application. It uses the same ordinary
 Lean source, native elaborator, runtime archives, IO bridge and deployment CLI.
 No restricted Lean dialect or application annotations are introduced.

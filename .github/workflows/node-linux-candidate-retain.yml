@@ -47,7 +47,7 @@ jobs:
         run: node --max-old-space-size=128 scripts/ci/node-candidate-acceptance.mjs
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz
+          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.35.tgz
           key: ${{ inputs.candidate-cache-key }}
           fail-on-cache-miss: true
       - name: Verify original archive identity and prepare its receipt
@@ -60,9 +60,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "node-linux-candidate-$GITHUB_RUN_ID" \
-            .work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz \
+            .work/node-candidate/lasm-compiler-0.1.0-experimental.35.tgz \
             .work/node-candidate/SHA256SUMS.txt \
             .work/node-candidate/acceptance.json \
             --draft --prerelease --target "$GITHUB_SHA" \
-            --title 'Lasm Linux Node candidate 0.1.0-experimental.34' \
+            --title 'Lasm Linux Node candidate 0.1.0-experimental.35' \
             --notes-file .work/node-candidate/notes.md

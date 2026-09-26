@@ -108,11 +108,11 @@ async function deployment(name, output, file, cases, directory = project, lake =
     assert.deepEqual(actual, native);
     checks.push({ args, expected: native });
   }
-  const bytes = size(output), budgetBytes = mode === 'dynamic' ? 3 * 1024 ** 3
-    : ['features', 'features-legacy', 'filesystem'].includes(name) ? 16 * 1024 ** 2 : 5 * 1024 ** 2;
+  const bytes = size(output), budgetBytes = ['features', 'features-legacy', 'filesystem'].includes(name) ? 16 * 1024 ** 2 : 5 * 1024 ** 2;
   assert.ok(bytes < budgetBytes, `${name}: deployment size regression (${bytes} bytes)`);
   assert.equal(buildInfo(output).linkRequirements.mode, mode);
-  assert.equal(existsSync(join(output, 'lean')), mode === 'dynamic', 'Only runtime evaluation needs compiler metadata');
+  assert.equal(mode, 'static');
+  assert.equal(existsSync(join(output, 'lean')), false, 'Ahead-of-time applications never deploy compiler metadata');
   result.deployments.push({ name, output, source: join(directory, file), build: buildInfo(output), bytes, budgetBytes,
     relocate: mode === 'dynamic', checks }); save();
 }
@@ -221,6 +221,7 @@ try {
       ['features', 'BundleFeatures.lean', ['123456789']],
       ['features-legacy', 'BundleFeaturesLegacy.lean', ['17']],
       ['filesystem', 'FilesystemSurface.lean', ['filesystem λ']],
+      ['compile-time', 'CompileTimeFeatures.lean', []],
     ]) {
       writeFileSync(join(project, fixture), readFileSync(join(workspace, 'fixtures', fixture)));
       const output = join(project, name + ' dist');
@@ -237,15 +238,18 @@ try {
     assert.ok(statSync(join(unusedOutput, 'program.wasm')).size <= statSync(join(result.cached, 'program.wasm')).size + 4096,
       'A thousand unreachable functions must not scale deployment size');
     await deployment('unused', unusedOutput, unused, [{ args: [], expected: basic }]);
-    const reflection = 'StandaloneModuleData.lean';
-    writeFileSync(join(project, reflection), readFileSync(join(workspace, 'fixtures', reflection)));
-    const evaluated = { code: 0, stdout: 'standard module data imported; seven runtime evaluations passed\n', stderr: '' };
-    matchesCli(npx('runtime evaluation retains full support', [reflection]), evaluated);
-    // Runtime module data is large. Relocate the complete cache result instead
-    // of retaining redundant copies; the deployment's tools/cache are denied.
-    const reflectionOutput = join(project, 'reflection dist');
-    renameSync(cachedDist(project, reflection), reflectionOutput);
-    await deployment('reflection', reflectionOutput, reflection, [{ args: [], expected: evaluated }], project, false, true, 'dynamic');
+    for (const fixture of ['StandaloneModuleData.lean', 'RuntimeModulePath.lean']) {
+      writeFileSync(join(project, fixture), readFileSync(join(workspace, 'fixtures', fixture)));
+      const rejectedOutput = join(project, fixture + ' rejected');
+      const rejected = npx('reject runtime compiler dependency: ' + fixture, ['build', fixture, '--output', rejectedOutput]);
+      assert.equal(rejected.code, 1, rejected.stderr);
+      assert.match(rejected.stderr, /Lasm does not support runtime Lean/);
+      assert.equal(existsSync(rejectedOutput), false, 'Forbidden code must not produce a deployment');
+      const applications = join(project, '.lake/lasm/applications');
+      for (const entry of readdirSync(applications))
+        assert.ok(!readdirSync(join(applications, entry)).some(name => name.startsWith('.build-')), 'Failed probes are removed');
+    }
+    result.runtimeRestrictions = { evaluation: 'rejected during build', moduleData: 'rejected during build', compileTimeMacrosAndProofs: 'passed' };
     result.toolsBytes = size(tools);
     const host = process.platform + '-' + process.arch;
     result.downloads = [

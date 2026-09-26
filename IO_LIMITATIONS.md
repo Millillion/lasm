@@ -1,5 +1,12 @@
 # Current IO limitations in Lasm
 
+**Current release scope (2026-09-26):** ordinary ahead-of-time Lean applications
+in Node. Runtime compiler/interpreter, module-data access and executable plugin
+loading are explicitly excluded; see the [README's exact boundary](README.md#lean-support-and-restrictions).
+Linux x86-64/ARM64 have passed the earlier installed candidate; macOS then Windows
+are the next native platform gates. The broader cross-engine results and goals
+below are historical research evidence, not the current release contract.
+
 Broader API parity is deferred by the [current first milestone](docs/PLAN.md),
 which covers basic ordinary Lean programs installed and run in Node on Linux
 x86-64 and ARM64. This file preserves the wider compatibility backlog.

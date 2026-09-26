@@ -3,16 +3,24 @@
 - Keep work in this local repository on `main` unless the user directs otherwise.
 - Make unsigned commits at meaningful milestones (`git -c commit.gpgsign=false commit`).
   Never GPG-sign commits; keep local commit signing disabled.
+- Before every commit, review README.md for irreducible simplicity and accuracy
+  against the current code. A human or AI must be able to start without guessing:
+  include prerequisites, complete Lean code, install/run/build/deploy examples,
+  every Lasm CLI command and option with examples, exact supported environments,
+  and exact unavailable Lean capabilities. Separate verified release behavior,
+  source changes awaiting acceptance, and experimental interfaces. Keep detailed
+  evidence in linked documents, without hiding essential support restrictions.
 - The user authorized `origin` at `git@github.com:Millillion/lasm.git`. Push after
   every commit and keep `main` synchronized with `origin/main`; never force-push
   or discard remote work. Push failures must not pause development or local
   commits. Per the user's latest instruction, attempt a push at least once after
   each commit; if it fails, retain the commit locally, continue work, and try
   again after the next commit. npm publication remains unauthorized.
-- Prioritize the basic ordinary Lean-on-Node installed workflow in
-  `docs/PLAN.md`, on native Linux x86-64 and Linux ARM64 first. macOS, Windows,
-  broader language/API parity, other engines and experimental helper integration
-  are deferred. Preserve their source, tests, artifacts and failures. Recheck
+- Prioritize the ordinary Lean-on-Node installed workflow in `docs/PLAN.md`.
+  Linux x86-64 and ARM64 have passed. The current order is ahead-of-time runtime
+  restrictions, native macOS x86-64 and ARM64, then Windows x86-64 and ARM64.
+  Broader API parity, other engines and experimental helper integration remain
+  deferred. Preserve their source, tests, artifacts and failures. Recheck
   official Node/Lean releases before a new acceptance campaign and pin exact
   versions within it. Keep Lean selectable through `lean-toolchain`.
 - GitHub Actions CI/CD is authorized autonomously within the user's existing

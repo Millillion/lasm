@@ -1,12 +1,13 @@
 // Shared object compilation and linking for ordinary generated Lean C and
 // unchanged upstream foreign-runtime test drivers. The CLI owns provisioning,
 // project discovery and caching; this helper uses its verified inputs.
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readApplicationSymbols, readInitializationFreeCppSymbols } from './application-symbols.mjs';
 import { readApplicationLinkRequirements, reachabilityRegistry, canSpecializeInitialization, selectiveInitialization } from './application-reachability.mjs';
+import { requireAotApplication } from './application-policy.mjs';
 import { executableName, responseFile } from './platform.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
@@ -82,18 +83,10 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   execute('em++', ['@' + argumentsFile]);
   const requirements = await readApplicationLinkRequirements(mapFile, analysis);
   requirements.specializedInitialization = specializeInitialization && requirements.mode === 'static';
-  if (requirements.mode === 'dynamic') {
-    progress?.({ stage: 'Preserving runtime evaluation and dynamic library support' });
-    const registryC = join(work, 'application-symbols.c'), registryObject = join(work, 'application-symbols.o');
-    await writeFile(registryC, registry.source);
-    execute('emcc', [...compileFlags, '-c', registryC, '-o', registryObject]);
-    const exports = [...new Set([...JSON.parse(await readFile(join(runtime.directory, 'exports.json'), 'utf8')), ...registry.exports])].sort();
-    await writeFile(exportsFile, JSON.stringify(exports) + '\n');
-    // Preserve the established optimization/resource profile for the full
-    // interpreter/compiler. Its much larger graph needs separate tuning.
-    await writeFile(argumentsFile, responseFile([...objects, registryObject, '-O1', ...link]));
-    execute('em++', ['@' + argumentsFile]);
-  } else {
+  // Fail during the build, before a full-runtime link or module-data packaging.
+  // The executable under analysis is temporary and is never delivered.
+  requireAotApplication(requirements);
+  {
     // The lookup marker is dead. Omit its object from the final link so no
     // delivered executable contains a null implementation of dynamic lookup.
     // -g1 preserves checked JS loader shapes without Wasm names or DWARF.
@@ -102,8 +95,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     progress?.({ stage: 'Linking application and Lean runtime' });
     execute('em++', ['@' + argumentsFile]);
     const finalRequirements = await readApplicationLinkRequirements(finalMap, analysis);
-    if (finalRequirements.mode !== 'static' || finalRequirements.requiresModuleData && !requirements.requiresModuleData)
-      throw new Error('Runtime dependencies changed during final application linking');
+    requireAotApplication(finalRequirements);
   }
   progress?.({ stage: 'Preparing the application launcher' });
   const glue = join(dist, 'program.cjs');

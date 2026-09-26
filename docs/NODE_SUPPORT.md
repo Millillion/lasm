@@ -2,8 +2,10 @@
 
 The first release contract is ordinary Lean `main`, console output, arguments,
 exit status, compilation diagnostics, and a tiny Lake project with local imports.
-The compiler uses ordinary Lean; this is a tested application scope, not a new
-restricted language. Full standard-library compatibility is not claimed.
+The compiler uses ordinary Lean syntax. Current source builds restrict deployed
+code to ahead-of-time execution; build-time language features remain available.
+The exact [runtime exclusions are in the README](../README.md#lean-support-and-restrictions).
+Full standard-library compatibility is not claimed.
 
 The validated targets are Ubuntu 24.04.5 LTS (glibc 2.39) on native x86-64 and ARM64,
 Node 26.10.0 with its npm, and Lean 4.34.1. Use stock Node without special flags.
@@ -29,9 +31,10 @@ unpacked tools and build caches occupy several GB. The acceptance report records
 observed disk usage, build times and deployment sizes separately. These are
 measurements of the identified candidate, not performance guarantees for other machines.
 The current builder removes unreachable code and includes only the deployment
-architecture's native helpers. Runtime evaluation keeps the full compiler and
-module data when needed. See the [size report](https://github.com/Millillion/lasm/blob/main/docs/BUNDLE_SIZE.md)
-for ordinary applications and the larger runtime-evaluation fallback.
+architecture's native helpers. Current source builds reject runtime compiler,
+interpreter, module-data and plugin dependencies; they never package the large
+fallback. The retained historical `.34` archive predates this restriction. See the
+[size report](https://github.com/Millillion/lasm/blob/main/docs/BUNDLE_SIZE.md).
 
 Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm`. Set
 `LASM_TOOLCHAIN_CACHE` to choose another directory. Compiled application caches

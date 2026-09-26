@@ -1,0 +1,81 @@
+{
+  "scope": "Local current-source AOT controls; Linux x64 only, not installed-package acceptance",
+  "accepted": {
+    "signature": "a3eff1f5241e05a896481098d724fab26ccace1874a09f68cbcc3ea179d5ddd5",
+    "requirements": {
+      "mode": "static",
+      "dynamic": [],
+      "cxxRuntime": [],
+      "moduleData": [],
+      "requiresModuleData": false,
+      "specializedInitialization": true
+    },
+    "stdout": "compile-time macros and proofs: 42\n"
+  },
+  "rejected": [
+    {
+      "fixture": "RuntimeModulePath.lean",
+      "code": "ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE",
+      "message": "Lasm does not support runtime Lean compilation, evaluation, module-data access, or plugin loading in deployed applications.\nDetected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o; runtime Lean module-data access: l_Lean_findSysroot, l_Lean_findSysroot___closed__0_value, l_Lean_findSysroot___closed__1_value, l_Lean_findSysroot___closed__2_value, l_Lean_findSysroot___closed__3_value.\nMove this operation to build time or remove the dependency. Ordinary imports, tactics, macros and deriving during compilation remain supported. No deployment was produced."
+    },
+    {
+      "fixture": "StandaloneModuleData.lean",
+      "code": "ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE",
+      "message": "Lasm does not support runtime Lean compilation, evaluation, module-data access, or plugin loading in deployed applications.\nDetected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlopen, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, dynlib.cpp.o; runtime Lean module-data access: l_Lean_findSysroot, l_Lean_findSysroot___closed__0_value, l_Lean_findSysroot___closed__1_value, l_Lean_findSysroot___closed__2_value, l_Lean_findSysroot___closed__3_value.\nMove this operation to build time or remove the dependency. Ordinary imports, tactics, macros and deriving during compilation remain supported. No deployment was produced."
+    }
+  ],
+  "previousDeploymentPreserved": true,
+  "failedProbesRemoved": true,
+  "resources": {
+    "startedAt": "2026-09-26T19:58:33.276Z",
+    "limits": {
+      "memoryMax": 4294967296,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 3435973836,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "peakMemoryBytes": 2180833280,
+    "unitReleased": true,
+    "finishedAt": "2026-09-26T20:00:44.742Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false
+  },
+  "disk": {
+    "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+    "minimumFreeBytes": 4294967296,
+    "preflightRequiredBytes": 4702989189,
+    "status": "passed",
+    "updatedAt": "2026-09-26T20:00:45.298052+00:00",
+    "freeAtStart": 4732928000,
+    "command": [
+      "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "scripts/full-lean/run-bounded.mjs",
+      "--memory-mib",
+      "4096",
+      "--report",
+      "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/aot-policy-r3-resources.json",
+      "--",
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      "--max-old-space-size=384",
+      ".work/bundle-size/aot-policy-controls.mjs",
+      ".work/bundle-size/aot-policy-r3"
+    ],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/aot-policy-r3-resources.json",
+    "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/aot-policy-r3.log",
+    "minimumObservedFreeBytes": 4496625664,
+    "exitCode": 0,
+    "freeAtEnd": 4725702656
+  },
+  "unitTests": {
+    "passed": 122,
+    "report": ".work/bundle-size/aot-full-unit-r1.json"
+  }
+}

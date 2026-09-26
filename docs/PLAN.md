@@ -1,6 +1,6 @@
 # Lasm current implementation plan
 
-Agreed 2026-09-25. The immediate milestone is an excellent installation,
+Agreed 2026-09-25; scope extended 2026-09-26. The immediate milestone is an excellent installation,
 compilation, CLI, packaging, and deployment experience for a basic ordinary Lean
 program running in Node. Complete language and standard-library compatibility
 will follow in separate chunks; it is not a prerequisite for this milestone.
@@ -14,6 +14,26 @@ Updating this document does not itself start, stop, or interrupt running work.
 the same packed candidate. See [the acceptance report](NODE_ACCEPTANCE.md) for
 exact hashes, versions, scope and measurements. The candidate is unpublished to
 npm; deferred chunks below remain future work.
+
+## Current ordered work, authorized 2026-09-26
+
+1. Remove the multi-gigabyte runtime-compiler fallback. Reject reachable runtime
+   Lean compilation/evaluation, module-data access, compiler/kernel state and
+   dynamic executable plugins during the build. Preserve native build-time
+   imports, macros, tactics, deriving and proofs. Reject incompatible deployment
+   capability records at startup. Test both positive and negative controls and
+   document the exact boundary in README.md.
+2. Extend the same managed, installed Node package to native macOS x86-64 and
+   ARM64. Validate each on no-cost standard GitHub-hosted runners with bounded
+   workloads; distinguish process-tree monitoring from kernel-enforced limits.
+3. After both macOS targets pass, extend to Windows x86-64 and ARM64. Resolve
+   missing native tool distributions with validated, redistributable artifacts;
+   do not call emulated execution a native ARM64 pass.
+
+Every implementation commit must review README.md for simplicity and current
+accuracy: complete quick start, every CLI command/option with examples, exact
+environment support, and exact unavailable Lean capabilities. Historical candidate
+evidence does not establish acceptance of a changed package. Publish no npm release.
 
 ## First milestone: install and run with only Node/npm
 
@@ -62,7 +82,8 @@ candidate archive described in the README.
 - Keep basic Lake project discovery and ordinary build-time imports working.
   A tiny local multi-module project is enough to validate that plumbing here;
   broad third-party library compatibility is later work.
-- Do not remove Lean language features to manufacture a restricted dialect.
+- Preserve ordinary Lean syntax and build-time language features. The user has
+  now authorized the runtime restrictions above to avoid the compiler fallback.
   Narrow the tested and documented support contract for this release. The fixture
   must execute real compiled Lean computation and IO, with no stubs or hardcoded
   output substituted for program behavior.
@@ -77,8 +98,8 @@ installed-package workflow:
 | Linux | Required | Required |
 
 Here, x86-64 means 64-bit x86 (also called x64 or AMD64), not 32-bit x86.
-macOS and Windows on both architectures are deferred until after this Linux
-milestone. Preserve their existing implementation and evidence.
+This Linux milestone is complete. macOS, then Windows on both architectures are
+now authorized as the next platform milestones; use the same gates below.
 
 Use native execution for acceptance. Cross-compilation or emulation can assist
 implementation but does not establish a native platform pass. Record exact OS
@@ -197,8 +218,10 @@ chunk at a time:
 5. Broader concurrency and other standard-library/runtime APIs, followed by
    separately scoped serverless deployment adapters and additional engines.
 
-No permanent language cuts are decided here. Runtime Lean compilation,
-elaboration, dynamic module loading/evaluation, arbitrary native extensions,
+Runtime Lean compilation, elaboration, dynamic module loading/evaluation and
+executable plugin loading are now explicitly unavailable in deployed applications.
+They must fail during the build; the removed fallback is not a release option.
+Broader native extensions,
 subprocess/signal/terminal parity, extreme stack/memory benchmarks, full upstream
 suite campaigns, callable-library expansion, and compiler-in-Wasm research are
 not first-milestone gates. Pause investigations whose only purpose is those

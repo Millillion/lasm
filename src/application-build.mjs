@@ -13,7 +13,7 @@ import { linkApplication } from './application-link.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint } from './application-output.mjs';
 import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './application-files.mjs';
 import { withApplicationLock } from './application-lock.mjs';
-import { applicationMetadata, copyApplicationMetadata } from './application-metadata.mjs';
+import { applicationPolicy } from './application-policy.mjs';
 import { insideDirectory } from './platform.mjs';
 import { applicationSupport, requireApplicationSupport } from './application-support.mjs';
 
@@ -60,7 +60,6 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   progress?.({ stage: project ? 'Checking Lean sources and Lake dependencies' : 'Checking Lean sources and imports' });
   const generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
   progress?.({ stage: 'Checking application inputs and cached build' });
-  const metadata = await applicationMetadata(generated, lean);
   const modules = [];
   for (let i = 0; i < generated.sources.length; i++) modules.push({
     module: generated.inputs[i].module, sourceSha256: await hashFile(generated.inputs[i].source),
@@ -71,7 +70,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
     emscripten: sdkCatalog.version, sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)),
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
-    ...(metadata ? { metadataInputsIdentity: metadata.identity } : {}),
+    applicationPolicy,
     target, host: `${process.platform}-${process.arch}`, node: applicationSupport()?.node,
     minimumGlibc: applicationSupport()?.minimumGlibc, memoryMode, modules };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
@@ -90,20 +89,22 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   if (!progress) log(`Building ${relative(process.cwd(), source) || source} for ${target}…`);
   const temporary = join(work, '.build-' + randomUUID()), dist = join(temporary, 'dist');
   await mkdir(dist, { recursive: true });
-  const linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
-    leanVersion: lean.version, memoryMode, verbose, progress });
+  let linkRequirements;
+  try {
+    linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
+      leanVersion: lean.version, memoryMode, verbose, progress });
+  } catch (error) {
+    // This unique staging directory contains only this failed build's files.
+    // Preserve any previously delivered application and avoid retaining probes.
+    await rm(temporary, { recursive: true, force: true });
+    throw error;
+  }
   progress?.({ stage: 'Packaging the application and runtime support' });
   copyApplicationHost(dist, { target }); writeApplicationEntrypoint(dist, target, {
     node: applicationSupport()?.node, minimumGlibc: applicationSupport()?.minimumGlibc,
   });
-  // JSON, parsers and other ordinary Lean library code do not need the
-  // compiler's on-disk environments. Retain those assets when the linked
-  // program can import/evaluate modules or use Lean's standard search paths.
-  await copyApplicationMetadata(linkRequirements.requiresModuleData ? metadata : null, dist);
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));
   const buildInfo = { ...recipe, signature, linkRequirements,
-    ...(linkRequirements.requiresModuleData && metadata
-      ? { moduleDataIdentity: metadata.identity, moduleDataBytes: metadata.manifest.bytes } : {}),
     sdkIdentity: sdk.identity, sdkDriverIdentity: sdk.driverIdentity };
   await writeFile(join(dist, 'build-info.json'), JSON.stringify(buildInfo, null, 2) + '\n');
   await writeFile(join(dist, outputReceipt), JSON.stringify({ schema: 1, signature, files: await fileInventory(dist) }) + '\n');

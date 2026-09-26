@@ -25,7 +25,7 @@ const control = join(workspace, 'node-linux-installed.mjs');
 for (const name of ['node-linux-installed.mjs', 'node-cache-controls.mjs'])
   copyFileSync(join(root, 'integration', name), join(workspace, name));
 mkdirSync(join(workspace, 'fixtures'));
-for (const name of ['BundleFeatures.lean', 'BundleFeaturesLegacy.lean', 'FilesystemSurface.lean', 'StandaloneModuleData.lean'])
+for (const name of ['BundleFeatures.lean', 'BundleFeaturesLegacy.lean', 'FilesystemSurface.lean', 'CompileTimeFeatures.lean', 'StandaloneModuleData.lean', 'RuntimeModulePath.lean'])
   copyFileSync(join(root, 'integration/fixtures', name), join(workspace, 'fixtures', name));
 for (const path of ['home', 'tmp', 'os-bin']) mkdirSync(join(workspace, path));
 symlinkSync('/bin/sh', join(workspace, 'os-bin/sh'));
