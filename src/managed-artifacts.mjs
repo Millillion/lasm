@@ -45,8 +45,13 @@ export function validateArtifact(artifact) {
 }
 
 async function download(artifact, destination, fetch_) {
-  const response = await fetch_(artifact.url, { signal: AbortSignal.timeout(15 * 60_000) });
-  if (!response.ok || !response.body) throw new Error(`Download failed for ${artifact.name}: HTTP ${response.status}`);
+  let response;
+  try { response = await fetch_(artifact.url, { signal: AbortSignal.timeout(15 * 60_000) }); }
+  catch (cause) {
+    throw new Error(`Could not download ${artifact.name} from ${new URL(artifact.url).hostname}. Check your network connection and retry. ${cause.message}`, { cause });
+  }
+  if (!response.ok || !response.body)
+    throw new Error(`Download failed for ${artifact.name}: HTTP ${response.status} from ${new URL(artifact.url).hostname}. Check your connection or retry when the download is available.`);
   if (response.url && new URL(response.url).protocol !== 'https:') throw new Error('Artifact download redirected away from HTTPS');
   const hash = createHash('sha256');
   let bytes = 0;

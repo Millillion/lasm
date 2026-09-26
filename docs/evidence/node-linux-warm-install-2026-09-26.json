@@ -1,0 +1,142 @@
+{
+  "scope": "Local installed-package warm-tool smoke only; not cold provisioning or ARM64 acceptance",
+  "package": {
+    "scope": "Reproducible local npm packing; native installed acceptance is separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/node-linux-package-r1/lasm-compiler-0.1.0-experimental.32.tgz",
+    "sha256": "d3776dd2597bd37fcc0177b9d6ad6066718cbe7a47c84440ae6fa6bcc5887580",
+    "sourceRevision": "3485d74917eb003718744b9a99793ef67ec60606",
+    "candidateVersion": "0.1.0-experimental.32",
+    "defaultLean": "4.34.1",
+    "node": "26.10.0",
+    "runtime": {
+      "identity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+      "name": "lean-4.34.1-wasm64"
+    },
+    "reproduciblePacking": true,
+    "compressedBytes": 65324978,
+    "installedBytes": 377738953,
+    "files": 228,
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/node-linux-package-r1-resources.json",
+    "recordedAt": "2026-09-26T03:23:30.792Z"
+  },
+  "steps": [
+    {
+      "label": "install",
+      "seconds": 6.713279904,
+      "code": 0,
+      "stdout": "\nadded 7 packages in 7s\n",
+      "stderr": "npm notice\nnpm notice New major version of npm available! 11.19.1 -> 12.1.0\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.1.0\nnpm notice To update run: npm install -g npm@12.1.0\nnpm notice\n"
+    },
+    {
+      "label": "npx Main.lean",
+      "seconds": 63.064151135,
+      "code": 0,
+      "stdout": "Hello from Lean! 2 + 3 = 5\n",
+      "stderr": "Preparing Lean 4.34.1 for node\u2026\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /tmp/lasm warm Linux \u03bb-JDVWwJ/project space \u65e5\u672c\u8a9e/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /tmp/lasm warm Linux \u03bb-JDVWwJ/project space \u65e5\u672c\u8a9e/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\n"
+    },
+    {
+      "label": "npx build Main.lean",
+      "seconds": 15.564694338,
+      "code": 0,
+      "stdout": "",
+      "stderr": "Preparing Lean 4.34.1 for node\u2026\nReused Lean 4.34.1 for node: /tmp/lasm warm Linux \u03bb-JDVWwJ/project space \u65e5\u672c\u8a9e/dist\n"
+    },
+    {
+      "label": "plain Node",
+      "seconds": 1.7348955950000091,
+      "code": 0,
+      "stdout": "Hello from Lean! 2 + 3 = 5\n",
+      "stderr": ""
+    },
+    {
+      "label": "npx Args.lean -- hello world \u03bb \u65e5\u672c\u8a9e  --target",
+      "seconds": 62.489819975999986,
+      "code": 0,
+      "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+      "stderr": "Preparing Lean 4.34.1 for node\u2026\nBuilding Args.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /tmp/lasm warm Linux \u03bb-JDVWwJ/project space \u65e5\u672c\u8a9e/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /tmp/lasm warm Linux \u03bb-JDVWwJ/project space \u65e5\u672c\u8a9e/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\n"
+    },
+    {
+      "label": "npx Args.lean -- fail",
+      "seconds": 16.996514668999996,
+      "code": 23,
+      "stdout": "arg=fail\n",
+      "stderr": "Preparing Lean 4.34.1 for node\u2026\n"
+    },
+    {
+      "label": "npx Main.lean",
+      "seconds": 64.94908855900003,
+      "code": 0,
+      "stdout": "Lean module: 42\n",
+      "stderr": "Preparing Lean 4.34.1 for node\u2026\ninfo: greeting: no previous manifest, creating one from scratch\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /tmp/lasm warm Linux \u03bb-JDVWwJ/project space \u65e5\u672c\u8a9e/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /tmp/lasm warm Linux \u03bb-JDVWwJ/project space \u65e5\u672c\u8a9e/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\n"
+    }
+  ],
+  "build": {
+    "schema": 1,
+    "lean": "4.34.1",
+    "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+    "emscripten": "6.0.9",
+    "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+    "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+    "buildDriverIdentity": "40d4ad287a95953d3c72721398b1c2c99679c11c9e52fa86595116063c6d4941",
+    "target": "node",
+    "host": "linux-x64",
+    "memoryMode": 1,
+    "modules": [
+      {
+        "module": "Main",
+        "sourceSha256": "2b0f501bc28cf8c4451b29af1506054a50be53b3410d309407f7841320c9edc6",
+        "cSha256": "f4a4b7d37a43e63ce90a7354bec4876e57cb326287781128e64149c0f792429f"
+      }
+    ],
+    "signature": "02717949530167beba5d1585a29c24d6d0015c227f3b4012f7ae18a18742e87f",
+    "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+    "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+  },
+  "deploymentBytes": 180484583,
+  "wasmBytes": 160426863,
+  "resources": {
+    "unitReleased": true,
+    "peakMemoryBytes": 4762279936,
+    "resourceLimited": false,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  },
+  "reports": [
+    ".work/node-linux-local-smoke-r2/result.json",
+    ".work/product-acceptance/node-linux-warm-smoke-r2-resources.json"
+  ],
+  "offlineAndIndependentDeployment": {
+    "scope": "Warm installed Linux x64 candidate: kernel-denied offline use and independently copied deployment",
+    "offline": {
+      "code": 0,
+      "stdout": "{\"networkDenied\":true,\"actual\":{\"code\":0,\"stdout\":\"Hello from Lean! 2 + 3 = 5\\n\",\"stderr\":\"Preparing Lean 4.34.1 for node\u2026\\n\"}}\n",
+      "stderr": ""
+    },
+    "deployed": "/tmp/lasm separate \u03bb-reNZlN",
+    "denial": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "native": {
+      "code": 0,
+      "stdout": "Hello from Lean! 2 + 3 = 5\n",
+      "stderr": ""
+    },
+    "actual": {
+      "code": 0,
+      "stdout": "Hello from Lean! 2 + 3 = 5\n",
+      "stderr": ""
+    },
+    "wasmSha256": "ce535fb30b50355d663ba5f5dc8d9bafd536bc0983606eeb23e8bcbb3bbbe25a",
+    "passed": true
+  },
+  "offlineResourceReport": ".work/product-acceptance/node-linux-offline-deploy-r1-resources.json"
+}

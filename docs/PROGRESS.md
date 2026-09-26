@@ -2,6 +2,6 @@
 
 **Estimated finish:** Not yet estimable; the new candidate and both native installed-workflow results remain unverified.
 
-**Changed:** Added standalone Linux candidate packaging, platform/version diagnostics, the basic README and example, and native x86-64/ARM64 installed acceptance workflows. Tests use actual npm/npx commands, kernel-denied developer tools, offline cache reuse, native Lean comparisons, and copied deployments. All 42 focused CLI/deployment/recovery checks passed without resource aborts. Candidate packing and the full native campaigns are still pending; their checkboxes remain open. CI uses standard public runners and the existing cache budget ceiling.
+**Changed:** The 65 MB local candidate packs reproducibly. Installed `npm`/`npx` checks passed for Hello World, build-only output, arguments, exit codes and a local Lake import, using existing verified tools. Kernel-denied offline reuse and a separately copied Node deployment also passed; output matches native Lean. The 42 focused checks passed. No OOM or resource abort occurred. Detailed evidence is in [the warm-install report](evidence/node-linux-warm-install-2026-09-26.json); it does not establish cold installation or ARM64 acceptance.
 
 **Remaining:** Package and exercise the exact basic CLI/README workflow on Linux x86-64; prove the same Node/npm-only installation and deployment on native Linux ARM64; produce the measured support contract and acceptance report.

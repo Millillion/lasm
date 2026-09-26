@@ -119,6 +119,14 @@ for (const mode of ['digest', 'truncated', 'oversized', 'http-error', 'interrupt
   });
 }
 
+test('unreachable download diagnostics identify the tool, host and recovery action', async t => {
+  const f = await fixture(t);
+  await assert.rejects(provisionArtifact(f.artifact, { ...f.options, fetch: async () => { throw new TypeError('fetch failed'); } }),
+    /Could not download tool-1\.tar\.zst from example\.invalid\. Check your network connection and retry/);
+  assert.deepEqual(await readdir(join(f.cache, 'artifacts')), []);
+  assert.equal((await provisionArtifact(f.artifact, f.options)).cacheHit, false);
+});
+
 for (const [name, entries] of [
   ['traversal', [{ path: 'tool/../../escape', body: 'escape' }]],
   ['absolute path', [{ path: '/tool/escape', body: 'escape' }]],

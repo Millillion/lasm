@@ -1,7 +1,7 @@
 // Native installed-package acceptance. Orchestration stays outside Landlock;
 // the package sees only stock Node/npm, OS facilities and its fresh workspace.
 import assert from 'node:assert/strict';
-import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync, statSync } from 'node:fs';
+import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync, statSync, symlinkSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { tmpdir, release } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -25,9 +25,10 @@ const control = join(workspace, 'node-linux-installed.mjs');
 for (const name of ['node-linux-installed.mjs', 'node-cache-controls.mjs'])
   copyFileSync(join(root, 'integration', name), join(workspace, name));
 writeFileSync(join(workspace, 'package.json'), '{"private":true,"type":"module"}\n');
-for (const path of ['home', 'tmp']) mkdirSync(join(workspace, path));
+for (const path of ['home', 'tmp', 'os-bin']) mkdirSync(join(workspace, path));
+symlinkSync('/bin/sh', join(workspace, 'os-bin/sh'));
 for (const path of ['npm-user-config', 'npm-global-config']) writeFileSync(join(workspace, path), '');
-const environment = { PATH: dirname(process.execPath), HOME: join(workspace, 'home'),
+const environment = { PATH: dirname(process.execPath) + ':' + join(workspace, 'os-bin'), HOME: join(workspace, 'home'),
   XDG_CACHE_HOME: join(workspace, 'cache'), TMPDIR: join(workspace, 'tmp'), LANG: 'C.UTF-8',
   LEAN_NUM_THREADS: '2', BINARYEN_CORES: '1', EMCC_CORES: '1',
   npm_config_userconfig: join(workspace, 'npm-user-config'), npm_config_globalconfig: join(workspace, 'npm-global-config'),

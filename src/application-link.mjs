@@ -14,13 +14,18 @@ import { preserveWebWorker } from '../scripts/full-lean/preserve-web-worker.mjs'
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
-export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode }) {
+export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true }) {
   if (![1, 2].includes(memoryMode)) throw new Error('Invalid application memory mode');
   if (!Array.isArray(sources) || !sources.length) throw new Error('Application C sources are required');
   if (leanVersion !== runtime.manifest.lean) throw new Error('Application and runtime versions differ');
   const compileFlags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN',
     '-sMEMORY64=1', '-I', join(runtime.directory, 'include')];
-  const execute = (tool, args) => sdk.execute(tool, args, { stdio: 'inherit', timeout: 1800_000 });
+  // Ordinary CLI users need Lean diagnostics and build progress. Detailed
+  // generated-C/SDK warnings remain available with --verbose; failures retain
+  // their captured diagnostics for the CLI's error reporter.
+  const execute = (tool, args) => sdk.execute(tool, args, {
+    stdio: verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'], timeout: 1800_000, maxBuffer: 8 * 1024 * 1024,
+  });
   const objects = [];
   for (let index = 0; index < sources.length; index++) {
     const object = join(work, `module-${index}.o`);

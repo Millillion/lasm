@@ -84,7 +84,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   const temporary = join(work, '.build-' + randomUUID()), dist = join(temporary, 'dist');
   await mkdir(dist, { recursive: true });
   await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
-    leanVersion: lean.version, memoryMode });
+    leanVersion: lean.version, memoryMode, verbose });
   copyApplicationHost(dist); writeApplicationEntrypoint(dist, target, { node: applicationSupport()?.node });
   await copyApplicationMetadata(metadata, dist);
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));

@@ -110,7 +110,8 @@ try {
     result.lake = { directory, signature: buildInfo(join(directory, 'dist')).signature };
   } else if (phase === 'offline') {
     // Kernel network restrictions, inherited by npm and every build tool.
-    await assert.rejects(fetch('https://example.com', { signal: AbortSignal.timeout(5000) }));
+    await assert.rejects(fetch('https://127.0.0.1:443', { signal: AbortSignal.timeout(5000) }),
+      error => error.cause?.code === 'EACCES', 'Kernel must deny TCP, not merely encounter an unavailable network');
     matchesCli(npx('offline cached npx run', ['Main.lean']), basic);
     assert.equal(statSync(join(result.cached, 'program.wasm')).mtimeMs, result.originalMtime);
     assert.equal(buildInfo(result.cached).signature, result.originalSignature);
