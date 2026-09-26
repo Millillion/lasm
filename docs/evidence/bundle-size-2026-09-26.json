@@ -21,7 +21,7 @@
     "checkedAt": "2026-09-26T14:12:40.319Z"
   },
   "baseline": {
-    "path": ".work/first-build-progress/smoke-r1/project λ/dist",
+    "path": ".work/first-build-progress/smoke-r1/project \u03bb/dist",
     "bytes": 180485088,
     "wasmBytes": 160426863,
     "build": {
@@ -281,7 +281,7 @@
             "seconds": 0.04316931300002034,
             "code": 0,
             "signal": null,
-            "stdout": "features passed: 0, 8, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301384}\n",
+            "stdout": "features passed: 0, 8, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301384}\n",
             "stderr": ""
           },
           {
@@ -289,7 +289,7 @@
             "seconds": 0.04372482699999818,
             "code": 0,
             "signal": null,
-            "stdout": "features passed: 17, 76, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+            "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
             "stderr": ""
           },
           {
@@ -297,7 +297,7 @@
             "seconds": 0.053188763999991354,
             "code": 0,
             "signal": null,
-            "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+            "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
             "stderr": ""
           },
           {
@@ -305,7 +305,7 @@
             "seconds": 0.29682296200000563,
             "code": 0,
             "signal": null,
-            "stdout": "features passed: 0, 8, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301384}\n",
+            "stdout": "features passed: 0, 8, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301384}\n",
             "stderr": ""
           },
           {
@@ -313,7 +313,7 @@
             "seconds": 0.30598399400000925,
             "code": 0,
             "signal": null,
-            "stdout": "features passed: 17, 76, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+            "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
             "stderr": ""
           },
           {
@@ -321,7 +321,7 @@
             "seconds": 0.2963646690000023,
             "code": 0,
             "signal": null,
-            "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+            "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
             "stderr": ""
           }
         ],
@@ -722,7 +722,7 @@
   ],
   "resourcePolicy": "One guarded local build at a time, 8 GiB cap, proactive stop below cap, no swap, one Binaryen worker, base pages, four-GiB disk reserve. No OOM events. Aborted duplicate metadata was hard-linked only after byte-identity verification; evidence paths and bytes preserved.",
   "installedCandidate": {
-    "status": "x64 passed; ARM64 proactive resource stop; unchanged archive awaiting recheck",
+    "status": "Same archive passed both native Linux architectures; draft retention pending",
     "candidate": {
       "scope": "Reproducible local npm packing; native installed acceptance is separate",
       "tarball": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz",
@@ -753,7 +753,29 @@
       "jobId": 108431156365,
       "evidence": "bundle-size-arm64-resource-abort-2026-09-26.json"
     },
-    "npmPublished": false
+    "npmPublished": false,
+    "nativeRecheck": {
+      "run": "https://github.com/Millillion/lasm/actions/runs/36253615772",
+      "controlsSourceRevision": "e4c23473d024f13476d3fdcf98fdcaaebc146b09",
+      "packageUnchanged": true,
+      "linux-x64": {
+        "passed": true,
+        "jobId": 108436154220,
+        "evidence": "bundle-size-linux-x64-recheck-2026-09-26.json"
+      },
+      "linux-arm64": {
+        "passed": true,
+        "jobId": 108436154129,
+        "evidence": "bundle-size-linux-arm64-recheck-2026-09-26.json"
+      },
+      "candidateRetention": {
+        "passed": false,
+        "jobId": 108439246788,
+        "failure": "GitHub API HTTP 403 when draft targeted the older package-source commit, which has no current branch/tag ref",
+        "nativeResultsUnaffected": true,
+        "permissionRule": "https://github.blog/changelog/2023-11-02-github-actions-enforcing-workflow-scope-when-creating-a-release/"
+      }
+    }
   },
   "legacyImports": {
     "report": ".work/bundle-size/legacy-r1/result.json",
@@ -770,12 +792,12 @@
     "js": 242730,
     "native": {
       "code": 0,
-      "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+      "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
       "stderr": ""
     },
     "actual": {
       "code": 0,
-      "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+      "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
       "stderr": ""
     },
     "resources": {

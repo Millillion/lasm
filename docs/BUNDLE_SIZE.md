@@ -130,37 +130,56 @@ Candidate `0.1.0-experimental.34`, source
 The archive is 65,335,003 bytes; deployment reduction does not remove the build
 libraries needed to compile different applications from the npm package.
 
-Native Linux x86-64 passed [installed-package CI](https://github.com/Millillion/lasm/actions/runs/36250526691/job/108427789071).
-The first native ARM64 attempt stopped at its proactive memory budget during
-runtime evaluation, after the seven small application builds/comparisons passed.
-It had no OOM. It is not yet a full platform pass. The [abort record](evidence/bundle-size-arm64-resource-abort-2026-09-26.json)
-preserves the original result and the targeted CI-only cache-advice correction.
-Both architectures will recheck the same archive, without repacking or changing
-assertions, timeouts, memory limits or deployment files.
-The packaging job passed 113 Node tests and three Python cache-advice controls.
-The [x86-64 evidence](evidence/bundle-size-linux-x64-2026-09-26.json) records
-49 command checks, eight isolated deployments and nine execution cases. The
-runtime-evaluation output was moved instead of copied to avoid a duplicate large
-module-data tree; access to original source, package and tools was still denied.
+Both native Linux architectures passed all 49 command checks, eight isolated
+deployments and nine execution cases using that exact archive in the
+[native recheck](https://github.com/Millillion/lasm/actions/runs/36253615772).
+The [x86-64 record](evidence/bundle-size-linux-x64-recheck-2026-09-26.json) and
+[ARM64 record](evidence/bundle-size-linux-arm64-recheck-2026-09-26.json) preserve
+all output, resource and disk measurements. Controls ran at
+`e4c23473d024f13476d3fdcf98fdcaaebc146b09`; the package was not rebuilt.
+The packaging job passed 113 Node tests; the native jobs each passed four
+small Python controls for cache advice before installed acceptance.
 
-| Complete deployment | Linux x86-64, bytes |
-| --- | ---: |
-| Hello | 3,209,670 |
-| Hello plus 1,000 unused functions | 3,209,672 |
-| Tiny Lake project | 3,210,293 |
-| Language and JSON fixture | 2,881,825 |
-| Same fixture with legacy imports | 3,592,645 |
-| Filesystem fixture | 3,298,829 |
-| Runtime evaluation with full module data | 2,385,695,830 |
+The first x86-64 attempt also [passed](evidence/bundle-size-linux-x64-2026-09-26.json).
+The first ARM64 attempt stopped proactively during runtime evaluation, with no
+OOM. Its [abort record](evidence/bundle-size-arm64-resource-abort-2026-09-26.json)
+remains unchanged. The correction advises the file cache of completed, receipted
+native comparison executables after compilation. It does not change package
+bytes, assertions, timeouts, memory limits or deployed files. Both rechecks passed
+with this CI-only correction, and no OOM or resource abort occurred.
 
-Hello and the unused-function variant have exactly the same Wasm SHA-256.
-The recorded x86-64 cold build took 278.71 seconds, while median first stdout
-from plain Node was 0.268 seconds across three samples. These are observations
-from one runner and this candidate, not guarantees for other workloads or hosts.
-The expanded campaign peaked at 4.74 GiB with no OOM or resource abort.
+The runtime-evaluation output was moved instead of copied to avoid a duplicate
+large module-data tree. All eight relocated deployments still execute with access
+to the original source, package and managed tools denied by Landlock.
+
+| Complete deployment | Linux x86-64, bytes | Linux ARM64, bytes |
+| --- | ---: | ---: |
+| Hello | 3,209,670 | 3,224,568 |
+| Hello plus 1,000 unused functions | 3,209,672 | 3,224,570 |
+| Tiny Lake project | 3,210,293 | 3,225,197 |
+| Language and JSON fixture | 2,881,825 | 2,896,723 |
+| Same fixture with legacy imports | 3,592,645 | 3,607,559 |
+| Filesystem fixture | 3,298,829 | 3,313,743 |
+| Runtime evaluation with full module data | 2,385,695,830 | 2,385,710,744 |
+
+On each architecture, Hello and its unused-function variant have exactly the
+same Wasm SHA-256. The x86-64 cold build took 258.78 seconds; ARM64 took 255.62
+seconds. Median first stdout from plain Node was 0.278 and 0.228 seconds,
+respectively, across three samples each. The whole guarded campaigns peaked at
+4.35 and 4.38 GiB. These are observations from individual runners and this
+candidate, not guarantees for other workloads or hosts.
 
 Full runtime evaluation remains a deliberately broad compatibility fallback,
 **not a minimized compiler distribution**. Its 2.39 GB output must not be confused
 with the small ordinary-application measurements. Further work on compiler/module
 packaging needs its own correctness evidence; application code elimination must
 not silently remove runtime-resolved declarations or change initializer effects.
+
+Draft retention is being retried separately; both native test jobs passed. The
+original retention job returned HTTP 403 while targeting the older package-source
+commit. That matches GitHub's [workflow-commit permission rule](https://github.blog/changelog/2023-11-02-github-actions-enforcing-workflow-scope-when-creating-a-release/).
+The retention workflow verifies both native job results, their logged candidate
+hashes and original source identities, then creates an unpublished draft targeting
+the current retention commit. Its notes distinguish package, validation and
+retention revisions. No extra token permissions or repeated compiler campaign
+are needed.
