@@ -97,7 +97,9 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
     const result = await nativeFiles().createTemporary(directory.path(template, state), isDirectory);
     // Creation uses the retained guest cwd; the returned name preserves the
     // original relative spelling rather than exposing the internal fd anchor.
-    const name = Buffer.concat([template.subarray(0, -6), result.path.subarray(-6)]);
+    // Darwin replaces every trailing X; glibc replaces only the final six.
+    // Retain the complete eight-character suffix returned by either libc.
+    const name = Buffer.concat([template.subarray(0, -8), result.path.subarray(-8)]);
     return isDirectory ? name : Buffer.concat([numbers(add(result.file)), name]);
   }
   function serial(file, action) {

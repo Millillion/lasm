@@ -42,6 +42,7 @@ jobs:
           node scripts/ci/check-darwin-guard.mjs
           node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-isolation-resources.json -- node scripts/ci/check-darwin-isolation.mjs
           node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-directory-resources.json -- node --test test/native-directory.test.mjs
+          node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-temporary-resources.json -- node --test test/native-temporary.test.mjs
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
@@ -53,4 +54,4 @@ jobs:
       - name: Preserve acceptance evidence
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/darwin-guard-normal.json','.work/darwin-guard-cleanup.json','.work/darwin-guard-below-cap-stop.json','.work/darwin-isolation-resources.json','.work/darwin-directory-resources.json','.work/darwin-isolation-control.json','.work/node-darwin-acceptance/result.json','.work/node-darwin-resources.json','.work/node-darwin-disk.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+          node -e "const f=require('node:fs');for(const p of ['.work/darwin-guard-normal.json','.work/darwin-guard-cleanup.json','.work/darwin-guard-below-cap-stop.json','.work/darwin-isolation-resources.json','.work/darwin-directory-resources.json','.work/darwin-temporary-resources.json','.work/darwin-isolation-control.json','.work/node-darwin-acceptance/result.json','.work/node-darwin-resources.json','.work/node-darwin-disk.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
