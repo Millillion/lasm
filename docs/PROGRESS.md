@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable; complete suite/API coverage, shipping helper integration and five native platform validations remain unfinished.
 
-**Changed:** The [standalone preview now uses an explicit baseline CPU target](evidence/wasmtime-baseline-lifecycle-2026-09-25.json). All 27 fresh lifecycle comparisons pass across Node, Deno and Bun, including completed deleted-directory recovery. CPU/cache, stale-input rejection and existing environment/import controls pass. Deployment peaks at 1.22 GiB without resource events. Different physical CPUs remain unverified; the shipping Bun `const_fold` failure remains open.
+**Changed:** The [Bun continuation completes all previously unrun application registrations](evidence/lean-4.34.1-upstream-applications-bun-combined-2026-09-26.json). Its 25 passes and one original exclusion bring combined coverage to 96 passes, four exclusions and the preserved `const_fold` failure. All 7,673 original entries and the frozen harness remain unchanged. Peak memory is 5.58 GiB without resource events; minimum free disk is 4.48 GiB. This is combined coverage, not a complete category pass.
 
 **Remaining:** Complete language/API and callable-library parity; ship and validate general imports, descriptors and runtime cleanup; finish all six native build/install platforms.
 

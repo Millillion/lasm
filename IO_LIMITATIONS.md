@@ -73,7 +73,11 @@ general helper/API parity and the other native platforms remain unfinished.
   now also passes all 97 deployed cases, retaining the four original exclusions,
   all 7,673 source entries, the unchanged harness and native compiler-child
   classification. Peak memory is 5.51 GiB with no resource events and at least
-  4.15 GiB free disk. The latest complete Bun campaign remains pending.
+  4.15 GiB free disk. The [latest Bun continuation](docs/evidence/lean-4.34.1-upstream-applications-bun-combined-2026-09-26.json)
+  completes all previously unrun registrations: combined coverage is 96 passes,
+  four original compilation-disabled exclusions and the retained `const_fold`
+  failure. All original sources and the frozen harness remain unchanged, with
+  no resource events. Shipping Bun repair and a complete category pass remain open.
   The [installed `.31` working-directory repair](docs/evidence/lean-4.34.1-raw-working-directory-2026-09-25.json)
   also passes eighteen relocated deployments against 36 native controls. Both
   cwd APIs, relative filesystem mutations and parent traversal match for Unicode,

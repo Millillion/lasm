@@ -134,8 +134,17 @@ now exposes the underlying Lean exception: thread creation failed with
 adds exception decoding; the original deployment remains byte-for-byte unchanged.
 All 7,673 original entries and the frozen harness remain unchanged. Guarded
 memory peaks at 6.01 GiB, with no OOM, swap, pressure or disk stop. This is an
-interrupted campaign, not a complete category pass; every unfinished registration
-remains pending alongside the Bun runtime repair.
+interrupted campaign, not a complete category pass.
+
+The [exact 26 uncompleted registrations now have results](evidence/lean-4.34.1-upstream-applications-bun-combined-2026-09-26.json)
+through the same installed `.31`: 25 deployed passes and the fourth original
+compilation-disabled exclusion. Combined coverage is **96 passes, four original
+exclusions and one `const_fold` failure**, with no unexecuted registration in
+this category. The continuation preserves all 7,673 original entries and its
+frozen harness, peaks at 5.58 GiB with no resource events, and retains at least
+4.48 GiB free disk. Both original HTTP benchmarks pass. Compiler children retain
+their native classification. This combines two campaigns; the shipping Bun
+runtime repair and complete category pass remain unfinished.
 
 The [four compilation-disabled inputs now pass separate AOT controls in all
 three installed engines](evidence/lean-4.34.1-compile-disabled-2026-09-25.json):
