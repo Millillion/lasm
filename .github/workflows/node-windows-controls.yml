@@ -1,0 +1,40 @@
+name: Native Windows resource and isolation controls
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  control:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            architecture: x64
+          - runner: windows-11-arm
+            architecture: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    env:
+      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.architecture }}
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Verify native host
+        env:
+          EXPECTED_ARCH: ${{ matrix.architecture }}
+        run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-'+process.env.EXPECTED_ARCH)"
+      - name: Verify deadline cleanup below the memory cap
+        run: node integration/windows-guard-deadline.mjs
+      - name: Verify Node, filesystem restrictions and online/offline capabilities
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --timeout-seconds 480 --report .work/windows-isolation-resources.json -- node scripts/ci/windows-isolation-controls.mjs
+      - name: Preserve results and setup diagnostics
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');for(const d of ['.work','.work/windows-isolation-controls'])if(f.existsSync(d))for(const n of f.readdirSync(d).filter(n=>n.endsWith('.json')||n.endsWith('.stderr')||n.endsWith('.stdout')))if(f.statSync(d+'/'+n).isFile()&&f.statSync(d+'/'+n).size<1000000)console.log(d+'/'+n+'\n'+f.readFileSync(d+'/'+n,'utf8'))"
