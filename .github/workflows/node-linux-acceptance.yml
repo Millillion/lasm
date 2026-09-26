@@ -61,11 +61,11 @@ jobs:
         id: budget
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/ci/cache-budget.mjs .work/node-candidate/lasm-compiler-0.1.0-experimental.33.tgz .work/node-candidate-budget.json
+        run: node scripts/ci/cache-budget.mjs .work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz .work/node-candidate-budget.json
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: steps.budget.outputs.allowed == 'true'
         with:
-          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.33.tgz
+          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz
           key: lasm-node-linux-candidate-${{ github.run_id }}-${{ steps.package.outputs.sha256 }}
       - name: Preserve candidate identity and packing measurements
         if: always()
@@ -102,7 +102,7 @@ jobs:
           package-manager-cache: false
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.33.tgz
+          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz
           key: ${{ needs.package.outputs.cache-key }}
           fail-on-cache-miss: true
       - name: Verify the tested archive and prepare its receipt
@@ -114,8 +114,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "node-linux-candidate-$GITHUB_RUN_ID" \
-            .work/node-candidate/lasm-compiler-0.1.0-experimental.33.tgz \
+            .work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz \
             .work/node-candidate/SHA256SUMS.txt \
             --draft --prerelease --target "$GITHUB_SHA" \
-            --title 'Lasm Linux Node candidate 0.1.0-experimental.33' \
+            --title 'Lasm Linux Node candidate 0.1.0-experimental.34' \
             --notes-file .work/node-candidate/notes.md

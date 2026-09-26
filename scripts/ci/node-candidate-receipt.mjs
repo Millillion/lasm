@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 
 assert.equal(process.env.GITHUB_REPOSITORY, 'Millillion/lasm');
 assert.equal(process.env.GITHUB_REF, 'refs/heads/main');
-const filename = 'lasm-compiler-0.1.0-experimental.33.tgz';
+const filename = 'lasm-compiler-0.1.0-experimental.34.tgz';
 const hash = createHash('sha256');
 for await (const chunk of createReadStream('.work/node-candidate/' + filename)) hash.update(chunk);
 const sha256 = hash.digest('hex');

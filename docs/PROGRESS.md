@@ -2,4 +2,4 @@
 
 **Verified locally:** Hello shrank from 180.49 MB to 3.21 MB; 1,000 unused definitions add no Wasm bytes. The language/JSON fixture is 2.88 MB, filesystem 3.30 MB, and HTTP server 4.18 MB. Native comparisons, 20 unchanged HTTP tests, seven runtime evaluations and 113 focused tests pass. Largest final campaign peak: 3.39 GiB; no OOM. Two earlier disk-reserve aborts remain recorded separately in [evidence](evidence/bundle-size-2026-09-26.json).
 
-**Remaining:** Pack candidate `.33` and run installed-package, offline and isolated-deployment checks on native Linux x86-64 and ARM64. The accepted `.32` candidate remains unchanged. No npm publication. First-build logging is included in the next candidate. ETA: one CI campaign if both architectures pass; fixes are not yet estimable.
+**Remaining:** Pack candidate `.34` and run installed-package, offline and isolated-deployment checks on native Linux x86-64 and ARM64. The accepted `.32` candidate remains unchanged. No npm publication. First-build logging is included in the next candidate. ETA: one CI campaign if both architectures pass; fixes are not yet estimable.

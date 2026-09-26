@@ -12,7 +12,7 @@ import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../', import.meta.url));
-const [outputArg, runtimeArg, nativeArg, manifestSha256, version = '0.1.0-experimental.33', ...extra] = process.argv.slice(2);
+const [outputArg, runtimeArg, nativeArg, manifestSha256, version = '0.1.0-experimental.34', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && runtimeArg && nativeArg && /^[a-f0-9]{64}$/.test(manifestSha256 ?? '') && !extra.length
   && /^0\.1\.0-experimental\.\d+$/.test(version),
 'Usage: package-node-release.mjs NEW_OUTPUT RUNTIME NATIVE_BUNDLE RUNTIME_MANIFEST_SHA256 [VERSION]');

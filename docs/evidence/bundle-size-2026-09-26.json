@@ -708,12 +708,17 @@
     {
       "name": "features-r2",
       "outcome": "Disk reserve abort, not an API failure. Weak shared C++ helpers were conservatively misclassified as compiler state; corrected with symbol bindings and live section evidence."
+    },
+    {
+      "name": "CI 36250388098",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36250388098",
+      "outcome": "Cancelled during packaging to correct candidate-facing documentation before native acceptance. Not a platform pass or product failure."
     }
   ],
   "resourcePolicy": "One guarded local build at a time, 8 GiB cap, proactive stop below cap, no swap, one Binaryen worker, base pages, four-GiB disk reserve. No OOM events. Aborted duplicate metadata was hard-linked only after byte-identity verification; evidence paths and bytes preserved.",
   "installedCandidate": {
     "status": "pending",
-    "version": "0.1.0-experimental.33",
+    "version": "0.1.0-experimental.34",
     "nativeArchitectures": [
       "x64",
       "arm64"

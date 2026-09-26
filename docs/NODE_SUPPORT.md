@@ -26,9 +26,12 @@ Pinned compressed tool downloads, including Git for a Lake project, total
 979,054,712 bytes on x86-64 and 910,904,894 bytes on ARM64. A standalone file skips
 the Git download. These totals exclude the npm package and generated build files;
 unpacked tools and build caches occupy several GB. The acceptance report records
-observed disk usage and build times separately. The tested cold build took about
-3.6–3.7 minutes on CI, with a roughly 180 MB Hello World deployment. These are
-current measured costs, not performance guarantees for other machines.
+observed disk usage, build times and deployment sizes separately. These are
+measurements of the identified candidate, not performance guarantees for other machines.
+The current builder removes unreachable code and includes only the deployment
+architecture's native helpers. Runtime evaluation keeps the full compiler and
+module data when needed. See the [size report](https://github.com/Millillion/lasm/blob/main/docs/BUNDLE_SIZE.md)
+for ordinary applications and the larger runtime-evaluation fallback.
 
 Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm`. Set
 `LASM_TOOLCHAIN_CACHE` to choose another directory. Compiled application caches
@@ -60,7 +63,8 @@ extraction, verification, compilation, linking and completion. Long phases emit
 elapsed-time updates every ten seconds, including while the compiler is busy.
 Download waits report when no new bytes have arrived. Status goes to stderr, so
 the application's stdout remains usable in pipes. These logging improvements
-postdate the accepted `.32` archive; that retained archive is unchanged.
+are checked in installed-package acceptance. The historical `.32` archive
+predates these improvements and remains unchanged.
 The package is a private experimental candidate, not an npm publication or a
 claim that every Lean program works. macOS, Windows, Deno, Bun, HTTP/filesystem
 parity and broad third-party packages remain separate milestones.

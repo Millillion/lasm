@@ -9,10 +9,10 @@ for verified platforms and the exact candidate. The package has not been publish
 to npm. Complete Lean language and library compatibility is later work.
 
 Download the candidate linked in the acceptance report, then create an empty
-directory and install the tarball:
+directory and install the tarball (replace `VERSION` with its actual version):
 
 ```sh
-npm install /path/to/lasm-compiler-0.1.0-experimental.32.tgz
+npm install /path/to/lasm-compiler-VERSION.tgz
 ```
 
 After a separately authorized npm release, installation will be
@@ -34,7 +34,8 @@ npx lasm Main.lean
 
 The program prints `Hello from Lean! 2 + 3 = 5`. The first run needs internet
 access, downloads about 1 GB of build tools, and uses several GB of disk space.
-Later runs reuse verified tools and unchanged builds. See
+The terminal reports downloads and build phases, with elapsed-time updates during
+long steps. Later runs reuse verified tools and unchanged builds. See
 [requirements and cache details](docs/NODE_SUPPORT.md).
 
 Build a deployment without running the program:
@@ -45,7 +46,10 @@ node dist/main.mjs
 ```
 
 Copy the **entire `dist/` directory** to another supported Linux machine with the
-same architecture and Node version. It needs no Lean source, npm installation,
+same architecture and Node version. Ordinary applications include only reachable
+code and required runtime support; size depends on what the application uses.
+See [deployment-size measurements](https://github.com/Millillion/lasm/blob/main/docs/BUNDLE_SIZE.md).
+It needs no Lean source, npm installation,
 build tools, or development cache. Build separately on each architecture.
 
 Pass program arguments with `npx lasm Main.lean -- hello`. Existing Lean projects
