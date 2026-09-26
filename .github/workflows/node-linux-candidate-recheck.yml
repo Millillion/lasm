@@ -1,0 +1,72 @@
+name: Recheck retained Linux Node candidate
+on:
+  workflow_dispatch:
+    inputs:
+      candidate-cache-key:
+        description: Exact cache key of the already packed candidate
+        required: true
+        type: string
+      candidate-sha256:
+        description: SHA-256 of that unchanged npm archive
+        required: true
+        type: string
+      candidate-source-revision:
+        description: Original source commit recorded inside the package
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: lasm-node-candidate-recheck
+  cancel-in-progress: false
+jobs:
+  # These are separate native machines. The candidate has already passed the
+  # initial x64 gate; recheck both with the corrected CI resource profile.
+  linux-x64:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/node-linux-consumer.yml
+    with:
+      runner: ubuntu-24.04
+      architecture: x64
+      sha256: ${{ inputs.candidate-sha256 }}
+      cache-key: ${{ inputs.candidate-cache-key }}
+  linux-arm64:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/node-linux-consumer.yml
+    with:
+      runner: ubuntu-24.04-arm
+      architecture: arm64
+      sha256: ${{ inputs.candidate-sha256 }}
+      cache-key: ${{ inputs.candidate-cache-key }}
+  candidate:
+    needs: [linux-x64, linux-arm64]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.candidate-sha256 }}
+      LASM_CANDIDATE_SOURCE_REVISION: ${{ inputs.candidate-source-revision }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz
+          key: ${{ inputs.candidate-cache-key }}
+          fail-on-cache-miss: true
+      - name: Verify original candidate identity and record both native passes
+        run: node scripts/ci/node-candidate-receipt.mjs
+      - name: Retain the exact tested candidate in an unpublished draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "node-linux-candidate-$GITHUB_RUN_ID" \
+            .work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz \
+            .work/node-candidate/SHA256SUMS.txt \
+            --draft --prerelease --target "$LASM_CANDIDATE_SOURCE_REVISION" \
+            --title 'Lasm Linux Node candidate 0.1.0-experimental.34' \
+            --notes-file .work/node-candidate/notes.md

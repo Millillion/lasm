@@ -44,6 +44,8 @@ jobs:
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Verify scoped cache advice preserves comparison and deployment files
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 256 --report .work/node-advice-control-resources.json -- python3 -I -B test/tool-cache-advice.test.py
       - name: Cold npm install, real npx commands, offline reuse and independent deployment
         run: node scripts/ci/run-node-linux.mjs
       - name: Preserve acceptance evidence in logs and summary

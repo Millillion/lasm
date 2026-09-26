@@ -713,11 +713,16 @@
       "name": "CI 36250388098",
       "url": "https://github.com/Millillion/lasm/actions/runs/36250388098",
       "outcome": "Cancelled during packaging to correct candidate-facing documentation before native acceptance. Not a platform pass or product failure."
+    },
+    {
+      "name": "CI ARM64 108431156365",
+      "outcome": "Proactive resource stop, zero OOM. Inactive pages included large completed native comparison executables. CI-only cache advice now includes receipted immutable native controls; product archive and assertions remain unchanged.",
+      "evidence": "bundle-size-arm64-resource-abort-2026-09-26.json"
     }
   ],
   "resourcePolicy": "One guarded local build at a time, 8 GiB cap, proactive stop below cap, no swap, one Binaryen worker, base pages, four-GiB disk reserve. No OOM events. Aborted duplicate metadata was hard-linked only after byte-identity verification; evidence paths and bytes preserved.",
   "installedCandidate": {
-    "status": "linux-x64 passed; native ARM64 running",
+    "status": "x64 passed; ARM64 proactive resource stop; unchanged archive awaiting recheck",
     "candidate": {
       "scope": "Reproducible local npm packing; native installed acceptance is separate",
       "tarball": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz",
@@ -744,8 +749,9 @@
       "jobId": 108427789071
     },
     "linux-arm64": {
-      "status": "running",
-      "jobId": 108431156365
+      "status": "resource-aborted",
+      "jobId": 108431156365,
+      "evidence": "bundle-size-arm64-resource-abort-2026-09-26.json"
     },
     "npmPublished": false
   },

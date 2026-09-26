@@ -98,6 +98,24 @@ def advise_applications(project, synchronized, evidence):
                 advise_tree(tree, 'applications/' + str(tree.relative_to(project)), synchronized, evidence)
 
 
+def advise_native_controls(project, synchronized, evidence):
+    # AOT comparison executables containing Lean can exceed 200 MB each. They
+    # are maintainer test artifacts, not application deployments. Each compile
+    # publishes a receipt in a fresh directory; no completed tree is rewritten.
+    parent = project / '.native-control'
+    if not parent.is_dir() or parent.is_symlink():
+        return
+    for tree in parent.iterdir():
+        if tree.is_symlink() or not tree.is_dir():
+            continue
+        receipt = tree / '.lasm-native-control.json'
+        if receipt.is_symlink() or not receipt.is_file():
+            continue
+        if json.loads(receipt.read_text()).get('schema') != 1:
+            raise RuntimeError('Unrecognized native comparison receipt: ' + str(receipt))
+        advise_tree(tree, 'native-controls/' + tree.name, synchronized, evidence)
+
+
 def main():
     group = require_guard()
     cache, report, stop, *projects = map(Path, sys.argv[1:])
@@ -106,7 +124,7 @@ def main():
     assert all(project.is_absolute() and not project.is_symlink() for project in projects)
     synchronized = set()
     evidence = {'method': 'fdatasync once per completed immutable cache tree; repeated POSIX_FADV_DONTNEED',
-                'scope': 'Completed immutable tools and optional application build caches only; excludes deployment files, package, staging and SDK state. No file changes, global cache drops or resource-limit changes',
+                'scope': 'Completed immutable tools, application build caches and receipted native comparison artifacts only; excludes deployment files, package, staging and SDK state. No file changes, global cache drops or resource-limit changes',
                 'cache': str(cache), 'trees': {}, 'passes': 0, 'adviceCalls': 0,
                 'advisedBytesIncludingRepeats': 0, 'status': 'running'}
 
@@ -125,6 +143,7 @@ def main():
             advise_completed(cache, synchronized, evidence)
             for project in projects:
                 advise_applications(project, synchronized, evidence)
+                advise_native_controls(project, synchronized, evidence)
             evidence['fileBytesAfterLastPass'] = int(cached_bytes())
             evidence['passes'] += 1
             save()

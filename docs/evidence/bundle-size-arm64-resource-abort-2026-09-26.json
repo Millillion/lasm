@@ -1,0 +1,1518 @@
+{
+  "scope": "Preserved ARM64 resource abort; not a behavior failure or a completed native platform pass",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36250526691",
+  "job": "https://github.com/Millillion/lasm/actions/runs/36250526691/job/108431156365",
+  "candidateSha256": "8af35118e9919f7cd0529507ee7c693a78ba55064bbfefbea35237235e7cd027",
+  "cause": "Proactive cgroup memory budget reached with 3,002,421,248 bytes of inactive file pages; no OOM, swap or pressure events. Seven small application builds/native comparisons passed; final isolation and runtime-evaluation gates were not complete.",
+  "correction": "Extend existing CI-only file-cache advice to completed, immutable, receipted native comparison outputs in fresh per-compile directories. Do not advise deployment files, staging or active compiler output. Preserve limits and test assertions; recheck the identical npm archive on both native architectures.",
+  "acceptance": {
+    "scope": "Native Linux installed CLI, offline cache and copied deployment; preinstalled developer tools and checkout contents denied by Landlock",
+    "platform": "linux-arm64",
+    "node": "v26.10.0",
+    "kernel": "6.17.0-1022-azure",
+    "osRelease": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+    "glibc": "2.39",
+    "sourceRevision": "484f86c3ab688660c2707b865442130d784e818e",
+    "archiveSha256": "8af35118e9919f7cd0529507ee7c693a78ba55064bbfefbea35237235e7cd027",
+    "archiveBytes": 65335003,
+    "workspace": "/tmp/lasm node Linux λ-wF764C",
+    "resourceReport": "/home/runner/work/lasm/lasm/.work/node-linux-resources.json",
+    "startedAt": "2026-09-26T15:24:38.703Z",
+    "passed": false,
+    "activePhase": "offline",
+    "phaseExecutions": [
+      {
+        "phase": "cold",
+        "code": 0,
+        "diagnostic": ""
+      },
+      {
+        "phase": "lake",
+        "code": 0,
+        "diagnostic": ""
+      }
+    ],
+    "installation": {
+      "steps": [
+        {
+          "label": "npm install candidate",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npm",
+            "install",
+            "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 5.288459397,
+          "code": 0,
+          "stdout": "\nadded 7 packages in 5s\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "npm version",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npm",
+            "--version"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.07323652399999991,
+          "code": 0,
+          "stdout": "11.19.1\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "cold npx lasm Main.lean",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 266.71750556200004,
+          "code": 0,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] First-time tool setup can take a few minutes. Lasm downloads and verifies its tools automatically; later builds reuse them.\n[lasm] Tools cache: /tmp/lasm node Linux λ-wF764C/cache/lasm\n[lasm] Downloading Lean 4.34.1 and Lake: 0 B / 581.9 MB (0%) — 0s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 381.9 MB / 581.9 MB (65%) — 9s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 581.9 MB / 581.9 MB (100%) — 14s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake — 5s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake — 15s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake — 4s elapsed\n[lasm] Finishing Lean 4.34.1 and Lake setup — 0s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Downloading Python 3.13.15: 0 B / 29.2 MB (0%) — 0s elapsed\n[lasm] Downloading Python 3.13.15: 29.2 MB / 29.2 MB (100%) — 0s elapsed\n[lasm] Extracting Python 3.13.15 — 0s elapsed\n[lasm] Verifying installed Python 3.13.15 — 0s elapsed\n[lasm] Finishing Python 3.13.15 setup — 0s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 0 B / 276.5 MB (0%) — 0s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 64.4 MB / 276.5 MB (23%) — 3s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 276.5 MB / 276.5 MB (100%) — 11s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) — 1s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) — 11s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) — 21s elapsed\n[lasm] Verifying installed compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Finishing compiler tools (Emscripten 6.0.9) setup — 0s elapsed\n[lasm] Preparing and checking compiler tools — 0s elapsed\n[lasm] Preparing and checking compiler tools — 2s elapsed\n[lasm] Compiling application module 1 of 1 — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Checking required runtime code — 0s elapsed\n[lasm] Checking required runtime code — 9s elapsed\n[lasm] Checking required runtime code — 19s elapsed\n[lasm] Checking required runtime code — 29s elapsed\n[lasm] Checking required runtime code — 39s elapsed\n[lasm] Checking required runtime code — 49s elapsed\n[lasm] Checking required runtime code — 59s elapsed\n[lasm] Checking required runtime code — 1m 9s elapsed\n[lasm] Checking required runtime code — 1m 19s elapsed\n[lasm] Linking application and Lean runtime — 0s elapsed\n[lasm] Linking application and Lean runtime — 4s elapsed\n[lasm] Linking application and Lean runtime — 14s elapsed\n[lasm] Linking application and Lean runtime — 24s elapsed\n[lasm] Linking application and Lean runtime — 34s elapsed\n[lasm] Linking application and Lean runtime — 44s elapsed\n[lasm] Linking application and Lean runtime — 54s elapsed\n[lasm] Linking application and Lean runtime — 1m 4s elapsed\n[lasm] Linking application and Lean runtime — 1m 14s elapsed\n[lasm] Preparing the application launcher — 0s elapsed\n[lasm] Packaging the application and runtime support — 0s elapsed\n[lasm] Verifying and writing application output — 0s elapsed\n[lasm] Build ready (4m 26s total).\n[lasm] Running Main.lean…\n",
+          "signal": null
+        },
+        {
+          "label": "npx lasm build Main.lean",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "build",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 12.737838700000022,
+          "code": 0,
+          "stdout": "",
+          "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Reusing verified application build — 0s elapsed\n[lasm] Reused cached build (12s total).\nReused Lean 4.34.1 for node: /tmp/lasm node Linux λ-wF764C/project space λ/dist\n",
+          "signal": null
+        },
+        {
+          "label": "native comparison: Main.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/lean",
+            "--run",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 1.3832892730000312,
+          "code": 0,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "plain Node: hello",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/dist/main.mjs"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.25328964900004214,
+          "code": 0,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "Lake local import",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語",
+          "seconds": 56.096871418,
+          "code": 0,
+          "stdout": "Lean module: 42\n",
+          "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] First-time tool setup can take a few minutes. Lasm downloads and verifies its tools automatically; later builds reuse them.\n[lasm] Tools cache: /tmp/lasm node Linux λ-wF764C/cache/lasm\n[lasm] Downloading Git 2.53.0: 0 B / 23.2 MB (0%) — 0s elapsed\n[lasm] Downloading Git 2.53.0: 23.2 MB / 23.2 MB (100%) — 0s elapsed\n[lasm] Extracting Git 2.53.0 — 0s elapsed\n[lasm] Verifying installed Git 2.53.0 — 0s elapsed\n[lasm] Finishing Git 2.53.0 setup — 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies — 0s elapsed\ninfo: greeting: no previous manifest, creating one from scratch\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Verifying cached Python 3.13.15 — 0s elapsed\n[lasm] Verifying cached Python 3.13.15 — 1s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 9s elapsed\n[lasm] Preparing and checking compiler tools — 0s elapsed\n[lasm] Compiling application module 1 of 2 — 0s elapsed\n[lasm] Compiling application module 2 of 2 — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Checking required runtime code — 0s elapsed\n[lasm] Linking application and Lean runtime — 0s elapsed\n[lasm] Linking application and Lean runtime — 6s elapsed\n[lasm] Preparing the application launcher — 0s elapsed\n[lasm] Packaging the application and runtime support — 0s elapsed\n[lasm] Verifying and writing application output — 0s elapsed\n[lasm] Build ready (55s total).\n[lasm] Running Main.lean…\n",
+          "signal": null
+        },
+        {
+          "label": "Lake deployment build",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "build",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語",
+          "seconds": 17.37961332899999,
+          "code": 0,
+          "stdout": "",
+          "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Verifying cached Git 2.53.0 — 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Reusing verified application build — 0s elapsed\n[lasm] Reused cached build (17s total).\nReused Lean 4.34.1 for node: /tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語/dist\n",
+          "signal": null
+        },
+        {
+          "label": "offline cached npx run",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 12.844519771000002,
+          "code": 0,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Reusing verified application build — 0s elapsed\n[lasm] Reused cached build (12s total).\n[lasm] Running Main.lean…\n",
+          "signal": null
+        },
+        {
+          "label": "Lean diagnostic",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Broken.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 13.755032360000001,
+          "code": 1,
+          "stdout": "",
+          "stderr": "[lasm] Preparing Broken.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n/tmp/lasm node Linux λ-wF764C/project space λ/Broken.lean:1:33: error(lean.unknownIdentifier): Unknown identifier `unknownGreeting`\n\n",
+          "signal": null
+        },
+        {
+          "label": "unsupported Lean pin",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.3344957050000012,
+          "code": 1,
+          "stdout": "",
+          "stderr": "[lasm] Preparing Main.lean — 0s elapsed\nUnsupported Lean toolchain \"leanprover/lean4:v999.0.0\" in /tmp/lasm node Linux λ-wF764C/project space λ/lean-toolchain. Supported managed versions: 4.34.1. The project pin was not changed.\n",
+          "signal": null
+        },
+        {
+          "label": "native tool drift cannot reuse cached output",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 12.293793420999998,
+          "code": 1,
+          "stdout": "",
+          "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\nManaged cache contents changed: /tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550. Changed entries (1): \"LICENSE\". Remove this toolchain directory to download a verified replacement.\n",
+          "signal": null
+        },
+        {
+          "label": "runtime drift cannot reuse cached output",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.3495223139999944,
+          "code": 1,
+          "stdout": "",
+          "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\nApplication runtime integrity check failed: exports.json\n",
+          "signal": null
+        },
+        {
+          "label": "arguments and exit code",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Args.lean",
+            "--",
+            "hello world",
+            "λ 日本語",
+            "",
+            "--target"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 49.119633027999996,
+          "code": 0,
+          "stdout": "arg=hello world\narg=λ 日本語\narg=\narg=--target\n",
+          "stderr": "[lasm] Preparing Args.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Verifying cached Python 3.13.15 — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 4s elapsed\n[lasm] Preparing and checking compiler tools — 0s elapsed\n[lasm] Preparing and checking compiler tools — 5s elapsed\n[lasm] Compiling application module 1 of 1 — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Checking required runtime code — 0s elapsed\n[lasm] Linking application and Lean runtime — 0s elapsed\n[lasm] Linking application and Lean runtime — 3s elapsed\n[lasm] Preparing the application launcher — 0s elapsed\n[lasm] Packaging the application and runtime support — 0s elapsed\n[lasm] Verifying and writing application output — 0s elapsed\n[lasm] Build ready (48s total).\n[lasm] Running Args.lean…\n",
+          "signal": null
+        },
+        {
+          "label": "arguments and exit code",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Args.lean",
+            "--",
+            "fail"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 12.996021194999994,
+          "code": 23,
+          "stdout": "arg=fail\n",
+          "stderr": "[lasm] Preparing Args.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Reusing verified application build — 0s elapsed\n[lasm] Reused cached build (12s total).\n[lasm] Running Args.lean…\n",
+          "signal": null
+        },
+        {
+          "label": "arguments deployment",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "build",
+            "Args.lean",
+            "--output",
+            "args dist λ"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 12.688221903999992,
+          "code": 0,
+          "stdout": "",
+          "stderr": "[lasm] Preparing Args.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Reusing verified application build — 0s elapsed\n[lasm] Reused cached build (12s total).\nReused Lean 4.34.1 for node: /tmp/lasm node Linux λ-wF764C/project space λ/args dist λ\n",
+          "signal": null
+        },
+        {
+          "label": "native comparison: Args.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/lean",
+            "--run",
+            "Args.lean",
+            "hello world",
+            "λ 日本語",
+            "",
+            "--target"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 1.2930858389999922,
+          "code": 0,
+          "stdout": "arg=hello world\narg=λ 日本語\narg=\narg=--target\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "plain Node: arguments",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/args dist λ/main.mjs",
+            "hello world",
+            "λ 日本語",
+            "",
+            "--target"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.25411991300000225,
+          "code": 0,
+          "stdout": "arg=hello world\narg=λ 日本語\narg=\narg=--target\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "native comparison: Args.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/lean",
+            "--run",
+            "Args.lean",
+            "fail"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 1.4861697139999888,
+          "code": 23,
+          "stdout": "arg=fail\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "plain Node: arguments",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/args dist λ/main.mjs",
+            "fail"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.25147629799999416,
+          "code": 23,
+          "stdout": "arg=fail\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "changed imported source",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語",
+          "seconds": 53.12351718999999,
+          "code": 0,
+          "stdout": "Lean module: 43\n",
+          "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Verifying cached Git 2.53.0 — 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Verifying cached Python 3.13.15 — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 1s elapsed\n[lasm] Preparing and checking compiler tools — 0s elapsed\n[lasm] Preparing and checking compiler tools — 2s elapsed\n[lasm] Compiling application module 1 of 2 — 0s elapsed\n[lasm] Compiling application module 2 of 2 — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Checking required runtime code — 0s elapsed\n[lasm] Checking required runtime code — 2s elapsed\n[lasm] Linking application and Lean runtime — 0s elapsed\n[lasm] Linking application and Lean runtime — 9s elapsed\n[lasm] Preparing the application launcher — 0s elapsed\n[lasm] Packaging the application and runtime support — 0s elapsed\n[lasm] Verifying and writing application output — 0s elapsed\n[lasm] Build ready (52s total).\n[lasm] Running Main.lean…\n",
+          "signal": null
+        },
+        {
+          "label": "changed Lake deployment",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "build",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語",
+          "seconds": 17.318400850000007,
+          "code": 0,
+          "stdout": "",
+          "stderr": "[lasm] Preparing Main.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Verifying cached Git 2.53.0 — 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Reusing verified application build — 0s elapsed\n[lasm] Reused cached build (17s total).\nReused Lean 4.34.1 for node: /tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語/dist\n",
+          "signal": null
+        },
+        {
+          "label": "native comparison: Main.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/lake",
+            "--keep-toolchain",
+            "env",
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/lean",
+            "--run",
+            "Main.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語",
+          "seconds": 1.4204850159999916,
+          "code": 0,
+          "stdout": "Lean module: 43\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "plain Node: lake",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語/dist/main.mjs"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語",
+          "seconds": 0.25439300099998946,
+          "code": 0,
+          "stdout": "Lean module: 43\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "features deployment",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "build",
+            "BundleFeatures.lean",
+            "--output",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/features dist"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 58.72998815500003,
+          "code": 0,
+          "stdout": "",
+          "stderr": "[lasm] Preparing BundleFeatures.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Checking application inputs and cached build — 6s elapsed\n[lasm] Verifying cached Python 3.13.15 — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 6s elapsed\n[lasm] Preparing and checking compiler tools — 0s elapsed\n[lasm] Preparing and checking compiler tools — 6s elapsed\n[lasm] Compiling application module 1 of 1 — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Checking required runtime code — 0s elapsed\n[lasm] Linking application and Lean runtime — 0s elapsed\n[lasm] Linking application and Lean runtime — 3s elapsed\n[lasm] Preparing the application launcher — 0s elapsed\n[lasm] Packaging the application and runtime support — 0s elapsed\n[lasm] Verifying and writing application output — 0s elapsed\n[lasm] Build ready (58s total).\nBuilt Lean 4.34.1 for node: /tmp/lasm node Linux λ-wF764C/project space λ/features dist\n",
+          "signal": null
+        },
+        {
+          "label": "compile native comparison: BundleFeatures.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/leanc",
+            "-O2",
+            "-rdynamic",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeatures.lean/lean/BundleFeatures.c",
+            "-o",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeatures.lean/program"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 2.33620127400005,
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "native executable comparison: BundleFeatures.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeatures.lean/program",
+            "123456789"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.04579088099999353,
+          "code": 0,
+          "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "compile native comparison: BundleFeatures.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/leanc",
+            "-O2",
+            "-rdynamic",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeatures.lean/lean/BundleFeatures.c",
+            "-o",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeatures.lean/program"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 2.348343264000025,
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "native executable comparison: BundleFeatures.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeatures.lean/program",
+            "123456789"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.04698737600003369,
+          "code": 0,
+          "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "plain Node: features",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/features dist/main.mjs",
+            "123456789"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.27820503900002225,
+          "code": 0,
+          "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "features-legacy deployment",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "build",
+            "BundleFeaturesLegacy.lean",
+            "--output",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/features-legacy dist"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 65.167763264,
+          "code": 0,
+          "stdout": "",
+          "stderr": "[lasm] Preparing BundleFeaturesLegacy.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Checking application inputs and cached build — 5s elapsed\n[lasm] Verifying cached Python 3.13.15 — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 4s elapsed\n[lasm] Preparing and checking compiler tools — 0s elapsed\n[lasm] Preparing and checking compiler tools — 4s elapsed\n[lasm] Compiling application module 1 of 1 — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Checking required runtime code — 0s elapsed\n[lasm] Linking application and Lean runtime — 0s elapsed\n[lasm] Linking application and Lean runtime — 1s elapsed\n[lasm] Linking application and Lean runtime — 11s elapsed\n[lasm] Preparing the application launcher — 0s elapsed\n[lasm] Packaging the application and runtime support — 0s elapsed\n[lasm] Verifying and writing application output — 0s elapsed\n[lasm] Build ready (1m 4s total).\nBuilt Lean 4.34.1 for node: /tmp/lasm node Linux λ-wF764C/project space λ/features-legacy dist\n",
+          "signal": null
+        },
+        {
+          "label": "compile native comparison: BundleFeaturesLegacy.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/leanc",
+            "-O2",
+            "-rdynamic",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeaturesLegacy.lean/lean/BundleFeaturesLegacy.c",
+            "-o",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeaturesLegacy.lean/program"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 2.0154892199999885,
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "native executable comparison: BundleFeaturesLegacy.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeaturesLegacy.lean/program",
+            "17"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.04392009000002872,
+          "code": 0,
+          "stdout": "features passed: 17, 76, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "compile native comparison: BundleFeaturesLegacy.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/leanc",
+            "-O2",
+            "-rdynamic",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeaturesLegacy.lean/lean/BundleFeaturesLegacy.c",
+            "-o",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeaturesLegacy.lean/program"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 2.0085217279999634,
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "native executable comparison: BundleFeaturesLegacy.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/BundleFeaturesLegacy.lean/program",
+            "17"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.04424847599997884,
+          "code": 0,
+          "stdout": "features passed: 17, 76, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "plain Node: features-legacy",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/features-legacy dist/main.mjs",
+            "17"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.30330051700002514,
+          "code": 0,
+          "stdout": "features passed: 17, 76, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "filesystem deployment",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "build",
+            "FilesystemSurface.lean",
+            "--output",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/filesystem dist"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 52.390310088999975,
+          "code": 0,
+          "stdout": "",
+          "stderr": "[lasm] Preparing FilesystemSurface.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Verifying cached Python 3.13.15 — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 4s elapsed\n[lasm] Preparing and checking compiler tools — 0s elapsed\n[lasm] Preparing and checking compiler tools — 5s elapsed\n[lasm] Compiling application module 1 of 1 — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Checking required runtime code — 0s elapsed\n[lasm] Linking application and Lean runtime — 0s elapsed\n[lasm] Linking application and Lean runtime — 1s elapsed\n[lasm] Linking application and Lean runtime — 11s elapsed\n[lasm] Preparing the application launcher — 0s elapsed\n[lasm] Packaging the application and runtime support — 0s elapsed\n[lasm] Verifying and writing application output — 0s elapsed\n[lasm] Build ready (52s total).\nBuilt Lean 4.34.1 for node: /tmp/lasm node Linux λ-wF764C/project space λ/filesystem dist\n",
+          "signal": null
+        },
+        {
+          "label": "compile native comparison: FilesystemSurface.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/leanc",
+            "-O2",
+            "-rdynamic",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/FilesystemSurface.lean/lean/FilesystemSurface.c",
+            "-o",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/FilesystemSurface.lean/program"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 1.540230775999953,
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "native executable comparison: FilesystemSurface.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/FilesystemSurface.lean/program",
+            "filesystem λ"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.012733056000026409,
+          "code": 0,
+          "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "compile native comparison: FilesystemSurface.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/leanc",
+            "-O2",
+            "-rdynamic",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/FilesystemSurface.lean/lean/FilesystemSurface.c",
+            "-o",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/FilesystemSurface.lean/program"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 1.6394157189999823,
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "native executable comparison: FilesystemSurface.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/project space λ/.native-control/FilesystemSurface.lean/program",
+            "filesystem λ"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.011741069999989123,
+          "code": 0,
+          "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "plain Node: filesystem",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/filesystem dist/main.mjs",
+            "filesystem λ"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.35519361000001665,
+          "code": 0,
+          "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "unused definitions deployment",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+            "lasm",
+            "build",
+            "Unused.lean",
+            "--output",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/unused dist"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 57.42685629700002,
+          "code": 0,
+          "stdout": "",
+          "stderr": "[lasm] Preparing Unused.lean — 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake — 9s elapsed\n[lasm] Checking Lean sources and imports — 0s elapsed\n[lasm] Checking application inputs and cached build — 0s elapsed\n[lasm] Verifying cached Python 3.13.15 — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) — 0s elapsed\n[lasm] Preparing and checking compiler tools — 0s elapsed\n[lasm] Preparing and checking compiler tools — 1s elapsed\n[lasm] Compiling application module 1 of 1 — 0s elapsed\n[lasm] Compiling application module 1 of 1 — 3s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Checking required runtime code — 0s elapsed\n[lasm] Linking application and Lean runtime — 0s elapsed\n[lasm] Linking application and Lean runtime — 5s elapsed\n[lasm] Preparing the application launcher — 0s elapsed\n[lasm] Packaging the application and runtime support — 0s elapsed\n[lasm] Verifying and writing application output — 0s elapsed\n[lasm] Build ready (57s total).\nBuilt Lean 4.34.1 for node: /tmp/lasm node Linux λ-wF764C/project space λ/unused dist\n",
+          "signal": null
+        },
+        {
+          "label": "native comparison: Unused.lean",
+          "command": [
+            "/tmp/lasm node Linux λ-wF764C/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/lean",
+            "--run",
+            "Unused.lean"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 4.251168814999983,
+          "code": 0,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "",
+          "signal": null
+        },
+        {
+          "label": "plain Node: unused",
+          "command": [
+            "/opt/hostedtoolcache/node/26.10.0/arm64/bin/node",
+            "/tmp/lasm node Linux λ-wF764C/project space λ/unused dist/main.mjs"
+          ],
+          "cwd": "/tmp/lasm node Linux λ-wF764C/project space λ",
+          "seconds": 0.2581774549999973,
+          "code": 0,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "",
+          "signal": null
+        }
+      ],
+      "deployments": [
+        {
+          "name": "hello",
+          "output": "/tmp/lasm node Linux λ-wF764C/project space λ/dist",
+          "source": "/tmp/lasm node Linux λ-wF764C/project space λ/Main.lean",
+          "build": {
+            "schema": 1,
+            "lean": "4.34.1",
+            "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+            "nativeLeanIdentity": "331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550",
+            "emscripten": "6.0.9",
+            "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+            "runtimeIdentity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+            "buildDriverIdentity": "7abecfc8e5b23f0cac35f4ab653567748731970498aca4dce3f05997f78e7dcb",
+            "target": "node",
+            "host": "linux-arm64",
+            "node": "26.10.0",
+            "minimumGlibc": "2.39",
+            "memoryMode": 1,
+            "modules": [
+              {
+                "module": "Main",
+                "sourceSha256": "2b0f501bc28cf8c4451b29af1506054a50be53b3410d309407f7841320c9edc6",
+                "cSha256": "f4a4b7d37a43e63ce90a7354bec4876e57cb326287781128e64149c0f792429f"
+              }
+            ],
+            "signature": "29a9a5f482ffdb61332b27ec17b45b87654e58b96afd6e59d22465c18ed08649",
+            "linkRequirements": {
+              "mode": "static",
+              "dynamic": [],
+              "cxxRuntime": [],
+              "moduleData": [],
+              "requiresModuleData": false,
+              "specializedInitialization": true
+            },
+            "sdkIdentity": "c42dc140877f01ac8f2a783c34f36e39eeb1caaaa95d6077050bda013f8bfa43",
+            "sdkDriverIdentity": "40c60188ecef87140e2ee6fc877a8e7e1a235912ab8ec510f997fb18f74af11d"
+          },
+          "bytes": 3224584,
+          "budgetBytes": 5242880,
+          "relocate": false,
+          "checks": [
+            {
+              "args": [],
+              "expected": {
+                "code": 0,
+                "stdout": "Hello from Lean! 2 + 3 = 5\n",
+                "stderr": ""
+              }
+            }
+          ]
+        },
+        {
+          "name": "arguments",
+          "output": "/tmp/lasm node Linux λ-wF764C/project space λ/args dist λ",
+          "source": "/tmp/lasm node Linux λ-wF764C/project space λ/Args.lean",
+          "build": {
+            "schema": 1,
+            "lean": "4.34.1",
+            "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+            "nativeLeanIdentity": "331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550",
+            "emscripten": "6.0.9",
+            "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+            "runtimeIdentity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+            "buildDriverIdentity": "7abecfc8e5b23f0cac35f4ab653567748731970498aca4dce3f05997f78e7dcb",
+            "target": "node",
+            "host": "linux-arm64",
+            "node": "26.10.0",
+            "minimumGlibc": "2.39",
+            "memoryMode": 1,
+            "modules": [
+              {
+                "module": "Args",
+                "sourceSha256": "5ec14ef77d4a2f1af43f11486ba57f7e1714301c2fd7b568f356c68d0a2ad2ea",
+                "cSha256": "757dd5c75eda797451d599062af406f438d396acdb484d1bfe1617b2f938e195"
+              }
+            ],
+            "signature": "7e120af03940a6579efd506b300bc34f62a4bcb0a2cb49af944dd994fc2c994e",
+            "linkRequirements": {
+              "mode": "static",
+              "dynamic": [],
+              "cxxRuntime": [],
+              "moduleData": [],
+              "requiresModuleData": false,
+              "specializedInitialization": true
+            },
+            "sdkIdentity": "c42dc140877f01ac8f2a783c34f36e39eeb1caaaa95d6077050bda013f8bfa43",
+            "sdkDriverIdentity": "40c60188ecef87140e2ee6fc877a8e7e1a235912ab8ec510f997fb18f74af11d"
+          },
+          "bytes": 3225595,
+          "budgetBytes": 5242880,
+          "relocate": false,
+          "checks": [
+            {
+              "args": [
+                "hello world",
+                "λ 日本語",
+                "",
+                "--target"
+              ],
+              "expected": {
+                "code": 0,
+                "stdout": "arg=hello world\narg=λ 日本語\narg=\narg=--target\n",
+                "stderr": ""
+              }
+            },
+            {
+              "args": [
+                "fail"
+              ],
+              "expected": {
+                "code": 23,
+                "stdout": "arg=fail\n",
+                "stderr": ""
+              }
+            }
+          ]
+        },
+        {
+          "name": "lake",
+          "output": "/tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語/dist",
+          "source": "/tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語/Main.lean",
+          "build": {
+            "schema": 1,
+            "lean": "4.34.1",
+            "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+            "nativeLeanIdentity": "331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550",
+            "emscripten": "6.0.9",
+            "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+            "runtimeIdentity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+            "buildDriverIdentity": "7abecfc8e5b23f0cac35f4ab653567748731970498aca4dce3f05997f78e7dcb",
+            "gitIdentity": "045b32d723b7545920e583e3c1a2247e74f1ae0057a074cdff42975c2617e4fa",
+            "gitVersion": "git version 2.53.0.dirty",
+            "target": "node",
+            "host": "linux-arm64",
+            "node": "26.10.0",
+            "minimumGlibc": "2.39",
+            "memoryMode": 1,
+            "modules": [
+              {
+                "module": "+Greeting",
+                "sourceSha256": "761f41a28177d73a06ce6d04e276d6942e2abd09d1811c041ea36512d596ba4e",
+                "cSha256": "b7c8f461b746768183bbd81f223702476ade1f153a89ea63a6d7d55b482172a6"
+              },
+              {
+                "module": "/+Main",
+                "sourceSha256": "b2d2dfd2988f6d71200e8af6916bc6cc0b4a214577a1c7d4afad30cee839e3bc",
+                "cSha256": "de7ed3f60d3c1af6bcd5ad699d214bb217b75b42e9a5e3ba1a0a41cd2b1b0d50"
+              }
+            ],
+            "signature": "ee9b9da9598523a2d31c7161387fc45b623ac9c0765f9fd5daa1aa4c951dabd6",
+            "linkRequirements": {
+              "mode": "static",
+              "dynamic": [],
+              "cxxRuntime": [],
+              "moduleData": [],
+              "requiresModuleData": false,
+              "specializedInitialization": true
+            },
+            "sdkIdentity": "c42dc140877f01ac8f2a783c34f36e39eeb1caaaa95d6077050bda013f8bfa43",
+            "sdkDriverIdentity": "40c60188ecef87140e2ee6fc877a8e7e1a235912ab8ec510f997fb18f74af11d"
+          },
+          "bytes": 3225213,
+          "budgetBytes": 5242880,
+          "relocate": false,
+          "checks": [
+            {
+              "args": [],
+              "expected": {
+                "code": 0,
+                "stdout": "Lean module: 43\n",
+                "stderr": ""
+              }
+            }
+          ]
+        },
+        {
+          "name": "features",
+          "output": "/tmp/lasm node Linux λ-wF764C/project space λ/features dist",
+          "source": "/tmp/lasm node Linux λ-wF764C/project space λ/BundleFeatures.lean",
+          "build": {
+            "schema": 1,
+            "lean": "4.34.1",
+            "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+            "nativeLeanIdentity": "331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550",
+            "emscripten": "6.0.9",
+            "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+            "runtimeIdentity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+            "buildDriverIdentity": "7abecfc8e5b23f0cac35f4ab653567748731970498aca4dce3f05997f78e7dcb",
+            "metadataInputsIdentity": "6a2a1dfcf1ee8b4d270f2c4b08844d359ac99f758ad7ac5159adced1cd649f6c",
+            "target": "node",
+            "host": "linux-arm64",
+            "node": "26.10.0",
+            "minimumGlibc": "2.39",
+            "memoryMode": 1,
+            "modules": [
+              {
+                "module": "BundleFeatures",
+                "sourceSha256": "81bb017333f331ae4a902baa82f4cb9d1f874c0ab787d1510981135d06ab7b6d",
+                "cSha256": "a6a99b0a0b137f357374c88d33a02aade535dc86cde9e6748f6b2e5b699ad910"
+              }
+            ],
+            "signature": "4a1ccaba72b153d82d9e69d4a0fa33a4e6847be2c78bcc90ed5a2e971eece7b8",
+            "linkRequirements": {
+              "mode": "static",
+              "dynamic": [],
+              "cxxRuntime": [],
+              "moduleData": [],
+              "requiresModuleData": false,
+              "specializedInitialization": true
+            },
+            "sdkIdentity": "c42dc140877f01ac8f2a783c34f36e39eeb1caaaa95d6077050bda013f8bfa43",
+            "sdkDriverIdentity": "40c60188ecef87140e2ee6fc877a8e7e1a235912ab8ec510f997fb18f74af11d"
+          },
+          "bytes": 2896739,
+          "budgetBytes": 16777216,
+          "relocate": false,
+          "checks": [
+            {
+              "args": [
+                "123456789"
+              ],
+              "expected": {
+                "code": 0,
+                "stdout": "features passed: 123456789, 493827164, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+                "stderr": ""
+              }
+            }
+          ]
+        },
+        {
+          "name": "features-legacy",
+          "output": "/tmp/lasm node Linux λ-wF764C/project space λ/features-legacy dist",
+          "source": "/tmp/lasm node Linux λ-wF764C/project space λ/BundleFeaturesLegacy.lean",
+          "build": {
+            "schema": 1,
+            "lean": "4.34.1",
+            "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+            "nativeLeanIdentity": "331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550",
+            "emscripten": "6.0.9",
+            "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+            "runtimeIdentity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+            "buildDriverIdentity": "7abecfc8e5b23f0cac35f4ab653567748731970498aca4dce3f05997f78e7dcb",
+            "metadataInputsIdentity": "2a7b861efbbc9f1665704294af36d5c3d91df4ef6264a44be3a5d4c5fc2b5cd5",
+            "target": "node",
+            "host": "linux-arm64",
+            "node": "26.10.0",
+            "minimumGlibc": "2.39",
+            "memoryMode": 1,
+            "modules": [
+              {
+                "module": "BundleFeaturesLegacy",
+                "sourceSha256": "dc143586209c15fffee2cc706e2de57271bde12e97d4dbd3a886d5e1b042c26c",
+                "cSha256": "06ff24d7219170ea91f7f0542a4c15350461b13b7e0e901e3e776e6f5aa17de9"
+              }
+            ],
+            "signature": "c3c80b7e320e863188e7a3b648d325225fafb527959530f6da270a22e9f703e7",
+            "linkRequirements": {
+              "mode": "static",
+              "dynamic": [],
+              "cxxRuntime": [],
+              "moduleData": [],
+              "requiresModuleData": false,
+              "specializedInitialization": true
+            },
+            "sdkIdentity": "c42dc140877f01ac8f2a783c34f36e39eeb1caaaa95d6077050bda013f8bfa43",
+            "sdkDriverIdentity": "40c60188ecef87140e2ee6fc877a8e7e1a235912ab8ec510f997fb18f74af11d"
+          },
+          "bytes": 3607559,
+          "budgetBytes": 16777216,
+          "relocate": false,
+          "checks": [
+            {
+              "args": [
+                "17"
+              ],
+              "expected": {
+                "code": 0,
+                "stdout": "features passed: 17, 76, {\"name\":\"λ 日本語\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+                "stderr": ""
+              }
+            }
+          ]
+        },
+        {
+          "name": "filesystem",
+          "output": "/tmp/lasm node Linux λ-wF764C/project space λ/filesystem dist",
+          "source": "/tmp/lasm node Linux λ-wF764C/project space λ/FilesystemSurface.lean",
+          "build": {
+            "schema": 1,
+            "lean": "4.34.1",
+            "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+            "nativeLeanIdentity": "331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550",
+            "emscripten": "6.0.9",
+            "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+            "runtimeIdentity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+            "buildDriverIdentity": "7abecfc8e5b23f0cac35f4ab653567748731970498aca4dce3f05997f78e7dcb",
+            "target": "node",
+            "host": "linux-arm64",
+            "node": "26.10.0",
+            "minimumGlibc": "2.39",
+            "memoryMode": 1,
+            "modules": [
+              {
+                "module": "FilesystemSurface",
+                "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+                "cSha256": "97f7eb816fd2b57d5bda4886794a892074bfd48f14a49abc2edfeb545c09a437"
+              }
+            ],
+            "signature": "d8e85bca2ceca5b46c715bc4e7da5ec70e22d0b1b3409899d563a09c2df8dc04",
+            "linkRequirements": {
+              "mode": "static",
+              "dynamic": [],
+              "cxxRuntime": [],
+              "moduleData": [],
+              "requiresModuleData": false,
+              "specializedInitialization": true
+            },
+            "sdkIdentity": "c42dc140877f01ac8f2a783c34f36e39eeb1caaaa95d6077050bda013f8bfa43",
+            "sdkDriverIdentity": "40c60188ecef87140e2ee6fc877a8e7e1a235912ab8ec510f997fb18f74af11d"
+          },
+          "bytes": 3313743,
+          "budgetBytes": 16777216,
+          "relocate": false,
+          "checks": [
+            {
+              "args": [
+                "filesystem λ"
+              ],
+              "expected": {
+                "code": 0,
+                "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+                "stderr": ""
+              }
+            }
+          ]
+        },
+        {
+          "name": "unused",
+          "output": "/tmp/lasm node Linux λ-wF764C/project space λ/unused dist",
+          "source": "/tmp/lasm node Linux λ-wF764C/project space λ/Unused.lean",
+          "build": {
+            "schema": 1,
+            "lean": "4.34.1",
+            "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+            "nativeLeanIdentity": "331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550",
+            "emscripten": "6.0.9",
+            "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+            "runtimeIdentity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+            "buildDriverIdentity": "7abecfc8e5b23f0cac35f4ab653567748731970498aca4dce3f05997f78e7dcb",
+            "target": "node",
+            "host": "linux-arm64",
+            "node": "26.10.0",
+            "minimumGlibc": "2.39",
+            "memoryMode": 1,
+            "modules": [
+              {
+                "module": "Unused",
+                "sourceSha256": "80ea7b637a570ab81f5bef7cd6746a4326d5087726e682b6ad940731377412ee",
+                "cSha256": "23b41fab06d4476c007bed081814a91cc0b32758335acaef820371b0dbe33ab6"
+              }
+            ],
+            "signature": "8fbea163178778a4759c0cb1da9ba60e70506502db91625366cd89b9b03b3ed5",
+            "linkRequirements": {
+              "mode": "static",
+              "dynamic": [],
+              "cxxRuntime": [],
+              "moduleData": [],
+              "requiresModuleData": false,
+              "specializedInitialization": true
+            },
+            "sdkIdentity": "c42dc140877f01ac8f2a783c34f36e39eeb1caaaa95d6077050bda013f8bfa43",
+            "sdkDriverIdentity": "40c60188ecef87140e2ee6fc877a8e7e1a235912ab8ec510f997fb18f74af11d"
+          },
+          "bytes": 3224586,
+          "budgetBytes": 5242880,
+          "relocate": false,
+          "checks": [
+            {
+              "args": [],
+              "expected": {
+                "code": 0,
+                "stdout": "Hello from Lean! 2 + 3 = 5\n",
+                "stderr": ""
+              }
+            }
+          ]
+        }
+      ],
+      "passedPhases": [
+        "cold",
+        "lake"
+      ],
+      "npm": "11.19.1",
+      "provenance": {
+        "sourceRevision": "484f86c3ab688660c2707b865442130d784e818e",
+        "runtimeManifestSha256": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+        "lean": "4.34.1",
+        "node": "26.10.0"
+      },
+      "packageVersion": "0.1.0-experimental.34",
+      "compiler": "/tmp/lasm node Linux λ-wF764C/project space λ/node_modules/@lasm/compiler",
+      "project": "/tmp/lasm node Linux λ-wF764C/project space λ",
+      "tools": "/tmp/lasm node Linux λ-wF764C/cache/lasm",
+      "support": {
+        "schema": 1,
+        "platforms": [
+          "linux-x64",
+          "linux-arm64"
+        ],
+        "node": "26.10.0",
+        "lean": "4.34.1",
+        "minimumGlibc": "2.39"
+      },
+      "cached": "/tmp/lasm node Linux λ-wF764C/project space λ/.lake/lasm/applications/d53904f1e93ab028/29a9a5f482ffdb61332b27ec17b45b87654e58b96afd6e59d22465c18ed08649/dist",
+      "originalSignature": "29a9a5f482ffdb61332b27ec17b45b87654e58b96afd6e59d22465c18ed08649",
+      "originalMtime": 1790436549727.0142,
+      "installBytes": 380750108,
+      "coldToolsBytes": 5557662945,
+      "lake": {
+        "directory": "/tmp/lasm node Linux λ-wF764C/project space λ/lake project 日本語",
+        "signature": "1d8b91a7db4c8ca137ee2016eac17e651bfdb409e85429644859406f75ad0592"
+      },
+      "offlineCacheReused": true,
+      "startupMeasurements": [
+        {
+          "firstOutputSeconds": 0.2472622219999994,
+          "totalSeconds": 0.2631295890000001,
+          "code": 0,
+          "signal": null,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "",
+          "outputLimitExceeded": false
+        },
+        {
+          "firstOutputSeconds": 0.23700074800000037,
+          "totalSeconds": 0.2503020919999999,
+          "code": 0,
+          "signal": null,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "",
+          "outputLimitExceeded": false
+        },
+        {
+          "firstOutputSeconds": 0.2307679870000011,
+          "totalSeconds": 0.245897973000001,
+          "code": 0,
+          "signal": null,
+          "stdout": "Hello from Lean! 2 + 3 = 5\n",
+          "stderr": "",
+          "outputLimitExceeded": false
+        }
+      ],
+      "cacheRecovery": [
+        {
+          "failure": "interrupted",
+          "recovered": true,
+          "cachedWithoutDownload": true
+        },
+        {
+          "failure": "truncated",
+          "recovered": true,
+          "cachedWithoutDownload": true
+        },
+        {
+          "failure": "checksum",
+          "recovered": true,
+          "cachedWithoutDownload": true
+        },
+        {
+          "failure": "unavailable",
+          "recovered": true,
+          "cachedWithoutDownload": true
+        },
+        {
+          "failure": "incomplete-cache",
+          "recovered": true,
+          "cachedWithoutDownload": true
+        },
+        {
+          "failure": "damaged-cache",
+          "recovered": true,
+          "cachedWithoutDownload": true
+        }
+      ],
+      "sourceInvalidation": true,
+      "activeCommand": {
+        "label": "runtime evaluation retains full support",
+        "command": [
+          "/opt/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "StandaloneModuleData.lean"
+        ],
+        "startedAt": "2026-09-26T15:40:16.830Z"
+      }
+    },
+    "toolCacheAdvice": {
+      "method": "fdatasync once per completed immutable cache tree; repeated POSIX_FADV_DONTNEED",
+      "scope": "Completed immutable tools and optional application build caches only; excludes deployment files, package, staging and SDK state. No file changes, global cache drops or resource-limit changes",
+      "cache": "/tmp/lasm node Linux λ-wF764C/cache/lasm",
+      "trees": {
+        "artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550": {
+          "files": 17738,
+          "bytes": 3125970586
+        },
+        "artifacts/08ece863de605baac3acf1500078f3f289e728664f0d25c62d30bd123a916424": {
+          "files": 3479,
+          "bytes": 79676967
+        },
+        "artifacts/c42dc140877f01ac8f2a783c34f36e39eeb1caaaa95d6077050bda013f8bfa43": {
+          "files": 19115,
+          "bytes": 1502278736
+        },
+        "derived/40c60188ecef87140e2ee6fc877a8e7e1a235912ab8ec510f997fb18f74af11d": {
+          "files": 18783,
+          "bytes": 800251434
+        },
+        "applications/.lake/lasm/applications/d53904f1e93ab028/29a9a5f482ffdb61332b27ec17b45b87654e58b96afd6e59d22465c18ed08649/dist": {
+          "files": 58,
+          "bytes": 3224584
+        },
+        "artifacts/045b32d723b7545920e583e3c1a2247e74f1ae0057a074cdff42975c2617e4fa": {
+          "files": 119,
+          "bytes": 54221301
+        },
+        "applications/lake project 日本語/.lake/lasm/applications/832ec7c101fd2270/1d8b91a7db4c8ca137ee2016eac17e651bfdb409e85429644859406f75ad0592/dist": {
+          "files": 58,
+          "bytes": 3225213
+        },
+        "applications/.lake/lasm/applications/5fe054eb168ac01c/7e120af03940a6579efd506b300bc34f62a4bcb0a2cb49af944dd994fc2c994e/dist": {
+          "files": 58,
+          "bytes": 3225595
+        },
+        "applications/lake project 日本語/.lake/lasm/applications/832ec7c101fd2270/ee9b9da9598523a2d31c7161387fc45b623ac9c0765f9fd5daa1aa4c951dabd6/dist": {
+          "files": 58,
+          "bytes": 3225213
+        },
+        "applications/.lake/lasm/applications/9b1511b871304249/4a1ccaba72b153d82d9e69d4a0fa33a4e6847be2c78bcc90ed5a2e971eece7b8/dist": {
+          "files": 58,
+          "bytes": 2896739
+        },
+        "applications/.lake/lasm/applications/cba30606868b45d1/c3c80b7e320e863188e7a3b648d325225fafb527959530f6da270a22e9f703e7/dist": {
+          "files": 58,
+          "bytes": 3607559
+        },
+        "applications/.lake/lasm/applications/a1b37a3b3c3ade07/d8e85bca2ceca5b46c715bc4e7da5ec70e22d0b1b3409899d563a09c2df8dc04/dist": {
+          "files": 58,
+          "bytes": 3313743
+        },
+        "applications/.lake/lasm/applications/08c13368058031a7/8fbea163178778a4759c0cb1da9ba60e70506502db91625366cd89b9b03b3ed5/dist": {
+          "files": 58,
+          "bytes": 3224586
+        }
+      },
+      "passes": 459,
+      "adviceCalls": 25025739,
+      "advisedBytesIncludingRepeats": 2369906577000,
+      "status": "running",
+      "fileBytesBeforeLastPass": 3659157504,
+      "fileBytesAfterLastPass": 3659157504
+    }
+  },
+  "resources": {
+    "startedAt": "2026-09-26T15:24:38.546Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "/opt/hostedtoolcache/node/26.10.0/arm64/bin/node",
+      "scripts/check-node-linux.mjs",
+      "/home/runner/work/lasm/lasm/.work/node-linux-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.34.tgz",
+      "8af35118e9919f7cd0529507ee7c693a78ba55064bbfefbea35237235e7cd027"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "d6d8257d-27ea-467c-b6ae-e36736685de9",
+    "limits": {
+      "memoryMax": 6581911552,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 5265529241,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 16722046976,
+      "available": 15172857856
+    },
+    "minimumHostAvailable": 12098396160,
+    "peakMemoryBytes": 5271875584,
+    "peakTasks": 62,
+    "report": "/home/runner/work/lasm/lasm/.work/node-linux-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-26T15:42:13.376Z",
+      "memoryBytes": 5271142400,
+      "peakMemoryBytes": 5271142400,
+      "swapBytes": 0,
+      "tasks": 62,
+      "memoryBreakdown": {
+        "anon": 1498329088,
+        "file": 3530760192,
+        "kernel": 241651712,
+        "shmem": 0,
+        "file_mapped": 1474560,
+        "inactive_file": 3002421248,
+        "slab": 225780744
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "highWaterProcesses": {
+      "at": "2026-09-26T15:25:14.443Z",
+      "processes": [
+        {
+          "pid": 2507,
+          "name": "node-MainThread",
+          "residentBytes": 254746624,
+          "threads": 12
+        },
+        {
+          "pid": 2494,
+          "name": "npm exec lasm M",
+          "residentBytes": 95862784,
+          "threads": 11
+        },
+        {
+          "pid": 2440,
+          "name": "node-MainThread",
+          "residentBytes": 92356608,
+          "threads": 11
+        },
+        {
+          "pid": 2453,
+          "name": "node-MainThread",
+          "residentBytes": 56205312,
+          "threads": 7
+        },
+        {
+          "pid": 2452,
+          "name": "python3",
+          "residentBytes": 11501568,
+          "threads": 1
+        },
+        {
+          "pid": 2506,
+          "name": "sh",
+          "residentBytes": 1626112,
+          "threads": 1
+        }
+      ]
+    },
+    "stoppedBecause": "Workload reached its proactive memory budget",
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "killed",
+      "exitStatus": "TERM",
+      "capturedAt": "2026-09-26T15:42:13.424Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 4441894912,
+      "peakMemoryBytes": 5271875584,
+      "swapBytes": 0,
+      "tasks": 20,
+      "memoryBreakdown": {
+        "anon": 658460672,
+        "file": 3530760192,
+        "kernel": 237142016,
+        "shmem": 0,
+        "file_mapped": 1245184,
+        "inactive_file": 3002421248,
+        "slab": 225090736
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-26T15:42:13.486Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": true,
+    "memoryThrottled": false
+  },
+  "disk": {
+    "reserveBytes": 4294967296,
+    "preflightBytes": 17179869184,
+    "freeAtStart": 114835472384,
+    "status": "resource-aborted",
+    "minimumFreeBytes": 105453228032,
+    "freeAtEnd": 105581559808
+  },
+  "controlVerification": {
+    "test": "test/tool-cache-advice.test.py",
+    "passed": 4,
+    "log": ".work/bundle-size/native-advice-controls-r1.log",
+    "resources": {
+      "startedAt": "2026-09-26T15:51:28.711Z",
+      "command": [
+        "python3",
+        "-I",
+        "-B",
+        "test/tool-cache-advice.test.py"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "6626b9ec-5992-421e-bacc-ae1cf3f400e8",
+      "limits": {
+        "memoryMax": 268435456,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 214748364,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 26532511744
+      },
+      "minimumHostAvailable": 26517401600,
+      "peakMemoryBytes": 23347200,
+      "peakTasks": 2,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/bundle-size/native-advice-controls-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-26T15:51:30.921Z",
+        "memoryBytes": 23162880,
+        "peakMemoryBytes": 23347200,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 12279808,
+          "file": 10027008,
+          "kernel": 471040,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 10022912,
+          "slab": 346296
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-26T15:51:31.080Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 13606912,
+        "peakMemoryBytes": 23347200,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11644928,
+          "file": 299008,
+          "kernel": 1064960,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 299008,
+          "slab": 142008
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-26T15:51:31.112Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  }
+}

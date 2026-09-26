@@ -1,6 +1,6 @@
 // Only Node built-ins and the installed product are available to this control.
 import assert from 'node:assert/strict';
-import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, statSync, rmSync, openSync, readSync, closeSync, renameSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, existsSync, readdirSync, statSync, rmSync, openSync, readSync, closeSync, renameSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, resolve, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -79,12 +79,17 @@ async function oracle(file, args, directory = project, lake = false, compiled = 
   const lean = await provisionLean(join(directory, file));
   const env = nativeLeanEnvironment(lean);
   if (compiled) {
-    const work = join(directory, '.native-control', file); mkdirSync(work, { recursive: true });
+    const controls = join(directory, '.native-control'); mkdirSync(controls, { recursive: true });
+    // Unique, immutable comparison outputs let the maintainer cache adviser
+    // release their file pages without ever touching an active compiler output.
+    const work = mkdtempSync(join(controls, file + '-'));
     const generated = applicationSources(join(directory, file), lean, work);
     const executable = join(work, 'program');
     const built = run('compile native comparison: ' + file, join(lean.prefix, 'bin/leanc'),
       ['-O2', '-rdynamic', ...generated.sources, '-o', executable], directory, env);
     assert.equal(built.code, 0, built.stderr);
+    writeFileSync(join(work, '.lasm-native-control.tmp'), JSON.stringify({ schema: 1, source: file }) + '\n');
+    renameSync(join(work, '.lasm-native-control.tmp'), join(work, '.lasm-native-control.json'));
     return run('native executable comparison: ' + file, executable, args, directory,
       { ...env, LEAN_SYSROOT: lean.prefix, LEAN_PATH: generated.metadataRoots.join(':') });
   }

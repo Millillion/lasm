@@ -131,7 +131,12 @@ The archive is 65,335,003 bytes; deployment reduction does not remove the build
 libraries needed to compile different applications from the npm package.
 
 Native Linux x86-64 passed [installed-package CI](https://github.com/Millillion/lasm/actions/runs/36250526691/job/108427789071).
-Native ARM64 acceptance is running against that same archive; it is not yet a pass.
+The first native ARM64 attempt stopped at its proactive memory budget during
+runtime evaluation, after the seven small application builds/comparisons passed.
+It had no OOM. It is not yet a full platform pass. The [abort record](evidence/bundle-size-arm64-resource-abort-2026-09-26.json)
+preserves the original result and the targeted CI-only cache-advice correction.
+Both architectures will recheck the same archive, without repacking or changing
+assertions, timeouts, memory limits or deployment files.
 The packaging job passed 113 Node tests and three Python cache-advice controls.
 The [x86-64 evidence](evidence/bundle-size-linux-x64-2026-09-26.json) records
 49 command checks, eight isolated deployments and nine execution cases. The

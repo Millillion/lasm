@@ -14,6 +14,33 @@ control['require_guard']()
 
 
 class ToolCacheAdvice(unittest.TestCase):
+    def test_only_receipted_native_comparisons_are_advised_with_bytes_and_metadata_unchanged(self):
+        with tempfile.TemporaryDirectory(prefix='lasm-native-advice-') as directory:
+            project = Path(directory)
+            completed = project / '.native-control/Feature.lean-completed'
+            completed.mkdir(parents=True)
+            (completed / '.lasm-native-control.json').write_text('{"schema":1}\n')
+            program = completed / 'program'
+            program.write_bytes(b'Native comparison' * 1024)
+            before = program.stat()
+            digest = hashlib.sha256(program.read_bytes()).hexdigest()
+            unfinished = completed.parent / 'unfinished'
+            unfinished.mkdir()
+            (unfinished / 'program').write_bytes(b'active compiler output')
+            (completed.parent / 'linked').symlink_to(completed, target_is_directory=True)
+            deployment = project / 'dist'
+            deployment.mkdir()
+            (deployment / '.lasm-native-control.json').write_text('{"schema":1}\n')
+            evidence = {'trees': {}, 'adviceCalls': 0, 'advisedBytesIncludingRepeats': 0}
+            control['advise_native_controls'](project, set(), evidence)
+            self.assertEqual(set(evidence['trees']), {'native-controls/Feature.lean-completed'})
+            self.assertEqual(evidence['adviceCalls'], 2)
+            self.assertEqual(hashlib.sha256(program.read_bytes()).hexdigest(), digest)
+            after = program.stat()
+            self.assertEqual((before.st_size, before.st_mode, before.st_mtime_ns),
+                             (after.st_size, after.st_mode, after.st_mtime_ns))
+            self.assertEqual((unfinished / 'program').read_bytes(), b'active compiler output')
+
     def test_only_complete_application_caches_are_advised_not_deployments_or_staging(self):
         with tempfile.TemporaryDirectory(prefix='lasm-application-advice-') as directory:
             project = Path(directory) / 'project'
