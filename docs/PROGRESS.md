@@ -1,7 +1,9 @@
-**Milestone:** Basic Lean-on-Node installation and deployment on native Linux x86-64 and ARM64. In progress; the earlier full-program percentage does not apply.
+**Milestone:** Basic ordinary Lean-on-Node installation and deployment on native Linux x86-64 and ARM64. In progress.
 
-**Estimated finish:** Not yet estimable; cold installation and native ARM64 remain unverified.
+**Estimated finish:** Not yet estimable; cold installation and ARM64 remain unverified.
 
-**Verified:** Reproducible 65 MB local package; 77 focused checks; all 27 steps of the [warm installed diagnostic](evidence/node-linux-warm-harness-2026-09-26.json), including native comparisons, Unicode arguments, exit codes, Lake import invalidation, damaged-cache rejection, recovery controls, offline reuse and three copied deployments. Peak 5.09 GiB; no OOM or resource abort. Empty-directory and glibc checks pass; measured first output takes 1.69–1.77 seconds with warm files. Warm tools do not establish cold provisioning.
+**Verified:** The [clean runtime build](https://github.com/Millillion/lasm/actions/runs/36214598592) and native-versus-Node smoke comparison passed. All twelve resource guards released; no OOM or resource abort. Peak stage memory was 3.80 GiB. All 77 focused checks pass in CI. Local warm installed controls and independent deployments remain passing, qualified evidence.
 
-**Remaining:** Finish the clean CI runtime build, pack the current source once, pass genuine empty-project/cold-tool acceptance on x86-64 then ARM64, retain the tested candidate as an unpublished draft, and complete the measured support report. No npm publication is authorized.
+**Current:** The first acceptance campaign safely stopped during combined extraction/packing at its proactive memory limit, with zero OOM events. Extraction and packing now run sequentially under unchanged independent guards; the verified runtime is reused.
+
+**Remaining:** Both native cold-install passes on the same tarball, tested draft candidate, and measured acceptance report. No npm publication is authorized.

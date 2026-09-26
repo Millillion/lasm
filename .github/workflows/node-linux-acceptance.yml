@@ -48,10 +48,12 @@ jobs:
           path: .work/node-runtime-inputs.tgz
           key: ${{ inputs.runtime-cache-key }}
           fail-on-cache-miss: true
-      - name: Verify runtime inputs and pack twice reproducibly
+      - name: Restore and verify runtime inputs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-restore-resources.json -- node scripts/ci/node-linux-candidate.mjs "$LASM_RUNTIME_ARCHIVE_SHA256"
+      - name: Pack twice reproducibly
         id: package
         run: |
-          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- node scripts/ci/node-linux-candidate.mjs "$LASM_RUNTIME_ARCHIVE_SHA256"
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")"
           node -e "const f=require('node:fs'),r=JSON.parse(f.readFileSync('.work/node-candidate/result.json'));f.appendFileSync(process.env.GITHUB_OUTPUT,'sha256='+r.sha256+'\n')"
       - name: Check the included storage budget
         id: budget
@@ -65,7 +67,7 @@ jobs:
           key: lasm-node-linux-candidate-${{ github.run_id }}-${{ steps.package.outputs.sha256 }}
       - name: Preserve candidate identity and packing measurements
         if: always()
-        run: node -e "const f=require('node:fs');for(const p of ['.work/node-candidate/result.json','.work/node-candidate-budget.json','.work/node-package-resources.json','.work/node-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+        run: node -e "const f=require('node:fs');for(const p of ['.work/node-candidate/result.json','.work/node-candidate-budget.json','.work/node-restore-resources.json','.work/node-package-resources.json','.work/node-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
   linux-x64:
     needs: package
     uses: ./.github/workflows/node-linux-consumer.yml

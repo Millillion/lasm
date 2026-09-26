@@ -1,0 +1,123 @@
+{
+  "scope": "Resource abort, not a failed Lean correctness test; no installed platform acceptance ran",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36219307441",
+  "sourceRevision": "359e13f99bf76502a044a4eb6fefeaa672bd0b77",
+  "focusedTestsPassed": 77,
+  "correction": "Separate authenticated extraction and reproducible packing into sequential guarded processes, retaining the 2 GiB cap and 80 percent proactive stop for each. Earlier local standalone packing peaked at 1094373376 bytes.",
+  "resources": {
+    "startedAt": "2026-09-26T04:56:36.284Z",
+    "command": [
+      "node",
+      "scripts/ci/node-linux-candidate.mjs",
+      "b00ba194c398a2acf9f384f5fb192214510daeff90a5e4a00c9fbf8f3bd192ca"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "13b9b187-8afc-4024-b84c-939cac4c2b6e",
+    "limits": {
+      "memoryMax": 2147483648,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 1717986918,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 16765370368,
+      "available": 15502790656
+    },
+    "minimumHostAvailable": 14805352448,
+    "peakMemoryBytes": 1721516032,
+    "peakTasks": 33,
+    "report": "/home/runner/work/lasm/lasm/.work/node-package-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-26T04:56:57.917Z",
+      "memoryBytes": 1721491456,
+      "peakMemoryBytes": 1721491456,
+      "swapBytes": 0,
+      "tasks": 33,
+      "memoryBreakdown": {
+        "anon": 799473664,
+        "file": 886853632,
+        "kernel": 33652736,
+        "shmem": 0,
+        "file_mapped": 315392,
+        "inactive_file": 886853632,
+        "slab": 27586536
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "highWaterProcesses": {
+      "at": "2026-09-26T04:56:47.705Z",
+      "processes": [
+        {
+          "pid": 2583,
+          "name": "node-MainThread",
+          "residentBytes": 302354432,
+          "threads": 11
+        },
+        {
+          "pid": 2612,
+          "name": "npm pack",
+          "residentBytes": 239546368,
+          "threads": 11
+        },
+        {
+          "pid": 2597,
+          "name": "node-MainThread",
+          "residentBytes": 106868736,
+          "threads": 11
+        }
+      ]
+    },
+    "stoppedBecause": "Workload reached its proactive memory budget",
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "killed",
+      "exitStatus": "TERM",
+      "capturedAt": "2026-09-26T04:56:57.982Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 928702464,
+      "peakMemoryBytes": 1721516032,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13692928,
+        "file": 886853632,
+        "kernel": 27938816,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 886853632,
+        "slab": 27005688
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-26T04:56:57.999Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": true,
+    "memoryThrottled": false
+  }
+}
