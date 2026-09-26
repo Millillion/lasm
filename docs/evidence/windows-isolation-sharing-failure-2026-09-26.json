@@ -1,0 +1,181 @@
+{
+  "scope": "Maintainer isolation setup hit WinError 32 when opening an ancestor directory with MAXIMUM_ALLOWED. No Lean test ran; deadline and disk controls passed separately.",
+  "sourceRevision": "8198abdb7b7e9be734cb3fd98b261ed8adb0ac94",
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36280429587/job/108511079142",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.11ffc6e2-91a8-4770-b328-ade3e9bcd814",
+        "offline": false,
+        "status": "isolation-error",
+        "startedAt": 1790466389.6566348,
+        "allPackagesOptOut": true,
+        "sid": "S-1-15-2-616984281-1198384711-2370038555-209046731-1281532099-3662704374-2795487633",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "error": "[WinError 32] The process cannot access the file because it is being used by another process.",
+        "finishedAt": 1790466389.6780982,
+        "descendantsReleased": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14240976896
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 92950528,
+        "minimumHostAvailable": 14128693248,
+        "startedAt": 1790466369.5157225,
+        "unit": "Local\\LasmResource-c52044c1-6006-47d7-8f1b-e5f29645541a",
+        "pid": 892,
+        "lastSampleAt": 1790466389.7040727,
+        "exitCode": 1,
+        "finishedAt": 1790466389.7421398
+      },
+      "deadlineControl": {
+        "status": "time-limit",
+        "command": [
+          "C:\\hostedtoolcache\\windows\\node\\26.10.0\\x64\\node.exe",
+          "test/fixtures/windows-guard-deadline.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14206791680
+        },
+        "limits": {
+          "jobCommittedBytes": 536870912,
+          "stopCommittedBytes": 429496729,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 3
+        },
+        "peakCommittedBytes": 42344448,
+        "minimumHostAvailable": 14162817024,
+        "startedAt": 1790466363.783646,
+        "disk": {
+          "reserveBytes": 4294967296,
+          "minimumFreeBytes": {
+            "D:\\a\\lasm\\lasm": 157346213888,
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 34536763392
+          }
+        },
+        "unit": "Local\\LasmResource-17453864-620a-41fc-9478-b781047b34fd",
+        "pid": 7880,
+        "lastSampleAt": 1790466366.8191106,
+        "stoppedBecause": "time-limit",
+        "exitCode": 124,
+        "finishedAt": 1790466366.825567
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36280429587/job/108511079287",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.dae78f20-b923-48f7-948d-0a142a38b7dc",
+        "offline": false,
+        "status": "failed",
+        "startedAt": 1790466417.5378344,
+        "allPackagesOptOut": true,
+        "sid": "S-1-15-2-1262298000-2694504656-1246082447-3710579780-3396599261-1535515493-1317391529",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "ancestorMetadata": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-YdottR",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+          "C:\\Users\\runneradmin\\AppData\\Local",
+          "C:\\Users\\runneradmin\\AppData",
+          "C:\\Users\\runneradmin",
+          "C:\\Users",
+          "C:\\"
+        ],
+        "grants": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-YdottR\\stock Node",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-YdottR\\readonly.txt",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-YdottR\\writable \u65e5\u672c\u8a9e"
+        ],
+        "pid": 1592,
+        "token": {
+          "appContainer": true
+        },
+        "inheritedCappedJob": "Local\\LasmResource-3d45080b-b6d3-4a0b-a612-31db2d9b140c",
+        "exitCode": 1,
+        "finishedAt": 1790466421.477363,
+        "descendantsReleased": true
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13560635392
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 95936512,
+        "minimumHostAvailable": 13381840896,
+        "startedAt": 1790466409.3183663,
+        "unit": "Local\\LasmResource-3d45080b-b6d3-4a0b-a612-31db2d9b140c",
+        "pid": 10028,
+        "lastSampleAt": 1790466421.40485,
+        "exitCode": 1,
+        "finishedAt": 1790466421.499158
+      },
+      "deadlineControl": {
+        "status": "time-limit",
+        "command": [
+          "C:\\hostedtoolcache\\windows\\node\\26.10.0\\arm64\\node.exe",
+          "test/fixtures/windows-guard-deadline.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13497020416
+        },
+        "limits": {
+          "jobCommittedBytes": 536870912,
+          "stopCommittedBytes": 429496729,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 3
+        },
+        "peakCommittedBytes": 45051904,
+        "minimumHostAvailable": 13467942912,
+        "startedAt": 1790466403.24898,
+        "disk": {
+          "reserveBytes": 4294967296,
+          "minimumFreeBytes": {
+            "C:\\a\\lasm\\lasm": 132853420032,
+            "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 132853420032
+          }
+        },
+        "unit": "Local\\LasmResource-47127c62-5c3d-4d80-8c39-549487a1dbe4",
+        "pid": 7412,
+        "lastSampleAt": 1790466406.3632612,
+        "stoppedBecause": "time-limit",
+        "exitCode": 124,
+        "finishedAt": 1790466406.3697135
+      }
+    }
+  ]
+}

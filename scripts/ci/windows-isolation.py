@@ -22,6 +22,7 @@ K = C.WinDLL("kernel32", use_last_error=True)
 A = C.WinDLL("advapi32", use_last_error=True)
 U = C.WinDLL("userenv", use_last_error=True)
 B = C.WinDLL("kernelbase", use_last_error=True)
+N = C.WinDLL("ntdll", use_last_error=True)
 P = C.c_void_p
 SIZE = C.c_size_t
 
@@ -70,6 +71,11 @@ class EXPLICIT_ACCESS(C.Structure):
     _fields_ = [("permissions", W.DWORD), ("mode", C.c_int), ("inheritance", W.DWORD), ("trustee", TRUSTEE)]
 
 
+class SECURITY_DESCRIPTOR(C.Structure):
+    _fields_ = [("revision", W.BYTE), ("reserved", W.BYTE), ("control", W.WORD),
+                ("owner", P), ("group", P), ("sacl", P), ("dacl", P)]
+
+
 def fn(lib, name, args, result=W.BOOL):
     value = getattr(lib, name)
     value.argtypes, value.restype = args, result
@@ -103,8 +109,13 @@ job_assign = fn(K, "AssignProcessToJobObject", [W.HANDLE, W.HANDLE])
 terminate = fn(K, "TerminateProcess", [W.HANDLE, W.UINT])
 open_file = fn(K, "CreateFileW", [W.LPCWSTR, W.DWORD, W.DWORD, P, W.DWORD, W.DWORD, W.HANDLE], W.HANDLE)
 get_security = fn(A, "GetSecurityInfo", [W.HANDLE, C.c_int, W.DWORD, P, P, C.POINTER(P), P, C.POINTER(P)], W.DWORD)
-set_security = fn(A, "SetSecurityInfo", [W.HANDLE, C.c_int, W.DWORD, P, P, P, P], W.DWORD)
 acl_entries = fn(A, "SetEntriesInAclW", [W.DWORD, C.POINTER(EXPLICIT_ACCESS), P, C.POINTER(P)], W.DWORD)
+sd_init = fn(A, "InitializeSecurityDescriptor", [P, W.DWORD])
+sd_dacl = fn(A, "SetSecurityDescriptorDacl", [P, W.BOOL, P, W.BOOL])
+sd_get_control = fn(A, "GetSecurityDescriptorControl", [P, C.POINTER(W.WORD), C.POINTER(W.DWORD)])
+sd_set_control = fn(A, "SetSecurityDescriptorControl", [P, W.WORD, W.WORD])
+set_object_security = fn(N, "NtSetSecurityObject", [W.HANDLE, W.DWORD, P], C.c_long)
+nt_error = fn(N, "RtlNtStatusToDosError", [C.c_long], W.DWORD)
 
 
 def check(value):
@@ -165,13 +176,14 @@ def acl(path, *args):
 
 
 def metadata_acl(path, grant):
-    # SetSecurityInfo explicitly does not propagate to children when the handle
-    # was opened with MAXIMUM_ALLOWED. icacls on a volume root triggers a costly
-    # inheritance walk even for a noninheritable new ACE; do not use it here.
-    # https://learn.microsoft.com/windows/win32/api/aclapi/nf-aclapi-setsecurityinfo
-    handle = open_file(str(path), 0x02000000, 7, None, 3, 0x02000000, None)
+    # SetSecurityInfo propagates existing inheritable ACEs across the volume.
+    # Its MAXIMUM_ALLOWED escape also requests DELETE, conflicting with live
+    # directory handles. Use the documented object-level setter with exactly
+    # READ_CONTROL | WRITE_DAC; no data/delete access or inheritance tree walk.
+    # https://learn.microsoft.com/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetsecurityobject
+    handle = open_file(str(path), 0x60000, 7, None, 3, 0x02000000, None)
     if handle == C.c_void_p(-1).value:
-        raise C.WinError(C.get_last_error())
+        raise OSError(f"Opening ancestor metadata {path}: {C.WinError(C.get_last_error())}")
     descriptor, old_acl, new_acl = P(), P(), P()
 
     def success(code):
@@ -183,7 +195,15 @@ def metadata_acl(path, grant):
         # READ_ATTRIBUTES | READ_EA | TRAVERSE | READ_CONTROL | SYNCHRONIZE.
         entry = EXPLICIT_ACCESS(0x1200a8 if grant else 0, 1 if grant else 4, 0, TRUSTEE(None, 0, 0, 0, sid))
         success(acl_entries(1, C.byref(entry), old_acl, C.byref(new_acl)))
-        success(set_security(handle, 1, 4, None, None, new_acl, None))
+        control, revision = W.WORD(), W.DWORD()
+        check(sd_get_control(descriptor, C.byref(control), C.byref(revision)))
+        updated = SECURITY_DESCRIPTOR()
+        check(sd_init(C.byref(updated), revision.value))
+        check(sd_dacl(C.byref(updated), True, new_acl, bool(control.value & 8)))
+        check(sd_set_control(C.byref(updated), 0x1500, control.value & 0x1500))
+        status = set_object_security(handle, 4, C.byref(updated))
+        if status < 0:
+            raise OSError(f"Updating ancestor metadata {path}: {C.WinError(nt_error(status))}")
     finally:
         if new_acl:
             free(new_acl)
