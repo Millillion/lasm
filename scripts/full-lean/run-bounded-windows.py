@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 import time
 import uuid
@@ -117,6 +118,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--memory-mib", type=int, default=8192)
 parser.add_argument("--timeout-seconds", type=int)
 parser.add_argument("--report", required=True)
+parser.add_argument("--disk-path", action="append", default=[])
+parser.add_argument("--disk-reserve-mib", type=int, default=4096)
 parser.add_argument("command", nargs=argparse.REMAINDER)
 args = parser.parse_args()
 command = args.command[1:] if args.command[:1] == ["--"] else args.command
@@ -124,6 +127,12 @@ if not command or not 128 <= args.memory_mib <= 10240:
     parser.error("Supply -- COMMAND and a cap of 128..10240 MiB")
 if args.timeout_seconds is not None and not 1 <= args.timeout_seconds <= 21600:
     parser.error("The optional deadline must be 1..21600 seconds")
+if not 512 <= args.disk_reserve_mib <= 32768:
+    parser.error("The disk reserve must be 512..32768 MiB")
+disk_paths = list(dict.fromkeys(str(Path(p).resolve()) for p in args.disk_path))
+for path in disk_paths:
+    if not Path(path).is_dir():
+        parser.error("Disk check paths must exist")
 report = Path(args.report).resolve()
 report.parent.mkdir(parents=True, exist_ok=True)
 with report.open("x", encoding="utf-8") as output:
@@ -137,6 +146,9 @@ evidence = {"status": "starting", "command": command, "hostAtStart": initial,
             "limits": {"jobCommittedBytes": limit, "stopCommittedBytes": int(limit * .8),
                        "hostReserveBytes": reserve, "timeoutSeconds": args.timeout_seconds},
             "peakCommittedBytes": 0, "minimumHostAvailable": initial["available"], "startedAt": time.time()}
+if disk_paths:
+    evidence["disk"] = {"reserveBytes": args.disk_reserve_mib * 1024**2,
+                        "minimumFreeBytes": {p: shutil.disk_usage(p).free for p in disk_paths}}
 
 
 def save():
@@ -183,8 +195,12 @@ try:
         evidence["peakCommittedBytes"] = max(evidence["peakCommittedBytes"], sample.peakJobMemory)
         evidence["minimumHostAvailable"] = min(evidence["minimumHostAvailable"], host["available"])
         evidence["lastSampleAt"] = time.time()
+        for path in disk_paths:
+            evidence["disk"]["minimumFreeBytes"][path] = min(
+                evidence["disk"]["minimumFreeBytes"][path], shutil.disk_usage(path).free)
         reason = ("proactive-memory-stop" if sample.peakJobMemory >= evidence["limits"]["stopCommittedBytes"]
                   else "host-headroom-stop" if host["available"] < reserve
+                  else "disk-reserve" if disk_paths and min(evidence["disk"]["minimumFreeBytes"].values()) < evidence["disk"]["reserveBytes"]
                   else "time-limit" if deadline is not None and time.monotonic() >= deadline else None)
         if reason:
             evidence["stoppedBecause"] = reason

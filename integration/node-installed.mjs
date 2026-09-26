@@ -8,14 +8,16 @@ import { spawn, spawnSync } from 'node:child_process';
 import { cacheControls } from './node-cache-controls.mjs';
 
 const [phase, workspace, archive, hiddenCheckout] = process.argv.slice(2);
-const project = join(workspace, 'project space λ'), tools = process.platform === 'darwin' ? join(workspace, 'home/Library/Caches/lasm') : join(workspace, 'cache/lasm');
+const project = join(workspace, 'project space λ'), tools = process.platform === 'darwin'
+  ? join(workspace, 'home/Library/Caches/lasm') : process.platform === 'win32'
+    ? join(workspace, 'home/AppData/Local/lasm/Cache') : join(workspace, 'cache/lasm');
 const compiler = join(project, 'node_modules/@lasm/compiler');
 const resultPath = join(workspace, 'result.json');
 const result = existsSync(resultPath) ? JSON.parse(readFileSync(resultPath)) : { steps: [], deployments: [], passedPhases: [] };
 const save = () => writeFileSync(resultPath, JSON.stringify(result, null, 2) + '\n');
 const run = (label, executable, args, cwd = project, env = process.env) => {
   const start = performance.now();
-  const logs = process.platform === 'darwin' ? ['stdout', 'stderr'].map(stream => join(workspace, `command-${result.steps.length}-${stream}.log`)) : undefined;
+  const logs = process.platform !== 'linux' ? ['stdout', 'stderr'].map(stream => join(workspace, `command-${result.steps.length}-${stream}.log`)) : undefined;
   result.activeCommand = { label, command: [executable, ...args], startedAt: new Date().toISOString(), logs }; save();
   const descriptors = logs?.map(file => openSync(file, 'wx'));
   let value;
@@ -33,7 +35,10 @@ const run = (label, executable, args, cwd = project, env = process.env) => {
   assert.ifError(value.error); assert.equal(value.signal, null, label + ': normal process exit');
   return observed;
 };
-const npx = (label, args, cwd = project) => run(label, join(dirname(process.execPath), 'npx'), ['lasm', ...args], cwd);
+const npm = (label, name, args, cwd = project) => process.platform === 'win32'
+  ? run(label, process.execPath, [join(dirname(process.execPath), 'node_modules/npm/bin', name + '-cli.js'), ...args], cwd)
+  : run(label, join(dirname(process.execPath), name), args, cwd);
+const npx = (label, args, cwd = project) => npm(label, 'npx', ['lasm', ...args], cwd);
 const json = path => JSON.parse(readFileSync(path, 'utf8'));
 const buildInfo = directory => json(join(directory, 'build-info.json'));
 const basic = { code: 0, stdout: 'Hello from Lean! 2 + 3 = 5\n', stderr: '' };
@@ -83,8 +88,8 @@ function cachedDist(directory, source) {
   return found[0];
 }
 async function oracle(file, args, directory = project, lake = false, compiled = false) {
-  if (compiled && process.platform === 'darwin') {
-    // Complex native controls need Apple's C SDK. The maintainer compiled them
+  if (compiled && process.platform !== 'linux') {
+    // Complex native controls need host C tooling. The maintainer compiled them
     // outside the consumer sandbox; the product cannot access that SDK/output.
     const records = json(join(workspace, 'native-controls.json'));
     const sourceSha256 = createHash('sha256').update(readFileSync(join(directory, file))).digest('hex');
@@ -136,7 +141,7 @@ async function deployment(name, output, file, cases, directory = project, lake =
 }
 
 try {
-  assert.throws(() => readFileSync(hiddenCheckout), { code: process.platform === 'darwin' ? 'EPERM' : 'EACCES' });
+  assert.throws(() => readFileSync(hiddenCheckout), error => ['EACCES', 'EPERM'].includes(error.code));
   for (const executable of ['lean', 'lake', 'cc', 'clang', 'python3', 'git'])
     assert.equal(spawnSync(executable, ['--version']).error?.code, 'ENOENT', executable + ' absent from PATH');
   for (const file of ['/usr/bin/python3', '/usr/bin/git', '/usr/bin/cc']) if (existsSync(file))
@@ -145,9 +150,9 @@ try {
     assert.equal(existsSync(tools), false, 'Cold tool cache starts absent');
     mkdirSync(project, { recursive: true });
     assert.deepEqual(readdirSync(project), [], 'The documented npm command must work in an empty directory');
-    const installed = run('npm install candidate', join(dirname(process.execPath), 'npm'), ['install', archive]);
+    const installed = npm('npm install candidate', 'npm', ['install', archive]);
     assert.equal(installed.code, 0);
-    result.npm = run('npm version', join(dirname(process.execPath), 'npm'), ['--version']).stdout.trim();
+    result.npm = npm('npm version', 'npm', ['--version']).stdout.trim();
     result.provenance = json(join(compiler, 'provenance.json'));
     result.packageVersion = json(join(compiler, 'package.json')).version;
     result.compiler = compiler; result.project = project; result.tools = tools;
@@ -188,8 +193,8 @@ try {
     result.lake = { directory, signature: buildInfo(join(directory, 'dist')).signature };
   } else if (phase === 'offline') {
     // Kernel network restrictions, inherited by npm and every build tool.
-    await assert.rejects(fetch('https://127.0.0.1:443', { signal: AbortSignal.timeout(5000) }),
-      error => error.cause?.code === (process.platform === 'darwin' ? 'EPERM' : 'EACCES'), 'OS sandbox must deny TCP, not merely encounter an unavailable network');
+    await assert.rejects(fetch(process.platform === 'win32' ? 'https://1.1.1.1:443' : 'https://127.0.0.1:443', { signal: AbortSignal.timeout(5000) }),
+      error => ['EPERM', 'EACCES'].includes(error.cause?.code), 'OS sandbox must deny TCP, not merely encounter an unavailable network');
     matchesCli(npx('offline cached npx run', ['Main.lean']), basic);
     assert.equal(statSync(join(result.cached, 'program.wasm')).mtimeMs, result.originalMtime);
     assert.equal(buildInfo(result.cached).signature, result.originalSignature);

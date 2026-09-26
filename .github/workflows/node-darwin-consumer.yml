@@ -16,7 +16,7 @@ on:
         type: string
       candidate-version:
         type: string
-        default: 0.1.0-experimental.37
+        default: 0.1.0-experimental.38
 permissions:
   contents: read
 jobs:

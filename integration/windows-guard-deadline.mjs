@@ -1,16 +1,20 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 
 assert.equal(process.platform, 'win32');
 const report = '.work/windows-guard-deadline-resources.json';
 const result = spawnSync(process.execPath, ['scripts/full-lean/run-bounded.mjs',
-  '--memory-mib', '512', '--timeout-seconds', '3', '--report', report, '--',
+  '--memory-mib', '512', '--timeout-seconds', '3', '--report', report,
+  '--disk-path', process.cwd(), '--disk-path', tmpdir(), '--disk-reserve-mib', '4096', '--',
   process.execPath, 'test/fixtures/windows-guard-deadline.mjs'], { stdio: 'inherit', timeout: 180_000 });
 assert.ifError(result.error); assert.equal(result.status, 124);
 const evidence = JSON.parse(readFileSync(report));
 assert.equal(evidence.status, 'time-limit'); assert.equal(evidence.stoppedBecause, 'time-limit');
 assert.ok(evidence.peakCommittedBytes < evidence.limits.stopCommittedBytes);
+assert.equal(evidence.disk.reserveBytes, 4 * 1024 ** 3);
+assert.ok(Object.values(evidence.disk.minimumFreeBytes).every(n => n >= evidence.disk.reserveBytes));
 const pids = JSON.parse(readFileSync('.work/deadline-control-pids.json'));
 assert.equal(pids.length, 2);
 for (const pid of pids) {

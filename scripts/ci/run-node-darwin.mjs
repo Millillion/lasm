@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 
 const output = resolve('.work/node-darwin-acceptance'), resources = resolve('.work/node-darwin-resources.json');
 const diskFile = resolve('.work/node-darwin-disk.json');
-const version = process.env.LASM_CANDIDATE_VERSION ?? '0.1.0-experimental.37';
+const version = process.env.LASM_CANDIDATE_VERSION ?? '0.1.0-experimental.38';
 assert.match(version, /^0\.1\.0-experimental\.\d+$/);
 assert.ok(!existsSync(output) && !existsSync(resources) && !existsSync(diskFile));
 mkdirSync('.work', { recursive: true });

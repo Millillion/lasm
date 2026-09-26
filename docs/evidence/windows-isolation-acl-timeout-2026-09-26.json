@@ -1,0 +1,96 @@
+{
+  "scope": "Maintainer isolation setup timed out in icacls on the volume root. No Lean tests ran; resource guards did not abort. Replaced inheritance propagation with handle-based non-propagating ancestor metadata grants.",
+  "sourceRevision": "4849f6690753c09dc5cabb02ccb047f3dd537970",
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36279659850/job/108508954656",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.20b5071b-bd36-4d39-9b3c-4e7711676803",
+        "offline": false,
+        "status": "isolation-error",
+        "startedAt": 1790465484.9184215,
+        "allPackagesOptOut": true,
+        "sid": "S-1-15-2-3965836694-3322115263-1025267802-1529985559-81830637-3051936047-2335778510",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "error": "Command '['C:\\\\Windows\\\\System32\\\\icacls.exe', 'C:\\\\', '/grant:r', '*S-1-15-2-3965836694-3322115263-1025267802-1529985559-81830637-3051936047-2335778510:(RA,REA,X,RC,S)', '/Q']' timed out after 180 seconds",
+        "finishedAt": 1790465681.566566,
+        "descendantsReleased": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14255570944
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 92372992,
+        "minimumHostAvailable": 13947592704,
+        "startedAt": 1790465473.354629,
+        "unit": "Local\\LasmResource-e02879a3-f302-43b5-8310-c37499570e11",
+        "pid": 3368,
+        "lastSampleAt": 1790465681.6269636,
+        "exitCode": 1,
+        "finishedAt": 1790465681.6348178
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36279659850/job/108508954744",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.524bdeea-6f04-41d1-bbd0-5330cbc021aa",
+        "offline": false,
+        "status": "isolation-error",
+        "startedAt": 1790465513.1332474,
+        "allPackagesOptOut": true,
+        "sid": "S-1-15-2-129355717-1324523652-3805996942-1142852306-2670131916-699356998-3581713193",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "error": "Command '['C:\\\\Windows\\\\System32\\\\icacls.exe', 'C:\\\\', '/grant:r', '*S-1-15-2-129355717-1324523652-3805996942-1142852306-2670131916-699356998-3581713193:(RA,REA,X,RC,S)', '/Q']' timed out after 180 seconds",
+        "finishedAt": 1790465708.2218928,
+        "descendantsReleased": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13617471488
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 92889088,
+        "minimumHostAvailable": 13291077632,
+        "startedAt": 1790465504.2460845,
+        "unit": "Local\\LasmResource-3d19fb67-9a8e-4fe7-8f38-8db2a7381225",
+        "pid": 11160,
+        "lastSampleAt": 1790465708.1112764,
+        "exitCode": 1,
+        "finishedAt": 1790465708.2912593
+      }
+    }
+  ]
+}

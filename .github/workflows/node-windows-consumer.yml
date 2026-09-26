@@ -1,0 +1,58 @@
+name: Native installed Windows Node consumer
+on:
+  workflow_call:
+    inputs:
+      runner:
+        required: true
+        type: string
+      architecture:
+        required: true
+        type: string
+      cache-key:
+        required: true
+        type: string
+      sha256:
+        required: true
+        type: string
+      candidate-version:
+        type: string
+        default: 0.1.0-experimental.38
+permissions:
+  contents: read
+jobs:
+  installed:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 120
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      EXPECTED_ARCHITECTURE: ${{ inputs.architecture }}
+      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ inputs.architecture }}
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Verify native host, deadline cleanup and isolated Node/npm controls
+        run: |
+          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-'+process.env.EXPECTED_ARCHITECTURE)"
+          node integration/windows-guard-deadline.mjs
+          node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --timeout-seconds 480 --report .work/windows-isolation-resources.json -- node scripts/ci/windows-isolation-controls.mjs
+      - name: Focused host and bundle controls
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-focused-resources.json -- node --test --test-concurrency=1 test/native-application-bundle.test.mjs test/node-host.test.mjs test/platform.test.mjs
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: ${{ inputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
+      - name: Cold install, installed CLI, offline cache and copied deployments
+        run: node scripts/ci/run-node-windows.mjs
+      - name: Preserve native results
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-isolation-controls/result.json','.work/windows-isolation-resources.json','.work/windows-focused-resources.json','.work/node-windows-acceptance/result.json','.work/node-windows-resources.json','.work/node-windows-disk.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

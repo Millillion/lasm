@@ -62,6 +62,14 @@ class EXTENDED_LIMIT(C.Structure):
                 ("jobMemory", SIZE), ("peakProcessMemory", SIZE), ("peakJobMemory", SIZE)]
 
 
+class TRUSTEE(C.Structure):
+    _fields_ = [("multiple", P), ("operation", C.c_int), ("form", C.c_int), ("type", C.c_int), ("name", P)]
+
+
+class EXPLICIT_ACCESS(C.Structure):
+    _fields_ = [("permissions", W.DWORD), ("mode", C.c_int), ("inheritance", W.DWORD), ("trustee", TRUSTEE)]
+
+
 def fn(lib, name, args, result=W.BOOL):
     value = getattr(lib, name)
     value.argtypes, value.restype = args, result
@@ -93,6 +101,10 @@ job_create = fn(K, "CreateJobObjectW", [P, W.LPCWSTR], W.HANDLE)
 job_set = fn(K, "SetInformationJobObject", [W.HANDLE, C.c_int, P, W.DWORD])
 job_assign = fn(K, "AssignProcessToJobObject", [W.HANDLE, W.HANDLE])
 terminate = fn(K, "TerminateProcess", [W.HANDLE, W.UINT])
+open_file = fn(K, "CreateFileW", [W.LPCWSTR, W.DWORD, W.DWORD, P, W.DWORD, W.DWORD, W.HANDLE], W.HANDLE)
+get_security = fn(A, "GetSecurityInfo", [W.HANDLE, C.c_int, W.DWORD, P, P, C.POINTER(P), P, C.POINTER(P)], W.DWORD)
+set_security = fn(A, "SetSecurityInfo", [W.HANDLE, C.c_int, W.DWORD, P, P, P, P], W.DWORD)
+acl_entries = fn(A, "SetEntriesInAclW", [W.DWORD, C.POINTER(EXPLICIT_ACCESS), P, C.POINTER(P)], W.DWORD)
 
 
 def check(value):
@@ -152,6 +164,34 @@ def acl(path, *args):
                     str(path), *args], check=True, capture_output=True, timeout=180)
 
 
+def metadata_acl(path, grant):
+    # SetSecurityInfo explicitly does not propagate to children when the handle
+    # was opened with MAXIMUM_ALLOWED. icacls on a volume root triggers a costly
+    # inheritance walk even for a noninheritable new ACE; do not use it here.
+    # https://learn.microsoft.com/windows/win32/api/aclapi/nf-aclapi-setsecurityinfo
+    handle = open_file(str(path), 0x02000000, 7, None, 3, 0x02000000, None)
+    if handle == C.c_void_p(-1).value:
+        raise C.WinError(C.get_last_error())
+    descriptor, old_acl, new_acl = P(), P(), P()
+
+    def success(code):
+        if code:
+            raise C.WinError(code)
+    try:
+        success(get_security(handle, 1, 4, None, None, C.byref(old_acl), None, C.byref(descriptor)))
+        assert old_acl.value, "Ancestor directory must retain a non-null DACL"
+        # READ_ATTRIBUTES | READ_EA | TRAVERSE | READ_CONTROL | SYNCHRONIZE.
+        entry = EXPLICIT_ACCESS(0x1200a8 if grant else 0, 1 if grant else 4, 0, TRUSTEE(None, 0, 0, 0, sid))
+        success(acl_entries(1, C.byref(entry), old_acl, C.byref(new_acl)))
+        success(set_security(handle, 1, 4, None, None, new_acl, None))
+    finally:
+        if new_acl:
+            free(new_acl)
+        if descriptor:
+            free(descriptor)
+        close(handle)
+
+
 try:
     # Registry reads provide ordinary Windows DLL/runtime configuration. No COM,
     # developer directory, clipboard, broad filesystem or privileged capability.
@@ -173,7 +213,7 @@ try:
     # no file data, listing, inheritance or write access. Remove non-recursively.
     if less_privileged:
         for path in [allowed_root, *allowed_root.parents]:
-            acl(path, "/grant:r", f"*{sid_text}:(RA,REA,X,RC,S)", "/Q")
+            metadata_acl(path, True)
             parents.append(path)
         evidence["ancestorMetadata"] = [str(p) for p in parents]
     # File data/execute/write grants stay inside the disposable test root.
@@ -271,7 +311,7 @@ finally:
             evidence.setdefault("cleanupErrors", []).append(str(error))
     for path in reversed(parents):
         try:
-            acl(path, "/remove:g", "*" + sid_text, "/Q")
+            metadata_acl(path, False)
         except Exception as error:
             evidence.setdefault("cleanupErrors", []).append(str(error))
     if sid:

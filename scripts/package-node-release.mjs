@@ -1,4 +1,4 @@
-// Pack the Linux/Node product without requiring a previous Lasm installation.
+// Pack the Node product without requiring a previous Lasm installation.
 // All files come from this checkout and an explicitly authenticated runtime.
 import assert from 'node:assert/strict';
 import { mkdirSync, cpSync, copyFileSync, readFileSync, writeFileSync, existsSync, appendFileSync } from 'node:fs';
@@ -7,12 +7,15 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { verifyApplicationRuntime } from '../src/application-runtime.mjs';
 import { toolchainCatalog } from '../src/managed-lean.mjs';
+import { sdkCatalog } from '../src/managed-sdk.mjs';
+import { pythonCatalog } from '../src/managed-python.mjs';
+import { gitCatalog } from '../src/managed-git.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../', import.meta.url));
-const [outputArg, runtimeArg, nativeArg, manifestSha256, version = '0.1.0-experimental.37', ...extra] = process.argv.slice(2);
+const [outputArg, runtimeArg, nativeArg, manifestSha256, version = '0.1.0-experimental.38', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && runtimeArg && nativeArg && /^[a-f0-9]{64}$/.test(manifestSha256 ?? '') && !extra.length
   && /^0\.1\.0-experimental\.\d+$/.test(version),
 'Usage: package-node-release.mjs NEW_OUTPUT RUNTIME NATIVE_BUNDLE RUNTIME_MANIFEST_SHA256 [VERSION]');
@@ -24,6 +27,13 @@ const runtime = await verifyApplicationRuntime(runtimeArg, expected);
 assert.equal(runtime.manifest.leanCommit, toolchainCatalog.lean[lean]?.commit, 'Match the native Lean release');
 const pins = JSON.parse(readFileSync(join(root, 'scripts/ci/acceptance-versions.json')));
 assert.equal(lean, pins.lean);
+const platforms = (process.env.LASM_CANDIDATE_PLATFORMS ?? 'linux-x64,linux-arm64,darwin-x64,darwin-arm64,win32-x64').split(',');
+assert.equal(new Set(platforms).size, platforms.length);
+for (const platform of platforms) {
+  assert.match(platform, /^(linux|darwin|win32)-(x64|arm64)$/);
+  for (const catalog of [toolchainCatalog.lean[lean], sdkCatalog, pythonCatalog, gitCatalog])
+    assert.ok(catalog.artifacts[platform], `Missing managed distribution for ${platform}`);
+}
 const sourceRevision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
 const dirty = execFileSync('git', ['status', '--porcelain', '--untracked-files=normal'], { cwd: root, encoding: 'utf8' }).trim();
 assert.equal(dirty, '', 'Commit source changes before packing a traceable candidate');
@@ -45,13 +55,13 @@ cpSync(join(root, 'examples/hello'), join(staging, 'examples/hello'), { recursiv
 const json = (path, value) => writeFileSync(join(staging, path), JSON.stringify(value, null, 2) + '\n');
 json('src/toolchains.json', { ...toolchainCatalog, defaultLean: lean, lean: { [lean]: toolchainCatalog.lean[lean] } });
 json('src/application-runtimes.json', { schema: 1, lean: { [lean]: expected } });
-json('application-support.json', { schema: 1, platforms: ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64'], node: pins.node, lean, minimumGlibc: '2.39' });
+json('application-support.json', { schema: 1, platforms, node: pins.node, lean, minimumGlibc: '2.39' });
 json('provenance.json', { sourceRevision, runtimeManifestSha256: manifestSha256, lean, node: pins.node });
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json')));
 json('package.json', {
   name: sourcePackage.name, version, private: true, license: 'UNLICENSED', type: 'module',
-  description: 'Compile ordinary Lean applications to run in Node on Linux and macOS',
-  bin: sourcePackage.bin, engines: { node: pins.node }, os: ['linux', 'darwin'], cpu: ['x64', 'arm64'],
+  description: 'Compile ordinary Lean applications to run in Node',
+  bin: sourcePackage.bin, engines: { node: pins.node }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
   files: ['bin', 'src', 'scripts', 'targets', 'docs', 'examples', 'README.md',
     'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json'],
   dependencies: { tar: sourcePackage.dependencies.tar },
