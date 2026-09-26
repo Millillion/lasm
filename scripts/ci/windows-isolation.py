@@ -138,6 +138,9 @@ inner = outer = token = None
 files, grants = [], []
 evidence = {"mechanism": "Windows Less Privileged AppContainer", "profile": name,
             "offline": bool(spec.get("offline")), "status": "starting", "startedAt": time.time()}
+less_privileged = spec.get("lessPrivileged", True)
+assert less_privileged or spec.get("control") == "ordinary-appcontainer-sentinel"
+evidence["allPackagesOptOut"] = less_privileged
 
 
 def save():
@@ -177,13 +180,15 @@ try:
                 acl(path, "/setintegritylevel", inheritance + "L", "/T", "/Q")
     evidence["grants"] = [str(p) for p in grants]
     length = SIZE()
-    attr_init(None, 3, 0, C.byref(length))
+    count = 3 if less_privileged else 2
+    attr_init(None, count, 0, C.byref(length))
     attribute_buffer = C.create_string_buffer(length.value)
-    check(attr_init(attribute_buffer, 3, 0, C.byref(length)))
+    check(attr_init(attribute_buffer, count, 0, C.byref(length)))
     security = CAPABILITIES(sid, values, len(caps), 0)
     policy = W.DWORD(1)  # PROCESS_CREATION_ALL_APPLICATION_PACKAGES_OPT_OUT
     check(attr_set(attribute_buffer, 0, 0x20009, C.byref(security), C.sizeof(security), None, None))
-    check(attr_set(attribute_buffer, 0, 0x2000f, C.byref(policy), C.sizeof(policy), None, None))
+    if less_privileged:
+        check(attr_set(attribute_buffer, 0, 0x2000f, C.byref(policy), C.sizeof(policy), None, None))
     files = [open(os.devnull, "rb"), open(str(report_file) + ".stdout", "xb"), open(str(report_file) + ".stderr", "xb")]
     handles = (W.HANDLE * 3)(*(msvcrt.get_osfhandle(f.fileno()) for f in files))
     for h in handles:
@@ -213,7 +218,11 @@ try:
     token = W.HANDLE()
     check(open_token(child.process, 8, C.byref(token)))
     actual = {}
-    for label, number in [("appContainer", 29), ("lessPrivileged", 46)]:
+    # GetTokenInformation does not implement the SDK's reserved LPAC enum on
+    # these hosts. Verify AppContainer here; native controls independently prove
+    # LPAC by denying a file readable by ALL APPLICATION PACKAGES, and run an
+    # ordinary AppContainer positive control against the same unchanged file.
+    for label, number in [("appContainer", 29)]:
         value, used = W.DWORD(), W.DWORD()
         check(token_info(token, number, C.byref(value), C.sizeof(value), C.byref(used)))
         assert value.value == 1, f"Missing {label} token restriction"

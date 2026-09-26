@@ -1,5 +1,7 @@
-**Four-platform candidate retained; Windows validation begins — 2026-09-26.** Candidate `.37` passed native installed-package and copied-deployment acceptance on Linux and macOS, each on x86-64 and ARM64. [Full report](NODE_ACCEPTANCE.md).
+**Windows implementation progressing — 2026-09-26.** Retained `.37` remains accepted on both Linux and both Mac architectures. Native Windows ARM64 SDK and Lean 4.34.1 builds are running; validated ARM64 leantar is retained.
 
-Native Windows ARM64 leantar passed upstream/reference/relocation checks and is retained. The SDK and Lean 4.34.1 distribution builds are running under Job Object limits. Windows isolation controls now create disposable Less Privileged AppContainers, verify their tokens and inherited resource cap, test file denial, stock Node/npm, child processes, workers, Wasm and online/offline networking, then remove profiles and grants. Native CI will determine whether those controls work; they are not yet verified.
+Windows deployment packaging now keeps only its matching native adapter and license, with no POSIX helper dependency. Thirteen focused bundle/support tests passed under a 512-MiB guard (31.2-MiB peak).
 
-README reviewed against current CLI and supported artifacts: complete `.37` quick start, all CLI examples, exact Linux/Mac environments and Lean restrictions remain accurate. Windows remains explicitly unsupported pending acceptance. Next: run isolation controls and inspect native builds. No npm publication. Completion ETA is not yet estimable.
+The first native isolation campaign failed before Node startup: Windows rejects the reserved LPAC token-information query. Both original reports are preserved. Revised controls verify AppContainer membership and prove reduced access using the same sentinel file in ordinary and less-privileged containers. Native reruns are required; no Windows application pass is claimed.
+
+README reviewed: retained `.37` quick start, CLI examples, Linux/Mac support and exact Lean restrictions still match the released code; Windows remains pending. Next: finish native isolation and toolchain builds. No npm publication. Completion ETA is not yet estimable.

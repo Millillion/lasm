@@ -16,7 +16,9 @@ export function windowsIsolated(spec, reportFile) {
   { encoding: 'utf8', timeout: ((spec.timeoutSeconds ?? 3000) + 600) * 1000, maxBuffer: 1024 * 1024, windowsHide: true });
   const evidence = existsSync(report) ? JSON.parse(readFileSync(report, 'utf8')) : undefined;
   assert.ifError(child.error); assert.ok(['passed', 'failed'].includes(evidence?.status), child.stderr + child.stdout);
-  assert.equal(evidence.token.lessPrivileged, true); assert.equal(evidence.descendantsReleased, true);
+  assert.equal(evidence.token.appContainer, true);
+  assert.equal(evidence.allPackagesOptOut, spec.lessPrivileged ?? true);
+  assert.equal(evidence.descendantsReleased, true);
   assert.equal(evidence.cleanupErrors, undefined); assert.equal(child.status, evidence.exitCode);
   return { code: evidence.exitCode, stdout: readFileSync(report + '.stdout', 'utf8'),
     stderr: readFileSync(report + '.stderr', 'utf8'), isolation: evidence };

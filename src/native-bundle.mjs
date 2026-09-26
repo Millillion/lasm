@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 /** Node deployments require the builder's native OS and architecture. */
 export function copyApplicationNativeBundle(root, output, { platform = process.platform, arch = process.arch } = {}) {
   if (!['x64', 'arm64'].includes(arch)) throw new Error('Unsupported Node application architecture');
-  if (!['linux', 'darwin'].includes(platform)) throw new Error('Unsupported Node application platform');
+  if (!['linux', 'darwin', 'win32'].includes(platform)) throw new Error('Unsupported Node application platform');
   const source = [join(root, 'src/native'), join(root, '.cache/native-host')].find(path => existsSync(join(path, 'manifest.json')));
   if (!source) throw new Error('Native Node file adapter is missing. Reinstall the complete Lasm package.');
   const destination = join(output, 'native');
@@ -32,7 +32,7 @@ export function copyApplicationNativeBundle(root, output, { platform = process.p
   write('manifest.json', { ...manifest, packages, deployment: { target: 'node', platform, arch, ...(platform === 'linux' ? { libc: 'glibc' } : {}) } });
   const helpers = platform === 'linux'
     ? [['process', `linux-${arch}-gnu`], ['signals', `linux-${arch}-gnu.so`]]
-    : [['signals', `darwin-${arch}.dylib`]];
+    : platform === 'darwin' ? [['signals', `darwin-${arch}.dylib`]] : [];
   for (const [directory, name] of helpers) {
     const manifest = json(directory + '/manifest.json'), record = manifest.files?.[name];
     const bytes = readFileSync(join(source, directory, name));

@@ -1,0 +1,103 @@
+{
+  "scope": "Harness setup failure before Node executed; reserved LPAC GetTokenInformation class returns ERROR_INVALID_PARAMETER. Original reports preserved.",
+  "records": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36279228305/job/108507759531",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.b686a994-f3fa-430d-8727-7bb0511f33ff",
+        "offline": false,
+        "status": "isolation-error",
+        "startedAt": 1790464985.9128616,
+        "sid": "S-1-15-2-815554054-1760330850-314604420-1348208592-3098904811-4171373979-2207066065",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "grants": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-CFEjhh\\stock Node",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-CFEjhh\\readonly.txt",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-CFEjhh\\writable \u65e5\u672c\u8a9e"
+        ],
+        "error": "[WinError 87] The parameter is incorrect.",
+        "finishedAt": 1790464991.863856,
+        "descendantsReleased": true
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14224429056
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 75771904,
+        "minimumHostAvailable": 14102736896,
+        "startedAt": 1790464980.1645222,
+        "unit": "Local\\LasmResource-3a3b2e23-cf22-4ebb-9600-7ba34dbceef7",
+        "pid": 7124,
+        "lastSampleAt": 1790464991.8099258,
+        "exitCode": 1,
+        "finishedAt": 1790464991.9259703
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36279228305/job/108507759424",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.ec70b348-0ad8-4305-9f10-5b9ca9d31789",
+        "offline": false,
+        "status": "isolation-error",
+        "startedAt": 1790465015.0046554,
+        "sid": "S-1-15-2-370737591-1801074557-304903262-2015548619-2324015724-3438584788-2371712089",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "grants": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-7wu4UZ\\stock Node",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-7wu4UZ\\readonly.txt",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-7wu4UZ\\writable \u65e5\u672c\u8a9e"
+        ],
+        "error": "[WinError 87] The parameter is incorrect.",
+        "finishedAt": 1790465019.3886454,
+        "descendantsReleased": true
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13623930880
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 78921728,
+        "minimumHostAvailable": 13454409728,
+        "startedAt": 1790465011.5389152,
+        "unit": "Local\\LasmResource-a4645be2-1628-47f7-9bdb-7a4e07223f6f",
+        "pid": 1056,
+        "lastSampleAt": 1790465019.267248,
+        "exitCode": 1,
+        "finishedAt": 1790465019.4503906
+      }
+    }
+  ]
+}
