@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 
 assert.equal(process.env.GITHUB_REPOSITORY, 'Millillion/lasm');
 assert.equal(process.env.GITHUB_REF, 'refs/heads/main');
-const version = process.env.LASM_CANDIDATE_VERSION ?? '0.1.0-experimental.39';
+const version = process.env.LASM_CANDIDATE_VERSION ?? '0.1.0-experimental.40';
 assert.match(version, /^0\.1\.0-experimental\.\d+$/);
 const filename = `lasm-compiler-${version}.tgz`;
 const hash = createHash('sha256');

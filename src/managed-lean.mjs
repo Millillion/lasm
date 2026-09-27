@@ -1,5 +1,5 @@
 import { readFile, stat } from 'node:fs/promises';
-import { join, dirname, resolve } from 'node:path';
+import { join, dirname, resolve, toNamespacedPath } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { provisionArtifact } from './managed-artifacts.mjs';
 import { executableName } from './platform.mjs';
@@ -36,8 +36,14 @@ export async function provisionLean(file, options = {}) {
   const artifact = release.artifacts[host];
   if (!artifact) throw new Error(`Managed Lean ${selection.version} is not implemented for ${host}. ${release.unavailable?.[host] ?? 'No matching native artifact is available.'} This platform remains an implementation gap.`);
   const installed = await provisionArtifact(artifact, { ...options, label: `Lean ${selection.version} and Lake` });
-  const lean = join(installed.directory, 'bin', executableName('lean', platform));
-  const lake = join(installed.directory, 'bin', executableName('lake', platform));
+  // Lake puts its executable-derived library root ahead of LEAN_PATH. Preserve
+  // the Windows namespace in GetModuleFileName as well as in our environment,
+  // so nested module files do not fall back to MAX_PATH-limited spellings.
+  const program = name => {
+    const file = join(installed.directory, 'bin', executableName(name, platform));
+    return platform === 'win32' ? toNamespacedPath(file) : file;
+  };
+  const lean = program('lean'), lake = program('lake');
   const nativePrograms = {};
   for (const [name, program] of [['lean', lean], ['lake', lake]])
     nativePrograms[name] = await verifyNativeProgram(program, platform, arch);

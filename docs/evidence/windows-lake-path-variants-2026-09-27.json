@@ -1,0 +1,145 @@
+{
+  "scope": "Native Windows Lake long-path localization, with successful short plain and namespaced controls",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36288928192",
+  "sourceRevision": "f97a413753766783750bf277d7c04e28866001ce",
+  "result": {
+    "passed": false,
+    "scope": "Native Lean/Lake long managed paths; installed Lasm acceptance remains separate",
+    "platform": "win32-x64",
+    "node": "v26.10.0",
+    "checks": [
+      {
+        "label": "unchanged upstream path handling",
+        "code": 1,
+        "stdout": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\project \u65e5\u672c\u8a9e\\Main.lean:1:0: error: failed to open file 'd:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\String\\Bootstrap.olean.server': 3\n",
+        "stderr": ""
+      },
+      {
+        "label": "extended library paths",
+        "code": 0,
+        "stdout": "long cache path 42\n",
+        "stderr": ""
+      },
+      {
+        "standaloneCGeneration": true
+      },
+      {
+        "label": "short plain Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls/short plain Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "short namespaced Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls/short namespaced Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "direct config compilation",
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "meta imported Lake",
+        "code": 1,
+        "stdout": "",
+        "stderr": "error: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\meta imported Lake\\lakefile.lean:2:5: unknown namespace `Lake`\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\meta imported Lake\\lakefile.lean:3:0: unexpected identifier; expected command\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\meta imported Lake\\lakefile.lean:5:17: unexpected identifier; expected 'abbrev', 'axiom', 'binder_predicate', 'builtin_initialize', 'class', 'coinductive', 'def', 'elab', 'elab_rules', 'example', 'inductive', 'infix', 'infixl', 'infixr', 'initialize', 'instance', 'macro', 'macro_rules', 'notation', 'opaque', 'postfix', 'prefix', 'structure', 'syntax' or 'theorem'\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\meta imported Lake\\lakefile.lean: package configuration has errors\n"
+      },
+      {
+        "label": "module Lake configuration",
+        "code": 1,
+        "stdout": "",
+        "stderr": "error: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\module Lake configuration\\lakefile.lean:3:5: unknown namespace `Lake`\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\module Lake configuration\\lakefile.lean:4:0: unexpected identifier; expected command\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\module Lake configuration\\lakefile.lean:6:17: unexpected identifier; expected 'abbrev', 'axiom', 'binder_predicate', 'builtin_initialize', 'class', 'coinductive', 'def', 'elab', 'elab_rules', 'example', 'inductive', 'infix', 'infixl', 'infixr', 'initialize', 'instance', 'macro', 'macro_rules', 'notation', 'opaque', 'postfix', 'prefix', 'structure', 'syntax' or 'theorem'\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\module Lake configuration\\lakefile.lean: package configuration has errors\n"
+      },
+      {
+        "label": "native Lake CLI",
+        "code": 1,
+        "stdout": "",
+        "stderr": "error: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\native Lake CLI\\lakefile.lean:2:5: unknown namespace `Lake`\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\native Lake CLI\\lakefile.lean:3:0: unexpected identifier; expected command\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\native Lake CLI\\lakefile.lean:5:17: unexpected identifier; expected 'abbrev', 'axiom', 'binder_predicate', 'builtin_initialize', 'class', 'coinductive', 'def', 'elab', 'elab_rules', 'example', 'inductive', 'infix', 'infixl', 'infixr', 'initialize', 'instance', 'macro', 'macro_rules', 'notation', 'opaque', 'postfix', 'prefix', 'structure', 'syntax' or 'theorem'\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\native Lake CLI\\lakefile.lean: package configuration has errors\n"
+      },
+      {
+        "label": "interpreter adapter",
+        "code": 1,
+        "stdout": "",
+        "stderr": "error: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\interpreter adapter\\lakefile.lean:2:5: unknown namespace `Lake`\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\interpreter adapter\\lakefile.lean:3:0: unexpected identifier; expected command\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\interpreter adapter\\lakefile.lean:5:17: unexpected identifier; expected 'abbrev', 'axiom', 'binder_predicate', 'builtin_initialize', 'class', 'coinductive', 'def', 'elab', 'elab_rules', 'example', 'inductive', 'infix', 'infixl', 'infixr', 'initialize', 'instance', 'macro', 'macro_rules', 'notation', 'opaque', 'postfix', 'prefix', 'structure', 'syntax' or 'theorem'\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\interpreter adapter\\lakefile.lean: package configuration has errors\nuncaught exception: could not load the Lake workspace\n"
+      },
+      {
+        "label": "adapter without SYSROOT override",
+        "code": 1,
+        "stdout": "",
+        "stderr": "error: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter without SYSROOT override\\lakefile.lean:2:5: unknown namespace `Lake`\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter without SYSROOT override\\lakefile.lean:3:0: unexpected identifier; expected command\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter without SYSROOT override\\lakefile.lean:5:17: unexpected identifier; expected 'abbrev', 'axiom', 'binder_predicate', 'builtin_initialize', 'class', 'coinductive', 'def', 'elab', 'elab_rules', 'example', 'inductive', 'infix', 'infixl', 'infixr', 'initialize', 'instance', 'macro', 'macro_rules', 'notation', 'opaque', 'postfix', 'prefix', 'structure', 'syntax' or 'theorem'\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter without SYSROOT override\\lakefile.lean: package configuration has errors\nuncaught exception: could not load the Lake workspace\n"
+      },
+      {
+        "label": "adapter with full Lake import",
+        "code": 1,
+        "stdout": "",
+        "stderr": "error: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter with full Lake import\\lakefile.lean:2:5: unknown namespace `Lake`\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter with full Lake import\\lakefile.lean:3:0: unexpected identifier; expected command\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter with full Lake import\\lakefile.lean:5:17: unexpected identifier; expected 'abbrev', 'axiom', 'binder_predicate', 'builtin_initialize', 'class', 'coinductive', 'def', 'elab', 'elab_rules', 'example', 'inductive', 'infix', 'infixl', 'infixr', 'initialize', 'instance', 'macro', 'macro_rules', 'notation', 'opaque', 'postfix', 'prefix', 'structure', 'syntax' or 'theorem'\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter with full Lake import\\lakefile.lean: package configuration has errors\nuncaught exception: could not load the Lake workspace\n"
+      },
+      {
+        "label": "adapter without plugin",
+        "code": 1,
+        "stdout": "",
+        "stderr": "LEAN ASSERTION VIOLATION\nFile: D:/a/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\n"
+      }
+    ],
+    "modulePath": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\Iterators\\Internal\\LawfulMonadLiftFunction.olean.private",
+    "modulePathLength": 287,
+    "lean": {
+      "version": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      }
+    },
+    "error": "Error: Command failed: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\bin\\lean.exe -j1 -s8192 --plugin=D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\bin\\libLake_shared.dll --run D:\\a\\lasm\\lasm\\src\\lake-module.lean D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\project \u65e5\u672c\u8a9e\\Main.lean\n    at genericNodeError (node:internal/errors:999:15)\n    at wrappedFn (node:internal/errors:544:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at run (file:///D:/a/lasm/lasm/src/application-sources.mjs:45:39)\n    at applicationSources (file:///D:/a/lasm/lasm/src/application-sources.mjs:59:30)\n    at file:///D:/a/lasm/lasm/scripts/ci/windows-lean-path-controls.mjs:101:16"
+  },
+  "resources": {
+    "status": "failed",
+    "command": [
+      "node",
+      "scripts/ci/windows-lean-path-controls.mjs"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 14154928128
+    },
+    "limits": {
+      "jobCommittedBytes": 2147483648,
+      "stopCommittedBytes": 1717986918,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 1200
+    },
+    "peakCommittedBytes": 1443598336,
+    "minimumHostAvailable": 12813848576,
+    "startedAt": 1790476559.3048873,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 153528864768
+      }
+    },
+    "unit": "Local\\LasmResource-c056ac41-6baf-4086-99a0-40020400a83e",
+    "pid": 6820,
+    "lastSampleAt": 1790476670.6992311,
+    "exitCode": 1,
+    "finishedAt": 1790476670.758132
+  },
+  "finding": "Short plain and namespaced toolchain paths both pass; direct Lean config compilation also passes. Lake native import headers remain broken only through the long executable location.",
+  "sourceExplanation": "Lake.findInstall? derives collocated Lean/Lake roots from IO.appPath and places those roots first in leanSearchPath. Environment-only extended paths do not override that order.",
+  "next": "Launch managed lean.exe and lake.exe with Windows namespace prefixes, and retest through the installed candidate.",
+  "originalLog": ".work/macos/windows-lake-path-variants-36288928192.log"
+}

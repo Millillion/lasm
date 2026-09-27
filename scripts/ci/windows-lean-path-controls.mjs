@@ -33,14 +33,14 @@ try {
   result.lean = { version: lean.version, commit: lean.commit, identity: lean.identity, nativePrograms: lean.nativePrograms };
   const env = nativeLeanEnvironment(lean), baseline = { ...env };
   delete baseline.LEAN_PATH; delete baseline.LEAN_SYSROOT;
-  function run(label, environment) {
-    const r = spawnSync(lean.lean, ['-j1', '-s8192', '--run', source],
+  function run(label, environment, program = lean.lean) {
+    const r = spawnSync(program, ['-j1', '-s8192', '--run', source],
       { cwd: project, env: environment, encoding: 'utf8', timeout: 120000, maxBuffer: 1024 ** 2 });
     assert.ifError(r.error); assert.equal(r.signal, null);
     result.checks.push({ label, code: r.status, stdout: r.stdout, stderr: r.stderr }); save();
     return r;
   }
-  const original = run('unchanged upstream path handling', baseline);
+  const original = run('unchanged upstream path handling', baseline, join(lean.prefix, 'bin/lean.exe'));
   assert.notEqual(original.status, 0);
   assert.match(original.stdout + original.stderr, /failed to open file.*\.olean/);
   const extended = run('extended library paths', env);

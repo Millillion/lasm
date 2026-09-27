@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, realpathSync, rmSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, relative } from 'node:path';
+import { join, relative, toNamespacedPath } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { canonicalApplicationPath } from '../src/application-sources.mjs';
 import { insideDirectory } from '../src/platform.mjs';
@@ -30,6 +30,8 @@ test('canonical source roots recognize filesystem aliases without admitting sibl
   assert.equal(readFileSync(join(alias, 'Init.lean'), 'utf8'), '-- standard fixture\n');
   const directory = canonicalApplicationPath(alias);
   const imported = canonicalApplicationPath(realpathSync.native(join(standard, 'Init.lean')));
+  assert.equal(canonicalApplicationPath(toNamespacedPath(join(standard, 'Init.lean'))), imported,
+    'Extended Windows paths and ordinary paths identify the same module');
   assert.equal(insideDirectory(directory, imported), true, 'Native Lean paths and Node cache aliases identify the same library');
   assert.equal(relative(directory, imported), 'Init.lean', 'Module output paths stay inside their source root');
   assert.equal(insideDirectory(directory, canonicalApplicationPath(join(sibling, 'External.lean'))), false);
