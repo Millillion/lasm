@@ -6,6 +6,11 @@ import { fileURLToPath } from 'node:url';
 import { insideDirectory } from './platform.mjs';
 import { managedGitEnvironment } from './managed-git.mjs';
 
+// Lean's Windows source inventory expands DOS 8.3 aliases. Node's JS realpath
+// can retain them, so use the OS path identity before comparing source roots.
+export const canonicalApplicationPath = file => process.platform === 'win32'
+  ? realpathSync.native(file) : realpathSync(file);
+
 /** A nested toolchain pin starts an independent project, even inside a checkout. */
 export function findApplicationProject(source) {
   let directory = dirname(resolve(source));
@@ -36,7 +41,7 @@ export function applicationSources(source, lean, work, { log = console.error, gi
   if (project) {
     const query = target => JSON.parse(run(lean.lake,
       ['--no-cache', '--keep-toolchain', '--quiet', '--json', 'query', target], project));
-    const configuredSource = resolve(realpathSync(project), relative(project, source));
+    const configuredSource = resolve(canonicalApplicationPath(project), relative(project, source));
     // Lake configuration defaults can refer to native initialized constants
     // without interpreter bodies. Match Lake's own initialized native library;
     // importing more Lean modules or loading symbols without the initializer
@@ -80,14 +85,14 @@ export function applicationSources(source, lean, work, { log = console.error, gi
   }
   // Standalone source trees use Lean's own import parser. Standard libraries
   // are already in the versioned bundle; local imports are compiled in order.
-  const directory = dirname(source), standard = realpathSync(join(lean.prefix, 'src/lean'));
+  const directory = canonicalApplicationPath(dirname(source)), standard = canonicalApplicationPath(join(lean.prefix, 'src/lean'));
   const output = join(work, 'lean'); mkdirSync(output, { recursive: true });
   Object.assign(env, { LEAN_PATH: output, LEAN_SRC_PATH: directory });
   const sources = [], inputs = [], visiting = new Set(), completed = new Map();
   function visit(file) {
-    file = realpathSync(file);
+    file = canonicalApplicationPath(file);
     if (insideDirectory(standard, file)) return lean.commit;
-    if (!insideDirectory(realpathSync(directory), file)) throw new Error(`Standalone import ${file} is outside the source directory. Declare external dependencies in an ordinary Lake project.`);
+    if (!insideDirectory(directory, file)) throw new Error(`Standalone import ${file} is outside the source directory. Declare external dependencies in an ordinary Lake project.`);
     if (completed.has(file)) return completed.get(file);
     if (visiting.has(file)) throw new Error(`Cyclic Lean module imports: ${file}`);
     visiting.add(file);

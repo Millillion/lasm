@@ -16,7 +16,7 @@ on:
         type: string
       candidate-version:
         type: string
-        default: 0.1.0-experimental.38
+        default: 0.1.0-experimental.39
 permissions:
   contents: read
 jobs:
@@ -45,7 +45,7 @@ jobs:
       - name: Focused host and bundle controls
         # The legacy platform suite needs an externally installed Lean compiler.
         # Managed compiler/linker behavior is exercised by the consumer below.
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-focused-resources.json -- node --test --test-concurrency=1 test/native-application-bundle.test.mjs test/native-program.test.mjs test/node-host.test.mjs test/application-support.test.mjs test/cli-arguments.test.mjs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-focused-resources.json -- node --test --test-concurrency=1 test/native-application-bundle.test.mjs test/native-program.test.mjs test/node-host.test.mjs test/application-support.test.mjs test/application-paths.test.mjs test/cli-arguments.test.mjs
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz

@@ -1,0 +1,97 @@
+{
+  "platform": "win32-x64",
+  "node": "v26.10.0",
+  "kernel": "10.0.26100",
+  "osRelease": "Microsoft Windows [Version 10.0.26100.33438]",
+  "sourceRevision": "649a814f18cf092dd396a972589a24c39ef19fc7",
+  "archiveSha256": "34dbe720d3c8fea90df5ca48ea4ff563bf6f536275628eb054635b2e3ecfa370",
+  "archiveBytes": 65336575,
+  "passed": false,
+  "activePhase": "cold",
+  "run": 36285630173,
+  "job": 108525893892,
+  "candidate": "0.1.0-experimental.38",
+  "scope": "Failed native Windows x64 installed workflow; npm install and native Lean provisioning passed, but first CLI run rejected a standard library import due to mixed DOS/full paths",
+  "steps": [
+    {
+      "label": "npm install candidate",
+      "command": [
+        "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\stock Node\\node.exe",
+        "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\stock Node\\node_modules\\npm\\bin\\npm-cli.js",
+        "install",
+        "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\candidate.tgz"
+      ],
+      "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+      "seconds": 26.918483199999997,
+      "code": 0,
+      "stdout": "\nadded 7 packages in 24s\n",
+      "stderr": "",
+      "signal": null
+    },
+    {
+      "label": "npm version",
+      "command": [
+        "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\stock Node\\node.exe",
+        "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\stock Node\\node_modules\\npm\\bin\\npm-cli.js",
+        "--version"
+      ],
+      "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+      "seconds": 0.08124349999999686,
+      "code": 0,
+      "stdout": "11.19.1\n",
+      "stderr": "",
+      "signal": null
+    },
+    {
+      "label": "cold npx lasm Main.lean",
+      "command": [
+        "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\stock Node\\node.exe",
+        "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+        "lasm",
+        "Main.lean"
+      ],
+      "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+      "seconds": 303.61337139999995,
+      "code": 1,
+      "stdout": "",
+      "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] First-time tool setup can take a few minutes. Lasm downloads and verifies its tools automatically; later builds reuse them.\n[lasm] Tools cache: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\consumer \u65e5\u672c\u8a9e\\home\\AppData\\Local\\lasm\\Cache\n[lasm] Downloading Lean 4.34.1 and Lake: 0 B / 589.0 MB (0%) \u2014 0s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 245.5 MB / 589.0 MB (41%) \u2014 9s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 511.5 MB / 589.0 MB (86%) \u2014 19s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 589.0 MB / 589.0 MB (100%) \u2014 22s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 7s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 17s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 27s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 37s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 47s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 57s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 7s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 17s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 27s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 37s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 47s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 57s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 7s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 17s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 27s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 37s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 47s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 57s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 7s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 17s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 27s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 37s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 47s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 57s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 4m 7s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 4m 17s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 4m 27s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake \u2014 5s elapsed\n[lasm] Finishing Lean 4.34.1 and Lake setup \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\nStandalone import c:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-BmN9UU\\consumer \u65e5\u672c\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\src\\lean\\Init.lean is outside the source directory. Declare external dependencies in an ordinary Lake project.\n",
+      "signal": null
+    }
+  ],
+  "resources": {
+    "status": "failed",
+    "command": [
+      "C:\\hostedtoolcache\\windows\\node\\26.10.0\\x64\\node.exe",
+      "scripts/check-node-windows.mjs",
+      "D:\\a\\lasm\\lasm\\.work\\node-windows-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.38.tgz",
+      "34dbe720d3c8fea90df5ca48ea4ff563bf6f536275628eb054635b2e3ecfa370"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 13772066816
+    },
+    "limits": {
+      "jobCommittedBytes": 8587180032,
+      "stopCommittedBytes": 6869744025,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 6600
+    },
+    "peakCommittedBytes": 702877696,
+    "minimumHostAvailable": 12750725120,
+    "startedAt": 1790472997.8318386,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 235496763392,
+        "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 26725679104
+      }
+    },
+    "unit": "Local\\LasmResource-cab25145-39a1-4e0f-bab2-0237d0b714e1",
+    "pid": 2928,
+    "lastSampleAt": 1790473347.4063258,
+    "exitCode": 1,
+    "finishedAt": 1790473347.5885437
+  },
+  "correction": "Canonicalize existing application/library paths through native Windows realpath before source containment checks; validate as a new candidate .39, preserving this failure."
+}
