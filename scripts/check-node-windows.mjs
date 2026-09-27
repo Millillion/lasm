@@ -49,7 +49,6 @@ const result = { scope: 'Native Windows installed Node/npm-only CLI and copied d
   archiveSha256: expectedSha, archiveBytes: statSync(archive).size, workspace, containerRoot, profile,
   resourceReport: process.env.LASM_RESOURCE_REPORT, startedAt: new Date().toISOString(), passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(result, null, 2) + '\n'); save();
-const behavior = ({ isolation, ...actual }) => actual;
 async function nativeControls() {
   const compiler = join(workspace, 'project space λ/node_modules/@lasm/compiler');
   const { provisionLean } = await import(pathToFileURL(join(compiler, 'src/managed-lean.mjs')));
@@ -108,21 +107,19 @@ try {
     join(result.installation.tools, 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean.exe')];
   const env = { PATH: '', SystemRoot: process.env.SystemRoot, WINDIR: process.env.SystemRoot,
     HOME: cwd, USERPROFILE: cwd, LOCALAPPDATA: cwd, APPDATA: cwd, TMP: temporary, TEMP: temporary, LEAN_NUM_THREADS: '1' };
-  const specification = { disposableRoot: deployed, reads: [engine, ...programs.map(p => p.copied)], writes: [cwd, temporary],
-    cwd, environment: env, offline: true, timeoutSeconds: 120 };
-  const control = windowsIsolated({ ...specification, command: [engine, '--input-type=module', '-e',
-    `import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';for(const p of ${JSON.stringify(denied)})assert.throws(()=>readFileSync(p),e=>['EACCES','EPERM'].includes(e.code));`] }, join(output, 'deployment-denial.json'));
-  assert.deepEqual(behavior(control), { code: 0, stdout: '', stderr: '' });
-  result.deployment = { denied, controlResult: control, programs: [] }; save();
-  for (const program of programs) {
-    const checks = [];
-    for (const [i, c] of program.checks.entries()) {
-      const start = performance.now();
-      const actual = windowsIsolated({ ...specification, command: [engine, join(program.copied, 'main.mjs'), ...c.args] }, join(output, `deployment-${program.name}-${i}.json`));
-      checks.push({ ...c, actual: behavior(actual), isolation: actual.isolation, seconds: (performance.now() - start) / 1000 });
-      assert.deepEqual(behavior(actual), c.expected);
-    }
-    result.deployment.programs.push({ name: program.name, bytes: program.bytes, wasmSha256: program.wasmSha256, checks }); save();
-  }
+  const control = join(deployed, 'deployment-control.mjs'), config = join(deployed, 'deployment-config.json');
+  const measurements = join(cwd, 'deployment-results.json');
+  result.deploymentMeasurements = measurements; save();
+  copyFileSync(join(root, 'integration/node-windows-deployed.mjs'), control);
+  writeFileSync(config, JSON.stringify({ denied, programs }, null, 2) + '\n');
+  const actual = windowsIsolated({ disposableRoot: deployed,
+    reads: [engine, control, config, ...programs.map(p => p.copied)], writes: [cwd, temporary],
+    cwd, environment: env, offline: true, timeoutSeconds: 1800,
+    command: [engine, control, config, measurements] }, join(output, 'deployment.json'));
+  if (existsSync(measurements)) result.deployment = JSON.parse(readFileSync(measurements));
+  result.deploymentExecution = actual; save();
+  assert.equal(actual.code, 0, actual.stderr);
+  assert.equal(result.deployment?.passed, true);
+  assert.equal(result.deployment.denialControlPassed, true);
   result.passed = true; result.finishedAt = new Date().toISOString(); save();
 } catch (error) { result.error = error.stack; save(); throw error; }

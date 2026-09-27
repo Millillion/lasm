@@ -40,6 +40,8 @@ disk.freeAtEnd = Object.fromEntries(diskPaths.map(p => [p, free(p)])); save();
 const file = resolve(output, 'result.json');
 if (existsSync(file)) {
   const acceptance = JSON.parse(readFileSync(file)), consumer = resolve(acceptance.workspace, 'result.json');
+  if (acceptance.deploymentMeasurements && existsSync(acceptance.deploymentMeasurements))
+    acceptance.deployment = JSON.parse(readFileSync(acceptance.deploymentMeasurements));
   if (existsSync(consumer)) {
     acceptance.installation = JSON.parse(readFileSync(consumer));
     for (const path of acceptance.installation.activeCommand?.logs ?? []) {
