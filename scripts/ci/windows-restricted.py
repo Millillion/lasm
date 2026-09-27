@@ -1,8 +1,9 @@
 """CI-only stock-Node prerequisite controls using a Windows restricted token.
 
-Remove every privilege, including traversal bypass; deny development/source roots
-with object-only ACL entries. This is not an adversarial sandbox. All descendants
-retain the capped Job Object. AppContainer is unsuitable for pinned stock Node: its
+Retain only ordinary traversal privilege, which stock Node requires for pipes;
+deny developer executables and source/cache files directly. This is not an
+adversarial sandbox. All descendants retain the capped Job Object.
+AppContainer is unsuitable for pinned stock Node: its
 libuv pipe-name retry loop predates the upstream AppContainer compatibility fix.
 """
 import base64
@@ -12,6 +13,7 @@ import json
 import msvcrt
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import time
@@ -219,6 +221,42 @@ def literal(text):
     return "'" + str(text).replace("'", "''") + "'"
 
 
+tool_names = {"lean.exe", "lake.exe", "leanc.exe", "leanchecker.exe", "leantar.exe",
+    "cl.exe", "link.exe", "lld.exe", "lld-link.exe", "ld.lld.exe", "ld.exe", "llc.exe", "opt.exe",
+    "wasm-ld.exe", "wasm-opt.exe", "ar.exe", "ranlib.exe", "gcc.exe", "g++.exe",
+    "py.exe", "git.exe", "git-cmd.exe", "git-bash.exe", "git-lfs.exe", "cmake.exe", "ninja.exe",
+    "make.exe", "mingw32-make.exe", "bash.exe", "sh.exe", "node.exe", "npm.cmd", "npx.cmd",
+    "emcc.bat", "emcc.cmd", "emcc.py", "em++.py", "emar.py", "emranlib.py", "emsdk.bat"}
+
+
+def developer_program(path):
+    return path.name.lower() in tool_names or re.fullmatch(r"(?:clang.*|llvm-.*|python.*)\.exe", path.name, re.I)
+
+
+def walk_files(root, *, developer=False):
+    pending, seen = [Path(root)], set()
+    while pending:
+        directory = pending.pop().resolve()
+        identity = str(directory).lower()
+        if identity in seen: continue
+        seen.add(identity)
+        try:
+            with os.scandir(directory) as entries:
+                for entry in entries:
+                    path = Path(entry.path)
+                    if entry.is_dir(follow_symlinks=True):
+                        if developer and entry.name.lower() in ("windows defender", "windows defender advanced threat protection"):
+                            continue
+                        # Runner Git/LLVM directories can be junctions. Resolve
+                        # and visit their targets, once, rather than skipping.
+                        pending.append(path)
+                    elif not developer or developer_program(path):
+                        yield path.resolve()
+        except PermissionError:
+            if not developer: raise
+            evidence.setdefault("inaccessibleDeveloperDirectories", []).append(str(directory))
+
+
 assert os.environ.get("GITHUB_ACTIONS") == "true" and os.environ.get("GITHUB_REPOSITORY") == "Millillion/lasm", \
     "CI ACL/firewall controls run only in this repository's disposable hosted VMs"
 spec_file, report_file = map(Path, sys.argv[1:])
@@ -245,6 +283,7 @@ original = restricted = outer = inner = token = None
 child = PROCESS()
 attribute_buffer = None
 files, changed = [], []
+changed_paths = set()
 firewall_group = "Lasm.CI." + str(identity)
 firewall_state = Path(str(report_file) + ".firewall.json")
 firewall_attempted = False
@@ -261,8 +300,9 @@ def save():
 def deny(path, permissions):
     path = Path(path).resolve()
     object_acl(path, permissions, 3)
-    if path not in changed:
+    if path not in changed_paths:
         changed.append(path)
+        changed_paths.add(path)
 
 
 try:
@@ -285,7 +325,8 @@ try:
     restricted = W.HANDLE()
     ordinary = startup_probe == "ordinary-token"
     restricting = startup_probe not in ("no-restricting-sids", "ordinary-token")
-    check(restricted_token(original, 1 if startup_probe == "keep-traversal" else 0,
+    keep_traversal = not startup_probe or startup_probe == "keep-traversal"
+    check(restricted_token(original, 1 if keep_traversal else 0,
         0 if ordinary else 1, None if ordinary else C.byref(disabled),
         0 if ordinary else privilege_count, None if ordinary else deleted,
         len(restrictions) if restricting else 0, restrictions if restricting else None, C.byref(restricted)))
@@ -304,19 +345,40 @@ try:
     finally: free(new_default)
     actual_privileges = C.cast(info(restricted, 3), C.POINTER(W.DWORD))[0]
     if not startup_probe:
-        assert is_restricted(restricted) and actual_privileges == 0
+        assert is_restricted(restricted) and actual_privileges == 1
+        remaining = info(restricted, 3)
+        privilege = LUID_ATTRIBUTES.from_buffer(remaining, TOKEN_PRIVILEGES.privileges.offset)
+        traversal = LUID(); check(lookup_privilege(None, "SeChangeNotifyPrivilege", C.byref(traversal)))
+        assert (privilege.luid.low, privilege.luid.high) == (traversal.low, traversal.high)
+        assert privilege.attributes & 2
     evidence["token"] = {"restricted": bool(is_restricted(restricted)), "privileges": actual_privileges,
-        "traversalBypass": startup_probe in ("keep-traversal", "ordinary-token"), "privateObjectDacl": True}
+        "traversalBypass": keep_traversal or ordinary, "privateObjectDacl": True}
+    if not startup_probe: evidence["token"]["privilegeNames"] = ["SeChangeNotifyPrivilege"]
 
     roots = [os.environ.get(k) for k in ("ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "RUNNER_TOOL_CACHE", "MSYS2_LOCATION")]
     roots.append(str(Path(os.environ["SystemRoot"]).anchor + "msys64"))
     developer_roots = sorted({str(Path(p).resolve()) for p in roots if p and Path(p).exists()})
-    for path in ([] if startup_probe else [*developer_roots, *spec.get("denied", [])]):
+    programs = []
+    if not startup_probe:
+        programs = spec.get("developerPrograms")
+        if programs is None:
+            programs = sorted({str(p) for root in developer_roots for p in walk_files(root, developer=True)})
+        assert programs
+        for value in programs:
+            path = Path(value).resolve()
+            assert developer_program(path) and path.is_file() and allowed_root not in path.parents
+            deny(path, 0x21)
+        evidence["blockedDevelopmentPrograms"] = programs
+        save()
+    for path in ([] if startup_probe else spec.get("denied", [])):
         target = Path(path).resolve()
         assert target.exists() and target != allowed_root and target not in allowed_root.parents
         deny(target, 0x21)  # FILE_READ_DATA/LIST_DIRECTORY | FILE_EXECUTE/TRAVERSE
+        if target.is_dir():
+            for file in walk_files(target): deny(file, 0x21)
     evidence["blockedDevelopmentRoots"] = [] if startup_probe else developer_roots
     evidence["deniedInputs"] = [] if startup_probe else spec.get("denied", [])
+    evidence["deniedObjects"] = len(changed)
     # Explicit write bits exclude SYNCHRONIZE and READ_CONTROL, which generic
     # FILE_GENERIC_WRITE also contains and would accidentally deny reads.
     read_only_start = len(changed)
@@ -380,7 +442,7 @@ try:
     token = W.HANDLE()
     check(open_token(child.process, 8, C.byref(token)))
     if not startup_probe:
-        assert is_restricted(token) and C.cast(info(token, 3), C.POINTER(W.DWORD))[0] == 0
+        assert is_restricted(token) and C.cast(info(token, 3), C.POINTER(W.DWORD))[0] == 1
     assert C.cast(info(token, 29), C.POINTER(W.DWORD))[0] == 0, "Use ordinary Node pipe namespaces, not AppContainer"
     evidence.update(status="running", pid=child.pid, inheritedCappedJob=outer_name)
     save()

@@ -5,14 +5,18 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 /** Privileged maintainer side only. The child receives only spec.environment. */
+let developerPrograms;
 export function windowsIsolated(spec, reportFile) {
   assert.equal(spec.startupProbe, undefined, 'Startup probes cannot satisfy consumer acceptance');
-  const actual = invoke(spec, reportFile);
+  const actual = invoke({ ...spec, ...(developerPrograms ? { developerPrograms } : {}) }, reportFile);
   const evidence = actual.isolation;
   assert.equal(evidence.token.restricted, true);
-  assert.equal(evidence.token.privileges, 0);
-  assert.equal(evidence.token.traversalBypass, false);
+  assert.equal(evidence.token.privileges, 1);
+  assert.equal(evidence.token.traversalBypass, true);
+  assert.deepEqual(evidence.token.privilegeNames, ['SeChangeNotifyPrivilege']);
   assert.ok(evidence.blockedDevelopmentRoots.length > 0);
+  assert.ok(evidence.blockedDevelopmentPrograms.length > 0);
+  developerPrograms = evidence.blockedDevelopmentPrograms;
   if (spec.offline) {
     assert.ok(evidence.offlinePrograms.length > 0);
     assert.equal(evidence.firewallRestored, true);

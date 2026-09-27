@@ -52,7 +52,9 @@ const positive = spawnSync(node, ['-e', `require('node:assert/strict').equal(req
 assert.ifError(positive.error); assert.equal(positive.status, 0, positive.stderr);
 report.ordinaryUserSentinel = { code: positive.status, stdout: positive.stdout, stderr: positive.stderr }; save();
 report.startupProbes = [];
-for (const startupProbe of ['no-acls', 'keep-traversal', 'no-restricting-sids', 'ordinary-token']) {
+const probes = process.argv.includes('--diagnose-pipes')
+  ? ['no-acls', 'keep-traversal', 'no-restricting-sids', 'ordinary-token'] : ['keep-traversal', 'ordinary-token'];
+for (const startupProbe of probes) {
   const actual = windowsStartupProbe({ startupProbe, disposableRoot: root,
     reads: [nodeDirectory], writes: [writable], command: [node, '--eval',
       'console.error("pipe probe started"); process.stdout.write(require("node:child_process").execFileSync(process.execPath,["--version"]))'],

@@ -1,0 +1,502 @@
+{
+  "scope": "With private OpenSSL configuration, native architecture, default cache, every file denial, Unicode filesystem, Wasm and worker controls pass on both architectures. Both online and offline phases then reach their 180-second child deadline at stock Node pipe creation. These are resource aborts in the CI harness, not Lean failures; cleanup completes.",
+  "sourceRevision": "71f5ea5c692c9e2108b4ee35075ded7d3963e21d",
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36284010416/job/108521186390",
+      "controls": {
+        "scope": "Native restricted-token and scoped firewall controls; no Lean application acceptance",
+        "platform": "win32-x64",
+        "root": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-uDPSh2",
+        "phases": [
+          {
+            "phase": "online",
+            "code": 124,
+            "stdout": "",
+            "stderr": "Starting control: native architecture\n{\"name\":\"native architecture\",\"passed\":true}\nStarting control: isolated default user cache\n{\"name\":\"isolated default user cache\",\"passed\":true}\nStarting control: read-only fixture\n{\"name\":\"read-only fixture\",\"passed\":true}\nStarting control: deny file: D:\\a\\lasm\\lasm\\package.json\n{\"name\":\"deny file: D:\\\\a\\\\lasm\\\\lasm\\\\package.json\",\"passed\":true}\nStarting control: deny file: D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe\n{\"name\":\"deny file: D:\\\\a\\\\lasm\\\\lasm\\\\.cache\\\\managed-tools\\\\artifacts\\\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\\\python.exe\",\"passed\":true}\nStarting control: deny file: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-uDPSh2\\denied directory\\ordinary-user-readable.txt\n{\"name\":\"deny file: C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-uDPSh2\\\\denied directory\\\\ordinary-user-readable.txt\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\bin\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\cmd\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\mingw64\\bin\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe\n{\"name\":\"deny file: C:\\\\hostedtoolcache\\\\windows\\\\Python\\\\3.12.10\\\\x64\\\\python.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\LLVM\\bin\\clang.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\LLVM\\\\bin\\\\clang.exe\",\"passed\":true}\nStarting control: deny writing read-only fixture\n{\"name\":\"deny writing read-only fixture\",\"passed\":true}\nStarting control: Unicode filesystem roundtrip\n{\"name\":\"Unicode filesystem roundtrip\",\"passed\":true}\nStarting control: Wasm JIT\n{\"name\":\"Wasm JIT\",\"passed\":true}\nStarting control: worker threads\n{\"name\":\"worker threads\",\"passed\":true}\nStarting control: child process pipes\n",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-860400601-2102376394-238647980-1001",
+              "offline": false,
+              "status": "failed",
+              "startedAt": 1790470638.5452487,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "D:\\a\\lasm\\lasm",
+                "D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-uDPSh2\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "pid": 6112,
+              "inheritedCappedJob": "Local\\LasmResource-e75f4e6c-a4cd-4a7c-958e-9e6ce8b751e4",
+              "stoppedBecause": "time-limit",
+              "exitCode": 124,
+              "finishedAt": 1790470821.0185835,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          },
+          {
+            "phase": "offline",
+            "code": 124,
+            "stdout": "",
+            "stderr": "Starting control: native architecture\n{\"name\":\"native architecture\",\"passed\":true}\nStarting control: isolated default user cache\n{\"name\":\"isolated default user cache\",\"passed\":true}\nStarting control: read-only fixture\n{\"name\":\"read-only fixture\",\"passed\":true}\nStarting control: deny file: D:\\a\\lasm\\lasm\\package.json\n{\"name\":\"deny file: D:\\\\a\\\\lasm\\\\lasm\\\\package.json\",\"passed\":true}\nStarting control: deny file: D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe\n{\"name\":\"deny file: D:\\\\a\\\\lasm\\\\lasm\\\\.cache\\\\managed-tools\\\\artifacts\\\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\\\python.exe\",\"passed\":true}\nStarting control: deny file: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-uDPSh2\\denied directory\\ordinary-user-readable.txt\n{\"name\":\"deny file: C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-uDPSh2\\\\denied directory\\\\ordinary-user-readable.txt\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\bin\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\cmd\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\mingw64\\bin\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe\n{\"name\":\"deny file: C:\\\\hostedtoolcache\\\\windows\\\\Python\\\\3.12.10\\\\x64\\\\python.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\LLVM\\bin\\clang.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\LLVM\\\\bin\\\\clang.exe\",\"passed\":true}\nStarting control: deny writing read-only fixture\n{\"name\":\"deny writing read-only fixture\",\"passed\":true}\nStarting control: Unicode filesystem roundtrip\n{\"name\":\"Unicode filesystem roundtrip\",\"passed\":true}\nStarting control: Wasm JIT\n{\"name\":\"Wasm JIT\",\"passed\":true}\nStarting control: worker threads\n{\"name\":\"worker threads\",\"passed\":true}\nStarting control: child process pipes\n",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-2790044450-3125565717-1865415863-1001",
+              "offline": true,
+              "status": "failed",
+              "startedAt": 1790470821.2957006,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "D:\\a\\lasm\\lasm",
+                "D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-uDPSh2\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "offlinePrograms": [
+                "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-uDPSh2\\stock Node\\node.exe"
+              ],
+              "pid": 2680,
+              "inheritedCappedJob": "Local\\LasmResource-e75f4e6c-a4cd-4a7c-958e-9e6ce8b751e4",
+              "stoppedBecause": "time-limit",
+              "exitCode": 124,
+              "firewallRestored": true,
+              "finishedAt": 1790471021.6400118,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          }
+        ],
+        "ordinaryUserSentinel": {
+          "code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "startupProbes": [
+          {
+            "startupProbe": "no-acls",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-844190292-2723050570-1430766237-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470637.5106254,
+              "startupProbe": "no-acls",
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [],
+              "deniedInputs": [],
+              "readOnlyObjects": 0,
+              "pid": 7312,
+              "inheritedCappedJob": "Local\\LasmResource-e75f4e6c-a4cd-4a7c-958e-9e6ce8b751e4",
+              "exitCode": 0,
+              "finishedAt": 1790470637.5517075,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "keep-traversal",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-2641997137-1615847367-1682200197-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470637.7807314,
+              "startupProbe": "keep-traversal",
+              "token": {
+                "restricted": true,
+                "privileges": 1,
+                "traversalBypass": true,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [],
+              "deniedInputs": [],
+              "readOnlyObjects": 0,
+              "pid": 7276,
+              "inheritedCappedJob": "Local\\LasmResource-e75f4e6c-a4cd-4a7c-958e-9e6ce8b751e4",
+              "exitCode": 0,
+              "finishedAt": 1790470637.81544,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "no-restricting-sids",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-440329136-1380150485-3795637657-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470638.0348916,
+              "startupProbe": "no-restricting-sids",
+              "token": {
+                "restricted": false,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [],
+              "deniedInputs": [],
+              "readOnlyObjects": 0,
+              "pid": 7848,
+              "inheritedCappedJob": "Local\\LasmResource-e75f4e6c-a4cd-4a7c-958e-9e6ce8b751e4",
+              "exitCode": 0,
+              "finishedAt": 1790470638.071017,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "ordinary-token",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-2733785208-3930731634-3929697969-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470638.2914093,
+              "startupProbe": "ordinary-token",
+              "token": {
+                "restricted": false,
+                "privileges": 24,
+                "traversalBypass": true,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [],
+              "deniedInputs": [],
+              "readOnlyObjects": 0,
+              "pid": 9724,
+              "inheritedCappedJob": "Local\\LasmResource-e75f4e6c-a4cd-4a7c-958e-9e6ce8b751e4",
+              "exitCode": 0,
+              "finishedAt": 1790470638.326184,
+              "descendantsReleased": true
+            }
+          }
+        ],
+        "passed": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14312902656
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 254439424,
+        "minimumHostAvailable": 13262823424,
+        "startedAt": 1790470631.2416437,
+        "unit": "Local\\LasmResource-e75f4e6c-a4cd-4a7c-958e-9e6ce8b751e4",
+        "pid": 9980,
+        "lastSampleAt": 1790471021.6300654,
+        "exitCode": 1,
+        "finishedAt": 1790471021.6707876
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36284010416/job/108521186457",
+      "controls": {
+        "scope": "Native restricted-token and scoped firewall controls; no Lean application acceptance",
+        "platform": "win32-arm64",
+        "root": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ObZRkj",
+        "phases": [
+          {
+            "phase": "online",
+            "code": 124,
+            "stdout": "",
+            "stderr": "Starting control: native architecture\n{\"name\":\"native architecture\",\"passed\":true}\nStarting control: isolated default user cache\n{\"name\":\"isolated default user cache\",\"passed\":true}\nStarting control: read-only fixture\n{\"name\":\"read-only fixture\",\"passed\":true}\nStarting control: deny file: C:\\a\\lasm\\lasm\\package.json\n{\"name\":\"deny file: C:\\\\a\\\\lasm\\\\lasm\\\\package.json\",\"passed\":true}\nStarting control: deny file: C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe\n{\"name\":\"deny file: C:\\\\a\\\\lasm\\\\lasm\\\\.cache\\\\managed-tools\\\\artifacts\\\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\\\python.exe\",\"passed\":true}\nStarting control: deny file: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ObZRkj\\denied directory\\ordinary-user-readable.txt\n{\"name\":\"deny file: C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-ObZRkj\\\\denied directory\\\\ordinary-user-readable.txt\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\bin\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\cmd\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\clangarm64\\bin\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\clangarm64\\\\bin\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\hostedtoolcache\\windows\\Python\\3.13.15\\arm64\\python.exe\n{\"name\":\"deny file: C:\\\\hostedtoolcache\\\\windows\\\\Python\\\\3.13.15\\\\arm64\\\\python.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\LLVM\\bin\\clang.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\LLVM\\\\bin\\\\clang.exe\",\"passed\":true}\nStarting control: deny writing read-only fixture\n{\"name\":\"deny writing read-only fixture\",\"passed\":true}\nStarting control: Unicode filesystem roundtrip\n{\"name\":\"Unicode filesystem roundtrip\",\"passed\":true}\nStarting control: Wasm JIT\n{\"name\":\"Wasm JIT\",\"passed\":true}\nStarting control: worker threads\n{\"name\":\"worker threads\",\"passed\":true}\nStarting control: child process pipes\n",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-4117263741-1565398063-2745093820-1001",
+              "offline": false,
+              "status": "failed",
+              "startedAt": 1790470669.399711,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "C:\\a\\lasm\\lasm",
+                "C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ObZRkj\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "pid": 7556,
+              "inheritedCappedJob": "Local\\LasmResource-7bd51f50-5127-4d9f-8a36-3a5df1ffe682",
+              "stoppedBecause": "time-limit",
+              "exitCode": 124,
+              "finishedAt": 1790470851.80393,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          },
+          {
+            "phase": "offline",
+            "code": 124,
+            "stdout": "",
+            "stderr": "Starting control: native architecture\n{\"name\":\"native architecture\",\"passed\":true}\nStarting control: isolated default user cache\n{\"name\":\"isolated default user cache\",\"passed\":true}\nStarting control: read-only fixture\n{\"name\":\"read-only fixture\",\"passed\":true}\nStarting control: deny file: C:\\a\\lasm\\lasm\\package.json\n{\"name\":\"deny file: C:\\\\a\\\\lasm\\\\lasm\\\\package.json\",\"passed\":true}\nStarting control: deny file: C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe\n{\"name\":\"deny file: C:\\\\a\\\\lasm\\\\lasm\\\\.cache\\\\managed-tools\\\\artifacts\\\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\\\python.exe\",\"passed\":true}\nStarting control: deny file: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ObZRkj\\denied directory\\ordinary-user-readable.txt\n{\"name\":\"deny file: C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-ObZRkj\\\\denied directory\\\\ordinary-user-readable.txt\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\bin\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\cmd\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\Git\\clangarm64\\bin\\git.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\clangarm64\\\\bin\\\\git.exe\",\"passed\":true}\nStarting control: deny file: C:\\hostedtoolcache\\windows\\Python\\3.13.15\\arm64\\python.exe\n{\"name\":\"deny file: C:\\\\hostedtoolcache\\\\windows\\\\Python\\\\3.13.15\\\\arm64\\\\python.exe\",\"passed\":true}\nStarting control: deny file: C:\\Program Files\\LLVM\\bin\\clang.exe\n{\"name\":\"deny file: C:\\\\Program Files\\\\LLVM\\\\bin\\\\clang.exe\",\"passed\":true}\nStarting control: deny writing read-only fixture\n{\"name\":\"deny writing read-only fixture\",\"passed\":true}\nStarting control: Unicode filesystem roundtrip\n{\"name\":\"Unicode filesystem roundtrip\",\"passed\":true}\nStarting control: Wasm JIT\n{\"name\":\"Wasm JIT\",\"passed\":true}\nStarting control: worker threads\n{\"name\":\"worker threads\",\"passed\":true}\nStarting control: child process pipes\n",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-4192385176-1817106194-1901826995-1001",
+              "offline": true,
+              "status": "failed",
+              "startedAt": 1790470852.0157213,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "C:\\a\\lasm\\lasm",
+                "C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ObZRkj\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "offlinePrograms": [
+                "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ObZRkj\\stock Node\\node.exe"
+              ],
+              "pid": 3396,
+              "inheritedCappedJob": "Local\\LasmResource-7bd51f50-5127-4d9f-8a36-3a5df1ffe682",
+              "stoppedBecause": "time-limit",
+              "exitCode": 124,
+              "firewallRestored": true,
+              "finishedAt": 1790471096.8188972,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          }
+        ],
+        "ordinaryUserSentinel": {
+          "code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "startupProbes": [
+          {
+            "startupProbe": "no-acls",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-3315535373-2018246238-3697130637-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470668.3489974,
+              "startupProbe": "no-acls",
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [],
+              "deniedInputs": [],
+              "readOnlyObjects": 0,
+              "pid": 6364,
+              "inheritedCappedJob": "Local\\LasmResource-7bd51f50-5127-4d9f-8a36-3a5df1ffe682",
+              "exitCode": 0,
+              "finishedAt": 1790470668.405978,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "keep-traversal",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-2564628751-3125022769-2670173328-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470668.6043975,
+              "startupProbe": "keep-traversal",
+              "token": {
+                "restricted": true,
+                "privileges": 1,
+                "traversalBypass": true,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [],
+              "deniedInputs": [],
+              "readOnlyObjects": 0,
+              "pid": 8068,
+              "inheritedCappedJob": "Local\\LasmResource-7bd51f50-5127-4d9f-8a36-3a5df1ffe682",
+              "exitCode": 0,
+              "finishedAt": 1790470668.6598797,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "no-restricting-sids",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-2774195457-1816731179-77104274-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470668.863082,
+              "startupProbe": "no-restricting-sids",
+              "token": {
+                "restricted": false,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [],
+              "deniedInputs": [],
+              "readOnlyObjects": 0,
+              "pid": 8716,
+              "inheritedCappedJob": "Local\\LasmResource-7bd51f50-5127-4d9f-8a36-3a5df1ffe682",
+              "exitCode": 0,
+              "finishedAt": 1790470668.9215114,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "ordinary-token",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-1164521895-3108910210-3987807374-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470669.1276343,
+              "startupProbe": "ordinary-token",
+              "token": {
+                "restricted": false,
+                "privileges": 24,
+                "traversalBypass": true,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [],
+              "deniedInputs": [],
+              "readOnlyObjects": 0,
+              "pid": 5960,
+              "inheritedCappedJob": "Local\\LasmResource-7bd51f50-5127-4d9f-8a36-3a5df1ffe682",
+              "exitCode": 0,
+              "finishedAt": 1790470669.2023401,
+              "descendantsReleased": true
+            }
+          }
+        ],
+        "passed": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13586403328
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 425426944,
+        "minimumHostAvailable": 13380243456,
+        "startedAt": 1790470664.3649292,
+        "unit": "Local\\LasmResource-7bd51f50-5127-4d9f-8a36-3a5df1ffe682",
+        "pid": 7464,
+        "lastSampleAt": 1790471096.7600613,
+        "exitCode": 1,
+        "finishedAt": 1790471096.8523881
+      }
+    }
+  ]
+}

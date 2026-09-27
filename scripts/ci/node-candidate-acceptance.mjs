@@ -86,8 +86,10 @@ for (const { os, architecture, id } of targets) {
     assert.ok(Object.values(resources.disk.minimumFreeBytes).every(n => n >= resources.disk.reserveBytes));
     for (const phase of acceptance.phaseExecutions) {
       assert.equal(phase.code, 0); assert.equal(phase.isolation.token.restricted, true);
-      assert.equal(phase.isolation.token.privileges, 0); assert.equal(phase.isolation.token.traversalBypass, false);
+      assert.equal(phase.isolation.token.privileges, 1); assert.equal(phase.isolation.token.traversalBypass, true);
+      assert.deepEqual(phase.isolation.token.privilegeNames, ['SeChangeNotifyPrivilege']);
       assert.ok(phase.isolation.blockedDevelopmentRoots.length > 0);
+      assert.ok(phase.isolation.blockedDevelopmentPrograms.length > 0);
       if (phase.phase === 'offline') assert.equal(phase.isolation.firewallRestored, true);
       assert.equal(phase.isolation.descendantsReleased, true);
       assert.equal(phase.isolation.cleanupErrors, undefined);
