@@ -12,7 +12,7 @@ are published atomically. These temporary execution directories can be removed
 when no build is running and will be recreated. Removing the main tool cache
 alone does not remove its temporary hard links or copies.
 
-Native validation of this correction is pending. A [whole-directory junction
+[Native Windows x64 validation passed](evidence/windows-lean-physical-prefix-2026-09-27.json): standalone Lean, Lake configurations, the interpreter adapter, and local-import C generation all work with a 289-character original module path. The unchanged upstream-path negative control still fails. Full installed-package acceptance remains separate. A [whole-directory junction
 failed](evidence/windows-lean-junction-failure-2026-09-27.json): Lean 4.34.1's
 `IO.appDir` resolves the physical path, and Lake overrides the child's library
 search path. A physically short bin directory addresses that lookup without
@@ -40,3 +40,5 @@ Lean 4.34.1 native compiler is still building. The reproducible
 must match the compiler's actual GMP version and leantar identity before it is
 connected to that distribution. No Windows ARM64 download catalog entry or
 public tool publication is established yet.
+
+Read-only archive audits verified the retained [SDK and its named licenses](evidence/windows-arm64-sdk-notice-audit-2026-09-27.json) and [leantar executable](evidence/windows-arm64-leantar-archive-audit-2026-09-27.json). They streamed compressed bytes and inventoried native identities without extracting full toolchains locally. The SDK contains 27 recorded native ARM64 files plus the two explicitly unused upstream source launchers; its LLVM, Binaryen, and Emscripten license texts are recorded by hash. These audits establish archive integrity, not complete installed application acceptance.

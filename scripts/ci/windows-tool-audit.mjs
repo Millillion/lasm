@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+import { resolve, join, sep } from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
@@ -13,8 +13,11 @@ import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
 const [kind, tag, expectedSha, ...extra] = process.argv.slice(2);
-const local = extra.length === 1 && extra[0] === '--local';
-assert.ok(['sdk', 'leantar', 'lean'].includes(kind) && (!extra.length || local));
+const local = extra[0] === '--local';
+if (local) extra.shift();
+let outputOverride;
+if (extra[0] === '--output') { extra.shift(); outputOverride = extra.shift(); assert.ok(outputOverride); }
+assert.ok(['sdk', 'leantar', 'lean'].includes(kind) && !extra.length);
 // The Linux resource guard intentionally clears arbitrary environment values.
 // A private CI-only file keeps the short-lived token out of command arguments
 // and resource logs. Local audits use gh's existing authorization for read-only
@@ -30,7 +33,8 @@ if (local) {
 }
 assert.match(tag, new RegExp(`^windows-arm64-${kind}-bootstrap-\\d+$`));
 assert.match(expectedSha, /^[a-f0-9]{64}$/);
-const output = resolve('.work/windows-tool-audit' + (local ? '-' + kind : ''));
+const output = resolve(outputOverride ?? '.work/windows-tool-audit' + (local ? '-' + kind : ''));
+assert.ok(output.startsWith(resolve('.work') + sep), 'Keep audit output in ignored .work directories');
 assert.ok(!existsSync(output)); mkdirSync(output, { recursive: true });
 const disk = statfsSync(output);
 assert.ok(disk.bavail * disk.bsize >= 4 * 1024 ** 3 + 32 * 1024 ** 2, 'Preserve the local disk reserve');
@@ -83,7 +87,7 @@ const parser = listTar({ strict: true, onReadEntry(entry) {
   if (entry.type !== 'File') return;
   const native = /\.(?:dll|exe)$/i.test(path);
   const capture = /(?:^|\/)build-provenance\.json$/.test(path)
-    || /(?:^|\/)(?:LICENSE[^/]*|COPYING[^/]*|msys2-package-versions\.txt|windows-manifest\.patch)$/.test(path);
+    || /(?:^|\/)(?:[^/]*[-_.])?(?:LICEN[SC]E[^/]*|COPYING[^/]*|COPYRIGHT[^/]*|NOTICE[^/]*|AUTHORS[^/]*|msys2-package-versions\.txt|windows-manifest\.patch)$/i.test(path);
   const hash = createHash('sha256'), chunks = [], header = []; let headerBytes = 0;
   if (capture) {
     metadataBytes += entry.size;
@@ -141,8 +145,10 @@ const nativeInventory = [...files.keys(), ...links.keys()].filter(path => /\.(dl
 writeFileSync(join(output, 'native-inventory.json'), JSON.stringify(nativeInventory, null, 2) + '\n');
 for (const { path } of nativeInventory)
   assert.ok(recorded.has(path), `Unrecorded native program: ${path}`);
-const notices = Object.keys(metadata).filter(path => /LICENSE|COPYING/.test(path));
+const notices = Object.keys(metadata).filter(path => /LICEN[SC]E|COPYING|COPYRIGHT|NOTICE|AUTHORS/i.test(path));
 assert.ok(notices.length > 0, 'Every archive must carry its license');
+if (kind === 'sdk') for (const name of ['LLVM', 'BINARYEN', 'EMSCRIPTEN'])
+  assert.ok(metadata[`install/notices/${name}-LICENSE.txt`]?.length > 100, `Missing ${name} license`);
 const provenancePath = (kind === 'leantar' ? '' : 'install/') + 'build-provenance.json';
 const provenance = JSON.parse(metadata[provenancePath]);
 const bundledLibraries = expected.map(([path]) => path).filter(path => /\.dll$/i.test(path));

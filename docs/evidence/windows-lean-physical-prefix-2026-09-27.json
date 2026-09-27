@@ -1,0 +1,161 @@
+{
+  "scope": "Native Windows x64 long-path Lean/Lake controls; installed Node acceptance is separate",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36291957364",
+  "sourceRevision": "bd33b3d425ee5cdede8c3cb339b7e46d41e03321",
+  "jobId": 108543626906,
+  "result": {
+    "passed": true,
+    "scope": "Native Lean/Lake long managed paths; installed Lasm acceptance remains separate",
+    "platform": "win32-x64",
+    "node": "v26.10.0",
+    "checks": [
+      {
+        "label": "unchanged upstream path handling",
+        "code": 1,
+        "stdout": "D:\\a\\lasm\\lasm\\.work\\windows-lean-prefix-controls\\project \u65e5\u672c\u8a9e\\Main.lean:1:0: error: failed to open file 'd:\\a\\lasm\\lasm\\.work\\windows-lean-prefix-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Control\\MonadAttach.olean.server': 3\n",
+        "stderr": ""
+      },
+      {
+        "label": "extended library paths",
+        "code": 0,
+        "stdout": "long cache path 42\n",
+        "stderr": ""
+      },
+      {
+        "standaloneCGeneration": true
+      },
+      {
+        "label": "short plain Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-prefix-controls/short plain Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "short namespaced Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-prefix-controls/short namespaced Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "direct config compilation",
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "meta imported Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-prefix-controls/meta imported Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "module Lake configuration",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-prefix-controls/module Lake configuration/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "native Lake CLI",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-prefix-controls/native Lake CLI/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "interpreter adapter",
+        "code": 0,
+        "stdout": "{\"metadataRoots\":[\"d:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-prefix-controls\\\\interpreter adapter\\\\.lake\\\\build\\\\lib\\\\lean\"],\"module\":\"/+Main\"}\n",
+        "stderr": "info: longPaths: no previous manifest, creating one from scratch\n"
+      },
+      {
+        "label": "adapter without SYSROOT override",
+        "code": 0,
+        "stdout": "{\"metadataRoots\":[\"d:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-prefix-controls\\\\adapter without SYSROOT override\\\\.lake\\\\build\\\\lib\\\\lean\"],\"module\":\"/+Main\"}\n",
+        "stderr": "info: longPaths: no previous manifest, creating one from scratch\n"
+      },
+      {
+        "label": "adapter with full Lake import",
+        "code": 0,
+        "stdout": "{\"metadataRoots\":[\"d:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-prefix-controls\\\\adapter with full Lake import\\\\.lake\\\\build\\\\lib\\\\lean\"],\"module\":\"/+Main\"}\n",
+        "stderr": "info: longPaths: no previous manifest, creating one from scratch\n"
+      },
+      {
+        "label": "adapter without plugin",
+        "code": 1,
+        "stdout": "",
+        "stderr": "LEAN ASSERTION VIOLATION\nFile: D:/a/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\n"
+      },
+      {
+        "lakeLocalImportCGeneration": true,
+        "sources": [
+          {
+            "module": "+Greeting",
+            "source": "D:\\a\\lasm\\lasm\\.work\\windows-lean-prefix-controls\\project \u65e5\u672c\u8a9e\\Greeting.lean"
+          },
+          {
+            "module": "/+Main",
+            "source": "D:\\a\\lasm\\lasm\\.work\\windows-lean-prefix-controls\\project \u65e5\u672c\u8a9e\\Main.lean"
+          }
+        ]
+      }
+    ],
+    "modulePath": "D:\\a\\lasm\\lasm\\.work\\windows-lean-prefix-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\Iterators\\Internal\\LawfulMonadLiftFunction.olean.private",
+    "modulePathLength": 289,
+    "executionPrefix": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05",
+    "executedPrograms": {
+      "lean": "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05\\bin\\lean.exe",
+      "lake": "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05\\bin\\lake.exe"
+    },
+    "lean": {
+      "version": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      }
+    }
+  },
+  "resources": {
+    "status": "passed",
+    "command": [
+      "node",
+      "scripts/ci/windows-lean-path-controls.mjs",
+      ".work/windows-lean-prefix-controls"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 13953163264
+    },
+    "limits": {
+      "jobCommittedBytes": 4294967296,
+      "stopCommittedBytes": 3435973836,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 1200
+    },
+    "peakCommittedBytes": 2278199296,
+    "minimumHostAvailable": 11776405504,
+    "startedAt": 1790480390.9240522,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 153530933248
+      }
+    },
+    "unit": "Local\\LasmResource-167b5820-9881-4774-a4cd-3c0587f7f638",
+    "pid": 1320,
+    "lastSampleAt": 1790480522.7763712,
+    "exitCode": 0,
+    "finishedAt": 1790480522.7961423
+  },
+  "originalLog": ".work/macos/windows-lean-prefix-36291957364.log"
+}

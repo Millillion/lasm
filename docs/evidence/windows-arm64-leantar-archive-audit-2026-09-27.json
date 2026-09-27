@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "scope": "Archive integrity and redistribution-metadata inventory; no new native execution or installed Node acceptance",
+  "kind": "leantar",
+  "tag": "windows-arm64-leantar-bootstrap-36278365557",
+  "archive": "leantar-0.1.20-win32-arm64.tar.gz",
+  "sha256": "1391fe8084ad6f1fd86806f6ba4392b23cd83c68a3ab5f564539be35a840145c",
+  "bytes": 787239,
+  "sourceRevision": "cc9c2c929cba829e7b0ee4ea847d1c45bb63aacd",
+  "sourceRun": "https://github.com/Millillion/lasm/actions/runs/36278365557",
+  "archiveEntries": 3,
+  "contentBytes": 1721546,
+  "nativePrograms": 1,
+  "bundledLibraries": [],
+  "notices": [
+    "LICENSE"
+  ],
+  "auditedAt": "2026-09-27T03:41:47.734Z",
+  "resourceReport": ".work/macos/windows-leantar-archive-audit-resources.json",
+  "resources": {
+    "peakMemoryBytes": 32374784,
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "unitReleased": true
+  },
+  "memoryEvents": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  }
+}

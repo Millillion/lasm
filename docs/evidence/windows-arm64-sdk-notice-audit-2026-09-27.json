@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "scope": "Archive integrity and redistribution-metadata inventory; no new native execution or installed Node acceptance",
+  "kind": "sdk",
+  "tag": "windows-arm64-sdk-bootstrap-36278363560",
+  "archive": "emscripten-6.0.9-win32-arm64.tar.gz",
+  "sha256": "abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a",
+  "bytes": 174792332,
+  "sourceRevision": "cc9c2c929cba829e7b0ee4ea847d1c45bb63aacd",
+  "sourceRun": "https://github.com/Millillion/lasm/actions/runs/36278363560",
+  "archiveEntries": 14380,
+  "contentBytes": 528897935,
+  "nativePrograms": 27,
+  "bundledLibraries": [
+    "install/bin/libc++.dll",
+    "install/bin/zlib1.dll",
+    "install/bin/libzstd.dll"
+  ],
+  "sourcePrograms": [
+    [
+      "install/emscripten/tools/pylauncher/pylauncher-arm64.exe",
+      "f48f99fdb9df801a27e72d5ea31b1fdf222ffba7b25ebb99ede5389f78726b67",
+      "arm64"
+    ],
+    [
+      "install/emscripten/tools/pylauncher/pylauncher.exe",
+      "2e672fb59e7f0f828dba7f00250fb2bde70ea81d7a2cb0009e3d7cf449e574f7",
+      "x64"
+    ]
+  ],
+  "auditedAt": "2026-09-27T03:41:08.578Z",
+  "requiredNamedNotices": {
+    "install/notices/BINARYEN-LICENSE.txt": {
+      "bytes": 11535,
+      "sha256": "64c0d02491e16eced74826440ecd2bcf7722d37fa586faf457b2494293afbffe"
+    },
+    "install/notices/EMSCRIPTEN-LICENSE.txt": {
+      "bytes": 5093,
+      "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86"
+    },
+    "install/notices/LLVM-LICENSE.txt": {
+      "bytes": 15141,
+      "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee"
+    }
+  },
+  "noticeFiles": 149,
+  "resourceReport": ".work/macos/windows-sdk-license-audit2-resources.json",
+  "resources": {
+    "peakMemoryBytes": 68018176,
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "unitReleased": true
+  },
+  "memoryEvents": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  }
+}
