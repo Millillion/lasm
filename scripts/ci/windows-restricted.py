@@ -240,6 +240,8 @@ def walk_files(root, *, developer=False):
         identity = str(directory).lower()
         if identity in seen: continue
         seen.add(identity)
+        progress("discovering developer tools" if developer else "enumerating denied inputs",
+            root=str(root), directory=str(directory), directoriesVisited=len(seen))
         try:
             with os.scandir(directory) as entries:
                 for entry in entries:
@@ -297,12 +299,21 @@ def save():
     report_file.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
 
 
+def progress(stage, *, force=False, **details):
+    previous = evidence.get("setup", {})
+    now = time.time()
+    if force or now - previous.get("updatedAt", 0) >= 5:
+        evidence["setup"] = {"stage": stage, "updatedAt": now, **details}
+        save()
+
+
 def deny(path, permissions):
     path = Path(path).resolve()
     object_acl(path, permissions, 3)
     if path not in changed_paths:
         changed.append(path)
         changed_paths.add(path)
+    progress("applying file access restrictions", objects=len(changed), path=str(path))
 
 
 try:
@@ -394,6 +405,7 @@ try:
     save()
 
     if spec.get("offline"):
+        progress("preparing offline firewall rules", force=True)
         # Cover stock Node and all provisioned executable children. No process
         # in the application environment receives PowerShell or firewall rights.
         programs = {str(Path(command[0]).resolve())}
@@ -445,6 +457,7 @@ try:
         assert is_restricted(token) and C.cast(info(token, 3), C.POINTER(W.DWORD))[0] == 1
     assert C.cast(info(token, 29), C.POINTER(W.DWORD))[0] == 0, "Use ordinary Node pipe namespaces, not AppContainer"
     evidence.update(status="running", pid=child.pid, inheritedCappedJob=outer_name)
+    progress("running control process", force=True)
     save()
     assert resume(child.thread) != 0xffffffff
     started = time.monotonic()
@@ -460,6 +473,7 @@ except BaseException as error:
     if child.process: terminate(child.process, 125)
     raise
 finally:
+    progress("restoring temporary access controls", force=True)
     if inner: close(inner)
     for handle in (token, outer, child.thread, child.process, restricted, original):
         if handle: close(handle)

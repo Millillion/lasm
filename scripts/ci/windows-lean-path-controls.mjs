@@ -30,7 +30,8 @@ try {
   const longModule = join(lean.prefix, 'lib/lean/Init/Data/Iterators/Internal/LawfulMonadLiftFunction.olean.private');
   assert.ok(longModule.length >= 260 && statSync(longModule).size > 0);
   result.modulePath = longModule; result.modulePathLength = longModule.length;
-  assert.equal(canonicalApplicationPath(lean.executionPrefix), canonicalApplicationPath(lean.prefix));
+  assert.equal(canonicalApplicationPath(join(lean.executionPrefix, 'lib')), canonicalApplicationPath(join(lean.prefix, 'lib')));
+  assert.notEqual(canonicalApplicationPath(join(lean.executionPrefix, 'bin')), canonicalApplicationPath(join(lean.prefix, 'bin')));
   result.executionPrefix = lean.executionPrefix;
   result.executedPrograms = { lean: lean.lean, lake: lean.lake };
   result.lean = { version: lean.version, commit: lean.commit, identity: lean.identity, nativePrograms: lean.nativePrograms };

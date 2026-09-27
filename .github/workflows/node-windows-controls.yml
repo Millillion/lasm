@@ -15,7 +15,7 @@ jobs:
           - runner: windows-11-arm
             architecture: arm64
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
     steps:
@@ -33,7 +33,7 @@ jobs:
       - name: Verify deadline cleanup below the memory cap
         run: node integration/windows-guard-deadline.mjs
       - name: Verify Node, filesystem restrictions and online/offline capabilities
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --timeout-seconds 480 --report .work/windows-isolation-resources.json -- node scripts/ci/windows-isolation-controls.mjs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --timeout-seconds 1200 --report .work/windows-isolation-resources.json -- node scripts/ci/windows-isolation-controls.mjs
       - name: Preserve results and setup diagnostics
         if: always()
         run: |

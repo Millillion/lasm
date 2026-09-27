@@ -42,10 +42,11 @@ export async function provisionLean(file, options = {}) {
   const notices = release.notices?.[host] ? await provisionArtifact(release.notices[host],
     { ...options, label: `Lean ${selection.version} tool sources and notices` }) : undefined;
   const installed = await provisionArtifact(artifact, { ...options, label: `Lean ${selection.version} and Lake` });
-  // Lake replaces LEAN_PATH for child compilers, whose executable-derived
-  // library root can lose the namespace prefix. A short junction also
-  // keeps those child-derived stdlib paths within upstream MAX_PATH handling.
-  const executionPrefix = platform === 'win32' ? await windowsToolPrefix(installed.directory) : installed.directory;
+  // Lake replaces LEAN_PATH for child compilers. Lean's own appDir resolves
+  // junctions, so its bin directory must physically have a short path.
+  if (platform === 'win32') options.progress?.({ stage: 'Preparing native Windows compiler paths' });
+  const executionPrefix = platform === 'win32' ? await windowsToolPrefix(installed.directory,
+    { receipt: installed.receipt }) : installed.directory;
   // Lake puts its executable-derived library root ahead of LEAN_PATH. Preserve
   // the Windows namespace in GetModuleFileName as well as in our environment,
   // so nested module files do not fall back to MAX_PATH-limited spellings.

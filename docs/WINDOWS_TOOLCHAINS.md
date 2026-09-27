@@ -3,15 +3,22 @@
 Windows remains unsupported until the installed Node package passes its native
 acceptance gates. The README identifies the currently accepted release.
 
-Managed native Lean/Lake execute through a stable directory junction under
-`os.tmpdir()/lasm-tools/<hash>`. The junction points to the complete verified
-toolchain in Lasm's versioned cache; it contains no copied compiler files. This
-keeps upstream Lean's child-process paths short without asking developers to
-move their cache or change Windows settings. Lasm checks the junction's target
-on every use and refuses to repoint a conflicting path. It can be removed when
-no build is running and will be recreated. Native validation of this correction
-is pending; the previous [child-path failure](evidence/windows-lake-child-path-failure-2026-09-27.json)
-is preserved.
+Managed native Lean/Lake execute from a short physical `bin` directory under
+`os.tmpdir()/lasm-tools/<hash>`. Its files are hard links to the verified cache
+when they share a volume; across volumes, copies are necessary. Library, source,
+and other large directories are junctions to the original verified cache.
+Every executable file and junction is rechecked before reuse, and new prefixes
+are published atomically. These temporary execution directories can be removed
+when no build is running and will be recreated. Removing the main tool cache
+alone does not remove its temporary hard links or copies.
+
+Native validation of this correction is pending. A [whole-directory junction
+failed](evidence/windows-lean-junction-failure-2026-09-27.json): Lean 4.34.1's
+`IO.appDir` resolves the physical path, and Lake overrides the child's library
+search path. A physically short bin directory addresses that lookup without
+changing a developer's chosen tool cache or Windows settings.
+
+Candidate `.41` [timed out during prerequisite setup](evidence/node41-windows-prerequisite-timeout-2026-09-27.json), before installed application checks. The harness now preserves intermediate setup reports and permits 1200 seconds instead of 480, with the same 1-GiB memory cap and assertions. This is a new bounded run, not a reclassification of the timeout.
 
 The pinned Emscripten linker receives `--output-eol=linux` on all platforms.
 Its default Windows CRLF output failed the strict loader-template check.

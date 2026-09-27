@@ -1,0 +1,125 @@
+{
+  "scope": "Windows prerequisite harness deadline; no installed application pass or failure established",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36290991412",
+  "sourceRevision": "0b97745593e55a4f43e9dbe0d56e0bea936cf575",
+  "candidate": {
+    "scope": "Reproducible local npm packing; native installed acceptance is separate",
+    "tarball": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.41.tgz",
+    "sha256": "81f0c2db775dea80f856bea551a8c6f1cf68963440d5605287a2b7083d289cf3",
+    "sourceRevision": "0b97745593e55a4f43e9dbe0d56e0bea936cf575",
+    "candidateVersion": "0.1.0-experimental.41",
+    "defaultLean": "4.34.1",
+    "node": "26.10.0",
+    "runtime": {
+      "identity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+      "name": "lean-4.34.1-wasm64"
+    },
+    "reproduciblePacking": true,
+    "compressedBytes": 65336045,
+    "installedBytes": 377773574,
+    "files": 234,
+    "resourceReport": "/home/runner/work/lasm/lasm/.work/node-package-resources.json",
+    "recordedAt": "2026-09-27T03:18:55.066Z"
+  },
+  "controls": {
+    "scope": "Native restricted-token and scoped firewall controls; no Lean application acceptance",
+    "platform": "win32-x64",
+    "root": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-ANSr6a",
+    "phases": [],
+    "ordinaryUserSentinel": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "startupProbes": [
+      {
+        "startupProbe": "keep-traversal",
+        "code": 0,
+        "stdout": "v26.10.0\r\n",
+        "stderr": "pipe probe started\n",
+        "isolation": {
+          "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+          "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+          "sid": "S-1-5-21-4281304917-3880161011-1966091649-1001",
+          "offline": false,
+          "status": "passed",
+          "startedAt": 1790479187.9642427,
+          "startupProbe": "keep-traversal",
+          "token": {
+            "restricted": true,
+            "privileges": 1,
+            "traversalBypass": true,
+            "privateObjectDacl": true
+          },
+          "blockedDevelopmentRoots": [],
+          "deniedInputs": [],
+          "deniedObjects": 0,
+          "readOnlyObjects": 0,
+          "pid": 9112,
+          "inheritedCappedJob": "Local\\LasmResource-75fc627c-a092-4387-b631-3d0120ebffb6",
+          "exitCode": 0,
+          "finishedAt": 1790479188.0477297,
+          "descendantsReleased": true
+        }
+      },
+      {
+        "startupProbe": "ordinary-token",
+        "code": 0,
+        "stdout": "v26.10.0\r\n",
+        "stderr": "pipe probe started\n",
+        "isolation": {
+          "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+          "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+          "sid": "S-1-5-21-4274196553-1313603129-660909219-1001",
+          "offline": false,
+          "status": "passed",
+          "startedAt": 1790479188.2670991,
+          "startupProbe": "ordinary-token",
+          "token": {
+            "restricted": false,
+            "privileges": 24,
+            "traversalBypass": true,
+            "privateObjectDacl": true
+          },
+          "blockedDevelopmentRoots": [],
+          "deniedInputs": [],
+          "deniedObjects": 0,
+          "readOnlyObjects": 0,
+          "pid": 5756,
+          "inheritedCappedJob": "Local\\LasmResource-75fc627c-a092-4387-b631-3d0120ebffb6",
+          "exitCode": 0,
+          "finishedAt": 1790479188.3516252,
+          "descendantsReleased": true
+        }
+      }
+    ]
+  },
+  "resources": {
+    "status": "time-limit",
+    "command": [
+      "node",
+      "scripts/ci/windows-isolation-controls.mjs"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 14189051904
+    },
+    "limits": {
+      "jobCommittedBytes": 1073741824,
+      "stopCommittedBytes": 858993459,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 480
+    },
+    "peakCommittedBytes": 97656832,
+    "minimumHostAvailable": 12950474752,
+    "startedAt": 1790479181.0323315,
+    "unit": "Local\\LasmResource-75fc627c-a092-4387-b631-3d0120ebffb6",
+    "pid": 3536,
+    "lastSampleAt": 1790479661.1251636,
+    "stoppedBecause": "time-limit",
+    "exitCode": 124,
+    "finishedAt": 1790479661.1306136
+  },
+  "originalLog": ".work/macos/node41-windows-x64-36290991412.log",
+  "next": "Separate 1200-second harness profile with unchanged memory limits and assertions; preserve intermediate setup diagnostics. Exact stalled setup phase was not captured by this job."
+}

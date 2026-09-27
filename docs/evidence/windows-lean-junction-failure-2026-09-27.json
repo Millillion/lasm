@@ -1,0 +1,154 @@
+{
+  "scope": "A whole-toolchain junction does not fix Lake child compilation because Lean resolves appDir to the physical cache directory",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36290987309",
+  "sourceRevision": "0b97745593e55a4f43e9dbe0d56e0bea936cf575",
+  "result": {
+    "passed": false,
+    "scope": "Native Lean/Lake long managed paths; installed Lasm acceptance remains separate",
+    "platform": "win32-x64",
+    "node": "v26.10.0",
+    "checks": [
+      {
+        "label": "unchanged upstream path handling",
+        "code": 1,
+        "stdout": "D:\\a\\lasm\\lasm\\.work\\windows-lean-junction-controls\\project \u65e5\u672c\u8a9e\\Main.lean:1:0: error: failed to open file 'd:\\a\\lasm\\lasm\\.work\\windows-lean-junction-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\Array\\Basic.olean.private': 3\n",
+        "stderr": ""
+      },
+      {
+        "label": "extended library paths",
+        "code": 0,
+        "stdout": "long cache path 42\n",
+        "stderr": ""
+      },
+      {
+        "standaloneCGeneration": true
+      },
+      {
+        "label": "short plain Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-junction-controls/short plain Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "short namespaced Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-junction-controls/short namespaced Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "direct config compilation",
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "meta imported Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-junction-controls/meta imported Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "module Lake configuration",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-junction-controls/module Lake configuration/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "native Lake CLI",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-junction-controls/native Lake CLI/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "interpreter adapter",
+        "code": 0,
+        "stdout": "{\"metadataRoots\":[\"d:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-junction-controls\\\\interpreter adapter\\\\.lake\\\\build\\\\lib\\\\lean\"],\"module\":\"/+Main\"}\n",
+        "stderr": "info: longPaths: no previous manifest, creating one from scratch\n"
+      },
+      {
+        "label": "adapter without SYSROOT override",
+        "code": 0,
+        "stdout": "{\"metadataRoots\":[\"d:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-junction-controls\\\\adapter without SYSROOT override\\\\.lake\\\\build\\\\lib\\\\lean\"],\"module\":\"/+Main\"}\n",
+        "stderr": "info: longPaths: no previous manifest, creating one from scratch\n"
+      },
+      {
+        "label": "adapter with full Lake import",
+        "code": 0,
+        "stdout": "{\"metadataRoots\":[\"d:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-junction-controls\\\\adapter with full Lake import\\\\.lake\\\\build\\\\lib\\\\lean\"],\"module\":\"/+Main\"}\n",
+        "stderr": "info: longPaths: no previous manifest, creating one from scratch\n"
+      },
+      {
+        "label": "adapter without plugin",
+        "code": 1,
+        "stdout": "",
+        "stderr": "LEAN ASSERTION VIOLATION\nFile: D:/a/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\n"
+      }
+    ],
+    "modulePath": "D:\\a\\lasm\\lasm\\.work\\windows-lean-junction-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\Iterators\\Internal\\LawfulMonadLiftFunction.olean.private",
+    "modulePathLength": 291,
+    "executionPrefix": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\c9de577fb2a6ba574ae7bbb1",
+    "executedPrograms": {
+      "lean": "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\c9de577fb2a6ba574ae7bbb1\\bin\\lean.exe",
+      "lake": "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\c9de577fb2a6ba574ae7bbb1\\bin\\lake.exe"
+    },
+    "lean": {
+      "version": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      }
+    },
+    "activeCheck": "Lake local import C generation",
+    "error": "Error: Command failed: \\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\c9de577fb2a6ba574ae7bbb1\\bin\\lake.exe --no-cache --keep-toolchain --quiet --json query +Greeting:c\n    at genericNodeError (node:internal/errors:999:15)\n    at wrappedFn (node:internal/errors:544:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at run (file:///D:/a/lasm/lasm/src/application-sources.mjs:46:39)\n    at query (file:///D:/a/lasm/lasm/src/application-sources.mjs:50:40)\n    at applicationSources (file:///D:/a/lasm/lasm/src/application-sources.mjs:77:20)\n    at file:///D:/a/lasm/lasm/scripts/ci/windows-lean-path-controls.mjs:115:16"
+  },
+  "resources": {
+    "status": "failed",
+    "command": [
+      "node",
+      "scripts/ci/windows-lean-path-controls.mjs",
+      ".work/windows-lean-junction-controls"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 14315991040
+    },
+    "limits": {
+      "jobCommittedBytes": 4294967296,
+      "stopCommittedBytes": 3435973836,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 1200
+    },
+    "peakCommittedBytes": 2331037696,
+    "minimumHostAvailable": 11956813824,
+    "startedAt": 1790479124.7644002,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 231763087360
+      }
+    },
+    "unit": "Local\\LasmResource-be910573-7fa6-4112-b654-9d53a473c767",
+    "pid": 7084,
+    "lastSampleAt": 1790479210.7683465,
+    "exitCode": 1,
+    "finishedAt": 1790479210.7889612
+  },
+  "sourceExplanation": {
+    "source": "lean4-5045d0056413266e57c625dcd7c365b10e377c52/src/Init/System/IO.lean",
+    "sha256": "4612b91e65806364c814fc445b35598d8e26ee0f2a811ffde6c330d792dcddab",
+    "definition": "def appDir : IO FilePath := do\n  let p \u2190 appPath\n  let some p \u2190 pure p.parent\n    | throw <| IO.userError s!\"IO.appDir: unexpected filename '{p}'\"\n  FS.realPath p"
+  },
+  "originalLog": ".work/macos/windows-lean-junction-36290987309.log"
+}

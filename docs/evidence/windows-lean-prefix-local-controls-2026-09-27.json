@@ -1,0 +1,55 @@
+{
+  "scope": "Local physical-bin and junction lifecycle tests; native Windows compilation is a separate gate",
+  "host": "linux-x64",
+  "node": "26.10.0",
+  "tests": 2,
+  "checks": [
+    "Physical bin path remains independent of the original directory",
+    "Library directory resolves to the verified original",
+    "Concurrent requests reuse one atomic complete prefix",
+    "Modified and added bin files are rejected without changing source files",
+    "Missing execution receipt is rejected"
+  ],
+  "resources": {
+    "peakMemoryBytes": 32747520,
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "unitReleased": true
+  },
+  "memoryEvents": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  },
+  "additionalFocusedRegression": {
+    "tests": 57,
+    "passed": 57,
+    "suites": [
+      "windows-tool-paths",
+      "application-paths",
+      "cli-arguments",
+      "managed-artifacts"
+    ],
+    "resourceReport": ".work/macos/windows-prefix-controls2-resources.json",
+    "peakMemoryBytes": 53735424,
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  }
+}
