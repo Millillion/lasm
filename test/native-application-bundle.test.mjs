@@ -5,6 +5,7 @@ import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { copyApplicationNativeBundle } from '../src/native-bundle.mjs';
+import { copyApplicationHost, applicationHostFiles } from '../src/application-output.mjs';
 
 function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'lasm-native-bundle-'));
@@ -80,8 +81,13 @@ for (const arch of ['x64', 'arm64']) test(`Windows ${arch} has its complete adap
   const { root, source, output } = fixture(t);
   // A Windows deployment must not depend on POSIX helper files even existing.
   for (const directory of ['signals', 'process']) rmSync(join(source, directory), { recursive: true });
-  copyApplicationNativeBundle(root, output, { platform: 'win32', arch });
-  const base = join(output, 'native'), copied = files(base);
+  for (const name of applicationHostFiles) writeFileSync(join(root, 'src', name), 'host fixture: ' + name);
+  // Exercise the application's selector too: calling only the low-level copier
+  // missed Windows falling back to the entire multi-platform native bundle.
+  copyApplicationHost(output, { target: 'node', platform: 'win32', arch, sourceRoot: root });
+  const base = join(output, 'host/native'), copied = files(base);
+  for (const name of applicationHostFiles)
+    assert.equal(readFileSync(join(output, 'host', name), 'utf8'), 'host fixture: ' + name);
   assert.equal(copied.length, 9);
   assert.ok(copied.includes(`node_modules/@koromix/koffi-win32-${arch}/win32_${arch}/koffi.node`));
   assert.ok(copied.includes('node_modules/koffi/LICENSE.txt'));

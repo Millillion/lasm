@@ -16,13 +16,13 @@ export const applicationHostFiles = [
 
 /** Application output carries its host support, including native FFI and helpers. */
 export function copyApplicationHost(output, { target, platform = process.platform, arch = process.arch,
-  glibc = process.report?.getReport().header.glibcVersionRuntime } = {}) {
+  glibc = process.report?.getReport().header.glibcVersionRuntime, sourceRoot = root } = {}) {
   const directory = join(resolve(output), 'host');
   mkdirSync(directory, { recursive: true });
-  for (const name of applicationHostFiles) copyFileSync(join(root, 'src', name), join(directory, name));
-  if (target === 'node' && (platform === 'darwin' || platform === 'linux' && glibc) && ['x64', 'arm64'].includes(arch))
-    copyApplicationNativeBundle(root, directory, { platform, arch });
-  else copyNativeBundle(root, directory);
+  for (const name of applicationHostFiles) copyFileSync(join(sourceRoot, 'src', name), join(directory, name));
+  if (target === 'node' && (['darwin', 'win32'].includes(platform) || platform === 'linux' && glibc) && ['x64', 'arm64'].includes(arch))
+    copyApplicationNativeBundle(sourceRoot, directory, { platform, arch });
+  else copyNativeBundle(sourceRoot, directory);
 }
 
 export function applicationEntrypoint(target, { platform = process.platform, arch = process.arch, node, minimumGlibc } = {}) {

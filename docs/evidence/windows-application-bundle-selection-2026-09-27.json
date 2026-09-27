@@ -1,0 +1,76 @@
+{
+  "scope": "Real vendor deployment-copy measurement on Linux; native Windows execution and complete Lean deployment acceptance remain separate",
+  "previousNativeBytes": 13335796,
+  "rows": [
+    {
+      "platform": "win32-x64",
+      "hostSupportBytes": 1252797,
+      "nativeBytes": 1066984,
+      "nativeIdentity": {
+        "platform": "win32",
+        "architectures": [
+          "x64"
+        ]
+      },
+      "nativeSha256": "3298715574ebf4dc7d7527c5b89ee1d3a439622ea3f3cd01be495c0e12a46b5b",
+      "hostModules": 35
+    },
+    {
+      "platform": "win32-arm64",
+      "hostSupportBytes": 1543117,
+      "nativeBytes": 1357304,
+      "nativeIdentity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "nativeSha256": "9df242b45d9b59f40d8e2cf2c7a8dde6134827cf4111179da84e8c4565c585d9",
+      "hostModules": 35
+    }
+  ],
+  "tests": {
+    "count": 15,
+    "passed": 15,
+    "scope": "Application host selector, native-bundle inventories and deployment loader behavior"
+  },
+  "resources": {
+    "copyMeasurement": {
+      "report": ".work/macos/windows-host-size-resources.json",
+      "peakMemoryBytes": 22233088,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "tests": {
+      "report": ".work/macos/windows-application-bundle-controls-resources.json",
+      "peakMemoryBytes": 39473152,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "next": "Installed candidate .43 must independently pass the existing unchanged deployment-size budgets and execution checks."
+}
