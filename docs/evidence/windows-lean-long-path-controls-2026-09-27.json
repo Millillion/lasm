@@ -1,0 +1,83 @@
+{
+  "scope": "Native long-path reproduction: extended search paths fix standalone Lean, Lake workspace loading remains failing",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36288074562",
+  "sourceRevision": "e1e5bbefe8d156744face0c436e2e563920e790f",
+  "result": {
+    "passed": false,
+    "scope": "Native Lean/Lake long managed paths; installed Lasm acceptance remains separate",
+    "platform": "win32-x64",
+    "node": "v26.10.0",
+    "checks": [
+      {
+        "label": "unchanged upstream path handling",
+        "code": 1,
+        "stdout": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\project \u65e5\u672c\u8a9e\\Main.lean:1:0: error: failed to open file 'd:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\String\\Bootstrap.olean.server': 3\n",
+        "stderr": ""
+      },
+      {
+        "label": "extended library paths",
+        "code": 0,
+        "stdout": "long cache path 42\n",
+        "stderr": ""
+      },
+      {
+        "standaloneCGeneration": true
+      }
+    ],
+    "modulePath": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\Iterators\\Internal\\LawfulMonadLiftFunction.olean.private",
+    "modulePathLength": 287,
+    "lean": {
+      "version": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      }
+    },
+    "error": "Error: Command failed: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\bin\\lean.exe -j1 -s8192 --plugin=D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\bin\\libLake_shared.dll --run D:\\a\\lasm\\lasm\\src\\lake-module.lean D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\project \u65e5\u672c\u8a9e\\Main.lean\n    at genericNodeError (node:internal/errors:999:15)\n    at wrappedFn (node:internal/errors:544:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at run (file:///D:/a/lasm/lasm/src/application-sources.mjs:45:39)\n    at applicationSources (file:///D:/a/lasm/lasm/src/application-sources.mjs:59:30)\n    at file:///D:/a/lasm/lasm/scripts/ci/windows-lean-path-controls.mjs:54:16"
+  },
+  "resources": {
+    "status": "failed",
+    "command": [
+      "node",
+      "scripts/ci/windows-lean-path-controls.mjs"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 14304829440
+    },
+    "limits": {
+      "jobCommittedBytes": 2147483648,
+      "stopCommittedBytes": 1717986918,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 1200
+    },
+    "peakCommittedBytes": 1429045248,
+    "minimumHostAvailable": 12742807552,
+    "startedAt": 1790475497.100913,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 153531731968
+      }
+    },
+    "unit": "Local\\LasmResource-d022f06a-fbc6-4022-947e-83e622e16a1a",
+    "pid": 8428,
+    "lastSampleAt": 1790475592.5849974,
+    "exitCode": 1,
+    "finishedAt": 1790475592.6404283
+  },
+  "diagnostic": "Lake workspace elaboration reports unknown namespace Lake in its ordinary lakefile.lean. Native CLI versus interpreter adapter controls are next.",
+  "originalLog": ".work/macos/windows-lean-path-controls-36288074562.log"
+}

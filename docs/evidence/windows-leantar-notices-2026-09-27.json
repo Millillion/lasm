@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "sourceCommit": "46485d0eca748ed2d2678e70d59949bbc602f32c",
+  "lockSha256": "23107428e6ad6247e058bc01e79f25887cdca66a2d4b963350b387a4a5cd4dd9",
+  "packages": 71,
+  "verifiedInputBytes": 73953189,
+  "compressedSourceBytes": 12273146,
+  "noticesSha256": "ce474151731022f4cb2b265d231d9c2bf74afeedc97ca770bb387c4eb92daa24",
+  "rustStd": {
+    "file": "archives/rustc-1.98.1-aarch64-pc-windows-msvc.tar.xz",
+    "url": "https://static.rust-lang.org/dist/2026-09-03/rustc-1.98.1-aarch64-pc-windows-msvc.tar.xz",
+    "sha256": "1beca996ad1072b1b8184d53f7ab7d0864f291cebd3464fb5dd48523004636f0",
+    "bytes": 60636728,
+    "version": "1.98.1 (48a229cea 2026-09-01)",
+    "manifest": {
+      "file": "archives/rust-1.98.1.toml",
+      "url": "https://static.rust-lang.org/dist/channel-rust-1.98.1.toml",
+      "sha256": "a7c8774a5fd8441c997d94c029776cbc5eb111e9d72ab5d256fa69866644347e",
+      "bytes": 898637
+    },
+    "notices": {
+      "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "COPYRIGHT": "172020dbfd5b53a226dfde77616190a48dcff519b0bc0e6deb91a8450782c4af",
+      "LICENSE-MIT": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1",
+      "rustc/share/doc/rust/COPYRIGHT-library.html": "68129500b616d5838629e68f55ff3aed5e096dacf60ce9eb41bbe599a563afa6",
+      "rustc/share/doc/rust/licenses/Apache-2.0.txt": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff",
+      "rustc/share/doc/rust/licenses/Unicode-3.0.txt": "f5062c9a188d81dfe66b56db4182dcf9e4b17c0d9b0d311a8e20b3a1b075c443",
+      "rustc/share/doc/rust/licenses/CC-BY-SA-4.0.txt": "23ee78c8bae49cf08ea2f0c84945c66b987ebe4520881fb51b3dad4fb43d07c2",
+      "rustc/share/doc/rust/licenses/OFL-1.1.txt": "8eea8287e5876b539670cadb82e99f9a7afddec6f6730811be1daf25d2e9bcfd",
+      "rustc/share/doc/rust/licenses/GCC-exception-3.1.txt": "a3966c9410ef94a1efbfa9ec04e9c1994026a70623fbf0885ce36737bfba3b54",
+      "rustc/share/doc/rust/licenses/NCSA.txt": "39cb0234065c92b9e6cee3830cbb52b1aa289aa8fe9ba2e66730fec5cf05c630",
+      "rustc/share/doc/rust/licenses/ISC.txt": "0ff61769b238634e042ab759dddfd104a8e69d091e3600ae3410e401a6164381",
+      "rustc/share/doc/rust/licenses/MIT.txt": "b85dcd3e453d05982552c52b5fc9e0bdd6d23c6f8e844b984a88af32570b0cc0",
+      "rustc/share/doc/rust/licenses/BSD-2-Clause.txt": "f32fb3b417a194167cfad068223fc975ba96c5960513a10f66a3c28720aec1df",
+      "rustc/share/doc/rust/licenses/LLVM-exception.txt": "e34c58338bd89d43e709e226610d8f32b3e3c47f4ad9a99a8dc1d4ac7842488e",
+      "rustc/share/doc/rust/licenses/GPL-3.0-or-later.txt": "05315fce6c35f79b8a35454828995fa26336f235895ac64557abc028f4ffcea2",
+      "rustc/share/doc/rust/licenses/GPL-2.0-only.txt": "54b212ba1f97f6948fa5486239ab505dd820b02e50cbfd296b4062c8609a70af"
+    }
+  },
+  "scope": "Source and notices only; final binary distribution packaging remains separate",
+  "manifestSha256": "ac37eb12d9e8f7e76932007d9ebb0fa3d62c98ca53c9c7d39de106fb6e954d95",
+  "collector": "scripts/ci/leantar-notices.py",
+  "localInventory": ".work/windows-leantar-sources",
+  "resourceReport": {
+    "path": ".work/macos/leantar-notices8-resources.json",
+    "peakMemoryBytes": 168247296,
+    "exitCode": 0,
+    "resourceLimited": false,
+    "unitReleased": true,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  },
+  "notes": [
+    "All 71 locked packages are included, including optional packages and packages for other targets; this is not an assertion that every package is linked into the helper.",
+    "Crate archives were authenticated against Cargo.lock; missing workspace notices came from embedded exact VCS revisions.",
+    "Rust standard-library copyright HTML comes from the official checksum-verified Rust compiler distribution. The unrelated whole-compiler copyright HTML is excluded.",
+    "Downloads were inspected without execution; final binary distribution packaging and native installed-package acceptance remain separate."
+  ]
+}
