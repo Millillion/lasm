@@ -18,7 +18,7 @@ export function windowsIsolated(spec, reportFile) {
   assert.ifError(child.error); assert.ok(['passed', 'failed'].includes(evidence?.status), child.stderr + child.stdout);
   assert.equal(evidence.token.appContainer, true);
   assert.equal(evidence.allPackagesOptOut, spec.lessPrivileged ?? true);
-  if (spec.lessPrivileged !== false) assert.equal(evidence.traverseBypassRemoved, true);
+  if (spec.lessPrivileged !== false) assert.ok(evidence.blockedDevelopmentPrograms > 0);
   assert.equal(evidence.descendantsReleased, true);
   assert.equal(evidence.cleanupErrors, undefined); assert.equal(child.status, evidence.exitCode);
   return { code: evidence.exitCode, stdout: readFileSync(report + '.stdout', 'utf8'),

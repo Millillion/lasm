@@ -192,7 +192,7 @@ def acl(path, *args):
                     str(path), *args], check=True, capture_output=True, timeout=180)
 
 
-def directory_acl(path, permissions=0x1200a8, mode=1):
+def object_acl(path, permissions=0x1200a8, mode=1):
     # SetSecurityInfo propagates existing inheritable ACEs across the volume.
     # Its MAXIMUM_ALLOWED escape also requests DELETE, conflicting with live
     # directory handles. Use the documented object-level setter with exactly
@@ -275,22 +275,39 @@ try:
     # no file data, listing, inheritance or write access. Remove non-recursively.
     if less_privileged:
         for path in [allowed_root, *allowed_root.parents]:
-            directory_acl(path)
+            object_acl(path)
             parents.append(path)
         evidence["ancestorMetadata"] = [str(p) for p in parents]
         # Program Files commonly grants ALL RESTRICTED APPLICATION PACKAGES
-        # access, including developer tools such as Git. A per-SID traversal
-        # deny plus removal of bypass-traversal privilege closes those trees
-        # without rewriting ACLs on their descendants. Ordinary OS files remain.
+        # access. Deny its preinstalled executables/scripts directly. Removing
+        # SeChangeNotifyPrivilege breaks Windows process initialization, so
+        # preserve normal traversal and ordinary Windows system libraries.
         roots = [os.environ.get(k) for k in ("ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "RUNNER_TOOL_CACHE", "MSYS2_LOCATION")]
         roots.append(str(Path(os.environ["SystemRoot"]).anchor + "msys64"))
+        visited = set()
+        def block_programs(path):
+            try:
+                with os.scandir(path) as entries:
+                    for entry in entries:
+                        if entry.is_symlink() or os.path.isjunction(entry.path):
+                            continue
+                        if entry.is_dir(follow_symlinks=False):
+                            block_programs(Path(entry.path))
+                        elif Path(entry.name).suffix.lower() in (".exe", ".com", ".bat", ".cmd", ".ps1", ".py", ".pyw", ".sh"):
+                            file = Path(entry.path)
+                            if file in visited:
+                                continue
+                            visited.add(file)
+                            object_acl(file, 0x21, 3)  # DENY_ACCESS: read data + execute.
+                            blocked.append(file)
+            except PermissionError:
+                evidence.setdefault("inaccessibleDevelopmentDirectories", []).append(str(path))
         for path in dict.fromkeys(Path(p).resolve() for p in roots if p):
             if not path.is_dir():
                 continue
             assert path != allowed_root and path not in allowed_root.parents and allowed_root not in path.parents
-            directory_acl(path, 0x21, 3)  # DENY_ACCESS: list directory + traverse.
-            blocked.append(path)
-        evidence["blockedDevelopmentDirectories"] = [str(p) for p in blocked]
+            block_programs(path)
+        evidence["blockedDevelopmentPrograms"] = len(blocked)
     # File data/execute/write grants stay inside the disposable test root.
     for mode in ("reads", "writes"):
         for item in spec.get(mode, []):
@@ -339,19 +356,7 @@ try:
     check(job_set(inner, 9, C.byref(limits), C.sizeof(limits)))
     check(job_assign(inner, child.process))
     token = W.HANDLE()
-    check(open_token(child.process, 8 | (0x20 if less_privileged else 0), C.byref(token)))
-    if less_privileged:
-        luid = LUID()
-        check(lookup_privilege(None, "SeChangeNotifyPrivilege", C.byref(luid)))
-        remove = TOKEN_PRIVILEGES(1, (LUID_ATTRIBUTES * 1)(LUID_ATTRIBUTES(luid, 4)))
-        check(adjust_privileges(token, False, C.byref(remove), 0, None, None))
-        privileges, used = C.create_string_buffer(4096), W.DWORD()
-        check(token_info(token, 3, privileges, C.sizeof(privileges), C.byref(used)))
-        count = C.cast(privileges, C.POINTER(W.DWORD))[0]
-        assert count <= 128
-        entries = C.cast(C.addressof(privileges) + TOKEN_PRIVILEGES.privileges.offset, C.POINTER(LUID_ATTRIBUTES))
-        assert all((entries[i].luid.low, entries[i].luid.high) != (luid.low, luid.high) for i in range(count))
-        evidence["traverseBypassRemoved"] = True
+    check(open_token(child.process, 8, C.byref(token)))
     actual = {}
     # GetTokenInformation does not implement the SDK's reserved LPAC enum on
     # these hosts. Verify AppContainer here; native controls independently prove
@@ -398,7 +403,7 @@ finally:
             evidence.setdefault("cleanupErrors", []).append(str(error))
     for path in reversed([*parents, *blocked]):
         try:
-            directory_acl(path, 0, 4)
+            object_acl(path, 0, 4)
         except Exception as error:
             evidence.setdefault("cleanupErrors", []).append(str(error))
     if sid:

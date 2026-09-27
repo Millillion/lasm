@@ -1,0 +1,274 @@
+{
+  "scope": "Removing traversal-bypass privilege prevented Windows Node process initialization with STATUS_ACCESS_DENIED on both architectures. Preserve ordinary traversal and deny developer executable files directly. No Lean test ran.",
+  "sourceRevision": "8b9a35aad017bac1ea045302dc97013796961e45",
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36281324699/job/108513565319",
+      "phases": [
+        {
+          "phase": "online",
+          "code": 3221225506,
+          "stdout": "",
+          "stderr": "",
+          "isolation": {
+            "mechanism": "Windows Less Privileged AppContainer",
+            "profile": "Lasm.CI.ba73307f-0b3d-4d4b-81a7-440f01cb4cc8",
+            "offline": false,
+            "status": "failed",
+            "startedAt": 1790467452.2088065,
+            "allPackagesOptOut": true,
+            "sid": "S-1-15-2-176011382-493358501-1503692562-452717680-3839698538-2489418481-3439138518",
+            "capabilities": [
+              "registryRead",
+              "internetClient"
+            ],
+            "ancestorMetadata": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-03nIjN",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+              "C:\\Users\\runneradmin\\AppData\\Local",
+              "C:\\Users\\runneradmin\\AppData",
+              "C:\\Users\\runneradmin",
+              "C:\\Users",
+              "C:\\"
+            ],
+            "blockedDevelopmentDirectories": [
+              "C:\\Program Files",
+              "C:\\Program Files (x86)",
+              "C:\\hostedtoolcache\\windows",
+              "C:\\msys64"
+            ],
+            "grants": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-03nIjN\\stock Node",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-03nIjN\\readonly.txt",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-03nIjN\\writable \u65e5\u672c\u8a9e"
+            ],
+            "traverseBypassRemoved": true,
+            "pid": 8124,
+            "token": {
+              "appContainer": true
+            },
+            "inheritedCappedJob": "Local\\LasmResource-6ca85c35-56c7-4e0a-8510-eefc128af7f6",
+            "exitCode": 3221225506,
+            "finishedAt": 1790467455.8407905,
+            "descendantsReleased": true
+          },
+          "controls": {
+            "passed": false,
+            "error": "Node did not produce a complete control report"
+          }
+        },
+        {
+          "phase": "offline",
+          "code": 3221225506,
+          "stdout": "",
+          "stderr": "",
+          "isolation": {
+            "mechanism": "Windows Less Privileged AppContainer",
+            "profile": "Lasm.CI.ba73307f-0b3d-4d4b-81a7-440f01cb4cc8",
+            "offline": true,
+            "status": "failed",
+            "startedAt": 1790467455.9764328,
+            "allPackagesOptOut": true,
+            "sid": "S-1-15-2-176011382-493358501-1503692562-452717680-3839698538-2489418481-3439138518",
+            "capabilities": [
+              "registryRead"
+            ],
+            "ancestorMetadata": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-03nIjN",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+              "C:\\Users\\runneradmin\\AppData\\Local",
+              "C:\\Users\\runneradmin\\AppData",
+              "C:\\Users\\runneradmin",
+              "C:\\Users",
+              "C:\\"
+            ],
+            "blockedDevelopmentDirectories": [
+              "C:\\Program Files",
+              "C:\\Program Files (x86)",
+              "C:\\hostedtoolcache\\windows",
+              "C:\\msys64"
+            ],
+            "grants": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-03nIjN\\stock Node",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-03nIjN\\readonly.txt",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-03nIjN\\writable \u65e5\u672c\u8a9e"
+            ],
+            "traverseBypassRemoved": true,
+            "pid": 5748,
+            "token": {
+              "appContainer": true
+            },
+            "inheritedCappedJob": "Local\\LasmResource-6ca85c35-56c7-4e0a-8510-eefc128af7f6",
+            "exitCode": 3221225506,
+            "finishedAt": 1790467460.2723012,
+            "descendantsReleased": true
+          },
+          "controls": {
+            "passed": false,
+            "error": "Node did not produce a complete control report"
+          }
+        }
+      ],
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14223577088
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 94883840,
+        "minimumHostAvailable": 14117679104,
+        "startedAt": 1790467438.5571253,
+        "unit": "Local\\LasmResource-6ca85c35-56c7-4e0a-8510-eefc128af7f6",
+        "pid": 3304,
+        "lastSampleAt": 1790467460.094471,
+        "exitCode": 1,
+        "finishedAt": 1790467460.2889032
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36281324699/job/108513565490",
+      "phases": [
+        {
+          "phase": "online",
+          "code": 3221225506,
+          "stdout": "",
+          "stderr": "",
+          "isolation": {
+            "mechanism": "Windows Less Privileged AppContainer",
+            "profile": "Lasm.CI.2c74ea04-98cf-4b5d-bbe3-d9678f3ecaa0",
+            "offline": false,
+            "status": "failed",
+            "startedAt": 1790467506.8656187,
+            "allPackagesOptOut": true,
+            "sid": "S-1-15-2-312510669-541823553-491026926-829442864-145531892-1271859376-672066064",
+            "capabilities": [
+              "registryRead",
+              "internetClient"
+            ],
+            "ancestorMetadata": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-rg8i32",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+              "C:\\Users\\runneradmin\\AppData\\Local",
+              "C:\\Users\\runneradmin\\AppData",
+              "C:\\Users\\runneradmin",
+              "C:\\Users",
+              "C:\\"
+            ],
+            "blockedDevelopmentDirectories": [
+              "C:\\Program Files",
+              "C:\\Program Files (x86)",
+              "C:\\hostedtoolcache\\windows",
+              "C:\\msys64"
+            ],
+            "grants": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-rg8i32\\stock Node",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-rg8i32\\readonly.txt",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-rg8i32\\writable \u65e5\u672c\u8a9e"
+            ],
+            "traverseBypassRemoved": true,
+            "pid": 11144,
+            "token": {
+              "appContainer": true
+            },
+            "inheritedCappedJob": "Local\\LasmResource-7c16e4d5-d500-4a8f-b6cf-c9c44b4e18db",
+            "exitCode": 3221225506,
+            "finishedAt": 1790467511.4738371,
+            "descendantsReleased": true
+          },
+          "controls": {
+            "passed": false,
+            "error": "Node did not produce a complete control report"
+          }
+        },
+        {
+          "phase": "offline",
+          "code": 3221225506,
+          "stdout": "",
+          "stderr": "",
+          "isolation": {
+            "mechanism": "Windows Less Privileged AppContainer",
+            "profile": "Lasm.CI.2c74ea04-98cf-4b5d-bbe3-d9678f3ecaa0",
+            "offline": true,
+            "status": "failed",
+            "startedAt": 1790467511.671803,
+            "allPackagesOptOut": true,
+            "sid": "S-1-15-2-312510669-541823553-491026926-829442864-145531892-1271859376-672066064",
+            "capabilities": [
+              "registryRead"
+            ],
+            "ancestorMetadata": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-rg8i32",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+              "C:\\Users\\runneradmin\\AppData\\Local",
+              "C:\\Users\\runneradmin\\AppData",
+              "C:\\Users\\runneradmin",
+              "C:\\Users",
+              "C:\\"
+            ],
+            "blockedDevelopmentDirectories": [
+              "C:\\Program Files",
+              "C:\\Program Files (x86)",
+              "C:\\hostedtoolcache\\windows",
+              "C:\\msys64"
+            ],
+            "grants": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-rg8i32\\stock Node",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-rg8i32\\readonly.txt",
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-rg8i32\\writable \u65e5\u672c\u8a9e"
+            ],
+            "traverseBypassRemoved": true,
+            "pid": 7676,
+            "token": {
+              "appContainer": true
+            },
+            "inheritedCappedJob": "Local\\LasmResource-7c16e4d5-d500-4a8f-b6cf-c9c44b4e18db",
+            "exitCode": 3221225506,
+            "finishedAt": 1790467515.4949064,
+            "descendantsReleased": true
+          },
+          "controls": {
+            "passed": false,
+            "error": "Node did not produce a complete control report"
+          }
+        }
+      ],
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13438738432
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 94916608,
+        "minimumHostAvailable": 13325058048,
+        "startedAt": 1790467498.3886147,
+        "unit": "Local\\LasmResource-7c16e4d5-d500-4a8f-b6cf-c9c44b4e18db",
+        "pid": 8052,
+        "lastSampleAt": 1790467515.3661516,
+        "exitCode": 1,
+        "finishedAt": 1790467515.5191677
+      }
+    }
+  ]
+}
