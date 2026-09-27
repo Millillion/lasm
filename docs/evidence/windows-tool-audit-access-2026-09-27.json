@@ -1,0 +1,23 @@
+{
+  "run": 36285817512,
+  "sourceRevision": "d3bd76112c82d53518254544511d70e85d18bf10",
+  "scope": "Retained SDK metadata audit access failure; archive validation did not run",
+  "error": "gh release download reported release not found with contents:read workflow token",
+  "draftVerifiedSeparately": {
+    "id": 397452563,
+    "tag": "windows-arm64-sdk-bootstrap-36278363560",
+    "draft": true,
+    "archiveAsset": 591801219,
+    "bytes": 174792332
+  },
+  "correction": "Automatic approval review rejected broadening the CI token to contents:write. Keep its read-only permission; use the existing authorized local gh session for read-only streaming audits without changing permissions or publishing anything.",
+  "firstLocalStream": {
+    "archiveSha256Verified": true,
+    "archiveBytesVerified": 174792332,
+    "outcome": "Metadata inventory stopped at unchanged upstream Emscripten pylauncher source assets absent from the native build receipt",
+    "peakMemoryBytes": 65024000,
+    "resourceReport": ".work/macos/windows-tool-audit-sdk-local-resources.json",
+    "sourceRevision": "4e4223852a0835923411059a3929907d7df1232e",
+    "correction": "Verify exact upstream launcher hashes and architecture separately; they are not counted as executed native tool acceptance."
+  }
+}
