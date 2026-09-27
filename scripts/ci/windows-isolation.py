@@ -292,8 +292,16 @@ try:
                         if entry.is_symlink() or os.path.isjunction(entry.path):
                             continue
                         if entry.is_dir(follow_symlinks=False):
+                            if entry.name.casefold() in ("windows defender", "windows defender advanced threat protection"):
+                                # These are protected Windows security services,
+                                # not compiler prerequisites. Leave them alone.
+                                evidence.setdefault("ordinarySecurityServices", []).append(entry.path)
+                                continue
                             block_programs(Path(entry.path))
-                        elif Path(entry.name).suffix.lower() in (".exe", ".com", ".bat", ".cmd", ".ps1", ".py", ".pyw", ".sh"):
+                        elif Path(entry.name).suffix.lower() in (".exe", ".com", ".bat", ".cmd"):
+                            # Denying the interpreter executable also denies
+                            # its library scripts; avoid visiting every Python
+                            # standard-library file and PowerShell module.
                             file = Path(entry.path)
                             if file in visited:
                                 continue
@@ -306,7 +314,11 @@ try:
             if not path.is_dir():
                 continue
             assert path != allowed_root and path not in allowed_root.parents and allowed_root not in path.parents
+            started = time.monotonic()
+            before = len(blocked)
             block_programs(path)
+            evidence.setdefault("developmentRoots", []).append({"path": str(path),
+                "blockedPrograms": len(blocked) - before, "seconds": time.monotonic() - started})
         evidence["blockedDevelopmentPrograms"] = len(blocked)
     # File data/execute/write grants stay inside the disposable test root.
     for mode in ("reads", "writes"):

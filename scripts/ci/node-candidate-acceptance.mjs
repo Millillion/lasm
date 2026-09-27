@@ -51,33 +51,53 @@ if (macRuns.some(Boolean)) {
   assert.ok(macRuns.every(Boolean), 'Retain macOS support only after both native architectures pass');
   targets.push(...['x64', 'arm64'].map((architecture, i) => ({ os: 'darwin', architecture, id: macRuns[i] })));
 }
+for (const architecture of ['x64', 'arm64']) {
+  const id = process.env[`LASM_WINDOWS_${architecture.toUpperCase()}_ACCEPTANCE_RUN_ID`];
+  if (id) targets.push({ os: 'win32', architecture, id });
+}
 for (const { os, architecture, id } of targets) {
   const platform = `${os}-${architecture}`, { run, jobs } = completedRun(id);
-  assert.ok(['.github/workflows/node-linux-acceptance.yml', os === 'linux'
-    ? '.github/workflows/node-linux-candidate-recheck.yml'
-    : '.github/workflows/node-darwin-candidate-recheck.yml'].includes(run.path));
-  const matching = jobs.filter(job => job.name === `${platform} / installed`);
+  const name = os === 'win32' ? 'windows' : os;
+  assert.ok(['.github/workflows/node-linux-acceptance.yml',
+    `.github/workflows/node-${name}-candidate-recheck.yml`].includes(run.path));
+  const matching = jobs.filter(job => job.name === `${name}-${architecture} / installed`);
   assert.equal(matching.length, 1);
   const job = matching[0];
   assert.equal(job.status, 'completed');
   assert.equal(job.conclusion, 'success');
   const lines = api(`actions/jobs/${job.id}/logs`).split(/\r?\n/)
     .map(line => line.replace(/^\uFEFF?\d{4}-\d{2}-\d{2}T\S+ /, ''));
-  const acceptance = reportFromLog(lines, `.work/node-${os}-acceptance/result.json`);
-  const resources = reportFromLog(lines, `.work/node-${os}-resources.json`);
-  const disk = reportFromLog(lines, `.work/node-${os}-disk.json`);
+  const acceptance = reportFromLog(lines, `.work/node-${name}-acceptance/result.json`);
+  const resources = reportFromLog(lines, `.work/node-${name}-resources.json`);
+  const disk = reportFromLog(lines, `.work/node-${name}-disk.json`);
   assert.equal(acceptance.platform, platform);
   assert.equal(acceptance.passed, true);
   assert.equal(acceptance.archiveSha256, archiveSha256);
   assert.equal(acceptance.sourceRevision, run.head_sha);
   assert.equal(acceptance.installation.provenance.sourceRevision, packageSourceRevision);
-  assert.equal(resources.result.code, 0);
-  assert.equal(resources.unitReleased, true);
-  assert.equal(resources.resourceLimited, false);
+  if (os === 'win32') {
+    const controls = reportFromLog(lines, '.work/windows-isolation-controls/result.json');
+    assert.equal(controls.platform, platform); assert.equal(controls.passed, true);
+    assert.equal(resources.status, 'passed'); assert.equal(resources.exitCode, 0);
+    assert.equal(resources.stoppedBecause, undefined);
+    assert.ok(resources.peakCommittedBytes < resources.limits.stopCommittedBytes);
+    assert.ok(resources.minimumHostAvailable >= resources.limits.hostReserveBytes);
+    assert.ok(resources.disk.reserveBytes >= 4 * 1024 ** 3);
+    assert.ok(Object.values(resources.disk.minimumFreeBytes).every(n => n >= resources.disk.reserveBytes));
+    for (const phase of acceptance.phaseExecutions) {
+      assert.equal(phase.code, 0); assert.equal(phase.isolation.token.appContainer, true);
+      assert.equal(phase.isolation.allPackagesOptOut, true); assert.equal(phase.isolation.descendantsReleased, true);
+      assert.equal(phase.isolation.cleanupErrors, undefined);
+    }
+  } else {
+    assert.equal(resources.result.code, 0);
+    assert.equal(resources.unitReleased, true);
+    assert.equal(resources.resourceLimited, false);
+  }
   if (os === 'linux') {
     assert.equal(resources.service.memoryEvents.oom, 0);
     assert.equal(resources.service.memoryEvents.oom_kill, 0);
-  } else {
+  } else if (os === 'darwin') {
     assert.equal(resources.hardCap, false, 'macOS evidence must not claim a kernel cap');
     assert.ok(resources.limits.hostReserveBytes >= 1536 * 1024 ** 2);
     assert.ok(resources.limits.stopMemoryBytes <= resources.hostAtStart.total * 0.4);

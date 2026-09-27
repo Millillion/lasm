@@ -1,0 +1,114 @@
+{
+  "scope": "CI developer-program enumeration encountered Windows Defender tamper protection. This ordinary OS security component is now explicitly excluded from developer prerequisites. Existing security-service permissions were not changed. No Lean test ran.",
+  "sourceRevision": "910bff21f339484914468087c60a43c710c13f57",
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36281682210/job/108514584786",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.f2b89ad4-0b54-4765-8b24-1aed4122ab59",
+        "offline": false,
+        "status": "isolation-error",
+        "startedAt": 1790467874.2537937,
+        "allPackagesOptOut": true,
+        "sid": "S-1-15-2-1555304787-469966005-1734353991-2538074065-1422125672-3822946841-1148942262",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "ancestorMetadata": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-Ao9UYW",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+          "C:\\Users\\runneradmin\\AppData\\Local",
+          "C:\\Users\\runneradmin\\AppData",
+          "C:\\Users\\runneradmin",
+          "C:\\Users",
+          "C:\\"
+        ],
+        "error": "Opening protected ancestor metadata C:\\Program Files\\Windows Defender\\ConfigSecurityPolicy.exe: [WinError 5] Access is denied.",
+        "finishedAt": 1790468052.5163321,
+        "descendantsReleased": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14174777344
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 95932416,
+        "minimumHostAvailable": 13158936576,
+        "startedAt": 1790467858.0679977,
+        "unit": "Local\\LasmResource-f620e37f-0c52-48ec-94f3-7d14423829d2",
+        "pid": 8084,
+        "lastSampleAt": 1790468052.5548115,
+        "exitCode": 1,
+        "finishedAt": 1790468052.6086166
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36281682210/job/108514584915",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.d02d6ec8-6def-49d9-bfa7-06112dcb08fb",
+        "offline": false,
+        "status": "isolation-error",
+        "startedAt": 1790467903.1007366,
+        "allPackagesOptOut": true,
+        "sid": "S-1-15-2-272616008-3210551835-3516613161-2694497644-3714891726-577529968-2311920075",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "ancestorMetadata": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-DRhbIt",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+          "C:\\Users\\runneradmin\\AppData\\Local",
+          "C:\\Users\\runneradmin\\AppData",
+          "C:\\Users\\runneradmin",
+          "C:\\Users",
+          "C:\\"
+        ],
+        "error": "Opening protected ancestor metadata C:\\Program Files\\Windows Defender\\ConfigSecurityPolicy.exe: [WinError 5] Access is denied.",
+        "finishedAt": 1790468068.663608,
+        "descendantsReleased": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169428480,
+          "available": 13535899648
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 95215616,
+        "minimumHostAvailable": 13231083520,
+        "startedAt": 1790467894.7907689,
+        "unit": "Local\\LasmResource-adf9e96a-2601-447e-8436-3c7396b11905",
+        "pid": 11256,
+        "lastSampleAt": 1790468068.6930225,
+        "exitCode": 1,
+        "finishedAt": 1790468068.745919
+      }
+    }
+  ]
+}

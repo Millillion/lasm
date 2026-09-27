@@ -1,0 +1,42 @@
+name: Recheck unchanged candidate on native Windows
+on:
+  workflow_dispatch:
+    inputs:
+      architecture:
+        description: Native architectures to rerun
+        type: choice
+        options: [x64, arm64, both]
+        default: x64
+      candidate-version:
+        description: Exact already packed package version
+        type: string
+        required: true
+      candidate-cache-key:
+        description: Exact candidate cache key
+        type: string
+        required: true
+      candidate-sha256:
+        description: SHA-256 of the unchanged archive
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  windows-x64:
+    if: inputs.architecture != 'arm64'
+    uses: ./.github/workflows/node-windows-consumer.yml
+    with:
+      runner: windows-2025
+      architecture: x64
+      candidate-version: ${{ inputs.candidate-version }}
+      cache-key: ${{ inputs.candidate-cache-key }}
+      sha256: ${{ inputs.candidate-sha256 }}
+  windows-arm64:
+    if: inputs.architecture != 'x64'
+    uses: ./.github/workflows/node-windows-consumer.yml
+    with:
+      runner: windows-11-arm
+      architecture: arm64
+      candidate-version: ${{ inputs.candidate-version }}
+      cache-key: ${{ inputs.candidate-cache-key }}
+      sha256: ${{ inputs.candidate-sha256 }}
