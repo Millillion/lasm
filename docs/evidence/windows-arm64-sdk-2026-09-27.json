@@ -1,0 +1,229 @@
+{
+  "scope": "Retained native Windows ARM64 SDK; relocation, managed extraction, C++ thread/exception execution at both Wasm widths and cache reuse passed. No Windows Lasm application acceptance or public download is claimed.",
+  "kind": "sdk",
+  "tag": "windows-arm64-sdk-bootstrap-36278363560",
+  "archive": "emscripten-6.0.9-win32-arm64.tar.gz",
+  "sha256": "abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a",
+  "bytes": 174792332,
+  "sourceRevision": "cc9c2c929cba829e7b0ee4ea847d1c45bb63aacd",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36278363560",
+  "resources": {
+    "status": "passed",
+    "command": [
+      "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+      "--login",
+      "scripts/full-lean/bootstrap-windows-arm64-sdk.sh"
+    ],
+    "hostAtStart": {
+      "total": 17169387520,
+      "available": 12885164032
+    },
+    "limits": {
+      "jobCommittedBytes": 8584693760,
+      "stopCommittedBytes": 6867755008,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": null
+    },
+    "peakCommittedBytes": 974430208,
+    "minimumHostAvailable": 11028697088,
+    "startedAt": 1790464184.0079732,
+    "unit": "Local\\LasmResource-38a619fe-e4ad-455c-aad1-11097e08432c",
+    "pid": 7404,
+    "lastSampleAt": 1790470619.653587,
+    "exitCode": 0,
+    "finishedAt": 1790470619.8351815
+  },
+  "recordedAt": "2026-09-27T00:57:06.508Z",
+  "receiptSha256": "0f19aa41e01ce8ad38fb0c1b9fd5336a8ad2e3fb58964d498e0b9e43b881cdeb",
+  "release": {
+    "draft": true,
+    "tag": "windows-arm64-sdk-bootstrap-36278363560",
+    "url": "https://github.com/Millillion/lasm/releases/tag/untagged-5d65774f833bd2ad18b0",
+    "archiveAsset": 591801219,
+    "receiptAsset": 591801221
+  },
+  "controls": {
+    "checks": [
+      {
+        "width": 32,
+        "cppThreadExceptionApplication": "passed",
+        "wasmSha256": "50444a87a054e68a8ad800aa7544fdd9f1aa9e91e038ef29323f456556dd741d"
+      },
+      {
+        "width": 64,
+        "cppThreadExceptionApplication": "passed",
+        "wasmSha256": "7d837a60fc48c1da197325843568195c55978d575a3f5239dc44a511ef887ae2"
+      }
+    ],
+    "verifiedReuse": true,
+    "nativePrograms": {
+      "clang": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "wasm-ld": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "wasm-opt": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    "driverIdentity": "5a1186d583d5b33b62c9e8d3265e58cdb8e311c0ddf1c7f08fe2df03264893bb"
+  },
+  "nativeFiles": [
+    {
+      "file": "clang.exe",
+      "sha256": "6e77312943116abbcb068d9483482da3048541fba08eb9ce0e1358bc74e1c373",
+      "bytes": 87654400
+    },
+    {
+      "file": "clang++.exe",
+      "sha256": "6e77312943116abbcb068d9483482da3048541fba08eb9ce0e1358bc74e1c373",
+      "bytes": 87654400
+    },
+    {
+      "file": "clang-scan-deps.exe",
+      "sha256": "1d581b156a509cda17c0663cbfb29d00c74150c66ea3334b9d48faed97c8e5a5",
+      "bytes": 41230848
+    },
+    {
+      "file": "lld.exe",
+      "sha256": "23685ec6f30116efa613b355960f4ea048131d15aeb6ff809816d6795e634cb8",
+      "bytes": 52347392
+    },
+    {
+      "file": "wasm-ld.exe",
+      "sha256": "23685ec6f30116efa613b355960f4ea048131d15aeb6ff809816d6795e634cb8",
+      "bytes": 52347392
+    },
+    {
+      "file": "llvm-ar.exe",
+      "sha256": "1c6d767135fed11d0dc8509d25b9b123be36408254b67043a9ed12596e99fc36",
+      "bytes": 5499392
+    },
+    {
+      "file": "llvm-ranlib.exe",
+      "sha256": "1c6d767135fed11d0dc8509d25b9b123be36408254b67043a9ed12596e99fc36",
+      "bytes": 5499392
+    },
+    {
+      "file": "llvm-nm.exe",
+      "sha256": "ddf76afdc17ff43de9fa60eb25538cc2800c7ac5e3031cb68d94ccfe8d848cec",
+      "bytes": 6582272
+    },
+    {
+      "file": "llvm-objcopy.exe",
+      "sha256": "b3200d70b13821556670a599cced15dc9c9b1cbbb88731cfb6adc7ee53c65c79",
+      "bytes": 5740032
+    },
+    {
+      "file": "llvm-dwarfdump.exe",
+      "sha256": "ed18439b0fce9d26df4854a82b2773b646a426216f3983821c5a81084c6fa1e8",
+      "bytes": 6645760
+    },
+    {
+      "file": "llvm-dwp.exe",
+      "sha256": "dffbb735fd0cbea04e376b05dfdc847dae628960096c08191b9ece00de3346df",
+      "bytes": 2286592
+    },
+    {
+      "file": "llvm-profdata.exe",
+      "sha256": "9933739d8914bd51c4e066c728f7a3f989bae7911225b702cb1d8cfc9e32a9ee",
+      "bytes": 7114240
+    },
+    {
+      "file": "llvm-cov.exe",
+      "sha256": "391cc7aeead3da100627fe799d677e62bca9e731f7025daab3818125d9808bc9",
+      "bytes": 6067712
+    },
+    {
+      "file": "llvm-readobj.exe",
+      "sha256": "92ade6bd24100f3619e7ff4dd05aa67178e254d11b3ff731f6d970b7be4c8ca0",
+      "bytes": 8261120
+    },
+    {
+      "file": "llvm-size.exe",
+      "sha256": "0c0691df5d2b16628a39f612eec7992543eadea835e8dba14cc46e6f36019c51",
+      "bytes": 4918784
+    },
+    {
+      "file": "llvm-strip.exe",
+      "sha256": "b3200d70b13821556670a599cced15dc9c9b1cbbb88731cfb6adc7ee53c65c79",
+      "bytes": 5740032
+    },
+    {
+      "file": "wasm-as.exe",
+      "sha256": "40b4cdab574d31d211efa8e7d280f380812f6600493ae58903dc483c8c7e8856",
+      "bytes": 13592064
+    },
+    {
+      "file": "wasm-ctor-eval.exe",
+      "sha256": "3053fd3d68e53facc6b8b198be09eed6f870b5a15af61a1d49c01a79f1cbf9e5",
+      "bytes": 13921792
+    },
+    {
+      "file": "wasm-dis.exe",
+      "sha256": "1df1b56093d2bf7fad45844ac12f5be05b1319292b925e6538b8c3ede819d4aa",
+      "bytes": 13580800
+    },
+    {
+      "file": "wasm-emscripten-finalize.exe",
+      "sha256": "020ec5e216aa491fce68874ffd74b296514287dd10b3f8c15e2342e027e99376",
+      "bytes": 13605888
+    },
+    {
+      "file": "wasm-metadce.exe",
+      "sha256": "836a02e235124931da48121e40a9a734eb8bdabfaf97469402c377018d0faad9",
+      "bytes": 13738496
+    },
+    {
+      "file": "wasm-opt.exe",
+      "sha256": "c9e25fe180e92008d326b36fb73406fe7346b01fad9f65b2327bc3f6fea8c15f",
+      "bytes": 15047680
+    },
+    {
+      "file": "wasm-split.exe",
+      "sha256": "8c854e745167f8a3ef19d71d984e4ea901c0153d02cadf768259ed215719f670",
+      "bytes": 13931520
+    },
+    {
+      "file": "wasm2js.exe",
+      "sha256": "09bf82d467c74249b8d9fc0b9ad8204455f0f5c4f272323d8afe4f57de014a11",
+      "bytes": 14131200
+    },
+    {
+      "file": "libc++.dll",
+      "sha256": "92e003c17be34ed7ce27571050de7d681d7217e1f9f856322d3726d58eace3aa",
+      "bytes": 1631232
+    },
+    {
+      "file": "zlib1.dll",
+      "sha256": "fed18d2fda0a1b0252787fd59e7c01ed900f5c90eeb131f30a9992abb328c7ca",
+      "bytes": 115200
+    },
+    {
+      "file": "libzstd.dll",
+      "sha256": "87e871f3f06ee054cdac83f99a7ea260f306472c923a1615ef88000905bfb9f2",
+      "bytes": 815104
+    }
+  ],
+  "bundledLibraries": [
+    "libc++.dll",
+    "libzstd.dll",
+    "zlib1.dll"
+  ],
+  "sources": {
+    "llvm": "b158b0ae6c559f87be325b8f427c5588e6a48823",
+    "binaryen": "d03c25ea43d8f147fc222f9b88ff3bf641abe8da",
+    "emscripten": "4e4223852a0835923411059a3929907d7df1232e",
+    "releases": "f04ea239d533260dd1db760dd2d668d5f9a88d6b"
+  }
+}

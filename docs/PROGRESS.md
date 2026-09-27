@@ -1,7 +1,5 @@
-**Windows startup verified — 2026-09-27.** Retained `.37` remains accepted on four Linux/Mac targets. Native ARM64 SDK and Lean builds continue; native leantar is retained.
+**Native Windows ARM64 SDK verified — 2026-09-27.** The pinned LLVM/Binaryen/Emscripten build passed native executable checks, relocation with original tools hidden, managed extraction/repairs, C++ threads/exceptions in Wasm32 and Wasm64, and cache reuse. The 174.8 MB archive is retained in an unpublished draft with checksums and provenance. Peak committed memory was 974.4 MB. Native Lean is still building.
 
-Correcting the restricted token's default object ACL fixed Node initialization on both Windows architectures. All four bounded startup probes passed. Full controls then stopped because Node attempted to read its compiled global OpenSSL configuration under denied Program Files. Evidence and cleanup results are preserved.
+Windows consumer controls remain incomplete. Corrected tokens initialize stock Node on both architectures; private OpenSSL configuration excludes runner settings. Small diagnostic probes now distinguish child-pipe behavior with and without traversal privilege or restricting SIDs. They cannot satisfy acceptance.
 
-CI now supplies an empty private OpenSSL configuration, alongside existing private npm/Git configuration, to reproduce an ordinary machine without developer configuration. TLS verification and stock Node remain unchanged. Prerequisite denials and offline controls still must pass before Windows application acceptance.
-
-README reviewed: `.37` installation, every CLI option, support matrix and runtime restrictions remain accurate. Windows remains unsupported. Next: finish native controls and installed-package acceptance. No npm publication. Completion ETA is not yet estimable.
+README reviewed against the CLI and support policy: retained `.37` remains the four-platform Linux/Mac candidate; Windows remains unsupported. Next: finish consumer controls, installed Windows x64 acceptance, and native ARM64 Lean distribution/acceptance. No npm publication. Completion ETA is not yet estimable.

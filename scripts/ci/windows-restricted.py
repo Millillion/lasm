@@ -233,7 +233,8 @@ assert 1 <= timeout <= 3600
 startup_probe = spec.get("startupProbe")
 if startup_probe:
     assert startup_probe in ("no-acls", "keep-traversal", "no-restricting-sids", "ordinary-token")
-    assert command[1:] == ["--version"] and not spec.get("offline")
+    assert len(command) == 3 and command[1] == "--eval" and not spec.get("offline")
+    assert command[2] == 'console.error("pipe probe started"); process.stdout.write(require("node:child_process").execFileSync(process.execPath,["--version"]))'
 report_file.parent.mkdir(parents=True, exist_ok=True)
 with report_file.open("x", encoding="utf-8") as output:
     output.write("{}\n")

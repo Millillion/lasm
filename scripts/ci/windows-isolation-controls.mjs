@@ -54,8 +54,9 @@ report.ordinaryUserSentinel = { code: positive.status, stdout: positive.stdout, 
 report.startupProbes = [];
 for (const startupProbe of ['no-acls', 'keep-traversal', 'no-restricting-sids', 'ordinary-token']) {
   const actual = windowsStartupProbe({ startupProbe, disposableRoot: root,
-    reads: [nodeDirectory], writes: [writable], command: [node, '--version'],
-    cwd: writable, environment, offline: false, timeoutSeconds: 20 }, join(output, startupProbe + '.json'));
+    reads: [nodeDirectory], writes: [writable], command: [node, '--eval',
+      'console.error("pipe probe started"); process.stdout.write(require("node:child_process").execFileSync(process.execPath,["--version"]))'],
+    cwd: writable, environment, offline: false, timeoutSeconds: 10 }, join(output, startupProbe + '.json'));
   report.startupProbes.push({ startupProbe, ...actual }); save();
 }
 for (const phase of ['online', 'offline']) {

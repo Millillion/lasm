@@ -21,7 +21,8 @@ export function windowsIsolated(spec, reportFile) {
 }
 
 export function windowsStartupProbe(spec, reportFile) {
-  assert.ok(spec.startupProbe); assert.deepEqual(spec.command.slice(1), ['--version']);
+  assert.ok(spec.startupProbe); assert.equal(spec.command[1], '--eval');
+  assert.equal(spec.command[2], 'console.error("pipe probe started"); process.stdout.write(require("node:child_process").execFileSync(process.execPath,["--version"]))');
   return invoke(spec, reportFile);
 }
 
