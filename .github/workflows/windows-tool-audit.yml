@@ -1,0 +1,46 @@
+name: Audit retained Windows ARM64 tool metadata
+on:
+  workflow_dispatch:
+    inputs:
+      kind:
+        type: choice
+        options: [sdk, leantar, lean]
+        required: true
+      tag:
+        description: Exact retained bootstrap draft tag
+        type: string
+        required: true
+      sha256:
+        description: Exact recorded archive SHA-256
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  audit:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Prepare private authentication for the bounded downloader
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node -e "const f=require('node:fs');f.mkdirSync('.work',{recursive:true});f.writeFileSync('.work/windows-tool-audit-context.json',JSON.stringify({repository:process.env.GITHUB_REPOSITORY,ref:process.env.GITHUB_REF,token:process.env.GH_TOKEN}),{mode:0o600,flag:'wx'})"
+      - name: Verify retained archive and inventory licenses, sources and native files
+        env:
+          AUDIT_KIND: ${{ inputs.kind }}
+          AUDIT_TAG: ${{ inputs.tag }}
+          AUDIT_SHA256: ${{ inputs.sha256 }}
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/windows-tool-audit-resources.json -- /usr/bin/timeout 900 node scripts/ci/windows-tool-audit.mjs "$AUDIT_KIND" "$AUDIT_TAG" "$AUDIT_SHA256"
+      - name: Preserve audit evidence
+        if: always()
+        run: node -e "const f=require('node:fs');for(const p of ['.work/windows-tool-audit/result.json','.work/windows-tool-audit-resources.json'])if(f.existsSync(p))console.log(p+'\\n'+f.readFileSync(p,'utf8'))"
+      - name: Remove private authentication
+        if: always()
+        run: node -e "require('node:fs').rmSync('.work/windows-tool-audit-context.json',{force:true})"

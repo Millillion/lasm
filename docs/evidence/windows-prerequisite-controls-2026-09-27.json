@@ -1,0 +1,768 @@
+{
+  "scope": "Native Windows prerequisite controls, not Lean application acceptance",
+  "run": 36285205050,
+  "sourceRevision": "649a814f18cf092dd396a972589a24c39ef19fc7",
+  "passed": true,
+  "platforms": [
+    "win32-x64",
+    "win32-arm64"
+  ],
+  "results": [
+    {
+      "architecture": "x64",
+      "job": 108524553828,
+      "jobUrl": "https://github.com/Millillion/lasm/actions/runs/36285205050/job/108524553828",
+      "logSha256": "d9d6817136ccae786c0fda1982e35d0e2c498bad8fc218bff77ef55f59e76566",
+      "ordinaryUserSentinel": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "startupProbes": [
+        {
+          "startupProbe": "keep-traversal",
+          "code": 0,
+          "stdout": "v26.10.0\r\n",
+          "stderr": "pipe probe started\n",
+          "isolation": {
+            "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+            "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+            "sid": "S-1-5-21-2757399959-1330353683-3753862562-1001",
+            "offline": false,
+            "status": "passed",
+            "startedAt": 1790472033.405735,
+            "startupProbe": "keep-traversal",
+            "token": {
+              "restricted": true,
+              "privileges": 1,
+              "traversalBypass": true,
+              "privateObjectDacl": true
+            },
+            "blockedDevelopmentRoots": [],
+            "deniedInputs": [],
+            "deniedObjects": 0,
+            "readOnlyObjects": 0,
+            "pid": 6568,
+            "inheritedCappedJob": "Local\\LasmResource-957b641c-a055-47c4-a484-5facb70100f8",
+            "exitCode": 0,
+            "finishedAt": 1790472033.4631145,
+            "descendantsReleased": true
+          }
+        },
+        {
+          "startupProbe": "ordinary-token",
+          "code": 0,
+          "stdout": "v26.10.0\r\n",
+          "stderr": "pipe probe started\n",
+          "isolation": {
+            "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+            "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+            "sid": "S-1-5-21-182922875-2235914445-4223719605-1001",
+            "offline": false,
+            "status": "passed",
+            "startedAt": 1790472033.601354,
+            "startupProbe": "ordinary-token",
+            "token": {
+              "restricted": false,
+              "privileges": 24,
+              "traversalBypass": true,
+              "privateObjectDacl": true
+            },
+            "blockedDevelopmentRoots": [],
+            "deniedInputs": [],
+            "deniedObjects": 0,
+            "readOnlyObjects": 0,
+            "pid": 7924,
+            "inheritedCappedJob": "Local\\LasmResource-957b641c-a055-47c4-a484-5facb70100f8",
+            "exitCode": 0,
+            "finishedAt": 1790472033.6596427,
+            "descendantsReleased": true
+          }
+        }
+      ],
+      "phases": [
+        {
+          "phase": "online",
+          "code": 0,
+          "controls": {
+            "passed": true,
+            "node": "v26.10.0",
+            "architecture": "x64",
+            "localAppData": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-IaNX5D\\writable \u65e5\u672c\u8a9e\\home\\AppData\\Local",
+            "phase": "online",
+            "checks": [
+              {
+                "name": "native architecture",
+                "passed": true
+              },
+              {
+                "name": "isolated default user cache",
+                "passed": true
+              },
+              {
+                "name": "read-only fixture",
+                "passed": true
+              },
+              {
+                "name": "deny file: D:\\a\\lasm\\lasm\\package.json",
+                "passed": true
+              },
+              {
+                "name": "deny file: D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-IaNX5D\\denied directory\\ordinary-user-readable.txt",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\bin\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\cmd\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\mingw64\\bin\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\LLVM\\bin\\clang.exe",
+                "passed": true
+              },
+              {
+                "name": "deny writing read-only fixture",
+                "passed": true
+              },
+              {
+                "name": "Unicode filesystem roundtrip",
+                "passed": true
+              },
+              {
+                "name": "Wasm JIT",
+                "passed": true
+              },
+              {
+                "name": "worker threads",
+                "passed": true
+              },
+              {
+                "name": "child process pipes",
+                "passed": true
+              },
+              {
+                "name": "child inherits default cache root",
+                "passed": true
+              },
+              {
+                "name": "child inherits every file restriction",
+                "passed": true
+              },
+              {
+                "name": "stock npm CLI",
+                "passed": true
+              },
+              {
+                "name": "stock npm.cmd",
+                "passed": true
+              },
+              {
+                "name": "stock npx.cmd",
+                "passed": true
+              },
+              {
+                "name": "online network capability",
+                "passed": true
+              }
+            ]
+          },
+          "isolation": {
+            "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+            "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+            "sid": "S-1-5-21-94573173-3326535791-2453487019-1001",
+            "offline": false,
+            "status": "passed",
+            "startedAt": 1790472033.7993693,
+            "token": {
+              "restricted": true,
+              "privileges": 1,
+              "traversalBypass": true,
+              "privateObjectDacl": true,
+              "privilegeNames": [
+                "SeChangeNotifyPrivilege"
+              ]
+            },
+            "blockedDevelopmentRoots": [
+              "C:\\Program Files",
+              "C:\\Program Files (x86)",
+              "C:\\hostedtoolcache\\windows",
+              "C:\\msys64"
+            ],
+            "deniedInputs": [
+              "D:\\a\\lasm\\lasm",
+              "D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+              "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-IaNX5D\\denied directory"
+            ],
+            "deniedObjects": 6269,
+            "readOnlyObjects": 2390,
+            "pid": 568,
+            "inheritedCappedJob": "Local\\LasmResource-957b641c-a055-47c4-a484-5facb70100f8",
+            "exitCode": 0,
+            "finishedAt": 1790472428.1735256,
+            "descendantsReleased": true
+          },
+          "blockedDevelopmentProgramCount": 563
+        },
+        {
+          "phase": "offline",
+          "code": 0,
+          "controls": {
+            "passed": true,
+            "node": "v26.10.0",
+            "architecture": "x64",
+            "localAppData": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-IaNX5D\\writable \u65e5\u672c\u8a9e\\home\\AppData\\Local",
+            "phase": "offline",
+            "checks": [
+              {
+                "name": "native architecture",
+                "passed": true
+              },
+              {
+                "name": "isolated default user cache",
+                "passed": true
+              },
+              {
+                "name": "read-only fixture",
+                "passed": true
+              },
+              {
+                "name": "deny file: D:\\a\\lasm\\lasm\\package.json",
+                "passed": true
+              },
+              {
+                "name": "deny file: D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-IaNX5D\\denied directory\\ordinary-user-readable.txt",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\bin\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\cmd\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\mingw64\\bin\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\LLVM\\bin\\clang.exe",
+                "passed": true
+              },
+              {
+                "name": "deny writing read-only fixture",
+                "passed": true
+              },
+              {
+                "name": "Unicode filesystem roundtrip",
+                "passed": true
+              },
+              {
+                "name": "Wasm JIT",
+                "passed": true
+              },
+              {
+                "name": "worker threads",
+                "passed": true
+              },
+              {
+                "name": "child process pipes",
+                "passed": true
+              },
+              {
+                "name": "child inherits default cache root",
+                "passed": true
+              },
+              {
+                "name": "child inherits every file restriction",
+                "passed": true
+              },
+              {
+                "name": "stock npm CLI",
+                "passed": true
+              },
+              {
+                "name": "stock npm.cmd",
+                "passed": true
+              },
+              {
+                "name": "stock npx.cmd",
+                "passed": true
+              },
+              {
+                "name": "offline network capability",
+                "passed": true
+              }
+            ]
+          },
+          "isolation": {
+            "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+            "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+            "sid": "S-1-5-21-1777862676-3846929405-1525400732-1001",
+            "offline": true,
+            "status": "passed",
+            "startedAt": 1790472428.334649,
+            "token": {
+              "restricted": true,
+              "privileges": 1,
+              "traversalBypass": true,
+              "privateObjectDacl": true,
+              "privilegeNames": [
+                "SeChangeNotifyPrivilege"
+              ]
+            },
+            "blockedDevelopmentRoots": [
+              "C:\\Program Files",
+              "C:\\Program Files (x86)",
+              "C:\\hostedtoolcache\\windows",
+              "C:\\msys64"
+            ],
+            "deniedInputs": [
+              "D:\\a\\lasm\\lasm",
+              "D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+              "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-IaNX5D\\denied directory"
+            ],
+            "deniedObjects": 6273,
+            "readOnlyObjects": 2390,
+            "offlinePrograms": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-IaNX5D\\stock Node\\node.exe"
+            ],
+            "pid": 1708,
+            "inheritedCappedJob": "Local\\LasmResource-957b641c-a055-47c4-a484-5facb70100f8",
+            "exitCode": 0,
+            "firewallRestored": true,
+            "finishedAt": 1790472437.2447195,
+            "descendantsReleased": true
+          },
+          "blockedDevelopmentProgramCount": 563
+        }
+      ],
+      "resources": {
+        "status": "passed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14270197760
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 262086656,
+        "minimumHostAvailable": 13753745408,
+        "startedAt": 1790472028.6158524,
+        "unit": "Local\\LasmResource-957b641c-a055-47c4-a484-5facb70100f8",
+        "pid": 6680,
+        "lastSampleAt": 1790472437.2524638,
+        "exitCode": 0,
+        "finishedAt": 1790472437.2736332
+      }
+    },
+    {
+      "architecture": "arm64",
+      "job": 108524553971,
+      "jobUrl": "https://github.com/Millillion/lasm/actions/runs/36285205050/job/108524553971",
+      "logSha256": "c180238aa72239803c491b501f0e12598e92a38c30da876e895ece0f98bf11ce",
+      "ordinaryUserSentinel": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "startupProbes": [
+        {
+          "startupProbe": "keep-traversal",
+          "code": 0,
+          "stdout": "v26.10.0\r\n",
+          "stderr": "pipe probe started\n",
+          "isolation": {
+            "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+            "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+            "sid": "S-1-5-21-2386531637-1648712907-80059778-1001",
+            "offline": false,
+            "status": "passed",
+            "startedAt": 1790472095.7368996,
+            "startupProbe": "keep-traversal",
+            "token": {
+              "restricted": true,
+              "privileges": 1,
+              "traversalBypass": true,
+              "privateObjectDacl": true
+            },
+            "blockedDevelopmentRoots": [],
+            "deniedInputs": [],
+            "deniedObjects": 0,
+            "readOnlyObjects": 0,
+            "pid": 5732,
+            "inheritedCappedJob": "Local\\LasmResource-dbde0ba0-8393-4554-a730-fab0ea6c7b05",
+            "exitCode": 0,
+            "finishedAt": 1790472095.9180636,
+            "descendantsReleased": true
+          }
+        },
+        {
+          "startupProbe": "ordinary-token",
+          "code": 0,
+          "stdout": "v26.10.0\r\n",
+          "stderr": "pipe probe started\n",
+          "isolation": {
+            "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+            "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+            "sid": "S-1-5-21-2252217436-289881262-3308994239-1001",
+            "offline": false,
+            "status": "passed",
+            "startedAt": 1790472096.136934,
+            "startupProbe": "ordinary-token",
+            "token": {
+              "restricted": false,
+              "privileges": 24,
+              "traversalBypass": true,
+              "privateObjectDacl": true
+            },
+            "blockedDevelopmentRoots": [],
+            "deniedInputs": [],
+            "deniedObjects": 0,
+            "readOnlyObjects": 0,
+            "pid": 2480,
+            "inheritedCappedJob": "Local\\LasmResource-dbde0ba0-8393-4554-a730-fab0ea6c7b05",
+            "exitCode": 0,
+            "finishedAt": 1790472096.3195128,
+            "descendantsReleased": true
+          }
+        }
+      ],
+      "phases": [
+        {
+          "phase": "online",
+          "code": 0,
+          "controls": {
+            "passed": true,
+            "node": "v26.10.0",
+            "architecture": "arm64",
+            "localAppData": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-WyU0Hy\\writable \u65e5\u672c\u8a9e\\home\\AppData\\Local",
+            "phase": "online",
+            "checks": [
+              {
+                "name": "native architecture",
+                "passed": true
+              },
+              {
+                "name": "isolated default user cache",
+                "passed": true
+              },
+              {
+                "name": "read-only fixture",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\a\\lasm\\lasm\\package.json",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-WyU0Hy\\denied directory\\ordinary-user-readable.txt",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\bin\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\cmd\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\clangarm64\\bin\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\hostedtoolcache\\windows\\Python\\3.13.15\\arm64\\python.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\LLVM\\bin\\clang.exe",
+                "passed": true
+              },
+              {
+                "name": "deny writing read-only fixture",
+                "passed": true
+              },
+              {
+                "name": "Unicode filesystem roundtrip",
+                "passed": true
+              },
+              {
+                "name": "Wasm JIT",
+                "passed": true
+              },
+              {
+                "name": "worker threads",
+                "passed": true
+              },
+              {
+                "name": "child process pipes",
+                "passed": true
+              },
+              {
+                "name": "child inherits default cache root",
+                "passed": true
+              },
+              {
+                "name": "child inherits every file restriction",
+                "passed": true
+              },
+              {
+                "name": "stock npm CLI",
+                "passed": true
+              },
+              {
+                "name": "stock npm.cmd",
+                "passed": true
+              },
+              {
+                "name": "stock npx.cmd",
+                "passed": true
+              },
+              {
+                "name": "online network capability",
+                "passed": true
+              }
+            ]
+          },
+          "isolation": {
+            "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+            "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+            "sid": "S-1-5-21-2150500283-2974226509-2832066458-1001",
+            "offline": false,
+            "status": "passed",
+            "startedAt": 1790472096.5267844,
+            "token": {
+              "restricted": true,
+              "privileges": 1,
+              "traversalBypass": true,
+              "privateObjectDacl": true,
+              "privilegeNames": [
+                "SeChangeNotifyPrivilege"
+              ]
+            },
+            "blockedDevelopmentRoots": [
+              "C:\\Program Files",
+              "C:\\Program Files (x86)",
+              "C:\\hostedtoolcache\\windows",
+              "C:\\msys64"
+            ],
+            "deniedInputs": [
+              "C:\\a\\lasm\\lasm",
+              "C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+              "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-WyU0Hy\\denied directory"
+            ],
+            "deniedObjects": 5970,
+            "readOnlyObjects": 2390,
+            "pid": 7932,
+            "inheritedCappedJob": "Local\\LasmResource-dbde0ba0-8393-4554-a730-fab0ea6c7b05",
+            "exitCode": 0,
+            "finishedAt": 1790472483.202859,
+            "descendantsReleased": true
+          },
+          "blockedDevelopmentProgramCount": 505
+        },
+        {
+          "phase": "offline",
+          "code": 0,
+          "controls": {
+            "passed": true,
+            "node": "v26.10.0",
+            "architecture": "arm64",
+            "localAppData": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-WyU0Hy\\writable \u65e5\u672c\u8a9e\\home\\AppData\\Local",
+            "phase": "offline",
+            "checks": [
+              {
+                "name": "native architecture",
+                "passed": true
+              },
+              {
+                "name": "isolated default user cache",
+                "passed": true
+              },
+              {
+                "name": "read-only fixture",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\a\\lasm\\lasm\\package.json",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-WyU0Hy\\denied directory\\ordinary-user-readable.txt",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\bin\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\cmd\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\Git\\clangarm64\\bin\\git.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\hostedtoolcache\\windows\\Python\\3.13.15\\arm64\\python.exe",
+                "passed": true
+              },
+              {
+                "name": "deny file: C:\\Program Files\\LLVM\\bin\\clang.exe",
+                "passed": true
+              },
+              {
+                "name": "deny writing read-only fixture",
+                "passed": true
+              },
+              {
+                "name": "Unicode filesystem roundtrip",
+                "passed": true
+              },
+              {
+                "name": "Wasm JIT",
+                "passed": true
+              },
+              {
+                "name": "worker threads",
+                "passed": true
+              },
+              {
+                "name": "child process pipes",
+                "passed": true
+              },
+              {
+                "name": "child inherits default cache root",
+                "passed": true
+              },
+              {
+                "name": "child inherits every file restriction",
+                "passed": true
+              },
+              {
+                "name": "stock npm CLI",
+                "passed": true
+              },
+              {
+                "name": "stock npm.cmd",
+                "passed": true
+              },
+              {
+                "name": "stock npx.cmd",
+                "passed": true
+              },
+              {
+                "name": "offline network capability",
+                "passed": true
+              }
+            ]
+          },
+          "isolation": {
+            "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+            "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+            "sid": "S-1-5-21-3647197698-1128755497-1340668297-1001",
+            "offline": true,
+            "status": "passed",
+            "startedAt": 1790472483.4383314,
+            "token": {
+              "restricted": true,
+              "privileges": 1,
+              "traversalBypass": true,
+              "privateObjectDacl": true,
+              "privilegeNames": [
+                "SeChangeNotifyPrivilege"
+              ]
+            },
+            "blockedDevelopmentRoots": [
+              "C:\\Program Files",
+              "C:\\Program Files (x86)",
+              "C:\\hostedtoolcache\\windows",
+              "C:\\msys64"
+            ],
+            "deniedInputs": [
+              "C:\\a\\lasm\\lasm",
+              "C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+              "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-WyU0Hy\\denied directory"
+            ],
+            "deniedObjects": 5974,
+            "readOnlyObjects": 2390,
+            "offlinePrograms": [
+              "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-WyU0Hy\\stock Node\\node.exe"
+            ],
+            "pid": 3936,
+            "inheritedCappedJob": "Local\\LasmResource-dbde0ba0-8393-4554-a730-fab0ea6c7b05",
+            "exitCode": 0,
+            "firewallRestored": true,
+            "finishedAt": 1790472556.221265,
+            "descendantsReleased": true
+          },
+          "blockedDevelopmentProgramCount": 505
+        }
+      ],
+      "resources": {
+        "status": "passed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13659848704
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 431333376,
+        "minimumHostAvailable": 13076381696,
+        "startedAt": 1790472091.312016,
+        "unit": "Local\\LasmResource-dbde0ba0-8393-4554-a730-fab0ea6c7b05",
+        "pid": 6892,
+        "lastSampleAt": 1790472556.0837831,
+        "exitCode": 0,
+        "finishedAt": 1790472556.2689152
+      }
+    }
+  ]
+}
