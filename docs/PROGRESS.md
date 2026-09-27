@@ -1,7 +1,7 @@
-**Windows consumer preparation — 2026-09-26.** Retained `.37` remains accepted on all four Linux/Mac targets. Native ARM64 SDK and Lean 4.34.1 builds are running. ARM64 leantar is validated and retained.
+**Windows consumer preparation — 2026-09-27.** Retained `.37` remains accepted on all four Linux/Mac targets. Native ARM64 SDK and Lean 4.34.1 builds continue; ARM64 leantar is validated and retained.
 
-Windows isolation controls are running after excluding ordinary security-service files from developer-program restrictions. Native deadline/disk controls, metadata grants and cleanup already pass. The unchanged-candidate receipt reader revalidated all four retained `.37` native reports at 32.4 MiB peak.
+Both Windows isolation controls reached their 480-second resource deadline after processing over 5,800 unrelated executable ACLs. Peak committed memory stayed below 200 MiB. Preserved as resource aborts, not Lean failures. The inventory now targets developer-tool entry points; individual controls report progress and bound worker replies. Explicit file-denial assertions remain unchanged.
 
-Copied Windows deployments now share one restricted test environment, while every app still launches with plain Node. This avoids repeated ACL setup and measures application startup independently of CI permission setup. Partial deployment results survive failures/resource stops. Native acceptance remains required.
+The Windows consumer workflow now supplies an independent native ARM64 reference compiler outside the product environment. Native acceptance is still required.
 
-README reviewed against the CLI and platform policy: `.37` instructions and restrictions remain accurate; Windows remains unsupported. Next: pass isolation controls, run candidate `.38` on Windows x64 and validate native ARM64 tools. No npm publication. Completion ETA is not yet estimable.
+README reviewed against the CLI and support policy: `.37` instructions remain accurate; Windows remains unsupported. Next: pass isolation controls, run candidate `.38` on Windows x64 and validate native ARM64 tools. No npm publication. Completion ETA is not yet estimable.

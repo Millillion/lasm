@@ -9,8 +9,10 @@ import { join } from 'node:path';
 const [configFile, phase] = process.argv.slice(2), config = JSON.parse(readFileSync(configFile));
 const checks = [], options = { encoding: 'utf8', timeout: 15000 };
 async function check(name, fn) {
+  console.error('Starting control: ' + name);
   try { await fn(); checks.push({ name, passed: true }); }
   catch (error) { checks.push({ name, passed: false, error: error.stack, stdout: error.stdout, stderr: error.stderr }); }
+  console.error(JSON.stringify(checks.at(-1)));
 }
 await check('native architecture', () => assert.equal(process.arch, config.architecture));
 await check('isolated default user cache', () => assert.equal(process.env.LOCALAPPDATA, config.localAppData));
@@ -30,8 +32,13 @@ await check('Wasm JIT', async () => {
 });
 await check('worker threads', async () => {
   const worker = new Worker('require("node:worker_threads").parentPort.postMessage(42)', { eval: true });
-  try { assert.equal(await new Promise((resolve, reject) => { worker.once('message', resolve); worker.once('error', reject); }), 42); }
-  finally { await worker.terminate(); }
+  let timeout;
+  try { assert.equal(await new Promise((resolve, reject) => {
+    timeout = setTimeout(() => reject(Error('Worker did not reply within 15 seconds')), 15000);
+    worker.once('message', resolve); worker.once('error', reject);
+    worker.once('exit', code => reject(Error('Worker exited before replying: ' + code)));
+  }), 42); }
+  finally { clearTimeout(timeout); await worker.terminate(); }
 });
 await check('child process pipes', () => assert.equal(execFileSync(process.execPath,
   ['-e', 'process.stdout.write("child pipes work")'], options), 'child pipes work'));

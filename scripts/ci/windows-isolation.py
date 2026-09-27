@@ -279,12 +279,18 @@ try:
             parents.append(path)
         evidence["ancestorMetadata"] = [str(p) for p in parents]
         # Program Files commonly grants ALL RESTRICTED APPLICATION PACKAGES
-        # access. Deny its preinstalled executables/scripts directly. Removing
+        # access. Deny its preinstalled build-tool entry points directly. Removing
         # SeChangeNotifyPrivilege breaks Windows process initialization, so
         # preserve normal traversal and ordinary Windows system libraries.
         roots = [os.environ.get(k) for k in ("ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "RUNNER_TOOL_CACHE", "MSYS2_LOCATION")]
         roots.append(str(Path(os.environ["SystemRoot"]).anchor + "msys64"))
         visited = set()
+        tool_names = {"lean.exe", "lake.exe", "leanc.exe", "leanchecker.exe", "leantar.exe",
+            "cl.exe", "link.exe", "lld.exe", "lld-link.exe", "ld.lld.exe", "ld.exe", "llc.exe", "opt.exe",
+            "wasm-ld.exe", "wasm-opt.exe", "ar.exe", "ranlib.exe", "gcc.exe", "g++.exe",
+            "py.exe", "git.exe", "git-cmd.exe", "git-bash.exe", "git-lfs.exe", "cmake.exe", "ninja.exe",
+            "make.exe", "mingw32-make.exe", "bash.exe", "sh.exe", "node.exe", "npm.cmd", "npx.cmd",
+            "emcc.bat", "emcc.cmd", "emcc.py", "em++.py", "emar.py", "emranlib.py", "emsdk.bat"}
         def block_programs(path):
             try:
                 with os.scandir(path) as entries:
@@ -298,7 +304,7 @@ try:
                                 evidence.setdefault("ordinarySecurityServices", []).append(entry.path)
                                 continue
                             block_programs(Path(entry.path))
-                        elif Path(entry.name).suffix.lower() in (".exe", ".com", ".bat", ".cmd"):
+                        elif entry.name.lower() in tool_names or re.fullmatch(r"(?:clang[^.]*|llvm-[^.]*|python[\d.w_-]*)\.exe", entry.name, re.I):
                             # Denying the interpreter executable also denies
                             # its library scripts; avoid visiting every Python
                             # standard-library file and PowerShell module.
@@ -319,6 +325,8 @@ try:
             block_programs(path)
             evidence.setdefault("developmentRoots", []).append({"path": str(path),
                 "blockedPrograms": len(blocked) - before, "seconds": time.monotonic() - started})
+            evidence["blockedDevelopmentPrograms"] = len(blocked)
+            save()
         evidence["blockedDevelopmentPrograms"] = len(blocked)
     # File data/execute/write grants stay inside the disposable test root.
     for mode in ("reads", "writes"):

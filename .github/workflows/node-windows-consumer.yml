@@ -52,6 +52,25 @@ jobs:
           key: ${{ inputs.cache-key }}
           enableCrossOsArchive: true
           fail-on-cache-miss: true
+      - name: Prepare native ARM64 compiler for independent reference outputs
+        if: inputs.architecture == 'arm64'
+        uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2.32.0
+        id: oracle
+        with:
+          msystem: CLANGARM64
+          cache: false
+          path-type: minimal
+          install: >-
+            mingw-w64-clang-aarch64-clang
+            mingw-w64-clang-aarch64-gmp
+            mingw-w64-clang-aarch64-libuv
+      - name: Keep the reference compiler outside the product environment
+        if: inputs.architecture == 'arm64'
+        env:
+          ORACLE_ROOT: ${{ steps.oracle.outputs.msys2-location }}
+        run: |
+          "MSYS2_LOCATION=$env:ORACLE_ROOT" >> $env:GITHUB_ENV
+          "LASM_NATIVE_ORACLE_CC=$(Join-Path $env:ORACLE_ROOT 'clangarm64/bin/clang.exe')" >> $env:GITHUB_ENV
       - name: Cold install, installed CLI, offline cache and copied deployments
         run: node scripts/ci/run-node-windows.mjs
       - name: Preserve native results
