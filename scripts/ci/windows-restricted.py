@@ -196,6 +196,7 @@ create_as_user = fn(A, "CreateProcessAsUserW", [W.HANDLE, W.LPCWSTR, W.LPWSTR, P
 parse_sid = fn(A, "ConvertStringSidToSidW", [W.LPCWSTR, C.POINTER(P)])
 equal_sid = fn(A, "EqualSid", [P, P])
 is_restricted = fn(A, "IsTokenRestricted", [W.HANDLE])
+set_token_info = fn(A, "SetTokenInformation", [W.HANDLE, C.c_int, P, W.DWORD])
 
 
 def info(handle, number):
@@ -229,6 +230,10 @@ allowed_root = Path(spec["disposableRoot"]).resolve()
 assert allowed_root.is_dir() and allowed_root.name.startswith("lasm ")
 timeout = spec.get("timeoutSeconds", 3000)
 assert 1 <= timeout <= 3600
+startup_probe = spec.get("startupProbe")
+if startup_probe:
+    assert startup_probe in ("no-acls", "keep-traversal", "no-restricting-sids", "ordinary-token")
+    assert command[1:] == ["--version"] and not spec.get("offline")
 report_file.parent.mkdir(parents=True, exist_ok=True)
 with report_file.open("x", encoding="utf-8") as output:
     output.write("{}\n")
@@ -245,6 +250,7 @@ firewall_attempted = False
 evidence = {"mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
     "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
     "sid": sid_text, "offline": bool(spec.get("offline")), "status": "starting", "startedAt": time.time()}
+if startup_probe: evidence["startupProbe"] = startup_probe
 
 
 def save():
@@ -262,7 +268,7 @@ try:
     check(parse_sid(sid_text, C.byref(sid)))
     check(parse_sid("S-1-5-32-544", C.byref(admin_sid)))
     original = W.HANDLE()
-    check(open_token(current_process(), 0x0b, C.byref(original)))
+    check(open_token(current_process(), 0x8b, C.byref(original)))
     user, groups, privileges = info(original, 1), info(original, 2), info(original, 3)
     user_sid = C.cast(user, C.POINTER(SID_ATTRIBUTES))[0].sid
     count = C.cast(groups, C.POINTER(W.DWORD))[0]
@@ -276,16 +282,35 @@ try:
     privilege_count = C.cast(privileges, C.POINTER(W.DWORD))[0]
     deleted = (LUID_ATTRIBUTES * privilege_count).from_buffer(privileges, TOKEN_PRIVILEGES.privileges.offset)
     restricted = W.HANDLE()
-    check(restricted_token(original, 0, 1, C.byref(disabled), privilege_count, deleted,
-        len(restrictions), restrictions, C.byref(restricted)))
-    assert is_restricted(restricted)
-    assert C.cast(info(restricted, 3), C.POINTER(W.DWORD))[0] == 0, "Remove all privileges, including traversal bypass"
-    evidence["token"] = {"restricted": True, "privileges": 0, "traversalBypass": False}
+    ordinary = startup_probe == "ordinary-token"
+    restricting = startup_probe not in ("no-restricting-sids", "ordinary-token")
+    check(restricted_token(original, 1 if startup_probe == "keep-traversal" else 0,
+        0 if ordinary else 1, None if ordinary else C.byref(disabled),
+        0 if ordinary else privilege_count, None if ordinary else deleted,
+        len(restrictions) if restricting else 0, restrictions if restricting else None, C.byref(restricted)))
+    # An elevated runner's default object ACL can name only SYSTEM and
+    # Administrators. Its non-admin child must still access its own newly
+    # created process, thread and pipe objects. Update only the new token's
+    # default ACL; existing filesystem denials are unaffected.
+    default = info(restricted, 6)
+    old_default = C.cast(default, C.POINTER(P))[0]
+    new_default = P()
+    defaults = (EXPLICIT_ACCESS * 2)(*(EXPLICIT_ACCESS(0x10000000, 1, 0,
+        TRUSTEE(None, 0, 0, 0, s)) for s in (user_sid, sid)))
+    error = acl_entries(2, defaults, old_default, C.byref(new_default))
+    if error: raise C.WinError(error)
+    try: check(set_token_info(restricted, 6, C.byref(new_default), C.sizeof(P)))
+    finally: free(new_default)
+    actual_privileges = C.cast(info(restricted, 3), C.POINTER(W.DWORD))[0]
+    if not startup_probe:
+        assert is_restricted(restricted) and actual_privileges == 0
+    evidence["token"] = {"restricted": bool(is_restricted(restricted)), "privileges": actual_privileges,
+        "traversalBypass": startup_probe in ("keep-traversal", "ordinary-token"), "privateObjectDacl": True}
 
     roots = [os.environ.get(k) for k in ("ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "RUNNER_TOOL_CACHE", "MSYS2_LOCATION")]
     roots.append(str(Path(os.environ["SystemRoot"]).anchor + "msys64"))
     developer_roots = sorted({str(Path(p).resolve()) for p in roots if p and Path(p).exists()})
-    for path in [*developer_roots, *spec.get("denied", [])]:
+    for path in ([] if startup_probe else [*developer_roots, *spec.get("denied", [])]):
         target = Path(path).resolve()
         assert target.exists() and target != allowed_root and target not in allowed_root.parents
         deny(target, 0x21)  # FILE_READ_DATA/LIST_DIRECTORY | FILE_EXECUTE/TRAVERSE
@@ -293,7 +318,7 @@ try:
     evidence["deniedInputs"] = spec.get("denied", [])
     # Explicit write bits exclude SYNCHRONIZE and READ_CONTROL, which generic
     # FILE_GENERIC_WRITE also contains and would accidentally deny reads.
-    for value in spec.get("reads", []):
+    for value in ([] if startup_probe else spec.get("reads", [])):
         path = Path(value).resolve()
         assert path == allowed_root or allowed_root in path.parents
         deny(path, 0xd0156)
@@ -352,7 +377,8 @@ try:
     check(job_assign(inner, child.process))
     token = W.HANDLE()
     check(open_token(child.process, 8, C.byref(token)))
-    assert is_restricted(token) and C.cast(info(token, 3), C.POINTER(W.DWORD))[0] == 0
+    if not startup_probe:
+        assert is_restricted(token) and C.cast(info(token, 3), C.POINTER(W.DWORD))[0] == 0
     assert C.cast(info(token, 29), C.POINTER(W.DWORD))[0] == 0, "Use ordinary Node pipe namespaces, not AppContainer"
     evidence.update(status="running", pid=child.pid, inheritedCappedJob=outer_name)
     save()

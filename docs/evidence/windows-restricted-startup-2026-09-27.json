@@ -1,0 +1,258 @@
+{
+  "scope": "Both restricted-token controls failed before Node initialization with STATUS_DLL_INIT_FAILED (0xc0000142). No child control or Lean application ran. Explicit cleanup and offline firewall restoration completed; resource limits were not reached.",
+  "sourceRevision": "f88c53041d9d3a70bcf72e57a5b8ca20ec856439",
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36283471276/job/108519666853",
+      "controls": {
+        "scope": "Native restricted-token and scoped firewall controls; no Lean application acceptance",
+        "platform": "win32-x64",
+        "root": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-fyJaam",
+        "phases": [
+          {
+            "phase": "online",
+            "code": 3221225794,
+            "stdout": "",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-2352271560-1413836611-3416013204-1001",
+              "offline": false,
+              "status": "failed",
+              "startedAt": 1790469987.1906204,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "D:\\a\\lasm\\lasm",
+                "D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-fyJaam\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "pid": 7196,
+              "inheritedCappedJob": "Local\\LasmResource-15854ebb-56a4-4461-8a06-34375835b281",
+              "exitCode": 3221225794,
+              "finishedAt": 1790469989.2909799,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          },
+          {
+            "phase": "offline",
+            "code": 3221225794,
+            "stdout": "",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-1391592251-3259640882-2586547100-1001",
+              "offline": true,
+              "status": "failed",
+              "startedAt": 1790469989.519527,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "D:\\a\\lasm\\lasm",
+                "D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-fyJaam\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "offlinePrograms": [
+                "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-fyJaam\\stock Node\\node.exe"
+              ],
+              "pid": 8064,
+              "inheritedCappedJob": "Local\\LasmResource-15854ebb-56a4-4461-8a06-34375835b281",
+              "exitCode": 3221225794,
+              "firewallRestored": true,
+              "finishedAt": 1790469998.938237,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          }
+        ],
+        "ordinaryUserSentinel": {
+          "code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "passed": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14260736000
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 255004672,
+        "minimumHostAvailable": 14050459648,
+        "startedAt": 1790469981.5227628,
+        "unit": "Local\\LasmResource-15854ebb-56a4-4461-8a06-34375835b281",
+        "pid": 2116,
+        "lastSampleAt": 1790469998.8115609,
+        "exitCode": 1,
+        "finishedAt": 1790469998.9616232
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36283471276/job/108519666963",
+      "controls": {
+        "scope": "Native restricted-token and scoped firewall controls; no Lean application acceptance",
+        "platform": "win32-arm64",
+        "root": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-azTZzO",
+        "phases": [
+          {
+            "phase": "online",
+            "code": 3221225794,
+            "stdout": "",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-1936132612-1782608134-366868368-1001",
+              "offline": false,
+              "status": "failed",
+              "startedAt": 1790470034.45555,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "C:\\a\\lasm\\lasm",
+                "C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-azTZzO\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "pid": 5944,
+              "inheritedCappedJob": "Local\\LasmResource-f8a58af2-6c6f-407d-b676-f7c4d3742250",
+              "exitCode": 3221225794,
+              "finishedAt": 1790470036.7854404,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          },
+          {
+            "phase": "offline",
+            "code": 3221225794,
+            "stdout": "",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-346110998-1766586615-3064458392-1001",
+              "offline": true,
+              "status": "failed",
+              "startedAt": 1790470036.9939845,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "C:\\a\\lasm\\lasm",
+                "C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-azTZzO\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "offlinePrograms": [
+                "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-azTZzO\\stock Node\\node.exe"
+              ],
+              "pid": 5728,
+              "inheritedCappedJob": "Local\\LasmResource-f8a58af2-6c6f-407d-b676-f7c4d3742250",
+              "exitCode": 3221225794,
+              "firewallRestored": true,
+              "finishedAt": 1790470102.997736,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          }
+        ],
+        "ordinaryUserSentinel": {
+          "code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "passed": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13576921088
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 390283264,
+        "minimumHostAvailable": 13215907840,
+        "startedAt": 1790470030.6188467,
+        "unit": "Local\\LasmResource-f8a58af2-6c6f-407d-b676-f7c4d3742250",
+        "pid": 8656,
+        "lastSampleAt": 1790470102.8211122,
+        "exitCode": 1,
+        "finishedAt": 1790470103.024304
+      }
+    }
+  ]
+}

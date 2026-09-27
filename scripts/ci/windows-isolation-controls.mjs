@@ -6,7 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 import { verifyNativeProgram } from '../../src/native-program.mjs';
-import { windowsIsolated } from './windows-isolation.mjs';
+import { windowsIsolated, windowsStartupProbe } from './windows-isolation.mjs';
 
 await ensureResourceGuard();
 assert.equal(process.platform, 'win32');
@@ -49,6 +49,13 @@ const positive = spawnSync(node, ['-e', `require('node:assert/strict').equal(req
   { cwd: writable, env: environment, encoding: 'utf8', timeout: 30000 });
 assert.ifError(positive.error); assert.equal(positive.status, 0, positive.stderr);
 report.ordinaryUserSentinel = { code: positive.status, stdout: positive.stdout, stderr: positive.stderr }; save();
+report.startupProbes = [];
+for (const startupProbe of ['no-acls', 'keep-traversal', 'no-restricting-sids', 'ordinary-token']) {
+  const actual = windowsStartupProbe({ startupProbe, disposableRoot: root,
+    reads: [nodeDirectory], writes: [writable], command: [node, '--version'],
+    cwd: writable, environment, offline: false, timeoutSeconds: 20 }, join(output, startupProbe + '.json'));
+  report.startupProbes.push({ startupProbe, ...actual }); save();
+}
 for (const phase of ['online', 'offline']) {
   const actual = windowsIsolated({ disposableRoot: root, reads: [nodeDirectory, readonly], writes: [writable],
     denied: [resolve('.'), process.env.LASM_RESOURCE_PYTHON, privateTree],
