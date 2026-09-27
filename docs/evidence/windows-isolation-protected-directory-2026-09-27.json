@@ -1,0 +1,114 @@
+{
+  "scope": "CI setup could not open the TrustedInstaller-owned Program Files DACL for a per-container restriction. No Lean tests ran. Preserve ownership and use a narrowly scoped administrative permission handle.",
+  "sourceRevision": "1a17f52432562261dd7b695fa20a4d76030ec4e0",
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36281079138/job/108512872168",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.887f9666-d978-4256-813b-853fdac776d7",
+        "offline": false,
+        "status": "isolation-error",
+        "startedAt": 1790467210.5145266,
+        "allPackagesOptOut": true,
+        "sid": "S-1-15-2-1109852330-3676810709-1532632736-2025374190-2495783210-1829318109-3927536967",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "ancestorMetadata": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-HfXg6m",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+          "C:\\Users\\runneradmin\\AppData\\Local",
+          "C:\\Users\\runneradmin\\AppData",
+          "C:\\Users\\runneradmin",
+          "C:\\Users",
+          "C:\\"
+        ],
+        "error": "Opening ancestor metadata C:\\Program Files: [WinError 5] Access is denied.",
+        "finishedAt": 1790467210.5325232,
+        "descendantsReleased": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14194442240
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 94973952,
+        "minimumHostAvailable": 14060130304,
+        "startedAt": 1790467199.9938438,
+        "unit": "Local\\LasmResource-9e16acf3-6fbc-4840-a9db-9424c817331d",
+        "pid": 1836,
+        "lastSampleAt": 1790467210.587297,
+        "exitCode": 1,
+        "finishedAt": 1790467210.596351
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36281079138/job/108512872257",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.b565bd33-89f5-46c7-bc1b-aaf95a6b060d",
+        "offline": false,
+        "status": "isolation-error",
+        "startedAt": 1790467207.7222705,
+        "allPackagesOptOut": true,
+        "sid": "S-1-15-2-2119404377-1551508367-2665495417-826232453-1437804056-1061369463-1483942063",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "ancestorMetadata": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-VSuOKx",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+          "C:\\Users\\runneradmin\\AppData\\Local",
+          "C:\\Users\\runneradmin\\AppData",
+          "C:\\Users\\runneradmin",
+          "C:\\Users",
+          "C:\\"
+        ],
+        "error": "Opening ancestor metadata C:\\Program Files: [WinError 5] Access is denied.",
+        "finishedAt": 1790467207.7426755,
+        "descendantsReleased": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169428480,
+          "available": 13611839488
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 94507008,
+        "minimumHostAvailable": 13461098496,
+        "startedAt": 1790467198.7600958,
+        "unit": "Local\\LasmResource-17ca8480-bec1-4a43-bacb-231b92f19fd2",
+        "pid": 2772,
+        "lastSampleAt": 1790467207.6888502,
+        "exitCode": 1,
+        "finishedAt": 1790467207.7983954
+      }
+    }
+  ]
+}

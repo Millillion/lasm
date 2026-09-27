@@ -96,6 +96,7 @@ def fn(lib, name, args, result=W.BOOL):
 
 
 close = fn(K, "CloseHandle", [W.HANDLE])
+current_process = fn(K, "GetCurrentProcess", [], W.HANDLE)
 free = fn(K, "LocalFree", [P], P)
 free_sid = fn(A, "FreeSid", [P], P)
 create_profile = fn(U, "CreateAppContainerProfile", [W.LPCWSTR, W.LPCWSTR, W.LPCWSTR,
@@ -198,6 +199,31 @@ def directory_acl(path, permissions=0x1200a8, mode=1):
     # READ_CONTROL | WRITE_DAC; no data/delete access or inheritance tree walk.
     # https://learn.microsoft.com/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetsecurityobject
     handle = open_file(str(path), 0x60000, 7, None, 3, 0x02000000, None)
+    if handle == C.c_void_p(-1).value and C.get_last_error() == 5:
+        # TrustedInstaller owns Program Files. The administrative CI launcher
+        # can obtain this narrowly scoped handle with backup/restore semantics;
+        # restore its privilege immediately, before any consumer is created.
+        # Do not take ownership or change any existing principal's permissions.
+        privileged = W.HANDLE()
+        check(open_token(current_process(), 0x28, C.byref(privileged)))
+        previous, used = TOKEN_PRIVILEGES(), W.DWORD()
+        try:
+            luid = LUID()
+            check(lookup_privilege(None, "SeRestorePrivilege", C.byref(luid)))
+            enable = TOKEN_PRIVILEGES(1, (LUID_ATTRIBUTES * 1)(LUID_ATTRIBUTES(luid, 2)))
+            check(adjust_privileges(privileged, False, C.byref(enable), C.sizeof(previous), C.byref(previous), C.byref(used)))
+            if C.get_last_error() != 0:
+                raise C.WinError(C.get_last_error())
+            handle = open_file(str(path), 0x60000, 7, None, 3, 0x02000000, None)
+            error = C.get_last_error()
+        finally:
+            try:
+                if previous.count:
+                    check(adjust_privileges(privileged, False, C.byref(previous), 0, None, None))
+            finally:
+                close(privileged)
+        if handle == C.c_void_p(-1).value:
+            raise OSError(f"Opening protected ancestor metadata {path}: {C.WinError(error)}")
     if handle == C.c_void_p(-1).value:
         raise OSError(f"Opening ancestor metadata {path}: {C.WinError(C.get_last_error())}")
     descriptor, old_acl, new_acl = P(), P(), P()
