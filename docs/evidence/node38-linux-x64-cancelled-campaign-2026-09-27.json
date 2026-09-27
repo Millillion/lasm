@@ -1,0 +1,50 @@
+{
+  "scope": "Internal Linux x64 consumer completed successfully in a subsequently cancelled campaign; not a successful GitHub job or a complete candidate acceptance",
+  "candidateVersion": "0.1.0-experimental.38",
+  "archiveSha256": "34dbe720d3c8fea90df5ca48ea4ff563bf6f536275628eb054635b2e3ecfa370",
+  "sourceRevision": "649a814f18cf092dd396a972589a24c39ef19fc7",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36285630173",
+  "job": "https://github.com/Millillion/lasm/actions/runs/36285630173/job/108525893886",
+  "jobConclusion": "cancelled",
+  "reason": "Superseded campaign cancelled after Windows path-alias failure, to begin corrected candidate .39. Linux internal report had completed before cancellation.",
+  "platform": "linux-x64",
+  "node": "v26.10.0",
+  "consumerPassed": true,
+  "phaseExecutions": [
+    {
+      "phase": "cold",
+      "code": 0
+    },
+    {
+      "phase": "lake",
+      "code": 0
+    },
+    {
+      "phase": "offline",
+      "code": 0
+    }
+  ],
+  "resources": {
+    "peakMemoryBytes": 4653752320,
+    "exitCode": 0,
+    "resourceLimited": false,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "unitReleased": true
+  },
+  "disk": {
+    "reserveBytes": 4294967296,
+    "preflightBytes": 17179869184,
+    "freeAtStart": 91406811136,
+    "status": "passed",
+    "minimumFreeBytes": 83423191040,
+    "freeAtEnd": 91406147584
+  },
+  "originalLog": ".work/macos/node38-linux-x64-cancelled.log"
+}

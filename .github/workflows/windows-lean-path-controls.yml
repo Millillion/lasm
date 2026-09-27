@@ -1,0 +1,27 @@
+name: Native Windows Lean long-path controls
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-lean-path-controls
+  cancel-in-progress: false
+jobs:
+  native:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: windows-2025
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Reproduce upstream long-path failure and check managed Lean and Lake
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --timeout-seconds 1200 --disk-path . --disk-reserve-mib 4096 --report .work/windows-lean-path-resources.json -- node scripts/ci/windows-lean-path-controls.mjs
+      - name: Preserve path and resource results
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-lean-path-controls/result.json','.work/windows-lean-path-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

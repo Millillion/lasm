@@ -1,0 +1,53 @@
+{
+  "scope": "Windows x64 installed candidate fails while native Lean reads a standard-library file at MAX_PATH; not a resource failure",
+  "candidateVersion": "0.1.0-experimental.39",
+  "archiveSha256": "a5148305c2ea2e9bb4fe310b347f222ab9df113494ccc85ee2b7c28243228fe3",
+  "sourceRevision": "52e19167c0214e481b0ed2f53d597d506924584b",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36286835095",
+  "job": "https://github.com/Millillion/lasm/actions/runs/36286835095/job/108529589401",
+  "platform": "win32-x64",
+  "node": "v26.10.0",
+  "osRelease": "Microsoft Windows [Version 10.0.26100.33438]",
+  "phase": "cold",
+  "passed": false,
+  "diagnostic": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-9MxuGM\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\Main.lean:1:0: error: failed to open file 'c:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-9MxuGM\\consumer \u65e5\u672c\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\Iterators\\Internal\\LawfulMonadLiftFunction.olean.private': 3",
+  "upstreamReader": "Lean 4.34.1 src/library/module.cpp uses CreateFile; its executable manifest lacks longPathAware.",
+  "filePathCharacters": 260,
+  "scopeOfCorrection": "Test extended-length library search paths without changing system policy; no Windows acceptance claimed",
+  "resources": {
+    "status": "failed",
+    "command": [
+      "C:\\hostedtoolcache\\windows\\node\\26.10.0\\x64\\node.exe",
+      "scripts/check-node-windows.mjs",
+      "D:\\a\\lasm\\lasm\\.work\\node-windows-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.39.tgz",
+      "a5148305c2ea2e9bb4fe310b347f222ab9df113494ccc85ee2b7c28243228fe3"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 13276069888
+    },
+    "limits": {
+      "jobCommittedBytes": 8587180032,
+      "stopCommittedBytes": 6869744025,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 6600
+    },
+    "peakCommittedBytes": 704212992,
+    "minimumHostAvailable": 12063629312,
+    "startedAt": 1790474636.421678,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 157264289792,
+        "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 29826326528
+      }
+    },
+    "unit": "Local\\LasmResource-1b2ce26e-2b4c-4384-a136-31af4cd88875",
+    "pid": 6016,
+    "lastSampleAt": 1790475026.1212778,
+    "exitCode": 1,
+    "finishedAt": 1790475026.305019
+  },
+  "originalLog": ".work/macos/node39-windows-x64-36286835095.log"
+}

@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, realpathSync } from 'node:fs';
-import { dirname, join, resolve, relative, delimiter } from 'node:path';
+import { dirname, join, resolve, relative, delimiter, toNamespacedPath } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -28,6 +28,13 @@ export function nativeLeanEnvironment(lean) {
   for (const key of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(key)) delete env[key];
   Object.assign(env, { LEAN_NUM_THREADS: '1', LEAN_STACK_SIZE_KB: '8192',
     PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(delimiter) });
+  // Lean's module reader uses CreateFile without long-path manifest opt-in.
+  // An explicit namespace keeps deep managed caches usable without changing
+  // Windows registry policy or requiring a shorter user-selected directory.
+  if (process.platform === 'win32') Object.assign(env, {
+    LEAN_SYSROOT: toNamespacedPath(lean.prefix),
+    LEAN_PATH: toNamespacedPath(join(lean.prefix, 'lib/lean')),
+  });
   return env;
 }
 
@@ -87,7 +94,7 @@ export function applicationSources(source, lean, work, { log = console.error, gi
   // are already in the versioned bundle; local imports are compiled in order.
   const directory = canonicalApplicationPath(dirname(source)), standard = canonicalApplicationPath(join(lean.prefix, 'src/lean'));
   const output = join(work, 'lean'); mkdirSync(output, { recursive: true });
-  Object.assign(env, { LEAN_PATH: output, LEAN_SRC_PATH: directory });
+  Object.assign(env, { LEAN_PATH: [toNamespacedPath(output), env.LEAN_PATH].filter(Boolean).join(delimiter), LEAN_SRC_PATH: directory });
   const sources = [], inputs = [], visiting = new Set(), completed = new Map();
   function visit(file) {
     file = canonicalApplicationPath(file);

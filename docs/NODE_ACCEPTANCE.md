@@ -32,7 +32,7 @@ Give the unchanged tarball to the developer, who needs only Node/npm. Follow the
 | linux-x64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node37-linux-x64-2026-09-26.json), [job](108499108754) |
 | linux-arm64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node37-linux-arm64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108502713293) |
 | darwin-x64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node37-darwin-x64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108743) |
-| darwin-arm64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node37-darwin-arm64-2026-09-26.json), [job](108499108768) |
+| darwin-arm64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node37-darwin-arm64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108768) |
 
 Each job installs the same archive into a fresh project containing spaces and Unicode. Linux Landlock and macOS sandbox-exec deny checkout data and preinstalled developer tools. The consumer receives stock Node/npm and ordinary OS facilities; Lasm provisions its own build tools. Offline phases deny network access. Copied deployments run with source, package, original build output and development tools/cache denied.
 
