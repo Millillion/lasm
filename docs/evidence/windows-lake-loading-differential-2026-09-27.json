@@ -1,0 +1,226 @@
+{
+  "scope": "Native Windows Lake and interpreter comparison, with native Linux control. No complete Windows workflow acceptance.",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36288508190",
+  "sourceRevision": "b0a07f92f09a306ef9edc98ffdc37a335dd4398e",
+  "result": {
+    "passed": false,
+    "scope": "Native Lean/Lake long managed paths; installed Lasm acceptance remains separate",
+    "platform": "win32-x64",
+    "node": "v26.10.0",
+    "checks": [
+      {
+        "label": "unchanged upstream path handling",
+        "code": 1,
+        "stdout": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\project \u65e5\u672c\u8a9e\\Main.lean:1:0: error: failed to open file 'd:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\String\\Bootstrap.olean.server': 3\n",
+        "stderr": ""
+      },
+      {
+        "label": "extended library paths",
+        "code": 0,
+        "stdout": "long cache path 42\n",
+        "stderr": ""
+      },
+      {
+        "standaloneCGeneration": true
+      },
+      {
+        "label": "native Lake CLI",
+        "code": 1,
+        "stdout": "",
+        "stderr": "error: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\native Lake CLI\\lakefile.lean:2:5: unknown namespace `Lake`\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\native Lake CLI\\lakefile.lean:3:0: unexpected identifier; expected command\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\native Lake CLI\\lakefile.lean:5:17: unexpected identifier; expected 'abbrev', 'axiom', 'binder_predicate', 'builtin_initialize', 'class', 'coinductive', 'def', 'elab', 'elab_rules', 'example', 'inductive', 'infix', 'infixl', 'infixr', 'initialize', 'instance', 'macro', 'macro_rules', 'notation', 'opaque', 'postfix', 'prefix', 'structure', 'syntax' or 'theorem'\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\native Lake CLI\\lakefile.lean: package configuration has errors\n"
+      },
+      {
+        "label": "interpreter adapter",
+        "code": 1,
+        "stdout": "",
+        "stderr": "error: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\interpreter adapter\\lakefile.lean:2:5: unknown namespace `Lake`\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\interpreter adapter\\lakefile.lean:3:0: unexpected identifier; expected command\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\interpreter adapter\\lakefile.lean:5:17: unexpected identifier; expected 'abbrev', 'axiom', 'binder_predicate', 'builtin_initialize', 'class', 'coinductive', 'def', 'elab', 'elab_rules', 'example', 'inductive', 'infix', 'infixl', 'infixr', 'initialize', 'instance', 'macro', 'macro_rules', 'notation', 'opaque', 'postfix', 'prefix', 'structure', 'syntax' or 'theorem'\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\interpreter adapter\\lakefile.lean: package configuration has errors\nuncaught exception: could not load the Lake workspace\n"
+      },
+      {
+        "label": "adapter without SYSROOT override",
+        "code": 1,
+        "stdout": "",
+        "stderr": "error: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter without SYSROOT override\\lakefile.lean:2:5: unknown namespace `Lake`\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter without SYSROOT override\\lakefile.lean:3:0: unexpected identifier; expected command\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter without SYSROOT override\\lakefile.lean:5:17: unexpected identifier; expected 'abbrev', 'axiom', 'binder_predicate', 'builtin_initialize', 'class', 'coinductive', 'def', 'elab', 'elab_rules', 'example', 'inductive', 'infix', 'infixl', 'infixr', 'initialize', 'instance', 'macro', 'macro_rules', 'notation', 'opaque', 'postfix', 'prefix', 'structure', 'syntax' or 'theorem'\nerror: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\adapter without SYSROOT override\\lakefile.lean: package configuration has errors\nuncaught exception: could not load the Lake workspace\n"
+      },
+      {
+        "label": "adapter with full Lake import",
+        "code": 1,
+        "stdout": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\full-import-adapter.lean:14:17: error(lean.unknownIdentifier): Unknown identifier `loadWorkspace`\nD:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\full-import-adapter.lean:20:21: error(lean.invalidField): Invalid field notation: Type of\n  ws\nis not known; cannot resolve field `root`\n\nHint: Consider replacing the field projection with a call to one of the following:\n  \u2022 `LeanExe.root`\n  \u2022 `LeanExeConfig.root`\n  \u2022 `Workspace.root`\n  \u2022 `PersistentArray.root`\n  \u2022 `PersistentHashMap.root`\n  \u2022 `IO.FS.DirEntry.root`\n  \u2022 `Meta.DiscrTree.root`\n  \u2022 `SubExpr.Pos.root`\n  \u2022 `Meta.SynthInstance.Waiter.root`\nD:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\full-import-adapter.lean:20:55: error(lean.invalidField): Invalid field notation: Type of\n  ws\nis not known; cannot resolve field `root`\n\nHint: Consider replacing the field projection with a call to one of the following:\n  \u2022 `LeanExe.root`\n  \u2022 `LeanExeConfig.root`\n  \u2022 `Workspace.root`\n  \u2022 `PersistentArray.root`\n  \u2022 `PersistentHashMap.root`\n  \u2022 `IO.FS.DirEntry.root`\n  \u2022 `Meta.DiscrTree.root`\n  \u2022 `SubExpr.Pos.root`\n  \u2022 `Meta.SynthInstance.Waiter.root`\nD:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\full-import-adapter.lean:21:29: error(lean.invalidField): Invalid field notation: Type of\n  mod\nis not known; cannot resolve field `leanFile`\n\nHint: Consider replacing the field projection `.leanFile` with a call to the function `Module.leanFile`.\nD:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\full-import-adapter.lean:23:55: error(lean.invalidField): Invalid field notation: Type of\n  mod\nis not known; cannot resolve field `name`\n\nHint: Consider replacing the field projection with a call to one of the following:\n  \u2022 `Artifact.name`\n  \u2022 `CacheServiceConfig.name`\n  \u2022 `ConfigDecl.name`\n  \u2022 `ConfigFieldInfo.name`\n  \u2022 `ConfigTarget.name`\n  \u2022 `DataKind.name`\n  \u2022 `Dependency.name`\n  \u2022 `Dynlib.name`\n  \u2022 `FacetConfig.name`\n  \u2022 `LeanExeConfig.name`\n  \u2022 `LeanLibConfig.name`\n  \u2022 `Module.name`\n  \u2022 `ModuleFacet.name`\n  \u2022 `NamedConfigDecl.name`\n  \u2022 `OptDataKind.name`\n  \u2022 `Package.name`\n  \u2022 `PackageDecl.name`\n  \u2022 `Pattern.name`\n  \u2022 `RegistryPkg.name`\n  \u2022 `Script.name`\n  \u2022 `AsyncConstantInfo.name`\n  \u2022 `AttributeImplCore.name`\n  \u2022 `ClassEntry.name`\n  \u2022 `ConstantInfo.name`\n  \u2022 `ConstantVal.name`\n  \u2022 `Constructor.name`\n  \u2022 `FVarId.name`\n  \u2022 `InductiveType.name`\n  \u2022 `LeanOption.name`\n  \u2022 `LevelMVarId.name`\n  \u2022 `MVarId.name`\n  \u2022 `MacroScopesView.name`\n  \u2022 `ModuleSetup.name`\n  \u2022 `Option.name`\n  \u2022 `OptionDecl.name`\n  \u2022 `PersistentEnvExtension.name`\n  \u2022 `PersistentEnvExtensionDescrCore.name`\n  \u2022 `SimplePersistentEnvExtensionDescr.name`\n  \u2022 `Doc.CodeBlockSuggestion.name`\n  \u2022 `Elab.Attribute.name`\n  \u2022 `Elab.DocElabInfo.name`\n  \u2022 `Elab.InlayHintLabel.name`\n  \u2022 `IR.CtorInfo.name`\n  \u2022 `IR.Decl.name`\n  \u2022 `KeyedDeclsAttribute.Def.name`\n  \u2022 `Meta.ExprParamInfo.name`\n  \u2022 `ScopedEnvExtension.Descr.name`\n  \u2022 `SimpleScopedEnvExtension.Descr.name`\n  \u2022 `Try.Config.name`\n  \u2022 `Compiler.LCNF.CtorInfo.name`\n  \u2022 `Compiler.LCNF.Signature.name`\n  \u2022 `Elab.Command.Linter.name`\n  \u2022 `Elab.Command.ModuleLinter.name`\n  \u2022 `Elab.Term.NamedArg.name`\n  \u2022 `PrettyPrinter.Delaborator.ParamKind.name`\n  \u2022 `Meta.Match.Extension.Entry.name`\nD:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\full-import-adapter.lean:24:32: error(lean.invalidField): Invalid field notation: Type of\n  ws\nis not known; cannot resolve field `leanPath`\n\nHint: Consider replacing the field projection with a call to one of the following:\n  \u2022 `Env.leanPath`\n  \u2022 `Workspace.leanPath`\nD:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\full-import-adapter.lean:30:6: error(lean.invalidField): Invalid field notation: Type of\n  ws\nis not known; cannot resolve field `findModule?`\n\nHint: Consider replacing the field projection with a call to one of the following:\n  \u2022 `findModule?`\n  \u2022 `LeanLib.findModule?`\n  \u2022 `Package.findModule?`\n  \u2022 `Workspace.findModule?`\nD:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\full-import-adapter.lean:32:32: error(lean.invalidField): Invalid field notation: Type of\n  ws\nis not known; cannot resolve field `leanPath`\n\nHint: Consider replacing the field projection with a call to one of the following:\n  \u2022 `Env.leanPath`\n  \u2022 `Workspace.leanPath`\n",
+        "stderr": ""
+      },
+      {
+        "label": "adapter without plugin",
+        "code": 1,
+        "stdout": "",
+        "stderr": "LEAN ASSERTION VIOLATION\nFile: D:/a/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\n"
+      }
+    ],
+    "modulePath": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\Iterators\\Internal\\LawfulMonadLiftFunction.olean.private",
+    "modulePathLength": 287,
+    "lean": {
+      "version": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      }
+    },
+    "error": "Error: Command failed: D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\bin\\lean.exe -j1 -s8192 --plugin=D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\bin\\libLake_shared.dll --run D:\\a\\lasm\\lasm\\src\\lake-module.lean D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\project \u65e5\u672c\u8a9e\\Main.lean\n    at genericNodeError (node:internal/errors:999:15)\n    at wrappedFn (node:internal/errors:544:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at run (file:///D:/a/lasm/lasm/src/application-sources.mjs:45:39)\n    at applicationSources (file:///D:/a/lasm/lasm/src/application-sources.mjs:59:30)\n    at file:///D:/a/lasm/lasm/scripts/ci/windows-lean-path-controls.mjs:79:16"
+  },
+  "resources": {
+    "status": "failed",
+    "command": [
+      "node",
+      "scripts/ci/windows-lean-path-controls.mjs"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 14203420672
+    },
+    "limits": {
+      "jobCommittedBytes": 2147483648,
+      "stopCommittedBytes": 1717986918,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 1200
+    },
+    "peakCommittedBytes": 1438367744,
+    "minimumHostAvailable": 12875218944,
+    "startedAt": 1790476039.4597044,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 153531633664
+      }
+    },
+    "unit": "Local\\LasmResource-0ad91780-eb64-4c49-8b09-96f853ba5b8a",
+    "pid": 2036,
+    "lastSampleAt": 1790476143.1329825,
+    "exitCode": 1,
+    "finishedAt": 1790476143.3188074
+  },
+  "linuxControl": [
+    {
+      "name": "import",
+      "code": 0,
+      "stdout": "\"/home/lastmjs/development/lasm/compiler/.work/local-lake-config-probe/import/Main.lean\"\n",
+      "stderr": ""
+    },
+    {
+      "name": "meta",
+      "code": 0,
+      "stdout": "\"/home/lastmjs/development/lasm/compiler/.work/local-lake-config-probe/meta/Main.lean\"\n",
+      "stderr": ""
+    },
+    {
+      "name": "module",
+      "code": 0,
+      "stdout": "\"/home/lastmjs/development/lasm/compiler/.work/local-lake-config-probe/module/Main.lean\"\n",
+      "stderr": ""
+    }
+  ],
+  "linuxResources": {
+    "startedAt": "2026-09-27T02:31:48.336Z",
+    "command": [
+      "/usr/bin/timeout",
+      "360",
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      ".work/local-lake-config-probe.mjs"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "8d435e1f-4aab-4901-9083-17ee7a93d54a",
+    "limits": {
+      "memoryMax": 2147483648,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 1717986918,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 25569898496
+    },
+    "minimumHostAvailable": 25498185728,
+    "peakMemoryBytes": 119386112,
+    "peakTasks": 17,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/macos/local-lake-config-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-27T02:31:51.343Z",
+      "memoryBytes": 4145152,
+      "peakMemoryBytes": 119386112,
+      "swapBytes": 0,
+      "tasks": 6,
+      "memoryBreakdown": {
+        "anon": 3014656,
+        "file": 442368,
+        "kernel": 684032,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 434176,
+        "slab": 183728
+      },
+      "pressureSomeAvg10": 1.63,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-27T02:31:51.399Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 13873152,
+      "peakMemoryBytes": 119386112,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11726848,
+        "file": 442368,
+        "kernel": 1122304,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 434176,
+        "slab": 211800
+      },
+      "pressureSomeAvg10": 1.63,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-27T02:31:51.435Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "originalLog": ".work/macos/windows-lake-differential-36288508190.log",
+  "next": "Compare short ordinary paths with short namespaced paths, and native module/import headers. The full-import adapter control is corrected to retain its required Lake.Load.Workspace import."
+}

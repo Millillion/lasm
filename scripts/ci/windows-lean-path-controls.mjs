@@ -1,7 +1,7 @@
 // Native regression for an ordinary managed cache whose stdlib paths cross
 // MAX_PATH. Exercise real Lean and Lake, not a mock of Windows path spelling.
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -57,7 +57,29 @@ try {
   // command's config-elaboration problem behind a cached lakefile.olean.
   const adapter = fileURLToPath(new URL('../../src/lake-module.lean', import.meta.url));
   const fullAdapter = join(root, 'full-import-adapter.lean');
-  writeFileSync(fullAdapter, readFileSync(adapter, 'utf8').replace('import Lake.Load.Workspace', 'import Lake'));
+  writeFileSync(fullAdapter, readFileSync(adapter, 'utf8').replace('import Lake.Load.Workspace', 'import Lake\nimport Lake.Load.Workspace'));
+  const shortPrefix = join(root, 'short toolchain');
+  symlinkSync(lean.prefix, shortPrefix, 'junction');
+  const shortLean = { ...lean, prefix: shortPrefix, lean: join(shortPrefix, 'bin/lean.exe'), lake: join(shortPrefix, 'bin/lake.exe') };
+  const shortEnv = nativeLeanEnvironment(shortLean);
+  const shortPlainEnv = { ...shortEnv, LEAN_PATH: join(shortPrefix, 'lib/lean'), LEAN_SYSROOT: shortPrefix };
+  for (const [label, tool, environment, header, nativeCli] of [
+    ['short plain Lake', shortLean, shortPlainEnv, 'import Lake', true],
+    ['short namespaced Lake', shortLean, shortEnv, 'import Lake', true],
+    ['direct config compilation', lean, env, 'import Lake', false],
+    ['meta imported Lake', lean, env, 'meta import Lake', true],
+    ['module Lake configuration', lean, env, 'module\npublic import Lake', true],
+  ]) {
+    const cwd = join(root, label); mkdirSync(cwd);
+    for (const file of ['lean-toolchain', 'Greeting.lean', 'Main.lean']) writeFileSync(join(cwd, file), readFileSync(join(project, file)));
+    writeFileSync(join(cwd, 'lakefile.lean'), readFileSync(join(project, 'lakefile.lean'), 'utf8').replace('import Lake', header));
+    const args = nativeCli ? ['--no-cache', '--keep-toolchain', '--quiet', '--json', 'query', '/+Main:lean']
+      : ['-j1', '-s8192', '--plugin=' + join(tool.prefix, 'bin/libLake_shared.dll'), 'lakefile.lean'];
+    const r = spawnSync(nativeCli ? tool.lake : tool.lean, args,
+      { cwd, env: managedGitEnvironment(git, environment), encoding: 'utf8', timeout: 120000, maxBuffer: 1024 ** 2 });
+    assert.ifError(r.error); assert.equal(r.signal, null);
+    result.checks.push({ label, code: r.status, stdout: r.stdout, stderr: r.stderr }); save();
+  }
   for (const [label, program, helper, sysroot, plugin] of [
     ['native Lake CLI', lean.lake, null, true, false],
     ['interpreter adapter', lean.lean, adapter, true, true],
