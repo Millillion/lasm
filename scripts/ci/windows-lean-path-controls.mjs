@@ -13,7 +13,7 @@ import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
 assert.equal(process.platform + '-' + process.arch, 'win32-x64');
-const root = resolve('.work/windows-lean-path-controls');
+const root = resolve(process.argv[2] ?? '.work/windows-lean-path-controls');
 assert.ok(!existsSync(root)); mkdirSync(root, { recursive: true });
 const project = join(root, 'project 日本語'), work = join(root, 'generated');
 mkdirSync(project); mkdirSync(work);
@@ -34,6 +34,7 @@ try {
   const env = nativeLeanEnvironment(lean), baseline = { ...env };
   delete baseline.LEAN_PATH; delete baseline.LEAN_SYSROOT;
   function run(label, environment, program = lean.lean) {
+    result.activeCheck = label; save();
     const r = spawnSync(program, ['-j1', '-s8192', '--run', source],
       { cwd: project, env: environment, encoding: 'utf8', timeout: 120000, maxBuffer: 1024 ** 2 });
     assert.ifError(r.error); assert.equal(r.signal, null);
@@ -46,6 +47,7 @@ try {
   const extended = run('extended library paths', env);
   assert.equal(extended.status, 0, extended.stdout + extended.stderr);
   assert.equal(extended.stdout.trim(), 'long cache path 42');
+  result.activeCheck = 'standalone C generation'; save();
   const standalone = applicationSources(source, lean, work);
   assert.ok(standalone.sources.length === 1 && statSync(standalone.sources[0]).size > 0);
   result.checks.push({ standaloneCGeneration: true }); save();
@@ -70,6 +72,7 @@ try {
     ['meta imported Lake', lean, env, 'meta import Lake', true],
     ['module Lake configuration', lean, env, 'module\npublic import Lake', true],
   ]) {
+    result.activeCheck = label; save();
     const cwd = join(root, label); mkdirSync(cwd);
     for (const file of ['lean-toolchain', 'Greeting.lean', 'Main.lean']) writeFileSync(join(cwd, file), readFileSync(join(project, file)));
     writeFileSync(join(cwd, 'lakefile.lean'), readFileSync(join(project, 'lakefile.lean'), 'utf8').replace('import Lake', header));
@@ -87,6 +90,7 @@ try {
     ['adapter with full Lake import', lean.lean, fullAdapter, true, true],
     ['adapter without plugin', lean.lean, adapter, true, false],
   ]) {
+    result.activeCheck = label; save();
     const cwd = join(root, label); mkdirSync(cwd);
     for (const file of ['lean-toolchain', 'lakefile.lean', 'Greeting.lean', 'Main.lean'])
       writeFileSync(join(cwd, file), readFileSync(join(project, file)));
@@ -98,10 +102,11 @@ try {
     assert.ifError(r.error); assert.equal(r.signal, null);
     result.checks.push({ label, code: r.status, stdout: r.stdout, stderr: r.stderr }); save();
   }
+  result.activeCheck = 'Lake local import C generation'; save();
   const lake = applicationSources(source, lean, work, { git });
   assert.ok(lake.sources.length >= 2 && lake.sources.every(file => statSync(file).size > 0));
   assert.ok(lake.sources.some(file => readFileSync(file, 'utf8').includes('Lake long cache path 42')));
   result.checks.push({ lakeLocalImportCGeneration: true, sources: lake.inputs });
-  result.passed = true; save();
+  result.passed = true; delete result.activeCheck; save();
 } catch (error) { result.error = error.stack; save(); throw error; }
 console.log(JSON.stringify(result, null, 2));

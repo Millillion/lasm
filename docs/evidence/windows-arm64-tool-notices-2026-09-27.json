@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "scope": "Reproducible verified source/notice archive; not native tool or installed application acceptance",
+  "archive": ".work/windows-arm64-tool-notices/windows-arm64-tool-notices-v1.tar.gz",
+  "sha256": "b167d935b5273ff0a2a15bb097dc903746bab8ac1dcb40f82da06085afa2850a",
+  "bytes": 14639815,
+  "unpackedBytes": 18148812,
+  "files": 120,
+  "reproduciblePacking": true,
+  "allArchivedFilesVerified": true,
+  "leantarCommit": "46485d0eca748ed2d2678e70d59949bbc602f32c",
+  "gmpVersion": "6.3.0-2",
+  "gmpRecipeCommit": "c9e5b84b9bd7ac93517ffc177522606b9762c1e5",
+  "packer": "scripts/ci/windows-tool-notices.py",
+  "resources": {
+    "peakMemoryBytes": 46743552,
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "unitReleased": true
+  },
+  "memoryEvents": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  },
+  "notes": [
+    "The two generated archives were byte-identical; each of the 120 archived files matched its verified source hash.",
+    "Do not associate this companion with a native Lean release until the bundled GMP version and helper identity match. No public tool publication or installed-package acceptance is established."
+  ]
+}

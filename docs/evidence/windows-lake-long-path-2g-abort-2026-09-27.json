@@ -1,0 +1,119 @@
+{
+  "scope": "Native CLI long-path correction passed; interpreter adapter and complete source generation not established because the proactive guard stopped the campaign",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36289340577",
+  "sourceRevision": "4be7eaa1acf6fce53de3681c688b7138509320a6",
+  "result": {
+    "passed": false,
+    "scope": "Native Lean/Lake long managed paths; installed Lasm acceptance remains separate",
+    "platform": "win32-x64",
+    "node": "v26.10.0",
+    "checks": [
+      {
+        "label": "unchanged upstream path handling",
+        "code": 1,
+        "stdout": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\project \u65e5\u672c\u8a9e\\Main.lean:1:0: error: failed to open file 'd:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\String\\Bootstrap.olean.server': 3\n",
+        "stderr": ""
+      },
+      {
+        "label": "extended library paths",
+        "code": 0,
+        "stdout": "long cache path 42\n",
+        "stderr": ""
+      },
+      {
+        "standaloneCGeneration": true
+      },
+      {
+        "label": "short plain Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls/short plain Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "short namespaced Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls/short namespaced Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "direct config compilation",
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "meta imported Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls/meta imported Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "module Lake configuration",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls/module Lake configuration/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "native Lake CLI",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls/native Lake CLI/Main.lean\"\n",
+        "stderr": ""
+      }
+    ],
+    "modulePath": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\Iterators\\Internal\\LawfulMonadLiftFunction.olean.private",
+    "modulePathLength": 287,
+    "lean": {
+      "version": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      }
+    }
+  },
+  "resources": {
+    "status": "resource-abort",
+    "command": [
+      "node",
+      "scripts/ci/windows-lean-path-controls.mjs"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 14166106112
+    },
+    "limits": {
+      "jobCommittedBytes": 2147483648,
+      "stopCommittedBytes": 1717986918,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 1200
+    },
+    "peakCommittedBytes": 1836437504,
+    "minimumHostAvailable": 12409139200,
+    "startedAt": 1790477074.60836,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 153528918016
+      }
+    },
+    "unit": "Local\\LasmResource-dd842beb-10ee-448c-8cef-77ee8ae2f4e2",
+    "pid": 2248,
+    "lastSampleAt": 1790477182.4208274,
+    "stoppedBecause": "proactive-memory-stop",
+    "exitCode": 125,
+    "finishedAt": 1790477182.4509013
+  },
+  "originalLog": ".work/macos/windows-lean-path-controls-36289340577.log",
+  "next": "A separate 4-GiB capped native CI profile; local host limits unchanged"
+}

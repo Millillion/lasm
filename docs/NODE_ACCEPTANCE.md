@@ -29,7 +29,7 @@ Give the unchanged tarball to the developer, who needs only Node/npm. Follow the
 
 | Target | Tested OS | Complete evidence |
 | --- | --- | --- |
-| linux-x64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node37-linux-x64-2026-09-26.json), [job](108499108754) |
+| linux-x64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node37-linux-x64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108754) |
 | linux-arm64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node37-linux-arm64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108502713293) |
 | darwin-x64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node37-darwin-x64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108743) |
 | darwin-arm64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node37-darwin-arm64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108768) |
@@ -61,3 +61,11 @@ These are individual CI measurements, not performance guarantees. File sizes cou
 Linux memory peaks use cgroup accounting; both guards released, recorded zero OOM events and no resource abort. Linux builds used base pages and one build/Binaryen worker. Mac peaks are sampled process-tree RSS, **not kernel-enforced aggregate limits**. Mac monitors released tracked processes with no resource abort; minimum available host memory was 7.82 GB (Intel) and 2.91 GB (ARM64). All jobs maintained their disk reserves.
 
 Original failures are preserved: [Intel directory ABI](evidence/darwin-x64-directory-failure-2026-09-26.json), [ARM64 temporary names](evidence/darwin-arm64-temporary-failure-2026-09-26.json), and earlier resource/control failures. Both fixes have [native regression controls](evidence/darwin-filesystem-controls-2026-09-26.json). Earlier archives and reports remain unchanged: [`.35` Linux acceptance and `.36` history](NODE_ACCEPTANCE_35_2026-09-26.md), [initial `.32`](NODE_ACCEPTANCE_32_2026-09-26.md), [size reduction and former fallback](BUNDLE_SIZE.md).
+
+The later `.39` campaign also passed [Linux x86-64](evidence/node39-linux-x64-2026-09-27.json),
+[Linux ARM64](evidence/node39-linux-arm64-2026-09-27.json),
+[Mac x86-64](evidence/node39-darwin-x64-2026-09-27.json), and
+[Mac ARM64](evidence/node39-darwin-arm64-2026-09-27.json), but
+[failed Windows](evidence/node39-windows-long-path-2026-09-27.json).
+It was not retained as the accepted release. These results do not establish
+acceptance of later source changes or Windows support.
