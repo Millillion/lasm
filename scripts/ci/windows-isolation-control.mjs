@@ -1,6 +1,6 @@
-// Copied unchanged into the disposable LPAC tree, with only fixture paths.
+// Copied unchanged into the disposable restricted-token tree, with only fixture paths.
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, unlinkSync, mkdirSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, unlinkSync, mkdirSync, rmdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { Worker } from 'node:worker_threads';
 import { connect } from 'node:net';
@@ -24,7 +24,7 @@ await check('deny writing read-only fixture', () =>
 await check('Unicode filesystem roundtrip', () => {
   writeFileSync('write λ.txt', 'roundtrip 日本語');
   assert.equal(readFileSync('write λ.txt', 'utf8'), 'roundtrip 日本語'); unlinkSync('write λ.txt');
-  mkdirSync('directory λ'); rmSync('directory λ');
+  mkdirSync('directory λ'); rmdirSync('directory λ');
 });
 await check('Wasm JIT', async () => {
   const wasm = await WebAssembly.instantiate(Uint8Array.from([0,97,115,109,1,0,0,0,1,5,1,96,0,1,127,3,2,1,0,7,10,1,6,97,110,115,119,101,114,0,0,10,6,1,4,0,65,42,11]));

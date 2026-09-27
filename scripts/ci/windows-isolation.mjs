@@ -12,13 +12,18 @@ export function windowsIsolated(spec, reportFile) {
   assert.ok(!existsSync(report) && !existsSync(rules));
   writeFileSync(rules, JSON.stringify(spec, null, 2) + '\n');
   const child = spawnSync(process.env.LASM_RESOURCE_PYTHON, ['-I', '-B',
-    fileURLToPath(new URL('./windows-isolation.py', import.meta.url)), rules, report],
+    fileURLToPath(new URL('./windows-restricted.py', import.meta.url)), rules, report],
   { encoding: 'utf8', timeout: ((spec.timeoutSeconds ?? 3000) + 600) * 1000, maxBuffer: 1024 * 1024, windowsHide: true });
   const evidence = existsSync(report) ? JSON.parse(readFileSync(report, 'utf8')) : undefined;
   assert.ifError(child.error); assert.ok(['passed', 'failed'].includes(evidence?.status), child.stderr + child.stdout);
-  assert.equal(evidence.token.appContainer, true);
-  assert.equal(evidence.allPackagesOptOut, spec.lessPrivileged ?? true);
-  if (spec.lessPrivileged !== false) assert.ok(evidence.blockedDevelopmentPrograms > 0);
+  assert.equal(evidence.token.restricted, true);
+  assert.equal(evidence.token.privileges, 0);
+  assert.equal(evidence.token.traversalBypass, false);
+  assert.ok(evidence.blockedDevelopmentRoots.length > 0);
+  if (spec.offline) {
+    assert.ok(evidence.offlinePrograms.length > 0);
+    assert.equal(evidence.firewallRestored, true);
+  }
   assert.equal(evidence.descendantsReleased, true);
   assert.equal(evidence.cleanupErrors, undefined); assert.equal(child.status, evidence.exitCode);
   return { code: evidence.exitCode, stdout: readFileSync(report + '.stdout', 'utf8'),

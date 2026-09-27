@@ -1,4 +1,4 @@
-// CI-only coordinator inside LPAC; each application starts with plain Node.
+// CI-only coordinator inside the restricted token; each application starts with plain Node.
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';

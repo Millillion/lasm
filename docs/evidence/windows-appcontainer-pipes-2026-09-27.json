@@ -1,0 +1,265 @@
+{
+  "scope": "Both native AppContainer controls stalled at stock Node child-process pipe creation. The outer deadline stopped each campaign. Git/Clang read denials also failed. A separate fixture bug called rmSync on a directory without recursive mode and is corrected to rmdirSync. No Lean application ran.",
+  "sourceRevision": "35b0f8da00b3118d2e5fcaee583a4f7a8cf1fc38",
+  "references": [
+    "https://github.com/nodejs/node/blob/v26.10.0/deps/uv/src/win/pipe.c#L109",
+    "https://github.com/libuv/libuv/issues/5178",
+    "https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-createrestrictedtoken"
+  ],
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36282890983/job/108518017588",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.43726d7d-65a2-4512-82bd-2c33aebc5d50",
+        "offline": false,
+        "status": "failed",
+        "startedAt": 1790469302.2330964,
+        "allPackagesOptOut": true,
+        "sid": "S-1-15-2-1724274281-2873652627-1865835047-3648161643-1384038263-4196231675-1273608826",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "ancestorMetadata": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-eKqjDg",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+          "C:\\Users\\runneradmin\\AppData\\Local",
+          "C:\\Users\\runneradmin\\AppData",
+          "C:\\Users\\runneradmin",
+          "C:\\Users",
+          "C:\\"
+        ],
+        "ordinarySecurityServices": [
+          "C:\\Program Files\\Windows Defender",
+          "C:\\Program Files\\Windows Defender Advanced Threat Protection",
+          "C:\\Program Files (x86)\\Windows Defender"
+        ],
+        "developmentRoots": [
+          {
+            "path": "C:\\Program Files",
+            "blockedPrograms": 298,
+            "seconds": 52.45112270000004
+          },
+          {
+            "path": "C:\\Program Files (x86)",
+            "blockedPrograms": 200,
+            "seconds": 31.344336000000112
+          },
+          {
+            "path": "C:\\hostedtoolcache\\windows",
+            "blockedPrograms": 50,
+            "seconds": 48.62994720000006
+          },
+          {
+            "path": "C:\\msys64",
+            "blockedPrograms": 5,
+            "seconds": 2.3392174000000523
+          }
+        ],
+        "blockedDevelopmentPrograms": 553,
+        "grants": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-eKqjDg\\stock Node",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-eKqjDg\\readonly.txt",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-eKqjDg\\writable \u65e5\u672c\u8a9e"
+        ],
+        "pid": 2116,
+        "token": {
+          "appContainer": true
+        },
+        "inheritedCappedJob": "Local\\LasmResource-15dad964-f8af-4df8-80c1-9a99844be7ae",
+        "stoppedBecause": "time-limit",
+        "exitCode": 124,
+        "finishedAt": 1790469622.2191384,
+        "descendantsReleased": true
+      },
+      "resources": {
+        "status": "time-limit",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 13584326656
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 209797120,
+        "minimumHostAvailable": 12553052160,
+        "startedAt": 1790469292.8959239,
+        "unit": "Local\\LasmResource-15dad964-f8af-4df8-80c1-9a99844be7ae",
+        "pid": 1988,
+        "lastSampleAt": 1790469772.9874315,
+        "stoppedBecause": "time-limit",
+        "exitCode": 124,
+        "finishedAt": 1790469772.9981203
+      },
+      "onlineControls": [
+        "Starting control: native architecture",
+        "{\"name\":\"native architecture\",\"passed\":true}",
+        "Starting control: isolated default user cache",
+        "{\"name\":\"isolated default user cache\",\"passed\":true}",
+        "Starting control: read-only fixture",
+        "{\"name\":\"read-only fixture\",\"passed\":true}",
+        "Starting control: deny file: D:\\a\\lasm\\lasm\\package.json",
+        "{\"name\":\"deny file: D:\\\\a\\\\lasm\\\\lasm\\\\package.json\",\"passed\":true}",
+        "Starting control: deny file: D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+        "{\"name\":\"deny file: D:\\\\a\\\\lasm\\\\lasm\\\\.cache\\\\managed-tools\\\\artifacts\\\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\\\python.exe\",\"passed\":true}",
+        "Starting control: deny file: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-eKqjDg\\all-application-packages.txt",
+        "{\"name\":\"deny file: C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-eKqjDg\\\\all-application-packages.txt\",\"passed\":true}",
+        "Starting control: deny file: C:\\Program Files\\Git\\bin\\git.exe",
+        "{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\",\"passed\":false,\"error\":\"AssertionError [ERR_ASSERTION]: Missing expected exception: C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:21:10\\n    at check (file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:13:15)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:20:41\"}",
+        "Starting control: deny file: C:\\Program Files\\Git\\cmd\\git.exe",
+        "{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\",\"passed\":false,\"error\":\"AssertionError [ERR_ASSERTION]: Missing expected exception: C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:21:10\\n    at check (file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:13:15)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:20:41\"}",
+        "Starting control: deny file: C:\\Program Files\\Git\\mingw64\\bin\\git.exe",
+        "{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\git.exe\",\"passed\":false,\"error\":\"AssertionError [ERR_ASSERTION]: Missing expected exception: C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\git.exe\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:21:10\\n    at check (file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:13:15)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:20:41\"}",
+        "Starting control: deny file: C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "{\"name\":\"deny file: C:\\\\hostedtoolcache\\\\windows\\\\Python\\\\3.12.10\\\\x64\\\\python.exe\",\"passed\":true}",
+        "Starting control: deny file: C:\\Program Files\\LLVM\\bin\\clang.exe",
+        "{\"name\":\"deny file: C:\\\\Program Files\\\\LLVM\\\\bin\\\\clang.exe\",\"passed\":false,\"error\":\"AssertionError [ERR_ASSERTION]: Missing expected exception: C:\\\\Program Files\\\\LLVM\\\\bin\\\\clang.exe\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:21:10\\n    at check (file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:13:15)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:20:41\"}",
+        "Starting control: deny writing read-only fixture",
+        "{\"name\":\"deny writing read-only fixture\",\"passed\":true}",
+        "Starting control: Unicode filesystem roundtrip",
+        "{\"name\":\"Unicode filesystem roundtrip\",\"passed\":false,\"error\":\"SystemError [ERR_FS_EISDIR]: Path is a directory: rm returned EISDIR (is a directory) directory \u03bb\\n    at rmSync (node:fs:1588:16)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:27:29\\n    at check (file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:13:15)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-eKqjDg/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:24:7\"}",
+        "Starting control: Wasm JIT",
+        "{\"name\":\"Wasm JIT\",\"passed\":true}",
+        "Starting control: worker threads",
+        "{\"name\":\"worker threads\",\"passed\":true}",
+        "Starting control: child process pipes"
+      ]
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36282890983/job/108518017711",
+      "isolation": {
+        "mechanism": "Windows Less Privileged AppContainer",
+        "profile": "Lasm.CI.96325ecb-7e03-4f07-ab66-87f79aaab474",
+        "offline": false,
+        "status": "failed",
+        "startedAt": 1790469317.05044,
+        "allPackagesOptOut": true,
+        "sid": "S-1-15-2-2903651686-3013103192-2178149451-626905047-3330262909-3391772345-3684238071",
+        "capabilities": [
+          "registryRead",
+          "internetClient"
+        ],
+        "ancestorMetadata": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-XqEtPb",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp",
+          "C:\\Users\\runneradmin\\AppData\\Local",
+          "C:\\Users\\runneradmin\\AppData",
+          "C:\\Users\\runneradmin",
+          "C:\\Users",
+          "C:\\"
+        ],
+        "ordinarySecurityServices": [
+          "C:\\Program Files\\Windows Defender",
+          "C:\\Program Files\\Windows Defender Advanced Threat Protection",
+          "C:\\Program Files (x86)\\Windows Defender"
+        ],
+        "developmentRoots": [
+          {
+            "path": "C:\\Program Files",
+            "blockedPrograms": 406,
+            "seconds": 135.88766009999972
+          },
+          {
+            "path": "C:\\Program Files (x86)",
+            "blockedPrograms": 52,
+            "seconds": 65.83107470000004
+          },
+          {
+            "path": "C:\\hostedtoolcache\\windows",
+            "blockedPrograms": 34,
+            "seconds": 55.716917800000374
+          },
+          {
+            "path": "C:\\msys64",
+            "blockedPrograms": 5,
+            "seconds": 3.96958450000011
+          }
+        ],
+        "blockedDevelopmentPrograms": 497,
+        "grants": [
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-XqEtPb\\stock Node",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-XqEtPb\\readonly.txt",
+          "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-XqEtPb\\writable \u65e5\u672c\u8a9e"
+        ],
+        "pid": 10296,
+        "token": {
+          "appContainer": true
+        },
+        "inheritedCappedJob": "Local\\LasmResource-caa50fda-f0dd-40ca-92bb-852dffe224f6",
+        "stoppedBecause": "time-limit",
+        "exitCode": 124,
+        "finishedAt": 1790469761.0026636,
+        "descendantsReleased": true
+      },
+      "resources": {
+        "status": "time-limit",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13631807488
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 202629120,
+        "minimumHostAvailable": 13142106112,
+        "startedAt": 1790469311.4717143,
+        "unit": "Local\\LasmResource-caa50fda-f0dd-40ca-92bb-852dffe224f6",
+        "pid": 3020,
+        "lastSampleAt": 1790469791.661907,
+        "stoppedBecause": "time-limit",
+        "exitCode": 124,
+        "finishedAt": 1790469791.6687412
+      },
+      "onlineControls": [
+        "Starting control: native architecture",
+        "{\"name\":\"native architecture\",\"passed\":true}",
+        "Starting control: isolated default user cache",
+        "{\"name\":\"isolated default user cache\",\"passed\":true}",
+        "Starting control: read-only fixture",
+        "{\"name\":\"read-only fixture\",\"passed\":true}",
+        "Starting control: deny file: C:\\a\\lasm\\lasm\\package.json",
+        "{\"name\":\"deny file: C:\\\\a\\\\lasm\\\\lasm\\\\package.json\",\"passed\":true}",
+        "Starting control: deny file: C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+        "{\"name\":\"deny file: C:\\\\a\\\\lasm\\\\lasm\\\\.cache\\\\managed-tools\\\\artifacts\\\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\\\python.exe\",\"passed\":true}",
+        "Starting control: deny file: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-XqEtPb\\all-application-packages.txt",
+        "{\"name\":\"deny file: C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm windows isolation \u03bb-XqEtPb\\\\all-application-packages.txt\",\"passed\":true}",
+        "Starting control: deny file: C:\\Program Files\\Git\\bin\\git.exe",
+        "{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\",\"passed\":false,\"error\":\"AssertionError [ERR_ASSERTION]: Missing expected exception: C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:21:10\\n    at check (file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:13:15)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:20:41\"}",
+        "Starting control: deny file: C:\\Program Files\\Git\\cmd\\git.exe",
+        "{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\",\"passed\":false,\"error\":\"AssertionError [ERR_ASSERTION]: Missing expected exception: C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:21:10\\n    at check (file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:13:15)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:20:41\"}",
+        "Starting control: deny file: C:\\Program Files\\Git\\clangarm64\\bin\\git.exe",
+        "{\"name\":\"deny file: C:\\\\Program Files\\\\Git\\\\clangarm64\\\\bin\\\\git.exe\",\"passed\":false,\"error\":\"AssertionError [ERR_ASSERTION]: Missing expected exception: C:\\\\Program Files\\\\Git\\\\clangarm64\\\\bin\\\\git.exe\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:21:10\\n    at check (file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:13:15)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:20:41\"}",
+        "Starting control: deny file: C:\\hostedtoolcache\\windows\\Python\\3.13.15\\arm64\\python.exe",
+        "{\"name\":\"deny file: C:\\\\hostedtoolcache\\\\windows\\\\Python\\\\3.13.15\\\\arm64\\\\python.exe\",\"passed\":true}",
+        "Starting control: deny file: C:\\Program Files\\LLVM\\bin\\clang.exe",
+        "{\"name\":\"deny file: C:\\\\Program Files\\\\LLVM\\\\bin\\\\clang.exe\",\"passed\":false,\"error\":\"AssertionError [ERR_ASSERTION]: Missing expected exception: C:\\\\Program Files\\\\LLVM\\\\bin\\\\clang.exe\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:21:10\\n    at check (file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:13:15)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:20:41\"}",
+        "Starting control: deny writing read-only fixture",
+        "{\"name\":\"deny writing read-only fixture\",\"passed\":true}",
+        "Starting control: Unicode filesystem roundtrip",
+        "{\"name\":\"Unicode filesystem roundtrip\",\"passed\":false,\"error\":\"SystemError [ERR_FS_EISDIR]: Path is a directory: rm returned EISDIR (is a directory) directory \u03bb\\n    at rmSync (node:fs:1588:16)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:27:29\\n    at check (file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:13:15)\\n    at file:///C:/Users/RUNNER%7E1/AppData/Local/Temp/lasm%20windows%20isolation%20%CE%BB-XqEtPb/writable%20%E6%97%A5%E6%9C%AC%E8%AA%9E/control.mjs:24:7\"}",
+        "Starting control: Wasm JIT",
+        "{\"name\":\"Wasm JIT\",\"passed\":true}",
+        "Starting control: worker threads",
+        "{\"name\":\"worker threads\",\"passed\":true}",
+        "Starting control: child process pipes"
+      ]
+    }
+  ]
+}

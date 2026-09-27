@@ -85,8 +85,11 @@ for (const { os, architecture, id } of targets) {
     assert.ok(resources.disk.reserveBytes >= 4 * 1024 ** 3);
     assert.ok(Object.values(resources.disk.minimumFreeBytes).every(n => n >= resources.disk.reserveBytes));
     for (const phase of acceptance.phaseExecutions) {
-      assert.equal(phase.code, 0); assert.equal(phase.isolation.token.appContainer, true);
-      assert.equal(phase.isolation.allPackagesOptOut, true); assert.equal(phase.isolation.descendantsReleased, true);
+      assert.equal(phase.code, 0); assert.equal(phase.isolation.token.restricted, true);
+      assert.equal(phase.isolation.token.privileges, 0); assert.equal(phase.isolation.token.traversalBypass, false);
+      assert.ok(phase.isolation.blockedDevelopmentRoots.length > 0);
+      if (phase.phase === 'offline') assert.equal(phase.isolation.firewallRestored, true);
+      assert.equal(phase.isolation.descendantsReleased, true);
       assert.equal(phase.isolation.cleanupErrors, undefined);
     }
   } else {

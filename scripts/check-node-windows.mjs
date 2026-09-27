@@ -1,11 +1,10 @@
-// Native Windows installed consumer; CI tools stay outside the LPAC boundary.
+// Native Windows installed consumer; CI tools are denied to the restricted token.
 import assert from 'node:assert/strict';
 import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, statSync, realpathSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { tmpdir, release } from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync, execFileSync } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 import { windowsIsolated } from './ci/windows-isolation.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
@@ -20,7 +19,6 @@ const output = resolve(outputArg), originalArchive = resolve(archiveArg);
 assert.ok(!existsSync(output), 'Preserve earlier acceptance reports');
 assert.equal(await hashFile(originalArchive), expectedSha); mkdirSync(output, { recursive: true });
 const containerRoot = realpathSync(mkdtempSync(join(tmpdir(), 'lasm Node Windows λ-')));
-const profile = 'Lasm.CI.' + randomUUID();
 const workspace = join(containerRoot, 'consumer 日本語'); mkdirSync(workspace);
 const archive = join(containerRoot, 'candidate.tgz'); copyFileSync(originalArchive, archive);
 const stock = join(containerRoot, 'stock Node'); mkdirSync(stock);
@@ -42,11 +40,11 @@ const environment = { PATH: stock, PATHEXT: '.COM;.EXE;.BAT;.CMD', SystemRoot: p
   GIT_CONFIG_SYSTEM: join(workspace, 'git-system-config'), GIT_CONFIG_GLOBAL: join(workspace, 'git-global-config'),
   npm_config_cache: join(workspace, 'npm-cache'), npm_config_registry: 'https://registry.npmjs.org/',
   npm_config_audit: 'false', npm_config_fund: 'false', npm_config_update_notifier: 'false' };
-const result = { scope: 'Native Windows installed Node/npm-only CLI and copied deployment, isolated by LPAC; bootstrap tools excluded',
+const result = { scope: 'Native Windows installed Node/npm-only CLI and copied deployment; restricted-token file denials and scoped offline firewall rules exclude bootstrap dependencies',
   platform: process.platform + '-' + process.arch, node: process.version, kernel: release(),
   osRelease: execFileSync('cmd.exe', ['/d', '/c', 'ver'], { encoding: 'utf8' }).trim(),
   sourceRevision: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),
-  archiveSha256: expectedSha, archiveBytes: statSync(archive).size, workspace, containerRoot, profile,
+  archiveSha256: expectedSha, archiveBytes: statSync(archive).size, workspace, containerRoot,
   resourceReport: process.env.LASM_RESOURCE_REPORT, startedAt: new Date().toISOString(), passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(result, null, 2) + '\n'); save();
 async function nativeControls() {
@@ -86,7 +84,8 @@ try {
   for (const phase of ['cold', 'lake', 'offline']) {
     if (phase === 'offline') await nativeControls();
     result.activePhase = phase; save();
-    const actual = windowsIsolated({ profile, disposableRoot: containerRoot, reads: [stock, archive], writes: [workspace],
+    const actual = windowsIsolated({ disposableRoot: containerRoot, reads: [stock, archive], writes: [workspace],
+      denied: [root, process.env.LASM_RESOURCE_PYTHON],
       command: [node, join(workspace, 'node-installed.mjs'), phase, workspace, archive, join(root, 'package.json')],
       cwd: workspace, environment, offline: phase === 'offline', timeoutSeconds: 3300 }, join(output, phase + '.json'));
     (result.phaseExecutions ??= []).push({ phase, code: actual.code, diagnostic: actual.stderr.slice(-6000), isolation: actual.isolation });
@@ -114,6 +113,7 @@ try {
   writeFileSync(config, JSON.stringify({ denied, programs }, null, 2) + '\n');
   const actual = windowsIsolated({ disposableRoot: deployed,
     reads: [engine, control, config, ...programs.map(p => p.copied)], writes: [cwd, temporary],
+    denied: [root, containerRoot, process.env.LASM_RESOURCE_PYTHON],
     cwd, environment: env, offline: true, timeoutSeconds: 1800,
     command: [engine, control, config, measurements] }, join(output, 'deployment.json'));
   if (existsSync(measurements)) result.deployment = JSON.parse(readFileSync(measurements));
