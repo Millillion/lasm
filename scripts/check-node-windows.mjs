@@ -31,11 +31,14 @@ mkdirSync(join(workspace, 'fixtures'));
 for (const name of ['BundleFeatures.lean', 'BundleFeaturesLegacy.lean', 'FilesystemSurface.lean', 'CompileTimeFeatures.lean', 'StandaloneModuleData.lean', 'RuntimeModulePath.lean'])
   copyFileSync(join(root, 'integration/fixtures', name), join(workspace, 'fixtures', name));
 for (const path of ['home/AppData/Local', 'home/AppData/Roaming', 'tmp']) mkdirSync(join(workspace, path), { recursive: true });
-for (const path of ['npm-user-config', 'npm-global-config', 'git-system-config', 'git-global-config']) writeFileSync(join(workspace, path), '');
+// Empty private configuration matches an ordinary machine with no developer
+// OpenSSL configuration. Node's compiled Program Files default is denied here.
+for (const path of ['npm-user-config', 'npm-global-config', 'git-system-config', 'git-global-config', 'openssl.cnf']) writeFileSync(join(workspace, path), '');
 const environment = { PATH: stock, PATHEXT: '.COM;.EXE;.BAT;.CMD', SystemRoot: process.env.SystemRoot, WINDIR: process.env.SystemRoot,
   ComSpec: join(process.env.SystemRoot, 'System32/cmd.exe'), HOME: join(workspace, 'home'), USERPROFILE: join(workspace, 'home'),
   LOCALAPPDATA: join(workspace, 'home/AppData/Local'), APPDATA: join(workspace, 'home/AppData/Roaming'),
   TMP: join(workspace, 'tmp'), TEMP: join(workspace, 'tmp'), LEAN_NUM_THREADS: '1', BINARYEN_CORES: '1', EMCC_CORES: '1',
+  OPENSSL_CONF: join(workspace, 'openssl.cnf'),
   npm_config_userconfig: join(workspace, 'npm-user-config'), npm_config_globalconfig: join(workspace, 'npm-global-config'),
   GIT_CONFIG_SYSTEM: join(workspace, 'git-system-config'), GIT_CONFIG_GLOBAL: join(workspace, 'git-global-config'),
   npm_config_cache: join(workspace, 'npm-cache'), npm_config_registry: 'https://registry.npmjs.org/',
@@ -96,6 +99,7 @@ try {
   result.deploymentRoot = deployed;
   const engine = join(deployed, 'node.exe'), cwd = join(deployed, 'working directory'), temporary = join(deployed, 'tmp');
   copyFileSync(node, engine); mkdirSync(cwd); mkdirSync(temporary);
+  const opensslConfig = join(deployed, 'openssl.cnf'); writeFileSync(opensslConfig, '');
   const programs = [];
   for (const entry of result.installation.deployments) {
     const copied = join(deployed, entry.name, 'dist'); cpSync(entry.output, copied, { recursive: true });
@@ -105,6 +109,7 @@ try {
     ...programs.flatMap(p => [p.source, join(p.output, 'program.wasm')]),
     join(result.installation.tools, 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean.exe')];
   const env = { PATH: '', SystemRoot: process.env.SystemRoot, WINDIR: process.env.SystemRoot,
+    OPENSSL_CONF: opensslConfig,
     HOME: cwd, USERPROFILE: cwd, LOCALAPPDATA: cwd, APPDATA: cwd, TMP: temporary, TEMP: temporary, LEAN_NUM_THREADS: '1' };
   const control = join(deployed, 'deployment-control.mjs'), config = join(deployed, 'deployment-config.json');
   const measurements = join(cwd, 'deployment-results.json');
@@ -112,7 +117,7 @@ try {
   copyFileSync(join(root, 'integration/node-windows-deployed.mjs'), control);
   writeFileSync(config, JSON.stringify({ denied, programs }, null, 2) + '\n');
   const actual = windowsIsolated({ disposableRoot: deployed,
-    reads: [engine, control, config, ...programs.map(p => p.copied)], writes: [cwd, temporary],
+    reads: [engine, control, config, opensslConfig, ...programs.map(p => p.copied)], writes: [cwd, temporary],
     denied: [root, containerRoot, process.env.LASM_RESOURCE_PYTHON],
     cwd, environment: env, offline: true, timeoutSeconds: 1800,
     command: [engine, control, config, measurements] }, join(output, 'deployment.json'));

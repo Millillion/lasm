@@ -1,0 +1,538 @@
+{
+  "scope": "Token default-ACL correction allows every stock Node startup probe on both architectures. Full controls then reject access to Node's compiled global OpenSSL configuration path inside denied Program Files. The next run supplies an empty private configuration; it does not disable TLS validation or modify Node.",
+  "sourceRevision": "313f2195cb8e25b5f1e9402ae697188a2e9453de",
+  "jobs": [
+    {
+      "platform": "win32-x64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36283784983/job/108520551618",
+      "controls": {
+        "scope": "Native restricted-token and scoped firewall controls; no Lean application acceptance",
+        "platform": "win32-x64",
+        "root": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-SEivvB",
+        "phases": [
+          {
+            "phase": "online",
+            "code": 5,
+            "stdout": "",
+            "stderr": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-SEivvB\\stock Node\\node.exe: OpenSSL configuration error:\r\nC4100000:error:80000005:system library:BIO_new_file:Input/output error:openssl\\crypto\\bio\\bss_file.c:67:calling fopen(C:\\Program Files\\Common Files\\SSL\\/openssl.cnf, rb)\r\n\r\n\r\n",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-3003246289-38651949-3609504677-1001",
+              "offline": false,
+              "status": "failed",
+              "startedAt": 1790470368.5798044,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "D:\\a\\lasm\\lasm",
+                "D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-SEivvB\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "pid": 4664,
+              "inheritedCappedJob": "Local\\LasmResource-6e3b3d90-1f7d-4893-b353-89a69c94d436",
+              "exitCode": 5,
+              "finishedAt": 1790470370.6828916,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          },
+          {
+            "phase": "offline",
+            "code": 5,
+            "stdout": "",
+            "stderr": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-SEivvB\\stock Node\\node.exe: OpenSSL configuration error:\r\n34030000:error:80000005:system library:BIO_new_file:Input/output error:openssl\\crypto\\bio\\bss_file.c:67:calling fopen(C:\\Program Files\\Common Files\\SSL\\/openssl.cnf, rb)\r\n\r\n\r\n",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-3910974505-2101370714-1073052057-1001",
+              "offline": true,
+              "status": "failed",
+              "startedAt": 1790470370.9135885,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "D:\\a\\lasm\\lasm",
+                "D:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-SEivvB\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "offlinePrograms": [
+                "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-SEivvB\\stock Node\\node.exe"
+              ],
+              "pid": 1296,
+              "inheritedCappedJob": "Local\\LasmResource-6e3b3d90-1f7d-4893-b353-89a69c94d436",
+              "exitCode": 5,
+              "firewallRestored": true,
+              "finishedAt": 1790470381.2438502,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          }
+        ],
+        "ordinaryUserSentinel": {
+          "code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "startupProbes": [
+          {
+            "startupProbe": "no-acls",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-1118465407-2822879697-2724261511-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470367.5699317,
+              "startupProbe": "no-acls",
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [],
+              "readOnlyObjects": -4,
+              "pid": 2932,
+              "inheritedCappedJob": "Local\\LasmResource-6e3b3d90-1f7d-4893-b353-89a69c94d436",
+              "exitCode": 0,
+              "finishedAt": 1790470367.6072137,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "keep-traversal",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-3842151701-2454672799-3469614725-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470367.8226216,
+              "startupProbe": "keep-traversal",
+              "token": {
+                "restricted": true,
+                "privileges": 1,
+                "traversalBypass": true,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [],
+              "readOnlyObjects": -4,
+              "pid": 1908,
+              "inheritedCappedJob": "Local\\LasmResource-6e3b3d90-1f7d-4893-b353-89a69c94d436",
+              "exitCode": 0,
+              "finishedAt": 1790470367.8568513,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "no-restricting-sids",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-3177626414-3661726499-3246865064-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470368.0720172,
+              "startupProbe": "no-restricting-sids",
+              "token": {
+                "restricted": false,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [],
+              "readOnlyObjects": -4,
+              "pid": 5916,
+              "inheritedCappedJob": "Local\\LasmResource-6e3b3d90-1f7d-4893-b353-89a69c94d436",
+              "exitCode": 0,
+              "finishedAt": 1790470368.107998,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "ordinary-token",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-1171191412-306838716-3437570733-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470368.328851,
+              "startupProbe": "ordinary-token",
+              "token": {
+                "restricted": false,
+                "privileges": 24,
+                "traversalBypass": true,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [],
+              "readOnlyObjects": -4,
+              "pid": 7276,
+              "inheritedCappedJob": "Local\\LasmResource-6e3b3d90-1f7d-4893-b353-89a69c94d436",
+              "exitCode": 0,
+              "finishedAt": 1790470368.3627782,
+              "descendantsReleased": true
+            }
+          }
+        ],
+        "passed": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14207385600
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 254455808,
+        "minimumHostAvailable": 14019964928,
+        "startedAt": 1790470361.274213,
+        "unit": "Local\\LasmResource-6e3b3d90-1f7d-4893-b353-89a69c94d436",
+        "pid": 6344,
+        "lastSampleAt": 1790470381.0980804,
+        "exitCode": 1,
+        "finishedAt": 1790470381.2681637
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "job": "https://github.com/Millillion/lasm/actions/runs/36283784983/job/108520551558",
+      "controls": {
+        "scope": "Native restricted-token and scoped firewall controls; no Lean application acceptance",
+        "platform": "win32-arm64",
+        "root": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-M6wJGj",
+        "phases": [
+          {
+            "phase": "online",
+            "code": 5,
+            "stdout": "",
+            "stderr": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-M6wJGj\\stock Node\\node.exe: OpenSSL configuration error:\r\nE81D0000:error:80000005:system library:BIO_new_file:Input/output error:openssl\\crypto\\bio\\bss_file.c:67:calling fopen(C:\\Program Files\\Common Files\\SSL\\/openssl.cnf, rb)\r\n\r\n\r\n",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-1898391259-356703352-3568373889-1001",
+              "offline": false,
+              "status": "failed",
+              "startedAt": 1790470439.3361902,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "C:\\a\\lasm\\lasm",
+                "C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-M6wJGj\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "pid": 2540,
+              "inheritedCappedJob": "Local\\LasmResource-eda4281b-8dca-4f1d-9122-1a915b93b7d8",
+              "exitCode": 5,
+              "finishedAt": 1790470441.7235818,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          },
+          {
+            "phase": "offline",
+            "code": 5,
+            "stdout": "",
+            "stderr": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-M6wJGj\\stock Node\\node.exe: OpenSSL configuration error:\r\n240E0000:error:80000005:system library:BIO_new_file:Input/output error:openssl\\crypto\\bio\\bss_file.c:67:calling fopen(C:\\Program Files\\Common Files\\SSL\\/openssl.cnf, rb)\r\n\r\n\r\n",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-833678153-1179518053-795121803-1001",
+              "offline": true,
+              "status": "failed",
+              "startedAt": 1790470441.924279,
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [
+                "C:\\a\\lasm\\lasm",
+                "C:\\a\\lasm\\lasm\\.cache\\managed-tools\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe",
+                "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-M6wJGj\\denied directory"
+              ],
+              "readOnlyObjects": 2390,
+              "offlinePrograms": [
+                "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm windows isolation \u03bb-M6wJGj\\stock Node\\node.exe"
+              ],
+              "pid": 5356,
+              "inheritedCappedJob": "Local\\LasmResource-eda4281b-8dca-4f1d-9122-1a915b93b7d8",
+              "exitCode": 5,
+              "firewallRestored": true,
+              "finishedAt": 1790470510.3219569,
+              "descendantsReleased": true
+            },
+            "controls": {
+              "passed": false,
+              "error": "Node did not produce a complete control report"
+            }
+          }
+        ],
+        "ordinaryUserSentinel": {
+          "code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "startupProbes": [
+          {
+            "startupProbe": "no-acls",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-1008365307-306611583-866471336-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470438.316368,
+              "startupProbe": "no-acls",
+              "token": {
+                "restricted": true,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [],
+              "readOnlyObjects": -4,
+              "pid": 5632,
+              "inheritedCappedJob": "Local\\LasmResource-eda4281b-8dca-4f1d-9122-1a915b93b7d8",
+              "exitCode": 0,
+              "finishedAt": 1790470438.3725648,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "keep-traversal",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-608523492-2470716333-4163794072-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470438.5683868,
+              "startupProbe": "keep-traversal",
+              "token": {
+                "restricted": true,
+                "privileges": 1,
+                "traversalBypass": true,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [],
+              "readOnlyObjects": -4,
+              "pid": 1348,
+              "inheritedCappedJob": "Local\\LasmResource-eda4281b-8dca-4f1d-9122-1a915b93b7d8",
+              "exitCode": 0,
+              "finishedAt": 1790470438.6227872,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "no-restricting-sids",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-3280582483-4649503-3646467726-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470438.8171902,
+              "startupProbe": "no-restricting-sids",
+              "token": {
+                "restricted": false,
+                "privileges": 0,
+                "traversalBypass": false,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [],
+              "readOnlyObjects": -4,
+              "pid": 4456,
+              "inheritedCappedJob": "Local\\LasmResource-eda4281b-8dca-4f1d-9122-1a915b93b7d8",
+              "exitCode": 0,
+              "finishedAt": 1790470438.872332,
+              "descendantsReleased": true
+            }
+          },
+          {
+            "startupProbe": "ordinary-token",
+            "code": 0,
+            "stdout": "v26.10.0\r\n",
+            "stderr": "",
+            "isolation": {
+              "mechanism": "Windows restricted token, explicit ACL denials and scoped outbound firewall rules",
+              "scope": "CI prerequisite and copied-deployment checks, not an adversarial security sandbox",
+              "sid": "S-1-5-21-1156966622-206357942-174335383-1001",
+              "offline": false,
+              "status": "passed",
+              "startedAt": 1790470439.0706973,
+              "startupProbe": "ordinary-token",
+              "token": {
+                "restricted": false,
+                "privileges": 24,
+                "traversalBypass": true,
+                "privateObjectDacl": true
+              },
+              "blockedDevelopmentRoots": [
+                "C:\\Program Files",
+                "C:\\Program Files (x86)",
+                "C:\\hostedtoolcache\\windows",
+                "C:\\msys64"
+              ],
+              "deniedInputs": [],
+              "readOnlyObjects": -4,
+              "pid": 592,
+              "inheritedCappedJob": "Local\\LasmResource-eda4281b-8dca-4f1d-9122-1a915b93b7d8",
+              "exitCode": 0,
+              "finishedAt": 1790470439.1393375,
+              "descendantsReleased": true
+            }
+          }
+        ],
+        "passed": false
+      },
+      "resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-isolation-controls.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13561733120
+        },
+        "limits": {
+          "jobCommittedBytes": 1073741824,
+          "stopCommittedBytes": 858993459,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 480
+        },
+        "peakCommittedBytes": 418467840,
+        "minimumHostAvailable": 13190692864,
+        "startedAt": 1790470432.0061133,
+        "unit": "Local\\LasmResource-eda4281b-8dca-4f1d-9122-1a915b93b7d8",
+        "pid": 10800,
+        "lastSampleAt": 1790470510.2515996,
+        "exitCode": 1,
+        "finishedAt": 1790470510.3479447
+      }
+    }
+  ]
+}

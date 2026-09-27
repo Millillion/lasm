@@ -22,12 +22,14 @@ const privateTree = join(root, 'denied directory'); mkdirSync(privateTree);
 const deniedFixture = join(privateTree, 'ordinary-user-readable.txt');
 writeFileSync(deniedFixture, 'ordinary user can read this\n');
 for (const name of ['home', 'tmp']) mkdirSync(join(writable, name));
+const opensslConfig = join(writable, 'openssl.cnf'); writeFileSync(opensslConfig, '');
 const environment = { PATH: nodeDirectory, PATHEXT: '.COM;.EXE;.BAT;.CMD',
   SystemRoot: process.env.SystemRoot, WINDIR: process.env.SystemRoot,
   ComSpec: join(process.env.SystemRoot, 'System32/cmd.exe'),
   HOME: join(writable, 'home'), USERPROFILE: join(writable, 'home'),
   LOCALAPPDATA: join(writable, 'home/AppData/Local'), APPDATA: join(writable, 'home/AppData/Roaming'),
   TMP: join(writable, 'tmp'), TEMP: join(writable, 'tmp'),
+  OPENSSL_CONF: opensslConfig,
   npm_config_cache: join(writable, 'npm-cache'), npm_config_update_notifier: 'false',
   npm_config_audit: 'false', npm_config_fund: 'false' };
 for (const path of [environment.LOCALAPPDATA, environment.APPDATA]) mkdirSync(path, { recursive: true });

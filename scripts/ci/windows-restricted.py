@@ -314,10 +314,11 @@ try:
         target = Path(path).resolve()
         assert target.exists() and target != allowed_root and target not in allowed_root.parents
         deny(target, 0x21)  # FILE_READ_DATA/LIST_DIRECTORY | FILE_EXECUTE/TRAVERSE
-    evidence["blockedDevelopmentRoots"] = developer_roots
-    evidence["deniedInputs"] = spec.get("denied", [])
+    evidence["blockedDevelopmentRoots"] = [] if startup_probe else developer_roots
+    evidence["deniedInputs"] = [] if startup_probe else spec.get("denied", [])
     # Explicit write bits exclude SYNCHRONIZE and READ_CONTROL, which generic
     # FILE_GENERIC_WRITE also contains and would accidentally deny reads.
+    read_only_start = len(changed)
     for value in ([] if startup_probe else spec.get("reads", [])):
         path = Path(value).resolve()
         assert path == allowed_root or allowed_root in path.parents
@@ -326,7 +327,7 @@ try:
             for child_path in path.rglob("*"):
                 assert not child_path.is_symlink() and not child_path.is_junction()
                 deny(child_path, 0xd0156)
-    evidence["readOnlyObjects"] = len(changed) - len(set(developer_roots + spec.get("denied", [])))
+    evidence["readOnlyObjects"] = len(changed) - read_only_start
     save()
 
     if spec.get("offline"):
