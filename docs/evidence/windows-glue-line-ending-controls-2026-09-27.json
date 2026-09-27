@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "scope": "Pinned Emscripten output-format differential on Linux; native Windows installed acceptance remains separate",
+  "checks": [
+    {
+      "style": "windows",
+      "crlf": true,
+      "loader": "reproduced strict drift rejection",
+      "stdout": "line ending probe 42\n"
+    },
+    {
+      "style": "linux",
+      "crlf": false,
+      "loader": "passed",
+      "stdout": "line ending probe 42\n"
+    }
+  ],
+  "freeBytesAfter": 4366721024,
+  "emscripten": "6.0.9-git",
+  "sdkArtifact": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+  "driverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+  "source": "int main(void) { puts(\"line ending probe 42\"); return 0; }",
+  "formatControls": [
+    "--output-eol=windows",
+    "--output-eol=linux"
+  ],
+  "pointerWidth": 64,
+  "host": "linux-x64",
+  "node": "26.10.0",
+  "resources": {
+    "peakMemoryBytes": 226222080,
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "unitReleased": true
+  },
+  "memoryEvents": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  },
+  "originalScript": ".work/macos/line-ending-probe.mjs",
+  "resourceReport": ".work/macos/line-ending-probe-resources.json"
+}

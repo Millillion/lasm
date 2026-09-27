@@ -1,0 +1,148 @@
+{
+  "scope": "Namespaced parent executable fixes configuration, but Lake child C generation still fails MAX_PATH; this campaign was not resource-aborted",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36290084463",
+  "sourceRevision": "5d7b86231e951ad2246a393403fa440e0024bed1",
+  "result": {
+    "passed": false,
+    "scope": "Native Lean/Lake long managed paths; installed Lasm acceptance remains separate",
+    "platform": "win32-x64",
+    "node": "v26.10.0",
+    "checks": [
+      {
+        "label": "unchanged upstream path handling",
+        "code": 1,
+        "stdout": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls-4g\\project \u65e5\u672c\u8a9e\\Main.lean:1:0: error: failed to open file 'd:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls-4g\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Control\\MonadAttach.olean.server': 3\n",
+        "stderr": ""
+      },
+      {
+        "label": "extended library paths",
+        "code": 0,
+        "stdout": "long cache path 42\n",
+        "stderr": ""
+      },
+      {
+        "standaloneCGeneration": true
+      },
+      {
+        "label": "short plain Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls-4g/short plain Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "short namespaced Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls-4g/short namespaced Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "direct config compilation",
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "meta imported Lake",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls-4g/meta imported Lake/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "module Lake configuration",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls-4g/module Lake configuration/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "native Lake CLI",
+        "code": 0,
+        "stdout": "\"D:/a/lasm/lasm/.work/windows-lean-path-controls-4g/native Lake CLI/Main.lean\"\n",
+        "stderr": ""
+      },
+      {
+        "label": "interpreter adapter",
+        "code": 0,
+        "stdout": "{\"metadataRoots\":[\"d:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-path-controls-4g\\\\interpreter adapter\\\\.lake\\\\build\\\\lib\\\\lean\"],\"module\":\"/+Main\"}\n",
+        "stderr": "info: longPaths: no previous manifest, creating one from scratch\n"
+      },
+      {
+        "label": "adapter without SYSROOT override",
+        "code": 0,
+        "stdout": "{\"metadataRoots\":[\"d:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-path-controls-4g\\\\adapter without SYSROOT override\\\\.lake\\\\build\\\\lib\\\\lean\"],\"module\":\"/+Main\"}\n",
+        "stderr": "info: longPaths: no previous manifest, creating one from scratch\n"
+      },
+      {
+        "label": "adapter with full Lake import",
+        "code": 0,
+        "stdout": "{\"metadataRoots\":[\"d:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-path-controls-4g\\\\adapter with full Lake import\\\\.lake\\\\build\\\\lib\\\\lean\"],\"module\":\"/+Main\"}\n",
+        "stderr": "info: longPaths: no previous manifest, creating one from scratch\n"
+      },
+      {
+        "label": "adapter without plugin",
+        "code": 1,
+        "stdout": "",
+        "stderr": "LEAN ASSERTION VIOLATION\nFile: D:/a/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\n"
+      }
+    ],
+    "modulePath": "D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls-4g\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Data\\Iterators\\Internal\\LawfulMonadLiftFunction.olean.private",
+    "modulePathLength": 290,
+    "lean": {
+      "version": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      }
+    },
+    "activeCheck": "Lake local import C generation",
+    "error": "Error: Command failed: \\\\?\\D:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls-4g\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\bin\\lake.exe --no-cache --keep-toolchain --quiet --json query +Greeting:c\n    at genericNodeError (node:internal/errors:999:15)\n    at wrappedFn (node:internal/errors:544:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at run (file:///D:/a/lasm/lasm/src/application-sources.mjs:45:39)\n    at query (file:///D:/a/lasm/lasm/src/application-sources.mjs:49:40)\n    at applicationSources (file:///D:/a/lasm/lasm/src/application-sources.mjs:76:20)\n    at file:///D:/a/lasm/lasm/scripts/ci/windows-lean-path-controls.mjs:106:16"
+  },
+  "resources": {
+    "status": "failed",
+    "command": [
+      "node",
+      "scripts/ci/windows-lean-path-controls.mjs",
+      ".work/windows-lean-path-controls-4g"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 14233403392
+    },
+    "limits": {
+      "jobCommittedBytes": 4294967296,
+      "stopCommittedBytes": 3435973836,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 1200
+    },
+    "peakCommittedBytes": 2374651904,
+    "minimumHostAvailable": 11855421440,
+    "startedAt": 1790478004.0723238,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 153528340480
+      }
+    },
+    "unit": "Local\\LasmResource-44cc3e45-acd9-4fd3-973f-fa339a7b5a05",
+    "pid": 560,
+    "lastSampleAt": 1790478134.8264554,
+    "exitCode": 1,
+    "finishedAt": 1790478134.9680407
+  },
+  "diagnostic": [
+    "error: Greeting.lean:1:0: failed to open file 'd:\\a\\lasm\\lasm\\.work\\windows-lean-path-controls-4g\\managed cache \u03bb xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7\\lib\\lean\\Init\\Control\\MonadAttach.olean.server': 3"
+  ],
+  "originalLog": ".work/macos/windows-lean-path-controls-4g-36290084463.log",
+  "next": "Use a verified stable short junction to the immutable tool cache for native compiler execution"
+}

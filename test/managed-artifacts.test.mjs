@@ -273,3 +273,34 @@ test('Windows ARM64 remains explicit until a native compiler artifact is impleme
   await assert.rejects(provisionLean(f.base, { ...f.options, platform: 'win32', arch: 'arm64' }), /no native Windows ARM64 archive/);
   assert.equal(f.requests(), 0);
 });
+
+test('required Lean source/notices companions fail closed and remain verified on retries', async t => {
+  const f = await fixture(t), requests = [], host = process.platform + '-' + process.arch;
+  const notice = { ...f.artifact, name: 'notices.tar.zst', url: 'https://example.invalid/notices.tar.zst' };
+  const compiler = { ...f.artifact, url: 'https://example.invalid/compiler.tar.zst' };
+  const catalog = { defaultLean: '4.34.0', lean: { '4.34.0': {
+    commit: 'f'.repeat(40), artifacts: { [host]: compiler }, notices: { [host]: notice },
+  } } };
+  let corrupt = true;
+  const options = { ...f.options, catalog, fetch: async url => {
+    requests.push(url);
+    if (url === notice.url) return new Response(corrupt ? f.bytes.subarray(0, -1) : f.bytes);
+    assert.equal(url, compiler.url);
+    return new Response('compiler temporarily unavailable', { status: 503 });
+  } };
+  await assert.rejects(provisionLean(f.base, options), /checksum or size/);
+  assert.deepEqual(requests, [notice.url], 'Never use a compiler without its required companion');
+  assert.deepEqual(await readdir(join(f.cache, 'artifacts')), []);
+  corrupt = false; requests.length = 0;
+  await assert.rejects(provisionLean(f.base, options), /HTTP 503/);
+  assert.deepEqual(requests, [notice.url, compiler.url]);
+  const [identity] = await readdir(join(f.cache, 'artifacts'));
+  assert.equal(await readFile(join(f.cache, 'artifacts', identity, 'LICENSE'), 'utf8'), 'Fixture redistribution notice');
+  requests.length = 0;
+  await assert.rejects(provisionLean(f.base, options), /HTTP 503/);
+  assert.deepEqual(requests, [compiler.url], 'A verified companion is reused after an interrupted compiler download');
+  await writeFile(join(f.cache, 'artifacts', identity, 'LICENSE'), 'changed notice');
+  requests.length = 0;
+  await assert.rejects(provisionLean(f.base, options), /cache contents changed/);
+  assert.deepEqual(requests, [], 'Cached notices remain mandatory and are checked before compiler use');
+});

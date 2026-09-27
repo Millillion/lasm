@@ -67,6 +67,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   });
   const memoryMode = target === 'bun' ? 2 : 1;
   const recipe = { schema: 1, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
+    ...(lean.notices ? { nativeLeanNoticesIdentity: lean.notices.identity } : {}),
     emscripten: sdkCatalog.version, sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)),
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),

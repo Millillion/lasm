@@ -29,6 +29,8 @@ npm; deferred chunks below remain future work.
 3. After both macOS targets pass, extend to Windows x86-64 and ARM64. Resolve
    missing native tool distributions with validated, redistributable artifacts;
    do not call emulated execution a native ARM64 pass.
+   Track the current implementation and distribution evidence in
+   [Windows toolchains](WINDOWS_TOOLCHAINS.md).
 
 Every implementation commit must review README.md for simplicity and current
 accuracy: complete quick start, every CLI command/option with examples, exact

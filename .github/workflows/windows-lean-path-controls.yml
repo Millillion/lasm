@@ -24,8 +24,8 @@ jobs:
         # while entering the interpreter adapter. Preserve that resource abort.
         # This separate profile still stops at 80% of its 4-GiB Job Object cap
         # and retains the guard's host-memory and disk reserves.
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --timeout-seconds 1200 --disk-path . --disk-reserve-mib 4096 --report .work/windows-lean-path-4g-resources.json -- node scripts/ci/windows-lean-path-controls.mjs .work/windows-lean-path-controls-4g
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --timeout-seconds 1200 --disk-path . --disk-reserve-mib 4096 --report .work/windows-lean-junction-resources.json -- node scripts/ci/windows-lean-path-controls.mjs .work/windows-lean-junction-controls
       - name: Preserve path and resource results
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/windows-lean-path-controls-4g/result.json','.work/windows-lean-path-4g-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-lean-junction-controls/result.json','.work/windows-lean-junction-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

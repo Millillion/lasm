@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { provisionLean } from '../../src/managed-lean.mjs';
-import { applicationSources, nativeLeanEnvironment } from '../../src/application-sources.mjs';
+import { applicationSources, nativeLeanEnvironment, canonicalApplicationPath } from '../../src/application-sources.mjs';
 import { provisionGit } from '../../src/managed-git.mjs';
 import { managedGitEnvironment } from '../../src/managed-git.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
@@ -30,6 +30,9 @@ try {
   const longModule = join(lean.prefix, 'lib/lean/Init/Data/Iterators/Internal/LawfulMonadLiftFunction.olean.private');
   assert.ok(longModule.length >= 260 && statSync(longModule).size > 0);
   result.modulePath = longModule; result.modulePathLength = longModule.length;
+  assert.equal(canonicalApplicationPath(lean.executionPrefix), canonicalApplicationPath(lean.prefix));
+  result.executionPrefix = lean.executionPrefix;
+  result.executedPrograms = { lean: lean.lean, lake: lean.lake };
   result.lean = { version: lean.version, commit: lean.commit, identity: lean.identity, nativePrograms: lean.nativePrograms };
   const env = nativeLeanEnvironment(lean), baseline = { ...env };
   delete baseline.LEAN_PATH; delete baseline.LEAN_SYSROOT;
@@ -62,7 +65,8 @@ try {
   writeFileSync(fullAdapter, readFileSync(adapter, 'utf8').replace('import Lake.Load.Workspace', 'import Lake\nimport Lake.Load.Workspace'));
   const shortPrefix = join(root, 'short toolchain');
   symlinkSync(lean.prefix, shortPrefix, 'junction');
-  const shortLean = { ...lean, prefix: shortPrefix, lean: join(shortPrefix, 'bin/lean.exe'), lake: join(shortPrefix, 'bin/lake.exe') };
+  const shortLean = { ...lean, prefix: shortPrefix, executionPrefix: shortPrefix,
+    lean: join(shortPrefix, 'bin/lean.exe'), lake: join(shortPrefix, 'bin/lake.exe') };
   const shortEnv = nativeLeanEnvironment(shortLean);
   const shortPlainEnv = { ...shortEnv, LEAN_PATH: join(shortPrefix, 'lib/lean'), LEAN_SYSROOT: shortPrefix };
   for (const [label, tool, environment, header, nativeCli] of [
@@ -82,6 +86,7 @@ try {
       { cwd, env: managedGitEnvironment(git, environment), encoding: 'utf8', timeout: 120000, maxBuffer: 1024 ** 2 });
     assert.ifError(r.error); assert.equal(r.signal, null);
     result.checks.push({ label, code: r.status, stdout: r.stdout, stderr: r.stderr }); save();
+    assert.equal(r.status, 0, label + ': ' + r.stdout + r.stderr);
   }
   for (const [label, program, helper, sysroot, plugin] of [
     ['native Lake CLI', lean.lake, null, true, false],
@@ -101,6 +106,10 @@ try {
     const r = spawnSync(program, args, { cwd, env: environment, encoding: 'utf8', timeout: 120000, maxBuffer: 1024 ** 2 });
     assert.ifError(r.error); assert.equal(r.signal, null);
     result.checks.push({ label, code: r.status, stdout: r.stdout, stderr: r.stderr }); save();
+    if (label === 'adapter without plugin') {
+      assert.notEqual(r.status, 0);
+      assert.match(r.stderr, /LEAN ASSERTION VIOLATION/);
+    } else assert.equal(r.status, 0, label + ': ' + r.stdout + r.stderr);
   }
   result.activeCheck = 'Lake local import C generation'; save();
   const lake = applicationSources(source, lean, work, { git });

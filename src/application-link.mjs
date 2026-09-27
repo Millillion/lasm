@@ -62,7 +62,10 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   const applicationPrelude = join(work, 'application-pre.js');
   await writeFile(applicationPrelude, `Module.lasmLeanVersion = ${JSON.stringify(leanVersion)};\n`);
   const mapFile = join(work, 'reachability.map');
-  const link = ['-pthread', '-fwasm-exceptions', `-sMEMORY64=${memoryMode}`, '-sMALLOC=mimalloc',
+  // The checked loader transformations use LF templates. Emscripten otherwise
+  // defaults to host line endings, making identical Windows output look like
+  // semantic drift. Ask the pinned driver to emit the same format everywhere.
+  const link = ['--output-eol=linux', '-pthread', '-fwasm-exceptions', `-sMEMORY64=${memoryMode}`, '-sMALLOC=mimalloc',
     '-sMAIN_MODULE=2', `-sEXPORTED_FUNCTIONS=@${exportsFile}`, '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=4',
     '-sEXPORTED_RUNTIME_METHODS=stringToNewUTF8', '-sEXIT_RUNTIME=1', '-sNODERAWFS=1',
     '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=1', '-sSTACK_OVERFLOW_CHECK=2',

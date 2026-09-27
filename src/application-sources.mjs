@@ -25,15 +25,16 @@ export function findApplicationProject(source) {
 
 export function nativeLeanEnvironment(lean) {
   const env = { ...process.env };
+  const prefix = lean.executionPrefix ?? lean.prefix;
   for (const key of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(key)) delete env[key];
   Object.assign(env, { LEAN_NUM_THREADS: '1', LEAN_STACK_SIZE_KB: '8192',
-    PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(delimiter) });
+    PATH: [join(prefix, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(delimiter) });
   // Lean's module reader uses CreateFile without long-path manifest opt-in.
   // An explicit namespace keeps deep managed caches usable without changing
   // Windows registry policy or requiring a shorter user-selected directory.
   if (process.platform === 'win32') Object.assign(env, {
-    LEAN_SYSROOT: toNamespacedPath(lean.prefix),
-    LEAN_PATH: toNamespacedPath(join(lean.prefix, 'lib/lean')),
+    LEAN_SYSROOT: toNamespacedPath(prefix),
+    LEAN_PATH: toNamespacedPath(join(prefix, 'lib/lean')),
   });
   return env;
 }
@@ -54,7 +55,7 @@ export function applicationSources(source, lean, work, { log = console.error, gi
     // importing more Lean modules or loading symbols without the initializer
     // does not establish that state. These are Lake's upstream install paths.
     const platform = lean.platform?.split('-')[0] ?? process.platform;
-    const lakePlugin = platform === 'win32' ? join(lean.prefix, 'bin', 'libLake_shared.dll')
+    const lakePlugin = platform === 'win32' ? join(lean.executionPrefix ?? lean.prefix, 'bin', 'libLake_shared.dll')
       : join(lean.prefix, 'lib/lean', `libLake_shared.${platform === 'darwin' ? 'dylib' : 'so'}`);
     const entry = JSON.parse(run(lean.lean, ['-j1', '-s8192', '--plugin=' + lakePlugin, '--run',
       fileURLToPath(new URL('./lake-module.lean', import.meta.url)), configuredSource], project));

@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { provisionArtifact } from './managed-artifacts.mjs';
 import { executableName } from './platform.mjs';
 import { verifyNativeProgram } from './native-program.mjs';
+import { windowsToolPrefix } from './windows-tool-paths.mjs';
 
 export const toolchainCatalog = JSON.parse(await readFile(new URL('./toolchains.json', import.meta.url), 'utf8'));
 
@@ -35,12 +36,21 @@ export async function provisionLean(file, options = {}) {
   const host = `${platform}-${arch}`;
   const artifact = release.artifacts[host];
   if (!artifact) throw new Error(`Managed Lean ${selection.version} is not implemented for ${host}. ${release.unavailable?.[host] ?? 'No matching native artifact is available.'} This platform remains an implementation gap.`);
+  // Some maintained native distributions carry complete corresponding sources
+  // and third-party notices in a smaller companion archive. Treat that archive
+  // as required, verified toolchain content, including on cached builds.
+  const notices = release.notices?.[host] ? await provisionArtifact(release.notices[host],
+    { ...options, label: `Lean ${selection.version} tool sources and notices` }) : undefined;
   const installed = await provisionArtifact(artifact, { ...options, label: `Lean ${selection.version} and Lake` });
+  // Lake replaces LEAN_PATH for child compilers, whose executable-derived
+  // library root can lose the namespace prefix. A short junction also
+  // keeps those child-derived stdlib paths within upstream MAX_PATH handling.
+  const executionPrefix = platform === 'win32' ? await windowsToolPrefix(installed.directory) : installed.directory;
   // Lake puts its executable-derived library root ahead of LEAN_PATH. Preserve
   // the Windows namespace in GetModuleFileName as well as in our environment,
   // so nested module files do not fall back to MAX_PATH-limited spellings.
   const program = name => {
-    const file = join(installed.directory, 'bin', executableName(name, platform));
+    const file = join(executionPrefix, 'bin', executableName(name, platform));
     return platform === 'win32' ? toNamespacedPath(file) : file;
   };
   const lean = program('lean'), lake = program('lake');
@@ -51,5 +61,6 @@ export async function provisionLean(file, options = {}) {
   // pairing a native compiler with another release's runtime/serialized files.
   const commit = execFileSync(lean, ['--githash'], { encoding: 'utf8', timeout: 30_000, windowsHide: true }).trim();
   if (commit !== release.commit) throw new Error(`Managed Lean identity mismatch: expected ${release.commit}, received ${commit}`);
-  return { ...selection, ...installed, prefix: installed.directory, lean, lake, commit, platform: host, nativePrograms };
+  return { ...selection, ...installed, prefix: installed.directory, executionPrefix, lean, lake, commit, platform: host, nativePrograms,
+    ...(notices ? { notices } : {}) };
 }
