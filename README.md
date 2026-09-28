@@ -95,6 +95,8 @@ The same `.44` archive covers all five accepted targets above.
 **Source changes awaiting acceptance:** the next `.45` candidate connects native
 Windows ARM64 tools and tests one archive on all six OS/architecture targets.
 It is not an accepted release until those installed-package checks pass.
+Its first Windows ARM64 run exposed an SDK bug with Unicode project paths;
+native repair controls are in progress.
 
 ## Lean support and restrictions
 

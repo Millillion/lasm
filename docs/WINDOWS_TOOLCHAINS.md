@@ -181,3 +181,16 @@ peak stayed below the 512-MiB cap. The archive's GMP 6.3.0-2 and leantar executa
 match the published source/notices companion. Candidate `.45` connects these
 verified inputs and enables the complete six-target installed/deployment matrix;
 those package-level checks are still required before claiming ARM64 support.
+
+Candidate `.45` failed its first native ARM64 installed build after provisioning
+the verified tools. The [preserved failure](evidence/node45-windows-arm64-unicode-failure-2026-09-28.json)
+shows `wasm-emscripten-finalize` replacing Unicode path characters with `?` while
+opening its output; memory peaked at 1,073,655,808 bytes and disk reserves held.
+A focused native differential now compares the unchanged SDK with copied
+Binaryen executables containing a process UTF-8 manifest. It checks that loaded
+code/data sections and entry-point identities are unchanged, reproduces the
+original Unicode failure, then exercises Unicode paths and C++ thread/exception
+applications in both Wasm widths. This is a proposed tool-distribution repair,
+not an accepted SDK or application result. It uses [Microsoft's process code
+page mechanism](https://learn.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page)
+and changes no global Windows settings.

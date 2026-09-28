@@ -1,0 +1,27 @@
+name: Native Windows ARM64 SDK Unicode controls
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-sdk-unicode-controls
+  cancel-in-progress: false
+jobs:
+  native:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: windows-11-arm
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: arm64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Original failure, resource-only repair and Unicode application controls
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --timeout-seconds 3000 --disk-path . --disk-reserve-mib 4096 --report .work/windows-sdk-unicode-resources.json -- node scripts/ci/windows-sdk-unicode-control.mjs
+      - name: Preserve native control and resource evidence
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-sdk-unicode/result.json','.work/windows-sdk-unicode-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

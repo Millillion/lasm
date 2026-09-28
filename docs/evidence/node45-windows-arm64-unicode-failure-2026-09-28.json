@@ -1,0 +1,81 @@
+{
+  "scope": "Preserved .45 native Windows ARM64 installed-package failure; Unicode path conversion is under focused investigation",
+  "passed": false,
+  "run": 36416852657,
+  "job": 108910309990,
+  "url": "https://github.com/Millillion/lasm/actions/runs/36416852657/job/108910309990",
+  "platform": "win32-arm64",
+  "sourceRevision": "9e7840355dd90d80b82078eb1b1c48fb1f75a535",
+  "candidateVersion": "0.1.0-experimental.45",
+  "archiveSha256": "3289d9e28376a30254b4466c41c66fc6619ad017a053e44742124691331df97f",
+  "packageProvenance": {
+    "sourceRevision": "9e7840355dd90d80b82078eb1b1c48fb1f75a535",
+    "runtimeManifestSha256": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+    "lean": "4.34.1",
+    "node": "26.10.0"
+  },
+  "activePhase": "cold",
+  "failedStep": {
+    "label": "cold npx lasm Main.lean",
+    "code": 1,
+    "signal": null,
+    "seconds": 640.5731683,
+    "stdout": "",
+    "stderrTail": " inputs in 0.68s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libGL-mt-getprocaddr.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libGL-mt-getprocaddr.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 4 inputs in 1.62s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libal.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libal.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 1 inputs in 0.67s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libhtml5.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libhtml5.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 5 inputs in 2.24s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libstubs-debug.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libstubs-debug.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 2 inputs in 1.35s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libc-mt-debug.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libc-mt-debug.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 1141 inputs in 77.65s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libmimalloc-mt.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libmimalloc-mt.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 20 inputs in 5.02s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libclang_rt.builtins-legacysjlj-mt.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libclang_rt.builtins-legacysjlj-mt.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 184 inputs in 13.72s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libc++-debug-mt-legacyexcept.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libc++-debug-mt-legacyexcept.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 57 inputs in 48.38s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libc++abi-debug-mt-legacyexcept.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libc++abi-debug-mt-legacyexcept.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 18 inputs in 7.37s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libunwind-mt-legacyexcept.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libunwind-mt-legacyexcept.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 1 inputs in 0.65s\r\ncache:INFO:  - ok\r\ncache:INFO: generating system library: sysroot\\lib\\wasm64-emscripten\\pic\\libsockets-mt.a... (this will be cached in \"C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\sdk-state\\7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747\\cache\\sysroot\\lib\\wasm64-emscripten\\pic\\libsockets-mt.a\" for subsequent builds)\r\nsystem_libs:INFO: compiled 27 inputs in 3.60s\r\ncache:INFO:  - ok\r\nwarning: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-t4DQNw\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\node_modules\\@lasm\\compiler\\scripts\\full-lean\\host-library.js: signature redefinition for: _abort_js__sig\nFatal: Failed opening 'C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows ?-t4DQNw\\consumer ???\\project space ?\\.lake\\lasm\\applications\\de3aaa2fd7a9357f\\.build-864e84de-7792-4519-843f-bf38917cff07\\dist\\program.wasm'\r\nem++: error: ''C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\artifacts\\d8adbbfaa0463afa443a3d7ba858e98e6e4718eb68d8c554df56196d55196ef5\\bin\\wasm-emscripten-finalize' --no-dyncalls --bigint --check-stack-overflow 'C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\project space \\u03bb\\.lake\\lasm\\applications\\de3aaa2fd7a9357f\\.build-864e84de-7792-4519-843f-bf38917cff07\\dist\\program.wasm' -o 'C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \\u03bb-t4DQNw\\consumer \\u65e5\\u672c\\u8a9e\\project space \\u03bb\\.lake\\lasm\\applications\\de3aaa2fd7a9357f\\.build-864e84de-7792-4519-843f-bf38917cff07\\dist\\program.wasm' --detect-features' failed (returned 1)\r\n\n"
+  },
+  "resources": {
+    "status": "failed",
+    "command": [
+      "C:\\hostedtoolcache\\windows\\node\\26.10.0\\arm64\\node.exe",
+      "scripts/check-node-windows.mjs",
+      "C:\\a\\lasm\\lasm\\.work\\node-windows-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.45.tgz",
+      "3289d9e28376a30254b4466c41c66fc6619ad017a053e44742124691331df97f"
+    ],
+    "hostAtStart": {
+      "total": 17169387520,
+      "available": 12662513664
+    },
+    "limits": {
+      "jobCommittedBytes": 8584693760,
+      "stopCommittedBytes": 6867755008,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 6600
+    },
+    "peakCommittedBytes": 1073655808,
+    "minimumHostAvailable": 11805495296,
+    "startedAt": 1790596117.4532955,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "C:\\a\\lasm\\lasm": 126734585856,
+        "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 126734585856
+      }
+    },
+    "unit": "Local\\LasmResource-ee693635-7b85-4748-a022-835e324d4a4a",
+    "pid": 4156,
+    "lastSampleAt": 1790596802.2889564,
+    "exitCode": 1,
+    "finishedAt": 1790596802.4040525
+  },
+  "disk": {
+    "reserveBytes": 4294967296,
+    "preflightBytes": 12884901888,
+    "freeAtStart": {
+      "C:\\a\\lasm\\lasm": 131115872256,
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp": 131115872256
+    },
+    "status": "failed",
+    "minimumFreeBytes": {
+      "C:\\a\\lasm\\lasm": 126734585856,
+      "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 126734585856
+    },
+    "freeAtEnd": {
+      "C:\\a\\lasm\\lasm": 126743957504,
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp": 126743957504
+    }
+  },
+  "interpretation": "The finalizer receives question marks in place of Unicode path characters; this was a process failure, not a resource stop. Per-executable UTF-8 manifests are a proposed repair pending native controls.",
+  "rawLogSha256": "e82c8790dbbca428fc9aeaddce97371fea8d8bdb03d4514ad48e6c9e1943b2d9",
+  "rawReportSha256": "2ad20958644881e500cc8ed3def591cb7694b9034720ff41cfd924d0ffcdbebc"
+}
