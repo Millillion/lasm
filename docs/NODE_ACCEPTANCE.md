@@ -69,3 +69,13 @@ The later `.39` campaign also passed [Linux x86-64](evidence/node39-linux-x64-20
 [failed Windows](evidence/node39-windows-long-path-2026-09-27.json).
 It was not retained as the accepted release. These results do not establish
 acceptance of later source changes or Windows support.
+
+Candidate `.43` subsequently passed [Linux x86-64](evidence/node43-linux-x64-2026-09-28.json),
+[Linux ARM64](evidence/node43-linux-arm64-2026-09-28.json), and
+[Mac ARM64](evidence/node43-darwin-arm64-2026-09-28.json), using the exact archive
+`578b16cbc62d8fe356ae38ce1ae7dcf0c4fd255d1762b18b3245dea50e3af428`.
+The Intel Mac run is still in progress. Windows x64 built and executed Hello,
+then [failed its byte-exact output check](evidence/windows-stdio-bytes-2026-09-28.json).
+The subsequent binary-stream repair passed native x64/ARM64 host controls and is
+in candidate `.44`, whose installed Windows validation is in progress. These
+partial results do not replace the accepted `.37` release above.

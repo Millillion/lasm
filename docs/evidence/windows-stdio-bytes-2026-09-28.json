@@ -37,7 +37,130 @@
       "native file creation and POSIX descriptor invariants"
     ]
   },
-  "nativeRepairValidation": "pending",
+  "nativeRepairValidation": {
+    "scope": "Four byte-preservation tests and native online/offline isolation controls; not complete installed-package acceptance",
+    "run": 36385212836,
+    "platforms": [
+      {
+        "platform": "win32-x64",
+        "job": 108809051018,
+        "url": "https://github.com/Millillion/lasm/actions/runs/36385212836/job/108809051018",
+        "controlsRevision": "5e9f68f1c3ee520646a5347a067320837f1a7c84",
+        "stdioResources": {
+          "status": "passed",
+          "command": [
+            "node",
+            "--test",
+            "--test-concurrency=1",
+            "test/stdio-bytes.test.mjs"
+          ],
+          "hostAtStart": {
+            "total": 17174360064,
+            "available": 14260662272
+          },
+          "limits": {
+            "jobCommittedBytes": 536870912,
+            "stopCommittedBytes": 429496729,
+            "hostReserveBytes": 2147483648,
+            "timeoutSeconds": 180
+          },
+          "peakCommittedBytes": 138870784,
+          "minimumHostAvailable": 14196117504,
+          "startedAt": 1790575913.6534657,
+          "unit": "Local\\LasmResource-53079a2e-462f-4052-b6b3-53f2f8bfcb5d",
+          "pid": 5156,
+          "lastSampleAt": 1790575914.0575044,
+          "exitCode": 0,
+          "finishedAt": 1790575914.2370217
+        },
+        "isolationResources": {
+          "status": "passed",
+          "command": [
+            "node",
+            "scripts/ci/windows-isolation-controls.mjs"
+          ],
+          "hostAtStart": {
+            "total": 17174360064,
+            "available": 14268317696
+          },
+          "limits": {
+            "jobCommittedBytes": 1073741824,
+            "stopCommittedBytes": 858993459,
+            "hostReserveBytes": 2147483648,
+            "timeoutSeconds": 1200
+          },
+          "peakCommittedBytes": 261382144,
+          "minimumHostAvailable": 12941139968,
+          "startedAt": 1790575922.62593,
+          "unit": "Local\\LasmResource-4ff9dc60-d5f7-4271-9d2d-bbc9208590d2",
+          "pid": 3216,
+          "lastSampleAt": 1790576404.181442,
+          "exitCode": 0,
+          "finishedAt": 1790576404.242898
+        },
+        "logSha256": "3f2994e2a932661dc1fbaf374cea50a7280a0135549bada9eebb5e5b0a0e2bdc"
+      },
+      {
+        "platform": "win32-arm64",
+        "job": 108809051240,
+        "url": "https://github.com/Millillion/lasm/actions/runs/36385212836/job/108809051240",
+        "controlsRevision": "5e9f68f1c3ee520646a5347a067320837f1a7c84",
+        "stdioResources": {
+          "status": "passed",
+          "command": [
+            "node",
+            "--test",
+            "--test-concurrency=1",
+            "test/stdio-bytes.test.mjs"
+          ],
+          "hostAtStart": {
+            "total": 17169428480,
+            "available": 13697040384
+          },
+          "limits": {
+            "jobCommittedBytes": 536870912,
+            "stopCommittedBytes": 429496729,
+            "hostReserveBytes": 2147483648,
+            "timeoutSeconds": 180
+          },
+          "peakCommittedBytes": 139710464,
+          "minimumHostAvailable": 13639913472,
+          "startedAt": 1790575952.155724,
+          "unit": "Local\\LasmResource-da9af104-b64f-4e48-8c12-c6883dacf750",
+          "pid": 9764,
+          "lastSampleAt": 1790575953.1856327,
+          "exitCode": 0,
+          "finishedAt": 1790575953.2385802
+        },
+        "isolationResources": {
+          "status": "passed",
+          "command": [
+            "node",
+            "scripts/ci/windows-isolation-controls.mjs"
+          ],
+          "hostAtStart": {
+            "total": 17169428480,
+            "available": 13721444352
+          },
+          "limits": {
+            "jobCommittedBytes": 1073741824,
+            "stopCommittedBytes": 858993459,
+            "hostReserveBytes": 2147483648,
+            "timeoutSeconds": 1200
+          },
+          "peakCommittedBytes": 402063360,
+          "minimumHostAvailable": 12420661248,
+          "startedAt": 1790575962.1964536,
+          "unit": "Local\\LasmResource-b7cdd288-11f0-45d7-a76e-d0b830dfd3de",
+          "pid": 8752,
+          "lastSampleAt": 1790576403.0999813,
+          "exitCode": 0,
+          "finishedAt": 1790576403.173076
+        },
+        "logSha256": "18adf464ca598b370b48d5aada7ad9fb8cb4dea1ac31f9285607700fa1e98276"
+      }
+    ]
+  },
   "failedRunResources": {
     "status": "failed",
     "command": [

@@ -82,5 +82,9 @@ program, then [failed the exact stdout comparison](evidence/windows-stdio-bytes-
 CRLF instead of native Lean's LF. The host now sets binary mode on its owned
 standard descriptors, matching Lean initialization without changing the embedding
 Node process's descriptors. Eight local controls passed, including redirected
-files, pipes, arbitrary bytes and direct/worker file IO. Native Windows controls
-and a new installed candidate must pass; no expected output was normalized.
+files, pipes, arbitrary bytes and direct/worker file IO. Native Windows x64 and
+ARM64 both passed the four byte controls and complete online/offline isolation
+in run `36385212836`; the byte tests peaked at 138,870,784 and 139,710,464 bytes.
+Candidate `.44` packed reproducibly with SHA-256
+`999389fdd7c27e3ef346977ece892456dd6367b961ff107657b1242bc56cd146`
+and is in full x64 installed validation. No expected output was normalized.

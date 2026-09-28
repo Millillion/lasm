@@ -1,0 +1,608 @@
+{
+  "scope": "Native installed candidate .43 on this platform only; Windows failed and this is not acceptance of later source changes",
+  "url": "https://github.com/Millillion/lasm/actions/runs/36381412633/job/108797772059",
+  "run": 36381412633,
+  "job": 108797772059,
+  "platform": "linux-arm64",
+  "passed": true,
+  "candidateVersion": "0.1.0-experimental.43",
+  "archiveSha256": "578b16cbc62d8fe356ae38ce1ae7dcf0c4fd255d1762b18b3245dea50e3af428",
+  "archiveBytes": 65336923,
+  "packageProvenance": {
+    "sourceRevision": "d5f9e9352cbe43f0545a37f26e5091e2316eb375",
+    "runtimeManifestSha256": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+    "lean": "4.34.1",
+    "node": "26.10.0"
+  },
+  "controlsRevision": "cd855b88b04d1b9345a01f45d4925c8f11d3a21c",
+  "node": "v26.10.0",
+  "npm": "11.19.1",
+  "osRelease": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+  "kernel": "6.17.0-1022-azure",
+  "glibc": "2.39",
+  "startedAt": "2026-09-28T05:19:53.961Z",
+  "finishedAt": "2026-09-28T05:39:14.148Z",
+  "phases": [
+    {
+      "phase": "cold",
+      "code": 0,
+      "diagnostic": ""
+    },
+    {
+      "phase": "lake",
+      "code": 0,
+      "diagnostic": ""
+    },
+    {
+      "phase": "offline",
+      "code": 0,
+      "diagnostic": "Generating Lean C: BundleFeatures.lean\nGenerating Lean C: BundleFeatures.lean\nGenerating Lean C: BundleFeaturesLegacy.lean\nGenerating Lean C: BundleFeaturesLegacy.lean\nGenerating Lean C: FilesystemSurface.lean\nGenerating Lean C: FilesystemSurface.lean\nGenerating Lean C: CompileTimeFeatures.lean\nGenerating Lean C: CompileTimeFeatures.lean\n"
+    }
+  ],
+  "deployments": [
+    {
+      "name": "hello",
+      "bytes": 3226561,
+      "budgetBytes": 5242880,
+      "checks": [
+        {
+          "args": [],
+          "expected": {
+            "code": 0,
+            "stdout": "Hello from Lean! 2 + 3 = 5\n",
+            "stderr": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "arguments",
+      "bytes": 3227572,
+      "budgetBytes": 5242880,
+      "checks": [
+        {
+          "args": [
+            "hello world",
+            "\u03bb \u65e5\u672c\u8a9e",
+            "",
+            "--target"
+          ],
+          "expected": {
+            "code": 0,
+            "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+            "stderr": ""
+          }
+        },
+        {
+          "args": [
+            "fail"
+          ],
+          "expected": {
+            "code": 23,
+            "stdout": "arg=fail\n",
+            "stderr": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "lake",
+      "bytes": 3227190,
+      "budgetBytes": 5242880,
+      "checks": [
+        {
+          "args": [],
+          "expected": {
+            "code": 0,
+            "stdout": "Lean module: 43\n",
+            "stderr": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "features",
+      "bytes": 2898620,
+      "budgetBytes": 16777216,
+      "checks": [
+        {
+          "args": [
+            "123456789"
+          ],
+          "expected": {
+            "code": 0,
+            "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+            "stderr": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "features-legacy",
+      "bytes": 3609440,
+      "budgetBytes": 16777216,
+      "checks": [
+        {
+          "args": [
+            "17"
+          ],
+          "expected": {
+            "code": 0,
+            "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+            "stderr": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "filesystem",
+      "bytes": 3315720,
+      "budgetBytes": 16777216,
+      "checks": [
+        {
+          "args": [
+            "filesystem \u03bb"
+          ],
+          "expected": {
+            "code": 0,
+            "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+            "stderr": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "compile-time",
+      "bytes": 2688863,
+      "budgetBytes": 5242880,
+      "checks": [
+        {
+          "args": [],
+          "expected": {
+            "code": 0,
+            "stdout": "compile-time macros and proofs: 42\n",
+            "stderr": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "unused",
+      "bytes": 3226563,
+      "budgetBytes": 5242880,
+      "checks": [
+        {
+          "args": [],
+          "expected": {
+            "code": 0,
+            "stdout": "Hello from Lean! 2 + 3 = 5\n",
+            "stderr": ""
+          }
+        }
+      ]
+    }
+  ],
+  "copiedDeployment": {
+    "denied": [
+      "/home/runner/work/lasm/lasm/package.json",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/node_modules/@lasm/compiler/bin/lasm.mjs",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/Main.lean",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/dist/program.wasm",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/Args.lean",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/args dist \u03bb/program.wasm",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/lake project \u65e5\u672c\u8a9e/Main.lean",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/lake project \u65e5\u672c\u8a9e/dist/program.wasm",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/BundleFeatures.lean",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/features dist/program.wasm",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/BundleFeaturesLegacy.lean",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/features-legacy dist/program.wasm",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/FilesystemSurface.lean",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/filesystem dist/program.wasm",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/CompileTimeFeatures.lean",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/compile-time dist/program.wasm",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/Unused.lean",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/project space \u03bb/unused dist/program.wasm",
+      "/tmp/lasm node Linux \u03bb-pYRHpV/cache/lasm/artifacts/331fa443102db54066966d0c9685dc12fbbd6284a56b1f10ba4d78ecd0537550/bin/lean"
+    ],
+    "controlResult": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "programs": [
+      {
+        "name": "hello",
+        "bytes": 3226561,
+        "relocation": "copied",
+        "wasmSha256": "5a553d0b3c9f6b6c30ef9599e82a074349f7aeb1783764aaf4fb819b24a52a7c",
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            },
+            "seconds": 0.26236490899999626
+          }
+        ]
+      },
+      {
+        "name": "arguments",
+        "bytes": 3227572,
+        "relocation": "copied",
+        "wasmSha256": "9822ba682f60e48a5545c07f1eb159e787d216186ea40e2e3cea2cf41f4a83b1",
+        "checks": [
+          {
+            "args": [
+              "hello world",
+              "\u03bb \u65e5\u672c\u8a9e",
+              "",
+              "--target"
+            ],
+            "expected": {
+              "code": 0,
+              "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+              "stderr": ""
+            },
+            "seconds": 0.2755140660000034
+          },
+          {
+            "args": [
+              "fail"
+            ],
+            "expected": {
+              "code": 23,
+              "stdout": "arg=fail\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 23,
+              "stdout": "arg=fail\n",
+              "stderr": ""
+            },
+            "seconds": 0.2625118529999163
+          }
+        ]
+      },
+      {
+        "name": "lake",
+        "bytes": 3227190,
+        "relocation": "copied",
+        "wasmSha256": "abed848beb9ba47821b8215b79a837d0719db653c7c32cf9543efd697e15e387",
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "Lean module: 43\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "Lean module: 43\n",
+              "stderr": ""
+            },
+            "seconds": 0.2654192129999865
+          }
+        ]
+      },
+      {
+        "name": "features",
+        "bytes": 2898620,
+        "relocation": "copied",
+        "wasmSha256": "6ef83465fcf23e0a9980a70fc37c8f9a1a3e1bc9e429126ea56092cd1300ba42",
+        "checks": [
+          {
+            "args": [
+              "123456789"
+            ],
+            "expected": {
+              "code": 0,
+              "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+              "stderr": ""
+            },
+            "seconds": 0.29181053999997675
+          }
+        ]
+      },
+      {
+        "name": "features-legacy",
+        "bytes": 3609440,
+        "relocation": "copied",
+        "wasmSha256": "ddddcd5025c485da9454cfc8006030268c40a30fce0564ebe333465605c7d3e9",
+        "checks": [
+          {
+            "args": [
+              "17"
+            ],
+            "expected": {
+              "code": 0,
+              "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+              "stderr": ""
+            },
+            "seconds": 0.32583513599983416
+          }
+        ]
+      },
+      {
+        "name": "filesystem",
+        "bytes": 3315720,
+        "relocation": "copied",
+        "wasmSha256": "3717510ed01e37c60ba99e4d996ba71fc6aeff40c21d368dbba861bc768e1469",
+        "checks": [
+          {
+            "args": [
+              "filesystem \u03bb"
+            ],
+            "expected": {
+              "code": 0,
+              "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+              "stderr": ""
+            },
+            "seconds": 0.38452101100003344
+          }
+        ]
+      },
+      {
+        "name": "compile-time",
+        "bytes": 2688863,
+        "relocation": "copied",
+        "wasmSha256": "6b275c04916352c4281d8f92e36cf83fa64e23e5352fd8fe4cf0afa90e59ba5d",
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "compile-time macros and proofs: 42\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "compile-time macros and proofs: 42\n",
+              "stderr": ""
+            },
+            "seconds": 0.26137230699998326
+          }
+        ]
+      },
+      {
+        "name": "unused",
+        "bytes": 3226563,
+        "relocation": "copied",
+        "wasmSha256": "5a553d0b3c9f6b6c30ef9599e82a074349f7aeb1783764aaf4fb819b24a52a7c",
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            },
+            "seconds": 0.2718854340000544
+          }
+        ]
+      }
+    ]
+  },
+  "cacheRecovery": [
+    {
+      "failure": "interrupted",
+      "recovered": true,
+      "cachedWithoutDownload": true
+    },
+    {
+      "failure": "truncated",
+      "recovered": true,
+      "cachedWithoutDownload": true
+    },
+    {
+      "failure": "checksum",
+      "recovered": true,
+      "cachedWithoutDownload": true
+    },
+    {
+      "failure": "unavailable",
+      "recovered": true,
+      "cachedWithoutDownload": true
+    },
+    {
+      "failure": "incomplete-cache",
+      "recovered": true,
+      "cachedWithoutDownload": true
+    },
+    {
+      "failure": "damaged-cache",
+      "recovered": true,
+      "cachedWithoutDownload": true
+    }
+  ],
+  "runtimeRestrictions": {
+    "evaluation": "rejected during build",
+    "moduleData": "rejected during build",
+    "compileTimeMacrosAndProofs": "passed"
+  },
+  "offlineCacheReused": true,
+  "sourceInvalidation": true,
+  "measurements": {
+    "installBytes": 380767396,
+    "toolsBytes": 5611884246,
+    "downloadBytes": 910904894
+  },
+  "resources": {
+    "startedAt": "2026-09-28T05:19:53.804Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "/opt/hostedtoolcache/node/26.10.0/arm64/bin/node",
+      "scripts/check-node-linux.mjs",
+      "/home/runner/work/lasm/lasm/.work/node-linux-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.43.tgz",
+      "578b16cbc62d8fe356ae38ce1ae7dcf0c4fd255d1762b18b3245dea50e3af428"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "0348818e-fbfc-4971-a5a3-421bb8d456cd",
+    "limits": {
+      "memoryMax": 6539968512,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 5231974809,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 16722042880,
+      "available": 15130746880
+    },
+    "minimumHostAvailable": 13481324544,
+    "peakMemoryBytes": 4707241984,
+    "peakTasks": 62,
+    "report": "/home/runner/work/lasm/lasm/.work/node-linux-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-28T05:39:18.546Z",
+      "memoryBytes": 139706368,
+      "peakMemoryBytes": 4707241984,
+      "swapBytes": 0,
+      "tasks": 11,
+      "memoryBreakdown": {
+        "anon": 39317504,
+        "file": 91860992,
+        "kernel": 8077312,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 91676672,
+        "slab": 7556520
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "highWaterProcesses": {
+      "at": "2026-09-28T05:20:40.096Z",
+      "processes": [
+        {
+          "pid": 2384,
+          "name": "node-MainThread",
+          "residentBytes": 257323008,
+          "threads": 12
+        },
+        {
+          "pid": 2370,
+          "name": "npm exec lasm M",
+          "residentBytes": 95653888,
+          "threads": 11
+        },
+        {
+          "pid": 2318,
+          "name": "node-MainThread",
+          "residentBytes": 92459008,
+          "threads": 11
+        },
+        {
+          "pid": 2331,
+          "name": "node-MainThread",
+          "residentBytes": 56164352,
+          "threads": 7
+        },
+        {
+          "pid": 2330,
+          "name": "python3",
+          "residentBytes": 11542528,
+          "threads": 1
+        },
+        {
+          "pid": 2383,
+          "name": "sh",
+          "residentBytes": 1613824,
+          "threads": 1
+        }
+      ]
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-28T05:39:18.690Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 52498432,
+      "peakMemoryBytes": 4707241984,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11759616,
+        "file": 38158336,
+        "kernel": 2224128,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 37974016,
+        "slab": 2078808
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-28T05:39:18.744Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "disk": {
+    "reserveBytes": 4294967296,
+    "preflightBytes": 17179869184,
+    "freeAtStart": 114830917632,
+    "status": "passed",
+    "minimumFreeBytes": 106728869888,
+    "freeAtEnd": 114832171008
+  },
+  "rawReportSha256": "10339d270d58d132f9d508ac3993b8ed72012be809f57316723b96eacfc28baa"
+}
