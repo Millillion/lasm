@@ -87,9 +87,25 @@ for (const [name, file] of [['LLVM-LICENSE.txt', 'llvm-project/llvm/LICENSE.TXT'
 // Retain MSYS2 package redistribution notices for bundled runtime DLLs.
 const licenses = resolve(msysBin, '../share/licenses');
 if (existsSync(licenses)) cpSync(licenses, join(notices, 'msys2-runtime-licenses'), { recursive: true, dereference: true });
+// Fresh bootstraps must preserve the same Unicode behavior as repaired archives.
+// Update only the manifest resource of the copied, unsigned Binaryen programs.
+const manifestPython = await provisionPython(), manifestRepairs = [];
+execFileSync(manifestPython.executable, ['-I', '-B', resolve('test/windows-sdk-manifest.test.py')],
+  { stdio: 'inherit', timeout: 60000 });
+for (const program of origins.values()) {
+  if (!program.source.replaceAll('\\', '/').includes('/binaryen-build/')) continue;
+  const file = join(bin, program.file), report = join(output, program.file + '-manifest.json');
+  execFileSync(manifestPython.executable, ['-I', '-B', resolve('scripts/ci/windows-sdk-utf8-manifest.py'),
+    file, program.sha256, report], { stdio: 'inherit', timeout: 60000 });
+  const repair = JSON.parse(readFileSync(report)); manifestRepairs.push(repair);
+  program.originalSha256 = program.sha256; program.sha256 = await hashFile(file);
+  assert.equal(program.sha256, repair.patchedSha256); program.bytes = statSync(file).size;
+  program.repair = 'per-process UTF-8 manifest';
+}
+assert.equal(manifestRepairs.length, 8);
 writeFileSync(join(prefix, 'build-provenance.json'), JSON.stringify({
   bootstrap: JSON.parse(readFileSync(join(base, 'result.json'), 'utf8')),
-  programs: [...origins.values()], imports,
+  programs: [...origins.values()], imports, manifestRepairs,
   msysPackages: readFileSync(join(base, 'msys2-package-versions.txt'), 'utf8'),
 }, null, 2) + '\n');
 const archive = join(output, 'emscripten-6.0.9-win32-arm64.tar.gz');
@@ -98,7 +114,7 @@ const artifact = { name: 'emscripten-6.0.9-win32-arm64-local', root: 'install',
   url: 'https://lasm-sdk-fixture.invalid/emscripten-6.0.9-win32-arm64.tar.gz',
   sha256: await hashFile(archive), bytes: statSync(archive).size,
   format: 'tar.gz', maximumExtractedBytes: 5_000_000_000 };
-const cache = join(base, 'relocated managed cache');
+const cache = join(base, 'relocated managed cache λ 日本語');
 await provisionPython({ cache });
 const catalog = { ...sdkCatalog, artifacts: { 'win32-arm64': artifact } };
 const localFetch = async url => {
@@ -110,11 +126,11 @@ const localFetch = async url => {
 const sdk = await provisionSdk({ catalog, cache, fetch: localFetch });
 renameSync(llvm, llvm + '.hidden'); renameSync(binaryen, binaryen + '.hidden');
 renameSync(join(base, 'emscripten'), join(base, 'emscripten.hidden'));
-const source = join(base, 'sdk-application.cpp');
+const source = join(base, 'sdk-application λ 日本語.cpp');
 writeFileSync(source, '#include <cstdio>\n#include <thread>\n#include <stdexcept>\nint main() { int n = 0; std::thread t([&]{n=42;}); t.join(); try { throw std::runtime_error("SDK"); } catch(const std::exception& e) { std::printf("%s %d\\n", e.what(), n); } }\n');
 const checks = [];
 for (const width of [32, 64]) {
-  const entry = join(base, `sdk-application-${width}.cjs`);
+  const entry = join(base, `sdk-application-${width} λ 日本語.cjs`);
   sdk.execute('em++', [source, '-O1', '-pthread', '-fwasm-exceptions', `-sMEMORY64=${width === 64 ? 1 : 0}`,
     '-sMALLOC=mimalloc', '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=2', '-sEXIT_RUNTIME=1',
     '-sALLOW_MEMORY_GROWTH=1', '-sMAXIMUM_MEMORY=268435456', '-sENVIRONMENT=node',
@@ -123,13 +139,14 @@ for (const width of [32, 64]) {
     encoding: 'utf8', timeout: 60_000 });
   assert.ifError(actual.error); assert.equal(actual.status, 0, actual.stderr);
   assert.equal(actual.stdout, 'SDK 42\n'); assert.equal(actual.stderr, '');
-  checks.push({ width, cppThreadExceptionApplication: 'passed', wasmSha256: await hashFile(entry.replace(/\.cjs$/, '.wasm')) });
+  checks.push({ width, cppThreadExceptionApplication: 'passed', unicodeCacheAndProject: true,
+    wasmSha256: await hashFile(entry.replace(/\.cjs$/, '.wasm')) });
 }
 const reused = await provisionSdk({ catalog, cache, fetch: localFetch });
 assert.equal(reused.cacheHit, true); assert.equal(reused.driverIdentity, sdk.driverIdentity);
 const report = { scope: 'Local relocatable Windows ARM64 SDK archive, managed extraction and C++ application checks; not a hosted download or Lean application pass',
   artifact, nativePrograms: sdk.nativePrograms, driverIdentity: sdk.driverIdentity,
-  programs: [...origins.values()], imports, checks, verifiedReuse: true,
+  programs: [...origins.values()], imports, manifestRepairs, checks, verifiedReuse: true,
   limitations: ['Archive remains on the CI runner; no artifact or release is uploaded.',
     'Full Lean application and Node/npm-only installation acceptance remain pending.'],
   recordedAt: new Date().toISOString(), resourceReport: process.env.LASM_RESOURCE_REPORT };

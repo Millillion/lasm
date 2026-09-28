@@ -1,0 +1,268 @@
+{
+  "scope": "Diagnostic PE resource update preserves all section bytes; relocation and debug section RVAs move by one page. Repaired execution has not yet passed.",
+  "run": 36422260090,
+  "job": 108927615011,
+  "url": "https://github.com/Millillion/lasm/actions/runs/36422260090/job/108927615011",
+  "sectionChanges": [
+    {
+      "section": ".reloc",
+      "beforeRva": 9621504,
+      "afterRva": 9625600,
+      "delta": 4096,
+      "flags": 1107296320,
+      "sha256": "e6891c1be590b93babd7efc7905dfa0f0a0301c01db62f87f444ed38cf1a74ff"
+    },
+    {
+      "section": "/18",
+      "beforeRva": 9895936,
+      "afterRva": 9900032,
+      "delta": 4096,
+      "flags": 1107296320,
+      "sha256": "9977841910b033d01d0b889b6124cb021724ebaed6dd85c47ea84a79db5a5575"
+    },
+    {
+      "section": "/32",
+      "beforeRva": 9908224,
+      "afterRva": 9912320,
+      "delta": 4096,
+      "flags": 1107296320,
+      "sha256": "e78929982fad683d0c09145b65a56aa285f72527da5ef31b789fbf350b426951"
+    },
+    {
+      "section": "/4",
+      "beforeRva": 9637888,
+      "afterRva": 9641984,
+      "delta": 4096,
+      "flags": 1107296320,
+      "sha256": "c1090bb52a6263c9efd880e3f53897972a90fa0b45f91057b9ac06699377586a"
+    },
+    {
+      "section": "/43",
+      "beforeRva": 9654272,
+      "afterRva": 9658368,
+      "delta": 4096,
+      "flags": 1107296320,
+      "sha256": "49e962a8b252ffefa9c33ac6e3f7f22e121372bf9e4aa2d6b6159c882f8d8501"
+    },
+    {
+      "section": "/55",
+      "beforeRva": 9723904,
+      "afterRva": 9728000,
+      "delta": 4096,
+      "flags": 1107296320,
+      "sha256": "5f0bc1f1f53e5b5a8f96b8cd575653f5786c8db944447869b34f35b65c94b524"
+    },
+    {
+      "section": "/67",
+      "beforeRva": 9773056,
+      "afterRva": 9777152,
+      "delta": 4096,
+      "flags": 1107296320,
+      "sha256": "585b2267b8841e6ca833b25663381920bc8322f635f9c301dbe688f0d63709dd"
+    }
+  ],
+  "identities": {
+    "after": {
+      "entryPoint": 5160,
+      "imageBase": 5368709120,
+      "machine": 43620,
+      "sections": {
+        ".buildid": {
+          "flags": 1073741888,
+          "rva": 9437184,
+          "sha256": "aeb7f0f2402573430c3d288285beb9632ac8fc97a2a396a55e5a20bef18b6ce2",
+          "virtualBytes": 53
+        },
+        ".data": {
+          "flags": 3221225536,
+          "rva": 9441280,
+          "sha256": "857cef65632b99b1f05f68396a5f46edc036c194421f2827bc2f7f7c5ade51df",
+          "virtualBytes": 8192
+        },
+        ".pdata": {
+          "flags": 1073741888,
+          "rva": 9449472,
+          "sha256": "b83a6f21343e20606e90d12fb1bca9c845739f92e041e8ec9531f1120c700cc5",
+          "virtualBytes": 163976
+        },
+        ".rdata": {
+          "flags": 1073741888,
+          "rva": 7778304,
+          "sha256": "16059484838553f3c1e4c0684f75ca109905ca63c34e03e822b3257332d986d7",
+          "virtualBytes": 1658416
+        },
+        ".reloc": {
+          "flags": 1107296320,
+          "rva": 9625600,
+          "sha256": "e6891c1be590b93babd7efc7905dfa0f0a0301c01db62f87f444ed38cf1a74ff",
+          "virtualBytes": 12416
+        },
+        ".text": {
+          "flags": 1610612768,
+          "rva": 4096,
+          "sha256": "75467b0e98d95c0ceb1b0e30f899f6945d6b70f73045eed06d134771cdcd6f9f",
+          "virtualBytes": 7773920
+        },
+        ".tls": {
+          "flags": 3221225536,
+          "rva": 9617408,
+          "sha256": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15",
+          "virtualBytes": 2072
+        },
+        "/18": {
+          "flags": 1107296320,
+          "rva": 9900032,
+          "sha256": "9977841910b033d01d0b889b6124cb021724ebaed6dd85c47ea84a79db5a5575",
+          "virtualBytes": 11152
+        },
+        "/32": {
+          "flags": 1107296320,
+          "rva": 9912320,
+          "sha256": "e78929982fad683d0c09145b65a56aa285f72527da5ef31b789fbf350b426951",
+          "virtualBytes": 32588
+        },
+        "/4": {
+          "flags": 1107296320,
+          "rva": 9641984,
+          "sha256": "c1090bb52a6263c9efd880e3f53897972a90fa0b45f91057b9ac06699377586a",
+          "virtualBytes": 14410
+        },
+        "/43": {
+          "flags": 1107296320,
+          "rva": 9658368,
+          "sha256": "49e962a8b252ffefa9c33ac6e3f7f22e121372bf9e4aa2d6b6159c882f8d8501",
+          "virtualBytes": 65602
+        },
+        "/55": {
+          "flags": 1107296320,
+          "rva": 9728000,
+          "sha256": "5f0bc1f1f53e5b5a8f96b8cd575653f5786c8db944447869b34f35b65c94b524",
+          "virtualBytes": 45736
+        },
+        "/67": {
+          "flags": 1107296320,
+          "rva": 9777152,
+          "sha256": "585b2267b8841e6ca833b25663381920bc8322f635f9c301dbe688f0d63709dd",
+          "virtualBytes": 118963
+        }
+      }
+    },
+    "before": {
+      "entryPoint": 5160,
+      "imageBase": 5368709120,
+      "machine": 43620,
+      "sections": {
+        ".buildid": {
+          "flags": 1073741888,
+          "rva": 9437184,
+          "sha256": "aeb7f0f2402573430c3d288285beb9632ac8fc97a2a396a55e5a20bef18b6ce2",
+          "virtualBytes": 53
+        },
+        ".data": {
+          "flags": 3221225536,
+          "rva": 9441280,
+          "sha256": "857cef65632b99b1f05f68396a5f46edc036c194421f2827bc2f7f7c5ade51df",
+          "virtualBytes": 8192
+        },
+        ".pdata": {
+          "flags": 1073741888,
+          "rva": 9449472,
+          "sha256": "b83a6f21343e20606e90d12fb1bca9c845739f92e041e8ec9531f1120c700cc5",
+          "virtualBytes": 163976
+        },
+        ".rdata": {
+          "flags": 1073741888,
+          "rva": 7778304,
+          "sha256": "16059484838553f3c1e4c0684f75ca109905ca63c34e03e822b3257332d986d7",
+          "virtualBytes": 1658416
+        },
+        ".reloc": {
+          "flags": 1107296320,
+          "rva": 9621504,
+          "sha256": "e6891c1be590b93babd7efc7905dfa0f0a0301c01db62f87f444ed38cf1a74ff",
+          "virtualBytes": 12416
+        },
+        ".text": {
+          "flags": 1610612768,
+          "rva": 4096,
+          "sha256": "75467b0e98d95c0ceb1b0e30f899f6945d6b70f73045eed06d134771cdcd6f9f",
+          "virtualBytes": 7773920
+        },
+        ".tls": {
+          "flags": 3221225536,
+          "rva": 9617408,
+          "sha256": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15",
+          "virtualBytes": 2072
+        },
+        "/18": {
+          "flags": 1107296320,
+          "rva": 9895936,
+          "sha256": "9977841910b033d01d0b889b6124cb021724ebaed6dd85c47ea84a79db5a5575",
+          "virtualBytes": 11152
+        },
+        "/32": {
+          "flags": 1107296320,
+          "rva": 9908224,
+          "sha256": "e78929982fad683d0c09145b65a56aa285f72527da5ef31b789fbf350b426951",
+          "virtualBytes": 32588
+        },
+        "/4": {
+          "flags": 1107296320,
+          "rva": 9637888,
+          "sha256": "c1090bb52a6263c9efd880e3f53897972a90fa0b45f91057b9ac06699377586a",
+          "virtualBytes": 14410
+        },
+        "/43": {
+          "flags": 1107296320,
+          "rva": 9654272,
+          "sha256": "49e962a8b252ffefa9c33ac6e3f7f22e121372bf9e4aa2d6b6159c882f8d8501",
+          "virtualBytes": 65602
+        },
+        "/55": {
+          "flags": 1107296320,
+          "rva": 9723904,
+          "sha256": "5f0bc1f1f53e5b5a8f96b8cd575653f5786c8db944447869b34f35b65c94b524",
+          "virtualBytes": 45736
+        },
+        "/67": {
+          "flags": 1107296320,
+          "rva": 9773056,
+          "sha256": "585b2267b8841e6ca833b25663381920bc8322f635f9c301dbe688f0d63709dd",
+          "virtualBytes": 118963
+        }
+      }
+    }
+  },
+  "resources": {
+    "status": "failed",
+    "command": [
+      "node",
+      "scripts/ci/windows-sdk-unicode-control.mjs"
+    ],
+    "hostAtStart": {
+      "total": 17169387520,
+      "available": 13449080832
+    },
+    "limits": {
+      "jobCommittedBytes": 4294967296,
+      "stopCommittedBytes": 3435973836,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 3000
+    },
+    "peakCommittedBytes": 238657536,
+    "minimumHostAvailable": 12974817280,
+    "startedAt": 1790598692.4726565,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "C:\\a\\lasm\\lasm": 131833036800
+      }
+    },
+    "unit": "Local\\LasmResource-6ecee750-20b6-4ca8-9ce0-c373d0089d78",
+    "pid": 3132,
+    "lastSampleAt": 1790598851.578037,
+    "exitCode": 1,
+    "finishedAt": 1790598851.6149929
+  },
+  "rawLogSha256": "34cd8d70f8052fbc928200bc51557605a8498a0dabc29f0677f8410d8b142afd"
+}

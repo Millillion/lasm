@@ -1,16 +1,18 @@
-**Native Unicode failure reproduced — 2026-09-28.** Candidate `.45` passed Linux
-x64/ARM64 and Apple Silicon; Intel Mac and Windows x64 results are still being
-collected. Windows ARM64 failed its cold build on a Unicode path, without a
-resource abort. The native Lean distribution itself remains verified.
+**Windows ARM64 Unicode repair — 2026-09-28.** Candidate `.45` passed the other
+five targets; Windows ARM64 failed the cold Unicode-path build without a resource
+abort. Native Lean itself remains verified. No six-target candidate is accepted.
 
-Focused run `36420742640` reproduced the SDK defect independently: identical
-Wasm bytes pass under ASCII paths and fail under Unicode paths. The proposed
-per-executable UTF-8 manifest repair stopped at its PE preservation assertion,
-before repaired execution. Detailed before/after section identities are now
-logged to distinguish metadata changes from changes to executable code/data.
-No repaired SDK has been accepted or published; original bytes and failures are
-preserved. README still marks Windows ARM64 unsupported.
+Diagnostic run `36422260090` showed that Windows preserves every section byte
+while moving only discardable relocation/debug metadata when the manifest grows.
+The preservation check now resolves debug names, verifies the relocated directory,
+and keeps code/data addresses, bytes and loader settings fixed. Seven regression
+checks pass locally; native repaired execution remains unverified.
 
-Remaining: resolve and validate the SDK repair, distribute audited bytes, and
-accept one exact npm candidate on all six targets. No npm publication.
-Completion ETA is not yet estimable.
+The SDK workflow can repackage the original verified archive, requiring original
+failure, repaired Unicode execution, unchanged files, reproducible archives,
+fresh Unicode cache/project relocation and offline reuse before retaining a draft.
+Fresh source bootstraps apply the same repair and Unicode controls. README still
+marks ARM64 unsupported.
+
+Remaining: native repair/distribution, then one exact candidate on all six targets.
+No npm publication. Completion ETA is not yet estimable.

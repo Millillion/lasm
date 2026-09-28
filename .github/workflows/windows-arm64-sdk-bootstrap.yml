@@ -1,6 +1,11 @@
 name: Native Windows ARM64 SDK bootstrap
 on:
   workflow_dispatch:
+    inputs:
+      repair-utf8:
+        description: Repackage the verified SDK with UTF-8 manifests and native Unicode controls
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -30,6 +35,7 @@ jobs:
           node --input-type=module -e "import {hasResourceGuard} from './scripts/full-lean/resource-guard.mjs'; if(hasResourceGuard()) throw Error('Unexpected guard outside workload')"
           node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-sdk-guard-control.json -- node --input-type=module -e "import {ensureResourceGuard,hasResourceGuard} from './scripts/full-lean/resource-guard.mjs'; if(!hasResourceGuard()) throw Error('Missing descendant guard'); await ensureResourceGuard(); console.log('Nested Job Object guard verified')"
       - uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2.32.0
+        if: ${{ !inputs.repair-utf8 }}
         id: msys2
         with:
           msystem: CLANGARM64
@@ -45,12 +51,16 @@ jobs:
             mingw-w64-clang-aarch64-zlib
             mingw-w64-clang-aarch64-zstd
       - name: Build one worker inside the Windows Job Object guard
+        if: ${{ !inputs.repair-utf8 }}
         env:
           MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: |
           $bash = Join-Path $env:MSYS2_LOCATION 'usr/bin/bash.exe'
           $env:LASM_BOOTSTRAP_NODE = (Get-Command node).Source
           node scripts/full-lean/run-bounded.mjs --report .work/windows-arm64-sdk-resources.json -- $bash --login scripts/full-lean/bootstrap-windows-arm64-sdk.sh
+      - name: Verify and repackage UTF-8 manifests without rebuilding LLVM
+        if: ${{ inputs.repair-utf8 }}
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --timeout-seconds 6000 --disk-path . --disk-reserve-mib 4096 --report .work/windows-arm64-sdk-resources.json -- node scripts/ci/windows-sdk-utf8-repack.mjs
       - name: Retain verified SDK bytes in an unpublished draft
         env:
           GH_TOKEN: ${{ github.token }}
@@ -58,5 +68,5 @@ jobs:
       - name: Preserve bounded results in logs
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/windows-sdk-guard-control.json','.work/windows-arm64-sdk/result.json','.work/windows-arm64-sdk/distribution/result.json','.work/windows-arm64-sdk-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-sdk-guard-control.json','.work/windows-arm64-sdk/result.json','.work/windows-arm64-sdk/distribution/result.json','.work/windows-sdk-unicode/result.json','.work/windows-arm64-sdk-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
       # Standard public runner; no paid Actions artifact or cache storage.

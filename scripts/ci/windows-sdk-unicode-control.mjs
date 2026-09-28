@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
-import { provisionSdk } from '../../src/managed-sdk.mjs';
+import { provisionSdk, sdkCatalog } from '../../src/managed-sdk.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { verifyNativeProgram } from '../../src/native-program.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
@@ -18,9 +18,17 @@ const result = { scope: 'Native Unicode-path differential for the existing SDK; 
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(result, null, 2) + '\n');
 save();
 try {
-  const sdk = await provisionSdk({ cache: join(output, 'cache') });
+  // Keep the negative control immutable when the shipping catalog is repaired.
+  const originalArtifact = { name: 'emscripten-6.0.9-win32-arm64', root: 'install',
+    url: 'https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/emscripten-6.0.9-win32-arm64.tar.gz',
+    sha256: 'abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a',
+    bytes: 174792332, format: 'tar.gz', maximumExtractedBytes: 5_000_000_000 };
+  const sdk = await provisionSdk({ cache: join(output, 'cache'),
+    catalog: { ...sdkCatalog, artifacts: { 'win32-arm64': originalArtifact } } });
   assert.equal(sdk.receipt.artifact.sha256, 'abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a');
   result.originalArtifact = sdk.receipt.artifact;
+  execFileSync(sdk.python.executable, ['-I', '-B', resolve('test/windows-sdk-manifest.test.py')],
+    { stdio: 'inherit', timeout: 60000 });
   const provenance = JSON.parse(readFileSync(join(sdk.prefix, 'build-provenance.json')));
   const binaryen = provenance.programs.filter(p => p.source.replaceAll('\\', '/').includes('/binaryen-build/'));
   assert.equal(binaryen.length, 8);

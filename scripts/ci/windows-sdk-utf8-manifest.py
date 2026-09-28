@@ -23,15 +23,32 @@ def pe_identity(data):
     assert machine == 0xAA64
     optional = pe + 24
     optional_size = struct.unpack_from("<H", data, pe + 20)[0]
-    assert optional_size >= 152 and struct.unpack_from("<H", data, optional)[0] == 0x20B
+    assert optional_size >= 240 and struct.unpack_from("<H", data, optional)[0] == 0x20B
+    directory_count = struct.unpack_from("<I", data, optional + 108)[0]
+    assert directory_count == 16
+    directories = [struct.unpack_from("<II", data, optional + 112 + index * 8)
+                   for index in range(directory_count)]
     # Altering a signed executable would invalidate its signature.
-    assert struct.unpack_from("<II", data, optional + 112 + 4 * 8) == (0, 0)
-    resource_rva = struct.unpack_from("<I", data, optional + 112 + 2 * 8)[0]
+    assert directories[4] == (0, 0)
+    resource_rva = directories[2][0]
+    symbols, symbol_count = struct.unpack_from("<II", data, pe + 12)
+    strings = symbols + symbol_count * 18
+
+    def section_name(raw_name):
+        name = raw_name.rstrip(b"\0").decode("ascii")
+        if name.startswith("/"):
+            assert symbols and strings + 4 <= len(data)
+            length = struct.unpack_from("<I", data, strings)[0]
+            offset = int(name[1:])
+            assert 4 <= offset < length and strings + length <= len(data)
+            end = data.index(b"\0", strings + offset, strings + length)
+            name = data[strings + offset:end].decode("ascii")
+        return name
     sections = {}
     resource_found = not resource_rva
     for index in range(count):
         offset = optional + optional_size + index * 40
-        name = data[offset:offset + 8].rstrip(b"\0").decode("ascii")
+        name = section_name(data[offset:offset + 8])
         virtual_size, rva, size, raw = struct.unpack_from("<IIII", data, offset + 8)
         flags = struct.unpack_from("<I", data, offset + 36)[0]
         assert raw + size <= len(data)
@@ -43,10 +60,43 @@ def pe_identity(data):
         sections[name] = {"rva": rva, "virtualBytes": virtual_size,
                           "flags": flags, "sha256": digest(data[raw:raw + size])}
     assert resource_found and sections
+    # Windows may move the relocation table when .rsrc grows. Its directory
+    # must still identify exactly the same bytes, by offset within .reloc.
+    reloc_rva, reloc_size = directories[5]
+    if reloc_rva:
+        reloc = sections[".reloc"]
+        reloc_offset = reloc_rva - reloc["rva"]
+        assert 0 <= reloc_offset and reloc_offset + reloc_size <= reloc["virtualBytes"]
+        directories[5] = (".reloc", reloc_offset, reloc_size)
+    directories[2] = None  # The resource directory is the intentional edit.
     return {"machine": machine,
             "entryPoint": struct.unpack_from("<I", data, optional + 16)[0],
             "imageBase": struct.unpack_from("<Q", data, optional + 24)[0],
+            "coffFlags": struct.unpack_from("<H", data, pe + 22)[0],
+            "loaderSettings": data[optional + 32:optional + 56].hex()
+                + data[optional + 68:optional + 112].hex(),
+            "directories": directories,
             "sections": sections}
+
+
+def verify_preservation(before, after):
+    original, updated = pe_identity(before), pe_identity(after)
+    normalized = json.loads(json.dumps(updated))
+    relocations = []
+    for name, section in updated["sections"].items():
+        previous = original["sections"].get(name)
+        # Only read-only, discardable relocation/DWARF metadata can move.
+        # Every byte, size and characteristic is still compared below.
+        if previous and (name == ".reloc" or name.startswith(".debug_")):
+            assert section["flags"] == previous["flags"] == 0x42000040
+            normalized["sections"][name]["rva"] = previous["rva"]
+            if section["rva"] != previous["rva"]:
+                relocations.append({"section": name, "beforeRva": previous["rva"],
+                                    "afterRva": section["rva"]})
+    assert normalized == json.loads(json.dumps(original)), (
+        "PE resource preservation difference: " + json.dumps({
+            "before": original, "after": updated}, sort_keys=True))
+    return original, relocations
 
 
 def utf8_manifest(original):
@@ -81,7 +131,7 @@ def repair(file, expected):
     assert Path(".work").resolve() in file.parents
     before = file.read_bytes()
     assert digest(before) == expected
-    identity = pe_identity(before)
+    pe_identity(before)
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
     handle = wintypes.HANDLE
     pointer = ctypes.c_void_p
@@ -154,12 +204,11 @@ def repair(file, expected):
     if not kernel.EndUpdateResourceW(update, False):
         raise ctypes.WinError(ctypes.get_last_error())
     after = file.read_bytes()
-    after_identity = pe_identity(after)
-    assert after_identity == identity, ("PE resource preservation difference: " + json.dumps({
-        "before": identity, "after": after_identity}, sort_keys=True))
+    identity, relocations = verify_preservation(before, after)
     assert manifests() == replacements
     return {"file": str(file), "originalSha256": expected, "patchedSha256": digest(after),
             "preservedExecutionIdentity": identity,
+            "metadataRelocations": relocations,
             "manifests": [{"language": language,
                            "originalSha256": digest(originals[language]) if language in originals else None,
                            "patchedSha256": digest(data), "xml": data.decode("utf-8")}

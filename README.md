@@ -92,11 +92,10 @@ The [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_A
 [the plan](https://github.com/Millillion/lasm/blob/main/docs/PLAN.md) records work in progress.
 The same `.44` archive covers all five accepted targets above.
 
-**Source changes awaiting acceptance:** the next `.45` candidate connects native
-Windows ARM64 tools and tests one archive on all six OS/architecture targets.
-It is not an accepted release until those installed-package checks pass.
-Its first Windows ARM64 run exposed an SDK bug with Unicode project paths;
-native repair controls are in progress.
+**Source changes awaiting acceptance:** candidate `.45` passed those same five
+targets, but its Windows ARM64 build exposed an SDK bug with Unicode paths.
+The native SDK repair is in progress. A revised package must pass all six
+OS/architecture targets before Windows ARM64 becomes supported.
 
 ## Lean support and restrictions
 
