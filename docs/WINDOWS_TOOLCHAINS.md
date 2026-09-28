@@ -105,7 +105,9 @@ The [maintained ARM64 SDK download](https://github.com/Millillion/lasm/releases/
 is pinned in `src/sdk-tools.json`. Its public archive has the same 174,792,332
 bytes and checksum as the native relocation and notices audits. The
 [anonymous download receipt](evidence/windows-arm64-sdk-public-download-2026-09-28.json)
-records retrieval without GitHub credentials. A fresh `managed-sdk.yml` run with
-`scope=win32-arm64` checks the public catalog under a 4-GiB Job Object cap,
-3.2-GiB proactive stop and 4-GiB disk reserve. Tool publication does not establish
-Windows Lasm support or publish an npm package.
+records retrieval without GitHub credentials. Fresh native run `36390222907`
+downloaded from this catalog, compiled a C-to-Wasm program, checked its output
+and exit status, and verified cache reuse. Cold compilation took 101.4 seconds;
+peak committed memory was 237,989,888 bytes under a 4-GiB Job Object cap and
+3.2-GiB proactive stop. Its 4-GiB disk reserve remained intact. Tool publication
+does not establish Windows Lasm support or publish an npm package.

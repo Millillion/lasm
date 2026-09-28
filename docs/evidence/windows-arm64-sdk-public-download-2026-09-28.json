@@ -72,5 +72,88 @@
   },
   "nativeRelocationEvidence": "windows-arm64-sdk-2026-09-27.json",
   "archiveAndNoticeEvidence": "windows-arm64-sdk-notice-audit-2026-09-27.json",
-  "freshNativePublicConsumer": "Pending dispatch after this catalog commit"
+  "freshNativePublicConsumer": {
+    "passed": true,
+    "run": 36390222907,
+    "job": 108824192013,
+    "url": "https://github.com/Millillion/lasm/actions/runs/36390222907/job/108824192013",
+    "sourceRevision": "95aff329cd1f068bb6e985cb7492e5cd86d089d9",
+    "result": {
+      "scope": "Managed SDK C-to-Wasm smoke; full Lean application acceptance remains separate",
+      "recordedAt": "2026-09-28T07:17:07.853Z",
+      "platform": "win32-arm64",
+      "node": "v26.10.0",
+      "sdk": "6.0.9",
+      "identity": "d8adbbfaa0463afa443a3d7ba858e98e6e4718eb68d8c554df56196d55196ef5",
+      "archive": {
+        "name": "emscripten-6.0.9-win32-arm64",
+        "root": "install",
+        "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/emscripten-6.0.9-win32-arm64.tar.gz",
+        "sha256": "abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a",
+        "bytes": 174792332,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 5000000000
+      },
+      "driverIdentity": "7fcb426de1d854c2f8424e68d902e86638b5917993dddfe7803ec172859ff747",
+      "runtimePatchesApplied": true,
+      "nativePrograms": {
+        "clang": {
+          "platform": "win32",
+          "architectures": [
+            "arm64"
+          ]
+        },
+        "wasm-ld": {
+          "platform": "win32",
+          "architectures": [
+            "arm64"
+          ]
+        },
+        "wasm-opt": {
+          "platform": "win32",
+          "architectures": [
+            "arm64"
+          ]
+        }
+      },
+      "python": "3.13.15",
+      "verifiedReuse": true,
+      "output": "managed SDK application",
+      "exit": 7,
+      "compileSeconds": 101.39146449999997
+    },
+    "resources": {
+      "status": "passed",
+      "command": [
+        "node",
+        "integration/managed-sdk.mjs",
+        ".work/managed-sdk-ci"
+      ],
+      "hostAtStart": {
+        "total": 17169428480,
+        "available": 13568004096
+      },
+      "limits": {
+        "jobCommittedBytes": 4294967296,
+        "stopCommittedBytes": 3435973836,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": 1500
+      },
+      "peakCommittedBytes": 237989888,
+      "minimumHostAvailable": 13084688384,
+      "startedAt": 1790579517.0769658,
+      "disk": {
+        "reserveBytes": 4294967296,
+        "minimumFreeBytes": {
+          "C:\\a\\lasm\\lasm": 131767197696
+        }
+      },
+      "unit": "Local\\LasmResource-db2143f9-6b85-494c-a062-29f5022fd1cc",
+      "pid": 8476,
+      "lastSampleAt": 1790579827.8310342,
+      "exitCode": 0,
+      "finishedAt": 1790579827.8800077
+    },
+    "rawLogSha256": "05d58021db5b94a0ed459c3bd948af20cfe8e392892d2a43828089484fbfb353"
+  }
 }
