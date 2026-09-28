@@ -50,6 +50,10 @@ jobs:
           architecture: arm64
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Check draft creation and asset retention before expensive work
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node --max-old-space-size=128 scripts/ci/windows-retention-preflight.mjs
       - name: Check the native host and resource accounting below the cap
         run: |
           node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-arm64')"
@@ -110,21 +114,22 @@ jobs:
         # 2.28 GB. Reuse that control's 4-GiB Job Object profile, stopping at
         # 80% and preserving the separate host-memory and disk reserves.
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --timeout-seconds 5400 --disk-path . --disk-reserve-mib 4096 --report .work/windows-arm64-lean-release-resources.json -- node scripts/ci/windows-lean-notices-repack.mjs
+      - name: Retain the verified native distribution in an unpublished draft
+        # A cache-retention failure must not discard a successful distribution.
+        if: always() && (steps.build.outcome == 'success' || steps.repack.outcome == 'success')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node --max-old-space-size=128 scripts/ci/windows-bootstrap-retain.mjs lean
       - name: Retain only completed compiler objects after the guard closes
         if: always() && steps.compiler_cache.outcome == 'success' && (steps.build.outcome == 'success' || steps.build.outcome == 'failure')
         env:
           GH_TOKEN: ${{ github.token }}
           MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --timeout-seconds 1200 --disk-path . --disk-reserve-mib 4096 --report .work/windows-release-cache-retain-resources.json -- node scripts/ci/windows-lean-release-cache.mjs retain
-      - name: Retain the verified native distribution in an unpublished draft
-        if: steps.build.outcome == 'success' || steps.repack.outcome == 'success'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: node --max-old-space-size=128 scripts/ci/windows-bootstrap-retain.mjs lean
       - name: Preserve native bootstrap evidence
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/windows-release-guard-control.json','.work/windows-release-cache-controls.json','.work/windows-release-notice-controls.json','.work/windows-lean-prepare-resources.json','.work/windows-arm64-lean-release/inputs.json','.work/windows-arm64-lean-release/distribution/result.json','.work/windows-arm64-lean-release-resources.json','.work/windows-arm64-lean-release-cache/preparation.json','.work/windows-arm64-lean-release-cache/compiler-control.json','.work/windows-arm64-lean-release-cache/retained/compiler-cache-receipt.json','.work/windows-release-cache-prepare-resources.json','.work/windows-release-cache-retain-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-retention-control/result.json','.work/windows-release-guard-control.json','.work/windows-release-cache-controls.json','.work/windows-release-notice-controls.json','.work/windows-lean-prepare-resources.json','.work/windows-arm64-lean-release/inputs.json','.work/windows-arm64-lean-release/distribution/result.json','.work/windows-arm64-lean-release-resources.json','.work/windows-arm64-lean-release-cache/preparation.json','.work/windows-arm64-lean-release-cache/compiler-control.json','.work/windows-arm64-lean-release-cache/retained/compiler-cache-receipt.json','.work/windows-release-cache-prepare-resources.json','.work/windows-release-cache-retain-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
       - name: Require a complete native distribution
         if: always()
         run: node -e "const a=require('node:assert/strict');a.equal(require('./.work/windows-arm64-lean-release-resources.json').status,'passed');a.equal(require('./.work/windows-arm64-lean-release/distribution/result.json').passed,true)"

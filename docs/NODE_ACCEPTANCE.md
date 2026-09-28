@@ -108,7 +108,11 @@ Peak committed memory was 2,808,406,016 bytes, below the 6,869,744,025-byte
 proactive stop; host memory and disk reserves passed. These are measurements
 of this run, not performance guarantees.
 
-The same `.44` archive is undergoing Linux (`36392920262`) and macOS
-(`36392911964`) rechecks on both architectures. Its retained-release update is
-pending; `.37` remains the available Linux/macOS archive. Windows ARM64 still
-needs a completed native Lean distribution and installed-package acceptance.
+The same `.44` archive passed [Linux x86-64](evidence/node44-linux-x64-2026-09-28.json),
+[Linux ARM64](evidence/node44-linux-arm64-2026-09-28.json), and
+[macOS ARM64](evidence/node44-darwin-arm64-2026-09-28.json) in runs
+`36392920262` and `36392911964`. Cold Hello took 256.8, 308.8 and 332.5 seconds,
+respectively; all copied deployments and resource checks passed. Intel macOS
+and the combined retained-release update remain pending; `.37` remains the
+available Linux/macOS archive. Windows ARM64 still needs its native Lean archive
+retained and distributed, followed by installed-package acceptance.

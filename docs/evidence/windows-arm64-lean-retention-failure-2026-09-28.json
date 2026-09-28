@@ -1,0 +1,1271 @@
+{
+  "scope": "Native compiler build and relocation passed; draft retention failed and no archive survived the runner. Not installed Lasm acceptance.",
+  "run": 36380911268,
+  "job": 108796311095,
+  "url": "https://github.com/Millillion/lasm/actions/runs/36380911268/job/108796311095",
+  "sourceRevision": "d5f9e9352cbe43f0545a37f26e5091e2316eb375",
+  "buildPassed": true,
+  "workflowPassed": false,
+  "distribution": {
+    "passed": true,
+    "scope": "Relocated native ARM64 Lean/Lake and local C generation; full Lasm installed application acceptance remains separate",
+    "lean": "4.34.1",
+    "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "artifact": {
+      "name": "lean-4.34.1-win32-arm64",
+      "root": "install",
+      "url": "https://lasm-fixture.invalid/lean-4.34.1-win32-arm64.tar.gz",
+      "format": "tar.gz",
+      "sha256": "26a26cc18d9cf7b43b8c6e2f5293add242fee57e25f56c2a57cf2b594fadfd50",
+      "bytes": 778091430,
+      "maximumExtractedBytes": 8589934592
+    },
+    "nativePrograms": {
+      "lean": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "lake": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    "identities": [
+      {
+        "file": "bin\\cadical.exe",
+        "sha256": "686f0a02ec87cf0fc0ce82dcef9611d077921beabdeb7ddd801005f81a9baab2",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\lake.exe",
+        "sha256": "5514b39630b10276e0b84e58591208c0b9fa215bd34f8838ebfe698fcae23137",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\lean.exe",
+        "sha256": "a9d1f488838e44eee5fc522ff8732b27563eaa218cf30f6cded427aebc1bfd12",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\leanc.exe",
+        "sha256": "ac437ece41b68dc794e5df8a655b0f3c891f74f010b8eb065bb6cbfe4c2b9159",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\leanchecker.exe",
+        "sha256": "8b574a9ab9c2d7cc61f2f1fdf548eda0e7317d2b7d6743f5cc5c219017c401a5",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\leanir.exe",
+        "sha256": "95a6ea5c451d2fa6dca149c657940b034c349aa9ac4ba0db13d068066ebbbc34",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\leantar.exe",
+        "sha256": "ffca47cf7cd98a9b98da01bcd1fea7b92a1edda2244c7306f75ab2060dff641a",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libInit_shared.dll",
+        "sha256": "7ddf29d3f1e1802200f92f36bca385a99f80923a295915310390f907e0223765",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libLake_shared.dll",
+        "sha256": "bf4d0c517d7d76363e26d3794a5d68f816c2733894a552650ece672ee2201355",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libleanshared.dll",
+        "sha256": "9233660164828ce939eadb1a2848102fd31968d45c8483e1a0b99b69b265cf12",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libleanshared_1.dll",
+        "sha256": "c274df7875f52f4406de3919755f08afa9b3b168a76791184a4d70a8c605d8ad",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libleanshared_2.dll",
+        "sha256": "a9e6566e90b7e67c955c7ba60039f7f51e2cc98ff2087368ba06bbaf6dda2c64",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libc++.dll",
+        "sha256": "92e003c17be34ed7ce27571050de7d681d7217e1f9f856322d3726d58eace3aa",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libgmp-10.dll",
+        "sha256": "bfc6046e374a27838b54bde5602851c7cc426ac9438cb65f019b9e67a961f47c",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libuv-1.dll",
+        "sha256": "95c30516d451197a5a61c5bece36254aad984ddffa8429cbf9bfd196d286c0db",
+        "nativeArm64": true
+      }
+    ],
+    "imports": [
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "libLake_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "libleanshared_1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "libLake_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "libleanshared_1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "libleanshared_2.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leantar.exe",
+        "dll": "bcryptprimitives.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leantar.exe",
+        "dll": "kernel32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leantar.exe",
+        "dll": "api-ms-win-core-synch-l1-2-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leantar.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leantar.exe",
+        "dll": "ntdll.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "libgmp-10.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "libuv-1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "ADVAPI32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "WS2_32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "icu.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "bcrypt.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "libleanshared_2.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "libleanshared_1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "libleanshared_2.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "libleanshared_1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "libleanshared_1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-multibyte-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "USER32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "ADVAPI32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "IPHLPAPI.DLL",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "USERENV.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "WS2_32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "dbghelp.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "ole32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "SHELL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      }
+    ],
+    "checks": [
+      {
+        "program": "lean.exe",
+        "args": [
+          "--githash"
+        ],
+        "stdout": "5045d0056413266e57c625dcd7c365b10e377c52\n",
+        "stderr": ""
+      },
+      {
+        "program": "lake.exe",
+        "args": [
+          "--version"
+        ],
+        "stdout": "Lake version 5.0.0-src+5045d00 (Lean version 4.34.1)\n",
+        "stderr": ""
+      },
+      {
+        "program": "lean.exe",
+        "args": [
+          "--run",
+          "Main.lean"
+        ],
+        "stdout": "native Windows ARM64 Lean 4.34.1\n",
+        "stderr": ""
+      },
+      {
+        "program": "lean.exe",
+        "args": [
+          "-Dcompiler.postponeCompile=false",
+          "-c",
+          "main.c",
+          "Main.lean"
+        ],
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "lakeLocalCGeneration": true,
+        "sources": [
+          {
+            "module": "+Greeting",
+            "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\relocated project \u65e5\u672c\u8a9e\\Greeting.lean"
+          },
+          {
+            "module": "/+Main",
+            "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\relocated project \u65e5\u672c\u8a9e\\Main.lean"
+          }
+        ]
+      }
+    ],
+    "inputs": {
+      "lean": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "seed": {
+        "prefix": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\seed-cache\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+        "artifact": {
+          "name": "lean-4.34.1-windows.tar.zst",
+          "root": "lean-4.34.1-windows",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.34.1/lean-4.34.1-windows.tar.zst",
+          "sha256": "667394ecf6708a228221eb4919c0bdb419966b7408bcf3089a9096a6f4ae62c9",
+          "bytes": 589007020,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        },
+        "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+        "architectures": {
+          "lean": {
+            "platform": "win32",
+            "architectures": [
+              "x64"
+            ]
+          },
+          "lake": {
+            "platform": "win32",
+            "architectures": [
+              "x64"
+            ]
+          }
+        },
+        "helperEmulation": true,
+        "scope": "Same-version official x64 build-time seed only; no seed executable or library is shipped"
+      },
+      "leantar": {
+        "executable": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\helper-cache\\artifacts\\2c445faa1aa52ac8445256b766bb9d198ed05f13b5679593d291effee961bf0d\\leantar.exe",
+        "directory": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\helper-cache\\artifacts\\2c445faa1aa52ac8445256b766bb9d198ed05f13b5679593d291effee961bf0d",
+        "receipt": {
+          "scope": "Unpublished native bootstrap archive; not Node installed-package acceptance",
+          "kind": "leantar",
+          "tag": "windows-arm64-leantar-bootstrap-36278365557",
+          "archive": "leantar-0.1.20-win32-arm64.tar.gz",
+          "sha256": "1391fe8084ad6f1fd86806f6ba4392b23cd83c68a3ab5f564539be35a840145c",
+          "bytes": 787239,
+          "sourceRevision": "cc9c2c929cba829e7b0ee4ea847d1c45bb63aacd",
+          "run": "https://github.com/Millillion/lasm/actions/runs/36278365557",
+          "report": {
+            "scope": "Native Windows ARM64 leantar, unchanged upstream tests and relocated CLI archive roundtrip; managed toolchain packaging remains separate",
+            "upstream": {
+              "version": "0.1.20",
+              "commit": "46485d0eca748ed2d2678e70d59949bbc602f32c",
+              "url": "https://github.com/digama0/leangz/releases/tag/v0.1.20"
+            },
+            "rust": {
+              "toolchain": "1.98.1-aarch64-pc-windows-msvc",
+              "version": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: aarch64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+              "nativeCompiler": true,
+              "nativeCargo": true,
+              "cCompiler": {
+                "host": "x64",
+                "target": "arm64",
+                "helperEmulation": true,
+                "path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\arm64\\cl.exe"
+              }
+            },
+            "inputs": {
+              "Cargo.toml": "8c44aa1cdc5d3c616eead3b4ef52bea7e75a062ed1c760554a2397413264d42c",
+              "Cargo.lock": "c704ff4c4c078b6cb67eb4dede88b13a3b0ba78e02b06eec5a6fd1ed524b7495",
+              "tests/module_compression.rs": "c1cb14003cf20c262f6e36052ef9d798ef60ec7b81150fb7f9052748233e1ba7",
+              "tests/module/Attr.olean": "21bea27e44e5e65c08869fbaa5664081438a8a333f3fe7cc96a7717607a84186",
+              "tests/module/Attr.olean.private": "cc8053aeb68f9952454518067c2d3b6a7c2691748a2a0a3cc7bd730fde9fd52b",
+              "tests/module/Attr.olean.server": "d5d225213b22d9940f50ac2e2df769b34679d15cfcf500088f66df451743c246",
+              "tests/module/Attr.trace": "d133837c0fb1c01bffce68e21f9a65742992cdb164f23c3155b13ad458806c8a",
+              "tests/module/README.md": "cc2af54982a92ebc4c3f7559a642d806f63233411b17d6df7cdd8abf9b11b2a7"
+            },
+            "executable": {
+              "sha256": "ffca47cf7cd98a9b98da01bcd1fea7b92a1edda2244c7306f75ab2060dff641a",
+              "nativeArm64": true,
+              "leantarVersion": "leantar 0.1.20",
+              "emptyPath": true
+            },
+            "reference": {
+              "artifact": {
+                "name": "leantar-v0.1.20-x86_64-pc-windows-msvc",
+                "root": "leantar-v0.1.20-x86_64-pc-windows-msvc",
+                "url": "https://github.com/digama0/leangz/releases/download/v0.1.20/leantar-v0.1.20-x86_64-pc-windows-msvc.zip",
+                "sha256": "7bb21a0a8d152da25863ad53039edddf5fd656b9d7be298b221f4565027f8cc7",
+                "bytes": 777243,
+                "format": "zip",
+                "maximumExtractedBytes": 8388608
+              },
+              "emulatedX64Control": true,
+              "nativeArchiveReadByReference": true,
+              "referenceArchiveReadByNative": true,
+              "traceComparison": "Exact official output; unchanged dependency hash, schema and outputs"
+            },
+            "roundtrip": {
+              "Attr.trace": "4e2d3472346215b2fbb4377c8a6c223a53930cf2ccb78e3c3fbbdaa758701535",
+              "Attr.olean": "21bea27e44e5e65c08869fbaa5664081438a8a333f3fe7cc96a7717607a84186",
+              "Attr.olean.private": "cc8053aeb68f9952454518067c2d3b6a7c2691748a2a0a3cc7bd730fde9fd52b",
+              "Attr.olean.server": "d5d225213b22d9940f50ac2e2df769b34679d15cfcf500088f66df451743c246"
+            },
+            "createdAt": "2026-09-26T23:09:18.113Z"
+          },
+          "resources": {
+            "status": "passed",
+            "command": [
+              "pwsh",
+              "-NoProfile",
+              "-File",
+              "scripts/ci/windows-leantar.ps1"
+            ],
+            "hostAtStart": {
+              "total": 17169387520,
+              "available": 13582864384
+            },
+            "limits": {
+              "jobCommittedBytes": 4294967296,
+              "stopCommittedBytes": 3435973836,
+              "hostReserveBytes": 2147483648,
+              "timeoutSeconds": 2100
+            },
+            "peakCommittedBytes": 756314112,
+            "minimumHostAvailable": 12431003648,
+            "startedAt": 1790464038.952415,
+            "unit": "Local\\LasmResource-c53ca42e-a721-4341-8551-0cfeb471bb60",
+            "pid": 9180,
+            "lastSampleAt": 1790464158.1378775,
+            "exitCode": 0,
+            "finishedAt": 1790464158.1761472
+          },
+          "recordedAt": "2026-09-26T23:09:23.239Z"
+        }
+      },
+      "sourceRevision": "d5f9e9352cbe43f0545a37f26e5091e2316eb375",
+      "recordedAt": "2026-09-28T05:19:14.465Z"
+    },
+    "recordedAt": "2026-09-28T08:12:29.084Z",
+    "resourceReport": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release-resources.json"
+  },
+  "buildResources": {
+    "status": "passed",
+    "command": [
+      "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+      "--login",
+      "scripts/full-lean/bootstrap-windows-arm64-lean-release.sh"
+    ],
+    "hostAtStart": {
+      "total": 17169387520,
+      "available": 13228662784
+    },
+    "limits": {
+      "jobCommittedBytes": 8584693760,
+      "stopCommittedBytes": 6867755008,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 14400
+    },
+    "peakCommittedBytes": 2711216128,
+    "minimumHostAvailable": 11295924224,
+    "startedAt": 1790572937.0059752,
+    "unit": "Local\\LasmResource-aa484742-4cad-446f-ab73-eb2e7866d9ff",
+    "pid": 5664,
+    "lastSampleAt": 1790583149.399104,
+    "exitCode": 0,
+    "finishedAt": 1790583149.462545
+  },
+  "cacheRetainResources": {
+    "status": "failed",
+    "command": [
+      "node",
+      "scripts/ci/windows-lean-release-cache.mjs",
+      "retain"
+    ],
+    "hostAtStart": {
+      "total": 17169387520,
+      "available": 13212106752
+    },
+    "limits": {
+      "jobCommittedBytes": 2147483648,
+      "stopCommittedBytes": 1717986918,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 1200
+    },
+    "peakCommittedBytes": 233955328,
+    "minimumHostAvailable": 12926001152,
+    "startedAt": 1790583158.3591683,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "C:\\a\\lasm\\lasm": 114362269696
+      }
+    },
+    "unit": "Local\\LasmResource-a7c6f89a-da3f-45be-9ccc-3bd3661311ed",
+    "pid": 9800,
+    "lastSampleAt": 1790583187.5797465,
+    "exitCode": 1,
+    "finishedAt": 1790583187.6525095
+  },
+  "retentionFailure": {
+    "operation": "Create compiler-cache draft with --target d5f9e9352cbe43f0545a37f26e5091e2316eb375",
+    "message": "HTTP 403: Resource not accessible by integration",
+    "consequence": "Cache retention failed; subsequent distribution retention was skipped by its implicit success condition. Release inventory confirmed neither archive retained.",
+    "repair": "Use existing main for draft targets; verify actual draft creation/upload/retrieval/deletion before build; retain native distribution independently before compiler cache."
+  },
+  "rawLogSha256": "2584a80e8954c9a5579b4db0ffa5103ccec532e574b19b35c3993df5f41be11b",
+  "rawReportsSha256": "1e64895e7d69757e02d8596e0694e02a6d98329fdf27c150c0e7bc79175ab8d6"
+}

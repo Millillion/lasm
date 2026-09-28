@@ -114,7 +114,7 @@ if (process.argv[2] === 'prepare') {
   const notes = join(output, 'notes.md');
   writeFileSync(notes, `Unpublished completed compiler-cache checkpoint.\n\nRecipe: ${packed.identitySha256}\nArchive: ${basename(next)}\nSHA-256: ${packed.sha256}\nSource: ${process.env.GITHUB_SHA}\nBuild result: ${resources.status}\n\nThis checkpoint does not establish a complete native Lean build or installed Lasm support.\n`);
   gh(['release', 'create', tag, next, receiptPath, '--repo', 'Millillion/lasm', '--draft', '--prerelease',
-    '--target', process.env.GITHUB_SHA, '--title', `Windows ARM64 Lean compiler cache ${process.env.GITHUB_RUN_ID}`, '--notes-file', notes]);
+    '--target', 'main', '--title', `Windows ARM64 Lean compiler cache ${process.env.GITHUB_RUN_ID}`, '--notes-file', notes]);
   const retained = JSON.parse(gh(['release', 'view', tag, '--repo', 'Millillion/lasm', '--json', 'isDraft,assets,url']));
   assert.equal(retained.isDraft, true);
   assert.equal(retained.assets.find(a => a.name === basename(next))?.size, packed.bytes);

@@ -132,3 +132,18 @@ below the 6,869,744,025-byte proactive stop; cleanup and disk reserves passed.
 The same archive is being checked on Linux (`36392920262`) and macOS
 (`36392911964`) on both native architectures. This pass does not establish
 Windows ARM64 or broad API parity.
+
+The two-job ARM64 retry [completed its native build and relocation](evidence/windows-arm64-lean-retention-failure-2026-09-28.json)
+in run `36380911268`, including Lean/Lake execution, C generation and all 15
+native executable/DLL identities. The guarded operation took 170.2 minutes and
+peaked at 2,711,216,128 committed bytes, with no memory abort. The subsequent
+compiler-cache draft request failed with HTTP 403 while targeting the older
+source commit; its failure caused the distribution-retention step to be skipped.
+Neither archive survived, so this remains build evidence only.
+
+Draft cache targets now use the existing `main` branch, with the exact source
+revision preserved in receipts. Before a retry builds anything, a small control
+creates a draft, uploads and retrieves identical bytes, then deletes that control.
+Successful native distributions are retained before the cache, with an explicit
+independent condition. A cache-upload failure cannot skip their retention.
+The retry also includes the already-fixed upstream `LICENSES` bundle directly.

@@ -1,15 +1,15 @@
-**Windows x64 passed — 2026-09-28.** Candidate `.44` passed Node/npm-only cold
-installation, local Lake imports, offline reuse, recovery/invalidation, runtime
-restrictions and eight copied deployments. Native outputs match exactly. Hello
-deploys in 3,042,522 bytes; peak committed memory was 2.62 GiB within the guard.
-Evidence: run `36389214996`.
+**Native ARM64 build passed; retention retry needed — 2026-09-28.**
+Run `36380911268` built and relocated native Windows ARM64 Lean/Lake, verified
+15 executable/DLL identities, and passed execution/C generation. Peak memory was
+2.53 GiB without a resource abort. A compiler-cache draft request failed; the
+following distribution-retention step was skipped, so neither archive survived.
 
-The same archive is running Linux (`36392920262`) and macOS (`36392911964`)
-regressions on both architectures. ARM64 Lean is still compiling. The public
-native ARM64 SDK passed a fresh consumer; the source/notices companion is public
-and checksum-verified, awaiting the compiler's dependency identity check.
+Retention now targets existing `main`, checks actual draft storage before building,
+and saves a successful distribution independently before the cache. The retry
+also includes upstream notices. README reviewed: ARM64 remains unsupported until
+distribution and installed acceptance pass.
 
-README reviewed and updated: `.37` remains the available Linux/macOS archive;
-Windows x64 `.44` passed, ARM64 remains unverified. Remaining gates: finish `.44`
-regressions/retention, distribute native ARM64 Lean, then accept one candidate
-across all six targets. No npm publication. Completion ETA is not yet estimable.
+Candidate `.44` passed Windows x64, both Linux architectures and macOS ARM64;
+Intel macOS and combined retention remain pending. Then finish native ARM64
+distribution and accept one candidate across all six targets. No npm publication.
+Completion ETA is not yet estimable.
