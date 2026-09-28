@@ -28,29 +28,6 @@ def coff_symbols(data):
             "stringBytes": length, "bytes": data[pointer:strings + length]}
 
 
-def preserve_coff_pointer(before, after):
-    # EndUpdateResourceW can move a MinGW COFF overlay without updating its
-    # deprecated file pointer. Recover only by a unique, byte-exact table match.
-    # Never guess an offset, discard symbols, or modify the symbol-table bytes.
-    symbols = coff_symbols(before)
-    if symbols is None:
-        return after, None
-    pe = struct.unpack_from("<I", after, 0x3C)[0]
-    pointer, count = struct.unpack_from("<II", after, pe + 12)
-    assert count == symbols["count"]
-    actual = after.find(symbols["bytes"])
-    assert actual >= 0 and after.rfind(symbols["bytes"]) == actual, (
-        "Original COFF table must survive as one exact byte sequence")
-    if pointer == actual:
-        return after, None
-    assert pointer == symbols["pointer"], "Unexpected COFF pointer modification"
-    corrected = bytearray(after)
-    struct.pack_into("<I", corrected, pe + 12, actual)
-    correction = {"beforePointer": pointer, "afterPointer": actual,
-                  "bytes": len(symbols["bytes"]), "sha256": digest(symbols["bytes"])}
-    return bytes(corrected), correction
-
-
 def pe_identity(data):
     """Preserve loaded code/data, entry point and preferred base across repair."""
     assert data[:2] == b"MZ"
@@ -96,10 +73,11 @@ def pe_identity(data):
             continue
         assert name != ".rsrc" and name not in sections
         sections[name] = {"rva": rva, "virtualBytes": virtual_size,
-                          "flags": flags, "sha256": digest(data[raw:raw + size])}
+                          "flags": flags, "rawPointer": raw, "rawBytes": size,
+                          "sha256": digest(data[raw:raw + size])}
     assert resource_found and sections
-    # Windows may move the relocation table when .rsrc grows. Its directory
-    # must still identify exactly the same bytes, by offset within .reloc.
+    # Validate the relocation directory against its table. Every section RVA
+    # is also compared, so neither the table nor its directory may move.
     reloc_rva, reloc_size = directories[5]
     if reloc_rva:
         reloc = sections[".reloc"]
@@ -112,7 +90,7 @@ def pe_identity(data):
             "imageBase": struct.unpack_from("<Q", data, optional + 24)[0],
             "coffFlags": struct.unpack_from("<H", data, pe + 22)[0],
             "coffSymbols": None if coff is None else {
-                "count": coff["count"], "sha256": digest(coff["bytes"])},
+                "pointer": coff["pointer"], "count": coff["count"], "sha256": digest(coff["bytes"])},
             "loaderSettings": data[optional + 32:optional + 56].hex()
                 + data[optional + 68:optional + 112].hex(),
             "directories": directories,
@@ -121,22 +99,83 @@ def pe_identity(data):
 
 def verify_preservation(before, after):
     original, updated = pe_identity(before), pe_identity(after)
-    normalized = json.loads(json.dumps(updated))
-    relocations = []
-    for name, section in updated["sections"].items():
-        previous = original["sections"].get(name)
-        # Only read-only, discardable relocation/DWARF metadata can move.
-        # Every byte, size and characteristic is still compared below.
-        if previous and (name == ".reloc" or name.startswith(".debug_")):
-            assert section["flags"] == previous["flags"] == 0x42000040
-            normalized["sections"][name]["rva"] = previous["rva"]
-            if section["rva"] != previous["rva"]:
-                relocations.append({"section": name, "beforeRva": previous["rva"],
-                                    "afterRva": section["rva"]})
-    assert normalized == json.loads(json.dumps(original)), (
-        "PE resource preservation difference: " + json.dumps({
-            "before": original, "after": updated}, sort_keys=True))
-    return original, relocations
+    assert original == updated, ("PE preservation difference: " + json.dumps({
+        "before": original, "after": updated}, sort_keys=True))
+    return original
+
+
+def pe_checksum(data):
+    # PE's 16-bit folded sum excludes the four-byte checksum field itself.
+    assert sys.byteorder == "little" and len(data) % 2 == 0
+    offset = struct.unpack_from("<I", data, 0x3C)[0] + 24 + 64
+    view = memoryview(data)
+    value = sum(view[:offset].cast("H")) + sum(view[offset + 4:].cast("H"))
+    while value >> 16:
+        value = (value & 0xFFFF) + (value >> 16)
+    return value + len(data)
+
+
+def append_manifest(before, manifest):
+    """Add a resource to a resource-free unsigned PE without relocating anything."""
+    identity = pe_identity(before)
+    pe = struct.unpack_from("<I", before, 0x3C)[0]
+    optional = pe + 24
+    count = struct.unpack_from("<H", before, pe + 6)[0]
+    optional_size = struct.unpack_from("<H", before, pe + 20)[0]
+    assert struct.unpack_from("<II", before, optional + 128) == (0, 0), (
+        "This pinned Binaryen repair requires an executable without resources")
+    assert 0 < len(manifest) < 65536 and count < 96
+    section_alignment, file_alignment = struct.unpack_from("<II", before, optional + 32)
+    assert section_alignment >= file_alignment >= 512
+    assert not section_alignment & (section_alignment - 1)
+    assert not file_alignment & (file_alignment - 1)
+    header = optional + optional_size + count * 40
+    header_limit = struct.unpack_from("<I", before, optional + 60)[0]
+    first_raw = min(s["rawPointer"] for s in identity["sections"].values() if s["rawBytes"])
+    assert header + 40 <= min(header_limit, first_raw)
+    assert before[header:header + 40] == bytes(40), "No unused section-header slot"
+    align = lambda value, alignment: (value + alignment - 1) & -alignment
+    maximum_rva = max(s["rva"] + max(s["virtualBytes"], s["rawBytes"])
+                      for s in identity["sections"].values())
+    rva = align(max(maximum_rva, struct.unpack_from("<I", before, optional + 56)[0]), section_alignment)
+    # Resource directories: type RT_MANIFEST (24), name 1, neutral language 0.
+    # Each directory has one numeric entry. Offsets in entries are relative to
+    # this section; only IMAGE_RESOURCE_DATA_ENTRY contains an absolute RVA.
+    payload = bytearray(88 + len(manifest))
+    for directory in [0, 24, 48]:
+        struct.pack_into("<HH", payload, directory + 12, 0, 1)
+    struct.pack_into("<II", payload, 16, 24, 0x80000000 | 24)
+    struct.pack_into("<II", payload, 40, 1, 0x80000000 | 48)
+    struct.pack_into("<II", payload, 64, 0, 72)
+    struct.pack_into("<IIII", payload, 72, rva + 88, len(manifest), 65001, 0)
+    payload[88:] = manifest
+    raw = align(len(before), file_alignment)
+    raw_size = align(len(payload), file_alignment)
+    after = bytearray(before)
+    after.extend(bytes(raw - len(after)))
+    after.extend(payload)
+    after.extend(bytes(raw_size - len(payload)))
+    struct.pack_into("<8sIIIIIIHHI", after, header, b".rsrc", len(payload), rva,
+                     raw_size, raw, 0, 0, 0, 0, 0x40000040)
+    struct.pack_into("<H", after, pe + 6, count + 1)
+    initialized = struct.unpack_from("<I", before, optional + 8)[0]
+    struct.pack_into("<I", after, optional + 8, initialized + raw_size)
+    struct.pack_into("<I", after, optional + 56, align(rva + len(payload), section_alignment))
+    struct.pack_into("<II", after, optional + 128, rva, len(payload))
+    struct.pack_into("<I", after, optional + 64, pe_checksum(after))
+    # This stronger whole-file check includes COFF symbols, strings and overlays.
+    # Only these declared header fields and the unused header slot may differ.
+    restored = bytearray(after[:len(before)])
+    header_edits = [(pe + 6, 2), (optional + 8, 4), (optional + 56, 4),
+                    (optional + 64, 4), (optional + 128, 8), (header, 40)]
+    for offset, size in header_edits:
+        restored[offset:offset + size] = before[offset:offset + size]
+    assert restored == before, "An original byte outside the declared header edits changed"
+    verify_preservation(before, after)
+    return bytes(after), {"resourceRva": rva, "resourceRawPointer": raw,
+                          "resourceBytes": len(payload), "originalBytes": len(before),
+                          "addedBytes": len(after) - len(before),
+                          "headerEdits": [{"offset": o, "bytes": n} for o, n in header_edits]}
 
 
 def utf8_manifest(original):
@@ -171,18 +210,25 @@ def repair(file, expected):
     assert Path(".work").resolve() in file.parents
     before = file.read_bytes()
     assert digest(before) == expected
-    pe_identity(before)
+    manifest = utf8_manifest(None)
+    after, addition = append_manifest(before, manifest)
+    file.write_bytes(after)
+    assert file.read_bytes() == after
+    # Independently verify the checksum and resource through Windows itself.
+    imagehlp = ctypes.WinDLL("imagehlp", use_last_error=True)
+    imagehlp.CheckSumMappedFile.argtypes = [ctypes.c_void_p, wintypes.DWORD,
+                                          ctypes.POINTER(wintypes.DWORD), ctypes.POINTER(wintypes.DWORD)]
+    imagehlp.CheckSumMappedFile.restype = ctypes.c_void_p
+    buffer = ctypes.create_string_buffer(after)
+    stored, computed = wintypes.DWORD(), wintypes.DWORD()
+    assert imagehlp.CheckSumMappedFile(buffer, len(after), ctypes.byref(stored), ctypes.byref(computed))
+    assert stored.value == computed.value == pe_checksum(after)
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
-    handle = wintypes.HANDLE
-    pointer = ctypes.c_void_p
+    handle, pointer = wintypes.HANDLE, ctypes.c_void_p
     kernel.LoadLibraryExW.argtypes = [wintypes.LPCWSTR, handle, wintypes.DWORD]
     kernel.LoadLibraryExW.restype = handle
     kernel.FreeLibrary.argtypes = [handle]
     kernel.FreeLibrary.restype = wintypes.BOOL
-    callback_type = ctypes.WINFUNCTYPE(wintypes.BOOL, handle, pointer, pointer,
-                                      wintypes.WORD, wintypes.LPARAM)
-    kernel.EnumResourceLanguagesW.argtypes = [handle, pointer, pointer, callback_type, wintypes.LPARAM]
-    kernel.EnumResourceLanguagesW.restype = wintypes.BOOL
     kernel.FindResourceExW.argtypes = [handle, pointer, pointer, wintypes.WORD]
     kernel.FindResourceExW.restype = handle
     kernel.LoadResource.argtypes = [handle, handle]
@@ -191,71 +237,25 @@ def repair(file, expected):
     kernel.SizeofResource.restype = wintypes.DWORD
     kernel.LockResource.argtypes = [handle]
     kernel.LockResource.restype = pointer
-    kernel.BeginUpdateResourceW.argtypes = [wintypes.LPCWSTR, wintypes.BOOL]
-    kernel.BeginUpdateResourceW.restype = handle
-    kernel.UpdateResourceW.argtypes = [handle, pointer, pointer, wintypes.WORD, pointer, wintypes.DWORD]
-    kernel.UpdateResourceW.restype = wintypes.BOOL
-    kernel.EndUpdateResourceW.argtypes = [handle, wintypes.BOOL]
-    kernel.EndUpdateResourceW.restype = wintypes.BOOL
-
-    def manifests():
-        # Data-file mapping never executes the input program or its DLL entry points.
-        library = kernel.LoadLibraryExW(str(file), None, 0x02 | 0x20)
-        if not library:
-            raise ctypes.WinError(ctypes.get_last_error())
-        try:
-            languages = []
-
-            @callback_type
-            def found(_module, _type, _name, language, _parameter):
-                languages.append(language)
-                return True
-
-            if not kernel.EnumResourceLanguagesW(library, pointer(24), pointer(1), found, 0):
-                error = ctypes.get_last_error()
-                assert error in [1812, 1813, 1814, 1815], error
-            result = {}
-            for language in languages:
-                resource = kernel.FindResourceExW(library, pointer(24), pointer(1), language)
-                assert resource
-                length = kernel.SizeofResource(library, resource)
-                assert 0 < length < 65536
-                address = kernel.LockResource(kernel.LoadResource(library, resource))
-                assert address
-                result[language] = ctypes.string_at(address, length)
-            return result
-        finally:
-            assert kernel.FreeLibrary(library)
-
-    originals = manifests()
-    replacements = {language: utf8_manifest(data)
-                    for language, data in (originals or {0: None}).items()}
-    update = kernel.BeginUpdateResourceW(str(file), False)
-    if not update:
+    # Data-file mapping never executes the program or DLL entry points.
+    library = kernel.LoadLibraryExW(str(file), None, 0x02 | 0x20)
+    if not library:
         raise ctypes.WinError(ctypes.get_last_error())
     try:
-        for language, data in replacements.items():
-            buffer = ctypes.create_string_buffer(data)
-            if not kernel.UpdateResourceW(update, pointer(24), pointer(1), language, buffer, len(data)):
-                raise ctypes.WinError(ctypes.get_last_error())
-    except BaseException:
-        kernel.EndUpdateResourceW(update, True)
-        raise
-    if not kernel.EndUpdateResourceW(update, False):
-        raise ctypes.WinError(ctypes.get_last_error())
-    after, coff_correction = preserve_coff_pointer(before, file.read_bytes())
-    if coff_correction:
-        file.write_bytes(after)
-    identity, relocations = verify_preservation(before, after)
-    assert manifests() == replacements
+        resource = kernel.FindResourceExW(library, pointer(24), pointer(1), 0)
+        assert resource
+        length = kernel.SizeofResource(library, resource)
+        address = kernel.LockResource(kernel.LoadResource(library, resource))
+        assert address and length == len(manifest)
+        assert ctypes.string_at(address, length) == manifest
+    finally:
+        assert kernel.FreeLibrary(library)
     return {"file": str(file), "originalSha256": expected, "patchedSha256": digest(after),
-            "preservedExecutionIdentity": identity,
-            "metadataRelocations": relocations,
-            "coffPointerCorrection": coff_correction,
-            "manifests": [{"language": language,
-                           "originalSha256": digest(originals[language]) if language in originals else None,
-                           "patchedSha256": digest(data), "xml": data.decode("utf-8")}
-                          for language, data in replacements.items()]}
+            "method": "Append one resource section; preserve every original section and overlay byte",
+            "preservedExecutionIdentity": verify_preservation(before, after),
+            "resourceAddition": addition, "windowsChecksumVerified": True,
+            "manifests": [{"language": 0, "originalSha256": None,
+                           "patchedSha256": digest(manifest), "xml": manifest.decode("utf-8")} ]}
 
 
 if __name__ == "__main__":

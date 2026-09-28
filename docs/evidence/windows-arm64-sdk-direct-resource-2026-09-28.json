@@ -1,0 +1,2067 @@
+{
+  "scope": "Windows resource rewriting rejected before execution; replacement direct section addition verified locally on every original binary, native execution still required",
+  "failedNativeRun": {
+    "run": 36424279691,
+    "job": 108934295418,
+    "url": "https://github.com/Millillion/lasm/actions/runs/36424279691/job/108934295418",
+    "reports": {
+      "windows-sdk-guard-control": {
+        "status": "passed",
+        "command": [
+          "node",
+          "--input-type=module",
+          "-e",
+          "import {ensureResourceGuard,hasResourceGuard} from './scripts/full-lean/resource-guard.mjs'; if(!hasResourceGuard()) throw Error('Missing descendant guard'); await ensureResourceGuard(); console.log('Nested Job Object guard verified')"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13643866112
+        },
+        "limits": {
+          "jobCommittedBytes": 536870912,
+          "stopCommittedBytes": 429496729,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": null
+        },
+        "peakCommittedBytes": 43249664,
+        "minimumHostAvailable": 13625647104,
+        "startedAt": 1790599837.7661188,
+        "unit": "Local\\LasmResource-53e5acff-2327-4326-ad5d-139b7cd13e6b",
+        "pid": 11124,
+        "lastSampleAt": 1790599838.3854966,
+        "exitCode": 0,
+        "finishedAt": 1790599838.5781271
+      },
+      "windows-sdk-unicode/result": {
+        "scope": "Native Unicode-path differential for the existing SDK; no distribution or package acceptance",
+        "platform": "win32-arm64",
+        "sourceRevision": "299d1a75c5ac0019535f99d37ec5ce5b543722a7",
+        "passed": false,
+        "checks": [
+          {
+            "label": "native compiler fixture",
+            "code": 0,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "original ASCII path",
+            "code": 0,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "original Unicode path",
+            "expectedFailure": true,
+            "code": 1,
+            "stdout": "",
+            "stderr": "Fatal: Failed opening 'C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\Unicode ? ???\\input ? ???.wasm'\r\n"
+          }
+        ],
+        "repairs": [],
+        "resourceReport": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk-resources.json",
+        "startedAt": "2026-09-28T12:50:44.089Z",
+        "originalArtifact": {
+          "name": "emscripten-6.0.9-win32-arm64",
+          "root": "install",
+          "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/emscripten-6.0.9-win32-arm64.tar.gz",
+          "sha256": "abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a",
+          "bytes": 174792332,
+          "format": "tar.gz",
+          "maximumExtractedBytes": 5000000000
+        },
+        "error": "Error: Command failed: C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\cache\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe -I -B C:\\a\\lasm\\lasm\\scripts\\ci\\windows-sdk-utf8-manifest.py C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\patched\\bin\\wasm-as.exe 40b4cdab574d31d211efa8e7d280f380812f6600493ae58903dc483c8c7e8856 C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\wasm-as.exe-manifest.json\n    at genericNodeError (node:internal/errors:999:15)\n    at wrappedFn (node:internal/errors:544:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at file:///C:/a/lasm/lasm/scripts/ci/windows-sdk-unicode-control.mjs:68:5\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+      },
+      "windows-arm64-sdk-resources": {
+        "status": "failed",
+        "command": [
+          "node",
+          "scripts/ci/windows-sdk-utf8-repack.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13686910976
+        },
+        "limits": {
+          "jobCommittedBytes": 4294967296,
+          "stopCommittedBytes": 3435973836,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 6000
+        },
+        "peakCommittedBytes": 298070016,
+        "minimumHostAvailable": 13147934720,
+        "startedAt": 1790599843.0856884,
+        "disk": {
+          "reserveBytes": 4294967296,
+          "minimumFreeBytes": {
+            "C:\\a\\lasm\\lasm": 131682230272
+          }
+        },
+        "unit": "Local\\LasmResource-1dab6c2a-a3cb-48db-9812-999b69f939ec",
+        "pid": 6580,
+        "lastSampleAt": 1790600045.9025128,
+        "exitCode": 1,
+        "finishedAt": 1790600045.9242134
+      }
+    },
+    "rawLogSha256": "9e2d20ae6f1c8bf86c572952d12d4bf2c55fce25d2bddc2f5e5e18af7195bf3b"
+  },
+  "directAddition": {
+    "scope": "Local byte/layout verification on all eight checksum-verified original binaries; no Windows execution claim",
+    "passed": true,
+    "files": [
+      {
+        "file": "wasm-as.exe",
+        "originalSha256": "40b4cdab574d31d211efa8e7d280f380812f6600493ae58903dc483c8c7e8856",
+        "proposedSha256": "61e21129fd069da0dcb0cc045a93e63054f7574116ad18d88b339929909e2a2b",
+        "addition": {
+          "resourceRva": 9940992,
+          "resourceRawPointer": 13592064,
+          "resourceBytes": 542,
+          "originalBytes": 13592064,
+          "addedBytes": 1024,
+          "headerEdits": [
+            {
+              "offset": 126,
+              "bytes": 2
+            },
+            {
+              "offset": 152,
+              "bytes": 4
+            },
+            {
+              "offset": 200,
+              "bytes": 4
+            },
+            {
+              "offset": 208,
+              "bytes": 4
+            },
+            {
+              "offset": 272,
+              "bytes": 8
+            },
+            {
+              "offset": 904,
+              "bytes": 40
+            }
+          ]
+        },
+        "preservedExecutionIdentity": {
+          "machine": 43620,
+          "entryPoint": 5160,
+          "imageBase": 5368709120,
+          "coffFlags": 34,
+          "coffSymbols": {
+            "pointer": 9905664,
+            "count": 32952,
+            "sha256": "419d17330798044ea11cf98dd1e27abb7ec5d470eb22bfaf3652efb1d5734e48"
+          },
+          "loaderSettings": "0010000000020000060000000000000006000000000000000300608100008000000000000010000000000000000010000000000000100000000000000000000010000000",
+          "directories": [
+            [
+              0,
+              0
+            ],
+            [
+              8363704,
+              260
+            ],
+            null,
+            [
+              9449472,
+              163976
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              ".reloc",
+              0,
+              12416
+            ],
+            [
+              9437184,
+              28
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              7820856,
+              40
+            ],
+            [
+              8362840,
+              312
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8366040,
+              2072
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "sections": {
+            ".text": {
+              "rva": 4096,
+              "virtualBytes": 7773920,
+              "flags": 1610612768,
+              "rawPointer": 1024,
+              "rawBytes": 7774208,
+              "sha256": "75467b0e98d95c0ceb1b0e30f899f6945d6b70f73045eed06d134771cdcd6f9f"
+            },
+            ".rdata": {
+              "rva": 7778304,
+              "virtualBytes": 1658416,
+              "flags": 1073741888,
+              "rawPointer": 7775232,
+              "rawBytes": 1658880,
+              "sha256": "16059484838553f3c1e4c0684f75ca109905ca63c34e03e822b3257332d986d7"
+            },
+            ".buildid": {
+              "rva": 9437184,
+              "virtualBytes": 53,
+              "flags": 1073741888,
+              "rawPointer": 9434112,
+              "rawBytes": 512,
+              "sha256": "aeb7f0f2402573430c3d288285beb9632ac8fc97a2a396a55e5a20bef18b6ce2"
+            },
+            ".data": {
+              "rva": 9441280,
+              "virtualBytes": 8192,
+              "flags": 3221225536,
+              "rawPointer": 9434624,
+              "rawBytes": 1024,
+              "sha256": "857cef65632b99b1f05f68396a5f46edc036c194421f2827bc2f7f7c5ade51df"
+            },
+            ".pdata": {
+              "rva": 9449472,
+              "virtualBytes": 163976,
+              "flags": 1073741888,
+              "rawPointer": 9435648,
+              "rawBytes": 164352,
+              "sha256": "b83a6f21343e20606e90d12fb1bca9c845739f92e041e8ec9531f1120c700cc5"
+            },
+            ".tls": {
+              "rva": 9617408,
+              "virtualBytes": 2072,
+              "flags": 3221225536,
+              "rawPointer": 9600000,
+              "rawBytes": 2560,
+              "sha256": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15"
+            },
+            ".reloc": {
+              "rva": 9621504,
+              "virtualBytes": 12416,
+              "flags": 1107296320,
+              "rawPointer": 9602560,
+              "rawBytes": 12800,
+              "sha256": "e6891c1be590b93babd7efc7905dfa0f0a0301c01db62f87f444ed38cf1a74ff"
+            },
+            ".debug_abbrev": {
+              "rva": 9637888,
+              "virtualBytes": 14410,
+              "flags": 1107296320,
+              "rawPointer": 9615360,
+              "rawBytes": 14848,
+              "sha256": "c1090bb52a6263c9efd880e3f53897972a90fa0b45f91057b9ac06699377586a"
+            },
+            ".debug_info": {
+              "rva": 9654272,
+              "virtualBytes": 65602,
+              "flags": 1107296320,
+              "rawPointer": 9630208,
+              "rawBytes": 66048,
+              "sha256": "49e962a8b252ffefa9c33ac6e3f7f22e121372bf9e4aa2d6b6159c882f8d8501"
+            },
+            ".debug_line": {
+              "rva": 9723904,
+              "virtualBytes": 45736,
+              "flags": 1107296320,
+              "rawPointer": 9696256,
+              "rawBytes": 46080,
+              "sha256": "5f0bc1f1f53e5b5a8f96b8cd575653f5786c8db944447869b34f35b65c94b524"
+            },
+            ".debug_loc": {
+              "rva": 9773056,
+              "virtualBytes": 118963,
+              "flags": 1107296320,
+              "rawPointer": 9742336,
+              "rawBytes": 119296,
+              "sha256": "585b2267b8841e6ca833b25663381920bc8322f635f9c301dbe688f0d63709dd"
+            },
+            ".debug_ranges": {
+              "rva": 9895936,
+              "virtualBytes": 11152,
+              "flags": 1107296320,
+              "rawPointer": 9861632,
+              "rawBytes": 11264,
+              "sha256": "9977841910b033d01d0b889b6124cb021724ebaed6dd85c47ea84a79db5a5575"
+            },
+            ".debug_str": {
+              "rva": 9908224,
+              "virtualBytes": 32588,
+              "flags": 1107296320,
+              "rawPointer": 9872896,
+              "rawBytes": 32768,
+              "sha256": "e78929982fad683d0c09145b65a56aa285f72527da5ef31b789fbf350b426951"
+            }
+          }
+        }
+      },
+      {
+        "file": "wasm-ctor-eval.exe",
+        "originalSha256": "3053fd3d68e53facc6b8b198be09eed6f870b5a15af61a1d49c01a79f1cbf9e5",
+        "proposedSha256": "574bdf0603bc83066d6082d97f39e50e89d15f1a85e32b4eda81c9938d056449",
+        "addition": {
+          "resourceRva": 10211328,
+          "resourceRawPointer": 13921792,
+          "resourceBytes": 542,
+          "originalBytes": 13921792,
+          "addedBytes": 1024,
+          "headerEdits": [
+            {
+              "offset": 126,
+              "bytes": 2
+            },
+            {
+              "offset": 152,
+              "bytes": 4
+            },
+            {
+              "offset": 200,
+              "bytes": 4
+            },
+            {
+              "offset": 208,
+              "bytes": 4
+            },
+            {
+              "offset": 272,
+              "bytes": 8
+            },
+            {
+              "offset": 904,
+              "bytes": 40
+            }
+          ]
+        },
+        "preservedExecutionIdentity": {
+          "machine": 43620,
+          "entryPoint": 5160,
+          "imageBase": 5368709120,
+          "coffFlags": 34,
+          "coffSymbols": {
+            "pointer": 10175488,
+            "count": 33533,
+            "sha256": "5bae7b5fc12aaad69b86f2ca49eb2888e197181ed1445ed8c6489a50b6a2cb6f"
+          },
+          "loaderSettings": "0010000000020000060000000000000006000000000000000300608100008000000000000010000000000000000010000000000000100000000000000000000010000000",
+          "directories": [
+            [
+              0,
+              0
+            ],
+            [
+              8603736,
+              260
+            ],
+            null,
+            [
+              9719808,
+              166440
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              ".reloc",
+              0,
+              12728
+            ],
+            [
+              9707520,
+              28
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8107272,
+              40
+            ],
+            [
+              8602848,
+              312
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8606080,
+              2080
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "sections": {
+            ".text": {
+              "rva": 4096,
+              "virtualBytes": 8002516,
+              "flags": 1610612768,
+              "rawPointer": 1024,
+              "rawBytes": 8002560,
+              "sha256": "25016fcc187095d3f83b1521a9a8532c1db45655acc356357428c4c5089c6183"
+            },
+            ".rdata": {
+              "rva": 8007680,
+              "virtualBytes": 1697784,
+              "flags": 1073741888,
+              "rawPointer": 8003584,
+              "rawBytes": 1697792,
+              "sha256": "d6fc233b4c112335b7ffd22e3c8e6ea4ad75201305a6a1c4722c40834268fc9d"
+            },
+            ".buildid": {
+              "rva": 9707520,
+              "virtualBytes": 53,
+              "flags": 1073741888,
+              "rawPointer": 9701376,
+              "rawBytes": 512,
+              "sha256": "e1cf21a04af9585b2e9f814ac61856a6e93c8011c8be6d8a342d903ce3618747"
+            },
+            ".data": {
+              "rva": 9711616,
+              "virtualBytes": 8184,
+              "flags": 3221225536,
+              "rawPointer": 9701888,
+              "rawBytes": 1024,
+              "sha256": "81ca174691d93cabaec978a8e2aa391c7054e9827837867475d1d77a657727de"
+            },
+            ".pdata": {
+              "rva": 9719808,
+              "virtualBytes": 166440,
+              "flags": 1073741888,
+              "rawPointer": 9702912,
+              "rawBytes": 166912,
+              "sha256": "0d305869fceec40efb5532ca72ac048363ef24ad79dd803969302386c4a0a1d3"
+            },
+            ".tls": {
+              "rva": 9887744,
+              "virtualBytes": 2072,
+              "flags": 3221225536,
+              "rawPointer": 9869824,
+              "rawBytes": 2560,
+              "sha256": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15"
+            },
+            ".reloc": {
+              "rva": 9891840,
+              "virtualBytes": 12728,
+              "flags": 1107296320,
+              "rawPointer": 9872384,
+              "rawBytes": 12800,
+              "sha256": "1b9d00451296a836eab37b8582a0dc49b4ecf8b5acd9c53edea03cf4f06a0213"
+            },
+            ".debug_abbrev": {
+              "rva": 9908224,
+              "virtualBytes": 14410,
+              "flags": 1107296320,
+              "rawPointer": 9885184,
+              "rawBytes": 14848,
+              "sha256": "06d931e28b12bd9c85b7c142cd30232509d0a7e9ee1a098548f9ae3b16fd59d2"
+            },
+            ".debug_info": {
+              "rva": 9924608,
+              "virtualBytes": 65602,
+              "flags": 1107296320,
+              "rawPointer": 9900032,
+              "rawBytes": 66048,
+              "sha256": "001582b535e4850a909060adc22871d9f7a9215511fad3610f6035431046f81e"
+            },
+            ".debug_line": {
+              "rva": 9994240,
+              "virtualBytes": 45736,
+              "flags": 1107296320,
+              "rawPointer": 9966080,
+              "rawBytes": 46080,
+              "sha256": "0a36df8021e26a23c30a3055c1676e5a571f62402ded3f1f27f765e21a6c0270"
+            },
+            ".debug_loc": {
+              "rva": 10043392,
+              "virtualBytes": 118963,
+              "flags": 1107296320,
+              "rawPointer": 10012160,
+              "rawBytes": 119296,
+              "sha256": "7891e0e8e744a0f65acd416b7784165e0c078c88e34cabb4ce747bdbc154896f"
+            },
+            ".debug_ranges": {
+              "rva": 10166272,
+              "virtualBytes": 11152,
+              "flags": 1107296320,
+              "rawPointer": 10131456,
+              "rawBytes": 11264,
+              "sha256": "7832b3c8f5db2920eaf46f1ef80452e081ea3b62d6d61e8e0b695fa5f7281623"
+            },
+            ".debug_str": {
+              "rva": 10178560,
+              "virtualBytes": 32588,
+              "flags": 1107296320,
+              "rawPointer": 10142720,
+              "rawBytes": 32768,
+              "sha256": "da7083d57a40c15f78879afa6ed701ecb7802fd5f4658501ce6fd4a699a11cef"
+            }
+          }
+        }
+      },
+      {
+        "file": "wasm-dis.exe",
+        "originalSha256": "1df1b56093d2bf7fad45844ac12f5be05b1319292b925e6538b8c3ede819d4aa",
+        "proposedSha256": "a2a506a190f9044af33c226db2c804d570f4fbef861e0e6847b5188c3528d5c3",
+        "addition": {
+          "resourceRva": 9936896,
+          "resourceRawPointer": 13580800,
+          "resourceBytes": 542,
+          "originalBytes": 13580800,
+          "addedBytes": 1024,
+          "headerEdits": [
+            {
+              "offset": 126,
+              "bytes": 2
+            },
+            {
+              "offset": 152,
+              "bytes": 4
+            },
+            {
+              "offset": 200,
+              "bytes": 4
+            },
+            {
+              "offset": 208,
+              "bytes": 4
+            },
+            {
+              "offset": 272,
+              "bytes": 8
+            },
+            {
+              "offset": 904,
+              "bytes": 40
+            }
+          ]
+        },
+        "preservedExecutionIdentity": {
+          "machine": 43620,
+          "entryPoint": 5160,
+          "imageBase": 5368709120,
+          "coffFlags": 34,
+          "coffSymbols": {
+            "pointer": 9899520,
+            "count": 32914,
+            "sha256": "d73aa3de8d7b656b0425d6ae0c695efdb2d0596b4b571af6ec40be135ce75863"
+          },
+          "loaderSettings": "0010000000020000060000000000000006000000000000000300608100008000000000000010000000000000000010000000000000100000000000000000000010000000",
+          "directories": [
+            [
+              0,
+              0
+            ],
+            [
+              8359088,
+              260
+            ],
+            null,
+            [
+              9445376,
+              163904
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              ".reloc",
+              0,
+              12352
+            ],
+            [
+              9433088,
+              28
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              7798016,
+              40
+            ],
+            [
+              8358224,
+              312
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8361424,
+              2072
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "sections": {
+            ".text": {
+              "rva": 4096,
+              "virtualBytes": 7768932,
+              "flags": 1610612768,
+              "rawPointer": 1024,
+              "rawBytes": 7769088,
+              "sha256": "535f0ead11b71409369d201bd3e73419708c7edf1a2e04bc07cbd4ef6c0bde0c"
+            },
+            ".rdata": {
+              "rva": 7774208,
+              "virtualBytes": 1657500,
+              "flags": 1073741888,
+              "rawPointer": 7770112,
+              "rawBytes": 1657856,
+              "sha256": "4e36b7b21931f76b5677ca589a9a303681d1e85ad2df35bbf38cd72c7ce9faa4"
+            },
+            ".buildid": {
+              "rva": 9433088,
+              "virtualBytes": 53,
+              "flags": 1073741888,
+              "rawPointer": 9427968,
+              "rawBytes": 512,
+              "sha256": "8da9b383d0e031cba7cfc5bf1725c2019bb06444daf93148eb4f309a026208cd"
+            },
+            ".data": {
+              "rva": 9437184,
+              "virtualBytes": 8192,
+              "flags": 3221225536,
+              "rawPointer": 9428480,
+              "rawBytes": 1024,
+              "sha256": "00e89525a3728a0663328170b46da09e779834670ce0806c19477fe1d155d084"
+            },
+            ".pdata": {
+              "rva": 9445376,
+              "virtualBytes": 163904,
+              "flags": 1073741888,
+              "rawPointer": 9429504,
+              "rawBytes": 164352,
+              "sha256": "398c288275832ba04915444e1cbd6f6ae7e8b83e6b9c68ec98a55c5188794c77"
+            },
+            ".tls": {
+              "rva": 9613312,
+              "virtualBytes": 2072,
+              "flags": 3221225536,
+              "rawPointer": 9593856,
+              "rawBytes": 2560,
+              "sha256": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15"
+            },
+            ".reloc": {
+              "rva": 9617408,
+              "virtualBytes": 12352,
+              "flags": 1107296320,
+              "rawPointer": 9596416,
+              "rawBytes": 12800,
+              "sha256": "5c578929d85dde668141dd7271a02571f10da2f14524f8bdd906823b2449c853"
+            },
+            ".debug_abbrev": {
+              "rva": 9633792,
+              "virtualBytes": 14410,
+              "flags": 1107296320,
+              "rawPointer": 9609216,
+              "rawBytes": 14848,
+              "sha256": "f185b2b3e7327dd5ec7ae19cf4377b9f9238e21e00731ce7a5fa5f42c38730fd"
+            },
+            ".debug_info": {
+              "rva": 9650176,
+              "virtualBytes": 65602,
+              "flags": 1107296320,
+              "rawPointer": 9624064,
+              "rawBytes": 66048,
+              "sha256": "da81de6f3f387983bf04eed3210cbb2c532fa2952fb45f5261de04fd8722f0a2"
+            },
+            ".debug_line": {
+              "rva": 9719808,
+              "virtualBytes": 45736,
+              "flags": 1107296320,
+              "rawPointer": 9690112,
+              "rawBytes": 46080,
+              "sha256": "2f8cf39f22ea6dd55a61cc86df3614ca7350adaeaaf769c83b0e974c48b57f6b"
+            },
+            ".debug_loc": {
+              "rva": 9768960,
+              "virtualBytes": 118963,
+              "flags": 1107296320,
+              "rawPointer": 9736192,
+              "rawBytes": 119296,
+              "sha256": "edcdd15c21daa18f8bb1a8baf6d83f8f7b6fad7a80138585f30fff9ad158837b"
+            },
+            ".debug_ranges": {
+              "rva": 9891840,
+              "virtualBytes": 11152,
+              "flags": 1107296320,
+              "rawPointer": 9855488,
+              "rawBytes": 11264,
+              "sha256": "9977841910b033d01d0b889b6124cb021724ebaed6dd85c47ea84a79db5a5575"
+            },
+            ".debug_str": {
+              "rva": 9904128,
+              "virtualBytes": 32588,
+              "flags": 1107296320,
+              "rawPointer": 9866752,
+              "rawBytes": 32768,
+              "sha256": "f611b406cb5a755eccb042b5893694949fc5fc9df4376e8c3bc31484ea221d10"
+            }
+          }
+        }
+      },
+      {
+        "file": "wasm-emscripten-finalize.exe",
+        "originalSha256": "020ec5e216aa491fce68874ffd74b296514287dd10b3f8c15e2342e027e99376",
+        "proposedSha256": "0f1852a11267ddfb98e1b8b998e04bf6e7f6836a49201fd925f6b89a95e0755e",
+        "addition": {
+          "resourceRva": 9953280,
+          "resourceRawPointer": 13605888,
+          "resourceBytes": 542,
+          "originalBytes": 13605888,
+          "addedBytes": 1024,
+          "headerEdits": [
+            {
+              "offset": 126,
+              "bytes": 2
+            },
+            {
+              "offset": 152,
+              "bytes": 4
+            },
+            {
+              "offset": 200,
+              "bytes": 4
+            },
+            {
+              "offset": 208,
+              "bytes": 4
+            },
+            {
+              "offset": 272,
+              "bytes": 8
+            },
+            {
+              "offset": 904,
+              "bytes": 40
+            }
+          ]
+        },
+        "preservedExecutionIdentity": {
+          "machine": 43620,
+          "entryPoint": 5160,
+          "imageBase": 5368709120,
+          "coffFlags": 34,
+          "coffSymbols": {
+            "pointer": 9911296,
+            "count": 33008,
+            "sha256": "760af0135ca032bc0941a91d4e51238169b8ad0ec0e3553ba0a3aaa1e432e93d"
+          },
+          "loaderSettings": "0010000000020000060000000000000006000000000000000300608100008000000000000010000000000000000010000000000000100000000000000000000010000000",
+          "directories": [
+            [
+              0,
+              0
+            ],
+            [
+              8369320,
+              260
+            ],
+            null,
+            [
+              9461760,
+              164008
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              ".reloc",
+              0,
+              12564
+            ],
+            [
+              9445376,
+              28
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              7821544,
+              40
+            ],
+            [
+              8368456,
+              312
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8371656,
+              2072
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "sections": {
+            ".text": {
+              "rva": 4096,
+              "virtualBytes": 7777300,
+              "flags": 1610612768,
+              "rawPointer": 1024,
+              "rawBytes": 7777792,
+              "sha256": "f9f71edba3d49f8af7106f7c183f8ef53ee05c6dcb2f8bb69ce1b1371c670871"
+            },
+            ".rdata": {
+              "rva": 7782400,
+              "virtualBytes": 1660524,
+              "flags": 1073741888,
+              "rawPointer": 7778816,
+              "rawBytes": 1660928,
+              "sha256": "8309687f0d7ee7deabbf7cc4b996dcec5504e1e264858346e99d8af5f9ea248d"
+            },
+            ".buildid": {
+              "rva": 9445376,
+              "virtualBytes": 53,
+              "flags": 1073741888,
+              "rawPointer": 9439744,
+              "rawBytes": 512,
+              "sha256": "a77348622bb65e356ecaa266a51a775c0a452f53b7a9013f52c323a5f697bdbe"
+            },
+            ".data": {
+              "rva": 9449472,
+              "virtualBytes": 8200,
+              "flags": 3221225536,
+              "rawPointer": 9440256,
+              "rawBytes": 1024,
+              "sha256": "007e5275646ad80bfaaab91dfb1c993020d0cc8aedc9f5ac98605b4cef5e43cd"
+            },
+            ".pdata": {
+              "rva": 9461760,
+              "virtualBytes": 164008,
+              "flags": 1073741888,
+              "rawPointer": 9441280,
+              "rawBytes": 164352,
+              "sha256": "f9214a45175b635be2c55fba3f61bb4299cebbe57051c47a92ddf56d4e635595"
+            },
+            ".tls": {
+              "rva": 9629696,
+              "virtualBytes": 2072,
+              "flags": 3221225536,
+              "rawPointer": 9605632,
+              "rawBytes": 2560,
+              "sha256": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15"
+            },
+            ".reloc": {
+              "rva": 9633792,
+              "virtualBytes": 12564,
+              "flags": 1107296320,
+              "rawPointer": 9608192,
+              "rawBytes": 12800,
+              "sha256": "ef5de48ad6485fad96c695bfeaf9f97d6596b9561017440c588d47c9aa07857b"
+            },
+            ".debug_abbrev": {
+              "rva": 9650176,
+              "virtualBytes": 14410,
+              "flags": 1107296320,
+              "rawPointer": 9620992,
+              "rawBytes": 14848,
+              "sha256": "e1997856a37167a7d3c28a8186614ed1a5251bedf4abd797c354ff92daca6886"
+            },
+            ".debug_info": {
+              "rva": 9666560,
+              "virtualBytes": 65602,
+              "flags": 1107296320,
+              "rawPointer": 9635840,
+              "rawBytes": 66048,
+              "sha256": "4e714e8b9a266096f3dff01828cb531278dc440e0ab27db3b93bfdafcf54cc40"
+            },
+            ".debug_line": {
+              "rva": 9736192,
+              "virtualBytes": 45736,
+              "flags": 1107296320,
+              "rawPointer": 9701888,
+              "rawBytes": 46080,
+              "sha256": "d5e2aaae5d204a78b5ebdc77a8e6554313b983cf4212275195810a398b525213"
+            },
+            ".debug_loc": {
+              "rva": 9785344,
+              "virtualBytes": 118963,
+              "flags": 1107296320,
+              "rawPointer": 9747968,
+              "rawBytes": 119296,
+              "sha256": "16a7da52c979c5cde04edabf02bdfe51b96d9091d4e4a0041d1479cead97fced"
+            },
+            ".debug_ranges": {
+              "rva": 9908224,
+              "virtualBytes": 11152,
+              "flags": 1107296320,
+              "rawPointer": 9867264,
+              "rawBytes": 11264,
+              "sha256": "9977841910b033d01d0b889b6124cb021724ebaed6dd85c47ea84a79db5a5575"
+            },
+            ".debug_str": {
+              "rva": 9920512,
+              "virtualBytes": 32588,
+              "flags": 1107296320,
+              "rawPointer": 9878528,
+              "rawBytes": 32768,
+              "sha256": "893bf8c167b73027cfe7aec3b5bd35c251e3efafa6295249e04ad702cab0dc31"
+            }
+          }
+        }
+      },
+      {
+        "file": "wasm-metadce.exe",
+        "originalSha256": "836a02e235124931da48121e40a9a734eb8bdabfaf97469402c377018d0faad9",
+        "proposedSha256": "0f6c2f5d26da613f8c2bc9e3ec329ce2f18da78f6f33a05d4a298539e11da12b",
+        "addition": {
+          "resourceRva": 10022912,
+          "resourceRawPointer": 13738496,
+          "resourceBytes": 542,
+          "originalBytes": 13738496,
+          "addedBytes": 1024,
+          "headerEdits": [
+            {
+              "offset": 126,
+              "bytes": 2
+            },
+            {
+              "offset": 152,
+              "bytes": 4
+            },
+            {
+              "offset": 200,
+              "bytes": 4
+            },
+            {
+              "offset": 208,
+              "bytes": 4
+            },
+            {
+              "offset": 272,
+              "bytes": 8
+            },
+            {
+              "offset": 904,
+              "bytes": 40
+            }
+          ]
+        },
+        "preservedExecutionIdentity": {
+          "machine": 43620,
+          "entryPoint": 5160,
+          "imageBase": 5368709120,
+          "coffFlags": 34,
+          "coffSymbols": {
+            "pointer": 9987072,
+            "count": 33369,
+            "sha256": "d4da2cc00832d8b8f4802103400ac046d6711b2a5469cd6c88b7c81b8a97a127"
+          },
+          "loaderSettings": "0010000000020000060000000000000006000000000000000300608100008000000000000010000000000000000010000000000000100000000000000000000010000000",
+          "directories": [
+            [
+              0,
+              0
+            ],
+            [
+              8437944,
+              260
+            ],
+            null,
+            [
+              9531392,
+              165752
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              ".reloc",
+              0,
+              12816
+            ],
+            [
+              9519104,
+              28
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              7928904,
+              40
+            ],
+            [
+              8437080,
+              312
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8440288,
+              2080
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "sections": {
+            ".text": {
+              "rva": 4096,
+              "virtualBytes": 7837556,
+              "flags": 1610612768,
+              "rawPointer": 1024,
+              "rawBytes": 7837696,
+              "sha256": "6a088531e875d2dd4ec0bec5a8ff14ef25d78f5bcb6462bd7e87885be47c90fa"
+            },
+            ".rdata": {
+              "rva": 7843840,
+              "virtualBytes": 1674596,
+              "flags": 1073741888,
+              "rawPointer": 7838720,
+              "rawBytes": 1674752,
+              "sha256": "fef170332a6e24d6e7eb4218e7b819134b65b6c648c563fe29babc9899692ae2"
+            },
+            ".buildid": {
+              "rva": 9519104,
+              "virtualBytes": 53,
+              "flags": 1073741888,
+              "rawPointer": 9513472,
+              "rawBytes": 512,
+              "sha256": "9c923af7819e6dd84c1ea6d38ba8eac8b85d2c152bcf517c8114453a671666d7"
+            },
+            ".data": {
+              "rva": 9523200,
+              "virtualBytes": 8176,
+              "flags": 3221225536,
+              "rawPointer": 9513984,
+              "rawBytes": 1024,
+              "sha256": "b1097f9589f336931aca6968bb8b298a0e2741e86c579946c71043b70d1e7093"
+            },
+            ".pdata": {
+              "rva": 9531392,
+              "virtualBytes": 165752,
+              "flags": 1073741888,
+              "rawPointer": 9515008,
+              "rawBytes": 165888,
+              "sha256": "8f195b91ce5e4483381ee462a6a221529a103a6a7e6ac6a54ef3b959c9811a53"
+            },
+            ".tls": {
+              "rva": 9699328,
+              "virtualBytes": 2072,
+              "flags": 3221225536,
+              "rawPointer": 9680896,
+              "rawBytes": 2560,
+              "sha256": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15"
+            },
+            ".reloc": {
+              "rva": 9703424,
+              "virtualBytes": 12816,
+              "flags": 1107296320,
+              "rawPointer": 9683456,
+              "rawBytes": 13312,
+              "sha256": "5f01cb81dc34162aa21509916c1e148a422cebec3cf0ec0d5f5e21c5ab7281ed"
+            },
+            ".debug_abbrev": {
+              "rva": 9719808,
+              "virtualBytes": 14410,
+              "flags": 1107296320,
+              "rawPointer": 9696768,
+              "rawBytes": 14848,
+              "sha256": "1f73c4701970edd3da93d569e812be467a2bc858bd98d918ed57b8e3a8fc9223"
+            },
+            ".debug_info": {
+              "rva": 9736192,
+              "virtualBytes": 65602,
+              "flags": 1107296320,
+              "rawPointer": 9711616,
+              "rawBytes": 66048,
+              "sha256": "3ba8bebe99422fcb2519aba59299410ac791abc0583210b8c7913290ba62e64a"
+            },
+            ".debug_line": {
+              "rva": 9805824,
+              "virtualBytes": 45736,
+              "flags": 1107296320,
+              "rawPointer": 9777664,
+              "rawBytes": 46080,
+              "sha256": "102518c283182d9d6611c3bf1e01a6d57a3ea1db272a9d18fdfcd9df7630334f"
+            },
+            ".debug_loc": {
+              "rva": 9854976,
+              "virtualBytes": 118963,
+              "flags": 1107296320,
+              "rawPointer": 9823744,
+              "rawBytes": 119296,
+              "sha256": "52866de11f1530c60b15eb5ed95086e90c587d3b172b297a87efe35a3202444e"
+            },
+            ".debug_ranges": {
+              "rva": 9977856,
+              "virtualBytes": 11152,
+              "flags": 1107296320,
+              "rawPointer": 9943040,
+              "rawBytes": 11264,
+              "sha256": "9977841910b033d01d0b889b6124cb021724ebaed6dd85c47ea84a79db5a5575"
+            },
+            ".debug_str": {
+              "rva": 9990144,
+              "virtualBytes": 32588,
+              "flags": 1107296320,
+              "rawPointer": 9954304,
+              "rawBytes": 32768,
+              "sha256": "2050e7de0e2057f2d2268c3ad9a383400efa703e65474ca2d7ad5129adbb5984"
+            }
+          }
+        }
+      },
+      {
+        "file": "wasm-opt.exe",
+        "originalSha256": "c9e25fe180e92008d326b36fb73406fe7346b01fad9f65b2327bc3f6fea8c15f",
+        "proposedSha256": "bf88e122932e69b3dff839ebc5297c8988d9d9a5c1ab7ff49a30a69b49576622",
+        "addition": {
+          "resourceRva": 10960896,
+          "resourceRawPointer": 15047680,
+          "resourceBytes": 542,
+          "originalBytes": 15047680,
+          "addedBytes": 1024,
+          "headerEdits": [
+            {
+              "offset": 126,
+              "bytes": 2
+            },
+            {
+              "offset": 152,
+              "bytes": 4
+            },
+            {
+              "offset": 200,
+              "bytes": 4
+            },
+            {
+              "offset": 208,
+              "bytes": 4
+            },
+            {
+              "offset": 272,
+              "bytes": 8
+            },
+            {
+              "offset": 904,
+              "bytes": 40
+            }
+          ]
+        },
+        "preservedExecutionIdentity": {
+          "machine": 43620,
+          "entryPoint": 5160,
+          "imageBase": 5368709120,
+          "coffFlags": 34,
+          "coffSymbols": {
+            "pointer": 10920448,
+            "count": 36176,
+            "sha256": "4e05030103722bba5c3e916892af6137017fd0975129d22aa38b2fda3f8f2eed"
+          },
+          "loaderSettings": "0010000000020000060000000000000006000000000000000300608100008000000000000010000000000000000010000000000000100000000000000000000010000000",
+          "directories": [
+            [
+              0,
+              0
+            ],
+            [
+              9257424,
+              260
+            ],
+            null,
+            [
+              10452992,
+              182640
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              ".reloc",
+              0,
+              13604
+            ],
+            [
+              10436608,
+              28
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8782312,
+              40
+            ],
+            [
+              9256512,
+              312
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              9259792,
+              2104
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "sections": {
+            ".text": {
+              "rva": 4096,
+              "virtualBytes": 8631844,
+              "flags": 1610612768,
+              "rawPointer": 1024,
+              "rawBytes": 8632320,
+              "sha256": "05862bbf4860321459d70ac7446e88faf29d4426b915942215c7af6aebb2938c"
+            },
+            ".rdata": {
+              "rva": 8638464,
+              "virtualBytes": 1795664,
+              "flags": 1073741888,
+              "rawPointer": 8633344,
+              "rawBytes": 1796096,
+              "sha256": "8439c8b4461eb53075f8877aebf4398fbc48c0f03ae09fee0829ea4bc3f05880"
+            },
+            ".buildid": {
+              "rva": 10436608,
+              "virtualBytes": 53,
+              "flags": 1073741888,
+              "rawPointer": 10429440,
+              "rawBytes": 512,
+              "sha256": "2f6dae2b31076dfa7a31107bed44ff800ad0b5ee43fac5acf2d79ccaa7d699ab"
+            },
+            ".data": {
+              "rva": 10440704,
+              "virtualBytes": 8360,
+              "flags": 3221225536,
+              "rawPointer": 10429952,
+              "rawBytes": 1024,
+              "sha256": "6d7114b08c2752567379cf73e2e4276bca86335a2b911ca6a403a9423eb58b62"
+            },
+            ".pdata": {
+              "rva": 10452992,
+              "virtualBytes": 182640,
+              "flags": 1073741888,
+              "rawPointer": 10430976,
+              "rawBytes": 182784,
+              "sha256": "e5223d667226db3d231798858480ef079db5723f3e71bf2010fdd58441ce1e11"
+            },
+            ".tls": {
+              "rva": 10637312,
+              "virtualBytes": 2072,
+              "flags": 3221225536,
+              "rawPointer": 10613760,
+              "rawBytes": 2560,
+              "sha256": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15"
+            },
+            ".reloc": {
+              "rva": 10641408,
+              "virtualBytes": 13604,
+              "flags": 1107296320,
+              "rawPointer": 10616320,
+              "rawBytes": 13824,
+              "sha256": "d15b69ca99cfcde9a31c3b98552d77a37af19819550aeda9f6fc85ced98958c8"
+            },
+            ".debug_abbrev": {
+              "rva": 10657792,
+              "virtualBytes": 14410,
+              "flags": 1107296320,
+              "rawPointer": 10630144,
+              "rawBytes": 14848,
+              "sha256": "5dbe4979f6eec73914305c8474d464bbe6701d44ef6d71cffa24bf58786d69d9"
+            },
+            ".debug_info": {
+              "rva": 10674176,
+              "virtualBytes": 65602,
+              "flags": 1107296320,
+              "rawPointer": 10644992,
+              "rawBytes": 66048,
+              "sha256": "a1830f37a008be0653b7c2b6fe9b96e9b6c368d5cb0f55f1932c1f4c0460ba5a"
+            },
+            ".debug_line": {
+              "rva": 10743808,
+              "virtualBytes": 45736,
+              "flags": 1107296320,
+              "rawPointer": 10711040,
+              "rawBytes": 46080,
+              "sha256": "ca029072861b896fb5081a9ed1140bb61cbf48894961967068f9ca9fff5d63c3"
+            },
+            ".debug_loc": {
+              "rva": 10792960,
+              "virtualBytes": 118963,
+              "flags": 1107296320,
+              "rawPointer": 10757120,
+              "rawBytes": 119296,
+              "sha256": "ab4d425d747e93291a192783ef777967630ae7cfce1bf31b828e86ae4bba95f8"
+            },
+            ".debug_ranges": {
+              "rva": 10915840,
+              "virtualBytes": 11152,
+              "flags": 1107296320,
+              "rawPointer": 10876416,
+              "rawBytes": 11264,
+              "sha256": "7832b3c8f5db2920eaf46f1ef80452e081ea3b62d6d61e8e0b695fa5f7281623"
+            },
+            ".debug_str": {
+              "rva": 10928128,
+              "virtualBytes": 32588,
+              "flags": 1107296320,
+              "rawPointer": 10887680,
+              "rawBytes": 32768,
+              "sha256": "804e5fa2b2d71bec1455f582bc4a5c3bd261846393a6cf9debbae613292b9962"
+            }
+          }
+        }
+      },
+      {
+        "file": "wasm-split.exe",
+        "originalSha256": "8c854e745167f8a3ef19d71d984e4ea901c0153d02cadf768259ed215719f670",
+        "proposedSha256": "ca8e59f55885bf362da44903d0b333ff2beecf00bfa7857468b6cdfbcb38dd57",
+        "addition": {
+          "resourceRva": 10137600,
+          "resourceRawPointer": 13931520,
+          "resourceBytes": 542,
+          "originalBytes": 13931520,
+          "addedBytes": 1024,
+          "headerEdits": [
+            {
+              "offset": 126,
+              "bytes": 2
+            },
+            {
+              "offset": 152,
+              "bytes": 4
+            },
+            {
+              "offset": 200,
+              "bytes": 4
+            },
+            {
+              "offset": 208,
+              "bytes": 4
+            },
+            {
+              "offset": 272,
+              "bytes": 8
+            },
+            {
+              "offset": 904,
+              "bytes": 40
+            }
+          ]
+        },
+        "preservedExecutionIdentity": {
+          "machine": 43620,
+          "entryPoint": 5160,
+          "imageBase": 5368709120,
+          "coffFlags": 34,
+          "coffSymbols": {
+            "pointer": 10100224,
+            "count": 33731,
+            "sha256": "7028d6b50c23d7d90fcfa9c32c12b44a09debec2ae208ce66c8ed07fe2ec19c4"
+          },
+          "loaderSettings": "0010000000020000060000000000000006000000000000000300608100008000000000000010000000000000000010000000000000100000000000000000000010000000",
+          "directories": [
+            [
+              0,
+              0
+            ],
+            [
+              8538032,
+              260
+            ],
+            null,
+            [
+              9646080,
+              167336
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              ".reloc",
+              0,
+              13020
+            ],
+            [
+              9629696,
+              28
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8021840,
+              40
+            ],
+            [
+              8537168,
+              312
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8540376,
+              2080
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "sections": {
+            ".text": {
+              "rva": 4096,
+              "virtualBytes": 7933504,
+              "flags": 1610612768,
+              "rawPointer": 1024,
+              "rawBytes": 7933952,
+              "sha256": "e24693f52cde6fce36da034af0066626292fb887e7280608fd9b7fb96ebc3853"
+            },
+            ".rdata": {
+              "rva": 7938048,
+              "virtualBytes": 1689728,
+              "flags": 1073741888,
+              "rawPointer": 7934976,
+              "rawBytes": 1690112,
+              "sha256": "191181efbab6b355d3e60d22c63f59ad83335f548c247ef83fb2e9c14fc7fd2c"
+            },
+            ".buildid": {
+              "rva": 9629696,
+              "virtualBytes": 53,
+              "flags": 1073741888,
+              "rawPointer": 9625088,
+              "rawBytes": 512,
+              "sha256": "1dde44adcae02ad2393366e2df32c1d081ed8e5430fec2633eb653b562adb6a0"
+            },
+            ".data": {
+              "rva": 9633792,
+              "virtualBytes": 8248,
+              "flags": 3221225536,
+              "rawPointer": 9625600,
+              "rawBytes": 1024,
+              "sha256": "003913a253f30c009ccb5ee1839b97a0aa0054dc064a0d11040afdd9c825cbbc"
+            },
+            ".pdata": {
+              "rva": 9646080,
+              "virtualBytes": 167336,
+              "flags": 1073741888,
+              "rawPointer": 9626624,
+              "rawBytes": 167424,
+              "sha256": "33900c1eb3c704fab4b2577adf28af6f61f95b66e514b8fc2f131f44361d0178"
+            },
+            ".tls": {
+              "rva": 9814016,
+              "virtualBytes": 2072,
+              "flags": 3221225536,
+              "rawPointer": 9794048,
+              "rawBytes": 2560,
+              "sha256": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15"
+            },
+            ".reloc": {
+              "rva": 9818112,
+              "virtualBytes": 13020,
+              "flags": 1107296320,
+              "rawPointer": 9796608,
+              "rawBytes": 13312,
+              "sha256": "f47aace695b6a0bcad71375ac077347e9cded9c568a2c7c3d1a80cbb6bb7dc00"
+            },
+            ".debug_abbrev": {
+              "rva": 9834496,
+              "virtualBytes": 14410,
+              "flags": 1107296320,
+              "rawPointer": 9809920,
+              "rawBytes": 14848,
+              "sha256": "06d931e28b12bd9c85b7c142cd30232509d0a7e9ee1a098548f9ae3b16fd59d2"
+            },
+            ".debug_info": {
+              "rva": 9850880,
+              "virtualBytes": 65602,
+              "flags": 1107296320,
+              "rawPointer": 9824768,
+              "rawBytes": 66048,
+              "sha256": "3b476e77e4f1cd0289b7cf23d85dfda4eec6c86bf1296e483d06554029f8f8d5"
+            },
+            ".debug_line": {
+              "rva": 9920512,
+              "virtualBytes": 45736,
+              "flags": 1107296320,
+              "rawPointer": 9890816,
+              "rawBytes": 46080,
+              "sha256": "75eea774c1624e9560dcedc1a9dc365325b016bd78f4591aca0815546ef15309"
+            },
+            ".debug_loc": {
+              "rva": 9969664,
+              "virtualBytes": 118963,
+              "flags": 1107296320,
+              "rawPointer": 9936896,
+              "rawBytes": 119296,
+              "sha256": "7891e0e8e744a0f65acd416b7784165e0c078c88e34cabb4ce747bdbc154896f"
+            },
+            ".debug_ranges": {
+              "rva": 10092544,
+              "virtualBytes": 11152,
+              "flags": 1107296320,
+              "rawPointer": 10056192,
+              "rawBytes": 11264,
+              "sha256": "7832b3c8f5db2920eaf46f1ef80452e081ea3b62d6d61e8e0b695fa5f7281623"
+            },
+            ".debug_str": {
+              "rva": 10104832,
+              "virtualBytes": 32588,
+              "flags": 1107296320,
+              "rawPointer": 10067456,
+              "rawBytes": 32768,
+              "sha256": "da7083d57a40c15f78879afa6ed701ecb7802fd5f4658501ce6fd4a699a11cef"
+            }
+          }
+        }
+      },
+      {
+        "file": "wasm2js.exe",
+        "originalSha256": "09bf82d467c74249b8d9fc0b9ad8204455f0f5c4f272323d8afe4f57de014a11",
+        "proposedSha256": "a35718846c832fb6a1ec91fffb4e59244eb2b2412c096d2c5d8fa73b25e961e7",
+        "addition": {
+          "resourceRva": 10305536,
+          "resourceRawPointer": 14131200,
+          "resourceBytes": 542,
+          "originalBytes": 14131200,
+          "addedBytes": 1024,
+          "headerEdits": [
+            {
+              "offset": 126,
+              "bytes": 2
+            },
+            {
+              "offset": 152,
+              "bytes": 4
+            },
+            {
+              "offset": 200,
+              "bytes": 4
+            },
+            {
+              "offset": 208,
+              "bytes": 4
+            },
+            {
+              "offset": 272,
+              "bytes": 8
+            },
+            {
+              "offset": 904,
+              "bytes": 40
+            }
+          ]
+        },
+        "preservedExecutionIdentity": {
+          "machine": 43620,
+          "entryPoint": 5160,
+          "imageBase": 5368709120,
+          "coffFlags": 34,
+          "coffSymbols": {
+            "pointer": 10259456,
+            "count": 34451,
+            "sha256": "6d328c968da407065a72dabe3d19aaed5e94e0c16eddf61d536c1c2ebcc65b24"
+          },
+          "loaderSettings": "0010000000020000060000000000000006000000000000000300608100008000000000000010000000000000000010000000000000100000000000000000000010000000",
+          "directories": [
+            [
+              0,
+              0
+            ],
+            [
+              8679672,
+              280
+            ],
+            null,
+            [
+              9805824,
+              169424
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              ".reloc",
+              0,
+              13516
+            ],
+            [
+              9789440,
+              28
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8178456,
+              40
+            ],
+            [
+              8678776,
+              312
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              8682072,
+              2120
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "sections": {
+            ".text": {
+              "rva": 4096,
+              "virtualBytes": 8062196,
+              "flags": 1610612768,
+              "rawPointer": 1024,
+              "rawBytes": 8062464,
+              "sha256": "97a30a035032ee5015cd2ac517cd9c19185f1e9d67e360a8fb118eb0c8f9031a"
+            },
+            ".rdata": {
+              "rva": 8069120,
+              "virtualBytes": 1717176,
+              "flags": 1073741888,
+              "rawPointer": 8063488,
+              "rawBytes": 1717248,
+              "sha256": "6e46c21066943d5da4eba680687aadf991a2c8b3168d9e9336e9b4402e07b1fe"
+            },
+            ".buildid": {
+              "rva": 9789440,
+              "virtualBytes": 53,
+              "flags": 1073741888,
+              "rawPointer": 9780736,
+              "rawBytes": 512,
+              "sha256": "404f7b0216dd42fc24ebe96892c85ded1aa9b1027e9b52ed6a5004483fc91b4d"
+            },
+            ".data": {
+              "rva": 9793536,
+              "virtualBytes": 9096,
+              "flags": 3221225536,
+              "rawPointer": 9781248,
+              "rawBytes": 1024,
+              "sha256": "1df917a4e9328c8f793d7a5b630912fc7509b1a3b1ffc986a31b2fef0c88bf98"
+            },
+            ".pdata": {
+              "rva": 9805824,
+              "virtualBytes": 169424,
+              "flags": 1073741888,
+              "rawPointer": 9782272,
+              "rawBytes": 169472,
+              "sha256": "0dcc07be9f0c364ffc0f67ffaebce230ed5f294ddf92024cbd1a909eb18b65b2"
+            },
+            ".tls": {
+              "rva": 9977856,
+              "virtualBytes": 2072,
+              "flags": 3221225536,
+              "rawPointer": 9951744,
+              "rawBytes": 2560,
+              "sha256": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15"
+            },
+            ".reloc": {
+              "rva": 9981952,
+              "virtualBytes": 13516,
+              "flags": 1107296320,
+              "rawPointer": 9954304,
+              "rawBytes": 13824,
+              "sha256": "3f17bfb19725042d55b914aebb17046ff55e7fc0a63ee84b7452be19986b94e7"
+            },
+            ".debug_abbrev": {
+              "rva": 9998336,
+              "virtualBytes": 14655,
+              "flags": 1107296320,
+              "rawPointer": 9968128,
+              "rawBytes": 14848,
+              "sha256": "d623b23512bdf371493bb1d6eda20dfee337aad26ae74a9be9423e110d717a1c"
+            },
+            ".debug_info": {
+              "rva": 10014720,
+              "virtualBytes": 66049,
+              "flags": 1107296320,
+              "rawPointer": 9982976,
+              "rawBytes": 66560,
+              "sha256": "cc6f2c2910c7d4cc1f5bc5da6d764b666c49c8bf236e1b3fce540d55dd78a9a8"
+            },
+            ".debug_line": {
+              "rva": 10084352,
+              "virtualBytes": 46027,
+              "flags": 1107296320,
+              "rawPointer": 10049536,
+              "rawBytes": 46080,
+              "sha256": "8a0720044d0aac811c8fadd297efd26e89846ff61751ea2304c7819d5421a8c6"
+            },
+            ".debug_loc": {
+              "rva": 10133504,
+              "virtualBytes": 119147,
+              "flags": 1107296320,
+              "rawPointer": 10095616,
+              "rawBytes": 119296,
+              "sha256": "7f836c12d941e09fa227bbd90dd4353b3ae57e13dbdc1e98af6eba5e6bed388e"
+            },
+            ".debug_ranges": {
+              "rva": 10256384,
+              "virtualBytes": 11152,
+              "flags": 1107296320,
+              "rawPointer": 10214912,
+              "rawBytes": 11264,
+              "sha256": "a281041552f9faa91813cb5f05134940fddaa40bdbe18146981d5955a2192453"
+            },
+            ".debug_str": {
+              "rva": 10268672,
+              "virtualBytes": 32958,
+              "flags": 1107296320,
+              "rawPointer": 10226176,
+              "rawBytes": 33280,
+              "sha256": "fe53fb2b88b67b3ee35b631864b546aeb2218cf0fdcedbfeca3eb35fa51e5780"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "directAdditionResources": {
+    "startedAt": "2026-09-28T13:04:07.271Z",
+    "command": [
+      "/usr/bin/timeout",
+      "120",
+      "python3",
+      "-I",
+      "-B",
+      ".work/macos/check-binaryen-direct.py"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "f57755b2-9ce3-49fa-9444-55eeb2fef343",
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 21710376960
+    },
+    "minimumHostAvailable": 21595766784,
+    "peakMemoryBytes": 87273472,
+    "peakTasks": 2,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/macos/binaryen-direct-addition-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-28T13:04:11.680Z",
+      "memoryBytes": 82591744,
+      "peakMemoryBytes": 87273472,
+      "swapBytes": 0,
+      "tasks": 2,
+      "memoryBreakdown": {
+        "anon": 82128896,
+        "file": 0,
+        "kernel": 397312,
+        "shmem": 0,
+        "file_mapped": 0,
+        "inactive_file": 0,
+        "slab": 62728
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-28T13:04:11.868Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 14073856,
+      "peakMemoryBytes": 87273472,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11706368,
+        "file": 53248,
+        "kernel": 1073152,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 53248,
+        "slab": 143984
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-28T13:04:11.893Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "preparation": {
+    "resourceReport": {
+      "startedAt": "2026-09-28T12:59:01.194Z",
+      "command": [
+        "/usr/bin/timeout",
+        "600",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=128",
+        ".work/macos/inspect-binaryen-pe.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "23aff0da-51b1-47b7-b052-3e2b1ff1237c",
+      "limits": {
+        "memoryMax": 536870912,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 429496729,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 21686018048
+      },
+      "minimumHostAvailable": 21612150784,
+      "peakMemoryBytes": 182636544,
+      "peakTasks": 12,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/macos/binaryen-pe-inspection-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-28T13:00:16.798Z",
+        "memoryBytes": 175869952,
+        "peakMemoryBytes": 182636544,
+        "swapBytes": 0,
+        "tasks": 12,
+        "memoryBreakdown": {
+          "anon": 59351040,
+          "file": 111562752,
+          "kernel": 4943872,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 111562752,
+          "slab": 3566088
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-28T13:00:16.939Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 128806912,
+        "peakMemoryBytes": 182636544,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11718656,
+          "file": 111562752,
+          "kernel": 4378624,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 111562752,
+          "slab": 3463032
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-28T13:00:16.966Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "explanation": "Streaming extraction verified the full pinned archive hash, then its final count assertion failed because its pattern also selected the wasm-ld hard link. The subsequent independent check selected only the eight Binaryen files and verified each against the previously audited source hash before testing direct resource addition."
+  }
+}
