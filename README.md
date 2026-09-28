@@ -35,6 +35,9 @@ The first build needs internet access, downloads about 0.9–1.3 GB, and occupie
 several GB. Measured first builds took about 5–16 minutes. The terminal shows progress
 and elapsed time. Later builds reuse verified tools and unchanged outputs. See
 [cache locations, requirements, and recovery](docs/NODE_SUPPORT.md).
+Failed downloads currently require rerunning the command. The
+[installation robustness review](docs/TOOLCHAIN_ROBUSTNESS.md) records remaining
+recovery gaps and proposed automatic CI checks.
 
 Copy **all of `dist/`** to a supported machine with the **same OS, architecture,
 and Node version**. No Lean source, npm install, build tools, or development cache

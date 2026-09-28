@@ -1,0 +1,400 @@
+{
+  "schema": 1,
+  "at": "2026-09-28T15:23:39.324Z",
+  "sourceRevision": "e64fd3000e4d5486c6b446a8e56cc26a1f7e6a7c",
+  "node": "26.10.0",
+  "host": "linux-x64",
+  "fixtureBytes": 258,
+  "provisionerSha256": "9b7d3d50f41a7bfd99fbd9671d5b4bb2ef926cbe3174e16e3a11b74ca115e9bd",
+  "cases": [
+    {
+      "name": "http-503",
+      "attemptsBeforeFailure": 1,
+      "first": {
+        "ok": false,
+        "error": {
+          "name": "Error",
+          "message": "Download failed for audit-fixture.tar.gz: HTTP 503 from 127.0.0.1. Check your connection or retry when the download is available."
+        },
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "manualRetry": {
+        "ok": true,
+        "cacheHit": false,
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      }
+    },
+    {
+      "name": "http-429",
+      "attemptsBeforeFailure": 1,
+      "first": {
+        "ok": false,
+        "error": {
+          "name": "Error",
+          "message": "Download failed for audit-fixture.tar.gz: HTTP 429 from 127.0.0.1. Check your connection or retry when the download is available."
+        },
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "manualRetry": {
+        "ok": true,
+        "cacheHit": false,
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      }
+    },
+    {
+      "name": "socket-reset",
+      "first": {
+        "ok": false,
+        "error": {
+          "name": "TypeError",
+          "message": "terminated",
+          "cause": {
+            "name": "SocketError",
+            "message": "other side closed",
+            "code": "UND_ERR_SOCKET"
+          }
+        },
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "manualRetry": {
+        "ok": true,
+        "cacheHit": false,
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "requests": [
+        {
+          "path": "/reset",
+          "range": null
+        },
+        {
+          "path": "/reset",
+          "range": null
+        }
+      ]
+    },
+    {
+      "name": "slow-progressing-download",
+      "result": {
+        "ok": false,
+        "error": {
+          "name": "TimeoutError",
+          "message": "The operation was aborted due to timeout",
+          "code": 23
+        },
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "deadline": {
+        "deadlineRequestedMs": 900000,
+        "testDeadlineMs": 500
+      },
+      "progressBytes": [
+        8,
+        64
+      ],
+      "note": "Deadline accelerated in probe only; production timeout is unchanged."
+    },
+    {
+      "name": "kill-download",
+      "signal": "SIGKILL",
+      "orphanBeforeRetry": [
+        ".install-UkyE6U"
+      ],
+      "entriesAfterRetry": [
+        ".install-UkyE6U",
+        "d2b6b8ece148110415fba10ee32485e8b223dbe87766b75702e26ea10c797f26"
+      ],
+      "manualRetry": {
+        "ok": true,
+        "cacheHit": false,
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      }
+    },
+    {
+      "name": "kill-extracted",
+      "signal": "SIGKILL",
+      "orphanBeforeRetry": [
+        ".install-Rq5RRm"
+      ],
+      "entriesAfterRetry": [
+        ".install-Rq5RRm",
+        "41fa067d762e6ab62355b6a030965c82add4d38fd8252b1bed68b8bd458f82bf"
+      ],
+      "manualRetry": {
+        "ok": true,
+        "cacheHit": false,
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      }
+    },
+    {
+      "name": "three-process-install-race",
+      "requests": 3,
+      "results": [
+        {
+          "ok": true,
+          "cacheHit": false,
+          "locale": "en-US",
+          "killed": false,
+          "signal": null
+        },
+        {
+          "ok": true,
+          "cacheHit": false,
+          "locale": "en-US",
+          "killed": false,
+          "signal": null
+        },
+        {
+          "ok": true,
+          "cacheHit": false,
+          "locale": "en-US",
+          "killed": false,
+          "signal": null
+        }
+      ],
+      "entries": [
+        "b81df53003335757a26eae3ce23741bbc3395c06ae1ef4d50119d074fef61c94"
+      ]
+    },
+    {
+      "name": "unchanged-cache-different-locale",
+      "first": {
+        "ok": true,
+        "cacheHit": false,
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "second": {
+        "ok": false,
+        "error": {
+          "name": "Error",
+          "message": "Managed cache contents changed: /home/lastmjs/development/lasm/compiler/.work/toolchain-robustness-2026-09-28/probe-run-r1/locale/artifacts/be8d4b899e0e2a5ec98a9e3b1628194ea0840f474236fbd54c4cf603f18e267c. Changed entries (0): . Remove this toolchain directory to download a verified replacement."
+        },
+        "locale": "sv-SE",
+        "killed": false,
+        "signal": null
+      },
+      "requests": 1
+    },
+    {
+      "name": "simulated-ENOSPC",
+      "result": {
+        "ok": false,
+        "error": {
+          "name": "Error",
+          "message": "simulated disk full",
+          "code": "ENOSPC"
+        },
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "entries": []
+    },
+    {
+      "name": "read-only-cache",
+      "result": {
+        "ok": false,
+        "error": {
+          "name": "Error",
+          "message": "EACCES: permission denied, mkdir '/home/lastmjs/development/lasm/compiler/.work/toolchain-robustness-2026-09-28/probe-run-r1/readonly/artifacts'",
+          "code": "EACCES"
+        },
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "requests": 0
+    },
+    {
+      "name": "post-publish-cleanup-denied",
+      "first": {
+        "ok": false,
+        "error": {
+          "name": "Error",
+          "message": "EACCES: permission denied, unlink '/home/lastmjs/development/lasm/compiler/.work/toolchain-robustness-2026-09-28/probe-run-r1/cleanup/artifacts/.install-kC6vGg/archive.tar.gz'",
+          "code": "EACCES"
+        },
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "entries": [
+        ".install-kC6vGg",
+        "58f2a363f3a41f725fee0a534a66d00b1f52ce4114a36075f60258a4dab4110b"
+      ],
+      "manualRetry": {
+        "ok": true,
+        "cacheHit": true,
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      }
+    },
+    {
+      "name": "private-CA",
+      "untrusted": {
+        "ok": false,
+        "error": {
+          "name": "Error",
+          "message": "Could not download audit-fixture.tar.gz from 127.0.0.1. Check your network connection and retry. fetch failed",
+          "cause": {
+            "name": "TypeError",
+            "message": "fetch failed",
+            "cause": {
+              "name": "Error",
+              "message": "self-signed certificate; if the root CA is installed locally, try running Node.js with --use-system-ca",
+              "code": "DEPTH_ZERO_SELF_SIGNED_CERT"
+            }
+          }
+        },
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "explicitCA": {
+        "ok": true,
+        "cacheHit": false,
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      }
+    },
+    {
+      "name": "explicit-HTTPS-proxy",
+      "withoutNodeOptIn": {
+        "ok": false,
+        "error": {
+          "name": "Error",
+          "message": "Could not download audit-fixture.tar.gz from fixture.invalid. Check your network connection and retry. fetch failed",
+          "cause": {
+            "name": "TypeError",
+            "message": "fetch failed",
+            "cause": {
+              "name": "Error",
+              "message": "getaddrinfo ENOTFOUND fixture.invalid",
+              "code": "ENOTFOUND"
+            }
+          }
+        },
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "withNodeOptIn": {
+        "ok": true,
+        "cacheHit": false,
+        "locale": "en-US",
+        "killed": false,
+        "signal": null
+      },
+      "proxyConnects": 1
+    }
+  ],
+  "scope": "Linux x86-64 characterization against unchanged installer code; not a new six-platform acceptance campaign.",
+  "sourceMatch": {
+    "candidateSha256": "c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae",
+    "candidateVersion": "0.1.0-experimental.46",
+    "allAuditedSourceFilesMatchCandidate": true,
+    "files": {
+      "src/application-build.mjs": "082813c1ee4c59fe1357f9325032b513e6c82d01dba1d0c33b49d193691531eb",
+      "src/application-lock.mjs": "cfde7dc0503e8e4bd04a0f857285b1f07048ac78e6ed2e20dbd8344f6ef3f5b6",
+      "src/application-support.mjs": "f1bc8148fd0ea7089177ddc885e8999e470893f6f2183d33bf735979972a4889",
+      "src/build-progress.mjs": "cc9893083e4fc7ada7574965971d99eda945b75bc37c4cb2c0273a36ad94abb5",
+      "src/managed-artifacts.mjs": "9b7d3d50f41a7bfd99fbd9671d5b4bb2ef926cbe3174e16e3a11b74ca115e9bd",
+      "src/managed-git.mjs": "d6bc7e6a3ff6403167f578459822dfe8688e363a0c918d62296d74e8c219abad",
+      "src/managed-lean.mjs": "6639c98cce58c43f6920ae798c38e7241eebe10575515e48379ae671313d4cd2",
+      "src/managed-python.mjs": "20ac895345455fca134851df18269ebe51b6f7779c8b2a612956cad26a1aab45",
+      "src/managed-sdk.mjs": "4fb366625adfae1a14f298efd66b5a004633e75e6392df7748aa80c5bfd9dc59",
+      "src/sdk-repairs.mjs": "57896d35501847ab585a3f45b858b8d616d0533284b367f785837a627c78ccd3",
+      "src/windows-tool-paths.mjs": "ff4d97ab1b1ed09a944a8e704686cfdb9005a85b63c68327ad168e15f27c898b",
+      "src/archive-stream.py": "d792b93cecdba78c19f67a2fc46ec06d6b276e39ff2a4aee50bb9c9fa2955042"
+    }
+  },
+  "existingFocusedTests": {
+    "passed": 59,
+    "failed": 0,
+    "skipped": 0,
+    "node": "26.10.0",
+    "fixturePython": "/usr/bin/python3",
+    "downloads": false
+  },
+  "resourceRuns": [
+    {
+      "name": "unit-resources.json",
+      "capBytes": 805306368,
+      "peakMemoryBytes": 70451200,
+      "status": "success",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceAbort": null
+    },
+    {
+      "name": "probe-resources-r1.json",
+      "capBytes": 805306368,
+      "peakMemoryBytes": 105697280,
+      "status": "success",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceAbort": null
+    },
+    {
+      "name": "source-audit-resources.json",
+      "capBytes": 402653184,
+      "peakMemoryBytes": 45281280,
+      "status": "success",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceAbort": null
+    }
+  ],
+  "githubControls": {
+    "checkedAt": "2026-09-28",
+    "branch": "main",
+    "protected": false,
+    "repositoryRulesets": [],
+    "workflowFiles": 37,
+    "triggers": [
+      "workflow_dispatch",
+      "workflow_call"
+    ],
+    "automaticPushPrScheduleTriggers": false
+  },
+  "sourceProbeSha256": "8cb6f2bd540c9b1f20945144f02d8e9adbdacf097b531a459de9b9ada3b45bbd"
+}

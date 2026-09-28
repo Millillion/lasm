@@ -59,12 +59,17 @@ in `lasm-tools/`. They contain verified hard links or copies and junctions to th
 main cache. Removing the main tool cache does not remove these directories;
 both can be removed when no build is running. See [Windows cache details](https://github.com/Millillion/lasm/blob/main/docs/WINDOWS_TOOLCHAINS.md).
 
-Downloads publish only after checksum verification and extraction. Interrupted
-downloads can be retried. If a completed tool cache is damaged or incomplete,
+Downloads publish only after checksum verification and extraction. Rerun the
+command to retry an interrupted download; the current installer makes one
+attempt per invocation and restarts the failed archive. Earlier completed tools
+remain reusable. If a completed tool cache is damaged or incomplete,
 Lasm refuses to execute it and prints its exact directory; remove that directory
 and retry to download a verified replacement. If a packaged runtime fails its
 integrity check, reinstall the candidate. An unavailable download must be restored
 before a cold build can succeed; retries never substitute an unverified tool.
+The [robustness review](TOOLCHAIN_ROBUSTNESS.md) records confirmed recovery gaps
+and proposed CI coverage; the six-platform pass does not establish a measured
+installation failure rate.
 
 `lasm build Main.lean` writes `dist/` and does not run `main`. Deploy all of `dist/`
 including host support and notices. Deployment files are specific to the build
