@@ -1,7 +1,8 @@
 # Windows toolchain implementation
 
 Windows x64 candidate `.44` has passed the installed Node package's native
-acceptance gates. Its Linux/macOS rechecks and retained archive update are pending.
+acceptance gates, as have both Linux and macOS architectures. The exact archive
+and combined receipt are [retained](evidence/node44-five-platform-retention-2026-09-28.json).
 ARM64 remains unverified as an installed Lasm application. The README identifies
 the currently available release and platform boundaries.
 
@@ -155,3 +156,7 @@ The next control failed in tar compression before any compiler rebuild, at a
 the actual streaming notice append and all preservation assertions are unchanged.
 Both local versions passed under a 512-MiB guard; the revised fixture still needs
 its native Windows recheck.
+
+That revised notice control and the draft-storage preflight passed on native ARM64
+in run `36397277364`. The guarded compiler rebuild is in progress. These early
+control passes do not establish a retained distribution or installed support.

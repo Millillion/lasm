@@ -1,4 +1,4 @@
-# Linux and macOS Node candidate support contract
+# Node candidate support contract
 
 The first release contract is ordinary Lean `main`, console output, arguments,
 exit status, compilation diagnostics, and a tiny Lake project with local imports.
@@ -8,8 +8,10 @@ The exact [runtime exclusions are in the README](../README.md#lean-support-and-r
 Full standard-library compatibility is not claimed.
 
 The validated targets are Ubuntu 24.04.5 LTS (glibc 2.39) on native x86-64 and ARM64,
-plus macOS 15.7.9 (24G830) on native x86-64 and ARM64. All use Node 26.10.0 with its npm and Lean 4.34.1. Use stock Node without special flags.
-Other distributions, older system libraries, Node versions and Lean versions are
+plus macOS 15.7.9 (24G830) on native x86-64 and ARM64, and Windows
+10.0.26100.33438 (`windows-2025`) on native x86-64. Candidate `.44` passed all five
+targets. All use Node 26.10.0 with npm 11.19.1 and Lean 4.34.1. Use stock Node without special flags.
+Windows ARM64, other OS versions/distributions, older system libraries, Node versions and Lean versions are
 unverified. Linux requires glibc 2.39 or newer; musl-based distributions
 such as Alpine are unsupported. Linux builds require the standard OS shell, loader, libc and system
 libraries supplied by Ubuntu; no separately installed developer tools are required.
@@ -26,7 +28,8 @@ administrator access is required.
 
 Pinned compressed tool downloads, including Git for a Lake project, total
 979,054,712 bytes on Linux x86-64, 910,904,894 on Linux ARM64,
-919,472,748 on Intel Mac and 925,010,880 on Apple Silicon. A standalone file skips
+919,472,748 on Intel Mac, 925,010,880 on Apple Silicon and 1,312,233,267 on
+Windows x86-64. A standalone file skips
 the Git download. These totals exclude the npm package and generated build files;
 unpacked tools and build caches occupy several GB. The acceptance report records
 observed disk usage, build times and deployment sizes separately. These are
@@ -37,9 +40,10 @@ interpreter, module-data and plugin dependencies; they never package the large
 fallback. The retained historical `.34` archive predates this restriction. See the
 [size report](https://github.com/Millillion/lasm/blob/main/docs/BUNDLE_SIZE.md).
 
-Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm` on Linux and
-`$HOME/Library/Caches/lasm` on macOS. Candidate `.37` is retained and passed the complete installed/deployment checks
-on both Linux and both Mac architectures. Set
+Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm` on Linux,
+`$HOME/Library/Caches/lasm` on macOS, and `%LOCALAPPDATA%\lasm\Cache` on Windows.
+Candidate `.44` is retained and passed the complete installed/deployment checks
+on all five accepted targets. Set
 `LASM_TOOLCHAIN_CACHE` to choose another directory. Compiled application caches
 live under the source project's `.lake/lasm/`. Hash checks detect changes to
 sources, tool descriptions, runtime inputs and generated outputs; an unchanged
@@ -47,6 +51,11 @@ application reuses its build. Cached builds need no downloads. Deleting these
 caches is safe when no build is running, but the next build downloads or compiles
 again. Allow generous disk space: exact cold-build usage is recorded in the
 acceptance report.
+
+Windows also keeps short execution directories under Node's temporary directory,
+in `lasm-tools/`. They contain verified hard links or copies and junctions to the
+main cache. Removing the main tool cache does not remove these directories;
+both can be removed when no build is running. See [Windows cache details](https://github.com/Millillion/lasm/blob/main/docs/WINDOWS_TOOLCHAINS.md).
 
 Downloads publish only after checksum verification and extraction. Interrupted
 downloads can be retried. If a completed tool cache is damaged or incomplete,
@@ -72,6 +81,6 @@ the application's stdout remains usable in pipes. These logging improvements
 are checked in installed-package acceptance. The historical `.32` archive
 predates these improvements and remains unchanged.
 The package is a private experimental candidate, not an npm publication or a
-claim that every Lean program works. Native macOS x86-64 and ARM64 acceptance passed for `.37`; Windows
-implementation is in progress. Deno, Bun, HTTP/filesystem parity and broad
+claim that every Lean program works. Windows ARM64 distribution and installed
+acceptance remain in progress. Deno, Bun, HTTP/filesystem parity and broad
 third-party packages remain separate milestones.

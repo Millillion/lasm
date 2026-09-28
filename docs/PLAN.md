@@ -15,6 +15,10 @@ the same packed candidate. See [the acceptance report](NODE_ACCEPTANCE.md) for
 exact hashes, versions, scope and measurements. The candidate is unpublished to
 npm; deferred chunks below remain future work.
 
+**Platform extension status — 2026-09-28:** the same retained `.44` candidate now
+passes both Linux and macOS architectures and Windows x86-64. Windows ARM64 still
+requires its native Lean distribution and complete installed-package acceptance.
+
 ## Current ordered work, authorized 2026-09-26
 
 1. Remove the multi-gigabyte runtime-compiler fallback. Reject reachable runtime

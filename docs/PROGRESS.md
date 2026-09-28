@@ -1,17 +1,15 @@
-**Native ARM64 build passed; retention retry needed — 2026-09-28.**
-Run `36380911268` built and relocated native Windows ARM64 Lean/Lake, verified
-15 executable/DLL identities, and passed execution/C generation. Peak memory was
-2.53 GiB without a resource abort. A compiler-cache draft request failed; the
-following distribution-retention step was skipped, so neither archive survived.
+**Five-platform candidate retained — 2026-09-28.** The exact `.44` archive passed
+native installed/deployment checks on Linux and macOS x64/ARM64 plus Windows x64.
+Run `36398226921` retained it with a combined acceptance receipt; GitHub's stored
+digest matches the tested hash. README and support documentation now use `.44`,
+with complete commands, exact platform boundaries and runtime exclusions.
 
-Retention now targets existing `main` and saves distributions independently before
-the cache. Native draft creation/upload/retrieval/cleanup passed in `36396705986`.
-A subsequent tiny archive control failed before rebuilding. Its input construction
-is now deterministic; unchanged preservation assertions passed locally and await
-native recheck. README reviewed: ARM64 remains unsupported until distribution
-and installed acceptance pass.
+Windows ARM64's first native compiler build passed with a 2.53-GiB peak, but
+archive retention failed. Retention now checks draft storage before building and
+saves distributions independently before compiler caches. The storage and revised
+archive-preservation controls passed natively in `36397277364`; its guarded
+compiler rebuild is running.
 
-Candidate `.44` passed Windows x64, both Linux architectures and macOS ARM64;
-Intel macOS and combined retention remain pending. Then finish native ARM64
-distribution and accept one candidate across all six targets. No npm publication.
-Completion ETA is not yet estimable.
+Remaining gates: retain/audit/distribute native ARM64 Lean, connect its catalog,
+and accept one exact candidate on all six targets. ARM64 remains unsupported;
+broader API parity is deferred. No npm publication. Completion ETA is not yet estimable.
