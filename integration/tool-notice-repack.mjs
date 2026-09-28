@@ -14,7 +14,11 @@ writeFileSync(join(base, 'install/bin/native.exe'), Buffer.from([0, 255, 127, 0,
 linkSync(join(base, 'install/bin/native.exe'), join(base, 'install/bin/alias.exe'));
 writeFileSync(join(base, 'install/LICENSE'), 'original license\n');
 const source = join(base, 'original.tgz'), output = join(base, 'complete.tgz'), notice = join(base, 'notice.txt');
-await create({ cwd: base, file: source, gzip: true, portable: true }, ['install']);
+// This tiny fixed input contains a hard link. Construct it synchronously so
+// filesystem callback ordering cannot affect the fixture compressor's finish.
+// The real notice-append operation below still streams asynchronously.
+create({ cwd: base, file: source, gzip: true, portable: true, sync: true }, ['install']);
+console.log('Notice-control input archive with native hard link created.');
 writeFileSync(notice, 'verified third-party notices\n');
 const sha256 = await hashFile(notice), sourceSha256 = await hashFile(source);
 const result = await appendToolNotice(source, output, notice, sha256);

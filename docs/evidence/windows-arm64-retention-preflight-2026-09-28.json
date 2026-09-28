@@ -1,0 +1,173 @@
+{
+  "scope": "Early native Windows ARM64 draft-retention control passed; archive-notice fixture failed before compiler rebuild.",
+  "run": 36396705986,
+  "job": 108844717524,
+  "url": "https://github.com/Millillion/lasm/actions/runs/36396705986/job/108844717524",
+  "sourceRevision": "f7ed048831e96ea7256c1729a6e05439b144180f",
+  "retentionControl": {
+    "passed": true,
+    "tag": "windows-arm64-retention-control-36396705986-1",
+    "sourceRevision": "f7ed048831e96ea7256c1729a6e05439b144180f",
+    "target": "main",
+    "uploadedAndReadIdenticalBytes": true,
+    "controlDraftDeleted": true
+  },
+  "noticeControlResources": {
+    "status": "failed",
+    "command": [
+      "node",
+      "integration/tool-notice-repack.mjs"
+    ],
+    "hostAtStart": {
+      "total": 17169387520,
+      "available": 13651243008
+    },
+    "limits": {
+      "jobCommittedBytes": 536870912,
+      "stopCommittedBytes": 429496729,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 180
+    },
+    "peakCommittedBytes": 60944384,
+    "minimumHostAvailable": 13616640000,
+    "startedAt": 1790583676.93151,
+    "unit": "Local\\LasmResource-220500c7-49d5-4554-b3e5-47fc4b071cf4",
+    "pid": 7732,
+    "lastSampleAt": 1790583677.3432276,
+    "exitCode": 1,
+    "finishedAt": 1790583677.348727
+  },
+  "failure": "tar async compressor emitted Z_STREAM_ERROR with the small native hard-link fixture; no resource abort",
+  "localBaseline": {
+    "startedAt": "2026-09-28T08:23:10.563Z",
+    "command": [
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      "integration/tool-notice-repack.mjs"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "c6f5248c-c70d-4568-b084-8dad5ba42a03",
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 21809180672
+    },
+    "minimumHostAvailable": 21809180672,
+    "peakMemoryBytes": 18694144,
+    "peakTasks": 0,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/macos/notices-repack-local-recheck-2026-09-28.json",
+    "status": "finished",
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-28T08:23:10.769Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 13615104,
+      "peakMemoryBytes": 18694144,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11710464,
+        "file": 24576,
+        "kernel": 1093632,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 24576,
+        "slab": 161792
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-28T08:23:10.800Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "localSynchronousFixture": {
+    "startedAt": "2026-09-28T08:24:22.906Z",
+    "command": [
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      "integration/tool-notice-repack.mjs"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "1d720d06-2ddb-4be8-8a67-107300579e9e",
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 21807947776
+    },
+    "minimumHostAvailable": 21807947776,
+    "peakMemoryBytes": 18481152,
+    "peakTasks": 0,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/macos/notices-repack-sync-input-2026-09-28.json",
+    "status": "finished",
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-28T08:24:23.088Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 14024704,
+      "peakMemoryBytes": 18481152,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11706368,
+        "file": 24576,
+        "kernel": 1077248,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 24576,
+        "slab": 153640
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-28T08:24:23.112Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "repairScope": "Construct only the tiny fixed input synchronously. Actual append operation and all member-preservation, checksum and no-overwrite assertions remain unchanged; native recheck required.",
+  "rawLogSha256": "4e7748a7f9f65a712974682d77453fb7eff4652d7470619f304bf770d1e333a9"
+}

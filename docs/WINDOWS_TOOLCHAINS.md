@@ -147,3 +147,11 @@ creates a draft, uploads and retrieves identical bytes, then deletes that contro
 Successful native distributions are retained before the cache, with an explicit
 independent condition. A cache-upload failure cannot skip their retention.
 The retry also includes the already-fixed upstream `LICENSES` bundle directly.
+
+The [early retention control passed](evidence/windows-arm64-retention-preflight-2026-09-28.json)
+on native ARM64 in run `36396705986`, including byte-exact retrieval and cleanup.
+The next control failed in tar compression before any compiler rebuild, at a
+60,944,384-byte peak. Its small hard-link input is now constructed synchronously;
+the actual streaming notice append and all preservation assertions are unchanged.
+Both local versions passed under a 512-MiB guard; the revised fixture still needs
+its native Windows recheck.
