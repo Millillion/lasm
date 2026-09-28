@@ -1,15 +1,15 @@
-**Native validation in progress — 2026-09-28.** Candidate `.43` packed twice
-identically (65.34 MB; SHA-256 `578b16cb…3af428`). Windows x64 installed checks and
-both macOS checks are running against those exact bytes. The Linux recheck exposed
-an undeclared reusable-workflow input before any test started. The input and
-archive selection are corrected; all local reusable call contracts now validate.
-This changes maintainer orchestration, not the candidate.
+**Windows prerequisite traversal corrected — 2026-09-28.** Candidate `.43` failed
+before installed execution: the isolation harness hit its parent deadline while
+resolving nearly 19,000 CodeQL directories. Discovery now uses cached directory
+metadata and resolves roots and reparse entries only. Full traversal, junction
+handling and file denials remain required. Two local controls passed for deep
+Unicode paths, tool discovery, aliases and cycles, using 9.7 MiB; native junction
+and isolation checks will run against the unchanged archive.
 
-The ARM64 retry passed native archive controls and is provisioning its seed.
-It uses two bounded build jobs and verified completed compiler-cache checkpoints;
-the prior linking deadline remains recorded separately.
+Linux and macOS rechecks remain in progress. ARM64's real compiler-cache control
+passed and its bounded Lean build is running. The verified source/notices archive
+is retained as an unpublished draft.
 
 README reviewed: `.37` remains accepted on Linux/macOS; Windows is unsupported.
-Next: native installed results, ARM64 compiler distribution, then the complete
-matrix. Evidence: [Windows implementation](WINDOWS_TOOLCHAINS.md). No npm publication.
-Completion ETA is not yet estimable.
+Remaining gates: native installed results, ARM64 distribution and complete matrix.
+No npm publication. Completion ETA is not yet estimable.

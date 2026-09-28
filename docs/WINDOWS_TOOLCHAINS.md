@@ -64,3 +64,5 @@ the exact recipe, tool hashes, MSYS package inventory, archive checksum, and
 per-file hashes. It always starts a fresh build tree and reruns native execution
 and relocation checks. A cache checkpoint never counts as distribution acceptance.
 Cache size is capped at 1 GiB and at most four checkpoint drafts are allowed.
+
+The resumed `.43` x64 attempt [failed during prerequisite discovery](evidence/windows-discovery-timeout-2026-09-28.json), before installed execution. Resolving every ordinary path while traversing the runner's large CodeQL tree exhausted the parent setup deadline. Discovery now uses cached directory metadata and resolves roots and reparse entries only; full coverage, junction traversal, file denials, memory limits and deadlines are unchanged. The unchanged package is being retried with native directory/junction controls. The source/notices companion is now retained in the unpublished draft recorded in its evidence receipt.

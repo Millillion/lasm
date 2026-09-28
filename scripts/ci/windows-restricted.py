@@ -9,11 +9,11 @@ libuv pipe-name retry loop predates the upstream AppContainer compatibility fix.
 import base64
 import ctypes as C
 from ctypes import wintypes as W
+import importlib.util
 import json
 import msvcrt
 import os
 from pathlib import Path
-import re
 import subprocess
 import sys
 import time
@@ -221,42 +221,18 @@ def literal(text):
     return "'" + str(text).replace("'", "''") + "'"
 
 
-tool_names = {"lean.exe", "lake.exe", "leanc.exe", "leanchecker.exe", "leantar.exe",
-    "cl.exe", "link.exe", "lld.exe", "lld-link.exe", "ld.lld.exe", "ld.exe", "llc.exe", "opt.exe",
-    "wasm-ld.exe", "wasm-opt.exe", "ar.exe", "ranlib.exe", "gcc.exe", "g++.exe",
-    "py.exe", "git.exe", "git-cmd.exe", "git-bash.exe", "git-lfs.exe", "cmake.exe", "ninja.exe",
-    "make.exe", "mingw32-make.exe", "bash.exe", "sh.exe", "node.exe", "npm.cmd", "npx.cmd",
-    "emcc.bat", "emcc.cmd", "emcc.py", "em++.py", "emar.py", "emranlib.py", "emsdk.bat"}
-
-
-def developer_program(path):
-    return path.name.lower() in tool_names or re.fullmatch(r"(?:clang.*|llvm-.*|python.*)\.exe", path.name, re.I)
+_walk_spec = importlib.util.spec_from_file_location("lasm_ci_file_walk", Path(__file__).with_name("windows_file_walk.py"))
+_walker = importlib.util.module_from_spec(_walk_spec)
+_walk_spec.loader.exec_module(_walker)
+developer_program = _walker.developer_program
 
 
 def walk_files(root, *, developer=False):
-    pending, seen = [Path(root)], set()
-    while pending:
-        directory = pending.pop().resolve()
-        identity = str(directory).lower()
-        if identity in seen: continue
-        seen.add(identity)
+    def directory_progress(root, directory, count):
         progress("discovering developer tools" if developer else "enumerating denied inputs",
-            root=str(root), directory=str(directory), directoriesVisited=len(seen))
-        try:
-            with os.scandir(directory) as entries:
-                for entry in entries:
-                    path = Path(entry.path)
-                    if entry.is_dir(follow_symlinks=True):
-                        if developer and entry.name.lower() in ("windows defender", "windows defender advanced threat protection"):
-                            continue
-                        # Runner Git/LLVM directories can be junctions. Resolve
-                        # and visit their targets, once, rather than skipping.
-                        pending.append(path)
-                    elif not developer or developer_program(path):
-                        yield path.resolve()
-        except PermissionError:
-            if not developer: raise
-            evidence.setdefault("inaccessibleDeveloperDirectories", []).append(str(directory))
+            root=str(root), directory=str(directory), directoriesVisited=count)
+    yield from _walker.walk_files(root, developer=developer, on_directory=directory_progress,
+        on_permission=lambda directory: evidence.setdefault("inaccessibleDeveloperDirectories", []).append(str(directory)))
 
 
 assert os.environ.get("GITHUB_ACTIONS") == "true" and os.environ.get("GITHUB_REPOSITORY") == "Millillion/lasm", \

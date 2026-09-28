@@ -41,6 +41,7 @@ jobs:
         run: |
           node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-'+process.env.EXPECTED_ARCHITECTURE)"
           node integration/windows-guard-deadline.mjs
+          node scripts/full-lean/run-bounded.mjs --memory-mib 512 --timeout-seconds 180 --report .work/windows-discovery-resources.json -- node -e "require('node:child_process').execFileSync(process.env.LASM_RESOURCE_PYTHON,['-I','-B','test/windows-file-walk.test.py'],{stdio:'inherit'})"
           node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --timeout-seconds 1200 --report .work/windows-isolation-resources.json -- node scripts/ci/windows-isolation-controls.mjs
       - name: Focused host and bundle controls
         # The legacy platform suite needs an externally installed Lean compiler.

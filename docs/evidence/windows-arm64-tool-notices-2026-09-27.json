@@ -32,5 +32,27 @@
   "notes": [
     "The two generated archives were byte-identical; each of the 120 archived files matched its verified source hash.",
     "Do not associate this companion with a native Lean release until the bundled GMP version and helper identity match. No public tool publication or installed-package acceptance is established."
-  ]
+  ],
+  "unpublishedRetention": {
+    "assets": [
+      {
+        "digest": "sha256:b43116788b94774cdd714d29d9741675c5da2670f87bc9561072ca6a2d55f418",
+        "id": 594581848,
+        "name": "retention.json",
+        "size": 779
+      },
+      {
+        "digest": "sha256:b167d935b5273ff0a2a15bb097dc903746bab8ac1dcb40f82da06085afa2850a",
+        "id": 594581849,
+        "name": "windows-arm64-tool-notices-v1.tar.gz",
+        "size": 14639815
+      }
+    ],
+    "draft": true,
+    "html_url": "https://github.com/Millillion/lasm/releases/tag/untagged-7f36c06b141dc5fe8709",
+    "id": 397970762,
+    "prerelease": true,
+    "tag_name": "windows-arm64-tool-notices-v1",
+    "target_commitish": "cd855b88b04d1b9345a01f45d4925c8f11d3a21c"
+  }
 }

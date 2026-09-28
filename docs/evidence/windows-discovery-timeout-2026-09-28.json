@@ -1,0 +1,120 @@
+{
+  "scope": "CI discovery setup timeout before installed Lasm execution; product candidate unchanged",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36380916339",
+  "jobId": 108796583392,
+  "sourceRevision": "d5f9e9352cbe43f0545a37f26e5091e2316eb375",
+  "candidateSha256": "578b16cbc62d8fe356ae38ce1ae7dcf0c4fd255d1762b18b3245dea50e3af428",
+  "error": "Parent spawnSync timed out while resolving developer directory paths; no installed application ran",
+  "partialSetup": {
+    "stage": "discovering developer tools",
+    "updatedAt": 1790573277.4358046,
+    "root": "C:\\hostedtoolcache\\windows",
+    "directory": "C:\\hostedtoolcache\\windows\\CodeQL\\2.27.0\\x64\\codeql\\qlpacks\\codeql\\swift-queries\\1.3.10\\.codeql\\libraries\\codeql\\dataflow\\2.1.13\\codeql\\dataflow\\test",
+    "directoriesVisited": 18677
+  },
+  "resources": {
+    "status": "failed",
+    "command": [
+      "node",
+      "scripts/ci/windows-isolation-controls.mjs"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 14251696128
+    },
+    "limits": {
+      "jobCommittedBytes": 1073741824,
+      "stopCommittedBytes": 858993459,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 1200
+    },
+    "peakCommittedBytes": 97742848,
+    "minimumHostAvailable": 13378441216,
+    "startedAt": 1790572486.1228333,
+    "unit": "Local\\LasmResource-a051a668-b8de-4db1-a077-7c6ce62c73ab",
+    "pid": 8196,
+    "lastSampleAt": 1790573279.0208821,
+    "exitCode": 1,
+    "finishedAt": 1790573279.085827
+  },
+  "localTraversalControls": {
+    "passed": true,
+    "cases": [
+      "deep ordinary files and compiler discovery with Unicode paths",
+      "external directory aliases, duplicate targets and cycle termination"
+    ],
+    "nativeWindowsJunctionControl": "Added to the unchanged-candidate native retry; pending",
+    "resources": {
+      "startedAt": "2026-09-28T05:32:40.486Z",
+      "command": [
+        "/usr/bin/timeout",
+        "180",
+        "python3",
+        "-I",
+        "-B",
+        "test/windows-file-walk.test.py"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "e721661a-0251-40d7-8ce9-3d789f9e2d4f",
+      "limits": {
+        "memoryMax": 536870912,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 429496729,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 22386900992
+      },
+      "minimumHostAvailable": 22386900992,
+      "peakMemoryBytes": 14098432,
+      "peakTasks": 0,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/macos/windows-file-walk-2026-09-28-resources.json",
+      "status": "finished",
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-28T05:32:40.647Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 14098432,
+        "peakMemoryBytes": 14098432,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11706368,
+          "file": 385024,
+          "kernel": 1056768,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 385024,
+          "slab": 152288
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-28T05:32:40.686Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "log": ".work/macos/node43-windows-36380916339.log",
+  "logSha256": "940b5f4d802941bae06684a327e6ca90f2e2d598c8f11c12d3028a62a0782736",
+  "change": "Use cached scandir metadata; resolve roots and reparse entries rather than every ordinary directory. Preserve full discovery, tool filters, junction traversal, permission reporting and direct file denials. Deadlines and memory limits unchanged."
+}
