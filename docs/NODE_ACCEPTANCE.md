@@ -72,9 +72,13 @@ acceptance of later source changes or Windows support.
 
 Candidate `.43` subsequently passed [Linux x86-64](evidence/node43-linux-x64-2026-09-28.json),
 [Linux ARM64](evidence/node43-linux-arm64-2026-09-28.json), and
+[Mac x86-64](evidence/node43-darwin-x64-2026-09-28.json) and
 [Mac ARM64](evidence/node43-darwin-arm64-2026-09-28.json), using the exact archive
 `578b16cbc62d8fe356ae38ce1ae7dcf0c4fd255d1762b18b3245dea50e3af428`.
-The Intel Mac run is still in progress. Windows x64 built and executed Hello,
+The Intel Mac campaign took 84.6 minutes, including a 25.9-minute first build;
+it maintained progress logging and passed without a resource abort, peaking at
+2,338,091,008 bytes of sampled RSS. These are observed timings, not performance
+guarantees. Windows x64 built and executed Hello,
 then [failed its byte-exact output check](evidence/windows-stdio-bytes-2026-09-28.json).
 The subsequent binary-stream repair passed native x64/ARM64 host controls and is
 in candidate `.44`, whose installed Windows validation is in progress. These
