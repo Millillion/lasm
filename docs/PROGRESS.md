@@ -1,15 +1,15 @@
-**Windows output mismatch fixed in source — 2026-09-28.** Candidate `.43` built
-and ran Hello on Windows x64, but CRT text mode changed LF to CRLF. Native Lean
-uses binary standard streams. Lasm now configures its owned descriptors the same
-way, preserving the embedding process's modes. Eight local checks passed under
-a 512-MiB cap, peaking at 68.4 MiB. Native Windows controls and a new packed
-candidate remain required; expected outputs remain byte-exact.
+**Windows x64 byte controls passed — 2026-09-28.** The native Windows CRT now
+preserves stdin/stdout/stderr bytes and the embedding Node process's descriptors.
+The new checks passed on x64; ARM64 is running them. Eight local checks passed
+under a 512-MiB cap, peaking at 68.4 MiB. Candidate `.43`'s original CRLF failure
+is preserved; no expected output was normalized.
 
-The unchanged `.43` candidate passed Linux x64/ARM64 and macOS ARM64; macOS x64
-is still running. Native ARM64 Lean compilation also continues; its distribution
-needs the prepared notice repair and fresh native relocation checks.
+The next candidate is `.44`. Its version is passed explicitly through packing,
+cache retention and every reusable consumer; all 11 workflow input contracts
+passed. The unchanged `.43` passed Linux x64/ARM64 and macOS ARM64; macOS x64
+is still running. The native ARM64 Lean distribution build continues.
 
 README reviewed: `.37` remains the accepted Linux/macOS release; Windows remains
-unsupported. Remaining gates: native controls, complete ARM64 tool distribution,
-then one candidate across the full matrix. No npm publication. Completion ETA
-is not yet estimable.
+unsupported. Remaining gates: native controls, repaired installed candidate,
+complete ARM64 tools and one candidate across the full matrix. No npm publication.
+Completion ETA is not yet estimable.

@@ -2,6 +2,11 @@ name: Native Node installed-package acceptance
 on:
   workflow_dispatch:
     inputs:
+      candidate-version:
+        description: Unique version for the newly packed candidate
+        required: true
+        type: string
+        default: 0.1.0-experimental.44
       runtime-cache-key:
         description: Exact cache key emitted by Node Linux runtime inputs
         required: true
@@ -30,6 +35,7 @@ jobs:
       sha256: ${{ steps.package.outputs.sha256 }}
       cache-key: lasm-node-linux-candidate-${{ github.run_id }}-${{ steps.package.outputs.sha256 }}
     env:
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
       LASM_RUNTIME_ARCHIVE_SHA256: ${{ inputs.runtime-sha256 }}
       LASM_CACHE_WRITER_GROUP: lasm-cache-writer
     steps:
@@ -60,17 +66,17 @@ jobs:
       - name: Pack twice reproducibly
         id: package
         run: |
-          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")"
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
           node -e "const f=require('node:fs'),r=JSON.parse(f.readFileSync('.work/node-candidate/result.json'));f.appendFileSync(process.env.GITHUB_OUTPUT,'sha256='+r.sha256+'\n')"
       - name: Check the included storage budget
         id: budget
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/ci/cache-budget.mjs .work/node-candidate/lasm-compiler-0.1.0-experimental.43.tgz .work/node-candidate-budget.json
+        run: node scripts/ci/cache-budget.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" .work/node-candidate-budget.json
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: steps.budget.outputs.allowed == 'true'
         with:
-          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.43.tgz
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
           key: lasm-node-linux-candidate-${{ github.run_id }}-${{ steps.package.outputs.sha256 }}
       - name: Preserve candidate identity and packing measurements
         if: always()
@@ -84,6 +90,7 @@ jobs:
       architecture: x64
       sha256: ${{ needs.package.outputs.sha256 }}
       cache-key: ${{ needs.package.outputs.cache-key }}
+      candidate-version: ${{ inputs.candidate-version }}
   linux-arm64:
     if: inputs.validation-scope == 'all'
     needs: [package, linux-x64]
@@ -93,6 +100,7 @@ jobs:
       architecture: arm64
       sha256: ${{ needs.package.outputs.sha256 }}
       cache-key: ${{ needs.package.outputs.cache-key }}
+      candidate-version: ${{ inputs.candidate-version }}
   darwin-x64:
     if: inputs.validation-scope == 'all'
     needs: package
@@ -102,6 +110,7 @@ jobs:
       architecture: x64
       sha256: ${{ needs.package.outputs.sha256 }}
       cache-key: ${{ needs.package.outputs.cache-key }}
+      candidate-version: ${{ inputs.candidate-version }}
   darwin-arm64:
     if: inputs.validation-scope == 'all'
     needs: package
@@ -111,6 +120,7 @@ jobs:
       architecture: arm64
       sha256: ${{ needs.package.outputs.sha256 }}
       cache-key: ${{ needs.package.outputs.cache-key }}
+      candidate-version: ${{ inputs.candidate-version }}
   windows-x64:
     needs: package
     uses: ./.github/workflows/node-windows-consumer.yml
@@ -119,6 +129,7 @@ jobs:
       architecture: x64
       sha256: ${{ needs.package.outputs.sha256 }}
       cache-key: ${{ needs.package.outputs.cache-key }}
+      candidate-version: ${{ inputs.candidate-version }}
   candidate:
     if: inputs.validation-scope == 'all'
     needs: [package, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64]
@@ -127,6 +138,7 @@ jobs:
     permissions:
       contents: write
     env:
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
       LASM_CANDIDATE_SHA256: ${{ needs.package.outputs.sha256 }}
       LASM_ACCEPTANCE_PLATFORMS: linux-x64,linux-arm64,darwin-x64,darwin-arm64,win32-x64
     steps:
@@ -137,7 +149,7 @@ jobs:
           package-manager-cache: false
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .work/node-candidate/lasm-compiler-0.1.0-experimental.43.tgz
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
           key: ${{ needs.package.outputs.cache-key }}
           fail-on-cache-miss: true
       - name: Verify the tested archive and prepare its receipt
@@ -149,8 +161,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "node-linux-candidate-$GITHUB_RUN_ID" \
-            .work/node-candidate/lasm-compiler-0.1.0-experimental.43.tgz \
+            ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" \
             .work/node-candidate/SHA256SUMS.txt \
             --draft --prerelease --target main \
-            --title 'Lasm Node candidate 0.1.0-experimental.43' \
+            --title "Lasm Node candidate $LASM_CANDIDATE_VERSION" \
             --notes-file .work/node-candidate/notes.md
