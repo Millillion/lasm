@@ -124,6 +124,75 @@
     }
   },
   "hypothesis": "Upstream leanc replaces ROOT in ROOT/bin/clang.exe without normalizing separators. A Windows namespace prefix retains the slash and prevents process spawning. Use the verified short ordinary sysroot for this maintainer-only C invocation, leaving the product module reader unchanged.",
-  "nativeRegression": "Pending: reproduce old failure with verbose compiler command and compile/run the same generated C after changing only LEAN_SYSROOT.",
-  "rawReportSha256": "e826d2392d4c1ce04ce7f11fd3bb24a850b124045c9cf55e835d756c811b8652"
+  "nativeRegression": {
+    "passed": true,
+    "run": 36388782468,
+    "job": 108819783919,
+    "url": "https://github.com/Millillion/lasm/actions/runs/36388782468/job/108819783919",
+    "sourceRevision": "2feab441feab5ecb9d55e5fe143eda7dfae130ee",
+    "conclusion": "Confirmed: changing only the independent native C launcher sysroot from a Windows namespace prefix to its verified ordinary short path allows the bundled clang to compile and run identical C.",
+    "checks": [
+      {
+        "label": "native C oracle with namespaced sysroot",
+        "sysroot": "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05",
+        "code": 1,
+        "stdout": "",
+        "stderr": "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05/bin/clang.exe -I \\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05\\include -fstack-clash-protection -ffp-contract=off -fdata-sections -ffunction-sections --sysroot \\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05 -nostdinc -isystem \\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05/include/clang -v -O2 D:\\a\\lasm\\lasm\\.work\\windows-lean-prefix-controls\\generated\\lean\\Main.c -o D:\\a\\lasm\\lasm\\.work\\windows-lean-prefix-controls\\native-control.exe --sysroot \\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05 -L \\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05/lib -Wl,-Bstatic -lgmp -luv -lpsapi -luser32 -ladvapi32 -liphlpapi -luserenv -lws2_32 -ldbghelp -lole32 -lshell32 -lssl -lcrypto -lunwind -Wl,-Bdynamic -lcrypt32 -lgdi32 -fuse-ld=lld -L \\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05\\lib\\lean -Wl,--start-group -lleancpp -lLean -Wl,--end-group -lStd -Wl,--start-group -lInit -lleanrt -Wl,--end-group -lc++ -lc++abi -lLake -lgmp -luv -lpsapi -luser32 -ladvapi32 -liphlpapi -luserenv -lws2_32 -ldbghelp -lole32 -lshell32 -lssl -lcrypto -lcrypt32 -lgdi32 -lucrtbase -Wl,--stack,104857600 -licu -Wl,--gc-sections -lm -lbcrypt -pthread -Wl,--whole-archive -lleanmanifest -Wl,--no-whole-archive -Wno-unused-command-line-argument\nuncaught exception: the system cannot find the file specified. (error code: 2)\n"
+      },
+      {
+        "label": "native C oracle with short ordinary sysroot",
+        "sysroot": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05",
+        "code": 0,
+        "stdout": "",
+        "stderr": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05/bin/clang.exe -I C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05\\include -fstack-clash-protection -ffp-contract=off -fdata-sections -ffunction-sections --sysroot C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05 -nostdinc -isystem C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05/include/clang -v -O2 D:\\a\\lasm\\lasm\\.work\\windows-lean-prefix-controls\\generated\\lean\\Main.c -o D:\\a\\lasm\\lasm\\.work\\windows-lean-prefix-controls\\native-control.exe --sysroot C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05 -L C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05/lib -Wl,-Bstatic -lgmp -luv -lpsapi -luser32 -ladvapi32 -liphlpapi -luserenv -lws2_32 -ldbghelp -lole32 -lshell32 -lssl -lcrypto -lunwind -Wl,-Bdynamic -lcrypt32 -lgdi32 -fuse-ld=lld -L C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05\\lib\\lean -Wl,--start-group -lleancpp -lLean -Wl,--end-group -lStd -Wl,--start-group -lInit -lleanrt -Wl,--end-group -lc++ -lc++abi -lLake -lgmp -luv -lpsapi -luser32 -ladvapi32 -liphlpapi -luserenv -lws2_32 -ldbghelp -lole32 -lshell32 -lssl -lcrypto -lcrypt32 -lgdi32 -lucrtbase -Wl,--stack,104857600 -licu -Wl,--gc-sections -lm -lbcrypt -pthread -Wl,--whole-archive -lleanmanifest -Wl,--no-whole-archive -Wno-unused-command-line-argument\nclang version 22.1.4\r\nTarget: x86_64-w64-windows-gnu\r\nThread model: posix\r\nInstalledDir: C:/Users/runneradmin/AppData/Local/Temp/lasm-tools/f68751d52db122f6b09ffd05/bin\r\n \"C:/Users/runneradmin/AppData/Local/Temp/lasm-tools/f68751d52db122f6b09ffd05/bin/clang.exe\" -cc1 -triple x86_64-w64-windows-gnu -O2 -emit-obj -dumpdir \"D:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-prefix-controls\\\\native-control.exe-\" -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name Main.c -mrelocation-model pic -pic-level 2 -mframe-pointer=none -fmath-errno -ffp-contract=off -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -fno-sized-deallocation -fno-use-init-array -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb \"-fdebug-compilation-dir=D:/a/lasm/lasm/.work/windows-lean-prefix-controls/project \u65e5\u672c\u8a9e\" -v -ffunction-sections -fdata-sections \"-fcoverage-compilation-dir=D:/a/lasm/lasm/.work/windows-lean-prefix-controls/project \u65e5\u672c\u8a9e\" -nostdsysteminc -nobuiltininc -resource-dir C:/Users/runneradmin/AppData/Local/Temp/lasm-tools/f68751d52db122f6b09ffd05/lib/clang/22 -isystem \"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05/include/clang\" -I \"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05\\\\include\" -isysroot \"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05\" -Wno-unused-command-line-argument -ferror-limit 19 -pthread -fno-use-cxa-atexit -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -exception-model=seh -vectorize-loops -vectorize-slp -faddrsig -o C:/Users/RUNNER~1/AppData/Local/Temp/Main-f11c44.o -x c \"D:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-prefix-controls\\\\generated\\\\lean\\\\Main.c\"\r\nclang -cc1 version 22.1.4 based upon LLVM 22.1.4 default target x86_64-w64-windows-gnu\r\n#include \"...\" search starts here:\r\n#include <...> search starts here:\r\n C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05\\include\r\n C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm-tools\\f68751d52db122f6b09ffd05/include/clang\r\nEnd of search list.\r\n \"C:/Users/runneradmin/AppData/Local/Temp/lasm-tools/f68751d52db122f6b09ffd05/bin/ld.lld\" \"--sysroot=C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05\" -m i386pep -Bdynamic -o \"D:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\windows-lean-prefix-controls\\\\native-control.exe\" \"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05/lib/crt2.o\" \"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05/lib/crtbegin.o\" \"-LC:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05/lib\" \"-LC:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05\\\\lib\\\\lean\" \"-LC:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05/x86_64-w64-mingw32/lib\" \"-LC:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05/x86_64-w64-mingw32/mingw/lib\" \"-LC:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05/lib\" -LC:/Users/runneradmin/AppData/Local/Temp/lasm-tools/f68751d52db122f6b09ffd05/lib/clang/22/lib/windows C:/Users/RUNNER~1/AppData/Local/Temp/Main-f11c44.o -Bstatic -lgmp -luv -lpsapi -luser32 -ladvapi32 -liphlpapi -luserenv -lws2_32 -ldbghelp -lole32 -lshell32 -lssl -lcrypto -lunwind -Bdynamic -lcrypt32 -lgdi32 --start-group -lleancpp -lLean --end-group -lStd --start-group -lInit -lleanrt --end-group -lc++ -lc++abi -lLake -lgmp -luv -lpsapi -luser32 -ladvapi32 -liphlpapi -luserenv -lws2_32 -ldbghelp -lole32 -lshell32 -lssl -lcrypto -lcrypt32 -lgdi32 -lucrtbase --stack 104857600 -licu --gc-sections -lm -lbcrypt --whole-archive -lleanmanifest --no-whole-archive -lmingw32 C:/Users/runneradmin/AppData/Local/Temp/lasm-tools/f68751d52db122f6b09ffd05/lib/clang/22/lib/windows/libclang_rt.builtins-x86_64.a -lmoldname -lmingwex -lucrtbase -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 C:/Users/runneradmin/AppData/Local/Temp/lasm-tools/f68751d52db122f6b09ffd05/lib/clang/22/lib/windows/libclang_rt.builtins-x86_64.a -lmoldname -lmingwex -lucrtbase -lkernel32 \"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lasm-tools\\\\f68751d52db122f6b09ffd05/lib/crtend.o\"\r\n"
+      },
+      {
+        "label": "native C oracle execution",
+        "code": 0,
+        "stdout": "long cache path 42\n",
+        "stderr": ""
+      }
+    ],
+    "modulePathLength": 289,
+    "resources": {
+      "status": "passed",
+      "command": [
+        "node",
+        "scripts/ci/windows-lean-path-controls.mjs",
+        ".work/windows-lean-prefix-controls"
+      ],
+      "hostAtStart": {
+        "total": 17174360064,
+        "available": 14233546752
+      },
+      "limits": {
+        "jobCommittedBytes": 4294967296,
+        "stopCommittedBytes": 3435973836,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": 1200
+      },
+      "peakCommittedBytes": 2371014656,
+      "minimumHostAvailable": 12090372096,
+      "startedAt": 1790578519.5837545,
+      "disk": {
+        "reserveBytes": 4294967296,
+        "minimumFreeBytes": {
+          "D:\\a\\lasm\\lasm": 231762776064
+        }
+      },
+      "unit": "Local\\LasmResource-2f370ab4-a910-40fd-80a4-ba66b27fce5a",
+      "pid": 5980,
+      "lastSampleAt": 1790578634.5138206,
+      "exitCode": 0,
+      "finishedAt": 1790578634.5626197
+    },
+    "rawLogSha256": "aa05445170f659c82985b7bfc8f9d408c623ac0c22c4c4729eacaa06b706ce58"
+  },
+  "rawReportSha256": "e826d2392d4c1ce04ce7f11fd3bb24a850b124045c9cf55e835d756c811b8652",
+  "retry": {
+    "run": 36389214996,
+    "controlsRevision": "2feab441feab5ecb9d55e5fe143eda7dfae130ee",
+    "archiveUnchanged": true,
+    "statusAtDispatch": "in_progress"
+  }
 }

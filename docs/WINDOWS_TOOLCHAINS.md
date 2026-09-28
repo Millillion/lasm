@@ -92,8 +92,10 @@ x64. Its Hello deployment is 3,042,522 bytes. No expected output was normalized.
 
 The `.44` run then [failed while preparing its independent native C oracle](evidence/windows-native-oracle-launch-2026-09-28.json), before the offline and copied-deployment phases.
 Upstream `leanc` substitutes the sysroot into `ROOT/bin/clang.exe`; a Windows
-namespace combined with those forward slashes is the suspected launch failure.
+namespace combined with those forward slashes caused the launch failure.
 The maintainer harness now supplies its verified short ordinary prefix only to
-that C invocation. A native differential will reproduce the old error and
-compile/run the identical generated C with the adjusted environment. The packed
-product is unchanged and will be retried after this control passes.
+that C invocation. Native run `36388782468` reproduced the original error and
+compiled/ran the identical generated C after changing only that environment
+value. Its long-path and Lake checks also passed, with a 2,371,014,656-byte peak
+below the 3.2-GiB proactive stop. Run `36389214996` retries the unchanged `.44`
+archive through full installed acceptance.
