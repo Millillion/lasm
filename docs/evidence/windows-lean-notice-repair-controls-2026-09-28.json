@@ -1,0 +1,116 @@
+{
+  "scope": "Local archive-only controls; native repaired distribution validation remains pending",
+  "upstream": {
+    "lean": "4.34.1",
+    "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "file": "LICENSES",
+    "url": "https://raw.githubusercontent.com/leanprover/lean4/5045d0056413266e57c625dcd7c365b10e377c52/LICENSES",
+    "bytes": 81854,
+    "sha256": "00cce2ac071f63d470a287438a7c6bbc4334706be244384e9af4fc9ead11cdce"
+  },
+  "finding": "The custom Lean archive copied LICENSE but omitted the upstream LICENSES bundle, which includes dependency notices. Existing bootstrap drafts remain unpublished.",
+  "controls": {
+    "passed": true,
+    "cases": [
+      "all original member bytes, modes and hardlinks preserved",
+      "original archive unchanged",
+      "upstream notice checksum required",
+      "duplicate notice bundle refused",
+      "existing output archive never overwritten"
+    ]
+  },
+  "resources": {
+    "startedAt": "2026-09-28T05:55:19.602Z",
+    "command": [
+      "/usr/bin/timeout",
+      "180",
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      "integration/tool-notice-repack.mjs"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "38550978-41d9-4eb3-96b6-506c3ae0057d",
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 22343278592
+    },
+    "minimumHostAvailable": 22314946560,
+    "peakMemoryBytes": 19091456,
+    "peakTasks": 7,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/macos/tool-notice-controls-r2-2026-09-28-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-28T05:55:19.828Z",
+      "memoryBytes": 10305536,
+      "peakMemoryBytes": 19091456,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 8282112,
+        "file": 45056,
+        "kernel": 937984,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 45056,
+        "slab": 163728
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-28T05:55:19.839Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 13279232,
+      "peakMemoryBytes": 19091456,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11714560,
+        "file": 45056,
+        "kernel": 1077248,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 45056,
+        "slab": 166024
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-28T05:55:19.868Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "nativeGate": "Use existing Windows ARM64 distribution workflow in mutually exclusive archive-repair mode; verify fresh native Lean/Lake, empty-PATH execution and local Lake C generation before retaining a new unpublished archive. Existing C/C++ build outputs must remain byte-identical."
+}

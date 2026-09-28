@@ -149,6 +149,11 @@ const notices = Object.keys(metadata).filter(path => /LICEN[SC]E|COPYING|COPYRIG
 assert.ok(notices.length > 0, 'Every archive must carry its license');
 if (kind === 'sdk') for (const name of ['LLVM', 'BINARYEN', 'EMSCRIPTEN'])
   assert.ok(metadata[`install/notices/${name}-LICENSE.txt`]?.length > 100, `Missing ${name} license`);
+if (kind === 'lean') {
+  assert.ok(metadata['install/LICENSES'], 'Missing upstream Lean third-party notice bundle');
+  assert.equal(createHash('sha256').update(metadata['install/LICENSES']).digest('hex'),
+    '00cce2ac071f63d470a287438a7c6bbc4334706be244384e9af4fc9ead11cdce');
+}
 const provenancePath = (kind === 'leantar' ? '' : 'install/') + 'build-provenance.json';
 const provenance = JSON.parse(metadata[provenancePath]);
 const bundledLibraries = expected.map(([path]) => path).filter(path => /\.dll$/i.test(path));

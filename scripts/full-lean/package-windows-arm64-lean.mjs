@@ -37,7 +37,7 @@ assert.ok(contentBytes < 8 * 1024 ** 3 && free >= contentBytes * 2 + 4 * 1024 **
 mkdirSync(output);
 for (const tree of trees) cpSync(join(build, tree), join(prefix, tree), { recursive: true, dereference: true });
 cpSync(join(source, 'src'), join(prefix, 'src/lean'), { recursive: true, dereference: true, filter: sourceFilter });
-copyFileSync(join(source, 'LICENSE'), join(prefix, 'LICENSE'));
+for (const name of ['LICENSE', 'LICENSES']) copyFileSync(join(source, name), join(prefix, name));
 const programs = new Map(), imports = [];
 function collect(directory) {
   for (const name of readdirSync(directory)) {

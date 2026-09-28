@@ -1,15 +1,15 @@
-**Windows prerequisite traversal corrected — 2026-09-28.** Candidate `.43` failed
-before installed execution: the isolation harness hit its parent deadline while
-resolving nearly 19,000 CodeQL directories. Discovery now uses cached directory
-metadata and resolves roots and reparse entries only. Full traversal, junction
-handling and file denials remain required. Two local controls passed for deep
-Unicode paths, tool discovery, aliases and cycles, using 9.7 MiB; native junction
-and isolation checks will run against the unchanged archive.
+**Three `.43` platforms passed — 2026-09-28.** Linux x64/ARM64 and macOS ARM64
+passed the exact candidate, including eight independent deployments each. macOS
+x64 remains in progress. Windows x64's corrected traversal passed native junction
+and isolation controls and reached installed application tests.
 
-Linux and macOS rechecks remain in progress. ARM64's real compiler-cache control
-passed and its bounded Lean build is running. The verified source/notices archive
-is retained as an unpublished draft.
+The ARM64 Lean build continues. Packaging now preserves upstream `LICENSES`.
+A notice-only repair route can complete the already-running bootstrap's archive
+without recompiling: five local controls passed, including byte/mode/hardlink
+preservation and bad-checksum rejection, at 18.2 MiB. The repaired archive must
+pass fresh native Lean/Lake checks before retention; it is not yet validated.
 
-README reviewed: `.37` remains accepted on Linux/macOS; Windows is unsupported.
-Remaining gates: native installed results, ARM64 distribution and complete matrix.
-No npm publication. Completion ETA is not yet estimable.
+README reviewed: `.37` remains the accepted Linux/macOS release; Windows remains
+unsupported. Remaining gates: native results, complete ARM64 distribution, then
+one candidate across the full matrix. No npm publication. Completion ETA is not
+yet estimable.
