@@ -81,6 +81,6 @@ the application's stdout remains usable in pipes. These logging improvements
 are checked in installed-package acceptance. The historical `.32` archive
 predates these improvements and remains unchanged.
 The package is a private experimental candidate, not an npm publication or a
-claim that every Lean program works. Windows ARM64 distribution and installed
-acceptance remain in progress. Deno, Bun, HTTP/filesystem parity and broad
+claim that every Lean program works. Native Windows ARM64 tool downloads are
+now available; installed-package acceptance remains in progress. Deno, Bun, HTTP/filesystem parity and broad
 third-party packages remain separate milestones.

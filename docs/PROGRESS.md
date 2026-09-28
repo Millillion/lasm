@@ -1,15 +1,16 @@
-**Five-platform candidate retained — 2026-09-28.** The exact `.44` archive passed
-native installed/deployment checks on Linux and macOS x64/ARM64 plus Windows x64.
-Run `36398226921` retained it with a combined acceptance receipt; GitHub's stored
-digest matches the tested hash. README and support documentation now use `.44`,
-with complete commands, exact platform boundaries and runtime exclusions.
+**Native Windows ARM64 tools connected — 2026-09-28.** Run `36397277364`
+completed Lean 4.34.1 compilation, native execution, relocation and retention.
+The build took 169.8 minutes with a 2.54-GiB peak. Streaming audits checked all
+15 native binaries and matching notices; anonymous retrieval verified the public
+778-MB archive. Local audit/download peaks were 87.1/35.5 MiB under 512-MiB caps.
+The completed compiler cache is retained separately.
 
-Windows ARM64's first native compiler build passed with a 2.53-GiB peak, but
-archive retention failed. Retention now checks draft storage before building and
-saves distributions independently before compiler caches. The storage and revised
-archive-preservation controls passed natively in `36397277364`; its guarded
-compiler rebuild is running.
+The source catalog now connects that compiler and its required source/notices
+companion. Candidate `.45` is configured to test one identical archive on Linux,
+macOS and Windows, each x64/ARM64. Artifact validation, workflow structure, syntax
+and whitespace checks passed. README retains `.44` as the accepted five-target
+release and clearly marks the pending source changes.
 
-Remaining gates: retain/audit/distribute native ARM64 Lean, connect its catalog,
-and accept one exact candidate on all six targets. ARM64 remains unsupported;
-broader API parity is deferred. No npm publication. Completion ETA is not yet estimable.
+Remaining gates: pack `.45`, pass all six native installed/deployment checks,
+retain its receipt and update the support contract. Broader API parity is deferred.
+No npm publication. Completion ETA is not yet estimable.

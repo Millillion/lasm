@@ -15,7 +15,7 @@ import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../', import.meta.url));
-const [outputArg, runtimeArg, nativeArg, manifestSha256, version = '0.1.0-experimental.44', ...extra] = process.argv.slice(2);
+const [outputArg, runtimeArg, nativeArg, manifestSha256, version = '0.1.0-experimental.45', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && runtimeArg && nativeArg && /^[a-f0-9]{64}$/.test(manifestSha256 ?? '') && !extra.length
   && /^0\.1\.0-experimental\.\d+$/.test(version),
 'Usage: package-node-release.mjs NEW_OUTPUT RUNTIME NATIVE_BUNDLE RUNTIME_MANIFEST_SHA256 [VERSION]');
@@ -27,7 +27,7 @@ const runtime = await verifyApplicationRuntime(runtimeArg, expected);
 assert.equal(runtime.manifest.leanCommit, toolchainCatalog.lean[lean]?.commit, 'Match the native Lean release');
 const pins = JSON.parse(readFileSync(join(root, 'scripts/ci/acceptance-versions.json')));
 assert.equal(lean, pins.lean);
-const platforms = (process.env.LASM_CANDIDATE_PLATFORMS ?? 'linux-x64,linux-arm64,darwin-x64,darwin-arm64,win32-x64').split(',');
+const platforms = (process.env.LASM_CANDIDATE_PLATFORMS ?? 'linux-x64,linux-arm64,darwin-x64,darwin-arm64,win32-x64,win32-arm64').split(',');
 assert.equal(new Set(platforms).size, platforms.length);
 for (const platform of platforms) {
   assert.match(platform, /^(linux|darwin|win32)-(x64|arm64)$/);

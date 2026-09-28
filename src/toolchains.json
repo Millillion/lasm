@@ -108,10 +108,27 @@
           "bytes": 589007020,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
+        },
+        "win32-arm64": {
+          "name": "lean-4.34.1-win32-arm64",
+          "root": "install",
+          "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-lean-bootstrap-36397277364/lean-4.34.1-win32-arm64.tar.gz",
+          "format": "tar.gz",
+          "sha256": "202ad6c1403970b98cac5ea10259a54e049b131836b9b2a97d5a82fab5ab4ae0",
+          "bytes": 778111723,
+          "maximumExtractedBytes": 8589934592
         }
       },
-      "unavailable": {
-        "win32-arm64": "Upstream publishes no native Windows ARM64 archive; Lasm must supply and validate a native build."
+      "notices": {
+        "win32-arm64": {
+          "name": "windows-arm64-tool-notices-v1",
+          "root": "install",
+          "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-tool-notices-v1/windows-arm64-tool-notices-v1.tar.gz",
+          "sha256": "b167d935b5273ff0a2a15bb097dc903746bab8ac1dcb40f82da06085afa2850a",
+          "bytes": 14639815,
+          "format": "tar.gz",
+          "maximumExtractedBytes": 67108864
+        }
       }
     }
   }

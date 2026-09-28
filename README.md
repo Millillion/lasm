@@ -82,7 +82,7 @@ compatibility launchers. These interfaces have no current release support guaran
 | Other Linux distributions | x86-64 and ARM64 | Unverified; glibc 2.39 or newer is required. Alpine/musl is unsupported. |
 | macOS 15.7.9 | x86-64 and ARM64 | Candidate `.44` passed native installed-package and copied-deployment acceptance. |
 | Windows 10.0.26100.33438 (`windows-2025` runner) | x86-64 | Candidate `.44` passed native installed-package and copied-deployment acceptance. Other Windows versions are unverified. |
-| Windows | ARM64 | Native compiler build passed; archive retention and installed-package checks remain pending. Not yet supported. |
+| Windows | ARM64 | Native Lean and SDK downloads are available; installed-package acceptance is pending. Not yet supported. |
 | Deno, Bun, browsers, Cloudflare Workers | Any | Not supported by the release candidate. |
 | Lambda, Netlify, other serverless services | Any | No deployment adapter or platform acceptance yet. |
 
@@ -91,6 +91,10 @@ needed. Linux requires its ordinary OS libraries and shell, but no developer SDK
 The [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md) identifies exact tested artifacts;
 [the plan](https://github.com/Millillion/lasm/blob/main/docs/PLAN.md) records work in progress.
 The same `.44` archive covers all five accepted targets above.
+
+**Source changes awaiting acceptance:** the next `.45` candidate connects native
+Windows ARM64 tools and tests one archive on all six OS/architecture targets.
+It is not an accepted release until those installed-package checks pass.
 
 ## Lean support and restrictions
 

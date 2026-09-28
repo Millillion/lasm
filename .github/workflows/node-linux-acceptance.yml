@@ -6,7 +6,7 @@ on:
         description: Unique version for the newly packed candidate
         required: true
         type: string
-        default: 0.1.0-experimental.44
+        default: 0.1.0-experimental.45
       runtime-cache-key:
         description: Exact cache key emitted by Node Linux runtime inputs
         required: true
@@ -18,7 +18,7 @@ on:
       validation-scope:
         description: Target a Windows repair or run the complete acceptance matrix
         type: choice
-        options: [all, windows-x64]
+        options: [all, windows-x64, windows-arm64]
         default: all
 permissions:
   contents: read
@@ -122,6 +122,7 @@ jobs:
       cache-key: ${{ needs.package.outputs.cache-key }}
       candidate-version: ${{ inputs.candidate-version }}
   windows-x64:
+    if: inputs.validation-scope == 'all' || inputs.validation-scope == 'windows-x64'
     needs: package
     uses: ./.github/workflows/node-windows-consumer.yml
     with:
@@ -130,9 +131,19 @@ jobs:
       sha256: ${{ needs.package.outputs.sha256 }}
       cache-key: ${{ needs.package.outputs.cache-key }}
       candidate-version: ${{ inputs.candidate-version }}
+  windows-arm64:
+    if: inputs.validation-scope == 'all' || inputs.validation-scope == 'windows-arm64'
+    needs: package
+    uses: ./.github/workflows/node-windows-consumer.yml
+    with:
+      runner: windows-11-arm
+      architecture: arm64
+      sha256: ${{ needs.package.outputs.sha256 }}
+      cache-key: ${{ needs.package.outputs.cache-key }}
+      candidate-version: ${{ inputs.candidate-version }}
   candidate:
     if: inputs.validation-scope == 'all'
-    needs: [package, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64]
+    needs: [package, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, windows-arm64]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -140,7 +151,7 @@ jobs:
     env:
       LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
       LASM_CANDIDATE_SHA256: ${{ needs.package.outputs.sha256 }}
-      LASM_ACCEPTANCE_PLATFORMS: linux-x64,linux-arm64,darwin-x64,darwin-arm64,win32-x64
+      LASM_ACCEPTANCE_PLATFORMS: linux-x64,linux-arm64,darwin-x64,darwin-arm64,win32-x64,win32-arm64
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7

@@ -1,0 +1,2224 @@
+{
+  "scope": "Native Windows ARM64 Lean distribution, public download and archive audit; installed Lasm package acceptance remains a separate gate",
+  "passed": true,
+  "run": 36397277364,
+  "job": 108846546297,
+  "url": "https://github.com/Millillion/lasm/actions/runs/36397277364/job/108846546297",
+  "sourceRevision": "16d91dc92e6cc1e6c58f7170ea22eabfff9f6688",
+  "artifact": {
+    "name": "lean-4.34.1-win32-arm64",
+    "root": "install",
+    "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-lean-bootstrap-36397277364/lean-4.34.1-win32-arm64.tar.gz",
+    "format": "tar.gz",
+    "sha256": "202ad6c1403970b98cac5ea10259a54e049b131836b9b2a97d5a82fab5ab4ae0",
+    "bytes": 778111723,
+    "maximumExtractedBytes": 8589934592
+  },
+  "nativeReport": {
+    "passed": true,
+    "scope": "Relocated native ARM64 Lean/Lake and local C generation; full Lasm installed application acceptance remains separate",
+    "lean": "4.34.1",
+    "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "artifact": {
+      "name": "lean-4.34.1-win32-arm64",
+      "root": "install",
+      "url": "https://lasm-fixture.invalid/lean-4.34.1-win32-arm64.tar.gz",
+      "format": "tar.gz",
+      "sha256": "202ad6c1403970b98cac5ea10259a54e049b131836b9b2a97d5a82fab5ab4ae0",
+      "bytes": 778111723,
+      "maximumExtractedBytes": 8589934592
+    },
+    "nativePrograms": {
+      "lean": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "lake": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    "identities": [
+      {
+        "file": "bin\\cadical.exe",
+        "sha256": "5f63dd3bc0fea75e6f33be1bc8de42a43180fbac06810705fc630932c023cf25",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\lake.exe",
+        "sha256": "ccb63c37af4ef13998a5de6387b4a692f7e183ef4ecc70fe0b8fcfecfcd7cd9c",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\lean.exe",
+        "sha256": "9918e904f4a7d616a812aec821b5869c5263c68f4cb14c511557bf7477a54ebd",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\leanc.exe",
+        "sha256": "dc8bb69aa3f99c00305c08f2912b1aae7018df9762b9018120fc083bafab14b9",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\leanchecker.exe",
+        "sha256": "a8a2507decc88ac421e2d116a8a66113de9ee5a3aa1b039540699d643dab4d93",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\leanir.exe",
+        "sha256": "6b272950303df8a375b69f5ec451a9ac8940bc72593f829a94640ff821d9352e",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\leantar.exe",
+        "sha256": "ffca47cf7cd98a9b98da01bcd1fea7b92a1edda2244c7306f75ab2060dff641a",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libInit_shared.dll",
+        "sha256": "4370609aa21e5a7d4e768b810823e877f52172f18088becaad4177637a3006ac",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libLake_shared.dll",
+        "sha256": "85f8e74cc6e4e4e4befc79652b88d0513d184c4616acb17441e332f36b1c1b20",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libleanshared.dll",
+        "sha256": "421aaf10a595b1cad0ab48d8b72ecfb78bbb12e61997ef0e47007fe3943d90a4",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libleanshared_1.dll",
+        "sha256": "d25227efacb5cd579d77bc2bd1ceaed051435f60e65025b5d877236698579c91",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libleanshared_2.dll",
+        "sha256": "fae331ad5cc53bdaeec6ee512045bb1f027a44692dfa88f66e7e8fa7718f3323",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libc++.dll",
+        "sha256": "92e003c17be34ed7ce27571050de7d681d7217e1f9f856322d3726d58eace3aa",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libgmp-10.dll",
+        "sha256": "bfc6046e374a27838b54bde5602851c7cc426ac9438cb65f019b9e67a961f47c",
+        "nativeArm64": true
+      },
+      {
+        "file": "bin\\libuv-1.dll",
+        "sha256": "95c30516d451197a5a61c5bece36254aad984ddffa8429cbf9bfd196d286c0db",
+        "nativeArm64": true
+      }
+    ],
+    "imports": [
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\cadical.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "libLake_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lake.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\lean.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanc.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "libleanshared_1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "libLake_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanchecker.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "libleanshared_1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "libleanshared_2.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leanir.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leantar.exe",
+        "dll": "bcryptprimitives.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leantar.exe",
+        "dll": "kernel32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leantar.exe",
+        "dll": "api-ms-win-core-synch-l1-2-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leantar.exe",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\leantar.exe",
+        "dll": "ntdll.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "libgmp-10.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "libuv-1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "ADVAPI32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "WS2_32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "icu.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "bcrypt.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libInit_shared.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "libleanshared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "libleanshared_2.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "libleanshared_1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libLake_shared.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "libleanshared_2.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "libleanshared_1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_1.dll",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "libleanshared_1.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "libInit_shared.dll",
+        "bundled": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libleanshared_2.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-multibyte-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libc++.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libgmp-10.dll",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "USER32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "ADVAPI32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "IPHLPAPI.DLL",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "USERENV.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "WS2_32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "dbghelp.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "ole32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "SHELL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "KERNEL32.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "windowsSystem": true
+      },
+      {
+        "from": "bin\\libuv-1.dll",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "windowsSystem": true
+      }
+    ],
+    "checks": [
+      {
+        "program": "lean.exe",
+        "args": [
+          "--githash"
+        ],
+        "stdout": "5045d0056413266e57c625dcd7c365b10e377c52\n",
+        "stderr": ""
+      },
+      {
+        "program": "lake.exe",
+        "args": [
+          "--version"
+        ],
+        "stdout": "Lake version 5.0.0-src+5045d00 (Lean version 4.34.1)\n",
+        "stderr": ""
+      },
+      {
+        "program": "lean.exe",
+        "args": [
+          "--run",
+          "Main.lean"
+        ],
+        "stdout": "native Windows ARM64 Lean 4.34.1\n",
+        "stderr": ""
+      },
+      {
+        "program": "lean.exe",
+        "args": [
+          "-Dcompiler.postponeCompile=false",
+          "-c",
+          "main.c",
+          "Main.lean"
+        ],
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "lakeLocalCGeneration": true,
+        "sources": [
+          {
+            "module": "+Greeting",
+            "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\relocated project \u65e5\u672c\u8a9e\\Greeting.lean"
+          },
+          {
+            "module": "/+Main",
+            "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\relocated project \u65e5\u672c\u8a9e\\Main.lean"
+          }
+        ]
+      }
+    ],
+    "inputs": {
+      "lean": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "seed": {
+        "prefix": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\seed-cache\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+        "artifact": {
+          "name": "lean-4.34.1-windows.tar.zst",
+          "root": "lean-4.34.1-windows",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.34.1/lean-4.34.1-windows.tar.zst",
+          "sha256": "667394ecf6708a228221eb4919c0bdb419966b7408bcf3089a9096a6f4ae62c9",
+          "bytes": 589007020,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        },
+        "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+        "architectures": {
+          "lean": {
+            "platform": "win32",
+            "architectures": [
+              "x64"
+            ]
+          },
+          "lake": {
+            "platform": "win32",
+            "architectures": [
+              "x64"
+            ]
+          }
+        },
+        "helperEmulation": true,
+        "scope": "Same-version official x64 build-time seed only; no seed executable or library is shipped"
+      },
+      "leantar": {
+        "executable": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\helper-cache\\artifacts\\2c445faa1aa52ac8445256b766bb9d198ed05f13b5679593d291effee961bf0d\\leantar.exe",
+        "directory": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\helper-cache\\artifacts\\2c445faa1aa52ac8445256b766bb9d198ed05f13b5679593d291effee961bf0d",
+        "receipt": {
+          "scope": "Unpublished native bootstrap archive; not Node installed-package acceptance",
+          "kind": "leantar",
+          "tag": "windows-arm64-leantar-bootstrap-36278365557",
+          "archive": "leantar-0.1.20-win32-arm64.tar.gz",
+          "sha256": "1391fe8084ad6f1fd86806f6ba4392b23cd83c68a3ab5f564539be35a840145c",
+          "bytes": 787239,
+          "sourceRevision": "cc9c2c929cba829e7b0ee4ea847d1c45bb63aacd",
+          "run": "https://github.com/Millillion/lasm/actions/runs/36278365557",
+          "report": {
+            "scope": "Native Windows ARM64 leantar, unchanged upstream tests and relocated CLI archive roundtrip; managed toolchain packaging remains separate",
+            "upstream": {
+              "version": "0.1.20",
+              "commit": "46485d0eca748ed2d2678e70d59949bbc602f32c",
+              "url": "https://github.com/digama0/leangz/releases/tag/v0.1.20"
+            },
+            "rust": {
+              "toolchain": "1.98.1-aarch64-pc-windows-msvc",
+              "version": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: aarch64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+              "nativeCompiler": true,
+              "nativeCargo": true,
+              "cCompiler": {
+                "host": "x64",
+                "target": "arm64",
+                "helperEmulation": true,
+                "path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\arm64\\cl.exe"
+              }
+            },
+            "inputs": {
+              "Cargo.toml": "8c44aa1cdc5d3c616eead3b4ef52bea7e75a062ed1c760554a2397413264d42c",
+              "Cargo.lock": "c704ff4c4c078b6cb67eb4dede88b13a3b0ba78e02b06eec5a6fd1ed524b7495",
+              "tests/module_compression.rs": "c1cb14003cf20c262f6e36052ef9d798ef60ec7b81150fb7f9052748233e1ba7",
+              "tests/module/Attr.olean": "21bea27e44e5e65c08869fbaa5664081438a8a333f3fe7cc96a7717607a84186",
+              "tests/module/Attr.olean.private": "cc8053aeb68f9952454518067c2d3b6a7c2691748a2a0a3cc7bd730fde9fd52b",
+              "tests/module/Attr.olean.server": "d5d225213b22d9940f50ac2e2df769b34679d15cfcf500088f66df451743c246",
+              "tests/module/Attr.trace": "d133837c0fb1c01bffce68e21f9a65742992cdb164f23c3155b13ad458806c8a",
+              "tests/module/README.md": "cc2af54982a92ebc4c3f7559a642d806f63233411b17d6df7cdd8abf9b11b2a7"
+            },
+            "executable": {
+              "sha256": "ffca47cf7cd98a9b98da01bcd1fea7b92a1edda2244c7306f75ab2060dff641a",
+              "nativeArm64": true,
+              "leantarVersion": "leantar 0.1.20",
+              "emptyPath": true
+            },
+            "reference": {
+              "artifact": {
+                "name": "leantar-v0.1.20-x86_64-pc-windows-msvc",
+                "root": "leantar-v0.1.20-x86_64-pc-windows-msvc",
+                "url": "https://github.com/digama0/leangz/releases/download/v0.1.20/leantar-v0.1.20-x86_64-pc-windows-msvc.zip",
+                "sha256": "7bb21a0a8d152da25863ad53039edddf5fd656b9d7be298b221f4565027f8cc7",
+                "bytes": 777243,
+                "format": "zip",
+                "maximumExtractedBytes": 8388608
+              },
+              "emulatedX64Control": true,
+              "nativeArchiveReadByReference": true,
+              "referenceArchiveReadByNative": true,
+              "traceComparison": "Exact official output; unchanged dependency hash, schema and outputs"
+            },
+            "roundtrip": {
+              "Attr.trace": "4e2d3472346215b2fbb4377c8a6c223a53930cf2ccb78e3c3fbbdaa758701535",
+              "Attr.olean": "21bea27e44e5e65c08869fbaa5664081438a8a333f3fe7cc96a7717607a84186",
+              "Attr.olean.private": "cc8053aeb68f9952454518067c2d3b6a7c2691748a2a0a3cc7bd730fde9fd52b",
+              "Attr.olean.server": "d5d225213b22d9940f50ac2e2df769b34679d15cfcf500088f66df451743c246"
+            },
+            "createdAt": "2026-09-26T23:09:18.113Z"
+          },
+          "resources": {
+            "status": "passed",
+            "command": [
+              "pwsh",
+              "-NoProfile",
+              "-File",
+              "scripts/ci/windows-leantar.ps1"
+            ],
+            "hostAtStart": {
+              "total": 17169387520,
+              "available": 13582864384
+            },
+            "limits": {
+              "jobCommittedBytes": 4294967296,
+              "stopCommittedBytes": 3435973836,
+              "hostReserveBytes": 2147483648,
+              "timeoutSeconds": 2100
+            },
+            "peakCommittedBytes": 756314112,
+            "minimumHostAvailable": 12431003648,
+            "startedAt": 1790464038.952415,
+            "unit": "Local\\LasmResource-c53ca42e-a721-4341-8551-0cfeb471bb60",
+            "pid": 9180,
+            "lastSampleAt": 1790464158.1378775,
+            "exitCode": 0,
+            "finishedAt": 1790464158.1761472
+          },
+          "recordedAt": "2026-09-26T23:09:23.239Z"
+        }
+      },
+      "sourceRevision": "16d91dc92e6cc1e6c58f7170ea22eabfff9f6688",
+      "recordedAt": "2026-09-28T08:32:06.843Z"
+    },
+    "recordedAt": "2026-09-28T11:24:25.405Z",
+    "resourceReport": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release-resources.json"
+  },
+  "nativeResources": {
+    "status": "passed",
+    "command": [
+      "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+      "--login",
+      "scripts/full-lean/bootstrap-windows-arm64-lean-release.sh"
+    ],
+    "hostAtStart": {
+      "total": 17169428480,
+      "available": 12886220800
+    },
+    "limits": {
+      "jobCommittedBytes": 8584714240,
+      "stopCommittedBytes": 6867771392,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 14400
+    },
+    "peakCommittedBytes": 2728611840,
+    "minimumHostAvailable": 11192745984,
+    "startedAt": 1790584475.3787818,
+    "unit": "Local\\LasmResource-c2ea0a1d-e6d9-4802-8d5b-56c896337c11",
+    "pid": 556,
+    "lastSampleAt": 1790594665.353769,
+    "exitCode": 0,
+    "finishedAt": 1790594665.5362017
+  },
+  "archiveAudit": {
+    "passed": true,
+    "scope": "Archive integrity and redistribution-metadata inventory; no new native execution or installed Node acceptance",
+    "kind": "lean",
+    "tag": "windows-arm64-lean-bootstrap-36397277364",
+    "archive": "lean-4.34.1-win32-arm64.tar.gz",
+    "sha256": "202ad6c1403970b98cac5ea10259a54e049b131836b9b2a97d5a82fab5ab4ae0",
+    "bytes": 778111723,
+    "sourceRevision": "16d91dc92e6cc1e6c58f7170ea22eabfff9f6688",
+    "sourceRun": "https://github.com/Millillion/lasm/actions/runs/36397277364",
+    "archiveEntries": 18437,
+    "contentBytes": 3074029990,
+    "nativePrograms": 15,
+    "bundledLibraries": [
+      "install/bin/libInit_shared.dll",
+      "install/bin/libLake_shared.dll",
+      "install/bin/libleanshared.dll",
+      "install/bin/libleanshared_1.dll",
+      "install/bin/libleanshared_2.dll",
+      "install/bin/libc++.dll",
+      "install/bin/libgmp-10.dll",
+      "install/bin/libuv-1.dll"
+    ],
+    "sourcePrograms": [],
+    "notices": [
+      "install/LICENSE",
+      "install/LICENSES",
+      "install/notices/leantar-LICENSE",
+      "install/notices/msys2-package-versions.txt",
+      "install/notices/windows-manifest.patch",
+      "install/notices/msys2/brotli/LICENSE",
+      "install/notices/msys2/bzip2/LICENSE",
+      "install/notices/msys2/c-ares/LICENSE.md",
+      "install/notices/msys2/clang/LICENSE",
+      "install/notices/msys2/clang-libs/LICENSE",
+      "install/notices/msys2/compiler-rt/LICENSE",
+      "install/notices/msys2/cppdap/LICENSE",
+      "install/notices/msys2/crt/COPYING",
+      "install/notices/msys2/crt/COPYING.MinGW-w64-runtime.txt",
+      "install/notices/msys2/crt/COPYING.MinGW-w64.txt",
+      "install/notices/msys2/curl/LICENSE",
+      "install/notices/msys2/expat/COPYING",
+      "install/notices/msys2/fmt/LICENSE",
+      "install/notices/msys2/gettext-runtime/COPYING",
+      "install/notices/msys2/headers/COPYING",
+      "install/notices/msys2/headers/COPYING.MinGW-w64-runtime.txt",
+      "install/notices/msys2/headers/COPYING.MinGW-w64.txt",
+      "install/notices/msys2/hwloc/LICENSE",
+      "install/notices/msys2/jsoncpp/LICENSE",
+      "install/notices/msys2/libarchive/LICENSE",
+      "install/notices/msys2/libb2/LICENSE",
+      "install/notices/msys2/libblake3/LICENSE_A2",
+      "install/notices/msys2/libblake3/LICENSE_A2LLVM",
+      "install/notices/msys2/libblake3/LICENSE_CC0",
+      "install/notices/msys2/libc++/LICENSE",
+      "install/notices/msys2/libffi/LICENSE",
+      "install/notices/msys2/libiconv/COPYING",
+      "install/notices/msys2/libiconv/COPYING.LIB",
+      "install/notices/msys2/libltdl/COPYING.LIB",
+      "install/notices/msys2/libpsl/COPYING",
+      "install/notices/msys2/libssh2/LICENSE",
+      "install/notices/msys2/libtasn1/COPYING",
+      "install/notices/msys2/libtasn1/COPYING.LESSERv2",
+      "install/notices/msys2/libunistring/LICENSE",
+      "install/notices/msys2/libunistring/LICENSE.LIB",
+      "install/notices/msys2/libunwind/LICENSE",
+      "install/notices/msys2/libuv/LICENSE",
+      "install/notices/msys2/libwinpthread/COPYING",
+      "install/notices/msys2/libxml2/COPYING",
+      "install/notices/msys2/lld/LICENSE",
+      "install/notices/msys2/llvm-libs/LICENSE",
+      "install/notices/msys2/llvm-tools/LICENSE",
+      "install/notices/msys2/nghttp2/COPYING",
+      "install/notices/msys2/nghttp3/COPYING",
+      "install/notices/msys2/ngtcp2/COPYING",
+      "install/notices/msys2/ninja/COPYING",
+      "install/notices/msys2/oneTBB/LICENSE",
+      "install/notices/msys2/openssl/LICENSE",
+      "install/notices/msys2/pcre2/COPYING",
+      "install/notices/msys2/pcre2/LICENCE.md",
+      "install/notices/msys2/rhash/LICENSE",
+      "install/notices/msys2/wineditline/LICENSE",
+      "install/notices/msys2/winpthreads/COPYING",
+      "install/notices/msys2/xxhash/LICENSE",
+      "install/notices/msys2/xz/COPYING",
+      "install/notices/msys2/xz/COPYING.0BSD",
+      "install/notices/msys2/xz/COPYING.GPLv2",
+      "install/notices/msys2/xz/COPYING.GPLv3",
+      "install/notices/msys2/xz/COPYING.LGPLv2.1",
+      "install/notices/msys2/zlib/LICENSE",
+      "install/notices/msys2/zstd/LICENSE",
+      "install/notices/msys2/gettext-runtime/intl/COPYING.LIB",
+      "install/notices/msys2/gettext-runtime/libasprintf/COPYING",
+      "install/notices/msys2/gettext-runtime/libasprintf/COPYING.LIB",
+      "install/notices/msys2/libiconv/libcharset/COPYING.LIB"
+    ],
+    "auditedAt": "2026-09-28T11:30:51.546Z"
+  },
+  "metadataHashes": {
+    "install/build-provenance.json": {
+      "sha256": "1ed56ded8d7c71bfe4273be3c9bfdd8d26e98ce8ad6d8ac113f77ef8728688d1",
+      "bytes": 30612
+    },
+    "install/LICENSE": {
+      "sha256": "8b28515ffffc5c0fe2807d8ae3735b00b324d9b7ce807dd63ff6ac8922fbce7e",
+      "bytes": 9160
+    },
+    "install/LICENSES": {
+      "sha256": "00cce2ac071f63d470a287438a7c6bbc4334706be244384e9af4fc9ead11cdce",
+      "bytes": 81854
+    },
+    "install/notices/leantar-LICENSE": {
+      "sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6",
+      "bytes": 11558
+    },
+    "install/notices/msys2-package-versions.txt": {
+      "sha256": "d2e4f1278a7ab127fefc8df843a6f9d135666177c6847d35b5f37e9de7c2acb5",
+      "bytes": 4766
+    },
+    "install/notices/windows-manifest.patch": {
+      "sha256": "a568c8a036e2e66914dd72b4959985868712a1e4cedf6ced493de8c87e4856b4",
+      "bytes": 1026
+    },
+    "install/notices/msys2/brotli/LICENSE": {
+      "sha256": "3d180008e36922a4e8daec11c34c7af264fed5962d07924aea928c38e8663c94",
+      "bytes": 1084
+    },
+    "install/notices/msys2/bzip2/LICENSE": {
+      "sha256": "c6dbbf828498be844a89eaa3b84adbab3199e342eb5cb2ed2f0d4ba7ec0f38a3",
+      "bytes": 1896
+    },
+    "install/notices/msys2/c-ares/LICENSE.md": {
+      "sha256": "460f5e768fda3752ca2169a95df062578a10fb126bfd65f3b9b1a1bed2f84807",
+      "bytes": 1211
+    },
+    "install/notices/msys2/clang/LICENSE": {
+      "sha256": "ebcd9bbf783a73d05c53ba4d586b8d5813dcdf3bbec50265860ccc885e606f47",
+      "bytes": 15140
+    },
+    "install/notices/msys2/clang-libs/LICENSE": {
+      "sha256": "ebcd9bbf783a73d05c53ba4d586b8d5813dcdf3bbec50265860ccc885e606f47",
+      "bytes": 15140
+    },
+    "install/notices/msys2/compiler-rt/LICENSE": {
+      "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d",
+      "bytes": 16708
+    },
+    "install/notices/msys2/cppdap/LICENSE": {
+      "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+      "bytes": 11357
+    },
+    "install/notices/msys2/crt/COPYING": {
+      "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f",
+      "bytes": 2326
+    },
+    "install/notices/msys2/crt/COPYING.MinGW-w64-runtime.txt": {
+      "sha256": "1db8da07b436c68833c0673ffee3d9fcb2526047f3820b81661865dfedc79a1f",
+      "bytes": 12155
+    },
+    "install/notices/msys2/crt/COPYING.MinGW-w64.txt": {
+      "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1",
+      "bytes": 5905
+    },
+    "install/notices/msys2/curl/LICENSE": {
+      "sha256": "82f2f4427d6545ee5aaac4f0b80428da6cc8ba41c2cf5da3a03680ec327b9681",
+      "bytes": 1088
+    },
+    "install/notices/msys2/expat/COPYING": {
+      "sha256": "31b15de82aa19a845156169a17a5488bf597e561b2c318d159ed583139b25e87",
+      "bytes": 1144
+    },
+    "install/notices/msys2/fmt/LICENSE": {
+      "sha256": "07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8",
+      "bytes": 1431
+    },
+    "install/notices/msys2/gettext-runtime/COPYING": {
+      "sha256": "7ef2cdfe58e0c0460657b6598b49af29d4e03c1e41cbaf0e1da1eb8ad74b95d0",
+      "bytes": 495
+    },
+    "install/notices/msys2/headers/COPYING": {
+      "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f",
+      "bytes": 2326
+    },
+    "install/notices/msys2/headers/COPYING.MinGW-w64-runtime.txt": {
+      "sha256": "1db8da07b436c68833c0673ffee3d9fcb2526047f3820b81661865dfedc79a1f",
+      "bytes": 12155
+    },
+    "install/notices/msys2/headers/COPYING.MinGW-w64.txt": {
+      "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1",
+      "bytes": 5905
+    },
+    "install/notices/msys2/hwloc/LICENSE": {
+      "sha256": "a7e03d1ccef79f9a6369f7b7385231e1656339e3292bbac1b7113782d0d384f4",
+      "bytes": 2724
+    },
+    "install/notices/msys2/jsoncpp/LICENSE": {
+      "sha256": "cec0db5f6d7ed6b3a72647bd50aed02e13c3377fd44382b96dc2915534c042ad",
+      "bytes": 2714
+    },
+    "install/notices/msys2/libarchive/LICENSE": {
+      "sha256": "30e556b3959e3985d66efefec5eaac51d4995053caa1d3cffe6eb916f146f229",
+      "bytes": 3089
+    },
+    "install/notices/msys2/libb2/LICENSE": {
+      "sha256": "6a1ee543e5282cd9061881edf462e6fdab181f328da71fc2c9a6950a80e94d01",
+      "bytes": 6556
+    },
+    "install/notices/msys2/libblake3/LICENSE_A2": {
+      "sha256": "00fcc7a934ddbc9ece2a7cc063ac788e284b703b1d705ccbba72d462aa97921e",
+      "bytes": 11361
+    },
+    "install/notices/msys2/libblake3/LICENSE_A2LLVM": {
+      "sha256": "a5695f57ea0c221e0e8b7d784ff774c35e88c3d3270353646a925880bb3492cc",
+      "bytes": 12267
+    },
+    "install/notices/msys2/libblake3/LICENSE_CC0": {
+      "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+      "bytes": 7048
+    },
+    "install/notices/msys2/libc++/LICENSE": {
+      "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b",
+      "bytes": 16703
+    },
+    "install/notices/msys2/libffi/LICENSE": {
+      "sha256": "d5699fa516968e3a1550e6c902b7441c78856f2603d61bedd0b0662a26655366",
+      "bytes": 1132
+    },
+    "install/notices/msys2/libiconv/COPYING": {
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "bytes": 35147
+    },
+    "install/notices/msys2/libiconv/COPYING.LIB": {
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+      "bytes": 26419
+    },
+    "install/notices/msys2/libltdl/COPYING.LIB": {
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+      "bytes": 26419
+    },
+    "install/notices/msys2/libpsl/COPYING": {
+      "sha256": "322392e6001b2b3b0fca705dc9f11f26e12441188ecde50eb1d22909980b2925",
+      "bytes": 1060
+    },
+    "install/notices/msys2/libssh2/LICENSE": {
+      "sha256": "f7f9633cf9ff2f1333f3d7ce46973a8716a4d2a2815ad56f30d437d5fea7bafe",
+      "bytes": 1959
+    },
+    "install/notices/msys2/libtasn1/COPYING": {
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    "install/notices/msys2/libtasn1/COPYING.LESSERv2": {
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+      "bytes": 26419
+    },
+    "install/notices/msys2/libunistring/LICENSE": {
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    "install/notices/msys2/libunistring/LICENSE.LIB": {
+      "sha256": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c",
+      "bytes": 7639
+    },
+    "install/notices/msys2/libunwind/LICENSE": {
+      "sha256": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d",
+      "bytes": 16706
+    },
+    "install/notices/msys2/libuv/LICENSE": {
+      "sha256": "16de0c32b265cb7d46a6d3bd614f259dd4d693a5e26b3407b04aae8d73041f0c",
+      "bytes": 1079
+    },
+    "install/notices/msys2/libwinpthread/COPYING": {
+      "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177",
+      "bytes": 2883
+    },
+    "install/notices/msys2/libxml2/COPYING": {
+      "sha256": "5d4873884a890122a4b9b20ad56ac6f7da1d796a5bfcf04a427970ac96217626",
+      "bytes": 1314
+    },
+    "install/notices/msys2/lld/LICENSE": {
+      "sha256": "f7891568956e34643eb6a0db1462db30820d40d7266e2a78063f2fe233ece5a0",
+      "bytes": 15138
+    },
+    "install/notices/msys2/llvm-libs/LICENSE": {
+      "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+      "bytes": 15141
+    },
+    "install/notices/msys2/llvm-tools/LICENSE": {
+      "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+      "bytes": 15141
+    },
+    "install/notices/msys2/nghttp2/COPYING": {
+      "sha256": "6b94f3abc1aabd0c72a7c7d92a77f79dda7c8a0cb3df839a97890b4116a2de2a",
+      "bytes": 1156
+    },
+    "install/notices/msys2/nghttp3/COPYING": {
+      "sha256": "58cc3fc8c6d6cb2485ab35eb5918e849b5bf1e56522974e106d7a39a88d61dcd",
+      "bytes": 1081
+    },
+    "install/notices/msys2/ngtcp2/COPYING": {
+      "sha256": "542dd526d2ea23565f0571cc68df6f05ed11248a90ff0f32de19d8ba589db513",
+      "bytes": 1080
+    },
+    "install/notices/msys2/ninja/COPYING": {
+      "sha256": "eb7e9ab9690124c5c9f42bdc81383d886a3dede26345b6ed15bbad7caf81f7ea",
+      "bytes": 11358
+    },
+    "install/notices/msys2/oneTBB/LICENSE": {
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357
+    },
+    "install/notices/msys2/openssl/LICENSE": {
+      "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+      "bytes": 10175
+    },
+    "install/notices/msys2/pcre2/COPYING": {
+      "sha256": "99272c55f3dcfa07a8a7e15a5c1a33096e4727de74241d65fa049fccfdd59507",
+      "bytes": 97
+    },
+    "install/notices/msys2/pcre2/LICENCE.md": {
+      "sha256": "197d8a73ffee0d6b09adba2f9c677b5f5aede24edf89258a68e48248d010d811",
+      "bytes": 4011
+    },
+    "install/notices/msys2/rhash/LICENSE": {
+      "sha256": "953e55838353335148c90b5a38a4894292680b1d4c37228ffddddbf18ce54bf5",
+      "bytes": 736
+    },
+    "install/notices/msys2/wineditline/LICENSE": {
+      "sha256": "e1a9520a9b3143ad64adb356c5d2fca6bb09a3ad3950cf1f7213946543582440",
+      "bytes": 1588
+    },
+    "install/notices/msys2/winpthreads/COPYING": {
+      "sha256": "63263614cdd29f2f93cba85e992f041b31f9fc7b4033692f31269489a8a1b177",
+      "bytes": 2883
+    },
+    "install/notices/msys2/xxhash/LICENSE": {
+      "sha256": "6ffedbc0f7878612d2b23589f1ff2ab15633e1df7963a5d9fc750ec5500c7e7a",
+      "bytes": 1389
+    },
+    "install/notices/msys2/xz/COPYING": {
+      "sha256": "616a3ad264ce29b8f1cb97e53037b139d406899ca8d1f799651e17bfa09830b8",
+      "bytes": 3119
+    },
+    "install/notices/msys2/xz/COPYING.0BSD": {
+      "sha256": "0b01625d853911cd0e2e088dcfb743261034a091bb379246cb25a14cc4c74bf1",
+      "bytes": 607
+    },
+    "install/notices/msys2/xz/COPYING.GPLv2": {
+      "sha256": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6",
+      "bytes": 17984
+    },
+    "install/notices/msys2/xz/COPYING.GPLv3": {
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    "install/notices/msys2/xz/COPYING.LGPLv2.1": {
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+      "bytes": 26419
+    },
+    "install/notices/msys2/zlib/LICENSE": {
+      "sha256": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2",
+      "bytes": 1002
+    },
+    "install/notices/msys2/zstd/LICENSE": {
+      "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+      "bytes": 1549
+    },
+    "install/notices/msys2/gettext-runtime/intl/COPYING.LIB": {
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+      "bytes": 26419
+    },
+    "install/notices/msys2/gettext-runtime/libasprintf/COPYING": {
+      "sha256": "03133addae5b99a6148c538300e6d97074453089be1423b741bd081f18e2b298",
+      "bytes": 65
+    },
+    "install/notices/msys2/gettext-runtime/libasprintf/COPYING.LIB": {
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+      "bytes": 26419
+    },
+    "install/notices/msys2/libiconv/libcharset/COPYING.LIB": {
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+      "bytes": 26419
+    }
+  },
+  "nativeInventory": [
+    {
+      "path": "install/bin/cadical.exe",
+      "bytes": 1086464,
+      "sha256": "5f63dd3bc0fea75e6f33be1bc8de42a43180fbac06810705fc630932c023cf25",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/lake.exe",
+      "bytes": 86016,
+      "sha256": "ccb63c37af4ef13998a5de6387b4a692f7e183ef4ecc70fe0b8fcfecfcd7cd9c",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/lean.exe",
+      "bytes": 81408,
+      "sha256": "9918e904f4a7d616a812aec821b5869c5263c68f4cb14c511557bf7477a54ebd",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/leanc.exe",
+      "bytes": 99840,
+      "sha256": "dc8bb69aa3f99c00305c08f2912b1aae7018df9762b9018120fc083bafab14b9",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/leanchecker.exe",
+      "bytes": 115200,
+      "sha256": "a8a2507decc88ac421e2d116a8a66113de9ee5a3aa1b039540699d643dab4d93",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/leanir.exe",
+      "bytes": 218624,
+      "sha256": "6b272950303df8a375b69f5ec451a9ac8940bc72593f829a94640ff821d9352e",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/leantar.exe",
+      "bytes": 1707008,
+      "sha256": "ffca47cf7cd98a9b98da01bcd1fea7b92a1edda2244c7306f75ab2060dff641a",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/libc++.dll",
+      "bytes": 1631232,
+      "sha256": "92e003c17be34ed7ce27571050de7d681d7217e1f9f856322d3726d58eace3aa",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/libgmp-10.dll",
+      "bytes": 541696,
+      "sha256": "bfc6046e374a27838b54bde5602851c7cc426ac9438cb65f019b9e67a961f47c",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/libInit_shared.dll",
+      "bytes": 27720704,
+      "sha256": "4370609aa21e5a7d4e768b810823e877f52172f18088becaad4177637a3006ac",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/libLake_shared.dll",
+      "bytes": 11531776,
+      "sha256": "85f8e74cc6e4e4e4befc79652b88d0513d184c4616acb17441e332f36b1c1b20",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/libleanshared.dll",
+      "bytes": 71376896,
+      "sha256": "421aaf10a595b1cad0ab48d8b72ecfb78bbb12e61997ef0e47007fe3943d90a4",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/libleanshared_1.dll",
+      "bytes": 53467648,
+      "sha256": "d25227efacb5cd579d77bc2bd1ceaed051435f60e65025b5d877236698579c91",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/libleanshared_2.dll",
+      "bytes": 60222976,
+      "sha256": "fae331ad5cc53bdaeec6ee512045bb1f027a44692dfa88f66e7e8fa7718f3323",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    {
+      "path": "install/bin/libuv-1.dll",
+      "bytes": 266752,
+      "sha256": "95c30516d451197a5a61c5bece36254aad984ddffa8429cbf9bfd196d286c0db",
+      "native": true,
+      "identity": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    }
+  ],
+  "auditResources": {
+    "startedAt": "2026-09-28T11:27:46.860Z",
+    "command": [
+      "/usr/bin/timeout",
+      "900",
+      "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "scripts/ci/windows-tool-audit.mjs",
+      "lean",
+      "windows-arm64-lean-bootstrap-36397277364",
+      "202ad6c1403970b98cac5ea10259a54e049b131836b9b2a97d5a82fab5ab4ae0",
+      "--local",
+      "--output",
+      ".work/windows-lean-audit-36397277364"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "e9a2f268-460b-488a-96ba-1835c56bffd6",
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 21659471872
+    },
+    "minimumHostAvailable": 21554450432,
+    "peakMemoryBytes": 91340800,
+    "peakTasks": 23,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/macos/native-lean-audit-36397277364-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-28T11:30:51.568Z",
+      "memoryBytes": 1679360,
+      "peakMemoryBytes": 91340800,
+      "swapBytes": 0,
+      "tasks": 1,
+      "memoryBreakdown": {
+        "anon": 0,
+        "file": 892928,
+        "kernel": 176128,
+        "shmem": 0,
+        "file_mapped": 0,
+        "inactive_file": 892928,
+        "slab": 95600
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-28T11:30:51.609Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 14663680,
+      "peakMemoryBytes": 91340800,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11710464,
+        "file": 892928,
+        "kernel": 1093632,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 892928,
+        "slab": 171384
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-28T11:30:51.635Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "publicDownload": {
+    "passed": true,
+    "scope": "Anonymous HTTPS archive checksum verification; native execution and archive contents were checked separately",
+    "artifact": {
+      "name": "lean-4.34.1-win32-arm64",
+      "root": "install",
+      "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-lean-bootstrap-36397277364/lean-4.34.1-win32-arm64.tar.gz",
+      "format": "tar.gz",
+      "sha256": "202ad6c1403970b98cac5ea10259a54e049b131836b9b2a97d5a82fab5ab4ae0",
+      "bytes": 778111723,
+      "maximumExtractedBytes": 8589934592
+    },
+    "bytes": 778111723,
+    "sha256": "202ad6c1403970b98cac5ea10259a54e049b131836b9b2a97d5a82fab5ab4ae0",
+    "startedAt": "2026-09-28T11:32:44.325Z",
+    "finishedAt": "2026-09-28T11:35:41.947Z",
+    "authentication": "No Authorization header or GitHub credentials supplied",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/macos/native-lean-public-download-36397277364-resources.json"
+  },
+  "publicDownloadResources": {
+    "startedAt": "2026-09-28T11:32:44.256Z",
+    "command": [
+      "/usr/bin/timeout",
+      "900",
+      "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      ".work/macos/verify-lean-public-36397277364.mjs"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "5873264c-629e-42c2-9d5b-a2b0238a3d82",
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 21725265920
+    },
+    "minimumHostAvailable": 21679030272,
+    "peakMemoryBytes": 37322752,
+    "peakTasks": 12,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/macos/native-lean-public-download-36397277364-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-28T11:35:41.986Z",
+      "memoryBytes": 380928,
+      "peakMemoryBytes": 37322752,
+      "swapBytes": 0,
+      "tasks": 1,
+      "memoryBreakdown": {
+        "anon": 0,
+        "file": 4096,
+        "kernel": 118784,
+        "shmem": 0,
+        "file_mapped": 0,
+        "inactive_file": 4096,
+        "slab": 52928
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-28T11:35:42.065Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 13668352,
+      "peakMemoryBytes": 37322752,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11710464,
+        "file": 4096,
+        "kernel": 1060864,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 4096,
+        "slab": 144416
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-28T11:35:42.094Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "release": {
+    "id": 398183277,
+    "tag_name": "windows-arm64-lean-bootstrap-36397277364",
+    "html_url": "https://github.com/Millillion/lasm/releases/tag/windows-arm64-lean-bootstrap-36397277364",
+    "published_at": "2026-09-28T11:32:11Z",
+    "target_commitish": "main",
+    "draft": false,
+    "prerelease": true
+  },
+  "releaseAsset": {
+    "id": 595240526,
+    "name": "lean-4.34.1-win32-arm64.tar.gz",
+    "size": 778111723,
+    "digest": "sha256:202ad6c1403970b98cac5ea10259a54e049b131836b9b2a97d5a82fab5ab4ae0",
+    "browser_download_url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-lean-bootstrap-36397277364/lean-4.34.1-win32-arm64.tar.gz"
+  },
+  "requiredCompanion": {
+    "name": "windows-arm64-tool-notices-v1",
+    "root": "install",
+    "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-tool-notices-v1/windows-arm64-tool-notices-v1.tar.gz",
+    "sha256": "b167d935b5273ff0a2a15bb097dc903746bab8ac1dcb40f82da06085afa2850a",
+    "bytes": 14639815,
+    "format": "tar.gz",
+    "maximumExtractedBytes": 67108864
+  },
+  "matchedDependencies": {
+    "gmpPackage": "mingw-w64-clang-aarch64-gmp 6.3.0-2",
+    "leantarExecutableSha256": "ffca47cf7cd98a9b98da01bcd1fea7b92a1edda2244c7306f75ab2060dff641a"
+  },
+  "earlyControls": {
+    "windows-retention-control/result": {
+      "passed": true,
+      "tag": "windows-arm64-retention-control-36397277364-1",
+      "sourceRevision": "16d91dc92e6cc1e6c58f7170ea22eabfff9f6688",
+      "target": "main",
+      "uploadedAndReadIdenticalBytes": true,
+      "controlDraftDeleted": true
+    },
+    "windows-release-guard-control": {
+      "status": "passed",
+      "command": [
+        "node",
+        "test/fixtures/windows-guard.mjs"
+      ],
+      "hostAtStart": {
+        "total": 17169428480,
+        "available": 13559521280
+      },
+      "limits": {
+        "jobCommittedBytes": 536870912,
+        "stopCommittedBytes": 429496729,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": null
+      },
+      "peakCommittedBytes": 111706112,
+      "minimumHostAvailable": 13458128896,
+      "startedAt": 1790584010.8788981,
+      "unit": "Local\\LasmResource-10d240b6-e185-4d64-9cd2-eb3e1a3e78a7",
+      "pid": 4272,
+      "lastSampleAt": 1790584012.1238785,
+      "exitCode": 0,
+      "finishedAt": 1790584012.1497629
+    },
+    "windows-release-cache-controls": {
+      "status": "passed",
+      "command": [
+        "node",
+        "integration/compiler-cache-archive.mjs"
+      ],
+      "hostAtStart": {
+        "total": 17169428480,
+        "available": 13582057472
+      },
+      "limits": {
+        "jobCommittedBytes": 536870912,
+        "stopCommittedBytes": 429496729,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": 180
+      },
+      "peakCommittedBytes": 121597952,
+      "minimumHostAvailable": 13535367168,
+      "startedAt": 1790584015.5671027,
+      "unit": "Local\\LasmResource-a57f6c16-7ffa-4b4e-a3b4-614a2e22b4d1",
+      "pid": 7572,
+      "lastSampleAt": 1790584018.4605482,
+      "exitCode": 0,
+      "finishedAt": 1790584018.4931512
+    },
+    "windows-release-notice-controls": {
+      "status": "passed",
+      "command": [
+        "node",
+        "integration/tool-notice-repack.mjs"
+      ],
+      "hostAtStart": {
+        "total": 17169428480,
+        "available": 13579096064
+      },
+      "limits": {
+        "jobCommittedBytes": 536870912,
+        "stopCommittedBytes": 429496729,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": 180
+      },
+      "peakCommittedBytes": 62185472,
+      "minimumHostAvailable": 13546127360,
+      "startedAt": 1790584021.7684667,
+      "unit": "Local\\LasmResource-4480aba4-3cca-49f0-945f-7f0463d68fd8",
+      "pid": 7272,
+      "lastSampleAt": 1790584022.1964161,
+      "exitCode": 0,
+      "finishedAt": 1790584022.2163763
+    }
+  },
+  "completedCompilerCache": {
+    "scope": "Completed native C/C++ compiler cache only; no Lean distribution acceptance",
+    "tag": "windows-arm64-lean-ccache-36397277364",
+    "operation": "pack",
+    "identitySha256": "6d7bce9e4c732c75a1859098d8680aa068c58c687e4ca694e494cd14609f926a",
+    "sha256": "b6e8c0c3646010c7c92a6832f85929f8ea17c503c72320d55a94b074bebb5aa3",
+    "bytes": 182758805,
+    "files": 10773,
+    "contentBytes": 182558537,
+    "buildResources": {
+      "status": "passed",
+      "command": [
+        "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+        "--login",
+        "scripts/full-lean/bootstrap-windows-arm64-lean-release.sh"
+      ],
+      "hostAtStart": {
+        "total": 17169428480,
+        "available": 12886220800
+      },
+      "limits": {
+        "jobCommittedBytes": 8584714240,
+        "stopCommittedBytes": 6867771392,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": 14400
+      },
+      "peakCommittedBytes": 2728611840,
+      "minimumHostAvailable": 11192745984,
+      "startedAt": 1790584475.3787818,
+      "unit": "Local\\LasmResource-c2ea0a1d-e6d9-4802-8d5b-56c896337c11",
+      "pid": 556,
+      "lastSampleAt": 1790594665.353769,
+      "exitCode": 0,
+      "finishedAt": 1790594665.5362017
+    },
+    "stats": {
+      "autoconf_test": 0,
+      "bad_compiler_arguments": 0,
+      "bad_input_file": 0,
+      "bad_output_file": 0,
+      "cache_miss": 5244,
+      "cache_size_kibibyte": 202160,
+      "called_for_link": 11,
+      "called_for_preprocessing": 0,
+      "cleanups_performed": 0,
+      "compile_failed": 0,
+      "compiler_check_failed": 0,
+      "compiler_produced_empty_output": 0,
+      "compiler_produced_no_output": 0,
+      "compiler_produced_stdout": 0,
+      "could_not_find_compiler": 0,
+      "could_not_use_modules": 0,
+      "could_not_use_precompiled_header": 0,
+      "direct_cache_hit": 0,
+      "direct_cache_miss": 5244,
+      "disabled": 0,
+      "error_hashing_extra_file": 0,
+      "files_in_cache": 10485,
+      "internal_error": 0,
+      "local_storage_hit": 0,
+      "local_storage_miss": 5244,
+      "local_storage_read_hit": 0,
+      "local_storage_read_miss": 10487,
+      "local_storage_write": 10485,
+      "max_cache_size_kibibyte": 1048576,
+      "max_files_in_cache": 0,
+      "missing_cache_file": 0,
+      "modified_input_file": 0,
+      "multiple_source_files": 0,
+      "no_input_file": 0,
+      "output_to_stdout": 0,
+      "preprocessed_cache_hit": 0,
+      "preprocessed_cache_miss": 5244,
+      "preprocessor_error": 0,
+      "recache": 0,
+      "remote_storage_error": 0,
+      "remote_storage_hit": 0,
+      "remote_storage_miss": 0,
+      "remote_storage_read_hit": 0,
+      "remote_storage_read_miss": 0,
+      "remote_storage_timeout": 0,
+      "remote_storage_write": 0,
+      "stats_updated_timestamp": 1790594714,
+      "stats_zeroed_timestamp": 1790584471,
+      "unsupported_code_directive": 0,
+      "unsupported_compiler_option": 0,
+      "unsupported_environment_variable": 0,
+      "unsupported_source_encoding": 0,
+      "unsupported_source_language": 0
+    },
+    "sourceRevision": "16d91dc92e6cc1e6c58f7170ea22eabfff9f6688",
+    "run": "https://github.com/Millillion/lasm/actions/runs/36397277364"
+  },
+  "rawLogSha256": "6b273dc9a9c4446cc1204d11c2d866c7cc06c56d05794824fde4ac26e7c0f9f8"
+}

@@ -6,6 +6,13 @@ and combined receipt are [retained](evidence/node44-five-platform-retention-2026
 ARM64 remains unverified as an installed Lasm application. The README identifies
 the currently available release and platform boundaries.
 
+The native Lean 4.34.1 archive now passed build, relocation, retention and a
+streaming archive audit. Its public tool download and required source/notices
+companion are connected in the source catalog for candidate `.45`. The SDK had
+already passed a fresh native public-download consumer. The next acceptance
+workflow uses one identical package on all six OS/architecture targets.
+The investigations below preserve earlier candidates and failures.
+
 Managed native Lean/Lake execute from a short physical `bin` directory under
 `os.tmpdir()/lasm-tools/<hash>`. Its files are hard links to the verified cache
 when they share a volume; across volumes, copies are necessary. Library, source,
@@ -41,9 +48,9 @@ recorded relocation controls. The SDK is now a public tool prerelease; leantar
 remains a retained bootstrap draft. The new
 Lean 4.34.1 native compiler [reached its deadline while linking](evidence/windows-arm64-lean-release-deadline-2026-09-27.json), with a 1.91-GiB peak and no completed distribution. The reproducible
 [source/notices companion](evidence/windows-arm64-tool-notices-2026-09-27.json)
-must match the compiler's actual GMP version and leantar identity before it is
-connected to that distribution. The Windows ARM64 Lean download catalog entry
-and complete installed Lasm acceptance remain pending.
+was checked against the successful compiler's actual GMP version and leantar
+identity before connection to its distribution. Native Lean download details are
+recorded below; complete installed Lasm acceptance remains pending.
 
 Read-only archive audits verified the retained [SDK and its named licenses](evidence/windows-arm64-sdk-notice-audit-2026-09-27.json) and [leantar executable](evidence/windows-arm64-leantar-archive-audit-2026-09-27.json). They streamed compressed bytes and inventoried native identities without extracting full toolchains locally. The SDK contains 27 recorded native ARM64 files plus the two explicitly unused upstream source launchers; its LLVM, Binaryen, and Emscripten license texts are recorded by hash. These audits establish archive integrity, not complete installed application acceptance.
 
@@ -52,7 +59,8 @@ than copying all native platforms. [Local real-vendor measurements and regressio
 controls](evidence/windows-application-bundle-selection-2026-09-27.json) record
 1,066,984 native bytes for x64 and 1,357,304 for ARM64, down from 13,335,796.
 These are the adapter payloads, not complete Lean deployment sizes. Loaders and
-licenses remain included; installed candidate `.43` validation is pending.
+licenses remain included. Later `.44` x64 acceptance includes that selection;
+ARM64 installed acceptance remains pending.
 
 On resumption, `.42` and the queued `.43` run were confirmed cancelled following
 the user's pause. `.42` had passed prerequisite isolation and was still in its
@@ -154,9 +162,22 @@ on native ARM64 in run `36396705986`, including byte-exact retrieval and cleanup
 The next control failed in tar compression before any compiler rebuild, at a
 60,944,384-byte peak. Its small hard-link input is now constructed synchronously;
 the actual streaming notice append and all preservation assertions are unchanged.
-Both local versions passed under a 512-MiB guard; the revised fixture still needs
-its native Windows recheck.
+Both local versions passed under a 512-MiB guard; the revised fixture
+subsequently passed the native Windows recheck below.
 
 That revised notice control and the draft-storage preflight passed on native ARM64
-in run `36397277364`. The guarded compiler rebuild is in progress. These early
-control passes do not establish a retained distribution or installed support.
+in run `36397277364`. The [compiler build, retained distribution and archive
+audit passed](evidence/windows-arm64-lean-distribution-2026-09-28.json).
+The build took 169.8 minutes and peaked at 2,728,611,840 committed bytes;
+its native execution, relocation and local Lake C-generation checks all passed.
+Both distribution and completed-object cache retention succeeded.
+
+The [native Lean tool prerelease](https://github.com/Millillion/lasm/releases/tag/windows-arm64-lean-bootstrap-36397277364)
+contains 778,111,723 compressed bytes, with SHA-256
+`202ad6c1403970b98cac5ea10259a54e049b131836b9b2a97d5a82fab5ab4ae0`.
+The local streaming audit checked all 18,437 archive entries, all 15 native ARM64
+executable/DLL identities, and the exact upstream `LICENSES` bundle. Its 87.1-MiB
+peak stayed below the 512-MiB cap. The archive's GMP 6.3.0-2 and leantar executable
+match the published source/notices companion. Candidate `.45` connects these
+verified inputs and enables the complete six-target installed/deployment matrix;
+those package-level checks are still required before claiming ARM64 support.

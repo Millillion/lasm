@@ -17,7 +17,9 @@ npm; deferred chunks below remain future work.
 
 **Platform extension status — 2026-09-28:** the same retained `.44` candidate now
 passes both Linux and macOS architectures and Windows x86-64. Windows ARM64 still
-requires its native Lean distribution and complete installed-package acceptance.
+requires complete installed-package acceptance. Its native Lean and SDK
+distributions are available; the next `.45` candidate is configured for all six
+OS/architecture targets.
 
 ## Current ordered work, authorized 2026-09-26
 
