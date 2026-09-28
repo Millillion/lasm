@@ -228,3 +228,23 @@ results. Anonymous download also verified the exact archive checksum. These
 audits peaked at 74.2 and 32.8 MiB under 512-MiB caps. The original SDK archive is
 preserved. Candidate `.46` now selects the repaired tools and still needs the
 complete six-target installed-package campaign; npm publication is unauthorized.
+
+### Candidate `.46` cold build succeeds; reference compiler setup needs OpenSSL
+
+Native Windows ARM64 run `36429228696`, job `108951274971`, passed cold installed
+execution, cached building, native Hello comparison, plain-Node execution, and
+the local Lake import/build phases using the repaired SDK. The first build took
+719 seconds in paths containing spaces, Greek and Japanese characters.
+
+It then failed while building the independent native reference executable:
+CI's MSYS2 compiler setup omitted `libssl.dll.a` and `libcrypto.dll.a`. The
+[preserved failure](evidence/node46-windows-arm64-native-reference-2026-09-28.json)
+records the passed phases and exact error. The 1.51-GiB peak was below the guard's
+proactive stop; no resource abort occurred. Offline and copied-deployment gates
+were not reached and remain unaccepted.
+
+The CI-only setup now includes the same ARM64 OpenSSL package as the original
+native Lean bootstrap and checks both import libraries before starting the
+consumer. These reference tools remain denied to the installed product. Retry
+the unchanged `.46` archive; this change does not modify its package bytes or
+any Lean test fixture.

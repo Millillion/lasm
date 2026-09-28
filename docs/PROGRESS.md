@@ -1,17 +1,14 @@
-**Windows ARM64 SDK repaired and distributed — 2026-09-28.** Native run
-`36426171536` passed original-failure reproduction, all eight manifest/checksum
-checks, Unicode C++ thread/exception execution in both Wasm widths, reproducible
-packing, fresh Unicode cache/project relocation, and offline reuse. It took
-17.5 minutes and peaked at 329.3 MiB under the 4-GiB cap.
+**Windows ARM64 cold build and Lake pass — 2026-09-28.** Candidate `.46` built and
+ran ordinary Lean in Unicode paths using the repaired SDK. Its cold and local
+Lake phases passed in run `36429228696`; first build took 719 seconds.
 
-The independent streaming audit verified all 27 native programs, 149 unchanged
-notices, and exact agreement with locally predicted repaired hashes. The new
-174,800,072-byte tool prerelease also passed anonymous checksum verification.
-Only its eight manifests and declared PE headers changed; original sections and
-COFF data remain intact.
+The later native reference compiler failed because CI omitted OpenSSL import
+libraries. Peak memory was 1.51 GiB with no resource abort. The CI-only dependency
+and an early presence check are now added; the package bytes remain unchanged.
+Linux x64 and Apple Silicon already passed this exact archive. Other jobs continue.
 
-Candidate `.46` now selects this SDK. Remaining: run and retain one exact package
-through all six native installed/deployment targets, then update acceptance docs.
-README still identifies `.44` as the accepted five-target archive. No npm
-publication. Final timing remains unverified on ARM64; completion ETA is not yet
-estimable.
+Remaining: retry ARM64 with the complete reference toolchain, finish all six
+native installed/deployment targets, retain their combined evidence, and update
+support docs. README still identifies `.44` as the accepted five-target archive.
+No npm publication. A previous Windows x64 suite took 45 minutes; full ARM64
+timing is not yet known, so completion ETA is not yet estimable.
