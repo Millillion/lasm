@@ -1,0 +1,77 @@
+{
+  "date": "2026-09-28",
+  "scope": "Windows x64 installed-candidate stdout regression; not platform acceptance",
+  "run": 36382477447,
+  "job": 108800912869,
+  "sourceRevision": "95e570168e7c0c3eead1b8a642adfd6e67d8371d",
+  "candidate": {
+    "version": "0.1.0-experimental.43",
+    "sha256": "578b16cbc62d8fe356ae38ce1ae7dcf0c4fd255d1762b18b3245dea50e3af428"
+  },
+  "url": "https://github.com/Millillion/lasm/actions/runs/36382477447",
+  "failure": {
+    "phase": "cold installed run",
+    "actual": "Hello from Lean! 2 + 3 = 5\r\n",
+    "expected": "Hello from Lean! 2 + 3 = 5\n",
+    "buildAndExecutionSucceeded": true,
+    "cause": "Owned Windows standard descriptors inherited CRT text mode, translating output LF to CRLF."
+  },
+  "nativeReference": {
+    "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "source": "https://github.com/leanprover/lean4/blob/5045d0056413266e57c625dcd7c365b10e377c52/src/runtime/io.cpp",
+    "behavior": "initialize_io applies _setmode(_O_BINARY) to stdin, stdout and stderr.",
+    "existingExecutionEvidence": "windows-lean-physical-prefix-2026-09-27.json",
+    "existingRawOutput": "long cache path 42\n"
+  },
+  "repair": "Set binary mode on owned duplicated descriptors before fdopen; close the duplicate on initialization failure. Preserve host descriptors and CRT defaults.",
+  "localControls": {
+    "passed": 8,
+    "memoryCapBytes": 536870912,
+    "peakMemoryBytes": 71774208,
+    "resourceAbort": false,
+    "coverage": [
+      "pipe and redirected-file stdin/stdout/stderr",
+      "LF, CRLF, lone CR, Ctrl-Z, NUL, invalid UTF-8 and Unicode bytes",
+      "unchanged embedding descriptor modes and continued host writes",
+      "direct and worker file IO",
+      "native file creation and POSIX descriptor invariants"
+    ]
+  },
+  "nativeRepairValidation": "pending",
+  "failedRunResources": {
+    "status": "failed",
+    "command": [
+      "C:\\hostedtoolcache\\windows\\node\\26.10.0\\x64\\node.exe",
+      "scripts/check-node-windows.mjs",
+      "D:\\a\\lasm\\lasm\\.work\\node-windows-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.43.tgz",
+      "578b16cbc62d8fe356ae38ce1ae7dcf0c4fd255d1762b18b3245dea50e3af428"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 13972299776
+    },
+    "limits": {
+      "jobCommittedBytes": 8587180032,
+      "stopCommittedBytes": 6869744025,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 6600
+    },
+    "peakCommittedBytes": 1103835136,
+    "minimumHostAvailable": 12062294016,
+    "startedAt": 1790574116.4541616,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 157263278080,
+        "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 27443351552
+      }
+    },
+    "unit": "Local\\LasmResource-76d916e8-5f42-4858-bd75-436c8385cb3a",
+    "pid": 692,
+    "lastSampleAt": 1790575165.127007,
+    "exitCode": 1,
+    "finishedAt": 1790575165.1901388
+  },
+  "logSha256": "ed3c176c88f2a43e994b738ecdf95801f25af38c875ee5391b646dafbc3896d3"
+}

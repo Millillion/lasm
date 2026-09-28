@@ -47,6 +47,8 @@ jobs:
         # The legacy platform suite needs an externally installed Lean compiler.
         # Managed compiler/linker behavior is exercised by the consumer below.
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-focused-resources.json -- node --test --test-concurrency=1 test/native-application-bundle.test.mjs test/native-program.test.mjs test/node-host.test.mjs test/application-support.test.mjs test/application-paths.test.mjs test/windows-tool-paths.test.mjs test/cli-arguments.test.mjs
+      - name: Preserve standard and file IO bytes with native Windows CRT adapters
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --timeout-seconds 180 --report .work/windows-stdio-resources.json -- node --test --test-concurrency=1 test/stdio-bytes.test.mjs
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
@@ -77,4 +79,4 @@ jobs:
       - name: Preserve native results
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/windows-isolation-controls/result.json','.work/windows-isolation-controls/online.json','.work/windows-isolation-controls/offline.json','.work/windows-isolation-resources.json','.work/windows-focused-resources.json','.work/node-windows-acceptance/result.json','.work/node-windows-resources.json','.work/node-windows-disk.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-isolation-controls/result.json','.work/windows-isolation-controls/online.json','.work/windows-isolation-controls/offline.json','.work/windows-isolation-resources.json','.work/windows-focused-resources.json','.work/windows-stdio-resources.json','.work/node-windows-acceptance/result.json','.work/node-windows-resources.json','.work/node-windows-disk.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

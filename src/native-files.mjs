@@ -20,6 +20,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const openFile = windows ? libc.func('int _wsopen_s(_Out_ int *fd, str16 path, int flags, int sharing, int mode)')
     : libc.func('int open(str path, int flags, ...)');
   const dup = bind(windows ? '_dup' : 'dup', 'int', ['int']);
+  const setmode = windows ? bind('_setmode', 'int', ['int', 'int']) : null;
   const closeFd = bind(windows ? '_close' : 'close', 'int', ['int']);
   const fcntl = windows ? null : libc.func('int fcntl(int fd, int command, ...)');
   const pipe = windows ? libc.func('int _pipe(_Out_ int *fds, uint size, int mode)')
@@ -455,8 +456,15 @@ export function nativeFiles({ synchronous = false } = {}) {
     duplicateDescriptor(fd, mode) {
       const owned = dup(fd);
       if (owned < 0) throw failure();
-      if (!windows && fcntl(owned, 2, 'int', 1) < 0) { const error = failure(); closeFd(owned); throw error; }
-      return adapter.openDescriptor(owned, mode);
+      try {
+        // Lean's initialize_io sets all three standard descriptors to binary
+        // mode on Windows. Apply that to our owned duplicate before fdopen:
+        // preserve LF, CRLF and Ctrl-Z without changing the embedding host's
+        // descriptor mode or process-wide CRT defaults.
+        if (windows ? setmode(owned, 0x8000 /* _O_BINARY */) < 0
+          : fcntl(owned, 2, 'int', 1) < 0) throw failure();
+        return adapter.openDescriptor(owned, mode);
+      } catch (error) { closeFd(owned); throw error; }
     },
     close(file, discardOutput = false) {
       const stream = file.stream;

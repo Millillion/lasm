@@ -30,6 +30,8 @@ jobs:
         env:
           EXPECTED_ARCH: ${{ matrix.architecture }}
         run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-'+process.env.EXPECTED_ARCH)"
+      - name: Preserve standard and file IO bytes with native Windows CRT adapters
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --timeout-seconds 180 --report .work/windows-stdio-resources.json -- node --test --test-concurrency=1 test/stdio-bytes.test.mjs
       - name: Verify deadline cleanup below the memory cap
         run: node integration/windows-guard-deadline.mjs
       - name: Verify Node, filesystem restrictions and online/offline capabilities

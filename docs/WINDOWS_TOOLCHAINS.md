@@ -76,3 +76,11 @@ member's bytes, type, mode and hardlink target. It skips source compilation and
 requires fresh native Lean/Lake and local C-generation checks before retaining
 the repaired archive. Bootstrap inputs stay unpublished throughout; the repaired
 archive has a new checksum and still needs installed Lasm acceptance.
+
+The next `.43` x64 run passed discovery and isolation, built its first Lean
+program, then [failed the exact stdout comparison](evidence/windows-stdio-bytes-2026-09-28.json):
+CRLF instead of native Lean's LF. The host now sets binary mode on its owned
+standard descriptors, matching Lean initialization without changing the embedding
+Node process's descriptors. Eight local controls passed, including redirected
+files, pipes, arbitrary bytes and direct/worker file IO. Native Windows controls
+and a new installed candidate must pass; no expected output was normalized.
