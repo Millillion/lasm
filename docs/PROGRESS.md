@@ -1,8 +1,9 @@
-**Public ARM64 SDK passed — 2026-09-28.** The natively validated SDK is
-published as a tool prerelease and pinned in the source catalog. Anonymous
-download verification passed with a 35.2-MiB local peak. A fresh native ARM64
-consumer downloaded it, compiled and ran C-to-Wasm, and verified cache reuse;
-peak committed memory was 227 MiB. Installed Lasm acceptance remains separate.
+**ARM64 tool downloads prepared — 2026-09-28.** The public SDK passed anonymous
+checksum verification and fresh native compilation/execution/cache reuse, with
+a 227-MiB native peak. The separate Lean source/notices companion is also public
+and checksum-verified; local peak was 30.3 MiB. Matching the companion to the new
+Lean compiler's dependency identities is still required. No installed ARM64
+Lasm pass is claimed.
 
 Run `36389214996` retries unchanged `.44` through complete Windows x64 acceptance.
 The native C oracle launch correction passed its differential control; earlier

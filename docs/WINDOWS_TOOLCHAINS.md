@@ -66,7 +66,7 @@ per-file hashes. It always starts a fresh build tree and reruns native execution
 and relocation checks. A cache checkpoint never counts as distribution acceptance.
 Cache size is capped at 1 GiB and at most four checkpoint drafts are allowed.
 
-The resumed `.43` x64 attempt [failed during prerequisite discovery](evidence/windows-discovery-timeout-2026-09-28.json), before installed execution. Resolving every ordinary path while traversing the runner's large CodeQL tree exhausted the parent setup deadline. Discovery now uses cached directory metadata and resolves roots and reparse entries only; full coverage, junction traversal, file denials, memory limits and deadlines are unchanged. The unchanged package is being retried with native directory/junction controls. The source/notices companion is now retained in the unpublished draft recorded in its evidence receipt.
+The resumed `.43` x64 attempt [failed during prerequisite discovery](evidence/windows-discovery-timeout-2026-09-28.json), before installed execution. Resolving every ordinary path while traversing the runner's large CodeQL tree exhausted the parent setup deadline. Discovery now uses cached directory metadata and resolves roots and reparse entries only; full coverage, junction traversal, file denials, memory limits and deadlines are unchanged. The unchanged package is being retried with native directory/junction controls. The source/notices companion was first retained in the draft recorded in its original evidence receipt.
 
 The custom Lean packer now includes upstream `LICENSES` as well as `LICENSE`.
 [Archive-repair controls](evidence/windows-lean-notice-repair-controls-2026-09-28.json)
@@ -111,3 +111,10 @@ and exit status, and verified cache reuse. Cold compilation took 101.4 seconds;
 peak committed memory was 237,989,888 bytes under a 4-GiB Job Object cap and
 3.2-GiB proactive stop. Its 4-GiB disk reserve remained intact. Tool publication
 does not establish Windows Lasm support or publish an npm package.
+
+The [source/notices companion](https://github.com/Millillion/lasm/releases/tag/windows-arm64-tool-notices-v1)
+is also public. [Anonymous retrieval](evidence/windows-arm64-tool-notices-public-2026-09-28.json)
+verified its original 14,639,815 bytes and checksum under a 512-MiB local cap;
+peak memory was 30.3 MiB. It covers the recorded leantar commit and GMP 6.3.0-2.
+The native Lean archive must match those identities before this companion is
+attached to its download catalog entry.
