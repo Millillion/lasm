@@ -1,0 +1,178 @@
+{
+  "scope": "Native ARM64 Lean 4.34.1 build deadline; no compiler compatibility failure or completed distribution established",
+  "run": "https://github.com/Millillion/lasm/actions/runs/36278877122",
+  "sourceRevision": "8d42f6d074b0af9af0cb271dc8c6d53c645b13f9",
+  "jobId": 108506779616,
+  "lastCompletedPhase": "Standard-library C and runtime compilation; linking split libleanshared DLLs",
+  "lastBuildLines": [
+    "2026-09-27T03:46:05.2400864Z [    ] Building C:/a/lasm/lasm/.work/windows-arm64-lean-release/build/stage1/bin/libleanshared.dll",
+    "2026-09-27T03:46:08.9235331Z C:/a/lasm/lasm/.work/windows-arm64-lean-release/build/stage1/bin/libleanshared_1.dll symbols: 65334",
+    "2026-09-27T03:53:21.3504774Z C:/a/lasm/lasm/.work/windows-arm64-lean-release/build/stage1/bin/libleanshared_2.dll symbols: 59053"
+  ],
+  "resources": {
+    "status": "time-limit",
+    "command": [
+      "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+      "--login",
+      "scripts/full-lean/bootstrap-windows-arm64-lean-release.sh"
+    ],
+    "hostAtStart": {
+      "total": 17169428480,
+      "available": 12673748992
+    },
+    "limits": {
+      "jobCommittedBytes": 8584714240,
+      "stopCommittedBytes": 6867771392,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 16200
+    },
+    "peakCommittedBytes": 2048532480,
+    "minimumHostAvailable": 11866947584,
+    "startedAt": 1790465185.7494364,
+    "unit": "Local\\LasmResource-018ee23c-d0e5-49f0-9379-0d6982f1745d",
+    "pid": 10484,
+    "lastSampleAt": 1790481386.2929902,
+    "stoppedBecause": "time-limit",
+    "exitCode": 124,
+    "finishedAt": 1790481386.3087873
+  },
+  "inputs": {
+    "lean": "4.34.1",
+    "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "seed": {
+      "prefix": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\seed-cache\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+      "artifact": {
+        "name": "lean-4.34.1-windows.tar.zst",
+        "root": "lean-4.34.1-windows",
+        "url": "https://github.com/leanprover/lean4/releases/download/v4.34.1/lean-4.34.1-windows.tar.zst",
+        "sha256": "667394ecf6708a228221eb4919c0bdb419966b7408bcf3089a9096a6f4ae62c9",
+        "bytes": 589007020,
+        "format": "tar.zst",
+        "maximumExtractedBytes": 8589934592
+      },
+      "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+      "architectures": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      },
+      "helperEmulation": true,
+      "scope": "Same-version official x64 build-time seed only; no seed executable or library is shipped"
+    },
+    "leantar": {
+      "executable": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\helper-cache\\artifacts\\2c445faa1aa52ac8445256b766bb9d198ed05f13b5679593d291effee961bf0d\\leantar.exe",
+      "directory": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-lean-release\\helper-cache\\artifacts\\2c445faa1aa52ac8445256b766bb9d198ed05f13b5679593d291effee961bf0d",
+      "receipt": {
+        "scope": "Unpublished native bootstrap archive; not Node installed-package acceptance",
+        "kind": "leantar",
+        "tag": "windows-arm64-leantar-bootstrap-36278365557",
+        "archive": "leantar-0.1.20-win32-arm64.tar.gz",
+        "sha256": "1391fe8084ad6f1fd86806f6ba4392b23cd83c68a3ab5f564539be35a840145c",
+        "bytes": 787239,
+        "sourceRevision": "cc9c2c929cba829e7b0ee4ea847d1c45bb63aacd",
+        "run": "https://github.com/Millillion/lasm/actions/runs/36278365557",
+        "report": {
+          "scope": "Native Windows ARM64 leantar, unchanged upstream tests and relocated CLI archive roundtrip; managed toolchain packaging remains separate",
+          "upstream": {
+            "version": "0.1.20",
+            "commit": "46485d0eca748ed2d2678e70d59949bbc602f32c",
+            "url": "https://github.com/digama0/leangz/releases/tag/v0.1.20"
+          },
+          "rust": {
+            "toolchain": "1.98.1-aarch64-pc-windows-msvc",
+            "version": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: aarch64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+            "nativeCompiler": true,
+            "nativeCargo": true,
+            "cCompiler": {
+              "host": "x64",
+              "target": "arm64",
+              "helperEmulation": true,
+              "path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\arm64\\cl.exe"
+            }
+          },
+          "inputs": {
+            "Cargo.toml": "8c44aa1cdc5d3c616eead3b4ef52bea7e75a062ed1c760554a2397413264d42c",
+            "Cargo.lock": "c704ff4c4c078b6cb67eb4dede88b13a3b0ba78e02b06eec5a6fd1ed524b7495",
+            "tests/module_compression.rs": "c1cb14003cf20c262f6e36052ef9d798ef60ec7b81150fb7f9052748233e1ba7",
+            "tests/module/Attr.olean": "21bea27e44e5e65c08869fbaa5664081438a8a333f3fe7cc96a7717607a84186",
+            "tests/module/Attr.olean.private": "cc8053aeb68f9952454518067c2d3b6a7c2691748a2a0a3cc7bd730fde9fd52b",
+            "tests/module/Attr.olean.server": "d5d225213b22d9940f50ac2e2df769b34679d15cfcf500088f66df451743c246",
+            "tests/module/Attr.trace": "d133837c0fb1c01bffce68e21f9a65742992cdb164f23c3155b13ad458806c8a",
+            "tests/module/README.md": "cc2af54982a92ebc4c3f7559a642d806f63233411b17d6df7cdd8abf9b11b2a7"
+          },
+          "executable": {
+            "sha256": "ffca47cf7cd98a9b98da01bcd1fea7b92a1edda2244c7306f75ab2060dff641a",
+            "nativeArm64": true,
+            "leantarVersion": "leantar 0.1.20",
+            "emptyPath": true
+          },
+          "reference": {
+            "artifact": {
+              "name": "leantar-v0.1.20-x86_64-pc-windows-msvc",
+              "root": "leantar-v0.1.20-x86_64-pc-windows-msvc",
+              "url": "https://github.com/digama0/leangz/releases/download/v0.1.20/leantar-v0.1.20-x86_64-pc-windows-msvc.zip",
+              "sha256": "7bb21a0a8d152da25863ad53039edddf5fd656b9d7be298b221f4565027f8cc7",
+              "bytes": 777243,
+              "format": "zip",
+              "maximumExtractedBytes": 8388608
+            },
+            "emulatedX64Control": true,
+            "nativeArchiveReadByReference": true,
+            "referenceArchiveReadByNative": true,
+            "traceComparison": "Exact official output; unchanged dependency hash, schema and outputs"
+          },
+          "roundtrip": {
+            "Attr.trace": "4e2d3472346215b2fbb4377c8a6c223a53930cf2ccb78e3c3fbbdaa758701535",
+            "Attr.olean": "21bea27e44e5e65c08869fbaa5664081438a8a333f3fe7cc96a7717607a84186",
+            "Attr.olean.private": "cc8053aeb68f9952454518067c2d3b6a7c2691748a2a0a3cc7bd730fde9fd52b",
+            "Attr.olean.server": "d5d225213b22d9940f50ac2e2df769b34679d15cfcf500088f66df451743c246"
+          },
+          "createdAt": "2026-09-26T23:09:18.113Z"
+        },
+        "resources": {
+          "status": "passed",
+          "command": [
+            "pwsh",
+            "-NoProfile",
+            "-File",
+            "scripts/ci/windows-leantar.ps1"
+          ],
+          "hostAtStart": {
+            "total": 17169387520,
+            "available": 13582864384
+          },
+          "limits": {
+            "jobCommittedBytes": 4294967296,
+            "stopCommittedBytes": 3435973836,
+            "hostReserveBytes": 2147483648,
+            "timeoutSeconds": 2100
+          },
+          "peakCommittedBytes": 756314112,
+          "minimumHostAvailable": 12431003648,
+          "startedAt": 1790464038.952415,
+          "unit": "Local\\LasmResource-c53ca42e-a721-4341-8551-0cfeb471bb60",
+          "pid": 9180,
+          "lastSampleAt": 1790464158.1378775,
+          "exitCode": 0,
+          "finishedAt": 1790464158.1761472
+        },
+        "recordedAt": "2026-09-26T23:09:23.239Z"
+      }
+    },
+    "sourceRevision": "8d42f6d074b0af9af0cb271dc8c6d53c645b13f9",
+    "recordedAt": "2026-09-26T23:24:10.663Z"
+  },
+  "originalLog": ".work/macos/windows-arm64-lean-36278877122.log",
+  "logSha256": "5a4b381d28890454d3e8a0f86a88f784a6f6d602ebdc8213ed51c66c9bd4437a",
+  "checkpointSaved": false,
+  "next": "Native two-job build, unchanged memory cap, and checksum-verified completed ccache objects retained between fresh build trees."
+}

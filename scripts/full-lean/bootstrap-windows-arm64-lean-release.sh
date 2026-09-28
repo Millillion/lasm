@@ -2,10 +2,17 @@
 set -euo pipefail
 [[ ${MSYSTEM:-} == CLANGARM64 ]]
 [[ $(clang -dumpmachine) == aarch64-w64-windows-gnu ]]
-export CMAKE_BUILD_PARALLEL_LEVEL=1 LEAN_NUM_THREADS=1 BINARYEN_CORES=1 EMCC_CORES=1
+export CMAKE_BUILD_PARALLEL_LEVEL=2 LEAN_NUM_THREADS=1 BINARYEN_CORES=1 EMCC_CORES=1
 export CC=clang CXX=clang++
 node_binary="$(cygpath -u "$LASM_BOOTSTRAP_NODE")"
 base="$PWD/.work/windows-arm64-lean-release"
+cache_base="$PWD/.work/windows-arm64-lean-release-cache"
+[[ -f "$cache_base/identity.json" ]]
+export CCACHE_DIR="$(cygpath -m "$cache_base/cache")"
+export CCACHE_TEMPDIR="$(cygpath -m "$cache_base/temporary")"
+export CCACHE_CONFIGPATH="$(cygpath -m "$cache_base/ccache.conf")"
+export CCACHE_MAXSIZE=1024MiB CCACHE_COMPILERCHECK=content CCACHE_REMOTE_STORAGE=
+command -v ccache
 [[ -f "$base/inputs.json" && ! -e "$base/lean4" ]]
 seed="$(cygpath -m "$(cat "$base/seed-prefix.txt")")"
 leantar="$(cygpath -m "$(cat "$base/leantar-path.txt")")"
@@ -22,11 +29,12 @@ git -C "$base/lean4" diff -- src/CMakeLists.txt stage0/src/CMakeLists.txt > "$ba
 # prior stage and must not be used with the x64 seed. Keep olean checks enabled.
 cmake -S "$base/lean4" -B "$base/build" -G 'Unix Makefiles' \
   -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_RC_COMPILER=llvm-windres \
+  -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
   -DCMAKE_BUILD_TYPE=Release -DCHECK_OLEAN_VERSION=ON \
   -DSTAGE1_PREV_STAGE="$seed" -DUSE_LAKE=OFF -DLLVM=OFF \
   -DLEAN_EXTRA_OPTS='-j1 -s8192' -DLEAN_PLATFORM_TARGET=aarch64-w64-windows-gnu \
   -DCADICAL_USE_CUSTOM_CXX=ON -DLEANTAR="$leantar" -DINSTALL_LEANTAR=ON
-cmake --build "$base/build" --target stage1 --parallel 1
+cmake --build "$base/build" --target stage1 --parallel 2
 prefix="$base/build/stage1"
 llvm-readobj --file-headers "$prefix/bin/lean.exe" > "$base/lean-pe.txt"
 grep -q IMAGE_FILE_MACHINE_ARM64 "$base/lean-pe.txt"

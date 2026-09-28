@@ -1,0 +1,157 @@
+{
+  "scope": "Resume after user pause; no Windows installed acceptance established",
+  "cancelledRuns": [
+    36291962059,
+    36292621817
+  ],
+  "windows42PartialResult": {
+    "scope": "Native Windows installed Node/npm-only CLI and copied deployment; restricted-token file denials and scoped offline firewall rules exclude bootstrap dependencies",
+    "platform": "win32-x64",
+    "node": "v26.10.0",
+    "kernel": "10.0.26100",
+    "osRelease": "Microsoft Windows [Version 10.0.26100.33438]",
+    "sourceRevision": "bd33b3d425ee5cdede8c3cb339b7e46d41e03321",
+    "archiveSha256": "300de91b853218842ee8e8b32a8f2baa7ae29937792ffb14732ebf3db91e44c4",
+    "archiveBytes": 65336872,
+    "workspace": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u00ce\u00bb-TEFeVA\\consumer \u00e6\u2014\u00a5\u00e6\u0153\u00ac\u00e8\u00aa\u017e",
+    "containerRoot": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u00ce\u00bb-TEFeVA",
+    "resourceReport": "D:\\a\\lasm\\lasm\\.work\\node-windows-resources.json",
+    "startedAt": "2026-09-27T03:48:25.591Z",
+    "passed": false,
+    "activePhase": "cold"
+  },
+  "windows42Log": ".work/macos/node42-windows-cancelled-36291962059.log",
+  "windows42LogSha256": "c222164920183718467618242743eb4646b1b1892646dd5b461f34ec18cf34d6",
+  "compilerCacheControls": [
+    "binary round trip",
+    "transport checksum",
+    "recipe identity",
+    "member checksum",
+    "fresh restore only"
+  ],
+  "controlResources": {
+    "startedAt": "2026-09-28T05:09:31.238Z",
+    "command": [
+      "/usr/bin/timeout",
+      "180",
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      "integration/compiler-cache-archive.mjs"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "e9464a73-9e76-4cbe-ab11-3acac5b40c19",
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 22395740160
+    },
+    "minimumHostAvailable": 22354423808,
+    "peakMemoryBytes": 33206272,
+    "peakTasks": 19,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/macos/compiler-cache-controls-2026-09-28-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-28T05:09:31.843Z",
+      "memoryBytes": 31588352,
+      "peakMemoryBytes": 33206272,
+      "swapBytes": 0,
+      "tasks": 19,
+      "memoryBreakdown": {
+        "anon": 28082176,
+        "file": 81920,
+        "kernel": 2617344,
+        "shmem": 0,
+        "file_mapped": 200704,
+        "inactive_file": 81920,
+        "slab": 447872
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-28T05:09:31.935Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 14209024,
+      "peakMemoryBytes": 33206272,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11722752,
+        "file": 81920,
+        "kernel": 1081344,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 81920,
+        "slab": 182296
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-28T05:09:31.963Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "currentReleaseCheck": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "expected": "v4.34.1",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "expected": "v26.10.0",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false
+    },
+    "checkedAt": "2026-09-28T05:07:31.114Z"
+  },
+  "runnerEligibility": {
+    "checkedAt": "2026-09-28T05:07:31.114Z",
+    "repositoryVisibility": "public",
+    "labels": [
+      "windows-2025",
+      "windows-11-arm"
+    ],
+    "sources": [
+      "https://docs.github.com/en/actions/reference/runners/github-hosted-runners",
+      "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+    ],
+    "paidFeaturesEnabled": false
+  }
+}

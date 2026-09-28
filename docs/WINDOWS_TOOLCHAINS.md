@@ -35,7 +35,7 @@ companion. These build-tool sources do not become application deployment files.
 The native ARM64 [SDK](evidence/windows-arm64-sdk-2026-09-27.json) and
 [leantar helper](evidence/windows-arm64-leantar-2026-09-26.json) passed their
 recorded relocation controls and are retained as unpublished drafts. The new
-Lean 4.34.1 native compiler is still building. The reproducible
+Lean 4.34.1 native compiler [reached its deadline while linking](evidence/windows-arm64-lean-release-deadline-2026-09-27.json), with a 1.91-GiB peak and no completed distribution. The reproducible
 [source/notices companion](evidence/windows-arm64-tool-notices-2026-09-27.json)
 must match the compiler's actual GMP version and leantar identity before it is
 connected to that distribution. No Windows ARM64 download catalog entry or
@@ -49,3 +49,18 @@ controls](evidence/windows-application-bundle-selection-2026-09-27.json) record
 1,066,984 native bytes for x64 and 1,357,304 for ARM64, down from 13,335,796.
 These are the adapter payloads, not complete Lean deployment sizes. Loaders and
 licenses remain included; installed candidate `.43` validation is pending.
+
+On resumption, `.42` and the queued `.43` run were confirmed cancelled following
+the user's pause. `.42` had passed prerequisite isolation and was still in its
+cold installed build; neither cancellation is a compatibility result.
+[Resume evidence](evidence/windows-resume-controls-2026-09-28.json) preserves the
+partial report and the new small compiler-cache controls.
+
+The ARM64 retry uses two native build jobs under the unchanged memory cap, a
+four-hour build deadline, and a six-hour job limit that leaves time for setup and
+checkpointing. Only completed ccache objects can be retained in unpublished
+drafts, after the build's entire guarded process tree exits. Restoration requires
+the exact recipe, tool hashes, MSYS package inventory, archive checksum, and
+per-file hashes. It always starts a fresh build tree and reruns native execution
+and relocation checks. A cache checkpoint never counts as distribution acceptance.
+Cache size is capped at 1 GiB and at most four checkpoint drafts are allowed.

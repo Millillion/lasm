@@ -10,6 +10,14 @@ on:
         description: SHA-256 of that leantar archive
         type: string
         required: true
+      compiler-cache-tag:
+        description: Optional exact unpublished completed-ccache checkpoint tag
+        type: string
+        default: ''
+      compiler-cache-sha256:
+        description: Matching checkpoint archive checksum
+        type: string
+        default: ''
 permissions:
   contents: write
 concurrency:
@@ -19,7 +27,7 @@ jobs:
   native:
     if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     runs-on: windows-11-arm
-    timeout-minutes: 330
+    timeout-minutes: 360
     env:
       LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
       MSYSTEM: CLANGARM64
@@ -36,6 +44,8 @@ jobs:
         run: |
           node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-arm64')"
           node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-release-guard-control.json -- node test/fixtures/windows-guard.mjs
+      - name: Verify compiler-cache archive restore and corruption rejection
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --timeout-seconds 180 --report .work/windows-release-cache-controls.json -- node integration/compiler-cache-archive.mjs
       - name: Prepare authenticated same-version seed and native leantar
         env:
           GH_TOKEN: ${{ github.token }}
@@ -52,22 +62,43 @@ jobs:
             make git tar diffutils binutils
             mingw-w64-clang-aarch64-cmake
             mingw-w64-clang-aarch64-clang
+            mingw-w64-clang-aarch64-ccache
             mingw-w64-clang-aarch64-llvm-tools
             mingw-w64-clang-aarch64-gmp
             mingw-w64-clang-aarch64-libuv
             mingw-w64-clang-aarch64-openssl
-      - name: Build and relocate native Lean with one worker
+      - name: Prepare or verify completed compiler objects for the exact recipe
+        id: compiler_cache
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+          LASM_LEAN_CCACHE_TAG: ${{ inputs.compiler-cache-tag }}
+          LASM_LEAN_CCACHE_SHA256: ${{ inputs.compiler-cache-sha256 }}
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --timeout-seconds 1200 --report .work/windows-release-cache-prepare-resources.json -- node scripts/ci/windows-lean-release-cache.mjs prepare
+      - name: Build and relocate native Lean with two bounded build jobs
+        id: build
+        continue-on-error: true
         env:
           MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: |
           $bash = Join-Path $env:MSYS2_LOCATION 'usr/bin/bash.exe'
           $env:LASM_BOOTSTRAP_NODE = (Get-Command node).Source
-          node scripts/full-lean/run-bounded.mjs --timeout-seconds 16200 --report .work/windows-arm64-lean-release-resources.json -- $bash --login scripts/full-lean/bootstrap-windows-arm64-lean-release.sh
+          node scripts/full-lean/run-bounded.mjs --timeout-seconds 14400 --report .work/windows-arm64-lean-release-resources.json -- $bash --login scripts/full-lean/bootstrap-windows-arm64-lean-release.sh
+      - name: Retain only completed compiler objects after the guard closes
+        if: always() && steps.compiler_cache.outcome == 'success' && (steps.build.outcome == 'success' || steps.build.outcome == 'failure')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --timeout-seconds 1200 --disk-path . --disk-reserve-mib 4096 --report .work/windows-release-cache-retain-resources.json -- node scripts/ci/windows-lean-release-cache.mjs retain
       - name: Retain the verified native distribution in an unpublished draft
+        if: steps.build.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: node --max-old-space-size=128 scripts/ci/windows-bootstrap-retain.mjs lean
       - name: Preserve native bootstrap evidence
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/windows-release-guard-control.json','.work/windows-lean-prepare-resources.json','.work/windows-arm64-lean-release/inputs.json','.work/windows-arm64-lean-release/distribution/result.json','.work/windows-arm64-lean-release-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-release-guard-control.json','.work/windows-release-cache-controls.json','.work/windows-lean-prepare-resources.json','.work/windows-arm64-lean-release/inputs.json','.work/windows-arm64-lean-release/distribution/result.json','.work/windows-arm64-lean-release-resources.json','.work/windows-arm64-lean-release-cache/preparation.json','.work/windows-arm64-lean-release-cache/compiler-control.json','.work/windows-arm64-lean-release-cache/retained/compiler-cache-receipt.json','.work/windows-release-cache-prepare-resources.json','.work/windows-release-cache-retain-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+      - name: Require a complete native distribution
+        if: always()
+        run: node -e "const a=require('node:assert/strict');a.equal(require('./.work/windows-arm64-lean-release-resources.json').status,'passed');a.equal(require('./.work/windows-arm64-lean-release/distribution/result.json').passed,true)"
