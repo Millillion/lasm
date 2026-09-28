@@ -15,13 +15,14 @@ the same packed candidate. See [the acceptance report](NODE_ACCEPTANCE.md) for
 exact hashes, versions, scope and measurements. The candidate is unpublished to
 npm; deferred chunks below remain future work.
 
-**Platform extension status — 2026-09-28:** the same retained `.44` candidate now
-passes both Linux and macOS architectures and Windows x86-64. Windows ARM64 still
-requires complete installed-package acceptance. Candidate `.45` passed the same
-five targets but exposed a Windows ARM64 SDK defect with Unicode paths. Its native
-Lean distribution is verified and available. The SDK repair has now passed native
-Unicode-path and archive-relocation controls; candidate `.46` connects those
-verified tools for a new complete six-target matrix.
+**Platform extension completed — 2026-09-28:** one retained `.46` archive passed
+native installed-package and copied-deployment checks on Linux, macOS and Windows,
+each on x86-64 and ARM64. Runtime restrictions, managed dependencies, Unicode
+paths, local Lake imports, offline reuse and independent deployments passed.
+The [acceptance report](NODE_ACCEPTANCE.md) identifies exact OS/tool versions,
+artifact hashes and all six native jobs. Earlier Unicode and CI reference-tool
+failures remain preserved. No npm publication occurred; broader compatibility
+work remains deferred.
 
 ## Current ordered work, authorized 2026-09-26
 
@@ -40,6 +41,7 @@ verified tools for a new complete six-target matrix.
    Track the current implementation and distribution evidence in
    [Windows toolchains](WINDOWS_TOOLCHAINS.md).
 
+All three ordered items above are complete for the scoped installed workflow.
 Every implementation commit must review README.md for simplicity and current
 accuracy: complete quick start, every CLI command/option with examples, exact
 environment support, and exact unavailable Lean capabilities. Historical candidate
@@ -98,18 +100,20 @@ candidate archive described in the README.
   must execute real compiled Lean computation and IO, with no stubs or hardcoded
   output substituted for program behavior.
 
-## Required native Linux platform matrix
+## Required native platform matrix
 
-Start with the two most common Linux architectures. Both must pass the complete
-installed-package workflow:
+The initial Linux milestone and authorized macOS/Windows extensions use the
+same complete installed-package workflow:
 
 | Operating system | x86-64 | ARM64 |
 | --- | --- | --- |
-| Linux | Required | Required |
+| Linux | Passed | Passed |
+| macOS | Passed | Passed |
+| Windows | Passed | Passed |
 
 Here, x86-64 means 64-bit x86 (also called x64 or AMD64), not 32-bit x86.
-This Linux milestone is complete. macOS, then Windows on both architectures are
-now authorized as the next platform milestones; use the same gates below.
+Both the Linux milestone and subsequent macOS/Windows extensions are complete.
+The acceptance report limits these passes to the exact tested OS and tool versions.
 
 Use native execution for acceptance. Cross-compilation or emulation can assist
 implementation but does not establish a native platform pass. Record exact OS
@@ -216,16 +220,14 @@ build tools and their versions managed by Lasm and included in cache identities.
 
 ## Deferred chunks
 
-After the first milestone, expand the same installed CLI and CI pipeline one
-chunk at a time:
+The native macOS and Windows extensions are complete. Future work should expand
+the same installed CLI and CI pipeline one separately scoped chunk at a time:
 
-1. Native macOS and Windows installation/build/deployment support, each on
-   x86-64 and ARM64, through separately scoped platform milestones.
-2. Broader core language and data-type behavior, with native-versus-Node tests.
-3. Complete ordinary `IO.FS` support and the supporting IO APIs it requires.
-4. Complete the selected Lean release's `Std.Http` support for all-Lean services,
+1. Broader core language and data-type behavior, with native-versus-Node tests.
+2. Complete ordinary `IO.FS` support and the supporting IO APIs it requires.
+3. Complete the selected Lean release's `Std.Http` support for all-Lean services,
    including the async/concurrency, streaming, cancellation, and cleanup it needs.
-5. Broader concurrency and other standard-library/runtime APIs, followed by
+4. Broader concurrency and other standard-library/runtime APIs, followed by
    separately scoped serverless deployment adapters and additional engines.
 
 Runtime Lean compilation, elaboration, dynamic module loading/evaluation and
@@ -267,6 +269,7 @@ relabel previous failures, or describe deferral as a fundamental limitation.
   compatibility program. Do not transfer the former full-program completion
   percentage to this smaller milestone or call a scope reduction technical progress.
 
-Completion of this milestone means a verified basic Lean-on-Node product workflow
-on Linux x86-64 and Linux ARM64. It does not mean complete Lean language/library parity or
-production acceptance of every application.
+The original Linux milestone and platform extensions now establish the basic
+Lean-on-Node workflow on Linux, macOS and Windows, each on x86-64 and ARM64.
+They do not establish complete Lean language/library parity or production
+acceptance of every application.

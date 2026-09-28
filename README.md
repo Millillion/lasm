@@ -2,18 +2,18 @@
 
 Write ordinary Lean. Compile it ahead of time and run it in Node.
 
-**Prerequisites:** stock **Node 26.10.0 and npm**. Lasm downloads its matching
+**Prerequisites:** stock **Node 26.10.0 with npm 11.19.1**. Lasm downloads its matching
 **Lean 4.34.1**, Lake, and build tools; you do not install them yourself.
 The package is experimental and **has not been published to npm**.
 
 ## Get started
 
-On a supported Linux, Mac, or Windows x64 machine, get the tested `.44` tarball in the
+On a supported Linux, Mac, or Windows machine, get the tested `.46` tarball in the
 [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
 from a maintainer (repository access may be required). Copy it into an empty directory:
 
 ```sh
-npm install ./lasm-compiler-0.1.0-experimental.44.tgz
+npm install ./lasm-compiler-0.1.0-experimental.46.tgz
 ```
 
 Save this complete program as `Main.lean`:
@@ -31,8 +31,8 @@ npx lasm build Main.lean     # Create dist/ without running main
 node dist/main.mjs          # Run the deployment
 ```
 
-The first build needs internet access, downloads about 1–1.3 GB, and occupies
-several GB. Measured first builds took 4–18 minutes. The terminal shows progress
+The first build needs internet access, downloads about 0.9–1.3 GB, and occupies
+several GB. Measured first builds took about 5–16 minutes. The terminal shows progress
 and elapsed time. Later builds reuse verified tools and unchanged outputs. See
 [cache locations, requirements, and recovery](docs/NODE_SUPPORT.md).
 
@@ -78,28 +78,24 @@ compatibility launchers. These interfaces have no current release support guaran
 
 | Environment | Architectures | Current status |
 | --- | --- | --- |
-| Ubuntu 24.04.5 LTS, glibc 2.39, Node 26.10.0 | x86-64 and ARM64 | Candidate `.44` passed native installed-package and copied-deployment acceptance. |
+| Ubuntu 24.04.5 LTS, glibc 2.39 | x86-64 and ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance. |
 | Other Linux distributions | x86-64 and ARM64 | Unverified; glibc 2.39 or newer is required. Alpine/musl is unsupported. |
-| macOS 15.7.9 | x86-64 and ARM64 | Candidate `.44` passed native installed-package and copied-deployment acceptance. |
-| Windows 10.0.26100.33438 (`windows-2025` runner) | x86-64 | Candidate `.44` passed native installed-package and copied-deployment acceptance. Other Windows versions are unverified. |
-| Windows | ARM64 | Native Lean and SDK downloads are available; installed-package acceptance is pending. Not yet supported. |
+| macOS 15.7.9 (24G830) | x86-64 and ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance. |
+| Windows Server 2025 Datacenter, 10.0.26100.33438 | x86-64 | Candidate `.46` passed native installed-package and copied-deployment acceptance on `windows-2025`. |
+| Windows 11 Enterprise, 10.0.26200.9457 | ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance on `windows-11-arm`. |
 | Deno, Bun, browsers, Cloudflare Workers | Any | Not supported by the release candidate. |
 | Lambda, Netlify, other serverless services | Any | No deployment adapter or platform acceptance yet. |
 
-Only the pinned Node and Lean versions above are accepted. No engine flags are
+Other OS releases and Node/npm/Lean versions are unverified. No engine flags are
 needed. Linux requires its ordinary OS libraries and shell, but no developer SDK.
 The [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md) identifies exact tested artifacts;
-[the plan](https://github.com/Millillion/lasm/blob/main/docs/PLAN.md) records work in progress.
-The same `.44` archive covers all five accepted targets above.
-
-**Source changes awaiting acceptance:** candidate `.46` connects the repaired
-Windows ARM64 SDK. Its native Unicode-path and archive-relocation checks passed.
-The new package must pass all six OS/architecture targets before Windows ARM64
-becomes supported. Candidate `.45`'s original Unicode failure remains recorded.
+[the plan](https://github.com/Millillion/lasm/blob/main/docs/PLAN.md) records the completed milestone and deferred work.
+The same `.46` archive covers all six accepted targets above. These passes use
+native x86-64 and ARM64 execution.
 
 ## Lean support and restrictions
 
-**Candidate `.44` and current source builds enforce ahead-of-time execution.**
+**Candidate `.46` and current source builds enforce ahead-of-time execution.**
 The older `.34` candidate predates these restrictions; do not use it to enforce
 this policy.
 

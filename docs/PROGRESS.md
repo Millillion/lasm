@@ -1,14 +1,15 @@
-**Windows ARM64 cold build and Lake pass — 2026-09-28.** Candidate `.46` built and
-ran ordinary Lean in Unicode paths using the repaired SDK. Its cold and local
-Lake phases passed in run `36429228696`; first build took 719 seconds.
+**Six-platform Node milestone complete — 2026-09-28.** One unchanged candidate
+`.46` passed native installed-package and copied-deployment acceptance on Linux,
+macOS and Windows, each on x86-64 and ARM64. All eight applications per target,
+offline reuse, six cache-recovery controls, local Lake imports and ahead-of-time
+restrictions passed. The Windows ARM64 SDK repair and CI reference-dependency
+correction have separate preserved failure and regression evidence.
 
-The later native reference compiler failed because CI omitted OpenSSL import
-libraries. Peak memory was 1.51 GiB with no resource abort. The CI-only dependency
-and an early presence check are now added; the package bytes remain unchanged.
-Linux x64 and Apple Silicon already passed this exact archive. Other jobs continue.
+Retention run `36439263093` combined the six successful reports. An independent
+download verified the exact archive, receipt and source provenance under a
+512-MiB cap, peaking at 88.4 MiB. No accepted run had a resource abort. Hello
+deployments are 3.04–3.63 MB; the largest fixture is 4.01 MB.
 
-Remaining: retry ARM64 with the complete reference toolchain, finish all six
-native installed/deployment targets, retain their combined evidence, and update
-support docs. README still identifies `.44` as the accepted five-target archive.
-No npm publication. A previous Windows x64 suite took 45 minutes; full ARM64
-timing is not yet known, so completion ETA is not yet estimable.
+README and support docs now identify exact environments, every CLI command and
+the runtime restrictions. All scoped milestone gates are complete. npm remains
+unpublished; full API parity, other engines and serverless adapters remain deferred.

@@ -1,34 +1,44 @@
-# Node acceptance: Linux, macOS and Windows x64
+# Node acceptance: Linux, macOS and Windows
 
-The same **0.1.0-experimental.44** archive passed native installed-package and
-independent-deployment checks on Linux and macOS, each on x86-64 and ARM64, plus
-Windows x86-64 on 2026-09-28. Ahead-of-time restrictions are enforced and there
-is no runtime-compiler fallback. **Windows ARM64 remains unaccepted. Nothing is
-published to npm.**
+The same **0.1.0-experimental.46** archive passed native installed-package and
+independent-deployment checks on **Linux, macOS and Windows, each on x86-64 and
+ARM64**, on 2026-09-28. Ahead-of-time restrictions are enforced, with no
+runtime-compiler fallback. **Nothing is published to npm.**
+
+The initial matrix passed five targets. Its ARM64 consumer passed cold and Lake
+builds before CI's independent native reference compiler encountered missing
+OpenSSL import libraries. A CI-only dependency correction allowed the
+[unchanged-archive ARM64 retry](https://github.com/Millillion/lasm/actions/runs/36433387126)
+to pass every gate. Package bytes and Lean fixtures were unchanged; the failed
+attempt remains preserved. This report combines those six successful native jobs.
 
 ## Exact artifact and installation
 
 | Item | Value |
 | --- | --- |
-| Package | `@lasm/compiler@0.1.0-experimental.44` |
-| Source revision | `40e9c0598c831bef49dfaebbdd4c5bd4b6696d1a` |
-| Archive SHA-256 | `999389fdd7c27e3ef346977ece892456dd6367b961ff107657b1242bc56cd146` |
-| Archive bytes | 65,337,349 |
+| Package | `@lasm/compiler@0.1.0-experimental.46` |
+| Source revision | `8fe54124c1dfc393f6d0a96aed171e75124dd57a` |
+| Archive SHA-256 | `c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae` |
+| Archive bytes | 65,337,774 |
 | Node / npm | 26.10.0 / 11.19.1 |
 | Lean / Lake | 4.34.1; commit `5045d0056413266e57c625dcd7c365b10e377c52` |
 | Managed build tools | Emscripten 6.0.9, Python 3.13.15, Git 2.53.0 |
 | Runtime manifest SHA-256 | `4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d` |
 
-Two independent packs produced identical bytes. The [retention workflow](https://github.com/Millillion/lasm/actions/runs/36398226921)
+Two independent packs produced identical bytes. Official Node and Lean release
+feeds were checked at 2026-09-28 13:31 UTC before the campaign; the exact versions
+above stayed pinned throughout it. The [retention workflow](https://github.com/Millillion/lasm/actions/runs/36439263093)
 rechecked every native job's successful report against this exact archive and
-package source revision. The [retention evidence](evidence/node44-five-platform-retention-2026-09-28.json)
-verifies GitHub's stored archive digest, size and the combined acceptance receipt.
-The archive remains [an unpublished draft](https://github.com/Millillion/lasm/releases/tag/untagged-1bcaed31d70e517ff80b).
+package source revision. The [retention evidence](evidence/node46-six-platform-retention-2026-09-28.json)
+verifies GitHub's stored digests and independently downloaded bytes for the
+archive and combined acceptance receipt. The local archive audit used a
+512-MiB cap, peaked at 88.4 MiB, and recorded no resource abort or OOM event.
+The archive remains [an unpublished draft](https://github.com/Millillion/lasm/releases/tag/untagged-eb0c5838d8d247a9d10d).
 
 A maintainer with repository access can retrieve it:
 
 ```sh
-gh release download node-linux-candidate-36398226921 --repo Millillion/lasm --pattern 'lasm-compiler-0.1.0-experimental.44.tgz' --pattern SHA256SUMS.txt
+gh release download node-linux-candidate-36439263093 --repo Millillion/lasm --pattern 'lasm-compiler-0.1.0-experimental.46.tgz' --pattern SHA256SUMS.txt
 ```
 
 Give the unchanged tarball to the developer, who needs only Node/npm. Follow the
@@ -42,11 +52,12 @@ and acceptance campaign.
 
 | Target | Tested OS | Complete evidence |
 | --- | --- | --- |
-| linux-x64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node44-linux-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392920262/job/108832580155) |
-| linux-arm64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node44-linux-arm64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392920262/job/108832580217) |
-| darwin-x64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node44-darwin-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392911964/job/108832553852) |
-| darwin-arm64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node44-darwin-arm64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392911964/job/108832554084) |
-| win32-x64 | Windows 10.0.26100.33438 (`windows-2025`) | [Passed report](evidence/node44-win32-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36389214996/job/108821105094) |
+| linux-x64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node46-linux-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951274962) |
+| linux-arm64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node46-linux-arm64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36429228696/job/108960024579) |
+| darwin-x64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node46-darwin-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951274991) |
+| darwin-arm64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node46-darwin-arm64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951275132) |
+| win32-x64 | Windows Server 2025 Datacenter, 10.0.26100.33438 (`windows-2025`) | [Passed report](evidence/node46-win32-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951275003) |
+| win32-arm64 | Windows 11 Enterprise, 10.0.26200.9457 (`windows-11-arm`) | [Passed report](evidence/node46-win32-arm64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36433387126/job/108965030474) |
 
 Each job installs the same archive into a fresh project with spaces and Unicode.
 Linux Landlock, macOS sandbox-exec, and Windows restricted-token/ACL controls deny
@@ -72,40 +83,41 @@ library parity. See the [exact restrictions](../README.md#lean-support-and-restr
 These are individual CI measurements, not performance guarantees. Sizes count
 logical regular-file bytes. Downloads exclude HTTP/npm overhead.
 
-| Measurement | Linux x86-64 | Linux ARM64 | Mac x86-64 | Mac ARM64 | Windows x86-64 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Installed node_modules, bytes | 380,767,845 | 380,767,845 | 380,767,861 | 380,767,861 | 380,769,336 |
-| Managed tool/cache files, bytes | 5,663,886,334 | 5,611,884,246 | 5,261,006,925 | 5,528,697,964 | 6,105,578,350 |
-| Compressed tool downloads, bytes | 979,054,712 | 910,904,894 | 919,472,748 | 925,010,880 | 1,312,233,267 |
-| Hello deployment, bytes | 3,212,096 | 3,227,010 | 3,626,808 | 3,279,120 | 3,042,522 |
-| Largest tested deployment, bytes | 3,594,975 | 3,609,889 | 4,009,687 | 3,661,999 | 3,425,401 |
-| npm install, seconds | 5.21 | 5.25 | 40.65 | 8.51 | 31.15 |
-| First npx including downloads, seconds | 256.84 | 308.76 | 1041.65 | 332.53 | 915.08 |
-| Cached build, seconds | 19.30 | 16.60 | 81.63 | 27.84 | 10.27 |
-| Offline cached run, seconds | 19.07 | 16.82 | 59.93 | 23.13 | 14.22 |
-| Median Node start to first output, seconds | 0.230 | 0.240 | 0.501 | 0.445 | 0.292 |
-| Campaign memory peak, bytes | 4,675,952,640 | 4,710,600,704 | 2,358,824,960 | 2,597,945,344 | 2,808,406,016 |
+| Measurement | Linux x86-64 | Linux ARM64 | Mac x86-64 | Mac ARM64 | Windows x86-64 | Windows ARM64 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Installed node_modules, bytes | 380,770,245 | 380,770,245 | 380,770,261 | 380,770,261 | 380,771,736 | 380,771,736 |
+| Managed tool/cache files, bytes | 5,663,886,334 | 5,611,884,246 | 5,261,006,925 | 5,528,697,964 | 6,105,578,350 | 4,178,116,237 |
+| Compressed tool downloads, bytes | 979,054,712 | 910,904,894 | 919,472,748 | 925,010,880 | 1,312,233,267 | 1,018,654,299 |
+| Hello deployment, bytes | 3,212,096 | 3,226,994 | 3,626,808 | 3,279,120 | 3,042,522 | 3,332,953 |
+| Largest tested deployment, bytes | 3,594,975 | 3,609,889 | 4,009,687 | 3,661,999 | 3,425,401 | 3,715,832 |
+| npm install, seconds | 7.01 | 4.90 | 22.09 | 6.57 | 26.47 | 13.98 |
+| First npx including downloads, seconds | 293.84 | 283.05 | 836.01 | 386.19 | 926.95 | 745.31 |
+| Cached build, seconds | 15.06 | 13.40 | 36.13 | 17.63 | 19.02 | 23.84 |
+| Offline cached run, seconds | 15.45 | 13.33 | 32.37 | 15.37 | 18.20 | 23.16 |
+| Median Node start to first output, seconds | 0.294 | 0.231 | 0.426 | 0.187 | 0.338 | 0.414 |
+| Campaign memory peak, bytes | 4,652,646,400 | 4,708,052,992 | 2,357,952,512 | 2,592,604,160 | 2,799,775,744 | 2,664,058,880 |
 
 Linux peaks use cgroup accounting with zero recorded OOM events, no throttling
 and no resource abort. Builds used base pages and one build/Binaryen worker.
 macOS peaks are sampled process-tree RSS, **not kernel-enforced aggregate limits**.
 Both Mac monitors released tracked processes without a resource abort. Windows
 uses a Job Object cap and a lower proactive stop; peak committed memory was
-2.62 GiB. Restricted-token checks, process cleanup, offline firewall restoration
-and all platform disk reserves passed.
+2.61 GiB on x86-64 and 2.48 GiB on ARM64. Restricted-token checks, process cleanup,
+offline firewall restoration and all platform disk reserves passed.
 
-## Preserved history and remaining platform work
+## Preserved history and scope
 
-The [earlier `.37` report and subsequent investigations](NODE_ACCEPTANCE_37_2026-09-26.md)
-retain Linux/macOS acceptance and the Windows failures preceding this pass.
-The [Windows byte-preservation repair](evidence/windows-stdio-bytes-2026-09-28.json)
-and [native C-oracle launch control](evidence/windows-native-oracle-launch-2026-09-28.json)
-have separate failure and regression evidence. Earlier archives remain unchanged.
+The [earlier `.44` report](NODE_ACCEPTANCE_44_2026-09-28.md) preserves the
+five-platform baseline and its exact archive. The
+[`.45` campaign](evidence/node45-six-platform-campaign-2026-09-28.json) retains
+the original ARM64 Unicode-path failure. The
+[SDK repair and distribution evidence](evidence/windows-arm64-sdk-utf8-distribution-2026-09-28.json)
+and [`.46` reference-compiler setup failure](evidence/node46-windows-arm64-native-reference-2026-09-28.json)
+record the fixes preceding this pass. The [Windows toolchain history](WINDOWS_TOOLCHAINS.md)
+contains the native compiler, license, relocation and archive audits.
 
-Windows ARM64's native Lean distribution has passed build, relocation, retention
-and archive auditing and is available as a managed download. Candidate `.45`
-passed the five targets above but exposed an SDK defect with Unicode paths on
-ARM64. The repair passed native SDK execution and archive-relocation checks;
-the [distribution tracker](WINDOWS_TOOLCHAINS.md) records the evidence. Candidate
-`.46` connects the repaired tools and must pass its own exact-archive campaign
-before Windows ARM64 becomes supported.
+The scoped six-platform installation/build/deployment milestone is complete.
+Complete `IO.FS`, `Std.Http`, concurrency, broad third-party libraries, full Lean
+upstream-suite parity, other engines and serverless adapters remain separate
+work. Runtime compiler/evaluation/module-data and executable-plugin capabilities
+remain explicitly unavailable under the ahead-of-time policy.

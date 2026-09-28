@@ -1,0 +1,393 @@
+{
+  "scope": "One unchanged unpublished .46 archive passed all six native installed/deployment targets. Its retained archive and acceptance receipt were downloaded and independently hashed; no npm publication occurred.",
+  "version": "0.1.0-experimental.46",
+  "sourceRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a",
+  "archiveSha256": "c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae",
+  "archiveBytes": 65337774,
+  "passedPlatforms": [
+    "linux-x64",
+    "linux-arm64",
+    "darwin-x64",
+    "darwin-arm64",
+    "win32-x64",
+    "win32-arm64"
+  ],
+  "nativeJobs": [
+    {
+      "platform": "linux-x64",
+      "runId": "36429228696",
+      "controlsRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a",
+      "jobId": 108951274962,
+      "url": "https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951274962"
+    },
+    {
+      "platform": "linux-arm64",
+      "runId": "36429228696",
+      "controlsRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a",
+      "jobId": 108960024579,
+      "url": "https://github.com/Millillion/lasm/actions/runs/36429228696/job/108960024579"
+    },
+    {
+      "platform": "darwin-x64",
+      "runId": "36429228696",
+      "controlsRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a",
+      "jobId": 108951274991,
+      "url": "https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951274991"
+    },
+    {
+      "platform": "darwin-arm64",
+      "runId": "36429228696",
+      "controlsRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a",
+      "jobId": 108951275132,
+      "url": "https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951275132"
+    },
+    {
+      "platform": "win32-x64",
+      "runId": "36429228696",
+      "controlsRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a",
+      "jobId": 108951275003,
+      "url": "https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951275003"
+    },
+    {
+      "platform": "win32-arm64",
+      "runId": "36433387126",
+      "controlsRevision": "c2f703cfc260760d1ad44beff3b4d45952791e63",
+      "jobId": 108965030474,
+      "url": "https://github.com/Millillion/lasm/actions/runs/36433387126/job/108965030474"
+    }
+  ],
+  "retentionRun": 36439263093,
+  "retentionJob": 108985185297,
+  "retentionSourceRevision": "c2f703cfc260760d1ad44beff3b4d45952791e63",
+  "retentionUrl": "https://github.com/Millillion/lasm/actions/runs/36439263093",
+  "draftRelease": {
+    "assets": [
+      {
+        "apiUrl": "https://api.github.com/repos/Millillion/lasm/releases/assets/595658923",
+        "contentType": "application/json",
+        "createdAt": "2026-09-28T14:53:02Z",
+        "downloadCount": 0,
+        "id": "RA_kwDOUnm2v84jgQir",
+        "label": "",
+        "name": "acceptance.json",
+        "size": 1359082,
+        "state": "uploaded",
+        "updatedAt": "2026-09-28T14:53:02Z",
+        "url": "https://github.com/Millillion/lasm/releases/download/untagged-eb0c5838d8d247a9d10d/acceptance.json"
+      },
+      {
+        "apiUrl": "https://api.github.com/repos/Millillion/lasm/releases/assets/595658921",
+        "contentType": "application/x-gtar",
+        "createdAt": "2026-09-28T14:53:02Z",
+        "downloadCount": 0,
+        "id": "RA_kwDOUnm2v84jgQip",
+        "label": "",
+        "name": "lasm-compiler-0.1.0-experimental.46.tgz",
+        "size": 65337774,
+        "state": "uploaded",
+        "updatedAt": "2026-09-28T14:53:05Z",
+        "url": "https://github.com/Millillion/lasm/releases/download/untagged-eb0c5838d8d247a9d10d/lasm-compiler-0.1.0-experimental.46.tgz"
+      },
+      {
+        "apiUrl": "https://api.github.com/repos/Millillion/lasm/releases/assets/595658926",
+        "contentType": "text/plain; charset=utf-8",
+        "createdAt": "2026-09-28T14:53:02Z",
+        "downloadCount": 0,
+        "id": "RA_kwDOUnm2v84jgQiu",
+        "label": "",
+        "name": "SHA256SUMS.txt",
+        "size": 106,
+        "state": "uploaded",
+        "updatedAt": "2026-09-28T14:53:02Z",
+        "url": "https://github.com/Millillion/lasm/releases/download/untagged-eb0c5838d8d247a9d10d/SHA256SUMS.txt"
+      }
+    ],
+    "body": "Unpublished, private npm candidate for the basic ordinary Lean-on-Node workflow.\n\nNative installed-package and independent-deployment controls passed for: linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64, win32-arm64. These passes use this exact archive.\n\nPackage source revision: 8fe54124c1dfc393f6d0a96aed171e75124dd57a\nValidation controls revision: 8fe54124c1dfc393f6d0a96aed171e75124dd57a\nRetention workflow revision: c2f703cfc260760d1ad44beff3b4d45952791e63\nThe unpublished draft may target main; package provenance, not that ref, identifies these exact bytes.\nPackage SHA-256: c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae\nCI evidence: https://github.com/Millillion/lasm/actions/runs/36429228696\nlinux-x64: https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951274962 (controls 8fe54124c1dfc393f6d0a96aed171e75124dd57a)\nlinux-arm64: https://github.com/Millillion/lasm/actions/runs/36429228696/job/108960024579 (controls 8fe54124c1dfc393f6d0a96aed171e75124dd57a)\ndarwin-x64: https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951274991 (controls 8fe54124c1dfc393f6d0a96aed171e75124dd57a)\ndarwin-arm64: https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951275132 (controls 8fe54124c1dfc393f6d0a96aed171e75124dd57a)\nwin32-x64: https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951275003 (controls 8fe54124c1dfc393f6d0a96aed171e75124dd57a)\nwin32-arm64: https://github.com/Millillion/lasm/actions/runs/36433387126/job/108965030474 (controls c2f703cfc260760d1ad44beff3b4d45952791e63)\n\nRequires Node 26.10.0 with npm; Lasm manages Lean 4.34.1 and its build tools. This is not full Lean language/library parity. No npm publication was performed.\n",
+    "isDraft": true,
+    "tagName": "node-linux-candidate-36439263093",
+    "url": "https://github.com/Millillion/lasm/releases/tag/untagged-eb0c5838d8d247a9d10d"
+  },
+  "storedAssets": {
+    "acceptance.json": {
+      "metadata": {
+        "url": "https://api.github.com/repos/Millillion/lasm/releases/assets/595658923",
+        "id": 595658923,
+        "node_id": "RA_kwDOUnm2v84jgQir",
+        "name": "acceptance.json",
+        "label": "",
+        "uploader": {
+          "login": "github-actions[bot]",
+          "id": 41898282,
+          "node_id": "MDM6Qm90NDE4OTgyODI=",
+          "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+          "html_url": "https://github.com/apps/github-actions",
+          "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+          "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+          "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+          "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+          "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+          "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+          "type": "Bot",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "content_type": "application/json",
+        "state": "uploaded",
+        "size": 1359082,
+        "digest": "sha256:48159c28990ab1eec1001c4301c20051864d76250e4ff0bff0a03b05e036b2b1",
+        "download_count": 0,
+        "created_at": "2026-09-28T14:53:02Z",
+        "updated_at": "2026-09-28T14:53:02Z",
+        "browser_download_url": "https://github.com/Millillion/lasm/releases/download/untagged-eb0c5838d8d247a9d10d/acceptance.json"
+      },
+      "downloadedSha256": "48159c28990ab1eec1001c4301c20051864d76250e4ff0bff0a03b05e036b2b1",
+      "downloadedBytes": 1359082
+    },
+    "lasm-compiler-0.1.0-experimental.46.tgz": {
+      "metadata": {
+        "url": "https://api.github.com/repos/Millillion/lasm/releases/assets/595658921",
+        "id": 595658921,
+        "node_id": "RA_kwDOUnm2v84jgQip",
+        "name": "lasm-compiler-0.1.0-experimental.46.tgz",
+        "label": "",
+        "uploader": {
+          "login": "github-actions[bot]",
+          "id": 41898282,
+          "node_id": "MDM6Qm90NDE4OTgyODI=",
+          "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+          "html_url": "https://github.com/apps/github-actions",
+          "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+          "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+          "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+          "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+          "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+          "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+          "type": "Bot",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "content_type": "application/x-gtar",
+        "state": "uploaded",
+        "size": 65337774,
+        "digest": "sha256:c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae",
+        "download_count": 0,
+        "created_at": "2026-09-28T14:53:02Z",
+        "updated_at": "2026-09-28T14:53:05Z",
+        "browser_download_url": "https://github.com/Millillion/lasm/releases/download/untagged-eb0c5838d8d247a9d10d/lasm-compiler-0.1.0-experimental.46.tgz"
+      },
+      "downloadedSha256": "c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae",
+      "downloadedBytes": 65337774
+    },
+    "SHA256SUMS.txt": {
+      "metadata": {
+        "url": "https://api.github.com/repos/Millillion/lasm/releases/assets/595658926",
+        "id": 595658926,
+        "node_id": "RA_kwDOUnm2v84jgQiu",
+        "name": "SHA256SUMS.txt",
+        "label": "",
+        "uploader": {
+          "login": "github-actions[bot]",
+          "id": 41898282,
+          "node_id": "MDM6Qm90NDE4OTgyODI=",
+          "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+          "html_url": "https://github.com/apps/github-actions",
+          "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+          "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+          "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+          "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+          "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+          "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+          "type": "Bot",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "content_type": "text/plain; charset=utf-8",
+        "state": "uploaded",
+        "size": 106,
+        "digest": "sha256:cbf4ec7de7ecbe36e1796bf2f744a29f28f05f6ffd3ba362597869578d56ee43",
+        "download_count": 0,
+        "created_at": "2026-09-28T14:53:02Z",
+        "updated_at": "2026-09-28T14:53:02Z",
+        "browser_download_url": "https://github.com/Millillion/lasm/releases/download/untagged-eb0c5838d8d247a9d10d/SHA256SUMS.txt"
+      },
+      "downloadedSha256": "cbf4ec7de7ecbe36e1796bf2f744a29f28f05f6ffd3ba362597869578d56ee43",
+      "downloadedBytes": 106
+    }
+  },
+  "packageProvenance": {
+    "sourceRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a",
+    "runtimeManifestSha256": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+    "lean": "4.34.1",
+    "node": "26.10.0"
+  },
+  "regularFiles": 234,
+  "logicalFileBytes": 377780890,
+  "acceptanceReceiptSha256": "48159c28990ab1eec1001c4301c20051864d76250e4ff0bff0a03b05e036b2b1",
+  "verifiedStoredDigest": true,
+  "independentlyDownloadedAndHashed": true,
+  "initialArm64Failure": "Run 36429228696 reached a missing CI reference compiler dependency after passing cold and Lake phases. Its failure remains preserved; successful ARM64 acceptance uses a separate unchanged-archive retry.",
+  "localAuditResources": {
+    "startedAt": "2026-09-28T14:53:48.583Z",
+    "command": [
+      "/usr/bin/timeout",
+      "240s",
+      "python3",
+      "-B",
+      ".work/macos/verify-node46-retention.py",
+      "36439263093"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "40af5ef9-41f2-4020-88e1-c49ede277b36",
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 21723160576
+    },
+    "minimumHostAvailable": 21651136512,
+    "peakMemoryBytes": 92684288,
+    "peakTasks": 17,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/macos/node46-retention-36439263093-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-28T14:54:08.436Z",
+      "memoryBytes": 80908288,
+      "peakMemoryBytes": 92684288,
+      "swapBytes": 0,
+      "tasks": 2,
+      "memoryBreakdown": {
+        "anon": 11542528,
+        "file": 66711552,
+        "kernel": 2244608,
+        "shmem": 0,
+        "file_mapped": 0,
+        "inactive_file": 66711552,
+        "slab": 2061456
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-28T14:54:08.527Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 82657280,
+      "peakMemoryBytes": 92684288,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11710464,
+        "file": 66727936,
+        "kernel": 3051520,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 66727936,
+        "slab": 2131840
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-28T14:54:08.554Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "packing": {
+    "scope": "Reproducible local npm packing; native installed acceptance is separate",
+    "tarball": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.46.tgz",
+    "sha256": "c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae",
+    "sourceRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a",
+    "candidateVersion": "0.1.0-experimental.46",
+    "defaultLean": "4.34.1",
+    "node": "26.10.0",
+    "runtime": {
+      "identity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+      "name": "lean-4.34.1-wasm64"
+    },
+    "reproduciblePacking": true,
+    "compressedBytes": 65337774,
+    "installedBytes": 377780890,
+    "files": 234,
+    "resourceReport": "/home/runner/work/lasm/lasm/.work/node-package-resources.json",
+    "recordedAt": "2026-09-28T13:32:39.132Z"
+  },
+  "officialVersionChecks": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "expected": "v4.34.1",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "expected": "v26.10.0",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false
+    },
+    "checkedAt": "2026-09-28T13:31:53.393Z"
+  },
+  "cacheBudget": {
+    "payloadBytes": 65337774,
+    "reportedBytes": 2760324462,
+    "listedBytes": 2760324462,
+    "usedBytes": 2760324462,
+    "uploadUpperBound": 83421746,
+    "ceilingBytes": 8589934592,
+    "includedAllowanceBytes": 10737418240,
+    "maximumAfterUpload": 2843746208,
+    "cacheEntries": 21,
+    "repository": "Millillion/lasm",
+    "payload": ".work/node-candidate/lasm-compiler-0.1.0-experimental.46.tgz",
+    "serializedWriterGroup": "lasm-cache-writer",
+    "checkedAt": "2026-09-28T13:32:39.920Z",
+    "billingSource": "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+  }
+}

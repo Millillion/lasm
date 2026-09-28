@@ -8,11 +8,13 @@ The exact [runtime exclusions are in the README](../README.md#lean-support-and-r
 Full standard-library compatibility is not claimed.
 
 The validated targets are Ubuntu 24.04.5 LTS (glibc 2.39) on native x86-64 and ARM64,
-plus macOS 15.7.9 (24G830) on native x86-64 and ARM64, and Windows
-10.0.26100.33438 (`windows-2025`) on native x86-64. Candidate `.44` passed all five
-targets. All use Node 26.10.0 with npm 11.19.1 and Lean 4.34.1. Use stock Node without special flags.
-Windows ARM64, other OS versions/distributions, older system libraries, Node versions and Lean versions are
-unverified. Linux requires glibc 2.39 or newer; musl-based distributions
+plus macOS 15.7.9 (24G830) on native x86-64 and ARM64, Windows Server 2025
+Datacenter 10.0.26100.33438 (`windows-2025`) on native x86-64, and Windows 11
+Enterprise 10.0.26200.9457 (`windows-11-arm`) on native ARM64. Candidate `.46`
+passed all six targets. All use Node 26.10.0 with npm 11.19.1 and Lean 4.34.1.
+Use stock Node without special flags. Other OS versions/distributions, older
+system libraries, and other Node/npm/Lean versions are unverified.
+Linux requires glibc 2.39 or newer; musl-based distributions
 such as Alpine are unsupported. Linux builds require the standard OS shell, loader, libc and system
 libraries supplied by Ubuntu; no separately installed developer tools are required.
 See the [current acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
@@ -29,7 +31,7 @@ administrator access is required.
 Pinned compressed tool downloads, including Git for a Lake project, total
 979,054,712 bytes on Linux x86-64, 910,904,894 on Linux ARM64,
 919,472,748 on Intel Mac, 925,010,880 on Apple Silicon and 1,312,233,267 on
-Windows x86-64. A standalone file skips
+Windows x86-64, and 1,018,654,299 on Windows ARM64. A standalone file skips
 the Git download. These totals exclude the npm package and generated build files;
 unpacked tools and build caches occupy several GB. The acceptance report records
 observed disk usage, build times and deployment sizes separately. These are
@@ -42,8 +44,8 @@ fallback. The retained historical `.34` archive predates this restriction. See t
 
 Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm` on Linux,
 `$HOME/Library/Caches/lasm` on macOS, and `%LOCALAPPDATA%\lasm\Cache` on Windows.
-Candidate `.44` is retained and passed the complete installed/deployment checks
-on all five accepted targets. Set
+Candidate `.46` is retained and passed the complete installed/deployment checks
+on all six accepted targets. Set
 `LASM_TOOLCHAIN_CACHE` to choose another directory. Compiled application caches
 live under the source project's `.lake/lasm/`. Hash checks detect changes to
 sources, tool descriptions, runtime inputs and generated outputs; an unchanged
@@ -81,6 +83,6 @@ the application's stdout remains usable in pipes. These logging improvements
 are checked in installed-package acceptance. The historical `.32` archive
 predates these improvements and remains unchanged.
 The package is a private experimental candidate, not an npm publication or a
-claim that every Lean program works. Native Windows ARM64 tool downloads are
-now available; installed-package acceptance remains in progress. Deno, Bun, HTTP/filesystem parity and broad
-third-party packages remain separate milestones.
+claim that every Lean program works. Linux, macOS and Windows passed on both
+architectures through the installed package and copied deployment. Deno, Bun,
+HTTP/filesystem parity and broad third-party packages remain separate milestones.

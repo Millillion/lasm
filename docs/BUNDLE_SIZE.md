@@ -1,6 +1,6 @@
 # Application deployment size
 
-## Current policy — 2026-09-26
+## Current policy — 2026-09-28
 
 Jordan chose ahead-of-time applications without a runtime Lean compiler. Current
 source builds reject reachable runtime evaluation, compiler/kernel state,
@@ -10,13 +10,19 @@ has been removed from the current application linker. Ordinary build-time Lean
 features remain available; broad runtime imports may still bring forbidden
 initializers, so compiler-only dependencies should use Lean's `meta import`.
 See the [README](../README.md#lean-support-and-restrictions) for the exact policy.
-Replacement candidate `.35` passed native Linux x86-64 and ARM64, with eight
-copied deployments of 2.67–3.61 MB, positive build-time macro/proof controls and
-build-time rejection of runtime evaluation/module-data access. See
-[the current acceptance report](NODE_ACCEPTANCE.md). Earlier measurements and
-failure evidence remain intact below; they describe historical `.34` behavior.
+Candidate `.46` passed native Linux, macOS and Windows on x86-64 and ARM64, with
+eight copied applications per target. Hello deployments measured 3.04–3.63 MB;
+the largest fixture deployment was 4.01 MB. Build-time macro/proof controls and
+build-time rejection of runtime evaluation/module-data access passed on all six
+targets. See [the current acceptance report](NODE_ACCEPTANCE.md) for the exact
+archive and measurements. Earlier measurements and failure evidence remain intact
+below; they describe historical `.34` behavior.
 
 ## Earlier measurements and implementation
+
+The first replacement candidate, `.35`, passed both native Linux architectures
+with eight copied deployments of 2.67–3.61 MB, positive build-time macro/proof
+controls and build-time rejection of runtime evaluation/module-data access.
 
 Historical candidate `.34` introduced linker reachability instead of exporting every
 Lean, Std and Lake declaration for every application. It uses the same ordinary

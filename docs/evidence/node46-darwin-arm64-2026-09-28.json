@@ -1,0 +1,1183 @@
+{
+  "scope": "This exact packed candidate passed native installed and copied-deployment checks on the named platform; broader API parity is not established",
+  "url": "https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951275132",
+  "run": "36429228696",
+  "job": 108951275132,
+  "platform": "darwin-arm64",
+  "passed": true,
+  "candidateVersion": "0.1.0-experimental.46",
+  "archiveSha256": "c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae",
+  "archiveBytes": 65337774,
+  "packageProvenance": {
+    "sourceRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a",
+    "runtimeManifestSha256": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+    "lean": "4.34.1",
+    "node": "26.10.0"
+  },
+  "controlsRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a",
+  "node": "v26.10.0",
+  "npm": "11.19.1",
+  "osRelease": "ProductName:\t\tmacOS\nProductVersion:\t\t15.7.9\nBuildVersion:\t\t24G830\n",
+  "kernel": "24.6.0",
+  "glibc": null,
+  "startedAt": "2026-09-28T13:33:13.287Z",
+  "finishedAt": "2026-09-28T13:56:33.873Z",
+  "phases": [
+    {
+      "phase": "cold",
+      "code": 0,
+      "diagnostic": ""
+    },
+    {
+      "phase": "lake",
+      "code": 0,
+      "diagnostic": ""
+    },
+    {
+      "phase": "offline",
+      "code": 0,
+      "diagnostic": ""
+    }
+  ],
+  "copiedDeployment": {
+    "denied": [
+      "/Users/runner/work/lasm/lasm/package.json",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/node_modules/@lasm/compiler/bin/lasm.mjs",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/Main.lean",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/dist/program.wasm",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/Args.lean",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/args dist \u03bb/program.wasm",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e/Main.lean",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e/dist/program.wasm",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/BundleFeatures.lean",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/features dist/program.wasm",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/BundleFeaturesLegacy.lean",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/features-legacy dist/program.wasm",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/FilesystemSurface.lean",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/filesystem dist/program.wasm",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/CompileTimeFeatures.lean",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/compile-time dist/program.wasm",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/Unused.lean",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/unused dist/program.wasm",
+      "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/home/Library/Caches/lasm/artifacts/4458db70a2775e191ba8f61de53632790f2455fa25a89c7ac760895046a4f007/bin/lean"
+    ],
+    "controlResult": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "programs": [
+      {
+        "name": "hello",
+        "wasmSha256": "ea52958e70e732dbe7c31bbc012bab50a1afdbbff4503c3a7de3bb40ea222c29",
+        "bytes": 3279120,
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            },
+            "seconds": 0.24855208299984224
+          }
+        ]
+      },
+      {
+        "name": "arguments",
+        "wasmSha256": "d4f5fb1b8600592b8dbcae9a14b6cb8b1984469938acbcf5c234d4a63ff3d800",
+        "bytes": 3280131,
+        "checks": [
+          {
+            "args": [
+              "hello world",
+              "\u03bb \u65e5\u672c\u8a9e",
+              "",
+              "--target"
+            ],
+            "expected": {
+              "code": 0,
+              "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+              "stderr": ""
+            },
+            "seconds": 0.27451304100011475
+          },
+          {
+            "args": [
+              "fail"
+            ],
+            "expected": {
+              "code": 23,
+              "stdout": "arg=fail\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 23,
+              "stdout": "arg=fail\n",
+              "stderr": ""
+            },
+            "seconds": 0.23468404199997894
+          }
+        ]
+      },
+      {
+        "name": "lake",
+        "wasmSha256": "793bd4e6b529306e7ac0614ecf31904cae49f7d746af699a1db5ab99a6f2e507",
+        "bytes": 3279743,
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "Lean module: 43\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "Lean module: 43\n",
+              "stderr": ""
+            },
+            "seconds": 0.2726515409999993
+          }
+        ]
+      },
+      {
+        "name": "features",
+        "wasmSha256": "286b13320e5f84d32d544cb3806470d6042a879ae6e5711433c6369a1414e518",
+        "bytes": 2951179,
+        "checks": [
+          {
+            "args": [
+              "123456789"
+            ],
+            "expected": {
+              "code": 0,
+              "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+              "stderr": ""
+            },
+            "seconds": 0.282984667000128
+          }
+        ]
+      },
+      {
+        "name": "features-legacy",
+        "wasmSha256": "1d23fdb051a9082ff4542b6b6ebeb1c2621a375d5b5f1c77b593cfce5eb6b9b2",
+        "bytes": 3661999,
+        "checks": [
+          {
+            "args": [
+              "17"
+            ],
+            "expected": {
+              "code": 0,
+              "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+              "stderr": ""
+            },
+            "seconds": 0.3512483749999665
+          }
+        ]
+      },
+      {
+        "name": "filesystem",
+        "wasmSha256": "cbf07221e6d44732e78bcd619029758103e53234c48ac35ffe742296e92d92af",
+        "bytes": 3368279,
+        "checks": [
+          {
+            "args": [
+              "filesystem \u03bb"
+            ],
+            "expected": {
+              "code": 0,
+              "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+              "stderr": ""
+            },
+            "seconds": 0.4086950840000063
+          }
+        ]
+      },
+      {
+        "name": "compile-time",
+        "wasmSha256": "504c086805b08d973cce2c9b2e67eca6464b00b08045eeb2b285df07190b3b2a",
+        "bytes": 2741422,
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "compile-time macros and proofs: 42\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "compile-time macros and proofs: 42\n",
+              "stderr": ""
+            },
+            "seconds": 0.2679499170000199
+          }
+        ]
+      },
+      {
+        "name": "unused",
+        "wasmSha256": "ea52958e70e732dbe7c31bbc012bab50a1afdbbff4503c3a7de3bb40ea222c29",
+        "bytes": 3279122,
+        "checks": [
+          {
+            "args": [],
+            "expected": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "stdout": "Hello from Lean! 2 + 3 = 5\n",
+              "stderr": ""
+            },
+            "seconds": 0.2535073750000447
+          }
+        ]
+      }
+    ]
+  },
+  "nativeControls": [
+    {
+      "file": "BundleFeatures.lean",
+      "args": [
+        "123456789"
+      ],
+      "sourceSha256": "81bb017333f331ae4a902baa82f4cb9d1f874c0ab787d1510981135d06ab7b6d",
+      "lean": "4.34.1",
+      "nativePrograms": {
+        "lean": {
+          "platform": "darwin",
+          "architectures": [
+            "arm64"
+          ]
+        },
+        "lake": {
+          "platform": "darwin",
+          "architectures": [
+            "arm64"
+          ]
+        }
+      },
+      "scope": "Native AOT oracle only; Apple SDK and this output directory denied to installed product",
+      "executable": "/Users/runner/work/lasm/lasm/.work/node-darwin-acceptance/native-controls/BundleFeatures.lean/program",
+      "result": {
+        "code": 0,
+        "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+        "stderr": ""
+      },
+      "gitBlobSha256": "81bb017333f331ae4a902baa82f4cb9d1f874c0ab787d1510981135d06ab7b6d",
+      "checkoutLineEndings": "Identical to committed fixture bytes"
+    },
+    {
+      "file": "BundleFeaturesLegacy.lean",
+      "args": [
+        "17"
+      ],
+      "sourceSha256": "dc143586209c15fffee2cc706e2de57271bde12e97d4dbd3a886d5e1b042c26c",
+      "lean": "4.34.1",
+      "nativePrograms": {
+        "lean": {
+          "platform": "darwin",
+          "architectures": [
+            "arm64"
+          ]
+        },
+        "lake": {
+          "platform": "darwin",
+          "architectures": [
+            "arm64"
+          ]
+        }
+      },
+      "scope": "Native AOT oracle only; Apple SDK and this output directory denied to installed product",
+      "executable": "/Users/runner/work/lasm/lasm/.work/node-darwin-acceptance/native-controls/BundleFeaturesLegacy.lean/program",
+      "result": {
+        "code": 0,
+        "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+        "stderr": ""
+      },
+      "gitBlobSha256": "dc143586209c15fffee2cc706e2de57271bde12e97d4dbd3a886d5e1b042c26c",
+      "checkoutLineEndings": "Identical to committed fixture bytes"
+    },
+    {
+      "file": "FilesystemSurface.lean",
+      "args": [
+        "filesystem \u03bb"
+      ],
+      "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+      "lean": "4.34.1",
+      "nativePrograms": {
+        "lean": {
+          "platform": "darwin",
+          "architectures": [
+            "arm64"
+          ]
+        },
+        "lake": {
+          "platform": "darwin",
+          "architectures": [
+            "arm64"
+          ]
+        }
+      },
+      "scope": "Native AOT oracle only; Apple SDK and this output directory denied to installed product",
+      "executable": "/Users/runner/work/lasm/lasm/.work/node-darwin-acceptance/native-controls/FilesystemSurface.lean/program",
+      "result": {
+        "code": 0,
+        "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+        "stderr": ""
+      },
+      "gitBlobSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+      "checkoutLineEndings": "Identical to committed fixture bytes"
+    },
+    {
+      "file": "CompileTimeFeatures.lean",
+      "args": [],
+      "sourceSha256": "de796139723e9460ac0efbaefdcc05650359ee3881e5404034e7587ce3103f45",
+      "lean": "4.34.1",
+      "nativePrograms": {
+        "lean": {
+          "platform": "darwin",
+          "architectures": [
+            "arm64"
+          ]
+        },
+        "lake": {
+          "platform": "darwin",
+          "architectures": [
+            "arm64"
+          ]
+        }
+      },
+      "scope": "Native AOT oracle only; Apple SDK and this output directory denied to installed product",
+      "executable": "/Users/runner/work/lasm/lasm/.work/node-darwin-acceptance/native-controls/CompileTimeFeatures.lean/program",
+      "result": {
+        "code": 0,
+        "stdout": "compile-time macros and proofs: 42\n",
+        "stderr": ""
+      },
+      "gitBlobSha256": "de796139723e9460ac0efbaefdcc05650359ee3881e5404034e7587ce3103f45",
+      "checkoutLineEndings": "Identical to committed fixture bytes"
+    }
+  ],
+  "installation": {
+    "steps": [
+      {
+        "label": "npm install candidate",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npm",
+          "install",
+          "/Users/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.46.tgz"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 6.566066333,
+        "code": 0,
+        "stdout": "\nadded 7 packages in 6s\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "npm version",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npm",
+          "--version"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.1677532080000001,
+        "code": 0,
+        "stdout": "11.19.1\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "cold npx lasm Main.lean",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 386.190764542,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] First-time tool setup can take a few minutes. Lasm downloads and verifies its tools automatically; later builds reuse them.\n[lasm] Tools cache: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/home/Library/Caches/lasm\n[lasm] Downloading Lean 4.34.1 and Lake: 0 B / 562.0 MB (0%) \u2014 0s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 562.0 MB / 562.0 MB (100%) \u2014 8s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 11s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 21s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake \u2014 7s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake \u2014 17s elapsed\n[lasm] Finishing Lean 4.34.1 and Lake setup \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Downloading Python 3.13.15: 0 B / 25.1 MB (0%) \u2014 0s elapsed\n[lasm] Downloading Python 3.13.15: 25.1 MB / 25.1 MB (100%) \u2014 0s elapsed\n[lasm] Extracting Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying installed Python 3.13.15 \u2014 0s elapsed\n[lasm] Finishing Python 3.13.15 setup \u2014 0s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 0 B / 275.5 MB (0%) \u2014 0s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 4.4 MB / 275.5 MB (1%) \u2014 2s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 40.0 MB / 275.5 MB (14%) \u2014 12s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 73.8 MB / 275.5 MB (26%) \u2014 22s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 108.8 MB / 275.5 MB (39%) \u2014 32s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 142.5 MB / 275.5 MB (51%) \u2014 42s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 177.4 MB / 275.5 MB (64%) \u2014 52s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 211.5 MB / 275.5 MB (76%) \u2014 1m 2s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 246.1 MB / 275.5 MB (89%) \u2014 1m 12s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 275.5 MB / 275.5 MB (100%) \u2014 1m 20s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 1s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 11s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 21s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 31s elapsed\n[lasm] Verifying installed compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying installed compiler tools (Emscripten 6.0.9) \u2014 7s elapsed\n[lasm] Finishing compiler tools (Emscripten 6.0.9) setup \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 7s elapsed\n[lasm] Preparing and checking compiler tools \u2014 17s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 7s elapsed\n[lasm] Checking required runtime code \u2014 17s elapsed\n[lasm] Checking required runtime code \u2014 27s elapsed\n[lasm] Checking required runtime code \u2014 37s elapsed\n[lasm] Checking required runtime code \u2014 47s elapsed\n[lasm] Checking required runtime code \u2014 57s elapsed\n[lasm] Checking required runtime code \u2014 1m 7s elapsed\n[lasm] Checking required runtime code \u2014 1m 17s elapsed\n[lasm] Checking required runtime code \u2014 1m 27s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 1s elapsed\n[lasm] Linking application and Lean runtime \u2014 11s elapsed\n[lasm] Linking application and Lean runtime \u2014 21s elapsed\n[lasm] Linking application and Lean runtime \u2014 31s elapsed\n[lasm] Linking application and Lean runtime \u2014 41s elapsed\n[lasm] Linking application and Lean runtime \u2014 51s elapsed\n[lasm] Linking application and Lean runtime \u2014 1m 1s elapsed\n[lasm] Linking application and Lean runtime \u2014 1m 11s elapsed\n[lasm] Linking application and Lean runtime \u2014 1m 21s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (6m 25s total).\n[lasm] Running Main.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "npx lasm build Main.lean",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 17.631936875000015,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (17s total).\nReused Lean 4.34.1 for node: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/dist\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Main.lean",
+        "command": [
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/home/Library/Caches/lasm/artifacts/4458db70a2775e191ba8f61de53632790f2455fa25a89c7ac760895046a4f007/bin/lean",
+          "--run",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 3.092964250000019,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: hello",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/dist/main.mjs"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.3136302920000162,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "Lake local import",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 78.033537958,
+        "code": 0,
+        "stdout": "Lean module: 42\n",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 19s elapsed\n[lasm] First-time tool setup can take a few minutes. Lasm downloads and verifies its tools automatically; later builds reuse them.\n[lasm] Tools cache: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/home/Library/Caches/lasm\n[lasm] Downloading Git 2.53.0: 0 B / 62.3 MB (0%) \u2014 0s elapsed\n[lasm] Downloading Git 2.53.0: 62.3 MB / 62.3 MB (100%) \u2014 1s elapsed\n[lasm] Extracting Git 2.53.0 \u2014 0s elapsed\n[lasm] Verifying installed Git 2.53.0 \u2014 0s elapsed\n[lasm] Finishing Git 2.53.0 setup \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 6s elapsed\ninfo: greeting: no previous manifest, creating one from scratch\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 6s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 1s elapsed\n[lasm] Compiling application module 1 of 2 \u2014 0s elapsed\n[lasm] Compiling application module 2 of 2 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 5s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 17s total).\n[lasm] Running Main.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "Lake deployment build",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 25.118654875000008,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Verifying cached Git 2.53.0 \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 1s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (24s total).\nReused Lean 4.34.1 for node: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e/dist\n",
+        "signal": null
+      },
+      {
+        "label": "offline cached npx run",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 15.368849709000001,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (14s total).\n[lasm] Running Main.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "Lean diagnostic",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "Broken.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 19.521732875,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Broken.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/Broken.lean:1:33: error(lean.unknownIdentifier): Unknown identifier `unknownGreeting`\n\n",
+        "signal": null
+      },
+      {
+        "label": "unsupported Lean pin",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.5991727499999979,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\nUnsupported Lean toolchain \"leanprover/lean4:v999.0.0\" in /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lean-toolchain. Supported managed versions: 4.34.1. The project pin was not changed.\n",
+        "signal": null
+      },
+      {
+        "label": "native tool drift cannot reuse cached output",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 14.530204957999995,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\nManaged cache contents changed: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/home/Library/Caches/lasm/artifacts/4458db70a2775e191ba8f61de53632790f2455fa25a89c7ac760895046a4f007. Changed entries (1): \"LICENSE\". Remove this toolchain directory to download a verified replacement.\n",
+        "signal": null
+      },
+      {
+        "label": "runtime drift cannot reuse cached output",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.8076517499999972,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\nApplication runtime integrity check failed: exports.json\n",
+        "signal": null
+      },
+      {
+        "label": "arguments and exit code",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "Args.lean",
+          "--",
+          "hello world",
+          "\u03bb \u65e5\u672c\u8a9e",
+          "",
+          "--target"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 74.442389833,
+        "code": 0,
+        "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+        "stderr": "[lasm] Preparing Args.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 19s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 2s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 8s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 3s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 3s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 8s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 13s total).\n[lasm] Running Args.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "arguments and exit code",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "Args.lean",
+          "--",
+          "fail"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 18.758382958999995,
+        "code": 23,
+        "stdout": "arg=fail\n",
+        "stderr": "[lasm] Preparing Args.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (18s total).\n[lasm] Running Args.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "arguments deployment",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "Args.lean",
+          "--output",
+          "args dist \u03bb"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 16.691390749999993,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Args.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (16s total).\nReused Lean 4.34.1 for node: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/args dist \u03bb\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Args.lean",
+        "command": [
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/home/Library/Caches/lasm/artifacts/4458db70a2775e191ba8f61de53632790f2455fa25a89c7ac760895046a4f007/bin/lean",
+          "--run",
+          "Args.lean",
+          "hello world",
+          "\u03bb \u65e5\u672c\u8a9e",
+          "",
+          "--target"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 1.291674708000006,
+        "code": 0,
+        "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: arguments",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/args dist \u03bb/main.mjs",
+          "hello world",
+          "\u03bb \u65e5\u672c\u8a9e",
+          "",
+          "--target"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.2510052909999795,
+        "code": 0,
+        "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Args.lean",
+        "command": [
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/home/Library/Caches/lasm/artifacts/4458db70a2775e191ba8f61de53632790f2455fa25a89c7ac760895046a4f007/bin/lean",
+          "--run",
+          "Args.lean",
+          "fail"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.4452843330000178,
+        "code": 23,
+        "stdout": "arg=fail\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: arguments",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/args dist \u03bb/main.mjs",
+          "fail"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.22980687500000932,
+        "code": 23,
+        "stdout": "arg=fail\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "changed imported source",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 62.040591667,
+        "code": 0,
+        "stdout": "Lean module: 43\n",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Verifying cached Git 2.53.0 \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 9s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 8s elapsed\n[lasm] Compiling application module 1 of 2 \u2014 0s elapsed\n[lasm] Compiling application module 2 of 2 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 3s elapsed\n[lasm] Linking application and Lean runtime \u2014 13s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 1s total).\n[lasm] Running Main.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "changed Lake deployment",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 31.088785667000018,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 19s elapsed\n[lasm] Verifying cached Git 2.53.0 \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 7s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (30s total).\nReused Lean 4.34.1 for node: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e/dist\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Main.lean",
+        "command": [
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/home/Library/Caches/lasm/artifacts/4458db70a2775e191ba8f61de53632790f2455fa25a89c7ac760895046a4f007/bin/lake",
+          "--keep-toolchain",
+          "env",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/home/Library/Caches/lasm/artifacts/4458db70a2775e191ba8f61de53632790f2455fa25a89c7ac760895046a4f007/bin/lean",
+          "--run",
+          "Main.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 0.7145816670000203,
+        "code": 0,
+        "stdout": "Lean module: 43\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: lake",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e/dist/main.mjs"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/lake project \u65e5\u672c\u8a9e",
+        "seconds": 0.31841762499994364,
+        "code": 0,
+        "stdout": "Lean module: 43\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "features deployment",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "BundleFeatures.lean",
+          "--output",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/features dist"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 74.76171162499999,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing BundleFeatures.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 19s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 7s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 10s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 5s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 9s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 14s total).\nBuilt Lean 4.34.1 for node: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/features dist\n",
+        "signal": null
+      },
+      {
+        "label": "plain Node: features",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/features dist/main.mjs",
+          "123456789"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.2669939580000355,
+        "code": 0,
+        "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "features-legacy deployment",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "BundleFeaturesLegacy.lean",
+          "--output",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/features-legacy dist"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 76.07005737499998,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing BundleFeaturesLegacy.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 19s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 8s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 5s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 1s elapsed\n[lasm] Linking application and Lean runtime \u2014 11s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 15s total).\nBuilt Lean 4.34.1 for node: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/features-legacy dist\n",
+        "signal": null
+      },
+      {
+        "label": "plain Node: features-legacy",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/features-legacy dist/main.mjs",
+          "17"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.2864507500000182,
+        "code": 0,
+        "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "filesystem deployment",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "FilesystemSurface.lean",
+          "--output",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/filesystem dist"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 57.918487375000026,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing FilesystemSurface.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 6s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (57s total).\nBuilt Lean 4.34.1 for node: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/filesystem dist\n",
+        "signal": null
+      },
+      {
+        "label": "plain Node: filesystem",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/filesystem dist/main.mjs",
+          "filesystem \u03bb"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.26332554099999833,
+        "code": 0,
+        "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "compile-time deployment",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "CompileTimeFeatures.lean",
+          "--output",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/compile-time dist"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 55.39794658300007,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing CompileTimeFeatures.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 4s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 8s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 7s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 3s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (54s total).\nBuilt Lean 4.34.1 for node: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/compile-time dist\n",
+        "signal": null
+      },
+      {
+        "label": "plain Node: compile-time",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/compile-time dist/main.mjs"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.15687287500000094,
+        "code": 0,
+        "stdout": "compile-time macros and proofs: 42\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "unused definitions deployment",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "Unused.lean",
+          "--output",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/unused dist"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 65.41056154200004,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Unused.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 9s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 8s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 10s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 4s total).\nBuilt Lean 4.34.1 for node: /private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/unused dist\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Unused.lean",
+        "command": [
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/home/Library/Caches/lasm/artifacts/4458db70a2775e191ba8f61de53632790f2455fa25a89c7ac760895046a4f007/bin/lean",
+          "--run",
+          "Unused.lean"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 4.046091499999981,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: unused",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/unused dist/main.mjs"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 0.3236566250000615,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "reject runtime compiler dependency: StandaloneModuleData.lean",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "StandaloneModuleData.lean",
+          "--output",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/StandaloneModuleData.lean rejected"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 70.90178116699995,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing StandaloneModuleData.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 19s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 5s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 6s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 3s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 4s elapsed\n[lasm] Checking required runtime code \u2014 14s elapsed\nLasm does not support runtime Lean compilation, evaluation, module-data access, or plugin loading in deployed applications.\nDetected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlopen, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, dynlib.cpp.o; runtime Lean module-data access: l_Lean_findSysroot, l_Lean_findSysroot___closed__0_value, l_Lean_findSysroot___closed__1_value, l_Lean_findSysroot___closed__2_value, l_Lean_findSysroot___closed__3_value.\nMove this operation to build time or remove the dependency. Ordinary imports, tactics, macros and deriving during compilation remain supported. No deployment was produced.\n",
+        "signal": null
+      },
+      {
+        "label": "reject runtime compiler dependency: RuntimeModulePath.lean",
+        "command": [
+          "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/npx",
+          "lasm",
+          "build",
+          "RuntimeModulePath.lean",
+          "--output",
+          "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb/RuntimeModulePath.lean rejected"
+        ],
+        "cwd": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm node Mac \u03bb-Tz9746/project space \u03bb",
+        "seconds": 54.87510537500004,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing RuntimeModulePath.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 9s elapsed\nLasm does not support runtime Lean compilation, evaluation, module-data access, or plugin loading in deployed applications.\nDetected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o; runtime Lean module-data access: l_Lean_findSysroot, l_Lean_findSysroot___closed__0_value, l_Lean_findSysroot___closed__1_value, l_Lean_findSysroot___closed__2_value, l_Lean_findSysroot___closed__3_value.\nMove this operation to build time or remove the dependency. Ordinary imports, tactics, macros and deriving during compilation remain supported. No deployment was produced.\n",
+        "signal": null
+      }
+    ],
+    "installBytes": 380770261,
+    "coldToolsBytes": 5373959905,
+    "toolsBytes": 5528697964,
+    "downloadBytes": 925010880,
+    "downloads": [
+      {
+        "tool": "Lean/Lake",
+        "name": "lean-4.34.1-darwin_aarch64.tar.zst",
+        "root": "lean-4.34.1-darwin_aarch64",
+        "url": "https://github.com/leanprover/lean4/releases/download/v4.34.1/lean-4.34.1-darwin_aarch64.tar.zst",
+        "sha256": "65f22a4f047738ec742667b3247e836a86ebf06eabc12655c3dee00637e37866",
+        "bytes": 562038070,
+        "format": "tar.zst",
+        "maximumExtractedBytes": 8589934592
+      },
+      {
+        "tool": "python",
+        "name": "python-3.13.15-20260901-darwin-arm64",
+        "root": "python",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-aarch64-apple-darwin-install_only_stripped.tar.gz",
+        "sha256": "d3904bd6a072246e07aa0bdadee9a14e80521e42a943c0848059feb16a2816dc",
+        "bytes": 25147663,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 600000000
+      },
+      {
+        "tool": "sdk",
+        "name": "emscripten-6.0.9-darwin-arm64",
+        "root": "install",
+        "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/mac/f04ea239d533260dd1db760dd2d668d5f9a88d6b/wasm-binaries-arm64.tar.xz",
+        "sha256": "b60514308507f64f4138d3c55bdb6979f20222288700fde603dced23b65dd533",
+        "bytes": 275476160,
+        "format": "tar.xz",
+        "maximumExtractedBytes": 5000000000
+      },
+      {
+        "tool": "git",
+        "name": "dugite-native-v2.53.0-4098283-macOS-arm64.tar.gz",
+        "root": ".",
+        "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-macOS-arm64.tar.gz",
+        "sha256": "f9dc64635a5b62fbd7ad95db73268bbb8912255ac516d65d37bf7af22fcb8ffe",
+        "bytes": 62348987,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 536870912
+      }
+    ],
+    "receipts": [
+      {
+        "identity": "4458db70a2775e191ba8f61de53632790f2455fa25a89c7ac760895046a4f007",
+        "files": 18341,
+        "bytes": 2860590175
+      },
+      {
+        "identity": "865164a104f9fcbfcd2fc9d1bda65f0311c79a31ab6b396763d0895fbc3c0234",
+        "files": 485,
+        "bytes": 154673341
+      },
+      {
+        "identity": "ae9e3f66aeda497552d2e55793d2fd9642d4bafb6b4467cc9f8d3cc9925f53a3",
+        "files": 1808,
+        "bytes": 64347794
+      },
+      {
+        "identity": "cc3f0e82b5e58eb0336049fd442445e776dff590bfd3961feedf2ce4a73a0135",
+        "files": 20864,
+        "bytes": 1490083691
+      }
+    ],
+    "startupMeasurements": [
+      {
+        "firstOutputSeconds": 0.20713883300000088,
+        "totalSeconds": 0.2148483750000014,
+        "code": 0,
+        "signal": null,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "outputLimitExceeded": false
+      },
+      {
+        "firstOutputSeconds": 0.18690754200000084,
+        "totalSeconds": 0.19229000000000088,
+        "code": 0,
+        "signal": null,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "outputLimitExceeded": false
+      },
+      {
+        "firstOutputSeconds": 0.17733270900000025,
+        "totalSeconds": 0.18242100000000028,
+        "code": 0,
+        "signal": null,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "outputLimitExceeded": false
+      }
+    ],
+    "offlineCacheReused": true,
+    "sourceInvalidation": true,
+    "runtimeRestrictions": {
+      "evaluation": "rejected during build",
+      "moduleData": "rejected during build",
+      "compileTimeMacrosAndProofs": "passed"
+    },
+    "cacheRecovery": [
+      {
+        "failure": "interrupted",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "truncated",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "checksum",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "unavailable",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "incomplete-cache",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "damaged-cache",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      }
+    ]
+  },
+  "resources": {
+    "unit": "24a92ffe-33a2-4eb3-ab2b-8b2348ca23b8",
+    "report": "/Users/runner/work/lasm/lasm/.work/node-darwin-resources.json",
+    "monitorPid": 2236,
+    "mechanism": "macOS process-tree RSS monitor",
+    "hardCap": false,
+    "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+    "limits": {
+      "memoryMax": null,
+      "stopMemoryBytes": 3006477107,
+      "hostReserveBytes": 1610612736,
+      "maximumCompressionGrowthBytes": 134217728,
+      "compressionReserveBytes": 2147483648,
+      "sampleMs": 250
+    },
+    "startedAt": "2026-09-28T13:33:13.066Z",
+    "hostAtStart": {
+      "total": 7516192768,
+      "available": 3294969856,
+      "compressed": 283820032
+    },
+    "minimumHostAvailable": 2929459200,
+    "peakMemoryBytes": 2592604160,
+    "peakCompressionGrowthBytes": 461783040,
+    "peakTasks": 7,
+    "resourceLimited": false,
+    "unitReleased": true,
+    "status": "finished",
+    "updatedAt": "2026-09-28T13:56:34.116Z",
+    "processGroup": 2243,
+    "command": [
+      "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node",
+      "scripts/check-node-darwin.mjs",
+      "/Users/runner/work/lasm/lasm/.work/node-darwin-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.46.tgz",
+      "c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae"
+    ],
+    "lastSample": {
+      "bytes": 208551936,
+      "host": {
+        "total": 7516192768,
+        "available": 3980754944,
+        "compressed": 710164480
+      },
+      "processes": [
+        {
+          "pid": 2243,
+          "parent": 2236,
+          "group": 2243,
+          "bytes": 89260032,
+          "started": "Mon Sep 28 13:33:13 2026",
+          "identity": "2243:Mon Sep 28 13:33:13 2026",
+          "command": "/Users/runner/hostedtoolcache/node/26.10.0/arm64/bin/node"
+        },
+        {
+          "pid": 47432,
+          "parent": 2243,
+          "group": 2243,
+          "bytes": 119291904,
+          "started": "Mon Sep 28 13:56:33 2026",
+          "identity": "47432:Mon Sep 28 13:56:33 2026",
+          "command": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/lasm deployed Mac M-fM^WM-%M-fM^\\M-,M-hM-*M^^-u383Gt/node"
+        }
+      ]
+    },
+    "finishedAt": "2026-09-28T13:56:34.116Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    }
+  },
+  "disk": {
+    "reserveBytes": 4294967296,
+    "preflightBytes": 12884901888,
+    "freeAtStart": 45410578432,
+    "status": "passed",
+    "minimumFreeBytes": 38170189824,
+    "freeAtEnd": 38209642496
+  },
+  "retainedReceiptSha256": "48159c28990ab1eec1001c4301c20051864d76250e4ff0bff0a03b05e036b2b1",
+  "hostedRunner": {
+    "operatingSystem": [
+      "macOS",
+      "15.7.9",
+      "24G830"
+    ],
+    "image": [
+      "Image: macos-15-arm64",
+      "Version: 20260907.0337.1",
+      "Included Software: https://github.com/actions/runner-images/blob/macos-15-arm64/20260907.0337/images/macos/macos-15-arm64-Readme.md",
+      "Image Release: https://github.com/actions/runner-images/releases/tag/macos-15-arm64%2F20260907.0337"
+    ]
+  },
+  "rawLogSha256": "b724bd3a3ebe6a9b81b2084d558bad9347ae2754d3167950306638be08d6f1f4"
+}

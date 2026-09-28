@@ -1,17 +1,17 @@
 # Windows toolchain implementation
 
-Windows x64 candidate `.44` has passed the installed Node package's native
-acceptance gates, as have both Linux and macOS architectures. The exact archive
-and combined receipt are [retained](evidence/node44-five-platform-retention-2026-09-28.json).
-ARM64 remains unverified as an installed Lasm application. The README identifies
-the currently available release and platform boundaries.
+Candidate `.46` passed native installed-package and independent-deployment
+acceptance on Windows x86-64 and ARM64, as well as both Linux and macOS
+architectures. The identical archive and combined receipt are
+[retained and independently verified](evidence/node46-six-platform-retention-2026-09-28.json).
+See the [acceptance report](NODE_ACCEPTANCE.md) for exact tested OS versions,
+tool versions, hashes and measurements. Nothing is published to npm.
 
-The native Lean 4.34.1 archive now passed build, relocation, retention and a
-streaming archive audit. Its public tool download and required source/notices
-companion are connected in the source catalog for candidate `.45`. The SDK had
-already passed a fresh native public-download consumer. The next acceptance
-workflow uses one identical package on all six OS/architecture targets.
-The investigations below preserve earlier candidates and failures.
+The native ARM64 Lean 4.34.1 distribution, required source/notices companion,
+and repaired Emscripten 6.0.9 SDK are available as verified managed downloads.
+The SDK's UTF-8 manifest repair passed both focused native controls and the
+complete installed application suite. The investigations below preserve earlier
+candidates and failures; later acceptance does not relabel those attempts.
 
 Managed native Lean/Lake execute from a short physical `bin` directory under
 `os.tmpdir()/lasm-tools/<hash>`. Its files are hard links to the verified cache
@@ -248,3 +248,20 @@ native Lean bootstrap and checks both import libraries before starting the
 consumer. These reference tools remain denied to the installed product. Retry
 the unchanged `.46` archive; this change does not modify its package bytes or
 any Lean test fixture.
+
+### Candidate `.46` completes both Windows architectures
+
+The corrected [ARM64 retry](https://github.com/Millillion/lasm/actions/runs/36433387126/job/108965030474)
+passed cold installation, local Lake imports, all four native reference programs,
+offline reuse, six cache-recovery controls, ahead-of-time restrictions, and eight
+copied applications with nine exact output/exit comparisons. Its first build took
+745 seconds. The Job Object report recorded a 2.48-GiB peak, successful cleanup,
+restored offline firewall controls, and no resource abort.
+
+The [x86-64 job](https://github.com/Millillion/lasm/actions/runs/36429228696/job/108951275003)
+passed the same gates. Both consume the unchanged `.46` archive with SHA-256
+`c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae`.
+Combined retention run `36439263093` verified all six platform reports. A local
+512-MiB guarded audit independently downloaded and hashed the retained package
+and receipt, peaking at 88.4 MiB with no resource abort. The Windows extension of
+the scoped Lean-on-Node milestone is complete; broader API parity remains deferred.

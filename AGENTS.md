@@ -17,8 +17,10 @@
   each commit; if it fails, retain the commit locally, continue work, and try
   again after the next commit. npm publication remains unauthorized.
 - Prioritize the ordinary Lean-on-Node installed workflow in `docs/PLAN.md`.
-  Linux x86-64 and ARM64 have passed. The current order is ahead-of-time runtime
-  restrictions, native macOS x86-64 and ARM64, then Windows x86-64 and ARM64.
+  Candidate `.46` passed the scoped native installed/deployment workflow on Linux,
+  macOS and Windows, each on x86-64 and ARM64, with ahead-of-time restrictions.
+  Exact accepted OS/tool versions and artifact identities are in
+  `docs/NODE_ACCEPTANCE.md`.
   Broader API parity, other engines and experimental helper integration remain
   deferred. Preserve their source, tests, artifacts and failures. Recheck
   official Node/Lean releases before a new acceptance campaign and pin exact
