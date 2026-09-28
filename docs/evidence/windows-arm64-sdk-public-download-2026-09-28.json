@@ -1,0 +1,76 @@
+{
+  "passed": true,
+  "scope": "Anonymous HTTPS archive checksum verification; native SDK execution is recorded separately",
+  "artifact": {
+    "name": "emscripten-6.0.9-win32-arm64",
+    "root": "install",
+    "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/emscripten-6.0.9-win32-arm64.tar.gz",
+    "sha256": "abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a",
+    "bytes": 174792332,
+    "format": "tar.gz",
+    "maximumExtractedBytes": 5000000000
+  },
+  "bytes": 174792332,
+  "sha256": "abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a",
+  "startedAt": "2026-09-28T07:08:31.290Z",
+  "finishedAt": "2026-09-28T07:09:07.599Z",
+  "authentication": "No Authorization header or GitHub credentials supplied",
+  "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/macos/windows-sdk-public-download-resources.json",
+  "resources": {
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "peakMemoryBytes": 36929536,
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "unitReleased": true
+  },
+  "memoryEvents": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  },
+  "release": {
+    "assets": [
+      {
+        "browser_download_url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/emscripten-6.0.9-win32-arm64.tar.gz",
+        "id": 591801219,
+        "name": "emscripten-6.0.9-win32-arm64.tar.gz",
+        "size": 174792332
+      },
+      {
+        "browser_download_url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/windows-sdk-retention.json",
+        "id": 591801221,
+        "name": "windows-sdk-retention.json",
+        "size": 73039
+      },
+      {
+        "browser_download_url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/windows-sdk-SHA256SUMS.txt",
+        "id": 591801220,
+        "name": "windows-sdk-SHA256SUMS.txt",
+        "size": 102
+      }
+    ],
+    "draft": false,
+    "html_url": "https://github.com/Millillion/lasm/releases/tag/windows-arm64-sdk-bootstrap-36278363560",
+    "id": 397452563,
+    "prerelease": true,
+    "published_at": "2026-09-28T07:06:47Z",
+    "tag_name": "windows-arm64-sdk-bootstrap-36278363560"
+  },
+  "nativeRelocationEvidence": "windows-arm64-sdk-2026-09-27.json",
+  "archiveAndNoticeEvidence": "windows-arm64-sdk-notice-audit-2026-09-27.json",
+  "freshNativePublicConsumer": "Pending dispatch after this catalog commit"
+}

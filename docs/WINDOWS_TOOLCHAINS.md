@@ -34,12 +34,13 @@ companion. These build-tool sources do not become application deployment files.
 
 The native ARM64 [SDK](evidence/windows-arm64-sdk-2026-09-27.json) and
 [leantar helper](evidence/windows-arm64-leantar-2026-09-26.json) passed their
-recorded relocation controls and are retained as unpublished drafts. The new
+recorded relocation controls. The SDK is now a public tool prerelease; leantar
+remains a retained bootstrap draft. The new
 Lean 4.34.1 native compiler [reached its deadline while linking](evidence/windows-arm64-lean-release-deadline-2026-09-27.json), with a 1.91-GiB peak and no completed distribution. The reproducible
 [source/notices companion](evidence/windows-arm64-tool-notices-2026-09-27.json)
 must match the compiler's actual GMP version and leantar identity before it is
-connected to that distribution. No Windows ARM64 download catalog entry or
-public tool publication is established yet.
+connected to that distribution. The Windows ARM64 Lean download catalog entry
+and complete installed Lasm acceptance remain pending.
 
 Read-only archive audits verified the retained [SDK and its named licenses](evidence/windows-arm64-sdk-notice-audit-2026-09-27.json) and [leantar executable](evidence/windows-arm64-leantar-archive-audit-2026-09-27.json). They streamed compressed bytes and inventoried native identities without extracting full toolchains locally. The SDK contains 27 recorded native ARM64 files plus the two explicitly unused upstream source launchers; its LLVM, Binaryen, and Emscripten license texts are recorded by hash. These audits establish archive integrity, not complete installed application acceptance.
 
@@ -99,3 +100,12 @@ compiled/ran the identical generated C after changing only that environment
 value. Its long-path and Lake checks also passed, with a 2,371,014,656-byte peak
 below the 3.2-GiB proactive stop. Run `36389214996` retries the unchanged `.44`
 archive through full installed acceptance.
+
+The [maintained ARM64 SDK download](https://github.com/Millillion/lasm/releases/tag/windows-arm64-sdk-bootstrap-36278363560)
+is pinned in `src/sdk-tools.json`. Its public archive has the same 174,792,332
+bytes and checksum as the native relocation and notices audits. The
+[anonymous download receipt](evidence/windows-arm64-sdk-public-download-2026-09-28.json)
+records retrieval without GitHub credentials. A fresh `managed-sdk.yml` run with
+`scope=win32-arm64` checks the public catalog under a 4-GiB Job Object cap,
+3.2-GiB proactive stop and 4-GiB disk reserve. Tool publication does not establish
+Windows Lasm support or publish an npm package.

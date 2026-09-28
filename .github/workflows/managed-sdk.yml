@@ -6,7 +6,7 @@ on:
         description: Native SDK hosts to check
         type: choice
         default: all
-        options: [all, darwin-x64]
+        options: [all, darwin-x64, win32-arm64]
 permissions:
   contents: read
 concurrency:
@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        include: ${{ fromJSON(inputs.scope == 'darwin-x64' && '[{"platform":"darwin-x64","runner":"macos-15-intel","arch":"x64"}]' || '[{"platform":"linux-x64","runner":"ubuntu-24.04","arch":"x64"},{"platform":"linux-arm64","runner":"ubuntu-24.04-arm","arch":"arm64"},{"platform":"darwin-x64","runner":"macos-15-intel","arch":"x64"},{"platform":"darwin-arm64","runner":"macos-15","arch":"arm64"},{"platform":"win32-x64","runner":"windows-2022","arch":"x64"},{"platform":"win32-arm64","runner":"windows-11-arm","arch":"arm64"}]') }}
+        include: ${{ fromJSON(inputs.scope == 'darwin-x64' && '[{"platform":"darwin-x64","runner":"macos-15-intel","arch":"x64"}]' || inputs.scope == 'win32-arm64' && '[{"platform":"win32-arm64","runner":"windows-11-arm","arch":"arm64"}]' || '[{"platform":"linux-x64","runner":"ubuntu-24.04","arch":"x64"},{"platform":"linux-arm64","runner":"ubuntu-24.04-arm","arch":"arm64"},{"platform":"darwin-x64","runner":"macos-15-intel","arch":"x64"},{"platform":"darwin-arm64","runner":"macos-15","arch":"arm64"},{"platform":"win32-x64","runner":"windows-2022","arch":"x64"},{"platform":"win32-arm64","runner":"windows-11-arm","arch":"arm64"}]') }}
     env:
       LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
     steps:
@@ -40,11 +40,16 @@ jobs:
       - name: Check the native Node host
         run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
       # One small C-to-Wasm fixture, one compiler/Binaryen worker. No full Lean
-      # build is scheduled here. Win ARM64 fails explicitly at its missing SDK.
+      # build is scheduled here. Windows uses a bounded Job Object for the
+      # entire native compiler process tree and a separate disk reserve.
       - name: Provision and use the managed SDK
+        if: runner.os != 'Windows'
         run: node integration/managed-sdk.mjs .work/managed-sdk-ci
+      - name: Provision and use the managed SDK under the Windows guard
+        if: runner.os == 'Windows'
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --timeout-seconds 1500 --disk-path . --disk-reserve-mib 4096 --report .work/managed-sdk-resources.json -- node integration/managed-sdk.mjs .work/managed-sdk-ci
       - name: Preserve result in job summary
         if: always()
         run: |
-          node -e "const f=require('node:fs');const p='.work/managed-sdk-ci/result.json';f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,f.existsSync(p)?f.readFileSync(p,'utf8'):'SDK check did not complete. See the failing step.\n')"
+          node -e "const f=require('node:fs');for(const p of ['.work/managed-sdk-ci/result.json','.work/managed-sdk-resources.json'])if(f.existsSync(p)){const text=f.readFileSync(p,'utf8');console.log(p+'\n'+text);f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,text)}"
       # Public standard runners only. No storage uploads/caches or publication.

@@ -2,7 +2,7 @@
   "version": "6.0.9",
   "releasesCommit": "f04ea239d533260dd1db760dd2d668d5f9a88d6b",
   "source": "https://github.com/emscripten-core/emsdk",
-  "checksumProvenance": "SHA256 computed by streaming exact official emsdk archive URLs on 2026-09-23; not an upstream-published checksum list",
+  "checksumProvenance": "Official emsdk archives were streamed and hashed on 2026-09-23. The maintained Windows ARM64 archive was built natively, audited, and published from the exact receipt linked in docs/WINDOWS_TOOLCHAINS.md; these are not upstream-published checksum lists.",
   "artifacts": {
     "linux-x64": {
       "name": "emscripten-6.0.9-linux-x64",
@@ -48,10 +48,16 @@
       "bytes": 654169912,
       "format": "zip",
       "maximumExtractedBytes": 5000000000
+    },
+    "win32-arm64": {
+      "name": "emscripten-6.0.9-win32-arm64",
+      "root": "install",
+      "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/emscripten-6.0.9-win32-arm64.tar.gz",
+      "sha256": "abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a",
+      "bytes": 174792332,
+      "format": "tar.gz",
+      "maximumExtractedBytes": 5000000000
     }
-  },
-  "unavailable": {
-    "win32-arm64": "Upstream SDK manifest has no native Windows ARM64 LLVM/Binaryen bundle; a native build remains an engineering gap."
   },
   "archiveVersion": "6.0.9-git"
 }
