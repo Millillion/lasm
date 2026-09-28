@@ -1,0 +1,1235 @@
+{
+  "scope": "Candidate .44 passed native installed Windows x64 acceptance; ARM64 and the remaining .44 platform checks are separate",
+  "url": "https://github.com/Millillion/lasm/actions/runs/36389214996/job/108821105094",
+  "run": 36389214996,
+  "job": 108821105094,
+  "passed": true,
+  "platform": "win32-x64",
+  "candidateVersion": "0.1.0-experimental.44",
+  "archiveSha256": "999389fdd7c27e3ef346977ece892456dd6367b961ff107657b1242bc56cd146",
+  "archiveBytes": 65337349,
+  "packageProvenance": {
+    "sourceRevision": "40e9c0598c831bef49dfaebbdd4c5bd4b6696d1a",
+    "runtimeManifestSha256": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+    "lean": "4.34.1",
+    "node": "26.10.0"
+  },
+  "controlsRevision": "2feab441feab5ecb9d55e5fe143eda7dfae130ee",
+  "node": "v26.10.0",
+  "npm": "11.19.1",
+  "osRelease": "Microsoft Windows [Version 10.0.26100.33438]",
+  "kernel": "10.0.26100",
+  "startedAt": "2026-09-28T07:10:20.290Z",
+  "finishedAt": "2026-09-28T07:49:50.730Z",
+  "phases": [
+    {
+      "phase": "cold",
+      "code": 0,
+      "token": {
+        "restricted": true,
+        "privileges": 1,
+        "traversalBypass": true,
+        "privateObjectDacl": true,
+        "privilegeNames": [
+          "SeChangeNotifyPrivilege"
+        ]
+      },
+      "blockedDevelopmentRoots": 4,
+      "blockedDevelopmentPrograms": 563,
+      "descendantsReleased": true,
+      "firewallRestored": null
+    },
+    {
+      "phase": "lake",
+      "code": 0,
+      "token": {
+        "restricted": true,
+        "privileges": 1,
+        "traversalBypass": true,
+        "privateObjectDacl": true,
+        "privilegeNames": [
+          "SeChangeNotifyPrivilege"
+        ]
+      },
+      "blockedDevelopmentRoots": 4,
+      "blockedDevelopmentPrograms": 563,
+      "descendantsReleased": true,
+      "firewallRestored": null
+    },
+    {
+      "phase": "offline",
+      "code": 0,
+      "token": {
+        "restricted": true,
+        "privileges": 1,
+        "traversalBypass": true,
+        "privateObjectDacl": true,
+        "privilegeNames": [
+          "SeChangeNotifyPrivilege"
+        ]
+      },
+      "blockedDevelopmentRoots": 4,
+      "blockedDevelopmentPrograms": 563,
+      "descendantsReleased": true,
+      "firewallRestored": true
+    },
+    {
+      "phase": "deployment",
+      "code": 0,
+      "token": {
+        "restricted": true,
+        "privileges": 1,
+        "traversalBypass": true,
+        "privateObjectDacl": true,
+        "privilegeNames": [
+          "SeChangeNotifyPrivilege"
+        ]
+      },
+      "blockedDevelopmentRoots": 4,
+      "blockedDevelopmentPrograms": 563,
+      "descendantsReleased": true,
+      "firewallRestored": true
+    }
+  ],
+  "deployments": [
+    {
+      "name": "hello",
+      "bytes": 3042522,
+      "wasmSha256": "a87b1cb2e25e4f8ae1da90f88e57cc41106a1e686b09f4e9ae81b682facbfbff",
+      "checks": [
+        {
+          "args": [],
+          "expected": {
+            "code": 0,
+            "stdout": "Hello from Lean! 2 + 3 = 5\n",
+            "stderr": ""
+          },
+          "command": [
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\node.exe",
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\hello\\dist\\main.mjs"
+          ],
+          "actual": {
+            "code": 0,
+            "stdout": "Hello from Lean! 2 + 3 = 5\n",
+            "stderr": ""
+          },
+          "seconds": 0.256747
+        }
+      ]
+    },
+    {
+      "name": "arguments",
+      "bytes": 3043533,
+      "wasmSha256": "2411dedbfc4d365d833b40505c3d97f912edce2391ae5dc66063c07e8dcb4f06",
+      "checks": [
+        {
+          "args": [
+            "hello world",
+            "\u03bb \u65e5\u672c\u8a9e",
+            "",
+            "--target"
+          ],
+          "expected": {
+            "code": 0,
+            "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+            "stderr": ""
+          },
+          "command": [
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\node.exe",
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\arguments\\dist\\main.mjs",
+            "hello world",
+            "\u03bb \u65e5\u672c\u8a9e",
+            "",
+            "--target"
+          ],
+          "actual": {
+            "code": 0,
+            "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+            "stderr": ""
+          },
+          "seconds": 0.25175709999999996
+        },
+        {
+          "args": [
+            "fail"
+          ],
+          "expected": {
+            "code": 23,
+            "stdout": "arg=fail\n",
+            "stderr": ""
+          },
+          "command": [
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\node.exe",
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\arguments\\dist\\main.mjs",
+            "fail"
+          ],
+          "actual": {
+            "code": 23,
+            "stdout": "arg=fail\n",
+            "stderr": ""
+          },
+          "seconds": 0.25433349999999993
+        }
+      ]
+    },
+    {
+      "name": "lake",
+      "bytes": 3043155,
+      "wasmSha256": "2015334a6c1a5b2c2771476150438a498958d81058b442f0e438b89d7efaa077",
+      "checks": [
+        {
+          "args": [],
+          "expected": {
+            "code": 0,
+            "stdout": "Lean module: 43\n",
+            "stderr": ""
+          },
+          "command": [
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\node.exe",
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\lake\\dist\\main.mjs"
+          ],
+          "actual": {
+            "code": 0,
+            "stdout": "Lean module: 43\n",
+            "stderr": ""
+          },
+          "seconds": 0.2673379
+        }
+      ]
+    },
+    {
+      "name": "features",
+      "bytes": 2714581,
+      "wasmSha256": "909a51721d1a7480d449f1349f0b56f5a820721e0210e7e5a23fde277e7468df",
+      "checks": [
+        {
+          "args": [
+            "123456789"
+          ],
+          "expected": {
+            "code": 0,
+            "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+            "stderr": ""
+          },
+          "command": [
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\node.exe",
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\features\\dist\\main.mjs",
+            "123456789"
+          ],
+          "actual": {
+            "code": 0,
+            "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+            "stderr": ""
+          },
+          "seconds": 0.32296379999999997
+        }
+      ]
+    },
+    {
+      "name": "features-legacy",
+      "bytes": 3425401,
+      "wasmSha256": "5e43afee67e6d5ae4f06214f747d51e4882785a663ae97bd61a65d86b5224353",
+      "checks": [
+        {
+          "args": [
+            "17"
+          ],
+          "expected": {
+            "code": 0,
+            "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+            "stderr": ""
+          },
+          "command": [
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\node.exe",
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\features-legacy\\dist\\main.mjs",
+            "17"
+          ],
+          "actual": {
+            "code": 0,
+            "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+            "stderr": ""
+          },
+          "seconds": 0.3633291999999999
+        }
+      ]
+    },
+    {
+      "name": "filesystem",
+      "bytes": 3131681,
+      "wasmSha256": "9aa754073c9518b4b5d484989c78bd092a690aae77b74c2f1d725a52d13825e2",
+      "checks": [
+        {
+          "args": [
+            "filesystem \u03bb"
+          ],
+          "expected": {
+            "code": 0,
+            "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+            "stderr": ""
+          },
+          "command": [
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\node.exe",
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\filesystem\\dist\\main.mjs",
+            "filesystem \u03bb"
+          ],
+          "actual": {
+            "code": 0,
+            "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+            "stderr": ""
+          },
+          "seconds": 0.38538349999999993
+        }
+      ]
+    },
+    {
+      "name": "compile-time",
+      "bytes": 2504824,
+      "wasmSha256": "9ea6d32e4e70d9a0fd874b43f032cf0ea60d2eb4b4b9e0d4326aa3c8562b786f",
+      "checks": [
+        {
+          "args": [],
+          "expected": {
+            "code": 0,
+            "stdout": "compile-time macros and proofs: 42\n",
+            "stderr": ""
+          },
+          "command": [
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\node.exe",
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\compile-time\\dist\\main.mjs"
+          ],
+          "actual": {
+            "code": 0,
+            "stdout": "compile-time macros and proofs: 42\n",
+            "stderr": ""
+          },
+          "seconds": 0.23909479999999986
+        }
+      ]
+    },
+    {
+      "name": "unused",
+      "bytes": 3042524,
+      "wasmSha256": "a87b1cb2e25e4f8ae1da90f88e57cc41106a1e686b09f4e9ae81b682facbfbff",
+      "checks": [
+        {
+          "args": [],
+          "expected": {
+            "code": 0,
+            "stdout": "Hello from Lean! 2 + 3 = 5\n",
+            "stderr": ""
+          },
+          "command": [
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\node.exe",
+            "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm deployed Windows \u65e5\u672c\u8a9e-q6nlXO\\unused\\dist\\main.mjs"
+          ],
+          "actual": {
+            "code": 0,
+            "stdout": "Hello from Lean! 2 + 3 = 5\n",
+            "stderr": ""
+          },
+          "seconds": 0.2747114999999999
+        }
+      ]
+    }
+  ],
+  "deploymentDenialControlPassed": true,
+  "nativeControls": [
+    {
+      "file": "BundleFeatures.lean",
+      "args": [
+        "123456789"
+      ],
+      "sourceSha256": "1d8ea11813c12fe54d923d0037591fc45463c59a66b4c939711bb5e409b84ea7",
+      "lean": "4.34.1",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      },
+      "scope": "Native AOT oracle outside the consumer; original fixture unchanged",
+      "executable": "D:\\a\\lasm\\lasm\\.work\\node-windows-acceptance\\native-controls\\BundleFeatures.lean\\program.exe",
+      "result": {
+        "code": 0,
+        "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+        "stderr": ""
+      },
+      "gitBlobSha256": "81bb017333f331ae4a902baa82f4cb9d1f874c0ab787d1510981135d06ab7b6d",
+      "checkoutLineEndings": "CRLF from ordinary Windows Git checkout; native and Node comparisons consume identical fixture bytes"
+    },
+    {
+      "file": "BundleFeaturesLegacy.lean",
+      "args": [
+        "17"
+      ],
+      "sourceSha256": "37fa0f449783cedddf8cfd81e98b38955a78240cc2c98688bb48b104db840888",
+      "lean": "4.34.1",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      },
+      "scope": "Native AOT oracle outside the consumer; original fixture unchanged",
+      "executable": "D:\\a\\lasm\\lasm\\.work\\node-windows-acceptance\\native-controls\\BundleFeaturesLegacy.lean\\program.exe",
+      "result": {
+        "code": 0,
+        "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+        "stderr": ""
+      },
+      "gitBlobSha256": "dc143586209c15fffee2cc706e2de57271bde12e97d4dbd3a886d5e1b042c26c",
+      "checkoutLineEndings": "CRLF from ordinary Windows Git checkout; native and Node comparisons consume identical fixture bytes"
+    },
+    {
+      "file": "FilesystemSurface.lean",
+      "args": [
+        "filesystem \u03bb"
+      ],
+      "sourceSha256": "bd29d27be1e7825cbaecdf11a9962f5acd2decf085ab4f41f6bd2eb1bde03dc7",
+      "lean": "4.34.1",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      },
+      "scope": "Native AOT oracle outside the consumer; original fixture unchanged",
+      "executable": "D:\\a\\lasm\\lasm\\.work\\node-windows-acceptance\\native-controls\\FilesystemSurface.lean\\program.exe",
+      "result": {
+        "code": 0,
+        "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+        "stderr": ""
+      },
+      "gitBlobSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+      "checkoutLineEndings": "CRLF from ordinary Windows Git checkout; native and Node comparisons consume identical fixture bytes"
+    },
+    {
+      "file": "CompileTimeFeatures.lean",
+      "args": [],
+      "sourceSha256": "d6436db17408de635a57fdafb38064cf2896ed8035dd98d251f85b6209bf9b81",
+      "lean": "4.34.1",
+      "nativePrograms": {
+        "lean": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "lake": {
+          "platform": "win32",
+          "architectures": [
+            "x64"
+          ]
+        }
+      },
+      "scope": "Native AOT oracle outside the consumer; original fixture unchanged",
+      "executable": "D:\\a\\lasm\\lasm\\.work\\node-windows-acceptance\\native-controls\\CompileTimeFeatures.lean\\program.exe",
+      "result": {
+        "code": 0,
+        "stdout": "compile-time macros and proofs: 42\n",
+        "stderr": ""
+      },
+      "gitBlobSha256": "de796139723e9460ac0efbaefdcc05650359ee3881e5404034e7587ce3103f45",
+      "checkoutLineEndings": "CRLF from ordinary Windows Git checkout; native and Node comparisons consume identical fixture bytes"
+    }
+  ],
+  "installation": {
+    "steps": [
+      {
+        "label": "npm install candidate",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npm-cli.js",
+          "install",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\candidate.tgz"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 31.146772999999996,
+        "code": 0,
+        "stdout": "\nadded 7 packages in 27s\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "npm version",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npm-cli.js",
+          "--version"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.10757670000000144,
+        "code": 0,
+        "stdout": "11.19.1\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "cold npx lasm Main.lean",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 915.082295,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] First-time tool setup can take a few minutes. Lasm downloads and verifies its tools automatically; later builds reuse them.\n[lasm] Tools cache: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\home\\AppData\\Local\\lasm\\Cache\n[lasm] Downloading Lean 4.34.1 and Lake: 0 B / 589.0 MB (0%) \u2014 0s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 250.1 MB / 589.0 MB (42%) \u2014 9s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 533.1 MB / 589.0 MB (90%) \u2014 19s elapsed\n[lasm] Downloading Lean 4.34.1 and Lake: 589.0 MB / 589.0 MB (100%) \u2014 21s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 8s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 18s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 28s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 38s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 48s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 58s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 8s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 18s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 28s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 38s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 48s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 1m 58s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 8s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 18s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 28s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 38s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 48s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 2m 58s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 8s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 18s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 28s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 38s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 48s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 3m 58s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 4m 8s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 4m 18s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 4m 28s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 4m 38s elapsed\n[lasm] Extracting Lean 4.34.1 and Lake \u2014 4m 48s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying installed Lean 4.34.1 and Lake \u2014 1s elapsed\n[lasm] Finishing Lean 4.34.1 and Lake setup \u2014 0s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Downloading Python 3.13.15: 0 B / 21.9 MB (0%) \u2014 0s elapsed\n[lasm] Downloading Python 3.13.15: 13.1 MB / 21.9 MB (59%) \u2014 1s elapsed\n[lasm] Downloading Python 3.13.15: 21.9 MB / 21.9 MB (100%) \u2014 1s elapsed\n[lasm] Extracting Python 3.13.15 \u2014 0s elapsed\n[lasm] Extracting Python 3.13.15 \u2014 9s elapsed\n[lasm] Extracting Python 3.13.15 \u2014 19s elapsed\n[lasm] Verifying installed Python 3.13.15 \u2014 0s elapsed\n[lasm] Finishing Python 3.13.15 setup \u2014 0s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 0 B / 654.2 MB (0%) \u2014 0s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 21.0 MB / 654.2 MB (3%) \u2014 2s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 210.7 MB / 654.2 MB (32%) \u2014 12s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 410.2 MB / 654.2 MB (62%) \u2014 22s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 592.0 MB / 654.2 MB (90%) \u2014 32s elapsed\n[lasm] Downloading compiler tools (Emscripten 6.0.9): 654.2 MB / 654.2 MB (100%) \u2014 35s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 6s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 16s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 26s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 36s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 46s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 56s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 1m 6s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 1m 16s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 1m 26s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 1m 36s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 1m 46s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 1m 56s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 2m 6s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 2m 16s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 2m 26s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 2m 36s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 2m 46s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 2m 56s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 3m 6s elapsed\n[lasm] Extracting compiler tools (Emscripten 6.0.9) \u2014 3m 16s elapsed\n[lasm] Verifying installed compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying installed compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Finishing compiler tools (Emscripten 6.0.9) setup \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 4s elapsed\n[lasm] Preparing and checking compiler tools \u2014 14s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 1s elapsed\n[lasm] Checking required runtime code \u2014 11s elapsed\n[lasm] Checking required runtime code \u2014 21s elapsed\n[lasm] Checking required runtime code \u2014 31s elapsed\n[lasm] Checking required runtime code \u2014 41s elapsed\n[lasm] Checking required runtime code \u2014 51s elapsed\n[lasm] Checking required runtime code \u2014 1m 1s elapsed\n[lasm] Checking required runtime code \u2014 1m 11s elapsed\n[lasm] Checking required runtime code \u2014 1m 21s elapsed\n[lasm] Checking required runtime code \u2014 1m 31s elapsed\n[lasm] Checking required runtime code \u2014 1m 41s elapsed\n[lasm] Checking required runtime code \u2014 1m 51s elapsed\n[lasm] Checking required runtime code \u2014 2m 1s elapsed\n[lasm] Checking required runtime code \u2014 2m 11s elapsed\n[lasm] Checking required runtime code \u2014 2m 21s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 2s elapsed\n[lasm] Linking application and Lean runtime \u2014 12s elapsed\n[lasm] Linking application and Lean runtime \u2014 22s elapsed\n[lasm] Linking application and Lean runtime \u2014 32s elapsed\n[lasm] Linking application and Lean runtime \u2014 42s elapsed\n[lasm] Linking application and Lean runtime \u2014 52s elapsed\n[lasm] Linking application and Lean runtime \u2014 1m 2s elapsed\n[lasm] Linking application and Lean runtime \u2014 1m 12s elapsed\n[lasm] Linking application and Lean runtime \u2014 1m 22s elapsed\n[lasm] Linking application and Lean runtime \u2014 1m 32s elapsed\n[lasm] Linking application and Lean runtime \u2014 1m 42s elapsed\n[lasm] Linking application and Lean runtime \u2014 1m 52s elapsed\n[lasm] Linking application and Lean runtime \u2014 2m 2s elapsed\n[lasm] Linking application and Lean runtime \u2014 2m 12s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (15m 14s total).\n[lasm] Running Main.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "npx lasm build Main.lean",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 10.2744608,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (9s total).\nReused Lean 4.34.1 for node: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\dist\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Main.lean",
+        "command": [
+          "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\tmp\\lasm-tools\\2e532d0817adb81650b0dd44\\bin\\lean.exe",
+          "--run",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.7078434000000124,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: hello",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\dist\\main.mjs"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.33767020000005143,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "Lake local import",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\lake project \u65e5\u672c\u8a9e",
+        "seconds": 83.77055100000001,
+        "code": 0,
+        "stdout": "Lean module: 42\n",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] First-time tool setup can take a few minutes. Lasm downloads and verifies its tools automatically; later builds reuse them.\n[lasm] Tools cache: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\home\\AppData\\Local\\lasm\\Cache\n[lasm] Downloading Git 2.53.0: 0 B / 47.1 MB (0%) \u2014 0s elapsed\n[lasm] Downloading Git 2.53.0: 47.1 MB / 47.1 MB (100%) \u2014 2s elapsed\n[lasm] Extracting Git 2.53.0 \u2014 0s elapsed\n[lasm] Extracting Git 2.53.0 \u2014 6s elapsed\n[lasm] Extracting Git 2.53.0 \u2014 16s elapsed\n[lasm] Verifying installed Git 2.53.0 \u2014 0s elapsed\n[lasm] Finishing Git 2.53.0 setup \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 0s elapsed\ninfo: greeting: no previous manifest, creating one from scratch\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 3s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Compiling application module 1 of 2 \u2014 0s elapsed\n[lasm] Compiling application module 2 of 2 \u2014 0s elapsed\n[lasm] Compiling application module 2 of 2 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 5s elapsed\n[lasm] Linking application and Lean runtime \u2014 15s elapsed\n[lasm] Linking application and Lean runtime \u2014 25s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 22s total).\n[lasm] Running Main.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "Lake deployment build",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\lake project \u65e5\u672c\u8a9e",
+        "seconds": 15.372460000000006,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Verifying cached Git 2.53.0 \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (14s total).\nReused Lean 4.34.1 for node: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\lake project \u65e5\u672c\u8a9e\\dist\n",
+        "signal": null
+      },
+      {
+        "label": "offline cached npx run",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 14.2236861,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (13s total).\n[lasm] Running Main.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "Lean diagnostic",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "Broken.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 14.3371237,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Broken.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\nC:\\Users\\runneradmin\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\Broken.lean:1:33: error(lean.unknownIdentifier): Unknown identifier `unknownGreeting`\n\n",
+        "signal": null
+      },
+      {
+        "label": "unsupported Lean pin",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.6670250000000014,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\nUnsupported Lean toolchain \"leanprover/lean4:v999.0.0\" in C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\lean-toolchain. Supported managed versions: 4.34.1. The project pin was not changed.\n",
+        "signal": null
+      },
+      {
+        "label": "native tool drift cannot reuse cached output",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 11.579217300000003,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\nManaged cache contents changed: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\home\\AppData\\Local\\lasm\\Cache\\artifacts\\58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7. Changed entries (1): \"LICENSE\". Remove this toolchain directory to download a verified replacement.\n",
+        "signal": null
+      },
+      {
+        "label": "runtime drift cannot reuse cached output",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.7200971999999966,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\nApplication runtime integrity check failed: exports.json\n",
+        "signal": null
+      },
+      {
+        "label": "arguments and exit code",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "Args.lean",
+          "--",
+          "hello world",
+          "\u03bb \u65e5\u672c\u8a9e",
+          "",
+          "--target"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 57.4425711,
+        "code": 0,
+        "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+        "stderr": "[lasm] Preparing Args.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 6s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 2s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 9s elapsed\n[lasm] Linking application and Lean runtime \u2014 19s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (56s total).\n[lasm] Running Args.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "arguments and exit code",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "Args.lean",
+          "--",
+          "fail"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 12.242926800000001,
+        "code": 23,
+        "stdout": "arg=fail\n",
+        "stderr": "[lasm] Preparing Args.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (11s total).\n[lasm] Running Args.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "arguments deployment",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "Args.lean",
+          "--output",
+          "args dist \u03bb"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 12.270192100000001,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Args.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (11s total).\nReused Lean 4.34.1 for node: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\args dist \u03bb\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Args.lean",
+        "command": [
+          "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\tmp\\lasm-tools\\2e532d0817adb81650b0dd44\\bin\\lean.exe",
+          "--run",
+          "Args.lean",
+          "hello world",
+          "\u03bb \u65e5\u672c\u8a9e",
+          "",
+          "--target"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.7036474000000162,
+        "code": 0,
+        "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: arguments",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\args dist \u03bb\\main.mjs",
+          "hello world",
+          "\u03bb \u65e5\u672c\u8a9e",
+          "",
+          "--target"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.33644759999998497,
+        "code": 0,
+        "stdout": "arg=hello world\narg=\u03bb \u65e5\u672c\u8a9e\narg=\narg=--target\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Args.lean",
+        "command": [
+          "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\tmp\\lasm-tools\\2e532d0817adb81650b0dd44\\bin\\lean.exe",
+          "--run",
+          "Args.lean",
+          "fail"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.7273287999999885,
+        "code": 23,
+        "stdout": "arg=fail\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: arguments",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\args dist \u03bb\\main.mjs",
+          "fail"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.32636739999998826,
+        "code": 23,
+        "stdout": "arg=fail\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "changed imported source",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\lake project \u65e5\u672c\u8a9e",
+        "seconds": 62.991746099999986,
+        "code": 0,
+        "stdout": "Lean module: 43\n",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Verifying cached Git 2.53.0 \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 2s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Compiling application module 1 of 2 \u2014 0s elapsed\n[lasm] Compiling application module 2 of 2 \u2014 0s elapsed\n[lasm] Compiling application module 2 of 2 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 5s elapsed\n[lasm] Linking application and Lean runtime \u2014 15s elapsed\n[lasm] Linking application and Lean runtime \u2014 25s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 2s total).\n[lasm] Running Main.lean\u2026\n",
+        "signal": null
+      },
+      {
+        "label": "changed Lake deployment",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\lake project \u65e5\u672c\u8a9e",
+        "seconds": 18.1255809,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Verifying cached Git 2.53.0 \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Reusing verified application build \u2014 0s elapsed\n[lasm] Reused cached build (14s total).\nReused Lean 4.34.1 for node: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\lake project \u65e5\u672c\u8a9e\\dist\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Main.lean",
+        "command": [
+          "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\tmp\\lasm-tools\\2e532d0817adb81650b0dd44\\bin\\lake.exe",
+          "--keep-toolchain",
+          "env",
+          "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\tmp\\lasm-tools\\2e532d0817adb81650b0dd44\\bin\\lean.exe",
+          "--run",
+          "Main.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\lake project \u65e5\u672c\u8a9e",
+        "seconds": 1.0530634999999893,
+        "code": 0,
+        "stdout": "Lean module: 43\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: lake",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\lake project \u65e5\u672c\u8a9e\\dist\\main.mjs"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\lake project \u65e5\u672c\u8a9e",
+        "seconds": 0.316819599999988,
+        "code": 0,
+        "stdout": "Lean module: 43\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "features deployment",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "BundleFeatures.lean",
+          "--output",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\features dist"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 81.6772827,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing BundleFeatures.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 3s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 13s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 5s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 2s elapsed\n[lasm] Linking application and Lean runtime \u2014 12s elapsed\n[lasm] Linking application and Lean runtime \u2014 22s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 20s total).\nBuilt Lean 4.34.1 for node: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\features dist\n",
+        "signal": null
+      },
+      {
+        "label": "plain Node: features",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\features dist\\main.mjs",
+          "123456789"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.34127429999999004,
+        "code": 0,
+        "stdout": "features passed: 123456789, 493827164, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782793452585329}\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "features-legacy deployment",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "BundleFeaturesLegacy.lean",
+          "--output",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\features-legacy dist"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 92.38875339999998,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing BundleFeaturesLegacy.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 6s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 16s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 26s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 5s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 10s elapsed\n[lasm] Linking application and Lean runtime \u2014 20s elapsed\n[lasm] Linking application and Lean runtime \u2014 30s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 29s total).\nBuilt Lean 4.34.1 for node: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\features-legacy dist\n",
+        "signal": null
+      },
+      {
+        "label": "plain Node: features-legacy",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\features-legacy dist\\main.mjs",
+          "17"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 1.7860003999999607,
+        "code": 0,
+        "stdout": "features passed: 17, 76, {\"name\":\"\u03bb \u65e5\u672c\u8a9e\",\"value\":1606938044258990275541962092341162602522202993782792835301469}\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "filesystem deployment",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "FilesystemSurface.lean",
+          "--output",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\filesystem dist"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 159.58717460000003,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing FilesystemSurface.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 8s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 18s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 28s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 38s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 48s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 58s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 6s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 16s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 10s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 1s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 2s elapsed\n[lasm] Linking application and Lean runtime \u2014 12s elapsed\n[lasm] Linking application and Lean runtime \u2014 22s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (2m 36s total).\nBuilt Lean 4.34.1 for node: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\filesystem dist\n",
+        "signal": null
+      },
+      {
+        "label": "plain Node: filesystem",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\filesystem dist\\main.mjs",
+          "filesystem \u03bb"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.44472849999996833,
+        "code": 0,
+        "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "compile-time deployment",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "CompileTimeFeatures.lean",
+          "--output",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\compile-time dist"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 130.8129990999999,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing CompileTimeFeatures.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 8s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 18s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 28s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 38s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 1s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 11s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 21s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 7s elapsed\n[lasm] Preparing and checking compiler tools \u2014 17s elapsed\n[lasm] Preparing and checking compiler tools \u2014 27s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 10s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (2m 8s total).\nBuilt Lean 4.34.1 for node: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\compile-time dist\n",
+        "signal": null
+      },
+      {
+        "label": "plain Node: compile-time",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\compile-time dist\\main.mjs"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.28789240000001154,
+        "code": 0,
+        "stdout": "compile-time macros and proofs: 42\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "unused definitions deployment",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "Unused.lean",
+          "--output",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\unused dist"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 145.3729617,
+        "code": 0,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Unused.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 8s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 18s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 28s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 38s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 1s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 7s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 17s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 27s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 2s elapsed\n[lasm] Preparing and checking compiler tools \u2014 12s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 3s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 2s elapsed\n[lasm] Linking application and Lean runtime \u2014 12s elapsed\n[lasm] Linking application and Lean runtime \u2014 22s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (2m 24s total).\nBuilt Lean 4.34.1 for node: C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\unused dist\n",
+        "signal": null
+      },
+      {
+        "label": "native comparison: Unused.lean",
+        "command": [
+          "\\\\?\\C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\tmp\\lasm-tools\\2e532d0817adb81650b0dd44\\bin\\lean.exe",
+          "--run",
+          "Unused.lean"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 3.2556875,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "plain Node: unused",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\unused dist\\main.mjs"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 0.6878371000000043,
+        "code": 0,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "signal": null
+      },
+      {
+        "label": "reject runtime compiler dependency: StandaloneModuleData.lean",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "StandaloneModuleData.lean",
+          "--output",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\StandaloneModuleData.lean rejected"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 105.55525080000004,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing StandaloneModuleData.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 7s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 10s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 20s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 1s elapsed\n[lasm] Preparing and checking compiler tools \u2014 11s elapsed\n[lasm] Preparing and checking compiler tools \u2014 21s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 7s elapsed\n[lasm] Checking required runtime code \u2014 17s elapsed\n[lasm] Checking required runtime code \u2014 27s elapsed\nLasm does not support runtime Lean compilation, evaluation, module-data access, or plugin loading in deployed applications.\nDetected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlopen, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, dynlib.cpp.o; runtime Lean module-data access: l_Lean_findSysroot, l_Lean_findSysroot___closed__0_value, l_Lean_findSysroot___closed__1_value, l_Lean_findSysroot___closed__2_value, l_Lean_findSysroot___closed__3_value.\nMove this operation to build time or remove the dependency. Ordinary imports, tactics, macros and deriving during compilation remain supported. No deployment was produced.\n",
+        "signal": null
+      },
+      {
+        "label": "reject runtime compiler dependency: RuntimeModulePath.lean",
+        "command": [
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node.exe",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\stock Node\\node_modules\\npm\\bin\\npx-cli.js",
+          "lasm",
+          "build",
+          "RuntimeModulePath.lean",
+          "--output",
+          "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb\\RuntimeModulePath.lean rejected"
+        ],
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lasm Node Windows \u03bb-Wkkmg3\\consumer \u65e5\u672c\u8a9e\\project space \u03bb",
+        "seconds": 156.21610939999997,
+        "code": 1,
+        "stdout": "",
+        "stderr": "[lasm] Preparing RuntimeModulePath.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 8s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 18s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 28s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 38s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 48s elapsed\n[lasm] Preparing native Windows compiler paths \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 0s elapsed\n[lasm] Checking Lean sources and imports \u2014 1s elapsed\n[lasm] Checking application inputs and cached build \u2014 0s elapsed\n[lasm] Verifying cached Python 3.13.15 \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 0s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 7s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 17s elapsed\n[lasm] Verifying cached compiler tools (Emscripten 6.0.9) \u2014 27s elapsed\n[lasm] Preparing and checking compiler tools \u2014 0s elapsed\n[lasm] Preparing and checking compiler tools \u2014 5s elapsed\n[lasm] Preparing and checking compiler tools \u2014 15s elapsed\n[lasm] Preparing and checking compiler tools \u2014 25s elapsed\n[lasm] Compiling application module 1 of 1 \u2014 0s elapsed\n[lasm] Preparing application symbols \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 0s elapsed\n[lasm] Checking required runtime code \u2014 5s elapsed\n[lasm] Checking required runtime code \u2014 15s elapsed\n[lasm] Checking required runtime code \u2014 25s elapsed\nLasm does not support runtime Lean compilation, evaluation, module-data access, or plugin loading in deployed applications.\nDetected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o; runtime Lean module-data access: l_Lean_findSysroot, l_Lean_findSysroot___closed__0_value, l_Lean_findSysroot___closed__1_value, l_Lean_findSysroot___closed__2_value, l_Lean_findSysroot___closed__3_value.\nMove this operation to build time or remove the dependency. Ordinary imports, tactics, macros and deriving during compilation remain supported. No deployment was produced.\n",
+        "signal": null
+      }
+    ],
+    "installBytes": 380769336,
+    "coldToolsBytes": 5986384163,
+    "toolsBytes": 6105578350,
+    "downloadBytes": 1312233267,
+    "downloads": [
+      {
+        "tool": "Lean/Lake",
+        "name": "lean-4.34.1-windows.tar.zst",
+        "root": "lean-4.34.1-windows",
+        "url": "https://github.com/leanprover/lean4/releases/download/v4.34.1/lean-4.34.1-windows.tar.zst",
+        "sha256": "667394ecf6708a228221eb4919c0bdb419966b7408bcf3089a9096a6f4ae62c9",
+        "bytes": 589007020,
+        "format": "tar.zst",
+        "maximumExtractedBytes": 8589934592
+      },
+      {
+        "tool": "python",
+        "name": "python-3.13.15-20260901-win32-x64",
+        "root": "python",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "sha256": "63d263ab0162f34a241a56dc5b283c22d6e131f5516117e6a921350c69ba7d4f",
+        "bytes": 21936514,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 600000000
+      },
+      {
+        "tool": "sdk",
+        "name": "emscripten-6.0.9-win32-x64",
+        "root": "install",
+        "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/win/f04ea239d533260dd1db760dd2d668d5f9a88d6b/wasm-binaries.zip",
+        "sha256": "f7512eab6e69ad9d7de5adbf39e68d7d6773b317b13e70ec5003ef1d10f92980",
+        "bytes": 654169912,
+        "format": "zip",
+        "maximumExtractedBytes": 5000000000
+      },
+      {
+        "tool": "git",
+        "name": "dugite-native-v2.53.0-4098283-windows-x64.tar.gz",
+        "root": ".",
+        "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-windows-x64.tar.gz",
+        "sha256": "7b76bc5c32c0d7c5984efdc2a8a32697cf1e8a43bc55176fbf9869c0ee995130",
+        "bytes": 47119821,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 536870912
+      }
+    ],
+    "receipts": [
+      {
+        "identity": "396d49f7d452aba700b0724263f4878c744861e5369b845742318f43708ce533",
+        "files": 458,
+        "bytes": 119136673
+      },
+      {
+        "identity": "58f49bae09ee2f7dead6236a9d1c867071f729d13477c40727f5806dcd2de6d7",
+        "files": 18376,
+        "bytes": 3246240978
+      },
+      {
+        "identity": "9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382",
+        "files": 3562,
+        "bytes": 62669961
+      },
+      {
+        "identity": "ff23ed41c08b4ddf5d6797e24c45189c405be06d4632375629bcc00f191ea3e6",
+        "files": 13632,
+        "bytes": 1824328297
+      }
+    ],
+    "startupMeasurements": [
+      {
+        "firstOutputSeconds": 0.25728880000000026,
+        "totalSeconds": 0.27653629999999974,
+        "code": 0,
+        "signal": null,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "outputLimitExceeded": false
+      },
+      {
+        "firstOutputSeconds": 0.29158929999999966,
+        "totalSeconds": 0.3100470999999998,
+        "code": 0,
+        "signal": null,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "outputLimitExceeded": false
+      },
+      {
+        "firstOutputSeconds": 0.3378209999999999,
+        "totalSeconds": 0.35572400000000015,
+        "code": 0,
+        "signal": null,
+        "stdout": "Hello from Lean! 2 + 3 = 5\n",
+        "stderr": "",
+        "outputLimitExceeded": false
+      }
+    ],
+    "offlineCacheReused": true,
+    "sourceInvalidation": true,
+    "runtimeRestrictions": {
+      "evaluation": "rejected during build",
+      "moduleData": "rejected during build",
+      "compileTimeMacrosAndProofs": "passed"
+    },
+    "cacheRecovery": [
+      {
+        "failure": "interrupted",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "truncated",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "checksum",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "unavailable",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "incomplete-cache",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      },
+      {
+        "failure": "damaged-cache",
+        "recovered": true,
+        "cachedWithoutDownload": true
+      }
+    ]
+  },
+  "resources": {
+    "status": "passed",
+    "command": [
+      "C:\\hostedtoolcache\\windows\\node\\26.10.0\\x64\\node.exe",
+      "scripts/check-node-windows.mjs",
+      "D:\\a\\lasm\\lasm\\.work\\node-windows-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.44.tgz",
+      "999389fdd7c27e3ef346977ece892456dd6367b961ff107657b1242bc56cd146"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 13867245568
+    },
+    "limits": {
+      "jobCommittedBytes": 8587180032,
+      "stopCommittedBytes": 6869744025,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 6600
+    },
+    "peakCommittedBytes": 2808406016,
+    "minimumHostAvailable": 11315929088,
+    "startedAt": 1790579418.2852905,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 235258544128,
+        "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 23971733504
+      }
+    },
+    "unit": "Local\\LasmResource-75129936-6175-4b40-8558-e91b83c30154",
+    "pid": 3656,
+    "lastSampleAt": 1790581790.775692,
+    "exitCode": 0,
+    "finishedAt": 1790581790.8533266
+  },
+  "disk": {
+    "reserveBytes": 4294967296,
+    "preflightBytes": 12884901888,
+    "freeAtStart": {
+      "D:\\a\\lasm\\lasm": 235495370752,
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp": 31250530304
+    },
+    "status": "passed",
+    "minimumFreeBytes": {
+      "D:\\a\\lasm\\lasm": 235258544128,
+      "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 23971733504
+    },
+    "freeAtEnd": {
+      "D:\\a\\lasm\\lasm": 235258544128,
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp": 24188305408
+    }
+  },
+  "rawReportSha256": "a37d8a66c3a5caefa0477c9c2df230af19decb66ab0583f2cded9901662389e6",
+  "rawLogSha256": "08059509a46a5326c67599cbf6e1f172922aa7d8bb8069fc7ea16186c09bd0f4"
+}

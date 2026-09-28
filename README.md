@@ -81,7 +81,8 @@ compatibility launchers. These interfaces have no current release support guaran
 | Ubuntu 24.04.5 LTS, glibc 2.39, Node 26.10.0 | x86-64 and ARM64 | Candidate `.37` passed native installed-package and copied-deployment acceptance. |
 | Other Linux distributions | x86-64 and ARM64 | Unverified; glibc 2.39 or newer is required. Alpine/musl is unsupported. |
 | macOS 15.7.9 | x86-64 and ARM64 | Candidate `.37` passed native installed-package and copied-deployment acceptance. |
-| Windows | x86-64 and ARM64 | Implementation in progress; not yet supported. |
+| Windows 10.0.26100.33438 (`windows-2025` runner) | x86-64 | Candidate `.44` passed native installed-package and copied-deployment checks; Linux/macOS rechecks and archive retention are pending. |
+| Windows | ARM64 | Native compiler distribution and installed-package checks are pending; not yet supported. |
 | Deno, Bun, browsers, Cloudflare Workers | Any | Not supported by the release candidate. |
 | Lambda, Netlify, other serverless services | Any | No deployment adapter or platform acceptance yet. |
 
@@ -89,6 +90,7 @@ Only the pinned Node and Lean versions above are accepted. No engine flags are
 needed. Linux requires its ordinary OS libraries and shell, but no developer SDK.
 The [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md) identifies exact tested artifacts;
 [the plan](https://github.com/Millillion/lasm/blob/main/docs/PLAN.md) records work in progress.
+The `.37` quick-start archive above is for Linux/macOS; it does not include Windows.
 
 ## Lean support and restrictions
 

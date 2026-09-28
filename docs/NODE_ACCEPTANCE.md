@@ -81,5 +81,34 @@ it maintained progress logging and passed without a resource abort, peaking at
 guarantees. Windows x64 built and executed Hello,
 then [failed its byte-exact output check](evidence/windows-stdio-bytes-2026-09-28.json).
 The subsequent binary-stream repair passed native x64/ARM64 host controls and is
-in candidate `.44`, whose installed Windows validation is in progress. These
-partial results do not replace the accepted `.37` release above.
+in candidate `.44`. These earlier partial results did not replace the accepted
+`.37` release above.
+
+Candidate `.44` then [passed native Windows x64 installed acceptance](evidence/node44-win32-x64-2026-09-28.json)
+in [run `36389214996`](https://github.com/Millillion/lasm/actions/runs/36389214996/job/108821105094).
+The archive is `999389fdd7c27e3ef346977ece892456dd6367b961ff107657b1242bc56cd146`
+(65,337,349 bytes), built from `40e9c0598c831bef49dfaebbdd4c5bd4b6696d1a`;
+the corrected native-oracle controls ran from
+`2feab441feab5ecb9d55e5fe143eda7dfae130ee`. This used Windows
+10.0.26100.33438 on `windows-2025`, native Node 26.10.0, npm 11.19.1 and Lean 4.34.1.
+
+Cold provisioning, local Lake imports, offline reuse, recovery/invalidation,
+runtime exclusions and all eight copied deployments passed. Exact outputs and
+exit codes matched native Lean; the filesystem fixture also passed. The native
+and Node comparisons checked identical fixture bytes from the Windows checkout;
+the evidence records both CRLF checkout hashes and original Git blob hashes.
+Deployment ran with the source, original outputs, development cache and tools
+denied, with cleanup and offline firewall restoration verified.
+
+Hello's deployment is 3,042,522 bytes; the largest fixture is 3,425,401 bytes.
+This run measured 915.1 seconds for cold Hello, 10.3 seconds for cached build,
+and 0.257 seconds for independent Hello startup. Tools downloaded 1,312,233,267
+compressed bytes and occupied 6,105,578,350 bytes after the full campaign.
+Peak committed memory was 2,808,406,016 bytes, below the 6,869,744,025-byte
+proactive stop; host memory and disk reserves passed. These are measurements
+of this run, not performance guarantees.
+
+The same `.44` archive is undergoing Linux (`36392920262`) and macOS
+(`36392911964`) rechecks on both architectures. Its retained-release update is
+pending; `.37` remains the available Linux/macOS archive. Windows ARM64 still
+needs a completed native Lean distribution and installed-package acceptance.

@@ -1,16 +1,15 @@
-**ARM64 tool downloads prepared — 2026-09-28.** The public SDK passed anonymous
-checksum verification and fresh native compilation/execution/cache reuse, with
-a 227-MiB native peak. The separate Lean source/notices companion is also public
-and checksum-verified; local peak was 30.3 MiB. Matching the companion to the new
-Lean compiler's dependency identities is still required. No installed ARM64
-Lasm pass is claimed.
+**Windows x64 passed — 2026-09-28.** Candidate `.44` passed Node/npm-only cold
+installation, local Lake imports, offline reuse, recovery/invalidation, runtime
+restrictions and eight copied deployments. Native outputs match exactly. Hello
+deploys in 3,042,522 bytes; peak committed memory was 2.62 GiB within the guard.
+Evidence: run `36389214996`.
 
-Run `36389214996` retries unchanged `.44` through complete Windows x64 acceptance.
-The native C oracle launch correction passed its differential control; earlier
-cold and Lake phases passed with a 3,042,522-byte Hello deployment. Linux and
-macOS x64/ARM64 all passed `.43`. Native ARM64 Lean compilation continues.
+The same archive is running Linux (`36392920262`) and macOS (`36392911964`)
+regressions on both architectures. ARM64 Lean is still compiling. The public
+native ARM64 SDK passed a fresh consumer; the source/notices companion is public
+and checksum-verified, awaiting the compiler's dependency identity check.
 
-README reviewed: `.37` remains the accepted Linux/macOS release; Windows remains
-unsupported. Remaining gates: complete Windows acceptance, ARM64 Lean
-distribution, then one candidate across the full matrix. No npm
-publication. Completion ETA is not yet estimable.
+README reviewed and updated: `.37` remains the available Linux/macOS archive;
+Windows x64 `.44` passed, ARM64 remains unverified. Remaining gates: finish `.44`
+regressions/retention, distribute native ARM64 Lean, then accept one candidate
+across all six targets. No npm publication. Completion ETA is not yet estimable.

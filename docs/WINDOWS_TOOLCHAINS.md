@@ -1,7 +1,9 @@
 # Windows toolchain implementation
 
-Windows remains unsupported until the installed Node package passes its native
-acceptance gates. The README identifies the currently accepted release.
+Windows x64 candidate `.44` has passed the installed Node package's native
+acceptance gates. Its Linux/macOS rechecks and retained archive update are pending.
+ARM64 remains unverified as an installed Lasm application. The README identifies
+the currently available release and platform boundaries.
 
 Managed native Lean/Lake execute from a short physical `bin` directory under
 `os.tmpdir()/lasm-tools/<hash>`. Its files are hard links to the verified cache
@@ -118,3 +120,15 @@ verified its original 14,639,815 bytes and checksum under a 512-MiB local cap;
 peak memory was 30.3 MiB. It covers the recorded leantar commit and GMP 6.3.0-2.
 The native Lean archive must match those identities before this companion is
 attached to its download catalog entry.
+
+Candidate `.44` [passed full Windows x64 acceptance](evidence/node44-win32-x64-2026-09-28.json)
+in run `36389214996`: cold Node/npm-only provisioning, ordinary Lean and local
+Lake imports, offline cache reuse, invalidation/recovery, runtime restrictions,
+and all eight independent copied deployments. Native oracle and Node fixture
+bytes match; expected output was not normalized. The Hello deployment is
+3,042,522 bytes and the largest fixture is 3,425,401 bytes. Cold Hello took
+915.1 seconds in this run. Peak committed memory was 2,808,406,016 bytes,
+below the 6,869,744,025-byte proactive stop; cleanup and disk reserves passed.
+The same archive is being checked on Linux (`36392920262`) and macOS
+(`36392911964`) on both native architectures. This pass does not establish
+Windows ARM64 or broad API parity.
