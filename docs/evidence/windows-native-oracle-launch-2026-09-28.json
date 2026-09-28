@@ -1,0 +1,129 @@
+{
+  "scope": "Candidate .44 cold and Lake product phases passed; independent native C oracle setup failed before offline/deployment acceptance",
+  "run": 36385395648,
+  "job": 108809884714,
+  "url": "https://github.com/Millillion/lasm/actions/runs/36385395648/job/108809884714",
+  "platform": "win32-x64",
+  "osRelease": "Microsoft Windows [Version 10.0.26100.33438]",
+  "candidateVersion": "0.1.0-experimental.44",
+  "archiveSha256": "999389fdd7c27e3ef346977ece892456dd6367b961ff107657b1242bc56cd146",
+  "archiveBytes": 65337349,
+  "packageProvenance": {
+    "sourceRevision": "40e9c0598c831bef49dfaebbdd4c5bd4b6696d1a",
+    "runtimeManifestSha256": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+    "lean": "4.34.1",
+    "node": "26.10.0"
+  },
+  "controlsRevision": "40e9c0598c831bef49dfaebbdd4c5bd4b6696d1a",
+  "passedPhases": [
+    "cold",
+    "lake"
+  ],
+  "steps": [
+    {
+      "label": "npm install candidate",
+      "seconds": 26.068721099999998,
+      "code": 0,
+      "stdout": "\nadded 7 packages in 19s\n"
+    },
+    {
+      "label": "npm version",
+      "seconds": 0.1420649999999987,
+      "code": 0,
+      "stdout": "11.19.1\n"
+    },
+    {
+      "label": "cold npx lasm Main.lean",
+      "seconds": 988.3779525,
+      "code": 0,
+      "stdout": "Hello from Lean! 2 + 3 = 5\n"
+    },
+    {
+      "label": "npx lasm build Main.lean",
+      "seconds": 78.95358839999989,
+      "code": 0,
+      "stdout": ""
+    },
+    {
+      "label": "native comparison: Main.lean",
+      "seconds": 0.9627832000001799,
+      "code": 0,
+      "stdout": "Hello from Lean! 2 + 3 = 5\n"
+    },
+    {
+      "label": "plain Node: hello",
+      "seconds": 0.43971699999994596,
+      "code": 0,
+      "stdout": "Hello from Lean! 2 + 3 = 5\n"
+    },
+    {
+      "label": "Lake local import",
+      "seconds": 137.3927634,
+      "code": 0,
+      "stdout": "Lean module: 42\n"
+    },
+    {
+      "label": "Lake deployment build",
+      "seconds": 44.86797959999999,
+      "code": 0,
+      "stdout": ""
+    }
+  ],
+  "helloDeploymentBytes": 3042522,
+  "failure": "AssertionError [ERR_ASSERTION]: uncaught exception: the system cannot find the file specified. (error code: 2)\n\n\n1 !== 0\n\n    at nativeControls (file:///D:/a/lasm/lasm/scripts/check-node-windows.mjs:75:41)\n    at async file:///D:/a/lasm/lasm/scripts/check-node-windows.mjs:88:30",
+  "resources": {
+    "status": "failed",
+    "command": [
+      "C:\\hostedtoolcache\\windows\\node\\26.10.0\\x64\\node.exe",
+      "scripts/check-node-windows.mjs",
+      "D:\\a\\lasm\\lasm\\.work\\node-windows-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.44.tgz",
+      "999389fdd7c27e3ef346977ece892456dd6367b961ff107657b1242bc56cd146"
+    ],
+    "hostAtStart": {
+      "total": 17174360064,
+      "available": 13306900480
+    },
+    "limits": {
+      "jobCommittedBytes": 8587180032,
+      "stopCommittedBytes": 6869744025,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 6600
+    },
+    "peakCommittedBytes": 1575460864,
+    "minimumHostAvailable": 12246142976,
+    "startedAt": 1790576572.5998735,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "D:\\a\\lasm\\lasm": 157262827520,
+        "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 27418054656
+      }
+    },
+    "unit": "Local\\LasmResource-8306a85f-3492-4879-b929-e1dc5ee3a0b0",
+    "pid": 4308,
+    "lastSampleAt": 1790577922.9926715,
+    "exitCode": 1,
+    "finishedAt": 1790577923.041812
+  },
+  "disk": {
+    "reserveBytes": 4294967296,
+    "preflightBytes": 12884901888,
+    "freeAtStart": {
+      "D:\\a\\lasm\\lasm": 157263314944,
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp": 34301550592
+    },
+    "status": "failed",
+    "minimumFreeBytes": {
+      "D:\\a\\lasm\\lasm": 157262827520,
+      "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 27418054656
+    },
+    "freeAtEnd": {
+      "D:\\a\\lasm\\lasm": 157262827520,
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp": 27456249856
+    }
+  },
+  "hypothesis": "Upstream leanc replaces ROOT in ROOT/bin/clang.exe without normalizing separators. A Windows namespace prefix retains the slash and prevents process spawning. Use the verified short ordinary sysroot for this maintainer-only C invocation, leaving the product module reader unchanged.",
+  "nativeRegression": "Pending: reproduce old failure with verbose compiler command and compile/run the same generated C after changing only LEAN_SYSROOT.",
+  "rawReportSha256": "e826d2392d4c1ce04ce7f11fd3bb24a850b124045c9cf55e835d756c811b8652"
+}

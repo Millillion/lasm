@@ -9,6 +9,7 @@ import { provisionLean } from '../../src/managed-lean.mjs';
 import { applicationSources, nativeLeanEnvironment, canonicalApplicationPath } from '../../src/application-sources.mjs';
 import { provisionGit } from '../../src/managed-git.mjs';
 import { managedGitEnvironment } from '../../src/managed-git.mjs';
+import { verifyNativeProgram } from '../../src/native-program.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
@@ -55,6 +56,30 @@ try {
   const standalone = applicationSources(source, lean, work);
   assert.ok(standalone.sources.length === 1 && statSync(standalone.sources[0]).size > 0);
   result.checks.push({ standaloneCGeneration: true }); save();
+  // The product generates Wasm with its managed SDK. Its independent native
+  // oracle also needs leanc's bundled C compiler. Preserve the failing default
+  // namespace and change only the C launcher's sysroot in the positive control.
+  const leanc = join(lean.prefix, 'bin/leanc.exe'), executable = join(root, 'native-control.exe');
+  await verifyNativeProgram(leanc, 'win32', 'x64');
+  await verifyNativeProgram(join(lean.executionPrefix, 'bin/clang.exe'), 'win32', 'x64');
+  for (const [label, environment, shouldPass] of [
+    ['native C oracle with namespaced sysroot', env, false],
+    ['native C oracle with short ordinary sysroot', { ...env, LEAN_SYSROOT: lean.executionPrefix }, true],
+  ]) {
+    result.activeCheck = label; save();
+    const r = spawnSync(leanc, ['-v', '-O2', ...standalone.sources, '-o', executable],
+      { cwd: project, env: environment, encoding: 'utf8', timeout: 180000, maxBuffer: 2 * 1024 ** 2 });
+    assert.ifError(r.error); assert.equal(r.signal, null);
+    result.checks.push({ label, sysroot: environment.LEAN_SYSROOT, code: r.status, stdout: r.stdout, stderr: r.stderr }); save();
+    if (shouldPass) assert.equal(r.status, 0, r.stdout + r.stderr);
+    else { assert.notEqual(r.status, 0); assert.match(r.stderr, /error code: 2/); }
+  }
+  await verifyNativeProgram(executable, 'win32', 'x64');
+  const nativeMain = spawnSync(executable, [], { cwd: project, env, encoding: 'utf8', timeout: 30000 });
+  assert.ifError(nativeMain.error); assert.equal(nativeMain.status, 0, nativeMain.stderr);
+  assert.equal(nativeMain.stdout, 'long cache path 42\n'); assert.equal(nativeMain.stderr, '');
+  result.checks.push({ label: 'native C oracle execution', code: nativeMain.status,
+    stdout: nativeMain.stdout, stderr: nativeMain.stderr }); save();
   writeFileSync(join(project, 'lakefile.lean'), 'import Lake\nopen Lake DSL\npackage longPaths\nlean_lib Greeting\n@[default_target]\nlean_exe hello where\n  root := `Main\n');
   writeFileSync(join(project, 'Greeting.lean'), 'def greeting : String := "Lake long cache path 42"\n');
   writeFileSync(source, 'import Greeting\ndef main : IO Unit := IO.println greeting\n');

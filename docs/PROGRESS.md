@@ -1,15 +1,15 @@
-**Four `.43` native platforms passed — 2026-09-28.** Linux and macOS x64/ARM64
-passed the same archive, including eight independent deployments each. Intel Mac
-completed in 84.6 minutes, with a 25.9-minute first build, continued progress
-logging, 2.18-GiB sampled RSS peak and no resource abort.
+**Windows cold and Lake phases passed — 2026-09-28.** Candidate `.44` printed
+byte-exact Hello output, reused its cache, and built/ran the local Lake project.
+Hello deployment: 3,042,522 bytes. The run then failed preparing the independent
+native C oracle, before offline and copied-deployment checks. Its 1.47-GiB peak
+was below the resource stop.
 
-Windows x64/ARM64 byte-exact IO and isolation controls passed; the original `.43`
-CRLF failure remains preserved. The repaired `.44` packed reproducibly and its
-complete Windows x64 install test continues. Native ARM64 Lean compilation is
-also running. Its notice-repair validation will use the previously validated
-4-GiB remote profile (3.2-GiB proactive stop); local limits are unchanged.
+A maintainer-only sysroot correction is prepared; a native differential must
+confirm the old launch failure and successful compilation of identical C. The
+product archive is unchanged. Linux and macOS x64/ARM64 all passed `.43`.
+Native ARM64 Lean compilation continues.
 
 README reviewed: `.37` remains the accepted Linux/macOS release; Windows remains
-unsupported. Remaining gates: repaired Windows acceptance, complete ARM64 tool
-distribution, then one candidate across the full matrix. No npm publication.
-Completion ETA is not yet estimable.
+unsupported. Remaining gates: native oracle control, complete Windows acceptance,
+ARM64 tool distribution, then one candidate across the full matrix. No npm
+publication. Completion ETA is not yet estimable.

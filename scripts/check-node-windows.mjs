@@ -71,7 +71,13 @@ async function nativeControls() {
     const options = { cwd: work, env, encoding: 'utf8', timeout: 300000, maxBuffer: 4 * 1024 ** 2 };
     const compile = spawnSync(lean.lean, ['-j1', '-s8192', '-Dcompiler.postponeCompile=false', '-c', generated, source], options);
     assert.ifError(compile.error); assert.equal(compile.status, 0, compile.stdout + compile.stderr);
-    const build = spawnSync(join(lean.prefix, 'bin/leanc.exe'), ['-O2', generated, '-o', executable], options);
+    // The upstream bundled-compiler template is ROOT/bin/clang.exe. A
+    // namespaced ROOT produces mixed separators that Windows cannot spawn.
+    // Keep Lean's module-reader namespace, but give the independent C oracle
+    // the already verified short ordinary prefix. Do not override LEAN_CC on
+    // x64: that would remove the upstream bundled compiler's internal flags.
+    const build = spawnSync(join(lean.prefix, 'bin/leanc.exe'), ['-O2', generated, '-o', executable],
+      { ...options, env: { ...env, LEAN_SYSROOT: lean.executionPrefix } });
     assert.ifError(build.error); assert.equal(build.status, 0, build.stdout + build.stderr);
     await verifyNativeProgram(executable);
     const actual = spawnSync(executable, args, { ...options, timeout: 120000 });

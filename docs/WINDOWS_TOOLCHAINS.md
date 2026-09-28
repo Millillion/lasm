@@ -87,4 +87,13 @@ ARM64 both passed the four byte controls and complete online/offline isolation
 in run `36385212836`; the byte tests peaked at 138,870,784 and 139,710,464 bytes.
 Candidate `.44` packed reproducibly with SHA-256
 `999389fdd7c27e3ef346977ece892456dd6367b961ff107657b1242bc56cd146`
-and is in full x64 installed validation. No expected output was normalized.
+passed cold installed execution, cached reuse and the local Lake project on
+x64. Its Hello deployment is 3,042,522 bytes. No expected output was normalized.
+
+The `.44` run then [failed while preparing its independent native C oracle](evidence/windows-native-oracle-launch-2026-09-28.json), before the offline and copied-deployment phases.
+Upstream `leanc` substitutes the sysroot into `ROOT/bin/clang.exe`; a Windows
+namespace combined with those forward slashes is the suspected launch failure.
+The maintainer harness now supplies its verified short ordinary prefix only to
+that C invocation. A native differential will reproduce the old error and
+compile/run the identical generated C with the adjusted environment. The packed
+product is unchanged and will be retried after this control passes.
