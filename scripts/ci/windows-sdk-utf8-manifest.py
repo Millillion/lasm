@@ -14,6 +14,43 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
+def coff_symbols(data):
+    pe = struct.unpack_from("<I", data, 0x3C)[0]
+    pointer, count = struct.unpack_from("<II", data, pe + 12)
+    if not pointer:
+        assert count == 0
+        return None
+    strings = pointer + count * 18
+    assert strings + 4 <= len(data)
+    length = struct.unpack_from("<I", data, strings)[0]
+    assert length >= 4 and strings + length <= len(data)
+    return {"pointer": pointer, "count": count, "strings": strings,
+            "stringBytes": length, "bytes": data[pointer:strings + length]}
+
+
+def preserve_coff_pointer(before, after):
+    # EndUpdateResourceW can move a MinGW COFF overlay without updating its
+    # deprecated file pointer. Recover only by a unique, byte-exact table match.
+    # Never guess an offset, discard symbols, or modify the symbol-table bytes.
+    symbols = coff_symbols(before)
+    if symbols is None:
+        return after, None
+    pe = struct.unpack_from("<I", after, 0x3C)[0]
+    pointer, count = struct.unpack_from("<II", after, pe + 12)
+    assert count == symbols["count"]
+    actual = after.find(symbols["bytes"])
+    assert actual >= 0 and after.rfind(symbols["bytes"]) == actual, (
+        "Original COFF table must survive as one exact byte sequence")
+    if pointer == actual:
+        return after, None
+    assert pointer == symbols["pointer"], "Unexpected COFF pointer modification"
+    corrected = bytearray(after)
+    struct.pack_into("<I", corrected, pe + 12, actual)
+    correction = {"beforePointer": pointer, "afterPointer": actual,
+                  "bytes": len(symbols["bytes"]), "sha256": digest(symbols["bytes"])}
+    return bytes(corrected), correction
+
+
 def pe_identity(data):
     """Preserve loaded code/data, entry point and preferred base across repair."""
     assert data[:2] == b"MZ"
@@ -33,6 +70,7 @@ def pe_identity(data):
     resource_rva = directories[2][0]
     symbols, symbol_count = struct.unpack_from("<II", data, pe + 12)
     strings = symbols + symbol_count * 18
+    coff = coff_symbols(data)
 
     def section_name(raw_name):
         name = raw_name.rstrip(b"\0").decode("ascii")
@@ -73,6 +111,8 @@ def pe_identity(data):
             "entryPoint": struct.unpack_from("<I", data, optional + 16)[0],
             "imageBase": struct.unpack_from("<Q", data, optional + 24)[0],
             "coffFlags": struct.unpack_from("<H", data, pe + 22)[0],
+            "coffSymbols": None if coff is None else {
+                "count": coff["count"], "sha256": digest(coff["bytes"])},
             "loaderSettings": data[optional + 32:optional + 56].hex()
                 + data[optional + 68:optional + 112].hex(),
             "directories": directories,
@@ -203,12 +243,15 @@ def repair(file, expected):
         raise
     if not kernel.EndUpdateResourceW(update, False):
         raise ctypes.WinError(ctypes.get_last_error())
-    after = file.read_bytes()
+    after, coff_correction = preserve_coff_pointer(before, file.read_bytes())
+    if coff_correction:
+        file.write_bytes(after)
     identity, relocations = verify_preservation(before, after)
     assert manifests() == replacements
     return {"file": str(file), "originalSha256": expected, "patchedSha256": digest(after),
             "preservedExecutionIdentity": identity,
             "metadataRelocations": relocations,
+            "coffPointerCorrection": coff_correction,
             "manifests": [{"language": language,
                            "originalSha256": digest(originals[language]) if language in originals else None,
                            "patchedSha256": digest(data), "xml": data.decode("utf-8")}

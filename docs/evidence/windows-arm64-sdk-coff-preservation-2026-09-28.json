@@ -1,0 +1,109 @@
+{
+  "scope": "Native repair stopped before repaired execution because Windows resource updating left an invalid COFF string-table pointer; no archive was produced or retained.",
+  "run": 36423388374,
+  "job": 108931357177,
+  "url": "https://github.com/Millillion/lasm/actions/runs/36423388374/job/108931357177",
+  "sourceRevision": "a6a64792505a4286b89c96f865f9170c22bd569f",
+  "reports": {
+    "windows-sdk-guard-control": {
+      "status": "passed",
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import {ensureResourceGuard,hasResourceGuard} from './scripts/full-lean/resource-guard.mjs'; if(!hasResourceGuard()) throw Error('Missing descendant guard'); await ensureResourceGuard(); console.log('Nested Job Object guard verified')"
+      ],
+      "hostAtStart": {
+        "total": 17169387520,
+        "available": 13620477952
+      },
+      "limits": {
+        "jobCommittedBytes": 536870912,
+        "stopCommittedBytes": 429496729,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": null
+      },
+      "peakCommittedBytes": 43204608,
+      "minimumHostAvailable": 13590249472,
+      "startedAt": 1790599323.9792192,
+      "unit": "Local\\LasmResource-7d152bd5-4698-4a47-9855-296a8e862af9",
+      "pid": 10416,
+      "lastSampleAt": 1790599324.6021535,
+      "exitCode": 0,
+      "finishedAt": 1790599324.617532
+    },
+    "windows-sdk-unicode/result": {
+      "scope": "Native Unicode-path differential for the existing SDK; no distribution or package acceptance",
+      "platform": "win32-arm64",
+      "sourceRevision": "a6a64792505a4286b89c96f865f9170c22bd569f",
+      "passed": false,
+      "checks": [
+        {
+          "label": "native compiler fixture",
+          "code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "original ASCII path",
+          "code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "original Unicode path",
+          "expectedFailure": true,
+          "code": 1,
+          "stdout": "",
+          "stderr": "Fatal: Failed opening 'C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\Unicode ? ???\\input ? ???.wasm'\r\n"
+        }
+      ],
+      "repairs": [],
+      "resourceReport": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk-resources.json",
+      "startedAt": "2026-09-28T12:42:08.745Z",
+      "originalArtifact": {
+        "name": "emscripten-6.0.9-win32-arm64",
+        "root": "install",
+        "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/emscripten-6.0.9-win32-arm64.tar.gz",
+        "sha256": "abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a",
+        "bytes": 174792332,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 5000000000
+      },
+      "error": "Error: Command failed: C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\cache\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe -I -B C:\\a\\lasm\\lasm\\scripts\\ci\\windows-sdk-utf8-manifest.py C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\patched\\bin\\wasm-as.exe 40b4cdab574d31d211efa8e7d280f380812f6600493ae58903dc483c8c7e8856 C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\wasm-as.exe-manifest.json\n    at genericNodeError (node:internal/errors:999:15)\n    at wrappedFn (node:internal/errors:544:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at file:///C:/a/lasm/lasm/scripts/ci/windows-sdk-unicode-control.mjs:68:5\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+    },
+    "windows-arm64-sdk-resources": {
+      "status": "failed",
+      "command": [
+        "node",
+        "scripts/ci/windows-sdk-utf8-repack.mjs"
+      ],
+      "hostAtStart": {
+        "total": 17169387520,
+        "available": 13660573696
+      },
+      "limits": {
+        "jobCommittedBytes": 4294967296,
+        "stopCommittedBytes": 3435973836,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": 6000
+      },
+      "peakCommittedBytes": 281284608,
+      "minimumHostAvailable": 13108498432,
+      "startedAt": 1790599327.9406896,
+      "disk": {
+        "reserveBytes": 4294967296,
+        "minimumFreeBytes": {
+          "C:\\a\\lasm\\lasm": 131676819456
+        }
+      },
+      "unit": "Local\\LasmResource-362613e1-5fc7-4846-ab98-9bc6a0eeece5",
+      "pid": 3580,
+      "lastSampleAt": 1790599495.8330286,
+      "exitCode": 1,
+      "finishedAt": 1790599495.9606364
+    }
+  },
+  "rawLogSha256": "047c0ad9283f33598e068e932c80d7bdd058ba1519165c4f9639b65fbec20eed",
+  "nextControl": "Repair only a stale COFF pointer by locating one unique exact original symbol/string-table byte sequence; reject changed or ambiguous bytes; then repeat all PE and native execution checks."
+}

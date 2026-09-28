@@ -96,6 +96,25 @@ class PreservationTests(unittest.TestCase):
         self.assertEqual([e.text for e in settings], ["UTF-8"])
         with self.assertRaises(AssertionError): helper["utf8_manifest"](replacement)
 
+    def test_stale_coff_pointer_is_repaired_only_by_exact_table_match(self):
+        before, after = fixture(), moved_metadata()
+        symbols = helper["coff_symbols"](before)
+        original = symbols["bytes"]
+        after[0xE00:0xE00 + len(original)] = b"\0" * len(original)
+        after[0xE80:0xE80 + len(original)] = original
+        with self.assertRaises(AssertionError): verify(before, after)
+        fixed, correction = helper["preserve_coff_pointer"](before, after)
+        self.assertEqual(correction["afterPointer"], 0xE80)
+        verify(before, fixed)
+        after[0xE80 + 8] ^= 1
+        with self.assertRaises(AssertionError): helper["preserve_coff_pointer"](before, after)
+
+    def test_ambiguous_coff_table_match_is_rejected(self):
+        before, after = fixture(), moved_metadata()
+        original = helper["coff_symbols"](before)["bytes"]
+        after[0xE80:0xE80 + len(original)] = original
+        with self.assertRaises(AssertionError): helper["preserve_coff_pointer"](before, after)
+
 
 if __name__ == "__main__":
     unittest.main()
