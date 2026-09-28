@@ -9,6 +9,10 @@ Its complete Windows x64 install test is running. The unchanged `.43` passed
 Linux x64/ARM64 and macOS ARM64; verified reports are committed. macOS x64 and
 the native ARM64 Lean distribution build continue.
 
+The pending archive-repair validation uses the existing 4-GiB Windows profile
+(3.2-GiB proactive stop): prior Lean/Lake checks peaked at 2.28 GB, exceeding
+the original 2-GiB profile. Local resource limits are unchanged.
+
 README reviewed: `.37` remains the accepted Linux/macOS release; Windows remains
 unsupported. Remaining gates: native controls, repaired installed candidate,
 complete ARM64 tools and one candidate across the full matrix. No npm publication.

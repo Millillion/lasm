@@ -106,7 +106,10 @@ jobs:
         if: inputs.repack-tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --timeout-seconds 5400 --disk-path . --disk-reserve-mib 4096 --report .work/windows-arm64-lean-release-resources.json -- node scripts/ci/windows-lean-notices-repack.mjs
+        # This also elaborates Lake, whose verified x64 control peaked at
+        # 2.28 GB. Reuse that control's 4-GiB Job Object profile, stopping at
+        # 80% and preserving the separate host-memory and disk reserves.
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --timeout-seconds 5400 --disk-path . --disk-reserve-mib 4096 --report .work/windows-arm64-lean-release-resources.json -- node scripts/ci/windows-lean-notices-repack.mjs
       - name: Retain only completed compiler objects after the guard closes
         if: always() && steps.compiler_cache.outcome == 'success' && (steps.build.outcome == 'success' || steps.build.outcome == 'failure')
         env:

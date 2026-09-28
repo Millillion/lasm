@@ -112,5 +112,18 @@
     "resourceLimited": false,
     "memoryThrottled": false
   },
-  "nativeGate": "Use existing Windows ARM64 distribution workflow in mutually exclusive archive-repair mode; verify fresh native Lean/Lake, empty-PATH execution and local Lake C generation before retaining a new unpublished archive. Existing C/C++ build outputs must remain byte-identical."
+  "nativeGate": "Use existing Windows ARM64 distribution workflow in mutually exclusive archive-repair mode; verify fresh native Lean/Lake, empty-PATH execution and local Lake C generation before retaining a new unpublished archive. Existing C/C++ build outputs must remain byte-identical.",
+  "pendingNativeValidationProfile": {
+    "jobMemoryCapBytes": 4294967296,
+    "proactiveStopBytes": 3435973836,
+    "hostReserveBytes": 2147483648,
+    "diskReserveBytes": 4294967296,
+    "deadlineSeconds": 5400,
+    "reason": "This route includes native Lake elaboration as well as archive copying. Reuse the previously validated Windows resource profile; the original smaller profile stopped proactively.",
+    "priorSmallerProfile": "windows-lake-long-path-2g-abort-2026-09-27.json",
+    "priorPassedProfile": "windows-lean-physical-prefix-2026-09-27.json",
+    "priorPassedPeakCommittedBytes": 2278199296,
+    "nativeArm64Result": "pending",
+    "localLimitsChanged": false
+  }
 }
