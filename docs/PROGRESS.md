@@ -1,13 +1,15 @@
-**Windows validation resumed — 2026-09-28.** The ARM64 Lean build reached its
-deadline during DLL linking, at a 1.91-GiB peak; it did not finish distribution
-validation. The retry uses two bounded jobs and retains completed compiler-cache
-objects between fresh builds. Five archive controls passed locally, including
-recipe and corruption rejection, at a 31.7-MiB peak. Native cache reuse is checked
-before the expensive build. Memory limits remain unchanged.
+**Native validation in progress — 2026-09-28.** Candidate `.43` packed twice
+identically (65.34 MB; SHA-256 `578b16cb…3af428`). Windows x64 installed checks and
+both macOS checks are running against those exact bytes. The Linux recheck exposed
+an undeclared reusable-workflow input before any test started. The input and
+archive selection are corrected; all local reusable call contracts now validate.
+This changes maintainer orchestration, not the candidate.
 
-The user-paused `.42` and queued `.43` runs are cancelled, not compatibility
-results. Node 26.10.0 and Lean 4.34.1 remain current. README reviewed: retained
-`.37` is accepted on both Linux and macOS architectures; Windows remains
-unsupported. Next gates are installed `.43`, a validated ARM64 tool distribution,
-and the complete native matrix. Evidence: [Windows implementation](WINDOWS_TOOLCHAINS.md).
-No npm publication. Completion ETA is not yet estimable.
+The ARM64 retry passed native archive controls and is provisioning its seed.
+It uses two bounded build jobs and verified completed compiler-cache checkpoints;
+the prior linking deadline remains recorded separately.
+
+README reviewed: `.37` remains accepted on Linux/macOS; Windows is unsupported.
+Next: native installed results, ARM64 compiler distribution, then the complete
+matrix. Evidence: [Windows implementation](WINDOWS_TOOLCHAINS.md). No npm publication.
+Completion ETA is not yet estimable.

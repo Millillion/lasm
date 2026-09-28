@@ -1,0 +1,49 @@
+{
+  "scope": "Workflow configuration startup repair; installed package unchanged",
+  "failedRun": "https://github.com/Millillion/lasm/actions/runs/36381195581",
+  "conclusion": "startup_failure",
+  "testsStarted": false,
+  "before": [
+    {
+      "workflow": ".github/workflows/node-linux-candidate-recheck.yml",
+      "job": "linux-x64",
+      "unexpected": [
+        "candidate-version"
+      ],
+      "missing": []
+    },
+    {
+      "workflow": ".github/workflows/node-linux-candidate-recheck.yml",
+      "job": "linux-arm64",
+      "unexpected": [
+        "candidate-version"
+      ],
+      "missing": []
+    }
+  ],
+  "after": {
+    "checkedCalls": 11,
+    "unexpectedInputs": 0,
+    "missingRequiredInputs": 0
+  },
+  "unchangedCandidate": {
+    "scope": "Reproducible local npm packing; native installed acceptance is separate",
+    "tarball": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.43.tgz",
+    "sha256": "578b16cbc62d8fe356ae38ce1ae7dcf0c4fd255d1762b18b3245dea50e3af428",
+    "sourceRevision": "d5f9e9352cbe43f0545a37f26e5091e2316eb375",
+    "candidateVersion": "0.1.0-experimental.43",
+    "defaultLean": "4.34.1",
+    "node": "26.10.0",
+    "runtime": {
+      "identity": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+      "name": "lean-4.34.1-wasm64"
+    },
+    "reproduciblePacking": true,
+    "compressedBytes": 65336923,
+    "installedBytes": 377778041,
+    "files": 234,
+    "resourceReport": "/home/runner/work/lasm/lasm/.work/node-package-resources.json",
+    "recordedAt": "2026-09-28T05:13:53.734Z"
+  },
+  "READMEReview": "Quick start, CLI options, supported environments and Lean exclusions unchanged and accurate; Windows still pending"
+}
