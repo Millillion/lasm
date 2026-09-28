@@ -194,3 +194,37 @@ applications in both Wasm widths. This is a proposed tool-distribution repair,
 not an accepted SDK or application result. It uses [Microsoft's process code
 page mechanism](https://learn.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page)
 and changes no global Windows settings.
+
+The complete [`.45` campaign](evidence/node45-six-platform-campaign-2026-09-28.json)
+passed both Linux architectures, both Mac architectures and Windows x64. ARM64's
+failure prevented combined candidate retention. The earlier `.44` archive remains
+the accepted five-target candidate.
+
+The first native repair controls reproduced the SDK failure with identical Wasm
+bytes under ASCII and Unicode paths. Windows' resource-update API moved relocation
+and debug sections and did not preserve the COFF table as a unique byte sequence;
+those attempts were rejected before repaired execution. The [direct-resource
+evidence](evidence/windows-arm64-sdk-direct-resource-2026-09-28.json) preserves
+the failures and the replacement: append a new manifest section without moving
+any original section or debug data. All eight exact original executables passed
+local whole-file preservation checks, allowing only specified PE header edits.
+Each grows by 1 KiB; the guarded check peaked at 83.2 MiB. Native Windows checksum,
+resource readback, Unicode execution and fresh archive relocation are still gates.
+
+Those [native SDK gates passed](evidence/windows-arm64-sdk-utf8-distribution-2026-09-28.json)
+in run `36426171536`. Windows verified each executable's checksum and read back
+its manifest, then the repaired optimizer and both Wasm32/Wasm64 C++
+thread/exception applications passed with Unicode paths. Two archive packs were
+identical. Fresh extraction into a Unicode cache and project passed both widths
+with original paths unavailable, followed by verified offline reuse. The guarded
+operation took 17.5 minutes and peaked at 329.3 MiB.
+
+The [repaired tool prerelease](https://github.com/Millillion/lasm/releases/tag/windows-arm64-sdk-bootstrap-36426171536)
+contains 174,800,072 bytes, with SHA-256
+`e9380d2bef2e3ad554507f768f32b0d4e4d3cf6d54dad7755001b5a7a08e096b`.
+A separate streaming audit verified all 27 native binaries and all 149 unchanged
+notices; the eight repaired hashes match the independently calculated local
+results. Anonymous download also verified the exact archive checksum. These
+audits peaked at 74.2 and 32.8 MiB under 512-MiB caps. The original SDK archive is
+preserved. Candidate `.46` now selects the repaired tools and still needs the
+complete six-target installed-package campaign; npm publication is unauthorized.

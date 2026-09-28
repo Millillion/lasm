@@ -50,11 +50,11 @@
       "maximumExtractedBytes": 5000000000
     },
     "win32-arm64": {
-      "name": "emscripten-6.0.9-win32-arm64",
+      "name": "emscripten-6.0.9-win32-arm64-utf8",
       "root": "install",
-      "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/emscripten-6.0.9-win32-arm64.tar.gz",
-      "sha256": "abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a",
-      "bytes": 174792332,
+      "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36426171536/emscripten-6.0.9-win32-arm64.tar.gz",
+      "sha256": "e9380d2bef2e3ad554507f768f32b0d4e4d3cf6d54dad7755001b5a7a08e096b",
+      "bytes": 174800072,
       "format": "tar.gz",
       "maximumExtractedBytes": 5000000000
     }

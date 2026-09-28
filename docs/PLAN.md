@@ -17,9 +17,11 @@ npm; deferred chunks below remain future work.
 
 **Platform extension status — 2026-09-28:** the same retained `.44` candidate now
 passes both Linux and macOS architectures and Windows x86-64. Windows ARM64 still
-requires complete installed-package acceptance. Its native Lean and SDK
-distributions are available; the next `.45` candidate is configured for all six
-OS/architecture targets.
+requires complete installed-package acceptance. Candidate `.45` passed the same
+five targets but exposed a Windows ARM64 SDK defect with Unicode paths. Its native
+Lean distribution is verified and available. The SDK repair has now passed native
+Unicode-path and archive-relocation controls; candidate `.46` connects those
+verified tools for a new complete six-target matrix.
 
 ## Current ordered work, authorized 2026-09-26
 

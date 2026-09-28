@@ -102,8 +102,10 @@ The [Windows byte-preservation repair](evidence/windows-stdio-bytes-2026-09-28.j
 and [native C-oracle launch control](evidence/windows-native-oracle-launch-2026-09-28.json)
 have separate failure and regression evidence. Earlier archives remain unchanged.
 
-Windows ARM64's native compiler build and relocation passed, but its first archive
-retention failed. The [distribution tracker](WINDOWS_TOOLCHAINS.md) records the
-repair and guarded retry. It still needs a retained, audited native Lean download
-and complete installed Lasm acceptance. A future six-platform package must pass
-its own exact-archive campaign.
+Windows ARM64's native Lean distribution has passed build, relocation, retention
+and archive auditing and is available as a managed download. Candidate `.45`
+passed the five targets above but exposed an SDK defect with Unicode paths on
+ARM64. The repair passed native SDK execution and archive-relocation checks;
+the [distribution tracker](WINDOWS_TOOLCHAINS.md) records the evidence. Candidate
+`.46` connects the repaired tools and must pass its own exact-archive campaign
+before Windows ARM64 becomes supported.

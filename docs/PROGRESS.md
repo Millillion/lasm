@@ -1,14 +1,17 @@
-**Windows ARM64 direct manifest addition — 2026-09-28.** Candidate `.45` passed
-five targets; ARM64 remains blocked by the original SDK Unicode-path bug.
+**Windows ARM64 SDK repaired and distributed — 2026-09-28.** Native run
+`36426171536` passed original-failure reproduction, all eight manifest/checksum
+checks, Unicode C++ thread/exception execution in both Wasm widths, reproducible
+packing, fresh Unicode cache/project relocation, and offline reuse. It took
+17.5 minutes and peaked at 329.3 MiB under the 4-GiB cap.
 
-Run `36424279691` rejected the Windows resource-update approach before repaired
-execution because the original COFF table was not uniquely preserved. No archive
-was produced. The replacement appends one resource section without moving any
-original section or COFF data. All eight checksum-verified originals passed local
-whole-file/header, section, address and symbol-table preservation checks, adding
-1 KiB each. Peak memory was 83.2 MiB under a 512-MiB guard. Nine regression tests
-pass. Native Windows checksum/resource readback and execution remain required.
+The independent streaming audit verified all 27 native programs, 149 unchanged
+notices, and exact agreement with locally predicted repaired hashes. The new
+174,800,072-byte tool prerelease also passed anonymous checksum verification.
+Only its eight manifests and declared PE headers changed; original sections and
+COFF data remain intact.
 
-Remaining: validate and distribute the repaired SDK, then accept one exact npm
-candidate on all six targets. README continues to mark ARM64 unsupported. No npm
-publication. Completion ETA is not yet estimable.
+Candidate `.46` now selects this SDK. Remaining: run and retain one exact package
+through all six native installed/deployment targets, then update acceptance docs.
+README still identifies `.44` as the accepted five-target archive. No npm
+publication. Final timing remains unverified on ARM64; completion ETA is not yet
+estimable.

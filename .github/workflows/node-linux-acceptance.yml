@@ -6,7 +6,7 @@ on:
         description: Unique version for the newly packed candidate
         required: true
         type: string
-        default: 0.1.0-experimental.45
+        default: 0.1.0-experimental.46
       runtime-cache-key:
         description: Exact cache key emitted by Node Linux runtime inputs
         required: true
