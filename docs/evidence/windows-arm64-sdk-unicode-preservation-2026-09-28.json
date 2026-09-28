@@ -1,0 +1,79 @@
+{
+  "scope": "Original native SDK Unicode failure independently reproduced; proposed manifest repair stopped at PE preservation check before repaired execution",
+  "run": 36420742640,
+  "job": 108922563106,
+  "url": "https://github.com/Millillion/lasm/actions/runs/36420742640/job/108922563106",
+  "result": {
+    "scope": "Native Unicode-path differential for the existing SDK; no distribution or package acceptance",
+    "platform": "win32-arm64",
+    "sourceRevision": "ef1e2446b9b05208e0b47dc27a5b75775df3a177",
+    "passed": false,
+    "checks": [
+      {
+        "label": "native compiler fixture",
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "original ASCII path",
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "original Unicode path",
+        "expectedFailure": true,
+        "code": 1,
+        "stdout": "",
+        "stderr": "Fatal: Failed opening 'C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\Unicode ? ???\\input ? ???.wasm'\r\n"
+      }
+    ],
+    "repairs": [],
+    "resourceReport": "C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode-resources.json",
+    "startedAt": "2026-09-28T12:17:25.705Z",
+    "originalArtifact": {
+      "name": "emscripten-6.0.9-win32-arm64",
+      "root": "install",
+      "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36278363560/emscripten-6.0.9-win32-arm64.tar.gz",
+      "sha256": "abd0e1f97c592d2e9c4f5e937ec9f9c1e63c6a4c4e540a6ebf336db851c33e5a",
+      "bytes": 174792332,
+      "format": "tar.gz",
+      "maximumExtractedBytes": 5000000000
+    },
+    "error": "Error: Command failed: C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\cache\\artifacts\\5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f\\python.exe -I -B C:\\a\\lasm\\lasm\\scripts\\ci\\windows-sdk-utf8-manifest.py C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\patched\\bin\\wasm-as.exe 40b4cdab574d31d211efa8e7d280f380812f6600493ae58903dc483c8c7e8856 C:\\a\\lasm\\lasm\\.work\\windows-sdk-unicode\\wasm-as.exe-manifest.json\n    at genericNodeError (node:internal/errors:999:15)\n    at wrappedFn (node:internal/errors:544:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at file:///C:/a/lasm/lasm/scripts/ci/windows-sdk-unicode-control.mjs:60:5\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  "resources": {
+    "status": "failed",
+    "command": [
+      "node",
+      "scripts/ci/windows-sdk-unicode-control.mjs"
+    ],
+    "hostAtStart": {
+      "total": 17169428480,
+      "available": 13579358208
+    },
+    "limits": {
+      "jobCommittedBytes": 4294967296,
+      "stopCommittedBytes": 3435973836,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 3000
+    },
+    "peakCommittedBytes": 237744128,
+    "minimumHostAvailable": 12998152192,
+    "startedAt": 1790597845.302685,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "C:\\a\\lasm\\lasm": 131690008576
+      }
+    },
+    "unit": "Local\\LasmResource-83ef6aa1-10d9-4147-9d6e-545de804c708",
+    "pid": 2056,
+    "lastSampleAt": 1790598029.3607717,
+    "exitCode": 1,
+    "finishedAt": 1790598029.516317
+  },
+  "interpretation": "The Windows resource-update API changed a section identity field or raw-section hash. Detailed before/after section identities are required before accepting any change; no repaired distribution was created.",
+  "rawLogSha256": "27e936380249a697985cf73851bc90796713f78b26a35014466f10e4ace95085"
+}

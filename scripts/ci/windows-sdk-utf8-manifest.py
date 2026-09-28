@@ -154,7 +154,9 @@ def repair(file, expected):
     if not kernel.EndUpdateResourceW(update, False):
         raise ctypes.WinError(ctypes.get_last_error())
     after = file.read_bytes()
-    assert pe_identity(after) == identity, "A loaded non-resource section or execution header changed"
+    after_identity = pe_identity(after)
+    assert after_identity == identity, ("PE resource preservation difference: " + json.dumps({
+        "before": identity, "after": after_identity}, sort_keys=True))
     assert manifests() == replacements
     return {"file": str(file), "originalSha256": expected, "patchedSha256": digest(after),
             "preservedExecutionIdentity": identity,
