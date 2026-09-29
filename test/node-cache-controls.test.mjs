@@ -12,4 +12,5 @@ test('the installed acceptance recovery controls exercise failed downloads and r
   const results = await cacheControls(fileURLToPath(new URL('../', import.meta.url)), directory);
   assert.equal(results.length, 6);
   assert.ok(results.every(result => result.recovered && result.cachedWithoutDownload));
+  assert.equal(results.filter(result => result.repairedThroughCli).length, 2);
 });

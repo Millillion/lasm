@@ -15,4 +15,5 @@ Daily validation now selects that exact archive; activation does not claim
 acceptance. Corrected controls must pass all six targets, then record three
 consecutive cold passes per target across at least 24 hours and two dates.
 Preparation/resource failures reset the sequence; guard reports are tested.
-Temporal confidence remains pending. README reviewed; npm unpublished. No local heavy builds.
+CLI repair controls pass locally. Confidence remains pending. README reviewed;
+npm unpublished.

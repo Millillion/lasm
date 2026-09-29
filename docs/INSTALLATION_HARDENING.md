@@ -105,6 +105,9 @@ network denial. No dependency lifecycle script is needed.
 The [automatic fault workflow](../.github/workflows/installer-faults.yml) runs on
 relevant pushes and PRs on the existing six native runners. It uses small TLS
 fixtures, process kills, locks, repair, archive and dependency packing controls.
+Damaged and incomplete-cache recovery invokes the actual `lasm cache repair`
+entrypoint against tiny caches, then verifies successful replacement and offline
+reuse. The full installed suite runs these same controls under network denial.
 Standard public runners are [free](https://docs.github.com/en/actions/reference/runners/github-hosted-runners);
 this workflow uploads no artifacts/caches. All outcomes remain in logs and job
 summaries. It observes direct pushes to main; it is not a pre-push branch gate.

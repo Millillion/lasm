@@ -6,10 +6,10 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 
 export async function cacheControls(compiler, directory) {
   const { provisionArtifact } = await import(pathToFileURL(join(compiler, 'src/managed-artifacts.mjs')));
-  const { repairManagedCache } = await import(pathToFileURL(join(compiler, 'src/cache-repair.mjs')));
   const { c: tar } = createRequire(join(compiler, 'package.json'))('tar');
   mkdirSync(join(directory, 'source/tool'), { recursive: true });
   writeFileSync(join(directory, 'source/tool/value'), 'verified fixture\n');
@@ -27,8 +27,14 @@ export async function cacheControls(compiler, directory) {
       else writeFileSync(join(installed.directory, 'value'), 'damaged');
       await assert.rejects(provisionArtifact(artifact, options), /cache|Cache/);
       assert.equal(downloads, 1, 'Never trust or execute damaged cached tools');
-      const repaired = await repairManagedCache({ cache, log() {} });
-      assert.equal(repaired.removed.length, 1, 'Explicit offline repair removes only the diagnosed entry');
+      const repaired = spawnSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'cache', 'repair'], {
+        env: { ...process.env, LASM_TOOLCHAIN_CACHE: cache }, encoding: 'utf8', timeout: 30_000, maxBuffer: 1024 * 1024,
+      });
+      assert.ifError(repaired.error); assert.equal(repaired.status, 0, repaired.stderr);
+      assert.equal(repaired.stdout, '');
+      assert.match(repaired.stderr, /1 invalid tools removed/);
+      assert.match(repaired.stderr, /0 cleanup operations pending/);
+      assert.deepEqual(readdirSync(join(cache, 'artifacts')), [], 'The installed CLI removes only the diagnosed entry offline');
     } else {
       const broken = { ...options, download: { sleep: async () => {} }, fetch: async () => {
         if (failure === 'unavailable') return new Response('missing', { status: 503 });
@@ -46,7 +52,8 @@ export async function cacheControls(compiler, directory) {
     assert.equal(readFileSync(join(recovered.directory, 'value'), 'utf8'), 'verified fixture\n');
     const reused = await provisionArtifact(artifact, { ...options, fetch: async () => { throw new Error('Unexpected cached download'); } });
     assert.equal(reused.cacheHit, true);
-    results.push({ failure, recovered: true, cachedWithoutDownload: true });
+    results.push({ failure, recovered: true, cachedWithoutDownload: true,
+      ...(failure.endsWith('-cache') ? { repairedThroughCli: true } : {}) });
   }
   return results;
 }
