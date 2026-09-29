@@ -1,0 +1,103 @@
+{
+  "scope": "Current maintainer controls on all six native targets; installed-package acceptance remains separate",
+  "runId": "36516202881",
+  "url": "https://github.com/Millillion/lasm/actions/runs/36516202881",
+  "revision": "9d86157490d8aa47ae10abe810576af0efd7d5ad",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "platform": "win32-arm64",
+      "jobId": "109238916239",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36516202881/job/109238916239",
+      "tests": 144,
+      "passed": 141,
+      "skipped": 3,
+      "node": "26.10.0",
+      "os": "10.0.26200",
+      "startedAt": "2026-09-29T03:15:49.380Z",
+      "finishedAt": "2026-09-29T03:16:33.548Z",
+      "peakBytes": 313503744,
+      "resourceStop": false,
+      "additionalWindowsReportControls": {
+        "tests": 3,
+        "passed": 3,
+        "realDenyDeleteHandle": true
+      }
+    },
+    {
+      "platform": "darwin-arm64",
+      "jobId": "109238916389",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36516202881/job/109238916389",
+      "tests": 144,
+      "passed": 141,
+      "skipped": 3,
+      "node": "26.10.0",
+      "os": "24.6.0",
+      "startedAt": "2026-09-29T03:14:34.458Z",
+      "finishedAt": "2026-09-29T03:14:50.543Z",
+      "peakBytes": 379305984,
+      "resourceStop": false
+    },
+    {
+      "platform": "linux-x64",
+      "jobId": "109238916399",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36516202881/job/109238916399",
+      "tests": 144,
+      "passed": 141,
+      "skipped": 3,
+      "node": "26.10.0",
+      "os": "6.17.0-1022-azure",
+      "startedAt": "2026-09-29T03:13:56.268Z",
+      "finishedAt": "2026-09-29T03:14:11.257Z",
+      "peakBytes": 142376960,
+      "resourceStop": false
+    },
+    {
+      "platform": "win32-x64",
+      "jobId": "109238916411",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36516202881/job/109238916411",
+      "tests": 144,
+      "passed": 141,
+      "skipped": 3,
+      "node": "26.10.0",
+      "os": "10.0.26100",
+      "startedAt": "2026-09-29T03:14:47.524Z",
+      "finishedAt": "2026-09-29T03:15:20.965Z",
+      "peakBytes": 300036096,
+      "resourceStop": false,
+      "additionalWindowsReportControls": {
+        "tests": 3,
+        "passed": 3,
+        "realDenyDeleteHandle": true
+      }
+    },
+    {
+      "platform": "darwin-x64",
+      "jobId": "109238916441",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36516202881/job/109238916441",
+      "tests": 144,
+      "passed": 141,
+      "skipped": 3,
+      "node": "26.10.0",
+      "os": "24.6.0",
+      "startedAt": "2026-09-29T03:14:23.663Z",
+      "finishedAt": "2026-09-29T03:14:49.414Z",
+      "peakBytes": 301658112,
+      "resourceStop": false
+    },
+    {
+      "platform": "linux-arm64",
+      "jobId": "109238916466",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36516202881/job/109238916466",
+      "tests": 144,
+      "passed": 141,
+      "skipped": 3,
+      "node": "26.10.0",
+      "os": "6.17.0-1022-azure",
+      "startedAt": "2026-09-29T03:13:56.557Z",
+      "finishedAt": "2026-09-29T03:14:11.765Z",
+      "peakBytes": 131215360,
+      "resourceStop": false
+    }
+  ]
+}

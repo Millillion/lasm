@@ -2,8 +2,8 @@
 
 Authorized 2026-09-28 following the [dated audit](TOOLCHAIN_ROBUSTNESS.md).
 Candidate `.46` and its six-platform acceptance remain unchanged. This document
-describes source changes awaiting a new packed candidate, not a retroactive claim
-about that archive.
+describes the hardened candidate and its ongoing validation, not a retroactive
+claim about that archive.
 
 ## Transfers
 
@@ -260,6 +260,19 @@ periodic saves without sleeping or pausing resource checks. Persistent contentio
 fails closed after five seconds; final retries happen after the workload job is
 closed. A native deny-delete-handle control exercises recovery and bounded failure.
 These are maintainer-control changes; the candidate bytes remain unchanged.
+
+The updated [144-control matrix](https://github.com/Millillion/lasm/actions/runs/36516202881)
+passed 141 applicable controls with three skips on each native target. Both
+Windows targets additionally passed three atomic-report controls, including a
+real deny-delete handle. [Compact evidence](evidence/installer-faults-guard-controls-2026-09-29.json)
+records all six jobs and their resource outcomes. The complete
+[Apple Silicon installed/network report](evidence/installer-hardened-darwin-arm64-2026-09-29.json)
+includes an empty-cache npm installation under network denial and all six bundled
+dependency identities. The confidence collector classified that real success
+and the Linux resource abort correctly. The
+[unchanged-archive repetition](https://github.com/Millillion/lasm/actions/runs/36515690424)
+uses the corrected Linux resource profile; subsequent runs also use the corrected
+Windows report writer. No failed attempt is replaced.
 
 ### Repeated cold installations
 

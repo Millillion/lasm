@@ -57,9 +57,11 @@ packed candidate before extending the accepted support claim.
 - [x] Bundle the locked installer dependency graph and verify offline npm install.
 - [x] Add proxy/CA and storage diagnostics, cancellation, and explicit safe cache
   repair with tests that preserve active installs and unrelated files.
-- [ ] Run deterministic native fault tests automatically on relevant pushes/PRs
+- [x] Run deterministic native fault tests automatically on relevant pushes/PRs
   across all six targets. Replace cache-only runtime handoff with a durable,
-  authenticated input and validate a new single packed candidate on all six.
+  authenticated input.
+- [ ] Validate the new single packed candidate on all six targets, including
+  the full CLI/Lake private-CA and authenticated-proxy control.
 - [ ] Schedule live distribution checks; retain all attempts and bounded evidence.
   Track three cold repetitions per target over at least two days as an additional
   release-confidence gate, without claiming a statistical reliability guarantee.
