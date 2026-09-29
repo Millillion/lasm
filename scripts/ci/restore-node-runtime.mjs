@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import { readFile, mkdir, mkdtemp, rename, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { x as untar } from 'tar';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { verifyApplicationRuntime } from '../../src/application-runtime.mjs';
@@ -21,9 +20,7 @@ assert.ok(!existsSync(destination), 'Use a fresh runner/output for runtime resto
 await mkdir('.work', { recursive: true });
 const staging = await mkdtemp(resolve('.work/.restore-runtime-'));
 try {
-  const archive = join(staging, source.asset);
-  execFileSync('gh', ['release', 'download', source.release, '--repo', source.repository,
-    '--pattern', source.asset, '--dir', staging], { stdio: 'inherit', timeout: 180_000, windowsHide: true });
+  const archive = resolve('.work/node-runtime-source.tgz');
   assert.equal(await hashFile(archive), source.sha256, 'Durable runtime input digest must match the reviewed source');
   const unpacked = join(staging, 'unpacked'); await mkdir(unpacked);
   await untar({ file: archive, cwd: unpacked, strict: true, preservePaths: false,

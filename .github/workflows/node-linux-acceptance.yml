@@ -52,9 +52,11 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/node-unit-resources.json -- node --max-old-space-size=256 --test --test-concurrency=1 test/darwin-resources.test.mjs test/application-output.test.mjs test/application-policy.test.mjs test/application-reachability.test.mjs test/application-symbols.test.mjs test/native-application-bundle.test.mjs test/native-directory.test.mjs test/native-temporary.test.mjs test/application-metadata.test.mjs test/application-support.test.mjs test/application-paths.test.mjs test/windows-tool-paths.test.mjs test/application-launcher.test.mjs test/build-progress.test.mjs test/cli-arguments.test.mjs test/application-files.test.mjs test/application-runtime.test.mjs test/node-cache-controls.test.mjs test/managed-artifacts.test.mjs test/managed-git.test.mjs
       - name: Completed cache advice preserves file contents and excludes deployments
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 256 --report .work/node-cache-advice-resources.json -- python3 -I -B test/tool-cache-advice.test.py
-      - name: Restore authenticated runtime from its durable retained input
+      - name: Download the pinned retained runtime input
         env:
           GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract durable runtime under the resource guard
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-restore-resources.json -- node scripts/ci/restore-node-runtime.mjs
       - name: Pack twice reproducibly
         id: package

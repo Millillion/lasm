@@ -49,7 +49,7 @@ jobs:
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: Bounded POSIX fault suite
         if: runner.os != 'Windows'
-        run: LASM_TEST_PYTHON="$(command -v python3)" node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/installer-fault-resources.json -- node scripts/ci/installer-faults.mjs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/installer-fault-resources.json -- /usr/bin/env LASM_TEST_PYTHON="$(command -v python3)" LASM_EXPECT_PLATFORM="$LASM_EXPECT_PLATFORM" GITHUB_SHA="$GITHUB_SHA" GITHUB_RUN_ID="$GITHUB_RUN_ID" GITHUB_RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" node scripts/ci/installer-faults.mjs
       - name: Bounded Windows fault suite
         if: runner.os == 'Windows'
         shell: pwsh

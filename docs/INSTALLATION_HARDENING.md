@@ -173,3 +173,9 @@ OS-isolated prerequisite proof; both gates must pass.
 
 The new packed candidate, full CLI/Lake network results, and scheduled multi-day
 confidence reporting remain gates in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).
+
+The first `.47` attempt ([36510234373](https://github.com/Millillion/lasm/actions/runs/36510234373))
+stopped before packaging: the compiler guard's minimal environment omitted
+`GH_TOKEN`, so the draft runtime asset was invisible. The correction downloads
+with CI authentication first, then independently hashes/extracts under the
+unchanged guard. No candidate archive was produced by that attempt.

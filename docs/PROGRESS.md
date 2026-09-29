@@ -11,6 +11,8 @@ POSIX; 124 plus three inapplicable skips on Windows). Durable authenticated
 runtime/candidate handoffs and full CLI/Lake proxy/CA controls are implemented;
 new installed acceptance and scheduled confidence checks remain. See
 [implementation details](INSTALLATION_HARDENING.md).
+The first `.47` attempt stopped before packing because the guard intentionally
+removed download authentication; the download now precedes guarded extraction.
 ETA depends on native acceptance results and the multi-day gate. README was
 reviewed and distinguishes accepted `.46` from unaccepted source changes.
 Windows 11 x64, broad API parity and other engines remain deferred; npm unpublished.
