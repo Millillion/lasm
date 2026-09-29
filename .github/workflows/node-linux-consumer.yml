@@ -9,8 +9,11 @@ on:
         required: true
         type: string
       cache-key:
-        required: true
         type: string
+        default: ""
+      candidate-release:
+        type: string
+        default: ""
       sha256:
         required: true
         type: string
@@ -27,6 +30,7 @@ jobs:
     env:
       LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
       LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
       EXPECTED_ARCHITECTURE: ${{ inputs.architecture }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -37,11 +41,16 @@ jobs:
           package-manager-cache: false
       - name: Install maintainer orchestration dependencies
         run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - if: inputs.cache-key != ''
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
           key: ${{ inputs.cache-key }}
-          fail-on-cache-miss: true
+          fail-on-cache-miss: false
+      - name: Fetch and authenticate retained candidate when the cache is absent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
       - name: Enable process-tree resource guard
         run: |
           node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'linux-'+process.env.EXPECTED_ARCHITECTURE)"
@@ -52,7 +61,9 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 256 --report .work/node-advice-control-resources.json -- python3 -I -B test/tool-cache-advice.test.py
       - name: Cold npm install, real npx commands, offline reuse and independent deployment
         run: node scripts/ci/run-node-linux.mjs
+      - name: Installed CLI and Lake through private CA and authenticated proxy
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 8192 --report .work/node-network-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/ci/check-node-network.mjs
       - name: Preserve acceptance evidence in logs and summary
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/node-linux-acceptance/result.json','.work/node-linux-resources.json','.work/node-linux-disk.json'])if(f.existsSync(p)){const s=f.readFileSync(p,'utf8');console.log(p+'\n'+s);if(process.env.GITHUB_STEP_SUMMARY)f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### '+p+'\n\n\x60\x60\x60json\n'+s+'\x60\x60\x60\n')}"
+          node -e "const f=require('node:fs');for(const p of ['.work/node-network-result.json','.work/node-network-resources.json','.work/node-linux-acceptance/result.json','.work/node-linux-resources.json','.work/node-linux-disk.json'])if(f.existsSync(p)){const s=f.readFileSync(p,'utf8');console.log(p+'\n'+s);if(process.env.GITHUB_STEP_SUMMARY)f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### '+p+'\n\n\x60\x60\x60json\n'+s+'\x60\x60\x60\n')}"

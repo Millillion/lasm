@@ -9,8 +9,11 @@ on:
         required: true
         type: string
       cache-key:
-        required: true
         type: string
+        default: ""
+      candidate-release:
+        type: string
+        default: ""
       sha256:
         required: true
         type: string
@@ -27,6 +30,7 @@ jobs:
     env:
       LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
       LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
       EXPECTED_ARCHITECTURE: ${{ inputs.architecture }}
       LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
     steps:
@@ -49,12 +53,17 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-focused-resources.json -- node --test --test-concurrency=1 test/native-application-bundle.test.mjs test/native-program.test.mjs test/node-host.test.mjs test/application-support.test.mjs test/application-paths.test.mjs test/windows-tool-paths.test.mjs test/cli-arguments.test.mjs
       - name: Preserve standard and file IO bytes with native Windows CRT adapters
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --timeout-seconds 180 --report .work/windows-stdio-resources.json -- node --test --test-concurrency=1 test/stdio-bytes.test.mjs
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - if: inputs.cache-key != ''
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
           key: ${{ inputs.cache-key }}
           enableCrossOsArchive: true
-          fail-on-cache-miss: true
+          fail-on-cache-miss: false
+      - name: Fetch and authenticate retained candidate when the cache is absent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
       - name: Prepare native ARM64 compiler for independent reference outputs
         if: inputs.architecture == 'arm64'
         uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2.32.0
@@ -85,7 +94,9 @@ jobs:
           "LASM_NATIVE_ORACLE_CC=$(Join-Path $env:ORACLE_ROOT 'clangarm64/bin/clang.exe')" >> $env:GITHUB_ENV
       - name: Cold install, installed CLI, offline cache and copied deployments
         run: node scripts/ci/run-node-windows.mjs
+      - name: Installed CLI and Lake through private CA and authenticated proxy
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --timeout-seconds 1800 --report .work/node-network-resources.json -- node scripts/ci/check-node-network.mjs
       - name: Preserve native results
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/windows-isolation-controls/result.json','.work/windows-isolation-controls/online.json','.work/windows-isolation-controls/offline.json','.work/windows-isolation-resources.json','.work/windows-focused-resources.json','.work/windows-stdio-resources.json','.work/node-windows-acceptance/result.json','.work/node-windows-resources.json','.work/node-windows-disk.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+          node -e "const f=require('node:fs');for(const p of ['.work/node-network-result.json','.work/node-network-resources.json','.work/windows-isolation-controls/result.json','.work/windows-isolation-controls/online.json','.work/windows-isolation-controls/offline.json','.work/windows-isolation-resources.json','.work/windows-focused-resources.json','.work/windows-stdio-resources.json','.work/node-windows-acceptance/result.json','.work/node-windows-resources.json','.work/node-windows-disk.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

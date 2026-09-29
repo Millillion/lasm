@@ -5,7 +5,7 @@ import { release } from 'node:os';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
-const tests = ['managed-download', 'managed-network', 'managed-artifacts', 'managed-git',
+const tests = ['managed-download', 'managed-network', 'network-git', 'managed-artifacts', 'managed-git',
   'cache-lifecycle', 'installer-bundle', 'sdk-archives', 'sdk-repairs', 'windows-tool-paths',
   'application-lock', 'build-progress', 'cli-arguments', 'node-cache-controls'].map(name => `test/${name}.test.mjs`);
 assert.equal(process.platform + '-' + process.arch, process.env.LASM_EXPECT_PLATFORM ?? process.platform + '-' + process.arch);

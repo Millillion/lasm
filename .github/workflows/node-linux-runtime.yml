@@ -2,7 +2,7 @@ name: Node Linux runtime inputs
 on:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   actions: write
 concurrency:
   group: lasm-cache-writer
@@ -77,6 +77,15 @@ jobs:
         with:
           path: .work/node-runtime-inputs.tgz
           key: ${{ steps.inputs.outputs.cache-key }}
+      - name: Retain durable authenticated runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "node-runtime-inputs-$GITHUB_RUN_ID" \
+            .work/node-runtime-inputs.tgz .work/node-runtime-inputs-result.json \
+            --draft --prerelease --target "$GITHUB_SHA" \
+            --title "Lasm runtime input $GITHUB_RUN_ID" \
+            --notes "Pinned runtime handoff; no package acceptance or npm publication is implied. Preserve the recorded SHA-256 when updating scripts/ci/node-runtime-source.json."
       - name: Record the exact handoff
         run: cat .work/node-runtime-inputs-result.json .work/node-runtime-cache-budget.json
       - name: Preserve bounded build results in logs

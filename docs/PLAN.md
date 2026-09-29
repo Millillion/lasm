@@ -49,12 +49,12 @@ Implement the recommendations in [the dated robustness audit](TOOLCHAIN_ROBUSTNE
 Preserve candidate `.46` and its evidence unchanged. Changes below require a new
 packed candidate before extending the accepted support claim.
 
-- [ ] Make cache verification independent of locale; add bounded retries,
+- [x] Make cache verification independent of locale; add bounded retries,
   connection/idle/overall deadlines, authenticated range resume and useful errors.
-- [ ] Coordinate artifact installs across processes with OS-owned locks; recover
+- [x] Coordinate artifact installs across processes with OS-owned locks; recover
   abandoned staging for downloads, derivations and Windows execution prefixes.
   Preserve successful publication when temporary cleanup fails.
-- [ ] Bundle the locked installer dependency graph and verify offline npm install.
+- [x] Bundle the locked installer dependency graph and verify offline npm install.
 - [ ] Add proxy/CA and storage diagnostics, cancellation, and explicit safe cache
   repair with tests that preserve active installs and unrelated files.
 - [ ] Run deterministic native fault tests automatically on relevant pushes/PRs

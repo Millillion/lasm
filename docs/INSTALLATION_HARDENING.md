@@ -144,6 +144,32 @@ The integrated 116-test installer/CLI run also passed (84.6 MiB peak). Native
 platform acceptance is pending.
 
 The combined automatic suite passed all 127 tests locally under the guard
-(126.2 MiB peak). Native CI results, durable runtime inputs, full CLI/Lake network
-checks, a new six-platform installed candidate and scheduled confidence reporting
-remain gates in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).
+(126.2 MiB peak). The [first native automatic run](https://github.com/Millillion/lasm/actions/runs/36509526628)
+passed: Linux and macOS passed 127 tests per architecture; Windows passed 124 per
+architecture with three POSIX-only symlink tests skipped. Native Windows junction
+and compiler-prefix tests passed. [Machine-readable evidence](evidence/installer-faults-2026-09-29.json)
+preserves job identities and accounting. A further real-Git private-CA/proxy
+fixture passed locally before adding the full installed CLI/Lake control.
+
+## Candidate inputs and release gates
+
+Runtime inputs now come from a pinned retained release asset, with its archive
+and runtime manifest independently verified. The first source reference reuses
+only authenticated runtime/native bytes from `.46`; it does not reuse `.46`'s
+installer code. Future source runtime builds retain their handoffs as draft
+release assets as well as optional caches. The reviewed reference is
+[`node-runtime-source.json`](../scripts/ci/node-runtime-source.json).
+
+Each new candidate is packed once (with a second identical pack check), retained
+as an explicitly unaccepted draft, then fetched by exact hash by all six native
+consumers. Legacy cache inputs remain optional; cache eviction is no longer the
+sole-source failure mode. Draft assets do not consume Actions artifact storage.
+Candidate builds run automatically for relevant product/packaging pushes and can
+also be dispatched manually. All six deterministic fault jobs and native installed
+jobs gate creation of the tested-candidate draft. The native jobs additionally
+exercise the installed CLI -> Lake -> managed Git path against an authenticated
+loopback proxy and private CA. Its loopback fixture runs separately from the
+OS-isolated prerequisite proof; both gates must pass.
+
+The new packed candidate, full CLI/Lake network results, and scheduled multi-day
+confidence reporting remain gates in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).

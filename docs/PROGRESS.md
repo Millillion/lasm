@@ -6,10 +6,11 @@ locked installer dependency graph. All 127 fault controls passed locally under
 the guard (126.2 MiB peak), including real TLS/proxy/private-CA traffic, process
 kills and empty-cache offline npm installation. No resource abort or OOM.
 
-Automatic six-platform fault CI is configured for relevant pushes/PRs; native
-results are pending. Remaining: durable runtime inputs, full CLI/Lake network
-checks, new six-platform installed acceptance and scheduled
-confidence checks. See [implementation details](INSTALLATION_HARDENING.md).
-Completion ETA is not yet estimable until native fault checks run. README was
+The first automatic fault run passed on all six native targets (127 checks on
+POSIX; 124 plus three inapplicable skips on Windows). Durable authenticated
+runtime/candidate handoffs and full CLI/Lake proxy/CA controls are implemented;
+new installed acceptance and scheduled confidence checks remain. See
+[implementation details](INSTALLATION_HARDENING.md).
+ETA depends on native acceptance results and the multi-day gate. README was
 reviewed and distinguishes accepted `.46` from unaccepted source changes.
 Windows 11 x64, broad API parity and other engines remain deferred; npm unpublished.

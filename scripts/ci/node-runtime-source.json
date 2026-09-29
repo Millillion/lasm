@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "kind": "candidate",
+  "repository": "Millillion/lasm",
+  "release": "node-linux-candidate-36439263093",
+  "asset": "lasm-compiler-0.1.0-experimental.46.tgz",
+  "sha256": "c566d2dfa621808d70b7c411ee0821da1017c3d366d0b02f1896bf8d349b70ae",
+  "runtimeName": "lean-4.34.1-wasm64",
+  "runtimeManifestSha256": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+  "lean": "4.34.1",
+  "sourceRevision": "8fe54124c1dfc393f6d0a96aed171e75124dd57a"
+}

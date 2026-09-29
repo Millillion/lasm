@@ -1,20 +1,15 @@
 name: Native Node installed-package acceptance
 on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'bin/**', 'package*.json', 'scripts/package-node-release.mjs', 'scripts/bundle-installer.mjs']
   workflow_dispatch:
     inputs:
       candidate-version:
         description: Unique version for the newly packed candidate
         required: true
         type: string
-        default: 0.1.0-experimental.46
-      runtime-cache-key:
-        description: Exact cache key emitted by Node Linux runtime inputs
-        required: true
-        type: string
-      runtime-sha256:
-        description: SHA-256 of the authenticated runtime handoff
-        required: true
-        type: string
+        default: 0.1.0-experimental.47
       validation-scope:
         description: Target a Windows repair or run the complete acceptance matrix
         type: choice
@@ -22,22 +17,23 @@ on:
         default: all
 permissions:
   contents: read
-  actions: write
 concurrency:
-  group: lasm-cache-writer
+  group: node-installed-acceptance-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  faults:
+    uses: ./.github/workflows/installer-faults.yml
   package:
+    permissions:
+      contents: write
     if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     outputs:
       sha256: ${{ steps.package.outputs.sha256 }}
-      cache-key: lasm-node-linux-candidate-${{ github.run_id }}-${{ steps.package.outputs.sha256 }}
+      candidate-release: node-package-${{ github.run_id }}
     env:
-      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
-      LASM_RUNTIME_ARCHIVE_SHA256: ${{ inputs.runtime-sha256 }}
-      LASM_CACHE_WRITER_GROUP: lasm-cache-writer
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -56,101 +52,99 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/node-unit-resources.json -- node --max-old-space-size=256 --test --test-concurrency=1 test/darwin-resources.test.mjs test/application-output.test.mjs test/application-policy.test.mjs test/application-reachability.test.mjs test/application-symbols.test.mjs test/native-application-bundle.test.mjs test/native-directory.test.mjs test/native-temporary.test.mjs test/application-metadata.test.mjs test/application-support.test.mjs test/application-paths.test.mjs test/windows-tool-paths.test.mjs test/application-launcher.test.mjs test/build-progress.test.mjs test/cli-arguments.test.mjs test/application-files.test.mjs test/application-runtime.test.mjs test/node-cache-controls.test.mjs test/managed-artifacts.test.mjs test/managed-git.test.mjs
       - name: Completed cache advice preserves file contents and excludes deployments
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 256 --report .work/node-cache-advice-resources.json -- python3 -I -B test/tool-cache-advice.test.py
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .work/node-runtime-inputs.tgz
-          key: ${{ inputs.runtime-cache-key }}
-          fail-on-cache-miss: true
-      - name: Restore and verify runtime inputs
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-restore-resources.json -- node scripts/ci/node-linux-candidate.mjs "$LASM_RUNTIME_ARCHIVE_SHA256"
+      - name: Restore authenticated runtime from its durable retained input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-restore-resources.json -- node scripts/ci/restore-node-runtime.mjs
       - name: Pack twice reproducibly
         id: package
         run: |
           node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
           node -e "const f=require('node:fs'),r=JSON.parse(f.readFileSync('.work/node-candidate/result.json'));f.appendFileSync(process.env.GITHUB_OUTPUT,'sha256='+r.sha256+'\n')"
-      - name: Check the included storage budget
-        id: budget
+      - name: Retain exact unaccepted candidate for cache-independent validation
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/ci/cache-budget.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" .work/node-candidate-budget.json
-      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: steps.budget.outputs.allowed == 'true'
-        with:
-          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
-          key: lasm-node-linux-candidate-${{ github.run_id }}-${{ steps.package.outputs.sha256 }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "node-package-$GITHUB_RUN_ID" \
+            ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" \
+            .work/node-candidate/result.json \
+            --draft --prerelease --target "$GITHUB_SHA" \
+            --title "Unaccepted Lasm package $LASM_CANDIDATE_VERSION" \
+            --notes "Immutable package input for this validation attempt. This draft does not imply acceptance or npm publication. CI: https://github.com/Millillion/lasm/actions/runs/$GITHUB_RUN_ID"
       - name: Preserve candidate identity and packing measurements
         if: always()
-        run: node -e "const f=require('node:fs');for(const p of ['.work/node-candidate/result.json','.work/node-candidate-budget.json','.work/node-restore-resources.json','.work/node-package-resources.json','.work/node-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+        run: node -e "const f=require('node:fs');for(const p of ['.work/node-candidate/result.json','.work/node-runtime-restore-result.json','.work/node-restore-resources.json','.work/node-package-resources.json','.work/node-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
   linux-x64:
-    if: inputs.validation-scope == 'all'
-    needs: package
+    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    needs: [package, faults]
     uses: ./.github/workflows/node-linux-consumer.yml
     with:
       runner: ubuntu-24.04
       architecture: x64
       sha256: ${{ needs.package.outputs.sha256 }}
-      cache-key: ${{ needs.package.outputs.cache-key }}
-      candidate-version: ${{ inputs.candidate-version }}
+      candidate-release: ${{ needs.package.outputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   linux-arm64:
-    if: inputs.validation-scope == 'all'
-    needs: [package, linux-x64]
+    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    needs: [package, faults, linux-x64]
     uses: ./.github/workflows/node-linux-consumer.yml
     with:
       runner: ubuntu-24.04-arm
       architecture: arm64
       sha256: ${{ needs.package.outputs.sha256 }}
-      cache-key: ${{ needs.package.outputs.cache-key }}
-      candidate-version: ${{ inputs.candidate-version }}
+      candidate-release: ${{ needs.package.outputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   darwin-x64:
-    if: inputs.validation-scope == 'all'
-    needs: package
+    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    needs: [package, faults]
     uses: ./.github/workflows/node-darwin-consumer.yml
     with:
       runner: macos-15-intel
       architecture: x64
       sha256: ${{ needs.package.outputs.sha256 }}
-      cache-key: ${{ needs.package.outputs.cache-key }}
-      candidate-version: ${{ inputs.candidate-version }}
+      candidate-release: ${{ needs.package.outputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   darwin-arm64:
-    if: inputs.validation-scope == 'all'
-    needs: package
+    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    needs: [package, faults]
     uses: ./.github/workflows/node-darwin-consumer.yml
     with:
       runner: macos-15
       architecture: arm64
       sha256: ${{ needs.package.outputs.sha256 }}
-      cache-key: ${{ needs.package.outputs.cache-key }}
-      candidate-version: ${{ inputs.candidate-version }}
+      candidate-release: ${{ needs.package.outputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   windows-x64:
-    if: inputs.validation-scope == 'all' || inputs.validation-scope == 'windows-x64'
-    needs: package
+    if: github.event_name == 'push' || inputs.validation-scope == 'all' || inputs.validation-scope == 'windows-x64'
+    needs: [package, faults]
     uses: ./.github/workflows/node-windows-consumer.yml
     with:
       runner: windows-2025
       architecture: x64
       sha256: ${{ needs.package.outputs.sha256 }}
-      cache-key: ${{ needs.package.outputs.cache-key }}
-      candidate-version: ${{ inputs.candidate-version }}
+      candidate-release: ${{ needs.package.outputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   windows-arm64:
-    if: inputs.validation-scope == 'all' || inputs.validation-scope == 'windows-arm64'
-    needs: package
+    if: github.event_name == 'push' || inputs.validation-scope == 'all' || inputs.validation-scope == 'windows-arm64'
+    needs: [package, faults]
     uses: ./.github/workflows/node-windows-consumer.yml
     with:
       runner: windows-11-arm
       architecture: arm64
       sha256: ${{ needs.package.outputs.sha256 }}
-      cache-key: ${{ needs.package.outputs.cache-key }}
-      candidate-version: ${{ inputs.candidate-version }}
+      candidate-release: ${{ needs.package.outputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   candidate:
-    if: inputs.validation-scope == 'all'
-    needs: [package, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, windows-arm64]
+    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    needs: [package, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, windows-arm64]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: write
     env:
-      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
       LASM_CANDIDATE_SHA256: ${{ needs.package.outputs.sha256 }}
+      LASM_CANDIDATE_RELEASE: ${{ needs.package.outputs.candidate-release }}
       LASM_ACCEPTANCE_PLATFORMS: linux-x64,linux-arm64,darwin-x64,darwin-arm64,win32-x64,win32-arm64
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -158,11 +152,10 @@ jobs:
         with:
           node-version: 26.10.0
           package-manager-cache: false
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
-          key: ${{ needs.package.outputs.cache-key }}
-          fail-on-cache-miss: true
+      - name: Restore authenticated retained package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
       - name: Verify the tested archive and prepare its receipt
         run: node scripts/ci/node-candidate-receipt.mjs
       # Draft release assets have no Actions artifact-storage charge. Keep this

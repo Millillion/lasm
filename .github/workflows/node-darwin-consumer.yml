@@ -9,8 +9,11 @@ on:
         required: true
         type: string
       cache-key:
-        required: true
         type: string
+        default: ""
+      candidate-release:
+        type: string
+        default: ""
       sha256:
         required: true
         type: string
@@ -28,6 +31,7 @@ jobs:
       LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
       EXPECTED_ARCHITECTURE: ${{ inputs.architecture }}
       LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -43,15 +47,22 @@ jobs:
           node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-isolation-resources.json -- node scripts/ci/check-darwin-isolation.mjs
           node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-directory-resources.json -- node --test test/native-directory.test.mjs
           node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-temporary-resources.json -- node --test test/native-temporary.test.mjs
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - if: inputs.cache-key != ''
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
           key: ${{ inputs.cache-key }}
           enableCrossOsArchive: true
-          fail-on-cache-miss: true
+          fail-on-cache-miss: false
+      - name: Fetch and authenticate retained candidate when the cache is absent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
       - name: Cold npm install, real npx commands, offline reuse and independent deployment
         run: node scripts/ci/run-node-darwin.mjs
+      - name: Installed CLI and Lake through private CA and authenticated proxy
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --report .work/node-network-resources.json -- node scripts/ci/check-node-network.mjs
       - name: Preserve acceptance evidence
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/darwin-guard-normal.json','.work/darwin-guard-cleanup.json','.work/darwin-guard-below-cap-stop.json','.work/darwin-isolation-resources.json','.work/darwin-directory-resources.json','.work/darwin-temporary-resources.json','.work/darwin-isolation-control.json','.work/node-darwin-acceptance/result.json','.work/node-darwin-resources.json','.work/node-darwin-disk.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+          node -e "const f=require('node:fs');for(const p of ['.work/node-network-result.json','.work/node-network-resources.json','.work/darwin-guard-normal.json','.work/darwin-guard-cleanup.json','.work/darwin-guard-below-cap-stop.json','.work/darwin-isolation-resources.json','.work/darwin-directory-resources.json','.work/darwin-temporary-resources.json','.work/darwin-isolation-control.json','.work/node-darwin-acceptance/result.json','.work/node-darwin-resources.json','.work/node-darwin-disk.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
