@@ -313,8 +313,14 @@ paused, or more than three recoveries fails closed; a paused unsafe workload is
 killed instead of resumed. The original five-second command deadlines and memory
 limits stay unchanged. Reports retain every recovery. Real process-group controls
 verify that work cannot advance during accounting recovery and is killed after
-a persistent failure. Local guarded controls passed; native regression and fresh
-installed repetitions will validate this correction. The still-queued run
+a persistent failure. The [152-control native matrix](evidence/installer-faults-accounting-recovery-2026-09-29.json)
+passed on all six targets: POSIX passed 149 with three inapplicable skips; Windows
+passed 147 with five skips, plus its three separate atomic-report controls.
+The native Mac pause/resume/termination controls passed on both architectures.
+The largest matrix peak was 337.6 MiB, with no resource stop. A
+[fresh full installed repetition](https://github.com/Millillion/lasm/actions/runs/36520825246)
+is running against the unchanged archive with the corrected maintainer controls.
+The still-queued run
 `36519931807` was canceled before starting to replace its superseded controls;
 that cancellation remains visible in confidence history.
 The report job completed successfully and retained its

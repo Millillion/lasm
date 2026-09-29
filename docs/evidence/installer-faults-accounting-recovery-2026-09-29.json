@@ -1,0 +1,127 @@
+{
+  "scope": "Current maintainer controls on all six native targets, including paused Mac accounting recovery; full cold repetitions remain separate",
+  "runId": "36520775620",
+  "url": "https://github.com/Millillion/lasm/actions/runs/36520775620",
+  "revision": "4fa352c0ee55eae0a54f5cfc9a30f8d4521bccf8",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "platform": "linux-arm64",
+      "jobId": "109252913270",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36520775620/job/109252913270",
+      "tests": 152,
+      "passed": 149,
+      "skipped": 3,
+      "node": "26.10.0",
+      "os": "6.17.0-1022-azure",
+      "startedAt": "2026-09-29T04:15:12.631Z",
+      "finishedAt": "2026-09-29T04:15:28.220Z",
+      "peakBytes": 132923392,
+      "resourceStop": false,
+      "pausedAccountingProcessControls": {
+        "tests": 2,
+        "passed": 2,
+        "resumesOnlyAfterFreshAccounting": true,
+        "persistentFailureKillsWithoutResume": true
+      }
+    },
+    {
+      "platform": "win32-x64",
+      "jobId": "109252913348",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36520775620/job/109252913348",
+      "tests": 152,
+      "passed": 147,
+      "skipped": 5,
+      "node": "26.10.0",
+      "os": "10.0.26100",
+      "startedAt": "2026-09-29T04:16:01.117Z",
+      "finishedAt": "2026-09-29T04:16:36.136Z",
+      "peakBytes": 300232704,
+      "resourceStop": false,
+      "additionalWindowsReportControls": {
+        "tests": 3,
+        "passed": 3,
+        "realDenyDeleteHandle": true
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "jobId": "109252913351",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36520775620/job/109252913351",
+      "tests": 152,
+      "passed": 147,
+      "skipped": 5,
+      "node": "26.10.0",
+      "os": "10.0.26200",
+      "startedAt": "2026-09-29T04:17:05.108Z",
+      "finishedAt": "2026-09-29T04:17:45.224Z",
+      "peakBytes": 314130432,
+      "resourceStop": false,
+      "additionalWindowsReportControls": {
+        "tests": 3,
+        "passed": 3,
+        "realDenyDeleteHandle": true
+      }
+    },
+    {
+      "platform": "darwin-x64",
+      "jobId": "109252913422",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36520775620/job/109252913422",
+      "tests": 152,
+      "passed": 149,
+      "skipped": 3,
+      "node": "26.10.0",
+      "os": "24.6.0",
+      "startedAt": "2026-09-29T04:15:34.875Z",
+      "finishedAt": "2026-09-29T04:16:03.769Z",
+      "peakBytes": 302125056,
+      "resourceStop": false,
+      "pausedAccountingProcessControls": {
+        "tests": 2,
+        "passed": 2,
+        "resumesOnlyAfterFreshAccounting": true,
+        "persistentFailureKillsWithoutResume": true
+      }
+    },
+    {
+      "platform": "darwin-arm64",
+      "jobId": "109252913432",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36520775620/job/109252913432",
+      "tests": 152,
+      "passed": 149,
+      "skipped": 3,
+      "node": "26.10.0",
+      "os": "24.6.0",
+      "startedAt": "2026-09-29T04:15:51.018Z",
+      "finishedAt": "2026-09-29T04:16:09.880Z",
+      "peakBytes": 353910784,
+      "resourceStop": false,
+      "pausedAccountingProcessControls": {
+        "tests": 2,
+        "passed": 2,
+        "resumesOnlyAfterFreshAccounting": true,
+        "persistentFailureKillsWithoutResume": true
+      }
+    },
+    {
+      "platform": "linux-x64",
+      "jobId": "109252913436",
+      "url": "https://github.com/Millillion/lasm/actions/runs/36520775620/job/109252913436",
+      "tests": 152,
+      "passed": 149,
+      "skipped": 3,
+      "node": "26.10.0",
+      "os": "6.17.0-1022-azure",
+      "startedAt": "2026-09-29T04:15:08.363Z",
+      "finishedAt": "2026-09-29T04:15:23.908Z",
+      "peakBytes": 141271040,
+      "resourceStop": false,
+      "pausedAccountingProcessControls": {
+        "tests": 2,
+        "passed": 2,
+        "resumesOnlyAfterFreshAccounting": true,
+        "persistentFailureKillsWithoutResume": true
+      }
+    }
+  ]
+}
