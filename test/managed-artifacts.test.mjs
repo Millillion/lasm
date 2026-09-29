@@ -73,6 +73,21 @@ test('download progress uses actual bytes, reports extraction and verification, 
   assert.equal(f.requests(), 1);
 });
 
+test('old receipts remain valid regardless of filename or property ordering', async t => {
+  const f = await fixture(t);
+  const bytes = archive(['a', 'z', 'ä'].map(name => ({ path: 'tool/' + name, body: name })));
+  const options = { ...f.options, fetch: async () => new Response(bytes) };
+  const installed = await provisionArtifact(description(bytes), options);
+  const path = join(installed.directory, '.lasm-artifact.json');
+  const receipt = JSON.parse(await readFile(path, 'utf8'));
+  receipt.files = Object.fromEntries(Object.entries(receipt.files).reverse().map(([name, value]) =>
+    [name, Object.fromEntries(Object.entries(value).reverse())]));
+  await writeFile(path, JSON.stringify(receipt));
+  assert.equal((await provisionArtifact(description(bytes), options)).cacheHit, true);
+  await writeFile(join(installed.directory, 'ä'), 'different');
+  await assert.rejects(provisionArtifact(description(bytes), options), /Changed entries \(1\): "ä"/);
+});
+
 test('a failed checksum cannot report a verified download or begin extraction', async t => {
   const f = await fixture(t), events = [];
   await assert.rejects(provisionArtifact({ ...f.artifact, sha256: '0'.repeat(64) },
@@ -148,7 +163,7 @@ for (const mode of ['digest', 'truncated', 'oversized', 'http-error', 'interrupt
 test('unreachable download diagnostics identify the tool, host and recovery action', async t => {
   const f = await fixture(t);
   await assert.rejects(provisionArtifact(f.artifact, { ...f.options, fetch: async () => { throw new TypeError('fetch failed'); } }),
-    /Could not download tool-1\.tar\.zst from example\.invalid\. Check your network connection and retry/);
+    /Could not download tool-1\.tar\.zst from example\.invalid:.*Check network access and retry/);
   assert.deepEqual(await readdir(join(f.cache, 'artifacts')), []);
   assert.equal((await provisionArtifact(f.artifact, f.options)).cacheHit, false);
 });
@@ -282,7 +297,7 @@ test('required Lean source/notices companions fail closed and remain verified on
     commit: 'f'.repeat(40), artifacts: { [host]: compiler }, notices: { [host]: notice },
   } } };
   let corrupt = true;
-  const options = { ...f.options, catalog, fetch: async url => {
+  const options = { ...f.options, catalog, download: { sleep: async () => {} }, fetch: async url => {
     requests.push(url);
     if (url === notice.url) return new Response(corrupt ? f.bytes.subarray(0, -1) : f.bytes);
     assert.equal(url, compiler.url);
@@ -293,12 +308,12 @@ test('required Lean source/notices companions fail closed and remain verified on
   assert.deepEqual(await readdir(join(f.cache, 'artifacts')), []);
   corrupt = false; requests.length = 0;
   await assert.rejects(provisionLean(f.base, options), /HTTP 503/);
-  assert.deepEqual(requests, [notice.url, compiler.url]);
+  assert.deepEqual(requests, [notice.url, ...Array(4).fill(compiler.url)]);
   const [identity] = await readdir(join(f.cache, 'artifacts'));
   assert.equal(await readFile(join(f.cache, 'artifacts', identity, 'LICENSE'), 'utf8'), 'Fixture redistribution notice');
   requests.length = 0;
   await assert.rejects(provisionLean(f.base, options), /HTTP 503/);
-  assert.deepEqual(requests, [compiler.url], 'A verified companion is reused after an interrupted compiler download');
+  assert.deepEqual(requests, Array(4).fill(compiler.url), 'A verified companion is reused after an interrupted compiler download');
   await writeFile(join(f.cache, 'artifacts', identity, 'LICENSE'), 'changed notice');
   requests.length = 0;
   await assert.rejects(provisionLean(f.base, options), /cache contents changed/);

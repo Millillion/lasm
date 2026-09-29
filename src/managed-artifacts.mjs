@@ -1,14 +1,15 @@
-import { createReadStream, createWriteStream } from 'node:fs';
+import { createReadStream } from 'node:fs';
 import { mkdir, mkdtemp, readFile, readdir, readlink, lstat, realpath, rename, rm, writeFile, symlink, link } from 'node:fs/promises';
 import { dirname, join, resolve, relative, isAbsolute, posix } from 'node:path';
 import { homedir } from 'node:os';
 import { createHash } from 'node:crypto';
-import { Readable, Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress, createGunzip } from 'node:zlib';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { x as extractTar } from 'tar';
+import { isDeepStrictEqual } from 'node:util';
+import { downloadArtifact } from './managed-download.mjs';
 
 const digest = value => createHash('sha256').update(value).digest('hex');
 const pending = new Map();
@@ -42,29 +43,6 @@ export function validateArtifact(artifact) {
   const url = new URL(artifact.url);
   if (url.protocol !== 'https:' || url.username || url.password) throw new Error('Managed artifacts require an HTTPS URL without credentials');
   return digest(JSON.stringify(artifact));
-}
-
-async function download(artifact, destination, fetch_, update) {
-  let response;
-  try { response = await fetch_(artifact.url, { signal: AbortSignal.timeout(15 * 60_000) }); }
-  catch (cause) {
-    throw new Error(`Could not download ${artifact.name} from ${new URL(artifact.url).hostname}. Check your network connection and retry. ${cause.message}`, { cause });
-  }
-  if (!response.ok || !response.body)
-    throw new Error(`Download failed for ${artifact.name}: HTTP ${response.status} from ${new URL(artifact.url).hostname}. Check your connection or retry when the download is available.`);
-  if (response.url && new URL(response.url).protocol !== 'https:') throw new Error('Artifact download redirected away from HTTPS');
-  const hash = createHash('sha256');
-  let bytes = 0, lastUpdate = 0;
-  const check = new Transform({ transform(chunk, encoding, callback) {
-    bytes += chunk.length;
-    if (bytes > artifact.bytes) return callback(new Error(`Download size mismatch: ${artifact.name}`));
-    hash.update(chunk);
-    if (Date.now() - lastUpdate >= 250) { update?.(bytes); lastUpdate = Date.now(); }
-    callback(null, chunk);
-  } });
-  await pipeline(Readable.fromWeb(response.body), check, createWriteStream(destination, { flags: 'wx', mode: 0o600 }));
-  if (bytes !== artifact.bytes || hash.digest('hex') !== artifact.sha256) throw new Error(`Download checksum or size mismatch: ${artifact.name}`);
-  update?.(bytes, true);
 }
 
 function cleanArchivePath(name) {
@@ -164,7 +142,7 @@ async function inventory(directory) {
   directory = await realpath(directory);
   const files = {};
   async function walk(base) {
-    for (const entry of (await readdir(base, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
+    for (const entry of (await readdir(base, { withFileTypes: true })).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) {
       const file = join(base, entry.name), name = relative(directory, file).split(process.platform === 'win32' ? '\\' : '/').join('/');
       if (name === receiptName) continue;
       if (entry.isDirectory()) { files[name] = { type: 'directory' }; await walk(file); }
@@ -191,9 +169,9 @@ async function verify(directory, identity) {
   if (receipt.schema !== 1 || receipt.identity !== identity || !receipt.files || !Object.keys(receipt.files).length)
     throw new Error('Managed artifact receipt does not match the requested toolchain');
   const observed = await inventory(directory);
-  if (JSON.stringify(observed) !== JSON.stringify(receipt.files)) {
+  if (!isDeepStrictEqual(observed, receipt.files)) {
     const changed = [...new Set([...Object.keys(receipt.files), ...Object.keys(observed)])]
-      .filter(name => JSON.stringify(observed[name]) !== JSON.stringify(receipt.files[name]));
+      .filter(name => !isDeepStrictEqual(observed[name], receipt.files[name]));
     throw new Error(`Managed cache contents changed: ${directory}. Changed entries (${changed.length}): ` +
       changed.slice(0, 10).map(name => JSON.stringify(name)).join(', ') +
       (changed.length > 10 ? ', ...' : '') + '. Remove this toolchain directory to download a verified replacement.');
@@ -206,7 +184,7 @@ async function verify(directory, identity) {
  * No cache lock can be left behind by an interrupted process.
  */
 export async function provisionArtifact(artifact, { cache = managedCacheDirectory(), fetch: fetch_ = fetch, log = console.error, python,
-  progress, label = artifact.name } = {}) {
+  progress, label = artifact.name, signal, download = {} } = {}) {
   const identity = validateArtifact(artifact);
   if (['tar.xz', 'zip'].includes(artifact.format) && (!python || !isAbsolute(python)))
     throw new Error('SDK archives require the absolute path to a managed Python executable');
@@ -236,7 +214,14 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
       });
       if (!progress) log(`Downloading verified ${artifact.name}…`);
       downloadProgress();
-      await download(artifact, archive, fetch_, downloadProgress);
+      await downloadArtifact(artifact, archive, { ...download, fetch: fetch_, update: downloadProgress, signal,
+        event: event => {
+          download.event?.(event);
+          if (event.type === 'retry') {
+            const message = `Retrying ${label} in ${Math.ceil(event.waitMs / 1000)}s (attempt ${event.attempt + 1}): ${event.detail}`;
+            if (progress) progress({ stage: message }); else log(message);
+          }
+        } });
       progress?.({ stage: `Extracting ${label}` });
       await mkdir(tree);
       await extract(artifact, archive, tree, python);

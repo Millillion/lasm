@@ -11,7 +11,7 @@ try {
   // Error cloning alone drops subprocess diagnostics. Preserve the fields used
   // by the CLI so Lean still reports its original filename and line number.
   parentPort.postMessage({ type: 'failure', error: {
-    name: error.name, message: error.message, stack: error.stack,
+    name: error.name, message: error.message, stack: error.stack, code: error.code,
     stderr: error.stderr?.toString(), stdout: error.stdout?.toString(),
   } });
   process.exitCode = 1;

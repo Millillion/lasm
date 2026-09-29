@@ -42,6 +42,31 @@ work remains deferred.
    [Windows toolchains](WINDOWS_TOOLCHAINS.md).
 
 All three ordered items above are complete for the scoped installed workflow.
+
+## Installation hardening, authorized 2026-09-28
+
+Implement the recommendations in [the dated robustness audit](TOOLCHAIN_ROBUSTNESS.md).
+Preserve candidate `.46` and its evidence unchanged. Changes below require a new
+packed candidate before extending the accepted support claim.
+
+- [ ] Make cache verification independent of locale; add bounded retries,
+  connection/idle/overall deadlines, authenticated range resume and useful errors.
+- [ ] Coordinate artifact installs across processes with OS-owned locks; recover
+  abandoned staging for downloads, derivations and Windows execution prefixes.
+  Preserve successful publication when temporary cleanup fails.
+- [ ] Bundle the locked installer dependency graph and verify offline npm install.
+- [ ] Add proxy/CA and storage diagnostics, cancellation, and explicit safe cache
+  repair with tests that preserve active installs and unrelated files.
+- [ ] Run deterministic native fault tests automatically on relevant pushes/PRs
+  across all six targets. Replace cache-only runtime handoff with a durable,
+  authenticated input and validate a new single packed candidate on all six.
+- [ ] Schedule live distribution checks; retain all attempts and bounded evidence.
+  Track three cold repetitions per target over at least two days as an additional
+  release-confidence gate, without claiming a statistical reliability guarantee.
+
+Continue direct commits to `main`; automatic checks observe those commits.
+Do not add a mandatory PR workflow or publish to npm. Windows 11 x64 and broader
+language/API acceptance remain deferred.
 Every implementation commit must review README.md for simplicity and current
 accuracy: complete quick start, every CLI command/option with examples, exact
 environment support, and exact unavailable Lean capabilities. Historical candidate
