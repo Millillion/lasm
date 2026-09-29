@@ -13,4 +13,5 @@ single green retries after failure. Daily reporting stays inactive until initial
 acceptance, then requires three consecutive cold passes per target across at
 least 24 hours and two dates. Those observations remain pending. ETA depends on
 native results; the temporal gate cannot be completed today. README reviewed;
-npm unpublished. No local heavy build or OOM occurred.
+npm unpublished. Interrupted draft uploads now recover without replacing valid
+assets or evidence; controls and read-only reuse passed. No OOM.

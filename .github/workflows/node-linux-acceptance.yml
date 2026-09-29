@@ -67,13 +67,7 @@ jobs:
       - name: Retain exact unaccepted candidate for cache-independent validation
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "node-package-$GITHUB_RUN_ID" \
-            ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" \
-            .work/node-candidate/result.json \
-            --draft --prerelease --target "$GITHUB_SHA" \
-            --title "Unaccepted Lasm package $LASM_CANDIDATE_VERSION" \
-            --notes "Immutable package input for this validation attempt. This draft does not imply acceptance or npm publication. CI: https://github.com/Millillion/lasm/actions/runs/$GITHUB_RUN_ID"
+        run: node scripts/ci/retain-node-candidate.mjs input
       - name: Preserve candidate identity and packing measurements
         if: always()
         run: node -e "const f=require('node:fs');for(const p of ['.work/node-candidate/result.json','.work/node-runtime-restore-result.json','.work/node-restore-resources.json','.work/node-package-resources.json','.work/node-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
@@ -182,10 +176,4 @@ jobs:
       - name: Retain the tested candidate in an unpublished draft
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "node-linux-candidate-$GITHUB_RUN_ID" \
-            ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" \
-            .work/node-candidate/SHA256SUMS.txt \
-            --draft --prerelease --target main \
-            --title "Lasm Node candidate $LASM_CANDIDATE_VERSION" \
-            --notes-file .work/node-candidate/notes.md
+        run: node scripts/ci/retain-node-candidate.mjs tested

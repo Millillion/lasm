@@ -184,6 +184,12 @@ jobs gate creation of the tested-candidate draft. The native jobs additionally
 exercise the installed CLI -> Lake -> managed Git path against an authenticated
 loopback proxy and private CA. Its loopback fixture runs separately from the
 OS-isolated prerequisite proof; both gates must pass.
+Draft retention is idempotent: an interrupted upload can add only missing
+assets after checking all existing identities. Published releases, conflicting
+checksums and different source revisions are rejected. Original packing
+measurements are retained even when a retry records a different timestamp.
+Two regression controls cover partial upload recovery and conflict rejection;
+a read-only probe verified reuse of the actual retained candidate without writes.
 
 The new packed candidate, full CLI/Lake network results, and observed multi-day
 confidence remain gates in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).
