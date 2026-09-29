@@ -244,15 +244,22 @@ are retained. The corresponding reproducible candidate is
 `ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b`,
 from `e4bb15165042a439b9cabdcd1678fafdc2e99f35`. Its
 [full installed campaign](https://github.com/Millillion/lasm/actions/runs/36513318119)
-is separate and still running; packing and fault passes do not establish its
-installed acceptance.
+is separate. Linux x86-64 passed the full installed/deployment suite, then its
+additional network control reached the unchanged proactive memory stop. The
+[resource evidence](evidence/installer-network-resource-abort-2026-09-29.json)
+records about 4.86 GiB of file pages versus 189 MiB of anonymous memory, zero OOM
+events and no pressure throttling. The network control now uses the primary
+consumer's scoped completed-cache advice sidecar; limits and package bytes stay
+unchanged. This attempt remains a resource abort, not an installed/network pass.
 
 ### Repeated cold installations
 
 [`installation-confidence.yml`](../.github/workflows/installation-confidence.yml)
 runs daily at 03:17 UTC and supports manual dispatch. Its reviewed selection
 [`node-robustness-candidate.json`](../scripts/ci/node-robustness-candidate.json)
-is inactive until a complete initial campaign passes. All native repetitions
+selects the unchanged archive for initial and repeated validation. Activation is
+not acceptance: the corrected controls must first complete all six targets, and
+the multi-day gate remains separate. All native repetitions
 start from fresh VMs and empty consumer tool/npm caches and use one exact archive.
 The source controls also rerun; each report records their revision separately.
 

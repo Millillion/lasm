@@ -6,7 +6,7 @@ import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Worker } from 'node:worker_threads';
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
 import { createInstallerCertificate } from '../../test/fixtures/create-installer-certificate.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
@@ -26,6 +26,17 @@ const result = { schema: 1, platform: process.platform + '-' + process.arch, arc
   steps: [], requests: [], passed: false };
 const save = () => writeFile(reportPath, JSON.stringify(result, null, 2) + '\n');
 await save();
+// As in the primary Linux consumer, verification can charge several GiB of
+// reclaimable file pages to the cgroup. Advise only completed owned caches;
+// preserve the existing proactive memory cap and record the sidecar separately.
+const adviceReport = resolve('.work/node-network-advice.json'), adviceStop = join(output, 'stop-cache-advice');
+const advisor = process.platform === 'linux' ? spawn('/usr/bin/python3', ['-I', '-B', 'scripts/full-lean/advise-tool-cache.py',
+  tools, adviceReport, adviceStop, project], { stdio: 'inherit' }) : undefined;
+const advisorExit = advisor ? new Promise(resolve => {
+  advisor.once('error', error => resolve({ error: error.message }));
+  advisor.once('exit', (code, signal) => resolve({ code, signal }));
+}) : undefined;
+try {
 const env = { ...process.env, LASM_TOOLCHAIN_CACHE: tools, LEAN_NUM_THREADS: '1', EMCC_CORES: '1', BINARYEN_CORES: '1' };
 for (const name of Object.keys(env)) if (/proxy|NODE_EXTRA_CA_CERTS|NODE_TLS_REJECT_UNAUTHORIZED|GIT_SSL|GIT_CONFIG/i.test(name)) delete env[name];
 await writeFile(join(output, 'empty-git-config'), '');
@@ -78,6 +89,16 @@ try {
   result.git = { identity: git.identity, version: git.version, executable: git.executable };
   result.passed = true;
 } finally { await worker.terminate(); result.finishedAt = new Date().toISOString(); await save(); console.log(JSON.stringify(result, null, 2)); }
-// Linux previously reclaimed the workspace before this additional control.
+} finally {
+  if (advisor) {
+    await writeFile(adviceStop, 'stop\n');
+    result.toolCacheAdvisorExit = await advisorExit;
+    if (result.toolCacheAdvisorExit.code !== 0) result.passed = false;
+    result.toolCacheAdvice = JSON.parse(await readFile(adviceReport, 'utf8'));
+    await save();
+    assert.deepEqual(result.toolCacheAdvisorExit, { code: 0, signal: null });
+  }
+}
+// Stop the cache advisor before removing trees it can still be walking.
 // Preserve failures for diagnosis; successful ephemeral-runner caches are waste.
 if (result.passed && process.platform === 'linux') await rm(acceptance.workspace, { recursive: true, force: true });

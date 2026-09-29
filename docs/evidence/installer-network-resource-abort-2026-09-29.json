@@ -1,0 +1,191 @@
+{
+  "runId": "36513318119",
+  "jobId": "109231086727",
+  "url": "https://github.com/Millillion/lasm/actions/runs/36513318119/job/109231086727",
+  "platform": "linux-x64",
+  "archiveSha256": "ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b",
+  "packageSourceRevision": "e4bb15165042a439b9cabdcd1678fafdc2e99f35",
+  "installedAcceptancePassed": true,
+  "networkPassed": false,
+  "classification": "CI resource abort during full CLI network control, not an OOM or a completed conformance result",
+  "resourceReport": {
+    "startedAt": "2026-09-29T03:02:07.004Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "node",
+      "scripts/ci/check-node-network.mjs"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "6013bbe8-e637-473e-bfec-22c1f1d1cd4a",
+    "limits": {
+      "memoryMax": 6740246528,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 5392197222,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 16766410752,
+      "available": 15330717696
+    },
+    "minimumHostAvailable": 15284072448,
+    "peakMemoryBytes": 5441916928,
+    "peakTasks": 36,
+    "report": "/home/runner/work/lasm/lasm/.work/node-network-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-29T03:02:46.277Z",
+      "memoryBytes": 5438509056,
+      "peakMemoryBytes": 5438509056,
+      "swapBytes": 0,
+      "tasks": 24,
+      "memoryBreakdown": {
+        "anon": 198180864,
+        "file": 5213413376,
+        "kernel": 26411008,
+        "shmem": 0,
+        "file_mapped": 229376,
+        "inactive_file": 5213167616,
+        "slab": 21355472
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "highWaterProcesses": {
+      "at": "2026-09-29T03:02:37.059Z",
+      "processes": [
+        {
+          "pid": 8215,
+          "name": "node-MainThread",
+          "residentBytes": 204242944,
+          "threads": 12
+        },
+        {
+          "pid": 8160,
+          "name": "node-MainThread",
+          "residentBytes": 106934272,
+          "threads": 12
+        }
+      ]
+    },
+    "stoppedBecause": "Workload reached its proactive memory budget",
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "killed",
+      "exitStatus": "TERM",
+      "capturedAt": "2026-09-29T03:02:46.348Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 5253021696,
+      "peakMemoryBytes": 5441916928,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13705216,
+        "file": 5216739328,
+        "kernel": 21848064,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 5216501760,
+        "slab": 20935120
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-29T03:02:46.372Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": true,
+    "memoryThrottled": false
+  },
+  "network": {
+    "schema": 1,
+    "platform": "linux-x64",
+    "archiveSha256": "ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b",
+    "packageVersion": "0.1.0-experimental.36513318119",
+    "startedAt": "2026-09-29T03:02:07.093Z",
+    "scope": "Installed CLI/Lake/managed-Git private CA and authenticated proxy control; prerequisite isolation is tested separately",
+    "steps": [
+      {
+        "label": "fixture git init",
+        "seconds": 0.006167958999999996,
+        "code": 0,
+        "stdout": "Initialized empty Git repository in /home/runner/work/lasm/lasm/.work/node-network/source/.git/\n",
+        "stderr": ""
+      },
+      {
+        "label": "fixture git add",
+        "seconds": 0.0034537480000000186,
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "fixture unsigned commit",
+        "seconds": 0.006263770000000023,
+        "code": 0,
+        "stdout": "[main (root-commit) aa84ccc] Private dependency fixture\n 3 files changed, 6 insertions(+)\n create mode 100644 PrivateLibrary.lean\n create mode 100644 lakefile.toml\n create mode 100644 lean-toolchain\n",
+        "stderr": ""
+      },
+      {
+        "label": "fixture revision",
+        "seconds": 0.002528476000000012,
+        "code": 0,
+        "stdout": "aa84ccc5d06782f6ae1cc0fb6c8772c8c34682b7\n",
+        "stderr": ""
+      },
+      {
+        "label": "fixture bare repository",
+        "seconds": 0.00814009699999997,
+        "code": 0,
+        "stdout": "",
+        "stderr": "Cloning into bare repository '/home/runner/work/lasm/lasm/.work/node-network/bare'...\ndone.\n"
+      },
+      {
+        "label": "fixture HTTP info",
+        "seconds": 0.002858840999999984,
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "CLI rejects unknown private Git CA",
+        "seconds": 15.232321197,
+        "code": 1,
+        "signal": null,
+        "stdout": "",
+        "stderr": "[lasm] Preparing Main.lean \u2014 0s elapsed\n[lasm] Checking Lean 4.34.1 runtime \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 0s elapsed\n[lasm] Verifying cached Lean 4.34.1 and Lake \u2014 9s elapsed\n[lasm] Verifying cached Git 2.53.0 \u2014 0s elapsed\n[lasm] Checking Lean sources and Lake dependencies \u2014 0s elapsed\ninfo: network_app: no previous manifest, creating one from scratch\ninfo: network_fixture: cloning https://localhost:40555/repo.git\ninfo: stderr:\nCloning into '/home/runner/work/lasm/lasm/.work/node-network/project/.lake/packages/network_fixture'...\nfatal: unable to access 'https://localhost:40555/repo.git/': SSL certificate problem: self-signed certificate\nerror: external command 'git' exited with code 128\nuncaught exception: could not load the Lake workspace\nCommand failed: /tmp/lasm node Linux \u03bb-Xcmide/cache/lasm/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean -j1 -s8192 --plugin=/tmp/lasm node Linux \u03bb-Xcmide/cache/lasm/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/lib/lean/libLake_shared.so --run /tmp/lasm node Linux \u03bb-Xcmide/project space \u03bb/node_modules/@lasm/compiler/src/lake-module.lean /home/runner/work/lasm/lasm/.work/node-network/project/Main.lean\n"
+      }
+    ],
+    "requests": [
+      {
+        "type": "proxy-connect",
+        "target": "localhost:40555",
+        "authenticated": true
+      }
+    ],
+    "passed": false
+  },
+  "correction": "Apply the same scoped completed-cache fadvise sidecar as the primary Linux consumer. Keep memory and proactive limits unchanged. Retest unchanged package."
+}

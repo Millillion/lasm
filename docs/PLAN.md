@@ -65,8 +65,8 @@ packed candidate before extending the accepted support claim.
   release-confidence gate, without claiming a statistical reliability guarantee.
 
 The deterministic native matrix has passed; changed installed-package acceptance
-is still pending. Scheduled reporting is implemented but remains inactive until
-one complete six-platform campaign selects an immutable candidate. Three cold
+is still pending. Scheduled reporting selects the immutable candidate while
+corrected Linux resource controls repeat its initial validation. Three cold
 passes per target must then span at least 24 hours and two UTC dates.
 
 Continue direct commits to `main`; automatic checks observe those commits.

@@ -1,5 +1,5 @@
 {
-  "active": false,
+  "active": true,
   "version": "0.1.0-experimental.36513318119",
   "sha256": "ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b",
   "sourceRevision": "e4bb15165042a439b9cabdcd1678fafdc2e99f35",
@@ -7,5 +7,5 @@
   "baselineRunId": "36513318119",
   "node": "26.10.0",
   "lean": "4.34.1",
-  "reason": "Awaiting the first complete six-platform installed and network acceptance before scheduled repetitions."
+  "reason": "Selected immutable archive for initial and repeated validation. Original Linux network control hit its resource guard; corrected maintainer controls must pass without changing these package bytes. Acceptance and multi-day confidence remain pending."
 }
