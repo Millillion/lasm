@@ -2,6 +2,14 @@ import assert from 'node:assert/strict';
 
 export const confidencePlatforms = ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64', 'win32-x64', 'win32-arm64'];
 
+export function resourceReportPassed(platform, resources) {
+  if (platform.startsWith('win32')) return resources.status === 'passed' && resources.exitCode === 0
+    && !resources.stoppedBecause && Number.isFinite(resources.peakCommittedBytes)
+    && resources.peakCommittedBytes < resources.limits?.stopCommittedBytes;
+  return resources.result?.code === 0 && resources.unitReleased === true && resources.resourceLimited === false
+    && (!platform.startsWith('linux') || resources.service?.memoryEvents?.oom_kill === 0);
+}
+
 export function unavailableInstallation(candidate, { runId, runAttempt, platform, controlsRevision, startedAt, conclusion }) {
   return { runId, runAttempt, jobId: `unavailable-${platform}`, platform, controlsRevision, startedAt,
     conclusion, observation: 'campaign-unavailable', archiveSha256: candidate.sha256,

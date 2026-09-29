@@ -281,6 +281,9 @@ successful recovery, and provide observed median/p95/max cold timings with their
 sample counts. Artifact byte totals are pinned compressed lengths, not measured
 wire traffic; retries and transport overhead can add bytes. New controls include
 the mandatory Lean source/notices companion in that catalog total.
+Both the installed-suite and network-control resource reports must pass. A
+regression uses the actual Linux abort (whose service exit was zero but whose
+resource flag was set), alongside retained clean Linux/macOS/Windows reports.
 
 A single green matrix can create a tested draft, but it does not satisfy this
 additional gate. Any robustness release decision must require the selected

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { confidencePlatforms, installationConfidence, unavailableInstallation } from '../scripts/ci/installation-confidence.mjs';
+import { readFileSync } from 'node:fs';
+import { confidencePlatforms, installationConfidence, unavailableInstallation, resourceReportPassed } from '../scripts/ci/installation-confidence.mjs';
 
 const candidate = { version: '0.1.0-experimental.47', sha256: 'a'.repeat(64), sourceRevision: 'b'.repeat(40) };
 const attempts = () => confidencePlatforms.flatMap((platform, i) => [0, 12, 25].map((hours, n) => ({
@@ -70,4 +71,16 @@ test('timings and recovered downloads remain separate from failed and unmeasured
   assert.equal(report.platforms['linux-x64'].recoveredDownloadRetries, 1);
   const unmeasured = installationConfidence(candidate, attempts()).platforms['linux-x64'];
   assert.deepEqual(unmeasured.coldSeconds, { samples: 0, median: null, p95: null, maximum: null });
+});
+
+test('real resource-aborted reports cannot count as clean runs despite service exit zero', () => {
+  const abort = JSON.parse(readFileSync(new URL('../docs/evidence/installer-network-resource-abort-2026-09-29.json', import.meta.url))).resourceReport;
+  assert.equal(abort.result.code, 0, 'The real guard terminated the unit and returned a service-level success');
+  assert.equal(abort.resourceLimited, true);
+  assert.equal(resourceReportPassed('linux-x64', abort), false);
+  for (const platform of confidencePlatforms) assert.equal(resourceReportPassed(platform, {}), false);
+  for (const platform of ['linux-x64', 'darwin-arm64', 'win32-x64']) {
+    const accepted = JSON.parse(readFileSync(new URL(`../docs/evidence/node46-${platform}-2026-09-28.json`, import.meta.url)));
+    assert.equal(resourceReportPassed(platform, accepted.resources), true, platform);
+  }
 });

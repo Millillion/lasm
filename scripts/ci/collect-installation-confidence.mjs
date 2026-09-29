@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { confidencePlatforms, installationConfidence, unavailableInstallation } from './installation-confidence.mjs';
+import { confidencePlatforms, installationConfidence, unavailableInstallation, resourceReportPassed } from './installation-confidence.mjs';
 
 const repository = 'Millillion/lasm';
 assert.equal(process.env.GITHUB_REPOSITORY, repository);
@@ -87,14 +87,15 @@ for (const id of ids) {
         attempt.byteAccounting = 'Pinned compressed artifact lengths, excluding transport overhead and bytes repeated during retries; not a wire-byte measurement.';
         attempt.offlineNpmInstall = installation.offlineNpmInstall?.emptyCache === true && installation.offlineNpmInstall?.networkDenied === true;
         const resources = report(lines, `.work/node-${os}-resources.json`), disk = report(lines, `.work/node-${os}-disk.json`);
-        attempt.resourcePassed = disk.status === 'passed' && (platform.startsWith('win32')
-          ? resources.status === 'passed' && resources.exitCode === 0 && !resources.stoppedBecause
-            && resources.peakCommittedBytes < resources.limits.stopCommittedBytes
-          : resources.result?.code === 0 && resources.unitReleased === true && resources.resourceLimited === false);
-        if (platform.startsWith('linux')) attempt.resourcePassed &&= resources.service?.memoryEvents?.oom_kill === 0;
+        attempt.installedResourcePassed = disk.status === 'passed' && resourceReportPassed(platform, resources);
         const network = report(lines, '.work/node-network-result.json');
         assert.equal(network.archiveSha256, candidate.sha256); assert.equal(network.platform, platform);
         attempt.networkPassed = network.passed === true;
+        const networkResources = report(lines, '.work/node-network-resources.json');
+        attempt.networkResourcePassed = resourceReportPassed(platform, networkResources);
+        attempt.resourcePassed = attempt.installedResourcePassed && attempt.networkResourcePassed;
+        attempt.peakBytes = { installed: resources.peakMemoryBytes ?? resources.peakCommittedBytes,
+          network: networkResources.peakMemoryBytes ?? networkResources.peakCommittedBytes };
       } catch (error) { attempt.evidenceError = error.message; }
       attempts.push(attempt);
     }
