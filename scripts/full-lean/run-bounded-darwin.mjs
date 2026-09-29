@@ -8,6 +8,7 @@ import { dirname, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { darwinMemory, darwinProcesses, workloadProcesses, darwinStopReason } from './darwin-resources.mjs';
+import { recoverDarwinSample } from './darwin-monitor-recovery.mjs';
 
 assert.equal(process.platform, 'darwin');
 const args = process.argv.slice(2), separator = args.indexOf('--');
@@ -34,14 +35,24 @@ const evidence = { unit, report, monitorPid: process.pid, mechanism: 'macOS proc
   limits: { memoryMax: null, stopMemoryBytes: Math.floor(budget * 0.8), hostReserveBytes: reserve,
     maximumCompressionGrowthBytes: 128 * 1024 ** 2, compressionReserveBytes: reserve + 512 * 1024 ** 2, sampleMs: 250 },
   startedAt: new Date().toISOString(), hostAtStart: host, minimumHostAvailable: host.available,
-  peakMemoryBytes: 0, peakCompressionGrowthBytes: 0, peakTasks: 0, resourceLimited: false, unitReleased: false, status: 'starting' };
+  peakMemoryBytes: 0, peakCompressionGrowthBytes: 0, peakTasks: 0, resourceLimited: false, unitReleased: false,
+  monitorRecoveries: [], status: 'starting' };
 const save = () => { evidence.updatedAt = new Date().toISOString(); writeFileSync(report + '.tmp', JSON.stringify(evidence, null, 2) + '\n'); renameSync(report + '.tmp', report); };
 let child, timer, stopping, result, seen = new Set();
 const current = () => child?.pid ? workloadProcesses(darwinProcesses(), child.pid, seen) : [];
+const cleanupCurrent = () => {
+  try { return current(); }
+  catch (error) { (evidence.cleanupMonitorErrors ??= []).push(error.message); return null; }
+};
 function terminate(signal) {
   if (!child?.pid) return;
   try { process.kill(-child.pid, signal); } catch (error) { if (error.code !== 'ESRCH') throw error; }
-  for (const p of current()) if (p.group !== child.pid) {
+  const remaining = cleanupCurrent();
+  if (!remaining) {
+    try { process.kill(-child.pid, 'SIGKILL'); } catch (error) { if (error.code !== 'ESRCH') throw error; }
+    return;
+  }
+  for (const p of remaining) if (p.group !== child.pid) {
     try { process.kill(p.pid, signal); } catch (error) { if (error.code !== 'ESRCH') throw error; }
   }
 }
@@ -63,7 +74,17 @@ try {
   console.error(`[lasm] macOS proactive RSS stop ${(evidence.limits.stopMemoryBytes / 1024 ** 3).toFixed(2)} GiB; no kernel aggregate cap; ${report}`);
   timer = setInterval(() => {
     try {
-      const processes = current(), memory = darwinMemory();
+      const sample = () => ({ processes: current(), memory: darwinMemory() });
+      let fresh;
+      try { fresh = sample(); }
+      catch (error) {
+        if (stopping) throw error;
+        fresh = recoverDarwinSample(error, { group: child.pid, previousProcesses: evidence.lastSample?.processes,
+          recoveries: evidence.monitorRecoveries, sample,
+          stopReason: ({ processes, memory }) => darwinStopReason(processes.reduce((sum, p) => sum + p.bytes, 0), memory, host, evidence.limits) });
+        console.error('[lasm] macOS accounting recovered while the workload was paused; resource limits remain unchanged.');
+      }
+      const { processes, memory } = fresh;
       const bytes = processes.reduce((sum, p) => sum + p.bytes, 0);
       evidence.peakMemoryBytes = Math.max(evidence.peakMemoryBytes, bytes);
       evidence.peakTasks = Math.max(evidence.peakTasks, processes.length);
@@ -86,11 +107,17 @@ try {
   if (child?.pid) {
     terminate('SIGTERM');
     const deadline = Date.now() + 3000;
-    while (current().length && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 100));
-    if (current().length) terminate('SIGKILL');
+    let remaining = cleanupCurrent();
+    while (remaining?.length && Date.now() < deadline) {
+      await new Promise(resolve => setTimeout(resolve, 100)); remaining = cleanupCurrent();
+    }
+    if (!remaining || remaining.length) terminate('SIGKILL');
     const killDeadline = Date.now() + 2000;
-    while (current().length && Date.now() < killDeadline) await new Promise(resolve => setTimeout(resolve, 100));
-    evidence.unitReleased = current().length === 0;
+    remaining = cleanupCurrent();
+    while (remaining?.length && Date.now() < killDeadline) {
+      await new Promise(resolve => setTimeout(resolve, 100)); remaining = cleanupCurrent();
+    }
+    evidence.unitReleased = remaining !== null && remaining.length === 0;
   } else evidence.unitReleased = true;
   evidence.status = 'finished'; evidence.finishedAt = new Date().toISOString(); evidence.result = result;
   save();

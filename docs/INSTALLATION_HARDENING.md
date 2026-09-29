@@ -299,6 +299,30 @@ The [real CLI repair matrix](https://github.com/Millillion/lasm/actions/runs/365
 also passed all six native targets. No new application/compiler code was needed
 for the CI resource and evidence corrections.
 
+The first repetition subsequently hit a different CI failure on Intel macOS:
+[`ps` exceeded its five-second accounting deadline](evidence/installer-macos-accounting-abort-2026-09-29.json).
+Cold and Lake phases passed; the monitor stopped the later offline suite.
+Peak RSS was 1.64 GiB, below the unchanged 3.20 GiB stop, with at least 8.27 GiB
+host memory available. This is a failed repetition and resets that target's
+sequence; the earlier complete pass remains separate evidence.
+
+The maintainer monitor now pauses the known workload process group before one
+fresh accounting attempt. It resumes only after fresh memory/reserve checks pass.
+A second timeout, a detached process, an unsafe reading, more than 12 seconds
+paused, or more than three recoveries fails closed; a paused unsafe workload is
+killed instead of resumed. The original five-second command deadlines and memory
+limits stay unchanged. Reports retain every recovery. Real process-group controls
+verify that work cannot advance during accounting recovery and is killed after
+a persistent failure. Local guarded controls passed; native regression and fresh
+installed repetitions will validate this correction. The still-queued run
+`36519931807` was canceled before starting to replace its superseded controls;
+that cancellation remains visible in confidence history.
+The report job completed successfully and retained its
+[first immutable confidence report](evidence/installer-confidence-initial-2026-09-29.json)
+on the candidate draft. It correctly records the failed Mac repetition, counts
+the canceled preparation as unavailable, and leaves `passed: false`. The canceled
+preparation conservatively resets every platform's clean sequence.
+
 ### Repeated cold installations
 
 [`installation-confidence.yml`](../.github/workflows/installation-confidence.yml)

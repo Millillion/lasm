@@ -7,5 +7,5 @@
   "baselineRunId": "36513318119",
   "node": "26.10.0",
   "lean": "4.34.1",
-  "reason": "The exact archive passed complete installed, offline npm, copied deployment and CLI/Lake private-CA/proxy gates on all six native targets. Original Linux resource and Windows report-write failures remain preserved. Repeated cold validation over multiple days is active; its confidence gate remains pending."
+  "reason": "The exact archive passed complete installed, offline npm, copied deployment and CLI/Lake private-CA/proxy gates on all six native targets. Linux resource, Windows report-write and Intel Mac accounting failures remain preserved while corrected maintainer controls repeat validation. The multi-day confidence gate remains pending."
 }

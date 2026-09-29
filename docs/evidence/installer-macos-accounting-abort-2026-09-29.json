@@ -1,0 +1,140 @@
+{
+  "runId": "36515690424",
+  "jobId": "109238124570",
+  "url": "https://github.com/Millillion/lasm/actions/runs/36515690424/job/109238124570",
+  "platform": "darwin-x64",
+  "archiveSha256": "ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b",
+  "packageSourceRevision": "e4bb15165042a439b9cabdcd1678fafdc2e99f35",
+  "controlsRevision": "b51bcfba7efe61e5c873f4824d6b36451d1de44e",
+  "installedAcceptancePassed": false,
+  "classification": "CI accounting command timeout after cold and Lake phases passed; workload terminated below its RSS stop with host reserve intact",
+  "phaseExecutions": [
+    {
+      "phase": "cold",
+      "code": 0,
+      "diagnostic": ""
+    },
+    {
+      "phase": "lake",
+      "code": 0,
+      "diagnostic": ""
+    }
+  ],
+  "resourceReport": {
+    "unit": "52ba0da2-4cd1-4bea-8ea0-bc09855e5ea9",
+    "report": "/Users/runner/work/lasm/lasm/.work/node-darwin-resources.json",
+    "monitorPid": 2687,
+    "mechanism": "macOS process-tree RSS monitor",
+    "hardCap": false,
+    "limitations": "Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.",
+    "limits": {
+      "memoryMax": null,
+      "stopMemoryBytes": 3435973836,
+      "hostReserveBytes": 1610612736,
+      "maximumCompressionGrowthBytes": 134217728,
+      "compressionReserveBytes": 2147483648,
+      "sampleMs": 250
+    },
+    "startedAt": "2026-09-29T03:11:23.508Z",
+    "hostAtStart": {
+      "total": 15032385536,
+      "available": 10478977024,
+      "compressed": 0
+    },
+    "minimumHostAvailable": 8881762304,
+    "peakMemoryBytes": 1759006720,
+    "peakCompressionGrowthBytes": 40853504,
+    "peakTasks": 7,
+    "resourceLimited": true,
+    "unitReleased": true,
+    "status": "finished",
+    "updatedAt": "2026-09-29T04:07:04.151Z",
+    "processGroup": 2689,
+    "command": [
+      "/Users/runner/hostedtoolcache/node/26.10.0/x64/bin/node",
+      "scripts/check-node-darwin.mjs",
+      "/Users/runner/work/lasm/lasm/.work/node-darwin-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.36513318119.tgz",
+      "ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b"
+    ],
+    "lastSample": {
+      "bytes": 1507856384,
+      "host": {
+        "total": 15032385536,
+        "available": 8920616960,
+        "compressed": 40853504
+      },
+      "processes": [
+        {
+          "pid": 2689,
+          "parent": 2687,
+          "group": 2689,
+          "bytes": 111755264,
+          "started": "Tue Sep 29 03:11:23 2026",
+          "identity": "2689:Tue Sep 29 03:11:23 2026",
+          "command": "/Users/runner/hostedtoolcache/node/26.10.0/x64/bin/node"
+        },
+        {
+          "pid": 50697,
+          "parent": 2689,
+          "group": 2689,
+          "bytes": 110645248,
+          "started": "Tue Sep 29 03:40:43 2026",
+          "identity": "50697:Tue Sep 29 03:40:43 2026",
+          "command": "/Users/runner/hostedtoolcache/node/26.10.0/x64/bin/node"
+        },
+        {
+          "pid": 92511,
+          "parent": 50697,
+          "group": 2689,
+          "bytes": 77971456,
+          "started": "Tue Sep 29 04:05:03 2026",
+          "identity": "92511:Tue Sep 29 04:05:03 2026",
+          "command": "npm exec lasm build StandaloneModuleData.lean --output /private/var/folders/20/jp1_0n3n7kndh6rnbqb5344m0000gn/T/lasm node Mac M-NM-;-4OufCe/project space M-NM-;/StandaloneModuleData.lean rejected"
+        },
+        {
+          "pid": 92533,
+          "parent": 92511,
+          "group": 2689,
+          "bytes": 116793344,
+          "started": "Tue Sep 29 04:05:04 2026",
+          "identity": "92533:Tue Sep 29 04:05:04 2026",
+          "command": "node"
+        },
+        {
+          "pid": 94766,
+          "parent": 92533,
+          "group": 2689,
+          "bytes": 58519552,
+          "started": "Tue Sep 29 04:06:19 2026",
+          "identity": "94766:Tue Sep 29 04:06:19 2026",
+          "command": "/private/var/folders/20/jp1_0n3n7kndh6rnbqb5344m0000gn/T/lasm node Mac M-NM-;-4OufCe/home/Library/Caches/lasm/artifacts/e7d7675e501673e0a3a0584889c4c13126e93864a4441504ee336ff8c421c7df/bin/python3"
+        },
+        {
+          "pid": 95072,
+          "parent": 94766,
+          "group": 2689,
+          "bytes": 1032171520,
+          "started": "Tue Sep 29 04:06:42 2026",
+          "identity": "95072:Tue Sep 29 04:06:42 2026",
+          "command": "/private/var/folders/20/jp1_0n3n7kndh6rnbqb5344m0000gn/T/lasm node Mac M-NM-;-4OufCe/home/Library/Caches/lasm/artifacts/eca285097db8c138e4acef4ae85a7e10df44f30762592494dd92a2a6836a662c/bin/wasm-emscripten-finalize"
+        }
+      ]
+    },
+    "monitorError": "spawnSync /bin/ps ETIMEDOUT",
+    "stoppedBecause": "Resource monitor failed",
+    "finishedAt": "2026-09-29T04:07:04.149Z",
+    "result": {
+      "code": null,
+      "signal": "SIGTERM"
+    }
+  },
+  "disk": {
+    "reserveBytes": 4294967296,
+    "preflightBytes": 12884901888,
+    "freeAtStart": 114874654720,
+    "status": "resource-aborted",
+    "minimumFreeBytes": 107435024384,
+    "freeAtEnd": 107496251392
+  }
+}

@@ -96,6 +96,7 @@ for (const id of ids) {
         attempt.resourcePassed = attempt.installedResourcePassed && attempt.networkResourcePassed;
         attempt.peakBytes = { installed: resources.peakMemoryBytes ?? resources.peakCommittedBytes,
           network: networkResources.peakMemoryBytes ?? networkResources.peakCommittedBytes };
+        attempt.monitorRecoveries = { installed: resources.monitorRecoveries ?? [], network: networkResources.monitorRecoveries ?? [] };
       } catch (error) { attempt.evidenceError = error.message; }
       attempts.push(attempt);
     }

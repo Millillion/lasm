@@ -78,6 +78,9 @@ test('real resource-aborted reports cannot count as clean runs despite service e
   assert.equal(abort.result.code, 0, 'The real guard terminated the unit and returned a service-level success');
   assert.equal(abort.resourceLimited, true);
   assert.equal(resourceReportPassed('linux-x64', abort), false);
+  const macAbort = JSON.parse(readFileSync(new URL('../docs/evidence/installer-macos-accounting-abort-2026-09-29.json', import.meta.url))).resourceReport;
+  assert.equal(macAbort.monitorError, 'spawnSync /bin/ps ETIMEDOUT');
+  assert.equal(resourceReportPassed('darwin-x64', macAbort), false);
   for (const platform of confidencePlatforms) assert.equal(resourceReportPassed(platform, {}), false);
   for (const platform of ['linux-x64', 'darwin-arm64', 'win32-x64']) {
     const accepted = JSON.parse(readFileSync(new URL(`../docs/evidence/node46-${platform}-2026-09-28.json`, import.meta.url)));
