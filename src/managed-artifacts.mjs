@@ -152,26 +152,26 @@ async function extract(artifact, archive, directory, python) {
 
 async function inventory(directory) {
   directory = await realpath(directory);
-  const files = {};
+  const files = new Map();
   async function walk(base) {
     for (const entry of (await readdir(base, { withFileTypes: true })).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) {
       const file = join(base, entry.name), name = relative(directory, file).split(process.platform === 'win32' ? '\\' : '/').join('/');
       if (name === receiptName) continue;
-      if (entry.isDirectory()) { files[name] = { type: 'directory' }; await walk(file); }
+      if (entry.isDirectory()) { files.set(name, { type: 'directory' }); await walk(file); }
       else if (entry.isSymbolicLink()) {
         const target = await readlink(file);
         if (isAbsolute(target) || !inside(directory, resolve(dirname(file), target)) || !inside(directory, await realpath(file)))
           throw new Error(`Managed cache link escapes its toolchain: ${name}`);
-        files[name] = { type: 'symlink', target };
+        files.set(name, { type: 'symlink', target });
       } else if (entry.isFile()) {
         const stat = await lstat(file);
-        files[name] = { type: 'file', bytes: stat.size, sha256: await hashFile(file),
-          ...(process.platform === 'win32' ? {} : { executable: !!(stat.mode & 0o111) }) };
+        files.set(name, { type: 'file', bytes: stat.size, sha256: await hashFile(file),
+          ...(process.platform === 'win32' ? {} : { executable: !!(stat.mode & 0o111) }) });
       } else throw new Error(`Unexpected managed cache entry: ${name}`);
     }
   }
   await walk(directory);
-  return files;
+  return Object.fromEntries(files);
 }
 
 export async function verifyArtifactDirectory(directory, identity) {

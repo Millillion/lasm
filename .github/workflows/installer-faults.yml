@@ -50,6 +50,10 @@ jobs:
       - name: Bounded POSIX fault suite
         if: runner.os != 'Windows'
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/installer-fault-resources.json -- /usr/bin/env LASM_TEST_PYTHON="$(command -v python3)" LASM_EXPECT_PLATFORM="$LASM_EXPECT_PLATFORM" GITHUB_SHA="$GITHUB_SHA" GITHUB_RUN_ID="$GITHUB_RUN_ID" GITHUB_RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" node scripts/ci/installer-faults.mjs
+      - name: Create a small disposable Windows volume for actual cross-volume copies
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/ci/installer-volume.ps1 create
       - name: Bounded Windows fault suite
         if: runner.os == 'Windows'
         shell: pwsh
@@ -59,6 +63,10 @@ jobs:
           $env:LASM_TEST_PYTHON = (python -c "import sys; print(sys.executable)")
           & $env:LASM_TEST_PYTHON -I -B scripts/full-lean/run-bounded-windows.py --memory-mib 1024 --timeout-seconds 240 --report .work/installer-fault-resources.json -- node scripts/ci/installer-faults.mjs
           exit $LASTEXITCODE
+      - name: Remove the workflow-owned Windows fixture volume
+        if: always() && runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/ci/installer-volume.ps1 remove
       - name: Preserve all outcomes and resource evidence
         if: always()
         run: node -e "const f=require('node:fs');for(const p of ['.work/installer-faults.json','.work/installer-fault-resources.json'])if(f.existsSync(p)){const s=p+'\n'+f.readFileSync(p,'utf8');console.log(s);f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'\n\n'+s)}"

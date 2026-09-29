@@ -1,0 +1,57 @@
+name: Prepare authenticated candidate input
+on:
+  workflow_call:
+    inputs:
+      candidate-version: { required: true, type: string }
+      candidate-release: { required: true, type: string }
+      sha256: { required: true, type: string }
+    outputs:
+      cache-key:
+        value: ${{ jobs.prepare.outputs.cache-key }}
+permissions:
+  contents: read
+jobs:
+  prepare:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    # GitHub hides draft assets from read-only tokens. Only this retrieval job
+    # gets draft access; native validation jobs retain contents: read.
+    permissions:
+      contents: write
+      actions: read
+    concurrency:
+      group: lasm-cache-writer
+      cancel-in-progress: false
+    outputs:
+      cache-key: node-candidate-${{ github.run_id }}-${{ github.run_attempt }}-${{ inputs.sha256 }}
+    env:
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+      LASM_CACHE_WRITER_GROUP: lasm-cache-writer
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - name: Fetch exact retained bytes without relying on a warm cache
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Bound the short-lived handoff below included cache storage
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/cache-budget.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" .work/node-candidate-cache-budget.json
+      - name: Hand authenticated bytes to read-only native consumers
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: node-candidate-${{ github.run_id }}-${{ github.run_attempt }}-${{ inputs.sha256 }}
+          enableCrossOsArchive: true
+      - name: Preserve handoff accounting
+        if: always()
+        run: node -e "const f=require('node:fs'),p='.work/node-candidate-cache-budget.json';if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

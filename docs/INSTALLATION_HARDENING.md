@@ -74,6 +74,8 @@ files remain untouched. Shared build leases prevent repair during active builds;
 repair fails promptly with a useful message. Stop older Lasm versions first,
 because `.46` and earlier do not participate in these new leases. Use a local
 filesystem with OS file-lock support; network filesystems are unverified.
+If the CLI was forcibly killed, stop any remaining compiler subprocesses before
+repair: the lease belongs to the CLI process, not to an orphaned native compiler.
 
 Old random `.install-*` / `.derive-*` / `.prepare-*` directories do not carry the
 new ownership proof and are left for manual inspection. Windows repair also
@@ -164,6 +166,12 @@ Each new candidate is packed once (with a second identical pack check), retained
 as an explicitly unaccepted draft, then fetched by exact hash by all six native
 consumers. Legacy cache inputs remain optional; cache eviction is no longer the
 sole-source failure mode. Draft assets do not consume Actions artifact storage.
+GitHub draft visibility requires push access. A separate preparation job fetches
+and hashes the retained bytes, then creates a budgeted cache handoff for read-only
+native jobs. It reconstructs that handoff on every campaign, even with no prior
+Actions cache. If eviction happens during a run, the error directs maintainers
+to rerun the whole campaign; the durable archive remains intact. All cache writers
+share the existing serialized 8 GiB ceiling below the included 10 GiB allowance.
 Candidate builds run automatically for relevant product/packaging pushes and can
 also be dispatched manually. All six deterministic fault jobs and native installed
 jobs gate creation of the tested-candidate draft. The native jobs additionally
@@ -171,11 +179,48 @@ exercise the installed CLI -> Lake -> managed Git path against an authenticated
 loopback proxy and private CA. Its loopback fixture runs separately from the
 OS-isolated prerequisite proof; both gates must pass.
 
-The new packed candidate, full CLI/Lake network results, and scheduled multi-day
-confidence reporting remain gates in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).
+The new packed candidate, full CLI/Lake network results, and observed multi-day
+confidence remain gates in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).
 
 The first `.47` attempt ([36510234373](https://github.com/Millillion/lasm/actions/runs/36510234373))
 stopped before packaging: the compiler guard's minimal environment omitted
 `GH_TOKEN`, so the draft runtime asset was invisible. The correction downloads
 with CI authentication first, then independently hashes/extracts under the
 unchanged guard. No candidate archive was produced by that attempt.
+
+The second `.47` attempt ([36510489581](https://github.com/Millillion/lasm/actions/runs/36510489581))
+packed reproducibly and passed all six fault jobs, but read-only consumers could
+not see the draft package. Native installation did not start. The separate input
+job above fixes that authorization boundary without granting test jobs write
+access. The `.47` archive is preserved as unaccepted; a later candidate also
+includes the reserved-filename inventory regression and its own version in the
+packed README's installation command.
+
+The latest local suite passed 133 of 135 controls, with two Windows-only controls
+correctly skipped on Linux (132.8 MiB guard peak, no resource abort). New native
+Windows controls use a real deny-delete file handle and a disposable 64 MiB NTFS
+volume to exercise cleanup warnings and actual cross-volume prefix copies.
+They still need native CI results.
+
+### Repeated cold installations
+
+[`installation-confidence.yml`](../.github/workflows/installation-confidence.yml)
+runs daily at 03:17 UTC and supports manual dispatch. Its reviewed selection
+[`node-robustness-candidate.json`](../scripts/ci/node-robustness-candidate.json)
+is inactive until a complete initial campaign passes. All native repetitions
+start from fresh VMs and empty consumer tool/npm caches and use one exact archive.
+The source controls also rerun; each report records their revision separately.
+
+The gate requires three complete cold/offline/deployment/network passes per
+target, at least two UTC dates and 24 hours of separation. Duplicate job reports
+do not count twice. All original job attempts are collected; failed preparation,
+missing evidence, later failures and missing fault jobs prevent a passing latest
+campaign. Compact immutable reports stay with the retained draft; the last 30
+workflow runs are evaluated, and older report files remain preserved. First-run
+retry messages and cold timings remain distinct from final success.
+
+A single green matrix can create a tested draft, but it does not satisfy this
+additional gate. Any robustness release decision must require the selected
+candidate's confidence report to have `passed: true`. This is a practical
+regression threshold, not proof of a particular failure rate or of compatibility
+with every network, filesystem, antivirus policy or machine. npm stays unpublished.

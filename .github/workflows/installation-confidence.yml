@@ -1,0 +1,140 @@
+name: Repeated cold installation confidence
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: installation-confidence
+  cancel-in-progress: false
+# One exact retained archive, fresh standard native VMs, empty consumer caches.
+# No Actions artifact uploads; one budgeted archive handoff, compact durable reports.
+jobs:
+  select:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      active: ${{ steps.selected.outputs.active }}
+      version: ${{ steps.selected.outputs.version }}
+      sha256: ${{ steps.selected.outputs.sha256 }}
+      release: ${{ steps.selected.outputs.release }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - name: Select the reviewed immutable candidate
+        id: selected
+        run: |
+          node --input-type=module -e "import fs from 'node:fs';import assert from 'node:assert/strict';const c=JSON.parse(fs.readFileSync('scripts/ci/node-robustness-candidate.json'));assert.match(c.version,/^0\.1\.0-experimental\.\d+$/);assert.match(c.sha256,/^[a-f0-9]{64}$/);assert.match(c.release,/^node-(?:package|linux-candidate)-\d+$/);for(const k of ['active','version','sha256','release'])fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+c[k]+'\n');console.log(JSON.stringify(c,null,2));"
+  faults:
+    if: needs.select.outputs.active == 'true'
+    needs: select
+    uses: ./.github/workflows/installer-faults.yml
+  input:
+    if: needs.select.outputs.active == 'true'
+    needs: select
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/node-candidate-input.yml
+    with:
+      sha256: ${{ needs.select.outputs.sha256 }}
+      candidate-release: ${{ needs.select.outputs.release }}
+      candidate-version: ${{ needs.select.outputs.version }}
+  linux-x64:
+    if: needs.select.outputs.active == 'true'
+    needs: [select, input, faults]
+    uses: ./.github/workflows/node-linux-consumer.yml
+    with:
+      runner: ubuntu-24.04
+      architecture: x64
+      cache-key: ${{ needs.input.outputs.cache-key }}
+      sha256: ${{ needs.select.outputs.sha256 }}
+      candidate-release: ${{ needs.select.outputs.release }}
+      candidate-version: ${{ needs.select.outputs.version }}
+  linux-arm64:
+    if: needs.select.outputs.active == 'true'
+    needs: [select, input, faults]
+    uses: ./.github/workflows/node-linux-consumer.yml
+    with:
+      runner: ubuntu-24.04-arm
+      architecture: arm64
+      cache-key: ${{ needs.input.outputs.cache-key }}
+      sha256: ${{ needs.select.outputs.sha256 }}
+      candidate-release: ${{ needs.select.outputs.release }}
+      candidate-version: ${{ needs.select.outputs.version }}
+  darwin-x64:
+    if: needs.select.outputs.active == 'true'
+    needs: [select, input, faults]
+    uses: ./.github/workflows/node-darwin-consumer.yml
+    with:
+      runner: macos-15-intel
+      architecture: x64
+      cache-key: ${{ needs.input.outputs.cache-key }}
+      sha256: ${{ needs.select.outputs.sha256 }}
+      candidate-release: ${{ needs.select.outputs.release }}
+      candidate-version: ${{ needs.select.outputs.version }}
+  darwin-arm64:
+    if: needs.select.outputs.active == 'true'
+    needs: [select, input, faults]
+    uses: ./.github/workflows/node-darwin-consumer.yml
+    with:
+      runner: macos-15
+      architecture: arm64
+      cache-key: ${{ needs.input.outputs.cache-key }}
+      sha256: ${{ needs.select.outputs.sha256 }}
+      candidate-release: ${{ needs.select.outputs.release }}
+      candidate-version: ${{ needs.select.outputs.version }}
+  windows-x64:
+    if: needs.select.outputs.active == 'true'
+    needs: [select, input, faults]
+    uses: ./.github/workflows/node-windows-consumer.yml
+    with:
+      runner: windows-2025
+      architecture: x64
+      cache-key: ${{ needs.input.outputs.cache-key }}
+      sha256: ${{ needs.select.outputs.sha256 }}
+      candidate-release: ${{ needs.select.outputs.release }}
+      candidate-version: ${{ needs.select.outputs.version }}
+  windows-arm64:
+    if: needs.select.outputs.active == 'true'
+    needs: [select, input, faults]
+    uses: ./.github/workflows/node-windows-consumer.yml
+    with:
+      runner: windows-11-arm
+      architecture: arm64
+      cache-key: ${{ needs.input.outputs.cache-key }}
+      sha256: ${{ needs.select.outputs.sha256 }}
+      candidate-release: ${{ needs.select.outputs.release }}
+      candidate-version: ${{ needs.select.outputs.version }}
+  report:
+    if: always() && needs.select.outputs.active == 'true'
+    needs: [select, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, windows-arm64]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - name: Preserve all completed attempts and evaluate the multi-day gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node --max-old-space-size=256 scripts/ci/collect-installation-confidence.mjs
+      - name: Retain the compact immutable report
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_RELEASE: ${{ needs.select.outputs.release }}
+        run: |
+          name="installation-confidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT.json"
+          cp .work/installation-confidence.json ".work/$name"
+          gh release upload "$CANDIDATE_RELEASE" ".work/$name"
+          node -e "const f=require('node:fs'),r=JSON.parse(f.readFileSync('.work/installation-confidence.json'));f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,(r.passed?'Multi-day gate passed':'Multi-day gate pending')+'\n\n'+JSON.stringify(r.platforms,null,2)+'\n\n'+r.limitation)"

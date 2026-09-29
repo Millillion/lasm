@@ -1,18 +1,16 @@
-**Installation hardening in progress — 2026-09-28.** Candidate `.46` remains
-unchanged and accepted for the scoped six-platform workflow. Source now includes
-bounded/resumable downloads, locale-independent receipts, OS-owned installation
-locks, crash recovery, leases, offline repair, storage diagnostics and a bundled,
-locked installer dependency graph. All 127 fault controls passed locally under
-the guard (126.2 MiB peak), including real TLS/proxy/private-CA traffic, process
-kills and empty-cache offline npm installation. No resource abort or OOM.
+**Installation hardening in progress — 2026-09-29.** Accepted `.46` is unchanged.
+Source adds bounded/resumable transfers, OS locks, crash recovery, offline repair,
+storage diagnostics and locked bundled installer dependencies. The first native
+fault matrix passed all six targets. Latest local controls: 133 passed, two
+Windows-only skips, 132.8 MiB guard peak, no resource abort.
 
-The first automatic fault run passed on all six native targets (127 checks on
-POSIX; 124 plus three inapplicable skips on Windows). Durable authenticated
-runtime/candidate handoffs and full CLI/Lake proxy/CA controls are implemented;
-new installed acceptance and scheduled confidence checks remain. See
-[implementation details](INSTALLATION_HARDENING.md).
-The first `.47` attempt stopped before packing because the guard intentionally
-removed download authentication; the download now precedes guarded extraction.
-ETA depends on native acceptance results and the multi-day gate. README was
-reviewed and distinguishes accepted `.46` from unaccepted source changes.
-Windows 11 x64, broad API parity and other engines remain deferred; npm unpublished.
+Two `.47` campaigns exposed CI authentication boundaries, preserved in
+[the report](INSTALLATION_HARDENING.md). Draft retrieval now precedes guarded
+extraction and uses a separate preparation job; test jobs remain read-only.
+The final changed package, full CLI/Lake proxy/CA checks and new native Windows
+file-lock/cross-volume controls still need acceptance.
+
+Daily confidence reporting is implemented but inactive until initial acceptance.
+Its gate requires three cold passes per target over at least 24 hours and two
+dates. ETA is not yet estimable. README reviewed; npm unpublished. Broader API
+parity, other engines and Windows 11 x64 remain deferred.

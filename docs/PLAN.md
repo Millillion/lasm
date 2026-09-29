@@ -55,7 +55,7 @@ packed candidate before extending the accepted support claim.
   abandoned staging for downloads, derivations and Windows execution prefixes.
   Preserve successful publication when temporary cleanup fails.
 - [x] Bundle the locked installer dependency graph and verify offline npm install.
-- [ ] Add proxy/CA and storage diagnostics, cancellation, and explicit safe cache
+- [x] Add proxy/CA and storage diagnostics, cancellation, and explicit safe cache
   repair with tests that preserve active installs and unrelated files.
 - [ ] Run deterministic native fault tests automatically on relevant pushes/PRs
   across all six targets. Replace cache-only runtime handoff with a durable,
@@ -63,6 +63,11 @@ packed candidate before extending the accepted support claim.
 - [ ] Schedule live distribution checks; retain all attempts and bounded evidence.
   Track three cold repetitions per target over at least two days as an additional
   release-confidence gate, without claiming a statistical reliability guarantee.
+
+The deterministic native matrix has passed; changed installed-package acceptance
+is still pending. Scheduled reporting is implemented but remains inactive until
+one complete six-platform campaign selects an immutable candidate. Three cold
+passes per target must then span at least 24 hours and two UTC dates.
 
 Continue direct commits to `main`; automatic checks observe those commits.
 Do not add a mandatory PR workflow or publish to npm. Windows 11 x64 and broader

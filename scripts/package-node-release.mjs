@@ -13,6 +13,7 @@ import { gitCatalog } from '../src/managed-git.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 import { bundleInstaller } from './bundle-installer.mjs';
+import { candidateReadme } from './candidate-readme.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -50,7 +51,9 @@ for (const name of ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean
   'function-table-index.mjs', 'table-growth.mjs', 'preserve-web-worker.mjs'])
   copyFileSync(join(root, 'scripts/full-lean', name), join(staging, 'scripts/full-lean', name));
 mkdirSync(join(staging, 'docs'));
-copyFileSync(join(root, 'README.md'), join(staging, 'README.md'));
+writeFileSync(join(staging, 'README.md'), candidateReadme(readFileSync(join(root, 'README.md'), 'utf8'), {
+  version, sourceRevision, runId: process.env.GITHUB_RUN_ID,
+}));
 copyFileSync(join(root, 'docs/NODE_SUPPORT.md'), join(staging, 'docs/NODE_SUPPORT.md'));
 cpSync(join(root, 'examples/hello'), join(staging, 'examples/hello'), { recursive: true });
 const json = (path, value) => writeFileSync(join(staging, path), JSON.stringify(value, null, 2) + '\n');

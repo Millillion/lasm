@@ -88,6 +88,17 @@ test('old receipts remain valid regardless of filename or property ordering', as
   await assert.rejects(provisionArtifact(description(bytes), options), /Changed entries \(1\): "ä"/);
 });
 
+test('reserved JavaScript property names are ordinary verified filenames', async t => {
+  const f = await fixture(t);
+  const bytes = archive(['__proto__', 'constructor', 'toString'].map(name => ({ path: 'tool/' + name, body: name })));
+  const options = { ...f.options, fetch: async () => new Response(bytes) };
+  const installed = await provisionArtifact(description(bytes), options);
+  assert.equal(Object.hasOwn(installed.receipt.files, '__proto__'), true);
+  assert.equal((await provisionArtifact(description(bytes), options)).cacheHit, true);
+  await writeFile(join(installed.directory, '__proto__'), 'changed');
+  await assert.rejects(provisionArtifact(description(bytes), options), /Changed entries \(1\): "__proto__"/);
+});
+
 test('a failed checksum cannot report a verified download or begin extraction', async t => {
   const f = await fixture(t), events = [];
   await assert.rejects(provisionArtifact({ ...f.artifact, sha256: '0'.repeat(64) },

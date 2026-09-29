@@ -18,6 +18,7 @@ const name = `lasm-compiler-${version}.tgz`, directory = '.work/node-candidate',
 await mkdir(directory, { recursive: true });
 if (!existsSync(file)) {
   assert.ok(release, 'Candidate cache is unavailable and no durable release input was supplied');
+  assert.ok(process.env.GH_TOKEN, 'Candidate handoff was evicted or unavailable. Rerun the whole campaign: its preparation job restores the exact retained draft with the required access.');
   const temporary = await mkdtemp(join(directory, '.fetch-'));
   try {
     execFileSync('gh', ['release', 'download', release, '--repo', 'Millillion/lasm', '--pattern', name, '--dir', temporary],

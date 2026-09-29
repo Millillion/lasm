@@ -40,6 +40,8 @@ retries, safe resume, crash recovery, offline repair, and bundled installer
 dependencies. The first automatic fault run passed all applicable checks on six
 native targets; the changed package still awaits full installed acceptance. See
 [installation hardening](docs/INSTALLATION_HARDENING.md) for settings and progress.
+New candidates must also pass repeated cold installations before meeting the
+additional robustness gate; one successful run alone is insufficient.
 
 Copy **all of `dist/`** to a supported machine with the **same OS, architecture,
 and Node version**. No Lean source, npm install, build tools, or development cache
