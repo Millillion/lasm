@@ -277,6 +277,25 @@ and the Linux resource abort correctly. The
 uses the corrected Linux resource profile; subsequent runs also use the corrected
 Windows report writer. No failed attempt is replaced.
 
+The corrected Linux x86-64 network control passed at 1.26 GiB peak with all
+memory-event counters zero under unchanged limits. Linux ARM64, Intel macOS and
+Windows x86-64 also completed both installed and network gates. These are passes
+of the same archive across the original and corrected campaigns, not a claim that
+the original failed campaign was green. Windows ARM64 remains pending.
+
+| Target | Complete installed, deployment, network and resource evidence |
+| --- | --- |
+| Linux x86-64 | [Passed](evidence/installer-hardened-linux-x64-2026-09-29.json) |
+| Linux ARM64 | [Passed](evidence/installer-hardened-linux-arm64-2026-09-29.json) |
+| macOS x86-64 | [Passed](evidence/installer-hardened-darwin-x64-2026-09-29.json) |
+| macOS ARM64 | [Passed](evidence/installer-hardened-darwin-arm64-2026-09-29.json) |
+| Windows x86-64 | [Passed](evidence/installer-hardened-win32-x64-2026-09-29.json) |
+| Windows ARM64 | Fresh repetition running after the preserved report-write failure. |
+
+The [real CLI repair matrix](https://github.com/Millillion/lasm/actions/runs/36516980143)
+also passed all six native targets. No new application/compiler code was needed
+for the CI resource and evidence corrections.
+
 ### Repeated cold installations
 
 [`installation-confidence.yml`](../.github/workflows/installation-confidence.yml)
