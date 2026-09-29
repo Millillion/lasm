@@ -7,6 +7,7 @@ permissions:
   contents: read
 concurrency:
   group: installation-confidence
+  queue: max
   cancel-in-progress: false
 # One exact retained archive, fresh standard native VMs, empty consumer caches.
 # No Actions artifact uploads; one budgeted archive handoff, compact durable reports.

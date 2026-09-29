@@ -19,6 +19,7 @@ permissions:
   contents: read
 concurrency:
   group: node-installed-acceptance-${{ github.ref }}
+  queue: max
   cancel-in-progress: false
 jobs:
   faults:

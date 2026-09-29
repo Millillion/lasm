@@ -108,6 +108,10 @@ fixtures, process kills, locks, repair, archive and dependency packing controls.
 Standard public runners are [free](https://docs.github.com/en/actions/reference/runners/github-hosted-runners);
 this workflow uploads no artifacts/caches. All outcomes remain in logs and job
 summaries. It observes direct pushes to main; it is not a pre-push branch gate.
+Fault concurrency groups include the calling workflow, so a standalone check
+cannot replace a candidate's pending fault job. Relevant workflows use GitHub's
+[`queue: max`](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency)
+to retain queued attempts instead of the default single pending slot.
 
 ### Corporate networks
 

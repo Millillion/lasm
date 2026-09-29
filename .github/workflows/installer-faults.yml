@@ -10,7 +10,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: installer-faults-${{ github.ref }}
+  group: installer-faults-${{ github.workflow }}-${{ github.ref }}
+  queue: max
   cancel-in-progress: false
 # Standard public-repository runners only. No uploaded artifacts or caches;
 # compact reports and all attempts are retained in the workflow logs/summary.

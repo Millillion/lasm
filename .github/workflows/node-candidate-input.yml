@@ -22,6 +22,7 @@ jobs:
       actions: read
     concurrency:
       group: lasm-cache-writer
+      queue: max
       cancel-in-progress: false
     outputs:
       cache-key: node-candidate-${{ github.run_id }}-${{ github.run_attempt }}-${{ inputs.sha256 }}
