@@ -59,16 +59,22 @@ in `lasm-tools/`. They contain verified hard links or copies and junctions to th
 main cache. Removing the main tool cache does not remove these directories;
 both can be removed when no build is running. See [Windows cache details](https://github.com/Millillion/lasm/blob/main/docs/WINDOWS_TOOLCHAINS.md).
 
-Downloads publish only after checksum verification and extraction. Rerun the
-command to retry an interrupted download; the current installer makes one
-attempt per invocation and restarts the failed archive. Earlier completed tools
-remain reusable. If a completed tool cache is damaged or incomplete,
-Lasm refuses to execute it and prints its exact directory; remove that directory
-and retry to download a verified replacement. If a packaged runtime fails its
+Downloads publish only after checksum verification and extraction. Accepted
+candidate `.46` makes one attempt per invocation: rerun its command after an
+interruption. Newer source candidates add bounded retries, validated range resume,
+crash recovery, OS locks, and `npx lasm cache repair`. Repair is explicit and
+offline; it keeps verified tools and unrelated files, and refuses active builds.
+Stop older CLI versions or orphaned compiler processes before repair. Use a
+writable local filesystem with executable files and OS lock support; network
+filesystems and no-exec mounts are unsupported. See the
+[hardening settings and verification status](https://github.com/Millillion/lasm/blob/main/docs/INSTALLATION_HARDENING.md).
+If a completed tool cache is damaged or incomplete, Lasm refuses to execute it.
+Use repair with a newer candidate, or remove the named directory with `.46`,
+then retry to download a verified replacement. If a packaged runtime fails its
 integrity check, reinstall the candidate. An unavailable download must be restored
 before a cold build can succeed; retries never substitute an unverified tool.
-The [robustness review](TOOLCHAIN_ROBUSTNESS.md) records confirmed recovery gaps
-and proposed CI coverage; the six-platform pass does not establish a measured
+The [dated robustness review](https://github.com/Millillion/lasm/blob/main/docs/TOOLCHAIN_ROBUSTNESS.md) records the baseline recovery gaps;
+the six-platform pass does not establish a measured
 installation failure rate.
 
 `lasm build Main.lean` writes `dist/` and does not run `main`. Deploy all of `dist/`

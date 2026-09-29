@@ -1,6 +1,7 @@
 import { lstat, mkdir, rm, statfs } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { withApplicationLock } from './application-lock.mjs';
+import { setTimeout as delay } from 'node:timers/promises';
 
 /** Builds hold a shared lease until compiler children finish. Explicit repair
  * takes the exclusive lease and never removes files from an active new build.
@@ -23,13 +24,27 @@ export async function removeOwnedStaging(path, { log = console.error, remove = r
   try {
     const entry = await lstat(path);
     if (!entry.isDirectory()) throw new Error('staging is not an ordinary directory');
-    await remove(path, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+    await removeDirectoryWithRetries(path, { remove });
     return true;
   } catch (error) {
     if (error.code === 'ENOENT') return true;
     log(`[lasm] Temporary cleanup pending at ${path}: ${error.code ?? error.message}. `
       + 'Completed tools remain valid. Close programs holding these files and retry; use lasm cache repair when no build is active.');
     return false;
+  }
+}
+
+/** Node's recursive rm applies maxRetries again at each directory depth. A
+ * permanently locked nested file can therefore multiply delays dramatically.
+ * Retry the whole removal at one level only: at most 5.5 seconds of backoff.
+ */
+export async function removeDirectoryWithRetries(path, { remove = rm, sleep = delay } = {}) {
+  for (let retry = 0; ; retry++) {
+    try { return await remove(path, { recursive: true, force: true, maxRetries: 0 }); }
+    catch (error) {
+      if (retry === 10 || !['EBUSY', 'EMFILE', 'ENFILE', 'ENOTEMPTY', 'EPERM'].includes(error.code)) throw error;
+      await sleep((retry + 1) * 100);
+    }
   }
 }
 

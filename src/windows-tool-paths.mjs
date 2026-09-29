@@ -1,11 +1,11 @@
-import { mkdir, symlink, realpath, lstat, readdir, readFile, writeFile, link, copyFile, rename, rm } from 'node:fs/promises';
+import { mkdir, symlink, realpath, lstat, readdir, readFile, writeFile, link, copyFile, rename } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { hashFile } from './managed-artifacts.mjs';
 import { withApplicationLock } from './application-lock.mjs';
-import { removeOwnedStaging, createOwnedStaging } from './cache-lifecycle.mjs';
+import { removeOwnedStaging, createOwnedStaging, removeDirectoryWithRetries } from './cache-lifecycle.mjs';
 
 const marker = '.lasm-tool-prefix.json';
 const pending = new Map();
@@ -77,7 +77,7 @@ export async function windowsToolPrefix(directory, { receipt, temporaryDirectory
         if (!(await lstat(prefix)).isDirectory()) throw changed();
         // Explicit repair runs under the whole-cache exclusive lease and this
         // prefix lock. Removing junctions never traverses their library target.
-        await rm(prefix, { recursive: true, maxRetries: 10, retryDelay: 100 });
+        await removeDirectoryWithRetries(prefix);
       }
     }
     await createOwnedStaging(staging);

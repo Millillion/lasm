@@ -1,16 +1,16 @@
 **Installation hardening in progress — 2026-09-29.** Accepted `.46` is unchanged.
-Source adds bounded/resumable transfers, OS locks, crash recovery, offline repair,
-storage diagnostics and locked bundled installer dependencies. The first native
-fault matrix passed all six targets. Latest local controls: 133 passed, two
-Windows-only skips, 132.8 MiB guard peak, no resource abort.
+Source includes resilient downloads, locks, crash recovery, offline repair,
+storage diagnostics and locked bundled installer dependencies. Earlier native
+fault controls passed all six targets; latest Linux/macOS controls also passed.
 
-Two `.47` campaigns exposed CI authentication boundaries, preserved in
-[the report](INSTALLATION_HARDENING.md). Draft retrieval now precedes guarded
-extraction and uses a separate preparation job; test jobs remain read-only.
-The final changed package, full CLI/Lake proxy/CA checks and new native Windows
-file-lock/cross-volume controls still need acceptance.
+The new Windows sharing-violation test exposed excessive recursive cleanup
+retries and fixture cleanup ordering; README generation exposed CRLF handling.
+These are corrected, with bounded local regression tests passing. Native
+revalidation remains. Failures and guard measurements are preserved in
+[the report](INSTALLATION_HARDENING.md); no OOM occurred.
 
-Daily confidence reporting is implemented but inactive until initial acceptance.
-Its gate requires three cold passes per target over at least 24 hours and two
-dates. ETA is not yet estimable. README reviewed; npm unpublished. Broader API
-parity, other engines and Windows 11 x64 remain deferred.
+Authenticated draft retrieval and the budgeted handoff to read-only CI jobs
+passed. Full candidate installation, CLI/Lake proxy/CA acceptance and actual
+multi-day repetitions remain. Daily reporting is implemented but inactive until
+initial acceptance; its gate requires three cold passes per target over 24 hours
+and two dates. ETA not yet estimable. README reviewed; npm unpublished.

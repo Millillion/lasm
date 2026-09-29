@@ -13,12 +13,14 @@ import { windowsToolPrefix } from '../src/windows-tool-paths.mjs';
 test('a Windows deny-delete handle delays cleanup without losing a published tool',
   { skip: process.platform !== 'win32', timeout: 20_000 }, async t => {
     const base = await mkdtemp(join(tmpdir(), 'lasm-win-lock-'));
-    t.after(() => rm(base, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }));
     const ffi = createRequire(import.meta.url)('koffi'), kernel = ffi.load('kernel32.dll');
     const open = kernel.func('intptr_t __stdcall CreateFileW(str16, uint32_t, uint32_t, void *, uint32_t, uint32_t, intptr_t)');
     const close = kernel.func('int __stdcall CloseHandle(intptr_t)');
     let handle;
-    t.after(() => { if (handle !== undefined) close(handle); });
+    t.after(async () => {
+      if (handle !== undefined) { close(handle); handle = undefined; }
+      await rm(base, { recursive: true, force: true });
+    });
     const cache = join(base, 'cache'), archive = join(base, 'archive.tgz');
     await mkdir(join(base, 'source/tool'), { recursive: true });
     await writeFile(join(base, 'source/tool/compiler'), 'verified compiler');

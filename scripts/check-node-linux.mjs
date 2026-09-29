@@ -128,6 +128,7 @@ finally {
   save();
   assert.deepEqual(result.toolCacheAdvisorExit, { code: 0, signal: null });
 }
-// Keep immutable measurements, not another multi-gigabyte successful cache.
-rmSync(result.deploymentRoot, { recursive: true }); rmSync(workspace, { recursive: true });
+// The following full CLI/Lake network control needs this exact installed
+// product. It removes the successful workspace after recording its evidence.
+rmSync(result.deploymentRoot, { recursive: true });
 console.log(JSON.stringify(result, null, 2));

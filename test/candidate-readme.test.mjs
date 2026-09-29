@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { candidateReadme } from '../scripts/candidate-readme.mjs';
 
-test('a packed README installs its own archive without promoting untested bytes', () => {
-  const text = candidateReadme(readFileSync(new URL('../README.md', import.meta.url), 'utf8'), {
+for (const newline of ['\n', '\r\n']) test(`a packed README installs its own archive with ${JSON.stringify(newline)} source newlines`, () => {
+  const source = readFileSync(new URL('../README.md', import.meta.url), 'utf8').replace(/\r?\n/g, newline);
+  const text = candidateReadme(source, {
     version: '0.1.0-experimental.123', sourceRevision: 'a'.repeat(40), runId: '12345',
   });
   assert.match(text, /npm install \.\/lasm-compiler-0\.1\.0-experimental\.123\.tgz/);

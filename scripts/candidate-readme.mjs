@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 // A packed candidate must tell its reader how to install these exact bytes.
 // The accepted baseline table stays historical until a separate campaign passes.
 export function candidateReadme(source, { version, sourceRevision, runId }) {
+  source = source.replaceAll('\r\n', '\n');
   assert.match(version, /^0\.1\.0-experimental\.\d+$/);
   assert.match(sourceRevision, /^[a-f0-9]{40}$/);
   if (runId !== undefined) assert.match(runId, /^\d+$/);

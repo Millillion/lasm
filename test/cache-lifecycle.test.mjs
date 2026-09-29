@@ -8,7 +8,7 @@ import { fork } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { c as tar } from 'tar';
 import { provisionArtifact } from '../src/managed-artifacts.mjs';
-import { removeOwnedStaging, checkDownloadSpace, storageDiagnostic, withCacheLease } from '../src/cache-lifecycle.mjs';
+import { removeOwnedStaging, removeDirectoryWithRetries, checkDownloadSpace, storageDiagnostic, withCacheLease } from '../src/cache-lifecycle.mjs';
 import { repairManagedCache } from '../src/cache-repair.mjs';
 import { parseLasmArguments } from '../src/cli-arguments.mjs';
 
@@ -153,6 +153,19 @@ test('space and permission diagnostics require no real disk exhaustion or permis
   await checkDownloadSpace('.', 1000, { inspect: async () => ({ bavail: 100n, bsize: 512n }) });
   for (const code of ['ENOSPC', 'EDQUOT', 'EACCES', 'EROFS', 'EPERM'])
     assert.match(storageDiagnostic(Object.assign(new Error('failure'), { code }), '/cache').message, /LASM_TOOLCHAIN_CACHE/);
+});
+
+test('persistent cleanup contention exhausts one retry budget; transient contention recovers', async () => {
+  const locked = Object.assign(new Error('locked file'), { code: 'EPERM' });
+  const waits = []; let calls = 0;
+  await assert.rejects(removeDirectoryWithRetries('fixture', {
+    remove: async (_path, options) => { assert.equal(options.maxRetries, 0); calls++; throw locked; },
+    sleep: async ms => { waits.push(ms); },
+  }), error => error === locked);
+  assert.equal(calls, 11); assert.equal(waits.reduce((a, b) => a + b, 0), 5500);
+  calls = 0;
+  await removeDirectoryWithRetries('fixture', { remove: async () => { if (++calls < 3) throw locked; }, sleep: async () => {} });
+  assert.equal(calls, 3);
 });
 
 test('cache repair grammar is explicit and rejects unrelated options', () => {

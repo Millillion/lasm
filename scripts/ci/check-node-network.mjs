@@ -2,7 +2,7 @@
 // path. Loopback fixture hosting runs outside the prerequisite-isolation test;
 // the preceding cold/installed/deployment checks establish that requirement.
 import assert from 'node:assert/strict';
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Worker } from 'node:worker_threads';
@@ -78,3 +78,6 @@ try {
   result.git = { identity: git.identity, version: git.version, executable: git.executable };
   result.passed = true;
 } finally { await worker.terminate(); result.finishedAt = new Date().toISOString(); await save(); console.log(JSON.stringify(result, null, 2)); }
+// Linux previously reclaimed the workspace before this additional control.
+// Preserve failures for diagnosis; successful ephemeral-runner caches are waste.
+if (result.passed && process.platform === 'linux') await rm(acceptance.workspace, { recursive: true, force: true });

@@ -59,6 +59,8 @@ Each lock owns one deterministic staging path. The next invocation reclaims that
 path after a crash, including a crash after successful publication. Temporary
 cleanup failures produce an actionable warning and do not turn a successfully
 published tool into a reported installation failure.
+Cleanup retries the whole removal at one level, with at most 5.5 seconds of
+backoff. Node's per-directory recursive retry multiplier is deliberately disabled.
 
 Current source adds:
 
@@ -201,6 +203,18 @@ correctly skipped on Linux (132.8 MiB guard peak, no resource abort). New native
 Windows controls use a real deny-delete file handle and a disposable 64 MiB NTFS
 volume to exercise cleanup warnings and actual cross-volume prefix copies.
 They still need native CI results.
+
+The next automatic fault run ([36512182510](https://github.com/Millillion/lasm/actions/runs/36512182510))
+passed Linux/macOS but timed out on Windows. The new real-file-lock control
+exposed recursive deletion retries and a fixture cleanup ordering issue; a
+separate packaged-README control exposed Windows checkout line endings.
+The correction bounds retry backoff at one level, closes the fixture handle
+before cleanup even after failure, and normalizes README newlines. Both Windows
+temporary volumes were detached; the x64 guard peak was 285.7 MiB with no memory
+stop. The original timeout remains visible rather than being relabeled a pass.
+The candidate input job succeeded in [36512182772](https://github.com/Millillion/lasm/actions/runs/36512182772),
+proving the authenticated draft-to-read-only handoff. Linux workspace cleanup now
+follows the full CLI/Lake network check, which needs the installed package.
 
 ### Repeated cold installations
 
