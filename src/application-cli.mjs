@@ -41,8 +41,20 @@ export async function runApplicationCli(argv, { defaultTarget = 'node', targetEx
   const options = parseLasmArguments(argv, { defaultTarget });
   const support = applicationSupport();
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [-- arguments…]\n       lasm build Main.lean [--output dist]\n\nOptions: --rebuild, --verbose, --help\nBuild and run ordinary Lean main in Node.' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [-- arguments…]\n       lasm build Main.lean [--output dist]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nBuild and run ordinary Lean main in Node.' : cliUsage);
     return 0;
+  }
+  if (options.command === 'cache-repair') {
+    const { repairManagedCache } = await import('./cache-repair.mjs');
+    const { createBuildProgress } = await import('./build-progress.mjs');
+    const progress = createBuildProgress();
+    try {
+      const result = await repairManagedCache({ progress: event => progress.update(event) });
+      console.error(`[lasm] Cache repair: ${result.verified.length} valid tools retained, ${result.removed.length} invalid tools removed, `
+        + `${result.stagingRemoved.length} temporary directories cleaned, ${result.skipped.length} unrelated entries untouched, `
+        + `${result.pending.length} cleanup operations pending. Cache: ${result.cache}`);
+      return result.pending.length ? 1 : 0;
+    } finally { progress.finish(); }
   }
   if (support && (options.target !== 'node' || options.input.endsWith('.json')))
     throw new Error('This Lasm candidate builds ordinary .lean applications for Node. Use lasm Main.lean or lasm build Main.lean.');

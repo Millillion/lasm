@@ -46,7 +46,7 @@ export async function provisionLean(file, options = {}) {
   // junctions, so its bin directory must physically have a short path.
   if (platform === 'win32') options.progress?.({ stage: 'Preparing native Windows compiler paths' });
   const executionPrefix = platform === 'win32' ? await windowsToolPrefix(installed.directory,
-    { receipt: installed.receipt }) : installed.directory;
+    { receipt: installed.receipt, log: options.log, progress: options.progress, signal: options.signal }) : installed.directory;
   // Lake puts its executable-derived library root ahead of LEAN_PATH. Preserve
   // the Windows namespace in GetModuleFileName as well as in our environment,
   // so nested module files do not fall back to MAX_PATH-limited spellings.

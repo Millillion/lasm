@@ -1,6 +1,7 @@
 export const cliUsage = `Usage: lasm <Main.lean> [--target node|deno|bun] [-- arguments…]
        lasm build <Main.lean> [--target node|deno|bun] [--output dist]
        lasm build <lasm.json> [output-directory]
+       lasm cache repair
 
 Options: --rebuild, --verbose, --help
 Application arguments must follow --. The default target is node.`;
@@ -8,6 +9,11 @@ Application arguments must follow --. The default target is node.`;
 /** Parse independently of provisioning: help/errors must never download tools. */
 export function parseLasmArguments(argv, { defaultTarget = 'node' } = {}) {
   const tokens = [...argv];
+  if (tokens[0] === 'cache') {
+    if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
+    if (tokens.length !== 2 || tokens[1] !== 'repair') throw new Error('Usage: lasm cache repair');
+    return { command: 'cache-repair' };
+  }
   const result = { command: 'run', target: defaultTarget, rebuild: false, verbose: false, args: [] };
   if (['build', 'run'].includes(tokens[0])) result.command = tokens.shift();
   const positional = [], supplied = new Set();

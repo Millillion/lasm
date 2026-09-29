@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs';
-import { mkdir, mkdtemp, readFile, readdir, readlink, lstat, realpath, rename, rm, writeFile, symlink, link } from 'node:fs/promises';
+import { mkdir, readFile, readdir, readlink, lstat, realpath, rename, writeFile, symlink, link } from 'node:fs/promises';
 import { dirname, join, resolve, relative, isAbsolute, posix } from 'node:path';
 import { homedir } from 'node:os';
 import { createHash } from 'node:crypto';
@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { x as extractTar } from 'tar';
 import { isDeepStrictEqual } from 'node:util';
 import { downloadArtifact } from './managed-download.mjs';
+import { withCacheEntryLock, removeOwnedStaging, createOwnedStaging, storageDiagnostic, checkDownloadSpace } from './cache-lifecycle.mjs';
 
 const digest = value => createHash('sha256').update(value).digest('hex');
 const pending = new Map();
@@ -54,6 +55,8 @@ async function extract(artifact, archive, directory, python) {
   // macOS /var and Windows short-path temp directories are aliases. Compare
   // resolved link targets with the same physical root, not its lexical alias.
   directory = await realpath(directory);
+  const space = await checkDownloadSpace(directory, 0);
+  let occupied = 0n;
   let error, total = 0;
   const rootless = artifact.root === '.';
   const seen = new Set();
@@ -85,6 +88,15 @@ async function extract(artifact, archive, directory, python) {
       total += entry.size ?? 0;
       if (!Number.isSafeInteger(total) || total > artifact.maximumExtractedBytes) {
         error = new Error(`Extracted artifact exceeds its size limit: ${artifact.name}`); return false;
+      }
+      if (space) {
+        // Account conservatively for allocation rounding and directory entries.
+        const block = space.blockSize > 0n ? space.blockSize : 4096n;
+        occupied += ((BigInt(entry.size ?? 0) + block - 1n) / block + 1n) * block;
+        if (occupied > space.available) {
+          error = Object.assign(new Error(`Insufficient free space while extracting ${artifact.name}`), { code: 'ENOSPC' });
+          return false;
+        }
       }
       return true;
     },
@@ -162,7 +174,7 @@ async function inventory(directory) {
   return files;
 }
 
-async function verify(directory, identity) {
+export async function verifyArtifactDirectory(directory, identity) {
   if (!(await lstat(directory)).isDirectory() || !(await lstat(join(directory, receiptName))).isFile())
     throw new Error(`Managed artifact directory and receipt must not be symbolic links: ${directory}`);
   const receipt = JSON.parse(await readFile(join(directory, receiptName), 'utf8'));
@@ -174,14 +186,15 @@ async function verify(directory, identity) {
       .filter(name => !isDeepStrictEqual(observed[name], receipt.files[name]));
     throw new Error(`Managed cache contents changed: ${directory}. Changed entries (${changed.length}): ` +
       changed.slice(0, 10).map(name => JSON.stringify(name)).join(', ') +
-      (changed.length > 10 ? ', ...' : '') + '. Remove this toolchain directory to download a verified replacement.');
+      (changed.length > 10 ? ', ...' : '') + '. Run lasm cache repair, then retry to download a verified replacement.');
   }
   return receipt;
 }
+const verify = verifyArtifactDirectory;
 
 /** Install into a private staging directory; expose only a verified complete tree.
- * Concurrent processes may download twice but can never observe partial output.
- * No cache lock can be left behind by an interrupted process.
+ * An OS-owned per-artifact lock shares installs across independent processes.
+ * A process death releases the lock; its exact owned staging is reclaimed.
  */
 export async function provisionArtifact(artifact, { cache = managedCacheDirectory(), fetch: fetch_ = fetch, log = console.error, python,
   progress, label = artifact.name, signal, download = {} } = {}) {
@@ -191,7 +204,10 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
   const directory = resolve(cache, 'artifacts', identity);
   const key = directory;
   if (pending.has(key)) return pending.get(key);
-  const operation = (async () => {
+  const operation = withCacheEntryLock(cache, 'artifacts', identity, async () => {
+    await mkdir(dirname(directory), { recursive: true });
+    const staging = join(dirname(directory), '.install-' + identity);
+    await removeOwnedStaging(staging, { log });
     try {
       await lstat(directory);
       progress?.({ stage: `Verifying cached ${label}` });
@@ -200,12 +216,11 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
     } catch (error) {
       // A damaged existing cache is never silently trusted or overwritten.
       if (error.code !== 'ENOENT') throw error;
-      try { await lstat(directory); throw new Error(`Incomplete managed cache: ${directory}. Remove this toolchain directory and retry.`); }
+      try { await lstat(directory); throw new Error(`Incomplete managed cache: ${directory}. Run lasm cache repair and retry.`); }
       catch (missing) { if (missing.code !== 'ENOENT') throw missing; }
     }
-    await mkdir(dirname(directory), { recursive: true });
-    const staging = await mkdtemp(join(dirname(directory), '.install-'));
-    let failure;
+    await checkDownloadSpace(dirname(directory), artifact.bytes);
+    await createOwnedStaging(staging);
     try {
       const archive = join(staging, 'archive.' + artifact.format), tree = join(staging, 'tree');
       const downloadProgress = (receivedBytes = 0, complete = false) => progress?.({
@@ -238,24 +253,21 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
       }
       progress?.({ stage: `Finishing ${label} setup` });
       return { directory, identity, receipt, cacheHit: false };
-    } catch (error) { failure = error; throw error; }
-    finally {
-      try { await rm(staging, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
-      catch (cleanup) {
-        if (failure) throw new AggregateError([failure, cleanup], `Artifact installation failed: ${failure.message}; cleanup also failed: ${cleanup.message}`);
-        throw cleanup;
-      }
-    }
-  })();
+    } finally { await removeOwnedStaging(staging, { log }); }
+  }, { signal, onWait: () => progress?.({ stage: `Waiting for another ${label} installation or cache repair` }) })
+    .catch(error => { throw storageDiagnostic(error, cache); });
   pending.set(key, operation);
   try { return await operation; } finally { pending.delete(key); }
 }
 
 /** Record immutable build-tool derivations separately from upstream downloads. */
-export async function deriveArtifact(provenance, produce, { cache = managedCacheDirectory() } = {}) {
+export async function deriveArtifact(provenance, produce, { cache = managedCacheDirectory(), log = console.error, signal, progress } = {}) {
   const identity = digest(JSON.stringify(provenance)), directory = resolve(cache, 'derived', identity);
   if (pending.has(directory)) return pending.get(directory);
-  const operation = (async () => {
+  const operation = withCacheEntryLock(cache, 'derived', identity, async () => {
+    await mkdir(dirname(directory), { recursive: true });
+    const staging = join(dirname(directory), '.derive-' + identity);
+    await removeOwnedStaging(staging, { log });
     try {
       await lstat(directory);
       return { directory, identity, receipt: await verify(directory, identity), cacheHit: true };
@@ -264,8 +276,7 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
       try { await lstat(directory); throw new Error(`Incomplete derived tool cache: ${directory}`); }
       catch (missing) { if (missing.code !== 'ENOENT') throw missing; }
     }
-    await mkdir(dirname(directory), { recursive: true });
-    const staging = await mkdtemp(join(dirname(directory), '.derive-'));
+    await createOwnedStaging(staging);
     try {
       const tree = join(staging, 'tree'); await mkdir(tree);
       await produce(tree);
@@ -279,8 +290,9 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
         await verify(directory, identity);
       }
       return { directory, identity, receipt, cacheHit: false };
-    } finally { await rm(staging, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
-  })();
+    } finally { await removeOwnedStaging(staging, { log }); }
+  }, { signal, onWait: () => progress?.({ stage: 'Waiting for another tool derivation or cache repair' }) })
+    .catch(error => { throw storageDiagnostic(error, cache); });
   pending.set(directory, operation);
   try { return await operation; } finally { pending.delete(directory); }
 }

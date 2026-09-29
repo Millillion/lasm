@@ -1,9 +1,11 @@
-import { mkdir, mkdtemp, symlink, realpath, lstat, readdir, readFile, writeFile, link, copyFile, rename, rm } from 'node:fs/promises';
+import { mkdir, symlink, realpath, lstat, readdir, readFile, writeFile, link, copyFile, rename, rm } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { hashFile } from './managed-artifacts.mjs';
+import { withApplicationLock } from './application-lock.mjs';
+import { removeOwnedStaging, createOwnedStaging } from './cache-lifecycle.mjs';
 
 const marker = '.lasm-tool-prefix.json';
 const pending = new Map();
@@ -12,7 +14,7 @@ const pending = new Map();
  * Immutable bin files use hard links, with copies across volumes. Large library
  * and source directories remain junctions to the already verified tool cache.
  */
-export async function windowsToolPrefix(directory, { receipt, temporaryDirectory = tmpdir() } = {}) {
+export async function windowsToolPrefix(directory, { receipt, temporaryDirectory = tmpdir(), log = console.error, signal, progress, repair = false } = {}) {
   if (!receipt?.identity || !receipt.files) throw new Error('A verified Lean artifact receipt is required');
   const target = await realpath(directory);
   const parent = join(temporaryDirectory, 'lasm-tools');
@@ -21,7 +23,9 @@ export async function windowsToolPrefix(directory, { receipt, temporaryDirectory
   const key = createHash('sha256').update(JSON.stringify(provenance)).digest('hex').slice(0, 24);
   const prefix = join(parent, key);
   if (pending.has(prefix)) return pending.get(prefix);
-  const operation = (async () => {
+  const operation = withApplicationLock(join(parent, '.locks', key + '.lock'), async () => {
+    const staging = join(parent, '.prepare-' + key);
+    await removeOwnedStaging(staging, { log });
     const rootEntries = Object.entries(receipt.files).filter(([name]) => !name.includes('/'));
     if (!rootEntries.some(([name, entry]) => name === 'bin' && entry.type === 'directory'))
       throw new Error('Managed Lean has no ordinary bin directory');
@@ -61,12 +65,23 @@ export async function windowsToolPrefix(directory, { receipt, temporaryDirectory
         else if (entry.type !== 'file' || !await fileMatches(file, entry)) throw changed();
       }
     }
+    let present = false;
     try {
       await lstat(prefix);
-      try { await verify(prefix); } catch (cause) { throw new Error(changed().message, { cause }); }
-      return prefix;
+      present = true;
     } catch (error) { if (error.code !== 'ENOENT') throw error; }
-    const staging = await mkdtemp(join(parent, '.prepare-'));
+    if (present) {
+      try { await verify(prefix); return prefix; }
+      catch (cause) {
+        if (!repair || ['EACCES', 'EPERM', 'EIO'].includes(cause.code)) throw new Error(changed().message, { cause });
+        if (!(await lstat(prefix)).isDirectory()) throw changed();
+        // Explicit repair runs under the whole-cache exclusive lease and this
+        // prefix lock. Removing junctions never traverses their library target.
+        await rm(prefix, { recursive: true, maxRetries: 10, retryDelay: 100 });
+      }
+    }
+    await createOwnedStaging(staging);
+    progress?.({ stage: 'Preparing Windows compiler execution files' });
     async function shareFile(name, entry) {
       if (entry.type !== 'file') throw new Error(`Unsupported managed Lean bin entry: ${name}`);
       const source = join(target, name), destination = join(staging, name);
@@ -88,15 +103,17 @@ export async function windowsToolPrefix(directory, { receipt, temporaryDirectory
         else await shareFile(name, entry);
       }
       await writeFile(join(staging, marker), JSON.stringify(provenance) + '\n', { flag: 'wx' });
+      progress?.({ stage: 'Verifying Windows compiler execution files' });
       await verify(staging);
       try { await rename(staging, prefix); }
       catch (error) {
         if (!['EEXIST', 'ENOTEMPTY', 'EPERM', 'EACCES'].includes(error.code)) throw error;
         await verify(prefix);
       }
+      progress?.({ stage: 'Finishing Windows compiler execution files' });
       return prefix;
-    } finally { await rm(staging, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
-  })();
+    } finally { await removeOwnedStaging(staging, { log }); }
+  }, { signal, onWait: () => progress?.({ stage: 'Waiting for Windows compiler path preparation' }) });
   pending.set(prefix, operation);
   try { return await operation; } finally { pending.delete(prefix); }
 }

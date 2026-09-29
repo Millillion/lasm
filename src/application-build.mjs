@@ -6,7 +6,8 @@ import { createHash, randomUUID } from 'node:crypto';
 import { provisionLean, selectLeanVersion, toolchainCatalog } from './managed-lean.mjs';
 import { provisionSdk, sdkCatalog } from './managed-sdk.mjs';
 import { provisionGit } from './managed-git.mjs';
-import { hashFile } from './managed-artifacts.mjs';
+import { hashFile, managedCacheDirectory } from './managed-artifacts.mjs';
+import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject } from './application-sources.mjs';
 import { linkApplication } from './application-link.mjs';
@@ -37,7 +38,10 @@ export async function buildApplication(file, options = {}) {
   const source = resolve(file);
   if (!source.endsWith('.lean') || !(await stat(source)).isFile()) throw new Error(`Expected an existing Lean source: ${source}`);
   const directory = findApplicationProject(source) ?? dirname(source);
-  return withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), () => buildLockedApplication(source, options), {
+  return withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), () =>
+    withCacheLease(options.cache ?? managedCacheDirectory(), () => buildLockedApplication(source, options), {
+      onWait: () => options.progress?.({ stage: 'Waiting for tool cache repair to finish' }),
+    }), {
     onWait: () => options.progress?.({ stage: 'Waiting for another build in this project to finish' }),
   });
 }

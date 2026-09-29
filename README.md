@@ -66,10 +66,12 @@ These are all commands and options in the ordinary Node application interface:
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Explicit Node target | `npx lasm Main.lean --target node` | Select the default supported engine. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
+| Cache repair (new source; absent from `.46`) | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
 `--rebuild` and `--verbose` work with both run and build. `--output` is build-only;
 arguments after `--` are run-only. The application's exit status is preserved.
 There is currently no Lasm install, clean, uninstall, or version subcommand.
+The source installer also accepts the [documented download environment settings](docs/INSTALLATION_HARDENING.md#transfers).
 
 The source checkout also retains experimental interfaces. They are **unavailable
 in the Node release candidate**: `node bin/lasm.mjs build examples/basic/lasm.json dist`

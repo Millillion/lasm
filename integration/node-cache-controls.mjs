@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 
 export async function cacheControls(compiler, directory) {
   const { provisionArtifact } = await import(pathToFileURL(join(compiler, 'src/managed-artifacts.mjs')));
+  const { repairManagedCache } = await import(pathToFileURL(join(compiler, 'src/cache-repair.mjs')));
   const { c: tar } = createRequire(join(compiler, 'package.json'))('tar');
   mkdirSync(join(directory, 'source/tool'), { recursive: true });
   writeFileSync(join(directory, 'source/tool/value'), 'verified fixture\n');
@@ -26,10 +27,10 @@ export async function cacheControls(compiler, directory) {
       else writeFileSync(join(installed.directory, 'value'), 'damaged');
       await assert.rejects(provisionArtifact(artifact, options), /cache|Cache/);
       assert.equal(downloads, 1, 'Never trust or execute damaged cached tools');
-      // Exercise the documented recovery, removing exactly the diagnosed entry.
-      rmSync(installed.directory, { recursive: true });
+      const repaired = await repairManagedCache({ cache, log() {} });
+      assert.equal(repaired.removed.length, 1, 'Explicit offline repair removes only the diagnosed entry');
     } else {
-      const broken = { ...options, fetch: async () => {
+      const broken = { ...options, download: { sleep: async () => {} }, fetch: async () => {
         if (failure === 'unavailable') return new Response('missing', { status: 503 });
         if (failure === 'interrupted') return new Response(new ReadableStream({ start(controller) {
           controller.enqueue(bytes.subarray(0, 5)); controller.error(new Error('connection interrupted'));

@@ -46,6 +46,48 @@ $env:LASM_DOWNLOAD_TOTAL_MS = '14400000'
 npx lasm Main.lean
 ```
 
+## Cache coordination and repair
+
+Downloads and derived tools take OS-owned locks for their content identity.
+Windows short execution directories use the same coordination. Separate processes
+share one installation; the OS releases the lock when its owner dies. Lock files
+stay in place: deleting them could split waiters across different locks. There
+is no PID expiry or age threshold that could mistake a slow live install for a
+dead one. Receipts from earlier installers remain readable.
+
+Each lock owns one deterministic staging path. The next invocation reclaims that
+path after a crash, including a crash after successful publication. Temporary
+cleanup failures produce an actionable warning and do not turn a successfully
+published tool into a reported installation failure.
+
+Current source adds:
+
+```sh
+npx lasm cache repair
+```
+
+This is an explicit offline operation on `LASM_TOOLCHAIN_CACHE` (or the default
+cache). It verifies complete trees, retains valid tools, removes invalid trees
+through a private quarantine, and cleans owned staging. The next build replaces
+only missing tools. Project files, SDK mutable state, unknown entries and lock
+files remain untouched. Shared build leases prevent repair during active builds;
+repair fails promptly with a useful message. Stop older Lasm versions first,
+because `.46` and earlier do not participate in these new leases. Use a local
+filesystem with OS file-lock support; network filesystems are unverified.
+
+Old random `.install-*` / `.derive-*` / `.prepare-*` directories do not carry the
+new ownership proof and are left for manual inspection. Windows repair also
+rebuilds a corrupt short compiler prefix from an intact verified Lean archive.
+A killed process restarts its partial download; network retries within a live
+process may resume it. Atomic publication does not promise power-loss durability;
+receipts are fully checked again before reuse.
+
+The installer checks archive free space before downloading and accounts for
+extracted bytes and filesystem allocation rounding while reading archive headers.
+This is not a disk reservation: quotas or other writers can still exhaust space.
+ENOSPC, quota, read-only and permission errors explain how to relocate the cache.
+Tests inject insufficient-space errors without filling a disk or inducing OOM.
+
 ## Evidence and remaining gates
 
 The first source milestone passed 63 focused download/archive tests under the
@@ -54,6 +96,11 @@ interruptions, validated resume, ignored ranges, deadlines, cancellation,
 redirect rejection, integrity rejection and old receipt ordering. Cache receipts
 are compared by content rather than locale-dependent JSON key order.
 
-Cross-process recovery, explicit repair, dependency bundling, real TLS/proxy fault
-tests, automatic native CI and a new six-platform installed candidate remain
+The cache milestone passed 76 focused tests, including independent processes,
+kill/restart at download/extraction/verification/publication boundaries, active
+lease protection, locale changes and offline repair (84.2 MiB reported peak).
+The integrated 116-test installer/CLI run also passed (84.6 MiB peak). Native
+platform acceptance is pending.
+
+Dependency bundling, real TLS/proxy fault tests, automatic native CI and a new six-platform installed candidate remain
 implementation gates in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).

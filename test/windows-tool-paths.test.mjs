@@ -30,7 +30,7 @@ test('short physical compiler directories share libraries, verify bin files and 
   assert.equal(await readFile(join(a, 'bin/lean.exe'), 'utf8'), 'verified compiler');
   assert.equal(await readFile(join(a, 'LICENSE'), 'utf8'), 'unchanged notice');
   assert.equal(await windowsToolPrefix(tools, options), a);
-  assert.equal((await readdir(join(temporaryDirectory, 'lasm-tools'))).length, 1, 'No incomplete staging path survives');
+  assert.deepEqual((await readdir(join(temporaryDirectory, 'lasm-tools'))).filter(name => name.startsWith('.prepare-')), [], 'No incomplete staging path survives');
   // Replace the mirror file rather than editing a hard link to the source.
   await unlink(join(a, 'bin/lean.exe')); await writeFile(join(a, 'bin/lean.exe'), 'different program');
   await assert.rejects(windowsToolPrefix(tools, options), /execution files changed/);
@@ -41,4 +41,10 @@ test('short physical compiler directories share libraries, verify bin files and 
   await rm(join(a, 'bin/unexpected.dll'));
   await unlink(join(a, '.lasm-tool-prefix.json'));
   await assert.rejects(windowsToolPrefix(tools, options), /execution files changed/);
+  assert.equal(await windowsToolPrefix(tools, { ...options, repair: true }), a);
+  assert.equal(await readFile(join(a, 'bin/lean.exe'), 'utf8'), 'verified compiler');
+  const staging = join(temporaryDirectory, 'lasm-tools', '.prepare-' + a.split(/[/\\]/).at(-1));
+  await mkdir(staging); await writeFile(join(staging, 'interrupted'), 'stale');
+  assert.equal(await windowsToolPrefix(tools, options), a);
+  await assert.rejects(lstat(staging), { code: 'ENOENT' });
 });
