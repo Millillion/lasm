@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { confidencePlatforms, installationConfidence } from './installation-confidence.mjs';
+import { confidencePlatforms, installationConfidence, unavailableInstallation } from './installation-confidence.mjs';
 
 const repository = 'Millillion/lasm';
 assert.equal(process.env.GITHUB_REPOSITORY, repository);
@@ -48,9 +48,16 @@ for (const id of ids) {
     for (const platform of confidencePlatforms) {
       const name = platform.replace('win32', 'windows');
       const job = listing.jobs.find(j => j.name === `${name} / installed`);
-      if (!job || job.status !== 'completed') continue;
+      if (!job) {
+        if (run.status === 'completed' || number < run.run_attempt || id === process.env.GITHUB_RUN_ID)
+          attempts.push(unavailableInstallation(candidate, { runId: id, runAttempt: number, platform,
+            controlsRevision: run.head_sha, startedAt: run.created_at, conclusion: run.conclusion ?? 'unverified' }));
+        continue;
+      }
+      if (job.status !== 'completed') continue;
       const attempt = { runId: id, runAttempt: number, jobId: String(job.id), platform, controlsRevision: run.head_sha,
-        startedAt: job.started_at, conclusion: job.conclusion, url: job.html_url,
+        startedAt: job.started_at ?? run.created_at, conclusion: job.conclusion, url: job.html_url,
+        observation: job.conclusion === 'skipped' ? 'campaign-unavailable' : 'installation',
         archiveSha256: candidate.sha256, packageSourceRevision: candidate.sourceRevision,
         coldPassed: false, offlineNpmInstall: false, networkPassed: false, resourcePassed: false };
       try {
@@ -72,8 +79,12 @@ for (const id of ids) {
         attempt.coldPassed = acceptance.passed === true && cold?.code === 0
           && ['cold', 'lake', 'offline'].every(p => acceptance.phaseExecutions.some(e => e.phase === p && e.code === 0));
         attempt.coldSeconds = cold?.seconds;
-        attempt.retryMessages = [...new Set((cold?.stderr ?? '').split('\n').filter(s => s.includes('[lasm] Retrying ')).map(s => s.replace(/ — .* elapsed$/, '')))];
-        attempt.firstAttemptSucceeded = attempt.retryMessages.length === 0;
+        attempt.retryMessages = [...new Set(installation.steps.filter(s => ['cold npx lasm Main.lean', 'Lake local import'].includes(s.label))
+          .flatMap(s => (s.stderr ?? '').split('\n')).filter(s => s.includes('[lasm] Retrying ')).map(s => s.replace(/ — .* elapsed$/, '')))];
+        attempt.firstAttemptSucceeded = attempt.coldPassed && attempt.retryMessages.length === 0;
+        attempt.downloads = installation.downloads;
+        attempt.catalogDownloadBytes = installation.downloadBytes;
+        attempt.byteAccounting = 'Pinned compressed artifact lengths, excluding transport overhead and bytes repeated during retries; not a wire-byte measurement.';
         attempt.offlineNpmInstall = installation.offlineNpmInstall?.emptyCache === true && installation.offlineNpmInstall?.networkDenied === true;
         const resources = report(lines, `.work/node-${os}-resources.json`), disk = report(lines, `.work/node-${os}-disk.json`);
         attempt.resourcePassed = disk.status === 'passed' && (platform.startsWith('win32')

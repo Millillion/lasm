@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { confidencePlatforms, installationConfidence } from '../scripts/ci/installation-confidence.mjs';
+import { confidencePlatforms, installationConfidence, unavailableInstallation } from '../scripts/ci/installation-confidence.mjs';
 
 const candidate = { version: '0.1.0-experimental.47', sha256: 'a'.repeat(64), sourceRevision: 'b'.repeat(40) };
 const attempts = () => confidencePlatforms.flatMap((platform, i) => [0, 12, 25].map((hours, n) => ({
@@ -42,4 +42,32 @@ test('duplicate reports do not inflate trials and failures remain visible after 
   const recovered = installationConfidence(candidate, [...records, latestFailure, oneRetry]);
   assert.equal(recovered.passed, false, 'One green retry does not reuse earlier passes from before the failure');
   assert.equal(recovered.platforms['linux-x64'].consecutiveSuccessful, 1);
+});
+
+test('failed preparation resets every affected platform without pretending an installer ran', () => {
+  const records = attempts();
+  const missing = confidencePlatforms.map(platform => unavailableInstallation(candidate, {
+    platform, runId: '4', runAttempt: 1, controlsRevision: candidate.sourceRevision,
+    startedAt: '2026-09-30T02:00:00Z', conclusion: 'failure',
+  }));
+  const recovered = records.filter(r => r.runId === '3').map(r => ({ ...r, runId: '5', jobId: r.jobId + '-retry', startedAt: '2026-09-30T03:00:00Z' }));
+  const report = installationConfidence(candidate, [...records, ...missing, ...recovered]);
+  assert.equal(report.passed, false);
+  for (const platform of confidencePlatforms) {
+    assert.equal(report.platforms[platform].unavailableCampaigns, 1);
+    assert.equal(report.platforms[platform].consecutiveSuccessful, 1);
+    assert.equal(report.platforms[platform].successful, 4);
+  }
+});
+
+test('timings and recovered downloads remain separate from failed and unmeasured attempts', () => {
+  const records = attempts().map(r => ({ ...r, coldSeconds: Number(r.runId) * 10, firstAttemptSucceeded: r.runId !== '2' }));
+  records.push({ ...records[0], runId: '0', jobId: 'failed', startedAt: '2026-09-28T00:00:00Z', conclusion: 'failure', coldSeconds: 9999 });
+  const report = installationConfidence(candidate, records);
+  assert.equal(report.passed, true);
+  assert.deepEqual(report.platforms['linux-x64'].coldSeconds, { samples: 3, median: 20, p95: 30, maximum: 30 });
+  assert.equal(report.platforms['linux-x64'].withoutDownloadRetries, 2);
+  assert.equal(report.platforms['linux-x64'].recoveredDownloadRetries, 1);
+  const unmeasured = installationConfidence(candidate, attempts()).platforms['linux-x64'];
+  assert.deepEqual(unmeasured.coldSeconds, { samples: 0, median: null, p95: null, maximum: null });
 });

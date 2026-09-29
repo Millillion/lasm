@@ -208,11 +208,11 @@ access. The `.47` archive is preserved as unaccepted; a later candidate also
 includes the reserved-filename inventory regression and its own version in the
 packed README's installation command.
 
-The latest local suite passed 133 of 135 controls, with two Windows-only controls
+That local suite passed 133 of 135 controls, with two Windows-only controls
 correctly skipped on Linux (132.8 MiB guard peak, no resource abort). New native
 Windows controls use a real deny-delete file handle and a disposable 64 MiB NTFS
 volume to exercise cleanup warnings and actual cross-volume prefix copies.
-They still need native CI results.
+Its subsequent native results are recorded below.
 
 The next automatic fault run ([36512182510](https://github.com/Millillion/lasm/actions/runs/36512182510))
 passed Linux/macOS but timed out on Windows. The new real-file-lock control
@@ -267,6 +267,13 @@ A later failed or unverified installation restarts that platform's clean sequenc
 a single green retry cannot reuse passes recorded before the failure. The live
 collector was also checked against the original failed `.47` campaign: it retained
 all five started native jobs as failed/unverified and refused the confidence gate.
+Preparation failures with missing native jobs also reset the affected sequences,
+without claiming that an installer ran. Regression controls cover a failed input
+followed by one green retry. Reports separate downloads without retries from
+successful recovery, and provide observed median/p95/max cold timings with their
+sample counts. Artifact byte totals are pinned compressed lengths, not measured
+wire traffic; retries and transport overhead can add bytes. New controls include
+the mandatory Lean source/notices companion in that catalog total.
 
 A single green matrix can create a tested draft, but it does not satisfy this
 additional gate. Any robustness release decision must require the selected
