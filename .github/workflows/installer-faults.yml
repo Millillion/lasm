@@ -62,6 +62,8 @@ jobs:
           # This Python runs only the CI Job Object guard/archive fixtures. The
           # product's Node/npm-only bootstrap is a separate acceptance gate.
           $env:LASM_TEST_PYTHON = (python -c "import sys; print(sys.executable)")
+          & $env:LASM_TEST_PYTHON -I -B scripts/full-lean/run-bounded-windows.py --memory-mib 256 --timeout-seconds 30 --report .work/atomic-report-resources.json -- $env:LASM_TEST_PYTHON -I -B test/atomic-report.test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & $env:LASM_TEST_PYTHON -I -B scripts/full-lean/run-bounded-windows.py --memory-mib 1024 --timeout-seconds 240 --report .work/installer-fault-resources.json -- node scripts/ci/installer-faults.mjs
           exit $LASTEXITCODE
       - name: Remove the workflow-owned Windows fixture volume

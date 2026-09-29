@@ -1,0 +1,50 @@
+{
+  "runId": "36513318119",
+  "jobId": "109231086662",
+  "url": "https://github.com/Millillion/lasm/actions/runs/36513318119/job/109231086662",
+  "platform": "win32-arm64",
+  "archiveSha256": "ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b",
+  "packageSourceRevision": "e4bb15165042a439b9cabdcd1678fafdc2e99f35",
+  "installedAcceptancePassed": false,
+  "passedPhases": [
+    "cold",
+    "lake"
+  ],
+  "classification": "CI guard report replacement failed with Windows access denied after successful cold and Lake phases; no memory stop or OOM",
+  "resourceReport": {
+    "status": "guard-error",
+    "command": [
+      "C:\\hostedtoolcache\\windows\\node\\26.10.0\\arm64\\node.exe",
+      "scripts/check-node-windows.mjs",
+      "C:\\a\\lasm\\lasm\\.work\\node-windows-acceptance",
+      ".work/node-candidate/lasm-compiler-0.1.0-experimental.36513318119.tgz",
+      "ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b"
+    ],
+    "hostAtStart": {
+      "total": 17169387520,
+      "available": 12998893568
+    },
+    "limits": {
+      "jobCommittedBytes": 8584693760,
+      "stopCommittedBytes": 6867755008,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 6600
+    },
+    "peakCommittedBytes": 2167558144,
+    "minimumHostAvailable": 11955859456,
+    "startedAt": 1790650206.4492922,
+    "disk": {
+      "reserveBytes": 4294967296,
+      "minimumFreeBytes": {
+        "C:\\a\\lasm\\lasm": 127977091072,
+        "C:\\Users\\runneradmin\\AppData\\Local\\Temp": 127977091072
+      }
+    },
+    "unit": "Local\\LasmResource-d74845d7-2cc9-477a-9a80-a23219f86942",
+    "pid": 3780,
+    "lastSampleAt": 1790651345.3680477,
+    "error": "[WinError 5] Access is denied: 'C:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\node-windows-resources.json.partial' -> 'C:\\\\a\\\\lasm\\\\lasm\\\\.work\\\\node-windows-resources.json'",
+    "finishedAt": 1790651345.575208
+  },
+  "correction": "Nonblocking bounded contention tolerance for periodic evidence writes. Continue all resource checks, fail closed on persistent contention, and retry final report only after closing the workload job. Retest unchanged package."
+}

@@ -16,6 +16,7 @@ import shutil
 import sys
 import time
 import uuid
+import runpy
 
 if sys.platform != "win32":
     raise SystemExit("This guard requires native Windows Python")
@@ -151,10 +152,11 @@ if disk_paths:
                         "minimumFreeBytes": {p: shutil.disk_usage(p).free for p in disk_paths}}
 
 
-def save():
-    temporary = report.with_suffix(report.suffix + ".partial")
-    temporary.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
-    temporary.replace(report)
+report_writer = runpy.run_path(str(Path(__file__).with_name('atomic-report.py')))['AtomicReport'](report)
+
+
+def save(*, final=False):
+    return report_writer.save(evidence, final=final)
 
 
 job = mutex = None
@@ -228,7 +230,9 @@ finally:
         if handle:
             close(handle)
     evidence["finishedAt"] = time.time()
-    save()
-    print(json.dumps(evidence), flush=True)
+    try:
+        save(final=True)
+    finally:
+        print(json.dumps(evidence), flush=True)
 raise SystemExit(124 if evidence.get("stoppedBecause") == "time-limit"
                  else 125 if evidence.get("stoppedBecause") else evidence["exitCode"])

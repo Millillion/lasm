@@ -251,6 +251,15 @@ records about 4.86 GiB of file pages versus 189 MiB of anonymous memory, zero OO
 events and no pressure throttling. The network control now uses the primary
 consumer's scoped completed-cache advice sidecar; limits and package bytes stay
 unchanged. This attempt remains a resource abort, not an installed/network pass.
+Apple Silicon subsequently passed the complete installed and network gates. The
+[original Windows ARM64 attempt](evidence/installer-windows-report-contention-2026-09-29.json)
+passed cold and Lake builds, then its CI guard encountered access denied while
+atomically replacing its evidence file. Peak commitment was 2.02 GiB, with no
+memory stop. The supervisor now tolerates brief Windows sharing contention during
+periodic saves without sleeping or pausing resource checks. Persistent contention
+fails closed after five seconds; final retries happen after the workload job is
+closed. A native deny-delete-handle control exercises recovery and bounded failure.
+These are maintainer-control changes; the candidate bytes remain unchanged.
 
 ### Repeated cold installations
 

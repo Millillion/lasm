@@ -4,15 +4,15 @@ CA/proxy transport, process interruption and offline packaging. Candidate
 `0.1.0-experimental.36513318119` is packed reproducibly and retained by hash.
 Accepted `.46` remains unchanged.
 
-Linux x86-64 passed full installed/deployment acceptance. Its additional network
-control hit the proactive guard due to verified-tool file pages, with zero OOM
-events. The correction applies the primary suite's scoped cache advice without
-changing limits or package bytes. Other native jobs continue. Every failure is
-preserved in [the report](INSTALLATION_HARDENING.md).
+Apple Silicon passed full installed/network acceptance. Linux passed installed
+checks before a network-control file-cache resource stop; scoped cache advice
+corrects it. Windows ARM64 passed cold/Lake builds before CI report replacement
+hit file contention; bounded nonblocking persistence corrects that supervisor.
+Limits and package bytes are unchanged. Every failure remains in
+[the report](INSTALLATION_HARDENING.md).
 
 Daily validation now selects that exact archive; activation does not claim
 acceptance. Corrected controls must pass all six targets, then record three
 consecutive cold passes per target across at least 24 hours and two dates.
-Preparation/resource failures reset the sequence; real guard reports are tested.
-ETA depends on native results; temporal
-confidence remains pending. README reviewed; npm unpublished. No local heavy builds.
+Preparation/resource failures reset the sequence; guard reports are tested.
+Temporal confidence remains pending. README reviewed; npm unpublished. No local heavy builds.
