@@ -1,0 +1,63 @@
+name: Installer fault controls
+on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'bin/**', 'scripts/**', 'test/**', 'integration/node-cache-controls.mjs', 'package*.json', '.github/workflows/installer-faults.yml']
+  pull_request:
+    paths: ['src/**', 'bin/**', 'scripts/**', 'test/**', 'integration/node-cache-controls.mjs', 'package*.json', '.github/workflows/installer-faults.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: installer-faults-${{ github.ref }}
+  cancel-in-progress: false
+# Standard public-repository runners only. No uploaded artifacts or caches;
+# compact reports and all attempts are retained in the workflow logs/summary.
+jobs:
+  faults:
+    if: github.event.repository.visibility == 'public'
+    name: Faults ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+          - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
+          - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
+          - { platform: win32-x64, runner: windows-2025, arch: x64 }
+          - { platform: win32-arm64, runner: windows-11-arm, arch: arm64 }
+    env:
+      LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable Linux process-tree guard
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Bounded POSIX fault suite
+        if: runner.os != 'Windows'
+        run: LASM_TEST_PYTHON="$(command -v python3)" node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/installer-fault-resources.json -- node scripts/ci/installer-faults.mjs
+      - name: Bounded Windows fault suite
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # This Python runs only the CI Job Object guard/archive fixtures. The
+          # product's Node/npm-only bootstrap is a separate acceptance gate.
+          $env:LASM_TEST_PYTHON = (python -c "import sys; print(sys.executable)")
+          & $env:LASM_TEST_PYTHON -I -B scripts/full-lean/run-bounded-windows.py --memory-mib 1024 --timeout-seconds 240 --report .work/installer-fault-resources.json -- node scripts/ci/installer-faults.mjs
+          exit $LASTEXITCODE
+      - name: Preserve all outcomes and resource evidence
+        if: always()
+        run: node -e "const f=require('node:fs');for(const p of ['.work/installer-faults.json','.work/installer-fault-resources.json'])if(f.existsSync(p)){const s=p+'\n'+f.readFileSync(p,'utf8');console.log(s);f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'\n\n'+s)}"

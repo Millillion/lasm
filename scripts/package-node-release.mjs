@@ -12,6 +12,7 @@ import { pythonCatalog } from '../src/managed-python.mjs';
 import { gitCatalog } from '../src/managed-git.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
+import { bundleInstaller } from './bundle-installer.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -56,15 +57,18 @@ const json = (path, value) => writeFileSync(join(staging, path), JSON.stringify(
 json('src/toolchains.json', { ...toolchainCatalog, defaultLean: lean, lean: { [lean]: toolchainCatalog.lean[lean] } });
 json('src/application-runtimes.json', { schema: 1, lean: { [lean]: expected } });
 json('application-support.json', { schema: 1, platforms, node: pins.node, lean, minimumGlibc: '2.39' });
-json('provenance.json', { sourceRevision, runtimeManifestSha256: manifestSha256, lean, node: pins.node });
+const installer = await bundleInstaller(root, staging);
+json('provenance.json', { sourceRevision, runtimeManifestSha256: manifestSha256,
+  installerManifestSha256: installer.sha256, lean, node: pins.node });
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json')));
 json('package.json', {
   name: sourcePackage.name, version, private: true, license: 'UNLICENSED', type: 'module',
   description: 'Compile ordinary Lean applications to run in Node',
   bin: sourcePackage.bin, engines: { node: pins.node }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
   files: ['bin', 'src', 'scripts', 'targets', 'docs', 'examples', 'README.md',
-    'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json'],
+    'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json', 'installer-dependencies.json'],
   dependencies: { tar: sourcePackage.dependencies.tar },
+  bundleDependencies: ['tar'],
 });
 writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), readFileSync(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8')
   + '\n=== Koffi runtime adapter ===\n' + readFileSync(join(staging, 'src/native/node_modules/koffi/LICENSE.txt'), 'utf8'));
@@ -80,9 +84,13 @@ for (const file of ['bin/lasm.mjs', 'src/application-support.mjs', 'src/applicat
   'src/native/process/manifest.json', 'src/native/signals/manifest.json', 'src/native/bun-stack/manifest.json',
   'scripts/full-lean/host-library.js', 'application-support.json', 'provenance.json', 'THIRD_PARTY_NOTICES.txt',
   `targets/${runtime.manifest.name}/target.json`]) assert.ok(files.has(file), `npm pack omitted ${file}`);
+for (const [path, dependency] of Object.entries(installer.manifest.packages)) {
+  for (const file of Object.keys(dependency.files)) assert.ok(files.has(`${path}/${file}`), `npm pack omitted bundled installer file ${path}/${file}`);
+}
 const result = { scope: 'Reproducible local npm packing; native installed acceptance is separate',
   tarball: archive, sha256, sourceRevision, candidateVersion: version, defaultLean: lean, node: pins.node,
   runtime: { identity: manifestSha256, name: runtime.manifest.name }, reproduciblePacking: true,
+  installer: { identity: installer.sha256, packages: Object.fromEntries(Object.entries(installer.manifest.packages).map(([path, p]) => [path, p.version])) },
   compressedBytes: packed.size, installedBytes: packed.unpackedSize, files: packed.entryCount,
   resourceReport: process.env.LASM_RESOURCE_REPORT, recordedAt: new Date().toISOString() };
 writeFileSync(join(output, 'result.json'), JSON.stringify(result, null, 2) + '\n');

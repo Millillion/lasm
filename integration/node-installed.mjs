@@ -154,6 +154,9 @@ try {
     assert.equal(installed.code, 0);
     result.npm = npm('npm version', 'npm', ['--version']).stdout.trim();
     result.provenance = json(join(compiler, 'provenance.json'));
+    const installerManifest = readFileSync(join(compiler, 'installer-dependencies.json'));
+    assert.equal(createHash('sha256').update(installerManifest).digest('hex'), result.provenance.installerManifestSha256);
+    result.installerDependencies = Object.fromEntries(Object.entries(JSON.parse(installerManifest).packages).map(([path, p]) => [path, p.version]));
     result.packageVersion = json(join(compiler, 'package.json')).version;
     result.compiler = compiler; result.project = project; result.tools = tools;
     result.support = json(join(compiler, 'application-support.json'));
@@ -195,6 +198,21 @@ try {
     // Kernel network restrictions, inherited by npm and every build tool.
     await assert.rejects(fetch(process.platform === 'win32' ? 'https://1.1.1.1:443' : 'https://127.0.0.1:443', { signal: AbortSignal.timeout(5000) }),
       error => ['EPERM', 'EACCES'].includes(error.cause?.code), 'OS sandbox must deny TCP, not merely encounter an unavailable network');
+    const offlineProject = join(workspace, 'offline npm project'), offlineNpmCache = join(workspace, 'empty offline npm cache');
+    assert.equal(existsSync(offlineProject), false); assert.equal(existsSync(offlineNpmCache), false);
+    mkdirSync(offlineProject);
+    const offlineInstall = npm('empty-cache offline npm install', 'npm', ['install', archive, '--offline', '--no-audit', '--no-fund', '--cache', offlineNpmCache], offlineProject);
+    assert.equal(offlineInstall.code, 0, offlineInstall.stderr);
+    const offlineCompiler = join(offlineProject, 'node_modules/@lasm/compiler');
+    const installer = json(join(offlineCompiler, 'installer-dependencies.json'));
+    for (const [path, dependency] of Object.entries(installer.packages)) {
+      assert.equal(json(join(offlineCompiler, path, 'package.json')).version, dependency.version);
+      for (const [name, expected] of Object.entries(dependency.files))
+        assert.equal(createHash('sha256').update(readFileSync(join(offlineCompiler, path, name))).digest('hex'), expected.sha256);
+    }
+    result.offlineNpmInstall = { emptyCache: true, networkDenied: true, packages: Object.keys(installer.packages).length,
+      installerManifestSha256: result.provenance.installerManifestSha256 };
+    save();
     matchesCli(npx('offline cached npx run', ['Main.lean']), basic);
     assert.equal(statSync(join(result.cached, 'program.wasm')).mtimeMs, result.originalMtime);
     assert.equal(buildInfo(result.cached).signature, result.originalSignature);

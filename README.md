@@ -36,8 +36,9 @@ several GB. Measured first builds took about 5–16 minutes. The terminal shows 
 and elapsed time. Later builds reuse verified tools and unchanged outputs. See
 [cache locations, requirements, and recovery](docs/NODE_SUPPORT.md).
 Candidate `.46` requires rerunning failed downloads. Current source adds bounded
-automatic retries, safe transfer resume, and locale-independent cache checks;
-these changes await a new six-platform candidate. See
+retries, safe resume, crash recovery, offline repair, and bundled installer
+dependencies. Automatic native fault checks are configured; the changed package
+still awaits six-platform acceptance. See
 [installation hardening](docs/INSTALLATION_HARDENING.md) for settings and progress.
 
 Copy **all of `dist/`** to a supported machine with the **same OS, architecture,

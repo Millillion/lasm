@@ -90,6 +90,47 @@ Tests inject insufficient-space errors without filling a disk or inducing OOM.
 
 ## Evidence and remaining gates
 
+The candidate packer now bundles the six packages in the installer's exact
+committed npm dependency graph. `installer-dependencies.json` records versions,
+registry integrity values, graph edges and every bundled file hash; provenance
+includes its digest. Packing twice must produce identical bytes. The tiny packing
+control passed installation with an empty npm cache, `--offline`, and an unusable
+registry. Full candidate acceptance additionally repeats installation under OS
+network denial. No dependency lifecycle script is needed.
+
+The [automatic fault workflow](../.github/workflows/installer-faults.yml) runs on
+relevant pushes and PRs on the existing six native runners. It uses small TLS
+fixtures, process kills, locks, repair, archive and dependency packing controls.
+Standard public runners are [free](https://docs.github.com/en/actions/reference/runners/github-hosted-runners);
+this workflow uploads no artifacts/caches. All outcomes remain in logs and job
+summaries. It observes direct pushes to main; it is not a pre-push branch gate.
+
+### Corporate networks
+
+Real loopback HTTPS/CONNECT tests verify untrusted-CA rejection, trusted startup
+CA configuration, proxy credentials and `NO_PROXY` through the build-worker
+transport. No system trust settings are modified. Node's [startup settings](https://github.com/nodejs/node/blob/main/doc/api/cli.md)
+must be present before the CLI starts:
+
+```sh
+NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://proxy.example:8080 \
+  NODE_EXTRA_CA_CERTS=/path/to/company-ca.pem npx lasm Main.lean
+```
+
+```powershell
+$env:NODE_USE_ENV_PROXY = '1'
+$env:HTTPS_PROXY = 'http://proxy.example:8080'
+$env:NODE_EXTRA_CA_CERTS = 'C:\certificates\company-ca.pem'
+npx lasm Main.lean
+```
+
+`NO_PROXY` controls exclusions. npm configuration alone does not configure Node's
+fetch. Git uses its ordinary proxy/CA configuration; set `GIT_SSL_CAINFO` to the
+appropriate CA bundle when Lake dependencies use a private Git server. Do not
+disable certificate verification. Complete CLI/Lake corporate-network validation
+is an additional installed-candidate gate; the tiny worker tests do not establish
+compatibility with every proxy appliance or corporate policy.
+
 The first source milestone passed 63 focused download/archive tests under the
 local resource guard (52.6 MiB reported peak). It covers bounded retries,
 interruptions, validated resume, ignored ranges, deadlines, cancellation,
@@ -102,5 +143,7 @@ lease protection, locale changes and offline repair (84.2 MiB reported peak).
 The integrated 116-test installer/CLI run also passed (84.6 MiB peak). Native
 platform acceptance is pending.
 
-Dependency bundling, real TLS/proxy fault tests, automatic native CI and a new six-platform installed candidate remain
-implementation gates in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).
+The combined automatic suite passed all 127 tests locally under the guard
+(126.2 MiB peak). Native CI results, durable runtime inputs, full CLI/Lake network
+checks, a new six-platform installed candidate and scheduled confidence reporting
+remain gates in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).
