@@ -60,16 +60,18 @@ packed candidate before extending the accepted support claim.
 - [x] Run deterministic native fault tests automatically on relevant pushes/PRs
   across all six targets. Replace cache-only runtime handoff with a durable,
   authenticated input.
-- [ ] Validate the new single packed candidate on all six targets, including
+- [x] Validate the new single packed candidate on all six targets, including
   the full CLI/Lake private-CA and authenticated-proxy control.
-- [ ] Schedule live distribution checks; retain all attempts and bounded evidence.
-  Track three cold repetitions per target over at least two days as an additional
+- [x] Schedule live distribution checks; retain all attempts and bounded evidence.
+- [ ] Observe three consecutive cold repetitions per target over at least two days as an additional
   release-confidence gate, without claiming a statistical reliability guarantee.
 
-The deterministic native matrix has passed; changed installed-package acceptance
-is still pending. Scheduled reporting selects the immutable candidate while
-corrected Linux resource controls repeat its initial validation. Three cold
-passes per target must then span at least 24 hours and two UTC dates.
+The deterministic native matrix and the hardened candidate's complete installed,
+offline npm, deployment and CLI/Lake network gates have passed all six targets.
+The [hardening report](INSTALLATION_HARDENING.md) retains the original failures
+and exact archive/job identities. Daily reporting selects this immutable archive;
+the additional three consecutive cold passes per target must span at least
+24 hours and two UTC dates. This temporal gate remains pending.
 
 Continue direct commits to `main`; automatic checks observe those commits.
 Do not add a mandatory PR workflow or publish to npm. Windows 11 x64 and broader

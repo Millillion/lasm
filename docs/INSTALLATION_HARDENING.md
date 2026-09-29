@@ -151,8 +151,8 @@ are compared by content rather than locale-dependent JSON key order.
 The cache milestone passed 76 focused tests, including independent processes,
 kill/restart at download/extraction/verification/publication boundaries, active
 lease protection, locale changes and offline repair (84.2 MiB reported peak).
-The integrated 116-test installer/CLI run also passed (84.6 MiB peak). Native
-platform acceptance is pending.
+The integrated 116-test installer/CLI run also passed (84.6 MiB peak). The later
+native results below extend this local evidence.
 
 The combined automatic suite passed all 127 tests locally under the guard
 (126.2 MiB peak). The [first native automatic run](https://github.com/Millillion/lasm/actions/runs/36509526628)
@@ -194,8 +194,9 @@ measurements are retained even when a retry records a different timestamp.
 Two regression controls cover partial upload recovery and conflict rejection;
 a read-only probe verified reuse of the actual retained candidate without writes.
 
-The new packed candidate, full CLI/Lake network results, and observed multi-day
-confidence remain gates in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).
+The new packed candidate and full CLI/Lake network gates have passed all six
+targets, as recorded below. Observed multi-day confidence remains a separate gate
+in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).
 
 The first `.47` attempt ([36510234373](https://github.com/Millillion/lasm/actions/runs/36510234373))
 stopped before packaging: the compiler guard's minimal environment omitted
@@ -236,7 +237,7 @@ completed in 5.6 seconds, and actual cross-volume copying passed on both Windows
 architectures. A subsequent environment review corrected `Path`/`PATH` composition
 and mixed-case Lean/Lake/Elan overrides in Windows workers. Installed acceptance
 now also runs the Lake project offline with unrelated developer settings present;
-that additional profile awaits its new candidate.
+that profile is exercised by the new candidate below.
 
 The final source [139-control matrix](https://github.com/Millillion/lasm/actions/runs/36513317821)
 also passed all six targets, including the environment controls. Each platform
@@ -281,7 +282,9 @@ The corrected Linux x86-64 network control passed at 1.26 GiB peak with all
 memory-event counters zero under unchanged limits. Linux ARM64, Intel macOS and
 Windows x86-64 also completed both installed and network gates. These are passes
 of the same archive across the original and corrected campaigns, not a claim that
-the original failed campaign was green. Windows ARM64 remains pending.
+the original failed campaign was green. Windows ARM64 then passed its complete
+fresh repetition, with 2.50 GiB installed-suite and 1.46 GiB network-control peak
+commitment, completing initial acceptance of the exact archive on all six targets.
 
 | Target | Complete installed, deployment, network and resource evidence |
 | --- | --- |
@@ -290,7 +293,7 @@ the original failed campaign was green. Windows ARM64 remains pending.
 | macOS x86-64 | [Passed](evidence/installer-hardened-darwin-x64-2026-09-29.json) |
 | macOS ARM64 | [Passed](evidence/installer-hardened-darwin-arm64-2026-09-29.json) |
 | Windows x86-64 | [Passed](evidence/installer-hardened-win32-x64-2026-09-29.json) |
-| Windows ARM64 | Fresh repetition running after the preserved report-write failure. |
+| Windows ARM64 | [Passed](evidence/installer-hardened-win32-arm64-2026-09-29.json) |
 
 The [real CLI repair matrix](https://github.com/Millillion/lasm/actions/runs/36516980143)
 also passed all six native targets. No new application/compiler code was needed
@@ -299,11 +302,20 @@ for the CI resource and evidence corrections.
 ### Repeated cold installations
 
 [`installation-confidence.yml`](../.github/workflows/installation-confidence.yml)
-runs daily at 03:17 UTC and supports manual dispatch. Its reviewed selection
+is scheduled daily at 03:17 UTC and supports manual dispatch. GitHub documents
+that [scheduled runs can be delayed or dropped](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+Only actual completed observations count; a missing scheduled run is never a
+successful trial. A maintainer can request a fresh run of the same reviewed
+selection without changing its package:
+
+```sh
+gh workflow run installation-confidence.yml --repo Millillion/lasm --ref main
+```
+
+Its reviewed selection
 [`node-robustness-candidate.json`](../scripts/ci/node-robustness-candidate.json)
-selects the unchanged archive for initial and repeated validation. Activation is
-not acceptance: the corrected controls must first complete all six targets, and
-the multi-day gate remains separate. All native repetitions
+selects the unchanged archive for repeated validation. Initial acceptance has
+passed on all six targets; the multi-day gate remains separate. All native repetitions
 start from fresh VMs and empty consumer tool/npm caches and use one exact archive.
 The source controls also rerun; each report records their revision separately.
 

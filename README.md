@@ -37,8 +37,9 @@ and elapsed time. Later builds reuse verified tools and unchanged outputs. See
 [cache locations, requirements, and recovery](docs/NODE_SUPPORT.md).
 Candidate `.46` requires rerunning failed downloads. Current source adds bounded
 retries, safe resume, crash recovery, offline repair, and bundled installer
-dependencies. Installer fault checks pass on all six native targets; the changed
-package is undergoing full installed acceptance. See
+dependencies. The hardened candidate also passed installed, offline, deployment,
+and proxy/CA acceptance on all six native targets, alongside the installer fault
+checks. Its multi-day validation remains pending. See
 [installation hardening](docs/INSTALLATION_HARDENING.md) for settings and progress.
 New candidates must also pass consecutive cold installations across multiple days before meeting the
 additional robustness gate; one successful run alone is insufficient.
