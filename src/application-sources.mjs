@@ -23,12 +23,17 @@ export function findApplicationProject(source) {
   }
 }
 
-export function nativeLeanEnvironment(lean) {
-  const env = { ...process.env };
+export function nativeLeanEnvironment(lean, inherited = process.env) {
+  const env = { ...inherited };
   const prefix = lean.executionPrefix ?? lean.prefix;
-  for (const key of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(key)) delete env[key];
+  const windows = process.platform === 'win32';
+  const priorPath = env.PATH ?? (windows ? env[Object.keys(env).find(key => key.toUpperCase() === 'PATH')] : undefined);
+  for (const key of Object.keys(env)) {
+    const name = windows ? key.toUpperCase() : key;
+    if (/^(?:LEAN_|LAKE_|ELAN_)/.test(name) || windows && name === 'PATH') delete env[key];
+  }
   Object.assign(env, { LEAN_NUM_THREADS: '1', LEAN_STACK_SIZE_KB: '8192',
-    PATH: [join(prefix, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(delimiter) });
+    PATH: [join(prefix, 'bin'), dirname(process.execPath), priorPath].filter(Boolean).join(delimiter) });
   // Lean's module reader uses CreateFile without long-path manifest opt-in.
   // An explicit namespace keeps deep managed caches usable without changing
   // Windows registry policy or requiring a shorter user-selected directory.

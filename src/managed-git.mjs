@@ -10,7 +10,7 @@ export const gitCatalog = JSON.parse(await readFile(new URL('./git-tools.json', 
 export function managedGitEnvironment(git, inherited = process.env) {
   const env = { ...inherited };
   const paths = git.platform === 'win32' ? win32 : posix;
-  const priorPath = Object.keys(env).find(key => key.toUpperCase() === 'PATH');
+  const priorPath = Object.hasOwn(env, 'PATH') ? 'PATH' : Object.keys(env).find(key => key.toUpperCase() === 'PATH');
   const path = priorPath === undefined ? '' : env[priorPath];
   // Windows environment keys are case insensitive. Avoid competing Path/PATH
   // entries when passing the managed tools to native Lean and Git children.

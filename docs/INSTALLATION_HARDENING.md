@@ -220,6 +220,15 @@ The candidate input job succeeded in [36512182772](https://github.com/Millillion
 proving the authenticated draft-to-read-only handoff. Linux workspace cleanup now
 follows the full CLI/Lake network check, which needs the installed package.
 
+The corrected [137-control matrix](https://github.com/Millillion/lasm/actions/runs/36512703131)
+passed all six targets: POSIX passed 135 with two Windows-only skips; Windows
+passed 134 with three POSIX-only skips. The real Windows x64 locked-file case
+completed in 5.6 seconds, and actual cross-volume copying passed on both Windows
+architectures. A subsequent environment review corrected `Path`/`PATH` composition
+and mixed-case Lean/Lake/Elan overrides in Windows workers. Installed acceptance
+now also runs the Lake project offline with unrelated developer settings present;
+that additional profile awaits its new candidate.
+
 ### Repeated cold installations
 
 [`installation-confidence.yml`](../.github/workflows/installation-confidence.yml)

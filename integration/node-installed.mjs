@@ -213,6 +213,21 @@ try {
     result.offlineNpmInstall = { emptyCache: true, networkDenied: true, packages: Object.keys(installer.packages).length,
       installerManifestSha256: result.provenance.installerManifestSha256 };
     save();
+    const inheritedEnvironment = { ...process.env };
+    for (const [name, value] of Object.entries({ LEAN_PATH: join(workspace, 'unrelated Lean'),
+      LAKE_HOME: join(workspace, 'unrelated Lake'), ELAN_HOME: join(workspace, 'unrelated Elan') })) {
+      inheritedEnvironment[process.platform === 'win32' ? name[0] + name.slice(1).toLowerCase() : name] = value;
+    }
+    if (process.platform === 'win32') {
+      const pathKey = Object.keys(inheritedEnvironment).find(key => key.toUpperCase() === 'PATH');
+      const priorPath = inheritedEnvironment[pathKey];
+      for (const name of Object.keys(inheritedEnvironment)) if (name.toUpperCase() === 'PATH') delete inheritedEnvironment[name];
+      inheritedEnvironment.Path = priorPath;
+    }
+    matchesCli(run('offline Lake build with unrelated developer environment', process.execPath,
+      [join(compiler, 'bin/lasm.mjs'), 'Main.lean'], result.lake.directory, inheritedEnvironment),
+    { code: 0, stdout: 'Lean module: 42\n' });
+    result.inheritedEnvironmentChecked = true; save();
     matchesCli(npx('offline cached npx run', ['Main.lean']), basic);
     assert.equal(statSync(join(result.cached, 'program.wasm')).mtimeMs, result.originalMtime);
     assert.equal(buildInfo(result.cached).signature, result.originalSignature);
