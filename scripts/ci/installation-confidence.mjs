@@ -24,16 +24,16 @@ export function installationConfidence(candidate, attempts, { repetitions = 3, m
   history.sort((a, b) => Date.parse(a.startedAt) - Date.parse(b.startedAt));
   const platforms = Object.fromEntries(confidencePlatforms.map(platform => {
     const observed = history.filter(a => a.platform === platform), successful = observed.filter(a => a.qualified);
-    const dates = [...new Set(successful.map(a => new Date(a.startedAt).toISOString().slice(0, 10)))];
-    const spanHours = successful.length > 1 ? (Date.parse(successful.at(-1).startedAt) - Date.parse(successful[0].startedAt)) / 3600_000 : 0;
-    // Any later failure requires another successful cold run. Earlier failures
-    // remain in the report and never become successful trials by rerunning a job.
-    const latestPassed = observed.at(-1)?.qualified === true;
+    const lastFailure = observed.findLastIndex(a => !a.qualified), clean = observed.slice(lastFailure + 1);
+    const dates = [...new Set(clean.map(a => new Date(a.startedAt).toISOString().slice(0, 10)))];
+    const spanHours = clean.length > 1 ? (Date.parse(clean.at(-1).startedAt) - Date.parse(clean[0].startedAt)) / 3600_000 : 0;
+    // A later failure restarts the clean sequence, not just the next job. All
+    // previous observations remain in the report and its overall success count.
     return [platform, { observed: observed.length, successful: successful.length,
-      failedOrUnverified: observed.length - successful.length, dates, spanHours,
-      passed: successful.length >= repetitions && dates.length >= 2 && spanHours >= minimumSpanHours && latestPassed }];
+      failedOrUnverified: observed.length - successful.length, consecutiveSuccessful: clean.length, dates, spanHours,
+      passed: clean.length >= repetitions && dates.length >= 2 && spanHours >= minimumSpanHours }];
   }));
-  return { schema: 1, candidate, requirements: { platforms: confidencePlatforms, repetitions, minimumDays: 2, minimumSpanHours },
+  return { schema: 1, candidate, requirements: { platforms: confidencePlatforms, repetitions, consecutive: true, minimumDays: 2, minimumSpanHours },
     passed: confidencePlatforms.every(platform => platforms[platform].passed), platforms, attempts: history,
     limitation: 'Repeated hosted-runner checks plus deterministic faults increase practical confidence. They do not prove a 99.9% success rate or independence, and cannot guarantee arbitrary networks, disks or machines.' };
 }

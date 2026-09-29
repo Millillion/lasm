@@ -229,6 +229,18 @@ and mixed-case Lean/Lake/Elan overrides in Windows workers. Installed acceptance
 now also runs the Lake project offline with unrelated developer settings present;
 that additional profile awaits its new candidate.
 
+The final source [139-control matrix](https://github.com/Millillion/lasm/actions/runs/36513317821)
+also passed all six targets, including the environment controls. Each platform
+passed 136 applicable checks with three explicitly inapplicable skips and no
+resource stop. [Exact job identities, OS versions, accounting and memory](evidence/installer-faults-final-2026-09-29.json)
+are retained. The corresponding reproducible candidate is
+`0.1.0-experimental.36513318119`, SHA-256
+`ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b`,
+from `e4bb15165042a439b9cabdcd1678fafdc2e99f35`. Its
+[full installed campaign](https://github.com/Millillion/lasm/actions/runs/36513318119)
+is separate and still running; packing and fault passes do not establish its
+installed acceptance.
+
 ### Repeated cold installations
 
 [`installation-confidence.yml`](../.github/workflows/installation-confidence.yml)
@@ -238,13 +250,17 @@ is inactive until a complete initial campaign passes. All native repetitions
 start from fresh VMs and empty consumer tool/npm caches and use one exact archive.
 The source controls also rerun; each report records their revision separately.
 
-The gate requires three complete cold/offline/deployment/network passes per
+The gate requires three consecutive complete cold/offline/deployment/network passes per
 target, at least two UTC dates and 24 hours of separation. Duplicate job reports
 do not count twice. All original job attempts are collected; failed preparation,
 missing evidence, later failures and missing fault jobs prevent a passing latest
 campaign. Compact immutable reports stay with the retained draft; the last 30
 workflow runs are evaluated, and older report files remain preserved. First-run
 retry messages and cold timings remain distinct from final success.
+A later failed or unverified installation restarts that platform's clean sequence;
+a single green retry cannot reuse passes recorded before the failure. The live
+collector was also checked against the original failed `.47` campaign: it retained
+all five started native jobs as failed/unverified and refused the confidence gate.
 
 A single green matrix can create a tested draft, but it does not satisfy this
 additional gate. Any robustness release decision must require the selected

@@ -38,4 +38,8 @@ test('duplicate reports do not inflate trials and failures remain visible after 
   assert.equal(report.attempts[0].conclusion, 'failure');
   const latestFailure = { ...failed, runId: '4', jobId: 'latest', startedAt: '2026-09-30T02:00:00Z' };
   assert.equal(installationConfidence(candidate, [...records, latestFailure]).passed, false);
+  const oneRetry = { ...records[0], runId: '5', jobId: 'single-retry', startedAt: '2026-09-30T03:00:00Z' };
+  const recovered = installationConfidence(candidate, [...records, latestFailure, oneRetry]);
+  assert.equal(recovered.passed, false, 'One green retry does not reuse earlier passes from before the failure');
+  assert.equal(recovered.platforms['linux-x64'].consecutiveSuccessful, 1);
 });

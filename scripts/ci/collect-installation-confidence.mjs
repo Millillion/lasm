@@ -57,9 +57,9 @@ for (const id of ids) {
         const lines = api(`actions/jobs/${job.id}/logs`).split(/\r?\n/).map(line => line.replace(/^\uFEFF?\d{4}-\d{2}-\d{2}T\S+ /, ''));
         const os = platform.split('-')[0].replace('win32', 'windows');
         const acceptance = report(lines, `.work/node-${os}-acceptance/result.json`);
-        // A scheduled run for an earlier selected candidate is retained in its
-        // own report, not miscounted toward the newly selected archive.
-        if (acceptance.archiveSha256 !== candidate.sha256) continue;
+        // Selection was authenticated above. A mismatching observed package is
+        // a failed attempt, not an observation that may be silently discarded.
+        assert.equal(acceptance.archiveSha256, candidate.sha256);
         attempt.archiveSha256 = acceptance.archiveSha256;
         assert.equal(acceptance.platform, platform);
         assert.equal(acceptance.installation.provenance.sourceRevision, candidate.sourceRevision);
