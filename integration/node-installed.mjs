@@ -87,6 +87,11 @@ function cachedDist(directory, source) {
   assert.equal(found.length, 1, 'The selected source has exactly one cached build');
   return found[0];
 }
+async function oracleLean(source) {
+  const { provisionLean } = await import(pathToFileURL(join(compiler, 'src/managed-lean.mjs')));
+  return provisionLean(source, { cache: join(workspace, 'oracle-tools'), distribution: 'full' });
+}
+
 async function oracle(file, args, directory = project, lake = false, compiled = false) {
   if (compiled && process.platform !== 'linux') {
     // Complex native controls need host C tooling. The maintainer compiled them
@@ -99,7 +104,7 @@ async function oracle(file, args, directory = project, lake = false, compiled = 
   }
   const { provisionLean } = await import(pathToFileURL(join(compiler, 'src/managed-lean.mjs')));
   const { nativeLeanEnvironment, applicationSources } = await import(pathToFileURL(join(compiler, 'src/application-sources.mjs')));
-  const lean = await provisionLean(join(directory, file));
+  const lean = compiled ? await oracleLean(join(directory, file)) : await provisionLean(join(directory, file));
   const env = nativeLeanEnvironment(lean);
   if (compiled) {
     const controls = join(directory, '.native-control'); mkdirSync(controls, { recursive: true });
@@ -185,6 +190,11 @@ try {
     await deployment('hello', join(project, 'dist'), 'Main.lean', [{ args: [], expected: basic }]);
     result.installBytes = size(join(project, 'node_modules'));
     result.coldToolsBytes = size(tools);
+    // The Linux native oracle compiles with Lean's bundled leanc, which the
+    // tiered product distribution omits. Provision the complete upstream
+    // archive into a separate cache while online, after the product
+    // measurements above, so later offline phases reuse it.
+    if (process.platform === 'linux') await oracleLean(join(project, 'Main.lean'));
   } else if (phase === 'lake') {
     const directory = join(project, 'lake project 日本語'); mkdirSync(directory);
     writeFileSync(join(directory, 'lean-toolchain'), 'leanprover/lean4:v' + result.support.lean + '\n');
