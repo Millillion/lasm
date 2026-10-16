@@ -142,3 +142,142 @@ acceptance and the three consecutive cold-installation gate.
    missing platform packages (lockfile bugs, `--omit=optional`) and print the
    exact fix. Validate with a local Verdaccio registry on all six native runners.
    npm publication remains a separate user decision.
+
+## Phase 2 milestone A (2026-10-16): recorded `emcc` recipe and byte-equality harness
+
+Maintainer tooling only; the product link path is unchanged apart from the
+`program.cjs` reproducibility fix below. Recorded on Linux x86-64 (Node 24.13.1)
+with the managed, repaired Emscripten 6.0.9 SDK in a dedicated tool cache and the
+`.46` Lean 4.34.1 runtime bundle (manifest `4d3d6c60…`).
+
+- [`scripts/link-driver/record-emcc.mjs`](../scripts/link-driver/record-emcc.mjs)
+  runs the product's `linkApplication` on copied fixtures (each with its own
+  `lean-toolchain`, same work and `.build-<uuid>` layout as `lasm build`). With
+  `--debug` it sets `EMCC_DEBUG=1`/`EMCC_VERBOSE=1` and a private temp directory
+  per call, and dry-runs each compile with `-###` (exact clang driver and cc1
+  commands). Every intermediate and output is kept and hashed.
+- [`scripts/link-driver/recipe.mjs`](../scripts/link-driver/recipe.mjs) turns a
+  recording into a versioned `recipe.json` with placeholder paths: compile
+  commands, both links' em++ arguments, every subprocess emcc ran, the system
+  libraries selected and how they were built (flags, sources, archive command),
+  settings before/after Wasm metadata, the JS symbol inventory, and intermediate
+  hashes. `--combine` compares recipes across fixtures.
+- [`scripts/link-driver/compare.mjs`](../scripts/link-driver/compare.mjs)
+  compares two runs, fixtures or plain build directories: objects, link maps
+  (each side's own absolute roots replaced by placeholders), `program.wasm`,
+  `program.cjs`. It reports the first divergence as a text line/column, or a Wasm
+  byte offset with its section and function index.
+
+Fixtures: `examples/hello`, `integration/fixtures/FilesystemSurface.lean`,
+`TcpErrorPhases.lean` (Std TCP; no Std.Http fixture exists outside Lake
+projects) and `BundleFeaturesLegacy.lean` (imports `Lean.Data.Json`, extended
+Lean tier). `StandaloneModuleData.lean` is not linkable: the AOT policy rejects
+it after the probe link, as designed.
+
+### Recorded recipe
+
+- **Compile (per module, plus `reachability.c` and `initialization.c`)**: one clang
+  process. Emcc adds `-target wasm64-unknown-emscripten -fvisibility=default
+  -mllvm -combiner-global-alias-analysis=false -mllvm -wasm-enable-sjlj -mllvm
+  -wasm-use-legacy-eh -mllvm -disable-lsr --sysroot=<state>/cache/sysroot
+  -D__EMSCRIPTEN_SHARED_MEMORY__=1 -Xclang -iwithsysroot/include/fakesdl -Xclang
+  -iwithsysroot/include/compat` to Lasm's flags; `-sMEMORY64=1` becomes the triple.
+  Objects contain no paths (cc1's `-fdebug-compilation-dir=<cwd>` is inert
+  without `-g`). The cc1 command is identical across fixtures except the input
+  name.
+- **Link (probe `-O0` and final `-Oz -g1`)**: `node compiler.mjs --symbols-only`
+  (JS symbol inventory, 1,670 dependency entries, identical for all fixtures),
+  a generated stub `libemscripten_js_symbols.so` (identical), `wasm-ld` (92
+  arguments plus inputs: `--import-memory --shared-memory --strip-debug
+  --unresolved-symbols=import-dynamic --export-table --growable-table -z
+  stack-size=67108864 --max-memory=8589934592 --initial-memory=134217728
+  --entry=_emscripten_proxy_main --table-base=1`, exports, then Lasm's 10 runtime
+  archives and the system libraries), `llvm-objcopy` (removes `producers`,
+  `.debug*`, annotations), `wasm-emscripten-finalize --no-dyncalls --bigint
+  --check-stack-overflow --detect-features`, metadata extraction (Python), `node
+  compiler.mjs` (glue). The final link then runs `wasm-opt --strip-target-features
+  --post-emscripten -Oz --low-memory-unused --zero-filled-memory
+  --pass-arg=directize-initial-contents-immutable --no-stack-ir` plus explicit
+  feature flags, acorn `growableHeap`, `AJSDCE`, `emitDCEGraph`, `wasm-metadce
+  --optimize-level=2 --shrink-level=2 --optimize-stack-ir`,
+  `applyDCEGraphRemovals`, `AJSDCE`. The probe link stops after `growableHeap`.
+- **Same recipe for all four fixtures**: em++ arguments, every subprocess
+  command, system inputs and their hashes are identical after replacing input
+  paths and Emscripten's random temp names. Settings before and after metadata
+  differ only in `PRE_JS_FILES` paths. Glue differs only in Lasm's
+  `lasmInitialFunctionTable`, JS functions kept by the metadce graph (for example
+  `_lasm_node_start` for TCP, memalign-backed `mmap` for the Lean import) and
+  export-assignment order.
+- **System libraries (wasm64, PIC, `-sMAIN_MODULE -g -sSTRICT -Werror`, built
+  by recursive emcc from the repaired SDK tree)**. Final link:
+  `crtbegin-mt.o`, `crt1_proxy_main.o`, `libGL-mt-getprocaddr`, `libal`,
+  `libhtml5`, `libc_optz-mt`, `libstubs`, `libc-mt` (1,141 sources, includes
+  repaired `pthread_create.c`), `libmimalloc-mt` (includes repaired
+  `emmalloc.c`), `libclang_rt.builtins-legacysjlj-mt`, `libc++-mt-legacyexcept`,
+  `libc++abi-mt-legacyexcept`, `libunwind-mt-legacyexcept`, `libsockets-mt`
+  (about 16 MB). The `-O0` probe uses `-debug` variants of libstubs, libc,
+  libc++ and libc++abi. The other `sdk-repairs.json` entries change the Python
+  driver (`link.py`, `shared.py`, `utils.py`, `config.py`) or JS libraries
+  (`libdylink.js`, `libpthread.js`), which reach the glue through
+  `compiler.mjs`.
+- **Time (hello, warm cache)**: final link 20.3 s, of which `wasm-opt` 14.4 s,
+  `wasm-metadce` 2.7 s, `wasm-ld` 1.4 s, JS compiler about 0.6 s, finalize and
+  metadata 0.4 s; the probe link takes about 4 s. Python orchestration is well
+  under a second. Real work: clang, wasm-ld, finalize, wasm-opt, metadce,
+  compiler.mjs, acorn-optimizer.mjs. Orchestration a Node driver must
+  reimplement: argument and settings derivation (`link.py`), system-library
+  selection, metadata extraction (`extract_metadata.py`), and ASM_CONSTS, EM_JS
+  and export assembly around the JS compiler output.
+
+### Reproducibility
+
+Emscripten labels each `--pre-js` in the glue with the path it was given
+(`// include: /…/scripts/full-lean/emscripten-pre.js`, and the random
+`.build-<uuid>/application-pre.js`). `linkApplication` now relabels these six
+comment lines to basenames before its loader transformations (portable separator
+comparison, each label required exactly once; `test/application-link-glue.test.mjs`).
+Evidence (all under `.work/link-driver/`):
+
+- `run-plain-a2` and `run-plain-b` (different source and build directories):
+  all objects, normalized maps, `program.wasm` and `program.cjs` identical for the
+  four fixtures. `run-debug-2` (EMCC_DEBUG) is identical to both, so recording
+  does not perturb output.
+- The pre-fix recording `run-hello-debug-1` differs from `run-plain-a2` only in
+  `program.cjs`, line 49 (`// include: <absolute path>`).
+- A copy of the checkout, runtime and tool cache in another directory
+  (`relocated/`) rebuilt the system libraries and produced a different
+  `program.wasm`: `libmimalloc-mt.a` embeds `__DATE__`/`__TIME__`
+  (`mimalloc/src/options.c`), so output depends on when the user's SDK cache built
+  it. With `SOURCE_DATE_EPOCH=1700000000` (honored by the pinned clang), two
+  independently relocated rebuilds (`run-sde-1`, `run-sde-2`) were byte-identical.
+  System-library DWARF also embeds the absolute sysroot include path; wasm-ld's
+  `--strip-debug` removes it from the program.
+
+Not yet fixed in the product: set `SOURCE_DATE_EPOCH` in the managed SDK
+environment (affects only newly built caches), or make it moot with the prebuilt
+sysroot below.
+
+### Plan for milestones B–D
+
+- **System-library prebuild.** Build the 14 final and 4 probe-only artifacts
+  above from the repaired SDK tree, with recorded flags, a fixed
+  `SOURCE_DATE_EPOCH` and `-ffile-prefix-map` for the sysroot, plus the
+  generated sysroot headers. Pack them deterministically with
+  `libemscripten_js_symbols.so`. The byte-equality reference is `emcc` with
+  `FROZEN_CACHE` pointing at that same prebuilt cache.
+- **B — compile in Node.** Invoke clang directly with the recorded driver
+  arguments (`clang`, not cc1, to stay version-robust). Gate: all objects
+  byte-identical to `emcc -c` on the four fixtures and the reachability and
+  initialization objects (`compare.mjs`).
+- **C — link, metadata and glue in Node.** Run wasm-ld, llvm-objcopy and finalize
+  with the recorded arguments. Port metadata extraction and the glue assembly
+  (settings JSON, `compiler.mjs`, ASM_CONSTS/EM_JS/exports), then wasm-opt,
+  acorn and metadce passes in recorded order. Gate: identical maps,
+  `program.wasm` and `program.cjs` against emcc on the same sysroot, checked per
+  intermediate (the recipe hashes `base.wasm`, finalize output, `original.js`
+  and each pass) so a divergence is found at its first step.
+- **D — minimal toolchain.** Ship clang, wasm-ld, llvm-objcopy, Binaryen tools,
+  the prebuilt sysroot and Emscripten's `src/` and `tools/*.mjs` JavaScript in a
+  catalog artifact; remove Python and the SDK from the user path. Validate with a
+  new candidate on all six native platforms, including identical outputs across
+  platforms.
