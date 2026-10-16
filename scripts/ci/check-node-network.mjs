@@ -63,11 +63,12 @@ await invoke('fixture git add', git.executable, ['add', '.'], repository, gitEnv
 await invoke('fixture unsigned commit', git.executable, ['-c', 'commit.gpgsign=false', '-c', 'user.name=Lasm Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-m', 'Private dependency fixture'], repository, gitEnv);
 const revision = (await invoke('fixture revision', git.executable, ['rev-parse', 'HEAD'], repository, gitEnv)).stdout.trim();
 await invoke('fixture bare repository', git.executable, ['clone', '--bare', repository, bare], output, gitEnv);
-await invoke('fixture HTTP info', git.executable, ['--git-dir=' + bare, 'update-server-info'], output, gitEnv);
 const fixture = createInstallerCertificate(), ca = join(output, 'ca.pem'); await writeFile(ca, fixture.certificate);
 const credential = 'fixture:ephemeral-proxy-password';
 const worker = new Worker(new URL('./network-fixture-worker.mjs', import.meta.url), { workerData: {
   repository: bare, certificate: fixture.certificate, privateKey: fixture.privateKey.export({ type: 'pkcs8', format: 'pem' }), proxyCredential: credential,
+  // The managed Git also serves the fixture through smart HTTP (`git http-backend`).
+  git: { executable: git.executable, env: gitEnv },
 } });
 worker.on('message', message => { if (message.type !== 'ready') result.requests.push(message); });
 try {
@@ -84,8 +85,11 @@ try {
     { ...networkEnv, NODE_EXTRA_CA_CERTS: ca, GIT_SSL_CAINFO: ca });
   assert.equal(trusted.stdout, 'Network dependency: 42\n');
   assert.ok(result.requests.some(r => r.type === 'proxy-connect' && r.authenticated));
-  assert.ok(result.requests.some(r => r.type === 'git-request' && r.path.endsWith('/info/refs')));
-  assert.ok(result.requests.some(r => r.type === 'git-request' && r.path.includes('/objects/')));
+  assert.ok(result.requests.some(r => r.type === 'git-request' && r.path.endsWith('/info/refs') && r.service === 'git-upload-pack'));
+  assert.ok(result.requests.some(r => r.type === 'git-request' && r.method === 'POST' && r.path.endsWith('/git-upload-pack')));
+  // Lake 4.35's tree-filtered fetch must not recurse through lazy promisor fetches.
+  assert.ok(!result.requests.some(r => r.type === 'git-request-refused'), 'Git discovery requests were refused as recursive');
+  assert.ok(result.requests.filter(r => r.type === 'git-request' && r.path.endsWith('/info/refs')).length <= 8, 'Bounded Git discovery requests');
   result.git = { identity: git.identity, version: git.version, executable: git.executable };
   result.passed = true;
 } finally { await worker.terminate(); result.finishedAt = new Date().toISOString(); await save(); console.log(JSON.stringify(result, null, 2)); }

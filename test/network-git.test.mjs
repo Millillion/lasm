@@ -21,7 +21,8 @@ test('private Git fixture exercises CA rejection and authenticated proxy cloning
   const git = (args, environment = env) => execute('git', args, { cwd: source, env: environment, windowsHide: true, timeout: 10_000, encoding: 'utf8' });
   await git(['init', '--initial-branch=main']); await git(['add', '.']);
   await git(['-c', 'commit.gpgsign=false', '-c', 'user.name=Lasm Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-m', 'TLS fixture']);
-  await git(['clone', '--bare', source, bare]); await git(['--git-dir=' + bare, 'update-server-info']);
+  await git(['clone', '--bare', source, bare]);
+  const revision = (await git(['rev-parse', 'HEAD'])).stdout.trim();
   const certificate = createInstallerCertificate(), ca = join(directory, 'ca.pem'); await writeFile(ca, certificate.certificate);
   const credential = 'fixture:ephemeral-proxy-password', requests = [];
   worker = new Worker(new URL('../scripts/ci/network-fixture-worker.mjs', import.meta.url), { workerData: {
@@ -34,7 +35,19 @@ test('private Git fixture exercises CA rejection and authenticated proxy cloning
   const destination = join(directory, 'cloned');
   const cloned = await git(['clone', ready.url, destination], { ...network, GIT_SSL_CAINFO: ca });
   assert.equal(await readFile(join(destination, 'fixture'), 'utf8'), 'verified Git TLS fixture');
+  // Lake 4.35 materializes dependencies with a tree-filtered fetch of one revision;
+  // the smart-HTTP fixture must serve it without recursive lazy promisor fetches.
+  const partial = join(directory, 'partial'); await mkdir(partial);
+  const trusted = { ...network, GIT_SSL_CAINFO: ca };
+  await execute('git', ['init', '--initial-branch=main'], { cwd: partial, env, timeout: 10_000 });
+  const discoveriesBefore = requests.filter(r => r.type === 'git-request' && r.path.endsWith('/info/refs')).length;
+  await execute('git', ['fetch', '--tags', '--force', '--filter=tree:0', ready.url, revision], { cwd: partial, env: trusted, timeout: 20_000 });
+  await execute('git', ['checkout', '--detach', revision], { cwd: partial, env: trusted, timeout: 20_000 });
+  assert.equal(await readFile(join(partial, 'fixture'), 'utf8'), 'verified Git TLS fixture');
   assert.ok(requests.some(r => r.type === 'proxy-connect' && r.authenticated));
-  assert.ok(requests.some(r => r.type === 'git-request' && r.path.includes('/objects/')));
+  assert.ok(requests.some(r => r.type === 'git-request' && r.path.endsWith('/info/refs') && r.service === 'git-upload-pack'));
+  assert.ok(requests.some(r => r.type === 'git-request' && r.method === 'POST' && r.path.endsWith('/git-upload-pack')));
+  assert.ok(requests.filter(r => r.type === 'git-request' && r.path.endsWith('/info/refs')).length - discoveriesBefore <= 4, JSON.stringify(requests));
+  assert.ok(!requests.some(r => r.type === 'git-request-refused'));
   assert.doesNotMatch(cloned.stderr, /ephemeral-proxy-password/);
 });
