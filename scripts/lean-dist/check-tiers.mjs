@@ -27,9 +27,10 @@ import { x as extractTar } from 'tar';
 const { values: options } = parseArgs({ options: {
   tiers: { type: 'string' }, upstream: { type: 'string' }, work: { type: 'string' },
   platform: { type: 'string', default: `${process.platform}-${process.arch}` }, version: { type: 'string', default: '4.34.1' },
-  report: { type: 'string' }, 'full-prefix': { type: 'string' },
+  report: { type: 'string' }, 'full-prefix': { type: 'string' }, phase: { type: 'string', default: 'all' },
 } });
-if (!options.upstream && !options['full-prefix']) throw new Error('--upstream or --full-prefix is required');
+if (!['all', 'extract', 'check'].includes(options.phase)) throw new Error('--phase must be all, extract or check');
+if (!options.upstream && !options['full-prefix'] && options.phase !== 'check') throw new Error('--upstream or --full-prefix is required');
 for (const name of ['tiers', 'work']) if (!options[name]) throw new Error(`--${name} is required`);
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const catalog = JSON.parse(readFileSync(join(root, 'src/toolchains.json'), 'utf8'));
@@ -66,9 +67,12 @@ async function unpack(file, directory, format = 'tar.zst') {
   // Bound dirty page-cache bursts, which the resource guard reports as memory pressure.
   if (!windows) spawnSync('sync', { stdio: 'ignore' });
 }
-await rm(work, { recursive: true, force: true });
 const prefixes = { core: join(work, 'core'), extended: join(work, 'extended'),
   full: options['full-prefix'] ? resolve(options['full-prefix']) : join(work, 'full') };
+// --phase extract (unguarded file extraction), then --phase check (compilers
+// under the resource guard, whose Linux accounting includes page cache).
+if (options.phase !== 'check') {
+await rm(work, { recursive: true, force: true });
 for (const piece of ['bin', ...corePieces]) await unpack(await verified(archive(piece)), prefixes.core);
 // The extended prefix shares the core files through hard links, as Lasm's cache does.
 async function linkTree(from, to) {
@@ -82,15 +86,17 @@ async function linkTree(from, to) {
 }
 await linkTree(prefixes.core, prefixes.extended);
 for (const piece of extendedPieces) await unpack(await verified(archive(piece)), prefixes.extended);
-if (options['full-prefix']) {
-  // A previously extracted copy of the same pinned archive (local validation).
-  const full = spawnSync(join(prefixes.full, 'bin', exe('lean')), ['--githash'], { encoding: 'utf8' });
-  assert.equal(full.stdout?.trim(), release.commit, 'Reference prefix is the pinned release');
-} else {
+// --full-prefix: a previously extracted copy of the same pinned archive (local validation).
+if (!options['full-prefix']) {
   const upstreamBytes = await readFile(options.upstream);
   assert.equal(sha256(upstreamBytes), upstream.sha256, 'Pinned upstream archive checksum');
   await unpack(resolve(options.upstream), prefixes.full, upstream.format);
 }
+}
+if (options.phase === 'extract') process.exit(0);
+await rm(join(work, 'fixtures'), { recursive: true, force: true });
+const full = spawnSync(join(prefixes.full, 'bin', exe('lean')), ['--githash'], { encoding: 'utf8' });
+assert.equal(full.stdout?.trim(), release.commit, 'Reference prefix is the pinned release');
 
 const result = { schema: 1, platform: options.platform, version: options.version, node: process.versions.node,
   started: new Date().toISOString(), archives: [...new Set(['bin', ...corePieces, ...extendedPieces])].map(piece => archive(piece).name), checks: [] };

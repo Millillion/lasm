@@ -86,7 +86,13 @@ jobs:
       - name: Require identical shared archives and the size ceiling
         run: |
           ls -l .work/lean-tiers/all
-          node scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ inputs.tag }}/" .work/lean-tiers/all/report-*.json > .work/lean-tiers/tiers.json
+          # Lasm's own native Windows ARM64 build (not an upstream archive) has
+          # different module data; that platform keeps its complete archive.
+          node -e "
+            const read = p => require('./.work/lean-tiers/all/report-' + p + '.json').archives.filter(a => a.piece !== 'bin');
+            const upstream = new Map(read('linux-x64').map(a => [a.piece, a.sha256]));
+            for (const a of read('win32-arm64')) console.log('win32-arm64', a.piece, a.sha256 === upstream.get(a.piece) ? 'identical' : 'differs');"
+          node scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ inputs.tag }}/" $(ls .work/lean-tiers/all/report-*.json | grep -v win32-arm64) > .work/lean-tiers/tiers.json
           node -e "
             const fs = require('fs'), entry = JSON.parse(fs.readFileSync('.work/lean-tiers/tiers.json'));
             const all = [...Object.values(entry.bin), ...entry.core, ...entry.extended];
@@ -112,7 +118,6 @@ jobs:
           - { platform: darwin-x64, runner: macos-15-intel, memory: 6144 }
           - { platform: darwin-arm64, runner: macos-15, memory: 5120 }
           - { platform: win32-x64, runner: windows-2025, memory: 6144 }
-          - { platform: win32-arm64, runner: windows-11-arm, memory: 6144 }
     env:
       PLATFORM: ${{ matrix.platform }}
       VERSION: ${{ inputs.version }}
@@ -139,11 +144,16 @@ jobs:
         run: |
           url=$(node -p "require('./src/toolchains.json').lean[process.env.VERSION].artifacts[process.env.PLATFORM].url")
           curl --fail --location --retry 5 --retry-all-errors --proto '=https' --output .work/lean-tiers/upstream "$url"
+      - name: Extract the tiers and the complete archive
+        run: |
+          node scripts/lean-dist/check-tiers.mjs --phase extract --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
+            --upstream .work/lean-tiers/upstream --work .work/lean-tiers/native
+          rm -f .work/lean-tiers/upstream
       - name: Run the tiers natively and compare generated C with the complete toolchain
         run: |
           node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/lean-tiers-native-resources.json -- \
-            node scripts/lean-dist/check-tiers.mjs --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
-              --upstream .work/lean-tiers/upstream --work .work/lean-tiers/native --report .work/lean-tiers/native.json
+            node scripts/lean-dist/check-tiers.mjs --phase check --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
+              --work .work/lean-tiers/native --report .work/lean-tiers/native.json
           { echo "### $PLATFORM"; echo '```json'; cat .work/lean-tiers/native.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
   publish:
@@ -170,6 +180,7 @@ jobs:
           TAG: ${{ inputs.tag }}
         run: |
           cd .work/lean-tiers/all
+          rm -f report-win32-arm64.json lean-*-win32-arm64-bin.tar.zst
           node ../../../scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/" report-*.json > tiers.json
           sha256sum *.tar.zst > SHA256SUMS
           cat > notes.md <<EOF
