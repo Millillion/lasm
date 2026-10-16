@@ -1,0 +1,144 @@
+name: Link toolchain fixtures
+# Maintainer-only (docs/TOOLCHAIN_SLIMMING.md, Phase 2 milestone D): on each
+# native runner, build the hello and filesystem fixtures with the Node link
+# driver from the PUBLISHED link-toolchain archives (no SDK, no emcc, no Python),
+# run them, and compare objects, program.wasm and program.cjs with linux-x64.
+# With emcc, the same fixtures are also linked by emcc from the full managed SDK
+# on that runner (same prebuilt sysroot, frozen), to tell a Node-driver
+# difference from an upstream per-platform difference.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Published link-toolchain release tag
+        type: string
+        default: emscripten-6.0.9-lasm-toolchain-v1
+      emcc:
+        description: Also link with emcc from the full SDK on every runner
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: link-toolchain-fixtures
+  cancel-in-progress: false
+jobs:
+  fixtures:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, memory: 6144 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, memory: 6144 }
+          - { platform: darwin-x64, runner: macos-15-intel, memory: 6144 }
+          - { platform: darwin-arm64, runner: macos-15, memory: 5120 }
+          - { platform: win32-x64, runner: windows-2025, memory: 6144 }
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      TAG: ${{ inputs.tag }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Fetch the durable runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime under the resource guard
+        run: |
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/restore-resources.json -- node scripts/ci/restore-node-runtime.mjs
+          cp -R .work/node-runtime-restored/native src/native
+      - name: Download and verify the published toolchain
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .work/lt/dl
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir .work/lt/dl --pattern link-toolchain.json \
+            --pattern "emscripten-6.0.9-$PLATFORM-tools.tar.zst" --pattern emscripten-6.0.9-lasm-shared.tar.zst
+          node --input-type=module -e "
+            import { createHash } from 'node:crypto'; import { readFileSync } from 'node:fs';
+            import { extractToolchain } from './scripts/link-driver/toolchain.mjs';
+            const catalog = JSON.parse(readFileSync('.work/lt/dl/link-toolchain.json', 'utf8'));
+            const files = [catalog.native[process.env.PLATFORM], catalog.shared].map(artifact => {
+              const file = '.work/lt/dl/' + artifact.name + '.tar.zst', bytes = readFileSync(file);
+              if (bytes.length !== artifact.bytes || createHash('sha256').update(bytes).digest('hex') !== artifact.sha256) throw new Error(file + ' does not match the release catalog');
+              console.log('verified', artifact.name, artifact.sha256);
+              return file;
+            });
+            await extractToolchain(files, '.work/lt/toolchain');"
+      - name: Build the fixtures with the Node link driver
+        run: |
+          node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report ".work/lt-node-$PLATFORM-resources.json" -- \
+            node scripts/link-driver/record-emcc.mjs --cache .cache/lt-tools --runtime .work/node-runtime-restored/runtime \
+              --runtime-sha256 "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" \
+              --output .work/lt/node --toolchain .work/lt/toolchain --link-driver node --package \
+              --fixture hello=examples/hello/Main.lean --fixture filesystem=integration/fixtures/FilesystemSurface.lean
+      - name: Run the applications
+        run: |
+          node .work/lt/node/hello/app/main.mjs | tee ".work/lt/hello-$PLATFORM.out"
+          mkdir -p .work/lt/run-filesystem && cd .work/lt/run-filesystem
+          node ../node/filesystem/app/main.mjs 'fs working λ' | tee "../filesystem-$PLATFORM.out"
+          grep -q 'filesystem surface checks passed' "../filesystem-$PLATFORM.out"
+      - name: Build the fixtures with emcc from the full SDK
+        if: inputs.emcc
+        run: |
+          node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report ".work/lt-emcc-$PLATFORM-resources.json" -- \
+            node scripts/link-driver/record-emcc.mjs --cache .cache/lt-tools --runtime .work/node-runtime-restored/runtime \
+              --runtime-sha256 "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" \
+              --output .work/lt/emcc --frozen-cache .work/lt/toolchain/emscripten-6.0.9-lasm-shared/cache --link-driver emcc \
+              --fixture hello=examples/hello/Main.lean --fixture filesystem=integration/fixtures/FilesystemSurface.lean
+      - name: Collect comparable outputs
+        run: |
+          node scripts/link-driver/collect-outputs.mjs .work/lt/node ".work/lt/collected/$PLATFORM/node"
+          if [ -d .work/lt/emcc ]; then node scripts/link-driver/collect-outputs.mjs .work/lt/emcc ".work/lt/collected/$PLATFORM/emcc"; fi
+          { echo "### $PLATFORM"; echo '```json'; cat ".work/lt/collected/$PLATFORM/node/hashes.json"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: fixtures-${{ matrix.platform }}
+          path: |
+            .work/lt/collected/
+            .work/lt/*.out
+            .work/lt-*-resources.json
+          retention-days: 7
+          if-no-files-found: warn
+
+  equality:
+    needs: fixtures
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: fixtures-*
+          path: .work/fixtures
+          merge-multiple: true
+      - name: Compare every platform with linux-x64
+        run: |
+          ls -R .work/fixtures/lt/collected | head -50
+          set +e
+          node scripts/link-driver/compare-platforms.mjs .work/fixtures/lt/collected --json .work/equality.json | tee .work/equality.txt
+          status=${PIPESTATUS[0]}
+          { echo '### Cross-platform equality'; echo '```'; cat .work/equality.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $status
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: equality
+          path: .work/equality.*
+          retention-days: 7

@@ -1,0 +1,12 @@
+{
+  "deps": "https://chromium.googlesource.com/emscripten-releases/+/f04ea239d533260dd1db760dd2d668d5f9a88d6b/DEPS",
+  "llvm": { "repository": "https://github.com/llvm/llvm-project", "revision": "b158b0ae6c559f87be325b8f427c5588e6a48823", "reportedRevision": "510126255f89d693717c1ce7105b593f995f07c1" },
+  "binaryen": { "repository": "https://github.com/WebAssembly/binaryen", "revision": "d03c25ea43d8f147fc222f9b88ff3bf641abe8da" },
+  "emscripten": { "repository": "https://github.com/emscripten-core/emscripten", "revision": "4e4223852a0835923411059a3929907d7df1232e" },
+  "licenses": {
+    "llvm-LICENSE.TXT": "llvm/LICENSE.TXT",
+    "clang-LICENSE.TXT": "clang/LICENSE.TXT",
+    "lld-LICENSE.TXT": "lld/LICENSE.TXT",
+    "binaryen-LICENSE.txt": "LICENSE"
+  }
+}

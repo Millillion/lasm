@@ -93,7 +93,12 @@ if (resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   const log = message => console.error(`[sysroot ${((Date.now() - started) / 1000).toFixed(0)}s] ${message}`);
 
   const sdk = await provisionSdk({ cache: resolve(process.env.LASM_TOOLCHAIN_CACHE), log });
-  if (sdk.version !== recipe.emscripten || sdk.driverIdentity !== recipe.sdk.driverIdentity)
+  // The repaired-driver identity is per platform (it names that platform's SDK
+  // archive); the recipe records the linux-x64 one. Any platform's repaired SDK
+  // of the recorded version builds the sysroot, and link-toolchain.yml requires
+  // identical archives from more than one host.
+  if (sdk.version !== recipe.emscripten || !sdk.runtimePatchesApplied
+      || (sdk.platform === recipe.recordedFrom?.platform && sdk.driverIdentity !== recipe.sdk.driverIdentity))
     throw new Error(`The managed SDK (${sdk.version}, ${sdk.driverIdentity}) is not the recorded one`);
   const emcache = join(output, 'build', 'cache');
   // A private cache; EM_* overrides the managed config's CACHE and PORTS.

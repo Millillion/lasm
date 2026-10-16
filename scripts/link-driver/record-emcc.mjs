@@ -41,10 +41,17 @@ const { values: options } = parseArgs({ options: {
   'link-driver': { type: 'string' },
   // Also assemble a runnable application (dist plus host and main.mjs) under <fixture>/app.
   package: { type: 'boolean', default: false },
+  // Milestone D: a directory holding the extracted native and shared link-toolchain
+  // archives (scripts/link-driver/build-toolchain.mjs) instead of the managed SDK.
+  // Only --link-driver node can use it: it contains no emcc and no Python.
+  toolchain: { type: 'string' },
+  // The managed tool cache (Lean, and the SDK for emcc); defaults to LASM_TOOLCHAIN_CACHE.
+  cache: { type: 'string' },
 } });
 if (options['compile-driver'] && options['link-driver']) throw new Error('Use --link-driver or --compile-driver, not both');
 const linkDriver = options['link-driver'] ?? ({ undefined: 'emcc', emcc: 'emcc', node: 'node-compile' })[options['compile-driver']];
 if (!['emcc', 'node-compile', 'node'].includes(linkDriver)) throw new Error('Invalid --link-driver or --compile-driver');
+if (options.toolchain && (linkDriver !== 'node' || options['frozen-cache'])) throw new Error('--toolchain needs --link-driver node and no --frozen-cache');
 
 if (options.analyze) {
   const summary = analyzeRun(resolve(options.analyze));
@@ -54,8 +61,8 @@ if (options.analyze) {
 
 const { ensureResourceGuard } = await import('../full-lean/resource-guard.mjs');
 await ensureResourceGuard();
-if (!process.env.LASM_TOOLCHAIN_CACHE) throw new Error('Set LASM_TOOLCHAIN_CACHE to a dedicated cache under .cache/ or .work/');
-const cache = resolve(process.env.LASM_TOOLCHAIN_CACHE);
+if (!options.cache && !process.env.LASM_TOOLCHAIN_CACHE) throw new Error('Set --cache or LASM_TOOLCHAIN_CACHE to a dedicated cache under .cache/ or .work/');
+const cache = resolve(options.cache ?? process.env.LASM_TOOLCHAIN_CACHE);
 for (const [name, value] of [['cache', cache], ['output', resolve(options.output ?? '')]])
   if (!['.cache', '.work'].some(base => !relative(join(root, base), value).startsWith('..')))
     throw new Error(`The ${name} directory must be under the ignored .cache/ or .work/ directories`);
@@ -116,7 +123,8 @@ for (const spec of options.fixture) {
   mkdirSync(work, { recursive: true });
   log(`${name}: generating C`);
   const generated = applicationSources(source, lean, work, { log: () => {} });
-  const sdk = await provisionSdk({ cache, log });
+  const sdk = options.toolchain ? await (await import('./toolchain.mjs')).toolchainSdk(resolve(options.toolchain))
+    : await provisionSdk({ cache, log });
   const temporary = join(work, '.build-' + randomUUID()), dist = join(temporary, 'dist');
   mkdirSync(dist, { recursive: true });
   const stepsDirectory = join(fixture, 'steps');
@@ -171,15 +179,16 @@ for (const spec of options.fixture) {
     leanVersion: lean.version, memoryMode: 1, verbose: false, progress: ({ stage }) => log(`${name}: ${stage}`),
     linkDriver, linkIntermediates: options.debug && linkDriver === 'node' ? join(fixture, 'node-link') : undefined });
   const paths = { fixture, source: sourceDirectory, work, build: temporary, runtime: runtime.directory, lasm: root,
-    sdk: sdk.prefix, emscripten: sdk.driver, state: sdk.state, python: sdk.python.executable, node: process.execPath,
+    sdk: sdk.prefix, emscripten: sdk.driver, state: sdk.state, python: sdk.python?.executable, node: process.execPath,
     lean: lean.prefix, cache,
     // The Emscripten cache emcc used (sysroot, system libraries): map files name it.
-    emcache: options['frozen-cache'] ? resolve(options['frozen-cache']) : join(sdk.state, 'cache') };
+    emcache: options['frozen-cache'] ? resolve(options['frozen-cache']) : sdk.cache ?? join(sdk.state, 'cache') };
   const record = { schema: 1, name, fixture: relative(root, original), debug: options.debug,
     lean: { version: lean.version, commit: lean.commit, distribution: lean.distribution, tier: lean.tier, identity: lean.identity },
     runtime: { identity: runtime.identity, name: runtime.manifest.name, libraries: runtime.manifest.libraries },
     sdk: { version: sdk.version, identity: sdk.identity, driverIdentity: sdk.driverIdentity, runtimePatchesApplied: sdk.runtimePatchesApplied },
     linkDriver, frozenCache: options['frozen-cache'] ? resolve(options['frozen-cache']) : null,
+    toolchain: options.toolchain ? resolve(options.toolchain) : null,
     node: process.version, paths, generatedSources: generated.sources.map(file => relative(temporary, file).startsWith('..') ? relative(work, file) : relative(temporary, file)),
     requirements, steps: steps.map(({ index, tool, status, seconds }) => ({ index, tool, status, seconds })),
     // Everything Lasm produced: generated C, objects, maps, response files, outputs.
