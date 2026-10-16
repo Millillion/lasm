@@ -64,8 +64,14 @@ An existing Lake project can use local imports normally. To pin Lean, put
 source) in its `lean-toolchain` file. A package supports exactly one Lean release;
 other versions are rejected with `Unsupported Lean toolchain … Supported managed
 versions: …` and the pin is left unchanged. Broad third-party package compatibility is not yet verified.
-After an authorized npm release, installation will be `npm install @lasm/compiler`;
-that registry command is **not available yet**.
+After an authorized npm release, installation will be `npm install @lasm/cli`
+(or `npx @lasm/cli Main.lean` without installing); the bin stays `lasm`. That
+registry command is **not available yet**. Current source, not yet in a candidate,
+can take its build tools from exact-pinned `@lasm/…` npm packages instead of
+downloading them, and fetches the Lake/`Lean`-import data and Git with your own
+npm on first use; this was validated only against a local test registry
+([npm distribution](docs/TOOLCHAIN_SLIMMING.md#phase-3-2026-10-16-npm-distribution)).
+`LASM_ARTIFACT_SOURCE=npm` forbids direct downloads; `https` ignores the packages.
 
 ## CLI reference
 

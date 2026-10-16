@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { x as extractTar } from 'tar';
 import { isDeepStrictEqual } from 'node:util';
 import { downloadArtifact } from './managed-download.mjs';
+import { acquireArtifact } from './npm-artifacts.mjs';
 import { withCacheEntryLock, removeOwnedStaging, createOwnedStaging, storageDiagnostic, checkDownloadSpace } from './cache-lifecycle.mjs';
 
 const digest = value => createHash('sha256').update(value).digest('hex');
@@ -33,6 +34,15 @@ export async function hashFile(file) {
   const hash = createHash('sha256');
   for await (const bytes of createReadStream(file)) hash.update(bytes);
   return hash.digest('hex');
+}
+
+/** The same final check downloadArtifact applies, for archives from npm packages. */
+export async function verifyArchiveFile(artifact, file) {
+  const hash = createHash('sha256');
+  let bytes = 0;
+  for await (const chunk of createReadStream(file)) { hash.update(chunk); bytes += chunk.length; }
+  if (bytes !== artifact.bytes || hash.digest('hex') !== artifact.sha256)
+    throw Object.assign(new Error(`Checksum or size mismatch: ${artifact.name}`), { code: 'LASM_INTEGRITY' });
 }
 
 export function validateArtifact(artifact) {
@@ -198,7 +208,7 @@ const verify = verifyArtifactDirectory;
  * A process death releases the lock; its exact owned staging is reclaimed.
  */
 export async function provisionArtifact(artifact, { cache = managedCacheDirectory(), fetch: fetch_ = fetch, log = console.error, python,
-  progress, label = artifact.name, signal, download = {} } = {}) {
+  progress, label = artifact.name, signal, download = {}, npm, env = process.env } = {}) {
   const identity = validateArtifact(artifact);
   if (['tar.xz', 'zip'].includes(artifact.format) && (!python || !isAbsolute(python)))
     throw new Error('SDK archives require the absolute path to a managed Python executable');
@@ -228,23 +238,25 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
         stage: `Downloading ${label}`, receivedBytes, totalBytes: artifact.bytes,
         download: true, cache: resolve(cache), complete,
       });
-      if (!progress) log(`Downloading verified ${artifact.name}…`);
-      downloadProgress();
-      await downloadArtifact(artifact, archive, { ...download, fetch: fetch_, update: downloadProgress, signal,
-        event: event => {
-          download.event?.(event);
-          if (event.type === 'retry') {
-            const message = `Retrying ${label} in ${Math.ceil(event.waitMs / 1000)}s (attempt ${event.attempt + 1}): ${event.detail}`;
-            if (progress) progress({ stage: message }); else log(message);
-          }
-        } });
+      // An installed or npm-fetched package supplies the same bytes; every source is
+      // checked against the catalog's SHA-256 and size before extraction.
+      const source = await acquireArtifact(artifact, archive, { label, log, progress, staging, signal, npm, env,
+        downloadProgress, verify: () => verifyArchiveFile(artifact, archive),
+        download: () => downloadArtifact(artifact, archive, { ...download, fetch: fetch_, update: downloadProgress, signal,
+          event: event => {
+            download.event?.(event);
+            if (event.type === 'retry') {
+              const message = `Retrying ${label} in ${Math.ceil(event.waitMs / 1000)}s (attempt ${event.attempt + 1}): ${event.detail}`;
+              if (progress) progress({ stage: message }); else log(message);
+            }
+          } }) });
       progress?.({ stage: `Extracting ${label}` });
       await mkdir(tree);
       await extract(artifact, archive, tree, python);
       progress?.({ stage: `Verifying installed ${label}` });
       const files = await inventory(tree);
       if (!Object.keys(files).length) throw new Error('Managed artifact is empty');
-      const receipt = { schema: 1, identity, artifact, files };
+      const receipt = { schema: 1, identity, artifact, source, files };
       await writeFile(join(tree, receiptName), JSON.stringify(receipt) + '\n', { flag: 'wx' });
       try { await rename(tree, directory); }
       catch (error) {

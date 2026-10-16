@@ -751,9 +751,209 @@ committed driver.
 
 - A packed candidate with this source on all five native targets, the installer
   fault suite there and the three-consecutive cold-installation gate.
-- npm distribution: the per-platform tools archives as `optionalDependencies`
-  packages and the shared archive with the Lean data packages (all below the
-  ~150 MB ceiling), fetched through npm; Verdaccio validation on the five runners.
+- npm distribution: implemented in source and validated against a loopback
+  registry (Phase 3 below); not in a packed candidate and not published.
 - Retire `src/managed-sdk.mjs`/`src/managed-python.mjs` from the package once one
   candidate has compared emcc and Node outputs; they remain maintainer tools for
   recordings, `build-sysroot.mjs` and the Windows resource guard.
+
+## Phase 3 (2026-10-16): npm distribution
+
+Source change awaiting review plus maintainer tooling; **nothing is published**. The
+user's npm organization `lasm` owns the `@lasm` scope (confirmed 2026-10-16); the
+unscoped `lasm` name belongs to an unrelated package, so the CLI is `@lasm/cli` with
+its bin still named `lasm` (`npx @lasm/cli Main.lean` anywhere, `npx lasm` once
+installed). The scope is a build option (`--scope`).
+
+### Design
+
+npm is a new **source** for the existing catalog archives, not a new trust model.
+Each tool package contains exactly one catalog archive, byte-identical to the
+release asset (same SHA-256), plus `package.json` and a README naming the asset URL
+and digest; licence texts and notices are inside the archive as before. No package
+has an entry point or any install script. Lasm still checks SHA-256 and size,
+applies the extraction limits, writes receipts and takes the same locks; the
+receipt now also records the source (`npm-installed`, `npm-fetched` or `https`).
+
+| Package | Install | Contents |
+| --- | --- | --- |
+| `@lasm/lean-<platform>` | `optionalDependencies` (`os`, `cpu`, `libc: glibc` on Linux) | Lean bin tier |
+| `@lasm/emscripten-<platform>` | `optionalDependencies` (same) | Node link driver's native tools |
+| `@lasm/lean-core-init`, `@lasm/lean-core-std` | `dependencies` | Init and Std module data |
+| `@lasm/emscripten-shared` | `dependencies` | Emscripten JavaScript subset and sysroot |
+| `@lasm/lean-ext-meta`, `-ext-elab`, `-ext-rest` | never installed; `npm pack` on demand | extended Lean tier |
+| `@lasm/git-<platform>` | never installed; `npm pack` on demand | Git (dugite-native), Lake projects only |
+
+Lean and Emscripten are separate packages, not one `tools-<platform>` package, so
+each keeps its own version: a package's version comes from the immutable release
+that published its archive (`lean-4.34.1-tiers-v1` → `4.34.1-lasm.1`,
+`emscripten-6.0.9-lasm-toolchain-v1` → `6.0.9-lasm.1`, dugite `v2.53.0-4` →
+`2.53.0-dugite.4`). A Lean upgrade then republishes only the Lean packages, and
+users' npm caches keep the unchanged toolchain. The CLI pins every installed tool
+package to an exact version, and its `src/npm-tools.json` (written at packing time,
+absent from a source checkout) maps each archive SHA-256 to package, version, file,
+size, install class and the package tarball's sha512 integrity.
+
+**Source resolution** ([`src/npm-artifacts.mjs`](../src/npm-artifacts.mjs), called
+by `provisionArtifact` before its download):
+
+- Installed packages are resolved from the CLI's own location with
+  `createRequire(import.meta.url).resolve('<name>/package.json')` (hoisted, nested
+  and pnpm layouts). Name and version must equal the pin and the file must have the
+  catalog size; the archive is copied into the owned staging directory and then
+  verified like a download. A damaged file falls back to the download.
+- A missing platform package (`--omit=optional`, a lockfile lacking this platform
+  (npm/cli#4828), an unsupported C library) prints one message naming every missing
+  package of this host and the exact repair, for example
+  ``Fix: run `npm install @lasm/emscripten-linux-x64@6.0.9-lasm.1 @lasm/lean-linux-x64@4.34.1-lasm.1` ``
+  (or `npm install --include=optional`), then downloads the same archive directly.
+- `LASM_ARTIFACT_SOURCE` = `auto` (default: npm package, else HTTPS), `npm` (never
+  download directly; for offline mirrors and validation), `https` (ignore packages,
+  the earlier behavior). A source checkout has no manifest and always downloads.
+
+**On demand through npm.** When a build needs the extended tier or Git, Lasm runs
+the user's npm without a shell: the `npm-cli.js` beside `npm_execpath` (npm and npx
+set it), else the one shipped beside Node, else `npm` on `PATH` (on Windows the
+`npm-cli.js` beside `npm.cmd`). It runs `npm pack <name>@<version> --pack-destination
+<owned staging> --ignore-scripts` in the current directory, so the user's registry,
+proxy, CA, cache and project `.npmrc` apply; checks the tarball against the pinned
+sha512; extracts only the archive member; and verifies its SHA-256. If npm fails, it
+explains why and downloads directly (unless `LASM_ARTIFACT_SOURCE=npm`).
+
+### Tooling
+
+- [`scripts/npm-dist/packages.mjs`](../scripts/npm-dist/packages.mjs): layout, versions,
+  package metadata, the runtime manifest and the CLI's exact pins (pure functions).
+- [`scripts/npm-dist/build.mjs`](../scripts/npm-dist/build.mjs) (steps `plan`,
+  `package`, `main`) and [`build-all.mjs`](../scripts/npm-dist/build-all.mjs), which runs
+  each package in its own resource guard (the guard counts page cache; one process
+  per package peaks at 0.1–0.7 GiB). Release assets are downloaded and verified
+  against the catalog; every package is packed twice with `npm pack` and must be
+  identical; `npm-dist.json` records names, versions, sha512 integrity, SHA-256,
+  sizes and file counts. The CLI package comes from a packed candidate; with
+  `--overlay-source` its `bin/`, `src/` and runtime glue are this checkout's (a
+  maintainer test package, recorded in `provenance.json`).
+- [`scripts/npm-dist/registry.mjs`](../scripts/npm-dist/registry.mjs): Verdaccio
+  6.10.4 on 127.0.0.1 only, no uplinks, `max_body_size` 400 MB, storage under the
+  given directory; `publish` refuses any non-loopback registry, uses a private
+  user configuration, and checks the registry serves the packed integrity.
+- [`scripts/npm-dist/consumer.mjs`](../scripts/npm-dist/consumer.mjs) and
+  [`network-audit.cjs`](../scripts/npm-dist/network-audit.cjs) (a `--require`
+  preload, so it also runs in Lasm's build worker): every Node process records each
+  HTTP(S) request and non-loopback requests are blocked; Lasm runs with
+  `LASM_ARTIFACT_SOURCE=npm`, empty npm and Lasm caches per scenario.
+- [`npm-dist.yml`](../.github/workflows/npm-dist.yml) (`workflow_dispatch`): all of
+  the above on the five native runners, then a job requiring byte-identical tool
+  packages across runners.
+
+### Sizes (Lean 4.34.1 package set)
+
+| Package | Version | Install | Archive bytes | Package bytes |
+| --- | --- | --- | --- | --- |
+| `@lasm/lean-linux-x64` | 4.34.1-lasm.1 | optional | 40,565,096 | 40,560,627 |
+| `@lasm/lean-linux-arm64` | 4.34.1-lasm.1 | optional | 42,461,760 | 42,461,978 |
+| `@lasm/lean-darwin-x64` | 4.34.1-lasm.1 | optional | 34,482,295 | 34,488,976 |
+| `@lasm/lean-darwin-arm64` | 4.34.1-lasm.1 | optional | 32,697,075 | 32,705,853 |
+| `@lasm/lean-win32-x64` | 4.34.1-lasm.1 | optional | 36,516,813 | 36,514,952 |
+| `@lasm/emscripten-linux-x64` | 6.0.9-lasm.1 | optional | 58,160,064 | 58,086,469 |
+| `@lasm/emscripten-linux-arm64` | 6.0.9-lasm.1 | optional | 55,647,283 | 55,600,279 |
+| `@lasm/emscripten-darwin-x64` | 6.0.9-lasm.1 | optional | 51,135,721 | 51,119,977 |
+| `@lasm/emscripten-darwin-arm64` | 6.0.9-lasm.1 | optional | 43,627,516 | 43,616,813 |
+| `@lasm/emscripten-win32-x64` | 6.0.9-lasm.1 | optional | 41,593,397 | 41,569,536 |
+| `@lasm/lean-core-init` | 4.34.1-lasm.1 | required | 97,012,715 | 97,026,363 |
+| `@lasm/lean-core-std` | 4.34.1-lasm.1 | required | 74,707,631 | 74,712,809 |
+| `@lasm/emscripten-shared` | 6.0.9-lasm.1 | required | 3,359,267 | 3,358,076 |
+| `@lasm/lean-ext-meta` | 4.34.1-lasm.1 | demand | 81,888,090 | 81,906,911 |
+| `@lasm/lean-ext-elab` | 4.34.1-lasm.1 | demand | 78,432,815 | 78,452,524 |
+| `@lasm/lean-ext-rest` | 4.34.1-lasm.1 | demand | 93,668,179 | 93,683,560 |
+| `@lasm/git-linux-x64` | 2.53.0-dugite.4 | demand | 65,269,219 | 65,057,698 |
+| `@lasm/git-linux-arm64` | 2.53.0-dugite.4 | demand | 23,223,345 | 23,200,231 |
+| `@lasm/git-darwin-x64` | 2.53.0-dugite.4 | demand | 66,136,060 | 65,926,064 |
+| `@lasm/git-darwin-arm64` | 2.53.0-dugite.4 | demand | 62,348,987 | 62,124,810 |
+| `@lasm/git-win32-x64` | 2.53.0-dugite.4 | demand | 47,119,821 | 46,981,917 |
+| `@lasm/cli` (test build) | 0.1.0-experimental.38930715033.npm.1 | — | — | 66,001,408 |
+
+The largest package is 97 MB, below the ~150 MB ceiling. For Lean 4.35.0 the same
+layout gives `4.35.0-lasm.1` packages of 31.5–96.1 MB (unit-tested, not packed).
+`npm install @lasm/cli` on Linux x86-64 fetches 66.0 + 40.6 + 58.1 + 97.0 + 74.7 +
+3.4 ≈ 340 MB; Lake projects add 254 MB (extended tier) and 65 MB (Git) on first use.
+
+### Evidence (local, Linux x86-64)
+
+Package input: the accepted candidate `.38930715033` (Lean 4.34.1, runtime
+`4d3d6c60…`, Node 26.10.0) with `--overlay-source` from this source; the Lean 4.35
+runtime is not yet wired, so 4.34.1 is the self-contained choice. Node 26.10.0 /
+npm 11.19.1 for consumers (packing used Node 24.13.1 / npm 11.8.0). Evidence is under
+`.work/npm-dist/` (`build-3`, `consumer-3`, `consumer-3-*.out`, resource reports).
+
+- **Packing:** all 22 packages packed twice identically; the registry served the
+  packed integrity for each.
+- **`installed`:** `npm install @lasm/cli@…` in an empty project (5.3 s) installed
+  exactly `cli`, `lean-linux-x64`, `emscripten-linux-x64`, the two core packages and
+  `emscripten-shared`. `npx lasm Main.lean` with an empty Lasm cache printed
+  `Hello from Lean! 2 + 3 = 5` in 59 s; all five receipts are `npm-installed`; the
+  audit saw only `127.0.0.1:4873` (20 requests, none blocked). Guard peak 3.05 GiB.
+- **`lake`:** a Lake project (local `Greeting` module) in the same project printed
+  `Lean module: 42` in 83 s; the three extended archives and Git are `npm-fetched`
+  (via `npm pack` from the registry), the rest `npm-installed`; only loopback traffic.
+- **`npx`:** `npx --yes @lasm/cli@… Main.lean` in an empty directory with empty npm
+  and Lasm caches: 62 s; npx installed the platform packages too; all `npm-installed`.
+- **`omit-optional`:** after `npm install --omit=optional`, the build stopped in
+  1.8 s with the message above, naming both platform packages; running exactly the
+  printed command made both resolvable.
+- **`foreign-lock`:** a lockfile created with `npm install --os=darwin --cpu=arm64`
+  lists all ten platform packages; after deleting `node_modules`, `npm ci` on Linux
+  installed the Linux packages. npm 11 did not reproduce npm/cli#4828 for a lockfile
+  created from scratch; the fix message covers lockfiles that do lack the entries.
+- **`pnpm`:** `pnpm add` (pnpm 12.4.2) resolved every package of this host from the
+  CLI's location (resolution only, no build).
+- Unit tests: `test/npm-artifacts.test.mjs` (source order, fix messages, npm-only
+  and https modes, version and digest mismatches, `npm pack` integrity, extraction,
+  finding npm on each OS) and `test/npm-dist-packages.test.mjs` (layout, versions,
+  ceiling, exact pins, manifest), both now in the installer fault suite: under the
+  guard 171 tests, 168 passed, 3 skipped, 0 failed (`.work/npm-dist/installer-faults-b.log`).
+
+CI ([`npm-dist.yml`](../.github/workflows/npm-dist.yml), Node 26.10.0 / npm 11.19.1,
+on the review branch `npm-dist-preview`, which holds the uncommitted source change):
+[run 38963750452](https://github.com/Millillion/lasm/actions/runs/38963750452) passed
+on all five native runners (Ubuntu 24.04 x86-64 and ARM64, macOS 15 Intel and Apple
+Silicon, Windows Server 2025). Every runner packed all packages twice identically,
+published them to its own loopback Verdaccio, and passed every scenario above with
+only `127.0.0.1:4873` contacted and every receipt from npm:
+
+| Runner | `installed` first build | `lake` | `npx` | `omit-optional` fix | `foreign-lock` | `pnpm` |
+| --- | --- | --- | --- | --- | --- | --- |
+| linux-x64 | 42 s | 58 s | 47 s | exact, repaired | host packages installed | resolved |
+| linux-arm64 | 32 s | 43 s | 36 s | exact, repaired | host packages installed | resolved |
+| darwin-x64 | 196 s | 312 s | 235 s | exact, repaired | host packages installed | resolved |
+| darwin-arm64 | 46 s | 103 s | 50 s | exact, repaired | host packages installed | resolved |
+| win32-x64 | 85 s | 117 s | 92 s | exact, repaired | host packages installed | resolved |
+
+(Foreign lockfiles: created for darwin-arm64 on Linux runners and for glibc
+linux-x64 elsewhere.) The equality job found all 21 tool packages byte-identical on
+the five runners (105 comparisons). The CLI package is identical on Linux and macOS
+and differs on Windows (file modes of the overlaid checkout; it is a per-runner test
+package, not a release input). The earlier
+[run 38961308274](https://github.com/Millillion/lasm/actions/runs/38961308274) passed on
+the four Linux and macOS runners and failed on Windows in a unit test (a POSIX file
+URL); it also showed that `npm pack` records the archive's file mode (a downloaded
+0600 file versus a copied 0644 one changed the local tarballs), which
+`build.mjs` now normalizes.
+
+### Open decisions and risks
+
+- **Publication** to the public registry and its order (tool packages before the
+  CLI), npm provenance / trusted publishing per package from CI, and 2FA for the
+  `lasm` organization: user decisions, not started.
+- **Git redistribution:** the Git packages redistribute desktop/dugite-native
+  binaries (GPL-2.0 Git and bundled components) under the `@lasm` scope; the README
+  points to upstream, but whether to republish them or keep downloading Git from
+  dugite-native is a licensing and maintenance decision.
+- **Disk:** an installed archive exists in `node_modules`, in npm's cache and,
+  briefly, in Lasm's staging before extraction (the copy could become a hard link).
+- **Determinism across npm versions:** tarball bytes depend on npm's tar and gzip
+  (and file modes, now normalized); the five runners agree with one npm (11.19.1),
+  and local npm 11.8.0 produced the same bytes for every unseeded package. Pin
+  the npm used for publication.
+- **npm/cli#4828** and `--omit=optional` cannot be prevented by Lasm; they are
+  detected and reported with the exact repair, and the direct download still works.
