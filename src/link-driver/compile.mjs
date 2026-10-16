@@ -18,7 +18,7 @@ import path from 'node:path';
 import { executableName } from '../platform.mjs';
 
 export const recipeKind = 'lasm-link-driver-recipe';
-export const recipeSchema = 1;
+export const recipeSchema = 2;
 const placeholderPattern = /<([a-z-]+)(?::([^>]*))?>/g;
 
 /** Validates a recipe document (object or JSON text) and returns it frozen. */
@@ -48,7 +48,38 @@ export function parseRecipe(input) {
     if (!/^[A-Z_][A-Z0-9_]*$/.test(key) || typeof value !== 'string') fail(`invalid environment entry ${key}`);
   if (!Array.isArray(recipe.sysroot?.libraries) || recipe.sysroot.libraries.some(name => !/^[A-Za-z0-9_+.-]+\.(?:a|o)$/.test(name)))
     fail('sysroot.libraries must list archive or object names');
+  if (recipe.link !== undefined) validateLink(recipe.link, fail);
   return deepFreeze(recipe);
+}
+
+const linkKinds = new Set(['symbols', 'wasm-ld', 'strip', 'finalize', 'glue', 'wasm-opt', 'acorn', 'dce-graph', 'metadce']);
+const linkPlaceholders = new Set(['emscripten', 'wasm', 'stub', 'exports', 'export-if-defined', 'inputs', 'syslib',
+  'features', 'js', 'js-out', 'info', 'graph']);
+const linkPrograms = new Set(['node', 'wasm-ld', 'llvm-objcopy', 'wasm-emscripten-finalize', 'wasm-opt', 'wasm-metadce']);
+
+/** The link section (milestone C): per-mode em++ flags, settings template and pipeline. */
+function validateLink(link, fail) {
+  if (!link || typeof link !== 'object') fail('invalid link section');
+  if (!/^[a-z0-9_-]+(?:\/[a-z0-9_-]+)*$/.test(link.systemLibraryDirectory ?? '')) fail('invalid link.systemLibraryDirectory');
+  if (!/^native-sigs-emscripten-[0-9.]+\.json$/.test(link.nativeSigs?.file ?? '') || !/^[a-f0-9]{64}$/.test(link.nativeSigs?.sha256 ?? ''))
+    fail('invalid link.nativeSigs');
+  if (!link.settingsDefaults || typeof link.settingsDefaults !== 'object' || Array.isArray(link.settingsDefaults)) fail('invalid link.settingsDefaults');
+  for (const mode of ['probe', 'final']) {
+    const spec = link.modes?.[mode];
+    if (!spec) fail(`missing link mode ${mode}`);
+    if (!Array.isArray(spec.emccFlags) || spec.emccFlags.some(arg => typeof arg !== 'string' || !arg.startsWith('-')))
+      fail(`link.modes.${mode}.emccFlags must list flags`);
+    if (!spec.settings || typeof spec.settings !== 'object' || Array.isArray(spec.settings)) fail(`link.modes.${mode}.settings must be an object`);
+    if (!Array.isArray(spec.pipeline) || !spec.pipeline.length) fail(`link.modes.${mode}.pipeline must be a non-empty array`);
+    for (const step of spec.pipeline) {
+      if (!linkKinds.has(step.kind)) fail(`unknown link step ${step.kind}`);
+      if (!linkPrograms.has(step.program)) fail(`unknown link program ${step.program}`);
+      if (!Array.isArray(step.args) || step.args.some(arg => typeof arg !== 'string')) fail(`invalid ${step.kind} arguments`);
+      for (const arg of step.args) for (const [, name] of arg.matchAll(/<([a-z-]+)>/g))
+        if (!linkPlaceholders.has(name)) fail(`unknown link placeholder <${name}>`);
+    }
+    if (spec.pipeline[0].kind !== 'symbols' || spec.pipeline[1]?.kind !== 'wasm-ld') fail(`the ${mode} pipeline must start with the JS symbols and wasm-ld`);
+  }
 }
 
 function deepFreeze(value) {

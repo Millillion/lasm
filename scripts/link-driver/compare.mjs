@@ -16,9 +16,6 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from '
 import { join, relative, resolve, basename } from 'node:path';
 import { parseArgs } from 'node:util';
 
-const { values: options, positionals } = parseArgs({ allowPositionals: true, options: {
-  json: { type: 'string' }, all: { type: 'boolean', default: false } } });
-if (positionals.length !== 2) { console.error('Usage: compare.mjs A B [--json FILE] [--all]'); process.exit(2); }
 
 const isWasm = bytes => bytes.length >= 8 && bytes.readUInt32LE(0) === 0x6d736100;
 function readLeb(bytes, offset) {
@@ -148,6 +145,9 @@ function sides(directory) {
 }
 
 if (resolve(process.argv[1]) === resolve(new URL(import.meta.url).pathname)) {
+  const { values: options, positionals } = parseArgs({ allowPositionals: true, options: {
+    json: { type: 'string' }, all: { type: 'boolean', default: false } } });
+  if (positionals.length !== 2) { console.error('Usage: compare.mjs A B [--json FILE] [--all]'); process.exit(2); }
   const [left, right] = positionals.map(sides);
   const report = { a: resolve(positionals[0]), b: resolve(positionals[1]), fixtures: {} };
   for (const name of [...new Set([...Object.keys(left), ...Object.keys(right)])]) {

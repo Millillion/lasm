@@ -8,8 +8,9 @@
 // All absolute paths are replaced by placeholders (<build>, <work>, <runtime>,
 // <lasm>, <sdk>, <emscripten>, <state>, <node>, <python>, <temp>, ...), so recipes
 // from different directories, runs and machines compare directly.
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { basename, join, resolve } from 'node:path';
+import { existsSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
+import { basename, dirname, join, resolve } from 'node:path';
+import { deriveLinkRecipe } from './derive-link.mjs';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -144,7 +145,7 @@ function analyzeFixture(fixture) {
   const stepsRoot = join(fixture, 'steps');
   const result = { name: build.name, fixture: build.fixture, lean: build.lean, runtime: build.runtime, sdk: build.sdk,
     node: build.node, requirements: build.requirements, compiles: [], links: [] };
-  for (const name of readdirSync(stepsRoot).sort()) {
+  for (const name of existsSync(stepsRoot) ? readdirSync(stepsRoot).sort() : []) {
     const directory = join(stepsRoot, name), step = JSON.parse(readFileSync(join(directory, 'step.json'), 'utf8'));
     const temp = join(directory, 'temp'), normalize = normalizer(build.paths, { temp, step: directory });
     if (step.tool === 'emcc' && step.args.includes('-c')) {
@@ -256,7 +257,7 @@ const emccJoinedOptions = ['-l', '-L', '-I', '-z', '-o', '-x', '-u'];
  * from a recording's recipe.json. Every compile of every fixture must reduce to
  * the same template, and the template must reproduce each recorded clang driver
  * command exactly; otherwise derivation fails. */
-export function deriveProductRecipe(run, { sysrootManifest } = {}) {
+export function deriveProductRecipe(run, { sysrootManifest, nativeSigsOut } = {}) {
   const recorded = JSON.parse(readFileSync(join(run, 'recipe.json'), 'utf8'));
   const fixtures = Object.values(recorded.fixtures);
   if (!fixtures.length) throw new Error('The recording has no fixtures');
@@ -304,8 +305,9 @@ export function deriveProductRecipe(run, { sysrootManifest } = {}) {
     systemInputs.set(name, [...new Set([...(systemInputs.get(name) ?? []), link.kind])]);
   }
   const libraries = [...systemInputs.keys()].sort();
+  const link = deriveLinkRecipe(run, recorded, { nativeSigsOut });
   const recipe = {
-    schema: 1, kind: 'lasm-link-driver-recipe', emscripten: first.sdk.version,
+    schema: 2, kind: 'lasm-link-driver-recipe', emscripten: first.sdk.version,
     sdk: { driverIdentity: first.sdk.driverIdentity, runtimePatchesApplied: first.sdk.runtimePatchesApplied },
     recordedFrom: { run: recorded.run, platform: recorded.platform, node: recorded.node,
       runtime: first.runtime.identity, fixtures: fixtures.map(fixture => fixture.fixture) },
@@ -322,6 +324,7 @@ export function deriveProductRecipe(run, { sysrootManifest } = {}) {
       libraries, usedBy: Object.fromEntries(libraries.map(name => [name, systemInputs.get(name)])),
       ...(sysrootManifest ? { archive: sysrootManifest } : {}),
     },
+    link,
   };
   return recipe;
 }
@@ -332,12 +335,15 @@ if (resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
     // --derive OUT RUN [SYSROOT_MANIFEST]
     const [, out, run, manifest] = args;
     const sysroot = manifest ? JSON.parse(readFileSync(manifest, 'utf8')) : undefined;
-    const recipe = deriveProductRecipe(resolve(run), { sysrootManifest: sysroot && {
+    // The native signature table is written next to the recipe (recipe.link.nativeSigs.file).
+    const nativeSigsOut = join(dirname(resolve(out)), 'native-sigs.pending.json');
+    const recipe = deriveProductRecipe(resolve(run), { nativeSigsOut, sysrootManifest: sysroot && {
       name: sysroot.archive.name, bytes: sysroot.archive.bytes, sha256: sysroot.archive.sha256,
       tarBytes: sysroot.archive.tarBytes, root: sysroot.root, files: sysroot.fileCount, sourceDateEpoch: sysroot.sourceDateEpoch,
       debugInfo: sysroot.debugInfo } });
     writeFileSync(out, JSON.stringify(recipe, null, 2) + '\n');
-    console.log(`wrote ${out}`);
+    renameSync(nativeSigsOut, join(dirname(resolve(out)), recipe.link.nativeSigs.file));
+    console.log(`wrote ${out} and ${recipe.link.nativeSigs.file}`);
   } else if (args[0] === '--combine') {
     const [, out, ...runs] = args;
     writeFileSync(out, JSON.stringify(combine(runs.map(run => resolve(run))), null, 2) + '\n');

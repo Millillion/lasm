@@ -35,8 +35,16 @@ const { values: options } = parseArgs({ options: {
   analyze: { type: 'string' }, lean: { type: 'string', default: '4.34.1' },
   // Milestone B: an extracted prebuilt sysroot cache (scripts/link-driver/build-sysroot.mjs),
   // used read-only by emcc through EM_CACHE + EM_FROZEN_CACHE, and the compile driver.
-  'frozen-cache': { type: 'string' }, 'compile-driver': { type: 'string', default: 'emcc' },
+  'frozen-cache': { type: 'string' }, 'compile-driver': { type: 'string' },
+  // Milestone C: emcc | node-compile | node (src/application-link.mjs linkDrivers).
+  // --compile-driver node (milestone B scripts) means node-compile.
+  'link-driver': { type: 'string' },
+  // Also assemble a runnable application (dist plus host and main.mjs) under <fixture>/app.
+  package: { type: 'boolean', default: false },
 } });
+if (options['compile-driver'] && options['link-driver']) throw new Error('Use --link-driver or --compile-driver, not both');
+const linkDriver = options['link-driver'] ?? ({ undefined: 'emcc', emcc: 'emcc', node: 'node-compile' })[options['compile-driver']];
+if (!['emcc', 'node-compile', 'node'].includes(linkDriver)) throw new Error('Invalid --link-driver or --compile-driver');
 
 if (options.analyze) {
   const summary = analyzeRun(resolve(options.analyze));
@@ -83,7 +91,7 @@ const readResponseFile = file => readFileSync(file, 'utf8').split('\n').filter(B
   .map(line => line.slice(1, -1).replace(/\\(.)/g, '$1'));
 
 const runSummary = { schema: 1, recorder: 'scripts/link-driver/record-emcc.mjs', debug: options.debug,
-  compileDriver: options['compile-driver'], frozenCache: options['frozen-cache'] ? resolve(options['frozen-cache']) : null,
+  linkDriver, frozenCache: options['frozen-cache'] ? resolve(options['frozen-cache']) : null,
   startedAt: new Date().toISOString(), node: process.version, platform: `${process.platform}-${process.arch}`,
   cache, fixtures: [] };
 for (const spec of options.fixture) {
@@ -161,7 +169,7 @@ for (const spec of options.fixture) {
   log(`${name}: linking ${generated.sources.length} module(s)`);
   const requirements = await linkApplication({ sources: generated.sources, sdk: recorded, runtime, work: temporary, dist,
     leanVersion: lean.version, memoryMode: 1, verbose: false, progress: ({ stage }) => log(`${name}: ${stage}`),
-    compileDriver: options['compile-driver'] });
+    linkDriver, linkIntermediates: options.debug && linkDriver === 'node' ? join(fixture, 'node-link') : undefined });
   const paths = { fixture, source: sourceDirectory, work, build: temporary, runtime: runtime.directory, lasm: root,
     sdk: sdk.prefix, emscripten: sdk.driver, state: sdk.state, python: sdk.python.executable, node: process.execPath,
     lean: lean.prefix, cache,
@@ -171,13 +179,26 @@ for (const spec of options.fixture) {
     lean: { version: lean.version, commit: lean.commit, distribution: lean.distribution, tier: lean.tier, identity: lean.identity },
     runtime: { identity: runtime.identity, name: runtime.manifest.name, libraries: runtime.manifest.libraries },
     sdk: { version: sdk.version, identity: sdk.identity, driverIdentity: sdk.driverIdentity, runtimePatchesApplied: sdk.runtimePatchesApplied },
-    compileDriver: options['compile-driver'], frozenCache: options['frozen-cache'] ? resolve(options['frozen-cache']) : null,
+    linkDriver, frozenCache: options['frozen-cache'] ? resolve(options['frozen-cache']) : null,
     node: process.version, paths, generatedSources: generated.sources.map(file => relative(temporary, file).startsWith('..') ? relative(work, file) : relative(temporary, file)),
     requirements, steps: steps.map(({ index, tool, status, seconds }) => ({ index, tool, status, seconds })),
     // Everything Lasm produced: generated C, objects, maps, response files, outputs.
     work: inventory(work, work, name => name.startsWith('.build-')),
     build: inventory(temporary) };
   writeFileSync(join(fixture, 'build.json'), JSON.stringify(record, null, 2) + '\n');
+  if (options.package) {
+    // The same packaging as src/application-build.mjs, for running the program.
+    const { copyApplicationHost, writeApplicationEntrypoint } = await import('../../src/application-output.mjs');
+    const { applicationSupport } = await import('../../src/application-support.mjs');
+    const app = join(fixture, 'app');
+    cpSync(dist, app, { recursive: true });
+    copyApplicationHost(app);
+    writeApplicationEntrypoint(app, { node: applicationSupport()?.node, minimumGlibc: applicationSupport()?.minimumGlibc });
+    copyFileSync(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(app, 'THIRD_PARTY_NOTICES.txt'));
+    // main.mjs checks the ahead-of-time policy and link requirements before starting.
+    const { applicationPolicy } = await import('../../src/application-policy.mjs');
+    writeFileSync(join(app, 'build-info.json'), JSON.stringify({ applicationPolicy, linkRequirements: requirements }, null, 2) + '\n');
+  }
   runSummary.fixtures.push({ name, fixture: record.fixture, program: record.build['dist/program.wasm'], glue: record.build['dist/program.cjs'] });
   log(`${name}: done`);
 }

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { bundledRecipe, parseRecipe, translateEmccFlags, clangArguments, clangCommand, checkRecordedFlags,
   emscriptenCache, compileObject } from '../src/link-driver/compile.mjs';
-import { selectedCompileDriver } from '../src/application-link.mjs';
+import { selectedLinkDriver } from '../src/application-link.mjs';
 import { selectCacheFile, libraryDirectory, archiveRoot } from '../scripts/link-driver/build-sysroot.mjs';
 
 // Lasm's compile flags (src/application-link.mjs) for a runtime at /r.
@@ -10,7 +10,7 @@ const flags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DL
   '-sMEMORY64=1', '-ffunction-sections', '-fdata-sections', '-I', '/r/include'];
 
 // The clang driver command emcc ran for examples/hello (EMCC_DEBUG + -### recording,
-// .work/link-driver/ref-b-debug), with only the absolute roots shortened.
+// .work/link-driver/ref-b-debug and ref-c-debug), with only the absolute roots shortened.
 const recordedHello = ['-target', 'wasm64-unknown-emscripten', '-fvisibility=default', '-mllvm',
   '-combiner-global-alias-analysis=false', '-mllvm', '-wasm-enable-sjlj', '-mllvm', '-wasm-use-legacy-eh', '-mllvm',
   '-disable-lsr', '--sysroot=/s/cache/sysroot', '-D__EMSCRIPTEN_SHARED_MEMORY__=1', '-Xclang',
@@ -77,7 +77,13 @@ test('recipe validation rejects malformed documents', () => {
   assert.doesNotThrow(() => parseRecipe(JSON.stringify(good)));
   const broken = [
     recipe => { recipe.kind = 'other'; },
-    recipe => { recipe.schema = 2; },
+    recipe => { recipe.schema = 1; },
+    recipe => { recipe.link.modes.final.pipeline[0].kind = 'shell'; },
+    recipe => { recipe.link.modes.probe.pipeline[1].args.push('<unknown>'); },
+    recipe => { recipe.link.modes.final.pipeline[2].program = '../python3'; },
+    recipe => { delete recipe.link.modes.probe; },
+    recipe => { recipe.link.nativeSigs.file = '../x.json'; },
+    recipe => { recipe.link.modes.final.emccFlags.push('input.o'); },
     recipe => { recipe.compile.driver = recipe.compile.driver.filter(arg => arg !== '<flags>'); },
     recipe => { recipe.compile.driver.push('<flags>'); },
     recipe => { recipe.compile.driver.push('--x=<unknown>'); },
@@ -92,12 +98,13 @@ test('recipe validation rejects malformed documents', () => {
   }
 });
 
-test('the compile driver switch defaults to emcc', () => {
-  assert.equal(selectedCompileDriver(undefined), 'emcc');
-  assert.equal(selectedCompileDriver(''), 'emcc');
-  assert.equal(selectedCompileDriver('emcc'), 'emcc');
-  assert.equal(selectedCompileDriver('node'), 'node');
-  assert.throws(() => selectedCompileDriver('python'), /Unsupported LASM_LINK_DRIVER/);
+test('the link driver switch defaults to emcc', () => {
+  assert.equal(selectedLinkDriver(undefined), 'emcc');
+  assert.equal(selectedLinkDriver(''), 'emcc');
+  assert.equal(selectedLinkDriver('emcc'), 'emcc');
+  assert.equal(selectedLinkDriver('node'), 'node');
+  assert.equal(selectedLinkDriver('node-compile'), 'node-compile');
+  assert.throws(() => selectedLinkDriver('python'), /Unsupported LASM_LINK_DRIVER/);
 });
 
 test('the prebuilt sysroot keeps headers and only the recorded libraries', () => {
