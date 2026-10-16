@@ -48,7 +48,7 @@ if (info.moduleDataIdentity) {
   metadataReclamation = await reclaimBuildMetadata(project, sourceKey, info.signature, dist);
   writeFileSync(join(output, 'metadata-reclamation.json'), JSON.stringify(metadataReclamation, null, 2) + '\n');
 }
-const prefix = join(process.env.LASM_TOOLCHAIN_CACHE, 'artifacts', info.nativeLeanIdentity);
+const prefix = join(process.env.LASM_TOOLCHAIN_CACHE, info.nativeLeanTier ? 'derived' : 'artifacts', info.nativeLeanIdentity);
 const lean = { prefix, commit: info.leanCommit, lean: join(prefix, 'bin', executableName('lean')),
   lake: join(prefix, 'bin', executableName('lake')) };
 const generated = applicationSources(join(project, 'Main.lean'), lean, join(output, 'oracle'), { log: () => {} });
