@@ -260,7 +260,10 @@ The user approved shrinking the first-build download while keeping Node.js and
 npm as the only prerequisites. Follow [the slimming design](TOOLCHAIN_SLIMMING.md):
 
 - [ ] Phase 1: tiered trimmed Lean (per-platform binaries, shared core and
-  extended module data), assembled into one prefix on demand.
+  extended module data), assembled into one prefix on demand. Implemented in
+  source and validated by the maintainer tier workflow; awaiting a packed
+  candidate's six-platform acceptance and cold-installation gate. Windows ARM64
+  keeps its complete Lasm-built archive (its module data differs from upstream).
 - [ ] Phase 2: Node link driver replacing `emcc` and Python, byte-identical to
   current output on existing fixtures.
 - [ ] Phase 3: npm platform packages via `optionalDependencies`, validated with

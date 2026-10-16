@@ -69,7 +69,10 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     cSha256: await hashFile(generated.sources[i]),
   });
   const memoryMode = 1;
+  // A tiered Lean is identified by its assembled prefix, which is keyed by the
+  // identities of the binaries and every module-data archive it contains.
   const recipe = { schema: 1, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
+    ...(lean.distribution === 'tiers' ? { nativeLeanTier: lean.tier, nativeLeanComponents: lean.components } : {}),
     ...(lean.notices ? { nativeLeanNoticesIdentity: lean.notices.identity } : {}),
     emscripten: sdkCatalog.version, sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)),
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),

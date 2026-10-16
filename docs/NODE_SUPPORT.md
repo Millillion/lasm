@@ -36,6 +36,11 @@ the Git download. These totals exclude the npm package and generated build files
 unpacked tools and build caches occupy several GB. The acceptance report records
 observed disk usage, build times and deployment sizes separately. These are
 measurements of the identified candidate, not performance guarantees for other machines.
+Current source, not yet in an accepted candidate, replaces the complete Lean
+archive with [tiered archives](TOOLCHAIN_SLIMMING.md#phase-1-status-2026-10-16)
+on every target except Windows ARM64: on Linux x86-64 Lean's share falls from
+580,432,872 to 212,285,442 bytes for an ordinary program, and to 466,274,526
+bytes for a Lake project or a program importing `Lean`/`Lake`.
 The current builder removes unreachable code and includes only the deployment
 architecture's native helpers. Current source builds reject runtime compiler,
 interpreter, module-data and plugin dependencies; they never package the large

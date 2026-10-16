@@ -89,7 +89,7 @@ const artifact = { name: 'lean-4.34.1-win32-arm64', root: 'install',
 assert.ok(artifact.bytes < 2 * 1024 ** 3);
 const catalog = structuredClone(toolchainCatalog); catalog.lean['4.34.1'].artifacts['win32-arm64'] = artifact;
 const cache = join(base, 'relocated cache λ');
-const lean = await provisionLean(base, { catalog, cache, fetch: async url => {
+const lean = await provisionLean(base, { catalog, cache, distribution: 'full', fetch: async url => {
   assert.equal(url, artifact.url); return new Response(Readable.toWeb(createReadStream(archive)));
 } });
 // Neither the original native build nor the emulated seed may satisfy the

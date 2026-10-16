@@ -46,7 +46,7 @@ for (const file of [sourceReceipt, priorBuild]) {
 }
 const selection = join(output, 'selection'); mkdirSync(selection, { recursive: true });
 writeFileSync(join(selection, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
-const native = await provisionLean(selection, { cache });
+const native = await provisionLean(selection, { cache, distribution: 'full' });
 if (native.commit !== expectedCommit) throw new Error('Wrong native bootstrap version');
 const source = join(output, 'source'), build = join(output, 'build');
 const run = (command, argv, options = {}) => execFileSync(command, argv, { cwd: root, stdio: 'inherit',

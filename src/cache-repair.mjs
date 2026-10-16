@@ -43,7 +43,11 @@ export async function repairManagedCache({ cache = managedCacheDirectory(), log 
             continue;
           }
           result.verified.push(path);
-          if (process.platform === 'win32' && kind === 'artifacts' && receipt.files['bin/lean.exe'] && receipt.files['bin/lake.exe'])
+          // Complete Lean prefixes: an upstream full archive, or a prefix assembled
+          // from tiered archives. A binaries-only tier is never executed directly.
+          if (process.platform === 'win32' && receipt.files['bin/lean.exe'] && receipt.files['bin/lake.exe']
+              && receipt.files['lib/lean/Init.olean']
+              && (kind === 'artifacts' || receipt.provenance?.kind === 'lean-prefix'))
             await windowsToolPrefix(path, { receipt, repair: true, log, progress });
         }
       }

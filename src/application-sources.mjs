@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, realpathSync } from 'node:fs';
 import { dirname, join, resolve, relative, delimiter, toNamespacedPath } from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { insideDirectory } from './platform.mjs';
@@ -42,6 +42,42 @@ export function nativeLeanEnvironment(lean, inherited = process.env) {
     LEAN_PATH: toNamespacedPath(join(prefix, 'lib/lean')),
   });
   return env;
+}
+
+/** Whether a standalone source imports, directly or through local imports,
+ * a module rooted in `roots`. Lean's own header parser resolves the imports;
+ * a module absent from the selected prefix fails with its unknown root. */
+export function standaloneImportsModules(source, lean, roots) {
+  const directory = canonicalApplicationPath(dirname(resolve(source)));
+  const standard = canonicalApplicationPath(join(lean.prefix, 'src/lean'));
+  const env = { ...nativeLeanEnvironment(lean), LEAN_SRC_PATH: directory };
+  const wanted = new Set(roots), seen = new Set();
+  const rootOf = file => {
+    const parts = relative(standard, file).split(/[\\/]/);
+    return (parts[0] === 'lake' ? parts[1] : parts[0]).replace(/\.lean$/, '');
+  };
+  const pending = [canonicalApplicationPath(resolve(source))];
+  while (pending.length) {
+    const file = pending.pop();
+    if (seen.has(file)) continue;
+    seen.add(file);
+    const result = spawnSync(lean.lean, ['--src-deps', file], { cwd: directory, env, windowsHide: true, encoding: 'utf8',
+      timeout: 120_000, maxBuffer: 16 * 1024 * 1024 });
+    if (result.error) throw result.error;
+    const output = (result.stdout ?? '') + '\n' + (result.stderr ?? '');
+    for (const match of output.matchAll(/unknown module(?: prefix)? '([^'.]+)/g)) if (wanted.has(match[1])) return true;
+    // Any other failure may hide an import from the extended tier behind a
+    // differently worded diagnostic. Prefer the larger prefix; the ordinary
+    // build then reports a genuine source error unchanged.
+    if (result.status !== 0) return true;
+    for (const line of result.stdout.split(/\r?\n/).filter(Boolean)) {
+      let dependency;
+      try { dependency = canonicalApplicationPath(resolve(directory, line)); } catch { continue; }
+      if (insideDirectory(standard, dependency)) { if (wanted.has(rootOf(dependency))) return true; }
+      else if (insideDirectory(directory, dependency)) pending.push(dependency);
+    }
+  }
+  return false;
 }
 
 export function applicationSources(source, lean, work, { log = console.error, git } = {}) {

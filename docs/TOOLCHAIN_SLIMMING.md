@@ -52,6 +52,71 @@ Research findings (2026-10-16):
 
 An ordinary program's first build falls from about 913 MB to about 293 MB.
 
+## Phase 1 status (2026-10-16)
+
+Implemented in source; **not yet in an accepted candidate**. Released candidates
+still download the complete upstream Lean archive.
+
+- **Maintainer repackager:** [`scripts/lean-dist/build-tiers.mjs`](../scripts/lean-dist/build-tiers.mjs)
+  checks the pinned archive's SHA-256 and writes one binaries archive per platform
+  and five shared data archives. The binaries are `lean`, `lake`, `leanir`,
+  `cadical`, the Lake plugin, and the shared libraries their own ELF/Mach-O/PE
+  load commands name (Linux also needs `libc++`, `libc++abi`, `libunwind` and
+  `libatomic` for `cadical`). Each archive carries `LICENSE`, a `NOTICE` with
+  the upstream URL, digest and sources, and on binaries `LICENSES` plus the
+  missing libuv licence (the archives record libuv 1.48.0 on Linux and 1.52.1
+  on macOS and Windows; the bundled text is libuv 1.48.0's `LICENSE` and
+  `LICENSE-extra`). Entries are sorted with fixed owner, mode
+  (executable bits kept) and mtime; zstd level 19, 2^27 window (Node's default
+  decompression limit), long-distance matching. `.ilean`, static libraries,
+  `include/`, Lean's clang/LLVM toolchain and `Leanc` data are omitted.
+- **Determinism:** each archive is packed twice and compared. The five upstream
+  platforms produced byte-identical shared archives in CI, and CI (Node 26.10.0)
+  reproduced the local Linux x86-64 bytes (Node 24.13.1).
+- **Maintainer workflow:** [`lean-tiers.yml`](../.github/workflows/lean-tiers.yml)
+  ([run 38876900984](https://github.com/Millillion/lasm/actions/runs/38876900984))
+  repackages all platforms, requires shared-archive equality and the size
+  ceiling, runs each platform natively against its complete archive (identical
+  generated C for an `import Std` program whose proof runs `bv_decide`, a program
+  importing `Lean` through a local module, and a Lake project; Lake loaded as a
+  `--plugin`), then retains the archives as public release assets
+  ([`lean-4.34.1-tiers-v1`](https://github.com/Millillion/lasm/releases/tag/lean-4.34.1-tiers-v1)).
+  All five upstream targets passed natively; only OS libraries remain external
+  (glibc on Linux, `libSystem`/`libc++` on macOS, Windows system DLLs and ICU).
+- **Product path:** `src/managed-lean.mjs` provisions binaries plus core data and
+  hard-links them into one verified prefix under `derived/`, keyed by every
+  component identity. Lake projects, directories, and standalone files that
+  import a `Lean`/`Lake`/`LeanIR`/`LeanChecker`/`LakeMain` module, directly or
+  through local imports (found with Lean's own `--src-deps`), use a second prefix
+  that adds the extended data. Cache repair verifies and rebuilds these prefixes
+  offline from cached components; old receipts remain readable. Full archives
+  remain in the catalog for rollback, maintainer oracles (`distribution: 'full'`)
+  and Windows ARM64.
+- **Windows ARM64:** Lasm's own native Lean build has module data that differs
+  from the upstream archives (4 of 5 shared archives differ), so that platform
+  keeps its complete archive. Generated C for the three fixtures was nevertheless
+  identical when its binaries used the upstream data ([run 38866478386](https://github.com/Millillion/lasm/actions/runs/38866478386)).
+
+Measured archives for Lean 4.34.1 (bytes):
+
+| Archive | Compressed | Unpacked |
+| --- | --- | --- |
+| `linux-x64-bin` | 40,565,096 | 249,564,933 |
+| `linux-arm64-bin` | 42,461,760 | 272,471,633 |
+| `darwin-x64-bin` | 34,482,295 | 198,187,479 |
+| `darwin-arm64-bin` | 32,697,075 | 190,665,563 |
+| `win32-x64-bin` | 36,516,813 | 225,397,047 |
+| `core-init` (Init) | 97,012,715 | 398,324,609 |
+| `core-std` (Std) | 74,707,631 | 338,309,791 |
+| `ext-meta` (Lean.Meta) | 81,888,090 | 465,800,578 |
+| `ext-elab` (Lean.Elab) | 78,432,815 | 443,052,249 |
+| `ext-rest` (other Lean, Lake, LeanIR, LeanChecker) | 93,668,179 | 509,186,422 |
+
+An ordinary program's Lean download on Linux x86-64 falls from 580,432,872 to
+212,285,442 bytes; Lake projects and programs importing `Lean`/`Lake` add
+253,989,084 bytes (466,274,526 in total). Pending: candidate acceptance on all
+six native targets and the repeated cold-installation gate.
+
 ## Phases
 
 Each phase ships only after a new packed candidate passes the six-platform

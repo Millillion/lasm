@@ -54,7 +54,7 @@ export async function checkDeployment(output, installed) {
       stderr: result.stderr.replace(/^\[lasm\] Landlock ABI \d+: filesystem access restricted before execution\n/, '') };
   };
   const deniedFiles = [join(root, 'package.json'), join(installed, 'workspace/project/Main.lean'),
-    join(installation.toolchains, 'artifacts', installation.build.nativeLeanIdentity, 'bin/lean'),
+    join(installation.toolchains, installation.build.nativeLeanTier ? 'derived' : 'artifacts', installation.build.nativeLeanIdentity, 'bin/lean'),
     join(installation.compiler, 'bin/lasm.mjs'), join(installation.output, 'program.wasm')];
   const denialControl = run(['--input-type=module', '-e',
     `import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs';

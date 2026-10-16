@@ -101,7 +101,7 @@ try {
     environment: { PATH: '', HOME: cwd, LANG: 'C.UTF-8', TMPDIR: temporary, LEAN_NUM_THREADS: '2' } }, null, 2) + '\n');
   const denied = [join(root, 'package.json'), join(result.installation.compiler, 'bin/lasm.mjs'),
     ...programs.flatMap(entry => [entry.source, ...(!entry.relocate ? [join(entry.output, 'program.wasm')] : [])]),
-    join(result.installation.tools, 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean')];
+    join(result.installation.tools, programs[0].build.nativeLeanTier ? 'derived' : 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean')];
   const controlResult = isolated(deploymentRules, [engine, '--input-type=module', '-e',
     `import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs';
     for (const file of ${JSON.stringify(denied)}) assert.throws(() => readFileSync(file), {code:'EACCES'});`], cwd, 30_000);

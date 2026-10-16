@@ -4,7 +4,9 @@ import { createHash } from 'node:crypto';
 import { hashFile } from './managed-artifacts.mjs';
 
 // Current Lean loads module IR only when its companion signature file exists.
-const metadataFile = /\.(?:olean(?:\.private|\.server)?|ir(?:\.sig)?|ilean)$/;
+// .ilean files are language-server reference indexes: importing never reads
+// them, and the tiered Lean distribution does not ship them.
+const metadataFile = /\.(?:olean(?:\.private|\.server)?|ir(?:\.sig)?)$/;
 
 /** Lean's environment/import APIs need their ordinary module data at runtime. */
 export async function applicationMetadata(generated, lean) {

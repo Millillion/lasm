@@ -119,6 +119,111 @@
           "maximumExtractedBytes": 8589934592
         }
       },
+      "tiers": {
+        "bin": {
+          "darwin-arm64": {
+            "name": "lean-4.34.1-darwin-arm64-bin.tar.zst",
+            "root": "lean-4.34.1-darwin-arm64-bin",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.34.1-tiers-v1/lean-4.34.1-darwin-arm64-bin.tar.zst",
+            "sha256": "4b5518c785868609f63c8a78284628be7d79a77405f919f109db1da8a055a384",
+            "bytes": 32697075,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 214958080
+          },
+          "darwin-x64": {
+            "name": "lean-4.34.1-darwin-x64-bin.tar.zst",
+            "root": "lean-4.34.1-darwin-x64-bin",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.34.1-tiers-v1/lean-4.34.1-darwin-x64-bin.tar.zst",
+            "sha256": "00d3e6742551a1ea69042a590c5d647ec877bd69da6bc5f9d6e41b97325871ff",
+            "bytes": 34482295,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 223346688
+          },
+          "linux-arm64": {
+            "name": "lean-4.34.1-linux-arm64-bin.tar.zst",
+            "root": "lean-4.34.1-linux-arm64-bin",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.34.1-tiers-v1/lean-4.34.1-linux-arm64-bin.tar.zst",
+            "sha256": "b1018c460c3f6ff3385330c727ffb0d857b497f8fa6cdf7694536557a25a2836",
+            "bytes": 42461760,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 307232768
+          },
+          "linux-x64": {
+            "name": "lean-4.34.1-linux-x64-bin.tar.zst",
+            "root": "lean-4.34.1-linux-x64-bin",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.34.1-tiers-v1/lean-4.34.1-linux-x64-bin.tar.zst",
+            "sha256": "b4081c06770fd16664861350edb133499d8b209241788a08f7d76783ca0a0d83",
+            "bytes": 40565096,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 281018368
+          },
+          "win32-x64": {
+            "name": "lean-4.34.1-win32-x64-bin.tar.zst",
+            "root": "lean-4.34.1-win32-x64-bin",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.34.1-tiers-v1/lean-4.34.1-win32-x64-bin.tar.zst",
+            "sha256": "6a03c51a1fb437be1d449c1970741c205fb438bf4da5a175524fa124e803d3ef",
+            "bytes": 36516813,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 253755392
+          }
+        },
+        "core": [
+          {
+            "name": "lean-4.34.1-core-init.tar.zst",
+            "root": "lean-4.34.1-core-init",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.34.1-tiers-v1/lean-4.34.1-core-init.tar.zst",
+            "sha256": "041b4bc9b96a96ccfa8e60b4c646a30c94234b1446bd65518ae0a3346c5a5fe2",
+            "bytes": 97012715,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 448790528
+          },
+          {
+            "name": "lean-4.34.1-core-std.tar.zst",
+            "root": "lean-4.34.1-core-std",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.34.1-tiers-v1/lean-4.34.1-core-std.tar.zst",
+            "sha256": "9be082bdda70ffc90aff8ffa50b02dea2a2be3294ff05a93eb0bef2e1d283084",
+            "bytes": 74707631,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 380633088
+          }
+        ],
+        "extended": [
+          {
+            "name": "lean-4.34.1-ext-meta.tar.zst",
+            "root": "lean-4.34.1-ext-meta",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.34.1-tiers-v1/lean-4.34.1-ext-meta.tar.zst",
+            "sha256": "c4b867de68e8fc74bd796cbbd770a3db082a56b5b69117b88e8f29bbdf3d5553",
+            "bytes": 81888090,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 524288000
+          },
+          {
+            "name": "lean-4.34.1-ext-elab.tar.zst",
+            "root": "lean-4.34.1-ext-elab",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.34.1-tiers-v1/lean-4.34.1-ext-elab.tar.zst",
+            "sha256": "fd595633b632a7c576120e7a286b0ddfd12596b7279d85d781a2b3added9adab",
+            "bytes": 78432815,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 499122176
+          },
+          {
+            "name": "lean-4.34.1-ext-rest.tar.zst",
+            "root": "lean-4.34.1-ext-rest",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.34.1-tiers-v1/lean-4.34.1-ext-rest.tar.zst",
+            "sha256": "ee2aaafc6bc6d0c16d875d19fe94c4880b81b85c7c6613c448505443e1edb80f",
+            "bytes": 93668179,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 573571072
+          }
+        ],
+        "extendedModules": [
+          "Lake",
+          "LakeMain",
+          "Lean",
+          "LeanChecker",
+          "LeanIR"
+        ]
+      },
       "notices": {
         "win32-arm64": {
           "name": "windows-arm64-tool-notices-v1",

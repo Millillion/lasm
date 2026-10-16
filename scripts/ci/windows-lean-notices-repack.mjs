@@ -58,7 +58,7 @@ const artifact = { ...receipt.report.artifact, url: 'https://lasm-fixture.invali
   sha256: preserved.sha256, bytes: preserved.bytes };
 const catalog = structuredClone(toolchainCatalog); catalog.lean['4.34.1'].artifacts['win32-arm64'] = artifact;
 const cache = join(base, 'verified cache λ');
-const lean = await provisionLean(base, { catalog, cache, fetch: async url => {
+const lean = await provisionLean(base, { catalog, cache, distribution: 'full', fetch: async url => {
   assert.equal(url, artifact.url); return new Response(Readable.toWeb(createReadStream(archive)));
 } });
 assert.equal(await hashFile(join(lean.prefix, 'LICENSES')), noticeSha256);

@@ -15,7 +15,7 @@ assert.equal(process.platform + '-' + process.arch, 'win32-arm64');
 const base = resolve('.work/windows-arm64-lean-release');
 assert.ok(!existsSync(base), 'Preserve earlier bootstrap evidence'); mkdirSync(base, { recursive: true });
 writeFileSync(join(base, 'lean-toolchain'), 'leanprover/lean4:v4.34.1\n');
-const seed = await provisionLean(base, { arch: 'x64', cache: join(base, 'seed-cache') });
+const seed = await provisionLean(base, { arch: 'x64', cache: join(base, 'seed-cache'), distribution: 'full' });
 const tag = process.env.LASM_LEANTAR_TAG, sha256 = process.env.LASM_LEANTAR_SHA256;
 assert.match(tag, /^windows-arm64-leantar-bootstrap-\d+$/); assert.match(sha256, /^[a-f0-9]{64}$/);
 const helper = join(base, 'helper'); mkdirSync(helper);

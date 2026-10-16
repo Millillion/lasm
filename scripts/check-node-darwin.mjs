@@ -52,7 +52,9 @@ async function nativeControls() {
     const work = join(output, 'native-controls', file); mkdirSync(work, { recursive: true });
     const source = join(work, file); copyFileSync(join(workspace, 'fixtures', file), source);
     writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v' + result.installation.support.lean + '\n');
-    const lean = await provisionLean(source, { cache: result.installation.tools });
+    // The independent leanc oracle needs Lean's bundled C toolchain, which the
+    // tiered product distribution omits; use the complete upstream archive.
+    const lean = await provisionLean(source, { cache: result.installation.tools, distribution: 'full' });
     const executable = join(work, 'program'), env = { ...nativeLeanEnvironment(lean), SDKROOT: appleSdk };
     // These unchanged fixtures import only standard libraries. Let native Lean
     // compile them directly, independently of Lasm's dependency discovery. In
@@ -107,7 +109,7 @@ try {
   writeFileSync(profile, darwinSandbox({ executables: [engine], reads: programs.map(p => p.copied), writes: [cwd, temporary], offline: true }));
   const denied = [join(root, 'package.json'), join(result.installation.compiler, 'bin/lasm.mjs'),
     ...programs.flatMap(p => [p.source, join(p.output, 'program.wasm')]),
-    join(result.installation.tools, 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean')];
+    join(result.installation.tools, programs[0].build.nativeLeanTier ? 'derived' : 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean')];
   const env = { PATH: '', HOME: cwd, TMPDIR: temporary, LANG: 'en_US.UTF-8', LEAN_NUM_THREADS: '1' };
   const control = isolated(profile, [engine, '--input-type=module', '-e',
     `import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';for(const path of ${JSON.stringify(denied)})assert.throws(()=>readFileSync(path),{code:'EPERM'});`], cwd, env, 30_000);

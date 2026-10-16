@@ -27,7 +27,7 @@ const result = { passed: false, scope: 'Native Lean/Lake long managed paths; ins
 const save = () => writeFileSync(join(root, 'result.json'), JSON.stringify(result, null, 2) + '\n');
 save();
 try {
-  const lean = await provisionLean(source, { cache });
+  const lean = await provisionLean(source, { cache, distribution: 'full' });
   const longModule = join(lean.prefix, 'lib/lean/Init/Data/Iterators/Internal/LawfulMonadLiftFunction.olean.private');
   assert.ok(longModule.length >= 260 && statSync(longModule).size > 0);
   result.modulePath = longModule; result.modulePathLength = longModule.length;
