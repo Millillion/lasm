@@ -104,9 +104,9 @@ test('Windows ARM64 deployments are refused as an unsupported platform', t => {
 
 test('unknown vendor layouts, missing helpers and changed helper bytes fail the build', t => {
   const { root, output, put } = fixture(t);
-  assert.throws(() => copyApplicationNativeBundle(root, output, { arch: 'other' }), /architecture/);
+  assert.throws(() => copyApplicationNativeBundle(root, output, { platform: 'linux', arch: 'other' }), /architecture/);
   put('process/linux-x64-gnu', 'changed');
   assert.throws(() => copyApplicationNativeBundle(root, output, { platform: 'linux', arch: 'x64' }), /integrity mismatch/);
   put('manifest.json', JSON.stringify({ nodeApi: 8, packages: [] }));
-  assert.throws(() => copyApplicationNativeBundle(root, output, { arch: 'arm64' }), /layout/);
+  assert.throws(() => copyApplicationNativeBundle(root, output, { platform: 'linux', arch: 'arm64' }), /layout/);
 });
