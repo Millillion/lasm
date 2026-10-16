@@ -26,6 +26,9 @@ jobs:
   fixtures:
     if: github.ref == 'refs/heads/main'
     runs-on: ${{ matrix.runner }}
+    # The retained .46 runtime input is a draft release asset, readable only with write access.
+    permissions:
+      contents: write
     timeout-minutes: 120
     strategy:
       fail-fast: false
