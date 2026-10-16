@@ -54,7 +54,7 @@ jobs:
         # The memory cap includes the staged files' page cache.
         run: |
           data=hash; [ "$PLATFORM" = linux-x64 ] && data=write
-          node scripts/full-lean/run-bounded.mjs --memory-mib 12288 --timeout-seconds 12600 --report .work/lean-tiers-$PLATFORM-resources.json -- \
+          node scripts/full-lean/run-bounded.mjs --memory-mib 12288 --report .work/lean-tiers-$PLATFORM-resources.json -- \
             node scripts/lean-dist/build-tiers.mjs --version "$VERSION" --platform "$PLATFORM" --archive .work/lean-tiers/dl/upstream \
               --out .work/lean-tiers/out --work .work/lean-tiers/work --data $data --twice
           rm -f .work/lean-tiers/dl/upstream
@@ -140,7 +140,7 @@ jobs:
           curl --fail --location --retry 5 --retry-all-errors --proto '=https' --output .work/lean-tiers/upstream "$url"
       - name: Run the tiers natively and compare generated C with the complete toolchain
         run: |
-          node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --timeout-seconds 5400 --report .work/lean-tiers-native-resources.json -- \
+          node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --report .work/lean-tiers-native-resources.json -- \
             node scripts/lean-dist/check-tiers.mjs --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
               --upstream .work/lean-tiers/upstream --work .work/lean-tiers/native --report .work/lean-tiers/native.json
           { echo "### $PLATFORM"; echo '```json'; cat .work/lean-tiers/native.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
