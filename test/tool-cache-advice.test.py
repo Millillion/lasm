@@ -71,6 +71,61 @@ class ToolCacheAdvice(unittest.TestCase):
             self.assertEqual((completed / 'program.wasm').read_bytes(), b'\0asm immutable output')
             self.assertEqual((deployment / 'program.wasm').read_bytes(), b'\0asm deployment stays warm')
 
+    def test_only_stamped_runtime_build_outputs_are_advised(self):
+        with tempfile.TemporaryDirectory(prefix='lasm-runtime-advice-') as directory:
+            root = Path(directory)
+            output = root / 'runtime output λ'
+            generated = output / 'build/generated-c/Std/Data'
+            generated.mkdir(parents=True)
+            libraries = output / 'build/lib/lean'
+            libraries.mkdir(parents=True)
+            def write(path, size):
+                path.write_bytes(b'x' * size)
+                return path
+            old = time.time_ns() - 10 ** 9
+            complete = write(generated / 'Map.o', 1000)
+            os.utime(complete, ns=(old, old))
+            write(generated / 'Map.stamp', 64)
+            archive = write(generated / 'Map.c.gz', 200)
+            # A rebuilt object newer than its stamp is not yet published.
+            rebuilt = write(generated / 'Set.o', 30000)
+            write(generated / 'Set.stamp', 64)
+            os.utime(generated / 'Set.stamp', ns=(old, old))
+            write(generated / 'Set.c.gz', 50000)
+            write(generated / 'Tree.o.partial', 7)       # unfinished object
+            write(generated / 'Tree.c.partial', 9)       # generated C being written
+            write(generated / 'Heap.c.gz.partial', 11)   # unfinished compression
+            write(generated / 'Heap.c', 13)              # retained generated C
+            outside = write(root / 'outside.o', 17)
+            (generated / 'Link.o').symlink_to(outside)
+            write(generated / 'Link.stamp', 64)
+            library = write(libraries / 'libStd.a', 4000)
+            write(libraries / 'libLean.a.partial', 23)
+            write(libraries / 'libleanrt.a', 29)         # CMake output, not ours
+            digest = hashlib.sha256(complete.read_bytes()).hexdigest()
+            before = complete.stat()
+            evidence = {'trees': {}, 'adviceCalls': 0, 'advisedBytesIncludingRepeats': 0}
+            seen = set()
+            control['advise_runtime_build'](output, seen, evidence)
+            self.assertEqual(evidence['runtimeBuild']['filesLastPass'], 3)
+            self.assertEqual(evidence['runtimeBuild']['bytesLastPass'], 1000 + 200 + 4000)
+            self.assertEqual(len(seen), 3)
+            after = complete.stat()
+            self.assertEqual((before.st_size, before.st_mtime_ns, before.st_mode),
+                             (after.st_size, after.st_mtime_ns, after.st_mode))
+            self.assertEqual(hashlib.sha256(complete.read_bytes()).hexdigest(), digest)
+            self.assertEqual((archive.read_bytes(), library.read_bytes(), rebuilt.read_bytes()),
+                             (b'x' * 200, b'x' * 4000, b'x' * 30000))
+            # Once the rebuild publishes its stamp, its outputs are complete too.
+            write(generated / 'Set.stamp', 64)
+            control['advise_runtime_build'](output, seen, evidence)
+            self.assertEqual(evidence['runtimeBuild']['filesLastPass'], 5)
+            self.assertEqual(evidence['adviceCalls'], 8)
+            linked = root / 'linked output'
+            linked.symlink_to(output, target_is_directory=True)
+            with self.assertRaises(RuntimeError):
+                control['advise_runtime_build'](linked, seen, evidence)
+
     def test_monitor_reports_and_stops_inside_the_same_guard(self):
         with tempfile.TemporaryDirectory(prefix='lasm-advice-monitor-') as directory:
             root = Path(directory)
@@ -82,7 +137,9 @@ class ToolCacheAdvice(unittest.TestCase):
             process = subprocess.Popen([sys.executable, '-I', '-B',
                 str(Path(__file__).resolve().parents[1] / 'scripts/full-lean/advise-tool-cache.py'),
                 # A second, not-yet-created cache (the native oracle's) is skipped until it exists.
-                str(root / 'tools') + os.pathsep + str(root / 'oracle-tools'), str(report), str(stop), str(root / 'project')],
+                str(root / 'tools') + os.pathsep + str(root / 'oracle-tools'), str(report), str(stop), str(root / 'project'),
+                # A runtime build output that does not exist yet is skipped.
+                '--runtime-build', str(root / 'runtime-output')],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             try:
                 deadline = time.monotonic() + 10

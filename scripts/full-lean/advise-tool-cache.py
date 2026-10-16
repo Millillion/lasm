@@ -73,6 +73,79 @@ def advise_tree(tree, key, synchronized, evidence):
     evidence['advisedBytesIncludingRepeats'] += size
 
 
+def advise_runtime_build(output, synchronized, evidence):
+    # build-application-runtime.mjs publishes each generated module by renaming
+    # X.o.partial to X.o and only then writes X.stamp; X.c.gz and lib<Group>.a
+    # are likewise renamed from .partial names after their bytes are complete.
+    # A stamp at least as new as its object is therefore an explicit completion
+    # marker. Never touch .partial files, generated C still being written, the
+    # extracted source or CMake's own outputs.
+    build = output / 'build'
+    generated, libraries = build / 'generated-c', build / 'lib/lean'
+    if any(path.is_symlink() for path in (output, build, generated, build / 'lib', libraries)):
+        raise RuntimeError('Runtime build output must not contain symbolic links: ' + str(output))
+    files, size = 0, 0
+
+    def advise(name, descriptor, info):
+        nonlocal files, size
+        fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=descriptor)
+        try:
+            actual = os.fstat(fd)
+            if not stat.S_ISREG(actual.st_mode) or (actual.st_dev, actual.st_ino) != (info.st_dev, info.st_ino):
+                return
+            identity = ('runtime-build', actual.st_dev, actual.st_ino, actual.st_size, actual.st_mtime_ns)
+            if identity not in synchronized:
+                os.fdatasync(fd)
+                synchronized.add(identity)
+            os.posix_fadvise(fd, 0, 0, os.POSIX_FADV_DONTNEED)
+            files += 1
+            size += actual.st_size
+        finally:
+            os.close(fd)
+
+    def regular(name, descriptor):
+        try:
+            info = os.stat(name, dir_fd=descriptor, follow_symlinks=False)
+        except FileNotFoundError:
+            return None
+        return info if stat.S_ISREG(info.st_mode) else None
+
+    if generated.is_dir():
+        for directory, names, filenames, descriptor in os.fwalk(generated, follow_symlinks=False):
+            names[:] = [name for name in names if not os.path.islink(os.path.join(directory, name))]
+            for name in filenames:
+                if not name.endswith('.stamp'):
+                    continue
+                stamp = regular(name, descriptor)
+                if stamp is None:
+                    continue
+                base = name[:-len('.stamp')]
+                obj = regular(base + '.o', descriptor)
+                if obj is None or obj.st_mtime_ns > stamp.st_mtime_ns:
+                    continue  # A newer object belongs to an unfinished rebuild.
+                for complete, info in ((base + '.o', obj), (base + '.c.gz', regular(base + '.c.gz', descriptor))):
+                    if info is not None:
+                        try:
+                            advise(complete, descriptor, info)
+                        except FileNotFoundError:
+                            continue
+    if libraries.is_dir():
+        descriptor = os.open(libraries, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            for group in ('Init', 'Std', 'Lean', 'Lake'):
+                info = regular('lib' + group + '.a', descriptor)
+                if info is not None:
+                    try:
+                        advise('lib' + group + '.a', descriptor, info)
+                    except FileNotFoundError:
+                        continue
+        finally:
+            os.close(descriptor)
+    evidence['runtimeBuild'] = {'output': str(output), 'filesLastPass': files, 'bytesLastPass': size}
+    evidence['adviceCalls'] += files
+    evidence['advisedBytesIncludingRepeats'] += size
+
+
 def advise_applications(project, synchronized, evidence):
     # Only published application caches under .lake/lasm/applications. Plain
     # Node startup measurements use the separately copied dist, which is excluded.
@@ -121,14 +194,23 @@ def main():
     # The first argument may name several completed-tool caches separated by
     # os.pathsep (for example a maintainer oracle cache beside the product's).
     caches = [Path(value) for value in sys.argv[1].split(os.pathsep)]
-    report, stop, *projects = map(Path, sys.argv[2:])
+    arguments = sys.argv[2:]
+    # Optional: the output directory of build-application-runtime.mjs, whose
+    # stamped module objects/archives are advised as completed build outputs.
+    runtime_builds = []
+    if '--runtime-build' in arguments:
+        index = arguments.index('--runtime-build')
+        runtime_builds = [Path(arguments[index + 1])]
+        del arguments[index:index + 2]
+    report, stop, *projects = map(Path, arguments)
     assert len(projects) <= 1
+    assert all(output.is_absolute() for output in runtime_builds)
     assert caches and all(cache.is_absolute() and not cache.is_symlink() for cache in caches)
     assert all(project.is_absolute() and not project.is_symlink() for project in projects)
     synchronized = set()
-    evidence = {'method': 'fdatasync once per completed immutable cache tree; repeated POSIX_FADV_DONTNEED',
-                'scope': 'Completed immutable tools, application build caches and receipted native comparison artifacts only; excludes deployment files, package, staging and SDK state. No file changes, global cache drops or resource-limit changes',
-                'cache': os.pathsep.join(map(str, caches)), 'trees': {}, 'passes': 0, 'adviceCalls': 0,
+    evidence = {'method': 'fdatasync once per completed immutable cache tree or stamped runtime-build file; repeated POSIX_FADV_DONTNEED',
+                'scope': 'Completed immutable tools, application build caches, receipted native comparison artifacts and stamped runtime-build module outputs only; excludes deployment files, package, staging, partial outputs and SDK state. No file changes, global cache drops or resource-limit changes',
+                'cache': os.pathsep.join(map(str, caches)), 'runtimeBuilds': list(map(str, runtime_builds)), 'trees': {}, 'passes': 0, 'adviceCalls': 0,
                 'advisedBytesIncludingRepeats': 0, 'status': 'running'}
 
     def save():
@@ -149,6 +231,9 @@ def main():
             for project in projects:
                 advise_applications(project, synchronized, evidence)
                 advise_native_controls(project, synchronized, evidence)
+            for output in runtime_builds:
+                if output.is_dir():
+                    advise_runtime_build(output, synchronized, evidence)
             evidence['fileBytesAfterLastPass'] = int(cached_bytes())
             evidence['passes'] += 1
             save()
