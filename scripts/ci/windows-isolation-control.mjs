@@ -7,6 +7,7 @@ import { connect } from 'node:net';
 import { join } from 'node:path';
 
 const [configFile, phase] = process.argv.slice(2), config = JSON.parse(readFileSync(configFile));
+assert.match(config.npm, /^\d+\.\d+\.\d+$/);
 const checks = [], options = { encoding: 'utf8', timeout: 15000 };
 async function check(name, fn) {
   console.error('Starting control: ' + name);
@@ -48,12 +49,12 @@ await check('child inherits every file restriction', () => execFileSync(process.
   'for(const p of JSON.parse(process.argv[1]))require("node:assert/strict").throws(()=>require("node:fs").readFileSync(p),e=>["EACCES","EPERM"].includes(e.code),p)',
   JSON.stringify(config.denied)], options));
 await check('stock npm CLI', () => assert.equal(execFileSync(process.execPath,
-  [join(config.nodeDirectory, 'node_modules/npm/bin/npm-cli.js'), '--version'], options).trim(), '11.19.1'));
+  [join(config.nodeDirectory, 'node_modules/npm/bin/npm-cli.js'), '--version'], options).trim(), config.npm));
 for (const name of ['npm.cmd', 'npx.cmd']) await check('stock ' + name, () => {
   const command = '""' + join(config.nodeDirectory, name) + '" --version"';
   const version = execFileSync(process.env.ComSpec, ['/d', '/s', '/c', command],
     { ...options, windowsVerbatimArguments: true }).trim();
-  assert.equal(version, '11.19.1');
+  assert.equal(version, config.npm);
 });
 await check(phase + ' network capability', async () => {
   if (phase === 'offline') {

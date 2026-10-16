@@ -11,6 +11,9 @@ import { windowsIsolated, windowsStartupProbe } from './windows-isolation.mjs';
 await ensureResourceGuard();
 assert.equal(process.platform, 'win32');
 await verifyNativeProgram(process.execPath);
+// The stock npm bundled with the pinned Node; one source of truth for both pins.
+const pins = JSON.parse(readFileSync(new URL('./acceptance-versions.json', import.meta.url)));
+assert.equal(process.versions.node, pins.node, 'Run the controls on the pinned Node');
 const root = mkdtempSync(join(tmpdir(), 'lasm windows isolation λ-'));
 const nodeDirectory = join(root, 'stock Node'), node = join(nodeDirectory, 'node.exe');
 mkdirSync(nodeDirectory); copyFileSync(process.execPath, node);
@@ -43,7 +46,7 @@ const program = join(writable, 'control.mjs');
 copyFileSync(fileURLToPath(new URL('./windows-isolation-control.mjs', import.meta.url)), program);
 const config = join(writable, 'control-config.json');
 writeFileSync(config, JSON.stringify({ architecture: process.arch, readonly, denied, nodeDirectory,
-  localAppData: environment.LOCALAPPDATA }) + '\n');
+  npm: pins.npm, localAppData: environment.LOCALAPPDATA }) + '\n');
 const output = resolve('.work/windows-isolation-controls'); assert.ok(!existsSync(output)); mkdirSync(output, { recursive: true });
 const report = { scope: 'Native restricted-token and scoped firewall controls; no Lean application acceptance', platform: process.platform + '-' + process.arch, root, phases: [] };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n'); save();

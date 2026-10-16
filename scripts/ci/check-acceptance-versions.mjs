@@ -9,7 +9,7 @@ const result = {};
 const versions = JSON.parse(readFileSync(new URL('./acceptance-versions.json', import.meta.url)));
 const names = ['lean', 'node'];
 assert.ok(process.argv.length <= 3);
-for (const name of names) assert.match(versions[name], /^\d+\.\d+\.\d+$/);
+for (const name of [...names, 'npm']) assert.match(versions[name], /^\d+\.\d+\.\d+$/);
 for (const [name, repository, expected] of [['lean', 'leanprover/lean4', 'v' + versions.lean]]) {
   const source = `https://api.github.com/repos/${repository}/releases/latest`;
   const response = await fetch(source, { headers: { 'User-Agent': 'Lasm-acceptance' }, signal: AbortSignal.timeout(30_000) });
@@ -21,8 +21,13 @@ for (const [name, repository, expected] of [['lean', 'leanprover/lean4', 'v' + v
 const source = 'https://nodejs.org/dist/index.json';
 const response = await fetch(source, { signal: AbortSignal.timeout(30_000) });
 assert.ok(response.ok, `Node release lookup failed: HTTP ${response.status}`);
-const node = (await response.json()).find(release => /^v\d+\.\d+\.\d+$/.test(release.version));
+const releases = await response.json();
+const node = releases.find(release => /^v\d+\.\d+\.\d+$/.test(release.version));
 result.node = { source, expected: 'v' + versions.node, tag: node.version, date: node.date, lts: node.lts };
+// The npm pin is the npm bundled with the pinned Node, never an independent choice.
+const pinnedNode = releases.find(release => release.version === 'v' + versions.node);
+assert.ok(pinnedNode, `Pinned Node ${versions.node} is not an official release`);
+result.npm = { source, expected: versions.npm, bundledWithPinnedNode: pinnedNode.npm };
 result.checkedAt = new Date().toISOString();
 const deferred = versions.deferredLatest ?? {};
 result.deferredLatest = deferred;
@@ -36,4 +41,5 @@ for (const name of names) {
   else assert.equal(result[name].tag, result[name].expected, `Latest ${name} changed; update the acceptance pins`);
   if (name !== 'node') { assert.equal(result[name].draft, false); assert.equal(result[name].prerelease, false); }
 }
+assert.equal(result.npm.bundledWithPinnedNode, result.npm.expected, `Node ${versions.node} bundles npm ${pinnedNode.npm}; update the npm pin`);
 console.log(JSON.stringify(result, null, 2));

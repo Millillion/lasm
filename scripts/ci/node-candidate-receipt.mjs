@@ -22,7 +22,8 @@ assert.equal(pkg.name, '@lasm/compiler');
 assert.equal('lasm-compiler-' + pkg.version + '.tgz', filename);
 assert.match(provenance.sourceRevision, /^[a-f0-9]{40}$/);
 assert.equal(provenance.sourceRevision, process.env.LASM_CANDIDATE_SOURCE_REVISION ?? process.env.GITHUB_SHA);
-assert.equal(provenance.node, '26.10.0'); assert.equal(provenance.lean, '4.34.1');
+const pins = JSON.parse(readFileSync(new URL('./acceptance-versions.json', import.meta.url), 'utf8'));
+assert.equal(provenance.node, pins.node); assert.equal(provenance.lean, pins.lean);
 const acceptance = process.env.LASM_ACCEPTANCE_RUN_ID
   ? JSON.parse(readFileSync('.work/node-candidate/acceptance.json', 'utf8'))
   : { runId: process.env.GITHUB_RUN_ID, sourceRevision: process.env.GITHUB_SHA,
@@ -52,5 +53,5 @@ Package SHA-256: ${sha256}
 CI evidence: https://github.com/Millillion/lasm/actions/runs/${acceptance.runId}
 ${(acceptance.nativeJobs ?? []).map(job => `${job.platform}: ${job.url} (controls ${job.controlsRevision})`).join('\n')}
 
-Requires Node 26.10.0 with npm; Lasm manages Lean 4.34.1 and its build tools. This is not full Lean language/library parity. No npm publication was performed.
+Requires Node ${provenance.node} with npm; Lasm manages Lean ${provenance.lean} and its build tools. This is not full Lean language/library parity. No npm publication was performed.
 `);
