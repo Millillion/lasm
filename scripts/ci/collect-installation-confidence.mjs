@@ -40,11 +40,13 @@ for (const id of ids) {
   for (let number = 1; number <= run.run_attempt; number++) {
     const listing = json(`actions/runs/${id}/attempts/${number}/jobs?per_page=100`);
     assert.equal(listing.jobs.length, listing.total_count);
-    const native = listing.jobs.filter(j => / \/ installed$/.test(j.name));
-    const faults = listing.jobs.filter(j => /Faults (?:linux|darwin|win32)-(?:x64|arm64)$/.test(j.name));
+    // Count only the supported targets, so earlier six-target campaigns that
+    // also ran Windows ARM64 are judged on the same five platforms.
+    const native = listing.jobs.filter(j => confidencePlatforms.some(p => j.name === `${p.replace('win32', 'windows')} / installed`));
+    const faults = listing.jobs.filter(j => confidencePlatforms.some(p => j.name.endsWith(`Faults ${p}`)));
     campaigns.push({ runId: id, runAttempt: number, startedAt: run.created_at,
-      nativePassed: native.length === 6 && native.every(j => j.conclusion === 'success'),
-      faultsPassed: faults.length === 6 && faults.every(j => j.conclusion === 'success') });
+      nativePassed: native.length === confidencePlatforms.length && native.every(j => j.conclusion === 'success'),
+      faultsPassed: faults.length === confidencePlatforms.length && faults.every(j => j.conclusion === 'success') });
     for (const platform of confidencePlatforms) {
       const name = platform.replace('win32', 'windows');
       const job = listing.jobs.find(j => j.name === `${name} / installed`);

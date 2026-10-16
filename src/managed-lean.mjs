@@ -3,7 +3,7 @@ import { constants } from 'node:fs';
 import { join, dirname, resolve, toNamespacedPath } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { provisionArtifact, deriveArtifact, validateArtifact, managedCacheDirectory } from './managed-artifacts.mjs';
-import { executableName } from './platform.mjs';
+import { assertSupportedHost, executableName } from './platform.mjs';
 import { verifyNativeProgram } from './native-program.mjs';
 import { windowsToolPrefix } from './windows-tool-paths.mjs';
 import { findApplicationProject, standaloneImportsModules } from './application-sources.mjs';
@@ -91,14 +91,10 @@ export async function provisionLean(file, options = {}) {
   const selection = await selectLeanVersion(file, catalog);
   const release = catalog.lean[selection.version];
   const platform = options.platform ?? process.platform, arch = options.arch ?? process.arch;
+  assertSupportedHost(platform, arch);
   const host = `${platform}-${arch}`;
   const distribution = leanDistribution(release, host, options);
   if (!distribution) throw new Error(`Managed Lean ${selection.version} is not implemented for ${host}. ${release.unavailable?.[host] ?? 'No matching native artifact is available.'} This platform remains an implementation gap.`);
-  // Some maintained native distributions carry complete corresponding sources
-  // and third-party notices in a smaller companion archive. Treat that archive
-  // as required, verified toolchain content, including on cached builds.
-  const notices = release.notices?.[host] ? await provisionArtifact(release.notices[host],
-    { ...options, label: `Lean ${selection.version} tool sources and notices` }) : undefined;
   const finish = async (installed, details) => {
     // Lake replaces LEAN_PATH for child compilers. Lean's own appDir resolves
     // junctions, so its bin directory must physically have a short path.
@@ -121,7 +117,7 @@ export async function provisionLean(file, options = {}) {
     const commit = execFileSync(lean, ['--githash'], { encoding: 'utf8', timeout: 30_000, windowsHide: true }).trim();
     if (commit !== release.commit) throw new Error(`Managed Lean identity mismatch: expected ${release.commit}, received ${commit}`);
     return { ...selection, ...installed, prefix: installed.directory, executionPrefix, lean, lake, commit, platform: host, nativePrograms,
-      ...details, ...(notices ? { notices } : {}) };
+      ...details };
   };
   if (distribution.kind === 'full')
     return finish(await provisionArtifact(distribution.artifact, { ...options, label: `Lean ${selection.version} and Lake` }),

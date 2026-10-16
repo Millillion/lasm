@@ -15,7 +15,7 @@ concurrency:
 
 # Native fixture oracles only; never count these as Wasm application passes.
 # Reuses the verified public standard-runner/guard profile. No stored caches
-# or artifact uploads. macOS and native Windows ARM64 acceptance remain open.
+# or artifact uploads. macOS acceptance remains open; Windows ARM64 is unsupported.
 jobs:
   controls:
     if: github.event.repository.visibility == 'public'

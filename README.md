@@ -41,7 +41,8 @@ and elapsed time. Later builds reuse verified tools and unchanged outputs. See
 Candidate `.46` requires rerunning failed downloads. Current source adds bounded
 retries, safe resume, crash recovery, offline repair, and bundled installer
 dependencies. The hardened candidate also passed installed, offline, deployment,
-and proxy/CA acceptance on all six native targets, alongside the installer fault
+and proxy/CA acceptance on all six native targets then tested (including Windows
+ARM64, since removed), alongside the installer fault
 checks, and its repeated-installation gate (three consecutive clean cold
 installations on every target) passed on 2026-10-16. See
 [installation hardening](docs/INSTALLATION_HARDENING.md) for settings and progress.
@@ -96,7 +97,7 @@ source-only compatibility launcher. These interfaces have no current release sup
 | Other Linux distributions | x86-64 and ARM64 | Unverified; glibc 2.39 or newer is required. Alpine/musl is unsupported. |
 | macOS 15.7.9 (24G830) | x86-64 and ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance. |
 | Windows Server 2025 Datacenter, 10.0.26100.33438 | x86-64 | Candidate `.46` passed native installed-package and copied-deployment acceptance on `windows-2025`. |
-| Windows 11 Enterprise, 10.0.26200.9457 | ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance on `windows-11-arm`. |
+| Windows ARM64 | ARM64 | **Not supported.** Removed on 2026-10-16: neither Lean nor Emscripten publishes Windows ARM64 prebuilts. Current source stops with `Lasm supports Linux and macOS on x86-64 and ARM64, and Windows on x86-64. Windows ARM64 is not supported.` (Candidate `.46` historically passed on `windows-11-arm`.) |
 | Other JavaScript runtimes, browsers, Cloudflare Workers | Any | Not supported; Lasm targets Node only. |
 | Lambda, Netlify, other serverless services | Any | No deployment adapter or platform acceptance yet. |
 
@@ -104,8 +105,10 @@ Other OS releases and Node/npm/Lean versions are unverified. No engine flags are
 needed. Linux requires its ordinary OS libraries and shell, but no developer SDK.
 The [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md) identifies exact tested artifacts;
 [the plan](https://github.com/Millillion/lasm/blob/main/docs/PLAN.md) records the completed milestone and deferred work.
-The same `.46` archive covers all six accepted targets above. These passes use
-native x86-64 and ARM64 execution.
+Lasm supports five targets: Linux and macOS on x86-64 and ARM64, and Windows on
+x86-64. The same `.46` archive passed on all five (and historically on Windows
+ARM64, which current source no longer supports). These passes use native x86-64
+and ARM64 execution.
 
 ## Lean support and restrictions
 

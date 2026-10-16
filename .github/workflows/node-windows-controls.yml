@@ -12,8 +12,6 @@ jobs:
         include:
           - runner: windows-2025
             architecture: x64
-          - runner: windows-11-arm
-            architecture: arm64
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 25
     env:

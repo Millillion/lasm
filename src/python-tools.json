@@ -47,15 +47,6 @@
       "bytes": 21936514,
       "format": "tar.gz",
       "maximumExtractedBytes": 600000000
-    },
-    "win32-arm64": {
-      "name": "python-3.13.15-20260901-win32-arm64",
-      "root": "python",
-      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-aarch64-pc-windows-msvc-install_only_stripped.tar.gz",
-      "sha256": "8b31e1ddae9ebd339eae0549049546aa54484dbf92c81694b1e7510fee869413",
-      "bytes": 20657679,
-      "format": "tar.gz",
-      "maximumExtractedBytes": 600000000
     }
   }
 }

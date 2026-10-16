@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: false
 
 # Standard public runner only, with a Windows Job Object cap. No stored cache
-# or artifact uploads. Native ARM64 needs the separately unfinished managed SDK.
+# or artifact uploads. Windows ARM64 is unsupported (removed 2026-10-16).
 jobs:
   compare:
     if: github.event.repository.visibility == 'public'

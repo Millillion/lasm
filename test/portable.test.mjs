@@ -2,13 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPortableWasi } from '../src/wasi.mjs';
 import { assertPlatform } from '../src/toolchain.mjs';
-import { buildPlatforms } from '../src/platform.mjs';
+import { assertSupportedHost, buildPlatforms } from '../src/platform.mjs';
 
 test('the build platform policy accepts the intended 64-bit desktop matrix', () => {
   for (const platform of buildPlatforms) assert.doesNotThrow(() => assertPlatform(...platform.split('-')));
+  assert.deepEqual(buildPlatforms, ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64', 'win32-x64']);
   for (const pair of [['freebsd', 'x64'], ['win32', 'ia32'], ['linux', 'riscv64']]) {
-    assert.throws(() => assertPlatform(...pair), /64-bit Linux, macOS, or Windows/);
+    assert.throws(() => assertPlatform(...pair), /^Error: Lasm supports Linux and macOS on x86-64 and ARM64, and Windows on x86-64\. Your host is/);
   }
+});
+
+test('Windows ARM64 fails early with an explicit unsupported-platform message', () => {
+  assert.throws(() => assertPlatform('win32', 'arm64'), { message:
+    'Lasm supports Linux and macOS on x86-64 and ARM64, and Windows on x86-64. Windows ARM64 is not supported.' });
+  assert.throws(() => assertSupportedHost('win32', 'arm64'), /Windows ARM64 is not supported\.$/);
 });
 
 test('portable WASI implements empty environment, console writes, EOF, clocks and error codes', () => {

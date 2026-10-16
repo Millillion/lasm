@@ -99,7 +99,8 @@ parallel CPU execution or preempt a long computation.
 
 See [the example](../examples/lean-server/README.md) and the current unchecked
 [limitations](../IO_LIMITATIONS.md). The implementation is tested on Linux x64.
-The six native OS/architecture CI targets are prepared, but have not run.
+The five supported native OS/architecture CI targets (Windows ARM64 was removed
+on 2026-10-16) are prepared, but have not run.
 The [upstream audit](UPSTREAM_RESULTS.md) separates observed matches from missing
 APIs, adaptation failures, resource limits, and behavior differences.
 

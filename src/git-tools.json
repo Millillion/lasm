@@ -49,15 +49,6 @@
       "bytes": 47119821,
       "format": "tar.gz",
       "maximumExtractedBytes": 536870912
-    },
-    "win32-arm64": {
-      "name": "dugite-native-v2.53.0-4098283-windows-arm64.tar.gz",
-      "root": ".",
-      "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-windows-arm64.tar.gz",
-      "sha256": "1abbeb3a2ce06e9b80e75bb888dce959b6c73bdb11ccc670a01a71d64f4422a5",
-      "bytes": 45084825,
-      "format": "tar.gz",
-      "maximumExtractedBytes": 536870912
     }
   }
 }

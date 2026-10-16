@@ -8,6 +8,7 @@ import tempfile
 import time
 import unittest
 import json
+import os
 
 control = runpy.run_path(str(Path(__file__).resolve().parents[1] / 'scripts/full-lean/advise-tool-cache.py'))
 control['require_guard']()
@@ -80,7 +81,9 @@ class ToolCacheAdvice(unittest.TestCase):
             report, stop = root / 'report.json', root / 'stop'
             process = subprocess.Popen([sys.executable, '-I', '-B',
                 str(Path(__file__).resolve().parents[1] / 'scripts/full-lean/advise-tool-cache.py'),
-                str(root / 'tools'), str(report), str(stop), str(root / 'project')], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                # A second, not-yet-created cache (the native oracle's) is skipped until it exists.
+                str(root / 'tools') + os.pathsep + str(root / 'oracle-tools'), str(report), str(stop), str(root / 'project')],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             try:
                 deadline = time.monotonic() + 10
                 while time.monotonic() < deadline:

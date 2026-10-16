@@ -8,8 +8,8 @@ concurrency:
   cancel-in-progress: false
 
 # Narrow native-library comparison, not full Wasm/platform acceptance. The
-# current process-tree guard supports Linux and Windows. macOS and the missing
-# native Windows ARM64 Lean distribution remain separate acceptance work.
+# current process-tree guard supports Linux and Windows. macOS remains separate
+# acceptance work; Windows ARM64 is unsupported (removed 2026-10-16).
 # Standard public runners only; no cache or artifact uploads.
 jobs:
   compare:

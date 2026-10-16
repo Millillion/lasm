@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64, win32-arm64]
+        platform: [linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64]
     env:
       PLATFORM: ${{ matrix.platform }}
       VERSION: ${{ inputs.version }}
@@ -86,13 +86,7 @@ jobs:
       - name: Require identical shared archives and the size ceiling
         run: |
           ls -l .work/lean-tiers/all
-          # Lasm's own native Windows ARM64 build (not an upstream archive) has
-          # different module data; that platform keeps its complete archive.
-          node -e "
-            const read = p => require('./.work/lean-tiers/all/report-' + p + '.json').archives.filter(a => a.piece !== 'bin');
-            const upstream = new Map(read('linux-x64').map(a => [a.piece, a.sha256]));
-            for (const a of read('win32-arm64')) console.log('win32-arm64', a.piece, a.sha256 === upstream.get(a.piece) ? 'identical' : 'differs');"
-          node scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ inputs.tag }}/" $(ls .work/lean-tiers/all/report-*.json | grep -v win32-arm64) > .work/lean-tiers/tiers.json
+          node scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ inputs.tag }}/" .work/lean-tiers/all/report-*.json > .work/lean-tiers/tiers.json
           node -e "
             const fs = require('fs'), entry = JSON.parse(fs.readFileSync('.work/lean-tiers/tiers.json'));
             const all = [...Object.values(entry.bin), ...entry.core, ...entry.extended];
@@ -180,7 +174,6 @@ jobs:
           TAG: ${{ inputs.tag }}
         run: |
           cd .work/lean-tiers/all
-          rm -f report-win32-arm64.json lean-*-win32-arm64-bin.tar.zst
           node ../../../scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/" report-*.json > tiers.json
           sha256sum *.tar.zst > SHA256SUMS
           cat > notes.md <<EOF

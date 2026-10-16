@@ -4,7 +4,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
-import { buildPlatforms, bundledTools, executableName, insideDirectory, responseFile } from './platform.mjs';
+import { assertSupportedHost, bundledTools, executableName, insideDirectory, responseFile } from './platform.mjs';
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const lean = process.env.LEAN ?? executableName('lean');
@@ -19,9 +19,7 @@ export function run(executable, args, extra = {}) {
 }
 
 export function assertPlatform(platform = process.platform, architecture = process.arch) {
-  if (!buildPlatforms.includes(`${platform}-${architecture}`)) {
-    throw new Error(`Lasm requires a 64-bit Linux, macOS, or Windows host; received ${platform}-${architecture}`);
-  }
+  assertSupportedHost(platform, architecture);
   if (Number(process.versions.node.split('.')[0]) < 24) throw new Error('Lasm requires Node.js 24 or newer');
 }
 

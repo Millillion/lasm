@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 
-export const confidencePlatforms = ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64', 'win32-x64', 'win32-arm64'];
+import { buildPlatforms } from '../../src/platform.mjs';
+
+// The five supported targets; Windows ARM64 was removed on 2026-10-16.
+export const confidencePlatforms = [...buildPlatforms];
 
 export function resourceReportPassed(platform, resources) {
   if (platform.startsWith('win32')) return resources.status === 'passed' && resources.exitCode === 0

@@ -105,7 +105,7 @@ audit peaked at 386 MiB with no resource events.
 - [ ] Trace executable dependencies, private helpers and dynamic callbacks.
 - [ ] Audit each runtime implementation, including platform-specific branches.
 - [ ] Map unchanged upstream and supplementary differential tests to APIs.
-- [ ] Complete Node behavior coverage on six native platforms.
+- [ ] Complete Node behavior coverage on the five supported native platforms.
 
 The existing Emscripten implementations of `Std.Internal.UV.Loop.configure`
 and `alive` are explicit unsupported branches. Their linked symbols do not make

@@ -11,11 +11,15 @@ const attempts = () => confidencePlatforms.flatMap((platform, i) => [0, 12, 25].
   conclusion: 'success', coldPassed: true, offlineNpmInstall: true, networkPassed: true, resourcePassed: true,
 })));
 
-test('confidence requires all six targets, the exact candidate and three consecutive cold trials', () => {
+test('the confidence gate covers exactly the five supported targets', () => {
+  assert.deepEqual(confidencePlatforms, ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64', 'win32-x64']);
+});
+
+test('confidence requires all five targets, the exact candidate and three consecutive cold trials', () => {
   const records = attempts();
   assert.equal(installationConfidence(candidate, records).passed, true);
   for (const change of [
-    rows => rows.filter(r => r.platform !== 'win32-arm64'),
+    rows => rows.filter(r => r.platform !== 'win32-x64'),
     rows => rows.filter(r => r.runId !== '3'),
     rows => rows.map(r => ({ ...r, archiveSha256: 'c'.repeat(64) })),
     rows => rows.map(r => ({ ...r, packageSourceRevision: 'd'.repeat(40) })),
@@ -35,7 +39,7 @@ test('green job status alone cannot replace cold/offline/network/resource eviden
 test('duplicate reports do not inflate trials and failures remain visible after recovery', () => {
   const records = attempts(), failed = { ...records[0], runId: '0', jobId: 'failed', conclusion: 'failure', startedAt: '2026-09-28T00:00:00Z' };
   const report = installationConfidence(candidate, [failed, ...records, ...records]);
-  assert.equal(report.passed, true); assert.equal(report.attempts.length, 19);
+  assert.equal(report.passed, true); assert.equal(report.attempts.length, 16);
   assert.equal(report.platforms['linux-x64'].failedOrUnverified, 1);
   assert.equal(report.attempts[0].conclusion, 'failure');
   const latestFailure = { ...failed, runId: '4', jobId: 'latest', startedAt: '2026-09-30T02:00:00Z' };

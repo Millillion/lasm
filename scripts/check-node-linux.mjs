@@ -2,7 +2,7 @@
 // the package sees only stock Node/npm, OS facilities and its fresh workspace.
 import assert from 'node:assert/strict';
 import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync, statSync, symlinkSync, renameSync } from 'node:fs';
-import { join, resolve, dirname } from 'node:path';
+import { join, resolve, dirname, delimiter } from 'node:path';
 import { tmpdir, release } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
@@ -63,7 +63,8 @@ function isolated(rules, command, cwd, timeout) {
 save();
 const adviceReport = join(output, 'tool-cache-advice.json'), adviceStop = join(output, 'stop-tool-cache-advice');
 const advisor = spawn('/usr/bin/python3', ['-I', '-B', join(root, 'scripts/full-lean/advise-tool-cache.py'),
-  join(workspace, 'cache/lasm'), adviceReport, adviceStop, join(workspace, 'project space λ')], { stdio: 'inherit' });
+  // The oracle cache holds the complete upstream Lean used only for native comparisons.
+  [join(workspace, 'cache/lasm'), join(workspace, 'oracle-tools')].join(delimiter), adviceReport, adviceStop, join(workspace, 'project space λ')], { stdio: 'inherit' });
 const advisorExit = new Promise(resolve => {
   advisor.once('error', error => resolve({ error: error.message }));
   advisor.once('exit', (code, signal) => resolve({ code, signal }));

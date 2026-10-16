@@ -16,7 +16,7 @@ interchangeable with this pinned runtime.
 | macOS Intel | Yes | Pending |
 | macOS Apple Silicon | Yes | Pending |
 | Windows x64 | Yes | Pending |
-| Windows ARM64 | Yes | Pending, including x64 Lean emulation |
+| Windows ARM64 | No | Not supported (removed 2026-10-16; no upstream Lean/Emscripten prebuilts) |
 
 The package permits this 64-bit matrix; an accepted platform value is not proof
 of native support. Only Linux x64 has completed native acceptance. Therefore the
@@ -149,10 +149,9 @@ is identified accurately. A report with `complete: false` is not acceptance.
 
 The local [manual CI workflow](../.github/workflows/platform-acceptance.yml) builds
 the compiler and ordinary-server tests and one tarball on Linux, then runs the
-same npm-only acceptance suite on all six
+same npm-only acceptance suite on all five supported
 OS/architecture combinations. It has not run. It is prepared for a future
 authorized remote and manual dispatch; it does not publish an npm package.
-Its Windows ARM64 job also tests whether Lean's installer/emulation path works.
 The Linux development suite additionally tests pnpm and Yarn. Wine execution is
 useful for finding Windows-specific bugs but cannot establish native Windows
 support, and fixture-based path tests cannot establish macOS support.

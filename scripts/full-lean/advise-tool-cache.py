@@ -118,14 +118,17 @@ def advise_native_controls(project, synchronized, evidence):
 
 def main():
     group = require_guard()
-    cache, report, stop, *projects = map(Path, sys.argv[1:])
+    # The first argument may name several completed-tool caches separated by
+    # os.pathsep (for example a maintainer oracle cache beside the product's).
+    caches = [Path(value) for value in sys.argv[1].split(os.pathsep)]
+    report, stop, *projects = map(Path, sys.argv[2:])
     assert len(projects) <= 1
-    assert cache.is_absolute() and not cache.is_symlink()
+    assert caches and all(cache.is_absolute() and not cache.is_symlink() for cache in caches)
     assert all(project.is_absolute() and not project.is_symlink() for project in projects)
     synchronized = set()
     evidence = {'method': 'fdatasync once per completed immutable cache tree; repeated POSIX_FADV_DONTNEED',
                 'scope': 'Completed immutable tools, application build caches and receipted native comparison artifacts only; excludes deployment files, package, staging and SDK state. No file changes, global cache drops or resource-limit changes',
-                'cache': str(cache), 'trees': {}, 'passes': 0, 'adviceCalls': 0,
+                'cache': os.pathsep.join(map(str, caches)), 'trees': {}, 'passes': 0, 'adviceCalls': 0,
                 'advisedBytesIncludingRepeats': 0, 'status': 'running'}
 
     def save():
@@ -140,7 +143,9 @@ def main():
         save()
         while not stop.exists():
             evidence['fileBytesBeforeLastPass'] = int(cached_bytes())
-            advise_completed(cache, synchronized, evidence)
+            for cache in caches:
+                if cache.is_dir():
+                    advise_completed(cache, synchronized, evidence)
             for project in projects:
                 advise_applications(project, synchronized, evidence)
                 advise_native_controls(project, synchronized, evidence)

@@ -180,8 +180,9 @@ general helper/API parity and the other native platforms remain unfinished.
   abort signals/output, including empty/zero environment values and redirection
   during abort. The internal adapter adds no Lean API. Private Shell panic
   controls, full symbolization and other native platforms remain open.
-- [ ] Finish managed application packaging, native Windows ARM64 tools and
-  deployment validation without source or build tools.
+- [ ] Finish managed application packaging and deployment validation without
+  source or build tools. (Native Windows ARM64 tools were dropped on 2026-10-16
+  when Windows ARM64 support was removed; the history below is preserved.)
   The [completed native Lean tree is now retained and byte-verified in CI](docs/evidence/windows-arm64-completed-tree-2026-09-24.json),
   with native compiler/Lake/application checks and all resource guards passing.
   Fresh restore, external dependencies, relocation and installed Wasm acceptance

@@ -101,20 +101,9 @@ jobs:
       sha256: ${{ needs.select.outputs.sha256 }}
       candidate-release: ${{ needs.select.outputs.release }}
       candidate-version: ${{ needs.select.outputs.version }}
-  windows-arm64:
-    if: needs.select.outputs.active == 'true'
-    needs: [select, input, faults]
-    uses: ./.github/workflows/node-windows-consumer.yml
-    with:
-      runner: windows-11-arm
-      architecture: arm64
-      cache-key: ${{ needs.input.outputs.cache-key }}
-      sha256: ${{ needs.select.outputs.sha256 }}
-      candidate-release: ${{ needs.select.outputs.release }}
-      candidate-version: ${{ needs.select.outputs.version }}
   report:
     if: always() && needs.select.outputs.active == 'true'
-    needs: [select, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, windows-arm64]
+    needs: [select, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:

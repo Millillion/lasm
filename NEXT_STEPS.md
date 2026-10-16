@@ -33,8 +33,9 @@ below retain their original, narrower scope.
   pipeline with automatic tools, Lake dependencies and reliable cache reuse.
 - [ ] Validate the HTTP and Express examples and callable JS/TypeScript bindings
   through that shipping pipeline.
-- [ ] Supply and validate native Windows ARM64 Lean and compiler SDK bundles.
-  The [native Lean bootstrap](docs/evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json)
+- [x] ~~Supply and validate native Windows ARM64 Lean and compiler SDK bundles.~~
+  Dropped 2026-10-16: Windows ARM64 support was removed (user decision; no
+  upstream Lean/Emscripten prebuilts). Historical: the [native Lean bootstrap](docs/evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json)
   now passes compiler/Lake, interpreted-main and compiled ARM64-main checks;
   managed relocatable distribution and complete package acceptance remain open.
 - [ ] Run unchanged upstream tests through their appropriate native build-time

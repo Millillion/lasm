@@ -19,6 +19,13 @@ test('release diagnostics name unsupported hosts and the required Node version',
   assert.throws(() => requireApplicationSupport(support, { platform: 'linux', arch: 'x64', versions: { node: '24.0.0' } }), /requires Node 26.10.0.*running Node 24.0.0/);
 });
 
+test('Windows ARM64 is refused before candidate checks, even in a research checkout', () => {
+  const message = 'Lasm supports Linux and macOS on x86-64 and ARM64, and Windows on x86-64. Windows ARM64 is not supported.';
+  const host = { platform: 'win32', arch: 'arm64', versions: { node: '26.10.0' } };
+  assert.throws(() => requireApplicationSupport({ ...support, platforms: [...support.platforms, 'win32-arm64'] }, host), { message });
+  assert.throws(() => requireApplicationSupport(undefined, host), { message });
+});
+
 for (const arch of ['x64', 'arm64']) test(`macOS ${arch} does not inherit Linux glibc requirements`, () => {
   requireApplicationSupport({ ...support, platforms: [...support.platforms, 'darwin-' + arch], minimumGlibc: '2.39' },
     { platform: 'darwin', arch, versions: { node: support.node } });

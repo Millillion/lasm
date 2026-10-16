@@ -174,9 +174,10 @@ the regression and deferred-link fix pass. The final guarded run peaks at
 [provisioning evidence](evidence/managed-lean-provisioning-2026-09-23.json).
 
 The official Lean release has native downloads for Linux and macOS on x64/ARM64,
-and Windows x64. **A native Windows ARM64 distribution remains missing.** The
-installer reports that gap and does not substitute an emulated x64 compiler.
-That missing artifact is an engineering gap, not a fundamental limitation.
+and Windows x64. There is no upstream native Windows ARM64 distribution. After
+the history below, **Windows ARM64 support was removed on 2026-10-16** (user
+decision): Lasm stops there with an explicit unsupported-platform message and
+does not substitute an emulated x64 compiler.
 
 The [native Windows ARM64 bootstrap checkpoint](evidence/windows-arm64-bootstrap-checkpoint-2026-09-24.json)
 reached its 260-minute guard deadline while compiling stage1 Lean modules, with
@@ -400,7 +401,7 @@ separate deployment check peaked at 1.52 GiB. Both retained the proactive 8 GiB
 guard and 10 GiB hard cap, with no OOM, throttling or resource aborts. Further
 checks reuse the installed tools instead of repeating the cold downloads.
 Additional ordinary dependency layouts, concurrent cache users, full upstream/API
-coverage, and the six native platform matrix remain acceptance gates. The package
+coverage, and the five-platform native matrix remain acceptance gates. The package
 assembler preserves the older callable-library target with its original Lean
 4.32 requirements.
 
@@ -486,9 +487,9 @@ failures. The Linux request is now 6 GiB within the existing half-RAM cap,
 8 GiB host reserve and proactive-stop policy; Windows keeps 2 GiB. The local
 guard configuration is unchanged.
 
-`managed-tools.yml` tests provisioning on the six required standard native runner
-types. Windows ARM64 remains a failing acceptance row until its distribution is
-implemented. CI provisioning results do not constitute Wasm application passes.
+`managed-tools.yml` tests provisioning on the five supported standard native runner
+types (it also ran a failing Windows ARM64 row until that platform was removed on
+2026-10-16). CI provisioning results do not constitute Wasm application passes.
 
 The [first native matrix result](evidence/managed-lean-native-ci-2026-09-23.json)
 verifies automatic downloads, whole-cache integrity, ordinary Lean execution and
@@ -500,7 +501,8 @@ PATH on all five platforms. Windows ARM64 remains the sole failing row because
 Lean's upstream archive is missing. Those additional checks are not imported
 into the earlier evidence file.
 
-The separate Windows ARM64 bootstrap workflow builds native Lean from the pinned
+The separate Windows ARM64 bootstrap workflow (deleted 2026-10-16 with Windows
+ARM64 support; history preserved here) built native Lean from the pinned
 source on `windows-11-arm`. It first validates a Windows Job Object guard using
 small allocations in a parent and child. The build has one worker, a hard memory
 cap no larger than half the runner's RAM, and a proactive stop at 80% of that cap.
@@ -564,7 +566,8 @@ of that data remains required for self-contained deployments.
   differential main probe; full API validation remains required below.
 - [ ] Produce portable `dist/main.mjs` output and callable bindings for stock
   Node; preserve full threading/IO semantics.
-- [ ] Supply and validate the Windows ARM64 native compiler distribution.
+- [x] ~~Supply and validate the Windows ARM64 native compiler distribution.~~
+  Dropped 2026-10-16 with Windows ARM64 support.
 - [ ] Verify the entire native OS/architecture matrix and source-free deployment.
 - [ ] Classify unchanged upstream tests for the application pipeline, and add
   native differential coverage for standard APIs beyond the upstream suite.

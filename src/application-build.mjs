@@ -73,7 +73,6 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // identities of the binaries and every module-data archive it contains.
   const recipe = { schema: 1, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
     ...(lean.distribution === 'tiers' ? { nativeLeanTier: lean.tier, nativeLeanComponents: lean.components } : {}),
-    ...(lean.notices ? { nativeLeanNoticesIdentity: lean.notices.identity } : {}),
     emscripten: sdkCatalog.version, sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)),
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),

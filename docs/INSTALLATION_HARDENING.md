@@ -5,6 +5,12 @@ Candidate `.46` and its six-platform acceptance remain unchanged. This document
 describes the hardened candidate and its ongoing validation, not a retroactive
 claim about that archive.
 
+**Windows ARM64 removed — 2026-10-16 (user decision).** Lasm now supports five
+targets: Linux and macOS on x86-64 and ARM64, and Windows on x86-64. The fault
+matrix, installed-candidate campaign and repeated-installation gate now cover
+these five targets. Results below that mention six targets or Windows ARM64 are
+historical records of what ran at the time and remain as written.
+
 ## Transfers
 
 The installer streams archives to private files and verifies the entire pinned
@@ -103,7 +109,8 @@ registry. Full candidate acceptance additionally repeats installation under OS
 network denial. No dependency lifecycle script is needed.
 
 The [automatic fault workflow](../.github/workflows/installer-faults.yml) runs on
-relevant pushes and PRs on the existing six native runners. It uses small TLS
+relevant pushes and PRs on the five supported native runners (six before the
+2026-10-16 Windows ARM64 removal). It uses small TLS
 fixtures, process kills, locks, repair, archive and dependency packing controls.
 Damaged and incomplete-cache recovery invokes the actual `lasm cache repair`
 entrypoint against tiny caches, then verifies successful replacement and offline
@@ -172,7 +179,7 @@ release assets as well as optional caches. The reviewed reference is
 [`node-runtime-source.json`](../scripts/ci/node-runtime-source.json).
 
 Each new candidate is packed once (with a second identical pack check), retained
-as an explicitly unaccepted draft, then fetched by exact hash by all six native
+as an explicitly unaccepted draft, then fetched by exact hash by all five native
 consumers. Legacy cache inputs remain optional; cache eviction is no longer the
 sole-source failure mode. Draft assets do not consume Actions artifact storage.
 GitHub draft visibility requires push access. A separate preparation job fetches
@@ -182,7 +189,7 @@ Actions cache. If eviction happens during a run, the error directs maintainers
 to rerun the whole campaign; the durable archive remains intact. All cache writers
 share the existing serialized 8 GiB ceiling below the included 10 GiB allowance.
 Candidate builds run automatically for relevant product/packaging pushes and can
-also be dispatched manually. All six deterministic fault jobs and native installed
+also be dispatched manually. All five deterministic fault jobs and native installed
 jobs gate creation of the tested-candidate draft. The native jobs additionally
 exercise the installed CLI -> Lake -> managed Git path against an authenticated
 loopback proxy and private CA. Its loopback fixture runs separately from the
@@ -349,8 +356,10 @@ passed on all six targets; the repeated-installation gate passed separately. All
 start from fresh VMs and empty consumer tool/npm caches and use one exact archive.
 The source controls also rerun; each report records their revision separately.
 
-The gate requires three consecutive complete cold/offline/deployment/network passes per
-target. Campaigns may run back to back; the user removed the earlier requirement
+The gate requires three consecutive complete cold/offline/deployment/network passes on
+each of the five supported targets. When older campaigns are evaluated, only
+those five targets' jobs are counted; their historical Windows ARM64 jobs are
+ignored. Campaigns may run back to back; the user removed the earlier requirement
 of two UTC dates and 24 hours of separation on 2026-10-16, and reports still
 record each sequence's dates and span for context. Duplicate job reports
 do not count twice. All original job attempts are collected; failed preparation,
@@ -367,8 +376,9 @@ without claiming that an installer ran. Regression controls cover a failed input
 followed by one green retry. Reports separate downloads without retries from
 successful recovery, and provide observed median/p95/max cold timings with their
 sample counts. Artifact byte totals are pinned compressed lengths, not measured
-wire traffic; retries and transport overhead can add bytes. New controls include
-the mandatory Lean source/notices companion in that catalog total.
+wire traffic; retries and transport overhead can add bytes. (The Windows ARM64
+source/notices companion once included in that total was removed with that
+platform.)
 Both the installed-suite and network-control resource reports must pass. A
 regression uses the actual Linux abort (whose service exit was zero but whose
 resource flag was set), alongside retained clean Linux/macOS/Windows reports.

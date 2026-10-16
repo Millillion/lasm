@@ -56,7 +56,6 @@ jobs:
           - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
           - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
           - { platform: win32-x64, runner: windows-2022, arch: x64 }
-          - { platform: win32-arm64, runner: windows-11-arm, arch: arm64 }
     env:
       LASM_TEST_MANAGERS: npm
       LASM_TEST_PLATFORM: ${{ matrix.platform }}

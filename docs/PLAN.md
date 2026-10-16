@@ -10,6 +10,15 @@ parity before delivering the basic workflow. The previous plan is preserved in
 [OLD PLAN — archived 2026-09-25](PLAN_OLD_2026-09-25.md) for reference only.
 Updating this document does not itself start, stop, or interrupt running work.
 
+**Windows ARM64 support removed — 2026-10-16:** user decision; no upstream
+Lean/Emscripten prebuilts. Lasm now targets five platforms: Linux x86-64, Linux
+ARM64, macOS x86-64, macOS ARM64 and Windows x86-64. Windows ARM64 required
+Lasm to build and maintain both toolchains from source, Windows on Arm is a small
+share of developers, and that work slowed the MVP. On a Windows ARM64 host Lasm
+stops early with an explicit unsupported-platform message. Do not add Windows
+ARM64 back without upstream Lean and Emscripten prebuilts. Historical statements
+below about six-target passes remain accurate records of what was tested then.
+
 **First milestone completed 2026-09-26:** native Linux x86-64 and ARM64 passed
 the same packed candidate. See [the acceptance report](NODE_ACCEPTANCE.md) for
 exact hashes, versions, scope and measurements. The candidate is unpublished to
@@ -145,7 +154,7 @@ same complete installed-package workflow:
 | --- | --- | --- |
 | Linux | Passed | Passed |
 | macOS | Passed | Passed |
-| Windows | Passed | Passed |
+| Windows | Passed | Passed historically; unsupported since 2026-10-16 |
 
 Here, x86-64 means 64-bit x86 (also called x64 or AMD64), not 32-bit x86.
 Both the Linux milestone and subsequent macOS/Windows extensions are complete.
@@ -262,12 +271,11 @@ npm as the only prerequisites. Follow [the slimming design](TOOLCHAIN_SLIMMING.m
 - [ ] Phase 1: tiered trimmed Lean (per-platform binaries, shared core and
   extended module data), assembled into one prefix on demand. Implemented in
   source and validated by the maintainer tier workflow; awaiting a packed
-  candidate's six-platform acceptance and cold-installation gate. Windows ARM64
-  keeps its complete Lasm-built archive (its module data differs from upstream).
+  candidate's five-platform acceptance and cold-installation gate.
 - [ ] Phase 2: Node link driver replacing `emcc` and Python, byte-identical to
   current output on existing fixtures.
 - [ ] Phase 3: npm platform packages via `optionalDependencies`, validated with
-  a local registry on all six native targets. Publication stays a user decision.
+  a local registry on all five native targets. Publication stays a user decision.
 
 ## Deferred chunks
 
@@ -324,6 +332,7 @@ relabel previous failures, or describe deferral as a fundamental limitation.
   percentage to this smaller milestone or call a scope reduction technical progress.
 
 The original Linux milestone and platform extensions now establish the basic
-Lean-on-Node workflow on Linux, macOS and Windows, each on x86-64 and ARM64.
+Lean-on-Node workflow on Linux, macOS and Windows, each on x86-64 and ARM64
+(Windows ARM64 has since been removed; see the 2026-10-16 note above).
 They do not establish complete Lean language/library parity or production
 acceptance of every application.

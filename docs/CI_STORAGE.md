@@ -22,7 +22,14 @@ verified build inputs; compiled checkpoints must retain checksums and provenance
 Do not include credentials or unrelated workspace files. A completed restore
 must be verified before cached tools or build products are used.
 
-The separate `cache-control.yml` workflow tests a tiny payload on the standard
+**2026-10-16:** Windows ARM64 support was removed (user decision; no upstream
+Lean/Emscripten prebuilts). The `cache-control.yml` and
+`compiler-cache-control.yml` workflows, their scripts, and the ARM64 Lean
+bootstrap's ccache checkpointing described below were deleted with it. The
+paragraphs below are a historical record; the general budget rules above still
+apply to the remaining cache writers.
+
+The former `cache-control.yml` workflow tested a tiny payload on the standard
 native Windows ARM64 runner: budget check, save, local removal, exact-key restore,
 hash/length comparison, and deletion of that disposable cache. It uploads no
 Actions artifacts. Local budget-boundary controls pass without large allocations;
@@ -48,7 +55,7 @@ it stops both parent and child before checkpoint collection, with a separate
 time-limit status. It does not change the existing memory limits. See the
 [deadline controls](evidence/windows-guard-deadline-2026-09-24.json).
 
-The Lean ARM64 bootstrap now uses these controls for bounded resumptions. Its
+The (since removed) Lean ARM64 bootstrap used these controls for bounded resumptions. Its
 compiler phase stops after 260 minutes, leaving time inside the 330-minute job
 for ccache cleanup, hashing and upload. A fresh source/build tree is created on
 every runner. Only completed compiler-cache entries are carried forward; no

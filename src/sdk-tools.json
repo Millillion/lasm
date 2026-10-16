@@ -2,7 +2,7 @@
   "version": "6.0.9",
   "releasesCommit": "f04ea239d533260dd1db760dd2d668d5f9a88d6b",
   "source": "https://github.com/emscripten-core/emsdk",
-  "checksumProvenance": "Official emsdk archives were streamed and hashed on 2026-09-23. The maintained Windows ARM64 archive was built natively, audited, and published from the exact receipt linked in docs/WINDOWS_TOOLCHAINS.md; these are not upstream-published checksum lists.",
+  "checksumProvenance": "Official emsdk archives were streamed and hashed on 2026-09-23; these are not upstream-published checksum lists.",
   "artifacts": {
     "linux-x64": {
       "name": "emscripten-6.0.9-linux-x64",
@@ -47,15 +47,6 @@
       "sha256": "f7512eab6e69ad9d7de5adbf39e68d7d6773b317b13e70ec5003ef1d10f92980",
       "bytes": 654169912,
       "format": "zip",
-      "maximumExtractedBytes": 5000000000
-    },
-    "win32-arm64": {
-      "name": "emscripten-6.0.9-win32-arm64-utf8",
-      "root": "install",
-      "url": "https://github.com/Millillion/lasm/releases/download/windows-arm64-sdk-bootstrap-36426171536/emscripten-6.0.9-win32-arm64.tar.gz",
-      "sha256": "e9380d2bef2e3ad554507f768f32b0d4e4d3cf6d54dad7755001b5a7a08e096b",
-      "bytes": 174800072,
-      "format": "tar.gz",
       "maximumExtractedBytes": 5000000000
     }
   },

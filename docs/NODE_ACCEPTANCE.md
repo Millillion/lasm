@@ -5,6 +5,11 @@ independent-deployment checks on **Linux, macOS and Windows, each on x86-64 and
 ARM64**, on 2026-09-28. Ahead-of-time restrictions are enforced, with no
 runtime-compiler fallback. **Nothing is published to npm.**
 
+**Windows ARM64 support was removed on 2026-10-16** (user decision; neither Lean
+nor Emscripten publishes Windows ARM64 prebuilts). Lasm now supports five
+targets: Linux and macOS on x86-64 and ARM64, and Windows on x86-64. The Windows
+ARM64 results below remain accurate historical records of what `.46` passed.
+
 The initial matrix passed five targets. Its ARM64 consumer passed cold and Lake
 builds before CI's independent native reference compiler encountered missing
 OpenSSL import libraries. A CI-only dependency correction allowed the

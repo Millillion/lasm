@@ -30,7 +30,6 @@ jobs:
           - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
           - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
           - { platform: win32-x64, runner: windows-2022, arch: x64 }
-          - { platform: win32-arm64, runner: windows-11-arm, arch: arm64 }
     env:
       LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
     steps:
@@ -51,8 +50,6 @@ jobs:
         run: node integration/managed-python.mjs .work/managed-python-ci
       - name: SDK archive decoder regressions
         run: node test/sdk-archives.test.mjs
-      # Windows ARM64 intentionally remains a failing acceptance row until a
-      # native Lean artifact is implemented. Do not skip or emulate that gap.
       - name: Native Lean and Lake with only managed tools
         run: node integration/managed-lean.mjs .work/managed-lean-ci
       - name: Preserve the provisioning result in the job summary

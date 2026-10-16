@@ -34,8 +34,7 @@ if (process.env.LASM_ACCEPTANCE_RUN_ID) {
   assert.deepEqual(acceptance.passedArchitectures, ['x64', 'arm64']);
   const expected = ['linux-x64', 'linux-arm64'];
   if (process.env.LASM_DARWIN_X64_ACCEPTANCE_RUN_ID) expected.push('darwin-x64', 'darwin-arm64');
-  for (const architecture of ['x64', 'arm64'])
-    if (process.env[`LASM_WINDOWS_${architecture.toUpperCase()}_ACCEPTANCE_RUN_ID`]) expected.push('win32-' + architecture);
+  if (process.env.LASM_WINDOWS_X64_ACCEPTANCE_RUN_ID) expected.push('win32-x64');
   assert.deepEqual(acceptance.passedPlatforms, expected);
 }
 assert.match(acceptance.sourceRevision, /^[a-f0-9]{40}$/);

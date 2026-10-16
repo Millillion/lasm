@@ -4,9 +4,10 @@ import { managedGitEnvironment, gitCatalog } from '../src/managed-git.mjs';
 import { validateArtifact } from '../src/managed-artifacts.mjs';
 import { nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { join, delimiter } from 'node:path';
+import { buildPlatforms } from '../src/platform.mjs';
 
-test('portable Git catalog pins native distributions for all six supported hosts', () => {
-  assert.deepEqual(Object.keys(gitCatalog.artifacts).sort(), ['darwin-arm64', 'darwin-x64', 'linux-arm64', 'linux-x64', 'win32-arm64', 'win32-x64']);
+test('portable Git catalog pins native distributions for all five supported hosts', () => {
+  assert.deepEqual(Object.keys(gitCatalog.artifacts).sort(), [...buildPlatforms].sort());
   for (const artifact of Object.values(gitCatalog.artifacts)) assert.match(validateArtifact(artifact), /^[a-f0-9]{64}$/);
 });
 

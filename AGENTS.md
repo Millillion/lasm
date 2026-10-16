@@ -17,10 +17,13 @@
   each commit; if it fails, retain the commit locally, continue work, and try
   again after the next commit. npm publication remains unauthorized.
 - Prioritize the ordinary Lean-on-Node installed workflow in `docs/PLAN.md`.
-  Candidate `.46` passed the scoped native installed/deployment workflow on Linux,
-  macOS and Windows, each on x86-64 and ARM64, with ahead-of-time restrictions.
-  Exact accepted OS/tool versions and artifact identities are in
-  `docs/NODE_ACCEPTANCE.md`.
+  Lasm targets five platforms: Linux and macOS on x86-64 and ARM64, and Windows
+  on x86-64 (user decision, 2026-10-16; see `docs/PLAN.md`). Windows ARM64 was
+  removed because neither Lean nor Emscripten publishes Windows ARM64 prebuilts;
+  do not add Windows ARM64 without upstream prebuilts. Candidate `.46` passed the
+  scoped native installed/deployment workflow on all five (and historically on
+  Windows ARM64), with ahead-of-time restrictions. Exact accepted OS/tool
+  versions and artifact identities are in `docs/NODE_ACCEPTANCE.md`.
   Lasm targets Node only (user decision, 2026-10-16; see `docs/PLAN.md`); do not
   add other JavaScript engines. Broader API parity and experimental helper integration remain
   deferred. Preserve their source, tests, artifacts and failures. Recheck

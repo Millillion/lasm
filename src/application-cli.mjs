@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { constants } from 'node:os';
 import { join } from 'node:path';
 import { applicationSupport } from './application-support.mjs';
+import { assertSupportedHost } from './platform.mjs';
 
 /** Inherit terminal streams, forward interruption, and preserve the exit code. */
 export async function runApplicationChild(executable, args, missingMessage) {
@@ -33,6 +34,7 @@ export async function runApplicationCli(argv) {
     console.log(support ? 'Usage: lasm Main.lean [-- arguments…]\n       lasm build Main.lean [--output dist]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nBuild and run ordinary Lean main in Node.' : cliUsage);
     return 0;
   }
+  assertSupportedHost();
   if (options.command === 'cache-repair') {
     const { repairManagedCache } = await import('./cache-repair.mjs');
     const { createBuildProgress } = await import('./build-progress.mjs');

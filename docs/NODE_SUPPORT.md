@@ -9,9 +9,13 @@ Full standard-library compatibility is not claimed.
 
 The validated targets are Ubuntu 24.04.5 LTS (glibc 2.39) on native x86-64 and ARM64,
 plus macOS 15.7.9 (24G830) on native x86-64 and ARM64, Windows Server 2025
-Datacenter 10.0.26100.33438 (`windows-2025`) on native x86-64, and Windows 11
-Enterprise 10.0.26200.9457 (`windows-11-arm`) on native ARM64. Candidate `.46`
-passed all six targets. All use Node 26.10.0 with npm 11.19.1 and Lean 4.34.1.
+Datacenter 10.0.26100.33438 (`windows-2025`) on native x86-64. Candidate `.46`
+passed all five supported targets. All use Node 26.10.0 with npm 11.19.1 and Lean 4.34.1.
+**Windows ARM64 is not supported** (removed 2026-10-16: neither Lean nor
+Emscripten publishes Windows ARM64 prebuilts). Candidate `.46` also passed on
+Windows 11 Enterprise 10.0.26200.9457 (`windows-11-arm`) historically; current
+source stops there with `Lasm supports Linux and macOS on x86-64 and ARM64, and
+Windows on x86-64. Windows ARM64 is not supported.`
 Use stock Node without special flags. Other OS versions/distributions, older
 system libraries, and other Node/npm/Lean versions are unverified.
 Linux requires glibc 2.39 or newer; musl-based distributions
@@ -31,14 +35,14 @@ administrator access is required.
 Pinned compressed tool downloads, including Git for a Lake project, total
 979,054,712 bytes on Linux x86-64, 910,904,894 on Linux ARM64,
 919,472,748 on Intel Mac, 925,010,880 on Apple Silicon and 1,312,233,267 on
-Windows x86-64, and 1,018,654,299 on Windows ARM64. A standalone file skips
+Windows x86-64. A standalone file skips
 the Git download. These totals exclude the npm package and generated build files;
 unpacked tools and build caches occupy several GB. The acceptance report records
 observed disk usage, build times and deployment sizes separately. These are
 measurements of the identified candidate, not performance guarantees for other machines.
 Current source, not yet in an accepted candidate, replaces the complete Lean
 archive with [tiered archives](TOOLCHAIN_SLIMMING.md#phase-1-status-2026-10-16)
-on every target except Windows ARM64: on Linux x86-64 Lean's share falls from
+on every supported target: on Linux x86-64 Lean's share falls from
 580,432,872 to 212,285,442 bytes for an ordinary program, and to 466,274,526
 bytes for a Lake project or a program importing `Lean`/`Lake`.
 The current builder removes unreachable code and includes only the deployment

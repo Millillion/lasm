@@ -30,7 +30,7 @@ test('module data and sources are assigned to exactly one documented piece', () 
 });
 
 test('binary roots and staging candidates match each platform layout', () => {
-  assert.deepEqual(binaryRoots('win32-arm64'), ['bin/lean.exe', 'bin/lake.exe', 'bin/leanir.exe', 'bin/cadical.exe', 'bin/libLake_shared.dll']);
+  assert.deepEqual(binaryRoots('win32-x64'), ['bin/lean.exe', 'bin/lake.exe', 'bin/leanir.exe', 'bin/cadical.exe', 'bin/libLake_shared.dll']);
   assert.ok(binaryRoots('darwin-x64').includes('lib/lean/libLake_shared.dylib'));
   assert.ok(binaryCandidate('lib/libc++.so.1.0', 'linux-x64') && binaryCandidate('lib/lean/libleanshared.so', 'linux-arm64'));
   assert.ok(!binaryCandidate('lib/lean/libLean.a', 'linux-x64') && !binaryCandidate('include/lean/lean.h', 'darwin-arm64'));

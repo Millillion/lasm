@@ -11,7 +11,7 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 import { verifyNativeProgram } from '../src/native-program.mjs';
 
 await ensureResourceGuard();
-assert.equal(process.platform, 'win32'); assert.ok(['x64', 'arm64'].includes(process.arch));
+assert.equal(process.platform, 'win32'); assert.equal(process.arch, 'x64');
 const root = fileURLToPath(new URL('../', import.meta.url));
 const [outputArg, archiveArg, expectedSha, ...extra] = process.argv.slice(2);
 assert.ok(outputArg && archiveArg && /^[a-f0-9]{64}$/.test(expectedSha ?? '') && !extra.length);
@@ -64,12 +64,6 @@ async function nativeControls() {
     // tiered product distribution omits; use the complete upstream archive.
     const lean = await provisionLean(source, { cache: result.installation.tools, distribution: 'full' });
     const env = nativeLeanEnvironment(lean), executable = join(work, 'program.exe'), generated = join(work, 'program.c');
-    if (process.arch === 'arm64') {
-      assert.ok(process.env.LASM_NATIVE_ORACLE_CC, 'Native ARM64 C compiler is required only by this maintainer oracle');
-      await verifyNativeProgram(process.env.LASM_NATIVE_ORACLE_CC);
-      env.LEAN_CC = process.env.LASM_NATIVE_ORACLE_CC;
-      env.PATH = join(lean.prefix, 'bin') + ';' + dirname(env.LEAN_CC) + ';' + env.PATH;
-    }
     const options = { cwd: work, env, encoding: 'utf8', timeout: 300000, maxBuffer: 4 * 1024 ** 2 };
     const compile = spawnSync(lean.lean, ['-j1', '-s8192', '-Dcompiler.postponeCompile=false', '-c', generated, source], options);
     assert.ifError(compile.error); assert.equal(compile.status, 0, compile.stdout + compile.stderr);

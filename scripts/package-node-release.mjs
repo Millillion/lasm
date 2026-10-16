@@ -11,6 +11,7 @@ import { sdkCatalog } from '../src/managed-sdk.mjs';
 import { pythonCatalog } from '../src/managed-python.mjs';
 import { gitCatalog } from '../src/managed-git.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
+import { buildPlatforms } from '../src/platform.mjs';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 import { bundleInstaller } from './bundle-installer.mjs';
 import { candidateReadme } from './candidate-readme.mjs';
@@ -29,10 +30,10 @@ const runtime = await verifyApplicationRuntime(runtimeArg, expected);
 assert.equal(runtime.manifest.leanCommit, toolchainCatalog.lean[lean]?.commit, 'Match the native Lean release');
 const pins = JSON.parse(readFileSync(join(root, 'scripts/ci/acceptance-versions.json')));
 assert.equal(lean, pins.lean);
-const platforms = (process.env.LASM_CANDIDATE_PLATFORMS ?? 'linux-x64,linux-arm64,darwin-x64,darwin-arm64,win32-x64,win32-arm64').split(',');
+const platforms = process.env.LASM_CANDIDATE_PLATFORMS?.split(',') ?? buildPlatforms;
 assert.equal(new Set(platforms).size, platforms.length);
 for (const platform of platforms) {
-  assert.match(platform, /^(linux|darwin|win32)-(x64|arm64)$/);
+  assert.ok(buildPlatforms.includes(platform), `Unsupported candidate platform: ${platform}`);
   for (const catalog of [toolchainCatalog.lean[lean], sdkCatalog, pythonCatalog, gitCatalog])
     assert.ok(catalog.artifacts[platform], `Missing managed distribution for ${platform}`);
 }

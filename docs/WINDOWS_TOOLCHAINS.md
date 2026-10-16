@@ -1,17 +1,29 @@
 # Windows toolchain implementation
 
+> **Windows ARM64 support removed — 2026-10-16 (user decision).** Lasm supports
+> Windows on x86-64 only, alongside Linux and macOS on x86-64 and ARM64. Neither
+> Lean nor Emscripten publishes Windows ARM64 prebuilts, so Lasm had to build
+> and maintain both toolchains from source; Windows on Arm is a small share of
+> developers, and that work slowed the MVP. On a Windows ARM64 host Lasm now stops
+> with: `Lasm supports Linux and macOS on x86-64 and ARM64, and Windows on
+> x86-64. Windows ARM64 is not supported.` The ARM64 bootstrap workflows and
+> scripts, its catalog entries and its source/notices companion support were
+> deleted. Previously published tool prereleases remain on GitHub because older
+> candidates reference them. Do not add Windows ARM64 back without upstream
+> Lean and Emscripten prebuilts. ARM64 material below is preserved as history.
+
 Candidate `.46` passed native installed-package and independent-deployment
-acceptance on Windows x86-64 and ARM64, as well as both Linux and macOS
+acceptance on Windows x86-64 and (historically) ARM64, as well as both Linux and macOS
 architectures. The identical archive and combined receipt are
 [retained and independently verified](evidence/node46-six-platform-retention-2026-09-28.json).
 See the [acceptance report](NODE_ACCEPTANCE.md) for exact tested OS versions,
 tool versions, hashes and measurements. Nothing is published to npm.
 
-The native ARM64 Lean 4.34.1 distribution, required source/notices companion,
-and repaired Emscripten 6.0.9 SDK are available as verified managed downloads.
-The SDK's UTF-8 manifest repair passed both focused native controls and the
-complete installed application suite. The investigations below preserve earlier
-candidates and failures; later acceptance does not relabel those attempts.
+Until the 2026-10-16 removal, Lasm's own native ARM64 Lean 4.34.1 distribution,
+its source/notices companion and a repaired Emscripten 6.0.9 SDK were verified
+managed downloads; current catalogs no longer list them. The investigations below
+preserve earlier candidates and failures; later acceptance does not relabel those
+attempts.
 
 Managed native Lean/Lake execute from a short physical `bin` directory under
 `os.tmpdir()/lasm-tools/<hash>`. Its files are hard links to the verified cache
@@ -36,11 +48,10 @@ A [compiler differential](evidence/windows-glue-line-ending-controls-2026-09-27.
 reproduced that failure and verified the LF format without loosening semantic
 checks. Complete Windows installed acceptance remains separate.
 
-For maintained distributions, a host entry in a Lean release's `notices` catalog
-can declare a required companion source/notices archive. Lasm verifies and
-caches it before using the compiler, rechecks it on cached builds, and records
-its identity in build information. Compiler download retries reuse a verified
-companion. These build-tool sources do not become application deployment files.
+Historically, a host entry in a Lean release's `notices` catalog declared a
+required companion source/notices archive for Lasm's own Windows ARM64 build.
+That catalog field and its build-recipe identity were removed with Windows ARM64
+on 2026-10-16; every remaining platform uses unmodified upstream Lean archives.
 
 The native ARM64 [SDK](evidence/windows-arm64-sdk-2026-09-27.json) and
 [leantar helper](evidence/windows-arm64-leantar-2026-09-26.json) passed their

@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { assertSupportedHost } from './platform.mjs';
 
 /** Release candidates declare their tested contract; research checkouts do not. */
 export function applicationSupport() {
@@ -7,6 +8,7 @@ export function applicationSupport() {
 }
 
 export function requireApplicationSupport(support = applicationSupport(), host = process) {
+  assertSupportedHost(host.platform, host.arch);
   if (!support) return;
   if (!support.platforms.includes(`${host.platform}-${host.arch}`))
     throw new Error(`This Lasm candidate supports ${support.platforms.join(', ')}. Your host is ${host.platform}-${host.arch}. Use a supported native platform.`);

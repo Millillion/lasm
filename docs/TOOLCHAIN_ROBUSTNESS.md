@@ -2,6 +2,10 @@
 
 Reviewed 2026-09-28 at `e64fd3000e4d5486c6b446a8e56cc26a1f7e6a7c`.
 
+*Note, 2026-10-16:* Windows ARM64 support was later removed (user decision; no
+upstream Lean/Emscripten prebuilts). References below to six targets describe
+the matrix at review time; the current gates cover the five supported targets.
+
 **Verdict:** the CLI has a credible six-platform compatibility baseline and good
 integrity checks. It does not yet have enough fault tolerance or continuing CI
 coverage to claim extremely reliable installation across developer machines.

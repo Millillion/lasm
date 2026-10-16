@@ -9,7 +9,8 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = join(root, '.cache/native-host');
 const lock = JSON.parse(readFileSync(join(root, 'package-lock.json')));
-const names = ['koffi', ...['linux', 'darwin', 'win32'].flatMap(os => ['x64', 'arm64'].map(arch => `@koromix/koffi-${os}-${arch}`))];
+// Windows ARM64 is unsupported (removed 2026-10-16), so its Koffi binary is not bundled.
+const names = ['koffi', ...['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64', 'win32-x64'].map(host => `@koromix/koffi-${host}`)];
 const records = [];
 for (const name of names) {
   const entry = lock.packages[`node_modules/${name}`];

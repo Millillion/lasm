@@ -322,7 +322,6 @@ try {
     const leanRelease = json(join(compiler, 'src/toolchains.json')).lean[result.support.lean];
     result.downloads = [
       { tool: 'Lean/Lake', ...leanRelease.artifacts[host] },
-      ...(leanRelease.notices?.[host] ? [{ tool: 'Lean tool sources/notices', ...leanRelease.notices[host] }] : []),
       ...['python', 'sdk', 'git'].map(tool => ({ tool, ...json(join(compiler, `src/${tool}-tools.json`)).artifacts[host] })),
     ];
     result.downloadBytes = result.downloads.reduce((sum, value) => sum + value.bytes, 0);

@@ -51,10 +51,9 @@ if (macRuns.some(Boolean)) {
   assert.ok(macRuns.every(Boolean), 'Retain macOS support only after both native architectures pass');
   targets.push(...['x64', 'arm64'].map((architecture, i) => ({ os: 'darwin', architecture, id: macRuns[i] })));
 }
-for (const architecture of ['x64', 'arm64']) {
-  const id = process.env[`LASM_WINDOWS_${architecture.toUpperCase()}_ACCEPTANCE_RUN_ID`];
-  if (id) targets.push({ os: 'win32', architecture, id });
-}
+// Windows ARM64 is unsupported (removed 2026-10-16); only Windows x64 is retained.
+if (process.env.LASM_WINDOWS_X64_ACCEPTANCE_RUN_ID)
+  targets.push({ os: 'win32', architecture: 'x64', id: process.env.LASM_WINDOWS_X64_ACCEPTANCE_RUN_ID });
 for (const { os, architecture, id } of targets) {
   const platform = `${os}-${architecture}`, { run, jobs } = completedRun(id);
   const name = os === 'win32' ? 'windows' : os;
