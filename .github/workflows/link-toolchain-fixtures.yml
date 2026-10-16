@@ -107,17 +107,19 @@ jobs:
               --fixture hello=examples/hello/Main.lean --fixture filesystem=integration/fixtures/FilesystemSurface.lean
       - name: Collect comparable outputs
         run: |
-          node scripts/link-driver/collect-outputs.mjs .work/lt/node ".work/lt/collected/$PLATFORM/node"
-          if [ -d .work/lt/emcc ]; then node scripts/link-driver/collect-outputs.mjs .work/lt/emcc ".work/lt/collected/$PLATFORM/emcc"; fi
-          { echo "### $PLATFORM"; echo '```json'; cat ".work/lt/collected/$PLATFORM/node/hashes.json"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          node scripts/link-driver/collect-outputs.mjs .work/lt/node ".work/lt/upload/collected/$PLATFORM/node"
+          if [ -d .work/lt/emcc ]; then node scripts/link-driver/collect-outputs.mjs .work/lt/emcc ".work/lt/upload/collected/$PLATFORM/emcc"; fi
+          { echo "### $PLATFORM"; echo '```json'; cat ".work/lt/upload/collected/$PLATFORM/node/hashes.json"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Gather logs for upload
+        if: always()
+        run: |
+          mkdir -p ".work/lt/upload/logs/$PLATFORM"
+          cp .work/lt/*.out .work/lt-*-resources.json ".work/lt/upload/logs/$PLATFORM/" 2>/dev/null || true
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: fixtures-${{ matrix.platform }}
-          path: |
-            .work/lt/collected/
-            .work/lt/*.out
-            .work/lt-*-resources.json
+          path: .work/lt/upload/
           retention-days: 7
           if-no-files-found: warn
 
@@ -139,15 +141,16 @@ jobs:
           merge-multiple: true
       - name: Compare every platform with linux-x64
         run: |
-          ls -R .work/fixtures/lt/collected | head -50
+          ls -R .work/fixtures | head -60
           set +e
-          node scripts/link-driver/compare-platforms.mjs .work/fixtures/lt/collected --json .work/equality.json | tee .work/equality.txt
+          mkdir -p .work/eq
+          node scripts/link-driver/compare-platforms.mjs .work/fixtures/collected --json .work/eq/equality.json | tee .work/eq/equality.txt
           status=${PIPESTATUS[0]}
-          { echo '### Cross-platform equality'; echo '```'; cat .work/equality.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          { echo '### Cross-platform equality'; echo '```'; cat .work/eq/equality.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit $status
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: equality
-          path: .work/equality.*
+          path: .work/eq/
           retention-days: 7
