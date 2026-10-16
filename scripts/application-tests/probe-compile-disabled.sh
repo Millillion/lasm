@@ -60,13 +60,11 @@ run_after "$file"
 printf 'application-build\n' > "$evidence/phase.txt"
 run_before "$file"
 "$LASM_BUILD_NODE" "$LASM_COMPILER/bin/lasm.mjs" build "$PWD/$file" \
-  --target "$LASM_APPLICATION_TARGET" --output "$evidence/dist"
+  --output "$evidence/dist"
 "$LASM_BUILD_NODE" "${BASH_SOURCE[0]%/*}/reclaim-case-metadata.mjs" \
   "$PWD/$file" "$evidence/dist" "$evidence/module-data-reclamation.json"
-prefix=()
-if [[ $LASM_APPLICATION_TARGET == deno ]]; then prefix=(run -A); fi
 printf 'application-runtime\n' > "$evidence/phase.txt"
-capture_only "$file" "$LASM_APPLICATION_ENGINE" "${prefix[@]}" "$evidence/dist/main.mjs" "${TEST_ARGS[@]}"
+capture_only "$file" "$LASM_APPLICATION_ENGINE" "$evidence/dist/main.mjs" "${TEST_ARGS[@]}"
 cp "$file.out.produced" "$evidence/target-raw.out"
 printf '%s\n' "$EXIT" > "$evidence/target-exit.txt"
 normalize_measurements

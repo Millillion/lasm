@@ -10,9 +10,10 @@ import { nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg] = process.argv.slice(2);
-if (!outputArg || !['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)
-  throw new Error('Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER');
+const [outputArg, engineArg, compilerArg] = process.argv.slice(2);
+const target = 'node';
+if (!outputArg || !engineArg || !compilerArg)
+  throw new Error('Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER');
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg);
 if (existsSync(output)) throw new Error('Preserve previous comparison output');
 mkdirSync(output, { recursive: true });
@@ -64,14 +65,14 @@ try {
     absolute: String(process.platform === 'win32'),
   });
   const dist = join(output, 'dist');
-  run('build', process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', source, '--target', target, '--output', dist]);
+  run('build', process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', source, '--output', dist]);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8'));
   const deployed = join(output, 'relocated deployment'), empty = join(output, 'empty-cwd');
   renameSync(dist, deployed); renameSync(source, source + '.hidden'); mkdirSync(empty);
   const deployedEnvironment = Object.fromEntries(Object.entries(process.env)
     .filter(([name]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_TOOLCHAIN_CACHE)/.test(name)));
-  Object.assign(deployedEnvironment, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '1' });
-  report.deployed = parse(run('deployed', engine, [...(target === 'deno' ? ['run', '-A'] : []), join(deployed, 'main.mjs')],
+  Object.assign(deployedEnvironment, { PATH: '', LEAN_NUM_THREADS: '1' });
+  report.deployed = parse(run('deployed', engine, [join(deployed, 'main.mjs')],
     empty, deployedEnvironment));
   report.deployment = { directory: deployed, sourceHidden: true, path: '', buildToolEnvironmentRemoved: true,
     wasmSha256: await hashFile(join(deployed, 'program.wasm')) };

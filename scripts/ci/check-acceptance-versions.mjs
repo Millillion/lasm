@@ -7,14 +7,10 @@ const output = resolve(process.argv[2] ?? '.work/acceptance-versions.json');
 assert.ok(!existsSync(output), 'Preserve earlier release observations');
 const result = {};
 const versions = JSON.parse(readFileSync(new URL('./acceptance-versions.json', import.meta.url)));
-const names = process.argv[3] === '--node-only' ? ['lean', 'node'] : ['lean', 'node', 'deno', 'bun'];
-assert.ok(process.argv.length <= 3 || process.argv.length === 4 && process.argv[3] === '--node-only');
+const names = ['lean', 'node'];
+assert.ok(process.argv.length <= 3);
 for (const name of names) assert.match(versions[name], /^\d+\.\d+\.\d+$/);
-for (const [name, repository, expected] of [
-  ['lean', 'leanprover/lean4', 'v' + versions.lean], ['deno', 'denoland/deno', 'v' + versions.deno],
-  ['bun', 'oven-sh/bun', 'bun-v' + versions.bun],
-]) {
-  if (!names.includes(name)) continue;
+for (const [name, repository, expected] of [['lean', 'leanprover/lean4', 'v' + versions.lean]]) {
   const source = `https://api.github.com/repos/${repository}/releases/latest`;
   const response = await fetch(source, { headers: { 'User-Agent': 'Lasm-acceptance' }, signal: AbortSignal.timeout(30_000) });
   assert.ok(response.ok, `Release lookup failed: ${name} HTTP ${response.status}`);

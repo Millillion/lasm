@@ -13,13 +13,13 @@ Eight unchanged supplementary filesystem and console fixtures have fresh
 on Linux x64. Their outputs match exactly and cleanup checks pass. A retained
 pressure-aborted attempt precedes the successful base-page retry. The
 [installed `.25` comparisons](../evidence/lean-4.34.1-installed-io-2026-09-25.json)
-now pass all eight fixtures in each stock engine: 24 exact native/deployed output
+now pass all eight fixtures in stock Node: eight exact native/deployed output
 comparisons, including temporary-resource cleanup and source-hidden relocation
 with empty PATH. Peak memory is 4.48 GiB without resource events. Native
 validation on the other five platforms and complete API parity remain open.
 
 The [additional binary-console fixture](../evidence/lean-4.34.1-binary-console-2026-09-25.json)
-passes through all three installed targets and, separately, the private helper.
+passes through the installed Node target and, separately, the private helper.
 Ordinary `IO.FS` binary-file and stream APIs preserve every byte value, split
 writes and shutdown flushing. Both native controls and every deployment agree
 on 295 stdout bytes and seven stderr bytes. Raw byte records prevent invalid
@@ -27,27 +27,25 @@ UTF-8 from collapsing into falsely equal decoded text. This adds behavior
 coverage without claiming complete stream, descriptor or platform parity.
 
 The [large-file fixture](../evidence/lean-4.34.1-large-transfers-2026-09-25.json)
-now passes on installed `.27` in all three engines, matching both native
+now passes on installed `.27` in Node, matching both native
 controls for every byte of a 64 MiB + 1 byte file, a direct short read at EOF,
-and cleanup. Separate private-helper runs also pass after repairing Deno's
-per-byte worker-message heap overhead with internal ArrayBuffer envelopes.
-Forty-nine focused controls pass; one Windows-only check remains skipped on
-Linux. Earlier Deno heap-exhaustion evidence is retained, with no host OOM.
+and cleanup. Separate private-helper runs also pass. Forty-nine focused controls
+pass; one Windows-only check remains skipped on Linux.
 Whole-buffer allocation limits and full API/platform acceptance remain open.
 
 The [Linux system-query repair](../evidence/lean-4.34.1-system-memory-repair-2026-09-25.json)
 adds installed `.28` native/deployed comparisons for `osUname`, `freeMemory`,
-`totalMemory`, `constrainedMemory` and `availableMemory` in every stock engine.
+`totalMemory`, `constrainedMemory` and `availableMemory` in stock Node.
 OS identity and stable memory values match exactly; volatile values satisfy
 native range/constraint invariants. Separately, 39 deterministic file scenarios
-match the unchanged libuv 1.48 C implementation in all three engines, including
+match the unchanged libuv 1.48 C implementation in Node, including
 both cgroup formats, unlimited 64-bit values and missing-data fallbacks. Forty-seven
 focused checks pass. No stress allocations are used. This is Linux x64 evidence;
 other host combinations and complete declaration coverage remain unverified.
 
 The [expanded upstream HTTP IO comparison](../evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
-passes twelve original inputs and all 148 actions in each stock engine: 36
-native/deployed comparisons and 444 deployed actions. Inputs cover bodies,
+passes twelve original inputs and all 148 actions in stock Node: twelve
+native/deployed comparisons and 148 deployed actions. Inputs cover bodies,
 headers, dispatch, expectations, incremental/fuzz parsing, keep-alive,
 replayable bodies, request lines, response framing and trailers. Every original
 native driver passes before the separate byte-preserving parallel mains run.
@@ -59,12 +57,12 @@ contexts. All resource guards release without aborts. These Linux x64 behavior
 observations do not establish individual declaration coverage or complete
 `Std.Http` equivalence.
 
-[Ten further inputs pass in all three engines](../evidence/lean-4.34.1-upstream-io-stress-network-complete-2026-09-25.json),
-adding 30 comparisons and 213 deployed actions for temporary files, TCP, UDP,
+[Ten further inputs pass in Node](../evidence/lean-4.34.1-upstream-io-stress-network-complete-2026-09-25.json),
+adding ten comparisons and 71 deployed actions for temporary files, TCP, UDP,
 cancellation reasons and serial HTTP fuzz/hang cases. Eight integrity controls
 preserve exact sources, serial sidecars and execution requirements. Assertions
 and timeouts are unchanged; every resource guard releases without an abort.
-Combined coverage is 22 inputs per engine and 657 deployed actions. The TCP
+Combined coverage is 22 inputs and 219 deployed actions. The TCP
 half-close input runs only `listenClose`; its unused `acceptClose` definition
 does not establish behavior. Full declaration coverage, other evaluation contexts
 and all other native platforms remain pending.
@@ -107,7 +105,7 @@ audit peaked at 386 MiB with no resource events.
 - [ ] Trace executable dependencies, private helpers and dynamic callbacks.
 - [ ] Audit each runtime implementation, including platform-specific branches.
 - [ ] Map unchanged upstream and supplementary differential tests to APIs.
-- [ ] Complete behavior coverage across three engines and six native platforms.
+- [ ] Complete Node behavior coverage on six native platforms.
 
 The existing Emscripten implementations of `Std.Internal.UV.Loop.configure`
 and `alive` are explicit unsupported branches. Their linked symbols do not make
@@ -148,7 +146,7 @@ repair are retained separately. The rerun passes all six native cases on Linux
 and all four portable cases on Windows.
 
 The [installed `.14` IO comparison](../evidence/application-io-surface-2026-09-24.json)
-now passes all six cases in stock Node, Deno and Bun on Linux x64. Each of the
+now passes all six cases in stock Node on Linux x64. Each of the
 18 comparisons has independently matching interpreted-native, compiled-native
 and source-hidden deployed outputs, with an empty deployment PATH. Temporary
 and fixture cleanup checks pass. The peak is 3.47 GiB without memory or pressure
@@ -158,7 +156,7 @@ These tests exercise the stated operations and inputs, not every possible
 behavior of the 163 filesystem declarations or other standard APIs.
 
 The [installed Linux-query repair](../evidence/application-platform-linux-2026-09-24.json)
-now makes `System.Platform.isLinux` match native Linux in all three stock engines.
+now makes `System.Platform.isLinux` match native Linux in stock Node.
 The original source-index snapshot remains unchanged; the new runtime derives a
 single patched object, with every other archive member and bundle file verified.
 `isWindows`, `isOSX`, pointer width and the tested path behavior also match native
@@ -167,7 +165,7 @@ describe the actual Wasm artifact; zero libuv/OpenSSL version observations remai
 an open semantics audit.
 
 The unchanged [upstream floating-point package](../evidence/upstream-float-2026-09-24.json)
-now passes all 1,751,726 checks per engine through installed `.14` on Linux x64:
+now passes all 1,751,726 checks through installed `.14` on Linux x64:
 875,863 original vectors across 48 files, with both model and native backends.
 The original NaN-class comparison and ignored exception flags are preserved;
 timings are the only output excluded from differential comparison. This adds
@@ -177,12 +175,10 @@ floating-point, libm, other-API or native-platform parity.
 The [panic runtime repair](../evidence/upstream-debug-2026-09-24.json) replaces
 only `object.cpp.o`, preserving the other 33 runtime archive members and 17
 bundle files. Installed `.15` now captures actual Lean-thread backtraces in
-Node and Deno. The original debug/release project and environment controls
-establish the recorded panic/exit behavior; that candidate still lacked
-identifiable Bun Wasm frames. The later repair below extends this partial
-coverage; full symbolization and native platform validation remain open.
+Node. The original debug/release project and environment controls
+establish the recorded panic/exit behavior; full symbolization and native platform validation remain open.
 
-Installed `.16` adds [seven exact native panic comparisons per engine](../evidence/panic-semantics-2026-09-24.json)
+Installed `.16` adds [seven exact native panic comparisons](../evidence/panic-semantics-2026-09-24.json)
 on Linux x64. Ordinary panic fallback, actual redirected stderr, IO failure and
 process abort now match, including empty/zero environment values and bypassing
 redirected stderr during abort. The supplementary fixture uses public ordinary
@@ -190,9 +186,3 @@ Lean APIs. The private abort adapter is part of the relocated deployment; it
 does not introduce Lean syntax or public APIs. This leaves private Shell panic
 controls, full symbolization and other native platforms unverified.
 
-Installed `.18` [restores identifiable Bun Wasm frames](../evidence/bun-backtrace-2026-09-24.json)
-without replacing the engine or changing ordinary Lean code. All three engines
-pass the unchanged upstream debug executable and six parallel controls, including
-native abort behavior with backtraces enabled. The adapter preserves the original
-stack-hook settings and captures deep callers. Actual backend frames are retained;
-readable symbolization and the broader platform/API obligations remain open.

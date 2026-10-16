@@ -31,10 +31,9 @@ their original versions.
 
 The local `.25` candidate now passes
 [fresh installed main and reference-count checks](evidence/lean-4.34.1-installed-main-2026-09-25.json)
-in stock Node, Deno and Bun on Linux x64. Six native/deployed main comparisons
+in stock Node on Linux x64. Six native/deployed main comparisons
 cover Unicode/empty arguments, large-integer async work, filesystem operations
-and normal/error exit status; cache reuse and the direct-file command pass in
-each engine. The unchanged upstream `misc_dir/rc_sticky` source and shell driver
+and normal/error exit status; cache reuse and the direct-file command pass. The unchanged upstream `misc_dir/rc_sticky` source and shell driver
 also pass through the installed production linker, including separate relocated
 execution with sources hidden and PATH empty. This private parallel C-test
 adapter adds no public foreign-code CLI. Installation used the local npm cache
@@ -54,15 +53,15 @@ covering source, compiler, toolchain and original output. Peak memory is
 extend cold-install acceptance to the other native hosts or close full API parity.
 
 The [fresh installed IO campaign](evidence/lean-4.34.1-installed-io-2026-09-25.json)
-passes all eight supplementary filesystem/console fixtures in each stock engine
-on Linux x64. All 24 source-hidden deployed comparisons match interpreted and
+passes all eight supplementary filesystem/console fixtures in Node
+on Linux x64. All source-hidden deployed comparisons match interpreted and
 C-compiled native output and pass cleanup checks. Peak memory is 4.48 GiB with
 no resource events. The queue stops only after the final successful IO workload
 releases its guard, before the HTTP server's larger module-data copies; HTTP
 continues separately with additional disk headroom.
 
 A [byte-exact console/filesystem fixture](evidence/lean-4.34.1-binary-console-2026-09-25.json)
-also passes in all three installed targets. It round-trips every byte value
+also passes in the installed Node target. It round-trips every byte value
 through a binary file, flushes individual console bytes, writes split UTF-8 and
 invalid UTF-8, and leaves its final output for normal shutdown. Both native
 controls and the relocated deployments produce exactly 295 stdout bytes and
@@ -72,8 +71,8 @@ invalid bytes can evade the preceding text-only comparison. Installed builds
 peak at 3.44 GiB. These Linux x64 observations do not establish other platforms.
 
 The [real-terminal continuation](evidence/lean-4.34.1-terminal-2026-09-25.json)
-passes nine installed `.27` executions and 18 interpreted/compiled native
-controls across the three engines. A real raw controlling terminal verifies
+passes installed `.27` executions and interpreted/compiled native
+controls in Node. A real raw controlling terminal verifies
 standard handles and `/dev/tty`, a concurrent timer while input is blocked,
 Unicode lines and binary reads/writes. A separate 16 KiB write remains pending
 while the OS pipe is measured full at 4 KiB, then completes after the reader
@@ -83,16 +82,15 @@ hidden and PATH empty. Guards release without resource events; peak memory is
 3.44 GiB. This does not establish cooked-terminal or Windows-console behavior.
 
 The [installed `.28` system-query repair](evidence/lean-4.34.1-system-memory-repair-2026-09-25.json)
-passes in all three engines on Linux x64. Ordinary Lean programs match native
+passes in Node on Linux x64. Ordinary Lean programs match native
 OS identity, total memory and the cgroup constraint after relocation, with
 source hidden and PATH empty. Available/free memory is volatile; those values
 use range and constraint assertions. The private host reads the same bounded
-Linux metadata as Lean's libuv 1.48 and retains unsigned 64-bit values exactly.
-This corrects Deno/Bun's earlier host-wide available-memory result and Deno's
-OS version/release mismatch without adding any Lean API.
+Linux metadata as Lean's libuv 1.48 and retains unsigned 64-bit values exactly,
+without adding any Lean API.
 
 Thirty-nine synthetic file scenarios match the unchanged upstream C functions
-in each engine, and direct native-library controls pass under a 1 GiB cap.
+in Node, and direct native-library controls pass under a 1 GiB cap.
 Forty-seven focused checks also cover deployment dependencies; retained callable
 outputs and compiler snapshots now include the memory adapter and missing
 signal/worker-message support files. These checks establish file completeness,
@@ -106,7 +104,7 @@ process-tree cap completes at 1.71 GiB, followed by byte-verified npm installati
 Other native platforms and full API acceptance remain open.
 
 The [installed `.29` TCP repair](evidence/lean-4.34.1-tcp-error-phases-2026-09-25.json)
-matches 66 ordinary Lean observations across Node, Deno and Bun on Linux x64.
+matches ordinary Lean observations in Node on Linux x64.
 Both native execution modes agree with every relocated deployment, with source
 hidden and PATH empty. The private bridge now distinguishes errors raised by an
 IO action before it returns a promise from errors delivered through that promise.
@@ -115,29 +113,24 @@ errors, EOF readiness and shutdown behavior observed in the native controls.
 
 Only the async bridge object changes in a freshly verified runtime archive;
 the 2,516 standard modules and original runtime bundle remain intact. Twenty-one
-focused checks and sixty unchanged HTTP checks pass, including thirty deployed
-and thirty native HTTP checks. Disk preflight refusals prevented execution when
+focused checks and the unchanged deployed and native HTTP checks pass. Disk preflight refusals prevented execution when
 headroom was insufficient. An archival attempt reached its proactive memory
 budget without OOM or swap; a bounded streaming retry with file-cache eviction
 passes under the same cap. These results leave complete TCP/API and native
 platform acceptance open.
 
 The [installed `.31` working-directory comparisons](evidence/lean-4.34.1-raw-working-directory-2026-09-25.json)
-pass in all three stock engines on Linux x64. Six cases per engine cover valid
+pass in stock Node on Linux x64. Six cases cover valid
 Unicode, invalid UTF-8 and truncated UTF-8 directory names, each inherited at
 startup or entered through an ASCII symlink. Both ordinary Lean cwd APIs,
-relative reads/writes/rename/removal and parent traversal match 36 interpreted
+relative reads/writes/rename/removal and parent traversal match interpreted
 and C-compiled native controls. Deployments are relocated with source hidden
 and PATH empty; no Lean API or syntax is added.
 
 The host anchors the inherited directory without decoding its name and returns
-native filename bytes to Lean. Deno's exceptional worker bootstrap has a private
-filesystem context and is disposed after final output drains. Twenty-three
-regression checks cover messaging, transferred ports, shared memory, clone and
+native filename bytes to Lean. Twenty-three regression checks cover messaging, transferred ports, shared memory, clone and
 worker failures, disposal, existing directory behavior and packaged dependencies.
-The first installed retry exposed a second failure in Deno's engine diagnostic
-report; signal initialization now detects libc from its loaded symbols. All
-earlier failures remain recorded. Successful workloads peak at 3.57 GiB, with
+All earlier failures remain recorded. Successful workloads peak at 3.57 GiB, with
 no resource events and at least 5.42 GiB free disk. Other platforms, Linux hosts
 without the required `/proc`/unshare facilities and broader path/process behavior
 remain open.
@@ -150,7 +143,6 @@ CLI supplies its ordinary module data; the harness verifies and reclaims only
 the redundant generated cache copy after the build. Peak memory is 7.76 GiB
 with no resource stop or OOM events, and disk free space remains above 4.71 GiB.
 Completed data and Wasm binaries are retained in verified lossless archives.
-Deno/Bun HTTP server revalidation remains pending at this checkpoint.
 
 An additional [Node upstream HTTP comparison](evidence/lean-4.34.1-upstream-http-io-node-2026-09-25.json)
 passes all 85 IO actions from three original elaboration tests. A separate copy
@@ -159,20 +151,11 @@ with a named action called by ordinary `main`. Original native drivers, native
 interpreted/compiled copies and installed relocated execution all pass. These
 are additional API checks; the original registrations remain native compiler
 tests, and this does not establish full HTTP or suite compatibility.
-The [Deno/Bun continuation](evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
-also passes, completing nine comparisons and 255 deployed actions across the
-three engines. Original sources and assertions are unchanged, and no resource
-abort or OOM event occurs. The ordinary HTTP server's remaining engine checks
-continue separately.
 
 The [full HTTP fixture continuation](evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json)
-now passes all sixty Vitest checks: ten deployed and ten native checks per stock
-engine, with zero failures/skips and unchanged sources/assertions/deadlines.
-All three builds produce identical runtime module-data identities. The maximum
-guarded peak is 7.76 GiB and no OOM, swap or proactive memory stop occurs.
-Bun's first attempt stops at disk preflight before any test or build starts;
-verified lossless archival recovers headroom and the fresh retry retains the
-same nine-GiB start allowance, four-GiB reserve and ten-GiB memory cap. This closes
+passes ten deployed and ten native checks in Node, with zero failures/skips and
+unchanged sources/assertions/deadlines. The maximum guarded peak is 7.76 GiB and
+no OOM, swap or proactive memory stop occurs. This closes
 the latest-release Linux x64 HTTP example comparison, not complete API or
 native platform acceptance.
 
@@ -285,8 +268,8 @@ C++ runtime and existing host adapters. This builds application libraries, not
 a Wasm Lean compiler executable. The guarded build peaked at 2.17 GiB with no
 OOM or pressure stops.
 
-A compiled ordinary Lean main now matches native Lean on **stock Node 26.10.0,
-Deno 2.9.7 and Bun 1.4.2** on Linux x64. Checks cover console output, filesystem
+A compiled ordinary Lean main now matches native Lean on **stock Node 26.10.0**
+on Linux x64. Checks cover console output, filesystem
 round trips and missing-file errors, tasks and sleep, Unicode/empty arguments,
 large natural numbers, ordinary exceptions and exit codes. Each complete output
 directory was relocated and run from a separate working directory with an empty
@@ -294,50 +277,40 @@ PATH and no Lean toolchain environment. Host support and notices are bundled.
 Each probe peaked below 0.5 GiB. See the
 [application evidence](evidence/application-aot-three-engines-2026-09-23.json).
 
-Node/Deno use native Wasm64 addressing. Stock Bun uses Emscripten's lowered
-memory mode while retaining Lean's 64-bit layout; its current 4 GiB linear-memory
-ceiling and large-memory behavior remain open work. These small application
+Node uses native Wasm64 addressing. These small application
 passes do not establish full API compatibility, a finished managed CLI, or the
 other native platform results.
 
 The ordinary three-module Lean 4.34 HTTP application now uses Lake C generation
 and the full threaded runtime, including the compiler/reflection symbol registry.
-Lean 4.34's package-qualified symbols are included in that registry. All three
-stock engines pass the twenty-check parallel Vitest suite (ten deployed HTTP
-checks and ten corresponding native checks per engine), covering persistence,
+Lean 4.34's package-qualified symbols are included in that registry. Stock Node
+passes the twenty-check parallel Vitest suite (ten deployed HTTP
+checks and ten corresponding native checks), covering persistence,
 concurrent writes, validation, streaming, cancellation and shutdown. The
 [HTTP evidence](evidence/application-http-three-engines-2026-09-23.json) records
 exact artifacts, tests, deadlines and resources.
 
-Reusing the verified function-table index and bulk allocation optimization cut
-stock Bun's first server startup from 36.32 seconds to about two seconds with
-unchanged Wasm. The initial timeout runs remain preserved separately. This is
+This is
 Linux x64 maintainer-build evidence; primary CLI packaging, callable libraries,
 full API coverage, long-duration cleanup and the six-platform application matrix
 remain unfinished.
 
 The command parser covers the planned direct-file/run/build forms, options
-before or after the filename, target selection, output directories, and the
+before or after the filename, output directories, and the
 application-argument separator. Nineteen parser checks pass. The primary CLI now
 uses the parser and the managed full-runtime application builder. JSON binding
 configurations still select the preserved older callable-library implementation.
 
-The source-tree `lasm-node.js`, `lasm-deno.js` and `lasm-bun.js` compatibility
-filenames now call that same managed application pipeline. They preserve the
-earlier `[--rebuild] [--verbose] Main.lean [--] arguments…` syntax. Running a
-wrapper under Deno/Bun invokes Node for compilation and then the exact original
-engine executable for the application; Node must be on PATH. Node can also run
-any of the three wrapper files, with the selected deployment engine on PATH.
+The source-tree `lasm-node.js` compatibility
+filename now calls that same managed application pipeline. It preserves the
+earlier `[--rebuild] [--verbose] Main.lean [--] arguments…` syntax.
 Help and usage errors perform no tool downloads. The 23 parser/launcher controls
 now pass on all six native platforms; see the
 [launcher evidence](evidence/application-launchers-2026-09-23.json).
-Real installed-candidate launcher acceptance now passes on Linux x64 in all
-three engines, as recorded below. The
+Real installed-candidate launcher acceptance now passes on Linux x64 in Node,
+as recorded below. The
 earlier 4.32 implementation and its regression fixtures remain explicitly legacy.
-Run commands now check that the selected engine starts before creating a build
-cache or downloading tools. Build-only commands still require only Node/npm.
-The added missing-engine check passes on all six hosts; the evidence also
-retains the earlier 22-check run.
+The evidence also retains the earlier 22-check run.
 
 The full-runtime output helper packages host adapters and native support and
 generates a relative `main.mjs` launcher. Three loader checks cover relocation,
@@ -377,7 +350,7 @@ campaign keeps its original package identity.
 Native file/descriptor checks exposed incorrect fixed-arity bindings for POSIX
 `open` and `fcntl` on macOS ARM64. The repaired variadic bindings pass file
 creation, permissions, reopen, append, exclusive-create and descriptor checks
-in stock Node 26.10.0, Deno 2.9.7 and Bun 1.4.2 on all six native platforms.
+in stock Node 26.10.0 on all six native platforms.
 The two POSIX-only pipe/socket checks explicitly do not apply to Windows.
 These [host-adapter results](evidence/native-file-abi-2026-09-23.json) do not
 establish full filesystem or compiled-application parity on those hosts.
@@ -400,10 +373,7 @@ cache. The first SDK Wasm64 system-library build was included and peaked at
 clean npm installation claim. The ordinary Lake HTTP project also passes all
 20 differential checks through the primary CLI, peaking at 3.19 GiB.
 
-Stock Deno 2.9.7 and Bun 1.4.2 now pass the same managed-build controls and
-the direct-file CLI with application arguments after `--`. The latest cached
-Bun build took 15.27 seconds, mostly native tool integrity checks; faster repeat
-startup remains work. The [managed CLI evidence](evidence/managed-application-cli-2026-09-23.json)
+The [managed CLI evidence](evidence/managed-application-cli-2026-09-23.json)
 keeps exact build inputs, native comparisons, cache timings and guarded resource
 reports. These passes used preprovisioned verified tool caches and a maintainer
 runtime-bundle path, so package installation remains a separate gate.
@@ -435,44 +405,41 @@ assembler preserves the older callable-library target with its original Lean
 4.32 requirements.
 
 The same npm-installed candidate now compiles the ordinary three-module Lake
-HTTP server for Node, Deno and stock Bun. Each engine passes all 20 Vitest checks
+HTTP server for Node. It passes all 20 Vitest checks
 (ten deployed tests and ten native controls), with no failures or skips. These
 cover routing, validation, binary bodies, concurrent persisted mutations,
-streaming/cancellation and graceful restart. All three runs use the candidate's
+streaming/cancellation and graceful restart. The run uses the candidate's
 packaged runtime and host support, with no maintainer runtime override; managed
-tools are reused from the cold installation. Peaks were 3.20, 4.05 and 3.88 GiB,
-respectively, with no resource events. See the
+tools are reused from the cold installation. The peak was 3.20 GiB,
+with no resource events. See the
 [installed HTTP evidence](evidence/installed-http-three-engines-2026-09-23.json).
 This closes the Linux installed-package HTTP example check; the broader API,
 callable/Express, dependency and platform requirements remain open.
 
 The next candidate, `0.1.0-experimental.5`, repairs application self-launching:
-ordinary `IO.Process` calls using `IO.appPath` start the selected engine with
+ordinary `IO.Process` calls using `IO.appPath` start Node with
 the deployed entry point. The original cross-process closure-save/load test now
-passes through that installed package in all three engines. Host controls also
+passes through that installed package in Node. Host controls also
 verify Unicode/empty arguments, explicit cwd, pipes, PID/exit status and an empty
-PATH with environment inheritance disabled. Deno's automatic Node PATH shim is
-temporarily disabled during this child startup; original visible values are
-restored before the application starts. See the
+PATH with environment inheritance disabled. See the
 [repair evidence](evidence/application-self-launch-2026-09-23.json). This exact
 self-path mapping still needs broader alias/other-deployment/platform coverage.
 
 Installed candidate `0.1.0-experimental.9` now passes an ordinary three-module
-Lake project with a pinned local Git dependency in stock Node, Deno and Bun on
+Lake project with a pinned local Git dependency in stock Node on
 Linux x64. Each run verifies non-default source roots, a symlinked entry source,
 exact cache reuse, dependency-source invalidation, preservation of added assets,
-the engine-specific compatibility launcher, and relocated deployment with an
+the compatibility launcher, and relocated deployment with an
 empty PATH. Output, errors and exit status match the native Lake executable.
-Arguments include Unicode, empty strings, spaces, the literal engine path and
+Arguments include Unicode, empty strings, spaces, the literal Node executable path and
 option-like data. The sequential guarded campaign peaked at 4.85 GiB without
 resource events. See the [installed Lake evidence](evidence/installed-lake-three-engines-2026-09-23.json).
 
-Two real failures led to these repairs. Lake's file query resolves symlinks before
+A real failure led to this repair. Lake's file query resolves symlinks before
 looking up the module, which loses a configured entry whose destination is outside
 `srcDir`. A private build-time Lean helper now asks the evaluated Lake workspace
-for the configured module, checking its resolved file. Deno's child-process shim
-also rewrote a literal Deno executable path inside application arguments. The
-private Node build bridge now receives one JSON payload, preserving those strings.
+for the configured module, checking its resolved file. The
+private Node build bridge now receives one JSON payload, preserving argument strings.
 Earlier failures remain recorded. Other native platforms, remote Lake transports,
 and concurrent full CLI builds still require end-to-end validation.
 
@@ -480,7 +447,7 @@ Installed candidate `0.1.0-experimental.10` also accepts ordinary Lake scripts
 outside the configured library/executable targets. Lake supplies imports, package
 compiler options and build-time setup through its standard `lake lean` command.
 The script is re-elaborated to observe setup changes; unchanged generated inputs
-still reuse the final compiled application. All three stock engines pass the
+still reuse the final compiled application. Stock Node passes the
 same dependency, symlink, cache, asset and relocation checks, including a
 compile-time assertion that the package's `maxRecDepth` option is honored. The
 sequential campaign peaked at 5.03 GiB with no resource events. See the
@@ -495,16 +462,15 @@ found and repaired a release-specific mismatch: the newer runtime uses libuv
 messages for CRT failures and positive numbers for libuv errors. The private
 application prelude now selects the matching Lean error policy; the retained
 Lean 4.32 path keeps its earlier ABI. All 221 native-library decoder cases match
-in Node, Deno and Bun on Linux x64, including otherwise-unrepresentable errno
+in Node on Linux x64, including otherwise-unrepresentable errno
 values. Explicit Lean messages, such as NUL-path errors, remain intact.
 
-The installed filesystem differential then caught Deno's general removal
-operation behind its Node-compatible `unlink`. The POSIX host now calls the
+The POSIX host now calls the
 native `unlink` primitive, so file removal preserves directories and native
 errors. Candidate `0.1.0-experimental.12` passes the unchanged ordinary Lean
-filesystem fixture in all three engines against interpreted and native-compiled
+filesystem fixture in Node against interpreted and native-compiled
 controls, with relocated output, hidden build sources and empty PATH. Separate
-unlink controls pass in each engine and 17 focused Node regressions pass. The
+unlink controls pass and 17 focused Node regressions pass. The
 final guarded campaign peaked at 5.66 GiB without resource events. Earlier
 failures remain recorded; complete API and native-platform coverage are open.
 
@@ -588,16 +554,16 @@ Installed `.19` [repairs Lake project discovery](evidence/runtime-imports-and-la
 for configurations whose defaults require initialized native Lake constants.
 The private helper now loads the verified managed Lake library as a Lean plugin,
 using Lake's upstream platform-specific library paths. Native Linux discovery
-controls and installed application comparisons in all three engines pass. This
+controls and installed application comparisons in Node pass. This
 does not establish discovery acceptance on the other native hosts. The associated
 runtime-import comparisons use explicitly supplied metadata; automatic packaging
 of that data remains required for self-contained deployments.
 
 - [x] Wire managed compiler/linker/runtime artifacts into the primary CLI.
-- [x] Build matching Lean 4.34 application libraries and pass the first three-engine
+- [x] Build matching Lean 4.34 application libraries and pass the first Node
   differential main probe; full API validation remains required below.
 - [ ] Produce portable `dist/main.mjs` output and callable bindings for stock
-  Node, Deno and Bun; preserve full threading/IO semantics.
+  Node; preserve full threading/IO semantics.
 - [ ] Supply and validate the Windows ARM64 native compiler distribution.
 - [ ] Verify the entire native OS/architecture matrix and source-free deployment.
 - [ ] Classify unchanged upstream tests for the application pipeline, and add
@@ -623,122 +589,43 @@ Lean 4.34.0 and Node 26.10.0. Linux checks 221 error inputs per architecture;
 Windows checks 168. Constructors, numeric codes and diagnostic messages match
 the original native library. Windows uses libuv 1.52.1; the Linux distributions
 link 1.48.0. This validates the host decoder, not all IO operations, deployed
-Wasm, other engines on those runners, or the complete six-platform installation
+Wasm, or the complete six-platform installation
 contract. The earlier cold-extraction resource stops and seven Windows failures
 remain preserved alongside the passing follow-up.
 
-The [Deno startup adapter](evidence/deno-stack-startup-2026-09-24.json) configures
-V8's execution stack before a directly launched POSIX application initializes,
-using native exec with the original Deno arguments and permission flags. Seven
-Linux x64 source controls pass, including a failing unconfigured recursion
-control, same-PID signal delivery, stdio, empty/Unicode arguments, environment
-restoration, and explicit network/subprocess denials. A separate prototype runs
-the unchanged Lean benchmark five times. Installed-candidate and native macOS
-checks remain pending. Windows needs a different implementation. Imported or
-preloaded mains keep their caller's engine configuration to avoid replaying user
-effects; those embedding cases remain a deep-stack acceptance gap.
-
-Installed candidate `0.1.0-experimental.13` now passes thirty unchanged
-`const_fold` repetitions in stock Deno 2.9.7 on Linux x64 with ordinary
-`deno run -A`, plus a relocated run with its source hidden and PATH empty.
-The original 4 GiB stack setting and native compiled/interpreted controls are
-preserved. Packaging, installation and execution peaked at 4.20 GiB without
-resource events. See the [installed evidence](evidence/deno-stack-installed-2026-09-24.json).
-Seven startup controls also pass on each native macOS architecture. The first
-Linux CI jobs were green but skipped four Deno checks because their engine path
-was not forwarded through systemd; their logs are preserved and the corrected
-workflow requires that engine rather than accepting an implicit skip.
-
-The [corrected Deno startup matrix](evidence/deno-stack-native-ci-2026-09-24.json)
-now executes **all seven controls with zero skips on Linux and macOS, each on
-x64 and ARM64**. This confirms the adapter's native argument-vector handling
-and observed startup behavior on those four platforms. It remains source-level
-startup evidence, separate from full deployed Lean application acceptance.
-
-The [bundled Bun startup adapter](evidence/bun-stack-startup-installed-2026-09-24.json)
-now configures both Linux worker reservations and Bun's separate JSC execution
-budget before a directly launched application starts. A verified private shared
-library ships in the output; same-PID exec preserves argument bytes, stdio,
-inherited descriptors and both the native and JavaScript environments. Opening
-the helper through an inherited descriptor supports deployment paths containing
-spaces. Bun itself is the unchanged released binary.
-
-Installed `.20` passes all three repetitions of the previously failing ordinary
-Lean channel/mutex application on Linux x64, after relocation with sources hidden
-and PATH empty. Fourteen startup/deployment controls pass with zero skips; the
-maximum installed-build/run peak is 3.45 GiB without resource events. The earlier
-application failure and initial startup-loop defect remain recorded. Native
-ARM64/musl acceptance, macOS/Windows implementation and deep-stack embedding or
-preload/configuration support remain open. The prepared Linux x64/ARM64 CI
-workflow tests a natively compiled helper, separately from shipped-binary checks.
-
-That workflow's [first native attempt](evidence/bun-stack-native-ci-build-failure-2026-09-24.json)
-failed before runtime checks: GCC rejects an ignored diagnostic `write` result
-under the retained strict warnings. The source now handles short writes and
-interruption explicitly; a new malformed-reservation control exercises that
-diagnostic. Native follow-up validation remains pending.
-
-The [corrected native run](evidence/bun-stack-native-ci-2026-09-24.json) passes
-all **eleven checks with zero skips on Linux x64 and ARM64**. Both source-built
-GCC helpers execute the recursion, environment-byte, descriptor, signal and
-preload controls. The maximum guarded peak is 65.9 MiB, with no resource events.
-Local strict-GCC compilation, rebuilt Zig helpers and fifteen startup/output
-controls also pass. These results retain the earlier failed run and do not
-establish complete installed application acceptance on ARM64.
-
-Installed `.21` [repairs Deno SIGUSR1 delivery](evidence/upstream-signal-2026-09-24.json)
-without starting its debugger. The private native signal helper ships in both
-the npm candidate and deployment, requires no user compiler, and adds no Lean
-API. The unchanged excluded upstream signal application now matches native
-stdout, stderr and termination in Node, Deno and Bun on Linux x64 with sources
+Installed `.21` adds a [private native signal helper](evidence/upstream-signal-2026-09-24.json)
+that ships in both the npm candidate and deployment, requires no user compiler,
+and adds no Lean API. The unchanged excluded upstream signal application now matches native
+stdout, stderr and termination in Node on Linux x64 with sources
 hidden and PATH empty. Nine focused controls pass; the largest application
-campaign peaks at 3.45 GiB without resource events. Other native platforms,
-the complete signal API and Deno-native observer coexistence remain pending.
+campaign peaks at 3.45 GiB without resource events. Other native platforms
+and the complete signal API remain pending.
 
 The [native signal CI follow-up](evidence/signal-native-ci-2026-09-24.json)
 executes all nine checks with zero skips on both Linux x64 and ARM64, using
-native GCC helpers and all three stock engines. Maximum guarded memory is
+native GCC helpers and stock Node. Maximum guarded memory is
 59.9 MiB without resource events. Separate Linux x64 host-adapter probes also
-pass all 22 signal names per engine. These are source-helper controls, not
+pass all 22 signal names. These are source-helper controls, not
 complete installed Lean ARM64 or default-signal-behavior acceptance.
 
-Installed `.22` [matches 48 supplementary native Lean signal comparisons](evidence/application-signal-policy-2026-09-24.json)
-on Linux x64. Every engine completes one-shot and repeated delivery for all 22
+Installed `.22` [matches supplementary native Lean signal comparisons](evidence/application-signal-policy-2026-09-24.json)
+on Linux x64. Node completes one-shot and repeated delivery for all 22
 signal names, then matches seven default actions both before and after stopping
 a waiter. The generated standalone entry removes the engine-owned SIGUSR1
-debugger hooks in Node/Deno and the SIGABRT crash reporter in Bun. Existing
+debugger hooks in Node. Existing
 JavaScript listeners, external native handlers and observed ignored dispositions
 retain their caller policy. Forty-five focused controls pass without skips;
-the installed comparisons peak at 3.45 GiB with no resource events. All four
-earlier differences remain recorded. Deno-native observer coexistence, inherited
+the installed comparisons peak at 3.45 GiB with no resource events. Earlier
+differences remain recorded. Inherited
 state altered before JavaScript entry, cancellation races, callable embedding
 and other native platforms remain unverified. The native Linux workflow now
 includes the expanded controls; its new run is pending.
 
-The [expanded native Linux CI attempt](evidence/signal-policy-native-ci-failure-2026-09-24.json)
-passes 43 of 45 controls on each architecture. Bun's two default SIGABRT
-termination cases reach the unchanged ten-second deadline; neither guard records
-a resource event. A core-collection difference is under investigation: the
-workflow's shell limit was outside the systemd service. The guard now applies
-the zero core-file limit inside that service, and timeout diagnostics retain
-child signal masks and process state. This is a pending investigation, not a
-verified repair or a completed native signal gate.
-
-The [diagnostic follow-up](evidence/signal-policy-core-collector-2026-09-24.json)
-confirms that both Bun children are already core-dumping at the deadline despite
-zero soft and hard core-file limits. The CI runner's piped systemd collector
-ignores those limits; ARM64 records a wait in `anon_pipe_write`. The workflow
-now temporarily selects a plain core filename on its disposable dedicated
-runner so the zero limit is effective, then restores the original pattern.
-Application expectations and deadlines are unchanged, and no desktop setting
-is modified. Follow-up execution remains pending.
-
 The [corrected native signal run](evidence/signal-policy-native-ci-2026-09-24.json)
 passes **all 45 controls without skips on Linux x64 and ARM64**. Child diagnostics
-confirm both zero core-file limits and the plain core pattern; both restoration
-steps succeed. Every process-tree guard releases without resource events. The
-earlier failed runs are retained. These source-helper controls expand Linux
-evidence but do not establish complete installed Lean ARM64 or other-platform
+confirm zero core-file limits and a plain core pattern; both restoration
+steps succeed. Every process-tree guard releases without resource events.
+These source-helper controls expand Linux evidence but do not establish complete installed Lean ARM64 or other-platform
 signal acceptance.
 
 Automatic module-data packaging is now wired into the application builder,
@@ -780,7 +667,7 @@ The installed import harness now supports
 [separate original and attribute selections](evidence/application-module-data-split-preflight-2026-09-24.json).
 Each builds one application per guard; original imports and missing-data errors
 remain together, while the supplementary runtime assertions run separately.
-Both selections in every engine are still required. This allows verified
+Both selections are still required. This allows verified
 archival of completed generated data between checks without raising resource
 limits. Syntax checks pass; these selections have not yet executed.
 
@@ -794,33 +681,27 @@ Three integrity controls cover a new parallel-harness step that verifies and
 removes only that redundant cache copy before future execution. The effect on
 execution peak was not yet measured in that initial result.
 
-[Both selections now pass on Node and Deno](evidence/application-module-data-node-deno-2026-09-24.json)
+Both selections now pass on Node
 with installed `.23`: original imports, exact missing-standard-data errors and
 the three supplementary runtime attribute checks. All 7,669 upstream source
 hashes remain unchanged. Deployed processes have no Lean path environment inputs,
 an empty executable search path and hidden source directories. The Node attribute
-run peaked at 7.59 GiB; Deno's original and attribute runs peaked at 6.20 and
-6.34 GiB. All four guards released without OOM, memory-limit or throttle events.
+run peaked at 7.59 GiB. Both guards released without OOM, memory-limit or throttle events.
 Removing duplicate metadata after the build reduces retained data, but these
 results do not show a lower overall build peak. Every completed deployment's
 metadata and generated binaries have verified archives and restore receipts.
-The [same two selections also pass in Bun](evidence/application-module-data-bun-2026-09-24.json),
-with exact native observations and unchanged sources. Its original and attribute
-runs peaked at 5.86 and 6.85 GiB. The first Bun attempt was stopped before
-completion to protect the disk reserve; its incomplete result remains separate.
-Verified binary archives restored headroom, and subsequent cases required at
-least 9 GiB available disk before starting. All six successful cases use the
-same installed `.23` candidate, in separate sequential guards. Other native
+Both cases use the same installed `.23` candidate, in separate sequential
+guards. Other native
 platforms and complete dynamic-module handling remain open.
 
 Installed `.24` [repairs the ordinary Windows timezone APIs on Linux](evidence/windows-timezone-installed-2026-09-24.json):
-all 13 observations match native Lean in each of Node, Deno and Bun. The old
+all 13 observations match native Lean in Node. The old
 package returned a synthetic UTC value, unsupported-operation errors for named
 zones and a guest errno for local-zone lookup. The private host dispatch now
 retains the corresponding host's behavior. On Windows, its implementation binds
 the same ICU C functions used by Lean. A supplementary cross-language control
 executes the original upstream function bodies with Linux ICU and matches 27
-cases per engine. Native Windows validation is prepared separately and has not
+cases. Native Windows validation is prepared separately and has not
 run; the Linux control is not a Windows acceptance result. The runtime derivation
 verifies both changed archive members and every unchanged member, without
 rebuilding the 2,516 standard modules. The retained Lean 4.32 runtime stays outside
@@ -900,7 +781,7 @@ with no OOM, memory-limit or pressure events. Five SDK/cache controls also pass.
 This validates the nested-Python repair and a cold source build on Linux x64.
 The candidate has its own identity; the shipping catalog remains unchanged.
 No package or cache was uploaded. Clean installed-package acceptance, deployment
-in a separate environment, and the other engines/platforms remain required.
+in a separate environment, and the other platforms remain required.
 
 The [filesystem-device fixture](evidence/filesystem-devices-preflight-2026-09-24.json)
 adds ordinary Lean coverage for Linux character devices and procfs: bounded
@@ -913,7 +794,7 @@ identical observations across architectures. In particular, a small buffered
 `/dev/full` write succeeds before flush reports errno 28; repeating the flush
 succeeds, while a large write reports errno 28. All guards release without
 resource events. [Installed `.24` comparisons now pass](evidence/filesystem-devices-installed-2026-09-24.json)
-in all three engines on Linux x64: 24 observations per engine, including six
+in Node on Linux x64: 24 observations, including six
 complete error values, match native interpreted and compiled Lean exactly.
 Each relocated deployment runs with source hidden, PATH empty and build
 environment removed. All six build/archive guards release without resource
@@ -923,15 +804,15 @@ not complete device or platform acceptance.
 The internal [scalar atomic adapter](evidence/native-atomic-views-2026-09-24.json)
 now connects JavaScript integer conversions to the tested memory64 primitives.
 Nine operations, eight signed/unsigned integer formats, reentrant coercions and
-four concurrent Wasm/JavaScript worker controls match each stock engine's own
+four concurrent Wasm/JavaScript worker controls match stock Node's own
 Atomics behavior on Linux x64. The sparse probe touches 36 cells below and above
 4 GiB and peaks at 91 MiB under a 1 GiB guard. The original primitive and wait
 controls also still pass. This is a backend component under development;
 ordinary heap access, wait scheduling and real Lean execution remain required.
 
 [Blocking waits and notifications](evidence/native-atomic-waits-2026-09-24.json)
-now share the native Wasm queue across independent JavaScript workers in all
-three engines. Sixteen groups per engine compare statuses, coercions and wake
+now share the native Wasm queue across independent JavaScript workers in
+Node. Sixteen groups compare statuses, coercions and wake
 counts; mixed 32/64-bit waiters and notifications in both directions pass.
 The guard releases at a 63 MiB peak. Async scheduling, general heap access,
 finite durations beyond the prototype's signed-nanosecond transport, and real
@@ -939,8 +820,8 @@ Lean application integration remain open. No shipping backend selection changes.
 
 The [real-module startup probe](evidence/wasmtime-real-lean-instantiation-2026-09-24.json)
 now runs ordinary stack, main-thread/TLS and constructor initialization through
-the verified native cache in all three stock engines. Twenty-three GCD/log2
-results per engine match native interpreted and compiled Lean. Host environment
+the verified native cache in stock Node. Twenty-three GCD/log2
+results match native interpreted and compiled Lean. Host environment
 round trips and four asynchronous tasks through the actual Wasm proxy/mailbox
 queues also pass. The mailbox uses Emscripten's existing message fallback;
 coalesced delivery, a subsequent notification and guest queue cleanup are checked.
@@ -952,7 +833,7 @@ case, worker routing, dynamic linking and installed-package integration remain
 open; unimplemented imports still trap rather than claiming unsupported behavior.
 
 The [real allocator also passes sparse high-address controls](evidence/wasmtime-real-lean-high-allocation-2026-09-24.json)
-in all three engines: allocate/free 4 GiB plus 64 KiB twice, copy through four
+in Node: allocate/free 4 GiB plus 64 KiB twice, copy through four
 eight-byte windows per allocation across the 4 GiB boundary, then run arithmetic
 again. Actual shared memory grows to 4,433,838,080 bytes using the generated
 loader's geometric-growth policy. The repeated startup/mailbox/native controls
@@ -961,7 +842,7 @@ This closes a component allocation prerequisite. The original large-stack
 benchmark, worker lifecycle and shipping helper integration remain unpassed.
 
 [Real guest pthread lifecycle now passes](evidence/wasmtime-real-lean-pthreads-2026-09-24.json)
-in Node, Deno and Bun. The guest allocates each thread through `pthread_create`,
+in Node. The guest allocates each thread through `pthread_create`,
 a separate JS worker initializes its own Wasmtime store and real TLS, executes
 a guest function-table entry, and exits through the module's actual thread
 runtime. `pthread_join` receives the result and frees the thread data. The
@@ -974,28 +855,27 @@ and the shipping backend remain open.
 [Concurrent guest threads also pass](evidence/wasmtime-real-lean-concurrency-2026-09-24.json)
 with independent stores on the same real memory: one 2 MiB and one 4 GiB stack,
 verified mutex contention, 1,000 protected shared updates and 1,000 concurrent
-GCD checks per engine. All five sequential/concurrent threads per engine exit,
+GCD checks. All five sequential/concurrent threads exit,
 join and clean up. Repeated startup and allocation controls pass; peak memory is
 295 MiB with no resource events. Complete Lean task scheduling, nested spawning,
 cross-worker mailbox routing and full application execution remain separate work.
 
 [Cross-worker mailbox routing now passes](evidence/wasmtime-real-lean-mailboxes-2026-09-24.json)
-through actual guest proxy queues: six tasks per engine travel from main to two
+through actual guest proxy queues: six tasks travel from main to two
 workers, back to main, and between workers through the main relay. Exact task
 counts and values verify receiver execution; all queues and seven test threads
-per engine are reclaimed. Earlier controls pass again, and the guard releases
+are reclaimed. Earlier controls pass again, and the guard releases
 at 293 MiB without resource events. This exercises available receiving event
 loops. Blocked-runtime integration, nested/detached lifecycle, cancellation,
 full application main and shipping integration still remain.
 
 The [unchanged `const_fold` main now passes through the private helper](evidence/wasmtime-real-lean-main-2026-09-24.json)
-in stock Node 26.10.0, Deno 2.9.7 and Bun 1.4.2 on Linux x64. Two runs per
-engine produce exactly `93011 93011` and exit zero, matching both native Lean
+in stock Node 26.10.0 on Linux x64. Two runs produce exactly `93011 93011` and exit zero, matching both native Lean
 oracles. The original argument `15` and `LEAN_STACK_SIZE_KB=4194304` remain
 unchanged. Lean allocates 4 GiB plus its upstream 128 KiB buffer for the actual
 computation thread, then joins and frees it. Nested creation and host IO use
 guest futex waits so blocked threads can service Wasm mailbox work. The existing
-seven-thread mutex/mailbox/cleanup regression also still passes in every engine.
+seven-thread mutex/mailbox/cleanup regression also still passes.
 
 Full execution exposed a separate FFI stack problem: Koffi's default 1 MiB
 synchronous stack was smaller than Wasmtime's configured budget, despite the
@@ -1013,7 +893,7 @@ reclaims the remaining main/completion workers after host output is flushed;
 that does not establish reusable-instance or general task cleanup semantics.
 
 A [direct Node-API prerequisite passes](evidence/native-api-stack-2026-09-24.json)
-in all three stock engines. The same small addon invokes registered FFI
+in stock Node. The same small addon invokes registered FFI
 callbacks, including nested calls, while executing on the actual OS thread
 stack. Each 96 MiB worker safely uses about 24 MiB of native stack and then calls
 back into JavaScript again; small main stacks are rejected before that workload.
@@ -1022,7 +902,7 @@ ceiling. Real Wasmtime integration and relocating runtime ownership onto a
 verified worker stack are still required before increasing its current limit.
 
 The [real main now passes through that direct Node-API path](evidence/wasmtime-native-api-main-2026-09-24.json)
-in all three stock engines. Runtime ownership moves to a verified 96 MiB worker;
+in stock Node. Runtime ownership moves to a verified 96 MiB worker;
 the process main thread supervises termination. Each direct Wasm entry checks
 native stack headroom, allowing a 64 MiB Wasmtime budget with room for host
 callbacks. An independent recursion control traps safely and recovers in the
@@ -1038,7 +918,7 @@ The [Lean 4.34.1 private application continuation](evidence/wasmtime-lean-4.34.1
 now reuses the exact ordinary IO program from the cold-installed `.25` package.
 Its complete Wasm module converts to standardized exceptions and compiles with
 single-worker Wasmtime 49.0.0; the verified local compiled cache is reused.
-Fresh interpreted and C-compiled native controls match Node, Deno and Bun for
+Fresh interpreted and C-compiled native controls match Node for
 Unicode/empty arguments, async file IO, a missing-file error and exit code 7,
 and separately for an uncaught Unicode exception with exit code 1.
 
@@ -1078,11 +958,10 @@ recorded. Six additional transform controls cover section placement, LEB count
 boundaries, reserved names and malformed metadata, alongside nine rejected
 binding modules.
 
-All six SDK console routes match the unchanged generated decoder for 788 vectors
-per engine, totaling 14,184 indirect calls. These check method dispatch, strings
-and high addresses; exact engine stack-trace rendering is not claimed. A fresh
+All six SDK console routes match the unchanged generated decoder for 788 vectors. These check method dispatch, strings
+and high addresses; exact stack-trace rendering is not claimed. A fresh
 canonicalized compilation of the ordinary Lean 4.34.1 application also matches
-interpreted and C-compiled native behavior in Node, Deno and Bun. Compilation
+interpreted and C-compiled native behavior in Node. Compilation
 peaks at 5.33 GiB and execution at 0.54 GiB, with no resource events. An application
 disk preflight refusal is retained; verified older installations were reclaimed
 only after matching their retained npm tarballs. General imports, dynamic/weak
@@ -1090,8 +969,8 @@ linking, real WASI descriptors, reusable runtime cleanup and managed shipping
 integration remain open.
 
 The subsequent [binary-console application comparison](evidence/lean-4.34.1-binary-console-2026-09-25.json)
-matches all 302 native output bytes through the private helper in Node, Deno and
-Bun, including invalid UTF-8 and byte-at-a-time flushing. The comparison keeps
+matches all 302 native output bytes through the private helper in Node,
+including invalid UTF-8 and byte-at-a-time flushing. The comparison keeps
 Base64 byte records as well as readable diagnostics. Thirteen integrity controls
 pass, and three deliberate oracle mismatches terminate within the original
 deadline. A coordinator argument error is preserved separately: it passed a

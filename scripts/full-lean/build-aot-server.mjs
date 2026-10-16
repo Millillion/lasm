@@ -8,8 +8,7 @@ await ensureResourceGuard();
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
-const target = option('--target', 'node');
-const output = resolve(option('--output', `.work/aot-server-${target}-4.34`));
+const output = resolve(option('--output', '.work/aot-server-4.34'));
 const runtime = resolve(option('--runtime', '.work/application-runtime-4.34.0'));
 if (existsSync(output)) throw new Error('Choose a new output directory to preserve evidence');
 const input = JSON.parse(readFileSync(join(runtime, 'build-inputs.json')));
@@ -30,5 +29,5 @@ for (const module of ['App.Model', 'App.Server', 'Main']) {
 }
 const list = join(output, 'c-inputs.json'); writeFileSync(list, JSON.stringify(cInputs) + '\n');
 execFileSync(process.execPath, [join(root, 'scripts/full-lean/probe-aot-application.mjs'),
-  '--runtime', runtime, '--target', target, '--source', join(project, 'Main.lean'), '--c-inputs', list,
+  '--runtime', runtime, '--source', join(project, 'Main.lean'), '--c-inputs', list,
   '--build-only', '--output', join(output, 'application')], { cwd: root, env: { ...env, ...process.env }, stdio: 'inherit' });

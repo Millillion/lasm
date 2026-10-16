@@ -6,7 +6,6 @@ import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { ensureResourceGuard } from './resource-guard.mjs';
-import { preserveWebWorker } from './preserve-web-worker.mjs';
 import { connectLeanSymbolLoader } from './lean-symbol-loader.mjs';
 import { indexFunctionTable } from './function-table-index.mjs';
 import { optimizeMainTableGrowth } from './table-growth.mjs';
@@ -17,18 +16,15 @@ await ensureResourceGuard();
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
-const target = option('--target', 'node');
-if (!['node', 'deno', 'bun'].includes(target)) throw new Error('Invalid --target');
 const runtime = resolve(option('--runtime', '.work/application-runtime-4.34.0'));
-const output = resolve(option('--output', `.work/aot-application-${target}-4.34.0`));
+const output = resolve(option('--output', '.work/aot-application-4.34.0'));
 if (existsSync(output)) throw new Error('Use a new output directory to preserve earlier evidence');
 const source = resolve(option('--source', 'test/fixtures/application-main/Main.lean'));
 const input = JSON.parse(readFileSync(join(runtime, 'build-inputs.json')));
 assert.equal(input.lean, '4.34.0');
 const { build, sdk, nativePrefix } = input;
-const engine = resolve(option('--executable', target === 'node' ? process.execPath : target === 'deno'
-  ? '.cache/js-runtimes/deno-2.9.7/deno' : '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'));
-const memory = target === 'bun' ? 2 : 1;
+const engine = resolve(option('--executable', process.execPath));
+const memory = 1;
 const run = (program, argv, options = {}) => execFileSync(program, argv, { cwd: root, stdio: 'inherit',
   env: { ...process.env, LEAN_NUM_THREADS: '2', BINARYEN_CORES: '1', EMCC_CORES: '1' }, ...options });
 mkdirSync(output, { recursive: true });
@@ -75,8 +71,7 @@ writeFileSync(join(dist, 'program.cjs'), connectLeanSymbolLoader(readFileSync(jo
 const tableIndex = await indexFunctionTable(join(dist, 'program.wasm'), join(dist, 'program.cjs'));
 writeFileSync(join(work, 'function-table-index.json'), JSON.stringify(tableIndex, null, 2) + '\n');
 writeFileSync(join(dist, 'program.cjs'), optimizeMainTableGrowth(readFileSync(join(dist, 'program.cjs'), 'utf8')));
-preserveWebWorker(join(dist, 'program.cjs'));
-copyApplicationHost(dist); writeApplicationEntrypoint(dist, target);
+copyApplicationHost(dist); writeApplicationEntrypoint(dist);
 const notices = [
   ['Lean', join(input.source, 'LICENSE')], ['Lean bundled dependencies', join(input.source, 'LICENSES')],
   ['Emscripten', join(sdk, 'upstream/emscripten/LICENSE')],
@@ -91,11 +86,11 @@ const notices = [
 writeFileSync(join(dist, 'THIRD_PARTY_NOTICES.txt'), notices.map(([name, file]) =>
   `=== ${name} ===\n${readFileSync(file, 'utf8')}\n`).join('\n'));
 writeFileSync(join(dist, 'build-info.json'), JSON.stringify({ lean: input.lean, leanCommit: input.leanCommit,
-  target, memoryMode: memory, emscripten: input.emscripten, sourceSha256: await hashFile(source),
+  memoryMode: memory, emscripten: input.emscripten, sourceSha256: await hashFile(source),
   nativeArtifactIdentity: input.nativeArtifactIdentity }, null, 2) + '\n');
 const deploy = join(output, 'deployed'); renameSync(dist, deploy);
 if (args.includes('--build-only')) {
-  const result = { lean: input.lean, leanCommit: input.leanCommit, target, deployed: deploy,
+  const result = { lean: input.lean, leanCommit: input.leanCommit, deployed: deploy,
     nativeExecutable: join(work, 'native-main'), sourceSha256: await hashFile(source),
     cInputs: await Promise.all(cInputs.map(async path => ({ path, sha256: await hashFile(path) }))),
     memoryMode: memory, wasmSha256: await hashFile(join(deploy, 'program.wasm')),
@@ -114,7 +109,7 @@ delete environment.LASM_FULL_HOST_MODULE; delete environment.LASM_FULL_APP_PATH;
 const controls = [];
 for (const arguments_ of [['hello λ', '', 'space argument'], ['fail']]) {
   const native = spawnSync(join(work, 'native-main'), arguments_, { cwd: nativeCwd, env: environment, encoding: 'utf8', timeout: 60_000 });
-  const actual = spawnSync(engine, [...(target === 'deno' ? ['run', '-A'] : []), join(deploy, 'main.mjs'), ...arguments_],
+  const actual = spawnSync(engine, [join(deploy, 'main.mjs'), ...arguments_],
     { cwd: targetCwd, env: environment, encoding: 'utf8', timeout: 60_000 });
   const record = { arguments: arguments_, native: { code: native.status, stdout: native.stdout, stderr: native.stderr, error: native.error?.message },
     target: { code: actual.status, stdout: actual.stdout, stderr: actual.stderr, error: actual.error?.message } };
@@ -124,7 +119,7 @@ for (const arguments_ of [['hello λ', '', 'space argument'], ['fail']]) {
   assert.deepEqual(record.target, record.native);
 }
 const result = { scope: 'Maintainer AOT application build and relocated deployment; managed build-tool distribution unfinished',
-  lean: input.lean, leanCommit: input.leanCommit, target, executable: engine,
+  lean: input.lean, leanCommit: input.leanCommit, executable: engine,
   engineVersion: execFileSync(engine, ['--version'], { encoding: 'utf8' }).trim(), sourceSha256: await hashFile(source),
   memoryMode: memory, wasmSha256: await hashFile(join(deploy, 'program.wasm')), controls,
   resourceReport: process.env.LASM_RESOURCE_REPORT, deployed: deploy, recordedAt: new Date().toISOString() };

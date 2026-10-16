@@ -12,9 +12,10 @@ import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { processOutput } from './process-output.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg, version, ...extra] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && !extra.length,
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER LEAN_VERSION');
+const [outputArg, engineArg, compilerArg, version, ...extra] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg && !extra.length,
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER LEAN_VERSION');
 assert.match(version ?? '', /^\d+\.\d+\.\d+$/);
 assert.equal(process.platform, 'linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -79,17 +80,17 @@ try {
   }
   const dist = join(output, 'dist');
   run('build installed application', [process.execPath, join(compiler, 'bin/lasm.mjs'), 'build', source,
-    '--target', target, '--output', dist], project, environment, 1800_000);
+    '--output', dist], project, environment, 1800_000);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   assert.equal(report.build.lean, version); assert.equal(report.build.leanCommit, lean.commit); assert.equal(report.build.target, target);
   const relocated = join(output, 'relocated deployment'); renameSync(dist, relocated); renameSync(project, project + '.hidden');
   report.wasmSha256 = await hashFile(join(relocated, 'program.wasm'));
   const deployedEnvironment = Object.fromEntries(Object.entries(process.env).filter(([name]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(name)));
-  Object.assign(deployedEnvironment, { PATH: '', LEAN_NUM_THREADS: '2', DENO_DISABLE_NODE_SHIM: '1' });
+  Object.assign(deployedEnvironment, { PATH: '', LEAN_NUM_THREADS: '2' });
   report.deployment = { directory: relocated, sourceHidden: true, path: '', buildEnvironmentRemoved: true };
   for (const [index, sample] of samples.entries()) {
     const row = report.cases[index];
-    row.actual = observe(sample.name + '/deployed', [engine, ...(target === 'deno' ? ['run', '-A'] : []),
+    row.actual = observe(sample.name + '/deployed', [engine, 
       join(relocated, 'main.mjs')], sample, deployedEnvironment); save();
     row.matchesNative = JSON.stringify(row.actual) === JSON.stringify(row.nativeInterpreted);
     assert.deepEqual(readdirSync(sample.directory).sort(), ['payload']);

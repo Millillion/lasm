@@ -30,8 +30,6 @@ test('ordinary Lean chdir preserves native error constructors and search permiss
     const program = join(built.output, 'main.mjs');
     for (const [label, executable, prefix] of [
       ['node', process.execPath, []],
-      ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-      ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
     ]) {
       if (!existsSync(executable)) { t.diagnostic(`${label}: not installed`); continue; }
       await t.test(label, () => {

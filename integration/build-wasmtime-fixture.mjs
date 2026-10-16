@@ -31,7 +31,7 @@ const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(rep
 save();
 try {
   const command = [process.execPath, join(compiler, 'bin/lasm.mjs'), 'build', source,
-    '--target', 'node', '--output', dist];
+    '--output', dist];
   const run = spawnSync(command[0], command.slice(1), { cwd: project, encoding: 'utf8',
     timeout: 1800_000, killSignal: 'SIGKILL', maxBuffer: 1024 * 1024,
     env: { ...process.env, EMCC_CORES: '1', BINARYEN_CORES: '1', RAYON_NUM_THREADS: '1' } });

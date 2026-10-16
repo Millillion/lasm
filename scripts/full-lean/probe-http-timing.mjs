@@ -10,7 +10,7 @@ import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 await ensureResourceGuard();
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
-const toolchain = resolve(option('--toolchain', '.work/full-toolchains/deno-v33'));
+const toolchain = resolve(option('--toolchain', '.work/full-toolchains/node'));
 const output = resolve(option('--output', '.work/full-engine-probe/http-timing-comparison'));
 const scale = Number(option('--scale', '10'));
 const repetitions = Number(option('--repetitions', '3'));

@@ -6,7 +6,6 @@ import { resolve, join, dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { expandResponseArgs } from './response-args.mjs';
-import { preserveWebWorker } from './preserve-web-worker.mjs';
 import { applicationLinkMode, isRuntimeLibrary, isRuntimeArchive } from './application-link-mode.mjs';
 import { standaloneOptimizationPlan, standaloneOptimizationCommands } from './standalone-link-optimization.mjs';
 
@@ -142,7 +141,6 @@ exec ${command.map(quote).join(' ')} "$@"
 `);
   chmodSync(output, 0o755);
 } else if (!compileOnly && !shared) {
-  preserveWebWorker(resolve(output + '.cjs'));
   const quote = text => "'" + text.replaceAll("'", "'\\''") + "'";
   const frozenHost = join(config.build, 'host/node-host.mjs');
   const host = existsSync(frozenHost) ? frozenHost : resolve(config.runtimeSupport, '../../src/node-host.mjs');

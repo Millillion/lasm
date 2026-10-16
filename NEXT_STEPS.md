@@ -5,14 +5,13 @@
 These items follow the [updated plan](docs/PLAN.md); the historical milestones
 below retain their original, narrower scope.
 
-- [x] Pin the latest stable acceptance baseline: Lean 4.34.1, Node 26.10.0,
-  Deno 2.9.7 and stock Bun 1.4.2.
+- [x] Pin the latest stable acceptance baseline: Lean 4.34.1 and Node 26.10.0.
 - [x] Provision and verify native Lean/Lake and the compiler SDK on the five
   platforms with upstream distributions; verify private Python on all six.
 - [x] Provision and verify native Git clone/fetch, pinned revisions and HTTPS
   transport on all six platforms; SSH and full Lake integration remain open.
 - [x] Build the matching full runtime and all 2,516 shipped Lean library modules.
-- [x] Verify the first ordinary compiled Lean main in all three stock engines.
+- [x] Verify the first ordinary compiled Lean main in stock Node.
 - [x] Inventory all 4,069 unchanged upstream test registrations and exclusions.
 - [x] Classify the execution obligations of all 111 mixed shell registrations;
   their native and deployed phases still need execution evidence.
@@ -24,12 +23,12 @@ below retain their original, narrower scope.
   provisioning, and a separate deployment denied access to source/build tools
   on Linux x64; the remaining native platforms are tracked below.
 - [x] Build the ordinary Lean HTTP Lake example with the installed candidate and
-  pass its native/deployed Vitest checks on stock Node, Deno and Bun on Linux x64.
+  pass its native/deployed Vitest checks on stock Node on Linux x64.
 - [x] Verify an installed candidate's pinned Lake Git dependency, custom source
   roots, symlinked main, cache reuse/invalidation, asset preservation, compatibility
-  launchers and relocated deployment in all three stock engines on Linux x64.
+  launchers and relocated deployment in stock Node on Linux x64.
 - [x] Verify ordinary scripts outside configured Lake targets, preserving package
-  compiler options and the above workflow checks in all three engines on Linux x64.
+  compiler options and the above workflow checks in Node on Linux x64.
 - [ ] Finish and package the primary `lasm Main.lean` / `lasm build Main.lean`
   pipeline with automatic tools, Lake dependencies and reliable cache reuse.
 - [ ] Validate the HTTP and Express examples and callable JS/TypeScript bindings
@@ -43,11 +42,10 @@ below retain their original, narrower scope.
   [The latest Node compiled-application category](docs/evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
   now has 97 deployed passes and four original compilation-disabled cases;
   [parallel AOT controls for those four cases](docs/evidence/lean-4.34.1-compile-disabled-2026-09-25.json)
-  now pass in all three engines. Remaining categories and full engine campaigns
-  stay open.
+  now pass in Node. Remaining categories and full Node campaigns stay open.
 - [ ] Audit and differentially test all standard APIs, including IO.FS and Std.Http.
 - [ ] Complete source-free deployment and native six-platform acceptance for
-  stock Node, Deno and Bun.
+  stock Node.
 
 See [implementation evidence and open work](docs/APPLICATION_PIPELINE.md).
 Passing provisioning or maintainer probes does not close the shipping gates.

@@ -1,8 +1,6 @@
-import { runApplicationCli, runApplicationChild, reportCliError } from './application-cli.mjs';
-import { engineName } from './js-engine.mjs';
-import { fileURLToPath } from 'node:url';
+import { runApplicationCli, reportCliError } from './application-cli.mjs';
 
-export const launcherUsage = 'Usage: lasm-<node|deno|bun>.js [--rebuild] [--verbose] <Main.lean> [--] [arguments…]';
+export const launcherUsage = 'Usage: lasm-node.js [--rebuild] [--verbose] <Main.lean> [--] [arguments…]';
 
 /** Keep the original filename launcher's arguments, including optional --. */
 export function launcherArguments(argv) {
@@ -15,24 +13,10 @@ export function launcherArguments(argv) {
   return [...options, file, '--', ...rest];
 }
 
-export async function launch(target) {
+export async function launch() {
   try {
-    if (!['node', 'deno', 'bun'].includes(target)) throw new Error('Unknown launcher target');
     const args = launcherArguments(process.argv.slice(2));
     if (!args) { console.log(launcherUsage); return; }
-    const actual = engineName();
-    if (actual === 'node') process.exitCode = await runApplicationCli(args, { defaultTarget: target });
-    else {
-      if (actual !== target) throw new Error(`lasm-${target}.js requires Node or ${target}; this process is running ${actual}`);
-      // Compilation remains in Node; deployment uses the exact Deno/Bun that
-      // invoked this wrapper, even when that executable is absent from PATH.
-      // Deno's child-process compatibility layer rewrites a bare Deno binary
-      // path appearing in argv into a Node-mode invocation. This is data for
-      // our private bridge, so encode it rather than exposing a command token.
-      process.exitCode = await runApplicationChild('node',
-        [fileURLToPath(new URL('./launcher-node.mjs', import.meta.url)),
-          JSON.stringify({ target, executable: process.execPath, args })],
-        'Building Lean applications requires Node/npm. Put Node on PATH; Lean and the compiler SDK are provisioned automatically.');
-    }
+    process.exitCode = await runApplicationCli(args);
   } catch (error) { reportCliError(error); process.exitCode = 1; }
 }

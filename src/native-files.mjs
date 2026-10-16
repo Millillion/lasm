@@ -73,14 +73,6 @@ export function nativeFiles({ synchronous = false } = {}) {
     ? bind('_NSGetEnviron', 'void *', []) : libc.symbol('environ');
   const environmentPointer = () => ffi.decode(typeof environ === 'function' ? environ() : environ, 'void *');
   const copyCString = pointer => Buffer.from(new Uint8Array(ffi.view(pointer, Number(strlen(pointer)))));
-  function environmentValue(name, original) {
-    // Bun keeps process.env updates in an engine-owned map. Preserve original
-    // bytes while its JS value is unchanged, and honor subsequent JS edits.
-    if (!process.versions.bun) return original;
-    const value = process.env[name];
-    if (value === undefined) return undefined;
-    return original?.toString() === value ? original : Buffer.from(value);
-  }
   // Match <dirent.h>'s __DARWIN_INODE64 alias. Intel macOS keeps the legacy
   // 32-bit-inode ABI at plain scandir; ARM64 has only the modern layout.
   // Both modern Darwin layouts put d_reclen at 16 and d_name at 21.
@@ -228,7 +220,7 @@ export function nativeFiles({ synchronous = false } = {}) {
         return value === undefined ? undefined : Buffer.from(value);
       }
       const pointer = getenv(name);
-      return environmentValue(name, pointer ? copyCString(pointer) : undefined);
+      return pointer ? copyCString(pointer) : undefined;
     },
     setEnvironment(name, value) {
       if (setenv && setenv(name, value, 1) < 0) {
@@ -252,20 +244,6 @@ export function nativeFiles({ synchronous = false } = {}) {
         if (!item) break;
         const bytes = copyCString(item), separator = bytes.indexOf(61);
         if (separator >= 0) entries.push([bytes.subarray(0, separator), bytes.subarray(separator + 1)]);
-      }
-      if (process.versions.bun) {
-        const names = new Set();
-        for (let i = entries.length - 1; i >= 0; i--) {
-          const [key, original] = entries[i], name = key.toString();
-          names.add(name);
-          // A malformed key is still a valid POSIX name. Do not merge it with
-          // a distinct key whose real bytes contain replacement characters.
-          if (!Buffer.from(name).equals(key)) continue;
-          const value = environmentValue(name, original);
-          if (value === undefined) entries.splice(i, 1); else entries[i] = [key, value];
-        }
-        for (const [name, value] of Object.entries(process.env))
-          if (!names.has(name) && value !== undefined) entries.push([Buffer.from(name), Buffer.from(value)]);
       }
       return entries;
     },
@@ -344,7 +322,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     async readDirectory(path) {
       if (!scanDirectory) throw new Error('Native directory scanning is POSIX-only');
       // A null comparator preserves readdir order. Copy raw filename bytes
-      // before freeing libc's records; Deno's opendir ignores encoding:buffer.
+      // before freeing libc's records.
       const output = [null];
       const { value: count, errno } = await call(scanDirectory, path, output, null, null);
       if (count < 0) throw failure(errno);
@@ -379,8 +357,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     },
     async realPath(path) {
       if (!realpath) throw new Error('Native realpath is POSIX-only');
-      // Let libc traverse symlinks before dot segments. Some engine filesystem
-      // adapters normalize them first, including /proc/self/fd/N/.. on Bun.
+      // Let libc traverse symlinks before dot segments.
       const { value, errno } = await call(realpath, path, null);
       if (!value) throw failure(errno);
       // Buffer.from(ArrayBuffer) aliases storage; copy through a typed array

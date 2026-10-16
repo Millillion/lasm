@@ -9,12 +9,10 @@ test('private pthread factory preserves application cwd and worker messaging aft
   { skip: process.platform !== 'linux' || process.getuid?.() === 0, timeout: 35_000 }, async t => {
     for (const [name, executable, prefix] of [
       ['node', process.execPath, []],
-      ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
     ]) {
       if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }
-      // Deno prints an intentional uncaught worker exception even when the
-      // parent's error event is handled. Compare the unwrapped engine control
-      // so this adapter must preserve its diagnostic, not merely ignore stderr.
+      // Compare the unwrapped engine control so this adapter must preserve
+      // its diagnostic, not merely ignore stderr.
       const direct = spawnSync(executable, [...prefix, join(root, 'test/fixtures/pthread-cwd-host.cjs'), 'direct-error'], {
         encoding: 'utf8', timeout: 12000, killSignal: 'SIGKILL' });
       assert.equal(direct.status, 0, direct.error?.message ?? direct.stdout + direct.stderr);

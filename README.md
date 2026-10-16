@@ -1,6 +1,7 @@
 # Lasm
 
-Write ordinary Lean. Compile it ahead of time and run it in Node.
+Write ordinary Lean. Compile it ahead of time and run it in Node. Node.js is the
+only supported JavaScript runtime.
 
 **Prerequisites:** stock **Node 26.10.0 with npm 11.19.1**. Lasm downloads its matching
 **Lean 4.34.1**, Lake, and build tools; you do not install them yourself.
@@ -68,21 +69,21 @@ These are all commands and options in the ordinary Node application interface:
 | Output directory | `npx lasm build Main.lean --output "app dist"` | Choose the deployment directory. `lasm build Main.lean "app dist"` is an alias. |
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
-| Explicit Node target | `npx lasm Main.lean --target node` | Select the default supported engine. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
 | Cache repair (new source; absent from `.46`) | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
 `--rebuild` and `--verbose` work with both run and build. `--output` is build-only;
 arguments after `--` are run-only. The application's exit status is preserved.
 There is currently no Lasm install, clean, uninstall, or version subcommand.
+Candidate `.46` also accepts a redundant `--target node`; current source removed
+that option, and passing it is an error.
 The source installer also accepts the [documented download environment settings](docs/INSTALLATION_HARDENING.md#transfers).
 
 The source checkout also retains experimental interfaces. They are **unavailable
 in the Node release candidate**: `node bin/lasm.mjs build examples/basic/lasm.json dist`
 builds callable bindings from a JSON configuration;
-`node bin/lasm.mjs Main.lean --target deno` and `--target bun` select experimental
-engines. The root `lasm-node.js`, `lasm-deno.js`, and `lasm-bun.js` are source-only
-compatibility launchers. These interfaces have no current release support guarantee.
+`node lasm-node.js [--rebuild] [--verbose] Main.lean [--] [arguments…]` is a
+source-only compatibility launcher. These interfaces have no current release support guarantee.
 
 ## Supported environments
 
@@ -93,7 +94,7 @@ compatibility launchers. These interfaces have no current release support guaran
 | macOS 15.7.9 (24G830) | x86-64 and ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance. |
 | Windows Server 2025 Datacenter, 10.0.26100.33438 | x86-64 | Candidate `.46` passed native installed-package and copied-deployment acceptance on `windows-2025`. |
 | Windows 11 Enterprise, 10.0.26200.9457 | ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance on `windows-11-arm`. |
-| Deno, Bun, browsers, Cloudflare Workers | Any | Not supported by the release candidate. |
+| Other JavaScript runtimes, browsers, Cloudflare Workers | Any | Not supported; Lasm targets Node only. |
 | Lambda, Netlify, other serverless services | Any | No deployment adapter or platform acceptance yet. |
 
 Other OS releases and Node/npm/Lean versions are unverified. No engine flags are

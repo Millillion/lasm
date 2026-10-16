@@ -10,9 +10,9 @@ import { nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg] = process.argv.slice(2);
-assert.ok(outputArg && engineArg && compilerArg && ['node', 'deno', 'bun'].includes(target),
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER');
+const [outputArg, engineArg, compilerArg] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg, 'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER');
 const output = resolve(outputArg), compiler = resolve(compilerArg), engine = resolve(engineArg);
 assert.ok(!existsSync(output), 'Preserve previous filesystem evidence');
 mkdirSync(output, { recursive: true });
@@ -52,7 +52,7 @@ const compiled = execute(native, [], filesystem('native-compiled'), env);
 assert.deepEqual(compiled, interpreted);
 const dist = join(output, 'dist');
 execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', source,
-  '--target', target, '--output', dist], { env, stdio: 'inherit', timeout: 1800_000 });
+  '--output', dist], { env, stdio: 'inherit', timeout: 1800_000 });
 assert.equal(await hashFile(source), sourceSha256);
 const build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
 const wasmSha256 = await hashFile(join(dist, 'program.wasm'));
@@ -61,7 +61,7 @@ renameSync(sourceDirectory, sourceDirectory + '.hidden');
 const runtimeEnv = { ...process.env, PATH: '' };
 for (const key of Object.keys(runtimeEnv)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(key)) delete runtimeEnv[key];
 delete runtimeEnv.LASM_APPLICATION_RUNTIME;
-const actual = execute(engine, [...(target === 'deno' ? ['run', '-A'] : []), join(relocated, 'main.mjs')],
+const actual = execute(engine, [join(relocated, 'main.mjs')],
   filesystem('deployed'), runtimeEnv);
 const report = { scope: 'Ordinary filesystem fixture in installed Lean 4.34 AOT application; native interpreter and C executable controls',
   target, platform: process.platform + '-' + process.arch, engineVersion: execFileSync(engine, ['--version'], { encoding: 'utf8' }).trim(),

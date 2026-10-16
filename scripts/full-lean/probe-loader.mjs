@@ -49,8 +49,6 @@ for (const [directory, value] of [[libraries, 42], [override, 84]]) {
 }
 const engines = [
   ['node', process.execPath, []],
-  ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-  ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
 ];
 const main = join(root, 'scripts/full-lean/probes/loader.c');
 for (const [label, rpath] of [['absolute', libraries], ['origin', '$ORIGIN/../libraries with 日本語'],

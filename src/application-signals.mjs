@@ -7,16 +7,10 @@ import { nativeSignals } from './native-signals.mjs';
 // library initialization hook.
 export function prepareApplicationSignals() {
   if (process.platform === 'win32') return;
-  const name = process.versions.bun ? 'SIGABRT' : 'SIGUSR1', number = constants.signals[name];
+  const name = 'SIGUSR1', number = constants.signals[name];
   if (process.listenerCount(name)) return;
   const native = nativeSignals(), action = native.action(number), disposition = native.disposition(action);
   if (disposition === 'external') return;
-  if (process.versions.deno) {
-    // Prime Deno's signal registry before its delayed inspector subscription.
-    // A later subscriber reuses that entry and does not install another handler.
-    const listener = () => {};
-    process.on(name, listener); process.off(name, listener);
-  }
   if (disposition === 'engine') native.reset(number);
   else native.restore(number, action); // Preserve observed default/ignored state.
 }

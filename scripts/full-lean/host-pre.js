@@ -8,7 +8,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     lasmPreviousOnExit?.(code);
     // Native process exit releases descriptors even when a Lean value remains
     // reachable from a background task. Emscripten lets the host loop drain;
-    // leaving a TCP listener alive here can otherwise prevent Deno from exiting.
+    // leaving a TCP listener alive here can otherwise prevent the host from exiting.
     // Flush first, without blocking pipe readers, then close remaining handles.
     var disposeWorkers = () => Module.lasmDisposeCwdWorkers?.();
     if (!lasmFullHost) return disposeWorkers();
@@ -29,7 +29,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
           args: process.argv.slice(2), appPath: process.env.LASM_FULL_APP_PATH ?? __filename, propagateCwd: true, processExit: true,
           applicationCommand: process.env.LASM_FULL_APP_PATH ? {
             executable: process.execPath,
-            arguments: process.versions.deno ? ['run', '--no-config', '-A'] : [],
+            arguments: [],
           } : undefined,
         }));
       }
@@ -57,7 +57,6 @@ if (!ENVIRONMENT_IS_PTHREAD) {
           : await new Promise(resolve => { lasmFullCompletionWaiter = resolve; });
       }
       else result = await host.request(...args);
-      // Keep typed-array indices out of Deno's recursive MessagePort patcher.
       // Responses may alias retained host buffers, so preserve cloning here.
       port.postMessage(result.bytes === undefined ? result : {
         error: result.error, byteBuffer: result.bytes.buffer,

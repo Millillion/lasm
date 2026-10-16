@@ -20,7 +20,7 @@ import { applicationSupport, requireApplicationSupport } from './application-sup
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const helpers = ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs',
-  'function-table-index.mjs', 'table-growth.mjs', 'preserve-web-worker.mjs'];
+  'function-table-index.mjs', 'table-growth.mjs'];
 const digest = value => createHash('sha256').update(value).digest('hex');
 
 async function buildDriverIdentity() {
@@ -46,15 +46,14 @@ export async function buildApplication(file, options = {}) {
   });
 }
 
-async function buildLockedApplication(source, { target = 'node', output, rebuild = false, verbose = false,
+async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
   cache, runtimeDirectory, log = console.error, progress } = {}) {
-  if (!['node', 'deno', 'bun'].includes(target)) throw new Error('Invalid application target');
   // Check the bundle before expensive tool provisioning; a missing package must
   // never make an otherwise pointless multi-gigabyte compiler download.
   const selection = await selectLeanVersion(source);
   progress?.({ stage: `Checking Lean ${selection.version} runtime` });
   const runtime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit }, { directory: runtimeDirectory });
-  if (!progress) log(`Preparing Lean ${selection.version} for ${target}…`);
+  if (!progress) log(`Preparing Lean ${selection.version} for Node…`);
   const lean = await provisionLean(source, { cache, log, progress });
   if (sdkCatalog.version !== runtime.manifest.emscripten) throw new Error('The managed SDK and application runtime do not match');
   const project = findApplicationProject(source), directory = project ?? dirname(source);
@@ -69,14 +68,14 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
     module: generated.inputs[i].module, sourceSha256: await hashFile(generated.inputs[i].source),
     cSha256: await hashFile(generated.sources[i]),
   });
-  const memoryMode = target === 'bun' ? 2 : 1;
+  const memoryMode = 1;
   const recipe = { schema: 1, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
     ...(lean.notices ? { nativeLeanNoticesIdentity: lean.notices.identity } : {}),
     emscripten: sdkCatalog.version, sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)),
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
     applicationPolicy,
-    target, host: `${process.platform}-${process.arch}`, node: applicationSupport()?.node,
+    target: 'node', host: `${process.platform}-${process.arch}`, node: applicationSupport()?.node,
     minimumGlibc: applicationSupport()?.minimumGlibc, memoryMode, modules };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
@@ -91,7 +90,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   // reviewed driver repairs are still part of the cache identity. Revalidate
   // the full SDK/Python trees when compilation actually needs to execute them.
   const sdk = await provisionSdk({ cache, log, progress });
-  if (!progress) log(`Building ${relative(process.cwd(), source) || source} for ${target}…`);
+  if (!progress) log(`Building ${relative(process.cwd(), source) || source} for Node…`);
   const temporary = join(work, '.build-' + randomUUID()), dist = join(temporary, 'dist');
   await mkdir(dist, { recursive: true });
   let linkRequirements;
@@ -105,7 +104,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
     throw error;
   }
   progress?.({ stage: 'Packaging the application and runtime support' });
-  copyApplicationHost(dist, { target }); writeApplicationEntrypoint(dist, target, {
+  copyApplicationHost(dist); writeApplicationEntrypoint(dist, {
     node: applicationSupport()?.node, minimumGlibc: applicationSupport()?.minimumGlibc,
   });
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));

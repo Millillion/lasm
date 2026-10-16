@@ -17,7 +17,6 @@ import { readGuestBytes, writeGuestBytes } from './wasmtime-guest-memory.mjs';
 import { invokeConsoleImport } from './wasmtime-console.mjs';
 import { createWasmtimeFileHost } from './wasmtime-file-host.mjs';
 import { invokeFileImport } from './wasmtime-file-imports.mjs';
-import cwdFactory from './native-pthread-factory.cjs';
 
 export async function runWasmtimeMain(options) {
 const { helper: libraryPath, cache, cacheSha256: expectedHash, nativeApi: nativeApiPath,
@@ -63,7 +62,6 @@ const workers = new Map(), timers = new Set(), registered = [], trace = diagnost
 const stdout = [], stderr = [], hostOperations = diagnostic ? [] : quiet, completions = [];
 let completionWaiter, response = new Uint8Array(0), requestedExit;
 let workerMessageListener;
-let cwdWorker;
 let files;
 const host = isRuntimeRoot && diagnostic ? createNodeRuntimeHost({ leanVersion: check.lean, args: check.args, appPath: check.name,
   stdio: { stdout: bytes => stdout.push(Buffer.from(bytes)), stderr: bytes => stderr.push(Buffer.from(bytes)) } }) : null;
@@ -113,9 +111,8 @@ function rpc(request) {
   const channel = new MessageChannel();
   try {
     assert.equal(signalStore(probe, signal, 0), 0);
-    // Deno's Node adapter scans every indexed property of a typed-array
-    // message. Encode binary payloads as buffers on both worker hops, including
-    // file-import replies, so traversal does not grow with the payload size.
+    // Encode binary payloads as buffers on both worker hops, including
+    // file-import replies.
     parentPort.postMessage({ kind: 'rpc', request: encodeFileMessage(request).message,
       signal, port: channel.port2, sender: ownPthread }, [channel.port2]);
     const deadline = diagnostic ? Date.now() + 15_000 : Infinity;
@@ -238,21 +235,11 @@ function routeMailbox(target, sender) {
 function spawnWorker(pthread, start, argument) {
   const key = String(pthread);
   assert.ok(!workers.has(key) || workers.get(key).cleaned, 'Live thread cannot be replaced');
-  const nodeStdio = !process.versions.deno && !process.versions.bun;
-  let RuntimeWorker = Worker;
-  if (process.versions.deno) {
-    try { Deno.cwd(); }
-    catch (error) {
-      if (error.name !== 'NotFound' && error.name !== 'InvalidData' && error.code !== 'ENOENT') throw error;
-      cwdWorker ??= cwdFactory.createCwdWorkerFactory();
-      RuntimeWorker = cwdWorker;
-    }
-  }
-  const worker = new RuntimeWorker(new URL('./wasmtime-worker.mjs', import.meta.url), {
-    ...(nodeStdio ? { stdout: true, stderr: true,
-      // Internal workers have their own resourceLimits. Explicitly replaying
-      // parent V8 flags (such as --max-old-space-size) is invalid in Node.
-      execArgv: ['--require', fileURLToPath(new URL('./native-worker-cwd.cjs', import.meta.url))] } : {}), resourceLimits: {
+  const worker = new Worker(new URL('./wasmtime-worker.mjs', import.meta.url), {
+    stdout: true, stderr: true,
+    // Internal workers have their own resourceLimits. Explicitly replaying
+    // parent V8 flags (such as --max-old-space-size) is invalid in Node.
+    execArgv: ['--require', fileURLToPath(new URL('./native-worker-cwd.cjs', import.meta.url))], resourceLimits: {
     stackSizeMb: 96, maxOldGenerationSizeMb: 128,
   }, workerData: { options, parent: ffi.address(probe), pthread, start, argument } });
   const record = { worker, pthread, start, argument, exited: false };
@@ -278,7 +265,7 @@ function spawnWorker(pthread, start, argument) {
     } catch (error) { fail(error); }
   });
   worker.on('error', fail);
-  if (nodeStdio) forwardWorkerStdio(worker);
+  forwardWorkerStdio(worker);
   record.exit = new Promise(resolve => worker.once('exit', code => {
     record.exited = true; record.code = code; resolve();
     if (!closed && !record.result && record.processExit === undefined) fail(new Error(`Application worker exited before completion: ${code}`));
@@ -384,8 +371,7 @@ async function finishApplication(code, force = false) {
     && record.cleaned && record.exited && record.result?.result === '0'));
   const output = { scope: 'Verified application main through a private Wasmtime host integration; not shipping acceptance',
     application: check.name, lean: check.lean,
-    engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
-    version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
+    engine: 'node', version: process.versions.node,
     args: check.args, leanStackSizeKb: process.env.LEAN_STACK_SIZE_KB, ...observed,
     threads: threadResults, trace, hostOperations, sharedBytes: String(snapshot()[3]),
     wasmEntry: nativeDriver ? 'direct Node-API on verified worker stacks' : 'Koffi synchronous FFI',
@@ -481,14 +467,10 @@ try {
   for (const record of workers.values()) if (!record.exited) { await record.worker.terminate(); await record.exit; }
   if (probe) destroy(probe);
   host?.close();
-  await cwdWorker?.dispose();
   for (const pointer of registered) ffi.unregister(pointer);
   if (!isRuntimeRoot) {
     if (workerMessageListener) parentPort.off('message', workerMessageListener);
     parentPort.close?.();
-    // Deno's Node parentPort is an EventEmitter without MessagePort.close.
-    // Its underlying worker supplies the standard WorkerGlobalScope.close.
-    globalThis.close?.();
   }
 }
 

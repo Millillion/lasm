@@ -43,7 +43,7 @@ if (!native.passed) throw new Error('Native TCP control failed; inspect its resu
 for (const facade of facades) {
   const config = JSON.parse(readFileSync(join(facade, 'toolchain.json')));
   if (application) run(config.engine + '-application', config.executable,
-    [...(config.engine === 'deno' ? ['run', '-A'] : []), application], native.stdout);
+    [application], native.stdout);
   else {
     const snapshot = JSON.parse(readFileSync(join(config.build, 'snapshot.json')));
     for (const [name, expected] of Object.entries(snapshot.files)) {

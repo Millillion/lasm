@@ -12,7 +12,7 @@ Prepare a fresh campaign with:
 node scripts/full-lean/run-bounded.mjs -- \
   env LASM_TOOLCHAIN_CACHE=/absolute/managed-cache \
   node scripts/application-tests/prepare.mjs \
-  .work/application-campaign compiled-application node /absolute/node \
+  .work/application-campaign compiled-application /absolute/node \
   /absolute/project/node_modules/@lasm/compiler '^compile/' upstream 4.34.1
 
 node scripts/full-lean/run-bounded.mjs -- \
@@ -42,7 +42,7 @@ after the original compilation-disabled driver. Its recorded native compiler
 children restore the original driver's `LEAN_SYSROOT` and `LEAN_PATH`: deployed
 module-data paths belong to the application and contain no native compiler.
 The original markers, sources, assertions and timeouts remain unchanged. Fresh
-[Lean 4.34.1 controls pass all four inputs in each engine](../../docs/evidence/lean-4.34.1-compile-disabled-2026-09-25.json),
+[Lean 4.34.1 controls pass all four inputs in Node](../../docs/evidence/lean-4.34.1-compile-disabled-2026-09-25.json),
 with native server/compiler child actions recorded separately.
 
 `prepare-native-shard.mjs OUTPUT SELECTION INDEX COUNT [LEAN_VERSION]` and
@@ -72,7 +72,7 @@ preserving the original project's stage-directory pin. Its native Lake build
 and server commands remain explicit native coverage. Select these three LSP
 groups separately; unexpected child commands fail explicitly. No parser or LSP
 campaign result is implied by harness support alone.
-The target and engine arguments accept Node, Deno or Bun. The harness itself
+The engine argument is a Node executable. The harness itself
 requires Linux, Bash, GNU tar, CTest, Perl and diff, as used by the upstream
 drivers. End-user tool provisioning is tested separately.
 
@@ -80,15 +80,14 @@ drivers. End-user tool provisioning is tested separately.
 reviewed IO tests whose original actions run through `#eval`. The exact
 release, source hashes and action counts live in `eval-io-reviewed.json`.
 The initial three inputs are `async_http_body`, `async_http_body_framing` and
-`async_http_request_headers`; their three-engine results are recorded separately.
+`async_http_request_headers`; their results are recorded separately.
 Nine additional flat IO inputs cover dispatch, expectations, incremental parsing,
 parser fuzzing, keep-alive, replayable bodies, request lines, response framing
-and trailers. Their [twelve-input three-engine comparison](../../docs/evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
-now passes all 148 actions per engine, for 444 deployed actions in total.
+and trailers. Their [twelve-input comparison](../../docs/evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
+now passes all 148 deployed actions in Node.
 Ten further reviewed inputs cover temporary files, TCP, UDP, cancellation,
 HTTP fuzzing and hang regressions. Their [complete Node comparison](../../docs/evidence/lean-4.34.1-upstream-io-stress-network-node-2026-09-25.json)
-passes all 71 deployed actions and eight integrity controls. Deno and Bun
-comparisons are in progress. The `async_tcp_half` input executes only its
+passes all 71 deployed actions and eight integrity controls. The `async_tcp_half` input executes only its
 `listenClose` action; its unused `acceptClose` definition adds no assertion coverage.
 Listing a new input permits validation attempts, not an execution pass.
 It first runs the original native elaboration driver and its assertions. The
@@ -101,7 +100,7 @@ evaluation commands before native and installed AOT comparisons run. A new
 release or changed source hash requires a fresh review; filename reuse cannot
 silently carry an earlier review forward.
 
-Arguments are `NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE
+Arguments are `NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE
 REVIEWED_TEST [LEAN_VERSION]`, where the reviewed name is, for example,
 `elab/async_http_body.lean`. Use the resource guard and base-page wrapper as above.
 The native interpreted, native C-compiled and source-hidden relocated deployed
@@ -129,7 +128,7 @@ node scripts/full-lean/run-bounded.mjs -- \
   env LASM_TOOLCHAIN_CACHE=/absolute/managed-cache \
   python3 scripts/full-lean/base-pages.py \
   node integration/application-upstream-projects.mjs \
-  .work/project-comparison node /absolute/node \
+  .work/project-comparison /absolute/node \
   /absolute/project/node_modules/@lasm/compiler \
   /absolute/pristine-upstream-source 'path with spaces'
 ```
@@ -142,7 +141,7 @@ checks and deployed comparisons are recorded separately; this adapter does not
 claim to map the other mixed-project registrations.
 
 For an application, the original native compile/interpreter driver executes
-first. The parallel driver then uses the installed Lasm CLI and selected engine
+first. The parallel driver then uses the installed Lasm CLI and Node
 with the original source, argument sidecars, before/after scripts, output
 normalization and expected-output/exit assertions. Upstream's four
 compile-disabled cases remain explicitly untested as deployed applications.
@@ -160,12 +159,12 @@ passes.
 
 The four extra AOT controls also record every intercepted native Lean invocation,
 including the completion benchmark's actual native language-server processes.
-The separately recorded [three-engine result](../../docs/evidence/upstream-compile-disabled-all-engines-2026-09-24.json)
+The separately recorded [result](../../docs/evidence/upstream-compile-disabled-all-engines-2026-09-24.json)
 does not change the default compilation-disabled markers.
 
 `integration/application-upstream-signal.mjs` separately runs the original
 upstream-excluded `pkg/signal` driver and its unchanged application. Arguments
-are `NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE`; run under
+are `NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE`; run under
 the resource guard and base-page wrapper. A separate release-pinned application
 copy preserves the original stage pin. Its native/deployed controller sends the
 same four signals, with the same one-second readiness delay, after hiding source
@@ -221,7 +220,7 @@ The numeric and private-import Lake projects have a separate application harness
 node scripts/full-lean/run-bounded.mjs -- \
   python3 scripts/full-lean/base-pages.py \
   node integration/application-upstream-packages.mjs \
-  .work/numeric-node-ofScientific node /absolute/path/to/node \
+  .work/numeric-node-ofScientific /absolute/path/to/node \
   /absolute/path/to/installed/compiler /absolute/path/to/pristine/reference \
   ofScientific
 ```
@@ -247,7 +246,7 @@ records timeouts separately from behavior failures. Harness availability alone
 is not acceptance evidence.
 
 `integration/application-upstream-runtime-imports.mjs` takes
-`NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE` under the same
+`NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE` under the same
 resource guard and base-page profile. It runs the unchanged `pkg/user_attr_app`
 native driver, builds its original main through the installed CLI, and compares
 native and deployed runtime imports. A separate ordinary Lean fixture repeats

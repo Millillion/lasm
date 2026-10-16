@@ -34,14 +34,14 @@ assert.equal(compilation.build.modules[0].sourceSha256, sourceSha256);
 const sources = ['scripts/full-lean/probe-wasmtime-application.mjs',
   'scripts/full-lean/probes/wasmtime-instantiate-lean.c', 'scripts/full-lean/probes/wasmtime-native-api.c',
   'scripts/full-lean/probes/wasmtime-lean-supervisor.mjs', 'scripts/full-lean/probes/wasmtime-lean-main.mjs',
-  'src/node-host.mjs', 'src/lean-io-errors.mjs', 'src/bun-stack.mjs',
+  'src/node-host.mjs', 'src/lean-io-errors.mjs',
   'scripts/full-lean/probes/wasmtime-wasi-stdio.mjs', 'integration/process-output.mjs',
   'scripts/full-lean/probes/wasmtime-guest-memory.mjs',
   'scripts/full-lean/probes/wasmtime-console.mjs',
   'src/native-files.mjs', 'src/native-file-worker.mjs', 'src/native-file-worker-pool.mjs',
-  'src/native-file-worker-deno.mjs', 'src/native-file-message.mjs',
+  'src/native-file-message.mjs',
   'scripts/full-lean/probes/wasmtime-canonical-imports.h'];
-sources.push('src/wasmtime-runtime.mjs', 'src/wasmtime-worker.mjs', 'src/wasmtime-artifact.mjs', 'src/wasmtime-native-stdio.mjs', 'src/wasmtime-guest-memory.mjs', 'src/wasmtime-console.mjs', 'src/wasmtime-wasi-stdio.mjs', 'src/worker-stdio.cjs', 'src/native-worker-cwd.cjs', 'src/native-pthread-factory.cjs', 'src/native-pthread-factory-deno.mjs');
+sources.push('src/wasmtime-runtime.mjs', 'src/wasmtime-worker.mjs', 'src/wasmtime-artifact.mjs', 'src/wasmtime-native-stdio.mjs', 'src/wasmtime-guest-memory.mjs', 'src/wasmtime-console.mjs', 'src/wasmtime-wasi-stdio.mjs', 'src/worker-stdio.cjs', 'src/native-worker-cwd.cjs', 'src/native-pthread-factory.cjs');
 sources.push('scripts/full-lean/probes/wasmtime-engine-config.h', 'scripts/full-lean/probes/wasmtime-main-symbols.h');
 sources.push('src/wasmtime-file-host.mjs', 'src/wasmtime-file-imports.mjs');
 const hashes = Object.fromEntries(await Promise.all(sources.map(async path => [path, await hashFile(join(root, path))])));
@@ -104,8 +104,6 @@ try {
   writeFileSync(checkPath, JSON.stringify(check, null, 2) + '\n'); report.applicationCheckSha256 = await hashFile(checkPath);
   const engines = [
     ['node', join(root, '.cache/js-runtimes/node-26.10.0/bin/node'), ['--max-old-space-size=128']],
-    ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
-    ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
   ];
   for (const [name, engine, flags] of engines) {
     const cwd = join(output, name); mkdirSync(cwd);
@@ -128,7 +126,7 @@ try {
   }
   assert.equal(report.failures.length, 0);
   assert.deepEqual(report.results.map(row => [row.engine, row.version]),
-    [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
+    [['node', '26.10.0']]);
   assert.equal(await hashFile(checkPath), report.applicationCheckSha256);
   assert.equal(await hashFile(compilation.cache.file), compilation.cache.sha256);
   report.passed = true;

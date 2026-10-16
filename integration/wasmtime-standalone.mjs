@@ -201,13 +201,11 @@ for (const path of ${JSON.stringify(denied)}) assert.throws(() => readFileSync(p
     path: '', sourceAndBuildContentsDenied: true, expectedResultsPresent: false };
   for (const [engine, binary, flags] of [
     ['node', '.cache/js-runtimes/node-26.10.0/bin/node', ['--max-old-space-size=128']],
-    ['deno', '.cache/js-runtimes/deno-2.9.7/deno', ['run', '--no-config', '-A', '--v8-flags=--max-old-space-size=128']],
-    ['bun', '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun', []],
   ]) {
     const executable = join(isolated, engine); copyFileSync(join(root, binary), executable);
     const ruleFile = join(output, engine + '-rules.json');
     const env = { PATH: '', LANG: 'C.UTF-8', TMPDIR: temporary, HOME: temporary,
-      DENO_DIR: join(temporary, 'deno'), DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' };
+      LEAN_NUM_THREADS: '2' };
     if (benchmark) env.LEAN_STACK_SIZE_KB = benchmark.leanStackSizeKb;
     const rules = { allow: [...linuxIsolationFiles(),
       { path: executable, access: 'execute' }, { path: deployment, access: 'execute' },

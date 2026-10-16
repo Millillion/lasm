@@ -8,9 +8,8 @@ the benchmark directories. These use a separate validation campaign; adding the
 five flaky tests with `--include-excluded` produces 3,896 registrations and does
 not add those benchmark-only inputs. See
 [the source/driver inventory](../../docs/evidence/upstream-benchmark-only-inventory-2026-09-22.json).
-All seven now pass their original benchmark drivers in native Lean, Node, Deno
-and local rebuilt Bun on Linux x64, with matching output after explicit timing
-normalization. See [the separate benchmark results](../../docs/evidence/benchmark-inputs-all-engines-2026-09-22.json).
+All seven now pass their original benchmark drivers in native Lean and Node on
+Linux x64, with matching output after explicit timing normalization. See [the separate benchmark results](../../docs/evidence/benchmark-inputs-all-engines-2026-09-22.json).
 
 Source verification covers 7,267 original regular-file hashes and the six
 original symlink targets, including shared benchmark drivers. The link inventory
@@ -87,8 +86,7 @@ are excluded from comparison. The shared fixture also drives
 
 `probe-system-directories.py NEW_OUTPUT FROZEN_FACADE` compares fifteen Linux
 home/temporary-directory cases in the same guarded slot. `--startup` runs the
-preserved original conditions, including oversized `HOME` values that prevent
-Deno/Bun startup. The default parallel probe sets those three boundary values
+preserved original conditions, including oversized `HOME` values. The default parallel probe sets those three boundary values
 using ordinary Lean `osSetenv` after startup. Packaged tests use a compact
 every-byte check for the long ASCII result because the preserved verbose version
 exposes a separate packaged-stack failure. Neither failure is counted as a pass;
@@ -109,8 +107,7 @@ OOM, throttling and swap events. A zero CTest exit cannot override missing
 monitoring. A contained proactive budget stop remains a separate
 `resource-aborted` outcome; pressure and monitor failures stop for review.
 The predicate has 29 small report-only controls and accepts all 3,896 completed
-Node reports, the 109 Deno reports available at validation, and the retained
-safe budget-stop record. No allocation-pressure test was used; see
+Node reports and the retained safe budget-stop record. No allocation-pressure test was used; see
 [the completion-check evidence](../../docs/evidence/campaign-resource-completion-2026-09-23.json).
 
 Do **not** use `MemoryHigh` throttling or deliberately induce OOM to verify this
@@ -217,8 +214,7 @@ and generated wrappers are checked before and after each run. Keep its results
 separate from the interpreted-driver campaigns. A passing compiled-driver run
 does not erase an original-driver memory stop or establish full conformance.
 The server-project and cancellation controls pass with this harness in native
-Lean, Node, Deno and the local rebuilt Bun, preserving every original and
-harness hash. Node's server-project run peaks at 7.54 GiB below the unchanged
+Lean and Node, preserving every original and harness hash. Node's server-project run peaks at 7.54 GiB below the unchanged
 8 GiB proactive budget; the earlier interpreted-driver stop remains recorded.
 See [the separate comparison](../../docs/evidence/server-project-driver-2026-09-22.json).
 `probe-driver-integrity.mjs NEW_DIRECTORY` checks unchanged inputs and drift
@@ -293,53 +289,14 @@ The original failures and fixed comparisons are retained separately. This is
 additional behavioral coverage, not an upstream-suite pass. The Windows bind
 path still needs implementation; the POSIX branch needs native macOS validation.
 
-`probe-bun-startup.mjs --toolchain FROZEN_BUN_FACADE --output NEW_DIRECTORY`
-compares four sequential startup smoke runs under one resource guard. It checks
-the pinned engine's option dump before executing each variant and retains a
-native control. Explicitly enabling IPInt may repeat the default; the recorded
-effective options determine whether a variant actually changes anything.
-The first comparison found no startup improvement from that setting or from
-reducing Wasm compiler threads to two. Its resource peak covers the entire
-comparison, so it cannot establish a per-variant memory improvement.
-`--profile interpreter` compares normal tiering with IPInt enabled and both Wasm
-JIT tiers disabled; `--profile control` runs just the normal-engine control.
-The follow-up found disabling the JIT slower (80 versus 72 seconds). A separately
-frozen five-worker facade, with identical Wasm bytes, completed the same smoke
-in 46 seconds and passed the unchanged dedicated-task, timer, and TCP tests.
-These are single-run timings and three regressions, not full Bun conformance.
-See [the retained comparison](../../docs/evidence/bun-pool5-2026-09-21.json).
-Broader validation subsequently timed out in every case of the unchanged HTTP
-hang-regression file with five prestarted workers. Restoring eight workers with
-identical Wasm and host code passed that original test in 77 seconds. Keep eight
-prestarted workers for full Bun testing; the smaller startup smoke does not
-justify adopting five for general workloads. The first combined attempt stopped
-safely at its memory budget, and the isolated five-worker retry was a completed
-test failure; neither result is erased by the passing eight-worker control.
-
 The subsequent startup trace isolated 13,985 individual table-growth calls per
 main/worker. `derive-table-growth.mjs FROZEN_SOURCE NEW_OUTPUT` preserves the
 Wasm, worker count, and host while reserving exactly those missing initial-main
 function slots in one growth. Existing free slots, function-pointer order,
 aliases, later side modules, and incremental table-limit failures retain their
 original behavior. Future `freeze-build.mjs` snapshots apply this optimization.
-The eight-worker Bun startup smoke now takes 4.42 seconds; the same ordinary
-console fixture fell from 70.09 to 4.77 seconds. These are individual Linux x64
-executions with the disclosed Bun stack helper, not portable timing guarantees.
 The [retained evidence](../../docs/evidence/table-growth-2026-09-21.json) includes
-28 loader controls, 47 passing upstream registrations, and the pre-existing Bun
-module-root failure reproduced on both old and optimized runtimes.
-
-A later six-worker comparison also fails HTTP's early-streaming assertion and
-safely resource-aborts the original parallel-cancellation test at 8.06 GiB.
-`derive-bun-gc.mjs FROZEN_SOURCE NEW_OUTPUT` freezes an opt-in alternative with
-unchanged Wasm and worker counts. Prepare that snapshot with `--engine bun
---bun-smol` to apply Bun's `--smol` to the main process and `smol:true` to every
-Emscripten worker, including generated applications. The flag is rejected for
-other engines or snapshots without the matching worker prelude. Ordinary
-facades retain their existing GC behavior. The eight-worker GC experiment
-passes HTTP but still reaches 8.06 GiB in cancellation, so it remains a
-diagnostic, not a solution to that memory gate. See
-[the retained results](../../docs/evidence/bun-gc-2026-09-21.json).
+28 loader controls and 47 passing upstream registrations.
 
 `probe-fifo-finalizer.mjs --output NEW_DIRECTORY --toolchains FACADE[,FACADE]`
 compares a supplementary ordinary Lean fixture against native Lean and the
@@ -347,8 +304,7 @@ selected engines. On Linux it measures a FIFO's capacity, fills it plus a partia
 stdio buffer, and checks that a delayed reader can run while the writer's
 finalizer flushes. Each child has an external deadline so a blocked host event
 loop cannot also disable its timeout. The compiler deadline defaults to 180
-seconds to accommodate Bun's measured startup, and can be set with
-`--timeout-seconds`; the host-only deadline is five seconds.
+seconds and can be set with `--timeout-seconds`; the host-only deadline is five seconds.
 `--host-only --host-module MODULE` isolates
 the private host adapter. These are additional differential checks, not edited
 upstream tests or full-suite passes.
@@ -363,7 +319,7 @@ PATH/main.mjs` to the probe to run a built application with stock engine flags,
 and `--source FILE.lean` to select a supplementary native control. Each run copies
 the exact fixture and records its hash. `FifoFinalizer.lean` covers a dropped file
 handle; `FifoThreadFinalizer.lean` covers the last reference in task-local stdout.
-Both now pass natively and in stock Node, Deno, and Bun on Linux x64. The packaged
+Both now pass natively and in stock Node on Linux x64. The packaged
 scheduler preserves its suspended C stack pointer and runs task-local cleanup as
 a resumable entry. `test/finalizers.test.mjs` keeps both as application regressions.
 See [the evidence](../../docs/evidence/cooperative-finalizers-2026-09-21.json);
@@ -428,7 +384,7 @@ compiler without recompiling its Wasm:
 
 ```sh
 node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/derive-cc-driver.mjs FROZEN_COMPILER .work/compiler-with-split-link
-node scripts/full-lean/prepare-toolchain.mjs --engine node --build .work/compiler-with-split-link --output .work/split-link-toolchain --standalone-link-optimization 1 --lean-threads 4 --lake-threads 1
+node scripts/full-lean/prepare-toolchain.mjs --build .work/compiler-with-split-link --output .work/split-link-toolchain --standalone-link-optimization 1 --lean-threads 4 --lake-threads 1
 ```
 
 Only one generated Lean C source with verified runtime libraries qualifies.
@@ -447,7 +403,7 @@ then derive a composite artifact and prepare a fresh toolchain facade:
 ```sh
 node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py python3 scripts/full-lean/build-shared-runtime.py FROZEN_COMPILER .work/shared-runtime
 node scripts/full-lean/derive-application-runtime.mjs FROZEN_COMPILER .work/shared-runtime .work/compiler-with-shared-runtime
-node scripts/full-lean/prepare-toolchain.mjs --engine node --build .work/compiler-with-shared-runtime --output .work/shared-toolchain --shared-applications --lean-threads 4 --lake-threads 1
+node scripts/full-lean/prepare-toolchain.mjs --build .work/compiler-with-shared-runtime --output .work/shared-toolchain --shared-applications --lean-threads 4 --lake-threads 1
 ```
 
 Use new output directories. The builder uses one build/Binaryen worker and one
@@ -491,7 +447,7 @@ checks own/enumerable membership directly and computes an enumeration index only
 when adding a new table function. Worker synchronization still receives that
 exact index. The pinned SDK patch applies the same repair to future builds.
 
-The original HTTP streaming regression passed three repetitions in each engine
+The original HTTP streaming regression passed three repetitions in Node
 after this change, with no timing edits. Nine loader unit controls and native/
 Wasm cross-thread pointer controls supplement those runs. Reproduce the latter
 with the normal Lasm worker bootstrap and a writable development SDK:
@@ -510,7 +466,7 @@ native Lean. Ten cases require identical fixture output. A separate missing-
 directory case records the pinned native ENOENT-decoder crash and checks Lasm's
 safe error against native's valid empty-directory error path. This is explicitly
 a safety check, not a parity pass. Linux x64 checks pass in packaged and full
-Node, Deno and Bun; full Bun uses the local engine build and stack helper. See
+Node. See
 [the temporary-file evidence](../../docs/evidence/temporary-files-2026-09-22.json).
 
 `probe-realpath.mjs NEW_OUTPUT FULL_TOOLCHAIN...` compares 17 ordinary Lean
@@ -637,12 +593,8 @@ the same unchanged module compiled successfully with the 8 MiB setting. This is 
 build configuration adjustment, not an upstream test edit or a conformance pass.
 
 The engine probe checks actual Wasm threads, exceptions, binary host filesystem
-operations, and empty environment values in Node, Deno, and Bun. It includes the
-Bun worker-message adapter in `emscripten-pre.js`. Passing the probe is only a
+operations, and empty environment values in Node. Passing the probe is only a
 prerequisite for the full compiler and test suite.
-
-The application-engine integration checks are maintained separately in
-`integration/engines.test.mjs`; see [the engine report](../../docs/JS_ENGINES.md).
 
 ## Native value layout and full host integration
 
@@ -670,27 +622,24 @@ recipe uses Emscripten's `emconfigure`, `--host=none --disable-assembly
 ```sh
 node scripts/full-lean/build.mjs --stage wasm64 --jobs 2 --link-opt -O1
 LEAN_STACK_SIZE_KB=8192 node scripts/full-lean/run-bounded.mjs -- node scripts/full-lean/run-compiler.mjs --prefix .work/lean-full/wasm64 --version
-node scripts/full-lean/prepare-toolchain.mjs --engine node
+node scripts/full-lean/prepare-toolchain.mjs
 node scripts/full-lean/prepare-suite.mjs --output .work/full-suite-node --backend node --prefix .work/full-toolchains/node
 node scripts/full-lean/run-suite.mjs --suite .work/full-suite-node --jobs 1
 ```
 
-`prepare-toolchain.mjs` also accepts `--engine deno` and `--engine bun`. Its Lean,
-Lake, LeanIR, Leanc, and LeanChecker entry points all run Lean in that engine.
+The `prepare-toolchain.mjs` facade's Lean, Lake, LeanIR, Leanc, and LeanChecker
+entry points all run Lean in Node.
 They do not substitute native Lean tools on failure. External C compilation,
 archive, and SAT tools remain explicit subprocess dependencies, as in upstream.
 Full suites must run against frozen compiler builds; do not rebuild the selected
 artifact during a run. New facades default to four Lean workers and 64 MiB application thread
 stacks unless explicitly overridden. `build.mjs --stack-mb` controls the compiler's
 main pthread reservation (default 64 MiB); changing `LEAN_STACK_SIZE_KB` alone
-does not resize that main stack. Node and Deno's separate engine worker stacks
-reserve 64 MiB through `LASM_VM_STACK_MB`. Deno additionally receives
-`--v8-flags=--stack-size=61440` to raise its separate V8 budget while leaving
-native stack headroom. Bun currently ignores the Node
-worker resource-limit option, so the shim does not pass it there. These resource settings belong to the parallel
+does not resize that main stack. Node's separate engine worker stacks
+reserve 64 MiB through `LASM_VM_STACK_MB`. These resource settings belong to the parallel
 harness, not upstream tests. Run complete suites in sequence when their fixed-port
 network tests could otherwise collide, or pass the same `--network-lock` path to
-`prepare-suite.mjs` for each engine. That Linux harness option serializes the
+`prepare-suite.mjs` for each suite. That Linux harness option serializes the
 original fixed-port TCP/UDP drivers with `flock`; it does not rewrite their ports.
 
 `prepare-toolchain.mjs --lake-threads 1` creates a separately recorded resource
@@ -750,10 +699,7 @@ to call libc `execvp`; it is replaced by the actual requested executable. Its
 configuration travels over a private pipe, and target environment settings are
 applied after launcher startup. Standard Lean declarations are unchanged.
 File workers have separate startup handling for removed working directories:
-Node uses a worker-local JS cwd fallback during bootstrap, and Deno can create
-a worker with an explicit module URL before Node compatibility initializes.
-Both preserve the OS cwd. The Deno fallback retires after one operation because
-the Web Worker API lacks `unref`; the normal reusable pool is retained otherwise.
+Node uses a worker-local JS cwd fallback during bootstrap, preserving the OS cwd.
 The additional FIFO regression starts four blocked readers from a removed cwd
 and then performs their dependent writes. Native macOS/Windows validation and
 concurrent rename/removal races remain outside these controls.
@@ -775,16 +721,13 @@ Standalone mains propagate cwd changes; embedded module instances retain their
 separate directory by default.
 
 When the saved directory identity matches the process cwd, Linux child launchers
-inherit it instead of calling `fchdir` again. Deno uses libc `posix_spawn` for this
-path because its [Node-compatible spawn implementation](https://github.com/denoland/deno/blob/v2.9.7/ext/process/lib.rs)
-re-enters a named cwd even when no cwd argument was supplied. Only libc runs
-between its internal fork/vfork and exec. A private socket transfers configuration;
+inherit it instead of calling `fchdir` again. A private socket transfers configuration;
 close-on-exec acknowledgement keeps a dropped child's bootstrap alive until the
 requested executable starts or the launcher fails. It does not wait for that
 executable to finish. Native spawn controls cover low-numbered descriptors, large
 configuration payloads, concurrent engine/native child reapers, and signal exit
-status. Deno's Linux child now starts through `native/process-launcher.c`, a small
-bundled executable that does not query cwd during bootstrap. The maintainer-only
+status. `native/process-launcher.c` is a small bundled executable that does not
+query cwd during bootstrap. The maintainer-only
 `scripts/build-process-launcher.mjs` builds glibc and static-musl variants for x64
 and ARM64 with pinned Zig under the resource guard and a two-CPU affinity. End
 users do not compile this helper. Source, binary hashes, and third-party notices
@@ -799,16 +742,10 @@ same source through generated mains and source launchers. It is a supplementary
 fixture, not an edited upstream test.
 
 That comparison also exposed fresh pthread bootstrap failures after cwd deletion.
-Node now preloads the existing worker-local JS cwd fallback. Deno starts one
-unreferenced private factory while the directory is valid; Linux `unshare(CLONE_FS)`
-gives only that factory its own directory context, rooted at `/`. When the real
-application cwd is removed, the factory starts new workers with the same stack
-limits and relays their messages, transferred ports, and shared memory. Ordinary
-workers retain their direct path. The application cwd is never temporarily
-changed. Error and shutdown comparisons include each engine's unwrapped worker
-control. Sandboxes denying `unshare(CLONE_FS)`, independent instance cwd permission
-inheritance, and non-Linux behavior remain open. `derive-worker-cwd.mjs` freezes
-this private prelude change without rebuilding or modifying Wasm or Lean inputs.
+Node now preloads the existing worker-local JS cwd fallback. The application cwd
+is never temporarily changed. Independent instance cwd permission inheritance and
+non-Linux behavior remain open. `derive-worker-cwd.mjs` freezes this private
+prelude change without rebuilding or modifying Wasm or Lean inputs.
 
 Lean's C++ shell does not read the generated application main's thread/stack
 environment defaults. The facade supplies its ordinary `-j` and `-s` options
@@ -827,12 +764,7 @@ still fails the memory-intensive `instances` test with this option. The alternat
 `--memory64 1 --max-memory-gb 8` selects actual 64-bit Wasm addressing; the default
 remains lowered `--memory64 2 --max-memory-gb 4`. These variants need separate
 frozen builds and conformance evidence. Native memory64 engine prerequisites pass
-in Node and Deno; Bun's experimental flag currently exposes a shared-memory
-worker-transfer defect, so it is not a working Bun configuration. A separately
-downloaded and SHA-verified `1.4.3-canary.1+a2b69f7b0` retains that defect in the
-same one-page reproduction; Node and Deno controls pass. This remains an engine
-defect, not a proven fundamental restriction. See
-[the canary comparison](../../docs/evidence/bun-canary-memory64-2026-09-21.json).
+in Node.
 
 `--lean-allocator mimalloc` is a separate experimental option: it enables Lean's
 native mimalloc object layout and uses the SDK's matching allocator/header. It
@@ -852,29 +784,17 @@ node scripts/full-lean/probe-stack-diagnostics.mjs .work/stack-diagnostic-probe
 node scripts/full-lean/prepare-http-timing-probe.mjs .work/http-timing-probe 10
 ```
 
-`probe-loader.mjs` compares the native loader with all three engines on Linux.
-`probe-memory64.mjs` records stock and flagged Bun results as well as Node/Deno.
+`probe-loader.mjs` compares the native loader with Node on Linux.
+`probe-memory64.mjs` records the Node result.
 `probe-host-memory.mjs` exercises the real synchronous/asynchronous bridge above
-2 GiB in all three engines and above 4 GiB in Node/Deno. Requests carry a numeric
-wait-signal offset: cloning a shared typed array truncates that offset in the
-pinned Node engine; Deno's corresponding control preserves it. `probe-build-cache.mjs` checks the actual generated
+2 GiB and 4 GiB in Node. Requests carry a numeric wait-signal offset: cloning a
+shared typed array truncates that offset in the pinned Node engine. `probe-build-cache.mjs` checks the actual generated
 make rules after a runtime-header change. `probe-stack-diagnostics.mjs` verifies
 the diagnostic and exit status for uncaught engine stack exhaustion.
 `prepare-http-timing-probe.mjs` creates a separate HTTP test derivative with
 uniformly scaled time intervals. It records every changed line and the original
 source hash. Run its generated Lean file with both the native control and the
 chosen Wasm facade; report those results separately from the unchanged suite.
-`probe-bun-stack.mjs` takes an existing generated `const_fold.lean.out.cjs`, a
-frozen host module, and a new output directory. It compiles a Linux-only helper
-and preloads it only into diagnostic child processes. This is not part of the
-published launcher or the stock Bun conformance run.
-
-For a separate Linux resource-adjusted suite, `prepare-toolchain.mjs --engine bun
---bun-stack-helper <compiled-stack-reservation.so>` copies and hashes that helper
-into the new facade, reserves 64 MiB for Bun workers, and sets JSC's budget to
-60 MiB. The facade and its generated programs record/use that environment.
-Keep these results separate from stock Bun; this option is not a portable
-packaged solution and must never be used to relabel an existing run.
 
 The host bridge transfers requests from Wasm pthreads to the JavaScript main
 thread through message ports. Waiting pthreads use Emscripten's futex API, which
@@ -888,24 +808,22 @@ The full-runtime host imports now use pointer-sized input/copy lengths and signe
 64-bit response lengths. `probe-transfer-width.py` exercises the production C++
 declarations and JavaScript imports with length-only RPC responses, so the
 2 GiB/4 GiB boundary checks do not allocate large buffers. Run it through the
-guard with an explicit memory64-capable Bun executable:
+guard:
 
 ```sh
 node scripts/full-lean/run-bounded.mjs --report .work/transfer-width.resources.json -- \
   python3 scripts/full-lean/base-pages.py python3 scripts/full-lean/probe-transfer-width.py \
-  .work/transfer-width --bun /absolute/path/to/memory64-capable-bun
+  .work/transfer-width
 ```
 
 Use a new output directory to retain previous attempts. The probe snapshots its
-inputs and hashes the engines before and after all 72 checks. These synthetic
+inputs and hashes Node before and after all 24 checks. These synthetic
 counts and the separate high-address bridge checks do not establish safe
 multi-GiB payload allocation. The packaged Wasm32 ABI remains unchanged; see
 [the repair evidence](../../docs/evidence/host-transfer-width-2026-09-22.json).
 
 The private transport carries ArrayBuffers and explicit view bounds, reconstructing
-typed arrays after receipt. [Deno 2.9.7's synchronous port adapter](https://github.com/denoland/deno/blob/v2.9.7/ext/node/polyfills/worker_threads.ts#L2120)
-recursively enumerates typed-array indices; the ArrayBuffer envelope avoids that traversal.
-Fresh request copies transfer their backing stores. Responses preserve cloning
+typed arrays after receipt. Fresh request copies transfer their backing stores. Responses preserve cloning
 because the host may retain aliases. `probes/message-buffer.cjs` compares the
 small-buffer forms without a compiler build:
 
@@ -915,12 +833,9 @@ node scripts/full-lean/run-bounded.mjs --report .work/message-buffer.resources.j
   arraybuffer transfer 8388608
 ```
 
-Use `buffer`, `uint8`, or `arraybuffer`, and `clone` or `transfer`. Repeat with
-`deno run -A` and Bun in separate guarded workloads. The probe caps payloads at
-8 MiB, verifies received length and sampled bytes, and reports elapsed time and
-RSS without a timing-based pass threshold. Larger ordinary-Lean reads and their
-remaining copy costs are recorded in
-[the transport evidence](../../docs/evidence/deno-message-envelope-2026-09-22.json).
+Use `buffer`, `uint8`, or `arraybuffer`, and `clone` or `transfer`. The probe caps
+payloads at 8 MiB, verifies received length and sampled bytes, and reports elapsed
+time and RSS without a timing-based pass threshold.
 
 The maintained build patch also fixes C++/Lean ABI declaration mismatches exposed
 by strict Wasm validation, retains initialized constants needed by the interpreter,
@@ -929,7 +844,7 @@ and check both value layouts plus concurrent asynchronous host calls and heap
 accesses above 2 GiB. The SDK patch enables unsigned JavaScript heap indexing for
 lowered memory64 and preserves BigInt conversion for dynamically loaded symbols.
 The regression allocates a high-address pthread stack and calls the host clock
-with a high-address output buffer in all three engines. It does not change a Lean
+with a high-address output buffer in Node. It does not change a Lean
 test or raise a test's expected limits.
 
 The maintained engine probes also load a library while another pthread waits on
@@ -955,12 +870,12 @@ The full compiler includes the actual generated `LakeMain`, `Leanc`, `LeanIR`, a
 original compiled main. The tool facade selects an entry point with a private
 host environment value; no tool is replaced with native Lean. Reinterpreting the
 Lake entry source had exposed missing runtime initialization; the real compiled
-entry point starts correctly in all three engines.
+entry point starts correctly in Node.
 
 The SDK patch also ignores only normal cleanup/finished notifications already
 queued when a pthread is terminated during process exit. Unexpected late messages
 still report an error. A separate build probe repeats detached-thread shutdown ten
-times in each engine and requires exactly empty stderr. The application C adapter
+times in Node and requires exactly empty stderr. The application C adapter
 uses the C input driver with C++ runtime linking, avoiding accidental C++ treatment
 of Lean's generated C. SDK notices about the chosen experimental link configuration
 are disabled in this adapter; source diagnostics remain enabled.
@@ -982,9 +897,8 @@ paths cannot silently retain the old SDK. Neither a running snapshot's host
 modules nor its compiler sources should be edited during a conformance run.
 
 The full runtime and executable adapter enable `GROWABLE_ARRAYBUFFERS=1`: use
-growable memory views when supported, with Emscripten's fixed-view fallback for
-other engines. This addresses an observed stale shared-memory view in Deno's
-full compiler. The library prelude also searches the host's library-path variable
+growable memory views when supported, with Emscripten's fixed-view fallback
+otherwise. The library prelude also searches the host's library-path variable
 when loading a shared dependency before Emscripten's libc loader is initialized.
 
 `prepare-suite.mjs --include-excluded` adds the five tests that upstream explicitly
@@ -1015,47 +929,13 @@ checks transferred and freshly constructed modules, the memory address type,
 growth, maximum enforcement, shared atomic writes, and a return transfer.
 Use `i32`/`i64`, initial/maximum pairs `0 0`, `0 2`, `1 2`, and transports
 `workerData`, `postMessage`, `messageChannel`. Run these probes through the
-resource guard. Bun also needs `BUN_JSC_useWasmMemory64=true` inside the guard;
-Deno uses `deno run -A`.
-
-Node and Deno pass all 18 variants. Stable Bun and the tested canary each pass
-six; zero-capacity variants crash, and the remaining memory64 variants lose
-the address type across worker transfer. These tiny engine cases allocate at
-most two 64 KiB pages. Stock Bun remains unchanged. See
-[the complete matrix](../../docs/evidence/bun-shared-memory-matrix-2026-09-21.json).
-
-The local [Bun 1.4.2 patch](patches/bun-1.4.2-shared-memory-address.patch)
-preserves the address type alongside the shared-memory handle and avoids
-dereferencing a null handle for zero-capacity memory. It applies to commit
-`744846f844374847c902b5e7fd59b4342a51ef99`. A Linux x64 debug build with ASAN
-passes all 18 added checks, 15 existing neighboring worker-transfer tests, and
-the original four-check one-page memory64 probe. The added tests first reproduce
-all 12 expected failures on the released binary. This is an opt-in engine repair;
-full Lean validation and other platforms remain separate gates.
-
-Use Bun's ordinary `bun bd` build-then-exec workflow in an ignored source tree,
-inside `run-bounded.mjs` and `base-pages.py`, with one build job on this host.
-Keep its build cache inside this repository's ignored cache. For the ASAN debug
-binary, `ASAN_OPTIONS=allow_user_segv_handler=1` is required for shared Wasm,
-as in Bun's own test harness; this does not disable sanitizer checks. The full
-compile stopped safely at the proactive budget during linking; an unchanged
-incremental link completed under the same guard. Preserve those attempts
-separately. See [the patch, validation, and resource evidence](../../docs/evidence/bun-memory64-local-fix-2026-09-21.json).
-
-A separate local `build:release` build passes the same 18 + 15 + 4 engine controls
-and starts the full Lean compiler in 2.51 seconds. Four unchanged IO, cancellation,
-and HTTP registrations pass. `instances` still reports an internal allocation
-failure because Bun's fork retains a separate 4 GiB ArrayBuffer/Wasm capacity
-limit. Its source explains that some Bun buffer paths still use 32-bit lengths.
-Do not remove that limit without addressing and validating those paths.
+resource guard. Node passes all 18 variants. These tiny engine cases allocate at
+most two 64 KiB pages.
 
 `probes/memory64-capacity.cjs` queries exposed resizable capacity with just one
 initial 64 KiB page per memory and no positive growth. Run it inside the resource
-guard, using `BUN_JSC_useWasmMemory64=true` for Bun and `deno run -A` for Deno.
-Patched Bun reports 4 GiB for an 8 GiB declaration; Deno reports 8 GiB. The pinned
-Node lacks this query, which is recorded explicitly. This is an engine diagnosis,
-not an upstream test or a fundamental-limit claim. The release build and all five
-Lean outcomes are preserved in [the release evidence](../../docs/evidence/bun-memory64-release-2026-09-21.json).
+guard. The pinned Node lacks this query, which is recorded explicitly. This is an
+engine diagnosis, not an upstream test or a fundamental-limit claim.
 
 ## Host platform comparisons
 
@@ -1068,11 +948,11 @@ use the Wasm64 ABI. This changes no public Lean API.
 platform object using the same frozen runtime archives. Supply native-memory64
 prefixes sharing one frozen compiler and run under `run-bounded.mjs` with
 `base-pages.py`. The supplementary ordinary Lean fixture runs against native
-Lean and controlled Linux/Windows/macOS host values in each selected engine.
+Lean and controlled Linux/Windows/macOS host values in Node.
 The production mapping body is retained; only its host input is controlled.
 Nine repaired comparisons pass, while the original fails all six non-Linux
 cases. Actual rebuilt compiler checks and six unchanged upstream registrations
-per engine also pass on Linux x64. These are separate from native cross-OS
+also pass on Linux x64. These are separate from native cross-OS
 validation; see [the retained evidence](../../docs/evidence/host-platform-2026-09-21.json).
 
 ## External C compiler inputs
@@ -1085,8 +965,8 @@ object file when linking a command such as `clang main.c helper.o -o app`.
 `probe-cc-inputs.mjs NEW_OUTPUT PREFIX...` checks mixed C/C++ sources, objects,
 archives, the C++ driver's treatment of a `.c` input, and quoted response files
 containing paths with spaces. Run it through `run-bounded.mjs` with
-`base-pages.py`, supplying one frozen toolchain prefix per engine. Three native
-controls and all fifteen engine cases pass on Linux x64. The small fixture
+`base-pages.py`, supplying a frozen toolchain prefix. The native controls and
+engine cases pass on Linux x64. The small fixture
 rejects accidental C++ compilation of its C source and verifies the linked
 program's result.
 
@@ -1097,56 +977,19 @@ This allows an isolated adapter regression without rebuilding or mutating the
 parent compiler snapshot.
 
 The unchanged Lake FFI and reverse-FFI examples, dedicated-thread compilation,
-and external boxing also pass in each engine, twelve registrations total. See
+and external boxing also pass in Node. See
 [the original failure and full validation](../../docs/evidence/cc-inputs-2026-09-21.json).
 
 `probes/buffer-width.cjs` checks 40 buffer operations using a three-byte input
 and boundary offsets, including values above 4 GiB. It allocates no large
-buffer. Run inside the guard with Node, `deno run -A`, or Bun and compare the
-recorded results. Node and Deno agree; released and locally patched Bun differ
-on three `StringDecoder.text` cases. These engine findings inform the separate
-large-buffer audit and are not Lean suite failures. See
+buffer. Run it inside the guard with Node. These engine findings inform the
+separate large-buffer audit and are not Lean suite failures. See
 [the offset comparisons](../../docs/evidence/buffer-width-2026-09-21.json).
-
-The subsequent `patches/bun-1.4.2-string-decoder-width.patch` retains `size_t`
-decoder lengths and follows Node's public `text` slicing/reset behavior. Apply
-it to the same pinned Bun source after the shared-memory patch, then use Bun's
-official build-then-execute workflow inside `run-bounded.mjs` with one build job.
-Separate frozen release and ASAN artifacts are recorded in
-[the decoder evidence](../../docs/evidence/bun-decoder-width-2026-09-21.json).
-The patch adds 22 tests without changing existing test bodies.
 
 `probes/decoder-width.cjs` checks a 4 GiB buffer's final byte and rejection of
 oversized hex output. Run it only inside the guard: although the probe explicitly
 writes one byte, the native Node baseline peaked at about 4.03 GiB for the guarded
-run. `probes/decoder-text-negative.cjs` preserves the input of Bun's existing
-negative-offset test and checks Node's `ERR_STRING_TOO_LONG` result. The original
-Bun test remains a recorded failure because it expects an empty string. Both
-repaired profiles pass the separate comparison and all six width checks.
-
-The default ASAN run records a timeout for the 1,000 forced-GC case. A parallel
-run supplies `bun test --timeout 90000`; the test source and its other explicit
-deadlines remain unchanged. Both release and that debug profile pass 119 of 120
-decoder cases, with only the documented Node-semantics disagreement remaining.
-All 18 cloning controls, 15 neighboring worker tests, and four original memory
-checks pass again. The WebKit capacity constant is unchanged at 4 GiB; these
-engine checks are neither a capacity repair nor full Lean-suite results.
-
-The later `patches/webkit-2e2aa2290fac856d-bun-8g-capacity.patch` is an opt-in
-experiment against WebKit commit `2e2aa2290fac856d6f451ceacb58f7f5b44dd057`.
-Apply it in a separate source checkout, retain both Bun patches, and use Bun's
-supported `BUN_WEBKIT_PATH` / `--webkit=local` build path in a new build directory.
-Rebuild the matching static libraries and Bun; changing downloaded headers alone
-does not change their compiled capacity. Keep the one-job build inside the guard.
-The recorded Linux build uses host ICU 74.2 instead of bundled ICU 78.3.
-
-`probes/memory64-boundary-jsc.js` checks the JSC shell first. Its arguments are
-`shared|unshared PAGES observe-tier|require-final-tier "$LASM_RESOURCE_UNIT"`;
-use `--useWasmMemory64=true`, start at two pages, and only then use 65,537 pages.
-The explicit guard token prevents accidental unguarded large allocations.
-The optional final-tier assertion tests optimizer coverage, not just semantics.
-It remains a recorded failure for the large mixed-offset loop; a separate profile
-keeps all correctness assertions while recording actual observed tiers.
+run.
 
 `probes/memory64-buffer-boundaries.cjs` and `probes/buffer-high-offsets.cjs` take
 `shared|unshared [PAGES]`. Run them only inside the guard, starting at two pages.
@@ -1155,13 +998,7 @@ engine does not guarantee low commitment elsewhere. They test Wasm/typed-array
 access, Buffer operations, filesystem offsets, and shared worker views. The latter
 probe isolates each operation and retains failures instead of stopping at the
 first one. It also checks Lasm's typed-array copy and numeric-offset reconstruction
-paths against known Node/Deno high-offset Buffer/cloning differences.
-
-The frozen local 8 GiB engine passes all five selected unchanged Lean controls,
-including `instances`; the earlier capacity failure remains preserved. Stock Bun,
-ASAN coverage of the new WebKit build, the full Lean suite, package integration,
-and other operating systems/architectures remain separate gates. See
-[the full capacity evidence](../../docs/evidence/bun-memory64-capacity-2026-09-22.json).
+paths against known Node high-offset Buffer/cloning behavior.
 
 ### Private helper integration prerequisites
 
@@ -1180,10 +1017,9 @@ for all earlier failures and the successful 5.16 GiB peak.
 `probe-wasmtime-memory-view.mjs NEW_OUTPUT window` checks a separate host-memory
 bridge prerequisite, using a one-GiB guard and base-pages wrapper. The native
 mapping is sparse; only one eight-byte cell at address 4 GiB is touched. Parent
-and worker access are ordered by messages. Each engine views eight bytes of the
+and worker access are ordered by messages. Node views eight bytes of the
 same native memory without copying, and native/Wasm operations observe the
 changes. Invalid ranges are rejected. The `whole` profile retains the original
-full-view experiment, which aborted Bun's process without a memory-resource
-event. These external views are ordinary ArrayBuffers, not SharedArrayBuffers;
+full-view experiment. These external views are ordinary ArrayBuffers, not SharedArrayBuffers;
 this does not implement JavaScript atomic synchronization or Emscripten's complete
 memory interface. See the [view evidence](../../docs/evidence/wasmtime-memory-views-2026-09-24.json).

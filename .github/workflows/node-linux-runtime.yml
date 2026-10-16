@@ -32,7 +32,7 @@ jobs:
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Confirm latest stable acceptance pins
-        run: node scripts/ci/check-acceptance-versions.mjs .work/ci-application-runtime/versions.json --node-only
+        run: node scripts/ci/check-acceptance-versions.mjs .work/ci-application-runtime/versions.json
       - name: Enable process-tree guard
         run: |
           node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'linux-x64')"

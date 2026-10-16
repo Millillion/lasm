@@ -172,8 +172,8 @@ if (!isMainThread) {
     assert.throws(() => bridge.atomics.load(span, 0), /released/); rejectionControls++;
     equal(bridge.atomics.load(ordinary, 0), -37, 'close does not disable unrelated native Atomics');
     console.log(JSON.stringify({ scope: 'Nine scalar JS Atomics operations on branded sparse native spans; waits, general heap views, shipping backend and Lean acceptance remain separate',
-      engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
-      version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
+      engine: 'node',
+      version: process.versions.node,
       accessibleGuestBytes: byteLength, touchedGuestCells: 36, groups, comparisons, rejectionControls }));
   } finally {
     bridge.close();

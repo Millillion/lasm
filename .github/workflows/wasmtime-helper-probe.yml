@@ -22,14 +22,6 @@ jobs:
         with:
           node-version: 26.10.0
           package-manager-cache: false
-      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
-        with:
-          deno-version: 2.9.7
-          cache: false
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version: 1.4.2
-          no-cache: true
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Verify current stable acceptance pins
         run: node --max-old-space-size=128 scripts/ci/check-acceptance-versions.mjs .work/wasmtime-probe-versions.json
@@ -38,20 +30,20 @@ jobs:
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
-      - name: Probe stock engines serially under one guard
+      - name: Probe stock Node under one guard
         run: >-
           node scripts/full-lean/run-bounded.mjs --memory-mib 1024
           --report .work/wasmtime-helper-resources.json --
           python3 scripts/full-lean/base-pages.py
           node --max-old-space-size=128 scripts/full-lean/probe-wasmtime-helper.mjs
-          .work/wasmtime-helper node deno bun
+          .work/wasmtime-helper node
       - name: Check scalar atomic adapter and Wasm synchronization
         run: >-
           node scripts/full-lean/run-bounded.mjs --memory-mib 1024
           --report .work/native-atomic-views-resources.json --
           python3 scripts/full-lean/base-pages.py
           node --max-old-space-size=128 scripts/full-lean/probe-native-atomic-views.mjs
-          .work/native-atomic-views node deno bun
+          .work/native-atomic-views node
       - name: Preserve bounded experiment receipts
         if: always()
         run: node -e "const f=require('node:fs');for(const p of ['.work/wasmtime-helper/preparation.json','.work/wasmtime-helper/result.json','.work/wasmtime-helper-resources.json','.work/native-atomic-views/result.json','.work/native-atomic-views-resources.json','.work/wasmtime-probe-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

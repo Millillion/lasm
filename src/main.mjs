@@ -6,7 +6,6 @@ import { build } from './build.mjs';
 import { findLakeProject } from './lake.mjs';
 import { root, targetName, resolveLean, run } from './toolchain.mjs';
 import { executableName } from './platform.mjs';
-import { engineName } from './js-engine.mjs';
 
 function fingerprint(directory, source, project) {
   const hash = createHash('sha256');
@@ -58,7 +57,7 @@ export async function buildMain(file, { output, rebuild = false, verbose = false
     if (previous?.signature === signature && Array.isArray(previous.files) && previous.files.every(name => existsSync(join(output, name))))
       return { output, cacheHit: true, signature };
   }
-  console.error(`Building ${relative(process.cwd(), source) || source} for ${engineName()}…`);
+  console.error(`Building ${relative(process.cwd(), source) || source} for Node…`);
   const config = join(cache, 'main.json');
   let module = 'LasmUserMain';
   if (project) {
@@ -87,7 +86,7 @@ try {
 `);
   // Stamp the inputs observed before compilation. If a source or runtime file
   // changes during the build, the next invocation must invalidate this output.
-  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'lean-io-errors.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'native-process.mjs', 'process-launcher.mjs', 'process-exec.mjs', 'node-udp.mjs', 'node-system.mjs', 'linux-memory.mjs', 'node-signal.mjs', 'deno-signals.mjs', 'native-signals.mjs', 'thread-id.cjs', 'native-files.mjs', 'native-clock.mjs', 'native-windows-timezone.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-file-message.mjs', 'native-worker-cwd.cjs', 'worker-stdio.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native/manifest.json', 'native/process/manifest.json', 'wasi.mjs', 'manifest.json'];
+  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'lean-io-errors.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'native-process.mjs', 'process-launcher.mjs', 'process-exec.mjs', 'node-udp.mjs', 'node-system.mjs', 'linux-memory.mjs', 'node-signal.mjs', 'native-signals.mjs', 'thread-id.cjs', 'native-files.mjs', 'native-clock.mjs', 'native-windows-timezone.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-message.mjs', 'native-worker-cwd.cjs', 'worker-stdio.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native/manifest.json', 'native/process/manifest.json', 'wasi.mjs', 'manifest.json'];
   const launchers = JSON.parse(readFileSync(join(output, 'native/process/manifest.json')));
   for (const name of Object.keys(launchers.files)) files.push('native/process/' + name);
   writeFileSync(stampFile, JSON.stringify({ signature, files }) + '\n');

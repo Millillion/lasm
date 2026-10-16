@@ -9,9 +9,10 @@ import { nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg] = process.argv.slice(2);
-if (!outputArg || !['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)
-  throw new Error('Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER');
+const [outputArg, engineArg, compilerArg] = process.argv.slice(2);
+const target = 'node';
+if (!outputArg || !engineArg || !compilerArg)
+  throw new Error('Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER');
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg);
 if (existsSync(output)) throw new Error('Preserve previous acceptance output');
 mkdirSync(output, { recursive: true });
@@ -41,9 +42,9 @@ const native = join(output, 'native');
 execFileSync(join(lean.prefix, 'bin/leanc'), ['-O3', '-DNDEBUG', '-o', native, source + '.c'], { env, cwd: output, stdio: 'inherit', timeout: 90_000 });
 assert.deepEqual(run(native, ['15']), expected);
 const dist = join(output, 'dist');
-execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', source, '--target', target, '--output', dist],
+execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', source, '--output', dist],
   { env, cwd: output, stdio: 'inherit', timeout: 1800_000 });
-const prefix = target === 'deno' ? ['run', '-A'] : [];
+const prefix = [];
 const results = [];
 for (let index = 0; index < 30; index++) {
   const result = run(engine, [...prefix, join(dist, 'main.mjs'), '15']);
@@ -57,7 +58,7 @@ renameSync(dist, deployed); renameSync(source, source + '.hidden');
 mkdirSync(empty);
 const deployedEnvironment = Object.fromEntries(Object.entries(process.env)
   .filter(([name]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_TOOLCHAIN_CACHE)/.test(name)));
-Object.assign(deployedEnvironment, { PATH: '', DENO_DISABLE_NODE_SHIM: '1',
+Object.assign(deployedEnvironment, { PATH: '',
   LEAN_NUM_THREADS: '2', LEAN_STACK_SIZE_KB: '4194304' });
 const relocated = run(engine, [...prefix, join(deployed, 'main.mjs'), '15'], empty, deployedEnvironment);
 assert.deepEqual(relocated, expected, 'relocated deployment without source/tool paths');

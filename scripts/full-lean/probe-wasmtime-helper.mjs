@@ -8,9 +8,9 @@ import { ensureResourceGuard } from './resource-guard.mjs';
 import { legacyExceptionBytes } from './probes/legacy-exception-bytes.mjs';
 
 await ensureResourceGuard();
-const [outputArg, nodeArg, denoArg, bunArg, ...extra] = process.argv.slice(2);
-if (!outputArg || extra.length || (nodeArg && (!denoArg || !bunArg)) || process.platform !== 'linux' || process.arch !== 'x64')
-  throw new Error('Supply NEW_OUTPUT [NODE DENO BUN] on Linux x64');
+const [outputArg, nodeArg, ...extra] = process.argv.slice(2);
+if (!outputArg || extra.length || process.platform !== 'linux' || process.arch !== 'x64')
+  throw new Error('Supply NEW_OUTPUT [NODE] on Linux x64');
 const root = fileURLToPath(new URL('../..', import.meta.url)), output = resolve(outputArg);
 assert.ok(!existsSync(output), 'Preserve earlier helper experiments');
 mkdirSync(output, { recursive: true });
@@ -59,8 +59,6 @@ try {
     report.helpers[profile] = await hashFile(helper);
   for (const [engine, args] of [
     [nodeArg ?? join(root, '.cache/js-runtimes/node-26.10.0/bin/node'), ['--max-old-space-size=128']],
-    [denoArg ?? join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
-    [bunArg ?? join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
   ]) {
     try { report.results.push(JSON.parse(run(engine, [...args, harness, helper, profile, convertedFile]).stdout)); }
     catch (error) { report.failures.push({ profile, engine, error: error.message }); save(); }
@@ -68,7 +66,6 @@ try {
   }
   assert.equal(report.failures.length, 0, 'One or more stock engine probes failed; see result.json');
   assert.deepEqual(report.results.map(row => [row.engine, row.version]),
-    [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2'],
-     ['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
+    [['node', '26.10.0'], ['node', '26.10.0']]);
   report.passed = true;
 } finally { report.finishedAt = new Date().toISOString(); save(); }

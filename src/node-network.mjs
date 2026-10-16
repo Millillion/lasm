@@ -50,9 +50,7 @@ export function createNodeNetwork({ add, get, release }) {
     const socket = resource.socket;
     if (!socket) throw tcpFailure('ENOTCONN');
     return new Promise((resolve, reject) => {
-      const resumeImported = Boolean(process.versions.deno && resource.bound);
       const cleanup = () => {
-        if (resumeImported) socket.pause();
         socket.off('readable', ready); socket.off('end', ready); socket.off('close', ready); socket.off('error', failed);
         resource.readWait = null;
       };
@@ -81,10 +79,6 @@ export function createNodeNetwork({ add, get, release }) {
       }
       resource.readWait = { reject: failed };
       socket.on('readable', ready); socket.on('end', ready); socket.on('close', ready); socket.on('error', failed);
-      // Deno's imported TCP stream can remain stopped when only a readable
-      // listener is added. Resume for this read, then pause before detaching
-      // that listener so data cannot flow away between Lean receive calls.
-      if (resumeImported) socket.resume();
       ready();
     });
   }
@@ -260,21 +254,11 @@ export function createNodeNetwork({ add, get, release }) {
       const t = getTcp(id);
       if (t.socket || t.server) throw tcpFailure('EINVAL');
       if (t.bound) return t.bound.connect(address(bytes)).then(async () => {
-        // Complete the connection before importing it. Bun's constructor only
-        // validates TCP fds; its pinned node:net implementation imports them in
-        // connect({fd}), also used internally for cluster-accepted sockets.
-        t.socket = process.versions.bun ? new net.Socket({ allowHalfOpen: true })
-          : new net.Socket({ fd: t.bound.transfer(), allowHalfOpen: true, readable: true, writable: true });
+        // Complete the connection before importing it.
+        t.socket = new net.Socket({ fd: t.bound.transfer(), allowHalfOpen: true, readable: true, writable: true });
         t.socket.pause();
         t.socket.on('error', err => { t.error = err; });
         t.socket.once('close', () => t.bound.forget());
-        if (process.versions.bun) await new Promise((resolve, reject) => {
-          const failed = error => { t.socket.off('connect', ready); reject(error); };
-          const ready = () => { t.socket.off('error', failed); resolve(); };
-          t.socket.once('error', failed);
-          t.socket.once('connect', ready);
-          t.socket.connect({ fd: t.bound.transfer(), fdIsRawSocket: true, pauseOnConnect: true });
-        });
         return empty;
       });
       t.socket = new net.Socket({ allowHalfOpen: true }); t.socket.pause();

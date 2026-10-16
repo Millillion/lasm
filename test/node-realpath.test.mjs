@@ -21,8 +21,6 @@ test('ordinary Lean realPath preserves symlink traversal, bytes and errors',
     const built = await buildMain(source), program = join(built.output, 'main.mjs');
     for (const [label, executable, args] of [
       ['node', process.execPath, []],
-      ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-      ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
     ]) {
       if (!existsSync(executable)) { t.diagnostic(`${label}: not installed`); continue; }
       await t.test(label, () => {

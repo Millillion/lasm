@@ -7,8 +7,6 @@ import { resolve } from 'node:path';
 
 const engines = [
   ['node', process.execPath, []],
-  ['deno', resolve(process.env.LASM_TEST_DENO ?? '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-  ['bun', resolve(process.env.LASM_TEST_BUN ?? '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
 ];
 for (const [name, engine, flags] of engines) {
   const available = process.platform !== 'win32' && existsSync(engine);

@@ -20,9 +20,7 @@ for (const removedCwd of [false, true]) test(`four blocked FIFO readers leave de
       assert.equal(result.status, 0, result.stderr);
       descriptors.push(openSync(path, constants.O_RDWR | constants.O_NONBLOCK));
     }
-    const engines = [[process.execPath, []],
-      ['.cache/js-runtimes/deno-2.9.7/deno', ['run', '-A']],
-      ['.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun', []]];
+    const engines = [[process.execPath, []]];
     for (const [engine, prefix] of engines) {
       if (!existsSync(engine)) continue;
       const result = spawnSync(engine, [...prefix, 'test/fixtures/fifo-workers-host.mjs',
@@ -43,9 +41,7 @@ test('directory enumeration preserves native order and invalid UTF-8 filename by
     const d = opendirSync(directory, { encoding: 'buffer' });
     const bytes = [];
     try { for (let e; (e = d.readSync());) bytes.push(e.name, Buffer.from([0])); } finally { d.closeSync(); }
-    const engines = [[process.execPath, []],
-      ['.cache/js-runtimes/deno-2.9.7/deno', ['run', '-A']],
-      ['.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun', []]];
+    const engines = [[process.execPath, []]];
     for (const [engine, prefix] of engines) {
       if (!existsSync(engine)) continue;
       const result = spawnSync(engine, [...prefix, 'test/fixtures/directory-host.mjs', directory, Buffer.concat(bytes).toString('hex')],
@@ -70,8 +66,6 @@ test('embedded exit closes owned stdout after pending and completed writes in ea
   { timeout: 60_000 }, async t => {
     for (const [name, executable, prefix] of [
       ['node', process.execPath, []],
-      ['deno', '.cache/js-runtimes/deno-2.9.7/deno', ['run', '-A']],
-      ['bun', '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun', []],
     ]) {
       if (!existsSync(executable)) continue;
       for (const mode of ['normal', 'force']) for (const timing of ['pending', 'settled']) {

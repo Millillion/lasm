@@ -115,8 +115,8 @@ if (!isMainThread) {
       ['add64', 0n, 200001n, 0n],
     ]) assert.equal(invoke(probe, name, offset, value, timeout, [0], error, error.length), 2);
     console.log(JSON.stringify({ scope: 'Sparse memory64 host atomic primitives and Wasm wait/notify; no full JS Atomics facade or Lean application integration',
-      engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
-      version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
+      engine: 'node',
+      version: process.versions.node,
       accessibleGuestBytes: 2 ** 32 + 2 * 65536, touchedCells: 12, checks,
       invalidNativeAddressesAndOperationsRejected: 5, invalidWasmInputsRejected: 5 }));
   } finally {

@@ -19,8 +19,6 @@ test('line and byte reads preserve partial-read, sticky-error, and EOF ordering 
     const control = JSON.parse(native.stdout);
     for (const [name, engine, prefix] of [
       ['node', process.execPath, []],
-      ['deno', '.cache/js-runtimes/deno-2.9.7/deno', ['run', '-A']],
-      ['bun', '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun', []],
     ]) {
       if (!existsSync(engine)) { t.diagnostic(`${name}: not installed`); continue; }
       await t.test(name, () => {

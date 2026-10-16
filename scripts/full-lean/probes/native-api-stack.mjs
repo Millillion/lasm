@@ -1,10 +1,8 @@
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
-import { prepareBunStack } from '../../../src/bun-stack.mjs';
 
 assert.ok(process.env.LASM_RESOURCE_UNIT, 'Use the resource guard');
-prepareBunStack(import.meta.url);
 const [path] = isMainThread ? process.argv.slice(2) : workerData;
 const require = createRequire(import.meta.url), addon = require(path), ffi = require('koffi');
 const library = ffi.load(path);
@@ -58,6 +56,6 @@ if (isMainThread) {
     worker.once('error', reject);
     worker.once('exit', code => { try { assert.equal(code, 0); assert.ok(response); resolve(); } catch (error) { reject(error); } });
   });
-  console.log(JSON.stringify({ engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
-    version: process.versions.bun ?? process.versions.deno ?? process.versions.node, main: result, worker: response }));
+  console.log(JSON.stringify({ engine: 'node',
+    version: process.versions.node, main: result, worker: response }));
 } else parentPort.postMessage(result);

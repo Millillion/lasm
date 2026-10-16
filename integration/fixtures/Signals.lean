@@ -36,7 +36,7 @@ def defaultAction (number : Nat) (stopped : Bool) : IO Unit := do
     let waiter ← Signal.Waiter.mk signal true
     discard <| waiter.wait
     waiter.stop
-  -- Include Deno's delayed inspector registration in the comparison.
+  -- Include delayed inspector registration in the comparison.
   IO.sleep 700
   ready number 0
   IO.sleep 500

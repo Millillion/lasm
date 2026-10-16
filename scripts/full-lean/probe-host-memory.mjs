@@ -28,8 +28,6 @@ if (!ENVIRONMENT_IS_PTHREAD) {
 `);
 const engines = [
   ['node', process.execPath, []],
-  ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-  ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
 ];
 const results = [];
 for (const [label, memoryMode, boundary, maximum] of [
@@ -48,9 +46,7 @@ for (const [label, memoryMode, boundary, maximum] of [
     { encoding: 'utf8', timeout: 120_000 });
   writeFileSync(join(output, `${label}-build.log`), built.stdout + built.stderr);
   assert.equal(built.status, 0, built.error?.message ?? built.stderr);
-  // Bun's pinned release cannot clone a shared memory64 Memory to a Worker.
-  // That separate engine reproduction is recorded by probe-memory64.mjs.
-  for (const [name, executable, prefix] of engines.filter(([name]) => memoryMode !== 1 || name !== 'bun')) {
+  for (const [name, executable, prefix] of engines) {
     const run = spawnSync(executable, [...prefix, program], { encoding: 'utf8', timeout: 60_000,
       env: { ...process.env, LASM_PROBE_HIGH_BASE: String(boundary), LASM_PROBE_HIGH_VALUE: 'host above heap',
         LASM_FULL_HOST_MODULE: new URL('../../src/node-host.mjs', import.meta.url).href } });

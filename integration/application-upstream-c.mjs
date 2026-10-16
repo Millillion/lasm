@@ -31,8 +31,8 @@ async function compileOriginal(configFile, args) {
   mkdirSync(config.work); mkdirSync(config.dist);
   await linkApplication({ sources: [join(config.sourceDirectory, 'rc_sticky.c')], sdk, runtime,
     work: config.work, dist: config.dist, leanVersion: config.lean,
-    memoryMode: config.target === 'bun' ? 2 : 1 });
-  copyApplicationHost(config.dist); writeApplicationEntrypoint(config.dist, config.target);
+    memoryMode: 1 });
+  copyApplicationHost(config.dist); writeApplicationEntrypoint(config.dist);
   copyFileSync(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(config.dist, 'THIRD_PARTY_NOTICES.txt'));
   const build = { scope: 'Unchanged upstream C driver through the installed application object/link pipeline',
     lean: config.lean, leanCommit: config.leanCommit, emscripten: sdk.version, sdkIdentity: sdk.identity,
@@ -41,16 +41,17 @@ async function compileOriginal(configFile, args) {
     applicationLinkSha256: await hashFile(join(config.compiler, 'src/application-link.mjs')),
     wasmSha256: await hashFile(join(config.dist, 'program.wasm')) };
   writeFileSync(join(config.dist, 'build-info.json'), JSON.stringify(build, null, 2) + '\n');
-  const command = [config.engine, ...(config.target === 'deno' ? ['run', '-A'] : []), join(config.dist, 'main.mjs')];
+  const command = [config.engine, join(config.dist, 'main.mjs')];
   writeFileSync('rc_sticky.produced', '#!/bin/sh\nexec ' + command.map(shellQuote).join(' ') + ' "$@"\n', { mode: 0o755 });
 }
 
 if (process.argv[2] === '--compile') {
   await compileOriginal(process.argv[3], process.argv.slice(4));
 } else {
-  const [outputArg, target, engineArg, compilerArg, referenceArg, version, ...extra] = process.argv.slice(2);
-  assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && referenceArg && version && !extra.length,
-    'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE LEAN_VERSION');
+  const [outputArg, engineArg, compilerArg, referenceArg, version, ...extra] = process.argv.slice(2);
+const target = 'node';
+  assert.ok(outputArg && engineArg && compilerArg && referenceArg && version && !extra.length,
+    'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE LEAN_VERSION');
   assert.equal(process.platform, 'linux', 'This parallel upstream shell harness requires Linux');
   const { inventory, sources } = loadUpstreamEvidence(version);
   const test = inventory.tests.find(test => test.name === 'misc_dir/rc_sticky');
@@ -115,9 +116,9 @@ if (process.argv[2] === '--compile') {
     renameSync(nativeSource, nativeSource + '.hidden');
     const deploymentEnv = Object.fromEntries(Object.entries(process.env)
       .filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-    Object.assign(deploymentEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1' });
+    Object.assign(deploymentEnv, { PATH: '' });
     report.deployed = run('relocated deployed executable', engine,
-      [...(target === 'deno' ? ['run', '-A'] : []), join(relocated, 'main.mjs')], output, deploymentEnv);
+      [join(relocated, 'main.mjs')], output, deploymentEnv);
     assert.deepEqual(report.deployed, report.native);
     report.deployment = { sourceHidden: true, path: '', directory: relocated };
     for (const [file, expected] of Object.entries(originalHashes)) assert.equal(await hashFile(join(reference, file)), expected);

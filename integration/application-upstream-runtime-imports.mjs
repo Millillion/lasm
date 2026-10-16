@@ -13,14 +13,15 @@ import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.m
 import { reclaimBuildMetadata } from '../scripts/application-tests/reclaim-metadata.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg, referenceArg, ...extra] = process.argv.slice(2);
+const [outputArg, engineArg, compilerArg, referenceArg, ...extra] = process.argv.slice(2);
+const target = 'node';
 const bundled = extra.includes('--bundled-metadata');
 const selected = extra.filter(option => option.startsWith('--case=')).map(option => option.slice('--case='.length));
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && referenceArg
+assert.ok(outputArg && engineArg && compilerArg && referenceArg
   && selected.length <= 1 && selected.every(name => ['original', 'attributes'].includes(name))
   && new Set(extra).size === extra.length
   && extra.every(option => option === '--bundled-metadata' || option.startsWith('--case=')),
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE [--bundled-metadata] [--case=original|attributes]');
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE [--bundled-metadata] [--case=original|attributes]');
 const originalCase = !selected.length || selected[0] === 'original';
 const attributeCase = !selected.length || selected[0] === 'attributes';
 assert.equal(process.platform, 'linux');
@@ -132,7 +133,7 @@ try {
   const dist = join(output, 'dist');
   if (originalCase) {
     run('installed application build', process.execPath,
-      [join(compiler, 'bin/lasm.mjs'), 'build', join(project, 'Main.lean'), '--target', target, '--output', dist], project, env);
+      [join(compiler, 'bin/lasm.mjs'), 'build', join(project, 'Main.lean'), '--output', dist], project, env);
     report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
     if (bundled) report.reclaimedOriginalCache = await reclaimBuildMetadata(project,
       createHash('sha256').update(join(project, 'Main.lean')).digest('hex').slice(0, 16), report.build.signature, dist);
@@ -156,7 +157,7 @@ try {
     run('compile native runtime-attribute control', join(lean.prefix, 'bin/leanc'),
       ['-O2', '-rdynamic', ...generated.sources, '-o', nativeAttributeBinary], project, env);
     run('build installed runtime-attribute control', process.execPath,
-      [join(compiler, 'bin/lasm.mjs'), 'build', fixtureSource, '--target', target, '--output', attributeDist], project, env);
+      [join(compiler, 'bin/lasm.mjs'), 'build', fixtureSource, '--output', attributeDist], project, env);
     report.attributeBuild = JSON.parse(readFileSync(join(attributeDist, 'build-info.json')));
     if (bundled) report.reclaimedAttributeCache = await reclaimBuildMetadata(project,
       createHash('sha256').update(fixtureSource).digest('hex').slice(0, 16), report.attributeBuild.signature, attributeDist);
@@ -180,14 +181,14 @@ try {
   }
   for (const directory of [native, original, project]) renameSync(directory, directory + '.hidden');
   const runtimeEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
+  Object.assign(runtimeEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
   if (!bundled) Object.assign(runtimeEnv, { LEAN_SYSROOT: lean.prefix, LEAN_PATH: data });
   const nativeRuntimeEnv = bundled && originalCase
     ? { ...runtimeEnv, LEAN_SYSROOT: report.bundled.sysroot, LEAN_PATH: report.bundled.projectPath } : runtimeEnv;
   const nativeAttributeEnv = bundled && attributeCase
     ? { ...runtimeEnv, LEAN_SYSROOT: report.attributeBundled.sysroot, LEAN_PATH: report.attributeBundled.projectPath } : runtimeEnv;
   const nativeBinary = join(native + '.hidden', '.lake/build/bin/user_attr');
-  const invocation = [...(target === 'deno' ? ['run', '-A'] : []), join(deployment, 'main.mjs')];
+  const invocation = [join(deployment, 'main.mjs')];
   if (originalCase) {
     report.deployment = { directory: deployment, sourceHidden: true, path: '', buildProcessesUsedAtRuntime: false,
       selfContained: bundled, suppliedLeanPaths: !bundled, wasmSha256: await hashFile(join(deployment, 'program.wasm')) };
@@ -210,7 +211,7 @@ try {
     report.runtimeAttributes = {
       native: run('native runtime-attribute assertions', nativeAttributeBinary, [], runtimeCwd, nativeAttributeEnv),
       actual: run('deployed runtime-attribute assertions', engine,
-        [...(target === 'deno' ? ['run', '-A'] : []), join(attributeDeployment, 'main.mjs')], runtimeCwd, runtimeEnv),
+        [join(attributeDeployment, 'main.mjs')], runtimeCwd, runtimeEnv),
     };
     assert.deepEqual(report.runtimeAttributes.actual, report.runtimeAttributes.native);
   }

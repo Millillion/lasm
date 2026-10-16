@@ -24,8 +24,6 @@ assert.equal(built.status, 0, built.error?.message ?? built.stderr);
 const results = [];
 for (const [name, executable, prefix] of [
   ['node', process.execPath, []],
-  ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--stack-size=61440']],
-  ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
 ]) {
   const execution = spawnSync(executable, [...prefix, program], { encoding: 'utf8', timeout: 30_000 });
   results.push({ name, executable, prefix, status: execution.status, signal: execution.signal,

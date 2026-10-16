@@ -13,9 +13,9 @@ import { reclaimApplicationBuildMetadata } from './reclaim-metadata.mjs';
 
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
-const [outputArg, category, target, engineArg, compilerArg, filter = '.*', mode = 'upstream', version = '4.34.0'] = process.argv.slice(2);
-if (process.argv.length > 10 || !outputArg || !['compiled-application', 'compiled-test-driver', 'compiled-driver-and-native-compiler', 'native-build-time'].includes(category) || !['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)
-  throw new Error('Supply NEW_OUTPUT CATEGORY TARGET ENGINE INSTALLED_COMPILER [FILTER [MODE [LEAN_VERSION]]]');
+const [outputArg, category, engineArg, compilerArg, filter = '.*', mode = 'upstream', version = '4.34.0'] = process.argv.slice(2);
+if (process.argv.length > 9 || !outputArg || !['compiled-application', 'compiled-test-driver', 'compiled-driver-and-native-compiler', 'native-build-time'].includes(category) || !engineArg || !compilerArg)
+  throw new Error('Supply NEW_OUTPUT CATEGORY NODE INSTALLED_COMPILER [FILTER [MODE [LEAN_VERSION]]]');
 if (!['upstream', 'probe-compile-disabled'].includes(mode) || mode !== 'upstream' && category !== 'compiled-application')
   throw new Error('The optional probe-compile-disabled mode applies only to compiled-application cases');
 const output = resolve(outputArg), compiler = resolve(compilerArg), engine = resolve(engineArg);
@@ -66,7 +66,7 @@ if (!projectServer && (category === 'compiled-application' || sharedDriver || st
 const environment = { TEST_DIR: join(source, 'tests'), SRC_DIR: join(source, 'src'), SCRIPT_DIR: join(source, 'script'),
   BUILD_DIR: lean.prefix, STAGE: '1', TEST_CTEST: '1',
   PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(':'),
-  LASM_COMPILER: compiler, LASM_BUILD_NODE: process.execPath, LASM_APPLICATION_TARGET: target, LASM_APPLICATION_ENGINE: engine,
+  LASM_COMPILER: compiler, LASM_BUILD_NODE: process.execPath, LASM_APPLICATION_ENGINE: engine,
   LASM_NATIVE_LEAN: lean.lean, LASM_NATIVE_LAKE: lean.lake,
   LASM_TOOLCHAIN_CACHE: process.env.LASM_TOOLCHAIN_CACHE,
   LEAN_HEADER_SNAPSHOTS: '0', LEANC_OPTS: '', CXX: join(lean.prefix, 'bin/clang++') };
@@ -101,7 +101,7 @@ if (sharedDriver) {
   const env = { ...process.env }; delete env.LASM_APPLICATION_RUNTIME;
   for (const key of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(key)) delete env[key];
   execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', compiledSource,
-    '--target', target, '--output', dist], { env, stdio: 'inherit', timeout: 1800_000 });
+    '--output', dist], { env, stdio: 'inherit', timeout: 1800_000 });
   compiledDriver = { source: driverSource, sourceSha256: await hashFile(driverSource),
     ...(projectServer ? { compiledSource, compiledSourceSha256: await hashFile(compiledSource) } : {}),
     dist, build: JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8')),
@@ -130,7 +130,7 @@ if (standaloneServer) {
 const timeoutSeconds = 900;
 const manifest = { schema: 1, lean: inventory.lean, leanCommit: lean.commit, sourceArchiveSha256: inventory.sourceArchiveSha256,
   sourceManifestSha256, verifiedOriginalFilesAndLinks: verified,
-  output, source, execution, category, mode, target, engine, compiler, nativeEnvironment, compileDriver, timeoutSeconds, environment, tests, generatedPins,
+  output, source, execution, category, mode, engine, compiler, nativeEnvironment, compileDriver, timeoutSeconds, environment, tests, generatedPins,
   nativeArtifactIdentity: lean.identity, compiledDriver, additionalHarnessFiles, resourceReport: process.env.LASM_RESOURCE_REPORT,
   scope: category === 'native-build-time' ? 'Unchanged managed native compiler tests; no deployed runtime pass implied'
     : 'Unchanged native driver followed by installed-CLI AOT execution with original arguments and assertions',

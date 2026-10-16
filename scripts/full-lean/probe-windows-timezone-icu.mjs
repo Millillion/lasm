@@ -13,8 +13,8 @@ import { hashFile } from '../../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
 assert.equal(process.platform, 'linux', 'This supplementary ICU control is Linux-specific');
-const [sourceArg, outputArg, denoArg, bunArg] = process.argv.slice(2);
-assert.ok(sourceArg && outputArg && denoArg && bunArg);
+const [sourceArg, outputArg] = process.argv.slice(2);
+assert.ok(sourceArg && outputArg);
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const source = resolve(sourceArg), output = resolve(outputArg);
 assert.ok(!existsSync(output)); mkdirSync(output, { recursive: true });
@@ -26,7 +26,7 @@ const report = { scope: 'Original Lean Windows ICU function bodies executed with
     'The two original runtime functions are extracted with identical bodies. Only their external names change to linker --wrap entry points.',
     'LEAN_WINDOWS is defined after Linux Lean/ICU headers, selecting only these functions\' original ICU branches.',
     'A separate ordinary Lean fixture calls the original APIs. Native compiler tests and upstream test files remain unchanged.',
-    'All engines bind the same Linux ICU shared library with its versioned symbols. The production adapter still loads Windows icu.dll only on Windows.',
+    'Node binds the same Linux ICU shared library with its versioned symbols. The production adapter still loads Windows icu.dll only on Windows.',
   ], resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], cases: [], passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 function run(label, program, args, timeout = 120_000) {
@@ -82,7 +82,7 @@ try {
     ['-O2', '-DNDEBUG', '-o', native, main + '.c', object, ...names.map(name => '-Wl,--wrap=' + name),
       library, library.replace('libicui18n.so', 'libicuuc.so')]);
   report.nativeSha256 = await hashFile(native);
-  const engines = [['node', process.execPath, []], ['deno', resolve(denoArg), ['run', '-A']], ['bun', resolve(bunArg), []]];
+  const engines = [['node', process.execPath, []]];
   report.engines = engines.map(([name, program]) => ({ name, program, version: run(name + ' version', program, ['--version']).stdout.trim() }));
   const hostFixture = join(root, 'integration/fixtures/windows-timezone-icu-host.mjs');
   const hostModule = join(root, 'src/native-windows-timezone.mjs');

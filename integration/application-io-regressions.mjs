@@ -21,12 +21,13 @@ if (versionIndex >= 0) {
   assert.match(version ?? '', /^\d+\.\d+\.\d+$/, 'Supply an exact --lean-version');
   arguments_.splice(versionIndex, 2);
 }
-const [outputArg, target, ...remaining] = arguments_;
-const nativeOnly = target === 'native';
+const [outputArg, ...remaining] = arguments_;
+const nativeOnly = remaining[0] === 'native';
+const target = 'node';
 const [engineArg, compilerArg] = nativeOnly ? [] : remaining;
-const selection = nativeOnly ? remaining : remaining.slice(2);
-if (!outputArg || (!nativeOnly && (!['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)))
-  throw new Error('Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER [CASE ...] [--lean-version VERSION], or NEW_OUTPUT native [CASE ...] [--lean-version VERSION]');
+const selection = nativeOnly ? remaining.slice(1) : remaining.slice(2);
+if (!outputArg || (!nativeOnly && (!engineArg || !compilerArg)))
+  throw new Error('Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER [CASE ...] [--lean-version VERSION], or NEW_OUTPUT native [CASE ...] [--lean-version VERSION]');
 const cases = [
   { name: 'filesystem-surface', source: 'integration/fixtures/FilesystemSurface.lean',
     marker: 'filesystem surface checks passed\n', removesData: true },
@@ -117,15 +118,15 @@ try {
     }
     const dist = join(base, 'dist');
     run(fixture.name + '/build application', process.execPath,
-      [join(compiler, 'bin/lasm.mjs'), 'build', source, '--target', target, '--output', dist], project, env, 1800_000);
+      [join(compiler, 'bin/lasm.mjs'), 'build', source, '--output', dist], project, env, 1800_000);
     row.build = JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8'));
     const deployed = join(base, 'relocated deployment');
     renameSync(dist, deployed); renameSync(project, project + '.hidden');
     row.wasmSha256 = await hashFile(join(deployed, 'program.wasm'));
     const deploymentEnv = Object.fromEntries(Object.entries(process.env)
       .filter(([name]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(name)));
-    Object.assign(deploymentEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
-    row.actual = execute('deployed', [engine, ...(target === 'deno' ? ['run', '-A'] : []), join(deployed, 'main.mjs')],
+    Object.assign(deploymentEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
+    row.actual = execute('deployed', [engine, join(deployed, 'main.mjs')],
       base, row, deploymentEnv);
     row.deployment = { sourceHidden: true, path: '', buildEnvironmentRemoved: true, directory: deployed };
     save();

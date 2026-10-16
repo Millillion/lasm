@@ -11,9 +11,9 @@ import { memoryVectors } from '../test/fixtures/linux-memory.mjs';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
-const [referenceArg, outputArg, denoArg, bunArg, ...extra] = process.argv.slice(2);
-assert.ok(referenceArg && outputArg && denoArg && bunArg && !extra.length,
-  'Supply PINNED_LIBUV_LINUX_C NEW_OUTPUT DENO BUN');
+const [referenceArg, outputArg, ...extra] = process.argv.slice(2);
+assert.ok(referenceArg && outputArg && !extra.length,
+  'Supply PINNED_LIBUV_LINUX_C NEW_OUTPUT');
 assert.equal(process.platform, 'linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const reference = resolve(referenceArg), output = resolve(outputArg);
@@ -110,7 +110,7 @@ try {
   report.native = observed; save();
   assert.deepEqual(observed, memoryVectors.map(vector => ({ name: vector.name, values: vector.expected.map(String) })),
     'Fixture expectations must agree with actual upstream C');
-  for (const [target, engine, prefix] of [['node', process.execPath, []], ['deno', resolve(denoArg), ['run', '-A']], ['bun', resolve(bunArg), []]]) {
+  for (const [target, engine, prefix] of [['node', process.execPath, []]]) {
     const version = run(target + ' version', [engine, '--version']).trim();
     const values = JSON.parse(run(target + ' host model', [engine, ...prefix, join(root, 'integration/linux-memory-vector-host.mjs')]));
     assert.deepEqual(values, observed, target + ' differs from the native C oracle');

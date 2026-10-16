@@ -38,7 +38,7 @@ function fixture(t) {
     put(directory + '/manifest.json', JSON.stringify({ protocol: 1, sourceSha256: 'retained provenance', files }));
     put(directory + '/THIRD_PARTY_NOTICES.txt', 'license');
   }
-  put('bun-stack/not-required.so', 'unused');
+  put('unrelated/not-required.so', 'unused');
   return { root, source, put, output: join(root, 'output') };
 }
 
@@ -54,7 +54,7 @@ for (const arch of ['x64', 'arm64']) test(`Linux ${arch} deployment keeps its lo
   assert.equal(copied.length, 15);
   assert.ok(copied.includes(`node_modules/@koromix/koffi-linux-${arch}/linux_${arch}/koffi.node`));
   assert.ok(copied.includes('node_modules/koffi/LICENSE.txt'));
-  assert.equal(copied.some(name => /musl|darwin|bun-stack|\.cc$/.test(name)), false);
+  assert.equal(copied.some(name => /musl|darwin|unrelated|\.cc$/.test(name)), false);
   for (const name of copied.filter(name => !name.endsWith('manifest.json')))
     assert.deepEqual(readFileSync(join(base, name)), readFileSync(join(source, name)));
   for (const [directory, name] of [['process', `linux-${arch}-gnu`], ['signals', `linux-${arch}-gnu.so`]]) {
@@ -72,7 +72,7 @@ for (const arch of ['x64', 'arm64']) test(`macOS ${arch} copies only its native 
   assert.equal(copied.length, 12);
   assert.ok(copied.includes(`node_modules/@koromix/koffi-darwin-${arch}/darwin_${arch}/koffi.node`));
   assert.ok(copied.includes(`signals/darwin-${arch}.dylib`));
-  assert.equal(copied.some(name => /linux|musl|process|bun-stack|\.cc$/.test(name)), false);
+  assert.equal(copied.some(name => /linux|musl|process|unrelated|\.cc$/.test(name)), false);
   for (const name of copied.filter(name => !name.endsWith('manifest.json')))
     assert.deepEqual(readFileSync(join(base, name)), readFileSync(join(source, name)));
 });
@@ -84,14 +84,14 @@ for (const arch of ['x64', 'arm64']) test(`Windows ${arch} has its complete adap
   for (const name of applicationHostFiles) writeFileSync(join(root, 'src', name), 'host fixture: ' + name);
   // Exercise the application's selector too: calling only the low-level copier
   // missed Windows falling back to the entire multi-platform native bundle.
-  copyApplicationHost(output, { target: 'node', platform: 'win32', arch, sourceRoot: root });
+  copyApplicationHost(output, { platform: 'win32', arch, sourceRoot: root });
   const base = join(output, 'host/native'), copied = files(base);
   for (const name of applicationHostFiles)
     assert.equal(readFileSync(join(output, 'host', name), 'utf8'), 'host fixture: ' + name);
   assert.equal(copied.length, 9);
   assert.ok(copied.includes(`node_modules/@koromix/koffi-win32-${arch}/win32_${arch}/koffi.node`));
   assert.ok(copied.includes('node_modules/koffi/LICENSE.txt'));
-  assert.equal(copied.some(name => /linux|darwin|signals|process|bun-stack|\.cc$/.test(name)), false);
+  assert.equal(copied.some(name => /linux|darwin|signals|process|unrelated|\.cc$/.test(name)), false);
   for (const name of copied.filter(name => !name.endsWith('manifest.json')))
     assert.deepEqual(readFileSync(join(base, name)), readFileSync(join(source, name)));
   assert.deepEqual(JSON.parse(readFileSync(join(base, 'manifest.json'))).deployment, { target: 'node', platform: 'win32', arch });

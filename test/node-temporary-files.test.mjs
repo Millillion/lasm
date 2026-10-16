@@ -69,8 +69,6 @@ test('ordinary Lean temporary APIs match native paths and errors across packaged
     const built = await buildMain(source), program = join(built.output, 'main.mjs');
     for (const [label, executable, args] of [
       ['node', process.execPath, []],
-      ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-      ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
     ]) {
       if (!existsSync(executable)) { t.diagnostic(`${label}: not installed`); continue; }
       for (const entry of cases) await t.test(`${label}/${entry.name}`, () => {

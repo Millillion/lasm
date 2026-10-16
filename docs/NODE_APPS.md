@@ -17,7 +17,6 @@ node dist/main.mjs argument1 "argument two"
 ```
 
 In this repository, the same runner is `node lasm-node.js Main.lean`.
-The [Deno and Bun launchers](JS_ENGINES.md) use the same application runtime.
 For a complete server, run:
 
 ```sh
@@ -46,7 +45,7 @@ must see a message immediately, call `(← IO.getStdout).flush` after printing i
 The Lean server example does this for its listening address. Normal main
 completion flushes console output. Standalone runners flush native C streams
 before the engine coordinates ordinary process shutdown. Forced exit uses
-`_Exit` to discard buffered output. Comparisons with native Lean pass in all three engines
+`_Exit` to discard buffered output. Comparisons with native Lean pass in Node
 on Linux x64. Embedded modules preserve their host process by throwing
 `LeanExit`; their forced-exit disposal still needs buffer-discard parity. Broader
 platform validation remains tracked in [IO limitations](../IO_LIMITATIONS.md).

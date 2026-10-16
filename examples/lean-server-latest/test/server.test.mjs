@@ -11,7 +11,7 @@ const manifestPath = process.env.LASM_AOT_HTTP_MANIFEST;
 if (!manifestPath) throw new Error('Build the server and set LASM_AOT_HTTP_MANIFEST');
 const artifact = JSON.parse(await readFile(manifestPath, 'utf8'));
 const engine = process.env.LASM_AOT_HTTP_ENGINE;
-if (!engine) throw new Error('Set LASM_AOT_HTTP_ENGINE to the stock target executable');
+if (!engine) throw new Error('Set LASM_AOT_HTTP_ENGINE to the stock Node executable');
 const environment = { ...process.env, PATH: '', LEAN_NUM_THREADS: '2' };
 for (const name of ['LEAN_PATH', 'LEAN_SRC_PATH', 'LEAN_SYSROOT', 'LASM_FULL_HOST_MODULE', 'LASM_FULL_APP_PATH']) delete environment[name];
 
@@ -19,14 +19,14 @@ async function start(mode, directory) {
   const started = performance.now();
   const args = ['0', directory];
   const child = mode === 'wasm'
-    ? spawn(engine, [...(artifact.target === 'deno' ? ['run', '-A'] : []), join(artifact.deployed, 'main.mjs'), ...args], { cwd: directory, env: environment })
+    ? spawn(engine, [join(artifact.deployed, 'main.mjs'), ...args], { cwd: directory, env: environment })
     : spawn(artifact.nativeExecutable, args, { cwd: directory, env: environment });
   let stdout = '', stderr = '';
   const exited = new Promise(resolve => child.once('exit', (code, signal) => resolve({ code, signal })));
   child.stderr.on('data', bytes => { stderr += bytes; });
   const base = await new Promise((resolve, reject) => {
-    // The full runtime includes the Lean reflection registry. Stock Bun's cold
-    // compilation exceeds the old small runtime's 10-second startup deadline.
+    // The full runtime includes the Lean reflection registry. Its cold
+    // compilation can exceed the old small runtime's 10-second startup deadline.
     // Request deadlines and all behavior assertions remain unchanged.
     const timer = setTimeout(() => { child.kill(); reject(new Error(`Server startup timed out: ${stderr}`)); }, 90_000);
     child.once('error', err => { clearTimeout(timer); reject(err); });
@@ -37,7 +37,7 @@ async function start(mode, directory) {
       if (match) { clearTimeout(timer); resolve(match[0]); }
     });
   });
-  console.info(`[aot-http] ${artifact.target}/${mode} startup: ${((performance.now() - started) / 1000).toFixed(3)}s`);
+  console.info(`[aot-http] ${mode} startup: ${((performance.now() - started) / 1000).toFixed(3)}s`);
   return {
     base, child, get stderr() { return stderr; },
     async stop() {

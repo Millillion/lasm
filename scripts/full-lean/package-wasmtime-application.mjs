@@ -117,14 +117,6 @@ try {
   writeFileSync(join(dist, 'wasmtime.json'), JSON.stringify(manifest, null, 2) + '\n');
   writeFileSync(join(dist, 'package.json'), JSON.stringify({ private: true, type: 'module' }) + '\n');
   writeFileSync(join(dist, 'main.mjs'), `import { runWasmtimeApplication } from './host/wasmtime-standalone.mjs';
-if (process.versions.deno && process.env.LASM_DENO_CHILD_ENV !== undefined) {
-  const saved = JSON.parse(process.env.LASM_DENO_CHILD_ENV);
-  if (!Array.isArray(saved) || saved.length !== 2 || saved.some(value => value !== null && typeof value !== 'string'))
-    throw new Error('Invalid private child environment transport');
-  for (const [index, key] of ['DENO_DISABLE_NODE_SHIM', 'LASM_DENO_CHILD_ENV'].entries()) {
-    if (saved[index] === null) delete process.env[key]; else process.env[key] = saved[index];
-  }
-}
 await runWasmtimeApplication(import.meta.url);
 `);
   assert.deepEqual(await readWasmtimeArtifact(dist), manifest);

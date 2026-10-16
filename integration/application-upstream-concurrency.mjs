@@ -11,9 +11,10 @@ import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg, referenceArg, ...extra] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && referenceArg && !extra.length,
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE');
+const [outputArg, engineArg, compilerArg, referenceArg, ...extra] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg && referenceArg && !extra.length,
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE');
 assert.equal(process.platform, 'linux', 'The original shell-driver control currently requires Linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
@@ -86,18 +87,18 @@ try {
     ['-O2', ...generated.sources, '-o', binary], project, env, 900_000);
   const dist = join(output, 'dist');
   run('installed application build', process.execPath,
-    [join(compiler, 'bin/lasm.mjs'), 'build', source, '--target', target, '--output', dist], project, env, 900_000);
+    [join(compiler, 'bin/lasm.mjs'), 'build', source, '--output', dist], project, env, 900_000);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   const deployment = join(output, 'relocated deployment'); renameSync(dist, deployment);
   renameSync(project, project + '.hidden'); renameSync(oracle, oracle + '.hidden');
   const runtimeEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
+  Object.assign(runtimeEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
   report.deployment = { directory: deployment, sourceHidden: true, path: '', wasmSha256: await hashFile(join(deployment, 'program.wasm')) };
   for (let repetition = 1; repetition <= 3; repetition++) {
     const row = { repetition,
       native: run('native repetition ' + repetition, binary, [], deployment, runtimeEnv),
       actual: run('deployed repetition ' + repetition, engine,
-        [...(target === 'deno' ? ['run', '-A'] : []), join(deployment, 'main.mjs')], deployment, runtimeEnv),
+        [join(deployment, 'main.mjs')], deployment, runtimeEnv),
     };
     report.repetitions.push(row); save(); assert.deepEqual(row.actual, row.native);
     assert.ok(row.native.stdout.endsWith('Mutex, try-lock and condition-variable checks passed\n'));

@@ -1,7 +1,6 @@
-// Deno's Node worker bootstrap queries cwd before user code. A small private
-// factory keeps its own Linux filesystem context rooted at /, so a new pthread
-// can start from a removed or non-UTF-8 cwd. The application and its other
-// threads retain their actual cwd. Used only for those exceptional cases.
+// A small private factory keeps its own Linux filesystem context rooted at /,
+// so a new pthread can start from a removed or non-UTF-8 cwd. The application
+// and its other threads retain their actual cwd.
 const { Worker, MessageChannel, MessagePort, parentPort, workerData } = require('node:worker_threads');
 const { EventEmitter } = require('node:events');
 const { existsSync } = require('node:fs');
@@ -60,19 +59,8 @@ else {
     if (process.platform !== 'linux') throw new Error('Private cwd worker factory is Linux-only');
     const buffer = new SharedArrayBuffer(4096), ready = new Int32Array(buffer, 0, 2);
     const active = new Set();
-    let exceptional = false;
-    if (process.versions.deno) {
-      try { Deno.cwd(); }
-      catch (error) {
-        if (error.name !== 'NotFound' && error.name !== 'InvalidData' && error.code !== 'ENOENT') throw error;
-        exceptional = true;
-      }
-    }
     const data = { lasmPrivateCwdFactory: true, ready: buffer };
-    const WebWorker = globalThis[Symbol.for('lasm.denoWebWorker')] ?? globalThis.Worker;
-    const factory = exceptional
-      ? new WebWorker(require('node:url').pathToFileURL(join(__dirname, 'native-pthread-factory-deno.mjs')), { type: 'module' })
-      : new Worker(__filename, { workerData: data });
+    const factory = new Worker(__filename, { workerData: data });
     let disposed = false, disposal, factoryFailure;
     const failed = error => {
       if (factoryFailure) return;
@@ -86,15 +74,10 @@ else {
         try { worker.emit('error', error); } finally { worker.emit('exit', 1); }
       });
     };
-    if (exceptional) {
-      factory.addEventListener('error', event => { event.preventDefault(); failed(new Error(event.message)); });
-      factory.postMessage(data);
-    } else {
-      factory.on('error', failed);
-      factory.on('exit', code => {
-        if (!disposed || active.size) failed(new Error(`Private cwd worker factory exited unexpectedly (${code})`));
-      });
-    }
+    factory.on('error', failed);
+    factory.on('exit', code => {
+      if (!disposed || active.size) failed(new Error(`Private cwd worker factory exited unexpectedly (${code})`));
+    });
     Atomics.wait(ready, 0, 0, 15_000);
     if (Atomics.load(ready, 0) !== 1) {
       void factory.terminate();

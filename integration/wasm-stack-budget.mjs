@@ -33,5 +33,5 @@ if (isMainThread) {
       outcomes[kind] = await fn(100_000);
     } catch (error) { outcomes[kind] = String(error); }
   }
-  parentPort.postMessage({ engine: process.versions.deno ?? process.version, smallControl: 100, ...workerData, outcomes });
+  parentPort.postMessage({ engine: process.version, smallControl: 100, ...workerData, outcomes });
 }

@@ -7,8 +7,8 @@ import { hashFile } from '../../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from './resource-guard.mjs';
 
 await ensureResourceGuard();
-const [outputArg, nodeArg, denoArg, bunArg, ...extra] = process.argv.slice(2);
-assert.ok(outputArg && !extra.length && (!nodeArg || denoArg && bunArg), 'Supply NEW_OUTPUT [NODE DENO BUN]');
+const [outputArg, nodeArg, ...extra] = process.argv.slice(2);
+assert.ok(outputArg && !extra.length, 'Supply NEW_OUTPUT [NODE]');
 assert.equal(process.platform + '-' + process.arch, 'linux-x64');
 const root = fileURLToPath(new URL('../..', import.meta.url)), output = resolve(outputArg);
 assert.ok(!existsSync(output), 'Preserve earlier probes'); mkdirSync(output, { recursive: true });
@@ -38,8 +38,6 @@ try {
   const worker = join(root, inputs[1]);
   for (const [engine, args] of [
     [nodeArg ?? join(root, '.cache/js-runtimes/node-26.10.0/bin/node'), ['--max-old-space-size=128']],
-    [denoArg ?? join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
-    [bunArg ?? join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
   ]) {
     try { report.results.push(JSON.parse(run(engine, [...args, worker, helper]))); }
     catch (error) { report.failures.push({ engine, message: error.message }); }
@@ -47,7 +45,7 @@ try {
   }
   assert.equal(report.failures.length, 0);
   assert.deepEqual(report.results.map(row => [row.engine, row.version]),
-    [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
+    [['node', '26.10.0']]);
   report.passed = true;
 } finally {
   report.inputsUnchanged = true;

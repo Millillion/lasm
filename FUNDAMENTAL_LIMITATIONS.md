@@ -1,19 +1,18 @@
 # Fundamental limitations
 
 No remaining Lean conformance failure has yet been established as fundamental.
-The complete native reference suite passes, but the full Node, Deno, and Bun
-conformance work is unfinished. See [current results](docs/FULL_SUITE_RESULTS.md)
+The complete native reference suite passes, but the full Node conformance work
+is unfinished. See [current results](docs/FULL_SUITE_RESULTS.md)
 and [the remaining IO work](IO_LIMITATIONS.md).
 
 These current restrictions must not be mistaken for fundamental limitations:
 
 | Restriction or observed failure | Current classification |
 | --- | --- |
-| Signed JavaScript heap indexing above 2 GiB | Fixed SDK port defect; regression passes in all three engines. |
-| Host calls stalled above 4 GiB | Repaired bridge defect triggered by Node truncating cloned typed-array offsets; Deno's independent cloning control is correct. Numeric-offset requests and the original high-memory Lean test pass in both engines. Broader full-suite validation remains necessary. |
+| Signed JavaScript heap indexing above 2 GiB | Fixed SDK port defect; regression passes in Node. |
+| Host calls stalled above 4 GiB | Repaired bridge defect triggered by Node truncating cloned typed-array offsets. Numeric-offset requests and the original high-memory Lean test pass in Node. Broader full-suite validation remains necessary. |
 | 32-bit `USize` in the application runtime | Runtime target choice; the experimental full compiler preserves native 64-bit values. |
-| 4 GiB memory ceiling in the lowered-memory64 build | Native memory64 accesses above 4 GiB pass in Node and Deno. Bun's experimental memory64 loses its address type when shared memory crosses workers; this is a minimized engine defect, not an established fundamental limit. |
-| Bun's small OS worker stack | The exact failing benchmark passes with a Linux diagnostic stack-reservation helper plus a larger JSC budget. Portable integration remains unfinished. |
+| 4 GiB memory ceiling in the lowered-memory64 build | Native memory64 accesses above 4 GiB pass in Node. |
 | Missing runtime externs, module initializers, or compiled symbol lookup | Implementation gaps. |
 | Native libraries lacking a Wasm build or host adapter | Missing integration; evaluate the actual dependency before claiming impossibility. |
 | Test deadlines or resource exhaustion under instrumentation | Investigate separately with documented parallel-harness adjustments. |

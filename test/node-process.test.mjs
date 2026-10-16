@@ -13,8 +13,6 @@ const spawnBytes = (command, args) => Buffer.concat([
 ]);
 const engines = [
   ['node', process.execPath, []],
-  ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-  ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
 ];
 
 function droppedChild(executable, args, label) {

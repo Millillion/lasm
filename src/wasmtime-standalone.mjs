@@ -4,21 +4,18 @@ import { writeSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readWasmtimeArtifact } from './wasmtime-artifact.mjs';
-import { prepareBunStack } from './bun-stack.mjs';
 import { prepareApplicationSignals } from './application-signals.mjs';
 import { prepareApplicationMetadata } from './application-metadata-runtime.mjs';
 import forwardWorkerStdio from './worker-stdio.cjs';
 import { createWasmtimeProcessHost } from './wasmtime-process-host.mjs';
 import { LeanExit } from './node-host.mjs';
 import { encodeFileMessage, decodeFileMessage } from './native-file-message.mjs';
-import cwdFactory from './native-pthread-factory.cjs';
 
 // Standalone entry only. This function owns process termination; it is not an
 // embedding API and does not claim reusable Store cancellation or disposal.
 export async function runWasmtimeApplication(entrypoint, args = process.argv.slice(2)) {
   if (!isMainThread || process.platform !== 'linux' || process.arch !== 'x64')
     throw new Error('The standalone Wasmtime backend currently requires Linux x64');
-  prepareBunStack(entrypoint, { minimumStackMiB: 96 });
   prepareApplicationSignals();
   prepareApplicationMetadata(entrypoint);
   const directory = dirname(fileURLToPath(entrypoint));
@@ -36,20 +33,11 @@ export async function runWasmtimeApplication(entrypoint, args = process.argv.sli
     try { writeSync(2, String(error.stack ?? error) + '\n'); }
     finally { exit(1); }
   };
-  const nodeStdio = !process.versions.deno && !process.versions.bun;
-  let RuntimeWorker = Worker;
-  if (process.versions.deno) {
-    try { Deno.cwd(); }
-    catch (error) {
-      if (error.name !== 'NotFound' && error.name !== 'InvalidData' && error.code !== 'ENOENT') throw error;
-      RuntimeWorker = cwdFactory.createCwdWorkerFactory();
-    }
-  }
-  const worker = new RuntimeWorker(new URL('./wasmtime-worker.mjs', import.meta.url), {
-    ...(nodeStdio ? { stdout: true, stderr: true } : {}),
+  const worker = new Worker(new URL('./wasmtime-worker.mjs', import.meta.url), {
+    stdout: true, stderr: true,
     // V8 command-line heap flags cannot be replayed as explicit Worker flags;
     // the internal heap and stack reservations remain in resourceLimits below.
-    ...(nodeStdio ? { execArgv: ['--require', fileURLToPath(new URL('./native-worker-cwd.cjs', import.meta.url))] } : {}),
+    execArgv: ['--require', fileURLToPath(new URL('./native-worker-cwd.cjs', import.meta.url))],
     workerData: { runtimeRoot: true, options }, resourceLimits: { stackSizeMb: 96, maxOldGenerationSizeMb: 128 },
   });
   worker.on('message', value => {
@@ -70,6 +58,6 @@ export async function runWasmtimeApplication(entrypoint, args = process.argv.sli
     else fail(new Error('Unexpected Wasmtime supervisor message'));
   });
   worker.on('error', fail);
-  if (nodeStdio) forwardWorkerStdio(worker);
+  forwardWorkerStdio(worker);
   worker.on('exit', code => { if (!completed) fail(new Error(`Wasmtime runtime exited before application completion: ${code}`)); });
 }

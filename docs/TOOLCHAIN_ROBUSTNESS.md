@@ -10,7 +10,7 @@ does not invalidate the scoped [candidate `.46` acceptance](NODE_ACCEPTANCE.md).
 
 This is an analysis and proposed next milestone, not an implemented hardening
 release. Windows 11 x86-64 remains deferred as requested. npm publication,
-additional operating systems, broader Lean APIs, and other engines are outside
+additional operating systems and broader Lean APIs are outside
 this review.
 
 ## Evidence and limits

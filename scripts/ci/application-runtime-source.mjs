@@ -96,7 +96,7 @@ try {
     result.gmp.toolTreesUnchanged = true;
   } else if (phase === 'hosts') {
     run(process.execPath, ['scripts/prepare-native.mjs']);
-    result.manifests = Object.fromEntries(await Promise.all(['manifest.json', 'process/manifest.json', 'bun-stack/manifest.json', 'signals/manifest.json']
+    result.manifests = Object.fromEntries(await Promise.all(['manifest.json', 'process/manifest.json', 'signals/manifest.json']
       .map(async path => [path, await hashFile(join('.cache/native-host', path))])));
   } else {
     const target = resolve(`.work/ci-application-bundle/lean-${version}-wasm64`);

@@ -41,8 +41,6 @@ console.log('host still running');
 `);
     for (const [name, executable, prefix] of [
       ['node', process.execPath, []],
-      ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-      ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
     ]) {
       if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }
       for (const mode of Object.keys(expected)) await t.test(`${name}: ${mode}`, () => {

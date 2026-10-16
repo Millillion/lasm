@@ -16,7 +16,7 @@ const inputs = ['scripts/full-lean/probes/wasmtime-memory-view.c', 'scripts/full
   'scripts/full-lean/probes/wasmtime-memory-view.mjs', 'scripts/full-lean/probe-wasmtime-memory-view.mjs',
   'node_modules/koffi/src/koffi/src/ffi.cc'];
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
-const report = { scope: 'Zero-copy external ArrayBuffer views of an existing sparse Wasmtime mapping, all three stock engines, Linux x64 only',
+const report = { scope: 'Zero-copy external ArrayBuffer views of an existing sparse Wasmtime mapping, stock Node, Linux x64 only',
   reviewedImplementation: 'Koffi CreateView uses Napi::ArrayBuffer::New(env, ptr, length); no backing copy. Wasmtime reserves virtual space and touches one 8-byte cell.',
   profile, inputs: hashes, resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], results: [], failures: [], passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
@@ -39,8 +39,6 @@ try {
   const worker = join(root, inputs[2]);
   for (const [engine, args] of [
     [join(root, '.cache/js-runtimes/node-26.10.0/bin/node'), ['--max-old-space-size=128']],
-    [join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
-    [join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
   ]) {
     try { report.results.push(JSON.parse(run(engine, [...args, worker, helper, profile]))); }
     catch (error) { report.failures.push({ engine, message: error.message }); }
@@ -48,7 +46,7 @@ try {
   }
   assert.equal(report.failures.length, 0);
   assert.deepEqual(report.results.map(row => [row.engine, row.version]),
-    [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
+    [['node', '26.10.0']]);
   report.passed = true;
 } finally {
   report.inputsUnchanged = true;

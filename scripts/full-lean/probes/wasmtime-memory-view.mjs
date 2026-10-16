@@ -85,8 +85,8 @@ if (!isMainThread) {
     assert.equal(memory.values.getBigUint64(viewIndex, true), 42n);
     assert.equal(memory.bytes[viewIndex], 42);
     assert.equal(Number(peek(probe)), 42);
-    console.log(JSON.stringify({ engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
-      version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
+    console.log(JSON.stringify({ engine: 'node',
+      version: process.versions.node,
       profile, accessibleGuestBytes: length, byteLength: viewLength, dataOffset: offset, touchedBytes: 8, worker: result,
       externalBuffer: true, sharedArrayBuffer: false,
       scope: 'Ordered JavaScript/native/Wasm access to one sparse high-address cell; no copying, bulk allocation, JS atomic synchronization, or Lean execution' }));

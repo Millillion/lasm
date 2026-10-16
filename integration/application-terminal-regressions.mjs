@@ -12,9 +12,10 @@ import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { processOutput } from './process-output.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg, version, ...extra] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && !extra.length,
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER LEAN_VERSION');
+const [outputArg, engineArg, compilerArg, version, ...extra] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg && !extra.length,
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER LEAN_VERSION');
 assert.match(version ?? '', /^\d+\.\d+\.\d+$/);
 assert.notEqual(process.platform, 'win32', 'This fixture requires a POSIX controlling terminal');
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -93,14 +94,14 @@ try {
   assert.deepEqual(terminal('native-compiled', [native], environment), interpreted);
   const dist = join(output, 'dist');
   run('build installed application', [process.execPath, join(compiler, 'bin/lasm.mjs'), 'build', source,
-    '--target', target, '--output', dist], project, environment, 1800_000);
+    '--output', dist], project, environment, 1800_000);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   const relocated = join(output, 'relocated deployment'); renameSync(dist, relocated); renameSync(project, project + '.hidden');
   report.wasmSha256 = await hashFile(join(relocated, 'program.wasm'));
   const deployedEnvironment = Object.fromEntries(Object.entries(process.env).filter(([name]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(name)));
-  Object.assign(deployedEnvironment, { PATH: '', LEAN_NUM_THREADS: '2', DENO_DISABLE_NODE_SHIM: '1' });
+  Object.assign(deployedEnvironment, { PATH: '', LEAN_NUM_THREADS: '2' });
   report.deployment = { directory: relocated, sourceHidden: true, path: '', buildEnvironmentRemoved: true };
-  assert.deepEqual(terminal('deployed', [engine, ...(target === 'deno' ? ['run', '-A'] : []), join(relocated, 'main.mjs')], deployedEnvironment), interpreted);
+  assert.deepEqual(terminal('deployed', [engine, join(relocated, 'main.mjs')], deployedEnvironment), interpreted);
   report.passed = true;
 } finally {
   report.inputsUnchanged = true;

@@ -30,8 +30,7 @@ function diagnostic(text) {
   }
 }
 try {
-  // Deno's fs descriptor numbers are resource IDs. Use the inherited OS pipe
-  // directly in every engine. Environment values never travel in argv.
+  // Read the inherited OS pipe directly. Environment values never travel in argv.
   const chunks = [];
   for (;;) {
     const bytes = Buffer.alloc(64 * 1024), count = read(3, bytes, bytes.length);

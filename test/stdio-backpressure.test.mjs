@@ -7,8 +7,6 @@ test('standard-output flush and disposal leave the host event loop available',
   { skip: process.platform !== 'linux' }, async t => {
     for (const [name, engine, prefix] of [
       ['node', process.execPath, []],
-      ['deno', '.cache/js-runtimes/deno-2.9.7/deno', ['run', '-A']],
-      ['bun', '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun', []],
     ]) {
       if (!existsSync(engine)) { t.diagnostic(`${name}: not installed`); continue; }
       for (const action of ['flush', 'close']) await t.test(`${name}: ${action}`, () => {

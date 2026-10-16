@@ -1,6 +1,5 @@
 import { constants } from 'node:os';
 import { numbers } from './node-host.mjs';
-import { retainDenoUserSignal } from './deno-signals.mjs';
 
 const names = { 1: 'SIGHUP', 2: 'SIGINT', 3: 'SIGQUIT', 6: 'SIGABRT', 15: 'SIGTERM', 28: 'SIGWINCH',
   5: 'SIGTRAP', 10: 'SIGUSR1', 12: 'SIGUSR2', 14: 'SIGALRM', 17: 'SIGCHLD', 18: 'SIGCONT',
@@ -24,15 +23,12 @@ export function createNodeSignals({ add, get }) {
     };
     signal.unwatch = () => {
       if (name) process.off(name, signal.listener);
-      signal.releaseNative?.(); signal.releaseNative = undefined;
       clearInterval(signal.keepAlive);
     };
     signal.start = () => {
       if (!name || constants.signals[name] === undefined)
         throw Object.assign(new Error('invalid argument'), { code: 'EINVAL', errno: -22 });
       process.on(name, signal.listener);
-      try { signal.releaseNative = retainDenoUserSignal(name); }
-      catch (error) { process.off(name, signal.listener); throw error; }
       // Node signal watchers are unreferenced. A Lean main awaiting a signal
       // must remain alive even when this is its only pending host operation.
       signal.keepAlive = setInterval(() => {}, 2_147_483_647);

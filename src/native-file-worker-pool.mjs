@@ -2,7 +2,6 @@ import { Worker } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
 import forwardWorkerStdio from './worker-stdio.cjs';
 import { encodeFileMessage, decodeFileMessage } from './native-file-message.mjs';
-const DenoWebWorker = globalThis[Symbol.for('lasm.denoWebWorker')] ?? globalThis.Worker;
 
 // Blocking stdio calls cannot use the shared N-API/libuv pool: enough reads
 // would prevent their writers from ever starting. Lease an independent worker
@@ -27,24 +26,11 @@ function failed(state, error) {
   job?.reject(error);
 }
 function create() {
-  let removedDenoCwd = false;
-  if (process.versions.deno) {
-    try { Deno.cwd(); }
-    catch (error) {
-      if (error.name !== 'NotFound' && error.name !== 'InvalidData' && error.code !== 'ENOENT') throw error;
-      removedDenoCwd = true;
-    }
-  }
-  const worker = removedDenoCwd
-    ? new DenoWebWorker(new URL('./native-file-worker-deno.mjs', import.meta.url), { type: 'module', name: 'lasm-file-io' })
-    : new Worker(new URL('./native-file-worker.mjs', import.meta.url), {
-      name: 'lasm-file-io',
-      ...(!process.versions.deno && !process.versions.bun ? {
-        stdout: true, stderr: true,
-        execArgv: ['--require', fileURLToPath(new URL('./native-worker-cwd.cjs', import.meta.url))],
-      } : {}),
-    });
-  if (!process.versions.deno && !process.versions.bun) forwardWorkerStdio(worker);
+  const worker = new Worker(new URL('./native-file-worker.mjs', import.meta.url), {
+    name: 'lasm-file-io', stdout: true, stderr: true,
+    execArgv: ['--require', fileURLToPath(new URL('./native-worker-cwd.cjs', import.meta.url))],
+  });
+  forwardWorkerStdio(worker);
   const state = { worker };
   const received = encoded => {
     let message;
@@ -53,7 +39,7 @@ function create() {
     const job = state.job;
     if (!job) return failed(state, new Error('Unexpected native file worker response'));
     state.job = undefined;
-    if (!removedDenoCwd && idle.length < 2) {
+    if (idle.length < 2) {
       idle.push(state);
       worker.unref();
       state.timer = setTimeout(() => retire(state), 1000);
@@ -62,18 +48,11 @@ function create() {
     if (message.ok) job.resolve(message.value);
     else job.reject(Object.assign(new Error(message.error.message), message.error));
   };
-  if (removedDenoCwd) {
-    // Web Workers have no public unref method. Retire these exceptional workers
-    // after each operation; keep the ordinary reusable pool on valid cwd paths.
-    worker.addEventListener('message', event => received(event.data));
-    worker.addEventListener('error', event => { event.preventDefault(); failed(state, new Error(event.message)); });
-  } else {
-    worker.on('message', received);
-    worker.on('error', error => failed(state, error));
-    worker.on('exit', code => {
-      if (!state.retired) failed(state, new Error(`Native file worker exited unexpectedly (${code})`));
-    });
-  }
+  worker.on('message', received);
+  worker.on('error', error => failed(state, error));
+  worker.on('exit', code => {
+    if (!state.retired) failed(state, new Error(`Native file worker exited unexpectedly (${code})`));
+  });
   return state;
 }
 export function callNativeFile(operation, args) {

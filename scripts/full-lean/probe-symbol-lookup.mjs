@@ -50,8 +50,6 @@ try {
       throw new Error('The compiled SDK did not retain the symbol lookup repair');
     for (const [engine, path, flags] of [
       ['node', process.execPath, []],
-      ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-      ...(memory === 2 ? [['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []]] : []),
     ]) run('execute', `${engine}/memory${memory}`, [path, ...flags, executable], expected);
   }
 } finally {

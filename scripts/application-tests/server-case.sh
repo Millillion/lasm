@@ -13,7 +13,7 @@ printf '%s\n' "$EXIT" > "$evidence/native-exit.txt"
 
 printf 'application-build\n' > "$evidence/phase.txt"
 "$LASM_BUILD_NODE" "$LASM_COMPILER/bin/lasm.mjs" build "$PWD/$file" \
-  --target "$LASM_APPLICATION_TARGET" --output "$evidence/dist"
+  --output "$evidence/dist"
 
 export LASM_TEST_DRIVER_DIST="$evidence/dist"
 export LASM_TEST_INPUT="$file"

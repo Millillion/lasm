@@ -1,38 +1,27 @@
 // A parallel-suite toolchain facade. Every Lean entry point executes the full
-// Wasm compiler in the selected engine; there is no native Lean fallback.
-import { mkdirSync, writeFileSync, readFileSync, symlinkSync, existsSync, chmodSync, copyFileSync } from 'node:fs';
+// Wasm compiler in Node; there is no native Lean fallback.
+import { mkdirSync, writeFileSync, readFileSync, symlinkSync, existsSync, chmodSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 
 const argv = process.argv.slice(2);
 const option = (name, fallback) => { const i = argv.indexOf(name); return i < 0 ? fallback : argv[i + 1]; };
-const engine = option('--engine', 'node');
+const engine = 'node';
 const sharedApplications = argv.includes('--shared-applications');
 const linkOptimization = option('--standalone-link-optimization');
 if (argv.includes('--standalone-link-optimization') && linkOptimization !== '1')
   throw new Error('--standalone-link-optimization currently accepts only 1');
 if (linkOptimization !== undefined && sharedApplications)
   throw new Error('Choose standalone link optimization or shared applications, not both');
-const bunSmol = argv.includes('--bun-smol');
-if (bunSmol && engine !== 'bun') throw new Error('--bun-smol is only supported by the Bun facade');
 const leanThreads = Number(option('--lean-threads', '4'));
 if (!Number.isInteger(leanThreads) || leanThreads < 1 || leanThreads > 4)
   throw new Error('--lean-threads must be 1..4 on this maintainer host');
 const lakeThreads = Number(option('--lake-threads', '4'));
 if (!Number.isInteger(lakeThreads) || lakeThreads < 1 || lakeThreads > 4)
   throw new Error('--lake-threads must be 1..4 on this maintainer host');
-const defaults = {
-  node: [process.execPath, []],
-  // Deno applies resourceLimits.stackSizeMb to the OS worker reservation but
-  // leaves V8's separate stack budget at its much smaller command-line default.
-  deno: [join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--stack-size=61440']],
-  bun: [join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
-};
-if (!defaults[engine]) throw new Error('Use --engine node, deno, or bun');
-const [defaultExecutable, engineArgs] = defaults[engine];
-if (bunSmol) engineArgs.push('--smol');
-const executable = resolve(option('--executable', defaultExecutable));
+const engineArgs = [];
+const executable = resolve(option('--executable', process.execPath));
 const output = resolve(option('--output', `.work/full-toolchains/${engine}`));
 if (existsSync(output)) throw new Error('Prepare a new toolchain directory to preserve previous run configurations');
 const build = resolve(option('--build', '.work/lean-full/wasm64'));
@@ -49,8 +38,6 @@ const buildConfig = readFileSync(join(build, 'CMakeCache.txt'), 'utf8');
 // A recorded worker-pool derivative changes generated JavaScript without
 // rebuilding the Wasm. Use its actual pool size for generated applications too.
 const javascript = readFileSync(join(build, 'bin/lean.js'), 'utf8');
-if (bunSmol && !javascript.includes('process.env.LASM_BUN_SMOL'))
-  throw new Error('The selected snapshot does not propagate Bun smol mode to workers; derive or rebuild it first');
 const poolMatches = [...javascript.matchAll(/var pthreadPoolSize = (\d+);/g)];
 if (poolMatches.length !== 1) throw new Error('Cannot determine the compiled worker-pool size');
 const pthreadPoolSize = Number(poolMatches[0][1]);
@@ -102,29 +89,10 @@ if (sharedApplications) {
     compilerLibraryDirectories: [join(build, 'lib/lean'), join(output, 'lib/lean')],
     scope: 'Opt-in shared linking for generated Lean C with the recorded runtime libraries; other inputs retain standalone Wasm linking.' };
 }
-const engineEnvironment = engine === 'bun' && memoryMode === 1 ? { BUN_JSC_useWasmMemory64: 'true' } : {};
-if (bunSmol) engineEnvironment.LASM_BUN_SMOL = '1';
-// This is an explicit Linux harness resource adjustment, not an implicit change
-// to stock Bun or a portable launcher feature. Preserve a local copy and hash.
-const stackHelper = option('--bun-stack-helper');
-if (stackHelper && (engine !== 'bun' || process.platform !== 'linux'))
-  throw new Error('--bun-stack-helper is only supported by the Linux Bun test facade');
-const stackHelperBytes = stackHelper ? readFileSync(resolve(stackHelper)) : undefined;
-if (stackHelperBytes && !stackHelperBytes.subarray(0, 4).equals(Buffer.from([0x7f, 0x45, 0x4c, 0x46])))
-  throw new Error('--bun-stack-helper must be the compiled Linux stack-reservation library');
+const engineEnvironment = {};
 if (!/^LASM_LINK_TOOLS:BOOL=ON$/m.test(buildConfig))
   throw new Error('The selected compiler must include the original tool entry points (build --stage wasm64)');
 mkdirSync(join(output, 'bin'), { recursive: true });
-let stackAdjustment;
-if (stackHelperBytes) {
-  const localHelper = join(output, 'bun-stack-reservation.so');
-  copyFileSync(resolve(stackHelper), localHelper);
-  Object.assign(engineEnvironment, { LD_PRELOAD: localHelper, BUN_JSC_maxPerThreadStackUsage: '62914560' });
-  stackAdjustment = { helper: localHelper,
-    sha256: createHash('sha256').update(stackHelperBytes).digest('hex'),
-    osThreadStackBytes: 64 * 1024 * 1024, jscStackBudgetBytes: 60 * 1024 * 1024,
-    scope: 'Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result.' };
-}
 const quote = text => "'" + text.replaceAll("'", "'\\''") + "'";
 const runner = [executable, ...engineArgs, join(runtimeSupport, 'run-compiler.mjs'), '--prefix', build];
 const wrappers = {
@@ -180,11 +148,11 @@ for (const [name, target] of Object.entries(links)) if (!existsSync(join(output,
 writeFileSync(join(output, 'toolchain.json'), JSON.stringify({ leanCommit, engine, executable, engineArgs, build, source, sdk, runtimeSupport,
   ...(applicationRuntime ? { prefix: output, applicationRuntime } : {}),
   ...(standaloneLinkOptimization ? { standaloneLinkOptimization } : {}),
-  leanThreads, lakeThreads, bunSmol,
+  leanThreads, lakeThreads,
   sourceBuild: snapshot?.sourceBuild ?? build,
   systemAllocator: buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sMALLOC=(\w+)/m)?.[1] ?? 'dlmalloc',
   leanAllocator: /^USE_MIMALLOC:BOOL=ON$/m.test(buildConfig) ? 'mimalloc' : 'generic',
-  memoryMode, engineEnvironment, stackAdjustment,
+  memoryMode, engineEnvironment,
   maximumMemoryBytes: Number(buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sMAXIMUM_MEMORY=(\d+)/m)?.[1] ?? 4294967296),
   pthreadPoolSize,
   backend: memoryMode === 1 ? 'full-lean-wasm64-native' : 'full-lean-wasm64-lowered', nativeLeanFallback: false,

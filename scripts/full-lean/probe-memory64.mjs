@@ -26,9 +26,6 @@ writeFileSync(join(output, 'build.log'), build.stdout + build.stderr);
 assert.equal(build.status, 0, build.error?.message ?? build.stderr);
 const engines = [
   ['node', process.execPath, [], {}],
-  ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A'], {}],
-  ['bun-stock', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), [], {}],
-  ['bun-memory64', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), [], { BUN_JSC_useWasmMemory64: 'true' }],
 ];
 const results = engines.map(([name, executable, prefix, environment]) => {
   const started = performance.now();

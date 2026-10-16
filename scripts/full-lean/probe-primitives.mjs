@@ -31,7 +31,7 @@ const interfaces = resolve(root, 'scripts/full-lean/probes/Interfaces.lean');
 const compact = resolve(root, 'scripts/full-lean/probes/CompactLayout.lean');
 const expectedInterfaces = run('native interfaces', join(native, 'bin/lean'), ['--run', interfaces]);
 const expectedCompact = run('native compact values', join(native, 'bin/lean'), ['--run', compact]);
-for (const engine of ['node', 'deno', 'bun']) {
+for (const engine of ['node']) {
   const lean = join(root, `.work/full-toolchains/${engine}-${revision}/bin/lean`);
   assert.equal(run(`${engine} interfaces`, lean, ['--run', interfaces]), expectedInterfaces, `${engine}: native interface records/order`);
   const directory = join(output, engine);

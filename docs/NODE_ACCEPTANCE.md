@@ -118,6 +118,6 @@ contains the native compiler, license, relocation and archive audits.
 
 The scoped six-platform installation/build/deployment milestone is complete.
 Complete `IO.FS`, `Std.Http`, concurrency, broad third-party libraries, full Lean
-upstream-suite parity, other engines and serverless adapters remain separate
+upstream-suite parity and serverless adapters remain separate
 work. Runtime compiler/evaluation/module-data and executable-plugin capabilities
 remain explicitly unavailable under the ahead-of-time policy.

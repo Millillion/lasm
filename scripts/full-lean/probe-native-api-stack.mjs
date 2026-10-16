@@ -12,7 +12,7 @@ assert.ok(outputArg && !extra.length); assert.equal(process.platform + '-' + pro
 const root = fileURLToPath(new URL('../..', import.meta.url)), output = resolve(outputArg);
 assert.ok(!existsSync(output), 'Preserve earlier probes'); mkdirSync(output, { recursive: true });
 const sources = ['scripts/full-lean/probes/native-api-stack.c', 'scripts/full-lean/probes/native-api-stack.mjs',
-  'scripts/full-lean/probe-native-api-stack.mjs', 'src/bun-stack.mjs'];
+  'scripts/full-lean/probe-native-api-stack.mjs'];
 const inputs = Object.fromEntries(await Promise.all(sources.map(async path => [path, await hashFile(join(root, path))])));
 const headers = join(root, '.cache/js-runtimes/node-26.10.0/include/node');
 const headerHashes = Object.fromEntries(await Promise.all(['node_api.h', 'node_api_types.h', 'js_native_api.h', 'js_native_api_types.h']
@@ -34,11 +34,9 @@ try {
   report.helperSha256 = await hashFile(helper);
   for (const [engine, args] of [
     [join(root, '.cache/js-runtimes/node-26.10.0/bin/node'), ['--max-old-space-size=128']],
-    [join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
-    [join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
   ]) report.results.push(JSON.parse(run(engine, [...args, join(root, sources[1]), helper])));
   assert.deepEqual(report.results.map(row => [row.engine, row.version]),
-    [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
+    [['node', '26.10.0']]);
   report.passed = true;
 } catch (error) { report.error = error.stack ?? String(error); throw error; }
 finally {

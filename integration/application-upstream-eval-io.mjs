@@ -15,9 +15,10 @@ import { parallelEvalIOSource, reviewedEvalIOTests, reviewedEvalIOInput } from '
 import { reviewedEvalIOSidecars } from '../scripts/application-tests/eval-io-sidecars.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg, referenceArg, name, version = '4.34.1', ...extra] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && referenceArg && !extra.length,
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE REVIEWED_TEST [LEAN_VERSION]');
+const [outputArg, engineArg, compilerArg, referenceArg, name, version = '4.34.1', ...extra] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg && referenceArg && !extra.length,
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE REVIEWED_TEST [LEAN_VERSION]');
 assert.ok(reviewedEvalIOTests.has(name));
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
@@ -105,7 +106,7 @@ try {
   assert.deepEqual(report.nativeCompiled, report.nativeInterpreted);
   const dist = join(output, 'dist');
   run('installed application build', process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', main,
-    '--target', target, '--output', dist], project, env, 1800_000);
+    '--output', dist], project, env, 1800_000);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   assert.equal(report.build.lean, version); assert.equal(report.build.leanCommit, lean.commit);
   assert.equal(report.build.target, target);
@@ -113,8 +114,8 @@ try {
   renameSync(dist, relocated); renameSync(project, project + '.hidden'); renameSync(original, original + '.hidden');
   report.wasmSha256 = await hashFile(join(relocated, 'program.wasm'));
   const deploymentEnv = Object.fromEntries(Object.entries(process.env).filter(([name]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(name)));
-  Object.assign(deploymentEnv, { PATH: '', LEAN_NUM_THREADS: '2', DENO_DISABLE_NODE_SHIM: '1' });
-  report.actual = execute('deployed', [engine, ...(target === 'deno' ? ['run', '-A'] : []), join(relocated, 'main.mjs')], deploymentEnv);
+  Object.assign(deploymentEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
+  report.actual = execute('deployed', [engine, join(relocated, 'main.mjs')], deploymentEnv);
   assert.deepEqual(report.actual, report.nativeInterpreted);
   assert.equal(await hashFile(join(project + '.hidden', 'Main.lean')), report.parallel.sourceSha256);
   for (const path of originals) assert.equal(await hashFile(join(original + '.hidden', path)), sources[path].sha256);

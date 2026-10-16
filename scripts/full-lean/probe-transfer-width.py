@@ -6,8 +6,6 @@ root = Path(__file__).resolve().parents[2]
 parser = argparse.ArgumentParser(description='Guarded synthetic full-runtime transfer ABI regression; no large buffers.')
 parser.add_argument('output', type=Path)
 parser.add_argument('--node', type=Path, default=shutil.which('node'))
-parser.add_argument('--deno', type=Path, default=root / '.cache/js-runtimes/deno-2.9.7/deno')
-parser.add_argument('--bun', type=Path, required=True, help='Explicit memory64-capable Bun executable')
 parser.add_argument('--sdk', type=Path, default=os.environ.get('LASM_EMSDK', str(root / '.cache/emsdk-6.0.9-dev')))
 parser.add_argument('--include', type=Path, default=root / '.work/lean-full/wasm64/include')
 args = parser.parse_args()
@@ -15,8 +13,7 @@ base = root / 'scripts/full-lean/probes'
 output = args.output.resolve()
 assert not output.exists()
 output.mkdir(parents=True)
-engines = [('node', [str(args.node.resolve())]), ('deno', [str(args.deno.resolve()), 'run', '-A']),
-           ('bun', [str(args.bun.resolve())])]
+engines = [('node', [str(args.node.resolve())])]
 assert all(Path(command[0]).is_file() for _, command in engines)
 def sha(path):
     with path.open('rb') as stream:
@@ -56,8 +53,7 @@ save()
 assert built.returncode == 0, 'Inspect retained build.log'
 record['wasmSha256'] = hashlib.sha256(program.with_suffix('.wasm').read_bytes()).hexdigest()
 for name, engine in engines:
-    run_env = {**env, **({'BUN_JSC_useWasmMemory64': 'true'} if name == 'bun' else {})}
-    result = subprocess.run(engine + [str(program)], env=run_env, capture_output=True, text=True, timeout=60)
+    result = subprocess.run(engine + [str(program)], env=env, capture_output=True, text=True, timeout=60)
     cases = [json.loads(line) for line in result.stdout.splitlines() if line.startswith('{')]
     record['runs'].append({'engine': name, 'command': engine + [str(program)], 'code': result.returncode,
                            'stdout': result.stdout, 'stderr': result.stderr, 'cases': cases})

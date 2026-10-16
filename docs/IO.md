@@ -2,15 +2,15 @@
 
 For executable applications, use ordinary Lean APIs: `main`, `IO.FS`, console
 streams and `Std.Http.Server`. Application source needs no `Lasm.IO` imports.
-The managed CLI builds the application ahead of time for Node, Deno or Bun:
+The managed CLI builds the application ahead of time for Node:
 
 ```sh
-node bin/lasm.mjs examples/lean-server/Main.lean --target node
+node bin/lasm.mjs examples/lean-server/Main.lean
 ```
 
 | Application | Interface | Backend |
 | --- | --- | --- |
-| A managed Lean executable | Ordinary `main`; `--target node\|deno\|bun` | Full Lean runtime with guest pthreads and private host adapters |
+| A managed Lean executable | Ordinary `main`; Node only | Full Lean runtime with guest pthreads and private host adapters |
 | A callable Lean library using the earlier compiler | `lasm.json` exports; standard Node IO is available to IO exports | Asyncify with cooperative tasks |
 | Existing explicit-capability examples | `Lasm.readBytes`, `writeBytes`, `fetchBytes` | Asyncify or optional JSPI |
 | Browser/Worker experiments | Explicit storage/fetch adapters | Legacy interface, Asyncify |
@@ -44,7 +44,7 @@ constraints should not be confused with the executable backend.
 
 Fresh Lean 4.34.1 [filesystem/console comparisons](evidence/lean-4.34.1-installed-io-2026-09-25.json)
 and [the ordinary HTTP server's Vitest checks](evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json)
-pass in all three stock engines on Linux x64. These do not establish complete
+pass in stock Node on Linux x64. These do not establish complete
 `IO.FS`, `Std.Http`, `Std.Async`, or cross-platform compatibility. Native
 acceptance on the other five OS/architecture combinations remains unfinished.
 See [the current limitations](../IO_LIMITATIONS.md) and

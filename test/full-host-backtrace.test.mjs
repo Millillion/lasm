@@ -15,21 +15,8 @@ function fixture(versions, allocate = text => text) {
   return { capture: library.lasm_host_backtrace, Error: runInContext('Error', context) };
 }
 
-test('Bun formatting retains real frame descriptions and restores caller descriptors', () => {
-  const { capture, Error } = fixture({ bun: 'test' });
-  const formatter = { value: () => 'caller formatter', enumerable: true, configurable: true, writable: false };
-  const limit = { value: 3, enumerable: true, configurable: true, writable: false };
-  Object.defineProperty(Error, 'prepareStackTrace', formatter);
-  Object.defineProperty(Error, 'stackTraceLimit', limit);
-  const stack = capture();
-  assert.match(stack, /at .*lasm_host_backtrace/);
-  assert.doesNotMatch(stack, /caller formatter/);
-  assert.deepEqual(Object.getOwnPropertyDescriptor(Error, 'prepareStackTrace'), formatter);
-  assert.deepEqual(Object.getOwnPropertyDescriptor(Error, 'stackTraceLimit'), limit);
-});
-
 test('backtrace allocation failure restores an absent formatter and the original limit', () => {
-  const { capture, Error } = fixture({ bun: 'test' }, () => { throw new Error('allocation boundary failed'); });
+  const { capture, Error } = fixture({}, () => { throw new Error('allocation boundary failed'); });
   const limit = Object.getOwnPropertyDescriptor(Error, 'stackTraceLimit');
   assert.equal(Object.hasOwn(Error, 'prepareStackTrace'), false);
   assert.throws(capture, /allocation boundary failed/);
@@ -37,9 +24,9 @@ test('backtrace allocation failure restores an absent formatter and the original
   assert.deepEqual(Object.getOwnPropertyDescriptor(Error, 'stackTraceLimit'), limit);
 });
 
-test('other engines and nonconfigurable formatters keep the caller stack policy', () => {
-  for (const [versions, configurable] of [[{}, true], [{ deno: 'test' }, true], [{ bun: 'test' }, false]]) {
-    const { capture, Error } = fixture(versions);
+test('configurable and nonconfigurable formatters keep the caller stack policy', () => {
+  for (const configurable of [true, false]) {
+    const { capture, Error } = fixture({});
     const formatter = { value: () => 'caller stack', configurable, writable: false, enumerable: false };
     Object.defineProperty(Error, 'prepareStackTrace', formatter);
     assert.equal(capture(), 'caller stack');

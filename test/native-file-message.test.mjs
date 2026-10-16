@@ -43,7 +43,7 @@ test('owned results move full allocations once while pooled peers stay live', ()
   assert.equal(received[3].buffer.byteLength, 0);
 });
 
-test('Deno-style message traversal has bounded overhead independent of byte length', () => {
+test('worker message traversal has bounded overhead independent of byte length', () => {
   function properties(value) {
     assert.equal(ArrayBuffer.isView(value), false, 'No indexed views may reach worker message inspection');
     let count = 0;

@@ -115,7 +115,7 @@ const cases = manifest.tests.map(test => {
 const counts = {};
 for (const test of cases) counts[test.status] = (counts[test.status] ?? 0) + 1;
 const report = { startedAt, finishedAt: new Date().toISOString(), scope: manifest.scope,
-  lean: manifest.lean, leanCommit: manifest.leanCommit, category: manifest.category, target: manifest.target,
+  lean: manifest.lean, leanCommit: manifest.leanCommit, category: manifest.category,
   execution, counts, registered: manifest.tests.length, originalSources: { before, after },
   harness: { before: harnessBefore, changed: harnessChanged },
   cases, cleanup, resourceStop, diskAtStart, diskAtEnd: freeDisk(), minimumFreeDisk,

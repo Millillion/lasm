@@ -9,7 +9,7 @@ Subsequent investigations and guarded workload results are recorded below.
 Kernel logs show global OOM episodes around 01:06, 08:36, and 11:37 Eastern.
 All 2 GiB of swap were exhausted. The kernel killed ChatGPT processes repeatedly.
 At 08:36 individual compiler/engine processes occupied about 1.1–5.1 GiB each;
-the task table includes several Node, Deno, and Bun processes simultaneously.
+the task table includes several Node processes simultaneously.
 An earlier episode includes three concurrent `wasm-opt` processes using about
 2.8–2.9 GiB each in addition to multiple Lean engine processes.
 
@@ -144,20 +144,9 @@ The resumed packaged-finalizer investigation on September 21 found a Wasm
 memory-access trap, not host memory exhaustion. The probe peaked below 0.5 GiB
 with zero OOM/throttling counters. Its cause was incorrect restoration of a
 suspended fiber's C stack pointer. After correcting that state, fresh builds and
-native/Node/Deno/Bun FIFO comparisons passed at a combined 0.41 GiB peak, still
+native/Node FIFO comparisons passed at a combined 0.41 GiB peak, still
 with zero OOM, throttling, or swap use. The resource policy is unchanged; see
 [the finalizer evidence](evidence/cooperative-finalizers-2026-09-21.json).
-
-A later combined TCP/HTTP regression sequence was stopped proactively at
-8.03 GiB while running Bun with five prestarted workers. The entire service was
-released; memory-high/max/OOM counters and swap use all remained zero. About
-1.9 GiB of the final sample was retained file cache, so the same HTTP registration
-was retried alone under the unchanged guard. It finished as a real test failure
-at 7.07 GiB: all 22 original cases timed out. Restoring eight prestarted workers
-with identical Wasm and host code passed the unchanged registration at a
-4.78 GiB combined preparation/test peak. Keep this resource abort, the isolated
-failure, and the passing control distinct. The guard limits were never raised;
-see [the worker-pool HTTP comparison](evidence/bun-pool-http-2026-09-21.json).
 
 The prioritized Node campaign then reached the proactive budget in three
 language-server cancellation registrations (8.05–8.11 GiB). Lowering all Lean
@@ -174,74 +163,18 @@ original four Lean workers, all three unchanged Node server tests then passed
 at 7.18–7.37 GiB, with all original source hashes intact. The compiler memory
 probe fell from 3.77 to 3.09 GiB. The first index attempt fell back on console
 imports and saved little; it remains recorded along with the concurrency trials.
-Five focused lookup tests and 54 cross-engine ABI/thread/library checks pass.
-Broader server and engine campaigns remain necessary. The memory cap, proactive
+Five focused lookup tests and the ABI/thread/library checks pass.
+Broader server campaigns remain necessary. The memory cap, proactive
 stop, pressure monitor, swap restriction, and single-workload policy are unchanged.
 See [the complete comparisons](evidence/function-table-index-2026-09-21.json).
-
-The indexed Bun compiler still exceeds the proactive process-tree budget in
-the original parallel-cancellation server test: 8.13 GiB with eight prestarted
-workers per compiler process. The guard stopped and released the workload;
-all 7,267 source hashes remained intact, and high/max/OOM counters and swap
-were zero. The same original registration passed in Node and Deno. This is
-a remaining resource result, not a Bun conformance failure or a fundamental
-limit. See [the process comparison](evidence/process-lifetime-2026-09-21.json).
-
-Two isolated follow-ups also retain the unchanged memory limits. Six prestarted
-Bun workers passed the dedicated-task test, failed HTTP's early-streaming check,
-and reached 8.06 GiB in parallel cancellation. Eight workers with Bun's opt-in
-`--smol`/worker `smol:true` GC mode passed HTTP but also reached 8.06 GiB in
-parallel cancellation. Both budget stops released their units with zero
-high/max/OOM counters and zero swap; every run preserved all 7,267 original
-hashes. Neither experiment resolves the server-memory gate. Six workers are not
-adopted; the GC setting remains an optional diagnostic rather than a default.
-See [the configurations and retained outcomes](evidence/bun-gc-2026-09-21.json).
-
-A subsequent numeric-memory trace of the original Bun cancellation workload
-recorded no full function-table scans in any of its three compiler processes;
-each used the metadata index in its main instance and eight workers. The guard
-stopped it at 8.04 GiB, again with zero OOM/throttling/swap and unchanged original
-sources. The file worker process also created a ninth worker before the stop.
-The driver's sampled linear memory reached 1.83 GiB and its RSS reached
-3.72 GiB. These counters do not fully attribute the remaining engine/native
-overhead, but they rule out a recurrence of the full-scan path in this attempt.
-See [the complete numeric trace](evidence/bun-memory-trace-2026-09-21.json).
-
-Reducing Lean's actual worker count to three, with six prestarted Bun workers,
-also leaves the parallel-cancellation gate open: Bun passed the unchanged HTTP
-registration at 3.32 GiB but stopped parallel cancellation at 8.09 GiB. Native
-Lean passed both original registrations with three workers. The Wasm and host
-snapshot matched the earlier six-worker experiment; source hashes remained
-intact, and the guard released every unit with zero OOM/throttling/swap events.
-The compiler-shell setting was validated here, not AOT-generated launchers.
-See [the retained comparison](evidence/bun-three-workers-2026-09-21.json).
-
-A later source check and tiny Bun control corrected one diagnostic detail:
-`bun -e` deliberately uses different JIT startup defaults from a script file.
-The startup probe now inspects a file invocation, matching the compiler launcher.
-Earlier timings still describe their actual file runs; the reported
-`useConcurrentJIT=false` belonged to their one-shot inspection call. No engine
-default or memory limit was changed; see
-[the option-mode comparison](evidence/bun-option-mode-2026-09-21.json).
 
 The original-driver v52 Node campaign reached 8.01 GiB in
 `docstringLinksExamples` after 27 passes. Compiling the unchanged small Lean
 server-test driver ahead of time in an explicitly separate harness allowed
 that original registration and four related Node controls to pass at
-6.20–7.31 GiB. Deno's two controls passed at 6.87–7.26 GiB. Bun's first control
-timed out at 900 seconds and 6.56 GiB. These different outcomes remain separate;
-no timeout or resource abort is counted as a conformance pass.
-
-Two Deno driver preparation attempts stopped on workload memory pressure during
-linking at 3.72 and 4.18 GiB. All workload memory-high/max/OOM counters and swap
-were zero; ancestor limits were unlimited and historical counters did not
-increase. The precise pressure mechanism remains unresolved. An optional
-preparation path lets the full Leanc process print its public flags and exit
-before invoking the same external C toolchain. That reduced overlap completed
-the driver build and suite preparation at 2.99 GiB without a pressure stop.
-Actual suite compiler/Leanc invocations remain unchanged. All stopped services
-were released, and every comparison retained the original guard settings.
-See [the build, suite, and integrity evidence](evidence/compiled-server-driver-2026-09-21.json).
+6.20–7.31 GiB. The resource abort and these passes remain separate; no
+resource abort is counted as a conformance pass. See
+[the build, suite, and integrity evidence](evidence/compiled-server-driver-2026-09-21.json).
 
 During the directory-identity runtime rebuild, two full Wasm links stopped on
 workload pressure at 1.80 and 2.26 GiB. The second attempt used only one build
@@ -297,7 +230,6 @@ requires one. The completed two-test smoke and manually interrupted follow-up
 remain recorded separately. The interruption occurred at 3.87 GiB with no OOM,
 memory-limit, throttling or swap events; all source hashes remained intact.
 An explicit one-worker retry passes all eleven selected Node registrations.
-Eight further controls pass sequentially in Deno and the local Bun build.
 
 The guard now defaults CMake, Emscripten and Binaryen to one worker. A small
 direct child/grandchild control verifies those actual defaults; campaign policy,
@@ -316,7 +248,7 @@ support stopping a long build before the runner's hard deadline so completed
 compiler-cache entries can be collected. They do not establish full compiler
 checkpoint correctness.
 
-On 2026-09-25, lossless archival of an unused 1.18 GB Bun research library
+On 2026-09-25, lossless archival of an unused 1.18 GB research library
 reached the 1 GiB guard's proactive threshold while hashing. The retained
 sample attributes 925 MB to file cache and 8.5 MB to anonymous memory. The
 guard terminated the workload at a 945 MB peak; all OOM, memory-limit,
@@ -339,21 +271,9 @@ thresholds were unchanged. The first attempt remains a resource abort, including
 its partial observations; the successful retry supports the mitigation without
 establishing a unique cause. See the [two preserved attempts](evidence/lean-4.34.1-native-io-ci-2026-09-25.json).
 
-The latest-release HTTP campaign separately refuses to start Bun with
-9,344,819,200 free bytes, below its nine-GiB preflight allowance
-(9,663,676,416 bytes). No service, build, test or Bun output directory is
-created for that attempt. Node and Deno have already passed. Lossless,
-decompression-verified archival of completed cold-install Wasm files and native
-HTTP executables restores headroom. A fresh Bun run passes all twenty unchanged
-checks under the same start allowance, four-GiB disk reserve and ten-GiB memory
-cap. All three HTTP comparisons finish without OOM or proactive memory stops.
-The guard refusal is a resource preflight result, not a test failure; the
-original report and archive/restore receipts remain in the
-[three-engine HTTP evidence](evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json).
-
-A subsequent successful-output cleanup reclaims 4.85 GiB from 60 completed
-Lean 4.34.1 comparisons: 36 HTTP IO-expression comparisons and 24 supplementary
-filesystem/console comparisons. Every original result, source, diagnostic and
+A subsequent successful-output cleanup reclaims 4.85 GiB from completed
+Lean 4.34.1 HTTP IO-expression and supplementary filesystem/console
+comparisons. Every original result, source, diagnostic and
 prior archive receipt is verified and retained. Only reproducible successful
 deployments, per-case build caches and native binaries are retired, after their
 contents and prior compressed copies are checked. Failed and interrupted cases,

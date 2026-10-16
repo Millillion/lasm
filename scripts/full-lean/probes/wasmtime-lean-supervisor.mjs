@@ -2,11 +2,9 @@ import assert from 'node:assert/strict';
 import { Worker } from 'node:worker_threads';
 import { writeSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { prepareBunStack } from '../../../src/bun-stack.mjs';
 
 assert.ok(process.env.LASM_RESOURCE_UNIT);
 assert.equal(process.platform, 'linux', 'This private supervisor owns a Linux diagnostic process');
-prepareBunStack(import.meta.url);
 // Node's process.exit can wait indefinitely for workers blocked inside native
 // Wasm. This standalone diagnostic owns the whole process. After synchronous
 // result/error output, the CRT exit reclaims all its threads without deleting

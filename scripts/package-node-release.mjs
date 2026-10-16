@@ -43,12 +43,12 @@ mkdirSync(staging, { recursive: true });
 for (const path of ['bin', 'src']) cpSync(join(root, path), join(staging, path), { recursive: true,
   filter: file => basename(file) !== 'native' });
 cpSync(resolve(nativeArg), join(staging, 'src/native'), { recursive: true });
-for (const file of ['manifest.json', 'process/manifest.json', 'signals/manifest.json', 'bun-stack/manifest.json', 'node_modules/koffi/LICENSE.txt'])
+for (const file of ['manifest.json', 'process/manifest.json', 'signals/manifest.json', 'node_modules/koffi/LICENSE.txt'])
   assert.ok(existsSync(join(staging, 'src/native', file)), `Missing runtime dependency: ${file}`);
 cpSync(runtime.directory, join(staging, 'targets', runtime.manifest.name), { recursive: true });
 mkdirSync(join(staging, 'scripts/full-lean'), { recursive: true });
 for (const name of ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs',
-  'function-table-index.mjs', 'table-growth.mjs', 'preserve-web-worker.mjs'])
+  'function-table-index.mjs', 'table-growth.mjs'])
   copyFileSync(join(root, 'scripts/full-lean', name), join(staging, 'scripts/full-lean', name));
 mkdirSync(join(staging, 'docs'));
 writeFileSync(join(staging, 'README.md'), candidateReadme(readFileSync(join(root, 'README.md'), 'utf8'), {
@@ -84,7 +84,7 @@ assert.equal(await hashFile(archive), sha256, 'Two independent npm pack calls mu
 const files = new Set(packed.files.map(file => file.path));
 for (const file of ['bin/lasm.mjs', 'src/application-support.mjs', 'src/application-build-client.mjs',
   'src/application-build-worker.mjs', 'src/build-progress.mjs', 'src/native/node_modules/koffi/index.cjs',
-  'src/native/process/manifest.json', 'src/native/signals/manifest.json', 'src/native/bun-stack/manifest.json',
+  'src/native/process/manifest.json', 'src/native/signals/manifest.json',
   'scripts/full-lean/host-library.js', 'application-support.json', 'provenance.json', 'THIRD_PARTY_NOTICES.txt',
   `targets/${runtime.manifest.name}/target.json`]) assert.ok(files.has(file), `npm pack omitted ${file}`);
 for (const [path, dependency] of Object.entries(installer.manifest.packages)) {

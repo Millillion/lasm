@@ -1,20 +1,20 @@
-export const cliUsage = `Usage: lasm <Main.lean> [--target node|deno|bun] [-- arguments…]
-       lasm build <Main.lean> [--target node|deno|bun] [--output dist]
+export const cliUsage = `Usage: lasm <Main.lean> [-- arguments…]
+       lasm build <Main.lean> [--output dist]
        lasm build <lasm.json> [output-directory]
        lasm cache repair
 
 Options: --rebuild, --verbose, --help
-Application arguments must follow --. The default target is node.`;
+Application arguments must follow --.`;
 
 /** Parse independently of provisioning: help/errors must never download tools. */
-export function parseLasmArguments(argv, { defaultTarget = 'node' } = {}) {
+export function parseLasmArguments(argv) {
   const tokens = [...argv];
   if (tokens[0] === 'cache') {
     if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
     if (tokens.length !== 2 || tokens[1] !== 'repair') throw new Error('Usage: lasm cache repair');
     return { command: 'cache-repair' };
   }
-  const result = { command: 'run', target: defaultTarget, rebuild: false, verbose: false, args: [] };
+  const result = { command: 'run', rebuild: false, verbose: false, args: [] };
   if (['build', 'run'].includes(tokens[0])) result.command = tokens.shift();
   const positional = [], supplied = new Set();
   for (let i = 0; i < tokens.length; i++) {
@@ -25,19 +25,17 @@ export function parseLasmArguments(argv, { defaultTarget = 'node' } = {}) {
     }
     if (token === '--help' || token === '-h') return { command: 'help' };
     if (token === '--rebuild' || token === '--verbose') { result[token.slice(2)] = true; continue; }
-    const match = /^(--target|--output)(?:=(.*))?$/.exec(token);
+    const match = /^--output(?:=(.*))?$/.exec(token);
     if (match) {
-      const name = match[1].slice(2);
-      if (supplied.has(name)) throw new Error(`Specify --${name} only once`);
-      supplied.add(name);
-      const value = match[2] ?? tokens[++i];
-      if (!value || value.startsWith('--')) throw new Error(`--${name} requires a value`);
-      result[name] = value; continue;
+      if (supplied.has('output')) throw new Error('Specify --output only once');
+      supplied.add('output');
+      const value = match[1] ?? tokens[++i];
+      if (!value || value.startsWith('--')) throw new Error('--output requires a value');
+      result.output = value; continue;
     }
     if (token.startsWith('-')) throw new Error(`Unknown Lasm option: ${token}. Application arguments must follow --.`);
     positional.push(token);
   }
-  if (!['node', 'deno', 'bun'].includes(result.target)) throw new Error('Use --target node, deno, or bun');
   if (!positional.length) throw new Error(cliUsage);
   result.input = positional.shift();
   if (result.command === 'build' && positional.length === 1 && result.output === undefined) result.output = positional.shift();

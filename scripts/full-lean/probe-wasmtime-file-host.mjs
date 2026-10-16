@@ -39,8 +39,8 @@ save();
 try {
   const path = Buffer.concat([Buffer.from(join(output, 'binary-')), Buffer.from([255, 128])]);
   const data = Buffer.from([0, 1, 255, 128, 10, 13, 66, 67]);
-  // Deno's node:fs path conversion decodes malformed UTF-8. Create the raw
-  // filename through the independent Node oracle, then test this host's FFI.
+  // Create the raw filename through the independent Node oracle, then test
+  // this host's FFI.
   oracle('import{writeFileSync}from"node:fs";writeFileSync(Buffer.from(process.argv[1],"base64"),Buffer.from(process.argv[2],"base64"));', path.toString('base64'), data.toString('base64'));
   let fd = await open(path);
   assert.deepEqual(Buffer.from((await success({ operation: 'read', fd, length: 3 })).bytes), data.subarray(0, 3));

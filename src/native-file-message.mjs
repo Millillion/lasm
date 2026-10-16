@@ -1,6 +1,4 @@
-// Deno's Node worker adapter recursively inspects message properties for
-// MessagePorts, including every index in a typed array. Send binary payloads as
-// ArrayBuffers instead. Tag all containers so user bytes/paths and record keys
+// Send binary payloads as ArrayBuffers. Tag all containers so user bytes/paths and record keys
 // cannot be mistaken for part of this private transport protocol.
 export function encodeFileMessage(value, { move = false } = {}) {
   const transfers = new Set();

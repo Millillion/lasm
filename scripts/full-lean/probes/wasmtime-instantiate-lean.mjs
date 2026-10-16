@@ -148,8 +148,8 @@ try {
   assert.match(message(), /UNIMPLEMENTED IMPORT env\.lasm_host_platform/);
   const control = message(); details(probe, observed); assert.equal(Number(observed[2]), 1);
   console.log(JSON.stringify({ scope: 'Real compiled Lean module instantiated; pure runtime exports with actual startup, clock and memory metadata, other function imports reject, no main/API acceptance',
-    engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
-    version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
+    engine: 'node',
+    version: process.versions.node,
     imports: 139, exports: 27181, accessibleMemoryBytes: Number(observed[3]), profile, largeAllocation,
     stack: { base: String(base), end: String(end), compiledBoundsCheckRetained: true,
       ffiStackBytes: ffi.config().sync_stack_size, wasmControlStackBudget: 12 * 1024 ** 2,

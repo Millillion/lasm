@@ -7,55 +7,38 @@ import { applicationPolicy, requireAotApplication, requireAotDeployment } from '
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 export const applicationHostFiles = [
-  'node-host.mjs', 'lean-io-errors.mjs', 'deno-stack.mjs', 'bun-stack.mjs', 'posix-arguments.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs',
+  'node-host.mjs', 'lean-io-errors.mjs', 'posix-arguments.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs',
   'node-process.mjs', 'native-process.mjs', 'process-launcher.mjs', 'process-exec.mjs', 'node-udp.mjs',
-  'node-system.mjs', 'linux-memory.mjs', 'node-signal.mjs', 'deno-signals.mjs', 'native-signals.mjs', 'application-signals.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-pthread-factory-deno.mjs', 'native-files.mjs',
-  'native-clock.mjs', 'native-windows-timezone.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-file-message.mjs',
+  'node-system.mjs', 'linux-memory.mjs', 'node-signal.mjs', 'native-signals.mjs', 'application-signals.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-files.mjs',
+  'native-clock.mjs', 'native-windows-timezone.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-message.mjs',
   'native-worker-cwd.cjs', 'worker-stdio.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native-abort.cjs',
 ];
 
 /** Application output carries its host support, including native FFI and helpers. */
-export function copyApplicationHost(output, { target, platform = process.platform, arch = process.arch,
+export function copyApplicationHost(output, { platform = process.platform, arch = process.arch,
   glibc = process.report?.getReport().header.glibcVersionRuntime, sourceRoot = root } = {}) {
   const directory = join(resolve(output), 'host');
   mkdirSync(directory, { recursive: true });
   for (const name of applicationHostFiles) copyFileSync(join(sourceRoot, 'src', name), join(directory, name));
-  if (target === 'node' && (['darwin', 'win32'].includes(platform) || platform === 'linux' && glibc) && ['x64', 'arm64'].includes(arch))
+  if ((['darwin', 'win32'].includes(platform) || platform === 'linux' && glibc) && ['x64', 'arm64'].includes(arch))
     copyApplicationNativeBundle(sourceRoot, directory, { platform, arch });
   else copyNativeBundle(sourceRoot, directory);
 }
 
-export function applicationEntrypoint(target, { platform = process.platform, arch = process.arch, node, minimumGlibc } = {}) {
-  if (!['node', 'deno', 'bun'].includes(target)) throw new Error('Invalid application deployment target');
-  const shebang = target === 'deno' ? '/usr/bin/env -S deno run -A' : '/usr/bin/env ' + target;
-  return `#!${shebang}
+export function applicationEntrypoint({ platform = process.platform, arch = process.arch, node, minimumGlibc } = {}) {
+  return `#!/usr/bin/env node
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-// A self-launch may temporarily disable Deno's automatic PATH shim. Restore
-// the caller's exact visible values before the program or its workers start.
-if (process.versions.deno && process.env.LASM_DENO_CHILD_ENV !== undefined) {
-  const saved = JSON.parse(process.env.LASM_DENO_CHILD_ENV);
-  if (!Array.isArray(saved) || saved.length !== 2 || saved.some(value => value !== null && typeof value !== 'string'))
-    throw new Error('Invalid private child environment transport');
-  for (const [index, key] of ['DENO_DISABLE_NODE_SHIM', 'LASM_DENO_CHILD_ENV'].entries()) {
-    if (saved[index] === null) delete process.env[key]; else process.env[key] = saved[index];
-  }
-}
-const expected = ${JSON.stringify(target)};
-const actual = process.versions.deno ? 'deno' : process.versions.bun ? 'bun' : 'node';
 const expectedHost = ${JSON.stringify(`${platform}-${arch}`)};
 const actualHost = process.platform + '-' + process.arch;
 const expectedNode = ${JSON.stringify(node ?? null)};
 const minimumGlibc = ${JSON.stringify(minimumGlibc ?? null)};
 const glibcAtLeast = ${glibcAtLeast.toString()};
-if (actual !== expected) {
-  console.error('This application was built for ' + expected + '; it is running in ' + actual + '. Rebuild with --target ' + actual + '.');
-  process.exitCode = 1;
-} else if (actualHost !== expectedHost) {
+if (actualHost !== expectedHost) {
   console.error('This application was built on ' + expectedHost + '; it is running on ' + actualHost + '. Rebuild the Lean source with Lasm on this platform.');
   process.exitCode = 1;
-} else if (actual === 'node' && expectedNode && process.versions.node !== expectedNode) {
+} else if (expectedNode && process.versions.node !== expectedNode) {
   console.error('This application requires Node ' + expectedNode + '; you are running Node ' + process.versions.node + '. Install the supported Node release.');
   process.exitCode = 1;
 } else if (process.platform === 'linux' && minimumGlibc && !glibcAtLeast(process.report?.getReport().header.glibcVersionRuntime, minimumGlibc)) {
@@ -66,8 +49,6 @@ if (actual !== expected) {
   const requireAotApplication = ${requireAotApplication.toString()};
   const requireAotDeployment = ${requireAotDeployment.toString()};
   requireAotDeployment(JSON.parse(readFileSync(new URL('./build-info.json', import.meta.url), 'utf8')));
-  if (actual === 'deno') (await import('./host/deno-stack.mjs')).prepareDenoStack(import.meta.url);
-  if (actual === 'bun') (await import('./host/bun-stack.mjs')).prepareBunStack(import.meta.url);
   (await import('./host/application-signals.mjs')).prepareApplicationSignals();
   process.env.LASM_FULL_HOST_MODULE = new URL('./host/node-host.mjs', import.meta.url).href;
   process.env.LASM_FULL_APP_PATH = fileURLToPath(import.meta.url);
@@ -76,8 +57,8 @@ if (actual !== expected) {
 `;
 }
 
-export function writeApplicationEntrypoint(output, target, support) {
+export function writeApplicationEntrypoint(output, support) {
   mkdirSync(output, { recursive: true });
-  writeFileSync(join(output, 'main.mjs'), applicationEntrypoint(target, support), { mode: 0o755 });
+  writeFileSync(join(output, 'main.mjs'), applicationEntrypoint(support), { mode: 0o755 });
   writeFileSync(join(output, 'package.json'), JSON.stringify({ private: true, type: 'module' }) + '\n');
 }

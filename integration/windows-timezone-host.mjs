@@ -12,8 +12,8 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
 assert.equal(process.platform, 'win32');
-const [outputArg, node, deno, bun, version = '4.34.0', ...extra] = process.argv.slice(2);
-assert.ok(outputArg && node && deno && bun && !extra.length);
+const [outputArg, node, version = '4.34.0', ...extra] = process.argv.slice(2);
+assert.ok(outputArg && node && !extra.length, 'Supply NEW_OUTPUT NODE [LEAN_VERSION]');
 assert.match(version, /^\d+\.\d+\.\d+$/);
 const output = resolve(outputArg), root = fileURLToPath(new URL('..', import.meta.url));
 assert.ok(!existsSync(output)); mkdirSync(output, { recursive: true });
@@ -48,10 +48,9 @@ try {
   run('generate native fixture', lean.lean, ['-j1', '-Dlinter.all=false', '-Dcompiler.postponeCompile=false', '-c', main + '.c', main]);
   run('compile native fixture', join(lean.prefix, 'bin/leanc.exe'), ['-O2', '-DNDEBUG', '-o', native, main + '.c']);
   report.nativeSha256 = await hashFile(native);
-  const engines = [['node', node, []], ['deno', deno, ['run', '-A']], ['bun', bun, []]];
+  const engines = [['node', node, []]];
   report.engines = engines.map(([name, program]) => ({ name, program, version: run(name + ' version', program, ['--version']).stdout.trim() }));
   assert.equal(report.engines[0].version, 'v26.10.0');
-  assert.match(report.engines[1].version, /^deno 2\.9\.7 /); assert.equal(report.engines[2].version, '1.4.2');
   const selections = [];
   for (const name of ['UTC', 'America/New_York', 'Europe/Berlin', 'Australia/Lord_Howe', 'Lasm/No_such_zone', 'a'.repeat(300)]) {
     selections.push(['transition', name, '-2147483648', 'true']);

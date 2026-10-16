@@ -22,7 +22,7 @@ const { registered, remaining, selected } = selectNativeTests(inventory, sources
 const escape = name => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const filter = '^(?:' + selected.map(test => escape(test.name)).join('|') + ')$';
 if (!checkOnly) execFileSync(process.execPath, ['scripts/application-tests/prepare.mjs', output,
-  'native-build-time', 'node', process.execPath, process.cwd(), filter, 'upstream', version], { stdio: 'inherit', timeout: 900_000 });
+  'native-build-time', process.execPath, process.cwd(), filter, 'upstream', version], { stdio: 'inherit', timeout: 900_000 });
 const manifest = JSON.parse(readFileSync(join(output, 'manifest.json'), 'utf8'));
 campaignSourceEvidence(manifest);
 if (manifest.lean !== version) throw new Error('Prepared shard uses a different Lean release');

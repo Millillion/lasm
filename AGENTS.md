@@ -21,7 +21,8 @@
   macOS and Windows, each on x86-64 and ARM64, with ahead-of-time restrictions.
   Exact accepted OS/tool versions and artifact identities are in
   `docs/NODE_ACCEPTANCE.md`.
-  Broader API parity, other engines and experimental helper integration remain
+  Lasm targets Node only (user decision, 2026-10-16; see `docs/PLAN.md`); do not
+  add other JavaScript engines. Broader API parity and experimental helper integration remain
   deferred. Preserve their source, tests, artifacts and failures. Recheck
   official Node/Lean releases before a new acceptance campaign and pin exact
   versions within it. Keep Lean selectable through `lean-toolchain`.

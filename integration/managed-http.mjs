@@ -15,10 +15,11 @@ import { reclaimBuildMetadata } from '../scripts/application-tests/reclaim-metad
 await ensureResourceGuard();
 
 const root = resolve(fileURLToPath(new URL('../', import.meta.url)));
-const [outputArg, target, engineArg, compilerArg = root, version = '4.34.0', ...extra] = process.argv.slice(2);
-if (!outputArg || !['node', 'deno', 'bun'].includes(target) || !engineArg ||
+const [outputArg, engineArg, compilerArg = root, version = '4.34.0', ...extra] = process.argv.slice(2);
+const target = 'node';
+if (!outputArg || !engineArg ||
     !/^\d+\.\d+\.\d+$/.test(version) || extra.length)
-  throw new Error('Supply NEW_OUTPUT TARGET STOCK_ENGINE [INSTALLED_COMPILER [LEAN_VERSION]]');
+  throw new Error('Supply NEW_OUTPUT STOCK_ENGINE [INSTALLED_COMPILER [LEAN_VERSION]]');
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg);
 if (existsSync(output)) throw new Error('Use a new output directory');
 const project = join(output, 'ordinary Lake project'), dist = join(output, 'deployed');
@@ -38,7 +39,7 @@ const env = { ...process.env, PATH: dirname(process.execPath) };
 for (const name of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(name)) delete env[name];
 if (compiler !== root) delete env.LASM_APPLICATION_RUNTIME;
 execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', join(project, 'Main.lean'),
-  '--target', target, '--output', dist, '--verbose'], { cwd: project, env, stdio: 'inherit', timeout: 1800_000 });
+  '--output', dist, '--verbose'], { cwd: project, env, stdio: 'inherit', timeout: 1800_000 });
 const info = JSON.parse(readFileSync(join(dist, 'build-info.json')));
 assert.equal(info.lean, version); assert.equal(info.target, target);
 let metadataReclamation;

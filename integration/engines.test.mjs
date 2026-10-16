@@ -8,15 +8,8 @@ import { join } from 'node:path';
 import { buildMain } from '../src/main.mjs';
 import { root } from '../src/toolchain.mjs';
 
-const cached = (name, path) => process.env[`LASM_${name.toUpperCase()}`]
-  ?? (existsSync(join(root, path)) ? join(root, path) : name);
-const engines = {
-  node: { executable: process.execPath, prefix: [] },
-  deno: { executable: cached('deno', '.cache/js-runtimes/deno-2.9.7/deno'), prefix: ['run', '--allow-all'] },
-  bun: { executable: cached('bun', '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), prefix: [] },
-};
-const selected = (process.env.LASM_TEST_ENGINES ?? 'node,deno,bun').split(',');
-for (const name of selected) assert.ok(engines[name], `Unknown engine: ${name}`);
+const engines = { node: { executable: process.execPath, prefix: [] } };
+const selected = Object.keys(engines);
 
 function execute(engine, args, options = {}) {
   return new Promise((resolve, reject) => {

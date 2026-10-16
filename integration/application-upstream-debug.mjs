@@ -11,10 +11,11 @@ import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg, referenceArg, variant, ...extra] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg
+const [outputArg, engineArg, compilerArg, referenceArg, variant, ...extra] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg
   && referenceArg && ['release', 'debug'].includes(variant) && !extra.length,
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE release|debug');
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE release|debug');
 assert.equal(process.platform, 'linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
@@ -124,25 +125,25 @@ try {
   report.nativeSourceAfter = await verify(native, originals);
   const dist = join(output, 'dist');
   run('installed application build', process.execPath,
-    [join(compiler, 'bin/lasm.mjs'), 'build', join(project, variant + '.lean'), '--target', target, '--output', dist], project, env);
+    [join(compiler, 'bin/lasm.mjs'), 'build', join(project, variant + '.lean'), '--output', dist], project, env);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   report.applicationAfter = await verify(project, buildSources);
   report.originalApplicationAfter = await verify(original, originals);
   const deployment = join(output, 'relocated deployment'); renameSync(dist, deployment);
   for (const directory of [native, original, project]) renameSync(directory, directory + '.hidden');
   const runtimeEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
+  Object.assign(runtimeEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
   report.deployment = { directory: deployment, sourceHidden: true, buildEnvironmentRemoved: true, path: '',
     wasmSha256: await hashFile(join(deployment, 'program.wasm')) };
   report.actual = run('selected relocated executable', engine,
-    [...(target === 'deno' ? ['run', '-A'] : []), join(deployment, 'main.mjs')], deployment, runtimeEnv, false);
+    [join(deployment, 'main.mjs')], deployment, runtimeEnv, false);
   report.originalOutcomeMatches = (report.actual.code === 0 && report.actual.signal === null) === (variant === 'release');
   report.referenceAfter = await verify(reference, sources);
   report.diagnosticComparison = compare(report.actual, report.native, variant === 'debug');
   assert.ok(report.originalOutcomeMatches);
   for (const control of report.environmentControls) {
     control.actual = run('deployed ' + control.name, engine,
-      [...(target === 'deno' ? ['run', '-A'] : []), join(deployment, 'main.mjs')], deployment,
+      [join(deployment, 'main.mjs')], deployment,
       { ...runtimeEnv, ...control.env }, false);
     control.comparison = compare(control.actual, control.native, control.trace); save();
   }

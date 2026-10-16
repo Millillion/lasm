@@ -54,10 +54,7 @@ for (const memory of [1, 2]) {
   writeFileSync(executable, connectLeanSymbolLoader(original, true));
   for (const [engine, path, flags] of [
     ['node', process.execPath, []],
-    ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-    ['bun', join(root, '.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun'), []],
-  ]) run('execute', `${engine}/memory${memory}`, [path, ...flags, executable, library],
-    engine === 'bun' && memory === 1 ? { BUN_JSC_useWasmMemory64: 'true' } : {});
+  ]) run('execute', `${engine}/memory${memory}`, [path, ...flags, executable, library], {});
 }
 for (const [path, digest] of Object.entries(inputs))
   assert.equal(hash(path.startsWith('file:') ? new URL(path) : path), digest);

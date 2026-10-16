@@ -1,5 +1,5 @@
 // Independent oracle: execute the unmodified native Lean library's C error
-// decoders, then compare the private host envelope in each stock engine.
+// decoders, then compare the private host envelope in Node.
 import assert from 'node:assert/strict';
 import { mkdirSync, existsSync, copyFileSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
@@ -14,9 +14,9 @@ import { nativeFiles } from '../src/native-files.mjs';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
-const [outputArg, nodeArg, denoArg, bunArg, hostArg] = process.argv.slice(2);
-const engineArgs = denoArg || bunArg ? [nodeArg, denoArg, bunArg] : [nodeArg ?? process.execPath];
-assert.ok(outputArg && engineArgs.every(Boolean), 'Supply NEW_OUTPUT [NODE [DENO BUN [HOST_MODULE]]]');
+const [outputArg, nodeArg, hostArg, ...extra] = process.argv.slice(2);
+const engineArgs = [nodeArg ?? process.execPath];
+assert.ok(outputArg && !extra.length, 'Supply NEW_OUTPUT [NODE [HOST_MODULE]]');
 const hostModule = resolve(hostArg ?? 'src/node-host.mjs');
 const output = resolve(outputArg);
 assert.ok(!existsSync(output), 'Preserve previous decoder evidence');
@@ -85,13 +85,13 @@ for (const row of oracle.rows) {
   try { assert.deepEqual(actual, expected); }
   catch { failures.push({ key: row.key, expected, actual }); }
 }
-console.log(JSON.stringify({ engine: process.versions.deno ? 'deno' : process.versions.bun ? 'bun' : 'node',
+console.log(JSON.stringify({ engine: 'node',
   checked: oracle.rows.length, failures }));
 `);
 const comparisons = [];
-for (const [index, engineArg] of engineArgs.entries()) {
+for (const engineArg of engineArgs) {
   const engine = resolve(engineArg);
-  const args = [...(index === 1 ? ['run', '-A'] : []), harness];
+  const args = [harness];
   comparisons.push(JSON.parse(execFileSync(engine, args, { env, encoding: 'utf8', timeout: 30_000 })));
 }
 const result = { ...oracle, comparisons, recordedAt: new Date().toISOString(), resourceReport: process.env.LASM_RESOURCE_REPORT };

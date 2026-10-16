@@ -6,8 +6,6 @@ import { resolve } from 'node:path';
 
 const engines = [
   ['node', process.execPath, []],
-  ['deno', resolve(process.env.LASM_TEST_DENO ?? '.cache/js-runtimes/deno-2.9.7/deno'), ['run','-A']],
-  ['bun', resolve(process.env.LASM_TEST_BUN ?? '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
 ];
 function processState(pid) {
   if (process.platform !== 'linux') return {};
@@ -27,7 +25,7 @@ for (const [name, engine, flags] of engines) {
   for (const signal of ['SIGUSR1','SIGABRT']) for (const mode of ['default', 'stopped', 'watch', 'ignored', 'native', 'javascript']) {
     test(`${name} application ${signal} policy preserves ${mode} behavior`, { skip: !available, timeout: 15_000 }, async t => {
       const child = spawn(engine, [...flags, resolve('test/fixtures/application-signals.mjs'), mode, signal],
-        { stdio: ['ignore','pipe','pipe'], env: { ...process.env, PATH: '', DENO_DISABLE_NODE_SHIM: '1' } });
+        { stdio: ['ignore','pipe','pipe'], env: { ...process.env, PATH: '' } });
       let stdout = '', stderr = '', sent = false, readyState;
       const timer = setTimeout(() => {
         t.diagnostic(JSON.stringify({ readyState, deadlineState: processState(child.pid) }));
@@ -54,9 +52,7 @@ for (const [name, engine, flags] of engines) {
           const message = { watch: 'lean received', ignored: 'ignored', native: 'native received', javascript: 'javascript received' }[mode];
           assert.equal(stdout, 'ready\n' + message + '\n');
         }
-        // Explicit preexisting JS subscriptions keep their caller's engine
-        // policy, including Deno's independently subscribed inspector.
-        if (mode !== 'javascript' || name !== 'deno' || signal !== 'SIGUSR1') assert.equal(stderr, '');
+        assert.equal(stderr, '');
       } finally { clearTimeout(timer); if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL'); }
     });
   }

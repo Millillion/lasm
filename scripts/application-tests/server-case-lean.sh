@@ -2,9 +2,7 @@
 # Map only commands present in these four unchanged upstream clients.
 set -eo pipefail
 if [[ $# == 3 && $1 == -Dlinter.all=false && $2 == --run && $3 == "$LASM_TEST_INPUT" ]]; then
-  prefix=()
-  if [[ $LASM_APPLICATION_TARGET == deno ]]; then prefix=(run -A); fi
-  exec "$LASM_APPLICATION_ENGINE" "${prefix[@]}" "$LASM_TEST_DRIVER_DIST/main.mjs"
+  exec "$LASM_APPLICATION_ENGINE" "$LASM_TEST_DRIVER_DIST/main.mjs"
 fi
 native=false
 case "$LASM_TEST_INPUT" in

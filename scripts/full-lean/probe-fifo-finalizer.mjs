@@ -71,7 +71,7 @@ for (const facade of facades) {
     // Packaged applications must run with the ordinary engine flags. The
     // full compiler's Linux stack adjustments are not portable launcher defaults.
     if (application) run(config.engine + '-application', config.executable,
-      [...(config.engine === 'deno' ? ['run', '-A'] : []), application]);
+      [application]);
     else run(config.engine + '-lean', join(facade, 'bin/lean'), ['--run', source]);
   }
 }

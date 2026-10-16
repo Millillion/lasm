@@ -8,9 +8,10 @@ import { provisionLean } from '../src/managed-lean.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const [outputArg, target = 'node', engineArg = process.execPath, version = '4.34.0', compilerArg = root, ...extra] = process.argv.slice(2);
-if (!outputArg || !['node', 'deno', 'bun'].includes(target) || !/^\d+\.\d+\.\d+$/.test(version) || extra.length)
-  throw new Error('Usage: managed-application.mjs NEW_OUTPUT [TARGET ENGINE LEAN_VERSION INSTALLED_COMPILER]');
+const [outputArg, engineArg = process.execPath, version = '4.34.0', compilerArg = root, ...extra] = process.argv.slice(2);
+const target = 'node';
+if (!outputArg || !/^\d+\.\d+\.\d+$/.test(version) || extra.length)
+  throw new Error('Usage: managed-application.mjs NEW_OUTPUT [NODE LEAN_VERSION INSTALLED_COMPILER]');
 const base = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg);
 if (existsSync(base)) throw new Error('Choose a new output directory');
 const project = join(base, 'source project'), dist = join(base, 'deployment'), source = join(project, 'Main.lean');
@@ -22,12 +23,12 @@ for (const name of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(name)) de
 const cli = args => execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), ...args],
   { cwd: project, env, encoding: 'utf8', timeout: 1800_000, stdio: ['ignore', 'pipe', 'inherit'] });
 const started = performance.now();
-cli(['build', source, '--target', target, '--output', dist]);
+cli(['build', source, '--output', dist]);
 const buildSeconds = (performance.now() - started) / 1000;
 const first = JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8'));
 const wasmHash = await hashFile(join(dist, 'program.wasm')), wasmMtime = statSync(join(dist, 'program.wasm')).mtimeMs;
 const cacheStarted = performance.now();
-cli(['build', source, '--target', target, '--output', dist]);
+cli(['build', source, '--output', dist]);
 const cachedBuildSeconds = (performance.now() - cacheStarted) / 1000;
 assert.equal(statSync(join(dist, 'program.wasm')).mtimeMs, wasmMtime, 'cache reuse must not replace output');
 assert.equal(await hashFile(join(dist, 'program.wasm')), wasmHash);
@@ -47,15 +48,15 @@ for (const args of [['hello λ', '', 'space argument'], ['fail']]) {
     return { code: result.status, stdout: result.stdout, stderr: result.stderr };
   };
   const expected = run(native, args, nativeCwd);
-  const actual = run(engine, [...(target === 'deno' ? ['run', '-A'] : []), join(dist, 'main.mjs'), ...args], targetCwd);
+  const actual = run(engine, [join(dist, 'main.mjs'), ...args], targetCwd);
   controls.push({ args, native: expected, target: actual });
   writeFileSync(join(base, 'controls.json'), JSON.stringify(controls, null, 2) + '\n');
   assert.deepEqual(actual, expected);
 }
 // Exercise the actual direct-file command and its argument separator too. The
-// build above deliberately had only Node on PATH; running selects the installed
-// target engine, so add only that engine's directory for this control.
-const cliRun = spawnSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), source, '--target', target,
+// build above deliberately had only Node on PATH; add only the Node directory
+// and the selected engine's directory for this control.
+const cliRun = spawnSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), source,
   '--', ...controls[0].args], { cwd: project, encoding: 'utf8', timeout: 180_000,
   env: { ...env, LEAN_NUM_THREADS: '2', PATH: [dirname(process.execPath), dirname(engine)].join(delimiter) } });
 assert.ifError(cliRun.error);

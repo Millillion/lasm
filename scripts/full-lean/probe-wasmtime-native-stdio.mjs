@@ -14,15 +14,15 @@ assert.ok(!existsSync(output)); mkdirSync(output, { recursive: true });
 const inputs = ['scripts/full-lean/probe-wasmtime-native-stdio.mjs', 'scripts/full-lean/probes/native-stdio-control.c',
   'test/fixtures/wasmtime-native-stdio.mjs', 'src/wasmtime-native-stdio.mjs', 'src/wasmtime-artifact.mjs',
   'src/native-files.mjs', 'src/native-file-worker.mjs', 'src/native-file-worker-pool.mjs',
-  'src/native-file-message.mjs', 'src/native-file-worker-deno.mjs'];
+  'src/native-file-message.mjs'];
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async name => [name, await hashFile(join(root, name))])));
-const report = { scope: 'Native raw standard-descriptor writes compared with leased host workers in all three engines; not complete WASI descriptor support',
+const report = { scope: 'Native raw standard-descriptor writes compared with leased host workers in Node; not complete WASI descriptor support',
   inputs: hashes, resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], comparisons: [], passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 const run = (binary, args) => {
   const cwd = join(output, 'case-' + report.commands.length); mkdirSync(cwd);
   const result = spawnSync(binary, args, { cwd, timeout: 15_000, killSignal: 'SIGKILL', maxBuffer: 128 * 1024,
-    env: { ...process.env, PATH: '', DENO_DISABLE_NODE_SHIM: '1' } });
+    env: { ...process.env, PATH: '' } });
   const actual = { stdout: result.stdout?.toString('base64'), stderr: result.stderr?.toString(), code: result.status, signal: result.signal };
   if (existsSync(join(cwd, 'buffered.bin'))) actual.bufferedFile = readFileSync(join(cwd, 'buffered.bin')).toString('base64');
   report.commands.push({ binary, args, cwd, ...actual, error: result.error?.message }); save();
@@ -39,8 +39,6 @@ try {
   const oracles = Object.fromEntries(modes.map(mode => [mode, run(native, [mode])]));
   for (const [engine, binary, flags] of [
     ['node', '.cache/js-runtimes/node-26.10.0/bin/node', ['--max-old-space-size=128']],
-    ['deno', '.cache/js-runtimes/deno-2.9.7/deno', ['run', '--no-config', '-A', '--v8-flags=--max-old-space-size=128']],
-    ['bun', '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun', []],
   ]) for (const mode of modes) {
     const actual = run(join(root, binary), [...flags, join(root, inputs[2]), mode]);
     assert.deepEqual(actual, oracles[mode]); report.comparisons.push({ engine, mode, result: JSON.parse(actual.stderr) }); save();

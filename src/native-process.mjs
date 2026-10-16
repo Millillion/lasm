@@ -7,8 +7,8 @@ import { encodeProcessConfiguration, nativeProcessLauncher } from './process-lau
 const require = createRequire(import.meta.url);
 let implementation;
 
-// Deno currently resolves and re-enters even an omitted, still-named cwd.
-// Linux posix_spawn can inherit it without a new search-permission check.
+// Linux posix_spawn can inherit an omitted, still-named cwd without a new
+// search-permission check.
 // Only libc executes between its internal fork/vfork and exec: no JavaScript
 // or FFI callback runs in the child of a multithreaded engine.
 export function spawnInheritedProcess(command, args, descriptors, configuration, nativeLauncher = false) {

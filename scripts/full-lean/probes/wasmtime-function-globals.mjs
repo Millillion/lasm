@@ -104,8 +104,8 @@ try {
   assert.equal(callbacks, cases.length * 6);
   assert.equal(await hashFile(cache), cacheSha256); assert.equal(await hashFile(gluePath), glueSha256);
   console.log(JSON.stringify({ passed: true, scope: 'Private helper indirect console functions with unchanged SDK decoder/sink oracle',
-    engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
-    version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
+    engine: 'node',
+    version: process.versions.node,
     cases: cases.length, callbacks, pointers, resultSha256: digest.digest('hex'),
     oracle: { path: gluePath, sha256: glueSha256, extractedFunctionSha256: createHash('sha256').update(originalFunctions).digest('hex') },
     capturedMethods: ['log', 'error', 'warn', 'trace', 'out', 'err'],

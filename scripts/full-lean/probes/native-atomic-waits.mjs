@@ -183,8 +183,8 @@ if (!isMainThread) {
     }
     assert.throws(() => bridge.atomics.waitAsync(span, 0, 0, 0), /not implemented/); rejectionControls++;
     console.log(JSON.stringify({ scope: 'Blocking native-span wait/notify semantics and Wasm queue interoperability; async waits and full runtime integration remain open',
-      engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
-      version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
+      engine: 'node',
+      version: process.versions.node,
       accessibleGuestBytes: byteLength, checks, comparisons, rejectionControls,
       limitation: 'Prototype signed-nanosecond transport rejects finite timeouts above its range; no full JS Atomics compatibility claim' }));
   } finally {

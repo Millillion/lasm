@@ -23,7 +23,7 @@ for (const [name, expected] of Object.entries(metadata.files))
 const runtimeArchives = {};
 for (const name of ['lib/lean/libgmp.a', 'libuv/src/libuv/libuv.a'])
   if (existsSync(join(source, name))) runtimeArchives[name] = await hash(join(source, name));
-for (const name of ['response-args.mjs', 'preserve-web-worker.mjs'])
+for (const name of ['response-args.mjs'])
   if (await hash(join(source, 'runtime-support', name)) !== await hash(join(root, 'scripts/full-lean', name)))
     throw new Error(`Adapter dependency changed: ${name}; derive that change explicitly`);
 const driver = 'runtime-support/cc-driver.mjs';

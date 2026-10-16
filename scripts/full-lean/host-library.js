@@ -13,8 +13,8 @@ addToLibrary({
   lasm_host_platform: function () {
     return process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0;
   },
-  // Capture on the calling Lean pthread, before returning through Wasm. V8 and
-  // JavaScriptCore expose actual Wasm frames here. Keep the engine's property
+  // Capture on the calling Lean pthread, before returning through Wasm. V8
+  // exposes actual Wasm frames here. Keep the engine's property
   // descriptor intact after allowing the same 100-frame budget as native Lean.
   lasm_host_backtrace__deps: ['$stringToNewUTF8'],
   lasm_host_backtrace__sig: 'p',
@@ -22,10 +22,7 @@ addToLibrary({
     var descriptor = Object.getOwnPropertyDescriptor(Error, 'stackTraceLimit');
     var changed = !descriptor || descriptor.configurable;
     var assignLimit = !descriptor || descriptor.writable || descriptor.set;
-    var formatter = Object.getOwnPropertyDescriptor(Error, 'prepareStackTrace');
-    var formatFrames = process.versions.bun && (!formatter || formatter.configurable);
-    var assignFormatter = !formatter || formatter.writable || formatter.set;
-    var oldLimit = Error.stackTraceLimit, oldFormatter = Error.prepareStackTrace;
+    var oldLimit = Error.stackTraceLimit;
     try {
       if (changed) {
         if (assignLimit) Error.stackTraceLimit = 100;
@@ -33,30 +30,10 @@ addToLibrary({
           value: 100, configurable: true, writable: true,
         });
       }
-      // Bun's default stack string hides Wasm frames as "unknown", whereas
-      // CallSite.toString exposes their actual function indices/names. Avoid
-      // getFunction: reading a Wasm callee as a JS function can crash Bun.
-      if (formatFrames) {
-        var capture = function (_, frames) {
-          return frames.map(function (frame) { return '    at ' + frame.toString(); }).join('\n');
-        };
-        // Bun's writable data properties also control internal stack hooks.
-        // Replacing their descriptors disconnects those hooks; use ordinary
-        // assignment and restore through the same path whenever permitted.
-        if (assignFormatter) Error.prepareStackTrace = capture;
-        else Object.defineProperty(Error, 'prepareStackTrace', {
-          value: capture, configurable: true, writable: true,
-        });
-      }
       var stack = new Error().stack;
       return stringToNewUTF8(typeof stack === 'string'
         ? stack.replace(/^Error\n/, '').trimEnd() : '(stack trace unavailable)');
     } finally {
-      if (formatFrames) {
-        if (assignFormatter) Error.prepareStackTrace = oldFormatter;
-        else Object.defineProperty(Error, 'prepareStackTrace', formatter);
-        if (!formatter) delete Error.prepareStackTrace;
-      }
       if (changed) {
         if (assignLimit) Error.stackTraceLimit = oldLimit;
         else Object.defineProperty(Error, 'stackTraceLimit', descriptor);
@@ -111,8 +88,7 @@ addToLibrary({
         // Send the numeric offset, not the typed view. Some engine structured
         // cloners truncate a typed array's byteOffset above 4 GiB. The parent
         // already owns this shared Wasm memory and can construct its own view.
-        // Deno's synchronous port receiver recursively enumerates typed-array
-        // indices. Send the backing store and numeric view bounds instead.
+        // Send the backing store and numeric view bounds instead.
         kind, operation, handle, argument, byteBuffer: bytes.buffer,
         byteOffset: bytes.byteOffset, byteLength: bytes.byteLength,
         signalPointer: Number(signalPointer), port: channel.port2,

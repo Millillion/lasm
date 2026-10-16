@@ -196,8 +196,6 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
       try {
         if (process.platform !== 'win32')
           return Buffer.concat((await nativeFiles().readDirectory(path(bytes))).flatMap(name => [name, Buffer.from([0])]));
-        // Node defaults to 32 entries; Deno's Node-compatible API currently
-        // requires that default explicitly when an options object is supplied.
         const dir = await fsp.opendir(path(bytes), { encoding: 'buffer', bufferSize: 32 });
         const names = [];
         for await (const entry of dir) names.push(Buffer.from(entry.name), Buffer.from([0]));

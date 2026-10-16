@@ -13,9 +13,10 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../', import.meta.url));
-const [outputArg, target = 'node', engineArg = process.execPath, compilerArg = root, entryKind = 'configured'] = process.argv.slice(2);
-if (!outputArg || !['node', 'deno', 'bun'].includes(target) || !['configured', 'script'].includes(entryKind))
-  throw new Error('Supply NEW_OUTPUT [TARGET ENGINE INSTALLED_COMPILER configured|script]');
+const [outputArg, engineArg = process.execPath, compilerArg = root, entryKind = 'configured'] = process.argv.slice(2);
+const target = 'node';
+if (!outputArg || !['configured', 'script'].includes(entryKind))
+  throw new Error('Supply NEW_OUTPUT [ENGINE INSTALLED_COMPILER configured|script]');
 const base = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg);
 if (existsSync(base)) throw new Error('Use a fresh Lake acceptance directory');
 const project = join(base, 'consumer λ'), dependency = join(base, 'dependency origin'), dist = join(base, 'dist');
@@ -51,19 +52,19 @@ else {
 }
 const cli = args => execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), ...args],
   { cwd: project, env, encoding: 'utf8', timeout: 1800_000, stdio: ['ignore', 'pipe', 'inherit'] });
-cli(['build', source, '--target', target, '--output', dist]);
+cli(['build', source, '--output', dist]);
 const receipt = JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8'));
 assert.equal(receipt.gitIdentity, git.identity);
 assert.equal(receipt.modules.length, 3, 'Dependency, Local and Main must all be compiled');
 const manifest = JSON.parse(readFileSync(join(project, 'lake-manifest.json'), 'utf8'));
 assert.equal(manifest.packages.find(p => p.name === 'dependency').rev, revision);
 const firstHash = await hashFile(join(dist, 'program.wasm')), firstMtime = statSync(join(dist, 'program.wasm')).mtimeMs;
-cli(['build', source, '--target', target, '--output', dist]);
+cli(['build', source, '--output', dist]);
 assert.equal(statSync(join(dist, 'program.wasm')).mtimeMs, firstMtime);
 assert.equal(await hashFile(join(dist, 'program.wasm')), firstHash);
 mkdirSync(join(dist, 'assets/empty'), { recursive: true }); writeFileSync(join(dist, 'assets/data.txt'), 'kept');
 writeFileSync(join(project, 'app/Local.lean'), 'import Dependency\ndef localValue : Nat := dependencyValue + 6\n');
-cli(['build', source, '--target', target, '--output', dist]);
+cli(['build', source, '--output', dist]);
 assert.notEqual(await hashFile(join(dist, 'program.wasm')), firstHash);
 assert.equal(readFileSync(join(dist, 'assets/data.txt'), 'utf8'), 'kept');
 assert.ok(statSync(join(dist, 'assets/empty')).isDirectory());
@@ -74,8 +75,8 @@ const nativeEnv = managedGitEnvironment(git, { ...nativeLeanEnvironment(lean), .
 execFileSync(lean.lake, ['--no-cache', '--keep-toolchain', 'build', 'consumer'],
   { cwd: project, env: nativeEnv, stdio: 'inherit', timeout: 900_000 });
 const native = join(project, '.lake/build/bin', process.platform === 'win32' ? 'consumer.exe' : 'consumer');
-// A literal Deno executable path must not cause its child-process compatibility
-// layer to reinterpret the following application data as engine arguments.
+// A literal engine path must not be reinterpreted as engine arguments when it
+// appears among the application data.
 const args = ['λ 日本語', '', 'two words', engine, '--target', 'literal'];
 const compare = (file, argv) => {
   const result = spawnSync(file, argv, { cwd: base, env: { ...env, PATH: '', LEAN_NUM_THREADS: '2' },
@@ -84,10 +85,8 @@ const compare = (file, argv) => {
 };
 const expected = compare(native, args);
 assert.equal(expected.code, 0); assert.equal(expected.stdout, 'dependency=43; args=' + args.join('|') + '\n');
-// The filename alias uses the same managed application pipeline. Deno/Bun
-// invoke Node for compilation and return to this exact engine to run output.
-const launcher = spawnSync(engine, [...(target === 'deno' ? ['run', '-A'] : []),
-  join(compiler, `lasm-${target}.js`), source, ...args],
+// The filename alias uses the same managed application pipeline.
+const launcher = spawnSync(engine, [join(compiler, 'lasm-node.js'), source, ...args],
   { cwd: project, env, encoding: 'utf8', timeout: 300_000, maxBuffer: 1024 * 1024 });
 assert.ifError(launcher.error);
 assert.equal(launcher.status, expected.code, launcher.stderr);
@@ -96,7 +95,7 @@ assert.doesNotMatch(launcher.stderr, /Building /, 'the compatibility launcher mu
 // Hide the source and Git origin before invoking the relocated deployment.
 const deployed = join(base, 'relocated deployment'); renameSync(dist, deployed);
 renameSync(project, project + '.hidden'); renameSync(dependency, dependency + '.hidden');
-const actual = compare(engine, [...(target === 'deno' ? ['run', '-A'] : []), join(deployed, 'main.mjs'), ...args]);
+const actual = compare(engine, [join(deployed, 'main.mjs'), ...args]);
 assert.deepEqual(actual, expected);
 const result = { scope: 'Ordinary Lake Git dependency through application CLI, native control and relocated deployment',
   target, platform: process.platform + '-' + process.arch, node: process.version,

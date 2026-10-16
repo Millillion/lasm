@@ -17,10 +17,11 @@ import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.m
 await ensureResourceGuard();
 assert.equal(process.platform, 'linux', 'This parallel shell-driver harness currently requires Linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
-const [outputArg, target, engineArg, compilerArg, referenceArg, name] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && referenceArg
+const [outputArg, engineArg, compilerArg, referenceArg, name] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg && referenceArg
   && ['float', 'ofScientific', 'exe_private_lean_import'].includes(name),
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE float|ofScientific|exe_private_lean_import');
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE float|ofScientific|exe_private_lean_import');
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
 assert.ok(!existsSync(output), 'Preserve earlier acceptance evidence');
 const sourcesFile = join(root, 'docs/evidence/lean-4.34-upstream-source-files.json');
@@ -162,7 +163,7 @@ try {
   report.nativeSourceAfter = await verify(native, packageSources);
   const dist = join(output, 'dist');
   run('installed application build', process.execPath,
-    [join(compiler, 'bin/lasm.mjs'), 'build', join(applicationProject, 'Main.lean'), '--target', target, '--output', dist], applicationProject, env);
+    [join(compiler, 'bin/lasm.mjs'), 'build', join(applicationProject, 'Main.lean'), '--output', dist], applicationProject, env);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   report.applicationSourceAfter = await verify(project, packageSources);
   if (report.parallelApplicationCopy) report.parallelApplicationCopy.after = await verify(applicationProject, applicationSources);
@@ -179,7 +180,7 @@ try {
   }
   const runtimeEnv = Object.fromEntries(Object.entries(process.env)
     .filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
+  Object.assign(runtimeEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
   if (name === 'float') {
     const gzip = '/usr/bin/gzip', dependencyPath = join(output, 'runtime dependencies');
     mkdirSync(dependencyPath); symlinkSync(gzip, join(dependencyPath, 'gzip')); runtimeEnv.PATH = dependencyPath;
@@ -195,7 +196,7 @@ try {
   report.deployment.sourceFiles = unexpectedSources(deployment);
   assert.deepEqual(report.deployment.sourceFiles, []);
   report.actual = run('relocated compiled application', engine,
-    [...(target === 'deno' ? ['run', '-A'] : []), join(deployment, 'main.mjs')], deployment, runtimeEnv);
+    [join(deployment, 'main.mjs')], deployment, runtimeEnv);
   report.actualObservations = observations(report.actual, report.expected);
   assert.deepEqual(report.actualObservations, report.nativeObservations);
   report.deployedDataAfter = await verify(deployment, dataSources);

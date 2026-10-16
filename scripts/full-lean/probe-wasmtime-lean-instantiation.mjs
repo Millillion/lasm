@@ -41,11 +41,11 @@ const inputs = ['scripts/full-lean/probes/wasmtime-instantiate-lean.c',
   'scripts/full-lean/probes/wasmtime-instantiate-lean.mjs',
   'scripts/full-lean/probe-wasmtime-lean-instantiation.mjs', 'integration/fixtures/LeanPureExports.lean',
   'scripts/full-lean/probes/wasmtime-lean-workers.mjs',
-  'scripts/full-lean/probes/wasmtime-lean-main.mjs', 'src/bun-stack.mjs', 'src/node-host.mjs',
+  'scripts/full-lean/probes/wasmtime-lean-main.mjs', 'src/node-host.mjs',
   'scripts/full-lean/probes/wasmtime-native-api.c', 'scripts/full-lean/probes/wasmtime-lean-supervisor.mjs',
   'scripts/full-lean/probes/wasmtime-console.mjs', 'scripts/full-lean/probes/wasmtime-guest-memory.mjs',
   'scripts/full-lean/probes/wasmtime-canonical-imports.h'];
-inputs.push('src/wasmtime-runtime.mjs', 'src/wasmtime-worker.mjs', 'src/wasmtime-artifact.mjs', 'src/wasmtime-native-stdio.mjs', 'src/wasmtime-guest-memory.mjs', 'src/wasmtime-console.mjs', 'src/wasmtime-wasi-stdio.mjs', 'src/worker-stdio.cjs', 'src/native-worker-cwd.cjs', 'src/native-pthread-factory.cjs', 'src/native-pthread-factory-deno.mjs');
+inputs.push('src/wasmtime-runtime.mjs', 'src/wasmtime-worker.mjs', 'src/wasmtime-artifact.mjs', 'src/wasmtime-native-stdio.mjs', 'src/wasmtime-guest-memory.mjs', 'src/wasmtime-console.mjs', 'src/wasmtime-wasi-stdio.mjs', 'src/worker-stdio.cjs', 'src/native-worker-cwd.cjs', 'src/native-pthread-factory.cjs');
 inputs.push('scripts/full-lean/probes/wasmtime-engine-config.h');
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 const report = { scope: runMain
@@ -134,8 +134,6 @@ try {
   }
   for (const [engine, args] of [
     [join(root, '.cache/js-runtimes/node-26.10.0/bin/node'), ['--max-old-space-size=128']],
-    [join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
-    [join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
   ]) {
     try { report.results.push(JSON.parse(run('pure runtime exports', engine,
       [...args, join(root, inputs[1]), helper, cache, cacheIdentity.sha256, oraclePath,
@@ -152,12 +150,11 @@ try {
   }
   assert.equal(report.failures.length, 0);
   assert.deepEqual(report.results.map(row => [row.engine, row.version]),
-    [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
+    [['node', '26.10.0']]);
   if (profile === 'workers') assert.deepEqual(report.workerResults.map(row => [row.engine, row.version]),
-    [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
+    [['node', '26.10.0']]);
   if (runMain) assert.deepEqual(report.mainResults.map(row => [row.engine, row.version, row.stdout, row.code]),
-    ['node', 'deno', 'bun'].map((engine, index) =>
-      [engine, ['26.10.0', '2.9.7', '1.4.2'][index], report.mainOracle.stdout, 0]));
+    [['node', '26.10.0', report.mainOracle.stdout, 0]]);
   if (directNativeApi) for (const result of report.mainResults) {
     assert.equal(result.wasmEntry, 'direct Node-API on verified worker stacks');
     assert.equal(result.controlStackBytes, 64 * 1024 ** 2);

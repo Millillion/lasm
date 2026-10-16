@@ -11,10 +11,11 @@ import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg, referenceArg, name, ...extra] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg
+const [outputArg, engineArg, compilerArg, referenceArg, name, ...extra] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg
   && referenceArg && ['path with spaces', 'def_clash'].includes(name) && !extra.length,
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE "path with spaces"|def_clash');
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE "path with spaces"|def_clash');
 assert.equal(process.platform, 'linux', 'This original shell-driver adapter currently requires Linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
@@ -99,7 +100,7 @@ try {
   report.nativeSourceAfter = await verify(native, originals);
 
   const build = (label, source, dist, success = true) => run(label, process.execPath,
-    [join(compiler, 'bin/lasm.mjs'), 'build', join(project, source), '--target', target, '--output', dist], project, env, success);
+    [join(compiler, 'bin/lasm.mjs'), 'build', join(project, source), '--output', dist], project, env, success);
   if (!spaces) {
     report.expectedBuildFailures = [];
     for (const [source, message] of [['TestFoo.lean', "environment already contains 'foo'"], ['TestLocalUse.lean', 'lp_test_bar']]) {
@@ -118,7 +119,7 @@ try {
   report.wasmSha256 = await hashFile(join(dist, 'program.wasm'));
   if (spaces) {
     const cached = build('unchanged installed application rebuild', entry, dist);
-    assert.ok(cached.stderr.includes('Reused Lean 4.34.0 for ' + target + ':'), 'Unchanged second build must reuse the verified cache');
+    assert.ok(cached.stderr.includes('Reused Lean 4.34.0 for Node:'), 'Unchanged second build must reuse the verified cache');
     assert.deepEqual(JSON.parse(readFileSync(join(dist, 'build-info.json'))), report.build);
     assert.equal(await hashFile(join(dist, 'program.wasm')), report.wasmSha256);
     report.cacheReused = true;
@@ -129,18 +130,18 @@ try {
   mkdirSync(dirname(deployment)); renameSync(dist, deployment);
   for (const directory of [native, original, project]) renameSync(directory, directory + '.hidden');
   const runtimeEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
+  Object.assign(runtimeEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
   report.deployment = { directory: deployment, sourceHidden: true, buildEnvironmentRemoved: true, path: '',
     wasmSha256: report.wasmSha256 };
   report.actual = run('relocated compiled application', engine,
-    [...(target === 'deno' ? ['run', '-A'] : []), join(deployment, 'main.mjs')], deployment, runtimeEnv);
+    [join(deployment, 'main.mjs')], deployment, runtimeEnv);
   assert.deepEqual(report.actual, report.native);
   if (spaces) {
     const shadow = join(dirname(deployment), 'path');
     assert.ok(!existsSync(shadow)); writeFileSync(shadow, '');
     report.shadowFile = { path: shadow, sha256: await hashFile(shadow) };
     report.actualWithShadow = run('relocated application with path-prefix shadow file', engine,
-      [...(target === 'deno' ? ['run', '-A'] : []), join(deployment, 'main.mjs')], deployment, runtimeEnv);
+      [join(deployment, 'main.mjs')], deployment, runtimeEnv);
     assert.deepEqual(report.actualWithShadow, report.native);
   }
   report.referenceAfter = await verify(reference, sources);

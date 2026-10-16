@@ -3,7 +3,6 @@ import { constants } from 'node:os';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { nativeFiles } from './native-files.mjs';
-import { spawnInheritedProcess } from './native-process.mjs';
 import { numbers } from './node-host.mjs';
 
 export function createNodeProcesses({ add, get, release, cwd, applicationCommand, flushStdout = async () => {} }) {
@@ -69,21 +68,6 @@ export function createNodeProcesses({ add, get, release, cwd, applicationCommand
     if (applicationCommand && options.command === applicationCommand.path) {
       options.command = applicationCommand.executable;
       options.args = [...applicationCommand.arguments, applicationCommand.path, ...options.args];
-      if (process.versions.deno) {
-        // Deno 2.9.7 prepends a Node shim to PATH when it cannot find node.
-        // Disable that startup mutation, then let the generated entry point
-        // restore these two private transport values before running Lean.
-        const flag = 'DENO_DISABLE_NODE_SHIM', transport = 'LASM_DENO_CHILD_ENV';
-        const saved = JSON.stringify([options.env[flag] ?? null, options.env[transport] ?? null]);
-        for (const [key, value] of [[flag, '1'], [transport, saved]]) {
-          options.env[key] = value;
-          if (options.envBytes) {
-            const encoded = Buffer.from(key).toString('base64');
-            options.envBytes = options.envBytes.filter(([name]) => name !== encoded);
-            options.envBytes.push([encoded, Buffer.from(value).toString('base64')]);
-          }
-        }
-      }
     }
     // Native Lean flushes std::cout only when the child inherits stdin. A
     // failed implicit flush does not stop it from attempting the spawn.
@@ -102,23 +86,18 @@ export function createNodeProcesses({ add, get, release, cwd, applicationCommand
       const stdioFlags = posix ? stdio.map((fd, index) => fd === 'ignore' ? 0
         : native.descriptorFlags(typeof fd === 'number' ? fd : index)) : undefined;
       const helper = fileURLToPath(new URL('./process-exec.mjs', import.meta.url));
-      const inheritedNative = process.platform === 'linux' && !!process.versions.deno;
-      const child = inheritedNative
-        ? spawnInheritedProcess(undefined, [],
-          [...stdio, ...(options.directoryFd === undefined ? [] : [options.directoryFd])], { ...options, stdioFlags }, true)
-        : posix
-        ? spawn(process.execPath, [...(process.versions.deno ? ['run', '--no-config', '-A'] : []), helper],
+      const child = posix
+        ? spawn(process.execPath, [helper],
           { cwd: options.inheritProcessCwd ? undefined : '/', env: {},
             stdio: [...stdio, 'pipe', ...(options.directoryFd === undefined ? [] : [options.directoryFd])] })
         : spawn(options.command, options.args, { cwd: options.directory, env: options.env, stdio, windowsHide: false });
       const resource = { type: 'process', child, setsid: options.setsid, reaped: false };
-      resource.exit = inheritedNative ? child.exit.then(code => resource.code = code) : new Promise(resolve => {
+      resource.exit = new Promise(resolve => {
         child.once('exit', (code, signal) => { resource.code = code ?? 128 + (constants.signals[signal] ?? 0); resolve(resource.code); });
       });
       resource.exit.catch(error => { resource.waitError = error; });
-      if (!inheritedNative)
-        await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
-      if (posix && !inheritedNative) {
+      await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
+      if (posix) {
         // A killed/exited child may close the transport before consuming it.
         // The ordinary exit status remains observable through Child.wait.
         child.stdio[3].on('error', () => {});

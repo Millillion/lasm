@@ -99,14 +99,12 @@ for name, expected in meta['files'].items():
     assert digest(source / name) == expected, 'Source input changed during relink: ' + name
 subprocess.run(['node', '--input-type=module', '-e', '''
 import { indexFunctionTable } from './scripts/full-lean/function-table-index.mjs';
-import { preserveWebWorker } from './scripts/full-lean/preserve-web-worker.mjs';
 import { optimizeMainTableGrowth } from './scripts/full-lean/table-growth.mjs';
 import { readFileSync, writeFileSync, copyFileSync } from 'node:fs';
 import { join } from 'node:path';
 const out = process.argv[1];
 const index = await indexFunctionTable(join(out, 'bin/lean.wasm'), join(out, 'bin/lean.js'));
 writeFileSync(join(out, 'bin/lean.js'), optimizeMainTableGrowth(readFileSync(join(out, 'bin/lean.js'), 'utf8')));
-preserveWebWorker(join(out, 'bin/lean.js'));
 copyFileSync(join(out, 'bin/lean.js'), join(out, 'bin/lean.cjs'));
 writeFileSync(join(out, 'function-table-index.json'), JSON.stringify(index, null, 2) + '\\n');
 ''', str(out)], check=True, cwd=root)

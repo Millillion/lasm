@@ -31,22 +31,9 @@ jobs:
           node-version: 26.10.0
           architecture: ${{ matrix.arch }}
           package-manager-cache: false
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version: 1.4.2
-          no-cache: true
-      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
-        with:
-          deno-version: 2.9.7
-          cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Check native engines and retain exact paths
-        run: |
-          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
-          deno eval "if(Deno.version.deno!=='2.9.7'||process.platform+'-'+process.arch!==process.env.LASM_EXPECT_PLATFORM)throw Error('Incorrect engine'); console.log(Deno.version)"
-          bun -e "if(Bun.version!=='1.4.2'||process.platform+'-'+process.arch!==process.env.LASM_EXPECT_PLATFORM)throw Error('Incorrect engine'); console.log(process.versions)"
-          printf 'LASM_TEST_DENO=%s\n' "$(command -v deno)" >> "$GITHUB_ENV"
-          printf 'LASM_TEST_BUN=%s\n' "$(command -v bun)" >> "$GITHUB_ENV"
+      - name: Verify native host
+        run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
       - name: Enable process-tree guard
         run: |
           sudo loginctl enable-linger "$(id -un)"
@@ -56,7 +43,7 @@ jobs:
         run: |
           mkdir -p .work
           cat /proc/sys/kernel/core_pattern > .work/original-core-pattern
-          # A piped systemd collector ignores RLIMIT_CORE and delayed Bun's
+          # A piped systemd collector ignores RLIMIT_CORE and can delay
           # deliberate SIGABRT cases beyond their existing ten-second deadline.
           # A plain pattern respects the service's zero limit; no dump is made.
           sudo sysctl --write kernel.core_pattern=core
@@ -67,7 +54,7 @@ jobs:
       - name: Guarded signal controls
         run: |
           ulimit -c 0
-          node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/signal-controls-resources.json -- /usr/bin/env LASM_TEST_BUN="$LASM_TEST_BUN" LASM_TEST_DENO="$LASM_TEST_DENO" LASM_REQUIRE_SIGNAL_ENGINES=1 node --max-old-space-size=128 --test --test-concurrency=1 test/node-signal.test.mjs test/application-signals.test.mjs test/application-output.test.mjs
+          node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/signal-controls-resources.json -- node --max-old-space-size=128 --test --test-concurrency=1 test/node-signal.test.mjs test/application-signals.test.mjs test/application-output.test.mjs
       - name: Preserve guard and helper receipts in logs
         if: always()
         run: |

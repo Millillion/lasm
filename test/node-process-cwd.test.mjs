@@ -29,8 +29,6 @@ test('ordinary Lean child cwd preserves OS symlink and dot-segment resolution',
     const program = join(built.output, 'main.mjs');
     for (const [label, executable, args] of [
       ['node', process.execPath, [program]],
-      ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', program]],
-      ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), [program]],
     ]) {
       if (!existsSync(executable)) { t.diagnostic(`${label}: not installed`); continue; }
       await t.test(label, () => run(label, executable, args));

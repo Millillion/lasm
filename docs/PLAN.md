@@ -118,8 +118,8 @@ candidate archive described in the README.
   compilation tools, producing application Wasm, JavaScript loaders, and any
   required packaged host support. The deployed application executes in Node;
   running a native Lean executable instead is not acceptance of this pipeline.
-- Node is the only engine in this milestone. No Deno, Bun, browser, or Cloudflare
-  Workers acceptance work is required now. Lambda and Netlify adapters are later
+- Node is the only supported engine. No browser or Cloudflare Workers acceptance
+  work is required now. Lambda and Netlify adapters are later
   deployment work, not part of this first milestone.
 - Keep the primary interface centered on Lean `main`. Do not require user-written
   JavaScript handlers, Lasm-specific Lean syntax, APIs, or annotations.
@@ -263,7 +263,10 @@ the same installed CLI and CI pipeline one separately scoped chunk at a time:
 3. Complete the selected Lean release's `Std.Http` support for all-Lean services,
    including the async/concurrency, streaming, cancellation, and cleanup it needs.
 4. Broader concurrency and other standard-library/runtime APIs, followed by
-   separately scoped serverless deployment adapters and additional engines.
+   separately scoped serverless deployment adapters.
+
+**Deno and Bun support removed — 2026-10-16:** by the user's decision, Deno and
+Bun support was removed from Lasm. Lasm targets Node only.
 
 Runtime Lean compilation, elaboration, dynamic module loading/evaluation and
 executable plugin loading are now explicitly unavailable in deployed applications.
@@ -272,7 +275,7 @@ Broader native extensions,
 subprocess/signal/terminal parity, extreme stack/memory benchmarks, full upstream
 suite campaigns, callable-library expansion, and compiler-in-Wasm research are
 not first-milestone gates. Pause investigations whose only purpose is those
-deferred goals, including Deno/Bun module-loading work. Preserve their source,
+deferred goals. Preserve their source,
 artifacts, tests, results, and unresolved failures for later use.
 
 When the implementation task adopts this plan, safely checkpoint the current

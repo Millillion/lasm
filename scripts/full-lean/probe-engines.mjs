@@ -19,8 +19,6 @@ const sdk = process.env.LASM_EMSDK ?? join(root, '.cache/emsdk-6.0.9');
 patchSdk(sdk);
 const engines = [
   ['node', process.execPath, []],
-  ['deno', process.env.LASM_DENO ?? join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
-  ['bun', process.env.LASM_BUN ?? join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
 ];
 const results = [];
 const plugin = join(output, 'shared.so');

@@ -10,9 +10,10 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg, ...extra] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && !extra.length,
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER');
+const [outputArg, engineArg, compilerArg, ...extra] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg && !extra.length,
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg);
 assert.ok(!existsSync(output), 'Preserve previous attempts'); mkdirSync(output, { recursive: true });
@@ -75,16 +76,16 @@ try {
   assert.match(redirectedAbort.stderr, /redirected panic/);
   const dist = join(output, 'dist');
   run('installed application build', process.execPath,
-    [join(compiler, 'bin/lasm.mjs'), 'build', source, '--target', target, '--output', dist], project, env, true, 900_000);
+    [join(compiler, 'bin/lasm.mjs'), 'build', source, '--output', dist], project, env, true, 900_000);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   const deployment = join(output, 'relocated deployment'); renameSync(dist, deployment);
   renameSync(project, project + '.hidden');
   const runtimeEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
+  Object.assign(runtimeEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
   report.deployment = { directory: deployment, sourceHidden: true, buildEnvironmentRemoved: true,
     path: '', wasmSha256: await hashFile(join(deployment, 'program.wasm')) };
   for (const row of cases) {
-    row.actual = execute('deployed-' + row.name, [engine, ...(target === 'deno' ? ['run', '-A'] : []),
+    row.actual = execute('deployed-' + row.name, [engine, 
       join(deployment, 'main.mjs')], row.mode, { ...runtimeEnv, ...row.env });
     try { assert.deepEqual(row.actual, row.native); row.passed = true; }
     catch (error) { row.passed = false; row.difference = error.message; }

@@ -108,8 +108,8 @@ if (!isMainThread) {
     assert.equal(standalone(probe, converted, converted.length, convertedResult, error, error.length), 0, message());
     assert.equal(Number(convertedResult[0]), Number(legacyNative));
     const convertedException = { helperResult: Number(convertedResult[0]), stockEngineValid: WebAssembly.validate(converted) };
-    console.log(JSON.stringify({ engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
-      version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
+    console.log(JSON.stringify({ engine: 'node',
+      version: process.versions.node,
       before, after, first, second, third, concurrentWait: { notified, attempts, waitResult: waiting.result },
       legacyException, convertedException, profile: sparseHigh ? 'sparse-high' : 'small', dataAddress: sparseHigh ? 4294967296 : 0,
       accessibleGuestBytes: after[3], memoryAccessPattern: 'One 8-byte data cell plus a 4-byte wait cell at offset 8; no bulk fill',

@@ -12,7 +12,6 @@ import { executableName, responseFile } from './platform.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
 import { optimizeMainTableGrowth } from '../scripts/full-lean/table-growth.mjs';
-import { preserveWebWorker } from '../scripts/full-lean/preserve-web-worker.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
@@ -104,6 +103,6 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   const glue = join(dist, 'program.cjs');
   writeFileSync(glue, connectLeanSymbolLoader(readFileSync(glue, 'utf8'), true, { packageSymbols: true }));
   await indexFunctionTable(join(dist, 'program.wasm'), glue);
-  writeFileSync(glue, optimizeMainTableGrowth(readFileSync(glue, 'utf8'))); preserveWebWorker(glue);
+  writeFileSync(glue, optimizeMainTableGrowth(readFileSync(glue, 'utf8')));
   return requirements;
 }

@@ -11,9 +11,10 @@ import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg, referenceArg, ...extra] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && referenceArg && !extra.length,
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE');
+const [outputArg, engineArg, compilerArg, referenceArg, ...extra] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg && referenceArg && !extra.length,
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE');
 assert.equal(process.platform, 'linux', 'The original shell-driver signal control currently requires Linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
@@ -126,7 +127,7 @@ try {
   report.nativeSourceAfter = await verify(native, originals);
   const dist = join(output, 'dist');
   run('installed application build', process.execPath,
-    [join(compiler, 'bin/lasm.mjs'), 'build', join(project, 'Main.lean'), '--target', target, '--output', dist], project, env);
+    [join(compiler, 'bin/lasm.mjs'), 'build', join(project, 'Main.lean'), '--output', dist], project, env);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   report.applicationAfter = await verify(project, buildSources);
   assert.equal(readFileSync(join(project, 'lean-toolchain'), 'utf8'), report.parallelPin.release);
@@ -134,11 +135,11 @@ try {
   const deployment = join(output, 'relocated deployment'); renameSync(dist, deployment);
   for (const directory of [native, original, project]) renameSync(directory, directory + '.hidden');
   const runtimeEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
+  Object.assign(runtimeEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
   report.deployment = { directory: deployment, sourceHidden: true, path: '', wasmSha256: await hashFile(join(deployment, 'program.wasm')) };
   report.native = await signals('native signal control', join(native + '.hidden', '.lake/build/bin/release'), [], deployment, runtimeEnv);
   report.actual = await signals('deployed signal control', engine,
-    [...(target === 'deno' ? ['run', '-A'] : []), join(deployment, 'main.mjs')], deployment, runtimeEnv);
+    [join(deployment, 'main.mjs')], deployment, runtimeEnv);
   assert.deepEqual(report.actual, report.native);
   report.referenceAfter = await verify(reference, sources);
   assert.equal(await hashFile(fileURLToPath(import.meta.url)), report.harnessSha256);

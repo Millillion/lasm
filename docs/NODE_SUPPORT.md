@@ -95,5 +95,5 @@ are checked in installed-package acceptance. The historical `.32` archive
 predates these improvements and remains unchanged.
 The package is a private experimental candidate, not an npm publication or a
 claim that every Lean program works. Linux, macOS and Windows passed on both
-architectures through the installed package and copied deployment. Deno, Bun,
-HTTP/filesystem parity and broad third-party packages remain separate milestones.
+architectures through the installed package and copied deployment. HTTP/filesystem
+parity and broad third-party packages remain separate milestones.

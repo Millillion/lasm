@@ -5,14 +5,14 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { applicationEntrypoint, applicationHostFiles, writeApplicationEntrypoint } from '../src/application-output.mjs';
+import { applicationHostFiles, writeApplicationEntrypoint } from '../src/application-output.mjs';
 import { applicationPolicy } from '../src/application-policy.mjs';
 
 test('entrypoint resolves host/glue relative to deployment, independent of build and working directory', t => {
   const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-deployment-')));
   t.after(() => rmSync(base, { recursive: true, force: true }));
   const original = join(base, 'build'), moved = join(base, 'deploy space');
-  writeApplicationEntrypoint(original, 'node');
+  writeApplicationEntrypoint(original);
   writeFileSync(join(original, 'build-info.json'), JSON.stringify({ applicationPolicy,
     linkRequirements: { mode: 'static', dynamic: [], cxxRuntime: [], moduleData: [], requiresModuleData: false } }));
   mkdirSync(join(original, 'host'));
@@ -33,21 +33,18 @@ test('entrypoint resolves host/glue relative to deployment, independent of build
   assert.ok(!readFileSync(join(moved, 'main.mjs'), 'utf8').includes(original));
 });
 
-test('wrong engines fail before executing the application payload', t => {
-  const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-target-')));
+test('the entrypoint is a Node executable module', t => {
+  const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-entrypoint-')));
   t.after(() => rmSync(base, { recursive: true, force: true }));
-  writeApplicationEntrypoint(base, 'bun');
-  writeFileSync(join(base, 'program.cjs'), 'throw new Error("PAYLOAD EXECUTED");');
-  const result = spawnSync(process.execPath, ['--max-old-space-size=64', join(base, 'main.mjs')], { encoding: 'utf8' });
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /built for bun.*running in node/);
-  assert.doesNotMatch(result.stderr, /PAYLOAD EXECUTED/);
+  writeApplicationEntrypoint(base);
+  assert.ok(readFileSync(join(base, 'main.mjs'), 'utf8').startsWith('#!/usr/bin/env node\n'));
+  assert.deepEqual(JSON.parse(readFileSync(join(base, 'package.json'), 'utf8')), { private: true, type: 'module' });
 });
 
 test('stale or compiler-capable deployments fail before loading host code or the payload', t => {
   const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-deployment-policy-')));
   t.after(() => rmSync(base, { recursive: true, force: true }));
-  writeApplicationEntrypoint(base, 'node');
+  writeApplicationEntrypoint(base);
   writeFileSync(join(base, 'program.cjs'), 'throw new Error("PAYLOAD EXECUTED");');
   for (const info of [{}, { applicationPolicy, linkRequirements: {
     mode: 'dynamic', dynamic: ['dlopen'], cxxRuntime: [], moduleData: [], requiresModuleData: true } }]) {
@@ -67,18 +64,16 @@ for (const [name, support, message] of [
   if (name === 'system library' && process.platform !== 'linux') return t.skip('glibc is a Linux prerequisite');
   const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-platform-')));
   t.after(() => rmSync(base, { recursive: true, force: true }));
-  writeApplicationEntrypoint(base, 'node', support);
+  writeApplicationEntrypoint(base, support);
   const result = spawnSync(process.execPath, [join(base, 'main.mjs')], { encoding: 'utf8' });
   assert.equal(result.status, 1);
   assert.match(result.stderr, message);
   assert.doesNotMatch(result.stderr, /ERR_MODULE_NOT_FOUND/);
 });
 
-test('all full-runtime host support files exist and target validation is strict', () => {
-  assert.throws(() => applicationEntrypoint('browser'), /Invalid/);
+test('all full-runtime host support files exist with their dependencies', () => {
   const names = new Set(applicationHostFiles);
   assert.equal(names.size, applicationHostFiles.length);
-  assert.ok(names.has('native-pthread-factory-deno.mjs'), 'Exceptional Deno worker bootstrap must deploy');
   for (const file of names) {
     const source = readFileSync(new URL('../src/' + file, import.meta.url), 'utf8');
     for (const [, dependency] of source.matchAll(/(?:from\s*|import\s*\(|require\s*\()\s*['"]\.\/([^'"]+\.(?:mjs|cjs))['"]/g))
@@ -96,15 +91,11 @@ test('retained callable and frozen compiler outputs include transitive host depe
     const list = text.match(/(?:for \(const name of|const hostFiles =) \[('node-host\.mjs'[^\]]+)\]/)[1];
     return new Set([...list.matchAll(/'([^']+)'/g)].map(match => match[1]));
   })];
-  for (const names of inventories) {
-    if (names.has('native-pthread-factory.cjs'))
-      assert.ok(names.has('native-pthread-factory-deno.mjs'), 'Private factory needs its Deno bootstrap');
-  }
   for (const names of inventories) for (const file of names) {
     const source = readFileSync(new URL('../src/' + file, import.meta.url), 'utf8');
     for (const [, dependency] of source.matchAll(/(?:from\s*|import\s*\(|require\s*\()\s*['"]\.\/([^'"]+\.(?:mjs|cjs))['"]/g))
       assert.ok(names.has(dependency) || dependency.startsWith('native/'), `${file} needs ${dependency}`);
   }
-  for (const name of ['linux-memory.mjs', 'deno-signals.mjs', 'native-signals.mjs', 'native-file-message.mjs'])
+  for (const name of ['linux-memory.mjs', 'native-signals.mjs', 'native-file-message.mjs'])
     assert.ok(stamp.has(name), 'Legacy main cache must notice a missing ' + name);
 });

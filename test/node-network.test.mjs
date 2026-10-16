@@ -13,8 +13,6 @@ test('bound and failed-bind descriptors are released in each installed engine',
     const fixture = join(root, 'test/fixtures/tcp-lifetime-host.mjs');
     const engines = [
       ['node', process.execPath, [fixture]],
-      ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', fixture]],
-      ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), [fixture]],
     ];
     for (const [name, executable, command] of engines) {
       if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }

@@ -10,9 +10,10 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
-const [outputArg, target, engineArg, compilerArg, ...extra] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && !extra.length,
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER');
+const [outputArg, engineArg, compilerArg, ...extra] = process.argv.slice(2);
+const target = 'node';
+assert.ok(outputArg && engineArg && compilerArg && !extra.length,
+  'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER');
 assert.equal(process.platform, 'linux', 'This fixture asserts native Linux signal numbers');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg);
@@ -89,11 +90,11 @@ try {
   run('compile native', join(lean.prefix, 'bin/leanc'), ['-O2', '-DNDEBUG', '-o', native, input + '.c'], project, env);
   const dist = join(output, 'dist');
   run('installed application build', process.execPath,
-    [join(compiler, 'bin/lasm.mjs'), 'build', input, '--target', target, '--output', dist], project, env);
+    [join(compiler, 'bin/lasm.mjs'), 'build', input, '--output', dist], project, env);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   const deployment = join(output, 'relocated deployment'); renameSync(dist, deployment); renameSync(project, project + '.hidden');
   const runtimeEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
+  Object.assign(runtimeEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
   report.deployment = { directory: deployment, sourceHidden: true, path: '', wasmSha256: await hashFile(join(deployment, 'program.wasm')) };
   const cases = [['once'], ['repeat'], ...['default','stopped'].flatMap(mode => [10,12,15,6,2,3,28].map(n => [mode,String(n)]))];
   for (const args of cases) {
@@ -102,7 +103,7 @@ try {
     if (args.length === 1) { assert.equal(native.code, 0); assert.equal(native.stderr, ''); assert.ok(native.stdout.endsWith('delivery complete\n')); }
     else if (args[1] !== '28') assert.equal(native.signal, numbers[args[1]], 'Native default-action control did not terminate as expected');
     const actual = await execute('deployed/' + report.phase,
-      [engine, ...(target === 'deno' ? ['run','-A'] : []), join(deployment, 'main.mjs')], args, runtimeEnv, deployment);
+      [engine, join(deployment, 'main.mjs')], args, runtimeEnv, deployment);
     const row = { args, native, actual, passed: false };
     try { assert.deepEqual(actual, native); row.passed = true; } catch (error) { row.difference = error.message; }
     report.comparisons.push(row); save(); console.log(target + ' ' + args.join(' ') + ': ' + (row.passed ? 'passed' : 'DIFFERS'));

@@ -2,8 +2,8 @@
 
 For the current Lean 4.34 application pipeline, start with an ordinary `main` in
 a standalone file or Lake project and run `lasm Main.lean`. Build deployable
-output with `lasm build Main.lean --target node`, then `node dist/main.mjs`.
-`deno` and `bun` are also deployment targets. No `lasm.json` or Lean dependency
+output with `lasm build Main.lean`, then `node dist/main.mjs`. Node is the only
+deployment target. No `lasm.json` or Lean dependency
 on Lasm is needed. See [current implementation status](APPLICATION_PIPELINE.md)
 for managed-tool, package, and platform acceptance; the package is not published.
 

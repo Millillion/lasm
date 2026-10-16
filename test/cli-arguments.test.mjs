@@ -4,19 +4,19 @@ import { parseLasmArguments } from '../src/cli-arguments.mjs';
 
 test('ordinary Lean files default to run on Node, and preserve arguments after --', () => {
   assert.deepEqual(parseLasmArguments(['Main.lean', '--', 'hello', '--target', 'user-option']), {
-    command: 'run', input: 'Main.lean', target: 'node', rebuild: false, verbose: false,
+    command: 'run', input: 'Main.lean', rebuild: false, verbose: false,
     args: ['hello', '--target', 'user-option'],
   });
   assert.deepEqual(parseLasmArguments(['run', 'Main.lean']), parseLasmArguments(['Main.lean']));
 });
 
-for (const target of ['node', 'deno', 'bun']) test(`${target} selection works on either side of the filename`, () => {
-  const before = parseLasmArguments(['--target', target, '--verbose', 'Main.lean', '--rebuild']);
-  const after = parseLasmArguments(['Main.lean', '--target=' + target, '--rebuild', '--verbose']);
+test('options work on either side of the filename', () => {
+  const before = parseLasmArguments(['--verbose', 'Main.lean', '--rebuild']);
+  const after = parseLasmArguments(['Main.lean', '--rebuild', '--verbose']);
   assert.deepEqual(before, after);
-  assert.equal(after.target, target);
   assert.equal(after.rebuild, true); assert.equal(after.verbose, true);
-  assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).output, 'dist');
+  assert.equal('target' in after, false);
+  assert.equal(parseLasmArguments(['build', 'Main.lean']).output, 'dist');
 });
 
 test('build retains explicit output directories and existing binding configuration inputs', () => {
@@ -31,10 +31,11 @@ test('help needs no input or build-time side effects', () => {
 });
 
 for (const [args, error] of [
-  [[], /Usage/], [['Main.lean', '--target'], /requires a value/],
-  [['Main.lean', '--target='], /requires a value/], [['Main.lean', '--target', '--verbose'], /requires a value/],
-  [['Main.lean', '--target', 'browser'], /Use --target/],
-  [['Main.lean', '--target', 'bun', '--target', 'node'], /only once/],
+  [[], /Usage/], [['Main.lean', '--target', 'node'], /Unknown Lasm option: --target/],
+  [['Main.lean', '--target=node'], /Unknown Lasm option: --target=node/],
+  [['build', 'Main.lean', '--target', 'node'], /Unknown Lasm option: --target/],
+  [['Main.lean', '--output', 'one', '--output', 'two'], /only once/],
+  [['build', 'Main.lean', '--output'], /requires a value/],
   [['Main.lean', '--node-version', '26'], /Unknown Lasm option/],
   [['Main.lean', 'hello'], /after --/], [['Main.lean', '--output', 'dist'], /only with lasm build/],
   [['build', 'Main.lean', '--', 'hello'], /not lasm build/],

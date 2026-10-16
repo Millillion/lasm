@@ -57,8 +57,6 @@ try {
   save();
   for (const [engine, program, flags] of [
     ['node', node, ['--max-old-space-size=128']],
-    ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
-    ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
   ]) {
     try {
       const result = JSON.parse(run(`${engine} SDK console differential`, program, [...flags, join(root, inputs[3]),
@@ -69,7 +67,7 @@ try {
   }
   assert.deepEqual(report.failures, []);
   assert.deepEqual(report.engines.map(row => [row.engine, row.version]),
-    [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
+    [['node', '26.10.0']]);
   assert.equal(new Set(report.engines.map(row => row.resultSha256)).size, 1);
   assert.equal(await hashFile(cache), cacheSha256); assert.equal(await hashFile(helper), report.helperSha256);
   report.passed = true;

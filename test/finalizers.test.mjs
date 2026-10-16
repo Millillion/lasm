@@ -20,8 +20,6 @@ for (const fixture of ['FifoFinalizer', 'FifoThreadFinalizer']) {
       const engines = [
         ['native', resolveLean(root).lean, ['-j4', '--run', source]],
         ['node', process.execPath, [join(built.output, 'main.mjs')]],
-        ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', join(built.output, 'main.mjs')]],
-        ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), [join(built.output, 'main.mjs')]],
       ];
       for (const [name, executable, args] of engines) {
         if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }

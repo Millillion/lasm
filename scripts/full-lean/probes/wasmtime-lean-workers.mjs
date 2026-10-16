@@ -341,8 +341,8 @@ try {
     assert.equal(state[2], 0n); assert.equal(state[22], 7n); assert.equal(state[23], 7n);
     assert.equal(state[25], 7n);
     output = { scope: 'Real guest pthread creation, separate JS worker Stores, TLS, guest entry execution, exit and join; no full Lean main or general scheduler acceptance',
-      engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
-      version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
+      engine: 'node',
+      version: process.versions.node,
       results, concurrentResults, concurrentProtectedUpdates: 1000,
       mailboxResults, mailboxRoutes, mainMailbox: { delivered: String(state[12]), sum: String(state[13]) },
       sharedBytes: String(state[3]), created: 7, joined: 7, cleaned: 7,
