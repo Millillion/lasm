@@ -18,7 +18,7 @@
 // maintainer test package, not a release candidate.
 import assert from 'node:assert/strict';
 import { parseArgs } from 'node:util';
-import { mkdir, readFile, writeFile, rm, cp, link, copyFile, rename, stat, readdir } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rm, cp, link, copyFile, rename, stat, readdir, chmod } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -109,6 +109,8 @@ if (args.step === 'package') {
     await rename(file + '.partial', file);
     assert.ok(await valid(file), `${name} does not match the catalog`);
   }
+  // npm pack records the file mode (0600 from a download, 0644 from a copy), so fix it.
+  await chmod(file, 0o644);
   const directory = join(out, 'staging', pkg.name.replace('/', '__'));
   await rm(directory, { recursive: true, force: true });
   await mkdir(directory, { recursive: true });
