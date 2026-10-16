@@ -425,3 +425,18 @@ installations of 11 (Linux x86-64, Linux ARM64, Apple Silicon), 4 (Intel macOS,
 Windows x86-64) and 3 (Windows ARM64). Earlier failures remain in the history.
 This is a practical regression threshold for the exact archive
 `0.1.0-experimental.36513318119`, not a measured failure rate; npm stays unpublished.
+
+### Slimmed candidate gate result (2026-10-16)
+
+Candidate `0.1.0-experimental.38930715033` (source `3dc280d`, SHA-256
+`99593d597804f05e489d1f9d7c2c3da985e67906b8dbb114b7cf6300f9765dc9`) carries the
+tiered Lean distribution and the Python-free Node link driver. It passed native
+acceptance on all five supported targets in
+[38930715033](https://github.com/Millillion/lasm/actions/runs/38930715033), then
+three back-to-back confidence campaigns:
+[38935405343](https://github.com/Millillion/lasm/actions/runs/38935405343),
+[38935422653](https://github.com/Millillion/lasm/actions/runs/38935422653) and
+[38935439348](https://github.com/Millillion/lasm/actions/runs/38935439348).
+The third campaign's report job first failed on a GitHub API HTTP 502 while
+collecting job lists; its rerun (no installations repeated) recorded
+`passed: true` with five consecutive clean cold installations per target.
