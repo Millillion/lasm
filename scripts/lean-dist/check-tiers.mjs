@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { createReadStream, readFileSync } from 'node:fs';
 import { readFile, readdir, mkdir, writeFile, rm, link, symlink, readlink } from 'node:fs/promises';
 import { join, resolve, delimiter, toNamespacedPath } from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress, createGunzip } from 'node:zlib';
@@ -90,7 +90,17 @@ for (const piece of extendedPieces) await unpack(await verified(archive(piece)),
 if (!options['full-prefix']) {
   const upstreamBytes = await readFile(options.upstream);
   assert.equal(sha256(upstreamBytes), upstream.sha256, 'Pinned upstream archive checksum');
-  await unpack(resolve(options.upstream), prefixes.full, upstream.format);
+  if (windows) await unpack(resolve(options.upstream), prefixes.full, upstream.format);
+  else {
+    // Upstream Linux/macOS archives contain shared-library symlink chains that
+    // node-tar's hardened extractor refuses; the system tar is only used for
+    // this pinned, checksum-verified reference archive.
+    await mkdir(prefixes.full, { recursive: true });
+    const tar = spawn('tar', ['-x', '--strip-components=1', '-C', prefixes.full], { stdio: ['pipe', 'inherit', 'inherit'] });
+    const exited = new Promise((done, fail) => { tar.once('error', fail); tar.once('close', done); });
+    await pipeline(createReadStream(resolve(options.upstream)), upstream.format === 'tar.gz' ? createGunzip() : createZstdDecompress(), tar.stdin);
+    assert.equal(await exited, 0, 'Reference archive extraction');
+  }
 }
 }
 if (options.phase === 'extract') process.exit(0);
