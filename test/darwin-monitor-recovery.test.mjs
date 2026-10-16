@@ -53,7 +53,8 @@ const syncPause = () => {
 for (const shouldRecover of [true, false]) test(`real process group stays paused during accounting and ${shouldRecover ? 'resumes' : 'is killed'}`,
   { skip: process.platform === 'win32', timeout: 15000 }, async () => {
     const dir = mkdtempSync(join(tmpdir(), 'lasm accounting ')), heartbeat = join(dir, 'heartbeat');
-    const child = spawn(process.execPath, ['-e', 'const fs=require("node:fs");let n=0;setInterval(()=>fs.writeFileSync(process.argv[1],String(++n)),10)', heartbeat],
+    // Publish by rename: a truncating write could be observed as an empty count.
+    const child = spawn(process.execPath, ['-e', 'const fs=require("node:fs"),f=process.argv[1];let n=0;setInterval(()=>{fs.writeFileSync(f+".tmp",String(++n));fs.renameSync(f+".tmp",f)},10)', heartbeat],
       { detached: true, stdio: 'ignore' });
     const exited = once(child, 'exit');
     const count = () => { try { return Number(readFileSync(heartbeat, 'utf8')); } catch { return 0; } };
@@ -70,9 +71,9 @@ for (const shouldRecover of [true, false]) test(`real process group stays paused
         }, stopReason: () => null };
       if (shouldRecover) {
         recoverDarwinSample(timeout(), f);
-        const deadline = Date.now() + 5000;
-        while (count() <= stoppedAt && Date.now() < deadline) await pause(20);
-        assert.ok(count() > stoppedAt, 'Safe work resumes after accounting recovers');
+        const deadline = Date.now() + 5000; let resumed = count();
+        while (resumed <= stoppedAt && Date.now() < deadline) { await pause(20); resumed = count(); }
+        assert.ok(resumed > stoppedAt, 'Safe work resumes after accounting recovers');
       } else {
         assert.throws(() => recoverDarwinSample(timeout(), f), /ETIMEDOUT/);
         const [code, signal] = await exited; assert.equal(code, null); assert.equal(signal, 'SIGKILL');

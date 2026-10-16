@@ -127,14 +127,19 @@ def check(value):
     return value
 
 
-def object_acl(path, permissions=0x1200a8, mode=1):
+def object_acl(path, permissions=0x1200a8, mode=1, *, missing_ok=False):
     # SetSecurityInfo propagates existing inheritable ACEs across the volume.
     # Its MAXIMUM_ALLOWED escape also requests DELETE, conflicting with live
     # directory handles. Use the documented object-level setter with exactly
     # READ_CONTROL | WRITE_DAC; no data/delete access or inheritance tree walk.
     # https://learn.microsoft.com/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntsetsecurityobject
     handle = open_file(str(path), 0x60000, 7, None, 3, 0x02000000, None)
-    if handle == C.c_void_p(-1).value and C.get_last_error() == 5:
+    opened = C.get_last_error()
+    if handle == C.c_void_p(-1).value and missing_ok and opened in (2, 3):
+        # ERROR_FILE_NOT_FOUND / ERROR_PATH_NOT_FOUND: the object is gone, so it
+        # carries no ACE to change. Callers record this instead of guessing.
+        return False
+    if handle == C.c_void_p(-1).value and opened == 5:
         # TrustedInstaller owns Program Files. The administrative CI launcher
         # can obtain this narrowly scoped handle with backup/restore semantics;
         # restore its privilege immediately, before any consumer is created.
@@ -160,7 +165,7 @@ def object_acl(path, permissions=0x1200a8, mode=1):
         if handle == C.c_void_p(-1).value:
             raise OSError(f"Opening protected CI path {path}: {C.WinError(error)}")
     if handle == C.c_void_p(-1).value:
-        raise OSError(f"Opening CI path {path}: {C.WinError(C.get_last_error())}")
+        raise OSError(f"Opening CI path {path}: {C.WinError(opened)}")
     descriptor, old_acl, new_acl = P(), P(), P()
 
     def success(code):
@@ -186,6 +191,7 @@ def object_acl(path, permissions=0x1200a8, mode=1):
         if descriptor:
             free(descriptor)
         close(handle)
+    return True
 
 
 class TOKEN_GROUPS(C.Structure):
@@ -283,9 +289,14 @@ def progress(stage, *, force=False, **details):
         save()
 
 
-def deny(path, permissions):
+def deny(path, permissions, *, enumerated=False):
     path = Path(path).resolve()
-    object_acl(path, permissions, 3)
+    # Enumerated children of a denied tree can vanish before their ACL is set,
+    # e.g. the privileged resource supervisor's atomic `.partial` report. A
+    # vanished file cannot be read by the consumer; explicit targets must exist.
+    if not object_acl(path, permissions, 3, missing_ok=enumerated):
+        evidence.setdefault("vanishedBeforeDenial", []).append(str(path))
+        return
     if path not in changed_paths:
         changed.append(path)
         changed_paths.add(path)
@@ -362,7 +373,7 @@ try:
         assert target.exists() and target != allowed_root and target not in allowed_root.parents
         deny(target, 0x21)  # FILE_READ_DATA/LIST_DIRECTORY | FILE_EXECUTE/TRAVERSE
         if target.is_dir():
-            for file in walk_files(target): deny(file, 0x21)
+            for file in walk_files(target): deny(file, 0x21, enumerated=True)
     evidence["blockedDevelopmentRoots"] = [] if startup_probe else developer_roots
     evidence["deniedInputs"] = [] if startup_probe else spec.get("denied", [])
     evidence["deniedObjects"] = len(changed)
@@ -376,7 +387,7 @@ try:
         if path.is_dir():
             for child_path in path.rglob("*"):
                 assert not child_path.is_symlink() and not child_path.is_junction()
-                deny(child_path, 0xd0156)
+                deny(child_path, 0xd0156, enumerated=True)
     evidence["readOnlyObjects"] = len(changed) - read_only_start
     save()
 
@@ -464,7 +475,10 @@ finally:
             evidence["firewallRestored"] = True
         except Exception as error: evidence.setdefault("cleanupErrors", []).append(str(error))
     for path in reversed(changed):
-        try: object_acl(path, 0, 4)
+        # A file renamed or deleted during the run took its temporary ACE with it.
+        try:
+            if not object_acl(path, 0, 4, missing_ok=True):
+                evidence.setdefault("vanishedBeforeRestore", []).append(str(path))
         except Exception as error: evidence.setdefault("cleanupErrors", []).append(str(error))
     if sid: free(sid)
     if admin_sid: free(admin_sid)

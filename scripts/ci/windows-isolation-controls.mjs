@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 import { verifyNativeProgram } from '../../src/native-program.mjs';
@@ -62,9 +62,20 @@ for (const startupProbe of probes) {
   report.startupProbes.push({ startupProbe, ...actual }); save();
 }
 for (const phase of ['online', 'offline']) {
+  // A privileged writer (like the resource supervisor's atomic `.partial`
+  // report) removes a denied file mid-run; restoration must record, not fail.
+  const vanishing = join(privateTree, phase + '-vanishing.partial'), phaseReport = join(output, phase + '.json');
+  writeFileSync(vanishing, 'removed while the restricted consumer runs\n');
+  const remover = spawn(process.execPath, ['-e', `const fs=require('node:fs'),[r,f]=process.argv.slice(1),end=Date.now()+170000;
+    const t=setInterval(()=>{let s;try{s=JSON.parse(fs.readFileSync(r,'utf8')).status}catch{}
+    if(s==='running'){fs.rmSync(f);clearInterval(t)}else if(Date.now()>end)clearInterval(t)},50)`, phaseReport, vanishing], { stdio: 'ignore' });
   const actual = windowsIsolated({ disposableRoot: root, reads: [nodeDirectory, readonly], writes: [writable],
     denied: [resolve('.'), process.env.LASM_RESOURCE_PYTHON, privateTree],
-    command: [node, program, config, phase], cwd: writable, environment, offline: phase === 'offline', timeoutSeconds: 180 }, join(output, phase + '.json'));
+    command: [node, program, config, phase], cwd: writable, environment, offline: phase === 'offline', timeoutSeconds: 180 }, phaseReport);
+  if (remover.exitCode === null) remover.kill();
+  assert.ok(!existsSync(vanishing), 'The privileged writer must remove its file during the restricted run');
+  const expected = join(realpathSync.native(privateTree), phase + '-vanishing.partial').toLowerCase();
+  assert.ok(actual.isolation.vanishedBeforeRestore?.some(p => p.toLowerCase() === expected), 'A vanished denied file is recorded as such');
   let controls;
   try { controls = JSON.parse(actual.stdout); }
   catch { controls = { passed: false, error: 'Node did not produce a complete control report' }; }

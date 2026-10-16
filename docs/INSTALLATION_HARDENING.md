@@ -376,3 +376,27 @@ additional gate. Any robustness release decision must require the selected
 candidate's confidence report to have `passed: true`. This is a practical
 regression threshold, not proof of a particular failure rate or of compatibility
 with every network, filesystem, antivirus policy or machine. npm stays unpublished.
+
+### Observed daily repetitions (2026-09-29 to 2026-10-15)
+
+Seventeen scheduled campaigns ran against the unchanged archive and source
+revision `71ed7b3`. On 2026-10-15, Linux x86-64, Linux ARM64 and Apple Silicon
+had eight consecutive complete passes. Intel macOS and Windows x86-64 had one
+because of the infrastructure cancellation below. Windows ARM64 had none, so
+the gate stayed `passed: false`. No failure came from the installer or the
+packaged CLI. Every failure is retained and still resets its sequence:
+
+| Date | Failure | Cause |
+| --- | --- | --- |
+| 10-02, 10-07 | Linux fault job | Test race: the heartbeat fixture truncated before writing, and a second read saw `0` |
+| 10-11, 10-15 | Windows ARM64 installed job | CI isolation race: the resource supervisor's transient `.partial` report was denied, then renamed away, so restoring its ACL failed with `WinError 2` |
+| 10-14 | Intel macOS, both Windows installed jobs | GitHub Actions internal error cancelled all three simultaneously |
+
+The heartbeat now publishes by rename, and the test reads it once (40/40 local
+resume repetitions passed). Windows isolation now records denied files that
+vanish during enumeration or before restoration (`vanishedBeforeDenial`,
+`vanishedBeforeRestore`) instead of reporting cleanup errors. Explicit denial
+targets must still exist, and every other ACL error still fails closed. A
+native control removes a denied file during each restricted phase. The
+candidate bytes are unchanged. The multi-day gate restarts from the next
+complete campaign.
