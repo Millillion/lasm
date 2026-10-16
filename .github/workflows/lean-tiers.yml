@@ -54,7 +54,7 @@ jobs:
         # The memory cap includes the staged files' page cache.
         run: |
           data=hash; [ "$PLATFORM" = linux-x64 ] && data=write
-          node scripts/full-lean/run-bounded.mjs --memory-mib 12288 --report .work/lean-tiers-$PLATFORM-resources.json -- \
+          node scripts/full-lean/run-bounded.mjs --memory-mib 8192 --report .work/lean-tiers-$PLATFORM-resources.json -- \
             node scripts/lean-dist/build-tiers.mjs --version "$VERSION" --platform "$PLATFORM" --archive .work/lean-tiers/dl/upstream \
               --out .work/lean-tiers/out --work .work/lean-tiers/work --data $data --twice
           rm -f .work/lean-tiers/dl/upstream
