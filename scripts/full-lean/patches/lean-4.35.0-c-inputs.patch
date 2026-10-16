@@ -1,0 +1,22 @@
+diff --git a/src/lean.mk.in b/src/lean.mk.in
+index f520b05..17eb567 100644
+--- a/src/lean.mk.in
++++ b/src/lean.mk.in
+@@ -99,7 +99,7 @@ $(BC_OUT)/%.bc: $(OLEAN_OUT)/%.olean
+ endif
+ 
+ ifdef LLVM
+-$(TEMP_OUT)/%.o.export: $(BC_OUT)/%.bc
++$(TEMP_OUT)/%.o.export: $(BC_OUT)/%.bc $(LEANC_DEPS)
+ else
+ $(TEMP_OUT)/%.o.export: $(C_OUT)/%.c $(LEANC_DEPS)
+ endif
+@@ -114,7 +114,7 @@ endif
+ # on other platforms, no point in bothering
+ ifeq (@CMAKE_SYSTEM_NAME@, Windows)
+ ifdef LLVM
+-$(TEMP_OUT)/%.o: $(BC_OUT)/%.bc
++$(TEMP_OUT)/%.o: $(BC_OUT)/%.bc $(LEANC_DEPS)
+ else
+ $(TEMP_OUT)/%.o: $(C_OUT)/%.c $(LEANC_DEPS)
+ endif

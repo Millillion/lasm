@@ -62,16 +62,21 @@ if (!existsSync(source)) {
 }
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const patches = {};
+// Lean 4.35 moved mimalloc into the runtime (`runtime/mimalloc.cpp`), added
+// LEANC_DEPS upstream and fixed several declarations the 4.32 build patch
+// touched; these three patches were ported to its sources.
+const ported = Number(version.split('.')[1]) >= 35 ? new Set(['wasm-build', 'sdk-mimalloc', 'c-inputs']) : new Set();
 const patchInputs = ['wasm-build', 'compact-alignment', 'thread-runtime', 'sdk-mimalloc', 'c-inputs', 'region-allocation', 'host-platform']
-  .map(name => ({ name, file: `lean-4.32.0-${name}.patch` }));
+  .map(name => ({ name, file: `lean-${ported.has(name) ? '4.35.0' : '4.32.0'}-${name}.patch` }));
 // getIsLinux was added after the original host-platform patch. Keep the older
 // version's patch applicable to its own sources.
 patchInputs.push({ name: 'host-linux', file: 'lean-4.34.0-host-linux.patch' });
 patchInputs.push({ name: 'host-backtrace', file: 'lean-4.34.0-host-backtrace.patch' });
 patchInputs.push({ name: 'libuv-source', file: 'lean-4.34.0-libuv-source.patch' });
 for (const { name, file } of patchInputs) {
-  // These reviewed runtime changes still apply to 4.34. Record the actual patch
-  // bytes and source commit; never treat old 4.32 tests as validation of 4.34.
+  // These reviewed runtime changes still apply to 4.34 and, with the ports above,
+  // to 4.35. Record the actual patch bytes and source commit; never treat older
+  // versions' tests as validation of a newer release.
   let patch = readFileSync(join(root, 'scripts/full-lean/patches', file), 'utf8');
   if (name === 'wasm-build') patch = patch.replace('8c9756b28d64dab099da31a4c09229a9e6a2ef35', expectedCommit);
   patches[name] = hash(patch);

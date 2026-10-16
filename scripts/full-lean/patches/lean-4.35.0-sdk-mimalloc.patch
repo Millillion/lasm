@@ -1,0 +1,88 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index a549e80..d2cb916 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -776,10 +776,17 @@ else()
+ endif()
+ configure_file("${LEAN_SOURCE_DIR}/config.h.in" "${LEAN_BINARY_DIR}/include/lean/config.h")
+ if(USE_MIMALLOC)
+-  file(
+-    COPY "${LEAN_BINARY_DIR}/../mimalloc/src/mimalloc/include/mimalloc.h"
+-    DESTINATION "${LEAN_BINARY_DIR}/include/lean"
+-  )
++  if(LASM_SDK_MIMALLOC)
++    # Emscripten supplies the allocator and its threading/linear-memory port.
++    # Compile Lean against that same header and link with -sMALLOC=mimalloc.
++    file(COPY "${LASM_MIMALLOC_INCLUDE}/mimalloc.h"
++      DESTINATION "${LEAN_BINARY_DIR}/include/lean")
++  else()
++    file(
++      COPY "${LEAN_BINARY_DIR}/../mimalloc/src/mimalloc/include/mimalloc.h"
++      DESTINATION "${LEAN_BINARY_DIR}/include/lean"
++    )
++  endif()
+ endif()
+ install(DIRECTORY ${LEAN_BINARY_DIR}/include/ DESTINATION include)
+ configure_file(${LEAN_SOURCE_DIR}/lean.mk.in ${LEAN_BINARY_DIR}/share/lean/lean.mk)
+diff --git a/src/runtime/CMakeLists.txt b/src/runtime/CMakeLists.txt
+index 1081927..933cd05 100644
+--- a/src/runtime/CMakeLists.txt
++++ b/src/runtime/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-if(USE_MIMALLOC)
++if(USE_MIMALLOC AND NOT LASM_SDK_MIMALLOC)
+   # `mimalloc.cpp` #includes all of mimalloc (`static.c`, compiled as C++ like everything else)
+   # together with the runtime's fused allocation entry point so mimalloc's fast path inlines into
+   # it.
+@@ -94,6 +94,11 @@ set(
+   uv/signal.cpp
+   openssl.cpp
+ )
++if(USE_MIMALLOC AND LASM_SDK_MIMALLOC)
++  # Emscripten links its own mimalloc (-sMALLOC=mimalloc); only the runtime's entry points are
++  # compiled here, against the SDK header, instead of `mimalloc.cpp` with Lean's mimalloc copy.
++  list(APPEND RUNTIME_OBJS lasm-sdk-mimalloc.cpp)
++endif()
+ 
+ add_library(leanrt_initial-exec STATIC ${RUNTIME_OBJS})
+ set_target_properties(leanrt_initial-exec PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+@@ -107,7 +112,7 @@ if(NOT MSVC)
+   target_compile_options(leanrt PRIVATE -ftls-model=local-exec)
+ endif()
+ # adds each variant's object to the archive; its `PRIVATE` flags do not propagate to the rest
+-if(USE_MIMALLOC)
++if(USE_MIMALLOC AND NOT LASM_SDK_MIMALLOC)
+   add_mimalloc_variant(mimalloc_initial-exec OBJECT ${LEAN_MI_SECURE})
+   add_mimalloc_variant(mimalloc_local-exec OBJECT ${LEAN_MI_SECURE} ${MIMALLOC_LOCAL_EXEC_OPTS})
+   target_link_libraries(leanrt_initial-exec PRIVATE mimalloc_initial-exec)
+diff --git a/src/runtime/lasm-sdk-mimalloc.cpp b/src/runtime/lasm-sdk-mimalloc.cpp
+new file mode 100644
+index 0000000..95c03ad
+--- /dev/null
++++ b/src/runtime/lasm-sdk-mimalloc.cpp
+@@ -0,0 +1,25 @@
++/*
++Lasm: allocation entry points for builds that link Emscripten's mimalloc
++(LASM_SDK_MIMALLOC). Upstream `mimalloc.cpp` compiles Lean's own mimalloc copy
++into the runtime; here the SDK supplies the allocator, so only the symbols the
++rest of the runtime and `lean.h` expect are defined, with the same observable
++behavior as Lean 4.34's inline `lean_alloc_small_object`: one heartbeat per
++small allocation, `mi_malloc_small`, and the exact aligned size in `m_cs_sz`.
++*/
++#include <lean/lean.h>
++#include "runtime/alloc.h"
++#include "runtime/debug.h"
++
++extern "C" __thread lean_runtime_tls lean_g_tls = { 0, nullptr };
++
++extern "C" void lean_mi_theap_cache_init(void) {}
++
++extern "C" LEAN_EXPORT LEAN_ATTR_MALLOC lean_object * lean_alloc_small_object_core(unsigned sz) {
++    lean_g_tls.heartbeat++;
++    lean_assert(sz > 0 && sz % LEAN_OBJECT_SIZE_DELTA == 0 && sz <= MI_SMALL_SIZE_MAX);
++    void * mem = mi_malloc_small(sz);
++    if (LEAN_UNLIKELY(mem == NULL)) lean_internal_panic_out_of_memory();
++    lean_object * o = (lean_object *)mem;
++    o->m_cs_sz = sz;
++    return o;
++}
