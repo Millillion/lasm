@@ -11,17 +11,18 @@ const attempts = () => confidencePlatforms.flatMap((platform, i) => [0, 12, 25].
   conclusion: 'success', coldPassed: true, offlineNpmInstall: true, networkPassed: true, resourcePassed: true,
 })));
 
-test('confidence requires all six targets, the exact candidate, three cold trials and real time separation', () => {
+test('confidence requires all six targets, the exact candidate and three consecutive cold trials', () => {
   const records = attempts();
   assert.equal(installationConfidence(candidate, records).passed, true);
   for (const change of [
     rows => rows.filter(r => r.platform !== 'win32-arm64'),
     rows => rows.filter(r => r.runId !== '3'),
-    rows => rows.map(r => ({ ...r, startedAt: '2026-09-29T01:00:00Z' })),
     rows => rows.map(r => ({ ...r, archiveSha256: 'c'.repeat(64) })),
     rows => rows.map(r => ({ ...r, packageSourceRevision: 'd'.repeat(40) })),
-    rows => rows.map(r => ({ ...r, startedAt: r.runId === '3' ? '2026-09-30T00:01:00Z' : '2026-09-29T23:59:00Z' })),
   ]) assert.equal(installationConfidence(candidate, change(records)).passed, false);
+  // Back-to-back campaigns qualify; time separation is no longer required.
+  const sameHour = records.map(r => ({ ...r, startedAt: new Date(Date.UTC(2026, 9, 16, 4) + Number(r.runId) * 60_000).toISOString() }));
+  assert.equal(installationConfidence(candidate, sameHour).passed, true);
 });
 
 test('green job status alone cannot replace cold/offline/network/resource evidence', () => {

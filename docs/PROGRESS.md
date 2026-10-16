@@ -11,7 +11,7 @@ architectures. A fresh full repetition is running in `36520825246`. Package byte
 and resource limits stayed unchanged. Original failures and the retained pending
 confidence report remain in [the report](INSTALLATION_HARDENING.md).
 
-Daily validation is active. The additional gate requires three consecutive cold
-passes per target spanning 24 hours and two dates. Preparation/resource failures
-reset the sequence. Temporal confidence remains pending; scheduled runs are
-best-effort. README reviewed; npm unpublished.
+Daily validation is active as monitoring. The additional gate requires three
+consecutive cold passes per target; campaigns may run back to back (the 24-hour,
+two-date requirement was removed on 2026-10-16). Preparation/resource failures
+reset the sequence. The gate remains pending; scheduled runs are best-effort. README reviewed; npm unpublished.

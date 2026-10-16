@@ -138,4 +138,4 @@ jobs:
           name="installation-confidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT.json"
           cp .work/installation-confidence.json ".work/$name"
           gh release upload "$CANDIDATE_RELEASE" ".work/$name"
-          node -e "const f=require('node:fs'),r=JSON.parse(f.readFileSync('.work/installation-confidence.json'));f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,(r.passed?'Multi-day gate passed':'Multi-day gate pending')+'\n\n'+JSON.stringify(r.platforms,null,2)+'\n\n'+r.limitation)"
+          node -e "const f=require('node:fs'),r=JSON.parse(f.readFileSync('.work/installation-confidence.json'));f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,(r.passed?'Repeated-install gate passed':'Repeated-install gate pending')+'\n\n'+JSON.stringify(r.platforms,null,2)+'\n\n'+r.limitation)"

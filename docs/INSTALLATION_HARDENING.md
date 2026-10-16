@@ -195,7 +195,7 @@ Two regression controls cover partial upload recovery and conflict rejection;
 a read-only probe verified reuse of the actual retained candidate without writes.
 
 The new packed candidate and full CLI/Lake network gates have passed all six
-targets, as recorded below. Observed multi-day confidence remains a separate gate
+targets, as recorded below. The repeated-installation confidence gate remains separate
 in [the plan](PLAN.md#installation-hardening-authorized-2026-09-28).
 
 The first `.47` attempt ([36510234373](https://github.com/Millillion/lasm/actions/runs/36510234373))
@@ -345,12 +345,14 @@ gh workflow run installation-confidence.yml --repo Millillion/lasm --ref main
 Its reviewed selection
 [`node-robustness-candidate.json`](../scripts/ci/node-robustness-candidate.json)
 selects the unchanged archive for repeated validation. Initial acceptance has
-passed on all six targets; the multi-day gate remains separate. All native repetitions
+passed on all six targets; the repeated-installation gate remains separate. All native repetitions
 start from fresh VMs and empty consumer tool/npm caches and use one exact archive.
 The source controls also rerun; each report records their revision separately.
 
 The gate requires three consecutive complete cold/offline/deployment/network passes per
-target, at least two UTC dates and 24 hours of separation. Duplicate job reports
+target. Campaigns may run back to back; the user removed the earlier requirement
+of two UTC dates and 24 hours of separation on 2026-10-16, and reports still
+record each sequence's dates and span for context. Duplicate job reports
 do not count twice. All original job attempts are collected; failed preparation,
 missing evidence, later failures and missing fault jobs prevent a passing latest
 campaign. Compact immutable reports stay with the retained draft; the last 30
@@ -398,5 +400,5 @@ vanish during enumeration or before restoration (`vanishedBeforeDenial`,
 `vanishedBeforeRestore`) instead of reporting cleanup errors. Explicit denial
 targets must still exist, and every other ACL error still fails closed. A
 native control removes a denied file during each restricted phase. The
-candidate bytes are unchanged. The multi-day gate restarts from the next
-complete campaign.
+candidate bytes are unchanged. Gate sequences restart from the next complete
+campaign.

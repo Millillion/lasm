@@ -20,8 +20,10 @@ export function unavailableInstallation(candidate, { runId, runAttempt, platform
 
 /** A practical regression gate, not a statistical reliability estimate. Keep
  * failed and interrupted attempts visible even when later attempts succeed.
+ * Consecutive clean campaigns may run back to back; dates and span are reported
+ * for context only (the user removed the multi-day requirement on 2026-10-16).
  */
-export function installationConfidence(candidate, attempts, { repetitions = 3, minimumSpanHours = 24 } = {}) {
+export function installationConfidence(candidate, attempts, { repetitions = 3 } = {}) {
   assert.match(candidate.sha256, /^[a-f0-9]{64}$/);
   assert.match(candidate.sourceRevision, /^[a-f0-9]{40}$/);
   const seen = new Set(), history = [];
@@ -53,9 +55,9 @@ export function installationConfidence(candidate, attempts, { repetitions = 3, m
       withoutDownloadRetries: successful.filter(a => a.firstAttemptSucceeded === true).length,
       recoveredDownloadRetries: successful.filter(a => a.firstAttemptSucceeded === false).length,
       coldSeconds: { samples: durations.length, median: percentile(0.5), p95: percentile(0.95), maximum: durations.at(-1) ?? null },
-      passed: clean.length >= repetitions && dates.length >= 2 && spanHours >= minimumSpanHours }];
+      passed: clean.length >= repetitions }];
   }));
-  return { schema: 1, candidate, requirements: { platforms: confidencePlatforms, repetitions, consecutive: true, minimumDays: 2, minimumSpanHours },
+  return { schema: 1, candidate, requirements: { platforms: confidencePlatforms, repetitions, consecutive: true },
     passed: confidencePlatforms.every(platform => platforms[platform].passed), platforms, attempts: history,
     limitation: 'Repeated hosted-runner checks plus deterministic faults increase practical confidence. They do not prove a 99.9% success rate or independence, and cannot guarantee arbitrary networks, disks or machines.' };
 }
