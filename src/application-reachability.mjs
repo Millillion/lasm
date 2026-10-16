@@ -79,7 +79,12 @@ export const reachabilityRegistry = 'void *lasm_lookup_lean_symbol(const char *n
 // An updated runtime must be reviewed before it can use this specialization.
 export function canSpecializeInitialization(runtime) {
   return ['4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf',
-    '4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d'].includes(runtime.identity);
+    '4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d',
+    // Lean 4.35.0 (CI handoff node-runtime-inputs-38960639129): init.cpp's default
+    // (non-LEAN_MINIMAL_CORE_INIT) path changed only in comments and
+    // runtime/init_module.cpp is byte-identical to 4.34.1; libleancpp links the
+    // default `initialize` object, not `initialize_minimal`.
+    '7482333e0a70a6aee12a540e11a48f31fd56c86761e7b3477f4a46ae310f80d3'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';
