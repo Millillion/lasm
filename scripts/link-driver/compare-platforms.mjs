@@ -9,7 +9,7 @@
 // node and emcc are also compared on the same platform. Objects, program.wasm
 // and program.cjs must be identical; link maps (paths normalized on each runner)
 // are reported, not required, because their path spelling is host-specific.
-import { existsSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { compareSides } from './compare.mjs';
@@ -23,7 +23,7 @@ function side(path) {
   (function walk(base, prefix) {
     for (const entry of readdirSync(base, { withFileTypes: true })) {
       if (entry.isDirectory()) walk(join(base, entry.name), prefix + entry.name + '/');
-      else names.push(prefix + entry.name);
+      else if (entry.name !== 'hashes.json') names.push(prefix + entry.name);
     }
   })(path, '');
   return { label: path, base: path, roots: [], names };
@@ -34,7 +34,13 @@ function compare(label, a, b) {
     if (!existsSync(join(a, fixture)) || !existsSync(join(b, fixture))) { comparisons.push({ label, fixture, missing: true, required: false }); continue; }
     const result = compareSides(side(join(a, fixture)), side(join(b, fixture)));
     const required = result.files.filter(file => !file.name.endsWith('.map'));
-    comparisons.push({ label, fixture, identical: result.identical, requiredIdentical: required.every(file => file.status === 'identical'),
+    // The probe link's reachability classification (build.json requirements) must agree too.
+    const requirements = side => JSON.stringify(JSON.parse(readFileSync(join(side, 'hashes.json'), 'utf8')).fixtures[fixture]?.requirements ?? null);
+    const sameRequirements = requirements(a) === requirements(b);
+    if (!sameRequirements) result.files.push({ name: 'requirements', status: 'different' });
+    comparisons.push({ label, fixture, identical: result.identical && sameRequirements,
+      requiredIdentical: sameRequirements && ['dist/program.wasm', 'dist/program.cjs'].every(name => required.some(file => file.name === name))
+        && required.every(file => file.status === 'identical'),
       files: result.files.map(({ name, status, offset, a: locationA, b: locationB }) => ({ name, status, offset, a: locationA, b: locationB })) });
   }
 }

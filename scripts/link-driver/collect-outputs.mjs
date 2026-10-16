@@ -22,9 +22,12 @@ for (const { name } of summary.fixtures) {
   const roots = Object.entries(build.paths).filter(([, value]) => typeof value === 'string')
     .map(([key, value]) => [key, value.replace(/[\\/]$/, '')]).filter(([, value]) => value.length > 1)
     .sort((x, y) => y[1].length - x[1].length);
-  hashes.fixtures[name] = {};
-  for (const file of Object.keys(build.build).filter(comparable)) {
-    const source = join(build.paths.build, file), target = join(out, name, file);
+  hashes.fixtures[name] = { requirements: build.requirements };
+  // build.json names files with the recording host's separator.
+  for (const recorded of Object.keys(build.build)) {
+    const file = recorded.replaceAll('\\', '/');
+    if (!comparable(file)) continue;
+    const source = join(build.paths.build, recorded), target = join(out, name, ...file.split('/'));
     mkdirSync(dirname(target), { recursive: true });
     if (file.endsWith('.map')) {
       let text = readFileSync(source, 'utf8');
