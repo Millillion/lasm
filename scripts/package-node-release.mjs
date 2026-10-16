@@ -9,6 +9,7 @@ import { verifyApplicationRuntime } from '../src/application-runtime.mjs';
 import { toolchainCatalog } from '../src/managed-lean.mjs';
 import { sdkCatalog } from '../src/managed-sdk.mjs';
 import { pythonCatalog } from '../src/managed-python.mjs';
+import { linkToolchainCatalog } from '../src/managed-link-toolchain.mjs';
 import { gitCatalog } from '../src/managed-git.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 import { buildPlatforms } from '../src/platform.mjs';
@@ -34,6 +35,8 @@ const platforms = process.env.LASM_CANDIDATE_PLATFORMS?.split(',') ?? buildPlatf
 assert.equal(new Set(platforms).size, platforms.length);
 for (const platform of platforms) {
   assert.ok(buildPlatforms.includes(platform), `Unsupported candidate platform: ${platform}`);
+  // The default link toolchain; the full SDK and Python remain for LASM_LINK_DRIVER=emcc.
+  assert.ok(linkToolchainCatalog.native[platform], `Missing managed link toolchain for ${platform}`);
   for (const catalog of [toolchainCatalog.lean[lean], sdkCatalog, pythonCatalog, gitCatalog])
     assert.ok(catalog.artifacts[platform], `Missing managed distribution for ${platform}`);
 }

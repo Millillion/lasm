@@ -98,9 +98,9 @@ test('recipe validation rejects malformed documents', () => {
   }
 });
 
-test('the link driver switch defaults to emcc', () => {
-  assert.equal(selectedLinkDriver(undefined), 'emcc');
-  assert.equal(selectedLinkDriver(''), 'emcc');
+test('the link driver switch defaults to the Node driver', () => {
+  assert.equal(selectedLinkDriver(undefined), 'node');
+  assert.equal(selectedLinkDriver(''), 'node');
   assert.equal(selectedLinkDriver('emcc'), 'emcc');
   assert.equal(selectedLinkDriver('node'), 'node');
   assert.equal(selectedLinkDriver('node-compile'), 'node-compile');

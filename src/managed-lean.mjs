@@ -1,8 +1,7 @@
-import { readFile, stat, mkdir, link, copyFile, symlink } from 'node:fs/promises';
-import { constants } from 'node:fs';
+import { readFile, stat } from 'node:fs/promises';
 import { join, dirname, resolve, toNamespacedPath } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { provisionArtifact, deriveArtifact, validateArtifact, managedCacheDirectory } from './managed-artifacts.mjs';
+import { provisionArtifact, deriveArtifact, validateArtifact, managedCacheDirectory, linkArtifactTree } from './managed-artifacts.mjs';
 import { assertSupportedHost, executableName } from './platform.mjs';
 import { verifyNativeProgram } from './native-program.mjs';
 import { windowsToolPrefix } from './windows-tool-paths.mjs';
@@ -45,29 +44,6 @@ export function leanDistribution(release, host, { distribution = 'tiers' } = {})
   return { kind: 'full', artifact: release.artifacts[host] };
 }
 
-/** Hard-link one verified artifact tree into a prefix under assembly. */
-async function linkArtifactTree(source, receipt, destination, owners, name) {
-  for (const [path, entry] of Object.entries(receipt.files).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) {
-    const target = join(destination, ...path.split('/'));
-    if (entry.type === 'directory') {
-      if (owners.has(path) && owners.get(path) !== 'directory') throw new Error(`Lean archive ${name} conflicts at ${path}`);
-      owners.set(path, 'directory');
-      await mkdir(target, { recursive: true });
-      continue;
-    }
-    if (owners.has(path)) throw new Error(`Lean archives ${owners.get(path)} and ${name} both contain ${path}`);
-    owners.set(path, name);
-    await mkdir(dirname(target), { recursive: true });
-    if (entry.type === 'symlink') { await symlink(entry.target, target); continue; }
-    const from = join(source, ...path.split('/'));
-    try { await link(from, target); }
-    catch (error) {
-      if (!['EXDEV', 'EPERM', 'EACCES', 'ENOTSUP', 'EMLINK'].includes(error.code)) throw error;
-      await copyFile(from, target, constants.COPYFILE_EXCL);
-    }
-  }
-}
-
 /** One physical prefix: Lean finds its sysroot from bin/../lib/lean. The
  * receipt-verified prefix is keyed by every component's identity; components
  * are only downloaded or rechecked when the prefix itself must be assembled. */
@@ -81,7 +57,7 @@ export async function assembleLeanPrefix(version, release, components, options =
     for (const { artifact, label } of components) {
       const installed = await provisionArtifact(artifact, { ...options, cache, label });
       options.progress?.({ stage: `Assembling Lean ${version}` });
-      await linkArtifactTree(installed.directory, installed.receipt, tree, owners, artifact.name);
+      await linkArtifactTree(installed.directory, installed.receipt, tree, owners, artifact.name, 'Lean archive');
     }
   }, { cache, log: options.log, signal: options.signal, progress: options.progress });
 }

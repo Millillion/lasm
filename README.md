@@ -34,7 +34,8 @@ node dist/main.mjs          # Run the deployment
 
 The first build needs internet access, downloads about 0.9–1.3 GB, and occupies
 several GB. Measured first builds took about 5–16 minutes. Current source, not
-yet accepted, downloads about 370 MB less Lean for an ordinary program; see
+yet accepted, downloads about 250–275 MB for an ordinary program (tiered Lean and
+a minimal compiler toolchain, no Python); see
 [toolchain slimming](docs/TOOLCHAIN_SLIMMING.md). The terminal shows progress
 and elapsed time. Later builds reuse verified tools and unchanged outputs. See
 [cache locations, requirements, and recovery](docs/NODE_SUPPORT.md).

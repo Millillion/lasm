@@ -25,11 +25,12 @@ See the [current acceptance report](https://github.com/Millillion/lasm/blob/main
 for exact artifact hashes, native CI results and measurements.
 
 The installed package contains the Lean Wasm runtime, standard-library archives,
-and host adapters. On the first build Lasm downloads pinned native Lean/Lake,
-Python and the Emscripten/LLVM/Binaryen SDK; Lake projects also provision Git.
+and host adapters. On the first build candidate `.46` downloads pinned native
+Lean/Lake, Python and the Emscripten/LLVM/Binaryen SDK; Lake projects also provision Git.
 HTTPS access to GitHub releases, Emscripten's Google Storage downloads and the npm
-registry is needed. Downloads, sizes and SHA-256 checksums are pinned in the
-package's `src/*tools.json` and `src/toolchains.json`. No global configuration or
+registry is needed (current source, below, needs no Google Storage download).
+Downloads, sizes and SHA-256 checksums are pinned in the
+package's `src/*tools.json`, `src/link-toolchain.json` (current source) and `src/toolchains.json`. No global configuration or
 administrator access is required.
 
 Pinned compressed tool downloads, including Git for a Lake project, total
@@ -41,10 +42,17 @@ unpacked tools and build caches occupy several GB. The acceptance report records
 observed disk usage, build times and deployment sizes separately. These are
 measurements of the identified candidate, not performance guarantees for other machines.
 Current source, not yet in an accepted candidate, replaces the complete Lean
-archive with [tiered archives](TOOLCHAIN_SLIMMING.md#phase-1-status-2026-10-16)
-on every supported target: on Linux x86-64 Lean's share falls from
-580,432,872 to 212,285,442 bytes for an ordinary program, and to 466,274,526
-bytes for a Lake project or a program importing `Lean`/`Lake`.
+archive with [tiered archives](TOOLCHAIN_SLIMMING.md#phase-1-status-2026-10-16),
+and the Emscripten SDK and Python with a
+[minimal compiler toolchain](TOOLCHAIN_SLIMMING.md#phase-2-milestone-d-2026-10-16-minimal-toolchain-node-driver-by-default)
+(clang, wasm-ld and Binaryen per platform, plus one shared archive with Emscripten's
+JavaScript compiler and a prebuilt system library tree, from this repository's
+GitHub releases). It never downloads or runs Python. Its first-build downloads
+for an ordinary program are 273,804,773 bytes on Linux x86-64, 273,188,656 on
+Linux ARM64, 260,697,629 on Intel Mac, 251,404,204 on Apple Silicon and
+253,189,823 on Windows x86-64; a Lake project or a program importing
+`Lean`/`Lake` downloads 593,063,076, 550,401,085, 580,822,773, 567,742,275 and
+554,298,728 bytes including Git.
 The current builder removes unreachable code and includes only the deployment
 architecture's native helpers. Current source builds reject runtime compiler,
 interpreter, module-data and plugin dependencies; they never package the large

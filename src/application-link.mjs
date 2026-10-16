@@ -9,7 +9,7 @@ import { readApplicationSymbols, readInitializationFreeCppSymbols } from './appl
 import { readApplicationLinkRequirements, reachabilityRegistry, canSpecializeInitialization, selectiveInitialization } from './application-reachability.mjs';
 import { requireAotApplication } from './application-policy.mjs';
 import { executableName, responseFile } from './platform.mjs';
-import { bundledRecipe, compileObject, emscriptenCache } from './link-driver/compile.mjs';
+import { bundledRecipe, checkToolchainIdentity, compileObject, emscriptenCache } from './link-driver/compile.mjs';
 import { bundledNativeSigs, linkTemporaryDirectory, linkWithNode, removeTemporary } from './link-driver/link.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
@@ -39,15 +39,19 @@ export function relabelPreJs(glue, files) {
   return result;
 }
 
-/** Experimental (docs/TOOLCHAIN_SLIMMING.md Phase 2), internal maintainer switch
- * LASM_LINK_DRIVER; the default remains emcc.
- *   'node'          compiles with the SDK's clang and performs both links with
- *                   the Node link driver (src/link-driver/link.mjs): no emcc and
- *                   no Python;
- *   'node-compile'  milestone B: Node/clang compiles, emcc still links. */
+/** Link drivers (docs/TOOLCHAIN_SLIMMING.md Phase 2), internal maintainer switch
+ * LASM_LINK_DRIVER:
+ *   'node'          the default: compiles with clang and performs both links with
+ *                   the Node link driver (src/link-driver/link.mjs) using the
+ *                   managed link toolchain (src/managed-link-toolchain.mjs): no
+ *                   emcc and no Python;
+ *   'emcc'          maintainer comparison and recording: emcc from the full
+ *                   managed SDK and its private Python;
+ *   'node-compile'  milestone B: Node/clang compiles, emcc still links (full SDK). */
 export const linkDrivers = Object.freeze(['emcc', 'node-compile', 'node']);
+export const defaultLinkDriver = 'node';
 export function selectedLinkDriver(value = process.env.LASM_LINK_DRIVER) {
-  if (value === undefined || value === '') return 'emcc';
+  if (value === undefined || value === '') return defaultLinkDriver;
   if (linkDrivers.includes(value)) return value;
   throw new Error(`Unsupported LASM_LINK_DRIVER ${JSON.stringify(value)}`);
 }
@@ -74,6 +78,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   if (nodeCompile && !existsSync(join(emscriptenCache(sdk), 'sysroot_install.stamp')))
     throw new Error('The Node compile driver needs installed Emscripten system headers (a prebuilt or emcc-initialized cache)');
   const recipe = nodeCompile ? bundledRecipe() : undefined;
+  if (nodeCompile) checkToolchainIdentity(recipe, sdk);
   // Tool diagnostics as emcc shows them: inherited with --verbose, else captured for the error reporter.
   const toolStdio = verbose ? ['ignore', 'inherit', 'inherit'] : ['ignore', 'pipe', 'pipe'];
   const runLink = (mode, args) => {

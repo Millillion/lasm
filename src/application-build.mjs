@@ -4,13 +4,13 @@ import { join, resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
 import { provisionLean, selectLeanVersion, toolchainCatalog } from './managed-lean.mjs';
-import { provisionSdk, sdkCatalog } from './managed-sdk.mjs';
+import { provisionLinkToolchain, linkToolchainCatalog } from './managed-link-toolchain.mjs';
 import { provisionGit } from './managed-git.mjs';
 import { hashFile, managedCacheDirectory } from './managed-artifacts.mjs';
 import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject } from './application-sources.mjs';
-import { linkApplication } from './application-link.mjs';
+import { linkApplication, selectedLinkDriver } from './application-link.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint } from './application-output.mjs';
 import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './application-files.mjs';
 import { withApplicationLock } from './application-lock.mjs';
@@ -55,7 +55,13 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const runtime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit }, { directory: runtimeDirectory });
   if (!progress) log(`Preparing Lean ${selection.version} for Node…`);
   const lean = await provisionLean(source, { cache, log, progress });
-  if (sdkCatalog.version !== runtime.manifest.emscripten) throw new Error('The managed SDK and application runtime do not match');
+  // The default Node link driver uses the minimal link toolchain. The emcc and
+  // node-compile maintainer drivers (LASM_LINK_DRIVER) need the full SDK and its
+  // private Python, which ordinary builds never download.
+  const linkDriver = selectedLinkDriver();
+  const sdkCatalog = linkDriver === 'node' ? undefined : (await import('./managed-sdk.mjs')).sdkCatalog;
+  const emscripten = linkDriver === 'node' ? linkToolchainCatalog.version : sdkCatalog.version;
+  if (emscripten !== runtime.manifest.emscripten) throw new Error('The managed compiler tools and application runtime do not match');
   const project = findApplicationProject(source), directory = project ?? dirname(source);
   const git = project ? await provisionGit({ cache, log, progress }) : undefined;
   const work = join(directory, '.lake/lasm/applications', digest(source).slice(0, 16));
@@ -73,7 +79,10 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // identities of the binaries and every module-data archive it contains.
   const recipe = { schema: 1, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
     ...(lean.distribution === 'tiers' ? { nativeLeanTier: lean.tier, nativeLeanComponents: lean.components } : {}),
-    emscripten: sdkCatalog.version, sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)),
+    // Outputs of different link drivers and tool sets never share a cache entry.
+    emscripten, linkDriver, ...(linkDriver === 'node'
+      ? { linkToolchainIdentity: digest(JSON.stringify(linkToolchainCatalog)) }
+      : { sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)) }),
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
     applicationPolicy,
@@ -88,17 +97,18 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     await deliverOutput(cached, output, signature);
     return { ...JSON.parse(await readFile(join(cached, 'build-info.json'), 'utf8')), output, cached, signature, cacheHit: true };
   }
-  // No compiler SDK code runs on an unchanged application. Its catalog and
-  // reviewed driver repairs are still part of the cache identity. Revalidate
-  // the full SDK/Python trees when compilation actually needs to execute them.
-  const sdk = await provisionSdk({ cache, log, progress });
+  // No compiler tool runs on an unchanged application. The tool catalog and
+  // link driver are still part of the cache identity. Revalidate the tools only
+  // when compilation actually needs to execute them.
+  const sdk = linkDriver === 'node' ? await provisionLinkToolchain({ cache, log, progress })
+    : await (await import('./managed-sdk.mjs')).provisionSdk({ cache, log, progress });
   if (!progress) log(`Building ${relative(process.cwd(), source) || source} for Node…`);
   const temporary = join(work, '.build-' + randomUUID()), dist = join(temporary, 'dist');
   await mkdir(dist, { recursive: true });
   let linkRequirements;
   try {
     linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
-      leanVersion: lean.version, memoryMode, verbose, progress });
+      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver });
   } catch (error) {
     // This unique staging directory contains only this failed build's files.
     // Preserve any previously delivered application and avoid retaining probes.
@@ -111,7 +121,8 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   });
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));
   const buildInfo = { ...recipe, signature, linkRequirements,
-    sdkIdentity: sdk.identity, sdkDriverIdentity: sdk.driverIdentity };
+    ...(linkDriver === 'node' ? { linkToolchain: { identity: sdk.identity, ...sdk.toolchain } }
+      : { sdkIdentity: sdk.identity, sdkDriverIdentity: sdk.driverIdentity }) };
   await writeFile(join(dist, 'build-info.json'), JSON.stringify(buildInfo, null, 2) + '\n');
   await writeFile(join(dist, outputReceipt), JSON.stringify({ schema: 1, signature, files: await fileInventory(dist) }) + '\n');
   await mkdir(dirname(cached), { recursive: true });

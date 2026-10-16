@@ -1296,5 +1296,16 @@
         ]
       }
     }
+  },
+  "toolchain": {
+    "release": "emscripten-6.0.9-lasm-toolchain-v1",
+    "shared": "e09719566086f42818ea7c11230ccbfa23c717d22862effa3e233ff4dc2bbee2",
+    "native": {
+      "darwin-arm64": "5de66ef7a7ae7afa01cae1fc51654d60ce073a87092a877e46d55db56a7e6430",
+      "darwin-x64": "2eb1b8fad4c8c7419575cdc388f2c8eafe9e3d944cbc2175b69ae814f6bab5ff",
+      "linux-arm64": "69fb3dd63a6f9eadf93edaa079bc103359d74ab633791f13aac66f6aedd7fd69",
+      "linux-x64": "e3f417bc9d5525c303a35fe8c4ab2d6229f8b45a44f2edd40b3c191fb0e67de7",
+      "win32-x64": "65d55d5788047b733859594f5c810cf9bb4463ec37ead83752cc631d84079865"
+    }
   }
 }

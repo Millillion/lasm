@@ -368,7 +368,7 @@ The installer fault suite passed under the guard (151 passed, 3 skipped, 0 faile
 
 ## Phase 2 milestone C (2026-10-16): link, metadata and glue in Node
 
-Experimental and not the default: `lasm build` still compiles and links with emcc.
+Experimental when written; milestone D (below) made `node` the default. At milestone C `lasm build` still compiled and linked with emcc.
 With the internal `LASM_LINK_DRIVER=node`, `linkApplication` compiles with clang
 (milestone B) and performs both the `-O0` reachability probe link and the final
 `-Oz -g1` link without emcc, em++ or Python. Linux x86-64, Node 24.13.1, managed
@@ -501,7 +501,7 @@ templates; DCE graph; recipe) and the updated `test/link-driver-compile.test.mjs
 The installer fault suite passed under the guard (151 passed, 3 skipped, 0 failed;
 `.work/link-driver/installer-faults-c-1792160859.json`).
 
-### Plan for milestone D: minimal toolchain
+### Plan for milestone D: minimal toolchain (implemented; see milestone D below)
 
 1. **Artifact.** A per-platform toolchain archive with only what `node` mode runs:
    `clang` (+ its resource headers), `wasm-ld`, `llvm-objcopy`, `llvm-nm`,
@@ -524,3 +524,191 @@ The installer fault suite passed under the guard (151 passed, 3 skipped, 0 faile
    platforms and against an emcc-linked build of the same candidate, the installer
    fault suite, and the cold-installation gate. Windows is first exercised there
    (`.exe` names, path separators, response-file quoting).
+
+## Phase 2 milestone D (2026-10-16): minimal toolchain, Node driver by default
+
+Implemented in source; **not yet in an accepted candidate**. Released candidates
+still download the full Emscripten SDK and Python and link with emcc.
+
+### Archives
+
+[`scripts/link-driver/build-toolchain.mjs`](../scripts/link-driver/build-toolchain.mjs)
+checks each pinned emsdk archive in `src/sdk-tools.json` (SHA-256 and size) and
+writes, deterministically (Phase 1's sorted tar writer, fixed owner/mode/mtime,
+zstd 19, 2^27 window, long-distance matching; packed twice and compared):
+
+- `emscripten-6.0.9-<platform>-tools`: `clang`, `wasm-ld`, `llvm-objcopy`,
+  `llvm-nm`, `wasm-opt`, `wasm-emscripten-finalize`, `wasm-metadce` (with the
+  upstream symlinks `clang -> clang-24` and `wasm-ld -> lld` on Linux and macOS),
+  clang's resource headers (`lib/clang/24/include`), the shared libraries the
+  programs' own ELF/Mach-O/PE import tables name inside the archive (none on any
+  platform: Binaryen and LLVM are statically linked), the LLVM (`llvm`, `clang`,
+  `lld`) and Binaryen licence texts from the source commits named by the
+  emscripten-releases DEPS file (the emsdk archive carries none), and a NOTICE with
+  the upstream URL, SHA-256 and sources. Only OS libraries stay external: glibc,
+  `libgcc_s`, `libz` (Linux); `libSystem`, `libz` (macOS); Windows system DLLs.
+- `emscripten-6.0.9-lasm-shared`: `emscripten/` is the subset the Node driver
+  uses (`src/`, `tools/*.mjs`, `acorn`, `acorn-import-phases`, `third_party/terser`,
+  `LICENSE`, `AUTHORS`, version file, the licence texts under `system/`) with the
+  reviewed repairs of `src/lib/libpthread.js`, `src/lib/libdylink.js` and
+  `emscripten-version.txt`; the other repairs patch the Python driver (omitted) or
+  the system-library sources compiled into the sysroot. `cache/` is the prebuilt
+  sysroot `b8fd589b…` (milestone B). 175 Emscripten files, 1,911 members in all.
+
+| Archive | Compressed | Unpacked | SDK + Python today |
+| --- | --- | --- | --- |
+| `linux-x64-tools` | 58,160,064 | 306,057,658 | 333,352,621 |
+| `linux-arm64-tools` | 55,647,283 | 308,529,667 | 305,735,497 |
+| `darwin-x64-tools` | 51,135,721 | 273,670,118 | 288,988,586 |
+| `darwin-arm64-tools` | 43,627,516 | 262,482,501 | 300,623,823 |
+| `win32-x64-tools` | 41,593,397 | 208,728,579 | 676,106,426 |
+| `lasm-shared` (all platforms) | 3,359,267 | 31,396,035 | — |
+
+The compiler toolchain download falls by 82–93% (Linux x86-64: 333,352,621 to
+61,519,331 bytes, native plus shared).
+
+**Determinism and equality.** [`link-toolchain.yml`](../.github/workflows/link-toolchain.yml)
+([run 38921486487](https://github.com/Millillion/lasm/actions/runs/38921486487))
+built the sysroot on linux-x64 and linux-arm64, repackaged all five emsdk archives
+twice each, and packed the shared archive from every platform's emsdk archive with
+the same sysroot: all five produced the identical shared archive `e0971956…`
+(Emscripten subset digest `8ac5e1ef…`). The local Linux x86-64 build (Node 24.13.1)
+reproduced CI's (Node 26.10.0) native and shared bytes. Two host-dependent inputs
+were found and handled ([run 38919510116](https://github.com/Millillion/lasm/actions/runs/38919510116)):
+
+- The Windows emsdk archive alone writes `emscripten-revision.txt` with CRLF. Nothing
+  in the subset reads it, so it is omitted; the NOTICE names the revision. All other
+  Emscripten files are byte-identical in the five archives.
+- The sysroot built on linux-arm64 differs from the linux-x64 one (`b8fd589b…`, also
+  rebuilt identically in CI) only in two `libc-mt.a`/`libc-mt-debug.a` member
+  names: emcc's libc build walks musl's tree in directory-listing order
+  (`tools/system_libs.py`, `os.walk` unsorted) and suffixes the second of `_Exit.c`
+  and `_exit.c` (`_Exit__1.o`/`_exit.o` versus `_Exit.o`/`_exit__1.o`). Member
+  order, offsets and contents are identical. The workflow accepts exactly this
+  ([`compare-sysroots.mjs`](../scripts/link-driver/compare-sysroots.mjs)) and ships the
+  linux-x64 sysroot, so every user now links against the same libraries; with emcc,
+  each user's SDK cache built its own.
+
+The workflow then smoke-tested every native archive on its own runner (each tool's
+executable header and `--version`, and a pthread C file compiled with the recipe's
+clang command, linked with `wasm-ld`, inspected with `llvm-nm`, stripped,
+finalized, optimized and metadce'd): all outputs are byte-identical across the five
+platforms. It published the archives with their reports, `link-toolchain.json` and
+`SHA256SUMS` as the public release
+[`emscripten-6.0.9-lasm-toolchain-v1`](https://github.com/Millillion/lasm/releases/tag/emscripten-6.0.9-lasm-toolchain-v1).
+
+### Product path
+
+- `src/link-toolchain.json` names both archives per platform (URLs, SHA-256, sizes,
+  extraction bounds) and the external OS libraries.
+- [`src/managed-link-toolchain.mjs`](../src/managed-link-toolchain.mjs) downloads
+  and verifies both archives and hard-links them into one receipt-verified prefix
+  under `derived/` keyed by both identities (`bin/`, `lib/clang`, `emscripten/`,
+  `cache/`), checks every program's executable header and the Emscripten version,
+  and returns the tools with no `emcc` and no Python. Later builds verify only the
+  prefix; `lasm cache repair` verifies and rebuilds it offline like the Lean prefixes.
+  `tar.zst` archives are decoded by Node, so the user path never needs Python.
+- **Default driver** is `node`. `LASM_LINK_DRIVER=emcc` (or `node-compile`) selects the
+  full SDK and its private Python for maintainer comparison and recording; only
+  then are they downloaded or loaded.
+- **Recipe identity.** `recipe.mjs --bind-toolchain` writes the published
+  archive digests into the recipe (`toolchain`); `checkToolchainIdentity` refuses to
+  compile or link with any other native or shared archive (or, for maintainer
+  recordings, any SDK but the recorded one). Procedure for an Emscripten or flag
+  change: record, `recipe.mjs --derive`, `gate-link.mjs`, `build-sysroot.mjs`,
+  `link-toolchain.yml`, `--bind-toolchain`.
+- **Build cache identity** records the link driver and the link-toolchain catalog
+  (emcc builds keep the SDK catalog), so outputs of different drivers never share a
+  cache entry. `build-info.json` records the toolchain prefix and archive identities.
+
+### Validation (Linux x86-64, local)
+
+The real CLI (`node bin/lasm.mjs build`, from a copy of this source with the
+packaging step's runtime catalog, runtime `4d3d6c60…`) with a fresh, empty
+`LASM_TOOLCHAIN_CACHE`, `PATH` containing only Node, Python variables unset and
+[`spawn-audit.mjs`](../scripts/link-driver/spawn-audit.mjs) preloaded through
+`NODE_OPTIONS`, built the four milestone fixtures with the default driver
+(`.work/link-toolchain/cli-1`, repeated after the response-file change below as
+`cli-2`; guard peak 3.66 GiB):
+
+- `program.wasm` and `program.cjs` are byte-identical to the emcc reference
+  `ref-c-debug` for `hello`, `FilesystemSurface`, `TcpErrorPhases` and
+  `BundleFeaturesLegacy`. All four applications run (`Hello from Lean! 2 + 3 = 5`,
+  `filesystem surface checks passed`, `TCP error phases checked`, `features passed`).
+- Processes started: `lean`, `clang`, `llvm-nm`, `wasm-ld`, `llvm-objcopy`,
+  `wasm-emscripten-finalize`, `wasm-opt`, `wasm-metadce` and Node (`compiler.mjs`,
+  `acorn-optimizer.mjs`, the applications). No Python, no emcc.
+- Downloaded: the Lean tiers and the two toolchain archives only; no SDK or Python
+  artifact exists in the cache. **First build of an ordinary program (`hello`):
+  273,804,773 bytes** (Lean binaries 40,565,096, Init/Std data 171,720,346,
+  toolchain 61,519,331), **116 s and 167 s cold** in two runs on this host (`cli-1`,
+  `cli-2`; downloads, extraction, prefix assembly, Lean and both links; the
+  difference is download time). Filesystem and TCP then took 36 s each;
+  `BundleFeaturesLegacy` 174–181 s, including the 253,989,084-byte extended Lean tier.
+- A full recording from the release archives (`record-emcc.mjs --toolchain`,
+  `.work/link-toolchain/node-d1`) is identical to `ref-c-debug` for all 28 files
+  (objects, both maps, `program.wasm`, `program.cjs`).
+- `LASM_LINK_DRIVER=emcc` still builds `hello` through the full SDK and Python, into a
+  separate cache entry; its `program.cjs` is identical and `program.wasm` differs only
+  in the 117 mimalloc build-date bytes of that older SDK cache (milestone B).
+- Installer fault suite under the guard: 158 tests, 155 passed, 3 skipped, 0 failed
+  (now including `test/managed-link-toolchain.test.mjs`).
+
+First-build downloads for an ordinary program (Lean tiers plus toolchain) by
+platform: Linux x86-64 273,804,773; Linux ARM64 273,188,656; Intel Mac 260,697,629;
+Apple Silicon 251,404,204; Windows x86-64 253,189,823 bytes. Lake projects add the
+extended Lean tier and Git: 593,063,076; 550,401,085; 580,822,773; 567,742,275;
+554,298,728 bytes.
+
+### Cross-platform outputs
+
+[`link-toolchain-fixtures.yml`](../.github/workflows/link-toolchain-fixtures.yml)
+([run 38928705615](https://github.com/Millillion/lasm/actions/runs/38928705615))
+downloads the published archives on each native runner (Ubuntu 24.04 x86-64 and
+ARM64, macOS 15 Intel and Apple Silicon, Windows Server 2025), verifies them
+against the release's `link-toolchain.json`, builds `hello` and `FilesystemSurface`
+with the Node driver from source (`record-emcc.mjs --toolchain`, retained `.46`
+runtime `4d3d6c60…`, no SDK and no Python), runs both applications, and links the
+same fixtures with emcc from the full SDK on the same runner (same prebuilt
+sysroot, frozen). [`compare-platforms.mjs`](../scripts/link-driver/compare-platforms.mjs)
+then compares objects, `program.wasm`, `program.cjs`, the probe link's
+reachability requirements and the link maps:
+
+| Platform | Node vs linux-x64 Node | Node vs emcc on the same runner |
+| --- | --- | --- |
+| linux-x64 | (reference) | identical, maps included |
+| linux-arm64 | identical, maps included | identical, maps included |
+| darwin-x64 | identical, maps included | identical, maps included |
+| darwin-arm64 | identical, maps included | identical, maps included |
+| win32-x64 | identical objects, programs and requirements; maps differ | identical objects, programs and requirements; maps differ |
+
+`program.wasm`/`program.cjs` for `hello` are `72de0b13…`/`14d212c1…` on all five,
+equal to the Linux emcc reference; both applications ran on every runner. Earlier
+attempts showed two Windows-only effects of the CI checkout, not of the toolchain:
+Windows runners convert line endings by default, which changed the hash-checked
+`native-sigs` table (the workflow now checks out repository bytes, as an npm
+package carries them).
+
+**Windows link maps.** The Node driver passed wasm-ld its arguments through an
+Emscripten-format response file every time. Emscripten escapes backslashes in
+response files, and wasm-ld on Windows reads them with Windows quoting, which keeps
+both backslashes, so input names appear as `D:\\a\\…\\module-0.o` in the map. emcc
+uses a response file only when `shlex.join(cmd)` exceeds 7,000 characters
+(`tools/building.py`), and passed these links' arguments directly. The maps are
+build-time inputs to the reachability check, which accepts either separator
+(identical requirements above), and do not reach the outputs. Current source now
+makes the same choice as emcc (`needsResponseFile`, unit-tested; on Linux the CLI
+validation above ran every wasm-ld without a response file and stayed identical).
+This fix is not yet exercised on a Windows runner: the fixtures workflow runs the
+committed driver.
+
+### Remaining (Phase 3 and acceptance)
+
+- A packed candidate with this source on all five native targets, the installer
+  fault suite there and the three-consecutive cold-installation gate.
+- npm distribution: the per-platform tools archives as `optionalDependencies`
+  packages and the shared archive with the Lean data packages (all below the
+  ~150 MB ceiling), fetched through npm; Verdaccio validation on the five runners.
+- Retire `src/managed-sdk.mjs`/`src/managed-python.mjs` from the package once one
+  candidate has compared emcc and Node outputs; they remain maintainer tools for
+  recordings, `build-sysroot.mjs` and the Windows resource guard.

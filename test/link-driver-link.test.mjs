@@ -11,7 +11,7 @@ import { Settings, instantiateSettings } from '../src/link-driver/settings.mjs';
 import { asmjsMangle, createAsmConsts, createEmJs, makeInvoke, makeWasm64Wrapper, createSending, createReceiving,
   assembleGlue, handleLicense, trimAsmConstBody, updateSettingsGlue, addUnexpectedExports, checkSupportedSettings,
   createPointerConversionWrappers } from '../src/link-driver/glue.mjs';
-import { emscriptenResponseFile, parseLinkArguments, expandArguments, stubObject, linkerExports, addJsDependencies,
+import { emscriptenResponseFile, shlexJoin, needsResponseFile, responseFileThreshold, parseLinkArguments, expandArguments, stubObject, linkerExports, addJsDependencies,
   prepareDceGraph, unusedFromMetadce, bundledNativeSigs } from '../src/link-driver/link.mjs';
 import { bundledRecipe } from '../src/link-driver/compile.mjs';
 
@@ -273,4 +273,11 @@ test('the bundled recipe has both link modes and its native signature table', ()
   const sigs = bundledNativeSigs(recipe);
   assert.equal(Object.keys(sigs).length, recipe.link.nativeSigs.entries);
   assert.equal(sigs.malloc, 'pp');
+});
+
+test('wasm-ld gets a response file only where emcc would use one', () => {
+  assert.equal(shlexJoin(['/sdk/bin/wasm-ld', '-o', 'a b', "it's", '', '--export=_main', 'C:\\x.o', 'λ']),
+    `/sdk/bin/wasm-ld -o 'a b' 'it'"'"'s' '' --export=_main 'C:\\x.o' 'λ'`);
+  assert.equal(needsResponseFile(['wasm-ld', 'x'.repeat(responseFileThreshold - 8)]), false);
+  assert.equal(needsResponseFile(['wasm-ld', 'x'.repeat(responseFileThreshold - 7)]), true);
 });

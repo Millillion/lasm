@@ -33,6 +33,19 @@ export function emscriptenResponseFile(args, platform = process.platform) {
   }).join('');
 }
 
+/** Python shlex.join, whose length tools/building.py measures. */
+export function shlexJoin(args) {
+  return args.map(arg => !arg ? "''" : /[^\w@%+=:,./-]/.test(arg) ? `'${arg.replaceAll("'", `'"'"'`)}'` : arg).join(' ');
+}
+/** tools/building.py get_command_with_possible_response_file: emcc passes the
+ * arguments directly unless shlex.join(cmd) exceeds 7000 characters. The choice
+ * matters on Windows, where wasm-ld reads response files with Windows quoting and
+ * so keeps the escaped (doubled) backslashes in input names (visible in maps). */
+export const responseFileThreshold = 7000;
+export function needsResponseFile(command) {
+  return [...shlexJoin(command)].length > responseFileThreshold;
+}
+
 /** Split Lasm's em++ arguments into what the recipe records as fixed flags and
  * the per-application inputs. Inputs and -Wl, flags keep their order (they
  * become wasm-ld's input list); --start-group/--end-group are dropped as
@@ -178,9 +191,11 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   const linkStep = next('wasm-ld');
   const { exports, exportIfDefined } = linkerExports(settings, jsSyms);
   const linkArgs = expandArguments(linkStep.args, { ...values, stub, exports, 'export-if-defined': exportIfDefined }, platform);
-  const responseFile = paths.join(temp, 'wasm-ld.rsp');
-  writeFileSync(responseFile, emscriptenResponseFile(linkArgs, platform));
-  run(linkStep.program, ['@' + responseFile]);
+  if (needsResponseFile([tool(linkStep.program), ...linkArgs])) {
+    const responseFile = paths.join(temp, 'wasm-ld.rsp');
+    writeFileSync(responseFile, emscriptenResponseFile(linkArgs, platform));
+    run(linkStep.program, ['@' + responseFile]);
+  } else run(linkStep.program, linkArgs);
 
   // finalize_wasm: strip sections, extract metadata, wasm-emscripten-finalize.
   saveFile('base.wasm', wasm);

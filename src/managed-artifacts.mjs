@@ -1,5 +1,6 @@
 import { createReadStream } from 'node:fs';
-import { mkdir, readFile, readdir, readlink, lstat, realpath, rename, writeFile, symlink, link } from 'node:fs/promises';
+import { mkdir, readFile, readdir, readlink, lstat, realpath, rename, writeFile, symlink, link, copyFile } from 'node:fs/promises';
+import { constants } from 'node:fs';
 import { dirname, join, resolve, relative, isAbsolute, posix } from 'node:path';
 import { homedir } from 'node:os';
 import { createHash } from 'node:crypto';
@@ -295,4 +296,27 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
     .catch(error => { throw storageDiagnostic(error, cache); });
   pending.set(directory, operation);
   try { return await operation; } finally { pending.delete(directory); }
+}
+
+/** Hard-link one verified artifact tree into a prefix under assembly. */
+export async function linkArtifactTree(source, receipt, destination, owners, name, kind = 'Archive') {
+  for (const [path, entry] of Object.entries(receipt.files).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) {
+    const target = join(destination, ...path.split('/'));
+    if (entry.type === 'directory') {
+      if (owners.has(path) && owners.get(path) !== 'directory') throw new Error(`${kind} ${name} conflicts at ${path}`);
+      owners.set(path, 'directory');
+      await mkdir(target, { recursive: true });
+      continue;
+    }
+    if (owners.has(path)) throw new Error(`${kind}s ${owners.get(path)} and ${name} both contain ${path}`);
+    owners.set(path, name);
+    await mkdir(dirname(target), { recursive: true });
+    if (entry.type === 'symlink') { await symlink(entry.target, target); continue; }
+    const from = join(source, ...path.split('/'));
+    try { await link(from, target); }
+    catch (error) {
+      if (!['EXDEV', 'EPERM', 'EACCES', 'ENOTSUP', 'EMLINK'].includes(error.code)) throw error;
+      await copyFile(from, target, constants.COPYFILE_EXCL);
+    }
+  }
 }

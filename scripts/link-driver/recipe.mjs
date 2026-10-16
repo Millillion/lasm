@@ -4,6 +4,10 @@
 //   node scripts/link-driver/recipe.mjs RUN            (re)write RUN/recipe.json
 //   node scripts/link-driver/recipe.mjs --combine OUT.json RUN [RUN...]
 //                                     cross-fixture recipe comparison
+//   node scripts/link-driver/recipe.mjs --derive OUT RUN SYSROOT_JSON
+//                                     the product recipe (then gate-link.mjs)
+//   node scripts/link-driver/recipe.mjs --bind-toolchain RECIPE LINK_TOOLCHAIN_JSON TAG
+//                                     bind it to the published link toolchain
 //
 // All absolute paths are replaced by placeholders (<build>, <work>, <runtime>,
 // <lasm>, <sdk>, <emscripten>, <state>, <node>, <python>, <temp>, ...), so recipes
@@ -329,9 +333,31 @@ export function deriveProductRecipe(run, { sysrootManifest, nativeSigsOut } = {}
   return recipe;
 }
 
+/** Bind a derived recipe to the published link-toolchain archives (milestone D):
+ * the product refuses to run the recipe against any other tool identities
+ * (src/link-driver/compile.mjs checkToolchainIdentity). The catalog must be
+ * scripts/link-driver/toolchain-catalog.mjs output for this Emscripten version,
+ * built from the recipe's own sysroot archive. */
+export function bindToolchain(recipe, catalog, release) {
+  if (!/^[A-Za-z0-9._-]+$/.test(release ?? '')) throw new Error('Name the release tag that publishes the archives');
+  if (catalog.version !== recipe.emscripten) throw new Error(`The toolchain is Emscripten ${catalog.version}; the recipe ${recipe.emscripten}`);
+  if (!recipe.sysroot.archive || catalog.sysroot?.sha256 !== recipe.sysroot.archive.sha256)
+    throw new Error('The toolchain was not built from the recipe\'s sysroot archive');
+  for (const artifact of [catalog.shared, ...Object.values(catalog.native)])
+    if (!artifact.url.includes(`/releases/download/${release}/`)) throw new Error(`${artifact.name} is not published by ${release}`);
+  return { ...recipe, toolchain: { release, shared: catalog.shared.sha256,
+    native: Object.fromEntries(Object.entries(catalog.native).sort(([a], [b]) => a < b ? -1 : 1).map(([host, artifact]) => [host, artifact.sha256])) } };
+}
+
 if (resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
-  if (args[0] === '--derive') {
+  if (args[0] === '--bind-toolchain') {
+    // --bind-toolchain RECIPE LINK_TOOLCHAIN_JSON RELEASE_TAG (rewrites RECIPE)
+    const [, file, catalogFile, release] = args;
+    const recipe = bindToolchain(JSON.parse(readFileSync(file, 'utf8')), JSON.parse(readFileSync(catalogFile, 'utf8')), release);
+    writeFileSync(file, JSON.stringify(recipe, null, 2) + '\n');
+    console.log(`bound ${file} to ${release}`);
+  } else if (args[0] === '--derive') {
     // --derive OUT RUN [SYSROOT_MANIFEST]
     const [, out, run, manifest] = args;
     const sysroot = manifest ? JSON.parse(readFileSync(manifest, 'utf8')) : undefined;

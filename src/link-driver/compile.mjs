@@ -1,8 +1,7 @@
-// Phase 2 Node link driver, milestone B: compile Lasm's generated C directly
-// with the SDK's clang, using the clang driver arguments that emcc was
-// recorded passing (docs/TOOLCHAIN_SLIMMING.md). Not the default: only
-// src/application-link.mjs with compileDriver 'node' (LASM_LINK_DRIVER=node)
-// uses it, and emcc still performs every link.
+// Phase 2 Node link driver (docs/TOOLCHAIN_SLIMMING.md): compile Lasm's
+// generated C directly with clang, using the clang driver arguments that emcc
+// was recorded passing. src/application-link.mjs uses it for the default 'node'
+// driver (with src/link-driver/link.mjs) and the maintainer 'node-compile' mode.
 //
 // All Emscripten-specific knowledge lives in the versioned recipe file, which
 // scripts/link-driver/recipe.mjs --derive writes from an EMCC_DEBUG recording:
@@ -49,6 +48,12 @@ export function parseRecipe(input) {
   if (!Array.isArray(recipe.sysroot?.libraries) || recipe.sysroot.libraries.some(name => !/^[A-Za-z0-9_+.-]+\.(?:a|o)$/.test(name)))
     fail('sysroot.libraries must list archive or object names');
   if (recipe.link !== undefined) validateLink(recipe.link, fail);
+  if (recipe.toolchain !== undefined) {
+    const { toolchain } = recipe, hash = value => /^[a-f0-9]{64}$/.test(value ?? '');
+    if (!/^[A-Za-z0-9._-]+$/.test(toolchain.release ?? '') || !hash(toolchain.shared) || !toolchain.native
+        || !Object.keys(toolchain.native).length || Object.entries(toolchain.native).some(([host, sha]) => !/^[a-z0-9]+-[a-z0-9]+$/.test(host) || !hash(sha)))
+      fail('invalid toolchain identities');
+  }
   return deepFreeze(recipe);
 }
 
@@ -141,10 +146,25 @@ export function clangCommand(recipe, { sdkPrefix, env = process.env, platform = 
     env: { ...env, ...recipe.compile.env } };
 }
 
-/** The Emscripten cache whose sysroot emcc would pass to clang. EM_CACHE
- * (a prebuilt, frozen cache) overrides the managed SDK state's own cache. */
+/** The Emscripten cache whose sysroot emcc would pass to clang: the managed link
+ * toolchain's prebuilt cache, else EM_CACHE (a prebuilt, frozen cache), else the
+ * managed SDK state's own cache. */
 export function emscriptenCache(sdk) {
-  return sdk.env?.EM_CACHE || path.join(sdk.state, 'cache');
+  return sdk.cache ?? (sdk.env?.EM_CACHE || path.join(sdk.state, 'cache'));
+}
+
+/** The recipe runs only against the tools it was recorded and verified with:
+ * the published link-toolchain archives it names (recipe.toolchain), or, for
+ * maintainer recordings and gates, the repaired SDK it was recorded from. */
+export function checkToolchainIdentity(recipe, sdk) {
+  if (sdk.toolchain) {
+    const expected = recipe.toolchain;
+    if (expected && expected.shared === sdk.toolchain.shared && expected.native[sdk.platform] === sdk.toolchain.native) return 'toolchain';
+    throw new Error(`The link-driver recipe for Emscripten ${recipe.emscripten} was not verified with these compiler tools `
+      + `(${sdk.platform} ${sdk.toolchain.native}, shared ${sdk.toolchain.shared})`);
+  }
+  if (sdk.driverIdentity && sdk.driverIdentity === recipe.sdk?.driverIdentity) return 'sdk';
+  throw new Error(`The link-driver recipe for Emscripten ${recipe.emscripten} was not recorded with this compiler SDK (${sdk.driverIdentity ?? 'unknown'})`);
 }
 
 /** Compile one C file to a Wasm object exactly as `emcc -c` would. */
