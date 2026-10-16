@@ -345,7 +345,7 @@ gh workflow run installation-confidence.yml --repo Millillion/lasm --ref main
 Its reviewed selection
 [`node-robustness-candidate.json`](../scripts/ci/node-robustness-candidate.json)
 selects the unchanged archive for repeated validation. Initial acceptance has
-passed on all six targets; the repeated-installation gate remains separate. All native repetitions
+passed on all six targets; the repeated-installation gate passed separately. All native repetitions
 start from fresh VMs and empty consumer tool/npm caches and use one exact archive.
 The source controls also rerun; each report records their revision separately.
 
@@ -402,3 +402,16 @@ targets must still exist, and every other ACL error still fails closed. A
 native control removes a denied file during each restricted phase. The
 candidate bytes are unchanged. Gate sequences restart from the next complete
 campaign.
+
+### Gate result (2026-10-16)
+
+After the harness fixes, three back-to-back campaigns passed every fault job and
+every native installed, offline, deployment and network job:
+[38847047512](https://github.com/Millillion/lasm/actions/runs/38847047512),
+[38850143704](https://github.com/Millillion/lasm/actions/runs/38850143704) and
+[38850152012](https://github.com/Millillion/lasm/actions/runs/38850152012).
+The final confidence report records `passed: true`, with consecutive clean
+installations of 11 (Linux x86-64, Linux ARM64, Apple Silicon), 4 (Intel macOS,
+Windows x86-64) and 3 (Windows ARM64). Earlier failures remain in the history.
+This is a practical regression threshold for the exact archive
+`0.1.0-experimental.36513318119`, not a measured failure rate; npm stays unpublished.

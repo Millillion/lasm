@@ -40,7 +40,8 @@ Candidate `.46` requires rerunning failed downloads. Current source adds bounded
 retries, safe resume, crash recovery, offline repair, and bundled installer
 dependencies. The hardened candidate also passed installed, offline, deployment,
 and proxy/CA acceptance on all six native targets, alongside the installer fault
-checks. Its repeated-installation gate remains pending. See
+checks, and its repeated-installation gate (three consecutive clean cold
+installations on every target) passed on 2026-10-16. See
 [installation hardening](docs/INSTALLATION_HARDENING.md) for settings and progress.
 New candidates must also pass three consecutive cold installations on every target
 before meeting the additional robustness gate; one successful run alone is insufficient.

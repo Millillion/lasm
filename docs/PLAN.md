@@ -63,7 +63,7 @@ packed candidate before extending the accepted support claim.
 - [x] Validate the new single packed candidate on all six targets, including
   the full CLI/Lake private-CA and authenticated-proxy control.
 - [x] Schedule live distribution checks; retain all attempts and bounded evidence.
-- [ ] Observe three consecutive cold repetitions per target as an additional
+- [x] Observe three consecutive cold repetitions per target as an additional
   release-confidence gate, without claiming a statistical reliability guarantee.
   The user removed the earlier two-day/24-hour requirement on 2026-10-16.
 
@@ -72,7 +72,8 @@ offline npm, deployment and CLI/Lake network gates have passed all six targets.
 The [hardening report](INSTALLATION_HARDENING.md) retains the original failures
 and exact archive/job identities. Daily reporting selects this immutable archive;
 the additional gate requires three consecutive cold passes per target, which may
-run back to back. This gate remains pending.
+run back to back. This gate passed on 2026-10-16 (runs 38847047512,
+38850143704 and 38850152012).
 
 Continue direct commits to `main`; automatic checks observe those commits.
 Do not add a mandatory PR workflow or publish to npm. Windows 11 x64 and broader

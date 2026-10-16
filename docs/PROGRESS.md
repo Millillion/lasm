@@ -14,4 +14,4 @@ confidence report remain in [the report](INSTALLATION_HARDENING.md).
 Daily validation is active as monitoring. The additional gate requires three
 consecutive cold passes per target; campaigns may run back to back (the 24-hour,
 two-date requirement was removed on 2026-10-16). Preparation/resource failures
-reset the sequence. The gate remains pending; scheduled runs are best-effort. README reviewed; npm unpublished.
+reset the sequence. The gate passed on 2026-10-16; scheduled runs are best-effort. README reviewed; npm unpublished.
