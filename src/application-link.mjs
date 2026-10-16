@@ -15,6 +15,25 @@ import { optimizeMainTableGrowth } from '../scripts/full-lean/table-growth.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
+/** Emscripten labels each --pre-js in the glue with the path it was given.
+ * Name these files only by basename, so program.cjs does not depend on the
+ * package location or the random build directory. Comments only; no code.
+ * Each label must occur exactly once (separators compared portably). */
+export function relabelPreJs(glue, files) {
+  const portable = path => path.replaceAll('\\', '/');
+  const wanted = new Map(files.map(file => [portable(file), portable(file).split('/').pop()]));
+  const seen = new Map();
+  const result = glue.replace(/^(\/\/ (?:end )?include: )(.*)$/gm, (line, marker, path) => {
+    const name = wanted.get(portable(path));
+    if (name === undefined) return line;
+    seen.set(marker + path, (seen.get(marker + path) ?? 0) + 1);
+    return marker + name;
+  });
+  if (seen.size !== 2 * files.length || [...seen.values()].some(count => count !== 1))
+    throw new Error('Unexpected Emscripten pre-js labels in the application glue');
+  return result;
+}
+
 export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress }) {
   if (![1, 2].includes(memoryMode)) throw new Error('Invalid application memory mode');
   if (!Array.isArray(sources) || !sources.length) throw new Error('Application C sources are required');
@@ -60,6 +79,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // depend on mutable process environment or alter Lean's visible environment.
   const applicationPrelude = join(work, 'application-pre.js');
   await writeFile(applicationPrelude, `Module.lasmLeanVersion = ${JSON.stringify(leanVersion)};\n`);
+  const preJs = [join(root, 'scripts/full-lean/emscripten-pre.js'), applicationPrelude, join(root, 'scripts/full-lean/host-pre.js')];
   const mapFile = join(work, 'reachability.map');
   // The checked loader transformations use LF templates. Emscripten otherwise
   // defaults to host line endings, making identical Windows output look like
@@ -72,9 +92,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     `-sMAXIMUM_MEMORY=${memoryMode === 1 ? 8589934592 : 4294967296}`, '-sSTACK_SIZE=67108864',
     '-Wno-experimental', '-Wno-pthreads-mem-growth', '-Wl,--start-group',
     ...runtime.manifest.libraries.map(name => join(runtime.directory, name)), '-Wl,--end-group',
-    '--pre-js', join(root, 'scripts/full-lean/emscripten-pre.js'),
-    '--pre-js', applicationPrelude,
-    '--pre-js', join(root, 'scripts/full-lean/host-pre.js'),
+    ...preJs.flatMap(file => ['--pre-js', file]),
     '--js-library', join(root, 'scripts/full-lean/host-library.js'), '-o', join(dist, 'program.cjs')];
   const argumentsFile = join(work, 'link.rsp');
   // Classify the live graph before expensive optimization. In particular, a
@@ -101,7 +119,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   }
   progress?.({ stage: 'Preparing the application launcher' });
   const glue = join(dist, 'program.cjs');
-  writeFileSync(glue, connectLeanSymbolLoader(readFileSync(glue, 'utf8'), true, { packageSymbols: true }));
+  writeFileSync(glue, connectLeanSymbolLoader(relabelPreJs(readFileSync(glue, 'utf8'), preJs), true, { packageSymbols: true }));
   await indexFunctionTable(join(dist, 'program.wasm'), glue);
   writeFileSync(glue, optimizeMainTableGrowth(readFileSync(glue, 'utf8')));
   return requirements;

@@ -41,8 +41,11 @@ export async function provisionSdk(options = {}) {
   await rename(pendingConfig, config);
   const env = { ...process.env };
   for (const key of Object.keys(env)) if (/^(?:EM_|EMCC_|EMSDK|PYTHON|LLVM_|BINARYEN_)/.test(key)) delete env[key];
+  // Emscripten builds its system libraries on first use; mimalloc embeds
+  // __DATE__/__TIME__. A fixed epoch keeps program.wasm independent of when
+  // and where a cache was built.
   Object.assign(env, { EM_CONFIG: config, EMSDK_PYTHON: python.executable, PYTHONDONTWRITEBYTECODE: '1',
-    BINARYEN_CORES: '1', EMCC_CORES: '1',
+    BINARYEN_CORES: '1', EMCC_CORES: '1', SOURCE_DATE_EPOCH: '315532800',
     PATH: [join(prefix, 'bin'), dirname(python.executable), dirname(process.execPath)].join(delimiter) });
   const execute = (tool, args, settings = {}) => {
     if (!['emcc', 'em++', 'emar', 'emranlib'].includes(tool)) throw new Error('Unsupported managed compiler tool');
