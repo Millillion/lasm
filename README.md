@@ -3,8 +3,10 @@
 Write ordinary Lean. Compile it ahead of time and run it in Node. Node.js is the
 only supported JavaScript runtime.
 
-**Prerequisites:** stock **Node 26.10.0 with npm 11.19.1**. Lasm downloads its matching
-**Lean 4.34.1**, Lake, and build tools; you do not install them yourself.
+**Prerequisites:** stock **Node 26.10.0 with npm 11.19.1** for the tested `.46`
+candidate, which downloads its matching **Lean 4.34.1**, Lake, and build tools; you
+do not install them yourself. Current source, not yet in an accepted candidate,
+moves to **Node 26.12.0 with npm 11.20.0** and **Lean 4.35.0**.
 The package is experimental and **has not been published to npm**.
 
 ## Get started
@@ -33,10 +35,12 @@ node dist/main.mjs          # Run the deployment
 ```
 
 The first build needs internet access, downloads about 0.9–1.3 GB, and occupies
-several GB. Measured first builds took about 5–16 minutes. Current source, not
-yet accepted, downloads about 250–275 MB for an ordinary program (tiered Lean and
-a minimal compiler toolchain, no Python); see
-[toolchain slimming](docs/TOOLCHAIN_SLIMMING.md). The terminal shows progress
+several GB. Measured first builds took about 5–16 minutes. The slimmed installer
+(tiered Lean and a minimal compiler toolchain, no Python) downloads about 250–275 MB
+for an ordinary program; it passed acceptance and the cold-installation gate in
+candidate `.38930715033` on Lean 4.34.1 / Node 26.10.0 (see
+[toolchain slimming](docs/TOOLCHAIN_SLIMMING.md)). The Lean 4.35.0 / Node 26.12.0
+move in current source awaits acceptance. The terminal shows progress
 and elapsed time. Later builds reuse verified tools and unchanged outputs. See
 [cache locations, requirements, and recovery](docs/NODE_SUPPORT.md).
 Candidate `.46` requires rerunning failed downloads. Current source adds bounded
@@ -56,8 +60,10 @@ is needed there. Build separately on each platform. Include your application's
 external assets yourself.
 
 An existing Lake project can use local imports normally. To pin Lean, put
-`leanprover/lean4:v4.34.1` in its `lean-toolchain` file. Other Lean versions are
-rejected. Broad third-party package compatibility is not yet verified.
+`leanprover/lean4:v4.34.1` (candidate `.46`) or `leanprover/lean4:v4.35.0` (current
+source) in its `lean-toolchain` file. A package supports exactly one Lean release;
+other versions are rejected with `Unsupported Lean toolchain … Supported managed
+versions: …` and the pin is left unchanged. Broad third-party package compatibility is not yet verified.
 After an authorized npm release, installation will be `npm install @lasm/compiler`;
 that registry command is **not available yet**.
 

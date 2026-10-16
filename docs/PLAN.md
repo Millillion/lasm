@@ -268,14 +268,25 @@ build tools and their versions managed by Lasm and included in cache identities.
 The user approved shrinking the first-build download while keeping Node.js and
 npm as the only prerequisites. Follow [the slimming design](TOOLCHAIN_SLIMMING.md):
 
-- [ ] Phase 1: tiered trimmed Lean (per-platform binaries, shared core and
-  extended module data), assembled into one prefix on demand. Implemented in
-  source and validated by the maintainer tier workflow; awaiting a packed
-  candidate's five-platform acceptance and cold-installation gate.
-- [ ] Phase 2: Node link driver replacing `emcc` and Python, byte-identical to
-  current output on existing fixtures.
+- [x] Phase 1: tiered trimmed Lean (per-platform binaries, shared core and
+  extended module data), assembled into one prefix on demand. Accepted for Lean
+  4.34.1 in candidate `.38930715033` (five-platform acceptance run 38930715033;
+  cold-installation gate passed 2026-10-16).
+- [x] Phase 2: Node link driver replacing `emcc` and Python, byte-identical to
+  current output on existing fixtures. Accepted in the same candidate on Lean
+  4.34.1 / Node 26.10.0.
 - [ ] Phase 3: npm platform packages via `optionalDependencies`, validated with
   a local registry on all five native targets. Publication stays a user decision.
+
+**Lean 4.35.0 / Node 26.12.0 upgrade — approved 2026-10-16:** the step after the
+slimmed installer was validated on Lean 4.34.1. Current source pins Lean 4.35.0
+(default; a package carries one Lean release and its runtime) and Node 26.12.0
+with npm 11.20.0. Tiered archives: [`lean-4.35.0-tiers-v1`](TOOLCHAIN_SLIMMING.md#lean-4350-tiers-2026-10-16).
+The Wasm runtime build needed three of Lasm's Lean build patches ported to 4.35
+(`scripts/full-lean/patches/lean-4.35.0-*.patch`: Lean now compiles mimalloc into
+its runtime; Lasm keeps linking Emscripten's mimalloc). Remaining before
+acceptance: the retained CI runtime, a packed candidate, the five-platform
+native acceptance and the three-run cold-installation gate.
 
 ## Deferred chunks
 

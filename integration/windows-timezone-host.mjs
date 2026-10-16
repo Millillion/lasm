@@ -50,7 +50,7 @@ try {
   report.nativeSha256 = await hashFile(native);
   const engines = [['node', node, []]];
   report.engines = engines.map(([name, program]) => ({ name, program, version: run(name + ' version', program, ['--version']).stdout.trim() }));
-  assert.equal(report.engines[0].version, 'v26.10.0');
+  assert.equal(report.engines[0].version, 'v26.12.0');
   const selections = [];
   for (const name of ['UTC', 'America/New_York', 'Europe/Berlin', 'Australia/Lord_Howe', 'Lasm/No_such_zone', 'a'.repeat(300)]) {
     selections.push(['transition', name, '-2147483648', 'true']);

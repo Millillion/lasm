@@ -1,4 +1,5 @@
 import net from 'node:net';
+import { constants } from 'node:os';
 import { getSystemErrorMap } from 'node:util';
 import { numbers } from './node-host.mjs';
 import { nativeTcp } from './native-tcp.mjs';
@@ -21,7 +22,15 @@ function encodeAddress(value) {
   return Buffer.concat([numbers(value.family === 'IPv6' ? 6 : 4, value.port), Buffer.from(value.address)]);
 }
 
-export function createNodeNetwork({ add, get, release }) {
+// Lean 4.35 rejects any second shutdown request on a socket, pending or finished,
+// with IO.Error.otherError (-UV_EALREADY) "shutdown already requested"
+// (runtime/uv/tcp.cpp, m_shutdown_requested). Earlier releases reported only a
+// pending request (EALREADY) and let uv_shutdown fail afterwards (ENOTCONN).
+const shutdownOnce = version => !['4.32.0', '4.34.0', '4.34.1'].includes(version);
+const shutdownRequested = () => Object.assign(new Error('shutdown already requested'), {
+  code: 'EALREADY', errno: process.platform === 'win32' ? 4084 : constants.errno.EALREADY, nativeMessage: true });
+
+export function createNodeNetwork({ add, get, release, leanVersion = '4.32.0' }) {
   function getTcp(id) {
     const resource = get(id, 'tcp');
     // destroy() can close the fd before its deferred 'close' event. Never run a
@@ -215,9 +224,11 @@ export function createNodeNetwork({ add, get, release }) {
     }
     case 60: {
       const t = getTcp(id);
+      if (t.shutdownRequested) throw shutdownRequested();
       if (t.shutdownPending) throw tcpFailure('EALREADY');
       if (!t.socket || t.socket.destroyed || t.socket.writableEnded || t.socket.writableFinished) throw tcpFailure('ENOTCONN');
       t.shutdownPending = true;
+      if (shutdownOnce(leanVersion)) t.shutdownRequested = true;
       return new Promise((resolve, reject) => t.socket.end(err => err ? reject(err) : resolve(empty)))
         .finally(() => { t.shutdownPending = false; });
     }

@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createNodeRuntimeHost, numbers } from '../src/node-host.mjs';
 
-function fixture(t) {
-  const host = createNodeRuntimeHost({ leanVersion: '4.34.1' });
+function fixture(t, leanVersion = '4.34.1') {
+  const host = createNodeRuntimeHost({ leanVersion });
   t.after(() => host.close());
   const request = (op, id = 0, arg = 0, bytes = Buffer.alloc(0)) => host.request(op, id, BigInt(arg), bytes);
   const start = (op, id, arg = 0, bytes = Buffer.alloc(0)) => {
@@ -98,5 +98,19 @@ test('completed TCP shutdown rejects further writes but preserves reverse traffi
   error(f.start(60, client).result, 'socket is not connected');
   assert.equal((await f.finish(f.start(59, client, 0))).error, false);
   error(f.start(59, client, 1).result, 'broken pipe');
+  error(f.start(59, client, 1, Buffer.from('x')).result, 'broken pipe');
+});
+
+test('Lean 4.35 rejects every repeated TCP shutdown as otherError, pending or completed', { timeout: 10_000 }, async t => {
+  const f = fixture(t, '4.35.0'), { client, peer } = await f.pair();
+  const requested = f.start(60, client);
+  error(f.start(60, client).result, 'shutdown already requested');
+  assert.equal(f.start(60, client).result.bytes.readBigUInt64LE(0), 0n, 'otherError');
+  assert.equal((await f.finish(requested)).error, false);
+  assert.equal((await f.success(56, peer, 1)).length, 0);
+  const repeated = f.start(60, client).result;
+  error(repeated, 'shutdown already requested');
+  assert.equal(repeated.bytes.readBigUInt64LE(0), 0n);
+  assert.equal(repeated.bytes.readBigInt64LE(8), BigInt(process.platform === 'win32' ? 4084 : (await import('node:os')).constants.errno.EALREADY));
   error(f.start(59, client, 1, Buffer.from('x')).result, 'broken pipe');
 });

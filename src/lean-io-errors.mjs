@@ -141,8 +141,11 @@ const windowsCrtCases = new Set(`
 
 export function checkLeanIOVersion(version) {
   // The verified 4.34.1 archives preserve both Init.System.IO and runtime/io.cpp
-  // byte-for-byte. Keep unreviewed releases explicit instead of a version range.
-  if (!['4.32.0', '4.34.0', '4.34.1'].includes(version))
+  // byte-for-byte. Lean 4.35.0 leaves Init/System/IOError.lean and the error
+  // mapping in runtime/io.cpp unchanged (reviewed 2026-10-16: its io.cpp changes
+  // are the ST.Ref put/take primitives; IO.lean changes only getLine docs).
+  // Keep unreviewed releases explicit instead of a version range.
+  if (!['4.32.0', '4.34.0', '4.34.1', '4.35.0'].includes(version))
     throw new Error('No verified IO error policy for Lean ' + version);
 }
 

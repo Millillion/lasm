@@ -139,7 +139,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
     // Fatal teardown may also close resources while host promises are settling.
     return closeResource(resource, asynchronous);
   }
-  const network = createNodeNetwork({ add, get, release });
+  const network = createNodeNetwork({ add, get, release, leanVersion });
   const udp = createNodeUdp({ add, get });
   const processes = createNodeProcesses({ add, get, release, cwd: state => directory.spawn(state),
     applicationCommand: applicationCommand && { ...applicationCommand, path: appPath },

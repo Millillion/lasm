@@ -54,8 +54,10 @@ An ordinary program's first build falls from about 913 MB to about 293 MB.
 
 ## Phase 1 status (2026-10-16)
 
-Implemented in source; **not yet in an accepted candidate**. Released candidates
-still download the complete upstream Lean archive.
+**Accepted (Lean 4.34.1 / Node 26.10.0) in candidate `.38930715033`**: five-platform
+acceptance run 38930715033 and the three-run cold-installation gate passed on
+2026-10-16 (see [installation hardening](INSTALLATION_HARDENING.md)). The `.46`
+candidate still downloads the complete upstream Lean archive.
 
 - **Maintainer repackager:** [`scripts/lean-dist/build-tiers.mjs`](../scripts/lean-dist/build-tiers.mjs)
   checks the pinned archive's SHA-256 and writes one binaries archive per platform
@@ -112,8 +114,50 @@ Measured archives for Lean 4.34.1 (bytes):
 
 An ordinary program's Lean download on Linux x86-64 falls from 580,432,872 to
 212,285,442 bytes; Lake projects and programs importing `Lean`/`Lake` add
-253,989,084 bytes (466,274,526 in total). Pending: candidate acceptance on all
-five supported targets and the repeated cold-installation gate.
+253,989,084 bytes (466,274,526 in total).
+
+### Lean 4.35.0 tiers (2026-10-16)
+
+Approved upgrade from Lean 4.34.1 / Node 26.10.0; source only, awaiting a packed
+candidate. [`lean-tiers.yml`](../.github/workflows/lean-tiers.yml) now takes the
+catalog naming the upstream archives as an input, so the release was repackaged
+from the maintainer pin [`scripts/lean-dist/lean-4.35.0-upstream.json`](../scripts/lean-dist/lean-4.35.0-upstream.json)
+before the product catalog adopted it
+([run 38937652744](https://github.com/Millillion/lasm/actions/runs/38937652744), Node
+26.12.0, zstd 1.5.7): every archive packed twice identically, the five platforms
+produced byte-identical shared archives, and all five native jobs passed the same
+generated-C, Lake-plugin and executable checks as 4.34.1. Published as
+[`lean-4.35.0-tiers-v1`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-tiers-v1).
+Lean 4.35 adds the top-level `LeanExport` module, which the catalog lists among
+the extended-tier roots.
+
+| Archive | Compressed | Extraction bound |
+| --- | --- | --- |
+| `linux-x64-bin` | 39,646,766 | 279,969,792 |
+| `linux-arm64-bin` | 41,351,291 | 307,232,768 |
+| `darwin-x64-bin` | 33,513,583 | 221,249,536 |
+| `darwin-arm64-bin` | 31,521,256 | 213,909,504 |
+| `win32-x64-bin` | 35,562,606 | 252,706,816 |
+| `core-init` | 96,093,735 | 443,547,648 |
+| `core-std` | 72,439,227 | 370,147,328 |
+| `ext-meta` | 82,217,270 | 526,385,152 |
+| `ext-elab` | 79,592,078 | 506,462,208 |
+| `ext-rest` | 95,373,790 | 584,056,832 |
+
+An ordinary program's Lean download on Linux x86-64 is 208,179,728 bytes (the
+complete upstream archive is 594,481,375); Lake projects and programs importing
+`Lean`/`Lake` add 257,183,138 bytes.
+
+Local Linux x86-64 checks (Node 26.12.0, evidence under `.work/lean-4.35-upgrade/`):
+generated C for `examples/hello`, `FilesystemSurface`, `TcpErrorPhases` and
+`BundleFeaturesLegacy` is identical from the published tiers and the complete
+archive. With a locally built 4.35.0 runtime (manifest `46532b5f…`, not the
+retained CI runtime), the CLI built and ran all four with the default Node link
+driver; `FilesystemSurface` and `TcpErrorPhases` output equals native Lean 4.35.0,
+and `LASM_LINK_DRIVER=emcc` produced identical `program.wasm` and `program.cjs`, so
+the recorded Emscripten recipe still applies. The AOT policy still rejects
+`StandaloneModuleData.lean`. Lean 4.35 rejects every repeated TCP shutdown as
+`otherError` "shutdown already requested"; the Node host now matches for 4.35.
 
 ## Phases
 
@@ -527,8 +571,9 @@ The installer fault suite passed under the guard (151 passed, 3 skipped, 0 faile
 
 ## Phase 2 milestone D (2026-10-16): minimal toolchain, Node driver by default
 
-Implemented in source; **not yet in an accepted candidate**. Released candidates
-still download the full Emscripten SDK and Python and link with emcc.
+**Accepted in candidate `.38930715033`** (Lean 4.34.1 / Node 26.10.0; acceptance and
+cold-installation gate passed 2026-10-16). The `.46` candidate still downloads the
+full Emscripten SDK and Python and links with emcc.
 
 ### Archives
 

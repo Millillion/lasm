@@ -11,6 +11,9 @@ The validated targets are Ubuntu 24.04.5 LTS (glibc 2.39) on native x86-64 and A
 plus macOS 15.7.9 (24G830) on native x86-64 and ARM64, Windows Server 2025
 Datacenter 10.0.26100.33438 (`windows-2025`) on native x86-64. Candidate `.46`
 passed all five supported targets. All use Node 26.10.0 with npm 11.19.1 and Lean 4.34.1.
+Current source, not yet in an accepted candidate, pins Node 26.12.0 with npm 11.20.0
+and Lean 4.35.0 (a package carries one Lean release; projects pinning another one,
+including 4.34.1, get `Unsupported Lean toolchain …`).
 **Windows ARM64 is not supported** (removed 2026-10-16: neither Lean nor
 Emscripten publishes Windows ARM64 prebuilts). Candidate `.46` also passed on
 Windows 11 Enterprise 10.0.26200.9457 (`windows-11-arm`) historically; current
@@ -47,12 +50,14 @@ and the Emscripten SDK and Python with a
 [minimal compiler toolchain](TOOLCHAIN_SLIMMING.md#phase-2-milestone-d-2026-10-16-minimal-toolchain-node-driver-by-default)
 (clang, wasm-ld and Binaryen per platform, plus one shared archive with Emscripten's
 JavaScript compiler and a prebuilt system library tree, from this repository's
-GitHub releases). It never downloads or runs Python. Its first-build downloads
-for an ordinary program are 273,804,773 bytes on Linux x86-64, 273,188,656 on
-Linux ARM64, 260,697,629 on Intel Mac, 251,404,204 on Apple Silicon and
-253,189,823 on Windows x86-64; a Lake project or a program importing
-`Lean`/`Lake` downloads 593,063,076, 550,401,085, 580,822,773, 567,742,275 and
-554,298,728 bytes including Git.
+GitHub releases). It never downloads or runs Python. With Lean 4.35.0
+([`lean-4.35.0-tiers-v1`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-tiers-v1)),
+its first-build downloads for an ordinary program are 269,699,059 bytes on Linux
+x86-64, 268,890,803 on Linux ARM64, 256,541,533 on Intel Mac, 247,041,001 on Apple
+Silicon and 249,048,232 on Windows x86-64; a Lake project or a program importing
+`Lean`/`Lake` downloads 592,151,416, 549,297,286, 579,860,731, 566,573,126 and
+553,351,191 bytes including Git (catalog sizes; the Lean 4.34.1 tiers measured
+273,804,773 bytes for an ordinary program on Linux x86-64).
 The current builder removes unreachable code and includes only the deployment
 architecture's native helpers. Current source builds reject runtime compiler,
 interpreter, module-data and plugin dependencies; they never package the large
