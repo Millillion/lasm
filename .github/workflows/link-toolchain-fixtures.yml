@@ -60,6 +60,8 @@ jobs:
         run: |
           node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/restore-resources.json -- node scripts/ci/restore-node-runtime.mjs
           cp -R .work/node-runtime-restored/native src/native
+          # record-emcc.mjs names the runtime by its directory, as the package does.
+          mv .work/node-runtime-restored/runtime .work/node-runtime-restored/lean-4.34.1-wasm64
       - name: Download and verify the published toolchain
         env:
           GH_TOKEN: ${{ github.token }}
@@ -81,7 +83,7 @@ jobs:
       - name: Build the fixtures with the Node link driver
         run: |
           node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report ".work/lt-node-$PLATFORM-resources.json" -- \
-            node scripts/link-driver/record-emcc.mjs --cache .cache/lt-tools --runtime .work/node-runtime-restored/runtime \
+            node scripts/link-driver/record-emcc.mjs --cache .cache/lt-tools --runtime .work/node-runtime-restored/lean-4.34.1-wasm64 \
               --runtime-sha256 "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" \
               --output .work/lt/node --toolchain .work/lt/toolchain --link-driver node --package \
               --fixture hello=examples/hello/Main.lean --fixture filesystem=integration/fixtures/FilesystemSurface.lean
@@ -95,7 +97,7 @@ jobs:
         if: inputs.emcc
         run: |
           node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report ".work/lt-emcc-$PLATFORM-resources.json" -- \
-            node scripts/link-driver/record-emcc.mjs --cache .cache/lt-tools --runtime .work/node-runtime-restored/runtime \
+            node scripts/link-driver/record-emcc.mjs --cache .cache/lt-tools --runtime .work/node-runtime-restored/lean-4.34.1-wasm64 \
               --runtime-sha256 "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" \
               --output .work/lt/emcc --frozen-cache .work/lt/toolchain/emscripten-6.0.9-lasm-shared/cache --link-driver emcc \
               --fixture hello=examples/hello/Main.lean --fixture filesystem=integration/fixtures/FilesystemSurface.lean
