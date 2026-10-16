@@ -33,6 +33,9 @@ const { values: options } = parseArgs({ options: {
   runtime: { type: 'string' }, 'runtime-sha256': { type: 'string' }, output: { type: 'string' },
   fixture: { type: 'string', multiple: true, default: [] }, debug: { type: 'boolean', default: false },
   analyze: { type: 'string' }, lean: { type: 'string', default: '4.34.1' },
+  // Milestone B: an extracted prebuilt sysroot cache (scripts/link-driver/build-sysroot.mjs),
+  // used read-only by emcc through EM_CACHE + EM_FROZEN_CACHE, and the compile driver.
+  'frozen-cache': { type: 'string' }, 'compile-driver': { type: 'string', default: 'emcc' },
 } });
 
 if (options.analyze) {
@@ -80,6 +83,7 @@ const readResponseFile = file => readFileSync(file, 'utf8').split('\n').filter(B
   .map(line => line.slice(1, -1).replace(/\\(.)/g, '$1'));
 
 const runSummary = { schema: 1, recorder: 'scripts/link-driver/record-emcc.mjs', debug: options.debug,
+  compileDriver: options['compile-driver'], frozenCache: options['frozen-cache'] ? resolve(options['frozen-cache']) : null,
   startedAt: new Date().toISOString(), node: process.version, platform: `${process.platform}-${process.arch}`,
   cache, fixtures: [] };
 for (const spec of options.fixture) {
@@ -109,12 +113,14 @@ for (const spec of options.fixture) {
   mkdirSync(dist, { recursive: true });
   const stepsDirectory = join(fixture, 'steps');
   const steps = [];
-  const recorded = { ...sdk, execute(tool, args, settings = {}) {
+  const baseEnv = options['frozen-cache']
+    ? { ...sdk.env, EM_CACHE: resolve(options['frozen-cache']), EM_FROZEN_CACHE: '1' } : sdk.env;
+  const recorded = { ...sdk, env: baseEnv, execute(tool, args, settings = {}) {
     const index = steps.length, directory = join(stepsDirectory, `${String(index).padStart(2, '0')}-${tool}`);
     const temp = join(directory, 'temp');
     mkdirSync(temp, { recursive: true });
     const expanded = args.flatMap(arg => arg.startsWith('@') ? readResponseFile(arg.slice(1)) : [arg]);
-    const env = options.debug ? { ...sdk.env, EMCC_DEBUG: '1', EMCC_VERBOSE: '1', EMCC_TEMP_DIR: temp } : sdk.env;
+    const env = options.debug ? { ...baseEnv, EMCC_DEBUG: '1', EMCC_VERBOSE: '1', EMCC_TEMP_DIR: temp } : baseEnv;
     const responseCopies = args.filter(arg => arg.startsWith('@')).map(arg => {
       const copy = join(directory, basename(arg.slice(1))); copyFileSync(arg.slice(1), copy); return copy;
     });
@@ -148,20 +154,24 @@ for (const spec of options.fixture) {
     if (options.debug && tool === 'emcc' && args.includes('-c')) {
       // Dry run: emcc prints its exact clang command; clang -### expands cc1.
       const dry = openSync(join(directory, 'emcc-dry-run.log'), 'w');
-      try { sdk.execute(tool, [...args, '-###'], { env: sdk.env, stdio: ['ignore', dry, dry] }); } finally { closeSync(dry); }
+      try { sdk.execute(tool, [...args, '-###'], { env: baseEnv, stdio: ['ignore', dry, dry] }); } finally { closeSync(dry); }
     }
     return Buffer.alloc(0);
   } };
   log(`${name}: linking ${generated.sources.length} module(s)`);
   const requirements = await linkApplication({ sources: generated.sources, sdk: recorded, runtime, work: temporary, dist,
-    leanVersion: lean.version, memoryMode: 1, verbose: false, progress: ({ stage }) => log(`${name}: ${stage}`) });
+    leanVersion: lean.version, memoryMode: 1, verbose: false, progress: ({ stage }) => log(`${name}: ${stage}`),
+    compileDriver: options['compile-driver'] });
   const paths = { fixture, source: sourceDirectory, work, build: temporary, runtime: runtime.directory, lasm: root,
     sdk: sdk.prefix, emscripten: sdk.driver, state: sdk.state, python: sdk.python.executable, node: process.execPath,
-    lean: lean.prefix, cache };
+    lean: lean.prefix, cache,
+    // The Emscripten cache emcc used (sysroot, system libraries): map files name it.
+    emcache: options['frozen-cache'] ? resolve(options['frozen-cache']) : join(sdk.state, 'cache') };
   const record = { schema: 1, name, fixture: relative(root, original), debug: options.debug,
     lean: { version: lean.version, commit: lean.commit, distribution: lean.distribution, tier: lean.tier, identity: lean.identity },
     runtime: { identity: runtime.identity, name: runtime.manifest.name, libraries: runtime.manifest.libraries },
     sdk: { version: sdk.version, identity: sdk.identity, driverIdentity: sdk.driverIdentity, runtimePatchesApplied: sdk.runtimePatchesApplied },
+    compileDriver: options['compile-driver'], frozenCache: options['frozen-cache'] ? resolve(options['frozen-cache']) : null,
     node: process.version, paths, generatedSources: generated.sources.map(file => relative(temporary, file).startsWith('..') ? relative(work, file) : relative(temporary, file)),
     requirements, steps: steps.map(({ index, tool, status, seconds }) => ({ index, tool, status, seconds })),
     // Everything Lasm produced: generated C, objects, maps, response files, outputs.

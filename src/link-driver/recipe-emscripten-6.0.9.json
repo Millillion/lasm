@@ -1,0 +1,284 @@
+{
+  "schema": 1,
+  "kind": "lasm-link-driver-recipe",
+  "emscripten": "6.0.9",
+  "sdk": {
+    "driverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+    "runtimePatchesApplied": true
+  },
+  "recordedFrom": {
+    "run": "ref-b-debug",
+    "platform": "linux-x64",
+    "node": "v24.13.1",
+    "runtime": "4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d",
+    "fixtures": [
+      "examples/hello/Main.lean",
+      "integration/fixtures/FilesystemSurface.lean",
+      "integration/fixtures/TcpErrorPhases.lean",
+      "integration/fixtures/BundleFeaturesLegacy.lean"
+    ]
+  },
+  "compile": {
+    "tool": "clang",
+    "emccFlags": [
+      "-O2",
+      "-DNDEBUG",
+      "-pthread",
+      "-fwasm-exceptions",
+      "-fPIC",
+      "-DLEAN_EMSCRIPTEN",
+      "-sMEMORY64=1",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-I",
+      "<include>"
+    ],
+    "driver": [
+      "-target",
+      "wasm64-unknown-emscripten",
+      "-fvisibility=default",
+      "-mllvm",
+      "-combiner-global-alias-analysis=false",
+      "-mllvm",
+      "-wasm-enable-sjlj",
+      "-mllvm",
+      "-wasm-use-legacy-eh",
+      "-mllvm",
+      "-disable-lsr",
+      "--sysroot=<sysroot>",
+      "-D__EMSCRIPTEN_SHARED_MEMORY__=1",
+      "-Xclang",
+      "-iwithsysroot/include<sep>fakesdl",
+      "-Xclang",
+      "-iwithsysroot/include<sep>compat",
+      "<flags>"
+    ],
+    "translation": {
+      "consumedSettings": [
+        "-sMEMORY64=1"
+      ],
+      "joinedOptions": [
+        "-l",
+        "-L",
+        "-I",
+        "-z",
+        "-o",
+        "-x",
+        "-u"
+      ],
+      "valueOptions": [
+        "-I"
+      ]
+    },
+    "env": {
+      "SOURCE_DATE_EPOCH": "315532800"
+    },
+    "recordedObjects": [
+      {
+        "fixture": "hello",
+        "source": "Main.c",
+        "object": {
+          "name": "module-0.o",
+          "bytes": 3246,
+          "sha256": "a42a21dbc5c5ff4aa78df0d5f7ff17213ba6e3f634fa39495248e5af2683243f"
+        }
+      },
+      {
+        "fixture": "hello",
+        "source": "reachability.c",
+        "object": {
+          "name": "reachability.o",
+          "bytes": 438,
+          "sha256": "98077cd687833b404d8f19c47c523d183ba306b286f31dedb42efd23b8f03a85"
+        }
+      },
+      {
+        "fixture": "hello",
+        "source": "initialization.c",
+        "object": {
+          "name": "initialization.o",
+          "bytes": 501,
+          "sha256": "37b6a1f6f93d555714f6f29e6f10594f36ea89066787d1500cbc9132a167da7e"
+        }
+      },
+      {
+        "fixture": "filesystem",
+        "source": "FilesystemSurface.c",
+        "object": {
+          "name": "module-0.o",
+          "bytes": 111903,
+          "sha256": "c886ad0c13936183de0a6b53b8f93eed4c42352f83cd14ab4ec4bb8922ebc240"
+        }
+      },
+      {
+        "fixture": "filesystem",
+        "source": "reachability.c",
+        "object": {
+          "name": "reachability.o",
+          "bytes": 438,
+          "sha256": "98077cd687833b404d8f19c47c523d183ba306b286f31dedb42efd23b8f03a85"
+        }
+      },
+      {
+        "fixture": "filesystem",
+        "source": "initialization.c",
+        "object": {
+          "name": "initialization.o",
+          "bytes": 501,
+          "sha256": "37b6a1f6f93d555714f6f29e6f10594f36ea89066787d1500cbc9132a167da7e"
+        }
+      },
+      {
+        "fixture": "tcp",
+        "source": "TcpErrorPhases.c",
+        "object": {
+          "name": "module-0.o",
+          "bytes": 109826,
+          "sha256": "0174d02e81d2cb1e3c98fc130c59bc4dee541cd092c15036eea94ab038a10ff1"
+        }
+      },
+      {
+        "fixture": "tcp",
+        "source": "reachability.c",
+        "object": {
+          "name": "reachability.o",
+          "bytes": 438,
+          "sha256": "98077cd687833b404d8f19c47c523d183ba306b286f31dedb42efd23b8f03a85"
+        }
+      },
+      {
+        "fixture": "tcp",
+        "source": "initialization.c",
+        "object": {
+          "name": "initialization.o",
+          "bytes": 501,
+          "sha256": "37b6a1f6f93d555714f6f29e6f10594f36ea89066787d1500cbc9132a167da7e"
+        }
+      },
+      {
+        "fixture": "lean-import",
+        "source": "BundleFeaturesLegacy.c",
+        "object": {
+          "name": "module-0.o",
+          "bytes": 48173,
+          "sha256": "a540d94e1b979a44cdc1840d266e4456290d363f827364bbd3cad7e3b274edf9"
+        }
+      },
+      {
+        "fixture": "lean-import",
+        "source": "reachability.c",
+        "object": {
+          "name": "reachability.o",
+          "bytes": 438,
+          "sha256": "98077cd687833b404d8f19c47c523d183ba306b286f31dedb42efd23b8f03a85"
+        }
+      },
+      {
+        "fixture": "lean-import",
+        "source": "initialization.c",
+        "object": {
+          "name": "initialization.o",
+          "bytes": 501,
+          "sha256": "37b6a1f6f93d555714f6f29e6f10594f36ea89066787d1500cbc9132a167da7e"
+        }
+      }
+    ]
+  },
+  "sysroot": {
+    "libraries": [
+      "crt1_proxy_main.o",
+      "crtbegin-mt.o",
+      "libGL-mt-getprocaddr.a",
+      "libal.a",
+      "libc++-debug-mt-legacyexcept.a",
+      "libc++-mt-legacyexcept.a",
+      "libc++abi-debug-mt-legacyexcept.a",
+      "libc++abi-mt-legacyexcept.a",
+      "libc-mt-debug.a",
+      "libc-mt.a",
+      "libc_optz-mt.a",
+      "libclang_rt.builtins-legacysjlj-mt.a",
+      "libhtml5.a",
+      "libmimalloc-mt.a",
+      "libsockets-mt.a",
+      "libstubs-debug.a",
+      "libstubs.a",
+      "libunwind-mt-legacyexcept.a"
+    ],
+    "usedBy": {
+      "crt1_proxy_main.o": [
+        "probe",
+        "final"
+      ],
+      "crtbegin-mt.o": [
+        "probe",
+        "final"
+      ],
+      "libGL-mt-getprocaddr.a": [
+        "probe",
+        "final"
+      ],
+      "libal.a": [
+        "probe",
+        "final"
+      ],
+      "libc++-debug-mt-legacyexcept.a": [
+        "probe"
+      ],
+      "libc++-mt-legacyexcept.a": [
+        "final"
+      ],
+      "libc++abi-debug-mt-legacyexcept.a": [
+        "probe"
+      ],
+      "libc++abi-mt-legacyexcept.a": [
+        "final"
+      ],
+      "libc-mt-debug.a": [
+        "probe"
+      ],
+      "libc-mt.a": [
+        "final"
+      ],
+      "libc_optz-mt.a": [
+        "final"
+      ],
+      "libclang_rt.builtins-legacysjlj-mt.a": [
+        "probe",
+        "final"
+      ],
+      "libhtml5.a": [
+        "probe",
+        "final"
+      ],
+      "libmimalloc-mt.a": [
+        "probe",
+        "final"
+      ],
+      "libsockets-mt.a": [
+        "probe",
+        "final"
+      ],
+      "libstubs-debug.a": [
+        "probe"
+      ],
+      "libstubs.a": [
+        "final"
+      ],
+      "libunwind-mt-legacyexcept.a": [
+        "probe",
+        "final"
+      ]
+    },
+    "archive": {
+      "name": "emscripten-6.0.9-cache-wasm64-pic.tar.zst",
+      "bytes": 2692922,
+      "sha256": "b8fd589bb8c4352d495fefa138c7ac1c928b99500decaaef942f99a26106fee8",
+      "tarBytes": 28869120,
+      "root": "emscripten-6.0.9-cache-wasm64-pic",
+      "files": 1735,
+      "sourceDateEpoch": "315532800",
+      "debugInfo": "removed from system libraries with llvm-objcopy --strip-debug"
+    }
+  }
+}

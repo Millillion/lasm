@@ -1,0 +1,128 @@
+// Phase 2 Node link driver, milestone B: compile Lasm's generated C directly
+// with the SDK's clang, using the clang driver arguments that emcc was
+// recorded passing (docs/TOOLCHAIN_SLIMMING.md). Not the default: only
+// src/application-link.mjs with compileDriver 'node' (LASM_LINK_DRIVER=node)
+// uses it, and emcc still performs every link.
+//
+// All Emscripten-specific knowledge lives in the versioned recipe file, which
+// scripts/link-driver/recipe.mjs --derive writes from an EMCC_DEBUG recording:
+//   compile.emccFlags   the emcc flags the recording covered (Lasm's own flags);
+//   compile.driver      clang's arguments, with placeholders, where <flags> is
+//                       the translated emcc flags plus -c/-o;
+//   compile.translation how emcc turns its flags into clang flags
+//                       (tools/cmdline.py normalize_args; consumed -s settings);
+//   compile.env         environment that must match the product's SDK env.
+import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import path from 'node:path';
+import { executableName } from '../platform.mjs';
+
+export const recipeKind = 'lasm-link-driver-recipe';
+export const recipeSchema = 1;
+const placeholderPattern = /<([a-z-]+)(?::([^>]*))?>/g;
+
+/** Validates a recipe document (object or JSON text) and returns it frozen. */
+export function parseRecipe(input) {
+  const recipe = typeof input === 'string' ? JSON.parse(input) : structuredClone(input);
+  const fail = message => { throw new Error(`Invalid link-driver recipe: ${message}`); };
+  if (recipe?.kind !== recipeKind) fail('unexpected kind');
+  if (recipe.schema !== recipeSchema) fail(`unsupported schema ${recipe.schema}`);
+  if (!/^\d+\.\d+\.\d+$/.test(recipe.emscripten ?? '')) fail('missing Emscripten version');
+  const compile = recipe.compile;
+  if (!compile || typeof compile !== 'object') fail('missing compile section');
+  if (!/^[a-z][a-z0-9+-]*$/.test(compile.tool ?? '')) fail('invalid compile tool');
+  for (const key of ['emccFlags', 'driver'])
+    if (!Array.isArray(compile[key]) || !compile[key].length || compile[key].some(arg => typeof arg !== 'string'))
+      fail(`compile.${key} must be a non-empty string array`);
+  if (compile.driver.filter(arg => arg === '<flags>').length !== 1) fail('compile.driver must contain <flags> once');
+  const translation = compile.translation;
+  if (!Array.isArray(translation?.joinedOptions) || !Array.isArray(translation?.consumedSettings))
+    fail('compile.translation needs joinedOptions and consumedSettings');
+  if (translation.consumedSettings.some(arg => !/^-s[A-Z_0-9]+=\S*$/.test(arg))) fail('invalid consumed setting');
+  if (translation.valueOptions?.some(option => !translation.joinedOptions.includes(option)))
+    fail('every value option must be a joined option');
+  const known = new Set(['flags', 'sysroot', 'source', 'object', 'sep']);
+  for (const arg of compile.driver) for (const [, name] of arg.matchAll(placeholderPattern))
+    if (!known.has(name)) fail(`unknown placeholder <${name}>`);
+  for (const [key, value] of Object.entries(compile.env ?? {}))
+    if (!/^[A-Z_][A-Z0-9_]*$/.test(key) || typeof value !== 'string') fail(`invalid environment entry ${key}`);
+  if (!Array.isArray(recipe.sysroot?.libraries) || recipe.sysroot.libraries.some(name => !/^[A-Za-z0-9_+.-]+\.(?:a|o)$/.test(name)))
+    fail('sysroot.libraries must list archive or object names');
+  return deepFreeze(recipe);
+}
+
+function deepFreeze(value) {
+  if (value && typeof value === 'object') { Object.freeze(value); for (const item of Object.values(value)) deepFreeze(item); }
+  return value;
+}
+
+let bundled;
+/** The recipe recorded for the pinned managed SDK (src/sdk-tools.json). */
+export function bundledRecipe() {
+  bundled ??= parseRecipe(readFileSync(new URL('./recipe-emscripten-6.0.9.json', import.meta.url), 'utf8'));
+  return bundled;
+}
+
+/** Lasm's emcc flags must be exactly the recorded ones; -I values are free. */
+export function checkRecordedFlags(recipe, flags) {
+  const values = new Set(recipe.compile.translation.valueOptions ?? []);
+  const shape = list => list.map((arg, index) => values.has(list[index - 1]) ? '<value>' : arg);
+  const expected = shape(recipe.compile.emccFlags), actual = shape(flags);
+  if (expected.length !== actual.length || expected.some((arg, index) => arg !== actual[index]))
+    throw new Error(`The Node compile driver has no recording for these compiler flags: ${JSON.stringify(flags)}`);
+}
+
+/** emcc's own flag translation: drop consumed -s settings, then
+ * tools/cmdline.py normalize_args joins ['-I', 'dir'] into '-Idir', etc. */
+export function translateEmccFlags(recipe, args) {
+  const { joinedOptions, consumedSettings } = recipe.compile.translation;
+  const consumed = new Set(consumedSettings), joined = new Set(joinedOptions), result = [];
+  for (let index = 0; index < args.length; index++) {
+    const arg = args[index];
+    if (consumed.has(arg)) continue;
+    if (/^-s[A-Z_]/.test(arg) || arg === '-s') throw new Error(`Unrecorded Emscripten setting ${arg}`);
+    if (joined.has(arg)) {
+      if (index + 1 >= args.length) throw new Error(`Option ${arg} requires an argument`);
+      result.push(arg + args[++index]);
+    } else result.push(arg);
+  }
+  return result;
+}
+
+/** Python's os.path.join for the platform emcc runs on (used by -iwithsysroot). */
+const separator = platform => platform === 'win32' ? '\\' : '/';
+
+/** Complete clang argument vector (without the program) for one translation unit. */
+export function clangArguments(recipe, { flags, source, object, sysroot, platform = process.platform }) {
+  for (const [name, value] of Object.entries({ source, object, sysroot }))
+    if (typeof value !== 'string' || !value) throw new Error(`Missing ${name} for the Node compile driver`);
+  checkRecordedFlags(recipe, flags);
+  const translated = translateEmccFlags(recipe, [...flags, '-c', source, '-o', object]);
+  const values = { sysroot, source, object, sep: separator(platform) };
+  return recipe.compile.driver.flatMap(arg => arg === '<flags>' ? translated
+    : [arg.replace(placeholderPattern, (_, name) => values[name])]);
+}
+
+/** The program and environment for clang, from the managed SDK. */
+export function clangCommand(recipe, { sdkPrefix, env = process.env, platform = process.platform }) {
+  const paths = platform === 'win32' ? path.win32 : path.posix;
+  return { program: paths.join(sdkPrefix, 'bin', executableName(recipe.compile.tool, platform)),
+    env: { ...env, ...recipe.compile.env } };
+}
+
+/** The Emscripten cache whose sysroot emcc would pass to clang. EM_CACHE
+ * (a prebuilt, frozen cache) overrides the managed SDK state's own cache. */
+export function emscriptenCache(sdk) {
+  return sdk.env?.EM_CACHE || path.join(sdk.state, 'cache');
+}
+
+/** Compile one C file to a Wasm object exactly as `emcc -c` would. */
+export function compileObject({ sdk, flags, source, object, recipe = bundledRecipe(), execute = execFileSync, settings = {} }) {
+  const sysroot = path.join(emscriptenCache(sdk), 'sysroot');
+  const args = clangArguments(recipe, { flags, source, object, sysroot });
+  const { program, env } = clangCommand(recipe, { sdkPrefix: sdk.prefix, env: sdk.env });
+  // Generated-source paths are short; Windows' CreateProcess limit is 32,767.
+  const length = [program, ...args].reduce((total, arg) => total + arg.length + 3, 0);
+  if (process.platform === 'win32' && length > 24000) throw new Error('The clang command line is too long for Windows');
+  return execute(program, args, { env, windowsHide: true, ...settings });
+}

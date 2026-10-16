@@ -86,6 +86,8 @@ function side(directory) {
   if (existsSync(join(directory, 'build.json'))) {
     const build = JSON.parse(readFileSync(join(directory, 'build.json'), 'utf8'));
     const roots = Object.entries(build.paths).filter(([, value]) => typeof value === 'string');
+    // Recordings before milestone B name no separate Emscripten cache: emcc used <state>/cache.
+    if (!build.paths.emcache && build.paths.state) roots.push(['emcache', join(build.paths.state, 'cache')]);
     return { label: directory, base: build.paths.build, roots, names: Object.keys(build.build) };
   }
   const names = [];

@@ -174,7 +174,7 @@ function analyzeFixture(fixture) {
         definedSymbols: parsed.definedSymbols?.length, deps: parsed.deps ? Object.keys(parsed.deps).length : undefined };
     }
     const wasmLd = log.commands.find(argv => toolName(argv) === 'wasm-ld');
-    const sysroot = join(build.paths.state, 'cache', 'sysroot');
+    const sysroot = join(build.paths.emcache ?? join(build.paths.state, 'cache'), 'sysroot');
     const searchPath = (wasmLd ?? []).filter(arg => arg.startsWith('-L')).map(arg => arg.slice(2));
     const resolveLibrary = name => searchPath.map(directory => join(directory, `lib${name}.a`)).find(existsSync);
     const systemInputs = (wasmLd ?? []).flatMap(arg => arg.startsWith('-l') ? [resolveLibrary(arg.slice(2)) ?? arg]
@@ -249,9 +249,96 @@ export function combine(runs) {
     referenceShape: shapes[reference], differences };
 }
 
+// emcc's tools/cmdline.py normalize_args joins these options with their value.
+const emccJoinedOptions = ['-l', '-L', '-I', '-z', '-o', '-x', '-u'];
+
+/** Derive the checked-in product recipe (src/link-driver/recipe-emscripten-<v>.json)
+ * from a recording's recipe.json. Every compile of every fixture must reduce to
+ * the same template, and the template must reproduce each recorded clang driver
+ * command exactly; otherwise derivation fails. */
+export function deriveProductRecipe(run, { sysrootManifest } = {}) {
+  const recorded = JSON.parse(readFileSync(join(run, 'recipe.json'), 'utf8'));
+  const fixtures = Object.values(recorded.fixtures);
+  if (!fixtures.length) throw new Error('The recording has no fixtures');
+  const first = fixtures[0];
+  let template, emccFlags, consumed;
+  const compiles = [];
+  for (const fixture of fixtures) {
+    if (fixture.sdk.version !== first.sdk.version || fixture.sdk.driverIdentity !== first.sdk.driverIdentity)
+      throw new Error('Fixtures were recorded with different SDKs');
+    for (const compile of fixture.compiles) {
+      if (!compile.clangDriver) throw new Error(`Compile step ${compile.step} of ${fixture.name} has no -### record`);
+      const driver = compile.clangDriver.at(-1) === '-###' ? compile.clangDriver.slice(0, -1) : compile.clangDriver;
+      const args = compile.emccArgs, c = args.indexOf('-c');
+      if (c < 0 || args[c + 2] !== '-o' || args.length !== c + 4) throw new Error('Unexpected emcc compile shape');
+      const flags = args.slice(0, c), [source, object] = [args[c + 1], args[c + 3]];
+      const settings = flags.filter(arg => /^-s[A-Z]/.test(arg));
+      // Placeholder form of what emcc would pass for these flags.
+      const translated = [];
+      const inputs = [...flags.filter(arg => !settings.includes(arg)), '-c', source, '-o', object];
+      for (let i = 0; i < inputs.length; i++)
+        translated.push(emccJoinedOptions.includes(inputs[i]) ? inputs[i] + inputs[++i] : inputs[i]);
+      const tail = driver.slice(driver.length - translated.length);
+      if (JSON.stringify(tail) !== JSON.stringify(translated))
+        throw new Error(`Recorded clang arguments do not end with emcc's translation of the flags (${fixture.name} step ${compile.step})`);
+      if (!/^<sdk>\/bin\/clang(?:\.exe)?$/.test(driver[0])) throw new Error(`Unexpected compiler ${driver[0]}`);
+      const prefix = driver.slice(1, driver.length - translated.length).map(arg => arg
+        .replace(/^--sysroot=(?:<state>\/cache|<emcache>)\/sysroot$/, '--sysroot=<sysroot>')
+        // tools/compile.py: '-iwithsysroot' + os.path.join('/include', name)
+        .replace(/^-iwithsysroot\/include\//, '-iwithsysroot/include<sep>'));
+      if (prefix.some(arg => /<(?:state|emcache|sdk|work|build|lasm|runtime|cache)>/.test(arg)))
+        throw new Error(`Unresolved path in recorded compile prefix: ${prefix.join(' ')}`);
+      const shapeFlags = flags.map((arg, i) => flags[i - 1] === '-I' ? '<include>' : arg);
+      const candidate = JSON.stringify([...prefix, '<flags>']);
+      if (template === undefined) { template = candidate; emccFlags = shapeFlags; consumed = settings; }
+      else if (template !== candidate || JSON.stringify(emccFlags) !== JSON.stringify(shapeFlags))
+        throw new Error(`Compile template differs for ${fixture.name} step ${compile.step}`);
+      compiles.push({ fixture: fixture.name, source: basename(source), object: compile.object });
+    }
+  }
+  const systemInputs = new Map();
+  for (const fixture of fixtures) for (const link of fixture.links) for (const input of link.systemInputs) {
+    if (input.unresolved) throw new Error(`Unresolved system input ${input.file}`);
+    const name = basename(input.file);
+    if (!input.file.startsWith('lib/wasm64-emscripten/pic/')) throw new Error(`Unexpected system input ${input.file}`);
+    systemInputs.set(name, [...new Set([...(systemInputs.get(name) ?? []), link.kind])]);
+  }
+  const libraries = [...systemInputs.keys()].sort();
+  const recipe = {
+    schema: 1, kind: 'lasm-link-driver-recipe', emscripten: first.sdk.version,
+    sdk: { driverIdentity: first.sdk.driverIdentity, runtimePatchesApplied: first.sdk.runtimePatchesApplied },
+    recordedFrom: { run: recorded.run, platform: recorded.platform, node: recorded.node,
+      runtime: first.runtime.identity, fixtures: fixtures.map(fixture => fixture.fixture) },
+    compile: {
+      tool: 'clang',
+      emccFlags, driver: JSON.parse(template),
+      translation: { consumedSettings: consumed, joinedOptions: emccJoinedOptions, valueOptions: ['-I'] },
+      // src/managed-sdk.mjs sets the same value for emcc and its system-library builds.
+      env: { SOURCE_DATE_EPOCH: '315532800' },
+      recordedObjects: compiles,
+    },
+    sysroot: {
+      // Selected by emcc for Lasm's final (-Oz) and probe (-O0) links (lib/wasm64-emscripten/pic).
+      libraries, usedBy: Object.fromEntries(libraries.map(name => [name, systemInputs.get(name)])),
+      ...(sysrootManifest ? { archive: sysrootManifest } : {}),
+    },
+  };
+  return recipe;
+}
+
 if (resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
-  if (args[0] === '--combine') {
+  if (args[0] === '--derive') {
+    // --derive OUT RUN [SYSROOT_MANIFEST]
+    const [, out, run, manifest] = args;
+    const sysroot = manifest ? JSON.parse(readFileSync(manifest, 'utf8')) : undefined;
+    const recipe = deriveProductRecipe(resolve(run), { sysrootManifest: sysroot && {
+      name: sysroot.archive.name, bytes: sysroot.archive.bytes, sha256: sysroot.archive.sha256,
+      tarBytes: sysroot.archive.tarBytes, root: sysroot.root, files: sysroot.fileCount, sourceDateEpoch: sysroot.sourceDateEpoch,
+      debugInfo: sysroot.debugInfo } });
+    writeFileSync(out, JSON.stringify(recipe, null, 2) + '\n');
+    console.log(`wrote ${out}`);
+  } else if (args[0] === '--combine') {
     const [, out, ...runs] = args;
     writeFileSync(out, JSON.stringify(combine(runs.map(run => resolve(run))), null, 2) + '\n');
     console.log(`wrote ${out}`);

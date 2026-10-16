@@ -2,13 +2,14 @@
 // unchanged upstream foreign-runtime test drivers. The CLI owns provisioning,
 // project discovery and caching; this helper uses its verified inputs.
 import { writeFile } from 'node:fs/promises';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readApplicationSymbols, readInitializationFreeCppSymbols } from './application-symbols.mjs';
 import { readApplicationLinkRequirements, reachabilityRegistry, canSpecializeInitialization, selectiveInitialization } from './application-reachability.mjs';
 import { requireAotApplication } from './application-policy.mjs';
 import { executableName, responseFile } from './platform.mjs';
+import { compileObject, emscriptenCache } from './link-driver/compile.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
 import { optimizeMainTableGrowth } from '../scripts/full-lean/table-growth.mjs';
@@ -34,7 +35,17 @@ export function relabelPreJs(glue, files) {
   return result;
 }
 
-export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress }) {
+/** Experimental (docs/TOOLCHAIN_SLIMMING.md Phase 2): 'node' compiles with the
+ * SDK's clang directly from the recorded recipe; emcc still links. Internal
+ * maintainer switch LASM_LINK_DRIVER=node; the default remains emcc. */
+export function selectedCompileDriver(value = process.env.LASM_LINK_DRIVER) {
+  if (value === undefined || value === '' || value === 'emcc') return 'emcc';
+  if (value === 'node') return 'node';
+  throw new Error(`Unsupported LASM_LINK_DRIVER ${JSON.stringify(value)}`);
+}
+
+export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
+  compileDriver = selectedCompileDriver() }) {
   if (![1, 2].includes(memoryMode)) throw new Error('Invalid application memory mode');
   if (!Array.isArray(sources) || !sources.length) throw new Error('Application C sources are required');
   if (leanVersion !== runtime.manifest.lean) throw new Error('Application and runtime versions differ');
@@ -46,11 +57,18 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   const execute = (tool, args) => sdk.execute(tool, args, {
     stdio: verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'], timeout: 1800_000, maxBuffer: 8 * 1024 * 1024,
   });
+  if (!['emcc', 'node'].includes(compileDriver)) throw new Error('Invalid application compile driver');
+  if (compileDriver === 'node' && !existsSync(join(emscriptenCache(sdk), 'sysroot_install.stamp')))
+    throw new Error('The Node compile driver needs installed Emscripten system headers (a prebuilt or emcc-initialized cache)');
+  const compile = (source, object) => compileDriver === 'node'
+    ? compileObject({ sdk, flags: compileFlags, source, object, settings: {
+      stdio: verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'], timeout: 1800_000, maxBuffer: 8 * 1024 * 1024 } })
+    : execute('emcc', [...compileFlags, '-c', source, '-o', object]);
   const objects = [];
   for (let index = 0; index < sources.length; index++) {
     progress?.({ stage: `Compiling application module ${index + 1} of ${sources.length}` });
     const object = join(work, `module-${index}.o`);
-    execute('emcc', [...compileFlags, '-c', sources[index], '-o', object]);
+    compile(sources[index], object);
     objects.push(object);
   }
   progress?.({ stage: 'Preparing application symbols' });
@@ -58,7 +76,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     runtime.manifest.applicationSymbolHook);
   const probeC = join(work, 'reachability.c'), probeObject = join(work, 'reachability.o');
   await writeFile(probeC, reachabilityRegistry);
-  execute('emcc', [...compileFlags, '-c', probeC, '-o', probeObject]);
+  compile(probeC, probeObject);
   const initializeObject = join(work, 'initialization.o');
   const specializeInitialization = canSpecializeInitialization(runtime);
   const analysis = { initializationFreeCppSymbols: specializeInitialization
@@ -67,7 +85,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   const initializationInputs = [];
   if (specializeInitialization) {
     const initializeC = join(work, 'initialization.c'); await writeFile(initializeC, selectiveInitialization);
-    execute('emcc', [...compileFlags, '-c', initializeC, '-o', initializeObject]);
+    compile(initializeC, initializeObject);
     initializationInputs.push(initializeObject, '-Wl,--wrap=lean_initialize');
   }
   const exportsFile = join(work, 'exports.json');
