@@ -90,6 +90,14 @@ Stop older CLI versions or orphaned compiler processes before repair. Use a
 writable local filesystem with executable files and OS lock support; network
 filesystems and no-exec mounts are unsupported. See the
 [hardening settings and verification status](https://github.com/Millillion/lasm/blob/main/docs/INSTALLATION_HARDENING.md).
+
+**Known limitation (Lean 4.35.0 Lake):** Lake now fetches Git dependencies with a
+tree-filtered `git fetch`. Against a Git server that only offers "dumb" HTTP
+(static files, no `git http-backend`), Git then fetches missing objects one at a
+time and can spawn hundreds of nested processes and gigabytes of memory. This is
+upstream Lake/Git behavior and also affects native Lake. Hosts such as GitHub,
+GitLab and Bitbucket use smart HTTP and are unaffected; serve private dependencies
+over smart HTTP or SSH.
 If a completed tool cache is damaged or incomplete, Lasm refuses to execute it.
 Use repair with a newer candidate, or remove the named directory with `.46`,
 then retry to download a verified replacement. If a packaged runtime fails its
