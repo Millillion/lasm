@@ -3,7 +3,7 @@
 //
 //   node scripts/lean-dist/build-tiers.mjs --platform linux-x64 --archive lean.tar.zst \
 //     --out .work/lean-tiers/out --work .work/lean-tiers/work [--version 4.34.1]
-//     [--data write|hash|none] [--twice]
+//     [--data write|hash|none] [--twice] [--catalog toolchains.json]
 //
 // Emits lean-<version>-<platform>-bin.tar.zst and, with --data write, the shared
 // lean-<version>-<piece>.tar.zst module-data archives. --data hash only reports

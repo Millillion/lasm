@@ -9,11 +9,15 @@ on:
       version:
         description: Pinned Lean version in src/toolchains.json
         type: string
-        default: 4.34.1
+        default: 4.35.0
+      catalog:
+        description: Catalog naming the pinned upstream archives (a maintainer pin file before the product catalog adopts the release)
+        type: string
+        default: src/toolchains.json
       tag:
         description: Release tag for the archives (only used when publishing)
         type: string
-        default: lean-4.34.1-tiers-v1
+        default: lean-4.35.0-tiers-v1
       publish:
         description: Create the public release after every check passes
         type: boolean
@@ -35,16 +39,17 @@ jobs:
     env:
       PLATFORM: ${{ matrix.platform }}
       VERSION: ${{ inputs.version }}
+      CATALOG: ${{ inputs.catalog }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.10.0
+          node-version: 26.12.0
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Download the pinned archive
         run: |
-          url=$(node -p "require('./src/toolchains.json').lean[process.env.VERSION].artifacts[process.env.PLATFORM].url")
+          url=$(node -p "require(require('path').resolve(process.env.CATALOG)).lean[process.env.VERSION].artifacts[process.env.PLATFORM].url")
           mkdir -p .work/lean-tiers/dl
           curl --fail --location --retry 5 --retry-all-errors --proto '=https' --output .work/lean-tiers/dl/upstream "$url"
           df -h .
@@ -55,7 +60,7 @@ jobs:
         run: |
           data=hash; [ "$PLATFORM" = linux-x64 ] && data=write
           node scripts/full-lean/run-bounded.mjs --memory-mib 8192 --report .work/lean-tiers-$PLATFORM-resources.json -- \
-            node scripts/lean-dist/build-tiers.mjs --version "$VERSION" --platform "$PLATFORM" --archive .work/lean-tiers/dl/upstream \
+            node scripts/lean-dist/build-tiers.mjs --catalog "$CATALOG" --version "$VERSION" --platform "$PLATFORM" --archive .work/lean-tiers/dl/upstream \
               --out .work/lean-tiers/out --work .work/lean-tiers/work --data $data --twice
           rm -f .work/lean-tiers/dl/upstream
           ls -l .work/lean-tiers/out
@@ -76,7 +81,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.10.0
+          node-version: 26.12.0
           package-manager-cache: false
       - uses: actions/download-artifact@v8
         with:
@@ -115,6 +120,7 @@ jobs:
     env:
       PLATFORM: ${{ matrix.platform }}
       VERSION: ${{ inputs.version }}
+      CATALOG: ${{ inputs.catalog }}
     defaults:
       run:
         shell: bash
@@ -122,7 +128,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.10.0
+          node-version: 26.12.0
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - uses: actions/download-artifact@v8
@@ -136,17 +142,17 @@ jobs:
           path: .work/lean-tiers/check
       - name: Download the complete pinned archive for comparison
         run: |
-          url=$(node -p "require('./src/toolchains.json').lean[process.env.VERSION].artifacts[process.env.PLATFORM].url")
+          url=$(node -p "require(require('path').resolve(process.env.CATALOG)).lean[process.env.VERSION].artifacts[process.env.PLATFORM].url")
           curl --fail --location --retry 5 --retry-all-errors --proto '=https' --output .work/lean-tiers/upstream "$url"
       - name: Extract the tiers and the complete archive
         run: |
-          node scripts/lean-dist/check-tiers.mjs --phase extract --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
+          node scripts/lean-dist/check-tiers.mjs --phase extract --catalog "$CATALOG" --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
             --upstream .work/lean-tiers/upstream --work .work/lean-tiers/native
           rm -f .work/lean-tiers/upstream
       - name: Run the tiers natively and compare generated C with the complete toolchain
         run: |
           node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/lean-tiers-native-resources.json -- \
-            node scripts/lean-dist/check-tiers.mjs --phase check --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
+            node scripts/lean-dist/check-tiers.mjs --phase check --catalog "$CATALOG" --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
               --work .work/lean-tiers/native --report .work/lean-tiers/native.json
           { echo "### $PLATFORM"; echo '```json'; cat .work/lean-tiers/native.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
@@ -161,7 +167,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.10.0
+          node-version: 26.12.0
           package-manager-cache: false
       - uses: actions/download-artifact@v8
         with:

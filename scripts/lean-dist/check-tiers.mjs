@@ -10,7 +10,7 @@
 //  - checks that the core prefix reports a missing `Lean` import by root name.
 //
 //   node scripts/lean-dist/check-tiers.mjs --tiers <dir> --upstream <archive> --work <dir> \
-//     [--platform linux-x64] [--version 4.34.1] [--report file]
+//     [--platform linux-x64] [--version 4.34.1] [--report file] [--catalog toolchains.json]
 // --full-prefix <dir> instead of --upstream reuses an extracted copy of the pinned archive.
 import assert from 'node:assert/strict';
 import { createReadStream, readFileSync } from 'node:fs';
@@ -28,12 +28,13 @@ const { values: options } = parseArgs({ options: {
   tiers: { type: 'string' }, upstream: { type: 'string' }, work: { type: 'string' },
   platform: { type: 'string', default: `${process.platform}-${process.arch}` }, version: { type: 'string', default: '4.34.1' },
   report: { type: 'string' }, 'full-prefix': { type: 'string' }, phase: { type: 'string', default: 'all' },
+  catalog: { type: 'string' },
 } });
 if (!['all', 'extract', 'check'].includes(options.phase)) throw new Error('--phase must be all, extract or check');
 if (!options.upstream && !options['full-prefix'] && options.phase !== 'check') throw new Error('--upstream or --full-prefix is required');
 for (const name of ['tiers', 'work']) if (!options[name]) throw new Error(`--${name} is required`);
 const root = fileURLToPath(new URL('../../', import.meta.url));
-const catalog = JSON.parse(readFileSync(join(root, 'src/toolchains.json'), 'utf8'));
+const catalog = JSON.parse(readFileSync(options.catalog ?? join(root, 'src/toolchains.json'), 'utf8'));
 const release = catalog.lean[options.version], upstream = release.artifacts[options.platform];
 const windows = options.platform.startsWith('win32'), darwin = options.platform.startsWith('darwin');
 const tiers = resolve(options.tiers), work = resolve(options.work);

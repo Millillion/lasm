@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "defaultLean": "4.35.0",
+  "lean": {
+    "4.35.0": {
+      "commit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
+      "release": "https://github.com/leanprover/lean4/releases/tag/v4.35.0",
+      "publishedAt": "2026-10-12T18:13:12Z",
+      "verifiedAt": "2026-10-16",
+      "artifacts": {
+        "linux-x64": {
+          "name": "lean-4.35.0-linux.tar.zst",
+          "root": "lean-4.35.0-linux",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-linux.tar.zst",
+          "sha256": "7289597a44543246c9227b8cae501767e095ce17f6d448b95fc4a8dc97268f6d",
+          "bytes": 594481375,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        },
+        "linux-arm64": {
+          "name": "lean-4.35.0-linux_aarch64.tar.zst",
+          "root": "lean-4.35.0-linux_aarch64",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-linux_aarch64.tar.zst",
+          "sha256": "c8f0f8a3920e839718b1343e6781fd80a3e9b1024fbcd7078eb30f54e806b028",
+          "bytes": 594868592,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        },
+        "darwin-x64": {
+          "name": "lean-4.35.0-darwin.tar.zst",
+          "root": "lean-4.35.0-darwin",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-darwin.tar.zst",
+          "sha256": "0b43be5c7ecfb36016566a41005ab62bdb04743e6bfd5837e45f796ef4750b4e",
+          "bytes": 576516478,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        },
+        "darwin-arm64": {
+          "name": "lean-4.35.0-darwin_aarch64.tar.zst",
+          "root": "lean-4.35.0-darwin_aarch64",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-darwin_aarch64.tar.zst",
+          "sha256": "c0c6f34f35ba1dcc5c4a5fd106fefab9eb5e8469712624dd2c868d51b63177c2",
+          "bytes": 570422530,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        },
+        "win32-x64": {
+          "name": "lean-4.35.0-windows.tar.zst",
+          "root": "lean-4.35.0-windows",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-windows.tar.zst",
+          "sha256": "893fde3f52b48c647e3edcf33844cbb61f8ef70fcd88e0536bfc83f29844081e",
+          "bytes": 622724192,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        }
+      }
+    }
+  }
+}
