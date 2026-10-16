@@ -106,12 +106,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { platform: linux-x64, runner: ubuntu-24.04 }
-          - { platform: linux-arm64, runner: ubuntu-24.04-arm }
-          - { platform: darwin-x64, runner: macos-15-intel }
-          - { platform: darwin-arm64, runner: macos-15 }
-          - { platform: win32-x64, runner: windows-2025 }
-          - { platform: win32-arm64, runner: windows-11-arm }
+          # Linux cgroup accounting includes the extracted trees' page cache.
+          - { platform: linux-x64, runner: ubuntu-24.04, memory: 8192 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, memory: 8192 }
+          - { platform: darwin-x64, runner: macos-15-intel, memory: 6144 }
+          - { platform: darwin-arm64, runner: macos-15, memory: 5120 }
+          - { platform: win32-x64, runner: windows-2025, memory: 6144 }
+          - { platform: win32-arm64, runner: windows-11-arm, memory: 6144 }
     env:
       PLATFORM: ${{ matrix.platform }}
       VERSION: ${{ inputs.version }}
@@ -140,7 +141,7 @@ jobs:
           curl --fail --location --retry 5 --retry-all-errors --proto '=https' --output .work/lean-tiers/upstream "$url"
       - name: Run the tiers natively and compare generated C with the complete toolchain
         run: |
-          node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --report .work/lean-tiers-native-resources.json -- \
+          node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/lean-tiers-native-resources.json -- \
             node scripts/lean-dist/check-tiers.mjs --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
               --upstream .work/lean-tiers/upstream --work .work/lean-tiers/native --report .work/lean-tiers/native.json
           { echo "### $PLATFORM"; echo '```json'; cat .work/lean-tiers/native.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
