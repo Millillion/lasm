@@ -1,0 +1,180 @@
+name: Tiered Lean distribution
+# Maintainer-only: repackage each pinned Lean archive into per-platform binaries
+# and shared module-data archives, prove the shared archives are byte-identical
+# across platforms and deterministic, run them natively against the complete
+# upstream toolchain, then optionally retain them as public release assets.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Pinned Lean version in src/toolchains.json
+        type: string
+        default: 4.34.1
+      tag:
+        description: Release tag for the archives (only used when publishing)
+        type: string
+        default: lean-4.34.1-tiers-v1
+      publish:
+        description: Create the public release after every check passes
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: lean-tiers
+  cancel-in-progress: false
+jobs:
+  repackage:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64, win32-arm64]
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Download the pinned archive
+        run: |
+          url=$(node -p "require('./src/toolchains.json').lean[process.env.VERSION].artifacts[process.env.PLATFORM].url")
+          mkdir -p .work/lean-tiers/dl
+          curl --fail --location --retry 5 --retry-all-errors --proto '=https' --output .work/lean-tiers/dl/upstream "$url"
+          df -h .
+      - name: Repackage twice and record digests
+        # Shared data is written once, from linux-x64; every other platform
+        # packs it into a digest sink so equality is checked without storage.
+        # The memory cap includes the staged files' page cache.
+        run: |
+          data=hash; [ "$PLATFORM" = linux-x64 ] && data=write
+          node scripts/full-lean/run-bounded.mjs --memory-mib 12288 --timeout-seconds 12600 --report .work/lean-tiers-$PLATFORM-resources.json -- \
+            node scripts/lean-dist/build-tiers.mjs --version "$VERSION" --platform "$PLATFORM" --archive .work/lean-tiers/dl/upstream \
+              --out .work/lean-tiers/out --work .work/lean-tiers/work --data $data --twice
+          rm -f .work/lean-tiers/dl/upstream
+          ls -l .work/lean-tiers/out
+          { echo "### $PLATFORM"; echo '```'; node -e "for (const a of require('./.work/lean-tiers/out/report-' + process.env.PLATFORM + '.json').archives) console.log(a.name, a.bytes, a.sha256, a.written ? 'written' : 'digest')"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: tiers-${{ matrix.platform }}
+          path: .work/lean-tiers/out/
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+
+  shared:
+    needs: repackage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: tiers-*
+          path: .work/lean-tiers/all
+          merge-multiple: true
+      - name: Require identical shared archives and the size ceiling
+        run: |
+          ls -l .work/lean-tiers/all
+          node scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ inputs.tag }}/" .work/lean-tiers/all/report-*.json > .work/lean-tiers/tiers.json
+          node -e "
+            const fs = require('fs'), entry = JSON.parse(fs.readFileSync('.work/lean-tiers/tiers.json'));
+            const all = [...Object.values(entry.bin), ...entry.core, ...entry.extended];
+            for (const a of all) {
+              const size = fs.statSync('.work/lean-tiers/all/' + a.name).size;
+              if (size !== a.bytes) throw new Error(a.name + ' size mismatch');
+              if (a.bytes > 150 * 1024 * 1024) throw new Error(a.name + ' exceeds 150 MiB');
+            }
+            console.log(JSON.stringify(entry, null, 2));"
+          { echo '### Catalog entry'; echo '```json'; cat .work/lean-tiers/tiers.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+  native:
+    needs: repackage
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm }
+          - { platform: darwin-x64, runner: macos-15-intel }
+          - { platform: darwin-arm64, runner: macos-15 }
+          - { platform: win32-x64, runner: windows-2025 }
+          - { platform: win32-arm64, runner: windows-11-arm }
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      VERSION: ${{ inputs.version }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: actions/download-artifact@v8
+        with:
+          name: tiers-linux-x64
+          path: .work/lean-tiers/check
+      - uses: actions/download-artifact@v8
+        if: matrix.platform != 'linux-x64'
+        with:
+          name: tiers-${{ matrix.platform }}
+          path: .work/lean-tiers/check
+      - name: Download the complete pinned archive for comparison
+        run: |
+          url=$(node -p "require('./src/toolchains.json').lean[process.env.VERSION].artifacts[process.env.PLATFORM].url")
+          curl --fail --location --retry 5 --retry-all-errors --proto '=https' --output .work/lean-tiers/upstream "$url"
+      - name: Run the tiers natively and compare generated C with the complete toolchain
+        run: |
+          node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --timeout-seconds 5400 --report .work/lean-tiers-native-resources.json -- \
+            node scripts/lean-dist/check-tiers.mjs --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
+              --upstream .work/lean-tiers/upstream --work .work/lean-tiers/native --report .work/lean-tiers/native.json
+          { echo "### $PLATFORM"; echo '```json'; cat .work/lean-tiers/native.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+  publish:
+    needs: [shared, native]
+    if: inputs.publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: tiers-*
+          path: .work/lean-tiers/all
+          merge-multiple: true
+      - name: Retain the verified archives as public release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          cd .work/lean-tiers/all
+          node ../../../scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/" report-*.json > tiers.json
+          sha256sum *.tar.zst > SHA256SUMS
+          cat > notes.md <<EOF
+          Tiered Lean ${{ inputs.version }} archives for Lasm, produced by run ${GITHUB_RUN_ID} from ${GITHUB_SHA}.
+          Each archive is an unmodified subset of the pinned upstream Lean release; see the NOTICE inside each archive.
+          The per-platform report-*.json files record the upstream archive digests, archive digests and determinism checks.
+          EOF
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$TAG" --notes-file notes.md \
+            *.tar.zst report-*.json tiers.json SHA256SUMS
