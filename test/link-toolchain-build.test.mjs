@@ -42,7 +42,7 @@ test('the Emscripten subset is the JavaScript compiler, its dependencies and lic
     'node_modules/acorn/dist/acorn.mjs', 'node_modules/acorn-import-phases/src/index.js', 'third_party/terser/terser.js',
     'LICENSE', 'AUTHORS', 'emscripten-version.txt', 'system/lib/libc/musl/COPYRIGHT', 'system/lib/libcxx/LICENSE.TXT'])
     assert.ok(sharedJsCandidate(path), path);
-  for (const path of ['emcc.py', 'tools/link.py', 'tools/maint/x.mjs', 'node_modules/terser/dist/x.js', 'cache/sysroot/x.h',
+  for (const path of ['emcc.py', 'emscripten-revision.txt', 'tools/link.py', 'tools/maint/x.mjs', 'node_modules/terser/dist/x.js', 'cache/sysroot/x.h',
     'system/lib/emmalloc.c', 'src/__pycache__/x.pyc', 'test/x.mjs'])
     assert.ok(!sharedJsCandidate(path), path);
 });
@@ -79,4 +79,17 @@ test('the catalog requires identical shared bytes and subsets from every platfor
   assert.throws(() => toolchainCatalogEntry([report('linux-x64', { written: true }), report('win32-x64', { sha: 'other' })], base), /shared archive differs/);
   assert.throws(() => toolchainCatalogEntry([report('linux-x64', { written: true }), report('win32-x64', { digest: 'e' })], base), /subset differs/);
   assert.throws(() => toolchainCatalogEntry([report('win32-x64')], base), /No written shared archive/);
+});
+
+test('ar member listings see names, order and contents', async () => {
+  const { arMembers } = await import('../scripts/link-driver/compare-sysroots.mjs');
+  const header = (name, size) => Buffer.from(name.padEnd(16) + '0'.padEnd(12) + '0'.padEnd(6) + '0'.padEnd(6) + '644'.padEnd(8) + String(size).padEnd(10) + '`\n', 'latin1');
+  const member = (name, text) => [header(name, text.length), Buffer.from(text), ...(text.length % 2 ? [Buffer.from('\n')] : [])];
+  const archive = (...items) => Buffer.concat([Buffer.from('!<arch>\n'), ...items.flat()]);
+  const a = arMembers(archive(member('/', 'symbols'), member('_Exit__1.o/', 'one'), member('_exit.o/', 'two')));
+  const b = arMembers(archive(member('/', 'symbols'), member('_Exit.o/', 'one'), member('_exit__1.o/', 'two')));
+  assert.deepEqual(a.map(item => item.name), ['_Exit__1.o', '_exit.o']);
+  assert.deepEqual(a.map(item => item.sha256), b.map(item => item.sha256));
+  assert.notDeepEqual(a.map(item => item.name), b.map(item => item.name));
+  assert.throws(() => arMembers(Buffer.from('not an archive')), /Not an ar archive/);
 });

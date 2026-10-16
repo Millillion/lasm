@@ -122,14 +122,15 @@ jobs:
         with:
           pattern: sysroot-*
           path: .work/link-toolchain/sysroots
-      - name: Require identical sysroots, shared archives and the size ceiling
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Require equivalent sysroots, identical shared archives and the size ceiling
+        # Sysroots from two hosts must be byte-identical except for the libc member
+        # names emcc assigns in directory-listing order (compare-sysroots.mjs).
         run: |
           ls -lR .work/link-toolchain/sysroots
-          node -e "
-            const fs = require('fs'), dir = '.work/link-toolchain/sysroots';
-            const hosts = fs.readdirSync(dir).map(name => [name, require('./' + dir + '/' + name + '/sysroot.json').archive]);
-            console.log(JSON.stringify(hosts));
-            if (hosts.length !== 2 || hosts[0][1].sha256 !== hosts[1][1].sha256) throw new Error('Sysroot archives differ between hosts');"
+          node scripts/link-driver/compare-sysroots.mjs .work/link-toolchain/sysroots/sysroot-linux-x64/emscripten-6.0.9-cache-wasm64-pic.tar.zst \
+            .work/link-toolchain/sysroots/sysroot-linux-arm64/emscripten-6.0.9-cache-wasm64-pic.tar.zst --json .work/link-toolchain/sysroot-comparison.json
+          { echo '### Sysroot linux-x64 vs linux-arm64'; echo '```json'; cat .work/link-toolchain/sysroot-comparison.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           node scripts/link-driver/toolchain-catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ inputs.tag }}/" .work/link-toolchain/all/report-*.json > .work/link-toolchain/link-toolchain.json
           node -e "
             const fs = require('fs'), entry = JSON.parse(fs.readFileSync('.work/link-toolchain/link-toolchain.json'));

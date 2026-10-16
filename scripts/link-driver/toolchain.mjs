@@ -55,7 +55,9 @@ export function resolveNativeImport(name, platform, members) {
  * and the licence texts of the system libraries the sysroot is built from. */
 export function sharedJsCandidate(path) {
   if (path.split('/').some(part => part === '__pycache__')) return false;
-  if (['LICENSE', 'AUTHORS', 'emscripten-version.txt', 'emscripten-revision.txt', 'package.json'].includes(path)) return true;
+  // emscripten-revision.txt is omitted: nothing in the subset reads it, and the
+  // Windows emsdk archive alone writes it with CRLF (the NOTICE names the revision).
+  if (['LICENSE', 'AUTHORS', 'emscripten-version.txt', 'package.json'].includes(path)) return true;
   if (path.startsWith('src/')) return true;
   if (/^tools\/[^/]+\.mjs$/.test(path)) return true;
   if (path.startsWith('third_party/terser/')) return true;
@@ -153,8 +155,18 @@ export async function extractToolchain(archives, directory) {
   const { extract } = await import('tar');
   mkdirSync(directory, { recursive: true });
   if (readdirSync(directory).length) throw new Error('Extract the toolchain into a new, empty directory');
-  for (const archive of archives)
+  const { createHash } = await import('node:crypto');
+  const { writeFileSync } = await import('node:fs');
+  const { basename, join } = await import('node:path');
+  const identities = {};
+  for (const archive of archives) {
+    const hash = createHash('sha256');
+    for await (const chunk of createReadStream(archive)) hash.update(chunk);
+    identities[basename(archive).replace(/\.tar\.zst$/, '')] = hash.digest('hex');
     await pipe(createReadStream(archive), zstd(), extract({ cwd: directory, strict: true, preservePaths: false, preserveOwner: false }));
+  }
+  // Archive identities, so the link recipe can check what it runs against.
+  writeFileSync(join(directory, 'toolchain.json'), JSON.stringify(identities, null, 2) + '\n');
   return directory;
 }
 
@@ -167,7 +179,11 @@ export async function toolchainSdk(directory, { version = '6.0.9', platform = `$
   const clean = { ...env };
   for (const key of Object.keys(clean)) if (/^(?:EM_|EMCC_|EMSDK|PYTHON|LLVM_|BINARYEN_)/.test(key)) delete clean[key];
   const cache = join(shared, sharedLayout.cache);
-  return { prefix, driver: join(shared, sharedLayout.emscripten), cache, version, platform,
+  const { readFileSync } = await import('node:fs');
+  const identities = existsSync(join(directory, 'toolchain.json')) ? JSON.parse(readFileSync(join(directory, 'toolchain.json'), 'utf8')) : {};
+  const toolchain = identities[nativeArchiveName(version, platform)] && identities[sharedArchiveName(version)]
+    ? { native: identities[nativeArchiveName(version, platform)], shared: identities[sharedArchiveName(version)] } : undefined;
+  return { prefix, driver: join(shared, sharedLayout.emscripten), cache, version, platform, toolchain,
     env: { ...clean, EM_CACHE: cache, BINARYEN_CORES: '1', SOURCE_DATE_EPOCH: '315532800' },
     execute(tool) { throw new Error(`The Node link toolchain has no ${tool}`); } };
 }
