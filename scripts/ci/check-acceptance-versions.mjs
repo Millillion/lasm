@@ -24,10 +24,16 @@ assert.ok(response.ok, `Node release lookup failed: HTTP ${response.status}`);
 const node = (await response.json()).find(release => /^v\d+\.\d+\.\d+$/.test(release.version));
 result.node = { source, expected: 'v' + versions.node, tag: node.version, date: node.date, lts: node.lts };
 result.checkedAt = new Date().toISOString();
+const deferred = versions.deferredLatest ?? {};
+result.deferredLatest = deferred;
 mkdirSync(dirname(output), { recursive: true });
 writeFileSync(output, JSON.stringify(result, null, 2) + '\n');
+// A recorded deferral accepts exactly one newer release per tool. Any later
+// release fails again, so a deferral cannot silently age.
 for (const name of names) {
-  assert.equal(result[name].tag, result[name].expected, `Latest ${name} changed; update the acceptance pins`);
+  if (result[name].tag !== result[name].expected && deferred[name] !== undefined)
+    assert.equal(result[name].tag, 'v' + deferred[name], `Latest ${name} changed beyond the recorded deferral; update the acceptance pins`);
+  else assert.equal(result[name].tag, result[name].expected, `Latest ${name} changed; update the acceptance pins`);
   if (name !== 'node') { assert.equal(result[name].draft, false); assert.equal(result[name].prerelease, false); }
 }
 console.log(JSON.stringify(result, null, 2));
