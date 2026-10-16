@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, openSync, closeSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawn, spawnSync } from 'node:child_process';
@@ -66,13 +66,19 @@ for (const phase of ['online', 'offline']) {
   // report) removes a denied file mid-run; restoration must record, not fail.
   const vanishing = join(privateTree, phase + '-vanishing.partial'), phaseReport = join(output, phase + '.json');
   writeFileSync(vanishing, 'removed while the restricted consumer runs\n');
-  const remover = spawn(process.execPath, ['-e', `const fs=require('node:fs'),[r,f]=process.argv.slice(1),end=Date.now()+170000;
+  // Setup (denying developer programs and the repository) can take minutes, so
+  // the remover waits for the consumer to start and is stopped after the phase.
+  const removerLog = openSync(phaseReport + '.remover.stderr', 'w');
+  const remover = spawn(process.execPath, ['-e', `const fs=require('node:fs'),[r,f]=process.argv.slice(1);
     const t=setInterval(()=>{let s;try{s=JSON.parse(fs.readFileSync(r,'utf8')).status}catch{}
-    if(s==='running'){fs.rmSync(f);clearInterval(t)}else if(Date.now()>end)clearInterval(t)},50)`, phaseReport, vanishing], { stdio: 'ignore' });
-  const actual = windowsIsolated({ disposableRoot: root, reads: [nodeDirectory, readonly], writes: [writable],
-    denied: [resolve('.'), process.env.LASM_RESOURCE_PYTHON, privateTree],
-    command: [node, program, config, phase], cwd: writable, environment, offline: phase === 'offline', timeoutSeconds: 180 }, phaseReport);
-  if (remover.exitCode === null) remover.kill();
+    if(s==='running'){clearInterval(t);fs.rmSync(f)}},50)`, phaseReport, vanishing], { stdio: ['ignore', 'ignore', removerLog] });
+  closeSync(removerLog);
+  let actual;
+  try {
+    actual = windowsIsolated({ disposableRoot: root, reads: [nodeDirectory, readonly], writes: [writable],
+      denied: [resolve('.'), process.env.LASM_RESOURCE_PYTHON, privateTree],
+      command: [node, program, config, phase], cwd: writable, environment, offline: phase === 'offline', timeoutSeconds: 180 }, phaseReport);
+  } finally { if (remover.exitCode === null && remover.signalCode === null) remover.kill(); }
   assert.ok(!existsSync(vanishing), 'The privileged writer must remove its file during the restricted run');
   const expected = join(realpathSync.native(privateTree), phase + '-vanishing.partial').toLowerCase();
   assert.ok(actual.isolation.vanishedBeforeRestore?.some(p => p.toLowerCase() === expected), 'A vanished denied file is recorded as such');
