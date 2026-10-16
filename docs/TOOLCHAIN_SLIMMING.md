@@ -159,6 +159,29 @@ the recorded Emscripten recipe still applies. The AOT policy still rejects
 `StandaloneModuleData.lean`. Lean 4.35 rejects every repeated TCP shutdown as
 `otherError` "shutdown already requested"; the Node host now matches for 4.35.
 
+### Lean 4.35.0 CI runtime build resources (2026-10-16)
+
+Because 4.35.0 has tiers, the cold Lean CI step now provisions only tiers and the
+runtime build extracts the complete native archive (3,141,032,927 bytes) inside
+its Init/Std unit; with 4.34.1 that happened in the cold Lean step. The first
+4.35.0 [runtime run](https://github.com/Millillion/lasm/actions/runs/38955960352)
+reached the unchanged proactive stop (5.17 GiB of a 5,537,320,140-byte budget on
+a 16 GiB runner) at `Std/Data/DTreeMap/Internal/Lemmas`: file pages 4,041,646,080
+bytes, anonymous memory 1,318,195,200 bytes. This is a resource abort, not a
+build failure. Each runtime build, bundle and smoke step now runs
+[`with-cache-advice.mjs`](../scripts/full-lean/with-cache-advice.mjs) in the
+same guarded unit. It starts the existing completed-file advice sidecar for the
+receipted tool cache. The sidecar now also covers runtime-build outputs that the
+build has marked complete: module `.o`/`.c.gz` files whose `.stamp` is at least
+as new as the object, and renamed `lib<Group>.a`. It never touches `.partial`
+files, generated C, the extracted source or CMake outputs. Limits and runtime
+bytes are unchanged. The
+[rerun](https://github.com/Millillion/lasm/actions/runs/38960639129) passed,
+with peaks of Init/Std 3.89 GiB, Lean 0.91, all libraries 0.90, bundle 2.21 and
+smoke 1.00 GiB. It retained draft release `node-runtime-inputs-38960639129`
+(`node-runtime-inputs.tgz`, SHA-256 `0b6ccf3a…2b95`; runtime manifest
+`7482333e…80d3`). [Evidence](evidence/node-linux-ci-runtime-4.35.0-2026-10-16.json).
+
 ## Phases
 
 Each phase ships only after a new packed candidate passes the five-platform

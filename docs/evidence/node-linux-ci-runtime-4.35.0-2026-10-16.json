@@ -1,0 +1,887 @@
+{
+ "scope": "Lean 4.35.0 source-built application runtime on a free ubuntu-24.04 runner (16 GiB); maintainer CI resource handling, not package acceptance",
+ "diagnosis": "Lean 4.35.0 has tiered catalog archives, so the cold Lean step provisions tiers; build-application-runtime.mjs then provisions the full native archive (about 3.14 GB extracted, artifacts/e7c467665b...) inside the Init/Std unit. Lean 4.34.1 had no tiers and extracted the full archive in the cold Lean step (peak 3.80 GiB there, Init/Std 2.15 GiB; see node-linux-ci-runtime-2026-09-26.json).",
+ "failedRun": {
+  "url": "https://github.com/Millillion/lasm/actions/runs/38955960352",
+  "sourceRevision": "86e0c4c",
+  "step": "Build runtime and Init Std application archives",
+  "lastModuleStarted": "Std/Data/DTreeMap/Internal/Lemmas",
+  "resources": {
+   "lean": {
+    "peakMemoryBytes": 2959974400,
+    "stopMemoryBytes": 5307472281,
+    "memoryMax": 6634340352,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T19:36:09.600Z",
+     "memoryBytes": 2731225088,
+     "peakMemoryBytes": 2959974400,
+     "swapBytes": 0,
+     "tasks": 11,
+     "memoryBreakdown": {
+      "anon": 164786176,
+      "file": 2456895488,
+      "kernel": 107130880,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 2456895488,
+      "slab": 103428816
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "sdk": {
+    "peakMemoryBytes": 2782154752,
+    "stopMemoryBytes": 5619528499,
+    "memoryMax": 7024410624,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T19:37:05.612Z",
+     "memoryBytes": 2605510656,
+     "peakMemoryBytes": 2782154752,
+     "swapBytes": 0,
+     "tasks": 1,
+     "memoryBreakdown": {
+      "anon": 4096,
+      "file": 2485092352,
+      "kernel": 119869440,
+      "shmem": 0,
+      "file_mapped": 0,
+      "inactive_file": 2485075968,
+      "slab": 119841184
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "sources": {
+    "peakMemoryBytes": 757383168,
+    "stopMemoryBytes": 5476922163,
+    "memoryMax": 6846152704,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T19:37:35.944Z",
+     "memoryBytes": 654872576,
+     "peakMemoryBytes": 757383168,
+     "swapBytes": 0,
+     "tasks": 7,
+     "memoryBreakdown": {
+      "anon": 10514432,
+      "file": 591052800,
+      "kernel": 52916224,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 590938112,
+      "slab": 52153168
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "gmp": {
+    "peakMemoryBytes": 317771776,
+    "stopMemoryBytes": 5562485964,
+    "memoryMax": 6953107456,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T19:46:09.850Z",
+     "memoryBytes": 198344704,
+     "peakMemoryBytes": 317771776,
+     "swapBytes": 0,
+     "tasks": 11,
+     "memoryBreakdown": {
+      "anon": 129241088,
+      "file": 58023936,
+      "kernel": 10506240,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 54456320,
+      "slab": 8408696
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "hosts": {
+    "peakMemoryBytes": 379092992,
+    "stopMemoryBytes": 5663149260,
+    "memoryMax": 7078936576,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T19:47:47.597Z",
+     "memoryBytes": 343814144,
+     "peakMemoryBytes": 379092992,
+     "swapBytes": 0,
+     "tasks": 24,
+     "memoryBreakdown": {
+      "anon": 177823744,
+      "file": 144769024,
+      "kernel": 20922368,
+      "shmem": 0,
+      "file_mapped": 229376,
+      "inactive_file": 141094912,
+      "slab": 17214864
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "init-std": {
+    "peakMemoryBytes": 5552099328,
+    "stopMemoryBytes": 5537320140,
+    "memoryMax": 6921650176,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": true,
+    "stoppedBecause": "Workload reached its proactive memory budget",
+    "lastSample": {
+     "at": "2026-10-16T20:07:42.053Z",
+     "memoryBytes": 5551575040,
+     "peakMemoryBytes": 5551575040,
+     "swapBytes": 0,
+     "tasks": 20,
+     "memoryBreakdown": {
+      "anon": 1318195200,
+      "file": 4041646080,
+      "kernel": 191467520,
+      "shmem": 0,
+      "file_mapped": 174997504,
+      "inactive_file": 4031266816,
+      "slab": 182636912
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   }
+  }
+ },
+ "successfulRun": {
+  "url": "https://github.com/Millillion/lasm/actions/runs/38960639129",
+  "sourceRevision": "71f82030645c8d05b9f73628b3cf1c7e2dda375a",
+  "change": "scripts/full-lean/with-cache-advice.mjs runs scripts/full-lean/advise-tool-cache.py inside each build unit; scope extended to stamped generated-c objects/archives and renamed lib<Group>.a. Limits unchanged.",
+  "resources": {
+   "lean": {
+    "peakMemoryBytes": 2958057472,
+    "stopMemoryBytes": 5307472281,
+    "memoryMax": 6634340352,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T20:14:21.070Z",
+     "memoryBytes": 2731503616,
+     "peakMemoryBytes": 2958057472,
+     "swapBytes": 0,
+     "tasks": 11,
+     "memoryBreakdown": {
+      "anon": 165396480,
+      "file": 2456838144,
+      "kernel": 107171840,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 2456838144,
+      "slab": 103423024
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "sdk": {
+    "peakMemoryBytes": 2786844672,
+    "stopMemoryBytes": 5586812928,
+    "memoryMax": 6983516160,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T20:15:05.817Z",
+     "memoryBytes": 2620153856,
+     "peakMemoryBytes": 2786844672,
+     "swapBytes": 0,
+     "tasks": 7,
+     "memoryBreakdown": {
+      "anon": 12820480,
+      "file": 2485108736,
+      "kernel": 120774656,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 2485092352,
+      "slab": 119882160
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "sources": {
+    "peakMemoryBytes": 770424832,
+    "stopMemoryBytes": 5465178112,
+    "memoryMax": 6831472640,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T20:15:32.611Z",
+     "memoryBytes": 767971328,
+     "peakMemoryBytes": 767971328,
+     "swapBytes": 0,
+     "tasks": 13,
+     "memoryBreakdown": {
+      "anon": 124579840,
+      "file": 588881920,
+      "kernel": 54165504,
+      "shmem": 0,
+      "file_mapped": 188416,
+      "inactive_file": 588759040,
+      "slab": 52204560
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "gmp": {
+    "peakMemoryBytes": 315756544,
+    "stopMemoryBytes": 5513832038,
+    "memoryMax": 6892290048,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T20:24:34.350Z",
+     "memoryBytes": 194207744,
+     "peakMemoryBytes": 315756544,
+     "swapBytes": 0,
+     "tasks": 11,
+     "memoryBreakdown": {
+      "anon": 125595648,
+      "file": 57679872,
+      "kernel": 10416128,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 54112256,
+      "slab": 8047800
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "hosts": {
+    "peakMemoryBytes": 378765312,
+    "stopMemoryBytes": 5674893312,
+    "memoryMax": 7093616640,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T20:26:21.299Z",
+     "memoryBytes": 335826944,
+     "peakMemoryBytes": 378765312,
+     "swapBytes": 0,
+     "tasks": 24,
+     "memoryBreakdown": {
+      "anon": 169119744,
+      "file": 144773120,
+      "kernel": 21565440,
+      "shmem": 0,
+      "file_mapped": 229376,
+      "inactive_file": 141099008,
+      "slab": 17239960
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "init-std": {
+    "peakMemoryBytes": 4178407424,
+    "stopMemoryBytes": 5539836723,
+    "memoryMax": 6924795904,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T21:04:06.106Z",
+     "memoryBytes": 919052288,
+     "peakMemoryBytes": 4178407424,
+     "swapBytes": 0,
+     "tasks": 8,
+     "memoryBreakdown": {
+      "anon": 16764928,
+      "file": 818397184,
+      "kernel": 83206144,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 808017920,
+      "slab": 83628032
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "lean-library": {
+    "peakMemoryBytes": 973299712,
+    "stopMemoryBytes": 5383808614,
+    "memoryMax": 6729760768,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T22:05:55.688Z",
+     "memoryBytes": 596353024,
+     "peakMemoryBytes": 973299712,
+     "swapBytes": 0,
+     "tasks": 8,
+     "memoryBreakdown": {
+      "anon": 17305600,
+      "file": 562139136,
+      "kernel": 16306176,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 279064576,
+      "slab": 18990880
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "all-libraries": {
+    "peakMemoryBytes": 967561216,
+    "stopMemoryBytes": 5323410636,
+    "memoryMax": 6654263296,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T22:13:23.460Z",
+     "memoryBytes": 179531776,
+     "peakMemoryBytes": 967561216,
+     "swapBytes": 0,
+     "tasks": 8,
+     "memoryBreakdown": {
+      "anon": 17801216,
+      "file": 157024256,
+      "kernel": 4206592,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 56274944,
+      "slab": 3375048
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "bundle": {
+    "peakMemoryBytes": 2375917568,
+    "stopMemoryBytes": 5417363046,
+    "memoryMax": 6771703808,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T22:15:57.774Z",
+     "memoryBytes": 675028992,
+     "peakMemoryBytes": 2375917568,
+     "swapBytes": 0,
+     "tasks": 8,
+     "memoryBreakdown": {
+      "anon": 17760256,
+      "file": 638488576,
+      "kernel": 18067456,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 570748928,
+      "slab": 17154584
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "smoke": {
+    "peakMemoryBytes": 1077964800,
+    "stopMemoryBytes": 5239524556,
+    "memoryMax": 6549405696,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T22:16:52.706Z",
+     "memoryBytes": 484065280,
+     "peakMemoryBytes": 1077964800,
+     "swapBytes": 0,
+     "tasks": 8,
+     "memoryBreakdown": {
+      "anon": 15982592,
+      "file": 457605120,
+      "kernel": 9580544,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 42692608,
+      "slab": 8696888
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   },
+   "handoff": {
+    "peakMemoryBytes": 580685824,
+    "stopMemoryBytes": 1717986918,
+    "memoryMax": 2147483648,
+    "hostTotalBytes": 16766414848,
+    "result": {
+     "code": 0,
+     "signal": null
+    },
+    "resourceLimited": false,
+    "stoppedBecause": null,
+    "lastSample": {
+     "at": "2026-10-16T22:16:59.761Z",
+     "memoryBytes": 576749568,
+     "peakMemoryBytes": 580685824,
+     "swapBytes": 0,
+     "tasks": 11,
+     "memoryBreakdown": {
+      "anon": 120385536,
+      "file": 440852480,
+      "kernel": 14880768,
+      "shmem": 0,
+      "file_mapped": 86016,
+      "inactive_file": 440799232,
+      "slab": 13483656
+     },
+     "pressureSomeAvg10": 0,
+     "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+     }
+    }
+   }
+  },
+  "advice": {
+   "init-std": {
+    "method": "fdatasync once per completed immutable cache tree or stamped runtime-build file; repeated POSIX_FADV_DONTNEED",
+    "scope": "Completed immutable tools, application build caches, receipted native comparison artifacts and stamped runtime-build module outputs only; excludes deployment files, package, staging, partial outputs and SDK state. No file changes, global cache drops or resource-limit changes",
+    "status": "finished",
+    "passes": 843,
+    "adviceCalls": 65597930,
+    "advisedBytesIncludingRepeats": 8662031842906,
+    "fileBytesBeforeLastPass": 1104777216,
+    "fileBytesAfterLastPass": 818397184,
+    "runtimeBuild": {
+     "output": "/home/runner/work/lasm/lasm/.work/ci-application-libraries",
+     "filesLastPass": 2296,
+     "bytesLastPass": 79131966
+    },
+    "treeBytes": {
+     "artifacts/237cac6079401a3ec99aacbbd9785d5e2719b1b8e8bfe611193128636478fdce": 468349813,
+     "artifacts/bb02e2c8981f2b0c3792ea9103e8611d4b6186c4a2bcdd7a443e0d311a6b2563": 329139956,
+     "artifacts/12b385f6e04be3c9996f00b094d971cb2aaee6dd535e7bdc82ce7062e05805f1": 394244387,
+     "artifacts/20bab494f6c48819f71a4440510aabab3a3ecd87fe972b1f9b19ad9ee4121287": 449840314,
+     "artifacts/530d047d60f404ffbcabce1eb103e9983b3f94b3730625778f7815273a4e2e57": 248505207,
+     "artifacts/fbb538cb832673bb66912d8b9df971453edf0503312cadc16037617f9779a47c": 98996687,
+     "artifacts/5cff5dce62e8ec898accd6130a08b50cab481c91016c53bd79ad622034677353": 519266686,
+     "artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6": 1496470847,
+     "derived/55e241085383ab05648f2455cbbd77b35151b047529909170daef773a30312b0": 2409343488,
+     "derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7": 795001158,
+     "artifacts/e7c467665bf37e1d106563cf36655c8d51a272aae524c9044b9bc7928c2542b0": 3141032927
+    }
+   },
+   "lean-library": {
+    "method": "fdatasync once per completed immutable cache tree or stamped runtime-build file; repeated POSIX_FADV_DONTNEED",
+    "scope": "Completed immutable tools, application build caches, receipted native comparison artifacts and stamped runtime-build module outputs only; excludes deployment files, package, staging, partial outputs and SDK state. No file changes, global cache drops or resource-limit changes",
+    "status": "finished",
+    "passes": 1366,
+    "adviceCalls": 110504213,
+    "advisedBytesIncludingRepeats": 14439954480176,
+    "fileBytesBeforeLastPass": 415240192,
+    "fileBytesAfterLastPass": 107986944,
+    "runtimeBuild": {
+     "output": "/home/runner/work/lasm/lasm/.work/ci-application-libraries",
+     "filesLastPass": 4750,
+     "bytesLastPass": 364699323
+    },
+    "treeBytes": {
+     "artifacts/237cac6079401a3ec99aacbbd9785d5e2719b1b8e8bfe611193128636478fdce": 468349813,
+     "artifacts/bb02e2c8981f2b0c3792ea9103e8611d4b6186c4a2bcdd7a443e0d311a6b2563": 329139956,
+     "artifacts/12b385f6e04be3c9996f00b094d971cb2aaee6dd535e7bdc82ce7062e05805f1": 394244387,
+     "artifacts/20bab494f6c48819f71a4440510aabab3a3ecd87fe972b1f9b19ad9ee4121287": 449840314,
+     "artifacts/530d047d60f404ffbcabce1eb103e9983b3f94b3730625778f7815273a4e2e57": 248505207,
+     "artifacts/fbb538cb832673bb66912d8b9df971453edf0503312cadc16037617f9779a47c": 98996687,
+     "artifacts/5cff5dce62e8ec898accd6130a08b50cab481c91016c53bd79ad622034677353": 519266686,
+     "artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6": 1496470847,
+     "artifacts/e7c467665bf37e1d106563cf36655c8d51a272aae524c9044b9bc7928c2542b0": 3141032927,
+     "derived/55e241085383ab05648f2455cbbd77b35151b047529909170daef773a30312b0": 2409343488,
+     "derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7": 795001158
+    }
+   },
+   "all-libraries": {
+    "method": "fdatasync once per completed immutable cache tree or stamped runtime-build file; repeated POSIX_FADV_DONTNEED",
+    "scope": "Completed immutable tools, application build caches, receipted native comparison artifacts and stamped runtime-build module outputs only; excludes deployment files, package, staging, partial outputs and SDK state. No file changes, global cache drops or resource-limit changes",
+    "status": "finished",
+    "passes": 163,
+    "adviceCalls": 13410069,
+    "advisedBytesIncludingRepeats": 1786067287079,
+    "fileBytesBeforeLastPass": 326840320,
+    "fileBytesAfterLastPass": 112099328,
+    "runtimeBuild": {
+     "output": "/home/runner/work/lasm/lasm/.work/ci-application-libraries",
+     "filesLastPass": 5077,
+     "bytesLastPass": 618975164
+    },
+    "treeBytes": {
+     "artifacts/237cac6079401a3ec99aacbbd9785d5e2719b1b8e8bfe611193128636478fdce": 468349813,
+     "artifacts/bb02e2c8981f2b0c3792ea9103e8611d4b6186c4a2bcdd7a443e0d311a6b2563": 329139956,
+     "artifacts/12b385f6e04be3c9996f00b094d971cb2aaee6dd535e7bdc82ce7062e05805f1": 394244387,
+     "artifacts/20bab494f6c48819f71a4440510aabab3a3ecd87fe972b1f9b19ad9ee4121287": 449840314,
+     "artifacts/530d047d60f404ffbcabce1eb103e9983b3f94b3730625778f7815273a4e2e57": 248505207,
+     "artifacts/fbb538cb832673bb66912d8b9df971453edf0503312cadc16037617f9779a47c": 98996687,
+     "artifacts/5cff5dce62e8ec898accd6130a08b50cab481c91016c53bd79ad622034677353": 519266686,
+     "artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6": 1496470847,
+     "artifacts/e7c467665bf37e1d106563cf36655c8d51a272aae524c9044b9bc7928c2542b0": 3141032927,
+     "derived/55e241085383ab05648f2455cbbd77b35151b047529909170daef773a30312b0": 2409343488,
+     "derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7": 795001158
+    }
+   },
+   "bundle": {
+    "method": "fdatasync once per completed immutable cache tree or stamped runtime-build file; repeated POSIX_FADV_DONTNEED",
+    "scope": "Completed immutable tools, application build caches, receipted native comparison artifacts and stamped runtime-build module outputs only; excludes deployment files, package, staging, partial outputs and SDK state. No file changes, global cache drops or resource-limit changes",
+    "status": "finished",
+    "passes": 57,
+    "adviceCalls": 4701018,
+    "advisedBytesIncludingRepeats": 626146913319,
+    "fileBytesBeforeLastPass": 533819392,
+    "fileBytesAfterLastPass": 532340736,
+    "runtimeBuild": {
+     "output": "/home/runner/work/lasm/lasm/.work/ci-application-libraries",
+     "filesLastPass": 5080,
+     "bytesLastPass": 634842097
+    },
+    "treeBytes": {
+     "artifacts/237cac6079401a3ec99aacbbd9785d5e2719b1b8e8bfe611193128636478fdce": 468349813,
+     "artifacts/bb02e2c8981f2b0c3792ea9103e8611d4b6186c4a2bcdd7a443e0d311a6b2563": 329139956,
+     "artifacts/12b385f6e04be3c9996f00b094d971cb2aaee6dd535e7bdc82ce7062e05805f1": 394244387,
+     "artifacts/20bab494f6c48819f71a4440510aabab3a3ecd87fe972b1f9b19ad9ee4121287": 449840314,
+     "artifacts/530d047d60f404ffbcabce1eb103e9983b3f94b3730625778f7815273a4e2e57": 248505207,
+     "artifacts/fbb538cb832673bb66912d8b9df971453edf0503312cadc16037617f9779a47c": 98996687,
+     "artifacts/5cff5dce62e8ec898accd6130a08b50cab481c91016c53bd79ad622034677353": 519266686,
+     "artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6": 1496470847,
+     "artifacts/e7c467665bf37e1d106563cf36655c8d51a272aae524c9044b9bc7928c2542b0": 3141032927,
+     "derived/55e241085383ab05648f2455cbbd77b35151b047529909170daef773a30312b0": 2409343488,
+     "derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7": 795001158
+    }
+   },
+   "smoke": {
+    "method": "fdatasync once per completed immutable cache tree or stamped runtime-build file; repeated POSIX_FADV_DONTNEED",
+    "scope": "Completed immutable tools, application build caches, receipted native comparison artifacts and stamped runtime-build module outputs only; excludes deployment files, package, staging, partial outputs and SDK state. No file changes, global cache drops or resource-limit changes",
+    "status": "finished",
+    "passes": 19,
+    "adviceCalls": 1616178,
+    "advisedBytesIncludingRepeats": 217998773170,
+    "fileBytesBeforeLastPass": 377647104,
+    "fileBytesAfterLastPass": 99147776,
+    "runtimeBuild": null,
+    "treeBytes": {
+     "artifacts/237cac6079401a3ec99aacbbd9785d5e2719b1b8e8bfe611193128636478fdce": 468349813,
+     "artifacts/bb02e2c8981f2b0c3792ea9103e8611d4b6186c4a2bcdd7a443e0d311a6b2563": 329139956,
+     "artifacts/12b385f6e04be3c9996f00b094d971cb2aaee6dd535e7bdc82ce7062e05805f1": 394244387,
+     "artifacts/20bab494f6c48819f71a4440510aabab3a3ecd87fe972b1f9b19ad9ee4121287": 449840314,
+     "artifacts/530d047d60f404ffbcabce1eb103e9983b3f94b3730625778f7815273a4e2e57": 248505207,
+     "artifacts/fbb538cb832673bb66912d8b9df971453edf0503312cadc16037617f9779a47c": 98996687,
+     "artifacts/5cff5dce62e8ec898accd6130a08b50cab481c91016c53bd79ad622034677353": 519266686,
+     "artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6": 1496470847,
+     "artifacts/e7c467665bf37e1d106563cf36655c8d51a272aae524c9044b9bc7928c2542b0": 3141032927,
+     "derived/55e241085383ab05648f2455cbbd77b35151b047529909170daef773a30312b0": 2409343488,
+     "derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7": 795001158,
+     "derived/846714deb73236315edb16475734fddf54b09bc00e72a3e3fa5d9ce3dbec55d5": 971888401,
+     "artifacts/32df1bae74da67e88c4373898382e97f62d1d7b3ff40dc6e6c529d39dc1bd6d7": 306109210,
+     "artifacts/db4fe4c75ba01c81d8f1bab1edef8bf408375a5649b7a04d51555bf6ed5de2c4": 31736051,
+     "derived/b15125fb185bbb8a4bddfb689d65a3db0e7d08af8cc09d6db38ee3aece498011": 337844595
+    }
+   }
+  }
+ },
+ "handoff": {
+  "release": "node-runtime-inputs-38960639129",
+  "asset": "node-runtime-inputs.tgz",
+  "sha256": "0b6ccf3a86e264f95a4957d656d992b197809ea049cdceb0762d4933744d2b95",
+  "cacheKey": "lasm-node-linux-inputs-71f82030645c8d05b9f73628b3cf1c7e2dda375a-0b6ccf3a86e264f95a4957d656d992b197809ea049cdceb0762d4933744d2b95",
+  "runtimeName": "lean-4.35.0-wasm64",
+  "runtimeManifestSha256": "7482333e0a70a6aee12a540e11a48f31fd56c86761e7b3477f4a46ae310f80d3",
+  "lean": "4.35.0",
+  "sourceBuild": {
+   "schema": 1,
+   "lean": "4.35.0",
+   "leanCommit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
+   "sourceArchiveSha256": "a947ac7d535edf26ca5a2542615f8ba4b50756e099cd6c8913f789de96b6b92c",
+   "nativeArtifactIdentity": "e7c467665bf37e1d106563cf36655c8d51a272aae524c9044b9bc7928c2542b0",
+   "patches": {
+    "wasm-build": "842f5fc7a861dcd287f1cd518fa24a8464f7a85282641598e5eae4fa0c4f8d16",
+    "compact-alignment": "071e70af2a4b58e1744b178ba1ee094c0d2701bcefef4653995675656f4daedb",
+    "thread-runtime": "2e4a2efd1a209cabd2caa893e5dfa8e26174f82ed2a808145b9faafff667265a",
+    "sdk-mimalloc": "701d60826b111a83d0fc024da47b74e45a81a5d33e32289d3dd7ae43af1eeef4",
+    "c-inputs": "5763a561cab0cd21243b1d4c7a73fecf49420d9c70145c3cef6c4d91215e6d0f",
+    "region-allocation": "d8584427270436c68bdcbaaa75da56e74a572983a585022fb84923c979ae1787",
+    "host-platform": "de1d33de36b72d17ae2350bf912a636c0db511b426b6ca428b3fa2834d4ae61c",
+    "host-linux": "77f66fc789821bcce694a9683dd079d5ce0f8c73902b91095d8a8f10fd88fa4a",
+    "host-backtrace": "55a0559e972f7db3eeeab0d521458a3c30416ecff76362bb54f148f0798577f8",
+    "libuv-source": "0681c682f09c5752897b7e882c16ed2b413522876047cb52ff2d29ddad4a2421"
+   },
+   "sdkPatchSha256": "30831eade8835dfa36b92f9354a1fcaaa4ec0315a06deb79d1c72508abef4664",
+   "emscripten": "6.0.9",
+   "gmpSha256": "cb631f9489ceb906eead0a7edd60c75b67483d97cbd1d4fe49af5472b6693c22",
+   "memoryLayout": "wasm64",
+   "threading": "pthreads",
+   "allocator": "mimalloc",
+   "purpose": "AOT application libraries; no Wasm compiler executable",
+   "sdk": "/home/runner/work/lasm/lasm/.cache/ci-application-tools/artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+   "sdkMode": "managed",
+   "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+   "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+   "sdkToolCache": "/home/runner/work/lasm/lasm/.cache/ci-application-tools",
+   "nativePrefix": "/home/runner/work/lasm/lasm/.cache/ci-application-tools/artifacts/e7c467665bf37e1d106563cf36655c8d51a272aae524c9044b9bc7928c2542b0",
+   "source": "/home/runner/work/lasm/lasm/.work/ci-application-libraries/source",
+   "build": "/home/runner/work/lasm/lasm/.work/ci-application-libraries/build",
+   "resourceReport": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/all-libraries-resources.json"
+  },
+  "smoke": {
+   "phase": "smoke",
+   "lean": "4.35.0",
+   "leanCommit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
+   "scope": "Source-built AOT runtime control, not installed-package acceptance",
+   "passed": true,
+   "resourceReport": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/smoke-resources.json",
+   "startedAt": "2026-10-16T22:15:58.145Z",
+   "committedCatalog": {
+    "schema": 1,
+    "lean": {
+     "4.34.1": {
+      "name": "lean-4.34.1-wasm64",
+      "manifestSha256": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf"
+     },
+     "4.34.0": {
+      "name": "lean-4.34.0-wasm64",
+      "manifestSha256": "37ede9f5998fe2179e9f4f911fa01cba4c393323f34ecbd817804b5ab8b7682a"
+     }
+    }
+   },
+   "candidate": {
+    "identity": "7482333e0a70a6aee12a540e11a48f31fd56c86761e7b3477f4a46ae310f80d3",
+    "modules": 2538
+   },
+   "build": {
+    "signature": "8cee96897ef539a2649407d4ab2e4d594c14fe53356e3dd31e12dfa42e4f145e",
+    "cacheHit": false
+   },
+   "native": {
+    "code": 0,
+    "signal": null,
+    "stdout": "ordinary Lean IO\n1361129467683753853853498429727072845841\n",
+    "stderr": ""
+   },
+   "actual": {
+    "code": 0,
+    "signal": null,
+    "stdout": "ordinary Lean IO\n1361129467683753853853498429727072845841\n",
+    "stderr": ""
+   },
+   "runtimeBuild": {
+    "status": "complete",
+    "completed": 2538,
+    "groups": [
+     "Init",
+     "Std",
+     "Lean",
+     "Lake"
+    ]
+   },
+   "finishedAt": "2026-10-16T22:16:52.637Z"
+  }
+ }
+}
