@@ -1,11 +1,11 @@
 {
   "active": true,
-  "version": "0.1.0-experimental.36513318119",
-  "sha256": "ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b",
-  "sourceRevision": "e4bb15165042a439b9cabdcd1678fafdc2e99f35",
-  "release": "node-package-36513318119",
-  "baselineRunId": "36513318119",
+  "version": "0.1.0-experimental.38930715033",
+  "sha256": "99593d597804f05e489d1f9d7c2c3da985e67906b8dbb114b7cf6300f9765dc9",
+  "sourceRevision": "3dc280da933c494b8b0d3352361b2a4807356745",
+  "release": "node-package-38930715033",
+  "baselineRunId": "38930715033",
   "node": "26.10.0",
   "lean": "4.34.1",
-  "reason": "The exact archive passed complete installed, offline npm, copied deployment and CLI/Lake private-CA/proxy gates on all six native targets. Linux resource, Windows report-write and Intel Mac accounting failures remain preserved while corrected maintainer controls repeat validation. The multi-day confidence gate remains pending."
+  "reason": "Slimmed installer (tiered Lean, Python-free Node link driver): the exact archive passed complete installed, offline npm, copied deployment and CLI/Lake private-CA/proxy gates on all five supported native targets in run 38930715033."
 }
