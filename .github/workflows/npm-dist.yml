@@ -1,0 +1,139 @@
+name: npm distribution (local registry)
+# Maintainer-only (docs/TOOLCHAIN_SLIMMING.md, Phase 3). On each native runner:
+# build every npm package deterministically from the catalog's release assets and
+# a packed Lasm candidate, publish them to a private loopback Verdaccio registry
+# (no uplinks), and install and build from it in empty directories with an empty
+# Lasm tool cache, LASM_ARTIFACT_SOURCE=npm (no direct downloads) and a network
+# audit that blocks every non-loopback request. Nothing is published anywhere else.
+#
+# The packed input is the accepted Lean 4.34.1 candidate (its runtime, native
+# helpers and bundled installer dependencies), overlaid with this ref's bin/ and
+# src/ (scripts/npm-dist/build.mjs --overlay-source), so the npm source code is
+# exercised before a Lean 4.35 runtime candidate exists.
+on:
+  workflow_dispatch:
+    inputs:
+      base-release:
+        description: Retained candidate release supplying the runtime
+        type: string
+        default: node-linux-candidate-38930715033
+      base-sha256:
+        description: SHA-256 of its package tarball
+        type: string
+        default: 99593d597804f05e489d1f9d7c2c3da985e67906b8dbb114b7cf6300f9765dc9
+      node:
+        description: Node version the candidate requires
+        type: string
+        default: 26.10.0
+permissions:
+  contents: read
+concurrency:
+  group: npm-dist-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  registry:
+    runs-on: ${{ matrix.runner }}
+    # The retained candidate is a draft release asset, readable only with write access.
+    permissions:
+      contents: write
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, memory: 6144 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, memory: 6144 }
+          - { platform: darwin-x64, runner: macos-15-intel, memory: 6144 }
+          - { platform: darwin-arm64, runner: macos-15, memory: 5120 }
+          - { platform: win32-x64, runner: windows-2025, memory: 6144 }
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      MEMORY: ${{ matrix.memory }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ inputs.node }}
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable the process-tree guard
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Unit tests (source resolution, fix messages, package layout)
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/npm-unit-resources.json -- node --test --test-concurrency=1 test/npm-artifacts.test.mjs test/npm-dist-packages.test.mjs test/managed-artifacts.test.mjs
+      - name: Fetch and verify the retained candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_RELEASE: ${{ inputs.base-release }}
+          BASE_SHA256: ${{ inputs.base-sha256 }}
+        run: |
+          mkdir -p .work/npm-base
+          gh release download "$BASE_RELEASE" --repo "$GITHUB_REPOSITORY" --dir .work/npm-base --pattern '*.tgz'
+          node -e "const c=require('node:crypto'),f=require('node:fs'),[n]=f.readdirSync('.work/npm-base');const h=c.createHash('sha256').update(f.readFileSync('.work/npm-base/'+n)).digest('hex');if(h!==process.env.BASE_SHA256)throw new Error('candidate digest '+h);console.log(n,h)"
+      - name: Build all packages (each step guarded; npm pack twice per package)
+        run: node scripts/npm-dist/build-all.mjs --base .work/npm-base/*.tgz --out .work/npm-dist/build --overlay-source --memory-mib 2048
+      - name: Start a loopback Verdaccio and publish to it
+        run: |
+          node scripts/npm-dist/registry.mjs start --dir "$RUNNER_TEMP/verdaccio" --port 4873
+          node scripts/npm-dist/registry.mjs publish --dir "$RUNNER_TEMP/verdaccio" --dist .work/npm-dist/build
+      - name: Install from the registry and build (empty caches, npm only, non-loopback requests blocked)
+        run: |
+          for scenario in installed lake npx omit-optional foreign-lock; do
+            node scripts/full-lean/run-bounded.mjs --memory-mib "$MEMORY" --report ".work/npm-consumer-$scenario-resources.json" -- \
+              node scripts/npm-dist/consumer.mjs --registry http://127.0.0.1:4873/ --dist .work/npm-dist/build --work "$RUNNER_TEMP/consumer" --scenario "$scenario"
+          done
+      - name: pnpm resolution
+        continue-on-error: true
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pnpm" --no-audit --no-fund --ignore-scripts pnpm@12.4.2
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/npm-consumer-pnpm-resources.json -- \
+            node scripts/npm-dist/consumer.mjs --registry http://127.0.0.1:4873/ --dist .work/npm-dist/build --work "$RUNNER_TEMP/consumer" --scenario pnpm --pnpm "$RUNNER_TEMP/pnpm/node_modules/pnpm/bin/pnpm.mjs"
+      - name: Gather evidence
+        if: always()
+        run: |
+          node scripts/npm-dist/registry.mjs stop --dir "$RUNNER_TEMP/verdaccio" || true
+          mkdir -p ".work/upload/$PLATFORM"
+          cp .work/npm-dist/build/npm-dist.json ".work/upload/$PLATFORM/" 2>/dev/null || true
+          cp -R .work/npm-dist/build/resources ".work/upload/$PLATFORM/build-resources" 2>/dev/null || true
+          cp .work/npm-consumer-*-resources.json "$RUNNER_TEMP"/consumer/*.json "$RUNNER_TEMP"/consumer/*.jsonl "$RUNNER_TEMP"/consumer/*.log ".work/upload/$PLATFORM/" 2>/dev/null || true
+          cp "$RUNNER_TEMP/verdaccio/verdaccio.log" ".work/upload/$PLATFORM/" 2>/dev/null || true
+          for f in "$RUNNER_TEMP"/consumer/report-*.json; do [ -f "$f" ] && { echo "### $PLATFORM $(basename "$f")"; echo '```json'; cat "$f"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"; done; true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: npm-dist-${{ matrix.platform }}
+          path: .work/upload/
+          retention-days: 7
+          if-no-files-found: warn
+
+  equality:
+    needs: registry
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: evidence
+      - name: Tool packages are byte-identical on every runner
+        run: |
+          node -e "
+            const f = require('node:fs'), p = require('node:path');
+            const records = f.readdirSync('evidence').flatMap(d => { const file = p.join('evidence', d, d.replace('npm-dist-', ''), 'npm-dist.json'); return f.existsSync(file) ? [[d, JSON.parse(f.readFileSync(file))]] : []; });
+            if (records.length !== 5) throw new Error('Expected five package records, found ' + records.length);
+            const [[reference, first]] = records; let differs = 0;
+            for (const [name, record] of records) for (const pkg of record.packages) {
+              const other = first.packages.find(q => q.name === pkg.name);
+              const same = other && other.integrity === pkg.integrity;
+              if (!same) differs++;
+              console.log((same ? 'identical ' : 'DIFFERENT ') + name + ' ' + pkg.name + ' ' + pkg.integrity);
+            }
+            for (const [name, record] of records) console.log('main ' + name + ' ' + record.main.integrity + ' (npm ' + record.npm + ')');
+            if (differs) throw new Error(differs + ' tool packages differ from ' + reference);"

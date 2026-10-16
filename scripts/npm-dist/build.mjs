@@ -1,0 +1,170 @@
+// Maintainer packaging for npm distribution (docs/TOOLCHAIN_SLIMMING.md, Phase 3).
+// Produces, deterministically, one npm tarball per tool package (each carrying a
+// catalog archive byte for byte) and the main package, which pins every tool
+// package to an exact version and carries src/npm-tools.json. Never publishes.
+//
+//   node scripts/npm-dist/build.mjs --base CANDIDATE.tgz --out DIR --step plan [--overlay-source]
+//     [--scope @lasm] [--version V] [--no-git]
+//   node scripts/npm-dist/build.mjs --out DIR --step package --only @lasm/lean-linux-x64 [--assets DIR] [--seed DIR]...
+//   node scripts/npm-dist/build.mjs --out DIR --step main
+// scripts/npm-dist/build-all.mjs runs every step, each in its own resource guard:
+// the guard counts page cache, so one process per package keeps each step small.
+//
+// --base is a packed Lasm candidate (scripts/package-node-release.mjs output, or a
+// retained one): it supplies the runtime, native helpers and bundled installer
+// dependencies. --overlay-source replaces its bin/, src/ (except src/native; the
+// runtime catalogs stay the candidate's) and runtime glue with this checkout's, for
+// validating unpacked source changes against an accepted runtime; the result is a
+// maintainer test package, not a release candidate.
+import assert from 'node:assert/strict';
+import { parseArgs } from 'node:util';
+import { mkdir, readFile, writeFile, rm, cp, link, copyFile, rename, stat, readdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { join, resolve, basename } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import { x as extractTar } from 'tar';
+import { hashFile } from '../../src/managed-artifacts.mjs';
+import { downloadArtifact } from '../../src/managed-download.mjs';
+import { findNpm, archiveFileName } from '../../src/npm-artifacts.mjs';
+import { toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, defaultScope, maximumPackageBytes } from './packages.mjs';
+
+const root = fileURLToPath(new URL('../../', import.meta.url));
+const { values: args } = parseArgs({ options: {
+  step: { type: 'string' }, only: { type: 'string' },
+  base: { type: 'string' }, out: { type: 'string' }, scope: { type: 'string', default: defaultScope },
+  version: { type: 'string' }, assets: { type: 'string', default: join(root, '.cache/npm-dist/assets') },
+  seed: { type: 'string', multiple: true, default: [] }, 'overlay-source': { type: 'boolean', default: false },
+  'no-git': { type: 'boolean', default: false },
+} });
+assert.ok(['plan', 'package', 'main'].includes(args.step) && args.out, 'Usage: build.mjs --out DIR --step plan|package|main (see header)');
+const out = resolve(args.out), planFile = join(out, 'plan.json');
+const json = async path => JSON.parse(await readFile(path, 'utf8'));
+const npmCache = join(root, '.cache/npm'), npm = findNpm();
+assert.ok(npm, 'npm was not found');
+const runNpm = (npmArgs, options) => execFileSync(npm.command, [...npm.args, ...npmArgs],
+  { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true, ...options });
+
+if (args.step === 'plan') {
+  assert.ok(args.base, 'The plan step needs --base CANDIDATE.tgz');
+  assert.ok(!existsSync(out), 'Use a new output directory');
+  await mkdir(join(out, 'packages'), { recursive: true });
+  await mkdir(join(out, 'packed'));
+  const probe = join(out, 'base-metadata');
+  await mkdir(probe);
+  await extractTar({ file: resolve(args.base), cwd: probe, strict: true, preservePaths: false, preserveOwner: false,
+    filter: name => ['package/package.json', 'package/application-support.json'].includes(name) });
+  const basePackage = await json(join(probe, 'package/package.json')), support = await json(join(probe, 'package/application-support.json'));
+  await rm(probe, { recursive: true });
+  const catalogs = {
+    toolchains: await json(join(root, 'src/toolchains.json')), linkToolchain: await json(join(root, 'src/link-toolchain.json')),
+    git: await json(join(root, 'src/git-tools.json')),
+  };
+  const packages = toolPackages({ lean: support.lean, ...catalogs, git: args['no-git'] ? undefined : catalogs.git, scope: args.scope,
+    platforms: support.platforms });
+  const plan = { schema: 1, base: { file: resolve(args.base), sha256: await hashFile(resolve(args.base)), version: basePackage.version },
+    lean: support.lean, platforms: support.platforms, scope: args.scope, overlaySource: args['overlay-source'],
+    main: { name: `${args.scope}/cli`, version: args.version ?? `${basePackage.version}.npm.1` },
+    // The catalog this source pins, kept with the plan so later steps cannot drift.
+    catalog: { toolchains: { ...catalogs.toolchains, defaultLean: support.lean, lean: { [support.lean]: catalogs.toolchains.lean[support.lean] } } },
+    packages };
+  await writeFile(planFile, JSON.stringify(plan, null, 2) + '\n');
+  console.log(packages.map(p => p.name).join('\n'));
+  process.exit(0);
+}
+
+const plan = await json(planFile);
+function pack(directory, destination) {
+  const [result] = JSON.parse(runNpm(['pack', '--json', '--ignore-scripts', '--pack-destination', destination, '--cache', npmCache], { cwd: directory }));
+  return result;
+}
+/** npm pack twice into separate directories; the bytes must be identical. */
+async function packTwice(directory, name) {
+  const tarballs = join(out, 'packages'), repack = join(out, 'repack-' + name.replace('/', '__'));
+  await mkdir(repack, { recursive: true });
+  const first = pack(directory, tarballs), file = join(tarballs, first.filename), sha256 = await hashFile(file);
+  const second = pack(directory, repack);
+  assert.equal(second.filename, first.filename);
+  assert.equal(await hashFile(join(repack, second.filename)), sha256, `Two npm pack runs differ for ${name}`);
+  await rm(repack, { recursive: true });
+  return { filename: first.filename, integrity: first.integrity, sha256, size: first.size, unpackedSize: first.unpackedSize,
+    entryCount: first.entryCount };
+}
+
+if (args.step === 'package') {
+  const pkg = plan.packages.find(p => p.name === args.only);
+  assert.ok(pkg, `No planned package ${args.only}`);
+  // The release asset, verified exactly as Lasm verifies it.
+  const artifact = pkg.artifact, name = archiveFileName(artifact), assets = resolve(args.assets);
+  await mkdir(assets, { recursive: true });
+  const file = join(assets, name);
+  const valid = async path => existsSync(path) && (await stat(path)).size === artifact.bytes && await hashFile(path) === artifact.sha256;
+  if (!await valid(file)) {
+    let seeded = false;
+    for (const directory of args.seed) {
+      const candidate = join(resolve(directory), name);
+      if (await valid(candidate)) { await copyFile(candidate, file + '.partial'); seeded = true; break; }
+    }
+    if (!seeded) { console.error(`Downloading ${artifact.url}`); await downloadArtifact(artifact, file + '.partial'); }
+    await rename(file + '.partial', file);
+    assert.ok(await valid(file), `${name} does not match the catalog`);
+  }
+  const directory = join(out, 'staging', pkg.name.replace('/', '__'));
+  await rm(directory, { recursive: true, force: true });
+  await mkdir(directory, { recursive: true });
+  try { await link(file, join(directory, name)); } catch { await copyFile(file, join(directory, name)); }
+  await writeFile(join(directory, 'package.json'), JSON.stringify(toolPackageJson(pkg), null, 2) + '\n');
+  await writeFile(join(directory, 'README.md'), toolPackageReadme(pkg));
+  const packed = await packTwice(directory, pkg.name);
+  assert.ok(packed.size <= maximumPackageBytes, `${pkg.name} exceeds the package ceiling`);
+  await rm(directory, { recursive: true });
+  await writeFile(join(out, 'packed', pkg.name.replace('/', '__') + '.json'), JSON.stringify(packed, null, 2) + '\n');
+  console.log(`packed ${pkg.name}@${pkg.version} ${packed.size} bytes ${packed.integrity}`);
+}
+
+if (args.step === 'main') {
+  const packed = {};
+  for (const pkg of plan.packages) packed[pkg.name] = await json(join(out, 'packed', pkg.name.replace('/', '__') + '.json'));
+  const directory = join(out, 'staging', 'main');
+  await rm(directory, { recursive: true, force: true });
+  await mkdir(directory, { recursive: true });
+  assert.equal(await hashFile(plan.base.file), plan.base.sha256, 'The base candidate changed since the plan step');
+  await extractTar({ file: plan.base.file, cwd: directory, strict: true, preservePaths: false, preserveOwner: false });
+  const main = join(directory, 'package'), basePackage = await json(join(main, 'package.json'));
+  let overlay;
+  if (plan.overlaySource) {
+    for (const path of ['bin', 'src']) {
+      for (const name of await readdir(join(main, path))) if (!(path === 'src' && name === 'native')) await rm(join(main, path, name), { recursive: true });
+      await cp(join(root, path), join(main, path), { recursive: true, filter: file => file !== join(root, 'src', 'native') });
+    }
+    for (const name of ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs', 'function-table-index.mjs', 'table-growth.mjs'])
+      await copyFile(join(root, 'scripts/full-lean', name), join(main, 'scripts/full-lean', name));
+    // As scripts/package-node-release.mjs: only the packaged Lean version and its accepted runtime.
+    await writeFile(join(main, 'src/toolchains.json'), JSON.stringify(plan.catalog.toolchains, null, 2) + '\n');
+    const provenance = await json(join(main, 'provenance.json'));
+    await writeFile(join(main, 'src/application-runtimes.json'), JSON.stringify({ schema: 1,
+      lean: { [plan.lean]: { name: `lean-${plan.lean}-wasm64`, manifestSha256: provenance.runtimeManifestSha256 } } }, null, 2) + '\n');
+    let sourceRevision = 'unknown', uncommittedChanges = 'unknown';
+    try {
+      sourceRevision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+      uncommittedChanges = execFileSync('git', ['status', '--porcelain', '--', 'bin', 'src', 'scripts/full-lean'], { cwd: root, encoding: 'utf8' }).trim() !== '';
+    } catch {}
+    overlay = { sourceRevision, uncommittedChanges };
+    await writeFile(join(main, 'provenance.json'), JSON.stringify({ ...provenance, npmDistributionOverlay: overlay }, null, 2) + '\n');
+  }
+  await writeFile(join(main, 'src/npm-tools.json'), JSON.stringify(npmToolManifest(plan.packages, packed), null, 2) + '\n');
+  await writeFile(join(main, 'package.json'), JSON.stringify(mainPackageJson(basePackage, plan.packages, plan.main), null, 2) + '\n');
+  const mainPacked = await packTwice(main, plan.main.name);
+  await rm(directory, { recursive: true });
+  await rm(join(out, 'staging'), { recursive: true, force: true });
+  const record = {
+    schema: 1, scope: plan.scope, lean: plan.lean, platforms: plan.platforms, recordedAt: new Date().toISOString(),
+    host: `${process.platform}-${process.arch}`, node: process.versions.node, npm: runNpm(['--version']).trim(), reproduciblePacking: true,
+    base: { file: basename(plan.base.file), sha256: plan.base.sha256, version: plan.base.version }, overlay,
+    main: { ...plan.main, ...mainPacked },
+    packages: plan.packages.map(pkg => ({ name: pkg.name, version: pkg.version, install: pkg.install, platform: pkg.platform,
+      artifact: { name: pkg.artifact.name, sha256: pkg.artifact.sha256, bytes: pkg.artifact.bytes }, ...packed[pkg.name] })),
+  };
+  await writeFile(join(out, 'npm-dist.json'), JSON.stringify(record, null, 2) + '\n');
+  console.log(JSON.stringify({ main: record.main, packages: record.packages.map(p => [p.name, p.version, p.install, p.size]) }, null, 2));
+}
