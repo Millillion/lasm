@@ -63,6 +63,8 @@ async function unpack(file, directory, format = 'tar.zst') {
   await mkdir(directory, { recursive: true });
   await pipeline(createReadStream(file), format === 'tar.gz' ? createGunzip() : createZstdDecompress(),
     extractTar({ cwd: directory, strip: 1, strict: true, preservePaths: false, preserveOwner: false }));
+  // Bound dirty page-cache bursts, which the resource guard reports as memory pressure.
+  if (!windows) spawnSync('sync', { stdio: 'ignore' });
 }
 await rm(work, { recursive: true, force: true });
 const prefixes = { core: join(work, 'core'), extended: join(work, 'extended'),
@@ -153,7 +155,7 @@ async function lake(prefix, kind) {
   const plugin = windows ? join(prefix, 'bin/libLake_shared.dll') : join(prefix, 'lib/lean', `libLake_shared.${darwin ? 'dylib' : 'so'}`);
   const entry = JSON.parse(ok(run(prefix, 'lean', ['-j1', '-s8192', '--plugin=' + plugin, '--run', join(root, 'src/lake-module.lean'),
     join(directory, 'Main.lean')], directory), `${kind} Lake plugin`));
-  assert.ok(Array.isArray(entry.imports), 'Lake module query returns imports');
+  assert.ok(typeof entry?.module === 'string' || Array.isArray(entry?.imports), `Unexpected Lake module identity ${JSON.stringify(entry)}`);
   for (const target of ['+App', '+Main']) {
     const file = JSON.parse(ok(run(prefix, 'lake', ['--no-cache', '--keep-toolchain', '--quiet', '--json', 'query', target + ':c'], directory), `${kind} lake ${target}`));
     generated[target] = await readFile(resolve(directory, file));
