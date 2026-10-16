@@ -253,6 +253,18 @@ Use the user's installed supported Node. Do not add a Node version manager or
 require engine-specific flags in the documented deployment command. Keep internal
 build tools and their versions managed by Lasm and included in cache identities.
 
+## Toolchain slimming, authorized 2026-10-16
+
+The user approved shrinking the first-build download while keeping Node.js and
+npm as the only prerequisites. Follow [the slimming design](TOOLCHAIN_SLIMMING.md):
+
+- [ ] Phase 1: tiered trimmed Lean (per-platform binaries, shared core and
+  extended module data), assembled into one prefix on demand.
+- [ ] Phase 2: Node link driver replacing `emcc` and Python, byte-identical to
+  current output on existing fixtures.
+- [ ] Phase 3: npm platform packages via `optionalDependencies`, validated with
+  a local registry on all six native targets. Publication stays a user decision.
+
 ## Deferred chunks
 
 The native macOS and Windows extensions are complete. Future work should expand
