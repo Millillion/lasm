@@ -166,3 +166,7 @@ fixtures have native-versus-Node tests. **Complete `IO.FS`, `Std.Http`, concurre
 subprocess/signal/terminal parity, every third-party library, and the full Lean
 upstream suite are not release guarantees.** See [IO gaps](https://github.com/Millillion/lasm/blob/main/IO_LIMITATIONS.md)
 and [deployment-size evidence](https://github.com/Millillion/lasm/blob/main/docs/BUNDLE_SIZE.md) for the remaining work.
+**Long-running `Std.Http` servers are not yet production-ready:** with candidate
+`.54`, a server's memory grows with every request until the process is stopped
+(see the [Server MVP robustness results](https://github.com/Millillion/lasm/blob/main/docs/SERVER_MVP.md#step-1-milestone-2-robustness-load-faults-soak)).
+Native Lean's memory stays flat under the same load.

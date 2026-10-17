@@ -127,3 +127,12 @@ runner cap. There were no OOM or swap events. Resource stops are listed above.
 Other platforms, the 3 LSP-client and 5 mixed drivers, an elaboration-aware
 review of the 3 unparsed tests, load/soak/fault tests and the three-clean-run
 gate are all still to do.
+
+## Step 1, milestone 2: robustness (load, faults, soak)
+
+In progress (2026-10-17). Harness: `integration/fixtures/server-robustness/Main.lean`,
+`scripts/server-mvp/build-robustness.mjs`, `scripts/server-mvp/robustness.mjs` and
+`.github/workflows/server-mvp-robustness.yml`. First local Linux x64 runs found two
+Lasm memory leaks in long-running servers; results and criteria follow once the
+five-platform CI runs complete.
+

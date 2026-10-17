@@ -1,0 +1,160 @@
+name: Server MVP robustness (load, faults, soak)
+# Server MVP step 1, milestone 2: build integration/fixtures/server-robustness
+# natively (Lean 4.35.0 leanc) and with the exact retained Lasm candidate, then
+# run scripts/server-mvp/robustness.mjs on each of the five supported native
+# runners. Standard public runners only; results are small JSON files kept 7 days.
+on:
+  workflow_dispatch:
+    inputs:
+      soak-seconds:
+        description: Soak duration per build (native and Lasm run one after the other)
+        type: string
+        default: "900"
+      load-seconds:
+        description: Measured load seconds per concurrency level
+        type: string
+        default: "30"
+      variants:
+        description: JSON array of variants (candidate, overlay)
+        type: string
+        default: '["candidate","overlay"]'
+      platforms:
+        description: JSON array of platforms, or "all"
+        type: string
+        default: all
+      candidate-version:
+        type: string
+        default: 0.1.0-experimental.54
+      candidate-release:
+        type: string
+        default: node-linux-candidate-38986393273
+      sha256:
+        type: string
+        default: 567ea838eb672249d4dfd071c9e659de3dc9eedd3a503570cacc82a60c2aad77
+      lean:
+        type: string
+        default: 4.35.0
+permissions:
+  contents: read
+concurrency:
+  group: server-mvp-robustness-${{ github.ref }}
+  queue: max
+  cancel-in-progress: false
+jobs:
+  input:
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/node-candidate-input.yml
+    with:
+      sha256: ${{ inputs.sha256 }}
+      candidate-release: ${{ inputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version }}
+  plan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      targets: ${{ steps.plan.outputs.targets }}
+    steps:
+      - id: plan
+        env:
+          PLATFORMS: ${{ inputs.platforms }}
+        run: |
+          node -e '
+          const all = [
+            { platform: "linux-x64", runner: "ubuntu-24.04", arch: "x64" },
+            { platform: "linux-arm64", runner: "ubuntu-24.04-arm", arch: "arm64" },
+            { platform: "darwin-x64", runner: "macos-15-intel", arch: "x64" },
+            { platform: "darwin-arm64", runner: "macos-15", arch: "arm64" },
+            { platform: "win32-x64", runner: "windows-2022", arch: "x64" }];
+          const wanted = process.env.PLATFORMS === "all" ? all.map(t => t.platform) : JSON.parse(process.env.PLATFORMS);
+          const targets = all.filter(t => wanted.includes(t.platform));
+          if (!targets.length) throw new Error("No platforms selected");
+          console.log("targets=" + JSON.stringify(targets));' >> "$GITHUB_OUTPUT"
+  robustness:
+    needs: [input, plan]
+    name: ${{ matrix.target.platform }} ${{ matrix.variant }}
+    runs-on: ${{ matrix.target.runner }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: ${{ fromJSON(inputs.variants) }}
+        target: ${{ fromJSON(needs.plan.outputs.targets) }}
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+      LASM_LEAN: ${{ inputs.lean }}
+      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
+      EXPECTED_PLATFORM: ${{ matrix.target.platform }}
+      VARIANT: ${{ matrix.variant }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.0
+          architecture: ${{ matrix.target.arch }}
+          package-manager-cache: false
+      - run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.EXPECTED_PLATFORM)"
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: ${{ needs.input.outputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify authenticated candidate handoff
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Install the exact candidate as an ordinary npm dependency
+        run: |
+          mkdir -p .work/install && cd .work/install
+          echo '{"private":true}' > package.json
+          npm install --no-audit --no-fund "../node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
+      - name: Overlay the proposed host RPC fix onto the installed copy
+        if: matrix.variant == 'overlay'
+        run: |
+          git apply --directory=.work/install/node_modules/@lasm/compiler scripts/server-mvp/patches/host-rpc-channel-reuse.patch
+          node -e "const c=require('node:crypto'),f=require('node:fs');console.log(JSON.stringify(Object.fromEntries(['host-library.js','host-pre.js'].map(n=>[n,c.createHash('sha256').update(f.readFileSync('.work/install/node_modules/@lasm/compiler/scripts/full-lean/'+n)).digest('hex')]))))"
+      - name: Enable process-tree resource guard
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      # Archive download/extraction stays outside the build's guard.
+      - name: Download and verify the full native Lean oracle
+        run: node scripts/server-mvp/provision.mjs native "$LASM_LEAN" "$PWD/.work/install/node_modules/@lasm/compiler" .work/server-mvp-provision
+      - name: Build the fixture natively and with the installed candidate
+        run: |
+          pages=(); [ "$RUNNER_OS" = Linux ] && pages=(python3 scripts/full-lean/base-pages.py)
+          node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --report .work/robustness-build-resources.json -- \
+            "${pages[@]}" node scripts/server-mvp/build-robustness.mjs .work/robustness-build "$PWD/.work/install/node_modules/@lasm/compiler" "$LASM_LEAN"
+      - name: Load, faults and soak (native, then Lasm in Node)
+        env:
+          SOAK: ${{ inputs.soak-seconds }}
+          LOAD: ${{ inputs.load-seconds }}
+        run: |
+          node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --report .work/robustness-run-resources.json -- \
+            node scripts/server-mvp/robustness.mjs .work/robustness-build/application.json .work/robustness-result.json \
+            "ROBUSTNESS_SOAK_SECONDS=$SOAK" "ROBUSTNESS_LOAD_SECONDS=$LOAD" "ROBUSTNESS_VARIANT=$VARIANT"
+      - name: Summarize
+        if: always()
+        run: node scripts/server-mvp/robustness-summary.mjs .work/robustness-result.json .work/robustness-build-resources.json .work/robustness-run-resources.json .work/robustness-compact.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Keep the results briefly
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: server-robustness-${{ matrix.target.platform }}-${{ matrix.variant }}
+          path: |
+            .work/robustness-result.json
+            .work/robustness-compact.json
+            .work/robustness-build/application.json
+          retention-days: 7
+          include-hidden-files: true
+          if-no-files-found: warn
