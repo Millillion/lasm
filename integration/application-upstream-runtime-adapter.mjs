@@ -105,7 +105,9 @@ try {
   // command. Every pass and its diagnostics are recorded.
   let chosen = {}, plan, layout;
   for (let pass = 0; ; pass++) {
-    assert.ok(pass <= modes.length + 1, 'Elaboration passes did not converge');
+    // Each pass advances at least one action's mode, so this terminates; Lean
+    // may report later actions' errors only once earlier ones elaborate.
+    assert.ok(pass <= 64, 'Elaboration passes did not converge');
     plan = planActions(source, syntax, { wholeOutput, modes: chosen });
     const generated = generateRuntimeSource(source, syntax, plan, name);
     layout = generated; writeFileSync(main, generated.generated);
