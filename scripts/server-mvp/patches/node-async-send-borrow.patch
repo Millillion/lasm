@@ -1,0 +1,24 @@
+diff --git a/runtime/node-async.cpp b/runtime/node-async.cpp
+index d135fcd..19c3ab7 100644
+--- a/runtime/node-async.cpp
++++ b/runtime/node-async.cpp
+@@ -245,7 +245,9 @@ O *lean_uv_tcp_send(O *socket, O *data) {
+     std::vector<uint8_t> bytes;
+     const auto count = lean_array_size(data);
+     for (size_t i = 0; i < count; i++) {
+-        auto *part = lean_array_uget(data, i);
++        // Borrow each part: lean_array_uget returns an owned reference, which
++        // leaked every sent ByteArray (native libuv also only borrows them).
++        auto *part = lean_array_get_core(data, i);
+         bytes.insert(bytes.end(), lean_sarray_cptr(part), lean_sarray_cptr(part) + lean_sarray_size(part));
+     }
+     auto *result = start_io_request(59, socket, count, bytes.data(), bytes.size(), 0);
+@@ -274,7 +276,7 @@ O *lean_uv_udp_send(O *socket, O *data, O *addr) {
+     bytes.insert(bytes.end(), address.begin(), address.end());
+     auto count = lean_array_size(data);
+     for (size_t i = 0; i < count; i++) {
+-        auto *part = lean_array_uget(data, i);
++        auto *part = lean_array_get_core(data, i); // borrowed, as in lean_uv_tcp_send
+         bytes.insert(bytes.end(), lean_sarray_cptr(part), lean_sarray_cptr(part) + lean_sarray_size(part));
+     }
+     auto *promise = start_request(103, socket, count, bytes.data(), bytes.size(), 0);
