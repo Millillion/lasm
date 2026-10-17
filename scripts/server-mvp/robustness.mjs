@@ -9,7 +9,7 @@
 //   ROBUSTNESS_FAULT_SCALE (1)    ROBUSTNESS_KINDS (native,lasm)
 //   ROBUSTNESS_ENGINE (this node) ROBUSTNESS_SAMPLE_MS (5000)
 //   ROBUSTNESS_PHASES (load,faults,soak) ROBUSTNESS_REQUEST_TIMEOUT_MS (30000)
-//   ROBUSTNESS_MAX_SERVER_RSS_MIB (2048) ROBUSTNESS_SOAK_FAULT_EVERY_MS (2000; 0 disables)
+//   ROBUSTNESS_MAX_SERVER_RSS_MIB (2048) ROBUSTNESS_MAX_SERVER_COMMIT_MIB (5120, Windows) ROBUSTNESS_SOAK_FAULT_EVERY_MS (2000; 0 disables)
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import { connect } from 'node:net';
@@ -35,8 +35,8 @@ const config = {
   soakFaultEveryMs: Number(env.ROBUSTNESS_SOAK_FAULT_EVERY_MS ?? 2000), sampleMs: Number(env.ROBUSTNESS_SAMPLE_MS ?? 5000),
   faultScale: Number(env.ROBUSTNESS_FAULT_SCALE ?? 1),
   // Stop (and fail) a server whose RSS exceeds this, before a host guard has to.
-  // Windows counts committed bytes (Wasm memory grows commit in large steps).
-  maxServerRssBytes: Number(env.ROBUSTNESS_MAX_SERVER_RSS_MIB ?? (process.platform === 'win32' ? 1536 : 2048)) * 1024 ** 2,
+  maxServerRssBytes: Number(env.ROBUSTNESS_MAX_SERVER_RSS_MIB ?? 2048) * 1024 ** 2,
+  maxServerCommitBytes: Number(env.ROBUSTNESS_MAX_SERVER_COMMIT_MIB ?? 5120) * 1024 ** 2,
   kinds: (env.ROBUSTNESS_KINDS ?? 'native,lasm').split(','), variant: env.ROBUSTNESS_VARIANT ?? 'local',
   requestTimeoutMs: Number(env.ROBUSTNESS_REQUEST_TIMEOUT_MS ?? 30_000),
   phases: (env.ROBUSTNESS_PHASES ?? 'load,faults,soak').split(','),
@@ -316,11 +316,15 @@ function watch(server) {
     if (busy || !alive(server) || server.capExceeded) return;
     busy = true;
     const sample = await sampleProcess(server.child.pid).finally(() => { busy = false; });
-    // Windows Job Objects count committed private bytes, which run ahead of the working set.
-    const used = Math.max(sample.rss ?? 0, sample.privateBytes ?? 0);
+    // The cap is on resident memory. Windows also reports committed private
+    // bytes: Lasm commits each worker's reserved stack and every Wasm memory
+    // growth up front, so commit runs far ahead of use; it only has a separate
+    // backstop below the Job Object limit of the resource guard.
+    const used = sample.rss ?? 0;
     server.peakRss = Math.max(server.peakRss ?? 0, used);
-    if (used > config.maxServerRssBytes) {
-      server.capExceeded = { rssMiB: Math.round(used / 1024 ** 2), atSeconds: Math.round((Date.now() - server.startedAt) / 1000), phase: server.phase };
+    server.peakCommit = Math.max(server.peakCommit ?? 0, sample.privateBytes ?? 0);
+    if (used > config.maxServerRssBytes || (sample.privateBytes ?? 0) > config.maxServerCommitBytes) {
+      server.capExceeded = { rssMiB: Math.round(used / 1024 ** 2), commitMiB: sample.privateBytes ? Math.round(sample.privateBytes / 1024 ** 2) : undefined, atSeconds: Math.round((Date.now() - server.startedAt) / 1000), phase: server.phase };
       log(`${server.kind} exceeded the ${config.maxServerRssBytes / 1024 ** 2} MiB memory cap in ${server.phase}: stopping it`);
       server.child.kill('SIGKILL');
     }
@@ -535,6 +539,7 @@ async function suite(kind) {
     if (alive(server)) server.child.kill('SIGKILL');
     if (server.capExceeded) result.memoryCaps.push(server.capExceeded);
     result.peakRssMiB = Math.max(result.peakRssMiB ?? 0, Math.round((server.peakRss ?? 0) / 1024 ** 2));
+    if (server.peakCommit) result.peakCommitMiB = Math.max(result.peakCommitMiB ?? 0, Math.round(server.peakCommit / 1024 ** 2));
     result.stderr.lines += server.stderrLines;
     for (const line of server.stderrSample) {
       const found = result.stderr.distinct.find(d => d.line === line.line);

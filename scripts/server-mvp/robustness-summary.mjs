@@ -40,7 +40,7 @@ if (compactFile) {
     results: Object.fromEntries(kinds.map(k => {
       const x = r.results[k];
       return [k, { checks: x.checks, startupSeconds: x.startupSeconds, exit: x.exit, stderrLines: x.stderr?.lines,
-        memoryCaps: x.memoryCaps, restarts: x.restarts, peakRssMiB: x.peakRssMiB, stderr: x.stderr?.distinct,
+        memoryCaps: x.memoryCaps, restarts: x.restarts, peakRssMiB: x.peakRssMiB, peakCommitMiB: x.peakCommitMiB, stderr: x.stderr?.distinct,
         load: x.load.map(l => ({ connections: l.connections, requestsPerSecond: l.requestsPerSecond, latencyMs: l.latencyMs, errors: l.errors,
           requests: l.requests, connectionsOpened: l.connectionsOpened, cpu: l.cpu, memoryCapStopped: l.memoryCapStopped, errorSamples: l.errorSamples?.slice(0, 5) })),
         soak: x.soak && { requests: x.soak.load.requests, errors: x.soak.load.errors, faultsSent: x.soak.faultsSent, checks: x.soak.checks, growth: x.soak.growth,
