@@ -86,7 +86,9 @@ jobs:
       LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
       LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
       LASM_LEAN: ${{ inputs.lean }}
-      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
+      # Linux's guard starts workloads with a clean environment, so keep the
+      # default cache there; Windows uses a short workspace cache path.
+      LASM_TOOLCHAIN_CACHE: ${{ matrix.target.platform == 'win32-x64' && format('{0}/.cache/managed-tools', github.workspace) || '' }}
       EXPECTED_PLATFORM: ${{ matrix.target.platform }}
       VARIANT: ${{ matrix.variant }}
     defaults:
@@ -119,7 +121,9 @@ jobs:
       - name: Overlay the proposed host RPC fix onto the installed copy
         if: matrix.variant == 'overlay'
         run: |
-          git apply --directory=.work/install/node_modules/@lasm/compiler scripts/server-mvp/patches/host-rpc-channel-reuse.patch
+          # Windows checkouts convert the patch to CRLF; the installed files are LF.
+          tr -d '\r' < scripts/server-mvp/patches/host-rpc-channel-reuse.patch > .work/overlay.patch
+          git apply --directory=.work/install/node_modules/@lasm/compiler .work/overlay.patch
           node -e "const c=require('node:crypto'),f=require('node:fs');console.log(JSON.stringify(Object.fromEntries(['host-library.js','host-pre.js'].map(n=>[n,c.createHash('sha256').update(f.readFileSync('.work/install/node_modules/@lasm/compiler/scripts/full-lean/'+n)).digest('hex')]))))"
       - name: Enable process-tree resource guard
         if: runner.os == 'Linux'
@@ -140,7 +144,7 @@ jobs:
           SOAK: ${{ inputs.soak-seconds }}
           LOAD: ${{ inputs.load-seconds }}
         run: |
-          node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --report .work/robustness-run-resources.json -- \
+          node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --report .work/robustness-run-resources.json -- \
             node scripts/server-mvp/robustness.mjs .work/robustness-build/application.json .work/robustness-result.json \
             "ROBUSTNESS_SOAK_SECONDS=$SOAK" "ROBUSTNESS_LOAD_SECONDS=$LOAD" "ROBUSTNESS_VARIANT=$VARIANT"
       - name: Summarize

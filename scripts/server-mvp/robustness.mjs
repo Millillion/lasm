@@ -303,16 +303,20 @@ const alive = server => server.exit === null && server.child.exitCode === null;
 let currentServer;
 // RSS watchdog for the whole suite: a leaking server is stopped and recorded.
 function watch(server) {
+  let busy = false;
   const timer = setInterval(async () => {
-    if (!alive(server) || server.capExceeded) return;
-    const sample = await sampleProcess(server.child.pid);
-    server.peakRss = Math.max(server.peakRss ?? 0, sample.rss ?? 0);
-    if (sample.rss > config.maxServerRssBytes) {
-      server.capExceeded = { rssMiB: Math.round(sample.rss / 1024 ** 2), atSeconds: Math.round((Date.now() - server.startedAt) / 1000), phase: server.phase };
-      log(`${server.kind} exceeded the ${config.maxServerRssBytes / 1024 ** 2} MiB RSS cap in ${server.phase}: stopping it`);
+    if (busy || !alive(server) || server.capExceeded) return;
+    busy = true;
+    const sample = await sampleProcess(server.child.pid).finally(() => { busy = false; });
+    // Windows Job Objects count committed private bytes, which run ahead of the working set.
+    const used = Math.max(sample.rss ?? 0, sample.privateBytes ?? 0);
+    server.peakRss = Math.max(server.peakRss ?? 0, used);
+    if (used > config.maxServerRssBytes) {
+      server.capExceeded = { rssMiB: Math.round(used / 1024 ** 2), atSeconds: Math.round((Date.now() - server.startedAt) / 1000), phase: server.phase };
+      log(`${server.kind} exceeded the ${config.maxServerRssBytes / 1024 ** 2} MiB memory cap in ${server.phase}: stopping it`);
       server.child.kill('SIGKILL');
     }
-  }, 2000);
+  }, 1000);
   timer.unref();
   return () => clearInterval(timer);
 }
