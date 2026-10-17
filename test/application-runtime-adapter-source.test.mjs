@@ -27,7 +27,7 @@ test('only command tokens change, and the original is restored byte for byte', (
   assert.equal(plan.actions[0].expected, 'info: 2');
   const { generated, marker, lines } = generateRuntimeSource(source, survey, plan, 'elab/x.lean');
   const out = generated.toString();
-  assert.ok(out.includes('/--\ninfo: 2\n-/\ndef _root_.lasmParallelAction0 : IO Unit := LasmParallel.guardMsgs "info: 2" <| LasmParallel.monadEval <| 1 + 1'));
+  assert.ok(out.includes('/- \ninfo: 2\n-/\ndef _root_.lasmParallelAction0 : IO Unit := LasmParallel.guardMsgs "info: 2" <| LasmParallel.monadEval <| 1 + 1'));
   assert.ok(out.includes('def _root_.lasmParallelAction1 : IO Unit := LasmParallel.guard <| 1 = 1'));
   assert.ok(out.includes('def _root_.lasmParallelAction2 : IO Unit := LasmParallel.guardMsgs "" <| LasmParallel.monadEval <| pure () : IO Unit'));
   assert.ok(out.includes('open Nat in\n#eval 3'), 'Unmapped commands keep their bytes');

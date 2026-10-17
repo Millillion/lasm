@@ -127,9 +127,6 @@
         "elab/dateTimeOrd.lean": {
           "sha256": "4b8b91bbec71a13d53e8b94f6faf446724175b666e8cac11a0206146c6b5fba4"
         },
-        "elab/docstringRewrites.lean": {
-          "sha256": "e1c272d871390b588b9a06b4542d793e019459f4d8b98d0c553ceaa6368172fd"
-        },
         "elab/idbg_basic.lean": {
           "sha256": "1b882a5beb2e4e27b50c804f1be1a51ae66f92ded265c005d2e2180e2bfa44d8"
         },
@@ -315,6 +312,18 @@
               "kind": "ignored-output"
             }
           ]
+        },
+        "elab/async_http_string_quoting.lean": {
+          "sha256": "8a0bddbc058c9a93257c1cc8826584c66fade3f0d83b622b45c282158d9d9b80"
+        },
+        "elab/jsonSurrogates.lean": {
+          "sha256": "a970012917cb1fbc2fe9631d73b89280262b2525362f7435d40eae53513c14a4"
+        }
+      },
+      "excluded": {
+        "elab/docstringRewrites.lean": {
+          "sha256": "e1c272d871390b588b9a06b4542d793e019459f4d8b98d0c553ceaa6368172fd",
+          "reason": "Topical only through a Task API mention; its later #guard_msgs checks docstring-elaboration state produced by earlier command-level evaluations, so token replacement changes an unmapped command's result (harness run 2026-10-17: elaboration error in an unchanged command). Native build-time coverage only."
         }
       }
     }

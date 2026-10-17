@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import { applicationSources, nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { executableName } from '../src/platform.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
+import { provisionLean } from '../src/managed-lean.mjs';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { reclaimBuildMetadata } from '../scripts/application-tests/reclaim-metadata.mjs';
 
@@ -48,9 +49,14 @@ if (info.moduleDataIdentity) {
   metadataReclamation = await reclaimBuildMetadata(project, sourceKey, info.signature, dist);
   writeFileSync(join(output, 'metadata-reclamation.json'), JSON.stringify(metadataReclamation, null, 2) + '\n');
 }
-const prefix = join(process.env.LASM_TOOLCHAIN_CACHE, info.nativeLeanTier ? 'derived' : 'artifacts', info.nativeLeanIdentity);
-const lean = { prefix, commit: info.leanCommit, lean: join(prefix, 'bin', executableName('lean')),
-  lake: join(prefix, 'bin', executableName('lake')) };
+// Tiered Lean (4.35+) ships no leanc: the native oracle uses the full release.
+const lean = info.nativeLeanTier ? await provisionLean(join(project, 'Main.lean'), { distribution: 'full' }) : (() => {
+  const prefix = join(process.env.LASM_TOOLCHAIN_CACHE, 'artifacts', info.nativeLeanIdentity);
+  return { prefix, commit: info.leanCommit, lean: join(prefix, 'bin', executableName('lean')),
+    lake: join(prefix, 'bin', executableName('lake')) };
+})();
+assert.equal(lean.commit, info.leanCommit);
+const prefix = lean.prefix;
 const generated = applicationSources(join(project, 'Main.lean'), lean, join(output, 'oracle'), { log: () => {} });
 const nativeExecutable = join(output, executableName('native-server'));
 execFileSync(join(prefix, 'bin', executableName('leanc')), ['-O2', ...generated.sources, '-o', nativeExecutable],

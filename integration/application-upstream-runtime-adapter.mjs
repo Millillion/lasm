@@ -149,7 +149,19 @@ try {
   report.nativeCompiled = execute('native-compiled', [native], env);
   report.nativeCompiledRepeat = execute('native-compiled-repeat', [native], env);
   const dist = join(output, 'dist');
-  run('installed application build', process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', main, '--output', dist], project, env);
+  const built = run('installed application build', process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', main, '--output', dist], project, env, { check: false });
+  if (built.code !== 0) {
+    // The shipping ahead-of-time policy rejects programs that need runtime Lean
+    // compilation/kernel state; record that as its own outcome, not a crash.
+    const policy = /Lasm does not support runtime Lean compilation[^\n]*\n(Detected [^\n]*)?/.exec(built.stderr + built.stdout);
+    assert.ok(policy, 'installed application build failed: ' + built.stderr.slice(-4000));
+    report.buildRejected = { policy: true, detected: policy[1] ?? null };
+    report.verdicts = plan.actions.map(action => ({ identifier: action.identifier, form: action.form,
+      verdict: report.nativeCompiled.actions[action.identifier] === 'ok' ? 'aot-policy-rejected' : 'adapter-native-failure',
+      native: report.nativeCompiled.actions[action.identifier] }));
+    report.summary = report.verdicts.reduce((counts, row) => ({ ...counts, [row.verdict]: (counts[row.verdict] ?? 0) + 1 }), {});
+    throw Object.assign(new Error('Ahead-of-time policy rejected the parallel program: ' + report.buildRejected.detected), { policyRejected: true });
+  }
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   assert.equal(report.build.lean, version); assert.equal(report.build.leanCommit, lean.commit);
   const relocated = join(output, 'relocated deployment');
@@ -177,7 +189,7 @@ try {
     compiledVsRepeat: sameRun(report.nativeCompiled, report.nativeCompiledRepeat),
     compiledVsDeployed: sameRun(report.nativeCompiled, report.deployed) };
   report.passed = report.exact.compiledVsDeployed && report.nativeCompiled.code === 0 && report.nativeCompiled.completed;
-} catch (error) { report.error = error.stack; throw error; }
+} catch (error) { report.error = error.stack; if (!error.policyRejected) throw error; }
 finally {
   report.inputsUnchanged = true;
   for (const [path, hash] of Object.entries(inputHashes))

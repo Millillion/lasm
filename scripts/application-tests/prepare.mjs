@@ -38,7 +38,8 @@ for (const [name, expected] of Object.entries(hashes)) {
 // not a developer toolchain selection. It is not extracted. The test sources
 // remain exact; this generated parallel project selects the matching release.
 writeFileSync(join(source, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
-const lean = await provisionLean(source);
+// Native controls compile with leanc/clang++; tiered Lean (4.35+) ships neither.
+const lean = await provisionLean(source, { distribution: 'full' });
 if (lean.commit !== inventory.leanCommit) throw new Error('Native control version mismatch');
 const tests = inventory.tests.filter(test => test.category === category && new RegExp(filter).test(test.name))
   .map(test => {
