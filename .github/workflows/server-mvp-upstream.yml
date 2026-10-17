@@ -115,6 +115,12 @@ jobs:
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      # Archive download/extraction page cache otherwise counts against the
+      # comparison's guard (first dispatch stopped at 4.9 GiB of a 6.08 GiB cap).
+      - name: Download and verify the full native Lean oracle
+        run: node scripts/server-mvp/provision.mjs native "$LASM_LEAN" "$PWD/.work/install/node_modules/@lasm/compiler" .work/server-mvp-provision
+      - name: Warm the installed candidate's tools with one bounded Std.Http build
+        run: node scripts/full-lean/run-bounded.mjs --report .work/server-mvp-provision-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/server-mvp/provision.mjs candidate "$LASM_LEAN" "$PWD/.work/install/node_modules/@lasm/compiler" .work/server-mvp-provision
       - name: Native original driver, native controls and deployed Node comparison
         run: |
           script=integration/application-upstream-eval-io.mjs
