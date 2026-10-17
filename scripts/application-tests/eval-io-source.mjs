@@ -7,11 +7,15 @@ import { readFileSync } from 'node:fs';
 
 const review = JSON.parse(readFileSync(new URL('./eval-io-reviewed.json', import.meta.url)));
 assert.equal(review.schema, 1);
-export const reviewedEvalIOTests = new Set(Object.keys(review.tests));
+// Each release needs its own explicit review; byte-identical sources still get a
+// fresh entry rather than silently inheriting an earlier release's approval.
+const reviewedReleases = { [review.lean]: review.tests,
+  ...Object.fromEntries(Object.entries(review.releases ?? {}).map(([version, entry]) => [version, entry.tests])) };
+export const reviewedEvalIOTests = new Set(Object.values(reviewedReleases).flatMap(Object.keys));
 
 export function reviewedEvalIOInput(version, name, sourceSha256) {
-  assert.equal(version, review.lean, 'Review the new release before adapting its IO expressions');
-  const input = review.tests[name];
+  assert.ok(Object.hasOwn(reviewedReleases, version), 'Review the new release before adapting its IO expressions');
+  const input = reviewedReleases[version][name];
   assert.ok(input, 'This source needs an explicit IO Unit/context review');
   assert.equal(sourceSha256, input.sha256, 'Upstream source differs from the reviewed IO input');
   return input;

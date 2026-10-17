@@ -1,0 +1,135 @@
+name: Server MVP upstream runtime comparisons
+# Server MVP step 1: run reviewed upstream Lean tests (Std.Http and server
+# neighbours) natively and through an exact retained Lasm candidate in Node.
+# Each matrix entry is one independent, bounded workload on a standard public
+# runner. Results are small JSON files with short retention; no caches written.
+on:
+  workflow_dispatch:
+    inputs:
+      harness:
+        description: Parallel harness
+        type: choice
+        options: [eval-io, runtime-adapter]
+        default: eval-io
+      tests:
+        description: JSON array of reviewed test names, or "all"
+        type: string
+        default: all
+      candidate-version:
+        type: string
+        default: 0.1.0-experimental.54
+      candidate-release:
+        type: string
+        default: node-linux-candidate-38986393273
+      sha256:
+        type: string
+        default: 567ea838eb672249d4dfd071c9e659de3dc9eedd3a503570cacc82a60c2aad77
+      lean:
+        type: string
+        default: 4.35.0
+permissions:
+  contents: read
+concurrency:
+  group: server-mvp-upstream-${{ github.ref }}-${{ inputs.harness }}
+  queue: max
+  cancel-in-progress: false
+jobs:
+  input:
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/node-candidate-input.yml
+    with:
+      sha256: ${{ inputs.sha256 }}
+      candidate-release: ${{ inputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version }}
+  plan:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      tests: ${{ steps.plan.outputs.tests }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.0
+          package-manager-cache: false
+      - id: plan
+        env:
+          LASM_HARNESS: ${{ inputs.harness }}
+          LASM_TESTS: ${{ inputs.tests }}
+          LASM_LEAN: ${{ inputs.lean }}
+        run: node scripts/server-mvp/plan-ci.mjs >> "$GITHUB_OUTPUT"
+  run:
+    needs: [input, plan]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        test: ${{ fromJSON(needs.plan.outputs.tests) }}
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+      LASM_LEAN: ${{ inputs.lean }}
+      LASM_HARNESS: ${{ inputs.harness }}
+      LASM_TEST: ${{ matrix.test }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: ${{ needs.input.outputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify authenticated candidate handoff
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Install the exact candidate as an ordinary npm dependency
+        run: |
+          mkdir -p .work/install && cd .work/install
+          echo '{"private":true}' > package.json
+          npm install --no-audit --no-fund "../node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
+      - name: Fetch and verify the pinned upstream source archive
+        run: |
+          mkdir -p .cache/downloads .work/pristine
+          url="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_LEAN].url')"
+          sha="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_LEAN].sha256')"
+          archive=".cache/downloads/lean4-v$LASM_LEAN.tar.gz"
+          curl --fail --location --retry 3 --output "$archive" "$url"
+          printf '%s  %s\n' "$sha" "$archive" | sha256sum -c -
+          tar -xzf "$archive" -C .work/pristine --strip-components=1
+      - name: Enable process-tree resource guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Native original driver, native controls and deployed Node comparison
+        run: |
+          script=integration/application-upstream-eval-io.mjs
+          [ "$LASM_HARNESS" = runtime-adapter ] && script=integration/application-upstream-runtime-adapter.mjs
+          node scripts/full-lean/run-bounded.mjs --memory-mib 10240 --report .work/server-mvp-resources.json -- \
+            python3 scripts/full-lean/base-pages.py node "$script" .work/server-mvp-case "$(command -v node)" \
+            "$PWD/.work/install/node_modules/@lasm/compiler" "$PWD/.work/pristine" "$LASM_TEST" "$LASM_LEAN"
+      - name: Compact evidence
+        if: always()
+        run: node scripts/server-mvp/compact-result.mjs .work/server-mvp-case/result.json .work/server-mvp-resources.json .work/server-mvp-compact.json
+      - name: Keep the compact result briefly
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: server-mvp-${{ strategy.job-index }}
+          path: .work/server-mvp-compact.json
+          retention-days: 7
+          if-no-files-found: warn

@@ -40,7 +40,8 @@ const inputs = ['integration/application-upstream-eval-io.mjs', 'scripts/upstrea
 const inputHashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 mkdirSync(output, { recursive: true });
 writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
-const lean = await provisionLean(output);
+// The native oracle needs leanc; tiered Lean (4.35+) ships no C toolchain.
+const lean = await provisionLean(output, { distribution: 'full' });
 assert.equal(lean.commit, inventory.leanCommit);
 const env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '2' };
 const report = { scope: 'Original native driver plus separate byte-preserving IO-expression AOT comparisons; no full-suite or full API claim',
