@@ -130,9 +130,184 @@ gate are all still to do.
 
 ## Step 1, milestone 2: robustness (load, faults, soak)
 
-In progress (2026-10-17). Harness: `integration/fixtures/server-robustness/Main.lean`,
-`scripts/server-mvp/build-robustness.mjs`, `scripts/server-mvp/robustness.mjs` and
-`.github/workflows/server-mvp-robustness.yml`. First local Linux x64 runs found two
-Lasm memory leaks in long-running servers; results and criteria follow once the
-five-platform CI runs complete.
+Recorded 2026-10-17. **Not yet met for Lasm:** load and fault behaviour match
+native Lean on all five targets, but candidate `.54` servers leak memory until
+stopped. Two Lasm leaks were found and fixed in reviewed-pending source; with both
+fixes Windows passes every check and the remaining Linux/macOS growth is ~1 KiB per
+request (open). Evidence: [robustness runs](evidence/server-mvp-robustness-2026-10-17.json),
+[leak reproductions](evidence/server-mvp-host-leaks-2026-10-17.json).
 
+### Harness
+
+- Fixture `integration/fixtures/server-robustness/Main.lean`: ordinary Lean,
+  `Std.Http.Server` and `Lean.Data.Json`. Routes: `/health`, JSON compute
+  (`POST /json`), streaming chunked echo (`POST /echo`), `/slow/MS` (`Async.sleep`),
+  `/throw` (uncaught handler exception), `/env` (`IO.getEnv`), `/stream/N`, `/big/KIB`,
+  `/shutdown`. Config: `maxBodySize` 1 MiB, `maxHeaderBytes` 16 KiB, 50 headers,
+  `headerTimeout` 2 s, `lingeringTimeout` 3 s, `keepAliveTimeout` 5 s.
+- `scripts/server-mvp/build-robustness.mjs` builds it with the installed candidate
+  (default Node link driver) and natively (`leanc -O2`, full Lean 4.35.0).
+- `scripts/server-mvp/robustness.mjs` (no dependencies) runs native first, then
+  Lasm, each in a fresh process with `PATH` empty:
+  - **Load:** 16 and 64 keep-alive connections (Windows: 16 and 32, see below),
+    3 s warmup plus 30 s measured. The mix is seeded: health 30 %, JSON 25 %,
+    echo 15 % (1–16 KiB, half chunked), slow 10 %, env, stream and 64 KiB big.
+    Every status and body is checked byte for byte.
+  - **Faults:** 31 raw-socket cases in 6 classes, then idle connections. After each
+    class the harness checks 30 verified requests and that the process is alive.
+  - **Soak:** 900 s at 8 connections with a rotating fault every 2 s. External
+    sampling every 5 s: `/proc` on Linux, `ps`/`lsof` on macOS, PowerShell on
+    Windows. For Lasm, an opt-in `--import` diagnostic records Node heap and
+    `WebAssembly.Memory` size (`robustness-diag.mjs`; no product API).
+  - Ends with a final verification and `POST /shutdown`, which must exit 0.
+- A watchdog stops a server above 2 GiB RSS (Windows also above 6 GiB commit) and
+  records a memory cap. A fresh server then runs the next phase or fault class.
+- CI: `.github/workflows/server-mvp-robustness.yml`, dispatch-only, five standard
+  runners. Variant `candidate` is exact `.54`. Variant `full` is `.54` plus both
+  proposed fixes, overlaid by `scripts/server-mvp/overlay-fix.mjs`; it is not a
+  candidate. Artifacts are kept 7 days.
+
+### Criteria
+
+| Check | Pass condition |
+| --- | --- |
+| Load | 0 errors or mismatches at every level; no memory cap |
+| Faults | Every class leaves the server alive and serving; per case, the outcome set matches native |
+| Soak | After max(120 s, 25 %) of warmup: RSS slope ≤ 256 B/request; final − baseline ≤ 256 B/request + 32 MiB; Lasm Wasm memory growth ≤ 256 B/request + 16 MiB; handles ≤ baseline + 64; 0 errors; alive |
+| Lifecycle | Final verification passes; shutdown exits 0; no restarts |
+
+Growth is normalized by requests served: an application leak scales with
+requests, allocator high-water growth does not. A 15-minute soak at these rates
+resolves leaks of about 256 B/request.
+
+Some fault differences are informational. A server that closes with client bytes
+unread sends a TCP RST instead of a FIN. Native Lean closes with unread data, so
+the client sees `server-reset` and can lose the already-sent status
+(`none/error-EPIPE`). Node reads eagerly, so Lasm shows `server-close`. Status codes
+must match exactly.
+
+### Results (run [39073980437](https://github.com/Millillion/lasm/actions/runs/39073980437), variant `full`; `candidate` in the next table)
+
+| Platform | Build | req/s c=16 | p50/p99 ms | req/s c=64 (Win: 32) | p50/p99 ms | Soak B/request | Soak RSS warm→final MiB | Passed |
+| --- | --- | ---: | --- | ---: | --- | ---: | --- | --- |
+| linux-x64 | native | 836 | 16/49 | 689 | 74/225 | 94 | 154→184 | yes |
+| linux-x64 | Lasm | 295 | 46/120 | 262 | 214/494 | capped (2.1 GiB) in faults | — | no |
+| linux-arm64 | native | 1,119 | 12/41 | 932 | 55/166 | 51 | 214→245 | yes |
+| linux-arm64 | Lasm | 279 | 50/124 | 245 | 228/526 | 1,032 | 1,165→1,345 | no |
+| darwin-x64 | native | 587 | 18/143 | 543 | 97/299 | 86 | 122→149 | yes |
+| darwin-x64 | Lasm | 76 | 176/735 | 57 | 988/4,237 | 1,329 | 1,165→1,231 | no |
+| darwin-arm64 | native | 1,984 | 6/35 | 1,407 | 42/118 | 32 | 244→277 | yes |
+| darwin-arm64 | Lasm | 247 | 57/164 | 183 | 314/780 | 1,201 | 1,170→1,363 | no |
+| win32-x64 | native | 3,619 | 2.6/27 | 3,986 | 6.1/32 | −1 | 38→36 | yes |
+| win32-x64 | Lasm | 327 | 42/111 | 332 | 82/209 | 67 | 368→371 | **yes** |
+
+Repeat run [39077295412](https://github.com/Millillion/lasm/actions/runs/39077295412)
+agrees on every verdict. Lasm `full`:
+
+- passes on Windows: 434 / 449 req/s, RSS 524 → 404 MiB;
+- grows 608–1,352 B/request on macOS and Linux arm64;
+- was capped at 64 connections on linux-x64. It was also capped during faults in the
+  first run, after the 1.5 GiB high-water of the 64-connection load.
+
+Native passes everywhere except macOS (below). Fault outcomes matched native in every
+case of both runs. The only non-informational differences are cases cut short by a
+Lasm memory cap: `ECONNREFUSED` while the server was being replaced.
+
+Candidate `.54` unchanged: every Lasm server hits the 2 GiB cap within seconds of
+load on all five targets and again in the soak. That is 2–3 caps per platform and
+48–80 transport errors from the stopped processes. Native passes on four targets.
+**Native Lean 4.35.0 is unreliable on macOS under this soak.** It failed 5 of 10
+native macOS soaks across the three full runs:
+
+- darwin-arm64 stopped answering 3 times, with all requests timing out while the
+  process stayed alive with flat RSS;
+- it aborted twice with `libc++abi: … condition_variable wait failed: Invalid
+  argument`: darwin-arm64 in
+  [39017668610](https://github.com/Millillion/lasm/actions/runs/39017668610) and
+  darwin-x64 in 39077295412.
+
+Lasm never hung or aborted. This is an upstream issue to report.
+
+Throughput: Lasm reaches 10–40 % of native (Windows 9 %), and p99 latency is 2–14×
+native. Startup is 0.27–0.80 s, against 0.035–0.12 s native. Lasm RSS is 0.4–1.5 GiB
+under load, against 50–280 MiB native. Every Lean pthread is a Node worker isolate,
+and Wasm memory never shrinks.
+
+### Fault outcomes (identical on all five targets apart from the TCP close kind)
+
+| Class | Case | Native and Lasm |
+| --- | --- | --- |
+| Handler exception | `GET /throw` (also pipelined) | 500, `connection: close`, server closes; the next request is served |
+| Handler exception | JSON body over the handler's 64 KiB `readAll` | 500 (native RST, Lasm FIN) |
+| Malformed | garbage request line, header without colon, missing Host, bad chunk size, CL+TE, binary/NUL | 400 + close |
+| Malformed | `HTTP/7.0` | 505 + close |
+| Oversized | 2 MiB body (Content-Length or chunked) | 413, then RST while the client is still sending |
+| Oversized | 20 KiB of headers; 60 headers | 431 |
+| Oversized | 9,000-byte header value; 9,000-byte URI | 400 |
+| Slow client | slow-loris; partial headers | closed without a response within 1–6 s (`headerTimeout` 2 s) |
+| Slow client | partial body then silence | 408 within 1–6 s (`lingeringTimeout`) |
+| Disconnect / RST | mid-headers, mid-upload, mid-response (1 MiB), mid-stream, during a slow handler | server continues |
+| Idle | 300 idle connections | all traffic served meanwhile; the server closes all 300 between 3 and 8 s (`keepAliveTimeout` 5 s) |
+
+The only Lasm-specific message is `connection failure: cannot call write after a
+stream was destroyed`. It appears about 30 times, where native reports `broken pipe`.
+Informational: a handler that answers before reading the request body loses that
+body (0/100 full echoes, native and Lasm). This is upstream `Std.Http` behaviour.
+
+### Lasm bugs found (fixes uncommitted, awaiting review)
+
+1. **Host RPC leaked a MessagePort per call.** The source is
+   `scripts/full-lean/host-library.js` and `host-pre.js`. Each Lean→host call created
+   a `MessageChannel`. A Lean pthread never returns to its worker's event loop, so
+   `port1.close()` never completed, and about 3–4 KiB of native and V8 memory leaked
+   per call for the thread's life.
+   - Repro: `integration/fixtures/host-call-churn/Main.lean`, with 4 long-lived
+     threads making 720,000 calls. RSS went from 590 to 2,532 MiB with `.54` and stayed
+     at 323–343 MiB with the fix. 0 replies were misrouted, and the fix ran 25 % faster.
+   - Fix: one reply channel per worker isolate, keyed by `threadId`. Replies carry a
+     sequence number, so a call nested inside the futex wait gets its own reply. The
+     main side keeps an `unref`'d port, removed on `close`.
+   - Test: `test/full-host-rpc-channel.test.mjs`. It fails 3/3 against HEAD and passes
+     with the fix. Existing host, glue and link-driver tests pass (54/54).
+2. **`lean_uv_tcp_send`/`udp_send` leaked every sent buffer.** The source is
+   `runtime/node-async.cpp`. `lean_array_uget` returns an owned reference, and it was
+   never released; native libuv borrows the parts.
+   - Repro: `integration/fixtures/host-send-leak/Main.lean`, which sends 12,000
+     64 KiB replies. Native grew from 10 to 25 MiB; Lasm grew from 143 to 1,168 MiB,
+     with Wasm memory above 2 GiB.
+   - A Wasm memory scan after 3,000 `/big/64` responses found exactly 3,000 live
+     65,536-byte ByteArrays with rc = 1.
+   - With the fix, 30,000 `/big/64` responses leave Wasm at 663 MiB. With only fix 1,
+     Wasm grew to 5,797 MiB.
+   - Rebuilding `node-async.cpp.o` from HEAD source reproduces the shipped object
+     byte for byte (`b26ebc74…`), and the fixed object is `d9e9e9c2…`.
+3. **Remaining after both fixes:** Linux and macOS still grow by 1.0–1.3 KiB per
+   request, with Wasm memory flat. On Linux the growth is in 2–64 MiB anonymous
+   (malloc arena) regions, not V8 pages. Windows is flat. The cause is open.
+4. **Windows commit charge:** each Lean pthread worker commits its 64 MiB VM stack.
+   At 64 connections (~75 threads) Lasm needs more than 7 GiB of commit and tripped
+   the runner guard, so Windows measures 16 and 32 connections. Commit was 4.5 GiB
+   at 32 connections, against 0.8 GiB RSS.
+
+Shipping fix 2 changes the runtime archive and therefore its identity. That needs a
+re-derived runtime artifact, a new `src/application-runtimes.json` pin, and review of
+the new identity for `canSpecializeInitialization` in
+`src/application-reachability.mjs`. Otherwise the AOT policy rejects every build
+(observed). The JS files are link inputs, hashed into `buildDriverIdentity`, so cached
+builds are invalidated; they are packed by `scripts/package-node-release.mjs`.
+
+### Resources
+
+Peaks: local runs (one at a time, under the guard) ≤ 6.3 GiB. That was a deliberate
+leak run stopped proactively by the guard; no OOM or swap. CI build steps peaked at
+3.7 GiB on Linux and 1.5 GiB on macOS; suite runs at ≤ 2.3 GiB. One earlier Windows
+`full` run was stopped by the Job Object guard on commit (7.0 GiB). This was recorded
+as a resource stop, and the Windows connection levels were changed.
+
+### Remaining
+
+- Review and ship fixes 1–2 in a candidate.
+- Find the residual ~1 KiB/request growth.
+- Reduce the per-thread memory and commit cost.
+- Report the native macOS hang/abort upstream (`condition_variable wait failed`).
+- Run three consecutive clean five-platform runs.

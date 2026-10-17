@@ -1,0 +1,95 @@
+{
+ "scope": "Server MVP: two Lasm memory leaks in long-running servers, minimal reproductions and proposed fixes (awaiting review; product sources uncommitted)",
+ "platform": "linux-x64 (local, resource guard)",
+ "node": "26.12.0",
+ "lean": "4.35.0",
+ "candidate": "0.1.0-experimental.54",
+ "rpcChannelLeak": {
+  "fixture": "integration/fixtures/host-call-churn/Main.lean",
+  "args": "60000 4 1 (4 long-lived dedicated threads, 720,000 host calls)",
+  "candidate": {
+   "exitCode": 0,
+   "rounds": [
+    "round 0 calls 720000 mismatched 0"
+   ],
+   "rssMiBEvery3s": [
+    590,
+    818,
+    958,
+    1151,
+    1294,
+    1464,
+    1614,
+    1735,
+    1880,
+    1986,
+    2100,
+    2164,
+    2220,
+    2301,
+    2352,
+    2437,
+    2497
+   ],
+   "threads": 20,
+   "fds": 67
+  },
+  "fixed": {
+   "exitCode": 0,
+   "rounds": [
+    "round 0 calls 720000 mismatched 0"
+   ],
+   "rssMiBEvery3s": [
+    323,
+    328,
+    333,
+    340,
+    341,
+    343,
+    337,
+    338,
+    338,
+    341,
+    338,
+    340,
+    341
+   ],
+   "threads": 20,
+   "fds": 67
+  },
+  "mismatchedReplies": 0,
+  "fix": "scripts/server-mvp/patches/host-rpc-channel-reuse.patch (scripts/full-lean/host-library.js, host-pre.js)",
+  "microbenchmark": "Node 26.12.0 worker that never yields, 100,000 calls: fresh MessageChannel per call 66->492 MiB RSS; one reused channel 66->64 MiB"
+ },
+ "sendLeak": {
+  "fixture": "integration/fixtures/host-send-leak/Main.lean (repro variants: .work only)",
+  "load": "8 keep-alive clients x 1500 replies of 64 KiB",
+  "native": {
+   "startMiB": 10,
+   "endMiB": 25
+  },
+  "candidateRpcFixed": {
+   "startMiB": 143,
+   "endMiB": 1168,
+   "wasmEndMiB": ">2048"
+  },
+  "wasmScan": "After 3,000 /big/64 responses: exactly 3,000 live ByteArrays of 65,536 bytes in Wasm memory, header rc=1 tag 0xf8 (ST scalar array)",
+  "cause": "runtime/node-async.cpp lean_uv_tcp_send/lean_uv_udp_send used lean_array_uget (owned +1 reference per part, never released); native libuv code borrows with lean_array_get_core",
+  "objectRebuild": {
+   "shippedSha256": "b26ebc74b28f58cdfb967a9383c7b9aed223c63632a1614a4930991e29fb994f",
+   "rebuiltFromHeadSha256": "b26ebc74b28f58cdfb967a9383c7b9aed223c63632a1614a4930991e29fb994f",
+   "fixedSha256": "d9e9e9c276d2ac9c1435007f3c63a7a5111d9d9f9689da145f92bb1a5f1a22b3",
+   "liblasmhostSha256": "7b83f31af3bb29c92fcb7c7ccb9921223679c406c28243c52b7c148415277c2f",
+   "experimentalRuntimeIdentity": "3772b03fac0d0a3701114ef7ab568723e733d901a5ddd9cd4bf3e44b866e258b"
+  },
+  "fixtureBigC8": {
+   "requests": 30000,
+   "rpcOnlyWasmMiB": 5797,
+   "rpcOnlyRssMiB": 2584,
+   "bothFixesWasmMiB": 663,
+   "bothFixesRssMiB": 563,
+   "nativeRssMiB": 101
+  }
+ },
+ "recordedAt": "2026-10-17T21:29:13.114Z"
+}

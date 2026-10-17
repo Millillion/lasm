@@ -314,6 +314,9 @@ application API.
    Progress and evidence: [SERVER_MVP.md](SERVER_MVP.md). The Lean 4.35.0 Linux x64
    baseline (2026-10-17): 22/22 eval-io inputs and 1,255 runtime-adapter actions
    pass in Node with no deployed failures. The remaining non-passes are classified there.
+   Robustness (2026-10-17): Lasm load and fault behaviour matches native on all five
+   targets, but candidate `.54` leaks per request; two leak fixes await review, after
+   which Windows passes and Linux/macOS still grow about 1 KiB per request.
 2. Node serverless (Netlify Functions first, then Lambda/Vercel): the same
    `Std.Http` handler fed platform requests by Lasm-internal glue; Node 22/24/26,
    no glibc 2.39 floor, cold start and warm reuse.
