@@ -15,6 +15,9 @@ if (out.resultFound) {
     engineVersion: r.engineVersion, actions: r.parallel?.actions, mapping: r.parallel?.mapping,
     build: r.build && { lean: r.build.lean, target: r.build.target, linkDriver: r.build.linkDriver },
     error: tail(r.error, 6000), finishedAt: r.finishedAt,
+    summary: r.summary, verdicts: r.verdicts, exact: r.exact, buildRejected: r.buildRejected, passes: r.passes,
+    unmapped: r.parallel?.unmapped, candidates: r.parallel?.candidates,
+    actionForms: r.parallel?.actions?.map(a => ({ identifier: a.identifier, form: a.form, mode: a.mode, start: a.start })),
     commands: (r.commands ?? []).map(c => ({ label: c.label, code: c.code, signal: c.signal, error: c.error,
       stdoutSha256: sha(c.stdout), stderrSha256: sha(c.stderr), stdoutBytes: (c.stdout ?? '').length,
       stdoutTail: tail(c.stdout, 1500), stderrTail: tail(c.stderr, 3000) })) });
