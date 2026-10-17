@@ -1,11 +1,11 @@
 {
   "active": true,
-  "version": "0.1.0-experimental.38930715033",
-  "sha256": "99593d597804f05e489d1f9d7c2c3da985e67906b8dbb114b7cf6300f9765dc9",
-  "sourceRevision": "3dc280da933c494b8b0d3352361b2a4807356745",
-  "release": "node-package-38930715033",
-  "baselineRunId": "38930715033",
-  "node": "26.10.0",
-  "lean": "4.34.1",
-  "reason": "Slimmed installer (tiered Lean, Python-free Node link driver): the exact archive passed complete installed, offline npm, copied deployment and CLI/Lake private-CA/proxy gates on all five supported native targets in run 38930715033."
+  "version": "0.1.0-experimental.54",
+  "sha256": "567ea838eb672249d4dfd071c9e659de3dc9eedd3a503570cacc82a60c2aad77",
+  "sourceRevision": "b34f5702a479ecddc5aeddad2b3845ca6b86bc89",
+  "release": "node-package-38986393273",
+  "baselineRunId": "38986393273",
+  "node": "26.12.0",
+  "lean": "4.35.0",
+  "reason": "Lean 4.35.0 / Node 26.12.0 with the slimmed installer and npm artifact sources: the exact archive passed complete installed, offline npm, copied deployment and CLI/Lake private-CA/proxy gates on all five supported native targets in run 38986393273."
 }
