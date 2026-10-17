@@ -61,12 +61,12 @@ function forms(commands) {
     const kind = command.kind;
     if (kind === 'Lean.Parser.Command.eval') count.eval++;
     else if (kind === 'Lean.Parser.Command.evalBang') count.evalBang++;
-    else if (kind === 'Lean.guardCmd') count.guard++;
+    else if (kind === 'Lean.Parser.Command.guardCmd') count.guard++;
     else if (kind === 'Lean.guardMsgsCmd') {
       if (command.spec) count.guardMsgsSpec++;
       const inner = command.command.kind;
       if (inner === 'Lean.Parser.Command.eval') count.guardMsgsEval++;
-      else if (inner === 'Lean.guardCmd') count.guardMsgsGuard++;
+      else if (inner === 'Lean.Parser.Command.guardCmd') count.guardMsgsGuard++;
       else count.guardMsgsOther++;
     } else if (/runCmd|runElab|runMeta|run_cmd|run_elab|run_meta/i.test(kind)) count.runCommand++;
     else count.other[kind] = (count.other[kind] ?? 0) + 1;

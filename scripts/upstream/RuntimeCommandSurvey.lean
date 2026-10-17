@@ -22,7 +22,7 @@ private partial def describe (stx : Syntax) : Json :=
   let base : List (String × Json) := [("kind", toJson kind.toString), ("range", toJson (range stx))]
   if kind == ``Parser.Command.eval || kind == ``Parser.Command.evalBang then
     Json.mkObj (base ++ [("token", toJson (range stx[0])), ("term", toJson (range stx[1]))])
-  else if kind == `Lean.guardCmd then
+  else if kind == ``Parser.Command.guardCmd then
     Json.mkObj (base ++ [("token", toJson (range stx[0])), ("term", toJson (range stx[1]))])
   else if kind == `Lean.guardMsgsCmd then
     -- (plainDocComment)? "#guard_msgs" (guardMsgsSpec)? " in" command
@@ -49,13 +49,16 @@ unsafe def surveyFile (cache : IO.Ref (Option (String × Environment))) (file : 
   let mut state := initial
   let mut messages := initialMessages
   let mut commands : Array Json := #[]
+  let mut exited := false
   repeat
     let (stx, next, moreMessages) := Parser.parseCommand input { env, options := {} } state messages
     state := next
     messages := moreMessages
     if Parser.isTerminalCommand stx then
+      -- `#exit` ends elaboration; everything after it is not part of the test.
       unless stx.isOfKind ``Parser.Command.eoi do
-        throw <| IO.userError "Unexpected terminal command"
+        exited := true
+        commands := commands.push (describe stx)
       break
     commands := commands.push (describe stx)
   if messages.hasErrors then
@@ -63,7 +66,7 @@ unsafe def surveyFile (cache : IO.Ref (Option (String × Environment))) (file : 
     throw <| IO.userError ("Syntax survey failed: " ++ String.join texts)
   let headerEnd := (range header).map (·.getObjValD "stop") |>.getD (toJson 0)
   return Json.mkObj [("file", toJson file), ("headerStop", headerEnd),
-    ("imports", toJson (imports.map (·.module.toString))), ("commands", toJson commands)]
+    ("imports", toJson (imports.map (·.module.toString))), ("exited", toJson exited), ("commands", toJson commands)]
 
 /-- One JSON line per file; a file's failure is reported, not fatal. Every file
 in one invocation must share the same imports. -/

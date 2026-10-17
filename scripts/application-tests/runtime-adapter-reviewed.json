@@ -1,0 +1,322 @@
+{
+  "schema": 1,
+  "review": "Server MVP runtime adapter (2026-10-17). Structural review of every topical upstream elaboration test with #eval/#guard actions in the pinned release: exact source and sidecar hashes; only serial markers and whole-output expected/ignored files are accepted. Per-run gates: unchanged original native driver first; header-import syntax survey; token-only replacement reversed byte for byte; native elaboration decides each action's display mode or restores the original command; a re-survey must find only the recorded unmapped commands.",
+  "releases": {
+    "4.35.0": {
+      "tests": {
+        "elab/10078.lean": {
+          "sha256": "20dc29845afbf3ba58df23522fbef46e80f7aeb6541ebc06fde5e98be15634e1",
+          "sidecars": [
+            {
+              "path": "tests/elab/10078.lean.out.expected",
+              "sha256": "043b04a83bf92631ace799c95f899ca0b0cea24463f6645e0a4bfe105393171d",
+              "kind": "expected-output"
+            }
+          ]
+        },
+        "elab/async.lean": {
+          "sha256": "123c4362e8769a1abead90db97c72575620cbb5f9ee125b6cf58eb6476f4f713",
+          "sidecars": [
+            {
+              "path": "tests/elab/async.lean.out.expected",
+              "sha256": "87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7",
+              "kind": "expected-output"
+            }
+          ]
+        },
+        "elab/async_base_functions.lean": {
+          "sha256": "81012cf9e6dc37f0681499687253a57e12b2ae5e72df7fac2c3e61194c50cbc1"
+        },
+        "elab/async_cancellation.lean": {
+          "sha256": "416e140c1da5049e773dcdd3d06f623613997dd97e8bc3627db96dc5d50fb866",
+          "sidecars": [
+            {
+              "path": "tests/elab/async_cancellation.lean.serial",
+              "sha256": "8c7a1c9a6505508bda904403546ceb13e6571ba96fd8bb6c5072b3a9ccb5db67",
+              "kind": "ctest-run-serial"
+            }
+          ]
+        },
+        "elab/async_dns.lean": {
+          "sha256": "83d1465e23fedf9dfc98332f65924da429e8af97f1f71eaaf782090d4232c4b7",
+          "sidecars": [
+            {
+              "path": "tests/elab/async_dns.lean.serial",
+              "sha256": "77f370a2a5cb74a1e45c6b5a0bf6b2d87708572d151fd0f62a72cc267c396816",
+              "kind": "ctest-run-serial"
+            }
+          ]
+        },
+        "elab/async_http_encode.lean": {
+          "sha256": "edcc76d98953edf844b294dfaf29df4fb116c1e1153ad0f4f82960da44086501"
+        },
+        "elab/async_http_h1_rfc_compliance.lean": {
+          "sha256": "909f372d83fd7a7d876019bab07a8a620dc8fd603ce23f8d1907775541c819e9"
+        },
+        "elab/async_http_headers.lean": {
+          "sha256": "aa1775ed75c56c778999ae168ff04ba9ce9f42cd1ae87cb8da94f94f7215ab11"
+        },
+        "elab/async_http_idle_timeout.lean": {
+          "sha256": "957fefe6f3c9a12c29ee8aef9e7900d93c07169f4ca761b1d48e33efd609919c"
+        },
+        "elab/async_http_redirect.lean": {
+          "sha256": "3297cfb1ca103de16e50b0fc9e85713fc0887c08c0bd07234e6b6a63234a24f6"
+        },
+        "elab/async_http_uri.lean": {
+          "sha256": "f8a4773d4fdf8781f8189b6771a9b7186e209a297b4c8b9f2ae37016c8f57565"
+        },
+        "elab/async_select_combine.lean": {
+          "sha256": "493bf703d03e6ccd5e39ac404ae8dc588b45c2a710ea86b1c7797f959fb53867"
+        },
+        "elab/async_select_error_unregister.lean": {
+          "sha256": "35eca2ea22c92dd047199cd3711b4148302ac3e5cdb0413fa56f1fd83c0c898f"
+        },
+        "elab/async_select_gate.lean": {
+          "sha256": "3439d41ff4696e9d47f6ee94b85599c4e775a94ec53b22eb6115eb6227893883"
+        },
+        "elab/async_select_socket.lean": {
+          "sha256": "94a943f5fabd9afdbb19e8dd68badee872fd8b3ac54a11184c9f2b131adadf81",
+          "sidecars": [
+            {
+              "path": "tests/elab/async_select_socket.lean.out.expected",
+              "sha256": "d5fb3577185569d900aafc047f931f786f4b76145751c1c0b4e1e2c60a453b19",
+              "kind": "expected-output"
+            },
+            {
+              "path": "tests/elab/async_select_socket.lean.serial",
+              "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+              "kind": "ctest-run-serial"
+            }
+          ]
+        },
+        "elab/async_select_timer.lean": {
+          "sha256": "7cf4f432516c144337edddd40f0f00a993e3c1b2a0f0ad70d0ebc587693d4b16",
+          "sidecars": [
+            {
+              "path": "tests/elab/async_select_timer.lean.serial",
+              "sha256": "452531018a03fb902056cf8c23e0e236ec5725f05e1410cfedbfeeea27d7b012",
+              "kind": "ctest-run-serial"
+            }
+          ]
+        },
+        "elab/async_streammap.lean": {
+          "sha256": "75ddde2bbcd087a0799c3666f87c8d4df52853726c776e5224d68ac04e117712"
+        },
+        "elab/async_surface_sleep.lean": {
+          "sha256": "0197d4b994ac08051bbce13eb2decceb38c3e4ee6d3fa989f0dad3e3644dca79"
+        },
+        "elab/async_systems_info.lean": {
+          "sha256": "faeb4d897bb74c3a7f299a52886570f937b6aeeb3b4c1d3c82c2f5ef2f228b50",
+          "sidecars": [
+            {
+              "path": "tests/elab/async_systems_info.lean.out.ignored",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "kind": "ignored-output"
+            }
+          ]
+        },
+        "elab/broadcast.lean": {
+          "sha256": "23da8de99a238cfed2421c2a6a0526d388cd9dfd7776cd7cbf5ff4c74adf0124"
+        },
+        "elab/cancellation_context.lean": {
+          "sha256": "91804d06eff0c559f92106d45a26e37002b33cc3a23c60f421ed2f80b523c937"
+        },
+        "elab/context_async.lean": {
+          "sha256": "be5e88f16942e231f0eb795a278a9c6232ad4e2133f3d2883fd95fe78addf925"
+        },
+        "elab/dateTimeOrd.lean": {
+          "sha256": "4b8b91bbec71a13d53e8b94f6faf446724175b666e8cac11a0206146c6b5fba4"
+        },
+        "elab/docstringRewrites.lean": {
+          "sha256": "e1c272d871390b588b9a06b4542d793e019459f4d8b98d0c553ceaa6368172fd"
+        },
+        "elab/idbg_basic.lean": {
+          "sha256": "1b882a5beb2e4e27b50c804f1be1a51ae66f92ded265c005d2e2180e2bfa44d8"
+        },
+        "elab/ioNulBytes.lean": {
+          "sha256": "ef45017cc38adcb75348b46e2f9b6b2d7d8b1998db3960e10e2f77d6fb84e254"
+        },
+        "elab/json.lean": {
+          "sha256": "3a8c905b97343c24833c68dc531ab2564d5fc69d8917cb0ede7681b8122bfa37",
+          "sidecars": [
+            {
+              "path": "tests/elab/json.lean.out.expected",
+              "sha256": "1b7068cd5414d692629882c4b2f1473e6940bdc4682ab4e33e041f813f2910c9",
+              "kind": "expected-output"
+            }
+          ]
+        },
+        "elab/json2.lean": {
+          "sha256": "d8bcfdc6964fd1ab9629d1f324a849d573c644602b960d725a6d2b781ad554dc"
+        },
+        "elab/json_empty.lean": {
+          "sha256": "815104a549b358d5d014a9033015d16061ce98d7751db764d17b5942745aff5f"
+        },
+        "elab/kernelInterrupt.lean": {
+          "sha256": "7836ac7748b86fdb496bf9a27282b97ea0bac7b0fd30629267518ad77a209d20"
+        },
+        "elab/leanExportParse.lean": {
+          "sha256": "507268ef80c73f5d85ba2fdad198bd27e67cdb336356526b566eefcbe19a90d9"
+        },
+        "elab/libuv_signal_retry.lean": {
+          "sha256": "d7e56546f7090aebe5109c9e357b1612b946b69f8da9f095a9010d52cff716b4"
+        },
+        "elab/libuv_tcp_shutdown_pending.lean": {
+          "sha256": "e8dc6efe16192b2f27feba98ebd3f2a095de8f04e191fc373ec70bf04e02f502"
+        },
+        "elab/net_addr.lean": {
+          "sha256": "27bb25a69118947395a91a48836057f7bf6c0232011f5202e13a96a57a4f5c8a"
+        },
+        "elab/networkInterfaces.lean": {
+          "sha256": "69e6f92a5e934ba9ac8b4e8fec3ea3866df3781fda7afcfdc74b24badf02eef3"
+        },
+        "elab/newdo.lean": {
+          "sha256": "e2bc2621147b5d5726f08578facf738d57ae97beeb46948e8b1cf03db9dca195",
+          "sidecars": [
+            {
+              "path": "tests/elab/newdo.lean.out.expected",
+              "sha256": "86d5d4754f2008e78f07bdcdc423d6fae60b39d956c8943f5863e71c4f40801e",
+              "kind": "expected-output"
+            }
+          ]
+        },
+        "elab/promise.lean": {
+          "sha256": "4b8328e874dcf1a079c8e78466abdf44b6cbf429857d0e52c9b5c448b863d58d"
+        },
+        "elab/sync_barrier.lean": {
+          "sha256": "c7f147f927b4371fd7ab7a109cfec492ba6e0952f6ff48e0640a67c229ec7347"
+        },
+        "elab/sync_channel.lean": {
+          "sha256": "336f9c15fbc72621b35c4e97366446724d4f6e7e3990996b2bbcf985a09b70f1"
+        },
+        "elab/sync_notify.lean": {
+          "sha256": "85b1288e112a689bb2acaf31225baf103d263abfc30361bfcdf5abe9c8d9b9fa"
+        },
+        "elab/sync_recursive_mutex.lean": {
+          "sha256": "3e2ed8be0a0e4167a1e155fcde65377dd7b0f578580b9cd1a8dfe670631f356d"
+        },
+        "elab/sync_shared_mutex.lean": {
+          "sha256": "21606250dbb57d961d531f23379993ba3e2f4c50b1c1700bfdf2b18c9bc4ffb4"
+        },
+        "elab/taskState.lean": {
+          "sha256": "2f32b8a53815b8d9c527a08ac0dd3bc2539d1425d3ba776bbd33d06f8cab1243"
+        },
+        "elab/task_iterators.lean": {
+          "sha256": "3ecbacd20a09c19fc7d8578528c4ddeab49223a384d5b25b745b71591fe73bfb"
+        },
+        "elab/task_test.lean": {
+          "sha256": "98ba89c725bb9067824d48cf6777365b3e4edc220ae2eae6c4a3b56a1341cf99",
+          "sidecars": [
+            {
+              "path": "tests/elab/task_test.lean.out.ignored",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "kind": "ignored-output"
+            }
+          ]
+        },
+        "elab/task_test2.lean": {
+          "sha256": "1bfed3aa23b83b1f1eef7583f66282c25e95cf244212c74ccc5cd9b3f4405161",
+          "sidecars": [
+            {
+              "path": "tests/elab/task_test2.lean.out.ignored",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "kind": "ignored-output"
+            }
+          ]
+        },
+        "elab/timeAPI.lean": {
+          "sha256": "7eae268ff39c8efc47f6734a1ac7d4bdb4fe81f944e92be08ed872f0bfd73e68"
+        },
+        "elab/timeCanonFormats.lean": {
+          "sha256": "c656854438438d35a0861e592b5427514b9321139a8648e365a66480efbaf7ac"
+        },
+        "elab/timeClassOperations.lean": {
+          "sha256": "2fd5bb7c20c3070783cb467fa385f2f99b9933d7456a9a5ce45d439daf8bc6da"
+        },
+        "elab/timeFormats.lean": {
+          "sha256": "92a1f69212f2cd453ad5d4a8a8cf632a9200fdcac0da324c3c47272c29a82633"
+        },
+        "elab/timeLimits.lean": {
+          "sha256": "cb1a4bb3a3e446207a8284c081a8016f412346d6828d0edd027038f9568275ba"
+        },
+        "elab/timeLocalDateTime.lean": {
+          "sha256": "940f562efc7ca494144fe3abebda4d0086f9651aaa59bfb146f2bb64fb308a46"
+        },
+        "elab/timeNegative.lean": {
+          "sha256": "e363e083c664ffa87c3d9d5e55dba78121d0c39e5731be58a4f59bd6c36b5eff"
+        },
+        "elab/timeOperations.lean": {
+          "sha256": "aff9e94d606747d00b8f083db0018927e880913d083026b63c1fc0589210879a"
+        },
+        "elab/timeOperationsOffset.lean": {
+          "sha256": "555e594578c2f04b1b517aadea346cd97e2d765fc03c39e572e74d52fabbc74f"
+        },
+        "elab/timeParse.lean": {
+          "sha256": "31a5637e8ec817f64f39f7168848d0694e186ca4864b8eac1746cce8385fba10"
+        },
+        "elab/timePosixTzFooter.lean": {
+          "sha256": "7c0795c04b661d6441fa4ab42f41acd50106f3fbc577ca252e11528a375b847c"
+        },
+        "elab/timeSet.lean": {
+          "sha256": "23505332e6d164dbf69dd92438b32066a2b1f812d32f0b8772fd7bc6af29cf4a"
+        },
+        "elab/timeSub.lean": {
+          "sha256": "3d387c21205c521d63ff7c3537db809d85afbb2df87199f1288f1ec49e9164e1"
+        },
+        "elab/timeTzifParse.lean": {
+          "sha256": "0dac84c69e4435e0915cf5e3bbc7190bf182ecb25cb6c8247c5559fb4332f922"
+        },
+        "elab/versoDocs.lean": {
+          "sha256": "f157f6d80377724bff72cedda502dc09c21de8332725d8006c5bf4d58264a762",
+          "sidecars": [
+            {
+              "path": "tests/elab/versoDocs.lean.out.expected",
+              "sha256": "c9c3b2511387c68730abf3b47dddfcf146d20b13effbce0ca6ba255f081f25f1",
+              "kind": "expected-output"
+            }
+          ]
+        },
+        "elab_bench/cbv_decide.lean": {
+          "sha256": "62ebc05dfc435295911abd98983d2a5bfc80a763e127af9ab20916d160c0c0b7",
+          "sidecars": [
+            {
+              "path": "tests/elab_bench/cbv_decide.lean.out.ignored",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "kind": "ignored-output"
+            }
+          ]
+        },
+        "elab_bench/cbv_divisors.lean": {
+          "sha256": "63f4c4ddaeb0c3b8f337573ba8ba0bb64168e2275b06d23e82660e69a8e24d28",
+          "sidecars": [
+            {
+              "path": "tests/elab_bench/cbv_divisors.lean.out.ignored",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "kind": "ignored-output"
+            }
+          ]
+        },
+        "elab_bench/cbv_leroy.lean": {
+          "sha256": "e78609ffeebfba689395c436d0f9e0ce3e306dc1cb4f2e82bf4f1037c9703bc4",
+          "sidecars": [
+            {
+              "path": "tests/elab_bench/cbv_leroy.lean.out.ignored",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "kind": "ignored-output"
+            }
+          ]
+        },
+        "elab_bench/cbv_merge_sort.lean": {
+          "sha256": "434c3aa7d5aa9eb1a18057845c81427f8429f1cdc1c4e6f3eafab3bb599ddb0b",
+          "sidecars": [
+            {
+              "path": "tests/elab_bench/cbv_merge_sort.lean.out.ignored",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "kind": "ignored-output"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
