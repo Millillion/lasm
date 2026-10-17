@@ -144,7 +144,7 @@ jobs:
           # Windows commits each Lean pthread worker's full 64 MiB VM stack up
           # front, so 64 connections (~75 threads) exceed the runner's guard on
           # commit alone; measure 16 and 32 there, natively and with Lasm alike.
-          PLATFORM_ARGS: ${{ matrix.target.platform == 'win32-x64' && 'ROBUSTNESS_LOAD_CONNECTIONS=16,32 ROBUSTNESS_MAX_SERVER_COMMIT_MIB=4096' || '' }}
+          PLATFORM_ARGS: ${{ matrix.target.platform == 'win32-x64' && 'ROBUSTNESS_LOAD_CONNECTIONS=16,32 ROBUSTNESS_MAX_SERVER_COMMIT_MIB=6144' || '' }}
         run: |
           node scripts/full-lean/run-bounded.mjs --memory-mib "$RUN_MIB" --report .work/robustness-run-resources.json -- \
             node scripts/server-mvp/robustness.mjs .work/robustness-build/application.json .work/robustness-result.json \
