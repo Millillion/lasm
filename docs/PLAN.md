@@ -292,6 +292,32 @@ its runtime; Lasm keeps linking Emscripten's mimalloc). Remaining before
 acceptance: the retained CI runtime, a packed candidate, the five-platform
 native acceptance and the three-run cold-installation gate.
 
+## Server MVP, authorized 2026-10-17
+
+Goal: developers run Lean on the server in Node runtimes, platform by platform,
+building robustness at each step. Use Lean's own `Std.Http`; add no Lasm-specific
+application API.
+
+1. **Plain Node server** (VPS, Docker, Fly, Render — anything running `node`).
+   Developers write ordinary Lean with `Std.Http.Server` handlers, `Lean.Data.Json`,
+   environment variables, `Std.Time` and async tasks. Done means:
+   - Lean's upstream `Std.Http` (and related async/time/JSON) tests pass under
+     Lasm as they do natively;
+   - example servers (routing, JSON APIs, streaming bodies, keep-alive) serve real
+     clients on all five targets in CI;
+   - load (sustained concurrency, no errors; throughput/latency vs native Lean),
+     soak (flat memory over long runs) and fault tests (handler exceptions,
+     malformed requests, slow/disconnecting clients, oversized bodies fail one
+     request, never the server);
+   - acceptance plus three consecutive clean runs.
+   Outbound HTTP is deferred: Lean has no HTTP client or TLS; revisit with usage.
+2. Node serverless (Netlify Functions first, then Lambda/Vercel): the same
+   `Std.Http` handler fed platform requests by Lasm-internal glue; Node 22/24/26,
+   no glibc 2.39 floor, cold start and warm reuse.
+3. Cloudflare Workers: single-threaded, no native add-ons, no filesystem, 128 MB.
+
+npm publication follows language coverage (user decision 2026-10-17).
+
 ## Deferred chunks
 
 The native macOS and Windows extensions are complete. Future work should expand
