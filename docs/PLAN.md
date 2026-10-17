@@ -275,10 +275,14 @@ npm as the only prerequisites. Follow [the slimming design](TOOLCHAIN_SLIMMING.m
 - [x] Phase 2: Node link driver replacing `emcc` and Python, byte-identical to
   current output on existing fixtures. Accepted in the same candidate on Lean
   4.34.1 / Node 26.10.0.
-- [ ] Phase 3: npm platform packages via `optionalDependencies`, validated with
-  a local registry on all five native targets. Publication stays a user decision.
+- [x] Phase 3: npm platform packages via `optionalDependencies`, validated with
+  a local registry on all five native targets (run 38963750452). The npm artifact
+  source is in accepted candidate `.54`. Publication stays a user decision; on
+  2026-10-16 the user chose to broaden language coverage before publishing.
 
-**Lean 4.35.0 / Node 26.12.0 upgrade — approved 2026-10-16:** the step after the
+**Lean 4.35.0 / Node 26.12.0 upgrade — accepted 2026-10-16** in candidate `.54`
+(five-platform acceptance 38986393273; three consecutive cold-installation
+campaigns passed). Approved as the step after the
 slimmed installer was validated on Lean 4.34.1. Current source pins Lean 4.35.0
 (default; a package carries one Lean release and its runtime) and Node 26.12.0
 with npm 11.20.0. Tiered archives: [`lean-4.35.0-tiers-v1`](TOOLCHAIN_SLIMMING.md#lean-4350-tiers-2026-10-16).

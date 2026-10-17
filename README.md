@@ -3,10 +3,9 @@
 Write ordinary Lean. Compile it ahead of time and run it in Node. Node.js is the
 only supported JavaScript runtime.
 
-**Prerequisites:** stock **Node 26.10.0 with npm 11.19.1** for the tested `.46`
-candidate, which downloads its matching **Lean 4.34.1**, Lake, and build tools; you
-do not install them yourself. Current source, not yet in an accepted candidate,
-moves to **Node 26.12.0 with npm 11.20.0** and **Lean 4.35.0**.
+**Prerequisites:** stock **Node 26.12.0 with npm 11.20.0**. Lasm downloads its
+matching **Lean 4.35.0**, Lake, and build tools; you do not install them yourself
+(accepted candidate `.54`; the older candidate `.46` used Node 26.10.0 / Lean 4.34.1).
 The package is experimental and **has not been published to npm**.
 
 ## Get started
@@ -34,13 +33,14 @@ npx lasm build Main.lean     # Create dist/ without running main
 node dist/main.mjs          # Run the deployment
 ```
 
-The first build needs internet access, downloads about 0.9–1.3 GB, and occupies
-several GB. Measured first builds took about 5–16 minutes. The slimmed installer
-(tiered Lean and a minimal compiler toolchain, no Python) downloads about 250–275 MB
-for an ordinary program; it passed acceptance and the cold-installation gate in
-candidate `.38930715033` on Lean 4.34.1 / Node 26.10.0 (see
-[toolchain slimming](docs/TOOLCHAIN_SLIMMING.md)). The Lean 4.35.0 / Node 26.12.0
-move in current source awaits acceptance. The terminal shows progress
+The first build needs internet access and downloads about 250–275 MB for an
+ordinary program (tiered Lean and a minimal compiler toolchain, no Python); Lake
+projects and programs importing `Lean` download more. Measured first builds of a
+small program took 42–60 seconds on Linux and Apple Silicon and about 3 minutes on
+the slower Intel Mac and Windows CI machines. Candidate `.54` passed acceptance and
+three consecutive cold installations on all five targets (see
+[toolchain slimming](docs/TOOLCHAIN_SLIMMING.md)). Candidate `.46` downloaded
+0.9–1.3 GB and took 5–16 minutes. The terminal shows progress
 and elapsed time. Later builds reuse verified tools and unchanged outputs. See
 [cache locations, requirements, and recovery](docs/NODE_SUPPORT.md).
 Candidate `.46` requires rerunning failed downloads. Current source adds bounded

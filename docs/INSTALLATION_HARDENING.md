@@ -440,3 +440,18 @@ three back-to-back confidence campaigns:
 The third campaign's report job first failed on a GitHub API HTTP 502 while
 collecting job lists; its rerun (no installations repeated) recorded
 `passed: true` with five consecutive clean cold installations per target.
+
+### Lean 4.35.0 candidate gate result (2026-10-16)
+
+Candidate `0.1.0-experimental.54` (source `b34f570`, SHA-256
+`567ea838eb672249d4dfd071c9e659de3dc9eedd3a503570cacc82a60c2aad77`; Lean 4.35.0,
+Node 26.12.0, tiered Lean, Python-free link driver and npm artifact sources)
+passed native acceptance on all five supported targets in
+[38986393273](https://github.com/Millillion/lasm/actions/runs/38986393273), then
+three back-to-back confidence campaigns
+([38989444051](https://github.com/Millillion/lasm/actions/runs/38989444051),
+[38989452544](https://github.com/Millillion/lasm/actions/runs/38989452544),
+[38989461708](https://github.com/Millillion/lasm/actions/runs/38989461708)):
+`passed: true`, four consecutive clean cold installations per target. Median cold
+`npx lasm Main.lean` times (two samples each, CI runners): Linux x86-64 50 s,
+Linux ARM64 42 s, Intel macOS 168 s, Apple Silicon 59 s, Windows x86-64 193 s.
