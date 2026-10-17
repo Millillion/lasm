@@ -17,8 +17,20 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       finally { host.close(); }
     }).catch(() => {}).finally(disposeWorkers);
   };
+  // Each worker isolate transfers its reply port once (see $lasmFullRPC).
+  var lasmFullReplyPorts = new Map();
   Module.lasmFullHostRequest = async function (request) {
-    const { port, signalPointer } = request;
+    const { signalPointer, sequence } = request;
+    if (request.port) {
+      lasmFullReplyPorts.set(request.channelId, request.port);
+      // Never let a retained reply port keep the host process alive.
+      request.port.unref?.();
+      request.port.once('close', () => {
+        if (lasmFullReplyPorts.get(request.channelId) === request.port) lasmFullReplyPorts.delete(request.channelId);
+      });
+    }
+    const port = lasmFullReplyPorts.get(request.channelId);
+    const reply = message => port?.postMessage({ ...message, sequence });
     const signal = new Int32Array(wasmMemory.buffer, signalPointer, 1);
     try {
       if (!lasmFullHost) {
@@ -58,7 +70,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       }
       else result = await host.request(...args);
       // Responses may alias retained host buffers, so preserve cloning here.
-      port.postMessage(result.bytes === undefined ? result : {
+      reply(result.bytes === undefined ? result : {
         error: result.error, byteBuffer: result.bytes.buffer,
         byteOffset: result.bytes.byteOffset, byteLength: result.bytes.byteLength,
       });
@@ -67,11 +79,10 @@ if (!ENVIRONMENT_IS_PTHREAD) {
         await lasmFullHost?.then(host => host.flushStdIO()).catch(() => {});
         process.exit(error.code);
       }
-      port.postMessage({ failure: error.stack ?? String(error) });
+      reply({ failure: error.stack ?? String(error) });
     } finally {
       Atomics.store(signal, 0, 1);
       Atomics.notify(signal, 0);
-      port.close();
     }
   };
 }

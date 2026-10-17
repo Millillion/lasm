@@ -64,6 +64,15 @@ addToLibrary({
   $lasmFullRPC__deps: ['malloc', 'free', 'emscripten_futex_wait'],
   $lasmFullRPC: {
     response: new Uint8Array(0),
+    // One reply channel per worker isolate, reused for every call. A Lean
+    // pthread never returns to its worker's event loop, so a per-call
+    // MessageChannel could never finish closing there: each call leaked its
+    // port (about 4 KiB of native and V8 memory) for the life of the worker.
+    channel: null,
+    channelId: 0,
+    sequence: 0,
+    // Created lazily: library objects are serialized into the generated JavaScript.
+    replies: null,
     call: function (kind, operation, handle, argument, input, length) {
       if (!ENVIRONMENT_IS_PTHREAD) throw new Error('Lean host calls require PROXY_TO_PTHREAD');
       length = Number(length);
@@ -73,7 +82,14 @@ addToLibrary({
         var path = require('node:url').fileURLToPath(new URL('./thread-id.cjs', process.env.LASM_FULL_HOST_MODULE));
         nativeThreadId = require(path)();
       }
-      var channel = new wt.MessageChannel();
+      var newPort;
+      if (!lasmFullRPC.channel) {
+        lasmFullRPC.replies = new Map();
+        lasmFullRPC.channel = new wt.MessageChannel();
+        lasmFullRPC.channelId = wt.threadId;
+        newPort = lasmFullRPC.channel.port2;
+      }
+      var sequence = ++lasmFullRPC.sequence;
       // Wait through Emscripten's futex implementation, which also services the
       // pthread mailbox. A raw Atomics.wait on a separate buffer starves dylink
       // synchronization indefinitely when this thread waits for host IO.
@@ -83,7 +99,7 @@ addToLibrary({
       Atomics.store(signal, 0, 0);
       var bytes = length ? HEAPU8.slice(Number(input), Number(input) + length) : new Uint8Array(0);
       // CMD_CALL_HANDLER is Emscripten 6.0.9's documented-in-source dispatch to a
-      // Module callback. Transfer the reply port, never the Wasm memory itself.
+      // Module callback. Transfer the reply port once, never the Wasm memory itself.
       wt.parentPort.postMessage({ cmd: 9, handler: 'lasmFullHostRequest', args: [{
         // Send the numeric offset, not the typed view. Some engine structured
         // cloners truncate a typed array's byteOffset above 4 GiB. The parent
@@ -91,24 +107,32 @@ addToLibrary({
         // Send the backing store and numeric view bounds instead.
         kind, operation, handle, argument, byteBuffer: bytes.buffer,
         byteOffset: bytes.byteOffset, byteLength: bytes.byteLength,
-        signalPointer: Number(signalPointer), port: channel.port2,
+        signalPointer: Number(signalPointer), port: newPort,
+        channelId: lasmFullRPC.channelId, sequence,
         thread: Number(_pthread_self()),
         nativeThreadId,
-      }] }, [channel.port2, bytes.buffer]);
-      var packet;
+      }] }, newPort ? [newPort, bytes.buffer] : [bytes.buffer]);
+      var message;
       try {
         while (Atomics.load(signal, 0) === 0) _emscripten_futex_wait(signalPointer, 0, Infinity);
-        while (!(packet = wt.receiveMessageOnPort(channel.port1))) _emscripten_futex_wait(signalPointer, 1, 1);
+        // Replies carry their sequence: a call nested inside this wait (for
+        // example from a serviced mailbox task) may receive another reply first.
+        while (!lasmFullRPC.replies.has(sequence)) {
+          var packet = wt.receiveMessageOnPort(lasmFullRPC.channel.port1);
+          if (packet) lasmFullRPC.replies.set(packet.message.sequence, packet.message);
+          else _emscripten_futex_wait(signalPointer, 1, 1);
+        }
+        message = lasmFullRPC.replies.get(sequence);
+        lasmFullRPC.replies.delete(sequence);
       } finally {
-        channel.port1.close();
         _free(signalPointer);
       }
-      if (packet.message.failure) throw new Error(packet.message.failure);
-      if (packet.message.byteBuffer !== undefined) {
-        packet.message.bytes = new Uint8Array(packet.message.byteBuffer,
-          packet.message.byteOffset, packet.message.byteLength);
+      if (message.failure) throw new Error(message.failure);
+      if (message.byteBuffer !== undefined) {
+        message.bytes = new Uint8Array(message.byteBuffer,
+          message.byteOffset, message.byteLength);
       }
-      return packet.message;
+      return message;
     },
   },
   lasm_node_call__deps: ['$lasmFullRPC'],
