@@ -1,3 +1,13 @@
+# Lean 4.35.0 Server MVP baseline (2026-10-17)
+
+A fresh [4.35.0 inventory](evidence/lean-4.35.0-upstream-application-inventory.json)
+records 4,219 registrations and 8,044 verified files. Server-relevant results for
+installed `.54` on Linux x64 are in [SERVER_MVP.md](SERVER_MVP.md): all 22 eval-io
+inputs pass. The new runtime adapter (`integration/application-upstream-runtime-adapter.mjs`)
+re-checks `#guard`, `#guard_msgs`+`#eval` and bare `#eval` assertions at run time,
+and 1,255 of its actions pass. These are parallel runtime checks, not upstream
+suite passes.
+
 # Lean 4.34 upstream application acceptance
 
 The latest-release target is now **4.34.1**. Its

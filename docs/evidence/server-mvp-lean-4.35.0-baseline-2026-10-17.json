@@ -1,0 +1,2425 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-10-17T06:00:51.106Z",
+  "scope": "Server MVP step 1, milestone 1: Lean 4.35.0 upstream Std.Http and server-neighbour baseline on Linux x64 through installed candidate .54 in Node 26.12.0; parallel runtime re-checks of build-time tests, not upstream suite passes",
+  "candidate": {
+    "version": "0.1.0-experimental.54",
+    "sha256": "567ea838eb672249d4dfd071c9e659de3dc9eedd3a503570cacc82a60c2aad77",
+    "release": "node-linux-candidate-38986393273"
+  },
+  "ci": {
+    "evalIO": "https://github.com/Millillion/lasm/actions/runs/39004033361",
+    "runtimeAdapter": "https://github.com/Millillion/lasm/actions/runs/39006173177",
+    "runner": "ubuntu-24.04 (standard public, linux-x64)",
+    "runtimeAdapterRerun": "https://github.com/Millillion/lasm/actions/runs/39008042295",
+    "supersededAttempts": {
+      "https://github.com/Millillion/lasm/actions/runs/39003270249": "eval-io: all 22 stopped by the guard at 4.9 of 6.08 GiB while extracting the full native Lean archive (resource stops, not failures)",
+      "https://github.com/Millillion/lasm/actions/runs/39004660569": "runtime adapter, earlier harness (attached doc comments, strict backtraces, 4-pass limit); cancelled after 52 jobs",
+      "https://github.com/Millillion/lasm/actions/runs/39005907180": "cancelled before matrix (compact results lacked verdicts)",
+      "https://github.com/Millillion/lasm/actions/runs/39005928600": "cancelled before matrix (backtraces enabled)",
+      "https://github.com/Millillion/lasm/actions/runs/39005989701": "cancelled before matrix (pass limit)"
+    }
+  },
+  "evalIO": {
+    "tests": 22,
+    "passed": 22,
+    "actions": 219,
+    "actionsInPassedTests": 219,
+    "maxPeakGiB": 2.23,
+    "results": [
+      {
+        "name": "elab/async_cancellation_reasons.lean",
+        "passed": true,
+        "actions": 11,
+        "inputsUnchanged": true,
+        "wasmSha256": "0281c60639e941f9284c608711e2a18e0736523de73be77510ba6713b4c4ed9e",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_body_framing.lean",
+        "passed": true,
+        "actions": 12,
+        "inputsUnchanged": true,
+        "wasmSha256": "0f5ec0c2e3dc7ee88a02e24366d29af6eab3578c1d59b5645b27f70f086fb7d1",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_body.lean",
+        "passed": true,
+        "actions": 69,
+        "inputsUnchanged": true,
+        "wasmSha256": "31cc5e8e6c7fabf8ff725902f33e659f8c4cffd683a0fe7e0552db9bf91cca01",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_dispatch.lean",
+        "passed": true,
+        "actions": 2,
+        "inputsUnchanged": true,
+        "wasmSha256": "0f45e057e513d2d8c79b1e165b21600afa2802934989b300943ebe51ebb2a8dc",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_expect.lean",
+        "passed": true,
+        "actions": 5,
+        "inputsUnchanged": true,
+        "wasmSha256": "b4455adb0e33a20090d25815ee5ff437d006b28fdd7214070bf3f03be962ecef",
+        "linkDriver": "node",
+        "peakGiB": 2.23
+      },
+      {
+        "name": "elab/async_http_fuzz_limits.lean",
+        "passed": true,
+        "actions": 10,
+        "inputsUnchanged": true,
+        "wasmSha256": "f434299f6817ea289e800fffe8c2c941efabb4193ac65bbdd09137e9c4226a8f",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_fuzz_random.lean",
+        "passed": true,
+        "actions": 8,
+        "inputsUnchanged": true,
+        "wasmSha256": "4c2cc224508f7dd93050ff4ef33545389d4afd5b08aab2a04a3695302fe16c9f",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_fuzz.lean",
+        "passed": true,
+        "actions": 10,
+        "inputsUnchanged": true,
+        "wasmSha256": "b09db1c01d78af63efc7708aca8125ddbb5f0dbdd2012539f183874bc31625fa",
+        "linkDriver": "node",
+        "peakGiB": 2.23
+      },
+      {
+        "name": "elab/async_http_h1_incremental.lean",
+        "passed": true,
+        "actions": 6,
+        "inputsUnchanged": true,
+        "wasmSha256": "60a09db960bc61d7e294571a917318f6829e84d8121257b78fa9b1805c1e6d2b",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_h1_parser_fuzz.lean",
+        "passed": true,
+        "actions": 4,
+        "inputsUnchanged": true,
+        "wasmSha256": "d626b1848f8f015ee97451fff16fc5fd1f254f6527127bf0dd66648034713ff0",
+        "linkDriver": "node",
+        "peakGiB": 2.23
+      },
+      {
+        "name": "elab/async_http_hang_regressions.lean",
+        "passed": true,
+        "actions": 22,
+        "inputsUnchanged": true,
+        "wasmSha256": "a316f1de954740d02bdcfc8ccbcfcb33e24aa7654d3cbdc648391d2fa33a8428",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_keepalive.lean",
+        "passed": true,
+        "actions": 5,
+        "inputsUnchanged": true,
+        "wasmSha256": "27f798a774c145b3ad09fb31da934e539e10fbccea76c025fb72208d8cefd3b0",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_replayable.lean",
+        "passed": true,
+        "actions": 13,
+        "inputsUnchanged": true,
+        "wasmSha256": "c152e4f91703dc8fcfc4e866f4ff577a4ba3c05434104ba87a66df23423a0456",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_request_headers.lean",
+        "passed": true,
+        "actions": 4,
+        "inputsUnchanged": true,
+        "wasmSha256": "b4e96015fb6e6cfdc3640d7705a19066ec1f5a6bf68d99a0ce25fdde1f7e1d92",
+        "linkDriver": "node",
+        "peakGiB": 2.23
+      },
+      {
+        "name": "elab/async_http_request_line.lean",
+        "passed": true,
+        "actions": 7,
+        "inputsUnchanged": true,
+        "wasmSha256": "fad4a2f94c3c82a86151d0e4f698c64fcb3dfe02c9134680456037fc5f21a2ab",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_http_response_framing.lean",
+        "passed": true,
+        "actions": 7,
+        "inputsUnchanged": true,
+        "wasmSha256": "43bfa4755d8aa74a655ea19aced52065fe51452a0b87837403f914385fdab5e5",
+        "linkDriver": "node",
+        "peakGiB": 2.23
+      },
+      {
+        "name": "elab/async_http_trailers.lean",
+        "passed": true,
+        "actions": 14,
+        "inputsUnchanged": true,
+        "wasmSha256": "9853a18e5f4c78a87c5321eb16780812acb2b4ad74774aa2dcb91884b7628933",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_tcp_fname_errors.lean",
+        "passed": true,
+        "actions": 1,
+        "inputsUnchanged": true,
+        "wasmSha256": "40ccb84e18668ce78532fcf811070828df1187a5f4137444e781b6e7b55448d0",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_tcp_half.lean",
+        "passed": true,
+        "actions": 1,
+        "inputsUnchanged": true,
+        "wasmSha256": "1a28f139907973f5e7d7bd127d42f117759629d247e16ea7bf8af4566fa28293",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/async_tcp_server_client.lean",
+        "passed": true,
+        "actions": 2,
+        "inputsUnchanged": true,
+        "wasmSha256": "d8fc99aa58781f87c08d02ebc445d3788435266e1ca46917d5a33d4f9a9f29c0",
+        "linkDriver": "node",
+        "peakGiB": 2.23
+      },
+      {
+        "name": "elab/async_udp_sockets.lean",
+        "passed": true,
+        "actions": 2,
+        "inputsUnchanged": true,
+        "wasmSha256": "1280da8226d7c9a757018480f168f9f5a5f627c064ad1ae984bd0ff89e32fb70",
+        "linkDriver": "node",
+        "peakGiB": 2.22
+      },
+      {
+        "name": "elab/tempfile.lean",
+        "passed": true,
+        "actions": 4,
+        "inputsUnchanged": true,
+        "wasmSha256": "27fd27991fef3141b1e642acd09767e12007a71612b5d243ec14554f54859823",
+        "linkDriver": "node",
+        "peakGiB": 2.23
+      }
+    ]
+  },
+  "runtimeAdapter": {
+    "tests": 65,
+    "completed": 65,
+    "exactNativeVsDeployed": 53,
+    "policyRejected": 11,
+    "harnessErrors": [],
+    "actionVerdicts": {
+      "pass": 1255,
+      "adapter-native-failure": 4,
+      "aot-policy-rejected": 45,
+      "deployed-build-failed": 13
+    },
+    "mappedByForm": {
+      "eval-differential": 62,
+      "eval-no-messages": 197,
+      "guard-msgs-eval": 768,
+      "guard": 290
+    },
+    "unmappedReasons": {
+      "does not elaborate as a runtime IO action": 18,
+      "scoped command": 4,
+      "guard_msgs specification": 15
+    },
+    "maxPeakGiB": 3.8,
+    "results": [
+      {
+        "name": "elab_bench/cbv_decide.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 1,
+        "mapped": 0,
+        "byForm": {},
+        "unmapped": 1,
+        "unmappedReasons": {
+          "does not elaborate as a runtime IO action": 1
+        },
+        "verdicts": {},
+        "buildRejected": "Detected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o.",
+        "elaborationPasses": 4,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 3.73,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab_bench/cbv_divisors.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 1,
+        "mapped": 0,
+        "byForm": {},
+        "unmapped": 1,
+        "unmappedReasons": {
+          "does not elaborate as a runtime IO action": 1
+        },
+        "verdicts": {},
+        "buildRejected": "Detected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o.",
+        "elaborationPasses": 4,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 3.73,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab_bench/cbv_leroy.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 1,
+        "mapped": 0,
+        "byForm": {},
+        "unmapped": 1,
+        "unmappedReasons": {
+          "does not elaborate as a runtime IO action": 1
+        },
+        "verdicts": {},
+        "buildRejected": "Detected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o.",
+        "elaborationPasses": 4,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 3.73,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab_bench/cbv_merge_sort.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 1,
+        "mapped": 0,
+        "byForm": {},
+        "unmapped": 1,
+        "unmappedReasons": {
+          "does not elaborate as a runtime IO action": 1
+        },
+        "verdicts": {},
+        "buildRejected": "Detected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o.",
+        "elaborationPasses": 4,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 3.73,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/10078.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 6,
+        "mapped": 6,
+        "byForm": {
+          "eval-differential": 6
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 6
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_base_functions.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 8,
+        "mapped": 8,
+        "byForm": {
+          "eval-no-messages": 7,
+          "guard-msgs-eval": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 6,
+          "adapter-native-failure": 2
+        },
+        "exact": {
+          "interpretedVsCompiled": false,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [
+          {
+            "identifier": "lasmParallelAction3",
+            "form": "eval-no-messages",
+            "verdict": "adapter-native-failure",
+            "native": "FAIL \"#guard_msgs mismatch\\nexpected:\\n\\nactual:\\nerror: (`Inhabited.default` for `IO.Error`)\"",
+            "nativeRepeat": "FAIL \"#guard_msgs mismatch\\nexpected:\\n\\nactual:\\nerror: (`Inhabited.default` for `IO.Error`)\"",
+            "interpreted": "ok",
+            "deployed": "FAIL \"#guard_msgs mismatch\\nexpected:\\n\\nactual:\\nerror: (`Inhabited.default` for `IO.Error`)\""
+          },
+          {
+            "identifier": "lasmParallelAction5",
+            "form": "eval-no-messages",
+            "verdict": "adapter-native-failure",
+            "native": "FAIL \"#guard_msgs mismatch\\nexpected:\\n\\nactual:\\nerror: (`Inhabited.default` for `IO.Error`)\"",
+            "nativeRepeat": "FAIL \"#guard_msgs mismatch\\nexpected:\\n\\nactual:\\nerror: (`Inhabited.default` for `IO.Error`)\"",
+            "interpreted": "ok",
+            "deployed": "FAIL \"#guard_msgs mismatch\\nexpected:\\n\\nactual:\\nerror: (`Inhabited.default` for `IO.Error`)\""
+          }
+        ],
+        "peakGiB": 0.87,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_cancellation.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 10,
+        "mapped": 10,
+        "byForm": {
+          "eval-no-messages": 10
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 10
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.87,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_dns.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 3,
+        "mapped": 3,
+        "byForm": {
+          "eval-no-messages": 2,
+          "guard-msgs-eval": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 3
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.86,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_http_encode.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 88,
+        "mapped": 88,
+        "byForm": {
+          "guard-msgs-eval": 88
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 88
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.83,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_http_h1_rfc_compliance.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 14,
+        "mapped": 14,
+        "byForm": {
+          "eval-no-messages": 14
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 14
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.9,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_http_headers.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 105,
+        "mapped": 105,
+        "byForm": {
+          "guard": 91,
+          "guard-msgs-eval": 14
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 105
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.9,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_http_idle_timeout.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 3,
+        "mapped": 3,
+        "byForm": {
+          "eval-no-messages": 3
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 3
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.9,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_http_redirect.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 41,
+        "mapped": 41,
+        "byForm": {
+          "guard": 36,
+          "guard-msgs-eval": 5
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 41
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.9,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_http_string_quoting.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 69,
+        "mapped": 69,
+        "byForm": {
+          "guard": 69
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 69
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_http_uri.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 169,
+        "mapped": 169,
+        "byForm": {
+          "guard-msgs-eval": 85,
+          "eval-no-messages": 52,
+          "guard": 32
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 169
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.83,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_select_combine.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 2,
+        "mapped": 2,
+        "byForm": {
+          "guard-msgs-eval": 2
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 2
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.87,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_select_error_unregister.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 2,
+        "mapped": 2,
+        "byForm": {
+          "guard-msgs-eval": 2
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 2
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.8,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_select_gate.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 5,
+        "mapped": 5,
+        "byForm": {
+          "guard-msgs-eval": 5
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 5
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_select_socket.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 5,
+        "mapped": 5,
+        "byForm": {
+          "guard-msgs-eval": 5
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 5
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_select_timer.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 3,
+        "mapped": 3,
+        "byForm": {
+          "guard-msgs-eval": 3
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 3
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_streammap.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 15,
+        "mapped": 15,
+        "byForm": {
+          "eval-no-messages": 15
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 15
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.87,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_surface_sleep.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 7,
+        "mapped": 7,
+        "byForm": {
+          "eval-no-messages": 7
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 7
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async_systems_info.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 26,
+        "mapped": 26,
+        "byForm": {
+          "eval-differential": 26
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 26
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 2.55,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/async.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 2,
+        "mapped": 2,
+        "byForm": {
+          "guard-msgs-eval": 2
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 2
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.87,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/broadcast.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 12,
+        "mapped": 12,
+        "byForm": {
+          "eval-no-messages": 12
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 12
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.87,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/cancellation_context.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 6,
+        "mapped": 6,
+        "byForm": {
+          "guard-msgs-eval": 6
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 6
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.87,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/context_async.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 23,
+        "mapped": 23,
+        "byForm": {
+          "guard-msgs-eval": 23
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 23
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.87,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/dateTimeOrd.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 1,
+        "mapped": 1,
+        "byForm": {
+          "guard-msgs-eval": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 1
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/idbg_basic.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 0,
+        "mapped": 0,
+        "byForm": {},
+        "unmapped": 3,
+        "unmappedReasons": {
+          "scoped command": 1,
+          "guard_msgs specification": 2
+        },
+        "verdicts": {},
+        "buildRejected": "Detected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o.",
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 3.66,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/ioNulBytes.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 13,
+        "mapped": 13,
+        "byForm": {
+          "eval-no-messages": 12,
+          "guard-msgs-eval": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 13
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/json_empty.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 8,
+        "mapped": 8,
+        "byForm": {
+          "guard-msgs-eval": 8
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "aot-policy-rejected": 8
+        },
+        "buildRejected": "Detected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o.",
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [
+          {
+            "identifier": "lasmParallelAction0",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction1",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction2",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction3",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction4",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction5",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction6",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction7",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          }
+        ],
+        "peakGiB": 3.73,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/json.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 39,
+        "mapped": 30,
+        "byForm": {
+          "eval-differential": 30
+        },
+        "unmapped": 9,
+        "unmappedReasons": {
+          "does not elaborate as a runtime IO action": 9
+        },
+        "verdicts": {
+          "aot-policy-rejected": 30
+        },
+        "buildRejected": "Detected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o.",
+        "elaborationPasses": 4,
+        "inputsUnchanged": true,
+        "failingActions": [
+          {
+            "identifier": "lasmParallelAction0",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction1",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction2",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction3",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction4",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction5",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction6",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction7",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction8",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction9",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction10",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction11",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction12",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction13",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction14",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction15",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction16",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction17",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction18",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction19",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction20",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction21",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction22",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction23",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction24",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction25",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction26",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction27",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction37",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction38",
+            "form": "eval-differential",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          }
+        ],
+        "peakGiB": 3.73,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/json2.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 1,
+        "mapped": 1,
+        "byForm": {
+          "guard-msgs-eval": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 1
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 2.54,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/jsonSurrogates.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 4,
+        "mapped": 4,
+        "byForm": {
+          "guard": 4
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 4
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 2.54,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/kernelInterrupt.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 1,
+        "mapped": 0,
+        "byForm": {},
+        "unmapped": 1,
+        "unmappedReasons": {
+          "does not elaborate as a runtime IO action": 1
+        },
+        "verdicts": {},
+        "buildRejected": "Detected Lean compiler/kernel state: expr.cpp.o, formatter.cpp.o, level.cpp.o, print.cpp.o.",
+        "elaborationPasses": 4,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 2.43,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/leanExportParse.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 13,
+        "mapped": 13,
+        "byForm": {
+          "guard-msgs-eval": 13
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "deployed-build-failed": 13
+        },
+        "buildRejected": "error: undefined symbol: initialize_LeanExport_Parse (referenced by root reference (e.g. compiled C/C++ code))\nerror: undefined symbol: l_LeanExport_parseStream (referenced by root reference (e.g. compiled C/C++ code))",
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [
+          {
+            "identifier": "lasmParallelAction0",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction1",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction2",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction3",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction4",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction5",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction6",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction7",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction8",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction9",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction10",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction11",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction12",
+            "form": "guard-msgs-eval",
+            "verdict": "deployed-build-failed",
+            "native": "ok"
+          }
+        ],
+        "peakGiB": 2.44,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/libuv_signal_retry.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 1,
+        "mapped": 1,
+        "byForm": {
+          "guard-msgs-eval": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 1
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/libuv_tcp_shutdown_pending.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 2,
+        "mapped": 2,
+        "byForm": {
+          "guard-msgs-eval": 2
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 2
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/net_addr.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 9,
+        "mapped": 9,
+        "byForm": {
+          "guard-msgs-eval": 9
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 9
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/networkInterfaces.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 1,
+        "mapped": 1,
+        "byForm": {
+          "eval-no-messages": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 1
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/newdo.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 1,
+        "mapped": 1,
+        "byForm": {
+          "guard-msgs-eval": 1
+        },
+        "unmapped": 16,
+        "unmappedReasons": {
+          "guard_msgs specification": 13,
+          "scoped command": 3
+        },
+        "verdicts": {
+          "aot-policy-rejected": 1
+        },
+        "buildRejected": "Detected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlsym; Lean compiler/kernel state: abstract.cpp.o, cases_on.cpp.o, constants.cpp.o, declaration.cpp.o, elab_environment.cpp.o.",
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [
+          {
+            "identifier": "lasmParallelAction0",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          }
+        ],
+        "peakGiB": 3.8,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/promise.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 3,
+        "mapped": 3,
+        "byForm": {
+          "eval-no-messages": 3
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 3
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/sync_barrier.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 1,
+        "mapped": 1,
+        "byForm": {
+          "eval-no-messages": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 1
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/sync_channel.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 1,
+        "mapped": 1,
+        "byForm": {
+          "eval-no-messages": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 1
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.84,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/sync_notify.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 5,
+        "mapped": 5,
+        "byForm": {
+          "eval-no-messages": 5
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 5
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.87,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/sync_recursive_mutex.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 3,
+        "mapped": 3,
+        "byForm": {
+          "eval-no-messages": 3
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 3
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.8,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/sync_shared_mutex.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 4,
+        "mapped": 4,
+        "byForm": {
+          "eval-no-messages": 4
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 4
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/task_iterators.lean",
+        "completed": true,
+        "passed": false,
+        "candidates": 8,
+        "mapped": 8,
+        "byForm": {
+          "guard-msgs-eval": 8
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "aot-policy-rejected": 6,
+          "adapter-native-failure": 2
+        },
+        "buildRejected": "Detected runtime evaluation or plugin loading: lasm_lookup_lean_symbol, dlopen, dlsym; Lean compiler/kernel state: abstract.cpp.o, declaration.cpp.o, dynlib.cpp.o, elab_environment.cpp.o, environment.cpp.o.",
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [
+          {
+            "identifier": "lasmParallelAction0",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction1",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction2",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction3",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction4",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          },
+          {
+            "identifier": "lasmParallelAction5",
+            "form": "guard-msgs-eval",
+            "verdict": "adapter-native-failure",
+            "native": "FAIL \"#guard_msgs mismatch\\nexpected:\\ninfo: Tactic names: [sorry, exact, skip]\\nGoal counts: [0, 0, 1]\\nactual:\\nerror: unknown module prefix 'Init'\\n\\nNo directory 'Init' or file 'Init.olean' in the search path entries:\""
+          },
+          {
+            "identifier": "lasmParallelAction6",
+            "form": "guard-msgs-eval",
+            "verdict": "adapter-native-failure",
+            "native": "FAIL \"#guard_msgs mismatch\\nexpected:\\ninfo: Results: [(sorry, true), (exact, false), (skip, false)]\\nPASSED: Task 1 observed Task 2 completed (parallel execution verified)\\nactual:\\nerror: unknown module prefix 'Init'\\n\\nNo directory 'Init' or file 'Init.olean' in the search path entries:\""
+          },
+          {
+            "identifier": "lasmParallelAction7",
+            "form": "guard-msgs-eval",
+            "verdict": "aot-policy-rejected",
+            "native": "ok"
+          }
+        ],
+        "peakGiB": 2.49,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/task_test.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 1,
+        "mapped": 1,
+        "byForm": {
+          "guard-msgs-eval": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 1
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/task_test2.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 1,
+        "mapped": 1,
+        "byForm": {
+          "guard-msgs-eval": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 1
+        },
+        "exact": {
+          "interpretedVsCompiled": false,
+          "compiledVsRepeat": false,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/taskState.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 1,
+        "mapped": 1,
+        "byForm": {
+          "eval-no-messages": 1
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 1
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeAPI.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 8,
+        "mapped": 8,
+        "byForm": {
+          "guard-msgs-eval": 8
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 8
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.79,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeCanonFormats.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 22,
+        "mapped": 22,
+        "byForm": {
+          "guard-msgs-eval": 22
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 22
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeClassOperations.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 29,
+        "mapped": 29,
+        "byForm": {
+          "guard-msgs-eval": 29
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 29
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeFormats.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 249,
+        "mapped": 245,
+        "byForm": {
+          "guard-msgs-eval": 145,
+          "guard": 56,
+          "eval-no-messages": 44
+        },
+        "unmapped": 4,
+        "unmappedReasons": {
+          "does not elaborate as a runtime IO action": 4
+        },
+        "verdicts": {
+          "pass": 245
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 6,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.85,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeLimits.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 13,
+        "mapped": 13,
+        "byForm": {
+          "guard-msgs-eval": 13
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 13
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeLocalDateTime.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 10,
+        "mapped": 10,
+        "byForm": {
+          "guard-msgs-eval": 10
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 10
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeNegative.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 13,
+        "mapped": 13,
+        "byForm": {
+          "guard-msgs-eval": 13
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 13
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeOperations.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 51,
+        "mapped": 51,
+        "byForm": {
+          "guard-msgs-eval": 51
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 51
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.83,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeOperationsOffset.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 99,
+        "mapped": 99,
+        "byForm": {
+          "guard-msgs-eval": 99
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 99
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.83,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeParse.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 21,
+        "mapped": 21,
+        "byForm": {
+          "guard-msgs-eval": 21
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 21
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timePosixTzFooter.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 40,
+        "mapped": 40,
+        "byForm": {
+          "guard": 2,
+          "guard-msgs-eval": 38
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 40
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 1,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeSet.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 12,
+        "mapped": 12,
+        "byForm": {
+          "guard-msgs-eval": 12
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 12
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeSub.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 8,
+        "mapped": 8,
+        "byForm": {
+          "guard-msgs-eval": 8
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 8
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.81,
+        "resourceStatus": "finished"
+      },
+      {
+        "name": "elab/timeTzifParse.lean",
+        "completed": true,
+        "passed": true,
+        "candidates": 10,
+        "mapped": 10,
+        "byForm": {
+          "guard-msgs-eval": 10
+        },
+        "unmapped": 0,
+        "unmappedReasons": {},
+        "verdicts": {
+          "pass": 10
+        },
+        "exact": {
+          "interpretedVsCompiled": true,
+          "compiledVsRepeat": true,
+          "compiledVsDeployed": true
+        },
+        "elaborationPasses": 3,
+        "inputsUnchanged": true,
+        "failingActions": [],
+        "peakGiB": 0.82,
+        "resourceStatus": "finished"
+      }
+    ],
+    "excludedFromReview": {
+      "elab/docstringRewrites.lean": "adapter changes later unmapped docstring-state command",
+      "elab/versoDocs.lean": "adapter changes later unmapped Verso documentation command"
+    },
+    "note": "exactNativeVsDeployed counts tests whose native compiled run exits 0 and matches the deployed run exactly; async_base_functions also matches exactly (stdout, stderr, exit 1) but its native compiled run fails two actions that pass interpreted."
+  },
+  "inventory": {
+    "file": "docs/evidence/lean-4.35.0-server-mvp-inventory.json",
+    "registrations": 140,
+    "byTopic": {
+      "http": 27,
+      "net": 16,
+      "env": 26,
+      "tasks": 45,
+      "json": 20,
+      "async": 42,
+      "time": 20
+    },
+    "byCategory": {
+      "mixed-driver-review-required": 5,
+      "source-lint": 1,
+      "compiled-application": 10,
+      "native-build-time": 121,
+      "compiled-driver-and-native-compiler": 3
+    },
+    "byExecution": {
+      "separate harness: mixed-driver-review-required": 5,
+      "separate harness: source-lint": 1,
+      "runtime: compiled application": 10,
+      "runtime candidate: parallel adapter review": 67,
+      "native build-time only (no #eval/#guard actions)": 30,
+      "runtime: reviewed eval-io adapter": 21,
+      "review: syntax survey failed": 3,
+      "separate harness: compiled-driver-and-native-compiler": 3
+    },
+    "byChange": {
+      "changed": 1,
+      "unchanged": 118,
+      "added": 21
+    },
+    "fullInventory": {
+      "registrations": 4219,
+      "verifiedOriginalFilesAndLinks": 8044,
+      "previous": {
+        "version": "4.34.1",
+        "registrations": 4069,
+        "verifiedOriginalFilesAndLinks": 7673
+      }
+    },
+    "stdLibraryChangesSince4341": {
+      "src/Std/Http": "3 of 48 files changed (URI/Config, Internal/Char, Server/Connection)",
+      "src/Std/Internal/UV": "TCP.lean changed",
+      "src/runtime/uv": "7 of 16 changed (event_loop, signal, system, tcp.cpp/.h, timer, udp)",
+      "src/runtime/io.cpp": "changed",
+      "unchanged": [
+        "src/Std/Async",
+        "src/Std/Net",
+        "src/Std/Time",
+        "src/Lean/Data/Json",
+        "src/Std/Sync"
+      ]
+    },
+    "testSourcesSince4341": "All 22 previously reviewed eval-io inputs and their serial markers are byte-identical; 21 topical registrations added (2 HTTP/net-relevant runtime: async_http_idle_timeout, libuv_tcp_shutdown_pending; plus libuv_signal_retry, leanExportParse), 1 changed (lake cacheTransfer), none removed."
+  },
+  "compiledApplications": {
+    "scope": "Topical upstream compiled-application registrations through the existing CTest application harness, installed .54, Linux x64 local, one bounded workload each campaign",
+    "results": {
+      "compile/StackOverflowTask.lean": "pass",
+      "compile/wait_dedicated.lean": "pass",
+      "compile_bench/binarytrees.lean": "pass",
+      "compile_bench/channel.lean": "pass",
+      "compile_bench/http_server.lean": "pass",
+      "compile_bench/http_server_tcp.lean": "pass",
+      "compile_bench/select.lean": "pass",
+      "compile_bench/identifier_completion.lean": "upstream compile-disabled (skipped)",
+      "compile_bench/ilean_roundtrip.lean": "deployed build rejected by AOT policy: Lean compiler/kernel state expr.cpp.o, formatter.cpp.o, level.cpp.o, print.cpp.o (import Lean.Data.Lsp)",
+      "compile_bench/workspaceSymbolsNewRanges.lean": "deployed build rejected by AOT policy: runtime symbol lookup and environment/kernel state (imports Lean)"
+    },
+    "peaksGiB": {
+      "campaign1": 1.15,
+      "campaign2": 0.38
+    },
+    "originalSourcesUnchanged": 8044
+  },
+  "exampleServer": {
+    "scope": "examples/lean-server-latest built as an ordinary Lake project by installed .54 for Lean 4.35.0 (Node link driver) on Linux x64; integration/managed-http.mjs differential suite plus a curl/raw-socket/fetch smoke",
+    "vitest": {
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "sourcesUnchanged": true,
+      "buildPeakGiB": 2.33
+    },
+    "smoke": {
+      "passed": true,
+      "curl": "curl 8.5.0 (x86_64-pc-linux-gnu) libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3 brotli/1.1.0 zstd/1.5.5 libidn2/2.3.7 libpsl/0.21.2 (+libidn2/2.3.7) libssh/0.10.6/openssl/zlib nghttp2/1.59.0 librtmp/2.3 OpenLDAP/2.6.10",
+      "checks": {
+        "node": {
+          "GET / routes to JSON": true,
+          "unknown route is 404": true,
+          "POST /todos creates (201) with Unicode JSON": true,
+          "malformed JSON is 400": true,
+          "keep-alive reuses one connection for two requests": true,
+          "chunked binary upload echoes exact bytes": true,
+          "streamed events arrive chunked in order": true,
+          "malformed request line is rejected with 400": true,
+          "Node fetch lists the created todo": true,
+          "POST /shutdown stops the server with status 0": true
+        },
+        "native": {
+          "GET / routes to JSON": true,
+          "unknown route is 404": true,
+          "POST /todos creates (201) with Unicode JSON": true,
+          "malformed JSON is 400": true,
+          "keep-alive reuses one connection for two requests": true,
+          "chunked binary upload echoes exact bytes": true,
+          "streamed events arrive chunked in order": true,
+          "malformed request line is rejected with 400": true,
+          "Node fetch lists the created todo": true,
+          "POST /shutdown stops the server with status 0": true
+        }
+      },
+      "startupSeconds": {
+        "node": 0.269,
+        "native": 0.04
+      }
+    }
+  },
+  "repros": {
+    "importLeanRejected": "import Lean + def main : IO Unit := IO.println (Lean.Json.compress (Lean.Json.mkObj [(\"a\", 1)])) -> build rejected by AOT policy (documented: broad import Lean retains the compiler via initializers); the same program with import Lean.Data.Json builds and prints {\"a\":1}",
+    "importLspRejected": "import Lean.Data.Lsp + printing ToJson of Lean.Lsp.Position -> rejected: Lean compiler/kernel state expr.cpp.o, formatter.cpp.o, level.cpp.o, print.cpp.o",
+    "leanExportLink": "import LeanExport.Parse (ships with Lean 4.35.0) -> link error: undefined symbol initialize_LeanExport_Parse / l_LeanExport_parseStream",
+    "nativeCompiledVsInterpreted": "elab/async_base_functions.lean actions concAll and racerAllNotCancels pass interpreted but panic in native leanc -O2 code (assertion count 30 / 12) in two native runs; the Lasm deployment reproduces the native compiled stdout/stderr/exit exactly"
+  },
+  "adapterNegativeControl": "Changing one generated #guard_msgs expectation (async_http_encode action 0, \"HTTP/1.1\" -> \"HTTP/1.0\") makes the native interpreted run report that action as FAIL with exit 1.",
+  "localResources": {
+    "boundedRuns": 34,
+    "maxPeakGiB": 5.5,
+    "pressureStops": [
+      {
+        "peakGiB": 2.6,
+        "stoppedBecause": "Workload memory pressure reached 5 percent",
+        "report": "2026-10-17T04-40-23.271Z-d2d20086-4fb2-460d-97ca-889e4fe5c158.json"
+      },
+      {
+        "peakGiB": 2.3,
+        "stoppedBecause": "Workload memory pressure reached 5 percent",
+        "report": "2026-10-17T04-43-48.926Z-417558af-2a65-4e35-8b1d-ad28acd70af7.json"
+      },
+      {
+        "peakGiB": 2.29,
+        "stoppedBecause": "Workload memory pressure reached 5 percent",
+        "report": "2026-10-17T04-44-03.739Z-64b9fb47-7ae7-4284-b2d0-2ed30f82c683.json"
+      },
+      {
+        "peakGiB": 2.15,
+        "stoppedBecause": "Workload memory pressure reached 5 percent",
+        "report": "2026-10-17T04-44-30.487Z-dea09d75-d324-4892-91e3-2210104d8dd5.json"
+      },
+      {
+        "peakGiB": 2.15,
+        "stoppedBecause": "Workload memory pressure reached 5 percent",
+        "report": "2026-10-17T04-44-47.731Z-229d81e4-43b8-4d0b-bcd3-41f13642132d.json"
+      },
+      {
+        "peakGiB": 2.28,
+        "stoppedBecause": "Workload memory pressure reached 5 percent",
+        "report": "2026-10-17T05-12-15.271Z-e2334ced-361a-4dae-b007-45541a5f3583.json"
+      }
+    ],
+    "oom": 0,
+    "swap": 0
+  },
+  "notRunHere": {
+    "compiled-driver-and-native-compiler": [
+      "server/diags.lean",
+      "server/init_exit_worker.lean",
+      "server_interactive/cancellation_try_plain.lean"
+    ],
+    "mixed-driver-review-required": [
+      "tests/lake/tests/cacheTransfer/test.sh",
+      "tests/lake/tests/leanExit/test.sh",
+      "tests/lake/tests/query/test.sh",
+      "tests/lake/tests/toml/test.sh",
+      "pkg/float"
+    ],
+    "source-lint": [
+      "lint.py"
+    ],
+    "surveyFailedNeedsElaborationAwareSurvey": [
+      "elab/dottedIdentNotation.lean",
+      "elab/toFromJson.lean",
+      "elab_bench/bv_decide_incremental.lean"
+    ],
+    "nativeBuildTimeOnly": 30
+  }
+}

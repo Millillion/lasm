@@ -1,0 +1,3757 @@
+{
+  "schema": 1,
+  "lean": "4.35.0",
+  "leanCommit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
+  "previous": "4.34.1",
+  "scope": "Static topical inventory of upstream registrations relevant to the Server MVP; parsing only, no test passes",
+  "surveyTool": {
+    "path": "scripts/upstream/RuntimeCommandSurvey.lean",
+    "sha256": "3fefa6dca53082ee38c49210178c5fc46d0c05ff4890781f0b8c9a9c92186331"
+  },
+  "topicPatterns": {
+    "http": "Std\\.Http|Std\\.Internal\\.Http",
+    "async": "Std\\.Async|Std\\.Internal\\.Async|ContextAsync|Std\\.Internal\\.IO\\.Async",
+    "net": "Std\\.Net|Std\\.Internal\\.UV|\\bTCP\\b|\\bUDP\\b|Socket\\b",
+    "time": "Std\\.Time",
+    "json": "Lean\\.Data\\.Json|\\bJson\\b",
+    "env": "IO\\.getEnv\\b",
+    "tasks": "IO\\.asTask|Task\\.spawn|IO\\.mapTask|IO\\.bindTask|BaseIO\\.asTask|Std\\.Channel|CloseableChannel|IO\\.Promise|Std\\.Sync|IO\\.wait\\b|IO\\.waitAny"
+  },
+  "socketPattern": "\\bTCP\\b|\\bUDP\\b|Socket\\.|\\.connect\\b|\\.listen\\b|\\.bind\\b|\\bDNS\\b|getAddrInfo|Std\\.Http\\.Server\\.serve|Server\\.serve",
+  "registrations": 140,
+  "byTopic": {
+    "http": 27,
+    "net": 16,
+    "env": 26,
+    "tasks": 45,
+    "json": 20,
+    "async": 42,
+    "time": 20
+  },
+  "byCategory": {
+    "mixed-driver-review-required": 5,
+    "source-lint": 1,
+    "compiled-application": 10,
+    "native-build-time": 121,
+    "compiled-driver-and-native-compiler": 3
+  },
+  "byExecution": {
+    "separate harness: mixed-driver-review-required": 5,
+    "separate harness: source-lint": 1,
+    "runtime: compiled application": 10,
+    "runtime candidate: parallel adapter review": 67,
+    "native build-time only (no #eval/#guard actions)": 30,
+    "runtime: reviewed eval-io adapter": 21,
+    "review: syntax survey failed": 3,
+    "separate harness: compiled-driver-and-native-compiler": 3
+  },
+  "byChange": {
+    "changed": 1,
+    "unchanged": 118,
+    "added": 21
+  },
+  "removedRegistrationsSincePrevious": [
+    "elab/14383.lean",
+    "elab/cbv_decidable_congr.lean",
+    "elab/grind_toInt_issue.lean",
+    "elab/grind_toInt_mbtc.lean",
+    "elab/grind_toint_instances.lean",
+    "elab/reduceBool.lean",
+    "elab_fail/etaStructIssue.lean"
+  ],
+  "tests": [
+    {
+      "name": "tests/lake/tests/cacheTransfer/test.sh",
+      "category": "mixed-driver-review-required",
+      "topics": [
+        "http",
+        "net",
+        "env"
+      ],
+      "source": "tests/lake/tests/cacheTransfer/test.sh",
+      "sha256": "2dcc690d600639272ad5b796890366adb6263390ecbb177404025c0b8062206a",
+      "sidecars": [],
+      "change": "changed",
+      "usesSockets": true,
+      "execution": "separate harness: mixed-driver-review-required"
+    },
+    {
+      "name": "tests/lake/tests/leanExit/test.sh",
+      "category": "mixed-driver-review-required",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/lake/tests/leanExit/test.sh",
+      "sha256": "d2385d804fb2797d5f1ea8e15c73dd91ec102e8f81b0c6c489868f9ce22bff0f",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "separate harness: mixed-driver-review-required"
+    },
+    {
+      "name": "tests/lake/tests/query/test.sh",
+      "category": "mixed-driver-review-required",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/lake/tests/query/test.sh",
+      "sha256": "5d22c76340c1aa981a9a92820f4d871f9a3c20886380a171ce37015b7a615dfa",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "separate harness: mixed-driver-review-required"
+    },
+    {
+      "name": "tests/lake/tests/toml/test.sh",
+      "category": "mixed-driver-review-required",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/lake/tests/toml/test.sh",
+      "sha256": "3d3cd21adf7090d75710cfdab7921ed53ec459c160380163505eaa9d263fa7d0",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "separate harness: mixed-driver-review-required"
+    },
+    {
+      "name": "lint.py",
+      "category": "source-lint",
+      "topics": [
+        "http",
+        "async",
+        "net",
+        "time",
+        "json",
+        "env",
+        "tasks"
+      ],
+      "source": "tests/lint.py",
+      "sha256": "db09dce8f8ef384eb7bfe0a00cc5e80bf6c82f7029e39a813258aa0b61b8c7e7",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "execution": "separate harness: source-lint"
+    },
+    {
+      "name": "compile/StackOverflowTask.lean",
+      "category": "compiled-application",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/compile/StackOverflowTask.lean",
+      "sha256": "ca3928c152a07bdda9a0736d39de5fb38a1437af0c74e17f97fd6e47a8dd13b1",
+      "sidecars": [
+        "tests/compile/StackOverflowTask.lean.init.sh",
+        "tests/compile/StackOverflowTask.lean.no_interpret",
+        "tests/compile/StackOverflowTask.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "runtime: compiled application"
+    },
+    {
+      "name": "compile/wait_dedicated.lean",
+      "category": "compiled-application",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/compile/wait_dedicated.lean",
+      "sha256": "e4b0b1e53c3eb9eb21c705f4b2d81cd878d72fd31893a5acf82b71dc106b935e",
+      "sidecars": [
+        "tests/compile/wait_dedicated.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "runtime: compiled application"
+    },
+    {
+      "name": "compile_bench/binarytrees.lean",
+      "category": "compiled-application",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/compile_bench/binarytrees.lean",
+      "sha256": "d1a18ef9921e82a2dc4773894d6253902184a8f6229719e01ee109829ed4bfe7",
+      "sidecars": [
+        "tests/compile_bench/binarytrees.lean.init.sh",
+        "tests/compile_bench/binarytrees.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "runtime: compiled application"
+    },
+    {
+      "name": "compile_bench/channel.lean",
+      "category": "compiled-application",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/compile_bench/channel.lean",
+      "sha256": "984bedcc89cba1292394ce2bc7578461e3415ba89236566bb05fbec4556f4f71",
+      "sidecars": [
+        "tests/compile_bench/channel.lean.init.sh",
+        "tests/compile_bench/channel.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "runtime: compiled application"
+    },
+    {
+      "name": "compile_bench/http_server.lean",
+      "category": "compiled-application",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/compile_bench/http_server.lean",
+      "sha256": "114b72eae0f26818278dfcd7a390980c3bf7651a9d49fa91f9fceac1090b389f",
+      "sidecars": [
+        "tests/compile_bench/http_server.lean.init.sh",
+        "tests/compile_bench/http_server.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "execution": "runtime: compiled application"
+    },
+    {
+      "name": "compile_bench/http_server_tcp.lean",
+      "category": "compiled-application",
+      "topics": [
+        "http",
+        "async",
+        "net"
+      ],
+      "source": "tests/compile_bench/http_server_tcp.lean",
+      "sha256": "df4deefbc5477ac7279ff71631736a322080e8ef59698357b6198d1fb8bdcc2e",
+      "sidecars": [
+        "tests/compile_bench/http_server_tcp.lean.init.sh",
+        "tests/compile_bench/http_server_tcp.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "execution": "runtime: compiled application"
+    },
+    {
+      "name": "compile_bench/identifier_completion.lean",
+      "category": "compiled-application",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/compile_bench/identifier_completion.lean",
+      "sha256": "a7c6d5894f1182a04d0368825c96ce3f83e8817097c9260c63723ad734385707",
+      "sidecars": [
+        "tests/compile_bench/identifier_completion.lean.dir/didOpen.log",
+        "tests/compile_bench/identifier_completion.lean.dir/file.lean",
+        "tests/compile_bench/identifier_completion.lean.dir/initialization.log",
+        "tests/compile_bench/identifier_completion.lean.do_interpret",
+        "tests/compile_bench/identifier_completion.lean.no_compile",
+        "tests/compile_bench/identifier_completion.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "runtime: compiled application"
+    },
+    {
+      "name": "compile_bench/ilean_roundtrip.lean",
+      "category": "compiled-application",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/compile_bench/ilean_roundtrip.lean",
+      "sha256": "81741545fdf83992e138ae70246a09816dba2fc7fb29e6b160a581ecdbc8007d",
+      "sidecars": [
+        "tests/compile_bench/ilean_roundtrip.lean.init.sh",
+        "tests/compile_bench/ilean_roundtrip.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "runtime: compiled application"
+    },
+    {
+      "name": "compile_bench/select.lean",
+      "category": "compiled-application",
+      "topics": [
+        "async"
+      ],
+      "source": "tests/compile_bench/select.lean",
+      "sha256": "d46972b027a146a75a76b799af56e71db10886aa0501068cf5a19916dbfacb12",
+      "sidecars": [
+        "tests/compile_bench/select.lean.init.sh",
+        "tests/compile_bench/select.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "runtime: compiled application"
+    },
+    {
+      "name": "compile_bench/workspaceSymbolsNewRanges.lean",
+      "category": "compiled-application",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/compile_bench/workspaceSymbolsNewRanges.lean",
+      "sha256": "82b4e6a78cd649cf37e82e9e8924b9edd52b642fc8e33e2c4b8d2f073d539663",
+      "sidecars": [
+        "tests/compile_bench/workspaceSymbolsNewRanges.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "execution": "runtime: compiled application"
+    },
+    {
+      "name": "elab/10078.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/10078.lean",
+      "sha256": "20dc29845afbf3ba58df23522fbef46e80f7aeb6541ebc06fde5e98be15634e1",
+      "sidecars": [
+        "tests/elab/10078.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 6,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 7
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/14838.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/14838.lean",
+      "sha256": "64412dfae74637ad0357fab0670806fc1224c057834937263c212fc0c22a193d",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.namespace": 1,
+          "Lean.Parser.Command.declaration": 13,
+          "Lean.Parser.Command.end": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/1985.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/1985.lean",
+      "sha256": "04bf8b3fa7734ac9ce90dc186100a0744c0c5d1dd3f1322c60974785e5741665",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 9
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/2137.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/2137.lean",
+      "sha256": "c5226116e9d2ae452bc5930ca63f8df0df279df0506d11dc36e3ed35f07e31ee",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/async.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "net"
+      ],
+      "source": "tests/elab/async.lean",
+      "sha256": "123c4362e8769a1abead90db97c72575620cbb5f9ee125b6cf58eb6476f4f713",
+      "sidecars": [
+        "tests/elab/async.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 2,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 3,
+          "Lean.Parser.Command.declaration": 3
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_base_functions.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_base_functions.lean",
+      "sha256": "81012cf9e6dc37f0681499687253a57e12b2ae5e72df7fac2c3e61194c50cbc1",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 7,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 1,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 9
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_cancellation.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_cancellation.lean",
+      "sha256": "416e140c1da5049e773dcdd3d06f623613997dd97e8bc3627db96dc5d50fb866",
+      "sidecars": [
+        "tests/elab/async_cancellation.lean.serial"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 10,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 12
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_cancellation_reasons.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_cancellation_reasons.lean",
+      "sha256": "43e2405f5d7d5a01d1f192fc437fd0329976fa75b4b99099e3471f9620489866",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 11,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 11
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_dns.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "net",
+        "time"
+      ],
+      "source": "tests/elab/async_dns.lean",
+      "sha256": "83d1465e23fedf9dfc98332f65924da429e8af97f1f71eaaf782090d4232c4b7",
+      "sidecars": [
+        "tests/elab/async_dns.lean.serial"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 2,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 1,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 3,
+          "Lean.Parser.Command.declaration": 5
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_http_body.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/elab/async_http_body.lean",
+      "sha256": "526c7bc0e86f13faaf7836d9dbf757abf8b218f6d5fe5a3edeeb236c51ab5f50",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 69,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 3,
+          "Lean.Parser.Command.moduleDoc": 6,
+          "Lean.Parser.Command.declaration": 72
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_body_framing.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/elab/async_http_body_framing.lean",
+      "sha256": "5f2afaf502d03d88af27527c7561dbb2e7edcb303daa6f3de31f32d399428ebd",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 12,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_dispatch.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_http_dispatch.lean",
+      "sha256": "0c0efd8472df0e93dde0e2aa9d120297c2239d1a411dcad6fcb86838e008475d",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 2,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_encode.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http"
+      ],
+      "source": "tests/elab/async_http_encode.lean",
+      "sha256": "edcc76d98953edf844b294dfaf29df4fb116c1e1153ad0f4f82960da44086501",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 88,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 1,
+          "Lean.Parser.Command.moduleDoc": 15
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_http_expect.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/elab/async_http_expect.lean",
+      "sha256": "a9126465e1dcbc56d1bf908f219c8972de88c63a37af812e07a7ffa732a40565",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 5,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 6
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_fuzz.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_http_fuzz.lean",
+      "sha256": "d28901076d0af0f77f860777032bd01b486970d1d8fe017a9c7f14ce0daf2da2",
+      "sidecars": [
+        "tests/elab/async_http_fuzz.lean.serial"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 10,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 34
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_fuzz_limits.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_http_fuzz_limits.lean",
+      "sha256": "ef9e819611a80bee8c957b1b9c7409d18cb8552661399ed8eebb545eff74529f",
+      "sidecars": [
+        "tests/elab/async_http_fuzz_limits.lean.serial"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 10,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.declaration": 25
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_fuzz_random.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_http_fuzz_random.lean",
+      "sha256": "ab96c3e1cbdd2927896c10826317b92bc64be1dc2ae4510516756ae8f017c982",
+      "sidecars": [
+        "tests/elab/async_http_fuzz_random.lean.serial"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 8,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.declaration": 16
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_h1_incremental.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http"
+      ],
+      "source": "tests/elab/async_http_h1_incremental.lean",
+      "sha256": "e58511a83608ef50cf7fc04b92d75eb57aa11f3f9c13b0693e68a63d2a757269",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 6,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 25
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_h1_parser_fuzz.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http"
+      ],
+      "source": "tests/elab/async_http_h1_parser_fuzz.lean",
+      "sha256": "f55c98e43646bfd6b38cc287667cc9882f78345f1a57d788f52d744161ed8484",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 4,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 13
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_h1_rfc_compliance.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http"
+      ],
+      "source": "tests/elab/async_http_h1_rfc_compliance.lean",
+      "sha256": "909f372d83fd7a7d876019bab07a8a620dc8fd603ce23f8d1907775541c819e9",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 14,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 4,
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.declaration": 51,
+          "Lean.Parser.Command.namespace": 1,
+          "Lean.Parser.Command.end": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_http_hang_regressions.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_http_hang_regressions.lean",
+      "sha256": "b75a003ded614169a1b4017243a0c67ce0f0f41674223194e0f2cf18ea45e258",
+      "sidecars": [
+        "tests/elab/async_http_hang_regressions.lean.serial"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 22,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 15
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_headers.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http"
+      ],
+      "source": "tests/elab/async_http_headers.lean",
+      "sha256": "aa1775ed75c56c778999ae168ff04ba9ce9f42cd1ae87cb8da94f94f7215ab11",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 91,
+        "guardMsgsEval": 14,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 3,
+          "Lean.Parser.Command.moduleDoc": 5,
+          "Lean.Parser.Command.section": 1,
+          "Lean.Parser.Command.declaration": 1,
+          "Lean.Parser.Command.end": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_http_idle_timeout.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/elab/async_http_idle_timeout.lean",
+      "sha256": "957fefe6f3c9a12c29ee8aef9e7900d93c07169f4ca761b1d48e33efd609919c",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": true,
+      "forms": {
+        "eval": 3,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_http_keepalive.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/elab/async_http_keepalive.lean",
+      "sha256": "c76c6717f8593179f2c22de29be12b4d0a6a79ef7225719c34205fde7208e1fb",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 5,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_redirect.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http"
+      ],
+      "source": "tests/elab/async_http_redirect.lean",
+      "sha256": "3297cfb1ca103de16e50b0fc9e85713fc0887c08c0bd07234e6b6a63234a24f6",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 36,
+        "guardMsgsEval": 5,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.moduleDoc": 8,
+          "Lean.Parser.Command.declaration": 15
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_http_replayable.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/elab/async_http_replayable.lean",
+      "sha256": "3eba8c240409484a9c1910d90d8f69e10f7d73ae37225c302040af1db54ad045",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 13,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 2,
+          "Lean.Parser.Command.open": 3,
+          "Lean.Parser.Command.declaration": 13
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_request_headers.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/elab/async_http_request_headers.lean",
+      "sha256": "0f70c9cd4267f2c47ad285b806ed40c4fb336612732859d1d20ccdc5d3ce16f0",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 4,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 1
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_request_line.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/elab/async_http_request_line.lean",
+      "sha256": "83b3b71bceff873f957cce8b0e6dfe74214ea88933694ecc53bd195f6f36cdf1",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 7,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 1
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_response_framing.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/elab/async_http_response_framing.lean",
+      "sha256": "7060468048cd67ce5fcc2eaea23ac13979848783b78330eb546a88649b9c7ef0",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 7,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 1
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_string_quoting.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http"
+      ],
+      "source": "tests/elab/async_http_string_quoting.lean",
+      "sha256": "8a0bddbc058c9a93257c1cc8826584c66fade3f0d83b622b45c282158d9d9b80",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 69,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_http_trailers.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http",
+        "async"
+      ],
+      "source": "tests/elab/async_http_trailers.lean",
+      "sha256": "f96ab03abd812d854471323973cffbbff1e1d11e26a80a41baf334489eec072b",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 14,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 3,
+          "Lean.Parser.Command.declaration": 4
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_http_uri.lean",
+      "category": "native-build-time",
+      "topics": [
+        "http"
+      ],
+      "source": "tests/elab/async_http_uri.lean",
+      "sha256": "f8a4773d4fdf8781f8189b6771a9b7186e209a297b4c8b9f2ae37016c8f57565",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 52,
+        "evalBang": 0,
+        "guard": 32,
+        "guardMsgsEval": 85,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 3,
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.declaration": 3
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_select_combine.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_select_combine.lean",
+      "sha256": "493bf703d03e6ccd5e39ac404ae8dc588b45c2a710ea86b1c7797f959fb53867",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 2,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_select_error_unregister.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_select_error_unregister.lean",
+      "sha256": "35eca2ea22c92dd047199cd3711b4148302ac3e5cdb0413fa56f1fd83c0c898f",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 2,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 5
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_select_gate.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_select_gate.lean",
+      "sha256": "3439d41ff4696e9d47f6ee94b85599c4e775a94ec53b22eb6115eb6227893883",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 5,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.declaration": 7
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_select_socket.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "net"
+      ],
+      "source": "tests/elab/async_select_socket.lean",
+      "sha256": "94a943f5fabd9afdbb19e8dd68badee872fd8b3ac54a11184c9f2b131adadf81",
+      "sidecars": [
+        "tests/elab/async_select_socket.lean.out.expected",
+        "tests/elab/async_select_socket.lean.serial"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 5,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.namespace": 2,
+          "Lean.Parser.Command.declaration": 9,
+          "Lean.Parser.Command.end": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_select_timer.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async"
+      ],
+      "source": "tests/elab/async_select_timer.lean",
+      "sha256": "7cf4f432516c144337edddd40f0f00a993e3c1b2a0f0ad70d0ebc587693d4b16",
+      "sidecars": [
+        "tests/elab/async_select_timer.lean.serial"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 3,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_streammap.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/async_streammap.lean",
+      "sha256": "75ddde2bbcd087a0799c3666f87c8d4df52853726c776e5224d68ac04e117712",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 15,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 15
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_surface_sleep.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "time"
+      ],
+      "source": "tests/elab/async_surface_sleep.lean",
+      "sha256": "0197d4b994ac08051bbce13eb2decceb38c3e4ee6d3fa989f0dad3e3644dca79",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 7,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 8,
+          "Lean.Parser.Command.namespace": 2,
+          "Lean.Parser.Command.end": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_systems_info.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async"
+      ],
+      "source": "tests/elab/async_systems_info.lean",
+      "sha256": "faeb4d897bb74c3a7f299a52886570f937b6aeeb3b4c1d3c82c2f5ef2f228b50",
+      "sidecars": [
+        "tests/elab/async_systems_info.lean.out.ignored"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 26,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/async_tcp_fname_errors.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "net"
+      ],
+      "source": "tests/elab/async_tcp_fname_errors.lean",
+      "sha256": "d37535c6d32c5761c23968e7ba1ae84e86933cba5097df54798c27ab1e9eb27b",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 1,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 5
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_tcp_half.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "net"
+      ],
+      "source": "tests/elab/async_tcp_half.lean",
+      "sha256": "714436bdf6c6f1975983b817af4de6639f6bde69621c9d8e95921f6b60bf8feb",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 1,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 4
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_tcp_server_client.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "net"
+      ],
+      "source": "tests/elab/async_tcp_server_client.lean",
+      "sha256": "5471ef0ce0cbfa9a4a3ad25fbe7b1a617d39390be1257f83eb6ee07e752a6290",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 2,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 2,
+          "Lean.Parser.Command.declaration": 5
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/async_udp_sockets.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "net"
+      ],
+      "source": "tests/elab/async_udp_sockets.lean",
+      "sha256": "566a8a4c9e6715d098ab49682cfde49c4786aeaee775bbf8827ff33df4b5e4ae",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 2,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 3,
+          "Lean.Parser.Command.declaration": 3
+        }
+      },
+      "execution": "runtime: reviewed eval-io adapter"
+    },
+    {
+      "name": "elab/broadcast.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/broadcast.lean",
+      "sha256": "23da8de99a238cfed2421c2a6a0526d388cd9dfd7776cd7cbf5ff4c74adf0124",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 12,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 13
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/cancellation_context.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/cancellation_context.lean",
+      "sha256": "91804d06eff0c559f92106d45a26e37002b33cc3a23c60f421ed2f80b523c937",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 6,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 7
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/context_async.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/context_async.lean",
+      "sha256": "be5e88f16942e231f0eb795a278a9c6232ad4e2133f3d2883fd95fe78addf925",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 23,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 25
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/dateTimeOrd.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/dateTimeOrd.lean",
+      "sha256": "4b8b91bbec71a13d53e8b94f6faf446724175b666e8cac11a0206146c6b5fba4",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 1,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 18
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/delabConst.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/delabConst.lean",
+      "sha256": "b9f4a95e505a441295af735460415c993654cf59047b02773988abc20b1d1244",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 23,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 14,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 7,
+          "Lean.Parser.Command.namespace": 6,
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.end": 7,
+          "Lean.Parser.Command.in": 3,
+          "Lean.Parser.Command.export": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/doControlInfoAggregate.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/doControlInfoAggregate.lean",
+      "sha256": "4df85d5d38163056749358eccdf8c5328ce3541a1239df3067f38f686bc5cbf5",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 9,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.set_option": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/docstringRewrites.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/docstringRewrites.lean",
+      "sha256": "e1c272d871390b588b9a06b4542d793e019459f4d8b98d0c553ceaa6368172fd",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 2,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 18,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 1,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 7,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 4
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/dottedIdentNotation.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/dottedIdentNotation.lean",
+      "sha256": "c2de515aae5b7d3bab5f1e41871a479d96a69c9887a571033965b58f33ffe277",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "surveyError": "Syntax survey failed: .work/server-mvp-m1/pristine/tests/elab/dottedIdentNotation.lean:228:40: error: unexpected token ')'; expected term\n",
+      "execution": "review: syntax survey failed"
+    },
+    {
+      "name": "elab/idbg_basic.lean",
+      "category": "native-build-time",
+      "topics": [
+        "net"
+      ],
+      "source": "tests/elab/idbg_basic.lean",
+      "sha256": "1b882a5beb2e4e27b50c804f1be1a51ae66f92ded265c005d2e2180e2bfa44d8",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 2,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 2,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 2,
+          "Lean.Parser.Command.in": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/idbg_e2e.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "net",
+        "json",
+        "tasks"
+      ],
+      "source": "tests/elab/idbg_e2e.lean",
+      "sha256": "db9e744f7f6b15ef6571ca338d80a5b6af2684362c9db618d0a9cb6cf7dddee2",
+      "sidecars": [
+        "tests/elab/idbg_e2e.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": true,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.in": 1,
+          "Lean.Parser.Command.exit": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/ioNulBytes.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab/ioNulBytes.lean",
+      "sha256": "ef45017cc38adcb75348b46e2f9b6b2d7d8b1998db3960e10e2f77d6fb84e254",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 12,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 1,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/json.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/json.lean",
+      "sha256": "3a8c905b97343c24833c68dc531ab2564d5fc69d8917cb0ede7681b8122bfa37",
+      "sidecars": [
+        "tests/elab/json.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 39,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 4,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/json2.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/json2.lean",
+      "sha256": "d8bcfdc6964fd1ab9629d1f324a849d573c644602b960d725a6d2b781ad554dc",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 1,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/jsonSurrogates.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/jsonSurrogates.lean",
+      "sha256": "a970012917cb1fbc2fe9631d73b89280262b2525362f7435d40eae53513c14a4",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 4,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {}
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/json_empty.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/json_empty.lean",
+      "sha256": "815104a549b358d5d014a9033015d16061ce98d7751db764d17b5942745aff5f",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 8,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 7,
+          "Lean.Parser.Command.declaration": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/kernelInterrupt.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/kernelInterrupt.lean",
+      "sha256": "7836ac7748b86fdb496bf9a27282b97ea0bac7b0fd30629267518ad77a209d20",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 1,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/kernel_is_prop_issue.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/kernel_is_prop_issue.lean",
+      "sha256": "8dd13296d6dacd7a35572990fcec0aae7fd4bb1f37be5000362c96ac2748e5aa",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 1,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.set_option": 5,
+          "Lean.Parser.Command.namespace": 1,
+          "Lean.Parser.Command.declaration": 71,
+          "Lean.Parser.Command.end": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/leanExportParse.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/leanExportParse.lean",
+      "sha256": "507268ef80c73f5d85ba2fdad198bd27e67cdb336356526b566eefcbe19a90d9",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 13,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.declaration": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/library_suggestions_shared_cache.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/library_suggestions_shared_cache.lean",
+      "sha256": "fd798342db62998b1a56829958d994b77995fe99252886743a1eaca533cd9ab5",
+      "sidecars": [
+        "tests/elab/library_suggestions_shared_cache.lean.init.sh"
+      ],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 5,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 4
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/libuv_signal_retry.lean",
+      "category": "native-build-time",
+      "topics": [
+        "net"
+      ],
+      "source": "tests/elab/libuv_signal_retry.lean",
+      "sha256": "d7e56546f7090aebe5109c9e357b1612b946b69f8da9f095a9010d52cff716b4",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 1,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/libuv_tcp_shutdown_pending.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "net",
+        "tasks"
+      ],
+      "source": "tests/elab/libuv_tcp_shutdown_pending.lean",
+      "sha256": "e8dc6efe16192b2f27feba98ebd3f2a095de8f04e191fc373ec70bf04e02f502",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": true,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 2,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 6
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/net_addr.lean",
+      "category": "native-build-time",
+      "topics": [
+        "net"
+      ],
+      "source": "tests/elab/net_addr.lean",
+      "sha256": "27bb25a69118947395a91a48836057f7bf6c0232011f5202e13a96a57a4f5c8a",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 9,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/networkInterfaces.lean",
+      "category": "native-build-time",
+      "topics": [
+        "net"
+      ],
+      "source": "tests/elab/networkInterfaces.lean",
+      "sha256": "69e6f92a5e934ba9ac8b4e8fec3ea3866df3781fda7afcfdc74b24badf02eef3",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 1,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {}
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/newdo.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/newdo.lean",
+      "sha256": "e2bc2621147b5d5726f08578facf738d57ae97beeb46948e8b1cf03db9dca195",
+      "sidecars": [
+        "tests/elab/newdo.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 1,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 13,
+        "guardMsgsSpec": 13,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.check": 2,
+          "Lean.Parser.Command.declaration": 26,
+          "Lean.Parser.Command.in": 3,
+          "Lean.Parser.Command.namespace": 1,
+          "Lean.Parser.Command.end": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/printStructure.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/printStructure.lean",
+      "sha256": "a2923e0189225b46912c5113d4dbeaa48a36d63b0d2b68e2b04794079a44120d",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 10,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 11,
+          "Lean.Parser.Command.declaration": 4
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/promise.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/promise.lean",
+      "sha256": "4b8328e874dcf1a079c8e78466abdf44b6cbf429857d0e52c9b5c448b863d58d",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 3,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/sync_barrier.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/sync_barrier.lean",
+      "sha256": "c7f147f927b4371fd7ab7a109cfec492ba6e0952f6ff48e0640a67c229ec7347",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 1,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/sync_channel.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/sync_channel.lean",
+      "sha256": "336f9c15fbc72621b35c4e97366446724d4f6e7e3990996b2bbcf985a09b70f1",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 1,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 17
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/sync_notify.lean",
+      "category": "native-build-time",
+      "topics": [
+        "async",
+        "tasks"
+      ],
+      "source": "tests/elab/sync_notify.lean",
+      "sha256": "85b1288e112a689bb2acaf31225baf103d263abfc30361bfcdf5abe9c8d9b9fa",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 5,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 5
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/sync_recursive_mutex.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/sync_recursive_mutex.lean",
+      "sha256": "3e2ed8be0a0e4167a1e155fcde65377dd7b0f578580b9cd1a8dfe670631f356d",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 3,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 6
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/sync_shared_mutex.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/sync_shared_mutex.lean",
+      "sha256": "21606250dbb57d961d531f23379993ba3e2f4c50b1c1700bfdf2b18c9bc4ffb4",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 4,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 11
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/taskState.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/taskState.lean",
+      "sha256": "2f32b8a53815b8d9c527a08ac0dd3bc2539d1425d3ba776bbd33d06f8cab1243",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 1,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/task_iterators.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/task_iterators.lean",
+      "sha256": "3ecbacd20a09c19fc7d8578528c4ddeab49223a384d5b25b745b71591fe73bfb",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 8,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 11
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/task_test.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/task_test.lean",
+      "sha256": "98ba89c725bb9067824d48cf6777365b3e4edc220ae2eae6c4a3b56a1341cf99",
+      "sidecars": [
+        "tests/elab/task_test.lean.out.ignored"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 1,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 4
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/task_test2.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/task_test2.lean",
+      "sha256": "1bfed3aa23b83b1f1eef7583f66282c25e95cf244212c74ccc5cd9b3f4405161",
+      "sidecars": [
+        "tests/elab/task_test2.lean.out.ignored"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 1,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/task_test_io.lean",
+      "category": "native-build-time",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/elab/task_test_io.lean",
+      "sha256": "9a81404b15854ffb03ecd5d8370a4c46c6549239f39a6cc50fba66142918e278",
+      "sidecars": [
+        "tests/elab/task_test_io.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.exit": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/timeAPI.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeAPI.lean",
+      "sha256": "7eae268ff39c8efc47f6734a1ac7d4bdb4fe81f944e92be08ed872f0bfd73e68",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 8,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 176
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeCanonFormats.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeCanonFormats.lean",
+      "sha256": "c656854438438d35a0861e592b5427514b9321139a8648e365a66480efbaf7ac",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 22,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 4
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeClassOperations.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeClassOperations.lean",
+      "sha256": "2fd5bb7c20c3070783cb467fa385f2f99b9933d7456a9a5ce45d439daf8bc6da",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 29,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 7
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeFormats.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeFormats.lean",
+      "sha256": "92a1f69212f2cd453ad5d4a8a8cf632a9200fdcac0da324c3c47272c29a82633",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 44,
+        "evalBang": 0,
+        "guard": 56,
+        "guardMsgsEval": 149,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.declaration": 50
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeLimits.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeLimits.lean",
+      "sha256": "cb1a4bb3a3e446207a8284c081a8016f412346d6828d0edd027038f9568275ba",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 13,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 5
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeLocalDateTime.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeLocalDateTime.lean",
+      "sha256": "940f562efc7ca494144fe3abebda4d0086f9651aaa59bfb146f2bb64fb308a46",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 10,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 10
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeNegative.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeNegative.lean",
+      "sha256": "e363e083c664ffa87c3d9d5e55dba78121d0c39e5731be58a4f59bd6c36b5eff",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 13,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeOperations.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeOperations.lean",
+      "sha256": "aff9e94d606747d00b8f083db0018927e880913d083026b63c1fc0589210879a",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 51,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 5
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeOperationsOffset.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeOperationsOffset.lean",
+      "sha256": "555e594578c2f04b1b517aadea346cd97e2d765fc03c39e572e74d52fabbc74f",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 99,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeParse.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeParse.lean",
+      "sha256": "31a5637e8ec817f64f39f7168848d0694e186ca4864b8eac1746cce8385fba10",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 21,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 33
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timePosixTzFooter.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timePosixTzFooter.lean",
+      "sha256": "7c0795c04b661d6441fa4ab42f41acd50106f3fbc577ca252e11528a375b847c",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 2,
+        "guardMsgsEval": 38,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.declaration": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeSet.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeSet.lean",
+      "sha256": "23505332e6d164dbf69dd92438b32066a2b1f812d32f0b8772fd7bc6af29cf4a",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 12,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 16
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeSub.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeSub.lean",
+      "sha256": "3d387c21205c521d63ff7c3537db809d85afbb2df87199f1288f1ec49e9164e1",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 8,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 3
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/timeTzifParse.lean",
+      "category": "native-build-time",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/elab/timeTzifParse.lean",
+      "sha256": "0dac84c69e4435e0915cf5e3bbc7190bf182ecb25cb6c8247c5559fb4332f922",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 10,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 3
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab/toFromJson.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/toFromJson.lean",
+      "sha256": "38d22489656d743351f00c13ef21d543a46bdca0af741445c9edaa234accf867",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "surveyError": "Syntax survey failed: .work/server-mvp-m1/pristine/tests/elab/toFromJson.lean:17:12: error: unexpected token '$'; expected '(', ']', '_', '`(tactic|', 'do', '}' or identifier\n.work/server-mvp-m1/pristine/tests/elab/toFromJson.lean:51:66: error: unexpected token ','; expected '//' or structInstFieldDecl\n.work/server-mvp-m1/pristine/tests/elab/toFromJson.lean:70:64: error: unexpected token ','; expected '//', '}' or structInstFieldDecl\n.work/server-mvp-m1/pristine/tests/elab/toFromJson.lean:73:56: error: unexpected token ','; expected '//', '}' or structInstFieldDecl\n",
+      "execution": "review: syntax survey failed"
+    },
+    {
+      "name": "elab/tojson_fromjson_perf_issue.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/tojson_fromjson_perf_issue.lean",
+      "sha256": "d13adb5a86c16dcb0b1e25859617a6b77675de383f817ba0c7abca262577178f",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 2
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/unusedVarDoMatch.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/unusedVarDoMatch.lean",
+      "sha256": "bd76ed8e9ea0dd4cbd8c37e962a3003b4dcfab7fef85c44d2cadf682dc33fbee",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.in": 4
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab/versoDocs.lean",
+      "category": "native-build-time",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/elab/versoDocs.lean",
+      "sha256": "f157f6d80377724bff72cedda502dc09c21de8332725d8006c5bf4d58264a762",
+      "sidecars": [
+        "tests/elab/versoDocs.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 3,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 6,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 18,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.set_option": 5,
+          "Lean.Parser.Command.moduleDoc": 15,
+          "Lean.Parser.Command.open": 5,
+          "Lean.Parser.Command.declaration": 42,
+          "Lean.Parser.Command.check": 3,
+          "Lean.Parser.Command.in": 2,
+          "Lean.Parser.Command.section": 7,
+          "Lean.Parser.Command.variable": 1,
+          "Lean.Parser.Command.end": 13,
+          "Lean.Parser.Command.namespace": 6,
+          "Lean.Parser.Command.syntax": 2,
+          "Lean.Parser.Command.syntaxCat": 1,
+          "Lean.Parser.Command.addDocString": 2,
+          "Lean.Parser.Command.docs_to_verso": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab_bench/bv_decide_incremental.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/bv_decide_incremental.lean",
+      "sha256": "ce5eea9205474d75196bdec8ccc8d215438a85ab06e695f63c055330b8d7c824",
+      "sidecars": [
+        "tests/elab_bench/bv_decide_incremental.lean.out.expected"
+      ],
+      "change": "added",
+      "usesSockets": false,
+      "surveyError": "Syntax survey failed: .work/server-mvp-m1/pristine/tests/elab_bench/bv_decide_incremental.lean:71:14: error: unexpected identifier; expected grind\n.work/server-mvp-m1/pristine/tests/elab_bench/bv_decide_incremental.lean:106:60: error: unexpected identifier; expected ')'\n.work/server-mvp-m1/pristine/tests/elab_bench/bv_decide_incremental.lean:155:29: error: unexpected token '#'; expected command\n",
+      "execution": "review: syntax survey failed"
+    },
+    {
+      "name": "elab_bench/cbv_decide.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/cbv_decide.lean",
+      "sha256": "62ebc05dfc435295911abd98983d2a5bfc80a763e127af9ab20916d160c0c0b7",
+      "sidecars": [
+        "tests/elab_bench/cbv_decide.lean.out.ignored"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 1,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 5,
+          "Lean.Parser.Command.set_option": 1
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab_bench/cbv_divisors.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/cbv_divisors.lean",
+      "sha256": "63f4c4ddaeb0c3b8f337573ba8ba0bb64168e2275b06d23e82660e69a8e24d28",
+      "sidecars": [
+        "tests/elab_bench/cbv_divisors.lean.out.ignored"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 1,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 4
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab_bench/cbv_leroy.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/cbv_leroy.lean",
+      "sha256": "e78609ffeebfba689395c436d0f9e0ce3e306dc1cb4f2e82bf4f1037c9703bc4",
+      "sidecars": [
+        "tests/elab_bench/cbv_leroy.lean.out.ignored"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 1,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.declaration": 26,
+          "Lean.Parser.Command.notation": 1,
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.set_option": 2
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab_bench/cbv_merge_sort.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/cbv_merge_sort.lean",
+      "sha256": "434c3aa7d5aa9eb1a18057845c81427f8429f1cdc1c4e6f3eafab3bb599ddb0b",
+      "sidecars": [
+        "tests/elab_bench/cbv_merge_sort.lean.out.ignored"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 1,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 5
+        }
+      },
+      "execution": "runtime candidate: parallel adapter review"
+    },
+    {
+      "name": "elab_bench/charactersIn.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/charactersIn.lean",
+      "sha256": "cb91f230ee1d729c2c10c7009d4417b707fea12da23ed0cd14165f62e7c3e286",
+      "sidecars": [
+        "tests/elab_bench/charactersIn.lean.out.ignored"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 4,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 0,
+        "other": {
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 2,
+          "Lean.Parser.Command.set_option": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/delayed_assign.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/delayed_assign.lean",
+      "sha256": "10f7804d66591aa1602f3eaf43ad235aceaef21733ffa44b50364d6a14fda654",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 3
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/delayed_lift.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/delayed_lift.lean",
+      "sha256": "c27b612ab55b83da15e2092176b47cdc4b010f6e40889bc302a3307417a29fff",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 6,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/delayed_sharing.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/delayed_sharing.lean",
+      "sha256": "9af9a18634dd10cb117f74290a7f7143800178ddb6334668c160bb4cbd5bdce3",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.open": 1,
+          "Lean.Parser.Command.declaration": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/let_to_have_chain.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/let_to_have_chain.lean",
+      "sha256": "6be659b42fa8e645a8b56b9e0b5f62af556c3d486943f8c12ae2c1cf114a953d",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 6,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/let_to_have_closed_body.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/let_to_have_closed_body.lean",
+      "sha256": "2747287b37eb9e2a0a9514b7c239bdff8464f22bed0befe8c56a95d9583e097f",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 5,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/let_to_have_nested.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/let_to_have_nested.lean",
+      "sha256": "b1942ff2e2b579273e3bcddc4f4a769beebaa56ddbc0384f261578b9d26a5d6b",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 7,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/lift_lets_binders.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/lift_lets_binders.lean",
+      "sha256": "15cf0e9ec80e1aa6cdbc77f4ae57fbd335008ca04d1a0a71df00eb8c6ecff374",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 6,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/lift_lets_chain.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/lift_lets_chain.lean",
+      "sha256": "eaa7809fe23190411d12db9b3e3c6b1a9153f8d27cd61fe137a4ebe2ee709317",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 6,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/lift_lets_dag.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/lift_lets_dag.lean",
+      "sha256": "adb7102922be1e3c78952fa8fc9aea36badf560c82010c7b9584469a03e426a3",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 5,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/lift_lets_parallel.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/lift_lets_parallel.lean",
+      "sha256": "5cb4be46c8f7ab1c496160af22972efdb1feafc14f5110348a8d7bde25221545",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 7,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/lift_lets_spine.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/lift_lets_spine.lean",
+      "sha256": "167a7d6794be895cbe381eeb0d0295daf38935bf0900440a4a3cb48910bff406",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 7,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/sym_let_to_have_chain.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/sym_let_to_have_chain.lean",
+      "sha256": "615330a1df74007912b96369fa314c721bea0300df5a9e6505d131fa4171d00c",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 6,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/sym_let_to_have_closed_body.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/sym_let_to_have_closed_body.lean",
+      "sha256": "909072bdc937bb5fbe573723ebbc794238b78ed0cfa87c0df2a72329aacc1d2e",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 5,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/sym_let_to_have_nested.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/sym_let_to_have_nested.lean",
+      "sha256": "50f219931b813f2572f6d344c09ebd49538a8a9799924a904bcf8f67783ed876",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 7,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/sym_lift_lets_chain.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/sym_lift_lets_chain.lean",
+      "sha256": "471dcae603e7821532eabda0b0c9e79e638d86ae2582a53d7838254eec44b2a1",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 6,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/sym_lift_lets_parallel.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/sym_lift_lets_parallel.lean",
+      "sha256": "ec243747d9a93a88f04a701238247c24770fa251f9b09a371f9f674e51bdb66d",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 7,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "elab_bench/sym_lift_lets_spine.lean",
+      "category": "native-build-time",
+      "topics": [
+        "env"
+      ],
+      "source": "tests/elab_bench/sym_lift_lets_spine.lean",
+      "sha256": "23db70e2c5a7107e9e9d2d2432b3a0a55799df05d7e7d9af2ee92b408c56080d",
+      "sidecars": [],
+      "change": "added",
+      "usesSockets": false,
+      "forms": {
+        "eval": 0,
+        "evalBang": 0,
+        "guard": 0,
+        "guardMsgsEval": 0,
+        "guardMsgsGuard": 0,
+        "guardMsgsOther": 0,
+        "guardMsgsSpec": 0,
+        "runCommand": 1,
+        "other": {
+          "Lean.Parser.Command.moduleDoc": 1,
+          "Lean.Parser.Command.set_option": 1,
+          "Lean.Parser.Command.declaration": 7,
+          "Lean.Parser.Command.open": 1
+        }
+      },
+      "execution": "native build-time only (no #eval/#guard actions)"
+    },
+    {
+      "name": "server/diags.lean",
+      "category": "compiled-driver-and-native-compiler",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/server/diags.lean",
+      "sha256": "50cd682c9583a0363e2ce26bc30667f5e8385451bec085f8f694ccd9053fdfa5",
+      "sidecars": [
+        "tests/server/diags.lean.before.sh",
+        "tests/server/diags.lean.content_diag.json"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "separate harness: compiled-driver-and-native-compiler"
+    },
+    {
+      "name": "server/init_exit_worker.lean",
+      "category": "compiled-driver-and-native-compiler",
+      "topics": [
+        "json"
+      ],
+      "source": "tests/server/init_exit_worker.lean",
+      "sha256": "f8c33ca7f118b4f1926c4e9babb9ee9a8112ade84c845246bc0a061fbe969497",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "separate harness: compiled-driver-and-native-compiler"
+    },
+    {
+      "name": "server_interactive/cancellation_try_plain.lean",
+      "category": "compiled-driver-and-native-compiler",
+      "topics": [
+        "tasks"
+      ],
+      "source": "tests/server_interactive/cancellation_try_plain.lean",
+      "sha256": "b43910bff1fb108766055aa6f62864348bfbc031b57fc3c8b6a8102d6ded24b2",
+      "sidecars": [
+        "tests/server_interactive/cancellation_try_plain.lean.out.expected"
+      ],
+      "change": "unchanged",
+      "usesSockets": false,
+      "execution": "separate harness: compiled-driver-and-native-compiler"
+    },
+    {
+      "name": "pkg/float",
+      "category": "mixed-driver-review-required",
+      "topics": [
+        "time"
+      ],
+      "source": "tests/pkg/float/run_test.sh",
+      "sha256": "96a9f35d1e2da58c2f3b343b7c48d51eb3d1108a503a95dea5c2455e0a4a9796",
+      "sidecars": [],
+      "change": "unchanged",
+      "usesSockets": true,
+      "execution": "separate harness: mixed-driver-review-required"
+    }
+  ]
+}
