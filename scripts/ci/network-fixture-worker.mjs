@@ -3,13 +3,18 @@ import { createServer as httpsServer } from 'node:https';
 import { createServer as httpServer } from 'node:http';
 import { connect } from 'node:net';
 import { spawn } from 'node:child_process';
-import { basename, dirname, resolve } from 'node:path';
+import { createGunzip } from 'node:zlib';
+import { resolve } from 'node:path';
 
-// Serve the bare fixture through Git's smart HTTP protocol (`git http-backend`),
-// as private Git hosts do. Lake 4.35 fetches dependencies with
-// `git fetch --filter=tree:0 <url> <rev>`; over the dumb HTTP protocol Git 2.53
-// then recurses through lazy promisor fetches (git -> git-remote-https -> git ...)
-// until process creation fails, which is a fixture artifact, not the product path.
+// Serve the bare fixture through Git's smart HTTP protocol, as private Git
+// hosts do. Lake 4.35 fetches dependencies with `git fetch --filter=tree:0
+// <url> <rev>`; over the dumb HTTP protocol Git 2.53 then recurses through lazy
+// promisor fetches (git -> git-remote-https -> git ...) until process creation
+// fails, which is a fixture artifact, not the product path.
+// The protocol is implemented here over the built-in `git upload-pack
+// --stateless-rpc` (what `git http-backend` runs): the managed Windows Git
+// (dugite-native) does not reliably provide the separate http-backend program,
+// and this avoids CGI parsing and path translation on every platform.
 const root = resolve(workerData.repository);
 const git = workerData.git ?? { executable: 'git', env: process.env };
 // Discovery requests are counted so that a lazy-fetch recursion is refused
@@ -17,16 +22,21 @@ const git = workerData.git ?? { executable: 'git', env: process.env };
 const maximumDiscoveries = 32;
 let discoveries = 0;
 const backendEnvironment = {
-  ...git.env, GIT_PROJECT_ROOT: dirname(root), GIT_HTTP_EXPORT_ALL: '1',
+  ...git.env,
   // Match common private hosts: partial-clone filters and fetching reachable revisions.
   GIT_CONFIG_COUNT: '2',
   GIT_CONFIG_KEY_0: 'uploadpack.allowFilter', GIT_CONFIG_VALUE_0: 'true',
   GIT_CONFIG_KEY_1: 'uploadpack.allowReachableSHA1InWant', GIT_CONFIG_VALUE_1: 'true',
 };
-for (const name of Object.keys(backendEnvironment)) if (/proxy/i.test(name)) delete backendEnvironment[name];
+for (const name of Object.keys(backendEnvironment)) if (/proxy|^GIT_PROTOCOL$/i.test(name)) delete backendEnvironment[name];
+const packet = text => (text.length + 4).toString(16).padStart(4, '0') + text;
 
 const server = httpsServer({ key: workerData.privateKey, cert: workerData.certificate }, (req, res) => {
-  const fail = status => { if (!res.headersSent) res.writeHead(status); res.end(); };
+  const fail = (status, detail) => {
+    if (detail) parentPort.postMessage({ type: 'git-backend-failure', method: req.method, path: req.url, status, ...detail });
+    if (!res.headersSent) res.writeHead(status, { 'Content-Type': 'text/plain' });
+    res.end(detail ? JSON.stringify(detail) + '\n' : undefined);
+  };
   try {
     const url = new URL(req.url, 'https://localhost');
     const service = url.searchParams.get('service') ?? undefined;
@@ -37,35 +47,36 @@ const server = httpsServer({ key: workerData.privateKey, cert: workerData.certif
       parentPort.postMessage({ type: 'git-request-refused', method: req.method, path: url.pathname, discoveries });
       fail(429); return;
     }
-    parentPort.postMessage({ type: 'git-request', method: req.method, path: url.pathname, service });
-    const env = { ...backendEnvironment, REQUEST_METHOD: req.method, QUERY_STRING: url.search.slice(1),
-      PATH_INFO: '/' + basename(root) + url.pathname.slice('/repo.git'.length), REMOTE_ADDR: '127.0.0.1',
-      CONTENT_TYPE: req.headers['content-type'] ?? '' };
-    if (req.headers['content-length'] !== undefined) env.CONTENT_LENGTH = req.headers['content-length'];
-    if (req.headers['content-encoding'] !== undefined) env.HTTP_CONTENT_ENCODING = req.headers['content-encoding'];
-    if (req.headers['git-protocol'] !== undefined) env.GIT_PROTOCOL = req.headers['git-protocol'];
-    const backend = spawn(git.executable, ['http-backend'], { env, stdio: ['pipe', 'pipe', 'ignore'], windowsHide: true });
-    backend.on('error', () => fail(500));
-    req.on('error', () => backend.kill());
-    req.pipe(backend.stdin).on('error', () => {});
-    // CGI response: header lines, a blank line, then the body.
-    let header = Buffer.alloc(0), bodyStarted = false;
-    backend.stdout.on('data', chunk => {
-      if (bodyStarted) { res.write(chunk); return; }
-      header = Buffer.concat([header, chunk]);
-      const text = header.toString('latin1'), crlf = text.indexOf('\r\n\r\n'), lf = text.indexOf('\n\n');
-      const end = crlf >= 0 && (lf < 0 || crlf < lf) ? crlf + 4 : lf >= 0 ? lf + 2 : -1;
-      if (end < 0) { if (header.length > 65536) { backend.kill(); fail(502); } return; }
-      let status = 200; const headers = {};
-      for (const line of text.slice(0, end).split(/\r?\n/).filter(Boolean)) {
-        const colon = line.indexOf(':'), name = line.slice(0, colon).trim(), value = line.slice(colon + 1).trim();
-        if (name.toLowerCase() === 'status') status = Number.parseInt(value, 10); else headers[name] = value;
-      }
-      res.writeHead(status, headers); bodyStarted = true;
-      const rest = header.subarray(end); if (rest.length) res.write(rest);
+    const protocol = req.headers['git-protocol'];
+    parentPort.postMessage({ type: 'git-request', method: req.method, path: url.pathname, service, protocol });
+    const env = { ...backendEnvironment };
+    if (typeof protocol === 'string') env.GIT_PROTOCOL = protocol;
+    const args = ['upload-pack', '--stateless-rpc', ...(discovery ? ['--advertise-refs'] : []), root];
+    const backend = spawn(git.executable, args, { env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
+    const stderr = [];
+    backend.stderr.on('data', chunk => { if (stderr.reduce((n, c) => n + c.length, 0) < 65536) stderr.push(chunk); });
+    let started = false;
+    const start = () => {
+      if (started) return; started = true;
+      res.writeHead(200, { 'Content-Type': `application/x-git-upload-pack-${discovery ? 'advertisement' : 'result'}`,
+        'Cache-Control': 'no-cache' });
+      // Protocol v0/v1 discovery starts with a service announcement; v2 does not.
+      if (discovery && !/version=2/.test(protocol ?? '')) res.write(packet('# service=git-upload-pack\n') + '0000');
+    };
+    backend.stdout.on('data', chunk => { start(); res.write(chunk); });
+    backend.on('error', error => fail(500, { error: error.message, args }));
+    backend.on('close', (code, signal) => {
+      if (code === 0) { start(); res.end(); return; }
+      const detail = { code, signal, args, stderr: Buffer.concat(stderr).toString('utf8').slice(-4000) };
+      if (started) { parentPort.postMessage({ type: 'git-backend-failure', method: req.method, path: url.pathname, ...detail }); res.destroy(); }
+      else fail(500, detail);
     });
-    backend.on('close', code => { if (!bodyStarted) fail(code === 0 ? 502 : 500); else res.end(); });
-  } catch { fail(500); }
+    backend.stdin.on('error', () => {});
+    req.on('error', () => backend.kill());
+    if (discovery) { req.resume(); backend.stdin.end(); }
+    else if (req.headers['content-encoding'] === 'gzip') req.pipe(createGunzip()).on('error', () => backend.kill()).pipe(backend.stdin);
+    else req.pipe(backend.stdin);
+  } catch (error) { fail(500, { error: error.message }); }
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const tlsPort = server.address().port, proxy = httpServer();

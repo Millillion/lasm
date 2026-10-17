@@ -89,6 +89,7 @@ try {
   assert.ok(result.requests.some(r => r.type === 'git-request' && r.method === 'POST' && r.path.endsWith('/git-upload-pack')));
   // Lake 4.35's tree-filtered fetch must not recurse through lazy promisor fetches.
   assert.ok(!result.requests.some(r => r.type === 'git-request-refused'), 'Git discovery requests were refused as recursive');
+  assert.ok(!result.requests.some(r => r.type === 'git-backend-failure'), 'The fixture Git backend failed');
   assert.ok(result.requests.filter(r => r.type === 'git-request' && r.path.endsWith('/info/refs')).length <= 8, 'Bounded Git discovery requests');
   result.git = { identity: git.identity, version: git.version, executable: git.executable };
   result.passed = true;

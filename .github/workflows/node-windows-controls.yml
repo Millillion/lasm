@@ -32,7 +32,9 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --timeout-seconds 180 --report .work/windows-stdio-resources.json -- node --test --test-concurrency=1 test/stdio-bytes.test.mjs
       - name: Verify deadline cleanup below the memory cap
         run: node integration/windows-guard-deadline.mjs
-      - name: Verify smart-HTTP private Git fixture with a tree-filtered fetch
+      - name: Verify smart-HTTP private Git fixture with a tree-filtered fetch (bundled Git)
+        env:
+          LASM_TEST_MANAGED_GIT: '1'
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --timeout-seconds 180 --report .work/windows-network-git-resources.json -- node --test test/network-git.test.mjs
       - name: Verify Node, filesystem restrictions and online/offline capabilities
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --timeout-seconds 1200 --report .work/windows-isolation-resources.json -- node scripts/ci/windows-isolation-controls.mjs

@@ -8,7 +8,7 @@ import { promisify } from 'node:util';
 import { Worker } from 'node:worker_threads';
 import { createInstallerCertificate } from './fixtures/create-installer-certificate.mjs';
 
-test('private Git fixture exercises CA rejection and authenticated proxy cloning with real Git', { timeout: 30_000 }, async t => {
+test('private Git fixture exercises CA rejection and authenticated proxy cloning with real Git', { timeout: 180_000 }, async t => {
   const directory = await mkdtemp(join(tmpdir(), 'lasm-git-network-'));
   let worker;
   t.after(async () => { if (worker) await worker.terminate(); await rm(directory, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); });
@@ -17,8 +17,17 @@ test('private Git fixture exercises CA rejection and authenticated proxy cloning
   const env = { ...process.env };
   for (const name of Object.keys(env)) if (/proxy|GIT_SSL|GIT_CONFIG/i.test(name)) delete env[name];
   Object.assign(env, { GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: config });
+  // Native controls set LASM_TEST_MANAGED_GIT=1 to exercise the bundled Git the product
+  // provisions (and the fixture serves with); otherwise the host Git is used.
+  let program = 'git', serving;
+  if (process.env.LASM_TEST_MANAGED_GIT === '1') {
+    const { provisionGit, managedGitEnvironment } = await import('../src/managed-git.mjs');
+    const managed = await provisionGit({ cache: process.env.LASM_TOOLCHAIN_CACHE ?? join(directory, 'tools') });
+    Object.assign(env, managedGitEnvironment(managed, env)); program = managed.executable;
+    serving = { executable: managed.executable, env: { ...env } };
+  }
   const execute = promisify(execFile);
-  const git = (args, environment = env) => execute('git', args, { cwd: source, env: environment, windowsHide: true, timeout: 10_000, encoding: 'utf8' });
+  const git = (args, environment = env) => execute(program, args, { cwd: source, env: environment, windowsHide: true, timeout: 20_000, encoding: 'utf8' });
   await git(['init', '--initial-branch=main']); await git(['add', '.']);
   await git(['-c', 'commit.gpgsign=false', '-c', 'user.name=Lasm Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-m', 'TLS fixture']);
   await git(['clone', '--bare', source, bare]);
@@ -26,7 +35,7 @@ test('private Git fixture exercises CA rejection and authenticated proxy cloning
   const certificate = createInstallerCertificate(), ca = join(directory, 'ca.pem'); await writeFile(ca, certificate.certificate);
   const credential = 'fixture:ephemeral-proxy-password', requests = [];
   worker = new Worker(new URL('../scripts/ci/network-fixture-worker.mjs', import.meta.url), { workerData: {
-    repository: bare, certificate: certificate.certificate, privateKey: certificate.privateKey.export({ type: 'pkcs8', format: 'pem' }), proxyCredential: credential,
+    repository: bare, certificate: certificate.certificate, privateKey: certificate.privateKey.export({ type: 'pkcs8', format: 'pem' }), proxyCredential: credential, git: serving,
   } });
   worker.on('message', m => { if (m.type !== 'ready') requests.push(m); });
   const ready = await new Promise((resolve, reject) => { worker.once('message', resolve); worker.once('error', reject); });
@@ -39,15 +48,15 @@ test('private Git fixture exercises CA rejection and authenticated proxy cloning
   // the smart-HTTP fixture must serve it without recursive lazy promisor fetches.
   const partial = join(directory, 'partial'); await mkdir(partial);
   const trusted = { ...network, GIT_SSL_CAINFO: ca };
-  await execute('git', ['init', '--initial-branch=main'], { cwd: partial, env, timeout: 10_000 });
+  await execute(program, ['init', '--initial-branch=main'], { cwd: partial, env, windowsHide: true, timeout: 20_000 });
   const discoveriesBefore = requests.filter(r => r.type === 'git-request' && r.path.endsWith('/info/refs')).length;
-  await execute('git', ['fetch', '--tags', '--force', '--filter=tree:0', ready.url, revision], { cwd: partial, env: trusted, timeout: 20_000 });
-  await execute('git', ['checkout', '--detach', revision], { cwd: partial, env: trusted, timeout: 20_000 });
+  await execute(program, ['fetch', '--tags', '--force', '--filter=tree:0', ready.url, revision], { cwd: partial, env: trusted, windowsHide: true, timeout: 20_000 });
+  await execute(program, ['checkout', '--detach', revision], { cwd: partial, env: trusted, windowsHide: true, timeout: 20_000 });
   assert.equal(await readFile(join(partial, 'fixture'), 'utf8'), 'verified Git TLS fixture');
   assert.ok(requests.some(r => r.type === 'proxy-connect' && r.authenticated));
   assert.ok(requests.some(r => r.type === 'git-request' && r.path.endsWith('/info/refs') && r.service === 'git-upload-pack'));
   assert.ok(requests.some(r => r.type === 'git-request' && r.method === 'POST' && r.path.endsWith('/git-upload-pack')));
   assert.ok(requests.filter(r => r.type === 'git-request' && r.path.endsWith('/info/refs')).length - discoveriesBefore <= 4, JSON.stringify(requests));
-  assert.ok(!requests.some(r => r.type === 'git-request-refused'));
+  assert.ok(!requests.some(r => r.type === 'git-request-refused' || r.type === 'git-backend-failure'), JSON.stringify(requests));
   assert.doesNotMatch(cloned.stderr, /ephemeral-proxy-password/);
 });
