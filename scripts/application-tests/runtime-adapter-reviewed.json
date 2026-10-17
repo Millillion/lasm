@@ -263,16 +263,6 @@
         "elab/timeTzifParse.lean": {
           "sha256": "0dac84c69e4435e0915cf5e3bbc7190bf182ecb25cb6c8247c5559fb4332f922"
         },
-        "elab/versoDocs.lean": {
-          "sha256": "f157f6d80377724bff72cedda502dc09c21de8332725d8006c5bf4d58264a762",
-          "sidecars": [
-            {
-              "path": "tests/elab/versoDocs.lean.out.expected",
-              "sha256": "c9c3b2511387c68730abf3b47dddfcf146d20b13effbce0ca6ba255f081f25f1",
-              "kind": "expected-output"
-            }
-          ]
-        },
         "elab_bench/cbv_decide.lean": {
           "sha256": "62ebc05dfc435295911abd98983d2a5bfc80a763e127af9ab20916d160c0c0b7",
           "sidecars": [
@@ -324,6 +314,10 @@
         "elab/docstringRewrites.lean": {
           "sha256": "e1c272d871390b588b9a06b4542d793e019459f4d8b98d0c553ceaa6368172fd",
           "reason": "Topical only through a Task API mention; its later #guard_msgs checks docstring-elaboration state produced by earlier command-level evaluations, so token replacement changes an unmapped command's result (harness run 2026-10-17: elaboration error in an unchanged command). Native build-time coverage only."
+        },
+        "elab/versoDocs.lean": {
+          "sha256": "f157f6d80377724bff72cedda502dc09c21de8332725d8006c5bf4d58264a762",
+          "reason": "Topical only through a Json mention; a Verso documentation test whose unchanged later commands depend on documentation elaboration state, so token replacement produced an elaboration error outside any mapped action (harness run 2026-10-17). Native build-time coverage only."
         }
       }
     }

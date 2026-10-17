@@ -6,7 +6,7 @@
 // extra deployed API coverage; the original registration stays native-build-time.
 //   node application-upstream-runtime-adapter.mjs NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE REVIEWED_TEST [LEAN_VERSION]
 import assert from 'node:assert/strict';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, renameSync, symlinkSync, writeFileSync } from 'node:fs';
 import { resolve, join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -45,8 +45,14 @@ for (const entry of review.sidecars ?? []) {
   assert.equal(sources[entry.path].sha256, entry.sha256, 'The upstream sidecar changed');
 }
 const wholeOutput = (review.sidecars ?? []).some(entry => entry.kind !== 'ctest-run-serial');
-const originals = [test.source, test.driver, 'tests/util.sh', 'tests/CMakeLists.txt', ...sidecarPaths];
-for (const path of originals) assert.equal(await hashFile(join(reference, path)), sources[path].sha256);
+// elab_bench/run_test.sh is an upstream symlink to elab/run_test.sh: keep the
+// link itself and its target, each verified against the source manifest.
+const originals = [test.source, test.driver, 'tests/elab/run_test.sh', 'tests/util.sh', 'tests/CMakeLists.txt', ...sidecarPaths]
+  .filter((path, index, all) => all.indexOf(path) === index);
+const unchanged = async (base, path) => sources[path].symlink !== undefined
+  ? lstatSync(join(base, path)).isSymbolicLink() && readlinkSync(join(base, path)) === sources[path].symlink
+  : await hashFile(join(base, path)) === sources[path].sha256;
+for (const path of originals) assert.ok(await unchanged(reference, path), 'Upstream file changed: ' + path);
 const inputs = ['integration/application-upstream-runtime-adapter.mjs', 'scripts/upstream/RuntimeCommandSurvey.lean',
   'scripts/application-tests/runtime-adapter-source.mjs', 'scripts/application-tests/runtime-adapter-reviewed.json',
   'scripts/application-tests/upstream-evidence.mjs'];
@@ -81,7 +87,8 @@ try {
   const original = join(output, 'original');
   for (const path of originals) {
     mkdirSync(dirname(join(original, path)), { recursive: true });
-    copyFileSync(join(reference, path), join(original, path));
+    if (sources[path].symlink !== undefined) symlinkSync(sources[path].symlink, join(original, path));
+    else copyFileSync(join(reference, path), join(original, path));
   }
   const group = dirname(test.driver);
   const originalDriver = join(output, 'original-driver.sh');
@@ -157,14 +164,16 @@ try {
   if (built.code !== 0) {
     // The shipping ahead-of-time policy rejects programs that need runtime Lean
     // compilation/kernel state; record that as its own outcome, not a crash.
-    const policy = /Lasm does not support runtime Lean compilation[^\n]*\n(Detected [^\n]*)?/.exec(built.stderr + built.stdout);
-    assert.ok(policy, 'installed application build failed: ' + built.stderr.slice(-4000));
-    report.buildRejected = { policy: true, detected: policy[1] ?? null };
+    const log = built.stderr + built.stdout;
+    const policy = /Lasm does not support runtime Lean compilation[^\n]*\n(Detected [^\n]*)?/.exec(log);
+    report.buildRejected = { policy: !!policy, detected: policy ? policy[1] ?? null
+      : (log.match(/^error: .*$/gm) ?? []).slice(0, 5).join('\n') || log.slice(-2000) };
+    const outcome = policy ? 'aot-policy-rejected' : 'deployed-build-failed';
     report.verdicts = plan.actions.map(action => ({ identifier: action.identifier, form: action.form,
-      verdict: report.nativeCompiled.actions[action.identifier] === 'ok' ? 'aot-policy-rejected' : 'adapter-native-failure',
+      verdict: report.nativeCompiled.actions[action.identifier] === 'ok' ? outcome : 'adapter-native-failure',
       native: report.nativeCompiled.actions[action.identifier] }));
     report.summary = report.verdicts.reduce((counts, row) => ({ ...counts, [row.verdict]: (counts[row.verdict] ?? 0) + 1 }), {});
-    throw Object.assign(new Error('Ahead-of-time policy rejected the parallel program: ' + report.buildRejected.detected), { policyRejected: true });
+    throw Object.assign(new Error(`Installed build produced no deployment (${policy ? 'ahead-of-time policy' : 'build failure'}): ` + report.buildRejected.detected), { policyRejected: true });
   }
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   assert.equal(report.build.lean, version); assert.equal(report.build.leanCommit, lean.commit);
@@ -175,7 +184,7 @@ try {
   Object.assign(deploymentEnv, { PATH: '', LEAN_NUM_THREADS: '2', LEAN_BACKTRACE: '0' });
   report.deployed = execute('deployed', [engine, join(relocated, 'main.mjs')], deploymentEnv);
   assert.equal(await hashFile(join(project + '.hidden', 'Main.lean')), report.parallel.sourceSha256);
-  for (const path of originals) assert.equal(await hashFile(join(original + '.hidden', path)), sources[path].sha256);
+  for (const path of originals) assert.ok(await unchanged(original + '.hidden', path), path);
   report.deployment = { sourceHidden: true, path: '', buildEnvironmentRemoved: true };
   // Per-action verdicts. Native failures mean the adapter does not reproduce
   // the build-time assertion; native disagreement means nondeterminism.
@@ -199,7 +208,7 @@ finally {
   for (const [path, hash] of Object.entries(inputHashes))
     if (await hashFile(join(root, path)) !== hash) report.inputsUnchanged = false;
   for (const path of originals)
-    if (await hashFile(join(reference, path)) !== sources[path].sha256) report.inputsUnchanged = false;
+    if (!await unchanged(reference, path)) report.inputsUnchanged = false;
   report.finishedAt = new Date().toISOString(); save(); assert.ok(report.inputsUnchanged);
 }
 console.log(JSON.stringify({ name, passed: report.passed, summary: report.summary, exact: report.exact,
