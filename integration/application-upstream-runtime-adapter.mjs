@@ -56,7 +56,9 @@ writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
 // The native oracle needs leanc; tiered Lean ships no C toolchain.
 const lean = await provisionLean(output, { distribution: 'full' });
 assert.equal(lean.commit, inventory.leanCommit);
-const env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '2' };
+// Backtraces differ by design between native and Wasm frames; disable them so
+// panic messages, stdout and exit status can be compared exactly.
+const env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '2', LEAN_BACKTRACE: '0' };
 const report = { scope: 'Original native driver plus separate token-replacing runtime re-checks of its assertions; no full-suite or full API claim',
   name, version, leanCommit: lean.commit, target: 'node', compiler, engine, inputs: inputHashes,
   sourceSha256: sources[test.source].sha256, originals, sidecars: review.sidecars ?? [], wholeOutput,
@@ -168,7 +170,7 @@ try {
   renameSync(dist, relocated); renameSync(project, project + '.hidden'); renameSync(original, original + '.hidden');
   report.wasmSha256 = await hashFile(join(relocated, 'program.wasm'));
   const deploymentEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(deploymentEnv, { PATH: '', LEAN_NUM_THREADS: '2' });
+  Object.assign(deploymentEnv, { PATH: '', LEAN_NUM_THREADS: '2', LEAN_BACKTRACE: '0' });
   report.deployed = execute('deployed', [engine, join(relocated, 'main.mjs')], deploymentEnv);
   assert.equal(await hashFile(join(project + '.hidden', 'Main.lean')), report.parallel.sourceSha256);
   for (const path of originals) assert.equal(await hashFile(join(original + '.hidden', path)), sources[path].sha256);
