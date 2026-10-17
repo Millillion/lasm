@@ -390,9 +390,13 @@ function normalize(caseName, r) {
     return `${r.status ?? 'none'}/${r.ended}/${r.ms < 1000 ? '<1s' : r.ms < 6000 ? '1-6s' : r.ms < 12000 ? '6-12s' : '>=12s'}`;
   return outcome(r);
 }
-async function runFaults(server) {
+// `ensure(phase)` replaces a capped or exited server and returns the live one,
+// so one fault class stopping the server does not void the classes after it.
+async function runFaults(ensure) {
   const results = [];
+  let server;
   for (const fault of faultClasses(config.faultScale)) {
+    server = await ensure(`faults: ${fault.name}`);
     const before = await sampleProcess(server.child.pid), cases = [];
     for (const c of fault.cases) {
       log(`${server.kind} fault ${fault.name}: ${c.name} x${c.n}`);
@@ -414,6 +418,7 @@ async function runFaults(server) {
     results.push({ name: fault.name, expect: fault.expect, cases, verifiedAfter: after, alive: alive(server),
       rssBefore: before.rss, rssAfter: sample.rss, handlesBefore: before.handles, handlesAfter: sample.handles });
   }
+  server = await ensure('faults: idle-connections');
   log(`${server.kind} idle connections`);
   // Many idle connections: open, serve normal traffic, watch the server's idle timeout.
   const idleCount = Math.max(10, Math.round(300 * Math.min(1, config.faultScale)));
@@ -437,6 +442,7 @@ async function runFaults(server) {
     cases: [{ name: `${idleCount} idle TCP connections`, repetitions: 1, outcomes: { opened: idle.opened, ...Object.fromEntries(
       Object.entries(closedAfter).map(([k, v]) => [`closedByServerWithin${k}`, v])) }, servedDuring: servedWhileIdle }],
     verifiedAfter: await verifyBatch(server.base, 30, 19), alive: alive(server) });
+  server = await ensure('faults: echo-live');
   // Informational: answering before consuming the request body (upstream behaviour).
   let full = 0, short = 0;
   const liveAgent = new http.Agent({ keepAlive: false });
@@ -559,7 +565,7 @@ async function suite(kind) {
     unwatch = watch(server);
     result.startupSeconds ??= server.startupSeconds;
   };
-  const ensure = async phase => { if (!alive(server) || server.capExceeded) await begin(phase); server.phase = phase; };
+  const ensure = async phase => { if (!alive(server) || server.capExceeded) await begin(phase); server.phase = phase; return server; };
   try {
     await begin('preflight');
     result.preflight = await verifyBatch(server.base, 60, 3);
@@ -580,7 +586,7 @@ async function suite(kind) {
     }
     result.afterLoad = alive(server) ? await sampleProcess(server.child.pid) : null;
     await ensure('faults');
-    result.faults = config.phases.includes('faults') ? await runFaults(server) : [];
+    result.faults = config.phases.includes('faults') ? await runFaults(ensure) : [];
     if (config.soakSeconds > 0 && config.phases.includes('soak')) {
       await ensure('soak');
       log(`${kind} soak ${config.soakSeconds}s`);
