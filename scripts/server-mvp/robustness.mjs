@@ -19,6 +19,7 @@ import { join } from 'node:path';
 import { tmpdir, cpus, totalmem, release } from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { compareFaults } from './robustness-compare.mjs';
 
 const [manifestFile, outputFile, ...overrides] = process.argv.slice(2);
 assert.ok(manifestFile && outputFile && !existsSync(outputFile), 'Supply MANIFEST NEW_OUTPUT.json');
@@ -579,29 +580,6 @@ async function suite(kind) {
   result.passed = Object.values(result.checks).every(v => v !== false);
   return result;
 }
-// Fault outcome agreement: identical outcome keys per case (counts may differ only
-// for outcomes that are inherently timing dependent, listed in `timing`).
-function compareFaults(a, b) {
-  const differences = [];
-  for (const fault of a.faults) {
-    const other = b.faults.find(f => f.name === fault.name);
-    for (const c of fault.cases) {
-      const d = other?.cases.find(x => x.name === c.name);
-      // A server close with unread client bytes still queued becomes a TCP RST
-      // instead of a FIN; which one the client sees depends on how much of the
-      // request the server had read (Node reads eagerly). Status codes must match.
-      const canon = outcomes => [...new Set(Object.keys(outcomes).map(k => k.replace('server-reset', 'server-close')))].sort().join(' | ');
-      const ka = canon(c.outcomes), kb = d ? canon(d.outcomes) : 'missing';
-      if (d && ka === kb && JSON.stringify(Object.keys(c.outcomes).sort()) !== JSON.stringify(Object.keys(d.outcomes).sort()))
-        differences.push({ fault: fault.name, case: c.name, native: c.outcomes, lasm: d.outcomes, informational: true, kind: 'FIN vs RST on server close' });
-      if (fault.name === 'idle-connections' || fault.informational) {
-        if (JSON.stringify(c.outcomes) !== JSON.stringify(d?.outcomes)) differences.push({ fault: fault.name, case: c.name, native: c.outcomes, lasm: d?.outcomes, informational: true });
-      } else if (ka !== kb) differences.push({ fault: fault.name, case: c.name, native: c.outcomes, lasm: d?.outcomes });
-    }
-  }
-  return differences;
-}
-
 const results = {};
 for (const kind of config.kinds) {
   console.log(`[robustness] ${kind}: start`);

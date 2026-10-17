@@ -3,6 +3,7 @@
 //   node assemble-robustness.mjs OUTPUT.json RUN_ID=DIR [RUN_ID=DIR...] > tables.md
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { compareFaults } from './robustness-compare.mjs';
 
 const [outputFile, ...runs] = process.argv.slice(2);
 const entries = [];
@@ -11,7 +12,11 @@ for (const spec of runs) {
   for (const name of readdirSync(dir).filter(n => n.startsWith('server-robustness-')).sort()) {
     const file = join(dir, name, 'robustness-compact.json');
     if (!existsSync(file)) { entries.push({ run, artifact: name, missing: true }); continue; }
-    entries.push({ run, artifact: name, ...JSON.parse(readFileSync(file, 'utf8')) });
+    const entry = { run, artifact: name, ...JSON.parse(readFileSync(file, 'utf8')) };
+    // Re-apply the current comparison rules to the recorded outcomes.
+    if (entry.results?.native && entry.results?.lasm && entry.comparison)
+      entry.comparison.faultDifferences = compareFaults(entry.results.native, entry.results.lasm);
+    entries.push(entry);
   }
 }
 const evidence = { scope: 'Server MVP step 1 milestone 2: robustness of integration/fixtures/server-robustness, native Lean vs Lasm in Node',
