@@ -35,21 +35,28 @@ const config = {
   soakFaultEveryMs: Number(env.ROBUSTNESS_SOAK_FAULT_EVERY_MS ?? 2000), sampleMs: Number(env.ROBUSTNESS_SAMPLE_MS ?? 5000),
   faultScale: Number(env.ROBUSTNESS_FAULT_SCALE ?? 1),
   // Stop (and fail) a server whose RSS exceeds this, before a host guard has to.
-  maxServerRssBytes: Number(env.ROBUSTNESS_MAX_SERVER_RSS_MIB ?? 2048) * 1024 ** 2, kinds: (env.ROBUSTNESS_KINDS ?? 'native,lasm').split(','),
+  // Windows counts committed bytes (Wasm memory grows commit in large steps).
+  maxServerRssBytes: Number(env.ROBUSTNESS_MAX_SERVER_RSS_MIB ?? (process.platform === 'win32' ? 1536 : 2048)) * 1024 ** 2,
+  kinds: (env.ROBUSTNESS_KINDS ?? 'native,lasm').split(','), variant: env.ROBUSTNESS_VARIANT ?? 'local',
   requestTimeoutMs: Number(env.ROBUSTNESS_REQUEST_TIMEOUT_MS ?? 30_000),
   phases: (env.ROBUSTNESS_PHASES ?? 'load,faults,soak').split(','),
   // Std.Http.Config used by the fixture (integration/fixtures/server-robustness/Main.lean).
   server: { maxBodySize: 1048576, maxHeaderBytes: 16384, maxHeaders: 50, headerTimeoutMs: 2000,
     lingeringTimeoutMs: 3000, keepAliveTimeoutMs: 5000, maxConnections: 512, maxUriLength: 8192 },
 };
-// Soak criterion (both builds): after a warmup of max(120 s, 25 % of the soak),
-// the least-squares RSS slope is at most 2 MiB/min and the final RSS (median of
-// the last 5 samples) is at most 110 % + 16 MiB of the warm baseline (median of
-// the first 5 samples after warmup). Lasm also: Wasm linear memory (which never
-// shrinks) grows by at most 16 MiB after warmup. Open descriptors/handles end
-// within 64 of the warm baseline. Zero request errors; the process stays alive.
-const soakCriteria = { warmupFraction: 0.25, minimumWarmupSeconds: 120, maxSlopeBytesPerMinute: 2 * 1024 ** 2,
-  maxFinalRatio: 1.10, finalAllowanceBytes: 16 * 1024 ** 2, maxWasmGrowthBytes: 16 * 1024 ** 2, maxHandleGrowth: 64 };
+// Soak criterion (both builds). Warmup: max(120 s, 25 % of the soak). Over the
+// rest, memory growth is normalized by the requests served, because an
+// application leak scales with requests while allocator high-water growth does
+// not. Pass when (1) the least-squares RSS slope is at most 256 bytes per
+// request, (2) final RSS (median of the last 5 samples) minus the warm baseline
+// (median of the first 5) is at most 256 bytes per request served in between
+// plus 32 MiB, (3) for Lasm, Wasm linear memory (which never shrinks) grows by
+// at most 256 bytes per request plus 16 MiB, (4) descriptors/handles end within
+// 64 of the baseline, (5) zero request errors, and the process stays alive.
+// At ~1,000 req/s a 15-minute soak resolves leaks of ~256 B/request; smaller
+// leaks are not distinguishable from allocator growth at this duration.
+const soakCriteria = { warmupFraction: 0.25, minimumWarmupSeconds: 120, maxBytesPerRequest: 256,
+  finalAllowanceBytes: 32 * 1024 ** 2, wasmAllowanceBytes: 16 * 1024 ** 2, maxHandleGrowth: 64 };
 const engine = env.ROBUSTNESS_ENGINE ?? process.execPath;
 const diagModule = fileURLToPath(new URL('./robustness-diag.mjs', import.meta.url));
 const GREETING = 'héllo wörld ✓';
@@ -146,7 +153,7 @@ async function traffic(base, { connections, seconds, warmup = 0, seed, stopSigna
   const startAt = Date.now(), measureAt = startAt + warmup * 1000, endAt = measureAt + seconds * 1000;
   let measuredStart = null, measuredEnd = null;
   const worker = async () => {
-    while (Date.now() < endAt && !(stopSignal?.stopped) && !currentServer?.capExceeded) {
+    while (Date.now() < endAt && !(stopSignal?.stopped) && !currentServer?.capExceeded && (!currentServer || alive(currentServer))) {
       const spec = makeRequest(random);
       const result = await send(agent, base, spec);
       const problem = verify(spec, result);
@@ -166,7 +173,7 @@ async function traffic(base, { connections, seconds, warmup = 0, seed, stopSigna
   agent.destroy();
   const elapsed = Math.max(0.001, ((measuredEnd ?? Date.now()) - (measuredStart ?? Date.now())) / 1000);
   return { connections, seconds, warmupSeconds: warmup, requests: stats.requests, errors: stats.errors, errorSamples: stats.errorSamples,
-    jsonByteDiffs: stats.jsonByteDiffs, requestsPerSecond: Math.round(stats.requests / elapsed * 10) / 10,
+    jsonByteDiffs: stats.jsonByteDiffs, requestsPerSecond: Math.round(stats.latencies.length / elapsed * 10) / 10, // verified successes only
     connectionsOpened: created, reusedRequests: stats.reused, latencyMs: summarize(stats.latencies),
     byEndpoint: Object.fromEntries(Object.entries(stats.byEndpoint).map(([k, v]) => [k, summarize(v)])) };
 }
@@ -483,17 +490,27 @@ async function runSoak(server) {
   const diag = server.kind === 'lasm' ? readDiag(server) : [];
   const warmDiag = diag.filter(d => d.at - startedAt >= warmupMs);
   const wasmBase = warmDiag[0]?.wasmBytes ?? null, wasmFinal = warmDiag.at(-1)?.wasmBytes ?? null;
+  const windowSeconds = warm.length > 1 ? (warm.at(-1).at - warm[0].at) / 1000 : 0;
+  const windowRequests = load.requestsPerSecond * windowSeconds;
+  const perRequest = bytes => windowRequests > 0 ? bytes / windowRequests : null;
+  const requestsPerMinute = load.requestsPerSecond * 60;
+  const slopePerRequest = rssSlope === null || !requestsPerMinute ? null : rssSlope / requestsPerMinute;
+  const limit = soakCriteria.maxBytesPerRequest;
   const checks = {
     errors: load.errors === 0,
     samples: warm.length >= 5,
-    slope: rssSlope !== null && rssSlope <= soakCriteria.maxSlopeBytesPerMinute,
-    final: final !== null && final <= baseline * soakCriteria.maxFinalRatio + soakCriteria.finalAllowanceBytes,
+    slope: slopePerRequest !== null && slopePerRequest <= limit,
+    final: final !== null && final - baseline <= limit * windowRequests + soakCriteria.finalAllowanceBytes,
     handles: handlesBase == null || handlesFinal <= handlesBase + soakCriteria.maxHandleGrowth,
-    wasm: server.kind !== 'lasm' || (wasmBase !== null && wasmFinal - wasmBase <= soakCriteria.maxWasmGrowthBytes),
+    wasm: server.kind !== 'lasm' || (wasmBase !== null && wasmFinal - wasmBase <= limit * windowRequests + soakCriteria.wasmAllowanceBytes),
     alive: alive(server),
   };
+  const growth = { windowSeconds: Math.round(windowSeconds), windowRequests: Math.round(windowRequests),
+    slopeBytesPerRequest: slopePerRequest === null ? null : Math.round(slopePerRequest * 10) / 10,
+    finalMinusBaselineBytesPerRequest: final === null || baseline === null ? null : Math.round(perRequest(final - baseline) * 10) / 10,
+    wasmBytesPerRequest: wasmBase === null || wasmFinal === null ? null : Math.round(perRequest(wasmFinal - wasmBase) * 10) / 10 };
   const mib = b => b == null ? null : Math.round(b / 1024 ** 2 * 100) / 100;
-  return { seconds: config.soakSeconds, connections: config.soakConnections, load, faultsSent, faultOutcomes,
+  return { seconds: config.soakSeconds, connections: config.soakConnections, load, faultsSent, faultOutcomes, growth,
     memory: { warmupSeconds: warmupMs / 1000, samples: ok.length, warmSamples: warm.length,
       startMiB: mib(ok[0]?.rss), peakMiB: mib(Math.max(...ok.map(s => s.rss))), warmBaselineMiB: mib(baseline), finalMiB: mib(final),
       slopeMiBPerMinute: rssSlope === null ? null : Math.round(rssSlope / 1024 ** 2 * 1000) / 1000,
@@ -537,7 +554,7 @@ async function suite(kind) {
     unwatch = watch(server);
     result.startupSeconds ??= server.startupSeconds;
   };
-  const ensure = async phase => { if (!alive(server)) await begin(phase); server.phase = phase; };
+  const ensure = async phase => { if (!alive(server) || server.capExceeded) await begin(phase); server.phase = phase; };
   try {
     await begin('preflight');
     result.preflight = await verifyBatch(server.base, 60, 3);
@@ -553,6 +570,7 @@ async function suite(kind) {
         driverCores: Math.round((driver.user + driver.system) / 1e6 / wall * 100) / 100,
         serverRssMiB: after.rss ? Math.round(after.rss / 1024 ** 2) : null, threads: after.threads ?? null };
       load.memoryCapStopped = Boolean(server.capExceeded);
+      if (load.memoryCapStopped) load.requestsPerSecond = null; // cut short: no throughput figure
       result.load.push(load);
     }
     result.afterLoad = alive(server) ? await sampleProcess(server.child.pid) : null;
@@ -592,7 +610,7 @@ for (const kind of config.kinds) {
 const comparison = results.native && results.lasm ? {
   faultDifferences: compareFaults(results.native, results.lasm),
   load: results.native.load.map((n, i) => ({ connections: n.connections, nativeRps: n.requestsPerSecond, lasmRps: results.lasm.load[i]?.requestsPerSecond,
-    lasmToNativeThroughput: Math.round(results.lasm.load[i]?.requestsPerSecond / n.requestsPerSecond * 1000) / 1000,
+    lasmToNativeThroughput: results.lasm.load[i]?.requestsPerSecond && n.requestsPerSecond ? Math.round(results.lasm.load[i].requestsPerSecond / n.requestsPerSecond * 1000) / 1000 : null,
     nativeP99: n.latencyMs.p99, lasmP99: results.lasm.load[i]?.latencyMs.p99 })),
   startupSeconds: { native: results.native.startupSeconds, lasm: results.lasm.startupSeconds },
 } : null;

@@ -143,8 +143,10 @@ jobs:
         env:
           SOAK: ${{ inputs.soak-seconds }}
           LOAD: ${{ inputs.load-seconds }}
+          # Windows Job Objects cap commit; Lasm's Wasm memory commits in large steps.
+          RUN_MIB: ${{ matrix.target.platform == 'win32-x64' && '10240' || '6144' }}
         run: |
-          node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --report .work/robustness-run-resources.json -- \
+          node scripts/full-lean/run-bounded.mjs --memory-mib "$RUN_MIB" --report .work/robustness-run-resources.json -- \
             node scripts/server-mvp/robustness.mjs .work/robustness-build/application.json .work/robustness-result.json \
             "ROBUSTNESS_SOAK_SECONDS=$SOAK" "ROBUSTNESS_LOAD_SECONDS=$LOAD" "ROBUSTNESS_VARIANT=$VARIANT"
       - name: Summarize

@@ -20,10 +20,10 @@ for (const check of Object.keys(r.results[kinds[0]].checks))
 lines.push('', '| Build | Connections | req/s | p50 ms | p95 ms | p99 ms | errors | server cores | sockets opened |', '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |');
 for (const k of kinds) for (const l of r.results[k].load)
   lines.push(`| ${k} | ${l.connections} | ${l.requestsPerSecond} | ${l.latencyMs.p50} | ${l.latencyMs.p95} | ${l.latencyMs.p99} | ${l.errors} | ${l.cpu?.serverCores ?? ''} | ${l.connectionsOpened} |`);
-lines.push('', '| Build | Soak requests | errors | faults sent | RSS warm → final MiB | slope MiB/min | handles base → final | Wasm MiB warm → final |', '| --- | ---: | ---: | ---: | --- | ---: | --- | --- |');
+lines.push('', '| Build | Soak requests | errors | faults sent | RSS warm → final MiB | slope MiB/min | slope B/request | handles base → final | Wasm MiB warm → final |', '| --- | ---: | ---: | ---: | --- | ---: | ---: | --- | --- |');
 for (const k of kinds) {
   const s = r.results[k].soak; if (!s) continue;
-  lines.push(`| ${k} | ${s.load.requests} | ${s.load.errors} | ${s.faultsSent} | ${s.memory.warmBaselineMiB} → ${s.memory.finalMiB} | ${s.memory.slopeMiBPerMinute} | ${s.memory.handles.base} → ${s.memory.handles.final} | ${s.memory.wasm ? `${s.memory.wasm.warmBaselineMiB} → ${s.memory.wasm.finalMiB}` : ''} |`);
+  lines.push(`| ${k} | ${s.load.requests} | ${s.load.errors} | ${s.faultsSent} | ${s.memory.warmBaselineMiB} → ${s.memory.finalMiB} | ${s.memory.slopeMiBPerMinute} | ${s.growth?.slopeBytesPerRequest ?? ''} | ${s.memory.handles.base} → ${s.memory.handles.final} | ${s.memory.wasm ? `${s.memory.wasm.warmBaselineMiB} → ${s.memory.wasm.finalMiB}` : ''} |`);
 }
 lines.push('', '| Fault | Case | ' + kinds.join(' | ') + ' |', '| --- | --- |' + kinds.map(() => ' --- |').join(''));
 const faults = r.results[kinds[0]].faults ?? [];
@@ -43,7 +43,8 @@ if (compactFile) {
         memoryCaps: x.memoryCaps, restarts: x.restarts, peakRssMiB: x.peakRssMiB, stderr: x.stderr?.distinct,
         load: x.load.map(l => ({ connections: l.connections, requestsPerSecond: l.requestsPerSecond, latencyMs: l.latencyMs, errors: l.errors,
           requests: l.requests, connectionsOpened: l.connectionsOpened, cpu: l.cpu, memoryCapStopped: l.memoryCapStopped, errorSamples: l.errorSamples?.slice(0, 5) })),
-        soak: x.soak && { requests: x.soak.load.requests, errors: x.soak.load.errors, faultsSent: x.soak.faultsSent, checks: x.soak.checks,
+        soak: x.soak && { requests: x.soak.load.requests, errors: x.soak.load.errors, faultsSent: x.soak.faultsSent, checks: x.soak.checks, growth: x.soak.growth,
+          requestsPerSecond: x.soak.load.requestsPerSecond, latencyMs: x.soak.load.latencyMs,
           memory: { ...x.soak.memory, series: undefined } },
         faults: x.faults.map(f => ({ name: f.name, alive: f.alive, verifiedAfter: f.verifiedAfter?.ok,
           cases: f.cases.map(c => ({ name: c.name, outcomes: c.outcomes, servedDuring: c.servedDuring?.ok })) })) }];
