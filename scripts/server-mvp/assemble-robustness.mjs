@@ -24,15 +24,15 @@ const evidence = { scope: 'Server MVP step 1 milestone 2: robustness of integrat
 writeFileSync(outputFile, JSON.stringify(evidence, null, 1) + '\n');
 const out = [];
 const variant = e => e.config?.variant ?? e.artifact.replace(/^server-robustness-[^-]+-[^-]+-/, '');
-out.push('| Run | Platform | Variant | Build | req/s c=16 | p50/p99 ms c=16 | req/s c=64 | p50/p99 ms c=64 | load errors | soak slope MiB/min | slope B/req | RSS warm→final MiB | peak RSS MiB | caps | passed |',
-  '| --- | --- | --- | --- | ---: | --- | ---: | --- | ---: | ---: | ---: | --- | ---: | ---: | --- |');
+out.push('| Run | Platform | Variant | Build | req/s c=16 | p50/p99 ms c=16 | c2 | req/s c2 | p50/p99 ms c2 | load errors | soak slope MiB/min | slope B/req | RSS warm→final MiB | peak RSS MiB | caps | passed |',
+  '| --- | --- | --- | --- | ---: | --- | ---: | ---: | --- | ---: | ---: | ---: | --- | ---: | ---: | --- |');
 for (const e of entries) {
-  if (e.missing || !e.results) { out.push(`| ${e.run} | ${e.artifact} | | | | | | | | | | | | | missing |`); continue; }
+  if (e.missing || !e.results) { out.push(`| ${e.run} | ${e.artifact} | | | | | | | | | | | | | | missing |`); continue; }
   for (const [kind, r] of Object.entries(e.results)) {
     const l = c => r.load.find(x => x.connections === c);
     const lat = x => x ? `${x.latencyMs.p50}/${x.latencyMs.p99}` : '';
     const m = r.soak?.memory;
-    out.push(`| ${e.run} | ${e.platform} | ${variant(e)} | ${kind} | ${l(16)?.memoryCapStopped ? 'cap' : l(16)?.requestsPerSecond ?? ''} | ${lat(l(16))} | ${l(64)?.memoryCapStopped ? 'cap' : l(64)?.requestsPerSecond ?? ''} | ${lat(l(64))} | ${r.load.reduce((a, x) => a + x.errors, 0)} | ${m?.slopeMiBPerMinute ?? ''} | ${r.soak?.growth?.slopeBytesPerRequest ?? ''} | ${m ? `${m.warmBaselineMiB}→${m.finalMiB}` : ''} | ${r.peakRssMiB ?? ''} | ${r.memoryCaps?.length ?? 0} | ${Object.values(r.checks).every(v => v !== false)} |`);
+    out.push(`| ${e.run} | ${e.platform} | ${variant(e)} | ${kind} | ${l(16)?.memoryCapStopped ? 'cap' : l(16)?.requestsPerSecond ?? ''} | ${lat(l(16))} | ${r.load[1]?.connections ?? ''} | ${r.load[1]?.memoryCapStopped ? 'cap' : r.load[1]?.requestsPerSecond ?? ''} | ${lat(r.load[1])} | ${r.load.reduce((a, x) => a + x.errors, 0)} | ${m?.slopeMiBPerMinute ?? ''} | ${r.soak?.growth?.slopeBytesPerRequest ?? ''} | ${m ? `${m.warmBaselineMiB}→${m.finalMiB}` : ''} | ${r.peakRssMiB ?? ''} | ${r.memoryCaps?.length ?? 0} | ${Object.values(r.checks).every(v => v !== false)} |`);
   }
 }
 out.push('', '| Run | Platform | Variant | Fault differences (native vs Lasm) |', '| --- | --- | --- | --- |');

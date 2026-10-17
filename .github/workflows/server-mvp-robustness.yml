@@ -141,10 +141,14 @@ jobs:
           LOAD: ${{ inputs.load-seconds }}
           # Windows Job Objects cap commit; Lasm's Wasm memory commits in large steps.
           RUN_MIB: ${{ matrix.target.platform == 'win32-x64' && '10240' || '6144' }}
+          # Windows commits each Lean pthread worker's full 64 MiB VM stack up
+          # front, so 64 connections (~75 threads) exceed the runner's guard on
+          # commit alone; measure 16 and 32 there, natively and with Lasm alike.
+          PLATFORM_ARGS: ${{ matrix.target.platform == 'win32-x64' && 'ROBUSTNESS_LOAD_CONNECTIONS=16,32 ROBUSTNESS_MAX_SERVER_COMMIT_MIB=4096' || '' }}
         run: |
           node scripts/full-lean/run-bounded.mjs --memory-mib "$RUN_MIB" --report .work/robustness-run-resources.json -- \
             node scripts/server-mvp/robustness.mjs .work/robustness-build/application.json .work/robustness-result.json \
-            "ROBUSTNESS_SOAK_SECONDS=$SOAK" "ROBUSTNESS_LOAD_SECONDS=$LOAD" "ROBUSTNESS_VARIANT=$VARIANT"
+            "ROBUSTNESS_SOAK_SECONDS=$SOAK" "ROBUSTNESS_LOAD_SECONDS=$LOAD" "ROBUSTNESS_VARIANT=$VARIANT" $PLATFORM_ARGS
       - name: Summarize
         if: always()
         run: node scripts/server-mvp/robustness-summary.mjs .work/robustness-result.json .work/robustness-build-resources.json .work/robustness-run-resources.json .work/robustness-compact.json >> "$GITHUB_STEP_SUMMARY"
