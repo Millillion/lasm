@@ -311,6 +311,16 @@ application API.
      request, never the server);
    - acceptance plus three consecutive clean runs.
    Outbound HTTP is deferred: Lean has no HTTP client or TLS; revisit with usage.
+   **Performance (user decision 2026-10-17):** the profile (docs/SERVER_MVP.md)
+   shows the host RPC bridge dominates: 58 Lean→Node calls per request at ~50–65 µs
+   of main-thread CPU each, saturating Node's main thread at ~330 req/s while Lean
+   threads idle. Before the step 1 gate, in order: (a) cheap wins — stop re-reading
+   zoneinfo for every `Date` header, read clocks inside the worker; (b) merge the
+   async promise protocol into fewer calls; (c) a cheaper RPC transport (shared
+   memory, no reply cloning, no stack traces on routine cancellation); then (d)
+   gate targets: at least 50% of native throughput and p99 latency within 3× of
+   native on the robustness fixture, with RPCs per request and main-thread
+   utilization tracked as regression metrics.
    Progress and evidence: [SERVER_MVP.md](SERVER_MVP.md). The Lean 4.35.0 Linux x64
    baseline (2026-10-17): 22/22 eval-io inputs and 1,255 runtime-adapter actions
    pass in Node with no deployed failures. The remaining non-passes are classified there.
