@@ -1,0 +1,48 @@
+diff --git a/src/native-file-worker-pool.mjs b/src/native-file-worker-pool.mjs
+index 66a59a3..ac03177 100644
+--- a/src/native-file-worker-pool.mjs
++++ b/src/native-file-worker-pool.mjs
+@@ -5,13 +5,19 @@ import { encodeFileMessage, decodeFileMessage } from './native-file-message.mjs'
+ 
+ // Blocking stdio calls cannot use the shared N-API/libuv pool: enough reads
+ // would prevent their writers from ever starting. Lease an independent worker
+-// to each in-flight call, and retain at most two idle workers briefly. A busy
+-// worker never causes another operation to wait in a fixed-size worker queue.
++// to each in-flight call. A busy worker never causes another operation to wait
++// in a fixed-size worker queue.
++// Keep idle workers for the life of the host (unref'd, so they never keep it
++// alive) instead of retiring them. Koffi 3.3.0 does not release a worker's FFI
++// memory when the worker exits: every create/terminate cycle leaked about
++// 50-100 KiB and one 2-4 MiB mapping. Std.Http reads /etc/localtime for each
++// response's Date header, so the earlier policy (at most two idle workers,
++// retired after 1 s) leaked about 1.3 KiB per request on Linux and macOS.
++const maxIdle = 16;
+ const idle = [];
+ function removeIdle(state) {
+   const i = idle.indexOf(state);
+   if (i !== -1) idle.splice(i, 1);
+-  clearTimeout(state.timer);
+ }
+ function retire(state) {
+   if (state.retired) return;
+@@ -39,11 +45,9 @@ function create() {
+     const job = state.job;
+     if (!job) return failed(state, new Error('Unexpected native file worker response'));
+     state.job = undefined;
+-    if (idle.length < 2) {
++    if (idle.length < maxIdle) {
+       idle.push(state);
+       worker.unref();
+-      state.timer = setTimeout(() => retire(state), 1000);
+-      state.timer.unref();
+     } else retire(state);
+     if (message.ok) job.resolve(message.value);
+     else job.reject(Object.assign(new Error(message.error.message), message.error));
+@@ -60,7 +64,6 @@ export function callNativeFile(operation, args) {
+     let state;
+     try {
+       state = idle.pop() ?? create();
+-      clearTimeout(state.timer);
+       state.worker.ref?.();
+       state.job = { resolve, reject };
+       // Requests are cloned, not transferred: callers retain their input bytes.

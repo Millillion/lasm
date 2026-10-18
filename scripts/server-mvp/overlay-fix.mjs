@@ -7,31 +7,76 @@
 //       (lean_uv_tcp_send/udp_send borrow array parts instead of taking an owned
 //       reference per part). The runtime identity changes, so target.json, the
 //       runtime pin and the reviewed-initialization allowlist are updated to match.
+// runtime RESTORED: rpc, plus the whole CI-rebuilt runtime from an extracted
+//       node-runtime-inputs handoff (RESTORED/runtime, RESTORED/native; identity
+//       pinned in runtime-overlay.json), the same pin/allowlist update, and
+//       patches/file-worker-retention.patch (src/native-file-worker-pool.mjs).
+//       Mirrors the uncommitted product wiring awaiting review; not a candidate.
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, copyFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, copyFileSync, cpSync, rmSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { join, resolve, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
-const [compilerArg, mode] = process.argv.slice(2);
-assert.ok(compilerArg && ['rpc', 'full'].includes(mode), 'Supply INSTALLED_COMPILER rpc|full');
+const [compilerArg, mode, restoredArg] = process.argv.slice(2);
+assert.ok(compilerArg && ['rpc', 'full', 'runtime'].includes(mode), 'Supply INSTALLED_COMPILER rpc|full|runtime [RESTORED]');
+assert.ok(mode !== 'runtime' || restoredArg, 'runtime mode needs the extracted handoff directory');
 const compiler = resolve(compilerArg), here = fileURLToPath(new URL('./patches/', import.meta.url));
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const result = { mode };
-// LF-normalize: Windows checkouts may convert the patch to CRLF.
-const patch = join(tmpdir(), `lasm-overlay-${process.pid}.patch`);
-writeFileSync(patch, readFileSync(join(here, 'host-rpc-channel-reuse.patch'), 'utf8').replace(/\r\n/g, '\n'));
 // Run from the checkout root, as the CI workflow does; git wants a relative, '/'-separated directory.
 const directory = relative(process.cwd(), compiler).replace(/\\/g, '/');
 assert.ok(directory && !directory.startsWith('..'), 'Run from a checkout that contains the installed copy');
-execFileSync('git', ['apply', `--directory=${directory}`, patch], { stdio: 'inherit' });
+function applyPatch(name) {
+  // LF-normalize: Windows checkouts may convert the patch to CRLF.
+  const patch = join(tmpdir(), `lasm-overlay-${process.pid}-${name}`);
+  writeFileSync(patch, readFileSync(join(here, name), 'utf8').replace(/\r\n/g, '\n'));
+  execFileSync('git', ['apply', `--directory=${directory}`, patch], { stdio: 'inherit' });
+}
+applyPatch('host-rpc-channel-reuse.patch');
 for (const name of ['host-library.js', 'host-pre.js'])
   result[name] = sha(readFileSync(join(compiler, 'scripts/full-lean', name)));
+const base = '7482333e0a70a6aee12a540e11a48f31fd56c86761e7b3477f4a46ae310f80d3';
+const target = join(compiler, 'targets/lean-4.35.0-wasm64');
+function repin(identity) {
+  const pins = join(compiler, 'src/application-runtimes.json'), runtimes = JSON.parse(readFileSync(pins, 'utf8'));
+  assert.equal(runtimes.lean['4.35.0'].manifestSha256, base);
+  runtimes.lean['4.35.0'].manifestSha256 = identity;
+  writeFileSync(pins, JSON.stringify(runtimes, null, 2) + '\n');
+  const policy = join(compiler, 'src/application-reachability.mjs'), source = readFileSync(policy, 'utf8');
+  const quoted = `'${base}']`;
+  assert.equal(source.split(quoted).length, 2, 'Expected one reviewed-initialization entry for .54');
+  writeFileSync(policy, source.replace(quoted, `'${base}', '${identity}']`));
+}
+if (mode === 'runtime') {
+  const pin = JSON.parse(readFileSync(new URL('./runtime-overlay.json', import.meta.url), 'utf8'));
+  const restored = resolve(restoredArg);
+  assert.equal(sha(readFileSync(join(target, 'target.json'))), base, 'Expected the candidate .54 runtime');
+  const provenance = JSON.parse(readFileSync(join(restored, 'provenance.json'), 'utf8'));
+  assert.equal(provenance.runtimeManifestSha256, pin.runtimeManifestSha256);
+  assert.equal(provenance.sourceRevision, pin.sourceRevision);
+  assert.equal(sha(readFileSync(join(restored, 'runtime/target.json'))), pin.runtimeManifestSha256);
+  const manifest = JSON.parse(readFileSync(join(restored, 'runtime/target.json'), 'utf8'));
+  for (const [name, file] of Object.entries(manifest.files))
+    assert.equal(sha(readFileSync(join(restored, 'runtime', name))), file.sha256, `runtime file ${name}`);
+  rmSync(target, { recursive: true });
+  cpSync(join(restored, 'runtime'), target, { recursive: true });
+  // Native helpers ship with the runtime handoff; record whether they changed.
+  const nativeManifest = p => existsSync(p) ? sha(readFileSync(p)) : null;
+  result.nativeManifestBefore = nativeManifest(join(compiler, 'src/native/manifest.json'));
+  result.nativeManifestHandoff = nativeManifest(join(restored, 'native/manifest.json'));
+  if (result.nativeManifestBefore !== result.nativeManifestHandoff) {
+    rmSync(join(compiler, 'src/native'), { recursive: true, force: true });
+    cpSync(join(restored, 'native'), join(compiler, 'src/native'), { recursive: true });
+  }
+  repin(pin.runtimeManifestSha256);
+  applyPatch('file-worker-retention.patch');
+  result['native-file-worker-pool.mjs'] = sha(readFileSync(join(compiler, 'src/native-file-worker-pool.mjs')));
+  Object.assign(result, { runtimeIdentity: pin.runtimeManifestSha256, release: pin.release });
+}
 if (mode === 'full') {
-  const base = '7482333e0a70a6aee12a540e11a48f31fd56c86761e7b3477f4a46ae310f80d3';
-  const target = join(compiler, 'targets/lean-4.35.0-wasm64');
   assert.equal(sha(readFileSync(join(target, 'target.json'))), base, 'Expected the candidate .54 runtime');
   const archive = readFileSync(join(here, 'liblasmhost-send-borrow.a'));
   assert.equal(sha(archive), '7b83f31af3bb29c92fcb7c7ccb9921223679c406c28243c52b7c148415277c2f');
@@ -42,14 +87,7 @@ if (mode === 'full') {
   const text = JSON.stringify(manifest, null, 2) + '\n';
   writeFileSync(join(target, 'target.json'), text);
   const identity = sha(text);
-  const pins = join(compiler, 'src/application-runtimes.json'), runtimes = JSON.parse(readFileSync(pins, 'utf8'));
-  assert.equal(runtimes.lean['4.35.0'].manifestSha256, base);
-  runtimes.lean['4.35.0'].manifestSha256 = identity;
-  writeFileSync(pins, JSON.stringify(runtimes, null, 2) + '\n');
-  const policy = join(compiler, 'src/application-reachability.mjs'), source = readFileSync(policy, 'utf8');
-  const quoted = `'${base}']`;
-  assert.equal(source.split(quoted).length, 2, 'Expected one reviewed-initialization entry for .54');
-  writeFileSync(policy, source.replace(quoted, `'${base}', '${identity}']`));
+  repin(identity);
   Object.assign(result, { runtimeIdentity: identity, liblasmhost: sha(archive) });
 }
 console.log(JSON.stringify(result));

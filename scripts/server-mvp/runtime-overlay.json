@@ -1,0 +1,9 @@
+{
+  "scope": "Server MVP robustness variant `runtime` only (maintainer experiment, not a candidate): CI-rebuilt Lean 4.35.0 runtime with the lean_uv_tcp_send/udp_send borrow fix",
+  "repository": "Millillion/lasm",
+  "release": "node-runtime-inputs-39080448291",
+  "asset": "node-runtime-inputs.tgz",
+  "sha256": "db24c7ce7eb12ac4652e5ccbc4b3b497aaf8bbbcd313def2d641f154a9091948",
+  "runtimeManifestSha256": "36cf596b617bea6e360a96321aff1e41b8e5c4ee20abdc7d8a7e474b9a5cc6e4",
+  "sourceRevision": "f79ab96010fa692d2921717972453281b69a8a25"
+}
