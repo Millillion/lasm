@@ -311,3 +311,140 @@ as a resource stop, and the Windows connection levels were changed.
 - Reduce the per-thread memory and commit cost.
 - Report the native macOS hang/abort upstream (`condition_variable wait failed`).
 - Run three consecutive clean five-platform runs.
+
+## Performance profile (2026-10-17)
+
+A measurement pass, with no product changes. It was run on Linux x64 only, on the local
+host, with the `full` build of the robustness fixture (`.54` plus both pending fixes)
+and native Lean 4.35.0 (`leanc -O2`). Evidence:
+[server-mvp-profile-2026-10-17.json](evidence/server-mvp-profile-2026-10-17.json).
+Tools:
+- `scripts/server-mvp/profile.mjs` runs the measurements under `run-bounded.mjs`.
+- `profile-instrument.mjs` makes an instrumented copy of `program.cjs`. It counts every
+  host RPC per operation, measures round trips on the worker side and records main-thread
+  event-loop utilization (ELU).
+- `profile/Main.lean` holds the in-process micro-benchmarks, built by `build-profile.mjs`.
+
+Other maintainer workloads ran between these runs and the host load average was 1–8 on
+12 threads. Same-run ratios are more reliable than absolute numbers.
+
+### Summary
+
+**Lasm is bound by the host RPC path, not by Wasm compute.** One keep-alive
+`GET /health` makes **58 host RPCs** (63 with a new connection per request). The Node
+main thread services every RPC and spends 47–64 µs of CPU on each one.
+
+At 16 connections the main thread is saturated:
+- ELU is 0.92–0.93.
+- It uses 7.4 of 8 CPU-seconds.
+- Throughput levels off at about 330 req/s for every route: health, JSON and 64 KiB bodies
+  alike. Native serves 1,400–1,900 req/s.
+
+The Wasm pthreads mostly wait. 95–99 % of their V8 samples sit in
+`emscripten_futex_wait` (`wasm-function[850]`, which contains `memory.atomic.wait32`). The
+28 Lean threads use 2.2 cores in total.
+
+| c, route | Native req/s, p50/p99 ms | Lasm req/s, p50/p99 ms | Lasm CPU ms/request (native) | Main-thread ELU |
+| --- | --- | --- | --- | --- |
+| 1, health | 737, 1.3/2.0 | 128, 7.7/10.6 | 10.8 (2.4) | 0.43 |
+| 16, health | 1,927, 8.3/11.5 | 338, 44/105 | 10.5 (2.8) | 0.92 |
+| 16, JSON | 1,407, 11.5/15.0 | 332, 44/112 | 12.3 (4.0) | 0.93 |
+| 16, `/big/64` | 1,941, 8.2/12.7 | 313, 48/113 | 11.3 (2.8) | 0.91 |
+| 8, new connection each | 1,573, 4.5/14.7 | 294, 20/92 | 11.6 (3.1) | 0.92 |
+
+### Where one request goes (keep-alive health, 58 RPCs)
+
+| Category | RPCs per request | Latency at c=1 (sum of worker round trips) |
+| --- | ---: | ---: |
+| Async promise protocol: register (91), completion long-poll (92), finish (90), start check (93) | 29.4 | included below |
+| Read: `waitReadable` 2.5, `cancel_recv` 2.5, `recv` 1, plus their 3.5 promises | 6 + protocol | ≈ 2.2 ms |
+| Timers (`Selector.sleep` per select loop for header and keep-alive timeouts): `mk` 2, `next` 2.5, start 2.5, cancel 2.5, plus 2.5 promises | 9.5 + protocol | ≈ 2.1 ms |
+| `Date` header: `DateTime.nowAt "UTC"` reads the zone file (open 1, read 2, stat 2, getenv 1, close) plus wall clock 2 | 9 | ≈ 2.2 ms |
+| Write: head and body as 2 sends, plus 2 promises | 2 + protocol | ≈ 1.2 ms |
+| Other releases (finalizers) | ~2 | ≈ 0.4 ms |
+
+The round trips add up to about 8 ms, which covers the 7.7 ms request (some overlap
+across threads). By the in-process benchmarks, H1 parse, routing, handler and
+serialization in Wasm take ≲ 1 ms.
+
+Unloaded round trip for a trivial synchronous RPC (`IO.monoNanosNow`): 66 µs, against
+34 ns native (1,900×). Under load, most RPCs take 0.1–0.5 ms. The file operations go
+through the file-I/O worker pool and take 0.3–1.8 ms.
+
+On the main thread, during the load window:
+
+| Share of samples | What |
+| ---: | --- |
+| 23 % | idle |
+| 23 % | V8/native work (message deserialization, futex notify, libuv) |
+| 12 % | `lasmFullHostRequest` self time |
+| 6.5 % | reply cloning |
+| 5.4 % | `postMessage` |
+| 4.2 % | worker message dispatch |
+| 2.4 % | creating `Error` objects with stacks for routine cancellations |
+
+### Wasm compute (in-process, no network; ns/op, median of 3)
+
+| Benchmark | Native | Lasm | Ratio |
+| --- | ---: | ---: | ---: |
+| `Json.parse` + compute + `compress` (64 numbers) | 24,570 | 48,933 | 2.0× |
+| Build and fold a 1,000-element `List Nat` (RC, mimalloc) | 25,730 | 66,609 | 2.6× |
+| One Std.Http request over the in-memory Mock transport | 1,179,733 | 4,386,147 | 3.7× (17.8 RPCs each: Date and timers) |
+| `DateTime.nowAt "UTC"` (8 RPCs) | 19,475 | 1,679,261 | 86× |
+| `Async.sleep 0` (7 RPCs) | 56,028 | 1,927,923 | 34× |
+| `IO.monoNanosNow` (1 sync RPC) | 34 | 65,724 | 1,933× |
+| `IO.currentDir` (1 async RPC) | 1,537 | 352,248 | 229× |
+
+Pure compute runs at 2–2.6× native, which includes memory64, `-Oz` and Wasm exceptions;
+memory64 was not isolated. Re-optimizing the delivered binary with wasm-opt `-O3` or
+`-O2` made no measurable difference:
+- JSON: 50 vs 49 µs.
+- List: 58 vs 67 µs.
+- health c=16: 301 and 265 req/s, against 338 req/s for `-Oz` (within noise).
+
+A `-O3` relink is not a lever while the RPC path dominates.
+
+### Startup (median of 6; Lasm 373 ms to `Listening`, 553 ms to the first response; native 88 / 92 ms)
+
+| Mark (ms from the main thread's time origin) | Lasm |
+| --- | ---: |
+| Bare `node -e 0` spawn | 47 |
+| Glue loaded, Wasm compiled and instantiated | 110 |
+| 4 pool workers loaded | 140 |
+| `callMain` | 146 |
+| First host RPC | 162 |
+| `Listening` printed | ≈ 373 |
+| First `/health` answered | ≈ 553 |
+
+- **Compilation is not the cost.** V8 compiles the module lazily in 11 ms; eager Liftoff
+  takes 74–87 ms.
+- **There is no streaming compile and no code cache.** Node takes the
+  `instantiate(buffer)` path. `v8.serialize(module)` gives only a 2-byte in-process
+  handle, and Node has no persistent Wasm code-cache API.
+- **Four bare workers start in 33 ms** in parallel, so a smaller pool saves little.
+- **Lean initialization in Wasm takes about 210 ms.** This includes the fixture's
+  1 MiB `pattern` built byte by byte, first-call (lazy) compilation of each function and
+  about 14 RPCs.
+- **The first request adds 180 ms** of first-call compilation and first use of the
+  file pool.
+
+### Optimization opportunities (ranked; none implemented)
+
+| # | Change | Expected gain (evidence) | Effort | Risk |
+| --- | --- | --- | --- | --- |
+| 1 | Fuse the async protocol: start + start-check (93) + register (91) becomes one RPC, and completion (92) carries the result so finish (90) disappears (`runtime/node-async.cpp`, `host-pre.js`) | −24 of 58 RPCs (−41 %), so about 1.6× throughput (main-thread-bound) and about −35 % c=1 latency | M | Medium: runtime identity re-pin; cancellation semantics |
+| 2 | Cheaper transport: a shared-memory request/reply slot (main side `Atomics.waitAsync`), synchronous handling of synchronous operations, no reply cloning, and no `Error`-with-stack for cancellation | Per-RPC main CPU 47–64 µs → ~10–20 µs; 2–3× higher ceiling; trivial round trip 66 µs → ~20 µs | M–L | Medium: core glue (`host-library.js`, `host-pre.js`) |
+| 3 | Keep timers in the worker: arm/cancel without per-loop `mk`/`next`/start/cancel round trips, or a Wasm-side timer thread using futex timeouts | −10 to −15 RPCs (−20 %), about −2 ms at c=1 | M | Medium: timer/cancel semantics |
+| 4 | `Date` header cost: serve small read-only file reads (zoneinfo) synchronously without the file pool, or cache them; app workaround `generateDate := false`; upstream: cache the UTC zone in Std.Http | −8 RPCs (−14 %), −1.7 ms per response (`nowAt` is 86× native) | S–M | Low |
+| 5 | In-worker clocks for `monoMsNow`/`monoNanosNow`/`getCurrentTime` (ops 25–27) | 66 µs → < 1 µs per call; −2 RPCs per request, more in apps | S | Low: one cross-thread monotonic origin |
+| 6 | Not worth doing now: `-O3`/`-O2` (no gain measured), fewer pool threads (33 ms), Wasm code caching (11 ms lazy compile; no Node API), buffer transfer (64 KiB bodies 313 vs 338 req/s) | ≤ 5 % | — | — |
+
+Recommendation: do 1 and 2 first. Together they target the measured bottleneck: RPC count
+× main-thread cost per RPC. 4 and 5 are small, low-risk follow-ups. Re-measure with
+`profile.mjs` after each change; `rpcPerRequest` and the main-thread ELU are the
+acceptance signals.
+
+Keeping socket reads on the Lean worker is not directly possible. A Lean pthread never
+returns to its isolate's event loop, so Node sockets cannot run there. A separate I/O
+isolate would still be a cross-thread hop. Reducing hops (1, 3) and cost per hop (2) is
+the available path.
