@@ -1,0 +1,563 @@
+{
+ "scope": "Server MVP soak: residual Lasm memory growth after the host-RPC and send-borrow fixes (Linux x64, local, resource guard). Maintainer experiments; product fix awaiting review.",
+ "platform": "linux-x64 (Ubuntu 24.04, glibc 2.39), Node 26.12.0, Lean 4.35.0",
+ "method": "scripts as recorded in .work/residual (driver: N keep-alive clients against integration/fixtures/server-robustness; external /proc sampling; in-process diagnostic: process.memoryUsage, glibc mallinfo2 over all arenas, Worker#getHeapStatistics for every pthread isolate, smaps mapping census; glibc heap walk of in-use chunk sizes via /proc/PID/mem from the parent process)",
+ "rootCause": {
+  "summary": "Std.Http formats a Date header for every response; on Linux/macOS Std.Time reads /etc/localtime each time (host ops: getenv TZ, 2x stat, open, 2x read, close). Lasm routes these through src/native-file-worker-pool.mjs, which kept at most 2 idle workers and retired them after 1 s, so many file operations created and terminated a worker_threads Worker. Koffi 3.3.0 does not release its per-isolate FFI memory when a worker exits: each create/terminate leaked ~50-100 KiB of RSS and one 2 or 4 MiB anonymous mapping. Windows reads its time zone through op 180 (no file IO), which is why Windows was flat.",
+  "evidence": {
+   "hostOpsPer124812Requests": {
+    "open(op1)": 124665,
+    "read(op2)": 249330,
+    "stat(op10)": 249331,
+    "getenv(op22)": 124666,
+    "wallClock(op27)": 249333
+   },
+   "candidateFixtureBefore_e1": {
+    "requests": 592759,
+    "seconds": 1803,
+    "rssBytesPerRequest": 1657,
+    "mallocInUseBytesPerRequest": 1302,
+    "mallocInUseMiB": [
+     110,
+     788
+    ],
+    "anon1to64MiBMappings": [
+     36,
+     31696
+    ],
+    "v8HeapsFlat": true,
+    "wasmFlat": true
+   },
+   "microFileChurn_HEAD": "16,000 open/read/read/close at concurrency 8 (src/native-files.mjs, no Lean): RSS 53->598 MiB, mappings 158->12,436",
+   "workerChurn500": {
+    "plainWorker": "RSS 62->69 MiB over 400 workers, mappings flat",
+    "requireKoffi": "49->91 MiB",
+    "koffiFuncDefined": "one 2 or 4 MiB mapping leaked per worker (mappings 141->476 for 300 workers)",
+    "koffiSmallConfig": "sync_stack/heap 64 KiB: many small mappings still leaked"
+   },
+   "starvedWorkersControl": "4 plain workers that never return to their event loop exchanging 19M messages: malloc in-use flat (rules out generic starved-isolate messaging)"
+  }
+ },
+ "fix": {
+  "file": "src/native-file-worker-pool.mjs",
+  "change": "retain up to 16 idle workers (unref'd) for the host's life; no 1 s idle retirement",
+  "test": "test/native-file-worker-churn.test.mjs (fails on HEAD: idle workers recreated after a pause; passes with the fix)",
+  "safety": {
+   "exitWith8IdleWorkers": "process exits by itself in 0.16 s, status 0",
+   "8x2000Cycles": "0 new workers; fds 62 and threads 15 unchanged",
+   "concurrency32": "creates workers beyond 16 and retires them: +16 workers per 32-wide burst (churn returns above the cap); fds 62->102 and threads 15->23 with 16 idle workers, then stable",
+   "24ConcurrentBlockingFifoReads": "all complete, no queueing"
+  }
+ },
+ "afterFix": {
+  "e3_health_30min_fixedPool": {
+   "requests": 596733,
+   "errors": 0,
+   "seconds": 1803,
+   "rssBytesPerRequest": 255.1,
+   "curve": [
+    [
+     0,
+     0,
+     151
+    ],
+    [
+     60,
+     19626,
+     536
+    ],
+    [
+     120,
+     40451,
+     543
+    ],
+    [
+     180,
+     59677,
+     545
+    ],
+    [
+     240,
+     78763,
+     548
+    ],
+    [
+     300,
+     97871,
+     552
+    ],
+    [
+     361,
+     118095,
+     558
+    ],
+    [
+     421,
+     139065,
+     561
+    ],
+    [
+     481,
+     158289,
+     563
+    ],
+    [
+     541,
+     177485,
+     567
+    ],
+    [
+     601,
+     197313,
+     585
+    ],
+    [
+     661,
+     217415,
+     589
+    ],
+    [
+     721,
+     236035,
+     590
+    ],
+    [
+     781,
+     255541,
+     595
+    ],
+    [
+     841,
+     276228,
+     601
+    ],
+    [
+     901,
+     295585,
+     603
+    ],
+    [
+     961,
+     314927,
+     607
+    ],
+    [
+     1022,
+     334508,
+     611
+    ],
+    [
+     1082,
+     352781,
+     613
+    ],
+    [
+     1142,
+     372659,
+     613
+    ],
+    [
+     1202,
+     392415,
+     614
+    ],
+    [
+     1262,
+     412452,
+     618
+    ],
+    [
+     1322,
+     433396,
+     626
+    ],
+    [
+     1382,
+     455058,
+     647
+    ],
+    [
+     1442,
+     474345,
+     650
+    ],
+    [
+     1502,
+     492220,
+     653
+    ],
+    [
+     1562,
+     512781,
+     657
+    ],
+    [
+     1623,
+     534683,
+     663
+    ],
+    [
+     1683,
+     556454,
+     667
+    ],
+    [
+     1743,
+     578268,
+     670
+    ],
+    [
+     1803,
+     596733,
+     672
+    ],
+    [
+     1833,
+     596733,
+     614
+    ]
+   ],
+   "mallocInUseBytesPerRequest": 202.0,
+   "mallocInUseMiB": [
+    77.0,
+    191.4
+   ],
+   "mainHeapUsedMiB": [
+    8.7,
+    8.8
+   ],
+   "workerHeapsUsedMiB": [
+    154.1,
+    161.4
+   ],
+   "wasmMiB": [
+    663,
+    796
+   ],
+   "anonMappings1to64MiB": [
+    [
+     0,
+     38
+    ],
+    [
+     120,
+     96
+    ],
+    [
+     240,
+     96
+    ],
+    [
+     361,
+     96
+    ],
+    [
+     481,
+     96
+    ],
+    [
+     601,
+     96
+    ],
+    [
+     721,
+     96
+    ],
+    [
+     841,
+     96
+    ],
+    [
+     961,
+     96
+    ],
+    [
+     1082,
+     96
+    ],
+    [
+     1202,
+     96
+    ],
+    [
+     1322,
+     96
+    ],
+    [
+     1442,
+     98
+    ],
+    [
+     1562,
+     98
+    ],
+    [
+     1683,
+     98
+    ],
+    [
+     1803,
+     98
+    ]
+   ]
+  },
+  "e8_mix_60min_productBuild_newRuntime": {
+   "requests": 1000873,
+   "errors": 0,
+   "seconds": 3603,
+   "rssBytesPerRequest": 348.3,
+   "curve": [
+    [
+     0,
+     0,
+     152
+    ],
+    [
+     120,
+     33355,
+     550
+    ],
+    [
+     240,
+     66790,
+     557
+    ],
+    [
+     360,
+     100039,
+     565
+    ],
+    [
+     480,
+     133518,
+     588
+    ],
+    [
+     600,
+     166768,
+     595
+    ],
+    [
+     721,
+     200270,
+     600
+    ],
+    [
+     841,
+     233803,
+     608
+    ],
+    [
+     961,
+     266929,
+     615
+    ],
+    [
+     1081,
+     300434,
+     621
+    ],
+    [
+     1201,
+     333737,
+     627
+    ],
+    [
+     1321,
+     367120,
+     633
+    ],
+    [
+     1441,
+     400705,
+     639
+    ],
+    [
+     1561,
+     434105,
+     645
+    ],
+    [
+     1681,
+     467267,
+     651
+    ],
+    [
+     1801,
+     500932,
+     664
+    ],
+    [
+     1921,
+     534175,
+     678
+    ],
+    [
+     2041,
+     567708,
+     700
+    ],
+    [
+     2161,
+     601141,
+     707
+    ],
+    [
+     2281,
+     634667,
+     726
+    ],
+    [
+     2402,
+     668080,
+     748
+    ],
+    [
+     2522,
+     701624,
+     759
+    ],
+    [
+     2642,
+     734877,
+     765
+    ],
+    [
+     2762,
+     768259,
+     770
+    ],
+    [
+     2882,
+     801692,
+     810
+    ],
+    [
+     3002,
+     834948,
+     817
+    ],
+    [
+     3122,
+     868269,
+     824
+    ],
+    [
+     3242,
+     901456,
+     829
+    ],
+    [
+     3362,
+     934897,
+     837
+    ],
+    [
+     3482,
+     968199,
+     842
+    ],
+    [
+     3603,
+     1000873,
+     848
+    ],
+    [
+     3603,
+     1000873,
+     848
+    ]
+   ],
+   "mallocInUseBytesPerRequest": 212.5,
+   "mallocInUseMiB": [
+    89.3,
+    286.0
+   ],
+   "mainHeapUsedMiB": [
+    24.5,
+    34.3
+   ],
+   "workerHeapsUsedMiB": [
+    154.6,
+    182.1
+   ],
+   "wasmMiB": [
+    663,
+    663
+   ],
+   "anonMappings1to64MiB": [
+    [
+     0,
+     37
+    ],
+    [
+     600,
+     96
+    ],
+    [
+     1201,
+     96
+    ],
+    [
+     1801,
+     96
+    ],
+    [
+     2402,
+     96
+    ],
+    [
+     3002,
+     96
+    ],
+    [
+     3603,
+     96
+    ]
+   ],
+   "heapWalk": {
+    "inUseMiB": [
+     86.6,
+     275.0
+    ],
+    "bytesPerRequest": 215.4,
+    "topChunkGrowth": [
+     {
+      "chunkBytes": 65616,
+      "added": 2830,
+      "bytesPerRequest": 202.4
+     },
+     {
+      "chunkBytes": 64,
+      "added": 51407,
+      "bytesPerRequest": 3.6
+     },
+     {
+      "chunkBytes": 32,
+      "added": 63157,
+      "bytesPerRequest": 2.2
+     }
+    ]
+   }
+  },
+  "remaining": "~200-350 B/request on Linux, linear over 60 min / 1.0M requests (no plateau). >=94% of malloc growth is 65,616-byte chunks (~1 per 300-350 requests) holding V8 tagged heap pointers; more of them with --no-incremental-marking (391 B/req vs 191-293). Mapping count flat (96). Cause not identified."
+ },
+ "koffiUpstream": "No koffi changelog entry (through 3.3.3, 2026-10-10) mentions worker exit or per-worker memory release; 3.3.2 changed the default sync stack/heap sizes only. Not upgraded.",
+ "recordedAt": "2026-10-19",
+ "runtimeHandoff": {
+  "run": "https://github.com/Millillion/lasm/actions/runs/39080448291",
+  "release": "node-runtime-inputs-39080448291",
+  "sha256": "db24c7ce7eb12ac4652e5ccbc4b3b497aaf8bbbcd313def2d641f154a9091948",
+  "runtimeIdentity": "36cf596b617bea6e360a96321aff1e41b8e5c4ee20abdc7d8a7e474b9a5cc6e4",
+  "sourceRevision": "f79ab96",
+  "ciPeakMemoryGiB": 3.9,
+  "diffFrom7482333e": "only runtime/lib/liblasmhost.a; within it only node-async.cpp.o (b26ebc74 -> d9e9e9c2); the archive is byte-identical to scripts/server-mvp/patches/liblasmhost-send-borrow.a (7b83f31a). Native helpers: darwin signal dylibs and native/signals/manifest.json differ from the previous handoff; Linux helpers identical.",
+  "localVerification": {
+   "sendLeakRepro": "integration/fixtures/host-send-leak, 8 clients: 12,000 x 64 KiB replies RSS 143->377 MiB, Wasm 184->551 MiB; 36,000 replies RSS 433 MiB, Wasm 551 MiB (before: 12,000 replies RSS 143->1,168 MiB, Wasm >2 GiB)",
+   "linkDriverEquality": "default Node driver vs LASM_LINK_DRIVER=emcc, program.wasm and program.cjs byte-identical for hello, filesystem (FilesystemSurface), tcp (TcpErrorPhases), lean-import (BundleFeaturesLegacy) and server-robustness",
+   "helloRun": "Hello from Lean! 2 + 3 = 5, exit 0",
+   "cli": "package-node-release.mjs from a local throwaway commit of the pending changes (version 0.1.0-experimental.999, never published), installed with npm",
+   "unitTests": "38/38 (reachability, runtime, link glue, host RPC channel, shutdown, file worker, churn, node host, node network)"
+  }
+ }
+}

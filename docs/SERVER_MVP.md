@@ -137,6 +137,14 @@ fixes Windows passes every check and the remaining Linux/macOS growth is ~1 KiB 
 request (open). Evidence: [robustness runs](evidence/server-mvp-robustness-2026-10-17.json),
 [leak reproductions](evidence/server-mvp-host-leaks-2026-10-17.json).
 
+Update 2026-10-19: a third leak was found (native file workers, fix 3 below), and the
+send fix has a CI-rebuilt runtime. With all three fixes, Lasm has no memory caps and
+passes load and faults on all five targets. Windows passes the soak. Linux and macOS
+still grow 296–602 B per request and fail the 256 B/request slope check (run
+[39239133744](https://github.com/Millillion/lasm/actions/runs/39239133744), table below).
+Evidence: [run](evidence/server-mvp-robustness-runtime-2026-10-19.json),
+[residual analysis](evidence/server-mvp-residual-leak-2026-10-19.json).
+
 ### Harness
 
 - Fixture `integration/fixtures/server-robustness/Main.lean`: ordinary Lean,
@@ -254,7 +262,7 @@ stream was destroyed`. It appears about 30 times, where native reports `broken p
 Informational: a handler that answers before reading the request body loses that
 body (0/100 full echoes, native and Lasm). This is upstream `Std.Http` behaviour.
 
-### Lasm bugs found (fixes uncommitted, awaiting review)
+### Lasm bugs found
 
 1. **Host RPC leaked a MessagePort per call.** The source is
    `scripts/full-lean/host-library.js` and `host-pre.js`. Each Lean→host call created
@@ -269,6 +277,7 @@ body (0/100 full echoes, native and Lasm). This is upstream `Std.Http` behaviour
      main side keeps an `unref`'d port, removed on `close`.
    - Test: `test/full-host-rpc-channel.test.mjs`. It fails 3/3 against HEAD and passes
      with the fix. Existing host, glue and link-driver tests pass (54/54).
+   - Committed in f79ab96.
 2. **`lean_uv_tcp_send`/`udp_send` leaked every sent buffer.** The source is
    `runtime/node-async.cpp`. `lean_array_uget` returns an owned reference, and it was
    never released; native libuv borrows the parts.
@@ -281,10 +290,48 @@ body (0/100 full echoes, native and Lasm). This is upstream `Std.Http` behaviour
      Wasm grew to 5,797 MiB.
    - Rebuilding `node-async.cpp.o` from HEAD source reproduces the shipped object
      byte for byte (`b26ebc74…`), and the fixed object is `d9e9e9c2…`.
-3. **Remaining after both fixes:** Linux and macOS still grow by 1.0–1.3 KiB per
-   request, with Wasm memory flat. On Linux the growth is in 2–64 MiB anonymous
-   (malloc arena) regions, not V8 pages. Windows is flat. The cause is open.
-4. **Windows commit charge:** each Lean pthread worker commits its 64 MiB VM stack.
+   - Source committed in f79ab96. CI run
+     [39080448291](https://github.com/Millillion/lasm/actions/runs/39080448291) rebuilt
+     the runtime: handoff `node-runtime-inputs-39080448291` (`db24c7ce…`), runtime
+     identity `36cf596b…`. Compared with `7482333e…`, only `lib/liblasmhost.a` differs,
+     and within it only `node-async.cpp.o`. That archive is byte-identical to the local
+     experiment. The pin, the handoff source and the initialization allowlist entry are
+     uncommitted, awaiting review.
+   - Verified locally with a product package built from the pending changes (never
+     published). The send repro served 36,000 replies with Wasm flat at 551 MiB (before:
+     above 2 GiB after 12,000). The Node and emcc link drivers give byte-identical
+     `program.wasm` and `program.cjs` for hello, filesystem, tcp, lean-import and the
+     server fixture.
+3. **Native file workers leaked on Linux and macOS (fix uncommitted, awaiting review).**
+   `Std.Http` writes a `Date` header on every response. On Linux and macOS, `Std.Time`
+   reads `/etc/localtime` for it each time: open, two reads, close. Windows asks the OS
+   for the time zone instead, which is why Windows stayed flat.
+   - Lasm runs these file operations on `worker_threads` workers
+     (`src/native-file-worker-pool.mjs`). The pool kept at most 2 idle workers and
+     retired them after 1 s, so many operations created and ended a worker.
+   - Koffi 3.3.0 does not free its per-isolate FFI memory when a worker ends. Each
+     create/terminate cycle leaked 50–100 KiB and one 2 or 4 MiB mapping. No koffi
+     changelog entry up to 3.3.3 mentions this.
+   - Evidence (Linux x64, local, 30 min): 593k requests. RSS grew 1,657 B/request and
+     glibc in-use memory 1,302 B/request. Anonymous 2/4 MiB mappings went from 36 to
+     31,696. V8 heaps and Wasm memory were flat.
+   - Fix: keep up to 16 idle workers for the host's life (`unref`'d). Test:
+     `test/native-file-worker-churn.test.mjs`, which fails on HEAD and passes with the fix.
+   - With 8 idle workers the process exits by itself in 0.16 s. 16,000 file cycles at
+     concurrency 8 create no new workers and leave fds and threads unchanged.
+     24 concurrent blocking FIFO reads all complete. Above 16 concurrent operations,
+     workers past the cap are still created and retired (16 per 32-wide burst).
+   - After the fix, the same local soak grows 241–255 B/request and the mapping count
+     stays flat (96).
+4. **Remaining after all three fixes (open):** Linux and macOS grow 296–602 B/request
+   in CI. Locally on Linux, a 60-minute mixed soak of the product build served 1.0M
+   requests: RSS +343 B/request and glibc in-use +213 B/request, linear with no plateau.
+   A glibc heap walk puts at least 94 % of the malloc growth in 65,616-byte chunks
+   (about 1 per 350 requests) that hold V8 tagged pointers. Plain event-loop-starved
+   workers exchanging 19M messages stay flat. `--no-incremental-marking` raises the rate
+   (391 B/request). This is a true leak, not allocator high-water. The cause is not
+   identified.
+5. **Windows commit charge:** each Lean pthread worker commits its 64 MiB VM stack.
    At 64 connections (~75 threads) Lasm needs more than 7 GiB of commit and tripped
    the runner guard, so Windows measures 16 and 32 connections. Commit was 4.5 GiB
    at 32 connections, against 0.8 GiB RSS.
@@ -296,7 +343,31 @@ the new identity for `canSpecializeInitialization` in
 (observed). The JS files are link inputs, hashed into `buildDriverIdentity`, so cached
 builds are invalidated; they are packed by `scripts/package-node-release.mjs`.
 
+### Results with all fixes (run [39239133744](https://github.com/Millillion/lasm/actions/runs/39239133744), variant `runtime`)
+
+Variant `runtime` is a maintainer overlay on `.54`, not a candidate: the RPC fix,
+the rebuilt runtime `36cf596b…`, and the file-worker fix
+(`scripts/server-mvp/overlay-fix.mjs`). Lasm had no memory caps and 0 load errors,
+and every fault class matched native on all five targets. Shutdown passed everywhere.
+
+| Platform | Lasm req/s c=16 | Lasm soak B/request | Lasm RSS warm→final MiB | Lasm soak | Native B/request | Native soak |
+| --- | ---: | ---: | --- | --- | ---: | --- |
+| linux-x64 | 381 | 296 | 1,834→1,900 | fail (slope) | 100 | pass |
+| linux-arm64 | 320 | 417 | 1,133→1,203 | fail (slope) | 76 | pass |
+| darwin-x64 | 90 | 602 | 1,192→1,227 | fail (slope) | 108 | pass |
+| darwin-arm64 | 291 | 342 | 1,130→1,139 | fail (slope) | 20 | pass |
+| win32-x64 | 331 | 31 | 416→412 | pass | −3 | pass |
+
+Before fix 3 (runs 39073980437 and 39077295412, variant `full`), Linux and macOS grew
+608–1,352 B/request, and linux-x64 hit the memory cap. Native macOS passed every soak
+in this run.
+
 ### Resources
+
+Peaks for the 2026-10-19 work: local runs at most 4.8 GiB (a link-driver comparison
+batch that the guard stopped proactively; it was rerun one fixture at a time at
+≤ 0.9 GiB). The local 60-minute soak peaked at 1.03 GiB. CI runtime rebuild: 3.9 GiB.
+CI robustness: build ≤ 3.7 GiB and run ≤ 1.9 GiB.
 
 Peaks: local runs (one at a time, under the guard) ≤ 6.3 GiB. That was a deliberate
 leak run stopped proactively by the guard; no OOM or swap. CI build steps peaked at
@@ -306,8 +377,11 @@ as a resource stop, and the Windows connection levels were changed.
 
 ### Remaining
 
-- Review and ship fixes 1–2 in a candidate.
-- Find the residual ~1 KiB/request growth.
+- Review the runtime wiring (fix 2) and fix 3, then ship them in a candidate.
+- Find the remaining 65,616-byte V8-related allocation (about 200–350 B/request on
+  Linux; item 4). Keep the soak criterion at 256 B/request: the growth is linear,
+  not a plateau.
+- Report the koffi per-worker memory leak upstream.
 - Reduce the per-thread memory and commit cost.
 - Report the native macOS hang/abort upstream (`condition_variable wait failed`).
 - Run three consecutive clean five-platform runs.
