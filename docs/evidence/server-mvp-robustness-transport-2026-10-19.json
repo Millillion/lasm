@@ -1,0 +1,4877 @@
+{
+ "scope": "Server MVP step 1 milestone 2: robustness of integration/fixtures/server-robustness, native Lean vs Lasm in Node",
+ "runs": [
+  "https://github.com/Millillion/lasm/actions/runs/39302965569"
+ ],
+ "entries": [
+  {
+   "run": "39302965569",
+   "artifact": "server-robustness-darwin-arm64-transport",
+   "platform": "darwin-arm64",
+   "passed": false,
+   "engineVersion": "v26.12.0",
+   "cpus": 3,
+   "cpuModel": "Apple M1 (Virtual)",
+   "resources": {
+    "buildPeakMiB": 1520,
+    "runPeakMiB": 1377
+   },
+   "config": {
+    "loadSeconds": 30,
+    "loadWarmupSeconds": 3,
+    "loadConnections": [
+     16,
+     64
+    ],
+    "soakSeconds": 900,
+    "soakConnections": 8,
+    "soakFaultEveryMs": 2000,
+    "sampleMs": 5000,
+    "faultScale": 1,
+    "maxServerRssBytes": 2147483648,
+    "maxServerCommitBytes": 5368709120,
+    "kinds": [
+     "native",
+     "lasm"
+    ],
+    "variant": "transport",
+    "requestTimeoutMs": 30000,
+    "phases": [
+     "load",
+     "faults",
+     "soak"
+    ],
+    "server": {
+     "maxBodySize": 1048576,
+     "maxHeaderBytes": 16384,
+     "maxHeaders": 50,
+     "headerTimeoutMs": 2000,
+     "lingeringTimeoutMs": 3000,
+     "keepAliveTimeoutMs": 5000,
+     "maxConnections": 512,
+     "maxUriLength": 8192
+    }
+   },
+   "build": {
+    "lean": "4.35.0",
+    "linkDriver": "node",
+    "sourceSha256": "003b1062c6618477295643bec3895f68884ff579531b6748bb3244c044d235c5",
+    "wasmBytes": 2986518,
+    "nativeBytes": 103277600,
+    "lasmBuildSeconds": 128.93,
+    "nativeBuildSeconds": 28.432
+   },
+   "comparison": {
+    "faultDifferences": [
+     {
+      "fault": "handler-exception",
+      "case": "JSON body over the handler readAll limit (64 KiB)",
+      "native": {
+       "500/server-reset+close-header": 10
+      },
+      "lasm": {
+       "500/server-close+close-header": 10
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     },
+     {
+      "fault": "oversized",
+      "case": "Content-Length 2 MiB > maxBodySize",
+      "native": {
+       "none/error-EPIPE": 5
+      },
+      "lasm": {
+       "413/error-EPIPE+close-header": 5
+      }
+     },
+     {
+      "fault": "oversized",
+      "case": "URI 9000 B > maxUriLength",
+      "native": {
+       "400/server-reset+close-header": 10
+      },
+      "lasm": {
+       "400/server-close+close-header": 10
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     }
+    ],
+    "load": [
+     {
+      "connections": 16,
+      "nativeRps": 2421.6,
+      "lasmRps": 505.1,
+      "lasmToNativeThroughput": 0.209,
+      "nativeP99": 32.722,
+      "lasmP99": 104.507
+     },
+     {
+      "connections": 64,
+      "nativeRps": 2180.6,
+      "lasmRps": 443.5,
+      "lasmToNativeThroughput": 0.203,
+      "nativeP99": 90.061,
+      "lasmP99": 489.79
+     }
+    ],
+    "startupSeconds": {
+     "native": 0.221,
+     "lasm": 0.374
+    }
+   },
+   "recordedAt": "2026-10-19T19:08:08.955Z",
+   "results": {
+    "native": {
+     "checks": {
+      "preflight": true,
+      "load": true,
+      "faults": true,
+      "soak": true,
+      "final": true,
+      "shutdown": true,
+      "memoryCap": true,
+      "noRestarts": true
+     },
+     "startupSeconds": 0.221,
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "at": 1792435884331
+     },
+     "stderrLines": 1066,
+     "memoryCaps": [],
+     "restarts": [],
+     "peakRssMiB": 282,
+     "stderr": [
+      {
+       "line": "connection failure: robustness fixture: deliberate handler exception",
+       "count": 135
+      },
+      {
+       "line": "connection failure: body exceeded maximum size of N bytes",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Connection closed",
+       "count": 189
+      },
+      {
+       "line": "connection failure: Bad message",
+       "count": 214
+      },
+      {
+       "line": "connection failure: Unsupported version",
+       "count": 20
+      },
+      {
+       "line": "connection failure: Entity too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Headers too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Too many headers",
+       "count": 84
+      },
+      {
+       "line": "connection failure: request header timeout",
+       "count": 15
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+       "count": 301
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, broken pipe)",
+       "count": 78
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "requestsPerSecond": 2421.6,
+       "latencyMs": {
+        "count": 72688,
+        "p50": 4.46,
+        "p95": 25.973,
+        "p99": 32.722,
+        "max": 60.169
+       },
+       "errors": 0,
+       "requests": 72688,
+       "connectionsOpened": 16,
+       "cpu": {
+        "serverCores": 2.09,
+        "driverCores": 0.29,
+        "serverRssMiB": 78,
+        "threads": null
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      },
+      {
+       "connections": 64,
+       "requestsPerSecond": 2180.6,
+       "latencyMs": {
+        "count": 65438,
+        "p50": 25.934,
+        "p95": 59.653,
+        "p99": 90.061,
+        "max": 185.146
+       },
+       "errors": 0,
+       "requests": 65438,
+       "connectionsOpened": 64,
+       "cpu": {
+        "serverCores": 2.19,
+        "driverCores": 0.26,
+        "serverRssMiB": 175,
+        "threads": null
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      }
+     ],
+     "soak": {
+      "requests": 1643707,
+      "errors": 0,
+      "faultsSent": 445,
+      "checks": {
+       "errors": true,
+       "samples": true,
+       "slope": true,
+       "final": true,
+       "handles": true,
+       "wasm": true,
+       "alive": true
+      },
+      "growth": {
+       "windowSeconds": 677,
+       "windowRequests": 1235512,
+       "slopeBytesPerRequest": 26.8,
+       "finalMinusBaselineBytesPerRequest": 24.9,
+       "wasmBytesPerRequest": null
+      },
+      "requestsPerSecond": 1826.3,
+      "latencyMs": {
+       "count": 1643707,
+       "p50": 2.269,
+       "p95": 25.193,
+       "p99": 29.104,
+       "max": 189.056
+      },
+      "memory": {
+       "warmupSeconds": 225,
+       "samples": 180,
+       "warmSamples": 135,
+       "startMiB": 194.48,
+       "peakMiB": 282.45,
+       "warmBaselineMiB": 252.92,
+       "finalMiB": 282.31,
+       "slopeMiBPerMinute": 2.801,
+       "handles": {
+        "base": 20,
+        "final": 20,
+        "peak": 21
+       },
+       "threads": {
+        "final": null
+       }
+      }
+     },
+     "faults": [
+      {
+       "name": "handler-exception",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "GET /throw",
+         "outcomes": {
+          "500/server-close+close-header": 50
+         }
+        },
+        {
+         "name": "pipelined /throw then /health",
+         "outcomes": {
+          "500/server-close+close-header": 10,
+          "statuses 500": 10
+         }
+        },
+        {
+         "name": "JSON body over the handler readAll limit (64 KiB)",
+         "outcomes": {
+          "500/server-reset+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "malformed",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "garbage request line",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "header without colon",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "unsupported HTTP version",
+         "outcomes": {
+          "505/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "missing Host",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "invalid chunk size",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "Content-Length with Transfer-Encoding",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "binary garbage with NUL",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "oversized",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "Content-Length 2 MiB > maxBodySize",
+         "outcomes": {
+          "none/error-EPIPE": 5
+         }
+        },
+        {
+         "name": "chunked 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/error-EPIPE+close-header": 3,
+          "413/server-reset+close-header": 2
+         }
+        },
+        {
+         "name": "headers 20 KiB > maxHeaderBytes",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "60 headers > maxHeaders",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "header value 9000 B > maxHeaderValueLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "URI 9000 B > maxUriLength",
+         "outcomes": {
+          "400/server-reset+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "slow-client",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "slow-loris: one header byte every 250 ms",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial headers then silence",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial body then silence",
+         "outcomes": {
+          "408/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "client-disconnect",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "half request line then FIN",
+         "outcomes": {
+          "400/server-close+close-header": 30
+         }
+        },
+        {
+         "name": "partial body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "incomplete chunked body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "mid-response (1 MiB, after 64 KiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "mid-stream (/stream/400, after 3 chunks)",
+         "outcomes": {
+          "200/client": 20
+         }
+        },
+        {
+         "name": "during slow handler",
+         "outcomes": {
+          "none/client-destroy": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "reset",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "RST mid-headers",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST after request, before response",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-upload",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-response (1 MiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "RST mid-stream",
+         "outcomes": {
+          "200/client": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "idle-connections",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "300 idle TCP connections",
+         "outcomes": {
+          "opened": 300,
+          "closedByServerWithin3000ms": 0,
+          "closedByServerWithin8000ms": 300,
+          "closedByServerWithin14000ms": 300
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "echo-live-race (informational)",
+       "alive": true,
+       "cases": [
+        {
+         "name": "respond before consuming the request body",
+         "outcomes": {
+          "fullEcho": 0,
+          "shortOrEmpty": 100
+         }
+        }
+       ]
+      }
+     ]
+    },
+    "lasm": {
+     "checks": {
+      "preflight": true,
+      "load": true,
+      "faults": true,
+      "soak": true,
+      "final": true,
+      "shutdown": true,
+      "memoryCap": true,
+      "noRestarts": true
+     },
+     "startupSeconds": 0.374,
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "at": 1792436888863
+     },
+     "stderrLines": 1045,
+     "memoryCaps": [],
+     "restarts": [],
+     "peakRssMiB": 1158,
+     "stderr": [
+      {
+       "line": "connection failure: robustness fixture: deliberate handler exception",
+       "count": 135
+      },
+      {
+       "line": "connection failure: body exceeded maximum size of N bytes",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Connection closed",
+       "count": 189
+      },
+      {
+       "line": "connection failure: Bad message",
+       "count": 214
+      },
+      {
+       "line": "connection failure: Unsupported version",
+       "count": 20
+      },
+      {
+       "line": "connection failure: Entity too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Headers too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Too many headers",
+       "count": 84
+      },
+      {
+       "line": "connection failure: request header timeout",
+       "count": 15
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+       "count": 179
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, broken pipe)",
+       "count": 114
+      },
+      {
+       "line": "connection failure: the promise linked to the Async was dropped",
+       "count": 1
+      },
+      {
+       "line": "connection failure: cannot call write after a stream was destroyed (error code: N)",
+       "count": 64
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "requestsPerSecond": 505.1,
+       "latencyMs": {
+        "count": 15157,
+        "p50": 25.792,
+        "p95": 74.624,
+        "p99": 104.507,
+        "max": 160.775
+       },
+       "errors": 0,
+       "requests": 15157,
+       "connectionsOpened": 16,
+       "cpu": {
+        "serverCores": 1.58,
+        "driverCores": 0.12,
+        "serverRssMiB": 479,
+        "threads": null
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      },
+      {
+       "connections": 64,
+       "requestsPerSecond": 443.5,
+       "latencyMs": {
+        "count": 13343,
+        "p50": 114.833,
+        "p95": 315.752,
+        "p99": 489.79,
+        "max": 971.134
+       },
+       "errors": 0,
+       "requests": 13343,
+       "connectionsOpened": 64,
+       "cpu": {
+        "serverCores": 1.81,
+        "driverCores": 0.14,
+        "serverRssMiB": 654,
+        "threads": null
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      }
+     ],
+     "soak": {
+      "requests": 411395,
+      "errors": 0,
+      "faultsSent": 445,
+      "checks": {
+       "errors": true,
+       "samples": true,
+       "slope": true,
+       "final": true,
+       "handles": true,
+       "wasm": true,
+       "alive": true
+      },
+      "growth": {
+       "windowSeconds": 676,
+       "windowRequests": 309110,
+       "slopeBytesPerRequest": -499.1,
+       "finalMinusBaselineBytesPerRequest": -508.8,
+       "wasmBytesPerRequest": 0
+      },
+      "requestsPerSecond": 457.1,
+      "latencyMs": {
+       "count": 411395,
+       "p50": 12.951,
+       "p95": 47.019,
+       "p99": 74.564,
+       "max": 225.143
+      },
+      "memory": {
+       "warmupSeconds": 225,
+       "samples": 180,
+       "warmSamples": 135,
+       "startMiB": 1121.63,
+       "peakMiB": 1157.05,
+       "warmBaselineMiB": 1148.98,
+       "finalMiB": 998.98,
+       "slopeMiBPerMinute": -13.054,
+       "handles": {
+        "base": 170,
+        "final": 170,
+        "peak": 172
+       },
+       "threads": {
+        "final": null
+       },
+       "wasm": {
+        "samples": 502,
+        "warmBaselineMiB": 1828.25,
+        "finalMiB": 1828.25,
+        "peakMiB": 1828.25,
+        "heapUsedSlopeMiBPerMinute": -0.191,
+        "finalHeapUsedMiB": 28.79,
+        "finalExternalMiB": 5.83
+       }
+      }
+     },
+     "faults": [
+      {
+       "name": "handler-exception",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "GET /throw",
+         "outcomes": {
+          "500/server-close+close-header": 50
+         }
+        },
+        {
+         "name": "pipelined /throw then /health",
+         "outcomes": {
+          "500/server-close+close-header": 10,
+          "statuses 500": 10
+         }
+        },
+        {
+         "name": "JSON body over the handler readAll limit (64 KiB)",
+         "outcomes": {
+          "500/server-close+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "malformed",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "garbage request line",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "header without colon",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "unsupported HTTP version",
+         "outcomes": {
+          "505/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "missing Host",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "invalid chunk size",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "Content-Length with Transfer-Encoding",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "binary garbage with NUL",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "oversized",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "Content-Length 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/error-EPIPE+close-header": 5
+         }
+        },
+        {
+         "name": "chunked 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/error-EPIPE+close-header": 4,
+          "413/server-reset+close-header": 1
+         }
+        },
+        {
+         "name": "headers 20 KiB > maxHeaderBytes",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "60 headers > maxHeaders",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "header value 9000 B > maxHeaderValueLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "URI 9000 B > maxUriLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "slow-client",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "slow-loris: one header byte every 250 ms",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial headers then silence",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial body then silence",
+         "outcomes": {
+          "408/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "client-disconnect",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "half request line then FIN",
+         "outcomes": {
+          "400/server-close+close-header": 30
+         }
+        },
+        {
+         "name": "partial body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "incomplete chunked body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "mid-response (1 MiB, after 64 KiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "mid-stream (/stream/400, after 3 chunks)",
+         "outcomes": {
+          "200/client": 20
+         }
+        },
+        {
+         "name": "during slow handler",
+         "outcomes": {
+          "none/client-destroy": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "reset",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "RST mid-headers",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST after request, before response",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-upload",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-response (1 MiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "RST mid-stream",
+         "outcomes": {
+          "200/client": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "idle-connections",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "300 idle TCP connections",
+         "outcomes": {
+          "opened": 300,
+          "closedByServerWithin3000ms": 0,
+          "closedByServerWithin8000ms": 300,
+          "closedByServerWithin14000ms": 300
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "echo-live-race (informational)",
+       "alive": true,
+       "cases": [
+        {
+         "name": "respond before consuming the request body",
+         "outcomes": {
+          "fullEcho": 0,
+          "shortOrEmpty": 100
+         }
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "run": "39302965569",
+   "artifact": "server-robustness-darwin-x64-transport",
+   "platform": "darwin-x64",
+   "passed": true,
+   "engineVersion": "v26.12.0",
+   "cpus": 4,
+   "cpuModel": "Intel(R) Core(TM) i7-8700B CPU @ 3.20GHz",
+   "resources": {
+    "buildPeakMiB": 1365,
+    "runPeakMiB": 1369
+   },
+   "config": {
+    "loadSeconds": 30,
+    "loadWarmupSeconds": 3,
+    "loadConnections": [
+     16,
+     64
+    ],
+    "soakSeconds": 900,
+    "soakConnections": 8,
+    "soakFaultEveryMs": 2000,
+    "sampleMs": 5000,
+    "faultScale": 1,
+    "maxServerRssBytes": 2147483648,
+    "maxServerCommitBytes": 5368709120,
+    "kinds": [
+     "native",
+     "lasm"
+    ],
+    "variant": "transport",
+    "requestTimeoutMs": 30000,
+    "phases": [
+     "load",
+     "faults",
+     "soak"
+    ],
+    "server": {
+     "maxBodySize": 1048576,
+     "maxHeaderBytes": 16384,
+     "maxHeaders": 50,
+     "headerTimeoutMs": 2000,
+     "lingeringTimeoutMs": 3000,
+     "keepAliveTimeoutMs": 5000,
+     "maxConnections": 512,
+     "maxUriLength": 8192
+    }
+   },
+   "build": {
+    "lean": "4.35.0",
+    "linkDriver": "node",
+    "sourceSha256": "003b1062c6618477295643bec3895f68884ff579531b6748bb3244c044d235c5",
+    "wasmBytes": 2986518,
+    "nativeBytes": 111099472,
+    "lasmBuildSeconds": 404.347,
+    "nativeBuildSeconds": 59.582
+   },
+   "comparison": {
+    "faultDifferences": [
+     {
+      "fault": "handler-exception",
+      "case": "JSON body over the handler readAll limit (64 KiB)",
+      "native": {
+       "500/server-reset+close-header": 10
+      },
+      "lasm": {
+       "500/server-close+close-header": 10
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     },
+     {
+      "fault": "oversized",
+      "case": "Content-Length 2 MiB > maxBodySize",
+      "native": {
+       "413/error-EPIPE+close-header": 5
+      },
+      "lasm": {
+       "413/error-EPIPE+close-header": 4,
+       "none/server-reset": 1
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     },
+     {
+      "fault": "oversized",
+      "case": "URI 9000 B > maxUriLength",
+      "native": {
+       "400/server-reset+close-header": 10
+      },
+      "lasm": {
+       "400/server-close+close-header": 10
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     }
+    ],
+    "load": [
+     {
+      "connections": 16,
+      "nativeRps": 589.5,
+      "lasmRps": 160.5,
+      "lasmToNativeThroughput": 0.272,
+      "nativeP99": 72.558,
+      "lasmP99": 331.272
+     },
+     {
+      "connections": 64,
+      "nativeRps": 581.8,
+      "lasmRps": 180.5,
+      "lasmToNativeThroughput": 0.31,
+      "nativeP99": 244.337,
+      "lasmP99": 987.406
+     }
+    ],
+    "startupSeconds": {
+     "native": 0.103,
+     "lasm": 1.764
+    }
+   },
+   "recordedAt": "2026-10-19T19:16:38.625Z",
+   "results": {
+    "native": {
+     "checks": {
+      "preflight": true,
+      "load": true,
+      "faults": true,
+      "soak": true,
+      "final": true,
+      "shutdown": true,
+      "memoryCap": true,
+      "noRestarts": true
+     },
+     "startupSeconds": 0.103,
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "at": 1792436368757
+     },
+     "stderrLines": 1050,
+     "memoryCaps": [],
+     "restarts": [],
+     "peakRssMiB": 170,
+     "stderr": [
+      {
+       "line": "connection failure: robustness fixture: deliberate handler exception",
+       "count": 134
+      },
+      {
+       "line": "connection failure: body exceeded maximum size of N bytes",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Connection closed",
+       "count": 188
+      },
+      {
+       "line": "connection failure: Bad message",
+       "count": 213
+      },
+      {
+       "line": "connection failure: Unsupported version",
+       "count": 20
+      },
+      {
+       "line": "connection failure: Entity too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Headers too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Too many headers",
+       "count": 83
+      },
+      {
+       "line": "connection failure: request header timeout",
+       "count": 15
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+       "count": 273
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, broken pipe)",
+       "count": 94
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "requestsPerSecond": 589.5,
+       "latencyMs": {
+        "count": 17690,
+        "p50": 23.113,
+        "p95": 49.591,
+        "p99": 72.558,
+        "max": 147.368
+       },
+       "errors": 0,
+       "requests": 17690,
+       "connectionsOpened": 16,
+       "cpu": {
+        "serverCores": 2.37,
+        "driverCores": 0.35,
+        "serverRssMiB": 43,
+        "threads": null
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      },
+      {
+       "connections": 64,
+       "requestsPerSecond": 581.8,
+       "latencyMs": {
+        "count": 17473,
+        "p50": 101.833,
+        "p95": 183.32,
+        "p99": 244.337,
+        "max": 450.065
+       },
+       "errors": 0,
+       "requests": 17473,
+       "connectionsOpened": 64,
+       "cpu": {
+        "serverCores": 2.45,
+        "driverCores": 0.3,
+        "serverRssMiB": 68,
+        "threads": null
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      }
+     ],
+     "soak": {
+      "requests": 485679,
+      "errors": 0,
+      "faultsSent": 439,
+      "checks": {
+       "errors": true,
+       "samples": true,
+       "slope": true,
+       "final": true,
+       "handles": true,
+       "wasm": true,
+       "alive": true
+      },
+      "growth": {
+       "windowSeconds": 674,
+       "windowRequests": 363884,
+       "slopeBytesPerRequest": 142.1,
+       "finalMinusBaselineBytesPerRequest": 137.1,
+       "wasmBytesPerRequest": null
+      },
+      "requestsPerSecond": 539.7,
+      "latencyMs": {
+       "count": 485679,
+       "p50": 11.796,
+       "p95": 34.214,
+       "p99": 50.564,
+       "max": 268.399
+      },
+      "memory": {
+       "warmupSeconds": 225,
+       "samples": 175,
+       "warmSamples": 131,
+       "startMiB": 83.55,
+       "peakMiB": 170.11,
+       "warmBaselineMiB": 122.46,
+       "finalMiB": 170.05,
+       "slopeMiBPerMinute": 4.389,
+       "handles": {
+        "base": 19,
+        "final": 19,
+        "peak": 20
+       },
+       "threads": {
+        "final": null
+       }
+      }
+     },
+     "faults": [
+      {
+       "name": "handler-exception",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "GET /throw",
+         "outcomes": {
+          "500/server-close+close-header": 50
+         }
+        },
+        {
+         "name": "pipelined /throw then /health",
+         "outcomes": {
+          "500/server-close+close-header": 10,
+          "statuses 500": 10
+         }
+        },
+        {
+         "name": "JSON body over the handler readAll limit (64 KiB)",
+         "outcomes": {
+          "500/server-reset+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "malformed",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "garbage request line",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "header without colon",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "unsupported HTTP version",
+         "outcomes": {
+          "505/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "missing Host",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "invalid chunk size",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "Content-Length with Transfer-Encoding",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "binary garbage with NUL",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "oversized",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "Content-Length 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/error-EPIPE+close-header": 5
+         }
+        },
+        {
+         "name": "chunked 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/error-EPIPE+close-header": 5
+         }
+        },
+        {
+         "name": "headers 20 KiB > maxHeaderBytes",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "60 headers > maxHeaders",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "header value 9000 B > maxHeaderValueLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "URI 9000 B > maxUriLength",
+         "outcomes": {
+          "400/server-reset+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "slow-client",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "slow-loris: one header byte every 250 ms",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial headers then silence",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial body then silence",
+         "outcomes": {
+          "408/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "client-disconnect",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "half request line then FIN",
+         "outcomes": {
+          "400/server-close+close-header": 30
+         }
+        },
+        {
+         "name": "partial body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "incomplete chunked body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "mid-response (1 MiB, after 64 KiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "mid-stream (/stream/400, after 3 chunks)",
+         "outcomes": {
+          "200/client": 20
+         }
+        },
+        {
+         "name": "during slow handler",
+         "outcomes": {
+          "none/client-destroy": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "reset",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "RST mid-headers",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST after request, before response",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-upload",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-response (1 MiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "RST mid-stream",
+         "outcomes": {
+          "200/client": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "idle-connections",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "300 idle TCP connections",
+         "outcomes": {
+          "opened": 300,
+          "closedByServerWithin3000ms": 0,
+          "closedByServerWithin8000ms": 300,
+          "closedByServerWithin14000ms": 300
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "echo-live-race (informational)",
+       "alive": true,
+       "cases": [
+        {
+         "name": "respond before consuming the request body",
+         "outcomes": {
+          "fullEcho": 0,
+          "shortOrEmpty": 100
+         }
+        }
+       ]
+      }
+     ]
+    },
+    "lasm": {
+     "checks": {
+      "preflight": true,
+      "load": true,
+      "faults": true,
+      "soak": true,
+      "final": true,
+      "shutdown": true,
+      "memoryCap": true,
+      "noRestarts": true
+     },
+     "startupSeconds": 1.764,
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "at": 1792437398518
+     },
+     "stderrLines": 1042,
+     "memoryCaps": [],
+     "restarts": [],
+     "peakRssMiB": 1208,
+     "stderr": [
+      {
+       "line": "connection failure: robustness fixture: deliberate handler exception",
+       "count": 134
+      },
+      {
+       "line": "connection failure: body exceeded maximum size of N bytes",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Connection closed",
+       "count": 189
+      },
+      {
+       "line": "connection failure: Bad message",
+       "count": 214
+      },
+      {
+       "line": "connection failure: Unsupported version",
+       "count": 20
+      },
+      {
+       "line": "connection failure: Entity too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Headers too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Too many headers",
+       "count": 83
+      },
+      {
+       "line": "connection failure: request header timeout",
+       "count": 15
+      },
+      {
+       "line": "connection failure: the promise linked to the Async was dropped",
+       "count": 6
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, broken pipe)",
+       "count": 121
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+       "count": 191
+      },
+      {
+       "line": "connection failure: cannot call write after a stream was destroyed (error code: N)",
+       "count": 39
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "requestsPerSecond": 160.5,
+       "latencyMs": {
+        "count": 4824,
+        "p50": 78.981,
+        "p95": 213.21,
+        "p99": 331.272,
+        "max": 689.89
+       },
+       "errors": 0,
+       "requests": 4824,
+       "connectionsOpened": 16,
+       "cpu": {
+        "serverCores": 2.16,
+        "driverCores": 0.18,
+        "serverRssMiB": 395,
+        "threads": null
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      },
+      {
+       "connections": 64,
+       "requestsPerSecond": 180.5,
+       "latencyMs": {
+        "count": 5471,
+        "p50": 290.756,
+        "p95": 738.604,
+        "p99": 987.406,
+        "max": 1483.765
+       },
+       "errors": 0,
+       "requests": 5471,
+       "connectionsOpened": 64,
+       "cpu": {
+        "serverCores": 2.32,
+        "driverCores": 0.14,
+        "serverRssMiB": 505,
+        "threads": null
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      }
+     ],
+     "soak": {
+      "requests": 132339,
+      "errors": 0,
+      "faultsSent": 442,
+      "checks": {
+       "errors": true,
+       "samples": true,
+       "slope": true,
+       "final": true,
+       "handles": true,
+       "wasm": true,
+       "alive": true
+      },
+      "growth": {
+       "windowSeconds": 679,
+       "windowRequests": 99818,
+       "slopeBytesPerRequest": 189.3,
+       "finalMinusBaselineBytesPerRequest": 198.9,
+       "wasmBytesPerRequest": 0
+      },
+      "requestsPerSecond": 147,
+      "latencyMs": {
+       "count": 132339,
+       "p50": 46.091,
+       "p95": 112.488,
+       "p99": 150.362,
+       "max": 463.724
+      },
+      "memory": {
+       "warmupSeconds": 225,
+       "samples": 178,
+       "warmSamples": 134,
+       "startMiB": 1179.84,
+       "peakMiB": 1205.23,
+       "warmBaselineMiB": 1182.71,
+       "finalMiB": 1201.64,
+       "slopeMiBPerMinute": 1.592,
+       "handles": {
+        "base": 169,
+        "final": 169,
+        "peak": 172
+       },
+       "threads": {
+        "final": null
+       },
+       "wasm": {
+        "samples": 514,
+        "warmBaselineMiB": 1828.25,
+        "finalMiB": 1828.25,
+        "peakMiB": 1828.25,
+        "heapUsedSlopeMiBPerMinute": -0.036,
+        "finalHeapUsedMiB": 19.41,
+        "finalExternalMiB": 4.69
+       }
+      }
+     },
+     "faults": [
+      {
+       "name": "handler-exception",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "GET /throw",
+         "outcomes": {
+          "500/server-close+close-header": 50
+         }
+        },
+        {
+         "name": "pipelined /throw then /health",
+         "outcomes": {
+          "500/server-close+close-header": 10,
+          "statuses 500": 10
+         }
+        },
+        {
+         "name": "JSON body over the handler readAll limit (64 KiB)",
+         "outcomes": {
+          "500/server-close+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "malformed",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "garbage request line",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "header without colon",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "unsupported HTTP version",
+         "outcomes": {
+          "505/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "missing Host",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "invalid chunk size",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "Content-Length with Transfer-Encoding",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "binary garbage with NUL",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "oversized",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "Content-Length 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/error-EPIPE+close-header": 4,
+          "none/server-reset": 1
+         }
+        },
+        {
+         "name": "chunked 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/error-EPIPE+close-header": 5
+         }
+        },
+        {
+         "name": "headers 20 KiB > maxHeaderBytes",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "60 headers > maxHeaders",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "header value 9000 B > maxHeaderValueLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "URI 9000 B > maxUriLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "slow-client",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "slow-loris: one header byte every 250 ms",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial headers then silence",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial body then silence",
+         "outcomes": {
+          "408/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "client-disconnect",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "half request line then FIN",
+         "outcomes": {
+          "400/server-close+close-header": 30
+         }
+        },
+        {
+         "name": "partial body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "incomplete chunked body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "mid-response (1 MiB, after 64 KiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "mid-stream (/stream/400, after 3 chunks)",
+         "outcomes": {
+          "200/client": 20
+         }
+        },
+        {
+         "name": "during slow handler",
+         "outcomes": {
+          "none/client-destroy": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "reset",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "RST mid-headers",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST after request, before response",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-upload",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-response (1 MiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "RST mid-stream",
+         "outcomes": {
+          "200/client": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "idle-connections",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "300 idle TCP connections",
+         "outcomes": {
+          "opened": 300,
+          "closedByServerWithin3000ms": 0,
+          "closedByServerWithin8000ms": 300,
+          "closedByServerWithin14000ms": 300
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "echo-live-race (informational)",
+       "alive": true,
+       "cases": [
+        {
+         "name": "respond before consuming the request body",
+         "outcomes": {
+          "fullEcho": 0,
+          "shortOrEmpty": 100
+         }
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "run": "39302965569",
+   "artifact": "server-robustness-linux-arm64-transport",
+   "platform": "linux-arm64",
+   "passed": true,
+   "engineVersion": "v26.12.0",
+   "cpus": 4,
+   "cpuModel": "unknown",
+   "resources": {
+    "buildPeakMiB": 3748,
+    "runPeakMiB": 1199
+   },
+   "config": {
+    "loadSeconds": 30,
+    "loadWarmupSeconds": 3,
+    "loadConnections": [
+     16,
+     64
+    ],
+    "soakSeconds": 900,
+    "soakConnections": 8,
+    "soakFaultEveryMs": 2000,
+    "sampleMs": 5000,
+    "faultScale": 1,
+    "maxServerRssBytes": 2147483648,
+    "maxServerCommitBytes": 5368709120,
+    "kinds": [
+     "native",
+     "lasm"
+    ],
+    "variant": "transport",
+    "requestTimeoutMs": 30000,
+    "phases": [
+     "load",
+     "faults",
+     "soak"
+    ],
+    "server": {
+     "maxBodySize": 1048576,
+     "maxHeaderBytes": 16384,
+     "maxHeaders": 50,
+     "headerTimeoutMs": 2000,
+     "lingeringTimeoutMs": 3000,
+     "keepAliveTimeoutMs": 5000,
+     "maxConnections": 512,
+     "maxUriLength": 8192
+    }
+   },
+   "build": {
+    "lean": "4.35.0",
+    "linkDriver": "node",
+    "sourceSha256": "003b1062c6618477295643bec3895f68884ff579531b6748bb3244c044d235c5",
+    "wasmBytes": 2986518,
+    "nativeBytes": 132372984,
+    "lasmBuildSeconds": 97.08,
+    "nativeBuildSeconds": 11.692
+   },
+   "comparison": {
+    "faultDifferences": [
+     {
+      "fault": "handler-exception",
+      "case": "JSON body over the handler readAll limit (64 KiB)",
+      "native": {
+       "500/server-reset+close-header": 10
+      },
+      "lasm": {
+       "500/server-close+close-header": 10
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     },
+     {
+      "fault": "oversized",
+      "case": "URI 9000 B > maxUriLength",
+      "native": {
+       "400/server-reset+close-header": 10
+      },
+      "lasm": {
+       "400/server-close+close-header": 10
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     }
+    ],
+    "load": [
+     {
+      "connections": 16,
+      "nativeRps": 1151.4,
+      "lasmRps": 605.8,
+      "lasmToNativeThroughput": 0.526,
+      "nativeP99": 40.515,
+      "lasmP99": 64.254
+     },
+     {
+      "connections": 64,
+      "nativeRps": 933.1,
+      "lasmRps": 537.3,
+      "lasmToNativeThroughput": 0.576,
+      "nativeP99": 165.696,
+      "lasmP99": 289.642
+     }
+    ],
+    "startupSeconds": {
+     "native": 0.035,
+     "lasm": 0.262
+    }
+   },
+   "recordedAt": "2026-10-19T19:06:53.033Z",
+   "results": {
+    "native": {
+     "checks": {
+      "preflight": true,
+      "load": true,
+      "faults": true,
+      "soak": true,
+      "final": true,
+      "shutdown": true,
+      "memoryCap": true,
+      "noRestarts": true
+     },
+     "startupSeconds": 0.035,
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "at": 1792435812723
+     },
+     "stderrLines": 1037,
+     "memoryCaps": [],
+     "restarts": [],
+     "peakRssMiB": 573,
+     "stderr": [
+      {
+       "line": "connection failure: robustness fixture: deliberate handler exception",
+       "count": 135
+      },
+      {
+       "line": "connection failure: body exceeded maximum size of N bytes",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Connection closed",
+       "count": 190
+      },
+      {
+       "line": "connection failure: Bad message",
+       "count": 215
+      },
+      {
+       "line": "connection failure: Unsupported version",
+       "count": 20
+      },
+      {
+       "line": "connection failure: Entity too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Headers too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Too many headers",
+       "count": 84
+      },
+      {
+       "line": "connection failure: request header timeout",
+       "count": 15
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+       "count": 234
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, broken pipe)",
+       "count": 114
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "requestsPerSecond": 1151.4,
+       "latencyMs": {
+        "count": 34571,
+        "p50": 11.571,
+        "p95": 34.305,
+        "p99": 40.515,
+        "max": 47.861
+       },
+       "errors": 0,
+       "requests": 34571,
+       "connectionsOpened": 16,
+       "cpu": {
+        "serverCores": 2.06,
+        "driverCores": 0.26,
+        "serverRssMiB": 113,
+        "threads": 21
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      },
+      {
+       "connections": 64,
+       "requestsPerSecond": 933.1,
+       "latencyMs": {
+        "count": 28046,
+        "p50": 55.103,
+        "p95": 147.867,
+        "p99": 165.696,
+        "max": 212.398
+       },
+       "errors": 0,
+       "requests": 28046,
+       "connectionsOpened": 64,
+       "cpu": {
+        "serverCores": 2.16,
+        "driverCores": 0.21,
+        "serverRssMiB": 118,
+        "threads": 23
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      }
+     ],
+     "soak": {
+      "requests": 1220019,
+      "errors": 0,
+      "faultsSent": 447,
+      "checks": {
+       "errors": true,
+       "samples": true,
+       "slope": true,
+       "final": true,
+       "handles": true,
+       "wasm": true,
+       "alive": true
+      },
+      "growth": {
+       "windowSeconds": 680,
+       "windowRequests": 921755,
+       "slopeBytesPerRequest": 73.4,
+       "finalMinusBaselineBytesPerRequest": 59.6,
+       "wasmBytesPerRequest": null
+      },
+      "requestsPerSecond": 1355.5,
+      "latencyMs": {
+       "count": 1220019,
+       "p50": 4.117,
+       "p95": 25.993,
+       "p99": 29.393,
+       "max": 36.764
+      },
+      "memory": {
+       "warmupSeconds": 225,
+       "samples": 182,
+       "warmSamples": 137,
+       "startMiB": 550.59,
+       "peakMiB": 560.91,
+       "warmBaselineMiB": 232.9,
+       "finalMiB": 285.28,
+       "slopeMiBPerMinute": 5.69,
+       "handles": {
+        "base": 21,
+        "final": 21,
+        "peak": 23
+       },
+       "threads": {
+        "final": 68
+       }
+      }
+     },
+     "faults": [
+      {
+       "name": "handler-exception",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "GET /throw",
+         "outcomes": {
+          "500/server-close+close-header": 50
+         }
+        },
+        {
+         "name": "pipelined /throw then /health",
+         "outcomes": {
+          "500/server-close+close-header": 10,
+          "statuses 500": 10
+         }
+        },
+        {
+         "name": "JSON body over the handler readAll limit (64 KiB)",
+         "outcomes": {
+          "500/server-reset+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "malformed",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "garbage request line",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "header without colon",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "unsupported HTTP version",
+         "outcomes": {
+          "505/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "missing Host",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "invalid chunk size",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "Content-Length with Transfer-Encoding",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "binary garbage with NUL",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "oversized",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "Content-Length 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "chunked 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "headers 20 KiB > maxHeaderBytes",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "60 headers > maxHeaders",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "header value 9000 B > maxHeaderValueLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "URI 9000 B > maxUriLength",
+         "outcomes": {
+          "400/server-reset+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "slow-client",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "slow-loris: one header byte every 250 ms",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial headers then silence",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial body then silence",
+         "outcomes": {
+          "408/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "client-disconnect",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "half request line then FIN",
+         "outcomes": {
+          "400/server-close+close-header": 30
+         }
+        },
+        {
+         "name": "partial body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "incomplete chunked body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "mid-response (1 MiB, after 64 KiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "mid-stream (/stream/400, after 3 chunks)",
+         "outcomes": {
+          "200/client": 20
+         }
+        },
+        {
+         "name": "during slow handler",
+         "outcomes": {
+          "none/client-destroy": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "reset",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "RST mid-headers",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST after request, before response",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-upload",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-response (1 MiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "RST mid-stream",
+         "outcomes": {
+          "200/client": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "idle-connections",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "300 idle TCP connections",
+         "outcomes": {
+          "opened": 300,
+          "closedByServerWithin3000ms": 0,
+          "closedByServerWithin8000ms": 300,
+          "closedByServerWithin14000ms": 300
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "echo-live-race (informational)",
+       "alive": true,
+       "cases": [
+        {
+         "name": "respond before consuming the request body",
+         "outcomes": {
+          "fullEcho": 0,
+          "shortOrEmpty": 100
+         }
+        }
+       ]
+      }
+     ]
+    },
+    "lasm": {
+     "checks": {
+      "preflight": true,
+      "load": true,
+      "faults": true,
+      "soak": true,
+      "final": true,
+      "shutdown": true,
+      "memoryCap": true,
+      "noRestarts": true
+     },
+     "startupSeconds": 0.262,
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "at": 1792436812972
+     },
+     "stderrLines": 1035,
+     "memoryCaps": [],
+     "restarts": [],
+     "peakRssMiB": 1098,
+     "stderr": [
+      {
+       "line": "connection failure: robustness fixture: deliberate handler exception",
+       "count": 135
+      },
+      {
+       "line": "connection failure: body exceeded maximum size of N bytes",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Connection closed",
+       "count": 189
+      },
+      {
+       "line": "connection failure: Bad message",
+       "count": 215
+      },
+      {
+       "line": "connection failure: Unsupported version",
+       "count": 20
+      },
+      {
+       "line": "connection failure: Entity too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Headers too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Too many headers",
+       "count": 84
+      },
+      {
+       "line": "connection failure: request header timeout",
+       "count": 15
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+       "count": 134
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, broken pipe)",
+       "count": 118
+      },
+      {
+       "line": "connection failure: cannot call write after a stream was destroyed (error code: N)",
+       "count": 95
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "requestsPerSecond": 605.8,
+       "latencyMs": {
+        "count": 18185,
+        "p50": 22.913,
+        "p95": 59.266,
+        "p99": 64.254,
+        "max": 84.396
+       },
+       "errors": 0,
+       "requests": 18185,
+       "connectionsOpened": 16,
+       "cpu": {
+        "serverCores": 2.57,
+        "driverCores": 0.15,
+        "serverRssMiB": 386,
+        "threads": 26
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      },
+      {
+       "connections": 64,
+       "requestsPerSecond": 537.3,
+       "latencyMs": {
+        "count": 16164,
+        "p50": 94.205,
+        "p95": 249.709,
+        "p99": 289.642,
+        "max": 357.57
+       },
+       "errors": 0,
+       "requests": 16164,
+       "connectionsOpened": 64,
+       "cpu": {
+        "serverCores": 2.65,
+        "driverCores": 0.14,
+        "serverRssMiB": 495,
+        "threads": 35
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      }
+     ],
+     "soak": {
+      "requests": 523842,
+      "errors": 0,
+      "faultsSent": 446,
+      "checks": {
+       "errors": true,
+       "samples": true,
+       "slope": true,
+       "final": true,
+       "handles": true,
+       "wasm": true,
+       "alive": true
+      },
+      "growth": {
+       "windowSeconds": 676,
+       "windowRequests": 393562,
+       "slopeBytesPerRequest": 3.9,
+       "finalMinusBaselineBytesPerRequest": 10.2,
+       "wasmBytesPerRequest": 0
+      },
+      "requestsPerSecond": 582,
+      "latencyMs": {
+       "count": 523842,
+       "p50": 11.32,
+       "p95": 34.672,
+       "p99": 40.241,
+       "max": 52.015
+      },
+      "memory": {
+       "warmupSeconds": 225,
+       "samples": 181,
+       "warmSamples": 136,
+       "startMiB": 1056.84,
+       "peakMiB": 1098.46,
+       "warmBaselineMiB": 1086.07,
+       "finalMiB": 1089.89,
+       "slopeMiBPerMinute": 0.13,
+       "handles": {
+        "base": 383,
+        "final": 383,
+        "peak": 386
+       },
+       "threads": {
+        "final": 81
+       },
+       "wasm": {
+        "samples": 500,
+        "warmBaselineMiB": 1828.25,
+        "finalMiB": 1828.25,
+        "peakMiB": 1828.25,
+        "heapUsedSlopeMiBPerMinute": -0.161,
+        "finalHeapUsedMiB": 22.96,
+        "finalExternalMiB": 5.24
+       }
+      }
+     },
+     "faults": [
+      {
+       "name": "handler-exception",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "GET /throw",
+         "outcomes": {
+          "500/server-close+close-header": 50
+         }
+        },
+        {
+         "name": "pipelined /throw then /health",
+         "outcomes": {
+          "500/server-close+close-header": 10,
+          "statuses 500": 10
+         }
+        },
+        {
+         "name": "JSON body over the handler readAll limit (64 KiB)",
+         "outcomes": {
+          "500/server-close+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "malformed",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "garbage request line",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "header without colon",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "unsupported HTTP version",
+         "outcomes": {
+          "505/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "missing Host",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "invalid chunk size",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "Content-Length with Transfer-Encoding",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "binary garbage with NUL",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "oversized",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "Content-Length 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "chunked 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "headers 20 KiB > maxHeaderBytes",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "60 headers > maxHeaders",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "header value 9000 B > maxHeaderValueLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "URI 9000 B > maxUriLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "slow-client",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "slow-loris: one header byte every 250 ms",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial headers then silence",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial body then silence",
+         "outcomes": {
+          "408/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "client-disconnect",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "half request line then FIN",
+         "outcomes": {
+          "400/server-close+close-header": 30
+         }
+        },
+        {
+         "name": "partial body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "incomplete chunked body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "mid-response (1 MiB, after 64 KiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "mid-stream (/stream/400, after 3 chunks)",
+         "outcomes": {
+          "200/client": 20
+         }
+        },
+        {
+         "name": "during slow handler",
+         "outcomes": {
+          "none/client-destroy": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "reset",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "RST mid-headers",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST after request, before response",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-upload",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-response (1 MiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "RST mid-stream",
+         "outcomes": {
+          "200/client": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "idle-connections",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "300 idle TCP connections",
+         "outcomes": {
+          "opened": 300,
+          "closedByServerWithin3000ms": 0,
+          "closedByServerWithin8000ms": 300,
+          "closedByServerWithin14000ms": 300
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "echo-live-race (informational)",
+       "alive": true,
+       "cases": [
+        {
+         "name": "respond before consuming the request body",
+         "outcomes": {
+          "fullEcho": 0,
+          "shortOrEmpty": 100
+         }
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "run": "39302965569",
+   "artifact": "server-robustness-linux-x64-transport",
+   "platform": "linux-x64",
+   "passed": true,
+   "engineVersion": "v26.12.0",
+   "cpus": 4,
+   "cpuModel": "AMD EPYC 7763 64-Core Processor",
+   "resources": {
+    "buildPeakMiB": 3728,
+    "runPeakMiB": 1177
+   },
+   "config": {
+    "loadSeconds": 30,
+    "loadWarmupSeconds": 3,
+    "loadConnections": [
+     16,
+     64
+    ],
+    "soakSeconds": 900,
+    "soakConnections": 8,
+    "soakFaultEveryMs": 2000,
+    "sampleMs": 5000,
+    "faultScale": 1,
+    "maxServerRssBytes": 2147483648,
+    "maxServerCommitBytes": 5368709120,
+    "kinds": [
+     "native",
+     "lasm"
+    ],
+    "variant": "transport",
+    "requestTimeoutMs": 30000,
+    "phases": [
+     "load",
+     "faults",
+     "soak"
+    ],
+    "server": {
+     "maxBodySize": 1048576,
+     "maxHeaderBytes": 16384,
+     "maxHeaders": 50,
+     "headerTimeoutMs": 2000,
+     "lingeringTimeoutMs": 3000,
+     "keepAliveTimeoutMs": 5000,
+     "maxConnections": 512,
+     "maxUriLength": 8192
+    }
+   },
+   "build": {
+    "lean": "4.35.0",
+    "linkDriver": "node",
+    "sourceSha256": "003b1062c6618477295643bec3895f68884ff579531b6748bb3244c044d235c5",
+    "wasmBytes": 2986518,
+    "nativeBytes": 120462312,
+    "lasmBuildSeconds": 99.292,
+    "nativeBuildSeconds": 13.42
+   },
+   "comparison": {
+    "faultDifferences": [
+     {
+      "fault": "handler-exception",
+      "case": "JSON body over the handler readAll limit (64 KiB)",
+      "native": {
+       "500/server-reset+close-header": 10
+      },
+      "lasm": {
+       "500/server-close+close-header": 10
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     },
+     {
+      "fault": "oversized",
+      "case": "URI 9000 B > maxUriLength",
+      "native": {
+       "400/server-reset+close-header": 10
+      },
+      "lasm": {
+       "400/server-close+close-header": 10
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     }
+    ],
+    "load": [
+     {
+      "connections": 16,
+      "nativeRps": 810.8,
+      "lasmRps": 650.2,
+      "lasmToNativeThroughput": 0.802,
+      "nativeP99": 50.525,
+      "lasmP99": 60.64
+     },
+     {
+      "connections": 64,
+      "nativeRps": 648,
+      "lasmRps": 577.1,
+      "lasmToNativeThroughput": 0.891,
+      "nativeP99": 239.921,
+      "lasmP99": 268.046
+     }
+    ],
+    "startupSeconds": {
+     "native": 0.037,
+     "lasm": 0.327
+    }
+   },
+   "recordedAt": "2026-10-19T19:06:38.619Z",
+   "results": {
+    "native": {
+     "checks": {
+      "preflight": true,
+      "load": true,
+      "faults": true,
+      "soak": true,
+      "final": true,
+      "shutdown": true,
+      "memoryCap": true,
+      "noRestarts": true
+     },
+     "startupSeconds": 0.037,
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "at": 1792435798340
+     },
+     "stderrLines": 1038,
+     "memoryCaps": [],
+     "restarts": [],
+     "peakRssMiB": 587,
+     "stderr": [
+      {
+       "line": "connection failure: robustness fixture: deliberate handler exception",
+       "count": 135
+      },
+      {
+       "line": "connection failure: body exceeded maximum size of N bytes",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Connection closed",
+       "count": 189
+      },
+      {
+       "line": "connection failure: Bad message",
+       "count": 215
+      },
+      {
+       "line": "connection failure: Unsupported version",
+       "count": 20
+      },
+      {
+       "line": "connection failure: Entity too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Headers too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Too many headers",
+       "count": 84
+      },
+      {
+       "line": "connection failure: request header timeout",
+       "count": 15
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, broken pipe)",
+       "count": 125
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+       "count": 225
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "requestsPerSecond": 810.8,
+       "latencyMs": {
+        "count": 24353,
+        "p50": 16.836,
+        "p95": 46.048,
+        "p99": 50.525,
+        "max": 59.069
+       },
+       "errors": 0,
+       "requests": 24353,
+       "connectionsOpened": 16,
+       "cpu": {
+        "serverCores": 2.29,
+        "driverCores": 0.2,
+        "serverRssMiB": 105,
+        "threads": 21
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      },
+      {
+       "connections": 64,
+       "requestsPerSecond": 648,
+       "latencyMs": {
+        "count": 19477,
+        "p50": 78.562,
+        "p95": 209.536,
+        "p99": 239.921,
+        "max": 299.602
+       },
+       "errors": 0,
+       "requests": 19477,
+       "connectionsOpened": 64,
+       "cpu": {
+        "serverCores": 2.46,
+        "driverCores": 0.16,
+        "serverRssMiB": 145,
+        "threads": 36
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      }
+     ],
+     "soak": {
+      "requests": 796027,
+      "errors": 0,
+      "faultsSent": 446,
+      "checks": {
+       "errors": true,
+       "samples": true,
+       "slope": true,
+       "final": true,
+       "handles": true,
+       "wasm": true,
+       "alive": true
+      },
+      "growth": {
+       "windowSeconds": 675,
+       "windowRequests": 597359,
+       "slopeBytesPerRequest": 107.7,
+       "finalMinusBaselineBytesPerRequest": 87.6,
+       "wasmBytesPerRequest": null
+      },
+      "requestsPerSecond": 884.5,
+      "latencyMs": {
+       "count": 796027,
+       "p50": 7.008,
+       "p95": 28.047,
+       "p99": 33.283,
+       "max": 41.363
+      },
+      "memory": {
+       "warmupSeconds": 225,
+       "samples": 181,
+       "warmSamples": 136,
+       "startMiB": 584.72,
+       "peakMiB": 584.72,
+       "warmBaselineMiB": 219.43,
+       "finalMiB": 269.34,
+       "slopeMiBPerMinute": 5.452,
+       "handles": {
+        "base": 21,
+        "final": 21,
+        "peak": 22
+       },
+       "threads": {
+        "final": 67
+       }
+      }
+     },
+     "faults": [
+      {
+       "name": "handler-exception",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "GET /throw",
+         "outcomes": {
+          "500/server-close+close-header": 50
+         }
+        },
+        {
+         "name": "pipelined /throw then /health",
+         "outcomes": {
+          "500/server-close+close-header": 10,
+          "statuses 500": 10
+         }
+        },
+        {
+         "name": "JSON body over the handler readAll limit (64 KiB)",
+         "outcomes": {
+          "500/server-reset+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "malformed",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "garbage request line",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "header without colon",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "unsupported HTTP version",
+         "outcomes": {
+          "505/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "missing Host",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "invalid chunk size",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "Content-Length with Transfer-Encoding",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "binary garbage with NUL",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "oversized",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "Content-Length 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "chunked 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "headers 20 KiB > maxHeaderBytes",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "60 headers > maxHeaders",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "header value 9000 B > maxHeaderValueLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "URI 9000 B > maxUriLength",
+         "outcomes": {
+          "400/server-reset+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "slow-client",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "slow-loris: one header byte every 250 ms",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial headers then silence",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial body then silence",
+         "outcomes": {
+          "408/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "client-disconnect",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "half request line then FIN",
+         "outcomes": {
+          "400/server-close+close-header": 30
+         }
+        },
+        {
+         "name": "partial body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "incomplete chunked body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "mid-response (1 MiB, after 64 KiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "mid-stream (/stream/400, after 3 chunks)",
+         "outcomes": {
+          "200/client": 20
+         }
+        },
+        {
+         "name": "during slow handler",
+         "outcomes": {
+          "none/client-destroy": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "reset",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "RST mid-headers",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST after request, before response",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-upload",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-response (1 MiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "RST mid-stream",
+         "outcomes": {
+          "200/client": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "idle-connections",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "300 idle TCP connections",
+         "outcomes": {
+          "opened": 300,
+          "closedByServerWithin3000ms": 0,
+          "closedByServerWithin8000ms": 300,
+          "closedByServerWithin14000ms": 300
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "echo-live-race (informational)",
+       "alive": true,
+       "cases": [
+        {
+         "name": "respond before consuming the request body",
+         "outcomes": {
+          "fullEcho": 0,
+          "shortOrEmpty": 100
+         }
+        }
+       ]
+      }
+     ]
+    },
+    "lasm": {
+     "checks": {
+      "preflight": true,
+      "load": true,
+      "faults": true,
+      "soak": true,
+      "final": true,
+      "shutdown": true,
+      "memoryCap": true,
+      "noRestarts": true
+     },
+     "startupSeconds": 0.327,
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "at": 1792436798572
+     },
+     "stderrLines": 1044,
+     "memoryCaps": [],
+     "restarts": [],
+     "peakRssMiB": 1192,
+     "stderr": [
+      {
+       "line": "connection failure: robustness fixture: deliberate handler exception",
+       "count": 135
+      },
+      {
+       "line": "connection failure: body exceeded maximum size of N bytes",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Connection closed",
+       "count": 189
+      },
+      {
+       "line": "connection failure: Bad message",
+       "count": 215
+      },
+      {
+       "line": "connection failure: Unsupported version",
+       "count": 20
+      },
+      {
+       "line": "connection failure: Entity too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Headers too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Too many headers",
+       "count": 84
+      },
+      {
+       "line": "connection failure: request header timeout",
+       "count": 15
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, broken pipe)",
+       "count": 140
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+       "count": 117
+      },
+      {
+       "line": "connection failure: cannot call write after a stream was destroyed (error code: N)",
+       "count": 99
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "requestsPerSecond": 650.2,
+       "latencyMs": {
+        "count": 19516,
+        "p50": 21.389,
+        "p95": 55.789,
+        "p99": 60.64,
+        "max": 79.653
+       },
+       "errors": 0,
+       "requests": 19516,
+       "connectionsOpened": 16,
+       "cpu": {
+        "serverCores": 2.81,
+        "driverCores": 0.16,
+        "serverRssMiB": 448,
+        "threads": 27
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      },
+      {
+       "connections": 64,
+       "requestsPerSecond": 577.1,
+       "latencyMs": {
+        "count": 17356,
+        "p50": 87.991,
+        "p95": 232.861,
+        "p99": 268.046,
+        "max": 337.076
+       },
+       "errors": 0,
+       "requests": 17356,
+       "connectionsOpened": 64,
+       "cpu": {
+        "serverCores": 2.94,
+        "driverCores": 0.15,
+        "serverRssMiB": 568,
+        "threads": 37
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      }
+     ],
+     "soak": {
+      "requests": 564009,
+      "errors": 0,
+      "faultsSent": 446,
+      "checks": {
+       "errors": true,
+       "samples": true,
+       "slope": true,
+       "final": true,
+       "handles": true,
+       "wasm": true,
+       "alive": true
+      },
+      "growth": {
+       "windowSeconds": 676,
+       "windowRequests": 423728,
+       "slopeBytesPerRequest": 19.7,
+       "finalMinusBaselineBytesPerRequest": 17.6,
+       "wasmBytesPerRequest": 0
+      },
+      "requestsPerSecond": 626.7,
+      "latencyMs": {
+       "count": 564009,
+       "p50": 10.412,
+       "p95": 33.222,
+       "p99": 38.554,
+       "max": 52.746
+      },
+      "memory": {
+       "warmupSeconds": 225,
+       "samples": 181,
+       "warmSamples": 136,
+       "startMiB": 1139.47,
+       "peakMiB": 1191.66,
+       "warmBaselineMiB": 1184.34,
+       "finalMiB": 1191.46,
+       "slopeMiBPerMinute": 0.705,
+       "handles": {
+        "base": 353,
+        "final": 353,
+        "peak": 355
+       },
+       "threads": {
+        "final": 75
+       },
+       "wasm": {
+        "samples": 500,
+        "warmBaselineMiB": 1700.13,
+        "finalMiB": 1700.13,
+        "peakMiB": 1700.13,
+        "heapUsedSlopeMiBPerMinute": -0.002,
+        "finalHeapUsedMiB": 12.59,
+        "finalExternalMiB": 3.05
+       }
+      }
+     },
+     "faults": [
+      {
+       "name": "handler-exception",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "GET /throw",
+         "outcomes": {
+          "500/server-close+close-header": 50
+         }
+        },
+        {
+         "name": "pipelined /throw then /health",
+         "outcomes": {
+          "500/server-close+close-header": 10,
+          "statuses 500": 10
+         }
+        },
+        {
+         "name": "JSON body over the handler readAll limit (64 KiB)",
+         "outcomes": {
+          "500/server-close+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "malformed",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "garbage request line",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "header without colon",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "unsupported HTTP version",
+         "outcomes": {
+          "505/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "missing Host",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "invalid chunk size",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "Content-Length with Transfer-Encoding",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "binary garbage with NUL",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "oversized",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "Content-Length 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "chunked 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "headers 20 KiB > maxHeaderBytes",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "60 headers > maxHeaders",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "header value 9000 B > maxHeaderValueLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "URI 9000 B > maxUriLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "slow-client",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "slow-loris: one header byte every 250 ms",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial headers then silence",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial body then silence",
+         "outcomes": {
+          "408/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "client-disconnect",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "half request line then FIN",
+         "outcomes": {
+          "400/server-close+close-header": 30
+         }
+        },
+        {
+         "name": "partial body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "incomplete chunked body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "mid-response (1 MiB, after 64 KiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "mid-stream (/stream/400, after 3 chunks)",
+         "outcomes": {
+          "200/client": 20
+         }
+        },
+        {
+         "name": "during slow handler",
+         "outcomes": {
+          "none/client-destroy": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "reset",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "RST mid-headers",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST after request, before response",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-upload",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-response (1 MiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "RST mid-stream",
+         "outcomes": {
+          "200/client": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "idle-connections",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "300 idle TCP connections",
+         "outcomes": {
+          "opened": 300,
+          "closedByServerWithin3000ms": 0,
+          "closedByServerWithin8000ms": 300,
+          "closedByServerWithin14000ms": 300
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "echo-live-race (informational)",
+       "alive": true,
+       "cases": [
+        {
+         "name": "respond before consuming the request body",
+         "outcomes": {
+          "fullEcho": 0,
+          "shortOrEmpty": 100
+         }
+        }
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "run": "39302965569",
+   "artifact": "server-robustness-win32-x64-transport",
+   "platform": "win32-x64",
+   "passed": true,
+   "engineVersion": "v26.12.0",
+   "cpus": 4,
+   "cpuModel": "AMD EPYC 9V45 96-Core Processor                ",
+   "resources": {
+    "buildPeakMiB": 0,
+    "runPeakMiB": 0
+   },
+   "config": {
+    "loadSeconds": 30,
+    "loadWarmupSeconds": 3,
+    "loadConnections": [
+     16,
+     32
+    ],
+    "soakSeconds": 900,
+    "soakConnections": 8,
+    "soakFaultEveryMs": 2000,
+    "sampleMs": 5000,
+    "faultScale": 1,
+    "maxServerRssBytes": 2147483648,
+    "maxServerCommitBytes": 6442450944,
+    "kinds": [
+     "native",
+     "lasm"
+    ],
+    "variant": "transport",
+    "requestTimeoutMs": 30000,
+    "phases": [
+     "load",
+     "faults",
+     "soak"
+    ],
+    "server": {
+     "maxBodySize": 1048576,
+     "maxHeaderBytes": 16384,
+     "maxHeaders": 50,
+     "headerTimeoutMs": 2000,
+     "lingeringTimeoutMs": 3000,
+     "keepAliveTimeoutMs": 5000,
+     "maxConnections": 512,
+     "maxUriLength": 8192
+    }
+   },
+   "build": {
+    "lean": "4.35.0",
+    "linkDriver": "node",
+    "sourceSha256": "66e44baafb0f91ca3f59b73b22d5a20cc71686493095515d697799319360f240",
+    "wasmBytes": 2986518,
+    "nativeBytes": 108808192,
+    "lasmBuildSeconds": 141.906,
+    "nativeBuildSeconds": 13.24
+   },
+   "comparison": {
+    "faultDifferences": [
+     {
+      "fault": "handler-exception",
+      "case": "JSON body over the handler readAll limit (64 KiB)",
+      "native": {
+       "500/server-reset+close-header": 10
+      },
+      "lasm": {
+       "500/server-close+close-header": 10
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     },
+     {
+      "fault": "oversized",
+      "case": "Content-Length 2 MiB > maxBodySize",
+      "native": {
+       "none/server-reset": 2,
+       "413/server-reset+close-header": 3
+      },
+      "lasm": {
+       "413/server-reset+close-header": 5
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     },
+     {
+      "fault": "oversized",
+      "case": "URI 9000 B > maxUriLength",
+      "native": {
+       "400/server-reset+close-header": 10
+      },
+      "lasm": {
+       "400/server-close+close-header": 10
+      },
+      "informational": true,
+      "kind": "TCP close: FIN vs RST, or a status lost to RST"
+     }
+    ],
+    "load": [
+     {
+      "connections": 16,
+      "nativeRps": 5271,
+      "lasmRps": 1527.7,
+      "lasmToNativeThroughput": 0.29,
+      "nativeP99": 28.357,
+      "lasmP99": 38.306
+     },
+     {
+      "connections": 32,
+      "nativeRps": 6609.2,
+      "lasmRps": 1491.7,
+      "lasmToNativeThroughput": 0.226,
+      "nativeP99": 29,
+      "lasmP99": 63.056
+     }
+    ],
+    "startupSeconds": {
+     "native": 0.051,
+     "lasm": 0.384
+    }
+   },
+   "recordedAt": "2026-10-19T19:09:00.071Z",
+   "results": {
+    "native": {
+     "checks": {
+      "preflight": true,
+      "load": true,
+      "faults": true,
+      "soak": true,
+      "final": true,
+      "shutdown": true,
+      "memoryCap": true,
+      "noRestarts": true
+     },
+     "startupSeconds": 0.051,
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "at": 1792435932762
+     },
+     "stderrLines": 1073,
+     "memoryCaps": [],
+     "restarts": [],
+     "peakRssMiB": 108,
+     "peakCommitMiB": 349,
+     "stderr": [
+      {
+       "line": "connection failure: robustness fixture: deliberate handler exception",
+       "count": 135
+      },
+      {
+       "line": "connection failure: body exceeded maximum size of N bytes",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Connection closed",
+       "count": 189
+      },
+      {
+       "line": "connection failure: Bad message",
+       "count": 215
+      },
+      {
+       "line": "connection failure: Unsupported version",
+       "count": 20
+      },
+      {
+       "line": "connection failure: Entity too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Headers too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Too many headers",
+       "count": 84
+      },
+      {
+       "line": "connection failure: request header timeout",
+       "count": 15
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+       "count": 259
+      },
+      {
+       "line": "connection failure: invalid argument (error code: N, socket is not connected)",
+       "count": 106
+      },
+      {
+       "line": "connection failure: operation canceled (error code: N)",
+       "count": 18
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, broken pipe)",
+       "count": 2
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "requestsPerSecond": 5271,
+       "latencyMs": {
+        "count": 158482,
+        "p50": 1.037,
+        "p95": 21.006,
+        "p99": 28.357,
+        "max": 76.629
+       },
+       "errors": 0,
+       "requests": 158482,
+       "connectionsOpened": 16,
+       "cpu": {
+        "serverCores": 2.15,
+        "driverCores": 0.17,
+        "serverRssMiB": 57,
+        "threads": 25
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      },
+      {
+       "connections": 32,
+       "requestsPerSecond": 6609.2,
+       "latencyMs": {
+        "count": 198634,
+        "p50": 2.784,
+        "p95": 25.616,
+        "p99": 29,
+        "max": 58.674
+       },
+       "errors": 0,
+       "requests": 198634,
+       "connectionsOpened": 32,
+       "cpu": {
+        "serverCores": 2.83,
+        "driverCores": 0.11,
+        "serverRssMiB": 99,
+        "threads": 39
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      }
+     ],
+     "soak": {
+      "requests": 2273155,
+      "errors": 0,
+      "faultsSent": 446,
+      "checks": {
+       "errors": true,
+       "samples": true,
+       "slope": true,
+       "final": true,
+       "handles": true,
+       "wasm": true,
+       "alive": true
+      },
+      "growth": {
+       "windowSeconds": 676,
+       "windowRequests": 1707631,
+       "slopeBytesPerRequest": 0.4,
+       "finalMinusBaselineBytesPerRequest": -0.1,
+       "wasmBytesPerRequest": null
+      },
+      "requestsPerSecond": 2525.6,
+      "latencyMs": {
+       "count": 2273155,
+       "p50": 0.754,
+       "p95": 24.484,
+       "p99": 39.605,
+       "max": 86.554
+      },
+      "memory": {
+       "warmupSeconds": 225,
+       "samples": 171,
+       "warmSamples": 128,
+       "startMiB": 105.5,
+       "peakMiB": 105.5,
+       "warmBaselineMiB": 41.66,
+       "finalMiB": 41.47,
+       "slopeMiBPerMinute": 0.059,
+       "handles": {
+        "base": 306,
+        "final": 306,
+        "peak": 307
+       },
+       "threads": {
+        "final": 39
+       }
+      }
+     },
+     "faults": [
+      {
+       "name": "handler-exception",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "GET /throw",
+         "outcomes": {
+          "500/server-close+close-header": 50
+         }
+        },
+        {
+         "name": "pipelined /throw then /health",
+         "outcomes": {
+          "500/server-close+close-header": 10,
+          "statuses 500": 10
+         }
+        },
+        {
+         "name": "JSON body over the handler readAll limit (64 KiB)",
+         "outcomes": {
+          "500/server-reset+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "malformed",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "garbage request line",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "header without colon",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "unsupported HTTP version",
+         "outcomes": {
+          "505/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "missing Host",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "invalid chunk size",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "Content-Length with Transfer-Encoding",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "binary garbage with NUL",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "oversized",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "Content-Length 2 MiB > maxBodySize",
+         "outcomes": {
+          "none/server-reset": 2,
+          "413/server-reset+close-header": 3
+         }
+        },
+        {
+         "name": "chunked 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "headers 20 KiB > maxHeaderBytes",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "60 headers > maxHeaders",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "header value 9000 B > maxHeaderValueLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "URI 9000 B > maxUriLength",
+         "outcomes": {
+          "400/server-reset+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "slow-client",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "slow-loris: one header byte every 250 ms",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial headers then silence",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial body then silence",
+         "outcomes": {
+          "408/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "client-disconnect",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "half request line then FIN",
+         "outcomes": {
+          "400/server-close+close-header": 30
+         }
+        },
+        {
+         "name": "partial body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "incomplete chunked body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "mid-response (1 MiB, after 64 KiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "mid-stream (/stream/400, after 3 chunks)",
+         "outcomes": {
+          "200/client": 20
+         }
+        },
+        {
+         "name": "during slow handler",
+         "outcomes": {
+          "none/client-destroy": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "reset",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "RST mid-headers",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST after request, before response",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-upload",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-response (1 MiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "RST mid-stream",
+         "outcomes": {
+          "200/client": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "idle-connections",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "300 idle TCP connections",
+         "outcomes": {
+          "opened": 300,
+          "closedByServerWithin3000ms": 0,
+          "closedByServerWithin8000ms": 300,
+          "closedByServerWithin14000ms": 300
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "echo-live-race (informational)",
+       "alive": true,
+       "cases": [
+        {
+         "name": "respond before consuming the request body",
+         "outcomes": {
+          "fullEcho": 0,
+          "shortOrEmpty": 100
+         }
+        }
+       ]
+      }
+     ]
+    },
+    "lasm": {
+     "checks": {
+      "preflight": true,
+      "load": true,
+      "faults": true,
+      "soak": true,
+      "final": true,
+      "shutdown": true,
+      "memoryCap": true,
+      "noRestarts": true
+     },
+     "startupSeconds": 0.384,
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "at": 1792436940019
+     },
+     "stderrLines": 1046,
+     "memoryCaps": [],
+     "restarts": [],
+     "peakRssMiB": 819,
+     "peakCommitMiB": 4501,
+     "stderr": [
+      {
+       "line": "connection failure: robustness fixture: deliberate handler exception",
+       "count": 135
+      },
+      {
+       "line": "connection failure: body exceeded maximum size of N bytes",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Connection closed",
+       "count": 189
+      },
+      {
+       "line": "connection failure: Bad message",
+       "count": 215
+      },
+      {
+       "line": "connection failure: Unsupported version",
+       "count": 20
+      },
+      {
+       "line": "connection failure: Entity too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Headers too large",
+       "count": 10
+      },
+      {
+       "line": "connection failure: Too many headers",
+       "count": 84
+      },
+      {
+       "line": "connection failure: request header timeout",
+       "count": 15
+      },
+      {
+       "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+       "count": 194
+      },
+      {
+       "line": "connection failure: software caused connection abort (error code: N)",
+       "count": 112
+      },
+      {
+       "line": "connection failure: cannot call write after a stream was destroyed (error code: N)",
+       "count": 52
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "requestsPerSecond": 1527.7,
+       "latencyMs": {
+        "count": 45932,
+        "p50": 7.721,
+        "p95": 31.359,
+        "p99": 38.306,
+        "max": 71.972
+       },
+       "errors": 0,
+       "requests": 45932,
+       "connectionsOpened": 16,
+       "cpu": {
+        "serverCores": 2.18,
+        "driverCores": 0.11,
+        "serverRssMiB": 571,
+        "threads": 34
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      },
+      {
+       "connections": 32,
+       "requestsPerSecond": 1491.7,
+       "latencyMs": {
+        "count": 44771,
+        "p50": 17.534,
+        "p95": 48.276,
+        "p99": 63.056,
+        "max": 191.724
+       },
+       "errors": 0,
+       "requests": 44771,
+       "connectionsOpened": 32,
+       "cpu": {
+        "serverCores": 2.25,
+        "driverCores": 0.12,
+        "serverRssMiB": 766,
+        "threads": 48
+       },
+       "memoryCapStopped": false,
+       "errorSamples": []
+      }
+     ],
+     "soak": {
+      "requests": 1319179,
+      "errors": 0,
+      "faultsSent": 446,
+      "checks": {
+       "errors": true,
+       "samples": true,
+       "slope": true,
+       "final": true,
+       "handles": true,
+       "wasm": true,
+       "alive": true
+      },
+      "growth": {
+       "windowSeconds": 675,
+       "windowRequests": 989765,
+       "slopeBytesPerRequest": -21.7,
+       "finalMinusBaselineBytesPerRequest": -44.4,
+       "wasmBytesPerRequest": 0
+      },
+      "requestsPerSecond": 1465.7,
+      "latencyMs": {
+       "count": 1319179,
+       "p50": 3.214,
+       "p95": 26.222,
+       "p99": 31.379,
+       "max": 97.384
+      },
+      "memory": {
+       "warmupSeconds": 225,
+       "samples": 168,
+       "warmSamples": 126,
+       "startMiB": 752.56,
+       "peakMiB": 818.12,
+       "warmBaselineMiB": 339.21,
+       "finalMiB": 297.29,
+       "slopeMiBPerMinute": -1.816,
+       "handles": {
+        "base": 413,
+        "final": 413,
+        "peak": 415
+       },
+       "threads": {
+        "final": 48
+       },
+       "wasm": {
+        "samples": 503,
+        "warmBaselineMiB": 1187.75,
+        "finalMiB": 1187.75,
+        "peakMiB": 1187.75,
+        "heapUsedSlopeMiBPerMinute": 0.102,
+        "finalHeapUsedMiB": 22.48,
+        "finalExternalMiB": 5.6
+       }
+      }
+     },
+     "faults": [
+      {
+       "name": "handler-exception",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "GET /throw",
+         "outcomes": {
+          "500/server-close+close-header": 50
+         }
+        },
+        {
+         "name": "pipelined /throw then /health",
+         "outcomes": {
+          "500/server-close+close-header": 10,
+          "statuses 500": 10
+         }
+        },
+        {
+         "name": "JSON body over the handler readAll limit (64 KiB)",
+         "outcomes": {
+          "500/server-close+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "malformed",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "garbage request line",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "header without colon",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "unsupported HTTP version",
+         "outcomes": {
+          "505/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "missing Host",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "invalid chunk size",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "Content-Length with Transfer-Encoding",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        },
+        {
+         "name": "binary garbage with NUL",
+         "outcomes": {
+          "400/server-close+close-header": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "oversized",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "Content-Length 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "chunked 2 MiB > maxBodySize",
+         "outcomes": {
+          "413/server-reset+close-header": 5
+         }
+        },
+        {
+         "name": "headers 20 KiB > maxHeaderBytes",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "60 headers > maxHeaders",
+         "outcomes": {
+          "431/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "header value 9000 B > maxHeaderValueLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        },
+        {
+         "name": "URI 9000 B > maxUriLength",
+         "outcomes": {
+          "400/server-close+close-header": 10
+         }
+        }
+       ]
+      },
+      {
+       "name": "slow-client",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "slow-loris: one header byte every 250 ms",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial headers then silence",
+         "outcomes": {
+          "none/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        },
+        {
+         "name": "partial body then silence",
+         "outcomes": {
+          "408/server-close/1-6s": 5
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "client-disconnect",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "half request line then FIN",
+         "outcomes": {
+          "400/server-close+close-header": 30
+         }
+        },
+        {
+         "name": "partial body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "incomplete chunked body then destroy",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "mid-response (1 MiB, after 64 KiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "mid-stream (/stream/400, after 3 chunks)",
+         "outcomes": {
+          "200/client": 20
+         }
+        },
+        {
+         "name": "during slow handler",
+         "outcomes": {
+          "none/client-destroy": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "reset",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "RST mid-headers",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST after request, before response",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-upload",
+         "outcomes": {
+          "none/client": 30
+         }
+        },
+        {
+         "name": "RST mid-response (1 MiB)",
+         "outcomes": {
+          "200/client": 30
+         }
+        },
+        {
+         "name": "RST mid-stream",
+         "outcomes": {
+          "200/client": 20
+         }
+        }
+       ]
+      },
+      {
+       "name": "idle-connections",
+       "alive": true,
+       "verifiedAfter": true,
+       "cases": [
+        {
+         "name": "300 idle TCP connections",
+         "outcomes": {
+          "opened": 300,
+          "closedByServerWithin3000ms": 0,
+          "closedByServerWithin8000ms": 300,
+          "closedByServerWithin14000ms": 300
+         },
+         "servedDuring": true
+        }
+       ]
+      },
+      {
+       "name": "echo-live-race (informational)",
+       "alive": true,
+       "cases": [
+        {
+         "name": "respond before consuming the request body",
+         "outcomes": {
+          "fullEcho": 0,
+          "shortOrEmpty": 100
+         }
+        }
+       ]
+      }
+     ]
+    }
+   }
+  }
+ ],
+ "assembledAt": "2026-10-19T19:18:34.191Z"
+}

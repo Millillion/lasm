@@ -46,6 +46,7 @@ test('initializer specialization is limited to the audited immutable runtime', (
   assert.equal(canSpecializeInitialization({ identity: '4d3d6c60d978dd73c3b9bf0d9ae6020862c512f411c151abeffc37ffc9fd515d' }), true);
   assert.equal(canSpecializeInitialization({ identity: '7482333e0a70a6aee12a540e11a48f31fd56c86761e7b3477f4a46ae310f80d3' }), true);
   assert.equal(canSpecializeInitialization({ identity: '36cf596b617bea6e360a96321aff1e41b8e5c4ee20abdc7d8a7e474b9a5cc6e4' }), true);
+  assert.equal(canSpecializeInitialization({ identity: '84934c27498e0b97bd6e3d88253729704dc551aa8900f2fa4da919e9df40fcc4' }), true);
   assert.equal(canSpecializeInitialization({ identity: 'another runtime' }), false);
 });
 

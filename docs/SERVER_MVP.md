@@ -659,3 +659,35 @@ same-run native control). Evidence:
     which that host does not know, and the completion thread stops at startup with
     `INTERNAL PANIC: Invalid asynchronous completion packet`. The runtime pin and the
     host JS must land in one commit.
+
+### Five-platform run with the shared-memory transport (run [39302965569](https://github.com/Millillion/lasm/actions/runs/39302965569), variant `transport`)
+
+Variant `transport` is a maintainer overlay on candidate `.55`, not a candidate: the
+CI-rebuilt runtime `84934c27…` (handoff `node-runtime-inputs-39287146914`, source
+`d20932e`; only `liblasmhost.a`'s `node-async.cpp.o` differs from `36cf596b…`, and it is
+byte-identical to the local object `f04c7e92…`) plus `patches/server-transport.patch`
+(steps 1–3). Load 30 s per level, soak 900 s. Evidence:
+[run](evidence/server-mvp-robustness-transport-2026-10-19.json).
+
+| Platform | Lasm req/s c=16 (native, ratio) | p99 ms c=16 (native) | req/s c=64, Win 32 (native, ratio) | p99 ms (native) | Lasm soak B/request (native) | Passed |
+| --- | --- | --- | --- | --- | --- | --- |
+| linux-x64 | 650 (811, 80 %) | 61 (51) | 577 (648, 89 %) | 268 (240) | 19.7 (107.7) | yes |
+| linux-arm64 | 606 (1,151, 53 %) | 64 (41) | 537 (933, 58 %) | 290 (166) | 3.9 (73.4) | yes |
+| darwin-x64 | 161 (590, 27 %) | 331 (73) | 181 (582, 31 %) | 987 (244) | 189.3 (142.1) | yes |
+| darwin-arm64 | 505 (2,422, 21 %) | 105 (33) | 444 (2,181, 20 %) | 490 (90) | −499 (26.8) | no (one fault case) |
+| win32-x64 | 1,528 (5,271, 29 %) | 38 (28) | 1,492 (6,609, 23 %) | 63 (29) | −21.7 (0.4) | yes |
+
+- **Soak passes for Lasm on all five targets** (0 errors, Wasm memory flat). Linux and
+  macOS grew 296–602 B/request in run 39239133744; now 4–189 B/request, within the
+  256 B/request criterion. The residual leak is resolved.
+- Load and every fault class pass everywhere. darwin-arm64's single failing comparison
+  is `Content-Length 2 MiB > maxBodySize`: native lost the 413 to the TCP reset in 5 of
+  5 attempts (`none/error-EPIPE`), Lasm delivered it (`413/error-EPIPE+close-header`).
+  This is the documented "status lost to RST" effect on the native side, but
+  `robustness-compare.mjs` only treats it as informational when some native attempts
+  still saw the status. Not changed here.
+- **Targets** (≥ 50 % of native throughput, p99 ≤ 3× native): met on Linux x64 and
+  ARM64. Not met on macOS (20–31 %; p99 up to 5.4×) or Windows (23–29 % throughput;
+  p99 1.4–2.2×, within target). Not yet profiled there; the Node main thread, which
+  still serves every host call, is the likely limit (Windows' native server is also
+  6–8× faster than on Linux).

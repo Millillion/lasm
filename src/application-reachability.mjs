@@ -90,7 +90,15 @@ export function canSpecializeInitialization(runtime) {
     // node-async.cpp.o (lean_uv_tcp_send/lean_uv_udp_send borrow array parts with
     // lean_array_get_core). Every Init/Std/Lean/Lake/libleancpp archive, the
     // headers and exports.json are byte-identical, so no initialization path changed.
-    '36cf596b617bea6e360a96321aff1e41b8e5c4ee20abdc7d8a7e474b9a5cc6e4'].includes(runtime.identity);
+    '36cf596b617bea6e360a96321aff1e41b8e5c4ee20abdc7d8a7e474b9a5cc6e4',
+    // Lean 4.35.0 (CI handoff node-runtime-inputs-39287146914, source d20932e): again
+    // only lib/liblasmhost.a differs from the entry above, and within it only
+    // node-async.cpp.o (one-call asynchronous start, op 94; batched completion poll,
+    // op 95). That object only changes how host requests and completions are
+    // exchanged and contains no initialization code. Every
+    // Init/Std/Lean/Lake/libleancpp archive, the headers and exports.json are
+    // byte-identical, so no initialization path changed.
+    '84934c27498e0b97bd6e3d88253729704dc551aa8900f2fa4da919e9df40fcc4'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';
