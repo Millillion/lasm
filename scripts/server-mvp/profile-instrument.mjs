@@ -1,9 +1,9 @@
 // Profiling only (never shipped): copy a Lasm deployment and patch the copy's
 // program.cjs so every Lean→host RPC is counted and timed.
 //   node profile-instrument.mjs DEPLOYED NEW_COPY
-// - Worker side: each call measures its own round trip (postMessage → reply
-//   consumed) and piggybacks the previous call's [operation, kind, ms] on the
-//   next request, so no extra messages or files are needed.
+// - Worker side: each call measures its own round trip (request → reply
+//   consumed). Message transport: piggybacked on the next request. Slot
+//   transport (shared memory): batched to the main thread every 256 calls.
 // - Main side: Module.lasmFullHostRequest counts calls per kind/operation, the
 //   main-thread time to settle each request, and the worker-reported round
 //   trips; startup marks are recorded. SIGUSR2 writes the counters and
@@ -22,6 +22,52 @@ export function instrument(deployed, copy) {
     assert.equal(glue.split(from).length, 2, `Expected exactly one ${JSON.stringify(from.slice(0, 60))}`);
     glue = glue.replace(from, to);
   };
+  const common = `  var lasmProfile = globalThis.lasmProfile = { started: performance.now(), marks: {}, ops: {}, rt: {} };
+  lasmProfile.mark = name => { lasmProfile.marks[name] ??= performance.now(); };
+  lasmProfile.bucket = ms => ms < 0.05 ? '<0.05' : ms < 0.1 ? '<0.1' : ms < 0.2 ? '<0.2' : ms < 0.5 ? '<0.5' : ms < 1 ? '<1' : ms < 2 ? '<2' : ms < 5 ? '<5' : ms < 20 ? '<20' : '>=20';
+  lasmProfile.dump = () => {
+    const elu = performance.eventLoopUtilization();
+    require('node:fs').writeFileSync(process.env.LASM_PROFILE_OUT, JSON.stringify({ now: performance.now(),
+      timeOrigin: performance.timeOrigin, elu, marks: lasmProfile.marks, ops: lasmProfile.ops, rt: lasmProfile.rt }));
+  };
+  if (process.env.LASM_PROFILE_OUT) process.on('SIGUSR2', lasmProfile.dump);
+`;
+  if (glue.includes('  var lasmFullServeOne = function(slot) {\n')) {
+    // Shared-memory slot transport (host-library.js $lasmFullRPC.exchange).
+    // Worker side: time each exchange; batch [key, ms] pairs to the main
+    // thread every 256 calls (and never on the measured path's reply).
+    patch('  exchange: function(slot, kind, operation, handle, argument, input, length) {\n',
+      '  exchange: function(slot, kind, operation, handle, argument, input, length) {\n    var lasmProfileT0 = performance.now();\n');
+    patch('    return (growMemViews(), HEAP32)[(slot + 20) / 4];\n  },\n',
+      `    var lasmProfileBatch = lasmFullRPC.profileBatch ??= [];
+    lasmProfileBatch.push(kind === 0 ? operation : ["request", "release", "start", "copy"][kind] + ":" + operation, performance.now() - lasmProfileT0);
+    if (lasmProfileBatch.length >= 512) { lasmFullRPC.profileBatch = []; require("node:worker_threads").parentPort.postMessage({ cmd: 9, handler: "lasmProfileRt", args: [ lasmProfileBatch ] }); }
+    return (growMemViews(), HEAP32)[(slot + 20) / 4];
+  },
+`);
+    patch('  var lasmFullServeOne = function(slot) {\n', common + `  Module.lasmProfileRt = batch => {
+    for (let i = 0; i < batch.length; i += 2) {
+      const rt = lasmProfile.rt[batch[i]] ??= { calls: 0, totalMs: 0, buckets: {} };
+      rt.calls++; rt.totalMs += batch[i + 1]; const b = lasmProfile.bucket(batch[i + 1]); rt.buckets[b] = (rt.buckets[b] ?? 0) + 1;
+    }
+  };
+  var lasmFullServeOneProfiled = function(slot) {
+    const t0 = performance.now();
+    const { view } = lasmFullViews(), p = slot.pointer;
+    const kind = view.getInt32(p + 8, true), operation = view.getInt32(p + 12, true);
+    const key = kind === 0 ? String(operation) : ['request', 'release', 'start', 'copy'][kind] + ':' + operation;
+    lasmProfile.mark('firstRpc');
+    const op = lasmProfile.ops[key] ??= { calls: 0, settleMs: 0, syncMs: 0, inBytes: 0 };
+    op.calls++; op.inBytes += Number(view.getBigUint64(p + 40, true));
+    const pending = lasmFullServeOneInner(slot);
+    op.syncMs += performance.now() - t0;
+    if (!pending) { op.settleMs += performance.now() - t0; return pending; }
+    return pending.finally(() => { op.settleMs += performance.now() - t0; });
+  };
+  var lasmFullServeOneInner = function(slot) {
+`);
+    patch('      const pending = lasmFullServeOne(slot);\n', '      const pending = lasmFullServeOneProfiled(slot);\n');
+  } else {
   // Worker side.
   patch('    wt.parentPort.postMessage({\n      cmd: 9,\n      handler: "lasmFullHostRequest",\n      args: [ {\n',
     '    var lasmProfileT0 = performance.now();\n    wt.parentPort.postMessage({\n      cmd: 9,\n      handler: "lasmFullHostRequest",\n      args: [ {\n        lasmProfileLast: lasmFullRPC.profileLast,\n');
@@ -61,6 +107,7 @@ export function instrument(deployed, copy) {
   };
 }
 `);
+  }
   // Startup marks: instantiation done, worker pool loaded, Lean main called.
   patch('    var pthreadPoolReady = PThread.loadWasmModuleToAllWorkers();\n',
     '    globalThis.lasmProfile?.mark("preRun");\n    var pthreadPoolReady = PThread.loadWasmModuleToAllWorkers();\n');
