@@ -3,6 +3,11 @@
 // Fault outcome agreement: the same set of canonical outcome keys per case
 // (counts may differ). Idle-connection timing and informational probes are
 // reported but never fail the comparison.
+// The status Std.Http must send for cases where the server rejects a request
+// while the client is still uploading. The kernel's RST can discard it on the
+// native side in every attempt; Lasm (Node reads eagerly) usually delivers it.
+const requiredStatus = { 'Content-Length 2 MiB > maxBodySize': '413', 'chunked 2 MiB > maxBodySize': '413' };
+
 export function compareFaults(a, b) {
   const differences = [];
   for (const fault of a.faults) {
@@ -25,7 +30,15 @@ export function compareFaults(a, b) {
         continue;
       }
       const ka = canon(c.outcomes), kb = d ? canon(d.outcomes) : 'missing';
-      if (ka !== kb) differences.push({ fault: fault.name, case: c.name, native: c.outcomes, lasm: d?.outcomes });
+      // Native lost the status to RST in every attempt; accept only if every Lasm
+      // outcome carries exactly the status the specification requires.
+      const nativeAllLost = Object.keys(c.outcomes).every(k => k.startsWith('none/'));
+      const required = requiredStatus[c.name];
+      if (ka !== kb && nativeAllLost && required && d
+          && Object.keys(d.outcomes).every(k => k.split('/')[0] === required))
+        differences.push({ fault: fault.name, case: c.name, native: c.outcomes, lasm: d.outcomes, informational: true,
+          kind: `native status lost to RST in every attempt; Lasm delivered the required ${required}` });
+      else if (ka !== kb) differences.push({ fault: fault.name, case: c.name, native: c.outcomes, lasm: d?.outcomes });
       else if (JSON.stringify(Object.keys(c.outcomes).sort()) !== JSON.stringify(Object.keys(d.outcomes).sort()))
         differences.push({ fault: fault.name, case: c.name, native: c.outcomes, lasm: d.outcomes, informational: true, kind: 'TCP close: FIN vs RST, or a status lost to RST' });
     }
