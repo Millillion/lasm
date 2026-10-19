@@ -1,12 +1,12 @@
 import net from 'node:net';
 import { constants } from 'node:os';
 import { getSystemErrorMap } from 'node:util';
-import { numbers } from './node-host.mjs';
+import { numbers, cancellation } from './node-host.mjs';
 import { nativeTcp } from './native-tcp.mjs';
 
 const empty = Buffer.alloc(0);
 const failure = (code, message) => Object.assign(new Error(message), { code });
-const cancelled = () => failure('ECANCELED', 'Operation cancelled');
+const cancelled = () => cancellation('Operation cancelled');
 const uvErrors = new Map([...getSystemErrorMap()].map(([errno, [code, message]]) => [code, { errno, message }]));
 const tcpFailure = code => {
   const value = uvErrors.get(code);

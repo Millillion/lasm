@@ -1,11 +1,11 @@
 import { constants } from 'node:os';
-import { numbers } from './node-host.mjs';
+import { numbers, cancellation } from './node-host.mjs';
 
 const names = { 1: 'SIGHUP', 2: 'SIGINT', 3: 'SIGQUIT', 6: 'SIGABRT', 15: 'SIGTERM', 28: 'SIGWINCH',
   5: 'SIGTRAP', 10: 'SIGUSR1', 12: 'SIGUSR2', 14: 'SIGALRM', 17: 'SIGCHLD', 18: 'SIGCONT',
   20: 'SIGTSTP', 21: 'SIGTTIN', 22: 'SIGTTOU', 23: 'SIGURG', 24: 'SIGXCPU', 25: 'SIGXFSZ',
   26: 'SIGVTALRM', 27: 'SIGPROF', 29: 'SIGIO', 31: 'SIGSYS' };
-const cancelled = () => Object.assign(new Error('Signal wait cancelled'), { code: 'ECANCELED' });
+const cancelled = () => cancellation('Signal wait cancelled');
 
 export function createNodeSignals({ add, get }) {
   function create(signum, repeating) {

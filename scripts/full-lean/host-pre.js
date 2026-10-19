@@ -17,8 +17,6 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       finally { host.close(); }
     }).catch(() => {}).finally(disposeWorkers);
   };
-  // Each worker isolate transfers its reply port once (see $lasmFullRPC).
-  var lasmFullReplyPorts = new Map();
   // Completions go to the dedicated Lean completion thread's long poll (op 92).
   var lasmFullComplete = function (completion) {
     if (lasmFullCompletionWaiter) {
@@ -31,79 +29,147 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     await lasmFullHost?.then(host => host.flushStdIO()).catch(() => {});
     process.exit(error.code);
   };
-  Module.lasmFullHostRequest = async function (request) {
-    const { signalPointer, sequence } = request;
-    if (request.port) {
-      lasmFullReplyPorts.set(request.channelId, request.port);
-      // Never let a retained reply port keep the host process alive.
-      request.port.unref?.();
-      request.port.once('close', () => {
-        if (lasmFullReplyPorts.get(request.channelId) === request.port) lasmFullReplyPorts.delete(request.channelId);
-      });
+  var lasmFullHostValue;
+  var lasmFullLoadHost = function () {
+    if (!lasmFullHost) {
+      const path = process.env.LASM_FULL_HOST_MODULE;
+      if (!path) return Promise.reject(new Error('LASM_FULL_HOST_MODULE must point to the Lasm host module'));
+      lasmFullHost = import(path).then(m => m.createNodeRuntimeHost({
+        leanVersion: Module.lasmLeanVersion,
+        args: process.argv.slice(2), appPath: process.env.LASM_FULL_APP_PATH ?? __filename, propagateCwd: true, processExit: true,
+        applicationCommand: process.env.LASM_FULL_APP_PATH ? {
+          executable: process.execPath,
+          arguments: [],
+        } : undefined,
+      }));
     }
-    const port = lasmFullReplyPorts.get(request.channelId);
-    const reply = message => port?.postMessage({ ...message, sequence });
-    const signal = new Int32Array(wasmMemory.buffer, signalPointer, 1);
-    try {
-      if (!lasmFullHost) {
-        const path = process.env.LASM_FULL_HOST_MODULE;
-        if (!path) throw new Error('LASM_FULL_HOST_MODULE must point to the Lasm host module');
-        lasmFullHost = import(path).then(m => m.createNodeRuntimeHost({
-          leanVersion: Module.lasmLeanVersion,
-          args: process.argv.slice(2), appPath: process.env.LASM_FULL_APP_PATH ?? __filename, propagateCwd: true, processExit: true,
-          applicationCommand: process.env.LASM_FULL_APP_PATH ? {
-            executable: process.execPath,
-            arguments: [],
-          } : undefined,
-        }));
-      }
-      const host = await lasmFullHost;
-      let result;
-      const bytes = new Uint8Array(request.byteBuffer, request.byteOffset, request.byteLength);
-      const args = [request.operation, request.handle, request.argument, bytes,
-        { fiber: request.thread, nativeThreadId: request.nativeThreadId }];
-      if (request.kind === 'start') result = { id: host.start(...args) };
-      else if (request.kind === 'release') { await host.releaseAsync(request.handle); result = {}; }
-      else if (request.operation === 91) {
-        // Completion registration carries opaque Lean pointers. JavaScript only
-        // queues their bytes; the dedicated Lean thread owns and resolves them.
-        host.whenReady(request.handle).then(() => lasmFullComplete({ error: false, bytes }));
-        result = { error: false, bytes: new Uint8Array(0) };
-      } else if (request.operation === 94) {
-        // Start an asynchronous operation and register its completion in one
-        // call. Header: promise, resource, kind (opaque, echoed), check,
-        // operation, argument; then the operation's input. The completion
-        // carries the result (failed flag, bytes), so no separate finish call.
-        // With check, a synchronous startup failure is returned instead and
-        // nothing is registered (the former start-check, op 93).
-        const input = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-        const header = Buffer.from(input.subarray(0, 24));
-        const started = host.request(Number(input.readBigUInt64LE(32)), request.handle, input.readBigUInt64LE(40),
-          input.subarray(48), args[4]);
-        if (input.readBigUInt64LE(24) !== 0n && !started.then && started.error) result = started;
-        else {
-          Promise.resolve(started).then(done => lasmFullComplete({ error: false,
-            bytes: Buffer.concat([header, Buffer.from([done.error ? 1 : 0, 0, 0, 0, 0, 0, 0, 0]), done.bytes]) }),
-          error => error?.name === 'LeanExit' ? lasmFullExit(error)
-            : lasmFullComplete({ failure: error?.stack ?? String(error) }));
-          result = { error: false, bytes: new Uint8Array(0) };
+    return lasmFullHost.then(host => (lasmFullHostValue = host));
+  };
+  // One host call: returns its result synchronously when the operation is
+  // synchronous, otherwise a promise. Results: { error, bytes }, {} (release),
+  // or { failure } for an internal host defect.
+  var lasmFullDispatch = function (host, kind, operation, handle, argument, bytes, context) {
+    if (kind === 2) return { error: false, bytes: Buffer.from(new BigUint64Array([BigInt(host.start(operation, handle, argument, bytes, context))]).buffer) };
+    if (kind === 1) return Promise.resolve(host.releaseAsync(handle)).then(() => ({}));
+    if (operation === 91) {
+      // Completion registration carries opaque Lean pointers. JavaScript only
+      // queues their bytes; the dedicated Lean thread owns and resolves them.
+      host.whenReady(handle).then(() => lasmFullComplete({ error: false, bytes }));
+      return { error: false, bytes: new Uint8Array(0) };
+    }
+    if (operation === 94) {
+      // Start an asynchronous operation and register its completion in one
+      // call. Header: promise, resource, kind (opaque, echoed), check,
+      // operation, argument; then the operation's input. The completion
+      // carries the result (failed flag, bytes), so no separate finish call.
+      // With check, a synchronous startup failure is returned instead and
+      // nothing is registered (the former start-check, op 93).
+      const input = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      const header = Buffer.from(input.subarray(0, 24));
+      const started = host.request(Number(input.readBigUInt64LE(32)), handle, input.readBigUInt64LE(40),
+        input.subarray(48), context);
+      if (input.readBigUInt64LE(24) !== 0n && !started.then && started.error) return started;
+      Promise.resolve(started).then(done => lasmFullComplete({ error: false,
+        bytes: Buffer.concat([header, Buffer.from([done.error ? 1 : 0, 0, 0, 0, 0, 0, 0, 0]), done.bytes]) }),
+      error => error?.name === 'LeanExit' ? lasmFullExit(error)
+        : lasmFullComplete({ failure: error?.stack ?? String(error) }));
+      return { error: false, bytes: new Uint8Array(0) };
+    }
+    if (operation === 92) {
+      return lasmFullCompletions.length ? lasmFullCompletions.shift()
+        : new Promise(resolve => { lasmFullCompletionWaiter = resolve; });
+    }
+    if (operation === 95) {
+      // Every queued completion in one reply, in order: (u64 size, packet)
+      // records. A host failure is delivered alone, after earlier packets.
+      const batch = () => {
+        const parts = [];
+        while (lasmFullCompletions.length && parts.length < 512 && lasmFullCompletions[0].failure === undefined) {
+          const { bytes } = lasmFullCompletions.shift();
+          const size = Buffer.alloc(8);
+          size.writeBigUInt64LE(BigInt(bytes.length));
+          parts.push(size, bytes);
         }
-      } else if (request.operation === 92) {
-        result = lasmFullCompletions.length ? lasmFullCompletions.shift()
-          : await new Promise(resolve => { lasmFullCompletionWaiter = resolve; });
+        return parts.length ? { error: false, bytes: Buffer.concat(parts) } : lasmFullCompletions.shift();
+      };
+      if (lasmFullCompletions.length) return batch();
+      return new Promise(resolve => { lasmFullCompletionWaiter = completion => {
+        lasmFullCompletions.unshift(completion);
+        resolve(batch());
+      }; });
+    }
+    return host.request(operation, handle, argument, bytes, context);
+  };
+  // Shared-memory slots (layout in host-library.js $lasmFullRPC). Views are
+  // rebuilt when memory growth replaces wasmMemory.buffer.
+  var lasmFullMemory = { buffer: null, i32: null, view: null, u8: null };
+  var lasmFullViews = function () {
+    const buffer = wasmMemory.buffer;
+    if (lasmFullMemory.buffer !== buffer) lasmFullMemory = { buffer, i32: new Int32Array(buffer),
+      view: new DataView(buffer), u8: new Uint8Array(buffer) };
+    return lasmFullMemory;
+  };
+  var lasmFullReply = function (slot, result) {
+    const { i32, view, u8 } = lasmFullViews(), p = slot.pointer;
+    let status = 0, bytes = result.bytes ?? new Uint8Array(0);
+    if (result.failure !== undefined) { status = 2; bytes = Buffer.from(String(result.failure)); }
+    else if (result.error) status = 1;
+    view.setBigUint64(p + 64, BigInt(bytes.length), true);
+    if (bytes.length > Number(view.getBigUint64(p + 56, true))) {
+      // The calling thread grows its buffer and asks again (kind 3).
+      slot.large = { status, bytes };
+      status = 3;
+    } else if (bytes.length) u8.set(bytes, Number(view.getBigUint64(p + 48, true)));
+    view.setInt32(p + 20, status, true);
+    Atomics.store(i32, (p + 4) / 4, 1);
+    Atomics.notify(i32, (p + 4) / 4);
+  };
+  var lasmFullFail = async function (slot, error) {
+    if (error?.name === 'LeanExit') await lasmFullExit(error);
+    lasmFullReply(slot, { failure: error?.stack ?? String(error) });
+  };
+  // Serve one request. Undefined when it was answered synchronously,
+  // otherwise a promise that settles after the reply.
+  var lasmFullServeOne = function (slot) {
+    const { view, u8 } = lasmFullViews(), p = slot.pointer;
+    const kind = view.getInt32(p + 8, true);
+    if (kind === 3) {
+      const large = slot.large;
+      slot.large = undefined;
+      return lasmFullReply(slot, large.status === 2 ? { failure: Buffer.from(large.bytes).toString() }
+        : { error: large.status === 1, bytes: large.bytes });
+    }
+    const operation = view.getInt32(p + 12, true), handle = view.getUint32(p + 16, true);
+    const argument = view.getBigUint64(p + 24, true);
+    const input = Number(view.getBigUint64(p + 32, true)), length = Number(view.getBigUint64(p + 40, true));
+    // Copy: hosts and completion queues may retain request bytes.
+    const bytes = length ? u8.slice(input, input + length) : new Uint8Array(0);
+    const context = { fiber: Number(view.getBigUint64(p + 72, true)),
+      nativeThreadId: view.getInt32(p + 88, true) ? view.getBigUint64(p + 80, true) : undefined };
+    const run = host => {
+      let result;
+      try { result = lasmFullDispatch(host, kind, operation, handle, argument, bytes, context); }
+      catch (error) { return lasmFullFail(slot, error); }
+      if (!result?.then) return lasmFullReply(slot, result);
+      return result.then(value => lasmFullReply(slot, value), error => lasmFullFail(slot, error));
+    };
+    return lasmFullHostValue ? run(lasmFullHostValue)
+      : lasmFullLoadHost().then(run, error => lasmFullFail(slot, error));
+  };
+  var lasmFullServe = function (slot) {
+    for (;;) {
+      const { i32 } = lasmFullViews(), index = slot.pointer / 4;
+      const sequence = Atomics.load(i32, index);
+      if (sequence === slot.sequence) {
+        const wait = Atomics.waitAsync(i32, index, sequence);
+        if (wait.async) { wait.value.then(() => lasmFullServe(slot)); return; }
+        continue;
       }
-      else result = await host.request(...args);
-      // Responses may alias retained host buffers, so preserve cloning here.
-      reply(result.bytes === undefined ? result : {
-        error: result.error, byteBuffer: result.bytes.buffer,
-        byteOffset: result.bytes.byteOffset, byteLength: result.bytes.byteLength,
-      });
-    } catch (error) {
-      if (error.name === 'LeanExit') await lasmFullExit(error);
-      reply({ failure: error.stack ?? String(error) });
-    } finally {
-      Atomics.store(signal, 0, 1);
-      Atomics.notify(signal, 0);
+      slot.sequence = sequence;
+      const pending = lasmFullServeOne(slot);
+      if (pending) { pending.then(() => lasmFullServe(slot)); return; }
     }
   };
+  // CMD_CALL_HANDLER from a Lean thread's first call at a nesting depth.
+  Module.lasmFullHostSlot = function (pointer) { lasmFullServe({ pointer, sequence: 0 }); };
 }

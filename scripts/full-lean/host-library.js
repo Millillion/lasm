@@ -61,78 +61,84 @@ addToLibrary({
       emit(base, LDSO.loadedLibsByHandle[key].name);
     }
   },
+  // Lean→host calls use a request/reply slot in shared Wasm memory, one per
+  // thread and nesting depth. Layout (byte offsets, little endian):
+  //   0 i32 request sequence (incremented by this thread; the host waits on it)
+  //   4 i32 reply ready (0 while pending, 1 when the host has replied)
+  //   8 i32 kind (0 request, 1 release, 2 start, 3 copy a large reply)
+  //  12 i32 operation  16 u32 handle  20 i32 reply status
+  //     (0 ok, 1 Lean IO error, 2 host failure message, 3 reply larger than the buffer)
+  //  24 u64 argument  32 u64 input pointer  40 u64 input length
+  //  48 u64 reply buffer pointer  56 u64 reply buffer capacity  64 u64 reply length
+  //  72 u64 calling pthread  80 u64 native thread id  88 i32 native thread id present
+  // Requests are read and replies written in place: nothing is cloned or
+  // transferred. A reply that does not fit is kept by the host until this
+  // thread has grown its buffer and asked for it (kind 3). The host registers
+  // each slot once (CMD_CALL_HANDLER message) and then waits on its sequence
+  // with Atomics.waitAsync. This thread waits through Emscripten's futex
+  // implementation, which also services the pthread mailbox; a raw
+  // Atomics.wait would starve dylink synchronization. A call nested in that
+  // wait (a serviced mailbox task) uses the next depth's slot.
   $lasmFullRPC__deps: ['malloc', 'free', 'emscripten_futex_wait'],
   $lasmFullRPC: {
-    response: new Uint8Array(0),
-    // One reply channel per worker isolate, reused for every call. A Lean
-    // pthread never returns to its worker's event loop, so a per-call
-    // MessageChannel could never finish closing there: each call leaked its
-    // port (about 4 KiB of native and V8 memory) for the life of the worker.
-    channel: null,
-    channelId: 0,
-    sequence: 0,
-    // Created lazily: library objects are serialized into the generated JavaScript.
-    replies: null,
+    response: null,
+    slots: null,
+    depth: 0,
+    slotBytes: 96,
+    replyBytes: 65536,
+    newSlot: function () {
+      var slot = Number(_malloc(lasmFullRPC.slotBytes));
+      var buffer = Number(_malloc(lasmFullRPC.replyBytes));
+      if (!slot || !buffer) throw new Error('Cannot allocate a Lean host call slot');
+      HEAPU8.fill(0, slot, slot + lasmFullRPC.slotBytes);
+      HEAPU64[(slot + 48) / 8] = BigInt(buffer);
+      HEAPU64[(slot + 56) / 8] = BigInt(lasmFullRPC.replyBytes);
+      require('node:worker_threads').parentPort.postMessage({ cmd: 9, handler: 'lasmFullHostSlot', args: [slot] });
+      return slot;
+    },
+    exchange: function (slot, kind, operation, handle, argument, input, length) {
+      HEAP32[(slot + 8) / 4] = kind;
+      HEAP32[(slot + 12) / 4] = operation;
+      HEAPU32[(slot + 16) / 4] = handle;
+      HEAPU64[(slot + 24) / 8] = BigInt.asUintN(64, BigInt(argument));
+      HEAPU64[(slot + 32) / 8] = BigInt(input);
+      HEAPU64[(slot + 40) / 8] = BigInt(length);
+      HEAPU64[(slot + 72) / 8] = BigInt(_pthread_self());
+      Atomics.store(HEAP32, (slot + 4) / 4, 0);
+      Atomics.add(HEAP32, slot / 4, 1);
+      Atomics.notify(HEAP32, slot / 4);
+      while (Atomics.load(HEAP32, (slot + 4) / 4) === 0) _emscripten_futex_wait(slot + 4, 0, Infinity);
+      return HEAP32[(slot + 20) / 4];
+    },
     call: function (kind, operation, handle, argument, input, length) {
       if (!ENVIRONMENT_IS_PTHREAD) throw new Error('Lean host calls require PROXY_TO_PTHREAD');
-      length = Number(length);
-      var wt = require('node:worker_threads');
-      var nativeThreadId;
-      if (operation === 37) {
-        var path = require('node:url').fileURLToPath(new URL('./thread-id.cjs', process.env.LASM_FULL_HOST_MODULE));
-        nativeThreadId = require(path)();
-      }
-      var newPort;
-      if (!lasmFullRPC.channel) {
-        lasmFullRPC.replies = new Map();
-        lasmFullRPC.channel = new wt.MessageChannel();
-        lasmFullRPC.channelId = wt.threadId;
-        newPort = lasmFullRPC.channel.port2;
-      }
-      var sequence = ++lasmFullRPC.sequence;
-      // Wait through Emscripten's futex implementation, which also services the
-      // pthread mailbox. A raw Atomics.wait on a separate buffer starves dylink
-      // synchronization indefinitely when this thread waits for host IO.
-      var signalPointer = _malloc({{{ to64('4') }}});
-      if (!signalPointer) throw new Error('Cannot allocate Lean host wait signal');
-      var signal = new Int32Array(wasmMemory.buffer, Number(signalPointer), 1);
-      Atomics.store(signal, 0, 0);
-      var bytes = length ? HEAPU8.slice(Number(input), Number(input) + length) : new Uint8Array(0);
-      // CMD_CALL_HANDLER is Emscripten 6.0.9's documented-in-source dispatch to a
-      // Module callback. Transfer the reply port once, never the Wasm memory itself.
-      wt.parentPort.postMessage({ cmd: 9, handler: 'lasmFullHostRequest', args: [{
-        // Send the numeric offset, not the typed view. Some engine structured
-        // cloners truncate a typed array's byteOffset above 4 GiB. The parent
-        // already owns this shared Wasm memory and can construct its own view.
-        // Send the backing store and numeric view bounds instead.
-        kind, operation, handle, argument, byteBuffer: bytes.buffer,
-        byteOffset: bytes.byteOffset, byteLength: bytes.byteLength,
-        signalPointer: Number(signalPointer), port: newPort,
-        channelId: lasmFullRPC.channelId, sequence,
-        thread: Number(_pthread_self()),
-        nativeThreadId,
-      }] }, newPort ? [newPort, bytes.buffer] : [bytes.buffer]);
-      var message;
+      var code = { request: 0, release: 1, start: 2 }[kind];
+      var depth = lasmFullRPC.depth++;
       try {
-        while (Atomics.load(signal, 0) === 0) _emscripten_futex_wait(signalPointer, 0, Infinity);
-        // Replies carry their sequence: a call nested inside this wait (for
-        // example from a serviced mailbox task) may receive another reply first.
-        while (!lasmFullRPC.replies.has(sequence)) {
-          var packet = wt.receiveMessageOnPort(lasmFullRPC.channel.port1);
-          if (packet) lasmFullRPC.replies.set(packet.message.sequence, packet.message);
-          else _emscripten_futex_wait(signalPointer, 1, 1);
+        lasmFullRPC.slots ??= [];
+        var slot = lasmFullRPC.slots[depth] ??= lasmFullRPC.newSlot();
+        if (operation === 37) {
+          var path = require('node:url').fileURLToPath(new URL('./thread-id.cjs', process.env.LASM_FULL_HOST_MODULE));
+          HEAPU64[(slot + 80) / 8] = BigInt.asUintN(64, BigInt(require(path)()));
+          HEAP32[(slot + 88) / 4] = 1;
+        } else HEAP32[(slot + 88) / 4] = 0;
+        var status = lasmFullRPC.exchange(slot, code, operation, handle, argument, Number(input), Number(length));
+        var size = Number(HEAPU64[(slot + 64) / 8]);
+        if (status === 3) {
+          // Grow this slot's reply buffer once and keep it for later replies.
+          var buffer = Number(_malloc(size));
+          if (!buffer) throw new Error('Cannot allocate a Lean host reply buffer');
+          _free(Number(HEAPU64[(slot + 48) / 8]));
+          HEAPU64[(slot + 48) / 8] = BigInt(buffer);
+          HEAPU64[(slot + 56) / 8] = BigInt(size);
+          status = lasmFullRPC.exchange(slot, 3, 0, 0, 0, 0, 0);
         }
-        message = lasmFullRPC.replies.get(sequence);
-        lasmFullRPC.replies.delete(sequence);
+        var pointer = Number(HEAPU64[(slot + 48) / 8]);
+        if (status === 2) throw new Error(new TextDecoder().decode(HEAPU8.slice(pointer, pointer + size)));
+        return { error: status === 1, pointer: pointer, length: size };
       } finally {
-        _free(signalPointer);
+        lasmFullRPC.depth--;
       }
-      if (message.failure) throw new Error(message.failure);
-      if (message.byteBuffer !== undefined) {
-        message.bytes = new Uint8Array(message.byteBuffer,
-          message.byteOffset, message.byteLength);
-      }
-      return message;
     },
   },
   lasm_node_call__deps: ['$lasmFullRPC', '$lasmFullClock'],
@@ -144,21 +150,26 @@ addToLibrary({
       return BigInt(clock.length);
     }
     var result = lasmFullRPC.call('request', operation, handle, argument, input, length);
-    lasmFullRPC.response = result.bytes;
-    var length = BigInt(result.bytes.length);
+    // The reply stays in this thread's slot buffer until lasm_node_copy, which
+    // the runtime calls next on this thread without another host call.
+    lasmFullRPC.response = result;
+    var length = BigInt(result.length);
     return result.error ? -length - 1n : length;
   },
   lasm_node_copy__deps: ['$lasmFullRPC'],
   lasm_node_copy__sig: 'vpp',
   lasm_node_copy: function (output, length) {
-    if (Number(length) !== lasmFullRPC.response.length) throw new Error('Mismatched Lean host response size');
-    HEAPU8.set(lasmFullRPC.response, Number(output));
-    lasmFullRPC.response = new Uint8Array(0);
+    var response = lasmFullRPC.response;
+    lasmFullRPC.response = null;
+    if (!response || Number(length) !== response.length) throw new Error('Mismatched Lean host response size');
+    if (response instanceof Uint8Array) HEAPU8.set(response, Number(output));
+    else HEAPU8.copyWithin(Number(output), response.pointer, response.pointer + response.length);
   },
   lasm_node_start__deps: ['$lasmFullRPC'],
   lasm_node_start__sig: 'iiijpp',
   lasm_node_start: function (operation, handle, argument, input, length) {
-    return lasmFullRPC.call('start', operation, handle, argument, input, length).id;
+    var result = lasmFullRPC.call('start', operation, handle, argument, input, length);
+    return Number(HEAPU64[result.pointer / 8]);
   },
   lasm_node_release__deps: ['$lasmFullRPC'],
   lasm_node_release__sig: 'vi',

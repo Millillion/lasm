@@ -1,5 +1,5 @@
 import dgram from 'node:dgram';
-import { numbers } from './node-host.mjs';
+import { numbers, cancellation } from './node-host.mjs';
 
 const empty = Buffer.alloc(0);
 const error = (code, message) => Object.assign(new Error(message), { code });
@@ -69,7 +69,7 @@ export function createNodeUdp({ add, get }) {
     if (op === 100) {
       const resource = { type: 'udp', messages: [], family: 4, bound: false };
       resource.close = () => {
-        resource.waiter?.reject(error('ECANCELED', 'Operation cancelled'));
+        resource.waiter?.reject(cancellation('Operation cancelled'));
         resource.waiter = undefined; resource.messages.length = 0;
         if (resource.socket) {
           try { resource.socket.close(); } catch (failure) { if (failure.code !== 'ERR_SOCKET_DGRAM_NOT_RUNNING') throw failure; }
@@ -104,7 +104,7 @@ export function createNodeUdp({ add, get }) {
     if (op === 104) return receive(resource, n, false);
     if (op === 105) return receive(resource, 0, true);
     if (op === 106) {
-      resource.waiter?.reject(error('ECANCELED', 'Operation cancelled'));
+      resource.waiter?.reject(cancellation('Operation cancelled'));
       resource.waiter = undefined; return empty;
     }
     if (op === 107) {

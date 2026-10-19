@@ -1,115 +1,120 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createContext, runInContext, runInNewContext } from 'node:vm';
-import { MessageChannel, receiveMessageOnPort } from 'node:worker_threads';
+import { runInNewContext } from 'node:vm';
+import { Worker } from 'node:worker_threads';
 
-// Lean pthreads never return to their worker event loop, so a MessagePort they
-// close never finishes closing. Host calls must reuse one reply channel per
-// worker isolate and route replies by sequence number.
+// Lean→host calls use one shared-memory slot per Lean thread and nesting depth
+// (host-library.js $lasmFullRPC, host-pre.js lasmFullServe). These tests run the
+// actual worker-side object in a real worker thread against the actual
+// main-thread prelude, over one SharedArrayBuffer standing in for Wasm memory.
 const prelude = readFileSync(new URL('../scripts/full-lean/host-pre.js', import.meta.url), 'utf8');
 const library = readFileSync(new URL('../scripts/full-lean/host-library.js', import.meta.url), 'utf8');
+const rpcSource = library.slice(library.indexOf('  $lasmFullRPC: {') + '  $lasmFullRPC: '.length, library.indexOf('  lasm_node_call__deps'))
+  .trimEnd().replace(/,$/, '');
 
-function mainThread(host) {
-  const memory = new SharedArrayBuffer(64);
-  const Module = {};
-  runInNewContext(prelude, { ENVIRONMENT_IS_PTHREAD: false, Module, wasmMemory: { buffer: memory },
-    Atomics, Int32Array, Uint8Array, lasmFullHost: Promise.resolve(host), process });
-  return { Module, signal: new Int32Array(memory) };
-}
-const request = (fields, sequence, signalPointer = 0) => ({ kind: 'request', operation: 1, handle: 0, argument: 0n,
-  byteBuffer: new ArrayBuffer(0), byteOffset: 0, byteLength: 0, signalPointer, thread: 1, sequence, ...fields });
-
-test('the main thread keeps one unreferenced reply port per worker and tags replies', async () => {
-  const pending = [];
-  const { Module, signal } = mainThread({
-    request: operation => new Promise(resolve => pending.push(() => resolve({ error: false, bytes: Buffer.from([operation]) }))),
-  });
-  const first = new MessageChannel(), second = new MessageChannel();
-  let unrefs = 0;
-  const unref = first.port2.unref.bind(first.port2);
-  first.port2.unref = () => { unrefs++; unref(); };
-  // Two workers, interleaved, answered out of order.
-  const calls = [
-    Module.lasmFullHostRequest(request({ port: first.port2, channelId: 7, operation: 11 }, 1, 0)),
-    Module.lasmFullHostRequest(request({ port: second.port2, channelId: 8, operation: 21 }, 1, 4)),
-    Module.lasmFullHostRequest(request({ channelId: 7, operation: 12 }, 2, 8)),
-  ];
-  await new Promise(resolve => setImmediate(resolve));
-  assert.equal(pending.length, 3);
-  for (const index of [2, 1, 0]) pending[index]();
-  await Promise.all(calls);
-  assert.equal(unrefs, 1);
-  const replies = port => { const out = []; let packet; while ((packet = receiveMessageOnPort(port))) out.push(packet.message); return out; };
-  const firstReplies = replies(first.port1), secondReplies = replies(second.port1);
-  assert.deepEqual(firstReplies.map(r => [r.sequence, new Uint8Array(r.byteBuffer, r.byteOffset, r.byteLength)[0]]).sort(), [[1, 11], [2, 12]]);
-  assert.deepEqual(secondReplies.map(r => [r.sequence, new Uint8Array(r.byteBuffer, r.byteOffset, r.byteLength)[0]]), [[1, 21]]);
-  assert.deepEqual([...signal.subarray(0, 3)], [1, 1, 1]);
-  first.port1.close(); second.port1.close();
-});
-
-test('a host failure is still delivered on the reused port with its sequence', async () => {
-  const { Module } = mainThread({ request: async () => { throw new Error('host operation failed'); } });
-  const channel = new MessageChannel();
-  await Module.lasmFullHostRequest(request({ port: channel.port2, channelId: 3 }, 9));
-  const reply = receiveMessageOnPort(channel.port1).message;
-  assert.equal(reply.sequence, 9);
-  assert.match(reply.failure, /host operation failed/);
-  channel.port1.close();
-});
-
-// Worker side: evaluate the actual $lasmFullRPC object with a simulated main
-// thread that answers inside the futex wait, as the real one does.
-function workerThread({ onRequest }) {
-  const memory = new SharedArrayBuffer(4096), heap = new Uint8Array(memory);
-  let next = 64, channels = 0;
-  const posted = [];
-  class CountingChannel extends MessageChannel { constructor() { super(); channels++; } }
-  const threads = { MessageChannel: CountingChannel, receiveMessageOnPort, threadId: 42,
-    parentPort: { postMessage(message, transfer) { posted.push({ message: message.args[0], transfer }); } } };
-  const body = library.slice(library.indexOf('  $lasmFullRPC: {') + '  $lasmFullRPC: '.length, library.indexOf('  lasm_node_call__deps'))
-    .replace("{{{ to64('4') }}}", '4').trimEnd().replace(/,$/, '');
-  const context = createContext({ ENVIRONMENT_IS_PTHREAD: true, require: name => { assert.equal(name, 'node:worker_threads'); return threads; },
-    process: { env: {} }, wasmMemory: { buffer: memory }, HEAPU8: heap, Atomics, Int32Array, Uint8Array, Map, Number,
-    _malloc: () => { next += 8; return next; }, _free: () => {}, _pthread_self: () => 1n,
-    _emscripten_futex_wait: pointer => onRequest(posted, pointer, memory) });
-  runInContext(`var lasmFullRPC = ${body};`, context);
-  return { rpc: runInContext('lasmFullRPC', context), posted, channels: () => channels };
-}
-function answer(entry, memory, value) {
-  const port = entry.port;
-  port.postMessage({ sequence: entry.message.sequence, error: false, byteBuffer: new Uint8Array([value]).buffer, byteOffset: 0, byteLength: 1 });
-  const signal = new Int32Array(memory, entry.message.signalPointer, 1);
-  Atomics.store(signal, 0, 1);
-}
-
-test('worker calls create one channel, transfer it once and route nested replies by sequence', () => {
-  let port, nested = false, worker;
-  worker = workerThread({ onRequest(posted, pointer, memory) {
-    for (const entry of posted) if (entry.message.port) port = entry.message.port;
-    const open = posted.filter(entry => !entry.answered);
-    if (!open.length) return;
-    // While the first call waits, a serviced mailbox task makes a nested call.
-    if (open.length === 1 && open[0].message.operation === 1 && !nested) {
-      nested = true;
-      const inner = worker.rpc.call('request', 2, 0, 0n, 0, 0);
-      assert.equal(inner.bytes[0], 2);
-      return;
-    }
-    // Answer the outer call first: the nested call must still get its own reply.
-    for (const entry of [...open].sort((a, b) => a.message.sequence - b.message.sequence)) {
-      entry.port = port; entry.answered = true; answer(entry, memory, entry.message.operation);
-    }
+// The worker evaluates $lasmFullRPC with Emscripten's globals: heap views, a
+// bump allocator, and a futex wait that is a plain Atomics.wait (Emscripten's
+// also services the pthread mailbox; here a script can run a nested call).
+const workerSource = `
+const { parentPort, workerData } = require('node:worker_threads');
+const vm = require('node:vm');
+const { memory, rpcSource, script } = workerData;
+let next = 1024, nestedOnce = false;
+const context = vm.createContext({ ENVIRONMENT_IS_PTHREAD: true, require, process, Atomics, BigInt, Number, Error, TextDecoder, TextEncoder,
+  HEAP32: new Int32Array(memory), HEAPU32: new Uint32Array(memory), HEAPU64: new BigUint64Array(memory), HEAPU8: new Uint8Array(memory),
+  _malloc: size => { const p = next; next += Math.ceil(Number(size) / 16) * 16; return p; },
+  _free: () => {}, _pthread_self: () => 77,
+  _emscripten_futex_wait: (address, value, timeout) => {
+    if (context.nested && !nestedOnce) { nestedOnce = true; context.nested(); }
+    Atomics.wait(new Int32Array(memory), address / 4, value, timeout === Infinity ? undefined : timeout);
   } });
-  const outer = worker.rpc.call('request', 1, 0, 0n, 0, 0);
-  assert.equal(outer.bytes[0], 1);
-  // Operation 37 also loads the native thread-id helper; it is not needed here.
-  for (let operation = 3; operation < 50; operation++) if (operation !== 37)
-    assert.equal(worker.rpc.call('request', operation, 0, 0n, 0, 0).bytes[0], operation);
-  assert.equal(worker.channels(), 1);
-  assert.equal(worker.posted.filter(entry => entry.message.port).length, 1);
-  assert.equal(worker.posted[0].transfer.length, 2);
-  assert.ok(worker.posted.slice(1).every(entry => entry.transfer.length === 1 && entry.message.channelId === 42));
-  assert.equal(worker.rpc.replies.size, 0);
-  port.close();
+vm.runInContext('var lasmFullRPC = ' + rpcSource + ';', context);
+const results = vm.runInContext(script, context);
+parentPort.postMessage({ done: results });
+`;
+
+function run(host, script) {
+  const memory = new SharedArrayBuffer(4 * 1024 * 1024);
+  const Module = { lasmLeanVersion: '4.35.0' };
+  const context = { ENVIRONMENT_IS_PTHREAD: false, Module, wasmMemory: { buffer: memory }, Atomics, Int32Array, Uint8Array,
+    DataView, BigUint64Array, Buffer, process, lasmFullHost: Promise.resolve(host) };
+  runInNewContext(prelude, context);
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(workerSource, { eval: true, workerData: { memory, rpcSource, script } });
+    worker.on('message', message => {
+      if (message.cmd === 9) Module[message.handler](...message.args);
+      else { resolve(message.done); worker.terminate(); }
+    });
+    worker.on('error', reject);
+  });
+}
+
+test('synchronous and asynchronous calls reply in place, with Lean error status and request fields', async () => {
+  const seen = [];
+  const host = { request(op, id, arg, bytes, context) {
+    seen.push([op, id, arg, Buffer.from(bytes).toString(), context.fiber]);
+    if (op === 1) return { error: false, bytes: Buffer.from('sync') };
+    if (op === 2) return Promise.resolve({ error: true, bytes: Buffer.from('async error') });
+    return { error: false, bytes: Buffer.alloc(0) };
+  } };
+  const results = await run(host, `
+    const input = 600; HEAPU8.set(new TextEncoder().encode('payload'), input);
+    const read = r => [r.error, new TextDecoder().decode(HEAPU8.slice(r.pointer, r.pointer + r.length))];
+    [read(lasmFullRPC.call('request', 1, 5, 2n ** 63n, input, 7)), read(lasmFullRPC.call('request', 2, 6, 0n, 0, 0)),
+     read(lasmFullRPC.call('request', 3, 0, 0n, 0, 0)), lasmFullRPC.slots.length]`);
+  assert.deepEqual(results, [[false, 'sync'], [true, 'async error'], [false, ''], 1]);
+  assert.deepEqual(seen, [[1, 5, 2n ** 63n, 'payload', 77], [2, 6, 0n, '', 77], [3, 0, 0n, '', 77]]);
+});
+
+test('a reply larger than the slot buffer grows it once and is copied whole', async () => {
+  const big = Buffer.alloc(200_000, 7); big[0] = 1; big[big.length - 1] = 9;
+  const host = { request: op => ({ error: false, bytes: op === 1 ? big : Buffer.from([op]) }) };
+  const results = await run(host, `
+    const a = lasmFullRPC.call('request', 1, 0, 0n, 0, 0);
+    const first = [a.length, HEAPU8[a.pointer], HEAPU8[a.pointer + a.length - 1], HEAPU8[a.pointer + 1000]];
+    const b = lasmFullRPC.call('request', 1, 0, 0n, 0, 0);
+    const c = lasmFullRPC.call('request', 2, 0, 0n, 0, 0);
+    [first, b.pointer === a.pointer, b.length, HEAPU8[c.pointer], Number(HEAPU64[(lasmFullRPC.slots[0] + 56) / 8])]`);
+  assert.deepEqual(results, [[200_000, 1, 9, 7], true, 200_000, 2, 200_000]);
+});
+
+test('host failures throw on the Lean thread; release and start use their kinds', async () => {
+  const host = {
+    request: () => { throw new Error('host defect'); },
+    releaseAsync: id => new Promise(resolve => setTimeout(() => { host.released = id; resolve(); }, 5)),
+    start: () => 4242,
+  };
+  const results = await run(host, `
+    let message; try { lasmFullRPC.call('request', 1, 0, 0n, 0, 0); } catch (e) { message = e.message; }
+    const released = lasmFullRPC.call('release', 0, 9, 0n, 0, 0);
+    const started = lasmFullRPC.call('start', 35, 0, 1n, 0, 0);
+    [message.split('\\n')[0], released.error, released.length, Number(HEAPU64[started.pointer / 8])]`);
+  assert.deepEqual(results, ['Error: host defect', false, 0, 4242]);
+  assert.equal(host.released, 9);
+});
+
+test('a call nested inside the wait uses the next depth slot and both get their replies', async () => {
+  let release;
+  const host = { request(op) {
+    if (op === 1) return new Promise(resolve => { release = () => resolve({ error: false, bytes: Buffer.from('outer') }); });
+    setTimeout(() => release(), 5);
+    return { error: false, bytes: Buffer.from('inner') };
+  } };
+  const results = await run(host, `
+    const read = r => new TextDecoder().decode(HEAPU8.slice(r.pointer, r.pointer + r.length));
+    let inner;
+    nested = () => { inner = read(lasmFullRPC.call('request', 2, 0, 0n, 0, 0)); };
+    const outer = read(lasmFullRPC.call('request', 1, 0, 0n, 0, 0));
+    [outer, inner, lasmFullRPC.slots.length, lasmFullRPC.depth]`);
+  assert.deepEqual(results, ['outer', 'inner', 2, 0]);
+});
+
+test('many sequential calls keep one slot per depth', async () => {
+  const host = { request: op => (op % 2 ? { error: false, bytes: Buffer.from([op & 255]) } : Promise.resolve({ error: false, bytes: Buffer.from([op & 255]) })) };
+  const results = await run(host, `
+    // Ordinary operation numbers only (37 loads a native helper; 91-95 are the async protocol).
+    let ok = 0; for (let i = 100; i < 2100; i++) { const r = lasmFullRPC.call('request', i, 0, 0n, 0, 0); if (r.length === 1 && HEAPU8[r.pointer] === (i & 255)) ok++; }
+    [ok, lasmFullRPC.slots.length]`);
+  assert.deepEqual(results, [2000, 1]);
 });

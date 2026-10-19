@@ -2,33 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
-import { MessageChannel, receiveMessageOnPort } from 'node:worker_threads';
 
 // Op 94 starts an asynchronous host operation and registers its completion in
 // one call (runtime/node-async.cpp begin_request). The completion long poll
-// (op 92) then carries the result, so there is no separate finish call (op 90).
+// (op 92, or op 95 for every queued completion at once) then carries the
+// result, so there is no separate finish call (op 90).
 const prelude = readFileSync(new URL('../scripts/full-lean/host-pre.js', import.meta.url), 'utf8');
 
 function mainThread(host) {
-  const memory = new SharedArrayBuffer(64);
-  const Module = {};
-  runInNewContext(prelude, { ENVIRONMENT_IS_PTHREAD: false, Module, wasmMemory: { buffer: memory },
-    Atomics, Int32Array, Uint8Array, Buffer, lasmFullHost: Promise.resolve(host), process });
-  const channel = new MessageChannel();
-  let sequence = 0, first = true;
+  const context = { ENVIRONMENT_IS_PTHREAD: false, Module: {}, wasmMemory: { buffer: new SharedArrayBuffer(64) },
+    Atomics, Int32Array, Uint8Array, DataView, BigUint64Array, Buffer, lasmFullHost: Promise.resolve(host), process };
+  runInNewContext(prelude, context);
+  // The transport (test/full-host-rpc-channel.test.mjs) delivers exactly this result.
   const call = async (operation, handle, input) => {
-    const bytes = new Uint8Array(input);
-    const id = ++sequence;
-    await Module.lasmFullHostRequest({ kind: 'request', operation, handle, argument: 0n, byteBuffer: bytes.buffer,
-      byteOffset: 0, byteLength: bytes.length, signalPointer: 0, thread: 1, sequence: id, channelId: 1,
-      ...(first ? { port: channel.port2 } : {}) });
-    first = false;
-    const reply = receiveMessageOnPort(channel.port1).message;
-    assert.equal(reply.sequence, id);
-    if (reply.failure) throw new Error(reply.failure);
-    return { error: reply.error, bytes: Buffer.from(reply.byteBuffer, reply.byteOffset, reply.byteLength) };
+    const result = await context.lasmFullDispatch(host, 0, operation, handle, 0n, new Uint8Array(input), { fiber: 1 });
+    if (result.failure) throw new Error(result.failure);
+    return { error: result.error, bytes: Buffer.from(result.bytes) };
   };
-  return { call, close: () => channel.port1.close() };
+  return { call, close: () => {} };
 }
 const u64 = (...values) => Buffer.concat(values.map(v => { const b = Buffer.alloc(8); b.writeBigUInt64LE(BigInt(v)); return b; }));
 const begin = (op, arg, { check, kind = 3, promise = 0x1000, resource = 0x2000, data = Buffer.alloc(0) }) =>
@@ -96,4 +87,28 @@ test('an unexpected host rejection reaches the completion thread as a failure', 
   await call(94, 1, begin(56, 0n, { check: true }));
   await assert.rejects(call(92, 0, []), /host defect/);
   close();
+});
+
+test('the batched poll returns every queued completion in order, and a failure alone', async () => {
+  const pending = [];
+  const host = { request: () => new Promise(resolve => pending.push(resolve)) };
+  const { call } = mainThread(host);
+  for (const promise of [0xa, 0xb, 0xc]) await call(94, 1, begin(56, 0n, { check: true, promise }));
+  const waiting = call(95, 0, []);
+  pending[1]({ error: false, bytes: Buffer.from('b') });
+  const records = bytes => { const out = []; for (let o = 0; o < bytes.length;) { const n = Number(bytes.readBigUInt64LE(o)); out.push(bytes.subarray(o + 8, o + 8 + n)); o += 8 + n; } return out; };
+  const first = records((await waiting).bytes);
+  assert.deepEqual(first.map(r => [r.readBigUInt64LE(0), r.subarray(32).toString()]), [[0xbn, 'b']]);
+  pending[2]({ error: false, bytes: Buffer.from('c') });
+  pending[0]({ error: true, bytes: Buffer.from('a') });
+  await new Promise(resolve => setImmediate(resolve));
+  const second = records((await call(95, 0, [])).bytes);
+  assert.deepEqual(second.map(r => [r.readBigUInt64LE(0), r.readBigUInt64LE(24), r.subarray(32).toString()]), [[0xcn, 0n, 'c'], [0xan, 1n, 'a']]);
+  host.request = () => Promise.reject(new Error('host defect'));
+  await call(94, 1, begin(56, 0n, { check: true }));
+  host.request = () => Promise.resolve({ error: false, bytes: Buffer.from('d') });
+  await call(94, 1, begin(56, 0n, { check: true, promise: 0xd }));
+  await new Promise(resolve => setImmediate(resolve));
+  await assert.rejects(call(95, 0, []), /host defect/);
+  assert.equal(records((await call(95, 0, [])).bytes)[0].readBigUInt64LE(0), 0xdn);
 });

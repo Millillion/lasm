@@ -15,7 +15,7 @@ on:
         type: string
         default: "30"
       variants:
-        description: JSON array of variants (candidate, rpc, full, runtime)
+        description: JSON array of variants (candidate, rpc, full, runtime, transport)
         type: string
         default: '["candidate","full"]'
       platforms:
@@ -73,7 +73,7 @@ jobs:
           console.log("targets=" + JSON.stringify(targets));' >> "$GITHUB_OUTPUT"
   robustness:
     needs: [input, plan]
-    # Variant `runtime` downloads the draft runtime handoff release.
+    # Variants `runtime` and `transport` download a draft runtime handoff release.
     permissions:
       contents: write
     name: ${{ matrix.target.platform }} ${{ matrix.variant }}
@@ -121,14 +121,14 @@ jobs:
           mkdir -p .work/install && cd .work/install
           echo '{"private":true}' > package.json
           npm install --no-audit --no-fund "../node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
-      - name: Fetch the rebuilt runtime handoff (variant runtime; not a candidate)
-        if: matrix.variant == 'runtime'
+      - name: Fetch the rebuilt runtime handoff (variants runtime, transport; not a candidate)
+        if: matrix.variant == 'runtime' || matrix.variant == 'transport'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node scripts/server-mvp/fetch-runtime-overlay.mjs .work/runtime-overlay
+        run: node scripts/server-mvp/fetch-runtime-overlay.mjs .work/runtime-overlay ${{ matrix.variant == 'transport' && 'runtime-overlay-transport.json' || 'runtime-overlay.json' }}
       - name: Overlay the proposed fixes onto the installed copy (not a candidate)
         if: matrix.variant != 'candidate'
-        run: node scripts/server-mvp/overlay-fix.mjs .work/install/node_modules/@lasm/compiler "$VARIANT" ${{ matrix.variant == 'runtime' && '.work/runtime-overlay' || '' }} | tee .work/robustness-overlay.json
+        run: node scripts/server-mvp/overlay-fix.mjs .work/install/node_modules/@lasm/compiler "$VARIANT" ${{ (matrix.variant == 'runtime' || matrix.variant == 'transport') && '.work/runtime-overlay' || '' }} | tee .work/robustness-overlay.json
       - name: Enable process-tree resource guard
         if: runner.os == 'Linux'
         run: |

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createNodeRuntimeHost } from '../src/node-host.mjs';
+import { createNodeRuntimeHost, cancellation } from '../src/node-host.mjs';
 
 // Direct adapter checks for durations that cannot be exercised in real time.
 test('IO.sleep preserves durations beyond one Node timeout instead of clamping to 1ms', async t => {
@@ -122,4 +122,14 @@ test('a synchronous exit during request startup leaves no pending result', async
     assert.equal((await host.whenReady(next)).error, false);
     assert.equal((await host.request(90, next)).error, false);
   } finally { host.close(); }
+});
+
+test('routine cancellations carry their code and message without a captured stack', () => {
+  const limit = Error.stackTraceLimit;
+  const error = cancellation('Operation cancelled');
+  assert.ok(error instanceof Error);
+  assert.equal(error.code, 'ECANCELED');
+  assert.equal(error.message, 'Operation cancelled');
+  assert.equal(error.stack, 'Error: Operation cancelled');
+  assert.equal(Error.stackTraceLimit, limit);
 });

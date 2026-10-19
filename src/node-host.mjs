@@ -27,6 +27,15 @@ export function numbers(...values) {
   return result;
 }
 function error(code, message) { return Object.assign(new Error(message), { code }); }
+// Routine cancellations (cancel_recv, timer and sleep cancellation) are normal
+// control flow, reported to Lean only by code and message. Do not capture a
+// JavaScript stack trace for each one.
+export function cancellation(message) {
+  let limit, changed = false;
+  try { limit = Error.stackTraceLimit; Error.stackTraceLimit = 0; changed = true; } catch { /* keep the engine default */ }
+  try { return Object.assign(new Error(message), { code: 'ECANCELED' }); }
+  finally { if (changed) Error.stackTraceLimit = limit; }
+}
 export function encodeError(err, leanVersion = '4.32.0') {
   checkLeanIOVersion(leanVersion);
   // node:os wraps libuv errors in SystemError; preserve the underlying code.
@@ -262,7 +271,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
     case 35: return new Promise((resolve, reject) => {
       let timer;
       let remaining = n;
-      const token = add({ type: 'sleep', close() { clearTimeout(timer); reject(error('ECANCELED', 'Sleep cancelled')); } });
+      const token = add({ type: 'sleep', close() { clearTimeout(timer); reject(cancellation('Sleep cancelled')); } });
       const step = () => {
         const delay = Math.min(remaining, 2_147_483_647);
         timer = setTimeout(() => {

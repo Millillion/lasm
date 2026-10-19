@@ -535,6 +535,8 @@ same-run native control). Evidence:
 | 1: host-thread regular files, in-worker clocks | 55.92 | 0.88 | 368 (2,035) | 42.3/61.3 (7.9/10.6) | 5.84 (1.40) |
 | 1, rerun back to back with step 2 | 55.56 | 0.89 | 361 (2,189) | 45.1/54.5 (7.4/9.3) | 5.57 (0.91) |
 | 2: one-call async start, result-carrying completion (local runtime object) | 34.40 | 0.89 | 494 (2,156) | 32.1/41.5 (7.4/10.5) | 4.16 (0.92) |
+| 3a: shared-memory slot transport (step 2 runtime), rerun back to back with 3b | 34.43 | 0.92 | 926 (2,186) | 16.9/23.5 (7.4/9.4) | 2.98 (0.91) |
+| 3b: plus batched completions, op 95 (local runtime object) | 28.66 | 1.00 | 1,321 (2,204) | 12.1/15.0 (7.3/9.3) | 2.99 (0.91) |
 
 ### Step 1 behaviour (source awaiting review)
 
@@ -600,3 +602,60 @@ same-run native control). Evidence:
   `libuv_signal_retry`, `cancellation_context`, `promise`, `timeAPI`; 53 actions) all
   match native; the robustness load and all 31 fault cases match native (local
   Linux); emcc and Node link drivers give byte-identical `program.wasm`/`program.cjs`.
+
+### Step 3 behaviour (source awaiting review; runtime rebuild pending)
+
+- **Shared-memory request/reply slots** (`scripts/full-lean/host-library.js`
+  `$lasmFullRPC`, `scripts/full-lean/host-pre.js` `lasmFullServe`). Each Lean thread
+  allocates one 96-byte slot (and a 64 KiB reply buffer) in Wasm memory per call
+  nesting depth, on first use, and registers it once with the host thread
+  (`CMD_CALL_HANDLER` message). A call writes kind, operation, handle, argument, the
+  input's address and length and the calling pthread into the slot, increments its
+  request sequence and notifies it. The host thread waits on each registered slot's
+  sequence with `Atomics.waitAsync`, reads the request in place (copying the input,
+  which hosts may retain), and writes the status, length and reply bytes straight
+  into the slot's buffer before setting and notifying the reply flag. The Lean thread
+  waits on that flag with `emscripten_futex_wait`, which still services the pthread
+  mailbox; a call nested in that wait uses the next depth's slot. `lasm_node_copy`
+  copies from the slot buffer. No request or reply is structured-cloned or
+  transferred, and no per-call `malloc`, `MessagePort` message or reply map remains.
+- **Synchronous operations are answered synchronously**: when the host returns a
+  value rather than a promise, the reply is written in the same task.
+- **Large replies**: a reply longer than the slot's buffer is kept by the host; the
+  Lean thread replaces its buffer with one of the reply's size (kept for later calls)
+  and asks for it (kind 3). Inputs of any size are read in place.
+- **Host failures** (internal defects) still throw on the Lean thread with the host's
+  message and stack text; `LeanExit` still flushes standard IO and exits.
+- **Routine cancellations** (`cancel_recv`, `cancel_accept`, timer, signal, UDP and
+  sleep cancellation) create their `ECANCELED` errors with `Error.stackTraceLimit`
+  temporarily 0 (`cancellation` in `src/node-host.mjs`): same code and message, no
+  stack capture.
+- **Batched completions** (`runtime/node-async.cpp`, op 95): the completion thread's
+  poll returns every completion queued so far, in settlement order, as (u64 size,
+  packet) records; a host failure is delivered alone after earlier packets. Under load
+  this replaced about 6 of 7.8 completion polls per request. Ops 92 and 91 remain for
+  the currently pinned runtime.
+- Rejected: spinning briefly on the reply flag before the futex wait cut throughput
+  at 16 connections by a third (961 → 639 req/s; Lean threads took CPU from the host
+  thread), although it cut c=1 latency by 22 %.
+- Robustness fixture, local Linux, mixed load (20 s per level, same run): Lasm
+  1,000 req/s at 16 connections against native 1,487 (67 %), p99 42 against 36 ms
+  (1.2×); at 64 connections 905 against 1,252 (72 %), p99 166 against 122 ms (1.4×).
+  All fault classes pass with only the informational FIN/RST differences.
+- **Residual leak, local re-measurement**: a 15-minute Lasm soak (8 connections, a
+  rotating fault every 2 s) served 815,736 requests with 0 errors: RSS 569 → 584 MiB,
+  slope 20 B/request (criterion 256; the same local soak grew 241–343 B/request before),
+  Wasm memory and handles flat. This is consistent with the leak belonging to the
+  removed per-call message machinery (no heap walk was repeated). Five-platform confirmation is pending.
+- **Compatibility between host JS and runtime.** A deployment links the host JS and
+  the runtime archive from the same package, and cached builds are keyed by both
+  (`buildDriverIdentity` hashes the host files; the runtime identity is pinned), so a
+  shipped package never mixes them. Checked locally anyway:
+  - new host JS with the previously pinned runtime `36cf596b…` works: the host still
+    serves `node_start` (kind 2), the start check (op 93), registration (op 91), the
+    single-completion poll (op 92) and finish (op 90) over the new transport (robustness
+    load and all fault classes pass, 484 req/s at 16 connections);
+  - the new runtime with the committed (step 2) host JS does not: it polls with op 95,
+    which that host does not know, and the completion thread stops at startup with
+    `INTERNAL PANIC: Invalid asynchronous completion packet`. The runtime pin and the
+    host JS must land in one commit.
