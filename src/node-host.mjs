@@ -18,6 +18,8 @@ import { createWorkingDirectory } from './working-directory.mjs';
 import { checkLeanIOVersion, leanIOError } from './lean-io-errors.mjs';
 
 const empty = Buffer.alloc(0);
+// Larger reads of regular files keep using a file worker, off the host thread.
+const regularReadLimit = 64 * 1024;
 export class LeanExit extends Error { constructor(code, force = false) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; this.force = force; } }
 export function numbers(...values) {
   const result = Buffer.alloc(values.length * 8);
@@ -64,7 +66,8 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
     if (resource.type === 'file') {
       const close = () => {
         try {
-          if (asynchronous) return nativeFiles().closeAsync(resource, discardOutput).catch(() => {});
+          // Closing a read-only regular file never flushes or waits.
+          if (asynchronous && !resource.regular) return nativeFiles().closeAsync(resource, discardOutput).catch(() => {});
           nativeFiles().close(resource, discardOutput);
         } catch { /* finalizers cannot report IO errors */ }
       };
@@ -168,10 +171,20 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
     if (op >= 40) return network.dispatch(op, id, arg, bytes, context);
     const n = Number(arg);
     switch (op) {
-    case 1: return (async () => {
-      return numbers(add(await nativeFiles().open(path(bytes), n)));
-    })();
-    case 2: { const f = get(id, 'file'); return serial(f, () => fileRead(f, n)); }
+    case 1: {
+      const name = path(bytes);
+      // Read-only regular files open on this thread (see openRegular).
+      const regular = n === 0 ? nativeFiles().openRegular(name) : undefined;
+      if (regular) return numbers(add(regular));
+      return (async () => numbers(add(await nativeFiles().open(name, n))))();
+    }
+    case 2: {
+      const f = get(id, 'file');
+      // Small reads of an openRegular stream complete here, in order.
+      if (!f.regular || n > regularReadLimit) return serial(f, () => fileRead(f, n));
+      const read = () => nativeFiles().readRegular(f, n);
+      return f.pending ? serial(f, read) : read();
+    }
     case 3: { const f = get(id, 'file'); return serial(f, () => fileWrite(f, bytes)); }
     case 4: { const f = get(id, 'file'); return serial(f, async () => { if (f.stream) await nativeFiles().flush(f); return empty; }); }
     case 5: { const f = get(id, 'file'); return serial(f, async () => { await nativeFiles().rewind(nativeFile(f)); return empty; }); }

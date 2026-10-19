@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import { existsSync, constants } from 'node:fs';
+import { existsSync, constants, statSync, fstatSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { homedir, tmpdir, userInfo } from 'node:os';
 import { callNativeFile } from './native-file-worker-pool.mjs';
@@ -539,6 +539,41 @@ export function nativeFiles({ synchronous = false } = {}) {
   const buffer = bytes => Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   implementation = { ...adapter,
     flushAll() { return callNativeFile('flushAll', []); },
+    // Host thread, POSIX only: open an existing regular file read-only without
+    // leasing a file worker. Opening or reading a regular file never waits for
+    // another party (FIFOs, terminals and devices can), so the result, errno
+    // and FILE stream are those of the pooled open. Std.Http reads a zoneinfo
+    // file this way for every response's Date header. Returns undefined, and
+    // leaves the decision and any error to the pooled open, unless both the
+    // path and the opened descriptor are regular files. O_NONBLOCK (cleared
+    // again before use) makes a conflicting lease fail instead of blocking.
+    openRegular(path) {
+      if (windows || typeof path !== 'string') return undefined;
+      try { if (!statSync(path).isFile()) return undefined; } catch { return undefined; }
+      const c = constants;
+      const fd = openFile(path, c.O_RDONLY | c.O_NONBLOCK | c.O_NOCTTY
+        | (process.platform === 'darwin' ? 0x1000000 : 0x80000), 'uint32_t', 0);
+      if (fd < 0) return undefined;
+      try {
+        const flags = fstatSync(fd).isFile() ? fcntl(fd, 3 /* F_GETFL */) : -1;
+        if (flags < 0 || fcntl(fd, 4 /* F_SETFL */, 'int', flags & ~c.O_NONBLOCK) < 0) {
+          closeFd(fd); return undefined;
+        }
+      } catch { closeFd(fd); return undefined; }
+      const stream = fdopen(fd, 'r');
+      if (!stream) { closeFd(fd); return undefined; }
+      return { stream, fd, tail: Promise.resolve(), type: 'file', regular: true };
+    },
+    // A synchronous fread for openRegular's streams (same EOF/error handling).
+    readRegular(file, count) {
+      if (!count) return Buffer.alloc(0);
+      let bytes;
+      try { bytes = Buffer.allocUnsafe(count); } catch { throw failure(ffi.os.errno.ENOMEM); }
+      const value = fread(bytes, 1, count, file.stream), errno = ffi.errno();
+      if (value) return bytes.subarray(0, Number(value));
+      if (feof(file.stream)) { clearerr(file.stream); return bytes.subarray(0, 0); }
+      throw failure(errno);
+    },
     async open(...args) {
       return { ...await callNativeFile('open', args), tail: Promise.resolve() };
     },

@@ -135,9 +135,14 @@ addToLibrary({
       return message;
     },
   },
-  lasm_node_call__deps: ['$lasmFullRPC'],
+  lasm_node_call__deps: ['$lasmFullRPC', '$lasmFullClock'],
   lasm_node_call__sig: 'jiijpp',
   lasm_node_call: function (operation, handle, argument, input, length) {
+    var clock = lasmFullClock.read(operation);
+    if (clock) {
+      lasmFullRPC.response = clock;
+      return BigInt(clock.length);
+    }
     var result = lasmFullRPC.call('request', operation, handle, argument, input, length);
     lasmFullRPC.response = result.bytes;
     var length = BigInt(result.bytes.length);
@@ -159,6 +164,36 @@ addToLibrary({
   lasm_node_release__sig: 'vi',
   lasm_node_release: function (handle) {
     lasmFullRPC.call('release', 0, handle, 0n, 0, 0);
+  },
+  // Clocks read on the calling Lean thread, without a host round trip, from
+  // the same sources and with the same encoding as src/node-host.mjs:
+  // process.hrtime (libuv uv_hrtime, one process-wide monotonic clock) and
+  // native-clock.mjs (the native realtime clock). Undefined: ask the host.
+  $lasmFullClock: {
+    wall: null,
+    loaded: false,
+    read: function (operation) {
+      var numbers = function () {
+        var view = new DataView(new ArrayBuffer(arguments.length * 8));
+        for (var i = 0; i < arguments.length; i++) view.setBigUint64(i * 8, BigInt.asUintN(64, arguments[i]), true);
+        return new Uint8Array(view.buffer);
+      };
+      if (operation === 25) return numbers(process.hrtime.bigint() / 1000000n);
+      if (operation === 26) return numbers(process.hrtime.bigint());
+      if (operation !== 27) return undefined;
+      if (!lasmFullClock.loaded) {
+        lasmFullClock.loaded = true;
+        try {
+          var path = require('node:url').fileURLToPath(new URL('./native-clock.mjs', process.env.LASM_FULL_HOST_MODULE));
+          lasmFullClock.wall = require(path).nativeClock();
+        } catch (error) { /* keep using the host */ }
+      }
+      if (!lasmFullClock.wall) return undefined;
+      var ns;
+      // Clock errors keep the host's Lean error encoding.
+      try { ns = lasmFullClock.wall.now(); } catch (error) { return undefined; }
+      return numbers(ns / 1000000000n, ns % 1000000000n);
+    },
   },
   lasm_fiber_current__sig: 'i',
   lasm_fiber_current: function () { return Number(_pthread_self()); },

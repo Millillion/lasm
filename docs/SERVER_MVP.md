@@ -522,3 +522,42 @@ Keeping socket reads on the Lean worker is not directly possible. A Lean pthread
 returns to its isolate's event loop, so Node sockets cannot run there. A separate I/O
 isolate would still be a cross-thread hop. Reducing hops (1, 3) and cost per hop (2) is
 the available path.
+
+## Performance work (2026-10-19)
+
+Linux x64, local, `profile.mjs` load phase on the robustness fixture (8 s per row,
+same-run native control). Evidence:
+[server-mvp-performance-2026-10-19.json](evidence/server-mvp-performance-2026-10-19.json).
+
+| Step | RPCs/request (health) | ELU c=16 | req/s c=16 (native) | p50/p99 ms c=16 (native) | p50 ms c=1 (native) |
+| --- | ---: | ---: | --- | --- | --- |
+| Baseline (`01003a4`) | 57.96 | 0.90 | 347 (2,048) | 45.7/60.0 (7.9/10.3) | 6.54 (1.40) |
+| 1: host-thread regular files, in-worker clocks | 55.92 | 0.88 | 368 (2,035) | 42.3/61.3 (7.9/10.6) | 5.84 (1.40) |
+
+### Step 1 behaviour (source awaiting review)
+
+- **Read-only regular files skip the file-worker pool** (`src/native-files.mjs`
+  `openRegular`/`readRegular`, `src/node-host.mjs`). `IO.FS.Handle.mk path .read` on
+  Linux/macOS first `stat`s the path. Only if it is a regular file is it opened on the
+  host thread with the pooled open's flags plus `O_NONBLOCK | O_NOCTTY`; the opened
+  descriptor must also be a regular file, and `O_NONBLOCK` is cleared before `fdopen`.
+  Anything else (FIFOs, devices, directories, `stat` or `open` errors, a conflicting
+  lease) closes the probe descriptor and uses the unchanged pooled open, which decides
+  the result and the error. Reads of at most 64 KiB on such a handle are `fread` on the
+  host thread, in order with any pooled operation on the same stream; larger reads and
+  every other operation keep using a file worker. Closing such a handle is a host-thread
+  `fclose` (read-only: nothing to flush). Lean still reads the file every time: nothing
+  is cached. `Std.Http`'s `Date` header (`DateTime.nowAt "UTC"`: getenv, 2 stat, open,
+  2 reads, close) therefore no longer waits for 4 worker hops: open 0.19 → 0.07 ms,
+  read 0.16 → 0.03 ms, close 0.06 → 0.02 ms at c=1. Writable modes and Windows are
+  unchanged.
+- **Clocks are read on the Lean thread** (`scripts/full-lean/host-library.js`
+  `$lasmFullClock`). `IO.monoMsNow`/`IO.monoNanosNow`/`lean_uv_hrtime` use
+  `process.hrtime.bigint()`, which is libuv's process-wide monotonic clock, the same
+  source the host used, so readings stay monotonic across threads. The wall clock
+  (`IO.getCurrentTime`, op 27) uses the same `native-clock.mjs` (`clock_gettime` /
+  `GetSystemTimePreciseAsFileTime`, microsecond truncation) loaded in that worker; if
+  it cannot load or the clock call fails, the host call (and its error encoding) is
+  used. No `Date.now`/`performance.now` approximation is involved. Loading the clock
+  in each Lean worker did not raise server RSS (16-connection load: 567–605 MiB
+  against 610–621 MiB before, with fewer threads because the file pool is idle).
