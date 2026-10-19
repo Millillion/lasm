@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
@@ -67,7 +67,14 @@ for (const scenario of ['range', 'ignored-range', 'bad-range', 'changed-etag', '
       if (++requests === 1) {
         const stream = new ReadableStream({ async start(controller) {
           controller.enqueue(bytes.subarray(0, 5));
-          await delay(30); controller.error(failed('ECONNRESET'));
+          // Interrupt only after the first bytes are on disk: the downloader
+          // resumes from the file's actual size, which a fixed delay did not
+          // guarantee on slow runners (the retry then correctly sent no Range).
+          for (let i = 0; i < 500; i++) {
+            if (await stat(f.file).then(s => s.size === 5, () => false)) break;
+            await delay(10);
+          }
+          controller.error(failed('ECONNRESET'));
         } });
         return new Response(stream, { headers: scenario === 'no-etag' ? {} : { etag: '"fixture"' } });
       }
