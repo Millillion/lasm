@@ -120,17 +120,29 @@ void ensure_completion_thread() {
                 started = true; ready.notify_one();
             }
             for (;;) {
-                // Packet: promise, resource, kind, failed, then the result bytes
-                // (begin_request's op 94: the completion carries its result).
-                Reply completion(92);
-                if (completion.failed || completion.bytes.size() < 4 * sizeof(uint64_t)) {
+                // Op 95 returns every completion queued so far, in order, as
+                // (u64 size, packet) records. Packet: promise, resource, kind,
+                // failed, then the result bytes (begin_request's op 94: the
+                // completion carries its result).
+                Reply batch(95);
+                if (batch.failed || batch.bytes.empty()) {
                     lean_internal_panic("Invalid asynchronous completion packet");
                     __builtin_trap();
                 }
-                auto *promise = reinterpret_cast<O *>(completion.number());
-                auto *resource = reinterpret_cast<O *>(completion.number(8));
-                const Reply result(Reply::Carried{}, completion.number(24) != 0, completion.bytes.data() + 32, completion.bytes.size() - 32);
-                lean_dec(resolve_request(promise, resource, result, completion.number(16)));
+                for (size_t offset = 0; offset < batch.bytes.size();) {
+                    const uint64_t size = batch.number(offset);
+                    offset += 8;
+                    if (size < 4 * sizeof(uint64_t) || size > batch.bytes.size() - offset) {
+                        lean_internal_panic("Invalid asynchronous completion packet");
+                        __builtin_trap();
+                    }
+                    auto *promise = reinterpret_cast<O *>(batch.number(offset));
+                    auto *resource = reinterpret_cast<O *>(batch.number(offset + 8));
+                    const Reply result(Reply::Carried{}, batch.number(offset + 24) != 0,
+                        batch.bytes.data() + offset + 32, size - 32);
+                    lean_dec(resolve_request(promise, resource, result, batch.number(offset + 16)));
+                    offset += size;
+                }
             }
         }); // lthread detaches; Emscripten terminates it with the process runtime.
         std::unique_lock<std::mutex> lock(mutex);
