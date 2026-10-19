@@ -56,9 +56,7 @@ O *socket_address_bytes(const uint8_t *data, size_t size) {
 O *socket_address(const Reply &r) { return socket_address_bytes(r.bytes.data(), r.bytes.size()); }
 // response kind: Unit=0, socket=1, optional bytes=2, Bool=3, timer Unit=4,
 // datagram=5, IP addresses=6, host/service names=7, bytes=8, signal=9.
-O *finish_request(O *promise, O *resource, O *request, O *kind, O*) {
-    Reply r(90, lean_unbox(request));
-    const unsigned k = lean_unbox(kind);
+O *resolve_request(O *promise, O *resource, const Reply &r, unsigned k) {
     // Native UV cancellation drops its promise rather than resolving a value.
     if (!(r.failed && r.number() == 10)) {
         O *value;
@@ -101,6 +99,9 @@ O *finish_request(O *promise, O *resource, O *request, O *kind, O*) {
     lean_dec(promise); lean_dec(resource);
     return lean_box(0);
 }
+[[maybe_unused]] O *finish_request(O *promise, O *resource, O *request, O *kind, O*) {
+    return resolve_request(promise, resource, Reply(90, lean_unbox(request)), lean_unbox(kind));
+}
 #ifdef LASM_FULL_NATIVE_THREADS
 // Native libuv completes promises outside Lean's task pool. Preserve that
 // property: pending socket reads must never occupy all ordinary Lean workers.
@@ -119,15 +120,17 @@ void ensure_completion_thread() {
                 started = true; ready.notify_one();
             }
             for (;;) {
+                // Packet: promise, resource, kind, failed, then the result bytes
+                // (begin_request's op 94: the completion carries its result).
                 Reply completion(92);
-                if (completion.failed || completion.bytes.size() != 4 * sizeof(uint64_t)) {
+                if (completion.failed || completion.bytes.size() < 4 * sizeof(uint64_t)) {
                     lean_internal_panic("Invalid asynchronous completion packet");
                     __builtin_trap();
                 }
                 auto *promise = reinterpret_cast<O *>(completion.number());
                 auto *resource = reinterpret_cast<O *>(completion.number(8));
-                lean_dec(finish_request(promise, resource, lean_box(completion.number(16)),
-                    lean_box(completion.number(24)), lean_box(0)));
+                const Reply result(Reply::Carried{}, completion.number(24) != 0, completion.bytes.data() + 32, completion.bytes.size() - 32);
+                lean_dec(resolve_request(promise, resource, result, completion.number(16)));
             }
         }); // lthread detaches; Emscripten terminates it with the process runtime.
         std::unique_lock<std::mutex> lock(mutex);
@@ -135,7 +138,7 @@ void ensure_completion_thread() {
     });
 }
 #endif
-O *request_promise(uint32_t id, O *resource, unsigned kind) {
+[[maybe_unused]] O *request_promise(uint32_t id, O *resource, unsigned kind) {
     auto *promise = lean::lean_promise_new();
     lean_inc(promise); lean_inc(resource);
 #ifdef LASM_FULL_NATIVE_THREADS
@@ -152,6 +155,36 @@ O *request_promise(uint32_t id, O *resource, unsigned kind) {
 #endif
     return promise;
 }
+#ifdef LASM_FULL_NATIVE_THREADS
+// One host call starts the operation and registers its completion (op 94).
+// The completion thread then receives the result with the completion itself.
+// With check, a synchronous startup failure is returned instead, as native
+// libuv rejects startup before Lean creates the observable promise: the
+// promise is then released unobserved and no completion is registered.
+O *begin_request(uint32_t op, O *resource, uint64_t arg, const void *data, size_t size, unsigned kind, bool check) {
+    auto *promise = lean::lean_promise_new();
+    lean_inc(promise); lean_inc(resource);
+    lean_mark_mt(promise); lean_mark_mt(resource);
+    ensure_completion_thread();
+    uint64_t header[] = {reinterpret_cast<uintptr_t>(promise), reinterpret_cast<uintptr_t>(resource), kind, check, op, arg};
+    std::vector<uint8_t> input(sizeof(header) + size);
+    memcpy(input.data(), header, sizeof(header));
+    if (size) memcpy(input.data() + sizeof(header), data, size);
+    Reply started(94, lean_is_scalar(resource) ? 0 : handle_id(resource), 0, input.data(), input.size());
+    if (!started.failed) return ok(promise);
+    if (!check) { lean_internal_panic("Cannot start asynchronous host request"); __builtin_trap(); }
+    lean_dec(promise); lean_dec(promise); lean_dec(resource);
+    return started.result();
+}
+O *start_request(uint32_t op, O *resource, uint64_t arg, const void *data, size_t size, unsigned kind) {
+    auto *result = begin_request(op, resource, arg, data, size, kind, false);
+    auto *promise = lean_ctor_get(result, 0); lean_inc(promise); lean_dec(result);
+    return promise;
+}
+O *start_io_request(uint32_t op, O *resource, uint64_t arg, const void *data, size_t size, unsigned kind) {
+    return begin_request(op, resource, arg, data, size, kind, true);
+}
+#else
 O *start_request(uint32_t op, O *resource, uint64_t arg, const void *data, size_t size, unsigned kind) {
     auto id = lasm_node_start(op, lean_is_scalar(resource) ? 0 : handle_id(resource), arg, (const uint8_t*)data, size);
     return request_promise(id, resource, kind);
@@ -164,6 +197,7 @@ O *start_io_request(uint32_t op, O *resource, uint64_t arg, const void *data, si
     Reply started(93, id);
     return started.failed ? started.result() : ok(request_promise(id, resource, kind));
 }
+#endif
 O *unit_call(uint32_t op, O *h, uint64_t arg = 0) { return Reply(op, handle_id(h), arg).result(); }
 O *lock_call(uint32_t op, O *h, uint64_t arg = 0) {
     auto r = Reply(op, handle_id(h), arg);

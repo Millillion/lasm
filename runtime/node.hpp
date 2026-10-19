@@ -41,6 +41,9 @@ struct Reply {
         bytes.resize(length);
         lasm_node_copy(bytes.data(), length);
     }
+    // A result that arrived inside another reply (an asynchronous completion).
+    struct Carried {};
+    Reply(Carried, bool failed, const uint8_t *data, size_t size) : failed(failed), bytes(data, data + size) {}
     uint64_t number(size_t offset = 0) const {
         uint64_t n = 0;
         if (offset + 8 > bytes.size()) __builtin_trap();

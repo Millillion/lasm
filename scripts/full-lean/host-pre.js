@@ -19,6 +19,18 @@ if (!ENVIRONMENT_IS_PTHREAD) {
   };
   // Each worker isolate transfers its reply port once (see $lasmFullRPC).
   var lasmFullReplyPorts = new Map();
+  // Completions go to the dedicated Lean completion thread's long poll (op 92).
+  var lasmFullComplete = function (completion) {
+    if (lasmFullCompletionWaiter) {
+      const resolve = lasmFullCompletionWaiter;
+      lasmFullCompletionWaiter = undefined;
+      resolve(completion);
+    } else lasmFullCompletions.push(completion);
+  };
+  var lasmFullExit = async function (error) {
+    await lasmFullHost?.then(host => host.flushStdIO()).catch(() => {});
+    process.exit(error.code);
+  };
   Module.lasmFullHostRequest = async function (request) {
     const { signalPointer, sequence } = request;
     if (request.port) {
@@ -55,15 +67,27 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       else if (request.operation === 91) {
         // Completion registration carries opaque Lean pointers. JavaScript only
         // queues their bytes; the dedicated Lean thread owns and resolves them.
-        host.whenReady(request.handle).then(() => {
-          const completion = { error: false, bytes };
-          if (lasmFullCompletionWaiter) {
-            const resolve = lasmFullCompletionWaiter;
-            lasmFullCompletionWaiter = undefined;
-            resolve(completion);
-          } else lasmFullCompletions.push(completion);
-        });
+        host.whenReady(request.handle).then(() => lasmFullComplete({ error: false, bytes }));
         result = { error: false, bytes: new Uint8Array(0) };
+      } else if (request.operation === 94) {
+        // Start an asynchronous operation and register its completion in one
+        // call. Header: promise, resource, kind (opaque, echoed), check,
+        // operation, argument; then the operation's input. The completion
+        // carries the result (failed flag, bytes), so no separate finish call.
+        // With check, a synchronous startup failure is returned instead and
+        // nothing is registered (the former start-check, op 93).
+        const input = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        const header = Buffer.from(input.subarray(0, 24));
+        const started = host.request(Number(input.readBigUInt64LE(32)), request.handle, input.readBigUInt64LE(40),
+          input.subarray(48), args[4]);
+        if (input.readBigUInt64LE(24) !== 0n && !started.then && started.error) result = started;
+        else {
+          Promise.resolve(started).then(done => lasmFullComplete({ error: false,
+            bytes: Buffer.concat([header, Buffer.from([done.error ? 1 : 0, 0, 0, 0, 0, 0, 0, 0]), done.bytes]) }),
+          error => error?.name === 'LeanExit' ? lasmFullExit(error)
+            : lasmFullComplete({ failure: error?.stack ?? String(error) }));
+          result = { error: false, bytes: new Uint8Array(0) };
+        }
       } else if (request.operation === 92) {
         result = lasmFullCompletions.length ? lasmFullCompletions.shift()
           : await new Promise(resolve => { lasmFullCompletionWaiter = resolve; });
@@ -75,10 +99,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
         byteOffset: result.bytes.byteOffset, byteLength: result.bytes.byteLength,
       });
     } catch (error) {
-      if (error.name === 'LeanExit') {
-        await lasmFullHost?.then(host => host.flushStdIO()).catch(() => {});
-        process.exit(error.code);
-      }
+      if (error.name === 'LeanExit') await lasmFullExit(error);
       reply({ failure: error.stack ?? String(error) });
     } finally {
       Atomics.store(signal, 0, 1);

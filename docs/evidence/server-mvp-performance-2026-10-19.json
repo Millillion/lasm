@@ -553,6 +553,1396 @@
      }
     }
    ]
+  },
+  "step1-rerun": {
+   "recordedAt": "2026-10-19T12:53:03.674Z",
+   "deployed": "/home/lastmjs/development/lasm/compiler/.work/perf/build-s1/deployed",
+   "loadAverageAtStart": [
+    1.07,
+    1.65,
+    2.09
+   ],
+   "native": [
+    {
+     "workload": "health",
+     "connections": 1,
+     "rps": 1058.4,
+     "p50": 0.91,
+     "p99": 1.386,
+     "errors": 0,
+     "cpuMsPerRequest": 1.787,
+     "mainThreadCpuSeconds": 0
+    },
+    {
+     "workload": "health",
+     "connections": 16,
+     "rps": 2188.9,
+     "p50": 7.4,
+     "p99": 9.348,
+     "errors": 0,
+     "cpuMsPerRequest": 2.702,
+     "mainThreadCpuSeconds": 0
+    },
+    {
+     "workload": "json",
+     "connections": 16,
+     "rps": 1556,
+     "p50": 10.372,
+     "p99": 14.033,
+     "errors": 0,
+     "cpuMsPerRequest": 3.863,
+     "mainThreadCpuSeconds": 0
+    },
+    {
+     "workload": "big64",
+     "connections": 16,
+     "rps": 2092.9,
+     "p50": 7.682,
+     "p99": 10.425,
+     "errors": 0,
+     "cpuMsPerRequest": 2.73,
+     "mainThreadCpuSeconds": 0
+    },
+    {
+     "workload": "close",
+     "connections": 8,
+     "rps": 1816.4,
+     "p50": 4.163,
+     "p99": 5.628,
+     "errors": 0,
+     "cpuMsPerRequest": 2.831,
+     "mainThreadCpuSeconds": 0
+    }
+   ],
+   "lasm": [
+    {
+     "workload": "health",
+     "connections": 1,
+     "rps": 176.3,
+     "p50": 5.57,
+     "p99": 7.972,
+     "errors": 0,
+     "cpuMsPerRequest": 7.938,
+     "mainThreadCpuSeconds": 3.8
+    },
+    {
+     "workload": "health",
+     "connections": 16,
+     "rps": 361,
+     "p50": 45.103,
+     "p99": 54.495,
+     "errors": 0,
+     "cpuMsPerRequest": 9.868,
+     "mainThreadCpuSeconds": 7.17
+    },
+    {
+     "workload": "json",
+     "connections": 16,
+     "rps": 363.8,
+     "p50": 43.216,
+     "p99": 52.596,
+     "errors": 0,
+     "cpuMsPerRequest": 11.762,
+     "mainThreadCpuSeconds": 6.89
+    },
+    {
+     "workload": "big64",
+     "connections": 16,
+     "rps": 353.9,
+     "p50": 45.498,
+     "p99": 56.192,
+     "errors": 0,
+     "cpuMsPerRequest": 10.381,
+     "mainThreadCpuSeconds": 7.02
+    },
+    {
+     "workload": "close",
+     "connections": 8,
+     "rps": 366.4,
+     "p50": 21.231,
+     "p99": 28.588,
+     "errors": 0,
+     "cpuMsPerRequest": 9.543,
+     "mainThreadCpuSeconds": 7.17
+    }
+   ],
+   "lasmInstrumented": [
+    {
+     "workload": "health",
+     "connections": 1,
+     "rps": 174.1,
+     "p50": 5.694,
+     "p99": 7.63,
+     "errors": 0,
+     "cpuMsPerRequest": 8.139,
+     "mainThreadCpuSeconds": 3.95,
+     "rpcPerRequest": 55.56,
+     "mainEventLoopUtilization": 0.429,
+     "opsPerRequest": {
+      "1": 0.999,
+      "2": 1.997,
+      "10": 1.998,
+      "22": 0.999,
+      "58": 2.46,
+      "70": 1.997,
+      "71": 2.47,
+      "75": 2.471,
+      "90": 7.928,
+      "91": 7.928,
+      "92": 7.928,
+      "93": 5.457,
+      "start:57": 2.461,
+      "start:72": 2.47,
+      "start:56": 0.999,
+      "release:0": 2.996,
+      "start:59": 1.997
+     }
+    },
+    {
+     "workload": "health",
+     "connections": 16,
+     "rps": 325,
+     "p50": 49.92,
+     "p99": 58.988,
+     "errors": 0,
+     "cpuMsPerRequest": 10.36,
+     "mainThreadCpuSeconds": 7.27,
+     "rpcPerRequest": 55.97,
+     "mainEventLoopUtilization": 0.886,
+     "opsPerRequest": {
+      "1": 0.999,
+      "2": 1.998,
+      "10": 1.998,
+      "22": 0.999,
+      "58": 2.503,
+      "70": 1.997,
+      "71": 2.499,
+      "75": 2.501,
+      "90": 7.996,
+      "91": 7.995,
+      "92": 7.995,
+      "93": 5.496,
+      "start:57": 2.5,
+      "start:72": 2.499,
+      "start:56": 0.997,
+      "release:0": 2.997,
+      "start:59": 1.999
+     }
+    },
+    {
+     "workload": "json",
+     "connections": 16,
+     "rps": 336.9,
+     "p50": 47.101,
+     "p99": 57.451,
+     "errors": 0,
+     "cpuMsPerRequest": 12.345,
+     "mainThreadCpuSeconds": 7.01,
+     "rpcPerRequest": 56.92,
+     "mainEventLoopUtilization": 0.851,
+     "opsPerRequest": {
+      "1": 1,
+      "2": 2,
+      "10": 2,
+      "22": 1,
+      "58": 2.551,
+      "70": 2.129,
+      "71": 2.553,
+      "75": 2.553,
+      "90": 8.116,
+      "91": 8.108,
+      "92": 8.116,
+      "93": 5.555,
+      "start:57": 2.551,
+      "start:72": 2.553,
+      "start:56": 1.004,
+      "release:0": 3.128,
+      "start:59": 2
+     }
+    },
+    {
+     "workload": "big64",
+     "connections": 16,
+     "rps": 331,
+     "p50": 48.998,
+     "p99": 57.77,
+     "errors": 0,
+     "cpuMsPerRequest": 10.681,
+     "mainThreadCpuSeconds": 7.16,
+     "rpcPerRequest": 55.89,
+     "mainEventLoopUtilization": 0.871,
+     "opsPerRequest": {
+      "1": 1,
+      "2": 2,
+      "10": 2,
+      "22": 1,
+      "58": 2.487,
+      "70": 2,
+      "71": 2.491,
+      "75": 2.49,
+      "90": 7.985,
+      "91": 7.982,
+      "92": 7.984,
+      "93": 5.491,
+      "start:57": 2.488,
+      "start:72": 2.491,
+      "start:56": 1.003,
+      "release:0": 3,
+      "start:59": 2
+     }
+    },
+    {
+     "workload": "close",
+     "connections": 8,
+     "rps": 341.4,
+     "p50": 22.562,
+     "p99": 31.475,
+     "errors": 0,
+     "cpuMsPerRequest": 9.974,
+     "mainThreadCpuSeconds": 7.28,
+     "rpcPerRequest": 59.71,
+     "mainEventLoopUtilization": 0.889,
+     "opsPerRequest": {
+      "1": 0.997,
+      "2": 1.994,
+      "10": 1.994,
+      "22": 0.997,
+      "54": 0.997,
+      "55": 0.163,
+      "58": 2.497,
+      "61": 0.997,
+      "70": 1.997,
+      "71": 2.498,
+      "75": 2.498,
+      "90": 8.15,
+      "91": 8.151,
+      "92": 8.15,
+      "93": 5.49,
+      "start:57": 2.497,
+      "start:72": 2.498,
+      "start:56": 0.997,
+      "start:53": 0.163,
+      "release:0": 3.99,
+      "start:59": 1.996
+     }
+    }
+   ]
+  },
+  "step2": {
+   "recordedAt": "2026-10-19T12:55:36.388Z",
+   "deployed": "/home/lastmjs/development/lasm/compiler/.work/perf/build-s2/deployed",
+   "loadAverageAtStart": [
+    3.77,
+    2.66,
+    2.42
+   ],
+   "native": [
+    {
+     "workload": "health",
+     "connections": 1,
+     "rps": 1026.4,
+     "p50": 0.923,
+     "p99": 1.474,
+     "errors": 0,
+     "cpuMsPerRequest": 1.829,
+     "mainThreadCpuSeconds": 0
+    },
+    {
+     "workload": "health",
+     "connections": 16,
+     "rps": 2155.6,
+     "p50": 7.437,
+     "p99": 10.534,
+     "errors": 0,
+     "cpuMsPerRequest": 2.695,
+     "mainThreadCpuSeconds": 0
+    },
+    {
+     "workload": "json",
+     "connections": 16,
+     "rps": 1597,
+     "p50": 10.211,
+     "p99": 12.439,
+     "errors": 0,
+     "cpuMsPerRequest": 3.828,
+     "mainThreadCpuSeconds": 0
+    },
+    {
+     "workload": "big64",
+     "connections": 16,
+     "rps": 2107.5,
+     "p50": 7.632,
+     "p99": 10.231,
+     "errors": 0,
+     "cpuMsPerRequest": 2.727,
+     "mainThreadCpuSeconds": 0
+    },
+    {
+     "workload": "close",
+     "connections": 8,
+     "rps": 1818.8,
+     "p50": 4.169,
+     "p99": 5.569,
+     "errors": 0,
+     "cpuMsPerRequest": 2.816,
+     "mainThreadCpuSeconds": 0
+    }
+   ],
+   "lasm": [
+    {
+     "workload": "health",
+     "connections": 1,
+     "rps": 235.7,
+     "p50": 4.163,
+     "p99": 6.029,
+     "errors": 0,
+     "cpuMsPerRequest": 6.251,
+     "mainThreadCpuSeconds": 3.81
+    },
+    {
+     "workload": "health",
+     "connections": 16,
+     "rps": 493.9,
+     "p50": 32.148,
+     "p99": 41.549,
+     "errors": 0,
+     "cpuMsPerRequest": 8.012,
+     "mainThreadCpuSeconds": 7.09
+    },
+    {
+     "workload": "json",
+     "connections": 16,
+     "rps": 531.6,
+     "p50": 30.009,
+     "p99": 37.956,
+     "errors": 0,
+     "cpuMsPerRequest": 9.434,
+     "mainThreadCpuSeconds": 7.05
+    },
+    {
+     "workload": "big64",
+     "connections": 16,
+     "rps": 500.2,
+     "p50": 31.315,
+     "p99": 44.648,
+     "errors": 0,
+     "cpuMsPerRequest": 8.114,
+     "mainThreadCpuSeconds": 7.11
+    },
+    {
+     "workload": "close",
+     "connections": 8,
+     "rps": 514.3,
+     "p50": 15.08,
+     "p99": 22.284,
+     "errors": 0,
+     "cpuMsPerRequest": 7.709,
+     "mainThreadCpuSeconds": 7.57
+    }
+   ],
+   "lasmInstrumented": [
+    {
+     "workload": "health",
+     "connections": 1,
+     "rps": 228,
+     "p50": 4.318,
+     "p99": 6.27,
+     "errors": 0,
+     "cpuMsPerRequest": 6.446,
+     "mainThreadCpuSeconds": 3.86,
+     "rpcPerRequest": 34.4,
+     "mainEventLoopUtilization": 0.423,
+     "opsPerRequest": {
+      "1": 0.998,
+      "2": 1.997,
+      "10": 1.997,
+      "22": 0.998,
+      "58": 2.49,
+      "70": 1.997,
+      "71": 2.484,
+      "75": 2.487,
+      "92": 7.975,
+      "94": 7.975,
+      "release:0": 2.996
+     }
+    },
+    {
+     "workload": "health",
+     "connections": 16,
+     "rps": 473,
+     "p50": 34.21,
+     "p99": 46.632,
+     "errors": 0,
+     "cpuMsPerRequest": 8.161,
+     "mainThreadCpuSeconds": 7.22,
+     "rpcPerRequest": 34.45,
+     "mainEventLoopUtilization": 0.89,
+     "opsPerRequest": {
+      "1": 0.998,
+      "2": 1.998,
+      "10": 1.995,
+      "22": 0.997,
+      "58": 2.494,
+      "70": 1.996,
+      "71": 2.498,
+      "75": 2.499,
+      "92": 7.986,
+      "94": 7.987,
+      "release:0": 2.997
+     }
+    },
+    {
+     "workload": "json",
+     "connections": 16,
+     "rps": 479.6,
+     "p50": 32.857,
+     "p99": 44.1,
+     "errors": 0,
+     "cpuMsPerRequest": 9.943,
+     "mainThreadCpuSeconds": 7.06,
+     "rpcPerRequest": 34.97,
+     "mainEventLoopUtilization": 0.869,
+     "opsPerRequest": {
+      "1": 1,
+      "2": 2,
+      "10": 2,
+      "22": 1,
+      "58": 2.54,
+      "70": 2.097,
+      "71": 2.539,
+      "75": 2.539,
+      "92": 8.082,
+      "94": 8.08,
+      "release:0": 3.097
+     }
+    },
+    {
+     "workload": "big64",
+     "connections": 16,
+     "rps": 479.2,
+     "p50": 32.422,
+     "p99": 43.85,
+     "errors": 0,
+     "cpuMsPerRequest": 8.307,
+     "mainThreadCpuSeconds": 7.51,
+     "rpcPerRequest": 34.46,
+     "mainEventLoopUtilization": 0.925,
+     "opsPerRequest": {
+      "1": 0.998,
+      "2": 1.996,
+      "10": 1.997,
+      "22": 0.998,
+      "58": 2.5,
+      "70": 1.996,
+      "71": 2.499,
+      "75": 2.5,
+      "92": 7.994,
+      "94": 7.992,
+      "release:0": 2.993
+     }
+    },
+    {
+     "workload": "close",
+     "connections": 8,
+     "rps": 452.6,
+     "p50": 17.205,
+     "p99": 24.173,
+     "errors": 0,
+     "cpuMsPerRequest": 8.411,
+     "mainThreadCpuSeconds": 7.67,
+     "rpcPerRequest": 38.15,
+     "mainEventLoopUtilization": 0.95,
+     "opsPerRequest": {
+      "1": 0.997,
+      "2": 1.994,
+      "10": 1.995,
+      "22": 0.998,
+      "54": 0.999,
+      "55": 0.222,
+      "58": 2.494,
+      "61": 0.999,
+      "70": 1.996,
+      "71": 2.512,
+      "75": 2.512,
+      "92": 8.222,
+      "94": 8.222,
+      "release:0": 3.991
+     }
+    }
+   ],
+   "notes": "Local experiment: liblasmhost.a with node-async.cpp.o rebuilt from the working tree (sha256 0119590d…; HEAD source rebuilds the shipped object d9e9e9c2… byte for byte), runtime identity 4d4950e7… (local, not the CI handoff). step1-rerun and step2 ran back to back.",
+   "robustnessLocal": {
+    "platform": "linux-x64",
+    "passed": true,
+    "engineVersion": "v26.12.0",
+    "cpus": 12,
+    "cpuModel": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+    "resources": {
+     "buildPeakMiB": null,
+     "runPeakMiB": null
+    },
+    "config": {
+     "loadSeconds": 20,
+     "loadWarmupSeconds": 3,
+     "loadConnections": [
+      16,
+      64
+     ],
+     "soakSeconds": 600,
+     "soakConnections": 8,
+     "soakFaultEveryMs": 2000,
+     "sampleMs": 5000,
+     "faultScale": 1,
+     "maxServerRssBytes": 2147483648,
+     "maxServerCommitBytes": 5368709120,
+     "kinds": [
+      "native",
+      "lasm"
+     ],
+     "variant": "step2-local",
+     "requestTimeoutMs": 30000,
+     "phases": [
+      "load",
+      "faults"
+     ],
+     "server": {
+      "maxBodySize": 1048576,
+      "maxHeaderBytes": 16384,
+      "maxHeaders": 50,
+      "headerTimeoutMs": 2000,
+      "lingeringTimeoutMs": 3000,
+      "keepAliveTimeoutMs": 5000,
+      "maxConnections": 512,
+      "maxUriLength": 8192
+     }
+    },
+    "build": {
+     "lean": "4.35.0",
+     "linkDriver": "node",
+     "sourceSha256": "003b1062c6618477295643bec3895f68884ff579531b6748bb3244c044d235c5",
+     "wasmBytes": 2986396,
+     "nativeBytes": 120462312,
+     "lasmBuildSeconds": 77.15,
+     "nativeBuildSeconds": 28.687
+    },
+    "comparison": {
+     "faultDifferences": [
+      {
+       "fault": "handler-exception",
+       "case": "JSON body over the handler readAll limit (64 KiB)",
+       "native": {
+        "500/server-reset+close-header": 10
+       },
+       "lasm": {
+        "500/server-close+close-header": 10
+       },
+       "informational": true,
+       "kind": "TCP close: FIN vs RST, or a status lost to RST"
+      },
+      {
+       "fault": "oversized",
+       "case": "URI 9000 B > maxUriLength",
+       "native": {
+        "400/server-reset+close-header": 10
+       },
+       "lasm": {
+        "400/server-close+close-header": 10
+       },
+       "informational": true,
+       "kind": "TCP close: FIN vs RST, or a status lost to RST"
+      },
+      {
+       "fault": "slow-client",
+       "case": "slow-loris: one header byte every 250 ms",
+       "native": {
+        "none/server-close/1-6s": 2,
+        "none/server-reset/1-6s": 3
+       },
+       "lasm": {
+        "none/server-close/1-6s": 5
+       },
+       "informational": true,
+       "kind": "TCP close: FIN vs RST, or a status lost to RST"
+      }
+     ],
+     "load": [
+      {
+       "connections": 16,
+       "nativeRps": 1434.7,
+       "lasmRps": 436.1,
+       "lasmToNativeThroughput": 0.304,
+       "nativeP99": 36.197,
+       "lasmP99": 86.916
+      },
+      {
+       "connections": 64,
+       "nativeRps": 1232.6,
+       "lasmRps": 421,
+       "lasmToNativeThroughput": 0.342,
+       "nativeP99": 124.288,
+       "lasmP99": 307.781
+      }
+     ],
+     "startupSeconds": {
+      "native": 0.053,
+      "lasm": 0.345
+     }
+    },
+    "recordedAt": "2026-10-19T12:46:56.908Z",
+    "results": {
+     "native": {
+      "checks": {
+       "preflight": true,
+       "load": true,
+       "faults": true,
+       "soak": null,
+       "final": true,
+       "shutdown": true,
+       "memoryCap": true,
+       "noRestarts": true
+      },
+      "startupSeconds": 0.053,
+      "exit": {
+       "code": 0,
+       "signal": null,
+       "at": 1792413933678
+      },
+      "stderrLines": 600,
+      "memoryCaps": [],
+      "restarts": [],
+      "peakRssMiB": 129,
+      "stderr": [
+       {
+        "line": "connection failure: robustness fixture: deliberate handler exception",
+        "count": 60
+       },
+       {
+        "line": "connection failure: body exceeded maximum size of N bytes",
+        "count": 10
+       },
+       {
+        "line": "connection failure: Connection closed",
+        "count": 115
+       },
+       {
+        "line": "connection failure: Bad message",
+        "count": 140
+       },
+       {
+        "line": "connection failure: Unsupported version",
+        "count": 20
+       },
+       {
+        "line": "connection failure: Entity too large",
+        "count": 10
+       },
+       {
+        "line": "connection failure: Headers too large",
+        "count": 10
+       },
+       {
+        "line": "connection failure: Too many headers",
+        "count": 10
+       },
+       {
+        "line": "connection failure: request header timeout",
+        "count": 15
+       },
+       {
+        "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+        "count": 170
+       },
+       {
+        "line": "connection failure: resource vanished (error code: N, broken pipe)",
+        "count": 40
+       }
+      ],
+      "load": [
+       {
+        "connections": 16,
+        "requestsPerSecond": 1434.7,
+        "latencyMs": {
+         "count": 28722,
+         "p50": 8.951,
+         "p95": 28.854,
+         "p99": 36.197,
+         "max": 41.87
+        },
+        "errors": 0,
+        "requests": 28722,
+        "connectionsOpened": 16,
+        "cpu": {
+         "serverCores": 5.75,
+         "driverCores": 0.45,
+         "serverRssMiB": 92,
+         "threads": 27
+        },
+        "memoryCapStopped": false,
+        "errorSamples": []
+       },
+       {
+        "connections": 64,
+        "requestsPerSecond": 1232.6,
+        "latencyMs": {
+         "count": 24703,
+         "p50": 42.415,
+         "p95": 111.883,
+         "p99": 124.288,
+         "max": 159.912
+        },
+        "errors": 0,
+        "requests": 24703,
+        "connectionsOpened": 64,
+        "cpu": {
+         "serverCores": 6.22,
+         "driverCores": 0.36,
+         "serverRssMiB": 104,
+         "threads": 62
+        },
+        "memoryCapStopped": false,
+        "errorSamples": []
+       }
+      ],
+      "soak": null,
+      "faults": [
+       {
+        "name": "handler-exception",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "GET /throw",
+          "outcomes": {
+           "500/server-close+close-header": 50
+          }
+         },
+         {
+          "name": "pipelined /throw then /health",
+          "outcomes": {
+           "500/server-close+close-header": 10,
+           "statuses 500": 10
+          }
+         },
+         {
+          "name": "JSON body over the handler readAll limit (64 KiB)",
+          "outcomes": {
+           "500/server-reset+close-header": 10
+          }
+         }
+        ]
+       },
+       {
+        "name": "malformed",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "garbage request line",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "header without colon",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "unsupported HTTP version",
+          "outcomes": {
+           "505/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "missing Host",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "invalid chunk size",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "Content-Length with Transfer-Encoding",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "binary garbage with NUL",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         }
+        ]
+       },
+       {
+        "name": "oversized",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "Content-Length 2 MiB > maxBodySize",
+          "outcomes": {
+           "413/server-reset+close-header": 5
+          }
+         },
+         {
+          "name": "chunked 2 MiB > maxBodySize",
+          "outcomes": {
+           "413/server-reset+close-header": 5
+          }
+         },
+         {
+          "name": "headers 20 KiB > maxHeaderBytes",
+          "outcomes": {
+           "431/server-close+close-header": 10
+          }
+         },
+         {
+          "name": "60 headers > maxHeaders",
+          "outcomes": {
+           "431/server-close+close-header": 10
+          }
+         },
+         {
+          "name": "header value 9000 B > maxHeaderValueLength",
+          "outcomes": {
+           "400/server-close+close-header": 10
+          }
+         },
+         {
+          "name": "URI 9000 B > maxUriLength",
+          "outcomes": {
+           "400/server-reset+close-header": 10
+          }
+         }
+        ]
+       },
+       {
+        "name": "slow-client",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "slow-loris: one header byte every 250 ms",
+          "outcomes": {
+           "none/server-close/1-6s": 2,
+           "none/server-reset/1-6s": 3
+          },
+          "servedDuring": true
+         },
+         {
+          "name": "partial headers then silence",
+          "outcomes": {
+           "none/server-close/1-6s": 5
+          },
+          "servedDuring": true
+         },
+         {
+          "name": "partial body then silence",
+          "outcomes": {
+           "408/server-close/1-6s": 5
+          },
+          "servedDuring": true
+         }
+        ]
+       },
+       {
+        "name": "client-disconnect",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "half request line then FIN",
+          "outcomes": {
+           "400/server-close+close-header": 30
+          }
+         },
+         {
+          "name": "partial body then destroy",
+          "outcomes": {
+           "none/client": 30
+          }
+         },
+         {
+          "name": "incomplete chunked body then destroy",
+          "outcomes": {
+           "none/client": 30
+          }
+         },
+         {
+          "name": "mid-response (1 MiB, after 64 KiB)",
+          "outcomes": {
+           "200/client": 30
+          }
+         },
+         {
+          "name": "mid-stream (/stream/400, after 3 chunks)",
+          "outcomes": {
+           "200/client": 20
+          }
+         },
+         {
+          "name": "during slow handler",
+          "outcomes": {
+           "none/client-destroy": 20
+          }
+         }
+        ]
+       },
+       {
+        "name": "reset",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "RST mid-headers",
+          "outcomes": {
+           "none/client": 30
+          }
+         },
+         {
+          "name": "RST after request, before response",
+          "outcomes": {
+           "none/client": 30
+          }
+         },
+         {
+          "name": "RST mid-upload",
+          "outcomes": {
+           "none/client": 30
+          }
+         },
+         {
+          "name": "RST mid-response (1 MiB)",
+          "outcomes": {
+           "200/client": 30
+          }
+         },
+         {
+          "name": "RST mid-stream",
+          "outcomes": {
+           "200/client": 20
+          }
+         }
+        ]
+       },
+       {
+        "name": "idle-connections",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "300 idle TCP connections",
+          "outcomes": {
+           "opened": 300,
+           "closedByServerWithin3000ms": 0,
+           "closedByServerWithin8000ms": 300,
+           "closedByServerWithin14000ms": 300
+          },
+          "servedDuring": true
+         }
+        ]
+       },
+       {
+        "name": "echo-live-race (informational)",
+        "alive": true,
+        "cases": [
+         {
+          "name": "respond before consuming the request body",
+          "outcomes": {
+           "fullEcho": 0,
+           "shortOrEmpty": 100
+          }
+         }
+        ]
+       }
+      ]
+     },
+     "lasm": {
+      "checks": {
+       "preflight": true,
+       "load": true,
+       "faults": true,
+       "soak": null,
+       "final": true,
+       "shutdown": true,
+       "memoryCap": true,
+       "noRestarts": true
+      },
+      "startupSeconds": 0.345,
+      "exit": {
+       "code": 0,
+       "signal": null,
+       "at": 1792414016856
+      },
+      "stderrLines": 600,
+      "memoryCaps": [],
+      "restarts": [],
+      "peakRssMiB": 1543,
+      "stderr": [
+       {
+        "line": "connection failure: robustness fixture: deliberate handler exception",
+        "count": 60
+       },
+       {
+        "line": "connection failure: body exceeded maximum size of N bytes",
+        "count": 10
+       },
+       {
+        "line": "connection failure: Connection closed",
+        "count": 115
+       },
+       {
+        "line": "connection failure: Bad message",
+        "count": 140
+       },
+       {
+        "line": "connection failure: Unsupported version",
+        "count": 20
+       },
+       {
+        "line": "connection failure: Entity too large",
+        "count": 10
+       },
+       {
+        "line": "connection failure: Headers too large",
+        "count": 10
+       },
+       {
+        "line": "connection failure: Too many headers",
+        "count": 10
+       },
+       {
+        "line": "connection failure: request header timeout",
+        "count": 15
+       },
+       {
+        "line": "connection failure: resource vanished (error code: N, connection reset by peer)",
+        "count": 133
+       },
+       {
+        "line": "connection failure: resource vanished (error code: N, broken pipe)",
+        "count": 40
+       },
+       {
+        "line": "connection failure: cannot call write after a stream was destroyed (error code: N)",
+        "count": 37
+       }
+      ],
+      "load": [
+       {
+        "connections": 16,
+        "requestsPerSecond": 436.1,
+        "latencyMs": {
+         "count": 8735,
+         "p50": 31.495,
+         "p95": 76.183,
+         "p99": 86.916,
+         "max": 135.768
+        },
+        "errors": 0,
+        "requests": 8735,
+        "connectionsOpened": 16,
+        "cpu": {
+         "serverCores": 4.55,
+         "driverCores": 0.16,
+         "serverRssMiB": 741,
+         "threads": 35
+        },
+        "memoryCapStopped": false,
+        "errorSamples": []
+       },
+       {
+        "connections": 64,
+        "requestsPerSecond": 421,
+        "latencyMs": {
+         "count": 8475,
+         "p50": 132.36,
+         "p95": 282.384,
+         "p99": 307.781,
+         "max": 432.349
+        },
+        "errors": 0,
+        "requests": 8475,
+        "connectionsOpened": 64,
+        "cpu": {
+         "serverCores": 5.86,
+         "driverCores": 0.17,
+         "serverRssMiB": 1131,
+         "threads": 62
+        },
+        "memoryCapStopped": false,
+        "errorSamples": []
+       }
+      ],
+      "soak": null,
+      "faults": [
+       {
+        "name": "handler-exception",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "GET /throw",
+          "outcomes": {
+           "500/server-close+close-header": 50
+          }
+         },
+         {
+          "name": "pipelined /throw then /health",
+          "outcomes": {
+           "500/server-close+close-header": 10,
+           "statuses 500": 10
+          }
+         },
+         {
+          "name": "JSON body over the handler readAll limit (64 KiB)",
+          "outcomes": {
+           "500/server-close+close-header": 10
+          }
+         }
+        ]
+       },
+       {
+        "name": "malformed",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "garbage request line",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "header without colon",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "unsupported HTTP version",
+          "outcomes": {
+           "505/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "missing Host",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "invalid chunk size",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "Content-Length with Transfer-Encoding",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         },
+         {
+          "name": "binary garbage with NUL",
+          "outcomes": {
+           "400/server-close+close-header": 20
+          }
+         }
+        ]
+       },
+       {
+        "name": "oversized",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "Content-Length 2 MiB > maxBodySize",
+          "outcomes": {
+           "413/server-reset+close-header": 5
+          }
+         },
+         {
+          "name": "chunked 2 MiB > maxBodySize",
+          "outcomes": {
+           "413/server-reset+close-header": 5
+          }
+         },
+         {
+          "name": "headers 20 KiB > maxHeaderBytes",
+          "outcomes": {
+           "431/server-close+close-header": 10
+          }
+         },
+         {
+          "name": "60 headers > maxHeaders",
+          "outcomes": {
+           "431/server-close+close-header": 10
+          }
+         },
+         {
+          "name": "header value 9000 B > maxHeaderValueLength",
+          "outcomes": {
+           "400/server-close+close-header": 10
+          }
+         },
+         {
+          "name": "URI 9000 B > maxUriLength",
+          "outcomes": {
+           "400/server-close+close-header": 10
+          }
+         }
+        ]
+       },
+       {
+        "name": "slow-client",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "slow-loris: one header byte every 250 ms",
+          "outcomes": {
+           "none/server-close/1-6s": 5
+          },
+          "servedDuring": true
+         },
+         {
+          "name": "partial headers then silence",
+          "outcomes": {
+           "none/server-close/1-6s": 5
+          },
+          "servedDuring": true
+         },
+         {
+          "name": "partial body then silence",
+          "outcomes": {
+           "408/server-close/1-6s": 5
+          },
+          "servedDuring": true
+         }
+        ]
+       },
+       {
+        "name": "client-disconnect",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "half request line then FIN",
+          "outcomes": {
+           "400/server-close+close-header": 30
+          }
+         },
+         {
+          "name": "partial body then destroy",
+          "outcomes": {
+           "none/client": 30
+          }
+         },
+         {
+          "name": "incomplete chunked body then destroy",
+          "outcomes": {
+           "none/client": 30
+          }
+         },
+         {
+          "name": "mid-response (1 MiB, after 64 KiB)",
+          "outcomes": {
+           "200/client": 30
+          }
+         },
+         {
+          "name": "mid-stream (/stream/400, after 3 chunks)",
+          "outcomes": {
+           "200/client": 20
+          }
+         },
+         {
+          "name": "during slow handler",
+          "outcomes": {
+           "none/client-destroy": 20
+          }
+         }
+        ]
+       },
+       {
+        "name": "reset",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "RST mid-headers",
+          "outcomes": {
+           "none/client": 30
+          }
+         },
+         {
+          "name": "RST after request, before response",
+          "outcomes": {
+           "none/client": 30
+          }
+         },
+         {
+          "name": "RST mid-upload",
+          "outcomes": {
+           "none/client": 30
+          }
+         },
+         {
+          "name": "RST mid-response (1 MiB)",
+          "outcomes": {
+           "200/client": 30
+          }
+         },
+         {
+          "name": "RST mid-stream",
+          "outcomes": {
+           "200/client": 20
+          }
+         }
+        ]
+       },
+       {
+        "name": "idle-connections",
+        "alive": true,
+        "verifiedAfter": true,
+        "cases": [
+         {
+          "name": "300 idle TCP connections",
+          "outcomes": {
+           "opened": 300,
+           "closedByServerWithin3000ms": 0,
+           "closedByServerWithin8000ms": 300,
+           "closedByServerWithin14000ms": 300
+          },
+          "servedDuring": true
+         }
+        ]
+       },
+       {
+        "name": "echo-live-race (informational)",
+        "alive": true,
+        "cases": [
+         {
+          "name": "respond before consuming the request body",
+          "outcomes": {
+           "fullEcho": 0,
+           "shortOrEmpty": 100
+          }
+         }
+        ]
+       }
+      ]
+     }
+    }
+   }
   }
  }
 }

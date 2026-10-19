@@ -533,6 +533,8 @@ same-run native control). Evidence:
 | --- | ---: | ---: | --- | --- | --- |
 | Baseline (`01003a4`) | 57.96 | 0.90 | 347 (2,048) | 45.7/60.0 (7.9/10.3) | 6.54 (1.40) |
 | 1: host-thread regular files, in-worker clocks | 55.92 | 0.88 | 368 (2,035) | 42.3/61.3 (7.9/10.6) | 5.84 (1.40) |
+| 1, rerun back to back with step 2 | 55.56 | 0.89 | 361 (2,189) | 45.1/54.5 (7.4/9.3) | 5.57 (0.91) |
+| 2: one-call async start, result-carrying completion (local runtime object) | 34.40 | 0.89 | 494 (2,156) | 32.1/41.5 (7.4/10.5) | 4.16 (0.92) |
 
 ### Step 1 behaviour (source awaiting review)
 
@@ -561,3 +563,40 @@ same-run native control). Evidence:
   used. No `Date.now`/`performance.now` approximation is involved. Loading the clock
   in each Lean worker did not raise server RSS (16-connection load: 567–605 MiB
   against 610–621 MiB before, with fewer threads because the file pool is idle).
+
+### Step 2 behaviour (source awaiting review; runtime rebuild pending)
+
+- `runtime/node-async.cpp` `begin_request` (full, native-threads builds) replaces the
+  three calls `node_start` + start check (op 93) + completion registration (op 91)
+  with one `node_call` op 94. Its input is `promise, resource, kind, check, operation,
+  argument` (u64 each) followed by the operation's own input. The promise and the
+  extra promise/resource references are created and marked multi-threaded before the
+  call, exactly as the registration did.
+- `scripts/full-lean/host-pre.js` runs the operation (`host.request`, as `host.start`
+  did). With `check` (the former `start_io_request`), a synchronous startup failure is
+  returned as the call's error and nothing is registered; the runtime then releases
+  the unobserved promise and the resource reference (Lean resolves a dropped promise's
+  task with `none`; nobody holds it). Otherwise the call returns at once and, when the
+  result settles, the completion (op 92) carries `promise, resource, kind, failed`
+  followed by the result bytes. The completion thread resolves the promise from those
+  bytes with the unchanged decoding (`resolve_request`), so the finish call (op 90)
+  disappears. Cancellation keeps native behaviour: an `ECANCELED` result still drops
+  the promise instead of resolving it. Completions are queued in settlement order, as
+  before. A host rejection still reaches the completion thread as a failure (fatal),
+  and `LeanExit` still flushes standard IO and exits.
+- Ops 90, 91, 93 and `node_start` remain for the wasm32 runtime (no native threads)
+  and for the currently pinned runtime, whose 32-byte completion packets are unchanged.
+- Locally, HEAD's `node-async.cpp` rebuilds the shipped object byte for byte
+  (`d9e9e9c2…`); the changed source gives `0119590d…`, and that object was overlaid on
+  the installed package for these measurements (identity `4d4950e7…`, local only). The
+  shipped runtime needs a CI rebuild (`node-linux-runtime.yml`), a new pin and a
+  reviewed `canSpecializeInitialization` entry.
+- Checks: `test/full-host-async-begin.test.mjs`; upstream eval-io (`async_http_body`,
+  `async_http_keepalive`, `async_http_hang_regressions`, `async_tcp_server_client`,
+  `async_tcp_half`, `async_tcp_fname_errors`, `async_udp_sockets`,
+  `async_cancellation_reasons`, `tempfile`) and runtime-adapter (`async`,
+  `async_cancellation`, `async_dns`, `async_select_socket`, `async_select_timer`,
+  `async_surface_sleep`, `async_http_idle_timeout`, `libuv_tcp_shutdown_pending`,
+  `libuv_signal_retry`, `cancellation_context`, `promise`, `timeAPI`; 53 actions) all
+  match native; the robustness load and all 31 fault cases match native (local
+  Linux); emcc and Node link drivers give byte-identical `program.wasm`/`program.cjs`.
