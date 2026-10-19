@@ -787,8 +787,9 @@ node scripts/full-lean/prepare-http-timing-probe.mjs .work/http-timing-probe 10
 `probe-loader.mjs` compares the native loader with Node on Linux.
 `probe-memory64.mjs` records the Node result.
 `probe-host-memory.mjs` exercises the real synchronous/asynchronous bridge above
-2 GiB and 4 GiB in Node. Requests carry a numeric wait-signal offset: cloning a
-shared typed array truncates that offset in the pinned Node engine. `probe-build-cache.mjs` checks the actual generated
+2 GiB and 4 GiB in Node, and checks that each thread's shared-memory call slot
+lies above the boundary (the host addresses slots by numeric offset: cloning a
+shared typed array truncates its offset in the pinned Node engine). `probe-build-cache.mjs` checks the actual generated
 make rules after a runtime-header change. `probe-stack-diagnostics.mjs` verifies
 the diagnostic and exit status for uncaught engine stack exhaustion.
 `prepare-http-timing-probe.mjs` creates a separate HTTP test derivative with
@@ -796,10 +797,12 @@ uniformly scaled time intervals. It records every changed line and the original
 source hash. Run its generated Lean file with both the native control and the
 chosen Wasm facade; report those results separately from the unchanged suite.
 
-The host bridge transfers requests from Wasm pthreads to the JavaScript main
-thread through message ports. Waiting pthreads use Emscripten's futex API, which
-services dynamic-loader synchronization mailboxes while the main event
-loop continues serving asynchronous operations. `configure-host.mjs` records each
+The host bridge passes requests from Wasm pthreads to the JavaScript main
+thread through one shared-memory slot per thread and nesting depth
+(`host-library.js` `$lasmFullRPC`, `host-pre.js` `lasmFullServe`; the main thread
+waits on each slot with `Atomics.waitAsync`). Waiting pthreads use Emscripten's
+futex API, which services dynamic-loader synchronization mailboxes while the main
+event loop continues serving asynchronous operations. `configure-host.mjs` records each
 replaced runtime definition and keeps Lean's native scheduler, mutexes, and
 thread-local finalizer ordering. This is still experimental: full-suite results,
 not symbol counts or the presence of a wrapper, determine compatibility.
@@ -815,6 +818,11 @@ node scripts/full-lean/run-bounded.mjs --report .work/transfer-width.resources.j
   python3 scripts/full-lean/base-pages.py python3 scripts/full-lean/probe-transfer-width.py \
   .work/transfer-width
 ```
+
+Pass `--include` with a runtime bundle's `include` directory when
+`.work/lean-full/wasm64/include` is absent. Both probes were re-run for the
+shared-memory slot transport on 2026-10-19 (Node 26.12.0: both boundaries pass;
+24/24 transfer checks).
 
 Use a new output directory to retain previous attempts. The probe snapshots its
 inputs and hashes Node before and after all 24 checks. These synthetic

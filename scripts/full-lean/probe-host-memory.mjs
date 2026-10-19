@@ -16,13 +16,15 @@ const source = join(root, 'scripts/full-lean/probes/host-highmemory.cpp');
 const auditPrelude = join(output, 'audit-pre.js');
 writeFileSync(auditPrelude, `
 if (!ENVIRONMENT_IS_PTHREAD) {
-  const original = Module.lasmFullHostRequest;
-  Module.lasmFullHostRequest = function (request) {
-    if (request.signalPointer < Number(process.env.LASM_PROBE_HIGH_BASE)) {
-      console.error('Probe did not allocate its wait signal above the requested boundary');
+  // Each Lean thread registers its shared-memory call slot (wait flag and
+  // reply buffer pointer) once; it must lie above the boundary.
+  const original = Module.lasmFullHostSlot;
+  Module.lasmFullHostSlot = function (pointer) {
+    if (pointer < Number(process.env.LASM_PROBE_HIGH_BASE)) {
+      console.error('Probe did not allocate its host call slot above the requested boundary');
       process.exit(10);
     }
-    return original(request);
+    return original(pointer);
   };
 }
 `);
