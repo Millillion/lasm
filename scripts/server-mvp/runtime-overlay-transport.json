@@ -1,0 +1,9 @@
+{
+  "scope": "Server MVP robustness variant `transport` only (maintainer experiment, not a candidate): CI-rebuilt Lean 4.35.0 runtime with the one-call asynchronous start (op 94) and batched completion poll (op 95), for candidate .55 plus patches/server-transport.patch",
+  "repository": "Millillion/lasm",
+  "release": "node-runtime-inputs-39287146914",
+  "asset": "node-runtime-inputs.tgz",
+  "sha256": "4df2c8f5c6bbc392a5f0cb59f6ad3f12e421462ba4081c047cf544ad9d48b322",
+  "runtimeManifestSha256": "84934c27498e0b97bd6e3d88253729704dc551aa8900f2fa4da919e9df40fcc4",
+  "sourceRevision": "d20932e7093106e68f1e65ef43b72ebdb79c51a0"
+}
