@@ -321,6 +321,14 @@ application API.
    gate targets: at least 50% of native throughput and p99 latency within 3× of
    native on the robustness fixture, with RPCs per request and main-thread
    utilization tracked as regression metrics.
+   **Platform scope of the targets (user decision 2026-10-19):** the throughput
+   and p99 targets apply to Linux (x86-64 and ARM64), where production servers
+   run; they are met there (53–89% of native, p99 1.1–1.75×; run 39302965569).
+   macOS and Windows must pass correctness, faults and the soak (no leaks), with
+   performance measured and reported but not gating (currently 20–31% of native).
+   The step 1 gate is: the candidate's five-platform acceptance, three
+   consecutive clean cold-installation campaigns, and three consecutive clean
+   five-platform robustness runs on the exact candidate.
    Progress and evidence: [SERVER_MVP.md](SERVER_MVP.md). The Lean 4.35.0 Linux x64
    baseline (2026-10-17): 22/22 eval-io inputs and 1,255 runtime-adapter actions
    pass in Node with no deployed failures. The remaining non-passes are classified there.
