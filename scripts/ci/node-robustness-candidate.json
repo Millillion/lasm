@@ -1,11 +1,11 @@
 {
   "active": true,
-  "version": "0.1.0-experimental.54",
-  "sha256": "567ea838eb672249d4dfd071c9e659de3dc9eedd3a503570cacc82a60c2aad77",
-  "sourceRevision": "b34f5702a479ecddc5aeddad2b3845ca6b86bc89",
-  "release": "node-package-38986393273",
-  "baselineRunId": "38986393273",
+  "version": "0.1.0-experimental.39310029213",
+  "sha256": "a976ec4e386d1c238bcb08b6a6df3f37b22d5b9af7d7bfda904bed10bb1972a3",
+  "sourceRevision": "8829c9a7e2ead9a06933c506adaa7b7cefdc0fb8",
+  "release": "node-package-39310029213",
+  "baselineRunId": "39310029213",
   "node": "26.12.0",
   "lean": "4.35.0",
-  "reason": "Lean 4.35.0 / Node 26.12.0 with the slimmed installer and npm artifact sources: the exact archive passed complete installed, offline npm, copied deployment and CLI/Lake private-CA/proxy gates on all five supported native targets in run 38986393273."
+  "reason": "Server MVP step 1 candidate (leak fixes, shared-memory host transport, merged async protocol, runtime 84934c27\u2026): the exact archive passed five-platform installed acceptance in run 39310029213."
 }
