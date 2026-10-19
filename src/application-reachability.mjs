@@ -84,7 +84,13 @@ export function canSpecializeInitialization(runtime) {
     // (non-LEAN_MINIMAL_CORE_INIT) path changed only in comments and
     // runtime/init_module.cpp is byte-identical to 4.34.1; libleancpp links the
     // default `initialize` object, not `initialize_minimal`.
-    '7482333e0a70a6aee12a540e11a48f31fd56c86761e7b3477f4a46ae310f80d3'].includes(runtime.identity);
+    '7482333e0a70a6aee12a540e11a48f31fd56c86761e7b3477f4a46ae310f80d3',
+    // Lean 4.35.0 (CI handoff node-runtime-inputs-39080448291, source f79ab96): only
+    // lib/liblasmhost.a differs from the entry above, and within it only
+    // node-async.cpp.o (lean_uv_tcp_send/lean_uv_udp_send borrow array parts with
+    // lean_array_get_core). Every Init/Std/Lean/Lake/libleancpp archive, the
+    // headers and exports.json are byte-identical, so no initialization path changed.
+    '36cf596b617bea6e360a96321aff1e41b8e5c4ee20abdc7d8a7e474b9a5cc6e4'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';
