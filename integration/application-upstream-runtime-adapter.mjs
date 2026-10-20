@@ -113,6 +113,16 @@ function run(label, program, args, cwd, environment = env, { timeout = 1_800_000
   if (check) { assert.ifError(result.error); assert.equal(result.status, 0, label + ': ' + result.stderr + result.stdout); }
   return { code: result.status, signal: result.signal, stdout: result.stdout, stderr: result.stderr };
 }
+// The output each action printed (the lines since the previous action marker).
+// A bare #eval is differential: its displayed value is its assertion.
+const actionOutputs = stdout => {
+  const outputs = {}; let lines = [];
+  for (const line of (stdout ?? '').split('\n')) {
+    const marker = /^lasm-action (lasmParallelAction\d+) /.exec(line);
+    if (marker) { outputs[marker[1]] = lines.join('\n'); lines = []; } else lines.push(line);
+  }
+  return outputs;
+};
 const actionLines = stdout => Object.fromEntries([...(stdout ?? '').matchAll(/^lasm-action (lasmParallelAction\d+) (ok|FAIL.*)$/gm)]
   .map(match => [match[1], match[2]]));
 save();
@@ -244,9 +254,16 @@ try {
   const verdicts = plan.actions.map(action => {
     const id = action.identifier, n = report.nativeCompiled.actions[id], r = report.nativeCompiledRepeat.actions[id],
       i = report.nativeInterpreted.actions[id], d = report.deployed.actions[id];
+    // L1 counted a differential action as passed when it merely did not throw;
+    // its displayed value must also equal native's (when native is repeatable).
+    const shown = action.form === 'eval-differential' ? {
+      native: actionOutputs(report.nativeCompiled.stdout)[id], repeat: actionOutputs(report.nativeCompiledRepeat.stdout)[id],
+      deployed: actionOutputs(report.deployed.stdout)[id] } : undefined;
     const verdict = n !== 'ok' || i !== 'ok' ? (n === undefined ? 'native-not-reached' : 'adapter-native-failure')
-      : r !== 'ok' ? 'native-nondeterministic' : d === 'ok' ? 'pass' : d === undefined ? 'deployed-not-reached' : 'deployed-failure';
-    return { identifier: id, form: action.form, verdict, native: n, nativeRepeat: r, interpreted: i, deployed: d };
+      : r !== 'ok' || shown && shown.native !== shown.repeat ? 'native-nondeterministic'
+      : d === 'ok' && (!shown || shown.native === shown.deployed) ? 'pass' : d === undefined ? 'deployed-not-reached' : 'deployed-failure';
+    return { identifier: id, form: action.form, verdict, native: n, nativeRepeat: r, interpreted: i, deployed: d,
+      ...(shown && shown.native !== shown.deployed ? { nativeOutput: shown.native?.slice(-1500), deployedOutput: shown.deployed?.slice(-1500) } : {}) };
   });
   report.verdicts = verdicts;
   report.summary = verdicts.reduce((counts, row) => ({ ...counts, [row.verdict]: (counts[row.verdict] ?? 0) + 1 }), {});

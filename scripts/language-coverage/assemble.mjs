@@ -24,9 +24,18 @@ const actionClass = {
   'adapter-native-failure': 'harness (adapter not faithful natively)',
   'native-not-reached': 'harness (native run stopped)',
   'native-nondeterministic': 'upstream-flake (native repeat differs)',
+  'harness-environment': 'harness (deployment environment)',
 };
-function adapterOutcome(attempt) {
+// Reviewed actions whose native/deployed environments differ by design.
+const environmentActions = {
+  'elab/Process.lean': { lasmParallelAction7: 'spawns `lean --stdin`; a deployment has no Lean on PATH (native and Lasm both report the same failure without it)' },
+};
+function adapterOutcome(attempt, name) {
   const c = attempt.compact;
+  for (const verdict of c?.verdicts ?? []) {
+    const reason = environmentActions[name]?.[verdict.identifier];
+    if (reason && verdict.verdict === 'deployed-failure') Object.assign(verdict, { verdict: 'harness-environment', reason });
+  }
   if (attempt.resources?.resourceLimited || attempt.code === 125) return { outcome: 'resource-stop', reason: attempt.resources?.stoppedBecause };
   if (!c?.resultFound) return { outcome: 'harness', reason: `no result (exit ${attempt.code}${attempt.timedOut ? ', timeout' : ''})`, detail: attempt.stderrTail?.slice(-800) };
   if (!c.verdicts) return { outcome: 'harness', reason: 'no per-action verdicts', detail: c.error?.slice(-1200) };
@@ -104,7 +113,8 @@ for (const shard of shards) {
     }
     const last = result.attempts.at(-1);
     const classify = ['runtime-adapter', 'eval-io'].includes(shard.harness)
-      ? (shard.harness === 'eval-io' ? attempt => attempt.compact?.passed ? { outcome: 'pass' } : adapterOutcome(attempt) : adapterOutcome)
+      ? (shard.harness === 'eval-io' ? attempt => attempt.compact?.passed ? { outcome: 'pass' } : adapterOutcome(attempt, result.name)
+        : attempt => adapterOutcome(attempt, result.name))
       : applicationOutcome;
     tests.push({ harness: shard.harness, name: result.name, ...classify(last), attempts: result.attempts.length,
       seconds: last.seconds, peakGiB: gib(last.resources?.peakMemoryBytes),
