@@ -38,7 +38,8 @@ assert.equal(test.sha256, row.sourceSha256);
 // links, cache identity), so only `lake exe` runs the deployment. makeFlags: the
 // released lean.mk names the release build machine's llvm-ar; the distribution's
 // own llvm-ar is supplied to make in both phases.
-const archiver = () => join(prefix, 'bin', windows ? 'llvm-ar.exe' : 'llvm-ar');
+// make reads MAKEFLAGS through a shell: forward slashes keep a Windows path intact.
+const archiver = () => join(prefix, 'bin', windows ? 'llvm-ar.exe' : 'llvm-ar').replaceAll('\\', '/');
 const settings = {
   '../doc/examples/compiler': { leanmake: { 'build/bin/test': 'test.lean' }, makeFlags: () => `LEAN_AR=${archiver()}` },
   'tests/lake/tests/cache/test.sh': { mode: 'exe-only' },
