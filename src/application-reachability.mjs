@@ -98,7 +98,16 @@ export function canSpecializeInitialization(runtime) {
     // exchanged and contains no initialization code. Every
     // Init/Std/Lean/Lake/libleancpp archive, the headers and exports.json are
     // byte-identical, so no initialization path changed.
-    '84934c27498e0b97bd6e3d88253729704dc551aa8900f2fa4da919e9df40fcc4'].includes(runtime.identity);
+    '84934c27498e0b97bd6e3d88253729704dc551aa8900f2fa4da919e9df40fcc4',
+    // Lean 4.35.0 (CI build 39373118465, source 336d2d3, handoff fb3c0fe8…): adds
+    // lib/libLeanExport.a (upstream's LeanExport library: the LeanExport root and
+    // LeanExport.Basic/Json/Parse, ordinary Lean module objects whose initializers
+    // run only when imported) and lists it in target.json (libraries,
+    // standardModules 2538 → 2542, audit hash). Every other file, including all
+    // Init/Std/Lean/Lake/libleancpp/libleanrt/liblasmhost archives, the headers,
+    // exports.json and liblasmsymbols.a, is byte-identical to the entry above, so
+    // no libleancpp initialization path changed.
+    'd1b1394ce2df4f9af2624cbd9bcca2162ee051da6be60ec38b08119c33fbd981'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';

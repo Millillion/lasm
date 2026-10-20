@@ -3,7 +3,7 @@
   "lean": {
     "4.35.0": {
       "name": "lean-4.35.0-wasm64",
-      "manifestSha256": "84934c27498e0b97bd6e3d88253729704dc551aa8900f2fa4da919e9df40fcc4"
+      "manifestSha256": "d1b1394ce2df4f9af2624cbd9bcca2162ee051da6be60ec38b08119c33fbd981"
     },
     "4.34.1": {
       "name": "lean-4.34.1-wasm64",

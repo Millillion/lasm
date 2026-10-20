@@ -137,6 +137,15 @@ runtime restrictions as handwritten code. Import names are not banned, but
 initializers count as runtime dependencies: a broad `import Lean` can retain the
 compiler. Use ordinary Lean `meta import Lean` when it is needed only by macros or
 tactics in a module; use narrower imports for runtime data libraries.
+For example, `import Lean` with `Lean.Json.compress` is rejected, while
+`import Lean.Data.Json` builds and runs. **Current source** (not yet in a
+candidate) explains each rejection: it prints the chain from your code to the
+compiler code and, when a broad import is the cause, the narrower modules your code
+uses (here `import Lean.Data.Json.Basic` and `import Lean.Data.Json.Printer`).
+Current source also links Lean 4.35's `LeanExport` library (candidates fail with an
+undefined `initialize_LeanExport_…` symbol). Its parser, `LeanExport.parseStream`,
+builds `Lean.Expr` values, whose constructors call Lean's C++ kernel, so programs
+using it are still rejected.
 
 The deployed application cannot use the following capabilities:
 
