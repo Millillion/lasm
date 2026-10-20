@@ -1,0 +1,41 @@
+name: Recover a runtime handoff from its cache
+# A runtime build (node-linux-runtime.yml) that saved its verified handoff cache
+# but could not create its durable draft release keeps the bytes only in the
+# Actions cache. Restore that exact cache key, check the recorded SHA-256 and
+# keep the archive as a short-lived artifact for the maintainer to retain.
+on:
+  workflow_dispatch:
+    inputs:
+      cache-key:
+        description: Cache key printed by the runtime build (lasm-node-linux-inputs-<sha>-<sha256>)
+        type: string
+        required: true
+      sha256:
+        description: Recorded handoff SHA-256
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  recover:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-runtime-inputs.tgz
+          key: ${{ inputs.cache-key }}
+          fail-on-cache-miss: true
+      - name: Verify the recorded digest
+        env:
+          EXPECTED: ${{ inputs.sha256 }}
+        run: printf '%s  %s\n' "$EXPECTED" .work/node-runtime-inputs.tgz | sha256sum -c -
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: node-runtime-inputs
+          path: .work/node-runtime-inputs.tgz
+          retention-days: 3
+          include-hidden-files: true
+          if-no-files-found: error
