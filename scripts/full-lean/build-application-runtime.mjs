@@ -78,6 +78,11 @@ const patchInputs = ['wasm-build', 'compact-alignment', 'thread-runtime', 'sdk-m
 patchInputs.push({ name: 'host-linux', file: 'lean-4.34.0-host-linux.patch' });
 patchInputs.push({ name: 'host-backtrace', file: 'lean-4.34.0-host-backtrace.patch' });
 patchInputs.push({ name: 'libuv-source', file: 'lean-4.34.0-libuv-source.patch' });
+// Lean 4.35 added `LEAN_ABORT_ON_NONLINEAR` behind a `LEAN_EMSCRIPTEN` guard that
+// always returns false. Lasm's C runtime sees the host environment (Emscripten
+// NODE_HOST_ENV), as `LEAN_ABORT_ON_PANIC` already does after thread-runtime.
+if (Number(version.split('.')[1]) >= 35)
+  patchInputs.push({ name: 'nonlinear-environment', file: 'lean-4.35.0-nonlinear-environment.patch' });
 for (const { name, file } of patchInputs) {
   // These reviewed runtime changes still apply to 4.34 and, with the ports above,
   // to 4.35. Record the actual patch bytes and source commit; never treat older

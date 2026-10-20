@@ -1,0 +1,14 @@
+--- a/src/runtime/object.cpp
++++ b/src/runtime/object.cpp
+@@ -2037,11 +2037,7 @@
+ }
+ 
+ static bool should_abort_on_nonlinearity() {
+-#ifdef LEAN_EMSCRIPTEN
+-    return false;
+-#else
+     return std::getenv("LEAN_ABORT_ON_NONLINEAR");
+-#endif
+ }
+ 
+ // =======================================

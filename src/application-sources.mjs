@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync, realpathSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, realpathSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve, relative, delimiter, toNamespacedPath } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -44,6 +44,30 @@ export function nativeLeanEnvironment(lean, inherited = process.env) {
   return env;
 }
 
+// `lean --src-deps` searches LEAN_SRC_PATH (the source directory) before the
+// toolchain's `src/lean/lake` and `src/lean`, taking the first entry with a
+// directory `Root` or a file `Root.lean`. Those checks ask the file system, so on
+// case-insensitive macOS and Windows volumes a project's `init.lean` answers for
+// `Init` (likewise `std.lean`, `lean/`). Native Lean on Linux skips that entry.
+// Apply Linux's exact-case rule on every OS: a local root counts only when its
+// directory entry has exactly the imported name; otherwise the search continues.
+const exactEntry = (directory, name) => {
+  try { return readdirSync(directory).includes(name); } catch { return false; }
+};
+const isDirectory = file => { try { return statSync(file).isDirectory(); } catch { return false; } };
+const hasRoot = (entry, root) => exactEntry(entry, root) && isDirectory(join(entry, root))
+  || exactEntry(entry, root + '.lean');
+export function exactCaseImportSource(dependency, directory, standard) {
+  if (!insideDirectory(directory, dependency)) return dependency;
+  const parts = relative(directory, dependency).split(/[\\/]/);
+  const root = parts.length === 1 ? parts[0].replace(/\.lean$/, '') : parts[0];
+  if (hasRoot(directory, root)) return dependency;
+  for (const entry of [join(standard, 'lake'), standard])
+    if (hasRoot(entry, root)) return join(entry, ...parts);
+  throw new Error(`unknown module prefix '${root}'\n\nNo directory '${root}' or file '${root}.lean' in the search path entries:\n`
+    + [directory, join(standard, 'lake'), standard].join('\n'));
+}
+
 /** Whether a standalone source imports, directly or through local imports,
  * a module rooted in `roots`. Lean's own header parser resolves the imports;
  * a module absent from the selected prefix fails with its unknown root. */
@@ -72,7 +96,8 @@ export function standaloneImportsModules(source, lean, roots) {
     if (result.status !== 0) return true;
     for (const line of result.stdout.split(/\r?\n/).filter(Boolean)) {
       let dependency;
-      try { dependency = canonicalApplicationPath(resolve(directory, line)); } catch { continue; }
+      try { dependency = canonicalApplicationPath(exactCaseImportSource(resolve(directory, line), directory, standard)); }
+      catch { continue; }
       if (insideDirectory(standard, dependency)) { if (wanted.has(rootOf(dependency))) return true; }
       else if (insideDirectory(directory, dependency)) pending.push(dependency);
     }
@@ -146,7 +171,7 @@ export function applicationSources(source, lean, work, { log = console.error, gi
     if (visiting.has(file)) throw new Error(`Cyclic Lean module imports: ${file}`);
     visiting.add(file);
     const dependencies = run(lean.lean, ['--src-deps', file], directory).split(/\r?\n/).filter(Boolean)
-      .map(dependency => visit(resolve(directory, dependency)));
+      .map(dependency => visit(exactCaseImportSource(resolve(directory, dependency), directory, standard)));
     const stem = relative(directory, file).slice(0, -5), base = join(output, stem);
     mkdirSync(dirname(base), { recursive: true });
     const signature = createHash('sha256').update(lean.commit).update(readFileSync(file))
