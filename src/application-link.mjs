@@ -131,6 +131,19 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     compile(initializeC, initializeObject);
     initializationInputs.push(initializeObject, '-Wl,--wrap=lean_initialize');
   }
+  // A C entry point `int main(void)` defines only __main_void. The exported `main`
+  // (__main_argc_argv) would then resolve to the first archive member defining it:
+  // since Lean 4.35, upstream LeanExport's tool `main`, which pulls Lean's compiler
+  // (upstream misc_dir/rc_sticky was rejected). Define it as Emscripten's libc does.
+  const definedEntries = new Set(objects.flatMap(file => execFileSync(join(sdk.prefix, 'bin', executableName('llvm-nm')),
+    ['--defined-only', '--extern-only', '--just-symbol-name', file], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true })
+    .split(/\r?\n/)));
+  if (definedEntries.has('__main_void') && !definedEntries.has('__main_argc_argv')) {
+    const entryC = join(work, 'entry.c'), entryObject = join(work, 'entry.o');
+    await writeFile(entryC, 'int __main_void(void);\nint __main_argc_argv(int argc, char **argv) { return __main_void(); }\n');
+    compile(entryC, entryObject);
+    initializationInputs.push(entryObject);
+  }
   const exportsFile = join(work, 'exports.json');
   // Explicit application C exports remain roots. Ordinary Lean declarations,
   // data and imported standard libraries follow the linker's reachability.

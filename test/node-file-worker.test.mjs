@@ -65,7 +65,10 @@ test('a failed worker read preserves the error and allows subsequent operations'
   const writer = await files.open(path, 1);
   try {
     // ucrtbase's fread on a write-only stream sets the stream error flag without
-    // setting errno (observed on windows-2025); POSIX libcs report EBADF.
+    // setting errno; POSIX libcs report EBADF. Native Lean 4.35 on windows-2025
+    // reports otherError 0 for this read, and EBADF for a write or getLine misuse
+    // (language-coverage-probe handle-errors, runs 39459435026 and 39468463470;
+    // candidate .39458561103 matches native for all three).
     await assert.rejects(files.read(writer, 1024), error => error.nativeMessage === true
       && (process.platform === 'win32' ? error.errno === 0 : error.code === 'EBADF'));
     await files.write(writer, Buffer.from('ok'));

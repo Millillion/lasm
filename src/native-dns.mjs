@@ -26,7 +26,9 @@ export function nativeDns() {
   const getInfo = bind('getaddrinfo', 'int', ['str', 'str', ffi.pointer(addressInfo), ffi.out(ffi.pointer('void *'))]);
   const freeInfo = bind('freeaddrinfo', 'void', ['void *']);
   const getName = bind('getnameinfo', 'int', ['void *', 'uint32_t', 'void *', 'uint32_t', 'void *', 'uint32_t', 'int']);
-  const parseIp = bind(windows ? 'InetPtonA' : 'inet_pton', 'int', ['int', 'str', 'void *']);
+  // ws2_32.dll exports inet_pton (and InetPtonW); InetPtonA is only a header macro
+  // alias, so binding it failed on Windows (upstream async_dns, networkInterfaces).
+  const parseIp = bind('inet_pton', 'int', ['int', 'str', 'void *']);
   const linuxErrors = { '-1': -3002, '-2': -3008, '-3': -3001, '-4': -3004, '-5': -3007,
     '-6': -3005, '-7': -3011, '-8': -3010, '-9': -3000, '-10': -3006, '-12': -3009, '-101': -3003 };
   const darwinErrors = { 1: -3000, 2: -3001, 3: -3002, 4: -3004, 5: -3005, 6: -3006,
