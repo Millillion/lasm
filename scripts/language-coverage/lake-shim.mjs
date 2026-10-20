@@ -13,7 +13,7 @@
 // `lean [-D…] --run FILE ARGS` from PATH (e.g. `lake env lean --run`) builds FILE
 // through the installed CLI and runs the deployment; other `lean` calls are native.
 //   node lake-shim.mjs lake|leanmake|lean ARGS...
-import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync, rmSync, chmodSync, appendFileSync, lstatSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync, rmSync, chmodSync, appendFileSync, lstatSync, statSync, readdirSync } from 'node:fs';
 import { join, resolve, dirname, isAbsolute, relative } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -33,8 +33,10 @@ const launcherText = (deployment, file) => `#!/usr/bin/env bash
 printf '%s\\n' ${JSON.stringify(file)} >> ${JSON.stringify(invocations.replaceAll('\\', '/'))}
 exec ${JSON.stringify(env('LASM_LAKE_SHIM_ENGINE').replaceAll('\\', '/'))} ${JSON.stringify(join(deployment, 'main.mjs').replaceAll('\\', '/'))} "$@"
 `;
-// On Windows the launcher is the extensionless name Git Bash resolves first.
-const launcherPath = file => windows ? file.replace(/\.exe$/i, '') : file;
+// The launcher takes the executable's own path; Git Bash (Cygwin exec) runs a
+// shebang script even when it is named *.exe. Windows processes such as Lake
+// cannot, so on Windows no command keeps the launchers in place (see below).
+const launcherPath = file => file;
 
 function restore() {
   for (const [file, entry] of Object.entries(state.substituted)) {
@@ -75,8 +77,20 @@ function parseLake(argv) {
   return { options, command: rest.shift(), rest, directory: resolve(directory), file, keys: [...keys, ...packages] };
 }
 
+// Loading the workspace may write Lake's configuration cache (.lake/config/N);
+// drivers assert on it, so remove only entries this listing created.
+const configEntries = directory => { try { return new Set(readdirSync(join(directory, '.lake', 'config'))); } catch { return null; } };
 function listExes(directory, file, keys) {
   if (!['lakefile.lean', 'lakefile.toml'].some(name => existsSync(join(directory, name))) && !file) return [];
+  const before = configEntries(directory);
+  try { return listExesUnchecked(directory, file, keys); }
+  finally {
+    const after = configEntries(directory);
+    if (after) for (const entry of after) if (!before?.has(entry)) rmSync(join(directory, '.lake', 'config', entry), { recursive: true, force: true });
+    if (!before && after) rmSync(join(directory, '.lake', 'config'), { recursive: true, force: true });
+  }
+}
+function listExesUnchecked(directory, file, keys) {
   const result = spawnSync(env('LASM_NATIVE_LEAN'), ['--plugin=' + env('LASM_LAKE_SHIM_PLUGIN'), '--run',
     env('LASM_LAKE_SHIM_EXES'), directory, ...(file ? [file] : []), ...keys], { encoding: 'utf8', cwd: directory, maxBuffer: 16 << 20 });
   const line = (result.stdout ?? '').split('\n').find(text => text.startsWith('['));
@@ -90,7 +104,7 @@ function substitute(exes) {
     const file = exe.file, current = state.substituted[file];
     if (current) {
       // Still our launcher: nothing to do. Lake replaced it: forget the stash.
-      if (existsSync(launcherPath(file)) && readFileSync(launcherPath(file), 'utf8') === current.launcher && !existsSync(windows ? file : '\0')) continue;
+      if (existsSync(file) && readFileSync(file, 'utf8') === current.launcher) continue;
       rmSync(current.stash, { force: true }); delete state.substituted[file];
     }
     if (!existsSync(file) || !lstatSync(file).isFile()) continue;
@@ -177,7 +191,7 @@ const parsedLake = tool === 'lake' ? parseLake(args) : undefined;
 // a CURL mock for `cache`) keep the launchers in place; if Lake rebuilds instead,
 // its native executable runs and no deployed invocation is recorded. Every other
 // native command sees Lake's own outputs.
-const keepsLaunchers = ['env', 'test', 'lint', 'cache'].includes(parsedLake?.command);
+const keepsLaunchers = !windows && ['env', 'test', 'lint', 'cache'].includes(parsedLake?.command);
 if (!keepsLaunchers) restore();
 if (tool === 'lean') {
   code = leanTool(args);
