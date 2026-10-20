@@ -298,7 +298,7 @@ Goal: developers run Lean on the server in Node runtimes, platform by platform,
 building robustness at each step. Use Lean's own `Std.Http`; add no Lasm-specific
 application API.
 
-1. **Plain Node server** (VPS, Docker, Fly, Render — anything running `node`).
+1. **Plain Node server** (VPS, Docker, Fly, Render — anything running `node`). **Gate passed 2026-10-20** on candidate `0.1.0-experimental.39310029213` (see docs/SERVER_MVP.md).
    Developers write ordinary Lean with `Std.Http.Server` handlers, `Lean.Data.Json`,
    environment variables, `Std.Time` and async tasks. Done means:
    - Lean's upstream `Std.Http` (and related async/time/JSON) tests pass under

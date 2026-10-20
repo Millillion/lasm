@@ -691,3 +691,30 @@ byte-identical to the local object `f04c7e92…`) plus `patches/server-transport
   p99 1.4–2.2×, within target). Not yet profiled there; the Node main thread, which
   still serves every host call, is the likely limit (Windows' native server is also
   6–8× faster than on Linux).
+
+## Step 1 gate result (2026-10-20)
+
+Candidate `0.1.0-experimental.39310029213` (source `8829c9a`, SHA-256
+`a976ec4e386d1c238bcb08b6a6df3f37b22d5b9af7d7bfda904bed10bb1972a3`; runtime
+`84934c27…` with the leak fixes, merged async protocol, batched completions and
+shared-memory host transport) passed:
+
+- five-platform installed acceptance: [39310029213](https://github.com/Millillion/lasm/actions/runs/39310029213);
+- three consecutive cold-installation campaigns
+  ([39340365052](https://github.com/Millillion/lasm/actions/runs/39340365052),
+  [39340377605](https://github.com/Millillion/lasm/actions/runs/39340377605),
+  [39340396211](https://github.com/Millillion/lasm/actions/runs/39340396211); `passed: true`);
+- three consecutive five-platform robustness runs (load, faults, 900 s soak) on the
+  exact candidate: [39362216679](https://github.com/Millillion/lasm/actions/runs/39362216679),
+  [39362227642](https://github.com/Millillion/lasm/actions/runs/39362227642),
+  [39362238593](https://github.com/Millillion/lasm/actions/runs/39362238593).
+
+Earlier robustness attempts on the same candidate remain recorded: 39340424035
+(an Actions cache eviction failed the Intel Mac job's setup before any test),
+and 39353067086 / 39353078838, where Lasm passed every check but native Lean
+4.35 failed its own macOS soak (upstream instability). After those, the verdict
+became Lasm's own with native as the load/fault reference (native soak,
+shutdown and restart failures are reported, not gating), and three fresh runs
+were required rather than re-scoring old ones. Performance targets apply to
+Linux (met: 53–89% of native throughput, p99 1.1–1.75×); macOS and Windows
+performance is reported, not gating.
