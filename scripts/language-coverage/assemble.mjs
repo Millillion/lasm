@@ -75,9 +75,10 @@ for (const shard of shards) {
   for (const result of shard.results) {
     if (shard.harness === 'projects') {
       const failed = result.attempts.filter(a => !a.compact?.passed);
-      tests.push({ harness: shard.harness, name: result.name, outcome: failed.length ? 'needs-review' : 'pass',
+      const policy = failed.some(a => /Lasm does not support runtime Lean compilation/.test(String(a.compact?.error ?? '') + a.stderrTail));
+      tests.push({ harness: shard.harness, name: result.name, outcome: !failed.length ? 'pass' : policy ? 'unsupported-by-design' : 'needs-review',
         variants: result.attempts.map(a => ({ variant: a.variant, passed: !!a.compact?.passed, seconds: a.seconds, peakGiB: gib(a.resources?.peakMemoryBytes),
-          error: a.compact?.passed ? undefined : (a.compact?.error || a.compactionError || a.stderrTail)?.slice(-1500) })) });
+          error: a.compact?.passed ? undefined : String(a.compact?.error || a.compactionError || a.stderrTail || '').slice(-1500) })) });
       continue;
     }
     const last = result.attempts.at(-1);
@@ -96,13 +97,14 @@ for (const shard of shards) {
 // Lean-as-library work whatever the test is about.
 const inventory = JSON.parse(readFileSync(new URL('../../docs/evidence/lean-4.35.0-language-coverage-inventory.json', import.meta.url)));
 const imports = new Map(inventory.tests.map(test => [test.name, test.imports ?? []]));
+const base = name => name.split('/').pop();
 const areaRules = [
   ['Lean-as-library / reachability (L5)', (t, i) => ['docparse', 'lsp', 'lsp-server', 'lsp-project'].includes(t.harness)
-    || t.outcome === 'unsupported-by-design' || i.some(m => /^Lean(?:\.|$)/.test(m) && !/^Lean\.Data\.Json/.test(m))],
+    || t.outcome === 'unsupported-by-design' || /leanExport/i.test(t.name) || i.some(m => /^Lean(?:\.|$)/.test(m) && !/^Lean\.Data\.Json/.test(m))],
   ['server, network and time (Server MVP)', t => /http|tcp|udp|dns|net_|networkInterfaces|libuv|async_http|socket|time|date|zone/i.test(t.name)],
   ['concurrency (L4)', t => /async|task|thread|mutex|channel|sync|promise|cancel|barrier|condvar|select|parallel|StackOverflowTask/i.test(t.name)],
-  ['processes, signals, terminal (L3)', t => /process|spawn|signal|EnvVar|getenv|stdin|stdout|stdio|terminal|tty|exit|panic/i.test(t.name)],
-  ['IO.FS (L3)', t => /file|_fs|fs_|dir|path|handle|tempfile|symlink|stream|IO_/i.test(t.name)],
+  ['processes, signals, terminal (L3)', t => /process|spawn|signal|EnvVar|getenv|stdin|stdout|stdio|terminal|tty|exit/i.test(base(t.name))],
+  ['IO.FS (L3)', t => /file|_fs|fs_|dir|path|handle|tempfile|symlink|stream|IO_/i.test(base(t.name))],
   ['numerics / Float (L2)', t => /float|uint|sint|int|nat|bitvec|fixed|overflow|scientific|div|shift|pow|gcd|bignum|ofIntClamp|binarytrees/i.test(t.name)],
   ['strings / Unicode (L2)', t => /string|str\b|char|utf|unicode|substr|format|repr|json|parse/i.test(t.name)],
   ['core data types and control (L2)', () => true],

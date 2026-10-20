@@ -24,7 +24,8 @@ const { inventory, sources: hashes, archive, sourceManifestSha256 } = loadUpstre
 if (await hashFile(archive) !== inventory.sourceArchiveSha256) throw new Error('Upstream archive changed');
 const source = join(output, 'source'), execution = join(output, 'run');
 mkdirSync(source, { recursive: true }); mkdirSync(execution);
-execFileSync('tar', ['-xzf', archive, '-C', source, '--strip-components=1', '--wildcards',
+// --wildcards is GNU tar; macOS runners provide it as gtar (bsdtar matches globs natively).
+execFileSync(process.platform === 'darwin' ? 'gtar' : 'tar', ['-xzf', archive, '-C', source, '--strip-components=1', '--wildcards',
   '*/tests/*', '*/script/*', '*/doc/examples/*', '*/src/*'], { stdio: 'inherit' });
 let verified = 0;
 for (const [name, expected] of Object.entries(hashes)) {
