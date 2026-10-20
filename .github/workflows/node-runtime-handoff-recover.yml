@@ -14,11 +14,22 @@ on:
         description: Recorded handoff SHA-256
         type: string
         required: true
+      build-run:
+        description: Run id of the runtime build that saved the cache (names the draft release)
+        type: string
+        required: true
+      runtime-manifest-sha256:
+        description: Recorded runtime manifest SHA-256
+        type: string
+        required: true
 permissions:
   contents: read
   actions: read
 jobs:
   recover:
+    permissions:
+      contents: write
+      actions: read
     if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -39,3 +50,20 @@ jobs:
           retention-days: 3
           include-hidden-files: true
           if-no-files-found: error
+      - name: Retain the durable draft release the build could not create
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RUN: ${{ inputs.build-run }}
+          SHA256: ${{ inputs.sha256 }}
+          CACHE_KEY: ${{ inputs.cache-key }}
+          MANIFEST: ${{ inputs.runtime-manifest-sha256 }}
+        run: |
+          [[ "$BUILD_RUN" =~ ^[0-9]+$ ]]
+          source="${CACHE_KEY#lasm-node-linux-inputs-}"; source="${source%%-*}"
+          tar -xzOf .work/node-runtime-inputs.tgz runtime/target.json | sha256sum | grep -q "^$MANIFEST "
+          node -e "require('node:fs').writeFileSync('.work/node-runtime-inputs-result.json', JSON.stringify({ sha256: process.env.SHA256, cacheKey: process.env.CACHE_KEY, runtimeManifestSha256: process.env.MANIFEST, builtBy: 'https://github.com/Millillion/lasm/actions/runs/' + process.env.BUILD_RUN, recoveredBy: 'https://github.com/Millillion/lasm/actions/runs/' + process.env.GITHUB_RUN_ID }, null, 2) + '\n')"
+          gh release create "node-runtime-inputs-$BUILD_RUN" \
+            .work/node-runtime-inputs.tgz .work/node-runtime-inputs-result.json \
+            --draft --prerelease --target "$source" \
+            --title "Lasm runtime input $BUILD_RUN" \
+            --notes "Pinned runtime handoff built by run $BUILD_RUN and restored from its exact cache key by run $GITHUB_RUN_ID (digest re-verified). No package acceptance or npm publication is implied."
