@@ -342,6 +342,46 @@ application API.
 
 npm publication follows language coverage (user decision 2026-10-17).
 
+## Language coverage phases, approved 2026-10-19
+
+The user chose to build broader Lean language support on full Node.js first,
+then go platform by platform to serverless, in phases. **Stop at the end of
+each phase for the user's review before starting the next.** Oracle: upstream
+Lean tests and real programs must match native Lean; every non-pass is
+classified; five-platform CI validation and a candidate gate end each phase.
+Runtime compilation/elaboration and dynamic plugins stay unsupported by design
+and are documented as such.
+
+- **L1 — Baseline and quick fixes:** fix the LeanExport link failure; give
+  `import Lean` rejections a clear message naming narrow imports; run every
+  runtime-capable upstream registration (not only the server subset) on Node.
+  Exit: complete classified baseline and a ranked fix list sizing L2–L6.
+- **L2 — Core language and data types:** numerics (big Nat/Int, fixed-width
+  overflow, Float), String/Char/Unicode, arrays/byte arrays, hash/tree maps and
+  sets, recursion forms, exceptions. Exit: zero Lasm-caused failures in the
+  core upstream categories on all five targets.
+- **L3 — Complete I/O:** full IO.FS (directories, metadata, symlinks,
+  permissions, locking, temp files), processes, signals, stdio/terminal, time
+  zones, random. Exit: upstream I/O tests match native per OS, documented
+  OS-level exceptions only.
+- **L4 — Concurrency:** tasks, channels, mutex/condition variables, Std.Sync,
+  full Std.Async, cancellation, many-thread stress (incl. Windows per-thread
+  stack commit). Exit: upstream concurrency tests plus stress/soak without hangs
+  or leaks.
+- **L5 — Lean as a runtime library:** pure `Lean.*` code at runtime (Json via
+  `import Lean`, Lean.Data.*, LSP types) through finer-grained reachability;
+  runtime elaboration/evaluation stays unsupported. Exit: common libraries that
+  import Lean for data structures build and run.
+- **L6 — Ecosystem:** top Reservoir packages (Batteries, Qq, CLI/parser
+  libraries, Mathlib at build time, compile-time tactics); native FFI
+  (extern_lib/precompileModules) decision; outbound HTTP decision. Exit:
+  published tested-package compatibility list.
+- **L7 — Full-suite release gate:** complete runtime-capable upstream suite on
+  five targets plus performance/robustness regression check. Then revisit npm
+  publication and serverless platforms.
+
+L1's baseline may reorder or merge L2–L4; propose that at the L1 review.
+
 ## Deferred chunks
 
 The native macOS and Windows extensions are complete. Future work should expand
