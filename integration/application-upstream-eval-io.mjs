@@ -104,7 +104,9 @@ try {
   report.nativeInterpreted = execute('native-interpreted', [lean.lean, '-Dlinter.all=false', '--run', main], env);
   run('generate native parallel C', lean.lean, ['-j1', '-Dlinter.all=false', '-Dcompiler.postponeCompile=false', '-c', main + '.c', main], project);
   const native = join(project, windows ? 'native.exe' : 'native');
-  run('compile native parallel program', join(lean.prefix, 'bin', windows ? 'leanc.exe' : 'leanc'), ['-O2', '-DNDEBUG', '-o', native, main + '.c'], project);
+  run('compile native parallel program', join(lean.prefix, 'bin', windows ? 'leanc.exe' : 'leanc'), ['-O2', '-DNDEBUG', '-o', native, main + '.c'], project,
+    // Windows leanc locates its clang from a plain (not namespaced) sysroot, as scripts/server-mvp/build-robustness.mjs does.
+    windows && lean.executionPrefix ? { ...env, LEAN_SYSROOT: lean.executionPrefix } : env);
   report.nativeCompiled = execute('native-compiled', [native], env);
   assert.deepEqual(report.nativeCompiled, report.nativeInterpreted);
   const dist = join(output, 'dist');
