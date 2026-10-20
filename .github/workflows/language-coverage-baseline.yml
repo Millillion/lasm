@@ -1,0 +1,194 @@
+name: Language coverage baseline
+# Language coverage L1 (docs/LANGUAGE_COVERAGE.md): every runtime-capable upstream
+# registration of the pinned Lean release, natively and through an exact retained
+# Lasm candidate in Node. Dispatch-only; standard public runners; each matrix job
+# runs one shard sequentially, every test in its own resource-guarded workload.
+# Only small compact results are uploaded, kept 7 days; no caches are written.
+on:
+  workflow_dispatch:
+    inputs:
+      harness:
+        description: inventory, or the harness whose shards to run
+        type: choice
+        options: [inventory, runtime-adapter, eval-io, compiled-application, docparse, lsp, lsp-server, lsp-project]
+        default: inventory
+      shards:
+        description: Number of shards for this harness
+        type: string
+        default: '1'
+      only:
+        description: JSON array of shard indexes to run, or "all"
+        type: string
+        default: all
+      runner:
+        description: Standard runner label (Linux x64 first)
+        type: choice
+        options: [ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-intel, windows-2025]
+        default: ubuntu-24.04
+      max-parallel:
+        type: string
+        default: '12'
+      candidate-version:
+        type: string
+        default: 0.1.0-experimental.39310029213
+      candidate-release:
+        type: string
+        default: node-package-39310029213
+      sha256:
+        type: string
+        default: a976ec4e386d1c238bcb08b6a6df3f37b22d5b9af7d7bfda904bed10bb1972a3
+      lean:
+        type: string
+        default: 4.35.0
+permissions:
+  contents: read
+jobs:
+  input:
+    if: inputs.harness != 'inventory'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/node-candidate-input.yml
+    with:
+      sha256: ${{ inputs.sha256 }}
+      candidate-release: ${{ inputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version }}
+  inventory:
+    if: inputs.harness == 'inventory' && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      LASM_LEAN: ${{ inputs.lean }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Fetch and verify the pinned upstream source archive
+        run: |
+          mkdir -p .cache/downloads .work/pristine
+          url="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_LEAN].url')"
+          sha="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_LEAN].sha256')"
+          archive=".cache/downloads/lean4-v$LASM_LEAN.tar.gz"
+          curl --fail --location --retry 3 --output "$archive" "$url"
+          printf '%s  %s\n' "$sha" "$archive" | sha256sum -c -
+          tar -xzf "$archive" -C .work/pristine --strip-components=1
+      - name: Enable process-tree resource guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download and verify the full native Lean oracle
+        run: node scripts/server-mvp/provision.mjs native "$LASM_LEAN" "$PWD" .work/l1-provision | tee .work/native.json
+      - name: Survey every elaboration test against its own imports (resumable after resource stops)
+        run: |
+          bin="$(node -p 'JSON.parse(require("node:fs").readFileSync(".work/native.json","utf8").trim().split("\n").pop()).native')/bin"
+          for attempt in 1 2 3 4 5 6 7 8; do
+            if node scripts/full-lean/run-bounded.mjs --memory-mib 10240 --report ".work/inventory-resources-$attempt.json" -- \
+              node scripts/language-coverage/inventory.mjs "$LASM_LEAN" "$PWD/.work/pristine" "$bin" "$PWD/.work/inventory.json" "$PWD/.work/survey-cache.jsonl"; then
+              exit 0
+            fi
+            rm -f .work/inventory.json
+          done
+          exit 1
+      - name: Keep the inventory briefly
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: l1-inventory
+          path: |
+            .work/inventory.json
+            .work/survey-cache.jsonl
+            .work/inventory-resources-*.json
+          retention-days: 7
+          if-no-files-found: warn
+  plan:
+    if: inputs.harness != 'inventory' && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      shards: ${{ steps.plan.outputs.shards }}
+    steps:
+      - id: plan
+        env:
+          SHARDS: ${{ inputs.shards }}
+          ONLY: ${{ inputs.only }}
+        run: |
+          node -e '
+            const count = Number(process.env.SHARDS), only = process.env.ONLY;
+            if (!Number.isInteger(count) || count < 1 || count > 256) throw new Error("shards");
+            const all = [...Array(count).keys()];
+            const list = only === "all" ? all : JSON.parse(only);
+            if (!Array.isArray(list) || !list.length || list.some(i => !all.includes(i))) throw new Error("only");
+            console.log("shards=" + JSON.stringify(list));' >> "$GITHUB_OUTPUT"
+  run:
+    needs: [input, plan]
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ fromJSON(inputs.max-parallel) }}
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.shards) }}
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+      LASM_LEAN: ${{ inputs.lean }}
+      LASM_RUNTIME_ADAPTER_REVIEW: scripts/language-coverage/runtime-adapter-l1.json
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: ${{ needs.input.outputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify authenticated candidate handoff
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Install the exact candidate as an ordinary npm dependency
+        run: |
+          mkdir -p .work/install && cd .work/install
+          echo '{"private":true}' > package.json
+          npm install --no-audit --no-fund "../node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
+      - name: Fetch and verify the pinned upstream source archive
+        run: |
+          mkdir -p .cache/downloads .work/pristine
+          url="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_LEAN].url')"
+          sha="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_LEAN].sha256')"
+          archive=".cache/downloads/lean4-v$LASM_LEAN.tar.gz"
+          curl --fail --location --retry 3 --output "$archive" "$url"
+          printf '%s  %s\n' "$sha" "$archive" | sha256sum -c -
+          tar -xzf "$archive" -C .work/pristine --strip-components=1
+      - name: Enable process-tree resource guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download and verify the full native Lean oracle
+        run: node scripts/server-mvp/provision.mjs native "$LASM_LEAN" "$PWD/.work/install/node_modules/@lasm/compiler" .work/l1-provision
+      - name: Warm the installed candidate's tools with one bounded Std.Http build
+        run: node scripts/full-lean/run-bounded.mjs --report .work/l1-provision-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/server-mvp/provision.mjs candidate "$LASM_LEAN" "$PWD/.work/install/node_modules/@lasm/compiler" .work/l1-provision
+      - name: Run the shard (native drivers and controls, then the deployed Node comparison per test)
+        run: node scripts/language-coverage/run-shard.mjs "${{ inputs.harness }}" "${{ matrix.shard }}" "${{ inputs.shards }}" .work/l1-shard "$(command -v node)" "$PWD/.work/install/node_modules/@lasm/compiler" "$PWD/.work/pristine" "$LASM_LEAN"
+      - name: Keep the compact shard results briefly
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: l1-${{ inputs.harness }}-${{ inputs.runner }}-${{ matrix.shard }}
+          path: |
+            .work/l1-shard/shard.json
+            .work/l1-shard/compact
+          retention-days: 7
+          if-no-files-found: warn

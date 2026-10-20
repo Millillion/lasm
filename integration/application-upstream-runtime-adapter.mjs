@@ -22,7 +22,12 @@ const [outputArg, engineArg, compilerArg, referenceArg, name, version = '4.35.0'
 assert.ok(outputArg && engineArg && compilerArg && referenceArg && name && !extra.length,
   'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE REVIEWED_TEST [LEAN_VERSION]');
 const root = fileURLToPath(new URL('..', import.meta.url));
-const reviewFile = join(root, 'scripts/application-tests/runtime-adapter-reviewed.json');
+// The Server MVP review is the default; language-coverage campaigns name the
+// L1 structural review of every candidate (same criteria, wider selection).
+const reviewPath = process.env.LASM_RUNTIME_ADAPTER_REVIEW ?? 'scripts/application-tests/runtime-adapter-reviewed.json';
+assert.ok(['scripts/application-tests/runtime-adapter-reviewed.json', 'scripts/language-coverage/runtime-adapter-l1.json'].includes(reviewPath),
+  'Unknown runtime-adapter review ' + reviewPath);
+const reviewFile = join(root, reviewPath);
 const reviews = JSON.parse(readFileSync(reviewFile));
 assert.equal(reviews.schema, 1);
 const review = reviews.releases?.[version]?.tests?.[name];
@@ -54,7 +59,7 @@ const unchanged = async (base, path) => sources[path].symlink !== undefined
   : await hashFile(join(base, path)) === sources[path].sha256;
 for (const path of originals) assert.ok(await unchanged(reference, path), 'Upstream file changed: ' + path);
 const inputs = ['integration/application-upstream-runtime-adapter.mjs', 'scripts/upstream/RuntimeCommandSurvey.lean',
-  'scripts/application-tests/runtime-adapter-source.mjs', 'scripts/application-tests/runtime-adapter-reviewed.json',
+  'scripts/application-tests/runtime-adapter-source.mjs', reviewPath,
   'scripts/application-tests/upstream-evidence.mjs'];
 const inputHashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 mkdirSync(output, { recursive: true });
@@ -166,8 +171,10 @@ try {
     // compilation/kernel state; record that as its own outcome, not a crash.
     const log = built.stderr + built.stdout;
     const policy = /Lasm does not support runtime Lean compilation[^\n]*\n(Detected [^\n]*)?/.exec(log);
+    // Explanation lines (dependency chain, narrow-import suggestions) follow "Detected".
+    const explanation = policy ? (/Detected [^\n]*\n([^]*?)\nMove this operation/.exec(log)?.[1] ?? '').split('\n').filter(Boolean) : [];
     report.buildRejected = { policy: !!policy, detected: policy ? policy[1] ?? null
-      : (log.match(/^error: .*$/gm) ?? []).slice(0, 5).join('\n') || log.slice(-2000) };
+      : (log.match(/^error: .*$/gm) ?? []).slice(0, 5).join('\n') || log.slice(-2000), explanation };
     const outcome = policy ? 'aot-policy-rejected' : 'deployed-build-failed';
     report.verdicts = plan.actions.map(action => ({ identifier: action.identifier, form: action.form,
       verdict: report.nativeCompiled.actions[action.identifier] === 'ok' ? outcome : 'adapter-native-failure',
