@@ -1,12 +1,10 @@
-**Server MVP step 1, milestone 1: Lean 4.35.0 baseline (2026-10-17).** On Linux x64,
-installed `.54` in Node passes all 22 upstream eval-io inputs (219 actions). A new
-runtime adapter covers 65 more Std.Http, Time, Async, Net and JSON tests: 1,255
-actions pass with zero deployed failures. 45 actions are rejected by the documented
-ahead-of-time `import Lean` policy, 13 fail to link `LeanExport`, and 4 fail natively.
-The example server passes 20 HTTP checks plus a curl/fetch smoke. Seven of the ten
-topical compiled applications pass, including both HTTP servers. See
-[SERVER_MVP.md](SERVER_MVP.md).
-
-Remaining step-1 gates: the other four platforms; LSP and mixed drivers; load, soak
-and fault tests; and three clean runs. ETA is not yet estimable. README reviewed;
-npm unpublished.
+**Language coverage L1: baseline and quick fixes (2026-10-20), awaiting review.**
+`LeanExport` is packaged in the Wasm runtime (re-pinned in source, `bd390b6`) and
+ahead-of-time rejections now print the dependency chain and the narrow imports to
+use. Every runtime-capable 4.35.0 upstream registration ran on Linux x64 through
+candidate `.39310029213`: 428 tests and 3,603 actions pass, 420 tests are rejected
+by the AOT policy (Lean as a library), 8 are Lasm bugs (one runtime-environment
+bug, one fixed in source). A 62-test subset passes on all five targets; macOS
+shows an `init.lean` import-shadowing bug. Ranked fixes and a proposal to merge
+L2/L3 and bring L5 forward: [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md).
+Next: review stop. ETA for L2+ not yet estimable. README reviewed; npm unpublished.

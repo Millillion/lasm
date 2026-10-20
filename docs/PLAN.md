@@ -356,6 +356,7 @@ and are documented as such.
   `import Lean` rejections a clear message naming narrow imports; run every
   runtime-capable upstream registration (not only the server subset) on Node.
   Exit: complete classified baseline and a ranked fix list sizing L2–L6.
+  Results (2026-10-20, awaiting review): [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md).
 - **L2 — Core language and data types:** numerics (big Nat/Int, fixed-width
   overflow, Float), String/Char/Unicode, arrays/byte arrays, hash/tree maps and
   sets, recursion forms, exceptions. Exit: zero Lasm-caused failures in the

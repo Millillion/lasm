@@ -1,0 +1,3884 @@
+{
+ "schema": 1,
+ "recordedAt": "2026-10-20T07:56:21.211Z",
+ "platforms": {
+  "linux-arm64": {
+   "runtime-adapter": {
+    "tests": 62,
+    "tally": {
+     "pass": 62
+    },
+    "actionsPassed": 1668,
+    "results": [
+     {
+      "name": "elab/125.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 32.28,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/3079.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 32.089,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/Format.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 30.688,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/aig_optimizations.lean",
+      "outcome": "pass",
+      "actionsPassed": 6,
+      "seconds": 36.889,
+      "peakGiB": 0.85
+     },
+     {
+      "name": "elab/async_select_error_unregister.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 33.959,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/async_surface_sleep.lean",
+      "outcome": "pass",
+      "actionsPassed": 7,
+      "seconds": 33.871,
+      "peakGiB": 0.84
+     },
+     {
+      "name": "elab/cancel_token.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 31.243,
+      "peakGiB": 0.81
+     },
+     {
+      "name": "elab/charrange.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 28.685,
+      "peakGiB": 0.81
+     },
+     {
+      "name": "elab/demangling.lean",
+      "outcome": "pass",
+      "actionsPassed": 121,
+      "seconds": 72.158,
+      "peakGiB": 2.54
+     },
+     {
+      "name": "elab/filter.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 30.908,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/floatFma.lean",
+      "outcome": "pass",
+      "actionsPassed": 6,
+      "seconds": 32.231,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/hashMapIteratorLoop.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 30.765,
+      "peakGiB": 0.81
+     },
+     {
+      "name": "elab/interp.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 32.926,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/listtostring.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 32.175,
+      "peakGiB": 0.86
+     },
+     {
+      "name": "elab/negFloat.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 31.571,
+      "peakGiB": 0.81
+     },
+     {
+      "name": "elab/patbug.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 31.677,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/repr.lean",
+      "outcome": "pass",
+      "actionsPassed": 8,
+      "seconds": 33.601,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/string_replace.lean",
+      "outcome": "pass",
+      "actionsPassed": 16,
+      "seconds": 29.481,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/sync_shared_mutex.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 33.043,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/timeOperations.lean",
+      "outcome": "pass",
+      "actionsPassed": 51,
+      "seconds": 37.148,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/treeMap2.lean",
+      "outcome": "pass",
+      "actionsPassed": 489,
+      "seconds": 115.689,
+      "peakGiB": 0.91
+     },
+     {
+      "name": "elab/1804.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 32.927,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/4677.lean",
+      "outcome": "pass",
+      "actionsPassed": 8,
+      "seconds": 35.063,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/PArray_forM.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 67.624,
+      "peakGiB": 2.53
+     },
+     {
+      "name": "elab/async_cancellation.lean",
+      "outcome": "pass",
+      "actionsPassed": 10,
+      "seconds": 43.668,
+      "peakGiB": 0.88
+     },
+     {
+      "name": "elab/async_select_gate.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 35.319,
+      "peakGiB": 0.81
+     },
+     {
+      "name": "elab/bitvec.lean",
+      "outcome": "pass",
+      "actionsPassed": 70,
+      "seconds": 34.803,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/casesRec.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 32.359,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/context_async.lean",
+      "outcome": "pass",
+      "actionsPassed": 23,
+      "seconds": 62.842,
+      "peakGiB": 0.88
+     },
+     {
+      "name": "elab/derivingBEqLinear.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 35.002,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/float32.lean",
+      "outcome": "pass",
+      "actionsPassed": 10,
+      "seconds": 34.308,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/forBodyResultTypeIssue.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 33.435,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/hmul2.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 32.858,
+      "peakGiB": 0.81
+     },
+     {
+      "name": "elab/ioNulBytes.lean",
+      "outcome": "pass",
+      "actionsPassed": 13,
+      "seconds": 33.956,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/match_float.lean",
+      "outcome": "pass",
+      "actionsPassed": 14,
+      "seconds": 34.968,
+      "peakGiB": 0.81
+     },
+     {
+      "name": "elab/net_addr.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 34.203,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/proofAsSorry.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 33.844,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/stream.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 34.007,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/string_slice.lean",
+      "outcome": "pass",
+      "actionsPassed": 180,
+      "seconds": 48.22,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/timeClassOperations.lean",
+      "outcome": "pass",
+      "actionsPassed": 29,
+      "seconds": 40.065,
+      "peakGiB": 0.84
+     },
+     {
+      "name": "elab/timeOperationsOffset.lean",
+      "outcome": "pass",
+      "actionsPassed": 99,
+      "seconds": 40.491,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/uintCtors.lean",
+      "outcome": "pass",
+      "actionsPassed": 22,
+      "seconds": 34.505,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/303.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 30.486,
+      "peakGiB": 0.8
+     },
+     {
+      "name": "elab/9937.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 30.028,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/Process.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 37.152,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/async_http_h1_rfc_compliance.lean",
+      "outcome": "pass",
+      "actionsPassed": 14,
+      "seconds": 46.877,
+      "peakGiB": 0.91
+     },
+     {
+      "name": "elab/async_select_socket.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 48.219,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/bytearray.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 30.677,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/charQuote.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 30.175,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/currentDir.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 29.87,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/filePath.lean",
+      "outcome": "pass",
+      "actionsPassed": 28,
+      "seconds": 32.553,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/floatEquality.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 32.405,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/forInPArray.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 72.707,
+      "peakGiB": 2.54
+     },
+     {
+      "name": "elab/intModBug.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 31.409,
+      "peakGiB": 0.81
+     },
+     {
+      "name": "elab/levenshtein.lean",
+      "outcome": "pass",
+      "actionsPassed": 16,
+      "seconds": 87.404,
+      "peakGiB": 1.08
+     },
+     {
+      "name": "elab/missingExplicitWithForwardNamedDep.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 31.405,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "elab/ofIntClamp.lean",
+      "outcome": "pass",
+      "actionsPassed": 32,
+      "seconds": 28.224,
+      "peakGiB": 0.81
+     },
+     {
+      "name": "elab/realPath.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 31.218,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/string_kmp.lean",
+      "outcome": "pass",
+      "actionsPassed": 24,
+      "seconds": 28.997,
+      "peakGiB": 0.81
+     },
+     {
+      "name": "elab/sync_recursive_mutex.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 32.136,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "elab/timeFormats.lean",
+      "outcome": "pass",
+      "actionsPassed": 245,
+      "seconds": 68.057,
+      "peakGiB": 0.85
+     },
+     {
+      "name": "elab/timeSet.lean",
+      "outcome": "pass",
+      "actionsPassed": 12,
+      "seconds": 37.586,
+      "peakGiB": 0.84
+     }
+    ]
+   },
+   "compiled-application": {
+    "tests": 118,
+    "tally": {
+     "pass": 97,
+     "upstream-disabled": 4,
+     "lasm-bug: runtime output differs": 7,
+     "unsupported-by-design": 10
+    },
+    "actionsPassed": 0,
+    "results": [
+     {
+      "name": "compile/534.lean",
+      "outcome": "pass",
+      "seconds": 17.995,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/apply_m_overapp.lean",
+      "outcome": "pass",
+      "seconds": 17.901,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/arrayMk.lean",
+      "outcome": "pass",
+      "seconds": 17.929,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/array_test.lean",
+      "outcome": "pass",
+      "seconds": 19.844,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/char_escape.lean",
+      "outcome": "pass",
+      "seconds": 14.769,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile/closure_bug4.lean",
+      "outcome": "pass",
+      "seconds": 18.314,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile/closure_bug8.lean",
+      "outcome": "pass",
+      "seconds": 18.221,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/dep_regions.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 0.406,
+      "peakGiB": 0.07
+     },
+     {
+      "name": "compile/extractClosedMutualBlock.lean",
+      "outcome": "pass",
+      "seconds": 18.304,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile/float_cases_bug.lean",
+      "outcome": "pass",
+      "seconds": 18.385,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/incr_header_mismatch.lean",
+      "outcome": "pass",
+      "seconds": 59.08,
+      "peakGiB": 2.3
+     },
+     {
+      "name": "compile/lazylist.lean",
+      "outcome": "pass",
+      "seconds": 18.765,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/nat_shiftr.lean",
+      "outcome": "pass",
+      "seconds": 18.385,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/partial.lean",
+      "outcome": "pass",
+      "seconds": 18.107,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/phashmap_alter.lean",
+      "outcome": "pass",
+      "seconds": 26.037,
+      "peakGiB": 0.84
+     },
+     {
+      "name": "compile/reduceArity_overapp.lean",
+      "outcome": "pass",
+      "seconds": 18.215,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/sarray_mark_linear_grow_panic.lean",
+      "outcome": "lasm-bug: runtime output differs",
+      "seconds": 18.072,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/string_mark_linear.lean",
+      "outcome": "pass",
+      "seconds": 18.056,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/t2.lean",
+      "outcome": "pass",
+      "seconds": 18.769,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile/trigraphs.lean",
+      "outcome": "pass",
+      "seconds": 17.889,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/unreachable.lean",
+      "outcome": "pass",
+      "seconds": 17.812,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/vector_mark_linear_copy.lean",
+      "outcome": "pass",
+      "seconds": 18.224,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/binarytrees.lean",
+      "outcome": "pass",
+      "seconds": 19.977,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/deriv.lean",
+      "outcome": "pass",
+      "seconds": 18.838,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile_bench/identifier_completion.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 8.562,
+      "peakGiB": 0.73
+     },
+     {
+      "name": "compile_bench/io_compute.lean",
+      "outcome": "pass",
+      "seconds": 30.727,
+      "peakGiB": 0.76
+     },
+     {
+      "name": "compile_bench/parser.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 13.702,
+      "peakGiB": 0.79
+     },
+     {
+      "name": "compile_bench/rbmap_checkpoint.lean",
+      "outcome": "pass",
+      "seconds": 19.737,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/server_startup.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 12.841,
+      "peakGiB": 0.75
+     },
+     {
+      "name": "compile_bench/watchdogRss.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 18.351,
+      "peakGiB": 0.75
+     },
+     {
+      "name": "compile/StackOverflow.lean",
+      "outcome": "pass",
+      "seconds": 25.694,
+      "peakGiB": 1.02
+     },
+     {
+      "name": "compile/arity_bug1.lean",
+      "outcome": "pass",
+      "seconds": 17.947,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/array_mark_linear.lean",
+      "outcome": "pass",
+      "seconds": 17.79,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/array_test2.lean",
+      "outcome": "pass",
+      "seconds": 17.9,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/closure_bug1.lean",
+      "outcome": "pass",
+      "seconds": 17.767,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/closure_bug5.lean",
+      "outcome": "pass",
+      "seconds": 17.791,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/compact_closure.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 31.703,
+      "peakGiB": 2.19
+     },
+     {
+      "name": "compile/dep_regions_miss.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 0.415,
+      "peakGiB": 0.07
+     },
+     {
+      "name": "compile/extract_uaf.lean",
+      "outcome": "pass",
+      "seconds": 17.563,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/hashmap_mark_linear.lean",
+      "outcome": "pass",
+      "seconds": 19.764,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/init.lean",
+      "outcome": "pass",
+      "seconds": 17.468,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/link_lake.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 14.875,
+      "peakGiB": 0.85
+     },
+     {
+      "name": "compile/overflow1.lean",
+      "outcome": "pass",
+      "seconds": 17.715,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/phashmap.lean",
+      "outcome": "pass",
+      "seconds": 25.113,
+      "peakGiB": 0.85
+     },
+     {
+      "name": "compile/print_error.lean",
+      "outcome": "pass",
+      "seconds": 15.217,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/reusebug.lean",
+      "outcome": "pass",
+      "seconds": 17.865,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/sarray_mark_linear_panic.lean",
+      "outcome": "lasm-bug: runtime output differs",
+      "seconds": 17.56,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/string_mark_linear_copy.lean",
+      "outcome": "pass",
+      "seconds": 17.67,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/t4.lean",
+      "outcome": "pass",
+      "seconds": 18.591,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/tuple.lean",
+      "outcome": "pass",
+      "seconds": 17.726,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/uset.lean",
+      "outcome": "pass",
+      "seconds": 17.512,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/vector_mark_linear_panic.lean",
+      "outcome": "lasm-bug: runtime output differs",
+      "seconds": 17.743,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile_bench/binarytrees.st.lean",
+      "outcome": "pass",
+      "seconds": 19.781,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile_bench/hashmap.lean",
+      "outcome": "pass",
+      "seconds": 23.003,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/ilean_roundtrip.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 12.851,
+      "peakGiB": 0.75
+     },
+     {
+      "name": "compile_bench/iterators.lean",
+      "outcome": "pass",
+      "seconds": 24.462,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/phashmap.lean",
+      "outcome": "pass",
+      "seconds": 28.026,
+      "peakGiB": 0.84
+     },
+     {
+      "name": "compile_bench/rbmap_fbip.lean",
+      "outcome": "pass",
+      "seconds": 18.635,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/sigmaIterator.lean",
+      "outcome": "pass",
+      "seconds": 17.527,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/workspaceSymbolsNewRanges.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 19.019,
+      "peakGiB": 0.8
+     },
+     {
+      "name": "compile/StackOverflowTask.lean",
+      "outcome": "pass",
+      "seconds": 31.771,
+      "peakGiB": 1.02
+     },
+     {
+      "name": "compile/array.lean",
+      "outcome": "pass",
+      "seconds": 18.787,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/array_mark_linear_copy.lean",
+      "outcome": "pass",
+      "seconds": 18.943,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/bigctor.lean",
+      "outcome": "pass",
+      "seconds": 18.816,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/closure_bug2.lean",
+      "outcome": "pass",
+      "seconds": 19.002,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/closure_bug6.lean",
+      "outcome": "pass",
+      "seconds": 18.972,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/compact_closure_cross.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 37.075,
+      "peakGiB": 2.2
+     },
+     {
+      "name": "compile/escape.lean",
+      "outcome": "pass",
+      "seconds": 18.826,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/file_read_overflow.lean",
+      "outcome": "pass",
+      "seconds": 18.976,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile/hashmap_mark_linear_panic.lean",
+      "outcome": "lasm-bug: runtime output differs",
+      "seconds": 20.478,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/initUnboxed.lean",
+      "outcome": "pass",
+      "seconds": 18.835,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/map_big.lean",
+      "outcome": "pass",
+      "seconds": 18.527,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/overflow2.lean",
+      "outcome": "pass",
+      "seconds": 18.713,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/phashmap2.lean",
+      "outcome": "pass",
+      "seconds": 25.934,
+      "peakGiB": 0.84
+     },
+     {
+      "name": "compile/qsortBadLt.lean",
+      "outcome": "pass",
+      "seconds": 18.758,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/sarray_mark_linear.lean",
+      "outcome": "pass",
+      "seconds": 19.156,
+      "peakGiB": 0.68
+     },
+     {
+      "name": "compile/str.lean",
+      "outcome": "pass",
+      "seconds": 19.403,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/string_mark_linear_panic.lean",
+      "outcome": "lasm-bug: runtime output differs",
+      "seconds": 18.6,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/thunk.lean",
+      "outcome": "pass",
+      "seconds": 18.925,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/typeFormerPolymorphism.lean",
+      "outcome": "pass",
+      "seconds": 18.865,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/utf8Path.lean",
+      "outcome": "pass",
+      "seconds": 18.792,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile/vector_propagate_mark_panic.lean",
+      "outcome": "lasm-bug: runtime output differs",
+      "seconds": 18.895,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/channel.lean",
+      "outcome": "pass",
+      "seconds": 20.589,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/http_server.lean",
+      "outcome": "pass",
+      "seconds": 35.963,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile_bench/incr_header_load.lean",
+      "outcome": "pass",
+      "seconds": 28.857,
+      "peakGiB": 0.77
+     },
+     {
+      "name": "compile_bench/liasolver.lean",
+      "outcome": "pass",
+      "seconds": 38.078,
+      "peakGiB": 0.84
+     },
+     {
+      "name": "compile_bench/qsort.lean",
+      "outcome": "pass",
+      "seconds": 20.466,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/rbmap_library.lean",
+      "outcome": "pass",
+      "seconds": 24.42,
+      "peakGiB": 0.84
+     },
+     {
+      "name": "compile_bench/treemap.lean",
+      "outcome": "pass",
+      "seconds": 24.441,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/append.lean",
+      "outcome": "pass",
+      "seconds": 18.773,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/arrayMapIdxInPlace.lean",
+      "outcome": "pass",
+      "seconds": 18.418,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile/array_mark_linear_panic.lean",
+      "outcome": "lasm-bug: runtime output differs",
+      "seconds": 17.965,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/bytearray_bug.lean",
+      "outcome": "pass",
+      "seconds": 17.982,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/closure_bug3.lean",
+      "outcome": "pass",
+      "seconds": 18.674,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/closure_bug7.lean",
+      "outcome": "pass",
+      "seconds": 18.743,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/compactor_chain.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 0.457,
+      "peakGiB": 0.07
+     },
+     {
+      "name": "compile/expr.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 44.697,
+      "peakGiB": 3.49
+     },
+     {
+      "name": "compile/float.lean",
+      "outcome": "pass",
+      "seconds": 19.849,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/incr_cli_snapshot.lean",
+      "outcome": "pass",
+      "seconds": 26.038,
+      "peakGiB": 0.85
+     },
+     {
+      "name": "compile/large_closure_bug.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 29.393,
+      "peakGiB": 2.05
+     },
+     {
+      "name": "compile/module.lean",
+      "outcome": "pass",
+      "seconds": 22.225,
+      "peakGiB": 0.82
+     },
+     {
+      "name": "compile/overflow3.lean",
+      "outcome": "pass",
+      "seconds": 18.574,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/phashmap3.lean",
+      "outcome": "pass",
+      "seconds": 25.33,
+      "peakGiB": 0.85
+     },
+     {
+      "name": "compile/rbmap_library.lean",
+      "outcome": "pass",
+      "seconds": 26.112,
+      "peakGiB": 0.84
+     },
+     {
+      "name": "compile/sarray_mark_linear_copy.lean",
+      "outcome": "pass",
+      "seconds": 18.294,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/strictAndOr.lean",
+      "outcome": "pass",
+      "seconds": 18.446,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/t1.lean",
+      "outcome": "pass",
+      "seconds": 18.488,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/trie.lean",
+      "outcome": "pass",
+      "seconds": 25.505,
+      "peakGiB": 0.85
+     },
+     {
+      "name": "compile/uint_fold.lean",
+      "outcome": "pass",
+      "seconds": 18.668,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile/vector_mark_linear.lean",
+      "outcome": "pass",
+      "seconds": 19.135,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile/wait_dedicated.lean",
+      "outcome": "pass",
+      "seconds": 18.752,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/const_fold.lean",
+      "outcome": "pass",
+      "seconds": 19.085,
+      "peakGiB": 0.7
+     },
+     {
+      "name": "compile_bench/http_server_tcp.lean",
+      "outcome": "pass",
+      "seconds": 39.459,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile_bench/incr_header_save.lean",
+      "outcome": "pass",
+      "seconds": 28.129,
+      "peakGiB": 0.68
+     },
+     {
+      "name": "compile_bench/nat_repr.lean",
+      "outcome": "pass",
+      "seconds": 18.449,
+      "peakGiB": 0.71
+     },
+     {
+      "name": "compile_bench/rbmap.lean",
+      "outcome": "pass",
+      "seconds": 20,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile_bench/select.lean",
+      "outcome": "pass",
+      "seconds": 19.225,
+      "peakGiB": 0.68
+     },
+     {
+      "name": "compile_bench/unionfind.lean",
+      "outcome": "pass",
+      "seconds": 21.039,
+      "peakGiB": 0.7
+     }
+    ]
+   }
+  },
+  "darwin-arm64": {
+   "runtime-adapter": {
+    "tests": 62,
+    "tally": {
+     "pass": 62
+    },
+    "actionsPassed": 1668,
+    "results": [
+     {
+      "name": "elab/125.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 72.835,
+      "peakGiB": 1.68
+     },
+     {
+      "name": "elab/3079.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 62.833,
+      "peakGiB": 1.8
+     },
+     {
+      "name": "elab/Format.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 58.592,
+      "peakGiB": 1.81
+     },
+     {
+      "name": "elab/aig_optimizations.lean",
+      "outcome": "pass",
+      "actionsPassed": 6,
+      "seconds": 71.472,
+      "peakGiB": 2
+     },
+     {
+      "name": "elab/async_select_error_unregister.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 59.692,
+      "peakGiB": 1.8
+     },
+     {
+      "name": "elab/async_surface_sleep.lean",
+      "outcome": "pass",
+      "actionsPassed": 7,
+      "seconds": 51.57,
+      "peakGiB": 1.78
+     },
+     {
+      "name": "elab/cancel_token.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 60.687,
+      "peakGiB": 1.83
+     },
+     {
+      "name": "elab/charrange.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 60.432,
+      "peakGiB": 1.83
+     },
+     {
+      "name": "elab/demangling.lean",
+      "outcome": "pass",
+      "actionsPassed": 121,
+      "seconds": 132.742,
+      "peakGiB": 1.88
+     },
+     {
+      "name": "elab/filter.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 49.486,
+      "peakGiB": 1.81
+     },
+     {
+      "name": "elab/floatFma.lean",
+      "outcome": "pass",
+      "actionsPassed": 6,
+      "seconds": 46.666,
+      "peakGiB": 1.81
+     },
+     {
+      "name": "elab/hashMapIteratorLoop.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 55.596,
+      "peakGiB": 1.83
+     },
+     {
+      "name": "elab/interp.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 57.607,
+      "peakGiB": 1.82
+     },
+     {
+      "name": "elab/listtostring.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 60.803,
+      "peakGiB": 1.81
+     },
+     {
+      "name": "elab/negFloat.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 59.393,
+      "peakGiB": 1.8
+     },
+     {
+      "name": "elab/patbug.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 59.465,
+      "peakGiB": 1.8
+     },
+     {
+      "name": "elab/repr.lean",
+      "outcome": "pass",
+      "actionsPassed": 8,
+      "seconds": 55.256,
+      "peakGiB": 1.76
+     },
+     {
+      "name": "elab/string_replace.lean",
+      "outcome": "pass",
+      "actionsPassed": 16,
+      "seconds": 44.619,
+      "peakGiB": 1.84
+     },
+     {
+      "name": "elab/sync_shared_mutex.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 61.71,
+      "peakGiB": 1.79
+     },
+     {
+      "name": "elab/timeOperations.lean",
+      "outcome": "pass",
+      "actionsPassed": 51,
+      "seconds": 74.794,
+      "peakGiB": 1.86
+     },
+     {
+      "name": "elab/treeMap2.lean",
+      "outcome": "pass",
+      "actionsPassed": 489,
+      "seconds": 120.476,
+      "peakGiB": 2.03
+     },
+     {
+      "name": "elab/1804.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 65.169,
+      "peakGiB": 1.73
+     },
+     {
+      "name": "elab/4677.lean",
+      "outcome": "pass",
+      "actionsPassed": 8,
+      "seconds": 54.767,
+      "peakGiB": 1.78
+     },
+     {
+      "name": "elab/PArray_forM.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 92.291,
+      "peakGiB": 1.81
+     },
+     {
+      "name": "elab/async_cancellation.lean",
+      "outcome": "pass",
+      "actionsPassed": 10,
+      "seconds": 62.773,
+      "peakGiB": 2.05
+     },
+     {
+      "name": "elab/async_select_gate.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 66.719,
+      "peakGiB": 1.79
+     },
+     {
+      "name": "elab/bitvec.lean",
+      "outcome": "pass",
+      "actionsPassed": 70,
+      "seconds": 62.372,
+      "peakGiB": 1.83
+     },
+     {
+      "name": "elab/casesRec.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 59.503,
+      "peakGiB": 1.83
+     },
+     {
+      "name": "elab/context_async.lean",
+      "outcome": "pass",
+      "actionsPassed": 23,
+      "seconds": 91.428,
+      "peakGiB": 2.02
+     },
+     {
+      "name": "elab/derivingBEqLinear.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 79.244,
+      "peakGiB": 1.8
+     },
+     {
+      "name": "elab/float32.lean",
+      "outcome": "pass",
+      "actionsPassed": 10,
+      "seconds": 70.894,
+      "peakGiB": 1.8
+     },
+     {
+      "name": "elab/forBodyResultTypeIssue.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 65.36,
+      "peakGiB": 1.8
+     },
+     {
+      "name": "elab/hmul2.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 67.396,
+      "peakGiB": 1.81
+     },
+     {
+      "name": "elab/ioNulBytes.lean",
+      "outcome": "pass",
+      "actionsPassed": 13,
+      "seconds": 64.119,
+      "peakGiB": 1.77
+     },
+     {
+      "name": "elab/match_float.lean",
+      "outcome": "pass",
+      "actionsPassed": 14,
+      "seconds": 64.534,
+      "peakGiB": 1.81
+     },
+     {
+      "name": "elab/net_addr.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 63.476,
+      "peakGiB": 1.8
+     },
+     {
+      "name": "elab/proofAsSorry.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 64.76,
+      "peakGiB": 1.82
+     },
+     {
+      "name": "elab/stream.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 63.57,
+      "peakGiB": 1.82
+     },
+     {
+      "name": "elab/string_slice.lean",
+      "outcome": "pass",
+      "actionsPassed": 180,
+      "seconds": 78.009,
+      "peakGiB": 1.83
+     },
+     {
+      "name": "elab/timeClassOperations.lean",
+      "outcome": "pass",
+      "actionsPassed": 29,
+      "seconds": 75.239,
+      "peakGiB": 1.82
+     },
+     {
+      "name": "elab/timeOperationsOffset.lean",
+      "outcome": "pass",
+      "actionsPassed": 99,
+      "seconds": 73.306,
+      "peakGiB": 1.86
+     },
+     {
+      "name": "elab/uintCtors.lean",
+      "outcome": "pass",
+      "actionsPassed": 22,
+      "seconds": 70.84,
+      "peakGiB": 1.83
+     },
+     {
+      "name": "elab/303.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 72.381,
+      "peakGiB": 1.68
+     },
+     {
+      "name": "elab/9937.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 75.35,
+      "peakGiB": 1.8
+     },
+     {
+      "name": "elab/Process.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 84.042,
+      "peakGiB": 1.8
+     },
+     {
+      "name": "elab/async_http_h1_rfc_compliance.lean",
+      "outcome": "pass",
+      "actionsPassed": 14,
+      "seconds": 98.611,
+      "peakGiB": 2.06
+     },
+     {
+      "name": "elab/async_select_socket.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 93.867,
+      "peakGiB": 1.83
+     },
+     {
+      "name": "elab/bytearray.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 73.961,
+      "peakGiB": 1.79
+     },
+     {
+      "name": "elab/charQuote.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 74.102,
+      "peakGiB": 1.82
+     },
+     {
+      "name": "elab/currentDir.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 72.539,
+      "peakGiB": 1.78
+     },
+     {
+      "name": "elab/filePath.lean",
+      "outcome": "pass",
+      "actionsPassed": 28,
+      "seconds": 79.397,
+      "peakGiB": 1.79
+     },
+     {
+      "name": "elab/floatEquality.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 79.326,
+      "peakGiB": 1.82
+     },
+     {
+      "name": "elab/forInPArray.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 154.874,
+      "peakGiB": 1.82
+     },
+     {
+      "name": "elab/intModBug.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 75.677,
+      "peakGiB": 1.83
+     },
+     {
+      "name": "elab/levenshtein.lean",
+      "outcome": "pass",
+      "actionsPassed": 16,
+      "seconds": 142.715,
+      "peakGiB": 1.82
+     },
+     {
+      "name": "elab/missingExplicitWithForwardNamedDep.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 76.05,
+      "peakGiB": 1.78
+     },
+     {
+      "name": "elab/ofIntClamp.lean",
+      "outcome": "pass",
+      "actionsPassed": 32,
+      "seconds": 64.884,
+      "peakGiB": 1.82
+     },
+     {
+      "name": "elab/realPath.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 71.628,
+      "peakGiB": 1.78
+     },
+     {
+      "name": "elab/string_kmp.lean",
+      "outcome": "pass",
+      "actionsPassed": 24,
+      "seconds": 67.73,
+      "peakGiB": 1.82
+     },
+     {
+      "name": "elab/sync_recursive_mutex.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 71.845,
+      "peakGiB": 1.81
+     },
+     {
+      "name": "elab/timeFormats.lean",
+      "outcome": "pass",
+      "actionsPassed": 245,
+      "seconds": 120.507,
+      "peakGiB": 1.86
+     },
+     {
+      "name": "elab/timeSet.lean",
+      "outcome": "pass",
+      "actionsPassed": 12,
+      "seconds": 78.078,
+      "peakGiB": 1.84
+     }
+    ]
+   },
+   "compiled-application": {
+    "tests": 118,
+    "tally": {
+     "lasm-bug: case-insensitive Init.lean shadowing": 85,
+     "upstream-disabled": 4,
+     "pass": 24,
+     "unsupported-by-design": 5
+    },
+    "actionsPassed": 0,
+    "results": [
+     {
+      "name": "compile/534.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 14.504,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/apply_m_overapp.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 15.716,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/arrayMk.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 14.714,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/array_test.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.542,
+      "peakGiB": 0.45
+     },
+     {
+      "name": "compile/char_escape.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 9.536,
+      "peakGiB": 0.3
+     },
+     {
+      "name": "compile/closure_bug4.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 9.457,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/closure_bug8.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.857,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/dep_regions.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 0.731,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/extractClosedMutualBlock.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.898,
+      "peakGiB": 0.4
+     },
+     {
+      "name": "compile/float_cases_bug.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.888,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/incr_header_mismatch.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 79.951,
+      "peakGiB": 1.69
+     },
+     {
+      "name": "compile/lazylist.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.731,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/nat_shiftr.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 8.642,
+      "peakGiB": 0.41
+     },
+     {
+      "name": "compile/partial.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.036,
+      "peakGiB": 0.38
+     },
+     {
+      "name": "compile/phashmap_alter.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 20.524,
+      "peakGiB": 0.45
+     },
+     {
+      "name": "compile/reduceArity_overapp.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.504,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/sarray_mark_linear_grow_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.842,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/string_mark_linear.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.131,
+      "peakGiB": 0.39
+     },
+     {
+      "name": "compile/t2.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.605,
+      "peakGiB": 0.45
+     },
+     {
+      "name": "compile/trigraphs.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.132,
+      "peakGiB": 0.31
+     },
+     {
+      "name": "compile/unreachable.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.91,
+      "peakGiB": 0.36
+     },
+     {
+      "name": "compile/vector_mark_linear_copy.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.145,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile_bench/binarytrees.lean",
+      "outcome": "pass",
+      "seconds": 34.62,
+      "peakGiB": 1.23
+     },
+     {
+      "name": "compile_bench/deriv.lean",
+      "outcome": "pass",
+      "seconds": 37.932,
+      "peakGiB": 1.2
+     },
+     {
+      "name": "compile_bench/identifier_completion.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 18.369,
+      "peakGiB": 1.61
+     },
+     {
+      "name": "compile_bench/io_compute.lean",
+      "outcome": "pass",
+      "seconds": 54.391,
+      "peakGiB": 1.2
+     },
+     {
+      "name": "compile_bench/parser.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 46.776,
+      "peakGiB": 1.37
+     },
+     {
+      "name": "compile_bench/rbmap_checkpoint.lean",
+      "outcome": "pass",
+      "seconds": 40.888,
+      "peakGiB": 1.2
+     },
+     {
+      "name": "compile_bench/server_startup.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 41.515,
+      "peakGiB": 1.32
+     },
+     {
+      "name": "compile_bench/watchdogRss.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 50.166,
+      "peakGiB": 1.36
+     },
+     {
+      "name": "compile/StackOverflow.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 11.943,
+      "peakGiB": 1.02
+     },
+     {
+      "name": "compile/arity_bug1.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 5.849,
+      "peakGiB": 0.41
+     },
+     {
+      "name": "compile/array_mark_linear.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 4.199,
+      "peakGiB": 0.4
+     },
+     {
+      "name": "compile/array_test2.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 4.504,
+      "peakGiB": 0.4
+     },
+     {
+      "name": "compile/closure_bug1.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 4.35,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/closure_bug5.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 3.966,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/compact_closure.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 42.448,
+      "peakGiB": 0.45
+     },
+     {
+      "name": "compile/dep_regions_miss.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 3.682,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/extract_uaf.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.833,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/hashmap_mark_linear.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 9.114,
+      "peakGiB": 0.55
+     },
+     {
+      "name": "compile/init.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.938,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/link_lake.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 29.898,
+      "peakGiB": 0.69
+     },
+     {
+      "name": "compile/overflow1.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 15.93,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/phashmap.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 27.633,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/print_error.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.871,
+      "peakGiB": 0.33
+     },
+     {
+      "name": "compile/reusebug.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 10.293,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/sarray_mark_linear_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 9.123,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/string_mark_linear_copy.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 9.365,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/t4.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 8.371,
+      "peakGiB": 0.45
+     },
+     {
+      "name": "compile/tuple.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 5.208,
+      "peakGiB": 0.23
+     },
+     {
+      "name": "compile/uset.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.252,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/vector_mark_linear_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 8.748,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile_bench/binarytrees.st.lean",
+      "outcome": "pass",
+      "seconds": 34.734,
+      "peakGiB": 1.25
+     },
+     {
+      "name": "compile_bench/hashmap.lean",
+      "outcome": "pass",
+      "seconds": 40.405,
+      "peakGiB": 1.2
+     },
+     {
+      "name": "compile_bench/ilean_roundtrip.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 34.588,
+      "peakGiB": 1.35
+     },
+     {
+      "name": "compile_bench/iterators.lean",
+      "outcome": "pass",
+      "seconds": 38.908,
+      "peakGiB": 1.21
+     },
+     {
+      "name": "compile_bench/phashmap.lean",
+      "outcome": "pass",
+      "seconds": 50.037,
+      "peakGiB": 1.43
+     },
+     {
+      "name": "compile_bench/rbmap_fbip.lean",
+      "outcome": "pass",
+      "seconds": 28.737,
+      "peakGiB": 1.24
+     },
+     {
+      "name": "compile_bench/sigmaIterator.lean",
+      "outcome": "pass",
+      "seconds": 24.952,
+      "peakGiB": 1.24
+     },
+     {
+      "name": "compile_bench/workspaceSymbolsNewRanges.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 30.531,
+      "peakGiB": 1.35
+     },
+     {
+      "name": "compile/StackOverflowTask.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 19.206,
+      "peakGiB": 0.87
+     },
+     {
+      "name": "compile/array.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.614,
+      "peakGiB": 0.4
+     },
+     {
+      "name": "compile/array_mark_linear_copy.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.429,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/bigctor.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.521,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/closure_bug2.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.988,
+      "peakGiB": 0.36
+     },
+     {
+      "name": "compile/closure_bug6.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.588,
+      "peakGiB": 0.34
+     },
+     {
+      "name": "compile/compact_closure_cross.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 68.188,
+      "peakGiB": 0.45
+     },
+     {
+      "name": "compile/escape.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 19.412,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/file_read_overflow.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 11.967,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/hashmap_mark_linear_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 11.395,
+      "peakGiB": 0.55
+     },
+     {
+      "name": "compile/initUnboxed.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 8.764,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/map_big.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 7.016,
+      "peakGiB": 0.4
+     },
+     {
+      "name": "compile/overflow2.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 5.448,
+      "peakGiB": 0.38
+     },
+     {
+      "name": "compile/phashmap2.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.844,
+      "peakGiB": 0.47
+     },
+     {
+      "name": "compile/qsortBadLt.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 9.903,
+      "peakGiB": 0.41
+     },
+     {
+      "name": "compile/sarray_mark_linear.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 5.546,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/str.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 4.068,
+      "peakGiB": 0.45
+     },
+     {
+      "name": "compile/string_mark_linear_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 5.826,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/thunk.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 5.592,
+      "peakGiB": 0.38
+     },
+     {
+      "name": "compile/typeFormerPolymorphism.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.246,
+      "peakGiB": 0.4
+     },
+     {
+      "name": "compile/utf8Path.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 5.705,
+      "peakGiB": 0.39
+     },
+     {
+      "name": "compile/vector_propagate_mark_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 5.181,
+      "peakGiB": 0.41
+     },
+     {
+      "name": "compile_bench/channel.lean",
+      "outcome": "pass",
+      "seconds": 29.985,
+      "peakGiB": 1.25
+     },
+     {
+      "name": "compile_bench/http_server.lean",
+      "outcome": "pass",
+      "seconds": 53.419,
+      "peakGiB": 1.22
+     },
+     {
+      "name": "compile_bench/incr_header_load.lean",
+      "outcome": "pass",
+      "seconds": 70.702,
+      "peakGiB": 1.65
+     },
+     {
+      "name": "compile_bench/liasolver.lean",
+      "outcome": "pass",
+      "seconds": 72.338,
+      "peakGiB": 1.43
+     },
+     {
+      "name": "compile_bench/qsort.lean",
+      "outcome": "pass",
+      "seconds": 34.109,
+      "peakGiB": 1.24
+     },
+     {
+      "name": "compile_bench/rbmap_library.lean",
+      "outcome": "pass",
+      "seconds": 47.39,
+      "peakGiB": 1.42
+     },
+     {
+      "name": "compile_bench/treemap.lean",
+      "outcome": "pass",
+      "seconds": 36.202,
+      "peakGiB": 1.23
+     },
+     {
+      "name": "compile/append.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.908,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/arrayMapIdxInPlace.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.096,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/array_mark_linear_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 10.648,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/bytearray_bug.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 9.239,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/closure_bug3.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 11.312,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/closure_bug7.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 10.471,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/compactor_chain.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 1.04,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/expr.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 81.124,
+      "peakGiB": 1.28
+     },
+     {
+      "name": "compile/float.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 13.631,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/incr_cli_snapshot.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 23.636,
+      "peakGiB": 0.61
+     },
+     {
+      "name": "compile/large_closure_bug.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 56.932,
+      "peakGiB": 1.33
+     },
+     {
+      "name": "compile/module.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 34.833,
+      "peakGiB": 0.68
+     },
+     {
+      "name": "compile/overflow3.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 11.003,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/phashmap3.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 18.992,
+      "peakGiB": 0.45
+     },
+     {
+      "name": "compile/rbmap_library.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 24.513,
+      "peakGiB": 0.45
+     },
+     {
+      "name": "compile/sarray_mark_linear_copy.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 11.458,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/strictAndOr.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.557,
+      "peakGiB": 0.42
+     },
+     {
+      "name": "compile/t1.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.274,
+      "peakGiB": 0.25
+     },
+     {
+      "name": "compile/trie.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 18.719,
+      "peakGiB": 0.47
+     },
+     {
+      "name": "compile/uint_fold.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 11.066,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/vector_mark_linear.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 6.342,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/wait_dedicated.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 5.096,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile_bench/const_fold.lean",
+      "outcome": "pass",
+      "seconds": 26.155,
+      "peakGiB": 1.24
+     },
+     {
+      "name": "compile_bench/http_server_tcp.lean",
+      "outcome": "pass",
+      "seconds": 61.565,
+      "peakGiB": 1.23
+     },
+     {
+      "name": "compile_bench/incr_header_save.lean",
+      "outcome": "pass",
+      "seconds": 89.098,
+      "peakGiB": 2.03
+     },
+     {
+      "name": "compile_bench/nat_repr.lean",
+      "outcome": "pass",
+      "seconds": 36.88,
+      "peakGiB": 1.21
+     },
+     {
+      "name": "compile_bench/rbmap.lean",
+      "outcome": "pass",
+      "seconds": 36.169,
+      "peakGiB": 1.23
+     },
+     {
+      "name": "compile_bench/select.lean",
+      "outcome": "pass",
+      "seconds": 34.375,
+      "peakGiB": 1.22
+     },
+     {
+      "name": "compile_bench/unionfind.lean",
+      "outcome": "pass",
+      "seconds": 30.481,
+      "peakGiB": 1.21
+     }
+    ]
+   }
+  },
+  "darwin-x64": {
+   "runtime-adapter": {
+    "tests": 62,
+    "tally": {
+     "pass": 62
+    },
+    "actionsPassed": 1668,
+    "results": [
+     {
+      "name": "elab/125.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 97.197,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "elab/3079.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 96.817,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/Format.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 104.761,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/aig_optimizations.lean",
+      "outcome": "pass",
+      "actionsPassed": 6,
+      "seconds": 135.043,
+      "peakGiB": 1.47
+     },
+     {
+      "name": "elab/async_select_error_unregister.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 124.088,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "elab/async_surface_sleep.lean",
+      "outcome": "pass",
+      "actionsPassed": 7,
+      "seconds": 108.174,
+      "peakGiB": 1.31
+     },
+     {
+      "name": "elab/cancel_token.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 115.756,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/charrange.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 130.758,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "elab/demangling.lean",
+      "outcome": "pass",
+      "actionsPassed": 121,
+      "seconds": 340.807,
+      "peakGiB": 1.38
+     },
+     {
+      "name": "elab/filter.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 114.768,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "elab/floatFma.lean",
+      "outcome": "pass",
+      "actionsPassed": 6,
+      "seconds": 85.422,
+      "peakGiB": 1.26
+     },
+     {
+      "name": "elab/hashMapIteratorLoop.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 76.828,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/interp.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 83.389,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/listtostring.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 83.612,
+      "peakGiB": 1.31
+     },
+     {
+      "name": "elab/negFloat.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 95.446,
+      "peakGiB": 1.28
+     },
+     {
+      "name": "elab/patbug.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 102.466,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/repr.lean",
+      "outcome": "pass",
+      "actionsPassed": 8,
+      "seconds": 108.923,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/string_replace.lean",
+      "outcome": "pass",
+      "actionsPassed": 16,
+      "seconds": 113.562,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/sync_shared_mutex.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 101.084,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "elab/timeOperations.lean",
+      "outcome": "pass",
+      "actionsPassed": 51,
+      "seconds": 90.576,
+      "peakGiB": 1.32
+     },
+     {
+      "name": "elab/treeMap2.lean",
+      "outcome": "pass",
+      "actionsPassed": 489,
+      "seconds": 190.47,
+      "peakGiB": 1.47
+     },
+     {
+      "name": "elab/1804.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 96.22,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "elab/4677.lean",
+      "outcome": "pass",
+      "actionsPassed": 8,
+      "seconds": 105.511,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/PArray_forM.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 304.275,
+      "peakGiB": 1.4
+     },
+     {
+      "name": "elab/async_cancellation.lean",
+      "outcome": "pass",
+      "actionsPassed": 10,
+      "seconds": 117.899,
+      "peakGiB": 1.49
+     },
+     {
+      "name": "elab/async_select_gate.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 84.025,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "elab/bitvec.lean",
+      "outcome": "pass",
+      "actionsPassed": 70,
+      "seconds": 82.641,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "elab/casesRec.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 110.794,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/context_async.lean",
+      "outcome": "pass",
+      "actionsPassed": 23,
+      "seconds": 147.525,
+      "peakGiB": 1.5
+     },
+     {
+      "name": "elab/derivingBEqLinear.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 107.36,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/float32.lean",
+      "outcome": "pass",
+      "actionsPassed": 10,
+      "seconds": 122.205,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/forBodyResultTypeIssue.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 114.15,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/hmul2.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 107.911,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/ioNulBytes.lean",
+      "outcome": "pass",
+      "actionsPassed": 13,
+      "seconds": 114.927,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/match_float.lean",
+      "outcome": "pass",
+      "actionsPassed": 14,
+      "seconds": 125.189,
+      "peakGiB": 1.28
+     },
+     {
+      "name": "elab/net_addr.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 82.088,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/proofAsSorry.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 80.857,
+      "peakGiB": 1.28
+     },
+     {
+      "name": "elab/stream.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 84.028,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/string_slice.lean",
+      "outcome": "pass",
+      "actionsPassed": 180,
+      "seconds": 96.288,
+      "peakGiB": 1.3
+     },
+     {
+      "name": "elab/timeClassOperations.lean",
+      "outcome": "pass",
+      "actionsPassed": 29,
+      "seconds": 93.926,
+      "peakGiB": 1.32
+     },
+     {
+      "name": "elab/timeOperationsOffset.lean",
+      "outcome": "pass",
+      "actionsPassed": 99,
+      "seconds": 91.995,
+      "peakGiB": 1.3
+     },
+     {
+      "name": "elab/uintCtors.lean",
+      "outcome": "pass",
+      "actionsPassed": 22,
+      "seconds": 107.925,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/303.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 85.44,
+      "peakGiB": 1.28
+     },
+     {
+      "name": "elab/9937.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 78.587,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/Process.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 91.8,
+      "peakGiB": 1.26
+     },
+     {
+      "name": "elab/async_http_h1_rfc_compliance.lean",
+      "outcome": "pass",
+      "actionsPassed": 14,
+      "seconds": 117.459,
+      "peakGiB": 1.54
+     },
+     {
+      "name": "elab/async_select_socket.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 102.618,
+      "peakGiB": 1.31
+     },
+     {
+      "name": "elab/bytearray.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 82.565,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/charQuote.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 83.036,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/currentDir.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 81.613,
+      "peakGiB": 1.25
+     },
+     {
+      "name": "elab/filePath.lean",
+      "outcome": "pass",
+      "actionsPassed": 28,
+      "seconds": 85.28,
+      "peakGiB": 1.28
+     },
+     {
+      "name": "elab/floatEquality.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 84.814,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "elab/forInPArray.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 206.084,
+      "peakGiB": 1.42
+     },
+     {
+      "name": "elab/intModBug.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 83.316,
+      "peakGiB": 1.25
+     },
+     {
+      "name": "elab/levenshtein.lean",
+      "outcome": "pass",
+      "actionsPassed": 16,
+      "seconds": 202.956,
+      "peakGiB": 1.33
+     },
+     {
+      "name": "elab/missingExplicitWithForwardNamedDep.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 82.986,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/ofIntClamp.lean",
+      "outcome": "pass",
+      "actionsPassed": 32,
+      "seconds": 78.14,
+      "peakGiB": 1.26
+     },
+     {
+      "name": "elab/realPath.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 94.016,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/string_kmp.lean",
+      "outcome": "pass",
+      "actionsPassed": 24,
+      "seconds": 72.399,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/sync_recursive_mutex.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 81.955,
+      "peakGiB": 1.29
+     },
+     {
+      "name": "elab/timeFormats.lean",
+      "outcome": "pass",
+      "actionsPassed": 245,
+      "seconds": 144.578,
+      "peakGiB": 1.33
+     },
+     {
+      "name": "elab/timeSet.lean",
+      "outcome": "pass",
+      "actionsPassed": 12,
+      "seconds": 97.066,
+      "peakGiB": 1.3
+     }
+    ]
+   },
+   "compiled-application": {
+    "tests": 118,
+    "tally": {
+     "lasm-bug: case-insensitive Init.lean shadowing": 85,
+     "upstream-disabled": 4,
+     "pass": 24,
+     "unsupported-by-design": 5
+    },
+    "actionsPassed": 0,
+    "results": [
+     {
+      "name": "compile/534.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 24.17,
+      "peakGiB": 0.27
+     },
+     {
+      "name": "compile/apply_m_overapp.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 20.142,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/arrayMk.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 19.731,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/array_test.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 22.097,
+      "peakGiB": 0.3
+     },
+     {
+      "name": "compile/char_escape.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 19.416,
+      "peakGiB": 0.2
+     },
+     {
+      "name": "compile/closure_bug4.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 19.457,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/closure_bug8.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 19.239,
+      "peakGiB": 0.27
+     },
+     {
+      "name": "compile/dep_regions.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 2.221,
+      "peakGiB": 0.3
+     },
+     {
+      "name": "compile/extractClosedMutualBlock.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 19.156,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/float_cases_bug.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 19.112,
+      "peakGiB": 0.3
+     },
+     {
+      "name": "compile/incr_header_mismatch.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 213.729,
+      "peakGiB": 1.23
+     },
+     {
+      "name": "compile/lazylist.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 20.317,
+      "peakGiB": 0.3
+     },
+     {
+      "name": "compile/nat_shiftr.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 21.674,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/partial.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 19.115,
+      "peakGiB": 0.27
+     },
+     {
+      "name": "compile/phashmap_alter.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 38.86,
+      "peakGiB": 0.3
+     },
+     {
+      "name": "compile/reduceArity_overapp.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 18.042,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/sarray_mark_linear_grow_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 17.931,
+      "peakGiB": 0.25
+     },
+     {
+      "name": "compile/string_mark_linear.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 18.462,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/t2.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.697,
+      "peakGiB": 0.3
+     },
+     {
+      "name": "compile/trigraphs.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 13.775,
+      "peakGiB": 0.27
+     },
+     {
+      "name": "compile/unreachable.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 14.662,
+      "peakGiB": 0.21
+     },
+     {
+      "name": "compile/vector_mark_linear_copy.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 14.25,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile_bench/binarytrees.lean",
+      "outcome": "pass",
+      "seconds": 69.41,
+      "peakGiB": 1.07
+     },
+     {
+      "name": "compile_bench/deriv.lean",
+      "outcome": "pass",
+      "seconds": 44.713,
+      "peakGiB": 1.09
+     },
+     {
+      "name": "compile_bench/identifier_completion.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 15.339,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "compile_bench/io_compute.lean",
+      "outcome": "pass",
+      "seconds": 58.11,
+      "peakGiB": 1.08
+     },
+     {
+      "name": "compile_bench/parser.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 66.003,
+      "peakGiB": 1.2
+     },
+     {
+      "name": "compile_bench/rbmap_checkpoint.lean",
+      "outcome": "pass",
+      "seconds": 59.807,
+      "peakGiB": 1.08
+     },
+     {
+      "name": "compile_bench/server_startup.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 58.267,
+      "peakGiB": 1.2
+     },
+     {
+      "name": "compile_bench/watchdogRss.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 72.885,
+      "peakGiB": 1.17
+     },
+     {
+      "name": "compile/StackOverflow.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 33.302,
+      "peakGiB": 1.04
+     },
+     {
+      "name": "compile/arity_bug1.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 19.273,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/array_mark_linear.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 18.977,
+      "peakGiB": 0.27
+     },
+     {
+      "name": "compile/array_test2.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 21.114,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/closure_bug1.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 20.539,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/closure_bug5.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 17.417,
+      "peakGiB": 0.27
+     },
+     {
+      "name": "compile/compact_closure.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 156.992,
+      "peakGiB": 0.39
+     },
+     {
+      "name": "compile/dep_regions_miss.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 1.732,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/extract_uaf.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 17.574,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/hashmap_mark_linear.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 17.631,
+      "peakGiB": 0.35
+     },
+     {
+      "name": "compile/init.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 15.759,
+      "peakGiB": 0.25
+     },
+     {
+      "name": "compile/link_lake.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 42.358,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/overflow1.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 15.405,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/phashmap.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 45.136,
+      "peakGiB": 0.31
+     },
+     {
+      "name": "compile/print_error.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.485,
+      "peakGiB": 0.22
+     },
+     {
+      "name": "compile/reusebug.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 17.352,
+      "peakGiB": 0.3
+     },
+     {
+      "name": "compile/sarray_mark_linear_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.115,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/string_mark_linear_copy.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.241,
+      "peakGiB": 0.27
+     },
+     {
+      "name": "compile/t4.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.824,
+      "peakGiB": 0.3
+     },
+     {
+      "name": "compile/tuple.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 18.259,
+      "peakGiB": 0.27
+     },
+     {
+      "name": "compile/uset.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.622,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/vector_mark_linear_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 20.086,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile_bench/binarytrees.st.lean",
+      "outcome": "pass",
+      "seconds": 89.102,
+      "peakGiB": 1.07
+     },
+     {
+      "name": "compile_bench/hashmap.lean",
+      "outcome": "pass",
+      "seconds": 69.245,
+      "peakGiB": 1.07
+     },
+     {
+      "name": "compile_bench/ilean_roundtrip.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 67.702,
+      "peakGiB": 1.19
+     },
+     {
+      "name": "compile_bench/iterators.lean",
+      "outcome": "pass",
+      "seconds": 78.065,
+      "peakGiB": 1.08
+     },
+     {
+      "name": "compile_bench/phashmap.lean",
+      "outcome": "pass",
+      "seconds": 99.988,
+      "peakGiB": 1.26
+     },
+     {
+      "name": "compile_bench/rbmap_fbip.lean",
+      "outcome": "pass",
+      "seconds": 51.099,
+      "peakGiB": 1.08
+     },
+     {
+      "name": "compile_bench/sigmaIterator.lean",
+      "outcome": "pass",
+      "seconds": 50.858,
+      "peakGiB": 1.07
+     },
+     {
+      "name": "compile_bench/workspaceSymbolsNewRanges.lean",
+      "outcome": "unsupported-by-design",
+      "seconds": 69.742,
+      "peakGiB": 1.19
+     },
+     {
+      "name": "compile/StackOverflowTask.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 15.346,
+      "peakGiB": 0.88
+     },
+     {
+      "name": "compile/array.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.663,
+      "peakGiB": 0.18
+     },
+     {
+      "name": "compile/array_mark_linear_copy.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.487,
+      "peakGiB": 0.24
+     },
+     {
+      "name": "compile/bigctor.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.99,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/closure_bug2.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 15.341,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/closure_bug6.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.676,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/compact_closure_cross.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 119.661,
+      "peakGiB": 0.4
+     },
+     {
+      "name": "compile/escape.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.523,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/file_read_overflow.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.748,
+      "peakGiB": 0.18
+     },
+     {
+      "name": "compile/hashmap_mark_linear_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 20.103,
+      "peakGiB": 0.36
+     },
+     {
+      "name": "compile/initUnboxed.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 32.289,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/map_big.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 24,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/overflow2.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 17.38,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/phashmap2.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 51.794,
+      "peakGiB": 0.31
+     },
+     {
+      "name": "compile/qsortBadLt.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 15.817,
+      "peakGiB": 0.27
+     },
+     {
+      "name": "compile/sarray_mark_linear.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 14.732,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/str.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.737,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/string_mark_linear_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.5,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/thunk.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 12.601,
+      "peakGiB": 0.24
+     },
+     {
+      "name": "compile/typeFormerPolymorphism.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 13.764,
+      "peakGiB": 0.24
+     },
+     {
+      "name": "compile/utf8Path.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 15.712,
+      "peakGiB": 0.22
+     },
+     {
+      "name": "compile/vector_propagate_mark_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 13.213,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile_bench/channel.lean",
+      "outcome": "pass",
+      "seconds": 70.609,
+      "peakGiB": 1.09
+     },
+     {
+      "name": "compile_bench/http_server.lean",
+      "outcome": "pass",
+      "seconds": 108.421,
+      "peakGiB": 1.08
+     },
+     {
+      "name": "compile_bench/incr_header_load.lean",
+      "outcome": "pass",
+      "seconds": 102.762,
+      "peakGiB": 1.2
+     },
+     {
+      "name": "compile_bench/liasolver.lean",
+      "outcome": "pass",
+      "seconds": 127.473,
+      "peakGiB": 1.28
+     },
+     {
+      "name": "compile_bench/qsort.lean",
+      "outcome": "pass",
+      "seconds": 62.133,
+      "peakGiB": 1.08
+     },
+     {
+      "name": "compile_bench/rbmap_library.lean",
+      "outcome": "pass",
+      "seconds": 99.079,
+      "peakGiB": 1.27
+     },
+     {
+      "name": "compile_bench/treemap.lean",
+      "outcome": "pass",
+      "seconds": 69.39,
+      "peakGiB": 1.08
+     },
+     {
+      "name": "compile/append.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 10.978,
+      "peakGiB": 0.31
+     },
+     {
+      "name": "compile/arrayMapIdxInPlace.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 10.603,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/array_mark_linear_panic.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 10.009,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/bytearray_bug.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 10.254,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/closure_bug3.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 10.098,
+      "peakGiB": 0.25
+     },
+     {
+      "name": "compile/closure_bug7.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 10.058,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/compactor_chain.lean",
+      "outcome": "upstream-disabled",
+      "seconds": 0.952,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/expr.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 103.988,
+      "peakGiB": 0.83
+     },
+     {
+      "name": "compile/float.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 11.268,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/incr_cli_snapshot.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 26.821,
+      "peakGiB": 0.43
+     },
+     {
+      "name": "compile/large_closure_bug.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 33.129,
+      "peakGiB": 0.89
+     },
+     {
+      "name": "compile/module.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 44.312,
+      "peakGiB": 0.44
+     },
+     {
+      "name": "compile/overflow3.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 21.925,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/phashmap3.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 38.536,
+      "peakGiB": 0.31
+     },
+     {
+      "name": "compile/rbmap_library.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 44.278,
+      "peakGiB": 0.3
+     },
+     {
+      "name": "compile/sarray_mark_linear_copy.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 16.314,
+      "peakGiB": 0.28
+     },
+     {
+      "name": "compile/strictAndOr.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 15.324,
+      "peakGiB": 0.26
+     },
+     {
+      "name": "compile/t1.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 15.682,
+      "peakGiB": 0.22
+     },
+     {
+      "name": "compile/trie.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 41.414,
+      "peakGiB": 0.31
+     },
+     {
+      "name": "compile/uint_fold.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 14.477,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/vector_mark_linear.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 13.823,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile/wait_dedicated.lean",
+      "outcome": "lasm-bug: case-insensitive Init.lean shadowing",
+      "seconds": 13.989,
+      "peakGiB": 0.29
+     },
+     {
+      "name": "compile_bench/const_fold.lean",
+      "outcome": "pass",
+      "seconds": 60.419,
+      "peakGiB": 1.07
+     },
+     {
+      "name": "compile_bench/http_server_tcp.lean",
+      "outcome": "pass",
+      "seconds": 94.113,
+      "peakGiB": 1.1
+     },
+     {
+      "name": "compile_bench/incr_header_save.lean",
+      "outcome": "pass",
+      "seconds": 64.63,
+      "peakGiB": 1.44
+     },
+     {
+      "name": "compile_bench/nat_repr.lean",
+      "outcome": "pass",
+      "seconds": 50.786,
+      "peakGiB": 1.08
+     },
+     {
+      "name": "compile_bench/rbmap.lean",
+      "outcome": "pass",
+      "seconds": 53.899,
+      "peakGiB": 1.07
+     },
+     {
+      "name": "compile_bench/select.lean",
+      "outcome": "pass",
+      "seconds": 53.297,
+      "peakGiB": 1.08
+     },
+     {
+      "name": "compile_bench/unionfind.lean",
+      "outcome": "pass",
+      "seconds": 56.775,
+      "peakGiB": 1.06
+     }
+    ]
+   }
+  },
+  "win32-x64": {
+   "runtime-adapter": {
+    "tests": 62,
+    "tally": {
+     "pass": 62
+    },
+    "actionsPassed": 1668,
+    "results": [
+     {
+      "name": "elab/125.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 78.494
+     },
+     {
+      "name": "elab/3079.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 76.48
+     },
+     {
+      "name": "elab/Format.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 75.338
+     },
+     {
+      "name": "elab/aig_optimizations.lean",
+      "outcome": "pass",
+      "actionsPassed": 6,
+      "seconds": 95.747
+     },
+     {
+      "name": "elab/async_select_error_unregister.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 78.77
+     },
+     {
+      "name": "elab/async_surface_sleep.lean",
+      "outcome": "pass",
+      "actionsPassed": 7,
+      "seconds": 81.526
+     },
+     {
+      "name": "elab/cancel_token.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 77.012
+     },
+     {
+      "name": "elab/charrange.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 68.998
+     },
+     {
+      "name": "elab/demangling.lean",
+      "outcome": "pass",
+      "actionsPassed": 121,
+      "seconds": 281.823
+     },
+     {
+      "name": "elab/filter.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 81.546
+     },
+     {
+      "name": "elab/floatFma.lean",
+      "outcome": "pass",
+      "actionsPassed": 6,
+      "seconds": 85.758
+     },
+     {
+      "name": "elab/hashMapIteratorLoop.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 81.671
+     },
+     {
+      "name": "elab/interp.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 95.958
+     },
+     {
+      "name": "elab/listtostring.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 98.562
+     },
+     {
+      "name": "elab/negFloat.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 102.006
+     },
+     {
+      "name": "elab/patbug.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 78.612
+     },
+     {
+      "name": "elab/repr.lean",
+      "outcome": "pass",
+      "actionsPassed": 8,
+      "seconds": 81.594
+     },
+     {
+      "name": "elab/string_replace.lean",
+      "outcome": "pass",
+      "actionsPassed": 16,
+      "seconds": 70.179
+     },
+     {
+      "name": "elab/sync_shared_mutex.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 80.38
+     },
+     {
+      "name": "elab/timeOperations.lean",
+      "outcome": "pass",
+      "actionsPassed": 51,
+      "seconds": 91.014
+     },
+     {
+      "name": "elab/treeMap2.lean",
+      "outcome": "pass",
+      "actionsPassed": 489,
+      "seconds": 185.752
+     },
+     {
+      "name": "elab/1804.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 42.113
+     },
+     {
+      "name": "elab/4677.lean",
+      "outcome": "pass",
+      "actionsPassed": 8,
+      "seconds": 47.175
+     },
+     {
+      "name": "elab/PArray_forM.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 184.328
+     },
+     {
+      "name": "elab/async_cancellation.lean",
+      "outcome": "pass",
+      "actionsPassed": 10,
+      "seconds": 53.77
+     },
+     {
+      "name": "elab/async_select_gate.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 44.81
+     },
+     {
+      "name": "elab/bitvec.lean",
+      "outcome": "pass",
+      "actionsPassed": 70,
+      "seconds": 43.818
+     },
+     {
+      "name": "elab/casesRec.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 41.752
+     },
+     {
+      "name": "elab/context_async.lean",
+      "outcome": "pass",
+      "actionsPassed": 23,
+      "seconds": 71.824
+     },
+     {
+      "name": "elab/derivingBEqLinear.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 40.81
+     },
+     {
+      "name": "elab/float32.lean",
+      "outcome": "pass",
+      "actionsPassed": 10,
+      "seconds": 45.098
+     },
+     {
+      "name": "elab/forBodyResultTypeIssue.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 44.52
+     },
+     {
+      "name": "elab/hmul2.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 44.096
+     },
+     {
+      "name": "elab/ioNulBytes.lean",
+      "outcome": "pass",
+      "actionsPassed": 13,
+      "seconds": 43.517
+     },
+     {
+      "name": "elab/match_float.lean",
+      "outcome": "pass",
+      "actionsPassed": 14,
+      "seconds": 45.185
+     },
+     {
+      "name": "elab/net_addr.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 46.378
+     },
+     {
+      "name": "elab/proofAsSorry.lean",
+      "outcome": "pass",
+      "actionsPassed": 2,
+      "seconds": 48.537
+     },
+     {
+      "name": "elab/stream.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 68.915
+     },
+     {
+      "name": "elab/string_slice.lean",
+      "outcome": "pass",
+      "actionsPassed": 180,
+      "seconds": 83.597
+     },
+     {
+      "name": "elab/timeClassOperations.lean",
+      "outcome": "pass",
+      "actionsPassed": 29,
+      "seconds": 79.637
+     },
+     {
+      "name": "elab/timeOperationsOffset.lean",
+      "outcome": "pass",
+      "actionsPassed": 99,
+      "seconds": 76.067
+     },
+     {
+      "name": "elab/uintCtors.lean",
+      "outcome": "pass",
+      "actionsPassed": 22,
+      "seconds": 64.612
+     },
+     {
+      "name": "elab/303.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 58.832
+     },
+     {
+      "name": "elab/9937.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 56.419
+     },
+     {
+      "name": "elab/Process.lean",
+      "outcome": "pass",
+      "actionsPassed": 9,
+      "seconds": 67.722
+     },
+     {
+      "name": "elab/async_http_h1_rfc_compliance.lean",
+      "outcome": "pass",
+      "actionsPassed": 14,
+      "seconds": 84.385
+     },
+     {
+      "name": "elab/async_select_socket.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 78.081
+     },
+     {
+      "name": "elab/bytearray.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 58.045
+     },
+     {
+      "name": "elab/charQuote.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 59.562
+     },
+     {
+      "name": "elab/currentDir.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 61.165
+     },
+     {
+      "name": "elab/filePath.lean",
+      "outcome": "pass",
+      "actionsPassed": 28,
+      "seconds": 61.321
+     },
+     {
+      "name": "elab/floatEquality.lean",
+      "outcome": "pass",
+      "actionsPassed": 5,
+      "seconds": 58.778
+     },
+     {
+      "name": "elab/forInPArray.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 254.655
+     },
+     {
+      "name": "elab/intModBug.lean",
+      "outcome": "pass",
+      "actionsPassed": 4,
+      "seconds": 58.492
+     },
+     {
+      "name": "elab/levenshtein.lean",
+      "outcome": "pass",
+      "actionsPassed": 16,
+      "seconds": 111.837
+     },
+     {
+      "name": "elab/missingExplicitWithForwardNamedDep.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 61.415
+     },
+     {
+      "name": "elab/ofIntClamp.lean",
+      "outcome": "pass",
+      "actionsPassed": 32,
+      "seconds": 54.137
+     },
+     {
+      "name": "elab/realPath.lean",
+      "outcome": "pass",
+      "actionsPassed": 1,
+      "seconds": 61.231
+     },
+     {
+      "name": "elab/string_kmp.lean",
+      "outcome": "pass",
+      "actionsPassed": 24,
+      "seconds": 54.582
+     },
+     {
+      "name": "elab/sync_recursive_mutex.lean",
+      "outcome": "pass",
+      "actionsPassed": 3,
+      "seconds": 61.449
+     },
+     {
+      "name": "elab/timeFormats.lean",
+      "outcome": "pass",
+      "actionsPassed": 245,
+      "seconds": 109.39
+     },
+     {
+      "name": "elab/timeSet.lean",
+      "outcome": "pass",
+      "actionsPassed": 12,
+      "seconds": 74.971
+     }
+    ]
+   }
+  }
+ }
+}
