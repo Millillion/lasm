@@ -13,6 +13,7 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSy
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
+import { tmpdir } from 'node:os';
 import { executableName } from '../platform.mjs';
 import { Settings, instantiateSettings } from './settings.mjs';
 import { extractMetadata, updateMetadata } from './metadata.mjs';
@@ -337,8 +338,13 @@ export function unusedFromMetadce(settings, output, importNames, exportNames) {
 // prefix, so a deep project failed with ENAMETOOLONG (upstream Lake test
 // packageOverrides on windows-2025). Create it namespaced and return the
 // ordinary path, which Node fs and the LLVM tools both accept beyond MAX_PATH.
+// Binaryen's tools open their inputs with MAX_PATH-limited Windows paths, so a link
+// inside a deep project failed (emcc_dce_graph.json at 278 characters in upstream
+// packageOverrides). On Windows the temporary files go to the short system
+// temporary directory; the delivered files stay in the build directory.
 export function linkTemporaryDirectory(work, mode) {
-  const created = mkdtempSync(path.toNamespacedPath(path.join(work, `node-link-${mode}-`)));
+  const base = process.platform === 'win32' ? tmpdir() : work;
+  const created = mkdtempSync(path.toNamespacedPath(path.join(base, `node-link-${mode}-`)));
   return process.platform === 'win32' ? created.replace(/^\\\\\?\\UNC\\/, '\\\\').replace(/^\\\\\?\\/, '') : created;
 }
 export const removeTemporary = directory => rmSync(directory, { recursive: true, force: true });
