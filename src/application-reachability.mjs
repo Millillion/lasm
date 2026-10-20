@@ -107,7 +107,19 @@ export function canSpecializeInitialization(runtime) {
     // Init/Std/Lean/Lake/libleancpp/libleanrt/liblasmhost archives, the headers,
     // exports.json and liblasmsymbols.a, is byte-identical to the entry above, so
     // no libleancpp initialization path changed.
-    'd1b1394ce2df4f9af2624cbd9bcca2162ee051da6be60ec38b08119c33fbd981'].includes(runtime.identity);
+    'd1b1394ce2df4f9af2624cbd9bcca2162ee051da6be60ec38b08119c33fbd981',
+    // Lean 4.35.0 (CI build 39437915868, source 076f9e5, handoff e00eaaa3…): the
+    // nonlinear-environment patch lets should_abort_on_nonlinearity() read
+    // LEAN_ABORT_ON_NONLINEAR. Only lib/libleanrt.a and target.json (its hash and
+    // the patch record) differ from the entry above; within libleanrt.a only
+    // object.cpp.o, and within it only lean_copy_expand_array_nonlinear,
+    // lean_copy_sarray_nonlinear, lean_copy_string_nonlinear and
+    // lean_string_utf8_set (the getenv check and its panic path). Every other
+    // function, including initialize_object/finalize_object, differs only by data
+    // offsets of the added strings. The cold rebuild's Init/Std/Lean/LeanExport/
+    // Lake/libleancpp/liblasmhost archives, headers, exports.json and
+    // liblasmsymbols.a are byte-identical, so no initialization path changed.
+    '7aa5028c6226405b322961b289f955043824a49c997bec3f3e262647c045557c'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';

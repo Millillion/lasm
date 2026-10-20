@@ -72,6 +72,18 @@ test('a failed worker read preserves the error and allows subsequent operations'
   finally { await files.closeAsync(reader); }
 });
 
+test('a failed worker write reports the CRT errno, as native Lean does', async t => {
+  // Upstream elab/file_not_found: native Lean reports EBADF ("bad file
+  // descriptor") on every platform. Windows previously reported errno 0.
+  const files = nativeFiles(), path = await fixture(t, 'x');
+  const reader = await files.open(path, 0);
+  try {
+    // A write is buffered; flushing it to the read-only descriptor fails.
+    await assert.rejects(async () => { await files.write(reader, Buffer.from('foo')); await files.flush(reader); },
+      error => error.code === 'EBADF' && error.nativeMessage === true);
+  } finally { await files.closeAsync(reader); }
+});
+
 test('writes preserve offsets and caller ownership through the file worker', async t => {
   const files = nativeFiles(), path = await fixture(t, '');
   const backing = new Uint8Array(1024 * 1024 + 13);

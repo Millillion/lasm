@@ -85,7 +85,13 @@ export function nativeFiles({ synchronous = false } = {}) {
   const getGroup = windows ? null : libc.func('getgrgid_r', 'int', ['uint32_t', ffi.out(ffi.pointer(groupRecord)), 'void *', 'size_t', ffi.out(ffi.pointer('void *'))]);
   const fgetc = bind('fgetc', 'int', ['void *']);
   const codes = Object.fromEntries(Object.entries(ffi.os.errno).map(([name, number]) => [number, name]));
-  function failure(errno = ffi.errno()) {
+  // On Windows the CRT functions above set ucrtbase's thread-local errno, which
+  // koffi.errno() does not report (a write to a read-only stream gave errno 0,
+  // "Unknown system error 0", where native Lean reports EBADF). _errno() returns
+  // the calling thread's ucrtbase errno, so read it synchronously after a call.
+  const crtErrnoLocation = windows ? bind('_errno', 'void *', []) : null;
+  const currentErrno = windows ? () => ffi.decode(crtErrnoLocation(), 'int') : () => ffi.errno();
+  function failure(errno = currentErrno()) {
     return Object.assign(new Error(strerror(errno)), { code: codes[errno], errno, nativeMessage: true, errorOrigin: 'crt' });
   }
   const fromNodeError = error => failure(ffi.os.errno[error.code] ?? ffi.os.errno.EIO);
@@ -102,7 +108,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   // overwrite the calling thread's errno. Koffi propagates the worker's errno.
   const call = synchronous ? async (fn, ...args) => {
     const value = fn(...args);
-    return { value, errno: ffi.errno() };
+    return { value, errno: currentErrno() };
   } : (fn, ...args) => new Promise((resolve, reject) => fn.async(...args, (error, value) => {
     const errno = ffi.errno();
     if (error) reject(error); else resolve({ value, errno });

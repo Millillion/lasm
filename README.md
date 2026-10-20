@@ -146,8 +146,8 @@ Current source also links Lean 4.35's `LeanExport` library (candidates fail with
 undefined `initialize_LeanExport_…` symbol). Its parser, `LeanExport.parseStream`,
 builds `Lean.Expr` values, whose constructors call Lean's C++ kernel, so programs
 using it are still rejected.
-Two further current-source fixes await a candidate (the first also needs a runtime
-rebuild): deployed programs honor `LEAN_ABORT_ON_NONLINEAR=1` as native Lean does
+Two further current-source fixes await a candidate (the first through the re-pinned
+runtime `7aa5028c…`): deployed programs honor `LEAN_ABORT_ON_NONLINEAR=1` as native Lean does
 (candidates ignore it and silently copy a shared `markLinear` value), and on macOS
 and Windows a standalone source directory containing a file such as `init.lean`
 or `std.lean` no longer hides the standard `Init`/`Std` libraries (candidates fail
