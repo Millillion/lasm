@@ -106,10 +106,19 @@ try {
   assert.equal(await hashFile(originalFile), report.sourceSha256, 'Original driver must not modify the test');
   mkdirSync(project); writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
   const surveyTool = join(root, 'scripts/upstream/RuntimeCommandSurvey.lean');
+  // A file whose commands only parse after in-file notations/macros are
+  // elaborated is surveyed again in the elaboration-aware mode (actions are
+  // parsed, never run). Both attempts are recorded.
   const survey = file => {
-    const [line, ...rest] = run('survey syntax ranges', lean.lean, ['-j1', '--run', surveyTool, file], output).stdout.trim().split('\n');
-    assert.equal(rest.length, 0); const parsed = JSON.parse(line); assert.ok(!parsed.error, parsed.error); return parsed;
+    for (const mode of [[], ['--elaborate']]) {
+      const [line, ...rest] = run(`survey syntax ranges${mode.length ? ' (elaborating declarations)' : ''}`, lean.lean,
+        ['-j1', '--run', surveyTool, ...mode, file], join(output, 'survey-cwd')).stdout.trim().split('\n');
+      assert.equal(rest.length, 0); const parsed = JSON.parse(line);
+      if (!parsed.error) return parsed;
+      if (mode.length || !/^Syntax survey failed/.test(parsed.error)) assert.fail(parsed.error);
+    }
   };
+  mkdirSync(join(output, 'survey-cwd'));
   const syntax = survey(originalFile), source = readFileSync(originalFile), main = join(project, 'Main.lean');
   assert.equal(syntax.exited, false, 'A test with #exit needs a separate review');
   // Elaborate natively; move each action whose definition does not elaborate to

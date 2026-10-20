@@ -5,7 +5,8 @@
 //   node inventory.mjs LEAN_VERSION PRISTINE_SOURCE NATIVE_LEAN_BIN OUTPUT.json [SURVEY_CACHE.jsonl]
 // SURVEY_CACHE (optional) keeps per-file survey lines so an interrupted run resumes.
 import assert from 'node:assert/strict';
-import { appendFileSync, existsSync, readFileSync, readlinkSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdtempSync, readFileSync, readlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -21,6 +22,8 @@ const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const review = file => { const r = JSON.parse(readFileSync(join(root, file))); return r.lean === version ? r.tests : r.releases?.[version]?.tests ?? {}; };
 const evalIO = review('scripts/application-tests/eval-io-reviewed.json');
 const surveyTool = join(root, 'scripts/upstream/RuntimeCommandSurvey.lean');
+// Elaboration may write files relative to its working directory; never the pristine tree.
+const scratch = mkdtempSync(join(tmpdir(), 'lasm-survey-'));
 
 // Survey: one process per textual import set (see RuntimeCommandSurvey.lean).
 const cached = new Map();
@@ -50,6 +53,19 @@ function survey(paths) {
     }
     done += group.length;
     console.error(`surveyed ${done}/${paths.length - 0} (group of ${group.length})`);
+  }
+  // Files whose plain parse fails (in-file notations, macros, syntax) or that
+  // shared a process wrongly: one elaboration-aware process each.
+  for (const path of paths.filter(path => cached.get(path)?.error && !cached.get(path).retried)) {
+    const result = spawnSync(join(leanBin, 'lean'), ['-j1', '--run', surveyTool, '--elaborate', join(pristine, path)],
+      { cwd: scratch, encoding: 'utf8', timeout: 900_000, maxBuffer: 1 << 30, env: { ...process.env, PATH: leanBin + ':' + process.env.PATH, LEAN_PATH: '' } });
+    let parsed;
+    try { parsed = JSON.parse((result.stdout ?? '').trim().split('\n').pop()); } catch {}
+    if (!parsed || parsed.file !== join(pristine, path))
+      parsed = { error: `elaborating survey process ${result.status} ${result.signal ?? ''} ${(result.stderr ?? '').slice(-400)}` };
+    parsed.retried = true; parsed.plainError = cached.get(path).error.slice(0, 300);
+    cached.set(path, parsed);
+    if (cacheFile) appendFileSync(cacheFile, JSON.stringify({ path, survey: parsed }) + '\n');
   }
 }
 function forms(commands) {
@@ -101,7 +117,7 @@ const rows = inventory.tests.map(registration => {
   row.imports = parsed?.imports;
   row.sidecars = Object.keys(sources).filter(path => path.startsWith(registration.source + '.')).map(path => path.slice(registration.source.length + 1));
   if (parsed?.error) { row.surveyError = parsed.error.slice(0, 600); }
-  else { row.forms = forms(parsed.commands); row.exited = parsed.exited; }
+  else { row.forms = forms(parsed.commands); row.exited = parsed.exited; if (parsed.elaborated) row.surveyElaborated = true; }
   const group = registration.driver.split('/').slice(-2, -1)[0];
   if (Object.hasOwn(evalIO, registration.name)) row.execution = 'runtime: reviewed eval-io adapter';
   else if (group === 'elab_fail') row.execution = 'native build-time only: expected-error test';
