@@ -14,6 +14,7 @@ if (!r) {
 const kinds = Object.keys(r.results);
 const lines = [`## Server MVP robustness — ${r.platform} — variant ${r.config.variant} — ${r.passed ? 'PASSED' : 'FAILED'}`, '',
   `Node ${r.engineVersion}, Lean ${r.build.lean}, ${r.cpus} CPUs; load ${r.config.loadSeconds} s per level, soak ${r.config.soakSeconds} s; resource peaks ${JSON.stringify(resources)}`, '',
+  ...(r.nativeUpstreamFailures?.length ? [`Native Lean upstream instability (reported, not gating): ${r.nativeUpstreamFailures.join(', ')}`, ''] : []),
   '| Check | ' + kinds.join(' | ') + ' |', '| --- |' + kinds.map(() => ' --- |').join('')];
 for (const check of Object.keys(r.results[kinds[0]].checks))
   lines.push(`| ${check} | ${kinds.map(k => String(r.results[k].checks[check])).join(' | ')} |`);
