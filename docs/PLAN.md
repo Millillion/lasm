@@ -383,6 +383,21 @@ and are documented as such.
 
 L1's baseline may reorder or merge L2–L4; propose that at the L1 review.
 
+**Order after the L1 review (user decision 2026-10-20, option C):** L1 is
+complete (docs/LANGUAGE_COVERAGE.md). Next, still stopping for review after each:
+1. **L2+L3 merged — core and I/O completion:** fix the C runtime's view of the
+   environment (IO.getEnv sees variables, runtime getenv does not), the macOS/
+   Windows case-insensitive shadowing of standard libraries by project files
+   (e.g. `init.lean` vs `Init`), and make every upstream test type run on all five
+   targets (setup-script sidecars, Lake-project drivers, compiled-application
+   harness on macOS and Windows). Exit: zero Lasm-caused failures outside
+   Lean-as-a-library on all five targets, plus a candidate gate.
+2. **L6 ecosystem** (moved before L5): top Reservoir packages, FFI and outbound
+   HTTP decisions.
+3. **L5 Lean as a runtime library, scoped to what real packages need**; the
+   runtime-parser-over-an-empty-environment policy is decided by the user then.
+4. **L4 concurrency stress/soak**, then **L7** full-suite release gate.
+
 ## Deferred chunks
 
 The native macOS and Windows extensions are complete. Future work should expand
