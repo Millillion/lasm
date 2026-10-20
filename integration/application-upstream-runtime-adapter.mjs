@@ -199,11 +199,14 @@ try {
   renameSync(dist, relocated); renameSync(project, project + '.hidden'); renameSync(original, original + '.hidden');
   report.wasmSha256 = await hashFile(join(relocated, 'program.wasm'));
   const deploymentEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(deploymentEnv, { PATH: '', LEAN_NUM_THREADS: '2', LEAN_BACKTRACE: '0' });
+  // System tools only (tests spawn printenv, cat, sh, ...); no Lean, Lake, Node or
+  // build toolchain directory. An empty PATH made every subprocess test fail.
+  const systemPath = windows ? join(process.env.SystemRoot ?? 'C:\\Windows', 'System32') : '/usr/bin:/bin';
+  Object.assign(deploymentEnv, { PATH: systemPath, LEAN_NUM_THREADS: '2', LEAN_BACKTRACE: '0' });
   report.deployed = execute('deployed', [engine, join(relocated, 'main.mjs')], deploymentEnv);
   assert.equal(await hashFile(join(project + '.hidden', 'Main.lean')), report.parallel.sourceSha256);
   for (const path of originals) assert.ok(await unchanged(original + '.hidden', path), path);
-  report.deployment = { sourceHidden: true, path: '', buildEnvironmentRemoved: true };
+  report.deployment = { sourceHidden: true, path: systemPath, buildEnvironmentRemoved: true };
   // Per-action verdicts. Native failures mean the adapter does not reproduce
   // the build-time assertion; native disagreement means nondeterminism.
   const verdicts = plan.actions.map(action => {

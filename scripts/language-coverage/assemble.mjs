@@ -30,6 +30,8 @@ function adapterOutcome(attempt) {
   if (attempt.resources?.resourceLimited || attempt.code === 125) return { outcome: 'resource-stop', reason: attempt.resources?.stoppedBecause };
   if (!c?.resultFound) return { outcome: 'harness', reason: `no result (exit ${attempt.code}${attempt.timedOut ? ', timeout' : ''})`, detail: attempt.stderrTail?.slice(-800) };
   if (!c.verdicts) return { outcome: 'harness', reason: 'no per-action verdicts', detail: c.error?.slice(-1200) };
+  if (!c.verdicts.length) return { outcome: 'build-time-only', reason: 'no action elaborates as a runtime IO action (they need the elaborator monads)',
+    rejection: c.buildRejected && { detected: c.buildRejected.detected } };
   const counts = {};
   for (const verdict of c.verdicts) { const k = actionClass[verdict.verdict] ?? verdict.verdict; counts[k] = (counts[k] ?? 0) + 1; }
   const outcome = Object.keys(counts).length === 1 && counts.pass ? 'pass'
