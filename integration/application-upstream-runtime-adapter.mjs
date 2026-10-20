@@ -243,7 +243,12 @@ try {
   const deploymentEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
   // System tools only (tests spawn printenv, cat, sh, ...); no Lean, Lake, Node or
   // build toolchain directory. An empty PATH made every subprocess test fail.
-  const systemPath = windows ? join(process.env.SystemRoot ?? 'C:\\Windows', 'System32') : '/usr/bin:/bin';
+  // Windows: System32 plus the directory of Git Bash's POSIX tools (sh, cat, printenv),
+  // the Windows counterpart of /usr/bin that the native runs also see.
+  const posixTools = windows ? (process.env.PATH ?? process.env.Path ?? '').split(delimiter)
+    .find(entry => existsSync(join(entry, 'sh.exe')) && existsSync(join(entry, 'printenv.exe'))) : undefined;
+  const systemPath = windows ? [join(process.env.SystemRoot ?? 'C:\\Windows', 'System32'), posixTools].filter(Boolean).join(delimiter)
+    : '/usr/bin:/bin';
   Object.assign(deploymentEnv, { PATH: systemPath, LEAN_NUM_THREADS: '2', LEAN_BACKTRACE: '0', ...setupVariables });
   report.deployed = execute('deployed', [engine, join(relocated, 'main.mjs')], deploymentEnv);
   assert.equal(await hashFile(join(project + '.hidden', 'Main.lean')), report.parallel.sourceSha256);
