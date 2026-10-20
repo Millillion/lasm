@@ -29,6 +29,14 @@ const projectRuns = {
   'pkg/debug': [['integration/application-upstream-debug.mjs', 'release'], ['integration/application-upstream-debug.mjs', 'debug']],
   'misc_dir/rc_sticky': [['integration/application-upstream-c.mjs']],
 };
+// L2+L3: every other mixed driver with a deployed phase runs through the generic
+// Lake-driver adapter (native driver, then deployed executables via lake-shim).
+for (const row of JSON.parse(readFileSync(join(root, `docs/evidence/lean-${version}-mixed-driver-classification.json`))).tests)
+  // The bespoke per-project adapters are Linux-only; elsewhere the generic adapter
+  // runs those drivers too (rc_sticky's C harness keeps its own adapter).
+  if (['native-and-compiled-application', 'native-and-foreign-application'].includes(row.phase)
+      && (!Object.hasOwn(projectRuns, row.name) || process.platform !== 'linux' && row.name !== 'misc_dir/rc_sticky'))
+    projectRuns[row.name] = [['integration/application-upstream-lake-drivers.mjs', row.name]];
 const select = {
   // L2+L3 adds the sidecar and #exit tests L1 set aside (runtime-adapter-l23.json).
   'runtime-adapter': test => test.execution === 'runtime candidate: parallel adapter' || test.execution.startsWith('separate review'),

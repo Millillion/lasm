@@ -57,7 +57,8 @@ if (process.argv[2] === '--compile') {
 const target = 'node';
   assert.ok(outputArg && engineArg && compilerArg && referenceArg && version && !extra.length,
     'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE LEAN_VERSION');
-  assert.equal(process.platform, 'linux', 'This parallel upstream shell harness requires Linux');
+  // Windows runs the unchanged shell driver with Git Bash from PATH.
+  const windows = process.platform === 'win32', bash = windows ? 'bash' : '/bin/bash';
   const { inventory, sources } = loadUpstreamEvidence(version);
   const test = inventory.tests.find(test => test.name === 'misc_dir/rc_sticky');
   assert.ok(test, 'This release has no registered reference-count regression');
@@ -74,7 +75,9 @@ const target = 'node';
   const lean = await provisionLean(output, { distribution: 'full' });
   assert.equal(lean.commit, inventory.leanCommit);
   const env = { ...nativeLeanEnvironment(lean), TEST_DIR: join(reference, 'tests'),
-    LEANC_OPTS: '', LASM_BUILD_NODE: process.execPath, LASM_C_CASE_HARNESS: self };
+    LEANC_OPTS: '', LASM_BUILD_NODE: process.execPath, LASM_C_CASE_HARNESS: self,
+    // Windows leanc locates its clang from a plain (not namespaced) sysroot.
+    ...(windows && lean.executionPrefix ? { LEAN_SYSROOT: lean.executionPrefix } : {}) };
   const report = { name: test.name, lean: lean.version, leanCommit: lean.commit, nativeArtifactIdentity: lean.identity,
     scope: 'Unchanged native and deployed C reference-count assertions through the installed application linker; not a public foreign-code CLI',
     target, engine, compiler, originalHashes, harnessSha256: await hashFile(self),
@@ -102,8 +105,10 @@ const target = 'node';
       for (const file of originalFiles.slice(0, 2)) copyFileSync(join(reference, file), join(directory, file.split('/').at(-1)));
     }
     const originalDriver = 'source "$TEST_DIR/util.sh"\nsource ./run_test.sh\n';
-    run('unchanged native shell driver', '/bin/bash', ['-c', originalDriver], nativeSource);
-    report.native = run('native executable', join(nativeSource, 'rc_sticky.produced'), [], output);
+    run('unchanged native shell driver', bash, ['-c', originalDriver], nativeSource);
+    // A Windows PE named *.produced is started through Git Bash, as the driver does.
+    report.native = windows ? run('native executable', bash, ['-c', '"$0"', join(nativeSource, 'rc_sticky.produced').replaceAll('\\', '/')], output)
+      : run('native executable', join(nativeSource, 'rc_sticky.produced'), [], output);
     assert.deepEqual(report.native, { code: 0, stdout: '', stderr: '' });
     const config = { compiler, engine, target, lean: lean.version, leanCommit: lean.commit,
       sourceDirectory: deployedSource, sourceSha256: originalHashes[originalFiles[0]],
@@ -113,7 +118,7 @@ const target = 'node';
     const adaptedDriver = 'source "$TEST_DIR/util.sh"\n' +
       'leanc() { "$LASM_BUILD_NODE" "$LASM_C_CASE_HARNESS" --compile "$LASM_C_CASE_INPUT" "$@"; }\n' +
       'source ./run_test.sh\n';
-    run('unchanged deployed shell driver with exact compile adapter', '/bin/bash', ['-c', adaptedDriver], deployedSource,
+    run('unchanged deployed shell driver with exact compile adapter', bash, ['-c', adaptedDriver], deployedSource,
       { ...env, LASM_C_CASE_INPUT: configFile }, 1800_000);
     report.build = JSON.parse(readFileSync(join(config.dist, 'build-info.json')));
     const relocated = join(output, 'relocated deployment');
