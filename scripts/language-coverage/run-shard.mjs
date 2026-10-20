@@ -19,6 +19,16 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const output = resolve(outputArg);
 assert.ok(!existsSync(output), 'Use a fresh shard output directory');
 const inventory = JSON.parse(readFileSync(join(root, `docs/evidence/lean-${version}-language-coverage-inventory.json`)));
+// Mixed Lake/package registrations with an existing per-project deployed adapter.
+const projectRuns = {
+  'pkg/float': [['integration/application-upstream-packages.mjs', 'float']],
+  'pkg/ofScientific': [['integration/application-upstream-packages.mjs', 'ofScientific']],
+  'pkg/exe_private_lean_import': [['integration/application-upstream-packages.mjs', 'exe_private_lean_import']],
+  'pkg/path with spaces': [['integration/application-upstream-projects.mjs', 'path with spaces']],
+  'pkg/def_clash': [['integration/application-upstream-projects.mjs', 'def_clash']],
+  'pkg/debug': [['integration/application-upstream-debug.mjs', 'release'], ['integration/application-upstream-debug.mjs', 'debug']],
+  'misc_dir/rc_sticky': [['integration/application-upstream-c.mjs']],
+};
 const select = {
   'runtime-adapter': test => test.execution === 'runtime candidate: parallel adapter',
   'eval-io': test => test.execution === 'runtime: reviewed eval-io adapter',
@@ -27,6 +37,7 @@ const select = {
   lsp: test => test.category === 'compiled-driver-and-native-compiler' && test.name.startsWith('server_interactive/'),
   'lsp-server': test => test.category === 'compiled-driver-and-native-compiler' && test.name.startsWith('server/'),
   'lsp-project': test => test.name === 'misc_dir/server_project',
+  projects: test => Object.hasOwn(projectRuns, test.name),
 }[harness];
 assert.ok(select, 'Unknown harness ' + harness);
 // Adapter candidates outside the L1 review (symlinked sources) are recorded there as excluded.
@@ -63,7 +74,24 @@ function bounded(label, command, timeoutMinutes) {
 const resourceStopped = run => run.code === 125 && run.resources?.stoppedBecause;
 save();
 
-if (['runtime-adapter', 'eval-io'].includes(harness)) {
+if (harness === 'projects') {
+  for (const name of names) {
+    const attempts = [];
+    for (const [variantIndex, [script, ...variant]] of projectRuns[name].entries()) {
+      const label = `${safe(name)}-${variantIndex}`, caseDir = join(output, 'cases', label);
+      mkdirSync(join(output, 'cases'), { recursive: true });
+      const run = bounded(label, [node, join(root, script), caseDir, engine, compiler, pristine, ...variant, version], 120);
+      const compactFile = join(output, 'compact', `${label}.json`);
+      const compaction = spawnSync(node, [join(root, 'scripts/server-mvp/compact-result.mjs'), join(caseDir, 'result.json'),
+        join(output, 'resources', `${label}.json`), compactFile], { encoding: 'utf8', maxBuffer: 1 << 30 });
+      attempts.push({ attempt: variantIndex + 1, variant: variant.join(' ') || 'default', ...run, compact: readJson(compactFile),
+        ...(compaction.status === 0 ? {} : { compactionError: tail(compaction.stderr || compaction.error?.message, 2000) }) });
+      rmSync(caseDir, { recursive: true, force: true });
+    }
+    summary.results.push({ name, attempts }); save();
+    console.log(`${name}: ${attempts.map(a => a.compact?.passed ? 'passed' : `exit ${a.code}`).join(' | ')}`);
+  }
+} else if (['runtime-adapter', 'eval-io'].includes(harness)) {
   const script = harness === 'eval-io' ? 'integration/application-upstream-eval-io.mjs' : 'integration/application-upstream-runtime-adapter.mjs';
   for (const name of names) {
     const attempts = [];

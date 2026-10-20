@@ -66,7 +66,7 @@ const target = 'node';
   }
   mkdirSync(output, { recursive: true });
   writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
-  const lean = await provisionLean(output);
+  const lean = await provisionLean(output, { distribution: 'full' });
   assert.equal(lean.commit, inventory.leanCommit);
   const env = { ...nativeLeanEnvironment(lean), TEST_DIR: join(reference, 'tests'),
     LEANC_OPTS: '', LASM_BUILD_NODE: process.execPath, LASM_C_CASE_HARNESS: self };

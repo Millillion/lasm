@@ -73,6 +73,13 @@ for (const shard of shards) {
       detected: log.match(/Detected [^\n]*/)?.[0], detail: policy ? undefined : log.slice(-2000) })));
   }
   for (const result of shard.results) {
+    if (shard.harness === 'projects') {
+      const failed = result.attempts.filter(a => !a.compact?.passed);
+      tests.push({ harness: shard.harness, name: result.name, outcome: failed.length ? 'needs-review' : 'pass',
+        variants: result.attempts.map(a => ({ variant: a.variant, passed: !!a.compact?.passed, seconds: a.seconds, peakGiB: gib(a.resources?.peakMemoryBytes),
+          error: a.compact?.passed ? undefined : (a.compact?.error || a.compactionError || a.stderrTail)?.slice(-1500) })) });
+      continue;
+    }
     const last = result.attempts.at(-1);
     const classify = ['runtime-adapter', 'eval-io'].includes(shard.harness)
       ? (shard.harness === 'eval-io' ? attempt => attempt.compact?.passed ? { outcome: 'pass' } : adapterOutcome(attempt) : adapterOutcome)

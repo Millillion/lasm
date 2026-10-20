@@ -11,7 +11,10 @@ import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.mjs';
 
 await ensureResourceGuard();
-const [outputArg, engineArg, compilerArg, referenceArg, name, ...extra] = process.argv.slice(2);
+const [outputArg, engineArg, compilerArg, referenceArg, name, leanVersion = '4.34.0', ...extra] = process.argv.slice(2);
+// Historical 4.34.0 evidence keeps its original lean-4.34 filenames.
+const evidenceStem = leanVersion === '4.34.0' ? 'lean-4.34' : 'lean-' + leanVersion;
+assert.ok(['4.34.0', '4.35.0'].includes(leanVersion), 'Unsupported Lean version ' + leanVersion);
 const target = 'node';
 assert.ok(outputArg && engineArg && compilerArg
   && referenceArg && ['path with spaces', 'def_clash'].includes(name) && !extra.length,
@@ -21,10 +24,10 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
 assert.ok(!existsSync(output), 'Preserve earlier attempts');
 mkdirSync(output, { recursive: true });
-writeFileSync(join(output, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
-const sourcesFile = join(root, 'docs/evidence/lean-4.34-upstream-source-files.json');
+writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${leanVersion}\n`);
+const sourcesFile = join(root, `docs/evidence/${evidenceStem}-upstream-source-files.json`);
 const sources = JSON.parse(readFileSync(sourcesFile));
-const inventory = JSON.parse(readFileSync(join(root, 'docs/evidence/lean-4.34-upstream-application-inventory.json')));
+const inventory = JSON.parse(readFileSync(join(root, `docs/evidence/${evidenceStem}-upstream-application-inventory.json`)));
 const registration = inventory.tests.find(row => row.name === 'pkg/' + name);
 assert.equal(registration?.driver, 'tests/pkg/' + name + '/run_test.sh');
 const prefix = 'tests/pkg/' + name + '/';
@@ -70,7 +73,7 @@ function run(label, program, args, cwd, env, success = true) {
 save();
 try {
   report.referenceBefore = await verify(reference, sources);
-  const lean = await provisionLean(output); assert.equal(lean.commit, inventory.leanCommit);
+  const lean = await provisionLean(output, { distribution: 'full' }); assert.equal(lean.commit, inventory.leanCommit);
   Object.assign(report, { lean: lean.version, leanCommit: lean.commit, nativeArtifactIdentity: lean.identity });
   const env = { ...nativeLeanEnvironment(lean), TEST_DIR: join(reference, 'tests'),
     SRC_DIR: join(reference, 'src'), SCRIPT_DIR: join(reference, 'script'), BUILD_DIR: lean.prefix,
@@ -90,7 +93,7 @@ try {
   report.applicationBefore = await verify(project, buildSources);
   report.parallelPin = { original: existsSync(join(original, 'lean-toolchain'))
     ? readFileSync(join(original, 'lean-toolchain'), 'utf8') : null,
-    release: 'leanprover/lean4:v4.34.0\n', scope: 'Only the explicitly separate application build copy' };
+    release: `leanprover/lean4:v${leanVersion}\n`, scope: 'Only the explicitly separate application build copy' };
   writeFileSync(join(project, 'lean-toolchain'), report.parallelPin.release);
   assert.equal(await hashFile(join(native, 'run_test.sh')), registration.sha256);
   report.nativeDriver = run('original native shell driver', '/bin/bash',
@@ -119,7 +122,7 @@ try {
   report.wasmSha256 = await hashFile(join(dist, 'program.wasm'));
   if (spaces) {
     const cached = build('unchanged installed application rebuild', entry, dist);
-    assert.ok(cached.stderr.includes('Reused Lean 4.34.0 for Node:'), 'Unchanged second build must reuse the verified cache');
+    assert.ok(cached.stderr.includes(`Reused Lean ${leanVersion} for Node:`), 'Unchanged second build must reuse the verified cache');
     assert.deepEqual(JSON.parse(readFileSync(join(dist, 'build-info.json'))), report.build);
     assert.equal(await hashFile(join(dist, 'program.wasm')), report.wasmSha256);
     report.cacheReused = true;

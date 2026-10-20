@@ -11,7 +11,10 @@ import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.mjs';
 
 await ensureResourceGuard();
-const [outputArg, engineArg, compilerArg, referenceArg, variant, ...extra] = process.argv.slice(2);
+const [outputArg, engineArg, compilerArg, referenceArg, variant, leanVersion = '4.34.0', ...extra] = process.argv.slice(2);
+// Historical 4.34.0 evidence keeps its original lean-4.34 filenames.
+const evidenceStem = leanVersion === '4.34.0' ? 'lean-4.34' : 'lean-' + leanVersion;
+assert.ok(['4.34.0', '4.35.0'].includes(leanVersion), 'Unsupported Lean version ' + leanVersion);
 const target = 'node';
 assert.ok(outputArg && engineArg && compilerArg
   && referenceArg && ['release', 'debug'].includes(variant) && !extra.length,
@@ -20,9 +23,9 @@ assert.equal(process.platform, 'linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
 assert.ok(!existsSync(output), 'Preserve earlier attempts'); mkdirSync(output, { recursive: true });
-writeFileSync(join(output, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
-const sourcesFile = join(root, 'docs/evidence/lean-4.34-upstream-source-files.json');
-const inventory = JSON.parse(readFileSync(join(root, 'docs/evidence/lean-4.34-upstream-application-inventory.json')));
+writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${leanVersion}\n`);
+const sourcesFile = join(root, `docs/evidence/${evidenceStem}-upstream-source-files.json`);
+const inventory = JSON.parse(readFileSync(join(root, `docs/evidence/${evidenceStem}-upstream-application-inventory.json`)));
 const sources = JSON.parse(readFileSync(sourcesFile));
 const registration = inventory.tests.find(row => row.name === 'pkg/debug');
 assert.equal(registration?.driver, 'tests/pkg/debug/run_test.sh');
@@ -91,7 +94,7 @@ function run(label, program, args, cwd, env, success = true) {
 save();
 try {
   report.referenceBefore = await verify(reference, sources);
-  const lean = await provisionLean(output); assert.equal(lean.commit, inventory.leanCommit);
+  const lean = await provisionLean(output, { distribution: 'full' }); assert.equal(lean.commit, inventory.leanCommit);
   Object.assign(report, { lean: lean.version, leanCommit: lean.commit, nativeArtifactIdentity: lean.identity });
   const env = { ...nativeLeanEnvironment(lean), TEST_DIR: join(reference, 'tests'),
     SRC_DIR: join(reference, 'src'), SCRIPT_DIR: join(reference, 'script'), BUILD_DIR: lean.prefix,
@@ -110,7 +113,7 @@ try {
   const buildSources = { ...originals }; delete buildSources['lean-toolchain'];
   report.applicationBefore = await verify(project, buildSources);
   report.parallelPin = { original: readFileSync(join(original, 'lean-toolchain'), 'utf8'),
-    release: 'leanprover/lean4:v4.34.0\n', scope: 'Only the explicitly separate application build copy' };
+    release: `leanprover/lean4:v${leanVersion}\n`, scope: 'Only the explicitly separate application build copy' };
   writeFileSync(join(project, 'lean-toolchain'), report.parallelPin.release);
   assert.equal(await hashFile(join(native, 'run_test.sh')), registration.sha256);
   report.nativeDriver = run('original native release/debug shell driver', '/bin/bash',

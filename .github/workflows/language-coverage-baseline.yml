@@ -10,7 +10,7 @@ on:
       harness:
         description: inventory, or the harness whose shards to run
         type: choice
-        options: [inventory, runtime-adapter, eval-io, compiled-application, docparse, lsp, lsp-server, lsp-project]
+        options: [inventory, runtime-adapter, eval-io, compiled-application, docparse, lsp, lsp-server, lsp-project, projects]
         default: inventory
       shards:
         description: Number of shards for this harness

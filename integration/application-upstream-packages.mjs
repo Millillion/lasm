@@ -17,15 +17,18 @@ import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.m
 await ensureResourceGuard();
 assert.equal(process.platform, 'linux', 'This parallel shell-driver harness currently requires Linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
-const [outputArg, engineArg, compilerArg, referenceArg, name] = process.argv.slice(2);
+const [outputArg, engineArg, compilerArg, referenceArg, name, leanVersion = '4.34.0'] = process.argv.slice(2);
+// Historical 4.34.0 evidence keeps its original lean-4.34 filenames.
+const evidenceStem = leanVersion === '4.34.0' ? 'lean-4.34' : 'lean-' + leanVersion;
+assert.ok(['4.34.0', '4.35.0'].includes(leanVersion), 'Unsupported Lean version ' + leanVersion);
 const target = 'node';
 assert.ok(outputArg && engineArg && compilerArg && referenceArg
   && ['float', 'ofScientific', 'exe_private_lean_import'].includes(name),
   'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE float|ofScientific|exe_private_lean_import');
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
 assert.ok(!existsSync(output), 'Preserve earlier acceptance evidence');
-const sourcesFile = join(root, 'docs/evidence/lean-4.34-upstream-source-files.json');
-const inventoryFile = join(root, 'docs/evidence/lean-4.34-upstream-application-inventory.json');
+const sourcesFile = join(root, `docs/evidence/${evidenceStem}-upstream-source-files.json`);
+const inventoryFile = join(root, `docs/evidence/${evidenceStem}-upstream-application-inventory.json`);
 const sources = JSON.parse(readFileSync(sourcesFile));
 const inventory = JSON.parse(readFileSync(inventoryFile));
 const registration = inventory.tests.find(row => row.name === 'pkg/' + name);
@@ -37,14 +40,14 @@ const numeric = name !== 'exe_private_lean_import';
 const dataName = numeric ? name === 'float' ? 'test-vectors' : 'test-data' : undefined;
 const executableName = numeric ? name === 'float' ? 'testfloat-check' : 'parse-number-check' : 'main';
 mkdirSync(output, { recursive: true });
-writeFileSync(join(output, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${leanVersion}\n`);
 const report = { scope: 'Reviewed unchanged upstream Lake applications, complete vendored datasets and original native shell controls',
   name: registration.name, target, compiler, engine, reference, sourceArchiveSha256: inventory.sourceArchiveSha256,
   sourceManifestSha256: await hashFile(sourcesFile), resourceReport: process.env.LASM_RESOURCE_REPORT,
   commands: [], passed: false,
   adaptations: [
     'Original tests, shell drivers, vectors and expected values are unchanged; native and application builds use independent verified copies.',
-    'Packages without a pin receive an ordinary Lean 4.34.0 pin. Existing upstream stage pins remain unchanged in both original copies; a separate application copy preserves every other original byte and supplies the release pin.',
+    'Packages without a pin receive an ordinary Lean release pin. Existing upstream stage pins remain unchanged in both original copies; a separate application copy preserves every other original byte and supplies the release pin.',
     'The application phase uses the installed Lasm CLI, moves dist and its unchanged data into a deployment, hides both source trees and removes build-tool environment variables.',
     'No input filters or extra program arguments are used. Each original self-check and complete vendored input count must pass.',
     'Float durations are retained in raw logs but omitted from differential comparison; every per-file count, failure count and total is compared.',
@@ -121,7 +124,7 @@ async function expectedObservations() {
 save();
 try {
   report.referenceBefore = await verify(reference, sources);
-  const lean = await provisionLean(output);
+  const lean = await provisionLean(output, { distribution: 'full' });
   assert.equal(lean.commit, inventory.leanCommit);
   Object.assign(report, { lean: lean.version, leanCommit: lean.commit, nativeArtifactIdentity: lean.identity });
   const env = { ...nativeLeanEnvironment(lean), TEST_DIR: join(reference, 'tests'),
@@ -137,7 +140,7 @@ try {
     cpSync(join(reference, prefix), directory, { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
     await verify(directory, packageSources);
     if (!existsSync(join(directory, 'lean-toolchain')))
-      writeFileSync(join(directory, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+      writeFileSync(join(directory, 'lean-toolchain'), `leanprover/lean4:v${leanVersion}\n`);
   }
   let applicationProject = project;
   const applicationSources = { ...packageSources };
@@ -148,7 +151,7 @@ try {
     delete applicationSources['lean-toolchain'];
     report.parallelApplicationCopy = {
       directory: applicationProject, originalPin: readFileSync(join(project, 'lean-toolchain'), 'utf8'),
-      releasePin: 'leanprover/lean4:v4.34.0\n',
+      releasePin: `leanprover/lean4:v${leanVersion}\n`,
       originalPinPreservedAt: [join(native, 'lean-toolchain'), join(project, 'lean-toolchain')],
       before: await verify(applicationProject, applicationSources),
     };
