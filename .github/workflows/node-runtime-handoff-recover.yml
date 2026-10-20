@@ -62,7 +62,7 @@ jobs:
           source="${CACHE_KEY#lasm-node-linux-inputs-}"; source="${source%%-*}"
           tar -xzOf .work/node-runtime-inputs.tgz runtime/target.json | sha256sum | grep -q "^$MANIFEST "
           node -e "require('node:fs').writeFileSync('.work/node-runtime-inputs-result.json', JSON.stringify({ sha256: process.env.SHA256, cacheKey: process.env.CACHE_KEY, runtimeManifestSha256: process.env.MANIFEST, builtBy: 'https://github.com/Millillion/lasm/actions/runs/' + process.env.BUILD_RUN, recoveredBy: 'https://github.com/Millillion/lasm/actions/runs/' + process.env.GITHUB_RUN_ID }, null, 2) + '\n')"
-          gh release create "node-runtime-inputs-$BUILD_RUN" \
+          gh release create "node-runtime-inputs-$BUILD_RUN" --repo "$GITHUB_REPOSITORY" \
             .work/node-runtime-inputs.tgz .work/node-runtime-inputs-result.json \
             --draft --prerelease --target "$source" \
             --title "Lasm runtime input $BUILD_RUN" \
