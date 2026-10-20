@@ -245,5 +245,7 @@ jobs:
           emscripten-6.0.9-lasm-shared holds the repaired Emscripten JavaScript subset and the prebuilt wasm64 sysroot.
           See the NOTICE inside each archive. report-*.json record upstream digests, archive digests and determinism checks.
           EOF
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$TAG" --notes-file notes.md \
+          printf '\nSource revision: %s\n' "$GITHUB_SHA" >> notes.md
+          RELEASE_TARGET="$GITHUB_SHA"; [ "$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_REF_NAME" --jq .sha)" = "$GITHUB_SHA" ] || RELEASE_TARGET="$GITHUB_REF_NAME"  # GitHub refuses non-tip SHAs as release targets
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$RELEASE_TARGET" --title "$TAG" --notes-file notes.md \
             *.tar.zst report-*.json link-toolchain.json sysroot.json SHA256SUMS

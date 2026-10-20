@@ -64,6 +64,6 @@ jobs:
           node -e "require('node:fs').writeFileSync('.work/node-runtime-inputs-result.json', JSON.stringify({ sha256: process.env.SHA256, cacheKey: process.env.CACHE_KEY, runtimeManifestSha256: process.env.MANIFEST, builtBy: 'https://github.com/Millillion/lasm/actions/runs/' + process.env.BUILD_RUN, recoveredBy: 'https://github.com/Millillion/lasm/actions/runs/' + process.env.GITHUB_RUN_ID }, null, 2) + '\n')"
           gh release create "node-runtime-inputs-$BUILD_RUN" --repo "$GITHUB_REPOSITORY" \
             .work/node-runtime-inputs.tgz .work/node-runtime-inputs-result.json \
-            --draft --prerelease --target "$source" \
+            --draft --prerelease --target main \
             --title "Lasm runtime input $BUILD_RUN" \
-            --notes "Pinned runtime handoff built by run $BUILD_RUN and restored from its exact cache key by run $GITHUB_RUN_ID (digest re-verified). No package acceptance or npm publication is implied."
+            --notes "Pinned runtime handoff built by run $BUILD_RUN and restored from its exact cache key by run $GITHUB_RUN_ID (digest re-verified). No package acceptance or npm publication is implied. Source revision: $source (GitHub refuses non-tip SHAs as release targets, so the draft targets main)."

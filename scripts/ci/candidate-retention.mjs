@@ -16,7 +16,11 @@ export async function retainCandidateDraft(spec, service) {
   assert.equal(release.draft, true, 'Never modify a published release');
   assert.equal(release.prerelease, true);
   assert.equal(release.tag_name, spec.tag);
-  assert.equal(release.target_commitish, spec.target, 'Preserve the original source identity');
+  // A refused non-tip SHA target falls back to main with the exact source
+  // revision recorded in the release notes.
+  assert.ok(release.target_commitish === spec.target
+    || (release.target_commitish === 'main' && (release.body ?? '').includes(`Source revision: ${spec.target}`)),
+    'Preserve the original source identity');
   const verify = async (expected, observed) => {
     if (expected.packingReceipt) {
       assert.ok(observed.size < 1024 * 1024);

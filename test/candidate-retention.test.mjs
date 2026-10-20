@@ -41,3 +41,16 @@ test('published releases and conflicting retained bytes fail before any addition
   const f = fixture(); await retainCandidateDraft(f.spec, f.service); f.receipt.sha256 = 'c'.repeat(64);
   await assert.rejects(retainCandidateDraft(f.spec, f.service), /different bytes/); assert.equal(f.uploads, 2);
 });
+
+test('a draft targeting main is accepted only when its notes record the exact source revision', async () => {
+  for (const [body, ok] of [[`Draft.\nSource revision: ${'b'.repeat(40)}\n`, true], ['Draft without a revision.', false],
+    [`Source revision: ${'c'.repeat(40)}\n`, false]]) {
+    const f = fixture();
+    f.service.createRelease = async () => {};
+    f.service.readRelease = async () => ({ draft: true, prerelease: true, tag_name: f.spec.tag, target_commitish: 'main', body,
+      assets: [] });
+    f.service.upload = async () => {};
+    if (ok) await assert.doesNotReject(retainCandidateDraft(f.spec, f.service).catch(e => { if (/source identity/.test(e.message)) throw e; }));
+    else await assert.rejects(retainCandidateDraft(f.spec, f.service), /source identity/);
+  }
+});

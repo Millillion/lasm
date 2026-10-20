@@ -1,6 +1,6 @@
 // CI-only durable retention, using built-ins and the authenticated gh client.
 import assert from 'node:assert/strict';
-import { createReadStream, readFileSync, writeFileSync, statSync } from 'node:fs';
+import { appendFileSync, createReadStream, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { basename } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -43,8 +43,15 @@ const result = await retainCandidateDraft({ tag, target: env.GITHUB_SHA, notesFi
     // request raw REST metadata including server-recorded SHA-256 digests.
     return JSON.parse(gh(['api', view.apiUrl]));
   },
-  async createRelease(spec) { gh(['release', 'create', spec.tag, '--repo', repository, '--draft', '--prerelease',
-    '--target', spec.target, '--title', spec.title, '--notes-file', spec.notesFile]); },
+  // GitHub refuses a commit SHA that is no longer a branch tip as a release
+  // target (main often moves during a campaign). The notes always record the
+  // exact source revision; fall back to targeting main when the SHA is refused.
+  async createRelease(spec) {
+    appendFileSync(spec.notesFile, `\nSource revision: ${spec.target}\n`);
+    const create = target => gh(['release', 'create', spec.tag, '--repo', repository, '--draft', '--prerelease',
+      '--target', target, '--title', spec.title, '--notes-file', spec.notesFile]);
+    try { create(spec.target); } catch { create('main'); }
+  },
   async upload(tag, path) { gh(['release', 'upload', tag, path, '--repo', repository]); },
   async readSmallAsset(tag, name) { return gh(['release', 'download', tag, '--repo', repository, '--pattern', name, '--output', '-']); },
 });
