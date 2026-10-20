@@ -209,7 +209,9 @@ if (tool === 'lean') {
   code = windows ? run('bash', [env('LASM_NATIVE_LEANMAKE').replaceAll('\\', '/'), ...args]) : run(env('LASM_NATIVE_LEANMAKE'), args);
   const map = JSON.parse(env('LASM_LAKE_SHIM_LEANMAKE'));
   event({ kind: 'native', tool, args, code });
-  substitute(Object.entries(map).map(([file, source]) => ({ name: file, file: resolve(file), source: resolve(source) })));
+  // leanc on Windows writes `-o build/bin/test` as build/bin/test.exe.
+  const built = file => windows && !existsSync(resolve(file)) && existsSync(resolve(file) + '.exe') ? resolve(file) + '.exe' : resolve(file);
+  substitute(Object.entries(map).map(([file, source]) => ({ name: file, file: built(file), source: resolve(source) })));
 } else {
   const parsed = parsedLake;
   const envLean = parsed.command === 'env' && parsed.rest[0] === 'lean' ? parsed.rest.slice(1) : undefined;
