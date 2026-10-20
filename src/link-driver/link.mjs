@@ -333,8 +333,13 @@ export function unusedFromMetadce(settings, output, importNames, exportNames) {
 }
 
 /** A private temporary directory for one link, inside Lasm's build directory. */
+// Node's mkdtemp, unlike its other fs calls, does not add the Windows long-path
+// prefix, so a deep project failed with ENAMETOOLONG (upstream Lake test
+// packageOverrides on windows-2025). Create it namespaced and return the
+// ordinary path, which Node fs and the LLVM tools both accept beyond MAX_PATH.
 export function linkTemporaryDirectory(work, mode) {
-  return mkdtempSync(path.join(work, `node-link-${mode}-`));
+  const created = mkdtempSync(path.toNamespacedPath(path.join(work, `node-link-${mode}-`)));
+  return process.platform === 'win32' ? created.replace(/^\\\\\?\\UNC\\/, '\\\\').replace(/^\\\\\?\\/, '') : created;
 }
 export const removeTemporary = directory => rmSync(directory, { recursive: true, force: true });
 

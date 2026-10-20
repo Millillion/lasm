@@ -109,6 +109,11 @@ export function nativeFiles({ synchronous = false } = {}) {
   const call = synchronous ? async (fn, ...args) => {
     const value = fn(...args);
     return { value, errno: currentErrno() };
+  // The asynchronous form runs fn on a koffi worker thread; on Windows neither
+  // koffi.errno() nor this thread's _errno() is that call's errno. Every Windows
+  // operation whose errno matters goes through the native file worker (the
+  // synchronous form above); the host only uses this form for fflush(NULL),
+  // whose result is ignored. Keep any new errno-reporting call off this path.
   } : (fn, ...args) => new Promise((resolve, reject) => fn.async(...args, (error, value) => {
     const errno = ffi.errno();
     if (error) reject(error); else resolve({ value, errno });
@@ -118,7 +123,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     if (result.value < 0) throw failure(result.errno);
     return result.value;
   };
-  let lock, terminal = file => !!isatty(file.fd);
+  let lock, terminal = file => !!isatty(file.fd), nodeHandles;
   if (windows) {
     const kernel = ffi.load('kernel32.dll');
     const handle = bind('_get_osfhandle', 'intptr_t', ['int']);
@@ -431,6 +436,31 @@ export function nativeFiles({ synchronous = false } = {}) {
       return fds;
     },
     closeDescriptor(fd) { closeFd(fd); },
+    // Node's libuv resolves a numeric child stdio descriptor in node.exe's own
+    // CRT, not ucrtbase's, so a _pipe descriptor made spawn fail with EBADF
+    // (every piped IO.Process.spawn on Windows). Give Node a duplicate of the
+    // same OS handle opened in its CRT (node.exe exports uv_open_osfhandle);
+    // the caller closes it with fs.closeSync after the spawn.
+    nodeDescriptor(fd) {
+      if (!windows) return fd;
+      nodeHandles ??= {
+        osHandle: bind('_get_osfhandle', 'intptr_t', ['int']),
+        process: ffi.load('kernel32.dll').func('intptr_t __stdcall GetCurrentProcess()'),
+        duplicate: ffi.load('kernel32.dll').func('int __stdcall DuplicateHandle(intptr_t, intptr_t, intptr_t, _Out_ intptr_t *, uint32_t, int, uint32_t)'),
+        error: ffi.load('kernel32.dll').func('uint32_t __stdcall GetLastError()'),
+        close: ffi.load('kernel32.dll').func('int __stdcall CloseHandle(intptr_t)'),
+        open: ffi.load(process.execPath).func('int uv_open_osfhandle(intptr_t)'),
+      };
+      const source = nodeHandles.osHandle(fd);
+      if (source === -1) throw failure(ffi.os.errno.EBADF);
+      const out = [0];
+      // DUPLICATE_SAME_ACCESS; not inheritable (libuv makes its own child copy).
+      if (!nodeHandles.duplicate(nodeHandles.process(), source, nodeHandles.process(), out, 0, 0, 2))
+        throw Object.assign(new Error(`DuplicateHandle failed (${nodeHandles.error()})`), { code: 'EBADF', errno: -4083 });
+      const owned = nodeHandles.open(out[0]);
+      if (owned < 0) { nodeHandles.close(out[0]); throw Object.assign(new Error('uv_open_osfhandle failed'), { code: 'EMFILE', errno: owned }); }
+      return owned;
+    },
     openDescriptor(fd, mode) {
       const stream = fdopen(fd, mode);
       if (!stream) throw failure();

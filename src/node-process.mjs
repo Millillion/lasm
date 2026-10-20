@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { closeSync } from 'node:fs';
 import { constants } from 'node:os';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -72,7 +73,7 @@ export function createNodeProcesses({ add, get, release, cwd, applicationCommand
     // Native Lean flushes std::cout only when the child inherits stdin. A
     // failed implicit flush does not stop it from attempting the spawn.
     if (options.modes[0] === 1) await flushStdout().catch(() => {});
-    const ours = [], theirs = [];
+    const ours = [], theirs = [], nodeFds = [];
     try {
       const stdio = options.modes.map((mode, index) => {
         if (mode !== 0) { ours.push(0); return mode === 1 ? 'inherit' : 'ignore'; }
@@ -80,7 +81,11 @@ export function createNodeProcesses({ add, get, release, cwd, applicationCommand
         const parentFd = fds[index === 0 ? 1 : 0], childFd = fds[index === 0 ? 0 : 1];
         theirs.push(childFd);
         ours.push(add(native.openDescriptor(parentFd, index === 0 ? 'w' : 'r')));
-        return childFd;
+        if (process.platform !== 'win32') return childFd;
+        // Windows: Node needs the child end in its own CRT (see nodeDescriptor).
+        const nodeFd = native.nodeDescriptor(childFd);
+        nodeFds.push(nodeFd);
+        return nodeFd;
       });
       const posix = process.platform !== 'win32';
       const stdioFlags = posix ? stdio.map((fd, index) => fd === 'ignore' ? 0
@@ -112,7 +117,10 @@ export function createNodeProcesses({ add, get, release, cwd, applicationCommand
       for (const id of ours) if (id) release(id);
       throw process.platform === 'win32' ? err : native.fromNodeError(err);
     }
-    finally { for (const fd of theirs) native.closeDescriptor(fd); }
+    finally {
+      for (const fd of theirs) native.closeDescriptor(fd);
+      for (const fd of nodeFds) closeSync(fd);
+    }
   }
   function reap(resource, code) {
     if (process.platform !== 'win32' && resource.reaped) throw nativeFiles().error(constants.errno.ECHILD);
