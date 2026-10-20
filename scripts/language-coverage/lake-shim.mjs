@@ -80,15 +80,20 @@ function parseLake(argv) {
 // Loading the workspace may write Lake's configuration cache (.lake/config/N);
 // drivers assert on it, so remove only entries this listing created.
 const configEntries = directory => { try { return new Set(readdirSync(join(directory, '.lake', 'config'))); } catch { return null; } };
-function listExes(directory, file, keys) {
-  if (!['lakefile.lean', 'lakefile.toml'].some(name => existsSync(join(directory, name))) && !file) return [];
+// The same applies to a Lasm build of a Lake project (it loads the default
+// lakefile.lean even when the driver selected lakefile.toml).
+function withConfigUndo(directory, action) {
   const before = configEntries(directory);
-  try { return listExesUnchecked(directory, file, keys); }
+  try { return action(); }
   finally {
     const after = configEntries(directory);
     if (after) for (const entry of after) if (!before?.has(entry)) rmSync(join(directory, '.lake', 'config', entry), { recursive: true, force: true });
     if (!before && after) rmSync(join(directory, '.lake', 'config'), { recursive: true, force: true });
   }
+}
+function listExes(directory, file, keys) {
+  if (!['lakefile.lean', 'lakefile.toml'].some(name => existsSync(join(directory, name))) && !file) return [];
+  return withConfigUndo(directory, () => listExesUnchecked(directory, file, keys));
 }
 function listExesUnchecked(directory, file, keys) {
   const result = spawnSync(env('LASM_NATIVE_LEAN'), ['--plugin=' + env('LASM_LAKE_SHIM_PLUGIN'), '--run',
@@ -112,7 +117,10 @@ function substitute(exes) {
     let deployment = state.deployments[key];
     if (!deployment) {
       const output = join(stateDir, 'deployments', String(state.next++));
-      const built = buildDeployment(exe.source, output);
+      let workspace = dirname(exe.source);
+      while (!['lakefile.lean', 'lakefile.toml'].some(name => existsSync(join(workspace, name))) && dirname(workspace) !== workspace)
+        workspace = dirname(workspace);
+      const built = withConfigUndo(workspace, () => buildDeployment(exe.source, output));
       deployment = state.deployments[key] = { output, ...built, source: exe.source, exe: exe.name, nativeSha256: native };
       event({ kind: built.ok ? 'deployment-built' : 'deployment-failed', exe: exe.name, source: exe.source, ...built });
     }
@@ -197,7 +205,8 @@ if (tool === 'lean') {
   code = leanTool(args);
 } else if (tool === 'leanmake') {
   // Reviewed mapping for leanmake drivers: LASM_LAKE_SHIM_LEANMAKE='{"build/bin/test":"test.lean"}'.
-  code = run(env('LASM_NATIVE_LEANMAKE'), args);
+  // leanmake is a shell script; Windows cannot start it directly.
+  code = windows ? run('bash', [env('LASM_NATIVE_LEANMAKE').replaceAll('\\', '/'), ...args]) : run(env('LASM_NATIVE_LEANMAKE'), args);
   const map = JSON.parse(env('LASM_LAKE_SHIM_LEANMAKE'));
   event({ kind: 'native', tool, args, code });
   substitute(Object.entries(map).map(([file, source]) => ({ name: file, file: resolve(file), source: resolve(source) })));
