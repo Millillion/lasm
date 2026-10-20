@@ -91,12 +91,35 @@ for (const shard of shards) {
   const missing = shard.tests.filter(name => !shard.results.some(result => result.name === name));
   if (shard.results.length) tests.push(...missing.map(name => ({ harness: shard.harness, name, outcome: 'not-completed' })));
 }
+// L2–L6 areas (docs/PLAN.md). First matching rule wins; names and imports only,
+// so a few tests land in a neighbouring area. Rejections by the AOT policy are
+// Lean-as-library work whatever the test is about.
+const inventory = JSON.parse(readFileSync(new URL('../../docs/evidence/lean-4.35.0-language-coverage-inventory.json', import.meta.url)));
+const imports = new Map(inventory.tests.map(test => [test.name, test.imports ?? []]));
+const areaRules = [
+  ['Lean-as-library / reachability (L5)', (t, i) => ['docparse', 'lsp', 'lsp-server', 'lsp-project'].includes(t.harness)
+    || t.outcome === 'unsupported-by-design' || i.some(m => /^Lean(?:\.|$)/.test(m) && !/^Lean\.Data\.Json/.test(m))],
+  ['server, network and time (Server MVP)', t => /http|tcp|udp|dns|net_|networkInterfaces|libuv|async_http|socket|time|date|zone/i.test(t.name)],
+  ['concurrency (L4)', t => /async|task|thread|mutex|channel|sync|promise|cancel|barrier|condvar|select|parallel|StackOverflowTask/i.test(t.name)],
+  ['processes, signals, terminal (L3)', t => /process|spawn|signal|EnvVar|getenv|stdin|stdout|stdio|terminal|tty|exit|panic/i.test(t.name)],
+  ['IO.FS (L3)', t => /file|_fs|fs_|dir|path|handle|tempfile|symlink|stream|IO_/i.test(t.name)],
+  ['numerics / Float (L2)', t => /float|uint|sint|int|nat|bitvec|fixed|overflow|scientific|div|shift|pow|gcd|bignum|ofIntClamp|binarytrees/i.test(t.name)],
+  ['strings / Unicode (L2)', t => /string|str\b|char|utf|unicode|substr|format|repr|json|parse/i.test(t.name)],
+  ['core data types and control (L2)', () => true],
+];
+for (const test of tests) test.area = areaRules.find(([, rule]) => rule(test, imports.get(test.name) ?? []))[0];
 tests.sort((a, b) => a.harness.localeCompare(b.harness) || a.name.localeCompare(b.name));
 const tally = rows => rows.reduce((c, row) => ({ ...c, [row.outcome]: (c[row.outcome] ?? 0) + 1 }), {});
 const byHarness = Object.fromEntries([...new Set(tests.map(t => t.harness))].map(h => [h, tally(tests.filter(t => t.harness === h))]));
 const actions = tests.filter(t => t.actions).reduce((c, t) => { for (const [k, v] of Object.entries(t.actions)) c[k] = (c[k] ?? 0) + v; return c; }, {});
-const report = { schema: 1, recordedAt: new Date().toISOString(),
+const byArea = {};
+for (const test of tests) {
+  const area = byArea[test.area] ??= { tests: 0, outcomes: {}, actions: {} };
+  area.tests++; area.outcomes[test.outcome] = (area.outcomes[test.outcome] ?? 0) + 1;
+  for (const [k, v] of Object.entries(test.actions ?? {})) area.actions[k] = (area.actions[k] ?? 0) + v;
+}
+const report = { schema: 1, recordedAt: new Date().toISOString(), byArea,
   runs: Object.fromEntries(Object.entries(runs).map(([k, v]) => [k, `https://github.com/Millillion/lasm/actions/runs/${v}`])),
   tests: tests.length, byHarness, adapterActions: actions, maxPeakGiB: Math.max(0, ...tests.map(t => t.peakGiB ?? 0)), results: tests };
 writeFileSync(output, JSON.stringify(report, null, 1) + '\n');
-console.log(JSON.stringify({ tests: report.tests, byHarness, adapterActions: actions, maxPeakGiB: report.maxPeakGiB }, null, 2));
+console.log(JSON.stringify({ tests: report.tests, byHarness, adapterActions: actions, byArea, maxPeakGiB: report.maxPeakGiB }, null, 2));

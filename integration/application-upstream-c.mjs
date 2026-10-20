@@ -21,12 +21,14 @@ async function compileOriginal(configFile, args) {
   assert.deepEqual(args, ['-o', 'rc_sticky.produced', 'rc_sticky.c'], 'Unmapped original leanc arguments');
   assert.equal(process.cwd(), config.sourceDirectory);
   assert.equal(await hashFile('rc_sticky.c'), config.sourceSha256);
-  const { provisionSdk } = await importInstalled(config.compiler, 'managed-sdk.mjs');
+  // The shipping default is the Node link driver with the slim link toolchain
+  // (src/application-build.mjs); the full SDK is only the emcc maintainer driver.
+  const { provisionLinkToolchain } = await importInstalled(config.compiler, 'managed-link-toolchain.mjs');
   const { applicationRuntime } = await importInstalled(config.compiler, 'application-runtime.mjs');
   const { linkApplication } = await importInstalled(config.compiler, 'application-link.mjs');
   const { copyApplicationHost, writeApplicationEntrypoint } = await importInstalled(config.compiler, 'application-output.mjs');
   const runtime = await applicationRuntime({ version: config.lean, commit: config.leanCommit });
-  const sdk = await provisionSdk();
+  const sdk = await provisionLinkToolchain({});
   assert.equal(sdk.version, runtime.manifest.emscripten);
   mkdirSync(config.work); mkdirSync(config.dist);
   await linkApplication({ sources: [join(config.sourceDirectory, 'rc_sticky.c')], sdk, runtime,
@@ -36,7 +38,7 @@ async function compileOriginal(configFile, args) {
   copyFileSync(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(config.dist, 'THIRD_PARTY_NOTICES.txt'));
   const build = { scope: 'Unchanged upstream C driver through the installed application object/link pipeline',
     lean: config.lean, leanCommit: config.leanCommit, emscripten: sdk.version, sdkIdentity: sdk.identity,
-    sdkDriverIdentity: sdk.driverIdentity, runtimeIdentity: runtime.identity,
+    linkToolchain: { identity: sdk.identity, ...sdk.toolchain }, runtimeIdentity: runtime.identity,
     sourceSha256: config.sourceSha256, target: config.target,
     applicationLinkSha256: await hashFile(join(config.compiler, 'src/application-link.mjs')),
     wasmSha256: await hashFile(join(config.dist, 'program.wasm')) };
