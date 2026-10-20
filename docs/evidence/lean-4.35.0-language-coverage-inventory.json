@@ -5,7 +5,7 @@
  "scope": "Language coverage L1: execution class of every upstream registration of the pinned release; parsing only, no test passes",
  "surveyTool": {
   "path": "scripts/upstream/RuntimeCommandSurvey.lean",
-  "sha256": "67380bd94b3119bc83d9579752fdf754d4316ac64e48e0410f2e2a6bf961bd8c"
+  "sha256": "8994e7eab1234bbec47b0d012927ad4bc4ee449bd11a349d420d856660a00b33"
  },
  "registrations": 4219,
  "byCategory": {
@@ -22,16 +22,15 @@
   "native build-time only: documentation example driver": 7,
   "runtime: compiled application": 118,
   "runtime: compiled test driver (docparse)": 202,
-  "native build-time only: no runtime-checkable command": 2717,
-  "runtime candidate: parallel adapter": 524,
+  "native build-time only: no runtime-checkable command": 2718,
+  "runtime candidate: parallel adapter": 525,
   "separate review: unsupported sidecar": 9,
   "runtime: reviewed eval-io adapter": 22,
   "separate review: #exit": 1,
-  "review: syntax survey failed": 2,
   "native build-time only: expected-error test": 314,
   "runtime: compiled LSP client with native compiler children": 158
  },
- "runtimeActionsInCandidates": 5245,
+ "runtimeActionsInCandidates": 5246,
  "tests": [
   {
    "name": "tests/lake/examples/deps/test.sh",
@@ -73183,9 +73182,27 @@
    "category": "native-build-time",
    "source": "tests/elab/string.lean",
    "sha256": "578ef0c950e878abd41b1e1b9e00de912305ab8bf49e2a95791fff40892012d6",
+   "imports": [
+    "Init",
+    "Init",
+    "Init.Data.String",
+    "Init.Data.String.Basic"
+   ],
    "sidecars": [],
-   "surveyError": "Syntax survey failed: /home/runner/work/lasm/lasm/.work/pristine/tests/elab/string.lean:21:0: error: unexpected token '#'; expected command\n",
-   "execution": "review: syntax survey failed"
+   "forms": {
+    "eval": 0,
+    "evalBang": 0,
+    "guard": 0,
+    "guardMsgsEval": 0,
+    "guardMsgsGuard": 0,
+    "guardMsgsOther": 0,
+    "guardMsgsSpec": 0,
+    "scoped": 0,
+    "runtime": 0
+   },
+   "exited": false,
+   "surveyElaborated": true,
+   "execution": "native build-time only: no runtime-checkable command"
   },
   {
    "name": "elab/string_cases.lean",
@@ -80575,9 +80592,26 @@
    "category": "native-build-time",
    "source": "tests/elab/utf8英語.lean",
    "sha256": "9b656893589af0e5dcf6ed0695a344c596aba7d8c4928f08a3bdcee4bb538163",
+   "imports": [
+    "Init",
+    "Init",
+    "Lean.Util.TestExtern"
+   ],
    "sidecars": [],
-   "surveyError": "Syntax survey failed: /home/runner/work/lasm/lasm/.work/pristine/tests/elab/utf8英語.lean:26:44: error: unexpected token '=>'; expected ')'\n",
-   "execution": "review: syntax survey failed"
+   "forms": {
+    "eval": 0,
+    "evalBang": 0,
+    "guard": 0,
+    "guardMsgsEval": 1,
+    "guardMsgsGuard": 0,
+    "guardMsgsOther": 0,
+    "guardMsgsSpec": 0,
+    "scoped": 0,
+    "runtime": 1
+   },
+   "exited": false,
+   "surveyElaborated": true,
+   "execution": "runtime candidate: parallel adapter"
   },
   {
    "name": "elab/valueOfTerm.lean",

@@ -2558,6 +2558,9 @@
       }
      ]
     },
+    "elab/utf8英語.lean": {
+     "sha256": "9b656893589af0e5dcf6ed0695a344c596aba7d8c4928f08a3bdcee4bb538163"
+    },
     "elab/versoDocClass.lean": {
      "sha256": "8744e2a4367eacebe05a6d1e5210edc18c4c9be666bf55d823f594a6f63f7536"
     },
