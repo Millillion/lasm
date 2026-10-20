@@ -46,8 +46,10 @@ const save = () => writeFileSync(join(output, 'shard.json'), JSON.stringify(summ
 function bounded(label, command, timeoutMinutes) {
   const report = join(output, 'resources', `${label}.json`);
   const started = Date.now();
-  const result = spawnSync(node, [join(root, 'scripts/full-lean/run-bounded.mjs'), '--memory-mib', '10240', '--report', report, '--',
-    'python3', join(root, 'scripts/full-lean/base-pages.py'), ...command],
+  // Base pages are a Linux build wrapper; other platforms use their own guard as is.
+  const pages = process.platform === 'linux' ? ['python3', join(root, 'scripts/full-lean/base-pages.py')] : [];
+  const result = spawnSync(node, [join(root, 'scripts/full-lean/run-bounded.mjs'), '--memory-mib', process.env.LASM_L1_MEMORY_MIB ?? '10240',
+    '--report', report, '--', ...pages, ...command],
     { cwd: root, encoding: 'utf8', maxBuffer: 256 << 20, timeout: timeoutMinutes * 60_000, killSignal: 'SIGTERM' });
   const resources = readJson(report);
   return { code: result.status, signal: result.signal, timedOut: result.error?.code === 'ETIMEDOUT', seconds: (Date.now() - started) / 1000,
@@ -67,9 +69,10 @@ if (['runtime-adapter', 'eval-io'].includes(harness)) {
       mkdirSync(join(output, 'cases'), { recursive: true });
       const run = bounded(label, [node, join(root, script), caseDir, engine, compiler, pristine, name, version], 50);
       const compactFile = join(output, 'compact', `${label}.json`);
-      spawnSync(node, [join(root, 'scripts/server-mvp/compact-result.mjs'), join(caseDir, 'result.json'),
-        join(output, 'resources', `${label}.json`), compactFile], { encoding: 'utf8', maxBuffer: 512 << 20 });
-      attempts.push({ attempt, ...run, compact: readJson(compactFile) });
+      const compaction = spawnSync(node, [join(root, 'scripts/server-mvp/compact-result.mjs'), join(caseDir, 'result.json'),
+        join(output, 'resources', `${label}.json`), compactFile], { encoding: 'utf8', maxBuffer: 1 << 30 });
+      attempts.push({ attempt, ...run, compact: readJson(compactFile),
+        ...(compaction.status === 0 ? {} : { compactionError: tail(compaction.stderr || compaction.error?.message, 2000) }) });
       rmSync(caseDir, { recursive: true, force: true });
       if (!resourceStopped(run)) break;
     }
