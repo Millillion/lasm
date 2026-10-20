@@ -68,13 +68,16 @@ unsafe def surveyFile (cache : IO.Ref (Option (String × Environment))) (file : 
   return Json.mkObj [("file", toJson file), ("headerStop", headerEnd),
     ("imports", toJson (imports.map (·.module.toString))), ("exited", toJson exited), ("commands", toJson commands)]
 
-/-- Commands whose elaboration would run test actions: anything containing an
-evaluation, a guard or a `run_cmd`-style command. -/
-private def runsActions (stx : Syntax) : Bool :=
-  (stx.find? fun node =>
-    [``Parser.Command.eval, ``Parser.Command.evalBang, ``Parser.Command.guardCmd].contains node.getKind
-    || (node.getKind.toString.splitOn "runCmd").length > 1 || (node.getKind.toString.splitOn "runElab").length > 1
-    || (node.getKind.toString.splitOn "runMeta").length > 1).isSome
+/-- Commands whose elaboration would run test actions: an evaluation, a guard or
+a `run_cmd`-style command, also when wrapped by `#guard_msgs` or `... in`. Syntax
+inside quotations (a macro that expands to `#guard`) is a declaration, not an action. -/
+private partial def runsActions (stx : Syntax) : Bool :=
+  let kind := stx.getKind
+  let name := kind.toString
+  [``Parser.Command.eval, ``Parser.Command.evalBang, ``Parser.Command.guardCmd].contains kind
+    || (name.splitOn "runCmd").length > 1 || (name.splitOn "runElab").length > 1 || (name.splitOn "runMeta").length > 1
+    || (kind == `Lean.guardMsgsCmd && runsActions stx[4])
+    || (kind == ``Parser.Command.in && runsActions stx[2])
 
 /-- Elaboration-aware survey of one file (`--elaborate`): commands that may
 declare syntax (notations, macros, `syntax`, `elab`, ...) are elaborated so
