@@ -74,6 +74,20 @@ for (const shard of shards) {
   }
   for (const result of shard.results) {
     if (shard.harness === 'projects') {
+      // L2+L3 generic Lake-driver adapter: its summary names one outcome.
+      const generic = result.attempts.length === 1 && result.attempts[0].compact?.summary
+        && Object.keys(result.attempts[0].compact.summary)[0];
+      if (generic) {
+        const a = result.attempts[0];
+        const outcome = { pass: 'pass', 'aot-policy-rejected': 'unsupported-by-design', 'upstream-disabled': 'upstream-disabled',
+          'native-failed': 'harness', 'no-deployed-execution': 'harness' }[generic] ?? 'needs-review';
+        const deployed = a.compact.commands?.find(command => command.label === 'deployed');
+        tests.push({ harness: shard.harness, name: result.name, outcome, adapterOutcome: generic, seconds: a.seconds,
+          peakGiB: gib(a.resources?.peakMemoryBytes), detail: outcome === 'pass' ? undefined
+            : (a.compact.commands?.find(command => command.label === (generic === 'native-failed' ? 'native' : 'deployed'))?.stdoutTail ?? '').slice(-2500),
+          error: a.compact.error || undefined, deployedCode: deployed?.code });
+        continue;
+      }
       const failed = result.attempts.filter(a => !a.compact?.passed);
       const policy = failed.some(a => /Lasm does not support runtime Lean compilation/.test(String(a.compact?.error ?? '') + a.stderrTail));
       tests.push({ harness: shard.harness, name: result.name, outcome: !failed.length ? 'pass' : policy ? 'unsupported-by-design' : 'needs-review',

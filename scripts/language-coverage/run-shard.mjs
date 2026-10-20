@@ -96,6 +96,9 @@ if (harness === 'projects') {
         join(output, 'resources', `${label}.json`), compactFile], { encoding: 'utf8', maxBuffer: 1 << 30 });
       attempts.push({ attempt: variantIndex + 1, variant: variant.join(' ') || 'default', ...run, compact: readJson(compactFile),
         ...(compaction.status === 0 ? {} : { compactionError: tail(compaction.stderr || compaction.error?.message, 2000) }) });
+      // The generic Lake-driver result (two bounded driver logs and shim events) is kept whole.
+      if (script.endsWith('application-upstream-lake-drivers.mjs') && existsSync(join(caseDir, 'result.json')))
+        writeFileSync(join(output, 'compact', `${label}.result.json`), readFileSync(join(caseDir, 'result.json')));
       rmSync(caseDir, { recursive: true, force: true });
     }
     summary.results.push({ name, attempts }); save();

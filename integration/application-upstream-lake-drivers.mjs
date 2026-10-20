@@ -33,8 +33,18 @@ const row = JSON.parse(readFileSync(ledgerFile)).tests.find(test => test.name ==
 assert.ok(row && ['native-and-compiled-application', 'native-and-foreign-application'].includes(row.phase), 'Not a reviewed deployed-phase driver: ' + name);
 const test = inventory.tests.find(entry => entry.name === name);
 assert.equal(test.sha256, row.sourceSha256);
-// Reviewed leanmake drivers: built file → root source, relative to the driver directory.
-const leanmake = { '../doc/examples/compiler': { 'build/bin/test': 'test.lean' } }[name];
+// Reviewed per-driver settings. leanmake: built file → root source, relative to the
+// driver directory. exe-only: the driver inspects built executable files (hard
+// links, cache identity), so only `lake exe` runs the deployment. makeFlags: the
+// released lean.mk names the release build machine's llvm-ar; the distribution's
+// own llvm-ar is supplied to make in both phases.
+const archiver = () => join(prefix, 'bin', windows ? 'llvm-ar.exe' : 'llvm-ar');
+const settings = {
+  '../doc/examples/compiler': { leanmake: { 'build/bin/test': 'test.lean' }, makeFlags: () => `LEAN_AR=${archiver()}` },
+  'tests/lake/tests/cache/test.sh': { mode: 'exe-only' },
+}[name] ?? {};
+const leanmake = settings.leanmake;
+let prefix;
 const tree = test.driver.startsWith('doc/') ? ['doc', 'tests'] : ['tests'];
 const subset = Object.fromEntries(Object.entries(sources).filter(([path]) => tree.some(top => path.startsWith(top + '/'))));
 mkdirSync(output, { recursive: true });
@@ -47,6 +57,8 @@ const report = { scope: 'Unchanged upstream mixed driver, native then deployed (
     'Both phases run the unchanged driver in independent copies of the verified upstream tree; the pristine reference is checked before and after.',
     'Deployed phase: every native Lake command runs as invoked with Lake\'s own executables in place; afterwards each built lean_exe is compiled from its configured root module by the installed CLI and its path runs that deployment. `lake exe T` is a native `lake build T` followed by the deployed T.',
     'The Lasm build sees a release pin for its duration only (the upstream tree pins its stage build); the original pin bytes are restored.',
+    '`lean [-D…] --run FILE ARGS` from PATH (as in `lake env lean --run`) builds FILE through the installed CLI and runs the deployment; other lean calls are native.',
+    'Reviewed per-driver settings (exe-only replacement, leanmake roots, the distribution llvm-ar for lean.mk) are recorded in the result.',
   ], commands: [], passed: false, resourceReport: process.env.LASM_RESOURCE_REPORT };
 // Without symlink privileges Windows tar materializes a link as a copy of its target.
 const verify = async (directory, expected) => {
@@ -64,12 +76,12 @@ try {
   assert.deepEqual(report.referenceBefore.modified, []);
   const lean = await provisionLean(output, { distribution: 'full' });
   assert.equal(lean.commit, inventory.leanCommit);
-  const prefix = windows ? lean.executionPrefix ?? lean.prefix : lean.prefix;
+  prefix = windows ? lean.executionPrefix ?? lean.prefix : lean.prefix;
   const plugin = windows ? join(prefix, 'bin', 'libLake_shared.dll') : join(prefix, 'lib/lean', `libLake_shared.${process.platform === 'darwin' ? 'dylib' : 'so'}`);
   Object.assign(report, { leanCommit: lean.commit, nativeArtifactIdentity: lean.identity });
   report.engineVersion = spawnSync(engine, ['--version'], { encoding: 'utf8' }).stdout.trim();
   const shim = join(output, 'shim'); mkdirSync(shim);
-  for (const tool of ['lake', 'leanmake']) {
+  for (const tool of ['lake', 'leanmake', 'lean']) {
     writeFileSync(join(shim, tool), `#!/usr/bin/env bash\nexec "$LASM_BUILD_NODE" "$LASM_LAKE_SHIM_SCRIPT" ${tool} "$@"\n`);
     chmodSync(join(shim, tool), 0o755);
   }
@@ -87,7 +99,8 @@ try {
       LEAN_SRC_PATH: join(reference, 'src') + delimiter + join(reference, 'src/lake'),
       LEAN_NUM_THREADS: '1', LEAN_HEADER_SNAPSHOTS: '0',
       GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: 'commit.gpgsign', GIT_CONFIG_VALUE_0: 'false',
-      [pathKey]: (label === 'deployed' ? [shim, ...basePath] : basePath).join(delimiter) });
+      [pathKey]: (label === 'deployed' ? [shim, ...basePath] : basePath).join(delimiter),
+      ...(settings.makeFlags ? { MAKEFLAGS: settings.makeFlags() } : {}) });
     const state = join(output, label + '-shim-state');
     if (label === 'deployed') {
       mkdirSync(state);
@@ -95,7 +108,8 @@ try {
         LASM_LAKE_SHIM_EXES: join(root, 'scripts/language-coverage/LakeExes.lean'), LASM_LAKE_SHIM_PLUGIN: plugin,
         LASM_LAKE_SHIM_ENGINE: engine, LASM_LAKE_SHIM_LEAN: version, LASM_BUILD_NODE: process.execPath, LASM_COMPILER: compiler,
         LASM_NATIVE_LEAN: join(prefix, 'bin', windows ? 'lean.exe' : 'lean'), LASM_NATIVE_LAKE: join(prefix, 'bin', windows ? 'lake.exe' : 'lake'),
-        LASM_NATIVE_LEANMAKE: join(prefix, 'bin', 'leanmake'), ...(leanmake ? { LASM_LAKE_SHIM_LEANMAKE: JSON.stringify(leanmake) } : {}) });
+        LASM_NATIVE_LEANMAKE: join(prefix, 'bin', 'leanmake'), ...(leanmake ? { LASM_LAKE_SHIM_LEANMAKE: JSON.stringify(leanmake) } : {}),
+        ...(settings.mode ? { LASM_LAKE_SHIM_MODE: settings.mode } : {}) });
     }
     const driver = join(workspace, test.driver);
     const args = [join(root, 'scripts/application-tests/mixed-native.sh'), test.driver.startsWith('tests/lake/') ? 'lake' : 'ordinary', driver];
@@ -130,6 +144,10 @@ try {
   report.deployments = deployed.events.filter(event => /^deployment-/.test(event.kind))
     .map(({ kind, exe, source, policy, detected, wasmSha256, pinAdaptation }) => ({ kind, exe, source, policy, detected, wasmSha256, pinAdaptation }));
   report.passed = outcome === 'pass';
+  report.settings = { mode: settings.mode, leanmake, makeFlags: settings.makeFlags?.() };
+  // A compact explanation for CI artifacts (the full result is kept beside it).
+  if (!report.passed) report.error = [outcome, ...deployed.events.filter(event => !/^(native|deployed-exe|deployed-run|deployment-built)$/.test(event.kind))
+    .map(event => JSON.stringify(event).slice(0, 1500)), (outcome === 'native-failed' ? native : deployed).stdout.slice(-3000)].join('\n');
 } catch (error) { report.error = error.stack; throw error; }
 finally {
   report.referenceAfter = await verify(reference, sources);

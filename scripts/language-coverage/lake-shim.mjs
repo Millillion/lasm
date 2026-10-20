@@ -8,7 +8,11 @@
 // times) and moved back before the next native command, so Lake never sees the
 // launcher. `lake exe T ARGS` is `lake build T` (native) followed by the deployed T.
 // State and logs live outside the test's tree, in LASM_LAKE_SHIM_STATE.
-//   node lake-shim.mjs lake|leanmake ARGS...
+// A reviewed per-test mode may restrict replacement to `lake exe` (LASM_LAKE_SHIM_MODE
+// =exe-only) when the driver inspects the built executable files themselves.
+// `lean [-D…] --run FILE ARGS` from PATH (e.g. `lake env lean --run`) builds FILE
+// through the installed CLI and runs the deployment; other `lean` calls are native.
+//   node lake-shim.mjs lake|leanmake|lean ARGS...
 import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync, rmSync, chmodSync, appendFileSync, lstatSync, statSync } from 'node:fs';
 import { join, resolve, dirname, isAbsolute, relative } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -35,10 +39,11 @@ const launcherPath = file => windows ? file.replace(/\.exe$/i, '') : file;
 function restore() {
   for (const [file, entry] of Object.entries(state.substituted)) {
     const launcher = launcherPath(file);
-    if (existsSync(launcher) && readFileSync(launcher, 'utf8') === entry.launcher) rmSync(launcher);
-    // A driver may have deleted or rebuilt the directory meanwhile; only an
-    // untouched executable path receives its native file back.
-    if (existsSync(entry.stash) && !existsSync(file) && existsSync(dirname(file))) renameSync(entry.stash, file);
+    // Only an untouched launcher is swapped back for its native file. If the driver
+    // deleted the executable (or rebuilt the directory), the native file stays gone.
+    const intact = existsSync(launcher) && readFileSync(launcher, 'utf8') === entry.launcher;
+    if (intact) rmSync(launcher);
+    if (intact && existsSync(entry.stash) && !existsSync(file)) renameSync(entry.stash, file);
     else rmSync(entry.stash, { force: true });
     delete state.substituted[file];
   }
@@ -55,7 +60,7 @@ function run(program, argv, options = {}) {
 const valued = new Set(['-d', '--dir', '-f', '--file', '-K', '--packages', '--log-level', '--fail-level', '--ansi-level']);
 function parseLake(argv) {
   const options = [], rest = [...argv];
-  let directory = '.', file, keys = [];
+  let directory = '.', file, keys = [], packages = [];
   while (rest.length && rest[0].startsWith('-')) {
     const option = rest.shift(), [name, inline] = option.split(/=(.*)/s);
     let value = inline;
@@ -64,9 +69,10 @@ function parseLake(argv) {
     if (name === '-d' || name === '--dir') directory = value;
     if (name === '-f' || name === '--file') file = value;
     if (name === '-K') keys.push('-K' + value);
+    if (name === '--packages') packages.push('--packages=' + resolve(value));
     if (name.startsWith('-K') && name.length > 2) keys.push(option);
   }
-  return { options, command: rest.shift(), rest, directory: resolve(directory), file, keys };
+  return { options, command: rest.shift(), rest, directory: resolve(directory), file, keys: [...keys, ...packages] };
 }
 
 function listExes(directory, file, keys) {
@@ -81,7 +87,12 @@ function listExes(directory, file, keys) {
 // Build (once per native executable identity) and substitute every built exe.
 function substitute(exes) {
   for (const exe of exes) {
-    const file = exe.file;
+    const file = exe.file, current = state.substituted[file];
+    if (current) {
+      // Still our launcher: nothing to do. Lake replaced it: forget the stash.
+      if (existsSync(launcherPath(file)) && readFileSync(launcherPath(file), 'utf8') === current.launcher && !existsSync(windows ? file : '\0')) continue;
+      rmSync(current.stash, { force: true }); delete state.substituted[file];
+    }
     if (!existsSync(file) || !lstatSync(file).isFile()) continue;
     const native = sha256(file), key = exe.source + '\0' + native;
     let deployment = state.deployments[key];
@@ -105,9 +116,12 @@ function substitute(exes) {
 // The release pin nearest to the source must select the matching Lean for the
 // installed CLI. Upstream test trees pin their own stage build instead; that one
 // file is swapped for the duration of the Lasm build only and restored byte for byte.
-function buildDeployment(source, output) {
+// `standalone` (for `lean --run FILE`): a pin beside FILE makes the CLI treat it as a
+// standalone source, as `lean --run` ignores enclosing Lake workspaces.
+function buildDeployment(source, output, { standalone = false } = {}) {
   let directory = dirname(source), pin;
   for (;;) {
+    if (standalone) { if (existsSync(join(directory, 'lean-toolchain'))) pin = join(directory, 'lean-toolchain'); break; }
     if (existsSync(join(directory, 'lean-toolchain'))) { pin = join(directory, 'lean-toolchain'); break; }
     const parent = dirname(directory); if (parent === directory) break; directory = parent;
   }
@@ -132,12 +146,42 @@ function buildDeployment(source, output) {
   }
 }
 
+function leanTool(args) {
+  let code;
+  const at = args.indexOf('--run');
+  if (at < 0 || at + 1 >= args.length || !args.slice(0, at).every(arg => /^-D/.test(arg))) {
+    code = run(env('LASM_NATIVE_LEAN'), args);
+  } else {
+    const source = resolve(args[at + 1]), key = 'lean --run\0' + source + '\0' + sha256(source);
+    let deployment = state.deployments[key];
+    if (!deployment) {
+      const output = join(stateDir, 'deployments', String(state.next++));
+      deployment = state.deployments[key] = { output, ...buildDeployment(source, output, { standalone: true }), source, exe: 'lean --run' };
+      event({ kind: deployment.ok ? 'deployment-built' : 'deployment-failed', exe: 'lean --run', source, ...deployment });
+    }
+    if (!deployment.ok) {
+      process.stderr.write(`lake-shim: lean --run ${args[at + 1]} has no deployed substitute\n`);
+      code = 97;
+    } else {
+      appendFileSync(invocations, 'lean --run ' + source + '\n');
+      code = run(env('LASM_LAKE_SHIM_ENGINE'), [join(deployment.output, 'main.mjs'), ...args.slice(at + 2)]);
+      event({ kind: 'deployed-run', source, code });
+    }
+  }
+  return code;
+}
 let code;
+const exeOnly = process.env.LASM_LAKE_SHIM_MODE === 'exe-only';
 const parsedLake = tool === 'lake' ? parseLake(args) : undefined;
-// `lake env CMD` runs CMD (possibly a built executable) without building: keep
-// the launchers in place. Every other native command sees Lake's own outputs.
-if (parsedLake?.command !== 'env') restore();
-if (tool === 'leanmake') {
+// Commands where Lake runs a built executable itself (`env CMD`, test/lint drivers,
+// a CURL mock for `cache`) keep the launchers in place; if Lake rebuilds instead,
+// its native executable runs and no deployed invocation is recorded. Every other
+// native command sees Lake's own outputs.
+const keepsLaunchers = ['env', 'test', 'lint', 'cache'].includes(parsedLake?.command);
+if (!keepsLaunchers) restore();
+if (tool === 'lean') {
+  code = leanTool(args);
+} else if (tool === 'leanmake') {
   // Reviewed mapping for leanmake drivers: LASM_LAKE_SHIM_LEANMAKE='{"build/bin/test":"test.lean"}'.
   code = run(env('LASM_NATIVE_LEANMAKE'), args);
   const map = JSON.parse(env('LASM_LAKE_SHIM_LEANMAKE'));
@@ -145,7 +189,12 @@ if (tool === 'leanmake') {
   substitute(Object.entries(map).map(([file, source]) => ({ name: file, file: resolve(file), source: resolve(source) })));
 } else {
   const parsed = parsedLake;
-  if (['exe', 'exec'].includes(parsed.command) && parsed.rest.length) {
+  const envLean = parsed.command === 'env' && parsed.rest[0] === 'lean' ? parsed.rest.slice(1) : undefined;
+  if (envLean && envLean.includes('--run')) {
+    // `lake env` puts the toolchain first on PATH; route its `lean --run` here.
+    code = leanTool(envLean);
+    event({ kind: 'env-lean', args: envLean, code });
+  } else if (['exe', 'exec'].includes(parsed.command) && parsed.rest.length) {
     const [target, ...programArgs] = parsed.rest;
     // Native build of the same target; its log goes to stderr like a build inside `lake exe`.
     code = run(env('LASM_NATIVE_LAKE'), [...parsed.options, 'build', target], { stdio: ['inherit', 2, 'inherit'] });
@@ -164,12 +213,13 @@ if (tool === 'leanmake') {
         appendFileSync(invocations, exe.file + '\n');
         code = run(env('LASM_LAKE_SHIM_ENGINE'), [join(entry.deployment, 'main.mjs'), ...programArgs]);
         event({ kind: 'deployed-exe', target, code });
+        if (exeOnly) restore();
       }
     }
   } else {
     code = run(env('LASM_NATIVE_LAKE'), args);
     event({ kind: 'native', tool, args, code });
-    if (parsed.command !== 'env') substitute(listExes(parsed.directory, parsed.file, parsed.keys));
+    if (parsed.command !== 'env' && !exeOnly) substitute(listExes(parsed.directory, parsed.file, parsed.keys));
   }
 }
 process.exitCode = code;
