@@ -28,6 +28,10 @@ on:
       max-parallel:
         type: string
         default: '12'
+      names:
+        description: Optional JSON array restricting the harness selection to these test names
+        type: string
+        default: ''
       candidate-version:
         type: string
         default: 0.1.0-experimental.39310029213
@@ -136,6 +140,11 @@ jobs:
       LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
       LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
       LASM_LEAN: ${{ inputs.lean }}
+      # Standard macOS arm64 runners have 7 GiB of memory; the others 14-16 GiB.
+      LASM_L1_MEMORY_MIB: ${{ inputs.runner == 'macos-15' && '5120' || '10240' }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -155,25 +164,23 @@ jobs:
           echo '{"private":true}' > package.json
           npm install --no-audit --no-fund "../node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
       - name: Fetch and verify the pinned upstream source archive
-        run: |
-          mkdir -p .cache/downloads .work/pristine
-          url="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_LEAN].url')"
-          sha="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_LEAN].sha256')"
-          archive=".cache/downloads/lean4-v$LASM_LEAN.tar.gz"
-          curl --fail --location --retry 3 --output "$archive" "$url"
-          printf '%s  %s\n' "$sha" "$archive" | sha256sum -c -
-          tar -xzf "$archive" -C .work/pristine --strip-components=1
+        run: node scripts/language-coverage/fetch-pristine.mjs "$LASM_LEAN"
       - name: Enable process-tree resource guard
+        if: runner.os == 'Linux'
         run: |
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: Download and verify the full native Lean oracle
-        run: node scripts/server-mvp/provision.mjs native "$LASM_LEAN" "$PWD/.work/install/node_modules/@lasm/compiler" .work/l1-provision
+        run: node scripts/server-mvp/provision.mjs native "$LASM_LEAN" .work/install/node_modules/@lasm/compiler .work/l1-provision
       - name: Warm the installed candidate's tools with one bounded Std.Http build
-        run: node scripts/full-lean/run-bounded.mjs --report .work/l1-provision-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/server-mvp/provision.mjs candidate "$LASM_LEAN" "$PWD/.work/install/node_modules/@lasm/compiler" .work/l1-provision
+        run: |
+          pages=(); [ "$RUNNER_OS" = Linux ] && pages=(python3 scripts/full-lean/base-pages.py)
+          node scripts/full-lean/run-bounded.mjs --memory-mib "$LASM_L1_MEMORY_MIB" --report .work/l1-provision-resources.json -- "${pages[@]}" node scripts/server-mvp/provision.mjs candidate "$LASM_LEAN" .work/install/node_modules/@lasm/compiler .work/l1-provision
       - name: Run the shard (native drivers and controls, then the deployed Node comparison per test)
-        run: node scripts/language-coverage/run-shard.mjs "${{ inputs.harness }}" "${{ matrix.shard }}" "${{ inputs.shards }}" .work/l1-shard "$(command -v node)" "$PWD/.work/install/node_modules/@lasm/compiler" "$PWD/.work/pristine" "$LASM_LEAN"
+        env:
+          LASM_L1_NAMES: ${{ inputs.names }}
+        run: node scripts/language-coverage/run-shard.mjs "${{ inputs.harness }}" "${{ matrix.shard }}" "${{ inputs.shards }}" .work/l1-shard "$(node -p process.execPath)" "$(node -p "require('path').resolve('.work/install/node_modules/@lasm/compiler')")" "$(node -p "require('path').resolve('.work/pristine')")" "$LASM_LEAN"
       - name: Keep the compact shard results briefly
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

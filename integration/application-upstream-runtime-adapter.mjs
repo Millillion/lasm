@@ -7,7 +7,7 @@
 //   node application-upstream-runtime-adapter.mjs NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE REVIEWED_TEST [LEAN_VERSION]
 import assert from 'node:assert/strict';
 import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, renameSync, symlinkSync, writeFileSync } from 'node:fs';
-import { resolve, join, dirname, basename } from 'node:path';
+import { resolve, join, dirname, basename, delimiter } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { hashFile } from '../src/managed-artifacts.mjs';
@@ -18,6 +18,8 @@ import { loadUpstreamEvidence } from '../scripts/application-tests/upstream-evid
 import { planActions, generateRuntimeSource, actionsWithErrors, modes } from '../scripts/application-tests/runtime-adapter-source.mjs';
 
 await ensureResourceGuard();
+// Windows runs the unchanged shell drivers with Git Bash from PATH.
+const windows = process.platform === 'win32', bash = windows ? 'bash' : '/bin/bash';
 const [outputArg, engineArg, compilerArg, referenceArg, name, version = '4.35.0', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && engineArg && compilerArg && referenceArg && name && !extra.length,
   'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE REVIEWED_TEST [LEAN_VERSION]');
@@ -98,10 +100,10 @@ try {
   const group = dirname(test.driver);
   const originalDriver = join(output, 'original-driver.sh');
   writeFileSync(originalDriver, `#!/usr/bin/env bash\nsource "$TEST_DIR/util.sh"\nsource "$TEST_DIR/${group.slice('tests/'.length)}/run_test.sh" "$1"\n`);
-  run('unchanged native upstream driver', '/bin/bash', [originalDriver, basename(name)],
+  run('unchanged native upstream driver', bash, [originalDriver, basename(name)],
     join(original, group), { ...env, TEST_DIR: join(original, 'tests'), SRC_DIR: join(reference, 'src'),
       SCRIPT_DIR: join(reference, 'script'), BUILD_DIR: lean.prefix, STAGE: '1', TEST_CTEST: '1',
-      LEAN_HEADER_SNAPSHOTS: '0', PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].join(':') });
+      LEAN_HEADER_SNAPSHOTS: '0', PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].join(delimiter) });
   const originalFile = join(original, test.source), project = join(output, 'parallel-project');
   assert.equal(await hashFile(originalFile), report.sourceSha256, 'Original driver must not modify the test');
   mkdirSync(project); writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
@@ -169,8 +171,8 @@ try {
   };
   report.nativeInterpreted = execute('native-interpreted', [lean.lean, '-Dlinter.all=false', '--run', main], env);
   run('generate native parallel C', lean.lean, ['-j1', '-Dlinter.all=false', '-Dcompiler.postponeCompile=false', '-c', main + '.c', main], project);
-  const native = join(project, 'native');
-  run('compile native parallel program', join(lean.prefix, 'bin/leanc'), ['-O2', '-DNDEBUG', '-o', native, main + '.c'], project);
+  const native = join(project, windows ? 'native.exe' : 'native');
+  run('compile native parallel program', join(lean.prefix, 'bin', windows ? 'leanc.exe' : 'leanc'), ['-O2', '-DNDEBUG', '-o', native, main + '.c'], project);
   report.nativeCompiled = execute('native-compiled', [native], env);
   report.nativeCompiledRepeat = execute('native-compiled-repeat', [native], env);
   const dist = join(output, 'dist');

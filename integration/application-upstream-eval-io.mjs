@@ -3,7 +3,7 @@
 // deployed API coverage, not a reclassification of compiler tests.
 import assert from 'node:assert/strict';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
-import { resolve, join, dirname, basename } from 'node:path';
+import { resolve, join, dirname, basename, delimiter } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { hashFile } from '../src/managed-artifacts.mjs';
@@ -15,6 +15,8 @@ import { parallelEvalIOSource, reviewedEvalIOTests, reviewedEvalIOInput } from '
 import { reviewedEvalIOSidecars } from '../scripts/application-tests/eval-io-sidecars.mjs';
 
 await ensureResourceGuard();
+// Windows runs the unchanged shell drivers with Git Bash from PATH.
+const windows = process.platform === 'win32', bash = windows ? 'bash' : '/bin/bash';
 const [outputArg, engineArg, compilerArg, referenceArg, name, version = '4.34.1', ...extra] = process.argv.slice(2);
 const target = 'node';
 assert.ok(outputArg && engineArg && compilerArg && referenceArg && !extra.length,
@@ -76,10 +78,10 @@ try {
   }
   const originalDriver = join(output, 'original-driver.sh');
   writeFileSync(originalDriver, '#!/usr/bin/env bash\nsource "$TEST_DIR/util.sh"\nsource "$TEST_DIR/elab/run_test.sh" "$1"\n');
-  run('unchanged native upstream driver', '/bin/bash', [originalDriver, basename(name)],
+  run('unchanged native upstream driver', bash, [originalDriver, basename(name)],
     join(original, 'tests/elab'), { ...env, TEST_DIR: join(original, 'tests'), SRC_DIR: join(reference, 'src'),
       SCRIPT_DIR: join(reference, 'script'), BUILD_DIR: lean.prefix, STAGE: '1', TEST_CTEST: '1',
-      LEAN_HEADER_SNAPSHOTS: '0', PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].join(':') });
+      LEAN_HEADER_SNAPSHOTS: '0', PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].join(delimiter) });
   const originalFile = join(original, test.source), project = join(output, 'parallel-project');
   assert.equal(await hashFile(originalFile), report.sourceSha256, 'Original driver must not modify the test');
   mkdirSync(project); writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
@@ -101,8 +103,8 @@ try {
   };
   report.nativeInterpreted = execute('native-interpreted', [lean.lean, '-Dlinter.all=false', '--run', main], env);
   run('generate native parallel C', lean.lean, ['-j1', '-Dlinter.all=false', '-Dcompiler.postponeCompile=false', '-c', main + '.c', main], project);
-  const native = join(project, 'native');
-  run('compile native parallel program', join(lean.prefix, 'bin/leanc'), ['-O2', '-DNDEBUG', '-o', native, main + '.c'], project);
+  const native = join(project, windows ? 'native.exe' : 'native');
+  run('compile native parallel program', join(lean.prefix, 'bin', windows ? 'leanc.exe' : 'leanc'), ['-O2', '-DNDEBUG', '-o', native, main + '.c'], project);
   report.nativeCompiled = execute('native-compiled', [native], env);
   assert.deepEqual(report.nativeCompiled, report.nativeInterpreted);
   const dist = join(output, 'dist');

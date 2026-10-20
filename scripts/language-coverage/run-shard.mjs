@@ -32,7 +32,10 @@ assert.ok(select, 'Unknown harness ' + harness);
 // Adapter candidates outside the L1 review (symlinked sources) are recorded there as excluded.
 const reviewed = harness === 'runtime-adapter'
   ? new Set(Object.keys(JSON.parse(readFileSync(join(root, 'scripts/language-coverage/runtime-adapter-l1.json'))).releases[version].tests)) : undefined;
-const names = inventory.tests.filter(select).map(test => test.name).filter(name => !reviewed || reviewed.has(name)).sort()
+// Optional representative subset (cross-platform runs): LASM_L1_NAMES is a JSON array.
+const only = process.env.LASM_L1_NAMES ? new Set(JSON.parse(process.env.LASM_L1_NAMES)) : undefined;
+const names = inventory.tests.filter(select).map(test => test.name).filter(name => !reviewed || reviewed.has(name))
+  .filter(name => !only || only.has(name)).sort()
   .filter((_, position) => position % count === index);
 assert.ok(names.length, 'Empty shard');
 mkdirSync(join(output, 'compact'), { recursive: true }); mkdirSync(join(output, 'resources'));

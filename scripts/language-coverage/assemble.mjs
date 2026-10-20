@@ -51,17 +51,25 @@ function applicationOutcome(attempt) {
   if (status === 'upstream-compile-disabled') return { outcome: 'upstream-disabled' };
   if (status === 'harness-compiler-options-gap') return { outcome: 'harness', reason: 'extra compiler options not mapped' };
   if (c?.phase === 'native-driver') return { outcome: 'harness', reason: 'native driver failed', detail: attempt.stdoutTail?.slice(-1500) };
-  if (c?.phase === 'application-build') return { outcome: /Lasm does not support runtime Lean/.test(attempt.stdoutTail + attempt.stderrTail)
-    ? 'unsupported-by-design' : 'lasm-bug', reason: 'build', detail: (attempt.stderrTail + attempt.stdoutTail).slice(-2500) };
+  if (c?.phase === 'application-build') {
+    const log = attempt.stderrTail + attempt.stdoutTail, policy = /Lasm does not support runtime Lean/.test(log);
+    return { outcome: policy ? 'unsupported-by-design' : 'lasm-bug', reason: policy ? 'build rejected by the AOT policy' : 'build failed',
+      detected: log.match(/Detected [^\n]*/)?.[0], detail: policy ? undefined : log.slice(-2500) };
+  }
   return { outcome: status === 'timeout' ? 'lasm-bug' : status ? 'lasm-bug' : 'harness', reason: `${status ?? 'no result'} in ${c?.phase ?? '?'}`,
     nativeExit: c?.nativeExit, targetExit: c?.targetExit, nativeOutTail: c?.nativeOutTail, targetOutTail: c?.targetOutTail,
     detail: attempt.stdoutTail?.slice(-1500) };
 }
 const tests = [];
 for (const shard of shards) {
-  if (shard.prepare && shard.results.length === 0)
-    tests.push(...shard.tests.map(name => ({ harness: shard.harness, name, outcome: 'harness', reason: 'shard preparation failed',
-      detail: (shard.prepare.stderrTail + shard.prepare.stdoutTail).slice(-2000) })));
+  if (shard.prepare && shard.results.length === 0) {
+    // A shared compiled driver (docparse, LSP clients) is built once in preparation.
+    const log = shard.prepare.stderrTail + shard.prepare.stdoutTail;
+    const policy = /Lasm does not support runtime Lean compilation/.test(log);
+    tests.push(...shard.tests.map(name => ({ harness: shard.harness, name, outcome: policy ? 'unsupported-by-design' : 'harness',
+      reason: policy ? 'shared compiled driver rejected by the AOT policy' : 'shard preparation failed',
+      detected: log.match(/Detected [^\n]*/)?.[0], detail: policy ? undefined : log.slice(-2000) })));
+  }
   for (const result of shard.results) {
     const last = result.attempts.at(-1);
     const classify = ['runtime-adapter', 'eval-io'].includes(shard.harness)
