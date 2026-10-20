@@ -1,0 +1,80 @@
+name: Language coverage probe
+# Dispatch-only diagnosis for language coverage: one reviewed probe script
+# (scripts/language-coverage/probe-*.mjs) against an exact retained candidate on a
+# standard runner. Small results are kept 7 days; no caches are written.
+on:
+  workflow_dispatch:
+    inputs:
+      probe:
+        description: Probe name (scripts/language-coverage/probe-NAME.mjs)
+        type: string
+        required: true
+      runner:
+        type: choice
+        options: [ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-intel, windows-2025]
+        default: windows-2025
+      candidate-version:
+        type: string
+        required: true
+      candidate-release:
+        type: string
+        required: true
+      sha256:
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  probe:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 60
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Fetch and verify the exact retained candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Install the exact candidate as an ordinary npm dependency
+        run: |
+          mkdir -p .work/install && cd .work/install
+          echo '{"private":true}' > package.json
+          npm install --no-audit --no-fund "../node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
+      - name: Enable process-tree resource guard
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Run the probe
+        env:
+          PROBE: ${{ inputs.probe }}
+        run: |
+          [[ "$PROBE" =~ ^[a-z0-9-]+$ ]] || { echo "invalid probe name"; exit 1; }
+          node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --report .work/probe-resources.json -- \
+            node "scripts/language-coverage/probe-$PROBE.mjs" .work/probe "$(node -p "require('path').resolve('.work/install/node_modules/@lasm/compiler')")"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: probe-${{ inputs.probe }}-${{ inputs.runner }}
+          path: .work/probe/result.json
+          retention-days: 7
+          if-no-files-found: warn
