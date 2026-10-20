@@ -25,6 +25,7 @@ const actionClass = {
   'native-not-reached': 'harness (native run stopped)',
   'native-nondeterministic': 'upstream-flake (native repeat differs)',
   'harness-environment': 'harness (deployment environment)',
+  'native-output-varies': 'harness (native output varies between runs)',
 };
 // Reviewed actions whose native/deployed environments differ by design.
 const environmentActions = {
@@ -35,6 +36,10 @@ function adapterOutcome(attempt, name) {
   for (const verdict of c?.verdicts ?? []) {
     const reason = environmentActions[name]?.[verdict.identifier];
     if (reason && verdict.verdict === 'deployed-failure') Object.assign(verdict, { verdict: 'harness-environment', reason });
+    // Both native runs succeeded but displayed different values (timings, random
+    // bytes, the per-phase working directory): not comparable, not an upstream flake.
+    if (verdict.verdict === 'native-nondeterministic' && verdict.native === 'ok' && verdict.nativeRepeat === 'ok')
+      verdict.verdict = 'native-output-varies';
   }
   if (attempt.resources?.resourceLimited || attempt.code === 125) return { outcome: 'resource-stop', reason: attempt.resources?.stoppedBecause };
   if (!c?.resultFound) return { outcome: 'harness', reason: `no result (exit ${attempt.code}${attempt.timedOut ? ', timeout' : ''})`, detail: attempt.stderrTail?.slice(-800) };
