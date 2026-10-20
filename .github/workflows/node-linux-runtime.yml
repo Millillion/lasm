@@ -6,6 +6,10 @@ permissions:
   actions: write
 concurrency:
   group: lasm-cache-writer
+  # Queue rather than displace: without this, a candidate-input job joining the
+  # shared cache-writer group cancelled an in-progress runtime build (run
+  # 39367352041).
+  queue: max
   cancel-in-progress: false
 
 # Cold source build on a free standard public runner. A bounded cache carries
