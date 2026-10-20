@@ -146,17 +146,17 @@ function buildDeployment(source, output, { standalone = false } = {}) {
   }
 }
 
-function leanTool(args) {
+function leanTool(args, { standalone = true } = {}) {
   let code;
   const at = args.indexOf('--run');
   if (at < 0 || at + 1 >= args.length || !args.slice(0, at).every(arg => /^-D/.test(arg))) {
     code = run(env('LASM_NATIVE_LEAN'), args);
   } else {
-    const source = resolve(args[at + 1]), key = 'lean --run\0' + source + '\0' + sha256(source);
+    const source = resolve(args[at + 1]), key = `lean --run ${standalone}\0` + source + '\0' + sha256(source);
     let deployment = state.deployments[key];
     if (!deployment) {
       const output = join(stateDir, 'deployments', String(state.next++));
-      deployment = state.deployments[key] = { output, ...buildDeployment(source, output, { standalone: true }), source, exe: 'lean --run' };
+      deployment = state.deployments[key] = { output, ...buildDeployment(source, output, { standalone }), source, exe: 'lean --run' };
       event({ kind: deployment.ok ? 'deployment-built' : 'deployment-failed', exe: 'lean --run', source, ...deployment });
     }
     if (!deployment.ok) {
@@ -190,7 +190,13 @@ if (tool === 'lean') {
 } else {
   const parsed = parsedLake;
   const envLean = parsed.command === 'env' && parsed.rest[0] === 'lean' ? parsed.rest.slice(1) : undefined;
-  if (envLean && envLean.includes('--run')) {
+  // `lake lean FILE -- --run FILE ARGS`: run FILE's main with the workspace's imports.
+  const separator = parsed.command === 'lean' ? parsed.rest.indexOf('--') : -1;
+  const lakeLean = separator === 1 && parsed.rest[separator + 1] === '--run' ? parsed.rest.slice(separator + 1) : undefined;
+  if (lakeLean) {
+    code = leanTool(lakeLean, { standalone: false });
+    event({ kind: 'lake-lean', args: lakeLean, code });
+  } else if (envLean && envLean.includes('--run')) {
     // `lake env` puts the toolchain first on PATH; route its `lean --run` here.
     code = leanTool(envLean);
     event({ kind: 'env-lean', args: envLean, code });

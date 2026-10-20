@@ -79,10 +79,17 @@ for (const shard of shards) {
         && Object.keys(result.attempts[0].compact.summary)[0];
       if (generic) {
         const a = result.attempts[0];
-        const outcome = { pass: 'pass', 'aot-policy-rejected': 'unsupported-by-design', 'upstream-disabled': 'upstream-disabled',
+        // Reviewed drivers whose deployed phase cannot exist (docs/LANGUAGE_COVERAGE.md, L2+L3).
+        const reviewed = {
+          'tests/lake/examples/ffi/test.sh': ['upstream-disabled', 'test.sh exits 0 before any command ("broken, surfaced by mimalloc update")'],
+          'tests/lake/tests/llvm-bitcode-gen/test.sh': ['upstream-disabled', 'skips itself: the released lean has no LLVM backend'],
+          'tests/lake/examples/reverse-ffi/test.sh': ['unsupported-by-design', 'a native C program links Lean as a shared library; Lasm builds Node applications, not C-callable libraries (L6 FFI decision)'],
+          'tests/lake/tests/externLib/test.sh': ['unsupported-by-design', 'extern_lib C code (my_add) is not compiled into Wasm; native FFI is an L6 decision'],
+        }[result.name];
+        const outcome = reviewed && generic !== 'pass' ? reviewed[0] : { pass: 'pass', 'aot-policy-rejected': 'unsupported-by-design', 'upstream-disabled': 'upstream-disabled',
           'native-failed': 'harness', 'no-deployed-execution': 'harness' }[generic] ?? 'needs-review';
         const deployed = a.compact.commands?.find(command => command.label === 'deployed');
-        tests.push({ harness: shard.harness, name: result.name, outcome, adapterOutcome: generic, seconds: a.seconds,
+        tests.push({ harness: shard.harness, name: result.name, outcome, adapterOutcome: generic, reviewed: reviewed?.[1], seconds: a.seconds,
           peakGiB: gib(a.resources?.peakMemoryBytes), detail: outcome === 'pass' ? undefined
             : (a.compact.commands?.find(command => command.label === (generic === 'native-failed' ? 'native' : 'deployed'))?.stdoutTail ?? '').slice(-2500),
           error: a.compact.error || undefined, deployedCode: deployed?.code });
