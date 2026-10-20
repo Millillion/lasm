@@ -31,12 +31,15 @@ async function compileOriginal(configFile, args) {
   const sdk = await provisionLinkToolchain({});
   assert.equal(sdk.version, runtime.manifest.emscripten);
   mkdirSync(config.work); mkdirSync(config.dist);
-  await linkApplication({ sources: [join(config.sourceDirectory, 'rc_sticky.c')], sdk, runtime,
+  const { applicationPolicy } = await importInstalled(config.compiler, 'application-policy.mjs');
+  const linkRequirements = await linkApplication({ sources: [join(config.sourceDirectory, 'rc_sticky.c')], sdk, runtime,
     work: config.work, dist: config.dist, leanVersion: config.lean,
     memoryMode: 1 });
   copyApplicationHost(config.dist); writeApplicationEntrypoint(config.dist);
   copyFileSync(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(config.dist, 'THIRD_PARTY_NOTICES.txt'));
+  // The launcher re-checks the ahead-of-time policy record, as for CLI builds.
   const build = { scope: 'Unchanged upstream C driver through the installed application object/link pipeline',
+    applicationPolicy, linkRequirements,
     lean: config.lean, leanCommit: config.leanCommit, emscripten: sdk.version, sdkIdentity: sdk.identity,
     linkToolchain: { identity: sdk.identity, ...sdk.toolchain }, runtimeIdentity: runtime.identity,
     sourceSha256: config.sourceSha256, target: config.target,

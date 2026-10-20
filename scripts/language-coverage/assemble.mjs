@@ -108,6 +108,12 @@ const areaRules = [
   ['core data types and control (L2)', () => true],
 ];
 for (const test of tests) test.area = areaRules.find(([, rule]) => rule(test, imports.get(test.name) ?? []))[0];
+// A later directory (a targeted rerun after a harness fix) supersedes earlier
+// results for the same test; the earlier outcome is kept for the record.
+for (let index = tests.length - 1; index >= 0; index--) {
+  const earlier = tests.findIndex(test => test.harness === tests[index].harness && test.name === tests[index].name);
+  if (earlier !== index) { tests[index].supersedes = tests[earlier].outcome; tests.splice(earlier, 1); }
+}
 tests.sort((a, b) => a.harness.localeCompare(b.harness) || a.name.localeCompare(b.name));
 const tally = rows => rows.reduce((c, row) => ({ ...c, [row.outcome]: (c[row.outcome] ?? 0) + 1 }), {});
 const byHarness = Object.fromEntries([...new Set(tests.map(t => t.harness))].map(h => [h, tally(tests.filter(t => t.harness === h))]));
