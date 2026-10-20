@@ -136,7 +136,6 @@ jobs:
       LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
       LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
       LASM_LEAN: ${{ inputs.lean }}
-      LASM_RUNTIME_ADAPTER_REVIEW: scripts/language-coverage/runtime-adapter-l1.json
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:

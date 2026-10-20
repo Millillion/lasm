@@ -22,13 +22,13 @@ const [outputArg, engineArg, compilerArg, referenceArg, name, version = '4.35.0'
 assert.ok(outputArg && engineArg && compilerArg && referenceArg && name && !extra.length,
   'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE REVIEWED_TEST [LEAN_VERSION]');
 const root = fileURLToPath(new URL('..', import.meta.url));
-// The Server MVP review is the default; language-coverage campaigns name the
-// L1 structural review of every candidate (same criteria, wider selection).
-const reviewPath = process.env.LASM_RUNTIME_ADAPTER_REVIEW ?? 'scripts/application-tests/runtime-adapter-reviewed.json';
-assert.ok(['scripts/application-tests/runtime-adapter-reviewed.json', 'scripts/language-coverage/runtime-adapter-l1.json'].includes(reviewPath),
-  'Unknown runtime-adapter review ' + reviewPath);
-const reviewFile = join(root, reviewPath);
-const reviews = JSON.parse(readFileSync(reviewFile));
+// The Server MVP review is used first; the language-coverage L1 structural review
+// (same criteria, every candidate of the release) covers the remaining tests.
+// The resource guard does not forward the environment, so the choice is by name.
+const reviewPath = ['scripts/application-tests/runtime-adapter-reviewed.json', 'scripts/language-coverage/runtime-adapter-l1.json']
+  .find(path => JSON.parse(readFileSync(join(root, path))).releases?.[version]?.tests?.[name])
+  ?? 'scripts/application-tests/runtime-adapter-reviewed.json';
+const reviews = JSON.parse(readFileSync(join(root, reviewPath)));
 assert.equal(reviews.schema, 1);
 const review = reviews.releases?.[version]?.tests?.[name];
 assert.ok(review, `${name} has no runtime-adapter review for Lean ${version}`);
