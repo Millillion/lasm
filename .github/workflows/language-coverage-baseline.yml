@@ -43,16 +43,6 @@ on:
 permissions:
   contents: read
 jobs:
-  input:
-    if: inputs.harness != 'inventory'
-    permissions:
-      contents: write
-      actions: read
-    uses: ./.github/workflows/node-candidate-input.yml
-    with:
-      sha256: ${{ inputs.sha256 }}
-      candidate-release: ${{ inputs.candidate-release }}
-      candidate-version: ${{ inputs.candidate-version }}
   inventory:
     if: inputs.harness == 'inventory' && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -127,7 +117,13 @@ jobs:
             if (!Array.isArray(list) || !list.length || list.some(i => !all.includes(i))) throw new Error("only");
             console.log("shards=" + JSON.stringify(list));' >> "$GITHUB_OUTPUT"
   run:
-    needs: [input, plan]
+    needs: plan
+    # Each shard fetches the exact retained draft candidate itself (draft assets
+    # need contents: write), rather than waiting for the shared cache-writer
+    # group, which a runtime rebuild can hold for hours.
+    permissions:
+      contents: write
+      actions: read
     runs-on: ${{ inputs.runner }}
     timeout-minutes: 330
     strategy:
@@ -150,13 +146,9 @@ jobs:
           node-version: 26.12.0
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
-          key: ${{ needs.input.outputs.cache-key }}
-          enableCrossOsArchive: true
-          fail-on-cache-miss: false
-      - name: Verify authenticated candidate handoff
+      - name: Fetch and verify the exact retained candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: node scripts/ci/fetch-node-candidate.mjs
       - name: Install the exact candidate as an ordinary npm dependency
         run: |
