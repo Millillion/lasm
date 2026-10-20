@@ -7,7 +7,7 @@
 //   node application-upstream-runtime-adapter.mjs NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE REVIEWED_TEST [LEAN_VERSION]
 import assert from 'node:assert/strict';
 import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
-import { resolve, join, dirname, basename, delimiter, relative } from 'node:path';
+import { resolve, join, dirname, basename, delimiter, relative, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { hashFile } from '../src/managed-artifacts.mjs';
@@ -68,8 +68,12 @@ for (const [key, value] of Object.entries(setupVariables)) assert.ok(/^[A-Z_][A-
 // link itself and its target, each verified against the source manifest.
 const originals = [test.source, test.driver, 'tests/elab/run_test.sh', 'tests/util.sh', 'tests/CMakeLists.txt', ...sidecarPaths]
   .filter((path, index, all) => all.indexOf(path) === index);
+// Without symlink privileges Windows tar materializes a link as a copy of its
+// target; accept exactly that copy (the target itself is verified too).
+const linkTarget = path => sources[posix.join(posix.dirname(path), sources[path].symlink)];
 const unchanged = async (base, path) => sources[path].symlink !== undefined
-  ? lstatSync(join(base, path)).isSymbolicLink() && readlinkSync(join(base, path)) === sources[path].symlink
+  ? lstatSync(join(base, path)).isSymbolicLink() ? readlinkSync(join(base, path)) === sources[path].symlink
+    : windows && !!linkTarget(path)?.sha256 && await hashFile(join(base, path)) === linkTarget(path).sha256
   : await hashFile(join(base, path)) === sources[path].sha256;
 for (const path of originals) assert.ok(await unchanged(reference, path), 'Upstream file changed: ' + path);
 const inputs = ['integration/application-upstream-runtime-adapter.mjs', 'scripts/upstream/RuntimeCommandSurvey.lean',
@@ -131,7 +135,8 @@ try {
   const original = join(output, 'original');
   for (const path of originals) {
     mkdirSync(dirname(join(original, path)), { recursive: true });
-    if (sources[path].symlink !== undefined) symlinkSync(sources[path].symlink, join(original, path));
+    if (sources[path].symlink !== undefined && !(windows && !lstatSync(join(reference, path)).isSymbolicLink()))
+      symlinkSync(sources[path].symlink, join(original, path));
     else copyFileSync(join(reference, path), join(original, path));
   }
   const group = dirname(test.driver);
