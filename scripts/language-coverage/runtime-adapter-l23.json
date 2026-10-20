@@ -1,0 +1,154 @@
+{
+ "releases": {
+  "4.35.0": {
+   "tests": {
+    "elab/IO_test.lean": {
+     "sha256": "7af3cfb7c14841935b4c8dd708bac075e93af2ddfe60a8f5a655aa5228d80ec1",
+     "sidecars": [
+      {
+       "path": "tests/elab/IO_test.lean.before.sh",
+       "sha256": "e973725ac6274de9441507bdfe17ce38fdd8be0f1442b9b178146c92fc99efe0",
+       "kind": "setup-cleanup",
+       "remove": [
+        "IO_test.lean.dir"
+       ]
+      }
+     ]
+    },
+    "elab/Reformat.lean": {
+     "sha256": "9444ca194d840d3b53cf8414648a17ddc51052c0b74c276acf80c71f4280f7d2",
+     "sidecars": [
+      {
+       "path": "tests/elab/Reformat.lean.input",
+       "sha256": "a680fcf1e99d14d7950d88c7234a75f99647f0d78a53cf86ee5a5ef0a67d01a4",
+       "kind": "input-file"
+      },
+      {
+       "path": "tests/elab/Reformat.lean.out.expected",
+       "sha256": "fc173c73ce3d5571a9457727038fa8e3a520f1bfad426f60d70262a21613f696",
+       "kind": "expected-output"
+      }
+     ]
+    },
+    "elab/constProp.lean": {
+     "sha256": "e70874597b13be19dfbdf342b5be68523b83d652d751db4c796d888b343c8e1c",
+     "exit": true,
+     "sidecars": [
+      {
+       "path": "tests/elab/constProp.lean.out.expected",
+       "sha256": "95e61eea050e0cc82438c19876d84022d01febda3cd4aed66daed28c1d1bd993",
+       "kind": "expected-output"
+      }
+     ]
+    },
+    "elab/dbgMacros.lean": {
+     "sha256": "96aaa22b962f343a0c34f75bbe7d171626f60ac874f60cdfdfd1a0cde994b844",
+     "sidecars": [
+      {
+       "path": "tests/elab/dbgMacros.lean.init.sh",
+       "sha256": "e084971332dffaf7d86da39ae55575086caf117aaec67ebb6babb7471ccbdd98",
+       "kind": "environment",
+       "variables": {
+        "LEAN_BACKTRACE": "0"
+       }
+      },
+      {
+       "path": "tests/elab/dbgMacros.lean.out.expected",
+       "sha256": "0b79aecf86d3f0a6af26215b93f4d283d0182da3816ee10a4cb4fc908856f836",
+       "kind": "expected-output"
+      }
+     ]
+    },
+    "elab/file_not_found.lean": {
+     "sha256": "e39ee027ab033e04c7cc9e1fd767a6060f8591009ef16a9e1f92abef460bda70",
+     "sidecars": [
+      {
+       "path": "tests/elab/file_not_found.lean.before.sh",
+       "sha256": "88e4ac87c2a20d37e715182ee8124a13c01a2368184f805b2a2a3e2e48848527",
+       "kind": "setup-cleanup",
+       "remove": [
+        "file_not_found.lean.readonly.txt"
+       ]
+      }
+     ]
+    },
+    "elab/getline_crash.lean": {
+     "sha256": "87857f7b21ba48ae21971d30b3290876fce0d02f146e0f389df5b4227aa3eb0c",
+     "sidecars": [
+      {
+       "path": "tests/elab/getline_crash.lean.before.sh",
+       "sha256": "fa9d23615c4f5b106d73857276f642153ea297ad6f2adb9d2f6b04669f02066c",
+       "kind": "setup-cleanup",
+       "remove": [
+        "getline_crash.lean.tmp"
+       ]
+      }
+     ]
+    },
+    "elab/handleLocking.lean": {
+     "sha256": "37526eb884e09ca979373bdf0dbbe0e7919241e5d15c0bfda44f1d4727f030cb",
+     "sidecars": [
+      {
+       "path": "tests/elab/handleLocking.lean.before.sh",
+       "sha256": "b1a047319978f5d0cd504d4cbb01efa1f1770b22530b15524ec3867776cd86da",
+       "kind": "setup-cleanup",
+       "remove": [
+        "handleLocking.lean.lock"
+       ]
+      }
+     ]
+    },
+    "elab/nat_size_limit.lean": {
+     "sha256": "d551329f7c27fbfbf130f48a9418438792d0f39b9ddc0ca183d367fc37e855ae",
+     "sidecars": [
+      {
+       "path": "tests/elab/nat_size_limit.lean.init.sh",
+       "sha256": "717dd05402e9f9ec0bb2ee0ee8dc7a767657841f4419d469fad42b0a3d7054ab",
+       "kind": "environment",
+       "variables": {
+        "LEAN_NAT_MAX_SIZE": "16"
+       }
+      }
+     ]
+    },
+    "elab/readDir.lean": {
+     "sha256": "3c53c048fc0757ade855c390ae56694571bad95008b37581773a0d6032ae0439",
+     "sidecars": [
+      {
+       "path": "tests/elab/readDir.lean.dir/foo",
+       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+       "kind": "input-directory"
+      },
+      {
+       "path": "tests/elab/readDir.lean.out.expected",
+       "sha256": "f5f254497bdb493a02dd519eff36051a7208ec9d1c7cb90e1789c43c5ba53d0d",
+       "kind": "expected-output"
+      }
+     ]
+    },
+    "elab/stdio.lean": {
+     "sha256": "870d9df7affdd8102dba906c5365fdea27912605988f840f1f0c4ca256d0fae2",
+     "sidecars": [
+      {
+       "path": "tests/elab/stdio.lean.before.sh",
+       "sha256": "5837f3543d6985f40e138f9e47ae4fae7e798babc48cf41f674939c25a520834",
+       "kind": "setup-cleanup",
+       "remove": [
+        "stdio.lean.stdout1.txt",
+        "stdio.lean.stdout2.txt"
+       ]
+      },
+      {
+       "path": "tests/elab/stdio.lean.out.expected",
+       "sha256": "4e79aa074a01856f76d7a121941e8b7c936d7531428122b9bf753e3fc8eeabe6",
+       "kind": "expected-output"
+      }
+     ]
+    }
+   },
+   "excluded": {}
+  }
+ },
+ "schema": 1,
+ "review": "Language coverage L2+L3 (2026-10-20). Structural review of the upstream elaboration tests that L1 set aside for their setup sidecars or #exit: exact source and sidecar hashes, each sidecar with a reviewed platform-independent meaning (cleanup, literal environment, input file or directory). The per-run gates of the Server MVP adapter review apply unchanged."
+}

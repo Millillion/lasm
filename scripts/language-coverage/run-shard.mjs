@@ -30,7 +30,8 @@ const projectRuns = {
   'misc_dir/rc_sticky': [['integration/application-upstream-c.mjs']],
 };
 const select = {
-  'runtime-adapter': test => test.execution === 'runtime candidate: parallel adapter',
+  // L2+L3 adds the sidecar and #exit tests L1 set aside (runtime-adapter-l23.json).
+  'runtime-adapter': test => test.execution === 'runtime candidate: parallel adapter' || test.execution.startsWith('separate review'),
   'eval-io': test => test.execution === 'runtime: reviewed eval-io adapter',
   'compiled-application': test => test.category === 'compiled-application',
   docparse: test => test.category === 'compiled-test-driver',
@@ -42,7 +43,8 @@ const select = {
 assert.ok(select, 'Unknown harness ' + harness);
 // Adapter candidates outside the L1 review (symlinked sources) are recorded there as excluded.
 const reviewed = harness === 'runtime-adapter'
-  ? new Set(Object.keys(JSON.parse(readFileSync(join(root, 'scripts/language-coverage/runtime-adapter-l1.json'))).releases[version].tests)) : undefined;
+  ? new Set(['runtime-adapter-l1.json', 'runtime-adapter-l23.json'].flatMap(file =>
+    Object.keys(JSON.parse(readFileSync(join(root, 'scripts/language-coverage', file))).releases[version]?.tests ?? {}))) : undefined;
 // Optional representative subset (cross-platform runs): LASM_L1_NAMES is a JSON array.
 const only = process.env.LASM_L1_NAMES ? new Set(JSON.parse(process.env.LASM_L1_NAMES)) : undefined;
 const names = inventory.tests.filter(select).map(test => test.name).filter(name => !reviewed || reviewed.has(name))

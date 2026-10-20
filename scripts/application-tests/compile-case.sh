@@ -27,7 +27,9 @@ printf 'application-build\n' > "$evidence/phase.txt"
 run_before "$file"
 "$LASM_BUILD_NODE" "$LASM_COMPILER/bin/lasm.mjs" build "$PWD/$file" \
   --output "$evidence/dist"
-"$LASM_BUILD_NODE" "${BASH_SOURCE[0]%/*}/reclaim-case-metadata.mjs" \
+# Git Bash on Windows receives this script as a backslash path.
+harness="${BASH_SOURCE[0]//\\//}"
+"$LASM_BUILD_NODE" "${harness%/*}/reclaim-case-metadata.mjs" \
   "$PWD/$file" "$evidence/dist" "$evidence/module-data-reclamation.json"
 
 printf 'application-runtime\n' > "$evidence/phase.txt"

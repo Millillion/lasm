@@ -1,7 +1,7 @@
 // Prepare an explicit parallel CTest suite for the managed application product.
 // The pinned release's upstream source archive and every test/helper entry are checked.
 import { mkdirSync, readFileSync, writeFileSync, existsSync, lstatSync, readlinkSync, chmodSync } from 'node:fs';
-import { resolve, join, dirname } from 'node:path';
+import { resolve, join, dirname, relative, delimiter, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { hashFile } from '../../src/managed-artifacts.mjs';
@@ -25,12 +25,23 @@ if (await hashFile(archive) !== inventory.sourceArchiveSha256) throw new Error('
 const source = join(output, 'source'), execution = join(output, 'run');
 mkdirSync(source, { recursive: true }); mkdirSync(execution);
 // --wildcards is GNU tar; macOS runners provide it as gtar (bsdtar matches globs natively).
-execFileSync(process.platform === 'darwin' ? 'gtar' : 'tar', ['-xzf', archive, '-C', source, '--strip-components=1', '--wildcards',
-  '*/tests/*', '*/script/*', '*/doc/examples/*', '*/src/*'], { stdio: 'inherit' });
+// Windows: whichever tar is first on PATH (Git's GNU tar under Git Bash, or the
+// system bsdtar). A relative forward-slash archive path keeps GNU tar from reading
+// a drive letter as a remote host.
+const windows = process.platform === 'win32';
+const gnuTar = !windows || /GNU tar/.test(execFileSync('tar', ['--version'], { encoding: 'utf8' }));
+execFileSync(process.platform === 'darwin' ? 'gtar' : 'tar', [
+  '-xzf', windows ? relative(source, archive).replaceAll('\\', '/') : archive, '-C', windows ? '.' : source,
+  '--strip-components=1', ...(gnuTar ? ['--wildcards'] : []),
+  '*/tests/*', '*/script/*', '*/doc/examples/*', '*/src/*'], { stdio: 'inherit', cwd: source });
 let verified = 0;
 for (const [name, expected] of Object.entries(hashes)) {
   const file = join(source, name), info = lstatSync(file);
   if ('symlink' in expected) {
+    // Without symlink privileges Windows tar materializes a link as a copy of its
+    // target; accept exactly that copy (the target itself is verified as well).
+    const target = windows && !info.isSymbolicLink() && hashes[posix.join(posix.dirname(name), expected.symlink)];
+    if (target?.sha256 && info.isFile() && await hashFile(file) === target.sha256) { verified++; continue; }
     if (!info.isSymbolicLink() || readlinkSync(file) !== expected.symlink) throw new Error(`Upstream link changed: ${name}`);
   } else if (!info.isFile() || await hashFile(file) !== expected.sha256) throw new Error(`Upstream file changed: ${name}`);
   verified++;
@@ -65,13 +76,15 @@ if (!projectServer && (category === 'compiled-application' || sharedDriver || st
   // this parallel suite, matching the native driver's explicit PATH selection.
   writeFileSync(pin, `leanprover/lean4:v${version}\n`); generatedPins.push(pin);
 }
+// Windows runs Lean's tools from its short execution prefix (plain, not namespaced).
+const nativePrefix = windows ? lean.executionPrefix ?? lean.prefix : lean.prefix;
 const environment = { TEST_DIR: join(source, 'tests'), SRC_DIR: join(source, 'src'), SCRIPT_DIR: join(source, 'script'),
-  BUILD_DIR: lean.prefix, STAGE: '1', TEST_CTEST: '1',
-  PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(':'),
+  BUILD_DIR: nativePrefix, STAGE: '1', TEST_CTEST: '1',
+  PATH: [join(nativePrefix, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(delimiter),
   LASM_COMPILER: compiler, LASM_BUILD_NODE: process.execPath, LASM_APPLICATION_ENGINE: engine,
   LASM_NATIVE_LEAN: lean.lean, LASM_NATIVE_LAKE: lean.lake,
   LASM_TOOLCHAIN_CACHE: process.env.LASM_TOOLCHAIN_CACHE,
-  LEAN_HEADER_SNAPSHOTS: '0', LEANC_OPTS: '', CXX: join(lean.prefix, 'bin/clang++') };
+  LEAN_HEADER_SNAPSHOTS: '0', LEANC_OPTS: '', CXX: join(nativePrefix, windows ? 'bin/clang++.exe' : 'bin/clang++') };
 const nativeEnvironment = projectServer ? join(root, 'scripts/application-tests/server-project-case.sh')
   : standaloneServer ? join(root, 'scripts/application-tests/server-case.sh') : sharedDriver
   ? join(root, 'scripts/application-tests/docparse-case.sh') : join(output, 'native-environment.sh');

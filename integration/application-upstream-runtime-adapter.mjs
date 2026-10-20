@@ -6,8 +6,8 @@
 // extra deployed API coverage; the original registration stays native-build-time.
 //   node application-upstream-runtime-adapter.mjs NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE REVIEWED_TEST [LEAN_VERSION]
 import assert from 'node:assert/strict';
-import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, renameSync, symlinkSync, writeFileSync } from 'node:fs';
-import { resolve, join, dirname, basename, delimiter } from 'node:path';
+import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { resolve, join, dirname, basename, delimiter, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { hashFile } from '../src/managed-artifacts.mjs';
@@ -27,7 +27,9 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 // The Server MVP review is used first; the language-coverage L1 structural review
 // (same criteria, every candidate of the release) covers the remaining tests.
 // The resource guard does not forward the environment, so the choice is by name.
-const reviewPath = ['scripts/application-tests/runtime-adapter-reviewed.json', 'scripts/language-coverage/runtime-adapter-l1.json']
+// The L2+L3 review adds the sidecar and #exit tests L1 set aside.
+const reviewPath = ['scripts/application-tests/runtime-adapter-reviewed.json', 'scripts/language-coverage/runtime-adapter-l1.json',
+  'scripts/language-coverage/runtime-adapter-l23.json']
   .find(path => JSON.parse(readFileSync(join(root, path))).releases?.[version]?.tests?.[name])
   ?? 'scripts/application-tests/runtime-adapter-reviewed.json';
 const reviews = JSON.parse(readFileSync(join(root, reviewPath)));
@@ -47,11 +49,21 @@ assert.equal(sources[test.source].sha256, review.sha256, 'Upstream source differ
 const sidecarPaths = Object.keys(sources).filter(path => path.startsWith(test.source + '.')).sort();
 assert.deepEqual(sidecarPaths, (review.sidecars ?? []).map(entry => entry.path).sort(), 'Every upstream sidecar needs an explicit review');
 const sidecarKinds = { serial: 'ctest-run-serial', 'out.expected': 'expected-output', 'out.ignored': 'ignored-output' };
+// Setup sidecars (L2+L3 review only): each has a reviewed platform-independent
+// meaning, applied before every parallel phase in that phase's fresh directory.
+const setupKinds = { 'before.sh': 'setup-cleanup', 'init.sh': 'environment', input: 'input-file' };
+const setupReview = reviewPath === 'scripts/language-coverage/runtime-adapter-l23.json';
 for (const entry of review.sidecars ?? []) {
-  assert.equal(sidecarKinds[entry.path.slice(test.source.length + 1)], entry.kind, 'Unsupported sidecar ' + entry.path);
+  const suffix = entry.path.slice(test.source.length + 1);
+  const kind = sidecarKinds[suffix] ?? (setupReview ? setupKinds[suffix] ?? (suffix.startsWith('dir/') ? 'input-directory' : undefined) : undefined);
+  assert.equal(kind, entry.kind, 'Unsupported sidecar ' + entry.path);
   assert.equal(sources[entry.path].sha256, entry.sha256, 'The upstream sidecar changed');
 }
-const wholeOutput = (review.sidecars ?? []).some(entry => entry.kind !== 'ctest-run-serial');
+const outputKinds = new Set(['expected-output', 'ignored-output']);
+const wholeOutput = (review.sidecars ?? []).some(entry => outputKinds.has(entry.kind));
+const setupVariables = Object.assign({}, ...(review.sidecars ?? []).filter(entry => entry.kind === 'environment')
+  .map(entry => entry.variables));
+for (const [key, value] of Object.entries(setupVariables)) assert.ok(/^[A-Z_][A-Z0-9_]*$/.test(key) && typeof value === 'string');
 // elab_bench/run_test.sh is an upstream symlink to elab/run_test.sh: keep the
 // link itself and its target, each verified against the source manifest.
 const originals = [test.source, test.driver, 'tests/elab/run_test.sh', 'tests/util.sh', 'tests/CMakeLists.txt', ...sidecarPaths]
@@ -72,8 +84,23 @@ assert.equal(lean.commit, inventory.leanCommit);
 // Backtraces differ by design between native and Wasm frames; disable them so
 // panic messages, stdout and exit status can be compared exactly.
 const env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '2', LEAN_BACKTRACE: '0' };
+// The test's own init.sh settings apply to its parallel runtime phases.
+const runtimeEnv = { ...env, ...setupVariables };
+const sourceGroup = dirname(test.source);
+const prepareInputs = cwd => {
+  for (const entry of review.sidecars ?? []) {
+    if (entry.kind === 'setup-cleanup') for (const name of entry.remove) rmSync(join(cwd, name), { recursive: true, force: true });
+    if (entry.kind === 'input-file' || entry.kind === 'input-directory') {
+      // The test opens these by their path relative to its own directory.
+      const target = join(cwd, relative(sourceGroup, entry.path));
+      mkdirSync(dirname(target), { recursive: true });
+      copyFileSync(join(reference, entry.path), target);
+    }
+  }
+};
 const report = { scope: 'Original native driver plus separate token-replacing runtime re-checks of its assertions; no full-suite or full API claim',
-  name, version, leanCommit: lean.commit, target: 'node', compiler, engine, inputs: inputHashes,
+  name, version, leanCommit: lean.commit, target: 'node', compiler, engine, inputs: inputHashes, review: reviewPath,
+  setupVariables, exitReviewed: !!review.exit,
   sourceSha256: sources[test.source].sha256, originals, sidecars: review.sidecars ?? [], wholeOutput,
   commands: [], passes: [], passed: false, executionSequential: true, resourceReport: process.env.LASM_RESOURCE_REPORT };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
@@ -107,6 +134,8 @@ try {
   const originalFile = join(original, test.source), project = join(output, 'parallel-project');
   assert.equal(await hashFile(originalFile), report.sourceSha256, 'Original driver must not modify the test');
   mkdirSync(project); writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
+  // Commands restored for build time see the same inputs as in the original directory.
+  prepareInputs(project);
   const surveyTool = join(root, 'scripts/upstream/RuntimeCommandSurvey.lean');
   // A file whose commands only parse after in-file notations/macros are
   // elaborated is surveyed again in the elaboration-aware mode (actions are
@@ -122,7 +151,7 @@ try {
   };
   mkdirSync(join(output, 'survey-cwd'));
   const syntax = survey(originalFile), source = readFileSync(originalFile), main = join(project, 'Main.lean');
-  assert.equal(syntax.exited, false, 'A test with #exit needs a separate review');
+  assert.equal(syntax.exited, !!review.exit, 'A test with #exit needs a separate review');
   // Elaborate natively; move each action whose definition does not elaborate to
   // the next display mode (monadEval, io, pure), finally restoring the original
   // command. Every pass and its diagnostics are recorded.
@@ -134,7 +163,7 @@ try {
     plan = planActions(source, syntax, { wholeOutput, modes: chosen });
     const generated = generateRuntimeSource(source, syntax, plan, name);
     layout = generated; writeFileSync(main, generated.generated);
-    const check = run(`elaborate parallel copy (pass ${pass})`, lean.lean, ['-j1', '-Dlinter.all=false', main], project, env, { check: false });
+    const check = run(`elaborate parallel copy (pass ${pass})`, lean.lean, ['-j1', '-Dlinter.all=false', main], project, runtimeEnv, { check: false });
     const diagnostics = check.stdout + check.stderr;
     const { failing, outside } = actionsWithErrors(diagnostics, generated);
     report.passes.push({ pass, actions: plan.actions.length, failing, outside, code: check.code });
@@ -166,17 +195,18 @@ try {
   save();
   const execute = (label, command, environment, cwd = join(output, label)) => {
     mkdirSync(cwd, { recursive: true });
+    prepareInputs(cwd);
     const observed = run(label, command[0], command.slice(1), cwd, environment, { check: false, timeout: 1_800_000 });
     return { ...observed, actions: actionLines(observed.stdout), completed: (observed.stdout ?? '').includes(layout.marker + '\n') };
   };
-  report.nativeInterpreted = execute('native-interpreted', [lean.lean, '-Dlinter.all=false', '--run', main], env);
-  run('generate native parallel C', lean.lean, ['-j1', '-Dlinter.all=false', '-Dcompiler.postponeCompile=false', '-c', main + '.c', main], project);
+  report.nativeInterpreted = execute('native-interpreted', [lean.lean, '-Dlinter.all=false', '--run', main], runtimeEnv);
+  run('generate native parallel C', lean.lean, ['-j1', '-Dlinter.all=false', '-Dcompiler.postponeCompile=false', '-c', main + '.c', main], project, runtimeEnv);
   const native = join(project, windows ? 'native.exe' : 'native');
   run('compile native parallel program', join(lean.prefix, 'bin', windows ? 'leanc.exe' : 'leanc'), ['-O2', '-DNDEBUG', '-o', native, main + '.c'], project,
     // Windows leanc locates its clang from a plain (not namespaced) sysroot, as scripts/server-mvp/build-robustness.mjs does.
     windows && lean.executionPrefix ? { ...env, LEAN_SYSROOT: lean.executionPrefix } : env);
-  report.nativeCompiled = execute('native-compiled', [native], env);
-  report.nativeCompiledRepeat = execute('native-compiled-repeat', [native], env);
+  report.nativeCompiled = execute('native-compiled', [native], runtimeEnv);
+  report.nativeCompiledRepeat = execute('native-compiled-repeat', [native], runtimeEnv);
   const dist = join(output, 'dist');
   const built = run('installed application build', process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', main, '--output', dist], project, env, { check: false });
   if (built.code !== 0) {
@@ -204,7 +234,7 @@ try {
   // System tools only (tests spawn printenv, cat, sh, ...); no Lean, Lake, Node or
   // build toolchain directory. An empty PATH made every subprocess test fail.
   const systemPath = windows ? join(process.env.SystemRoot ?? 'C:\\Windows', 'System32') : '/usr/bin:/bin';
-  Object.assign(deploymentEnv, { PATH: systemPath, LEAN_NUM_THREADS: '2', LEAN_BACKTRACE: '0' });
+  Object.assign(deploymentEnv, { PATH: systemPath, LEAN_NUM_THREADS: '2', LEAN_BACKTRACE: '0', ...setupVariables });
   report.deployed = execute('deployed', [engine, join(relocated, 'main.mjs')], deploymentEnv);
   assert.equal(await hashFile(join(project + '.hidden', 'Main.lean')), report.parallel.sourceSha256);
   for (const path of originals) assert.ok(await unchanged(original + '.hidden', path), path);

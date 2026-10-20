@@ -183,8 +183,17 @@ ${calls}
   IO.println ${JSON.stringify(marker)}
   return if failed == 0 then 0 else 1
 `;
-  const body = Buffer.concat(chunks);
-  const generated = Buffer.concat([body, Buffer.from(main)]);
+  let body = Buffer.concat(chunks), tail = Buffer.alloc(0);
+  if (survey.exited) {
+    // `#exit` ends elaboration: the entry point goes just before it, and the
+    // unelaborated remainder (never part of the test) stays byte for byte.
+    const exit = survey.commands.at(-1);
+    assert.equal(exit.kind, 'Lean.Parser.Command.exit');
+    assert.ok(plan.actions.every(action => action.stop <= exit.range.start));
+    const at = toGenerated(exit.range.start);
+    tail = body.subarray(at); body = body.subarray(0, at);
+  }
+  const generated = Buffer.concat([body, Buffer.from(main), tail]);
   // Reverse exactly the recorded edits and require the complete original.
   const restored = [];
   let at = 0;

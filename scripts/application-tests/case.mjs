@@ -1,7 +1,7 @@
 // One CTest case. Results and output fingerprints survive removal of large,
 // successful temporary binaries. Failed artifacts stay available for diagnosis.
 import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, copyFileSync } from 'node:fs';
-import { resolve, join, dirname, basename } from 'node:path';
+import { resolve, join, dirname, basename, delimiter } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { hashFile } from '../../src/managed-artifacts.mjs';
@@ -19,13 +19,15 @@ const source = join(manifest.source, test.source), cwd = dirname(source);
 const env = { ...process.env, ...manifest.environment, LASM_APPLICATION_CASE: evidence };
 delete env.LASM_APPLICATION_RUNTIME;
 for (const name of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(name)) delete env[name];
-Object.assign(env, { LEAN_NUM_THREADS: '2', LEAN_SRC_PATH: join(manifest.source, 'src') + ':' + join(manifest.source, 'src/lake') });
+Object.assign(env, { LEAN_NUM_THREADS: '2', LEAN_SRC_PATH: join(manifest.source, 'src') + delimiter + join(manifest.source, 'src/lake') });
+// Windows runs the unchanged shell drivers with Git Bash from PATH.
+const bash = process.platform === 'win32' ? 'bash' : '/bin/bash';
 const before = await hashFile(source);
 if (before !== test.sha256) throw new Error('Upstream source changed before this test');
 const startedAt = new Date().toISOString();
 const command = test.category === 'compiled-application'
-  ? ['/bin/bash', manifest.compileDriver, basename(source), evidence]
-  : ['/bin/bash', manifest.nativeEnvironment, join(manifest.source, test.driver), basename(source)];
+  ? [bash, manifest.compileDriver, basename(source), evidence]
+  : [bash, manifest.nativeEnvironment, join(manifest.source, test.driver), basename(source)];
 const execution = spawnSync(command[0], command.slice(1), { cwd, env, stdio: 'inherit', timeout: manifest.timeoutSeconds * 1000 });
 const result = { name: test.name, category: test.category, command, startedAt, finishedAt: new Date().toISOString(),
   exitCode: execution.status, signal: execution.signal, error: execution.error?.message,
