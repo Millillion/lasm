@@ -105,6 +105,7 @@ jobs:
             .work/survey-cache.jsonl
             .work/inventory-resources-*.json
           retention-days: 7
+          include-hidden-files: true
           if-no-files-found: warn
   plan:
     if: inputs.harness != 'inventory' && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
@@ -191,4 +192,5 @@ jobs:
             .work/l1-shard/shard.json
             .work/l1-shard/compact
           retention-days: 7
+          include-hidden-files: true
           if-no-files-found: warn

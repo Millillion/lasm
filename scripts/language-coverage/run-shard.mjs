@@ -29,7 +29,11 @@ const select = {
   'lsp-project': test => test.name === 'misc_dir/server_project',
 }[harness];
 assert.ok(select, 'Unknown harness ' + harness);
-const names = inventory.tests.filter(select).map(test => test.name).sort().filter((_, position) => position % count === index);
+// Adapter candidates outside the L1 review (symlinked sources) are recorded there as excluded.
+const reviewed = harness === 'runtime-adapter'
+  ? new Set(Object.keys(JSON.parse(readFileSync(join(root, 'scripts/language-coverage/runtime-adapter-l1.json'))).releases[version].tests)) : undefined;
+const names = inventory.tests.filter(select).map(test => test.name).filter(name => !reviewed || reviewed.has(name)).sort()
+  .filter((_, position) => position % count === index);
 assert.ok(names.length, 'Empty shard');
 mkdirSync(join(output, 'compact'), { recursive: true }); mkdirSync(join(output, 'resources'));
 const node = process.execPath, safe = name => name.replace(/[^A-Za-z0-9._-]+/g, '__');

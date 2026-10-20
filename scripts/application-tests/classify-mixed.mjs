@@ -83,9 +83,26 @@ for (const name of nativeOther) add(name, 'native-build-time',
 for (const [name, rationale] of Object.entries(runtimeOther)) add(name, 'native-and-compiled-application', rationale);
 add('pkg/user_plugin', 'native-and-foreign-application',
   'Retain native --plugin controls; run the unchanged Lean.loadPlugin clients with compatible deployed dynamic libraries and initialization symbols.');
-if (version === '4.34.1') add('misc_dir/rc_sticky', 'native-and-foreign-application',
+if (['4.34.1', '4.35.0'].includes(version)) add('misc_dir/rc_sticky', 'native-and-foreign-application',
   'Run the unchanged C reference-count regression against the matching native and deployed Lean runtimes. Preserve every assertion and original leanc flags; native success alone does not cover the Wasm runtime.');
 
+if (version === '4.35.0') {
+  // Registrations added in 4.35.0 (language coverage L1 review, 2026-10-20).
+  for (const name of `builtin-lint-package-check challenge-bad-config challenge-def-hole-axiom-issue
+      challenge-def-hole-kind-mismatch challenge-def-hole-type-mismatch challenge-def-hole
+      challenge-inadvisably-no-sandbox challenge-no-sandbox challenge-numeric-namespace challenge-olean-issue
+      challenge-opaque-value challenge-primitive-issue challenge-simple-axiom-issue challenge-simple-kind-mismatch
+      challenge-simple-match challenge-simple-mismatch check-audit-reject check-audit check-from-export
+      check-inadvisably-no-sandbox check-multi check-paranoid check-sorry comparator-from-export copyDep failFast`.split(/\s+/))
+    add(`tests/lake/tests/${name}/test.sh`, 'native-build-time',
+      'Lake lint, check, challenge/comparator (Linux-namespace sandbox), dependency copy or scheduling behavior executes in the managed native build toolchain.');
+  add('tests/lake/tests/linkLake/test.sh', 'native-and-compiled-application',
+    'Run the main executable that links the Lake library (and, through it, LeanExport) and prints its "Lake " version line.');
+  for (const name of ['pkg/code_quality_log', 'pkg/find_matching_decl']) add(name, 'native-build-time',
+    'Original package build, linter or elaboration behavior executes in the managed native build toolchain.');
+  for (const name of ['pkg/con-leche', 'pkg/con-ron', 'pkg/lean4lean', 'pkg/nanoda']) add(name, 'native-build-time',
+    'External kernel checker fed by the native leanexport tool; the unchanged script skips unless that third-party checker is installed.');
+}
 const tests = inventory.tests.filter(test => test.category === 'mixed-driver-review-required');
 assert.equal(tests.length, inventory.categories['mixed-driver-review-required']);
 assert.equal(decisions.size, tests.length);
