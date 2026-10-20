@@ -20,7 +20,9 @@ const audit = JSON.parse(readFileSync(join(runtime, 'standard-library-audit.json
 assert.equal(input.leanCommit, audit.leanCommit);
 const progress = JSON.parse(readFileSync(join(runtime, 'progress.json')));
 assert.equal(progress.status, 'complete');
-assert.deepEqual([...progress.groups].sort(), ['Init', 'Lake', 'Lean', 'Std'], 'Package only a complete standard-library build');
+// Lean 4.35 added the LeanExport library (imported by Lake and by applications).
+const groups = Number(input.lean.split('.')[1]) >= 35 ? ['Init', 'Std', 'Lean', 'LeanExport', 'Lake'] : ['Init', 'Std', 'Lean', 'Lake'];
+assert.deepEqual([...progress.groups].sort(), [...groups].sort(), 'Package only a complete standard-library build');
 const { build, nativePrefix } = input;
 const sdk = await maintainerSdk({ managed: input.sdkMode === 'managed', directory: input.sdk, cache: input.sdkToolCache });
 if (input.sdkMode === 'managed') {
@@ -31,7 +33,7 @@ const run = (program, args, settings = {}) => execFileSync(program, args, { cwd:
 const name = `lean-${input.lean}-wasm64`, target = join(output, name), work = join(output, 'build');
 mkdirSync(join(target, 'lib'), { recursive: true }); mkdirSync(work);
 cpSync(join(build, 'include/lean'), join(target, 'include/lean'), { recursive: true, verbatimSymlinks: true });
-const libraries = ['Init', 'Std', 'Lean', 'Lake', 'leancpp', 'leanrt', 'lasmhost', 'gmp'];
+const libraries = [...groups, 'leancpp', 'leanrt', 'lasmhost', 'gmp'];
 for (const library of libraries) copyFileSync(join(build, `lib/lean/lib${library}.a`), join(target, `lib/lib${library}.a`));
 copyFileSync(join(build, 'libuv/src/libuv/libuv.a'), join(target, 'lib/libuv.a'));
 const exportsFile = join(target, 'exports.json'), registry = join(work, 'lean-symbols.c');

@@ -29,8 +29,13 @@ const cache = resolve(option('--tool-cache', '.cache/product-baseline/managed-le
 if (args.includes('--managed-sdk') && args.includes('--sdk')) throw new Error('Choose managed SDK or an explicit emsdk tree');
 const sdk = await maintainerSdk({ managed: args.includes('--managed-sdk'), directory: option('--sdk'), cache });
 const archive = resolve(option('--source-archive', `.cache/downloads/lean4-v${version}.tar.gz`));
-const groups = option('--libraries', 'Init,Std,Lean,Lake').split(',');
-if (!groups.length || groups.some(group => !['Init', 'Std', 'Lean', 'Lake'].includes(group))) throw new Error('Invalid library selection');
+// The Lean libraries of upstream's lakefile that applications can import. Lean 4.35
+// added LeanExport (`globs = ["LeanExport.*"]`: its root and submodules), which Lake
+// also imports. LakeMain, LeanIR, Leanc and LeanChecker are tool entry points with
+// their own `main`, not application libraries.
+const libraryGroups = Number(version.split('.')[1]) >= 35 ? ['Init', 'Std', 'Lean', 'LeanExport', 'Lake'] : ['Init', 'Std', 'Lean', 'Lake'];
+const groups = option('--libraries', libraryGroups.join(',')).split(',');
+if (!groups.length || groups.some(group => !libraryGroups.includes(group))) throw new Error('Invalid library selection');
 const sourceHash = release.sha256;
 const expectedCommit = release.commit;
 if (await hashFile(archive) !== sourceHash) throw new Error(`Lean ${version} source archive checksum mismatch`);
@@ -180,5 +185,7 @@ for (const group of groups) {
   renameSync(library + '.partial', library);
 }
 writeFileSync(join(output, 'standard-library-audit.json'), JSON.stringify({ ...provenance, compileIdentity, modules: audit }, null, 2) + '\n');
+// A group-subset run (CI builds Init,Std then Lean, then everything) is complete
+// only for its own groups; packaging checks the final run's groups.
 writeFileSync(join(output, 'progress.json'), JSON.stringify({ status: 'complete', completed: audit.length, groups }) + '\n');
 console.log(JSON.stringify({ output, libraries: groups, modules: audit.length }));
