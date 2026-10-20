@@ -44,17 +44,23 @@ const cleanupCurrent = () => {
   try { return current(); }
   catch (error) { (evidence.cleanupMonitorErrors ??= []).push(error.message); return null; }
 };
+// macOS kill(2) on a process group whose leader has exited (a zombie) can fail
+// with EPERM. That used to crash the guard after a resource stop and leave its
+// lock behind, failing every later workload on the runner (EEXIST). Record it and
+// continue: the sampled per-process kills below still reach the members.
+const signalled = (pid, signal) => {
+  try { process.kill(pid, signal); }
+  catch (error) {
+    if (error.code === 'EPERM') (evidence.killPermissionErrors ??= []).push({ pid, signal });
+    else if (error.code !== 'ESRCH') throw error;
+  }
+};
 function terminate(signal) {
   if (!child?.pid) return;
-  try { process.kill(-child.pid, signal); } catch (error) { if (error.code !== 'ESRCH') throw error; }
+  signalled(-child.pid, signal);
   const remaining = cleanupCurrent();
-  if (!remaining) {
-    try { process.kill(-child.pid, 'SIGKILL'); } catch (error) { if (error.code !== 'ESRCH') throw error; }
-    return;
-  }
-  for (const p of remaining) if (p.group !== child.pid) {
-    try { process.kill(p.pid, signal); } catch (error) { if (error.code !== 'ESRCH') throw error; }
-  }
+  if (!remaining) { signalled(-child.pid, 'SIGKILL'); return; }
+  for (const p of remaining) if (p.group !== child.pid) signalled(p.pid, signal);
 }
 function stop(reason) {
   if (stopping) return;
