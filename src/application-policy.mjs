@@ -1,7 +1,7 @@
 // This is a release support boundary, not a sandbox for adversarial Wasm/JS.
 export const applicationPolicy = Object.freeze({ schema: 1, mode: 'ahead-of-time' });
 
-export function requireAotApplication(requirements) {
+export function requireAotApplication(requirements, { explanation = [] } = {}) {
   if (!requirements || !['static', 'dynamic'].includes(requirements.mode)
       || typeof requirements.requiresModuleData !== 'boolean'
       || ['dynamic', 'cxxRuntime', 'moduleData'].some(key => !Array.isArray(requirements[key])
@@ -14,7 +14,9 @@ export function requireAotApplication(requirements) {
   if (requirements.mode !== 'static' || requirements.requiresModuleData || reasons.length) {
     const error = new Error('Lasm does not support runtime Lean compilation, evaluation, module-data access, or plugin loading in deployed applications.'
       + (reasons.length ? '\nDetected ' + reasons.join('; ') + '.' : '')
-      + '\nMove this operation to build time or remove the dependency. Ordinary imports, tactics, macros and deriving during compilation remain supported. No deployment was produced.');
+      + explanation.map(line => '\n' + line).join('')
+      + '\nMove this operation to build time or remove the dependency. Ordinary imports, tactics, macros and deriving during compilation remain supported. No deployment was produced.'
+      + '\nSee "Lean support and restrictions" in the Lasm README.');
     error.code = 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE';
     throw error;
   }

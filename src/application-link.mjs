@@ -4,10 +4,12 @@
 import { writeFile } from 'node:fs/promises';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { readApplicationSymbols, readInitializationFreeCppSymbols } from './application-symbols.mjs';
 import { readApplicationLinkRequirements, reachabilityRegistry, canSpecializeInitialization, selectiveInitialization } from './application-reachability.mjs';
 import { requireAotApplication } from './application-policy.mjs';
+import { archiveMembers, explainRejection, parseWhyExtract, undefinedSymbols } from './application-diagnosis.mjs';
 import { executableName, responseFile } from './platform.mjs';
 import { bundledRecipe, checkToolchainIdentity, compileObject, emscriptenCache } from './link-driver/compile.mjs';
 import { bundledNativeSigs, linkTemporaryDirectory, linkWithNode, removeTemporary } from './link-driver/link.mjs';
@@ -54,6 +56,17 @@ export function selectedLinkDriver(value = process.env.LASM_LINK_DRIVER) {
   if (value === undefined || value === '') return defaultLinkDriver;
   if (linkDrivers.includes(value)) return value;
   throw new Error(`Unsupported LASM_LINK_DRIVER ${JSON.stringify(value)}`);
+}
+
+/** Diagnostics for a rejected probe link; never masks the rejection itself. */
+function rejectionExplanation({ requirements, whyExtractFile, objects, runtime, nm }) {
+  try {
+    const nmText = args => execFileSync(nm, args, { encoding: 'utf8', maxBuffer: 1024 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+    const members = runtime.manifest.libraries.filter(name => !/lib(?:lasmsymbols|gmp)\.a$/.test(name))
+      .flatMap(name => archiveMembers(join(runtime.directory, name), nmText([join(runtime.directory, name)])));
+    return explainRejection({ rows: parseWhyExtract(readFileSync(whyExtractFile, 'utf8')), userObjects: objects, requirements,
+      members, userSymbols: undefinedSymbols(nmText(['--undefined-only', ...objects])) });
+  } catch { return []; }
 }
 
 export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
@@ -128,7 +141,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   const applicationPrelude = join(work, 'application-pre.js');
   await writeFile(applicationPrelude, `Module.lasmLeanVersion = ${JSON.stringify(leanVersion)};\n`);
   const preJs = [join(root, 'scripts/full-lean/emscripten-pre.js'), applicationPrelude, join(root, 'scripts/full-lean/host-pre.js')];
-  const mapFile = join(work, 'reachability.map');
+  const mapFile = join(work, 'reachability.map'), whyExtractFile = join(work, 'why-extract.txt');
   // The checked loader transformations use LF templates. Emscripten otherwise
   // defaults to host line endings, making identical Windows output look like
   // semantic drift. Ask the pinned driver to emit the same format everywhere.
@@ -146,14 +159,19 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // Classify the live graph before expensive optimization. In particular, a
   // runtime evaluator must not optimize the full compiler twice.
   await writeFile(argumentsFile, responseFile([...objects, probeObject, ...initializationInputs,
-    '-O0', '-Wl,-Map=' + mapFile, ...link]));
+    '-O0', '-Wl,-Map=' + mapFile, '-Wl,--why-extract=' + whyExtractFile, ...link]));
   progress?.({ stage: 'Checking required runtime code' });
   runLink('probe', ['@' + argumentsFile]);
   const requirements = await readApplicationLinkRequirements(mapFile, analysis);
   requirements.specializedInitialization = specializeInitialization && requirements.mode === 'static';
   // Fail during the build, before a full-runtime link or module-data packaging.
   // The executable under analysis is temporary and is never delivered.
-  requireAotApplication(requirements);
+  try { requireAotApplication(requirements); }
+  catch (error) {
+    if (error.code !== 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE') throw error;
+    requireAotApplication(requirements, { explanation: rejectionExplanation({ requirements, whyExtractFile, objects, runtime,
+      nm: join(sdk.prefix, 'bin', executableName('llvm-nm')) }) });
+  }
   {
     // The lookup marker is dead. Omit its object from the final link so no
     // delivered executable contains a null implementation of dynamic lookup.
