@@ -123,8 +123,13 @@ export function applicationSources(source, lean, work, { log = console.error, gi
     const platform = lean.platform?.split('-')[0] ?? process.platform;
     const lakePlugin = platform === 'win32' ? join(lean.executionPrefix ?? lean.prefix, 'bin', 'libLake_shared.dll')
       : join(lean.prefix, 'lib/lean', `libLake_shared.${platform === 'darwin' ? 'dylib' : 'so'}`);
-    const entry = JSON.parse(run(lean.lean, ['-j1', '-s8192', '--plugin=' + lakePlugin, '--run',
-      fileURLToPath(new URL('./lake-module.lean', import.meta.url)), configuredSource], project));
+    const adapter = (...args) => JSON.parse(run(lean.lean, ['-j1', '-s8192', '--plugin=' + lakePlugin, '--run',
+      fileURLToPath(new URL('./lake-module.lean', import.meta.url)), ...args], project).split(/\r?\n/).filter(Boolean).pop());
+    const entry = adapter(configuredSource);
+    // Packages with C code (extern_lib, precompiled modules, extra link objects)
+    // need Lean's own C compiler, headers and libraries: the complete release.
+    if (Array.isArray(entry?.native) && entry.native.length && lean.distribution === 'tiers')
+      return { needsFullLean: true, native: entry.native };
     const configured = typeof entry?.module === 'string' && entry.module.startsWith('/+');
     if (!configured && (!entry || !Array.isArray(entry.imports) || entry.imports.some(name => typeof name !== 'string')))
       throw new Error('Unexpected Lake module identity');
@@ -138,12 +143,22 @@ export function applicationSources(source, lean, work, { log = console.error, gi
       targets.push(...modules.map(name => '+' + name), target);
     }
     const sources = [], inputs = [];
-    for (const target of new Set(targets)) {
-      log(`Generating Lean C: ${target}`);
-      const file = query(target + ':c');
-      if (typeof file !== 'string') throw new Error(`Lake returned no C file for ${target}`);
-      sources.push(resolve(project, file));
-      inputs.push({ module: target, source: resolve(project, query(target + ':lean')) });
+    // One Lake query per batch of modules prints one JSON result per line, in order
+    // (a separate Lake process per module dominated large dependency graphs).
+    const queryAll = facets => run(lean.lake, ['--no-cache', '--keep-toolchain', '--quiet', '--json', 'query', ...facets], project)
+      .split(/\r?\n/).filter(Boolean).map(line => JSON.parse(line));
+    const unique = [...new Set(targets)];
+    for (let start = 0; start < unique.length; start += 64) {
+      const batch = unique.slice(start, start + 64);
+      for (const target of batch) log(`Generating Lean C: ${target}`);
+      const results = queryAll(batch.flatMap(target => [target + ':c', target + ':lean']));
+      if (results.length !== 2 * batch.length) throw new Error('Unexpected Lake query output');
+      batch.forEach((target, index) => {
+        const [file, lean] = results.slice(2 * index, 2 * index + 2);
+        if (typeof file !== 'string' || typeof lean !== 'string') throw new Error(`Lake returned no C file for ${target}`);
+        sources.push(resolve(project, file));
+        inputs.push({ module: target, source: resolve(project, lean) });
+      });
     }
     if (!configured) {
       const file = join(work, 'script.c');
@@ -155,7 +170,14 @@ export function applicationSources(source, lean, work, { log = console.error, gi
         '--', '-j1', '-s8192', '-Dcompiler.postponeCompile=false', '-c', file], project);
       sources.push(file); inputs.push({ module: relative(project, source).replaceAll('\\', '/'), source });
     }
-    return { project, sources, inputs, env, metadataRoots: entry.metadataRoots.map(path => resolve(project, path)) };
+    // The C code Lake would link into a native executable, built natively first.
+    let nativeLink;
+    if (Array.isArray(entry.native) && entry.native.length) {
+      log('Building native link inputs');
+      nativeLink = adapter('--link', configuredSource);
+    }
+    return { project, sources, inputs, env, metadataRoots: entry.metadataRoots.map(path => resolve(project, path)),
+      native: entry.native ?? [], nativeLink };
   }
   // Standalone source trees use Lean's own import parser. Standard libraries
   // are already in the versioned bundle; local imports are compiled in order.

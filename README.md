@@ -159,6 +159,26 @@ build. On Windows a project whose delivered `dist\program.wasm` path would excee
 characters still fails to build. Per-platform results:
 [language coverage](https://github.com/Millillion/lasm/blob/main/docs/LANGUAGE_COVERAGE.md).
 
+**Lake packages (current source, Phase 3 in progress, not yet in a candidate):**
+
+- Modules imported only for compilation (tactics, elaborators, attributes, for
+  example Aesop, Qq or `import Lean` for macros) no longer keep Lean's compiler
+  in the deployment. Lasm runs a module's initializers only when the program uses
+  something they define, when they register state the program uses, or when they
+  are the program's own code doing console, file, process or environment IO or
+  calling C. Other initialization side effects of unused modules (for example a
+  library printing while it initializes) do not happen, as with Lean's own
+  `meta import`. `--verbose` shows how many initializers were skipped.
+- C source that a package bundles (`extern_lib`, `moreLinkObjs`, for example
+  leansqlite's SQLite) is compiled for Node with Lasm's compiler. Such projects use
+  the complete Lean release (a one-time download of about 600 MB instead of the
+  tiers), and Lake still builds the C natively first, so `buildO`/`compileO`
+  targets that use the default compiler need a C compiler named `cc` on `PATH`,
+  as natively. C code that calls `dlopen` gets an implementation that always fails.
+- Prebuilt native libraries (shared libraries or `-l` link options, for example
+  libcurl, OpenSSL, libpq, hiredis, BLAS) cannot be linked; the build stops and
+  names the library and the package that needs it.
+
 The deployed application cannot use the following capabilities:
 
 | Unavailable at runtime | Examples and exact boundary |

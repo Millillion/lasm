@@ -145,7 +145,7 @@ export function expandArguments(template, values, platform = process.platform) {
 
 /** tools/link.py: run one link mode. Returns { wasm, js, map } paths. */
 export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediates, nativeSigs, execute = execFileSync,
-  stdio = ['ignore', 'pipe', 'inherit'], timeout = 1800_000, platform = process.platform, warn }) {
+  stdio = ['ignore', 'pipe', 'inherit'], timeout = 1800_000, platform = process.platform, warn, mapOnly = false }) {
   // emcc's diagnostics reach the user only when its stderr does (Lasm --verbose).
   warn ??= stdio[2] === 'inherit' ? message => process.stderr.write(`emcc: warning: ${message}\n`) : () => {};
   const spec = recipe.link.modes[mode];
@@ -197,6 +197,8 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
     writeFileSync(responseFile, emscriptenResponseFile(linkArgs, platform));
     run(linkStep.program, ['@' + responseFile]);
   } else run(linkStep.program, linkArgs);
+  // Planning probes (src/application-initialization.mjs) need only wasm-ld's map.
+  if (mapOnly) return;
 
   // finalize_wasm: strip sections, extract metadata, wasm-emscripten-finalize.
   saveFile('base.wasm', wasm);

@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile, stat, rename, rm, copyFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { planNativeInputs } from './application-native.mjs';
 import { join, resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
@@ -54,7 +55,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   progress?.({ stage: `Checking Lean ${selection.version} runtime` });
   const runtime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit }, { directory: runtimeDirectory });
   if (!progress) log(`Preparing Lean ${selection.version} for Node…`);
-  const lean = await provisionLean(source, { cache, log, progress });
+  let lean = await provisionLean(source, { cache, log, progress });
   // The default Node link driver uses the minimal link toolchain. The emcc and
   // node-compile maintainer drivers (LASM_LINK_DRIVER) need the full SDK and its
   // private Python, which ordinary builds never download.
@@ -67,7 +68,15 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const work = join(directory, '.lake/lasm/applications', digest(source).slice(0, 16));
   await mkdir(work, { recursive: true });
   progress?.({ stage: project ? 'Checking Lean sources and Lake dependencies' : 'Checking Lean sources and imports' });
-  const generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
+  let generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
+  if (generated.needsFullLean) {
+    // Lake packages with C code build it natively with Lean's own compiler, as Lake does.
+    progress?.({ stage: `Packages with C code (${generated.native.map(item => item.package).join(', ')}) need the complete Lean ${lean.version} release` });
+    lean = await provisionLean(source, { cache, log, progress, distribution: 'full' });
+    generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
+  }
+  const nativeCompilations = generated.nativeLink
+    ? planNativeInputs(generated.nativeLink, { leanPrefix: lean.prefix, runtimeInclude: join(runtime.directory, 'include') }) : [];
   progress?.({ stage: 'Checking application inputs and cached build' });
   const modules = [];
   for (let i = 0; i < generated.sources.length; i++) modules.push({
@@ -87,7 +96,9 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
     applicationPolicy,
     target: 'node', host: `${process.platform}-${process.arch}`, node: applicationSupport()?.node,
-    minimumGlibc: applicationSupport()?.minimumGlibc, memoryMode, modules };
+    minimumGlibc: applicationSupport()?.minimumGlibc, memoryMode, modules,
+    ...(nativeCompilations.length ? { nativeObjects: nativeCompilations.map(item => ({ object: item.object, identity: item.identity,
+      sourceSha256: createHash('sha256').update(readFileSync(item.source)).digest('hex'), args: item.extraArgs })) } : {}) };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
   if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)
@@ -108,11 +119,11 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   let linkRequirements;
   try {
     linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
-      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver });
+      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), nativeCompilations });
   } catch (error) {
     // This unique staging directory contains only this failed build's files.
     // Preserve any previously delivered application and avoid retaining probes.
-    await rm(temporary, { recursive: true, force: true });
+    if (!process.env.LASM_KEEP_LINK_WORK) await rm(temporary, { recursive: true, force: true });
     throw error;
   }
   progress?.({ stage: 'Packaging the application and runtime support' });
@@ -135,6 +146,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   }
   progress?.({ stage: 'Verifying and writing application output' });
   await deliverOutput(cached, output, signature);
-  await rm(temporary, { recursive: true, force: true });
+  // Maintainer diagnostics only: LASM_KEEP_LINK_WORK keeps the link probes and maps.
+  if (!process.env.LASM_KEEP_LINK_WORK) await rm(temporary, { recursive: true, force: true });
   return { ...buildInfo, output, cached, signature, cacheHit: false };
 }
