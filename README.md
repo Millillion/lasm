@@ -64,7 +64,10 @@ An existing Lake project can use local imports normally. To pin Lean, put
 `leanprover/lean4:v4.34.1` (candidate `.46`) or `leanprover/lean4:v4.35.0` (current
 source) in its `lean-toolchain` file. A package supports exactly one Lean release;
 other versions are rejected with `Unsupported Lean toolchain … Supported managed
-versions: …` and the pin is left unchanged. Broad third-party package compatibility is not yet verified.
+versions: …` and the pin is left unchanged. Current source has a per-package
+[compatibility list](https://github.com/Millillion/lasm/blob/main/docs/COMPATIBILITY.md) (Batteries, Cli, LSpec,
+Plausible, Aesop, Qq, leansqlite, UnicodeBasic, MD4Lean, lean-zip, lean4-parser, lean-redis,
+Millillion/fetch and others); packages not on it are untested.
 After an authorized npm release, installation will be `npm install @lasm/cli`
 (or `npx @lasm/cli Main.lean` without installing); the bin stays `lasm`. That
 registry command is **not available yet**. Current source, not yet in a candidate,
@@ -138,8 +141,8 @@ runtime restrictions as handwritten code. Import names are not banned, but
 initializers count as runtime dependencies: a broad `import Lean` can retain the
 compiler. Use ordinary Lean `meta import Lean` when it is needed only by macros or
 tactics in a module; use narrower imports for runtime data libraries.
-For example, `import Lean` with `Lean.Json.compress` is rejected, while
-`import Lean.Data.Json` builds and runs. **Current source** (not yet in a
+For example, accepted candidates reject `import Lean` with `Lean.Json.compress`,
+while `import Lean.Data.Json` builds and runs (current source accepts both; see below). **Current source** (not yet in a
 candidate) explains each rejection: it prints the chain from your code to the
 compiler code and, when a broad import is the cause, the narrower modules your code
 uses (here `import Lean.Data.Json.Basic` and `import Lean.Data.Json.Printer`).
@@ -160,11 +163,13 @@ build. On Windows a project whose delivered `dist\program.wasm` path would excee
 characters still fails to build. Per-platform results:
 [language coverage](https://github.com/Millillion/lasm/blob/main/docs/LANGUAGE_COVERAGE.md).
 
-**Lake packages (current source, Phase 3 in progress, not yet in a candidate):**
+**Lake packages (current source, Phase 3; candidate `.39652848544` passed installed acceptance):**
 
 - Modules imported only for compilation (tactics, elaborators, attributes, for
   example Aesop, Qq or `import Lean` for macros) no longer keep Lean's compiler
-  in the deployment. Lasm runs a module's initializers only when the program uses
+  in the deployment. In particular `import Lean` with `Lean.Json` (and `deriving
+  ToJson, FromJson`) now builds and runs; runtime elaboration and evaluation stay
+  unavailable. Lasm runs a module's initializers only when the program uses
   something they define, when they register state the program uses, or when they
   are the program's own code doing console, file, process or environment IO or
   calling C. Other initialization side effects of unused modules (for example a
@@ -181,6 +186,9 @@ characters still fails to build. Per-platform results:
   code needs one, the build stops and names the library and the package that
   declares it; a library used only during compilation (a tactic's solver) is
   left out.
+- Outbound HTTP: [Millillion/fetch](https://github.com/Millillion/fetch) (`import Fetch`)
+  uses Node's `fetch` under Lasm and libcurl or the `curl` tool natively. Programs that
+  run the `curl` command with `IO.Process` keep working where curl is installed.
 
 The deployed application cannot use the following capabilities:
 

@@ -93,18 +93,24 @@ async function startModuleServer() {
 try {
   // Native oracle: Lake resolves and builds exactly as for a native user.
   if (config.native !== 'skip') {
-    const update = await run(lake, ['update'], { env, bounded: true, report: join(dirname(out), `${name}-native-update-resources.json`) });
+    // Mathlib's post-update hook unpacks its cache: unguarded in CI like its build (Tier C).
+    const update = await run(lake, ['update'], { env: prepareEnv, bounded: !config.nativeUnbounded,
+      report: join(dirname(out), `${name}-native-update-resources.json`) });
     let prepared = update;
     for (const [index, step] of prepare.entries()) if (prepared.status === 0)
       // Downloads and unpacking (Mathlib's cache) run outside the build guard.
       prepared = await run(step[0] === 'lake' ? lake : step[0], step.slice(1), { env: prepareEnv, bounded: !!step.bounded, timeout: 7_200_000,
         report: join(dirname(out), `${name}-native-prepare-${index}-resources.json`) });
     // Tier C: Mathlib's build unpacks its cache beyond the desktop guard's budget (CI only).
-    const build = prepared.status === 0 ? await run(lake, ['build', config.exe], { env, bounded: !config.nativeUnbounded, timeout: 14_400_000,
+    // `elaborate`: only the program's modules are built natively (a package whose native
+    // executable link needs manual setup, while the Lasm deployment does not).
+    const build = prepared.status === 0 ? await run(lake, ['build', ...(config.native === 'elaborate' ? ['Main'] : [config.exe])], { env, bounded: !config.nativeUnbounded, timeout: 14_400_000,
       report: join(dirname(out), `${name}-native-build-resources.json`) }) : prepared;
     result.native = { buildSeconds: build.seconds, buildStatus: build.status };
     if (build.status !== 0) { result.native.log = tail(build.stdout + build.stderr); result.result = 'native-fail'; save(); process.exit(0); }
     await startModuleServer();
+  }
+  if (config.native !== 'skip' && config.native !== 'elaborate') {
     // Module data the build needs (Tier C measures Mathlib's).
     result.native.oleanBytes = readdirSync(join(work, '.lake'), { recursive: true }).reduce((total, file) => {
       if (!/\.olean(?:\.private|\.server)?$/.test(file)) return total;
@@ -155,7 +161,8 @@ try {
   }
   if (new Set(result.lasm.runs.map(item => `${item.exit} ${item.stdoutSha256}`)).size > 1) result.lasm.inconsistent = true;
   Object.assign(result.lasm, { exit: executed.status, stdout: executed.stdout, stderrTail: tail(executed.stderr, 10), runSeconds: executed.seconds });
-  if (config.native === 'skip') result.result = config.expect?.lasm === 'build-error' ? 'lasm-built-unexpectedly' : (executed.status === 0 ? 'pass' : 'lasm-run-fail');
+  if (config.native === 'elaborate') result.result = executed.status === 0 && !result.lasm.inconsistent && executed.stdout === config.expectStdout ? 'pass' : 'lasm-run-fail';
+  else if (config.native === 'skip') result.result = config.expect?.lasm === 'build-error' ? 'lasm-built-unexpectedly' : (executed.status === 0 ? 'pass' : 'lasm-run-fail');
   else if (!result.lasm.inconsistent && executed.status === result.native.exit
     && (config.compare === 'exit' ? executed.status === 0 : executed.stdout === result.native.stdout))
     result.result = 'pass';
