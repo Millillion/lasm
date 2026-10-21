@@ -146,12 +146,18 @@ Current source also links Lean 4.35's `LeanExport` library (candidates fail with
 undefined `initialize_LeanExport_…` symbol). Its parser, `LeanExport.parseStream`,
 builds `Lean.Expr` values, whose constructors call Lean's C++ kernel, so programs
 using it are still rejected.
-Two further current-source fixes await a candidate (the first through the re-pinned
-runtime `7aa5028c…`): deployed programs honor `LEAN_ABORT_ON_NONLINEAR=1` as native Lean does
-(candidates ignore it and silently copy a shared `markLinear` value), and on macOS
-and Windows a standalone source directory containing a file such as `init.lean`
-or `std.lean` no longer hides the standard `Init`/`Std` libraries (candidates fail
-with `Cyclic Lean module imports …/Init.lean`).
+Current source also fixes the following (in candidate `.39500947696`, which passed
+installed acceptance; its cold-installation gate is pending; accepted candidates
+behave as described in parentheses): deployed programs honor `LEAN_ABORT_ON_NONLINEAR=1`
+as native Lean does (ignored); on macOS and Windows a standalone source directory
+containing a file such as `init.lean` or `std.lean` no longer hides the standard
+`Init`/`Std` libraries (`Cyclic Lean module imports …/Init.lean`); on Windows,
+`IO.Process.spawn` with piped stdin/stdout/stderr works (fails with "bad file
+descriptor"), DNS lookups and `Std.Net.interfaceAddresses` work (fail),
+handle misuse reports the same error as native Lean, and projects in deep directories
+build. On Windows a project whose delivered `dist\program.wasm` path would exceed 260
+characters still fails to build. Per-platform results:
+[language coverage](https://github.com/Millillion/lasm/blob/main/docs/LANGUAGE_COVERAGE.md).
 
 The deployed application cannot use the following capabilities:
 

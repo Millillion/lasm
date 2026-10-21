@@ -88,6 +88,12 @@ for (const shard of shards) {
   }
   for (const result of shard.results) {
     if (shard.harness === 'projects') {
+      const stopped = result.attempts.find(a => a.resources?.resourceLimited || a.code === 125);
+      if (stopped) {
+        tests.push({ harness: shard.harness, name: result.name, outcome: 'resource-stop', reason: stopped.resources?.stoppedBecause,
+          peakGiB: gib(stopped.resources?.peakMemoryBytes), seconds: stopped.seconds });
+        continue;
+      }
       // L2+L3 generic Lake-driver adapter: its summary names one outcome.
       const generic = result.attempts.length === 1 && result.attempts[0].compact?.summary
         && Object.keys(result.attempts[0].compact.summary)[0];

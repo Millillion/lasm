@@ -1,0 +1,78 @@
+{
+ "schema": 1,
+ "recordedAt": "2026-10-20",
+ "lean": "4.35.0",
+ "runtimeRebuild": {
+  "run": "https://github.com/Millillion/lasm/actions/runs/39437915868",
+  "release": "node-runtime-inputs-39437915868",
+  "handoffSha256": "e00eaaa32c59bf0f22de0bf674dc90e3ac77334bb9eed6080ca23a5c3909c121",
+  "runtimeIdentity": "7aa5028c6226405b322961b289f955043824a49c997bec3f3e262647c045557c",
+  "comparedWith": "d1b1394ce2df4f9af2624cbd9bcca2162ee051da6be60ec38b08119c33fbd981",
+  "changedFiles": [
+   "runtime/lib/libleanrt.a",
+   "runtime/target.json",
+   "provenance.json",
+   "native/signals/darwin-arm64.dylib",
+   "native/signals/darwin-x64.dylib",
+   "native/signals/manifest.json"
+  ],
+  "byteIdentical": "every Init/Std/Lean/LeanExport/Lake/libleancpp/liblasmhost/liblasmsymbols archive, headers and exports.json after a cold standard-library rebuild",
+  "darwinSignalHelpers": "83 and 19 differing bytes (UUID/code-signature region); they also differed in L1's rebuild and their source is unchanged",
+  "libleanrtMembersChanged": [
+   "object.cpp.o"
+  ],
+  "functionsChanged": [
+   "lean_copy_expand_array_nonlinear",
+   "lean_copy_sarray_nonlinear",
+   "lean_copy_string_nonlinear",
+   "lean_string_utf8_set"
+  ],
+  "initializationReview": "initialize_object/finalize_object and every other function differ only by data offsets of added strings"
+ },
+ "nonlinearTests": {
+  "scope": "Linux x64 local, candidate .39310029213 overlaid with the rebuilt runtime and source fixes",
+  "results": [
+   {
+    "name": "compile/array_mark_linear_panic.lean",
+    "status": "passed"
+   },
+   {
+    "name": "compile/hashmap_mark_linear_panic.lean",
+    "status": "passed"
+   },
+   {
+    "name": "compile/sarray_mark_linear_grow_panic.lean",
+    "status": "passed"
+   },
+   {
+    "name": "compile/sarray_mark_linear_panic.lean",
+    "status": "passed"
+   },
+   {
+    "name": "compile/string_mark_linear_panic.lean",
+    "status": "passed"
+   },
+   {
+    "name": "compile/vector_mark_linear_panic.lean",
+    "status": "passed"
+   },
+   {
+    "name": "compile/vector_propagate_mark_panic.lean",
+    "status": "passed"
+   }
+  ]
+ },
+ "probes": {
+  "spawn-stdin (windows-2025, candidate .39310029213)": "https://github.com/Millillion/lasm/actions/runs/39457072715",
+  "windows-pipe (ucrtbase descriptor EBADF; handle reopened in Node CRT works)": "https://github.com/Millillion/lasm/actions/runs/39457965597",
+  "handle-errors native (windows-2025): read write-only otherError 0; write read-only and getLine EBADF": "https://github.com/Millillion/lasm/actions/runs/39459435026",
+  "handle-errors candidate .39458561103 matches native": "https://github.com/Millillion/lasm/actions/runs/39468463470",
+  "ws2-binding: InetPtonA absent, inet_pton and InetPtonW bind": "https://github.com/Millillion/lasm/actions/runs/39487324874"
+ },
+ "windowsControls": "https://github.com/Millillion/lasm/actions/runs/39458558848",
+ "acceptance": {
+  "0.1.0-experimental.39458561103": "https://github.com/Millillion/lasm/actions/runs/39458561103 (passed)",
+  "0.1.0-experimental.39489327335": "https://github.com/Millillion/lasm/actions/runs/39489327335 (passed)",
+  "0.1.0-experimental.39500947696": "https://github.com/Millillion/lasm/actions/runs/39500947696 (passed after a rerun of the windows-x64 isolation control, which first failed with a Python spawnSync ETIMEDOUT as in run 39456602931)"
+ }
+}

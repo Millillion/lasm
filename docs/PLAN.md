@@ -392,6 +392,9 @@ complete (docs/LANGUAGE_COVERAGE.md). Next, still stopping for review after each
    targets (setup-script sidecars, Lake-project drivers, compiled-application
    harness on macOS and Windows). Exit: zero Lasm-caused failures outside
    Lean-as-a-library on all five targets, plus a candidate gate.
+   Results (2026-10-20, awaiting review): [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#l2l3-merged-core-and-io-completion-2026-10-20);
+   zero Lasm-caused failures on all five targets with candidate `.39500947696`;
+   its cold-installation gate selection is prepared but not yet committed or run.
 2. **L6 ecosystem** (moved before L5): top Reservoir packages, FFI and outbound
    HTTP decisions.
 3. **L5 Lean as a runtime library, scoped to what real packages need**; the
