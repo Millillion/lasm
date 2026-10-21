@@ -7,7 +7,8 @@ the actual order; older evidence and code comments use the original labels
 
 ## Phase 2: core and I/O completion (2026-10-20)
 
-**Status: complete, awaiting review.** Order and exit criteria: [PLAN.md, option C](PLAN.md#language-coverage-phases-approved-2026-10-19).
+**Status: complete, gate passed, awaiting review.** Exit criteria: [PLAN.md](PLAN.md#language-coverage-phases-approved-2026-10-19).
+Candidate gate passed 2026-10-21: three back-to-back cold-installation confidence runs ([39537968104](https://github.com/Millillion/lasm/actions/runs/39537968104), [39537979004](https://github.com/Millillion/lasm/actions/runs/39537979004), [39537992042](https://github.com/Millillion/lasm/actions/runs/39537992042)) on candidate `0.1.0-experimental.39500947696` all succeeded; every platform reports at least 4 consecutive clean cold installs.
 Evidence: [five-platform results](evidence/lean-4.35.0-language-coverage-l23-2026-10-20.json),
 [fixes and probes](evidence/lean-4.35.0-language-coverage-l23-fixes-2026-10-20.json).
 Candidates (runtime `7aa5028c…`, each passing five-platform installed acceptance):

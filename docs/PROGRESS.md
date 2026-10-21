@@ -1,3 +1,5 @@
+**Language coverage Phase 2: core and I/O completion (2026-10-21), awaiting review.** Zero Lasm-caused failures outside Lean-as-a-library on all five targets with candidate `.39500947696`; 8 bugs fixed; the three-run cold-installation gate passed. Details: [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md). Next: review stop, then Phase 3 (ecosystem).
+
 **Language coverage Phase 1 (formerly L1): baseline and quick fixes (2026-10-20), reviewed.**
 `LeanExport` is packaged in the Wasm runtime (re-pinned in source, `bd390b6`) and
 ahead-of-time rejections now print the dependency chain and the narrow imports to

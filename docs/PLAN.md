@@ -376,7 +376,8 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   failures outside Lean-as-a-library on all five targets, plus a candidate gate.
   Results (2026-10-20, awaiting review): [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#phase-2-core-and-io-completion-2026-10-20);
   zero Lasm-caused failures on all five targets with candidate `.39500947696`;
-  its cold-installation gate is running.
+  its cold-installation gate passed 2026-10-21 (runs 39537968104,
+  39537979004, 39537992042).
 - **Phase 3 — Ecosystem (was L6, moved before Lean-as-a-library):** top
   Reservoir packages (Batteries, Qq, CLI/parser libraries, compile-time
   tactics; Mathlib as a measured experiment); native FFI by compiling a
