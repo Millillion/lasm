@@ -20,7 +20,8 @@ async function fixture(t, { install = 'optional', packageVersion = '1.0.0-lasm.1
   const source = join(base, 'source');
   await mkdir(join(source, 'tool/bin'), { recursive: true });
   await writeFile(join(source, 'tool/bin/lean'), 'compiler fixture');
-  await createTar({ cwd: source, file: join(base, 'tool.tar'), portable: true }, ['tool']);
+  // A fixed mtime keeps every fixture's archive identical (equal sizes when a test damages one byte).
+  await createTar({ cwd: source, file: join(base, 'tool.tar'), portable: true, mtime: new Date(0) }, ['tool']);
   const bytes = zstdCompressSync(await readFile(join(base, 'tool.tar')));
   const artifact = { name: 'tool-1', root: 'tool', url: 'https://example.invalid/tool-1.tar.zst', sha256: hash(bytes),
     bytes: bytes.length, format: 'tar.zst', maximumExtractedBytes: 1_000_000 };
