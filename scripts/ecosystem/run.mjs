@@ -62,9 +62,11 @@ function run(command, args, { cwd = work, timeout = 3_600_000, env = process.env
     child.on('close', (status, signal) => { clearTimeout(timer); resolvePromise({ status, signal, stdout, stderr, seconds: (Date.now() - started) / 1000 }); });
   });
 }
-const tail = (text, lines = 25) => text.split(/\r?\n/).slice(-lines).join('\n');
+const tail = (text, lines = 60) => text.split(/\r?\n/).slice(-lines).join('\n');
 const env = { ...process.env, PATH: [join(native, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(delimiter) };
 const lasmEnv = { ...process.env };
+// Prepare steps (dependency builds) run without the project settings below.
+const prepareEnv = { ...env };
 // Project settings a native user also needs (for example where a tactic's shared library is).
 for (const [key, value] of Object.entries(config.env ?? {})) env[key] = lasmEnv[key] = value.replaceAll('${work}', work);
 for (const item of extraEnv) { const at = item.indexOf('='); env[item.slice(0, at)] = lasmEnv[item.slice(0, at)] = item.slice(at + 1); }
@@ -95,9 +97,10 @@ try {
     let prepared = update;
     for (const [index, step] of prepare.entries()) if (prepared.status === 0)
       // Downloads and unpacking (Mathlib's cache) run outside the build guard.
-      prepared = await run(step[0] === 'lake' ? lake : step[0], step.slice(1), { env, bounded: false, timeout: 7_200_000,
+      prepared = await run(step[0] === 'lake' ? lake : step[0], step.slice(1), { env: prepareEnv, bounded: !!step.bounded, timeout: 7_200_000,
         report: join(dirname(out), `${name}-native-prepare-${index}-resources.json`) });
-    const build = prepared.status === 0 ? await run(lake, ['build', config.exe], { env, bounded: true, timeout: 14_400_000,
+    // Tier C: Mathlib's build unpacks its cache beyond the desktop guard's budget (CI only).
+    const build = prepared.status === 0 ? await run(lake, ['build', config.exe], { env, bounded: !config.nativeUnbounded, timeout: 14_400_000,
       report: join(dirname(out), `${name}-native-build-resources.json`) }) : prepared;
     result.native = { buildSeconds: build.seconds, buildStatus: build.status };
     if (build.status !== 0) { result.native.log = tail(build.stdout + build.stderr); result.result = 'native-fail'; save(); process.exit(0); }

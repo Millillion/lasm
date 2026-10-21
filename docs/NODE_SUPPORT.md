@@ -91,6 +91,15 @@ writable local filesystem with executable files and OS lock support; network
 filesystems and no-exec mounts are unsupported. See the
 [hardening settings and verification status](https://github.com/Millillion/lasm/blob/main/docs/INSTALLATION_HARDENING.md).
 
+**Lake packages with C code (current source, Phase 3):** a project whose packages
+use `extern_lib`, `precompileModules`, `moreLinkObjs`, `moreLinkLibs` or
+`moreLinkArgs` provisions the complete Lean release for the host (about 560–590 MB
+compressed, instead of the tiers) because Lake builds that C natively with Lean's
+own compiler, headers and libraries before Lasm recompiles it for Wasm. Targets that
+use Lake's default compiler (`buildO`, `compileO`) also need a C compiler named `cc`
+on `PATH`, exactly as with native Lean (the tested Ubuntu, macOS and Windows runners
+provide one). Per-package results: [COMPATIBILITY.md](COMPATIBILITY.md).
+
 **Known limitation (Lean 4.35.0 Lake):** Lake now fetches Git dependencies with a
 tree-filtered `git fetch`. Against a Git server that only offers "dumb" HTTP
 (static files, no `git http-backend`), Git then fetches missing objects one at a

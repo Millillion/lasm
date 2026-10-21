@@ -1,1 +1,1 @@
-{ "exe": "app", "tier": "C", "prepare": [["lake", "exe", "cache", "get"]], "lasmTimeoutSeconds": 14400 }
+{ "exe": "app", "tier": "C", "prepare": [["lake", "exe", "cache", "get"]], "nativeUnbounded": true, "lasmTimeoutSeconds": 14400 }
