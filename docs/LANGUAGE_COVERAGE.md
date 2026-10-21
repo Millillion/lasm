@@ -1,9 +1,11 @@
 # Language coverage
 
 Scope and phase gates: [PLAN.md, "Language coverage phases, approved 2026-10-19"](PLAN.md#language-coverage-phases-approved-2026-10-19).
-Each phase ends with a review stop.
+Each phase ends with a review stop. Phases were renumbered on 2026-10-20 to match
+the actual order; older evidence and code comments use the original labels
+(L1 = Phase 1, L2/L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6).
 
-## L2+L3 merged: core and I/O completion (2026-10-20)
+## Phase 2: core and I/O completion (2026-10-20)
 
 **Status: complete, awaiting review.** Order and exit criteria: [PLAN.md, option C](PLAN.md#language-coverage-phases-approved-2026-10-19).
 Evidence: [five-platform results](evidence/lean-4.35.0-language-coverage-l23-2026-10-20.json),
@@ -23,13 +25,13 @@ tests; the upstream registrations remain native build-time tests.
 
 | Fix | Cause | Evidence |
 | --- | --- | --- |
-| `LEAN_ABORT_ON_NONLINEAR` honored (`076f9e5`, runtime `7aa5028c…`) | L1's diagnosis was wrong: the C runtime already sees the environment (Emscripten `NODE_HOST_ENV`; `LEAN_ABORT_ON_PANIC` aborts as native). Lean 4.35 added `should_abort_on_nonlinearity()` behind `#ifdef LEAN_EMSCRIPTEN return false`, which the 4.32-era `thread-runtime` patch could not cover. New patch `lean-4.35.0-nonlinear-environment.patch`. | 7 `*_mark_linear_panic` apps pass on all five targets. The cold rebuild (run 39437915868) left every library archive byte-identical; only `object.cpp.o` in `libleanrt.a` changed, in exactly the four nonlinear functions, so the reviewed selective initialization still applies. |
+| `LEAN_ABORT_ON_NONLINEAR` honored (`076f9e5`, runtime `7aa5028c…`) | Phase 1's diagnosis was wrong: the C runtime already sees the environment (Emscripten `NODE_HOST_ENV`; `LEAN_ABORT_ON_PANIC` aborts as native). Lean 4.35 added `should_abort_on_nonlinearity()` behind `#ifdef LEAN_EMSCRIPTEN return false`, which the 4.32-era `thread-runtime` patch could not cover. New patch `lean-4.35.0-nonlinear-environment.patch`. | 7 `*_mark_linear_panic` apps pass on all five targets. The cold rebuild (run 39437915868) left every library archive byte-identical; only `object.cpp.o` in `libleanrt.a` changed, in exactly the four nonlinear functions, so the reviewed selective initialization still applies. |
 | Exact-case standard roots (`076f9e5`) | `lean --src-deps` searches the source directory first; on case-insensitive macOS/Windows volumes `init.lean` answered for `Init` (`Cyclic Lean module imports …/Init.lean`). Lasm now applies Linux's exact-case rule on every OS. | 85 `tests/compile` builds per macOS target and on Windows now pass; `test/application-paths.test.mjs` runs on Linux, macOS and Windows. |
 | Windows CRT errno (`a0cf255`) | koffi's `errno()` does not report ucrtbase's errno: a write to a read-only handle gave `otherError 0`, native gives EBADF. Lasm now reads ucrtbase `_errno()` on the calling thread. | Probe `handle-errors` (runs 39459435026, 39468463470): native and Lasm identical for read, write and `getLine` misuse. |
 | Windows piped `IO.Process.spawn` (`cdcfd05`) | Every piped spawn failed with EBADF: Node resolved the ucrtbase `_pipe` descriptor in its own CRT. The child end is now duplicated into Node's CRT through node.exe's `uv_open_osfhandle`. | Probes `spawn-stdin`, `windows-pipe` (runs 39457072715, 39457965597); `test/node-process-pipes.test.mjs`; `pkg/float`, `elab/Process` on Windows. |
 | Windows deep project paths (`cdcfd05`, `0c89de9`) | Node's `mkdtemp`, unlike its other fs calls, does not add the long-path prefix (ENAMETOOLONG in `packageOverrides`); then Binaryen, which opens files with 260-character (MAX_PATH) paths, failed on a 278-character link scratch file. Scratch files now live in the system temporary directory. **Remaining limit:** a project whose delivered `dist\program.wasm` path exceeds 260 characters still fails on Windows. | Windows `packageOverrides` passes. |
 | Windows DNS (`d41aa03`) | `ws2_32.dll` exports `inet_pton`; `InetPtonA` is a header macro, so every DNS operation failed on Windows. | Probe `ws2-binding`; `elab/async_dns`, `elab/networkInterfaces` on Windows. |
-| C `main(void)` entry (`d41aa03`) | Since L1's LeanExport re-pin, `libLeanExport.a` contains upstream's tool root `main`; a C program with `main(void)` resolved its exported `main` there and pulled the compiler (`misc_dir/rc_sticky` rejected). Lasm now defines `__main_argc_argv` as Emscripten's libc does. Lean programs are unaffected. | `rc_sticky` passes on all five targets. |
+| C `main(void)` entry (`d41aa03`) | Since Phase 1's LeanExport re-pin, `libLeanExport.a` contains upstream's tool root `main`; a C program with `main(void)` resolved its exported `main` there and pulled the compiler (`misc_dir/rc_sticky` rejected). Lasm now defines `__main_argc_argv` as Emscripten's libc does. Lean programs are unaffected. | `rc_sticky` passes on all five targets. |
 
 ### Harness completion (maintainer side)
 
@@ -39,11 +41,11 @@ tests; the upstream registrations remain native build-time tests.
   removal of literal names, `init.sh` literal environment, input files/directories; a
   `#exit` test gets its entry point before the `#exit`. No script is interpreted beyond
   that grammar; the original driver still runs the unchanged scripts with Bash first.
-- **Differential actions**: L1 counted a bare `#eval` as passed when it did not throw. Its
+- **Differential actions**: Phase 1 counted a bare `#eval` as passed when it did not throw. Its
   displayed value is its assertion, so it now passes only when the deployed value equals
-  native's. This is why L1 reported `elab/Process.lean` passing on Windows although every
+  native's. This is why Phase 1 reported `elab/Process.lean` passing on Windows although every
   piped spawn failed there (its output showed `error: … bad file descriptor`).
-- **Lake-project drivers (all 33 with a deployed phase, including the 26 L1 could not run)**:
+- **Lake-project drivers (all 33 with a deployed phase, including the 26 Phase 1 could not run)**:
   [`application-upstream-lake-drivers.mjs`](../integration/application-upstream-lake-drivers.mjs)
   runs each unchanged driver twice in verified copies. In the deployed copy a `lake` stand-in
   ([`lake-shim.mjs`](../scripts/language-coverage/lake-shim.mjs)) keeps every native command,
@@ -67,7 +69,7 @@ tests; the upstream registrations remain native build-time tests.
 Adapter = runtime adapter for `#eval`/`#guard`/`#guard_msgs` (Linux: all 535 reviewed tests;
 other platforms: the 321 outside Lean-as-a-library); apps = compiled applications (118);
 projects = mixed Lake/package drivers with a deployed phase (33). docparse 202 and LSP 158
-inputs (Linux only) are rejected by the AOT policy, as in L1 (Lean-as-a-library, L5).
+inputs (Linux only) are rejected by the AOT policy, as in Phase 1 (Lean-as-a-library, Phase 4).
 
 | Platform | Adapter: pass (+harness excl.) / build-time / AOT / harness / resource | eval-io | Apps: pass / disabled / AOT | Projects: pass / disabled / by design / harness / resource | Lasm-caused |
 | --- | --- | --- | --- | --- | ---: |
@@ -77,7 +79,7 @@ inputs (Linux only) are rejected by the AOT policy, as in L1 (Lean-as-a-library,
 | darwin-x64 | 285 (+8) / 10 / 0 / 18 / 0 | 22/22 | 104 / 4 / 10 | 23 / 2 / 8 / 0 / 0 | **0** |
 | win32-x64 | 284 (+8) / 10 / 0 / 19 / 0 | 22/22 | 104 / 4 / 10 | 21 / 2 / 8 / 2 / 0 | **0** |
 
-Against L1: the 7 nonlinear apps now pass everywhere; macOS went from 24 to 104 app passes
+Against Phase 1: the 7 nonlinear apps now pass everywhere; macOS went from 24 to 104 app passes
 (`init.lean` shadowing); Windows apps ran for the first time (104 pass); the 26 unmapped
 Lake drivers run (projects 6 → 23 passes); the 10 sidecar/`#exit` tests run on all five (8 pass; `nat_size_limit` build-time only, `Reformat` harness).
 
@@ -86,28 +88,28 @@ Lake drivers run (projects 6 → 23 passes); the 10 sidecar/`#exit` tests run on
 | Class | Tests (where) | Notes |
 | --- | --- | --- |
 | Lasm-caused | **0** on every platform outside Lean-as-a-library | Seven Lasm bugs were found and fixed during the phase (table above). |
-| Unsupported by design: AOT policy (L5) | Linux adapter 50, apps 10 everywhere, docparse 202, LSP 158; projects `frontend`, `user_attr_app`, `user_plugin`, `exe_private_lean_import`, `linkLake`, `toml` | Runtime environment/compiler or kernel C++ data; `toml` and `linkLake` reach it through Lake's modules. |
-| Unsupported by design: native FFI (L6 decision) | `externLib`, `reverse-ffi` | `extern_lib` C code is not compiled to Wasm (currently a raw `undefined symbol` link error); a C host embedding Lean is not a Lasm product. |
-| Build-time only | Linux adapter 146 (9–10 elsewhere, from the non-L5 selection) | No action elaborates as a runtime `IO` action. |
+| Unsupported by design: AOT policy (Phase 4) | Linux adapter 50, apps 10 everywhere, docparse 202, LSP 158; projects `frontend`, `user_attr_app`, `user_plugin`, `exe_private_lean_import`, `linkLake`, `toml` | Runtime environment/compiler or kernel C++ data; `toml` and `linkLake` reach it through Lake's modules. |
+| Unsupported by design: native FFI (Phase 3 decision) | `externLib`, `reverse-ffi` | `extern_lib` C code is not compiled to Wasm (currently a raw `undefined symbol` link error); a C host embedding Lean is not a Lasm product. |
+| Build-time only | Linux adapter 146 (9–10 elsewhere, from the selection outside Phase 4) | No action elaborates as a runtime `IO` action. |
 | Upstream disabled | apps 4 (`compile_disabled`), projects `lake/examples/ffi` (exits 0 before any command), `llvm-bitcode-gen` (no LLVM backend in the release) | Unchanged upstream gates. |
-| Harness | adapter 18–19 per platform, 31 on Linux (incl. L5 tests) | Native adapter not faithful (`lex`, `15427`, `trace_synth`, …), test defines `main` or needs `src/` (`Reformat`, `parsePrelude`, …), native interpreter stops (`intrinsicVerification`, `issue3770`), displayed value varies between native runs (`646` timing, `currentDir`, `evalInit`, `ioRandomBytes`, Windows `realPath`), deployment has no `lean` on PATH (`Process` action 7). None is a Lasm result. |
+| Harness | adapter 18–19 per platform, 31 on Linux (incl. Phase 4 tests) | Native adapter not faithful (`lex`, `15427`, `trace_synth`, …), test defines `main` or needs `src/` (`Reformat`, `parsePrelude`, …), native interpreter stops (`intrinsicVerification`, `issue3770`), displayed value varies between native runs (`646` timing, `currentDir`, `evalInit`, `ioRandomBytes`, Windows `realPath`), deployment has no `lean` on PATH (`Process` action 7). None is a Lasm result. |
 | Harness, OS-inherent (Windows) | projects `cacheTransfer`, `driver` | Lake itself runs these executables (CURL mock, test/lint drivers) with CreateProcess, which cannot run a script launcher; their native phases pass. On the other four platforms they pass. |
 | Resource stop (darwin-arm64 runner) | eval-io 9 (`async_http_*`, `async_tcp_*`, `async_udp_sockets`, `tempfile`), adapter `nat_size_limit`, projects `frontend` | The guard's proactive stop on the 7 GiB macos-15 runner is 2.80 GiB; these builds peak near 3 GiB. All pass on darwin-x64 (or are AOT/build-time elsewhere). Limits unchanged. |
 | Upstream flake | 0 | Every native repeat agreed in status; differing displayed values are counted as harness above. |
 
 ### Notes for later phases
 
-- L6: native FFI (`extern_lib` C code, `reverse-ffi`, plugins) fails today with a raw linker
+- Phase 3: native FFI (`extern_lib` C code, `reverse-ffi`, plugins) fails today with a raw linker
   error (`undefined symbol: my_add`); the FFI decision should also produce a clear message.
-- L6/L5: `lake/tests/toml` (460 TOML checks) and `linkLake` are rejected only because Lake's
-  modules reach the C++ environment; good first L5 targets.
+- Phase 3/Phase 4: `lake/tests/toml` (460 TOML checks) and `linkLake` are rejected only because Lake's
+  modules reach the C++ environment; good first Phase 4 targets.
 - Lasm strips `LEAN_*` from its managed build environment, so a build-time setting such as
   `LEAN_NAT_MAX_SIZE` (`elab/nat_size_limit`) does not reach elaboration; native Lean honors it.
 
-## L1: baseline and quick fixes (2026-10-20)
+## Phase 1: baseline and quick fixes (2026-10-20)
 
-**Status: complete, reviewed (option C).** Correction from L2+L3: the environment
-failures below were not caused by an unseeded `ENV`; see the L2+L3 fix table. Evidence:
+**Status: complete, reviewed (option C).** Correction from Phase 2: the environment
+failures below were not caused by an unseeded `ENV`; see the Phase 2 fix table. Evidence:
 [inventory](evidence/lean-4.35.0-language-coverage-inventory.json),
 [baseline](evidence/lean-4.35.0-language-coverage-baseline-2026-10-20.json),
 [4.35.0 mixed-driver review](evidence/lean-4.35.0-mixed-driver-classification.json).
@@ -141,7 +143,7 @@ registrations stay native build-time tests and none of this is an upstream suite
    With it, a `LeanExport.Json` program builds and prints exactly native's output.
    `leanExportParse` itself is then rejected by the ahead-of-time policy, not by the
    linker: `LeanExport.parseStream` builds `Lean.Expr`/`Level` values whose
-   constructors call C++ `lean_expr_mk_data`/`lean_level_mk_data` (an L5 item).
+   constructors call C++ `lean_expr_mk_data`/`lean_level_mk_data` (a Phase 4 item).
 2. **Rejections explain themselves** (source `7d5a8b0`). The probe link records
    `wasm-ld --why-extract`; on a rejection only, Lasm resolves each member exactly
    (by defined/undefined symbols, since many members share a basename like
@@ -178,7 +180,7 @@ registrations stay native build-time tests and none of this is an upstream suite
   the shared docparse and LSP client drivers (202 + 158) and the per-project
   adapters for 7 mixed registrations. Native interpreted, native compiled and a
   native repeat run first; the deployment then runs relocated with sources hidden.
-- **Harness fixes made during L1** (maintainer side): deployed adapter runs get
+- **Harness fixes made during Phase 1** (maintainer side): deployed adapter runs get
   `/usr/bin:/bin` instead of an empty `PATH` (subprocess tests); the adapter picks its
   review by test name (the guard does not forward the environment); the
   per-project adapters accept Lean 4.35.0 and the full native Lean; the `rc_sticky`
@@ -210,14 +212,14 @@ before any input runs (their native drivers passed in the 4.34.1 campaign).
 
 | Area | Tests | Native ok | Lasm pass | AOT policy | Lasm bug | Build-time only¹ | Harness | Actions native → Lasm |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| Core data types and control (L2) | 279 | 257 | 251 | 0 | 6 | 6 | 12 + 4 disabled | 1,356 → 1,356 |
-| Numerics / Float (L2) | 55 | 51 | 51 | 0 | 0 | 2 | 2 | 440 → 440 |
-| Strings / Unicode (L2) | 22 | 22 | 21 | 0 | 1 | 0 | 0 | 328 → 328 |
-| IO.FS (L3) | 9 | 9 | 9 | 0 | 0 | 0 | 0 | 39 → 39 |
-| Processes, signals, terminal (L3) | 5 | 4 | 4 | 0 | 0 | 1 | 0 | 14 → 14 |
-| Concurrency (L4) | 26 | 26 | 26 | 0 | 0 | 0 | 0 | 108 → 108 |
+| Core data types and control (Phase 2) | 279 | 257 | 251 | 0 | 6 | 6 | 12 + 4 disabled | 1,356 → 1,356 |
+| Numerics / Float (Phase 2) | 55 | 51 | 51 | 0 | 0 | 2 | 2 | 440 → 440 |
+| Strings / Unicode (Phase 2) | 22 | 22 | 21 | 0 | 1 | 0 | 0 | 328 → 328 |
+| IO.FS (Phase 2) | 9 | 9 | 9 | 0 | 0 | 0 | 0 | 39 → 39 |
+| Processes, signals, terminal (Phase 2) | 5 | 4 | 4 | 0 | 0 | 1 | 0 | 14 → 14 |
+| Concurrency (Phase 5) | 26 | 26 | 26 | 0 | 0 | 0 | 0 | 108 → 108 |
 | Server, network, time | 51 | 51 | 51 | 0 | 0 | 0 | 0 | 1,095 → 1,095 |
-| Lean as a library (L5) | 585 | 436 | 15 | 420 | 1 | 136 | 13 | 517 → 223 |
+| Lean as a library (Phase 4) | 585 | 436 | 15 | 420 | 1 | 136 | 13 | 517 → 223 |
 | **Total** | **1,032** | | **428** | **420** | **8** | **145** | **27 + 4 disabled** | **3,897 → 3,603** |
 
 ¹ No action elaborates as a runtime `IO` action (they need `MetaM`/`CommandElabM`);
@@ -248,30 +250,33 @@ compiled applications ([platform evidence](evidence/lean-4.35.0-language-coverag
 | --- | ---: | --- | --- |
 | Lasm bug: C runtime does not see the process environment | 7 compiled apps (+ same on arm64) | `LEAN_ABORT_ON_NONLINEAR=1` with `(List.replicate 5 (0 : UInt8)).toByteArray.markLinear` then `set!` on a shared copy: native panics, Lasm prints `10`; `IO.getEnv` sees the variable | Emscripten's `ENV` is not seeded from `process.env`, so every runtime `std::getenv` (`LEAN_ABORT_ON_NONLINEAR`, `LEAN_ABORT_ON_PANIC`, `LEAN_NUM_THREADS`, `LEAN_STACK_SIZE_KB`, `LEAN_MAIN_USE_THREAD`, `LEAN_BACKTRACE*`) reads defaults |
 | Lasm bug, macOS/Windows: case-insensitive `init.lean` shadows `Init` | 85 per macOS target (every `tests/compile` build) | a directory with `init.lean` next to `Main.lean`: `Cyclic Lean module imports …/Init.lean` (or `lstat …/Init` ENOENT) | `applicationSources` resolves imports with `LEAN_SRC_PATH` = the source directory first; the standard roots must win |
-| Lasm bug (fixed in source): `LeanExport` not packaged | 1 (13 actions) | `import LeanExport.Parse` | now an AOT-policy rejection (L5) |
+| Lasm bug (fixed in source): `LeanExport` not packaged | 1 (13 actions) | `import LeanExport.Parse` | now an AOT-policy rejection (Phase 4) |
 | Unsupported by design: broad `import Lean` | 29 adapter + `json`, `newdo`, … | `import Lean` + `Json.compress` | the new message names the narrow imports |
-| Unsupported by design today, L5 candidates: pure kernel data in C++ | LSP 158 + 4, `ilean_roundtrip`, `server_startup`, `watchdogRss`, `level`, `lvl1`, `abst`, `inst`, `expr1`, `expr_maps`, `hidden_proj`, `leanExportParse`, `exe_private_lean_import` | `import Lean.Data.Lsp` + `toJson Position` → `expr`/`formatter`/`level`/`print.cpp.o` | object-level reachability rejects pure `Expr`/`Level`/`Format` helpers |
+| Unsupported by design today, Phase 4 candidates: pure kernel data in C++ | LSP 158 + 4, `ilean_roundtrip`, `server_startup`, `watchdogRss`, `level`, `lvl1`, `abst`, `inst`, `expr1`, `expr_maps`, `hidden_proj`, `leanExportParse`, `exe_private_lean_import` | `import Lean.Data.Lsp` + `toJson Position` → `expr`/`formatter`/`level`/`print.cpp.o` | object-level reachability rejects pure `Expr`/`Level`/`Format` helpers |
 | Unsupported by design: runtime environment, parser or compiler | docparse 202 (`mkEmptyEnvironment` + parser), `parser`, `workspaceSymbolsNewRanges`, `expr`, `large_closure_bug`, `link_lake`, `compact_closure*` (module data) | `import Lean.DocString.Parser` driver | 4.34.1 (pre-policy `.10`/`.14`) ran these in Node |
 | Build-time only | 145 | `#eval show MetaM Unit from …` | not runtime-capable; counted |
 | Harness | 27 adapter | test defines `main` (6), `dbg_trace`/elaboration-time messages not reproducible at run time (29 actions), docstring/`#check` state commands (6), native `leanc` rejects the C emitted for `casesOnCases`/`inlineIssue` (both interpreters pass; upstream EmitC candidate), `parsePrelude` needs `src/` | none is a Lasm result |
 | Upstream disabled | 4 | `compile_disabled` markers | unchanged |
-| Not run | 26 mixed Lake drivers, 10 separate-review tests | `lake exe` workflows, `before.sh` IO tests (`IO_test`, `handleLocking`, `readDir`, `stdio`, …) | need adapters (L3 and L6) |
+| Not run | 26 mixed Lake drivers, 10 separate-review tests | `lake exe` workflows, `before.sh` IO tests (`IO_test`, `handleLocking`, `readDir`, `stdio`, …) | need adapters (Phase 2 and Phase 3) |
 | Upstream flake / resource stop | 0 / 0 | | |
 
-### Ranked fix list (sizes L2–L6)
+### Ranked fix list (sizes Phases 2–5)
 
 | # | Fix | Area / phase | Unblocks | Effort | Risk |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Seed Emscripten `ENV` from the host environment at startup (and keep it in sync with `IO.setEnv`) | L2 (runtime env) | 7 compiled apps on every target; every `LEAN_*` runtime switch | S | Low: host JS only, no runtime re-pin |
-| 2 | Resolve standard roots before the source directory in standalone imports (case-insensitive file systems) | L2/L3 platform | 85 builds per macOS target; any project with `init.lean`/`std.lean`/`lean.lean` on macOS/Windows | S | Low |
-| 3 | Cut a candidate with the LeanExport runtime (source `bd390b6`) | L1 follow-up | `LeanExport.Json`, Lake's imports | S | Low |
-| 4 | Audit pure C++ kernel data functions (`lean_expr_mk_data`, `lean_level_mk_data`, hashing, `Format`/`print`) as initialization-free, or link them separately from kernel state | L5 | 158 LSP + 4 server clients, 3 compiled apps, 9 adapter tests, `leanExportParse`, `exe_private_lean_import` | M–L | Medium: policy soundness, size |
-| 5 | Decide whether an empty `Environment` plus the parser (no elaboration, no module data) is allowed at run time | L5 (user decision) | 202 docparse inputs, `parser` | L | High: needs C++ environment state |
-| 6 | Sidecar-aware adapter (`before.sh`, `init.sh`, `input`, `dir`) and Lake-project adapters | L3 / L6 harness | 10 IO tests, 26 Lake drivers | M | Low |
-| 7 | Windows/macOS application harness (Bash/CTest drivers off Linux) | L2–L4 harness | per-OS compiled-app baselines | M | Low |
-| 8 | Concurrency stress/soak beyond upstream (all 26 upstream tests already pass) | L4 | — | M | Medium |
+| 1 | Seed Emscripten `ENV` from the host environment at startup (and keep it in sync with `IO.setEnv`) | Phase 2 (runtime env) | 7 compiled apps on every target; every `LEAN_*` runtime switch | S | Low: host JS only, no runtime re-pin |
+| 2 | Resolve standard roots before the source directory in standalone imports (case-insensitive file systems) | Phase 2 platform | 85 builds per macOS target; any project with `init.lean`/`std.lean`/`lean.lean` on macOS/Windows | S | Low |
+| 3 | Cut a candidate with the LeanExport runtime (source `bd390b6`) | Phase 1 follow-up | `LeanExport.Json`, Lake's imports | S | Low |
+| 4 | Audit pure C++ kernel data functions (`lean_expr_mk_data`, `lean_level_mk_data`, hashing, `Format`/`print`) as initialization-free, or link them separately from kernel state | Phase 4 | 158 LSP + 4 server clients, 3 compiled apps, 9 adapter tests, `leanExportParse`, `exe_private_lean_import` | M–L | Medium: policy soundness, size |
+| 5 | Decide whether an empty `Environment` plus the parser (no elaboration, no module data) is allowed at run time | Phase 4 (user decision) | 202 docparse inputs, `parser` | L | High: needs C++ environment state |
+| 6 | Sidecar-aware adapter (`before.sh`, `init.sh`, `input`, `dir`) and Lake-project adapters | Phase 2 / Phase 3 harness | 10 IO tests, 26 Lake drivers | M | Low |
+| 7 | Windows/macOS application harness (Bash/CTest drivers off Linux) | Phase 2 harness | per-OS compiled-app baselines | M | Low |
+| 8 | Concurrency stress/soak beyond upstream (all 26 upstream tests already pass) | Phase 5 | — | M | Medium |
 
-### Recommendation on L2–L4
+### Recommendation at the Phase 1 review (original labels)
+
+_Written before renumbering: L2/L3 are now Phase 2, L4 Phase 5, L5 Phase 4. The user chose option C._
+
 
 The upstream suite finds almost nothing wrong in core data types, numerics,
 strings, IO.FS, processes or concurrency: outside Lean-as-a-library, all 3,380

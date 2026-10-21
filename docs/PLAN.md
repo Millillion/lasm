@@ -352,54 +352,51 @@ classified; five-platform CI validation and a candidate gate end each phase.
 Runtime compilation/elaboration and dynamic plugins stay unsupported by design
 and are documented as such.
 
-- **L1 — Baseline and quick fixes:** fix the LeanExport link failure; give
-  `import Lean` rejections a clear message naming narrow imports; run every
-  runtime-capable upstream registration (not only the server subset) on Node.
-  Exit: complete classified baseline and a ranked fix list sizing L2–L6.
-  Results (2026-10-20, awaiting review): [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md).
-- **L2 — Core language and data types:** numerics (big Nat/Int, fixed-width
-  overflow, Float), String/Char/Unicode, arrays/byte arrays, hash/tree maps and
-  sets, recursion forms, exceptions. Exit: zero Lasm-caused failures in the
-  core upstream categories on all five targets.
-- **L3 — Complete I/O:** full IO.FS (directories, metadata, symlinks,
-  permissions, locking, temp files), processes, signals, stdio/terminal, time
-  zones, random. Exit: upstream I/O tests match native per OS, documented
-  OS-level exceptions only.
-- **L4 — Concurrency:** tasks, channels, mutex/condition variables, Std.Sync,
-  full Std.Async, cancellation, many-thread stress (incl. Windows per-thread
-  stack commit). Exit: upstream concurrency tests plus stress/soak without hangs
-  or leaks.
-- **L5 — Lean as a runtime library:** pure `Lean.*` code at runtime (Json via
-  `import Lean`, Lean.Data.*, LSP types) through finer-grained reachability;
-  runtime elaboration/evaluation stays unsupported. Exit: common libraries that
-  import Lean for data structures build and run.
-- **L6 — Ecosystem:** top Reservoir packages (Batteries, Qq, CLI/parser
-  libraries, Mathlib at build time, compile-time tactics); native FFI
-  (extern_lib/precompileModules) decision; outbound HTTP decision. Exit:
-  published tested-package compatibility list.
-- **L7 — Full-suite release gate:** complete runtime-capable upstream suite on
-  five targets plus performance/robustness regression check. Then revisit npm
-  publication and serverless platforms.
+Phase numbers follow the actual order (renumbered 2026-10-20). Older code
+comments and committed evidence use the original labels: L1 = Phase 1,
+L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
 
-L1's baseline may reorder or merge L2–L4; propose that at the L1 review.
-
-**Order after the L1 review (user decision 2026-10-20, option C):** L1 is
-complete (docs/LANGUAGE_COVERAGE.md). Next, still stopping for review after each:
-1. **L2+L3 merged — core and I/O completion:** fix the C runtime's view of the
-   environment (IO.getEnv sees variables, runtime getenv does not), the macOS/
-   Windows case-insensitive shadowing of standard libraries by project files
-   (e.g. `init.lean` vs `Init`), and make every upstream test type run on all five
-   targets (setup-script sidecars, Lake-project drivers, compiled-application
-   harness on macOS and Windows). Exit: zero Lasm-caused failures outside
-   Lean-as-a-library on all five targets, plus a candidate gate.
-   Results (2026-10-20, awaiting review): [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#l2l3-merged-core-and-io-completion-2026-10-20);
-   zero Lasm-caused failures on all five targets with candidate `.39500947696`;
-   its cold-installation gate selection is prepared but not yet committed or run.
-2. **L6 ecosystem** (moved before L5): top Reservoir packages, FFI and outbound
-   HTTP decisions.
-3. **L5 Lean as a runtime library, scoped to what real packages need**; the
-   runtime-parser-over-an-empty-environment policy is decided by the user then.
-4. **L4 concurrency stress/soak**, then **L7** full-suite release gate.
+- **Phase 1 — Baseline and quick fixes (was L1):** fix the LeanExport link
+  failure; give `import Lean` rejections a clear message naming narrow imports;
+  run every runtime-capable upstream registration (not only the server subset)
+  on Node. Exit: complete classified baseline and a ranked fix list.
+  **Complete and reviewed** (2026-10-20; the user chose option C, which this numbering
+  follows): [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#phase-1-baseline-and-quick-fixes-2026-10-20).
+- **Phase 2 — Core and I/O completion (was L2 + L3, merged at the Phase 1
+  review):** core language and data types (numerics, big Nat/Int, fixed-width
+  overflow, Float, String/Char/Unicode, arrays/byte arrays, hash/tree maps and
+  sets, recursion forms, exceptions) and complete I/O (IO.FS directories,
+  metadata, symlinks, permissions, locking, temp files; processes, signals,
+  stdio/terminal, time zones, random). Concretely: fix the C runtime's view of
+  the environment (IO.getEnv sees variables, runtime getenv does not), the
+  macOS/Windows case-insensitive shadowing of standard libraries by project
+  files (e.g. `init.lean` vs `Init`), and make every upstream test type run on
+  all five targets (setup-script sidecars, Lake-project drivers,
+  compiled-application harness on macOS and Windows). Exit: zero Lasm-caused
+  failures outside Lean-as-a-library on all five targets, plus a candidate gate.
+  Results (2026-10-20, awaiting review): [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#phase-2-core-and-io-completion-2026-10-20);
+  zero Lasm-caused failures on all five targets with candidate `.39500947696`;
+  its cold-installation gate is running.
+- **Phase 3 — Ecosystem (was L6, moved before Lean-as-a-library):** top
+  Reservoir packages (Batteries, Qq, CLI/parser libraries, compile-time
+  tactics; Mathlib as a measured experiment); native FFI by compiling a
+  package's C sources with Lasm's toolchain (prebuilt native libraries get a
+  clear error); outbound HTTP through a small opt-in fetch-style package, after
+  first evaluating Node-fetch implementations of existing clients' native
+  functions. Exit: published tested-package compatibility list.
+- **Phase 4 — Lean as a runtime library (was L5), scoped to what real packages
+  need:** pure `Lean.*` code at runtime (Json via `import Lean`, Lean.Data.*,
+  LSP types) through finer-grained reachability; runtime elaboration/evaluation
+  stays unsupported. The runtime-parser-over-an-empty-environment policy is
+  decided by the user at its start. Exit: common libraries that import Lean for
+  data structures build and run.
+- **Phase 5 — Concurrency stress/soak (was L4):** tasks, channels,
+  mutex/condition variables, Std.Sync, full Std.Async, cancellation,
+  many-thread stress (incl. Windows per-thread stack commit). All 26 upstream
+  concurrency tests already pass. Exit: stress/soak without hangs or leaks.
+- **Phase 6 — Full-suite release gate (was L7):** complete runtime-capable
+  upstream suite on five targets plus performance/robustness regression check.
+  Then revisit npm publication and serverless platforms.
 
 ## Deferred chunks
 
