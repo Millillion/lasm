@@ -378,13 +378,33 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   zero Lasm-caused failures on all five targets with candidate `.39500947696`;
   its cold-installation gate passed 2026-10-21 (runs 39537968104,
   39537979004, 39537992042).
-- **Phase 3 — Ecosystem (was L6, moved before Lean-as-a-library):** top
-  Reservoir packages (Batteries, Qq, CLI/parser libraries, compile-time
-  tactics; Mathlib as a measured experiment); native FFI by compiling a
-  package's C sources with Lasm's toolchain (prebuilt native libraries get a
-  clear error); outbound HTTP through a small opt-in fetch-style package, after
-  first evaluating Node-fetch implementations of existing clients' native
-  functions. Exit: published tested-package compatibility list.
+- **Phase 3 — Ecosystem (was L6, moved before Lean-as-a-library; scope
+  approved 2026-10-21):** targets chosen from adoption data
+  ([package research](research/lean-package-adoption-2026-10-21.md),
+  [HTTP client research](research/lean-http-clients-2026-10-21.md)).
+  - Tier A (must work): Batteries, Cli, LSpec, Plausible; Aesop and Qq
+    elaborate at build time and stay out of the Wasm link when unreachable at
+    run time; Lake resolves Mathlib's standard dependency set (ProofWidgets4,
+    import-graph, LeanSearchClient); `import Lean.Data.Json` works at run time
+    (pulled forward from Phase 4 by user decision 2026-10-21).
+  - Tier B (runtime libraries): leansqlite (flagship for compiling a package's
+    bundled C sources with Lasm's Emscripten toolchain), UnicodeBasic, MD4Lean,
+    lean-zip, lean4-parser, lean-regex, and one pure-Lean web stack (leanio or
+    lean-redis) end to end.
+  - Outbound HTTP: our own fetch-style client, [Millillion/fetch](https://github.com/Millillion/fetch)
+    (standalone public repo, `import Fetch`), using `Std.Http` types, with a
+    Lasm/Node `fetch` backend and a native backend (libcurl loaded at run time,
+    `curl` CLI fallback). Existing code that runs the `curl` command keeps
+    working where curl is installed. Option (b′), emulating an existing
+    client's native functions, is dropped: no client has real adoption.
+  - Tier C (measured experiments): Mathlib subset imports (build time, olean
+    volume, Wasm size); build-time native tactic libraries (lean-smt,
+    LeanCopilot) still elaborate in Lasm builds.
+  - Prebuilt native libraries (libcurl, OpenSSL, libpq, hiredis, BLAS) get a
+    clear error naming the library. Node-backed replacements for crypto,
+    Postgres and Redis, and Rust-based packages, are follow-up candidates.
+  Exit: published compatibility list with per-package status on all five
+  targets, plus a candidate gate.
 - **Phase 4 — Lean as a runtime library (was L5), scoped to what real packages
   need:** pure `Lean.*` code at runtime (Json via `import Lean`, Lean.Data.*,
   LSP types) through finer-grained reachability; runtime elaboration/evaluation
