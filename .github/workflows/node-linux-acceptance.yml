@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.12.0
+          node-version: 26.12.1
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Enable process-tree guard
@@ -50,7 +50,7 @@ jobs:
       - name: Check Node and Lean acceptance pins
         run: node scripts/ci/check-acceptance-versions.mjs .work/node-versions.json
       - name: Focused application and packaging controls
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/node-unit-resources.json -- node --max-old-space-size=256 --test --test-concurrency=1 test/candidate-readme.test.mjs test/darwin-resources.test.mjs test/application-output.test.mjs test/application-policy.test.mjs test/application-reachability.test.mjs test/application-symbols.test.mjs test/native-application-bundle.test.mjs test/native-directory.test.mjs test/native-temporary.test.mjs test/application-metadata.test.mjs test/application-support.test.mjs test/application-paths.test.mjs test/windows-tool-paths.test.mjs test/application-launcher.test.mjs test/build-progress.test.mjs test/cli-arguments.test.mjs test/application-files.test.mjs test/application-runtime.test.mjs test/node-cache-controls.test.mjs test/managed-artifacts.test.mjs test/managed-git.test.mjs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/node-unit-resources.json -- node --max-old-space-size=256 --test --test-concurrency=1 test/candidate-readme.test.mjs test/darwin-resources.test.mjs test/application-output.test.mjs test/application-policy.test.mjs test/application-reachability.test.mjs test/application-symbols.test.mjs test/native-application-bundle.test.mjs test/native-directory.test.mjs test/native-temporary.test.mjs test/application-metadata.test.mjs test/application-support.test.mjs test/application-paths.test.mjs test/windows-tool-paths.test.mjs test/application-launcher.test.mjs test/build-progress.test.mjs test/cli-arguments.test.mjs test/application-files.test.mjs test/application-runtime.test.mjs test/node-cache-controls.test.mjs test/managed-artifacts.test.mjs test/managed-git.test.mjs test/application-initialization.test.mjs test/application-native.test.mjs
       - name: Completed cache advice preserves file contents and excludes deployments
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 256 --report .work/node-cache-advice-resources.json -- python3 -I -B test/tool-cache-advice.test.py
       - name: Download the pinned retained runtime input
@@ -152,7 +152,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.12.0
+          node-version: 26.12.1
           package-manager-cache: false
       - name: Restore authenticated retained package
         env:

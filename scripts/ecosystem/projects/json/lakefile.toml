@@ -1,0 +1,6 @@
+name = "app"
+defaultTargets = ["app"]
+
+[[lean_exe]]
+name = "app"
+root = "Main"

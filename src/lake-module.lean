@@ -26,12 +26,13 @@ def nativeReasons (pkg : Package) : Array String := Id.run do
   return reasons
 
 structure LinkInputs where
-  objs : Array FilePath
+  objs : Array (String × FilePath)
   libs : Array Lake.Dynlib
   args : Array (String × String)
 
 def linkInputs (ws : Workspace) (roots : Array Lake.Module) (exe? : Option LeanExe) : FetchM (Job LinkInputs) := do
   let mut objJobs := #[]
+  let mut objPkgs : Array String := #[]
   let mut libJobs := #[]
   let mut imports : Array Lake.Module := roots
   for root in roots do
@@ -41,11 +42,13 @@ def linkInputs (ws : Workspace) (roots : Array Lake.Module) (exe? : Option LeanE
   let libs : Array LeanLib := imports.foldl (·.insert ·.lib) OrdHashSet.empty |>.toArray
   let mut args := #[]
   for lib in libs do
-    for link in lib.moreLinkObjs do objJobs := objJobs.push <| ← link.fetchIn lib.pkg
+    for link in lib.moreLinkObjs do
+      objJobs := objJobs.push <| ← link.fetchIn lib.pkg; objPkgs := objPkgs.push lib.pkg.baseName.toString
     for link in lib.moreLinkLibs do libJobs := libJobs.push <| ← link.fetchIn lib.pkg
     for arg in lib.weakLinkArgs ++ lib.linkArgs do args := args.push (lib.pkg.baseName.toString, arg)
   if let some exe := exe? then
-    for link in exe.moreLinkObjs do objJobs := objJobs.push <| ← link.fetchIn exe.pkg
+    for link in exe.moreLinkObjs do
+      objJobs := objJobs.push <| ← link.fetchIn exe.pkg; objPkgs := objPkgs.push exe.pkg.baseName.toString
     for link in exe.moreLinkLibs do libJobs := libJobs.push <| ← link.fetchIn exe.pkg
     for arg in exe.weakLinkArgs ++ exe.pkg.moreLinkArgs ++ exe.config.moreLinkArgs do
       args := args.push (exe.pkg.baseName.toString, arg)
@@ -55,13 +58,13 @@ def linkInputs (ws : Workspace) (roots : Array Lake.Module) (exe? : Option LeanE
   let pkgs := found.foldl (fun (seen : Array Package) pkg => if seen.any (·.wsIdx == pkg.wsIdx) then seen else seen.push pkg) #[]
   for pkg in pkgs do
     for lib in pkg.externLibs do
-      objJobs := objJobs.push <| ← lib.static.fetch
+      objJobs := objJobs.push <| ← lib.static.fetch; objPkgs := objPkgs.push pkg.baseName.toString
       for arg in lib.linkArgs do args := args.push (pkg.baseName.toString, arg)
   let _ := ws
   let objsJob := Job.collectArray objJobs "lasm.linkObjs"
   let libsJob := Job.collectArray libJobs "lasm.linkLibs"
   objsJob.bindM (sync := true) fun objs => libsJob.mapM (sync := true) fun libs =>
-    return { objs, libs, args }
+    return { objs := objPkgs.zip objs, libs, args }
 
 def main (args : List String) : IO UInt32 := do
   let (link, source) ← match args with
@@ -92,7 +95,7 @@ def main (args : List String) : IO UInt32 := do
     let exe? := configured.bind fun mod => ws.root.leanExes.find? (·.root.name == mod.name)
     let inputs ← ws.runBuild (linkInputs ws roots exe?) { verbosity := .quiet }
     IO.println <| (Json.mkObj [
-      ("objs", toJson (inputs.objs.map (·.toString))),
+      ("objs", toJson (inputs.objs.map fun (pkg, path) => Json.mkObj [("package", toJson pkg), ("path", toJson path.toString)])),
       ("libs", toJson (inputs.libs.map fun lib => Json.mkObj [("name", toJson lib.name), ("path", toJson lib.path.toString)])),
       ("args", toJson (inputs.args.map fun (pkg, arg) => Json.mkObj [("package", toJson pkg), ("arg", toJson arg)]))]).compress
     return 0

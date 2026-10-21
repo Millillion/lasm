@@ -1,0 +1,11 @@
+name = "app"
+defaultTargets = ["app"]
+
+[[require]]
+name = "fetch"
+git = "https://github.com/Millillion/fetch"
+rev = "743b2ddb3714bb7ee2aa3342cf19038708ada8e9"
+
+[[lean_exe]]
+name = "app"
+root = "Main"

@@ -176,8 +176,10 @@ characters still fails to build. Per-platform results:
   targets that use the default compiler need a C compiler named `cc` on `PATH`,
   as natively. C code that calls `dlopen` gets an implementation that always fails.
 - Prebuilt native libraries (shared libraries or `-l` link options, for example
-  libcurl, OpenSSL, libpq, hiredis, BLAS) cannot be linked; the build stops and
-  names the library and the package that needs it.
+  libcurl, OpenSSL, libpq, hiredis, BLAS) cannot be linked. When the program's
+  code needs one, the build stops and names the library and the package that
+  declares it; a library used only during compilation (a tactic's solver) is
+  left out.
 
 The deployed application cannot use the following capabilities:
 

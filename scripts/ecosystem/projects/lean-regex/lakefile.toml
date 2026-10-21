@@ -1,0 +1,12 @@
+name = "app"
+defaultTargets = ["app"]
+
+[[require]]
+name = "Regex"
+git = "https://github.com/pandaman64/lean-regex"
+rev = "32af6f33d80e1dad2b072da6981da58e92b08b9e"
+subDir = "regex"
+
+[[lean_exe]]
+name = "app"
+root = "Main"

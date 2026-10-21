@@ -12,6 +12,7 @@ export const applicationHostFiles = [
   'node-system.mjs', 'linux-memory.mjs', 'node-signal.mjs', 'native-signals.mjs', 'application-signals.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-files.mjs',
   'native-clock.mjs', 'native-windows-timezone.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-message.mjs',
   'native-worker-cwd.cjs', 'worker-stdio.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native-abort.cjs',
+  'node-fetch.mjs',
 ];
 
 /** Application output carries its host support, including native FFI and helpers. */

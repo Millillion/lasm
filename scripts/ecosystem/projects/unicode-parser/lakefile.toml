@@ -1,0 +1,16 @@
+name = "app"
+defaultTargets = ["app"]
+
+[[require]]
+name = "UnicodeBasic"
+git = "https://github.com/fgdorais/lean4-unicode-basic"
+rev = "6e48acac3a91665fcdc4a20d50b7ce6b7b41711f"
+
+[[require]]
+name = "Parser"
+git = "https://github.com/fgdorais/lean4-parser"
+rev = "12206aa786084b79af448a480be3523615914b4b"
+
+[[lean_exe]]
+name = "app"
+root = "Main"

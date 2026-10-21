@@ -1,0 +1,1 @@
+{ "exe": "app", "compare": "exit", "server": { "module": ".lake/packages/fetch/tests/server.mjs" } }

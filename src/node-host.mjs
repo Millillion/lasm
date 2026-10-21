@@ -9,6 +9,7 @@ import { nativeClock } from './native-clock.mjs';
 import { nativeWindowsTimeZone } from './native-windows-timezone.mjs';
 import { createNodeProcesses } from './node-process.mjs';
 import { createNodeUdp } from './node-udp.mjs';
+import { createNodeFetch } from './node-fetch.mjs';
 import { nativeDns } from './native-dns.mjs';
 import { createNodeSystem } from './node-system.mjs';
 import { createNodeSignals } from './node-signal.mjs';
@@ -158,6 +159,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
     flushStdout: () => flushStandard(1) });
   const system = createNodeSystem();
   const signals = createNodeSignals({ add, get });
+  const outbound = createNodeFetch({ add, get });
   const pending = new HandleTable();
   function dispatch(op, id, arg, bytes, context, state) {
     const path = bytes => pathAt(bytes, state);
@@ -168,6 +170,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
       ]);
     }
     if (op === 181) return nativeWindowsTimeZone().localIdentifier(arg);
+    if (op >= 190 && op <= 199) return outbound.dispatch(op, id, arg, bytes);
     if (op >= 160 && op <= 164) return signals.dispatch(op, id, arg);
     if (op >= 120 && op <= 144) return system.dispatch(op, id, arg, bytes);
     if (op === 115) {

@@ -141,46 +141,60 @@ export function describeLibrary(name) {
 }
 
 export class UnsupportedNativeLibrary extends Error {
-  constructor(entries) {
-    const lines = entries.map(({ package: pkg, library }) => {
+  constructor(entries, symbols = []) {
+    const lines = entries.map(({ package: pkg, library, reason }) => {
       const { label, advice } = describeLibrary(library);
-      return `  ${pkg ? `package ${pkg}` : 'the program'} links ${label} (${library})${advice ? '. ' + advice : ''}`;
+      return `  ${pkg ? `package ${pkg}` : 'the program'} links ${label} (${library})${reason && !/^(?:prebuilt|shared)/.test(reason) ? ` [${reason}]` : ''}${advice ? '. ' + advice : ''}`;
     });
-    super(['Lasm cannot link prebuilt native libraries into a Node application:', ...lines,
-      'Lasm compiles C source that packages bundle (extern_lib, moreLinkObjs); prebuilt system or shared libraries are not available in Wasm.',
+    super([`Lasm cannot link prebuilt native libraries into a Node application${symbols.length ? `; the program needs ${symbols.slice(0, 6).join(', ')}` : ''}:`,
+      ...lines, 'Lasm compiles C source that packages bundle and that Lake compiles (extern_lib, moreLinkObjs); prebuilt system or shared libraries are not available in Wasm.',
       'See "Lean support and restrictions" in the Lasm README.'].join('\n'));
     this.name = 'UnsupportedNativeLibrary'; this.code = 'ERR_LASM_NATIVE_LIBRARY'; this.libraries = entries;
   }
 }
 
 /** Plan the Wasm compilation of a Lake program's native link inputs
- * (src/lake-module.lean --link). */
+ * (src/lake-module.lean --link). Prebuilt libraries and objects Lake has no
+ * compile record for cannot be compiled; they are listed as unavailable and
+ * matter only when the program's code actually reaches their symbols. */
 export function planNativeInputs(info, { leanPrefix, runtimeInclude }) {
-  const unsupported = [];
-  for (const lib of info.libs ?? []) unsupported.push({ package: undefined, library: lib.path || lib.name });
+  const unavailable = [];
+  for (const lib of info.libs ?? []) unavailable.push({ library: lib.path || lib.name, reason: 'shared library' });
   for (const { package: pkg, arg } of info.args ?? []) {
     const library = /^-l(.+)$/.exec(arg)?.[1] ?? (/\.(?:so(?:\.\d+)*|dylib|dll)$/.test(arg) ? arg : undefined);
-    if (library && !providedLibraries.has(library)) unsupported.push({ package: pkg, library });
+    if (library && !providedLibraries.has(library)) unavailable.push({ package: pkg, library, reason: 'prebuilt library' });
   }
-  if (unsupported.length) throw new UnsupportedNativeLibrary(unsupported);
   const compilations = [];
-  for (const file of info.objs ?? []) {
-    if (/\.(?:so(?:\.\d+)*|dylib|dll)$/.test(file)) throw new UnsupportedNativeLibrary([{ library: file }]);
-    for (const object of /\.(?:a|lib)$/.test(file) ? archivedObjects(file) : [file]) {
-      const record = recordedCompilation(object);
+  for (const entry of info.objs ?? []) {
+    const { package: pkg, path: file } = typeof entry === 'string' ? { path: entry } : entry;
+    if (/\.(?:so(?:\.\d+)*|dylib|dll)$/.test(file)) { unavailable.push({ package: pkg, library: file, reason: 'shared library' }); continue; }
+    let objects;
+    try { objects = /\.(?:a|lib)$/.test(file) ? archivedObjects(file) : [file]; }
+    catch (error) { unavailable.push({ package: pkg, library: file, reason: error.message }); continue; }
+    for (const object of objects) {
+      let record;
+      try { record = recordedCompilation(object); }
+      catch (error) { unavailable.push({ package: pkg, library: file, reason: error.message }); continue; }
       const args = preprocessorArguments(splitLoggedArguments(record.args, record.cwd), { leanPrefix, runtimeInclude, cwd: record.cwd });
       const source = isAbsolute(record.source) ? record.source : join(record.cwd, record.source);
-      if (!existsSync(source)) throw new Error(`The C source ${source} recorded for ${object} is missing`);
-      compilations.push({ ...record, source, extraArgs: [...args.kept, ...dynamicLoadingRenames], droppedArgs: args.dropped });
+      if (!existsSync(source)) { unavailable.push({ package: pkg, library: file, reason: `its C source ${source} is missing` }); continue; }
+      compilations.push({ ...record, package: pkg, source, extraArgs: [...args.kept, ...dynamicLoadingRenames], droppedArgs: args.dropped });
     }
   }
-  return compilations;
+  const seen = new Set();
+  return { compilations, unavailable: unavailable.filter(item => {
+    const key = `${item.package}\0${item.library}`;
+    return !seen.has(key) && seen.add(key);
+  }) };
 }
 
 // Undefined-symbol prefixes of common prebuilt libraries, for link failures.
 const symbolLibraries = [[/^curl_/, 'curl'], [/^(?:SSL_|SSL_CTX_|EVP_|OPENSSL_|BIO_|X509_|CRYPTO_|RAND_bytes|ERR_get_error)/, 'ssl'],
   [/^PQ/, 'pq'], [/^redis/, 'hiredis'], [/^(?:cblas_|dgemm_|sgemm_|LAPACKE_)/, 'blas'], [/^sqlite3_/, 'sqlite3'],
   [/^(?:deflate|inflate|compress2?|uncompress)(?:Init|End|$)/, 'z']];
+/** Undefined symbols reported by a failed link. */
+export const undefinedSymbols = output => [...new Set([...String(output).matchAll(/undefined symbol: ([A-Za-z_][A-Za-z0-9_]*)/g)].map(match => match[1]))];
+
 /** The prebuilt libraries a failed link's undefined symbols point to. */
 export function librariesForUndefinedSymbols(output) {
   const found = new Map();

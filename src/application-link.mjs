@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { readApplicationSymbols, readInitializationFreeCppSymbols } from './application-symbols.mjs';
 import { readApplicationLinkRequirements, reachabilityRegistry, canSpecializeInitialization, selectiveInitialization } from './application-reachability.mjs';
 import { requireAotApplication } from './application-policy.mjs';
-import { dynamicLoadingStubs, librariesForUndefinedSymbols, UnsupportedNativeLibrary } from './application-native.mjs';
+import { describeLibrary, dynamicLoadingStubs, librariesForUndefinedSymbols, undefinedSymbols as linkUndefinedSymbols, UnsupportedNativeLibrary } from './application-native.mjs';
 import { cInitTargets, coreInitTargets, initializerWrappers, planInitializers, readLiveSymbols } from './application-initialization.mjs';
 import { archiveMembers, explainRejection, parseWhyExtract, undefinedSymbols } from './application-diagnosis.mjs';
 import { executableName, responseFile } from './platform.mjs';
@@ -73,7 +73,7 @@ function rejectionExplanation({ requirements, whyExtractFile, objects, runtime, 
 }
 
 export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
-  linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [] }) {
+  linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable = [] }) {
   let initializationPlan;
   if (![1, 2].includes(memoryMode)) throw new Error('Invalid application memory mode');
   // The recipe records memory mode 1 only (MEMORY64=1, 8 GiB maximum).
@@ -107,13 +107,16 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
         nativeSigs: bundledNativeSigs(recipe), stdio: toolStdio, mapOnly });
     } finally { removeTemporary(temp); }
   };
-  // A link that fails on symbols of a known prebuilt library names the library.
+  // A link that fails on undefined symbols names the native libraries the program
+  // declared but Lasm could not compile, and known prebuilt libraries by symbol.
   const runLink = (...args) => {
     try { return runLinkOnce(...args); }
     catch (error) {
-      const libraries = librariesForUndefinedSymbols(`${error.stderr ?? ''}\n${error.stdout ?? ''}\n${error.message ?? ''}`);
-      if (libraries.length) throw Object.assign(new UnsupportedNativeLibrary(libraries.map(({ library, symbol }) =>
-        ({ library: `${library}, needed for ${symbol}` }))), { cause: error });
+      const output = `${error.stderr ?? ''}\n${error.stdout ?? ''}\n${error.message ?? ''}`;
+      const symbols = linkUndefinedSymbols(output);
+      const known = librariesForUndefinedSymbols(output).filter(({ library }) => !nativeUnavailable.some(item => describeLibrary(item.library).name === library));
+      if (symbols.length && (nativeUnavailable.length || known.length))
+        throw Object.assign(new UnsupportedNativeLibrary([...nativeUnavailable, ...known.map(({ library }) => ({ library }))], symbols), { cause: error });
       throw error;
     }
   };

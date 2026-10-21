@@ -1,0 +1,16 @@
+name = "app"
+defaultTargets = ["app"]
+
+[[require]]
+name = "plausible"
+git = "https://github.com/leanprover-community/plausible"
+rev = "dfa4f38190d07c37e315953e08b90fe2d95b3c24"
+
+[[require]]
+name = "LSpec"
+git = "https://github.com/argumentcomputer/LSpec"
+rev = "d8eb3e0d9a8e33fc116e6700df0418a1d8114508"
+
+[[lean_exe]]
+name = "app"
+root = "Main"

@@ -75,8 +75,9 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     lean = await provisionLean(source, { cache, log, progress, distribution: 'full' });
     generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
   }
-  const nativeCompilations = generated.nativeLink
-    ? planNativeInputs(generated.nativeLink, { leanPrefix: lean.prefix, runtimeInclude: join(runtime.directory, 'include') }) : [];
+  const { compilations: nativeCompilations, unavailable: nativeUnavailable } = generated.nativeLink
+    ? planNativeInputs(generated.nativeLink, { leanPrefix: lean.prefix, runtimeInclude: join(runtime.directory, 'include') })
+    : { compilations: [], unavailable: [] };
   progress?.({ stage: 'Checking application inputs and cached build' });
   const modules = [];
   for (let i = 0; i < generated.sources.length; i++) modules.push({
@@ -98,7 +99,8 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     target: 'node', host: `${process.platform}-${process.arch}`, node: applicationSupport()?.node,
     minimumGlibc: applicationSupport()?.minimumGlibc, memoryMode, modules,
     ...(nativeCompilations.length ? { nativeObjects: nativeCompilations.map(item => ({ object: item.object, identity: item.identity,
-      sourceSha256: createHash('sha256').update(readFileSync(item.source)).digest('hex'), args: item.extraArgs })) } : {}) };
+      sourceSha256: createHash('sha256').update(readFileSync(item.source)).digest('hex'), args: item.extraArgs })) } : {}),
+    ...(nativeUnavailable.length ? { nativeUnavailable } : {}) };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
   if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)
@@ -119,7 +121,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   let linkRequirements;
   try {
     linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
-      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), nativeCompilations });
+      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), nativeCompilations, nativeUnavailable });
   } catch (error) {
     // This unique staging directory contains only this failed build's files.
     // Preserve any previously delivered application and avoid retaining probes.

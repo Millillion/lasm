@@ -36,19 +36,25 @@ test('Lake build records: compile commands and archived objects', () => {
     assert.equal(record.compiler, 'cc');
     assert.equal(record.args, `-I ${directory} -fPIC -DSQLITE_X`);
     assert.deepEqual(archivedObjects(library), [object]);
-    const [compilation] = planNativeInputs({ objs: [library], libs: [], args: [] }, { leanPrefix: '/lean', runtimeInclude: '/rt' });
+    const { compilations: [compilation], unavailable } = planNativeInputs({ objs: [{ package: 'pkg', path: library }], libs: [], args: [] },
+      { leanPrefix: '/lean', runtimeInclude: '/rt' });
+    assert.deepEqual(unavailable, []);
+    assert.equal(compilation.package, 'pkg');
     assert.deepEqual(compilation.extraArgs.slice(0, 3), ['-I', directory, '-DSQLITE_X']);
     assert.ok(compilation.extraArgs.includes('-Ddlopen=lasm_package_dlopen'));
     assert.throws(() => recordedCompilation(join(directory, 'missing.o')), /no build record/);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
-test('prebuilt libraries are reported by name', () => {
-  assert.throws(() => planNativeInputs({ objs: [], libs: [], args: [{ package: 'leanCurl', arg: '-lcurl' }, { package: 'x', arg: '-lm' }] }, {}),
-    error => error instanceof UnsupportedNativeLibrary && /package leanCurl links libcurl \(HTTP client\) \(curl\)/.test(error.message)
-      && !/\(m\)/.test(error.message));
-  assert.throws(() => planNativeInputs({ objs: [], libs: [{ name: 'pq', path: '/usr/lib/libpq.so.5' }], args: [] }, {}),
-    /libpq \(PostgreSQL client\)/);
+test('prebuilt libraries are unavailable, and named when the program needs them', () => {
+  const { unavailable } = planNativeInputs({ objs: [{ package: 'p', path: '/nowhere/libx.a' }], libs: [{ name: 'pq', path: '/usr/lib/libpq.so.5' }],
+    args: [{ package: 'leanCurl', arg: '-lcurl' }, { package: 'x', arg: '-lm' }, { package: 'x', arg: '-O3' }] }, {});
+  assert.deepEqual(unavailable.map(item => [item.package, item.library]), [[undefined, '/usr/lib/libpq.so.5'], ['leanCurl', 'curl'], ['p', '/nowhere/libx.a']]);
+  const error = new UnsupportedNativeLibrary(unavailable, ['curl_easy_init']);
+  assert.match(error.message, /the program needs curl_easy_init/);
+  assert.match(error.message, /package leanCurl links libcurl \(HTTP client\) \(curl\)/);
+  assert.match(error.message, /libpq \(PostgreSQL client\)/);
+  assert.match(error.message, /package p links the native library x \(\/nowhere\/libx.a\) \[Lake has no build record/);
   assert.deepEqual(describeLibrary('libssl.so.3').label, 'OpenSSL');
   assert.deepEqual(librariesForUndefinedSymbols('error: undefined symbol: redisConnect\nerror: undefined symbol: cblas_dgemm\nundefined symbol: lean_foo'),
     [{ library: 'hiredis', symbol: 'redisConnect' }, { library: 'blas', symbol: 'cblas_dgemm' }]);

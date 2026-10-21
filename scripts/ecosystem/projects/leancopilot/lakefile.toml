@@ -1,0 +1,11 @@
+name = "app"
+defaultTargets = ["app"]
+
+[[require]]
+name = "LeanCopilot"
+git = "https://github.com/lean-dojo/LeanCopilot"
+rev = "078135523a51e34b6a095bb2e4088ab4ee0161f0"
+
+[[lean_exe]]
+name = "app"
+root = "Main"

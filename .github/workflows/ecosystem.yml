@@ -1,0 +1,127 @@
+name: Ecosystem compatibility
+# Language coverage Phase 3 (docs/LANGUAGE_COVERAGE.md): each Lake project in
+# scripts/ecosystem/projects built and run natively (the oracle) and through an
+# exact retained Lasm candidate in Node. Dispatch-only; standard public runners;
+# one project per job, every heavy step in its own resource-guarded workload.
+# Only compact result JSON is uploaded, kept 7 days; no caches are written.
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: Standard runner label
+        type: choice
+        options: [ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-intel, windows-2025]
+        default: ubuntu-24.04
+      projects:
+        description: JSON array of project names, or "all" (every directory in scripts/ecosystem/projects except Tier C)
+        type: string
+        default: all
+      max-parallel:
+        type: string
+        default: '8'
+      candidate-version:
+        type: string
+        required: true
+      candidate-release:
+        type: string
+        required: true
+      sha256:
+        type: string
+        required: true
+      lean:
+        type: string
+        default: 4.35.0
+permissions:
+  contents: read
+jobs:
+  plan:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      projects: ${{ steps.plan.outputs.projects }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - id: plan
+        env:
+          PROJECTS: ${{ inputs.projects }}
+        run: |
+          node -e '
+            const { readdirSync, readFileSync } = require("node:fs");
+            const all = readdirSync("scripts/ecosystem/projects").sort();
+            const tierC = name => JSON.parse(readFileSync(`scripts/ecosystem/projects/${name}/project.json`, "utf8")).tier === "C";
+            const wanted = process.env.PROJECTS === "all" ? all.filter(name => !tierC(name)) : JSON.parse(process.env.PROJECTS);
+            if (!Array.isArray(wanted) || !wanted.length || wanted.some(name => !all.includes(name))) throw new Error("projects");
+            console.log("projects=" + JSON.stringify(wanted));' >> "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    # Each job fetches the exact retained draft candidate itself (draft assets need contents: write).
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ fromJSON(inputs.max-parallel) }}
+      matrix:
+        project: ${{ fromJSON(needs.plan.outputs.projects) }}
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+      LASM_LEAN: ${{ inputs.lean }}
+      # Standard macOS arm64 runners have 7 GiB of memory; the others 14-16 GiB.
+      LASM_ECO_MEMORY_MIB: ${{ inputs.runner == 'macos-15' && '5120' || '10240' }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Fetch and verify the exact retained candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Install the exact candidate as an ordinary npm dependency
+        run: |
+          mkdir -p .work/install && cd .work/install
+          echo '{"private":true}' > package.json
+          npm install --no-audit --no-fund "../node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
+      - name: Enable process-tree resource guard
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download and verify the full native Lean oracle
+        run: node scripts/server-mvp/provision.mjs native "$LASM_LEAN" .work/install/node_modules/@lasm/compiler .work/eco-provision | tee .work/native.json
+      - name: Record the runner's C compiler and curl
+        run: |
+          { command -v cc && cc --version | head -1; } || echo "no cc on PATH"
+          { command -v curl && curl --version | head -1; } || echo "no curl on PATH"
+      - name: Build and run natively and through the candidate
+        run: |
+          native="$(node -p 'JSON.parse(require("node:fs").readFileSync(".work/native.json","utf8").trim().split("\n").pop()).native')"
+          mkdir -p .work/eco/results
+          node scripts/ecosystem/run.mjs "${{ matrix.project }}" .work/eco/work .work/install/node_modules/@lasm/compiler "$native" \
+            ".work/eco/results/${{ matrix.project }}.json" --memory-mib "$LASM_ECO_MEMORY_MIB"
+          node scripts/ecosystem/summary.mjs ".work/eco/results/${{ matrix.project }}.json"
+      - name: Keep the compact result briefly
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ecosystem-${{ inputs.runner }}-${{ matrix.project }}
+          path: .work/eco/results
+          retention-days: 7
+          include-hidden-files: true
+          if-no-files-found: warn

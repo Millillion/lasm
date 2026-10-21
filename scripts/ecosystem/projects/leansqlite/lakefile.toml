@@ -1,0 +1,11 @@
+name = "app"
+defaultTargets = ["app"]
+
+[[require]]
+name = "leansqlite"
+git = "https://github.com/leanprover/leansqlite"
+rev = "4ed2f27ecf81792abc8ff848670ac4356d0c4794"
+
+[[lean_exe]]
+name = "app"
+root = "Main"

@@ -1,0 +1,19 @@
+name = "app"
+defaultTargets = ["app"]
+
+[[require]]
+name = "aesop"
+git = "https://github.com/leanprover-community/aesop"
+rev = "4a174c490d8707121c4a9290800489f105d85e07"
+
+[[require]]
+name = "Qq"
+git = "https://github.com/leanprover-community/quote4"
+rev = "dce0ad79c486cb1fb504af04f953c3466b0c6db8"
+
+[[lean_lib]]
+name = "Proofs"
+
+[[lean_exe]]
+name = "app"
+root = "Main"

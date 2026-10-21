@@ -1,0 +1,11 @@
+name = "app"
+defaultTargets = ["app"]
+
+[[require]]
+name = "lean-redis"
+git = "https://github.com/ecyrbe/lean-redis"
+rev = "91685c1e77c84228ba54c1ab39f15288a8179b28"
+
+[[lean_exe]]
+name = "app"
+root = "Main"

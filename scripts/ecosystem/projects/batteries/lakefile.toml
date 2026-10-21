@@ -1,0 +1,11 @@
+name = "app"
+defaultTargets = ["app"]
+
+[[require]]
+name = "batteries"
+git = "https://github.com/leanprover-community/batteries"
+rev = "66e469188fe07963e5cf666c7d4433f45b8131c5"
+
+[[lean_exe]]
+name = "app"
+root = "Main"

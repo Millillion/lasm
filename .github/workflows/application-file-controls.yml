@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.12.0
+          node-version: 26.12.1
           architecture: ${{ matrix.arch }}
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
@@ -40,6 +40,6 @@ jobs:
         run: node --max-old-space-size=128 --test --test-isolation=none test/cli-arguments.test.mjs test/application-launcher.test.mjs
       - name: Node native file ABI
         if: ${{ !cancelled() }}
-        run: node integration/native-file-abi.mjs 26.12.0
+        run: node integration/native-file-abi.mjs 26.12.1
       # Lightweight filesystem checks only; child fixtures each use a 64 MiB
       # JS heap cap. No compiler builds, artifacts or Actions caches.

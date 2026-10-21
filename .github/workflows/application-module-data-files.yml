@@ -29,12 +29,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.12.0
+          node-version: 26.12.1
           architecture: ${{ matrix.arch }}
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Record the native host and exact Node version
-        run: node -e "const a=require('node:assert/strict');a.equal(process.platform+'-'+process.arch,'${{ matrix.platform }}');a.equal(process.versions.node,'26.12.0');console.log(JSON.stringify({platform:process.platform,architecture:process.arch,node:process.versions.node}))"
+        run: node -e "const a=require('node:assert/strict');a.equal(process.platform+'-'+process.arch,'${{ matrix.platform }}');a.equal(process.versions.node,'26.12.1');console.log(JSON.stringify({platform:process.platform,architecture:process.arch,node:process.versions.node}))"
       - name: Module copying, linked paths, relocation and loader controls
         run: node --max-old-space-size=128 --test --test-isolation=none test/application-metadata.test.mjs test/application-output.test.mjs
       # Loader child fixtures each have a 64 MiB JS heap. This is not a complete
