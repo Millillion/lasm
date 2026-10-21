@@ -149,8 +149,10 @@ export function describeLibrary(name) {
 export class UnsupportedNativeLibrary extends Error {
   constructor(entries, symbols = []) {
     const lines = entries.map(({ package: pkg, library, reason }) => {
+      const owner = pkg ? `package ${pkg}` : 'the program';
+      if (/^does not compile/.test(reason ?? '')) return `  ${owner} has C code (${library}) that ${reason}`;
       const { label, advice } = describeLibrary(library);
-      return `  ${pkg ? `package ${pkg}` : 'the program'} links ${label} (${library})${reason && !/^(?:prebuilt|shared)/.test(reason) ? ` [${reason}]` : ''}${advice ? '. ' + advice : ''}`;
+      return `  ${owner} links ${label} (${library})${reason && !/^(?:prebuilt|shared)/.test(reason) ? ` [${reason}]` : ''}${advice ? '. ' + advice : ''}`;
     });
     super([`Lasm cannot link prebuilt native libraries into a Node application${symbols.length ? `; the program needs ${symbols.slice(0, 6).join(', ')}` : ''}:`,
       ...lines, 'Lasm compiles C source that packages bundle and that Lake compiles (extern_lib, moreLinkObjs); prebuilt system or shared libraries are not available in Wasm.',

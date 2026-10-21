@@ -196,8 +196,8 @@ export function coreInitTargets(version) {
 }
 
 export async function planInitializers({ objects, archives, probe, log = () => {}, forceKeep, initTargets }) {
-  const graph = new Map();
-  const units = initializerUnits([...objects, ...archives], { graph });
+  const files = [...objects, ...archives];
+  const units = initializerUnits(files);
   // The program's entry object: Lean's generated `main` calls its own module's initializer.
   const entry = [...units.values()].find(unit => !unit.member && ['main', '__main_argc_argv', '__main_void'].some(name => unit.siblings.has(name)));
   const roots = entry ? [...units.values()].filter(unit => unit.file === entry.file).map(unit => unit.name) : [];
@@ -238,6 +238,10 @@ export async function planInitializers({ objects, archives, probe, log = () => {
     log(`Initialization plan: ${skipped.length} of ${closure.length} initializers skipped; ${shared.length} shared globals${shared.length ? ': ' + shared.slice(0, 40).join(' ') : ''}`);
     if (!shared.length) break;
     // Keep the units whose code uses such a global, then plan again.
+    // The whole-program reference graph is large (all of Lean's libraries when a
+    // program imports Lean); build it only for this rare attribution.
+    const graph = new Map();
+    initializerUnits(files, { graph });
     const culprits = unitsReaching(graph, skipped, shared);
     if (!culprits.length || attempt >= 8) break;
     for (const name of culprits) keep.add(name);

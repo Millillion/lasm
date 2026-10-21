@@ -73,7 +73,8 @@ function rejectionExplanation({ requirements, whyExtractFile, objects, runtime, 
 }
 
 export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
-  linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable = [] }) {
+  linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable: declaredUnavailable = [] }) {
+  const nativeUnavailable = [...declaredUnavailable];
   let initializationPlan;
   if (![1, 2].includes(memoryMode)) throw new Error('Invalid application memory mode');
   // The recipe records memory mode 1 only (MEMORY64=1, 8 GiB maximum).
@@ -158,8 +159,17 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     if (cached && existsSync(cached)) copyFileSync(cached, object);
     else {
       if (!nodeCompile) throw new Error('Package C code requires the Node compile driver');
-      compileObject({ sdk, flags: compileFlags, source: item.source, object, extraArgs: item.extraArgs, settings: {
-        stdio: verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'], timeout: 1800_000, maxBuffer: 8 * 1024 * 1024, cwd: item.cwd } });
+      try {
+        compileObject({ sdk, flags: compileFlags, source: item.source, object, extraArgs: item.extraArgs, settings: {
+          stdio: verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'], timeout: 1800_000, maxBuffer: 8 * 1024 * 1024, cwd: item.cwd } });
+      } catch (error) {
+        // Code a package needs only natively (a tactic's C++ backend) need not compile
+        // for Wasm; the link reports it if the program actually reaches its symbols.
+        const reason = String(error.stderr ?? error.message).split(/\r?\n/).find(line => /error/.test(line))?.trim();
+        nativeUnavailable.push({ package: item.package, library: item.source,
+          reason: `does not compile for WebAssembly${reason ? ': ' + reason.slice(0, 200) : ''}` });
+        continue;
+      }
       if (cached) { const partial = cached + '.' + process.pid + '.partial'; copyFileSync(object, partial); renameSync(partial, cached); }
     }
     if (cached) usedObjects.add(cached);
