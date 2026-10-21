@@ -77,3 +77,30 @@ if (ENVIRONMENT_IS_NODE) {
     return lasmPreviousLocateFile ? lasmPreviousLocateFile(name, directory) : directory + name;
   };
 }
+
+// Package C code (extern_lib) uses Emscripten's raw Node file system. POSIX C
+// libraries such as SQLite build absolute paths by putting '/' before getcwd(),
+// which on Windows is "D:\..." (giving "/D:\..."). Present the working directory
+// to C as "/D:/..." and map such paths back to "D:/..." for Node. Lean's own
+// file operations use Lasm's host and are unaffected.
+if (ENVIRONMENT_IS_NODE && process.platform === 'win32') {
+  Module['preRun'] = [].concat(Module['preRun'] || [], function lasmWindowsCPaths() {
+    var drive = function (path) {
+      return typeof path === 'string' && /^\/[A-Za-z]:(?:[\\/]|$)/.test(path) ? path.slice(1) : path;
+    };
+    FS.cwd = function () { return '/' + process.cwd().replace(/\\/g, '/'); };
+    ['lookupPath', 'stat', 'lstat', 'open', 'mkdir', 'readdir', 'rmdir', 'unlink', 'readlink', 'chmod', 'lchmod',
+      'chown', 'lchown', 'utime', 'truncate', 'mknod', 'analyzePath', 'findObject'].forEach(function (name) {
+      var original = FS[name];
+      if (typeof original === 'function') FS[name] = function (path) {
+        var args = Array.prototype.slice.call(arguments); args[0] = drive(path); return original.apply(this, args);
+      };
+    });
+    ['rename', 'symlink'].forEach(function (name) {
+      var original = FS[name];
+      if (typeof original === 'function') FS[name] = function (a, b) {
+        var args = Array.prototype.slice.call(arguments); args[0] = drive(a); args[1] = drive(b); return original.apply(this, args);
+      };
+    });
+  });
+}

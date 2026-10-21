@@ -85,6 +85,8 @@ test('initialize results and effects classification', () => {
   for (const name of ['l_IO_println', 'lean_get_stdout', 'lean_io_prim_handle_put_str', 'lean_io_getenv']) assert.ok(hasExternalEffect(name), name);
   for (const name of ['lean_st_mk_ref', 'lean_io_mk_world', 'l_Nat_repr']) assert.ok(!hasExternalEffect(name), name);
   assert.ok(isForeignFunction('leansqlite_initialize'));
+  // Boxed constants of closed terms are assigned eagerly by the module initializer.
+  assert.deepEqual(cInitTargets(''), []);
   for (const name of ['lean_mark_persistent', 'l_foo', 'lp_pkg_bar', 'initialize_Init', 'memcpy']) assert.ok(!isForeignFunction(name), name);
 });
 

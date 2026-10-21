@@ -76,7 +76,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
   }
   const { compilations: nativeCompilations, unavailable: nativeUnavailable } = generated.nativeLink
-    ? planNativeInputs(generated.nativeLink, { leanPrefix: lean.prefix, runtimeInclude: join(runtime.directory, 'include') })
+    ? planNativeInputs(generated.nativeLink, { leanPrefix: [lean.prefix, lean.executionPrefix], runtimeInclude: join(runtime.directory, 'include') })
     : { compilations: [], unavailable: [] };
   progress?.({ stage: 'Checking application inputs and cached build' });
   const modules = [];

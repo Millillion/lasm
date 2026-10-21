@@ -3,9 +3,10 @@
 Write ordinary Lean. Compile it ahead of time and run it in Node. Node.js is the
 only supported JavaScript runtime.
 
-**Prerequisites:** stock **Node 26.12.0 with npm 11.20.0**. Lasm downloads its
-matching **Lean 4.35.0**, Lake, and build tools; you do not install them yourself
-(accepted candidate `.54`; the older candidate `.46` used Node 26.10.0 / Lean 4.34.1).
+**Prerequisites:** stock **Node 26.12.0 with npm 11.20.0** for accepted candidate
+`.54` (current source and its Phase 3 candidates pin **Node 26.12.1**, same npm).
+Lasm downloads its matching **Lean 4.35.0**, Lake, and build tools; you do not install
+them yourself (the older candidate `.46` used Node 26.10.0 / Lean 4.34.1).
 The package is experimental and **has not been published to npm**.
 
 ## Get started

@@ -11,7 +11,7 @@
 // (shared libraries, -l options) cannot be compiled and are reported by name.
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { isAbsolute, join, resolve } from 'node:path';
+import { isAbsolute, join, resolve, sep } from 'node:path';
 
 // Options whose value may follow as a separate argument.
 const valueOptions = new Set(['-I', '-isystem', '-iquote', '-idirafter', '-include', '-imacros', '-D', '-U', '-o', '-MF', '-MT', '-MQ',
@@ -69,12 +69,14 @@ export function splitLoggedArguments(text, cwd = process.cwd()) {
  * replaced by the Wasm runtime's and Lean's compiler-internal paths dropped. */
 export function preprocessorArguments(args, { leanPrefix, runtimeInclude, cwd }) {
   const kept = [], dropped = [];
-  const leanInclude = leanPrefix && resolve(leanPrefix, 'include');
+  // Windows runs Lean from a short execution prefix as well as its installed one.
+  const key = path => process.platform === 'win32' ? path.replaceAll('/', '\\').toLowerCase() : path;
+  const prefixes = [leanPrefix].flat().filter(Boolean).map(prefix => key(resolve(prefix)));
   const mapPath = value => {
-    const path = resolve(cwd, value);
-    if (leanInclude && path === leanInclude) return runtimeInclude;
-    if (leanPrefix && (path + '/').startsWith(resolve(leanPrefix) + '/')) return undefined;
-    return isAbsolute(value) ? value : path;
+    const path = key(resolve(cwd, value));
+    if (prefixes.some(prefix => path === key(resolve(prefix, 'include')))) return runtimeInclude;
+    if (prefixes.some(prefix => (path + sep).startsWith(prefix + sep))) return undefined;
+    return isAbsolute(value) ? value : resolve(cwd, value);
   };
   for (let index = 0; index < args.length; index++) {
     const arg = args[index];
@@ -82,7 +84,11 @@ export function preprocessorArguments(args, { leanPrefix, runtimeInclude, cwd })
     if (option) {
       const value = arg === option ? args[++index] : arg.slice(option.length);
       const mapped = mapPath(value);
-      if (mapped) kept.push(option, mapped); else dropped.push(arg, ...(arg === option ? [value] : []));
+      // A package's own include directories come after the Wasm C library's, so a
+      // native-only stand-in header (MD4Lean's Windows adhoc_include) cannot hide it.
+      if (mapped === runtimeInclude) kept.push('-I', mapped);
+      else if (mapped) kept.push(option === '-I' || option === '-iquote' || option === '-isystem' ? '-idirafter' : option, mapped);
+      else dropped.push(arg, ...(arg === option ? [value] : []));
     } else if (arg === '-D' || arg === '-U') kept.push(arg + args[++index]);
     else if (/^-[DU]./.test(arg) || /^-std=/.test(arg)) kept.push(arg);
     else if (valueOptions.has(arg)) dropped.push(arg, args[++index]);

@@ -39,8 +39,9 @@ export const isForeignFunction = name => !/^(?:lp?_|lean_|_lean_|(?:runtime_|met
   && !['memcpy', 'memmove', 'memset', 'memcmp', 'strlen', 'abort'].includes(name);
 export const isInitializerUnit = name => /^(?:runtime_|meta_)?initialize_[A-Za-z0-9_]+$/.test(name);
 // Per-module guard flags and Lean 4.35's lazily initialized closed terms.
-const ignoredData = name => /^_G_(?:runtime_|meta_)?initialized$/.test(name) || name.includes('___closed__')
-  || name.endsWith('_once');
+// (`___boxed__const__N` globals, even of closed terms, are assigned eagerly.)
+const ignoredData = name => /^_G_(?:runtime_|meta_)?initialized$/.test(name) || name.endsWith('_once')
+  || name.includes('___closed__') && !/___boxed__const__\d+$/.test(name);
 
 /** Initializer units of the given objects and archives: ordered initializer calls
  * and the data symbols each body references (the globals it assigns). */

@@ -19,7 +19,7 @@ test('only preprocessor options survive; Lean headers map to the Wasm runtime', 
   const { kept, dropped } = preprocessorArguments(['-I', '/lean/include', '-I', '/pkg/inc', '-isystem', '/lean/include/clang', '--sysroot', '/lean',
     '-nostdinc', '-D', 'A=1', '-DB', '-UC', '-std=c99', '-O3', '-flto', '-fPIC', '-march=native'],
   { leanPrefix: '/lean', runtimeInclude: '/runtime/include', cwd: '/pkg' });
-  assert.deepEqual(kept, ['-I', '/runtime/include', '-I', '/pkg/inc', '-DA=1', '-DB', '-UC', '-std=c99']);
+  assert.deepEqual(kept, ['-I', '/runtime/include', '-idirafter', '/pkg/inc', '-DA=1', '-DB', '-UC', '-std=c99']);
   assert.deepEqual(dropped, ['-isystem', '/lean/include/clang', '--sysroot', '/lean', '-nostdinc', '-O3', '-flto', '-fPIC', '-march=native']);
 });
 
@@ -40,7 +40,7 @@ test('Lake build records: compile commands and archived objects', () => {
       { leanPrefix: '/lean', runtimeInclude: '/rt' });
     assert.deepEqual(unavailable, []);
     assert.equal(compilation.package, 'pkg');
-    assert.deepEqual(compilation.extraArgs.slice(0, 3), ['-I', directory, '-DSQLITE_X']);
+    assert.deepEqual(compilation.extraArgs.slice(0, 3), ['-idirafter', directory, '-DSQLITE_X']);
     assert.ok(compilation.extraArgs.includes('-Ddlopen=lasm_package_dlopen'));
     assert.throws(() => recordedCompilation(join(directory, 'missing.o')), /no build record/);
   } finally { rmSync(directory, { recursive: true, force: true }); }
