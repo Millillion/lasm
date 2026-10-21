@@ -1,11 +1,11 @@
 {
   "active": true,
-  "version": "0.1.0-experimental.39500947696",
-  "sha256": "741d4c38fcf401a36246ada880a5dea355ed493a19cc5aaefbed0d881471aaed",
-  "sourceRevision": "0c89de960f6629df58899d5bed65ba94666e6728",
-  "release": "node-linux-candidate-39500947696",
-  "baselineRunId": "39500947696",
-  "node": "26.12.0",
+  "version": "0.1.0-experimental.39677808414",
+  "sha256": "12d799e8141549e39311c3d067eccb8d3dd13ef6a8f19e523d5eadef06a236d4",
+  "sourceRevision": "a6a546e9212cfd48875301e1648e7aab78b7fb45",
+  "release": "node-linux-candidate-39677808414",
+  "baselineRunId": "39677808414",
+  "node": "26.12.1",
   "lean": "4.35.0",
-  "reason": "Language coverage L2+L3 candidate (runtime 7aa5028c\u2026 honoring LEAN_ABORT_ON_NONLINEAR, exact-case standard roots, Windows CRT errno, piped spawns, DNS binding, deep link paths, C main entry): five-platform installed acceptance in run 39500947696."
+  "reason": "Language coverage Phase 3 (ecosystem) candidate: runtime initialization plan, package C compiled for Wasm, prebuilt-library diagnostics, Node fetch host operations (runtime 7aa5028c… unchanged): five-platform installed acceptance in run 39677808414."
 }
