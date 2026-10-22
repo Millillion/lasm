@@ -26,7 +26,7 @@ Cold-installation gate: passed 2026-10-22. Runs [39695659334](https://github.com
   initialization plan below. No reachability exception was needed: the C++ kernel and
   environment stay out of the link and the unchanged policy still checks the result.
   Runtime elaboration and evaluation remain unavailable.
-- **Outbound HTTP:** [Millillion/fetch](https://github.com/Millillion/fetch) (MIT, unreleased):
+- **Outbound HTTP (superseded 2026-10-22):** [Millillion/fetch](https://github.com/Millillion/fetch) (MIT; archived, never released):
   `fetch url { method, headers, body, redirect, timeout } : Async (Std.Http.Response Fetch.Body)`
   with `ok`, `status`, `statusText`, `url`, `redirected`, `headers`, `header?`, `text`, `bytes`,
   `json`, streaming `body.stream` and `close`; transports Node `fetch` (Lasm host operations
@@ -80,9 +80,11 @@ Approved at the Phase 3 review ([PLAN.md](PLAN.md#language-coverage-phases-appro
   objects that another Lean built in the same project, and their build records named that
   toolchain's headers, which broke Wasm compiles (fetch, lean-zip, MD4Lean on Windows with the
   first wrap-up candidate `.39790669255`); headers of any Lean installation are now ignored for Wasm.
-- **Millillion/fetch:** CI on five platforms (native, green; under-Lasm on dispatch with a token
-  for Lasm's draft candidates) and the planned gaps are documented. Tagging is on hold by user
-  decision; fetch stays unreleased.
+- **Millillion/fetch:** CI on five platforms (native, green) and the planned gaps were added;
+  then the user dropped the library (2026-10-22): the repository is archived and was never
+  released. Outbound HTTP today works through the `curl` subprocess pattern; Node's own `fetch`
+  through JS/npm interop is planned for Phase 4 ([PLAN.md](PLAN.md)). The ecosystem `fetch`
+  project still clones the archived repository and records its Phase 3 behavior.
 - **Final candidate and gate:** pending; recorded here when complete.
 
 ### Upstream regression check (Phase 2 harnesses on the Phase 3 candidate)

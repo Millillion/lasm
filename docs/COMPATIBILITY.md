@@ -8,6 +8,11 @@ deployment run printed exactly native's output with the same exit status (`fetch
 compares exit status, because its transport differs by design: Node's `fetch` under
 Lasm, libcurl or the curl tool natively).
 
+**Outbound HTTP:** the `fetch` rows record Millillion/fetch, an experimental client tested in
+Phase 3 and then superseded (archived 2026-10-22, never released). Today outbound HTTP from a Lasm
+program works through the `curl` subprocess pattern (`IO.Process`, where curl is installed);
+Node's own `fetch` through JS/npm interop is planned for Phase 4.
+
 Candidate: **`0.1.0-experimental.39677808414`** (source `a6a546e`, SHA-256 `12d799e8…36d4`,
 release `node-linux-candidate-39677808414`; five-platform installed acceptance run
 [39677808414](https://github.com/Millillion/lasm/actions/runs/39677808414); cold-installation gate passed 2026-10-22, report in run [39749093869](https://github.com/Millillion/lasm/actions/runs/39749093869)), Node 26.12.1, Lean 4.35.0,
@@ -98,7 +103,7 @@ platform: upstream); **resource-stop** (the guard stopped a build); **lasm-build
 | lean-zip | lean-zip `2f7a63f` (bundled C helpers) | gzip/zlib round trips at four levels, CRC-32, Adler-32 |
 | lean-regex | lean-regex `32af6f3` (`subDir = "regex"`) | `re!` and runtime-parsed regexes |
 | lean-redis | lean-redis `91685c1` (pure Lean on Std.Async TCP) | a client session against a local Redis-protocol server, end to end over TCP |
-| fetch | [Millillion/fetch](https://github.com/Millillion/fetch) `4a0c2f9` (unreleased) | 17 HTTP cases per transport against a local server, plus HTTPS (example.com) and the plain `curl` subprocess pattern |
+| fetch | [Millillion/fetch](https://github.com/Millillion/fetch) `4a0c2f9` (superseded and archived; never released) | 17 HTTP cases per transport against a local server, plus HTTPS (example.com) and the plain `curl` subprocess pattern |
 | mathlib-subset (Tier C) | Mathlib `v4.35.0` (cache) | prime factors, primes, sorting |
 | leancopilot (Tier C) | LeanCopilot `v4.35.0` | its native CTranslate2 library loads during elaboration; a trivial program |
 

@@ -66,8 +66,8 @@ source) in its `lean-toolchain` file. A package supports exactly one Lean releas
 other versions are rejected with `Unsupported Lean toolchain … Supported managed
 versions: …` and the pin is left unchanged. Current source has a per-package
 [compatibility list](https://github.com/Millillion/lasm/blob/main/docs/COMPATIBILITY.md) (Batteries, Cli, LSpec,
-Plausible, Aesop, Qq, leansqlite, UnicodeBasic, MD4Lean, lean-zip, lean4-parser, lean-redis,
-Millillion/fetch and others); packages not on it are untested.
+Plausible, Aesop, Qq, leansqlite, UnicodeBasic, MD4Lean, lean-zip, lean4-parser, lean-redis
+and others); packages not on it are untested.
 After an authorized npm release, installation will be `npm install @lasm/cli`
 (or `npx @lasm/cli Main.lean` without installing); the bin stays `lasm`. That
 registry command is **not available yet**. Current source, not yet in a candidate,
@@ -189,9 +189,10 @@ characters still fails to build. Per-platform results:
   code needs one, the build stops and names the library and the package that
   declares it; a library used only during compilation (a tactic's solver) is
   left out.
-- Outbound HTTP: [Millillion/fetch](https://github.com/Millillion/fetch) (`import Fetch`, unreleased)
-  uses Node's `fetch` under Lasm and libcurl or the `curl` tool natively. Programs that
-  run the `curl` command with `IO.Process` keep working where curl is installed.
+- Outbound HTTP: today a Lasm program makes HTTP requests by running the `curl` tool
+  with `IO.Process` (where curl is installed), as natively. Calling Node's own `fetch`
+  (and npm packages) through JS/npm interop is planned for Phase 4. The experimental
+  Millillion/fetch library tested in Phase 3 is superseded, archived and was never released.
 
 The deployed application cannot use the following capabilities:
 
