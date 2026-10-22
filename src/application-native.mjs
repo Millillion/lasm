@@ -67,6 +67,19 @@ export function splitLoggedArguments(text, cwd = process.cwd()) {
 
 /** Preprocessor options to keep for the Wasm compile, with Lean's headers
  * replaced by the Wasm runtime's and Lean's compiler-internal paths dropped. */
+const leanPrefixes = new Map();
+/** The Lean installation containing `path` (it has include/lean/lean.h), if any. */
+export function otherLeanPrefix(path) {
+  for (let directory = path, depth = 0; depth < 8; depth++) {
+    if (!leanPrefixes.has(directory)) leanPrefixes.set(directory, existsSync(join(directory, 'include', 'lean', 'lean.h')));
+    if (leanPrefixes.get(directory)) return directory;
+    const parent = resolve(directory, '..');
+    if (parent === directory) break;
+    directory = parent;
+  }
+  return undefined;
+}
+
 export function preprocessorArguments(args, { leanPrefix, runtimeInclude, cwd }) {
   const kept = [], dropped = [];
   // Windows runs Lean from a short execution prefix as well as its installed one.
@@ -76,6 +89,12 @@ export function preprocessorArguments(args, { leanPrefix, runtimeInclude, cwd })
     const path = key(resolve(cwd, value));
     if (prefixes.some(prefix => path === key(resolve(prefix, 'include')))) return runtimeInclude;
     if (prefixes.some(prefix => (path + sep).startsWith(prefix + sep))) return undefined;
+    // Lake may reuse objects that another Lean toolchain built in the same
+    // project (for example a native `lake build` with elan's Lean): its record
+    // then names that toolchain. Any Lean installation is recognized by its
+    // include/lean/lean.h; its headers are never used for Wasm.
+    const other = otherLeanPrefix(resolve(cwd, value));
+    if (other !== undefined) return key(resolve(cwd, value)) === key(join(other, 'include')) ? runtimeInclude : undefined;
     return isAbsolute(value) ? value : resolve(cwd, value);
   };
   for (let index = 0; index < args.length; index++) {

@@ -59,3 +59,16 @@ test('prebuilt libraries are unavailable, and named when the program needs them'
   assert.deepEqual(librariesForUndefinedSymbols('error: undefined symbol: redisConnect\nerror: undefined symbol: cblas_dgemm\nundefined symbol: lean_foo'),
     [{ library: 'hiredis', symbol: 'redisConnect' }, { library: 'blas', symbol: 'cblas_dgemm' }]);
 });
+
+test('headers of another Lean installation named in a reused build record are never used for Wasm', () => {
+  const other = mkdtempSync(join(tmpdir(), 'lasm-other-lean-'));
+  try {
+    mkdirSync(join(other, 'include', 'lean'), { recursive: true });
+    mkdirSync(join(other, 'include', 'clang'));
+    writeFileSync(join(other, 'include', 'lean', 'lean.h'), '');
+    const { kept, dropped } = preprocessorArguments(['-I', join(other, 'include'), '--sysroot', other, '-nostdinc',
+      '-isystem', join(other, 'include', 'clang'), '-I', '/pkg/inc'], { leanPrefix: '/lean', runtimeInclude: '/runtime/include', cwd: '/pkg' });
+    assert.deepEqual(kept, ['-I', '/runtime/include', '-idirafter', '/pkg/inc']);
+    assert.ok(dropped.includes(join(other, 'include', 'clang')));
+  } finally { rmSync(other, { recursive: true, force: true }); }
+});
