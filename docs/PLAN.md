@@ -432,9 +432,9 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
        gaps were added; then the user dropped the library (2026-10-22). The
        repository is archived and was never released; Node's own `fetch`
        through JS/npm interop is planned for Phase 4.
-    Candidate `.39815056197` (source `7eb24a3`) passed five-platform acceptance
-    and the ecosystem re-check ([COMPATIBILITY.md](COMPATIBILITY.md)); the
-    cold-installation gate and final acceptance are recorded in
+    Candidate `.39815056197` (source `7eb24a3`) passed five-platform acceptance,
+    the ecosystem re-check ([COMPATIBILITY.md](COMPATIBILITY.md)) and the
+    cold-installation gate (runs 39839405077, 39839429124, 39839453609); see
     [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#phase-3-wrap-up-2026-10-22).
   - Follow-ups recorded:
     - macOS ARM64 memory: 11 eval-io programs peak at ~2.8 GiB, at the CI

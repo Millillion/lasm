@@ -28,7 +28,7 @@ Evidence: [lean-4.35.0-ecosystem-2026-10-21.json](evidence/lean-4.35.0-ecosystem
 
 **Phase 3 wrap-up re-check (2026-10-22):** every project ran again with candidate
 `0.1.0-experimental.39815056197` (source `7eb24a3`: Lean's clang as `cc` and the C tier; SHA-256
-`f6f3a17c…4f0d`; five-platform acceptance run [39815056197](https://github.com/Millillion/lasm/actions/runs/39815056197)).
+`f6f3a17c…4f0d`; five-platform acceptance run [39815056197](https://github.com/Millillion/lasm/actions/runs/39815056197); cold-installation gate passed 2026-10-22, runs [39839405077](https://github.com/Millillion/lasm/actions/runs/39839405077), [39839429124](https://github.com/Millillion/lasm/actions/runs/39839429124), [39839453609](https://github.com/Millillion/lasm/actions/runs/39839453609)).
 Runs: [linux-x64](https://github.com/Millillion/lasm/actions/runs/39823900098),
 [linux-arm64](https://github.com/Millillion/lasm/actions/runs/39823911187),
 [darwin-arm64](https://github.com/Millillion/lasm/actions/runs/39823922346),

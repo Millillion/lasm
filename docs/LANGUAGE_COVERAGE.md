@@ -85,7 +85,7 @@ Approved at the Phase 3 review ([PLAN.md](PLAN.md#language-coverage-phases-appro
   released. Outbound HTTP today works through the `curl` subprocess pattern; Node's own `fetch`
   through JS/npm interop is planned for Phase 4 ([PLAN.md](PLAN.md)). The ecosystem `fetch`
   project still clones the archived repository and records its Phase 3 behavior.
-- **Final candidate and gate:** pending; recorded here when complete.
+- **Gate (2026-10-22):** three back-to-back cold-installation runs [39839405077](https://github.com/Millillion/lasm/actions/runs/39839405077), [39839429124](https://github.com/Millillion/lasm/actions/runs/39839429124), [39839453609](https://github.com/Millillion/lasm/actions/runs/39839453609) on candidate `.39815056197` succeeded; the final report: `passed: true`, 4 consecutive clean cold installs on every platform.
 
 ### Upstream regression check (Phase 2 harnesses on the Phase 3 candidate)
 
