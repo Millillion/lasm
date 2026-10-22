@@ -442,7 +442,7 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   - Follow-ups recorded:
     - macOS ARM64 memory: 11 eval-io programs peak at ~2.8 GiB, at the CI
       guard limit on 7 GiB runners. Investigate why small programs peak that
-      high (product work, not a guard change); folded into Phase 5.
+      high (product work, not a guard change); folded into Phase 6 (concurrency stress/soak).
     - LeanCopilot: dropped; documenting the limitation is enough (deploying an
       AI proof tactic to Node is not a real use case).
     - Native-library replacements: libcurl is covered by fetch; Redis by
