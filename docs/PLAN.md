@@ -440,6 +440,29 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
       concurrency soak; its scope comes from a catalog of the most-used,
       vital server packages (requested by the user 2026-10-22, to be
       discussed before approval).
+- **Next-phase discussion (2026-10-22, pending user decision):** the
+  [server package catalog](research/server-package-catalog-2026-10-22.md) ranked
+  vital server libraries (Tier 1: web framework, encoding, crypto, env, log,
+  tls, postgres, jwt). User feedback: a web framework is not needed from us
+  (`Std.Http` server + fetch already cover incoming and outgoing HTTP; routing
+  can come from the community), and rather than writing many packages, Lasm
+  programs could use npm packages. Proposal: replace the "server libraries"
+  phase with a **JS/npm interop phase** placed after Phase 4: a `Lasm.JS` API
+  (dynamic `JS.Value` handles, `JS.require`, `@[js "module" "export"]` typed
+  bindings, automatic conversion of strings/numbers/booleans/bytes/JSON, JS
+  promises as awaitable Lean tasks, built on the existing host-call transport
+  and handle table), `package.json` next to the lakefile with `lasm build`
+  resolving and bundling from `node_modules`; later, bindings generated from
+  `.d.ts` files and JS-to-Lean callbacks. Exit: a "hello CRUD API" (Std.Http +
+  npm `pg` + `jose`) on all five targets. Trade-offs: programs using interop
+  run only under Lasm (pure logic stays natively testable); no type checking
+  at the boundary without typed bindings; each call costs a thread crossing.
+  Our own pure-Lean packages only where they add value (like fetch). Catalog
+  answers recommended to the user: standardize on core `Lean.Json`; secret-key
+  crypto never in pure Lean for production; serverless adapters belong to
+  Lasm's serverless phases; mapping TCP/TLS onto Workers `connect()` belongs to
+  the Workers phase; proposing a WebSocket upgrade hook and base64 to Lean core
+  is the user's call.
 - **Phase 4 — Lean as a runtime library (was L5), scoped to what real packages
   need:** pure `Lean.*` code at runtime (Json via `import Lean`, Lean.Data.*,
   LSP types) through finer-grained reachability; runtime elaboration/evaluation
