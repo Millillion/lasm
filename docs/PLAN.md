@@ -413,19 +413,32 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   **Phase 3 review (user decisions 2026-10-22):**
   - Accepted: the Node pin moves to 26.12.1; initializer pruning (an unused
     module's initializers do not run, as with `meta import`).
-  - **Phase 3 wrap-up, approved, in progress** (keeps the "only Node.js/npm"
-    promise for packages with C):
-    1. When Lasm runs Lake, point the default C compiler (`cc`, used by
-       `buildO`/`compileO`) at the clang that ships in Lean's release, so no
-       project needs a system C compiler. Verify macOS and Windows system
-       headers specifically.
-    2. Add a small "C tier" to the tiered Lean distribution (Lean's clang,
-       linker and C headers) so projects with bundled C no longer download the
-       full ~600 MB release. Measure its size.
-    3. Millillion/fetch: its own CI (native Linux/macOS/Windows and under Lasm),
-       document planned gaps (streaming upload, abort signal, multipart), then
-       tag `v0.1.0` (tagging approved by the user 2026-10-22). Contacting the
-       Lean core team about it is the user's call.
+  - **Phase 3 wrap-up, approved; items 1 and 2 done (2026-10-22), item 3 on hold**
+    (keeps the "only Node.js/npm" promise for packages with C):
+    1. [x] When Lasm runs Lake, the default C compiler `cc` (used by
+       `buildO`/`compileO`) is the clang that ships in Lean's release (`bin/cc`
+       of the C tier, first on PATH). No system C compiler is needed on any of
+       the five targets; Linux was verified with every system compiler and
+       C header package purged. macOS still needs the Xcode Command Line Tools
+       SDK for C library headers (Apple's SDK may not be redistributed);
+       Windows needs nothing (the C tier's MinGW-w64 headers are clang's own
+       sysroot, a host MinGW is not read).
+    2. [x] A "C tier" per platform (release `lean-4.35.0-c-v1`, 39–52 MB
+       compressed, 176–314 MB unpacked; [NODE_SUPPORT.md](NODE_SUPPORT.md)):
+       Lean's clang, linker, archiver, headers and link libraries, clang's
+       resource headers and C library headers. Projects with bundled C no
+       longer download the full ~600 MB release.
+    3. Millillion/fetch: its own CI is in place (native Linux x64/arm64, macOS
+       x64/arm64 and Windows, green), the planned gaps (streaming upload, abort
+       signal, multipart) are documented, and the under-Lasm job runs on
+       dispatch with a token for Lasm's draft candidates (Lasm's ecosystem CI
+       runs it under every candidate). **On hold (2026-10-22):** no `v0.1.0` tag
+       or release; the user is reconsidering the library in favor of Node's own
+       `fetch` through a JS/npm interop layer. Fetch stays unreleased.
+    Candidate `.39815056197` (source `7eb24a3`) passed five-platform acceptance
+    and the ecosystem re-check ([COMPATIBILITY.md](COMPATIBILITY.md)); the
+    cold-installation gate and final acceptance are recorded in
+    [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#phase-3-wrap-up-2026-10-22).
   - Follow-ups recorded:
     - macOS ARM64 memory: 11 eval-io programs peak at ~2.8 GiB, at the CI
       guard limit on 7 GiB runners. Investigate why small programs peak that

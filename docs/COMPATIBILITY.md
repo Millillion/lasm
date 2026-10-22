@@ -21,6 +21,26 @@ standard GitHub runners (Ubuntu 24.04, macOS 15, Windows Server 2025). Runs:
 [linux-arm64](https://github.com/Millillion/lasm/actions/runs/39678297280).
 Evidence: [lean-4.35.0-ecosystem-2026-10-21.json](evidence/lean-4.35.0-ecosystem-2026-10-21.json).
 
+**Phase 3 wrap-up re-check (2026-10-22):** every project ran again with candidate
+`0.1.0-experimental.39815056197` (source `7eb24a3`: Lean's clang as `cc` and the C tier; SHA-256
+`f6f3a17c…4f0d`; five-platform acceptance run [39815056197](https://github.com/Millillion/lasm/actions/runs/39815056197)).
+Runs: [linux-x64](https://github.com/Millillion/lasm/actions/runs/39823900098),
+[linux-arm64](https://github.com/Millillion/lasm/actions/runs/39823911187),
+[darwin-arm64](https://github.com/Millillion/lasm/actions/runs/39823922346),
+[darwin-x64](https://github.com/Millillion/lasm/actions/runs/39823934114) (`cli` rerun
+[39837522925](https://github.com/Millillion/lasm/actions/runs/39837522925) after a GitHub connection timeout),
+[win32-x64](https://github.com/Millillion/lasm/actions/runs/39823945322). Every status in the table below is
+unchanged, and the projects with C (extern-lib, fetch, leansqlite, lean-zip, md4lean,
+native-tactic, unicode-parser) now build with the extended tiers plus the C tier instead of the
+complete release. **Without a system C compiler:** on linux-x64 and linux-arm64 the same C projects
+were built by Lasm after the native oracle, with every package providing `cc`, `gcc`, `clang` or
+`/usr/include/stdio.h` purged (runs [39823956871](https://github.com/Millillion/lasm/actions/runs/39823956871),
+[39823968317](https://github.com/Millillion/lasm/actions/runs/39823968317)): all pass, prebuilt-library as
+expected. Evidence: [ecosystem](evidence/lean-4.35.0-ecosystem-c-tier-2026-10-22.json),
+[no system C](evidence/lean-4.35.0-ecosystem-no-system-c-2026-10-22.json).
+macOS still needs the SDK of the Xcode Command Line Tools for C library headers
+([NODE_SUPPORT.md](NODE_SUPPORT.md)).
+
 ## Results
 
 | Project | linux-x64 | linux-arm64 | darwin-x64 | darwin-arm64 | win32-x64 |
@@ -95,6 +115,8 @@ builds on: **no Lasm-caused failure remains**.
 | leancopilot (Tier C), linux-arm64 | unsupported by design | LeanCopilot's native CTranslate2 library loaded and its tactics elaborated during the Lasm build, but LeanCopilot's own initializer calls its C++ (`cuda_available`) when a program starts, so the deployment would need CTranslate2 in Wasm. Lasm stops naming `ctranslate2` and the bridge that does not compile for Wasm. Untested workaround: `meta import LeanCopilot` in a module file. |
 | leancopilot (Tier C), linux-x64 | upstream | LeanCopilot's `ct2.o` failed to compile natively on the runner in this run (an earlier run compiled it, then downstream elaboration needed `LD_LIBRARY_PATH`). |
 | (earlier campaign) batteries, win32-x64 | infrastructure | HTTP 502 from GitHub while downloading Lean; the rerun passed. |
+| (wrap-up) cli, darwin-x64 | infrastructure | connection timeout to github.com while downloading a Lean tier; the rerun passed. |
+| (wrap-up, candidate `.39790669255`) fetch, lean-zip all; md4lean win32-x64 | Lasm, fixed in `7eb24a3` | Lake reused objects the native oracle had built with another Lean; their build records named its include directories, and its clang `stdatomic.h` ended Emscripten's `#include_next` chain empty. Headers of any Lean installation are now ignored for Wasm. |
 
 Lasm bugs found and fixed during the phase (all in the candidate): skipped initializers
 of `___boxed__const__` globals (null refcount writes, lean-redis and upstream

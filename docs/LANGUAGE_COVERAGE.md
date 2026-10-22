@@ -45,6 +45,46 @@ Cold-installation gate: passed 2026-10-22. Runs [39695659334](https://github.com
   `package app links libcurl (HTTP client) (curl)`; libcurl, OpenSSL, libpq, hiredis, BLAS,
   system SQLite and zlib are recognized by link option or by undefined-symbol prefix.
 
+### Phase 3 wrap-up (2026-10-22)
+
+Approved at the Phase 3 review ([PLAN.md](PLAN.md#language-coverage-phases-approved-2026-10-19)).
+
+- **No system C compiler.** Lake's default `cc` is now Lean's own clang: the new C tier
+  installs it as `bin/cc` in the Lean prefix, which Lasm already puts first on Lake's `PATH`.
+  Lean's release has no C library headers, so the C tier adds them (Ubuntu 22.04 glibc 2.35 and
+  Linux 5.15 UAPI headers on Linux through `C_INCLUDE_PATH`, searched before the system's;
+  MinGW-w64 13 and winpthreads on Windows as clang's own sysroot), plus clang's complete resource
+  headers from LLVM 23.1.0 (Lean's release ships only a few). Lake's own Lean-C and link steps
+  keep Lean's flags (freestanding headers, Lean's sysroot), as natively.
+  **What the OS must still provide:** nothing on Linux (verified by purging every package that
+  provides `cc`, `gcc`, `clang` or `/usr/include/stdio.h` before the Lasm build) and Windows
+  (a MinGW installation on `PATH` is not read); on macOS the C library headers of the Xcode
+  Command Line Tools SDK, which may not be redistributed (Lasm sets `SDKROOT` from `xcrun` and
+  otherwise stops with `xcode-select --install`).
+- **C tier.** `lean-4.35.0-<platform>-c.tar.zst` in release
+  [`lean-4.35.0-c-v1`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-c-v1), built
+  and checked natively by the tier workflow (run [39788040414](https://github.com/Millillion/lasm/actions/runs/39788040414);
+  the binaries archive rebuilt alongside is byte-identical to the published one). It holds
+  Lean's clang, `ld.lld`/`ld64.lld`, `llvm-ar` and the libraries they load, `include/`,
+  `lib/clang`, the link libraries outside `lib/lean`, and the pinned inputs of
+  [`c-tier-sources.json`](../scripts/lean-dist/c-tier-sources.json). Sizes (compressed /
+  unpacked): linux-x64 45.1 / 200 MB, linux-arm64 43.9 / 193 MB, darwin-x64 41.0 / 185 MB,
+  darwin-arm64 39.3 / 176 MB, win32-x64 51.8 / 314 MB, instead of the complete release
+  (560–620 MB compressed). The native check compiles C using the C library, OS APIs and
+  compiler intrinsics and requires every header to come from the prefix (or the macOS SDK);
+  it found and fixed a host MinGW leaking into Windows compiles.
+- **Results.** Candidate `0.1.0-experimental.39815056197` (source `7eb24a3`) passed five-platform
+  installed acceptance (run [39815056197](https://github.com/Millillion/lasm/actions/runs/39815056197));
+  the ecosystem re-check gives the same statuses as above on all five targets, now with the C
+  tier ([COMPATIBILITY.md](COMPATIBILITY.md)). Lasm bug found and fixed (`7eb24a3`): Lake reuses
+  objects that another Lean built in the same project, and their build records named that
+  toolchain's headers, which broke Wasm compiles (fetch, lean-zip, MD4Lean on Windows with the
+  first wrap-up candidate `.39790669255`); headers of any Lean installation are now ignored for Wasm.
+- **Millillion/fetch:** CI on five platforms (native, green; under-Lasm on dispatch with a token
+  for Lasm's draft candidates) and the planned gaps are documented. Tagging is on hold by user
+  decision; fetch stays unreleased.
+- **Final candidate and gate:** pending; recorded here when complete.
+
 ### Upstream regression check (Phase 2 harnesses on the Phase 3 candidate)
 
 Every Phase 2 harness ran again on the Phase 3 candidate on all five targets

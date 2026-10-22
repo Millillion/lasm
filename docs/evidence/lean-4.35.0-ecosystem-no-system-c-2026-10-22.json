@@ -1,0 +1,718 @@
+{
+  "schema": 1,
+  "generated": "2026-10-22T19:20:30.570Z",
+  "runs": {
+    "39823956871": "linux-x64",
+    "39823968317": "linux-arm64"
+  },
+  "results": [
+    {
+      "project": "extern-lib",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 2.758,
+        "buildStatus": 0,
+        "oleanBytes": 522648,
+        "exit": 0,
+        "runSeconds": 0.004,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      },
+      "lasm": {
+        "buildSeconds": 96.739,
+        "buildStatus": 0,
+        "wasmBytes": 1071184,
+        "distBytes": 2923382,
+        "initializationPlan": {
+          "units": 1694,
+          "kept": 4,
+          "skipped": 1690
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.174,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.186,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.192,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.174,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      }
+    },
+    {
+      "project": "extern-lib",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 0.987,
+        "buildStatus": 0,
+        "oleanBytes": 522648,
+        "exit": 0,
+        "runSeconds": 0.004,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      },
+      "lasm": {
+        "buildSeconds": 100.044,
+        "buildStatus": 0,
+        "wasmBytes": 1071184,
+        "distBytes": 2938302,
+        "initializationPlan": {
+          "units": 1694,
+          "kept": 4,
+          "skipped": 1690
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.203,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.208,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.201,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.203,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      }
+    },
+    {
+      "project": "fetch",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 5.874,
+        "buildStatus": 0,
+        "oleanBytes": 3313928,
+        "exit": 0,
+        "runSeconds": 2.391,
+        "stdoutSha256": "812aac95ed15b314c95c887d7dc53f563d95b8673628fefeb3323b45924ae83e",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: libcurl\n  ok   json\n  ok   POST body and header"
+      },
+      "lasm": {
+        "buildSeconds": 183.735,
+        "buildStatus": 0,
+        "wasmBytes": 1615755,
+        "distBytes": 3469929,
+        "initializationPlan": {
+          "units": 2585,
+          "kept": 7,
+          "skipped": 2578
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 3.758,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 3.733,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 3.748,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 3.758,
+        "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: node\n  ok   json\n  ok   POST body and header"
+      }
+    },
+    {
+      "project": "fetch",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 5.433,
+        "buildStatus": 0,
+        "oleanBytes": 3313928,
+        "exit": 0,
+        "runSeconds": 2.4,
+        "stdoutSha256": "812aac95ed15b314c95c887d7dc53f563d95b8673628fefeb3323b45924ae83e",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: libcurl\n  ok   json\n  ok   POST body and header"
+      },
+      "lasm": {
+        "buildSeconds": 144.917,
+        "buildStatus": 0,
+        "wasmBytes": 1615755,
+        "distBytes": 3484849,
+        "initializationPlan": {
+          "units": 2585,
+          "kept": 7,
+          "skipped": 2578
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 3.567,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 3.571,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 3.562,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 3.567,
+        "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: node\n  ok   json\n  ok   POST body and header"
+      }
+    },
+    {
+      "project": "lean-zip",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 470.239,
+        "buildStatus": 0,
+        "oleanBytes": 141896056,
+        "exit": 0,
+        "runSeconds": 0.018,
+        "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1",
+        "stdoutHead": "level 0: gzip 11823 bytes, zlib 11811 bytes, round trip true\nlevel 1: gzip 185 bytes, zlib 173 bytes, round trip true\nlevel 6: gzip 126 bytes, zlib 114 bytes, round trip true\nlevel 9: gzip 126 bytes, zlib 114 bytes, round trip true\ncrc32 2367691561 adler32 2538486289\n"
+      },
+      "lasm": {
+        "buildSeconds": 204.759,
+        "buildStatus": 0,
+        "wasmBytes": 1852934,
+        "distBytes": 3719709,
+        "initializationPlan": {
+          "units": 2429,
+          "kept": 13,
+          "skipped": 2416
+        },
+        "nativeObjects": 5,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.385,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.377,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.38,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.385,
+        "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1",
+        "stdoutHead": "level 0: gzip 11823 bytes, zlib 11811 bytes, round trip true\nlevel 1: gzip 185 bytes, zlib 173 bytes, round trip true\nlevel 6: gzip 126 bytes, zlib 114 bytes, round trip true\nlevel 9: gzip 126 bytes, zlib 114 bytes, round trip true\ncrc32 2367691561 adler32 2538486289\n"
+      }
+    },
+    {
+      "project": "lean-zip",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 499.998,
+        "buildStatus": 0,
+        "oleanBytes": 141896056,
+        "exit": 0,
+        "runSeconds": 0.015,
+        "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1",
+        "stdoutHead": "level 0: gzip 11823 bytes, zlib 11811 bytes, round trip true\nlevel 1: gzip 185 bytes, zlib 173 bytes, round trip true\nlevel 6: gzip 126 bytes, zlib 114 bytes, round trip true\nlevel 9: gzip 126 bytes, zlib 114 bytes, round trip true\ncrc32 2367691561 adler32 2538486289\n"
+      },
+      "lasm": {
+        "buildSeconds": 167.656,
+        "buildStatus": 0,
+        "wasmBytes": 1852934,
+        "distBytes": 3734629,
+        "initializationPlan": {
+          "units": 2429,
+          "kept": 13,
+          "skipped": 2416
+        },
+        "nativeObjects": 5,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.343,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.346,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.345,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.343,
+        "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1",
+        "stdoutHead": "level 0: gzip 11823 bytes, zlib 11811 bytes, round trip true\nlevel 1: gzip 185 bytes, zlib 173 bytes, round trip true\nlevel 6: gzip 126 bytes, zlib 114 bytes, round trip true\nlevel 9: gzip 126 bytes, zlib 114 bytes, round trip true\ncrc32 2367691561 adler32 2538486289\n"
+      }
+    },
+    {
+      "project": "leansqlite",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 12.711,
+        "buildStatus": 0,
+        "oleanBytes": 8263200,
+        "exit": 0,
+        "runSeconds": 0.035,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 137.509,
+        "buildStatus": 0,
+        "wasmBytes": 2409593,
+        "distBytes": 4282213,
+        "initializationPlan": {
+          "units": 2860,
+          "kept": 6,
+          "skipped": 2854
+        },
+        "nativeObjects": 3,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.281,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.282,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.27,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.281,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      }
+    },
+    {
+      "project": "leansqlite",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 16.706,
+        "buildStatus": 0,
+        "oleanBytes": 8263200,
+        "exit": 0,
+        "runSeconds": 0.038,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 136.934,
+        "buildStatus": 0,
+        "wasmBytes": 2409593,
+        "distBytes": 4297133,
+        "initializationPlan": {
+          "units": 2860,
+          "kept": 6,
+          "skipped": 2854
+        },
+        "nativeObjects": 3,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.34,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.345,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.348,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.34,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      }
+    },
+    {
+      "project": "md4lean",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 3.069,
+        "buildStatus": 0,
+        "oleanBytes": 2028624,
+        "exit": 0,
+        "runSeconds": 0.004,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      },
+      "lasm": {
+        "buildSeconds": 96.357,
+        "buildStatus": 0,
+        "wasmBytes": 1196019,
+        "distBytes": 3054576,
+        "initializationPlan": {
+          "units": 1701,
+          "kept": 4,
+          "skipped": 1697
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.188,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.18,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.184,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.188,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      }
+    },
+    {
+      "project": "md4lean",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 3.555,
+        "buildStatus": 0,
+        "oleanBytes": 2028624,
+        "exit": 0,
+        "runSeconds": 0.004,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      },
+      "lasm": {
+        "buildSeconds": 118.991,
+        "buildStatus": 0,
+        "wasmBytes": 1196019,
+        "distBytes": 3069496,
+        "initializationPlan": {
+          "units": 1701,
+          "kept": 4,
+          "skipped": 1697
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.231,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.229,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.219,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.231,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      }
+    },
+    {
+      "project": "native-tactic",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 5.189,
+        "buildStatus": 0,
+        "oleanBytes": 590184,
+        "exit": 0,
+        "runSeconds": 0.046,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      },
+      "lasm": {
+        "buildSeconds": 186.68,
+        "buildStatus": 0,
+        "wasmBytes": 2177728,
+        "distBytes": 4030538,
+        "initializationPlan": {
+          "units": 5816,
+          "kept": 4,
+          "skipped": 5812
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.306,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.309,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.311,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.306,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      }
+    },
+    {
+      "project": "native-tactic",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 4.802,
+        "buildStatus": 0,
+        "oleanBytes": 590184,
+        "exit": 0,
+        "runSeconds": 0.033,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      },
+      "lasm": {
+        "buildSeconds": 184.479,
+        "buildStatus": 0,
+        "wasmBytes": 2177728,
+        "distBytes": 4045458,
+        "initializationPlan": {
+          "units": 5816,
+          "kept": 4,
+          "skipped": 5812
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.282,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.275,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.278,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.282,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      }
+    },
+    {
+      "project": "prebuilt-library",
+      "platform": "linux-x64",
+      "result": "expected",
+      "node": "v26.12.1",
+      "lasm": {
+        "buildSeconds": 114.746,
+        "buildStatus": 1,
+        "logTail": "Lasm cannot link prebuilt native libraries into a Node application; the program needs shim_curl_version:\n  package app links libcurl (HTTP client) (curl). Use the Fetch package (Node fetch backend) or run the curl command with IO.Process.\nLasm compiles C source that packages bundle and that Lake compiles (extern_lib, moreLinkObjs); prebuilt system or shared libraries are not available in Wasm.\nSee \"Lean support and restrictions\" in the Lasm README.\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 1min 54.655s\nCPU time consumed: 2min 26.416s\nMemory peak: 4.1G\nMemory swap peak: 0B\n[lasm] Peak 4.14 GiB; exit-code\n"
+      }
+    },
+    {
+      "project": "prebuilt-library",
+      "platform": "linux-arm64",
+      "result": "expected",
+      "node": "v26.12.1",
+      "lasm": {
+        "buildSeconds": 96.503,
+        "buildStatus": 1,
+        "logTail": "Lasm cannot link prebuilt native libraries into a Node application; the program needs shim_curl_version:\n  package app links libcurl (HTTP client) (curl). Use the Fetch package (Node fetch backend) or run the curl command with IO.Process.\nLasm compiles C source that packages bundle and that Lake compiles (extern_lib, moreLinkObjs); prebuilt system or shared libraries are not available in Wasm.\nSee \"Lean support and restrictions\" in the Lasm README.\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 1min 36.401s\nCPU time consumed: 1min 47.269s\nMemory peak: 4.0G\nMemory swap peak: 0B\n[lasm] Peak 4.07 GiB; exit-code\n"
+      }
+    },
+    {
+      "project": "unicode-parser",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 116.034,
+        "buildStatus": 0,
+        "oleanBytes": 110376000,
+        "exit": 0,
+        "runSeconds": 0.075,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      },
+      "lasm": {
+        "buildSeconds": 239.612,
+        "buildStatus": 0,
+        "wasmBytes": 3221464,
+        "distBytes": 5125801,
+        "initializationPlan": {
+          "units": 3752,
+          "kept": 9,
+          "skipped": 3743
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.422,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.417,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.417,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.422,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      }
+    },
+    {
+      "project": "unicode-parser",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 72.257,
+        "buildStatus": 0,
+        "oleanBytes": 110376000,
+        "exit": 0,
+        "runSeconds": 0.067,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      },
+      "lasm": {
+        "buildSeconds": 205.007,
+        "buildStatus": 0,
+        "wasmBytes": 3221464,
+        "distBytes": 5140721,
+        "initializationPlan": {
+          "units": 3752,
+          "kept": 9,
+          "skipped": 3743
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.344,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.34,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.345,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.344,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      }
+    }
+  ]
+}

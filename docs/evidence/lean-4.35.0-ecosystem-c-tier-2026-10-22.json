@@ -1,0 +1,4213 @@
+{
+  "schema": 1,
+  "generated": "2026-10-22T19:20:30.506Z",
+  "runs": {
+    "39823900098": "linux-x64",
+    "39823911187": "linux-arm64",
+    "39823922346": "darwin-arm64",
+    "39823934114": "darwin-x64",
+    "39837522925": "darwin-x64-cli-rerun",
+    "39823945322": "win32-x64"
+  },
+  "results": [
+    {
+      "project": "aesop-qq",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 121.732,
+        "buildStatus": 0,
+        "oleanBytes": 105271464,
+        "exit": 0,
+        "runSeconds": 0.037,
+        "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c",
+        "stdoutHead": "clamp: [2, 5, 10]\nanswer: 42\n"
+      },
+      "lasm": {
+        "buildSeconds": 221.47,
+        "buildStatus": 0,
+        "wasmBytes": 1466889,
+        "distBytes": 3360495,
+        "initializationPlan": {
+          "units": 3317,
+          "kept": 5,
+          "skipped": 3312
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.338,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.338,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.325,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.338,
+        "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c",
+        "stdoutHead": "clamp: [2, 5, 10]\nanswer: 42\n"
+      }
+    },
+    {
+      "project": "aesop-qq",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 72.309,
+        "buildStatus": 0,
+        "oleanBytes": 105271464,
+        "exit": 0,
+        "runSeconds": 0.034,
+        "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c",
+        "stdoutHead": "clamp: [2, 5, 10]\nanswer: 42\n"
+      },
+      "lasm": {
+        "buildSeconds": 220.704,
+        "buildStatus": 0,
+        "wasmBytes": 1466889,
+        "distBytes": 3375415,
+        "initializationPlan": {
+          "units": 3317,
+          "kept": 5,
+          "skipped": 3312
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.278,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.277,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.279,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.278,
+        "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c",
+        "stdoutHead": "clamp: [2, 5, 10]\nanswer: 42\n"
+      }
+    },
+    {
+      "project": "aesop-qq",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 488.48,
+        "buildStatus": 0,
+        "oleanBytes": 105271464,
+        "exit": 0,
+        "runSeconds": 0.09,
+        "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c",
+        "stdoutHead": "clamp: [2, 5, 10]\nanswer: 42\n"
+      },
+      "lasm": {
+        "buildSeconds": 499.657,
+        "buildStatus": 0,
+        "wasmBytes": 1466889,
+        "distBytes": 3774907,
+        "initializationPlan": {
+          "units": 3317,
+          "kept": 5,
+          "skipped": 3312
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.549,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.351,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.388,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.549,
+        "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c",
+        "stdoutHead": "clamp: [2, 5, 10]\nanswer: 42\n"
+      }
+    },
+    {
+      "project": "aesop-qq",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 313.962,
+        "buildStatus": 0,
+        "oleanBytes": 105271464,
+        "exit": 0,
+        "runSeconds": 0.071,
+        "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c",
+        "stdoutHead": "clamp: [2, 5, 10]\nanswer: 42\n"
+      },
+      "lasm": {
+        "buildSeconds": 267.314,
+        "buildStatus": 0,
+        "wasmBytes": 1466889,
+        "distBytes": 3427219,
+        "initializationPlan": {
+          "units": 3317,
+          "kept": 5,
+          "skipped": 3312
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.28,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.313,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.324,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.28,
+        "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c",
+        "stdoutHead": "clamp: [2, 5, 10]\nanswer: 42\n"
+      }
+    },
+    {
+      "project": "aesop-qq",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 209.227,
+        "buildStatus": 0,
+        "oleanBytes": 105271464,
+        "exit": 0,
+        "runSeconds": 0.125,
+        "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c",
+        "stdoutHead": "clamp: [2, 5, 10]\nanswer: 42\n"
+      },
+      "lasm": {
+        "buildSeconds": 647.556,
+        "buildStatus": 0,
+        "wasmBytes": 1466889,
+        "distBytes": 3190613,
+        "initializationPlan": {
+          "units": 3317,
+          "kept": 5,
+          "skipped": 3312
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.332,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.336,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.343,
+            "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.332,
+        "stdoutSha256": "86d22e833777ee1c7e85497c68107ad0171780d32cb3b32e2212d4e5514a9b3c",
+        "stdoutHead": "clamp: [2, 5, 10]\nanswer: 42\n"
+      }
+    },
+    {
+      "project": "batteries",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 25.03,
+        "buildStatus": 0,
+        "oleanBytes": 37176456,
+        "exit": 0,
+        "runSeconds": 0.03,
+        "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef",
+        "stdoutHead": "#[9, 7, 5, 3, 3, 1]\ncomponents: [3, 3, 3, 3]\n([1, 2], [3, 4, 5, 6])\n[1, 2, 3, 4, 9]\n[a, b, , c]\n[1, 4, 6, 8]\n"
+      },
+      "lasm": {
+        "buildSeconds": 105.662,
+        "buildStatus": 0,
+        "wasmBytes": 1354859,
+        "distBytes": 3215463,
+        "initializationPlan": {
+          "units": 2797,
+          "kept": 4,
+          "skipped": 2793
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.226,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.223,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.221,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.226,
+        "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef",
+        "stdoutHead": "#[9, 7, 5, 3, 3, 1]\ncomponents: [3, 3, 3, 3]\n([1, 2], [3, 4, 5, 6])\n[1, 2, 3, 4, 9]\n[a, b, , c]\n[1, 4, 6, 8]\n"
+      }
+    },
+    {
+      "project": "batteries",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 25.262,
+        "buildStatus": 0,
+        "oleanBytes": 37176456,
+        "exit": 0,
+        "runSeconds": 0.033,
+        "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef",
+        "stdoutHead": "#[9, 7, 5, 3, 3, 1]\ncomponents: [3, 3, 3, 3]\n([1, 2], [3, 4, 5, 6])\n[1, 2, 3, 4, 9]\n[a, b, , c]\n[1, 4, 6, 8]\n"
+      },
+      "lasm": {
+        "buildSeconds": 106.303,
+        "buildStatus": 0,
+        "wasmBytes": 1354859,
+        "distBytes": 3230383,
+        "initializationPlan": {
+          "units": 2797,
+          "kept": 4,
+          "skipped": 2793
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.292,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.293,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.295,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.292,
+        "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef",
+        "stdoutHead": "#[9, 7, 5, 3, 3, 1]\ncomponents: [3, 3, 3, 3]\n([1, 2], [3, 4, 5, 6])\n[1, 2, 3, 4, 9]\n[a, b, , c]\n[1, 4, 6, 8]\n"
+      }
+    },
+    {
+      "project": "batteries",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 135.341,
+        "buildStatus": 0,
+        "oleanBytes": 37176456,
+        "exit": 0,
+        "runSeconds": 0.073,
+        "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef",
+        "stdoutHead": "#[9, 7, 5, 3, 3, 1]\ncomponents: [3, 3, 3, 3]\n([1, 2], [3, 4, 5, 6])\n[1, 2, 3, 4, 9]\n[a, b, , c]\n[1, 4, 6, 8]\n"
+      },
+      "lasm": {
+        "buildSeconds": 434.225,
+        "buildStatus": 0,
+        "wasmBytes": 1354859,
+        "distBytes": 3629875,
+        "initializationPlan": {
+          "units": 2797,
+          "kept": 4,
+          "skipped": 2793
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 1.717,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.505,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.539,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 1.717,
+        "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef",
+        "stdoutHead": "#[9, 7, 5, 3, 3, 1]\ncomponents: [3, 3, 3, 3]\n([1, 2], [3, 4, 5, 6])\n[1, 2, 3, 4, 9]\n[a, b, , c]\n[1, 4, 6, 8]\n"
+      }
+    },
+    {
+      "project": "batteries",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 74.453,
+        "buildStatus": 0,
+        "oleanBytes": 37176456,
+        "exit": 0,
+        "runSeconds": 0.088,
+        "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef",
+        "stdoutHead": "#[9, 7, 5, 3, 3, 1]\ncomponents: [3, 3, 3, 3]\n([1, 2], [3, 4, 5, 6])\n[1, 2, 3, 4, 9]\n[a, b, , c]\n[1, 4, 6, 8]\n"
+      },
+      "lasm": {
+        "buildSeconds": 170.81,
+        "buildStatus": 0,
+        "wasmBytes": 1354859,
+        "distBytes": 3282187,
+        "initializationPlan": {
+          "units": 2797,
+          "kept": 4,
+          "skipped": 2793
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.297,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.362,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.356,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.297,
+        "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef",
+        "stdoutHead": "#[9, 7, 5, 3, 3, 1]\ncomponents: [3, 3, 3, 3]\n([1, 2], [3, 4, 5, 6])\n[1, 2, 3, 4, 9]\n[a, b, , c]\n[1, 4, 6, 8]\n"
+      }
+    },
+    {
+      "project": "batteries",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 60.184,
+        "buildStatus": 0,
+        "oleanBytes": 37176456,
+        "exit": 0,
+        "runSeconds": 0.084,
+        "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef",
+        "stdoutHead": "#[9, 7, 5, 3, 3, 1]\ncomponents: [3, 3, 3, 3]\n([1, 2], [3, 4, 5, 6])\n[1, 2, 3, 4, 9]\n[a, b, , c]\n[1, 4, 6, 8]\n"
+      },
+      "lasm": {
+        "buildSeconds": 487.371,
+        "buildStatus": 0,
+        "wasmBytes": 1354859,
+        "distBytes": 3045581,
+        "initializationPlan": {
+          "units": 2797,
+          "kept": 4,
+          "skipped": 2793
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.332,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.342,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.348,
+            "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.332,
+        "stdoutSha256": "ec7191b871843675486b8c3e5790e9e992183819909fdf2cdeb1920da790cbef",
+        "stdoutHead": "#[9, 7, 5, 3, 3, 1]\ncomponents: [3, 3, 3, 3]\n([1, 2], [3, 4, 5, 6])\n[1, 2, 3, 4, 9]\n[a, b, , c]\n[1, 4, 6, 8]\n"
+      }
+    },
+    {
+      "project": "cli",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 5.396,
+        "buildStatus": 0,
+        "oleanBytes": 4229768,
+        "exit": 0,
+        "runSeconds": 0.003,
+        "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122",
+        "stdoutHead": "$ app greet Lean\nLean!\n$ app greet -s --times 2 node\nNODE!\nNODE!\n$ app sum 1 2 39\nsum = 42\n$ app greet"
+      },
+      "lasm": {
+        "buildSeconds": 79.991,
+        "buildStatus": 0,
+        "wasmBytes": 1294874,
+        "distBytes": 3147000,
+        "initializationPlan": {
+          "units": 1840,
+          "kept": 5,
+          "skipped": 1835
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.223,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.216,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.223,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.223,
+        "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122",
+        "stdoutHead": "$ app greet Lean\nLean!\n$ app greet -s --times 2 node\nNODE!\nNODE!\n$ app sum 1 2 39\nsum = 42\n$ app greet"
+      }
+    },
+    {
+      "project": "cli",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 8.518,
+        "buildStatus": 0,
+        "oleanBytes": 4229768,
+        "exit": 0,
+        "runSeconds": 0.005,
+        "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122",
+        "stdoutHead": "$ app greet Lean\nLean!\n$ app greet -s --times 2 node\nNODE!\nNODE!\n$ app sum 1 2 39\nsum = 42\n$ app greet"
+      },
+      "lasm": {
+        "buildSeconds": 98.973,
+        "buildStatus": 0,
+        "wasmBytes": 1294874,
+        "distBytes": 3161920,
+        "initializationPlan": {
+          "units": 1840,
+          "kept": 5,
+          "skipped": 1835
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.255,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.259,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.254,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.255,
+        "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122",
+        "stdoutHead": "$ app greet Lean\nLean!\n$ app greet -s --times 2 node\nNODE!\nNODE!\n$ app sum 1 2 39\nsum = 42\n$ app greet"
+      }
+    },
+    {
+      "project": "cli",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 34.496,
+        "buildStatus": 0,
+        "oleanBytes": 4229768,
+        "exit": 0,
+        "runSeconds": 0.011,
+        "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122",
+        "stdoutHead": "$ app greet Lean\nLean!\n$ app greet -s --times 2 node\nNODE!\nNODE!\n$ app sum 1 2 39\nsum = 42\n$ app greet"
+      },
+      "lasm": {
+        "buildSeconds": 364.301,
+        "buildStatus": 0,
+        "wasmBytes": 1294874,
+        "distBytes": 3561412,
+        "initializationPlan": {
+          "units": 1840,
+          "kept": 5,
+          "skipped": 1835
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.852,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.621,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.553,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.852,
+        "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122",
+        "stdoutHead": "$ app greet Lean\nLean!\n$ app greet -s --times 2 node\nNODE!\nNODE!\n$ app sum 1 2 39\nsum = 42\n$ app greet"
+      }
+    },
+    {
+      "project": "cli",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 14.691,
+        "buildStatus": 0,
+        "oleanBytes": 4229768,
+        "exit": 0,
+        "runSeconds": 0.012,
+        "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122",
+        "stdoutHead": "$ app greet Lean\nLean!\n$ app greet -s --times 2 node\nNODE!\nNODE!\n$ app sum 1 2 39\nsum = 42\n$ app greet"
+      },
+      "lasm": {
+        "buildSeconds": 172.03,
+        "buildStatus": 0,
+        "wasmBytes": 1294874,
+        "distBytes": 3213724,
+        "initializationPlan": {
+          "units": 1840,
+          "kept": 5,
+          "skipped": 1835
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.363,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.405,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.356,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.363,
+        "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122",
+        "stdoutHead": "$ app greet Lean\nLean!\n$ app greet -s --times 2 node\nNODE!\nNODE!\n$ app sum 1 2 39\nsum = 42\n$ app greet"
+      }
+    },
+    {
+      "project": "cli",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 14.766,
+        "buildStatus": 0,
+        "oleanBytes": 4229768,
+        "exit": 0,
+        "runSeconds": 0.034,
+        "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122",
+        "stdoutHead": "$ app greet Lean\nLean!\n$ app greet -s --times 2 node\nNODE!\nNODE!\n$ app sum 1 2 39\nsum = 42\n$ app greet"
+      },
+      "lasm": {
+        "buildSeconds": 438.722,
+        "buildStatus": 0,
+        "wasmBytes": 1294874,
+        "distBytes": 2977118,
+        "initializationPlan": {
+          "units": 1840,
+          "kept": 5,
+          "skipped": 1835
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.328,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.348,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.344,
+            "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.328,
+        "stdoutSha256": "64b211a923d99ba988225a50842e78578f24b62bccbe6ab5804807f8fb784122",
+        "stdoutHead": "$ app greet Lean\nLean!\n$ app greet -s --times 2 node\nNODE!\nNODE!\n$ app sum 1 2 39\nsum = 42\n$ app greet"
+      }
+    },
+    {
+      "project": "extern-lib",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 1.32,
+        "buildStatus": 0,
+        "oleanBytes": 522648,
+        "exit": 0,
+        "runSeconds": 0.004,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      },
+      "lasm": {
+        "buildSeconds": 167.973,
+        "buildStatus": 0,
+        "wasmBytes": 1071184,
+        "distBytes": 2923382,
+        "initializationPlan": {
+          "units": 1694,
+          "kept": 4,
+          "skipped": 1690
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.258,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.253,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.257,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.258,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      }
+    },
+    {
+      "project": "extern-lib",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 1.116,
+        "buildStatus": 0,
+        "oleanBytes": 522648,
+        "exit": 0,
+        "runSeconds": 0.004,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      },
+      "lasm": {
+        "buildSeconds": 103.232,
+        "buildStatus": 0,
+        "wasmBytes": 1071184,
+        "distBytes": 2938302,
+        "initializationPlan": {
+          "units": 1694,
+          "kept": 4,
+          "skipped": 1690
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.204,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.202,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.205,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.204,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      }
+    },
+    {
+      "project": "extern-lib",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 6.737,
+        "buildStatus": 0,
+        "oleanBytes": 522648,
+        "exit": 0,
+        "runSeconds": 0.015,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      },
+      "lasm": {
+        "buildSeconds": 466.083,
+        "buildStatus": 0,
+        "wasmBytes": 1071184,
+        "distBytes": 3337796,
+        "initializationPlan": {
+          "units": 1694,
+          "kept": 4,
+          "skipped": 1690
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.611,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.496,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.52,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.611,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      }
+    },
+    {
+      "project": "extern-lib",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 1.577,
+        "buildStatus": 0,
+        "oleanBytes": 522648,
+        "exit": 0,
+        "runSeconds": 0.004,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      },
+      "lasm": {
+        "buildSeconds": 122.95,
+        "buildStatus": 0,
+        "wasmBytes": 1071184,
+        "distBytes": 2990108,
+        "initializationPlan": {
+          "units": 1694,
+          "kept": 4,
+          "skipped": 1690
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.148,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.138,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.144,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.148,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      }
+    },
+    {
+      "project": "extern-lib",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 16.002,
+        "buildStatus": 0,
+        "oleanBytes": 522648,
+        "exit": 0,
+        "runSeconds": 0.037,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      },
+      "lasm": {
+        "buildSeconds": 464.84,
+        "buildStatus": 0,
+        "wasmBytes": 1071184,
+        "distBytes": 2753496,
+        "initializationPlan": {
+          "units": 1694,
+          "kept": 4,
+          "skipped": 1690
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.318,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.314,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.3,
+            "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.318,
+        "stdoutSha256": "69b7ab94898f8b44f035cd5057e4a0c8ab6b65bb22929b37f72745571aff0e15",
+        "stdoutHead": "twice 7 = 14\nsquare 7 = 49\nscaled 7 = 21\n"
+      }
+    },
+    {
+      "project": "fetch",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 5.781,
+        "buildStatus": 0,
+        "oleanBytes": 3313928,
+        "exit": 0,
+        "runSeconds": 2.315,
+        "stdoutSha256": "812aac95ed15b314c95c887d7dc53f563d95b8673628fefeb3323b45924ae83e",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: libcurl\n  ok   json\n  ok   POST body and header"
+      },
+      "lasm": {
+        "buildSeconds": 155.576,
+        "buildStatus": 0,
+        "wasmBytes": 1615755,
+        "distBytes": 3469929,
+        "initializationPlan": {
+          "units": 2585,
+          "kept": 7,
+          "skipped": 2578
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 3.694,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 3.634,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 3.643,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 3.694,
+        "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: node\n  ok   json\n  ok   POST body and header"
+      }
+    },
+    {
+      "project": "fetch",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 5.215,
+        "buildStatus": 0,
+        "oleanBytes": 3313928,
+        "exit": 0,
+        "runSeconds": 2.299,
+        "stdoutSha256": "812aac95ed15b314c95c887d7dc53f563d95b8673628fefeb3323b45924ae83e",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: libcurl\n  ok   json\n  ok   POST body and header"
+      },
+      "lasm": {
+        "buildSeconds": 131.621,
+        "buildStatus": 0,
+        "wasmBytes": 1615755,
+        "distBytes": 3484849,
+        "initializationPlan": {
+          "units": 2585,
+          "kept": 7,
+          "skipped": 2578
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 3.431,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 3.502,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 3.463,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 3.431,
+        "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: node\n  ok   json\n  ok   POST body and header"
+      }
+    },
+    {
+      "project": "fetch",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 25.224,
+        "buildStatus": 0,
+        "oleanBytes": 3313928,
+        "exit": 0,
+        "runSeconds": 3.396,
+        "stdoutSha256": "812aac95ed15b314c95c887d7dc53f563d95b8673628fefeb3323b45924ae83e",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: libcurl\n  ok   json\n  ok   POST body and header"
+      },
+      "lasm": {
+        "buildSeconds": 450.561,
+        "buildStatus": 0,
+        "wasmBytes": 1615755,
+        "distBytes": 3884343,
+        "initializationPlan": {
+          "units": 2585,
+          "kept": 7,
+          "skipped": 2578
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 6.682,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 6.933,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 8.193,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 6.682,
+        "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: node\n  ok   json\n  ok   POST body and header"
+      }
+    },
+    {
+      "project": "fetch",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 15.823,
+        "buildStatus": 0,
+        "oleanBytes": 3313928,
+        "exit": 0,
+        "runSeconds": 2.859,
+        "stdoutSha256": "812aac95ed15b314c95c887d7dc53f563d95b8673628fefeb3323b45924ae83e",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: libcurl\n  ok   json\n  ok   POST body and header"
+      },
+      "lasm": {
+        "buildSeconds": 217.22,
+        "buildStatus": 0,
+        "wasmBytes": 1615755,
+        "distBytes": 3536655,
+        "initializationPlan": {
+          "units": 2585,
+          "kept": 7,
+          "skipped": 2578
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 4.321,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 4.36,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 4.477,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 4.321,
+        "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: node\n  ok   json\n  ok   POST body and header"
+      }
+    },
+    {
+      "project": "fetch",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 16.871,
+        "buildStatus": 0,
+        "oleanBytes": 3313928,
+        "exit": 0,
+        "runSeconds": 9.31,
+        "stdoutSha256": "812aac95ed15b314c95c887d7dc53f563d95b8673628fefeb3323b45924ae83e",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: libcurl\n  ok   json\n  ok   POST body and header"
+      },
+      "lasm": {
+        "buildSeconds": 457.42,
+        "buildStatus": 0,
+        "wasmBytes": 1615755,
+        "distBytes": 3300046,
+        "initializationPlan": {
+          "units": 2585,
+          "kept": 7,
+          "skipped": 2578
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 3.31,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 3.27,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          },
+          {
+            "exit": 0,
+            "seconds": 3.185,
+            "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 3.31,
+        "stdoutSha256": "d20b47dda26f88a33a8baf0288f76d14b2367fbc4b44c36f52819dde36e31164",
+        "stdoutHead": "curl subprocess: ok\nFetch.Backend.auto:\n  ok   GET text\n  ok   headers\n  ok   not redirected\n  transport: node\n  ok   json\n  ok   POST body and header"
+      }
+    },
+    {
+      "project": "initialize",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 1.293,
+        "buildStatus": 0,
+        "oleanBytes": 126080,
+        "exit": 0,
+        "runSeconds": 0.005,
+        "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d",
+        "stdoutHead": "C initialized\nregistry: #[from B]\nconstant: #[10, 20, 30]\n"
+      },
+      "lasm": {
+        "buildSeconds": 100.327,
+        "buildStatus": 0,
+        "wasmBytes": 1075850,
+        "distBytes": 2928161,
+        "initializationPlan": {
+          "units": 1698,
+          "kept": 8,
+          "skipped": 1690
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.22,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.205,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.209,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.22,
+        "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d",
+        "stdoutHead": "C initialized\nregistry: #[from B]\nconstant: #[10, 20, 30]\n"
+      }
+    },
+    {
+      "project": "initialize",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 1.163,
+        "buildStatus": 0,
+        "oleanBytes": 126080,
+        "exit": 0,
+        "runSeconds": 0.003,
+        "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d",
+        "stdoutHead": "C initialized\nregistry: #[from B]\nconstant: #[10, 20, 30]\n"
+      },
+      "lasm": {
+        "buildSeconds": 102.253,
+        "buildStatus": 0,
+        "wasmBytes": 1075850,
+        "distBytes": 2943081,
+        "initializationPlan": {
+          "units": 1698,
+          "kept": 8,
+          "skipped": 1690
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.205,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.207,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.215,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.205,
+        "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d",
+        "stdoutHead": "C initialized\nregistry: #[from B]\nconstant: #[10, 20, 30]\n"
+      }
+    },
+    {
+      "project": "initialize",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 7.81,
+        "buildStatus": 0,
+        "oleanBytes": 126080,
+        "exit": 0,
+        "runSeconds": 0.019,
+        "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d",
+        "stdoutHead": "C initialized\nregistry: #[from B]\nconstant: #[10, 20, 30]\n"
+      },
+      "lasm": {
+        "buildSeconds": 416.462,
+        "buildStatus": 0,
+        "wasmBytes": 1075850,
+        "distBytes": 3342573,
+        "initializationPlan": {
+          "units": 1698,
+          "kept": 8,
+          "skipped": 1690
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.794,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.485,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.401,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.794,
+        "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d",
+        "stdoutHead": "C initialized\nregistry: #[from B]\nconstant: #[10, 20, 30]\n"
+      }
+    },
+    {
+      "project": "initialize",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 4.575,
+        "buildStatus": 0,
+        "oleanBytes": 126080,
+        "exit": 0,
+        "runSeconds": 0.005,
+        "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d",
+        "stdoutHead": "C initialized\nregistry: #[from B]\nconstant: #[10, 20, 30]\n"
+      },
+      "lasm": {
+        "buildSeconds": 110.452,
+        "buildStatus": 0,
+        "wasmBytes": 1075850,
+        "distBytes": 2994885,
+        "initializationPlan": {
+          "units": 1698,
+          "kept": 8,
+          "skipped": 1690
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.172,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.173,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.173,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.172,
+        "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d",
+        "stdoutHead": "C initialized\nregistry: #[from B]\nconstant: #[10, 20, 30]\n"
+      }
+    },
+    {
+      "project": "initialize",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 6.26,
+        "buildStatus": 0,
+        "oleanBytes": 126080,
+        "exit": 0,
+        "runSeconds": 0.038,
+        "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d",
+        "stdoutHead": "C initialized\nregistry: #[from B]\nconstant: #[10, 20, 30]\n"
+      },
+      "lasm": {
+        "buildSeconds": 476.71,
+        "buildStatus": 0,
+        "wasmBytes": 1075850,
+        "distBytes": 2758279,
+        "initializationPlan": {
+          "units": 1698,
+          "kept": 8,
+          "skipped": 1690
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.302,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.309,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.303,
+            "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.302,
+        "stdoutSha256": "4ea1b6aee0f8ee95a0ecbff6872094f2b4e13ef0f82312a231e77e7691f2da2d",
+        "stdoutHead": "C initialized\nregistry: #[from B]\nconstant: #[10, 20, 30]\n"
+      }
+    },
+    {
+      "project": "json",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 1.849,
+        "buildStatus": 0,
+        "oleanBytes": 438624,
+        "exit": 0,
+        "runSeconds": 0.035,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      },
+      "lasm": {
+        "buildSeconds": 104.248,
+        "buildStatus": 0,
+        "wasmBytes": 1460192,
+        "distBytes": 3312095,
+        "initializationPlan": {
+          "units": 2544,
+          "kept": 9,
+          "skipped": 2535
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.282,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.285,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.276,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.282,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      }
+    },
+    {
+      "project": "json",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 1.566,
+        "buildStatus": 0,
+        "oleanBytes": 438624,
+        "exit": 0,
+        "runSeconds": 0.035,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      },
+      "lasm": {
+        "buildSeconds": 101.997,
+        "buildStatus": 0,
+        "wasmBytes": 1460192,
+        "distBytes": 3327015,
+        "initializationPlan": {
+          "units": 2544,
+          "kept": 9,
+          "skipped": 2535
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.232,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.236,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.226,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.232,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      }
+    },
+    {
+      "project": "json",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 4.969,
+        "buildStatus": 0,
+        "oleanBytes": 438624,
+        "exit": 0,
+        "runSeconds": 0.079,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      },
+      "lasm": {
+        "buildSeconds": 340.83,
+        "buildStatus": 0,
+        "wasmBytes": 1460192,
+        "distBytes": 3726507,
+        "initializationPlan": {
+          "units": 2544,
+          "kept": 9,
+          "skipped": 2535
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.524,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.442,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.443,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.524,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      }
+    },
+    {
+      "project": "json",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 8.211,
+        "buildStatus": 0,
+        "oleanBytes": 438624,
+        "exit": 0,
+        "runSeconds": 0.081,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      },
+      "lasm": {
+        "buildSeconds": 146.143,
+        "buildStatus": 0,
+        "wasmBytes": 1460192,
+        "distBytes": 3378819,
+        "initializationPlan": {
+          "units": 2544,
+          "kept": 9,
+          "skipped": 2535
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.214,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.213,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.208,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.214,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      }
+    },
+    {
+      "project": "json",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 5.982,
+        "buildStatus": 0,
+        "oleanBytes": 438624,
+        "exit": 0,
+        "runSeconds": 0.105,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      },
+      "lasm": {
+        "buildSeconds": 551.964,
+        "buildStatus": 0,
+        "wasmBytes": 1460192,
+        "distBytes": 3142213,
+        "initializationPlan": {
+          "units": 2544,
+          "kept": 9,
+          "skipped": 2535
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.382,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.393,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.354,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.382,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      }
+    },
+    {
+      "project": "json-import-lean",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 2.015,
+        "buildStatus": 0,
+        "oleanBytes": 421264,
+        "exit": 0,
+        "runSeconds": 0.029,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      },
+      "lasm": {
+        "buildSeconds": 123.446,
+        "buildStatus": 0,
+        "wasmBytes": 2371701,
+        "distBytes": 4223604,
+        "initializationPlan": {
+          "units": 5815,
+          "kept": 9,
+          "skipped": 5806
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.257,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.263,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.276,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.257,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      }
+    },
+    {
+      "project": "json-import-lean",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 1.869,
+        "buildStatus": 0,
+        "oleanBytes": 421264,
+        "exit": 0,
+        "runSeconds": 0.034,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      },
+      "lasm": {
+        "buildSeconds": 140.743,
+        "buildStatus": 0,
+        "wasmBytes": 2371701,
+        "distBytes": 4238524,
+        "initializationPlan": {
+          "units": 5815,
+          "kept": 9,
+          "skipped": 5806
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.281,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.285,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.291,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.281,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      }
+    },
+    {
+      "project": "json-import-lean",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 4.628,
+        "buildStatus": 0,
+        "oleanBytes": 421264,
+        "exit": 0,
+        "runSeconds": 0.058,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      },
+      "lasm": {
+        "buildSeconds": 295.682,
+        "buildStatus": 0,
+        "wasmBytes": 2371701,
+        "distBytes": 4638016,
+        "initializationPlan": {
+          "units": 5815,
+          "kept": 9,
+          "skipped": 5806
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.411,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.464,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.43,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.411,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      }
+    },
+    {
+      "project": "json-import-lean",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 19.063,
+        "buildStatus": 0,
+        "oleanBytes": 421264,
+        "exit": 0,
+        "runSeconds": 0.059,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      },
+      "lasm": {
+        "buildSeconds": 189.054,
+        "buildStatus": 0,
+        "wasmBytes": 2371701,
+        "distBytes": 4290328,
+        "initializationPlan": {
+          "units": 5815,
+          "kept": 9,
+          "skipped": 5806
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.266,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.276,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.3,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.266,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      }
+    },
+    {
+      "project": "json-import-lean",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 7.152,
+        "buildStatus": 0,
+        "oleanBytes": 421264,
+        "exit": 0,
+        "runSeconds": 0.102,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      },
+      "lasm": {
+        "buildSeconds": 493.778,
+        "buildStatus": 0,
+        "wasmBytes": 2371701,
+        "distBytes": 4053722,
+        "initializationPlan": {
+          "units": 5815,
+          "kept": 9,
+          "skipped": 5806
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.378,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.401,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.399,
+            "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.378,
+        "stdoutSha256": "ef53d6c142e3ff044feeb952cefb17d36531f85d640ac60d7a0173914ae9bcb7",
+        "stdoutHead": "[{\"name\":\"apple\",\"price\":1.25,\"stock\":null,\"tags\":[\"fruit\"]},{\"name\":\"pear\",\"price\":2.5,\"stock\":3,\"tags\":[]}]\n[{\"tags\": [\"fruit\"], \"stock\": null, \"price\": 1.25, \"name\": \"apple\"},\n {\"tags\": [], \"stock\": 3, \"price\": 2.5, \"name\": \"pear\"}]\n[{\"circle\":{\"r\":2}},{\"rect\":{\"h\":4,\"w\":3}}]\n{ name := \"plum\", price := 0.750000, tags := #[\"stone\", \"fruit\"], stock := some 12 }\n[1,2500,-0.001,true,null,\"é\\n\"]\nparse error: offset 10: unexpected input\ntrue"
+      }
+    },
+    {
+      "project": "lean-redis",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 15.747,
+        "buildStatus": 0,
+        "oleanBytes": 14900736,
+        "exit": 0,
+        "runSeconds": 0.009,
+        "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca",
+        "stdoutHead": "ping: none\nget: (some (hello from Lean))\nincr: 42\nmissing: none\nhgetall: #[(lang, lean), (name, ada)]\ndel: 2\n"
+      },
+      "lasm": {
+        "buildSeconds": 93.299,
+        "buildStatus": 0,
+        "wasmBytes": 1659615,
+        "distBytes": 3522637,
+        "initializationPlan": {
+          "units": 2434,
+          "kept": 16,
+          "skipped": 2418
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.302,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.289,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.293,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.302,
+        "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca",
+        "stdoutHead": "ping: none\nget: (some (hello from Lean))\nincr: 42\nmissing: none\nhgetall: #[(lang, lean), (name, ada)]\ndel: 2\n"
+      }
+    },
+    {
+      "project": "lean-redis",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 13.928,
+        "buildStatus": 0,
+        "oleanBytes": 14900736,
+        "exit": 0,
+        "runSeconds": 0.009,
+        "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca",
+        "stdoutHead": "ping: none\nget: (some (hello from Lean))\nincr: 42\nmissing: none\nhgetall: #[(lang, lean), (name, ada)]\ndel: 2\n"
+      },
+      "lasm": {
+        "buildSeconds": 136.31,
+        "buildStatus": 0,
+        "wasmBytes": 1659615,
+        "distBytes": 3537557,
+        "initializationPlan": {
+          "units": 2434,
+          "kept": 16,
+          "skipped": 2418
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.304,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.304,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.307,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.304,
+        "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca",
+        "stdoutHead": "ping: none\nget: (some (hello from Lean))\nincr: 42\nmissing: none\nhgetall: #[(lang, lean), (name, ada)]\ndel: 2\n"
+      }
+    },
+    {
+      "project": "lean-redis",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 71.152,
+        "buildStatus": 0,
+        "oleanBytes": 14900736,
+        "exit": 0,
+        "runSeconds": 0.019,
+        "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca",
+        "stdoutHead": "ping: none\nget: (some (hello from Lean))\nincr: 42\nmissing: none\nhgetall: #[(lang, lean), (name, ada)]\ndel: 2\n"
+      },
+      "lasm": {
+        "buildSeconds": 274.978,
+        "buildStatus": 0,
+        "wasmBytes": 1659615,
+        "distBytes": 3937049,
+        "initializationPlan": {
+          "units": 2434,
+          "kept": 16,
+          "skipped": 2418
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.445,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.434,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.458,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.445,
+        "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca",
+        "stdoutHead": "ping: none\nget: (some (hello from Lean))\nincr: 42\nmissing: none\nhgetall: #[(lang, lean), (name, ada)]\ndel: 2\n"
+      }
+    },
+    {
+      "project": "lean-redis",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 30.165,
+        "buildStatus": 0,
+        "oleanBytes": 14900736,
+        "exit": 0,
+        "runSeconds": 0.01,
+        "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca",
+        "stdoutHead": "ping: none\nget: (some (hello from Lean))\nincr: 42\nmissing: none\nhgetall: #[(lang, lean), (name, ada)]\ndel: 2\n"
+      },
+      "lasm": {
+        "buildSeconds": 90.879,
+        "buildStatus": 0,
+        "wasmBytes": 1659615,
+        "distBytes": 3589361,
+        "initializationPlan": {
+          "units": 2434,
+          "kept": 16,
+          "skipped": 2418
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.206,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.198,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.198,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.206,
+        "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca",
+        "stdoutHead": "ping: none\nget: (some (hello from Lean))\nincr: 42\nmissing: none\nhgetall: #[(lang, lean), (name, ada)]\ndel: 2\n"
+      }
+    },
+    {
+      "project": "lean-redis",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 46.121,
+        "buildStatus": 0,
+        "oleanBytes": 14900736,
+        "exit": 0,
+        "runSeconds": 0.08,
+        "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca",
+        "stdoutHead": "ping: none\nget: (some (hello from Lean))\nincr: 42\nmissing: none\nhgetall: #[(lang, lean), (name, ada)]\ndel: 2\n"
+      },
+      "lasm": {
+        "buildSeconds": 455.327,
+        "buildStatus": 0,
+        "wasmBytes": 1659615,
+        "distBytes": 3352755,
+        "initializationPlan": {
+          "units": 2434,
+          "kept": 16,
+          "skipped": 2418
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.447,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.445,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.429,
+            "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.447,
+        "stdoutSha256": "a1615288d58876021bd7f3937cae6f5a69b53b7e04fbb320700f241e614051ca",
+        "stdoutHead": "ping: none\nget: (some (hello from Lean))\nincr: 42\nmissing: none\nhgetall: #[(lang, lean), (name, ada)]\ndel: 2\n"
+      }
+    },
+    {
+      "project": "lean-regex",
+      "platform": "linux-x64",
+      "result": "native-fail",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 15.682,
+        "buildStatus": 1,
+        "logTail": "[lasm] One workload, 6.43 GiB memory cap; resource log: /home/runner/work/lasm/lasm/.work/eco/results/lean-regex-native-build-resources.json\nRunning as unit: lasm-heavy-0539ccf52500.service; invocation ID: afd0bfc92f1d43cfb2c8381eb8a2ddde\n[lasm] Build process uses base pages; memory and pressure guards remain active\nerror: build failed\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 15.612s\nCPU time consumed: 46.870s\nMemory peak: 257.2M\nMemory swap peak: 0B\n[lasm] Peak 0.25 GiB; exit-code\n"
+      }
+    },
+    {
+      "project": "lean-regex",
+      "platform": "linux-arm64",
+      "result": "native-fail",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 10.924,
+        "buildStatus": 1,
+        "logTail": "[lasm] One workload, 6.24 GiB memory cap; resource log: /home/runner/work/lasm/lasm/.work/eco/results/lean-regex-native-build-resources.json\nRunning as unit: lasm-heavy-0539ccf52500.service; invocation ID: 906388d02946483d9833cb12bcbd80c4\n[lasm] Build process uses base pages; memory and pressure guards remain active\nerror: build failed\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 10.866s\nCPU time consumed: 30.641s\nMemory peak: 275.9M\nMemory swap peak: 0B\n[lasm] Peak 0.27 GiB; exit-code\n"
+      }
+    },
+    {
+      "project": "lean-regex",
+      "platform": "darwin-x64",
+      "result": "resource-stop",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 40.328,
+        "buildStatus": 1,
+        "logTail": "✔ [74/97] Built Regex.Data.BitVec:c.o (152ms)\n✔ [75/97] Built Regex.Data.BitMatrix:c.o (222ms)\n✔ [76/97] Built Regex.Data.BVPos:c.o (266ms)\n✔ [77/97] Built Regex.Regex.OptimizationInfo:c.o (344ms)\n✔ [78/97] Built Regex.Backtracker.Basic:c.o (364ms)\n✔ [79/97] Built Regex.Backtracker (416ms)\n✔ [89/97] Built Regex.Backtracker:c.o (135ms)\nSome required targets logged failures:\n- Regex.Data.SparseSet.Bijection\n[lasm] macOS proactive RSS stop 5.60 GiB; no kernel aggregate cap; /Users/runner/work/lasm/lasm/.work/eco/results/lean-regex-native-build-resources.json\nerror: build failed\n"
+      }
+    },
+    {
+      "project": "lean-regex",
+      "platform": "darwin-arm64",
+      "result": "resource-stop",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 28.102,
+        "buildStatus": 1,
+        "logTail": "✔ [74/97] Built Regex.Data.BVPos:c.o (145ms)\n✔ [75/97] Built Regex.Regex.OptimizationInfo:c.o (194ms)\n✔ [76/97] Built Regex.Data.BitMatrix:c.o (133ms)\n✔ [77/97] Built Regex.Backtracker.Basic (681ms)\n✔ [78/97] Built Regex.Backtracker.Basic:c.o (237ms)\n✔ [79/97] Built Regex.Backtracker (244ms)\n✔ [89/97] Built Regex.Backtracker:c.o (66ms)\nSome required targets logged failures:\n- Regex.Data.SparseSet.Bijection\n[lasm] macOS proactive RSS stop 2.80 GiB; no kernel aggregate cap; /Users/runner/work/lasm/lasm/.work/eco/results/lean-regex-native-build-resources.json\nerror: build failed\n"
+      }
+    },
+    {
+      "project": "lean-regex",
+      "platform": "win32-x64",
+      "result": "native-fail",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 38.568,
+        "buildStatus": 1,
+        "logTail": "✔ [70/97] Built Regex.NFA:c.o (983ms)\n✔ [71/97] Built Regex.Strategy (1.0s)\n✔ [76/97] Built Regex.Backtracker.Basic (1.4s)\n✔ [77/97] Built Regex.Strategy:c.o (1.4s)\n✔ [78/97] Built Regex.Backtracker.Basic:c.o (1.0s)\n✔ [79/97] Built Regex.Backtracker (1.0s)\n✔ [96/97] Built Regex.Backtracker:c.o (106ms)\nSome required targets logged failures:\n- Regex.Data.SparseSet.Bijection\n{\"status\": \"failed\", \"command\": [\"C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\lasm\\\\Cache\\\\artifacts\\\\7bf0d75dc2e7675eadc14d65161e4560e1f2b5d7f008a7eedd0114bf9f21411e\\\\bin\\\\lake.exe\", \"build\", \"app\"], \"hostAtStart\": {\"total\": 17174360064, \"available\": 14113591296}, \"limits\": {\"jobCommittedBytes\": 8587180032, \"stopCommittedBytes\": 6869744025, \"hostReserveBytes\": 2147483648, \"timeoutSeconds\": null}, \"peakCommittedBytes\": 1971810304, \"minimumHostAvailable\": 13633794048, \"startedAt\": 1792692246.6032302, \"unit\": \"Local\\\\LasmResource-ee9bfa9c-e589-4096-a027-d33c83e1ed2f\", \"pid\": 4128, \"lastSampleAt\": 1792692282.4099374, \"reportWriteContentions\": 0, \"exitCode\": 1, \"finishedAt\": 1792692282.5627127}\nerror: build failed\n"
+      }
+    },
+    {
+      "project": "lean-zip",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 546.552,
+        "buildStatus": 0,
+        "oleanBytes": 141896056,
+        "exit": 0,
+        "runSeconds": 0.018,
+        "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1",
+        "stdoutHead": "level 0: gzip 11823 bytes, zlib 11811 bytes, round trip true\nlevel 1: gzip 185 bytes, zlib 173 bytes, round trip true\nlevel 6: gzip 126 bytes, zlib 114 bytes, round trip true\nlevel 9: gzip 126 bytes, zlib 114 bytes, round trip true\ncrc32 2367691561 adler32 2538486289\n"
+      },
+      "lasm": {
+        "buildSeconds": 186.571,
+        "buildStatus": 0,
+        "wasmBytes": 1852934,
+        "distBytes": 3719709,
+        "initializationPlan": {
+          "units": 2429,
+          "kept": 13,
+          "skipped": 2416
+        },
+        "nativeObjects": 5,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.38,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.391,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.394,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.38,
+        "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1",
+        "stdoutHead": "level 0: gzip 11823 bytes, zlib 11811 bytes, round trip true\nlevel 1: gzip 185 bytes, zlib 173 bytes, round trip true\nlevel 6: gzip 126 bytes, zlib 114 bytes, round trip true\nlevel 9: gzip 126 bytes, zlib 114 bytes, round trip true\ncrc32 2367691561 adler32 2538486289\n"
+      }
+    },
+    {
+      "project": "lean-zip",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 485.758,
+        "buildStatus": 0,
+        "oleanBytes": 141896056,
+        "exit": 0,
+        "runSeconds": 0.014,
+        "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1",
+        "stdoutHead": "level 0: gzip 11823 bytes, zlib 11811 bytes, round trip true\nlevel 1: gzip 185 bytes, zlib 173 bytes, round trip true\nlevel 6: gzip 126 bytes, zlib 114 bytes, round trip true\nlevel 9: gzip 126 bytes, zlib 114 bytes, round trip true\ncrc32 2367691561 adler32 2538486289\n"
+      },
+      "lasm": {
+        "buildSeconds": 144.937,
+        "buildStatus": 0,
+        "wasmBytes": 1852934,
+        "distBytes": 3734629,
+        "initializationPlan": {
+          "units": 2429,
+          "kept": 13,
+          "skipped": 2416
+        },
+        "nativeObjects": 5,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.301,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.301,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.299,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.301,
+        "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1",
+        "stdoutHead": "level 0: gzip 11823 bytes, zlib 11811 bytes, round trip true\nlevel 1: gzip 185 bytes, zlib 173 bytes, round trip true\nlevel 6: gzip 126 bytes, zlib 114 bytes, round trip true\nlevel 9: gzip 126 bytes, zlib 114 bytes, round trip true\ncrc32 2367691561 adler32 2538486289\n"
+      }
+    },
+    {
+      "project": "lean-zip",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 1005.559,
+        "buildStatus": 0,
+        "oleanBytes": 141886984,
+        "exit": 0,
+        "runSeconds": 0.027,
+        "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1",
+        "stdoutHead": "level 0: gzip 11823 bytes, zlib 11811 bytes, round trip true\nlevel 1: gzip 185 bytes, zlib 173 bytes, round trip true\nlevel 6: gzip 126 bytes, zlib 114 bytes, round trip true\nlevel 9: gzip 126 bytes, zlib 114 bytes, round trip true\ncrc32 2367691561 adler32 2538486289\n"
+      },
+      "lasm": {
+        "buildSeconds": 383.971,
+        "buildStatus": 0,
+        "wasmBytes": 1852934,
+        "distBytes": 4134131,
+        "initializationPlan": {
+          "units": 2429,
+          "kept": 13,
+          "skipped": 2416
+        },
+        "nativeObjects": 5,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.5,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.496,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.511,
+            "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.5,
+        "stdoutSha256": "1ddd2ff52c5d6a7ba817fd6312b94a196f5d77c410634520a95ef005e81af7c1",
+        "stdoutHead": "level 0: gzip 11823 bytes, zlib 11811 bytes, round trip true\nlevel 1: gzip 185 bytes, zlib 173 bytes, round trip true\nlevel 6: gzip 126 bytes, zlib 114 bytes, round trip true\nlevel 9: gzip 126 bytes, zlib 114 bytes, round trip true\ncrc32 2367691561 adler32 2538486289\n"
+      }
+    },
+    {
+      "project": "lean-zip",
+      "platform": "darwin-arm64",
+      "result": "resource-stop",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 46.947,
+        "buildStatus": 125,
+        "logTail": "Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _h\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\n✔ [9/12] Built Zip.Native.Wide (2.6s)\n✔ [10/12] Built Zip.Native.InflateTreeFree (2.9s)\n✔ [11/13] Built Zip.Native.InflateFast (3.3s)\n✔ [12/16] Built Zip.Native.BitWriter (1.4s)\n✔ [13/16] Built ZipCommon.Binary (596ms)\n✔ [14/16] Built Zip.Native.TokenArray (1.4s)\n[lasm] macOS proactive RSS stop 2.80 GiB; no kernel aggregate cap; /Users/runner/work/lasm/lasm/.work/eco/results/lean-zip-native-build-resources.json\n"
+      }
+    },
+    {
+      "project": "lean-zip",
+      "platform": "win32-x64",
+      "result": "native-fail",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 348.575,
+        "buildStatus": 1,
+        "logTail": "✔ [126/130] Built Zip.Native.Gzip:c.o (801ms)\n⚠ [127/130] Built Main (865ms)\nwarning: Main.lean:8:97: `List.asString` has been deprecated: Use `String.ofList` instead\n\nNote: The updated constant is in a different namespace. Dot notation may need to be changed (e.g., from `x.asString` to `String.ofList x`).\n✔ [128/130] Built Main:c.o (130ms)\n✔ [129/130] Built Zip.Native.DeflateDynamic:c.o (2.0s)\nSome required targets logged failures:\n- zipCommon/io_ffi.o\n{\"status\": \"failed\", \"command\": [\"C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\lasm\\\\Cache\\\\artifacts\\\\7bf0d75dc2e7675eadc14d65161e4560e1f2b5d7f008a7eedd0114bf9f21411e\\\\bin\\\\lake.exe\", \"build\", \"app\"], \"hostAtStart\": {\"total\": 17174360064, \"available\": 14006583296}, \"limits\": {\"jobCommittedBytes\": 8587180032, \"stopCommittedBytes\": 6869744025, \"hostReserveBytes\": 2147483648, \"timeoutSeconds\": null}, \"peakCommittedBytes\": 6126325760, \"minimumHostAvailable\": 10756829184, \"startedAt\": 1792692321.5701709, \"unit\": \"Local\\\\LasmResource-3d6a1aa8-c943-4be8-bfcc-7f096ad43e6d\", \"pid\": 7156, \"lastSampleAt\": 1792692668.5975153, \"reportWriteContentions\": 0, \"exitCode\": 1, \"finishedAt\": 1792692668.7689495}\nerror: build failed\n"
+      }
+    },
+    {
+      "project": "leansqlite",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 16.241,
+        "buildStatus": 0,
+        "oleanBytes": 8263200,
+        "exit": 0,
+        "runSeconds": 0.208,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 144.816,
+        "buildStatus": 0,
+        "wasmBytes": 2409593,
+        "distBytes": 4282213,
+        "initializationPlan": {
+          "units": 2860,
+          "kept": 6,
+          "skipped": 2854
+        },
+        "nativeObjects": 3,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.373,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.351,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.351,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.373,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      }
+    },
+    {
+      "project": "leansqlite",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 20.453,
+        "buildStatus": 0,
+        "oleanBytes": 8263200,
+        "exit": 0,
+        "runSeconds": 0.053,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 178.281,
+        "buildStatus": 0,
+        "wasmBytes": 2409593,
+        "distBytes": 4297133,
+        "initializationPlan": {
+          "units": 2860,
+          "kept": 6,
+          "skipped": 2854
+        },
+        "nativeObjects": 3,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.38,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.363,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.367,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.38,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      }
+    },
+    {
+      "project": "leansqlite",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 44.468,
+        "buildStatus": 0,
+        "oleanBytes": 8263200,
+        "exit": 0,
+        "runSeconds": 0.071,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 533.572,
+        "buildStatus": 0,
+        "wasmBytes": 2409593,
+        "distBytes": 4696632,
+        "initializationPlan": {
+          "units": 2860,
+          "kept": 6,
+          "skipped": 2854
+        },
+        "nativeObjects": 3,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 1.599,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.515,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.544,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 1.599,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      }
+    },
+    {
+      "project": "leansqlite",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 34.106,
+        "buildStatus": 0,
+        "oleanBytes": 8263200,
+        "exit": 0,
+        "runSeconds": 0.072,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 268.283,
+        "buildStatus": 0,
+        "wasmBytes": 2409593,
+        "distBytes": 4348944,
+        "initializationPlan": {
+          "units": 2860,
+          "kept": 6,
+          "skipped": 2854
+        },
+        "nativeObjects": 3,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.306,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.314,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.312,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.306,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      }
+    },
+    {
+      "project": "leansqlite",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 23.753,
+        "buildStatus": 0,
+        "oleanBytes": 8263200,
+        "exit": 0,
+        "runSeconds": 0.438,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 425.877,
+        "buildStatus": 0,
+        "wasmBytes": 2409593,
+        "distBytes": 4112323,
+        "initializationPlan": {
+          "units": 2860,
+          "kept": 6,
+          "skipped": 2854
+        },
+        "nativeObjects": 3,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.278,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.281,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.273,
+            "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.278,
+        "stdoutSha256": "acfc46c64a846561c163fd4b4c7b3ee69fd6ed5733f55e4a8c57b06ac44b2758",
+        "stdoutHead": "2 pear 2.500000 4\n1 apple 1.250000 5\n3 plum 0.750000 4\nrows 3, total 4.500000, version 1\nreopened: apple,pear,plum\nfile exists: true\n"
+      }
+    },
+    {
+      "project": "lspec",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 17.007,
+        "buildStatus": 0,
+        "oleanBytes": 11756304,
+        "exit": 0,
+        "runSeconds": 0.036,
+        "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358",
+        "stdoutHead": "passing\n  arithmetic:\n    ✓ ∃: addition\n    ✓ ∃: fib 10\n    ✓ ∃: strings\n\npassing suite exit 0\nfailing"
+      },
+      "lasm": {
+        "buildSeconds": 138.756,
+        "buildStatus": 0,
+        "wasmBytes": 1352419,
+        "distBytes": 3209543,
+        "initializationPlan": {
+          "units": 2648,
+          "kept": 6,
+          "skipped": 2642
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.308,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.297,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.304,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.308,
+        "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358",
+        "stdoutHead": "passing\n  arithmetic:\n    ✓ ∃: addition\n    ✓ ∃: fib 10\n    ✓ ∃: strings\n\npassing suite exit 0\nfailing"
+      }
+    },
+    {
+      "project": "lspec",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 12.566,
+        "buildStatus": 0,
+        "oleanBytes": 11756304,
+        "exit": 0,
+        "runSeconds": 0.035,
+        "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358",
+        "stdoutHead": "passing\n  arithmetic:\n    ✓ ∃: addition\n    ✓ ∃: fib 10\n    ✓ ∃: strings\n\npassing suite exit 0\nfailing"
+      },
+      "lasm": {
+        "buildSeconds": 112.553,
+        "buildStatus": 0,
+        "wasmBytes": 1352419,
+        "distBytes": 3224463,
+        "initializationPlan": {
+          "units": 2648,
+          "kept": 6,
+          "skipped": 2642
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.297,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.288,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.291,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.297,
+        "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358",
+        "stdoutHead": "passing\n  arithmetic:\n    ✓ ∃: addition\n    ✓ ∃: fib 10\n    ✓ ∃: strings\n\npassing suite exit 0\nfailing"
+      }
+    },
+    {
+      "project": "lspec",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 43.763,
+        "buildStatus": 0,
+        "oleanBytes": 11756304,
+        "exit": 0,
+        "runSeconds": 0.064,
+        "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358",
+        "stdoutHead": "passing\n  arithmetic:\n    ✓ ∃: addition\n    ✓ ∃: fib 10\n    ✓ ∃: strings\n\npassing suite exit 0\nfailing"
+      },
+      "lasm": {
+        "buildSeconds": 309.698,
+        "buildStatus": 0,
+        "wasmBytes": 1352419,
+        "distBytes": 3623955,
+        "initializationPlan": {
+          "units": 2648,
+          "kept": 6,
+          "skipped": 2642
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.736,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.442,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.418,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.736,
+        "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358",
+        "stdoutHead": "passing\n  arithmetic:\n    ✓ ∃: addition\n    ✓ ∃: fib 10\n    ✓ ∃: strings\n\npassing suite exit 0\nfailing"
+      }
+    },
+    {
+      "project": "lspec",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 38.055,
+        "buildStatus": 0,
+        "oleanBytes": 11756304,
+        "exit": 0,
+        "runSeconds": 0.052,
+        "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358",
+        "stdoutHead": "passing\n  arithmetic:\n    ✓ ∃: addition\n    ✓ ∃: fib 10\n    ✓ ∃: strings\n\npassing suite exit 0\nfailing"
+      },
+      "lasm": {
+        "buildSeconds": 125.941,
+        "buildStatus": 0,
+        "wasmBytes": 1352419,
+        "distBytes": 3276267,
+        "initializationPlan": {
+          "units": 2648,
+          "kept": 6,
+          "skipped": 2642
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.224,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.305,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.305,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.224,
+        "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358",
+        "stdoutHead": "passing\n  arithmetic:\n    ✓ ∃: addition\n    ✓ ∃: fib 10\n    ✓ ∃: strings\n\npassing suite exit 0\nfailing"
+      }
+    },
+    {
+      "project": "lspec",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 29.213,
+        "buildStatus": 0,
+        "oleanBytes": 11756304,
+        "exit": 0,
+        "runSeconds": 0.106,
+        "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358",
+        "stdoutHead": "passing\n  arithmetic:\n    ✓ ∃: addition\n    ✓ ∃: fib 10\n    ✓ ∃: strings\n\npassing suite exit 0\nfailing"
+      },
+      "lasm": {
+        "buildSeconds": 416.355,
+        "buildStatus": 0,
+        "wasmBytes": 1352419,
+        "distBytes": 3039661,
+        "initializationPlan": {
+          "units": 2648,
+          "kept": 6,
+          "skipped": 2642
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.331,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.345,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.334,
+            "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.331,
+        "stdoutSha256": "164e1f73a6da1f1fa69593044a2f673b03ccd38bc4cf7c882e85c4a9f8151358",
+        "stdoutHead": "passing\n  arithmetic:\n    ✓ ∃: addition\n    ✓ ∃: fib 10\n    ✓ ∃: strings\n\npassing suite exit 0\nfailing"
+      }
+    },
+    {
+      "project": "mathlib-deps",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 8.835,
+        "buildStatus": 0,
+        "oleanBytes": 9961568,
+        "exit": 0,
+        "runSeconds": 0.03,
+        "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240",
+        "stdoutHead": "<div class=\"\"note\"\">rendered by Lean</div>\n"
+      },
+      "lasm": {
+        "buildSeconds": 138.142,
+        "buildStatus": 0,
+        "wasmBytes": 2216840,
+        "distBytes": 4074123,
+        "initializationPlan": {
+          "units": 5879,
+          "kept": 4,
+          "skipped": 5875
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.219,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.22,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.22,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.219,
+        "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240",
+        "stdoutHead": "<div class=\"\"note\"\">rendered by Lean</div>\n"
+      }
+    },
+    {
+      "project": "mathlib-deps",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 8.211,
+        "buildStatus": 0,
+        "oleanBytes": 9961568,
+        "exit": 0,
+        "runSeconds": 0.033,
+        "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240",
+        "stdoutHead": "<div class=\"\"note\"\">rendered by Lean</div>\n"
+      },
+      "lasm": {
+        "buildSeconds": 151.549,
+        "buildStatus": 0,
+        "wasmBytes": 2216840,
+        "distBytes": 4089043,
+        "initializationPlan": {
+          "units": 5879,
+          "kept": 4,
+          "skipped": 5875
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.262,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.266,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.264,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.262,
+        "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240",
+        "stdoutHead": "<div class=\"\"note\"\">rendered by Lean</div>\n"
+      }
+    },
+    {
+      "project": "mathlib-deps",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 86.095,
+        "buildStatus": 0,
+        "oleanBytes": 9961568,
+        "exit": 0,
+        "runSeconds": 0.099,
+        "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240",
+        "stdoutHead": "<div class=\"\"note\"\">rendered by Lean</div>\n"
+      },
+      "lasm": {
+        "buildSeconds": 480.019,
+        "buildStatus": 0,
+        "wasmBytes": 2216840,
+        "distBytes": 4488535,
+        "initializationPlan": {
+          "units": 5879,
+          "kept": 4,
+          "skipped": 5875
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.725,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.474,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.445,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.725,
+        "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240",
+        "stdoutHead": "<div class=\"\"note\"\">rendered by Lean</div>\n"
+      }
+    },
+    {
+      "project": "mathlib-deps",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 43.763,
+        "buildStatus": 0,
+        "oleanBytes": 9961568,
+        "exit": 0,
+        "runSeconds": 0.072,
+        "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240",
+        "stdoutHead": "<div class=\"\"note\"\">rendered by Lean</div>\n"
+      },
+      "lasm": {
+        "buildSeconds": 171.828,
+        "buildStatus": 0,
+        "wasmBytes": 2216840,
+        "distBytes": 4140847,
+        "initializationPlan": {
+          "units": 5879,
+          "kept": 4,
+          "skipped": 5875
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.236,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.257,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.245,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.236,
+        "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240",
+        "stdoutHead": "<div class=\"\"note\"\">rendered by Lean</div>\n"
+      }
+    },
+    {
+      "project": "mathlib-deps",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 22.782,
+        "buildStatus": 0,
+        "oleanBytes": 9961568,
+        "exit": 0,
+        "runSeconds": 0.489,
+        "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240",
+        "stdoutHead": "<div class=\"\"note\"\">rendered by Lean</div>\n"
+      },
+      "lasm": {
+        "buildSeconds": 512.383,
+        "buildStatus": 0,
+        "wasmBytes": 2216840,
+        "distBytes": 3904241,
+        "initializationPlan": {
+          "units": 5879,
+          "kept": 4,
+          "skipped": 5875
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.389,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.366,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.381,
+            "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.389,
+        "stdoutSha256": "1c4a7e63641fe8b605669133e0a6b70a256c6023767f7f8920809a1295976240",
+        "stdoutHead": "<div class=\"\"note\"\">rendered by Lean</div>\n"
+      }
+    },
+    {
+      "project": "md4lean",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 2.355,
+        "buildStatus": 0,
+        "oleanBytes": 2028624,
+        "exit": 0,
+        "runSeconds": 0.005,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      },
+      "lasm": {
+        "buildSeconds": 102.905,
+        "buildStatus": 0,
+        "wasmBytes": 1196019,
+        "distBytes": 3054576,
+        "initializationPlan": {
+          "units": 1701,
+          "kept": 4,
+          "skipped": 1697
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.17,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.16,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.161,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.17,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      }
+    },
+    {
+      "project": "md4lean",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 3.429,
+        "buildStatus": 0,
+        "oleanBytes": 2028624,
+        "exit": 0,
+        "runSeconds": 0.004,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      },
+      "lasm": {
+        "buildSeconds": 107.739,
+        "buildStatus": 0,
+        "wasmBytes": 1196019,
+        "distBytes": 3069496,
+        "initializationPlan": {
+          "units": 1701,
+          "kept": 4,
+          "skipped": 1697
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.22,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.221,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.211,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.22,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      }
+    },
+    {
+      "project": "md4lean",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 12.736,
+        "buildStatus": 0,
+        "oleanBytes": 2028624,
+        "exit": 0,
+        "runSeconds": 0.01,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      },
+      "lasm": {
+        "buildSeconds": 413.213,
+        "buildStatus": 0,
+        "wasmBytes": 1196019,
+        "distBytes": 3468997,
+        "initializationPlan": {
+          "units": 1701,
+          "kept": 4,
+          "skipped": 1697
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.478,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.395,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.448,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.478,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      }
+    },
+    {
+      "project": "md4lean",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 6.88,
+        "buildStatus": 0,
+        "oleanBytes": 2028624,
+        "exit": 0,
+        "runSeconds": 0.007,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      },
+      "lasm": {
+        "buildSeconds": 180.569,
+        "buildStatus": 0,
+        "wasmBytes": 1196019,
+        "distBytes": 3121309,
+        "initializationPlan": {
+          "units": 1701,
+          "kept": 4,
+          "skipped": 1697
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.268,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.275,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.309,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.268,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      }
+    },
+    {
+      "project": "md4lean",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 7.392,
+        "buildStatus": 0,
+        "oleanBytes": 2028624,
+        "exit": 0,
+        "runSeconds": 0.03,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      },
+      "lasm": {
+        "buildSeconds": 574.956,
+        "buildStatus": 0,
+        "wasmBytes": 1196019,
+        "distBytes": 2885188,
+        "initializationPlan": {
+          "units": 1701,
+          "kept": 4,
+          "skipped": 1697
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.23,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.232,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.236,
+            "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.23,
+        "stdoutSha256": "e8c96e516d6fab27dc4c9a181de1a1d3cf3d93fa32c64657f472f7f3b38c79b3",
+        "stdoutHead": "<h1>Title</h1>\n<p>Some <em>emphasis</em>, <strong>strong</strong> and <code>code</code>.</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<table>\n<thead>"
+      }
+    },
+    {
+      "project": "native-tactic",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 6.022,
+        "buildStatus": 0,
+        "oleanBytes": 590184,
+        "exit": 0,
+        "runSeconds": 0.035,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      },
+      "lasm": {
+        "buildSeconds": 190.235,
+        "buildStatus": 0,
+        "wasmBytes": 2177728,
+        "distBytes": 4030538,
+        "initializationPlan": {
+          "units": 5816,
+          "kept": 4,
+          "skipped": 5812
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.325,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.315,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.319,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.325,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      }
+    },
+    {
+      "project": "native-tactic",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 3.211,
+        "buildStatus": 0,
+        "oleanBytes": 590184,
+        "exit": 0,
+        "runSeconds": 0.035,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      },
+      "lasm": {
+        "buildSeconds": 154.163,
+        "buildStatus": 0,
+        "wasmBytes": 2177728,
+        "distBytes": 4045458,
+        "initializationPlan": {
+          "units": 5816,
+          "kept": 4,
+          "skipped": 5812
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.271,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.259,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.267,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.271,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      }
+    },
+    {
+      "project": "native-tactic",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 16.892,
+        "buildStatus": 0,
+        "oleanBytes": 590184,
+        "exit": 0,
+        "runSeconds": 0.095,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      },
+      "lasm": {
+        "buildSeconds": 610.202,
+        "buildStatus": 0,
+        "wasmBytes": 2177728,
+        "distBytes": 4444952,
+        "initializationPlan": {
+          "units": 5816,
+          "kept": 4,
+          "skipped": 5812
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.904,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.626,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.607,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.904,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      }
+    },
+    {
+      "project": "native-tactic",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 25.775,
+        "buildStatus": 0,
+        "oleanBytes": 590184,
+        "exit": 0,
+        "runSeconds": 0.065,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      },
+      "lasm": {
+        "buildSeconds": 239.779,
+        "buildStatus": 0,
+        "wasmBytes": 2177728,
+        "distBytes": 4097264,
+        "initializationPlan": {
+          "units": 5816,
+          "kept": 4,
+          "skipped": 5812
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.319,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.278,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.316,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.319,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      }
+    },
+    {
+      "project": "native-tactic",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 12.725,
+        "buildStatus": 0,
+        "oleanBytes": 590184,
+        "exit": 0,
+        "runSeconds": 0.142,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      },
+      "lasm": {
+        "buildSeconds": 517.589,
+        "buildStatus": 0,
+        "wasmBytes": 2177728,
+        "distBytes": 3860652,
+        "initializationPlan": {
+          "units": 5816,
+          "kept": 4,
+          "skipped": 5812
+        },
+        "nativeObjects": 1,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.57,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.374,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.378,
+            "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.57,
+        "stdoutSha256": "d5c160f523169e6cb31409044dfd2af8570c9a26a39f6aaffb7edf2785ab2945",
+        "stdoutHead": "computed during elaboration: 50, 145\n"
+      }
+    },
+    {
+      "project": "plausible",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 10.445,
+        "buildStatus": 0,
+        "oleanBytes": 8560320,
+        "exit": 0,
+        "runSeconds": 0.038,
+        "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc",
+        "stdoutHead": "reverse involutive: passed\nappend length: passed\nfalse claim: counterexample [n := 50, issue: 50 < 50 does not hold]\ngenerated a list of length ≤ 100: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 126.764,
+        "buildStatus": 0,
+        "wasmBytes": 1424818,
+        "distBytes": 3279665,
+        "initializationPlan": {
+          "units": 2623,
+          "kept": 5,
+          "skipped": 2618
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.287,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.306,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.297,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.287,
+        "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc",
+        "stdoutHead": "reverse involutive: passed\nappend length: passed\nfalse claim: counterexample [n := 50, issue: 50 < 50 does not hold]\ngenerated a list of length ≤ 100: true\n"
+      }
+    },
+    {
+      "project": "plausible",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 8.296,
+        "buildStatus": 0,
+        "oleanBytes": 8560320,
+        "exit": 0,
+        "runSeconds": 0.039,
+        "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc",
+        "stdoutHead": "reverse involutive: passed\nappend length: passed\nfalse claim: counterexample [n := 50, issue: 50 < 50 does not hold]\ngenerated a list of length ≤ 100: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 133.275,
+        "buildStatus": 0,
+        "wasmBytes": 1424818,
+        "distBytes": 3294585,
+        "initializationPlan": {
+          "units": 2623,
+          "kept": 5,
+          "skipped": 2618
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.257,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.248,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.257,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.257,
+        "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc",
+        "stdoutHead": "reverse involutive: passed\nappend length: passed\nfalse claim: counterexample [n := 50, issue: 50 < 50 does not hold]\ngenerated a list of length ≤ 100: true\n"
+      }
+    },
+    {
+      "project": "plausible",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 44.971,
+        "buildStatus": 0,
+        "oleanBytes": 8560320,
+        "exit": 0,
+        "runSeconds": 0.089,
+        "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc",
+        "stdoutHead": "reverse involutive: passed\nappend length: passed\nfalse claim: counterexample [n := 50, issue: 50 < 50 does not hold]\ngenerated a list of length ≤ 100: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 397.257,
+        "buildStatus": 0,
+        "wasmBytes": 1424818,
+        "distBytes": 3694077,
+        "initializationPlan": {
+          "units": 2623,
+          "kept": 5,
+          "skipped": 2618
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.444,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.409,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.399,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.444,
+        "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc",
+        "stdoutHead": "reverse involutive: passed\nappend length: passed\nfalse claim: counterexample [n := 50, issue: 50 < 50 does not hold]\ngenerated a list of length ≤ 100: true\n"
+      }
+    },
+    {
+      "project": "plausible",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 26.975,
+        "buildStatus": 0,
+        "oleanBytes": 8560320,
+        "exit": 0,
+        "runSeconds": 0.063,
+        "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc",
+        "stdoutHead": "reverse involutive: passed\nappend length: passed\nfalse claim: counterexample [n := 50, issue: 50 < 50 does not hold]\ngenerated a list of length ≤ 100: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 153.193,
+        "buildStatus": 0,
+        "wasmBytes": 1424818,
+        "distBytes": 3346389,
+        "initializationPlan": {
+          "units": 2623,
+          "kept": 5,
+          "skipped": 2618
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.252,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.331,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.315,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.252,
+        "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc",
+        "stdoutHead": "reverse involutive: passed\nappend length: passed\nfalse claim: counterexample [n := 50, issue: 50 < 50 does not hold]\ngenerated a list of length ≤ 100: true\n"
+      }
+    },
+    {
+      "project": "plausible",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 15.27,
+        "buildStatus": 0,
+        "oleanBytes": 8560320,
+        "exit": 0,
+        "runSeconds": 0.449,
+        "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc",
+        "stdoutHead": "reverse involutive: passed\nappend length: passed\nfalse claim: counterexample [n := 50, issue: 50 < 50 does not hold]\ngenerated a list of length ≤ 100: true\n"
+      },
+      "lasm": {
+        "buildSeconds": 603.821,
+        "buildStatus": 0,
+        "wasmBytes": 1424818,
+        "distBytes": 3109783,
+        "initializationPlan": {
+          "units": 2623,
+          "kept": 5,
+          "skipped": 2618
+        },
+        "nativeObjects": 0,
+        "leanDistribution": "tiers-extended",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.29,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.266,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.262,
+            "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.29,
+        "stdoutSha256": "a18d138a4a0c9d779f94cc7cea29beda73a07a69d382b678b70a4a3d81759acc",
+        "stdoutHead": "reverse involutive: passed\nappend length: passed\nfalse claim: counterexample [n := 50, issue: 50 < 50 does not hold]\ngenerated a list of length ≤ 100: true\n"
+      }
+    },
+    {
+      "project": "prebuilt-library",
+      "platform": "linux-x64",
+      "result": "expected",
+      "node": "v26.12.1",
+      "lasm": {
+        "buildSeconds": 116.976,
+        "buildStatus": 1,
+        "logTail": "Lasm cannot link prebuilt native libraries into a Node application; the program needs shim_curl_version:\n  package app links libcurl (HTTP client) (curl). Use the Fetch package (Node fetch backend) or run the curl command with IO.Process.\nLasm compiles C source that packages bundle and that Lake compiles (extern_lib, moreLinkObjs); prebuilt system or shared libraries are not available in Wasm.\nSee \"Lean support and restrictions\" in the Lasm README.\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 1min 56.856s\nCPU time consumed: 2min 10.029s\nMemory peak: 4.1G\nMemory swap peak: 0B\n[lasm] Peak 4.14 GiB; exit-code\n"
+      }
+    },
+    {
+      "project": "prebuilt-library",
+      "platform": "linux-arm64",
+      "result": "expected",
+      "node": "v26.12.1",
+      "lasm": {
+        "buildSeconds": 91.951,
+        "buildStatus": 1,
+        "logTail": "Lasm cannot link prebuilt native libraries into a Node application; the program needs shim_curl_version:\n  package app links libcurl (HTTP client) (curl). Use the Fetch package (Node fetch backend) or run the curl command with IO.Process.\nLasm compiles C source that packages bundle and that Lake compiles (extern_lib, moreLinkObjs); prebuilt system or shared libraries are not available in Wasm.\nSee \"Lean support and restrictions\" in the Lasm README.\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 1min 31.874s\nCPU time consumed: 1min 52.774s\nMemory peak: 4.0G\nMemory swap peak: 0B\n[lasm] Peak 4.06 GiB; exit-code\n"
+      }
+    },
+    {
+      "project": "prebuilt-library",
+      "platform": "darwin-x64",
+      "result": "expected",
+      "node": "v26.12.1",
+      "lasm": {
+        "buildSeconds": 475.698,
+        "buildStatus": 1,
+        "logTail": "[lasm] Planning runtime initialization — 12s elapsed\n[lasm] Planning runtime initialization — 22s elapsed\n[lasm] Planning runtime initialization — 32s elapsed\n[lasm] Planning runtime initialization — 42s elapsed\n[lasm] Planning runtime initialization — 52s elapsed\n[lasm] Planning runtime initialization — 1m 2s elapsed\n[lasm] Checking required runtime code — 0s elapsed\nLasm cannot link prebuilt native libraries into a Node application; the program needs shim_curl_version:\n  package app links libcurl (HTTP client) (curl). Use the Fetch package (Node fetch backend) or run the curl command with IO.Process.\nLasm compiles C source that packages bundle and that Lake compiles (extern_lib, moreLinkObjs); prebuilt system or shared libraries are not available in Wasm.\nSee \"Lean support and restrictions\" in the Lasm README.\n"
+      }
+    },
+    {
+      "project": "prebuilt-library",
+      "platform": "darwin-arm64",
+      "result": "expected",
+      "node": "v26.12.1",
+      "lasm": {
+        "buildSeconds": 215.106,
+        "buildStatus": 1,
+        "logTail": "[lasm] Compiling application module 1 of 1 — 0s elapsed\n[lasm] Compiling application module 1 of 1 — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Planning runtime initialization — 0s elapsed\n[lasm] Planning runtime initialization — 9s elapsed\n[lasm] Planning runtime initialization — 19s elapsed\n[lasm] Checking required runtime code — 0s elapsed\nLasm cannot link prebuilt native libraries into a Node application; the program needs shim_curl_version:\n  package app links libcurl (HTTP client) (curl). Use the Fetch package (Node fetch backend) or run the curl command with IO.Process.\nLasm compiles C source that packages bundle and that Lake compiles (extern_lib, moreLinkObjs); prebuilt system or shared libraries are not available in Wasm.\nSee \"Lean support and restrictions\" in the Lasm README.\n"
+      }
+    },
+    {
+      "project": "prebuilt-library",
+      "platform": "win32-x64",
+      "result": "expected",
+      "node": "v26.12.1",
+      "lasm": {
+        "buildSeconds": 489.44,
+        "buildStatus": 1,
+        "logTail": "[lasm] Compiling application module 1 of 1 — 0s elapsed\n[lasm] Preparing application symbols — 0s elapsed\n[lasm] Planning runtime initialization — 0s elapsed\n[lasm] Planning runtime initialization — 4s elapsed\n[lasm] Planning runtime initialization — 14s elapsed\n[lasm] Planning runtime initialization — 24s elapsed\n[lasm] Checking required runtime code — 0s elapsed\nLasm cannot link prebuilt native libraries into a Node application; the program needs shim_curl_version:\n  package app links libcurl (HTTP client) (curl). Use the Fetch package (Node fetch backend) or run the curl command with IO.Process.\nLasm compiles C source that packages bundle and that Lake compiles (extern_lib, moreLinkObjs); prebuilt system or shared libraries are not available in Wasm.\nSee \"Lean support and restrictions\" in the Lasm README.\n"
+      }
+    },
+    {
+      "project": "unicode-parser",
+      "platform": "linux-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 120.802,
+        "buildStatus": 0,
+        "oleanBytes": 110376000,
+        "exit": 0,
+        "runSeconds": 0.073,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      },
+      "lasm": {
+        "buildSeconds": 267.266,
+        "buildStatus": 0,
+        "wasmBytes": 3221464,
+        "distBytes": 5125801,
+        "initializationPlan": {
+          "units": 3752,
+          "kept": 9,
+          "skipped": 3743
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.421,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.408,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.408,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.421,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      }
+    },
+    {
+      "project": "unicode-parser",
+      "platform": "linux-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 77.513,
+        "buildStatus": 0,
+        "oleanBytes": 110376000,
+        "exit": 0,
+        "runSeconds": 0.068,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      },
+      "lasm": {
+        "buildSeconds": 210.319,
+        "buildStatus": 0,
+        "wasmBytes": 3221464,
+        "distBytes": 5140721,
+        "initializationPlan": {
+          "units": 3752,
+          "kept": 9,
+          "skipped": 3743
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.356,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.367,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.349,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.356,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      }
+    },
+    {
+      "project": "unicode-parser",
+      "platform": "darwin-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 611.17,
+        "buildStatus": 0,
+        "oleanBytes": 110376000,
+        "exit": 0,
+        "runSeconds": 0.214,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      },
+      "lasm": {
+        "buildSeconds": 649.126,
+        "buildStatus": 0,
+        "wasmBytes": 3221464,
+        "distBytes": 5540225,
+        "initializationPlan": {
+          "units": 3752,
+          "kept": 9,
+          "skipped": 3743
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.833,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.7,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.788,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.833,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      }
+    },
+    {
+      "project": "unicode-parser",
+      "platform": "darwin-arm64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 207.679,
+        "buildStatus": 0,
+        "oleanBytes": 110376000,
+        "exit": 0,
+        "runSeconds": 0.104,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      },
+      "lasm": {
+        "buildSeconds": 255.749,
+        "buildStatus": 0,
+        "wasmBytes": 3221464,
+        "distBytes": 5192537,
+        "initializationPlan": {
+          "units": 3752,
+          "kept": 9,
+          "skipped": 3743
+        },
+        "nativeObjects": 4,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.338,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.386,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.379,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.338,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      }
+    },
+    {
+      "project": "unicode-parser",
+      "platform": "win32-x64",
+      "result": "pass",
+      "node": "v26.12.1",
+      "native": {
+        "buildSeconds": 238.851,
+        "buildStatus": 0,
+        "oleanBytes": 110490584,
+        "exit": 0,
+        "runSeconds": 0.146,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      },
+      "lasm": {
+        "buildSeconds": 716.153,
+        "buildStatus": 0,
+        "wasmBytes": 3221464,
+        "distBytes": 4958982,
+        "initializationPlan": {
+          "units": 3752,
+          "kept": 9,
+          "skipped": 3743
+        },
+        "nativeObjects": 8,
+        "leanDistribution": "tiers-native",
+        "runs": [
+          {
+            "exit": 0,
+            "seconds": 0.625,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.486,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          },
+          {
+            "exit": 0,
+            "seconds": 0.507,
+            "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9"
+          }
+        ],
+        "exit": 0,
+        "runSeconds": 0.625,
+        "stdoutSha256": "a9f94d01b63c819a467ccc8b64dd9b3ba432b9438bac5773068f4937e05890c9",
+        "stdoutHead": "A: LATIN CAPITAL LETTER A gc=Unicode.GC.Lu upper=A lower=a numeric=false script=(some Latin)\nß: LATIN SMALL LETTER SHARP S gc=Unicode.GC.Ll upper=SS lower=ß numeric=false script=(some Latin)\nΣ: GREEK CAPITAL LETTER SIGMA gc=Unicode.GC.Lu upper=Σ lower=σ numeric=false script=(some Greek)\n٣: ARABIC-INDIC DIGIT THREE gc=Unicode.GC.Nd upper=٣ lower=٣ numeric=true script=(some Arabic)\n中: CJK UNIFIED IDEOGRAPH-4E2D gc=Unicode.GC.Lo upper=中 lower=中 numeric=false script=(some Han)\n😀: GRINNING FACE gc=Unicode.GC.So upper=😀 lower=😀 numeric=false script=(some Common)\n1, 22,333 -> #[1, 22, 333] sum 356\n4,5, -> error unexpected token at { byteIdx := 3 }"
+      }
+    }
+  ]
+}
