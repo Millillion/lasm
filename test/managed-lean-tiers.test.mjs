@@ -164,8 +164,8 @@ test('the C tier is selected per host and its compiler environment uses Lean\'s 
   const include = join('/lean', 'lib', 'lasm-libc', 'include');
   assert.deepEqual(cCompilerEnvironment(lean, { C_INCLUDE_PATH: '/mine' }, { platform: 'linux' }),
     { C_INCLUDE_PATH: [join(include, 'x86_64-linux-gnu'), include, '/mine'].join(delimiter) });
-  assert.deepEqual(cCompilerEnvironment({ ...lean, cCompiler: { multiarch: null } }, { Path: 'x', c_include_path: 'y' }, { platform: 'win32' }),
-    { c_include_path: [include, 'y'].join(delimiter) });
+  assert.deepEqual(cCompilerEnvironment({ ...lean, cCompiler: { multiarch: null } }, { Path: 'x' }, { platform: 'win32' }), {},
+    'On Windows the prefix itself is the MinGW sysroot');
   assert.deepEqual(cCompilerEnvironment(lean, {}, { platform: 'darwin', sdkPath: () => '/sdk' }), { SDKROOT: '/sdk' });
   assert.deepEqual(cCompilerEnvironment(lean, { SDKROOT: '/given' }, { platform: 'darwin', sdkPath: () => assert.fail('not asked') }), {});
   assert.throws(() => cCompilerEnvironment(lean, {}, { platform: 'darwin', sdkPath: () => null }), /Xcode Command Line Tools/);

@@ -104,8 +104,6 @@ export function cDataMember(path) {
 /** Debian multiarch directory of the C library headers, or null. */
 export const cMultiarch = platform => ({ 'linux-x64': 'x86_64-linux-gnu', 'linux-arm64': 'aarch64-linux-gnu' })[platform] ?? null;
 
-/** Where the C tier puts C library headers inside the Lean prefix. */
-export const cLibraryInclude = 'lib/lasm-libc/include';
 
 const cString = (bytes, offset) => {
   if (offset < 0 || offset >= bytes.length) throw new Error('Native import string is outside the file');

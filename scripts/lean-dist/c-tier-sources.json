@@ -16,28 +16,70 @@
       "linux-x64": {
         "multiarch": "x86_64-linux-gnu",
         "packages": [
-          { "name": "libc6-dev_2.35-0ubuntu3_amd64.deb", "url": "https://launchpadlibrarian.net/588931976/libc6-dev_2.35-0ubuntu3_amd64.deb",
-            "sha256": "cc37cab5c60bcfe4bbf289a8002f369949a41ed46e8b51a0503a001099370c56", "bytes": 2099422, "format": "deb", "copyright": "usr/share/doc/libc6-dev/copyright" },
-          { "name": "linux-libc-dev_5.15.0-25.25_amd64.deb", "url": "https://launchpadlibrarian.net/593947591/linux-libc-dev_5.15.0-25.25_amd64.deb",
-            "sha256": "1b2a93020593c9e94a25f750ce442da5a6e8ff48a20f52cec92dfc3fa35336d8", "bytes": 1305166, "format": "deb", "copyright": "usr/share/doc/linux-libc-dev/copyright" }
-        ]
+          {
+            "name": "libc6-dev_2.35-0ubuntu3_amd64.deb",
+            "url": "https://launchpadlibrarian.net/588931976/libc6-dev_2.35-0ubuntu3_amd64.deb",
+            "sha256": "cc37cab5c60bcfe4bbf289a8002f369949a41ed46e8b51a0503a001099370c56",
+            "bytes": 2099422,
+            "format": "deb",
+            "copyright": "usr/share/doc/libc6-dev/copyright"
+          },
+          {
+            "name": "linux-libc-dev_5.15.0-25.25_amd64.deb",
+            "url": "https://launchpadlibrarian.net/593947591/linux-libc-dev_5.15.0-25.25_amd64.deb",
+            "sha256": "1b2a93020593c9e94a25f750ce442da5a6e8ff48a20f52cec92dfc3fa35336d8",
+            "bytes": 1305166,
+            "format": "deb",
+            "copyright": "usr/share/doc/linux-libc-dev/copyright"
+          }
+        ],
+        "destination": "lib/lasm-libc/include"
       },
       "linux-arm64": {
         "multiarch": "aarch64-linux-gnu",
         "packages": [
-          { "name": "libc6-dev_2.35-0ubuntu3_arm64.deb", "url": "https://launchpadlibrarian.net/588938512/libc6-dev_2.35-0ubuntu3_arm64.deb",
-            "sha256": "2f254d6e843e413d549f407362885171c285f08383bb7e9392da855810ff78fd", "bytes": 1543666, "format": "deb", "copyright": "usr/share/doc/libc6-dev/copyright" },
-          { "name": "linux-libc-dev_5.15.0-25.25_arm64.deb", "url": "https://launchpadlibrarian.net/594038247/linux-libc-dev_5.15.0-25.25_arm64.deb",
-            "sha256": "ffbdfcd181d87b92c108cb49ca20e152c0688825b5a1aac9ecbc63391b348aeb", "bytes": 1281840, "format": "deb", "copyright": "usr/share/doc/linux-libc-dev/copyright" }
-        ]
+          {
+            "name": "libc6-dev_2.35-0ubuntu3_arm64.deb",
+            "url": "https://launchpadlibrarian.net/588938512/libc6-dev_2.35-0ubuntu3_arm64.deb",
+            "sha256": "2f254d6e843e413d549f407362885171c285f08383bb7e9392da855810ff78fd",
+            "bytes": 1543666,
+            "format": "deb",
+            "copyright": "usr/share/doc/libc6-dev/copyright"
+          },
+          {
+            "name": "linux-libc-dev_5.15.0-25.25_arm64.deb",
+            "url": "https://launchpadlibrarian.net/594038247/linux-libc-dev_5.15.0-25.25_arm64.deb",
+            "sha256": "ffbdfcd181d87b92c108cb49ca20e152c0688825b5a1aac9ecbc63391b348aeb",
+            "bytes": 1281840,
+            "format": "deb",
+            "copyright": "usr/share/doc/linux-libc-dev/copyright"
+          }
+        ],
+        "destination": "lib/lasm-libc/include"
       },
       "win32-x64": {
         "packages": [
-          { "name": "mingw-w64-clang-x86_64-headers-git-13.0.0.r380.gb83511db8-1-any.pkg.tar.zst",
+          {
+            "name": "mingw-w64-clang-x86_64-headers-git-13.0.0.r380.gb83511db8-1-any.pkg.tar.zst",
             "url": "https://repo.msys2.org/mingw/clang64/mingw-w64-clang-x86_64-headers-git-13.0.0.r380.gb83511db8-1-any.pkg.tar.zst",
-            "sha256": "2a766b2bebae15a7fd392b252930174968fda63a873026f77fc05399ef553762", "bytes": 6848291, "format": "msys2",
-            "include": "clang64/include", "copyright": "clang64/share/licenses/headers" }
-        ]
+            "sha256": "2a766b2bebae15a7fd392b252930174968fda63a873026f77fc05399ef553762",
+            "bytes": 6848291,
+            "format": "msys2",
+            "include": "clang64/include",
+            "copyright": "clang64/share/licenses/headers"
+          },
+          {
+            "name": "mingw-w64-clang-x86_64-winpthreads-13.0.0.r380.gb83511db8-1-any.pkg.tar.zst",
+            "url": "https://repo.msys2.org/mingw/clang64/mingw-w64-clang-x86_64-winpthreads-13.0.0.r380.gb83511db8-1-any.pkg.tar.zst",
+            "sha256": "7b63f5c2f3abae0ba81175f6d329f0fffcf9497fd00bcd9641e9ab4955c33f1d",
+            "bytes": 40591,
+            "format": "msys2",
+            "include": "clang64/include",
+            "copyright": "clang64/share/licenses/winpthreads"
+          }
+        ],
+        "destination": "x86_64-w64-mingw32/include",
+        "about": "Lean's clang (MinGW target) uses <prefix>/x86_64-w64-mingw32 as its sysroot when that directory exists, before any MinGW gcc on PATH, so no environment variable is needed and a MinGW installation of the host is never read."
       }
     }
   }

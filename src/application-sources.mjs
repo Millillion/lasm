@@ -46,18 +46,20 @@ export function nativeLeanEnvironment(lean, inherited = process.env) {
 }
 
 /** Lake's default `cc` is Lean's clang (bin/cc of the C tier, first on PATH).
- * Lean ships no C library headers: the C tier adds glibc/Linux or MinGW-w64
- * headers, searched before the system's; macOS uses the Xcode Command Line
- * Tools SDK, which may not be redistributed. */
+ * Lean ships no C library headers. On Linux the C tier's glibc/Linux headers
+ * are searched before the system's (C_INCLUDE_PATH); on Windows its MinGW-w64
+ * headers are in <prefix>/x86_64-w64-mingw32, which Lean's clang uses as its
+ * sysroot by itself; macOS uses the Xcode Command Line Tools SDK, which may
+ * not be redistributed. */
 export function cCompilerEnvironment(lean, env = process.env, { platform = process.platform, sdkPath = macosSdkPath } = {}) {
   const prefix = lean.executionPrefix ?? lean.prefix;
-  const key = platform === 'win32' ? Object.keys(env).find(name => name.toUpperCase() === 'C_INCLUDE_PATH') ?? 'C_INCLUDE_PATH' : 'C_INCLUDE_PATH';
+  const key = 'C_INCLUDE_PATH';
   const result = {};
-  if (platform !== 'darwin') {
+  if (platform === 'linux') {
     const include = join(prefix, 'lib', 'lasm-libc', 'include');
     result[key] = [...(lean.cCompiler.multiarch ? [join(include, lean.cCompiler.multiarch)] : []), include, env[key]]
       .filter(Boolean).join(delimiter);
-  } else if (!env.SDKROOT) {
+  } else if (platform === 'darwin' && !env.SDKROOT) {
     const sdk = sdkPath();
     if (!sdk) throw new Error('This project has packages with C code. On macOS, compiling it needs the C library headers of the macOS SDK, '
       + 'which Lasm cannot redistribute: install the Xcode Command Line Tools (xcode-select --install) or set SDKROOT to an SDK. '

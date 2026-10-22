@@ -81,21 +81,21 @@ export async function stageCInputs({ sources, version, platform, download, stage
       const data = arMembers(await readFile(file)).find(member => member.name === 'data.tar.zst');
       if (!data) throw new Error(`${pin.name} has no data.tar.zst`);
       await stageTar(Readable.from([data.data]), path =>
-        path.startsWith('usr/include/') ? `lib/lasm-libc/include/${path.slice('usr/include/'.length)}`
+        path.startsWith('usr/include/') ? `${libc.destination}/${path.slice('usr/include/'.length)}`
           : path === pin.copyright ? `${notice}/copyright` : null, stage, members);
     } else if (pin.format === 'msys2') {
       await stageTar(createReadStream(file), path =>
-        path.startsWith(pin.include + '/') ? `lib/lasm-libc/include/${path.slice(pin.include.length + 1)}`
+        path.startsWith(pin.include + '/') ? `${libc.destination}/${path.slice(pin.include.length + 1)}`
           : path.startsWith(pin.copyright + '/') ? `${notice}/${path.slice(pin.copyright.length + 1)}` : null, stage, members);
     } else throw new Error(`Unknown input format ${pin.format}`);
     if (![...members.keys()].some(path => path.startsWith(notice + '/'))) throw new Error(`${pin.name} has no license file`);
     provenance.push({ name: pin.name, url: pin.url, sha256: pin.sha256, use: 'C library headers' });
   }
-  if (libc && !members.has('lib/lasm-libc/include/stdio.h')) throw new Error(`No stdio.h among the ${platform} C library headers`);
+  if (libc && !members.has(`${libc.destination}/stdio.h`)) throw new Error(`No stdio.h among the ${platform} C library headers`);
   const out = [...members.values()];
   for (const license of licenses) {
     const source = fileURLToPath(new URL(license.source, import.meta.url));
     out.push({ path: license.path, type: 'file', source, size: (await stat(source)).size, executable: false });
   }
-  return { members: out, provenance, multiarch: libc?.multiarch ?? null };
+  return { members: out, provenance, multiarch: libc?.multiarch ?? null, destination: libc?.destination ?? null };
 }

@@ -23,7 +23,7 @@ import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { Parser } from 'tar';
 import { dataLayout, dataPieces, dataPieceOf, moduleOf, binaryRoots, binaryCandidate, nativeImports, resolveImport,
-  packArchive, zstdParameters, platformFamily, coreModuleRoots, cCandidate, cToolRoots, cDataMember, cMultiarch, cLibraryInclude } from './tiers.mjs';
+  packArchive, zstdParameters, platformFamily, coreModuleRoots, cCandidate, cToolRoots, cDataMember, cMultiarch } from './tiers.mjs';
 import { stageCInputs } from './c-inputs.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -272,7 +272,7 @@ Added by Lasm:
 - lib/clang/${resourceDirectory}/include: clang's resource headers, unmodified, from
 ${staged.provenance.filter(item => item.use.includes('resource')).map(item => `  ${item.url}\n  SHA-256 ${item.sha256}`).join('\n')}
   License: llvm-clang-LICENSE.txt (Apache-2.0 WITH LLVM-exception).
-${staged.provenance.some(item => item.use === 'C library headers') ? `- ${cLibraryInclude}: C library headers, unmodified, from
+${staged.provenance.some(item => item.use === 'C library headers') ? `- ${staged.destination}: C library headers, unmodified, from
 ${staged.provenance.filter(item => item.use === 'C library headers').map(item => `  ${item.url}\n  SHA-256 ${item.sha256}`).join('\n')}
   Their copyright and license files are in the directories named after each package.
 ` : `- No C library headers: on macOS the SDK of the Xcode Command Line Tools provides them.
