@@ -119,7 +119,7 @@ jobs:
           mkdir -p .work/eco/results
           before=()
           if [ "${{ inputs.remove-system-c }}" = true ] && [ "$RUNNER_OS" = Linux ]; then
-            before=(--before-lasm 'sudo apt-get purge -y -qq libc6-dev >/dev/null 2>&1; for tool in cc c99 gcc clang; do if command -v $tool; then echo "system $tool remains"; exit 1; fi; done; if [ -e /usr/include/stdio.h ]; then echo "system C headers remain"; exit 1; fi; echo "no system C compiler or C library headers"')
+            before=(--before-lasm 'set -u; for round in 1 2 3; do pkgs=$(for tool in cc c99 gcc clang; do p=$(command -v $tool) && dpkg -S "$(readlink -f "$p")" 2>/dev/null | cut -d: -f1; done; dpkg -S /usr/include/stdio.h 2>/dev/null | cut -d: -f1); [ -z "$pkgs" ] && break; echo "purging: $pkgs"; sudo apt-get purge -y -qq $pkgs libc6-dev >/dev/null 2>&1 || true; hash -r; done; for tool in cc c99 gcc clang; do if command -v $tool; then echo "system $tool remains"; exit 1; fi; done; if [ -e /usr/include/stdio.h ]; then echo "system C headers remain"; exit 1; fi; echo "no system C compiler or C library headers"')
           fi
           node scripts/ecosystem/run.mjs "${{ matrix.project }}" .work/eco/work .work/install/node_modules/@lasm/compiler "$native" \
             ".work/eco/results/${{ matrix.project }}.json" --memory-mib "$LASM_ECO_MEMORY_MIB" "${before[@]}"
