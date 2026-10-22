@@ -176,17 +176,20 @@ characters still fails to build. Per-platform results:
   library printing while it initializes) do not happen, as with Lean's own
   `meta import`. `--verbose` shows how many initializers were skipped.
 - C source that a package bundles (`extern_lib`, `moreLinkObjs`, for example
-  leansqlite's SQLite) is compiled for Node with Lasm's compiler. Such projects use
-  the complete Lean release (a one-time download of about 600 MB instead of the
-  tiers), and Lake still builds the C natively first, so `buildO`/`compileO`
-  targets that use the default compiler need a C compiler named `cc` on `PATH`,
-  as natively. C code that calls `dlopen` gets an implementation that always fails.
+  leansqlite's SQLite) is compiled for Node with Lasm's compiler. Lake still builds
+  that C natively first; Lasm then downloads a "C tier" once (39–52 MB): Lean's own
+  clang, which becomes Lake's default `cc`, its linker and headers, and C library
+  headers. No system C compiler is needed. On Linux and Windows nothing else is
+  needed either; on macOS the C library headers come from the Xcode Command Line
+  Tools SDK (`xcode-select --install`), which Lasm may not redistribute, and the
+  build says so when it is missing. C code that calls `dlopen` gets an
+  implementation that always fails.
 - Prebuilt native libraries (shared libraries or `-l` link options, for example
   libcurl, OpenSSL, libpq, hiredis, BLAS) cannot be linked. When the program's
   code needs one, the build stops and names the library and the package that
   declares it; a library used only during compilation (a tactic's solver) is
   left out.
-- Outbound HTTP: [Millillion/fetch](https://github.com/Millillion/fetch) (`import Fetch`)
+- Outbound HTTP: [Millillion/fetch](https://github.com/Millillion/fetch) (`import Fetch`, unreleased)
   uses Node's `fetch` under Lasm and libcurl or the `curl` tool natively. Programs that
   run the `curl` command with `IO.Process` keep working where curl is installed.
 

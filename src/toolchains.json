@@ -369,7 +369,59 @@
           "LeanChecker",
           "LeanExport",
           "LeanIR"
-        ]
+        ],
+        "c": {
+          "darwin-arm64": {
+            "name": "lean-4.35.0-darwin-arm64-c.tar.zst",
+            "root": "lean-4.35.0-darwin-arm64-c",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v1/lean-4.35.0-darwin-arm64-c.tar.zst",
+            "sha256": "e05ab3fed70079555b855f1b64ba7984e9a7e1fc2743ec8355608d37775e401c",
+            "bytes": 39314162,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 198180864,
+            "multiarch": null
+          },
+          "darwin-x64": {
+            "name": "lean-4.35.0-darwin-x64-c.tar.zst",
+            "root": "lean-4.35.0-darwin-x64-c",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v1/lean-4.35.0-darwin-x64-c.tar.zst",
+            "sha256": "dbfa9cd9221dc2a47e5246d8069bcae3563b561f0261ce6a515467cf53ef12ca",
+            "bytes": 41041745,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 208666624,
+            "multiarch": null
+          },
+          "linux-arm64": {
+            "name": "lean-4.35.0-linux-arm64-c.tar.zst",
+            "root": "lean-4.35.0-linux-arm64-c",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v1/lean-4.35.0-linux-arm64-c.tar.zst",
+            "sha256": "bd75fc15632772eb6570a9db6c7a264d5eb8a2f81617f2c2d7c18a41e30efdd3",
+            "bytes": 43916868,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 217055232,
+            "multiarch": "aarch64-linux-gnu"
+          },
+          "linux-x64": {
+            "name": "lean-4.35.0-linux-x64-c.tar.zst",
+            "root": "lean-4.35.0-linux-x64-c",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v1/lean-4.35.0-linux-x64-c.tar.zst",
+            "sha256": "b6102e1d06ea57a430832b505e5510efccdf9c178398632c42bd32c827568ee9",
+            "bytes": 45142659,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 225443840,
+            "multiarch": "x86_64-linux-gnu"
+          },
+          "win32-x64": {
+            "name": "lean-4.35.0-win32-x64-c.tar.zst",
+            "root": "lean-4.35.0-win32-x64-c",
+            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v1/lean-4.35.0-win32-x64-c.tar.zst",
+            "sha256": "e371378e2b06007679efbbfbcbfc42614f171bb2e631468509f4035aa0c6a4e0",
+            "bytes": 51775730,
+            "format": "tar.zst",
+            "maximumExtractedBytes": 354418688,
+            "multiarch": null
+          }
+        }
       }
     }
   }

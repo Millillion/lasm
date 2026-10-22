@@ -93,12 +93,29 @@ filesystems and no-exec mounts are unsupported. See the
 
 **Lake packages with C code (current source, Phase 3):** a project whose packages
 use `extern_lib`, `precompileModules`, `moreLinkObjs`, `moreLinkLibs` or
-`moreLinkArgs` provisions the complete Lean release for the host (about 560–590 MB
-compressed, instead of the tiers) because Lake builds that C natively with Lean's
-own compiler, headers and libraries before Lasm recompiles it for Wasm. Targets that
-use Lake's default compiler (`buildO`, `compileO`) also need a C compiler named `cc`
-on `PATH`, exactly as with native Lean (the tested Ubuntu, macOS and Windows runners
-provide one). Per-package results: [COMPATIBILITY.md](COMPATIBILITY.md).
+`moreLinkArgs` adds the C tier to the extended tiers, because Lake builds that C
+natively before Lasm recompiles it for Wasm. The C tier
+([release `lean-4.35.0-c-v1`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-c-v1),
+built by the tier workflow from the pinned Lean archives and
+[`c-tier-sources.json`](../scripts/lean-dist/c-tier-sources.json)) holds Lean's clang,
+installed as `bin/cc` so that Lake's default compiler (`buildO`, `compileO`) is Lean's
+clang, its linker and archiver, Lean's and clang's complete headers, the link
+libraries, and C library headers:
+
+| Host | Download (unpacked) | C library headers | Needed from the OS |
+| --- | --- | --- | --- |
+| linux-x64 | 45.1 MB (200 MB) | glibc 2.35 + Linux 5.15 UAPI (Ubuntu 22.04 packages), searched before the system's | nothing |
+| linux-arm64 | 43.9 MB (193 MB) | as linux-x64 | nothing |
+| darwin-x64 | 41.0 MB (185 MB) | — | the macOS SDK of the Xcode Command Line Tools (`xcode-select --install`): Apple's SDK may not be redistributed; Lasm sets `SDKROOT` from `xcrun` and stops with that instruction when it is missing |
+| darwin-arm64 | 39.3 MB (176 MB) | — | as darwin-x64 |
+| win32-x64 | 51.8 MB (314 MB) | MinGW-w64 13 + winpthreads (MSYS2 clang64), the compiler's own sysroot | nothing (a MinGW installation on `PATH` is not read) |
+
+Previously such projects downloaded the complete release (560–620 MB compressed) and
+needed a system `cc`. Lake's own Lean-C and link steps use Lean's flags (freestanding
+headers, Lean's sysroot) as natively. The tier workflow checks every C tier natively:
+`cc` is Lean's clang, a probe using the C library, OS APIs and compiler intrinsics reads
+headers only from the prefix (or the macOS SDK), `llvm-ar` archives it, and a shared
+library and an executable link and run. Per-package results: [COMPATIBILITY.md](COMPATIBILITY.md).
 
 **Known limitation (Lean 4.35.0 Lake):** Lake now fetches Git dependencies with a
 tree-filtered `git fetch`. Against a Git server that only offers "dumb" HTTP

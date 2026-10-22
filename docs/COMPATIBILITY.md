@@ -78,7 +78,7 @@ platform: upstream); **resource-stop** (the guard stopped a build); **lasm-build
 | lean-zip | lean-zip `2f7a63f` (bundled C helpers) | gzip/zlib round trips at four levels, CRC-32, Adler-32 |
 | lean-regex | lean-regex `32af6f3` (`subDir = "regex"`) | `re!` and runtime-parsed regexes |
 | lean-redis | lean-redis `91685c1` (pure Lean on Std.Async TCP) | a client session against a local Redis-protocol server, end to end over TCP |
-| fetch | [Millillion/fetch](https://github.com/Millillion/fetch) `743b2dd` | 17 HTTP cases per transport against a local server, plus HTTPS (example.com) and the plain `curl` subprocess pattern |
+| fetch | [Millillion/fetch](https://github.com/Millillion/fetch) `4a0c2f9` (unreleased) | 17 HTTP cases per transport against a local server, plus HTTPS (example.com) and the plain `curl` subprocess pattern |
 | mathlib-subset (Tier C) | Mathlib `v4.35.0` (cache) | prime factors, primes, sorting |
 | leancopilot (Tier C) | LeanCopilot `v4.35.0` | its native CTranslate2 library loads during elaboration; a trivial program |
 
