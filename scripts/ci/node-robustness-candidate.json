@@ -1,11 +1,11 @@
 {
   "active": true,
-  "version": "0.1.0-experimental.39677808414",
-  "sha256": "12d799e8141549e39311c3d067eccb8d3dd13ef6a8f19e523d5eadef06a236d4",
-  "sourceRevision": "a6a546e9212cfd48875301e1648e7aab78b7fb45",
-  "release": "node-linux-candidate-39677808414",
-  "baselineRunId": "39677808414",
+  "version": "0.1.0-experimental.39815056197",
+  "sha256": "f6f3a17ce70570cdc21b53ad0ed154101bf296f7aa5adf0bf6c647c7982c4f0d",
+  "sourceRevision": "7eb24a3d7414bb0fb0511411676f1265dd3c7f52",
+  "release": "node-linux-candidate-39815056197",
+  "baselineRunId": "39815056197",
   "node": "26.12.1",
   "lean": "4.35.0",
-  "reason": "Language coverage Phase 3 (ecosystem) candidate: runtime initialization plan, package C compiled for Wasm, prebuilt-library diagnostics, Node fetch host operations (runtime 7aa5028c… unchanged): five-platform installed acceptance in run 39677808414."
+  "reason": "Language coverage Phase 3 wrap-up candidate: Lean's clang as Lake's cc and the C tier (lean-4.35.0-c-v1) for packages with C, headers of other Lean installations ignored for Wasm (runtime 7aa5028c… unchanged): five-platform installed acceptance in run 39815056197."
 }
