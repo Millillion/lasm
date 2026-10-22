@@ -156,3 +156,26 @@ test('catalog entries require identical shared archives across platform reports'
   assert.throws(() => tierCatalogEntry([report('linux-x64', 'a', true), report('win32-x64', 'd', false)], 'https://example.invalid/r/'), /differs/);
   assert.throws(() => tierCatalogEntry([report('linux-x64', 'a', false)], 'https://example.invalid/r/'), /No written/);
 });
+
+test('C tier selection: tools, headers and link libraries, but not Lean\'s static archives', async () => {
+  const { cToolRoots, cDataMember, cCandidate, cMultiarch } = await import('../scripts/lean-dist/tiers.mjs');
+  assert.deepEqual(cToolRoots('linux-x64'), ['bin/clang', 'bin/ld.lld', 'bin/llvm-ar']);
+  assert.deepEqual(cToolRoots('darwin-arm64'), ['bin/clang', 'bin/ld64.lld', 'bin/llvm-ar']);
+  assert.deepEqual(cToolRoots('win32-x64'), ['bin/clang.exe', 'bin/ld.lld.exe', 'bin/lld.exe', 'bin/llvm-ar.exe']);
+  for (const path of ['include/lean/lean.h', 'include/clang/stddef.h', 'lib/clang/23/lib/linux/libclang_rt.builtins.a', 'lib/glibc/libc.so',
+    'lib/libc/libSystem.tbd', 'lib/crt1.o', 'lib/libgmp.a', 'lib/libLLVM.so.23.1']) assert.ok(cDataMember(path), path);
+  for (const path of ['lib/lean/libLean.a', 'lib/lean/Init.olean', 'src/lean/Init.lean', 'share/lean/lean.mk', 'bin/clang', 'LICENSE'])
+    assert.ok(!cDataMember(path), path);
+  assert.ok(cCandidate('bin/clang', 'linux-x64') && cCandidate('lib/glibc/libc.so', 'linux-x64') && !cCandidate('lib/lean/libInit.a', 'linux-x64'));
+  assert.equal(cMultiarch('linux-arm64'), 'aarch64-linux-gnu');
+  assert.equal(cMultiarch('win32-x64'), null);
+});
+
+test('C tier inputs: ar members of a Debian package are read exactly', async () => {
+  const { arMembers } = await import('../scripts/lean-dist/c-inputs.mjs');
+  const entry = (name, data) => Buffer.concat([Buffer.from(name.padEnd(16) + '0'.padEnd(12) + '0'.padEnd(6) + '0'.padEnd(6) + '100644'.padEnd(8)
+    + String(data.length).padEnd(10) + '`\n', 'latin1'), data, data.length % 2 ? Buffer.from('\n') : Buffer.alloc(0)]);
+  const archive = Buffer.concat([Buffer.from('!<arch>\n'), entry('debian-binary', Buffer.from('2.0\n')), entry('data.tar.zst', Buffer.from('abc'))]);
+  assert.deepEqual(arMembers(archive).map(item => [item.name, item.data.toString()]), [['debian-binary', '2.0\n'], ['data.tar.zst', 'abc']]);
+  assert.throws(() => arMembers(Buffer.from('nope')), /Not an ar archive/);
+});

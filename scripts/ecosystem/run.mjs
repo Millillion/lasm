@@ -1,6 +1,7 @@
 // Phase 3 ecosystem check: one Lake project from scripts/ecosystem/projects,
 // built and run natively (the oracle) and through an installed Lasm.
 //   node run.mjs PROJECT WORK_DIR LASM_PACKAGE NATIVE_LEAN_PREFIX OUT.json [--memory-mib N] [--env K=V]...
+//     [--before-lasm SHELL_COMMAND]   (for example removing the system C compiler after the native oracle)
 // Heavy steps (Lake builds, Lasm builds) each run in their own resource-guarded
 // workload. The project's project.json selects the executable, arguments, an
 // optional local server (`resp`: a small Redis-protocol server), and expected
@@ -8,7 +9,7 @@
 // build or run natively: upstream), lasm-build-fail, lasm-run-fail, expected.
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { delimiter, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,8 +18,10 @@ const [name, workArg, lasmArg, nativeArg, outArg, ...rest] = process.argv.slice(
 if (!name || !workArg || !lasmArg || !nativeArg || !outArg) throw new Error('Usage: run.mjs PROJECT WORK LASM_PACKAGE NATIVE_LEAN OUT.json');
 let memoryMiB = process.platform === 'darwin' && process.arch === 'arm64' ? 5120 : 10240;
 const extraEnv = [];
+let beforeLasm;
 for (let i = 0; i < rest.length; i++) {
   if (rest[i] === '--memory-mib') memoryMiB = Number(rest[++i]);
+  else if (rest[i] === '--before-lasm') beforeLasm = rest[++i];
   else if (rest[i] === '--env') extraEnv.push(rest[++i]);
   else throw new Error(`Unknown option ${rest[i]}`);
 }
@@ -126,6 +129,11 @@ try {
     const update = await run(lake, ['update'], { env, bounded: true, report: join(dirname(out), `${name}-native-update-resources.json`) });
     if (update.status !== 0) { result.result = 'native-fail'; result.native = { log: tail(update.stdout + update.stderr) }; save(); process.exit(0); }
     await startModuleServer();
+  }
+  if (beforeLasm) {
+    const prepared = spawnSync(beforeLasm, { shell: true, cwd: work, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    result.beforeLasm = { command: beforeLasm, status: prepared.status, log: tail(prepared.stdout + prepared.stderr, 20) };
+    if (prepared.status !== 0) throw new Error(`--before-lasm failed: ${prepared.stderr}`);
   }
   const lasmBuild = await run(process.execPath, [join(lasm, 'bin/lasm.mjs'), 'build', 'Main.lean', '--output', 'dist'],
     { env: lasmEnv, bounded: true, timeout: (config.lasmTimeoutSeconds ?? 3600) * 1000,

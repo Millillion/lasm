@@ -38,7 +38,14 @@ export function leanDistribution(release, host, { distribution = 'tiers' } = {})
         || tiers.extendedModules.some(name => typeof name !== 'string' || !/^[A-Z][A-Za-z0-9_]*$/.test(name)))
       throw new Error('Invalid tiered Lean catalog entry');
     for (const artifact of [tiers.bin[host], ...tiers.core, ...tiers.extended]) validateArtifact(artifact);
-    return { kind: 'tiers', bin: tiers.bin[host], core: tiers.core, extended: tiers.extended, extendedModules: tiers.extendedModules };
+    // The C tier (Lean's clang as `cc`, headers, link libraries) for packages with C code.
+    const c = tiers.c?.[host];
+    if (c) {
+      validateArtifact(c);
+      if (c.multiarch !== undefined && c.multiarch !== null && !/^[a-z0-9_]+-linux-gnu$/.test(c.multiarch)) throw new Error('Invalid tiered Lean catalog entry');
+    }
+    return { kind: 'tiers', bin: tiers.bin[host], core: tiers.core, extended: tiers.extended, extendedModules: tiers.extendedModules,
+      ...(c ? { c } : {}) };
   }
   if (!release.artifacts?.[host]) return null;
   return { kind: 'full', artifact: release.artifacts[host] };
@@ -103,8 +110,17 @@ export async function provisionLean(file, options = {}) {
     ...distribution.core.map((artifact, index, items) => ({ artifact, label: label(`Lean ${selection.version} standard library`, items, index) }))];
   const extended = [...core, ...distribution.extended.map((artifact, index, items) =>
     ({ artifact, label: label(`Lean ${selection.version} Lean and Lake libraries`, items, index) }))];
-  const tiered = async (components, tier) => finish(await assembleLeanPrefix(selection.version, release, components, options),
-    { distribution: 'tiers', tier, components: components.map(({ artifact }) => validateArtifact(artifact)) });
+  const tiered = async (components, tier, details = {}) => finish(await assembleLeanPrefix(selection.version, release, components, options),
+    { distribution: 'tiers', tier, components: components.map(({ artifact }) => validateArtifact(artifact)), ...details });
+  // Packages with C code: the extended tier plus the C tier, when the catalog has one.
+  if (options.native) {
+    if (!distribution.c) return finish(await provisionArtifact(release.artifacts[host], { ...options, label: `Lean ${selection.version} and Lake` }),
+      { distribution: 'full' });
+    const { name, url, sha256, bytes, format, root, maximumExtractedBytes } = distribution.c;
+    return tiered([...extended, { artifact: { name, url, sha256, bytes, format, root, maximumExtractedBytes },
+      label: `Lean ${selection.version} C compiler and headers` }], 'native',
+    { cCompiler: { multiarch: distribution.c.multiarch ?? null } });
+  }
   // Lake projects elaborate their lakefile and Lasm's Lake query module, both
   // of which import Lake. Only a standalone source can be satisfied by core.
   const source = resolve(file);

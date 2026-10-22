@@ -25,6 +25,13 @@ export function tierCatalogEntry(reports, base, { platforms } = {}) {
     if (!archive?.written) throw new Error(`No binaries archive for ${report.platform}`);
     bin[report.platform] = artifact(archive, base);
   }
+  // Optional C tier (build-tiers.mjs --c), one per platform.
+  const c = {};
+  for (const report of reports) {
+    if (platforms && !platforms.includes(report.platform)) continue;
+    const archive = report.archives.find(item => item.piece === 'c' && item.written);
+    if (archive) c[report.platform] = { ...artifact(archive, base), multiarch: archive.multiarch ?? null };
+  }
   const pieces = [...dataLayout.core, ...dataLayout.extended].map(entry => entry.piece);
   const shared = {};
   for (const report of reports) for (const archive of report.archives.filter(item => item.piece !== 'bin')) {
@@ -40,11 +47,25 @@ export function tierCatalogEntry(reports, base, { platforms } = {}) {
   const core = dataLayout.core.map(entry => shared[entry.piece]), extended = dataLayout.extended.map(entry => shared[entry.piece]);
   const coreModules = new Set(core.flatMap(archive => archive.modules));
   const extendedModules = [...new Set(extended.flatMap(archive => archive.modules))].filter(name => !coreModules.has(name)).sort();
-  return { bin, core: core.map(archive => artifact(archive, base)), extended: extended.map(archive => artifact(archive, base)), extendedModules };
+  return { bin, core: core.map(archive => artifact(archive, base)), extended: extended.map(archive => artifact(archive, base)), extendedModules,
+    ...(Object.keys(c).length ? { c } : {}) };
+}
+
+/** Catalog entries of C tier archives alone (a C-only tier release). */
+export function cTierCatalogEntry(reports, base) {
+  if (!base.endsWith('/')) throw new Error('The release base URL must end with /');
+  const c = {};
+  for (const report of reports) {
+    const archive = report.archives.find(item => item.piece === 'c' && item.written);
+    if (!archive) throw new Error(`No C tier archive for ${report.platform}`);
+    c[report.platform] = { ...artifact(archive, base), multiarch: archive.multiarch ?? null };
+  }
+  return { c };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const [base, ...files] = process.argv.slice(2);
+  const args = process.argv.slice(2), cOnly = args[0] === '--c-only';
+  const [base, ...files] = cOnly ? args.slice(1) : args;
   const reports = await Promise.all(files.map(async file => JSON.parse(await readFile(file, 'utf8'))));
-  console.log(JSON.stringify(tierCatalogEntry(reports, base), null, 2));
+  console.log(JSON.stringify(cOnly ? cTierCatalogEntry(reports, base) : tierCatalogEntry(reports, base), null, 2));
 }

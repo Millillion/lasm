@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, readFile, writeFile, rm, stat, readdir, chmod, unlink } from 'node:fs/promises';
-import { join, basename } from 'node:path';
+import { join, basename, delimiter } from 'node:path';
 import { tmpdir } from 'node:os';
 import { Readable, Writable } from 'node:stream';
 import { packArchive } from '../scripts/lean-dist/tiers.mjs';
 import { leanDistribution, assembleLeanPrefix, toolchainCatalog } from '../src/managed-lean.mjs';
 import { validateArtifact } from '../src/managed-artifacts.mjs';
-import { standaloneImportsModules } from '../src/application-sources.mjs';
+import { standaloneImportsModules, cCompilerEnvironment } from '../src/application-sources.mjs';
 import { repairManagedCache } from '../src/cache-repair.mjs';
 
 const host = process.platform + '-' + process.arch;
@@ -151,4 +151,27 @@ for (const [, name] of fs.readFileSync(file, 'utf8').matchAll(/^(?:public |meta 
   await write('Lakey.lean', 'import Lake\n');
   assert.equal(standaloneImportsModules(join(source, 'Lakey.lean'), lean, ['Lean', 'Lake']), true,
     'Modules resolved from the sources of an extended root also require the extended tier');
+});
+
+test('the C tier is selected per host and its compiler environment uses Lean\'s clang headers', async t => {
+  const f = await fixture(t);
+  const c = { ...f.archives.bin.artifact, name: 'lean-9.9.9-test-c.tar.zst', root: 'lean-9.9.9-test-c', multiarch: 'x86_64-linux-gnu' };
+  const release = { ...f.release, tiers: { ...f.release.tiers, c: { [host]: c } } };
+  assert.deepEqual(leanDistribution(release, host).c, c);
+  assert.equal(leanDistribution(f.release, host).c, undefined, 'Catalogs without a C tier fall back to the full archive');
+  assert.throws(() => leanDistribution({ ...release, tiers: { ...release.tiers, c: { [host]: { ...c, multiarch: '../x' } } } }, host), /Invalid/);
+  const lean = { prefix: join('/lean'), cCompiler: { multiarch: 'x86_64-linux-gnu' } };
+  const include = join('/lean', 'lib', 'lasm-libc', 'include');
+  assert.deepEqual(cCompilerEnvironment(lean, { C_INCLUDE_PATH: '/mine' }, { platform: 'linux' }),
+    { C_INCLUDE_PATH: [join(include, 'x86_64-linux-gnu'), include, '/mine'].join(delimiter) });
+  assert.deepEqual(cCompilerEnvironment({ ...lean, cCompiler: { multiarch: null } }, { Path: 'x', c_include_path: 'y' }, { platform: 'win32' }),
+    { c_include_path: [include, 'y'].join(delimiter) });
+  assert.deepEqual(cCompilerEnvironment(lean, {}, { platform: 'darwin', sdkPath: () => '/sdk' }), { SDKROOT: '/sdk' });
+  assert.deepEqual(cCompilerEnvironment(lean, { SDKROOT: '/given' }, { platform: 'darwin', sdkPath: () => assert.fail('not asked') }), {});
+  assert.throws(() => cCompilerEnvironment(lean, {}, { platform: 'darwin', sdkPath: () => null }), /Xcode Command Line Tools/);
+  // Every published C tier is a valid artifact below the package ceiling.
+  for (const version of Object.values(toolchainCatalog.lean)) for (const artifact of Object.values(version.tiers?.c ?? {})) {
+    validateArtifact(artifact);
+    assert.ok(artifact.bytes <= 150 * 1024 * 1024, `${artifact.name} stays below the package ceiling`);
+  }
 });

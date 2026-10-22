@@ -41,7 +41,39 @@ export function nativeLeanEnvironment(lean, inherited = process.env) {
     LEAN_SYSROOT: toNamespacedPath(prefix),
     LEAN_PATH: toNamespacedPath(join(prefix, 'lib/lean')),
   });
+  if (lean.cCompiler) Object.assign(env, cCompilerEnvironment(lean, env));
   return env;
+}
+
+/** Lake's default `cc` is Lean's clang (bin/cc of the C tier, first on PATH).
+ * Lean ships no C library headers: the C tier adds glibc/Linux or MinGW-w64
+ * headers, searched before the system's; macOS uses the Xcode Command Line
+ * Tools SDK, which may not be redistributed. */
+export function cCompilerEnvironment(lean, env = process.env, { platform = process.platform, sdkPath = macosSdkPath } = {}) {
+  const prefix = lean.executionPrefix ?? lean.prefix;
+  const key = platform === 'win32' ? Object.keys(env).find(name => name.toUpperCase() === 'C_INCLUDE_PATH') ?? 'C_INCLUDE_PATH' : 'C_INCLUDE_PATH';
+  const result = {};
+  if (platform !== 'darwin') {
+    const include = join(prefix, 'lib', 'lasm-libc', 'include');
+    result[key] = [...(lean.cCompiler.multiarch ? [join(include, lean.cCompiler.multiarch)] : []), include, env[key]]
+      .filter(Boolean).join(delimiter);
+  } else if (!env.SDKROOT) {
+    const sdk = sdkPath();
+    if (!sdk) throw new Error('This project has packages with C code. On macOS, compiling it needs the C library headers of the macOS SDK, '
+      + 'which Lasm cannot redistribute: install the Xcode Command Line Tools (xcode-select --install) or set SDKROOT to an SDK. '
+      + 'No C compiler other than Lean\'s own is used.');
+    result.SDKROOT = sdk;
+  }
+  return result;
+}
+
+function macosSdkPath() {
+  // Without developer tools, xcrun's stub opens an installation prompt.
+  const tools = spawnSync('xcode-select', ['-p'], { encoding: 'utf8', timeout: 30_000, stdio: ['ignore', 'pipe', 'ignore'] });
+  if (tools.status !== 0 || !tools.stdout.trim() || !existsSync(tools.stdout.trim())) return null;
+  const result = spawnSync('xcrun', ['--show-sdk-path'], { encoding: 'utf8', timeout: 60_000, stdio: ['ignore', 'pipe', 'ignore'] });
+  const path = result.status === 0 ? result.stdout.trim() : '';
+  return path && existsSync(join(path, 'usr', 'include', 'stdio.h')) ? path : null;
 }
 
 // `lean --src-deps` searches LEAN_SRC_PATH (the source directory) before the
@@ -127,9 +159,9 @@ export function applicationSources(source, lean, work, { log = console.error, gi
       fileURLToPath(new URL('./lake-module.lean', import.meta.url)), ...args], project).split(/\r?\n/).filter(Boolean).pop());
     const entry = adapter(configuredSource);
     // Packages with C code (extern_lib, precompiled modules, extra link objects)
-    // need Lean's own C compiler, headers and libraries: the complete release.
-    if (Array.isArray(entry?.native) && entry.native.length && lean.distribution === 'tiers')
-      return { needsFullLean: true, native: entry.native };
+    // need Lean's own C compiler, headers and libraries: the C tier.
+    if (Array.isArray(entry?.native) && entry.native.length && lean.distribution === 'tiers' && !lean.cCompiler)
+      return { needsCCompiler: true, native: entry.native };
     const configured = typeof entry?.module === 'string' && entry.module.startsWith('/+');
     if (!configured && (!entry || !Array.isArray(entry.imports) || entry.imports.some(name => typeof name !== 'string')))
       throw new Error('Unexpected Lake module identity');

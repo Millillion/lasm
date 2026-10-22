@@ -3,12 +3,15 @@
 //
 //   node scripts/lean-dist/build-tiers.mjs --platform linux-x64 --archive lean.tar.zst \
 //     --out .work/lean-tiers/out --work .work/lean-tiers/work [--version 4.34.1]
-//     [--data write|hash|none] [--twice] [--catalog toolchains.json]
+//     [--data write|hash|none] [--twice] [--catalog toolchains.json] [--c --c-download <dir>]
 //
 // Emits lean-<version>-<platform>-bin.tar.zst and, with --data write, the shared
 // lean-<version>-<piece>.tar.zst module-data archives. --data hash only reports
 // the shared archives' digests, for cross-platform equality checks. --twice packs
-// every archive again into a digest sink and requires identical bytes.
+// every archive again into a digest sink and requires identical bytes. --c also
+// writes lean-<version>-<platform>-c.tar.zst (Lean's clang as `cc`, its linker,
+// headers and link libraries, plus the pinned inputs of c-tier-sources.json,
+// which must already be in --c-download under their pinned names).
 import { createReadStream, createWriteStream, mkdirSync } from 'node:fs';
 import { mkdir, readFile, rm, rename, writeFile, copyFile, stat } from 'node:fs/promises';
 import { dirname, join, resolve, posix } from 'node:path';
@@ -20,7 +23,8 @@ import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { Parser } from 'tar';
 import { dataLayout, dataPieces, dataPieceOf, moduleOf, binaryRoots, binaryCandidate, nativeImports, resolveImport,
-  packArchive, zstdParameters, platformFamily, coreModuleRoots } from './tiers.mjs';
+  packArchive, zstdParameters, platformFamily, coreModuleRoots, cCandidate, cToolRoots, cDataMember, cMultiarch, cLibraryInclude } from './tiers.mjs';
+import { stageCInputs } from './c-inputs.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const { values: options } = parseArgs({ options: {
@@ -28,7 +32,10 @@ const { values: options } = parseArgs({ options: {
   version: { type: 'string', default: '4.34.1' }, platform: { type: 'string' }, archive: { type: 'string' },
   out: { type: 'string' }, work: { type: 'string' }, data: { type: 'string', default: 'write' },
   twice: { type: 'boolean', default: false }, keep: { type: 'boolean', default: false },
+  c: { type: 'boolean', default: false }, 'c-download': { type: 'string' },
+  'c-sources': { type: 'string', default: join(here, 'c-tier-sources.json') },
 } });
+if (options.c && !options['c-download']) throw new Error('--c needs --c-download');
 for (const name of ['platform', 'archive', 'out', 'work']) if (!options[name]) throw new Error(`--${name} is required`);
 if (!['write', 'hash', 'none'].includes(options.data)) throw new Error('--data must be write, hash or none');
 const catalog = JSON.parse(await readFile(options.catalog, 'utf8'));
@@ -63,7 +70,8 @@ parser.on('entry', entry => {
     const path = raw.slice(upstream.root.length + 1);
     if (!clean(path)) throw new Error(`Unsafe archive member ${entry.path}`);
     const piece = dataPieceOf(path);
-    const wanted = (options.data !== 'none' && piece && piece !== 'excluded') || binaryCandidate(path, options.platform);
+    const wanted = (options.data !== 'none' && piece && piece !== 'excluded')
+      || (options.c ? cCandidate(path, options.platform) : binaryCandidate(path, options.platform));
     if (!wanted || entry.type === 'Directory') { entry.resume(); return; }
     if (members.has(path)) throw new Error(`Duplicate archive member ${path}`);
     if (entry.type === 'SymbolicLink') {
@@ -99,25 +107,30 @@ for (const member of members.values()) if (member.type === 'file' && (await stat
 // 3. Platform binaries: the executables Lasm runs plus their in-archive
 // shared-library closure, read from each file's own load commands.
 const has = [...members.keys()];
-const binary = new Map(), external = new Map(), queue = [...binaryRoots(options.platform)];
-while (queue.length) {
-  const path = queue.shift();
-  if (binary.has(path)) continue;
-  const member = members.get(path);
-  if (!member) throw new Error(`Required Lean binary is missing from the upstream archive: ${path}`);
-  binary.set(path, member);
-  if (member.type === 'symlink') {
-    const target = posix.normalize(posix.join(posix.dirname(path), member.target));
-    if (!clean(target)) throw new Error(`Symlink escapes the archive: ${path}`);
-    queue.push(target); continue;
+async function programClosure(roots, external) {
+  const found = new Map(), queue = [...roots];
+  while (queue.length) {
+    const path = queue.shift();
+    if (found.has(path)) continue;
+    const member = members.get(path);
+    if (!member) throw new Error(`Required Lean binary is missing from the upstream archive: ${path}`);
+    found.set(path, member);
+    if (member.type === 'symlink') {
+      const target = posix.normalize(posix.join(posix.dirname(path), member.target));
+      if (!clean(target)) throw new Error(`Symlink escapes the archive: ${path}`);
+      queue.push(target); continue;
+    }
+    const imports = nativeImports(await readFile(member.source), options.platform);
+    for (const name of imports.needed) {
+      const resolved = resolveImport(name, options.platform, has);
+      if (resolved) queue.push(resolved);
+      else external.set(name, [...(external.get(name) ?? []), path].sort());
+    }
   }
-  const imports = nativeImports(await readFile(member.source), options.platform);
-  for (const name of imports.needed) {
-    const resolved = resolveImport(name, options.platform, has);
-    if (resolved) queue.push(resolved);
-    else external.set(name, [...(external.get(name) ?? []), path].sort());
-  }
+  return found;
 }
+const external = new Map();
+const binary = await programClosure(binaryRoots(options.platform), external);
 let libuv = null;
 if (members.has('lib/libuv.a')) {
   const versions = new Set([...(await readFile(members.get('lib/libuv.a').source)).toString('latin1')
@@ -197,6 +210,78 @@ ${sourceLine}
     generated(`lasm-notices/${name}/NOTICE`, notice)] };
 };
 
+// 4b. The C tier: what a native Lake build of a package's C code reads from the
+// release (clang, linker, archiver and their libraries; headers; compiler
+// runtime and link libraries), minus the binaries archive, plus `cc` and the
+// pinned header inputs. Lasm puts bin/ first on PATH, so Lake's default `cc`
+// is Lean's clang.
+let cTier = null;
+if (options.c) {
+  const name = `lean-${options.version}-${options.platform}-c`;
+  const family = platformFamily(options.platform);
+  const tools = await programClosure(cToolRoots(options.platform), new Map());
+  const selected = new Map([...tools]);
+  for (const member of members.values()) if (cDataMember(member.path)) selected.set(member.path, member);
+  for (const path of binary.keys()) selected.delete(path);
+  // Each archive is extracted and validated on its own: a symlink whose target
+  // lives in the binaries archive becomes a copy of the file it resolves to.
+  for (const [path, member] of [...selected]) {
+    if (member.type !== 'symlink') continue;
+    let target = path, current = member;
+    for (let depth = 0; current.type === 'symlink'; depth++) {
+      if (depth > 16) throw new Error(`Symlink loop at ${path}`);
+      target = posix.normalize(posix.join(posix.dirname(target), current.target));
+      current = members.get(target) ?? (() => { throw new Error(`Dangling symlink ${path}`); })();
+    }
+    let inside = path, step = member;
+    while (step.type === 'symlink') { inside = posix.normalize(posix.join(posix.dirname(inside), step.target)); if (!selected.has(inside)) break; step = selected.get(inside); }
+    if (!selected.has(inside)) selected.set(path, { ...current, path });
+  }
+  const resourceDirectory = [...selected.keys()].map(path => /^lib\/clang\/([^/]+)\//.exec(path)?.[1]).find(Boolean);
+  if (!resourceDirectory) throw new Error('The release has no clang resource directory');
+  const sources = JSON.parse(await readFile(options['c-sources'], 'utf8'));
+  const pinned = sources[options.version];
+  if (!pinned || pinned.clangVersion.split('.')[0] !== resourceDirectory) throw new Error(`C tier inputs do not match clang ${resourceDirectory}`);
+  const staged = await stageCInputs({ sources, version: options.version, platform: options.platform, download: resolve(options['c-download']),
+    stage: join(work, 'c-inputs'), resourceDirectory: `lib/clang/${resourceDirectory}`, notices: `lasm-notices/${name}` });
+  for (const member of staged.members) {
+    if (selected.has(member.path) || binary.has(member.path)) throw new Error(`C tier input overlaps the release at ${member.path}`);
+    selected.set(member.path, member);
+  }
+  const clang = members.get(cToolRoots(options.platform)[0]);
+  const cc = family === 'win32' ? { ...clang, path: 'bin/cc.exe' } : { path: 'bin/cc', type: 'symlink', target: 'clang' };
+  if (members.has(cc.path)) throw new Error(`The release already has ${cc.path}`);
+  selected.set(cc.path, cc);
+  const multiarch = cMultiarch(options.platform);
+  if (multiarch !== staged.multiarch) throw new Error('C library multiarch mismatch');
+  const notice = `${name}
+
+Lasm's C tier for Lean ${options.version} on ${options.platform}: what a native Lake build of a
+package's C code needs, so that no system C compiler is required.
+
+From ${upstreamRelease ? 'the upstream Lean' : 'the Lasm-maintained native Lean'} ${options.version} archive (unmodified files):
+Lean's clang, its linker and archiver and the shared libraries they load,
+include/, lib/clang/${resourceDirectory}/lib, ${family === 'linux' ? 'lib/glibc, ' : family === 'darwin' ? 'lib/libc, ' : ''}and the link-time libraries in lib/.
+Complete original archive: ${upstream.url}
+SHA-256 ${upstream.sha256}, ${upstream.bytes} bytes.
+${sourceLine}
+
+Added by Lasm:
+- ${cc.path}: ${family === 'win32' ? 'a byte-identical copy of bin/clang.exe' : 'a symbolic link to clang'}, so that Lake's default C
+  compiler is Lean's clang.
+- lib/clang/${resourceDirectory}/include: clang's resource headers, unmodified, from
+${staged.provenance.filter(item => item.use.includes('resource')).map(item => `  ${item.url}\n  SHA-256 ${item.sha256}`).join('\n')}
+  License: llvm-clang-LICENSE.txt (Apache-2.0 WITH LLVM-exception).
+${staged.provenance.some(item => item.use === 'C library headers') ? `- ${cLibraryInclude}: C library headers, unmodified, from
+${staged.provenance.filter(item => item.use === 'C library headers').map(item => `  ${item.url}\n  SHA-256 ${item.sha256}`).join('\n')}
+  Their copyright and license files are in the directories named after each package.
+` : `- No C library headers: on macOS the SDK of the Xcode Command Line Tools provides them.
+`}`;
+  selected.set(`lasm-notices/${name}/NOTICE`, generated(`lasm-notices/${name}/NOTICE`, notice));
+  const list = [...selected.values()].map(member => member.type === 'file' && !member.content ? { ...member } : member);
+  cTier = { name, piece: 'c', members: list, mode: 'write', multiarch, resourceDirectory, provenance: staged.provenance };
+}
+
 // 5. Pack. Archives are written beside a private temporary name, then renamed.
 const open = member => member.content ? Readable.from([member.content]) : createReadStream(member.source);
 const report = { schema: 1, version: options.version, platform: options.platform, commit: release.commit,
@@ -204,7 +289,8 @@ const report = { schema: 1, version: options.version, platform: options.platform
   zstd: { level: 19, windowLog: 27, longDistanceMatching: true, checksum: true, node: process.versions.node, zstd: process.versions.zstd }, libuv, coreModuleRoots, externalImports: Object.fromEntries([...external].sort()),
   archives: [] };
 const plan = [{ name: binName, piece: 'bin', members: binMembers, mode: 'write' },
-  ...(options.data === 'none' ? [] : dataPieces.map(piece => ({ ...dataArchive(piece), mode: options.data })))];
+  ...(options.data === 'none' ? [] : dataPieces.map(piece => ({ ...dataArchive(piece), mode: options.data }))),
+  ...(cTier ? [cTier] : [])];
 for (const archive of plan) {
   const started = Date.now();
   let result;
@@ -214,7 +300,8 @@ for (const archive of plan) {
     result = await packArchive(archive.name, archive.members, { open, sink: createWriteStream(partial) });
     await rename(partial, file);
   } else result = await packArchive(archive.name, archive.members, { open });
-  const entry = { name: archive.name + '.tar.zst', piece: archive.piece, root: archive.name, ...(archive.modules ? { modules: archive.modules } : {}), ...result,
+  const entry = { name: archive.name + '.tar.zst', piece: archive.piece, root: archive.name, ...(archive.modules ? { modules: archive.modules } : {}),
+    ...(archive.piece === 'c' ? { multiarch: archive.multiarch, clangResourceDirectory: archive.resourceDirectory, inputs: archive.provenance } : {}), ...result,
     files: archive.members.length, fileBytes: archive.members.reduce((total, member) => total + (member.size ?? 0), 0),
     written: archive.mode === 'write', seconds: Math.round((Date.now() - started) / 1000) };
   if (options.twice) {

@@ -3,6 +3,10 @@ name: Tiered Lean distribution
 # and shared module-data archives, prove the shared archives are byte-identical
 # across platforms and deterministic, run them natively against the complete
 # upstream toolchain, then optionally retain them as public release assets.
+# Every run also builds the per-platform C tier (Lean's clang as `cc`, headers
+# and link libraries, plus the pinned inputs of scripts/lean-dist/c-tier-sources.json)
+# and checks it natively. scope=c builds and publishes only the C tier; its
+# binaries archive must equal the published one.
 on:
   workflow_dispatch:
     inputs:
@@ -18,6 +22,11 @@ on:
         description: Release tag for the archives (only used when publishing)
         type: string
         default: lean-4.35.0-tiers-v1
+      scope:
+        description: all (binaries, module data and C tier) or c (C tier only)
+        type: choice
+        options: [all, c]
+        default: all
       publish:
         description: Create the public release after every check passes
         type: boolean
@@ -40,6 +49,7 @@ jobs:
       PLATFORM: ${{ matrix.platform }}
       VERSION: ${{ inputs.version }}
       CATALOG: ${{ inputs.catalog }}
+      SCOPE: ${{ inputs.scope }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -47,6 +57,16 @@ jobs:
           node-version: 26.12.1
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Download the pinned C tier inputs
+        run: |
+          mkdir -p .work/lean-tiers/c-dl
+          node -e '
+            const s = require("./scripts/lean-dist/c-tier-sources.json")[process.env.VERSION];
+            for (const p of [s.resourceHeaders, ...(s.libc[process.env.PLATFORM]?.packages ?? [])]) console.log(p.url + " " + p.name);' |
+          while read -r url name; do
+            curl --fail --location --retry 5 --retry-all-errors --proto '=https' --output ".work/lean-tiers/c-dl/$name" "$url"
+          done
+          ls -l .work/lean-tiers/c-dl
       - name: Download the pinned archive
         run: |
           url=$(node -p "require(require('path').resolve(process.env.CATALOG)).lean[process.env.VERSION].artifacts[process.env.PLATFORM].url")
@@ -59,10 +79,21 @@ jobs:
         # The memory cap includes the staged files' page cache.
         run: |
           data=hash; [ "$PLATFORM" = linux-x64 ] && data=write
+          [ "$SCOPE" = c ] && data=none
           node scripts/full-lean/run-bounded.mjs --memory-mib 8192 --report .work/lean-tiers-$PLATFORM-resources.json -- \
             node scripts/lean-dist/build-tiers.mjs --catalog "$CATALOG" --version "$VERSION" --platform "$PLATFORM" --archive .work/lean-tiers/dl/upstream \
-              --out .work/lean-tiers/out --work .work/lean-tiers/work --data $data --twice
-          rm -f .work/lean-tiers/dl/upstream
+              --out .work/lean-tiers/out --work .work/lean-tiers/work --data $data --twice --c --c-download .work/lean-tiers/c-dl
+          rm -rf .work/lean-tiers/dl/upstream .work/lean-tiers/c-dl
+          if [ "$SCOPE" = c ]; then
+            # The C tier excludes the published binaries archive's files; it must be that archive.
+            node -e '
+              const fs = require("fs"), path = require("path");
+              const catalog = JSON.parse(fs.readFileSync(path.resolve(process.env.CATALOG)));
+              const published = catalog.lean[process.env.VERSION].tiers.bin[process.env.PLATFORM];
+              const report = JSON.parse(fs.readFileSync(".work/lean-tiers/out/report-" + process.env.PLATFORM + ".json"));
+              const bin = report.archives.find(a => a.piece === "bin");
+              if (bin.sha256 !== published.sha256 || bin.bytes !== published.bytes) throw new Error("binaries archive differs from the published one");'
+          fi
           ls -l .work/lean-tiers/out
           { echo "### $PLATFORM"; echo '```'; node -e "for (const a of require('./.work/lean-tiers/out/report-' + process.env.PLATFORM + '.json').archives) console.log(a.name, a.bytes, a.sha256, a.written ? 'written' : 'digest')"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
@@ -75,6 +106,7 @@ jobs:
 
   shared:
     needs: repackage
+    if: inputs.scope == 'all'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -140,16 +172,25 @@ jobs:
         with:
           name: tiers-${{ matrix.platform }}
           path: .work/lean-tiers/check
+      - name: Check the C tier natively (Lean's clang as cc, headers, archiver, linker)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/lean-tiers-c-resources.json -- \
+            node scripts/lean-dist/check-c-tier.mjs --platform "$PLATFORM" --tiers .work/lean-tiers/check --work .work/lean-tiers/c-check --report .work/lean-tiers/c-check.json
+          { echo "### $PLATFORM C tier"; echo '```json'; cat .work/lean-tiers/c-check.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          rm -rf .work/lean-tiers/c-check
       - name: Download the complete pinned archive for comparison
+        if: inputs.scope == 'all'
         run: |
           url=$(node -p "require(require('path').resolve(process.env.CATALOG)).lean[process.env.VERSION].artifacts[process.env.PLATFORM].url")
           curl --fail --location --retry 5 --retry-all-errors --proto '=https' --output .work/lean-tiers/upstream "$url"
       - name: Extract the tiers and the complete archive
+        if: inputs.scope == 'all'
         run: |
           node scripts/lean-dist/check-tiers.mjs --phase extract --catalog "$CATALOG" --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
             --upstream .work/lean-tiers/upstream --work .work/lean-tiers/native
           rm -f .work/lean-tiers/upstream
       - name: Run the tiers natively and compare generated C with the complete toolchain
+        if: inputs.scope == 'all'
         run: |
           node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/lean-tiers-native-resources.json -- \
             node scripts/lean-dist/check-tiers.mjs --phase check --catalog "$CATALOG" --version "$VERSION" --platform "$PLATFORM" --tiers .work/lean-tiers/check \
@@ -158,7 +199,7 @@ jobs:
 
   publish:
     needs: [shared, native]
-    if: inputs.publish
+    if: always() && inputs.publish && needs.native.result == 'success' && (needs.shared.result == 'success' || inputs.scope == 'c')
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
@@ -180,11 +221,16 @@ jobs:
           TAG: ${{ inputs.tag }}
         run: |
           cd .work/lean-tiers/all
-          node ../../../scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/" report-*.json > tiers.json
+          if [ "${{ inputs.scope }}" = c ]; then
+            rm -f *-bin.tar.zst
+            node ../../../scripts/lean-dist/catalog.mjs --c-only "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/" report-*.json > tiers.json
+          else
+            node ../../../scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/" report-*.json > tiers.json
+          fi
           sha256sum *.tar.zst > SHA256SUMS
           cat > notes.md <<EOF
           Tiered Lean ${{ inputs.version }} archives for Lasm, produced by run ${GITHUB_RUN_ID} from ${GITHUB_SHA}.
-          Each archive is an unmodified subset of the pinned upstream Lean release; see the NOTICE inside each archive.
+          Each binaries and module-data archive is an unmodified subset of the pinned upstream Lean release. Each C tier archive (*-c.tar.zst) holds an unmodified subset (Lean's clang, linker, headers and link libraries) plus `cc` and pinned, unmodified third-party headers (clang resource headers; glibc/Linux or MinGW-w64 headers). See the NOTICE inside each archive.
           The per-platform report-*.json files record the upstream archive digests, archive digests and determinism checks.
           EOF
           printf '\nSource revision: %s\n' "$GITHUB_SHA" >> notes.md

@@ -84,6 +84,29 @@ export function binaryCandidate(path, platform) {
   return /^bin\/[^/]+$/.test(path) || /^lib\/(?:lean\/)?[^/]+\.(?:so|dylib)(?:\.[0-9.]+)?$/.test(path);
 }
 
+/** Members staged when the C tier is built. */
+export const cCandidate = (path, platform) => binaryCandidate(path, platform) || cDataMember(path);
+
+/** The C tier's programs: Lean's clang (also installed as `cc`), its linker and archiver. */
+export function cToolRoots(platform) {
+  const family = platformFamily(platform);
+  if (family === 'win32') return ['bin/clang.exe', 'bin/ld.lld.exe', 'bin/lld.exe', 'bin/llvm-ar.exe'];
+  return ['bin/clang', family === 'darwin' ? 'bin/ld64.lld' : 'bin/ld.lld', 'bin/llvm-ar'];
+}
+
+/** Release members a native C build reads besides programs: Lean's and clang's
+ * headers, compiler runtime objects and the link-time C libraries (not Lean's
+ * own static archives under lib/lean, which only native Lean executables use). */
+export function cDataMember(path) {
+  return /^include\//.test(path) || /^lib\/(?:clang|glibc|libc)\//.test(path) || /^lib\/[^/]+$/.test(path);
+}
+
+/** Debian multiarch directory of the C library headers, or null. */
+export const cMultiarch = platform => ({ 'linux-x64': 'x86_64-linux-gnu', 'linux-arm64': 'aarch64-linux-gnu' })[platform] ?? null;
+
+/** Where the C tier puts C library headers inside the Lean prefix. */
+export const cLibraryInclude = 'lib/lasm-libc/include';
+
 const cString = (bytes, offset) => {
   if (offset < 0 || offset >= bytes.length) throw new Error('Native import string is outside the file');
   const end = bytes.indexOf(0, offset);

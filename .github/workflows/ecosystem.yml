@@ -31,6 +31,10 @@ on:
       lean:
         type: string
         default: 4.35.0
+      remove-system-c:
+        description: Linux only - after the native oracle, purge the system C compiler and C library headers (libc6-dev and everything that depends on it) before the Lasm build
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -113,8 +117,12 @@ jobs:
         run: |
           native="$(node -p 'JSON.parse(require("node:fs").readFileSync(".work/native.json","utf8").trim().split("\n").pop()).native')"
           mkdir -p .work/eco/results
+          before=()
+          if [ "${{ inputs.remove-system-c }}" = true ] && [ "$RUNNER_OS" = Linux ]; then
+            before=(--before-lasm 'sudo apt-get purge -y -qq libc6-dev >/dev/null 2>&1; for tool in cc c99 gcc clang; do if command -v $tool; then echo "system $tool remains"; exit 1; fi; done; if [ -e /usr/include/stdio.h ]; then echo "system C headers remain"; exit 1; fi; echo "no system C compiler or C library headers"')
+          fi
           node scripts/ecosystem/run.mjs "${{ matrix.project }}" .work/eco/work .work/install/node_modules/@lasm/compiler "$native" \
-            ".work/eco/results/${{ matrix.project }}.json" --memory-mib "$LASM_ECO_MEMORY_MIB"
+            ".work/eco/results/${{ matrix.project }}.json" --memory-mib "$LASM_ECO_MEMORY_MIB" "${before[@]}"
           node scripts/ecosystem/summary.mjs ".work/eco/results/${{ matrix.project }}.json"
       - name: Keep the compact result briefly
         if: always()

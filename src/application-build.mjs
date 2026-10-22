@@ -69,10 +69,10 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   await mkdir(work, { recursive: true });
   progress?.({ stage: project ? 'Checking Lean sources and Lake dependencies' : 'Checking Lean sources and imports' });
   let generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
-  if (generated.needsFullLean) {
-    // Lake packages with C code build it natively with Lean's own compiler, as Lake does.
-    progress?.({ stage: `Packages with C code (${generated.native.map(item => item.package).join(', ')}) need the complete Lean ${lean.version} release` });
-    lean = await provisionLean(source, { cache, log, progress, distribution: 'full' });
+  if (generated.needsCCompiler) {
+    // Lake packages with C code build it natively with Lean's own clang, as Lake does.
+    progress?.({ stage: `Packages with C code (${generated.native.map(item => item.package).join(', ')}) need Lean's C compiler and headers` });
+    lean = await provisionLean(source, { cache, log, progress, native: true });
     generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
   }
   const { compilations: nativeCompilations, unavailable: nativeUnavailable } = generated.nativeLink
