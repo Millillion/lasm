@@ -410,6 +410,36 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   gate (report in run 39749093869); zero Lasm-caused failures. Results in
   [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#phase-3-ecosystem-2026-10-21) and
   [COMPATIBILITY.md](COMPATIBILITY.md).
+  **Phase 3 review (user decisions 2026-10-22):**
+  - Accepted: the Node pin moves to 26.12.1; initializer pruning (an unused
+    module's initializers do not run, as with `meta import`).
+  - **Phase 3 wrap-up, approved, in progress** (keeps the "only Node.js/npm"
+    promise for packages with C):
+    1. When Lasm runs Lake, point the default C compiler (`cc`, used by
+       `buildO`/`compileO`) at the clang that ships in Lean's release, so no
+       project needs a system C compiler. Verify macOS and Windows system
+       headers specifically.
+    2. Add a small "C tier" to the tiered Lean distribution (Lean's clang,
+       linker and C headers) so projects with bundled C no longer download the
+       full ~600 MB release. Measure its size.
+    3. Millillion/fetch: its own CI (native Linux/macOS/Windows and under Lasm),
+       document planned gaps (streaming upload, abort signal, multipart), then
+       tag `v0.1.0` (tagging approved by the user 2026-10-22). Contacting the
+       Lean core team about it is the user's call.
+  - Follow-ups recorded:
+    - macOS ARM64 memory: 11 eval-io programs peak at ~2.8 GiB, at the CI
+      guard limit on 7 GiB runners. Investigate why small programs peak that
+      high (product work, not a guard change); folded into Phase 5.
+    - LeanCopilot: dropped; documenting the limitation is enough (deploying an
+      AI proof tactic to Node is not a real use case).
+    - Native-library replacements: libcurl is covered by fetch; Redis by
+      lean-redis (pure Lean). Build our own libraries where none is
+      established, as with fetch: crypto (Node `crypto` under Lasm, OpenSSL
+      loaded at run time natively) and a pure-Lean Postgres driver over
+      `Std.Async` TCP. Proposed as a new phase after Phase 4 and before the
+      concurrency soak; its scope comes from a catalog of the most-used,
+      vital server packages (requested by the user 2026-10-22, to be
+      discussed before approval).
 - **Phase 4 — Lean as a runtime library (was L5), scoped to what real packages
   need:** pure `Lean.*` code at runtime (Json via `import Lean`, Lean.Data.*,
   LSP types) through finer-grained reachability; runtime elaboration/evaluation
