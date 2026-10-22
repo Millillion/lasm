@@ -352,7 +352,7 @@ classified; five-platform CI validation and a candidate gate end each phase.
 Runtime compilation/elaboration and dynamic plugins stay unsupported by design
 and are documented as such.
 
-Phase numbers follow the actual order (renumbered 2026-10-20). Older code
+Phase numbers follow the actual order (renumbered 2026-10-20; JS/npm interop inserted as Phase 4 on 2026-10-22, shifting later phases by one). Older code
 comments and committed evidence use the original labels: L1 = Phase 1,
 L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
 
@@ -453,7 +453,7 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
       concurrency soak; its scope comes from a catalog of the most-used,
       vital server packages (requested by the user 2026-10-22, to be
       discussed before approval).
-- **Next-phase discussion (2026-10-22, pending user decision):** the
+- **Next-phase discussion (2026-10-22; decided, see Phase 4 below):** the
   [server package catalog](research/server-package-catalog-2026-10-22.md) ranked
   vital server libraries (Tier 1: web framework, encoding, crypto, env, log,
   tls, postgres, jwt). User feedback: a web framework is not needed from us
@@ -476,17 +476,45 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   Lasm's serverless phases; mapping TCP/TLS onto Workers `connect()` belongs to
   the Workers phase; proposing a WebSocket upgrade hook and base64 to Lean core
   is the user's call.
-- **Phase 4 — Lean as a runtime library (was L5), scoped to what real packages
+- **Phase 4 — JS/npm interop (user decision 2026-10-22; runs before
+  Lean-as-a-library, which becomes Phase 5):** Lasm programs use existing npm
+  packages and Node built-ins (including Node's own `fetch`) instead of new
+  Lean libraries. Decisions: bindings are written by hand or by AI agents (no
+  `.d.ts` generator); no `js!` syntax for now (revisit only if real use shows a
+  need); programs that use interop run only under Lasm (pure logic stays
+  natively testable). Millillion/fetch is superseded and archived unreleased.
+  Work, in order:
+  1. Threading prototype: message passing between the Lean pthread and Node's
+     main thread versus JS Promise Integration (Lean on the main thread);
+     measure call and callback cost, check wasm64 + pthreads compatibility and
+     Lean blocking operations; choose the architecture.
+  2. Core: dynamic `JS.Value` handles (`JS.require`, `JS.global`, get, set,
+     call, new, await); `ToJS`/`FromJS` conversions (String, numbers, Bool,
+     ByteArray, Array, Option, `Lean.Json`, `deriving` for structures); typed
+     one-line bindings `@[js "module" "export"] opaque f : … → IO …` with the
+     conversion glue generated from the Lean type; JS promises as awaitable
+     Lean tasks; Lean functions as JS callbacks (async first; synchronous
+     callbacks documented with their cost).
+  3. `package.json` next to the lakefile: `lasm build` resolves from
+     `node_modules` and the deployable output includes the dependencies.
+  4. Agent-friendly binding: a binding guide written for AI agents with
+     complete examples; runtime type-mismatch errors that name the binding, the
+     expected Lean type and the JS value received; a binding check (declared
+     exports exist and accept the declared arity); worked examples for
+     Express, `pg` and `jose`.
+  Exit: a Lean app on Express with `pg` (Postgres) and `jose` (JWT) on all five
+  targets, using hand- or AI-written bindings, plus a candidate gate.
+- **Phase 5 — Lean as a runtime library (was L5; Phase 4 until 2026-10-22), scoped to what real packages
   need:** pure `Lean.*` code at runtime (Json via `import Lean`, Lean.Data.*,
   LSP types) through finer-grained reachability; runtime elaboration/evaluation
   stays unsupported. The runtime-parser-over-an-empty-environment policy is
   decided by the user at its start. Exit: common libraries that import Lean for
   data structures build and run.
-- **Phase 5 — Concurrency stress/soak (was L4):** tasks, channels,
+- **Phase 6 — Concurrency stress/soak (was L4; Phase 5 until 2026-10-22):** tasks, channels,
   mutex/condition variables, Std.Sync, full Std.Async, cancellation,
   many-thread stress (incl. Windows per-thread stack commit). All 26 upstream
   concurrency tests already pass. Exit: stress/soak without hangs or leaks.
-- **Phase 6 — Full-suite release gate (was L7):** complete runtime-capable
+- **Phase 7 — Full-suite release gate (was L7; Phase 6 until 2026-10-22):** complete runtime-capable
   upstream suite on five targets plus performance/robustness regression check.
   Then revisit npm publication and serverless platforms.
 
