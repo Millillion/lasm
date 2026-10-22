@@ -163,7 +163,7 @@ build. On Windows a project whose delivered `dist\program.wasm` path would excee
 characters still fails to build. Per-platform results:
 [language coverage](https://github.com/Millillion/lasm/blob/main/docs/LANGUAGE_COVERAGE.md).
 
-**Lake packages (current source, Phase 3; candidate `.39652848544` passed installed acceptance):**
+**Lake packages (current source, Phase 3; candidate `.39677808414` passed installed acceptance and the cold-installation gate):**
 
 - Modules imported only for compilation (tactics, elaborators, attributes, for
   example Aesop, Qq or `import Lean` for macros) no longer keep Lean's compiler

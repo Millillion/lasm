@@ -7,8 +7,100 @@ the actual order; older evidence and code comments use the original labels
 
 ## Phase 3: ecosystem (2026-10-21)
 
-**Status: in progress.** Scope: [PLAN.md](PLAN.md#language-coverage-phases-approved-2026-10-19).
-Per-package results: [COMPATIBILITY.md](COMPATIBILITY.md).
+**Status: complete, gate passed, awaiting review.** Scope: [PLAN.md](PLAN.md#language-coverage-phases-approved-2026-10-19).
+Candidate `0.1.0-experimental.39677808414` (source `a6a546e`, SHA-256 `12d799e8…36d4`,
+release `node-linux-candidate-39677808414`, runtime `7aa5028c…` unchanged from Phase 2):
+five-platform installed acceptance passed in run [39677808414](https://github.com/Millillion/lasm/actions/runs/39677808414).
+Cold-installation gate: passed 2026-10-22. Runs [39695659334](https://github.com/Millillion/lasm/actions/runs/39695659334), [39695686412](https://github.com/Millillion/lasm/actions/runs/39695686412), [39717868976](https://github.com/Millillion/lasm/actions/runs/39717868976), [39748521087](https://github.com/Millillion/lasm/actions/runs/39748521087) and the scheduled [39749093869](https://github.com/Millillion/lasm/actions/runs/39749093869) succeeded; [39695672707](https://github.com/Millillion/lasm/actions/runs/39695672707) failed only its Windows isolation control's online check (`registry.npmjs.org` timed out after 20 s, infrastructure), which restarted Windows' sequence. Final report (run 39749093869): `passed: true`, 6 consecutive clean cold installs on Linux x64/ARM64 and macOS x64/ARM64, 4 on Windows x64.
+
+### Results
+
+- **Compatibility list:** [COMPATIBILITY.md](COMPATIBILITY.md). Tier A (Batteries, Cli,
+  LSpec, Plausible, Aesop + Qq, Mathlib's dependency set) and Tier B (leansqlite,
+  UnicodeBasic + lean4-parser, MD4Lean, lean-zip, lean-redis end to end over TCP) and
+  Millillion/fetch pass on all five targets wherever the package builds natively; lean-regex
+  fails natively on Lean 4.35.0; lean-zip fails natively on Windows (upstream) and reaches the
+  macOS arm64 guard. Zero Lasm-caused failures.
+- **`import Lean.Data.Json` at run time:** works, including `deriving ToJson, FromJson`, and
+  so does `import Lean` with Json (projects `json`, `json-import-lean`), through the runtime
+  initialization plan below. No reachability exception was needed: the C++ kernel and
+  environment stay out of the link and the unchanged policy still checks the result.
+  Runtime elaboration and evaluation remain unavailable.
+- **Outbound HTTP:** [Millillion/fetch](https://github.com/Millillion/fetch) (MIT, unreleased):
+  `fetch url { method, headers, body, redirect, timeout } : Async (Std.Http.Response Fetch.Body)`
+  with `ok`, `status`, `statusText`, `url`, `redirected`, `headers`, `header?`, `text`, `bytes`,
+  `json`, streaming `body.stream` and `close`; transports Node `fetch` (Lasm host operations
+  190–192, [`src/node-fetch.mjs`](../src/node-fetch.mjs)), libcurl via `dlopen`, and the `curl`
+  tool. Its suite passes natively and under Lasm on all five targets, including HTTPS and the
+  plain `IO.Process` curl pattern under Lasm.
+- **Tier C:** Mathlib `v4.35.0` subset (`Mathlib.Data.Nat.Factors`, `Nat.Prime.Basic`,
+  `List.Sort`, `Order.Basic`) on Linux: native build after `lake exe cache get` 115 s (x64) /
+  100 s (arm64); module data under `.lake` 5.86 GB (5,858,501,440 bytes of `.olean*`); Lasm build
+  373 s / 479 s, `program.wasm` 2,147,893 bytes; 5,815 of 5,820 initializers skipped; output
+  identical to native. Build-time native tactics: the `native-tactic` project (an `extern_lib` +
+  `precompileModules` elaborator) passes on all five; real LeanCopilot `v4.35.0` elaborates
+  with its native library under Lasm on linux-arm64 but its own initializer calls C++ at
+  program start, so its deployment is not linkable (classified in COMPATIBILITY.md).
+- **Prebuilt libraries:** `prebuilt-library` (`-lcurl`) stops on all five with
+  `package app links libcurl (HTTP client) (curl)`; libcurl, OpenSSL, libpq, hiredis, BLAS,
+  system SQLite and zlib are recognized by link option or by undefined-symbol prefix.
+
+### Upstream regression check (Phase 2 harnesses on the Phase 3 candidate)
+
+Every Phase 2 harness ran again on the Phase 3 candidate on all five targets
+([evidence](evidence/lean-4.35.0-language-coverage-phase3-2026-10-21.json); runs listed per
+harness there). No test that passed in Phase 2 fails (three darwin-arm64 guard stops aside,
+see below); the initialization plan turns all
+LSP clients and several Lean-as-a-library applications and projects into passes.
+
+| Platform | Harness | Phase 2 | Phase 3 candidate |
+| --- | --- | --- | --- |
+| linux-x64 | runtime-adapter | 300 pass, 146 build-time-only, 50 unsupported-by-design, 31 harness, 8 pass-with-harness-exclusions | 327 pass, 146 build-time-only, 31 harness, 22 unsupported-by-design, 9 pass-with-harness-exclusions |
+| linux-x64 | eval-io | 22 pass | 22 pass |
+| linux-x64 | compiled-application | 104 pass, 10 unsupported-by-design, 4 upstream-disabled | 110 pass, 4 upstream-disabled, 4 unsupported-by-design |
+| linux-x64 | projects | 23 pass, 8 unsupported-by-design, 2 upstream-disabled | 25 pass, 5 unsupported-by-design, 2 upstream-disabled, 1 resource-stop |
+| linux-x64 | lsp | 153 unsupported-by-design | 153 pass |
+| linux-x64 | lsp-server | 4 unsupported-by-design | 4 pass |
+| linux-x64 | lsp-project | 1 unsupported-by-design | 1 pass |
+| linux-x64 | docparse | 202 unsupported-by-design | 202 unsupported-by-design |
+| linux-arm64 | runtime-adapter | 285 pass, 18 harness, 10 build-time-only, 8 pass-with-harness-exclusions | 285 pass, 18 harness, 10 build-time-only, 8 pass-with-harness-exclusions |
+| linux-arm64 | eval-io | 22 pass | 22 pass |
+| linux-arm64 | compiled-application | 104 pass, 10 unsupported-by-design, 4 upstream-disabled | 110 pass, 4 upstream-disabled, 4 unsupported-by-design |
+| linux-arm64 | projects | 23 pass, 8 unsupported-by-design, 2 upstream-disabled | 25 pass, 5 unsupported-by-design, 2 upstream-disabled, 1 resource-stop |
+| darwin-x64 | runtime-adapter | 285 pass, 18 harness, 10 build-time-only, 8 pass-with-harness-exclusions | 285 pass, 18 harness, 10 build-time-only, 8 pass-with-harness-exclusions |
+| darwin-x64 | eval-io | 22 pass | 22 pass |
+| darwin-x64 | compiled-application | 104 pass, 10 unsupported-by-design, 4 upstream-disabled | 110 pass, 4 upstream-disabled, 4 unsupported-by-design |
+| darwin-x64 | projects | 23 pass, 8 unsupported-by-design, 2 upstream-disabled | 25 pass, 6 unsupported-by-design, 2 upstream-disabled |
+| darwin-arm64 | runtime-adapter | 285 pass, 18 harness, 9 build-time-only, 8 pass-with-harness-exclusions, 1 resource-stop | 285 pass, 18 harness, 10 build-time-only, 8 pass-with-harness-exclusions |
+| darwin-arm64 | eval-io | 13 pass, 9 resource-stop | 11 pass, 11 resource-stop |
+| darwin-arm64 | compiled-application | 104 pass, 10 unsupported-by-design, 4 upstream-disabled | 110 pass, 4 upstream-disabled, 4 unsupported-by-design |
+| darwin-arm64 | projects | 23 pass, 7 unsupported-by-design, 2 upstream-disabled, 1 resource-stop | 25 pass, 5 unsupported-by-design, 2 upstream-disabled, 1 resource-stop |
+| win32-x64 | runtime-adapter | 284 pass, 19 harness, 10 build-time-only, 8 pass-with-harness-exclusions | 284 pass, 19 harness, 10 build-time-only, 8 pass-with-harness-exclusions |
+| win32-x64 | eval-io | 22 pass | 22 pass |
+| win32-x64 | compiled-application | 104 pass, 10 unsupported-by-design, 4 upstream-disabled | 110 pass, 4 upstream-disabled, 4 unsupported-by-design |
+| win32-x64 | projects | 21 pass, 8 unsupported-by-design, 2 upstream-disabled, 2 harness | 23 pass, 6 unsupported-by-design, 2 upstream-disabled, 2 harness |
+
+Non-passes beyond Phase 2's classified set: `pkg/user_attr_app` (runtime attributes; Lean as a
+library) now builds further before Lasm rejects it, and on the Linux runners the guard stopped it
+first (resource stop; a local run reaches the AOT rejection at a 3.1 GiB peak; unsupported by
+design on macOS x64 and Windows); on darwin-arm64, 11 eval-io tests and `pkg/frontend` stopped at the 2.80 GiB guard of the 7 GiB
+runner (peaks 2.81–2.86 GiB, the same tests pass on every other platform; Phase 2 had 9 such
+stops, and which tests cross the threshold varies by run). The darwin-x64 projects shard 4 failed
+while downloading the upstream source archive (infrastructure) and passed on rerun.
+
+### Lasm fixes (all in the candidate)
+
+| Fix | Commit | Cause | Evidence |
+| --- | --- | --- | --- |
+| Runtime initialization plan | `f69246b` | build-time-only imports kept Lean's compiler | Tier A projects; LSP clients, Lean-as-library apps now pass |
+| `___boxed__const__` globals are eager | `cc8a5f2` | treated as lazy closed terms; Std.Time's initializer skipped, a refcount went through a null global ("corrupted its heap memory area (address zero)" at exit) | lean-redis 20/30 → 0/30 failures; upstream `elab/async_http_expect` |
+| Windows package C paths | `cc8a5f2` | SQLite prefixes `getcwd()` ("D:\…") with `/`; Lean's include directory under the execution prefix was not mapped | leansqlite passes on win32-x64 (was `unable to open database file`) |
+| Package include directories after the C library | `cc8a5f2` | MD4Lean's Windows stand-in `stdio.h` hid the Wasm one | md4lean passes on win32-x64 |
+| Lazy failures for native-only package C | `a6a546e` | LeanCopilot's C++ bridge does not compile for Wasm | leancopilot reaches the link and is named |
+| Lazy reference graph | `a6a546e` | memory for programs importing all of Lean | `import Lean` + Json peak 1.18 GiB |
+| fetch: IO extern ABI | fetch `9fdb671` | Lean 4.35 IO externs take no world argument (natively tolerated, a Wasm signature mismatch trap) | fetch passes under Lasm |
+
+
 
 ### Runtime initialization plan (reviewed design)
 

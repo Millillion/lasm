@@ -26,7 +26,9 @@ for (const file of files) {
       stdoutHead: side.stdout.split('\n').slice(0, 8).join('\n') } : {}),
     ...(side.log ? { logTail: side.log.split('\n').slice(-12).join('\n') } : {}),
   };
-  results.push({ project: result.project, platform: result.platform, result: result.result, node: result.node,
+  // A build stopped by the resource guard is not a package or Lasm result.
+  const stopped = /proactive (?:RSS stop|memory budget)|resource-limited run/.test(`${result.native?.log ?? ''}\n${result.lasm?.log ?? ''}`);
+  results.push({ project: result.project, platform: result.platform, result: stopped && /fail/.test(result.result) ? 'resource-stop' : result.result, node: result.node,
     native: compact(result.native), lasm: compact(result.lasm) });
 }
 results.sort((a, b) => a.project.localeCompare(b.project) || platforms.indexOf(a.platform) - platforms.indexOf(b.platform));

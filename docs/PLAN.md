@@ -405,8 +405,9 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
     Postgres and Redis, and Rust-based packages, are follow-up candidates.
   Exit: published compatibility list with per-package status on all five
   targets, plus a candidate gate.
-  Status (2026-10-21): implemented in source; five-platform results, the
-  compatibility list and the gate are recorded in
+  Status (2026-10-22): complete, awaiting review. Candidate `.39677808414`
+  passed five-platform acceptance (run 39677808414) and the cold-installation
+  gate (report in run 39749093869); zero Lasm-caused failures. Results in
   [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#phase-3-ecosystem-2026-10-21) and
   [COMPATIBILITY.md](COMPATIBILITY.md).
 - **Phase 4 — Lean as a runtime library (was L5), scoped to what real packages
