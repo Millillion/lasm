@@ -635,6 +635,18 @@ folded into Phases 5.2/5.3 and 7.
   - **5.3 Release gate.** Full runtime-capable upstream suite on five targets,
     ecosystem and interop examples, performance/robustness regression check,
     five-platform acceptance and the cold-installation gate.
+    *Status (2026-10-23): running on candidate `.40000056579` (source `0b99c14`:
+    Phases 4, 5.1 and 5.2 including `Function.ofFnReply`; runtime `7aa5028c…`
+    unchanged), which passed five-platform acceptance, the interop examples and
+    the platform matrix (run 40000056579). Dispatched on it: the upstream suite
+    (every Phase 3 harness and shard count on all five targets), the ecosystem
+    re-check on five targets plus the Linux no-system-C and Tier C runs, server
+    robustness, release benchmarks on all five, the npm distribution through a
+    loopback registry in release mode (`@lasm/cli` 0.1.0, MIT, with a new `init`
+    scenario) and three cold-installation runs. The early release-mode npm run on
+    `.39988013618` passed on four platforms. Readiness review: README now has
+    Known limitations, Licenses and the environment variables, and each platform
+    claim names its CI job. Draft publish plan: [release/0.1.0-draft.md](release/0.1.0-draft.md).*
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as
