@@ -12,6 +12,7 @@ def main : IO Unit := do
   let app ← express
   let _ : Value ← app.callMethod "use" #[toJS (← jsonBodies)]
   -- Every request: read what App.handle needs, answer with res.status(…).json(…).
+  -- The handler runs in `Async`: while it awaits Postgres or jose it holds no Lean thread.
   let handler ← Function.ofFn fun args => do
     let (.ref req _, .ref res _) := (args[0]!, args[1]!) | throw (IO.userError "unexpected Express arguments")
     -- One call reads every field the API needs.

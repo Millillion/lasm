@@ -11,6 +11,7 @@ def main : IO Unit := do
   let ctx ← App.connect
   let app ← newHono
   -- Every request: read what App.handle needs and return c.json(body, status).
+  -- The handler runs in `Async`: while it awaits Postgres or jose it holds no Lean thread.
   let handler ← Function.ofFn fun args => do
     let .ref c _ := args[0]! | throw (IO.userError "unexpected Hono arguments")
     let req ← c.get "req"

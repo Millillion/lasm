@@ -15,12 +15,12 @@ open Lasm.JS
 
 @[js "express" ""] opaque express : IO Value
 @[js "express" "json"] opaque jsonBodies : IO Value
-@[js "node:fs/promises" "readFile"] opaque readFile : String → String → IO String
-@[js "node:timers/promises" "setTimeout"] opaque sleep : Nat → IO Unit
+@[js "node:fs/promises" "readFile"] opaque readFile : String → String → Async String
+@[js "node:timers/promises" "setTimeout"] opaque sleep : Nat → Async Unit
 @[js "node:process" "memoryUsage"] opaque memoryUsage : IO Data
 @[js "globalThis" "JSON.parse"] opaque parseJson : String → IO Data
 
-def handler (f : Value → Value → IO Unit) : IO Value :=
+def handler (f : Value → Value → Async Unit) : IO Value :=
   Function.ofFn fun args => do
     let (.ref req _, .ref res _) := (args[0]!, args[1]!) | throw (IO.userError "expected (req, res)")
     f req res
@@ -34,7 +34,7 @@ def missing : String := "/nonexistent/lasm-interop-soak"
 def main : IO Unit := do
   let app ← express
   let _ : Value ← app.callMethod "use" #[toJS (← jsonBodies)]
-  let route (method path : String) (f : Value → Value → IO Unit) : IO Unit := do
+  let route (method path : String) (f : Value → Value → Async Unit) : IO Unit := do
     let _ : Value ← app.callMethod method #[toJS path, toJS (← handler f)]
   route "get" "/hello/:name" fun req res => do
     let name ← (← req.get "params").get "name" String

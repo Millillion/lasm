@@ -15,20 +15,23 @@ open Lasm.JS
 /-- `serve(options, listening)` from @hono/node-server; returns the Node server. -/
 @[js "@hono/node-server" "serve"] opaque serve : Data → Value → IO Value
 
-/-- A Hono handler `(c) => Response` written in Lean. -/
-def handler (f : Value → IO Function.Reply) : IO Value :=
+/-- A Hono handler `(c) => Response` written in Lean. Handlers run in `Async`:
+awaiting JavaScript in them (`callMethodAwait`, an `Async` binding such as a
+database query) holds no Lean thread, so any number of requests can wait at
+once. `IO` actions work in `Async` unchanged. -/
+def handler (f : Value → Async Function.Reply) : IO Value :=
   Function.ofFnReply fun args => do
     let .ref c _ := args[0]! | throw (IO.userError "expected a Hono context")
     f c
 
 /-- `c.json(body)`: the `Response` the handler returns, made by the host as the
 reply (one host round trip fewer than calling it from Lean). -/
-def json (c : Value) (body : Data) : IO Function.Reply :=
+def json (c : Value) (body : Data) : Async Function.Reply :=
   return .callMethod c "json" #[body]
 
 def main : IO Unit := do
   let app ← newHono
-  let route (method path : String) (f : Value → IO Function.Reply) : IO Unit := do
+  let route (method path : String) (f : Value → Async Function.Reply) : IO Unit := do
     let _ : Value ← app.callMethod method #[toJS path, toJS (← handler f)]
   route "get" "/" fun c => json c (obj [("message", toJS "Hello from Lean on Hono!")])
   route "get" "/hello/:name" fun c => do

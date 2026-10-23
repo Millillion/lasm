@@ -9,12 +9,12 @@ open Lasm.JS
 
 @[js "hono" "new Hono"] opaque newHono : IO Value
 @[js "@hono/node-server" "serve"] opaque serve : Data → Value → IO Value
-@[js "node:fs/promises" "readFile"] opaque readFile : String → String → IO String
-@[js "node:timers/promises" "setTimeout"] opaque sleep : Nat → IO Unit
+@[js "node:fs/promises" "readFile"] opaque readFile : String → String → Async String
+@[js "node:timers/promises" "setTimeout"] opaque sleep : Nat → Async Unit
 @[js "node:process" "memoryUsage"] opaque memoryUsage : IO Data
 @[js "globalThis" "JSON.parse"] opaque parseJson : String → IO Data
 
-def handler (f : Value → IO Data) : IO Value :=
+def handler (f : Value → Async Data) : IO Value :=
   Function.ofFn fun args => do
     let .ref c _ := args[0]! | throw (IO.userError "expected a Hono context")
     f c
@@ -26,7 +26,7 @@ def missing : String := "/nonexistent/lasm-interop-soak"
 
 def main : IO Unit := do
   let app ← newHono
-  let route (method path : String) (f : Value → IO Data) : IO Unit := do
+  let route (method path : String) (f : Value → Async Data) : IO Unit := do
     let _ : Value ← app.callMethod method #[toJS path, toJS (← handler f)]
   route "get" "/hello/:name" fun c => do
     let name ← (← c.get "req").callMethod "param" #[toJS "name"] String

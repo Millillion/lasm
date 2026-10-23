@@ -4,7 +4,12 @@
 // errors, rejected JavaScript promises (uncaught and caught in Lean), timers,
 // and client disconnects (requests aborted while the Lean handler waits).
 //   node soak.mjs CANDIDATE_TGZ WORK_DIR RESULT.json --app express|hono
-//        [--seconds 7200] [--connections 16] [--sample-ms 5000]
+//        [--seconds 7200] [--connections 16] [--sample-ms 5000] [--probe-requests 1000]
+// Before the soak, a concurrency probe (concurrency-probe.mjs) starts the server
+// alone, pinned to 2 CPUs on Linux with LEAN_NUM_THREADS unset, and sends
+// --probe-requests concurrent GET /slow/100: handlers that await in `Async` hold
+// no Lean thread, so they must all finish within 1.5 s with no thread growth
+// (0 skips the probe).
 // LASM_INIT_FROM_SOURCE=1 creates the project with this checkout's `lasm init`.
 // Tracked: RSS, Wasm linear memory, the main isolate's heap, Lasm.JS live
 // handles, pending callbacks and live Lean functions, error rate and per-minute
@@ -18,6 +23,7 @@ import net from 'node:net';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { probe } from './concurrency-probe.mjs';
 
 const argv = process.argv.slice(2);
 const option = (name, fallback) => { const i = argv.indexOf(name); if (i < 0) return fallback; const [, v] = argv.splice(i, 2); return v; };
@@ -25,6 +31,7 @@ const app = option('--app', 'express');
 const seconds = Number(option('--seconds', 7200));
 const connections = Number(option('--connections', 16));
 const sampleMs = Number(option('--sample-ms', 5000));
+const probeRequests = Number(option('--probe-requests', 1000));
 // --project DIR: soak an already prepared project (maintainer runs with a patched package).
 const existingProject = option('--project', undefined);
 const [tgzArg, workArg, resultArg] = argv;
@@ -33,7 +40,7 @@ const tgz = resolve(tgzArg), work = resolve(workArg), resultFile = resolve(resul
 assert.ok(!existsSync(work), 'Use a new work directory');
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../..');
-const criteria = { warmupFraction: 0.25, minimumWarmupSeconds: 120, maxBytesPerRequest: 256,
+const criteria = { probeMaxMs: 1500, probeMaxThreadGrowth: 4, warmupFraction: 0.25, minimumWarmupSeconds: 120, maxBytesPerRequest: 256,
   finalAllowanceBytes: 32 * 1024 ** 2, wasmAllowanceBytes: 16 * 1024 ** 2, maxHandleGrowth: 64, p99Drift: 2, p99SlackMs: 5 };
 const result = { app, platform: `${process.platform}-${process.arch}`, node: process.version, candidate: tgz,
   seconds, connections, criteria, startedAt: new Date().toISOString(), steps: [], minutes: [] };
@@ -88,10 +95,9 @@ const mib = b => b == null ? null : Math.round(b / 1024 ** 2 * 100) / 100;
 
 // ---------- load ----------
 // [name, weight, method, path, body, check]; slow-abort requests are aborted
-// after 10 ms while the Lean handler still waits 60 ms. Every in-flight Lean
-// handler holds a Lean worker thread while it awaits (about one per CPU by
-// default), so the mix keeps waiting handlers below the worker count of a
-// 4-CPU runner: this is a leak soak at steady state, not an overload test.
+// after 10 ms while the Lean handler still waits 60 ms. This is a leak soak at
+// steady state, not an overload test; the concurrency probe covers many
+// waiting handlers at once.
 const mix = [
   ['hello', 58, 'GET', '/hello/Ada', null, r => r.status === 200 && JSON.parse(r.body).message === 'Hello, Ada, from Lean!'],
   ['echo', 15, 'POST', '/echo', { n: [1, 2, 3], s: 'λ soak' }, r => r.status === 200 && JSON.parse(r.body).echo?.s === 'λ soak'],
@@ -144,6 +150,14 @@ try {
     run('npm install', tool('npm'), ['install', '-D', tgz], project);
   }
   run('lasm build', tool('npm'), ['run', 'build'], project);
+
+  if (probeRequests > 0) {
+    log(`concurrency probe: ${probeRequests} concurrent GET /slow/100`);
+    result.concurrency = await probe(join(project, 'dist/main.mjs'), { requests: probeRequests, ms: 100, rounds: 3, cpus: '0,1' });
+    const c = result.concurrency;
+    log(`concurrency probe: rounds ${c.rounds.map(r => `${r.ok}/${r.requests} in ${r.totalMs} ms`).join(', ')}; threads ${c.threadsBefore} → ${c.threadsAfterRound1} → ${c.threadsAfter}`);
+    save();
+  }
 
   const port = await new Promise((done, fail) => { const s = net.createServer(); s.once('error', fail);
     s.listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => done(port)); }); });
@@ -262,7 +276,10 @@ try {
     p99: { firstMs: p99First, lastMs: p99Last },
     osHandles: { base: median(warm.slice(0, 5).map(s => s.handles)), final: median(warm.slice(-5).map(s => s.handles)) },
   };
+  const c = result.concurrency;
   const checks = {
+    concurrency: probeRequests === 0 || c?.allOk === true && c.bestTotalMs <= criteria.probeMaxMs
+      && (c.threadsAfter == null || c.threadsAfterRound1 == null || c.threadsAfter - c.threadsAfterRound1 <= criteria.probeMaxThreadGrowth),
     errors: totals.errors === 0,
     alive: server.exit === null,
     samples: warm.length >= 5,
@@ -291,6 +308,9 @@ try {
   }
   result.finishedAt = new Date().toISOString(); save();
 }
-console.log(JSON.stringify({ app, passed: result.passed, load: result.load && { requests: result.load.requests, rps: result.load.requestsPerSecond, errors: result.load.errors },
+console.log(JSON.stringify({ app, passed: result.passed,
+  concurrency: result.concurrency && { totalMs: result.concurrency.rounds.map(r => r.totalMs), ok: result.concurrency.allOk,
+    threads: [result.concurrency.threadsBefore, result.concurrency.threadsAfterRound1, result.concurrency.threadsAfter] },
+  load: result.load && { requests: result.load.requests, rps: result.load.requestsPerSecond, errors: result.load.errors },
   checks: result.checks, growth: result.growth, error: result.error?.slice(0, 2000) }, null, 2));
 process.exitCode = result.passed ? 0 : 1;

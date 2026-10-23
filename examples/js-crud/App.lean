@@ -7,6 +7,9 @@ Postgres (npm `pg`) and JSON Web Tokens (npm `jose`).
   POST /todos         {"title": "…"} + token      → 201 {"id", "title", "done"}
   GET  /health                                    → {"ok": true}
 
+Request handling runs in `Async`: while a handler awaits Postgres or jose it
+holds no Lean thread, so any number of requests can wait at once.
+
 Configuration: DATABASE_URL (Postgres connection string), JWT_SECRET, PORT (default 3000),
 HOST (default 0.0.0.0, every interface, as containers and hosting platforms need).
 -/
@@ -35,8 +38,8 @@ structure Login where
 @[js "pg" "new Pool"] opaque newPool : Data → IO Value
 /-- `new jose.SignJWT(payload)` -/
 @[js "jose" "new SignJWT"] opaque newSignJWT : Data → IO Value
-/-- `await jose.jwtVerify(token, key)` -/
-@[js "jose" "jwtVerify"] opaque jwtVerify : String → ByteArray → IO Data
+/-- `await jose.jwtVerify(token, key)`, without holding a Lean thread (`Async`). -/
+@[js "jose" "jwtVerify"] opaque jwtVerify : String → ByteArray → Async Data
 
 structure Context where
   pool : Value
@@ -44,6 +47,7 @@ structure Context where
 
 def env (name fallback : String) : IO String := return (← IO.getEnv name).getD fallback
 
+/-- At startup (`IO`): awaiting here blocks the main thread, which is fine. -/
 def connect : IO Context := do
   let url ← env "DATABASE_URL" "postgres://postgres:postgres@127.0.0.1:5432/postgres"
   let pool ← newPool (obj [("connectionString", toJS url)])
@@ -52,18 +56,18 @@ def connect : IO Context := do
   return { pool, secret := (← env "JWT_SECRET" "development secret, change me").toUTF8 }
 
 /-- Rows of a `pg` query (`result.rows`), converted to `α`. -/
-def query (α : Type) [FromJS α] (ctx : Context) (sql : String) (params : Array Data) : IO (Array α) := do
+def query (α : Type) [FromJS α] (ctx : Context) (sql : String) (params : Array Data) : Async (Array α) := do
   let result : Value ← ctx.pool.callMethodAwait "query" #[toJS sql, .array params] Value
   result.get "rows" (Array α)
 
-def issueToken (ctx : Context) (user : String) : IO String := do
+def issueToken (ctx : Context) (user : String) : Async String := do
   let jwt ← newSignJWT (obj [("sub", toJS user)])
   let jwt ← jwt.callMethod "setProtectedHeader" #[obj [("alg", toJS "HS256")]]
   let jwt ← jwt.callMethod "setExpirationTime" #[toJS "2h"]
   jwt.callMethodAwait "sign" #[toJS ctx.secret] String
 
 /-- The user of a valid `Authorization: Bearer …` header. -/
-def authenticate (ctx : Context) (header : Option String) : IO (Option String) := do
+def authenticate (ctx : Context) (header : Option String) : Async (Option String) := do
   let some header := header | return none
   unless header.startsWith "Bearer " do return none
   try
@@ -81,7 +85,7 @@ structure Response where
 def problem (status : Nat) (message : String) : Response := { status, body := obj [("error", toJS message)] }
 
 /-- The whole API, independent of the web framework. -/
-def handle (ctx : Context) (method path : String) (authorization : Option String) (body : Data) : IO Response := do
+def handle (ctx : Context) (method path : String) (authorization : Option String) (body : Data) : Async Response := do
   match method, path with
   | "GET", "/health" => return { status := 200, body := obj [("ok", toJS true)] }
   | "POST", "/login" =>

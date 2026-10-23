@@ -17,15 +17,18 @@ open Lasm.JS
 
 /-- An Express handler `(req, res) => …` written in Lean. It reads the request
 fields it needs in one call (`req.getFields`) and answers with `Function.Reply.callMethod`,
-which the host makes as part of the reply: two host round trips per request. -/
-def handler (fields : Array String) (f : Data → Value → IO Function.Reply) : IO Value :=
+which the host makes as part of the reply: two host round trips per request.
+Handlers run in `Async`: awaiting JavaScript in them (`callMethodAwait`, an
+`Async` binding such as a database query) holds no Lean thread, so any number
+of requests can wait at once. `IO` actions work in `Async` unchanged. -/
+def handler (fields : Array String) (f : Data → Value → Async Function.Reply) : IO Value :=
   Function.ofFnReply fun args => do
     let (.ref req _, .ref res _) := (args[0]!, args[1]!) | throw (IO.userError "expected (req, res)")
     let request ← if fields.isEmpty then pure Data.undefined else req.getFields fields
     f request res
 
 /-- `res.json(body)`, made by the host as the reply. -/
-def sendJson (res : Value) (body : Data) : IO Function.Reply :=
+def sendJson (res : Value) (body : Data) : Async Function.Reply :=
   return .callMethod res "json" #[body]
 
 def text : Data → String | .string s => s | _ => ""
@@ -33,7 +36,7 @@ def text : Data → String | .string s => s | _ => ""
 def main : IO Unit := do
   let app ← express
   let _ : Value ← app.callMethod "use" #[toJS (← jsonBodies)]
-  let route (method path : String) (fields : Array String) (f : Data → Value → IO Function.Reply) : IO Unit := do
+  let route (method path : String) (fields : Array String) (f : Data → Value → Async Function.Reply) : IO Unit := do
     let _ : Value ← app.callMethod method #[toJS path, toJS (← handler fields f)]
   route "get" "/" #[] fun _ res => sendJson res (obj [("message", toJS "Hello from Lean on Express!")])
   route "get" "/hello/:name" #["params"] fun req res =>

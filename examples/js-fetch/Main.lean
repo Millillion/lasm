@@ -7,8 +7,8 @@ import Lasm.JS
 import Lean.Data.Json
 open Lasm.JS
 
-/-- `await fetch(url, init)`: the Response object. -/
-@[js "globalThis" "fetch"] opaque fetch : String → Data → IO Value
+/-- `await fetch(url, init)`: the Response object. `Async`: waiting holds no Lean thread. -/
+@[js "globalThis" "fetch"] opaque fetch : String → Data → Async Value
 
 structure Reply where
   status : Nat
@@ -16,7 +16,7 @@ structure Reply where
   body : String
 
 /-- GET (or POST with a JSON body) and read the whole response as text. -/
-def request (url : String) (json : Option Lean.Json := none) : IO Reply := do
+def request (url : String) (json : Option Lean.Json := none) : Async Reply := do
   let init := match json with
     | none => obj []
     | some body => obj [("method", toJS "POST"), ("headers", obj [("content-type", toJS "application/json")]),
@@ -30,7 +30,7 @@ def request (url : String) (json : Option Lean.Json := none) : IO Reply := do
 def main (args : List String) : IO UInt32 := do
   let url := args.head?.getD "https://example.com"
   try
-    let reply ← request url
+    let reply ← (request url).block   -- run an `Async` computation from `IO` and wait for it
     IO.println s!"{reply.status} {reply.contentType.getD "?"} {reply.body.length} characters"
     return 0
   catch e =>
