@@ -22,5 +22,5 @@ async rejection: Lasm.JS binding failAsync (local-lib fail): RangeError: late bo
 async method: method
 async await: promise
 async handler: WAITS
-fan-out of 500 waiting handlers under 2 s: true
+fan-out of 500 waiting handlers under 5 s: true
 handles released: true

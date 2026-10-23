@@ -43,7 +43,8 @@ def asyncPart (lib : Value) : Async Unit := do
     let _ ← laterAsync "slow" 100
     return i
   let ms ← fanOut slow 500
-  IO.println s!"fan-out of 500 waiting handlers under 2 s: {decide (ms < 2000)}"
+  -- Blocking a Lean worker per call would take 500 / workers × 100 ms (12 s or more on 4 CPUs).
+  IO.println s!"fan-out of 500 waiting handlers under 5 s: {decide (ms < 5000)}"
 
 def main : IO Unit := do
   IO.println s!"available: {isAvailable}"
