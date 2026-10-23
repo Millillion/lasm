@@ -11,6 +11,9 @@ import { hashFile, managedCacheDirectory } from './managed-artifacts.mjs';
 import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject } from './application-sources.mjs';
+import { importsLibrary, librarySources } from './lasm-library.mjs';
+import { planNodeModules, copyNodeModules } from './application-npm.mjs';
+import { readBindings, checkBindings, requireValidBindings } from './application-binding-check.mjs';
 import { linkApplication, selectedLinkDriver } from './application-link.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint } from './application-output.mjs';
 import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './application-files.mjs';
@@ -78,6 +81,21 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const { compilations: nativeCompilations, unavailable: nativeUnavailable } = generated.nativeLink
     ? planNativeInputs(generated.nativeLink, { leanPrefix: [lean.prefix, lean.executionPrefix], runtimeInclude: join(runtime.directory, 'include') })
     : { compilations: [], unavailable: [] };
+  // Programs that import Lasm.JS link its generated C and C glue.
+  const usesJs = importsLibrary(generated.sources);
+  if (usesJs) {
+    const library = librarySources(lean);
+    generated = { ...generated, sources: [...generated.sources, ...library.sources], inputs: [...generated.inputs, ...library.inputs] };
+  }
+  // npm packages for Lasm.JS: package.json next to the lakefile (or the source).
+  const nodeModules = planNodeModules(directory);
+  // Lasm.JS bindings must name existing JavaScript functions.
+  let jsBindings;
+  if (usesJs) {
+    progress?.({ stage: 'Checking Lasm.JS bindings' });
+    jsBindings = checkBindings(directory, readBindings(lean, generated.env, generated.oleans()));
+    for (const warning of requireValidBindings(jsBindings)) log(`Lasm.JS binding warning: ${warning}`);
+  }
   progress?.({ stage: 'Checking application inputs and cached build' });
   const modules = [];
   for (let i = 0; i < generated.sources.length; i++) modules.push({
@@ -100,7 +118,9 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     minimumGlibc: applicationSupport()?.minimumGlibc, memoryMode, modules,
     ...(nativeCompilations.length ? { nativeObjects: nativeCompilations.map(item => ({ object: item.object, identity: item.identity,
       sourceSha256: createHash('sha256').update(readFileSync(item.source)).digest('hex'), args: item.extraArgs })) } : {}),
-    ...(nativeUnavailable.length ? { nativeUnavailable } : {}) };
+    ...(nativeUnavailable.length ? { nativeUnavailable } : {}),
+    ...(usesJs ? { lasmJs: true } : {}),
+    ...(nodeModules ? { nodeModules: { identity: nodeModules.identity, packages: nodeModules.packages } } : {}) };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
   if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)
@@ -133,7 +153,11 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     node: applicationSupport()?.node, minimumGlibc: applicationSupport()?.minimumGlibc,
   });
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));
-  const buildInfo = { ...recipe, signature, linkRequirements,
+  if (nodeModules) {
+    progress?.({ stage: `Copying ${nodeModules.packages.length} npm packages` });
+    copyNodeModules(nodeModules, dist);
+  }
+  const buildInfo = { ...recipe, signature, linkRequirements, ...(jsBindings ? { jsBindings } : {}),
     ...(linkDriver === 'node' ? { linkToolchain: { identity: sdk.identity, ...sdk.toolchain } }
       : { sdkIdentity: sdk.identity, sdkDriverIdentity: sdk.driverIdentity }) };
   await writeFile(join(dist, 'build-info.json'), JSON.stringify(buildInfo, null, 2) + '\n');

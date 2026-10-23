@@ -10,6 +10,7 @@ import { nativeWindowsTimeZone } from './native-windows-timezone.mjs';
 import { createNodeProcesses } from './node-process.mjs';
 import { createNodeUdp } from './node-udp.mjs';
 import { createNodeFetch } from './node-fetch.mjs';
+import { createNodeJs } from './node-js.mjs';
 import { nativeDns } from './native-dns.mjs';
 import { createNodeSystem } from './node-system.mjs';
 import { createNodeSignals } from './node-signal.mjs';
@@ -64,7 +65,7 @@ export function encodeError(err, leanVersion = '4.32.0') {
 
 /** Private Node implementation of Lean's runtime primitives, not a Lean API. */
 export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.' : process.cwd(), args = [], stdio = {}, appPath = process.execPath,
-  applicationCommand, propagateCwd = false, processExit = false, leanVersion = '4.32.0' } = {}) {
+  applicationCommand, propagateCwd = false, processExit = false, leanVersion = '4.32.0', wasmMemory, serveSync } = {}) {
   checkLeanIOVersion(leanVersion);
   if (!Array.isArray(args) || args.some(value => typeof value !== 'string' || !value.isWellFormed() || value.includes('\0')))
     throw new TypeError('Lean main arguments must be Unicode strings without NUL characters');
@@ -145,6 +146,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
   }
   function release(id, asynchronous = false) {
     if (id < 3) return;
+    if (js.owns(id)) return js.release(id);
     const resource = resources.get(id);
     if (!resource) return;
     resources.delete(id);
@@ -160,6 +162,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
   const system = createNodeSystem();
   const signals = createNodeSignals({ add, get });
   const outbound = createNodeFetch({ add, get });
+  const js = createNodeJs({ appPath, wasmMemory, serveSync });
   const pending = new HandleTable();
   function dispatch(op, id, arg, bytes, context, state) {
     const path = bytes => pathAt(bytes, state);
@@ -171,6 +174,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
     }
     if (op === 181) return nativeWindowsTimeZone().localIdentifier(arg);
     if (op >= 190 && op <= 199) return outbound.dispatch(op, id, arg, bytes);
+    if (op >= 200 && op <= 219) return js.dispatch(op, id, arg, bytes);
     if (op >= 160 && op <= 164) return signals.dispatch(op, id, arg);
     if (op >= 120 && op <= 144) return system.dispatch(op, id, arg, bytes);
     if (op === 115) {
@@ -349,6 +353,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
       directory.close();
       for (const value of resources.values()) value.cancelled = true;
       for (const id of resources.keys()) release(id);
+      js.close();
       for (const id of [0, 1, 2]) {
         const file = resources.get(id);
         if (file.stream || file.pending) closeResource(file, true);

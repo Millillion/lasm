@@ -84,6 +84,7 @@ addToLibrary({
     response: null,
     slots: null,
     depth: 0,
+    doorbell: 0,
     slotBytes: 96,
     replyBytes: 65536,
     newSlot: function () {
@@ -107,6 +108,12 @@ addToLibrary({
       Atomics.store(HEAP32, (slot + 4) / 4, 0);
       Atomics.add(HEAP32, slot / 4, 1);
       Atomics.notify(HEAP32, slot / 4);
+      // A Lasm.JS synchronous-callback thread also rings the doorbell the main
+      // thread waits on inside the callback, which then serves this slot inline.
+      if (lasmFullRPC.doorbell) {
+        Atomics.add(HEAP32, lasmFullRPC.doorbell / 4, 1);
+        Atomics.notify(HEAP32, lasmFullRPC.doorbell / 4);
+      }
       while (Atomics.load(HEAP32, (slot + 4) / 4) === 0) _emscripten_futex_wait(slot + 4, 0, Infinity);
       return HEAP32[(slot + 20) / 4];
     },
@@ -205,6 +212,18 @@ addToLibrary({
       try { ns = lasmFullClock.wall.now(); } catch (error) { return undefined; }
       return numbers(ns / 1000000000n, ns % 1000000000n);
     },
+  },
+  // Lasm.JS synchronous callbacks (library/c/lasm_js.c): this thread's
+  // host calls ring `doorbell`; returns the slot its depth-0 calls use. The
+  // caller makes one host call next, so the main thread has registered the slot.
+  lasm_js_sync_setup__deps: ['$lasmFullRPC'],
+  lasm_js_sync_setup__sig: 'pp',
+  lasm_js_sync_setup: function (doorbell) {
+    if (!ENVIRONMENT_IS_PTHREAD) throw new Error('Lasm.JS synchronous callbacks require PROXY_TO_PTHREAD');
+    lasmFullRPC.slots ??= [];
+    var slot = lasmFullRPC.slots[0] ??= lasmFullRPC.newSlot();
+    lasmFullRPC.doorbell = Number(doorbell);
+    return slot;
   },
   lasm_fiber_current__sig: 'i',
   lasm_fiber_current: function () { return Number(_pthread_self()); },

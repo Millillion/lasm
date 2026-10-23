@@ -3,6 +3,7 @@ import { join, dirname, resolve, toNamespacedPath } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { provisionArtifact, deriveArtifact, validateArtifact, managedCacheDirectory, linkArtifactTree } from './managed-artifacts.mjs';
 import { assertSupportedHost, executableName } from './platform.mjs';
+import { compileLibrary, libraryIdentity, libraryLeanVersions } from './lasm-library.mjs';
 import { verifyNativeProgram } from './native-program.mjs';
 import { windowsToolPrefix } from './windows-tool-paths.mjs';
 import { findApplicationProject, standaloneImportsModules } from './application-sources.mjs';
@@ -57,7 +58,9 @@ export function leanDistribution(release, host, { distribution = 'tiers' } = {})
 export async function assembleLeanPrefix(version, release, components, options = {}) {
   const cache = options.cache ?? managedCacheDirectory();
   const provenance = { kind: 'lean-prefix', schema: 1, version, commit: release.commit,
-    components: components.map(({ artifact }) => validateArtifact(artifact)) };
+    components: components.map(({ artifact }) => validateArtifact(artifact)),
+    // Lasm's own library (Lasm.JS), compiled into prefixes with Lean's elaborator.
+    lasmLibrary: libraryIdentity() };
   options.progress?.({ stage: `Checking Lean ${version} installation` });
   return deriveArtifact(provenance, async tree => {
     const owners = new Map();
@@ -66,6 +69,8 @@ export async function assembleLeanPrefix(version, release, components, options =
       options.progress?.({ stage: `Assembling Lean ${version}` });
       await linkArtifactTree(installed.directory, installed.receipt, tree, owners, artifact.name, 'Lean archive');
     }
+    if (libraryLeanVersions.includes(version)) options.progress?.({ stage: `Compiling Lasm's Lean library for Lean ${version}` });
+    compileLibrary(tree, version, { platform: options.platform });
   }, { cache, log: options.log, signal: options.signal, progress: options.progress });
 }
 

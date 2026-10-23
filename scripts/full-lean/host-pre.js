@@ -37,6 +37,9 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       lasmFullHost = import(path).then(m => m.createNodeRuntimeHost({
         leanVersion: Module.lasmLeanVersion,
         args: process.argv.slice(2), appPath: process.env.LASM_FULL_APP_PATH ?? __filename, propagateCwd: true, processExit: true,
+        // Lasm.JS synchronous callbacks: the Wasm memory and inline serving of
+        // one thread's slot while the main thread waits in a JS callback.
+        wasmMemory: () => wasmMemory, serveSync: pointer => lasmFullServeSync(pointer),
         applicationCommand: process.env.LASM_FULL_APP_PATH ? {
           executable: process.execPath,
           arguments: [],
@@ -170,6 +173,45 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       if (pending) { pending.then(() => lasmFullServe(slot)); return; }
     }
   };
+  // Serve one pending request of a slot now, on this thread, while the main
+  // thread waits inside a synchronous Lasm.JS callback for the Lean thread that
+  // owns the slot. Only synchronously completing operations can be answered:
+  // an operation that returns a promise is answered with a failure (its result,
+  // when it settles, is discarded), except writes, which are queued.
+  var lasmFullServeSync = function (pointer) {
+    const slot = lasmFullSlots.get(pointer);
+    if (!slot || !lasmFullHostValue) return;
+    const { i32, view } = lasmFullViews();
+    const sequence = Atomics.load(i32, pointer / 4);
+    if (sequence === slot.sequence) return;
+    slot.sequence = sequence;
+    const kind = view.getInt32(pointer + 8, true);
+    if (kind === 3) { lasmFullServeOne(slot); return; }
+    const operation = view.getInt32(pointer + 12, true), handle = view.getUint32(pointer + 16, true);
+    const argument = view.getBigUint64(pointer + 24, true);
+    const input = Number(view.getBigUint64(pointer + 32, true)), length = Number(view.getBigUint64(pointer + 40, true));
+    const { u8 } = lasmFullViews();
+    const bytes = length ? u8.slice(input, input + length) : new Uint8Array(0);
+    const context = { fiber: Number(view.getBigUint64(pointer + 72, true)), synchronous: true };
+    let result;
+    try { result = lasmFullDispatch(lasmFullHostValue, kind, operation, handle, argument, bytes, context); }
+    catch (error) { lasmFullReply(slot, { failure: error?.stack ?? String(error) }); return; }
+    if (result?.then) {
+      result.catch(() => {});
+      // Writes and flushes (ops 3, 4) are queued in order on their stream;
+      // report them as done so console output works in synchronous callbacks.
+      if (kind === 0 && (operation === 3 || operation === 4)) { lasmFullReply(slot, { error: false, bytes: new Uint8Array(0) }); return; }
+      lasmFullReply(slot, { error: true, bytes: Buffer.concat([Buffer.from(new BigUint64Array([18n, 0n]).buffer),
+        Buffer.from(`Lean host operation ${operation} completes asynchronously and cannot run inside a synchronous JavaScript callback (Lasm.JS.Function.ofSyncFn); use an asynchronous callback (ofFn)`)]) });
+      return;
+    }
+    lasmFullReply(slot, result);
+  };
+  var lasmFullSlots = new Map();
   // CMD_CALL_HANDLER from a Lean thread's first call at a nesting depth.
-  Module.lasmFullHostSlot = function (pointer) { lasmFullServe({ pointer, sequence: 0 }); };
+  Module.lasmFullHostSlot = function (pointer) {
+    const slot = { pointer, sequence: 0 };
+    lasmFullSlots.set(pointer, slot);
+    lasmFullServe(slot);
+  };
 }

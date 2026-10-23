@@ -189,10 +189,39 @@ characters still fails to build. Per-platform results:
   code needs one, the build stops and names the library and the package that
   declares it; a library used only during compilation (a tactic's solver) is
   left out.
-- Outbound HTTP: today a Lasm program makes HTTP requests by running the `curl` tool
-  with `IO.Process` (where curl is installed), as natively. Calling Node's own `fetch`
-  (and npm packages) through JS/npm interop is planned for Phase 4. The experimental
+- Outbound HTTP: accepted candidates make HTTP requests by running the `curl` tool
+  with `IO.Process` (where curl is installed), as natively. Current source calls
+  Node's own `fetch` through JS/npm interop (below). The experimental
   Millillion/fetch library tested in Phase 3 is superseded, archived and was never released.
+
+**JS/npm interop (current source, Phase 4; not yet in a candidate):** `import Lasm.JS`
+calls Node built-ins, Node globals such as `fetch`, and npm packages from Lean, and
+lets JavaScript call Lean functions (HTTP handlers for Express or Hono, callbacks).
+Lasm ships the library: no Lake dependency is needed. Put a `package.json` next to
+the lakefile (or next to `Main.lean`) and run `npm install`. `lasm build` copies the
+production dependencies into `dist/node_modules`, checks every binding against the
+installed packages. Lean 4.35.0 is required. Complete program:
+
+```lean
+import Lasm.JS
+open Lasm.JS
+
+/-- `await fetch(url, init)` (Node's global fetch) -/
+@[js "globalThis" "fetch"] opaque fetch : String → Data → IO Value
+
+def main : IO Unit := do
+  let response ← fetch "https://example.com" (obj [])
+  IO.println s!"{← response.get "status" Nat}: {(← response.callMethodAwait "text" #[] String).length} characters"
+```
+
+`npx lasm Main.lean` runs it. Each JavaScript call costs about 16 µs (the Lean thread
+crosses to Node's main thread). An Express or Hono server with a Lean handler reached
+37,000 requests per second in the prototype, against about 1,300 for `Std.Http` under
+Lasm. These programs run only under Lasm: natively, every JavaScript operation fails
+with a clear error, and the Lean editor extension does not know `Lasm.JS` yet. The
+guide for writing bindings (by hand or by an AI agent), with Express, Hono, `pg`,
+`jose` and `fetch` examples, type mappings, errors and exact limitations, is
+[JS_BINDINGS.md](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md).
 
 The deployed application cannot use the following capabilities:
 

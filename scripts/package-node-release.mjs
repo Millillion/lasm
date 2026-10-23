@@ -50,6 +50,8 @@ cpSync(resolve(nativeArg), join(staging, 'src/native'), { recursive: true });
 for (const file of ['manifest.json', 'process/manifest.json', 'signals/manifest.json', 'node_modules/koffi/LICENSE.txt'])
   assert.ok(existsSync(join(staging, 'src/native', file)), `Missing runtime dependency: ${file}`);
 cpSync(runtime.directory, join(staging, 'targets', runtime.manifest.name), { recursive: true });
+// Lasm's Lean library (import Lasm.JS), compiled into the managed Lean prefix on first use.
+cpSync(join(root, 'library'), join(staging, 'library'), { recursive: true });
 mkdirSync(join(staging, 'scripts/full-lean'), { recursive: true });
 for (const name of ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs',
   'function-table-index.mjs', 'table-growth.mjs'])
@@ -72,7 +74,7 @@ json('package.json', {
   name: sourcePackage.name, version, private: true, license: 'UNLICENSED', type: 'module',
   description: 'Compile ordinary Lean applications to run in Node',
   bin: sourcePackage.bin, engines: { node: pins.node }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
-  files: ['bin', 'src', 'scripts', 'targets', 'docs', 'examples', 'README.md',
+  files: ['bin', 'src', 'library', 'scripts', 'targets', 'docs', 'examples', 'README.md',
     'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json', 'installer-dependencies.json'],
   dependencies: { tar: sourcePackage.dependencies.tar },
   bundleDependencies: ['tar'],

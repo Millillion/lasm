@@ -201,8 +201,8 @@ export function applicationSources(source, lean, work, { log = console.error, gi
       // Re-elaborate the script to observe configuration/plugin changes; the
       // content-based application cache still reuses an unchanged final link.
       run(lean.lake, ['--no-cache', '--keep-toolchain', 'lean', configuredSource,
-        '--', '-j1', '-s8192', '-Dcompiler.postponeCompile=false', '-c', file], project);
-      sources.push(file); inputs.push({ module: relative(project, source).replaceAll('\\', '/'), source });
+        '--', '-j1', '-s8192', '-Dcompiler.postponeCompile=false', '-o', join(work, 'script.olean'), '-c', file], project);
+      sources.push(file); inputs.push({ module: relative(project, source).replaceAll('\\', '/'), source, olean: join(work, 'script.olean') });
     }
     // The C code Lake would link into a native executable, built natively first.
     let nativeLink;
@@ -210,8 +210,17 @@ export function applicationSources(source, lean, work, { log = console.error, gi
       log('Building native link inputs');
       nativeLink = adapter('--link', configuredSource);
     }
+    // .olean files of the workspace modules (for Lasm.JS's binding check).
+    const oleans = () => {
+      const files = [];
+      for (let start = 0; start < unique.length; start += 64) {
+        const batch = unique.slice(start, start + 64);
+        for (const file of queryAll(batch.map(target => target + ':olean'))) if (typeof file === 'string') files.push(resolve(project, file));
+      }
+      return [...files, ...inputs.filter(input => input.olean).map(input => input.olean)];
+    };
     return { project, sources, inputs, env, metadataRoots: entry.metadataRoots.map(path => resolve(project, path)),
-      native: entry.native ?? [], nativeLink };
+      native: entry.native ?? [], nativeLink, oleans };
   }
   // Standalone source trees use Lean's own import parser. Standard libraries
   // are already in the versioned bundle; local imports are compiled in order.
@@ -221,7 +230,8 @@ export function applicationSources(source, lean, work, { log = console.error, gi
   const sources = [], inputs = [], visiting = new Set(), completed = new Map();
   function visit(file) {
     file = canonicalApplicationPath(file);
-    if (insideDirectory(standard, file)) return lean.commit;
+    // The prefix identity covers the standard library and Lasm's own library (Lasm.JS).
+    if (insideDirectory(standard, file)) return lean.identity ?? lean.commit;
     if (!insideDirectory(directory, file)) throw new Error(`Standalone import ${file} is outside the source directory. Declare external dependencies in an ordinary Lake project.`);
     if (completed.has(file)) return completed.get(file);
     if (visiting.has(file)) throw new Error(`Cyclic Lean module imports: ${file}`);
@@ -254,5 +264,6 @@ export function applicationSources(source, lean, work, { log = console.error, gi
     return signature;
   }
   visit(source);
-  return { project: null, sources, inputs, env, metadataRoots: [output] };
+  return { project: null, sources, inputs, env, metadataRoots: [output],
+    oleans: () => sources.map(file => file.slice(0, -2) + '.olean') };
 }

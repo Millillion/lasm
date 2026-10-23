@@ -1,0 +1,6 @@
+{
+  "name": "lasm-js-interop-fixture",
+  "private": true,
+  "dependencies": { "local-lib": "file:./local-lib" },
+  "devDependencies": {}
+}

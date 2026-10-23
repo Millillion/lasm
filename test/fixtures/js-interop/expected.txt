@@ -1,0 +1,20 @@
+available: true
+greet: hello, Lean
+sum: 6.500000
+later: awaited
+task: as a task
+rejection: Lasm.JS binding fail (local-lib fail): RangeError: boom
+counter: 15
+nested: 42
+path: a/b
+config: fixture #[a, b] {"max":3} none
+clone: object {name, tags, limits, missing}
+enum: true
+mismatch: Lasm.JS get "greet": expected Lean type Nat, received JavaScript function greet (1 parameter)
+  sync callback 1
+  sync callback 2
+  sync callback 3
+mapSync: #[2, 4, 6]
+applyAsync: HELLO, CALLBACKS
+lean error in JS: Lasm.JS binding applyAsync (local-lib applyAsync): Error: from Lean
+handles released: true
