@@ -1,11 +1,11 @@
 {
   "active": true,
-  "version": "0.1.0-experimental.40000056579",
-  "sha256": "2bb87c44bbf6ee9b164e8ec8a6616b2c62972d36ff233935457a2caec462d1e1",
-  "sourceRevision": "0b99c143ce4ba844a51e4ae436ae206a8862dc12",
-  "release": "node-linux-candidate-40000056579",
-  "baselineRunId": "40000056579",
+  "version": "0.1.0-experimental.58",
+  "sha256": "abeccf74df7743b4ef86f1ea1e59468bd750c569295798264c6bf848b1945008",
+  "sourceRevision": "a9c5a9d3d051979653a78dec48994bc823dc8098",
+  "release": "node-linux-candidate-40012750099",
+  "baselineRunId": "40012750099",
   "node": "26.12.1",
   "lean": "4.35.0",
-  "reason": "Phase 5.3 release-gate candidate: Phases 4, 5.1 and 5.2 (lasm init templates, Function.ofFnReply / Function.Reply; runtime 7aa5028c… unchanged): five-platform installed acceptance, interop examples and the launch platform matrix in run 40000056579."
+  "reason": "Phase 5.3 release-gate candidate: Phases 4, 5.1 and 5.2 with non-blocking JS awaits in Async (Lasm.JS; templates and examples use Async handlers; runtime 7aa5028c… unchanged): five-platform installed acceptance, interop examples, templates and the launch platform matrix in run 40012750099."
 }
