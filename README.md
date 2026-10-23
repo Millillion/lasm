@@ -376,18 +376,29 @@ A summary; the sections above and the linked pages have the details.
 
 ## Licenses
 
-Lasm's own source is under the [MIT License](LICENSE). A built `dist/` contains:
-`THIRD_PARTY_NOTICES.txt` with the licenses of the code compiled into
-`program.wasm` (Lean's runtime and standard library, Apache-2.0; Emscripten, LLVM
-libc++/libc++abi, musl, mimalloc, libuv; GNU MP, LGPL-3.0-or-later or GPL-2.0-or-later, statically
-linked as in native Lean executables), koffi's MIT license under `host/native`,
-and, with npm interop, each npm package's own files including its license under
-`node_modules`. Whoever distributes `dist/` is responsible for those packages'
-license terms and for GNU MP's LGPL terms. Managed tools downloaded by Lasm (Lean,
-the link toolchain, the C tier, Git) keep their upstream license files in the
-tool cache, and the archives Lasm repackages add a `lasm-notices/` directory.
-The `@lasm/lean-c-<platform>` npm packages also carry the C tier's notices in
-`licenses/` (LLVM Apache-2.0 WITH LLVM-exception; on Linux glibc LGPL-2.1-or-later
-and the Linux UAPI headers' GPL-2.0-only WITH Linux-syscall-note; on Windows
-MinGW-w64 and winpthreads; Lean's LICENSE and LICENSES; libuv) and an SPDX
-`license` expression listing every component. `create-lasm` is MIT.
+Lasm's own source is under the [MIT License](LICENSE) (copyright Jordan Last);
+`@lasm/cli` and `create-lasm` are MIT. Lasm is not legal advice; the
+[license audit](docs/LICENSE_AUDIT.md) lists every distributed component, its
+license, how each obligation is met, the open gaps and the questions for a lawyer.
+
+- **Built `dist/`.** `THIRD_PARTY_NOTICES.txt` lists what `program.wasm`,
+  `program.cjs` and `host/` contain: Lean's runtime and standard library
+  (Apache-2.0, with Lasm's changes), Emscripten (MIT OR NCSA), musl, LLVM libc++,
+  libc++abi, libunwind and compiler-rt, mimalloc, libuv, GNU MP 6.3.0
+  (LGPL-3.0-or-later OR GPL-2.0-or-later, statically linked, as in native Lean
+  executables), koffi (MIT, `host/native`) and Lasm's own host code (MIT). Current
+  source also writes Lasm's MIT notice, the notice of every Lean file Lasm changed
+  and the compiler-rt, libunwind and libuv LICENSE-extra texts there; candidate
+  `.58` has only the runtime bundle's notices. With npm interop, `node_modules/`
+  holds each package with its own license. Lean and C code of your project and
+  its Lake dependencies are compiled in under their own licenses, which the file
+  does not list. **Whoever distributes a `dist/`** must meet those licenses and
+  GNU MP's LGPL terms for combined works (notably letting recipients relink with
+  a modified GNU MP; see the audit).
+- **Tool packages and release archives.** Each `@lasm/…` tool package has an SPDX
+  `license` field (or, for Git, a README section) and the upstream license files:
+  in the archive (`LICENSE`, `LICENSES`, `lasm-notices/`) and, for the C tier and
+  Git, in `licenses/`. Git (`@lasm/git-<platform>`, from dugite-native) is
+  GPL-2.0-only; its README names the corresponding source.
+- The Lean name and logos are trademarks of Lean FRO. Lasm is not affiliated with or endorsed
+  by Lean FRO.
