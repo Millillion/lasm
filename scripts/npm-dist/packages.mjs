@@ -220,8 +220,13 @@ ${pkg.git ? '\n' + gitReadme(pkg) : pkg.components ? `
 | Contents | Licence |
 | --- | --- |
 ${pkg.components.map(([what, spdx]) => `| ${what} | ${spdx ? `\`${spdx.replace(/^\((.*)\)$/, '$1')}\`` : 'not an SPDX licence; see the archive NOTICE'} |`).join('\n')}
-` : ''}`;
+` : ''}${pkg.name.includes('/lean-') ? trademark : ''}`;
 }
+
+const trademark = `
+The Lean name and logos are trademarks of Lean FRO. Lasm is not affiliated with or
+endorsed by Lean FRO.
+`;
 
 function cTierReadme(pkg) {
   const family = pkg.platform.split('-')[0], root = pkg.artifact.root;
@@ -256,7 +261,7 @@ The notices are in \`${noticeDirectory}/\`, copied verbatim:
   of Lean's binary release (LLVM, GNU C Library, GNU MP), from which the archive's
   compiler and libraries come (\`${pkg.notices.bin.name}\`).
 - \`${noticeDirectory}/libuv/\`: libuv's LICENSE and LICENSE-extra.
-`;
+${trademark}`;
 }
 
 /** The manifest Lasm reads at run time (src/npm-tools.json), keyed by archive SHA-256. */
