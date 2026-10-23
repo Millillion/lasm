@@ -33,6 +33,15 @@ const run = (program, args, settings = {}) => execFileSync(program, args, { cwd:
 const name = `lean-${input.lean}-wasm64`, target = join(output, name), work = join(output, 'build');
 mkdirSync(join(target, 'lib'), { recursive: true }); mkdirSync(work);
 cpSync(join(build, 'include/lean'), join(target, 'include/lean'), { recursive: true, verbatimSymlinks: true });
+// Apache-2.0 4(b): the shipped header is a file Lasm changed (the wasm-build patch).
+// The comment changes no declaration; the libraries were compiled from the same text.
+if (input.patches?.['wasm-build']) {
+  const header = join(target, 'include/lean/lean.h');
+  writeFileSync(header, `/* Modified by Lasm (https://github.com/Millillion/lasm): Lean ${input.lean}'s lean.h with
+   scripts/full-lean/patches/lean-${Number(input.lean.split('.')[1]) >= 35 ? '4.35.0' : '4.32.0'}-wasm-build.patch applied
+   (SHA-256 ${input.patches['wasm-build']}). Original: https://github.com/leanprover/lean4/blob/${input.leanCommit}/src/include/lean/lean.h */\n`
+    + readFileSync(header, 'utf8'));
+}
 const libraries = [...groups, 'leancpp', 'leanrt', 'lasmhost', 'gmp'];
 for (const library of libraries) copyFileSync(join(build, `lib/lean/lib${library}.a`), join(target, `lib/lib${library}.a`));
 copyFileSync(join(build, 'libuv/src/libuv/libuv.a'), join(target, 'lib/libuv.a'));
