@@ -643,18 +643,23 @@ folded into Phases 5.2/5.3 and 7.
   - **5.3 Release gate.** Full runtime-capable upstream suite on five targets,
     ecosystem and interop examples, performance/robustness regression check,
     five-platform acceptance and the cold-installation gate.
-    *Status (2026-10-23): early pass running on candidate `.40000056579` (source `0b99c14`:
-    Phases 4, 5.1 and 5.2 including `Function.ofFnReply`; runtime `7aa5028c…`
-    unchanged), which passed five-platform acceptance, the interop examples and
-    the platform matrix (run 40000056579). Dispatched on it: the upstream suite
-    (every Phase 3 harness and shard count on all five targets), the ecosystem
-    re-check on five targets plus the Linux no-system-C and Tier C runs, server
-    robustness, release benchmarks on all five, the npm distribution through a
-    loopback registry in release mode (`@lasm/cli` 0.1.0, MIT, with a new `init`
-    scenario) and three cold-installation runs. The early release-mode npm run on
-    `.39988013618` passed on four platforms. Readiness review: README now has
-    Known limitations, Licenses and the environment variables, and each platform
-    claim names its CI job. Draft publish plan: [release/0.1.0-draft.md](release/0.1.0-draft.md). Templates passed on all five targets on this candidate (run 40004298492). Early results on it: server robustness passed on all five (run 40008269718; the obsolete `full` overlay no longer applies and is off by default now), the npm distribution in release mode passed on all five (run 40005986403, `.39988013618`), and 39 ecosystem projects finished green before the early upstream-suite and ecosystem runs were cancelled: the non-blocking-await source (`a9c5a9d`) superseded the candidate and its acceptance (run 40012750099) needed the runners. The final confirming pass runs on that candidate.*
+    *Status (2026-10-23): final pass running on candidate `.58` (run 40012750099,
+    source `a9c5a9d`: Phases 4, 5.1 and 5.2 with non-blocking JS awaits in
+    `Async`; runtime `7aa5028c…` unchanged), which passed five-platform
+    acceptance, the interop examples, the templates on all five targets and the
+    platform matrix. Dispatched on it: the upstream suite (every Phase 3 harness
+    and shard count, five targets), the ecosystem re-check (five targets, Linux
+    without a system C compiler, Tier C), server robustness, release benchmarks on
+    all five, the npm distribution through a loopback registry (`@lasm/cli` 0.1.0,
+    MIT, new `init` scenario) and three cold-installation runs. Early pass on
+    `.40000056579`: robustness passed on all five (run 40008269718; the obsolete
+    `full` overlay is now off by default), benchmarks on all five (run
+    40008254876), 39 ecosystem projects green before cancellation, no regression in
+    264 finished linux-x64 adapter tests; the loopback npm run (40008240082) passed
+    on macOS/Windows and hit the guard's page-cache budget on Linux in the new init
+    scenario (fixed, `920718f`). Readiness review: README Known limitations,
+    Licenses, environment variables, platform claims tied to CI jobs. Draft publish
+    plan: [release/0.1.0-draft.md](release/0.1.0-draft.md).*
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as
