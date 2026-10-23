@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { releaseVersion, toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, maximumPackageBytes,
   cTierLicense, createPackageJson, createPackageLicense } from '../scripts/npm-dist/packages.mjs';
 import { leanDistribution } from '../src/managed-lean.mjs';
@@ -43,7 +44,18 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
         assert.equal(metadata.license, cTierLicense(pkg.platform));
         assert.deepEqual(metadata.files, [pkg.artifact.name, 'README.md', 'licenses']);
         assert.equal(pkg.notices.bin.sha256, c.toolchains.lean[lean].tiers.bin[pkg.platform].sha256);
-      } else assert.equal(metadata.license, 'SEE LICENSE IN README.md');
+      } else if (pkg.name.includes('/git-')) {
+        assert.equal(metadata.license, 'SEE LICENSE IN README.md');
+        assert.deepEqual(metadata.files, [pkg.artifact.name, 'README.md', 'licenses']);
+        assert.match(toolPackageReadme(pkg), /GPL-2\.0-only[\s\S]*Corresponding source/);
+        for (const [from] of pkg.licenseFiles) assert.ok(existsSync(new URL(`../scripts/npm-dist/notices/${from}`, import.meta.url)), from);
+      } else {
+        assert.match(metadata.license, /^[A-Za-z0-9.()+ -]+$/, 'An SPDX expression');
+        assert.ok(!metadata.license.includes('SEE LICENSE'));
+        assert.match(toolPackageReadme(pkg), /## Licences/);
+        if (/\/lean-(?:core|ext)-/.test(pkg.name)) assert.equal(metadata.license, 'Apache-2.0');
+        if (/\/lean-(?:linux|darwin|win32)-/.test(pkg.name)) assert.match(metadata.license, /LGPL-3\.0-or-later OR GPL-2\.0-or-later/);
+      }
     }
     // Shared Emscripten packages keep one version across Lean releases.
     assert.equal(packages.find(p => p.name === '@lasm/emscripten-shared').version, '6.0.9-lasm.1');

@@ -69,6 +69,75 @@ export function cTierLicense(platform) {
   return [...cTierComponents.common, ...cTierComponents[family]].map(([, spdx]) => spdx).join(' AND ');
 }
 
+/** Contents and licences of the other tool packages (docs/LICENSE_AUDIT.md), from
+ * inspecting the release archives. [contents, SPDX or null]; a null entry is listed
+ * in the README but has no SPDX identifier and is not in the `license` field. */
+export const toolComponents = Object.freeze({
+  'lean-bin': {
+    common: [
+      ['Lean executables and shared libraries (lean, lake, leanir, libleanshared, libInit_shared, libLake_shared)', 'Apache-2.0'],
+      ['GNU MP, statically linked into libleanshared', '(LGPL-3.0-or-later OR GPL-2.0-or-later)'],
+      ['libuv and mimalloc, statically linked into libleanshared; CaDiCaL (bin/cadical)', 'MIT'],
+    ],
+    linux: [['LLVM libc++, libc++abi, libunwind shared libraries', 'Apache-2.0 WITH LLVM-exception'],
+      ['GCC libatomic', 'GPL-3.0-or-later WITH GCC-exception-3.1']],
+    darwin: [],
+    win32: [['LLVM libc++ (libc++.dll)', 'Apache-2.0 WITH LLVM-exception'],
+      ['MinGW-w64 runtime startup code linked into the executables', 'ZPL-2.1']],
+  },
+  'lean-data': { common: [['Lean module data (.olean, .ir) and Lean sources', 'Apache-2.0']] },
+  'emscripten-native': {
+    common: [['LLVM: clang, lld/wasm-ld, llvm-nm, llvm-objcopy, clang resource headers', 'Apache-2.0 WITH LLVM-exception'],
+      ['Binaryen: wasm-opt, wasm-emscripten-finalize, wasm-metadce', 'Apache-2.0']],
+    linux: [['GNU libstdc++/libgcc, statically linked by the upstream build', 'GPL-3.0-or-later WITH GCC-exception-3.1']],
+    darwin: [],
+    win32: [['Microsoft C/C++ runtime, statically linked by the upstream build (Visual Studio redistribution terms)', null]],
+  },
+  'emscripten-shared': {
+    common: [['Emscripten JavaScript compiler and system library sources', '(MIT OR NCSA)'],
+      ['musl libc (in the prebuilt libc)', 'MIT'],
+      ['LLVM libc++, libc++abi, libunwind, compiler-rt (prebuilt libraries)', 'Apache-2.0 WITH LLVM-exception'],
+      ['mimalloc (prebuilt library); acorn, acorn-import-phases', 'MIT'],
+      ['terser', 'BSD-2-Clause']],
+  },
+});
+function componentsOf(kind, platform) {
+  const table = toolComponents[kind];
+  return [...table.common, ...(platform ? table[platform.split('-')[0]] ?? [] : [])];
+}
+const spdxOf = components => [...new Set(components.map(([, spdx]) => spdx).filter(Boolean))].join(' AND ');
+
+/** Licence texts the dugite-native archives lack (Linux and macOS carry none of
+ * them; Windows carries Git's and GCM's), copied from scripts/npm-dist/notices/ into
+ * licenses/: Git v2.53.0 COPYING, Git LFS v3.7.1 LICENSE.md, GCM v2.9.0 LICENSE. */
+export function gitLicenseFiles(platform) {
+  return [['git-COPYING.txt', 'git/COPYING'], ['git-lfs-LICENSE.md', 'git-lfs/LICENSE.md'],
+    ...(platform === 'linux-arm64' ? [] : [['git-credential-manager-LICENSE.txt', 'git-credential-manager/LICENSE']])];
+}
+
+/** Git from dugite-native: too many components for one honest SPDX expression; the
+ * README lists them and the GPL source locations. */
+const gitReadme = pkg => `## Licences
+
+\`license\`: \`SEE LICENSE IN README.md\`. This archive is dugite-native's release asset,
+unmodified. It contains Git 2.53.0 (\`GPL-2.0-only\`), Git LFS (\`MIT\`)${pkg.platform === 'linux-arm64' ? '' : ' and Git Credential\nManager (`MIT`, with the .NET runtime and libraries it bundles)'} and Mozilla's CA bundle
+(ssl/cacert.pem, \`MPL-2.0\`)${pkg.platform === 'win32-x64' ? `. On Windows it is Git for Windows' MinGit 2.53.0.windows.4,
+which also bundles the MSYS2 runtime and shell and MinGW-w64 libraries (curl, OpenSSL,
+libssh2, PCRE2, expat, zlib, zstd, brotli, nghttp2, libiconv, gettext, libunistring,
+OpenSSH and others) under their own licences, in mingw64/share/licenses/ and
+usr/share/licenses/ inside the archive; LICENSE.txt is Git's GPL-2.0` : `. On Linux and macOS Git links the
+operating system's libcurl, OpenSSL, zlib and expat dynamically; none of them is in
+the archive`}.
+
+Corresponding source (GPL-2.0 section 3): Git
+https://github.com/git/git/tree/v2.53.0 and dugite-native's build scripts and pinned
+submodules https://github.com/desktop/dugite-native/tree/v2.53.0-4${pkg.platform === 'win32-x64' ? `; MinGit
+https://github.com/git-for-windows/git/releases/tag/v2.53.0.windows.4 and its MSYS2 and
+MinGW-w64 package sources` : ''}. See Lasm's docs/LICENSE_AUDIT.md.
+
+Lasm adds these verbatim licence texts in \`${noticeDirectory}/\`: ${pkg.licenseFiles.map(([, to]) => `\`${to}\``).join(', ')}.
+`;
+
 /** Every tool package for one Lean version. install: optional (platform,
  * optionalDependencies), required (shared, dependencies), demand (npm pack on use). */
 export function toolPackages({ lean, toolchains, linkToolchain, git, scope = defaultScope, platforms }) {
@@ -84,17 +153,17 @@ export function toolPackages({ lean, toolchains, linkToolchain, git, scope = def
   const packages = [];
   for (const platform of platforms) {
     packages.push(tool(scope, `lean-${platform}`, release.tiers.bin[platform], 'optional',
-      { platform, ...platformParts(platform), description: `Lean ${lean} compiler binaries for Lasm on ${platform}` }));
+      { platform, ...platformParts(platform), components: componentsOf('lean-bin', platform), description: `Lean ${lean} compiler binaries for Lasm on ${platform}` }));
     packages.push(tool(scope, `emscripten-${platform}`, linkToolchain.native[platform], 'optional',
-      { platform, ...platformParts(platform), description: `Emscripten ${linkToolchain.version} compiler tools (clang, wasm-ld, Binaryen) for Lasm on ${platform}` }));
+      { platform, ...platformParts(platform), components: componentsOf('emscripten-native', platform), description: `Emscripten ${linkToolchain.version} compiler tools (clang, wasm-ld, Binaryen) for Lasm on ${platform}` }));
   }
   for (const artifact of release.tiers.core) packages.push(tool(scope, `lean-${tierName(artifact, 'core')}`, artifact, 'required',
-    { description: `Lean ${lean} ${tierName(artifact, 'core')} module data and sources for Lasm` }));
+    { components: componentsOf('lean-data'), description: `Lean ${lean} ${tierName(artifact, 'core')} module data and sources for Lasm` }));
   packages.push(tool(scope, 'emscripten-shared', linkToolchain.shared, 'required',
-    { description: `Emscripten ${linkToolchain.version} JavaScript compiler subset and prebuilt wasm64 sysroot for Lasm` }));
+    { components: componentsOf('emscripten-shared'), description: `Emscripten ${linkToolchain.version} JavaScript compiler subset and prebuilt wasm64 sysroot for Lasm` }));
   // Lake projects and programs importing Lean/Lake only: fetched on demand through npm.
   for (const artifact of release.tiers.extended) packages.push(tool(scope, `lean-${tierName(artifact, 'ext')}`, artifact, 'demand',
-    { description: `Lean ${lean} ${tierName(artifact, 'ext')} module data and sources for Lasm (fetched on demand)` }));
+    { components: componentsOf('lean-data'), description: `Lean ${lean} ${tierName(artifact, 'ext')} module data and sources for Lasm (fetched on demand)` }));
   // Lake projects with bundled C code: Lean's clang as `cc`, headers and link libraries, on demand.
   for (const platform of platforms) {
     const c = release.tiers.c?.[platform];
@@ -105,8 +174,9 @@ export function toolPackages({ lean, toolchains, linkToolchain, git, scope = def
       description: `Lean ${lean} C tier (Lean's clang as cc, C library headers and link libraries) for Lasm Lake projects with C code on ${platform} (fetched on demand)` }));
   }
   if (git) for (const platform of platforms) packages.push(tool(scope, `git-${platform}`, git.artifacts[platform], 'demand',
-    { platform, ...platformParts(platform), description: `Git ${git.version} (${git.distribution}, desktop/dugite-native) for Lasm Lake projects on ${platform} (fetched on demand)` }));
+    { platform, ...platformParts(platform), git: true, licenseFiles: gitLicenseFiles(platform), description: `Git ${git.version} (${git.distribution}, desktop/dugite-native) for Lasm Lake projects on ${platform} (fetched on demand)` }));
   assert.equal(new Set(packages.map(p => p.name)).size, packages.length, 'Duplicate tool package names');
+  for (const pkg of packages) if (pkg.components) pkg.license = spdxOf(pkg.components);
   return packages;
 }
 
@@ -115,7 +185,7 @@ export function toolPackageJson(pkg) {
     name: pkg.name, version: pkg.version, description: pkg.description,
     license: pkg.license ?? 'SEE LICENSE IN README.md',
     ...(pkg.os ? { os: pkg.os, cpu: pkg.cpu } : {}), ...(pkg.libc ? { libc: pkg.libc } : {}),
-    files: [archiveFileName(pkg.artifact), 'README.md', ...(pkg.notices ? [noticeDirectory] : [])],
+    files: [archiveFileName(pkg.artifact), 'README.md', ...(pkg.notices || pkg.licenseFiles ? [noticeDirectory] : [])],
     // Data only: no entry point, no scripts. Lasm verifies the archive's SHA-256.
     lasm: { schema: 1, artifact: { name: pkg.artifact.name, sha256: pkg.artifact.sha256, bytes: pkg.artifact.bytes, url: pkg.artifact.url } },
   };
@@ -138,10 +208,19 @@ release asset
     ${pkg.artifact.url}
     SHA-256 ${pkg.artifact.sha256}, ${pkg.artifact.bytes} bytes
 
-Lasm checks that digest and size before extracting it. The licence texts and
+Lasm checks that digest and size before extracting it. ${pkg.git ? `Licence texts are in
+\`${noticeDirectory}/\` (below)` : `The licence texts and
 notices of the contained software (LICENSE, LICENSES, NOTICE) are inside the
-archive, with the upstream sources it was repackaged from.
-`;
+archive, with the upstream sources it was repackaged from`}.
+${pkg.git ? '\n' + gitReadme(pkg) : pkg.components ? `
+## Licences
+
+\`license\`: \`${pkg.license}\`
+
+| Contents | Licence |
+| --- | --- |
+${pkg.components.map(([what, spdx]) => `| ${what} | ${spdx ? `\`${spdx.replace(/^\((.*)\)$/, '$1')}\`` : 'not an SPDX licence; see the archive NOTICE'} |`).join('\n')}
+` : ''}`;
 }
 
 function cTierReadme(pkg) {

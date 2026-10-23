@@ -154,6 +154,10 @@ if (args.step === 'package') {
     await copyArchiveFiles(await releaseAsset(bin), bin.root, [['LICENSE', 'lean/LICENSE'], ['LICENSES', 'lean/LICENSES'],
       [`lasm-notices/${bin.root}/libuv-LICENSE`, 'libuv/LICENSE'], [`lasm-notices/${bin.root}/libuv-LICENSE-extra`, 'libuv/LICENSE-extra']], notices);
   }
+  for (const [from, to] of pkg.licenseFiles ?? []) {
+    await mkdir(join(directory, noticeDirectory, to, '..'), { recursive: true });
+    await copyFile(join(root, 'scripts/npm-dist/notices', from), join(directory, noticeDirectory, to));
+  }
   await writeFile(join(directory, 'package.json'), JSON.stringify(toolPackageJson(pkg), null, 2) + '\n');
   await writeFile(join(directory, 'README.md'), toolPackageReadme(pkg));
   const packed = await packTwice(directory, pkg.name);
