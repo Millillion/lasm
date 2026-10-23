@@ -8,6 +8,9 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, realpat
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { insideDirectory } from './platform.mjs';
 
+// The compiler's own packages (the experimental tarball and the planned npm name).
+const lasmPackages = new Set(['@lasm/compiler', '@lasm/cli']);
+
 const readJson = file => {
   try { return JSON.parse(readFileSync(file, 'utf8')); }
   catch (error) { throw new Error(`Cannot read ${file}: ${error.message}`); }
@@ -22,7 +25,7 @@ function findPackage(name, from, root) {
   }
 }
 
-/** Production dependency closure: undefined when the project has no package.json. */
+/** Production dependency closure: undefined when there is no package.json or nothing to deploy. */
 export function planNodeModules(project) {
   const manifest = join(project, 'package.json');
   if (!existsSync(manifest)) return undefined;
@@ -35,6 +38,8 @@ export function planNodeModules(project) {
     const wanted = [...Object.keys(dependencies).map(name => [name, 'required']), ...Object.keys(optional).map(name => [name, 'optional']),
       ...Object.keys(peers).map(name => [name, 'peer'])];
     for (const [name, kind] of wanted) {
+      // Lasm itself (installed with `npm install`) is a build tool, never deployed.
+      if (lasmPackages.has(name)) continue;
       const directory = findPackage(name, from, root);
       if (!directory) {
         if (kind !== 'required') continue;
@@ -51,6 +56,8 @@ export function planNodeModules(project) {
         peers: info.peerDependencies ?? {}, by: `${name}@${info.version}` });
     }
   }
+  // Nothing to deploy (for example only Lasm itself is installed): ordinary build.
+  if (!packages.size) return undefined;
   const files = [];
   for (const [path, { directory }] of [...packages].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) {
     const walk = (from, to) => {

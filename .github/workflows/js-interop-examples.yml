@@ -1,0 +1,138 @@
+name: JS/npm interop examples
+# Phase 4 exit check: examples/js-crud (one Lean API on Express and on Hono,
+# Postgres through pg, JWT through jose) and examples/js-fetch (Node's fetch),
+# built and run with the installed candidate package on all five targets.
+# Postgres: a service container on Linux; embedded-postgres (PostgreSQL
+# binaries from npm, scripts/js-interop/start-postgres.mjs) on macOS/Windows.
+on:
+  workflow_call:
+    inputs:
+      cache-key:
+        type: string
+        default: ""
+      candidate-release:
+        type: string
+        default: ""
+      sha256:
+        required: true
+        type: string
+      candidate-version:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      candidate-release:
+        description: Release holding the candidate (node-package-RUN_ID)
+        required: true
+        type: string
+      sha256:
+        required: true
+        type: string
+      candidate-version:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  linux:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: ubuntu-24.04, architecture: x64 }
+          - { runner: ubuntu-24.04-arm, architecture: arm64 }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+      POSTGRES_KIND: postgres:17 service container
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: ${{ matrix.architecture }}
+          package-manager-cache: false
+      - if: inputs.cache-key != ''
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: ${{ inputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify the candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Express and Hono with pg and jose; fetch
+        run: node scripts/js-interop/run-examples.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm js examples λ" .work/js-interop-examples.json
+      - name: Preserve evidence
+        if: always()
+        run: |
+          cat .work/js-interop-examples.json || true
+          node -e "const r=require('./.work/js-interop-examples.json');require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY,'```json\n'+JSON.stringify({platform:r.platform,postgres:r.postgres,passed:r.passed,apps:r.apps.map(a=>({app:a.app,ok:a.ok,rps:a.load&&a.load.rps})),fetch:r.fetch&&r.fetch.code},null,2)+'\n```\n')" || true
+  other:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: macos-15-intel, architecture: x64 }
+          - { runner: macos-15, architecture: arm64 }
+          - { runner: windows-2025, architecture: x64 }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+      POSTGRES_KIND: embedded-postgres 18.4.0-beta.17 (PostgreSQL 18.4 binaries from npm)
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: ${{ matrix.architecture }}
+          package-manager-cache: false
+      - if: inputs.cache-key != ''
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: ${{ inputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify the candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Temporary Postgres; Express and Hono with pg and jose; fetch
+        run: |
+          node scripts/js-interop/start-postgres.mjs "$RUNNER_TEMP/postgres" 55432 > "$RUNNER_TEMP/postgres.log" 2>&1 < /dev/null &
+          for i in $(seq 1 300); do grep -q '^DATABASE_URL=' "$RUNNER_TEMP/postgres.log" && break; sleep 1; done
+          tail -20 "$RUNNER_TEMP/postgres.log"
+          export "$(grep '^DATABASE_URL=' "$RUNNER_TEMP/postgres.log")"
+          node scripts/js-interop/run-examples.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm js examples λ" .work/js-interop-examples.json
+      - name: Preserve evidence
+        if: always()
+        run: |
+          cat .work/js-interop-examples.json || true
+          node -e "const r=require('./.work/js-interop-examples.json');require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY,'```json\n'+JSON.stringify({platform:r.platform,postgres:r.postgres,passed:r.passed,apps:r.apps.map(a=>({app:a.app,ok:a.ok,rps:a.load&&a.load.rps})),fetch:r.fetch&&r.fetch.code},null,2)+'\n```\n')" || true

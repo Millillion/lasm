@@ -2,7 +2,7 @@ name: Native Node installed-package acceptance
 on:
   push:
     branches: [main]
-    paths: ['src/**', 'bin/**', 'package*.json', 'scripts/package-node-release.mjs', 'scripts/bundle-installer.mjs', 'scripts/candidate-readme.mjs']
+    paths: ['src/**', 'bin/**', 'library/**', 'package*.json', 'scripts/package-node-release.mjs', 'scripts/bundle-installer.mjs', 'scripts/candidate-readme.mjs']
   workflow_dispatch:
     inputs:
       candidate-version:
@@ -50,7 +50,7 @@ jobs:
       - name: Check Node and Lean acceptance pins
         run: node scripts/ci/check-acceptance-versions.mjs .work/node-versions.json
       - name: Focused application and packaging controls
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/node-unit-resources.json -- node --max-old-space-size=256 --test --test-concurrency=1 test/candidate-readme.test.mjs test/darwin-resources.test.mjs test/application-output.test.mjs test/application-policy.test.mjs test/application-reachability.test.mjs test/application-symbols.test.mjs test/native-application-bundle.test.mjs test/native-directory.test.mjs test/native-temporary.test.mjs test/application-metadata.test.mjs test/application-support.test.mjs test/application-paths.test.mjs test/windows-tool-paths.test.mjs test/application-launcher.test.mjs test/build-progress.test.mjs test/cli-arguments.test.mjs test/application-files.test.mjs test/application-runtime.test.mjs test/node-cache-controls.test.mjs test/managed-artifacts.test.mjs test/managed-git.test.mjs test/application-initialization.test.mjs test/application-native.test.mjs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/node-unit-resources.json -- node --max-old-space-size=256 --test --test-concurrency=1 test/candidate-readme.test.mjs test/darwin-resources.test.mjs test/application-output.test.mjs test/application-policy.test.mjs test/application-reachability.test.mjs test/application-symbols.test.mjs test/native-application-bundle.test.mjs test/native-directory.test.mjs test/native-temporary.test.mjs test/application-metadata.test.mjs test/application-support.test.mjs test/application-paths.test.mjs test/windows-tool-paths.test.mjs test/application-launcher.test.mjs test/build-progress.test.mjs test/cli-arguments.test.mjs test/application-files.test.mjs test/application-runtime.test.mjs test/node-cache-controls.test.mjs test/managed-artifacts.test.mjs test/managed-git.test.mjs test/application-initialization.test.mjs test/application-native.test.mjs test/node-js.test.mjs test/application-npm.test.mjs
       - name: Completed cache advice preserves file contents and excludes deployments
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 256 --report .work/node-cache-advice-resources.json -- python3 -I -B test/tool-cache-advice.test.py
       - name: Download the pinned retained runtime input
@@ -136,9 +136,20 @@ jobs:
       sha256: ${{ needs.package.outputs.sha256 }}
       candidate-release: ${{ needs.package.outputs.candidate-release }}
       candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
+  js-interop:
+    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    needs: [package, input, faults]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/js-interop-examples.yml
+    with:
+      cache-key: ${{ needs.input.outputs.cache-key }}
+      sha256: ${{ needs.package.outputs.sha256 }}
+      candidate-release: ${{ needs.package.outputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   candidate:
     if: github.event_name == 'push' || inputs.validation-scope == 'all'
-    needs: [package, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64]
+    needs: [package, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, js-interop]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

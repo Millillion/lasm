@@ -24,6 +24,8 @@ for (const name of ['node-installed.mjs', 'node-cache-controls.mjs']) copyFileSy
 mkdirSync(join(workspace, 'fixtures'));
 for (const name of ['BundleFeatures.lean', 'BundleFeaturesLegacy.lean', 'FilesystemSurface.lean', 'CompileTimeFeatures.lean', 'StandaloneModuleData.lean', 'RuntimeModulePath.lean'])
   copyFileSync(join(root, 'integration/fixtures', name), join(workspace, 'fixtures', name));
+cpSync(join(root, 'test/fixtures/js-interop'), join(workspace, 'fixtures/js-interop'), { recursive: true,
+  filter: file => !file.split(/[\\/]/).includes('node_modules') });
 for (const path of ['home', 'tmp', 'os-bin']) mkdirSync(join(workspace, path));
 symlinkSync('/bin/sh', join(workspace, 'os-bin/sh'));
 for (const path of ['npm-user-config', 'npm-global-config', 'git-system-config', 'git-global-config']) writeFileSync(join(workspace, path), '');

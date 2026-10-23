@@ -1,6 +1,6 @@
 // Only Node built-ins and the installed product are available to this control.
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, existsSync, readdirSync, statSync, rmSync, openSync, readSync, closeSync, renameSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, writeFileSync, readFileSync, existsSync, readdirSync, statSync, rmSync, openSync, readSync, closeSync, renameSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, resolve, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -204,6 +204,25 @@ try {
     matchesCli(npx('Lake local import', ['Main.lean'], directory), { code: 0, stdout: 'Lean module: 42\n' });
     assert.equal(npx('Lake deployment build', ['build', 'Main.lean'], directory).code, 0);
     result.lake = { directory, signature: buildInfo(join(directory, 'dist')).signature };
+    // JS/npm interop (Lasm.JS, test/fixtures/js-interop): a local npm package,
+    // typed bindings, callbacks, promises and the deployment's node_modules.
+    // Native Lean cannot run it, so its expected output is the fixture's file.
+    const interop = join(project, 'js interop λ');
+    cpSync(join(workspace, 'fixtures/js-interop'), interop, { recursive: true });
+    const expectedInterop = { code: 0, stdout: readFileSync(join(interop, 'expected.txt'), 'utf8'), stderr: '' };
+    assert.equal(npm('npm install for Lasm.JS', 'npm', ['install', '--offline'], interop).code, 0);
+    matchesCli(npx('Lasm.JS run', ['Main.lean'], interop), expectedInterop);
+    assert.equal(npx('Lasm.JS deployment build', ['build', 'Main.lean', '--output', 'interop dist'], interop).code, 0);
+    const interopOutput = join(interop, 'interop dist');
+    assert.ok(existsSync(join(interopOutput, 'node_modules/local-lib/index.js')), 'The deployment includes npm dependencies');
+    assert.deepEqual(run('plain Node: js-interop', process.execPath, [join(interopOutput, 'main.mjs')], interop), expectedInterop);
+    result.deployments.push({ name: 'js-interop', output: interopOutput, source: join(interop, 'Main.lean'), build: buildInfo(interopOutput),
+      bytes: size(interopOutput), budgetBytes: 8 * 1024 ** 2, relocate: false, checks: [{ args: [], expected: expectedInterop }] }); save();
+    // A binding to a missing export stops the build and names it.
+    writeFileSync(join(interop, 'Broken.lean'), 'import Lasm.JS\nopen Lasm.JS\n@[js "local-lib" "nope"] opaque nope : IO Unit\ndef main : IO Unit := nope\n');
+    const broken = npx('Lasm.JS binding check', ['build', 'Broken.lean', '--output', 'broken dist'], interop);
+    assert.notEqual(broken.code, 0);
+    assert.match(broken.stderr, /Lasm\.JS binding check failed:\n {2}nope: local-lib export "nope" is missing/);
   } else if (phase === 'offline') {
     // Kernel network restrictions, inherited by npm and every build tool.
     await assert.rejects(fetch(process.platform === 'win32' ? 'https://1.1.1.1:443' : 'https://127.0.0.1:443', { signal: AbortSignal.timeout(5000) }),

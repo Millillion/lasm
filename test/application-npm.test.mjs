@@ -18,7 +18,8 @@ test('no package.json: no npm dependencies', () => {
 
 test('the production closure keeps npm\'s layout and leaves out devDependencies', () => {
   const root = mkdtempSync(join(tmpdir(), 'lasm-npm-'));
-  writeFileSync(join(root, 'package.json'), JSON.stringify({ dependencies: { a: '1' }, optionalDependencies: { gone: '1' }, devDependencies: { dev: '1' } }));
+  writeFileSync(join(root, 'package.json'), JSON.stringify({ dependencies: { a: '1', '@lasm/compiler': 'file:lasm.tgz' }, optionalDependencies: { gone: '1' }, devDependencies: { dev: '1' } }));
+  pkg(root, 'node_modules/@lasm/compiler', { name: '@lasm/compiler', version: '0.1.0' });
   pkg(root, 'node_modules/a', { name: 'a', version: '1.0.0', dependencies: { b: '2', '@s/c': '1' } });
   pkg(root, 'node_modules/a/node_modules/b', { name: 'b', version: '2.0.0' });
   pkg(root, 'node_modules/b', { name: 'b', version: '1.0.0' });
