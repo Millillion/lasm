@@ -46,8 +46,27 @@ on:
 permissions:
   contents: read
 jobs:
+  # Amazon ECR Public refuses anonymous pulls from some shared runner addresses
+  # ("Data limit exceeded"): one job saves the Lambda Web Adapter image for both
+  # architectures (scripts/platform/fetch-adapter.mjs, as the platform CI does).
+  adapter:
+    if: inputs.docker && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - run: node scripts/platform/fetch-adapter.mjs "$RUNNER_TEMP/adapter"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: templates-lambda-web-adapter
+          path: ${{ runner.temp }}/adapter
+          retention-days: 1
+          if-no-files-found: error
   templates:
-    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    needs: adapter
+    if: always() && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
@@ -89,9 +108,16 @@ jobs:
         run: node scripts/ci/fetch-node-candidate.mjs
       - name: Init, build, run and request every template
         run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates λ" .work/templates.json
+      - if: inputs.docker && startsWith(matrix.platform, 'linux-') && needs.adapter.result == 'success'
+        uses: actions/download-artifact@v8
+        with:
+          name: templates-lambda-web-adapter
+          path: ${{ runner.temp }}/adapter
       - name: Dockerfiles (build on the runner's architecture, run with 512 MB and a read-only root)
         if: inputs.docker && startsWith(matrix.platform, 'linux-')
-        run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates docker" .work/templates-docker.json --docker
+        run: |
+          [ -f "$RUNNER_TEMP/adapter/adapter-${{ matrix.architecture == 'arm64' && 'arm64' || 'amd64' }}.tar" ] && docker load -i "$RUNNER_TEMP/adapter/adapter-${{ matrix.architecture == 'arm64' && 'arm64' || 'amd64' }}.tar"
+          node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates docker" .work/templates-docker.json --docker
       - name: Preserve evidence
         if: always()
         run: |

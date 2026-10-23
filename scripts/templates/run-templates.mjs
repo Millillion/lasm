@@ -137,7 +137,8 @@ try {
   mkdirSync(cli);
   run('npm install Lasm (for lasm init)', npm, ['install', '--no-save', tgz], cli);
   if (docker) for (const image of ['node:24-trixie', 'node:24-bookworm-slim', 'public.ecr.aws/lambda/nodejs:24', 'public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0'])
-    await dockerWithRetry(`docker pull ${image}`, ['pull', '-q', image], cli);
+    if (spawnSync('docker', ['image', 'inspect', image], { stdio: 'ignore' }).status !== 0)  // CI loads the adapter image
+      await dockerWithRetry(`docker pull ${image}`, ['pull', '-q', image], cli);
   for (const template of templates) {
     const entry = { template, ok: false }; result.templates.push(entry); save();
     // "guide": docs/GETTING_STARTED.md step 3 (the hono template plus an npm
