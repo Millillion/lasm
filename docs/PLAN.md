@@ -528,7 +528,7 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   issues are fixed. Node `http`/Express/Hono with Lean handlers becomes the
   recommended fast path for HTTP servers (prototype: 37k vs 1.3k req/s for
   `Std.Http` under Lasm); `Std.Http` stays supported.
-- **Order after Phase 4 (user decision 2026-10-23):** publish to npm before
+- **Order after Phase 4 (user decision 2026-10-23; final roadmap below):** publish to npm before
   serverless. Planned order: production hardening on Node (interop soak, memory
   incl. the macOS ARM64 finding, startup and bundle size, the role of
   `Std.Http` given interop is ~28x faster); developer experience (`lasm init`
@@ -542,6 +542,76 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   on Node 24 with the check removed), the build platform (koffi native add-on),
   and glibc >= 2.39 (AWS Lambda's Amazon Linux 2023 has 2.34) — launch
   blockers for most hosting platforms.
+### Roadmap after Phase 4 (user decision 2026-10-23)
+
+Every phase and sub-phase ends with a **review stop**: report to the user and
+wait for approval before starting the next. Platform support is tested only in
+our own CI with official local runtimes, emulators and images, never with real
+accounts or deployments (user decision 2026-10-23); support claims say which
+local runtime backs them. Bun and Deno as runtimes stay dropped. Research:
+[platform analysis](research/platform-support-analysis-2026-10-23.md).
+Earlier labels: the old Phase 5 (Lean as a runtime library) is parked below;
+the old Phase 6 (concurrency soak) and Phase 7 (full-suite release gate) are
+folded into Phases 5.2/5.3 and 7.
+
+- **Phase 5 — Launch on Node (npm 0.1).**
+  - **5.1 Portability fixes and launch-platform CI.** Built apps and the
+    compiler accept Node >= 24 instead of an exact version (verify the compiler
+    on Node 24); drop the app glibc check or lower it to 2.28 (Node's own floor);
+    include the linux-x64 and linux-arm64 native pieces (koffi, helpers) in every
+    build so a Mac build deploys to Linux, and check "native bundle present for
+    this host" instead of an exact host; stop shipping the unused
+    `native-pthread-factory.cjs`; templates listen on `0.0.0.0`/`$PORT`; document
+    >= 512 MB memory and `libatomic1` for Node 26 on minimal images; production
+    `node_modules` only. CI: built apps on Node 24.0/24.x/26.x (22.x gives a
+    clean error); Debian 11/12, Ubuntu 22.04/24.04 and Amazon Linux 2023
+    containers; read-only filesystem and 512 MB cap; build on macOS and Linux,
+    run on the other; AWS Lambda container image with its Runtime Interface
+    Emulator and the Lambda Web Adapter (x64 and arm64).
+  - **5.2 Launch essentials.** `lasm init` templates (plain program, Express,
+    Hono, Dockerfile, Lambda container); getting-started guide and a deployment
+    recipe per launch platform; a short interop soak (Express and Hono with Lean
+    handlers under load for hours: handle/callback leaks, memory growth, error
+    paths); published startup time, bundle size and memory numbers; decide and
+    document the role of `Std.Http` (interop is ~28x faster under Lasm).
+  - **5.3 Release gate.** Full runtime-capable upstream suite on five targets,
+    ecosystem and interop examples, performance/robustness regression check,
+    five-platform acceptance and the cold-installation gate.
+  - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
+    approval at that point.
+  - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as
+    accepted today); Docker/Kubernetes; Google Cloud Run, Fly.io, Railway,
+    Render, Heroku (container recipes); AWS Lambda via container image.
+- **Phase 6 — Node-based serverless fast-follow.**
+  - 6.1 AWS Lambda zip (`nodejs24.x`, x64/arm64) and Lambda@Edge (CloudFront
+    event shape, x86_64, 50 MB).
+  - 6.2 Vercel Functions and Netlify Functions (local `vercel`/`netlify`
+    tooling; if Vercel's local tools need an account, test its function shape
+    in the Lambda image instead).
+  - 6.3 Azure Functions (Core Tools), Google Cloud Functions (Functions
+    Framework), DigitalOcean App Platform (gVisor), Alpine/musl images.
+- **Phase 7 — Production hardening on Node.** Long soak and concurrency stress
+  (tasks, channels, Std.Sync/Std.Async, cancellation, many threads incl.
+  Windows stack commit), startup memory tuning (initial memory, 64 MiB worker
+  stacks, Wasm reservation), CI memory headroom on macOS ARM64 builds,
+  `Std.Http` performance if it stays a recommended path.
+- **Phase 8 — Isolate build (edge platforms).** One build unlocks every V8
+  isolate platform: no threads, no native add-ons, ~128 MB memory.
+  - 8.1 Prototype and decision: single-threaded Lean runtime, 32-bit Wasm,
+    pure-JS host instead of koffi, JSPI for awaiting promises; measure size,
+    memory and startup against platform limits.
+  - 8.2 Cloudflare Workers (tested with `wrangler dev` / workerd), including
+    Hono.
+  - 8.3 Vercel Edge, Netlify Edge (Deno-based, `netlify dev`) and Deno Deploy
+    as an edge host.
+- **Phase 9 — Fastly Compute:** a standard WASI Wasm backend (tested with
+  Viceroy).
+- **Parked — Lean as a runtime library** (old Phase 5): pure `Lean.*` code at
+  run time beyond what already works (JSON, `import Lean`, LSP types); runtime
+  parser/elaboration policy decided by the user if a real package needs it.
+
+<details><summary>Superseded phase entries (kept for history)</summary>
+
 - **Phase 5 — Lean as a runtime library (was L5; Phase 4 until 2026-10-22), scoped to what real packages
   need:** pure `Lean.*` code at runtime (Json via `import Lean`, Lean.Data.*,
   LSP types) through finer-grained reachability; runtime elaboration/evaluation
@@ -555,6 +625,9 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
 - **Phase 7 — Full-suite release gate (was L7; Phase 6 until 2026-10-22):** complete runtime-capable
   upstream suite on five targets plus performance/robustness regression check.
   Then revisit npm publication and serverless platforms.
+
+
+</details>
 
 ## Deferred chunks
 
