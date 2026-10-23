@@ -506,8 +506,16 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
      expected Lean type and the JS value received; a binding check (declared
      exports exist and accept the declared arity); worked examples for
      Express, `pg` and `jose`.
-  Exit: a Lean app on Express with `pg` (Postgres) and `jose` (JWT) on all five
-  targets, using hand- or AI-written bindings, plus a candidate gate.
+  Exit: a Lean app on Express with `pg` (Postgres) and `jose` (JWT), and the
+  same app on Hono (`@hono/node-server`; added by the user 2026-10-22 as an
+  important test library, since Hono also targets the planned serverless
+  platforms), on all five targets, using hand- or AI-written bindings, plus a
+  candidate gate. Architecture (user approval 2026-10-22): option A, message
+  passing with Lean on its own pthread ([JS_INTEROP.md](JS_INTEROP.md)); JSPI is
+  revisited only if real bindings prove chatty and the V8/Emscripten stack
+  issues are fixed. Node `http`/Express/Hono with Lean handlers becomes the
+  recommended fast path for HTTP servers (prototype: 37k vs 1.3k req/s for
+  `Std.Http` under Lasm); `Std.Http` stays supported.
 - **Phase 5 — Lean as a runtime library (was L5; Phase 4 until 2026-10-22), scoped to what real packages
   need:** pure `Lean.*` code at runtime (Json via `import Lean`, Lean.Data.*,
   LSP types) through finer-grained reachability; runtime elaboration/evaluation
