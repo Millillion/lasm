@@ -665,9 +665,11 @@ folded into Phases 5.2/5.3 and 7.
     handlers by default in `Lasm.JS` (breaking, pre-launch) — accepted;
     (2) `@lasm/cli` is MIT, copyright Jordan Last; (3) package set: the CLI plus
     the platform tool packages, and the C tier is also published as
-    `@lasm/lean-c-<platform>` (27 packages) — being packaged; the name stays
-    `@lasm/cli`; `create-lasm` (for `npm create lasm`) is explained and
-    undecided; (4) Git and (5) GMP wait for a full license-compliance audit
+    `@lasm/lean-c-<platform>` (`4.35.0-lasm.1`, on demand) — packaged in
+    `ee06055`/`be64a89`; the name stays `@lasm/cli`; `create-lasm` (for
+    `npm create lasm`, lockstep with the CLI, MIT) — approved and packaged
+    (`packages/create-lasm`): 28 packages; local-registry rehearsal scenarios
+    `c-tier` and `create` added to npm-dist.yml; (4) Git and (5) GMP wait for a full license-compliance audit
     (docs/LICENSE_AUDIT.md, in progress; items with legal weight go to a
     lawyer's review); (6) Lasm's MIT notice in built apps and the `--help`
     fixes are folded into the audit fixes.
