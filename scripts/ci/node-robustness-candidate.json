@@ -1,11 +1,11 @@
 {
   "active": true,
-  "version": "0.1.0-experimental.39891445495",
-  "sha256": "64b1d5ce0cc0ee59e6aa4b3b6b4fe8e4e9117a0381a73b241176f3bf5603c2d7",
-  "sourceRevision": "3aa1bf17cd4cfb3d9356e1808e9944a02b5b60b5",
-  "release": "node-linux-candidate-39891445495",
-  "baselineRunId": "39891445495",
+  "version": "0.1.0-experimental.39988013618",
+  "sha256": "281a2076b760f3332090e018e3fbf2744cc01c4d7491d09935d2524ea46afbcf",
+  "sourceRevision": "d8484c452f1f112065085f18b10e9d1a24e5785c",
+  "release": "node-linux-candidate-39988013618",
+  "baselineRunId": "39988013618",
   "node": "26.12.1",
   "lean": "4.35.0",
-  "reason": "Phase 4 JS/npm interop candidate: Lasm.JS (library compiled into the managed Lean prefix, host operations 200-214, npm dependencies in dist/node_modules, binding check; runtime 7aa5028c… unchanged): five-platform installed acceptance with the interop fixture and the Express/Hono + pg + jose and fetch examples in run 39891445495."
+  "reason": "Phase 5.1 portability candidate: apps and compiler accept Node >= 24, apps glibc >= 2.28 with Linux x64/arm64 native pieces in every build, compiler glibc >= 2.34, managed downloads back off over about 2-3 minutes (runtime 7aa5028c… unchanged): five-platform installed acceptance, interop examples, templates and the launch platform matrix in run 39988013618."
 }
