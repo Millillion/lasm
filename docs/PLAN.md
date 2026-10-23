@@ -513,8 +513,11 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   The interop fixture runs in the five-platform installed acceptance. The Express and
   Hono example with `pg` and `jose` and the `fetch` example run on all five targets in
   the `js-interop-examples` workflow: Postgres comes from a service container on Linux,
-  embedded-postgres on macOS and the image's PostgreSQL service on Windows. The
-  candidate gate is in progress.
+  embedded-postgres on macOS and the image's PostgreSQL service on Windows.
+  Candidate `.39891445495` (source `3aa1bf1`, SHA-256 `64b1d5ce…c2d7`) passed
+  five-platform installed acceptance with these checks in run 39891445495. Windows was
+  rerun once after a timeout in the pre-product isolation control. The cold-installation
+  gate is running (runs 39900386427, 39900397219, 39900407408).
   Exit: a Lean app on Express with `pg` (Postgres) and `jose` (JWT), and the
   same app on Hono (`@hono/node-server`; added by the user 2026-10-22 as an
   important test library, since Hono also targets the planned serverless
