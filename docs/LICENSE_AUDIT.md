@@ -147,7 +147,7 @@ text stub) and `lib/libc/libc++.dylib` (LLVM).
 | --- | --- | --- |
 | Apache/LLVM, MIT, BSD, Zlib notices | npm package `licenses/` (archive's `lasm-notices/`, Lean's `LICENSE`/`LICENSES`, libuv) | OK in the npm package |
 | The release archive itself | had **no** Lean `LICENSE`/`LICENSES` (only NOTICE, LLVM licence, Debian copyright files) | Fixed for the next C tier build (`03f742b`); `c-v1` on GitHub lacks them |
-| OpenSSL 3.6.0 (Apache-2.0), mimalloc (MIT) not in Lean's `LICENSES` | `openssl-LICENSE`, `mimalloc-LICENSE` in the next C tier build | Fixed for next build; npm `licenses/` of `c-v1` lacks them (Apache-2.0 text is in `LICENSES` via LLVM) |
+| OpenSSL 3.6.0 (Apache-2.0), mimalloc (MIT) not in Lean's `LICENSES` | `openssl-LICENSE`, `mimalloc-LICENSE` in the next C tier build | Fixed: the npm packages add both texts to `licenses/` (`be64a89`, parallel agent); the next C tier build carries them too |
 | glibc headers, crt objects, `libc_nonshared.a`: LGPL-2.1-or-later (crt files and `libc_nonshared` carry the LGPL "special exception" for linking) | Debian `copyright` files (full LGPL text referenced to `/usr/share/common-licenses`) and Lean's `LICENSES` (full LGPL-2.1) | OK; source: Ubuntu `glibc 2.35-0ubuntu3` source package; Lawyer (LGPL-2.1 §4/§6 source offer for headers) |
 | Linux UAPI headers: GPL-2.0-only WITH Linux-syscall-note | Debian `copyright`; the syscall note says userspace use of the headers is not a derived work. Distributing the headers themselves is GPL-2.0 distribution of source, so the source requirement is met by the files themselves | OK |
 | GNU MP `libgmp.a` (LGPL) | text in `LICENSES` | Lawyer (as §3.2) |
@@ -456,8 +456,9 @@ Facts:
 | `db5ff47` | Lean trademark disclaimer in the `@lasm/lean-*` package READMEs (and, in this commit, the repository README) | next npm-dist build |
 | (this commit) | this audit; README "Licenses" rewritten | docs |
 
-The C tier npm packaging (`ee06055`, the parallel agent) already adds Lean's
-`LICENSE`/`LICENSES` and libuv's licences in `licenses/` and an SPDX field.
+The C tier npm packaging (parallel agent: `ee06055`, `be64a89`) adds Lean's
+`LICENSE`/`LICENSES`, libuv's, OpenSSL's and mimalloc's licences in `licenses/`
+and an SPDX field.
 
 ## 11. Remaining gaps
 
@@ -470,7 +471,8 @@ The C tier npm packaging (`ee06055`, the parallel agent) already adds Lean's
 3. **GMP relinking for users** (§8).
 4. Released archives `lean-4.35.0-tiers-v1` (mimalloc text) and `lean-4.35.0-c-v1`
    (Lean licences, OpenSSL and mimalloc texts) predate the fixes; the C tier npm
-   package covers Lean's licences but not OpenSSL's or mimalloc's. Rebuild as
+   packages cover all of them in `licenses/` (`ee06055`, `be64a89`), the GitHub
+   assets do not. Rebuild as
    `tiers-v2`/`c-v2` before or after 0.1.0 (new package versions).
 5. The current runtime bundle's `lean.h` has no modification comment until the
    runtime is packaged again; candidate `.58` lacks every dist-notice fix until a
