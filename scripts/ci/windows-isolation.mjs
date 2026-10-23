@@ -5,7 +5,10 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 /** Privileged maintainer side only. The child receives only spec.environment. */
-let developerPrograms;
+// Discovered once by scripts/ci/windows-developer-programs.py (its own CI step);
+// otherwise by the first restricted run of this process.
+const discovered = fileURLToPath(new URL('../../.work/windows-developer-programs.json', import.meta.url));
+let developerPrograms = existsSync(discovered) ? JSON.parse(readFileSync(discovered, 'utf8')).programs : undefined;
 export function windowsIsolated(spec, reportFile) {
   assert.equal(spec.startupProbe, undefined, 'Startup probes cannot satisfy consumer acceptance');
   const actual = invoke({ ...spec, ...(developerPrograms ? { developerPrograms } : {}) }, reportFile);
