@@ -755,7 +755,7 @@ Hono with a Lean handler 9,682 req/s, Express 6,349, `Std.Http` 663, plain Node
 **Interop server path, cheap win taken (current source).** Express and Hono with
 Lean handlers are also bound by Node's main thread (ELU 1.0), at 4.3–4.4 host calls
 per request: read the request, call `res.json`/`c.json`, reply, plus the interop
-poll. `Function.ofFnReply` lets a handler answer with `Reply.callMethod res "json"
+poll. `Function.ofFnReply` lets a handler answer with `Function.Reply.callMethod res "json"
 #[body]`, which the host makes while processing the reply (one call fewer), and the
 templates read request fields with one `getFields`. Same host, same client, same
 run ([evidence](evidence/interop-reply-2026-10-23.json)):

@@ -352,13 +352,13 @@ end Value
 with: a value, or a method call that the host makes on Node's main thread as part
 of the reply, resolving the JavaScript promise with its result. A handler that
 ends with `res.json(body)` or `c.json(body)` saves one host round trip this way. -/
-inductive Reply where
+inductive Function.Reply where
   | value (result : Data)
   | callMethod (target : Value) (name : String) (args : Array Data)
 
 private structure Registry where
   next : UInt32 := 1
-  asyncFns : Std.HashMap UInt32 (Array Data → IO Reply) := {}
+  asyncFns : Std.HashMap UInt32 (Array Data → IO Function.Reply) := {}
   syncFns : Std.HashMap UInt32 (Array Data → IO Data) := {}
 
 private instance : Nonempty Registry := ⟨{}⟩
@@ -371,7 +371,7 @@ private initialize registry : IO.Ref Registry ← IO.mkRef {}
 
 private def errorText (e : IO.Error) : String := toString e
 
-private def reply (call : UInt64) (result : Except IO.Error Reply) : IO Unit := do
+private def reply (call : UInt64) (result : Except IO.Error Function.Reply) : IO Unit := do
   -- Status 0 a value, 1 a Lean error (message), 2 a method call [target, name, args].
   let (failed, payload, keep) : UInt8 × ByteArray × Data := match result with
     | .ok (.value d) => (0, Wire.encode d, d)
@@ -438,10 +438,10 @@ private def register (synchronous : Bool) (f : Array Data → IO Data) : IO UInt
   registry.modifyGet fun r =>
     let id := r.next
     let r' : Registry := if synchronous then { r with syncFns := r.syncFns.insert id f }
-      else { r with asyncFns := r.asyncFns.insert id fun args => Reply.value <$> f args }
+      else { r with asyncFns := r.asyncFns.insert id fun args => Function.Reply.value <$> f args }
     (id, { r' with next := id + 1 })
 
-private def registerReply (f : Array Data → IO Reply) : IO UInt32 :=
+private def registerReply (f : Array Data → IO Function.Reply) : IO UInt32 :=
   registry.modifyGet fun r =>
     let id := r.next
     (id, { r with asyncFns := r.asyncFns.insert id f, next := id + 1 })
@@ -455,10 +455,10 @@ def ofFn (f : Array Data → IO Data) : IO Value := do
   decodeAs Value "Function.ofFn" (← Wire.decode (← hostCall 210 id 1 .empty))
 
 /-- `ofFn` whose result may be a method call made by the host as part of the
-reply (`Reply.callMethod res "json" #[body]`), one host round trip fewer than
+reply (`Function.Reply.callMethod res "json" #[body]`), one host round trip fewer than
 calling the method and then returning. The JavaScript promise resolves with the
 method's result (awaited if it is a promise); if the method throws, it rejects. -/
-def ofFnReply (f : Array Data → IO Reply) : IO Value := do
+def ofFnReply (f : Array Data → IO Function.Reply) : IO Value := do
   ensureStarted
   let id ← registerReply f
   decodeAs Value "Function.ofFnReply" (← Wire.decode (← hostCall 210 id 1 .empty))

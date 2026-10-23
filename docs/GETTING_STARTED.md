@@ -58,7 +58,7 @@ How a Lean handler works (`Main.lean` from the template):
   that the export exists.
 - `Function.ofFnReply` turns a Lean function into a JavaScript function. Hono
   calls it with its context `c`; the Lean code reads the request
-  (`c.req.param("name")`) and answers `Reply.callMethod c "json" #[body]`: the host
+  (`c.req.param("name")`) and answers `Function.Reply.callMethod c "json" #[body]`: the host
   calls `c.json(body)` as part of the reply and Hono gets its `Response`. Each call
   runs as a Lean task, so handlers can block, await promises and make further
   JavaScript calls. Every JavaScript call from Lean is a round trip to Node's main
@@ -98,19 +98,19 @@ open Lasm.JS
 @[js "marked" "parse"] opaque renderMarkdown : String → IO String
 
 /-- A Hono handler `(c) => Response` written in Lean. -/
-def handler (f : Value → IO Reply) : IO Value :=
+def handler (f : Value → IO Function.Reply) : IO Value :=
   Function.ofFnReply fun args => do
     let .ref c _ := args[0]! | throw (IO.userError "expected a Hono context")
     f c
 
 /-- `c.json(body, status)`: the `Response` the handler returns, made by the host
 as the reply (one host round trip fewer than calling it from Lean). -/
-def json (c : Value) (body : Data) (status : Nat := 200) : IO Reply :=
+def json (c : Value) (body : Data) (status : Nat := 200) : IO Function.Reply :=
   return .callMethod c "json" #[body, toJS status]
 
 def main : IO Unit := do
   let app ← newHono
-  let route (method path : String) (f : Value → IO Reply) : IO Unit := do
+  let route (method path : String) (f : Value → IO Function.Reply) : IO Unit := do
     let _ : Value ← app.callMethod method #[toJS path, toJS (← handler f)]
   route "get" "/" fun c => json c (obj [("message", toJS "Hello from Lean on Hono!")])
   route "get" "/hello/:name" fun c => do

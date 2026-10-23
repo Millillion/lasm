@@ -214,7 +214,7 @@ Lasm.JS get "rows": expected Lean type Array (App.Todo), received JavaScript arr
 
 ```lean
 Function.ofFn  (f : Array Data → IO Data) : IO Value      -- async: JavaScript gets a function returning a Promise
-Function.ofFnReply (f : Array Data → IO Reply) : IO Value -- async; the reply may be a method call the host makes
+Function.ofFnReply (f : Array Data → IO Function.Reply) : IO Value -- async; the reply may be a method call the host makes
 Function.ofFn1 (f : α → IO β) / Function.ofFn2 (f : α → β → IO γ)   -- typed forms
 Function.ofSyncFn (f : Array Data → IO Data) : IO Value   -- synchronous
 Function.ofSyncFn2 (f : α → β → IO γ)
@@ -234,10 +234,10 @@ Function.ofSyncFn2 (f : α → β → IO γ)
   - A synchronous callback cannot call another synchronous callback.
 - **Replying with a method call (`ofFnReply`), for HTTP handlers.** A handler
   usually ends by calling `res.json(body)` (Express) or returning `c.json(body)`
-  (Hono). Returning `Reply.callMethod res "json" #[body]` instead lets the host make
+  (Hono). Returning `Function.Reply.callMethod res "json" #[body]` instead lets the host make
   that call as part of the reply, which saves one round trip to Node's main thread;
   the promise resolves with the method's result (Hono's `Response`) or rejects if
-  it throws. `Reply.value d` answers with a value, as `ofFn` does. Read the request
+  it throws. `Function.Reply.value d` answers with a value, as `ofFn` does. Read the request
   fields you need in one call with `req.getFields #["params", "body"]`. Together
   these took the `lasm init` Express template from 4.3 to 2.3 host calls per
   request and from 4,600 to 6,000 requests per second (Hono: 4.4 to 3.4 calls,
