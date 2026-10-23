@@ -544,8 +544,12 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   blockers for most hosting platforms.
 ### Roadmap after Phase 4 (user decision 2026-10-23)
 
-Every phase and sub-phase ends with a **review stop**: report to the user and
-wait for approval before starting the next. Platform support is tested only in
+Every phase and sub-phase ends with a **review stop**: report to the user.
+Working mode (user instruction 2026-10-23, to launch quickly): never sit idle
+on long CI runs — verify enough locally to build on the work, start CI, and
+keep moving to the next sub-phase while it runs; reviews are reported as each
+sub-phase completes rather than blocking work (the user can stop or redirect
+at any time). npm publication still waits for explicit approval. Platform support is tested only in
 our own CI with official local runtimes, emulators and images, never with real
 accounts or deployments (user decision 2026-10-23); support claims say which
 local runtime backs them. Bun and Deno as runtimes stay dropped. Research:
@@ -574,6 +578,17 @@ folded into Phases 5.2/5.3 and 7.
     handlers under load for hours: handle/callback leaks, memory growth, error
     paths); published startup time, bundle size and memory numbers; decide and
     document the role of `Std.Http` (interop is ~28x faster under Lasm).
+  - **5.2b Release benchmarks (user request 2026-10-23).** An irreducible set
+    of benchmarks recorded automatically on every release candidate and
+    committed to the repo (machine-readable history plus a readable
+    BENCHMARKS page), so users see exactly what they get and we have a
+    baseline to optimize against: cold start (process start to ready and to
+    first HTTP response), bundle size (dist total, `program.wasm`, compressed),
+    memory (idle and under-load RSS), HTTP throughput and p99 (Express/Hono
+    with Lean handlers, `Std.Http`, plain Node on the same runner as the
+    reference ratio), interop call latency, and build time (cold and
+    incremental) plus `@lasm/cli` install size. Record runner, OS, CPU and
+    Node for every number; compare by ratio to the same-runner Node baseline.
   - **5.3 Release gate.** Full runtime-capable upstream suite on five targets,
     ecosystem and interop examples, performance/robustness regression check,
     five-platform acceptance and the cold-installation gate.
