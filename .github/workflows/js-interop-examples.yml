@@ -82,9 +82,7 @@ jobs:
         run: node scripts/js-interop/run-examples.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm js examples λ" .work/js-interop-examples.json
       - name: Preserve evidence
         if: always()
-        run: |
-          cat .work/js-interop-examples.json || true
-          node -e "const r=require('./.work/js-interop-examples.json');require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY,'```json\n'+JSON.stringify({platform:r.platform,postgres:r.postgres,passed:r.passed,apps:r.apps.map(a=>({app:a.app,ok:a.ok,rps:a.load&&a.load.rps})),fetch:r.fetch&&r.fetch.code},null,2)+'\n```\n')" || true
+        run: node scripts/js-interop/summary.mjs .work/js-interop-examples.json
   other:
     if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     strategy:
@@ -133,6 +131,4 @@ jobs:
           node scripts/js-interop/run-examples.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm js examples λ" .work/js-interop-examples.json
       - name: Preserve evidence
         if: always()
-        run: |
-          cat .work/js-interop-examples.json || true
-          node -e "const r=require('./.work/js-interop-examples.json');require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY,'```json\n'+JSON.stringify({platform:r.platform,postgres:r.postgres,passed:r.passed,apps:r.apps.map(a=>({app:a.app,ok:a.ok,rps:a.load&&a.load.rps})),fetch:r.fetch&&r.fetch.code},null,2)+'\n```\n')" || true
+        run: node scripts/js-interop/summary.mjs .work/js-interop-examples.json

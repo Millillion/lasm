@@ -8,6 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve, dirname } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const [workArg, portArg = '55432'] = process.argv.slice(2);
 const work = resolve(workArg), port = Number(portArg);
@@ -15,7 +16,7 @@ mkdirSync(work, { recursive: true });
 writeFileSync(join(work, 'package.json'), JSON.stringify({ private: true, dependencies: { 'embedded-postgres': '18.4.0-beta.17' } }));
 const npm = process.platform === 'win32' ? [process.execPath, join(dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js')] : ['npm'];
 execFileSync(npm[0], [...npm.slice(1), 'install', '--no-audit', '--no-fund'], { cwd: work, stdio: 'inherit' });
-const { default: EmbeddedPostgres } = await import(createRequire(join(work, 'package.json')).resolve('embedded-postgres'));
+const { default: EmbeddedPostgres } = await import(pathToFileURL(createRequire(join(work, 'package.json')).resolve('embedded-postgres')).href);
 const server = new EmbeddedPostgres({ databaseDir: join(work, 'data'), user: 'postgres', password: 'postgres', port, persistent: false });
 await server.initialise();
 await server.start();
