@@ -36,6 +36,16 @@ const must = (args, options) => {
   assert.equal(run.status, 0, `docker ${args.join(' ')}: ${run.stderr}`);
   return run.stdout.trim();
 };
+// Registries rate-limit anonymous pulls per IP address, which CI runners share.
+async function pull(image) {
+  for (let attempt = 1; ; attempt++) {
+    const run = docker(['pull', '-q', image]);
+    if (run.status === 0) return;
+    assert.ok(attempt < 6 && /toomanyrequests|rate|timeout|TLS|connection/i.test(run.stderr), `docker pull -q ${image}: ${run.stderr}`);
+    console.log(`Retrying docker pull ${image} (${run.stderr.trim()})`);
+    await new Promise(done => setTimeout(done, 30_000 * attempt));
+  }
+}
 const cache = mkdtempSync(join(tmpdir(), 'lasm-platform-node-'));
 const sums = new Map();
 async function officialNode(version) {
@@ -65,6 +75,7 @@ const limits = ['--read-only', '--tmpfs', '/tmp', '--memory=512m', '--memory-swa
 let failed = false;
 try {
   must(['network', 'create', network]);
+  await pull(config.postgres);
   must(['run', '-d', '--name', postgres, '--network', network, '-e', 'POSTGRES_PASSWORD=postgres', config.postgres]);
   for (let i = 0; ; i++) {
     if (docker(['exec', postgres, 'pg_isready', '-U', 'postgres']).status === 0) break;
@@ -75,7 +86,7 @@ try {
     const run = { name: entry.name, image: entry.image, claim: entry.claim };
     result.runs.push(run); save();
     try {
-      must(['pull', '-q', entry.image]);
+      await pull(entry.image);
       run.imageDigest = must(['image', 'inspect', '--format', '{{index .RepoDigests 0}}', entry.image]);
       let image = entry.image;
       if (entry.prepare) {

@@ -46,7 +46,14 @@ await check('login issues a JWT', async () => {
   const r = await call('POST', '/login', { body: { user } });
   assert.equal(r.status, 200); token = r.json.token; assert.match(token, /^[\w-]+\.[\w-]+\.[\w-]+$/);
 });
-await check('a forged token is 401', async () => assert.equal((await call('GET', '/todos', { token: token.slice(0, -2) + 'xx' })).status, 401));
+// Change the signature's first character: every one of its bits counts (the last
+// base64url characters carry padding bits, so replacing them can leave the
+// signature unchanged; that made this check pass a valid token once in run 39967265027).
+await check('a forged token is 401', async () => {
+  const [header, payload, signature] = token.split('.');
+  const forged = `${header}.${payload}.${signature[0] === 'A' ? 'B' : 'A'}${signature.slice(1)}`;
+  assert.equal((await call('GET', '/todos', { token: forged })).status, 401);
+});
 await check('create a todo (201)', async () => {
   const r = await call('POST', '/todos', { token, body: { title: 'write Lean' } });
   assert.equal(r.status, 201); assert.equal(r.json.title, 'write Lean'); assert.equal(r.json.done, false); assert.ok(Number.isInteger(r.json.id));

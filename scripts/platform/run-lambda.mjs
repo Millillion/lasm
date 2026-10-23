@@ -32,7 +32,17 @@ const must = args => {
 const network = 'lasm-lambda-' + randomUUID().slice(0, 8), postgres = network + '-pg';
 let failed = false;
 try {
-  for (const image of [config.image, config.adapter]) must(['pull', '-q', image]);
+  // Anonymous Amazon ECR Public pulls are rate limited per IP address, which CI
+  // runners share ("toomanyrequests: Data limit exceeded"); retry with backoff.
+  for (const image of [config.image, config.adapter]) {
+    for (let attempt = 1; ; attempt++) {
+      const pull = docker(['pull', '-q', image]);
+      if (pull.status === 0) break;
+      assert.ok(attempt < 6 && /toomanyrequests|rate|timeout|TLS|connection/i.test(pull.stderr), `docker pull -q ${image}: ${pull.stderr}`);
+      console.log(`Retrying docker pull ${image} (${pull.stderr.trim()})`);
+      await new Promise(done => setTimeout(done, 30_000 * attempt));
+    }
+  }
   result.imageDigest = must(['image', 'inspect', '--format', '{{index .RepoDigests 0}}', config.image]);
   result.adapterDigest = must(['image', 'inspect', '--format', '{{index .RepoDigests 0}}', config.adapter]);
   must(['network', 'create', network]);
