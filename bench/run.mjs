@@ -22,7 +22,7 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileS
 import http from 'node:http';
 import net from 'node:net';
 import os from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { brotliCompressSync, gzipSync, constants as zlib } from 'node:zlib';
@@ -462,9 +462,11 @@ async function interopPhase() {
 // ---------- main ----------
 async function hashFile(path) { return createHash('sha256').update(readFileSync(path)).digest('hex'); }
 try {
-  const manifest = JSON.parse(execFileSync('tar', ['-xOzf', tgz, 'package/package.json'], { encoding: 'utf8', maxBuffer: 1 << 24 }));
+  // A relative archive name: GNU tar on Windows reads "D:" as a remote host.
+  const member = name => execFileSync('tar', ['-xOzf', basename(tgz), name], { cwd: dirname(tgz), encoding: 'utf8', maxBuffer: 1 << 26 });
+  const manifest = JSON.parse(member('package/package.json'));
   let provenance = null;
-  try { provenance = JSON.parse(execFileSync('tar', ['-xOzf', tgz, 'package/provenance.json'], { encoding: 'utf8', maxBuffer: 1 << 26 })); } catch { /* optional */ }
+  try { provenance = JSON.parse(member('package/provenance.json')); } catch { /* optional */ }
   result.candidate = { name: manifest.name, version: manifest.version, sha256: await hashFile(tgz),
     sourceRevision: provenance?.sourceRevision ?? provenance?.source?.revision ?? process.env.LASM_CANDIDATE_SOURCE_REVISION ?? null,
     release: process.env.LASM_CANDIDATE_RELEASE ?? null, requiredNode: manifest.engines?.node ?? null };
