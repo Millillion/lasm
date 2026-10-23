@@ -605,6 +605,9 @@ folded into Phases 5.2/5.3 and 7.
     with Lean handlers for production HTTP; `Std.Http` supported for pure-Lean
     portability (28.8 host calls per request against 4.4; no cheap fix beyond
     the optional `generateDate := false`; deeper work in Phase 7).
+    Interop server path: `Function.ofFnReply` (reply with a method call) and
+    one-call request reads in the templates cut host calls per request from
+    4.3–4.4 to 2.3–3.4 (+16–30 % locally); the rest is Phase 7.
   - **5.2b Release benchmarks (user request 2026-10-23).** An irreducible set
     of benchmarks recorded automatically on every release candidate and
     committed to the repo (machine-readable history plus a readable

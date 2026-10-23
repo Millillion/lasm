@@ -257,9 +257,12 @@ def main : IO Unit := do
 ```
 
 `npx lasm Main.lean` runs it. Each JavaScript call costs about 25–35 µs (the Lean thread
-crosses to Node's main thread). The Express and Hono example with a Lean handler serves
-about 4,600–5,200 requests per second with 16 connections on Linux x64, against about
-1,300 for `Std.Http` under Lasm. These programs run only under Lasm: natively, every JavaScript operation fails
+crosses to Node's main thread). On the benchmark runner (4-CPU GitHub Linux x64,
+candidate `.39891445495`, [BENCHMARKS.md](https://github.com/Millillion/lasm/blob/main/docs/BENCHMARKS.md)) a Hono server with a Lean handler serves about 9,700
+requests per second and Express about 6,300, against about 54,000 for a plain Node
+`http` server (0.18× and 0.12×) and about 660 for `Std.Http` under Lasm. Node's main
+thread is the limit: each request makes about four host calls. Current source cuts
+that to two or three (`Function.ofFnReply`; +16–30 % locally). These programs run only under Lasm: natively, every JavaScript operation fails
 with a clear error, and the Lean editor extension does not know `Lasm.JS` yet. The
 guide for writing bindings (by hand or by an AI agent), with Express, Hono, `pg`,
 `jose` and `fetch` examples, type mappings, errors and exact limitations, is
@@ -295,8 +298,8 @@ upstream suite are not release guarantees.** See [IO gaps](https://github.com/Mi
 and [deployment-size evidence](https://github.com/Millillion/lasm/blob/main/docs/BUNDLE_SIZE.md) for the remaining work.
 **HTTP servers: use Express or Hono with Lean handlers for production on Node.**
 `Std.Http` is supported for pure-Lean code that must also build natively. Under Lasm
-it serves about a fifth of the Hono/Express throughput (about 1,200 against
-4,600–5,700 requests per second with 16 connections on Linux x64), because every
+it serves about 660 requests per second on the benchmark runner, against about 9,700
+for Hono and 6,300 for Express with Lean handlers ([BENCHMARKS.md](https://github.com/Millillion/lasm/blob/main/docs/BENCHMARKS.md)), because every
 socket, timer and `Date` operation is a round trip to Node's main thread (about 29
 per request, against about 4 for a Lean handler in Express or Hono); details in the
 [launch position](https://github.com/Millillion/lasm/blob/main/docs/SERVER_MVP.md#launch-position-2026-10-23).

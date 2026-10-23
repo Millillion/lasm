@@ -214,6 +214,7 @@ Lasm.JS get "rows": expected Lean type Array (App.Todo), received JavaScript arr
 
 ```lean
 Function.ofFn  (f : Array Data → IO Data) : IO Value      -- async: JavaScript gets a function returning a Promise
+Function.ofFnReply (f : Array Data → IO Reply) : IO Value -- async; the reply may be a method call the host makes
 Function.ofFn1 (f : α → IO β) / Function.ofFn2 (f : α → β → IO γ)   -- typed forms
 Function.ofSyncFn (f : Array Data → IO Data) : IO Value   -- synchronous
 Function.ofSyncFn2 (f : α → β → IO γ)
@@ -231,6 +232,16 @@ Function.ofSyncFn2 (f : α → β → IO γ)
   - What fails: host operations that complete asynchronously, such as Lean file IO,
     `IO.sleep`, sockets and awaiting promises. They fail with an error that says so.
   - A synchronous callback cannot call another synchronous callback.
+- **Replying with a method call (`ofFnReply`), for HTTP handlers.** A handler
+  usually ends by calling `res.json(body)` (Express) or returning `c.json(body)`
+  (Hono). Returning `Reply.callMethod res "json" #[body]` instead lets the host make
+  that call as part of the reply, which saves one round trip to Node's main thread;
+  the promise resolves with the method's result (Hono's `Response`) or rejects if
+  it throws. `Reply.value d` answers with a value, as `ofFn` does. Read the request
+  fields you need in one call with `req.getFields #["params", "body"]`. Together
+  these took the `lasm init` Express template from 4.3 to 2.3 host calls per
+  request and from 4,600 to 6,000 requests per second (Hono: 4.4 to 3.4 calls,
+  5,750 to 6,650) on one local Linux x64 host with 16 connections.
 - **Lifetime.** The JavaScript function holds the Lean closure until JavaScript
   garbage-collects the function.
 
@@ -324,9 +335,11 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   cannot be loaded. pnpm/Yarn Plug'n'Play layouts are not supported.
 - **Cost per call.** Each call costs about 25–35 µs. An asynchronous callback round
   trip (JavaScript calls Lean, and Lean awaits the answer) costs about 0.27 ms.
-  `examples/js-crud` serves `GET /health` at about 4,600 (Express) and 5,200 (Hono)
-  requests per second with 16 connections on Linux x64. That is about 3.5× Lasm's
-  `Std.Http` server and about a fifth of plain Node.
+  On the 4-CPU benchmark runner, a Hono server with a Lean handler serves about
+  9,700 requests per second and Express about 6,300: 0.18× and 0.12× a plain Node
+  `http` server, and 15× and 10× Lasm's `Std.Http` server
+  ([BENCHMARKS.md](BENCHMARKS.md); measured before `ofFnReply`). Node's main thread,
+  which serves every host call, is the limit; use `ofFnReply` and `getFields`.
   Measurements: [JS_INTEROP.md](JS_INTEROP.md).
 - **Lasm only.** Programs that use interop run only under Lasm.
 - **Concurrent waiting handlers.** A Lean callback holds a Lean worker thread

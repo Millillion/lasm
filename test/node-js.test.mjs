@@ -116,3 +116,32 @@ test('promise completions carry the Lean promise pointer', async () => {
   assert.equal(events[9], 0);
   assert.equal(js.decode(events.subarray(14)), 5);
 });
+
+test('a Lean reply can be a method call the host makes (Reply.callMethod)', async () => {
+  const js = createNodeJs();
+  const f = js.decode(js.dispatch(210, 9, 1n, Buffer.alloc(0)));
+  class Response { json(body) { this.sent = body; return 'sent'; } }
+  const target = new Response();
+  const result = f(target);
+  const events = await js.dispatch(209, 0, 0n, Buffer.alloc(0));
+  const call = events.readBigUInt64LE(1);
+  const [ref] = js.decode(events.subarray(17));   // the argument arrives as a reference
+  const id = [...js.values.entries()].find(([, v]) => v === ref)[0];
+  const payload = wire([{ ref: id }, 'json', [{ ok: true }]]);
+  const reply = Buffer.concat([Buffer.alloc(8), Buffer.from([2]), u32(payload.length), payload]);
+  reply.writeBigUInt64LE(call);
+  js.dispatch(208, 0, 0n, reply);
+  assert.equal(await result, 'sent');
+  assert.deepEqual(target.sent, { ok: true });
+  // A method that throws rejects the JavaScript promise.
+  class Closed { json() { throw new RangeError('closed'); } }
+  const failing = f(new Closed());
+  const second = await js.dispatch(209, 0, 0n, Buffer.alloc(0));
+  const [ref2] = js.decode(second.subarray(17));
+  const id2 = [...js.values.entries()].find(([, v]) => v === ref2)[0];
+  const payload2 = wire([{ ref: id2 }, 'json', [1]]);
+  const reply2 = Buffer.concat([Buffer.alloc(8), Buffer.from([2]), u32(payload2.length), payload2]);
+  reply2.writeBigUInt64LE(second.readBigUInt64LE(1));
+  js.dispatch(208, 0, 0n, reply2);
+  await assert.rejects(failing, { message: 'closed' });
+});

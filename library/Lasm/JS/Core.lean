@@ -348,9 +348,17 @@ end Value
 
 /-! Promises, callbacks and the interop thread -/
 
+/-- What an asynchronous Lean function (`Function.ofFnReply`) answers JavaScript
+with: a value, or a method call that the host makes on Node's main thread as part
+of the reply, resolving the JavaScript promise with its result. A handler that
+ends with `res.json(body)` or `c.json(body)` saves one host round trip this way. -/
+inductive Reply where
+  | value (result : Data)
+  | callMethod (target : Value) (name : String) (args : Array Data)
+
 private structure Registry where
   next : UInt32 := 1
-  asyncFns : Std.HashMap UInt32 (Array Data → IO Data) := {}
+  asyncFns : Std.HashMap UInt32 (Array Data → IO Reply) := {}
   syncFns : Std.HashMap UInt32 (Array Data → IO Data) := {}
 
 private instance : Nonempty Registry := ⟨{}⟩
@@ -363,11 +371,14 @@ private initialize registry : IO.Ref Registry ← IO.mkRef {}
 
 private def errorText (e : IO.Error) : String := toString e
 
-private def reply (call : UInt64) (result : Except IO.Error Data) : IO Unit := do
-  let keep := match result with | .ok d => d | .error _ => .undefined
-  let (failed, payload) := match result with
-    | .ok d => ((0 : UInt8), Wire.encode d)
-    | .error e => (1, (errorText e).toUTF8)
+private def reply (call : UInt64) (result : Except IO.Error Reply) : IO Unit := do
+  -- Status 0 a value, 1 a Lean error (message), 2 a method call [target, name, args].
+  let (failed, payload, keep) : UInt8 × ByteArray × Data := match result with
+    | .ok (.value d) => (0, Wire.encode d, d)
+    | .ok (.callMethod target name args) =>
+      let d : Data := .array #[.ref target "", .string name, .array args]
+      (2, Wire.encode d, d)
+    | .error e => (1, (errorText e).toUTF8, .undefined)
   let mut b := ByteArray.empty
   for i in [0:8] do b := b.push (call >>> (8 * i).toUInt64).toUInt8
   b := b.push failed
@@ -427,8 +438,13 @@ private def register (synchronous : Bool) (f : Array Data → IO Data) : IO UInt
   registry.modifyGet fun r =>
     let id := r.next
     let r' : Registry := if synchronous then { r with syncFns := r.syncFns.insert id f }
-      else { r with asyncFns := r.asyncFns.insert id f }
+      else { r with asyncFns := r.asyncFns.insert id fun args => Reply.value <$> f args }
     (id, { r' with next := id + 1 })
+
+private def registerReply (f : Array Data → IO Reply) : IO UInt32 :=
+  registry.modifyGet fun r =>
+    let id := r.next
+    (id, { r with asyncFns := r.asyncFns.insert id f, next := id + 1 })
 
 /-- A JavaScript function that calls `f` and returns a promise of its result.
 Each call runs as a Lean task (so `f` may block on other JavaScript calls);
@@ -437,6 +453,15 @@ def ofFn (f : Array Data → IO Data) : IO Value := do
   ensureStarted
   let id ← register false f
   decodeAs Value "Function.ofFn" (← Wire.decode (← hostCall 210 id 1 .empty))
+
+/-- `ofFn` whose result may be a method call made by the host as part of the
+reply (`Reply.callMethod res "json" #[body]`), one host round trip fewer than
+calling the method and then returning. The JavaScript promise resolves with the
+method's result (awaited if it is a promise); if the method throws, it rejects. -/
+def ofFnReply (f : Array Data → IO Reply) : IO Value := do
+  ensureStarted
+  let id ← registerReply f
+  decodeAs Value "Function.ofFnReply" (← Wire.decode (← hostCall 210 id 1 .empty))
 
 /-- A JavaScript function that calls `f` synchronously and returns its result.
 Node's main thread waits while `f` runs (about 20 µs per call plus `f`), so the

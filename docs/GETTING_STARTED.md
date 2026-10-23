@@ -56,10 +56,13 @@ How a Lean handler works (`Main.lean` from the template):
 - `@[js "hono" "new Hono"] opaque newHono : IO Value` binds a JavaScript export to a
   Lean name. Lasm generates the glue from the Lean type and checks at build time
   that the export exists.
-- `Function.ofFn` turns a Lean function into a JavaScript function. Hono calls it
-  with its context `c`; the Lean code reads the request (`c.req.param("name")`) and
-  returns `c.json(…)`. Each call runs as a Lean task, so handlers can block, await
-  promises and make further JavaScript calls.
+- `Function.ofFnReply` turns a Lean function into a JavaScript function. Hono
+  calls it with its context `c`; the Lean code reads the request
+  (`c.req.param("name")`) and answers `Reply.callMethod c "json" #[body]`: the host
+  calls `c.json(body)` as part of the reply and Hono gets its `Response`. Each call
+  runs as a Lean task, so handlers can block, await promises and make further
+  JavaScript calls. Every JavaScript call from Lean is a round trip to Node's main
+  thread, so handlers make as few as they can (see [performance](#which-http-server-to-use)).
 - `waitForever` keeps `main` running while Node serves requests.
 
 The full API (values, conversions, `deriving ToJS, FromJS`, callbacks, errors,
@@ -95,18 +98,19 @@ open Lasm.JS
 @[js "marked" "parse"] opaque renderMarkdown : String → IO String
 
 /-- A Hono handler `(c) => Response` written in Lean. -/
-def handler (f : Value → IO Data) : IO Value :=
-  Function.ofFn fun args => do
+def handler (f : Value → IO Reply) : IO Value :=
+  Function.ofFnReply fun args => do
     let .ref c _ := args[0]! | throw (IO.userError "expected a Hono context")
     f c
 
-/-- `c.json(body, status)`: the `Response` the handler returns. -/
-def json (c : Value) (body : Data) (status : Nat := 200) : IO Data :=
-  c.callMethod "json" #[body, toJS status] Data
+/-- `c.json(body, status)`: the `Response` the handler returns, made by the host
+as the reply (one host round trip fewer than calling it from Lean). -/
+def json (c : Value) (body : Data) (status : Nat := 200) : IO Reply :=
+  return .callMethod c "json" #[body, toJS status]
 
 def main : IO Unit := do
   let app ← newHono
-  let route (method path : String) (f : Value → IO Data) : IO Unit := do
+  let route (method path : String) (f : Value → IO Reply) : IO Unit := do
     let _ : Value ← app.callMethod method #[toJS path, toJS (← handler f)]
   route "get" "/" fun c => json c (obj [("message", toJS "Hello from Lean on Hono!")])
   route "get" "/hello/:name" fun c => do
@@ -192,7 +196,7 @@ get a `Dockerfile.lambda`, see [lambda.md](deploy/lambda.md)).
 | | Express or Hono with Lean handlers (`--template express`, `hono`) | `Std.Http` (`--template std-http`) |
 | --- | --- | --- |
 | Use for | **Production HTTP services on Node.** | Pure-Lean code that must also build natively, or that is shared with native Lean servers. |
-| Throughput (`GET`, 16 connections, Linux x64) | about 4,600 (Express) and 5,700 (Hono) requests per second | about 1,200 requests per second |
+| Throughput ([benchmark runner](BENCHMARKS.md), 4-CPU Linux x64; plain Node `http`: about 54,000 req/s) | about 9,700 (Hono, 0.18× plain Node) and 6,300 (Express, 0.12×) requests per second | about 660 requests per second (0.01×) |
 | Node ecosystem (middleware, npm packages) | yes | through `Lasm.JS` calls only |
 | Runs natively (`lake build`) | `App.lean` only | yes |
 

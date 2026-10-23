@@ -747,6 +747,28 @@ The client limits plain Node here (the earlier raw-socket client measured
 At one connection: Hono/Express 1,900–2,100 req/s (p99 0.9 ms), `Std.Http` 313–315
 (p99 5.2 ms).
 
+Reference numbers for users are the ones the release benchmarks record on a
+4-CPU GitHub runner ([BENCHMARKS.md](BENCHMARKS.md), candidate `.39891445495`):
+Hono with a Lean handler 9,682 req/s, Express 6,349, `Std.Http` 663, plain Node
+`http` 53,784 (0.18×, 0.12× and 0.01×).
+
+**Interop server path, cheap win taken (current source).** Express and Hono with
+Lean handlers are also bound by Node's main thread (ELU 1.0), at 4.3–4.4 host calls
+per request: read the request, call `res.json`/`c.json`, reply, plus the interop
+poll. `Function.ofFnReply` lets a handler answer with `Reply.callMethod res "json"
+#[body]`, which the host makes while processing the reply (one call fewer), and the
+templates read request fields with one `getFields`. Same host, same client, same
+run ([evidence](evidence/interop-reply-2026-10-23.json)):
+
+| Template (c=16) | Before: req/s, calls/request | With `ofFnReply` + `getFields`: req/s, calls/request |
+| --- | --- | --- |
+| Express | 4,570–4,624, 4.34 | 5,969–6,007, 2.26 (+30 %) |
+| Hono | 5,717–5,797, 4.44 | 6,585–6,723, 3.38 (+16 %) |
+
+Not done (Phase 7): running simple handlers on the interop thread without a task
+(the main thread, not Lean, is the limit), batching several requests' host calls,
+and cheaper per-call main-thread work.
+
 **Why `Std.Http` is slower: per-request host round trips, not Lean compute.**
 Sockets and timers live on Node's main thread, and every operation on them from
 a Lean thread is a host call that Node's main thread serves (about 30 µs of

@@ -23,7 +23,7 @@
 //       promise result, 4 construct, 8 method call
 //   214 typed binding [Lean name, module, export path, arguments]; flags as 205
 //   207 resolve the Lean promise at arg when a value settles (interop thread event)
-//   208 replies of Lean callbacks   209 interop thread long poll (events)
+//   208 replies of Lean callbacks (status 0 value, 1 error, 2 method call)   209 interop thread long poll (events)
 //   210 a JavaScript function calling Lean function `handle` (arg 1 async, 2 sync)
 //   211 register the synchronous-callback channel   213 statistics
 import { createRequire } from 'node:module';
@@ -331,8 +331,12 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
           const pending = pendingCalls.get(call);
           if (!pending) continue;
           pendingCalls.delete(call);
-          if (failed) pending.reject(new Error(decoder.decode(payload)));
-          else { try { pending.resolve(decode(payload)); } catch (error) { pending.reject(error); } }
+          if (failed === 1) pending.reject(new Error(decoder.decode(payload)));
+          else if (failed === 2) {
+            // Reply.callMethod: [target, method name, arguments], made here (one round trip fewer).
+            try { const [target, name, args] = decode(payload); pending.resolve(invoke(target, name, args, 8)); }
+            catch (error) { pending.reject(error); }
+          } else { try { pending.resolve(decode(payload)); } catch (error) { pending.reject(error); } }
         }
         return Buffer.alloc(0);
       }
