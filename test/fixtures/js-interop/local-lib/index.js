@@ -15,4 +15,11 @@ module.exports = {
   mapSync: (xs, f) => xs.map(x => f(x)),
   // Calls an asynchronous Lean callback and awaits it.
   applyAsync: async (f, x) => await f(x),
+  // Calls an asynchronous Lean callback n times concurrently; milliseconds taken.
+  fanOut: async (f, n) => {
+    const started = Date.now();
+    const results = await Promise.all(Array.from({ length: n }, (_, i) => f(i)));
+    if (results.some((r, i) => r !== i)) throw new Error('fanOut: wrong results');
+    return Date.now() - started;
+  },
 };

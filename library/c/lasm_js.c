@@ -189,6 +189,28 @@ LEAN_EXPORT lean_obj_res lasm_js_await_into(b_lean_obj_arg promise, b_lean_obj_a
     return lean_io_result_mk_ok(lean_box(0));
 }
 
+/* (p : @& IO.Promise (Except String ByteArray)) (op handle : UInt32) (arg : UInt64)
+   (input : @& ByteArray) (keep : @& Data) : IO Unit
+   A call (op 205) or typed binding (op 214) whose result resolves p when it
+   settles (flag 16; the request starts with p), instead of a reply: the calling
+   Lean thread does not wait for the promise. */
+LEAN_EXPORT lean_obj_res lasm_js_call_into(b_lean_obj_arg promise, uint32_t op, uint32_t handle, uint64_t arg, b_lean_obj_arg input, b_lean_obj_arg keep) {
+    (void)keep;
+    if (!dispatcher) return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string("Lasm.JS is not started (internal error)")));
+    if (op != 205 && op != 214) return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string("Invalid Lasm.JS operation")));
+    size_t length = lean_sarray_size(input);
+    uint8_t *request = (uint8_t *)malloc(8 + length);
+    uint64_t pointer = (uint64_t)(uintptr_t)promise;
+    memcpy(request, &pointer, 8);
+    if (length) memcpy(request + 8, lean_sarray_cptr(input), length);
+    lean_inc(promise); lean_mark_mt(promise);
+    reply_t r = host_call(op, handle, arg | 16, request, 8 + length);
+    free(request);
+    if (r.failed) { lean_dec(promise); return lean_io_result_mk_error(lean_mk_io_user_error(failure_message(r))); }
+    free(r.bytes);
+    return lean_io_result_mk_ok(lean_box(0));
+}
+
 /* ---- synchronous callbacks ---- */
 typedef struct {
     volatile int32_t state;     /* 0 idle, 1 call posted, 2 result, 3 failure */
@@ -282,6 +304,9 @@ LEAN_EXPORT lean_obj_res lasm_js_value_of_handle(uint32_t handle) { (void)handle
 LEAN_EXPORT uint32_t lasm_js_value_handle(b_lean_obj_arg v) { (void)v; return 0; }
 LEAN_EXPORT lean_obj_res lasm_js_start(lean_obj_arg dispatch) { lean_dec(dispatch); return unavailable(); }
 LEAN_EXPORT lean_obj_res lasm_js_await_into(b_lean_obj_arg p, b_lean_obj_arg v, b_lean_obj_arg k) { (void)p; (void)v; (void)k; return unavailable(); }
+LEAN_EXPORT lean_obj_res lasm_js_call_into(b_lean_obj_arg p, uint32_t op, uint32_t handle, uint64_t arg, b_lean_obj_arg input, b_lean_obj_arg keep) {
+    (void)p; (void)op; (void)handle; (void)arg; (void)input; (void)keep; return unavailable();
+}
 LEAN_EXPORT lean_obj_res lasm_js_sync_start(lean_obj_arg dispatch) { lean_dec(dispatch); return unavailable(); }
 LEAN_EXPORT uint8_t lasm_js_available(lean_obj_arg unit) { (void)unit; return 0; }
 #endif

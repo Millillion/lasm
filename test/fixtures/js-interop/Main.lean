@@ -25,6 +25,25 @@ inductive Level where
 @[js "local-lib" "applyAsync"] opaque applyAsync : Value → String → IO String
 @[js "node:path" "posix.join"] opaque joinPath : String → String → IO String
 @[js "globalThis" "structuredClone"] opaque clone : Data → IO Data
+@[js "local-lib" "later"] opaque laterAsync : String → Nat → Async String
+@[js "local-lib" "fail"] opaque failAsync : String → Async Unit
+@[js "local-lib" "fanOut"] opaque fanOut : Value → Nat → Async Nat
+
+/-- Awaiting in `Async` (bindings, method calls, promises, handlers) holds no Lean thread. -/
+def asyncPart (lib : Value) : Async Unit := do
+  IO.println s!"async binding: {← laterAsync "async" 5}"
+  try failAsync "late boom" catch e => IO.println s!"async rejection: {e}"
+  IO.println s!"async method: {← lib.callMethodAwait "later" #[toJS "method", toJS 1] String}"
+  let promise ← lib.callMethod "later" #[toJS "promise", toJS 1]
+  IO.println s!"async await: {← promise.await String}"
+  let waits ← Function.ofFn1 fun (s : String) => do return (← laterAsync s 5).toUpper
+  IO.println s!"async handler: {← lib.callMethodAwait "applyAsync" #[toJS waits, toJS "waits"] String}"
+  -- 500 concurrent calls of a Lean function that awaits a 100 ms timer.
+  let slow ← Function.ofFn1 fun (i : Nat) => do
+    let _ ← laterAsync "slow" 100
+    return i
+  let ms ← fanOut slow 500
+  IO.println s!"fan-out of 500 waiting handlers under 2 s: {decide (ms < 2000)}"
 
 def main : IO Unit := do
   IO.println s!"available: {isAvailable}"
@@ -60,6 +79,7 @@ def main : IO Unit := do
   try
     let _ ← applyAsync failing "x"
   catch e => IO.println s!"lean error in JS: {e}"
+  (asyncPart lib).block
   for _ in [0:2000] do discard <| lib.get "config"
   let held := ((← stats).splitOn "\"values\":" |>.getD 1 "" |>.takeWhile Char.isDigit).toNat!
   IO.println s!"handles released: {decide (held < 20)}"

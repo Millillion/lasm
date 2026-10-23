@@ -36,7 +36,7 @@ function project() {
   writeFileSync(join(root, 'node_modules/lib/index.js'), `
     class Box { constructor(v) { this.v = v; } get() { return this.v; } }
     module.exports = { add: (a, b) => a + b, Box, later: v => Promise.resolve(v), nested: { f: () => 'deep' },
-      fail: () => { throw new RangeError('nope'); }, bytes: () => new Uint8Array([1, 2]), big: () => 2n ** 70n };`);
+      fail: () => { throw new RangeError('nope'); }, reject: () => Promise.reject(new RangeError('later nope')), bytes: () => new Uint8Array([1, 2]), big: () => 2n ** 70n };`);
   return createNodeJs({ appPath: join(root, 'main.mjs') });
 }
 
@@ -115,6 +115,38 @@ test('promise completions carry the Lean promise pointer', async () => {
   assert.equal(events.readBigUInt64LE(1), 0x1234n);
   assert.equal(events[9], 0);
   assert.equal(js.decode(events.subarray(14)), 5);
+});
+
+test('calls and bindings with flag 16 resolve a Lean promise instead of replying (Async awaits)', async () => {
+  const js = project();
+  const promise = pointer => { const b = Buffer.alloc(8); b.writeBigUInt64LE(pointer); return b; };
+  const event = async () => {
+    const events = await js.dispatch(209, 0, 0n, Buffer.alloc(0));
+    assert.equal(events[0], 1);
+    return { promise: events.readBigUInt64LE(1), failed: events[9], bytes: events.subarray(14) };
+  };
+  // A binding whose result is a promise: the reply is empty, the value arrives as an event.
+  const reply = await js.dispatch(214, 0, 16n, Buffer.concat([promise(0x10n), wire(['T.later', 'lib', 'later', [41]])]));
+  assert.equal(reply.length, 0);
+  let e = await event();
+  assert.deepEqual([e.promise, e.failed, js.decode(e.bytes)], [0x10n, 0, 41]);
+  // A plain (non-promise) result settles too; flag 1 keeps reference conversion.
+  await js.dispatch(214, 0, 16n | 1n | 4n, Buffer.concat([promise(0x11n), wire(['T.Box', 'lib', 'Box', [7]])]));
+  e = await event();
+  assert.equal(e.promise, 0x11n);
+  assert.equal(e.bytes[0], 10);
+  // A method call (op 205) on a held value, and a rejection.
+  const lib = js.decode(js.dispatch(201, 0, 1n, Buffer.from('lib')));
+  const id = [...js.values.entries()].find(([, v]) => v === lib)[0];
+  await js.dispatch(205, 0, 16n | 8n, Buffer.concat([promise(0x12n), wire([{ ref: id }, 'later', ['x']])]));
+  e = await event();
+  assert.deepEqual([e.promise, js.decode(e.bytes)], [0x12n, 'x']);
+  await js.dispatch(205, 0, 16n | 8n, Buffer.concat([promise(0x13n), wire([{ ref: id }, 'reject', []])]));
+  e = await event();
+  assert.deepEqual([e.promise, e.failed, e.bytes.toString()], [0x13n, 1, 'RangeError: later nope']);
+  // Synchronous failures still fail the host call (the Lean side then drops the promise).
+  assert.throws(() => js.dispatch(205, 0, 16n | 8n, Buffer.concat([promise(0x14n), wire([{ ref: id }, 'fail', []])])), /RangeError: nope/);
+  assert.throws(() => js.dispatch(205, 0, 16n, Buffer.alloc(4)), /Malformed/);
 });
 
 test('a Lean reply can be a method call the host makes (Reply.callMethod)', async () => {

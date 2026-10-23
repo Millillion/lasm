@@ -20,7 +20,9 @@
 //   203 get(handle, key, or an array of keys: an object of them)   204 set(handle, [key, value])
 //   206 describe(handle)
 //   205 call [target, receiver or method name, arguments]; arg flags 2 await a
-//       promise result, 4 construct, 8 method call
+//       promise result, 4 construct, 8 method call, 16 settle: the request
+//       starts with a u64 Lean promise pointer, resolved (interop thread event)
+//       when the result settles, instead of replying with the result
 //   214 typed binding [Lean name, module, export path, arguments]; flags as 205
 //   207 resolve the Lean promise at arg when a value settles (interop thread event)
 //   208 replies of Lean callbacks (status 0 value, 1 error, 2 method call)   209 interop thread long poll (events)
@@ -240,10 +242,10 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
     leanFunctions.register(f, fn);
     return f;
   }
-  function settle(promise, value) {
+  function settle(promise, value, mode = 'data') {
     Promise.resolve(value).then(result => {
       let bytes, failed = false;
-      try { bytes = encode(result, 'data'); } catch (error) { failed = true; bytes = Buffer.from(jsFailure(error).message); }
+      try { bytes = encode(result, mode); } catch (error) { failed = true; bytes = Buffer.from(jsFailure(error).message); }
       push({ kind: 1, promise, failed, bytes });
     }, error => push({ kind: 1, promise, failed: true, bytes: Buffer.from(jsFailure(error).message) }));
   }
@@ -287,7 +289,14 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
       const count = head.readUInt32LE(0);
       if (head.length < 4 + 4 * count) throw failure('Malformed Lasm.JS request');
       for (let i = 0; i < count; i++) if (values.delete(head.readUInt32LE(4 + 4 * i))) stats.released++;
-      const bytes = head.subarray(4 + 4 * count);
+      let bytes = head.subarray(4 + 4 * count);
+      // Flag 16 (ops 205, 214): settle the Lean promise that prefixes the request
+      // with the result, through the interop thread, instead of replying with it.
+      let into;
+      if ((op === 205 || op === 214) && Number(arg) & 16) {
+        if (bytes.length < 8) throw failure('Malformed Lasm.JS request');
+        into = bytes.readBigUInt64LE(0); bytes = bytes.subarray(8);
+      }
       switch (op) {
       case 200: return Buffer.from(Uint32Array.of(jsProtocolVersion).buffer);
       case 201: { const value = load(decoder.decode(bytes)); return encode(value, modeOf(arg)); }
@@ -312,6 +321,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
         const flags = Number(arg);
         const result = invoke(target, receiver, args, flags);
         const mode = modeOf(flags);
+        if (into !== undefined) { settle(into, result, mode); return Buffer.alloc(0); }
         if (flags & 2 && result && typeof result.then === 'function')
           return Promise.resolve(result).then(value => encode(value, mode), error => { throw jsFailure(error); });
         return encode(result, mode);
@@ -369,6 +379,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
         }
         const result = invoke(target, undefined, args, flags & 4);
         const mode = modeOf(flags);
+        if (into !== undefined) { settle(into, result, mode); return Buffer.alloc(0); }
         if (flags & 2 && result && typeof result.then === 'function')
           return Promise.resolve(result).then(value => encode(value, mode), error => { throw jsFailure(error); });
         return encode(result, mode);

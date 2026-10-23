@@ -17,4 +17,10 @@ mismatch: Lasm.JS get "greet": expected Lean type Nat, received JavaScript funct
 mapSync: #[2, 4, 6]
 applyAsync: HELLO, CALLBACKS
 lean error in JS: Lasm.JS binding applyAsync (local-lib applyAsync): Error: from Lean
+async binding: async
+async rejection: Lasm.JS binding failAsync (local-lib fail): RangeError: late boom
+async method: method
+async await: promise
+async handler: WAITS
+fan-out of 500 waiting handlers under 2 s: true
 handles released: true

@@ -4,8 +4,16 @@ Lean programs compiled by Lasm and run on Node.js. Every JavaScript operation
 is a host call to Node's main thread (about 25–35 µs); see docs/JS_INTEROP.md.
 -/
 import Std.Data.HashMap
+import Std.Async.Basic
 
 namespace Lasm.JS
+open Std.Async
+
+/- Std.Async's `Async`, available after `open Lasm.JS`: Lean code that waits for
+JavaScript (`callMethodAwait`, `Value.await`, `Async` bindings) without holding
+a Lean thread. JavaScript calls Lean functions (`Function.ofFn`) in `Async`;
+`IO` actions run in it unchanged. -/
+export Std.Async (Async)
 
 /-- A JavaScript value held by the host on Lean's behalf (any value: object,
 function, promise, class instance or primitive). It is released when the Lean
@@ -159,6 +167,8 @@ alive (and its handles unreleased) until the host has read the request. -/
 private def hostCall (op handle : UInt32) (arg : UInt64) (input : ByteArray) : IO ByteArray := hostCallKeep op handle arg input .undefined
 private def hostCallWith (op : UInt32) (arg : UInt64) (payload : Data) (handle : UInt32 := 0) : IO ByteArray :=
   hostCallKeep op handle arg (Wire.encode payload) payload
+/-- A call (205) or binding (214) whose result resolves `p` when it settles. -/
+@[extern "lasm_js_call_into"] private opaque hostCallInto (p : @& IO.Promise (Except String ByteArray)) (op handle : UInt32) (arg : UInt64) (input : @& ByteArray) (keep : @& Data) : IO Unit
 
 /-! Conversions -/
 
@@ -281,6 +291,120 @@ def readField (α : Type) [FromJS α] (d : Data) (key : String) : Except String 
       (fun e => s!"field {key}: expected {FromJS.typeName α}, received {(d.field key).describe}{if e.isEmpty then "" else " (" ++ e ++ ")"}")
   | _ => .error "expected an object"
 
+/-! The interop thread: promise completions and calls of Lean functions -/
+
+/-- What an asynchronous Lean function (`Function.ofFnReply`) answers JavaScript
+with: a value, or a method call that the host makes on Node's main thread as part
+of the reply, resolving the JavaScript promise with its result. A handler that
+ends with `res.json(body)` or `c.json(body)` saves one host round trip this way. -/
+inductive Function.Reply where
+  | value (result : Data)
+  | callMethod (target : Value) (name : String) (args : Array Data)
+
+private structure Registry where
+  next : UInt32 := 1
+  asyncFns : Std.HashMap UInt32 (Array Data → Async Function.Reply) := {}
+  syncFns : Std.HashMap UInt32 (Array Data → IO Data) := {}
+
+private instance : Nonempty Registry := ⟨{}⟩
+
+private initialize registry : IO.Ref Registry ← IO.mkRef {}
+
+@[extern "lasm_js_start"] private opaque startThread (dispatch : UInt8 → UInt32 → UInt64 → ByteArray → IO Unit) : IO Unit
+@[extern "lasm_js_await_into"] private opaque awaitInto (p : @& IO.Promise (Except String ByteArray)) (value : @& ByteArray) (keep : @& Data) : IO Unit
+@[extern "lasm_js_sync_start"] private opaque startSync (dispatch : UInt32 → ByteArray → IO (ByteArray × Data)) : IO Unit
+
+private def errorText (e : IO.Error) : String := toString e
+
+private def reply (call : UInt64) (result : Except IO.Error Function.Reply) : IO Unit := do
+  -- Status 0 a value, 1 a Lean error (message), 2 a method call [target, name, args].
+  let (failed, payload, keep) : UInt8 × ByteArray × Data := match result with
+    | .ok (.value d) => (0, Wire.encode d, d)
+    | .ok (.callMethod target name args) =>
+      let d : Data := .array #[.ref target "", .string name, .array args]
+      (2, Wire.encode d, d)
+    | .error e => (1, (errorText e).toUTF8, .undefined)
+  let mut b := ByteArray.empty
+  for i in [0:8] do b := b.push (call >>> (8 * i).toUInt64).toUInt8
+  b := b.push failed
+  let n := payload.size.toUInt32
+  b := b.push n.toUInt8 |>.push (n >>> 8).toUInt8 |>.push (n >>> 16).toUInt8 |>.push (n >>> 24).toUInt8
+  discard <| hostCallKeep 208 0 0 (b ++ payload) keep
+
+private def argsOf (bytes : ByteArray) : IO (Array Data) := do
+  match ← Wire.decode bytes with
+  | .array xs => pure xs
+  | d => pure #[d]
+
+/-- One call of a Lean function from JavaScript, run as a Lean task. If the
+function finishes without waiting, it replies at once; if it waits for a
+JavaScript promise, the reply is a continuation that runs when the computation
+finishes, and no Lean thread is held while it waits. -/
+private def runCall (call : UInt64) (f : Array Data → Async Function.Reply) (bytes : ByteArray) : BaseIO Unit := do
+  let run : Async Function.Reply := do f (← argsOf bytes)
+  match ← BaseAsync.toRawBaseIO run with
+  | .pure result => discard <| (reply call result).toBaseIO
+  | .ofTask t => discard <| BaseIO.mapTask (fun result => discard <| (reply call result).toBaseIO) t
+
+/-- Runs on the interop thread: kind 2 calls a Lean function as a task, kind 3
+forgets a function JavaScript no longer references. -/
+private def dispatch (kind : UInt8) (fn : UInt32) (call : UInt64) (bytes : ByteArray) : IO Unit := do
+  if kind == 3 then
+    registry.modify fun r => { r with asyncFns := r.asyncFns.erase fn, syncFns := r.syncFns.erase fn }
+  else
+    let f? := (← registry.get).asyncFns[fn]?
+    match f? with
+    | none => reply call (.error (IO.userError "Lasm.JS: the Lean function was released"))
+    | some f => discard <| BaseIO.asTask (runCall call f bytes)
+
+/-- Returns the reply and the data it mentions, which the C glue keeps alive until
+Node's main thread has read the reply. -/
+private def syncDispatch (fn : UInt32) (bytes : ByteArray) : IO (ByteArray × Data) := do
+  let result ← (do
+    let some f := (← registry.get).syncFns[fn]?
+      | throw (IO.userError "Lasm.JS: the Lean function was released")
+    f (← argsOf bytes)).toBaseIO
+  return match result with
+    | .ok d => (ByteArray.mk #[0] ++ Wire.encode d, d)
+    | .error e => (ByteArray.mk #[1] ++ (errorText e).toUTF8, .undefined)
+
+private def ensureStarted : IO Unit := startThread dispatch
+
+/-! Waiting for JavaScript -/
+
+/-- Monads in which Lean code waits for JavaScript promises (`callAwait`,
+`callMethodAwait`, `Value.await`). In `Async`, and monads that `Async` lifts
+into, waiting holds no Lean thread: the rest of the computation runs when the
+promise settles, so thousands of calls can wait at once. In `IO` (and other
+monads `IO` lifts into) the calling Lean thread blocks until the promise
+settles, which suits scripts; there are only about as many Lean threads as CPUs. -/
+class MonadJS (m : Type → Type) where
+  /-- `blocking` where only `IO` lifts into `m`, `nonblocking` where `Async` does. -/
+  awaitWith {α : Type} (blocking : IO α) (nonblocking : Async α) : m α
+
+instance [MonadLiftT Async m] : MonadJS m := ⟨fun _ a => monadLift a⟩
+instance (priority := low) [MonadLiftT IO m] : MonadJS m := ⟨fun b _ => monadLift b⟩
+
+/-- Continues when the host resolves `p`, holding no Lean thread meanwhile. -/
+private def awaitBytes (p : IO.Promise (Except String ByteArray)) : Async ByteArray :=
+  EAsync.ofTask <| ExceptT.mk <| p.result?.map (sync := true) fun
+    | some (.ok bytes) => .ok bytes
+    | some (.error message) => .error (IO.userError message)
+    | none => .error (IO.userError "Lasm.JS: a JavaScript result was lost (internal error)")
+
+/-- Host call `op` (205 a call, 214 a binding) whose result, once settled,
+resolves a Lean promise that the computation then continues from. -/
+private def callAsync (α : Type) [FromJS α] (context : String) (op : UInt32) (flags : UInt64) (payload : Data)
+    (failurePrefix : String := "") : Async α := do
+  ensureStarted
+  let p : IO.Promise (Except String ByteArray) ← IO.Promise.new
+  let settled : Async ByteArray := do
+    hostCallInto p op 0 flags (Wire.encode payload) payload
+    awaitBytes p
+  let bytes ← if failurePrefix.isEmpty then settled
+    else try settled catch e => throw (IO.userError s!"{failurePrefix}{e}")
+  decodeAs α context (← Wire.decode bytes)
+
 /-! Values and calls -/
 
 private def modeArg (m : Mode) : UInt64 := if m == .reference then 1 else 0
@@ -328,99 +452,32 @@ private def flags (α : Type) [FromJS α] (await : Bool) (extra : UInt64) : UInt
 def call (f : Value) (args : Array Data := #[]) (α : Type := Value) [FromJS α] (this : Data := .undefined) : IO α := do
   receive α "call" (← invokeRaw (.ref f "") this args (flags α false 0))
 
-/-- `await f(...args)`: blocks the calling Lean thread until a returned promise settles. -/
-def callAwait (f : Value) (args : Array Data := #[]) (α : Type := Data) [FromJS α] (this : Data := .undefined) : IO α := do
-  receive α "call" (← invokeRaw (.ref f "") this args (flags α true 0))
+/-- `await f(...args)`. In `Async` the Lean computation continues when the
+promise settles, holding no Lean thread; in `IO` the calling thread waits. -/
+def callAwait [MonadJS m] (f : Value) (args : Array Data := #[]) (α : Type := Data) [FromJS α] (this : Data := .undefined) : m α :=
+  MonadJS.awaitWith
+    (do receive α "call" (← invokeRaw (.ref f "") this args (flags α true 0)))
+    (callAsync α "call" 205 (flags α false 0) (.array #[.ref f "", this, .array args]))
 
 /-- `o.name(...args)`. A returned promise is not awaited (see `callMethodAwait`). -/
 def callMethod (o : Value) (name : String) (args : Array Data := #[]) (α : Type := Value) [FromJS α] : IO α := do
   receive α s!"method {name}" (← invokeRaw (.ref o "") (.string name) args (flags α false 8))
 
-/-- `await o.name(...args)`. -/
-def callMethodAwait (o : Value) (name : String) (args : Array Data := #[]) (α : Type := Data) [FromJS α] : IO α := do
-  receive α s!"method {name}" (← invokeRaw (.ref o "") (.string name) args (flags α true 8))
+/-- `await o.name(...args)`. In `Async` the Lean computation continues when the
+promise settles, holding no Lean thread; in `IO` the calling thread waits. -/
+def callMethodAwait [MonadJS m] (o : Value) (name : String) (args : Array Data := #[]) (α : Type := Data) [FromJS α] : m α :=
+  MonadJS.awaitWith
+    (do receive α s!"method {name}" (← invokeRaw (.ref o "") (.string name) args (flags α true 8)))
+    (callAsync α s!"method {name}" 205 (flags α false 8) (.array #[.ref o "", .string name, .array args]))
 
 /-- `new C(...args)`. -/
 def new (c : Value) (args : Array Data := #[]) (α : Type := Value) [FromJS α] : IO α := do
   receive α "new" (← invokeRaw (.ref c "") .undefined args (flags α false 4))
 
-end Value
-
-/-! Promises, callbacks and the interop thread -/
-
-/-- What an asynchronous Lean function (`Function.ofFnReply`) answers JavaScript
-with: a value, or a method call that the host makes on Node's main thread as part
-of the reply, resolving the JavaScript promise with its result. A handler that
-ends with `res.json(body)` or `c.json(body)` saves one host round trip this way. -/
-inductive Function.Reply where
-  | value (result : Data)
-  | callMethod (target : Value) (name : String) (args : Array Data)
-
-private structure Registry where
-  next : UInt32 := 1
-  asyncFns : Std.HashMap UInt32 (Array Data → IO Function.Reply) := {}
-  syncFns : Std.HashMap UInt32 (Array Data → IO Data) := {}
-
-private instance : Nonempty Registry := ⟨{}⟩
-
-private initialize registry : IO.Ref Registry ← IO.mkRef {}
-
-@[extern "lasm_js_start"] private opaque startThread (dispatch : UInt8 → UInt32 → UInt64 → ByteArray → IO Unit) : IO Unit
-@[extern "lasm_js_await_into"] private opaque awaitInto (p : @& IO.Promise (Except String ByteArray)) (value : @& ByteArray) (keep : @& Data) : IO Unit
-@[extern "lasm_js_sync_start"] private opaque startSync (dispatch : UInt32 → ByteArray → IO (ByteArray × Data)) : IO Unit
-
-private def errorText (e : IO.Error) : String := toString e
-
-private def reply (call : UInt64) (result : Except IO.Error Function.Reply) : IO Unit := do
-  -- Status 0 a value, 1 a Lean error (message), 2 a method call [target, name, args].
-  let (failed, payload, keep) : UInt8 × ByteArray × Data := match result with
-    | .ok (.value d) => (0, Wire.encode d, d)
-    | .ok (.callMethod target name args) =>
-      let d : Data := .array #[.ref target "", .string name, .array args]
-      (2, Wire.encode d, d)
-    | .error e => (1, (errorText e).toUTF8, .undefined)
-  let mut b := ByteArray.empty
-  for i in [0:8] do b := b.push (call >>> (8 * i).toUInt64).toUInt8
-  b := b.push failed
-  let n := payload.size.toUInt32
-  b := b.push n.toUInt8 |>.push (n >>> 8).toUInt8 |>.push (n >>> 16).toUInt8 |>.push (n >>> 24).toUInt8
-  discard <| hostCallKeep 208 0 0 (b ++ payload) keep
-
-private def argsOf (bytes : ByteArray) : IO (Array Data) := do
-  match ← Wire.decode bytes with
-  | .array xs => pure xs
-  | d => pure #[d]
-
-/-- Runs on the interop thread: kind 2 calls a Lean function as a task, kind 3
-forgets a function JavaScript no longer references. -/
-private def dispatch (kind : UInt8) (fn : UInt32) (call : UInt64) (bytes : ByteArray) : IO Unit := do
-  if kind == 3 then
-    registry.modify fun r => { r with asyncFns := r.asyncFns.erase fn, syncFns := r.syncFns.erase fn }
-  else
-    let f? := (← registry.get).asyncFns[fn]?
-    match f? with
-    | none => reply call (.error (IO.userError "Lasm.JS: the Lean function was released"))
-    | some f =>
-      discard <| IO.asTask do
-        let result ← (do f (← argsOf bytes)).toBaseIO
-        discard <| (reply call result).toBaseIO
-
-/-- Returns the reply and the data it mentions, which the C glue keeps alive until
-Node's main thread has read the reply. -/
-private def syncDispatch (fn : UInt32) (bytes : ByteArray) : IO (ByteArray × Data) := do
-  let result ← (do
-    let some f := (← registry.get).syncFns[fn]?
-      | throw (IO.userError "Lasm.JS: the Lean function was released")
-    f (← argsOf bytes)).toBaseIO
-  return match result with
-    | .ok d => (ByteArray.mk #[0] ++ Wire.encode d, d)
-    | .error e => (ByteArray.mk #[1] ++ (errorText e).toUTF8, .undefined)
-
-private def ensureStarted : IO Unit := startThread dispatch
-
-/-- Resolves when a JavaScript value settles: a promise (or any thenable)
-becomes its result, any other value is itself. Does not block a Lean thread. -/
-def Value.toTask (v : Value) (α : Type := Data) [FromJS α] : IO (Task (Except IO.Error α)) := do
+/-- A Lean task that finishes when a JavaScript value settles: a promise (or any
+thenable) becomes its result, any other value is itself. Does not block a Lean
+thread. -/
+def toTask (v : Value) (α : Type := Data) [FromJS α] : IO (Task (Except IO.Error α)) := do
   ensureStarted
   let p ← IO.Promise.new
   awaitInto p (Wire.encode (.ref v "")) (.ref v "")
@@ -428,37 +485,47 @@ def Value.toTask (v : Value) (α : Type := Data) [FromJS α] : IO (Task (Except 
     | .ok bytes => do decodeAs α "await" (← Wire.decode bytes)
     | .error message => throw (IO.userError message)
 
-/-- Blocks the calling Lean thread until a JavaScript promise settles. -/
-def Value.await (v : Value) (α : Type := Data) [FromJS α] : IO α := do
-  IO.ofExcept (← IO.wait (← v.toTask (α := α)))
+/-- `await v`: a promise (or any thenable) becomes its result, any other value is
+itself. In `Async` the Lean computation continues when it settles, holding no
+Lean thread; in `IO` the calling thread waits. -/
+def await [MonadJS m] (v : Value) (α : Type := Data) [FromJS α] : m α :=
+  MonadJS.awaitWith
+    (do IO.ofExcept (← IO.wait (← v.toTask (α := α))))
+    (do
+      ensureStarted
+      let p : IO.Promise (Except String ByteArray) ← IO.Promise.new
+      awaitInto p (Wire.encode (.ref v "")) (.ref v "")
+      decodeAs α "await" (← Wire.decode (← awaitBytes p)))
+
+end Value
 
 namespace Function
 
 private def register (synchronous : Bool) (f : Array Data → IO Data) : IO UInt32 :=
   registry.modifyGet fun r =>
     let id := r.next
-    let r' : Registry := if synchronous then { r with syncFns := r.syncFns.insert id f }
-      else { r with asyncFns := r.asyncFns.insert id fun args => Function.Reply.value <$> f args }
-    (id, { r' with next := id + 1 })
+    (id, { r with syncFns := if synchronous then r.syncFns.insert id f else r.syncFns, next := id + 1 })
 
-private def registerReply (f : Array Data → IO Function.Reply) : IO UInt32 :=
+private def registerReply (f : Array Data → Async Function.Reply) : IO UInt32 :=
   registry.modifyGet fun r =>
     let id := r.next
     (id, { r with asyncFns := r.asyncFns.insert id f, next := id + 1 })
 
 /-- A JavaScript function that calls `f` and returns a promise of its result.
-Each call runs as a Lean task (so `f` may block on other JavaScript calls);
-a Lean error rejects the promise with an `Error`. -/
-def ofFn (f : Array Data → IO Data) : IO Value := do
+Each call runs as a Lean task; while `f` awaits JavaScript (`callMethodAwait`,
+`Value.await`, an `Async` binding) it holds no Lean thread, so any number of
+calls can wait at once. `IO` actions run inside `f` unchanged. A Lean error
+rejects the promise with an `Error`. -/
+def ofFn (f : Array Data → Async Data) : IO Value := do
   ensureStarted
-  let id ← register false f
+  let id ← registerReply fun args => Function.Reply.value <$> f args
   decodeAs Value "Function.ofFn" (← Wire.decode (← hostCall 210 id 1 .empty))
 
 /-- `ofFn` whose result may be a method call made by the host as part of the
 reply (`Function.Reply.callMethod res "json" #[body]`), one host round trip fewer than
 calling the method and then returning. The JavaScript promise resolves with the
 method's result (awaited if it is a promise); if the method throws, it rejects. -/
-def ofFnReply (f : Array Data → IO Function.Reply) : IO Value := do
+def ofFnReply (f : Array Data → Async Function.Reply) : IO Value := do
   ensureStarted
   let id ← registerReply f
   decodeAs Value "Function.ofFnReply" (← Wire.decode (← hostCall 210 id 1 .empty))
@@ -479,10 +546,10 @@ private def argument (α : Type) [FromJS α] (args : Array Data) (i : Nat) : IO 
   decodeAs α s!"callback argument {i + 1}" (args[i]?.getD .undefined)
 
 /-- `ofFn` for a one-argument function with typed conversions. -/
-def ofFn1 [FromJS α] [ToJS β] (f : α → IO β) : IO Value :=
+def ofFn1 [FromJS α] [ToJS β] (f : α → Async β) : IO Value :=
   ofFn fun args => do return toJS (← f (← argument α args 0))
 /-- `ofFn` for a two-argument function with typed conversions. -/
-def ofFn2 [FromJS α] [FromJS β] [ToJS γ] (f : α → β → IO γ) : IO Value :=
+def ofFn2 [FromJS α] [FromJS β] [ToJS γ] (f : α → β → Async γ) : IO Value :=
   ofFn fun args => do return toJS (← f (← argument α args 0) (← argument β args 1))
 /-- `ofSyncFn` for a two-argument function with typed conversions. -/
 def ofSyncFn2 [FromJS α] [FromJS β] [ToJS γ] (f : α → β → IO γ) : IO Value :=
@@ -490,7 +557,7 @@ def ofSyncFn2 [FromJS α] [FromJS β] [ToJS γ] (f : α → β → IO γ) : IO V
 
 end Function
 
-/-! Typed bindings: `@[js "module" "export"] opaque f : A → B → IO C` (macro in
+/-! Typed bindings: `@[js "module" "export"] opaque f : A → B → Async C` (macro in
 Lasm.JS.Meta) defines `f` with `Bindable.bind`; the glue comes from the type. -/
 
 /-- One JavaScript export bound to a Lean declaration. `path` is the export
@@ -504,18 +571,30 @@ structure Binding where
   arity : Nat
   deriving Repr
 
+private def Binding.context (b : Binding) : String :=
+  s!"binding {b.name} ({b.module}{if b.path.isEmpty then "" else " " ++ b.path})"
+
+private def Binding.payload (b : Binding) (args : Array Data) : Data :=
+  .array #[.string b.name, .string b.module, .string b.path, .array args]
+
 /-- Calls the bound export with `args`. With `await`, a returned promise is
 awaited (blocking the calling Lean thread). Errors name the binding. -/
 def Binding.invoke (α : Type) [FromJS α] (b : Binding) (args : Array Data) (await : Bool := true) : IO α := do
   let flags := modeArg (FromJS.mode α) ||| (if await then 2 else 0) ||| (if b.construct then 4 else 0)
-  let context := s!"binding {b.name} ({b.module}{if b.path.isEmpty then "" else " " ++ b.path})"
-  let bytes ← try hostCallWith 214 flags (.array #[.string b.name, .string b.module, .string b.path, .array args])
-    catch e => throw (IO.userError s!"Lasm.JS {context}: {e}")
-  decodeAs α context (← Wire.decode bytes)
+  let bytes ← try hostCallWith 214 flags (b.payload args)
+    catch e => throw (IO.userError s!"Lasm.JS {b.context}: {e}")
+  decodeAs α b.context (← Wire.decode bytes)
+
+/-- Calls the bound export with `args` and continues when its result settles,
+holding no Lean thread meanwhile. Errors name the binding. -/
+def Binding.invokeAsync (α : Type) [FromJS α] (b : Binding) (args : Array Data) : Async α :=
+  callAsync α b.context 214 (modeArg (FromJS.mode α) ||| (if b.construct then 4 else 0)) (b.payload args)
+    (failurePrefix := s!"Lasm.JS {b.context}: ")
 
 /-- Lean function types a binding can have: arguments with `ToJS`, ending in
-`IO β` (the result, awaited if it is a promise) or `IO (Task (Except IO.Error β))`
-(not awaited on the calling thread), with `FromJS β`. -/
+`Async β` (a returned promise is awaited without holding a Lean thread), `IO β`
+(awaited by blocking the calling Lean thread) or `IO (Task (Except IO.Error β))`
+(not awaited), with `FromJS β`. -/
 class Bindable (α : Type) where
   arity : Nat
   bind : Binding → Array Data → α
@@ -528,6 +607,9 @@ instance (priority := high) [FromJS β] : Bindable (IO (Task (Except IO.Error β
 instance [FromJS β] : Bindable (IO β) where
   arity := 0
   bind b args := b.invoke β args
+instance [FromJS β] : Bindable (Async β) where
+  arity := 0
+  bind b args := b.invokeAsync β args
 instance [ToJS α] [Bindable β] : Bindable (α → β) where
   arity := Bindable.arity β + 1
   bind b args := fun a => Bindable.bind b (args.push (toJS a))
