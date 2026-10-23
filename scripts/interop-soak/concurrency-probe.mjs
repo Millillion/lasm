@@ -81,7 +81,9 @@ export async function probe(main, { requests = 1000, ms = 100, rounds = 3, cpus 
     // Warm-up, not counted: opens the keep-alive connections the rounds reuse
     // (so a small accept backlog, as on macOS, does not count) and warms the JIT,
     // Lean's worker pool and libuv.
-    agent = new http.Agent({ keepAlive: true, maxSockets: requests });
+    // maxFreeSockets: keep every warm connection (the default keeps 256 and
+    // closes the rest, whose reconnects then hit macOS's 128-entry backlog).
+    agent = new http.Agent({ keepAlive: true, maxSockets: requests, maxFreeSockets: requests });
     const warm = await burst(port, { requests, ms: 1, agent });
     assert.equal(warm.ok, requests, JSON.stringify(warm));
     result.warmup = { totalMs: warm.totalMs, ok: warm.ok };
