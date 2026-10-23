@@ -7,9 +7,11 @@ import { parseLasmArguments } from '../src/cli-arguments.mjs';
 import { initProject, lakeName, packageName, templates } from '../src/init.mjs';
 
 test('lasm init arguments', () => {
-  assert.deepEqual(parseLasmArguments(['init', 'my-app']), { command: 'init', template: 'plain', directory: 'my-app' });
-  assert.deepEqual(parseLasmArguments(['init', 'my-app', '--template', 'hono']), { command: 'init', template: 'hono', directory: 'my-app' });
-  assert.deepEqual(parseLasmArguments(['init', '-t=std-http', 'x']), { command: 'init', template: 'std-http', directory: 'x' });
+  assert.deepEqual(parseLasmArguments(['init', 'my-app']), { command: 'init', template: 'plain', deploy: [], directory: 'my-app' });
+  assert.deepEqual(parseLasmArguments(['init', 'my-app', '--template', 'hono']), { command: 'init', template: 'hono', deploy: [], directory: 'my-app' });
+  assert.deepEqual(parseLasmArguments(['init', '-t=std-http', 'x', '--deploy', 'lambda']), { command: 'init', template: 'std-http', deploy: ['lambda'], directory: 'x' });
+  assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'lambda']), /needs a server template/);
+  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel']), /--deploy accepts lambda/);
   assert.deepEqual(parseLasmArguments(['init', '--help']), { command: 'init-help' });
   assert.throws(() => parseLasmArguments(['init']), /Usage: lasm init/);
   assert.throws(() => parseLasmArguments(['init', 'a', 'b']), /Usage: lasm init/);
@@ -48,6 +50,13 @@ test('every template creates a complete project', () => {
       assert.equal(read('Main.lean').includes('import Lasm.JS'), templates[template].interop);
       assert.match(read('.gitignore'), /^dist\/$/m);
     }
+    const lambda = join(root, 'lambda');
+    assert.ok(initProject({ directory: lambda, template: 'hono', deploy: ['lambda'] }).files.includes('Dockerfile.lambda'));
+    const recipe = readFileSync(join(lambda, 'Dockerfile.lambda'), 'utf8');
+    assert.match(recipe, /^FROM public\.ecr\.aws\/lambda\/nodejs:24$/m);
+    assert.match(recipe, /AWS_LWA_READINESS_CHECK_PATH=\/health/);
+    assert.match(recipe, /printf '#!\/bin\/sh\\nexec node "\$LAMBDA_TASK_ROOT\/main\.mjs"\\n'/);
+    assert.match(readFileSync(join(lambda, 'README.md'), 'utf8'), /Dockerfile\.lambda/);
     // Never overwrite: a non-empty directory is refused; an empty one (or only .git) is used.
     assert.throws(() => initProject({ directory: join(root, 'app plain'), template: 'plain' }), /is not empty/);
     mkdirSync(join(root, 'empty', '.git'), { recursive: true });

@@ -183,7 +183,9 @@ on the architecture you deploy to; for amd64-only platforms on an ARM Mac, use
 `docker build --platform linux/amd64 -t my-app .`.
 
 Recipes for each launch platform: [deployment guides](deploy/README.md)
-(Docker and Kubernetes, Google Cloud Run, Fly.io, Railway, Render, Heroku).
+(Docker and Kubernetes, Google Cloud Run, Fly.io, Railway, Render, Heroku, and
+AWS Lambda as a container image: create the project with `--deploy lambda` to
+get a `Dockerfile.lambda`, see [lambda.md](deploy/lambda.md)).
 
 ## Which HTTP server to use
 

@@ -79,6 +79,42 @@ function waitForLine(child, pattern, timeoutMs, output) {
   });
 }
 
+/** Dockerfile.lambda: build, run with the image's Runtime Interface Emulator, invoke. */
+async function checkLambda(app, template) {
+  const image = `lasm-template-${template}-lambda:test`, name = `lasm-template-${template}-lambda-${process.pid}`;
+  run(`${template}: docker build Dockerfile.lambda`, ['docker'], ['build', '--progress=plain', '-f', 'Dockerfile.lambda', '-t', image, '.'], app);
+  const port = await freePort();
+  run(`${template}: docker run (Lambda emulator)`, ['docker'], ['run', '-d', '--name', name, '--memory=512m', '--read-only', '--tmpfs', '/tmp',
+    '-p', `127.0.0.1:${port}:8080`, image], app);
+  const invoke = async (method, path, body) => {
+    const event = { version: '2.0', routeKey: '$default', rawPath: path, rawQueryString: '',
+      headers: { host: 'localhost', ...(body ? { 'content-type': 'application/json' } : {}) },
+      requestContext: { http: { method, path, protocol: 'HTTP/1.1', sourceIp: '127.0.0.1', userAgent: 'lasm-ci' },
+        requestId: String(Date.now()), routeKey: '$default', stage: '$default', timeEpoch: Date.now() },
+      body: body ? JSON.stringify(body) : undefined, isBase64Encoded: false };
+    const response = await fetch(`http://127.0.0.1:${port}/2015-03-31/functions/function/invocations`,
+      { method: 'POST', body: JSON.stringify(event), signal: AbortSignal.timeout(60_000) });
+    const reply = JSON.parse(await response.text());
+    const text = reply.isBase64Encoded ? Buffer.from(reply.body, 'base64').toString() : reply.body;
+    return { statusCode: reply.statusCode, body: text };
+  };
+  try {
+    let hello;
+    for (let i = 0; i < 30 && hello?.statusCode !== 200; i++) {
+      try { hello = await invoke('GET', '/hello/Ada'); } catch (error) { hello = { error: error.message }; await new Promise(d => setTimeout(d, 1000)); }
+    }
+    assert.equal(hello.statusCode, 200, `${template} Lambda: ${JSON.stringify(hello)}`);
+    assert.deepEqual(JSON.parse(hello.body), { message: 'Hello, Ada, from Lean!' });
+    const echo = await invoke('POST', '/echo', { n: 1 });
+    assert.equal(echo.statusCode, 200, JSON.stringify(echo));
+    assert.deepEqual(JSON.parse(echo.body), { echo: { n: 1 } });
+    return { ok: true, hello, echo };
+  } finally {
+    spawnSync('docker', ['logs', name], { encoding: 'utf8' });
+    spawnSync('docker', ['rm', '-f', name]);
+  }
+}
+
 const framework = { express: 'Express', hono: 'Hono', 'std-http': 'Std.Http' };
 assert.ok(templates.every(t => t === 'plain' || t === 'guide' || framework[t]), `Unknown template in ${templates}`);
 
@@ -95,10 +131,12 @@ try {
     const guide = template === 'guide';
     const base = guide ? 'hono' : template;
     const app = join(work, `${template} app λ`);
+    // With --docker, server templates also get and test the Lambda image.
+    const lambda = docker && base !== 'plain' ? ['--deploy', 'lambda'] : [];
     // LASM_INIT_FROM_SOURCE=1 takes `lasm init` from this checkout (local runs with an older candidate).
     if (process.env.LASM_INIT_FROM_SOURCE === '1')
-      run(`lasm init ${template} (source)`, [process.execPath], [fileURLToPath(new URL('../../bin/lasm.mjs', import.meta.url)), 'init', app, '--template', base], cli);
-    else run(`lasm init ${base}`, npx, ['lasm', 'init', app, '--template', base], cli);
+      run(`lasm init ${template} (source)`, [process.execPath], [fileURLToPath(new URL('../../bin/lasm.mjs', import.meta.url)), 'init', app, '--template', base, ...lambda], cli);
+    else run(`lasm init ${base}`, npx, ['lasm', 'init', app, '--template', base, ...lambda], cli);
     for (const file of ['lakefile.toml', 'lean-toolchain', 'package.json', 'Main.lean', 'App.lean', 'README.md', 'Dockerfile', '.gitignore', '.dockerignore'])
       assert.ok(existsSync(join(app, file)), `${template}: missing ${file}`);
     // A local copy keeps the dependency inside the Docker build context.
@@ -188,6 +226,7 @@ try {
           entry.dockerLogs = spawnSync('docker', ['logs', name], { encoding: 'utf8' }).stdout?.slice(-2000);
           spawnSync('docker', ['rm', '-f', name]);
         }
+        entry.lambda = await checkLambda(app, template);
       }
     }
     entry.ok = true; save();

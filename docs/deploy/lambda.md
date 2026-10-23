@@ -17,8 +17,11 @@ through the image's built-in Runtime Interface Emulator with API Gateway HTTP AP
 
 ## From a `lasm init` project
 
-Replace the template's `Dockerfile` with this one. The first stage is the
-template's (tested by the template CI); the second is the tested recipe's.
+`lasm init my-app --template hono --deploy lambda` (any server template) writes
+this file as `Dockerfile.lambda` next to the ordinary `Dockerfile`; build it with
+`docker build -f Dockerfile.lambda -t my-app .`. The first stage is the template's;
+the second is the tested recipe's. The template CI builds it for every server
+template on Linux x64 and arm64 and invokes it through the emulator.
 
 ```dockerfile
 FROM node:24-trixie AS build

@@ -20,11 +20,13 @@ export const templates = {
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
 };
 
-export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}]
+export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}] [--deploy lambda]
 
 Creates a Lean project for Lasm: lakefile, lean-toolchain, package.json,
 Main.lean, README.md, Dockerfile, .dockerignore and .gitignore.
 The directory must be new or empty. The default template is plain.
+--deploy lambda also writes Dockerfile.lambda: an AWS Lambda container image
+(Lambda's Node 24 image behind the AWS Lambda Web Adapter; server templates).
 
 Templates:
 ${Object.entries(templates).map(([name, t]) => `  ${name.padEnd(9)} ${t.summary}`).join('\n')}
@@ -32,7 +34,7 @@ ${Object.entries(templates).map(([name, t]) => `  ${name.padEnd(9)} ${t.summary}
 Example: npx @lasm/cli init my-app --template hono`;
 
 export function parseInitArguments(tokens) {
-  const result = { command: 'init', template: 'plain' };
+  const result = { command: 'init', template: 'plain', deploy: [] };
   const positional = [];
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
@@ -43,12 +45,21 @@ export function parseInitArguments(tokens) {
       if (!value || value.startsWith('-')) throw new Error('--template requires a value\n\n' + initUsage);
       result.template = value; continue;
     }
+    const deploy = /^--deploy(?:=(.*))?$/.exec(token);
+    if (deploy) {
+      const value = deploy[1] ?? tokens[++i];
+      if (value !== 'lambda') throw new Error('--deploy accepts lambda\n\n' + initUsage);
+      if (!result.deploy.includes(value)) result.deploy.push(value);
+      continue;
+    }
     if (token.startsWith('-')) throw new Error(`Unknown lasm init option: ${token}\n\n${initUsage}`);
     positional.push(token);
   }
   if (positional.length !== 1) throw new Error(initUsage);
   if (!templates[result.template])
     throw new Error(`Unknown template "${result.template}". Choose one of: ${Object.keys(templates).join(', ')}`);
+  if (result.deploy.includes('lambda') && !templates[result.template].server)
+    throw new Error(`--deploy lambda needs a server template (express, hono or std-http), not ${result.template}`);
   result.directory = positional[0];
   return result;
 }
@@ -137,6 +148,33 @@ EXPOSE 8080
 `;
 }
 
+// AWS Lambda: the template's build stage plus the tested recipe of
+// deploy/lambda/Dockerfile and docs/deploy/lambda.md (Phase 5.1).
+function lambdaDockerfile() {
+  return `# syntax=docker/dockerfile:1
+# AWS Lambda container image: Lambda's managed Node 24 image, with the AWS Lambda
+# Web Adapter forwarding each invocation to the server's HTTP port.
+#   docker build --platform linux/amd64 -f Dockerfile.lambda -t my-app-lambda .
+# Give the function at least 512 MB of memory. See docs/deploy/lambda.md.
+
+FROM node:24-trixie AS build
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+COPY . .
+RUN --mount=type=cache,target=/root/.cache/lasm npx lasm build Main.lean --output dist
+
+FROM public.ecr.aws/lambda/nodejs:24
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0 /lambda-adapter /opt/extensions/lambda-adapter
+COPY --from=build /app/dist \${LAMBDA_TASK_ROOT}/
+RUN printf '#!/bin/sh\\nexec node "$LAMBDA_TASK_ROOT/main.mjs"\\n' > /opt/lasm-start && chmod 755 /opt/lasm-start
+# The server listens on PORT (not 8080: the local emulator uses it); the adapter
+# forwards requests once GET /health answers.
+ENV AWS_LAMBDA_EXEC_WRAPPER=/opt/lasm-start PORT=3000 AWS_LWA_PORT=3000 AWS_LWA_READINESS_CHECK_PATH=/health
+CMD ["main.mjs"]
+`;
+}
+
 const gitignore = `node_modules/
 dist/
 .lake/
@@ -148,7 +186,7 @@ dist
 .git
 `;
 
-function readme(name, template) {
+function readme(name, template, deploy) {
   const t = templates[template];
   const lasm = lasmPackage();
   const tryIt = template === 'plain'
@@ -218,7 +256,11 @@ docker run --rm ${t.server ? '-p 8080:8080 ' : ''}${name}
 
 The image sets \`PORT=8080\`; platforms that assign a port override it.` : ''}
 
-The image runs on any container platform (Docker, Kubernetes, Cloud Run, Fly.io,
+${deploy.includes('lambda') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image behind the
+AWS Lambda Web Adapter): \`docker build -f Dockerfile.lambda -t ${name}-lambda .\`; see the
+[Lambda guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md).
+
+` : ''}The image runs on any container platform (Docker, Kubernetes, Cloud Run, Fly.io,
 Railway, Render, Heroku); give it at least 512 MB of memory. Build on the
 platform's architecture (\`docker build --platform linux/amd64\` for amd64-only
 platforms). Platform recipes: [Lasm deployment guides](https://github.com/Millillion/lasm/blob/main/docs/deploy/README.md).
@@ -226,7 +268,7 @@ platforms). Platform recipes: [Lasm deployment guides](https://github.com/Millil
 }
 
 /** Creates the project; returns { directory, files }. */
-export function initProject({ directory, template }) {
+export function initProject({ directory, template, deploy = [] }) {
   if (!templates[template]) throw new Error(`Unknown template "${template}"`);
   const target = resolve(directory);
   if (existsSync(target)) {
@@ -240,11 +282,12 @@ export function initProject({ directory, template }) {
     'package.json': packageJson(name, template),
     'App.lean': readFileSync(join(templateRoot, 'common/App.lean'), 'utf8'),
     'Main.lean': readFileSync(join(templateRoot, template, 'Main.lean'), 'utf8'),
-    'README.md': readme(name, template),
+    'README.md': readme(name, template, deploy),
     'Dockerfile': dockerfile(template),
     '.dockerignore': dockerignore,
     '.gitignore': gitignore,
   };
+  if (deploy.includes('lambda')) files['Dockerfile.lambda'] = lambdaDockerfile();
   mkdirSync(target, { recursive: true });
   for (const [file, text] of Object.entries(files)) writeFileSync(join(target, file), text, { flag: 'wx' });
   return { directory: target, name, files: Object.keys(files) };
@@ -252,7 +295,8 @@ export function initProject({ directory, template }) {
 
 export function runInit(options) {
   const result = initProject(options);
-  const where = relative(process.cwd(), result.directory) || '.';
+  const near = relative(process.cwd(), result.directory) || '.';
+  const where = near.startsWith('..') ? result.directory : near;
   const cd = where === '.' ? '' : `  cd ${/\s/.test(where) ? JSON.stringify(where) : where}\n`;
   console.log(`Created ${result.name} (template ${options.template}) in ${where}:
   ${result.files.join(', ')}
