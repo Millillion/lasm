@@ -4,7 +4,7 @@
 // package to an exact version and carries src/npm-tools.json. Never publishes.
 //
 //   node scripts/npm-dist/build.mjs --base CANDIDATE.tgz --out DIR --step plan [--overlay-source]
-//     [--scope @lasm] [--version V] [--no-git]
+//     [--scope @lasm] [--version V] [--license MIT] [--no-git]
 //   node scripts/npm-dist/build.mjs --out DIR --step package --only @lasm/lean-linux-x64 [--assets DIR] [--seed DIR]...
 //   node scripts/npm-dist/build.mjs --out DIR --step main
 // scripts/npm-dist/build-all.mjs runs every step, each in its own resource guard:
@@ -33,7 +33,7 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values: args } = parseArgs({ options: {
   step: { type: 'string' }, only: { type: 'string' },
   base: { type: 'string' }, out: { type: 'string' }, scope: { type: 'string', default: defaultScope },
-  version: { type: 'string' }, assets: { type: 'string', default: join(root, '.cache/npm-dist/assets') },
+  version: { type: 'string' }, license: { type: 'string' }, assets: { type: 'string', default: join(root, '.cache/npm-dist/assets') },
   seed: { type: 'string', multiple: true, default: [] }, 'overlay-source': { type: 'boolean', default: false },
   'no-git': { type: 'boolean', default: false },
 } });
@@ -64,7 +64,7 @@ if (args.step === 'plan') {
     platforms: support.platforms });
   const plan = { schema: 1, base: { file: resolve(args.base), sha256: await hashFile(resolve(args.base)), version: basePackage.version },
     lean: support.lean, platforms: support.platforms, scope: args.scope, overlaySource: args['overlay-source'],
-    main: { name: `${args.scope}/cli`, version: args.version ?? `${basePackage.version}.npm.1` },
+    main: { name: `${args.scope}/cli`, version: args.version ?? `${basePackage.version}.npm.1`, ...(args.license ? { license: args.license } : {}) },
     // The catalog this source pins, kept with the plan so later steps cannot drift.
     catalog: { toolchains: { ...catalogs.toolchains, defaultLean: support.lean, lean: { [support.lean]: catalogs.toolchains.lean[support.lean] } } },
     packages };
@@ -154,6 +154,8 @@ if (args.step === 'main') {
     overlay = { sourceRevision, uncommittedChanges };
     await writeFile(join(main, 'provenance.json'), JSON.stringify({ ...provenance, npmDistributionOverlay: overlay }, null, 2) + '\n');
   }
+  // A publication licence (for example --license MIT): the field, and this checkout's LICENSE text in the package.
+  if (plan.main.license) await copyFile(join(root, 'LICENSE'), join(main, 'LICENSE'));
   await writeFile(join(main, 'src/npm-tools.json'), JSON.stringify(npmToolManifest(plan.packages, packed), null, 2) + '\n');
   await writeFile(join(main, 'package.json'), JSON.stringify(mainPackageJson(basePackage, plan.packages, plan.main), null, 2) + '\n');
   const mainPacked = await packTwice(main, plan.main.name);

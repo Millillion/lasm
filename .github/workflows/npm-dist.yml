@@ -29,6 +29,10 @@ on:
         description: Version of the @lasm/cli package (default <candidate version>.npm.1)
         type: string
         default: ''
+      license:
+        description: Licence of the @lasm/cli package (empty keeps the candidate's; MIT adds this checkout's LICENSE)
+        type: string
+        default: ''
       overlay-source:
         description: Replace the candidate's bin/ and src/ with this ref's (maintainer test package)
         type: boolean
@@ -89,14 +93,15 @@ jobs:
         env:
           OVERLAY: ${{ inputs.overlay-source && '--overlay-source' || '' }}
           CLI_VERSION: ${{ inputs.version }}
-        run: node scripts/npm-dist/build-all.mjs --base .work/npm-base/*.tgz --out .work/npm-dist/build $OVERLAY ${CLI_VERSION:+--version "$CLI_VERSION"} --memory-mib 2048
+          CLI_LICENSE: ${{ inputs.license }}
+        run: node scripts/npm-dist/build-all.mjs --base .work/npm-base/*.tgz --out .work/npm-dist/build $OVERLAY ${CLI_VERSION:+--version "$CLI_VERSION"} ${CLI_LICENSE:+--license "$CLI_LICENSE"} --memory-mib 2048
       - name: Start a loopback Verdaccio and publish to it
         run: |
           node scripts/npm-dist/registry.mjs start --dir "$RUNNER_TEMP/verdaccio" --port 4873
           node scripts/npm-dist/registry.mjs publish --dir "$RUNNER_TEMP/verdaccio" --dist .work/npm-dist/build
       - name: Install from the registry and build (empty caches, npm only, non-loopback requests blocked)
         run: |
-          for scenario in installed lake npx omit-optional foreign-lock; do
+          for scenario in installed lake npx init omit-optional foreign-lock; do
             node scripts/full-lean/run-bounded.mjs --memory-mib "$MEMORY" --report ".work/npm-consumer-$scenario-resources.json" -- \
               node scripts/npm-dist/consumer.mjs --registry http://127.0.0.1:4873/ --dist .work/npm-dist/build --work "$RUNNER_TEMP/consumer" --scenario "$scenario"
           done

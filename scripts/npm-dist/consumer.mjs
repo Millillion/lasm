@@ -9,6 +9,7 @@
 //   installed      npm install @lasm/cli@V in an empty project, then npx lasm Main.lean (empty Lasm cache)
 //   lake           a Lake project in the `installed` project (extended Lean tier and Git fetched on demand)
 //   npx            npx --yes @lasm/cli@V Main.lean in an empty directory (empty npm and Lasm caches)
+//   init           npx --yes @lasm/cli@V init app --template plain, then npm install, npm run build, node dist/main.mjs
 //   omit-optional  npm install --omit=optional: Lasm must fail with the exact fix; the fix must repair it
 //   foreign-lock   lockfile created for another OS (npm --os/--cpu), then npm ci on this host
 //   pnpm           pnpm add @lasm/cli@V (--pnpm path to the pnpm CLI script); package resolution only
@@ -141,6 +142,23 @@ if (args.scenario === 'npx') {
   report.build = result.seconds;
   report.receipts = receipts();
   assert.ok(report.receipts.every(r => r.source?.kind === 'npm-installed'), 'npx installed the platform packages too');
+}
+
+if (args.scenario === 'init') {
+  // The getting-started path after publication: scaffold with npx, install, build, run.
+  const directory = join(work, 'init-empty');
+  mkdirSync(directory, { recursive: true });
+  npxRun('npx --yes @lasm/cli init', ['--yes', spec, 'init', 'app', '--template', 'plain'], { cwd: directory });
+  const app = join(directory, 'app');
+  const manifest = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8'));
+  assert.deepEqual(manifest.devDependencies, { [record.main.name]: record.main.version }, 'lasm init pins the published CLI');
+  report.install = npmRun('npm install (initialized app)', ['install'], { cwd: app }).seconds;
+  report.build = npmRun('npm run build', ['run', 'build'], { cwd: app }).seconds;
+  const result = run('node dist/main.mjs Ada', process.execPath, [join(app, 'dist', 'main.mjs'), 'Ada'], { cwd: app });
+  assert.match(result.stdout, /Hello, Ada, from Lean!/);
+  report.receipts = receipts();
+  const kinds = new Set(report.receipts.map(r => r.source?.kind));
+  assert.ok(!kinds.has('https') && !kinds.has(undefined), 'Every tool came from npm');
 }
 
 if (args.scenario === 'omit-optional') {

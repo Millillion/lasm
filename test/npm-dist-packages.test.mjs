@@ -66,4 +66,8 @@ test('the runtime manifest and main package pin every tool package exactly', asy
   assert.ok(!Object.keys({ ...main.dependencies, ...main.optionalDependencies }).some(name => /ext-|git-/.test(name)),
     'On-demand packages are never installed by default');
   assert.throws(() => mainPackageJson({ ...base, dependencies: { tar: '^7.5.22' } }, packages, { name: 'x', version: '1.0.0' }), /exact versions/);
+  assert.equal(main.license, undefined, 'The base licence is kept unless one is given');
+  const licensed = mainPackageJson({ ...base, license: 'UNLICENSED', files: ['bin', 'src'] }, packages, { name: '@lasm/cli', version: '0.1.0', license: 'MIT' });
+  assert.equal(licensed.license, 'MIT');
+  assert.deepEqual(licensed.files, ['bin', 'src', 'LICENSE']);
 });

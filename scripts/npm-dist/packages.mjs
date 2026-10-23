@@ -103,10 +103,14 @@ export function npmToolManifest(packages, packed) {
 }
 
 /** Main package metadata: every tool package pinned to an exact version. */
-export function mainPackageJson(base, packages, { name, version }) {
+export function mainPackageJson(base, packages, { name, version, license }) {
   const pins = install => Object.fromEntries(packages.filter(p => p.install === install).map(p => [p.name, p.version]).sort());
   const result = { ...base, name, version };
   delete result.private;
+  if (license) {
+    result.license = license;
+    if (Array.isArray(result.files) && !result.files.includes('LICENSE')) result.files = [...result.files, 'LICENSE'];
+  }
   result.dependencies = Object.fromEntries(Object.entries({ ...base.dependencies, ...pins('required') }).sort());
   result.optionalDependencies = pins('optional');
   for (const value of [...Object.values(result.dependencies), ...Object.values(result.optionalDependencies)])
