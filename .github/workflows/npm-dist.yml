@@ -6,25 +6,33 @@ name: npm distribution (local registry)
 # Lasm tool cache, LASM_ARTIFACT_SOURCE=npm (no direct downloads) and a network
 # audit that blocks every non-loopback request. Nothing is published anywhere else.
 #
-# The packed input is the accepted Lean 4.34.1 candidate (its runtime, native
-# helpers and bundled installer dependencies), overlaid with this ref's bin/ and
-# src/ (scripts/npm-dist/build.mjs --overlay-source), so the npm source code is
-# exercised before a Lean 4.35 runtime candidate exists.
+# The packed input is a retained candidate (its runtime, native helpers and bundled
+# installer dependencies). Release mode (the default since Phase 5.3) packs the
+# candidate's own bin/ and src/, exactly what would be published; overlay-source
+# replaces them with this ref's (scripts/npm-dist/build.mjs --overlay-source).
 on:
   workflow_dispatch:
     inputs:
       base-release:
         description: Retained candidate release supplying the runtime
         type: string
-        default: node-linux-candidate-38930715033
+        default: node-linux-candidate-39988013618
       base-sha256:
         description: SHA-256 of its package tarball
         type: string
-        default: 99593d597804f05e489d1f9d7c2c3da985e67906b8dbb114b7cf6300f9765dc9
+        default: 281a2076b760f3332090e018e3fbf2744cc01c4d7491d09935d2524ea46afbcf
       node:
-        description: Node version the candidate requires
+        description: Node version for packing and the consumers
         type: string
-        default: 26.10.0
+        default: 26.12.1
+      version:
+        description: Version of the @lasm/cli package (default <candidate version>.npm.1)
+        type: string
+        default: ''
+      overlay-source:
+        description: Replace the candidate's bin/ and src/ with this ref's (maintainer test package)
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -78,7 +86,10 @@ jobs:
           gh release download "$BASE_RELEASE" --repo "$GITHUB_REPOSITORY" --dir .work/npm-base --pattern '*.tgz'
           node -e "const c=require('node:crypto'),f=require('node:fs'),[n]=f.readdirSync('.work/npm-base');const h=c.createHash('sha256').update(f.readFileSync('.work/npm-base/'+n)).digest('hex');if(h!==process.env.BASE_SHA256)throw new Error('candidate digest '+h);console.log(n,h)"
       - name: Build all packages (each step guarded; npm pack twice per package)
-        run: node scripts/npm-dist/build-all.mjs --base .work/npm-base/*.tgz --out .work/npm-dist/build --overlay-source --memory-mib 2048
+        env:
+          OVERLAY: ${{ inputs.overlay-source && '--overlay-source' || '' }}
+          CLI_VERSION: ${{ inputs.version }}
+        run: node scripts/npm-dist/build-all.mjs --base .work/npm-base/*.tgz --out .work/npm-dist/build $OVERLAY ${CLI_VERSION:+--version "$CLI_VERSION"} --memory-mib 2048
       - name: Start a loopback Verdaccio and publish to it
         run: |
           node scripts/npm-dist/registry.mjs start --dir "$RUNNER_TEMP/verdaccio" --port 4873
