@@ -29,12 +29,17 @@ currently restarts the interrupted artifact; it never trusts a partial tree.
 
 Defaults separate connection/header silence (60 seconds), body inactivity
 (120 seconds), and the overall archive budget including retries (two hours).
-Receiving data resets only the inactivity timer. The following environment
+Receiving data resets only the inactivity timer. Between attempts Lasm waits
+2 s, doubling to at most 60 s (75–100% jitter, or longer if the server sends
+`Retry-After`): about 2.3–3 minutes over the default eight attempts (current
+source; candidates up to Phase 4 made four attempts within about 10 seconds).
+Every HTTP 5xx, 408 and 429 and connection resets and timeouts are retried;
+other 4xx answers, certificate errors and checksum mismatches are not. The following environment
 variables can be set before invoking `npx lasm Main.lean`:
 
 | Variable | Default | Allowed range |
 | --- | --- | --- |
-| `LASM_DOWNLOAD_ATTEMPTS` | `4` | 1–10 attempts |
+| `LASM_DOWNLOAD_ATTEMPTS` | `8` | 1–20 attempts |
 | `LASM_DOWNLOAD_CONNECT_MS` | `60000` | 1000–600000 ms |
 | `LASM_DOWNLOAD_IDLE_MS` | `120000` | 1000–1800000 ms |
 | `LASM_DOWNLOAD_TOTAL_MS` | `7200000` | 1000–86400000 ms |

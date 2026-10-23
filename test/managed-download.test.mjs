@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
-import { downloadArtifact, downloadPolicy, transportDiagnostic } from '../src/managed-download.mjs';
+import { downloadArtifact, downloadPolicy, retryDelay, transportDiagnostic } from '../src/managed-download.mjs';
 
 const bytes = Buffer.from('a small but complete download');
 const artifact = { name: 'fixture', url: 'https://example.invalid/tool', bytes: bytes.length,
@@ -20,11 +20,11 @@ async function fixture(t) {
 }
 const failed = code => Object.assign(new Error('simulated connection failure'), { code });
 
-for (const status of [408, 429, 500, 502, 503, 504]) test(`recovers from HTTP ${status} within the attempt budget`, async t => {
+for (const status of [408, 429, 500, 502, 503, 504, 520, 599]) test(`recovers from HTTP ${status} within the attempt budget`, async t => {
   const f = await fixture(t); let requests = 0;
   await downloadArtifact(artifact, f.file, { ...f.options, fetch: async () => ++requests < 3
     ? new Response('', { status, headers: { 'retry-after': '2' } }) : new Response(bytes) });
-  assert.equal(requests, 3); assert.deepEqual(f.waits, [2000, 2000]);
+  assert.equal(requests, 3); assert.deepEqual(f.waits, [2000, 3000]); // Retry-After or the backoff, whichever is longer
   assert.deepEqual(await readFile(f.file), bytes);
   assert.equal(f.events.filter(e => e.type === 'failed-attempt').length, 2);
 });
@@ -38,11 +38,11 @@ for (const code of ['ECONNRESET', 'EAI_AGAIN', 'UND_ERR_SOCKET']) test(`recovers
   assert.equal(requests, 2);
 });
 
-for (const scenario of ['404', 'certificate', 'checksum', 'oversized', 'truncated', 'encoding']) test(`${scenario} is terminal`, async t => {
+for (const scenario of ['404', '400', '403', 'certificate', 'checksum', 'oversized', 'truncated', 'encoding']) test(`${scenario} is terminal`, async t => {
   const f = await fixture(t); let requests = 0;
   await assert.rejects(downloadArtifact(artifact, f.file, { ...f.options, fetch: async () => {
     requests++;
-    if (scenario === '404') return new Response('', { status: 404 });
+    if (/^\d+$/.test(scenario)) return new Response('', { status: Number(scenario) });
     if (scenario === 'certificate') throw new TypeError('fetch failed', { cause: failed('CERT_HAS_EXPIRED') });
     if (scenario === 'checksum') return new Response(Buffer.alloc(bytes.length));
     if (scenario === 'oversized') return new Response(Buffer.concat([bytes, bytes]));
@@ -50,6 +50,26 @@ for (const scenario of ['404', 'certificate', 'checksum', 'oversized', 'truncate
     return new Response(bytes, { headers: { 'content-encoding': 'gzip' } });
   } }));
   assert.equal(requests, 1); assert.deepEqual(f.waits, []);
+});
+
+test('default backoff rides out about 2-3 minutes of server errors', async t => {
+  const defaults = downloadPolicy({});
+  assert.equal(defaults.attempts, 8);
+  const total = random => Array.from({ length: defaults.attempts - 1 }, (_, i) => retryDelay(i + 1, () => random)).reduce((a, b) => a + b);
+  assert.deepEqual(Array.from({ length: 7 }, (_, i) => retryDelay(i + 1, () => 1)), [2000, 4000, 8000, 16000, 32000, 60000, 60000]);
+  assert.equal(total(0), 136_500); assert.equal(total(1), 182_000);
+  // Seven 502s in a row (a burst lasting minutes), then success, with the default policy.
+  const f = await fixture(t); let requests = 0;
+  await downloadArtifact(artifact, f.file, { ...f.options, policy: { ...defaults, totalMs: 600_000 }, fetch: async () => ++requests < 8
+    ? new Response('', { status: 502 }) : new Response(bytes) });
+  assert.equal(requests, 8);
+  assert.deepEqual(f.waits, [1500, 3000, 6000, 12000, 24000, 45000, 45000]);
+  assert.deepEqual(await readFile(f.file), bytes);
+  // Integrity is still checked after retries: a wrong archive after 502s is refused.
+  const g = await fixture(t); let calls = 0;
+  await assert.rejects(downloadArtifact(artifact, g.file, { ...g.options, policy: defaults, fetch: async () => ++calls < 3
+    ? new Response('', { status: 502 }) : new Response(Buffer.alloc(bytes.length)) }));
+  assert.equal(calls, 3);
 });
 
 test('exhausted retries preserve attempts and nested diagnostics', async t => {
@@ -139,7 +159,7 @@ test('redirects remain HTTPS, have no credentials, and are bounded', async t => 
 test('policy validates settings and diagnostics redact secrets', () => {
   assert.equal(downloadPolicy({}).totalMs, 7_200_000);
   assert.equal(downloadPolicy({ LASM_DOWNLOAD_ATTEMPTS: '2' }).attempts, 2);
-  for (const value of ['0', '11', '-1', '1.5', 'oops'])
+  for (const value of ['0', '21', '-1', '1.5', 'oops'])
     assert.throws(() => downloadPolicy({ LASM_DOWNLOAD_ATTEMPTS: value }), /integer/);
   const message = transportDiagnostic(new Error('failed https://user:password@proxy.invalid/path?token=secret#secret'));
   assert.equal(message, 'failed https://proxy.invalid/path');

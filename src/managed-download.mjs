@@ -5,7 +5,9 @@ import { Readable, Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { setTimeout as delay } from 'node:timers/promises';
 
-const retryStatuses = new Set([408, 429, 500, 502, 503, 504]);
+// Every 5xx is transient server trouble (GitHub's release CDN answers bursts of
+// 502s); of the 4xx statuses only request timeout and rate limiting are retried.
+const retryStatus = status => status >= 500 && status <= 599 || status === 408 || status === 429;
 const retryCodes = new Set(['ECONNRESET', 'ECONNREFUSED', 'EPIPE', 'ETIMEDOUT', 'EAI_AGAIN',
   'UND_ERR_SOCKET', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_HEADERS_TIMEOUT', 'UND_ERR_BODY_TIMEOUT',
   'LASM_CONNECT_TIMEOUT', 'LASM_IDLE_TIMEOUT', 'LASM_HTTP_RETRY']);
@@ -13,7 +15,9 @@ const error = (message, code) => Object.assign(new Error(message), { code });
 
 export function downloadPolicy(env = process.env) {
   const settings = [
-    ['attempts', 'LASM_DOWNLOAD_ATTEMPTS', 4, 1, 10],
+    // Eight attempts with exponential backoff wait about 2.3-3 minutes in total
+    // (retryDelay), enough to ride out a burst of server errors.
+    ['attempts', 'LASM_DOWNLOAD_ATTEMPTS', 8, 1, 20],
     ['connectMs', 'LASM_DOWNLOAD_CONNECT_MS', 60_000, 1_000, 600_000],
     ['idleMs', 'LASM_DOWNLOAD_IDLE_MS', 120_000, 1_000, 1_800_000],
     ['totalMs', 'LASM_DOWNLOAD_TOTAL_MS', 7_200_000, 1_000, 86_400_000],
@@ -48,6 +52,12 @@ function retryable(cause) {
   return retryCodes.has(cause?.cause?.code) || cause?.errors?.some(retryable) || retryableNested(cause?.cause);
 }
 function retryableNested(cause) { return cause ? retryable(cause) : false; }
+
+/** Wait before retry `attempt` + 1: 2 s doubling to at most 60 s, with 75-100%
+ * jitter. Over the default eight attempts: 137-182 s of waiting in total. */
+export function retryDelay(attempt, random = Math.random) {
+  return Math.round(Math.min(60_000, 2000 * 2 ** (attempt - 1)) * (0.75 + random() * 0.25));
+}
 
 function retryAfter(response, now) {
   const value = response.headers.get('retry-after');
@@ -93,7 +103,7 @@ export async function downloadArtifact(artifact, destination, {
         // before a request is made, not after fetch has followed them.
         if (response.url && new URL(response.url).protocol !== 'https:')
           throw error('Artifact download redirected away from HTTPS', 'LASM_REDIRECT');
-        if (retryStatuses.has(response.status)) {
+        if (retryStatus(response.status)) {
           waitMs = retryAfter(response, Date.now());
           throw error(`HTTP ${response.status}`, 'LASM_HTTP_RETRY');
         }
@@ -132,7 +142,7 @@ export async function downloadArtifact(artifact, destination, {
         event?.({ type: 'failed-attempt', attempt, code: cause.code, detail: transportDiagnostic(cause) });
         if (lifetime.aborted) throw lifetime.reason;
         if (!retryable(cause) || attempt === policy.attempts) throw cause;
-        const backoff = Math.min(30_000, 1000 * 2 ** (attempt - 1)) * (0.5 + random() * 0.5);
+        const backoff = retryDelay(attempt, random);
         waitMs = Math.max(waitMs, backoff);
         if (waitMs >= policy.totalMs - (Date.now() - started))
           throw error('Retry-After exceeds the remaining download time budget', 'LASM_TOTAL_TIMEOUT');
