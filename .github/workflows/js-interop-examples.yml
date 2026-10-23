@@ -21,6 +21,10 @@ on:
         type: string
   workflow_dispatch:
     inputs:
+      cache-key:
+        description: Actions cache key of the candidate (from an acceptance run's input job)
+        type: string
+        default: ""
       candidate-release:
         description: Release holding the candidate (node-package-RUN_ID)
         required: true
