@@ -13,7 +13,8 @@ deployment**: by project policy, CI uses no cloud accounts. Platform recipes:
 Status: candidate `.39988013618` (source `d8484c4`) passed this whole matrix,
 five-platform installed acceptance, the interop examples and the templates in
 [run 39988013618](https://github.com/Millillion/lasm/actions/runs/39988013618);
-its cold-installation gate is running. The same matrix also passed for the
+it also passed the three-run cold-installation gate (runs 39994918847,
+39994938810, 39994957491). The same matrix also passed for the
 preceding candidate `.56` (run 39977543832).
 
 ## Requirements of a built application
