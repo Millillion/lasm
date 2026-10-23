@@ -144,6 +144,7 @@ The result type `α` is the last argument and defaults to `Value` (`Data` for th
 | `require "pg"` | `require('pg')` |
 | `global` | `globalThis` |
 | `o.get "key"` / `o.get "key" Nat` | `o.key` |
+| `o.getFields #["a", "b"]` | `{a: o.a, b: o.b}` in **one** call (use it to read an HTTP request) |
 | `o.set "key" x` | `o.key = x` |
 | `f.call #[a, b]` / `f.callAwait #[a, b] String` | `f(a, b)` / `await f(a, b)` |
 | `o.callMethod "m" #[a]` / `o.callMethodAwait "m" #[a] Data` | `o.m(a)` / `await o.m(a)` |
