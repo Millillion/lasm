@@ -69,7 +69,9 @@ test('C tier packages carry an SPDX expression of every component', () => {
   const linux = cTierLicense('linux-x64');
   for (const id of ['Apache-2.0 WITH LLVM-exception', 'LGPL-2.1-or-later', 'GPL-2.0-only WITH Linux-syscall-note', '(LGPL-3.0-or-later OR GPL-2.0-or-later)', 'MIT', 'Zlib'])
     assert.ok(linux.includes(id), id);
-  assert.ok(cTierLicense('win32-x64').includes('ZPL-2.1') && cTierLicense('win32-x64').includes('MIT AND BSD-3-Clause'));
+  const windows = cTierLicense('win32-x64').split(' AND ');
+  assert.ok(windows.includes('ZPL-2.1') && windows.includes('BSD-3-Clause'));
+  assert.equal(windows.filter(term => term === 'MIT').length, 1, 'Each term once');
   assert.ok(!cTierLicense('darwin-arm64').includes('LGPL-2.1'), 'macOS carries no C library headers');
   assert.equal(cTierLicense('linux-arm64'), linux);
   // A conjunction of SPDX identifiers and WITH exceptions; OR only inside parentheses.

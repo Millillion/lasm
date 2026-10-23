@@ -46,7 +46,7 @@ export const cTierComponents = Object.freeze({
     ['LLVM: clang, lld, llvm-ar, LLVM/clang libraries, libc++, libc++abi, libunwind, compiler-rt, clang resource headers', 'Apache-2.0 WITH LLVM-exception'],
     ["Lean's include/lean headers; OpenSSL 3 (libssl.a, libcrypto.a)", 'Apache-2.0'],
     ['GNU MP (libgmp.a)', '(LGPL-3.0-or-later OR GPL-2.0-or-later)'],
-    ['libuv (libuv.a)', 'MIT'],
+    ['libuv (libuv.a); mimalloc (include/lean/mimalloc.h)', 'MIT'],
   ],
   linux: [
     ['GNU C Library 2.35 headers, crt objects and link stubs (libc6-dev, Ubuntu 22.04)', 'LGPL-2.1-or-later'],
@@ -63,10 +63,16 @@ export const cTierComponents = Object.freeze({
     ['zlib (zlib1.dll)', 'Zlib'],
   ],
 });
+/** Verbatim texts from scripts/lean-dist/notices/ for components whose licence the
+ * c-v1 archives and Lean's LICENSES omit (later C tier releases carry them inside). */
+export const cTierExtraNotices = Object.freeze([['openssl-LICENSE.txt', 'openssl/LICENSE'], ['mimalloc-LICENSE.txt', 'mimalloc/LICENSE']]);
+
 export function cTierLicense(platform) {
   const family = platform.split('-')[0];
   assert.ok(cTierComponents[family], `No C tier licence data for ${platform}`);
-  return [...cTierComponents.common, ...cTierComponents[family]].map(([, spdx]) => spdx).join(' AND ');
+  // Each distinct term once (an OR stays parenthesized as one term).
+  const terms = [...cTierComponents.common, ...cTierComponents[family]].flatMap(([, spdx]) => spdx.startsWith('(') ? [spdx] : spdx.split(' AND '));
+  return [...new Set(terms)].join(' AND ');
 }
 
 /** Contents and licences of the other tool packages (docs/LICENSE_AUDIT.md), from
@@ -260,7 +266,9 @@ The notices are in \`${noticeDirectory}/\`, copied verbatim:
 - \`${noticeDirectory}/lean/LICENSE\` and \`LICENSES\`: Lean's licence and the third-party licences
   of Lean's binary release (LLVM, GNU C Library, GNU MP), from which the archive's
   compiler and libraries come (\`${pkg.notices.bin.name}\`).
-- \`${noticeDirectory}/libuv/\`: libuv's LICENSE and LICENSE-extra.
+- \`${noticeDirectory}/libuv/\`: libuv's LICENSE and LICENSE-extra (from the same binaries archive).
+- \`${noticeDirectory}/openssl/LICENSE\` (OpenSSL 3.6.0) and \`${noticeDirectory}/mimalloc/LICENSE\`
+  (mimalloc v3.4.5), which neither archive carries.
 ${trademark}`;
 }
 

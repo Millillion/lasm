@@ -33,7 +33,7 @@ import { hashFile } from '../../src/managed-artifacts.mjs';
 import { downloadArtifact } from '../../src/managed-download.mjs';
 import { findNpm, archiveFileName } from '../../src/npm-artifacts.mjs';
 import { toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, defaultScope, maximumPackageBytes, noticeDirectory,
-  createPackageJson, createPackageLicense } from './packages.mjs';
+  createPackageJson, createPackageLicense, cTierExtraNotices } from './packages.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values: args } = parseArgs({ options: {
@@ -153,6 +153,11 @@ if (args.step === 'package') {
     await copyArchiveFiles(file, artifact.root, [[`lasm-notices/${artifact.root}/`, artifact.root]], notices);
     await copyArchiveFiles(await releaseAsset(bin), bin.root, [['LICENSE', 'lean/LICENSE'], ['LICENSES', 'lean/LICENSES'],
       [`lasm-notices/${bin.root}/libuv-LICENSE`, 'libuv/LICENSE'], [`lasm-notices/${bin.root}/libuv-LICENSE-extra`, 'libuv/LICENSE-extra']], notices);
+    // Texts that neither archive of release c-v1 carries (docs/LICENSE_AUDIT.md).
+    for (const [from, to] of cTierExtraNotices) {
+      await mkdir(join(notices, to, '..'), { recursive: true });
+      await copyFile(join(root, 'scripts/lean-dist/notices', from), join(notices, to));
+    }
   }
   for (const [from, to] of pkg.licenseFiles ?? []) {
     await mkdir(join(directory, noticeDirectory, to, '..'), { recursive: true });
