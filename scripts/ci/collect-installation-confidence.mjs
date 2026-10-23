@@ -9,9 +9,20 @@ assert.equal(process.env.GITHUB_REF, 'refs/heads/main');
 const candidate = JSON.parse(readFileSync('scripts/ci/node-robustness-candidate.json'));
 assert.match(candidate.baselineRunId, /^\d+$/);
 const allowRaw = execFileSync('gh', ['api', '--help'], { encoding: 'utf8', timeout: 10_000 }).includes('--allow-escape-sequences');
-const api = path => execFileSync('gh', ['api', `repos/${repository}/${path}`,
-  ...(allowRaw && path.endsWith('/logs') ? ['--allow-escape-sequences'] : [])],
-{ encoding: 'utf8', maxBuffer: 20 * 1024 * 1024, timeout: 60_000 });
+// GitHub's API intermittently answers 5xx (observed for run-attempt job listings
+// on 2026-10-23). Retry those with backoff; any other failure stops the report.
+const api = path => {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return execFileSync('gh', ['api', `repos/${repository}/${path}`,
+        ...(allowRaw && path.endsWith('/logs') ? ['--allow-escape-sequences'] : [])],
+      { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024, timeout: 60_000 });
+    } catch (error) {
+      if (attempt >= 6 || !/HTTP 5\d\d/.test(String(error.stderr ?? ''))) throw error;
+      execFileSync('sleep', [String(2 ** attempt)]);
+    }
+  }
+};
 const json = path => JSON.parse(api(path));
 function report(lines, path) {
   const starts = lines.flatMap((line, i) => line === path ? [i + 1] : []);
