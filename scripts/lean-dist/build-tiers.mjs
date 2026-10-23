@@ -159,17 +159,20 @@ ${release.notices?.[options.platform] ? `Corresponding sources and third-party n
 LICENSE and LICENSES are copied verbatim from that archive. Lean's runtime
 statically links libuv${libuv ? ` ${libuv} (version recorded in the archive's lib/libuv.a)` : ''}, whose
 MIT license is not included in LICENSES; libuv-LICENSE and libuv-LICENSE-extra
-are verbatim copies of libuv's LICENSE and LICENSE-extra files.
+are verbatim copies of libuv's LICENSE and LICENSE-extra files. It also statically
+links mimalloc (MIT), likewise missing from LICENSES; mimalloc-LICENSE is the
+LICENSE of mimalloc v3.4.5, the version Lean 4.35.0's build fetches.
 Module data and Lean sources are distributed separately in the shared
 lean-${options.version}-core-* and lean-${options.version}-ext-* archives.
 `;
 const notices = join(here, 'notices');
+// Verbatim licence texts in scripts/lean-dist/notices/<file>.txt -> lasm-notices/<archive>/<file>.
+const noticeFiles = async (archive, files) => Promise.all(files.map(async file => ({ path: `lasm-notices/${archive}/${file}`,
+  type: 'file', source: join(notices, file + '.txt'), size: (await stat(join(notices, file + '.txt'))).size })));
 const binMembers = [...binary.values(), members.get('LICENSE'), ...(members.has('LICENSES') ? [members.get('LICENSES')] : []),
   generated(`lasm-notices/${binName}/NOTICE`, binNotice),
-  { path: `lasm-notices/${binName}/libuv-LICENSE`, type: 'file', source: join(notices, 'libuv-LICENSE.txt'),
-    size: (await stat(join(notices, 'libuv-LICENSE.txt'))).size },
-  { path: `lasm-notices/${binName}/libuv-LICENSE-extra`, type: 'file', source: join(notices, 'libuv-LICENSE-extra.txt'),
-    size: (await stat(join(notices, 'libuv-LICENSE-extra.txt'))).size }];
+  ...await noticeFiles(binName, ['libuv-LICENSE']),
+  ...await noticeFiles(binName, ['libuv-LICENSE-extra', 'mimalloc-LICENSE'])];
 
 // The Windows upstream LICENSE uses CRLF line endings. Shared data archives
 // carry the LF text published in the Linux and macOS archives.
@@ -266,6 +269,14 @@ Complete original archive: ${upstream.url}
 SHA-256 ${upstream.sha256}, ${upstream.bytes} bytes.
 ${sourceLine}
 
+Licences: lasm-notices/${name}/LICENSE and LICENSES are Lean's, copied verbatim
+from that archive (Lean; LLVM, including clang, lld, libc++, libc++abi, libunwind
+and compiler-rt; the GNU C Library; GNU MP in lib/libgmp.a). LICENSES omits these,
+whose licences are beside this NOTICE: libuv (lib/libuv.a; libuv-LICENSE,
+libuv-LICENSE-extra), mimalloc (include/lean/mimalloc.h; mimalloc-LICENSE, v3.4.5)
+and OpenSSL 3 (lib/libssl.a, lib/libcrypto.a; openssl-LICENSE, Apache-2.0, from
+openssl-3.6.0). zlib, where present, is under the zlib licence.
+
 Added by Lasm:
 - ${cc.path}: ${family === 'win32' ? 'a byte-identical copy of bin/clang.exe' : 'a symbolic link to clang'}, so that Lake's default C
   compiler is Lean's clang.
@@ -278,6 +289,12 @@ ${staged.provenance.filter(item => item.use === 'C library headers').map(item =>
 ` : `- No C library headers: on macOS the SDK of the Xcode Command Line Tools provides them.
 `}`;
   selected.set(`lasm-notices/${name}/NOTICE`, generated(`lasm-notices/${name}/NOTICE`, notice));
+  // The licences of the release its files come from (as in the binaries archive), and
+  // of the link libraries that LICENSES omits.
+  for (const [path, member] of [['LICENSE', members.get('LICENSE')], ['LICENSES', members.get('LICENSES')]])
+    if (member) selected.set(`lasm-notices/${name}/${path}`, { ...member, path: `lasm-notices/${name}/${path}` });
+  for (const member of await noticeFiles(name, ['libuv-LICENSE', 'libuv-LICENSE-extra', 'mimalloc-LICENSE', 'openssl-LICENSE']))
+    selected.set(member.path, member);
   const list = [...selected.values()].map(member => member.type === 'file' && !member.content ? { ...member } : member);
   cTier = { name, piece: 'c', members: list, mode: 'write', multiarch, resourceDirectory, provenance: staged.provenance };
 }
