@@ -1,0 +1,11 @@
+{
+  "name": "lasm-release-benchmarks",
+  "private": true,
+  "description": "Release benchmark harness: the plain-Node reference servers' dependencies (see docs/BENCHMARKS.md)",
+  "type": "module",
+  "dependencies": {
+    "@hono/node-server": "2.1.3",
+    "express": "5.2.1",
+    "hono": "4.13.13"
+  }
+}

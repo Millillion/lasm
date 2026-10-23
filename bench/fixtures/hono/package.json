@@ -1,0 +1,8 @@
+{
+  "name": "lasm-bench-hono",
+  "private": true,
+  "dependencies": {
+    "@hono/node-server": "2.1.3",
+    "hono": "4.13.13"
+  }
+}
