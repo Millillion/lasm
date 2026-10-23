@@ -38,8 +38,15 @@ function invoke(spec, reportFile) {
   writeFileSync(rules, JSON.stringify(spec, null, 2) + '\n');
   const child = spawnSync(process.env.LASM_RESOURCE_PYTHON, ['-I', '-B',
     fileURLToPath(new URL('./windows-restricted.py', import.meta.url)), rules, report],
-  { encoding: 'utf8', timeout: ((spec.timeoutSeconds ?? 3000) + 600) * 1000, maxBuffer: 1024 * 1024, windowsHide: true });
-  const evidence = existsSync(report) ? JSON.parse(readFileSync(report, 'utf8')) : undefined;
+  // Setup walks the runner's developer-tool roots (Program Files, the tool
+  // cache) before the command starts; on slow hosted VMs that alone has taken
+  // more than ten minutes (2026-10-23). The margin stays below the step's
+  // 1200 s resource-guard limit for the isolation controls.
+  { encoding: 'utf8', timeout: ((spec.timeoutSeconds ?? 3000) + 1000) * 1000, maxBuffer: 1024 * 1024, windowsHide: true });
+  let evidence;
+  try { evidence = existsSync(report) ? JSON.parse(readFileSync(report, 'utf8')) : undefined; } catch { evidence = undefined; }
+  // Show where a timed-out setup stopped (the report's last progress entry).
+  if (child.error) console.error('Restricted run did not finish; partial report:', JSON.stringify(evidence ?? null).slice(0, 4000));
   assert.ifError(child.error); assert.ok(['passed', 'failed'].includes(evidence?.status), child.stderr + child.stdout);
   assert.equal(evidence.descendantsReleased, true);
   assert.equal(evidence.cleanupErrors, undefined); assert.equal(child.status, evidence.exitCode);
