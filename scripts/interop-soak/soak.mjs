@@ -25,6 +25,8 @@ const app = option('--app', 'express');
 const seconds = Number(option('--seconds', 7200));
 const connections = Number(option('--connections', 16));
 const sampleMs = Number(option('--sample-ms', 5000));
+// --project DIR: soak an already prepared project (maintainer runs with a patched package).
+const existingProject = option('--project', undefined);
 const [tgzArg, workArg, resultArg] = argv;
 assert.ok(tgzArg && workArg && resultArg && ['express', 'hono'].includes(app), 'Usage: node soak.mjs CANDIDATE_TGZ WORK_DIR RESULT.json --app express|hono [--seconds N] [--connections N]');
 const tgz = resolve(tgzArg), work = resolve(workArg), resultFile = resolve(resultArg);
@@ -85,15 +87,19 @@ const percentile = (sorted, p) => sorted.length ? sorted[Math.min(sorted.length 
 const mib = b => b == null ? null : Math.round(b / 1024 ** 2 * 100) / 100;
 
 // ---------- load ----------
-// [name, weight, method, path, body, check]; slow-abort requests are aborted after 50 ms.
+// [name, weight, method, path, body, check]; slow-abort requests are aborted
+// after 10 ms while the Lean handler still waits 60 ms. Every in-flight Lean
+// handler holds a Lean worker thread while it awaits (about one per CPU by
+// default), so the mix keeps waiting handlers below the worker count of a
+// 4-CPU runner: this is a leak soak at steady state, not an overload test.
 const mix = [
-  ['hello', 55, 'GET', '/hello/Ada', null, r => r.status === 200 && JSON.parse(r.body).message === 'Hello, Ada, from Lean!'],
+  ['hello', 58, 'GET', '/hello/Ada', null, r => r.status === 200 && JSON.parse(r.body).message === 'Hello, Ada, from Lean!'],
   ['echo', 15, 'POST', '/echo', { n: [1, 2, 3], s: 'λ soak' }, r => r.status === 200 && JSON.parse(r.body).echo?.s === 'λ soak'],
   ['throw', 5, 'GET', '/throw', null, r => r.status === 500],
   ['reject', 5, 'GET', '/reject', null, r => r.status === 500],
   ['reject-caught', 5, 'GET', '/reject-caught', null, r => r.status === 404 && /ENOENT/.test(JSON.parse(r.body).error)],
-  ['slow', 10, 'GET', '/slow/20', null, r => r.status === 200 && JSON.parse(r.body).slept === 20],
-  ['slow-abort', 5, 'GET', '/slow/300', null, null],
+  ['slow', 10, 'GET', '/slow/10', null, r => r.status === 200 && JSON.parse(r.body).slept === 10],
+  ['slow-abort', 2, 'GET', '/slow/60', null, null],
 ];
 const totalWeight = mix.reduce((a, m) => a + m[1], 0);
 function pick(random) {
@@ -125,15 +131,18 @@ function newBucket(at) { return { at, requests: 0, errors: 0, byRoute: {}, laten
 let server;
 try {
   mkdirSync(work, { recursive: true });
-  const project = join(work, `${app} soak`);
+  const project = existingProject ? resolve(existingProject) : join(work, `${app} soak`);
   const cli = join(work, 'cli'); mkdirSync(cli);
-  if (process.env.LASM_INIT_FROM_SOURCE === '1') run('lasm init (source)', [process.execPath], [join(root, 'bin/lasm.mjs'), 'init', project, '--template', app], cli);
+  if (existingProject) copyFileSync(join(here, app === 'express' ? 'Express.lean' : 'Hono.lean'), join(project, 'Main.lean'));
+  else if (process.env.LASM_INIT_FROM_SOURCE === '1') run('lasm init (source)', [process.execPath], [join(root, 'bin/lasm.mjs'), 'init', project, '--template', app], cli);
   else {
     run('npm install Lasm (for lasm init)', tool('npm'), ['install', '--no-save', tgz], cli);
     run('lasm init', tool('npx'), ['lasm', 'init', project, '--template', app], cli);
   }
-  copyFileSync(join(here, app === 'express' ? 'Express.lean' : 'Hono.lean'), join(project, 'Main.lean'));
-  run('npm install', tool('npm'), ['install', '-D', tgz], project);
+  if (!existingProject) {
+    copyFileSync(join(here, app === 'express' ? 'Express.lean' : 'Hono.lean'), join(project, 'Main.lean'));
+    run('npm install', tool('npm'), ['install', '-D', tgz], project);
+  }
   run('lasm build', tool('npm'), ['run', 'build'], project);
 
   const port = await new Promise((done, fail) => { const s = net.createServer(); s.once('error', fail);
@@ -200,8 +209,10 @@ try {
     const random = prng(seed);
     while (Date.now() < deadline && server.exit === null) {
       const m = pick(random);
-      const r = await send(agent, port, m, m[0] === 'slow-abort' ? 50 : 0);
-      const ok = m[0] === 'slow-abort' ? r.aborted === true : !r.error && m[5](r);
+      const r = await send(agent, port, m, m[0] === 'slow-abort' ? 10 : 0);
+      // A slow-abort request may still complete when this client's event loop is
+      // delayed past the abort (for example while a minute's percentiles are computed).
+      const ok = m[0] === 'slow-abort' ? r.aborted === true || r.status === 200 && JSON.parse(r.body).slept === 60 : !r.error && m[5](r);
       bucket.requests++; totals.requests++;
       bucket.byRoute[m[0]] = (bucket.byRoute[m[0]] ?? 0) + 1; totals.byRoute[m[0]] = (totals.byRoute[m[0]] ?? 0) + 1;
       if (m[0] === 'slow-abort') totals.aborted++;
@@ -259,7 +270,8 @@ try {
     rssFinal: final !== null && final - baseline <= criteria.maxBytesPerRequest * windowRequests + criteria.finalAllowanceBytes,
     wasm: wasmBase !== null && wasmFinal - wasmBase <= criteria.maxBytesPerRequest * windowRequests + criteria.wasmAllowanceBytes,
     jsValues: js0 && js1 && js1.values <= js0.values + criteria.maxHandleGrowth,
-    pendingCallbacks: js1?.pendingCalls === 0,
+    // Both idle samples are read by a /stats request, itself one pending call.
+    pendingCallbacks: js0 && js1 && js1.pendingCalls <= js0.pendingCalls,
     // functionsLive exists since source fcda634 (older candidates do not report it).
     leanFunctions: js0 && js1 && (js1.functionsLive === undefined || js1.functionsLive <= js0.functionsLive + criteria.maxHandleGrowth),
     p99Drift: p99First !== null && p99Last !== null && p99Last <= Math.max(p99First * criteria.p99Drift, p99First + criteria.p99SlackMs),

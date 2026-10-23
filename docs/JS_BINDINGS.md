@@ -329,6 +329,16 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   `Std.Http` server and about a fifth of plain Node.
   Measurements: [JS_INTEROP.md](JS_INTEROP.md).
 - **Lasm only.** Programs that use interop run only under Lasm.
+- **Concurrent waiting handlers.** A Lean callback holds a Lean worker thread
+  for as long as it runs, including while it awaits a promise (an `IO R`
+  binding, `callAwait`, `Value.await`, `IO.wait`). Lean starts one worker per
+  CPU that Node reports, so at most that many handlers can wait at once; further
+  requests queue until one finishes. Measured locally (12 CPUs): 12 concurrent
+  requests to a handler that awaits a 1 s timer finish in 1.1 s, 24 in 2.1 s.
+  `LEAN_NUM_THREADS=64` in the server's environment raised it (40 such requests
+  in 1.3 s) at about 9 MB of memory per extra worker. Size it to the number of
+  slow awaits (database queries, outbound HTTP) you expect in flight; on small
+  containers, check the worker count rather than assume it (untested there).
 - **Function length.** A JavaScript function made by `Function.ofFn` reports
   `length` 0. APIs that inspect it do not recognize it: Express treats only
   four-parameter middleware as an error handler, so write Express error handlers
