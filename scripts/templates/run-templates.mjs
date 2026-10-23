@@ -38,6 +38,18 @@ function run(label, [command, ...base], argv, cwd, options = {}) {
   return r;
 }
 
+// Anonymous registry pulls (Docker Hub, Amazon ECR Public) are rate limited per
+// IP address, which CI runners share: retry docker pulls and builds with backoff.
+const rateLimited = text => /toomanyrequests|429 Too Many Requests|rate limit/i.test(text ?? '');
+async function dockerWithRetry(label, args, cwd) {
+  for (let attempt = 1; ; attempt++) {
+    const r = run(`${label}${attempt > 1 ? ` (attempt ${attempt})` : ''}`, ['docker'], args, cwd, { allowFailure: true, env: { DOCKER_BUILDKIT: '1' } });
+    if (r.status === 0) return r;
+    assert.ok(attempt < 6 && rateLimited(r.stderr + r.stdout), `${label} failed (${r.status}): ${r.stderr?.slice(-4000)}`);
+    await new Promise(done => setTimeout(done, 30_000 * attempt));
+  }
+}
+
 const freePort = () => new Promise((done, fail) => {
   const server = net.createServer(); server.once('error', fail);
   server.listen(0, '127.0.0.1', () => { const { port } = server.address(); server.close(() => done(port)); });
@@ -82,7 +94,7 @@ function waitForLine(child, pattern, timeoutMs, output) {
 /** Dockerfile.lambda: build, run with the image's Runtime Interface Emulator, invoke. */
 async function checkLambda(app, template) {
   const image = `lasm-template-${template}-lambda:test`, name = `lasm-template-${template}-lambda-${process.pid}`;
-  run(`${template}: docker build Dockerfile.lambda`, ['docker'], ['build', '--progress=plain', '-f', 'Dockerfile.lambda', '-t', image, '.'], app);
+  await dockerWithRetry(`${template}: docker build Dockerfile.lambda`, ['build', '--progress=plain', '-f', 'Dockerfile.lambda', '-t', image, '.'], app);
   const port = await freePort();
   run(`${template}: docker run (Lambda emulator)`, ['docker'], ['run', '-d', '--name', name, '--memory=512m', '--read-only', '--tmpfs', '/tmp',
     '-p', `127.0.0.1:${port}:8080`, image], app);
@@ -124,6 +136,8 @@ try {
   const cli = join(work, 'cli');
   mkdirSync(cli);
   run('npm install Lasm (for lasm init)', npm, ['install', '--no-save', tgz], cli);
+  if (docker) for (const image of ['node:24-trixie', 'node:24-bookworm-slim', 'public.ecr.aws/lambda/nodejs:24', 'public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0'])
+    await dockerWithRetry(`docker pull ${image}`, ['pull', '-q', image], cli);
   for (const template of templates) {
     const entry = { template, ok: false }; result.templates.push(entry); save();
     // "guide": docs/GETTING_STARTED.md step 3 (the hono template plus an npm
@@ -193,8 +207,7 @@ try {
     }
     if (docker && !guide) {
       const image = `lasm-template-${template}:test`;
-      const dockerBuild = run(`${template}: docker build`, ['docker'], ['build', '--progress=plain', '-t', image, '.'], app,
-        { env: { DOCKER_BUILDKIT: '1' } });
+      const dockerBuild = await dockerWithRetry(`${template}: docker build`, ['build', '--progress=plain', '-t', image, '.'], app);
       entry.dockerBuildSeconds = result.steps.at(-1).seconds;
       const inspect = run(`${template}: docker image size`, ['docker'], ['image', 'inspect', image, '--format', '{{.Size}}'], app);
       entry.imageBytes = Number(inspect.stdout.trim());
