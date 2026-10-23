@@ -1,0 +1,1217 @@
+{
+ "scope": "Phase 4 step 1 threading prototype: Lean -> JS call costs, synchronous callbacks and compatibility (experiments/js-interop)",
+ "recordedAt": "2026-10-22T23:54:11.725Z",
+ "engine": "v26.12.1",
+ "platform": "linux-x64",
+ "cpus": 12,
+ "cpuModel": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+ "loadAverageAtStart": [
+  0.79,
+  0.89,
+  1.29
+ ],
+ "configs": {
+  "A": {
+   "env": {},
+   "description": "PROXY_TO_PTHREAD (as Lasm links today): Lean main on a pthread, every JS call crosses to the main thread over the shared-memory slot RPC"
+  },
+  "B-main": {
+   "env": {
+    "JSPROTO_PROGRAM": "program-jspi.cjs",
+    "LEAN_MAIN_USE_THREAD": "0",
+    "JSPROTO_V8_FLAGS": "--stack-size=65000 --wasm-stack-switching-stack-size=65536"
+   },
+   "description": "-sJSPI relink, no PROXY_TO_PTHREAD, LEAN_MAIN_USE_THREAD=0: Lean main on the Node main thread; JS calls are direct imports that suspend on promises; main-thread futex waits suspend on Atomics.waitAsync; 64 MiB JSPI stack via v8.setFlagsFromString"
+  },
+  "B-main-default-stack": {
+   "env": {
+    "JSPROTO_PROGRAM": "program-jspi.cjs",
+    "LEAN_MAIN_USE_THREAD": "0"
+   },
+   "description": "B-main without the V8 stack flags (default ~1 MiB JSPI stack)"
+  },
+  "B-pthread": {
+   "env": {
+    "JSPROTO_PROGRAM": "program-jspi.cjs"
+   },
+   "description": "The JSPI relink with Lean 4.35 default lean_run_main (Lean main on its own pthread): calls take the slot RPC as in A"
+  }
+ },
+ "runs": [
+  {
+   "config": "micro-proxy",
+   "args": [],
+   "status": 0,
+   "lines": [
+    {
+     "bench": "clock",
+     "batchMeanNs": 0
+    },
+    {
+     "bench": "clock",
+     "n": 200000,
+     "medianNs": 57,
+     "p99Ns": 204
+    },
+    {
+     "bench": "sync_noop",
+     "batchMeanNs": 8.1
+    },
+    {
+     "bench": "sync_noop",
+     "n": 200000,
+     "medianNs": 52,
+     "p99Ns": 78
+    },
+    {
+     "bench": "sync_random",
+     "batchMeanNs": 18.1
+    },
+    {
+     "bench": "sync_random",
+     "n": 200000,
+     "medianNs": 55,
+     "p99Ns": 154
+    },
+    {
+     "bench": "sync_callback_x1",
+     "batchMeanNs": 14
+    },
+    {
+     "bench": "sync_callback_x1",
+     "n": 200000,
+     "medianNs": 53,
+     "p99Ns": 87
+    },
+    {
+     "thread": "ok",
+     "sum": 1
+    }
+   ]
+  },
+  {
+   "config": "micro-jspi",
+   "args": [],
+   "status": 0,
+   "lines": [
+    {
+     "bench": "clock",
+     "batchMeanNs": 0
+    },
+    {
+     "bench": "clock",
+     "n": 200000,
+     "medianNs": 61,
+     "p99Ns": 139
+    },
+    {
+     "bench": "sync_noop",
+     "batchMeanNs": 19.6
+    },
+    {
+     "bench": "sync_noop",
+     "n": 200000,
+     "medianNs": 75,
+     "p99Ns": 121
+    },
+    {
+     "bench": "sync_random",
+     "batchMeanNs": 26.6
+    },
+    {
+     "bench": "sync_random",
+     "n": 200000,
+     "medianNs": 77,
+     "p99Ns": 166
+    },
+    {
+     "bench": "await_resolved",
+     "batchMeanNs": 220.9
+    },
+    {
+     "bench": "await_resolved",
+     "n": 200000,
+     "medianNs": 217,
+     "p99Ns": 361
+    },
+    {
+     "bench": "async_import_sync_value",
+     "batchMeanNs": 118.2
+    },
+    {
+     "bench": "async_import_sync_value",
+     "n": 200000,
+     "medianNs": 148,
+     "p99Ns": 252
+    },
+    {
+     "bench": "sync_callback_x1",
+     "batchMeanNs": 25.9
+    },
+    {
+     "bench": "sync_callback_x1",
+     "n": 200000,
+     "medianNs": 78,
+     "p99Ns": 131
+    },
+    {
+     "thread_await_resolved_meanNs": 610.6
+    },
+    {
+     "thread": "ok",
+     "sum": 1
+    }
+   ]
+  },
+  {
+   "config": "A",
+   "args": [
+    "bench",
+    "20000",
+    "sort_comparator_thread"
+   ],
+   "status": 0,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 6.05,
+   "lines": [
+    {
+     "bench": "clock",
+     "n": 20000,
+     "batchMeanNs": 91,
+     "medianNs": 1198,
+     "p90Ns": 1685,
+     "p99Ns": 4286,
+     "maxNs": 349736
+    },
+    {
+     "bench": "noop",
+     "n": 20000,
+     "batchMeanNs": 16015,
+     "medianNs": 15805,
+     "p90Ns": 19811,
+     "p99Ns": 44911,
+     "maxNs": 331472
+    },
+    {
+     "bench": "random",
+     "n": 20000,
+     "batchMeanNs": 16446,
+     "medianNs": 16021,
+     "p90Ns": 19666,
+     "p99Ns": 43909,
+     "maxNs": 438457
+    },
+    {
+     "bench": "call_json_math_random",
+     "n": 20000,
+     "batchMeanNs": 19992,
+     "medianNs": 17979,
+     "p90Ns": 23386,
+     "p99Ns": 51196,
+     "maxNs": 429944
+    },
+    {
+     "bench": "await_resolved_blocking",
+     "n": 20000,
+     "batchMeanNs": 18330,
+     "medianNs": 17274,
+     "p90Ns": 27910,
+     "p99Ns": 56020,
+     "maxNs": 448103
+    },
+    {
+     "bench": "await_resolved_task",
+     "n": 20000,
+     "batchMeanNs": 37059,
+     "medianNs": 29832,
+     "p90Ns": 42219,
+     "p99Ns": 95682,
+     "maxNs": 1493235
+    },
+    {
+     "bench": "sort_comparator_thread",
+     "sorts": 5,
+     "elements": 2000,
+     "sorted": true,
+     "elapsedNs": 879882958,
+     "statsBefore": {
+      "values": 0,
+      "comparisons": 0,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     },
+     "statsAfter": {
+      "values": 0,
+      "comparisons": 93855,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     }
+    }
+   ]
+  },
+  {
+   "config": "B-main",
+   "args": [
+    "bench",
+    "20000",
+    "sort_comparator_direct"
+   ],
+   "status": 0,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 2.359,
+   "lines": [
+    {
+     "bench": "clock",
+     "n": 20000,
+     "batchMeanNs": 96,
+     "medianNs": 1012,
+     "p90Ns": 1768,
+     "p99Ns": 4490,
+     "maxNs": 709807
+    },
+    {
+     "bench": "noop",
+     "n": 20000,
+     "batchMeanNs": 918,
+     "medianNs": 1443,
+     "p90Ns": 1810,
+     "p99Ns": 5178,
+     "maxNs": 354138
+    },
+    {
+     "bench": "random",
+     "n": 20000,
+     "batchMeanNs": 1033,
+     "medianNs": 1529,
+     "p90Ns": 2014,
+     "p99Ns": 5603,
+     "maxNs": 410131
+    },
+    {
+     "bench": "call_json_math_random",
+     "n": 20000,
+     "batchMeanNs": 2269,
+     "medianNs": 2603,
+     "p90Ns": 3216,
+     "p99Ns": 15609,
+     "maxNs": 397941
+    },
+    {
+     "bench": "await_resolved_blocking",
+     "n": 20000,
+     "batchMeanNs": 1647,
+     "medianNs": 2171,
+     "p90Ns": 3144,
+     "p99Ns": 15043,
+     "maxNs": 334104
+    },
+    {
+     "bench": "await_resolved_task",
+     "n": 20000,
+     "batchMeanNs": 34418,
+     "medianNs": 28363,
+     "p90Ns": 43693,
+     "p99Ns": 89526,
+     "maxNs": 1326174
+    },
+    {
+     "bench": "sort_comparator_direct",
+     "sorts": 5,
+     "elements": 2000,
+     "sorted": true,
+     "elapsedNs": 15095209,
+     "statsBefore": {
+      "values": 0,
+      "comparisons": 0,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     },
+     "statsAfter": {
+      "values": 0,
+      "comparisons": 93855,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     }
+    }
+   ]
+  },
+  {
+   "config": "A",
+   "args": [
+    "bench",
+    "20000",
+    "sort_comparator_thread"
+   ],
+   "status": 0,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 6.224,
+   "lines": [
+    {
+     "bench": "clock",
+     "n": 20000,
+     "batchMeanNs": 94,
+     "medianNs": 940,
+     "p90Ns": 1527,
+     "p99Ns": 4172,
+     "maxNs": 365684
+    },
+    {
+     "bench": "noop",
+     "n": 20000,
+     "batchMeanNs": 16968,
+     "medianNs": 21802,
+     "p90Ns": 29044,
+     "p99Ns": 64224,
+     "maxNs": 462023
+    },
+    {
+     "bench": "random",
+     "n": 20000,
+     "batchMeanNs": 17753,
+     "medianNs": 16461,
+     "p90Ns": 26316,
+     "p99Ns": 57243,
+     "maxNs": 447368
+    },
+    {
+     "bench": "call_json_math_random",
+     "n": 20000,
+     "batchMeanNs": 19861,
+     "medianNs": 17808,
+     "p90Ns": 24000,
+     "p99Ns": 51878,
+     "maxNs": 397525
+    },
+    {
+     "bench": "await_resolved_blocking",
+     "n": 20000,
+     "batchMeanNs": 17284,
+     "medianNs": 16847,
+     "p90Ns": 25382,
+     "p99Ns": 52946,
+     "maxNs": 353716
+    },
+    {
+     "bench": "await_resolved_task",
+     "n": 20000,
+     "batchMeanNs": 36006,
+     "medianNs": 29882,
+     "p90Ns": 48064,
+     "p99Ns": 96056,
+     "maxNs": 1163243
+    },
+    {
+     "bench": "sort_comparator_thread",
+     "sorts": 5,
+     "elements": 2000,
+     "sorted": true,
+     "elapsedNs": 860010413,
+     "statsBefore": {
+      "values": 0,
+      "comparisons": 0,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     },
+     "statsAfter": {
+      "values": 0,
+      "comparisons": 93855,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     }
+    }
+   ]
+  },
+  {
+   "config": "B-main",
+   "args": [
+    "bench",
+    "20000",
+    "sort_comparator_direct"
+   ],
+   "status": 0,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 2.353,
+   "lines": [
+    {
+     "bench": "clock",
+     "n": 20000,
+     "batchMeanNs": 86,
+     "medianNs": 1027,
+     "p90Ns": 1708,
+     "p99Ns": 4665,
+     "maxNs": 879527
+    },
+    {
+     "bench": "noop",
+     "n": 20000,
+     "batchMeanNs": 923,
+     "medianNs": 1528,
+     "p90Ns": 1964,
+     "p99Ns": 3797,
+     "maxNs": 287509
+    },
+    {
+     "bench": "random",
+     "n": 20000,
+     "batchMeanNs": 1202,
+     "medianNs": 1564,
+     "p90Ns": 2167,
+     "p99Ns": 14555,
+     "maxNs": 490109
+    },
+    {
+     "bench": "call_json_math_random",
+     "n": 20000,
+     "batchMeanNs": 2362,
+     "medianNs": 2608,
+     "p90Ns": 3333,
+     "p99Ns": 17110,
+     "maxNs": 815208
+    },
+    {
+     "bench": "await_resolved_blocking",
+     "n": 20000,
+     "batchMeanNs": 1613,
+     "medianNs": 2402,
+     "p90Ns": 3144,
+     "p99Ns": 17084,
+     "maxNs": 258433
+    },
+    {
+     "bench": "await_resolved_task",
+     "n": 20000,
+     "batchMeanNs": 34050,
+     "medianNs": 27749,
+     "p90Ns": 42706,
+     "p99Ns": 86487,
+     "maxNs": 1183017
+    },
+    {
+     "bench": "sort_comparator_direct",
+     "sorts": 5,
+     "elements": 2000,
+     "sorted": true,
+     "elapsedNs": 16157881,
+     "statsBefore": {
+      "values": 0,
+      "comparisons": 0,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     },
+     "statsAfter": {
+      "values": 0,
+      "comparisons": 93855,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     }
+    }
+   ]
+  },
+  {
+   "config": "A",
+   "args": [
+    "bench",
+    "20000",
+    "sort_comparator_thread"
+   ],
+   "status": 0,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 6.45,
+   "lines": [
+    {
+     "bench": "clock",
+     "n": 20000,
+     "batchMeanNs": 103,
+     "medianNs": 887,
+     "p90Ns": 1380,
+     "p99Ns": 4094,
+     "maxNs": 327067
+    },
+    {
+     "bench": "noop",
+     "n": 20000,
+     "batchMeanNs": 16047,
+     "medianNs": 15359,
+     "p90Ns": 20602,
+     "p99Ns": 44324,
+     "maxNs": 350092
+    },
+    {
+     "bench": "random",
+     "n": 20000,
+     "batchMeanNs": 17248,
+     "medianNs": 15509,
+     "p90Ns": 19210,
+     "p99Ns": 43348,
+     "maxNs": 265300
+    },
+    {
+     "bench": "call_json_math_random",
+     "n": 20000,
+     "batchMeanNs": 19489,
+     "medianNs": 17328,
+     "p90Ns": 28429,
+     "p99Ns": 51964,
+     "maxNs": 514422
+    },
+    {
+     "bench": "await_resolved_blocking",
+     "n": 20000,
+     "batchMeanNs": 17526,
+     "medianNs": 20195,
+     "p90Ns": 42589,
+     "p99Ns": 71788,
+     "maxNs": 3711728
+    },
+    {
+     "bench": "await_resolved_task",
+     "n": 20000,
+     "batchMeanNs": 45282,
+     "medianNs": 34596,
+     "p90Ns": 55396,
+     "p99Ns": 109504,
+     "maxNs": 1088031
+    },
+    {
+     "bench": "sort_comparator_thread",
+     "sorts": 5,
+     "elements": 2000,
+     "sorted": true,
+     "elapsedNs": 893553728,
+     "statsBefore": {
+      "values": 0,
+      "comparisons": 0,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     },
+     "statsAfter": {
+      "values": 0,
+      "comparisons": 93855,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     }
+    }
+   ]
+  },
+  {
+   "config": "B-main",
+   "args": [
+    "bench",
+    "20000",
+    "sort_comparator_direct"
+   ],
+   "status": 0,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 2.714,
+   "lines": [
+    {
+     "bench": "clock",
+     "n": 20000,
+     "batchMeanNs": 87,
+     "medianNs": 1003,
+     "p90Ns": 1763,
+     "p99Ns": 4739,
+     "maxNs": 1003229
+    },
+    {
+     "bench": "noop",
+     "n": 20000,
+     "batchMeanNs": 834,
+     "medianNs": 1414,
+     "p90Ns": 1853,
+     "p99Ns": 3848,
+     "maxNs": 321089
+    },
+    {
+     "bench": "random",
+     "n": 20000,
+     "batchMeanNs": 1065,
+     "medianNs": 1528,
+     "p90Ns": 2036,
+     "p99Ns": 4437,
+     "maxNs": 446017
+    },
+    {
+     "bench": "call_json_math_random",
+     "n": 20000,
+     "batchMeanNs": 2258,
+     "medianNs": 2502,
+     "p90Ns": 3383,
+     "p99Ns": 18368,
+     "maxNs": 431674
+    },
+    {
+     "bench": "await_resolved_blocking",
+     "n": 20000,
+     "batchMeanNs": 1571,
+     "medianNs": 2133,
+     "p90Ns": 2957,
+     "p99Ns": 15721,
+     "maxNs": 295377
+    },
+    {
+     "bench": "await_resolved_task",
+     "n": 20000,
+     "batchMeanNs": 41543,
+     "medianNs": 38578,
+     "p90Ns": 57166,
+     "p99Ns": 110850,
+     "maxNs": 1198853
+    },
+    {
+     "bench": "sort_comparator_direct",
+     "sorts": 5,
+     "elements": 2000,
+     "sorted": true,
+     "elapsedNs": 21414196,
+     "statsBefore": {
+      "values": 0,
+      "comparisons": 0,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     },
+     "statsAfter": {
+      "values": 0,
+      "comparisons": 93855,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     }
+    }
+   ]
+  },
+  {
+   "config": "B-pthread",
+   "args": [
+    "bench",
+    "20000",
+    "sort_comparator_thread"
+   ],
+   "status": 0,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 6.786,
+   "lines": [
+    {
+     "bench": "clock",
+     "n": 20000,
+     "batchMeanNs": 189,
+     "medianNs": 1044,
+     "p90Ns": 1989,
+     "p99Ns": 6562,
+     "maxNs": 381493
+    },
+    {
+     "bench": "noop",
+     "n": 20000,
+     "batchMeanNs": 17386,
+     "medianNs": 18015,
+     "p90Ns": 33224,
+     "p99Ns": 67646,
+     "maxNs": 3838231
+    },
+    {
+     "bench": "random",
+     "n": 20000,
+     "batchMeanNs": 16039,
+     "medianNs": 18575,
+     "p90Ns": 29767,
+     "p99Ns": 62609,
+     "maxNs": 470370
+    },
+    {
+     "bench": "call_json_math_random",
+     "n": 20000,
+     "batchMeanNs": 25384,
+     "medianNs": 18588,
+     "p90Ns": 26521,
+     "p99Ns": 57396,
+     "maxNs": 401306
+    },
+    {
+     "bench": "await_resolved_blocking",
+     "n": 20000,
+     "batchMeanNs": 22220,
+     "medianNs": 24952,
+     "p90Ns": 38134,
+     "p99Ns": 76488,
+     "maxNs": 669435
+    },
+    {
+     "bench": "await_resolved_task",
+     "n": 20000,
+     "batchMeanNs": 37998,
+     "medianNs": 32759,
+     "p90Ns": 52549,
+     "p99Ns": 104995,
+     "maxNs": 584540
+    },
+    {
+     "bench": "sort_comparator_thread",
+     "sorts": 5,
+     "elements": 2000,
+     "sorted": true,
+     "elapsedNs": 858949143,
+     "statsBefore": {
+      "values": 0,
+      "comparisons": 0,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     },
+     "statsAfter": {
+      "values": 0,
+      "comparisons": 93855,
+      "callbacks": 0,
+      "releasedValues": 1,
+      "pendingCallbacks": 0
+     }
+    }
+   ]
+  },
+  {
+   "config": "A",
+   "args": [
+    "compat"
+   ],
+   "status": 0,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 1.226,
+   "lines": [
+    {
+     "check": "pure_task_get",
+     "ok": true,
+     "detail": "4999950000",
+     "ms": 0
+    },
+    {
+     "check": "io_asTask_file_io_wait",
+     "ok": true,
+     "detail": "hello",
+     "ms": 4
+    },
+    {
+     "check": "many_tasks_with_js_calls",
+     "ok": true,
+     "detail": "8/8",
+     "ms": 39
+    },
+    {
+     "check": "io_sleep",
+     "ok": true,
+     "detail": "slept",
+     "ms": 20
+    },
+    {
+     "check": "mutex_contention",
+     "ok": true,
+     "detail": "800",
+     "ms": 0
+    },
+    {
+     "check": "std_async_block_pure",
+     "ok": true,
+     "detail": "42",
+     "ms": 0
+    },
+    {
+     "check": "std_async_block_async_await",
+     "ok": true,
+     "detail": "42",
+     "ms": 2
+    },
+    {
+     "check": "std_async_block_sleep_only",
+     "ok": true,
+     "detail": "slept",
+     "ms": 13
+    },
+    {
+     "check": "std_async_block_sleep",
+     "ok": true,
+     "detail": "42",
+     "ms": 21
+    },
+    {
+     "check": "await_promise_as_task_in_async",
+     "ok": true,
+     "detail": "bytes 1",
+     "ms": 1
+    },
+    {
+     "check": "js_exception_to_lean",
+     "ok": true,
+     "detail": "caught: TypeError: boom from JS",
+     "ms": 0
+    },
+    {
+     "check": "js_promise_rejection_to_lean_task",
+     "ok": true,
+     "detail": "error: TypeError: rejected",
+     "ms": 0
+    },
+    {
+     "check": "js_handles_released_by_lean_rc",
+     "ok": true,
+     "detail": "before {\"values\":0,\"comparisons\":0,\"callbacks\":0,\"releasedValues\":0,\"pendingCallbacks\":0} after {\"values\":0,\"comparisons\":0,\"callbacks\":0,\"releasedValues\":20000,\"pendingCallbacks\":0}",
+     "ms": 748
+    },
+    {
+     "check": "deep_recursion_100k",
+     "ok": true,
+     "detail": "100000",
+     "ms": 0
+    },
+    {
+     "check": "deep_recursion_1m",
+     "ok": true,
+     "detail": "1000000",
+     "ms": 0
+    }
+   ]
+  },
+  {
+   "config": "B-main",
+   "args": [
+    "compat"
+   ],
+   "status": 0,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 0.553,
+   "lines": [
+    {
+     "check": "pure_task_get",
+     "ok": true,
+     "detail": "4999950000",
+     "ms": 0
+    },
+    {
+     "check": "io_asTask_file_io_wait",
+     "ok": true,
+     "detail": "hello",
+     "ms": 4
+    },
+    {
+     "check": "many_tasks_with_js_calls",
+     "ok": true,
+     "detail": "8/8",
+     "ms": 43
+    },
+    {
+     "check": "io_sleep",
+     "ok": true,
+     "detail": "slept",
+     "ms": 20
+    },
+    {
+     "check": "mutex_contention",
+     "ok": true,
+     "detail": "800",
+     "ms": 0
+    },
+    {
+     "check": "std_async_block_pure",
+     "ok": true,
+     "detail": "42",
+     "ms": 0
+    },
+    {
+     "check": "std_async_block_async_await",
+     "ok": true,
+     "detail": "42",
+     "ms": 2
+    },
+    {
+     "check": "std_async_block_sleep_only",
+     "ok": true,
+     "detail": "slept",
+     "ms": 12
+    },
+    {
+     "check": "std_async_block_sleep",
+     "ok": true,
+     "detail": "42",
+     "ms": 18
+    },
+    {
+     "check": "await_promise_as_task_in_async",
+     "ok": true,
+     "detail": "bytes 1",
+     "ms": 1
+    },
+    {
+     "check": "js_exception_to_lean",
+     "ok": true,
+     "detail": "caught: TypeError: boom from JS",
+     "ms": 1
+    },
+    {
+     "check": "js_promise_rejection_to_lean_task",
+     "ok": true,
+     "detail": "error: TypeError: rejected",
+     "ms": 0
+    },
+    {
+     "check": "js_handles_released_by_lean_rc",
+     "ok": true,
+     "detail": "before {\"values\":0,\"comparisons\":0,\"callbacks\":0,\"releasedValues\":0,\"pendingCallbacks\":0} after {\"values\":0,\"comparisons\":0,\"callbacks\":0,\"releasedValues\":20000,\"pendingCallbacks\":0}",
+     "ms": 56
+    },
+    {
+     "check": "deep_recursion_100k",
+     "ok": true,
+     "detail": "100000",
+     "ms": 0
+    },
+    {
+     "check": "deep_recursion_1m",
+     "ok": true,
+     "detail": "1000000",
+     "ms": 0
+    }
+   ]
+  },
+  {
+   "config": "B-pthread",
+   "args": [
+    "compat"
+   ],
+   "status": 134,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 1.123,
+   "lines": [
+    {
+     "check": "pure_task_get",
+     "ok": true,
+     "detail": "4999950000",
+     "ms": 0
+    },
+    {
+     "check": "io_asTask_file_io_wait",
+     "ok": true,
+     "detail": "hello",
+     "ms": 5
+    },
+    {
+     "check": "many_tasks_with_js_calls",
+     "ok": true,
+     "detail": "8/8",
+     "ms": 37
+    },
+    {
+     "check": "io_sleep",
+     "ok": true,
+     "detail": "slept",
+     "ms": 20
+    },
+    {
+     "check": "mutex_contention",
+     "ok": true,
+     "detail": "800",
+     "ms": 0
+    },
+    {
+     "check": "std_async_block_pure",
+     "ok": true,
+     "detail": "42",
+     "ms": 0
+    },
+    {
+     "check": "std_async_block_async_await",
+     "ok": true,
+     "detail": "42",
+     "ms": 2
+    },
+    {
+     "check": "std_async_block_sleep_only",
+     "ok": true,
+     "detail": "slept",
+     "ms": 12
+    },
+    {
+     "check": "std_async_block_sleep",
+     "ok": true,
+     "detail": "42",
+     "ms": 17
+    },
+    {
+     "check": "await_promise_as_task_in_async",
+     "ok": true,
+     "detail": "bytes 1",
+     "ms": 1
+    },
+    {
+     "check": "js_exception_to_lean",
+     "ok": true,
+     "detail": "caught: TypeError: boom from JS",
+     "ms": 0
+    },
+    {
+     "check": "js_promise_rejection_to_lean_task",
+     "ok": true,
+     "detail": "error: TypeError: rejected",
+     "ms": 0
+    },
+    {
+     "check": "js_handles_released_by_lean_rc",
+     "ok": true,
+     "detail": "before {\"values\":0,\"comparisons\":0,\"callbacks\":0,\"releasedValues\":0,\"pendingCallbacks\":0} after {\"values\":0,\"comparisons\":0,\"callbacks\":0,\"releasedValues\":20000,\"pendingCallbacks\":0}",
+     "ms": 733
+    }
+   ],
+   "stderr": "\nStack overflow detected. Aborting.\n"
+  },
+  {
+   "config": "B-main-default-stack",
+   "args": [
+    "compat",
+    "deep_recursion_100k"
+   ],
+   "status": 1,
+   "signal": null,
+   "timedOut": false,
+   "seconds": 0.268,
+   "lines": [],
+   "stderr": "wasm://wasm/0052c86a:1\n\n\nRangeError: Maximum call stack size exceeded\n    at wasm://wasm/0052c86a:wasm-function[1250]:0x959aa\n    at wasm://wasm/0052c86a:wasm-function[1250]:0x959ef\n    at wasm://wasm/0052c86a:wasm-function[1250]:0x959ef\n    at wasm://wasm/0052c86a:wasm-function[1250]:0x959ef\n    at wasm://wasm/0052c86a:wasm-function[1250]:0x959ef\n    at wasm://wasm/0052c86a:wasm-function[1250]:0x959ef\n    at wasm://wasm/0052c86a:wasm-function[1250]:0x959ef\n    at wasm://wasm/0052c86a:wasm-function[1250]:0x959ef\n    at wasm://wasm/0052c86a:wasm-function[1250]:0x959ef\n    at wasm://wasm/0052c86a:wasm-function[1250]:0x959ef\n\nNode.js v26.12.1\n"
+  },
+  {
+   "config": "B-main",
+   "args": [
+    "bench",
+    "200",
+    "sort_comparator_thread"
+   ],
+   "status": null,
+   "signal": "SIGTERM",
+   "timedOut": true,
+   "seconds": 20.046,
+   "lines": [
+    {
+     "bench": "clock",
+     "n": 200,
+     "batchMeanNs": 933,
+     "medianNs": 2769,
+     "p90Ns": 6187,
+     "p99Ns": 41496,
+     "maxNs": 62283
+    },
+    {
+     "bench": "noop",
+     "n": 200,
+     "batchMeanNs": 2407,
+     "medianNs": 3721,
+     "p90Ns": 4133,
+     "p99Ns": 34818,
+     "maxNs": 278388
+    },
+    {
+     "bench": "random",
+     "n": 200,
+     "batchMeanNs": 5094,
+     "medianNs": 5655,
+     "p90Ns": 9854,
+     "p99Ns": 66025,
+     "maxNs": 544781
+    },
+    {
+     "bench": "call_json_math_random",
+     "n": 200,
+     "batchMeanNs": 9293,
+     "medianNs": 10457,
+     "p90Ns": 23921,
+     "p99Ns": 46872,
+     "maxNs": 66346
+    },
+    {
+     "bench": "await_resolved_blocking",
+     "n": 200,
+     "batchMeanNs": 7837,
+     "medianNs": 5407,
+     "p90Ns": 6938,
+     "p99Ns": 25450,
+     "maxNs": 26662
+    },
+    {
+     "bench": "await_resolved_task",
+     "n": 200,
+     "batchMeanNs": 81045,
+     "medianNs": 66301,
+     "p90Ns": 153485,
+     "p99Ns": 226718,
+     "maxNs": 878023
+    }
+   ],
+   "stderr": ""
+  }
+ ],
+ "loadAverageAtEnd": [
+  0.78,
+  0.89,
+  1.26
+ ],
+ "microStackDepth": {
+  "scope": "Deepest completed recursion of a 64-byte-frame C function (micro.c probe_depth) on the main JSPI stack (jspi.cjs) and on a PROXY_TO_PTHREAD pthread with Node default 4 MiB worker stack (proxy.cjs), by V8 flags",
+  "results": [
+   {
+    "file": "proxy.cjs",
+    "flags": [],
+    "maxDepth": 62125
+   },
+   {
+    "file": "jspi.cjs",
+    "flags": [],
+    "maxDepth": 15098
+   },
+   {
+    "file": "jspi.cjs",
+    "flags": [
+     "--wasm-stack-switching-stack-size=65536"
+    ],
+    "maxDepth": 15098
+   },
+   {
+    "file": "jspi.cjs",
+    "flags": [
+     "--stack-size=7000",
+     "--wasm-stack-switching-stack-size=65536"
+    ],
+    "maxDepth": 111354
+   },
+   {
+    "file": "jspi.cjs",
+    "flags": [
+     "--stack-size=60000",
+     "--wasm-stack-switching-stack-size=65536"
+    ],
+    "maxDepth": 959354
+   }
+  ],
+  "jsRecursionWithStackSize60000": "node --stack-size=60000: plain JS recursion on the main thread segfaults (exit 139) instead of throwing RangeError (8 MiB OS main-thread stack); v8.setFlagsFromString at run time leaves the main JS limit unchanged (RangeError at ~12.5k frames) but applies to new JSPI stacks"
+ },
+ "build": {
+  "runtime": "lean-4.35.0-wasm64 application runtime, manifest 7aa5028c6226405b322961b289f955043824a49c997bec3f3e262647c045557c (candidate 39677808414 bundle)",
+  "A": "experiments/js-interop/build-a.sh (bin/lasm.mjs build, Node link driver, -Oz)",
+  "B": "experiments/js-interop/jspi/relink.mjs on the kept link inputs (Python em++ 6.0.9, -Oz, -sJSPI, no PROXY_TO_PTHREAD); no runtime rebuild; relink 30-42 s, peak 0.7-1.2 GiB",
+  "note": "B-main bench rows with n=200 (last run) are the deadlock demonstration, not a measurement"
+ }
+}

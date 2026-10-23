@@ -485,6 +485,13 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
      main thread versus JS Promise Integration (Lean on the main thread);
      measure call and callback cost, check wasm64 + pthreads compatibility and
      Lean blocking operations; choose the architecture.
+     Status (2026-10-22): measured, **awaiting the user's review**; see
+     [JS_INTEROP.md](JS_INTEROP.md). Recommendation: message passing (A).
+     Lean→JS call ~16 µs (JSPI ~1 µs), but Node `http` with queued Lean callbacks
+     reaches 37k req/s at c=16 (plain Node 43k, JSPI 15k, current `Std.Http` 1.3k)
+     and Lean's tasks, blocking IO, `Std.Async` and 64 MiB stacks are unchanged;
+     JSPI needed main-thread futex rewriting and V8 stack flags and cannot make
+     host calls under synchronous callbacks.
   2. Core: dynamic `JS.Value` handles (`JS.require`, `JS.global`, get, set,
      call, new, await); `ToJS`/`FromJS` conversions (String, numbers, Bool,
      ByteArray, Array, Option, `Lean.Json`, `deriving` for structures); typed
