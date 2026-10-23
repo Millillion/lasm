@@ -580,8 +580,12 @@ folded into Phases 5.2/5.3 and 7.
     containers; read-only filesystem and 512 MB cap; build on macOS and Linux,
     run on the other; AWS Lambda container image with its Runtime Interface
     Emulator and the Lambda Web Adapter (x64 and arm64).
-    *Status (2026-10-23): implemented in source (`1a3c738`); candidate in
-    acceptance.* Apps check Node >= 24.0.0, "native pieces for this host" and
+    *Status (2026-10-23): candidate `.39988013618` (source `d8484c4`) passed
+    five-platform acceptance and the platform matrix (run 39988013618); the
+    cold-installation gate is running (runs 39994918847, 39994938810,
+    39994957491). It also lengthens managed-download retries to exponential
+    backoff over about 2-3 minutes (every 5xx, 408/429, resets).*
+    Apps check Node >= 24.0.0, "native pieces for this host" and
     glibc >= 2.28; the compiler checks Node >= 24 and glibc >= 2.34 (measured:
     managed Git needs GLIBC_2.34, Lean's LLVM 2.30, everything else <= 2.27).
     Production `node_modules` was already the deployed closure (no change). The
