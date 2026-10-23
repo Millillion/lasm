@@ -1,0 +1,64 @@
+{
+  "postgres": "postgres:17",
+  "recipeNodeImage": "node:24.22.1-bookworm-slim",
+  "images": [
+    {
+      "name": "debian12-node24",
+      "image": "node:24.22.1-bookworm-slim",
+      "glibc": "2.36",
+      "claim": "Docker/Kubernetes, Debian 12, Node 24"
+    },
+    {
+      "name": "debian12-node26",
+      "image": "node:26.12.1-bookworm-slim",
+      "glibc": "2.36",
+      "claim": "Docker/Kubernetes, Debian 12, Node 26"
+    },
+    {
+      "name": "debian11-node24",
+      "image": "node:24.20.0-bullseye-slim",
+      "glibc": "2.31",
+      "claim": "glibc 2.31 (older than every launch platform)"
+    },
+    {
+      "name": "ubuntu2204-node24",
+      "image": "ubuntu:22.04",
+      "node": "24.22.1",
+      "glibc": "2.35",
+      "claim": "Ubuntu 22.04 with the official Node tarball"
+    },
+    {
+      "name": "ubuntu2404-node26",
+      "image": "ubuntu:24.04",
+      "node": "26.12.1",
+      "glibc": "2.39",
+      "claim": "Ubuntu 24.04 (Heroku-24) with the official Node 26 tarball and libatomic1",
+      "prepare": "apt-get update && apt-get install -y --no-install-recommends libatomic1 && rm -rf /var/lib/apt/lists/*"
+    },
+    {
+      "name": "al2023-node24",
+      "image": "amazonlinux:2023",
+      "node": "24.22.1",
+      "glibc": "2.34",
+      "claim": "Amazon Linux 2023 (Lambda's OS) with the official Node tarball"
+    },
+    {
+      "name": "debian12-node24.0.0",
+      "image": "debian:12-slim",
+      "node": "24.0.0",
+      "glibc": "2.36",
+      "claim": "the minimum Node release, 24.0.0"
+    },
+    {
+      "name": "debian12-node22",
+      "image": "debian:12-slim",
+      "node": "22.23.4",
+      "expectNodeError": true,
+      "claim": "Node 22 gets a clear error"
+    }
+  ],
+  "lambda": {
+    "image": "public.ecr.aws/lambda/nodejs:24",
+    "adapter": "public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0"
+  }
+}

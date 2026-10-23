@@ -19,7 +19,7 @@ const port = await new Promise((done, fail) => {
   const timer = setTimeout(() => fail(new Error(`no Listening line within 120 s: ${stderr.slice(-2000)}`)), 120_000);
   child.stdout.on('data', bytes => {
     stdout += bytes;
-    const match = stdout.match(/Listening on http:\/\/127\.0\.0\.1:(\d+)/);
+    const match = stdout.match(/Listening on http:\/\/[^\s:]+:(\d+)/);
     if (match) { clearTimeout(timer); done(Number(match[1])); }
   });
   child.once('exit', code => { clearTimeout(timer); fail(new Error(`exited ${code}: ${stderr.slice(-2000)}`)); });

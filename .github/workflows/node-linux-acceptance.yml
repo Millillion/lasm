@@ -160,9 +160,23 @@ jobs:
       sha256: ${{ needs.package.outputs.sha256 }}
       candidate-release: ${{ needs.package.outputs.candidate-release }}
       candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
+  # Launch platform support (Phase 5.1): Node 24/26, Linux images, Lambda's
+  # image with its emulator, and cross-built deployments. No cloud accounts.
+  platform:
+    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    needs: [package, input, faults]
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/platform-support.yml
+    with:
+      cache-key: ${{ needs.input.outputs.cache-key }}
+      sha256: ${{ needs.package.outputs.sha256 }}
+      candidate-release: ${{ needs.package.outputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   candidate:
     if: github.event_name == 'push' || inputs.validation-scope == 'all'
-    needs: [package, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, js-interop]
+    needs: [package, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, js-interop, platform]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

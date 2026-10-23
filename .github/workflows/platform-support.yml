@@ -1,0 +1,272 @@
+name: Launch platform support
+# Phase 5.1: backs every launch support claim (README "Supported platforms",
+# docs/DEPLOYMENT.md) with a local runtime, image or emulator. No cloud
+# accounts or deployments, ever. Sample applications (examples/hello and
+# examples/js-crud on Express and on Hono) are built with the installed
+# candidate on Linux x64 (compiler on the newest Node 24), Linux arm64
+# (compiler on Node 24.0.0), macOS arm64 and Windows x64 (compiler on Node 26),
+# then run:
+#   - natively on Node 24.0.0, the newest 24 and 26 (x64 and arm64); Node 22
+#     must give a clean error;
+#   - in Debian 11/12, Ubuntu 22.04/24.04 and Amazon Linux 2023 containers,
+#     read-only with a 512 MB memory limit, plus the deploy/Dockerfile recipe;
+#   - in the AWS Lambda Node 24 image through its Runtime Interface Emulator and
+#     the AWS Lambda Web Adapter (deploy/lambda/Dockerfile), x64 and arm64;
+#   - cross-built: macOS and Windows builds on Linux, Linux builds on macOS.
+# Called by the candidate acceptance (node-linux-acceptance.yml) before a
+# candidate is retained as tested.
+on:
+  workflow_call:
+    inputs:
+      cache-key: { type: string, default: "" }
+      candidate-release: { type: string, default: "" }
+      sha256: { required: true, type: string }
+      candidate-version: { required: true, type: string }
+  workflow_dispatch:
+    inputs:
+      candidate-release:
+        description: Release holding the candidate (node-package-RUN_ID)
+        required: true
+        type: string
+      sha256:
+        required: true
+        type: string
+      candidate-version:
+        required: true
+        type: string
+  push:
+    branches: [main]
+    paths: ['.github/workflows/platform-support.yml', 'scripts/platform/**', 'deploy/**', 'examples/hello/**', 'examples/js-crud/**', 'scripts/ci/platform-candidate.json']
+permissions:
+  contents: read
+jobs:
+  select:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      active: ${{ steps.selected.outputs.active }}
+      version: ${{ steps.selected.outputs.version }}
+      sha256: ${{ steps.selected.outputs.sha256 }}
+      release: ${{ steps.selected.outputs.release }}
+      node24: ${{ steps.selected.outputs.node24 }}
+      node26: ${{ steps.selected.outputs.node26 }}
+      minimum: ${{ steps.selected.outputs.minimum }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      # A push re-checks the harness with the newest candidate that passed it
+      # (scripts/ci/platform-candidate.json); calls and dispatches name one.
+      - name: Select the candidate and the pinned Node releases
+        id: selected
+        env:
+          INPUT_VERSION: ${{ inputs.candidate-version }}
+          INPUT_SHA256: ${{ inputs.sha256 }}
+          INPUT_RELEASE: ${{ inputs.candidate-release }}
+        run: node scripts/platform/select.mjs
+  input:
+    needs: select
+    if: needs.select.outputs.active == 'true' && inputs.cache-key == ''
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/node-candidate-input.yml
+    with:
+      sha256: ${{ needs.select.outputs.sha256 }}
+      candidate-release: ${{ needs.select.outputs.release }}
+      candidate-version: ${{ needs.select.outputs.version }}
+  build:
+    needs: [select, input]
+    if: always() && needs.select.outputs.active == 'true' && needs.input.result != 'failure' && needs.input.result != 'cancelled'
+    name: build on ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: linux-x64, runner: ubuntu-24.04, architecture: x64, node: node24 }
+          - { name: linux-arm64, runner: ubuntu-24.04-arm, architecture: arm64, node: minimum }
+          - { name: darwin-arm64, runner: macos-15, architecture: arm64, node: node26 }
+          - { name: win32-x64, runner: windows-2025, architecture: x64, node: node26 }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    env:
+      LASM_CANDIDATE_SHA256: ${{ needs.select.outputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ needs.select.outputs.version }}
+      LASM_CANDIDATE_RELEASE: ${{ needs.select.outputs.release }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ needs.select.outputs[matrix.node] }}
+          architecture: ${{ matrix.architecture }}
+          package-manager-cache: false
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ needs.select.outputs.version }}.tgz
+          key: ${{ inputs.cache-key || needs.input.outputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify the candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Build hello, Express and Hono with the installed candidate
+        run: node scripts/platform/build-apps.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/platform-work" "$RUNNER_TEMP/apps"
+      # tar keeps the Linux helpers' execute permissions across the handoff.
+      - name: Pack the applications
+        working-directory: ${{ runner.temp }}
+        run: tar -cf "apps-${{ matrix.name }}.tar" -C apps .
+      - uses: actions/upload-artifact@v7
+        with:
+          name: platform-apps-${{ matrix.name }}
+          path: ${{ runner.temp }}/apps-${{ matrix.name }}.tar
+          retention-days: 1
+          compression-level: 6
+          if-no-files-found: error
+  native:
+    needs: [select, build]
+    if: always() && needs.select.outputs.active == 'true'
+    name: native ${{ matrix.runner }} node ${{ matrix.node }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+        node: [minimum, node24, node26, node22]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ matrix.node == 'node22' && '22.23.4' || needs.select.outputs[matrix.node] }}
+          package-manager-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: platform-apps-*
+          path: ${{ runner.temp }}/artifacts
+      - name: Run every build that targets this machine
+        run: |
+          own=linux-x64; [ "$(uname -m)" = aarch64 ] && own=linux-arm64
+          # This runner's own Linux build, plus the macOS and Windows builds (cross-built).
+          node scripts/platform/run-matrix.mjs native "$RUNNER_TEMP/artifacts" "$RUNNER_TEMP/results" "$own" darwin-arm64 win32-x64 \
+            ${{ matrix.node == 'node22' && '--expect-node-error' || '' }}
+      - name: Summary
+        if: always()
+        run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
+  containers:
+    needs: [select, build]
+    if: always() && needs.select.outputs.active == 'true'
+    name: containers ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ needs.select.outputs.node24 }}
+          package-manager-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: platform-apps-*
+          path: ${{ runner.temp }}/artifacts
+      - name: Linux images, read-only with 512 MB; the container recipe; macOS and Windows builds in Debian 12
+        run: |
+          own=linux-x64; [ "$(uname -m)" = aarch64 ] && own=linux-arm64
+          node scripts/platform/run-matrix.mjs containers "$RUNNER_TEMP/artifacts" "$RUNNER_TEMP/results" "$own" darwin-arm64 win32-x64
+      - name: Summary
+        if: always()
+        run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
+  lambda:
+    needs: [select, build]
+    if: always() && needs.select.outputs.active == 'true'
+    name: lambda ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ needs.select.outputs.node24 }}
+          package-manager-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: platform-apps-*
+          path: ${{ runner.temp }}/artifacts
+      - name: Lambda image, Runtime Interface Emulator and Lambda Web Adapter (Linux and macOS builds)
+        run: |
+          own=linux-x64; [ "$(uname -m)" = aarch64 ] && own=linux-arm64
+          node scripts/platform/run-matrix.mjs lambda "$RUNNER_TEMP/artifacts" "$RUNNER_TEMP/results" "$own" darwin-arm64
+      - name: Summary
+        if: always()
+        run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
+  macos:
+    needs: [select, build]
+    if: always() && needs.select.outputs.active == 'true'
+    name: macOS runs its own build; a Linux build refuses clearly
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ needs.select.outputs.node24 }}
+          package-manager-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: platform-apps-*
+          path: ${{ runner.temp }}/artifacts
+      # Builds carry Linux x64/arm64 and their build host's native pieces, so a
+      # Linux build must refuse macOS with the documented message.
+      - name: Temporary Postgres; the macOS build on Node 24; Linux builds refuse clearly
+        run: |
+          node scripts/js-interop/start-postgres.mjs "$RUNNER_TEMP/postgres" 55432 > "$RUNNER_TEMP/postgres.log" 2>&1 < /dev/null &
+          for i in $(seq 1 300); do grep -q '^DATABASE_URL=' "$RUNNER_TEMP/postgres.log" && break; sleep 1; done
+          export "$(grep '^DATABASE_URL=' "$RUNNER_TEMP/postgres.log")"
+          status=0
+          node scripts/platform/run-matrix.mjs native "$RUNNER_TEMP/artifacts" "$RUNNER_TEMP/results" darwin-arm64 || status=1
+          node scripts/platform/run-matrix.mjs native "$RUNNER_TEMP/artifacts" "$RUNNER_TEMP/results" linux-x64 --expect-host-error || status=1
+          exit $status
+      - name: Summary
+        if: always()
+        run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
+  result:
+    needs: [select, build, native, containers, lambda, macos]
+    if: always() && needs.select.outputs.active == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Every platform check passed
+        run: |
+          echo '${{ toJSON(needs) }}' | node -e "const n=JSON.parse(require('fs').readFileSync(0));const bad=Object.entries(n).filter(([k,v])=>k!=='select'&&v.result!=='success');console.log(Object.entries(n).map(([k,v])=>k+': '+v.result).join('\n'));if(bad.length)process.exit(1)"

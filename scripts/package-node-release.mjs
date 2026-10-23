@@ -67,7 +67,12 @@ cpSync(join(root, 'examples/hello'), join(staging, 'examples/hello'), { recursiv
 const json = (path, value) => writeFileSync(join(staging, path), JSON.stringify(value, null, 2) + '\n');
 json('src/toolchains.json', { ...toolchainCatalog, defaultLean: lean, lean: { [lean]: toolchainCatalog.lean[lean] } });
 json('src/application-runtimes.json', { schema: 1, lean: { [lean]: expected } });
-json('application-support.json', { schema: 1, platforms, node: pins.node, lean, minimumGlibc: '2.39' });
+// The compiler runs on Node >= 24 (tested on the pinned 24 and 26 releases). Its
+// Linux floor is the managed tools' newest glibc symbol (GLIBC_2.34, managed Git;
+// Lean's LLVM needs 2.30). Built applications carry their own, lower checks
+// (src/application-output.mjs: Node 24.0.0, glibc 2.28).
+json('application-support.json', { schema: 1, platforms, node: pins.node, minimumNode: pins.minimumNode,
+  testedNode: [pins.node24, pins.node], lean, minimumGlibc: '2.34' });
 const installer = await bundleInstaller(root, staging);
 json('provenance.json', { sourceRevision, runtimeManifestSha256: manifestSha256,
   installerManifestSha256: installer.sha256, lean, node: pins.node });
@@ -75,7 +80,7 @@ const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json')));
 json('package.json', {
   name: sourcePackage.name, version, private: true, license: 'UNLICENSED', type: 'module',
   description: 'Compile ordinary Lean applications to run in Node',
-  bin: sourcePackage.bin, engines: { node: pins.node }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
+  bin: sourcePackage.bin, engines: { node: '>=' + pins.minimumNode }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
   files: ['bin', 'src', 'library', 'templates', 'scripts', 'targets', 'docs', 'examples', 'README.md',
     'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json', 'installer-dependencies.json'],
   dependencies: { tar: sourcePackage.dependencies.tar },

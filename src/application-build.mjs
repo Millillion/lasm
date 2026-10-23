@@ -15,12 +15,13 @@ import { importsLibrary, librarySources } from './lasm-library.mjs';
 import { planNodeModules, copyNodeModules } from './application-npm.mjs';
 import { readBindings, checkBindings, requireValidBindings } from './application-binding-check.mjs';
 import { linkApplication, selectedLinkDriver } from './application-link.mjs';
-import { copyApplicationHost, writeApplicationEntrypoint } from './application-output.mjs';
+import { copyApplicationHost, writeApplicationEntrypoint, minimumApplicationNode, minimumApplicationGlibc } from './application-output.mjs';
+import { applicationNativeTargets } from './native-bundle.mjs';
 import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './application-files.mjs';
 import { withApplicationLock } from './application-lock.mjs';
 import { applicationPolicy } from './application-policy.mjs';
 import { insideDirectory } from './platform.mjs';
-import { applicationSupport, requireApplicationSupport } from './application-support.mjs';
+import { requireApplicationSupport } from './application-support.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const helpers = ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs',
@@ -114,8 +115,8 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
     applicationPolicy,
-    target: 'node', host: `${process.platform}-${process.arch}`, node: applicationSupport()?.node,
-    minimumGlibc: applicationSupport()?.minimumGlibc, memoryMode, modules,
+    target: 'node', host: `${process.platform}-${process.arch}`, nativeTargets: applicationNativeTargets(),
+    minimumNode: minimumApplicationNode, minimumGlibc: minimumApplicationGlibc, memoryMode, modules,
     ...(nativeCompilations.length ? { nativeObjects: nativeCompilations.map(item => ({ object: item.object, identity: item.identity,
       sourceSha256: createHash('sha256').update(readFileSync(item.source)).digest('hex'), args: item.extraArgs })) } : {}),
     ...(nativeUnavailable.length ? { nativeUnavailable } : {}),
@@ -149,9 +150,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     throw error;
   }
   progress?.({ stage: 'Packaging the application and runtime support' });
-  copyApplicationHost(dist); writeApplicationEntrypoint(dist, {
-    node: applicationSupport()?.node, minimumGlibc: applicationSupport()?.minimumGlibc,
-  });
+  copyApplicationHost(dist); writeApplicationEntrypoint(dist);
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));
   if (nodeModules) {
     progress?.({ stage: `Copying ${nodeModules.packages.length} npm packages` });

@@ -25,10 +25,12 @@ def main : IO Unit := do
     let response ← App.handle ctx method path authorization body
     c.callMethod "json" #[response.body, toJS response.status] Data
   let _ : Value ← app.callMethod "all" #[toJS "*", toJS handler]
+  -- Containers and hosting platforms route to 0.0.0.0 and set PORT.
   let port := ((← IO.getEnv "PORT").bind String.toNat?).getD 3000
+  let host := (← IO.getEnv "HOST").getD "0.0.0.0"
   let listening ← Function.ofFn fun args => do
-    IO.println s!"Listening on http://127.0.0.1:{(FromJS.fromJS ((args[0]?.getD Data.undefined).field "port") : Except String Nat).toOption.getD port} (Hono)"
+    IO.println s!"Listening on http://{host}:{(FromJS.fromJS ((args[0]?.getD Data.undefined).field "port") : Except String Nat).toOption.getD port} (Hono)"
     (← IO.getStdout).flush
     return .undefined
-  let _ ← serve (obj [("fetch", toJS (← app.get "fetch")), ("port", toJS port), ("hostname", toJS "127.0.0.1")]) listening
+  let _ ← serve (obj [("fetch", toJS (← app.get "fetch")), ("port", toJS port), ("hostname", toJS host)]) listening
   waitForever

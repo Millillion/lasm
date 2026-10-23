@@ -56,19 +56,39 @@ test('stale or compiler-capable deployments fail before loading host code or the
   }
 });
 
-for (const [name, support, message] of [
-  ['host', { platform: 'unsupported', arch: 'other' }, /built on unsupported-other.*Rebuild/],
-  ['Node version', { node: '0.0.0' }, /requires Node 0.0.0.*Install/],
-  ['system library', { minimumGlibc: '999.0' }, /requires glibc 999.0.*supported Linux system/],
+for (const [name, support, message, native] of [
+  ['Node version', { minimumNode: '999.0.0' }, /requires Node 999.0.0 or newer; you are running Node .*Install Node 24 or newer/],
+  ['host', {}, undefined, ['linux-x64', 'linux-arm64', 'unsupported-other']],
+  ['system library', { minimumGlibc: '999.0' }, /requires Linux with glibc 999.0 or newer; this system reports glibc .*supported Linux system/],
 ]) test(`incompatible deployment ${name} is rejected before loading host dependencies`, t => {
   if (name === 'system library' && process.platform !== 'linux') return t.skip('glibc is a Linux prerequisite');
   const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-platform-')));
   t.after(() => rmSync(base, { recursive: true, force: true }));
   writeApplicationEntrypoint(base, support);
+  // A deployment without this host's native pieces (a target list that never includes it).
+  const targets = native?.filter(target => target !== `${process.platform}-${process.arch}`);
+  if (targets) {
+    mkdirSync(join(base, 'host/native'), { recursive: true });
+    writeFileSync(join(base, 'host/native/manifest.json'), JSON.stringify({ deployment: { target: 'node', targets } }));
+  }
   const result = spawnSync(process.execPath, [join(base, 'main.mjs')], { encoding: 'utf8' });
   assert.equal(result.status, 1);
-  assert.match(result.stderr, message);
+  assert.match(result.stderr, name === 'host' ? new RegExp(`includes native support for ${targets.join(', ')}; it is running on ${process.platform}-${process.arch}\\..*rebuild`) : message);
   assert.doesNotMatch(result.stderr, /ERR_MODULE_NOT_FOUND/);
+});
+
+test('a deployment that carries this host\'s native pieces runs on any Node from the minimum', t => {
+  const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-platform-ok-')));
+  t.after(() => rmSync(base, { recursive: true, force: true }));
+  writeApplicationEntrypoint(base);
+  assert.match(readFileSync(join(base, 'main.mjs'), 'utf8'), /const minimumNode = "24.0.0";\nconst minimumGlibc = "2.28";/);
+  mkdirSync(join(base, 'host/native'), { recursive: true });
+  writeFileSync(join(base, 'host/native/manifest.json'), JSON.stringify({ deployment: { target: 'node', targets: ['linux-x64', 'linux-arm64', `${process.platform}-${process.arch}`] } }));
+  writeFileSync(join(base, 'host/application-signals.mjs'), 'export function prepareApplicationSignals() {}');
+  writeFileSync(join(base, 'build-info.json'), JSON.stringify({ applicationPolicy,
+    linkRequirements: { mode: 'static', dynamic: [], cxxRuntime: [], moduleData: [], requiresModuleData: false } }));
+  writeFileSync(join(base, 'program.cjs'), 'console.log("started")');
+  assert.equal(execFileSync(process.execPath, [join(base, 'main.mjs')], { encoding: 'utf8' }), 'started\n');
 });
 
 test('all full-runtime host support files exist with their dependencies', () => {

@@ -25,13 +25,15 @@ def main : IO Unit := do
     let _ : Value ← (← res.callMethod "status" #[toJS response.status]).callMethod "json" #[response.body]
     return .undefined
   let _ : Value ← app.callMethod "use" #[toJS handler]
+  -- Containers and hosting platforms route to 0.0.0.0 and set PORT.
   let port := ((← IO.getEnv "PORT").bind String.toNat?).getD 3000
+  let host := (← IO.getEnv "HOST").getD "0.0.0.0"
   let server ← IO.mkRef (none : Option Value)
   let listening ← Function.ofFn fun _ => do
     let some s ← server.get | return .undefined
     let address ← s.callMethod "address" #[] Data
-    IO.println s!"Listening on http://127.0.0.1:{(FromJS.fromJS (address.field "port") : Except String Nat).toOption.getD port} (Express)"
+    IO.println s!"Listening on http://{host}:{(FromJS.fromJS (address.field "port") : Except String Nat).toOption.getD port} (Express)"
     (← IO.getStdout).flush
     return .undefined
-  server.set (some (← app.callMethod "listen" #[toJS port, toJS "127.0.0.1", toJS listening]))
+  server.set (some (← app.callMethod "listen" #[toJS port, toJS host, toJS listening]))
   waitForever

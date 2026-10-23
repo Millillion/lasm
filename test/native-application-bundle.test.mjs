@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, chmodSync, statSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, chmodSync, statSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
@@ -47,40 +47,54 @@ function files(base) {
     ? files(join(base, entry.name)).map(name => entry.name + '/' + name) : [entry.name]).sort();
 }
 
-for (const arch of ['x64', 'arm64']) test(`Linux ${arch} deployment keeps its loaders, licenses and authenticated helpers`, t => {
+const linuxFiles = arch => [`node_modules/@koromix/koffi-linux-${arch}/index.js`, `node_modules/@koromix/koffi-linux-${arch}/package.json`,
+  `node_modules/@koromix/koffi-linux-${arch}/linux_${arch}/koffi.node`, `process/linux-${arch}-gnu`, `signals/linux-${arch}-gnu.so`];
+const koffiFiles = ['node_modules/koffi/index.cjs', 'node_modules/koffi/src/koffi/index.cjs', 'node_modules/koffi/src/koffi/src/static.cjs',
+  'node_modules/koffi/package.json', 'node_modules/koffi/LICENSE.txt', 'manifest.json'];
+const helperFiles = ['process/manifest.json', 'process/THIRD_PARTY_NOTICES.txt', 'signals/manifest.json', 'signals/THIRD_PARTY_NOTICES.txt'];
+
+function assertCopiedBytes(base, source, copied) {
+  for (const name of copied.filter(name => !name.endsWith('manifest.json')))
+    assert.deepEqual(readFileSync(join(base, name)), readFileSync(join(source, name)));
+}
+
+function assertLinuxHelpers(base, extraSignals = []) {
+  const processManifest = JSON.parse(readFileSync(join(base, 'process/manifest.json')));
+  assert.deepEqual(Object.keys(processManifest.files), ['linux-x64-gnu', 'linux-arm64-gnu']);
+  assert.equal(processManifest.sourceSha256, 'retained provenance');
+  const signals = JSON.parse(readFileSync(join(base, 'signals/manifest.json')));
+  assert.deepEqual(Object.keys(signals.files), ['linux-x64-gnu.so', 'linux-arm64-gnu.so', ...extraSignals]);
+  if (process.platform !== 'win32') for (const arch of ['x64', 'arm64'])
+    assert.equal(statSync(join(base, 'process', `linux-${arch}-gnu`)).mode & 0o111, 0o111);
+}
+
+for (const arch of ['x64', 'arm64']) test(`a Linux ${arch} build carries both glibc Linux targets, loaders, licenses and authenticated helpers`, t => {
   const { root, source, output } = fixture(t);
   copyApplicationNativeBundle(root, output, { platform: 'linux', arch });
   const base = join(output, 'native'), copied = files(base);
-  assert.equal(copied.length, 15);
-  assert.ok(copied.includes(`node_modules/@koromix/koffi-linux-${arch}/linux_${arch}/koffi.node`));
-  assert.ok(copied.includes('node_modules/koffi/LICENSE.txt'));
-  assert.equal(copied.some(name => /musl|darwin|unrelated|\.cc$/.test(name)), false);
-  for (const name of copied.filter(name => !name.endsWith('manifest.json')))
-    assert.deepEqual(readFileSync(join(base, name)), readFileSync(join(source, name)));
-  for (const [directory, name] of [['process', `linux-${arch}-gnu`], ['signals', `linux-${arch}-gnu.so`]]) {
-    const manifest = JSON.parse(readFileSync(join(base, directory, 'manifest.json')));
-    assert.deepEqual(Object.keys(manifest.files), [name]);
-    assert.equal(manifest.sourceSha256, 'retained provenance');
-    if (process.platform !== 'win32') assert.equal(statSync(join(base, directory, name)).mode & 0o111, 0o111);
-  }
+  assert.deepEqual(copied, [...koffiFiles, ...helperFiles, ...linuxFiles('x64'), ...linuxFiles('arm64')].sort());
+  assert.equal(copied.some(name => /musl|darwin|win32|unrelated|\.cc$/.test(name)), false);
+  assertCopiedBytes(base, source, copied);
+  assertLinuxHelpers(base);
+  assert.deepEqual(JSON.parse(readFileSync(join(base, 'manifest.json'))).deployment,
+    { target: 'node', targets: ['linux-x64', 'linux-arm64'], linuxLibc: 'glibc' });
 });
 
-for (const arch of ['x64', 'arm64']) test(`macOS ${arch} copies only its native adapter and signal helper`, t => {
+for (const arch of ['x64', 'arm64']) test(`a macOS ${arch} build carries its own adapter plus both Linux targets`, t => {
   const { root, source, output } = fixture(t);
   copyApplicationNativeBundle(root, output, { platform: 'darwin', arch });
   const base = join(output, 'native'), copied = files(base);
-  assert.equal(copied.length, 12);
-  assert.ok(copied.includes(`node_modules/@koromix/koffi-darwin-${arch}/darwin_${arch}/koffi.node`));
-  assert.ok(copied.includes(`signals/darwin-${arch}.dylib`));
-  assert.equal(copied.some(name => /linux|musl|process|unrelated|\.cc$/.test(name)), false);
-  for (const name of copied.filter(name => !name.endsWith('manifest.json')))
-    assert.deepEqual(readFileSync(join(base, name)), readFileSync(join(source, name)));
+  const darwin = [`node_modules/@koromix/koffi-darwin-${arch}/index.js`, `node_modules/@koromix/koffi-darwin-${arch}/package.json`,
+    `node_modules/@koromix/koffi-darwin-${arch}/darwin_${arch}/koffi.node`, `signals/darwin-${arch}.dylib`];
+  assert.deepEqual(copied, [...koffiFiles, ...helperFiles, ...linuxFiles('x64'), ...linuxFiles('arm64'), ...darwin].sort());
+  assert.equal(copied.some(name => /musl|win32|unrelated|\.cc$/.test(name) || name.includes(`darwin-${arch === 'x64' ? 'arm64' : 'x64'}`)), false);
+  assertCopiedBytes(base, source, copied);
+  assertLinuxHelpers(base, [`darwin-${arch}.dylib`]);
+  assert.deepEqual(JSON.parse(readFileSync(join(base, 'manifest.json'))).deployment.targets, ['linux-x64', 'linux-arm64', `darwin-${arch}`]);
 });
 
-for (const arch of ['x64']) test(`Windows ${arch} has its complete adapter without POSIX helper dependencies`, t => {
+for (const arch of ['x64']) test(`a Windows ${arch} build carries its adapter plus both Linux targets`, t => {
   const { root, source, output } = fixture(t);
-  // A Windows deployment must not depend on POSIX helper files even existing.
-  for (const directory of ['signals', 'process']) rmSync(join(source, directory), { recursive: true });
   for (const name of applicationHostFiles) writeFileSync(join(root, 'src', name), 'host fixture: ' + name);
   // Exercise the application's selector too: calling only the low-level copier
   // missed Windows falling back to the entire multi-platform native bundle.
@@ -88,13 +102,22 @@ for (const arch of ['x64']) test(`Windows ${arch} has its complete adapter witho
   const base = join(output, 'host/native'), copied = files(base);
   for (const name of applicationHostFiles)
     assert.equal(readFileSync(join(output, 'host', name), 'utf8'), 'host fixture: ' + name);
-  assert.equal(copied.length, 9);
-  assert.ok(copied.includes(`node_modules/@koromix/koffi-win32-${arch}/win32_${arch}/koffi.node`));
-  assert.ok(copied.includes('node_modules/koffi/LICENSE.txt'));
-  assert.equal(copied.some(name => /linux|darwin|signals|process|unrelated|\.cc$/.test(name)), false);
-  for (const name of copied.filter(name => !name.endsWith('manifest.json')))
-    assert.deepEqual(readFileSync(join(base, name)), readFileSync(join(source, name)));
-  assert.deepEqual(JSON.parse(readFileSync(join(base, 'manifest.json'))).deployment, { target: 'node', platform: 'win32', arch });
+  const windows = [`node_modules/@koromix/koffi-win32-${arch}/index.js`, `node_modules/@koromix/koffi-win32-${arch}/package.json`,
+    `node_modules/@koromix/koffi-win32-${arch}/win32_${arch}/koffi.node`];
+  assert.deepEqual(copied, [...koffiFiles, ...helperFiles, ...linuxFiles('x64'), ...linuxFiles('arm64'), ...windows].sort());
+  assert.equal(copied.some(name => /musl|darwin|unrelated|\.cc$/.test(name)), false);
+  assertCopiedBytes(base, source, copied);
+  assertLinuxHelpers(base);
+  assert.deepEqual(JSON.parse(readFileSync(join(base, 'manifest.json'))).deployment,
+    { target: 'node', targets: ['linux-x64', 'linux-arm64', 'win32-x64'], linuxLibc: 'glibc' });
+});
+
+test('deployments never carry the unused pthread working-directory factory', t => {
+  const { root, output } = fixture(t);
+  assert.equal(applicationHostFiles.includes('native-pthread-factory.cjs'), false);
+  for (const name of applicationHostFiles) writeFileSync(join(root, 'src', name), 'host fixture');
+  copyApplicationHost(output, { platform: 'linux', arch: 'x64', glibc: '2.39', sourceRoot: root });
+  assert.equal(existsSync(join(output, 'host/native-pthread-factory.cjs')), false);
 });
 
 test('Windows ARM64 deployments are refused as an unsupported platform', t => {

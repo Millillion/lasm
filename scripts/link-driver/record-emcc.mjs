@@ -199,11 +199,10 @@ for (const spec of options.fixture) {
   if (options.package) {
     // The same packaging as src/application-build.mjs, for running the program.
     const { copyApplicationHost, writeApplicationEntrypoint } = await import('../../src/application-output.mjs');
-    const { applicationSupport } = await import('../../src/application-support.mjs');
     const app = join(fixture, 'app');
     cpSync(dist, app, { recursive: true });
     copyApplicationHost(app);
-    writeApplicationEntrypoint(app, { node: applicationSupport()?.node, minimumGlibc: applicationSupport()?.minimumGlibc });
+    writeApplicationEntrypoint(app);
     copyFileSync(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(app, 'THIRD_PARTY_NOTICES.txt'));
     // main.mjs checks the ahead-of-time policy and link requirements before starting.
     const { applicationPolicy } = await import('../../src/application-policy.mjs');

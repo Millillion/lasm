@@ -2,20 +2,28 @@ import { mkdirSync, copyFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { copyNativeBundle, copyApplicationNativeBundle } from './native-bundle.mjs';
-import { glibcAtLeast } from './application-support.mjs';
+import { glibcAtLeast, nodeAtLeast } from './application-support.mjs';
 import { applicationPolicy, requireAotApplication, requireAotDeployment } from './application-policy.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 export const applicationHostFiles = [
   'node-host.mjs', 'lean-io-errors.mjs', 'posix-arguments.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs',
   'node-process.mjs', 'native-process.mjs', 'process-launcher.mjs', 'process-exec.mjs', 'node-udp.mjs',
-  'node-system.mjs', 'linux-memory.mjs', 'node-signal.mjs', 'native-signals.mjs', 'application-signals.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-files.mjs',
+  'node-system.mjs', 'linux-memory.mjs', 'node-signal.mjs', 'native-signals.mjs', 'application-signals.mjs', 'thread-id.cjs', 'native-files.mjs',
   'native-clock.mjs', 'native-windows-timezone.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-message.mjs',
   'native-worker-cwd.cjs', 'worker-stdio.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native-abort.cjs',
   'node-fetch.mjs', 'node-js.mjs',
 ];
 
-/** Application output carries its host support, including native FFI and helpers. */
+// Built applications run on any Node release from this one: memory64 and
+// table64 Wasm without flags arrived in V8 13.6 (Node 24.0.0).
+export const minimumApplicationNode = '24.0.0';
+// The glibc floor of the official Node 24/26 binaries; koffi needs 2.25 and
+// Lasm's Zig-built helpers 2.17.
+export const minimumApplicationGlibc = '2.28';
+
+/** Application output carries its host support, including native FFI and helpers
+ * for Linux x64/arm64 (glibc) and the build host, so one build deploys to Linux. */
 export function copyApplicationHost(output, { platform = process.platform, arch = process.arch,
   glibc = process.report?.getReport().header.glibcVersionRuntime, sourceRoot = root } = {}) {
   const directory = join(resolve(output), 'host');
@@ -26,24 +34,30 @@ export function copyApplicationHost(output, { platform = process.platform, arch 
   else copyNativeBundle(sourceRoot, directory);
 }
 
-export function applicationEntrypoint({ platform = process.platform, arch = process.arch, node, minimumGlibc } = {}) {
+export function applicationEntrypoint({ minimumNode = minimumApplicationNode, minimumGlibc = minimumApplicationGlibc } = {}) {
   return `#!/usr/bin/env node
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-const expectedHost = ${JSON.stringify(`${platform}-${arch}`)};
-const actualHost = process.platform + '-' + process.arch;
-const expectedNode = ${JSON.stringify(node ?? null)};
+const minimumNode = ${JSON.stringify(minimumNode ?? null)};
 const minimumGlibc = ${JSON.stringify(minimumGlibc ?? null)};
 const glibcAtLeast = ${glibcAtLeast.toString()};
-if (actualHost !== expectedHost) {
-  console.error('This application was built on ' + expectedHost + '; it is running on ' + actualHost + '. Rebuild the Lean source with Lasm on this platform.');
+const nodeAtLeast = ${nodeAtLeast.toString()};
+const host = process.platform + '-' + process.arch;
+let glibc;
+try { glibc = process.platform === 'linux' ? process.report?.getReport().header.glibcVersionRuntime : undefined; } catch { /* reported below */ }
+// The native pieces this deployment carries; absent in research outputs that carry every target.
+let nativeTargets = null;
+try { nativeTargets = JSON.parse(readFileSync(new URL('./host/native/manifest.json', import.meta.url), 'utf8')).deployment?.targets ?? null; }
+catch { /* checked when the host loads */ }
+if (minimumNode && !nodeAtLeast(process.versions.node, minimumNode)) {
+  console.error('This application requires Node ' + minimumNode + ' or newer; you are running Node ' + process.versions.node + '. Install Node 24 or newer.');
   process.exitCode = 1;
-} else if (expectedNode && process.versions.node !== expectedNode) {
-  console.error('This application requires Node ' + expectedNode + '; you are running Node ' + process.versions.node + '. Install the supported Node release.');
+} else if (nativeTargets && !nativeTargets.includes(host)) {
+  console.error('This application includes native support for ' + nativeTargets.join(', ') + '; it is running on ' + host + '. Run it on one of those platforms, or rebuild the Lean source with Lasm on this platform.');
   process.exitCode = 1;
-} else if (process.platform === 'linux' && minimumGlibc && !glibcAtLeast(process.report?.getReport().header.glibcVersionRuntime, minimumGlibc)) {
-  console.error('This application requires glibc ' + minimumGlibc + ' or newer. Use a supported Linux system; Ubuntu 24.04 is the tested distribution.');
+} else if (process.platform === 'linux' && minimumGlibc && !glibcAtLeast(glibc, minimumGlibc)) {
+  console.error('This application requires Linux with glibc ' + minimumGlibc + ' or newer; this system reports ' + (glibc ? 'glibc ' + glibc : 'no glibc (musl/Alpine is not supported yet)') + '. Use a supported Linux system, such as a Debian or Ubuntu based image.');
   process.exitCode = 1;
 } else {
   const applicationPolicy = ${JSON.stringify(applicationPolicy)};

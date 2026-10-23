@@ -7,7 +7,8 @@ Postgres (npm `pg`) and JSON Web Tokens (npm `jose`).
   POST /todos         {"title": "…"} + token      → 201 {"id", "title", "done"}
   GET  /health                                    → {"ok": true}
 
-Configuration: DATABASE_URL (Postgres connection string), JWT_SECRET, PORT.
+Configuration: DATABASE_URL (Postgres connection string), JWT_SECRET, PORT (default 3000),
+HOST (default 0.0.0.0, every interface, as containers and hosting platforms need).
 -/
 import Lasm.JS
 open Lasm.JS
