@@ -33,8 +33,21 @@ on:
 permissions:
   contents: read
 jobs:
+  # Draft release assets are hidden from read-only tokens: the shared input job
+  # retrieves the candidate with draft access and hands it over through the cache.
+  input:
+    if: inputs.cache-key == ''
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/node-candidate-input.yml
+    with:
+      sha256: ${{ inputs.sha256 }}
+      candidate-release: ${{ inputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version }}
   soak:
-    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    needs: input
+    if: always() && (needs.input.result == 'success' || needs.input.result == 'skipped') && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
@@ -67,11 +80,11 @@ jobs:
           node-version: 26.12.1
           architecture: ${{ matrix.target.architecture }}
           package-manager-cache: false
-      - if: env.SOAK_SECONDS != '0' && inputs.cache-key != ''
+      - if: env.SOAK_SECONDS != '0'
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
-          key: ${{ inputs.cache-key }}
+          key: ${{ inputs.cache-key || needs.input.outputs.cache-key }}
           enableCrossOsArchive: true
           fail-on-cache-miss: false
       - name: Verify the candidate
