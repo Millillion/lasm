@@ -55,38 +55,38 @@ This is the first recorded release: it is the baseline.
 
 ### Optional platforms (not the reference; informational)
 
-| Metric | darwin-arm64 | linux-arm64 |
-| --- | ---: | ---: |
-| Trivial program, start to exit | 276 ms (5.19×) | 215 ms (8.13×) |
-| Hono + Lean handler, start to first HTTP response | 335 ms (3.80×) | 298 ms (5.58×) |
-| Std.Http server, start to first HTTP response | 371 ms (4.21×) | 328 ms (6.15×) |
-| Trivial program: dist/ | 2.9 MiB | 2.8 MiB |
-| Trivial program: program.wasm | 1.0 MiB | 1.0 MiB |
-| Trivial program: dist/, brotli | 633 KiB | 559 KiB |
-| Hono app: dist/ without node_modules | 3.3 MiB | 3.3 MiB |
-| Hono app: program.wasm, brotli | 214 KiB | 214 KiB |
-| Hono app: dist/node_modules | 1.4 MiB | 1.4 MiB |
-| Trivial program, peak RSS | 124 MiB (2.41×) | 121 MiB (2.00×) |
-| Hono + Lean handler, idle RSS | 145 MiB (2.29×) | 145 MiB (2.41×) |
-| Hono + Lean handler, peak RSS under load | 278 MiB (3.23×) | 291 MiB (3.55×) |
-| Std.Http server, peak RSS under load | 335 MiB (3.89×) | 295 MiB (3.61×) |
-| Hono + Lean handler, throughput | 8,700 req/s (0.20×) | 10,519 req/s (0.25×) |
-| Hono + Lean handler, p99 latency | 6.6 ms (3.44×) | 5.8 ms (7.57×) |
-| Express + Lean handler, throughput | 6,880 req/s (0.16×) | 6,294 req/s (0.15×) |
-| Express + Lean handler, p99 latency | 6.9 ms (3.57×) | 7.2 ms (9.34×) |
-| Std.Http server, throughput | 869 req/s (0.02×) | 575 req/s (0.01×) |
-| Std.Http server, p99 latency | 39 ms (29.55×) | 38 ms (49.42×) |
-| Plain Node node:http (reference) | 43,458 req/s | 41,233 req/s |
-| Lean→JS call round trip, p50 | 16 µs | 45 µs |
-| Await a resolved JS promise, p50 | 18 µs | 46 µs |
-| Clean build, trivial program | 46 s | 38 s |
-| Incremental build after a one-line change, trivial program | 53 s | 39 s |
-| Clean build, Hono app | 112 s | 62 s |
-| Package download (npm tarball) | 62 MiB | 62 MiB |
-| Installed size | 363 MiB | 363 MiB |
-| npm install, empty cache | 10 s | 4.5 s |
-| First build incl. one-time tool download | 66 s | 62 s |
-| Tool cache on disk after the first build | 2304 MiB | 2550 MiB |
+| Metric | darwin-arm64 | linux-arm64 | win32-x64 |
+| --- | ---: | ---: | ---: |
+| Trivial program, start to exit | 276 ms (5.19×) | 215 ms (8.13×) | 303 ms (4.71×) |
+| Hono + Lean handler, start to first HTTP response | 335 ms (3.80×) | 298 ms (5.58×) | 390 ms (3.87×) |
+| Std.Http server, start to first HTTP response | 371 ms (4.21×) | 328 ms (6.15×) | 442 ms (4.38×) |
+| Trivial program: dist/ | 2.9 MiB | 2.8 MiB | 2.6 MiB |
+| Trivial program: program.wasm | 1.0 MiB | 1.0 MiB | 1.0 MiB |
+| Trivial program: dist/, brotli | 633 KiB | 559 KiB | 646 KiB |
+| Hono app: dist/ without node_modules | 3.3 MiB | 3.3 MiB | 3.1 MiB |
+| Hono app: program.wasm, brotli | 214 KiB | 214 KiB | 214 KiB |
+| Hono app: dist/node_modules | 1.4 MiB | 1.4 MiB | 1.4 MiB |
+| Trivial program, peak RSS | 124 MiB (2.41×) | 121 MiB (2.00×) | 120 MiB (2.85×) |
+| Hono + Lean handler, idle RSS | 145 MiB (2.29×) | 145 MiB (2.41×) | 145 MiB (2.73×) |
+| Hono + Lean handler, peak RSS under load | 278 MiB (3.23×) | 291 MiB (3.55×) | 287 MiB (4.47×) |
+| Std.Http server, peak RSS under load | 335 MiB (3.89×) | 295 MiB (3.61×) | 375 MiB (5.83×) |
+| Hono + Lean handler, throughput | 8,700 req/s (0.20×) | 10,519 req/s (0.25×) | 7,964 req/s (0.35×) |
+| Hono + Lean handler, p99 latency | 6.6 ms (3.44×) | 5.8 ms (7.57×) | 5.6 ms (3.66×) |
+| Express + Lean handler, throughput | 6,880 req/s (0.16×) | 6,294 req/s (0.15×) | 5,425 req/s (0.24×) |
+| Express + Lean handler, p99 latency | 6.9 ms (3.57×) | 7.2 ms (9.34×) | 7.0 ms (4.45×) |
+| Std.Http server, throughput | 869 req/s (0.02×) | 575 req/s (0.01×) | 1,083 req/s (0.05×) |
+| Std.Http server, p99 latency | 39 ms (29.55×) | 38 ms (49.42×) | 24 ms (15.36×) |
+| Plain Node node:http (reference) | 43,458 req/s | 41,233 req/s | 22,620 req/s |
+| Lean→JS call round trip, p50 | 16 µs | 45 µs | 50 µs |
+| Await a resolved JS promise, p50 | 18 µs | 46 µs | 50 µs |
+| Clean build, trivial program | 46 s | 38 s | 64 s |
+| Incremental build after a one-line change, trivial program | 53 s | 39 s | 69 s |
+| Clean build, Hono app | 112 s | 62 s | 106 s |
+| Package download (npm tarball) | 62 MiB | 62 MiB | 62 MiB |
+| Installed size | 363 MiB | 363 MiB | 363 MiB |
+| npm install, empty cache | 10 s | 4.5 s | 9.3 s |
+| First build incl. one-time tool download | 66 s | 62 s | 115 s |
+| Tool cache on disk after the first build | 2304 MiB | 2550 MiB | 2266 MiB |
 <!-- benchmarks:generated:end -->
 
 ## The benchmark set and why
@@ -180,9 +180,9 @@ is what a user would otherwise write).
   because it remains supported, and its role is decided in Phase 5.2.
 - On the 4-CPU reference runner the server gets 2 CPUs (the load generator the
   other 2). Lasm servers use several threads (Node's main thread, the Lean
-  thread, worker pools), so they score lower here than unpinned on a larger
+  thread, worker pools), so they score lower here than with more CPUs on a larger
   machine: `Std.Http` reaches about 660 req/s here against about 1,200 req/s
-  unpinned on a 12-CPU workstation, and Hono with a Lean handler about 9,700
+  with 10 CPUs on a 12-CPU workstation, and Hono with a Lean handler about 9,700
   in both. The setting is fixed, so releases stay comparable, and it resembles
   a common 2-vCPU instance.
 - Incremental builds currently take as long as clean ones: Lasm relinks the
@@ -190,9 +190,11 @@ is what a user would otherwise write).
   improves.
 - The tool cache figure is the extracted size on disk (about 2.5 GB); the
   download itself is smaller (about 250–275 MB, see the README).
-- Windows x64 extras: the first baseline run stopped before measuring (a tar
-  path issue, fixed in `bench/run.mjs`); the Windows column appears once an
-  extras run completes.
+- Repeatability: a second full run of the same candidate on a new runner
+  ([39971807352](https://github.com/Millillion/lasm/actions/runs/39971807352))
+  matched the baseline within about 4 % on every headline metric, with the
+  same ratios to two decimals. Its Windows x64 result was added to the baseline
+  (the first run's Windows job stopped on a tar path issue, since fixed).
 - The plain-Node reference may be limited by the load generator on small
   runners (both share the machine). This understates Lasm's ratios slightly
   but equally across releases.
