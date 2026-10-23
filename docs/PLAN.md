@@ -654,7 +654,7 @@ folded into Phases 5.2/5.3 and 7.
     scenario) and three cold-installation runs. The early release-mode npm run on
     `.39988013618` passed on four platforms. Readiness review: README now has
     Known limitations, Licenses and the environment variables, and each platform
-    claim names its CI job. Draft publish plan: [release/0.1.0-draft.md](release/0.1.0-draft.md). Templates passed on all five targets on this candidate (run 40004298492). The final confirming pass waits for the candidate with non-blocking JS awaits (a Lean handler no longer holds a worker thread while awaiting).*
+    claim names its CI job. Draft publish plan: [release/0.1.0-draft.md](release/0.1.0-draft.md). Templates passed on all five targets on this candidate (run 40004298492). Early results on it: server robustness passed on all five (run 40008269718; the obsolete `full` overlay no longer applies and is off by default now), the npm distribution in release mode passed on all five (run 40005986403, `.39988013618`), and 39 ecosystem projects finished green before the early upstream-suite and ecosystem runs were cancelled: the non-blocking-await source (`a9c5a9d`) superseded the candidate and its acceptance (run 40012750099) needed the runners. The final confirming pass runs on that candidate.*
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as
