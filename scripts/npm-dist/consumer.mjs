@@ -37,8 +37,10 @@ assert.ok(npm, 'npm was not found');
 const npmCli = npm.args[0] ?? npm.command;
 const npxCli = join(dirname(npmCli), 'npx-cli.js');
 
-// Empty npm and Lasm caches per scenario; the Lake scenario continues the installed project.
-const cacheName = args.scenario === 'lake' ? 'installed' : args.scenario;
+// Empty npm and Lasm caches per scenario; the Lake scenario continues the installed project,
+// and init reuses its caches (a fresh extraction of every tool again filled the guard's
+// budget with page cache on the 6 GiB Linux setting; empty caches are covered by installed and npx).
+const cacheName = ['lake', 'init'].includes(args.scenario) ? 'installed' : args.scenario;
 const preload = join(root, 'scripts/npm-dist/network-audit.cjs');
 function environment(extra = {}) {
   const env = { ...process.env };
