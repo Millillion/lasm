@@ -97,7 +97,11 @@ const mib = b => b == null ? null : Math.round(b / 1024 ** 2 * 100) / 100;
 // [name, weight, method, path, body, check]; slow-abort requests are aborted
 // after 10 ms while the Lean handler still waits 60 ms. This is a leak soak at
 // steady state, not an overload test; the concurrency probe covers many
-// waiting handlers at once.
+// waiting handlers at once. Each abort closes a client connection, which then
+// holds an ephemeral port in TIME_WAIT (120 s on Windows, about 16,000 ports:
+// about 130 new connections per second at most), so aborts are capped at
+// maxAbortsPerSecond; over the cap a slow-abort pick becomes a `slow` request.
+const maxAbortsPerSecond = 25;
 const mix = [
   ['hello', 58, 'GET', '/hello/Ada', null, r => r.status === 200 && JSON.parse(r.body).message === 'Hello, Ada, from Lean!'],
   ['echo', 15, 'POST', '/echo', { n: [1, 2, 3], s: 'λ soak' }, r => r.status === 200 && JSON.parse(r.body).echo?.s === 'λ soak'],
@@ -219,10 +223,17 @@ try {
       await sleep(sampleMs);
     }
   })();
+  const abortWindow = { second: 0, count: 0 };
   const worker = async seed => {
     const random = prng(seed);
     while (Date.now() < deadline && server.exit === null) {
-      const m = pick(random);
+      let m = pick(random);
+      if (m[0] === 'slow-abort') {
+        const second = Math.floor(Date.now() / 1000);
+        if (abortWindow.second !== second) Object.assign(abortWindow, { second, count: 0 });
+        if (abortWindow.count >= maxAbortsPerSecond) m = mix.find(x => x[0] === 'slow');
+        else abortWindow.count++;
+      }
       const r = await send(agent, port, m, m[0] === 'slow-abort' ? 10 : 0);
       // A slow-abort request may still complete when this client's event loop is
       // delayed past the abort (for example while a minute's percentiles are computed).
