@@ -329,3 +329,13 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   `Std.Http` server and about a fifth of plain Node.
   Measurements: [JS_INTEROP.md](JS_INTEROP.md).
 - **Lasm only.** Programs that use interop run only under Lasm.
+- **Function length.** A JavaScript function made by `Function.ofFn` reports
+  `length` 0. APIs that inspect it do not recognize it: Express treats only
+  four-parameter middleware as an error handler, so write Express error handlers
+  in JavaScript or catch errors inside the Lean handler. An uncaught Lean error
+  rejects the handler's promise, which Express 5 and Hono answer with 500.
+- **Diagnostics.** `Lasm.JS.stats` returns a JSON string with the live counts:
+  `values` (JavaScript values Lean holds), `pendingCalls` (JavaScript calls of
+  Lean functions awaiting their reply), `functionsLive` (Lean functions that
+  JavaScript has not yet garbage-collected), and totals. The interop soak uses
+  them to check for leaks.

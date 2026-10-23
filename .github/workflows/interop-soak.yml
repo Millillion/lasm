@@ -1,0 +1,91 @@
+name: Interop soak
+# Phase 5.2: Express and Hono apps with Lean handlers (the `lasm init` templates
+# plus error routes, scripts/interop-soak) under steady keep-alive load with a
+# mix of thrown Lean errors, rejected promises, timers and client disconnects.
+# Linux x64 runs the long soak (default 2 hours per app); the other targets run
+# a short one. Tracks RSS, Wasm memory, Lasm.JS live handles, pending callbacks
+# and live Lean functions, error rate and p99 drift (scripts/interop-soak/soak.mjs).
+on:
+  workflow_dispatch:
+    inputs:
+      cache-key:
+        description: Actions cache key of the candidate (from an acceptance run's input job)
+        type: string
+        default: ""
+      candidate-release:
+        description: Release holding the candidate (node-package-RUN_ID)
+        required: true
+        type: string
+      sha256:
+        required: true
+        type: string
+      candidate-version:
+        required: true
+        type: string
+      long-seconds:
+        description: Soak length on Linux x64, per app
+        type: string
+        default: "7200"
+      short-seconds:
+        description: Soak length on the other targets, per app (0 skips them)
+        type: string
+        default: "900"
+permissions:
+  contents: read
+jobs:
+  soak:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [express, hono]
+        target:
+          - { runner: ubuntu-24.04, architecture: x64, platform: linux-x64, long: true }
+          - { runner: ubuntu-24.04-arm, architecture: arm64, platform: linux-arm64, long: false }
+          - { runner: macos-15-intel, architecture: x64, platform: darwin-x64, long: false }
+          - { runner: macos-15, architecture: arm64, platform: darwin-arm64, long: false }
+          - { runner: windows-2025, architecture: x64, platform: win32-x64, long: false }
+    name: ${{ matrix.app }} ${{ matrix.target.platform }}
+    runs-on: ${{ matrix.target.runner }}
+    timeout-minutes: 200
+    defaults:
+      run:
+        shell: bash
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+      SOAK_SECONDS: ${{ matrix.target.long && inputs.long-seconds || inputs.short-seconds }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: env.SOAK_SECONDS != '0'
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        if: env.SOAK_SECONDS != '0'
+        with:
+          node-version: 26.12.1
+          architecture: ${{ matrix.target.architecture }}
+          package-manager-cache: false
+      - if: env.SOAK_SECONDS != '0' && inputs.cache-key != ''
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: ${{ inputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify the candidate
+        if: env.SOAK_SECONDS != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Soak
+        if: env.SOAK_SECONDS != '0'
+        run: node scripts/interop-soak/soak.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm soak" ".work/interop-soak-${{ matrix.app }}.json" --app ${{ matrix.app }} --seconds "$SOAK_SECONDS" --connections 16
+      - if: always() && env.SOAK_SECONDS != '0'
+        uses: actions/upload-artifact@v7
+        with:
+          name: interop-soak-${{ matrix.app }}-${{ matrix.target.platform }}
+          path: .work/interop-soak-*.json
+          retention-days: 30
+          if-no-files-found: ignore

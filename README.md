@@ -3,6 +3,11 @@
 Write ordinary Lean. Compile it ahead of time and run it in Node. Node.js is the
 only supported JavaScript runtime.
 
+**Start here: [Getting started](docs/GETTING_STARTED.md)** goes from Node and npm to a
+web server with Lean request handlers (Hono or Express), an npm package called from
+Lean, and a container deployment, with [recipes per platform](docs/deploy/README.md).
+It uses `lasm init` from current source (not yet in a candidate).
+
 **Prerequisites:** stock **Node 26.12.0 with npm 11.20.0** for accepted candidate
 `.54` (current source and its Phase 3 candidates pin **Node 26.12.1**, same npm).
 Lasm downloads its matching **Lean 4.35.0**, Lake, and build tools; you do not install
@@ -91,6 +96,7 @@ These are all commands and options in the ordinary Node application interface:
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
+| New project (current source; not yet in a candidate) | `npx lasm init my-app --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). Writes files only; run `npm install` next. `lasm init --help` lists the templates. |
 | Cache repair (new source; absent from `.46`) | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
 `--rebuild` and `--verbose` work with both run and build. `--output` is build-only;

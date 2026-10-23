@@ -52,6 +52,8 @@ for (const file of ['manifest.json', 'process/manifest.json', 'signals/manifest.
 cpSync(runtime.directory, join(staging, 'targets', runtime.manifest.name), { recursive: true });
 // Lasm's Lean library (import Lasm.JS), compiled into the managed Lean prefix on first use.
 cpSync(join(root, 'library'), join(staging, 'library'), { recursive: true });
+// `lasm init` project templates (src/init.mjs).
+cpSync(join(root, 'templates'), join(staging, 'templates'), { recursive: true });
 mkdirSync(join(staging, 'scripts/full-lean'), { recursive: true });
 for (const name of ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs',
   'function-table-index.mjs', 'table-growth.mjs'])
@@ -74,7 +76,7 @@ json('package.json', {
   name: sourcePackage.name, version, private: true, license: 'UNLICENSED', type: 'module',
   description: 'Compile ordinary Lean applications to run in Node',
   bin: sourcePackage.bin, engines: { node: pins.node }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
-  files: ['bin', 'src', 'library', 'scripts', 'targets', 'docs', 'examples', 'README.md',
+  files: ['bin', 'src', 'library', 'templates', 'scripts', 'targets', 'docs', 'examples', 'README.md',
     'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json', 'installer-dependencies.json'],
   dependencies: { tar: sourcePackage.dependencies.tar },
   bundleDependencies: ['tar'],
@@ -91,7 +93,7 @@ const files = new Set(packed.files.map(file => file.path));
 for (const file of ['bin/lasm.mjs', 'src/application-support.mjs', 'src/application-build-client.mjs',
   'src/application-build-worker.mjs', 'src/build-progress.mjs', 'src/native/node_modules/koffi/index.cjs',
   'src/native/process/manifest.json', 'src/native/signals/manifest.json',
-  'scripts/full-lean/host-library.js', 'application-support.json', 'provenance.json', 'THIRD_PARTY_NOTICES.txt',
+  'scripts/full-lean/host-library.js', 'src/init.mjs', 'templates/common/App.lean', 'templates/hono/Main.lean', 'application-support.json', 'provenance.json', 'THIRD_PARTY_NOTICES.txt',
   `targets/${runtime.manifest.name}/target.json`]) assert.ok(files.has(file), `npm pack omitted ${file}`);
 for (const [path, dependency] of Object.entries(installer.manifest.packages)) {
   for (const file of Object.keys(dependency.files)) assert.ok(files.has(`${path}/${file}`), `npm pack omitted bundled installer file ${path}/${file}`);

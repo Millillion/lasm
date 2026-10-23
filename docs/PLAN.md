@@ -578,6 +578,11 @@ folded into Phases 5.2/5.3 and 7.
     handlers under load for hours: handle/callback leaks, memory growth, error
     paths); published startup time, bundle size and memory numbers; decide and
     document the role of `Std.Http` (interop is ~28x faster under Lasm).
+    *Status (2026-10-23):* `lasm init` (templates `plain`, `express`, `hono`,
+    `std-http`), docs/GETTING_STARTED.md, docs/deploy/ and the interop soak
+    (scripts/interop-soak, `interop-soak.yml`) are in current source; template CI
+    (`templates.yml`) runs with every candidate. Startup, bundle size and memory
+    numbers are published by 5.2b (docs/BENCHMARKS.md).
   - **5.2b Release benchmarks (user request 2026-10-23).** An irreducible set
     of benchmarks recorded automatically on every release candidate and
     committed to the repo (machine-readable history plus a readable

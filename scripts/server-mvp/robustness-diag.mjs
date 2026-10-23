@@ -4,6 +4,7 @@
 // process.memoryUsage() and the byte length of every WebAssembly.Memory the
 // application creates, every LASM_ROBUSTNESS_DIAG_MS (default 2000) ms.
 // LASM_ROBUSTNESS_DIAG_WORKERS=1 also samples each worker isolate's V8 heap.
+// Programs using Lasm.JS also report its live handle and callback counts (`js`).
 import { isMainThread, threadId } from 'node:worker_threads';
 import { getHeapStatistics } from 'node:v8';
 import { appendFileSync } from 'node:fs';
@@ -37,7 +38,8 @@ if (isMainThread && file) {
     try {
       appendFileSync(file, JSON.stringify({ at: Date.now(), rss: usage.rss, heapUsed: usage.heapUsed,
         heapTotal: usage.heapTotal, external: usage.external, arrayBuffers: usage.arrayBuffers,
-        wasmMemories: memories.length, wasmBytes, workersCreated: workers.created, workersExited: workers.exited }) + '\n');
+        wasmMemories: memories.length, wasmBytes, workersCreated: workers.created, workersExited: workers.exited,
+        js: globalThis[Symbol.for('lasm.js.stats')]?.() ?? null }) + '\n');
     } catch { /* diagnostics never affect the application */ }
   };
   setInterval(sample, Number(process.env.LASM_ROBUSTNESS_DIAG_MS ?? 2000)).unref();

@@ -1,0 +1,108 @@
+name: lasm init templates
+# Phase 5.2: every `lasm init` template (plain, express, hono, std-http) is
+# created, built and run end to end with the installed candidate package on all
+# five targets: init, npm install, build, run, HTTP requests, expected
+# responses and SIGTERM shutdown (scripts/templates/run-templates.mjs).
+# The Dockerfiles are built and run on Linux x64 and ARM64, where the runners
+# have Docker: 512 MB memory cap, read-only root filesystem, docker stop.
+on:
+  workflow_call:
+    inputs:
+      cache-key:
+        type: string
+        default: ""
+      candidate-release:
+        type: string
+        default: ""
+      sha256:
+        required: true
+        type: string
+      candidate-version:
+        required: true
+        type: string
+      docker:
+        type: boolean
+        default: true
+  workflow_dispatch:
+    inputs:
+      cache-key:
+        description: Actions cache key of the candidate (from an acceptance run's input job)
+        type: string
+        default: ""
+      candidate-release:
+        description: Release holding the candidate (node-package-RUN_ID)
+        required: true
+        type: string
+      sha256:
+        required: true
+        type: string
+      candidate-version:
+        required: true
+        type: string
+      docker:
+        description: Also build and run the Dockerfiles (Linux)
+        type: boolean
+        default: true
+permissions:
+  contents: read
+jobs:
+  templates:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: ubuntu-24.04, architecture: x64, platform: linux-x64 }
+          - { runner: ubuntu-24.04-arm, architecture: arm64, platform: linux-arm64 }
+          - { runner: macos-15-intel, architecture: x64, platform: darwin-x64 }
+          - { runner: macos-15, architecture: arm64, platform: darwin-arm64 }
+          - { runner: windows-2025, architecture: x64, platform: win32-x64 }
+    name: templates ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    env:
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: ${{ matrix.architecture }}
+          package-manager-cache: false
+      - if: inputs.cache-key != ''
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: ${{ inputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify the candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Init, build, run and request every template
+        run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates λ" .work/templates.json
+      - name: Dockerfiles (build on the runner's architecture, run with 512 MB and a read-only root)
+        if: inputs.docker && startsWith(matrix.platform, 'linux-')
+        run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates docker" .work/templates-docker.json --docker
+      - name: Preserve evidence
+        if: always()
+        run: |
+          for f in .work/templates.json .work/templates-docker.json; do
+            [ -f "$f" ] && node -e "const r=JSON.parse(require('fs').readFileSync(process.argv[1]));console.log(process.argv[1], JSON.stringify({passed:r.passed,platform:r.platform,node:r.node,templates:r.templates.map(t=>({template:t.template,ok:t.ok,buildSeconds:t.buildSeconds,readyMs:t.readyMs,stop:t.stop,imageBytes:t.imageBytes,dockerStopMs:t.dockerStopMs})),error:r.error},null,2))" "$f"
+          done
+          exit 0
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: templates-${{ matrix.platform }}
+          path: .work/templates*.json
+          retention-days: 14
+          if-no-files-found: ignore

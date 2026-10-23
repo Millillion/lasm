@@ -1,5 +1,8 @@
+import { parseInitArguments } from './init.mjs';
+
 export const cliUsage = `Usage: lasm <Main.lean> [-- arguments…]
        lasm build <Main.lean> [--output dist]
+       lasm init <directory> [--template plain|express|hono|std-http]
        lasm build <lasm.json> [output-directory]
        lasm cache repair
 
@@ -9,6 +12,7 @@ Application arguments must follow --.`;
 /** Parse independently of provisioning: help/errors must never download tools. */
 export function parseLasmArguments(argv) {
   const tokens = [...argv];
+  if (tokens[0] === 'init') return parseInitArguments(tokens.slice(1));
   if (tokens[0] === 'cache') {
     if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
     if (tokens.length !== 2 || tokens[1] !== 'repair') throw new Error('Usage: lasm cache repair');

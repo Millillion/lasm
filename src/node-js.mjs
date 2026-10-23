@@ -99,7 +99,7 @@ class Reader {
 export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
   const values = new HandleTable({ first: firstJsHandle });
   const moduleRequire = createRequire(appPath ? join(dirname(appPath), 'package.json') : join(process.cwd(), 'package.json'));
-  const stats = { released: 0, callbacks: 0, syncCallbacks: 0 };
+  const stats = { released: 0, callbacks: 0, syncCallbacks: 0, functionsCreated: 0, functionsCollected: 0 };
   const bindings = new Map();
 
   function reference(value) { return values.allocate(value); }
@@ -176,7 +176,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
   // Lean functions exposed as JavaScript functions (op 210).
   const pendingCalls = new Map();
   let nextCall = 1n;
-  const leanFunctions = new FinalizationRegistry(fn => push({ kind: 3, fn }));
+  const leanFunctions = new FinalizationRegistry(fn => { stats.functionsCollected++; push({ kind: 3, fn }); });
   function asyncFunction(fn) {
     const f = function (...args) {
       return new Promise((resolve, reject) => {
@@ -342,6 +342,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
       case 210: {
         // A JavaScript function calling Lean function `id`; arg 1 asynchronous, 2 synchronous.
         const f = Number(arg) === 2 ? syncFunction(id) : asyncFunction(id);
+        stats.functionsCreated++;
         return encode(f, 'reference');
       }
       case 211: {
@@ -349,7 +350,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
         syncChannel = { channel: Number(r.u64()), slot: Number(r.u64()) };
         return Buffer.alloc(0);
       }
-      case 213: return Buffer.from(JSON.stringify({ values: values.size, pendingCalls: pendingCalls.size, ...stats }));
+      case 213: return Buffer.from(JSON.stringify(snapshot()));
       case 214: {
         // A typed binding: [Lean name, module, export path, arguments]; flags as op 205.
         const [, module, path, args] = decode(bytes);
@@ -374,8 +375,14 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
       throw error?.leanUserError ? error : jsFailure(error);
     }
   }
+  // Live counts for leak checks (Lasm.JS.stats, and the soak diagnostics through
+  // globalThis[Symbol.for('lasm.js.stats')]).
+  const snapshot = () => ({ values: values.size, pendingCalls: pendingCalls.size, queuedEvents: events.length,
+    functionsLive: stats.functionsCreated - stats.functionsCollected, ...stats });
+  globalThis[Symbol.for('lasm.js.stats')] = snapshot;
   return {
     dispatch,
+    snapshot,
     owns: id => id >= firstJsHandle,
     release(id) { if (values.delete(id)) stats.released++; },
     close() { values.clear(); pendingCalls.clear(); events.length = 0; },

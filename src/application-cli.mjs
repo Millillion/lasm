@@ -31,9 +31,11 @@ export async function runApplicationCli(argv) {
   const options = parseLasmArguments(argv);
   const support = applicationSupport();
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [-- arguments…]\n       lasm build Main.lean [--output dist]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nBuild and run ordinary Lean main in Node.' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [-- arguments…]\n       lasm build Main.lean [--output dist]\n       lasm init my-app [--template plain|express|hono|std-http]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nBuild and run ordinary Lean main in Node.' : cliUsage);
     return 0;
   }
+  if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }
+  if (options.command === 'init') return (await import('./init.mjs')).runInit(options);
   assertSupportedHost();
   if (options.command === 'cache-repair') {
     const { repairManagedCache } = await import('./cache-repair.mjs');
