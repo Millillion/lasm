@@ -128,7 +128,7 @@ jobs:
           path: ${{ runner.temp }}/bench-results
           merge-multiple: true
       - name: Require the reference result
-        run: test -s "$RUNNER_TEMP/bench-results/bench-linux-x64.json"
+        run: node -e "const r=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));if(!r.finishedAt)throw new Error('The reference suite did not finish')" "$RUNNER_TEMP/bench-results/bench-linux-x64.json"
       # Rebase-safe publication: on every attempt, start from the newest main,
       # record the results and regenerate the page from the full history, then
       # push. A push that loses a race simply retries on the new main, so no

@@ -22,6 +22,9 @@ if (mode === 'record') {
   for (const file of rest) {
     const result = JSON.parse(readFileSync(file, 'utf8'));
     assert.equal(result.suite, 'lasm-release-benchmarks', `${file} is not a benchmark result`);
+    // A suite that stopped early (an exception) is not recorded; one that
+    // finished is, with any invalid repetitions listed in its errors.
+    if (!result.finishedAt) { console.log(`Skipped incomplete ${result.environment?.platform ?? file}: ${result.errors?.[0]?.split('\n')[0]}`); continue; }
     const version = result.candidate.version;
     assert.match(version, /^[0-9A-Za-z.+-]+$/);
     const target = join(historyDir, `${version}.json`);
