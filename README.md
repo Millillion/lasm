@@ -133,6 +133,12 @@ x86-64. The same `.46` archive passed on all five (and historically on Windows
 ARM64, which current source no longer supports). These passes use native x86-64
 and ARM64 execution.
 
+**Performance:** [BENCHMARKS.md](https://github.com/Millillion/lasm/blob/main/docs/BENCHMARKS.md)
+lists cold start, bundle size, memory, HTTP throughput and latency, interop call
+latency, build time and install cost for each release candidate, beside plain-Node
+references measured on the same runner. The candidate pipeline records them
+automatically on Linux x64.
+
 ## Lean support and restrictions
 
 **Candidate `.46` and current source builds enforce ahead-of-time execution.**

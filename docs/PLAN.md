@@ -594,6 +594,11 @@ folded into Phases 5.2/5.3 and 7.
     reference ratio), interop call latency, and build time (cold and
     incremental) plus `@lasm/cli` install size. Record runner, OS, CPU and
     Node for every number; compare by ratio to the same-runner Node baseline.
+    Implemented 2026-10-23: fixtures and harness in `bench/`, workflow
+    `release-benchmarks.yml` (called by `node-linux-acceptance.yml` after a
+    candidate is retained; also manual), results committed to
+    `docs/benchmarks/history/<version>.json` and [BENCHMARKS.md](BENCHMARKS.md)
+    with the set's rationale and method. Regressions are flagged, not gating.
   - **5.3 Release gate.** Full runtime-capable upstream suite on five targets,
     ecosystem and interop examples, performance/robustness regression check,
     five-platform acceptance and the cold-installation gate.

@@ -204,3 +204,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: node scripts/ci/retain-node-candidate.mjs tested
+  # Phase 5.2b: record the release benchmarks of the tested candidate and commit
+  # them to main (docs/BENCHMARKS.md). Informational: it never gates the candidate.
+  benchmarks:
+    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    needs: [package, candidate]
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/release-benchmarks.yml
+    with:
+      candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
+      sha256: ${{ needs.package.outputs.sha256 }}
+      candidate-release: node-linux-candidate-${{ github.run_id }}

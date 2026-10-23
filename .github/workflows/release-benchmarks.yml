@@ -1,0 +1,156 @@
+name: Release benchmarks
+# Phase 5.2b: the irreducible benchmark set (bench/run.mjs, docs/BENCHMARKS.md)
+# for one exact candidate package, on free standard runners. Linux x64 is the
+# reference platform; the other runners are optional, informational extras.
+# Results are committed to main as docs/benchmarks/history/<version>.json plus a
+# regenerated docs/BENCHMARKS.md. Regressions are flagged in the job summary and
+# on the page, never fatal. Called by the candidate pipeline after a candidate is
+# retained (node-linux-acceptance.yml); also dispatchable by hand.
+on:
+  workflow_call:
+    inputs:
+      candidate-version: { required: true, type: string }
+      sha256: { required: true, type: string }
+      candidate-release: { required: true, type: string }
+      extras: { type: boolean, default: false }
+      commit: { type: boolean, default: true }
+  workflow_dispatch:
+    inputs:
+      candidate-version:
+        description: Exact candidate version (0.1.0-experimental.N)
+        required: true
+        type: string
+      sha256:
+        description: SHA-256 of the candidate npm archive
+        required: true
+        type: string
+      candidate-release:
+        description: Draft release holding the candidate (node-package-N or node-linux-candidate-N)
+        required: true
+        type: string
+      extras:
+        description: Also run the optional platforms (linux-arm64, darwin-arm64, win32-x64)
+        type: boolean
+        default: false
+      commit:
+        description: Commit the results to main
+        type: boolean
+        default: true
+permissions:
+  contents: read
+jobs:
+  input:
+    # Draft release assets need a write token; only this job gets one, and the
+    # benchmark jobs read the verified bytes from the short-lived cache handoff.
+    # It always runs: a caller's earlier handoff may have been evicted by now.
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/node-candidate-input.yml
+    with:
+      sha256: ${{ inputs.sha256 }}
+      candidate-release: ${{ inputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version }}
+  bench:
+    needs: input
+    if: >-
+      !cancelled() && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+      && needs.input.result == 'success'
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.extras && '[{"runner":"ubuntu-24.04","platform":"linux-x64","reference":true},{"runner":"ubuntu-24.04-arm","platform":"linux-arm64","reference":false},{"runner":"macos-15","platform":"darwin-arm64","reference":false},{"runner":"windows-2025","platform":"win32-x64","reference":false}]' || '[{"runner":"ubuntu-24.04","platform":"linux-x64","reference":true}]') }}
+    runs-on: ${{ matrix.runner }}
+    # Optional platforms never fail the workflow.
+    continue-on-error: ${{ !matrix.reference }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    env:
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version }}
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: ${{ needs.input.outputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify the candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Install the reference servers' dependencies
+        run: npm ci --prefix bench --no-audit --no-fund
+      - name: Run the benchmark suite
+        run: node bench/run.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm bench" ".work/bench-${{ matrix.platform }}.json"
+      - name: Preserve the result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: bench-${{ matrix.platform }}
+          path: .work/bench-${{ matrix.platform }}.json
+          retention-days: 7
+          if-no-files-found: ignore
+  commit:
+    needs: bench
+    if: >-
+      !cancelled() && inputs.commit && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    # One writer at a time; queued runs wait instead of being cancelled.
+    concurrency:
+      group: lasm-benchmark-history
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: bench-*
+          path: ${{ runner.temp }}/bench-results
+          merge-multiple: true
+      - name: Require the reference result
+        run: test -s "$RUNNER_TEMP/bench-results/bench-linux-x64.json"
+      # Rebase-safe publication: on every attempt, start from the newest main,
+      # record the results and regenerate the page from the full history, then
+      # push. A push that loses a race simply retries on the new main, so no
+      # merge conflict on the generated page is possible.
+      - name: Commit results to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          outcome=failed
+          for attempt in 1 2 3 4 5 6; do
+            git fetch --depth=1 origin main
+            git reset --hard origin/main
+            rm -f "$RUNNER_TEMP/summary.md"
+            node bench/render.mjs record docs/benchmarks/history "$RUNNER_TEMP"/bench-results/bench-*.json
+            node bench/render.mjs render docs/benchmarks/history docs/BENCHMARKS.md "$RUNNER_TEMP/summary.md"
+            git add docs/benchmarks/history docs/BENCHMARKS.md
+            if git diff --cached --quiet; then outcome=unchanged; break; fi
+            git commit -q -m "benchmarks: record ${{ inputs.candidate-version }}" \
+              -m "Release benchmarks for candidate ${{ inputs.candidate-version }} (sha256 ${{ inputs.sha256 }}), workflow run ${{ github.run_id }}."
+            if git push origin HEAD:main; then outcome=pushed; break; fi
+            sleep $((attempt * 10))
+          done
+          if [ -f "$RUNNER_TEMP/summary.md" ]; then cat "$RUNNER_TEMP/summary.md" >> "$GITHUB_STEP_SUMMARY"; fi
+          echo "Outcome: $outcome; $(git log -1 --format='%H %s')" | tee -a "$GITHUB_STEP_SUMMARY"
+          test "$outcome" != failed
