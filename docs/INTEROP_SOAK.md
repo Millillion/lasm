@@ -84,7 +84,7 @@ by `Async` handlers (next section).
 
 ## Concurrent waiting handlers
 
-*Current source, awaiting candidate acceptance (2026-10-23).* Lean handlers
+*Current source (2026-10-23); candidate `.58` passed five-platform acceptance, the interop examples, the templates and the soak below; awaiting the release gate.* Lean handlers
 (`Function.ofFn`, `ofFnReply`) run in `Async` (Lean's `Std.Async`), and
 `callAwait`, `callMethodAwait`, `Value.await` and bindings declared `→ Async R`
 await there without holding a Lean thread. The host settles the JavaScript
@@ -114,8 +114,36 @@ The `Async` time is the 100 ms timer plus about 1,000 × 5 host calls through
 Node's main thread. Throughput on the same host (server pinned to 2 CPUs, load
 from 2 others, 16 connections, 3 alternating runs): `GET /slow/0` (an awaiting
 handler) 4,860 → 5,490 requests per second, `GET /hello/Ada` 8,620 → 8,830, and
-the benchmark's Hono fixture 13,550 → 13,790: no regression. CI results on five targets are recorded with the candidate
-that includes the change.
+the benchmark's Hono fixture 13,550 → 13,790: no regression. **CI, candidate `0.1.0-experimental.58`** (source `a9c5a9d`; it passed
+five-platform installed acceptance, the interop examples and the templates in
+run [40012750099](https://github.com/Millillion/lasm/actions/runs/40012750099);
+evidence: [interop-soak-async-2026-10-23.json](evidence/interop-soak-async-2026-10-23.json)).
+Run [40021909538](https://github.com/Millillion/lasm/actions/runs/40021909538)
+(15 min per app on every target, the final harness): **all 10 passed**, 0 errors
+(Express on macOS x64 failed p99 drift once while the runner slowed from 125,000
+to 95,000 requests per minute, and passed on rerun). Run
+[40013948843](https://github.com/Millillion/lasm/actions/runs/40013948843) ran
+the 2-hour Linux x64 soak: both apps passed. Its Hono Windows job failed on the
+client: the faster server (6,850 requests per second) made 2 % aborted requests
+open about 137 connections per second, more than Windows' ephemeral ports allow
+with a 120 s TIME_WAIT (`EADDRINUSE`); aborts are now capped at 25 per second.
+Probe in run 40021909538, three rounds of 1,000 concurrent 100 ms awaits
+(Linux pinned to 2 CPUs; macOS and Windows unpinned):
+
+| Target | Express, ms per round | Hono, ms per round | Threads before → after |
+| --- | --- | --- | --- |
+| linux-x64 | 371, 349, 364 | 204, 181, 201 | 20 → 20 |
+| linux-arm64 | 367, 346, 327 | 284, 258, 261 | 20 → 20 |
+| darwin-x64 | 471, 502, 403 | 420, 426, 440 | 17 → 17 |
+| darwin-arm64 | 203, 277, 205 | 274, 199, 209 | 16 → 16 |
+| win32-x64 | 384, 356, 353 | 293, 278, 253 | 21 → 21 |
+
+Soak load is no longer limited by waiting handlers (10 % of requests await a
+10 ms timer): 2-hour Linux x64 soak 4,765 requests per second for Express and
+6,382 for Hono (1,586 and 1,574 before), RSS slope 0.3 bytes per request, Wasm
+memory flat, idle `values` 3 → 3 and 2 → 2, `functionsLive` 8 → 8 and 8 → 7,
+p99 5.2 → 5.2 ms and 3.5 → 3.3 ms. On the other targets: 2,220–6,839 requests per
+second, RSS slope −5.3 to 0.9 bytes per request, no handle or function growth.
 
 ## Reproduce
 

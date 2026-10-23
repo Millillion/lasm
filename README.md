@@ -275,7 +275,8 @@ requests per second and Express about 6,300, against about 54,000 for a plain No
 `http` server (0.18× and 0.12×) and about 660 for `Std.Http` under Lasm. Node's main
 thread is the limit: each request makes about four host calls. Current source cuts
 that to two or three (`Function.ofFnReply`; +16–30 % locally). In current source
-(awaiting candidate acceptance), Lean handlers run in `Async` (Lean's `Std.Async`):
+(candidate `.58` passed five-platform acceptance and the interop soak; awaiting the
+release gate), Lean handlers run in `Async` (Lean's `Std.Async`):
 a handler that awaits JavaScript (`callMethodAwait`, a binding declared
 `→ Async R`) holds no Lean thread, so any number of requests can wait at once
 (1,000 concurrent 100 ms awaits in about 0.3 s on 2 CPUs); awaiting in `IO`, as

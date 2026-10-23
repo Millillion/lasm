@@ -1,0 +1,2345 @@
+{
+ "runs": {
+  "40013948843": "long soak (Linux x64 2 h per app, others 15 min), harness 22e34ac..e304ce0: hono win32-x64 failed on client port exhaustion (EADDRINUSE, fixed in c1d7762); probe before maxFreeSockets fix (9d6175a)",
+  "40021909538": "15 min per app on all targets, harness 9d6175a (abort cap, keep-alive probe); express darwin-x64 attempt 1 failed p99Drift only (runner slowdown, throughput 125k to 95k requests per minute), passed on rerun (attempt 2)"
+ },
+ "candidate": "0.1.0-experimental.58 (source a9c5a9d, node-package-40012750099, sha256 abeccf74df7743b4ef86f1ea1e59468bd750c569295798264c6bf848b1945008)",
+ "results": [
+  {
+   "run": 40013948843,
+   "app": "express",
+   "platform": "darwin-arm64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 429,
+      "p50Ms": 302,
+      "p99Ms": 380,
+      "maxMs": 383,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 414,
+      "p50Ms": 248,
+      "p99Ms": 385,
+      "maxMs": 386,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 332,
+      "p50Ms": 245,
+      "p99Ms": 302,
+      "maxMs": 305,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "darwin-arm64",
+    "cpus": 3,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 391,
+     "ok": 1000
+    },
+    "threadsBefore": 16,
+    "threadsAfterRound1": 16,
+    "threadsAfterRound2": 16,
+    "threadsAfterRound3": 16,
+    "threadsAfter": 16,
+    "bestTotalMs": 332,
+    "worstTotalMs": 429,
+    "allOk": true
+   },
+   "load": {
+    "requests": 4950195,
+    "rps": 5500,
+    "errors": 0,
+    "aborted": 99652,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 687,
+    "windowRequests": 3781024,
+    "rss": {
+     "startMiB": 172.42,
+     "warmBaselineMiB": 278.08,
+     "finalMiB": 280.8,
+     "peakMiB": 281,
+     "slopeBytesPerRequest": 1
+    },
+    "wasm": {
+     "warmBaselineMiB": 319.44,
+     "finalMiB": 319.44,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 3,
+     "idleAfter": 3,
+     "slopePerMinuteUnderLoad": -0.38
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 8,
+     "callbacksServed": 4950204,
+     "released": 27221808
+    },
+    "p99": {
+     "firstMs": 6.38,
+     "lastMs": 8.53
+    },
+    "osHandles": {
+     "base": 51,
+     "final": 51
+    }
+   }
+  },
+  {
+   "run": 40013948843,
+   "app": "express",
+   "platform": "darwin-x64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 1250,
+      "p50Ms": 406,
+      "p99Ms": 1208,
+      "maxMs": 1209,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 1228,
+      "p50Ms": 377,
+      "p99Ms": 1190,
+      "maxMs": 1193,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 1218,
+      "p50Ms": 347,
+      "p99Ms": 1189,
+      "maxMs": 1191,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "darwin-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 1525,
+     "ok": 1000
+    },
+    "threadsBefore": 17,
+    "threadsAfterRound1": 17,
+    "threadsAfterRound2": 17,
+    "threadsAfterRound3": 17,
+    "threadsAfter": 17,
+    "bestTotalMs": 1218,
+    "worstTotalMs": 1250,
+    "allOk": true
+   },
+   "load": {
+    "requests": 1803430,
+    "rps": 2004,
+    "errors": 0,
+    "aborted": 36312,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 682,
+    "windowRequests": 1366627,
+    "rss": {
+     "startMiB": 187.18,
+     "warmBaselineMiB": 284.02,
+     "finalMiB": 279.29,
+     "peakMiB": 285.62,
+     "slopeBytesPerRequest": -3.5
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 3,
+     "idleAfter": 3,
+     "slopePerMinuteUnderLoad": -0.11
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 8,
+     "callbacksServed": 1803439,
+     "released": 9917222
+    },
+    "p99": {
+     "firstMs": 10.91,
+     "lastMs": 17.94
+    },
+    "osHandles": {
+     "base": 52,
+     "final": 52
+    }
+   }
+  },
+  {
+   "run": 40013948843,
+   "app": "express",
+   "platform": "linux-arm64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 395,
+      "p50Ms": 270,
+      "p99Ms": 367,
+      "maxMs": 377,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 397,
+      "p50Ms": 263,
+      "p99Ms": 372,
+      "maxMs": 381,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 362,
+      "p50Ms": 247,
+      "p99Ms": 345,
+      "maxMs": 347,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": "0,1",
+    "platform": "linux-arm64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 708,
+     "ok": 1000
+    },
+    "threadsBefore": 20,
+    "threadsAfterRound1": 20,
+    "threadsAfterRound2": 20,
+    "threadsAfterRound3": 20,
+    "threadsAfter": 20,
+    "bestTotalMs": 362,
+    "worstTotalMs": 397,
+    "allOk": true
+   },
+   "load": {
+    "requests": 3511809,
+    "rps": 3902,
+    "errors": 0,
+    "aborted": 70892,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 686,
+    "windowRequests": 2676494,
+    "rss": {
+     "startMiB": 180.94,
+     "warmBaselineMiB": 288.24,
+     "finalMiB": 288.53,
+     "peakMiB": 291.91,
+     "slopeBytesPerRequest": -0.1
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 3,
+     "idleAfter": 3,
+     "slopePerMinuteUnderLoad": -0.32
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 8,
+     "callbacksServed": 3511818,
+     "released": 19311677
+    },
+    "p99": {
+     "firstMs": 5.61,
+     "lastMs": 5.32
+    },
+    "osHandles": {
+     "base": 87,
+     "final": 87
+    }
+   }
+  },
+  {
+   "run": 40013948843,
+   "app": "express",
+   "platform": "linux-x64",
+   "seconds": 7200,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 391,
+      "p50Ms": 271,
+      "p99Ms": 363,
+      "maxMs": 380,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 382,
+      "p50Ms": 258,
+      "p99Ms": 354,
+      "maxMs": 358,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 345,
+      "p50Ms": 241,
+      "p99Ms": 325,
+      "maxMs": 327,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": "0,1",
+    "platform": "linux-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 743,
+     "ok": 1000
+    },
+    "threadsBefore": 20,
+    "threadsAfterRound1": 20,
+    "threadsAfterRound2": 20,
+    "threadsAfterRound3": 20,
+    "threadsAfter": 20,
+    "bestTotalMs": 345,
+    "worstTotalMs": 391,
+    "allOk": true
+   },
+   "load": {
+    "requests": 34311067,
+    "rps": 4765,
+    "errors": 0,
+    "aborted": 688040,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 5410,
+    "windowRequests": 25779717,
+    "rss": {
+     "startMiB": 278.02,
+     "warmBaselineMiB": 399.87,
+     "finalMiB": 405.85,
+     "peakMiB": 406.83,
+     "slopeBytesPerRequest": 0.3
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 3,
+     "idleAfter": 3,
+     "slopePerMinuteUnderLoad": 0.01
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 8,
+     "callbacksServed": 34311076,
+     "released": 188715913
+    },
+    "p99": {
+     "firstMs": 5.15,
+     "lastMs": 5.21
+    },
+    "osHandles": {
+     "base": 87,
+     "final": 87
+    }
+   }
+  },
+  {
+   "run": 40013948843,
+   "app": "express",
+   "platform": "win32-x64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 660,
+      "p50Ms": 484,
+      "p99Ms": 627,
+      "maxMs": 630,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 605,
+      "p50Ms": 448,
+      "p99Ms": 577,
+      "maxMs": 581,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 608,
+      "p50Ms": 450,
+      "p99Ms": 582,
+      "maxMs": 586,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "win32-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 935,
+     "ok": 1000
+    },
+    "threadsBefore": 21,
+    "threadsAfterRound1": 21,
+    "threadsAfterRound2": 21,
+    "threadsAfterRound3": 21,
+    "threadsAfter": 21,
+    "bestTotalMs": 605,
+    "worstTotalMs": 660,
+    "allOk": true
+   },
+   "load": {
+    "requests": 2819877,
+    "rps": 3133,
+    "errors": 0,
+    "aborted": 56954,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 688,
+    "windowRequests": 2156652,
+    "rss": {
+     "startMiB": 201.82,
+     "warmBaselineMiB": 184.38,
+     "finalMiB": 156.33,
+     "peakMiB": 289.24,
+     "slopeBytesPerRequest": -4.3
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 3,
+     "idleAfter": 3,
+     "slopePerMinuteUnderLoad": -0.11
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 8,
+     "callbacksServed": 2819886,
+     "released": 15507003
+    },
+    "p99": {
+     "firstMs": 7.39,
+     "lastMs": 7.09
+    },
+    "osHandles": {
+     "base": 302,
+     "final": 302
+    }
+   }
+  },
+  {
+   "run": 40013948843,
+   "app": "hono",
+   "platform": "darwin-arm64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 2195,
+      "p50Ms": 211,
+      "p99Ms": 2158,
+      "maxMs": 2159,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 1183,
+      "p50Ms": 242,
+      "p99Ms": 1152,
+      "maxMs": 1159,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 2180,
+      "p50Ms": 219,
+      "p99Ms": 2144,
+      "maxMs": 2146,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "darwin-arm64",
+    "cpus": 3,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 665,
+     "ok": 1000
+    },
+    "threadsBefore": 16,
+    "threadsAfterRound1": 16,
+    "threadsAfterRound2": 16,
+    "threadsAfterRound3": 16,
+    "threadsAfter": 16,
+    "bestTotalMs": 1183,
+    "worstTotalMs": 2195,
+    "allOk": true
+   },
+   "load": {
+    "requests": 4390357,
+    "rps": 4878,
+    "errors": 0,
+    "aborted": 88448,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 683,
+    "windowRequests": 3331589,
+    "rss": {
+     "startMiB": 167.91,
+     "warmBaselineMiB": 282.53,
+     "finalMiB": 283.55,
+     "peakMiB": 284.88,
+     "slopeBytesPerRequest": 0.5
+    },
+    "wasm": {
+     "warmBaselineMiB": 319.44,
+     "finalMiB": 319.44,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 2,
+     "idleAfter": 2,
+     "slopePerMinuteUnderLoad": -0.29
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 7,
+     "callbacksServed": 4390366,
+     "released": 16461474
+    },
+    "p99": {
+     "firstMs": 10.76,
+     "lastMs": 11.48
+    },
+    "osHandles": {
+     "base": 51,
+     "final": 51
+    }
+   }
+  },
+  {
+   "run": 40013948843,
+   "app": "hono",
+   "platform": "darwin-x64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 1183,
+      "p50Ms": 266,
+      "p99Ms": 1157,
+      "maxMs": 1158,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 1179,
+      "p50Ms": 311,
+      "p99Ms": 1151,
+      "maxMs": 1153,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 366,
+      "p50Ms": 281,
+      "p99Ms": 335,
+      "maxMs": 336,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "darwin-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 639,
+     "ok": 1000
+    },
+    "threadsBefore": 17,
+    "threadsAfterRound1": 17,
+    "threadsAfterRound2": 17,
+    "threadsAfterRound3": 17,
+    "threadsAfter": 17,
+    "bestTotalMs": 366,
+    "worstTotalMs": 1183,
+    "allOk": true
+   },
+   "load": {
+    "requests": 2757027,
+    "rps": 3063,
+    "errors": 0,
+    "aborted": 55652,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 685,
+    "windowRequests": 2098330,
+    "rss": {
+     "startMiB": 182.92,
+     "warmBaselineMiB": 281.36,
+     "finalMiB": 282.29,
+     "peakMiB": 282.95,
+     "slopeBytesPerRequest": 0.1
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 2,
+     "idleAfter": 2,
+     "slopePerMinuteUnderLoad": -0.38
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 7,
+     "callbacksServed": 2757036,
+     "released": 10337595
+    },
+    "p99": {
+     "firstMs": 12.12,
+     "lastMs": 11.33
+    },
+    "osHandles": {
+     "base": 52,
+     "final": 52
+    }
+   }
+  },
+  {
+   "run": 40013948843,
+   "app": "hono",
+   "platform": "linux-arm64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 303,
+      "p50Ms": 226,
+      "p99Ms": 282,
+      "maxMs": 283,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 279,
+      "p50Ms": 208,
+      "p99Ms": 259,
+      "maxMs": 260,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 277,
+      "p50Ms": 208,
+      "p99Ms": 254,
+      "maxMs": 254,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": "0,1",
+    "platform": "linux-arm64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 591,
+     "ok": 1000
+    },
+    "threadsBefore": 20,
+    "threadsAfterRound1": 20,
+    "threadsAfterRound2": 20,
+    "threadsAfterRound3": 20,
+    "threadsAfter": 20,
+    "bestTotalMs": 277,
+    "worstTotalMs": 303,
+    "allOk": true
+   },
+   "load": {
+    "requests": 5051771,
+    "rps": 5613,
+    "errors": 0,
+    "aborted": 101725,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 686,
+    "windowRequests": 3852357,
+    "rss": {
+     "startMiB": 177.52,
+     "warmBaselineMiB": 289.97,
+     "finalMiB": 291.31,
+     "peakMiB": 293.32,
+     "slopeBytesPerRequest": 0.5
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 2,
+     "idleAfter": 2,
+     "slopePerMinuteUnderLoad": -0.27
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 7,
+     "callbacksServed": 5051780,
+     "released": 18941619
+    },
+    "p99": {
+     "firstMs": 4.54,
+     "lastMs": 4.46
+    },
+    "osHandles": {
+     "base": 87,
+     "final": 87
+    }
+   }
+  },
+  {
+   "run": 40013948843,
+   "app": "hono",
+   "platform": "linux-x64",
+   "seconds": 7200,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 314,
+      "p50Ms": 238,
+      "p99Ms": 287,
+      "maxMs": 287,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 289,
+      "p50Ms": 215,
+      "p99Ms": 264,
+      "maxMs": 265,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 302,
+      "p50Ms": 231,
+      "p99Ms": 272,
+      "maxMs": 272,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": "0,1",
+    "platform": "linux-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 688,
+     "ok": 1000
+    },
+    "threadsBefore": 20,
+    "threadsAfterRound1": 20,
+    "threadsAfterRound2": 20,
+    "threadsAfterRound3": 20,
+    "threadsAfter": 20,
+    "bestTotalMs": 289,
+    "worstTotalMs": 314,
+    "allOk": true
+   },
+   "load": {
+    "requests": 45948710,
+    "rps": 6382,
+    "errors": 0,
+    "aborted": 920784,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 5408,
+    "windowRequests": 34513595,
+    "rss": {
+     "startMiB": 278.29,
+     "warmBaselineMiB": 396.32,
+     "finalMiB": 404.38,
+     "peakMiB": 405.5,
+     "slopeBytesPerRequest": 0.3
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 2,
+     "idleAfter": 2,
+     "slopePerMinuteUnderLoad": -0.01
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 7,
+     "callbacksServed": 45948719,
+     "released": 172306113
+    },
+    "p99": {
+     "firstMs": 3.5,
+     "lastMs": 3.3
+    },
+    "osHandles": {
+     "base": 87,
+     "final": 87
+    }
+   }
+  },
+  {
+   "run": 40013948843,
+   "app": "hono",
+   "platform": "win32-x64",
+   "seconds": 900,
+   "passed": false,
+   "checks": {
+    "concurrency": true,
+    "errors": false,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 311,
+      "p50Ms": 257,
+      "p99Ms": 295,
+      "maxMs": 296,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 286,
+      "p50Ms": 235,
+      "p99Ms": 267,
+      "maxMs": 269,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 285,
+      "p50Ms": 239,
+      "p99Ms": 274,
+      "maxMs": 275,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "win32-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 544,
+     "ok": 1000
+    },
+    "threadsBefore": 21,
+    "threadsAfterRound1": 21,
+    "threadsAfterRound2": 21,
+    "threadsAfterRound3": 21,
+    "threadsAfter": 21,
+    "bestTotalMs": 285,
+    "worstTotalMs": 311,
+    "allOk": true
+   },
+   "load": {
+    "requests": 6165623,
+    "rps": 6851,
+    "errors": 177742,
+    "aborted": 124071,
+    "errorSamples": [
+     {
+      "at": 477597,
+      "route": "slow",
+      "error": "EADDRINUSE"
+     },
+     {
+      "at": 477692,
+      "route": "hello",
+      "error": "EADDRINUSE"
+     },
+     {
+      "at": 477692,
+      "route": "slow",
+      "error": "EADDRINUSE"
+     }
+    ]
+   },
+   "growth": {
+    "windowSeconds": 686,
+    "windowRequests": 4699591,
+    "rss": {
+     "startMiB": 215.89,
+     "warmBaselineMiB": 138.04,
+     "finalMiB": 112.81,
+     "peakMiB": 292.53,
+     "slopeBytesPerRequest": -2.7
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 2,
+     "idleAfter": 2,
+     "slopePerMinuteUnderLoad": -0.17
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 7,
+     "callbacksServed": 5984636,
+     "released": 22439967
+    },
+    "p99": {
+     "firstMs": 4.37,
+     "lastMs": 4.29
+    },
+    "osHandles": {
+     "base": 303,
+     "final": 300
+    }
+   }
+  },
+  {
+   "run": 40021909538,
+   "app": "express",
+   "platform": "darwin-arm64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 203,
+      "p50Ms": 167,
+      "p99Ms": 188,
+      "maxMs": 190,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 277,
+      "p50Ms": 214,
+      "p99Ms": 267,
+      "maxMs": 268,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 205,
+      "p50Ms": 168,
+      "p99Ms": 192,
+      "maxMs": 193,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "darwin-arm64",
+    "cpus": 3,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 1066,
+     "ok": 1000
+    },
+    "threadsBefore": 16,
+    "threadsAfterRound1": 16,
+    "threadsAfterRound2": 16,
+    "threadsAfterRound3": 16,
+    "threadsAfter": 16,
+    "bestTotalMs": 203,
+    "worstTotalMs": 277,
+    "allOk": true
+   },
+   "load": {
+    "requests": 6155079,
+    "rps": 6839,
+    "errors": 0,
+    "aborted": 22514,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 686,
+    "windowRequests": 4691921,
+    "rss": {
+     "startMiB": 173.14,
+     "warmBaselineMiB": 283.8,
+     "finalMiB": 284.91,
+     "peakMiB": 285.92,
+     "slopeBytesPerRequest": 0.5
+    },
+    "wasm": {
+     "warmBaselineMiB": 319.44,
+     "finalMiB": 319.44,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 3,
+     "idleAfter": 3,
+     "slopePerMinuteUnderLoad": -0.04
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 8,
+     "callbacksServed": 6155088,
+     "released": 33848409
+    },
+    "p99": {
+     "firstMs": 7.06,
+     "lastMs": 3.01
+    },
+    "osHandles": {
+     "base": 51,
+     "final": 51
+    }
+   }
+  },
+  {
+   "run": 40021909538,
+   "app": "express",
+   "platform": "darwin-x64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 471,
+      "p50Ms": 316,
+      "p99Ms": 447,
+      "maxMs": 451,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 502,
+      "p50Ms": 383,
+      "p99Ms": 479,
+      "maxMs": 482,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 403,
+      "p50Ms": 280,
+      "p99Ms": 383,
+      "maxMs": 384,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "darwin-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 734,
+     "ok": 1000
+    },
+    "threadsBefore": 17,
+    "threadsAfterRound1": 17,
+    "threadsAfterRound2": 17,
+    "threadsAfterRound3": 17,
+    "threadsAfter": 17,
+    "bestTotalMs": 403,
+    "worstTotalMs": 502,
+    "allOk": true
+   },
+   "load": {
+    "requests": 1998019,
+    "rps": 2220,
+    "errors": 0,
+    "aborted": 22423,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 685,
+    "windowRequests": 1521381,
+    "rss": {
+     "startMiB": 187.65,
+     "warmBaselineMiB": 279.78,
+     "finalMiB": 280.29,
+     "peakMiB": 283.51,
+     "slopeBytesPerRequest": -0.8
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 3,
+     "idleAfter": 3,
+     "slopePerMinuteUnderLoad": -0.66
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 8,
+     "callbacksServed": 1998028,
+     "released": 10987349
+    },
+    "p99": {
+     "firstMs": 12.91,
+     "lastMs": 13.88
+    },
+    "osHandles": {
+     "base": 52,
+     "final": 52
+    }
+   }
+  },
+  {
+   "run": 40021909538,
+   "app": "express",
+   "platform": "linux-arm64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 367,
+      "p50Ms": 254,
+      "p99Ms": 348,
+      "maxMs": 349,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 346,
+      "p50Ms": 254,
+      "p99Ms": 331,
+      "maxMs": 332,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 327,
+      "p50Ms": 233,
+      "p99Ms": 311,
+      "maxMs": 312,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": "0,1",
+    "platform": "linux-arm64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 772,
+     "ok": 1000
+    },
+    "threadsBefore": 20,
+    "threadsAfterRound1": 20,
+    "threadsAfterRound2": 20,
+    "threadsAfterRound3": 20,
+    "threadsAfter": 20,
+    "bestTotalMs": 327,
+    "worstTotalMs": 367,
+    "allOk": true
+   },
+   "load": {
+    "requests": 3477969,
+    "rps": 3864,
+    "errors": 0,
+    "aborted": 22513,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 686,
+    "windowRequests": 2650519,
+    "rss": {
+     "startMiB": 179.3,
+     "warmBaselineMiB": 291.05,
+     "finalMiB": 291.13,
+     "peakMiB": 292.65,
+     "slopeBytesPerRequest": 0.2
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 3,
+     "idleAfter": 3,
+     "slopePerMinuteUnderLoad": -0.37
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 8,
+     "callbacksServed": 3477978,
+     "released": 19125687
+    },
+    "p99": {
+     "firstMs": 5.15,
+     "lastMs": 5.19
+    },
+    "osHandles": {
+     "base": 87,
+     "final": 87
+    }
+   }
+  },
+  {
+   "run": 40021909538,
+   "app": "express",
+   "platform": "linux-x64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 371,
+      "p50Ms": 266,
+      "p99Ms": 348,
+      "maxMs": 349,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 349,
+      "p50Ms": 247,
+      "p99Ms": 332,
+      "maxMs": 334,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 364,
+      "p50Ms": 255,
+      "p99Ms": 346,
+      "maxMs": 348,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": "0,1",
+    "platform": "linux-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 808,
+     "ok": 1000
+    },
+    "threadsBefore": 20,
+    "threadsAfterRound1": 20,
+    "threadsAfterRound2": 20,
+    "threadsAfterRound3": 20,
+    "threadsAfter": 20,
+    "bestTotalMs": 349,
+    "worstTotalMs": 371,
+    "allOk": true
+   },
+   "load": {
+    "requests": 3773552,
+    "rps": 4193,
+    "errors": 0,
+    "aborted": 22524,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 686,
+    "windowRequests": 2876522,
+    "rss": {
+     "startMiB": 282.14,
+     "warmBaselineMiB": 395.09,
+     "finalMiB": 397.41,
+     "peakMiB": 398.16,
+     "slopeBytesPerRequest": 0.9
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 3,
+     "idleAfter": 3,
+     "slopePerMinuteUnderLoad": -0.3
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 8,
+     "callbacksServed": 3773561,
+     "released": 20751020
+    },
+    "p99": {
+     "firstMs": 5.53,
+     "lastMs": 5.6
+    },
+    "osHandles": {
+     "base": 87,
+     "final": 87
+    }
+   }
+  },
+  {
+   "run": 40021909538,
+   "app": "express",
+   "platform": "win32-x64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 384,
+      "p50Ms": 276,
+      "p99Ms": 359,
+      "maxMs": 361,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 356,
+      "p50Ms": 254,
+      "p99Ms": 335,
+      "maxMs": 337,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 353,
+      "p50Ms": 251,
+      "p99Ms": 331,
+      "maxMs": 333,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "win32-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 826,
+     "ok": 1000
+    },
+    "threadsBefore": 21,
+    "threadsAfterRound1": 21,
+    "threadsAfterRound2": 21,
+    "threadsAfterRound3": 21,
+    "threadsAfter": 21,
+    "bestTotalMs": 353,
+    "worstTotalMs": 384,
+    "allOk": true
+   },
+   "load": {
+    "requests": 2961713,
+    "rps": 3291,
+    "errors": 0,
+    "aborted": 22505,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 684,
+    "windowRequests": 2249625,
+    "rss": {
+     "startMiB": 200.99,
+     "warmBaselineMiB": 187.5,
+     "finalMiB": 153.31,
+     "peakMiB": 288.62,
+     "slopeBytesPerRequest": -5.3
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 3,
+     "idleAfter": 3,
+     "slopePerMinuteUnderLoad": -0.18
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 8,
+     "callbacksServed": 2961722,
+     "released": 16287326
+    },
+    "p99": {
+     "firstMs": 6.53,
+     "lastMs": 6.42
+    },
+    "osHandles": {
+     "base": 302,
+     "final": 302
+    }
+   }
+  },
+  {
+   "run": 40021909538,
+   "app": "hono",
+   "platform": "darwin-arm64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 274,
+      "p50Ms": 205,
+      "p99Ms": 252,
+      "maxMs": 253,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 199,
+      "p50Ms": 163,
+      "p99Ms": 191,
+      "maxMs": 191,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 209,
+      "p50Ms": 158,
+      "p99Ms": 200,
+      "maxMs": 200,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "darwin-arm64",
+    "cpus": 3,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 1084,
+     "ok": 1000
+    },
+    "threadsBefore": 16,
+    "threadsAfterRound1": 16,
+    "threadsAfterRound2": 16,
+    "threadsAfterRound3": 16,
+    "threadsAfter": 16,
+    "bestTotalMs": 199,
+    "worstTotalMs": 274,
+    "allOk": true
+   },
+   "load": {
+    "requests": 5356275,
+    "rps": 5951,
+    "errors": 0,
+    "aborted": 22525,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 687,
+    "windowRequests": 4088154,
+    "rss": {
+     "startMiB": 169.38,
+     "warmBaselineMiB": 280.36,
+     "finalMiB": 280.25,
+     "peakMiB": 281.66,
+     "slopeBytesPerRequest": 0.7
+    },
+    "wasm": {
+     "warmBaselineMiB": 319.44,
+     "finalMiB": 319.44,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 2,
+     "idleAfter": 2,
+     "slopePerMinuteUnderLoad": 0.15
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 7,
+     "callbacksServed": 5356283,
+     "released": 20083658
+    },
+    "p99": {
+     "firstMs": 9.55,
+     "lastMs": 9.61
+    },
+    "osHandles": {
+     "base": 51,
+     "final": 51
+    }
+   }
+  },
+  {
+   "run": 40021909538,
+   "app": "hono",
+   "platform": "darwin-x64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 420,
+      "p50Ms": 338,
+      "p99Ms": 393,
+      "maxMs": 393,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 426,
+      "p50Ms": 335,
+      "p99Ms": 408,
+      "maxMs": 408,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 440,
+      "p50Ms": 362,
+      "p99Ms": 411,
+      "maxMs": 411,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "darwin-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 1111,
+     "ok": 1000
+    },
+    "threadsBefore": 17,
+    "threadsAfterRound1": 17,
+    "threadsAfterRound2": 17,
+    "threadsAfterRound3": 17,
+    "threadsAfter": 17,
+    "bestTotalMs": 420,
+    "worstTotalMs": 440,
+    "allOk": true
+   },
+   "load": {
+    "requests": 2164407,
+    "rps": 2405,
+    "errors": 0,
+    "aborted": 22438,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 682,
+    "windowRequests": 1639637,
+    "rss": {
+     "startMiB": 181.93,
+     "warmBaselineMiB": 276.45,
+     "finalMiB": 277.83,
+     "peakMiB": 281.1,
+     "slopeBytesPerRequest": 0.3
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 2,
+     "idleAfter": 2,
+     "slopePerMinuteUnderLoad": -0.25
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 7,
+     "callbacksServed": 2164416,
+     "released": 8115489
+    },
+    "p99": {
+     "firstMs": 20.18,
+     "lastMs": 16.8
+    },
+    "osHandles": {
+     "base": 52,
+     "final": 52
+    }
+   }
+  },
+  {
+   "run": 40021909538,
+   "app": "hono",
+   "platform": "linux-arm64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 284,
+      "p50Ms": 216,
+      "p99Ms": 266,
+      "maxMs": 266,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 258,
+      "p50Ms": 199,
+      "p99Ms": 245,
+      "maxMs": 245,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 261,
+      "p50Ms": 208,
+      "p99Ms": 250,
+      "maxMs": 251,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": "0,1",
+    "platform": "linux-arm64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 614,
+     "ok": 1000
+    },
+    "threadsBefore": 20,
+    "threadsAfterRound1": 20,
+    "threadsAfterRound2": 20,
+    "threadsAfterRound3": 20,
+    "threadsAfter": 20,
+    "bestTotalMs": 258,
+    "worstTotalMs": 284,
+    "allOk": true
+   },
+   "load": {
+    "requests": 4570210,
+    "rps": 5078,
+    "errors": 0,
+    "aborted": 22501,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 686,
+    "windowRequests": 3484714,
+    "rss": {
+     "startMiB": 175.52,
+     "warmBaselineMiB": 290.29,
+     "finalMiB": 291.11,
+     "peakMiB": 291.62,
+     "slopeBytesPerRequest": 0.2
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 2,
+     "idleAfter": 2,
+     "slopePerMinuteUnderLoad": -0.11
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 7,
+     "functionsLiveAfter": 7,
+     "callbacksServed": 4570219,
+     "released": 17135820
+    },
+    "p99": {
+     "firstMs": 4.87,
+     "lastMs": 5.94
+    },
+    "osHandles": {
+     "base": 87,
+     "final": 87
+    }
+   }
+  },
+  {
+   "run": 40021909538,
+   "app": "hono",
+   "platform": "linux-x64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 204,
+      "p50Ms": 168,
+      "p99Ms": 191,
+      "maxMs": 191,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 181,
+      "p50Ms": 152,
+      "p99Ms": 172,
+      "maxMs": 172,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 201,
+      "p50Ms": 161,
+      "p99Ms": 191,
+      "maxMs": 192,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": "0,1",
+    "platform": "linux-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 442,
+     "ok": 1000
+    },
+    "threadsBefore": 20,
+    "threadsAfterRound1": 20,
+    "threadsAfterRound2": 20,
+    "threadsAfterRound3": 20,
+    "threadsAfter": 20,
+    "bestTotalMs": 181,
+    "worstTotalMs": 204,
+    "allOk": true
+   },
+   "load": {
+    "requests": 8892273,
+    "rps": 9880,
+    "errors": 0,
+    "aborted": 22525,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 687,
+    "windowRequests": 6786169,
+    "rss": {
+     "startMiB": 278.02,
+     "warmBaselineMiB": 393.93,
+     "finalMiB": 397.86,
+     "peakMiB": 398.72,
+     "slopeBytesPerRequest": 0.5
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 2,
+     "idleAfter": 2,
+     "slopePerMinuteUnderLoad": -0.25
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 7,
+     "callbacksServed": 8892282,
+     "released": 33343008
+    },
+    "p99": {
+     "firstMs": 1,
+     "lastMs": 1.29
+    },
+    "osHandles": {
+     "base": 87,
+     "final": 87
+    }
+   }
+  },
+  {
+   "run": 40021909538,
+   "app": "hono",
+   "platform": "win32-x64",
+   "seconds": 900,
+   "passed": true,
+   "checks": {
+    "concurrency": true,
+    "errors": true,
+    "alive": true,
+    "samples": true,
+    "rssSlope": true,
+    "rssFinal": true,
+    "wasm": true,
+    "jsValues": true,
+    "pendingCallbacks": true,
+    "leanFunctions": true,
+    "p99Drift": true,
+    "osHandles": true
+   },
+   "concurrency": {
+    "requests": 1000,
+    "ms": 100,
+    "rounds": [
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 293,
+      "p50Ms": 226,
+      "p99Ms": 271,
+      "maxMs": 271,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 278,
+      "p50Ms": 221,
+      "p99Ms": 258,
+      "maxMs": 259,
+      "failures": []
+     },
+     {
+      "requests": 1000,
+      "ms": 100,
+      "ok": 1000,
+      "totalMs": 253,
+      "p50Ms": 195,
+      "p99Ms": 232,
+      "maxMs": 233,
+      "failures": []
+     }
+    ],
+    "pinnedCpus": null,
+    "platform": "win32-x64",
+    "cpus": 4,
+    "leanNumThreads": "default (unset)",
+    "warmup": {
+     "totalMs": 751,
+     "ok": 1000
+    },
+    "threadsBefore": 21,
+    "threadsAfterRound1": 21,
+    "threadsAfterRound2": 21,
+    "threadsAfterRound3": 21,
+    "threadsAfter": 21,
+    "bestTotalMs": 253,
+    "worstTotalMs": 293,
+    "allOk": true
+   },
+   "load": {
+    "requests": 3988810,
+    "rps": 4432,
+    "errors": 0,
+    "aborted": 22509,
+    "errorSamples": []
+   },
+   "growth": {
+    "windowSeconds": 681,
+    "windowRequests": 3018958,
+    "rss": {
+     "startMiB": 206.02,
+     "warmBaselineMiB": 163.54,
+     "finalMiB": 150.9,
+     "peakMiB": 292.6,
+     "slopeBytesPerRequest": -1.8
+    },
+    "wasm": {
+     "warmBaselineMiB": 383.38,
+     "finalMiB": 383.38,
+     "bytesPerRequest": 0
+    },
+    "jsValues": {
+     "idleBefore": 2,
+     "idleAfter": 2,
+     "slopePerMinuteUnderLoad": -0.24
+    },
+    "callbacks": {
+     "pendingAfter": 1,
+     "functionsLiveBefore": 8,
+     "functionsLiveAfter": 7,
+     "callbacksServed": 3988819,
+     "released": 14955600
+    },
+    "p99": {
+     "firstMs": 5.91,
+     "lastMs": 5.83
+    },
+    "osHandles": {
+     "base": 303,
+     "final": 303
+    }
+   }
+  }
+ ]
+}

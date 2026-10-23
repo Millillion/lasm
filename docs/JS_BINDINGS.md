@@ -5,7 +5,9 @@ complete: every rule needed to bind an npm package is here, with working example
 
 Status: **current source, Phase 4** (candidate `.39891445495` passed five-platform acceptance and the cold-installation gate; awaiting the user's review).
 `Async` handlers and bindings (waiting without holding a Lean thread) are
-**current source, Phase 5.2, awaiting candidate acceptance**. The design
+**current source, Phase 5.2**: candidate `.58` passed five-platform acceptance,
+the interop examples, the templates and the interop soak; awaiting the release
+gate. The design
 and measurements are in [JS_INTEROP.md](JS_INTEROP.md).
 
 ## What it is

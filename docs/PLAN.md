@@ -615,8 +615,9 @@ folded into Phases 5.2/5.3 and 7.
     Interop soak passed (docs/INTEROP_SOAK.md): 2 h per app on Linux x64 and
     15 min elsewhere, 0 errors, no handle/callback/memory growth. Finding: waiting
     handlers were bounded by Lean's worker threads (about one per CPU).
-    *Note (2026-10-23, pre-launch fix, current source awaiting candidate
-    acceptance):* handlers and promise-returning bindings now run in `Async`
+    *Note (2026-10-23, pre-launch fix, current source; candidate `.58`, source
+    `a9c5a9d`, passed five-platform acceptance (run 40012750099) and the interop
+    soak (runs 40013948843, 40021909538)):* handlers and promise-returning bindings now run in `Async`
     (Std.Async): `Function.ofFn`/`ofFnReply` take `Async` functions, and
     `callAwait`/`callMethodAwait`/`Value.await` and `Async R` bindings await
     without holding a Lean thread (the host resolves a Lean promise, the
