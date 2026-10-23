@@ -15,9 +15,9 @@ on:
         type: string
         default: "30"
       variants:
-        description: JSON array of variants (candidate, rpc, full, runtime, transport)
+        description: JSON array of variants (candidate; the rpc, full, runtime and transport overlays predate the merged fixes and no longer apply to current candidates)
         type: string
-        default: '["candidate","full"]'
+        default: '["candidate"]'
       platforms:
         description: JSON array of platforms, or "all"
         type: string
