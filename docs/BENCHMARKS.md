@@ -93,7 +93,7 @@ This is the first recorded release: it is the baseline.
 
 Each benchmark answers a question a user deploying Lean on Node asks, and the
 set stays small enough to run on every candidate on one free runner (about
-30–45 minutes).
+25 minutes on `ubuntu-24.04`).
 
 | Benchmark | Question it answers | Fixture |
 | --- | --- | --- |
@@ -178,6 +178,21 @@ is what a user would otherwise write).
   servers.
 - `Std.Http` under Lasm is much slower than the interop path; it is measured
   because it remains supported, and its role is decided in Phase 5.2.
+- On the 4-CPU reference runner the server gets 2 CPUs (the load generator the
+  other 2). Lasm servers use several threads (Node's main thread, the Lean
+  thread, worker pools), so they score lower here than unpinned on a larger
+  machine: `Std.Http` reaches about 660 req/s here against about 1,200 req/s
+  unpinned on a 12-CPU workstation, and Hono with a Lean handler about 9,700
+  in both. The setting is fixed, so releases stay comparable, and it resembles
+  a common 2-vCPU instance.
+- Incremental builds currently take as long as clean ones: Lasm relinks the
+  whole application after any change. The metric is there to show when that
+  improves.
+- The tool cache figure is the extracted size on disk (about 2.5 GB); the
+  download itself is smaller (about 250–275 MB, see the README).
+- Windows x64 extras: the first baseline run stopped before measuring (a tar
+  path issue, fixed in `bench/run.mjs`); the Windows column appears once an
+  extras run completes.
 - The plain-Node reference may be limited by the load generator on small
   runners (both share the machine). This understates Lasm's ratios slightly
   but equally across releases.
