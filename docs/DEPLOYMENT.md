@@ -64,6 +64,7 @@ listing records, 404s and 2 seconds of 16 concurrent clients
 | containers | own Linux build in every image; macOS and Windows builds in Debian 12 and the recipe | Docker on x64 and arm64: `--read-only --tmpfs /tmp --memory=512m --memory-swap=512m`, default seccomp ([`images.json`](../scripts/platform/images.json)) |
 | lambda | Linux and macOS builds | Lambda Node 24 image + Lambda Web Adapter through the Runtime Interface Emulator, x64 and arm64 |
 | macOS | the macOS build; the Linux x64 build must refuse macOS clearly | `macos-15`, Node 24.22.1 |
+| compiler-glibc | the compiler itself builds all three applications | `amazonlinux:2023` (glibc 2.34) with the official Node 24 |
 
 Run it locally (Docker; no accounts): build the three applications with
 `node scripts/platform/build-apps.mjs CANDIDATE.tgz WORK APPS`, then
@@ -79,4 +80,6 @@ Linux it needs **glibc 2.34 or newer**: the managed Git (dugite-native 2.53.0)
 uses GLIBC_2.34 symbols and Lean 4.35.0's LLVM libraries GLIBC_2.30; every other
 managed tool needs 2.27 or less (measured with `objdump -T` on the x64 and arm64
 archives, 2026-10-23). Installed-package acceptance runs on Ubuntu 24.04
-(glibc 2.39); older distributions are not yet tested as build machines.
+(glibc 2.39); the platform matrix also builds the three sample applications
+inside `amazonlinux:2023` (glibc 2.34, the floor) with Node 24. Other older
+distributions are untested as build machines.

@@ -129,6 +129,39 @@ jobs:
           retention-days: 1
           compression-level: 6
           if-no-files-found: error
+  # The compiler's Linux floor (glibc 2.34, measured from its managed tools) on
+  # Amazon Linux 2023, whose glibc is exactly 2.34, with the official Node 24.
+  compiler-glibc:
+    needs: [select, input]
+    if: always() && needs.select.outputs.active == 'true' && needs.input.result != 'failure' && needs.input.result != 'cancelled'
+    name: compiler on Amazon Linux 2023 (glibc 2.34)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      LASM_CANDIDATE_SHA256: ${{ needs.select.outputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ needs.select.outputs.version }}
+      LASM_CANDIDATE_RELEASE: ${{ needs.select.outputs.release }}
+      NODE24: ${{ needs.select.outputs.node24 }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ needs.select.outputs.node24 }}
+          package-manager-cache: false
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ needs.select.outputs.version }}.tgz
+          key: ${{ inputs.cache-key || needs.input.outputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify the candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Build hello, Express and Hono inside amazonlinux:2023
+        run: node scripts/platform/build-in-container.mjs amazonlinux:2023 "$NODE24" ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/al2023"
   native:
     needs: [select, build]
     if: always() && needs.select.outputs.active == 'true'
@@ -262,7 +295,7 @@ jobs:
         if: always()
         run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
   result:
-    needs: [select, build, native, containers, lambda, macos]
+    needs: [select, build, native, containers, lambda, macos, compiler-glibc]
     if: always() && needs.select.outputs.active == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
