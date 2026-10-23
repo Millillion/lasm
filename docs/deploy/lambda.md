@@ -26,9 +26,8 @@ template on Linux x64 and arm64 and invokes it through the emulator.
 ```dockerfile
 FROM node:24-trixie AS build
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . .
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 RUN --mount=type=cache,target=/root/.cache/lasm npx lasm build Main.lean --output dist
 
 FROM public.ecr.aws/lambda/nodejs:24

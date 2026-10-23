@@ -130,9 +130,9 @@ function dockerfile(template) {
 
 FROM node:24-trixie AS build
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+# The whole project (see .dockerignore), so local file: dependencies resolve too.
 COPY . .
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 # The first build downloads Lean and Lasm's build tools into the cache mount.
 RUN --mount=type=cache,target=/root/.cache/lasm npx lasm build Main.lean --output dist
 
@@ -159,9 +159,9 @@ function lambdaDockerfile() {
 
 FROM node:24-trixie AS build
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+# The whole project (see .dockerignore), so local file: dependencies resolve too.
 COPY . .
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 RUN --mount=type=cache,target=/root/.cache/lasm npx lasm build Main.lean --output dist
 
 FROM public.ecr.aws/lambda/nodejs:24

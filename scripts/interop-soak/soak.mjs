@@ -260,7 +260,8 @@ try {
     wasm: wasmBase !== null && wasmFinal - wasmBase <= criteria.maxBytesPerRequest * windowRequests + criteria.wasmAllowanceBytes,
     jsValues: js0 && js1 && js1.values <= js0.values + criteria.maxHandleGrowth,
     pendingCallbacks: js1?.pendingCalls === 0,
-    leanFunctions: js0 && js1 && js1.functionsLive <= js0.functionsLive + criteria.maxHandleGrowth,
+    // functionsLive exists since source fcda634 (older candidates do not report it).
+    leanFunctions: js0 && js1 && (js1.functionsLive === undefined || js1.functionsLive <= js0.functionsLive + criteria.maxHandleGrowth),
     p99Drift: p99First !== null && p99Last !== null && p99Last <= Math.max(p99First * criteria.p99Drift, p99First + criteria.p99SlackMs),
     osHandles: result.growth.osHandles.base == null || result.growth.osHandles.final <= result.growth.osHandles.base + criteria.maxHandleGrowth,
   };

@@ -216,7 +216,7 @@ npm run dev
 
 For the Docker build, copy the tarball into the project first and install it from
 there (`npm install -D ./lasm-compiler-<version>.tgz`), so that it is inside the
-build context.
+build context (the Dockerfile copies the whole project before `npm ci`).
 
 ## Next steps
 
