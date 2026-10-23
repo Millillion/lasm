@@ -9,9 +9,9 @@ compares exit status, because its transport differs by design: Node's `fetch` un
 Lasm, libcurl or the curl tool natively).
 
 **Outbound HTTP:** the `fetch` rows record Millillion/fetch, an experimental client tested in
-Phase 3 and then superseded (archived 2026-10-22, never released). Today outbound HTTP from a Lasm
-program works through the `curl` subprocess pattern (`IO.Process`, where curl is installed);
-Node's own `fetch` through JS/npm interop is planned for Phase 4.
+Phase 3 and then superseded (archived 2026-10-22, never released). Accepted candidates make
+outbound HTTP requests through the `curl` subprocess pattern (`IO.Process`, where curl is installed);
+current source calls Node's own `fetch` through JS/npm interop ([npm packages](#npm-packages-phase-4-jsnpm-interop)).
 
 Candidate: **`0.1.0-experimental.39677808414`** (source `a6a546e`, SHA-256 `12d799e8…36d4`,
 release `node-linux-candidate-39677808414`; five-platform installed acceptance run
@@ -128,3 +128,44 @@ of `___boxed__const__` globals (null refcount writes, lean-redis and upstream
 `elab/async_http_expect`), Windows Lean include prefix and SQLite's `getcwd` paths, MD4Lean's
 Windows stand-in headers shadowing the Wasm C library, eager failures on package C that only
 builds natively. See [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#phase-3-ecosystem-2026-10-21).
+
+## npm packages (Phase 4, JS/npm interop)
+
+Lean programs use these through `import Lasm.JS` ([guide](JS_BINDINGS.md)). Each row was
+built with the installed candidate `0.1.0-experimental.39891445495` (source `3aa1bf1`). The
+programs ran on standard GitHub runners in the `js-interop-examples` workflow, called by
+installed acceptance run [39891445495](https://github.com/Millillion/lasm/actions/runs/39891445495).
+**pass** means every check of
+[`scripts/js-interop/check-crud.mjs`](../scripts/js-interop/check-crud.mjs) (or the `fetch`
+output check) passed. Evidence: [js-interop-examples-2026-10-23.json](evidence/js-interop-examples-2026-10-23.json).
+
+| Package (exact version) | Used by | linux-x64 | linux-arm64 | darwin-x64 | darwin-arm64 | win32-x64 |
+| --- | --- | --- | --- | --- | --- | --- |
+| express 5.2.1 | [js-crud](../examples/js-crud) `Express.lean`: the server, routing, JSON bodies | pass | pass | pass | pass | pass |
+| hono 4.13.13 + @hono/node-server 2.1.3 | js-crud `Hono.lean`: the same API on Hono | pass | pass | pass | pass | pass |
+| pg 8.23.1 | js-crud `App.lean`: Pool, parameterized queries, `result.rows` | pass | pass | pass | pass | pass |
+| jose 6.2.12 | js-crud `App.lean`: SignJWT (HS256), jwtVerify | pass | pass | pass | pass | pass |
+| Node `fetch` (global) | [js-fetch](../examples/js-fetch) against a local HTTP server | pass | pass | pass | pass | pass |
+| Node built-ins (`node:crypto`, `node:path`, `node:fs/promises`, `structuredClone`) and a local `file:` package | [test fixture](../test/fixtures/js-interop), in installed acceptance | pass | pass | pass | pass | pass |
+
+Postgres used by the js-crud checks:
+
+- **Linux:** a `postgres:17` service container.
+- **macOS:** [embedded-postgres](https://www.npmjs.com/package/embedded-postgres)
+  18.4.0-beta.17, which runs PostgreSQL 18.4 binaries published on npm
+  ([`start-postgres.mjs`](../scripts/js-interop/start-postgres.mjs)).
+- **Windows:** the runner image's preinstalled PostgreSQL 17 service. PostgreSQL refuses to
+  run under the runner's administrator account, so embedded-postgres cannot start there.
+
+Requests per second on the authenticated database route (JWT verification and a query per
+request, 16 clients for 2 s, from the same runner), Express / Hono:
+
+| Platform | Express / Hono (req/s) |
+| --- | --- |
+| linux-x64 | 1,651 / 1,701 |
+| linux-arm64 | 1,426 / 1,461 |
+| darwin-x64 | 1,172 / 1,065 |
+| darwin-arm64 | 2,953 / 1,446 |
+| win32-x64 | 3,012 / 2,005 |
+
+These numbers are indicative only: shared runners, with the client on the same machine.

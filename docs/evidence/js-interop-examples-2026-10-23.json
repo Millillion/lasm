@@ -1,0 +1,950 @@
+{
+ "scope": "js-interop-examples workflow (called by installed acceptance run 39891445495, source 3aa1bf1): examples/js-crud on Express and Hono (pg, jose) and examples/js-fetch, built with the installed candidate 0.1.0-experimental.39891445495",
+ "runs": [
+  {
+   "platform": "linux-arm64",
+   "node": "v26.12.1",
+   "candidate": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz",
+   "postgres": "postgres:17 service container",
+   "startedAt": "2026-10-23T02:49:30.562Z",
+   "steps": [
+    {
+     "label": "npm install (example dependencies)",
+     "args": [
+      "install"
+     ],
+     "code": 0,
+     "seconds": 1.2,
+     "stderr": ""
+    },
+    {
+     "label": "npm install -D Lasm candidate",
+     "args": [
+      "install",
+      "-D",
+      "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz"
+     ],
+     "code": 0,
+     "seconds": 4.6,
+     "stderr": ""
+    },
+    {
+     "label": "lasm build Express.lean",
+     "args": [
+      "lasm",
+      "build",
+      "Express.lean",
+      "--output",
+      "/home/runner/work/_temp/lasm js examples \u03bb/crud app/dist Express"
+     ],
+     "code": 0,
+     "seconds": 144.5,
+     "stderr": "ng application and Lean runtime \u2014 10s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Copying 85 npm packages \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (2m 24s total).\nBuilt Lean 4.35.0 for Node: /home/runner/work/_temp/lasm js examples \u03bb/crud app/dist Express\n"
+    },
+    {
+     "label": "lasm build Hono.lean",
+     "args": [
+      "lasm",
+      "build",
+      "Hono.lean",
+      "--output",
+      "/home/runner/work/_temp/lasm js examples \u03bb/crud app/dist Hono"
+     ],
+     "code": 0,
+     "seconds": 62.6,
+     "stderr": "inking application and Lean runtime \u2014 11s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Copying 85 npm packages \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 2s total).\nBuilt Lean 4.35.0 for Node: /home/runner/work/_temp/lasm js examples \u03bb/crud app/dist Hono\n"
+    },
+    {
+     "label": "npm install -D Lasm candidate (fetch)",
+     "args": [
+      "install",
+      "-D",
+      "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz"
+     ],
+     "code": 0,
+     "seconds": 4.5,
+     "stderr": ""
+    },
+    {
+     "label": "lasm build js-fetch",
+     "args": [
+      "lasm",
+      "build",
+      "Main.lean",
+      "--output",
+      "dist"
+     ],
+     "code": 0,
+     "seconds": 60.5,
+     "stderr": "plication and Lean runtime \u2014 2s elapsed\n[lasm] Linking application and Lean runtime \u2014 12s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 0s total).\nBuilt Lean 4.35.0 for Node: /home/runner/work/_temp/lasm js examples \u03bb/fetch app/dist\n"
+    }
+   ],
+   "apps": [
+    {
+     "app": "Express",
+     "ok": true,
+     "startupMs": 333,
+     "checks": [
+      {
+       "name": "health",
+       "ok": true
+      },
+      {
+       "name": "todos without a token are 401",
+       "ok": true
+      },
+      {
+       "name": "login issues a JWT",
+       "ok": true
+      },
+      {
+       "name": "a forged token is 401",
+       "ok": true
+      },
+      {
+       "name": "create a todo (201)",
+       "ok": true
+      },
+      {
+       "name": "invalid body is 400",
+       "ok": true
+      },
+      {
+       "name": "list todos of this user",
+       "ok": true
+      },
+      {
+       "name": "unknown route is 404",
+       "ok": true
+      },
+      {
+       "name": "16 concurrent clients, 2 s",
+       "ok": true
+      }
+     ],
+     "load": {
+      "requests": 2866,
+      "errors": 0,
+      "rps": 1426
+     },
+     "platform": "linux-arm64",
+     "node": "v26.12.1"
+    },
+    {
+     "app": "Hono",
+     "ok": true,
+     "startupMs": 304,
+     "checks": [
+      {
+       "name": "health",
+       "ok": true
+      },
+      {
+       "name": "todos without a token are 401",
+       "ok": true
+      },
+      {
+       "name": "login issues a JWT",
+       "ok": true
+      },
+      {
+       "name": "a forged token is 401",
+       "ok": true
+      },
+      {
+       "name": "create a todo (201)",
+       "ok": true
+      },
+      {
+       "name": "invalid body is 400",
+       "ok": true
+      },
+      {
+       "name": "list todos of this user",
+       "ok": true
+      },
+      {
+       "name": "unknown route is 404",
+       "ok": true
+      },
+      {
+       "name": "16 concurrent clients, 2 s",
+       "ok": true
+      }
+     ],
+     "load": {
+      "requests": 2932,
+      "errors": 0,
+      "rps": 1461
+     },
+     "platform": "linux-arm64",
+     "node": "v26.12.1"
+    }
+   ],
+   "fetch": {
+    "url": "http://127.0.0.1:39795/hello",
+    "code": 0,
+    "stdout": "200 application/json 17 characters\n",
+    "stderr": ""
+   },
+   "passed": true,
+   "finishedAt": "2026-10-23T02:54:13.535Z"
+  },
+  {
+   "platform": "linux-x64",
+   "node": "v26.12.1",
+   "candidate": "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz",
+   "postgres": "postgres:17 service container",
+   "startedAt": "2026-10-23T02:49:35.876Z",
+   "steps": [
+    {
+     "label": "npm install (example dependencies)",
+     "args": [
+      "install"
+     ],
+     "code": 0,
+     "seconds": 1.2,
+     "stderr": ""
+    },
+    {
+     "label": "npm install -D Lasm candidate",
+     "args": [
+      "install",
+      "-D",
+      "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz"
+     ],
+     "code": 0,
+     "seconds": 6.2,
+     "stderr": ""
+    },
+    {
+     "label": "lasm build Express.lean",
+     "args": [
+      "lasm",
+      "build",
+      "Express.lean",
+      "--output",
+      "/home/runner/work/_temp/lasm js examples \u03bb/crud app/dist Express"
+     ],
+     "code": 0,
+     "seconds": 136.9,
+     "stderr": "ng application and Lean runtime \u2014 10s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Copying 85 npm packages \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (2m 16s total).\nBuilt Lean 4.35.0 for Node: /home/runner/work/_temp/lasm js examples \u03bb/crud app/dist Express\n"
+    },
+    {
+     "label": "lasm build Hono.lean",
+     "args": [
+      "lasm",
+      "build",
+      "Hono.lean",
+      "--output",
+      "/home/runner/work/_temp/lasm js examples \u03bb/crud app/dist Hono"
+     ],
+     "code": 0,
+     "seconds": 68.6,
+     "stderr": "Linking application and Lean runtime \u2014 9s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Copying 85 npm packages \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 8s total).\nBuilt Lean 4.35.0 for Node: /home/runner/work/_temp/lasm js examples \u03bb/crud app/dist Hono\n"
+    },
+    {
+     "label": "npm install -D Lasm candidate (fetch)",
+     "args": [
+      "install",
+      "-D",
+      "/home/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz"
+     ],
+     "code": 0,
+     "seconds": 6.1,
+     "stderr": ""
+    },
+    {
+     "label": "lasm build js-fetch",
+     "args": [
+      "lasm",
+      "build",
+      "Main.lean",
+      "--output",
+      "dist"
+     ],
+     "code": 0,
+     "seconds": 65.6,
+     "stderr": "plication and Lean runtime \u2014 0s elapsed\n[lasm] Linking application and Lean runtime \u2014 10s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 5s total).\nBuilt Lean 4.35.0 for Node: /home/runner/work/_temp/lasm js examples \u03bb/fetch app/dist\n"
+    }
+   ],
+   "apps": [
+    {
+     "app": "Express",
+     "ok": true,
+     "startupMs": 382,
+     "checks": [
+      {
+       "name": "health",
+       "ok": true
+      },
+      {
+       "name": "todos without a token are 401",
+       "ok": true
+      },
+      {
+       "name": "login issues a JWT",
+       "ok": true
+      },
+      {
+       "name": "a forged token is 401",
+       "ok": true
+      },
+      {
+       "name": "create a todo (201)",
+       "ok": true
+      },
+      {
+       "name": "invalid body is 400",
+       "ok": true
+      },
+      {
+       "name": "list todos of this user",
+       "ok": true
+      },
+      {
+       "name": "unknown route is 404",
+       "ok": true
+      },
+      {
+       "name": "16 concurrent clients, 2 s",
+       "ok": true
+      }
+     ],
+     "load": {
+      "requests": 3310,
+      "errors": 0,
+      "rps": 1651
+     },
+     "platform": "linux-x64",
+     "node": "v26.12.1"
+    },
+    {
+     "app": "Hono",
+     "ok": true,
+     "startupMs": 381,
+     "checks": [
+      {
+       "name": "health",
+       "ok": true
+      },
+      {
+       "name": "todos without a token are 401",
+       "ok": true
+      },
+      {
+       "name": "login issues a JWT",
+       "ok": true
+      },
+      {
+       "name": "a forged token is 401",
+       "ok": true
+      },
+      {
+       "name": "create a todo (201)",
+       "ok": true
+      },
+      {
+       "name": "invalid body is 400",
+       "ok": true
+      },
+      {
+       "name": "list todos of this user",
+       "ok": true
+      },
+      {
+       "name": "unknown route is 404",
+       "ok": true
+      },
+      {
+       "name": "16 concurrent clients, 2 s",
+       "ok": true
+      }
+     ],
+     "load": {
+      "requests": 3411,
+      "errors": 0,
+      "rps": 1701
+     },
+     "platform": "linux-x64",
+     "node": "v26.12.1"
+    }
+   ],
+   "fetch": {
+    "url": "http://127.0.0.1:37309/hello",
+    "code": 0,
+    "stdout": "200 application/json 17 characters\n",
+    "stderr": ""
+   },
+   "passed": true,
+   "finishedAt": "2026-10-23T02:54:26.017Z"
+  },
+  {
+   "platform": "darwin-arm64",
+   "node": "v26.12.1",
+   "candidate": "/Users/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz",
+   "postgres": "embedded-postgres 18.4.0-beta.17 (PostgreSQL 18.4 binaries from npm)",
+   "startedAt": "2026-10-23T02:49:25.584Z",
+   "steps": [
+    {
+     "label": "npm install (example dependencies)",
+     "args": [
+      "install"
+     ],
+     "code": 0,
+     "seconds": 0.9,
+     "stderr": ""
+    },
+    {
+     "label": "npm install -D Lasm candidate",
+     "args": [
+      "install",
+      "-D",
+      "/Users/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz"
+     ],
+     "code": 0,
+     "seconds": 6.2,
+     "stderr": ""
+    },
+    {
+     "label": "lasm build Express.lean",
+     "args": [
+      "lasm",
+      "build",
+      "Express.lean",
+      "--output",
+      "/Users/runner/work/_temp/lasm js examples \u03bb/crud app/dist Express"
+     ],
+     "code": 0,
+     "seconds": 148.4,
+     "stderr": "g application and Lean runtime \u2014 10s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Copying 85 npm packages \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (2m 28s total).\nBuilt Lean 4.35.0 for Node: /Users/runner/work/_temp/lasm js examples \u03bb/crud app/dist Express\n"
+    },
+    {
+     "label": "lasm build Hono.lean",
+     "args": [
+      "lasm",
+      "build",
+      "Hono.lean",
+      "--output",
+      "/Users/runner/work/_temp/lasm js examples \u03bb/crud app/dist Hono"
+     ],
+     "code": 0,
+     "seconds": 83.6,
+     "stderr": "king application and Lean runtime \u2014 15s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Copying 85 npm packages \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 23s total).\nBuilt Lean 4.35.0 for Node: /Users/runner/work/_temp/lasm js examples \u03bb/crud app/dist Hono\n"
+    },
+    {
+     "label": "npm install -D Lasm candidate (fetch)",
+     "args": [
+      "install",
+      "-D",
+      "/Users/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz"
+     ],
+     "code": 0,
+     "seconds": 7.2,
+     "stderr": ""
+    },
+    {
+     "label": "lasm build js-fetch",
+     "args": [
+      "lasm",
+      "build",
+      "Main.lean",
+      "--output",
+      "dist"
+     ],
+     "code": 0,
+     "seconds": 91.3,
+     "stderr": "ication and Lean runtime \u2014 8s elapsed\n[lasm] Linking application and Lean runtime \u2014 18s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 30s total).\nBuilt Lean 4.35.0 for Node: /Users/runner/work/_temp/lasm js examples \u03bb/fetch app/dist\n"
+    }
+   ],
+   "apps": [
+    {
+     "app": "Express",
+     "ok": true,
+     "startupMs": 346,
+     "checks": [
+      {
+       "name": "health",
+       "ok": true
+      },
+      {
+       "name": "todos without a token are 401",
+       "ok": true
+      },
+      {
+       "name": "login issues a JWT",
+       "ok": true
+      },
+      {
+       "name": "a forged token is 401",
+       "ok": true
+      },
+      {
+       "name": "create a todo (201)",
+       "ok": true
+      },
+      {
+       "name": "invalid body is 400",
+       "ok": true
+      },
+      {
+       "name": "list todos of this user",
+       "ok": true
+      },
+      {
+       "name": "unknown route is 404",
+       "ok": true
+      },
+      {
+       "name": "16 concurrent clients, 2 s",
+       "ok": true
+      }
+     ],
+     "load": {
+      "requests": 5913,
+      "errors": 0,
+      "rps": 2953
+     },
+     "platform": "darwin-arm64",
+     "node": "v26.12.1"
+    },
+    {
+     "app": "Hono",
+     "ok": true,
+     "startupMs": 359,
+     "checks": [
+      {
+       "name": "health",
+       "ok": true
+      },
+      {
+       "name": "todos without a token are 401",
+       "ok": true
+      },
+      {
+       "name": "login issues a JWT",
+       "ok": true
+      },
+      {
+       "name": "a forged token is 401",
+       "ok": true
+      },
+      {
+       "name": "create a todo (201)",
+       "ok": true
+      },
+      {
+       "name": "invalid body is 400",
+       "ok": true
+      },
+      {
+       "name": "list todos of this user",
+       "ok": true
+      },
+      {
+       "name": "unknown route is 404",
+       "ok": true
+      },
+      {
+       "name": "16 concurrent clients, 2 s",
+       "ok": true
+      }
+     ],
+     "load": {
+      "requests": 2927,
+      "errors": 0,
+      "rps": 1446
+     },
+     "platform": "darwin-arm64",
+     "node": "v26.12.1"
+    }
+   ],
+   "fetch": {
+    "url": "http://127.0.0.1:49289/hello",
+    "code": 0,
+    "stdout": "200 application/json 17 characters\n",
+    "stderr": ""
+   },
+   "passed": true,
+   "finishedAt": "2026-10-23T02:55:08.623Z"
+  },
+  {
+   "platform": "win32-x64",
+   "node": "v26.12.1",
+   "candidate": "D:\\a\\lasm\\lasm\\.work\\node-candidate\\lasm-compiler-0.1.0-experimental.39891445495.tgz",
+   "postgres": "the Windows runner image's preinstalled PostgreSQL 17 service",
+   "startedAt": "2026-10-23T02:49:29.821Z",
+   "steps": [
+    {
+     "label": "npm install (example dependencies)",
+     "args": [
+      "install"
+     ],
+     "code": 0,
+     "seconds": 5.9,
+     "stderr": ""
+    },
+    {
+     "label": "npm install -D Lasm candidate",
+     "args": [
+      "install",
+      "-D",
+      "D:\\a\\lasm\\lasm\\.work\\node-candidate\\lasm-compiler-0.1.0-experimental.39891445495.tgz"
+     ],
+     "code": 0,
+     "seconds": 12.8,
+     "stderr": ""
+    },
+    {
+     "label": "lasm build Express.lean",
+     "args": [
+      "lasm",
+      "build",
+      "Express.lean",
+      "--output",
+      "D:\\a\\_temp\\lasm js examples \u03bb\\crud app\\dist Express"
+     ],
+     "code": 0,
+     "seconds": 318.7,
+     "stderr": "\n[lasm] Linking application and Lean runtime \u2014 17s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Copying 85 npm packages \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (5m 18s total).\nBuilt Lean 4.35.0 for Node: D:\\a\\_temp\\lasm js examples \u03bb\\crud app\\dist Express\n"
+    },
+    {
+     "label": "lasm build Hono.lean",
+     "args": [
+      "lasm",
+      "build",
+      "Hono.lean",
+      "--output",
+      "D:\\a\\_temp\\lasm js examples \u03bb\\crud app\\dist Hono"
+     ],
+     "code": 0,
+     "seconds": 74.3,
+     "stderr": "sed\n[lasm] Linking application and Lean runtime \u2014 25s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Copying 85 npm packages \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 13s total).\nBuilt Lean 4.35.0 for Node: D:\\a\\_temp\\lasm js examples \u03bb\\crud app\\dist Hono\n"
+    },
+    {
+     "label": "npm install -D Lasm candidate (fetch)",
+     "args": [
+      "install",
+      "-D",
+      "D:\\a\\lasm\\lasm\\.work\\node-candidate\\lasm-compiler-0.1.0-experimental.39891445495.tgz"
+     ],
+     "code": 0,
+     "seconds": 14.4,
+     "stderr": ""
+    },
+    {
+     "label": "lasm build js-fetch",
+     "args": [
+      "lasm",
+      "build",
+      "Main.lean",
+      "--output",
+      "dist"
+     ],
+     "code": 0,
+     "seconds": 67,
+     "stderr": "m] Linking application and Lean runtime \u2014 8s elapsed\n[lasm] Linking application and Lean runtime \u2014 18s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 6s total).\nBuilt Lean 4.35.0 for Node: D:\\a\\_temp\\lasm js examples \u03bb\\fetch app\\dist\n"
+    }
+   ],
+   "apps": [
+    {
+     "app": "Express",
+     "ok": true,
+     "startupMs": 904,
+     "checks": [
+      {
+       "name": "health",
+       "ok": true
+      },
+      {
+       "name": "todos without a token are 401",
+       "ok": true
+      },
+      {
+       "name": "login issues a JWT",
+       "ok": true
+      },
+      {
+       "name": "a forged token is 401",
+       "ok": true
+      },
+      {
+       "name": "create a todo (201)",
+       "ok": true
+      },
+      {
+       "name": "invalid body is 400",
+       "ok": true
+      },
+      {
+       "name": "list todos of this user",
+       "ok": true
+      },
+      {
+       "name": "unknown route is 404",
+       "ok": true
+      },
+      {
+       "name": "16 concurrent clients, 2 s",
+       "ok": true
+      }
+     ],
+     "load": {
+      "requests": 6034,
+      "errors": 0,
+      "rps": 3012
+     },
+     "platform": "win32-x64",
+     "node": "v26.12.1"
+    },
+    {
+     "app": "Hono",
+     "ok": true,
+     "startupMs": 359,
+     "checks": [
+      {
+       "name": "health",
+       "ok": true
+      },
+      {
+       "name": "todos without a token are 401",
+       "ok": true
+      },
+      {
+       "name": "login issues a JWT",
+       "ok": true
+      },
+      {
+       "name": "a forged token is 401",
+       "ok": true
+      },
+      {
+       "name": "create a todo (201)",
+       "ok": true
+      },
+      {
+       "name": "invalid body is 400",
+       "ok": true
+      },
+      {
+       "name": "list todos of this user",
+       "ok": true
+      },
+      {
+       "name": "unknown route is 404",
+       "ok": true
+      },
+      {
+       "name": "16 concurrent clients, 2 s",
+       "ok": true
+      }
+     ],
+     "load": {
+      "requests": 4019,
+      "errors": 0,
+      "rps": 2005
+     },
+     "platform": "win32-x64",
+     "node": "v26.12.1"
+    }
+   ],
+   "fetch": {
+    "url": "http://127.0.0.1:63787/hello",
+    "code": 0,
+    "stdout": "200 application/json 17 characters\n",
+    "stderr": ""
+   },
+   "passed": true,
+   "finishedAt": "2026-10-23T02:57:49.163Z"
+  },
+  {
+   "platform": "darwin-x64",
+   "node": "v26.12.1",
+   "candidate": "/Users/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz",
+   "postgres": "embedded-postgres 18.4.0-beta.17 (PostgreSQL 18.4 binaries from npm)",
+   "startedAt": "2026-10-23T02:49:36.864Z",
+   "steps": [
+    {
+     "label": "npm install (example dependencies)",
+     "args": [
+      "install"
+     ],
+     "code": 0,
+     "seconds": 2.3,
+     "stderr": ""
+    },
+    {
+     "label": "npm install -D Lasm candidate",
+     "args": [
+      "install",
+      "-D",
+      "/Users/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz"
+     ],
+     "code": 0,
+     "seconds": 16,
+     "stderr": ""
+    },
+    {
+     "label": "lasm build Express.lean",
+     "args": [
+      "lasm",
+      "build",
+      "Express.lean",
+      "--output",
+      "/Users/runner/work/_temp/lasm js examples \u03bb/crud app/dist Express"
+     ],
+     "code": 0,
+     "seconds": 236.3,
+     "stderr": "g application and Lean runtime \u2014 24s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Copying 85 npm packages \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (3m 55s total).\nBuilt Lean 4.35.0 for Node: /Users/runner/work/_temp/lasm js examples \u03bb/crud app/dist Express\n"
+    },
+    {
+     "label": "lasm build Hono.lean",
+     "args": [
+      "lasm",
+      "build",
+      "Hono.lean",
+      "--output",
+      "/Users/runner/work/_temp/lasm js examples \u03bb/crud app/dist Hono"
+     ],
+     "code": 0,
+     "seconds": 108.9,
+     "stderr": "king application and Lean runtime \u2014 21s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Copying 85 npm packages \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 48s total).\nBuilt Lean 4.35.0 for Node: /Users/runner/work/_temp/lasm js examples \u03bb/crud app/dist Hono\n"
+    },
+    {
+     "label": "npm install -D Lasm candidate (fetch)",
+     "args": [
+      "install",
+      "-D",
+      "/Users/runner/work/lasm/lasm/.work/node-candidate/lasm-compiler-0.1.0-experimental.39891445495.tgz"
+     ],
+     "code": 0,
+     "seconds": 13,
+     "stderr": ""
+    },
+    {
+     "label": "lasm build js-fetch",
+     "args": [
+      "lasm",
+      "build",
+      "Main.lean",
+      "--output",
+      "dist"
+     ],
+     "code": 0,
+     "seconds": 106.2,
+     "stderr": "cation and Lean runtime \u2014 13s elapsed\n[lasm] Linking application and Lean runtime \u2014 23s elapsed\n[lasm] Preparing the application launcher \u2014 0s elapsed\n[lasm] Packaging the application and runtime support \u2014 0s elapsed\n[lasm] Verifying and writing application output \u2014 0s elapsed\n[lasm] Build ready (1m 45s total).\nBuilt Lean 4.35.0 for Node: /Users/runner/work/_temp/lasm js examples \u03bb/fetch app/dist\n"
+    }
+   ],
+   "apps": [
+    {
+     "app": "Express",
+     "ok": true,
+     "startupMs": 515,
+     "checks": [
+      {
+       "name": "health",
+       "ok": true
+      },
+      {
+       "name": "todos without a token are 401",
+       "ok": true
+      },
+      {
+       "name": "login issues a JWT",
+       "ok": true
+      },
+      {
+       "name": "a forged token is 401",
+       "ok": true
+      },
+      {
+       "name": "create a todo (201)",
+       "ok": true
+      },
+      {
+       "name": "invalid body is 400",
+       "ok": true
+      },
+      {
+       "name": "list todos of this user",
+       "ok": true
+      },
+      {
+       "name": "unknown route is 404",
+       "ok": true
+      },
+      {
+       "name": "16 concurrent clients, 2 s",
+       "ok": true
+      }
+     ],
+     "load": {
+      "requests": 2356,
+      "errors": 0,
+      "rps": 1172
+     },
+     "platform": "darwin-x64",
+     "node": "v26.12.1"
+    },
+    {
+     "app": "Hono",
+     "ok": true,
+     "startupMs": 434,
+     "checks": [
+      {
+       "name": "health",
+       "ok": true
+      },
+      {
+       "name": "todos without a token are 401",
+       "ok": true
+      },
+      {
+       "name": "login issues a JWT",
+       "ok": true
+      },
+      {
+       "name": "a forged token is 401",
+       "ok": true
+      },
+      {
+       "name": "create a todo (201)",
+       "ok": true
+      },
+      {
+       "name": "invalid body is 400",
+       "ok": true
+      },
+      {
+       "name": "list todos of this user",
+       "ok": true
+      },
+      {
+       "name": "unknown route is 404",
+       "ok": true
+      },
+      {
+       "name": "16 concurrent clients, 2 s",
+       "ok": true
+      }
+     ],
+     "load": {
+      "requests": 2148,
+      "errors": 0,
+      "rps": 1065
+     },
+     "platform": "darwin-x64",
+     "node": "v26.12.1"
+    }
+   ],
+   "fetch": {
+    "url": "http://127.0.0.1:49293/hello",
+    "code": 0,
+    "stdout": "200 application/json 17 characters\n",
+    "stderr": ""
+   },
+   "passed": true,
+   "finishedAt": "2026-10-23T02:57:45.562Z"
+  }
+ ]
+}
