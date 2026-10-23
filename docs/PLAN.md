@@ -661,6 +661,16 @@ folded into Phases 5.2/5.3 and 7.
     scenario (fixed, `920718f`). Readiness review: README Known limitations,
     Licenses, environment variables, platform claims tied to CI jobs. Draft publish
     plan: [release/0.1.0-draft.md](release/0.1.0-draft.md).*
+  - **Publication decisions (user, 2026-10-23), in progress:** (1) `Async`
+    handlers by default in `Lasm.JS` (breaking, pre-launch) — accepted;
+    (2) `@lasm/cli` is MIT, copyright Jordan Last; (3) package set: the CLI plus
+    the platform tool packages, and the C tier is also published as
+    `@lasm/lean-c-<platform>` (27 packages) — being packaged; the name stays
+    `@lasm/cli`; `create-lasm` (for `npm create lasm`) is explained and
+    undecided; (4) Git and (5) GMP wait for a full license-compliance audit
+    (docs/LICENSE_AUDIT.md, in progress; items with legal weight go to a
+    lawyer's review); (6) Lasm's MIT notice in built apps and the `--help`
+    fixes are folded into the audit fixes.
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as
