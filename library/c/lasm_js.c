@@ -31,13 +31,36 @@ extern void lean_initialize_thread(void);
 extern lean_object *lean_io_promise_resolve(lean_object *value, lean_object *promise);
 
 typedef struct { int failed; uint8_t *bytes; size_t size; } reply_t;
-static reply_t host_call(uint32_t op, uint32_t handle, uint64_t arg, const uint8_t *input, size_t length) {
+/* Handles of freed Values. Instead of one host call per finalizer, they travel
+   ahead of the next Lasm.JS host call: every request is
+   [u32 count][count × u32 handle][payload]. */
+#define RELEASE_CAPACITY 1024
+static uint32_t released[RELEASE_CAPACITY];
+static size_t released_count;
+static pthread_mutex_t released_mutex = PTHREAD_MUTEX_INITIALIZER;
+static reply_t host_call_raw(uint32_t op, uint32_t handle, uint64_t arg, const uint8_t *input, size_t length) {
     reply_t r;
     int64_t n = lasm_node_call(op, handle, arg, input, length);
     r.failed = n < 0;
     r.size = r.failed ? (size_t)(-(n + 1)) : (size_t)n;
     r.bytes = (uint8_t *)malloc(r.size ? r.size : 1);
     lasm_node_copy(r.bytes, r.size);
+    return r;
+}
+static reply_t host_call(uint32_t op, uint32_t handle, uint64_t arg, const uint8_t *input, size_t length) {
+    uint32_t ids[RELEASE_CAPACITY];
+    pthread_mutex_lock(&released_mutex);
+    uint32_t count = (uint32_t)released_count;
+    memcpy(ids, released, count * sizeof(uint32_t));
+    released_count = 0;
+    pthread_mutex_unlock(&released_mutex);
+    size_t prefix = 4 + (size_t)count * 4;
+    uint8_t *request = (uint8_t *)malloc(prefix + length + 1);
+    memcpy(request, &count, 4);
+    if (count) memcpy(request + 4, ids, (size_t)count * 4);
+    if (length) memcpy(request + prefix, input, length);
+    reply_t r = host_call_raw(op, handle, arg, request, prefix + length);
+    free(request);
     return r;
 }
 /* Host failures carry [u64 kind][u64 errno][message]. */
@@ -68,7 +91,14 @@ LEAN_EXPORT lean_obj_res lasm_js_call(uint32_t op, uint32_t handle, uint64_t arg
 }
 
 /* ---- JavaScript values held by Lean ---- */
-static void value_finalize(void *p) { lasm_node_release((uint32_t)(uintptr_t)p); }
+static void value_finalize(void *p) {
+    pthread_mutex_lock(&released_mutex);
+    int full = released_count == RELEASE_CAPACITY;
+    if (!full) released[released_count++] = (uint32_t)(uintptr_t)p;
+    pthread_mutex_unlock(&released_mutex);
+    /* A full batch: release this one handle directly (as the runtime does). */
+    if (full) lasm_node_release((uint32_t)(uintptr_t)p);
+}
 static void value_foreach(void *p, b_lean_obj_arg f) { (void)p; (void)f; }
 static lean_external_class *value_class_ptr;
 static pthread_once_t value_class_once = PTHREAD_ONCE_INIT;

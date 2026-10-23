@@ -214,10 +214,10 @@ def main : IO Unit := do
   IO.println s!"{← response.get "status" Nat}: {(← response.callMethodAwait "text" #[] String).length} characters"
 ```
 
-`npx lasm Main.lean` runs it. Each JavaScript call costs about 16 µs (the Lean thread
-crosses to Node's main thread). An Express or Hono server with a Lean handler reached
-37,000 requests per second in the prototype, against about 1,300 for `Std.Http` under
-Lasm. These programs run only under Lasm: natively, every JavaScript operation fails
+`npx lasm Main.lean` runs it. Each JavaScript call costs about 25–35 µs (the Lean thread
+crosses to Node's main thread). The Express and Hono example with a Lean handler serves
+about 4,600–5,200 requests per second with 16 connections on Linux x64, against about
+1,300 for `Std.Http` under Lasm. These programs run only under Lasm: natively, every JavaScript operation fails
 with a clear error, and the Lean editor extension does not know `Lasm.JS` yet. The
 guide for writing bindings (by hand or by an AI agent), with Express, Hono, `pg`,
 `jose` and `fetch` examples, type mappings, errors and exact limitations, is

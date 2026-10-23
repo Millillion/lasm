@@ -1,7 +1,9 @@
-# JS/npm interop: threading architecture (Phase 4, step 1)
+# JS/npm interop: threading architecture (Phase 4)
 
-Status: **measured prototype, recommendation awaiting the user's review** (2026-10-22).
-Nothing here is a supported Lasm interface. Step 2 (the `Lasm.JS` API) has not started.
+Status: **architecture A (message passing) approved by the user on 2026-10-22 and
+implemented in current source** (steps 2–4; not yet in an accepted candidate). The
+user guide is [JS_BINDINGS.md](JS_BINDINGS.md). This document keeps the step 1
+measurements that chose the architecture, and the implementation notes below.
 
 - Prototype source and measurement scripts: [`experiments/js-interop/`](../experiments/js-interop/)
   (throwaway; kept so the numbers can be reproduced).
@@ -11,6 +13,74 @@ Nothing here is a supported Lasm interface. Step 2 (the `Lasm.JS` API) has not s
 - Host: Linux x64 (local, 12 threads, desktop workload running; same-run ratios are more
   reliable than absolute numbers). Node 26.12.1 (V8 14.6), Emscripten 6.0.9, Lean 4.35.0,
   application runtime `7aa5028c…` (the current pin). **No runtime rebuild was needed.**
+
+## Implementation (steps 2–4, current source)
+
+- **Library shipping (decision).** `Lasm.JS` lives in [`library/`](../library) of the
+  compiler package. When Lasm assembles a managed Lean prefix that contains Lean's
+  elaborator (the extended tier) for Lean 4.35.0, it compiles the library into that
+  prefix (`lib/lean/Lasm/JS*.olean`, sources in `src/lean`, generated C in
+  `lib/lasm/c`). The library's source identity is part of the prefix's provenance,
+  so a changed library gives a new prefix.
+  - `import Lasm.JS` then resolves like a standard library module, for standalone
+    sources and Lake projects alike, with no Lake dependency. Lake rebuilds
+    dependent modules when the library's .olean changes; this was checked.
+  - The library's C and the C glue ([`library/c/lasm_js.c`](../library/c/lasm_js.c))
+    are linked only into programs whose generated C initializes `Lasm.JS`.
+  - The alternative, a Lake package, was rejected: standalone sources cannot
+    declare Lake dependencies, and every project would need a `require`.
+  - The cost of this choice: the editor (native Lean) does not see the library.
+- **Host side.** [`src/node-js.mjs`](../src/node-js.mjs) implements host operations
+  200–214, routed by `node-host.mjs`. Lean-held values are handles in their own range
+  (from 0x40000000), released by the Lean finalizer through `lasm_node_release`.
+  Calls pass the values they mention as borrowed arguments, so no handle is released
+  before the host has read the request.
+- **Interop thread.** A detached C pthread (like the runtime's completion thread)
+  long-polls op 209. It resolves `IO.Promise`s directly for `Value.toTask` and
+  bindings returning tasks. It hands calls of Lean functions from JavaScript to a
+  Lean dispatcher, which runs each call as a task (`IO.asTask`). One host call
+  replies with the result.
+- **Synchronous callbacks.** A second detached thread serves them through a
+  shared-memory channel (op 211).
+  - **Hooks.** `host-pre.js` passes the host the Wasm memory and
+    `lasmFullServeSync(slot)`. `host-library.js` adds a per-thread doorbell to the
+    slot RPC and `lasm_js_sync_setup`.
+  - **Nested calls.** While the main thread waits inside the JavaScript callback, it
+    serves the callback thread's nested host calls inline. Writes are queued, so
+    console output works. Asynchronous operations fail with a clear error.
+  - **Effect on other programs.** These are link inputs, not runtime archives: no
+    runtime re-pin. Programs that do not import `Lasm.JS` link the same objects; they
+    differ only by the doorbell check in the slot exchange (identical bytes on every
+    build).
+- **npm.** [`src/application-npm.mjs`](../src/application-npm.mjs) resolves the
+  production closure from `node_modules` as Node does and copies it into
+  `dist/node_modules`. Its file hashes are part of the build signature. Lasm's own
+  package is never deployed.
+- **Binding check.** [`src/application-binding-check.mjs`](../src/application-binding-check.mjs)
+  reads the bindings from the program's `.olean` files with the managed Lean (an
+  environment extension of `Lasm.JS.Meta`). It then loads each module in a separate
+  Node process.
+- **Measured cost of the library** (Linux x64, local host under load;
+  [evidence](evidence/js-interop-library-2026-10-22.json)), mean per call:
+  - `get` is about 25 µs, `callMethod` 24–28 µs, a typed binding 30–37 µs.
+  - Awaiting a resolved promise as a task costs about 110 µs.
+  - JavaScript calling an asynchronous Lean callback that Lean awaits costs about
+    270 µs.
+  - A synchronous comparator costs about 17–21 µs per comparison.
+
+  Two changes nearly doubled HTTP throughput: freed handles now travel ahead of the
+  next host call (no release round trip), and references no longer carry a
+  description (Lean asks for one only for an error message).
+  - `examples/js-crud` `GET /health` serves Express 4,600 req/s and Hono 5,200 req/s
+    at c=16, against `Std.Http` 1,300.
+  - This is below the prototype's 37,000: the prototype's handler ran inline on the
+    dispatcher thread and made no JavaScript calls.
+  - Each request here runs as a Lean task and makes about four host calls: read the
+    request, `status`, `json`, and the reply. Node's main thread is the bottleneck.
+- **API differences from the sketch below.** The result type is the last explicit
+  argument and defaults to `Value` (`Data` for `…Await` and `await`), for example
+  `o.get "rows" (Array Todo)`. Constructors bind as `"new Class"`, the module itself
+  as `""`, globals with module `"globalThis"`.
 
 ## Options
 
@@ -168,7 +238,7 @@ When to revisit: if real bindings turn out to be chatty (many tiny calls per req
 the ~16 µs dominates, JSPI is the lever. Revisit it then, ideally once Emscripten
 virtualizes the shadow stack per JSPI stack and V8 has growable stacks.
 
-## API sketch for step 2 (not implemented)
+## API sketch for step 2 (as proposed; implemented with the differences above)
 
 ```lean
 namespace Lasm.JS

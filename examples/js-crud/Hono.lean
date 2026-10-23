@@ -14,8 +14,10 @@ def main : IO Unit := do
   let handler ← Function.ofFn fun args => do
     let .ref c _ := args[0]! | throw (IO.userError "unexpected Hono arguments")
     let req ← c.get "req"
-    let method ← req.get "method" String
-    let path ← req.get "path" String
+    let request ← req.getFields #["method", "path"]
+    let text (d : Data) := match d with | .string s => s | _ => ""
+    let method := text (request.field "method")
+    let path := text (request.field "path")
     let authorization ← req.callMethod "header" #[toJS "authorization"] (Option String)
     let body ← if method == "POST" then
         try req.callMethodAwait "json" catch _ => pure Data.undefined

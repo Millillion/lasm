@@ -209,7 +209,8 @@ try {
     // Native Lean cannot run it, so its expected output is the fixture's file.
     const interop = join(project, 'js interop λ');
     cpSync(join(workspace, 'fixtures/js-interop'), interop, { recursive: true });
-    const expectedInterop = { code: 0, stdout: readFileSync(join(interop, 'expected.txt'), 'utf8'), stderr: '' };
+    // A Windows checkout may have CRLF line endings; Lean prints LF.
+    const expectedInterop = { code: 0, stdout: readFileSync(join(interop, 'expected.txt'), 'utf8').replace(/\r\n/g, '\n'), stderr: '' };
     assert.equal(npm('npm install for Lasm.JS', 'npm', ['install', '--offline'], interop).code, 0);
     matchesCli(npx('Lasm.JS run', ['Main.lean'], interop), expectedInterop);
     assert.equal(npx('Lasm.JS deployment build', ['build', 'Main.lean', '--output', 'interop dist'], interop).code, 0);

@@ -117,6 +117,16 @@ headers, Lean's sysroot) as natively. The tier workflow checks every C tier nati
 headers only from the prefix (or the macOS SDK), `llvm-ar` archives it, and a shared
 library and an executable link and run. Per-package results: [COMPATIBILITY.md](COMPATIBILITY.md).
 
+**JS/npm interop (current source, Phase 4):** a program that imports `Lasm.JS`
+uses the extended tier (like Lake projects). When Lasm assembles that Lean prefix,
+it compiles its own library into it (a few seconds, once per prefix, nothing extra to
+download). With a `package.json` next to the lakefile or the main source, `lasm build`
+copies the production dependencies (not `devDependencies`, never Lasm itself) from the
+project's `node_modules` into `dist/node_modules`. Install them with npm first; the
+build reports any missing package. Lasm's own package is never deployed, whether npm
+recorded it as a dependency or a devDependency. Deployments need only Node: the copied
+`dist/` contains the packages. Guide and exact limitations: [JS_BINDINGS.md](JS_BINDINGS.md).
+
 **Known limitation (Lean 4.35.0 Lake):** Lake now fetches Git dependencies with a
 tree-filtered `git fetch`. Against a Git server that only offers "dumb" HTTP
 (static files, no `git http-backend`), Git then fetches missing objects one at a

@@ -1,7 +1,7 @@
 /-
 Lasm.JS core: JavaScript values, conversions, calls, promises and callbacks for
 Lean programs compiled by Lasm and run on Node.js. Every JavaScript operation
-is a host call to Node's main thread (about 16 µs); see docs/JS_INTEROP.md.
+is a host call to Node's main thread (about 25–35 µs); see docs/JS_INTEROP.md.
 -/
 import Std.Data.HashMap
 
@@ -51,7 +51,7 @@ partial def describe : Data → String
   | .bytes b => s!"Uint8Array of length {b.size}"
   | .array xs => s!"array of length {xs.size}"
   | .object fs => s!"object \{{", ".intercalate (fs.toList.take 6 |>.map (·.1))}{if fs.size > 6 then ", …" else ""}}"
-  | .ref _ d => d
+  | .ref _ d => if d.isEmpty then "JavaScript value (a reference)" else d
 
 /-- The field `key` of an object (`undefined` when absent or not an object). -/
 def field (d : Data) (key : String) : Data :=
@@ -186,9 +186,14 @@ JavaScript value received. -/
 def decodeAs (α : Type) [FromJS α] (context : String) (d : Data) : IO α :=
   match FromJS.fromJS d with
   | .ok a => pure a
-  | .error detail => throw <| IO.userError <|
-    s!"Lasm.JS {context}: expected Lean type {FromJS.typeName α}, received JavaScript {d.describe}" ++
-      (if detail.isEmpty then "" else s!" ({detail})")
+  | .error detail => do
+    -- References carry no description; ask the host for one only now.
+    let received ← match d with
+      | .ref v "" => (do return String.fromUTF8! (← hostCallWith 206 0 (.ref v "") (valueHandle v))) <|> pure "a JavaScript value"
+      | _ => pure d.describe
+    throw <| IO.userError <|
+      s!"Lasm.JS {context}: expected Lean type {FromJS.typeName α}, received JavaScript {received}" ++
+        (if detail.isEmpty then "" else s!" ({detail})")
 
 instance : ToJS Data := ⟨id⟩
 instance : FromJS Data := ⟨.ok, "Lasm.JS.Data", .data⟩
@@ -300,6 +305,12 @@ def describe (v : Value) : IO String := do
 /-- `o[key]` -/
 def get (o : Value) (key : String) (α : Type := Value) [FromJS α] : IO α := do
   receive α s!"get {repr key}" (← hostCallKeep 203 (valueHandle o) (modeArg (FromJS.mode α)) (Wire.encode (.string key)) (.ref o ""))
+
+/-- Several properties in one call: `{k₁: o[k₁], …}` as data (non-plain values as
+references), converted to `α`. Each JavaScript call costs tens of microseconds;
+reading an HTTP request's fields this way takes one. -/
+def getFields (o : Value) (keys : Array String) (α : Type := Data) [FromJS α] : IO α := do
+  receive α "getFields" (← hostCallKeep 203 (valueHandle o) 0 (Wire.encode (.array (keys.map .string))) (.ref o ""))
 
 /-- `o[key] = x` -/
 def set [ToJS α] (o : Value) (key : String) (x : α) : IO Unit := do
@@ -428,7 +439,7 @@ def ofFn (f : Array Data → IO Data) : IO Value := do
   decodeAs Value "Function.ofFn" (← Wire.decode (← hostCall 210 id 1 .empty))
 
 /-- A JavaScript function that calls `f` synchronously and returns its result.
-Node's main thread waits while `f` runs (about 10 µs per call plus `f`), so the
+Node's main thread waits while `f` runs (about 20 µs per call plus `f`), so the
 event loop is blocked meanwhile. Inside `f`, JavaScript calls and other host
 operations that complete synchronously work; operations that complete
 asynchronously in Lasm's host (Lean file and console IO, sleeping, sockets,

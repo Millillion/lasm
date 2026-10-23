@@ -1,0 +1,106 @@
+{
+ "scope": "Lasm.JS library (current source) call costs, mean ns per call over 20,000 calls (5,000 for await, 2,000 for callbacks), 3 process runs; Linux x64 local host under desktop load (load average 3-5)",
+ "recordedAt": "2026-10-23T02:50:00Z",
+ "engine": "v26.12.1",
+ "source": ".work program equivalent to the benchmark in docs/JS_INTEROP.md (Implementation)",
+ "sameTimePrototypeNoopNs": 22639,
+ "notes": [
+  "await resolved promise = callMethod Promise.resolve + Value.await (completion through the interop thread)",
+  "async callback round trip = JS calls a Lean ofFn function from Lean (call + interop thread + Lean task + reply) and Lean awaits the returned promise",
+  "sync comparator: Array.prototype.sort of 2,000 numbers (about 19,000 comparisons) with an ofSyncFn2 comparator: 22-40 us per comparison"
+ ],
+ "before": {
+  "runs": [
+   {
+    "binding basename": 44702,
+    "callMethod Math.max (Float)": 37671,
+    "get Math.PI": 31380,
+    "await resolved promise (task)": 175600,
+    "JS calls async Lean callback (round trip)": 323979,
+    "sync comparator sort of 2000 (total)": 535260037
+   },
+   {
+    "binding basename": 43085,
+    "callMethod Math.max (Float)": 33218,
+    "get Math.PI": 28764,
+    "await resolved promise (task)": 178416,
+    "JS calls async Lean callback (round trip)": 311963,
+    "sync comparator sort of 2000 (total)": 426626372
+   },
+   {
+    "binding basename": 43736,
+    "callMethod Math.max (Float)": 29548,
+    "get Math.PI": 27632,
+    "await resolved promise (task)": 172255,
+    "JS calls async Lean callback (round trip)": 314667,
+    "sync comparator sort of 2000 (total)": 753871105
+   }
+  ],
+  "note": "first library version: one host call per released handle, a description string with every reference, TextEncoder string writes"
+ },
+ "runs": [
+  {
+   "binding basename": 36718,
+   "callMethod Math.max (Float)": 27955,
+   "get Math.PI": 24519,
+   "await resolved promise (task)": 113445,
+   "JS calls async Lean callback (round trip)": 270440,
+   "sync comparator sort of 2000 (total)": 332505772
+  },
+  {
+   "binding basename": 30166,
+   "callMethod Math.max (Float)": 24437,
+   "get Math.PI": 24615,
+   "await resolved promise (task)": 111336,
+   "JS calls async Lean callback (round trip)": 273204,
+   "sync comparator sort of 2000 (total)": 400074021
+  }
+ ],
+ "after": "released handles travel ahead of the next host call (no release round trip), references carry no description (fetched only for errors), Buffer string writes",
+ "httpLoad": {
+  "scope": "examples/js-crud GET /health (Lean handler: getFields + res.status().json() or c.json()), keep-alive closed loop, 6 s, experiments/js-interop/load.mjs, same host",
+  "rows": [
+   {
+    "server": "Express",
+    "connections": 1,
+    "rps": 2101.3,
+    "p50Ms": 0.45,
+    "p99Ms": 0.833
+   },
+   {
+    "server": "Express",
+    "connections": 16,
+    "rps": 4612.7,
+    "p50Ms": 3.467,
+    "p99Ms": 6.676
+   },
+   {
+    "server": "Hono",
+    "connections": 1,
+    "rps": 2424.7,
+    "p50Ms": 0.388,
+    "p99Ms": 0.846
+   },
+   {
+    "server": "Hono",
+    "connections": 16,
+    "rps": 5164,
+    "p50Ms": 3.099,
+    "p99Ms": 6.557
+   }
+  ],
+  "before": [
+   {
+    "server": "Express",
+    "connections": 16,
+    "rps": 2556.8
+   },
+   {
+    "server": "Hono",
+    "connections": 16,
+    "rps": 3736.4
+   }
+  ],
+  "crudCheck": "check-crud.mjs 16 clients on authenticated GET /todos (JWT verify + Postgres query per request): Express 1442 req/s, Hono 1470 req/s; CI: linux-x64 2070/2143, linux-arm64 994/1141 (first library version)"
+ }
+}

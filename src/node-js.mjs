@@ -17,7 +17,8 @@
 //
 // Operations (arg bit 0 = reference conversion of the result):
 //   200 protocol version   201 require(specifier)   202 globalThis
-//   203 get(handle, key)   204 set(handle, [key, value])   206 describe(handle)
+//   203 get(handle, key, or an array of keys: an object of them)   204 set(handle, [key, value])
+//   206 describe(handle)
 //   205 call [target, receiver or method name, arguments]; arg flags 2 await a
 //       promise result, 4 construct, 8 method call
 //   214 typed binding [Lean name, module, export path, arguments]; flags as 205
@@ -31,7 +32,6 @@ import { HandleTable } from './handle-table.mjs';
 
 export const jsProtocolVersion = 1;
 export const firstJsHandle = 0x40000000;
-const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 const maximumDepth = 64;
 
@@ -78,7 +78,10 @@ class Writer {
   f64(v) { this.reserve(8); this.buffer.writeDoubleLE(v, this.length); this.length += 8; }
   u64(v) { this.reserve(8); this.buffer.writeBigUInt64LE(BigInt.asUintN(64, BigInt(v)), this.length); this.length += 8; }
   bytes(b) { this.u32(b.length); this.reserve(b.length); this.buffer.set(b, this.length); this.length += b.length; }
-  string(s) { this.bytes(encoder.encode(s)); }
+  string(s) {
+    const n = Buffer.byteLength(s);
+    this.u32(n); this.reserve(n); this.buffer.write(s, this.length, 'utf8'); this.length += n;
+  }
   result() { return this.buffer.subarray(0, this.length); }
 }
 class Reader {
@@ -110,7 +113,8 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
   }
   function write(w, value, mode, depth = 0) {
     if (depth > maximumDepth) throw failure('JavaScript value nests too deeply to convert to Lean data (more than 64 levels)');
-    if (mode === 'reference') { w.u8(10); w.u32(reference(value)); w.string(describe(value)); return; }
+    // References carry no description: Lean asks for one (op 206) only for an error message.
+    if (mode === 'reference') { w.u8(10); w.u32(reference(value)); w.u32(0); return; }
     if (value === undefined) return w.u8(0);
     if (value === null) return w.u8(1);
     switch (typeof value) {
@@ -128,7 +132,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
         return;
       }
     }
-    w.u8(10); w.u32(reference(value)); w.string(describe(value));
+    w.u8(10); w.u32(reference(value)); w.u32(0);
   }
   function encode(value, mode) { const w = new Writer(); write(w, value, mode); return w.result(); }
   function read(r) {
@@ -274,13 +278,26 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
       throw jsFailure(error);
     }
   }
-  function dispatch(op, id, arg, bytes) {
+  function dispatch(op, id, arg, request) {
     try {
+      // Every request starts with handles Lean freed since its previous call
+      // ([u32 count][count × u32]), released first.
+      const head = Buffer.from(request.buffer, request.byteOffset, request.byteLength);
+      if (head.length < 4) throw failure('Malformed Lasm.JS request');
+      const count = head.readUInt32LE(0);
+      if (head.length < 4 + 4 * count) throw failure('Malformed Lasm.JS request');
+      for (let i = 0; i < count; i++) if (values.delete(head.readUInt32LE(4 + 4 * i))) stats.released++;
+      const bytes = head.subarray(4 + 4 * count);
       switch (op) {
       case 200: return Buffer.from(Uint32Array.of(jsProtocolVersion).buffer);
       case 201: { const value = load(decoder.decode(bytes)); return encode(value, modeOf(arg)); }
       case 202: return encode(globalThis, modeOf(arg));
-      case 203: { const key = decode(bytes); return encode(lookup(id)[key], modeOf(arg)); }
+      case 203: {
+        // One key, or an array of keys: an object of those properties (one call).
+        const key = decode(bytes), object = lookup(id);
+        if (Array.isArray(key)) return encode(Object.fromEntries(key.map(k => [k, object?.[k]])), 'data');
+        return encode(object[key], modeOf(arg));
+      }
       case 204: {
         const [key, value] = decode(bytes);
         const object = lookup(id);

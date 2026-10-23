@@ -44,8 +44,9 @@ export function compileLibrary(tree, version, { platform = process.platform } = 
     const source = join(tree, 'src', 'lean', ...parts) + '.lean';
     for (const file of [olean, c, source]) mkdirSync(dirname(file), { recursive: true });
     copyFileSync(sourceFile(module), source);
-    execFileSync(native(lean), ['-j1', '-s8192', '-R', native(join(tree, 'src', 'lean')), '-Dcompiler.postponeCompile=false',
-      '-o', native(olean), '-c', native(c), native(source)], { env, windowsHide: true, encoding: 'utf8', timeout: 600_000,
+    // As src/application-sources.mjs: a namespaced executable and LEAN_PATH, ordinary arguments.
+    execFileSync(native(lean), ['-j1', '-s8192', '-R', join(tree, 'src', 'lean'), '-Dcompiler.postponeCompile=false',
+      '-o', olean, '-c', c, source], { env, windowsHide: true, encoding: 'utf8', timeout: 600_000,
       stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 16 * 1024 * 1024 });
   }
   return true;

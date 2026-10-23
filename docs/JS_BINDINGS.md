@@ -19,8 +19,8 @@ Node globals (`fetch`) and npm packages, and lets JavaScript call Lean functions
   Lean the first time it is used. There is no Lake dependency to add. Programs that
   import it use Lasm's larger Lean download (the "extended" tier, which includes
   Lean's elaborator), as Lake projects already do.
-- **Cost: about 16 µs per JavaScript call.** Every call crosses from the Lean thread
-  to Node's main thread. Make one call per real operation (a query, a sign, an HTTP
+- **Cost: about 25–35 µs per JavaScript call** (measured on Linux x64). Every call crosses from the Lean thread to Node's
+  main thread. Make one call per real operation (a query, a sign, an HTTP
   response), not one per tiny step.
 
 ## Quick start
@@ -224,7 +224,7 @@ Function.ofSyncFn2 (f : α → β → IO γ)
   handlers (Express, Hono) and event listeners use this.
 - **Synchronous (`ofSyncFn`), only where JavaScript needs the result immediately**
   (a sort comparator, a `map` function). Node's main thread waits while the Lean
-  function runs, about 10 µs per call plus the function, so the event loop is blocked.
+  function runs, about 20 µs per call plus the function, so the event loop is blocked.
   - What works inside: JavaScript calls (served inline while the main thread waits)
     and console output.
   - What fails: host operations that complete asynchronously, such as Lean file IO,
@@ -321,6 +321,10 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   that complete asynchronously fail.
 - **Module loading.** Modules load with `require`: ES modules with top-level await
   cannot be loaded. pnpm/Yarn Plug'n'Play layouts are not supported.
-- **Cost per call.** Each call costs about 16 µs, with lower throughput on macOS and
-  Windows (see [JS_INTEROP.md](JS_INTEROP.md)).
+- **Cost per call.** Each call costs about 25–35 µs. An asynchronous callback round
+  trip (JavaScript calls Lean, and Lean awaits the answer) costs about 0.27 ms.
+  `examples/js-crud` serves `GET /health` at about 4,600 (Express) and 5,200 (Hono)
+  requests per second with 16 connections on Linux x64. That is about 3.5× Lasm's
+  `Std.Http` server and about a fifth of plain Node.
+  Measurements: [JS_INTEROP.md](JS_INTEROP.md).
 - **Lasm only.** Programs that use interop run only under Lasm.

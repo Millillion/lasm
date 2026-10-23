@@ -506,6 +506,15 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
      expected Lean type and the JS value received; a binding check (declared
      exports exist and accept the declared arity); worked examples for
      Express, `pg` and `jose`.
+  Status (2026-10-23): steps 2–4 implemented in current source
+  ([JS_BINDINGS.md](JS_BINDINGS.md), implementation notes in
+  [JS_INTEROP.md](JS_INTEROP.md#implementation-steps-24-current-source)). The library
+  ships with Lasm and is compiled into the managed Lean prefix (no Lake dependency).
+  The interop fixture runs in the five-platform installed acceptance. The Express and
+  Hono example with `pg` and `jose` and the `fetch` example run on all five targets in
+  the `js-interop-examples` workflow: Postgres comes from a service container on Linux,
+  embedded-postgres on macOS and the image's PostgreSQL service on Windows. The
+  candidate gate is in progress.
   Exit: a Lean app on Express with `pg` (Postgres) and `jose` (JWT), and the
   same app on Hono (`@hono/node-server`; added by the user 2026-10-22 as an
   important test library, since Hono also targets the planned serverless

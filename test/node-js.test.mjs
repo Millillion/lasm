@@ -3,10 +3,18 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { createNodeJs, describe, firstJsHandle } from '../src/node-js.mjs';
+import { createNodeJs as createHost, describe, firstJsHandle } from '../src/node-js.mjs';
+
+// Lean's C glue prefixes every request with the handles it released ([u32 count][ids]).
+const released = (ids = []) => Buffer.concat([u32(ids.length), ...ids.map(u32)]);
+function createNodeJs(options) {
+  const js = createHost(options);
+  const dispatch = js.dispatch;
+  return { ...js, dispatch: (op, id, arg, bytes, ids) => dispatch(op, id, arg, Buffer.concat([released(ids), bytes])) };
+}
 
 // Lean's side of the wire format (library/Lasm/JS/Core.lean Wire), for tests.
-const u32 = n => { const b = Buffer.alloc(4); b.writeUInt32LE(n); return b; };
+function u32(n) { const b = Buffer.alloc(4); b.writeUInt32LE(n); return b; }
 const str = s => Buffer.concat([u32(Buffer.byteLength(s)), Buffer.from(s)]);
 const wire = value => {
   if (value === undefined) return Buffer.from([0]);
@@ -70,7 +78,8 @@ test('require, typed bindings, construction, methods and errors', async () => {
   const id = encoded.readUInt32LE(1);
   assert.ok(id >= firstJsHandle);
   assert.equal(js.decode(js.dispatch(205, 0, 8n, wire([{ ref: id }, 'add', [1, 1]]))), 2);
-  js.release(id);
+  // Released handles arrive ahead of the next request.
+  js.dispatch(200, 0, 0n, Buffer.alloc(0), [id]);
   assert.throws(() => js.dispatch(206, id, 0n, Buffer.alloc(0)), /released Lasm.JS value handle/);
   assert.equal(js.decode(js.dispatch(214, 0, 0n, wire(['clone', 'globalThis', 'structuredClone', [{ a: [1] }]]))).a[0], 1);
 });
