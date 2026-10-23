@@ -16,6 +16,7 @@ import { buildPlatforms } from '../src/platform.mjs';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 import { bundleInstaller } from './bundle-installer.mjs';
 import { candidateReadme } from './candidate-readme.mjs';
+import { applicationNotices } from '../src/notices.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -86,7 +87,7 @@ json('package.json', {
   dependencies: { tar: sourcePackage.dependencies.tar },
   bundleDependencies: ['tar'],
 });
-writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), readFileSync(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8')
+writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), applicationNotices(runtime.manifest, readFileSync(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8'), { cli: true })
   + '\n=== Koffi runtime adapter ===\n' + readFileSync(join(staging, 'src/native/node_modules/koffi/LICENSE.txt'), 'utf8'));
 const pack = () => JSON.parse(execFileSync('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', output,
   '--cache', join(root, '.cache/npm')], { cwd: staging, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 }))[0];

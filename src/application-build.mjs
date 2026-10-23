@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile, stat, rename, rm, copyFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, stat, rename, rm } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import { planNativeInputs } from './application-native.mjs';
 import { join, resolve, dirname, relative } from 'node:path';
@@ -22,6 +22,7 @@ import { withApplicationLock } from './application-lock.mjs';
 import { applicationPolicy } from './application-policy.mjs';
 import { insideDirectory } from './platform.mjs';
 import { requireApplicationSupport } from './application-support.mjs';
+import { applicationNotices } from './notices.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const helpers = ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs',
@@ -151,7 +152,8 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   }
   progress?.({ stage: 'Packaging the application and runtime support' });
   copyApplicationHost(dist); writeApplicationEntrypoint(dist);
-  await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));
+  await writeFile(join(dist, 'THIRD_PARTY_NOTICES.txt'),
+    applicationNotices(runtime.manifest, await readFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8')));
   if (nodeModules) {
     progress?.({ stage: `Copying ${nodeModules.packages.length} npm packages` });
     copyNodeModules(nodeModules, dist);
