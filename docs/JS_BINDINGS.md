@@ -350,7 +350,7 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   requests to a handler that awaits a 1 s timer finish in 1.1 s, 24 in 2.1 s,
   also when the process is pinned to 2 CPUs. `LEAN_NUM_THREADS=64` in the
   server's environment raised it (40 such requests in 1.3 s) at about 9 MB of
-  memory per extra worker. Size it to the slow awaits (database queries,
+  memory per extra worker ([soak finding](INTEROP_SOAK.md#finding-waiting-handlers-are-bounded-by-leans-worker-threads)). Size it to the slow awaits (database queries,
   outbound HTTP) you expect in flight, and watch for 4-CPU and smaller machines.
 - **Function length.** A JavaScript function made by `Function.ofFn` reports
   `length` 0. APIs that inspect it do not recognize it: Express treats only

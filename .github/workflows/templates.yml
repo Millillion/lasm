@@ -105,4 +105,5 @@ jobs:
           name: templates-${{ matrix.platform }}
           path: .work/templates*.json
           retention-days: 14
+          include-hidden-files: true
           if-no-files-found: ignore

@@ -101,4 +101,5 @@ jobs:
           name: interop-soak-${{ matrix.app }}-${{ matrix.target.platform }}
           path: .work/interop-soak-*.json
           retention-days: 30
+          include-hidden-files: true
           if-no-files-found: ignore
