@@ -274,7 +274,12 @@ candidate `.39891445495`, [BENCHMARKS.md](https://github.com/Millillion/lasm/blo
 requests per second and Express about 6,300, against about 54,000 for a plain Node
 `http` server (0.18× and 0.12×) and about 660 for `Std.Http` under Lasm. Node's main
 thread is the limit: each request makes about four host calls. Current source cuts
-that to two or three (`Function.ofFnReply`; +16–30 % locally). These programs run only under Lasm: natively, every JavaScript operation fails
+that to two or three (`Function.ofFnReply`; +16–30 % locally). In current source
+(awaiting candidate acceptance), Lean handlers run in `Async` (Lean's `Std.Async`):
+a handler that awaits JavaScript (`callMethodAwait`, a binding declared
+`→ Async R`) holds no Lean thread, so any number of requests can wait at once
+(1,000 concurrent 100 ms awaits in about 0.3 s on 2 CPUs); awaiting in `IO`, as
+in the script above, blocks the calling thread. These programs run only under Lasm: natively, every JavaScript operation fails
 with a clear error, and the Lean editor extension does not know `Lasm.JS` yet. The
 guide for writing bindings (by hand or by an AI agent), with Express, Hono, `pg`,
 `jose` and `fetch` examples, type mappings, errors and exact limitations, is
@@ -339,8 +344,10 @@ A summary; the sections above and the linked pages have the details.
   `vm.overcommit_memory=2`) refuse it. Node 26's official binary needs
   `libatomic1` on minimal images that install the Node tarball themselves.
 - **JS/npm interop.** Each JavaScript call crosses to Node's main thread (about
-  25–35 µs). A Lean handler that awaits holds one of Lean's worker threads (about
-  one per CPU), so at most that many handlers wait at once; further requests queue
+  25–35 µs). Lean code that awaits a promise in `IO` holds one of Lean's worker
+  threads (about one per CPU) while it waits; in the accepted candidates every
+  Lean handler does, so at most that many handlers wait at once. Current source
+  runs handlers in `Async`, which awaits without a thread
   ([JS_BINDINGS.md](docs/JS_BINDINGS.md), [interop soak](docs/INTEROP_SOAK.md)).
   `Lasm.JS` programs fail natively, and the Lean editor extension does not know
   `Lasm.JS`.

@@ -40,6 +40,16 @@ measurements that chose the architecture, and the implementation notes below.
   bindings returning tasks. It hands calls of Lean functions from JavaScript to a
   Lean dispatcher, which runs each call as a task (`IO.asTask`). One host call
   replies with the result.
+- **Awaiting without a thread (Phase 5.2, current source).** Lean functions
+  called from JavaScript are `Async` computations (Lean's `Std.Async`). In
+  `Async`, `callAwait`/`callMethodAwait` and `Async R` bindings make the call
+  with flag 16 (ops 205/214): the request carries a Lean `IO.Promise`, the host
+  settles the JavaScript result into it through the interop thread, and the
+  computation continues as a task bound to that promise (`BaseIO.bindTask`).
+  The dispatcher replies directly when a call finishes without waiting, and from
+  a continuation otherwise. No worker waits, which removed the one-handler-per-CPU
+  limit ([INTEROP_SOAK.md](INTEROP_SOAK.md#concurrent-waiting-handlers)). In
+  `IO` the same functions keep the blocking path (flag 2), one round trip.
 - **Synchronous callbacks.** A second detached thread serves them through a
   shared-memory channel (op 211).
   - **Hooks.** `host-pre.js` passes the host the Wasm memory and

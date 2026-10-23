@@ -614,8 +614,16 @@ folded into Phases 5.2/5.3 and 7.
     4.3–4.4 to 2.3–3.4 (+16–30 % locally); the rest is Phase 7.
     Interop soak passed (docs/INTEROP_SOAK.md): 2 h per app on Linux x64 and
     15 min elsewhere, 0 errors, no handle/callback/memory growth. Finding: waiting
-    handlers are bounded by Lean's worker threads (about one per CPU); an
-    asynchronous handler API is proposed for Phase 7.
+    handlers were bounded by Lean's worker threads (about one per CPU).
+    *Note (2026-10-23, pre-launch fix, current source awaiting candidate
+    acceptance):* handlers and promise-returning bindings now run in `Async`
+    (Std.Async): `Function.ofFn`/`ofFnReply` take `Async` functions, and
+    `callAwait`/`callMethodAwait`/`Value.await` and `Async R` bindings await
+    without holding a Lean thread (the host resolves a Lean promise, the
+    computation continues from it). Locally, 1,000 concurrent requests awaiting
+    a 100 ms timer finish in 0.27–0.30 s pinned to 2 CPUs (8.7 s before), with
+    no thread growth; the soak now runs this probe first. `IO` awaits keep their
+    blocking behaviour for scripts. Templates, examples and guides use `Async`.
   - **5.2b Release benchmarks (user request 2026-10-23).** An irreducible set
     of benchmarks recorded automatically on every release candidate and
     committed to the repo (machine-readable history plus a readable

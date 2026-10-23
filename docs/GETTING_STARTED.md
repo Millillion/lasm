@@ -60,9 +60,11 @@ How a Lean handler works (`Main.lean` from the template):
   calls it with its context `c`; the Lean code reads the request
   (`c.req.param("name")`) and answers `Function.Reply.callMethod c "json" #[body]`: the host
   calls `c.json(body)` as part of the reply and Hono gets its `Response`. Each call
-  runs as a Lean task, so handlers can block, await promises and make further
-  JavaScript calls. Every JavaScript call from Lean is a round trip to Node's main
-  thread, so handlers make as few as they can (see [performance](#which-http-server-to-use)).
+  runs as a Lean task in `Async`: a handler can await promises
+  (`callMethodAwait`, a database query) and holds no Lean thread while it waits,
+  so any number of requests can wait at once. `IO` actions work in it unchanged.
+  Every JavaScript call from Lean is a round trip to Node's main thread, so
+  handlers make as few as they can (see [performance](#which-http-server-to-use)).
 - `waitForever` keeps `main` running while Node serves requests.
 
 The full API (values, conversions, `deriving ToJS, FromJS`, callbacks, errors,
@@ -97,20 +99,21 @@ open Lasm.JS
 /-- `marked.parse(markdown)`: Markdown to HTML. -/
 @[js "marked" "parse"] opaque renderMarkdown : String → IO String
 
-/-- A Hono handler `(c) => Response` written in Lean. -/
-def handler (f : Value → IO Function.Reply) : IO Value :=
+/-- A Hono handler `(c) => Response` written in Lean. Handlers run in `Async`:
+awaiting JavaScript in them holds no Lean thread. -/
+def handler (f : Value → Async Function.Reply) : IO Value :=
   Function.ofFnReply fun args => do
     let .ref c _ := args[0]! | throw (IO.userError "expected a Hono context")
     f c
 
 /-- `c.json(body, status)`: the `Response` the handler returns, made by the host
 as the reply (one host round trip fewer than calling it from Lean). -/
-def json (c : Value) (body : Data) (status : Nat := 200) : IO Function.Reply :=
+def json (c : Value) (body : Data) (status : Nat := 200) : Async Function.Reply :=
   return .callMethod c "json" #[body, toJS status]
 
 def main : IO Unit := do
   let app ← newHono
-  let route (method path : String) (f : Value → IO Function.Reply) : IO Unit := do
+  let route (method path : String) (f : Value → Async Function.Reply) : IO Unit := do
     let _ : Value ← app.callMethod method #[toJS path, toJS (← handler f)]
   route "get" "/" fun c => json c (obj [("message", toJS "Hello from Lean on Hono!")])
   route "get" "/hello/:name" fun c => do
@@ -157,9 +160,11 @@ curl -X POST http://localhost:3000/render -H 'content-type: application/json' -d
 ```
 
 The pattern for any npm package: `npm install` it, declare one `@[js "package"
-"export"]` line per function you call, and call it like a Lean function. A
-returned promise is awaited; use a `Value` result for objects whose methods you
-call (`callMethod`, `get`). `lasm build` copies the production dependencies into
+"export"]` line per function you call, and call it like a Lean function. End
+the type in `IO R` for a function that returns a value at once (`marked.parse`)
+and in `Async R` for one that returns a promise (a database query, `fetch`): it
+is awaited without holding a Lean thread. Use a `Value` result for objects whose
+methods you call (`callMethod`, `get`). `lasm build` copies the production dependencies into
 `dist/node_modules`. A misspelled export stops the build with
 `Lasm.JS binding check failed`.
 

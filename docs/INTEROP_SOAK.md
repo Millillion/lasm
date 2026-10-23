@@ -79,9 +79,43 @@ was tried and did not raise the limit under Lasm, so it was reverted.
 `LEAN_NUM_THREADS=64` did (40 concurrent waits in 1.3 s, about 9 MB of memory per
 extra worker). This is a capacity limit, not a leak; it is documented in
 [JS_BINDINGS.md](JS_BINDINGS.md) ("Concurrent waiting handlers"), and the soak mix
-keeps waiting handlers below a 4-CPU runner's worker count. Handlers that do not
-hold a thread while they wait (an asynchronous handler API) are proposed for
-Phase 7.
+keeps waiting handlers below a 4-CPU runner's worker count. Fixed before launch
+by `Async` handlers (next section).
+
+## Concurrent waiting handlers
+
+*Current source, awaiting candidate acceptance (2026-10-23).* Lean handlers
+(`Function.ofFn`, `ofFnReply`) run in `Async` (Lean's `Std.Async`), and
+`callAwait`, `callMethodAwait`, `Value.await` and bindings declared `→ Async R`
+await there without holding a Lean thread. The host settles the JavaScript
+promise into a Lean `IO.Promise` (host operations 205/214 with flag 16, one host
+call), and the rest of the handler is a continuation of that promise's task
+(`BaseIO.bindTask`), so no worker waits. A handler that finishes without
+waiting replies from the same task as before. Waiting in `IO` still blocks, for
+scripts. The soak servers, the templates and the examples use `Async`.
+
+**Probe** ([concurrency-probe.mjs](../scripts/interop-soak/concurrency-probe.mjs),
+run by the soak before its load): the soak server alone, `LEAN_NUM_THREADS`
+unset, pinned to CPUs 0–1 with `taskset` on Linux; an untimed warm-up opens N
+keep-alive connections; then 3 rounds of N = 1,000 concurrent `GET /slow/100`
+(each handler awaits a 100 ms JavaScript timer). Soak criterion: all requests
+succeed, the best round within 1.5 s, and at most 4 new threads after the first
+round.
+
+Local (Linux x64, 12 CPUs, Hono, candidate `.40000056579` with this change
+overlaid):
+
+| Handler | 1,000 × 100 ms awaits, wall time | Threads |
+| --- | --- | --- |
+| waits in `IO` (before) | 8.7 s (p50 4.4 s) | 28 → 28 |
+| waits in `Async` (after), 3 rounds | 0.27–0.30 s (p50 0.21–0.23 s, p99 0.24–0.26 s) | 28 → 28 |
+
+The `Async` time is the 100 ms timer plus about 1,000 × 5 host calls through
+Node's main thread. Throughput on the same host (server pinned to 2 CPUs, load
+from 2 others, 16 connections, 3 alternating runs): `GET /slow/0` (an awaiting
+handler) 4,860 → 5,490 requests per second, `GET /hello/Ada` 8,620 → 8,830, and
+the benchmark's Hono fixture 13,550 → 13,790: no regression. CI results on five targets are recorded with the candidate
+that includes the change.
 
 ## Reproduce
 
