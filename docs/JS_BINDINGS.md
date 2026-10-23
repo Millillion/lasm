@@ -3,7 +3,7 @@
 This guide is written for people **and AI agents** that write bindings. It is
 complete: every rule needed to bind an npm package is here, with working examples.
 
-Status: **current source, not yet in an accepted candidate** (Phase 4). The design
+Status: **current source, Phase 4** (candidate `.39891445495` passed five-platform acceptance and the cold-installation gate; awaiting the user's review). The design
 and measurements are in [JS_INTEROP.md](JS_INTEROP.md).
 
 ## What it is

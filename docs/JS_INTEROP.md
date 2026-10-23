@@ -1,7 +1,7 @@
 # JS/npm interop: threading architecture (Phase 4)
 
 Status: **architecture A (message passing) approved by the user on 2026-10-22 and
-implemented in current source** (steps 2–4; not yet in an accepted candidate). The
+implemented in current source** (steps 2–4; candidate `.39891445495` passed five-platform acceptance and the cold-installation gate). The
 user guide is [JS_BINDINGS.md](JS_BINDINGS.md). This document keeps the step 1
 measurements that chose the architecture, and the implementation notes below.
 

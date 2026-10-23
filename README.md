@@ -236,7 +236,7 @@ characters still fails to build. Per-platform results:
   Node's own `fetch` through JS/npm interop (below). The experimental
   Millillion/fetch library tested in Phase 3 is superseded, archived and was never released.
 
-**JS/npm interop (current source, Phase 4; not yet in a candidate):** `import Lasm.JS`
+**JS/npm interop (current source, Phase 4; candidate `.39891445495` passed five-platform acceptance and the cold-installation gate, not yet accepted by the user):** `import Lasm.JS`
 calls Node built-ins, Node globals such as `fetch`, and npm packages from Lean, and
 lets JavaScript call Lean functions (HTTP handlers for Express or Hono, callbacks).
 Lasm ships the library: no Lake dependency is needed. Put a `package.json` next to
