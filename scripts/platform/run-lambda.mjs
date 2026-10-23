@@ -35,6 +35,8 @@ try {
   // Anonymous Amazon ECR Public pulls are rate limited per IP address, which CI
   // runners share ("toomanyrequests: Data limit exceeded"); retry with backoff.
   for (const image of [config.image, config.adapter]) {
+    // CI loads the adapter fetched once by fetch-adapter.mjs.
+    if (image === config.adapter && docker(['image', 'inspect', image]).status === 0) continue;
     for (let attempt = 1; ; attempt++) {
       const pull = docker(['pull', '-q', image]);
       if (pull.status === 0) break;
@@ -43,8 +45,8 @@ try {
       await new Promise(done => setTimeout(done, 30_000 * attempt));
     }
   }
-  result.imageDigest = must(['image', 'inspect', '--format', '{{index .RepoDigests 0}}', config.image]);
-  result.adapterDigest = must(['image', 'inspect', '--format', '{{index .RepoDigests 0}}', config.adapter]);
+  result.imageDigest = must(['image', 'inspect', '--format', '{{.Id}} {{json .RepoDigests}}', config.image]);
+  result.adapterDigest = must(['image', 'inspect', '--format', '{{.Id}} {{json .RepoDigests}}', config.adapter]);
   must(['network', 'create', network]);
   must(['run', '-d', '--name', postgres, '--network', network, '-e', 'POSTGRES_PASSWORD=postgres', 'postgres:17']);
   for (let i = 0; docker(['exec', postgres, 'pg_isready', '-U', 'postgres']).status !== 0; i++) {
