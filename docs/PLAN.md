@@ -592,7 +592,11 @@ folded into Phases 5.2/5.3 and 7.
     `std-http`), docs/GETTING_STARTED.md, docs/deploy/ and the interop soak
     (scripts/interop-soak, `interop-soak.yml`) are in current source; template CI
     (`templates.yml`) runs with every candidate. Startup, bundle size and memory
-    numbers are published by 5.2b (docs/BENCHMARKS.md).
+    numbers are published by 5.2b (docs/BENCHMARKS.md). `Std.Http` position
+    (decided 2026-10-23, SERVER_MVP.md#launch-position-2026-10-23): Express/Hono
+    with Lean handlers for production HTTP; `Std.Http` supported for pure-Lean
+    portability (28.8 host calls per request against 4.4; no cheap fix beyond
+    the optional `generateDate := false`; deeper work in Phase 7).
   - **5.2b Release benchmarks (user request 2026-10-23).** An irreducible set
     of benchmarks recorded automatically on every release candidate and
     committed to the repo (machine-readable history plus a readable

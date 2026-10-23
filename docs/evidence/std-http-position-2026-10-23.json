@@ -1,0 +1,462 @@
+{
+ "recordedAt": "2026-10-23T14:29:05.024Z",
+ "node": "v26.12.1",
+ "platform": "linux-x64",
+ "cpus": 12,
+ "cpuModel": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+ "loadAverageAtStart": [
+  1.88,
+  1.83,
+  1.89
+ ],
+ "seconds": 8,
+ "rounds": 2,
+ "request": "GET /hello/Ada",
+ "servers": [
+  {
+   "name": "node",
+   "dist": null,
+   "rows": [
+    {
+     "connections": 1,
+     "round": 1,
+     "rps": 7841,
+     "p50": 0.094,
+     "p99": 0.303,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.055,
+     "rpc": null
+    },
+    {
+     "connections": 1,
+     "round": 2,
+     "rps": 8637,
+     "p50": 0.084,
+     "p99": 0.277,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.047,
+     "rpc": null
+    },
+    {
+     "connections": 16,
+     "round": 1,
+     "rps": 14280,
+     "p50": 0.978,
+     "p99": 2.489,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.044,
+     "rpc": null
+    },
+    {
+     "connections": 16,
+     "round": 2,
+     "rps": 14617,
+     "p50": 0.955,
+     "p99": 2.468,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.043,
+     "rpc": null
+    }
+   ]
+  },
+  {
+   "name": "std-http",
+   "dist": "std-http",
+   "rows": [
+    {
+     "connections": 1,
+     "round": 1,
+     "rps": 315,
+     "p50": 2.972,
+     "p99": 5.12,
+     "errors": 0,
+     "serverCpuMsPerRequest": 5.121,
+     "rpc": {
+      "perRequest": 34.12,
+      "mainEventLoopUtilization": 0.439,
+      "ops": {
+       "1": 1,
+       "2": 2,
+       "10": 2,
+       "22": 1,
+       "54": 0.01,
+       "55": 0.01,
+       "58": 2.42,
+       "61": 0.01,
+       "70": 2,
+       "71": 2.42,
+       "75": 2.44,
+       "94": 7.9,
+       "95": 7.9,
+       "release:0": 3.01
+      }
+     }
+    },
+    {
+     "connections": 1,
+     "round": 2,
+     "rps": 313,
+     "p50": 2.979,
+     "p99": 5.211,
+     "errors": 0,
+     "serverCpuMsPerRequest": 5.026,
+     "rpc": {
+      "perRequest": 34.02,
+      "mainEventLoopUtilization": 0.442,
+      "ops": {
+       "1": 1,
+       "2": 2,
+       "10": 2,
+       "22": 1,
+       "54": 0.01,
+       "55": 0.01,
+       "58": 2.39,
+       "61": 0.01,
+       "70": 2,
+       "71": 2.41,
+       "75": 2.44,
+       "94": 7.87,
+       "95": 7.87,
+       "release:0": 3.01
+      }
+     }
+    },
+    {
+     "connections": 16,
+     "round": 1,
+     "rps": 1207,
+     "p50": 13.043,
+     "p99": 18.034,
+     "errors": 0,
+     "serverCpuMsPerRequest": 4.587,
+     "rpc": {
+      "perRequest": 28.78,
+      "mainEventLoopUtilization": 0.996,
+      "ops": {
+       "1": 1,
+       "2": 2,
+       "10": 2,
+       "22": 1,
+       "54": 0.01,
+       "55": 0.01,
+       "58": 2.5,
+       "61": 0.01,
+       "70": 2,
+       "71": 2.5,
+       "75": 2.5,
+       "94": 8.01,
+       "95": 2.23,
+       "release:0": 3.02
+      }
+     }
+    },
+    {
+     "connections": 16,
+     "round": 2,
+     "rps": 1226,
+     "p50": 12.911,
+     "p99": 16.813,
+     "errors": 0,
+     "serverCpuMsPerRequest": 4.521,
+     "rpc": {
+      "perRequest": 28.79,
+      "mainEventLoopUtilization": 0.994,
+      "ops": {
+       "1": 1,
+       "2": 2,
+       "10": 2,
+       "22": 1,
+       "54": 0.01,
+       "55": 0.01,
+       "58": 2.51,
+       "61": 0.01,
+       "70": 2,
+       "71": 2.49,
+       "75": 2.5,
+       "94": 8.01,
+       "95": 2.24,
+       "release:0": 3.02
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "std-http-no-date",
+   "dist": "std-http-no-date",
+   "rows": [
+    {
+     "connections": 1,
+     "round": 1,
+     "rps": 377,
+     "p50": 2.64,
+     "p99": 3.925,
+     "errors": 0,
+     "serverCpuMsPerRequest": 4.715,
+     "rpc": {
+      "perRequest": 27.04,
+      "mainEventLoopUtilization": 0.432,
+      "ops": {
+       "54": 0.01,
+       "55": 0.01,
+       "58": 2.41,
+       "61": 0.01,
+       "70": 2,
+       "71": 2.41,
+       "75": 2.43,
+       "94": 7.87,
+       "95": 7.87,
+       "release:0": 2.01
+      }
+     }
+    },
+    {
+     "connections": 1,
+     "round": 2,
+     "rps": 382,
+     "p50": 2.602,
+     "p99": 3.885,
+     "errors": 0,
+     "serverCpuMsPerRequest": 4.616,
+     "rpc": {
+      "perRequest": 27.17,
+      "mainEventLoopUtilization": 0.433,
+      "ops": {
+       "54": 0.01,
+       "55": 0.01,
+       "58": 2.45,
+       "61": 0.01,
+       "70": 2,
+       "71": 2.42,
+       "75": 2.45,
+       "94": 7.9,
+       "95": 7.9,
+       "release:0": 2.01
+      }
+     }
+    },
+    {
+     "connections": 16,
+     "round": 1,
+     "rps": 1379,
+     "p50": 11.545,
+     "p99": 14.894,
+     "errors": 0,
+     "serverCpuMsPerRequest": 4.712,
+     "rpc": {
+      "perRequest": 21.49,
+      "mainEventLoopUtilization": 0.914,
+      "ops": {
+       "54": 0.01,
+       "55": 0.01,
+       "58": 2.5,
+       "61": 0.01,
+       "70": 2,
+       "71": 2.5,
+       "75": 2.5,
+       "94": 8.01,
+       "95": 1.95,
+       "release:0": 2.01
+      }
+     }
+    },
+    {
+     "connections": 16,
+     "round": 2,
+     "rps": 1397,
+     "p50": 11.442,
+     "p99": 14.538,
+     "errors": 0,
+     "serverCpuMsPerRequest": 4.736,
+     "rpc": {
+      "perRequest": 21.47,
+      "mainEventLoopUtilization": 0.906,
+      "ops": {
+       "54": 0.01,
+       "55": 0.01,
+       "58": 2.49,
+       "61": 0.01,
+       "70": 2,
+       "71": 2.49,
+       "75": 2.49,
+       "94": 7.99,
+       "95": 1.97,
+       "release:0": 2.01
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "express",
+   "dist": "express",
+   "rows": [
+    {
+     "connections": 1,
+     "round": 1,
+     "rps": 1951,
+     "p50": 0.465,
+     "p99": 0.968,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.537,
+     "rpc": {
+      "perRequest": 5,
+      "mainEventLoopUtilization": 0.584,
+      "ops": {
+       "203": 2,
+       "205": 1,
+       "208": 1,
+       "209": 1
+      }
+     }
+    },
+    {
+     "connections": 1,
+     "round": 2,
+     "rps": 2082,
+     "p50": 0.437,
+     "p99": 0.911,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.46,
+     "rpc": {
+      "perRequest": 5,
+      "mainEventLoopUtilization": 0.564,
+      "ops": {
+       "203": 2,
+       "205": 1,
+       "208": 1,
+       "209": 1
+      }
+     }
+    },
+    {
+     "connections": 16,
+     "round": 1,
+     "rps": 4632,
+     "p50": 3.422,
+     "p99": 6.789,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.44,
+     "rpc": {
+      "perRequest": 4.34,
+      "mainEventLoopUtilization": 0.998,
+      "ops": {
+       "203": 2,
+       "205": 1,
+       "208": 1,
+       "209": 0.34
+      }
+     }
+    },
+    {
+     "connections": 16,
+     "round": 2,
+     "rps": 4551,
+     "p50": 3.455,
+     "p99": 6.746,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.433,
+     "rpc": {
+      "perRequest": 4.34,
+      "mainEventLoopUtilization": 0.996,
+      "ops": {
+       "203": 2,
+       "205": 1,
+       "208": 1,
+       "209": 0.34
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "hono",
+   "dist": "hono",
+   "rows": [
+    {
+     "connections": 1,
+     "round": 1,
+     "rps": 1893,
+     "p50": 0.495,
+     "p99": 0.922,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.472,
+     "rpc": {
+      "perRequest": 5,
+      "mainEventLoopUtilization": 0.444,
+      "ops": {
+       "203": 1,
+       "205": 2,
+       "208": 1,
+       "209": 1
+      }
+     }
+    },
+    {
+     "connections": 1,
+     "round": 2,
+     "rps": 1947,
+     "p50": 0.48,
+     "p99": 0.909,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.424,
+     "rpc": {
+      "perRequest": 5,
+      "mainEventLoopUtilization": 0.433,
+      "ops": {
+       "203": 1,
+       "205": 2,
+       "208": 1,
+       "209": 1
+      }
+     }
+    },
+    {
+     "connections": 16,
+     "round": 1,
+     "rps": 5683,
+     "p50": 2.749,
+     "p99": 6.379,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.441,
+     "rpc": {
+      "perRequest": 4.44,
+      "mainEventLoopUtilization": 0.998,
+      "ops": {
+       "203": 1,
+       "205": 2,
+       "208": 1,
+       "209": 0.44
+      }
+     }
+    },
+    {
+     "connections": 16,
+     "round": 2,
+     "rps": 5659,
+     "p50": 2.742,
+     "p99": 6.476,
+     "errors": 0,
+     "serverCpuMsPerRequest": 0.423,
+     "rpc": {
+      "perRequest": 4.45,
+      "mainEventLoopUtilization": 0.997,
+      "ops": {
+       "203": 1,
+       "205": 2,
+       "208": 1,
+       "209": 0.45
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "loadAverageAtEnd": [
+  4.95,
+  2.94,
+  2.29
+ ],
+ "candidate": "0.1.0-experimental.39891445495",
+ "apps": "lasm init templates (current source fcda634) built with that candidate; std-http-no-date = std-http with { generateDate := false }"
+}

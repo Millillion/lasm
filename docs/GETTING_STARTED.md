@@ -192,14 +192,15 @@ get a `Dockerfile.lambda`, see [lambda.md](deploy/lambda.md)).
 | | Express or Hono with Lean handlers (`--template express`, `hono`) | `Std.Http` (`--template std-http`) |
 | --- | --- | --- |
 | Use for | **Production HTTP services on Node.** | Pure-Lean code that must also build natively, or that is shared with native Lean servers. |
-| Throughput (`GET`, 16 connections, Linux x64) | about 4,600 (Express) and 5,200 (Hono) requests per second | about 1,300 requests per second |
+| Throughput (`GET`, 16 connections, Linux x64) | about 4,600 (Express) and 5,700 (Hono) requests per second | about 1,200 requests per second |
 | Node ecosystem (middleware, npm packages) | yes | through `Lasm.JS` calls only |
 | Runs natively (`lake build`) | `App.lean` only | yes |
 
 `Std.Http` under Lasm is supported and passes the same load, fault and soak tests as
 native Lean, but each request costs about 29 host round trips between the Lean
-thread and Node's main thread; with Express or Hono, Node does the HTTP work and
-Lean runs only the handler. Details: [Std.Http performance](SERVER_MVP.md#performance-work-2026-10-19).
+thread and Node's main thread (sockets, timers, the `Date` header); with Express
+or Hono, Node does the HTTP work and Lean runs only the handler (about 4 round
+trips). Details: [Std.Http performance](SERVER_MVP.md#launch-position-2026-10-23).
 
 ## Before npm publication
 

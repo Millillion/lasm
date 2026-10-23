@@ -718,3 +718,65 @@ shutdown and restart failures are reported, not gating), and three fresh runs
 were required rather than re-scoring old ones. Performance targets apply to
 Linux (met: 53–89% of native throughput, p99 1.1–1.75×); macOS and Windows
 performance is reported, not gating.
+
+## Launch position (2026-10-23)
+
+**Position for launch: use Express or Hono with Lean handlers (through
+`Lasm.JS`) for production HTTP services on Node. `Std.Http` is supported for
+pure-Lean code that must also build natively or be shared with native Lean
+servers.** `lasm init` offers both (`--template express|hono` and `--template
+std-http`); the getting-started guide leads with Hono.
+
+Measurement: the `lasm init` server templates (current source `fcda634`) built
+with candidate `.39891445495`, `GET /hello/Ada`, keep-alive closed loop from a
+Node client on the same host (Linux x64, 12 threads, i7-9750H), 8 s × 2 rounds,
+every Lasm server run from an instrumented copy that counts host RPCs
+([`http-position.mjs`](../scripts/server-mvp/http-position.mjs); evidence:
+[std-http-position-2026-10-23.json](evidence/std-http-position-2026-10-23.json)).
+The client limits plain Node here (the earlier raw-socket client measured
+43,000 req/s); the Lasm rows are server-bound (main-thread ELU 0.9–1.0).
+
+| Server (c=16) | req/s | p99 ms | Host RPCs per request | Server CPU ms per request |
+| --- | ---: | ---: | ---: | ---: |
+| Plain Node `http` (reference, client-bound) | 14,280–14,617 | 2.5 | — | 0.04 |
+| Hono + Lean handler | 5,659–5,683 | 6.4 | 4.4 | 0.44 |
+| Express + Lean handler | 4,551–4,632 | 6.8 | 4.3 | 0.44 |
+| `Std.Http` | 1,207–1,226 | 17 | 28.8 | 4.6 |
+| `Std.Http` without the `Date` header (`generateDate := false`) | 1,379–1,397 | 15 | 21.5 | 4.7 |
+
+At one connection: Hono/Express 1,900–2,100 req/s (p99 0.9 ms), `Std.Http` 313–315
+(p99 5.2 ms).
+
+**Why `Std.Http` is slower: per-request host round trips, not Lean compute.**
+Sockets and timers live on Node's main thread, and every operation on them from
+a Lean thread is a host call that Node's main thread serves (about 30 µs of
+main-thread time each under load). Per keep-alive request, `Std.Http` makes:
+
+- 8 asynchronous operation starts (op 94: socket wait and receive, timer start, send);
+- 7.5 timer operations: create (70), next (71) and cancel (75), from the
+  header/keep-alive timeouts that every select loop arms and cancels;
+- 2.5 receive cancellations (58), the losing branch of each select;
+- about 7 for the `Date` header (`DateTime.nowAt "UTC"` reads the time-zone file:
+  open, stat, read, close, environment) plus releases and completion batches.
+
+With Express or Hono, Node parses HTTP itself and Lean runs only the handler:
+about 4.4 host calls per request (read the request, answer, the callback reply).
+The main thread saturates in both cases, so throughput follows the number of
+host calls per request. On the same host, native Lean's own `Std.Http` server
+serves about 2,200 req/s ([performance work](#performance-work-2026-10-19)), so
+Lasm runs `Std.Http` at about 55–60 % of native; the gap to Node comes mostly
+from `Std.Http`'s design (timers and selects per request) multiplied by the
+host-call cost.
+
+**Cheap fixes considered:**
+- Dropping the `Date` header removes 7.3 calls per request and gains 14 %, but
+  origin servers with a clock must send `Date` (RFC 9110 §6.6.1). Not applied;
+  applications may set `generateDate := false` themselves.
+- No other change is small. Moving timers into the Lean worker (opportunity 3
+  above) or serving socket waits without a round trip needs runtime work and a
+  re-pin, so it belongs to Phase 7 ("`Std.Http` performance if it stays a
+  recommended path").
+
+Robustness is not the issue: `Std.Http` under Lasm passed load, fault and 900 s
+soak runs on all five targets with candidate `.39310029213`
+([Step 1 gate result](#step-1-gate-result-2026-10-20)).

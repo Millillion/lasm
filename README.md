@@ -293,7 +293,12 @@ fixtures have native-versus-Node tests. **Complete `IO.FS`, `Std.Http`, concurre
 subprocess/signal/terminal parity, every third-party library, and the full Lean
 upstream suite are not release guarantees.** See [IO gaps](https://github.com/Millillion/lasm/blob/main/IO_LIMITATIONS.md)
 and [deployment-size evidence](https://github.com/Millillion/lasm/blob/main/docs/BUNDLE_SIZE.md) for the remaining work.
-**Long-running `Std.Http` servers are not yet production-ready:** with candidate
-`.54`, a server's memory grows with every request until the process is stopped
-(see the [Server MVP robustness results](https://github.com/Millillion/lasm/blob/main/docs/SERVER_MVP.md#step-1-milestone-2-robustness-load-faults-soak)).
-Native Lean's memory stays flat under the same load.
+**HTTP servers: use Express or Hono with Lean handlers for production on Node.**
+`Std.Http` is supported for pure-Lean code that must also build natively. Under Lasm
+it serves about a fifth of the Hono/Express throughput (about 1,200 against
+4,600–5,700 requests per second with 16 connections on Linux x64), because every
+socket, timer and `Date` operation is a round trip to Node's main thread (about 29
+per request, against about 4 for a Lean handler in Express or Hono); details in the
+[launch position](https://github.com/Millillion/lasm/blob/main/docs/SERVER_MVP.md#launch-position-2026-10-23).
+Candidate `.54` leaked memory on every `Std.Http` request; candidate `.39310029213`
+and later fixed it and passed load, fault and soak tests on all five targets.
