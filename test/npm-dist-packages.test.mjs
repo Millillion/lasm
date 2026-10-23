@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { releaseVersion, toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, maximumPackageBytes } from '../scripts/npm-dist/packages.mjs';
+import { releaseVersion, toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, maximumPackageBytes,
+  cTierLicense, createPackageJson, createPackageLicense } from '../scripts/npm-dist/packages.mjs';
+import { leanDistribution } from '../src/managed-lean.mjs';
 import { validateNpmToolManifest, npmEntryFor } from '../src/npm-artifacts.mjs';
 
 const json = async path => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
@@ -10,6 +12,8 @@ const catalogs = async () => ({ toolchains: await json('../src/toolchains.json')
 
 test('package versions come from the immutable release that published each archive', () => {
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v1/x.tar.zst'), '4.35.0-lasm.1');
+  assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v1/x.tar.zst'), '4.35.0-lasm.1');
+  assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v2/x.tar.zst'), '4.35.0-lasm.2');
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/emscripten-6.0.9-lasm-toolchain-v2/x'), '6.0.9-lasm.2');
   assert.equal(releaseVersion('https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/x.tar.gz'), '2.53.0-dugite.4');
   assert.throws(() => releaseVersion('https://example.com/releases/download/latest/x'), /No package version rule/);
@@ -23,8 +27,9 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
     assert.deepEqual(by('optional'), ['darwin-arm64', 'darwin-x64', 'linux-arm64', 'linux-x64', 'win32-x64']
       .flatMap(p => [`@lasm/emscripten-${p}`, `@lasm/lean-${p}`]).sort());
     assert.deepEqual(by('required'), ['@lasm/emscripten-shared', '@lasm/lean-core-init', '@lasm/lean-core-std']);
+    const cTier = c.toolchains.lean[lean].tiers.c ? Object.keys(c.toolchains.lean[lean].tiers.c).map(p => `@lasm/lean-c-${p}`) : [];
     assert.deepEqual(by('demand'), ['@lasm/git-darwin-arm64', '@lasm/git-darwin-x64', '@lasm/git-linux-arm64', '@lasm/git-linux-x64',
-      '@lasm/git-win32-x64', '@lasm/lean-ext-elab', '@lasm/lean-ext-meta', '@lasm/lean-ext-rest']);
+      '@lasm/git-win32-x64', ...cTier, '@lasm/lean-ext-elab', '@lasm/lean-ext-meta', '@lasm/lean-ext-rest'].sort());
     for (const pkg of packages) {
       assert.ok(pkg.artifact.bytes <= maximumPackageBytes);
       const metadata = toolPackageJson(pkg);
@@ -34,6 +39,11 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
       if (pkg.platform) assert.deepEqual([...metadata.os, ...metadata.cpu], pkg.platform.split('-'));
       else assert.equal(metadata.os, undefined);
       assert.match(toolPackageReadme(pkg), new RegExp(pkg.artifact.sha256));
+      if (pkg.name.includes('/lean-c-')) {
+        assert.equal(metadata.license, cTierLicense(pkg.platform));
+        assert.deepEqual(metadata.files, [pkg.artifact.name, 'README.md', 'licenses']);
+        assert.equal(pkg.notices.bin.sha256, c.toolchains.lean[lean].tiers.bin[pkg.platform].sha256);
+      } else assert.equal(metadata.license, 'SEE LICENSE IN README.md');
     }
     // Shared Emscripten packages keep one version across Lean releases.
     assert.equal(packages.find(p => p.name === '@lasm/emscripten-shared').version, '6.0.9-lasm.1');
@@ -41,6 +51,40 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
   const scoped = toolPackages({ lean: '4.35.0', ...c, git: undefined, scope: '@example-org' });
   assert.ok(scoped.every(p => p.name.startsWith('@example-org/') && !p.name.includes('git-')));
   assert.throws(() => toolPackages({ lean: '4.35.0', ...c, scope: 'lasm' }));
+});
+
+test('C tier packages carry an SPDX expression of every component', () => {
+  const linux = cTierLicense('linux-x64');
+  for (const id of ['Apache-2.0 WITH LLVM-exception', 'LGPL-2.1-or-later', 'GPL-2.0-only WITH Linux-syscall-note', '(LGPL-3.0-or-later OR GPL-2.0-or-later)', 'MIT', 'Zlib'])
+    assert.ok(linux.includes(id), id);
+  assert.ok(cTierLicense('win32-x64').includes('ZPL-2.1') && cTierLicense('win32-x64').includes('MIT AND BSD-3-Clause'));
+  assert.ok(!cTierLicense('darwin-arm64').includes('LGPL-2.1'), 'macOS carries no C library headers');
+  assert.equal(cTierLicense('linux-arm64'), linux);
+  // A conjunction of SPDX identifiers and WITH exceptions; OR only inside parentheses.
+  for (const platform of ['linux-x64', 'darwin-x64', 'win32-x64'])
+    for (const term of cTierLicense(platform).split(' AND ')) assert.match(term, /^(?:[A-Za-z0-9.+-]+(?: WITH [A-Za-z0-9.-]+)?|\([A-Za-z0-9.+-]+ OR [A-Za-z0-9.+-]+\))$/, term);
+});
+
+test('the C tier Lasm provisions is the archive its npm package carries', async () => {
+  const c = await catalogs();
+  const packages = toolPackages({ lean: '4.35.0', ...c });
+  const packed = Object.fromEntries(packages.map((p, i) => [p.name, { integrity: 'sha512-' + Buffer.alloc(64, i).toString('base64') }]));
+  const manifest = validateNpmToolManifest(npmToolManifest(packages, packed));
+  for (const platform of ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64', 'win32-x64']) {
+    // As provisionLean({ native: true }) passes it to provisionArtifact.
+    const { name, url, sha256, bytes, format, root, maximumExtractedBytes } = leanDistribution(c.toolchains.lean['4.35.0'], platform).c;
+    const entry = npmEntryFor(manifest, { name, url, sha256, bytes, format, root, maximumExtractedBytes });
+    assert.deepEqual([entry.package, entry.version, entry.install, entry.platform], [`@lasm/lean-c-${platform}`, '4.35.0-lasm.1', 'demand', platform]);
+  }
+});
+
+test('create-lasm pins the CLI exactly and is MIT', () => {
+  const meta = createPackageJson({ name: '@lasm/cli', version: '0.1.0' }, { engines: { node: '>=24' } });
+  assert.deepEqual([meta.name, meta.version, meta.license, meta.bin], ['create-lasm', '0.1.0', 'MIT', { 'create-lasm': 'bin.mjs' }]);
+  assert.deepEqual(meta.dependencies, { '@lasm/cli': '0.1.0' });
+  assert.equal(meta.scripts, undefined);
+  assert.match(createPackageLicense(2026), /^MIT License\n\nCopyright \(c\) 2026 Jordan Last\n/);
+  assert.throws(() => createPackageJson({ name: '@lasm/cli', version: '^0.1.0' }));
 });
 
 test('the runtime manifest and main package pin every tool package exactly', async () => {

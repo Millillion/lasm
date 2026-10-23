@@ -806,10 +806,13 @@ receipt now also records the source (`npm-installed`, `npm-fetched` or `https`).
 | `@lasm/emscripten-shared` | `dependencies` | Emscripten JavaScript subset and sysroot |
 | `@lasm/lean-ext-meta`, `-ext-elab`, `-ext-rest` | never installed; `npm pack` on demand | extended Lean tier |
 | `@lasm/git-<platform>` | never installed; `npm pack` on demand | Git (dugite-native), Lake projects only |
+| `@lasm/lean-c-<platform>` | never installed; `npm pack` on demand | C tier (Lean's clang as `cc`, C library headers, link libraries), Lake projects with C code only; also `licenses/` with the archive's notices and Lean's LICENSE/LICENSES, and an SPDX `license` expression of every component (added 2026-10-23) |
+| `create-lasm` | separate package (`npm create lasm`), exact dependency on the CLI | runs `lasm init` with the arguments unchanged; same version as `@lasm/cli` (added 2026-10-23) |
 
 Lean and Emscripten are separate packages, not one `tools-<platform>` package, so
 each keeps its own version: a package's version comes from the immutable release
-that published its archive (`lean-4.34.1-tiers-v1` → `4.34.1-lasm.1`,
+that published its archive (`lean-4.34.1-tiers-v1` → `4.34.1-lasm.1`, C tier
+`lean-4.35.0-c-v1` → `4.35.0-lasm.1`,
 `emscripten-6.0.9-lasm-toolchain-v1` → `6.0.9-lasm.1`, dugite `v2.53.0-4` →
 `2.53.0-dugite.4`). A Lean upgrade then republishes only the Lean packages, and
 users' npm caches keep the unchanged toolchain. The CLI pins every installed tool
@@ -834,7 +837,7 @@ by `provisionArtifact` before its download):
   download directly; for offline mirrors and validation), `https` (ignore packages,
   the earlier behavior). A source checkout has no manifest and always downloads.
 
-**On demand through npm.** When a build needs the extended tier or Git, Lasm runs
+**On demand through npm.** When a build needs the extended tier, the C tier or Git, Lasm runs
 the user's npm without a shell: the `npm-cli.js` beside `npm_execpath` (npm and npx
 set it), else the one shipped beside Node, else `npm` on `PATH` (on Windows the
 `npm-cli.js` beside `npm.cmd`). It runs `npm pack <name>@<version> --pack-destination

@@ -2,7 +2,8 @@ name: npm distribution (local registry)
 # Maintainer-only (docs/TOOLCHAIN_SLIMMING.md, Phase 3). On each native runner:
 # build every npm package deterministically from the catalog's release assets and
 # a packed Lasm candidate, publish them to a private loopback Verdaccio registry
-# (no uplinks), and install and build from it in empty directories with an empty
+# (no uplinks; the hono template's two pinned dependencies are copied in, checked
+# against registry.npmjs.org), and install and build from it in empty directories with an empty
 # Lasm tool cache, LASM_ARTIFACT_SOURCE=npm (no direct downloads) and a network
 # audit that blocks every non-loopback request. Nothing is published anywhere else.
 #
@@ -79,7 +80,7 @@ jobs:
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: Unit tests (source resolution, fix messages, package layout)
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/npm-unit-resources.json -- node --test --test-concurrency=1 test/npm-artifacts.test.mjs test/npm-dist-packages.test.mjs test/managed-artifacts.test.mjs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/npm-unit-resources.json -- node --test --test-concurrency=1 test/npm-artifacts.test.mjs test/npm-dist-packages.test.mjs test/create-lasm.test.mjs test/managed-artifacts.test.mjs
       - name: Fetch and verify the retained candidate
         env:
           GH_TOKEN: ${{ github.token }}
@@ -98,10 +99,10 @@ jobs:
       - name: Start a loopback Verdaccio and publish to it
         run: |
           node scripts/npm-dist/registry.mjs start --dir "$RUNNER_TEMP/verdaccio" --port 4873
-          node scripts/npm-dist/registry.mjs publish --dir "$RUNNER_TEMP/verdaccio" --dist .work/npm-dist/build
+          node scripts/npm-dist/registry.mjs publish --dir "$RUNNER_TEMP/verdaccio" --dist .work/npm-dist/build --mirror-template hono
       - name: Install from the registry and build (empty caches, npm only, non-loopback requests blocked)
         run: |
-          for scenario in installed lake npx init omit-optional foreign-lock; do
+          for scenario in installed lake c-tier npx init create omit-optional foreign-lock; do
             node scripts/full-lean/run-bounded.mjs --memory-mib "$MEMORY" --report ".work/npm-consumer-$scenario-resources.json" -- \
               node scripts/npm-dist/consumer.mjs --registry http://127.0.0.1:4873/ --dist .work/npm-dist/build --work "$RUNNER_TEMP/consumer" --scenario "$scenario"
           done

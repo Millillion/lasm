@@ -19,6 +19,15 @@ The package is experimental and **has not been published to npm**.
 
 ## Get started
 
+Once `@lasm/cli` 0.1.0 is published (**not yet**), a new project starts with
+
+```sh
+npm create lasm@latest my-app -- --template hono   # or: npx @lasm/cli init my-app --template hono
+cd my-app && npm install && npm run dev
+```
+
+as in [Getting started](docs/GETTING_STARTED.md). Until then:
+
 On a supported Linux, Mac, or Windows machine, get the tested `.46` tarball in the
 [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
 from a maintainer (repository access may be required). Copy it into an empty directory:
@@ -79,11 +88,14 @@ versions: …` and the pin is left unchanged. Current source has a per-package
 [compatibility list](https://github.com/Millillion/lasm/blob/main/docs/COMPATIBILITY.md) (Batteries, Cli, LSpec,
 Plausible, Aesop, Qq, leansqlite, UnicodeBasic, MD4Lean, lean-zip, lean4-parser, lean-redis
 and others); packages not on it are untested.
-After an authorized npm release, installation will be `npm install @lasm/cli`
-(or `npx @lasm/cli Main.lean` without installing); the bin stays `lasm`. That
-registry command is **not available yet**. Current source, not yet in a candidate,
+After an authorized npm release, `npm create lasm` (the `create-lasm` package runs
+`lasm init` of the same `@lasm/cli` version with the arguments unchanged) creates
+projects, and installation is `npm install @lasm/cli` (or `npx @lasm/cli Main.lean`
+without installing); the bin stays `lasm`. These registry commands are **not
+available yet**. Current source, not yet in a candidate,
 can take its build tools from exact-pinned `@lasm/…` npm packages instead of
-downloading them, and fetches the Lake/`Lean`-import data and Git with your own
+downloading them, and fetches the Lake/`Lean`-import data, the C tier
+(`@lasm/lean-c-<platform>`, only for Lake projects with C code) and Git with your own
 npm on first use; this was validated only against a local test registry
 ([npm distribution](docs/TOOLCHAIN_SLIMMING.md#phase-3-2026-10-16-npm-distribution)).
 `LASM_ARTIFACT_SOURCE=npm` forbids direct downloads; `https` ignores the packages.
@@ -102,7 +114,7 @@ These are all commands and options in the ordinary Node application interface:
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
-| New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
+| New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono`; after publication also `npm create lasm@latest my-app -- --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
 | Cache repair (new source; absent from `.46`) | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
 `--rebuild` and `--verbose` work with both run and build. `--output` is build-only;
@@ -231,7 +243,9 @@ characters still fails to build. Per-platform results:
   `meta import`. `--verbose` shows how many initializers were skipped.
 - C source that a package bundles (`extern_lib`, `moreLinkObjs`, for example
   leansqlite's SQLite) is compiled for Node with Lasm's compiler. Lake still builds
-  that C natively first; Lasm then downloads a "C tier" once (39–52 MB): Lean's own
+  that C natively first; Lasm then fetches a "C tier" once (39–52 MB; from the
+  `@lasm/lean-c-<platform>` npm package in an npm installation, else the
+  `lean-4.35.0-c-v1` GitHub release): Lean's own
   clang, which becomes Lake's default `cc`, its linker and headers, and C library
   headers. No system C compiler is needed. On Linux and Windows nothing else is
   needed either; on macOS the C library headers come from the Xcode Command Line
@@ -372,3 +386,8 @@ and, with npm interop, each npm package's own files including its license under
 license terms and for GNU MP's LGPL terms. Managed tools downloaded by Lasm (Lean,
 the link toolchain, the C tier, Git) keep their upstream license files in the
 tool cache, and the archives Lasm repackages add a `lasm-notices/` directory.
+The `@lasm/lean-c-<platform>` npm packages also carry the C tier's notices in
+`licenses/` (LLVM Apache-2.0 WITH LLVM-exception; on Linux glibc LGPL-2.1-or-later
+and the Linux UAPI headers' GPL-2.0-only WITH Linux-syscall-note; on Windows
+MinGW-w64 and winpthreads; Lean's LICENSE and LICENSES; libuv) and an SPDX
+`license` expression listing every component. `create-lasm` is MIT.

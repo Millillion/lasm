@@ -72,7 +72,9 @@ Approved at the Phase 3 review ([PLAN.md](PLAN.md#language-coverage-phases-appro
   darwin-arm64 39.3 / 176 MB, win32-x64 51.8 / 314 MB, instead of the complete release
   (560–620 MB compressed). The native check compiles C using the C library, OS APIs and
   compiler intrinsics and requires every header to come from the prefix (or the macOS SDK);
-  it found and fixed a host MinGW leaking into Windows compiles.
+  it found and fixed a host MinGW leaking into Windows compiles. Since 2026-10-23 (current
+  source) the same archives are also the npm packages `@lasm/lean-c-<platform>`
+  (`4.35.0-lasm.1`), fetched on demand by an npm installation, with the release as fallback.
 - **Results.** Candidate `0.1.0-experimental.39815056197` (source `7eb24a3`) passed five-platform
   installed acceptance (run [39815056197](https://github.com/Millillion/lasm/actions/runs/39815056197));
   the ecosystem re-check gives the same statuses as above on all five targets, now with the C

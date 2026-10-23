@@ -1,7 +1,9 @@
 // Maintainer packaging for npm distribution (docs/TOOLCHAIN_SLIMMING.md, Phase 3).
 // Produces, deterministically, one npm tarball per tool package (each carrying a
-// catalog archive byte for byte) and the main package, which pins every tool
-// package to an exact version and carries src/npm-tools.json. Never publishes.
+// catalog archive byte for byte; C tier packages also carry its licence files),
+// the main package, which pins every tool package to an exact version and carries
+// src/npm-tools.json, and create-lasm (packages/create-lasm), which pins the main
+// package. Never publishes.
 //
 //   node scripts/npm-dist/build.mjs --base CANDIDATE.tgz --out DIR --step plan [--overlay-source]
 //     [--scope @lasm] [--version V] [--license MIT] [--no-git]
@@ -24,10 +26,14 @@ import { join, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { x as extractTar } from 'tar';
+import { pipeline } from 'node:stream/promises';
+import { createReadStream } from 'node:fs';
+import { createZstdDecompress } from 'node:zlib';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { downloadArtifact } from '../../src/managed-download.mjs';
 import { findNpm, archiveFileName } from '../../src/npm-artifacts.mjs';
-import { toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, defaultScope, maximumPackageBytes } from './packages.mjs';
+import { toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, defaultScope, maximumPackageBytes, noticeDirectory,
+  createPackageJson, createPackageLicense } from './packages.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values: args } = parseArgs({ options: {
@@ -91,11 +97,9 @@ async function packTwice(directory, name) {
     entryCount: first.entryCount };
 }
 
-if (args.step === 'package') {
-  const pkg = plan.packages.find(p => p.name === args.only);
-  assert.ok(pkg, `No planned package ${args.only}`);
-  // The release asset, verified exactly as Lasm verifies it.
-  const artifact = pkg.artifact, name = archiveFileName(artifact), assets = resolve(args.assets);
+/** A release asset in the assets directory, verified exactly as Lasm verifies it. */
+async function releaseAsset(artifact) {
+  const name = archiveFileName(artifact), assets = resolve(args.assets);
   await mkdir(assets, { recursive: true });
   const file = join(assets, name);
   const valid = async path => existsSync(path) && (await stat(path)).size === artifact.bytes && await hashFile(path) === artifact.sha256;
@@ -111,10 +115,45 @@ if (args.step === 'package') {
   }
   // npm pack records the file mode (0600 from a download, 0644 from a copy), so fix it.
   await chmod(file, 0o644);
+  return file;
+}
+
+/** Copy regular files under `prefix` of a verified tar.zst archive into `destination`, verbatim. */
+async function copyArchiveFiles(file, root, members, destination) {
+  const wanted = new Map(members.map(([from, to]) => [`${root}/${from}`, to]));
+  const found = new Set(), staging = destination + '.extract';
+  await rm(staging, { recursive: true, force: true }); await mkdir(staging, { recursive: true });
+  const select = name => [...wanted.keys()].some(key => key.endsWith('/') ? name.startsWith(key) : name === key);
+  await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: staging, strict: true, preservePaths: false, preserveOwner: false,
+    filter: (name, header) => { const keep = header.type === 'File' && select(name); if (keep) found.add(name); return keep; } }));
+  for (const [from, to] of wanted) {
+    const hits = [...found].filter(name => from.endsWith('/') ? name.startsWith(from) : name === from);
+    assert.ok(hits.length, `${basename(file)} lacks ${from}`);
+    for (const hit of hits) {
+      const target = join(destination, to, from.endsWith('/') ? hit.slice(from.length) : '');
+      await mkdir(join(target, '..'), { recursive: true });
+      await rename(join(staging, hit), target);
+      await chmod(target, 0o644);
+    }
+  }
+  await rm(staging, { recursive: true });
+}
+
+if (args.step === 'package') {
+  const pkg = plan.packages.find(p => p.name === args.only);
+  assert.ok(pkg, `No planned package ${args.only}`);
+  const artifact = pkg.artifact, name = archiveFileName(artifact), file = await releaseAsset(artifact);
   const directory = join(out, 'staging', pkg.name.replace('/', '__'));
   await rm(directory, { recursive: true, force: true });
   await mkdir(directory, { recursive: true });
   try { await link(file, join(directory, name)); } catch { await copyFile(file, join(directory, name)); }
+  if (pkg.notices) {
+    // The C tier's own notices, and the licences of the Lean release its files come from.
+    const notices = join(directory, noticeDirectory), bin = pkg.notices.bin;
+    await copyArchiveFiles(file, artifact.root, [[`lasm-notices/${artifact.root}/`, artifact.root]], notices);
+    await copyArchiveFiles(await releaseAsset(bin), bin.root, [['LICENSE', 'lean/LICENSE'], ['LICENSES', 'lean/LICENSES'],
+      [`lasm-notices/${bin.root}/libuv-LICENSE`, 'libuv/LICENSE'], [`lasm-notices/${bin.root}/libuv-LICENSE-extra`, 'libuv/LICENSE-extra']], notices);
+  }
   await writeFile(join(directory, 'package.json'), JSON.stringify(toolPackageJson(pkg), null, 2) + '\n');
   await writeFile(join(directory, 'README.md'), toolPackageReadme(pkg));
   const packed = await packTwice(directory, pkg.name);
@@ -159,6 +198,16 @@ if (args.step === 'main') {
   await writeFile(join(main, 'src/npm-tools.json'), JSON.stringify(npmToolManifest(plan.packages, packed), null, 2) + '\n');
   await writeFile(join(main, 'package.json'), JSON.stringify(mainPackageJson(basePackage, plan.packages, plan.main), null, 2) + '\n');
   const mainPacked = await packTwice(main, plan.main.name);
+  // create-lasm, in lockstep with the CLI (packages/create-lasm).
+  const create = join(out, 'staging', 'create');
+  await rm(create, { recursive: true, force: true });
+  await mkdir(create, { recursive: true });
+  for (const name of ['bin.mjs', 'create.mjs', 'README.md']) await copyFile(join(root, 'packages/create-lasm', name), join(create, name));
+  await chmod(join(create, 'bin.mjs'), 0o755);
+  await writeFile(join(create, 'LICENSE'), createPackageLicense(2026));
+  const createMeta = createPackageJson(plan.main, { engines: basePackage.engines });
+  await writeFile(join(create, 'package.json'), JSON.stringify(createMeta, null, 2) + '\n');
+  const createPacked = await packTwice(create, createMeta.name);
   await rm(directory, { recursive: true });
   await rm(join(out, 'staging'), { recursive: true, force: true });
   const record = {
@@ -166,9 +215,10 @@ if (args.step === 'main') {
     host: `${process.platform}-${process.arch}`, node: process.versions.node, npm: runNpm(['--version']).trim(), reproduciblePacking: true,
     base: { file: basename(plan.base.file), sha256: plan.base.sha256, version: plan.base.version }, overlay,
     main: { ...plan.main, ...mainPacked },
+    create: { name: createMeta.name, version: createMeta.version, license: createMeta.license, ...createPacked },
     packages: plan.packages.map(pkg => ({ name: pkg.name, version: pkg.version, install: pkg.install, platform: pkg.platform,
       artifact: { name: pkg.artifact.name, sha256: pkg.artifact.sha256, bytes: pkg.artifact.bytes }, ...packed[pkg.name] })),
   };
   await writeFile(join(out, 'npm-dist.json'), JSON.stringify(record, null, 2) + '\n');
-  console.log(JSON.stringify({ main: record.main, packages: record.packages.map(p => [p.name, p.version, p.install, p.size]) }, null, 2));
+  console.log(JSON.stringify({ main: record.main, create: record.create, packages: record.packages.map(p => [p.name, p.version, p.install, p.size]) }, null, 2));
 }

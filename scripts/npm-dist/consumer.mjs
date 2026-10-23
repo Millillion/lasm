@@ -9,14 +9,19 @@
 //   installed      npm install @lasm/cli@V in an empty project, then npx lasm Main.lean (empty Lasm cache)
 //   lake           a Lake project in the `installed` project (extended Lean tier and Git fetched on demand)
 //   npx            npx --yes @lasm/cli@V Main.lean in an empty directory (empty npm and Lasm caches)
+//   c-tier         a Lake project with bundled C (scripts/ecosystem/projects/extern-lib) in the `installed`
+//                  project: Lean's C tier must come from @lasm/lean-c-<platform>, fetched on demand
 //   init           npx --yes @lasm/cli@V init app --template plain, then npm install, npm run build, node dist/main.mjs
+//   create         npm create lasm@V app -- --template hono, then npm install, npm run build, the server and HTTP
+//                  requests (registry.mjs publish --mirror-template hono supplies hono and @hono/node-server)
 //   omit-optional  npm install --omit=optional: Lasm must fail with the exact fix; the fix must repair it
 //   foreign-lock   lockfile created for another OS (npm --os/--cpu), then npm ci on this host
 //   pnpm           pnpm add @lasm/cli@V (--pnpm path to the pnpm CLI script); package resolution only
 import assert from 'node:assert/strict';
 import { parseArgs } from 'node:util';
-import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, rmSync, appendFileSync, statSync } from 'node:fs';
+import { spawnSync, spawn } from 'node:child_process';
+import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, rmSync, appendFileSync, statSync, cpSync } from 'node:fs';
+import { createServer } from 'node:net';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { findNpm } from '../../src/npm-artifacts.mjs';
@@ -40,7 +45,7 @@ const npxCli = join(dirname(npmCli), 'npx-cli.js');
 // Empty npm and Lasm caches per scenario; the Lake scenario continues the installed project,
 // and init reuses its caches (a fresh extraction of every tool again filled the guard's
 // budget with page cache on the 6 GiB Linux setting; empty caches are covered by installed and npx).
-const cacheName = ['lake', 'init'].includes(args.scenario) ? 'installed' : args.scenario;
+const cacheName = ['lake', 'c-tier', 'init', 'create'].includes(args.scenario) ? 'installed' : args.scenario;
 const preload = join(root, 'scripts/npm-dist/network-audit.cjs');
 function environment(extra = {}) {
   const env = { ...process.env };
@@ -134,6 +139,26 @@ if (args.scenario === 'installed' || args.scenario === 'lake') {
   if (args.scenario === 'lake') assert.ok(kinds.has('npm-fetched'), 'On-demand packages were fetched with npm');
 }
 
+if (args.scenario === 'c-tier') {
+  // Bundled C: Lake compiles c/ctable.c natively with Lean's clang from the C tier package.
+  const app = join(work, 'installed', 'extern-lib');
+  assert.ok(!existsSync(app), `Use a new work directory: ${app}`);
+  cpSync(join(root, 'scripts/ecosystem/projects/extern-lib'), app, { recursive: true, filter: file => !file.endsWith('project.json') });
+  const result = npxRun('npx lasm (Lake project with bundled C)', ['lasm', 'Main.lean'], { cwd: app });
+  assert.match(result.stdout, /twice 7 = 14\r?\nsquare 7 = 49\r?\nscaled 7 = 21/);
+  report.build = result.seconds;
+  report.receipts = receipts();
+  const kinds = new Set(report.receipts.map(r => r.source?.kind));
+  assert.ok(!kinds.has('https') && !kinds.has(undefined), 'Every tool came from npm');
+  const cPackage = record.packages.find(p => p.name === `${record.scope}/lean-c-${host}`);
+  assert.ok(cPackage, `No C tier package for ${host}`);
+  const c = report.receipts.find(r => r.artifact === cPackage.artifact.name);
+  assert.ok(c, 'The C tier was installed');
+  assert.deepEqual([c.source.kind, c.source.package, c.source.version], ['npm-fetched', cPackage.name, cPackage.version],
+    'The C tier came from its npm package');
+  report.cTier = { package: `${cPackage.name}@${cPackage.version}`, source: c.source };
+}
+
 if (args.scenario === 'npx') {
   const directory = join(work, 'npx-empty');
   mkdirSync(directory, { recursive: true });
@@ -158,6 +183,53 @@ if (args.scenario === 'init') {
   report.build = npmRun('npm run build', ['run', 'build'], { cwd: app }).seconds;
   const result = run('node dist/main.mjs Ada', process.execPath, [join(app, 'dist', 'main.mjs'), 'Ada'], { cwd: app });
   assert.match(result.stdout, /Hello, Ada, from Lean!/);
+  report.receipts = receipts();
+  const kinds = new Set(report.receipts.map(r => r.source?.kind));
+  assert.ok(!kinds.has('https') && !kinds.has(undefined), 'Every tool came from npm');
+}
+
+if (args.scenario === 'create') {
+  // The first command of the getting-started guide: npm create lasm, then a Hono server.
+  assert.ok(record.create, 'This build has no create-lasm package');
+  const directory = join(work, 'create-empty');
+  mkdirSync(directory, { recursive: true });
+  npmRun('npm create lasm', ['create', '--yes', `lasm@${record.create.version}`, 'app', '--', '--template', 'hono'], { cwd: directory });
+  const app = join(directory, 'app');
+  const manifest = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8'));
+  assert.deepEqual(manifest.devDependencies, { [record.main.name]: record.main.version }, 'create-lasm scaffolds with the pinned CLI');
+  assert.ok(manifest.dependencies?.hono, 'The hono template');
+  report.install = npmRun('npm install (created app)', ['install'], { cwd: app }).seconds;
+  report.build = npmRun('npm run build', ['run', 'build'], { cwd: app }).seconds;
+  const port = await new Promise((done, fail) => {
+    const server = createServer().once('error', fail);
+    server.listen(0, '127.0.0.1', () => { const { port } = server.address(); server.close(() => done(port)); });
+  });
+  const child = spawn(process.execPath, [join(app, 'dist', 'main.mjs')], { cwd: app, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true,
+    env: environment({ HOST: '127.0.0.1', PORT: String(port) }) });
+  let output = '';
+  const exited = new Promise(done => child.once('exit', (code, signal) => done({ code, signal })));
+  try {
+    await new Promise((done, fail) => {
+      const timer = setTimeout(() => fail(new Error(`The server did not start within 120 s:\n${output}`)), 120_000);
+      const check = text => { output += text; if (/Listening on http:\/\/127\.0\.0\.1:\d+/.test(output)) { clearTimeout(timer); done(); } };
+      child.stdout.setEncoding('utf8').on('data', check); child.stderr.setEncoding('utf8').on('data', check);
+      child.once('exit', code => { clearTimeout(timer); fail(new Error(`The server exited (${code}):\n${output}`)); });
+    });
+    report.requests = [];
+    for (const [path, expected] of [['/', { message: 'Hello from Lean on Hono!' }], ['/hello/Ada', { message: 'Hello, Ada, from Lean!' }],
+      ['/health', { ok: true }]]) {
+      const response = await fetch(`http://127.0.0.1:${port}${path}`, { signal: AbortSignal.timeout(30_000) });
+      const body = await response.text();
+      assert.equal(response.status, 200, `${path}: ${body}`);
+      assert.deepEqual(JSON.parse(body), expected, path);
+      report.requests.push({ path, status: response.status, body });
+    }
+  } finally {
+    if (child.exitCode === null) child.kill('SIGTERM');
+    await Promise.race([exited, new Promise(done => setTimeout(done, 15_000))]);
+    if (child.exitCode === null) child.kill('SIGKILL');
+    appendFileSync(log, `\n=== server output\n${output}\n`);
+  }
   report.receipts = receipts();
   const kinds = new Set(report.receipts.map(r => r.source?.kind));
   assert.ok(!kinds.has('https') && !kinds.has(undefined), 'Every tool came from npm');

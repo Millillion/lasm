@@ -12,6 +12,7 @@ const npm = {
   express: { express: '5.2.1' },
   hono: { '@hono/node-server': '2.1.3', hono: '4.13.13' },
 };
+export const templateDependencies = npm;
 
 export const templates = {
   plain: { summary: 'a Lean program (IO only)', server: false, interop: false },

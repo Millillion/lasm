@@ -106,7 +106,14 @@ built by the tier workflow from the pinned Lean archives and
 [`c-tier-sources.json`](../scripts/lean-dist/c-tier-sources.json)) holds Lean's clang,
 installed as `bin/cc` so that Lake's default compiler (`buildO`, `compileO`) is Lean's
 clang, its linker and archiver, Lean's and clang's complete headers, the link
-libraries, and C library headers:
+libraries, and C library headers. An npm installation fetches it on first use with
+your own npm from the exact-pinned `@lasm/lean-c-<platform>` package (`4.35.0-lasm.1`,
+the same archive byte for byte, with its licence notices in `licenses/`), as it does
+the Lake data tiers and Git, and falls back to the GitHub release under
+`LASM_ARTIFACT_SOURCE=auto`; `npm` forbids that fallback and `https` (or a source
+checkout) always downloads from the release. The archive's SHA-256 and size are
+checked either way (current source, not yet in a candidate; rehearsed against a
+local registry, [npm-dist.yml](../.github/workflows/npm-dist.yml) scenario `c-tier`):
 
 | Host | Download (unpacked) | C library headers | Needed from the OS |
 | --- | --- | --- | --- |
