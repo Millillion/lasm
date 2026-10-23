@@ -1,5 +1,16 @@
 # Local compiler release packaging
 
+> **Historical (superseded).** This page describes the retired `0.1.0-experimental.3`
+> packaging (Lean 4.32.0, a Zig-built target, `npm run package:release`). None of it
+> applies to current Lasm: Lean 4.35.0, Lasm-managed tools, no Zig, and candidates
+> built and accepted by [`node-linux-acceptance.yml`](../.github/workflows/node-linux-acceptance.yml).
+> Its "`UNLICENSED`" statement is also obsolete: the repository is under the MIT
+> [LICENSE](../LICENSE). Current documents: [README](../README.md) (install, CLI,
+> supported environments), [NODE_ACCEPTANCE.md](NODE_ACCEPTANCE.md) (accepted
+> candidates), [INSTALLATION_HARDENING.md](INSTALLATION_HARDENING.md#candidate-inputs-and-release-gates)
+> (release gates) and [DEPLOYMENT.md](DEPLOYMENT.md). Kept unchanged below for history.
+
+
 Building requires **Node 24+ with npm and the complete official Lean 4.32.0
 distribution**, including Lake and its bundled Clang/LLD (Lean commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`). No separate C SDK, Zig, Python, or

@@ -171,8 +171,9 @@ npm start            # runs it with Node only (node dist/main.mjs)
 ```
 
 `dist/` contains the WebAssembly program, its Node launcher and the production
-`node_modules`. Copy it to a machine with Node 24+ and the same OS and
-architecture, or use the generated `Dockerfile`:
+`node_modules`. Copy it to a machine with Node 24+: Linux x64 or arm64 (glibc 2.28
+or newer) from a build on any platform, or the build machine's own OS and
+architecture ([DEPLOYMENT.md](DEPLOYMENT.md)). Or use the generated `Dockerfile`:
 
 ```sh
 docker build -t my-app .

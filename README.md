@@ -6,12 +6,13 @@ only supported JavaScript runtime.
 **Start here: [Getting started](docs/GETTING_STARTED.md)** goes from Node and npm to a
 web server with Lean request handlers (Hono or Express), an npm package called from
 Lean, and a container deployment, with [recipes per platform](docs/deploy/README.md).
-It uses `lasm init` from current source (not yet in a candidate).
+It uses `lasm init` from current source (tested in candidates `.55` and later, not yet in an accepted candidate).
 
 **Prerequisites:** stock **Node 26.12.0 with npm 11.20.0** for accepted candidate
 `.54` (Phase 3/4 candidates pin **Node 26.12.1**, same npm). Current source (Phase
 5.1, not yet in an accepted candidate) accepts **Node 24 or newer with npm**, for
-the compiler and for built applications, and is tested on Node 24.22.1 and 26.12.1.
+the compiler and for built applications, and is tested on Node 24.22.1 and 26.12.1
+(the compiler on Node 24 only on Linux; on macOS and Windows on Node 26.12.1).
 Lasm downloads its matching **Lean 4.35.0**, Lake, and build tools; you do not install
 them yourself (the older candidate `.46` used Node 26.10.0 / Lean 4.34.1).
 The package is experimental and **has not been published to npm**.
@@ -101,7 +102,7 @@ These are all commands and options in the ordinary Node application interface:
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
-| New project (current source; not yet in a candidate) | `npx lasm init my-app --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. Writes files only; run `npm install` next. `lasm init --help` lists the templates. |
+| New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
 | Cache repair (new source; absent from `.46`) | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
 `--rebuild` and `--verbose` work with both run and build. `--output` is build-only;
@@ -110,6 +111,17 @@ There is currently no Lasm install, clean, uninstall, or version subcommand.
 Candidate `.46` also accepts a redundant `--target node`; current source removed
 that option, and passing it is an error.
 The source installer also accepts the [documented download environment settings](docs/INSTALLATION_HARDENING.md#transfers).
+
+Environment variables (all optional; set them before `npx lasm …`):
+
+| Variable | Example | Effect |
+| --- | --- | --- |
+| `LASM_TOOLCHAIN_CACHE` | `LASM_TOOLCHAIN_CACHE=/data/lasm-cache npx lasm Main.lean` | Move the managed tool cache ([default locations](docs/NODE_SUPPORT.md)). |
+| `LASM_ARTIFACT_SOURCE` (current source) | `LASM_ARTIFACT_SOURCE=npm npx lasm Main.lean` | `auto` (default): `@lasm/…` npm tool packages when present, else HTTPS; `npm`: never download directly; `https`: ignore the npm packages. |
+| `LASM_DOWNLOAD_ATTEMPTS`, `LASM_DOWNLOAD_CONNECT_MS`, `LASM_DOWNLOAD_IDLE_MS`, `LASM_DOWNLOAD_TOTAL_MS` | `LASM_DOWNLOAD_TOTAL_MS=14400000 npx lasm Main.lean` | Download retries and timeouts ([defaults and ranges](docs/INSTALLATION_HARDENING.md#transfers)). |
+| `NODE_USE_ENV_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, `NODE_EXTRA_CA_CERTS` (Node's own) | `NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://proxy:8080 npx lasm Main.lean` | Proxies and private CAs ([corporate networks](docs/INSTALLATION_HARDENING.md#corporate-networks)). |
+
+Other `LASM_*` variables in the source are maintainer diagnostics, not a supported interface.
 
 The source checkout also retains experimental interfaces. They are **unavailable
 in the Node release candidate**: `node bin/lasm.mjs build examples/basic/lasm.json dist`
@@ -158,10 +170,10 @@ cloud account or deployment. Details, requirements and the full matrix:
 | Platform | Tested in CI with |
 | --- | --- |
 | Linux x64 and arm64 (glibc 2.28+), Node 24+ | Node 24.0.0, 24.22.1 and 26.12.1 on `ubuntu-24.04` and `ubuntu-24.04-arm` |
-| macOS (x64, arm64) | Node 24.22.1 on `macos-15`; installed acceptance with Node 26.12.1 |
-| Windows x64 | installed acceptance with Node 26.12.1 (as accepted today) |
-| Docker / Kubernetes | `node:24-bookworm-slim`, `node:26-bookworm-slim`, `node:24-bullseye-slim` (glibc 2.31), Ubuntu 22.04/24.04 with Node tarballs; read-only, 512 MB, x64 and arm64 |
-| Google Cloud Run, Fly.io, Railway, Render, Heroku | the same container images (container recipes) |
+| macOS (x64, arm64) | arm64: Node 24.22.1 on `macos-15`; x64 and arm64: installed acceptance with Node 26.12.1 (`macos-15-intel`, `macos-15`). Node 24 on macOS x64 is untested. |
+| Windows x64 | installed acceptance with Node 26.12.1 on `windows-2025` (as accepted today). Node 24 on Windows is untested. |
+| Docker / Kubernetes | `node:24-bookworm-slim`, `node:26-bookworm-slim`, `node:24-bullseye-slim` (glibc 2.31), Ubuntu 22.04/24.04 with Node tarballs; read-only, 512 MB, x64 and arm64, with Docker (Kubernetes manifests are not applied in CI) |
+| Google Cloud Run, Fly.io, Railway, Render, Heroku | only the same container images and Dockerfiles (container recipes); the platforms themselves are never deployed to |
 | AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` + AWS Lambda Web Adapter through the Runtime Interface Emulator, x86_64 and arm64; `amazonlinux:2023` |
 
 Every build carries the Linux x64 and arm64 native pieces, so `dist/` built on a
@@ -305,3 +317,50 @@ per request, against about 4 for a Lean handler in Express or Hono); details in 
 [launch position](https://github.com/Millillion/lasm/blob/main/docs/SERVER_MVP.md#launch-position-2026-10-23).
 Candidate `.54` leaked memory on every `Std.Http` request; candidate `.39310029213`
 and later fixed it and passed load, fault and soak tests on all five targets.
+
+## Known limitations
+
+A summary; the sections above and the linked pages have the details.
+
+- **Ahead of time only.** Deployed programs cannot elaborate, evaluate or compile
+  Lean, load module data or plugins, or use Lean's C++ compiler/kernel (the table
+  above). Using Lean as a run-time library beyond pure data (JSON, `Lean.Data.*`)
+  is parked ([plan](docs/PLAN.md)).
+- **Native code.** Prebuilt native libraries (`-l` options, shared libraries)
+  cannot be linked; a package's bundled C source is compiled for Node, and
+  `dlopen` always fails. On macOS, C projects need the Xcode Command Line Tools SDK.
+- **Platforms.** No Windows ARM64, Alpine/musl, browsers, other JavaScript runtimes
+  or isolate platforms. On Windows a `dist\program.wasm` path over 260 characters
+  fails to build, and a `dist/` built on Windows and copied to Linux other than
+  through `docker build` needs `chmod 755 dist/host/native/process/linux-*`
+  ([DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+- **Memory.** Give an application at least 512 MB. It reserves about 22 GB of
+  virtual address space, so hosts that cap virtual memory (`ulimit -v`,
+  `vm.overcommit_memory=2`) refuse it. Node 26's official binary needs
+  `libatomic1` on minimal images that install the Node tarball themselves.
+- **JS/npm interop.** Each JavaScript call crosses to Node's main thread (about
+  25–35 µs). A Lean handler that awaits holds one of Lean's worker threads (about
+  one per CPU), so at most that many handlers wait at once; further requests queue
+  ([JS_BINDINGS.md](docs/JS_BINDINGS.md), [interop soak](docs/INTEROP_SOAK.md)).
+  `Lasm.JS` programs fail natively, and the Lean editor extension does not know
+  `Lasm.JS`.
+- **`Std.Http`** works but serves about 660 requests per second under Lasm; use
+  Express or Hono with Lean handlers for production HTTP.
+- **Lake dependencies over SSH:** the managed Git has no SSH client on Linux; use
+  HTTPS or a configured system SSH ([managed Git](docs/MANAGED_GIT.md)).
+- Complete `IO.FS`, concurrency, subprocess/signal/terminal parity, every
+  third-party package and the full upstream suite are not release guarantees
+  ([language coverage](docs/LANGUAGE_COVERAGE.md)).
+
+## Licenses
+
+Lasm's own source is under the [MIT License](LICENSE). A built `dist/` contains:
+`THIRD_PARTY_NOTICES.txt` with the licenses of the code compiled into
+`program.wasm` (Lean's runtime and standard library, Apache-2.0; Emscripten, LLVM
+libc++/libc++abi, musl, mimalloc, libuv; GNU MP, LGPL-3.0-or-later or GPL-2.0-or-later, statically
+linked as in native Lean executables), koffi's MIT license under `host/native`,
+and, with npm interop, each npm package's own files including its license under
+`node_modules`. Whoever distributes `dist/` is responsible for those packages'
+license terms and for GNU MP's LGPL terms. Managed tools downloaded by Lasm (Lean,
+the link toolchain, the C tier, Git) keep their upstream license files in the
+tool cache, and the archives Lasm repackages add a `lasm-notices/` directory.

@@ -1,5 +1,10 @@
 # Current IO limitations in Lasm
 
+> **Historical backlog (last broad update 2026-09-26).** The status lines below
+> predate the language-coverage phases. Current per-platform results, fixed bugs and
+> remaining Lasm gaps: [docs/LANGUAGE_COVERAGE.md](docs/LANGUAGE_COVERAGE.md); the
+> supported-release boundary: [README](README.md#lean-support-and-restrictions).
+
 **Current release scope (2026-09-26):** ordinary ahead-of-time Lean applications
 in Node. Runtime compiler/interpreter, module-data access and executable plugin
 loading are explicitly excluded; see the [README's exact boundary](README.md#lean-support-and-restrictions).

@@ -14,8 +14,9 @@ historical records of what ran at the time and remain as written.
 ## Transfers
 
 The installer streams archives to private files and verifies the entire pinned
-SHA-256 and length before extraction. It tries at most four times for HTTP 408,
-429, 500, 502, 503 and 504 and transient connection errors. Backoff grows with
+SHA-256 and length before extraction. It tries up to eight times (current source;
+candidates up to Phase 4: four times for HTTP 408, 429, 500, 502, 503 and 504) for
+every HTTP 5xx, 408 and 429 and transient connection errors. Backoff grows with
 jitter; `Retry-After` is honored within the overall deadline. Every failed attempt
 is observable through the progress/event stream. DNS, TLS and nested connection
 errors identify the tool and host; credentials and signed URL queries are redacted.

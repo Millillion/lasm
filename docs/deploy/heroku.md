@@ -1,5 +1,11 @@
 # Heroku
 
+**How this is tested:** Lasm's CI never deploys to Heroku (no cloud accounts, by
+project policy). This recipe relies on the container tests: the same `Dockerfile`
+built and run on Linux x64 and arm64, read-only with a 512 MB limit
+([template CI](README.md), [platform matrix](../DEPLOYMENT.md)). Heroku's own build
+service, routing and runtime environment are untested.
+
 Use the container stack: Heroku builds the `Dockerfile` and sets `PORT`. Add
 `heroku.yml` to the project root:
 

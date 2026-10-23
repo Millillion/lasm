@@ -1,5 +1,11 @@
 # Railway
 
+**How this is tested:** Lasm's CI never deploys to Railway (no cloud accounts, by
+project policy). This recipe relies on the container tests: the same `Dockerfile`
+built and run on Linux x64 and arm64, read-only with a 512 MB limit
+([template CI](README.md), [platform matrix](../DEPLOYMENT.md)). Railway's own build
+service, routing and runtime environment are untested.
+
 Railway builds a `Dockerfile` at the project root automatically and sets `PORT`.
 With the [Railway CLI](https://docs.railway.com/guides/cli), from the project
 directory:

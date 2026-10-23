@@ -73,3 +73,5 @@ spec:
 
 The image's `USER node` is a name, so Kubernetes needs `runAsUser: 1000` to
 verify `runAsNonRoot`. The readiness probe gates traffic until the server listens.
+CI runs the image with Docker only; this manifest is not applied to a cluster
+in CI (no Kubernetes runtime is tested).
