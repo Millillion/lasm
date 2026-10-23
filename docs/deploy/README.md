@@ -18,7 +18,13 @@ Requirements on every platform:
   memory use.
 - **Architecture:** build the image for the platform's CPU. Several platforms
   run only `linux/amd64`; on an Apple Silicon Mac, build with
-  `docker build --platform linux/amd64 -t my-app .` (slower, emulated).
+  `docker build --platform linux/amd64 -t my-app .` (slower, emulated). A
+  `dist/` built on the Mac itself also runs on Linux x64 and arm64 (every build
+  carries the Linux native pieces): copy it into an image with
+  [`deploy/Dockerfile`](../../deploy/Dockerfile), with no emulated Lean build.
+- **Node:** 24 or newer. Node 26's official binary needs `libatomic1`, which the
+  official `node:26-*` images include; install it on minimal images that add the
+  Node 26 tarball themselves.
 - **No Alpine/musl** images: use Debian- or Ubuntu-based Node images.
 
 | Platform | Recipe | Notes |
@@ -29,14 +35,15 @@ Requirements on every platform:
 | Railway | [railway.md](railway.md) | Builds the Dockerfile; sets `PORT`. |
 | Render | [render.md](render.md) | Docker runtime; a plan with at least 512 MB. |
 | Heroku | [heroku.md](heroku.md) | Container stack (`heroku.yml`). |
-| AWS Lambda | [lambda.md](lambda.md) | Container image behind the AWS Lambda Web Adapter. |
+| AWS Lambda | [lambda.md](lambda.md) | Container image (`public.ecr.aws/lambda/nodejs:24`) behind the AWS Lambda Web Adapter; x86_64 and arm64. |
 
 **What is tested.** Lasm's CI builds and runs every template's Dockerfile on
 Linux x64 and ARM64 with a 512 MB memory limit and a read-only root filesystem,
 sends HTTP requests, and checks that `docker stop` ends the container with exit
 code 0 ([`scripts/templates/run-templates.mjs`](../../scripts/templates/run-templates.mjs)).
-Node versions, Linux distributions and the Lambda image are covered by the
-portability tests in [DEPLOYMENT.md](../DEPLOYMENT.md). The platform recipes
+Node versions (24.0.0, 24.x, 26.x), Linux distributions (Debian 11/12, Ubuntu
+22.04/24.04, Amazon Linux 2023), cross-built deployments and the Lambda image
+are covered by the platform tests in [DEPLOYMENT.md](../DEPLOYMENT.md). The platform recipes
 below use each platform's documented container workflow. **They are not deployed
 by Lasm's CI**: by project policy, CI uses no real cloud accounts, so each page
 relies on the container tests above.

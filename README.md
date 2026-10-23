@@ -9,7 +9,9 @@ Lean, and a container deployment, with [recipes per platform](docs/deploy/README
 It uses `lasm init` from current source (not yet in a candidate).
 
 **Prerequisites:** stock **Node 26.12.0 with npm 11.20.0** for accepted candidate
-`.54` (current source and its Phase 3 candidates pin **Node 26.12.1**, same npm).
+`.54` (Phase 3/4 candidates pin **Node 26.12.1**, same npm). Current source (Phase
+5.1, not yet in an accepted candidate) accepts **Node 24 or newer with npm**, for
+the compiler and for built applications, and is tested on Node 24.22.1 and 26.12.1.
 Lasm downloads its matching **Lean 4.35.0**, Lake, and build tools; you do not install
 them yourself (the older candidate `.46` used Node 26.10.0 / Lean 4.34.1).
 The package is experimental and **has not been published to npm**.
@@ -60,10 +62,13 @@ installations on every target) passed on 2026-10-16. See
 New candidates must also pass three consecutive cold installations on every target
 before meeting the additional robustness gate; one successful run alone is insufficient.
 
-Copy **all of `dist/`** to a supported machine with the **same OS, architecture,
-and Node version**. No Lean source, npm install, build tools, or development cache
-is needed there. Build separately on each platform. Include your application's
-external assets yourself.
+Copy **all of `dist/`** to a supported machine. Candidates up to the Phase 4
+interop candidate require the **same OS, architecture, and Node version**. Current
+source (Phase 5.1) runs `dist/` on **Node 24 or newer** on Linux x64 and arm64
+(glibc 2.28+) from a build on any supported platform, and on the build machine's
+own platform; see [Supported platforms](#supported-platforms). No Lean source, npm
+install, build tools, or development cache is needed there. Include your
+application's external assets yourself.
 
 An existing Lake project can use local imports normally. To pin Lean, put
 `leanprover/lean4:v4.34.1` (candidate `.46`) or `leanprover/lean4:v4.35.0` (current
@@ -114,15 +119,17 @@ source-only compatibility launcher. These interfaces have no current release sup
 
 ## Supported environments
 
+These are the machines that **build** with Lasm (the compiler). Where built
+applications run is under [Supported platforms](#supported-platforms).
+
 | Environment | Architectures | Current status |
 | --- | --- | --- |
 | Ubuntu 24.04.5 LTS, glibc 2.39 | x86-64 and ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance. |
-| Other Linux distributions | x86-64 and ARM64 | Unverified; glibc 2.39 or newer is required. Alpine/musl is unsupported. |
+| Other Linux distributions | x86-64 and ARM64 | Unverified as build machines. Candidates need glibc 2.39; current source needs glibc 2.34 (the managed tools' newest symbol). Alpine/musl is unsupported. |
 | macOS 15.7.9 (24G830) | x86-64 and ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance. |
 | Windows Server 2025 Datacenter, 10.0.26100.33438 | x86-64 | Candidate `.46` passed native installed-package and copied-deployment acceptance on `windows-2025`. |
 | Windows ARM64 | ARM64 | **Not supported.** Removed on 2026-10-16: neither Lean nor Emscripten publishes Windows ARM64 prebuilts. Current source stops with `Lasm supports Linux and macOS on x86-64 and ARM64, and Windows on x86-64. Windows ARM64 is not supported.` (Candidate `.46` historically passed on `windows-11-arm`.) |
 | Other JavaScript runtimes, browsers, Cloudflare Workers | Any | Not supported; Lasm targets Node only. |
-| Lambda, Netlify, other serverless services | Any | No deployment adapter or platform acceptance yet. |
 
 Other OS releases and Node/npm/Lean versions are unverified. No engine flags are
 needed. Linux requires its ordinary OS libraries and shell, but no developer SDK.
@@ -138,6 +145,29 @@ lists cold start, bundle size, memory, HTTP throughput and latency, interop call
 latency, build time and install cost for each release candidate, beside plain-Node
 references measured on the same runner. The candidate pipeline records them
 automatically on Linux x64.
+
+## Supported platforms
+
+Current source (Phase 5.1). A built application (`dist/`) needs **Node 24 or
+newer**; Node 22 and older stop with `This application requires Node 24.0.0 or
+newer`. Give it **at least 512 MB of memory**. Each platform below is **tested in
+CI** with the local runtime, image or emulator named; none is checked with a real
+cloud account or deployment. Details, requirements and the full matrix:
+[DEPLOYMENT.md](docs/DEPLOYMENT.md); recipes: [docs/deploy](docs/deploy/README.md).
+
+| Platform | Tested in CI with |
+| --- | --- |
+| Linux x64 and arm64 (glibc 2.28+), Node 24+ | Node 24.0.0, 24.22.1 and 26.12.1 on `ubuntu-24.04` and `ubuntu-24.04-arm` |
+| macOS (x64, arm64) | Node 24.22.1 on `macos-15`; installed acceptance with Node 26.12.1 |
+| Windows x64 | installed acceptance with Node 26.12.1 (as accepted today) |
+| Docker / Kubernetes | `node:24-bookworm-slim`, `node:26-bookworm-slim`, `node:24-bullseye-slim` (glibc 2.31), Ubuntu 22.04/24.04 with Node tarballs; read-only, 512 MB, x64 and arm64 |
+| Google Cloud Run, Fly.io, Railway, Render, Heroku | the same container images (container recipes) |
+| AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` + AWS Lambda Web Adapter through the Runtime Interface Emulator, x86_64 and arm64; `amazonlinux:2023` |
+
+Every build carries the Linux x64 and arm64 native pieces, so `dist/` built on a
+Mac or Windows machine deploys to Linux containers. Not yet supported: Alpine/musl,
+Lambda zip packages, Vercel, Netlify, Azure Functions, Cloudflare Workers and
+other isolate platforms ([plan](docs/PLAN.md)).
 
 ## Lean support and restrictions
 

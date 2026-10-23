@@ -572,6 +572,16 @@ folded into Phases 5.2/5.3 and 7.
     containers; read-only filesystem and 512 MB cap; build on macOS and Linux,
     run on the other; AWS Lambda container image with its Runtime Interface
     Emulator and the Lambda Web Adapter (x64 and arm64).
+    *Status (2026-10-23): implemented in source (`1a3c738`); candidate in
+    acceptance.* Apps check Node >= 24.0.0, "native pieces for this host" and
+    glibc >= 2.28; the compiler checks Node >= 24 and glibc >= 2.34 (measured:
+    managed Git needs GLIBC_2.34, Lean's LLVM 2.30, everything else <= 2.27).
+    Production `node_modules` was already the deployed closure (no change). The
+    Lambda recipe uses the managed image's exec wrapper so the image's own
+    entry point and emulator work unchanged ([DEPLOYMENT.md](DEPLOYMENT.md),
+    `deploy/`, `platform-support.yml`, which gates candidate retention). By
+    design a Linux build refuses macOS/Windows (CI checks the message); the
+    other direction is supported.
   - **5.2 Launch essentials.** `lasm init` templates (plain program, Express,
     Hono, Dockerfile, Lambda container); getting-started guide and a deployment
     recipe per launch platform; a short interop soak (Express and Hono with Lean

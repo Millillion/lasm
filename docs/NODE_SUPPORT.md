@@ -20,8 +20,14 @@ Windows 11 Enterprise 10.0.26200.9457 (`windows-11-arm`) historically; current
 source stops there with `Lasm supports Linux and macOS on x86-64 and ARM64, and
 Windows on x86-64. Windows ARM64 is not supported.`
 Use stock Node without special flags. Other OS versions/distributions, older
-system libraries, and other Node/npm/Lean versions are unverified.
-Linux requires glibc 2.39 or newer; musl-based distributions
+system libraries, and other Node/npm/Lean versions are unverified as build machines.
+**Current source (Phase 5.1)** accepts Node 24 or newer for the compiler (tested on
+Node 24.22.1 and 26.12.1; `bin/lasm.mjs` refuses older Node before loading anything:
+`Lasm requires Node 24 or newer; you are running Node 22.23.4. Install Node 24 or
+newer and retry.`) and lowers the compiler's Linux floor to glibc 2.34, the newest
+symbol version among its managed tools (managed Git; Lean's LLVM needs 2.30).
+Candidates up to Phase 4 require their exact Node release and glibc 2.39.
+On Linux musl-based distributions
 such as Alpine are unsupported. Linux builds require the standard OS shell, loader, libc and system
 libraries supplied by Ubuntu; no separately installed developer tools are required.
 See the [current acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
@@ -144,9 +150,19 @@ the six-platform pass does not establish a measured
 installation failure rate.
 
 `lasm build Main.lean` writes `dist/` and does not run `main`. Deploy all of `dist/`
-including host support and notices. Deployment files are specific to the build
-OS/architecture and pinned Node version; the launcher diagnoses mismatches before
-loading native code. Source and build caches are unnecessary on the destination.
+including host support and notices. In candidates up to Phase 4, deployment files
+are specific to the build OS/architecture and pinned Node version. Current source
+(Phase 5.1) deploys to **Node 24 or newer** on **Linux x64 and arm64 with glibc
+2.28 or newer** from any build machine, and to the build machine's own platform:
+every `dist/host/native` carries koffi and the helpers for both Linux
+architectures (glibc) plus the build host's (2.5 MB for a Linux build). The launcher
+checks, before loading native code, in this order: the Node version (`This
+application requires Node 24.0.0 or newer; …`), that the deployment carries native
+pieces for this platform (`This application includes native support for
+linux-x64, linux-arm64, darwin-arm64; it is running on win32-x64. …`), and glibc
+2.28 on Linux (musl is named). Requirements per platform, memory (512 MB or more),
+`libatomic1` for Node 26 on minimal images, and the CI matrix:
+[DEPLOYMENT.md](DEPLOYMENT.md). Source and build caches are unnecessary on the destination.
 External application assets are the application's responsibility.
 
 To diagnose a compilation error, start with the Lean filename and line printed by
