@@ -181,7 +181,7 @@ is what a user would otherwise write).
   releases after dividing by that index.
 - **Platforms:** Linux x64 (`ubuntu-24.04`, a free standard runner) is the
   reference; the Linux performance targets are scoped to it. Linux ARM64, macOS
-  ARM64 and Windows x64 run only when requested (`extras`) and are shown
+  ARM64 and x64, and Windows x64 run only when requested (`extras`) and are shown
   separately as informational.
 - **Regressions** are flagged when a metric is worse than the previous release
   by more than 5 % (sizes) or 20 % (timings, memory, throughput), compared by
