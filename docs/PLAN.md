@@ -528,6 +528,20 @@ L2 and L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6.
   issues are fixed. Node `http`/Express/Hono with Lean handlers becomes the
   recommended fast path for HTTP servers (prototype: 37k vs 1.3k req/s for
   `Std.Http` under Lasm); `Std.Http` stays supported.
+- **Order after Phase 4 (user decision 2026-10-23):** publish to npm before
+  serverless. Planned order: production hardening on Node (interop soak, memory
+  incl. the macOS ARM64 finding, startup and bundle size, the role of
+  `Std.Http` given interop is ~28x faster); developer experience (`lasm init`
+  templates) plus the full-suite release gate, then `@lasm/cli` 0.1 on npm
+  (publication needs explicit approval); Node-based serverless (Lambda,
+  Netlify, Vercel); Cloudflare Workers last (needs a single-threaded runtime).
+  Lean as a runtime library is parked and picked up when packages need it.
+  The user wants launch very soon and an explicit supported-platform list
+  (like Hono's) decided now; a platform deep dive is in progress. Found
+  2026-10-23: built apps pin the exact Node version (26.12.0; the same app ran
+  on Node 24 with the check removed), the build platform (koffi native add-on),
+  and glibc >= 2.39 (AWS Lambda's Amazon Linux 2023 has 2.34) — launch
+  blockers for most hosting platforms.
 - **Phase 5 — Lean as a runtime library (was L5; Phase 4 until 2026-10-22), scoped to what real packages
   need:** pure `Lean.*` code at runtime (Json via `import Lean`, Lean.Data.*,
   LSP types) through finer-grained reachability; runtime elaboration/evaluation
