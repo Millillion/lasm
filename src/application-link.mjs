@@ -15,7 +15,7 @@ import { cInitTargets, coreInitTargets, initializerWrapperParts, initializerWrap
 import { buildJobs } from './managed-link-toolchain.mjs';
 import { archiveMembers, explainRejection, parseWhyExtract, undefinedSymbols } from './application-diagnosis.mjs';
 import { executableName, responseFile } from './platform.mjs';
-import { bundledRecipe, checkToolchainIdentity, compileObject, emscriptenCache } from './link-driver/compile.mjs';
+import { bundledRecipe, checkToolchainIdentity, compileObject, emscriptenCache, probeOptimization } from './link-driver/compile.mjs';
 import { bundledNativeSigs, linkTemporaryDirectory, linkWithNode, removeTemporary } from './link-driver/link.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
@@ -177,8 +177,9 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // reuses its object from this or the project's previous build: the key covers
   // the C bytes, the compiler flags (without the runtime path), the runtime
   // identity, the compiler tools and the link driver. Same key, same object bytes.
-  const objectKey = source => createHash('sha256').update(JSON.stringify({ schema: 1, runtime: runtime.identity, linkDriver,
-    tools: sdk.toolchain ?? sdk.driverIdentity ?? null, flags: compileFlags.filter(flag => flag !== join(runtime.directory, 'include')) }))
+  const objectKey = (source, optimization) => createHash('sha256').update(JSON.stringify({ schema: 1, runtime: runtime.identity, linkDriver,
+    tools: sdk.toolchain ?? sdk.driverIdentity ?? null, flags: compileFlags.filter(flag => flag !== join(runtime.directory, 'include')),
+    ...(optimization ? { optimization } : {}) }))
     .update(readFileSync(source)).digest('hex');
   const usedObjects = new Set();
   // Without a project cache, identical C within this build still compiles once
@@ -216,15 +217,16 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   };
   // Several sources at once (the initializer wrapper parts): cached objects are
   // copied, the others compile concurrently, up to the build's job count.
-  const compileAll = async pairs => {
+  const compileAll = async (pairs, { optimization } = {}) => {
     const pending = [];
     for (const [source, object] of pairs) {
-      const cached = join(objectStore, objectKey(source) + '.o');
+      const cached = join(objectStore, objectKey(source, optimization) + '.o');
       usedObjects.add(cached);
       if (existsSync(cached)) copyFileSync(cached, object); else pending.push({ source, object, cached });
     }
-    if (!nodeCompile || pending.length < 2) { for (const item of pending) { compileUncached(item.source, item.object); storeObject(item.object, item.cached); } return; }
-    const run = item => compileObject({ sdk, flags: compileFlags, source: item.source, object: item.object,
+    // The emcc maintainer driver has no probe optimization level: it compiles as recorded.
+    if (!nodeCompile || pending.length < 2 && !optimization) { for (const item of pending) { compileUncached(item.source, item.object); storeObject(item.object, item.cached); } return; }
+    const run = item => compileObject({ sdk, flags: compileFlags, source: item.source, object: item.object, optimization,
       execute: (program, args, options) => new Promise((resolve, reject) => execFile(program, args, options, (error, stdout, stderr) =>
         error ? reject(Object.assign(error, { stdout, stderr })) : resolve(stdout))),
       settings: { timeout: 1800_000, maxBuffer: 8 * 1024 * 1024 } }).then(() => { storeObject(item.object, item.cached); });
@@ -355,12 +357,17 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   };
   const planInputs = [], planWrap = [], planObjects = [];
   if (!['all', 'native'].includes(initialization)) {
-    const wrapperFiles = Array.from({ length: initializerWrapperParts }, (_, part) =>
-      [join(work, `initializers-${part}.c`), join(work, `initializers-${part}.o`)]);
-    const wrappersObjects = wrapperFiles.map(([, object]) => object);
-    const writeWrappers = async sources => {
-      for (let part = 0; part < wrapperFiles.length; part++) await writeFile(wrapperFiles[part][0], sources[part]);
-      await compileAll(wrapperFiles);
+    const wrapperFiles = (kind = '') => Array.from({ length: initializerWrapperParts }, (_, part) =>
+      [join(work, `initializers${kind}-${part}.c`), join(work, `initializers${kind}-${part}.o`)]);
+    const finalWrappers = wrapperFiles(), probeWrappers = wrapperFiles('-probe');
+    // Planning probes only read wasm-ld's live set: their wrapper objects are
+    // compiled at -O0 (src/link-driver/compile.mjs probeOptimization). The
+    // wrappers of the delivered program are compiled as recorded.
+    const writeWrappers = async (sources, { probe = false } = {}) => {
+      const files = probe ? probeWrappers : finalWrappers;
+      for (let part = 0; part < files.length; part++) await writeFile(files[part][0], sources[part]);
+      await compileAll(files, nodeCompile && probe ? { optimization: probeOptimization } : {});
+      return files.map(([, object]) => object);
     };
     const planMap = join(work, 'initializers.map'), planArguments = join(work, 'initializers.rsp');
     const bodiesExports = join(work, 'initializers-exports.json');
@@ -372,15 +379,18 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
       forceKeep: process.env.LASM_INITIALIZATION_KEEP ? new RegExp(process.env.LASM_INITIALIZATION_KEEP) : undefined,
       initTargets: (core => core && new Set([...core, ...sources.flatMap(file => cInitTargets(readFileSync(file, 'utf8')))]))(coreInitTargets(leanVersion)),
       async probe(source, wrapFlags, { bodies = false, exclude } = {}) {
-        await writeWrappers(source);
+        const wrappersObjects = await writeWrappers(source, { probe: true });
         const args = [...objects.filter(file => file !== exclude), ...nativeInputs, probeObject, ...wrappersObjects,
           ...initializationInputs.filter(file => !bodies || file !== entryObject),
           '-O0', '-Wl,-Map=' + planMap, ...wrapFlags, ...linkWith(bodies ? bodiesExports : exportsFile)];
         return (await probeLink(args, planMap, planArguments)).live;
       } });
     if (plan?.skipped.length && !plan.shared.length) {
-      await writeWrappers(initializerWrappers(plan.units, plan.closure, { keep: plan.keep, parts: initializerWrapperParts }));
-      planInputs.push(...wrappersObjects, ...plan.wrap); planWrap.push(...plan.wrap); planObjects.push(...wrappersObjects);
+      const planned = initializerWrappers(plan.units, plan.closure, { keep: plan.keep, parts: initializerWrapperParts });
+      planInputs.push(...await writeWrappers(planned), ...plan.wrap); planWrap.push(...plan.wrap);
+      // The requirements check repeats the last planning round's link (the same
+      // probe objects, from the object store), so its recorded result is reused.
+      planObjects.push(...await writeWrappers(planned, { probe: true }));
       initializationPlan = { units: plan.closure.length, kept: plan.keep.size, skipped: plan.skipped.length };
     } else if (plan) initializationPlan = { units: plan.closure.length, kept: plan.closure.length, skipped: 0,
       ...(plan.shared.length ? { sharedGlobals: plan.shared.slice(0, 20) } : {}) };

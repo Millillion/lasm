@@ -161,7 +161,7 @@ async function extract(artifact, archive, directory, python) {
   }
 }
 
-async function inventory(directory) {
+async function inventory(directory, { known } = {}) {
   directory = await realpath(directory);
   const files = new Map();
   async function walk(base) {
@@ -175,9 +175,13 @@ async function inventory(directory) {
           throw new Error(`Managed cache link escapes its toolchain: ${name}`);
         files.set(name, { type: 'symlink', target });
       } else if (entry.isFile()) {
-        const stat = await lstat(file);
-        files.set(name, { type: 'file', bytes: stat.size, sha256: await hashFile(file),
-          ...(process.platform === 'win32' ? {} : { executable: !!(stat.mode & 0o111) }) });
+        const stat = await lstat(file, { bigint: true });
+        // A hard link to a verified original (linkArtifactTree), unchanged since.
+        const same = known?.get(name);
+        const sha256 = same && same.ino === stat.ino && same.dev === stat.dev && same.size === stat.size && same.mtimeNs === stat.mtimeNs
+          ? same.sha256 : await hashFile(file);
+        files.set(name, { type: 'file', bytes: Number(stat.size), sha256,
+          ...(process.platform === 'win32' ? {} : { executable: !!(Number(stat.mode) & 0o111) }) });
       } else throw new Error(`Unexpected managed cache entry: ${name}`);
     }
   }
@@ -355,8 +359,9 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
     await createOwnedStaging(staging);
     try {
       const tree = join(staging, 'tree'); await mkdir(tree);
-      await produce(tree);
-      const files = await inventory(tree);
+      // produce may return the hashes of files it hard-linked from verified trees.
+      const known = await produce(tree);
+      const files = await inventory(tree, { known: known instanceof Map ? known : undefined });
       if (!Object.keys(files).length) throw new Error('Derived tool tree is empty');
       const receipt = { schema: 1, identity, provenance, files };
       await writeFile(join(tree, receiptName), JSON.stringify(receipt) + '\n', { flag: 'wx' });
@@ -376,7 +381,12 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
 }
 
 /** Hard-link one verified artifact tree into a prefix under assembly. */
-export async function linkArtifactTree(source, receipt, destination, owners, name, kind = 'Archive') {
+/** Hard-link one verified artifact tree into a prefix under assembly. With
+ * `known` (a Map), every file linked to its verified original is recorded with
+ * the original's hash and inode, so the assembled prefix's receipt need not
+ * hash it again (inventory). Links are made concurrently. */
+export async function linkArtifactTree(source, receipt, destination, owners, name, kind = 'Archive', known) {
+  const files = [];
   for (const [path, entry] of Object.entries(receipt.files).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) {
     const target = join(destination, ...path.split('/'));
     if (entry.type === 'directory') {
@@ -387,13 +397,24 @@ export async function linkArtifactTree(source, receipt, destination, owners, nam
     }
     if (owners.has(path)) throw new Error(`${kind}s ${owners.get(path)} and ${name} both contain ${path}`);
     owners.set(path, name);
+    files.push({ path, entry, target });
+  }
+  const linkOne = async ({ path, entry, target }) => {
     await mkdir(dirname(target), { recursive: true });
-    if (entry.type === 'symlink') { await symlink(entry.target, target); continue; }
+    if (entry.type === 'symlink') { await symlink(entry.target, target); return; }
     const from = join(source, ...path.split('/'));
-    try { await link(from, target); }
-    catch (error) {
+    try {
+      await link(from, target);
+      if (known) {
+        const [original, linked] = await Promise.all([lstat(from, { bigint: true }), lstat(target, { bigint: true })]);
+        if (original.ino === linked.ino && original.dev === linked.dev && Number(linked.size) === entry.bytes)
+          known.set(path, { sha256: entry.sha256, ino: linked.ino, dev: linked.dev, size: linked.size, mtimeNs: linked.mtimeNs });
+      }
+    } catch (error) {
       if (!['EXDEV', 'EPERM', 'EACCES', 'ENOTSUP', 'EMLINK'].includes(error.code)) throw error;
       await copyFile(from, target, constants.COPYFILE_EXCL);
     }
-  }
+  };
+  const queue = [...files];
+  await Promise.all(Array.from({ length: Math.min(32, queue.length) }, async () => { while (queue.length) await linkOne(queue.shift()); }));
 }

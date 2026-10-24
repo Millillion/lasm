@@ -62,12 +62,14 @@ export async function provisionLinkToolchain(options = {}) {
     components: components.map(({ artifact }) => validateArtifact(artifact)) };
   options.progress?.({ stage: 'Checking compiler tools' });
   const installed = await deriveArtifact(provenance, async tree => {
-    const owners = new Map();
-    for (const { artifact, label } of components) {
-      const component = await provisionArtifact(artifact, { ...options, cache, label });
+    const owners = new Map(), known = new Map();
+    // Independent archives download and extract concurrently; linking keeps their order.
+    const installed = await Promise.all(components.map(({ artifact, label }) => provisionArtifact(artifact, { ...options, cache, label })));
+    for (let index = 0; index < components.length; index++) {
       options.progress?.({ stage: 'Assembling compiler tools' });
-      await linkArtifactTree(component.directory, component.receipt, tree, owners, artifact.name, 'Compiler tool archive');
+      await linkArtifactTree(installed[index].directory, installed[index].receipt, tree, owners, components[index].artifact.name, 'Compiler tool archive', known);
     }
+    return known;
   }, { cache, log: options.log, signal: options.signal, progress: options.progress });
   const prefix = installed.directory;
   const nativePrograms = {};

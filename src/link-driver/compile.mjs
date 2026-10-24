@@ -129,14 +129,22 @@ export function translateEmccFlags(recipe, args) {
 const separator = platform => platform === 'win32' ? '\\' : '/';
 
 /** Complete clang argument vector (without the program) for one translation unit. */
-export function clangArguments(recipe, { flags, source, object, sysroot, platform = process.platform, extraArgs = [] }) {
+/** `optimization` '-O0' replaces the recorded optimization level for objects
+ * that are only analysed and never linked into a delivered program (Lasm's
+ * initializer-planning probes); emcc passes -O levels to clang unchanged. */
+export const probeOptimization = '-O0';
+export function clangArguments(recipe, { flags, source, object, sysroot, platform = process.platform, extraArgs = [], optimization }) {
   for (const [name, value] of Object.entries({ source, object, sysroot }))
     if (typeof value !== 'string' || !value) throw new Error(`Missing ${name} for the Node compile driver`);
   checkRecordedFlags(recipe, flags);
   // Package C sources (src/application-native.mjs) add preprocessor options only.
   if (extraArgs.some(arg => typeof arg !== 'string' || !/^-(?:I|isystem|iquote|idirafter|include|imacros|D|U|std=|x$|c$|w$)/.test(arg) && arg.startsWith('-')))
     throw new Error(`Unsupported package compiler option: ${JSON.stringify(extraArgs)}`);
-  const translated = translateEmccFlags(recipe, [...flags, '-c', source, '-o', object]);
+  if (optimization !== undefined && optimization !== probeOptimization) throw new Error(`Unsupported probe optimization ${optimization}`);
+  const levels = flags.filter(flag => /^-O[0-3sz]$/.test(flag));
+  if (optimization !== undefined && levels.length !== 1) throw new Error('The recorded compile flags need exactly one optimization level');
+  const translated = translateEmccFlags(recipe, [...(optimization === undefined ? flags : flags.map(flag => flag === levels[0] ? optimization : flag)),
+    '-c', source, '-o', object]);
   translated.splice(translated.indexOf('-c'), 0, ...extraArgs);
   const values = { sysroot, source, object, sep: separator(platform) };
   return recipe.compile.driver.flatMap(arg => arg === '<flags>' ? translated
@@ -172,9 +180,9 @@ export function checkToolchainIdentity(recipe, sdk) {
 }
 
 /** Compile one C file to a Wasm object exactly as `emcc -c` would. */
-export function compileObject({ sdk, flags, source, object, recipe = bundledRecipe(), execute = execFileSync, settings = {}, extraArgs = [] }) {
+export function compileObject({ sdk, flags, source, object, recipe = bundledRecipe(), execute = execFileSync, settings = {}, extraArgs = [], optimization }) {
   const sysroot = path.join(emscriptenCache(sdk), 'sysroot');
-  const args = clangArguments(recipe, { flags, source, object, sysroot, extraArgs });
+  const args = clangArguments(recipe, { flags, source, object, sysroot, extraArgs, optimization });
   const { program, env } = clangCommand(recipe, { sdkPrefix: sdk.prefix, env: sdk.env });
   // Generated-source paths are short; Windows' CreateProcess limit is 32,767.
   const length = [program, ...args].reduce((total, arg) => total + arg.length + 3, 0);
