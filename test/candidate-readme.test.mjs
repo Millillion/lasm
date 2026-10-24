@@ -9,9 +9,11 @@ for (const newline of ['\n', '\r\n']) test(`a packed README installs its own arc
     version: '0.1.0-experimental.123', sourceRevision: 'a'.repeat(40), runId: '12345',
   });
   assert.match(text, /npm install \.\/lasm-compiler-0\.1\.0-experimental\.123\.tgz/);
-  assert.doesNotMatch(text, /npm install \.\/lasm-compiler-0\.1\.0-experimental\.46\.tgz/);
+  // Only this archive's install line remains (the source README names the accepted one).
+  assert.equal([...text.matchAll(/npm install \.\/lasm-compiler-[^\s]+\.tgz/g)].length, 1);
   assert.match(text, /does not\nclaim that this candidate has passed/);
-  assert.match(text, /Candidate `\.46` passed native installed-package/);
+  // The environment table (the earlier accepted baseline) is kept.
+  assert.match(text, /\| x86-64 and ARM64 \| Candidate `\.\d+` passed native installed-package and copied-deployment acceptance/);
   assert.match(text, /actions\/runs\/12345/);
   assert.doesNotMatch(text, /\]\(docs\//);
 });

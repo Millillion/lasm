@@ -17,7 +17,6 @@ claim that this candidate has passed. Copy this tarball into an empty directory:
 \`\`\`sh
 npm install ./lasm-compiler-${version}.tgz
 \`\`\``);
-  text = text.replace('Cache repair (new source; absent from `.46`)', 'Cache repair');
   // Linked evidence is pinned to this source, while explicit live CI/report URLs
   // remain live. No dangling repository-relative links in an installed package.
   return text.replace(/\]\(((?!https?:|#)[^)]+)\)/g,
