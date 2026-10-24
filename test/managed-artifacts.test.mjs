@@ -302,3 +302,72 @@ test('Windows ARM64 is refused as an unsupported platform before any download', 
   await assert.rejects(provisionLean(f.base, { ...f.options, platform: 'win32', arch: 'arm64' }), /Windows ARM64 is not supported/);
   assert.equal(f.requests(), 0);
 });
+
+// The synchronous archive writer (src/managed-artifacts.mjs archiveWriter) that
+// replaced node-tar's: the same refusals, plus the cases below.
+for (const [name, entries] of [
+  ['parent traversal after normalization', [{ path: 'tool/bin/../../escape', body: 'escape' }]],
+  ['a drive letter', [{ path: 'C:/escape', body: 'escape' }]],
+  ['a drive-relative name', [{ path: 'tool/C:escape', body: 'escape' }]],
+  ['a UNC path', [{ path: '//server/share/escape', body: 'escape' }]],
+  ['a backslash UNC path', [{ path: '\\\\server\\share\\escape', body: 'escape' }]],
+  ['a backslash traversal', [{ path: 'tool\\..\\..\\escape', body: 'escape' }]],
+  ['a character device', [{ path: 'tool/device', type: 'CharacterDevice' }]],
+  ['a block device', [{ path: 'tool/disk', type: 'BlockDevice' }]],
+  ['an absolute symlink', [{ path: 'tool/link', type: 'SymbolicLink', linkpath: '/etc/passwd' }]],
+  ['an absolute hardlink', [{ path: 'tool/link', type: 'Link', linkpath: '/etc/passwd' }]],
+  ['a hardlink to another root', [{ path: 'tool/link', type: 'Link', linkpath: 'other/file' }]],
+]) test(`the archive writer rejects ${name}`, async t => {
+  const f = await fixture(t), bytes = archive(entries);
+  await assert.rejects(provisionArtifact(description(bytes), { ...f.options, fetch: async () => new Response(bytes) }), /Unsafe|escapes|TAR_/);
+  assert.deepEqual(await readdir(join(f.cache, 'artifacts')), []);
+});
+
+test('the archive writer drops setuid, setgid and sticky bits and keeps the owner able to write', { skip: process.platform === 'win32' }, async t => {
+  const f = await fixture(t);
+  const bytes = archive([{ path: 'tool/bin/suid', mode: 0o6755, body: 'tool' }, { path: 'tool/sticky', mode: 0o1444, body: 'notes' }]);
+  const installed = await provisionArtifact(description(bytes), { ...f.options, fetch: async () => new Response(bytes) });
+  const { stat } = await import('node:fs/promises');
+  const suid = await stat(join(installed.directory, 'bin/suid')), sticky = await stat(join(installed.directory, 'sticky'));
+  assert.equal(suid.mode & 0o7000, 0); assert.equal(suid.mode & 0o100, 0o100);
+  assert.equal(sticky.mode & 0o7000, 0); assert.equal(sticky.mode & 0o200, 0o200);
+});
+
+test('the archive writer handles PAX and GNU long names, and its hashes match the files', async t => {
+  const f = await fixture(t);
+  const deep = 'tool/' + Array.from({ length: 6 }, (_, i) => `directory-with-a-long-name-${i}-${'x'.repeat(30)}`).join('/');
+  const source = join(f.base, 'long');
+  await mkdir(join(source, deep), { recursive: true });
+  await writeFile(join(source, deep, `file-${'y'.repeat(120)}.olean`), 'long name contents');
+  await writeFile(join(source, 'tool', 'short'), 'short contents');
+  const parts = [];
+  for (const portable of [true, false]) {
+    await createTar({ cwd: source, file: join(f.base, `long-${portable}.tar`), portable }, ['tool']);
+    parts.push(await readFile(join(f.base, `long-${portable}.tar`)));
+  }
+  for (const tarBytes of parts) {
+    const bytes = zstdCompressSync(tarBytes);
+    const cache = await mkdtemp(join(f.base, 'cache-'));
+    const installed = await provisionArtifact(description(bytes), { ...f.options, cache, fetch: async () => new Response(bytes) });
+    const name = deep.slice('tool/'.length) + `/file-${'y'.repeat(120)}.olean`;
+    assert.equal(await readFile(join(installed.directory, ...name.split('/')), 'utf8'), 'long name contents');
+    assert.equal(installed.receipt.files[name].sha256, hash(Buffer.from('long name contents')));
+    // The hashes taken while writing are the files' hashes: a full check passes.
+    const { verifyArtifactDirectory } = await import('../src/managed-artifacts.mjs');
+    await verifyArtifactDirectory(installed.directory, installed.identity);
+  }
+});
+
+for (const [name, corrupt] of [
+  ['a truncated tar body', bytes => zstdCompressSync(bytes.subarray(0, 512 + 4))],
+  ['a corrupt zstd stream', bytes => Buffer.concat([zstdCompressSync(bytes).subarray(0, 20), Buffer.alloc(64, 7)])],
+  ['a garbage header', () => zstdCompressSync(Buffer.alloc(2048, 0x41))],
+]) test(`the archive writer fails cleanly on ${name}`, async t => {
+  const f = await fixture(t);
+  const tar = await readFile(join(f.base, 'tool.tar'));
+  const bytes = corrupt(tar);
+  await assert.rejects(provisionArtifact(description(bytes), { ...f.options, fetch: async () => new Response(bytes) }));
+  assert.deepEqual(await readdir(join(f.cache, 'artifacts')), []);
+  // The staging directory is removed, and a good archive installs afterwards.
+  assert.equal((await provisionArtifact(f.artifact, f.options)).cacheHit, false);
+});
