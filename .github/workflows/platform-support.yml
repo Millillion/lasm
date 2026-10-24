@@ -238,8 +238,54 @@ jobs:
       - name: Summary
         if: always()
         run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
+  # Fills the image cache for both architectures from an arm64 runner (ECR Public
+  # has refused x64 runners' addresses for hours: run 40136616607). A cache hit
+  # does nothing; consumers fall back to pulling their own architecture.
+  images:
+    needs: select
+    if: needs.select.outputs.active == 'true'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: lambda
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
+          lookup-only: true
+      - name: Pull the pinned lambda images for amd64 and arm64 by digest
+        if: steps.lambda.outputs.cache-hit != 'true'
+        id: seed-lambda
+        continue-on-error: true
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda --seed amd64,arm64 --no-load
+      - if: steps.lambda.outputs.cache-hit != 'true' && steps.seed-lambda.outcome == 'success'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: containers
+        with:
+          path: ${{ runner.temp }}/image-cache/containers
+          key: ci-images-containers-${{ hashFiles('scripts/ci/images.lock.json') }}
+          lookup-only: true
+      - name: Pull the pinned containers images for amd64 and arm64 by digest
+        if: steps.containers.outputs.cache-hit != 'true'
+        id: seed-containers
+        continue-on-error: true
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/containers" containers --seed amd64,arm64 --no-load
+      - if: steps.containers.outputs.cache-hit != 'true' && steps.seed-containers.outcome == 'success'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/image-cache/containers
+          key: ci-images-containers-${{ hashFiles('scripts/ci/images.lock.json') }}
   containers:
-    needs: [select, build]
+    needs: [select, build, images]
     if: always() && needs.select.outputs.active == 'true'
     name: containers ${{ matrix.runner }}
     strategy:
@@ -266,7 +312,7 @@ jobs:
         id: images-containers
         with:
           path: ${{ runner.temp }}/image-cache/containers
-          key: ci-images-containers-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
+          key: ci-images-containers-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Load the pinned containers images (cache, else registry by digest)
         run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/containers" containers
       - if: steps.images-containers.outputs.cache-hit != 'true'
@@ -274,7 +320,7 @@ jobs:
         continue-on-error: true
         with:
           path: ${{ runner.temp }}/image-cache/containers
-          key: ci-images-containers-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
+          key: ci-images-containers-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Linux images, read-only with 512 MB; the container recipe; macOS and Windows builds in Debian 12
         run: |
           own=linux-x64; [ "$(uname -m)" = aarch64 ] && own=linux-arm64
@@ -283,7 +329,7 @@ jobs:
         if: always()
         run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
   lambda:
-    needs: [select, build]
+    needs: [select, build, images]
     if: always() && needs.select.outputs.active == 'true'
     name: lambda ${{ matrix.runner }}
     strategy:
@@ -310,7 +356,7 @@ jobs:
         id: images-lambda
         with:
           path: ${{ runner.temp }}/image-cache/lambda
-          key: ci-images-lambda-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Load the pinned lambda images (cache, else registry by digest)
         run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
       - if: steps.images-lambda.outputs.cache-hit != 'true'
@@ -318,7 +364,7 @@ jobs:
         continue-on-error: true
         with:
           path: ${{ runner.temp }}/image-cache/lambda
-          key: ci-images-lambda-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Lambda image, Runtime Interface Emulator and Lambda Web Adapter (Linux and macOS builds)
         run: |
           own=linux-x64; [ "$(uname -m)" = aarch64 ] && own=linux-arm64

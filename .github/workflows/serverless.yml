@@ -93,8 +93,36 @@ jobs:
           retention-days: 3
           compression-level: 0
           if-no-files-found: error
+  # Fills the image cache for both architectures from an arm64 runner (ECR Public
+  # has refused x64 runners' addresses for hours: run 40136616607). A cache hit
+  # does nothing; consumers fall back to pulling their own architecture.
+  images:
+    if: github.event.repository.visibility == 'public'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: lambda
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
+          lookup-only: true
+      - name: Pull the pinned lambda images for amd64 and arm64 by digest
+        if: steps.lambda.outputs.cache-hit != 'true'
+        id: seed-lambda
+        continue-on-error: true
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda --seed amd64,arm64 --no-load
+      - if: steps.lambda.outputs.cache-hit != 'true' && steps.seed-lambda.outcome == 'success'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
   functions:
-    needs: input
+    needs: [input, images]
     name: functions ${{ matrix.arch }}
     strategy:
       fail-fast: false
@@ -122,7 +150,7 @@ jobs:
         id: images-lambda
         with:
           path: ${{ runner.temp }}/image-cache/lambda
-          key: ci-images-lambda-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Load the pinned Lambda images (cache, else registry by digest)
         run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
       - if: steps.images-lambda.outputs.cache-hit != 'true'
@@ -130,7 +158,7 @@ jobs:
         continue-on-error: true
         with:
           path: ${{ runner.temp }}/image-cache/lambda
-          key: ci-images-lambda-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Lambda zip and Lambda@Edge zip in the Lambda Node 24 image (Runtime Interface Emulator)
         run: node scripts/serverless/run-lambda.mjs "$RUNNER_TEMP/apps/apps.json" .work/lambda.json --compare-lwa public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0
       - name: Install AWS SAM CLI 1.170.0 (official installer)

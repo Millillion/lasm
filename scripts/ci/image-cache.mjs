@@ -5,7 +5,9 @@
 // the pins, scripts/ci/images.lock.json) and loads it in later runs. Users'
 // templates and docs keep the official upstream tags; nothing is republished.
 //
-//   node image-cache.mjs ensure DIR GROUP     load or pull GROUP's images for this runner's architecture
+//   node image-cache.mjs ensure DIR GROUP [--seed amd64,arm64] [--no-load]
+//                                            load or pull GROUP's images for this runner's architecture;
+//                                            --seed also writes the other architectures' archives
 //   node image-cache.mjs lock GROUP REF...    pin REF... (tags) by digest into the lock (maintainers; needs registry access)
 //
 // A loaded or pulled image must have the pinned identity: its image ID is the
@@ -51,20 +53,49 @@ function imageId(ref) {
   return inspect.status === 0 ? inspect.stdout.trim() : undefined;
 }
 
-export async function ensure(directory, group, arch = architecture()) {
+/** Pull `ref` for a foreign architecture by digest and save it to `archive` without keeping a tag. */
+async function saveForeign(ref, pin, archive) {
+  const pinned = await pull(ref, pin);
+  const temporary = archive + '.partial';
+  const save = docker(['save', '-o', temporary, pinned]);
+  assert.equal(save.status, 0, `docker save ${pinned}: ${save.stderr}`);
+  renameSync(temporary, archive);
+  docker(['image', 'rm', pinned]);
+}
+
+/**
+ * Makes GROUP's images for `arch` available locally (tagged with their original
+ * reference), from DIR's archives or the registry, and leaves an archive for each
+ * in DIR. `seed` also writes the other architectures' archives (pulled by
+ * digest, not loaded), so one runner whose address the registry still serves can
+ * fill the cache for every architecture.
+ */
+export async function ensure(directory, group, { arch = architecture(), seed = [], load = true } = {}) {
   const lock = readLock();
   assert.ok(lock.groups[group], `Unknown image group ${group}`);
   mkdirSync(directory, { recursive: true });
   const report = [];
   for (const ref of lock.groups[group]) {
+    // Without loading, this runner's own architecture is seeded too.
+    for (const other of seed.filter(other => other !== arch || !load)) {
+      const pin = lock.images[ref]?.platforms?.[other];
+      assert.ok(pin, `${ref} has no ${other} pin in scripts/ci/images.lock.json`);
+      const archive = join(directory, slug(ref, other) + '.tar');
+      if (!existsSync(archive)) { await saveForeign(ref, pin, archive); report.push({ ref, arch: other, source: 'registry (seeded)' }); }
+      console.log(`${ref} (${other}): archive ready`);
+    }
+    if (!load) continue;
     const pin = lock.images[ref]?.platforms?.[arch];
     assert.ok(pin, `${ref} has no ${arch} pin in scripts/ci/images.lock.json`);
     const archive = join(directory, slug(ref, arch) + '.tar');
     let source;
     if (identityMatches(imageId(ref), pin)) source = 'present';
     else if (existsSync(archive)) {
-      const load = docker(['load', '-q', '-i', archive]);
-      assert.equal(load.status, 0, `docker load ${archive}: ${load.stderr}`);
+      const loaded = docker(['load', '-q', '-i', archive]);
+      assert.equal(loaded.status, 0, `docker load ${archive}: ${loaded.stderr}`);
+      // An archive saved by digest (seeded) carries no tag: tag the loaded image.
+      const id = /sha256:[a-f0-9]{64}/.exec(loaded.stdout)?.[0];
+      if (!identityMatches(imageId(ref), pin) && id) docker(['tag', id, ref]);
       source = 'cache';
     }
     if (!identityMatches(imageId(ref), pin)) {
@@ -74,7 +105,7 @@ export async function ensure(directory, group, arch = architecture()) {
     }
     const id = imageId(ref);
     assert.ok(identityMatches(id, pin), `${ref} (${arch}) is ${id}, not the pinned ${pin.config} / ${pin.manifest}`);
-    if (source === 'registry' || !existsSync(archive)) {
+    if (!existsSync(archive)) {
       const temporary = archive + '.partial';
       const save = docker(['save', '-o', temporary, ref]);
       assert.equal(save.status, 0, `docker save ${ref}: ${save.stderr}`);
@@ -109,7 +140,12 @@ async function lockImages(group, refs) {
 
 if (import.meta.url === new URL(process.argv[1], 'file:').href || process.argv[1]?.endsWith('image-cache.mjs')) {
   const [command, ...rest] = process.argv.slice(2);
-  if (command === 'ensure') { const [directory, group] = rest; assert.ok(directory && group, 'Usage: image-cache.mjs ensure DIR GROUP'); await ensure(directory, group); }
+  if (command === 'ensure') {
+    const [directory, group, ...flags] = rest;
+    assert.ok(directory && group, 'Usage: image-cache.mjs ensure DIR GROUP [--seed amd64,arm64] [--no-load]');
+    const seedIndex = flags.indexOf('--seed');
+    await ensure(directory, group, { seed: seedIndex >= 0 ? flags[seedIndex + 1].split(',') : [], load: !flags.includes('--no-load') });
+  }
   else if (command === 'lock') { const [group, ...refs] = rest; assert.ok(group && refs.length, 'Usage: image-cache.mjs lock GROUP REF...'); await lockImages(group, refs); }
   else if (command !== undefined) throw new Error('Usage: image-cache.mjs ensure DIR GROUP | lock GROUP REF...');
 }

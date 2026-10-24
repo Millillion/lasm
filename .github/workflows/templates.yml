@@ -46,8 +46,37 @@ on:
 permissions:
   contents: read
 jobs:
+  # Fills the image cache for both architectures from an arm64 runner (ECR Public
+  # has refused x64 runners' addresses for hours: run 40136616607). A cache hit
+  # does nothing; consumers fall back to pulling their own architecture.
+  images:
+    if: inputs.docker && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: templates
+        with:
+          path: ${{ runner.temp }}/image-cache/templates
+          key: ci-images-templates-${{ hashFiles('scripts/ci/images.lock.json') }}
+          lookup-only: true
+      - name: Pull the pinned templates images for amd64 and arm64 by digest
+        if: steps.templates.outputs.cache-hit != 'true'
+        id: seed-templates
+        continue-on-error: true
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/templates" templates --seed amd64,arm64 --no-load
+      - if: steps.templates.outputs.cache-hit != 'true' && steps.seed-templates.outcome == 'success'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/image-cache/templates
+          key: ci-images-templates-${{ hashFiles('scripts/ci/images.lock.json') }}
   templates:
-    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    needs: images
+    if: always() && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     strategy:
       fail-fast: false
       matrix:
@@ -98,7 +127,7 @@ jobs:
         id: images-templates
         with:
           path: ${{ runner.temp }}/image-cache/templates
-          key: ci-images-templates-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
+          key: ci-images-templates-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Load the pinned template images (cache, else registry by digest)
         if: inputs.docker && startsWith(matrix.platform, 'linux-')
         run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/templates" templates
@@ -107,7 +136,7 @@ jobs:
         continue-on-error: true
         with:
           path: ${{ runner.temp }}/image-cache/templates
-          key: ci-images-templates-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
+          key: ci-images-templates-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Dockerfiles (build on the runner's architecture, run with 512 MB and a read-only root)
         if: inputs.docker && startsWith(matrix.platform, 'linux-')
         run: |
