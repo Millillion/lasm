@@ -803,6 +803,12 @@ folded into Phases 5.2/5.3 and 7.
   pure-JS host. A Hono app with Lean routes and a pure-Lean handler answer
   requests under `wrangler dev`: about 1.4 MiB per Worker (250 KiB gzip),
   27 MiB of Wasm memory, 55–70 ms startup, 0.04–0.36 ms per request.*
+  *Status (2026-10-24, branch `phase-7`): 7.2 in source: `lasm build --target
+  workers`, `lasm init --deploy workers` (Hono), `Lasm.JS.onEdge` /
+  `exportDefault`, a read-only VFS (UTC zone) and instance restart; CI
+  `workers.yml` (Linux) builds from source, serves with `wrangler dev` and runs on
+  Node 26, Deno and Bun with Free-plan budget gates ([deploy/workers.md](deploy/workers.md)).
+  Open: a published edge runtime package and a Node-link-driver edge recipe.*
 - **Phase 7 — Production hardening on Node.** Long soak and concurrency stress
   (tasks, channels, Std.Sync/Std.Async, cancellation, many threads incl.
   Windows stack commit), startup memory tuning (initial memory, 64 MiB worker

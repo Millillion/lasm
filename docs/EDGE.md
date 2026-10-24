@@ -43,6 +43,42 @@ The same build also runs on Node 26.12.1, Deno 2.9.6 and **Bun 1.4.4**.
 - **Asyncify is rejected:** it makes builds 2.2× larger and 2–3× slower to
   compute, and JSPI is available on every runtime we target.
 
+## Phase 7.2 status: Cloudflare Workers (branch `phase-7`)
+
+**In current branch source.**
+
+- **The command.** `lasm build Main.lean --target workers`
+  ([`src/edge/`](../src/edge/)) relinks the compiled program with the edge
+  runtime. It writes `workers/`: the generated entry, the program, the host,
+  and `wrangler.toml` when the project has none.
+- **The template.** `lasm init --template hono --deploy workers` produces one
+  `Main.lean` for Node and Workers.
+- **The API.** `Lasm.JS.onEdge` and `Lasm.JS.exportDefault` are new.
+  `waitForever` returns at once on the edge.
+- **The read-only VFS** serves the UTC zone (`Std.Time` works).
+- **Instance restart** after a stop.
+- **CI.** [`workers.yml`](../.github/workflows/workers.yml) runs on Linux:
+  - it builds the runtime, the template and
+    [`examples/edge-pure`](../examples/edge-pure/) from source;
+  - it serves them with pinned `wrangler dev` 4.152.0;
+  - it runs them on Node 26.12.1, Deno 2.9.6 and Bun 1.4.4;
+  - it gates the Free plan's budgets.
+
+  The guide is [deploy/workers.md](deploy/workers.md).
+
+**Not done in 7.2:**
+
+- **No published edge runtime package.** Builds need `LASM_EDGE_RUNTIME`
+  (the CI artifact) until the runtime is packaged and published with a release.
+- **The Node link driver.** The edge link uses the managed SDK's `emcc`
+  (about 300 MB once). A recorded edge recipe for the Node link driver would
+  remove that download.
+- **No edge output cache.** An edge build always relinks: about 20 s on top of
+  the Node build.
+- **No Workers-specific bindings API.** Workers bindings other than string
+  variables (KV, D1, R2, Durable Objects) reach Lean only as `Lasm.JS` values
+  through the `env` argument of the fetch handler.
+
 ## Platform facts
 
 ### Engine features (measured)

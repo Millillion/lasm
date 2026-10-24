@@ -37,6 +37,7 @@ test and deploy.
 | Platform | Recipe | Notes |
 | --- | --- | --- |
 | Docker, Kubernetes | [docker-kubernetes.md](docker-kubernetes.md) | The reference: what CI runs. |
+| Cloudflare Workers (experimental, branch `phase-7`) | [workers.md](workers.md) | An edge isolate, not a Node process: `lasm build --target workers`, tested with `wrangler dev`. |
 | Google Cloud Run | [cloud-run.md](cloud-run.md) | amd64 only; use the second-generation execution environment. |
 | Fly.io | [fly.md](fly.md) | Set the VM memory to 512 MB or more. |
 | Railway | [railway.md](railway.md) | Builds the Dockerfile; sets `PORT`. |

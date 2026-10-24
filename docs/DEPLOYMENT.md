@@ -90,6 +90,18 @@ Not yet supported (later phases, see [PLAN.md](PLAN.md)): isolate platforms
 (Cloudflare Workers, Vercel and Netlify Edge, Fastly), which have no threads or
 native add-ons.
 
+## Edge isolates (Phase 7, experimental)
+
+Cloudflare Workers is built on branch `phase-7`:
+
+- the command is `lasm build --target workers`;
+- the runtime is a single-threaded Lean runtime with a pure-JS host;
+- it is tested with `wrangler dev` and on Node 26, Deno and Bun by
+  [`workers.yml`](../.github/workflows/workers.yml).
+
+It is unreleased. See [deploy/workers.md](deploy/workers.md) and
+[EDGE.md](EDGE.md).
+
 ## What the CI matrix runs
 
 Three sample applications, built with the installed candidate exactly as a user
