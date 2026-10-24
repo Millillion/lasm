@@ -1,5 +1,6 @@
 import { parseInitArguments } from './init.mjs';
 import { parsePackageArguments, packageTargets } from './package.mjs';
+import { jsRuntime } from './js-runtime.mjs';
 
 // `lasm build --target`: `node` writes dist/ only; a function platform also
 // packages it (src/package.mjs). Lasm builds for the platform; it never
@@ -84,8 +85,8 @@ export function parseLasmArguments(argv) {
     throw new Error('--allow-dev applies to lasm build --target <platform> and lasm package');
   if (result.command === 'build') {
     result.output ??= 'dist';
-    // Today the CLI runs on Node, so `node` is the default host target.
-    result.target ??= 'node';
+    // The default target is the runtime the CLI runs on: node, bun or deno.
+    result.target ??= jsRuntime === 'node' || result.input.endsWith('.json') ? 'node' : jsRuntime;
     if (result.target !== 'node' && result.input.endsWith('.json')) throw new Error('--target applies to Lean applications, not binding configurations');
   }
   return result;

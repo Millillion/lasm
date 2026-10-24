@@ -168,6 +168,9 @@ stop-and-restart check on Netlify.
   The program, the link, the host and the restart logic are shared with
   Workers, Vercel and Netlify. Netlify Edge also runs on Deno.
 
+Bun and Deno as program targets (`--target bun|deno`, Phase 7.5) share this
+entry: see [BUN_DENO.md](BUN_DENO.md).
+
 **Supabase Edge Functions: not supported.**
 
 - Supabase's edge runtime, even the latest release `v1.77.8`

@@ -1,5 +1,6 @@
 // `lasm init`: scaffold a new Lean-on-Node project from a template.
 // Writes files only: no network access, no Lean toolchain, no npm install.
+import { jsRuntime } from './js-runtime.mjs';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,9 +33,10 @@ export const deployTargets = {
 };
 
 export const templates = {
-  plain: { summary: 'a Lean program (IO only)', server: false, interop: false },
+  // portable: also runs on Bun and Deno (the portable profile, Phase 7.5).
+  plain: { summary: 'a Lean program (IO only)', server: false, interop: false, portable: true },
   express: { summary: 'Express 5 with Lean request handlers (Lasm.JS)', server: true, interop: true },
-  hono: { summary: 'Hono on @hono/node-server with Lean request handlers (Lasm.JS)', server: true, interop: true },
+  hono: { summary: 'Hono on @hono/node-server with Lean request handlers (Lasm.JS)', server: true, interop: true, portable: true },
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
 };
 
@@ -145,10 +147,15 @@ function packageJson(name, template, deploy = []) {
     // Build and package in one step; Vercel's and Netlify's builds run these too.
     if (platform) pkg.scripts[`build:${platform}`] = `lasm build Main.lean --target ${platform}`;
   }
-  // Deno Deploy runs the same entrypoint as the Deno CLI.
-  if (deploy.includes('deno-deploy')) pkg.scripts['start:deno'] = 'deno run -A deno/main.mjs';
-  // Workers bundle the npm modules Lean binds; the Node server stays out.
-  if (deploy.some(target => ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy'].includes(target))) pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
+  // Bun and Deno (portable profile): `bun run dev:bun` runs Lasm itself on
+  // Bun (bun x --bun, even when Node is installed); `deno task dev` runs it on
+  // Deno. Deno Deploy runs the same deno/main.mjs.
+  if (templates[template].portable) Object.assign(pkg.scripts, {
+    'dev:bun': 'bun x --bun lasm Main.lean --', 'build:bun': 'bun x --bun lasm build Main.lean --target bun', 'start:bun': 'bun bun/main.mjs',
+    'build:deno': 'lasm build Main.lean --target deno', 'start:deno': 'deno run -A deno/main.mjs' });
+  else if (deploy.includes('deno-deploy')) pkg.scripts['start:deno'] = 'deno run -A deno/main.mjs';
+  // Edge and portable builds import the npm modules Lean binds; the Node server stays out.
+  if (template === 'hono') pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
   const dependencies = Object.assign({}, npm[template], ...deploy.map(target => deployTargets[target].dependencies));
   if (Object.keys(dependencies).length) pkg.dependencies = Object.fromEntries(Object.entries(dependencies).sort(([a], [b]) => a < b ? -1 : 1));
   pkg.devDependencies = { [lasm.name]: lasm.version };
@@ -272,10 +279,11 @@ const netlifyEdgeToml = `# Netlify runs the build: lasm build --target netlify-e
   publish = "public"
 `;
 
-function deployGitignore(deploy) {
+function deployGitignore(deploy, template) {
   const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
     'vercel-edge': '.vercel/\napi/lasm.mjs\napi/_lasm/', 'netlify-edge': '.netlify/\nnetlify/lasm/\nnetlify/edge-functions/lasm.mjs', 'deno-deploy': 'deno/' };
-  return gitignore + deploy.map(target => extra[target]).filter(Boolean).map(line => line + '\n').join('');
+  const portable = templates[template]?.portable ? ['bun/', 'deno/'] : [];
+  return gitignore + [...new Set([...portable, ...deploy.map(target => extra[target]).filter(Boolean)])].map(line => line + '\n').join('');
 }
 
 const dockerignore = `node_modules
@@ -339,7 +347,21 @@ Files:
 | \`Dockerfile\` | Builds with Lasm, runs on \`node:24-bookworm-slim\`. |
 
 ${native}
+${t.portable ? `
+## Bun and Deno
 
+The same \`Main.lean\` also runs on Bun and Deno with Lasm's portable profile. Lean
+runs single-threaded there, with no files, sockets or processes${t.server ? ', and the Hono app is\nserved with \`Bun.serve\` or \`Deno.serve\`' : ''}:
+
+\`\`\`sh
+bun install && bun run dev:bun${template === 'plain' ? ' Ada' : ''}      # Lasm itself runs on Bun
+bun run build:bun && bun run start:bun                # bun/main.mjs
+deno install && deno task dev${template === 'plain' ? ' Ada' : ''}       # Lasm itself runs on Deno
+deno task build:deno && deno task start:deno         # deno/main.mjs
+\`\`\`
+
+See [Bun and Deno](https://github.com/Millillion/lasm/blob/main/docs/BUN_DENO.md).
+` : ''}
 ## Deploy
 
 \`dist/\` is the whole deployment${t.interop ? ', including the production `node_modules`' : ''}: copy it to a machine
@@ -432,7 +454,7 @@ export function initProject({ directory, template, deploy = [] }) {
     'README.md': readme(name, template, deploy),
     'Dockerfile': dockerfile(template),
     '.dockerignore': dockerignore,
-    '.gitignore': deployGitignore(deploy),
+    '.gitignore': deployGitignore(deploy, template),
   };
   if (deploy.includes('lambda')) files['Dockerfile.lambda'] = lambdaDockerfile();
   if (deploy.includes('vercel')) files['vercel.json'] = vercelJson;
@@ -458,7 +480,15 @@ export function runInit(options) {
   ${result.files.join(', ')}
 
 Next:
-${cd}  npm install
-  npm run dev${options.template === 'plain' ? '' : '          # then: curl http://localhost:3000/hello/Ada'}`);
+${cd}${nextSteps(options.template, jsRuntime)}`);
   return 0;
+}
+
+/** The first commands, for the runtime that ran lasm init (Bun and Deno: portable templates). */
+export function nextSteps(template, runtime = 'node') {
+  const portable = templates[template].portable;
+  const server = template !== 'plain';
+  if (runtime === 'bun' && portable) return `  bun install\n  bun run dev:bun${server ? '      # then: curl http://localhost:3000/hello/Ada' : ''}`;
+  if (runtime === 'deno' && portable) return `  deno install\n  deno task dev${server ? '        # then: curl http://localhost:8000/hello/Ada' : ''}`;
+  return `  npm install\n  npm run dev${server ? '          # then: curl http://localhost:3000/hello/Ada' : ''}`;
 }

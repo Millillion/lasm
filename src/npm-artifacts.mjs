@@ -11,13 +11,15 @@
 //   install: 'optional'  platform package in optionalDependencies (os/cpu/libc)
 //            'required'  shared package in dependencies
 //            'demand'    never installed; fetched with `npm pack` when a build needs it
-import { readFile, lstat, copyFile, mkdir, readdir, rename, rm } from 'node:fs/promises';
+//                        (under Bun or Deno with no npm: from the registry directly)
+import { readFile, lstat, copyFile, mkdir, readdir, rename, rm, open } from 'node:fs/promises';
 import { createReadStream, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { basename, dirname, join, posix, win32 } from 'node:path';
 import { x as extractTar } from 'tar';
+import { jsRuntime } from './js-runtime.mjs';
 
 export const artifactSourceModes = Object.freeze(['auto', 'npm', 'https']);
 const packageName = /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/;
@@ -141,17 +143,24 @@ function runNpm(npm, args, { cwd, env, signal, timeoutMs }) {
  * the user's npm configuration), check the tarball against the pinned sha512, and
  * extract only the archive file. Its SHA-256 is checked by the caller. */
 export async function fetchNpmPackage(entry, directory, { npm = findNpm(), cwd = process.cwd(), env = process.env, signal,
-  timeoutMs = 7_200_000, run = runNpm } = {}) {
-  if (!npm) throw new Error('npm was not found (npm_execpath, beside Node, or on PATH)');
+  timeoutMs = 7_200_000, run = runNpm, fetch: fetch_ = globalThis.fetch, registryFallback = jsRuntime !== 'node' } = {}) {
   const tarballs = join(directory, 'npm-pack'), unpacked = join(directory, 'npm-unpacked');
   await mkdir(tarballs, { recursive: true }); await mkdir(unpacked, { recursive: true });
-  const output = await run(npm, ['pack', npmSpec(entry), '--pack-destination', tarballs, '--json', '--ignore-scripts',
-    '--no-audit', '--no-fund', '--loglevel=error'], { cwd, env: { ...env, npm_config_update_notifier: 'false' }, signal, timeoutMs });
-  let filename;
-  try { filename = JSON.parse(output.slice(output.indexOf('[')))[0].filename; } catch { filename = undefined; }
-  const files = await readdir(tarballs);
-  if (files.length !== 1 || (filename && basename(filename) !== files[0])) throw new Error(`npm pack ${npmSpec(entry)} produced no single tarball`);
-  const tarball = join(tarballs, files[0]);
+  let tarball;
+  if (npm) {
+    const output = await run(npm, ['pack', npmSpec(entry), '--pack-destination', tarballs, '--json', '--ignore-scripts',
+      '--no-audit', '--no-fund', '--loglevel=error'], { cwd, env: { ...env, npm_config_update_notifier: 'false' }, signal, timeoutMs });
+    let filename;
+    try { filename = JSON.parse(output.slice(output.indexOf('[')))[0].filename; } catch { filename = undefined; }
+    const files = await readdir(tarballs);
+    if (files.length !== 1 || (filename && basename(filename) !== files[0])) throw new Error(`npm pack ${npmSpec(entry)} produced no single tarball`);
+    tarball = join(tarballs, files[0]);
+  } else if (registryFallback) {
+    // Bun or Deno with no npm (Phase 7.5): the same pinned tarball straight
+    // from the registry; the sha512 check below decides, as with npm pack.
+    tarball = join(tarballs, 'package.tgz');
+    await downloadRegistryTarball(registryTarballUrl(entry, env), tarball, { fetch: fetch_, signal, timeoutMs });
+  } else throw new Error('npm was not found (npm_execpath, beside Node, or on PATH)');
   if (await sha512(tarball) !== entry.integrity) throw new Error(`npm package ${npmSpec(entry)} does not match its pinned integrity`);
   const member = `package/${entry.file}`;
   let seen = 0;
@@ -164,6 +173,33 @@ export async function fetchNpmPackage(entry, directory, { npm = findNpm(), cwd =
   if (seen !== 1) throw new Error(`npm package ${npmSpec(entry)} lacks ${entry.file}`);
   await rm(tarballs, { recursive: true, force: true });
   return join(unpacked, 'package', entry.file);
+}
+
+/** The registry tarball of a pinned package: npm_config_registry (set by npm,
+ * Bun and Deno tasks from .npmrc) or the public registry. */
+export function registryTarballUrl(entry, env = process.env) {
+  const registry = (env.npm_config_registry || env.NPM_CONFIG_REGISTRY || 'https://registry.npmjs.org/').replace(/\/*$/, '/');
+  return `${registry}${entry.package}/-/${entry.package.split('/').pop()}-${entry.version}.tgz`;
+}
+
+const maximumTarballBytes = 2 * 1024 ** 3;
+async function downloadRegistryTarball(url, file, { fetch: fetch_, signal, timeoutMs }) {
+  const loopback = host => ['localhost', '127.0.0.1', '[::1]'].includes(host);
+  const allowed = target => { const u = new URL(target); return !u.username && !u.password && (u.protocol === 'https:' || u.protocol === 'http:' && loopback(u.hostname)); };
+  if (!allowed(url)) throw new Error(`The npm registry must be credential-free HTTPS: ${url}`);
+  const timeout = AbortSignal.timeout(timeoutMs);
+  const response = await fetch_(url, { signal: signal ? AbortSignal.any([signal, timeout]) : timeout, redirect: 'follow' });
+  if (!allowed(response.url || url)) throw new Error(`The npm registry redirected away from HTTPS: ${response.url}`);
+  if (!response.ok) throw new Error(`The npm registry returned ${response.status} for ${url}`);
+  const handle = await open(file, 'w');
+  try {
+    let bytes = 0;
+    for await (const chunk of response.body) {
+      bytes += chunk.length;
+      if (bytes > maximumTarballBytes) throw new Error(`${url} is larger than ${maximumTarballBytes} bytes`);
+      await handle.write(chunk);
+    }
+  } finally { await handle.close(); }
 }
 
 /** Obtain one catalog artifact into `archive` and return the source used. `verify`

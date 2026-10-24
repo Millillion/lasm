@@ -814,6 +814,12 @@ folded into Phases 5.2/5.3 and 7.
   cache). 7.3 in source: `--target vercel-edge` and `--target netlify-edge`. 7.4:
   `--target deno-deploy` in source; Supabase Edge Functions not supported (its
   runtime, V8 11.6, has no JSPI). See [EDGE.md](EDGE.md).*
+  *Status (2026-10-24, branch `phase-7`): 7.5 in source, Linux-tested: the
+  compiler under Bun 1.4.4 and Deno 2.9.6 (byte-identical builds),
+  `--target bun|deno` (portable profile; CLI programs and servers), default
+  target = the CLI's runtime, registry fetch without npm, init scripts for
+  Bun and Deno. Open: macOS/Windows CI (after the 0.1.0 gate), installing the
+  published packages with bun/deno. See [BUN_DENO.md](BUN_DENO.md).*
 - **Phase 7 — Production hardening on Node.** Long soak and concurrency stress
   (tasks, channels, Std.Sync/Std.Async, cancellation, many threads incl.
   Windows stack commit), startup memory tuning (initial memory, 64 MiB worker

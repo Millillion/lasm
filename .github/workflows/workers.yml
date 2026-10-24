@@ -21,6 +21,9 @@ on:
       - 'src/application-binding-check.mjs'
       - 'src/application-build-worker.mjs'
       - 'src/link-driver/**'
+      - 'src/cli-arguments.mjs'
+      - 'src/npm-artifacts.mjs'
+      - 'packages/create-lasm/**'
       - 'src/init.mjs'
       - 'library/**'
       - 'templates/hono/**'
@@ -108,4 +111,66 @@ jobs:
         with:
           name: workers-results
           path: .work/edge-apps/*.json
+          retention-days: 14
+  # Phase 7.5: the compiler under Node, Bun and Deno (Linux only until the
+  # 0.1.0 gate allows macOS and Windows on this branch).
+  hosts:
+    needs: runtime
+    runs-on: ${{ matrix.runner }}
+    name: Compiler on Bun and Deno ${{ matrix.platform }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+    env:
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+      CI: '1'
+      BROWSER: 'false'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'${{ matrix.platform }}')"
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Native host pieces (koffi, helpers)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      - name: Fetch the pinned Node runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-archive
+          path: .work/edge-archive
+      - name: Extract the packaged edge runtime
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+      - name: Pinned Bun and Deno
+        run: npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
+      - name: Build under Node, Bun and Deno; serve and run on Bun and Deno
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: node scripts/edge/compiler-hosts-ci.mjs .work/hosts .work/host-tools
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: hosts-results-${{ matrix.platform }}
+          path: .work/hosts/*.json
           retention-days: 14

@@ -93,6 +93,15 @@ test('every template creates a complete project', () => {
     assert.deepEqual(edgePkg.lasm, { edge: { exclude: ['@hono/node-server'] } });
     assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^deno\/$/m);
     assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /entrypoint to `deno\/main\.mjs`/);
+    // Bun and Deno scripts (portable templates: plain and hono only).
+    assert.equal(edgePkg.scripts['dev:bun'], 'bun x --bun lasm Main.lean --');
+    assert.equal(edgePkg.scripts['build:deno'], 'lasm build Main.lean --target deno');
+    assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /## Bun and Deno/);
+    assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^bun\/$/m);
+    assert.equal(readFileSync(join(edge, '.gitignore'), 'utf8').match(/^deno\/$/gm).length, 1);
+    initProject({ directory: join(root, 'express-app'), template: 'express' });
+    const expressPkg = JSON.parse(readFileSync(join(root, 'express-app', 'package.json'), 'utf8'));
+    assert.ok(!expressPkg.scripts['dev:bun'] && !expressPkg.lasm, 'Express needs Node');
     // Never overwrite: a non-empty directory is refused; an empty one (or only .git) is used.
     assert.throws(() => initProject({ directory: join(root, 'app plain'), template: 'plain' }), /is not empty/);
     mkdirSync(join(root, 'empty', '.git'), { recursive: true });
