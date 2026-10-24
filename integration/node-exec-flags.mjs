@@ -15,6 +15,7 @@ import { join, resolve } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { connect, createServer } from 'node:net';
 import { fileURLToPath } from 'node:url';
+import { failedChecks } from './exec-flags-check.mjs';
 
 const args = process.argv.slice(2);
 const values = name => args.flatMap((arg, i) => arg === name ? [args[i + 1]] : []);
@@ -75,7 +76,7 @@ async function serve(node, flags) {
     const response = await get(port).catch(error => {
       throw new Error(`${error.message}; server stdout ${JSON.stringify(stdout.slice(-500))} stderr ${JSON.stringify(stderr.slice(-1500))} exit ${child.exitCode}`);
     });
-    return { ...response, stderr: stderr.replace(/Debugger listening on .*\n|For help, see: .*\n/g, '') };
+    return { ...response, stderr };
   } finally { child.kill('SIGKILL'); }
 }
 const results = [];
@@ -85,15 +86,15 @@ for (const node of nodes) {
   for (const flags of flagSets.filter(flags => network || !flags.some(flag => flag.startsWith('--inspect')))) {
     const run = spawnSync(node, [...flags, join(dist, 'main.mjs')], { cwd: dist, encoding: 'utf8', timeout: 120_000 });
     // --inspect prints its banner on stderr; nothing else may appear.
-    const stderr = (run.stderr ?? '').replace(/Debugger listening on .*\n|For help, see: .*\n/g, '');
+    const stderr = run.stderr ?? '';
     const program = { code: run.status, signal: run.signal, stdout: run.stdout, stderr };
     baseline ??= program;
     let server, serverError;
     if (network) try { server = await serve(node, flags); } catch (error) { serverError = [error.message, error.cause?.code, error.cause?.message].filter(Boolean).join(': '); }
-    const passed = program.code === 0 && program.stderr === '' && program.stdout === baseline.stdout
-      && (!network || server?.status === 200 && server.body === '{"ok":true}' && server.stderr === '');
-    results.push({ node: version, flags, passed, program, server, serverError });
-    console.log(`${passed ? 'PASS' : 'FAIL'} node ${version} ${flags.join(' ') || '(no flags)'}${passed ? '' : `: ${JSON.stringify({ program, server, serverError }).slice(0, 600)}`}`);
+    const failed = failedChecks({ program, server, serverError, baselineStdout: baseline.stdout, network });
+    const passed = failed.length === 0;
+    results.push({ node: version, flags, passed, failed, program, server, serverError });
+    console.log(`${passed ? 'PASS' : 'FAIL'} node ${version} ${flags.join(' ') || '(no flags)'}${passed ? '' : `: ${failed.join('; ')}`}`);
   }
 }
 const result = { scope: 'Built Lasm application under Node exec flags', dist, network, passed: results.every(r => r.passed), results };

@@ -26,7 +26,7 @@ const node = join(stock, 'node.exe'); copyFileSync(process.execPath, node);
 await verifyNativeProgram(node);
 cpSync(join(dirname(process.execPath), 'node_modules/npm'), join(stock, 'node_modules/npm'), { recursive: true, dereference: true });
 for (const name of ['npm.cmd', 'npx.cmd']) copyFileSync(join(dirname(process.execPath), name), join(stock, name));
-for (const name of ['node-installed.mjs', 'node-cache-controls.mjs', 'node-exec-flags.mjs']) copyFileSync(join(root, 'integration', name), join(workspace, name));
+for (const name of ['node-installed.mjs', 'node-cache-controls.mjs', 'node-exec-flags.mjs', 'exec-flags-check.mjs']) copyFileSync(join(root, 'integration', name), join(workspace, name));
 mkdirSync(join(workspace, 'fixtures'));
 for (const name of ['BundleFeatures.lean', 'BundleFeaturesLegacy.lean', 'FilesystemSurface.lean', 'CompileTimeFeatures.lean', 'StandaloneModuleData.lean', 'RuntimeModulePath.lean'])
   copyFileSync(join(root, 'integration/fixtures', name), join(workspace, 'fixtures', name));
