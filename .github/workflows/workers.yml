@@ -78,6 +78,8 @@ jobs:
           path: .work/edge-runtime
       - name: Pinned local platform tools (wrangler with workerd, Deno, Bun)
         run: npm install --prefix .work/edge-tools --no-audit --no-fund wrangler@4.152.0 deno@2.9.6 bun@1.4.4
+      - name: Managed Emscripten SDK for the edge link (its own bounded step)
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/edge-sdk-resources.json -- node --input-type=module -e "const { provisionSdk } = await import('./src/managed-sdk.mjs'); const sdk = await provisionSdk({ log: console.log }); console.log(sdk.identity)"
       - name: Build, serve and check the Workers apps
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
