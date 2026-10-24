@@ -5,42 +5,33 @@ only supported JavaScript runtime.
 
 **Start here: [Getting started](docs/GETTING_STARTED.md)** goes from Node and npm to a
 web server with Lean request handlers (Hono or Express), an npm package called from
-Lean, and a container deployment, with [recipes per platform](docs/deploy/README.md).
-It uses `lasm init` from current source (tested in candidates `.55` and later, not yet in an accepted candidate).
+Lean, a container deployment and function platforms, with
+[recipes per platform](docs/deploy/README.md).
 
-**Prerequisites:** stock **Node 26.12.0 with npm 11.20.0** for accepted candidate
-`.54` (Phase 3/4 candidates pin **Node 26.12.1**, same npm). Current source (Phase
-5.1, not yet in an accepted candidate) accepts **Node 24 or newer with npm**, for
-the compiler and for built applications, and is tested on Node 24.22.1 and 26.12.1
-(the compiler on Node 24 on Linux, macOS x64 and Windows x64; on macOS arm64 on Node 26.12.1).
-Lasm downloads its matching **Lean 4.35.0**, Lake, and build tools; you do not install
-them yourself. Lasm supports exactly Lean 4.35.0.
+**Prerequisites:** **Node 24 or newer with npm**, for the compiler and for built
+applications (tested on Node 24.0.0, 24.22.1 and 26.12.1). Lasm brings its
+matching **Lean 4.35.0**, Lake and build tools through npm; you do not install them
+yourself. Lasm supports exactly Lean 4.35.0.
 **Git, only for Lake projects with dependencies:** Lasm uses the `git` on your PATH
-and ships none (current source; candidates up to `.58` download one). Programs and
-Lake projects without dependencies need no Git. A project with Git or Reservoir
-dependencies stops before Lake runs, with the install command: macOS
-`xcode-select --install` (or `brew install git`), Debian/Ubuntu `sudo apt install
-git`, Fedora/RHEL/Amazon Linux `sudo dnf install git`, Windows `winget install --id
-Git.Git -e` (or git-scm.com).
-The package is experimental and **has not been published to npm**.
+and ships none. Programs and Lake projects without dependencies need no Git. A
+project with Git or Reservoir dependencies stops before Lake runs, with the install
+command: macOS `xcode-select --install` (or `brew install git`), Debian/Ubuntu
+`sudo apt install git`, Fedora/RHEL/Amazon Linux `sudo dnf install git`, Windows
+`winget install --id Git.Git -e` (or git-scm.com).
 
 ## Get started
-
-Once `@lasm/cli` 0.1.0 is published (**not yet**), a new project starts with
 
 ```sh
 npm create lasm@latest my-app -- --template hono   # or: npx @lasm/cli init my-app --template hono
 cd my-app && npm install && npm run dev
+curl http://localhost:3000/hello/Ada               # {"message":"Hello, Ada, from Lean!"}
 ```
 
-as in [Getting started](docs/GETTING_STARTED.md). Until then:
-
-On a supported Linux, Mac, or Windows machine, get the tested `.58` tarball (draft release
-`node-linux-candidate-40012750099`, run 40012750099) from a maintainer (repository access may be required). Copy it into an empty directory:
-
-```sh
-npm install ./lasm-compiler-0.1.0-experimental.58.tgz
-```
+`npm create lasm` runs `lasm init` of the same `@lasm/cli` version with the
+arguments unchanged; templates are `plain`, `express`, `hono` and `std-http`
+([CLI reference](#cli-reference)). In an existing directory, install the compiler
+with `npm install -D @lasm/cli` (the bin is `lasm`), or run it without installing:
+`npx @lasm/cli Main.lean`.
 
 Save this complete program as `Main.lean`:
 
@@ -54,56 +45,46 @@ Run, build, and deploy:
 ```sh
 npx lasm Main.lean           # Compile and run: Hello from Lean! 2 + 3 = 5
 npx lasm build Main.lean     # Create dist/ without running main
-node dist/main.mjs          # Run the deployment
+node dist/main.mjs           # Run the deployment
+npx lasm build Main.lean --target lambda   # dist/ and an AWS Lambda zip (also vercel, netlify, …)
 ```
 
-The first build needs internet access and downloads about 250–275 MB for an
-ordinary program (tiered Lean and a minimal compiler toolchain, no Python); Lake
-projects and programs importing `Lean` download more. Measured first builds of a
-small program took 42–60 seconds on Linux and Apple Silicon and about 3 minutes on
-the slower Intel Mac and Windows CI machines. Candidate `.54` passed acceptance and
-three consecutive cold installations on all five targets (see
-[toolchain slimming](docs/TOOLCHAIN_SLIMMING.md)). The terminal shows progress
-and elapsed time. Later builds reuse verified tools and unchanged outputs. See
-[cache locations, requirements, and recovery](docs/NODE_SUPPORT.md).
-Downloads have bounded retries, safe resume, crash recovery, offline repair, and
-bundled installer dependencies. The hardened candidate passed installed, offline, deployment,
-and proxy/CA acceptance on all six native targets then tested (including Windows
-ARM64, since removed), alongside the installer fault
-checks, and its repeated-installation gate (three consecutive clean cold
-installations on every target) passed on 2026-10-16. See
-[installation hardening](docs/INSTALLATION_HARDENING.md) for settings and progress.
-New candidates must also pass three consecutive cold installations on every target
-before meeting the additional robustness gate; one successful run alone is insufficient.
+`npm install @lasm/cli` brings Lean and the build tools as exact-pinned `@lasm/…`
+npm packages for your platform (about 340 MB on Linux x64), through your own npm
+registry, proxy and cache. The Lake/`Lean`-import data and, only for Lake projects
+with C code, the C tier (`@lasm/lean-c-<platform>`) are fetched with your npm on
+first use. `LASM_ARTIFACT_SOURCE=npm` forbids direct downloads; `https` ignores the
+packages and downloads the same verified archives from GitHub releases. The
+terminal shows progress and elapsed time; later builds reuse verified tools and
+unchanged outputs. See [cache locations, requirements, and recovery](docs/NODE_SUPPORT.md)
+and [installation hardening](docs/INSTALLATION_HARDENING.md) for retries, resume,
+offline repair, proxies and private CAs.
 
-Copy **all of `dist/`** to a supported machine. Candidates up to the Phase 4
-interop candidate require the **same OS, architecture, and Node version**. Current
-source (Phase 5.1) runs `dist/` on **Node 24 or newer** on Linux x64 and arm64
-(glibc 2.28+) from a build on any supported platform, and on the build machine's
-own platform; see [Supported platforms](#supported-platforms). No Lean source, npm
-install, build tools, or development cache is needed there. Include your
-application's external assets yourself.
+Copy **all of `dist/`** to a supported machine: it runs on **Node 24 or newer**
+on Linux x64 and arm64 (glibc 2.28+, or musl/Alpine) from a build on any supported
+platform, and on the build machine's own platform; see
+[Supported platforms](#supported-platforms). No Lean source, npm install, build
+tools or development cache is needed there. Include your application's external
+assets yourself.
 
 An existing Lake project can use local imports normally. To pin Lean, put
-`leanprover/lean4:v4.35.0` in its `lean-toolchain` file. Lasm supports exactly
-Lean 4.35.0; other versions are rejected with `Unsupported Lean toolchain … Lasm
-supports Lean v4.35.0; set lean-toolchain to leanprover/lean4:v4.35.0` (candidates
-up to `.58` word it `Supported managed versions: 4.35.0`) and the pin is left
-unchanged. Current source has a per-package
-[compatibility list](https://github.com/Millillion/lasm/blob/main/docs/COMPATIBILITY.md) (Batteries, Cli, LSpec,
-Plausible, Aesop, Qq, leansqlite, UnicodeBasic, MD4Lean, lean-zip, lean4-parser, lean-redis
-and others); packages not on it are untested.
-After an authorized npm release, `npm create lasm` (the `create-lasm` package runs
-`lasm init` of the same `@lasm/cli` version with the arguments unchanged) creates
-projects, and installation is `npm install @lasm/cli` (or `npx @lasm/cli Main.lean`
-without installing); the bin stays `lasm`. These registry commands are **not
-available yet**. Current source, not yet in a candidate,
-can take its build tools from exact-pinned `@lasm/…` npm packages instead of
-downloading them, and fetches the Lake/`Lean`-import data, the C tier
-(`@lasm/lean-c-<platform>`, only for Lake projects with C code) with your own
-npm on first use; this was validated only against a local test registry
-([npm distribution](docs/TOOLCHAIN_SLIMMING.md#phase-3-2026-10-16-npm-distribution)).
-`LASM_ARTIFACT_SOURCE=npm` forbids direct downloads; `https` ignores the packages.
+`leanprover/lean4:v4.35.0` in its `lean-toolchain` file. Other versions are rejected
+with `Unsupported Lean toolchain … Lasm supports Lean v4.35.0; set lean-toolchain
+to leanprover/lean4:v4.35.0` and the pin is left unchanged. A per-package
+[compatibility list](https://github.com/Millillion/lasm/blob/main/docs/COMPATIBILITY.md)
+covers Batteries, Cli, LSpec, Plausible, Aesop, Qq, leansqlite, UnicodeBasic,
+MD4Lean, lean-zip, lean4-parser, lean-redis and others; packages not on it are
+untested.
+
+### From a candidate tarball (maintainers)
+
+Release candidates are packed by CI before they reach npm.
+On a supported Linux, Mac, or Windows machine, get the tested `.58` tarball (draft release
+`node-linux-candidate-40012750099`, run 40012750099) from a maintainer (repository access may be required). Copy it into an empty directory:
+
+```sh
+npm install ./lasm-compiler-0.1.0-experimental.58.tgz
+```
 
 ## CLI reference
 
@@ -122,7 +103,7 @@ These are all commands and options in the ordinary Node application interface:
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
-| New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono`; after publication also `npm create lasm@latest my-app -- --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. `--deploy lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` (repeatable): `npm run build:<target>` scripts (`lasm build --target`), `vercel.json`/`netlify.toml`, and the platform npm package for `azure` and `gcf`. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
+| New project | `npm create lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. `--deploy lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` (repeatable): `npm run build:<target>` scripts (`lasm build --target`), `vercel.json`/`netlify.toml`, and the platform npm package for `azure` and `gcf`. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
 | Package an existing build | `npx lasm package --target lambda` | Package a built server (default `dist/`; any server that listens on `$HOST:$PORT`) for one or more platforms without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output; `lasm package dist2 --target lambda` packages another build. Checks the platform's size limit and leaves out the musl pieces (function platforms use glibc). Files only, no network. Refuses a dev build unless `--allow-dev` is given (then it warns). |
 | Cache repair | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
@@ -131,7 +112,7 @@ These are all commands and options in the ordinary Node application interface:
 exit status is preserved. There is currently no Lasm install, clean, uninstall,
 or version subcommand.
 
-**Build profiles (current source).** Both profiles link the same program with the
+**Build profiles.** Both profiles link the same program with the
 same settings and libraries, and both are deterministic:
 
 - **release** (`lasm build`, `lasm build --target …`, `lasm Main.lean --release`):
@@ -155,8 +136,8 @@ Environment variables (all optional; set them before `npx lasm …`):
 | Variable | Example | Effect |
 | --- | --- | --- |
 | `LASM_TOOLCHAIN_CACHE` | `LASM_TOOLCHAIN_CACHE=/data/lasm-cache npx lasm Main.lean` | Move the managed tool cache ([default locations](docs/NODE_SUPPORT.md)). |
-| `LASM_BUILD_JOBS` (current source) | `LASM_BUILD_JOBS=2 npx lasm build Main.lean` | Threads for Binaryen's optimizer (default: the machine's CPUs, at most 8). The output is the same for any value. |
-| `LASM_ARTIFACT_SOURCE` (current source) | `LASM_ARTIFACT_SOURCE=npm npx lasm Main.lean` | `auto` (default): `@lasm/…` npm tool packages when present, else HTTPS; `npm`: never download directly; `https`: ignore the npm packages. |
+| `LASM_BUILD_JOBS` | `LASM_BUILD_JOBS=2 npx lasm build Main.lean` | Threads for Binaryen's optimizer (default: the machine's CPUs, at most 8). The output is the same for any value. |
+| `LASM_ARTIFACT_SOURCE` | `LASM_ARTIFACT_SOURCE=npm npx lasm Main.lean` | `auto` (default): `@lasm/…` npm tool packages when present, else HTTPS; `npm`: never download directly; `https`: ignore the npm packages. |
 | `LASM_DOWNLOAD_ATTEMPTS`, `LASM_DOWNLOAD_CONNECT_MS`, `LASM_DOWNLOAD_IDLE_MS`, `LASM_DOWNLOAD_TOTAL_MS` | `LASM_DOWNLOAD_TOTAL_MS=14400000 npx lasm Main.lean` | Download retries and timeouts ([defaults and ranges](docs/INSTALLATION_HARDENING.md#transfers)). |
 | `NODE_USE_ENV_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, `NODE_EXTRA_CA_CERTS` (Node's own) | `NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://proxy:8080 npx lasm Main.lean` | Proxies and private CAs ([corporate networks](docs/INSTALLATION_HARDENING.md#corporate-networks)). |
 
@@ -198,7 +179,7 @@ automatically on Linux x64.
 
 ## Supported platforms
 
-Current source (Phase 5.1). A built application (`dist/`) needs **Node 24 or
+A built application (`dist/`) needs **Node 24 or
 newer**; Node 22 and older stop with `This application requires Node 24.0.0 or
 newer`. Give it **at least 512 MB of memory**. Each platform below is **tested in
 CI** with the local runtime, image or emulator named; none is checked with a real
@@ -421,15 +402,15 @@ A summary; the sections above and the linked pages have the details.
 
 ## Releases and provenance
 
-Nothing is published yet. Lasm's npm packages (`@lasm/cli`, `create-lasm` and the
-`@lasm/…` tool packages) will be published only by the
+0.1.0 is the first npm release. Lasm's npm packages (`@lasm/cli`, `create-lasm` and
+the `@lasm/…` tool packages) are published only by the
 [`release.yml`](.github/workflows/release.yml) GitHub Actions workflow, through npm
 trusted publishing with provenance: no npm tokens exist, and each package trusts
 only that workflow of this repository. A release is a pull request that bumps the
 `package.json` version; it is published only after the `release-checks` status
 (the five-platform candidate checks and an npm rehearsal of the exact packages)
 passed for the released commit. Releases get the tag `v<version>` and a GitHub
-release with the notes. Once published, `npm view @lasm/cli@<version>` shows the
+release with the notes ([0.1.0](docs/release/0.1.0-notes.md)). `npm view @lasm/cli@<version>` shows the
 provenance, and `npm audit signatures` in a project verifies it. Details:
 [Releasing](docs/RELEASING.md).
 
@@ -441,7 +422,7 @@ Lasm's MIT and every component it bundles, with their texts in `licenses/`. The
 [license audit](docs/LICENSE_AUDIT.md) lists every distributed component, its
 license and how each obligation is met.
 
-- **Built `dist/`** (current source). `THIRD_PARTY_NOTICES.txt` starts with Lasm's
+- **Built `dist/`**. `THIRD_PARTY_NOTICES.txt` starts with Lasm's
   MIT notice and the list of Lean files Lasm changed, then the licenses of what
   `program.wasm`, `program.cjs` and `host/` contain: Lean's runtime and standard
   library (Apache-2.0), Emscripten (MIT OR NCSA), musl, LLVM libc++, libc++abi,
