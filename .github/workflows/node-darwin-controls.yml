@@ -33,8 +33,6 @@ jobs:
       - name: Verify temporary file and directory paths
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-temporary-resources.json -- node --test test/native-temporary.test.mjs
       - name: Verify smart-HTTP private Git fixture with a tree-filtered fetch (system Git)
-        env:
-          LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/darwin-network-git-resources.json -- node --test test/network-git.test.mjs
       - name: Preserve resource evidence
         if: always()
