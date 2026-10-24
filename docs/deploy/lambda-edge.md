@@ -28,7 +28,7 @@ and what they mean here:
 | x86_64 only, created in us-east-1 | Use `--architectures x86_64`; the zip carries the x64 native pieces. |
 | 50 MB zipped for origin triggers; 1 MB for viewer triggers | `lasm package` fails above 50 MB. The templates are 1.4–2.0 MB zipped, so **viewer-request and viewer-response triggers are too small**: use origin request. |
 | No environment variables, layers or container images | The handler needs none: it sets `HOST` and `PORT` itself inside the function. |
-| 30 s timeout (origin), memory as for Lambda | Give it 512 MB or more; a cold start includes the Lean server's start (about 0.5–0.7 s in the emulator). |
+| 30 s timeout (origin), memory as for Lambda | Give it 512 MB or more; the init phase includes the Lean server's start (0.45–0.52 s in the emulator on x64). |
 | Request bodies only with "Include body"; generated responses up to 1 MB | Without "Include body" the server sees no body. Larger responses fail at CloudFront. |
 | Read-only and disallowed response headers | The handler drops `Content-Length`, `Transfer-Encoding`, `Connection`, `Via`, `X-Cache`, `X-Amz-Cf-*`, `X-Edge-*` and similar headers from the server's response. |
 

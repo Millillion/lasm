@@ -197,11 +197,13 @@ cloud account or deployment. Details, requirements and the full matrix:
 | AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` + AWS Lambda Web Adapter through the Runtime Interface Emulator, x86_64 and arm64; `amazonlinux:2023` |
 | AWS Lambda (.zip, `nodejs24.x`; Phase 6 source, not yet in a candidate) | `lasm package --target lambda` zips of every server template in `public.ecr.aws/lambda/nodejs:24` through the Runtime Interface Emulator, x86_64 and arm64, with API Gateway REST/HTTP API, function URL and ALB sample events; AWS SAM CLI `sam local invoke` and `sam local start-api` |
 | Lambda@Edge (origin request, x86_64; Phase 6 source) | the same image and emulator with CloudFront origin-request sample events; CloudFront itself is not emulated |
+| Vercel Functions (Node.js 24, x86_64; Phase 6 source) | Vercel CLI `vercel build` offline; the built function under Vercel's own Node launcher (`@vercel/node`) in `public.ecr.aws/lambda/nodejs:24`. `vercel dev` needs a login and is not used; Vercel's router is not emulated |
+| Netlify Functions (v2, x86_64; Phase 6 source) | Netlify CLI `netlify build --offline` (the deploy zip) and `netlify dev --offline`; the deploy zip in `public.ecr.aws/lambda/nodejs:24` with Netlify's bundled bootstrap |
 
 Every build carries the Linux x64 and arm64 native pieces, so `dist/` built on a
 Mac or Windows machine deploys to Linux containers. Not yet supported: Alpine/musl,
-Vercel, Netlify, Azure Functions, Google Cloud Functions, Cloudflare Workers and
-other isolate platforms ([plan](docs/PLAN.md)).
+Azure Functions, Google Cloud Functions, Cloudflare Workers and other isolate
+platforms, including Vercel and Netlify Edge ([plan](docs/PLAN.md)).
 
 ## Lean support and restrictions
 

@@ -37,6 +37,8 @@ Requirements on every platform:
 | Heroku | [heroku.md](heroku.md) | Container stack (`heroku.yml`). |
 | AWS Lambda | [lambda.md](lambda.md) | `.zip` for `nodejs24.x` (`lasm package --target lambda`, Phase 6 source) or a container image behind the AWS Lambda Web Adapter; x86_64 and arm64. |
 | Lambda@Edge | [lambda-edge.md](lambda-edge.md) | Phase 6 source. CloudFront origin-request trigger, x86_64, `lasm package --target lambda-edge`. |
+| Vercel Functions | [vercel.md](vercel.md) | Phase 6 source. `lasm package --target vercel` (Build Output API) or `lasm init --deploy vercel`. |
+| Netlify Functions | [netlify.md](netlify.md) | Phase 6 source. `lasm init --deploy netlify` (`netlify.toml` with `included_files`); 60 s synchronous limit. |
 
 **What is tested.** Lasm's CI builds and runs every template's Dockerfile on
 Linux x64 and ARM64 with a 512 MB memory limit and a read-only root filesystem,

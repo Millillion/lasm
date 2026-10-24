@@ -201,11 +201,14 @@ dist/
 
 // Vercel and Netlify run `npm run build` on their build machines (Linux x64),
 // then `lasm package` writes the function exactly as tested in CI.
+// `routes` sends every path to the function first: `vercel build` puts these
+// ahead of the zero-config routes it adds to .vercel/output/config.json.
 const vercelJson = JSON.stringify({
   $schema: 'https://openapi.vercel.sh/vercel.json',
   framework: null,
   installCommand: 'npm install',
   buildCommand: 'npm run build && npm run package:vercel',
+  routes: [{ src: '/(.*)', dest: '/index' }],
 }, null, 2) + '\n';
 
 const netlifyToml = `# Netlify runs the build, then lasm package writes a v2 function that serves

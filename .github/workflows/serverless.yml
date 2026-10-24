@@ -10,6 +10,12 @@ name: Serverless platforms
 #     image and its Runtime Interface Emulator, x86_64 and arm64, with API
 #     Gateway REST/HTTP API, function URL, ALB and CloudFront events; AWS SAM
 #     CLI `sam local invoke` and `sam local start-api`; size limits; cold starts.
+#   - Vercel (x64): `vercel build` offline; the function under Vercel's own
+#     Node launcher (@vercel/node) in the Lambda Node 24 image; `vercel dev`
+#     is recorded (it needs a login).
+#   - Netlify (x64): `netlify build --offline` (the deploy zip), `netlify dev
+#     --offline`, and the deploy zip in the Lambda Node 24 image with Netlify's
+#     bundled bootstrap.
 on:
   workflow_dispatch:
     inputs:
@@ -84,9 +90,9 @@ jobs:
           retention-days: 3
           compression-level: 0
           if-no-files-found: error
-  lambda:
+  functions:
     needs: input
-    name: lambda ${{ matrix.arch }}
+    name: functions ${{ matrix.arch }}
     strategy:
       fail-fast: false
       matrix:
@@ -119,18 +125,27 @@ jobs:
           "$RUNNER_TEMP/sam-bin/sam" --version
       - name: sam local invoke and sam local start-api (no AWS credentials)
         run: node scripts/serverless/run-sam.mjs "$RUNNER_TEMP/apps/apps.json" .work/sam.json "$RUNNER_TEMP/sam-bin/sam"
+      - name: Install the Vercel and Netlify CLIs (pinned)
+        if: always() && matrix.arch == 'x64'
+        run: npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund vercel@65.2.0 netlify-cli@27.14.2
+      - name: Vercel (vercel build offline; Vercel's Node launcher in the Lambda Node 24 image)
+        if: always() && matrix.arch == 'x64' && hashFiles('.work/lambda.json') != ''
+        run: node scripts/serverless/run-vercel.mjs "$RUNNER_TEMP/apps/apps.json" .work/vercel.json "$RUNNER_TEMP/tools/node_modules/.bin/vercel" "$RUNNER_TEMP/tools/node_modules"
+      - name: Netlify (netlify build and netlify dev offline; the deploy zip in the Lambda Node 24 image)
+        if: always() && matrix.arch == 'x64' && hashFiles('.work/lambda.json') != ''
+        run: node scripts/serverless/run-netlify.mjs "$RUNNER_TEMP/apps/apps.json" .work/netlify.json "$RUNNER_TEMP/tools/node_modules/.bin/netlify"
       - name: Preserve evidence
         if: always()
         run: |
           mkdir -p .work/evidence
           cp .work/overlay/overlay.json .work/evidence/ 2>/dev/null || true
           [ -f "$RUNNER_TEMP/apps/apps.json" ] && cp "$RUNNER_TEMP/apps/apps.json" .work/evidence/apps.json
-          for f in .work/lambda.json .work/sam.json; do [ -f "$f" ] && cp "$f" .work/evidence/; done
+          for f in .work/lambda.json .work/sam.json .work/vercel.json .work/netlify.json; do [ -f "$f" ] && cp "$f" .work/evidence/; done
           node -e "for (const f of ['.work/lambda.json']) { try { const r = JSON.parse(require('fs').readFileSync(f)); console.log(JSON.stringify(r.runs.map(x => ({ app: x.app, target: x.target, ok: x.ok, zipBytes: x.zipBytes, unzippedBytes: x.unzippedBytes, coldStarts: x.coldStarts, warmMedianMs: x.warmMedianMs, memory: x.memoryUsage })), null, 1)); } catch {} }"
       - if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: serverless-lambda-${{ matrix.arch }}
+          name: serverless-functions-${{ matrix.arch }}
           path: .work/evidence
           retention-days: 14
           if-no-files-found: ignore

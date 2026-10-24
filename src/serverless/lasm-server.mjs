@@ -10,7 +10,7 @@
 import http from 'node:http';
 import net from 'node:net';
 import { fileURLToPath } from 'node:url';
-import { Worker } from 'node:worker_threads';
+import { Worker, isMainThread } from 'node:worker_threads';
 
 const host = '127.0.0.1';
 const agent = new http.Agent({ keepAlive: true, maxSockets: 256 });
@@ -55,6 +55,13 @@ export function startLeanServer({ main = new URL('./main.mjs', import.meta.url),
     const port = Number(process.env.LASM_SERVER_PORT) || await freePort();
     process.env.PORT = String(port);
     process.env.HOST = host;
+    // Lean reads the C environment. In a worker thread (local function
+    // runtimes such as `netlify functions:serve`), process.env is the thread's
+    // own copy, so set the process environment through Lasm's native host too.
+    if (!isMainThread) {
+      const { nativeFiles } = await import(new URL('./host/native-files.mjs', main).href);
+      for (const [name, value] of [['PORT', String(port)], ['HOST', host]]) nativeFiles().setEnvironment(name, value);
+    }
     // The program sees only its own path as arguments, as with `node main.mjs`.
     const argv = process.argv;
     process.argv = [process.execPath, fileURLToPath(main)];
@@ -112,12 +119,31 @@ export async function forward({ method, path, headers, body }) {
   });
 }
 
+/** The request body of a Node (req, res) pair, however the platform left it. */
+function requestBody(req) {
+  // Frameworks such as the Functions Framework have already read it.
+  if (Buffer.isBuffer(req.rawBody)) return Promise.resolve(req.rawBody);
+  // A consumed stream yields nothing more, unless the platform replays it
+  // through its own `on` (Vercel's request helpers do).
+  if (req.readableEnded && !Object.hasOwn(req, 'on')) return Promise.resolve(Buffer.alloc(0));
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', chunk => chunks.push(Buffer.from(chunk)));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
+
 /** Pipes a Node (req, res) pair to the Lean server (Vercel, Google Cloud Functions). */
 export async function pipe(req, res) {
   const port = await startLeanServer();
+  const body = await requestBody(req);
   const headers = [];
-  for (let i = 0; i < req.rawHeaders.length; i += 2)
-    if (!hopByHop.has(req.rawHeaders[i].toLowerCase())) headers.push(req.rawHeaders[i], req.rawHeaders[i + 1]);
+  for (let i = 0; i < req.rawHeaders.length; i += 2) {
+    const name = req.rawHeaders[i].toLowerCase();
+    if (!hopByHop.has(name) && name !== 'content-length') headers.push(req.rawHeaders[i], req.rawHeaders[i + 1]);
+  }
+  if (body.length) headers.push('content-length', String(body.length));
   await new Promise((resolve, reject) => {
     const request = http.request({ host, port, method: req.method, path: req.originalUrl ?? req.url, headers, agent }, response => {
       const out = [];
@@ -129,10 +155,7 @@ export async function pipe(req, res) {
       response.on('error', reject);
     });
     request.on('error', reject);
-    // Frameworks such as the Functions Framework have already read the body.
-    if (req.rawBody !== undefined) request.end(req.rawBody);
-    else if (req.readableEnded) request.end();
-    else req.pipe(request);
+    request.end(body.length ? body : undefined);
   });
 }
 

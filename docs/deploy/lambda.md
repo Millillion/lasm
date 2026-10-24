@@ -27,7 +27,10 @@ connections. Each invocation becomes one HTTP request to that server, and the
 response goes back in the event's own shape. Supported events: API Gateway REST
 API (payload 1.0), API Gateway HTTP API (payload 2.0), Lambda function URLs,
 Application Load Balancer (single- and multi-value headers) and CloudFront
-(Lambda@Edge). Bodies are base64 when they are not text. Any server works: Express,
+(Lambda@Edge). Bodies are base64 when they are not text. Lambda's Node runtime
+starts Node with V8 flags (`--max-old-space-size=…` and others) that worker
+threads refuse; the handler removes them from what the Lean runtime's threads
+inherit. Any server works: Express,
 Hono on `@hono/node-server` and pure-Lean `Std.Http` are tested.
 
 - **Both architectures in one zip:** every build carries the Linux x64 and arm64
@@ -51,13 +54,25 @@ events for each type above (`scripts/serverless/events/`), with 512 MB and a
 read-only root; AWS SAM CLI 1.170.0 `sam local invoke` (REST and HTTP API events)
 and `sam local start-api` with the zip as `CodeUri`; the size limits; cold starts.
 
-**Why a handler, not the Web Adapter layer.** Measured in the emulator on Linux
-x64 (Hono template, three cold starts each, 2026-10-24): the handler's init phase
-took 530–600 ms against 505–520 ms for the Lambda Web Adapter layer layout
-(adapter extension + `run.sh`), and a warm invocation 3.4 ms against 2.6 ms.
-The handler needs no layer, no environment variables and no extension, works on
-Lambda@Edge (which allows none of them) and ALB/CloudFront events, and keeps the
-zip self-contained. The Web Adapter remains the container-image route.
+**Measured in CI** (run 40074644572, emulator on GitHub's `ubuntu-24.04` and
+`ubuntu-24.04-arm`, 512 MB, three cold starts per template; the emulator's
+INIT REPORT is the init phase, the first response also includes container start):
+
+| Template | Zip / unpacked | Init phase x64 / arm64 | Warm invocation x64 / arm64 | Memory in use x64 / arm64 |
+| --- | --- | --- | --- | --- |
+| Hono | 1.8 / 5.7 MB | 470–482 / 410–427 ms | 2.1 / 2.6 ms | 206 / 135 MiB |
+| Express | 2.0 / 6.5 MB | 503–518 / 476–480 ms | 2.1 / 2.7 ms | 212 / 142 MiB |
+| Std.Http | 1.4 / 5.4 MB | 444–459 / 413–426 ms | 3.9 / 5.2 ms | 308 / 186 MiB |
+
+**Why a handler, not the Web Adapter layer.** The same run measured the Lambda
+Web Adapter 1.1.0 in its layer layout (adapter extension, `/opt/bootstrap`, a
+`run.sh` handler) for the Hono template: init 423 ms (x64) and 390–394 ms
+(arm64), warm 1.6 / 2.0 ms, so about 50–90 ms faster to start and 0.5 ms faster
+per invocation. The handler was chosen anyway: it needs no layer, no
+environment variables and no extension, so the same zip works on Lambda@Edge
+(which allows none of them); it maps ALB and CloudFront events; and the zip is
+self-contained, with no layer ARN per region and architecture to keep current.
+The Web Adapter remains the container-image route.
 
 ## Container image
 

@@ -61,9 +61,11 @@ candidate includes them.
 | --- | --- | --- |
 | AWS Lambda (.zip, `nodejs24.x`, x86_64 and arm64) | `public.ecr.aws/lambda/nodejs:24` with its Runtime Interface Emulator, zip extracted with `unzip` and mounted read-only, 512 MB; API Gateway REST and HTTP API, function URL, ALB single/multi-value sample events; AWS SAM CLI 1.170.0 `sam local invoke` and `sam local start-api`; size limits; cold starts | [lambda.md](deploy/lambda.md) |
 | Lambda@Edge (origin request, x86_64) | the same, with the CloudFront origin-request sample event | [lambda-edge.md](deploy/lambda-edge.md) |
+| Vercel Functions (Node.js 24) | Vercel CLI 65.2.0 `vercel build` offline (local `.vercel/project.json`); the built function under `@vercel/node`'s Node launcher in `public.ecr.aws/lambda/nodejs:24`, helpers on and off. `vercel dev` needs a login | [vercel.md](deploy/vercel.md) |
+| Netlify Functions (v2) | Netlify CLI 27.14.2 `netlify build --offline` and `netlify dev --offline`; the deploy zip in `public.ecr.aws/lambda/nodejs:24` with Netlify's bundled bootstrap | [netlify.md](deploy/netlify.md) |
 
-Not yet supported (later phases, see [PLAN.md](PLAN.md)): Vercel, Netlify, Azure
-Functions, Google Cloud Functions, DigitalOcean App Platform (gVisor),
+Not yet supported (later phases, see [PLAN.md](PLAN.md)): Azure Functions,
+Google Cloud Functions, DigitalOcean App Platform (gVisor),
 Alpine/musl, and isolate platforms (Cloudflare Workers, Vercel and Netlify Edge,
 Fastly), which have no threads or native add-ons.
 
