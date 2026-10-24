@@ -7,17 +7,15 @@ code to ahead-of-time execution; build-time language features remain available.
 The exact [runtime exclusions are in the README](../README.md#lean-support-and-restrictions).
 Full standard-library compatibility is not claimed.
 
-The validated targets are Ubuntu 24.04.5 LTS (glibc 2.39) on native x86-64 and ARM64,
-plus macOS 15.7.9 (24G830) on native x86-64 and ARM64, Windows Server 2025
-Datacenter 10.0.26100.33438 (`windows-2025`) on native x86-64. Candidate `.46`
-passed all five supported targets. All use Node 26.10.0 with npm 11.19.1 and Lean 4.34.1.
-Current source, not yet in an accepted candidate, pins Node 26.12.0 with npm 11.20.0
-and Lean 4.35.0 (a package carries one Lean release; projects pinning another one,
-including 4.34.1, get `Unsupported Lean toolchain …`).
+The validated targets are Ubuntu 24.04 LTS (`ubuntu-24.04`, `ubuntu-24.04-arm`) on
+native x86-64 and ARM64, macOS 15 (`macos-15-intel`, `macos-15`) on native x86-64
+and ARM64, and Windows Server 2025 Datacenter (`windows-2025`) on native x86-64.
+Candidate `.58` passed all five with Node 26.12.1, npm 11.20.0 and Lean 4.35.0
+(run 40012750099). **Lasm supports exactly Lean 4.35.0** (user decision
+2026-10-24): a project pinning any other release gets `Unsupported Lean toolchain …
+Lasm supports Lean v4.35.0; set lean-toolchain to leanprover/lean4:v4.35.0`.
 **Windows ARM64 is not supported** (removed 2026-10-16: neither Lean nor
-Emscripten publishes Windows ARM64 prebuilts). Candidate `.46` also passed on
-Windows 11 Enterprise 10.0.26200.9457 (`windows-11-arm`) historically; current
-source stops there with `Lasm supports Linux and macOS on x86-64 and ARM64, and
+Emscripten publishes Windows ARM64 prebuilts); Lasm stops there with `Lasm supports Linux and macOS on x86-64 and ARM64, and
 Windows on x86-64. Windows ARM64 is not supported.`
 Use stock Node without special flags. Other OS versions/distributions, older
 system libraries, and other Node/npm/Lean versions are unverified as build machines.
@@ -35,8 +33,8 @@ See the [current acceptance report](https://github.com/Millillion/lasm/blob/main
 for exact artifact hashes, native CI results and measurements.
 
 The installed package contains the Lean Wasm runtime, standard-library archives,
-and host adapters. On the first build candidate `.46` downloads pinned native
-Lean/Lake, Python and the Emscripten/LLVM/Binaryen SDK; Lake projects also provision Git.
+and host adapters. On the first build Lasm downloads the pinned tiered Lean 4.35.0
+and its minimal link toolchain (older candidates also downloaded Python and the full SDK).
 Current source ships and downloads no Git: Lake projects with Git or Reservoir
 dependencies use the system `git` (Git is needed only for them; without it the build
 stops before Lake runs, with the install command for each OS), and dependency-free
@@ -69,8 +67,7 @@ its first-build downloads for an ordinary program are 269,709,784 bytes on Linux
 x86-64, 268,899,276 on Linux ARM64, 256,540,284 on Intel Mac, 247,047,545 on Apple
 Silicon and 249,052,231 on Windows x86-64; a Lake project or a program importing
 `Lean`/`Lake` downloads 526,892,922, 526,082,414, 513,723,422, 504,230,683 and
-506,235,369 bytes (no Git; catalog sizes; the Lean 4.34.1 tiers measured
-273,804,773 bytes for an ordinary program on Linux x86-64).
+506,235,369 bytes (no Git; catalog sizes).
 The current builder removes unreachable code and includes only the deployment
 architecture's native helpers. Current source builds reject runtime compiler,
 interpreter, module-data and plugin dependencies; they never package the large
@@ -79,8 +76,7 @@ fallback. The retained historical `.34` archive predates this restriction. See t
 
 Tools default to `${XDG_CACHE_HOME:-$HOME/.cache}/lasm` on Linux,
 `$HOME/Library/Caches/lasm` on macOS, and `%LOCALAPPDATA%\lasm\Cache` on Windows.
-Candidate `.46` is retained and passed the complete installed/deployment checks
-on all six accepted targets. Set
+Set
 `LASM_TOOLCHAIN_CACHE` to choose another directory. Compiled application caches
 live under the source project's `.lake/lasm/`. Hash checks detect changes to
 sources, tool descriptions, runtime inputs and generated outputs; an unchanged
@@ -94,9 +90,8 @@ in `lasm-tools/`. They contain verified hard links or copies and junctions to th
 main cache. Removing the main tool cache does not remove these directories;
 both can be removed when no build is running. See [Windows cache details](https://github.com/Millillion/lasm/blob/main/docs/WINDOWS_TOOLCHAINS.md).
 
-Downloads publish only after checksum verification and extraction. Accepted
-candidate `.46` makes one attempt per invocation: rerun its command after an
-interruption. Newer source candidates add bounded retries, validated range resume,
+Downloads publish only after checksum verification and extraction. They have
+bounded retries, validated range resume,
 crash recovery, OS locks, and `npx lasm cache repair`. Repair is explicit and
 offline; it keeps verified tools and unrelated files, and refuses active builds.
 Stop older CLI versions or orphaned compiler processes before repair. Use a
@@ -155,8 +150,7 @@ upstream Lake/Git behavior and also affects native Lake. Hosts such as GitHub,
 GitLab and Bitbucket use smart HTTP and are unaffected; serve private dependencies
 over smart HTTP or SSH.
 If a completed tool cache is damaged or incomplete, Lasm refuses to execute it.
-Use repair with a newer candidate, or remove the named directory with `.46`,
-then retry to download a verified replacement. If a packaged runtime fails its
+Use `npx lasm cache repair`, or remove the named directory, then retry to download a verified replacement. If a packaged runtime fails its
 integrity check, reinstall the candidate. An unavailable download must be restored
 before a cold build can succeed; retries never substitute an unverified tool.
 The [dated robustness review](https://github.com/Millillion/lasm/blob/main/docs/TOOLCHAIN_ROBUSTNESS.md) records the baseline recovery gaps;

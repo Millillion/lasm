@@ -14,7 +14,7 @@ It uses `lasm init` from current source (tested in candidates `.55` and later, n
 the compiler and for built applications, and is tested on Node 24.22.1 and 26.12.1
 (the compiler on Node 24 on Linux, macOS x64 and Windows x64; on macOS arm64 on Node 26.12.1).
 Lasm downloads its matching **Lean 4.35.0**, Lake, and build tools; you do not install
-them yourself (the older candidate `.46` used Node 26.10.0 / Lean 4.34.1).
+them yourself. Lasm supports exactly Lean 4.35.0.
 **Git, only for Lake projects with dependencies:** Lasm uses the `git` on your PATH
 and ships none (current source; candidates up to `.58` download one). Programs and
 Lake projects without dependencies need no Git. A project with Git or Reservoir
@@ -35,12 +35,11 @@ cd my-app && npm install && npm run dev
 
 as in [Getting started](docs/GETTING_STARTED.md). Until then:
 
-On a supported Linux, Mac, or Windows machine, get the tested `.46` tarball in the
-[acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md)
-from a maintainer (repository access may be required). Copy it into an empty directory:
+On a supported Linux, Mac, or Windows machine, get the tested `.58` tarball (draft release
+`node-linux-candidate-40012750099`, run 40012750099) from a maintainer (repository access may be required). Copy it into an empty directory:
 
 ```sh
-npm install ./lasm-compiler-0.1.0-experimental.46.tgz
+npm install ./lasm-compiler-0.1.0-experimental.58.tgz
 ```
 
 Save this complete program as `Main.lean`:
@@ -64,13 +63,11 @@ projects and programs importing `Lean` download more. Measured first builds of a
 small program took 42–60 seconds on Linux and Apple Silicon and about 3 minutes on
 the slower Intel Mac and Windows CI machines. Candidate `.54` passed acceptance and
 three consecutive cold installations on all five targets (see
-[toolchain slimming](docs/TOOLCHAIN_SLIMMING.md)). Candidate `.46` downloaded
-0.9–1.3 GB and took 5–16 minutes. The terminal shows progress
+[toolchain slimming](docs/TOOLCHAIN_SLIMMING.md)). The terminal shows progress
 and elapsed time. Later builds reuse verified tools and unchanged outputs. See
 [cache locations, requirements, and recovery](docs/NODE_SUPPORT.md).
-Candidate `.46` requires rerunning failed downloads. Current source adds bounded
-retries, safe resume, crash recovery, offline repair, and bundled installer
-dependencies. The hardened candidate also passed installed, offline, deployment,
+Downloads have bounded retries, safe resume, crash recovery, offline repair, and
+bundled installer dependencies. The hardened candidate passed installed, offline, deployment,
 and proxy/CA acceptance on all six native targets then tested (including Windows
 ARM64, since removed), alongside the installer fault
 checks, and its repeated-installation gate (three consecutive clean cold
@@ -88,10 +85,11 @@ install, build tools, or development cache is needed there. Include your
 application's external assets yourself.
 
 An existing Lake project can use local imports normally. To pin Lean, put
-`leanprover/lean4:v4.34.1` (candidate `.46`) or `leanprover/lean4:v4.35.0` (current
-source) in its `lean-toolchain` file. A package supports exactly one Lean release;
-other versions are rejected with `Unsupported Lean toolchain … Supported managed
-versions: …` and the pin is left unchanged. Current source has a per-package
+`leanprover/lean4:v4.35.0` in its `lean-toolchain` file. Lasm supports exactly
+Lean 4.35.0; other versions are rejected with `Unsupported Lean toolchain … Lasm
+supports Lean v4.35.0; set lean-toolchain to leanprover/lean4:v4.35.0` (candidates
+up to `.58` word it `Supported managed versions: 4.35.0`) and the pin is left
+unchanged. Current source has a per-package
 [compatibility list](https://github.com/Millillion/lasm/blob/main/docs/COMPATIBILITY.md) (Batteries, Cli, LSpec,
 Plausible, Aesop, Qq, leansqlite, UnicodeBasic, MD4Lean, lean-zip, lean4-parser, lean-redis
 and others); packages not on it are untested.
@@ -122,13 +120,12 @@ These are all commands and options in the ordinary Node application interface:
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
 | New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono`; after publication also `npm create lasm@latest my-app -- --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
-| Cache repair (new source; absent from `.46`) | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
+| Cache repair | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
 `--rebuild` and `--verbose` work with both run and build. `--output` is build-only;
 arguments after `--` are run-only. The application's exit status is preserved.
 There is currently no Lasm install, clean, uninstall, or version subcommand.
-Candidate `.46` also accepts a redundant `--target node`; current source removed
-that option, and passing it is an error.
+There is no `--target` option; passing it is an error.
 The source installer also accepts the [documented download environment settings](docs/INSTALLATION_HARDENING.md#transfers).
 
 Environment variables (all optional; set them before `npx lasm …`):
@@ -155,11 +152,11 @@ applications run is under [Supported platforms](#supported-platforms).
 
 | Environment | Architectures | Current status |
 | --- | --- | --- |
-| Ubuntu 24.04.5 LTS, glibc 2.39 | x86-64 and ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance. |
+| Ubuntu 24.04 LTS (`ubuntu-24.04`, `ubuntu-24.04-arm`) | x86-64 and ARM64 | Candidate `.58` passed native installed-package and copied-deployment acceptance (run 40012750099). |
 | Other Linux distributions | x86-64 and ARM64 | Unverified as build machines. Candidates need glibc 2.39; current source needs glibc 2.34 (the managed tools' newest symbol). Alpine/musl is unsupported. |
-| macOS 15.7.9 (24G830) | x86-64 and ARM64 | Candidate `.46` passed native installed-package and copied-deployment acceptance. |
-| Windows Server 2025 Datacenter, 10.0.26100.33438 | x86-64 | Candidate `.46` passed native installed-package and copied-deployment acceptance on `windows-2025`. |
-| Windows ARM64 | ARM64 | **Not supported.** Removed on 2026-10-16: neither Lean nor Emscripten publishes Windows ARM64 prebuilts. Current source stops with `Lasm supports Linux and macOS on x86-64 and ARM64, and Windows on x86-64. Windows ARM64 is not supported.` (Candidate `.46` historically passed on `windows-11-arm`.) |
+| macOS 15 (`macos-15-intel`, `macos-15`) | x86-64 and ARM64 | Candidate `.58` passed native installed-package and copied-deployment acceptance. |
+| Windows Server 2025 Datacenter (`windows-2025`) | x86-64 | Candidate `.58` passed native installed-package and copied-deployment acceptance. |
+| Windows ARM64 | ARM64 | **Not supported.** Removed on 2026-10-16: neither Lean nor Emscripten publishes Windows ARM64 prebuilts. Lasm stops with `Lasm supports Linux and macOS on x86-64 and ARM64, and Windows on x86-64. Windows ARM64 is not supported.` |
 | Other JavaScript runtimes, browsers, Cloudflare Workers | Any | Not supported; Lasm targets Node only. |
 
 Other OS releases and Node/npm/Lean versions are unverified. No engine flags are
@@ -167,9 +164,8 @@ needed. Linux requires its ordinary OS libraries and shell, but no developer SDK
 The [acceptance report](https://github.com/Millillion/lasm/blob/main/docs/NODE_ACCEPTANCE.md) identifies exact tested artifacts;
 [the plan](https://github.com/Millillion/lasm/blob/main/docs/PLAN.md) records the completed milestone and deferred work.
 Lasm supports five targets: Linux and macOS on x86-64 and ARM64, and Windows on
-x86-64. The same `.46` archive passed on all five (and historically on Windows
-ARM64, which current source no longer supports). These passes use native x86-64
-and ARM64 execution.
+x86-64. The same `.58` archive passed on all five, with native x86-64 and ARM64
+execution.
 
 **Performance:** [BENCHMARKS.md](https://github.com/Millillion/lasm/blob/main/docs/BENCHMARKS.md)
 lists cold start, bundle size, memory, HTTP throughput and latency, interop call
@@ -202,9 +198,7 @@ other isolate platforms ([plan](docs/PLAN.md)).
 
 ## Lean support and restrictions
 
-**Candidate `.46` and current source builds enforce ahead-of-time execution.**
-The older `.34` candidate predates these restrictions; do not use it to enforce
-this policy.
+**Builds enforce ahead-of-time execution.**
 
 Ordinary functions, recursion, closures, inductive types, pattern matching,
 type classes, dependent types, and compiled IO are not excluded by this policy.

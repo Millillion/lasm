@@ -284,10 +284,11 @@ test('nearest standard Lean pin wins; unsupported pins are never silently replac
   await writeFile(join(f.base, 'lean-toolchain'), 'leanprover/lean4:v4.32.0\n');
   await assert.rejects(selectLeanVersion(main), /Unsupported Lean toolchain.*4.32.0/);
   const pin = join(f.base, 'project/lean-toolchain');
-  await writeFile(pin, 'leanprover/lean4:v4.34.0\n');
-  assert.deepEqual(await selectLeanVersion(main), { version: '4.34.0', pin });
-  await writeFile(pin, 'leanprover/lean4:v4.34.1\n');
-  assert.deepEqual(await selectLeanVersion(main), { version: '4.34.1', pin });
+  // Lasm supports exactly Lean 4.35.0; earlier releases fail with the fix.
+  for (const value of ['leanprover/lean4:v4.34.0\n', 'leanprover/lean4:v4.34.1\n']) {
+    await writeFile(pin, value);
+    await assert.rejects(selectLeanVersion(main), { message: /Lasm supports Lean v4\.35\.0; set lean-toolchain to leanprover\/lean4:v4\.35\.0\. The project pin was not changed\./ });
+  }
   await writeFile(pin, 'leanprover/lean4:v4.35.0\n');
   assert.deepEqual(await selectLeanVersion(main), { version: '4.35.0', pin });
   for (const value of ['nightly', 'v4.34.0-rc1', '', '../tool', 'leanprover/lean4:v999.0.0']) {

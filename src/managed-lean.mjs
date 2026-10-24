@@ -22,7 +22,12 @@ export async function selectLeanVersion(file, catalog = toolchainCatalog) {
     catch (error) { if (error.code !== 'ENOENT') throw error; }
     if (text !== undefined) {
       const match = /^(?:leanprover\/lean4:)?v?(\d+\.\d+\.\d+)$/.exec(text);
-      if (!match || !catalog.lean[match[1]]) throw new Error(`Unsupported Lean toolchain ${JSON.stringify(text)} in ${pin}. Supported managed versions: ${Object.keys(catalog.lean).join(', ')}. The project pin was not changed.`);
+      if (!match || !catalog.lean[match[1]]) {
+        // Lasm supports exactly one Lean release (user decision 2026-10-24).
+        const supported = Object.keys(catalog.lean);
+        throw new Error(`Unsupported Lean toolchain ${JSON.stringify(text)} in ${pin}. Lasm supports Lean ${supported.map(v => 'v' + v).join(', ')}; `
+          + `set lean-toolchain to ${supported.map(v => 'leanprover/lean4:v' + v).join(' or ')}. The project pin was not changed.`);
+      }
       return { version: match[1], pin };
     }
     const parent = dirname(directory);
