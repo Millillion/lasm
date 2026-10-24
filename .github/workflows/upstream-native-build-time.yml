@@ -66,11 +66,7 @@ jobs:
           mkdir -p .cache/downloads
           # The recorded archive uses the full-commit directory prefix, not the
           # tag-based prefix. Preserve its original checksum and source manifest.
-          source_url="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_NATIVE_LEAN].url')"
-          source_sha="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_NATIVE_LEAN].sha256')"
-          archive=".cache/downloads/lean4-v${LASM_NATIVE_LEAN:?}.tar.gz"
-          curl --fail --location --retry 3 --output "$archive" "$source_url"
-          printf '%s  %s\n' "$source_sha" "$archive" | sha256sum -c -
+          node scripts/language-coverage/fetch-pristine.mjs "${LASM_NATIVE_LEAN:?}" --no-extract
       - name: Enable the per-user resource boundary on this disposable runner
         run: |
           sudo loginctl enable-linger "$(id -un)"

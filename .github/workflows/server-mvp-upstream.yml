@@ -103,13 +103,7 @@ jobs:
           npm install --no-audit --no-fund "../node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
       - name: Fetch and verify the pinned upstream source archive
         run: |
-          mkdir -p .cache/downloads .work/pristine
-          url="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_LEAN].url')"
-          sha="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_LEAN].sha256')"
-          archive=".cache/downloads/lean4-v$LASM_LEAN.tar.gz"
-          curl --fail --location --retry 3 --output "$archive" "$url"
-          printf '%s  %s\n' "$sha" "$archive" | sha256sum -c -
-          tar -xzf "$archive" -C .work/pristine --strip-components=1
+          node scripts/language-coverage/fetch-pristine.mjs "$LASM_LEAN"
       - name: Enable process-tree resource guard
         run: |
           sudo loginctl enable-linger "$(id -un)"
