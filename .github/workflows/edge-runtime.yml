@@ -7,6 +7,11 @@ name: Edge runtime (Phase 7)
 # workers.yml (which runs on pushes to phase-7 that change edge inputs).
 on:
   workflow_dispatch:
+    inputs:
+      draft-release:
+        description: Attach the packaged archive to the draft release lean-<version>-edge-v<n> named by src/edge-runtimes.json (it must match the catalog; the release stays a draft until 0.2.0)
+        type: boolean
+        default: false
   # workers.yml builds the runtime first, then tests with it.
   workflow_call:
 permissions:
@@ -62,6 +67,30 @@ jobs:
           for name in leanrt leancpp lasmhost; do cp .work/edge-libraries/build/lib/lean/lib$name.a .work/edge-runtime/lib/; done
           cp .work/edge-libraries/build-inputs.json .work/edge-runtime/
           node -e "const f=require('node:fs'),c=require('node:crypto');const d='.work/edge-runtime/lib';const files=Object.fromEntries(f.readdirSync(d).sort().map(n=>[n,c.createHash('sha256').update(f.readFileSync(d+'/'+n)).digest('hex')]));f.writeFileSync('.work/edge-runtime/libraries.json',JSON.stringify({schema:1,profile:'edge',baseRuntimeManifestSha256:require('./scripts/ci/node-runtime-source.json').runtimeManifestSha256,source:process.env.GITHUB_SHA,files},null,2)+'\n');console.log(JSON.stringify(files,null,2))"
+      - name: Package the tool archive and compare it with the catalog
+        id: package
+        run: |
+          node scripts/edge/package-edge-runtime.mjs .work/edge-runtime .work/node-runtime-restored/runtime .work/edge-package
+          node scripts/edge/check-edge-catalog.mjs .work/edge-package/artifact.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: edge-runtime-archive
+          path: |
+            .work/edge-package/*.tar.zst
+            .work/edge-package/artifact.json
+          retention-days: 14
+      - name: Attach the archive to the draft release
+        if: ${{ inputs.draft-release && steps.package.outputs.matches == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url=$(node -p "require('./src/edge-runtimes.json').lean[require('./scripts/ci/acceptance-versions.json').lean].url")
+          tag=$(basename "$(dirname "$url")")
+          # GitHub refuses non-tip SHAs as release targets.
+          RELEASE_TARGET="$GITHUB_SHA"; [ "$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_REF_NAME" --jq .sha)" = "$GITHUB_SHA" ] || RELEASE_TARGET="$GITHUB_REF_NAME"
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --draft --prerelease --target "$RELEASE_TARGET" \
+            --title "Lasm edge runtime $tag" --notes "Lean's runtime built single-threaded for edge isolates (docs/EDGE.md), the archive pinned by src/edge-runtimes.json. A draft until Lasm 0.2.0 publishes it. Source revision: $GITHUB_SHA"
+          gh release upload "$tag" .work/edge-package/*.tar.zst --clobber
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: edge-runtime-libraries

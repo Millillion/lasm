@@ -25,7 +25,7 @@ const platformParts = platform => {
  * rebuilt C tier (c-v2) becomes 4.35.0-lasm.2 of @lasm/lean-c-* without touching the others. */
 export function releaseVersion(url) {
   const tag = decodeURIComponent(new URL(url).pathname.split('/').at(-2));
-  let match = /^(?:lean|emscripten)-(\d+\.\d+\.\d+)-(?:tiers|c|lasm-toolchain)-v(\d+)$/.exec(tag);
+  let match = /^(?:lean|emscripten)-(\d+\.\d+\.\d+)-(?:tiers|c|edge|lasm-toolchain)-v(\d+)$/.exec(tag);
   if (match) return `${match[1]}-lasm.${match[2]}`;
   throw new Error(`No package version rule for release ${tag}`);
 }
@@ -104,6 +104,10 @@ export const toolComponents = Object.freeze({
       ['MinGW-w64 runtime startup code linked into the executables (lasm-notices: mingw-w64-runtime-COPYING)', 'ZPL-2.1 AND ISC AND BSD-2-Clause AND dtoa AND SunPro AND MIT AND LicenseRef-Cephes']],
   },
   'lean-data': { common: [['Lean module data (.olean, .ir) and Lean sources', 'Apache-2.0']] },
+  // The edge runtime (docs/EDGE.md): wasm64 static libraries built from Lean's
+  // runtime sources with Lasm's patches, and Lasm's host bridge.
+  'lean-edge': { common: [["Lean's C++ runtime, built single-threaded for WebAssembly (libleanrt.a, libleancpp.a)", 'Apache-2.0'],
+    ["Lasm's host bridge (liblasmhost.a)", 'MIT']] },
   'emscripten-native': {
     common: [['LLVM: clang, lld/wasm-ld, llvm-nm, llvm-objcopy, clang resource headers', 'Apache-2.0 WITH LLVM-exception'],
       ['Binaryen: wasm-opt, wasm-emscripten-finalize, wasm-metadce', 'Apache-2.0']],
@@ -127,7 +131,7 @@ const spdxOf = components => [...new Set(components.map(([, spdx]) => spdx).filt
 
 /** Every tool package for one Lean version. install: optional (platform,
  * optionalDependencies), required (shared, dependencies), demand (npm pack on use). */
-export function toolPackages({ lean, toolchains, linkToolchain, scope = defaultScope, platforms }) {
+export function toolPackages({ lean, toolchains, linkToolchain, edgeRuntimes, scope = defaultScope, platforms }) {
   assert.match(scope, /^@[a-z0-9][a-z0-9._-]*$/);
   const release = toolchains.lean[lean];
   assert.ok(release?.tiers, `No tiered Lean ${lean} in the catalog`);
@@ -159,6 +163,13 @@ export function toolPackages({ lean, toolchains, linkToolchain, scope = defaultS
     packages.push(tool(scope, `lean-c-${platform}`, artifact, 'demand', { platform, ...platformParts(platform), license: cTierLicense(platform),
       notices: { tierArchive: true, bin: release.tiers.bin[platform] },
       description: `Lean ${lean} C tier (Lean's clang as cc, C library headers and link libraries) for Lasm Lake projects with C code on ${platform} (fetched on demand)` }));
+  }
+  // Edge targets (lasm build --target workers, …): the single-threaded runtime, on demand.
+  const edge = edgeRuntimes?.lean?.[lean];
+  if (edge) {
+    const { baseRuntimeManifestSha256, source, ...artifact } = edge;
+    packages.push(tool(scope, 'lean-edge-runtime', artifact, 'demand', { components: componentsOf('lean-edge'),
+      description: `Lean ${lean} runtime built single-threaded for edge isolates (Cloudflare Workers and others) for Lasm (fetched on demand)` }));
   }
   assert.equal(new Set(packages.map(p => p.name)).size, packages.length, 'Duplicate tool package names');
   for (const pkg of packages) if (pkg.components) pkg.license = spdxOf(pkg.components);

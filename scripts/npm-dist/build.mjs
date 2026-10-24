@@ -63,6 +63,7 @@ if (args.step === 'plan') {
   await rm(probe, { recursive: true });
   const catalogs = {
     toolchains: await json(join(root, 'src/toolchains.json')), linkToolchain: await json(join(root, 'src/link-toolchain.json')),
+    edgeRuntimes: await json(join(root, 'src/edge-runtimes.json')),
   };
   const packages = toolPackages({ lean: support.lean, ...catalogs, scope: args.scope,
     platforms: support.platforms });

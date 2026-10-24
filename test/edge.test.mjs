@@ -71,3 +71,19 @@ test('generated Worker entry and configuration', () => {
   assert.match(config, /main = "worker.mjs"/);
   assert.match(config, /type = "CompiledWasm"/);
 });
+
+test('edge runtime: the cataloged archive is provisioned, verified and used', async t => {
+  const { edgeRuntime, edgeRuntimeCatalog } = await import('../src/edge/edge-runtime.mjs');
+  const archive = process.env.LASM_TEST_EDGE_ARCHIVE;
+  if (!archive) return t.skip('LASM_TEST_EDGE_ARCHIVE names the packaged archive (scripts/edge/package-edge-runtime.mjs)');
+  const { readFileSync } = await import('node:fs');
+  const artifact = edgeRuntimeCatalog.lean['4.35.0'];
+  const cache = mkdtempSync(join(tmpdir(), 'lasm-edge-cache-'));
+  let requested;
+  const fetch = async url => { requested = String(url); return new Response(readFileSync(archive)); };
+  const nodeRuntime = { identity: artifact.baseRuntimeManifestSha256, manifest: { lean: '4.35.0', name: 'lean-4.35.0-wasm64' } };
+  const edge = await edgeRuntime(nodeRuntime, { directory: undefined, cache, fetch, log: () => {} });
+  assert.equal(requested, artifact.url);
+  assert.deepEqual(Object.keys(edge.libraries).sort(), ['liblasmhost.a', 'libleancpp.a', 'libleanrt.a']);
+  await assert.rejects(edgeRuntime({ ...nodeRuntime, identity: '0'.repeat(64) }, { directory: undefined, cache, fetch }), /another runtime build/);
+});

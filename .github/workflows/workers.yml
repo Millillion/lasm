@@ -76,6 +76,14 @@ jobs:
         with:
           name: edge-runtime-libraries
           path: .work/edge-runtime
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-archive
+          path: .work/edge-archive
+      - name: Edge runtime provisioning from the packaged archive (unit tests)
+        env:
+          LASM_TEST_EDGE_ARCHIVE: ${{ github.workspace }}/.work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst
+        run: node --test test/edge.test.mjs
       - name: Pinned local platform tools (wrangler with workerd, Deno, Bun)
         run: npm install --prefix .work/edge-tools --no-audit --no-fund wrangler@4.152.0 deno@2.9.6 bun@1.4.4
       - name: Managed Emscripten SDK for the edge link (its own bounded step)

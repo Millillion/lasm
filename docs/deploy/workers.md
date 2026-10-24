@@ -47,9 +47,12 @@ app, then branches on `Lasm.JS.onEdge`:
 
 Lasm owns `workers/` and replaces it on every build. Requirements:
 
-- **The edge runtime.** It is not yet a published tool package. Maintainers set
+- **The edge runtime.** Lasm provisions it like its other tools: from the
+  on-demand npm package `@lasm/lean-edge-runtime`, else the release archive
+  pinned in `src/edge-runtimes.json`, checked by SHA-256. The release stays a
+  draft until 0.2.0 publishes it, so on the branch CI and maintainers set
   `LASM_EDGE_RUNTIME` to the
-  [`edge-runtime.yml`](../../.github/workflows/edge-runtime.yml) artifact.
+  [`edge-runtime.yml`](../../.github/workflows/edge-runtime.yml) output.
 - **Emscripten's driver.** The first edge build downloads the managed
   Emscripten SDK (about 300 MB, cached).
 

@@ -8,10 +8,12 @@ import { validateNpmToolManifest, npmEntryFor } from '../src/npm-artifacts.mjs';
 
 const json = async path => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
 const catalogs = async () => ({ toolchains: await json('../src/toolchains.json'), linkToolchain: await json('../src/link-toolchain.json'),
+  edgeRuntimes: await json('../src/edge-runtimes.json'),
 });
 
 test('package versions come from the immutable release that published each archive', () => {
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v1/x.tar.zst'), '4.35.0-lasm.1');
+  assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-edge-v1/x.tar.zst'), '4.35.0-lasm.1');
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v1/x.tar.zst'), '4.35.0-lasm.1');
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v2/x.tar.zst'), '4.35.0-lasm.2');
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/emscripten-6.0.9-lasm-toolchain-v2/x'), '6.0.9-lasm.2');
@@ -28,7 +30,9 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
       .flatMap(p => [`@lasm/emscripten-${p}`, `@lasm/lean-${p}`]).sort());
     assert.deepEqual(by('required'), ['@lasm/emscripten-shared', '@lasm/lean-core-init', '@lasm/lean-core-std']);
     const cTier = c.toolchains.lean[lean].tiers.c ? Object.keys(c.toolchains.lean[lean].tiers.c).map(p => `@lasm/lean-c-${p}`) : [];
-    assert.deepEqual(by('demand'), [...cTier, '@lasm/lean-ext-elab', '@lasm/lean-ext-meta', '@lasm/lean-ext-rest'].sort());
+    const edge = c.edgeRuntimes.lean[lean] ? ['@lasm/lean-edge-runtime'] : [];
+    assert.deepEqual(by('demand'), [...cTier, ...edge, '@lasm/lean-ext-elab', '@lasm/lean-ext-meta', '@lasm/lean-ext-rest'].sort());
+    if (edge.length) assert.equal(packages.find(p => p.name === '@lasm/lean-edge-runtime').license, 'Apache-2.0 AND MIT');
     assert.ok(!packages.some(p => p.name.includes('/git-')), 'Lasm ships no Git');
     for (const pkg of packages) {
       assert.ok(pkg.artifact.bytes <= maximumPackageBytes);

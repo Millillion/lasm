@@ -40,7 +40,8 @@ export async function releasePackages({ scope } = {}) {
   scope ??= defaultScope;
   const toolchains = JSON.parse(readFileSync(join(root, 'src/toolchains.json'), 'utf8'));
   const linkToolchain = JSON.parse(readFileSync(join(root, 'src/link-toolchain.json'), 'utf8'));
-  const tools = toolPackages({ lean: toolchains.defaultLean, toolchains, linkToolchain, scope });
+  const edgeRuntimes = JSON.parse(readFileSync(join(root, 'src/edge-runtimes.json'), 'utf8'));
+  const tools = toolPackages({ lean: toolchains.defaultLean, toolchains, linkToolchain, edgeRuntimes, scope });
   return [...tools.map(p => ({ name: p.name, version: p.version, license: p.license, kind: 'tool' })),
     { name: `${scope}/cli`, license: 'MIT', kind: 'cli' }, { name: createPackageName, license: 'MIT', kind: 'create' }];
 }
