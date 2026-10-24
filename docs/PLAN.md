@@ -694,6 +694,8 @@ folded into Phases 5.2/5.3 and 7.
     the GitHub release. One-time bootstrap by the user: `npm login`, 0.0.0
     placeholders (deprecated afterwards) and `npm trust github` per package.
     The agent merges release PRs once green; 0.1.0 waits for the user's go.
+    Implemented: [RELEASING.md](RELEASING.md) (`release-checks.yml`, `release.yml`,
+    `scripts/release/`).
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as

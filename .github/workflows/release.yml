@@ -1,0 +1,192 @@
+name: release
+# Publishes a release to npm (docs/RELEASING.md). A release is a commit on main
+# that changes the root package.json `version` (a merged release PR). This file
+# is the trusted publisher of every Lasm npm package (`npm trust github <pkg>
+# --repository Millillion/lasm --file release.yml`, no environment): npm accepts
+# an OIDC token from this workflow instead of any stored token, and records
+# provenance. There are no npm tokens or secrets.
+#
+# push: the release commit; it proceeds once release-checks passed for it.
+# workflow_run: release-checks completed for a push to main (the checks take hours,
+#   so this is how the push's release continues; both runs share `npm-release`).
+# workflow_dispatch: dry_run (the default) rehearses everything against a loopback
+#   registry and creates nothing; dry_run=false on main re-runs a release.
+#
+# `plan` refuses unless the release-checks run for this exact commit succeeded
+# (workflow run, `release-checks` check run and its manifest, via the API) and
+# proceeds only while something is missing (a package, the tag or the GitHub
+# release). `release` rebuilds the packages exactly as the rehearsal did, checks
+# them byte for byte against its record, publishes the missing ones in order
+# (tool packages, @lasm/cli, create-lasm), verifies `npm create lasm@<version>`
+# from the public registry, tags v<version> and creates the GitHub release.
+# Every step is idempotent: re-running after a partial failure skips what is done
+# and never republishes, unpublishes or moves a tag.
+on:
+  push:
+    branches: [main]
+    paths: [package.json]
+  workflow_run:
+    workflows: [release-checks]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Rehearse against a loopback registry; publish and create nothing
+        type: boolean
+        default: true
+      checks_run:
+        description: release-checks run to use (default the newest completed one for this commit)
+        type: string
+        default: ''
+permissions: {}
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+  queue: max
+jobs:
+  plan:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      checks: read
+    outputs:
+      proceed: ${{ steps.plan.outputs.proceed }}
+      version: ${{ steps.plan.outputs.version }}
+      dist-tag: ${{ steps.plan.outputs.dist-tag }}
+      checks-run: ${{ steps.plan.outputs.checks-run }}
+      candidate-release: ${{ steps.plan.outputs.candidate-release }}
+      candidate-sha256: ${{ steps.plan.outputs.candidate-sha256 }}
+      sha: ${{ steps.sha.outputs.sha }}
+      dry-run: ${{ steps.sha.outputs.dry-run }}
+    steps:
+      - name: The commit and the mode
+        id: sha
+        env:
+          SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] && [ "$DRY_RUN" != true ] && [ "$GITHUB_REF" != refs/heads/main ]; then
+            echo "A release (dry_run=false) runs only on main"; exit 1
+          fi
+          printf 'sha=%s\ndry-run=%s\n' "$SHA" "$DRY_RUN" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ steps.sha.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Plan (release-checks for this commit, npm, tag, GitHub release)
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.sha.outputs.sha }}
+          BEFORE: ${{ github.event.before }}
+          CHECKS_RUN: ${{ github.event.workflow_run.id || inputs.checks_run }}
+          DRY_RUN: ${{ steps.sha.outputs.dry-run }}
+        run: |
+          node scripts/release/plan.mjs --sha "$SHA" --event "$GITHUB_EVENT_NAME" ${BEFORE:+--before "$BEFORE"} \
+            ${CHECKS_RUN:+--checks-run "$CHECKS_RUN"} $([ "$DRY_RUN" = true ] && echo --dry-run) --work "$RUNNER_TEMP/plan"
+
+  release:
+    needs: plan
+    if: needs.plan.outputs.proceed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    # id-token: npm trusted publishing (OIDC) and provenance. contents: the draft
+    # candidate, the tag and the GitHub release. actions: the release-checks artifacts.
+    permissions:
+      id-token: write
+      contents: write
+      actions: read
+    env:
+      VERSION: ${{ needs.plan.outputs.version }}
+      DIST_TAG: ${{ needs.plan.outputs.dist-tag }}
+      SHA: ${{ needs.plan.outputs.sha }}
+      DRY_RUN: ${{ needs.plan.outputs.dry-run }}
+      CHECKS_RUN: ${{ needs.plan.outputs.checks-run }}
+      CANDIDATE_RELEASE: ${{ needs.plan.outputs.candidate-release }}
+      CANDIDATE_SHA256: ${{ needs.plan.outputs.candidate-sha256 }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Node >= 22.14 and npm >= 11.15.0 (trusted publishing)
+        run: |
+          node -e "
+            const npm = require('node:child_process').execSync('npm --version', { encoding: 'utf8' }).trim();
+            const at = (v, m) => { const [a, b] = [v, m].map(x => x.split('.').map(Number)); for (let i = 0; i < 3; i++) if (a[i] !== b[i]) return a[i] > b[i]; return true; };
+            if (!at(process.versions.node, '22.14.0') || !at(npm, '11.15.0')) throw new Error('Node ' + process.versions.node + ' / npm ' + npm + ' cannot use trusted publishing');
+            console.log('Node ' + process.versions.node + ', npm ' + npm);"
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable the process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: The rehearsal record and the accepted candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .work/release/checks .work/release/base
+          gh run download "$CHECKS_RUN" --repo "$GITHUB_REPOSITORY" --name release-checks --dir .work/release/checks
+          gh run download "$CHECKS_RUN" --repo "$GITHUB_REPOSITORY" --name npm-dist-linux-x64 --dir .work/release/rehearsal
+          gh release download "$CANDIDATE_RELEASE" --repo "$GITHUB_REPOSITORY" --dir .work/release/base --pattern '*.tgz'
+          node -e "
+            const c = require('node:crypto'), f = require('node:fs'), files = f.readdirSync('.work/release/base');
+            if (files.length !== 1) throw new Error('Expected one candidate tarball, found ' + files);
+            const h = c.createHash('sha256').update(f.readFileSync('.work/release/base/' + files[0])).digest('hex');
+            if (h !== process.env.CANDIDATE_SHA256) throw new Error('candidate digest ' + h);
+            console.log(files[0], h);"
+      - name: Build every package as the rehearsal did (each step guarded; npm pack twice)
+        run: node scripts/npm-dist/build-all.mjs --base .work/release/base/*.tgz --out .work/release/npm --version "$VERSION" --license MIT --memory-mib 2048
+      - name: Byte-identical to the rehearsal
+        run: node scripts/release/compare.mjs .work/release/rehearsal/linux-x64/npm-dist.json .work/release/npm/npm-dist.json
+      - name: Dry run - a loopback registry instead of npm
+        if: env.DRY_RUN == 'true'
+        run: |
+          node scripts/npm-dist/registry.mjs start --dir "$RUNNER_TEMP/verdaccio" --port 4873
+          node scripts/npm-dist/registry.mjs mirror --dir "$RUNNER_TEMP/verdaccio" --mirror-template hono
+          echo REGISTRY=http://127.0.0.1:4873/ >> "$GITHUB_ENV"
+          echo "LOCAL=--local $RUNNER_TEMP/verdaccio" >> "$GITHUB_ENV"
+      - name: Release - the public registry
+        if: env.DRY_RUN != 'true'
+        run: echo REGISTRY=https://registry.npmjs.org/ >> "$GITHUB_ENV"
+      - name: Publish what is missing (tool packages, @lasm/cli, create-lasm)
+        run: node scripts/release/publish.mjs --dist .work/release/npm --tag "$DIST_TAG" --registry "$REGISTRY" $LOCAL --report .work/release/evidence/publish.json
+      - name: Dry run - publishing again skips everything
+        if: env.DRY_RUN == 'true'
+        run: |
+          node scripts/release/publish.mjs --dist .work/release/npm --tag "$DIST_TAG" --registry "$REGISTRY" $LOCAL --report .work/release/evidence/publish-again.json
+          node -e "const r = require('./.work/release/evidence/publish-again.json'); if (r.packages.some(p => p.action !== 'skipped')) throw new Error('A second run published again'); console.log('second run: ' + r.packages.length + ' skipped')"
+      - name: npm create lasm@<version> from the registry (clean directory, empty caches)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --report .work/release/evidence/verify-resources.json -- \
+            node scripts/release/verify-create.mjs --registry "$REGISTRY" --version "$VERSION" --work "$RUNNER_TEMP/verify" --report .work/release/evidence/verify.json
+      - name: Tag v<version> and create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/release/tag-release.mjs --version "$VERSION" --sha "$SHA" $([ "$DRY_RUN" = true ] && echo --dry-run)
+      - name: Gather evidence
+        if: always()
+        run: |
+          node scripts/npm-dist/registry.mjs stop --dir "$RUNNER_TEMP/verdaccio" 2>/dev/null || true
+          mkdir -p .work/release/evidence
+          cp .work/release/npm/npm-dist.json .work/release/checks/release-checks.json .work/release/evidence/ 2>/dev/null || true
+          cp "$RUNNER_TEMP"/verify/verify-create.log .work/release/evidence/ 2>/dev/null || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: release-${{ needs.plan.outputs.version }}${{ needs.plan.outputs.dry-run == 'true' && '-dry-run' || '' }}
+          path: .work/release/evidence/
+          retention-days: 30
+          if-no-files-found: warn

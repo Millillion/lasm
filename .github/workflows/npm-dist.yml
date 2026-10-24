@@ -11,7 +11,18 @@ name: npm distribution (local registry)
 # installer dependencies). Release mode (the default since Phase 5.3) packs the
 # candidate's own bin/ and src/, exactly what would be published; overlay-source
 # replaces them with this ref's (scripts/npm-dist/build.mjs --overlay-source).
+# release-checks.yml calls it as the release rehearsal (version=<version>,
+# license=MIT) of the candidate it has just accepted; release.yml rebuilds the
+# same packages and compares them with this run's npm-dist-linux-x64 record.
 on:
+  workflow_call:
+    inputs:
+      base-release: { required: true, type: string }
+      base-sha256: { required: true, type: string }
+      node: { type: string, default: '26.12.1' }
+      version: { type: string, default: '' }
+      license: { type: string, default: '' }
+      overlay-source: { type: boolean, default: false }
   workflow_dispatch:
     inputs:
       base-release:
@@ -80,7 +91,7 @@ jobs:
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: Unit tests (source resolution, fix messages, package layout)
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/npm-unit-resources.json -- node --test --test-concurrency=1 test/npm-artifacts.test.mjs test/npm-dist-packages.test.mjs test/create-lasm.test.mjs test/managed-artifacts.test.mjs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/npm-unit-resources.json -- node --test --test-concurrency=1 test/npm-artifacts.test.mjs test/npm-dist-packages.test.mjs test/create-lasm.test.mjs test/managed-artifacts.test.mjs test/release.test.mjs
       - name: Fetch and verify the retained candidate
         env:
           GH_TOKEN: ${{ github.token }}

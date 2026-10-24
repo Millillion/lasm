@@ -35,6 +35,7 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
       const metadata = toolPackageJson(pkg);
       assert.equal(metadata.scripts, undefined, 'Tool packages never run install scripts');
       assert.equal(metadata.main, undefined);
+      assert.deepEqual(metadata.repository, { type: 'git', url: 'git+https://github.com/Millillion/lasm.git' }, 'Provenance needs the repository');
       if (pkg.platform?.startsWith('linux')) assert.deepEqual(metadata.libc, ['glibc']);
       if (pkg.platform) assert.deepEqual([...metadata.os, ...metadata.cpu], pkg.platform.split('-'));
       else assert.equal(metadata.os, undefined);
@@ -91,6 +92,7 @@ test('create-lasm pins the CLI exactly and is MIT', () => {
   assert.deepEqual([meta.name, meta.version, meta.license, meta.bin], ['create-lasm', '0.1.0', 'MIT', { 'create-lasm': 'bin.mjs' }]);
   assert.deepEqual(meta.dependencies, { '@lasm/cli': '0.1.0' });
   assert.equal(meta.scripts, undefined);
+  assert.equal(meta.repository.url, 'git+https://github.com/Millillion/lasm.git');
   assert.match(createPackageLicense(2026), /^MIT License\n\nCopyright \(c\) 2026 Jordan Last\n/);
   assert.throws(() => createPackageJson({ name: '@lasm/cli', version: '^0.1.0' }));
 });
@@ -112,6 +114,7 @@ test('the runtime manifest and main package pin every tool package exactly', asy
     bundleDependencies: ['tar'], bin: { lasm: 'bin/lasm.mjs' } };
   const main = mainPackageJson(base, packages, { name: '@lasm/compiler', version: '0.1.0-experimental.1.npm.1' });
   assert.equal(main.private, undefined);
+  assert.equal(main.repository.url, 'git+https://github.com/Millillion/lasm.git');
   assert.deepEqual(main.bundleDependencies, ['tar']);
   assert.deepEqual(Object.keys(main.dependencies), ['@lasm/emscripten-shared', '@lasm/lean-core-init', '@lasm/lean-core-std', 'tar']);
   assert.equal(Object.keys(main.optionalDependencies).length, 10);

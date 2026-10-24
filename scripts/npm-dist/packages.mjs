@@ -7,6 +7,11 @@ import assert from 'node:assert/strict';
 import { archiveFileName } from '../../src/npm-artifacts.mjs';
 
 export const defaultScope = '@lasm';
+/** Every published package names this repository: npm provenance (trusted
+ * publishing from .github/workflows/release.yml) requires `repository.url` to match
+ * the repository that built it. */
+export const repositoryUrl = 'git+https://github.com/Millillion/lasm.git';
+export const repository = directory => ({ type: 'git', url: repositoryUrl, ...(directory ? { directory } : {}) });
 export const maximumPackageBytes = 150_000_000;
 const platformParts = platform => {
   const [os, cpu] = platform.split('-');
@@ -163,7 +168,7 @@ export function toolPackages({ lean, toolchains, linkToolchain, scope = defaultS
 export function toolPackageJson(pkg) {
   return {
     name: pkg.name, version: pkg.version, description: pkg.description,
-    license: pkg.license ?? 'SEE LICENSE IN README.md',
+    license: pkg.license ?? 'SEE LICENSE IN README.md', repository: repository(),
     ...(pkg.os ? { os: pkg.os, cpu: pkg.cpu } : {}), ...(pkg.libc ? { libc: pkg.libc } : {}),
     files: [archiveFileName(pkg.artifact), 'README.md', noticeDirectory],
     // Data only: no entry point, no scripts. Lasm verifies the archive's SHA-256.
@@ -261,7 +266,7 @@ export function npmToolManifest(packages, packed) {
 /** Main package metadata: every tool package pinned to an exact version. */
 export function mainPackageJson(base, packages, { name, version, license, licenseFiles }) {
   const pins = install => Object.fromEntries(packages.filter(p => p.install === install).map(p => [p.name, p.version]).sort());
-  const result = { ...base, name, version };
+  const result = { ...base, name, version, repository: repository() };
   delete result.private;
   if (license) {
     result.license = license;
@@ -285,7 +290,7 @@ export function createPackageJson(main, { engines } = {}) {
     name: createPackageName, version: main.version, description: 'Create a Lean-on-Node project with Lasm: npm create lasm@latest my-app',
     license: 'MIT', type: 'module', bin: { 'create-lasm': 'bin.mjs' }, files: [...createPackageFiles],
     ...(engines ? { engines } : {}),
-    repository: { type: 'git', url: 'git+https://github.com/Millillion/lasm.git', directory: 'packages/create-lasm' },
+    repository: repository('packages/create-lasm'),
     dependencies: { [main.name]: main.version },
   };
 }

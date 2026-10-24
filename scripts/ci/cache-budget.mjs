@@ -3,6 +3,7 @@
 import { lstatSync, writeFileSync, mkdirSync, appendFileSync } from 'node:fs';
 import { dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { trustedRef } from './trusted-ref.mjs';
 
 const GiB = 1024 ** 3;
 export function planCacheUpload(payloadBytes, reportedBytes, listedBytes) {
@@ -21,8 +22,8 @@ export function planCacheUpload(payloadBytes, reportedBytes, listedBytes) {
 }
 
 async function main() {
-  if (process.env.GITHUB_REPOSITORY !== 'Millillion/lasm' || process.env.GITHUB_REF !== 'refs/heads/main')
-    throw new Error('Cache writes are restricted to the authorized repository main branch');
+  if (!trustedRef())
+    throw new Error('Cache writes are restricted to the authorized repository main branch and its own pull requests');
   if (!process.env.GITHUB_TOKEN) throw new Error('Missing CI API token');
   if (process.env.LASM_CACHE_WRITER_GROUP !== 'lasm-cache-writer')
     throw new Error('Run this check only in the serialized lasm-cache-writer job');

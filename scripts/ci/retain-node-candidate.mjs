@@ -5,9 +5,10 @@ import { createHash } from 'node:crypto';
 import { basename } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { retainCandidateDraft } from './candidate-retention.mjs';
+import { trustedRef } from './trusted-ref.mjs';
 
 const repository = 'Millillion/lasm', env = process.env;
-assert.equal(env.GITHUB_REPOSITORY, repository); assert.equal(env.GITHUB_REF, 'refs/heads/main');
+assert.equal(env.GITHUB_REPOSITORY, repository); assert.ok(trustedRef(env), 'Drafts are retained only from main or a pull request from this repository');
 assert.match(env.GITHUB_RUN_ID, /^\d+$/); assert.match(env.GITHUB_SHA, /^[a-f0-9]{40}$/);
 assert.match(env.LASM_CANDIDATE_VERSION, /^0\.1\.0-experimental\.\d+$/);
 const [mode, ...extra] = process.argv.slice(2); assert.ok(['input', 'tested'].includes(mode) && extra.length === 0);

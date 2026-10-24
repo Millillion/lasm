@@ -7,6 +7,7 @@
 // --mirror-template copies the exact npm dependencies a `lasm init` template pins
 // (src/init.mjs) from registry.npmjs.org into the loopback registry, read-only and
 // integrity-checked, so a consumer can install a scaffolded app without uplinks.
+//   node scripts/npm-dist/registry.mjs mirror  --dir DIR --mirror-template hono   (only the template dependencies)
 //   node scripts/npm-dist/registry.mjs stop    --dir DIR
 import assert from 'node:assert/strict';
 import { parseArgs } from 'node:util';
@@ -26,7 +27,7 @@ const [command, ...rest] = process.argv.slice(2);
 const { values: args } = parseArgs({ args: rest, options: { dir: { type: 'string' }, port: { type: 'string', default: '4873' },
   dist: { type: 'string' }, tool: { type: 'string', default: join(root, '.cache/npm-dist/verdaccio') },
   'mirror-template': { type: 'string', multiple: true, default: [] } } });
-assert.ok(['start', 'publish', 'stop'].includes(command) && args.dir, 'Usage: registry.mjs start|publish|stop --dir DIR');
+assert.ok(['start', 'publish', 'mirror', 'stop'].includes(command) && args.dir, 'Usage: registry.mjs start|publish|mirror|stop --dir DIR');
 const dir = resolve(args.dir), npm = findNpm();
 const runNpm = (npmArgs, options = {}) => execFileSync(npm.command, [...npm.args, ...npmArgs],
   { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true, ...options });
@@ -72,18 +73,19 @@ if (command === 'start') {
   throw new Error('Verdaccio did not start; see ' + join(dir, 'verdaccio.log'));
 }
 
-if (command === 'publish') {
+if (command === 'publish' || command === 'mirror') {
   const url = loopbackRegistry((await readFile(join(dir, 'url'), 'utf8')).trim());
-  const record = JSON.parse(await readFile(join(resolve(args.dist), 'npm-dist.json'), 'utf8'));
+  const record = command === 'publish' ? JSON.parse(await readFile(join(resolve(args.dist), 'npm-dist.json'), 'utf8'))
+    : { packages: [], main: undefined };
   // A private user configuration: no credentials of the user's own npm setup are read or sent.
   const userconfig = join(dir, 'npmrc');
   const host = new URL(url).host;
   await writeFile(userconfig, `registry=${url}\n//${host}/:_authToken=lasm-local-validation\n`);
-  const tarballs = join(resolve(args.dist), 'packages');
+  const tarballs = command === 'publish' ? join(resolve(args.dist), 'packages') : undefined;
   // Tool packages first, then the CLI that pins them, then create-lasm, which pins the CLI.
-  const published = [...record.packages, record.main, ...(record.create ? [record.create] : [])];
+  const published = command === 'publish' ? [...record.packages, record.main, ...(record.create ? [record.create] : [])] : [];
   const files = published.map(p => p.filename);
-  assert.deepEqual([...files].sort(), (await readdir(tarballs)).sort(), 'Publish exactly the recorded tarballs');
+  if (command === 'publish') assert.deepEqual([...files].sort(), (await readdir(tarballs)).sort(), 'Publish exactly the recorded tarballs');
   const env = { ...process.env, npm_config_registry: url, npm_config_userconfig: userconfig };
   for (const key of Object.keys(env)) if (/^npm_config_(?:_auth|.*token|.*registry)$/i.test(key) && key !== 'npm_config_registry') delete env[key];
   const manifestOf = async file => {

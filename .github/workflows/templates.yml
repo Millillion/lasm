@@ -50,7 +50,7 @@ jobs:
   # ("Data limit exceeded"): one job saves the Lambda Web Adapter image for both
   # architectures (scripts/platform/fetch-adapter.mjs, as the platform CI does).
   adapter:
-    if: inputs.docker && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    if: inputs.docker && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 30
     steps:
@@ -66,7 +66,7 @@ jobs:
           if-no-files-found: error
   templates:
     needs: adapter
-    if: always() && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    if: always() && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     strategy:
       fail-fast: false
       matrix:

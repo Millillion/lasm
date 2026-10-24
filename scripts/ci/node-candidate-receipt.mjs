@@ -2,9 +2,10 @@ import assert from 'node:assert/strict';
 import { createReadStream, readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { trustedRef } from './trusted-ref.mjs';
 
 assert.equal(process.env.GITHUB_REPOSITORY, 'Millillion/lasm');
-assert.equal(process.env.GITHUB_REF, 'refs/heads/main');
+assert.ok(trustedRef(), 'Candidate receipts are made only on main or a pull request from this repository');
 const version = process.env.LASM_CANDIDATE_VERSION ?? '0.1.0-experimental.46';
 assert.match(version, /^0\.1\.0-experimental\.\d+$/);
 const filename = `lasm-compiler-${version}.tgz`;

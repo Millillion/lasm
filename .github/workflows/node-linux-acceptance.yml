@@ -15,6 +15,17 @@ on:
         type: choice
         options: [all, windows-x64]
         default: all
+  # release-checks.yml: the candidate checks of a release PR or release commit.
+  workflow_call:
+    inputs:
+      candidate-version: { required: true, type: string }
+      validation-scope: { type: string, default: all }
+      release-check: { type: boolean, default: false }
+    outputs:
+      sha256:
+        value: ${{ jobs.package.outputs.sha256 }}
+      tested-release:
+        value: ${{ jobs.candidate.outputs.release }}
 permissions:
   contents: read
 concurrency:
@@ -27,7 +38,7 @@ jobs:
   package:
     permissions:
       contents: write
-    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     outputs:
@@ -181,6 +192,8 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+    outputs:
+      release: node-linux-candidate-${{ github.run_id }}
     env:
       LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
       LASM_CANDIDATE_SHA256: ${{ needs.package.outputs.sha256 }}
@@ -206,8 +219,9 @@ jobs:
         run: node scripts/ci/retain-node-candidate.mjs tested
   # Phase 5.2b: record the release benchmarks of the tested candidate and commit
   # them to main (docs/BENCHMARKS.md). Informational: it never gates the candidate.
+  # Not for release checks: it commits to main.
   benchmarks:
-    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    if: (github.event_name == 'push' || inputs.validation-scope == 'all') && !inputs.release-check
     needs: [package, candidate]
     permissions:
       contents: write

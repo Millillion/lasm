@@ -1,0 +1,140 @@
+name: release-checks
+# The single required status of a release (docs/RELEASING.md). On every pull
+# request to main and every push to main, `detect` compares the root
+# package.json `version` with the base (pull request) or the pushed-over commit
+# (push) and with npm. Unchanged: the `release-checks` job passes at once.
+# Changed: the candidate checks run for this exact commit (candidate build,
+# five-platform installed acceptance, platform-support, templates and
+# js-interop-examples, all in node-linux-acceptance.yml), then the npm-dist
+# loopback-registry rehearsal of the accepted candidate with version=<version>
+# license=MIT. `release-checks` passes only when all of them pass, and records
+# the result in the `release-checks` artifact, which release.yml reads before it
+# publishes anything (it accepts only a full run for a push to main).
+#
+# workflow_dispatch: a rehearsal of a version-bump commit on any branch, reusing
+# an already accepted candidate (candidate-release/-sha256) instead of building
+# one. Such a run is marked partial; release.yml uses it only for dry runs.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      candidate-release:
+        description: Reuse this accepted candidate draft (node-linux-candidate-RUN) instead of the candidate checks (partial; dry runs only)
+        type: string
+        default: ''
+      candidate-sha256:
+        description: SHA-256 of its package tarball
+        type: string
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: release-checks-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: false
+jobs:
+  detect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      release: ${{ steps.detect.outputs.release }}
+      version: ${{ steps.detect.outputs.version }}
+      dist-tag: ${{ steps.detect.outputs.dist-tag }}
+      previous: ${{ steps.detect.outputs.previous }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Compare the version with the previous commit and with npm
+        id: detect
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          REUSE: ${{ inputs.candidate-release }}
+          REUSE_SHA256: ${{ inputs.candidate-sha256 }}
+        run: |
+          if [ -n "$BASE" ] && ! printf '%s' "$BASE" | grep -Eq '^0+$'; then git fetch --no-tags --depth=1 origin "$BASE"; fi
+          if [ -n "$REUSE" ]; then
+            printf '%s' "$REUSE" | grep -Eq '^node-linux-candidate-[0-9]+$' || { echo "candidate-release must be node-linux-candidate-RUN"; exit 1; }
+            printf '%s' "$REUSE_SHA256" | grep -Eq '^[a-f0-9]{64}$' || { echo "candidate-sha256 must be a SHA-256"; exit 1; }
+          fi
+          node scripts/release/detect.mjs "$BASE"
+
+  # The candidate checks for this commit, as for a release candidate on main.
+  candidate:
+    needs: detect
+    if: needs.detect.outputs.release == 'true' && inputs.candidate-release == ''
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/node-linux-acceptance.yml
+    with:
+      candidate-version: 0.1.0-experimental.${{ github.run_id }}
+      validation-scope: all
+      release-check: true
+
+  # The npm packages of exactly that candidate, as release.yml will publish them.
+  rehearsal:
+    needs: [detect, candidate]
+    if: >-
+      always() && needs.detect.outputs.release == 'true' &&
+      (needs.candidate.result == 'success' || needs.candidate.result == 'skipped' && inputs.candidate-release != '')
+    permissions:
+      contents: write
+    uses: ./.github/workflows/npm-dist.yml
+    with:
+      base-release: ${{ inputs.candidate-release || needs.candidate.outputs.tested-release }}
+      base-sha256: ${{ inputs.candidate-sha256 || needs.candidate.outputs.sha256 }}
+      node: 26.12.1
+      version: ${{ needs.detect.outputs.version }}
+      license: MIT
+
+  release-checks:
+    name: release-checks
+    needs: [detect, candidate, rehearsal]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Record the result for release.yml
+        env:
+          DETECT: ${{ needs.detect.result }}
+          RELEASE: ${{ needs.detect.outputs.release }}
+          VERSION: ${{ needs.detect.outputs.version }}
+          PREVIOUS: ${{ needs.detect.outputs.previous }}
+          DIST_TAG: ${{ needs.detect.outputs.dist-tag }}
+          CANDIDATE: ${{ needs.candidate.result }}
+          REHEARSAL: ${{ needs.rehearsal.result }}
+          REUSE: ${{ inputs.candidate-release }}
+          REUSE_SHA256: ${{ inputs.candidate-sha256 }}
+          TESTED_RELEASE: ${{ needs.candidate.outputs.tested-release }}
+          TESTED_SHA256: ${{ needs.candidate.outputs.sha256 }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          mkdir -p manifest
+          node -e "
+            const e = process.env, release = e.RELEASE === 'true', full = !e.REUSE;
+            const passed = e.DETECT === 'success' && (!release || (full ? e.CANDIDATE === 'success' : e.CANDIDATE === 'skipped') && e.REHEARSAL === 'success');
+            const manifest = { schema: 1, workflow: 'release-checks', passed, release, full, version: e.VERSION, previous: e.PREVIOUS, distTag: e.DIST_TAG,
+              sha: e.GITHUB_SHA, headSha: e.HEAD_SHA, event: e.GITHUB_EVENT_NAME, ref: e.GITHUB_REF, runId: e.GITHUB_RUN_ID, runAttempt: e.GITHUB_RUN_ATTEMPT,
+              jobs: { detect: e.DETECT, candidate: e.CANDIDATE, rehearsal: e.REHEARSAL },
+              candidate: release ? { release: e.REUSE || e.TESTED_RELEASE, sha256: e.REUSE_SHA256 || e.TESTED_SHA256 } : null,
+              rehearsal: release ? { version: e.VERSION, license: 'MIT', node: '26.12.1', record: 'npm-dist-linux-x64/linux-x64/npm-dist.json' } : null };
+            require('node:fs').writeFileSync('manifest/release-checks.json', JSON.stringify(manifest, null, 2) + '\n');
+            console.log(JSON.stringify(manifest, null, 2));
+            require('node:fs').appendFileSync(e.GITHUB_STEP_SUMMARY, '### release-checks: ' + (passed ? 'passed' : 'FAILED') + '\n\n' +
+              (release ? 'Release ' + e.VERSION + (full ? '' : ' (partial: reused candidate ' + e.REUSE + '; dry runs only)') : 'Not a release commit') + '\n');
+            if (!passed) process.exit(1);"
+      - uses: actions/upload-artifact@v7
+        if: always() && needs.detect.outputs.release == 'true'
+        with:
+          name: release-checks
+          path: manifest/release-checks.json
+          retention-days: 30
+          if-no-files-found: error

@@ -381,6 +381,20 @@ A summary; the sections above and the linked pages have the details.
   third-party package and the full upstream suite are not release guarantees
   ([language coverage](docs/LANGUAGE_COVERAGE.md)).
 
+## Releases and provenance
+
+Nothing is published yet. Lasm's npm packages (`@lasm/cli`, `create-lasm` and the
+`@lasm/…` tool packages) will be published only by the
+[`release.yml`](.github/workflows/release.yml) GitHub Actions workflow, through npm
+trusted publishing with provenance: no npm tokens exist, and each package trusts
+only that workflow of this repository. A release is a pull request that bumps the
+`package.json` version; it is published only after the `release-checks` status
+(the five-platform candidate checks and an npm rehearsal of the exact packages)
+passed for the released commit. Releases get the tag `v<version>` and a GitHub
+release with the notes. Once published, `npm view @lasm/cli@<version>` shows the
+provenance, and `npm audit signatures` in a project verifies it. Details:
+[Releasing](docs/RELEASING.md).
+
 ## Licenses
 
 Lasm's own source is under the [MIT License](LICENSE) (copyright Jordan Last);
