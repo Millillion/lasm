@@ -738,6 +738,17 @@ folded into Phases 5.2/5.3 and 7.
     in the Lambda image instead).
   - 6.3 Azure Functions (Core Tools), Google Cloud Functions (Functions
     Framework), DigitalOcean App Platform (gVisor), Alpine/musl images.
+- **Developer workflow model (user decision 2026-10-24):** the runtime that runs
+  the CLI is the default target: Node runs and builds for Node (full profile,
+  npm only); from 7.5, Bun builds and runs on Bun, Deno on Deno (portable
+  profile). `--target` overrides it. For hosting platforms Lasm only builds:
+  `lasm build --target <platform>` compiles and packages in one step (added to
+  0.1.0 with the Phase 6 merge); `lasm package` re-packages an existing `dist/`.
+  Lasm never installs or boots a platform's local environment (`netlify dev`,
+  `vercel dev`, `wrangler dev`, … are the user's), and templates add only
+  platform config and scripts, never platform CLIs as dependencies. A watching
+  `lasm dev` (rebuild and restart on save) comes in an early 0.x release; fast
+  incremental builds are a Phase 9 priority because they make it pleasant.
 - **Reordering (user decision 2026-10-24):** Phase 6 (serverless functions) is
   merged into 0.1.0. Edge isolates move up to Phase 7, Fastly becomes Phase 8,
   and production hardening moves last as Phase 9 (pieces the edge build needs,
