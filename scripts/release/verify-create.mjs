@@ -3,7 +3,11 @@
 // the registry: npm create lasm@<version> app -- --template hono, npm install,
 // npm run build, the server, and HTTP requests (docs/RELEASING.md).
 //
-//   node scripts/release/verify-create.mjs --registry https://registry.npmjs.org/ --version V --work NEW_DIR [--report FILE]
+//   node scripts/release/verify-create.mjs --registry https://registry.npmjs.org/ --version V --work NEW_DIR [--report FILE] [--stage S]
+// --stage create|warm|build|serve runs one part (default all), so that each can run in
+// its own resource guard: the guard counts page cache, and a fresh extraction of every
+// tool plus the build exceeded a CI runner's budget in one guard. `warm` builds a hello
+// program with the app's installed CLI and the same empty-at-start Lasm cache first.
 import assert from 'node:assert/strict';
 import { parseArgs } from 'node:util';
 import { spawnSync, spawn } from 'node:child_process';
@@ -15,11 +19,13 @@ import { published, summary } from './lib.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const { values: args } = parseArgs({ options: { registry: { type: 'string' }, version: { type: 'string' }, work: { type: 'string' },
-  report: { type: 'string' } } });
+  report: { type: 'string' }, stage: { type: 'string', default: 'all' } } });
 assert.ok(args.registry && args.version && args.work, 'Usage: verify-create.mjs --registry URL --version V --work NEW_DIR');
 const registry = new URL(args.registry).href, version = args.version, work = resolve(args.work);
-assert.ok(!existsSync(work), `Use a new work directory: ${work}`);
-mkdirSync(work, { recursive: true });
+const stage = args.stage, does = name => stage === 'all' || stage === name;
+assert.ok(['all', 'create', 'warm', 'build', 'serve'].includes(stage), `Unknown stage ${stage}`);
+if (does('create')) { assert.ok(!existsSync(work), `Use a new work directory: ${work}`); mkdirSync(work, { recursive: true }); }
+else assert.ok(existsSync(join(work, 'state.json')), 'Run the create stage first');
 const npm = findNpm(); assert.ok(npm, 'npm was not found');
 const npmCli = npm.args[0] ?? npm.command, log = join(work, 'verify-create.log');
 
@@ -28,9 +34,10 @@ for (const key of Object.keys(env)) if (/^(?:npm_|NPM_|LASM_|NODE_AUTH_TOKEN$|NO
 writeFileSync(join(work, 'npmrc'), `registry=${registry}\n`);
 Object.assign(env, { npm_config_userconfig: join(work, 'npmrc'), npm_config_registry: registry, npm_config_cache: join(work, 'npm-cache'),
   npm_config_update_notifier: 'false', npm_config_audit: 'false', npm_config_fund: 'false', LASM_TOOLCHAIN_CACHE: join(work, 'lasm-cache') });
-function npmRun(label, npmArgs, cwd) {
-  const started = Date.now();
-  const result = spawnSync(process.execPath, [npmCli, ...npmArgs], { cwd, env, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true, timeout: 3_600_000 });
+function npmRun(label, npmArgs, cwd) { return nodeRun(label, [npmCli, ...npmArgs], cwd); }
+function nodeRun(label, nodeArgs, cwd) {
+  const started = Date.now(), npmArgs = nodeArgs.slice(1);
+  const result = spawnSync(process.execPath, nodeArgs, { cwd, env, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true, timeout: 3_600_000 });
   const seconds = (Date.now() - started) / 1000;
   appendFileSync(log, `\n=== ${label} (${seconds}s, exit ${result.status ?? result.signal})\n$ npm ${npmArgs.join(' ')}\n--- stdout\n${result.stdout}\n--- stderr\n${result.stderr}\n`);
   if (result.error) throw result.error;
@@ -39,19 +46,33 @@ function npmRun(label, npmArgs, cwd) {
   return seconds;
 }
 
-// The registry serves both packages (the public registry's metadata can lag behind a publish).
-for (const name of ['@lasm/cli', 'create-lasm']) {
-  let state;
-  for (let attempt = 0; attempt < 60 && !(state = await published(registry, name, version)).exists; attempt++) await delay(10_000);
-  assert.ok(state.exists, `${name}@${version} is not on ${registry}`);
+const app = join(work, 'app'), stateFile = join(work, 'state.json');
+const report = does('create') ? { schema: 1, registry, version, startedAt: new Date().toISOString(), node: process.versions.node }
+  : JSON.parse(readFileSync(stateFile, 'utf8'));
+const save = () => writeFileSync(stateFile, JSON.stringify(report, null, 2) + '\n');
+if (does('create')) {
+  // The registry serves both packages (the public registry's metadata can lag behind a publish).
+  for (const name of ['@lasm/cli', 'create-lasm']) {
+    let state;
+    for (let attempt = 0; attempt < 60 && !(state = await published(registry, name, version)).exists; attempt++) await delay(10_000);
+    assert.ok(state.exists, `${name}@${version} is not on ${registry}`);
+  }
+  report.create = npmRun('npm create lasm', ['create', '--yes', `lasm@${version}`, 'app', '--', '--template', 'hono'], work);
+  const manifest = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8'));
+  assert.deepEqual(manifest.devDependencies, { '@lasm/cli': version }, 'create-lasm scaffolds with the released CLI');
+  report.install = npmRun('npm install', ['install'], app);
+  save();
 }
-const report = { schema: 1, registry, version, startedAt: new Date().toISOString(), node: process.versions.node };
-report.create = npmRun('npm create lasm', ['create', '--yes', `lasm@${version}`, 'app', '--', '--template', 'hono'], work);
-const app = join(work, 'app');
-const manifest = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8'));
-assert.deepEqual(manifest.devDependencies, { '@lasm/cli': version }, 'create-lasm scaffolds with the released CLI');
-report.install = npmRun('npm install', ['install'], app);
-report.build = npmRun('npm run build', ['run', 'build'], app);
+if (does('warm')) {
+  const warm = join(work, 'warm');
+  mkdirSync(warm, { recursive: true });
+  writeFileSync(join(warm, 'Main.lean'), 'def main : IO Unit := IO.println "warm"\n');
+  writeFileSync(join(warm, 'lean-toolchain'), readFileSync(join(app, 'lean-toolchain')));
+  report.warm = nodeRun('lasm build (warm the tool cache)', [join(app, 'node_modules', '@lasm', 'cli', 'bin', 'lasm.mjs'), 'build', 'Main.lean'], warm);
+  save();
+}
+if (does('build')) { report.build = npmRun('npm run build', ['run', 'build'], app); save(); }
+if (!does('serve')) process.exit(0);
 const port = await new Promise((done, fail) => {
   const server = createServer().once('error', fail);
   server.listen(0, '127.0.0.1', () => { const { port } = server.address(); server.close(() => done(port)); });

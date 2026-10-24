@@ -173,8 +173,14 @@ jobs:
           node -e "const r = require('./.work/release/evidence/publish-again.json'); if (r.packages.some(p => p.action !== 'skipped')) throw new Error('A second run published again'); console.log('second run: ' + r.packages.length + ' skipped')"
       - name: npm create lasm@<version> from the registry (clean directory, empty caches)
         run: |
-          node scripts/full-lean/run-bounded.mjs --memory-mib 8192 --report .work/release/evidence/verify-resources.json -- \
-            node scripts/release/verify-create.mjs --registry "$REGISTRY" --version "$VERSION" --work "$RUNNER_TEMP/verify" --report .work/release/evidence/verify.json
+          # The guard caps a workload at host available memory minus 8 GiB and counts
+          # page cache: free the packed tarballs and the cache, and run each stage in its own guard.
+          rm -rf .work/release/npm/packages .work/release/base
+          sync && echo 3 | sudo tee /proc/sys/vm/drop_caches >/dev/null
+          for stage in create warm build serve; do
+            node scripts/full-lean/run-bounded.mjs --memory-mib 8192 --report ".work/release/evidence/verify-$stage-resources.json" -- \
+              node scripts/release/verify-create.mjs --registry "$REGISTRY" --version "$VERSION" --work "$RUNNER_TEMP/verify" --stage "$stage" --report .work/release/evidence/verify.json
+          done
       - name: Tag v<version> and create the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
