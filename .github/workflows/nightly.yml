@@ -1,0 +1,125 @@
+name: nightly
+# The nightly full five-target suite (CI test policy, docs/PLAN.md;
+# docs/LANGUAGE_COVERAGE.md#nightly). At a quiet hour, if main changed since the
+# last reported nightly and no release-checks or release run is in progress, it
+# packs a candidate from main and dispatches the launch gate's upstream-suite
+# shards (language-coverage-baseline.yml, every harness on five targets) and the
+# ecosystem runs (ecosystem.yml), a few runs at a time (scripts/nightly/layout.json),
+# pausing new dispatches while release checks run. When every run has completed it
+# compares the outcomes with the latest recorded baseline
+# (scripts/nightly/baseline.json) and, on any regression or missing result, opens
+# or updates the issue "Nightly regressions on main". It never blocks or affects a
+# release. A run that reaches its time limit saves its state and continues in a
+# new run (workflow_dispatch continue_from). Free standard runners only.
+on:
+  schedule:
+    - cron: '17 7 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Run even if main has not changed since the last nightly
+        type: boolean
+        default: false
+      continue_from:
+        description: (internal) continue the nightly whose state this run saved
+        type: string
+        default: ''
+permissions:
+  contents: read
+# queue: max keeps a pending continuation when the next schedule fires.
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+  queue: max
+jobs:
+  gate:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.continue_from == '')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      proceed: ${{ steps.gate.outputs.proceed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/nightly/driver.mjs gate --sha "$GITHUB_SHA" $([ "${{ inputs.force }}" = true ] && echo --force)
+
+  candidate:
+    needs: gate
+    if: needs.gate.outputs.proceed == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/node-linux-acceptance.yml
+    with:
+      candidate-version: 0.1.0-experimental.${{ github.run_id }}
+      validation-scope: package
+      release-check: true
+
+  drive:
+    needs: [gate, candidate]
+    if: always() && (needs.candidate.result == 'success' || inputs.continue_from != '' && needs.gate.result == 'skipped')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    permissions:
+      contents: read
+      actions: write
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: The saved state of the nightly this run continues
+        if: inputs.continue_from != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FROM: ${{ inputs.continue_from }}
+        run: gh run download "$FROM" --repo "$GITHUB_REPOSITORY" --name nightly-state --dir .work/nightly-state
+      - name: Dispatch, wait, compare with the baseline, report
+        id: drive
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: 0.1.0-experimental.${{ github.run_id }}
+          RELEASE: ${{ needs.candidate.outputs.package-release }}
+          SHA256: ${{ needs.candidate.outputs.sha256 }}
+        run: |
+          node scripts/nightly/driver.mjs drive --state .work/nightly-state/state.json --work .work/nightly --deadline-minutes 320 \
+            --nightly-run "$GITHUB_RUN_ID" ${RELEASE:+--sha "$GITHUB_SHA" --candidate-version "$VERSION" --candidate-release "$RELEASE" --candidate-sha256 "$SHA256"}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: nightly-state
+          path: .work/nightly-state/state.json
+          retention-days: 7
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v7
+        if: steps.drive.outputs.done == 'true'
+        with:
+          name: nightly-report
+          path: |
+            .work/nightly/report.json
+            .work/nightly/report.md
+            .work/nightly/coverage-*.json
+            .work/nightly/ecosystem-*.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Continue in a new run
+        if: steps.drive.outputs.done == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run nightly.yml --repo "$GITHUB_REPOSITORY" --ref main -f continue_from="$GITHUB_RUN_ID"

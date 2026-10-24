@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "note": "The latest recorded baselines the nightly compares with. Update when a newer gate or re-check is recorded in docs/evidence.",
+  "coverage": "docs/evidence/lean-4.35.0-language-coverage-phase3-2026-10-21.json",
+  "ecosystem": "docs/evidence/lean-4.35.0-ecosystem-c-tier-2026-10-22.json",
+  "ecosystemNoSystemC": "docs/evidence/lean-4.35.0-ecosystem-no-system-c-2026-10-22.json"
+}

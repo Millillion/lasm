@@ -723,6 +723,7 @@ folded into Phases 5.2/5.3 and 7.
       five targets;
     - nightly, when `main` changed: the full five-target upstream suite on its
       own schedule; it never blocks a release, and regressions are reported.
+      Implemented: `nightly.yml` ([LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#nightly)).
     - 0.1.0 itself gets the full launch gate on all five targets (user choice).
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.

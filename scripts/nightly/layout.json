@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "note": "The launch gate's shard layout (5.3 gate dispatches of 2026-10-23, runs 40028709923-40028991325) and the ecosystem re-check (five targets, Linux x64 also without a system C compiler; Tier C/Mathlib is not nightly). maxParallel is per dispatched run and kept low: the nightly is lower priority than release checks.",
+  "coverage": [
+    { "runner": "ubuntu-24.04", "harness": "runtime-adapter", "shards": 16 },
+    { "runner": "ubuntu-24.04", "harness": "eval-io", "shards": 2 },
+    { "runner": "ubuntu-24.04", "harness": "compiled-application", "shards": 8 },
+    { "runner": "ubuntu-24.04", "harness": "projects", "shards": 8 },
+    { "runner": "ubuntu-24.04", "harness": "docparse", "shards": 1 },
+    { "runner": "ubuntu-24.04", "harness": "lsp", "shards": 1 },
+    { "runner": "ubuntu-24.04", "harness": "lsp-server", "shards": 1 },
+    { "runner": "ubuntu-24.04", "harness": "lsp-project", "shards": 1 },
+    { "runner": "ubuntu-24.04-arm", "harness": "runtime-adapter", "shards": 12 },
+    { "runner": "ubuntu-24.04-arm", "harness": "eval-io", "shards": 2 },
+    { "runner": "ubuntu-24.04-arm", "harness": "compiled-application", "shards": 8 },
+    { "runner": "ubuntu-24.04-arm", "harness": "projects", "shards": 8 },
+    { "runner": "macos-15-intel", "harness": "runtime-adapter", "shards": 12 },
+    { "runner": "macos-15-intel", "harness": "eval-io", "shards": 2 },
+    { "runner": "macos-15-intel", "harness": "compiled-application", "shards": 8 },
+    { "runner": "macos-15-intel", "harness": "projects", "shards": 8 },
+    { "runner": "macos-15", "harness": "runtime-adapter", "shards": 12 },
+    { "runner": "macos-15", "harness": "eval-io", "shards": 2 },
+    { "runner": "macos-15", "harness": "compiled-application", "shards": 8 },
+    { "runner": "macos-15", "harness": "projects", "shards": 8 },
+    { "runner": "windows-2025", "harness": "runtime-adapter", "shards": 12 },
+    { "runner": "windows-2025", "harness": "eval-io", "shards": 2 },
+    { "runner": "windows-2025", "harness": "compiled-application", "shards": 8 },
+    { "runner": "windows-2025", "harness": "projects", "shards": 8 }
+  ],
+  "ecosystem": [
+    { "runner": "ubuntu-24.04" },
+    { "runner": "ubuntu-24.04", "removeSystemC": true },
+    { "runner": "ubuntu-24.04-arm" },
+    { "runner": "macos-15-intel" },
+    { "runner": "macos-15" },
+    { "runner": "windows-2025" }
+  ],
+  "maxParallel": { "ubuntu-24.04": 4, "ubuntu-24.04-arm": 4, "macos-15-intel": 2, "macos-15": 2, "windows-2025": 3 },
+  "activeRuns": 3
+}

@@ -5,6 +5,25 @@ Each phase ends with a review stop. Phases were renumbered on 2026-10-20 to matc
 the actual order; older evidence and code comments use the original labels
 (L1 = Phase 1, L2/L3 = Phase 2, L6 = Phase 3, L5 = Phase 4, L4 = Phase 5, L7 = Phase 6).
 
+## Nightly
+
+[`nightly.yml`](../.github/workflows/nightly.yml) (CI test policy, [PLAN.md](PLAN.md))
+runs at 07:17 UTC when `main` changed since the last reported nightly. It skips
+the night if a `release-checks` or `release` run is in progress, packs a candidate
+from `main` (`node-linux-acceptance.yml`, scope `package`), and dispatches the
+launch gate's shards ([layout](../scripts/nightly/layout.json): every harness on
+the five targets, the docparse/LSP harnesses on Linux x64) and the ecosystem runs
+(five targets, Linux x64 also without a system C compiler; not Tier C), at most
+three runs at a time with low per-run parallelism, and no new dispatch while
+release checks run. When all have completed it compares each test and project
+with the latest recorded baseline ([baseline.json](../scripts/nightly/baseline.json),
+updated when a newer gate is recorded): a regression passed in the baseline and
+does not pass now; resource stops are listed apart; results the baseline has but
+the nightly lacks are "missing". Any regression or missing result opens or updates
+the issue "Nightly regressions on main". The report is the run's `nightly-report`
+artifact (30 days). A nightly longer than one job continues itself in a new run.
+It never gates or affects a release.
+
 ## Phase 3: ecosystem (2026-10-21)
 
 **Status: complete, gate passed, awaiting review.** Scope: [PLAN.md](PLAN.md#language-coverage-phases-approved-2026-10-19).

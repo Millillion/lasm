@@ -16,6 +16,7 @@ on:
         options: [all, windows-x64]
         default: all
   # release-checks.yml: the candidate checks of a release PR or release commit.
+  # nightly.yml: validation-scope `package` packs and retains the input draft only.
   workflow_call:
     inputs:
       candidate-version: { required: true, type: string }
@@ -26,6 +27,8 @@ on:
         value: ${{ jobs.package.outputs.sha256 }}
       tested-release:
         value: ${{ jobs.candidate.outputs.release }}
+      package-release:
+        value: ${{ jobs.package.outputs.candidate-release }}
 permissions:
   contents: read
 concurrency:
