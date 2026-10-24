@@ -55,7 +55,13 @@ Resources:
       mkdirSync(join(directory, 'events'), { recursive: true });
       writeFileSync(join(directory, 'events', kind + '.json'), JSON.stringify(makeEvent(kind, { path: '/hello/Ada' })));
       const started = performance.now();
-      const r = spawnSync(sam, ['local', 'invoke', 'LeanFunction', '-e', `events/${kind}.json`], { cwd: directory, env, encoding: 'utf8', timeout: 600_000 });
+      let r;
+      // Amazon ECR Public is rate limited and sometimes slow from shared runners.
+      for (let attempt = 1; ; attempt++) {
+        r = spawnSync(sam, ['local', 'invoke', 'LeanFunction', '-e', `events/${kind}.json`], { cwd: directory, env, encoding: 'utf8', timeout: 600_000 });
+        if (r.status === 0 || attempt >= 4 || !/context deadline exceeded|toomanyrequests|500 Server Error|TLS handshake timeout/i.test(r.stderr)) break;
+        await new Promise(done => setTimeout(done, 20_000 * attempt));
+      }
       run[`invokeMs_${kind}`] = Math.round(performance.now() - started);
       assert.equal(r.status, 0, r.stderr.slice(-3000));
       const reply = JSON.parse(r.stdout.trim().split('\n').at(-1));
@@ -64,7 +70,8 @@ Resources:
     });
   }
   const port = await freePort();
-  const api = spawn(sam, ['local', 'start-api', '--port', String(port)], { cwd: directory, env, stdio: ['ignore', 'pipe', 'pipe'] });
+  // Warm containers, as Lambda keeps them: one cold start, then reuse.
+  const api = spawn(sam, ['local', 'start-api', '--port', String(port), '--warm-containers', 'EAGER'], { cwd: directory, env, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = ''; api.stdout.on('data', d => { log += d; }); api.stderr.on('data', d => { log += d; });
   try {
     const base = `http://127.0.0.1:${port}`;

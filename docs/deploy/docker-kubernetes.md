@@ -26,9 +26,16 @@ stays `node:24-trixie` (the Lasm compiler itself needs glibc). With
 NODE_IMAGE=node:24-alpine -t my-app .`. `lasm package` leaves the musl pieces
 out of function packages, whose platforms all use glibc.
 
+**Std.Http needs the time zone database**, which Alpine images lack: without
+it a pure-Lean `Std.Http` server accepts connections but closes them without
+answering (its `Date` header reads the system time zone). Add
+`RUN apk add --no-cache tzdata` to the Alpine stage. Express and Hono servers
+do not need it.
+
 **Tested in CI** (`.github/workflows/serverless.yml`, x64 and arm64):
 `node:24.22.1-alpine` and `node:26.12.1-alpine`, read-only with 512 MB, every
-server template (HTTP checks, `docker stop` exit code 0), the probe program
+server template (HTTP checks, `docker stop` exit code 0; std-http with
+`tzdata` added), the probe program
 (subprocess, files, environment) and `deploy/Dockerfile` built on the Alpine
 image.
 

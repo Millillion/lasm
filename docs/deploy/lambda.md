@@ -54,21 +54,22 @@ events for each type above (`scripts/serverless/events/`), with 512 MB and a
 read-only root; AWS SAM CLI 1.170.0 `sam local invoke` (REST and HTTP API events)
 and `sam local start-api` with the zip as `CodeUri`; the size limits; cold starts.
 
-**Measured in CI** (run 40074644572, emulator on GitHub's `ubuntu-24.04` and
-`ubuntu-24.04-arm`, 512 MB, three cold starts per template; the emulator's
-INIT REPORT is the init phase, the first response also includes container start):
+**Measured in CI** (runs 40074644572 and 40078265584, emulator on GitHub's
+`ubuntu-24.04` and `ubuntu-24.04-arm`, 512 MB, three cold starts per template
+per run; the init phase is the emulator's INIT REPORT, which includes Node's
+start, the handler's import and the Lean server's start):
 
 | Template | Zip / unpacked | Init phase x64 / arm64 | Warm invocation x64 / arm64 | Memory in use x64 / arm64 |
 | --- | --- | --- | --- | --- |
-| Hono | 1.8 / 5.7 MB | 470–482 / 410–427 ms | 2.1 / 2.6 ms | 206 / 135 MiB |
-| Express | 2.0 / 6.5 MB | 503–518 / 476–480 ms | 2.1 / 2.7 ms | 212 / 142 MiB |
-| Std.Http | 1.4 / 5.4 MB | 444–459 / 413–426 ms | 3.9 / 5.2 ms | 308 / 186 MiB |
+| Hono | 1.8 / 5.7 MB | 470–510 / 401–427 ms | 2.1–3.2 / 2.4–2.7 ms | 206 / 134 MiB |
+| Express | 2.0 / 6.5 MB | 503–640 / 456–480 ms | 2.1–3.2 / 2.3–2.8 ms | 213 / 143 MiB |
+| Std.Http | 1.4 / 5.4 MB | 444–501 / 394–426 ms | 3.9–5.7 / 4.6–5.8 ms | 312 / 186 MiB |
 
 **Why a handler, not the Web Adapter layer.** The same run measured the Lambda
 Web Adapter 1.1.0 in its layer layout (adapter extension, `/opt/bootstrap`, a
-`run.sh` handler) for the Hono template: init 423 ms (x64) and 390–394 ms
-(arm64), warm 1.6 / 2.0 ms, so about 50–90 ms faster to start and 0.5 ms faster
-per invocation. The handler was chosen anyway: it needs no layer, no
+`run.sh` handler) for the Hono template: init 423–497 ms (x64) and 390–394 ms
+(arm64), warm 1.6–1.9 / 2.0 ms, so about 15–90 ms faster to start and under
+1 ms faster per invocation. The handler was chosen anyway: it needs no layer, no
 environment variables and no extension, so the same zip works on Lambda@Edge
 (which allows none of them); it maps ALB and CloudFront events; and the zip is
 self-contained, with no layer ARN per region and architecture to keep current.

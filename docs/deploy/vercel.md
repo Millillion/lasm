@@ -53,7 +53,8 @@ offline in the `lasm init --deploy vercel` project, with a local
 under **Vercel's own Node launcher** (the dev server of `@vercel/node`, which
 `vercel dev` uses) inside AWS's `public.ecr.aws/lambda/nodejs:24` image (Vercel
 Functions run on AWS Lambda), read-only with 512 MB, with request helpers on and
-off, answering the templates' HTTP checks. **`vercel dev` itself needs a Vercel
+off, answering the templates' HTTP checks (first response 1.1–1.5 s after the
+container starts, run 40076471450). **`vercel dev` itself needs a Vercel
 login** (verified in each run: it starts a device login and serves nothing), so
 it is not used. Vercel's production router is not emulated: the routing of the
 deployed output is untested.

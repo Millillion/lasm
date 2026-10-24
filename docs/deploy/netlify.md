@@ -26,8 +26,9 @@ plus `dist/`), and Netlify bundles it with `included_files`, keeping the helpers
 executable.
 
 - **Limits:** Netlify stops synchronous functions after **60 seconds**; a Lean
-  cold start takes about a second. The templates' deploy zip is 1.6–2.2 MB
-  (5.4–7.1 MB unpacked), far below Netlify's limits. Request and response
+  cold start takes about a second. The templates' deploy zip is 1.9–2.4 MB
+  (6.4–7.6 MB unpacked), far below Netlify's limits. In the Lambda image the
+  first response after a cold start took 0.76–0.97 s (run 40078265584). Request and response
   payloads up to 6 MB buffered. Give the function 1024 MB (Netlify's default).
 - **Not supported:** Netlify Edge Functions (Deno isolates; Phase 8), background
   and scheduled functions (untested).

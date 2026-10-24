@@ -106,7 +106,9 @@ for (const app of apps.filter(app => app.packages.vercel)) {
 const app = apps.find(app => app.packages.vercel);
 if (app) {
   const port = await freePort();
-  const dev = spawn(vercel, ['dev', '--listen', String(port), '--yes'], { cwd: app.project, env, stdio: ['ignore', 'pipe', 'pipe'] });
+  // No display and CI=1: the login flow must not open a browser on a desktop.
+  const dev = spawn(vercel, ['dev', '--listen', String(port), '--yes'], { cwd: app.project,
+    env: { ...env, CI: '1', BROWSER: 'none', DISPLAY: '', WAYLAND_DISPLAY: '' }, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = ''; dev.stdout.on('data', d => { log += d; }); dev.stderr.on('data', d => { log += d; });
   await new Promise(done => setTimeout(done, 20_000));
   const answered = await fetch(`http://127.0.0.1:${port}/health`, { signal: AbortSignal.timeout(5000) }).then(r => r.status, () => null);
