@@ -11,6 +11,8 @@ name: nightly
 # or updates the issue "Nightly regressions on main". It never blocks or affects a
 # release. A run that reaches its time limit saves its state and continues in a
 # new run (workflow_dispatch continue_from). Free standard runners only.
+# `cleanup` deletes the nightly's own candidate drafts (node-package-<nightly run>)
+# older than 7 days, keeping the newest and any the baseline or the issue names.
 on:
   schedule:
     - cron: '17 7 * * *'
@@ -53,6 +55,27 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: node scripts/nightly/driver.mjs gate --sha "$GITHUB_SHA" $([ "${{ inputs.force }}" = true ] && echo --force)
+
+  cleanup:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.continue_from == '')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+      issues: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Delete nightly candidate drafts older than 7 days
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/nightly/cleanup-drafts.mjs
 
   candidate:
     needs: gate

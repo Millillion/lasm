@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { plannedRuns, nextStep } from '../scripts/nightly/driver.mjs';
+import { selectDeletions } from '../scripts/nightly/cleanup-drafts.mjs';
 import { compareCoverage, compareEcosystem, merge, markdown } from '../scripts/nightly/compare.mjs';
 
 const layout = JSON.parse(readFileSync(new URL('../scripts/nightly/layout.json', import.meta.url)));
@@ -53,4 +54,16 @@ test('nightly.yml: scheduled, serialized without cancellation, behind release ch
   assert.match(workflow, /schedule:/);
   assert.match(workflow, /group: nightly\n\s+cancel-in-progress: false/);
   for (const file of ['release.yml', 'release-checks.yml']) assert.doesNotMatch(readFileSync(new URL(`../.github/workflows/${file}`, import.meta.url), 'utf8'), /nightly/);
+});
+
+test('draft cleanup: only nightly drafts, older than 7 days, never the newest, a running or a referenced one', () => {
+  const day = 86_400_000, now = Date.parse('2026-11-30T00:00:00Z'), at = d => new Date(now - d * day).toISOString();
+  const drafts = [{ tag: 'node-package-1', createdAt: at(20) }, { tag: 'node-package-2', createdAt: at(15) }, { tag: 'node-package-3', createdAt: at(10) },
+    { tag: 'node-package-4', createdAt: at(9) }, { tag: 'node-package-5', createdAt: at(8) }, { tag: 'node-package-6', createdAt: at(3) },
+    { tag: 'node-package-7', createdAt: at(30) }];
+  const nightly = { path: '.github/workflows/nightly.yml', status: 'completed' };
+  const runs = { 1: nightly, 2: nightly, 3: nightly, 4: { ...nightly, status: 'in_progress' }, 5: nightly, 6: nightly,
+    7: { path: '.github/workflows/node-linux-acceptance.yml', status: 'completed' } };
+  assert.deepEqual(selectDeletions(drafts, runs, 'candidate node-package-3; run 5', { now }).map(d => d.tag), ['node-package-2', 'node-package-1']);
+  assert.deepEqual(selectDeletions([drafts[0]], runs, '', { now }), [], 'the newest nightly draft is kept');
 });

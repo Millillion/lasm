@@ -22,7 +22,10 @@ does not pass now; resource stops are listed apart; results the baseline has but
 the nightly lacks are "missing". Any regression or missing result opens or updates
 the issue "Nightly regressions on main". The report is the run's `nightly-report`
 artifact (30 days). A nightly longer than one job continues itself in a new run.
-It never gates or affects a release.
+It never gates or affects a release. Each nightly's candidate is a draft release
+`node-package-<nightly run>`; the `cleanup` job deletes those (only drafts of
+nightly.yml runs) older than 7 days, keeping the newest, any of a running nightly,
+and any the baseline files or the regression issue mention.
 
 ## Phase 3: ecosystem (2026-10-21)
 

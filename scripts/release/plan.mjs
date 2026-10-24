@@ -81,8 +81,8 @@ if (isMain) {
   if (!isVersion(version)) stop(`package.json version ${version} is not a release version`, { fail: true });
 
   // 1. The release-checks workflow run for this exact commit.
-  const runs = JSON.parse(gh(['api', '--paginate', '--slurp', `repos/${repository}/actions/workflows/${checksWorkflow}/runs?head_sha=${sha}&per_page=100`]))
-    .flatMap(page => page.workflow_runs);
+  const runs = gh(['api', '--paginate', `repos/${repository}/actions/workflows/${checksWorkflow}/runs?head_sha=${sha}&per_page=100`,
+    '-q', '.workflow_runs[] | tojson']).trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
   let checks;
   if (args['checks-run']) {
     checks = runs.find(r => String(r.id) === args['checks-run']);
