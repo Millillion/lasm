@@ -478,7 +478,16 @@ Free limit, and under Vercel Edge's 1 MB-gzip Hobby limit. The Node profile's
 7. **The `Data` conversion cost.** JSON-heavy handlers spend about 4.5× more
    than JS on conversion. Per-request cost is still well under 10 ms. Faster
    bulk conversion is Phase 9 work.
-8. **A second link recipe and runtime bundle to maintain.** Mitigation: keep the
+8. **Cross-request promise settlement in production Workers.** One Lean
+   stack serves every request of an isolate, so an event from one request (a
+   timer, a settled promise) can run Lean work for another, and settle that
+   request's promise from the first request's context. Local workerd showed no
+   warnings, with 50 concurrent requests and 5 concurrent blocking waits.
+   Production Workers cancel continuations whose creating request has already
+   finished; this is unverified there. Mitigation if it appears: run the pump
+   from the request whose event arrived (already the case for idle pumps), and
+   route each request's settlements through its own context.
+9. **A second link recipe and runtime bundle to maintain.** Mitigation: keep the
    differences in one place (`link-edge` flags, the edge patch) and test them on
    every candidate.
 

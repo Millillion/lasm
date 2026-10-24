@@ -66,12 +66,15 @@ Lasm owns `workers/` and replaces it on every build. Requirements:
 
 ## Limits (measured; [EDGE.md](../EDGE.md))
 
-| | This build | Workers Free plan |
-| --- | --- | --- |
-| Bundle | Hono template: 1.4 MiB (245 KiB gzip) | 64 MiB uncompressed |
-| Memory | about 27 MiB of Wasm memory | 128 MB per isolate |
-| Startup (initializers + `main`) | 50–90 ms | 1 s |
-| CPU per request | 0.07–0.35 ms for the test routes | 10 ms |
+| | This build | Workers Free plan | Workers Paid plan |
+| --- | --- | --- | --- |
+| Bundle | Hono template: 1.4 MiB (245 KiB gzip); pure-Lean example: 1.7 MiB | 64 MiB uncompressed | 64 MiB uncompressed |
+| Memory | about 27 MiB of Wasm memory | 128 MB per isolate | 128 MB per isolate |
+| Startup (initializers + `main`) | 50–90 ms | 1 s | 1 s |
+| CPU per request | 0.07–0.35 ms for the test routes | 10 ms | 30 s by default, up to 5 min |
+
+Limits: [developers.cloudflare.com/workers/platform/limits](https://developers.cloudflare.com/workers/platform/limits/),
+fetched 2026-10-24.
 
 ## What works and what does not
 
