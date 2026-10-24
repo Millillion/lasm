@@ -3,7 +3,7 @@
 // and `lasm cache repair` always checks contents in full.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, utimesSync, statSync, existsSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, utimesSync, statSync, existsSync, rmSync, linkSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -20,7 +20,7 @@ function tree() {
   return { directory, root: join(directory, 'tree'), stamps: join(directory, 'stamps') };
 }
 
-test('a recorded tree is not re-hashed until a file changes size, mtime or content', async () => {
+test('a recorded tree is not re-hashed until a file changes size, modification time or inode', async () => {
   const { root, stamps } = tree();
   let checks = 0;
   const verify = async () => { checks++; };
@@ -38,10 +38,15 @@ test('a recorded tree is not re-hashed until a file changes size, mtime or conte
   utimesSync(join(root, 'lib/a.txt'), atime, new Date(Date.now() - 3_600_000));
   await verifyTreeOnce(stamps, 'k', root, verify);
   assert.equal(checks, 3);
-  // Same size, mtime put back: the change time still differs.
+  // A replaced file (new inode), even with the same size and modification time.
   const before = statSync(join(root, 'lib/a.txt'));
-  writeFileSync(join(root, 'lib/a.txt'), 'ALPHA');
+  rmSync(join(root, 'lib/a.txt')); writeFileSync(join(root, 'lib/a.txt'), 'ALPHA');
   utimesSync(join(root, 'lib/a.txt'), before.atime, before.mtime);
+  await verifyTreeOnce(stamps, 'k', root, verify);
+  assert.equal(checks, 4);
+  // A hard link to a verified file from elsewhere (a Lean tier prefix, Windows
+  // tool paths) changes no byte and does not force a re-hash.
+  linkSync(join(root, 'b.txt'), join(tree().root, 'linked.txt'));
   await verifyTreeOnce(stamps, 'k', root, verify);
   assert.equal(checks, 4);
   // An added file, and another key.
@@ -83,8 +88,9 @@ test('cached tools: builds use the record, lasm cache repair always checks conte
   // Content changed: detected through the metadata change.
   writeFileSync(join(directory, 'bin/tool'), 'TOOL');
   await assert.rejects(verifyArtifactDirectory(directory, identity, { stamps }), /contents changed/);
-  // Even a record that matches the damaged tree (forged or stale) does not
-  // stop cache repair: it verifies every byte and removes the damaged tool.
+  // Deliberate tampering (a same-size edit with the exact modification time
+  // put back, or a record forged to match) passes the record, never cache
+  // repair: it verifies every byte and removes the damaged tool.
   const [name] = readdirSync(stamps);
   const record = JSON.parse(readFileSync(join(stamps, name), 'utf8'));
   writeFileSync(join(stamps, name), JSON.stringify({ ...record, fingerprint: treeFingerprint(directory) }));

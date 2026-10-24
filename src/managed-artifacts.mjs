@@ -185,16 +185,19 @@ async function inventory(directory) {
   return Object.fromEntries(files);
 }
 
-/** A cheap fingerprint of a tree's metadata: every entry's name, type, mode,
- * size, inode and modification and change times (nanoseconds). Any write,
- * truncation, rename, chmod or link-count change alters the change time. */
+/** A cheap fingerprint of a tree's metadata: every entry's name, type and
+ * permissions, size, inode and modification time (nanoseconds). Writing or
+ * truncating a file changes its modification time, replacing it changes the
+ * inode. The change time is left out on purpose: hard-linking a verified file
+ * into another tool prefix (Lean's tiers, Windows tool paths) changes it
+ * without changing any byte, which made the next build re-hash the prefix. */
 export function treeFingerprint(directory) {
   const hash = createHash('sha256');
   const walk = (base, prefix) => {
     for (const entry of readdirSync(base, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) {
       const file = join(base, entry.name), name = prefix + entry.name;
       const stat = lstatSync(file, { bigint: true });
-      hash.update(`${name}\0${stat.mode}\0${stat.size}\0${stat.ino}\0${stat.dev}\0${stat.mtimeNs}\0${stat.ctimeNs}\n`);
+      hash.update(`${name}\0${stat.mode}\0${stat.size}\0${stat.ino}\0${stat.dev}\0${stat.mtimeNs}\n`);
       if (stat.isDirectory()) walk(file, name + '/');
     }
   };

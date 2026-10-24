@@ -168,8 +168,8 @@ byte-identical (`program.wasm` and `program.cjs`, both fixtures, compared by
 SHA-256); the restructured initializer wrappers then changed the bytes once
 ([DECISIONS.md](DECISIONS.md)). Release builds stay byte-reproducible:
 
-- tools and the runtime are re-hashed only when a file's size, inode or
-  modification/change time differs from the machine's record of its last full
+- tools and the runtime are re-hashed only when a file's size, permissions,
+  inode or modification time differs from the machine's record of its last full
   check (`<tool cache>/verified/`); `lasm cache repair` always checks every byte;
 - every generated C file (Lean modules, initializer wrappers, stubs) is cached by
   content, and so is the live set of each planning probe link (keyed by the
@@ -204,11 +204,57 @@ worst case; CI's 4-vCPU runner has been about 1.6× faster on this work):
 ¹ after a release build of the same source, so the planning links were cached.
 ² estimated from the measured verification cost; the hit itself was 2 s once records existed.
 
-Expected on the CI reference runner (to be confirmed by the next candidate's
-generated table above): release builds about 10–15 s for the trivial program
-and 13–18 s for the Hono app, dev edits about 4–6 s. The remaining release time
-is mostly `wasm-opt -Oz`, two planning probe links when the program changed, and
-Lean itself; a first build in a new project also compiles the wrapper C once.
+On the free GitHub runners, all five platforms, measured with
+[`build-profile.yml`](../.github/workflows/build-profile.yml)
+(`scripts/ci/build-profile.mjs`: per-stage and per-tool times on the installed
+candidate; one sequence per runner, so single samples on shared machines, and
+the Intel Mac runner varies by 2× between runs). "First build in a new
+project" includes the one-time tool download for hello only.
+
+Candidate `0.1.0-experimental.40115736287` (round 1: caching, threads, dev
+profile; run 40119882655):
+
+| Build (seconds) | linux-x64 | linux-arm64 | win32-x64 | darwin-arm64 | darwin-x64 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| hello: first build in a new project | 58.3 | 44.8 | 167.3 | 63.2 | 223.4 |
+| hello: --rebuild | 12.1 | 9.5 | 12.2 | 14.8 | 43.0 |
+| hello: one-line edit | 10.1 | 7.3 | 12.0 | 9.5 | 32.9 |
+| hello: dev, one-line edit | 4.9 | 3.9 | 4.9 | 3.4 | 13.0 |
+| hono: first build in a new project | 81.2 | 63.4 | 182.1 | 85.0 | 228.7 |
+| hono: --rebuild | 21.8 | 16.3 | 23.5 | 44.2 | 67.7 |
+| hono: unchanged (cache hit) | 1.8 | 1.5 | 3.1 | 4.5 | 5.2 |
+| hono: one-line edit | 14.7 | 10.7 | 20.3 | 19.6 | 31.6 |
+| hono: dev, one-line edit | 8.1 | 6.6 | 9.9 | 10.4 | 14.6 |
+
+Candidate `0.1.0-experimental.40121836396` (round 2: parallel initializer
+wrappers, tools recorded at installation, cached binding reads; run
+40122336777):
+
+| Build (seconds) | linux-x64 | linux-arm64 | win32-x64 | darwin-arm64 | darwin-x64 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| hello: first build in a new project | 26.3 | 33.4 | 172.1 | 54.1 | 230.9 |
+| hello: --rebuild | 4.7 | 4.4 | 15.5 | 8.7 | 31.7 |
+| hello: one-line edit | 5.0 | 6.3 | 14.5 | 12.7 | 39.7 |
+| hello: dev, one-line edit | 2.9 | 3.8 | 7.1 | 5.2 | 17.3 |
+| hono: first build in a new project | 41.0 | 44.6 | 211.3 | 85.1 | 295.2 |
+| hono: --rebuild | 7.0 | 8.4 | 33.5 | 12.5 | 46.7 |
+| hono: unchanged (cache hit) | 0.5 | 0.6 | 1.9 | 0.7 | 2.7 |
+| hono: one-line edit | 7.8 | 9.3 | 24.4 | 19.6 | 42.1 |
+| hono: dev, one-line edit | 5.2 | 6.3 | 14.1 | 11.2 | 23.5 |
+
+What remains, by platform:
+
+- **Linux** (x64, arm64) meets the targets: release rebuilds 4–8 s, edits
+  5–9 s, dev edits 3–6 s.
+- **Windows x64** and **Intel macOS**: `wasm-opt -Oz` takes 8–11 s there
+  (3–5 s on Linux with the same 4 threads), and each `wasm-ld` probe link
+  1.3–4.5 s. The dev profile avoids the first.
+- A first rebuild after new tools were assembled re-hashed a prefix once (5–16 s
+  on Windows and macOS): hard-linking a tier changed its files' change time.
+  The record now ignores the change time (after round 2).
+- The Lasm.JS binding read (`lean --run`) takes 1–5 s on every edit of a
+  Lasm.JS program; it now imports only `Lean.Environment` (1.2 → 0.4 s here).
+
 
 ## Big numbers without GMP
 
