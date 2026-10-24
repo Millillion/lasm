@@ -155,6 +155,13 @@ test('catalog entries require identical shared archives across platform reports'
   assert.ok(extractionLimit(100) >= 100 + 16 * 1024 * 1024);
   assert.throws(() => tierCatalogEntry([report('linux-x64', 'a', true), report('win32-x64', 'd', false)], 'https://example.invalid/r/'), /differs/);
   assert.throws(() => tierCatalogEntry([report('linux-x64', 'a', false)], 'https://example.invalid/r/'), /No written/);
+  // Per-platform C tier archives in the same release (scope all) differ by design.
+  const withC = (platform, sha) => { const r = report(platform, 'a', platform === 'linux-x64');
+    r.archives.push({ name: `lean-9.9.9-${platform}-c.tar.zst`, root: `lean-9.9.9-${platform}-c`, piece: 'c', sha256: sha.repeat(64), bytes: 7, fileBytes: 70, written: true, multiarch: null });
+    return r; };
+  const both = tierCatalogEntry([withC('linux-x64', 'e'), withC('darwin-arm64', 'f')], 'https://example.invalid/r/');
+  assert.deepEqual(Object.keys(both.c), ['linux-x64', 'darwin-arm64']);
+  assert.equal(both.c['darwin-arm64'].sha256, 'f'.repeat(64));
 });
 
 test('C tier selection: tools, headers and link libraries, but not Lean\'s static archives', async () => {

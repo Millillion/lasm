@@ -34,7 +34,7 @@ export function tierCatalogEntry(reports, base, { platforms } = {}) {
   }
   const pieces = [...dataLayout.core, ...dataLayout.extended].map(entry => entry.piece);
   const shared = {};
-  for (const report of reports) for (const archive of report.archives.filter(item => item.piece !== 'bin')) {
+  for (const report of reports) for (const archive of report.archives.filter(item => item.piece !== 'bin' && item.piece !== 'c')) {
     const known = shared[archive.piece];
     if (known && (known.sha256 !== archive.sha256 || known.bytes !== archive.bytes))
       throw new Error(`Shared ${archive.piece} differs between ${known.platform} and ${report.platform}`);
