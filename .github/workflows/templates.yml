@@ -46,27 +46,8 @@ on:
 permissions:
   contents: read
 jobs:
-  # Amazon ECR Public refuses anonymous pulls from some shared runner addresses
-  # ("Data limit exceeded"): one job saves the Lambda Web Adapter image for both
-  # architectures (scripts/platform/fetch-adapter.mjs, as the platform CI does).
-  adapter:
-    if: inputs.docker && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - run: node scripts/platform/fetch-adapter.mjs "$RUNNER_TEMP/adapter"
-      - uses: actions/upload-artifact@v7
-        with:
-          name: templates-lambda-web-adapter
-          path: ${{ runner.temp }}/adapter
-          retention-days: 1
-          if-no-files-found: error
   templates:
-    needs: adapter
-    if: always() && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     strategy:
       fail-fast: false
       matrix:
@@ -110,15 +91,26 @@ jobs:
         run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates λ" .work/templates.json
       - name: Node exec flags (per-process flags, --inspect, Std.Http server) on a built app
         run: node scripts/ci/exec-flags-candidate.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm exec flags λ" .work/exec-flags.json
-      - if: inputs.docker && startsWith(matrix.platform, 'linux-') && needs.adapter.result == 'success'
-        uses: actions/download-artifact@v8
+      # Pinned images from the Actions cache (scripts/ci/images.lock.json): Amazon
+      # ECR Public and Docker Hub rate-limit anonymous pulls from shared runners.
+      - if: inputs.docker && startsWith(matrix.platform, 'linux-')
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: images-templates
         with:
-          name: templates-lambda-web-adapter
-          path: ${{ runner.temp }}/adapter
+          path: ${{ runner.temp }}/image-cache/templates
+          key: ci-images-templates-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
+      - name: Load the pinned template images (cache, else registry by digest)
+        if: inputs.docker && startsWith(matrix.platform, 'linux-')
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/templates" templates
+      - if: inputs.docker && startsWith(matrix.platform, 'linux-') && steps.images-templates.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/image-cache/templates
+          key: ci-images-templates-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Dockerfiles (build on the runner's architecture, run with 512 MB and a read-only root)
         if: inputs.docker && startsWith(matrix.platform, 'linux-')
         run: |
-          [ -f "$RUNNER_TEMP/adapter/adapter-${{ matrix.architecture == 'arm64' && 'arm64' || 'amd64' }}.tar" ] && docker load -i "$RUNNER_TEMP/adapter/adapter-${{ matrix.architecture == 'arm64' && 'arm64' || 'amd64' }}.tar"
           node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates docker" .work/templates-docker.json --docker
       - name: Preserve evidence
         if: always()

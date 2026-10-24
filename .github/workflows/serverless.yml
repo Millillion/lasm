@@ -118,6 +118,19 @@ jobs:
           path: .work/overlay
       - name: Build the server templates and package them (lasm init, npm run build, npm run package:*)
         run: node scripts/serverless/build-apps.mjs .work/overlay/lasm-compiler-overlay.tgz "$RUNNER_TEMP/apps"
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: images-lambda
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
+      - name: Load the pinned Lambda images (cache, else registry by digest)
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
+      - if: steps.images-lambda.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ runner.arch }}-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Lambda zip and Lambda@Edge zip in the Lambda Node 24 image (Runtime Interface Emulator)
         run: node scripts/serverless/run-lambda.mjs "$RUNNER_TEMP/apps/apps.json" .work/lambda.json --compare-lwa public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0
       - name: Install AWS SAM CLI 1.170.0 (official installer)

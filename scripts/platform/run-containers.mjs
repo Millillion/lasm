@@ -37,7 +37,9 @@ const must = (args, options) => {
   return run.stdout.trim();
 };
 // Registries rate-limit anonymous pulls per IP address, which CI runners share.
+// CI preloads pinned images from its cache (scripts/ci/image-cache.mjs).
 async function pull(image) {
+  if (docker(['image', 'inspect', image]).status === 0) return;
   for (let attempt = 1; ; attempt++) {
     const run = docker(['pull', '-q', image]);
     if (run.status === 0) return;
@@ -87,7 +89,8 @@ try {
     result.runs.push(run); save();
     try {
       await pull(entry.image);
-      run.imageDigest = must(['image', 'inspect', '--format', '{{index .RepoDigests 0}}', entry.image]);
+      // A loaded `docker save` archive has no repository digest; its image ID is the pinned one.
+      run.imageDigest = must(['image', 'inspect', '--format', '{{if .RepoDigests}}{{index .RepoDigests 0}}{{else}}{{.Id}}{{end}}', entry.image]);
       let image = entry.image;
       if (entry.prepare) {
         // Documented prerequisites of a minimal image (for example libatomic1 for Node 26).
