@@ -206,13 +206,13 @@ async function inventory(directory, { known, extracted } = {}) {
         files.set(name, { type: 'symlink', target });
       } else if (entry.isFile()) {
         const stat = await lstat(file, { bigint: true });
-        // A hard link to a verified original (linkArtifactTree), unchanged since.
+        // A hard link to a verified original made by this assembly (linkArtifactTree).
         const same = known?.get(name);
         // Or a file this process just extracted into its private staging tree,
         // hashed from the archive stream (extract).
         const written = extracted?.get(name);
-        const sha256 = same && same.ino === stat.ino && same.dev === stat.dev && same.size === stat.size && same.mtimeNs === stat.mtimeNs
-          ? same.sha256 : written && BigInt(written.size) === stat.size ? written.sha256 : await hashFile(file);
+        const sha256 = same && same.size === stat.size ? same.sha256
+          : written && BigInt(written.size) === stat.size ? written.sha256 : await hashFile(file);
         files.set(name, { type: 'file', bytes: Number(stat.size), sha256,
           ...(process.platform === 'win32' ? {} : { executable: !!(Number(stat.mode) & 0o111) }) });
       } else throw new Error(`Unexpected managed cache entry: ${name}`);
@@ -433,17 +433,18 @@ export async function linkArtifactTree(source, receipt, destination, owners, nam
     owners.set(path, name);
     files.push({ path, entry, target });
   }
+  // Directories come first in the receipt and were created above.
+  const made = new Set();
   const linkOne = async ({ path, entry, target }) => {
-    await mkdir(dirname(target), { recursive: true });
+    const parent = dirname(target);
+    if (!made.has(parent)) { await mkdir(parent, { recursive: true }); made.add(parent); }
     if (entry.type === 'symlink') { await symlink(entry.target, target); return; }
     const from = join(source, ...path.split('/'));
     try {
       await link(from, target);
-      if (known) {
-        const [original, linked] = await Promise.all([lstat(from, { bigint: true }), lstat(target, { bigint: true })]);
-        if (original.ino === linked.ino && original.dev === linked.dev && Number(linked.size) === entry.bytes)
-          known.set(path, { sha256: entry.sha256, ino: linked.ino, dev: linked.dev, size: linked.size, mtimeNs: linked.mtimeNs });
-      }
+      // A hard link is the verified original itself: inventory takes its hash
+      // when the size still matches.
+      known?.set(path, { sha256: entry.sha256, size: BigInt(entry.bytes), linked: true });
     } catch (error) {
       if (!['EXDEV', 'EPERM', 'EACCES', 'ENOTSUP', 'EMLINK'].includes(error.code)) throw error;
       await copyFile(from, target, constants.COPYFILE_EXCL);

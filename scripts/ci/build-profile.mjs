@@ -73,6 +73,18 @@ async function build(label, name, options = {}) {
   for (const s of record.stages) if (s.seconds >= 0.5) console.log(`  ${s.seconds.toFixed(1).padStart(6)} s  ${s.stage}`);
   for (const [k, v] of Object.entries(record.tools).slice(0, 6)) console.log(`    ${v.seconds.toFixed(1).padStart(6)} s  ${k} x${v.count}`);
 }
+// A new user's first Hono build: a new machine (an empty tool cache), a new project.
+{
+  const fresh = join(work, 'projects', 'hono-new-machine');
+  cpSync(projects.hono, fresh, { recursive: true });
+  projects['hono-new-machine'] = fresh;
+  await build('hono: first build on a new machine', 'hono-new-machine', { cache: join(work, 'new-machine-tools') });
+  const record = result.builds.at(-1);
+  record.downloadSeconds = +record.stages.filter(s => /^Downloading/.test(s.stage)).reduce((t, s) => t + s.seconds, 0).toFixed(2);
+  record.withoutDownloadSeconds = +(record.seconds - record.downloadSeconds).toFixed(2);
+  console.log(`  download ${record.downloadSeconds} s; without download ${record.withoutDownloadSeconds} s`);
+  writeFileSync(output, JSON.stringify(result, null, 2) + '\n');
+}
 for (const name of ['hello', 'hono']) {
   const source = join(projects[name], 'Main.lean'), original = readFileSync(source, 'utf8');
   await build(`${name}: first build in a new project`, name);
