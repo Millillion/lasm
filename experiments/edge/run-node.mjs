@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { startLean } from './runtime/edge-start.mjs';
+import { startLean } from '../../src/edge/edge-start.mjs';
 const out = resolve(process.argv[2]);
 const t0 = performance.now();
 const wasmModule = await WebAssembly.compile(readFileSync(join(out, 'program.wasm')));

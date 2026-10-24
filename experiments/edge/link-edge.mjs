@@ -38,7 +38,7 @@ const jsGlue = [];
 if (inputs.length !== kept.length) {
   const glue = join(out, 'lasm_js_edge.o');
   sdk.execute('emcc', ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-fwasm-exceptions', '-sMEMORY64=1', '-ffp-contract=off', '-fPIC',
-    '-ffunction-sections', '-fdata-sections', '-I', join(bundle, 'include'), '-c', join(here, 'runtime/lasm_js_edge.c'), '-o', glue],
+    '-ffunction-sections', '-fdata-sections', '-I', join(bundle, 'include'), '-c', join(here, '../../src/edge/lasm_js_edge.c'), '-o', glue],
     { stdio: 'inherit', env: { ...sdk.env, EMCC_CORES: '1' } });
   jsGlue.push(glue);
 }
@@ -54,7 +54,7 @@ const args = [...inputs, ...jsGlue, ...runtimeObjects, opt, '-g1', '--output-eol
   '-sEXPORTED_RUNTIME_METHODS=callMain,HEAPU8,HEAPU32', '-sDYNAMIC_EXECUTION=0', '-sINCOMING_MODULE_JS_API=instantiateWasm,noInitialRun,print,printErr,lasmEdgeJspi,onAbort',
   '-sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$stackSave,$stackRestore', '-Wl,--export-if-defined=__cpp_exception', '-Wno-experimental', `-Wl,-Map=${join(out, 'program.map')}`,
   '-Wl,--start-group', ...libraries, '-Wl,--end-group',
-  '--pre-js', join(work, 'application-pre.js'), '--pre-js', join(here, 'runtime/edge-pre.js'), '--js-library', join(here, 'runtime/edge-library.js'),
+  '--pre-js', join(work, 'application-pre.js'), '--pre-js', join(here, '../../src/edge/edge-pre.js'), '--js-library', join(here, '../../src/edge/edge-library.js'),
   ...(mode === 'jspi' ? ['-sJSPI', "-sJSPI_EXPORTS=['lasm_edge_pump','main']"] : []),
   ...(mode === 'asyncify' ? ['-sASYNCIFY', "-sASYNCIFY_EXPORTS=['lasm_edge_pump','main']", '-sASYNCIFY_STACK_SIZE=1048576'] : []),
   '-o', join(out, 'program.mjs')];

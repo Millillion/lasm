@@ -6,7 +6,7 @@
 import { env } from 'cloudflare:workers';
 import wasmModule from '../build/program.wasm';
 import createProgram from '../build/program.mjs';
-import { startLean } from '../../../runtime/edge-start.mjs';
+import { startLean } from '../../../../src/edge/edge-start.mjs';
 
 const strings = Object.fromEntries(Object.entries(env).filter(([, v]) => typeof v === 'string'));
 const jspi = env.JSPI !== '0';

@@ -13,10 +13,15 @@ export function numbers(...values) {
   return result;
 }
 // Lean IO error kinds as in src/node-host.mjs encodeError (subset).
-const kinds = { ENOENT: 1, EACCES: 2, EINVAL: 4, ENOSYS: 8, ECANCELED: 10, ENOMEM: 11 };
+const kinds = { ENOENT: 1, EACCES: 2, EROFS: 2, EINVAL: 4, EBADF: 4, EISDIR: 5, ENOTDIR: 5, ENOSYS: 8, ECANCELED: 10, ENOMEM: 11 };
+const errnos = { ENOENT: 2, EBADF: 9, EACCES: 13, ENOTDIR: 20, EISDIR: 21, EINVAL: 22, EROFS: 30, ENOSYS: 38 };
+// The UTC zone of the tz database (public domain; src/zoneinfo/UTC), so that
+// Std.Time's local zone (/etc/localtime) resolves on the edge.
+const utcZone = Uint8Array.from(atob('VFppZjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAQAAAAAAABVVEMAVFppZjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAQAAAAAAABVVEMAClVUQzAK'), c => c.charCodeAt(0));
+export const defaultEdgeFiles = Object.freeze({ '/etc/localtime': utcZone, '/usr/share/zoneinfo/UTC': utcZone, '/usr/share/zoneinfo/Etc/UTC': utcZone });
 function encodeError(err) {
   const kind = err?.leanUserError ? 18 : kinds[err?.code] ?? 0;
-  return { error: true, bytes: concat([numbers(kind, err?.errno ?? 0), encoder.encode(String(err?.message ?? err))]) };
+  return { error: true, bytes: concat([numbers(kind, err?.errno ?? errnos[err?.code] ?? 0), encoder.encode(String(err?.message ?? err))]) };
 }
 function concat(parts) { let n = 0; for (const p of parts) n += p.length; const r = new Uint8Array(n); let o = 0; for (const p of parts) { r.set(p, o); o += p.length; } return r; }
 const error = (code, message) => Object.assign(new Error(message), { code });
@@ -28,7 +33,13 @@ const unavailable = (op, what) => error('ENOSYS', `${what} is not available in t
  * modules: the JavaScript module map for Lasm.JS; notify(): called when events are queued.
  */
 export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => console.log(line), stderr = line => console.error(line),
-  modules = {}, notify = () => {}, syncCall } = {}) {
+  modules = {}, notify = () => {}, syncCall, files = defaultEdgeFiles } = {}) {
+  // A read-only in-memory file system: absolute paths to bytes.
+  const tree = new Map(Object.entries(files).map(([path, bytes]) => [path, bytes instanceof Uint8Array ? bytes : encoder.encode(String(bytes))]));
+  const directories = new Set(['/']);
+  for (const path of tree.keys()) { const parts = path.split('/'); for (let i = 1; i < parts.length - 1; i++) directories.add(parts.slice(0, i + 1).join('/')); }
+  const normal = path => { const parts = []; for (const part of path.split('/')) { if (!part || part === '.') continue; if (part === '..') parts.pop(); else parts.push(part); } return '/' + parts.join('/'); };
+  const fileError = (code, path) => Object.assign(error(code, `${{ ENOENT: 'no such file or directory', EROFS: 'read-only file system', EISDIR: 'is a directory', ENOTDIR: 'not a directory' }[code]} (Lasm edge file system) (error code: ${errnos[code]}, ${path})`), { errno: errnos[code] });
   const resources = new Map(); let nextResource = 10;
   let initializing = true;
   const add = r => { const id = nextResource++; resources.set(id, r); return id; };
@@ -74,8 +85,43 @@ export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => co
     if (op >= 200 && op <= 219) return js.dispatch(op, id, arg, bytes);
     const n = Number(arg);
     switch (op) {
-    case 1: throw unavailable(op, 'The file system');
-    case 3: return write(id, bytes);
+    case 1: {
+      const path = normal(decoder.decode(bytes));
+      if (n !== 0) throw fileError('EROFS', path);
+      if (directories.has(path)) throw fileError('EISDIR', path);
+      if (!tree.has(path)) throw fileError('ENOENT', path);
+      return numbers(add({ type: 'file', data: tree.get(path), offset: 0 }));
+    }
+    case 2: {
+      const f = get(id, 'file'), chunk = f.data.subarray(f.offset, f.offset + n);
+      f.offset += chunk.length; return chunk.slice();
+    }
+    case 5: get(id, 'file').offset = 0; return empty;
+    case 7: {
+      const f = get(id, 'file'); let end = f.data.indexOf(10, f.offset);
+      end = end < 0 ? f.data.length : end + 1;
+      const line = f.data.subarray(f.offset, end); f.offset = end; return line.slice();
+    }
+    case 10: case 11: {
+      const path = normal(decoder.decode(bytes));
+      if (tree.has(path)) return numbers(0, 0, 0, 0, tree.get(path).length, 1, 1);
+      if (directories.has(path)) return numbers(0, 0, 0, 0, 0, 1, 0);
+      throw fileError('ENOENT', path);
+    }
+    case 12: {
+      const path = normal(decoder.decode(bytes));
+      if (!tree.has(path) && !directories.has(path)) throw fileError('ENOENT', path);
+      return encoder.encode(path);
+    }
+    case 13: {
+      const path = normal(decoder.decode(bytes)), prefix = path === '/' ? '/' : path + '/';
+      if (!directories.has(path)) throw fileError(tree.has(path) ? 'ENOTDIR' : 'ENOENT', path);
+      const names = new Set([...tree.keys(), ...directories].filter(p => p !== path && p.startsWith(prefix)).map(p => p.slice(prefix.length).split('/')[0]));
+      return encoder.encode([...names].map(name => name + '\0').join(''));
+    }
+    case 3:
+      if (resources.get(id)?.type === 'file') throw fileError('EROFS', 'write');
+      return write(id, bytes);
     case 4: return flush(id);
     case 9: return numbers(0);
     case 22: {
@@ -125,7 +171,7 @@ export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => co
     case 120: return encoder.encode('lasm-edge');
     case 123: case 124: return numbers(1);
     default:
-      if (op >= 10 && op <= 21) throw unavailable(op, 'The file system');
+      if (op >= 14 && op <= 21) throw fileError('EROFS', 'the edge file system is read-only');
       if (op >= 50 && op <= 65 || op >= 100 && op <= 116) throw unavailable(op, 'Sockets and DNS (use fetch through Lasm.JS)');
       if (op >= 80 && op <= 89) throw unavailable(op, 'Processes');
       throw unavailable(op, 'This runtime operation');

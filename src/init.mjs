@@ -24,6 +24,8 @@ export const deployTargets = {
   netlify: { summary: 'Netlify Function (netlify.toml; Netlify runs the build)', package: 'netlify' },
   azure: { summary: 'Azure Functions app (npm run build:azure)', package: 'azure', dependencies: { '@azure/functions': '4.17.0' } },
   gcf: { summary: 'Google Cloud Functions gen2 (npm run build:gcf)', package: 'gcf', dependencies: { '@google-cloud/functions-framework': '5.0.5' } },
+  // Experimental (docs/EDGE.md): the edge build, Hono template only.
+  workers: { summary: 'Cloudflare Workers, experimental (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono'] },
 };
 
 export const templates = {
@@ -75,6 +77,8 @@ export function parseInitArguments(tokens) {
     throw new Error(`Unknown template "${result.template}". Choose one of: ${Object.keys(templates).join(', ')}`);
   if (result.deploy.length && !templates[result.template].server)
     throw new Error(`--deploy ${result.deploy[0]} needs a server template (express, hono or std-http), not ${result.template}`);
+  for (const target of result.deploy) if (deployTargets[target].templates && !deployTargets[target].templates.includes(result.template))
+    throw new Error(`--deploy ${target} supports the ${deployTargets[target].templates.join(', ')} template, not ${result.template}`);
   result.directory = positional[0];
   return result;
 }
@@ -134,6 +138,8 @@ function packageJson(name, template, deploy = []) {
     // Build and package in one step; Vercel's and Netlify's builds run these too.
     if (platform) pkg.scripts[`build:${platform}`] = `lasm build Main.lean --target ${platform}`;
   }
+  // Workers bundle the npm modules Lean binds; the Node server stays out.
+  if (deploy.includes('workers')) pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
   const dependencies = Object.assign({}, npm[template], ...deploy.map(target => deployTargets[target].dependencies));
   if (Object.keys(dependencies).length) pkg.dependencies = Object.fromEntries(Object.entries(dependencies).sort(([a], [b]) => a < b ? -1 : 1));
   pkg.devDependencies = { [lasm.name]: lasm.version };
@@ -225,8 +231,23 @@ const netlifyToml = `# Netlify runs the build: lasm build --target netlify write
   included_files = ["netlify/functions/lasm/**"]
 `;
 
+// Cloudflare Workers: wrangler serves and deploys workers/worker.mjs, which
+// `lasm build --target workers` writes with the Lean program.
+const wranglerToml = name => `# Cloudflare Workers (experimental Lasm edge build): npm run build:workers
+# writes workers/; test with npx wrangler dev, deploy with npx wrangler deploy.
+name = "${name.replace(/[^a-z0-9-]+/g, '-').slice(0, 54)}"
+main = "workers/worker.mjs"
+compatibility_date = "2026-10-01"
+
+# Lasm's program.wasm is imported as a precompiled module.
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false
+`;
+
 function deployGitignore(deploy) {
-  const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/' };
+  const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/' };
   return gitignore + deploy.map(target => extra[target]).filter(Boolean).map(line => line + '\n').join('');
 }
 
@@ -342,6 +363,11 @@ See the [Netlify guide](${guide('netlify')}).
 \`azure-functions/\`; test it with \`func start\` there and publish with
 \`func azure functionapp publish APP_NAME\`. See the [Azure guide](${guide('azure-functions')}).
 `,
+  workers: () => `**Cloudflare Workers (experimental):** \`npm run build:workers\` writes
+\`workers/\` (the Worker entry, the Lean program and its host); \`wrangler.toml\` points at it.
+Test with \`npx wrangler dev\` and deploy with \`npx wrangler deploy\`. The same \`Main.lean\`
+serves Node and Workers (\`Lasm.JS.onEdge\`). See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
+`,
   gcf: () => `**Google Cloud Functions:** \`npm run build:gcf\` writes \`gcf/\`; deploy with
 \`gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source gcf\`.
 See the [Cloud Functions guide](${guide('cloud-functions')}).
@@ -371,6 +397,7 @@ export function initProject({ directory, template, deploy = [] }) {
   if (deploy.includes('lambda')) files['Dockerfile.lambda'] = lambdaDockerfile();
   if (deploy.includes('vercel')) files['vercel.json'] = vercelJson;
   if (deploy.includes('netlify')) { files['netlify.toml'] = netlifyToml; files['public/.gitkeep'] = ''; }
+  if (deploy.includes('workers')) files['wrangler.toml'] = wranglerToml(name);
   mkdirSync(target, { recursive: true });
   for (const [file, text] of Object.entries(files)) {
     mkdirSync(dirname(join(target, file)), { recursive: true });

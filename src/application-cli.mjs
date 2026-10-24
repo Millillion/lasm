@@ -26,12 +26,35 @@ export function reportCliError(error) {
     : (error.stderr?.toString() || error.stdout?.toString() || error.message).slice(-12000));
 }
 
+/** `lasm build --target workers` (experimental, docs/EDGE.md): relink the
+ * compiled program for edge isolates. */
+async function buildEdge(input, target, result, verbose) {
+  const { rm } = await import('node:fs/promises');
+  const { dirname, resolve } = await import('node:path');
+  const { buildEdgeTarget } = await import('./edge/edge-build.mjs');
+  const { applicationRuntime } = await import('./application-runtime.mjs');
+  const { selectLeanVersion, toolchainCatalog } = await import('./managed-lean.mjs');
+  const { findApplicationProject } = await import('./application-sources.mjs');
+  const { provisionSdk } = await import('./managed-sdk.mjs');
+  const source = resolve(input);
+  try {
+    const selection = await selectLeanVersion(source);
+    const nodeRuntime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit });
+    console.error('[lasm] Linking for Cloudflare Workers (experimental edge build; the first one downloads the Emscripten SDK)…');
+    const sdk = await provisionSdk({ log: message => console.error('[lasm] ' + message) });
+    await buildEdgeTarget({ target, source, projectDirectory: findApplicationProject(source) ?? dirname(source), result, nodeRuntime, sdk, verbose });
+    return 0;
+  } finally {
+    if (result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
+  }
+}
+
 /** Shared by the primary CLI and the source-checkout launcher. */
 export async function runApplicationCli(argv) {
   const options = parseLasmArguments(argv);
   const support = applicationSupport();
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf] [--dev]\n       lasm init my-app [--template plain|express|hono|std-http] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nBuild and run ordinary Lean main in Node.' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers] [--dev]\n       lasm init my-app [--template plain|express|hono|std-http] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nBuild and run ordinary Lean main in Node.' : cliUsage);
     return 0;
   }
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }
@@ -64,7 +87,9 @@ export async function runApplicationCli(argv) {
   // A dev build refused by packaging is refused before it is built.
   if (target && target !== 'node' && options.profile === 'dev' && !allowDev)
     throw new Error(`lasm build --dev --target ${target}: dev builds are not for deployment. Drop --dev, or add --allow-dev to package a dev build anyway.`);
-  const result = await buildApplicationWithProgress(options.input, buildOptions);
+  const edge = target === 'workers';
+  const result = await buildApplicationWithProgress(options.input, { ...buildOptions, ...(edge ? { keepLinkWork: true } : {}) });
+  if (edge) return buildEdge(options.input, target, result, options.verbose);
   const profileNote = result.profile === 'dev' ? ' (dev profile: size optimizations skipped, not for deployment)' : ' (release profile)';
   if (options.command === 'build') {
     console.error(`${result.cacheHit ? 'Reused' : 'Built'} Lean ${result.lean} for Node${profileNote}: ${result.output}`);
