@@ -145,13 +145,16 @@ plan and the whole release job against a loopback Verdaccio instead of npm
 (publish, publish again to prove that everything is skipped, `npm create
 lasm@<version>` from it, and the tag/release commands printed, not run). A dry run
 accepts a partial `release-checks` run, which `release-checks`' own
-`workflow_dispatch` makes from an already accepted candidate:
+`workflow_dispatch` makes from an already accepted candidate (a real release
+refuses partial and overlaid runs):
 
 ```sh
 git switch -c release-dry-run origin/main
 # bump package.json "version" and add docs/release/<version>-notes.md, commit, push the branch
 gh workflow run release-checks.yml --ref release-dry-run \
   -f candidate-release=node-linux-candidate-RUN -f candidate-sha256=SHA256
+# a candidate older than the source (for example one that still downloads Git):
+#   add -f overlay-source=true (the rehearsal uses this commit's bin/ and src/)
 # when it has passed:
 gh workflow run release.yml --ref release-dry-run -f dry_run=true
 ```

@@ -60,6 +60,7 @@ jobs:
       checks-run: ${{ steps.plan.outputs.checks-run }}
       candidate-release: ${{ steps.plan.outputs.candidate-release }}
       candidate-sha256: ${{ steps.plan.outputs.candidate-sha256 }}
+      overlay: ${{ steps.plan.outputs.overlay }}
       sha: ${{ steps.sha.outputs.sha }}
       dry-run: ${{ steps.sha.outputs.dry-run }}
     steps:
@@ -112,6 +113,8 @@ jobs:
       CHECKS_RUN: ${{ needs.plan.outputs.checks-run }}
       CANDIDATE_RELEASE: ${{ needs.plan.outputs.candidate-release }}
       CANDIDATE_SHA256: ${{ needs.plan.outputs.candidate-sha256 }}
+      # Only a dry run's rehearsal may overlay this commit's sources (plan.mjs refuses it otherwise).
+      OVERLAY: ${{ needs.plan.outputs.overlay == 'true' && needs.plan.outputs.dry-run == 'true' && '--overlay-source' || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -148,7 +151,7 @@ jobs:
             if (h !== process.env.CANDIDATE_SHA256) throw new Error('candidate digest ' + h);
             console.log(files[0], h);"
       - name: Build every package as the rehearsal did (each step guarded; npm pack twice)
-        run: node scripts/npm-dist/build-all.mjs --base .work/release/base/*.tgz --out .work/release/npm --version "$VERSION" --license MIT --memory-mib 2048
+        run: node scripts/npm-dist/build-all.mjs --base .work/release/base/*.tgz --out .work/release/npm $OVERLAY --version "$VERSION" --license MIT --memory-mib 2048
       - name: Byte-identical to the rehearsal
         run: node scripts/release/compare.mjs .work/release/rehearsal/linux-x64/npm-dist.json .work/release/npm/npm-dist.json
       - name: Dry run - a loopback registry instead of npm
@@ -170,7 +173,7 @@ jobs:
           node -e "const r = require('./.work/release/evidence/publish-again.json'); if (r.packages.some(p => p.action !== 'skipped')) throw new Error('A second run published again'); console.log('second run: ' + r.packages.length + ' skipped')"
       - name: npm create lasm@<version> from the registry (clean directory, empty caches)
         run: |
-          node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --report .work/release/evidence/verify-resources.json -- \
+          node scripts/full-lean/run-bounded.mjs --memory-mib 8192 --report .work/release/evidence/verify-resources.json -- \
             node scripts/release/verify-create.mjs --registry "$REGISTRY" --version "$VERSION" --work "$RUNNER_TEMP/verify" --report .work/release/evidence/verify.json
       - name: Tag v<version> and create the GitHub release
         env:

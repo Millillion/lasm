@@ -13,7 +13,8 @@ name: release-checks
 #
 # workflow_dispatch: a rehearsal of a version-bump commit on any branch, reusing
 # an already accepted candidate (candidate-release/-sha256) instead of building
-# one. Such a run is marked partial; release.yml uses it only for dry runs.
+# one (optionally with this ref's sources overlaid, for a candidate older than
+# the source). Such a run is marked partial; release.yml uses it only for dry runs.
 on:
   pull_request:
     branches: [main]
@@ -29,6 +30,10 @@ on:
         description: SHA-256 of its package tarball
         type: string
         default: ''
+      overlay-source:
+        description: Rehearse the candidate with this ref's bin/ and src/ (npm-dist --overlay-source; dry runs only)
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -94,6 +99,7 @@ jobs:
       node: 26.12.1
       version: ${{ needs.detect.outputs.version }}
       license: MIT
+      overlay-source: ${{ inputs.overlay-source == true }}
 
   release-checks:
     name: release-checks
@@ -113,19 +119,20 @@ jobs:
           REHEARSAL: ${{ needs.rehearsal.result }}
           REUSE: ${{ inputs.candidate-release }}
           REUSE_SHA256: ${{ inputs.candidate-sha256 }}
+          OVERLAY: ${{ inputs.overlay-source == true }}
           TESTED_RELEASE: ${{ needs.candidate.outputs.tested-release }}
           TESTED_SHA256: ${{ needs.candidate.outputs.sha256 }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           mkdir -p manifest
           node -e "
-            const e = process.env, release = e.RELEASE === 'true', full = !e.REUSE;
+            const e = process.env, release = e.RELEASE === 'true', full = !e.REUSE && e.OVERLAY !== 'true';
             const passed = e.DETECT === 'success' && (!release || (full ? e.CANDIDATE === 'success' : e.CANDIDATE === 'skipped') && e.REHEARSAL === 'success');
             const manifest = { schema: 1, workflow: 'release-checks', passed, release, full, version: e.VERSION, previous: e.PREVIOUS, distTag: e.DIST_TAG,
               sha: e.GITHUB_SHA, headSha: e.HEAD_SHA, event: e.GITHUB_EVENT_NAME, ref: e.GITHUB_REF, runId: e.GITHUB_RUN_ID, runAttempt: e.GITHUB_RUN_ATTEMPT,
               jobs: { detect: e.DETECT, candidate: e.CANDIDATE, rehearsal: e.REHEARSAL },
               candidate: release ? { release: e.REUSE || e.TESTED_RELEASE, sha256: e.REUSE_SHA256 || e.TESTED_SHA256 } : null,
-              rehearsal: release ? { version: e.VERSION, license: 'MIT', node: '26.12.1', record: 'npm-dist-linux-x64/linux-x64/npm-dist.json' } : null };
+              rehearsal: release ? { version: e.VERSION, license: 'MIT', node: '26.12.1', overlaySource: e.OVERLAY === 'true', record: 'npm-dist-linux-x64/linux-x64/npm-dist.json' } : null };
             require('node:fs').writeFileSync('manifest/release-checks.json', JSON.stringify(manifest, null, 2) + '\n');
             console.log(JSON.stringify(manifest, null, 2));
             require('node:fs').appendFileSync(e.GITHUB_STEP_SUMMARY, '### release-checks: ' + (passed ? 'passed' : 'FAILED') + '\n\n' +

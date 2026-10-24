@@ -34,6 +34,7 @@ export function manifestProblems(manifest, { sha, version, dryRun }) {
   if (manifest.sha !== sha) problems.push(`release-checks tested ${manifest.sha}, not ${sha}`);
   if (manifest.version !== version) problems.push(`release-checks tested version ${manifest.version}, not ${version}`);
   if (!dryRun && !manifest.full) problems.push('release-checks reused a candidate (partial run; dry runs only)');
+  if (!dryRun && manifest.rehearsal?.overlaySource) problems.push('the rehearsal overlaid sources on the candidate (dry runs only)');
   if (!dryRun && manifest.event !== 'push') problems.push(`release-checks ran for a ${manifest.event} event; a release needs the push to main`);
   return problems;
 }
@@ -130,5 +131,5 @@ if (isMain) {
   if (state.problems.length) stop(state.problems.join('; '), { fail: true });
   if (!state.proceed) stop(`${version} is already released: every package, tag ${tagName(version)} and the GitHub release exist`);
   output({ proceed: true, version, 'dist-tag': distTag(version), prerelease: isPrerelease(version), 'checks-run': checks.id,
-    'candidate-release': manifest.candidate.release, 'candidate-sha256': manifest.candidate.sha256, 'to-publish': state.todo.length });
+    'candidate-release': manifest.candidate.release, 'candidate-sha256': manifest.candidate.sha256, overlay: Boolean(manifest.rehearsal?.overlaySource), 'to-publish': state.todo.length });
 }

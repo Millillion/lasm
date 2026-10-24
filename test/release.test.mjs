@@ -46,6 +46,8 @@ test('release.yml accepts only a passed, full push run of release-checks for the
   assert.deepEqual(manifestProblems(manifest, { sha, version: '0.1.0' }), []);
   assert.match(manifestProblems({ ...manifest, full: false }, { sha, version: '0.1.0' }).join(), /partial/);
   assert.deepEqual(manifestProblems({ ...manifest, full: false, event: 'workflow_dispatch' }, { sha, version: '0.1.0', dryRun: true }), []);
+  assert.match(manifestProblems({ ...manifest, rehearsal: { overlaySource: true } }, { sha, version: '0.1.0' }).join(), /overlaid/);
+  assert.deepEqual(manifestProblems({ ...manifest, rehearsal: { overlaySource: true } }, { sha, version: '0.1.0', dryRun: true }), []);
   assert.match(manifestProblems({ ...manifest, event: 'pull_request' }, { sha, version: '0.1.0' }).join(), /push to main/);
   assert.match(manifestProblems({ ...manifest, sha: other }, { sha, version: '0.1.0' }).join(), /tested b+/);
   assert.match(manifestProblems({ ...manifest, passed: false }, { sha, version: '0.1.0' }).join(), /did not pass/);
