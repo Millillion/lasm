@@ -3,22 +3,12 @@ name: Edge runtime (Phase 7)
 # isolates (scripts/full-lean/build-application-runtime.mjs --profile edge,
 # docs/EDGE.md), reusing the pinned Node runtime's verified standard-library
 # archives. Linux only, free runner, no publication: the result is a
-# short-lived workflow artifact. Runs on pushes to phase-7 that change the
-# edge runtime's inputs, or on demand.
+# short-lived workflow artifact. Runs on demand, and as the first job of
+# workers.yml (which runs on pushes to phase-7 that change edge inputs).
 on:
   workflow_dispatch:
   # workers.yml builds the runtime first, then tests with it.
   workflow_call:
-  push:
-    branches: [phase-7]
-    paths:
-      - '.github/workflows/edge-runtime.yml'
-      - 'scripts/full-lean/patches/lean-4.35.0-edge.patch'
-      - 'scripts/full-lean/build-application-runtime.mjs'
-      - 'scripts/full-lean/configure-host.mjs'
-      - 'runtime/edge.cpp'
-      - 'runtime/node-async.cpp'
-      - 'runtime/node.hpp'
 permissions:
   # Read access to the draft release that holds the pinned runtime handoff
   # (drafts are visible only with write access). Nothing is written.

@@ -22,6 +22,10 @@ on:
       - 'examples/edge-pure/**'
       - 'scripts/edge/**'
       - 'runtime/edge.cpp'
+      - 'runtime/node-async.cpp'
+      - 'runtime/node.hpp'
+      - 'scripts/full-lean/build-application-runtime.mjs'
+      - 'scripts/full-lean/configure-host.mjs'
       - 'scripts/full-lean/patches/lean-4.35.0-edge.patch'
 permissions:
   # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
