@@ -679,6 +679,13 @@ folded into Phases 5.2/5.3 and 7.
     removed. Licensing (user instruction 2026-10-23): resolve every compliance
     question ourselves, choosing the over-complying reading; no items are
     deferred to a lawyer.
+  - **Decision 5 (user, 2026-10-24): build Lean's Wasm runtime without GMP**
+    (Lean's own big-number code), so apps built with Lasm contain no copyleft
+    code. Proven by the full upstream suite on five targets plus big-number
+    performance measurements; fallback is GMP as a separate, replaceable Wasm
+    side module. GMP stays only in the compiler's native Lean binaries and the
+    C tier, covered by notices and mirrored sources. The final release
+    candidate and gate run after this rebuild.
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as
