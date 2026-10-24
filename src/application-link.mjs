@@ -80,19 +80,25 @@ function linkDriverSourceIdentity() {
 /** Initializer units of the runtime's (verified, immutable) archives, kept per
  * machine: keyed by the runtime identity, the archive and the analysis code. */
 const analysisSources = ['application-initialization.mjs', 'wasm-objects.mjs'];
-export function archiveUnitCache(directory, runtime) {
+/** The analysis shipped beside the runtime bundle (scripts/package-node-release.mjs). */
+export const shippedAnalysisDirectory = runtime => join(runtime.directory + '.analysis');
+export function archiveUnitCache(directory, runtime, { shipped = shippedAnalysisDirectory(runtime) } = {}) {
   const analyzer = createHash('sha256');
   for (const name of analysisSources) analyzer.update(readFileSync(new URL(`./${name}`, import.meta.url)));
   const key = file => createHash('sha256').update(JSON.stringify({ schema: 1, runtime: runtime.identity,
     archive: relative(runtime.directory, file).replaceAll('\\', '/'), analyzer: analyzer.copy().digest('hex') })).digest('hex');
-  const path = file => join(directory, `initializer-units-${key(file)}.json`);
+  const name = file => `initializer-units-${key(file)}.json`;
+  const path = file => join(directory, name(file));
   return {
     load(file) {
       if (relative(runtime.directory, file).startsWith('..')) return undefined;
-      try {
-        const record = JSON.parse(readFileSync(path(file), 'utf8'));
-        return record.schema === 1 && record.key === key(file) && Array.isArray(record.units) ? record.units : undefined;
-      } catch { return undefined; }
+      for (const candidate of [path(file), ...(shipped ? [join(shipped, name(file))] : [])]) {
+        try {
+          const record = JSON.parse(readFileSync(candidate, 'utf8'));
+          if (record.schema === 1 && record.key === key(file) && Array.isArray(record.units)) return record.units;
+        } catch { /* try the next */ }
+      }
+      return undefined;
     },
     save(file, units) {
       if (relative(runtime.directory, file).startsWith('..')) return;
@@ -157,16 +163,33 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   };
   // A link that fails on undefined symbols names the native libraries the program
   // declared but Lasm could not compile, and known prebuilt libraries by symbol.
+  const linkFailure = error => {
+    const output = `${error.stderr ?? ''}\n${error.stdout ?? ''}\n${error.message ?? ''}`;
+    const symbols = linkUndefinedSymbols(output);
+    const known = librariesForUndefinedSymbols(output).filter(({ library }) => !nativeUnavailable.some(item => describeLibrary(item.library).name === library));
+    if (symbols.length && (nativeUnavailable.length || known.length))
+      return Object.assign(new UnsupportedNativeLibrary([...nativeUnavailable, ...known.map(({ library }) => ({ library }))], symbols), { cause: error });
+    return error;
+  };
   const runLink = (...args) => {
     try { return runLinkOnce(...args); }
-    catch (error) {
-      const output = `${error.stderr ?? ''}\n${error.stdout ?? ''}\n${error.message ?? ''}`;
-      const symbols = linkUndefinedSymbols(output);
-      const known = librariesForUndefinedSymbols(output).filter(({ library }) => !nativeUnavailable.some(item => describeLibrary(item.library).name === library));
-      if (symbols.length && (nativeUnavailable.length || known.length))
-        throw Object.assign(new UnsupportedNativeLibrary([...nativeUnavailable, ...known.map(({ library }) => ({ library }))], symbols), { cause: error });
-      throw error;
-    }
+    catch (error) { throw linkFailure(error); }
+  };
+  // A map-only probe link whose wasm-ld runs asynchronously, so independent
+  // planning probes overlap (the Node driver; the emcc driver links in turn).
+  const runProbeLink = async args => {
+    if (!nodeLink) return runLink('probe', args, { mapOnly: true });
+    const temp = linkTemporaryDirectory(work, 'probe');
+    try {
+      const command = linkWithNode({ recipe, mode: 'probe', args: args.flatMap(arg => arg.startsWith('@') ? readResponseArguments(arg.slice(1)) : [arg]),
+        sdk, cache: emscriptenCache(sdk), temp, nativeSigs: bundledNativeSigs(recipe), stdio: toolStdio, mapOnly: 'command' });
+      await new Promise((resolve, reject) => execFile(command.program, command.args, { env: command.env, windowsHide: true,
+        timeout: 1800_000, maxBuffer: 512 * 1024 * 1024 }, (error, stdout, stderr) => {
+        if (verbose) { process.stdout.write(stdout); process.stderr.write(stderr); }
+        error ? reject(Object.assign(error, { stdout, stderr })) : resolve();
+      }));
+    } catch (error) { throw linkFailure(error); }
+    finally { removeTemporary(temp); }
   };
   const compileUncached = (source, object) => nodeCompile
     ? compileObject({ sdk, flags: compileFlags, source, object, settings: {
@@ -186,7 +209,8 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // (the last planning round's wrappers are the final link's).
   const objectStore = objectCache ?? join(work, 'object-store');
   mkdirSync(objectStore, { recursive: true });
-  const storeObject = (object, cached) => { const partial = cached + '.' + process.pid + '.partial'; copyFileSync(object, partial); renameSync(partial, cached); };
+  let partials = 0;
+  const storeObject = (object, cached) => { const partial = `${cached}.${process.pid}.${partials++}.partial`; copyFileSync(object, partial); renameSync(partial, cached); };
   const compile = (source, object) => {
     const cached = join(objectStore, objectKey(source) + '.o');
     usedObjects.add(cached);
@@ -345,7 +369,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
         requirements: record.requirements, requirementsError: record.requirementsError };
     } catch { /* not recorded */ }
     await writeFile(rsp, responseFile(args));
-    runLink('probe', ['@' + rsp], { mapOnly: true });
+    await runProbeLink(['@' + rsp]);
     const live = await readLiveSymbols(map);
     // Planning probes of initializer bodies have no application entry point.
     let requirements = null, requirementsError = null;
@@ -363,27 +387,30 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     // Planning probes only read wasm-ld's live set: their wrapper objects are
     // compiled at -O0 (src/link-driver/compile.mjs probeOptimization). The
     // wrappers of the delivered program are compiled as recorded.
-    const writeWrappers = async (sources, { probe = false } = {}) => {
-      const files = probe ? probeWrappers : finalWrappers;
+    let probeCount = 0;
+    const writeWrappers = async (sources, { probe = false, files = probe ? probeWrappers : finalWrappers } = {}) => {
       for (let part = 0; part < files.length; part++) await writeFile(files[part][0], sources[part]);
       await compileAll(files, nodeCompile && probe ? { optimization: probeOptimization } : {});
       return files.map(([, object]) => object);
     };
-    const planMap = join(work, 'initializers.map'), planArguments = join(work, 'initializers.rsp');
     const bodiesExports = join(work, 'initializers-exports.json');
     await writeFile(bodiesExports, JSON.stringify(['_main', '_malloc', '_free']) + '\n');
     progress?.({ stage: 'Planning runtime initialization' });
     const plan = await planInitializers({ objects, archives: runtime.manifest.libraries.map(name => join(runtime.directory, name)),
       archiveUnits: analysisCache && archiveUnitCache(analysisCache, runtime),
+      // One build job (LASM_BUILD_JOBS=1, the maintainer guard): probes in turn.
+      concurrent: nodeLink && buildJobs(sdk.env) > 1,
       log: verbose ? message => console.error(message) : () => {},
       forceKeep: process.env.LASM_INITIALIZATION_KEEP ? new RegExp(process.env.LASM_INITIALIZATION_KEEP) : undefined,
       initTargets: (core => core && new Set([...core, ...sources.flatMap(file => cInitTargets(readFileSync(file, 'utf8')))]))(coreInitTargets(leanVersion)),
       async probe(source, wrapFlags, { bodies = false, exclude } = {}) {
-        const wrappersObjects = await writeWrappers(source, { probe: true });
+        // Probes may run concurrently: each has its own files.
+        const id = probeCount++, map = join(work, `initializers-${id}.map`);
+        const wrappersObjects = await writeWrappers(source, { probe: true, files: wrapperFiles(`-probe-${id}`) });
         const args = [...objects.filter(file => file !== exclude), ...nativeInputs, probeObject, ...wrappersObjects,
           ...initializationInputs.filter(file => !bodies || file !== entryObject),
-          '-O0', '-Wl,-Map=' + planMap, ...wrapFlags, ...linkWith(bodies ? bodiesExports : exportsFile)];
-        return (await probeLink(args, planMap, planArguments)).live;
+          '-O0', '-Wl,-Map=' + map, ...wrapFlags, ...linkWith(bodies ? bodiesExports : exportsFile)];
+        return (await probeLink(args, map, join(work, `initializers-${id}.rsp`))).live;
       } });
     if (plan?.skipped.length && !plan.shared.length) {
       const planned = initializerWrappers(plan.units, plan.closure, { keep: plan.keep, parts: initializerWrapperParts });

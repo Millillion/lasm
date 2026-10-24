@@ -233,7 +233,7 @@ export function coreInitTargets(version) {
   return list.initTargets.map(([symbol]) => symbol);
 }
 
-export async function planInitializers({ objects, archives, probe, log = () => {}, forceKeep, initTargets, archiveUnits }) {
+export async function planInitializers({ objects, archives, probe, log = () => {}, forceKeep, initTargets, archiveUnits, concurrent = true }) {
   const files = [...objects, ...archives];
   const units = initializerUnits(files, { archiveUnits });
   // The program's entry object: Lean's generated `main` calls its own module's initializer.
@@ -254,6 +254,15 @@ export async function planInitializers({ objects, archives, probe, log = () => {
   // nullary constants are immutable. Without a list, every assigned global counts.
   const mutable = initTargets ?? new Set(closure.flatMap(name => units.get(name).data));
   let live, skipped, shared = [];
+  // The empty-program probe depends only on the closure: it runs while the
+  // rounds below do (its result is used only when some unit is skipped).
+  let baselineProbe;
+  const startBaseline = () => {
+    baselineProbe ??= probe(initializerWrappers(units, closure, { bodies: [], parts: initializerWrapperParts }), wrap, { bodies: true, exclude });
+    baselineProbe.catch(() => {});
+    return baselineProbe;
+  };
+  if (concurrent) startBaseline();
   for (let attempt = 1; ; attempt++) {
     for (let round = 1; ; round++) {
       live = await probe(initializerWrappers(units, closure, { keep, parts: initializerWrapperParts }), wrap);
@@ -271,7 +280,7 @@ export async function planInitializers({ objects, archives, probe, log = () => {
     // Lean's C++ compiler/kernel state is rejected by the application policy.
     // Compare the skipped bodies alone with an empty program.
     const reached = await probe(initializerWrappers(units, closure, { bodies: skipped, parts: initializerWrapperParts }), wrap, { bodies: true, exclude });
-    baseline ??= await probe(initializerWrappers(units, closure, { bodies: [], parts: initializerWrapperParts }), wrap, { bodies: true, exclude });
+    baseline ??= await startBaseline();
     shared = [...reached.data].filter(symbol => mutable.has(symbol) && live.data.has(symbol) && !baseline.data.has(symbol));
     log(`Initialization plan: ${skipped.length} of ${closure.length} initializers skipped; ${shared.length} shared globals${shared.length ? ': ' + shared.slice(0, 40).join(' ') : ''}`);
     if (!shared.length) break;
@@ -284,5 +293,7 @@ export async function planInitializers({ objects, archives, probe, log = () => {
     if (!culprits.length || attempt >= 8) break;
     for (const name of culprits) keep.add(name);
   }
+  // Settle the concurrent probe before returning (its failure matters only when used).
+  if (!baseline && baselineProbe) await baselineProbe.catch(() => {});
   return { units, closure, keep, skipped, shared, wrap, live };
 }

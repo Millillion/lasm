@@ -266,6 +266,35 @@ wrappers, tools recorded at installation, cached binding reads; run
 | hono: one-line edit | 7.8 | 9.3 | 24.4 | 19.6 | 42.1 |
 | hono: dev, one-line edit | 5.2 | 6.3 | 14.1 | 11.2 | 23.5 |
 
+First builds (source `ea4f17e`, run 40127904162): a synchronous archive
+writer that hashes as it writes (node-tar took 12.7 s for one Lean tier on the
+Windows runner, this writer 3.2 s), tool archives downloaded, extracted and
+hard-linked concurrently, prefix receipts reusing the verified originals'
+hashes, `-O0` planning probes, and Lasm.JS shipped compiled for Lean 4.35.0.
+"Hono new machine" is a new user's very first build: an empty tool cache and a
+new project, with the download time reported separately:
+
+| Build (seconds) | linux-x64 | linux-arm64 | win32-x64 | darwin-arm64 | darwin-x64 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Hono new machine, download | 4.6 | 17.9 | 6.5 | 23.1 | 9.9 |
+| Hono new machine, without download | 37.3 | 30.1 | 63.6 | 38.6 | 108.8 |
+| hono: first build on a new machine | 41.9 | 48.1 | 70.1 | 61.8 | 118.7 |
+| hello: first build in a new project | 23.8 | 28.1 | 57.6 | 29.2 | 68.9 |
+| hello: --rebuild | 5.7 | 4.4 | 11.1 | 3.8 | 12.1 |
+| hello: one-line edit | 7.8 | 6.3 | 14.4 | 5.3 | 15.4 |
+| hello: dev, one-line edit | 4.5 | 4.5 | 7.0 | 3.0 | 8.9 |
+| hono: first build in a new project | 28.6 | 32.2 | 68.4 | 33.5 | 79.4 |
+| hono: --rebuild | 7.9 | 6.4 | 16.8 | 5.8 | 18.6 |
+| hono: unchanged (cache hit) | 0.7 | 0.7 | 1.9 | 0.7 | 1.9 |
+| hono: one-line edit | 10.9 | 9.0 | 21.6 | 10.6 | 24.0 |
+| hono: dev, one-line edit | 6.4 | 6.0 | 11.3 | 6.8 | 14.4 |
+
+Before these changes the first Hono build in a new project (tools for hello
+already installed) took 41 / 45 / 211 / 85 / 295 s on the same five runners.
+Since then the runtime archives' initializer analysis is shipped with the
+package (2.1 s → 0.04 s on a new machine) and the program-independent planning
+probe runs alongside the others.
+
 What remains, by platform:
 
 - **Linux** (x64, arm64) meets the targets: release rebuilds 4–8 s, edits
