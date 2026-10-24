@@ -67,6 +67,23 @@ writeFileSync(output + '.audit.json', JSON.stringify({ archives, definedSymbols:
 }, null, 2) + '\n');
 console.log(JSON.stringify({ output, exported: exports.length, defined: symbols.size }));
 
+// --reuse-registry ARCHIVE: a runtime-only rebuild (build-application-runtime.mjs
+// --reuse-standard-libraries) has no generated C. Its registry is unchanged if the
+// linked archives define exactly the Lean symbols that the reused registry object
+// references: the declarations come from the same generated C, so the registry
+// source, and the object compiled from it with the same flags, are the same.
+const reuseRegistry = option('--reuse-registry');
+if (reuseRegistry) {
+  const names = [...symbols].filter(isLeanSymbol).sort();
+  const referenced = execFileSync(nm, ['--undefined-only', '--format=just-symbols', reuseRegistry],
+    { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 }).split('\n').map(line => line.trim()).filter(isLeanSymbol).sort();
+  const expected = new Set(names), unexpected = referenced.filter(name => !expected.has(name));
+  const absent = names.filter(name => !new Set(referenced).has(name));
+  if (unexpected.length || absent.length || referenced.length !== names.length)
+    throw new Error(`The reused symbol registry does not match the linked Lean symbols (${absent.length} new, ${unexpected.length} gone): ${[...absent, ...unexpected].slice(0, 20).join(', ')}`);
+  console.log(JSON.stringify({ reusedRegistry: reuseRegistry, symbols: names.length }));
+  process.exit(0);
+}
 const generated = existsSync(join(build, 'generated-c')) ? join(build, 'generated-c') : join(build, 'lib/temp');
 const files = dir => readdirSync(dir, { withFileTypes: true }).flatMap(e => e.isDirectory() ? files(join(dir, e.name)) : [join(dir, e.name)]);
 const declarations = new Map();

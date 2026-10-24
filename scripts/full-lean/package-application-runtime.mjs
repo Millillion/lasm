@@ -56,14 +56,22 @@ const abiInput = join(work, 'runtime-abi.cpp');
 writeFileSync(abiInput, '#include <string>\nint main() { return std::string("abi").size() == 3 ? 0 : 1; }\n');
 run(sdk.tool('em++'), [abiInput, '-O1', '-pthread', '-fwasm-exceptions', '-fPIC', '-sMEMORY64=1',
   '-sMAIN_MODULE=2', '-sMALLOC=mimalloc', '-sALLOW_MEMORY_GROWTH=1', '-o', join(work, 'runtime-abi.cjs')]);
+// A runtime-only rebuild reuses the earlier bundle's symbol registry after
+// generate-exports checks that it names exactly the linked Lean symbols.
+const reusedRegistry = audit.reusedStandardLibraries && join(audit.reusedStandardLibraries.bundle, 'lib/liblasmsymbols.a');
+if (reusedRegistry) assert.equal(await hashFile(reusedRegistry), audit.reusedStandardLibraries.registrySha256);
 run(process.execPath, [join(root, 'scripts/full-lean/generate-exports.mjs'), build, exportsFile,
   '--native-lean', join(nativePrefix, 'bin/lean'), '--lake', '--registry', registry,
+  ...(reusedRegistry ? ['--reuse-registry', reusedRegistry] : []),
   '--application-hook', 'lasm_lookup_application_symbol'], { env: { ...sdk.env, LASM_EMSDK: sdk.directory,
     LASM_LLVM_NM: join(sdk.llvm, 'llvm-nm'), LASM_EMSCRIPTEN_CACHE: sdk.cacheDirectory, LEAN_NUM_THREADS: '2' } });
 const object = join(work, 'lean-symbols.o');
-run(sdk.tool('emcc'), ['-O1', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC',
-  '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1', '-I', join(target, 'include'), '-c', registry, '-o', object]);
-run(sdk.tool('emar'), ['rcs', join(target, 'lib/liblasmsymbols.a'), object]);
+if (reusedRegistry) copyFileSync(reusedRegistry, join(target, 'lib/liblasmsymbols.a'));
+else {
+  run(sdk.tool('emcc'), ['-O1', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC',
+    '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1', '-I', join(target, 'include'), '-c', registry, '-o', object]);
+  run(sdk.tool('emar'), ['rcs', join(target, 'lib/liblasmsymbols.a'), object]);
+}
 // The archive audit has development paths; keep it with maintainer evidence.
 copyFileSync(exportsFile + '.audit.json', join(work, 'exports-audit.json'));
 const { unlinkSync } = await import('node:fs'); unlinkSync(exportsFile + '.audit.json');

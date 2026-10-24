@@ -216,7 +216,8 @@ if (reuseBundle) {
       unlinkSync(base + '.c'); unlinkSync(base + '.o');
     }
   }
-  reused = { bundleManifestSha256: reuseManifest, standardModules: manifest.standardModules,
+  reused = { bundleManifestSha256: reuseManifest, bundle, registrySha256: manifest.files['lib/liblasmsymbols.a'].sha256,
+    standardModules: manifest.standardModules,
     standardLibraryAuditSha256: manifest.standardLibraryAuditSha256, archives, sampledModules: sampled };
   console.log(`Reused ${groups.join(', ')} from runtime ${reuseManifest}; ${sampled.length} sampled modules recompiled byte-identically`);
 }
