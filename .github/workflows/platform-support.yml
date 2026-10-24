@@ -4,7 +4,8 @@ name: Launch platform support
 # accounts or deployments, ever. Sample applications (examples/hello and
 # examples/js-crud on Express and on Hono) are built with the installed
 # candidate on Linux x64 (compiler on the newest Node 24), Linux arm64
-# (compiler on Node 24.0.0), macOS arm64 and Windows x64 (compiler on Node 26),
+# (compiler on Node 24.0.0), macOS arm64 (compiler on Node 26), and Windows
+# x64 and macOS x64 (compiler on the newest Node 24),
 # then run:
 #   - natively on Node 24.0.0, the newest 24 and 26 (x64 and arm64); Node 22
 #     must give a clean error;
@@ -87,7 +88,8 @@ jobs:
           - { name: linux-x64, runner: ubuntu-24.04, architecture: x64, node: node24 }
           - { name: linux-arm64, runner: ubuntu-24.04-arm, architecture: arm64, node: minimum }
           - { name: darwin-arm64, runner: macos-15, architecture: arm64, node: node26 }
-          - { name: win32-x64, runner: windows-2025, architecture: x64, node: node26 }
+          - { name: win32-x64, runner: windows-2025, architecture: x64, node: node24 }
+          - { name: darwin-x64, runner: macos-15-intel, architecture: x64, node: node24 }
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 90
     defaults:
@@ -316,8 +318,56 @@ jobs:
       - name: Summary
         if: always()
         run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
+  # Built applications on Node 24 on Windows x64 and macOS x64 (their builds
+  # above also run the compiler on Node 24 there).
+  native-other:
+    needs: [select, build]
+    if: always() && needs.select.outputs.active == 'true'
+    name: native ${{ matrix.build }} node ${{ matrix.node }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: windows-2025, build: win32-x64, node: minimum }
+          - { runner: windows-2025, build: win32-x64, node: node24 }
+          - { runner: macos-15-intel, build: darwin-x64, node: minimum }
+          - { runner: macos-15-intel, build: darwin-x64, node: node24 }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ needs.select.outputs[matrix.node] }}
+          architecture: x64
+          package-manager-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: platform-apps-${{ matrix.build }}
+          path: ${{ runner.temp }}/artifacts/platform-apps-${{ matrix.build }}
+      - name: Temporary Postgres; the build on this Node
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            # PostgreSQL refuses to run under the runner's administrator account;
+            # start the image's preinstalled service instead (as js-interop-examples.yml).
+            pwsh -NoProfile -Command 'Set-Service postgresql-x64-17 -StartupType Manual; Start-Service postgresql-x64-17'
+            export DATABASE_URL=postgres://postgres:root@127.0.0.1:5432/postgres
+          else
+            node scripts/js-interop/start-postgres.mjs "$RUNNER_TEMP/postgres" 55432 > "$RUNNER_TEMP/postgres.log" 2>&1 < /dev/null &
+            for i in $(seq 1 300); do grep -q '^DATABASE_URL=' "$RUNNER_TEMP/postgres.log" && break; sleep 1; done
+            export "$(grep '^DATABASE_URL=' "$RUNNER_TEMP/postgres.log")"
+          fi
+          node scripts/platform/run-matrix.mjs native "$RUNNER_TEMP/artifacts" "$RUNNER_TEMP/results" ${{ matrix.build }}
+      - name: Summary
+        if: always()
+        run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"
   result:
-    needs: [select, build, native, containers, lambda, macos, compiler-glibc]
+    needs: [select, build, native, containers, lambda, macos, native-other, compiler-glibc]
     if: always() && needs.select.outputs.active == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5

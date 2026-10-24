@@ -1,11 +1,14 @@
 // Writes the platform-support results (run-matrix.mjs output files) to the job
 // log and a compact table to the job summary.
 //   node summary.mjs RESULT.json...
-import { appendFileSync, existsSync, readFileSync } from 'node:fs';
-import { basename } from 'node:path';
+import { appendFileSync, existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { basename, join } from 'node:path';
 
 const rows = [];
-for (const file of process.argv.slice(2).filter(existsSync)) {
+// Arguments are result files or directories of them (Windows shells do not glob).
+const files = process.argv.slice(2).filter(existsSync).flatMap(path => statSync(path).isDirectory()
+  ? readdirSync(path).filter(name => name.endsWith('.json')).sort().map(name => join(path, name)) : [path]);
+for (const file of files) {
   const r = JSON.parse(readFileSync(file, 'utf8'));
   console.log(basename(file) + '\n' + JSON.stringify(r, null, 2));
   const name = basename(file, '.json');

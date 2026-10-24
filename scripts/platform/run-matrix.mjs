@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
@@ -31,7 +31,9 @@ for (const build of builds) {
   const apps = join(results, '..', `apps-${build}`);
   if (!existsSync(apps)) {
     mkdirSync(apps, { recursive: true });
-    const untar = spawnSync('tar', ['-xf', archive, '-C', apps], { encoding: 'utf8' });
+    // Name the archive relative to its directory: Git for Windows' GNU tar reads
+    // "D:\\..." in -f as a remote host.
+    const untar = spawnSync('tar', ['-xf', basename(archive), '-C', apps], { encoding: 'utf8', cwd: dirname(archive) });
     assert.equal(untar.status, 0, untar.stderr);
   }
   let run;
