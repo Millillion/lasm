@@ -7,16 +7,17 @@ import { tmpdir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 import { buildMain } from '../src/main.mjs';
 import { root, resolveLean } from '../src/toolchain.mjs';
+import { launcherSource, programStderr } from './helpers/launcher-source.mjs';
 
 test('ordinary Lean process exit preserves status and distinguishes forced buffer discard',
   { timeout: 650_000 }, async t => {
     const directory = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-process-exit-')));
     t.after(() => rmSync(directory, { recursive: true, force: true }));
     const source = join(root, 'test/fixtures/process-exit/Main.lean');
-    function run(name, executable, prefix, mode) {
+    function run(name, executable, prefix, mode, timeout = 15_000) {
       const target = join(directory, `${name}-${mode}.txt`);
       const result = spawnSync(executable, [...prefix, mode, target],
-        { encoding: 'utf8', timeout: 15_000, killSignal: 'SIGKILL' });
+        { encoding: 'utf8', timeout, killSignal: 'SIGKILL' });
       assert.equal(result.error, undefined);
       assert.equal(result.signal, null);
       return { code: result.status, stdout: result.stdout, stderr: result.stderr,
@@ -46,10 +47,13 @@ console.log('host still running');
       for (const mode of Object.keys(expected)) await t.test(`${name}: ${mode}`, () => {
         assert.deepEqual(run(name, executable, [...prefix, join(built.output, 'main.mjs')], mode), expected[mode]);
       });
+      const pinned = launcherSource(t, source);
       for (const [mode, code] of [['exit', 17], ['force', 19]]) {
         await t.test(`${name}: source launcher ${mode}`, () => {
-          assert.deepEqual(run(name + '-source', executable,
-            [...prefix, join(root, `lasm-${name}.js`), source, '--'], mode), expected[mode]);
+          // The source launcher compiles first (minutes on a cold cache) and
+          // reports its build progress on stderr before the program's output.
+          const result = run(name + '-source', executable, [...prefix, join(root, `lasm-${name}.js`), pinned, '--'], mode, 480_000);
+          assert.deepEqual({ ...result, stderr: programStderr(result.stderr) }, expected[mode]);
         });
         await t.test(`${name}: embedded ${mode} preserves host process`, async t => {
           const result = run(name + '-embedded', executable, [...prefix, embedded], mode);

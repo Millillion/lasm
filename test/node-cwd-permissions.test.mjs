@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { buildMain } from '../src/main.mjs';
 import { root, resolveLean } from '../src/toolchain.mjs';
+import { launcherSource, managedLean, programStderr } from './helpers/launcher-source.mjs';
 
 test('standalone Lean mains retain native Linux cwd permission behavior',
   { skip: process.platform !== 'linux' || process.getuid?.() === 0, timeout: 650_000 }, async t => {
@@ -22,14 +23,20 @@ test('standalone Lean mains retain native Linux cwd permission behavior',
       ['node', process.execPath, []],
     ]) {
       if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }
-      for (const [mode, args] of [
-        ['built', [join(built.output, 'main.mjs'), directory]],
-        ['source launcher', [join(root, `lasm-${name}.js`), source, directory]],
+      // The launcher builds with managed Lean, whose messages and error codes
+      // differ from the legacy builder's Lean 4.32: compare it with that release natively.
+      const pinned = launcherSource(t, source);
+      const managed = spawnSync(await managedLean(pinned), ['--run', pinned, directory], options);
+      assert.equal(managed.status, 0, managed.error?.message ?? managed.stdout + managed.stderr);
+      for (const [mode, args, oracle] of [
+        ['built', [join(built.output, 'main.mjs'), directory], native],
+        ['source launcher', [join(root, `lasm-${name}.js`), pinned, directory], managed],
       ]) await t.test(`${name}: ${mode}`, () => {
-        const result = spawnSync(executable, [...prefix, ...args], options);
+        // The source launcher compiles first (minutes on a cold cache).
+        const result = spawnSync(executable, [...prefix, ...args], mode === 'built' ? options : { ...options, timeout: 480_000 });
         assert.equal(result.status, 0, result.error?.message ?? result.stdout + result.stderr);
-        assert.equal(result.stderr, '');
-        assert.equal(result.stdout, native.stdout);
+        assert.equal(mode === 'built' ? result.stderr : programStderr(result.stderr), '');
+        assert.equal(result.stdout, oracle.stdout);
       });
     }
   });
