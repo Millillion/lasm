@@ -1,0 +1,4 @@
+node_modules
+.wrangler
+workers/*/build
+workers/*/node_modules

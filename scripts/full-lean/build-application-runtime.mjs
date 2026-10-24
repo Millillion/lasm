@@ -26,6 +26,13 @@ if (!release || toolchainCatalog.lean[version]?.commit !== release.commit)
   throw new Error(`No matching source and native runtime-build inputs for Lean ${version}`);
 const output = resolve(option('--output', `.work/application-runtime-${version}`));
 const archiveGeneratedC = args.includes('--archive-generated-c');
+// --profile edge (Phase 7, docs/EDGE.md): Lean's C++ runtime and the host bridge
+// without threads (MULTI_THREAD=OFF, cooperative tasks, no completion thread) for
+// edge isolates. The standard-library archives keep their compile flags, so an
+// edge build can reuse a verified runtime's archives (--reuse-standard-libraries).
+const profile = option('--profile', 'node');
+if (!['node', 'edge'].includes(profile)) throw new Error('Invalid --profile (node or edge)');
+const edge = profile === 'edge';
 const cache = resolve(option('--tool-cache', '.cache/product-baseline/managed-lean-linux-x64/cache'));
 if (args.includes('--managed-sdk') && args.includes('--sdk')) throw new Error('Choose managed SDK or an explicit emsdk tree');
 const sdk = await maintainerSdk({ managed: args.includes('--managed-sdk'), directory: option('--sdk'), cache });
@@ -97,6 +104,10 @@ patchInputs.push({ name: 'libuv-source', file: 'lean-4.34.0-libuv-source.patch' 
 // NODE_HOST_ENV), as `LEAN_ABORT_ON_PANIC` already does after thread-runtime.
 if (Number(version.split('.')[1]) >= 35)
   patchInputs.push({ name: 'nonlinear-environment', file: 'lean-4.35.0-nonlinear-environment.patch' });
+if (edge) {
+  if (version !== '4.35.0') throw new Error('The edge profile has a runtime patch for Lean 4.35.0 only');
+  patchInputs.push({ name: 'edge', file: 'lean-4.35.0-edge.patch' });
+}
 for (const { name, file } of patchInputs) {
   // These reviewed runtime changes still apply to 4.34 and, with the ports above,
   // to 4.35. Record the actual patch bytes and source commit; never treat older
@@ -112,7 +123,7 @@ for (const { name, file } of patchInputs) {
 }
 const sdkPatch = sdk.patchSha256;
 copyFileSync(join(root, 'scripts/full-lean/emscripten-pre.js'), join(source, 'src/lasm-emscripten-pre.js'));
-run(process.execPath, [join(root, 'scripts/full-lean/configure-host.mjs'), join(source, 'src')]);
+run(process.execPath, [join(root, 'scripts/full-lean/configure-host.mjs'), join(source, 'src'), ...(edge ? ['--edge'] : [])]);
 // Decision 5 (docs/PLAN.md): no GNU MP in applications. USE_GMP=OFF selects Lean's
 // own big-number code (src/runtime/mpn.cpp, mpz.cpp), so the runtime links no
 // copyleft library. Its .olean flag differs from the official native Lean's, which
@@ -125,10 +136,12 @@ run(sdk.tool('emcmake'), ['cmake', '-S', join(source, 'src'), '-B', build,
   '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG', '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',
   '-DCMAKE_C_FLAGS=-sMEMORY64=1', '-DLASM_MEMORY64=1', '-DLASM_HOST_BRIDGE=ON',
   '-DLASM_LINK_LAKE=OFF', '-DLASM_LINK_TOOLS=OFF', '-DLEAN_EXTRA_OPTS=-j2 -s8192',
+  ...(edge ? ['-DMULTI_THREAD=OFF', '-DLASM_EDGE=ON'] : []),
 ]);
 const provenance = { schema: 1, lean: version, leanCommit: expectedCommit, sourceArchiveSha256: sourceHash,
   nativeArtifactIdentity: native.identity, patches, sdkPatchSha256: sdkPatch, emscripten: '6.0.9',
-  bignum: 'lean', memoryLayout: 'wasm64', threading: 'pthreads', allocator: 'mimalloc',
+  bignum: 'lean', memoryLayout: 'wasm64', threading: edge ? 'cooperative' : 'pthreads', allocator: 'mimalloc',
+  ...(edge ? { profile: 'edge' } : {}),
   purpose: 'AOT application libraries; no Wasm compiler executable', sdk: sdk.directory,
   ...(sdk.mode === 'managed' ? { sdkMode: sdk.mode, sdkIdentity: sdk.identity,
     sdkDriverIdentity: sdk.driverIdentity, sdkToolCache: sdk.toolCache } : {}), nativePrefix: native.prefix,
@@ -165,10 +178,14 @@ const audit = [];
 let reused;
 if (reuseBundle) {
   const name = `lean-${version}-wasm64`, bundle = resolve(reuseBundle);
+  // An edge build reuses the Node runtime's archives: they do not depend on the
+  // C++ runtime's threading (lean.h has no LEAN_MULTI_THREAD conditional and the
+  // compile flags below are unchanged), nor on the edge patch (C++ runtime only).
   const { manifest } = await verifyApplicationRuntime(bundle, { name, manifestSha256: reuseManifest });
-  for (const key of ['lean', 'leanCommit', 'sourceArchiveSha256', 'emscripten', 'memoryLayout', 'threading', 'allocator'])
+  for (const key of ['lean', 'leanCommit', 'sourceArchiveSha256', 'emscripten', 'memoryLayout', ...(edge ? [] : ['threading']), 'allocator'])
     if (manifest[key] !== provenance[key]) throw new Error(`Reused runtime differs in ${key}`);
-  if (JSON.stringify(manifest.patches) !== JSON.stringify(patches)) throw new Error('Reused runtime has other Lean patches');
+  const { edge: edgePatch, ...sharedPatches } = patches;
+  if (JSON.stringify(manifest.patches) !== JSON.stringify(edge ? sharedPatches : patches)) throw new Error('Reused runtime has other Lean patches');
   // Headers: the packager prepends one comment to lean.h; every byte after it must match.
   const shipped = readdirSync(join(bundle, 'include/lean')).filter(name => name.endsWith('.h')).sort();
   if (JSON.stringify(shipped) !== JSON.stringify(headers.map(([name]) => name))) throw new Error('Reused runtime has other headers');
