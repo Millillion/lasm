@@ -33,14 +33,18 @@ export const requiredSettings = {
   BINARYEN_EXTRA_PASSES: '', EMULATE_FUNCTION_POINTER_CASTS: 0, BINARYEN_IGNORE_IMPLICIT_TRAPS: 0,
   ERROR_ON_WASM_CHANGES_AFTER_LINK: 0, WASM: 1, FAKE_DYLIBS: 0, SIDE_MODULE_IMPORTS: [],
 };
-export function checkSupportedSettings(settings) {
-  for (const [key, value] of Object.entries(requiredSettings)) {
+export function checkSupportedSettings(settings, supported = {}) {
+  // A recipe mode may name other values it was recorded and checked with (the
+  // edge link: MODULARIZE=1, ASYNCIFY=2 for JSPI, MAIN_MODULE=0, MEMORY64=2).
+  for (const [key, recorded] of Object.entries(requiredSettings)) {
+    const value = Object.hasOwn(supported, key) ? supported[key] : recorded;
     const actual = settings.get(key);
     if (truthy(actual) !== truthy(value) || (typeof value === 'number' && value && Number(actual) !== value))
       throw new Error(`The Node link driver does not implement ${key}=${JSON.stringify(actual)}`);
   }
-  if (Number(settings.get('MAIN_MODULE')) !== 2) throw new Error('The Node link driver implements only MAIN_MODULE=2');
-  if (Number(settings.get('MEMORY64')) !== 1) throw new Error('The Node link driver implements only MEMORY64=1');
+  const mainModule = supported.MAIN_MODULE ?? 2, memory64 = supported.MEMORY64 ?? 1;
+  if (Number(settings.get('MAIN_MODULE')) !== mainModule) throw new Error(`The Node link driver implements only MAIN_MODULE=${mainModule} here`);
+  if (Number(settings.get('MEMORY64')) !== memory64) throw new Error(`The Node link driver implements only MEMORY64=${memory64} here`);
 }
 
 /** emscripten.py maybe_disable_filesystem. */
@@ -65,6 +69,7 @@ export function updateSettingsGlue(settings, metadata, weakImports) {
   settings.set('WASM_EXPORTS', [...metadata.allExports]);
   settings.set('HAVE_EM_ASM', Boolean(truthy(settings.get('MAIN_MODULE')) || metadata.emAsmConsts.size !== 0));
   const binaryenFeatures = ['--mvp-features', ...metadata.features];
+  if (Number(settings.get('ASYNCIFY')) === 2) binaryenFeatures.push('--enable-reference-types');
   if (truthy(settings.get('PTHREADS')) && !binaryenFeatures.includes('--enable-threads')) throw new Error('assertion failed: threads feature');
   if (truthy(settings.get('MEMORY64')) && !binaryenFeatures.includes('--enable-memory64')) throw new Error('assertion failed: memory64 feature');
   const wasmExports = settings.get('WASM_EXPORTS');
@@ -157,7 +162,7 @@ export function createEmJs(settings, metadata) {
     const list = !args || args === 'void' ? [] : args.split(',');
     args = list.filter(Boolean).map(arg => pythonSplit(arg).at(-1).replaceAll('*', '')).join(',');
     result.push(`function ${name}(${args}) ${body}`);
-    if (truthy(settings.get('MAIN_MODULE')) && metadata.emJsFuncTypes.has(name))
+    if ((truthy(settings.get('MAIN_MODULE')) || Number(settings.get('ASYNCIFY')) === 2) && metadata.emJsFuncTypes.has(name))
       result.push(`${name}.sig = '${funcTypeToSig(metadata.emJsFuncTypes.get(name))}';`);
   }
   return result;

@@ -105,13 +105,14 @@ const workerName = directory => {
 
 // Inputs of the linked edge program besides the Node build: the edge link and
 // its glue. The host modules (edge-*.mjs) are copied at delivery, not linked.
-const linkSources = ['edge-link.mjs', 'edge-pre.js', 'edge-library.js', 'lasm_js_edge.c'];
+const linkSources = ['edge-link.mjs', 'edge-pre.js', 'edge-library.js', 'lasm_js_edge.c',
+  ...['recipe-emscripten-6.0.9-edge.json', 'link.mjs', 'glue.mjs', 'settings.mjs', 'metadata.mjs', 'wasm.mjs', 'python.mjs'].map(file => '../link-driver/' + file)];
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 
 /** The edge program's cache identity: the Node build's signature (its objects
  * and initializer plan), the edge runtime, the edge link and its settings. */
 export function edgeProgramKey({ result, edge, suspend = 'jspi' }) {
-  return sha256(JSON.stringify({ schema: 1, node: result.signature, runtime: edge.manifest.files, settings: edgeLinkSettings, suspend,
+  return sha256(JSON.stringify({ schema: 1, node: result.signature, runtime: edge.identity, settings: edgeLinkSettings, suspend,
     sources: Object.fromEntries(linkSources.map(file => [file, sha256(readFileSync(join(here, file)))])) }));
 }
 

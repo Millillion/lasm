@@ -5,13 +5,21 @@
 // single-threaded runtime archives (edge-runtime.mjs), 4 MiB initial memory
 // with growth and a 1 MiB C stack, JSPI with the event pump and `main` as the
 // only promising exports, and the edge host glue (edge-pre.js, edge-library.js,
-// lasm_js_edge.c). The Node link driver has no recording of these settings, so
-// this link uses Emscripten's own driver from the managed SDK.
+// lasm_js_edge.c). The Node link driver replays it from its recording
+// (src/link-driver/recipe-emscripten-<version>-edge.json, byte-identical to
+// emcc's output: scripts/edge/compare-edge-link.mjs); emcc remains the fallback.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
+import { linkWithNode, bundledNativeSigs, linkTemporaryDirectory, removeTemporary } from '../link-driver/link.mjs';
+
+let recipeCache;
+/** The Node link driver's recording of the edge link (scripts/edge/derive-edge-recipe.mjs). */
+export function edgeRecipe() {
+  return recipeCache ??= JSON.parse(readFileSync(new URL('../link-driver/recipe-emscripten-6.0.9-edge.json', import.meta.url), 'utf8'));
+}
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 const readResponse = file => readFileSync(file, 'utf8').split('\n').filter(Boolean).map(line => line.slice(1, -1).replace(/\\(.)/g, '$1'));
@@ -20,7 +28,7 @@ const readResponse = file => readFileSync(file, 'utf8').split('\n').filter(Boole
 export const edgeLinkSettings = Object.freeze({ memory64: 2, initialMiB: 4, stackMiB: 1, maximumMiB: 2048, malloc: 'mimalloc', optimize: '-Oz' });
 
 /** linkWork: the Node build's kept link directory (link.rsp, objects, exports.json). */
-export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend = 'jspi', verbose = false }) {
+export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend = 'jspi', verbose = false, driver = sdk.toolchain ? 'node' : 'emcc' }) {
   if (!['jspi', 'none'].includes(suspend)) throw new Error(`Unknown edge suspension ${JSON.stringify(suspend)}`);
   const s = edgeLinkSettings;
   const rsp = readResponse(join(linkWork, 'link.rsp'));
@@ -34,12 +42,18 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
   mkdirSync(out, { recursive: true });
   const stdio = verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'];
   const env = { ...sdk.env, EMCC_CORES: '1' };
+  // Lasm.JS's edge glue: precompiled in the edge runtime (liblasmjsedge.a),
+  // else compiled here (a runtime directory from an older edge-runtime.yml).
   const glue = [];
   if (usesJs) {
-    glue.push(join(out, 'lasm_js_edge.o'));
-    sdk.execute('emcc', ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-fwasm-exceptions', '-sMEMORY64=1', '-ffp-contract=off',
-      '-fPIC', '-ffunction-sections', '-fdata-sections', '-I', join(nodeRuntime.directory, 'include'), '-c', join(here, 'lasm_js_edge.c'), '-o', glue[0]],
-    { stdio, env, timeout: 600_000 });
+    if (edge.libraries['liblasmjsedge.a']) glue.push(edge.libraries['liblasmjsedge.a']);
+    else if (driver === 'node') throw new Error('This edge runtime has no precompiled Lasm.JS glue (liblasmjsedge.a); the Node link driver cannot compile it');
+    else {
+      glue.push(join(out, 'lasm_js_edge.o'));
+      sdk.execute('emcc', ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-fwasm-exceptions', '-sMEMORY64=1', '-ffp-contract=off',
+        '-fPIC', '-ffunction-sections', '-fdata-sections', '-I', join(nodeRuntime.directory, 'include'), '-c', join(here, 'lasm_js_edge.c'), '-o', glue[0]],
+      { stdio, env, timeout: 600_000 });
+    }
   }
   const exportsList = JSON.parse(readFileSync(join(linkWork, 'exports.json'), 'utf8')).filter(name => !name.startsWith('_lasm_js_'));
   const exportsFile = join(out, 'exports.json');
@@ -52,20 +66,38 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
     '-sENVIRONMENT=web', '-sEXIT_RUNTIME=0', '-sFILESYSTEM=0', '-sALLOW_MEMORY_GROWTH=1', `-sINITIAL_MEMORY=${s.initialMiB << 20}`,
     `-sMAXIMUM_MEMORY=${s.maximumMiB * 1048576}`, `-sSTACK_SIZE=${s.stackMiB << 20}`,
     '-sEXPORTED_RUNTIME_METHODS=callMain,HEAPU8,HEAPU32', '-sDYNAMIC_EXECUTION=0',
-    '-sINCOMING_MODULE_JS_API=instantiateWasm,noInitialRun,print,printErr,lasmEdgeJspi,onAbort',
+    '-sINCOMING_MODULE_JS_API=instantiateWasm,noInitialRun,print,printErr,onAbort',
     '-sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$stackSave,$stackRestore', '-Wl,--export-if-defined=__cpp_exception', '-Wno-experimental',
-    '-Wl,--start-group', ...libraries, '-Wl,--end-group',
+    `-Wl,-Map=${join(out, 'program.map')}`, '-Wl,--start-group', ...libraries, '-Wl,--end-group',
     '--pre-js', join(linkWork, 'application-pre.js'), '--pre-js', join(here, 'edge-pre.js'), '--js-library', join(here, 'edge-library.js'),
     ...(suspend === 'jspi' ? ['-sJSPI', "-sJSPI_EXPORTS=['lasm_edge_pump','main']"] : []),
     '-o', join(out, 'program.mjs')];
-  writeFileSync(join(out, 'link-args.json'), JSON.stringify({ settings: s, suspend, args }, null, 1) + '\n');
-  sdk.execute('em++', args, { stdio, env, timeout: 3_600_000, maxBuffer: 64 << 20 });
-  return { program: join(out, 'program.mjs'), wasm: join(out, 'program.wasm'), usesJs, suspend };
+  writeFileSync(join(out, 'link-args.json'), JSON.stringify({ settings: s, suspend, driver, args }, null, 1) + '\n');
+  if (driver === 'node') {
+    // The Node link driver (src/link-driver/) replays the recorded edge link
+    // (recipe-emscripten-<version>-edge.json) with the link toolchain and the
+    // edge runtime's system libraries: no emcc and no Python.
+    if (suspend !== 'jspi') throw new Error('The edge recipe records the JSPI link only');
+    if (!edge.sysroot) throw new Error('This edge runtime has no system libraries for the Node link driver');
+    const recipe = edgeRecipe();
+    const temp = linkTemporaryDirectory(out, 'edge');
+    try {
+      linkWithNode({ recipe, mode: 'edge', args, sdk, cache: edge.sysroot.cache, temp, nativeSigs: bundledNativeSigs(recipe),
+        stdio: verbose ? ['ignore', 'inherit', 'inherit'] : ['ignore', 'pipe', 'pipe'] });
+    } finally { removeTemporary(temp); }
+  } else sdk.execute('em++', args, { stdio, env, timeout: 3_600_000, maxBuffer: 64 << 20 });
+  return { program: join(out, 'program.mjs'), wasm: join(out, 'program.wasm'), usesJs, suspend, driver };
 }
 
-/** The tools the edge link needs: Emscripten's own driver from the managed SDK
- * (see the header). */
-export async function provisionEdgeLinker(options = {}) {
+/** The tools the edge link needs. With an edge runtime that carries the
+ * system libraries and the precompiled glue, the Node link driver links with
+ * Lasm's link toolchain (the same packages as every Node build); otherwise, or
+ * with LASM_LINK_DRIVER=emcc, Emscripten's own driver from the managed SDK. */
+export async function provisionEdgeLinker(edge, options = {}, env = process.env) {
+  if (edge.sysroot && edge.libraries['liblasmjsedge.a'] && env.LASM_LINK_DRIVER !== 'emcc') {
+    const { provisionLinkToolchain } = await import('../managed-link-toolchain.mjs');
+    return provisionLinkToolchain(options);
+  }
   const { provisionSdk } = await import('../managed-sdk.mjs');
   return provisionSdk(options);
 }

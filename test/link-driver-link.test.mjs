@@ -195,9 +195,12 @@ test('glue settings update and keepalive exports follow emscripten.py', () => {
   const values = { FORCE_FILESYSTEM: 1, INCLUDE_FULL_LIBRARY: 0, MAIN_MODULE: 2, DEFAULT_LIBRARY_FUNCS_TO_INCLUDE: ['$x', 'foo'],
     WEAK_IMPORTS: [], WASM_EXPORTS: [], HAVE_EM_ASM: 0, PTHREADS: 1, MEMORY64: 1, PROXY_TO_PTHREAD: 1, STANDALONE_WASM: 0,
     HAS_MAIN: 0, MINIMAL_RUNTIME: 0, MAIN_READS_PARAMS: 0, STACK_OVERFLOW_CHECK: 0, SIDE_MODULE: 0,
-    EXPORTED_FUNCTIONS: ['_free'], REQUIRED_EXPORTS: [], EXPORT_IF_DEFINED: ['main'], USER_EXPORTS: ['_free', '_main'] };
+    EXPORTED_FUNCTIONS: ['_free'], REQUIRED_EXPORTS: [], EXPORT_IF_DEFINED: ['main'], USER_EXPORTS: ['_free', '_main'], ASYNCIFY: 0 };
   const features = updateSettingsGlue(settingsOf(values), metadata, ['foo']);
   assert.deepEqual(features, ['--mvp-features', '--enable-threads', '--enable-memory64']);
+  // JSPI (ASYNCIFY=2, the edge link) adds reference types, as emscripten.py does.
+  assert.deepEqual(updateSettingsGlue(settingsOf({ ...structuredClone(values), ASYNCIFY: 2 }), metadata, ['foo']),
+    ['--mvp-features', '--enable-threads', '--enable-memory64', '--enable-reference-types']);
   assert.deepEqual(values.DEFAULT_LIBRARY_FUNCS_TO_INCLUDE, ['$x', '__table_base', 'foo', '$exitJS', '$handleException', '$stringToUTF8OnStack', '$HEAPU64']);
   assert.equal(values.HAS_MAIN, true);
   assert.deepEqual(values.WEAK_IMPORTS, ['foo']);
@@ -238,7 +241,7 @@ test('argument templates expand lists and platform paths', () => {
 
 test('JS symbol dependencies become linker exports and the stub library', () => {
   const values = { REQUIRED_EXPORTS: ['malloc'], DEFAULT_LIBRARY_FUNCS_TO_INCLUDE: ['$x'], EXPORTED_RUNTIME_METHODS: ['y'],
-    EXPORTED_FUNCTIONS: ['_free', '_jsFn', '_free'], EXPORT_IF_DEFINED: ['main', 'main'], ERROR_ON_UNDEFINED_SYMBOLS: 1 };
+    EXPORTED_FUNCTIONS: ['_free', '_jsFn', '_free'], EXPORT_IF_DEFINED: ['main', 'main'], ERROR_ON_UNDEFINED_SYMBOLS: 1, ASYNCIFY: 0 };
   const settings = settingsOf(values);
   const jsSyms = addJsDependencies(settings, { deps: { $x: ['calloc'], $y: ['strlen'], jsFn: ['free'], none: [] }, extraLibraryFuncs: [] });
   assert.deepEqual(values.REQUIRED_EXPORTS, ['malloc', 'calloc', 'strlen', 'free']);

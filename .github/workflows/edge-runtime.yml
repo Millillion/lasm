@@ -67,6 +67,8 @@ jobs:
           for name in leanrt leancpp lasmhost; do cp .work/edge-libraries/build/lib/lean/lib$name.a .work/edge-runtime/lib/; done
           cp .work/edge-libraries/build-inputs.json .work/edge-runtime/
           node -e "const f=require('node:fs'),c=require('node:crypto');const d='.work/edge-runtime/lib';const files=Object.fromEntries(f.readdirSync(d).sort().map(n=>[n,c.createHash('sha256').update(f.readFileSync(d+'/'+n)).digest('hex')]));f.writeFileSync('.work/edge-runtime/libraries.json',JSON.stringify({schema:1,profile:'edge',baseRuntimeManifestSha256:require('./scripts/ci/node-runtime-source.json').runtimeManifestSha256,source:process.env.GITHUB_SHA,files},null,2)+'\n');console.log(JSON.stringify(files,null,2))"
+      - name: Lasm.JS edge glue and Emscripten's single-threaded system libraries
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/edge-extras-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/edge/build-edge-extras.mjs .work/edge-runtime .work/node-runtime-restored/runtime --cache .cache/ci-application-tools
       - name: Package the tool archive and compare it with the catalog
         id: package
         run: |

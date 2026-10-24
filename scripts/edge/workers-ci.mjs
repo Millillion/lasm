@@ -5,7 +5,7 @@
 // plan's budgets. Needs LASM_APPLICATION_RUNTIME and LASM_EDGE_RUNTIME.
 //   node scripts/edge/workers-ci.mjs WORK_DIR TOOLS_DIR
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,7 +31,7 @@ if (!existsSync(hono)) {
 if (!existsSync(pure)) cpSync(join(root, 'examples/edge-pure'), pure, { recursive: true });
 
 // The resource guard starts commands with a minimal environment: pass the runtimes on.
-const passed = ['LASM_APPLICATION_RUNTIME', 'LASM_EDGE_RUNTIME', 'LASM_BUILD_JOBS'].filter(key => process.env[key]).map(key => `${key}=${resolve(process.env[key]) === process.env[key] || key === 'LASM_BUILD_JOBS' ? process.env[key] : resolve(process.env[key])}`);
+const passed = ['LASM_APPLICATION_RUNTIME', 'LASM_EDGE_RUNTIME', 'LASM_BUILD_JOBS', 'LASM_KEEP_LINK_WORK'].filter(key => process.env[key]).map(key => `${key}=${resolve(process.env[key]) === process.env[key] || key === 'LASM_BUILD_JOBS' ? process.env[key] : resolve(process.env[key])}`);
 const bounded = [join(root, 'scripts/full-lean/run-bounded.mjs'), '--', 'python3', join(root, 'scripts/full-lean/base-pages.py'), 'env', ...passed];
 for (const [name, project, served] of [['hono', hono, hono], ['pure', pure, join(pure, 'workers')]]) {
   const started = Date.now();
@@ -52,6 +52,19 @@ for (const [name, project, served] of [['hono', hono, hono], ['pure', pure, join
     memory: node.wasmMemoryAfterMiB < budget.memoryMiB / 2,
   };
 }
+// The Node link driver's edge recipe against emcc on the pure example's kept
+// link inputs (LASM_KEEP_LINK_WORK=1 in the workflow): byte-identical output.
+if (process.env.LASM_KEEP_LINK_WORK) {
+  const applications = join(pure, '.lake/lasm/applications');
+  const builds = readdirSync(applications).flatMap(app => readdirSync(join(applications, app)).filter(name => name.startsWith('.build-'))
+    .map(name => join(applications, app, name))).filter(dir => existsSync(join(dir, 'link.rsp')))
+    .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs);
+  const out = join(work, 'edge-link-compare');
+  run(process.execPath, [join(root, 'scripts/full-lean/run-bounded.mjs'), '--', 'python3', join(root, 'scripts/full-lean/base-pages.py'),
+    process.execPath, join(root, 'scripts/edge/compare-edge-link.mjs'), builds[0], process.env.LASM_EDGE_RUNTIME,
+    process.env.LASM_APPLICATION_RUNTIME, out]);
+  results.edgeLinkCompare = JSON.parse(readFileSync(join(out, 'compare.json'), 'utf8'));
+}
 writeFileSync(join(work, 'workers-results.json'), JSON.stringify(results, null, 2) + '\n');
 const rows = Object.entries(results.apps).map(([name, a]) => `| ${name} | ${(a.workerd.bundle.bytes / MiB).toFixed(2)} MiB (${(a.workerd.bundle.gzipBytes / 1024).toFixed(0)} KiB gzip) | ${a.node.startupMs} / ${a.deno.startupMs} / ${a.bun.startupMs} ms | ${a.node.trivialMsPerRequest} / ${a.node.jsonMsPerRequest} ms | ${a.node.wasmMemoryAfterMiB} MiB | ${['workerd', 'node', 'deno', 'bun'].map(e => `${e} ${a[e].passed ? 'pass' : 'FAIL'}`).join(', ')} |`);
 const summary = `### Cloudflare Workers (experimental edge build)\n\n| App | Bundle (wrangler dry run) | Startup Node / Deno / Bun | Per request, trivial / heavier (Node) | Wasm memory | Checks |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\nBudgets (Free plan): bundle < 64 MiB, startup < 1 s, CPU < 10 ms per request, memory < 128 MB.\n`;
@@ -60,4 +73,5 @@ if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMM
 const failed = Object.entries(results.apps).flatMap(([name, a]) => [
   ...['workerd', 'node', 'deno', 'bun'].filter(e => !a[e].passed).map(e => `${name} on ${e}`),
   ...Object.entries(a.budget).filter(([, ok]) => !ok).map(([what]) => `${name} ${what} budget`)]);
+if (results.edgeLinkCompare && !results.edgeLinkCompare.identical) failed.push('the Node link driver\'s edge link differs from emcc\'s');
 if (failed.length) { console.error('Failed: ' + failed.join(', ')); process.exit(1); }

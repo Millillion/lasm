@@ -12,6 +12,9 @@ export const edgeRuntimeCatalog = JSON.parse(await readFile(new URL('../edge-run
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 export const edgeArchives = ['libleanrt.a', 'libleancpp.a', 'liblasmhost.a'];
+// Built beside them (scripts/edge/build-edge-extras.mjs): Lasm.JS's edge glue,
+// and Emscripten's single-threaded system libraries for the Node link driver.
+export const edgeExtras = ['liblasmjsedge.a'];
 
 /** Locates and verifies the edge runtime for a verified Node runtime bundle:
  * LASM_EDGE_RUNTIME (maintainers, CI), the package's targets/<name>-edge, or the
@@ -40,11 +43,20 @@ export async function edgeRuntime(nodeRuntime, { directory = process.env.LASM_ED
   if (manifest.baseRuntimeManifestSha256 !== nodeRuntime.identity)
     throw new Error(`The edge runtime was built for runtime ${manifest.baseRuntimeManifestSha256}, not this Lasm's ${nodeRuntime.identity}`);
   const libraries = {};
-  for (const archive of edgeArchives) {
+  for (const archive of [...edgeArchives, ...edgeExtras.filter(name => manifest.files?.[name])]) {
     const file = join(directory, 'lib', archive);
     const sha256 = existsSync(file) ? await hashFile(file) : null;
     if (!sha256 || sha256 !== manifest.files?.[archive]) throw new Error(`Edge runtime archive ${archive} is missing or changed`);
     libraries[archive] = file;
   }
-  return { directory, manifest, libraries, identity: JSON.stringify(manifest.files) };
+  // The single-threaded system libraries, verified like the archives.
+  let sysroot;
+  if (manifest.sysroot) {
+    sysroot = { cache: directory, directory: manifest.sysroot.directory };
+    for (const [name, digest] of Object.entries(manifest.sysroot.files)) {
+      const file = join(directory, 'sysroot/lib', manifest.sysroot.directory, name);
+      if (!existsSync(file) || await hashFile(file) !== digest) throw new Error(`Edge runtime system library ${name} is missing or changed`);
+    }
+  }
+  return { directory, manifest, libraries, sysroot, identity: JSON.stringify({ files: manifest.files, sysroot: manifest.sysroot?.files ?? null }) };
 }

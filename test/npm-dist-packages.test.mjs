@@ -32,7 +32,7 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
     const cTier = c.toolchains.lean[lean].tiers.c ? Object.keys(c.toolchains.lean[lean].tiers.c).map(p => `@lasm/lean-c-${p}`) : [];
     const edge = c.edgeRuntimes.lean[lean] ? ['@lasm/lean-edge-runtime'] : [];
     assert.deepEqual(by('demand'), [...cTier, ...edge, '@lasm/lean-ext-elab', '@lasm/lean-ext-meta', '@lasm/lean-ext-rest'].sort());
-    if (edge.length) assert.equal(packages.find(p => p.name === '@lasm/lean-edge-runtime').license, 'Apache-2.0 AND MIT');
+    if (edge.length) assert.equal(packages.find(p => p.name === '@lasm/lean-edge-runtime').license, 'Apache-2.0 AND MIT AND (MIT OR NCSA) AND Apache-2.0 WITH LLVM-exception');
     assert.ok(!packages.some(p => p.name.includes('/git-')), 'Lasm ships no Git');
     for (const pkg of packages) {
       assert.ok(pkg.artifact.bytes <= maximumPackageBytes);

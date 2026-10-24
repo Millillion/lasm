@@ -86,13 +86,16 @@ jobs:
         run: node --test test/edge.test.mjs
       - name: Pinned local platform tools (wrangler with workerd, Deno, Bun)
         run: npm install --prefix .work/edge-tools --no-audit --no-fund wrangler@4.152.0 deno@2.9.6 bun@1.4.4
-      - name: Managed Emscripten SDK for the edge link (its own bounded step)
+      - name: Managed Emscripten SDK (emcc, for the edge recipe's byte comparison)
         run: |
           node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/edge-sdk-resources.json -- node --input-type=module -e "const { provisionSdk } = await import('./src/managed-sdk.mjs'); const sdk = await provisionSdk({ log: console.log }); console.log(sdk.identity)"
+      - name: Extract the packaged edge runtime (what users get)
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
       - name: Build, serve and check the Workers apps
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
-          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+          LASM_KEEP_LINK_WORK: '1'
         run: node scripts/edge/workers-ci.mjs .work/edge-apps .work/edge-tools
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()

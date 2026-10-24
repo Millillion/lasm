@@ -40,15 +40,17 @@ async function buildEdge(input, target, buildOptions, verbose) {
   const source = resolve(input), projectDirectory = findApplicationProject(source) ?? dirname(source);
   const selection = await selectLeanVersion(source);
   const nodeRuntime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit });
-  let result = await buildApplicationWithProgress(input, buildOptions);
+  let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built' });
   const found = await findEdgeProgram({ result, nodeRuntime });
   let program = found.cached;
+  if (program && result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
   if (!program) {
-    result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: true });
+    // A Node build reused from its cache kept no link inputs: link it again.
+    if (!result.linkWork) result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: true });
     try {
       console.error('[lasm] Linking for the edge (experimental edge build)…');
       const { provisionEdgeLinker } = await import('./edge/edge-link.mjs');
-      const sdk = await provisionEdgeLinker({ log: message => console.error('[lasm] ' + message) });
+      const sdk = await provisionEdgeLinker(found.edge, { log: message => console.error('[lasm] ' + message) });
       program = linkCachedEdgeProgram({ result, nodeRuntime, edge: found.edge, key: found.key, sdk, verbose });
     } finally {
       if (result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });

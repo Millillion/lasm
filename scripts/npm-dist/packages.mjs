@@ -107,7 +107,10 @@ export const toolComponents = Object.freeze({
   // The edge runtime (docs/EDGE.md): wasm64 static libraries built from Lean's
   // runtime sources with Lasm's patches, and Lasm's host bridge.
   'lean-edge': { common: [["Lean's C++ runtime, built single-threaded for WebAssembly (libleanrt.a, libleancpp.a)", 'Apache-2.0'],
-    ["Lasm's host bridge (liblasmhost.a)", 'MIT']] },
+    ["Lasm's host bridge and Lasm.JS edge glue (liblasmhost.a, liblasmjsedge.a)", 'MIT'],
+    ['Emscripten system libraries (sysroot/): Emscripten library code', '(MIT OR NCSA)'],
+    ['musl libc (in libc.a); mimalloc (libmimalloc.a)', 'MIT'],
+    ['LLVM libc++, libc++abi, libunwind, compiler-rt (sysroot/)', 'Apache-2.0 WITH LLVM-exception']] },
   'emscripten-native': {
     common: [['LLVM: clang, lld/wasm-ld, llvm-nm, llvm-objcopy, clang resource headers', 'Apache-2.0 WITH LLVM-exception'],
       ['Binaryen: wasm-opt, wasm-emscripten-finalize, wasm-metadce', 'Apache-2.0']],
