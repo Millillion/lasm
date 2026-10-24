@@ -15,7 +15,14 @@
   or discard remote work. Push failures must not pause development or local
   commits. Per the user's latest instruction, attempt a push at least once after
   each commit; if it fails, retain the commit locally, continue work, and try
-  again after the next commit. npm publication remains unauthorized.
+  again after the next commit.
+- npm publication (user decision 2026-10-24) happens only through the
+  `release.yml` workflow: a version bump in `package.json`, merged to `main`
+  through a release PR whose candidate checks passed, triggers OIDC trusted
+  publishing with provenance, the `v<version>` tag and the GitHub release.
+  Never publish manually or with tokens. The agent may open and merge release
+  PRs itself once their checks pass; the first public release (0.1.0) waits for
+  the user's explicit go-ahead.
 - Prioritize the ordinary Lean-on-Node installed workflow in `docs/PLAN.md`.
   Lasm targets five platforms: Linux and macOS on x86-64 and ARM64, and Windows
   on x86-64 (user decision, 2026-10-16; see `docs/PLAN.md`). Windows ARM64 was

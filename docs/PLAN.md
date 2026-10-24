@@ -686,6 +686,14 @@ folded into Phases 5.2/5.3 and 7.
     side module. GMP stays only in the compiler's native Lean binaries and the
     C tier, covered by notices and mirrored sources. The final release
     candidate and gate run after this rebuild.
+  - **Release process (user decision 2026-10-24):** releases are version
+    bumps. A release PR changes `package.json` `version` and adds
+    `docs/release/<version>-notes.md`; CI runs the candidate checks; on merge to
+    `main`, `release.yml` publishes new packages via npm trusted publishing
+    (OIDC, provenance), verifies `npm create lasm@<version>`, tags and creates
+    the GitHub release. One-time bootstrap by the user: `npm login`, 0.0.0
+    placeholders (deprecated afterwards) and `npm trust github` per package.
+    The agent merges release PRs once green; 0.1.0 waits for the user's go.
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as
