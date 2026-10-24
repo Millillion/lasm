@@ -108,6 +108,8 @@ jobs:
         run: node scripts/ci/fetch-node-candidate.mjs
       - name: Init, build, run and request every template
         run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates λ" .work/templates.json
+      - name: Node exec flags (per-process flags, --inspect, Std.Http server) on a built app
+        run: node scripts/ci/exec-flags-candidate.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm exec flags λ" .work/exec-flags.json
       - if: inputs.docker && startsWith(matrix.platform, 'linux-') && needs.adapter.result == 'success'
         uses: actions/download-artifact@v8
         with:

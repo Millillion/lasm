@@ -242,13 +242,15 @@ try {
     assert.notEqual(broken.code, 0);
     assert.match(broken.stderr, /Lasm\.JS binding check failed:\n {2}nope: local-lib export "nope" is missing/);
     // Node exec flags: per-process V8/Node options (--max-old-space-size, --expose-gc,
-    // --stack-size, --title, ...) must not reach pthread Workers' execArgv, and
-    // per-thread ones (--enable-source-maps, --inspect, ...) still work: a threaded
-    // program and a Std.Http server under each flag set (sockets are allowed here).
+    // --stack-size, --title, ...) must not reach pthread Workers' execArgv. This
+    // sandbox denies the time zone files Std.Http's Date header reads (and the
+    // offline phase denies sockets), so here only the program part runs, online and
+    // again offline; templates.yml runs the server and --inspect sets unsandboxed.
     writeFileSync(join(project, 'ExecFlags.lean'), readFileSync(join(workspace, 'fixtures', 'ExecFlags.lean')));
     result.execFlagsDist = join(project, 'exec flags dist');
     assert.equal(npx('exec flags deployment', ['build', 'ExecFlags.lean', '--output', result.execFlagsDist]).code, 0);
-    const execFlags = run('Node exec flags', process.execPath, [join(workspace, 'node-exec-flags.mjs'), join(workspace, 'exec-flags-online'), '--dist', result.execFlagsDist]);
+    const execFlags = run('Node exec flags', process.execPath, [join(workspace, 'node-exec-flags.mjs'), join(workspace, 'exec-flags-online'),
+      '--dist', result.execFlagsDist, '--no-network']);
     result.execFlags = JSON.parse(readFileSync(join(workspace, 'exec-flags-online/result.json'), 'utf8')).results
       .map(({ node, flags, passed }) => ({ node, flags, passed })); save();
     assert.equal(execFlags.code, 0, execFlags.stdout + execFlags.stderr);
@@ -344,8 +346,7 @@ try {
       const expected = await oracle(fixture, args, project, false, true); assert.equal(expected.code, 0);
       await deployment(name, output, fixture, [{ args, expected }], project, false, true);
     }
-    // Node exec flags, offline: the program part only (sockets are denied here;
-    // the lake phase ran the server and --inspect sets on the same deployment).
+    // Node exec flags, offline: the program part again, on the lake phase's deployment.
     const execFlags = run('Node exec flags (no network)', process.execPath, [join(workspace, 'node-exec-flags.mjs'),
       join(workspace, 'exec-flags-offline'), '--dist', result.execFlagsDist, '--no-network']);
     result.execFlagsOffline = JSON.parse(readFileSync(join(workspace, 'exec-flags-offline/result.json'), 'utf8')).results

@@ -7,12 +7,13 @@
 // Without --dist, builds integration/fixtures/exec-flags with this source tree.
 // Each --node (default: this Node) runs the program and the Std.Http server
 // under every flag set; output must equal the run without flags. --no-network
-// (for sandboxes that deny sockets) skips the server and the --inspect sets.
+// skips the server and the --inspect sets, for sandboxes that deny sockets or the
+// time zone files that Std.Http's Date header reads (installed acceptance).
 import assert from 'node:assert/strict';
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
-import { createServer } from 'node:net';
+import { connect, createServer } from 'node:net';
 import { fileURLToPath } from 'node:url';
 
 const args = process.argv.slice(2);
@@ -44,6 +45,24 @@ const flagSets = [[], ['--max-old-space-size=2048'], ['--stack-size=2000'], ['--
   ['--inspect=0', '--max-old-space-size=2048', '--expose-gc']];
 const freePort = () => new Promise((done, fail) => { const s = createServer(); s.on('error', fail);
   s.listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => done(port)); }); });
+// One HTTP/1.1 GET over a plain socket: no fetch/undici, so no proxy or
+// environment-dependent client behaviour; errors keep their code.
+const get = port => new Promise((resolve, reject) => {
+  const socket = connect({ host: '127.0.0.1', port });
+  let data = '';
+  socket.setTimeout(20_000, () => socket.destroy(new Error('HTTP request timed out')));
+  socket.on('connect', () => socket.write(`GET / HTTP/1.1\r\nHost: 127.0.0.1:${port}\r\nConnection: close\r\n\r\n`));
+  socket.on('data', chunk => { data += chunk; });
+  socket.on('error', error => reject(new Error(`${error.code ?? ''} ${error.message}`.trim())));
+  socket.on('close', () => {
+    const [head, ...rest] = data.split('\r\n\r\n'), body = rest.join('\r\n\r\n');
+    const status = Number(/^HTTP\/1\.[01] (\d{3})/.exec(head)?.[1]);
+    if (!status) return reject(new Error(`No HTTP response: ${JSON.stringify(data.slice(0, 200))}`));
+    // A chunked body: keep the payload of its first chunk.
+    const chunked = /\r\ntransfer-encoding: *chunked/i.test(head) ? /^[0-9a-f]+\r\n([\s\S]*?)\r\n/i.exec(body)?.[1] : undefined;
+    resolve({ status, body: chunked ?? body });
+  });
+});
 async function serve(node, flags) {
   const port = await freePort();
   const child = spawn(node, [...flags, join(dist, 'main.mjs'), 'serve'], { cwd: dist, env: { ...process.env, PORT: String(port) }, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -53,8 +72,10 @@ async function serve(node, flags) {
     const deadline = Date.now() + 60_000;
     while (!stdout.includes('Listening on') && child.exitCode === null && Date.now() < deadline) await new Promise(r => setTimeout(r, 100));
     assert.ok(stdout.includes('Listening on'), `server did not start: ${stderr.slice(-2000)}`);
-    const response = await fetch(`http://127.0.0.1:${port}/`, { signal: AbortSignal.timeout(20_000) });
-    return { status: response.status, body: await response.text(), stderr: stderr.replace(/Debugger listening on .*\n|For help, see: .*\n/g, '') };
+    const response = await get(port).catch(error => {
+      throw new Error(`${error.message}; server stdout ${JSON.stringify(stdout.slice(-500))} stderr ${JSON.stringify(stderr.slice(-1500))} exit ${child.exitCode}`);
+    });
+    return { ...response, stderr: stderr.replace(/Debugger listening on .*\n|For help, see: .*\n/g, '') };
   } finally { child.kill('SIGKILL'); }
 }
 const results = [];
@@ -68,7 +89,7 @@ for (const node of nodes) {
     const program = { code: run.status, signal: run.signal, stdout: run.stdout, stderr };
     baseline ??= program;
     let server, serverError;
-    if (network) try { server = await serve(node, flags); } catch (error) { serverError = error.message; }
+    if (network) try { server = await serve(node, flags); } catch (error) { serverError = [error.message, error.cause?.code, error.cause?.message].filter(Boolean).join(': '); }
     const passed = program.code === 0 && program.stderr === '' && program.stdout === baseline.stdout
       && (!network || server?.status === 200 && server.body === '{"ok":true}' && server.stderr === '');
     results.push({ node: version, flags, passed, program, server, serverError });
