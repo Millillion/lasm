@@ -805,7 +805,7 @@ receipt now also records the source (`npm-installed`, `npm-fetched` or `https`).
 | `@lasm/lean-core-init`, `@lasm/lean-core-std` | `dependencies` | Init and Std module data |
 | `@lasm/emscripten-shared` | `dependencies` | Emscripten JavaScript subset and sysroot |
 | `@lasm/lean-ext-meta`, `-ext-elab`, `-ext-rest` | never installed; `npm pack` on demand | extended Lean tier |
-| `@lasm/git-<platform>` | never installed; `npm pack` on demand | Git (dugite-native), Lake projects only |
+| `@lasm/git-<platform>` | never installed; `npm pack` on demand | Git (dugite-native), Lake projects only; **removed 2026-10-24** (system Git) |
 | `@lasm/lean-c-<platform>` | never installed; `npm pack` on demand | C tier (Lean's clang as `cc`, C library headers, link libraries), Lake projects with C code only; also `licenses/` with the archive's notices and Lean's LICENSE/LICENSES, and an SPDX `license` expression of every component (added 2026-10-23) |
 | `create-lasm` | separate package (`npm create lasm`), exact dependency on the CLI | runs `lasm init` with the arguments unchanged; same version as `@lasm/cli` (added 2026-10-23) |
 
@@ -971,10 +971,9 @@ URL); it also showed that `npm pack` records the archive's file mode (a download
 - **Publication** to the public registry and its order (tool packages before the
   CLI), npm provenance / trusted publishing per package from CI, and 2FA for the
   `lasm` organization: user decisions, not started.
-- **Git redistribution:** the Git packages redistribute desktop/dugite-native
-  binaries (GPL-2.0 Git and bundled components) under the `@lasm` scope; the README
-  points to upstream, but whether to republish them or keep downloading Git from
-  dugite-native is a licensing and maintenance decision.
+- **Git redistribution: removed** (user decision 4, 2026-10-23). The `@lasm/git-*`
+  packages above were dropped; Lasm uses the system `git`, needed only for Lake
+  projects with dependencies ([system Git](MANAGED_GIT.md)).
 - **Disk:** an installed archive exists in `node_modules`, in npm's cache and,
   briefly, in Lasm's staging before extraction (the copy could become a hard link).
 - **Determinism across npm versions:** tarball bytes depend on npm's tar and gzip

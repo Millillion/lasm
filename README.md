@@ -15,6 +15,13 @@ the compiler and for built applications, and is tested on Node 24.22.1 and 26.12
 (the compiler on Node 24 only on Linux; on macOS and Windows on Node 26.12.1).
 Lasm downloads its matching **Lean 4.35.0**, Lake, and build tools; you do not install
 them yourself (the older candidate `.46` used Node 26.10.0 / Lean 4.34.1).
+**Git, only for Lake projects with dependencies:** Lasm uses the `git` on your PATH
+and ships none (current source; candidates up to `.58` download one). Programs and
+Lake projects without dependencies need no Git. A project with Git or Reservoir
+dependencies stops before Lake runs, with the install command: macOS
+`xcode-select --install` (or `brew install git`), Debian/Ubuntu `sudo apt install
+git`, Fedora/RHEL/Amazon Linux `sudo dnf install git`, Windows `winget install --id
+Git.Git -e` (or git-scm.com).
 The package is experimental and **has not been published to npm**.
 
 ## Get started
@@ -95,7 +102,7 @@ without installing); the bin stays `lasm`. These registry commands are **not
 available yet**. Current source, not yet in a candidate,
 can take its build tools from exact-pinned `@lasm/…` npm packages instead of
 downloading them, and fetches the Lake/`Lean`-import data, the C tier
-(`@lasm/lean-c-<platform>`, only for Lake projects with C code) and Git with your own
+(`@lasm/lean-c-<platform>`, only for Lake projects with C code) with your own
 npm on first use; this was validated only against a local test registry
 ([npm distribution](docs/TOOLCHAIN_SLIMMING.md#phase-3-2026-10-16-npm-distribution)).
 `LASM_ARTIFACT_SOURCE=npm` forbids direct downloads; `https` ignores the packages.
@@ -368,8 +375,8 @@ A summary; the sections above and the linked pages have the details.
   `Lasm.JS`.
 - **`Std.Http`** works but serves about 660 requests per second under Lasm; use
   Express or Hono with Lean handlers for production HTTP.
-- **Lake dependencies over SSH:** the managed Git has no SSH client on Linux; use
-  HTTPS or a configured system SSH ([managed Git](docs/MANAGED_GIT.md)).
+- **Lake dependencies** use your system Git (and its SSH/credential setup); Lasm
+  ships no Git ([system Git](docs/MANAGED_GIT.md)).
 - Complete `IO.FS`, concurrency, subprocess/signal/terminal parity, every
   third-party package and the full upstream suite are not release guarantees
   ([language coverage](docs/LANGUAGE_COVERAGE.md)).

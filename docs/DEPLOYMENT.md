@@ -80,8 +80,9 @@ Run it locally (Docker; no accounts): build the three applications with
 The compiler (`npx lasm …`) runs on Node 24 or newer (candidates are tested on
 Node 24.22.1 and 26.12.1; the platform matrix also builds with 24.0.0) on the
 five build platforms in the [README](../README.md#supported-environments). On
-Linux it needs **glibc 2.34 or newer**: the managed Git (dugite-native 2.53.0)
-uses GLIBC_2.34 symbols and Lean 4.35.0's LLVM libraries GLIBC_2.30; every other
+Linux it needs **glibc 2.34 or newer**. The floor was set by the formerly bundled
+Git (dugite-native 2.53.0, GLIBC_2.34; Lasm now uses the system Git, needed only for
+Lake projects with dependencies); Lean 4.35.0's LLVM libraries need GLIBC_2.30; every other
 managed tool needs 2.27 or less (measured with `objdump -T` on the x64 and arm64
 archives, 2026-10-23). Installed-package acceptance runs on Ubuntu 24.04
 (glibc 2.39); the platform matrix also builds the three sample applications

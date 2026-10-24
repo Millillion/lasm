@@ -24,8 +24,9 @@ system libraries, and other Node/npm/Lean versions are unverified as build machi
 **Current source (Phase 5.1)** accepts Node 24 or newer for the compiler (tested on
 Node 24.22.1 and 26.12.1; `bin/lasm.mjs` refuses older Node before loading anything:
 `Lasm requires Node 24 or newer; you are running Node 22.23.4. Install Node 24 or
-newer and retry.`) and lowers the compiler's Linux floor to glibc 2.34, the newest
-symbol version among its managed tools (managed Git; Lean's LLVM needs 2.30).
+newer and retry.`) and lowers the compiler's Linux floor to glibc 2.34. That floor
+came from the formerly bundled Git; the remaining managed tools need 2.30 (Lean's
+LLVM), and a lower floor is untested, so 2.34 stays.
 Candidates up to Phase 4 require their exact Node release and glibc 2.39.
 On Linux musl-based distributions
 such as Alpine are unsupported. Linux builds require the standard OS shell, loader, libc and system
@@ -36,6 +37,11 @@ for exact artifact hashes, native CI results and measurements.
 The installed package contains the Lean Wasm runtime, standard-library archives,
 and host adapters. On the first build candidate `.46` downloads pinned native
 Lean/Lake, Python and the Emscripten/LLVM/Binaryen SDK; Lake projects also provision Git.
+Current source ships and downloads no Git: Lake projects with Git or Reservoir
+dependencies use the system `git` (Git is needed only for them; without it the build
+stops before Lake runs, with the install command for each OS), and dependency-free
+Lake projects and programs need none. The Git download sizes below are those
+candidates'.
 HTTPS access to GitHub releases, Emscripten's Google Storage downloads and the npm
 registry is needed (current source, below, needs no Google Storage download).
 Downloads, sizes and SHA-256 checksums are pinned in the
