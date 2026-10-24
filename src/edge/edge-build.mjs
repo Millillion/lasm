@@ -2,7 +2,7 @@
 // compiled program relinked for edge isolates, plus a generated Worker entry
 // module. Experimental: needs the edge runtime (edge-runtime.mjs) and the
 // managed Emscripten SDK (one download, reused).
-import { mkdirSync, readFileSync, writeFileSync, copyFileSync, existsSync, rmSync, renameSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, copyFileSync, existsSync, rmSync, renameSync, readdirSync, statSync } from 'node:fs';
 import { basename, join, relative, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -11,8 +11,15 @@ import { linkEdgeProgram, edgeLinkSettings } from './edge-link.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 export const edgeHostFiles = ['edge-start.mjs', 'edge-host.mjs', 'edge-js.mjs'];
+// Edge targets: where the output goes and what each writes beside the program.
 export const edgeTargets = {
-  workers: { summary: 'Cloudflare Workers: workers/ (worker.mjs, the program and its host; wrangler.toml when the project has none)', output: 'workers' },
+  workers: { label: 'Cloudflare Workers', summary: 'Cloudflare Workers: workers/ (worker.mjs, the program and its host; wrangler.toml when the project has none)', output: 'workers',
+    write({ staging, projectDirectory, modules }) {
+      writeFileSync(join(staging, 'worker.mjs'), workersEntry(modules));
+      const rootConfig = ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc'].find(name => existsSync(join(projectDirectory, name)));
+      if (!rootConfig) writeFileSync(join(staging, 'wrangler.toml'), workersConfig(workerName(projectDirectory)));
+      return { note: rootConfig && (out => `your ${rootConfig} must use main = "${out}/worker.mjs" and the CompiledWasm rule`) };
+    } },
 };
 // Tested together in CI (.github/workflows/workers.yml).
 export const workersCompatibilityDate = '2026-10-01';
@@ -96,11 +103,60 @@ const workerName = directory => {
   return String(name ?? basename(directory)).toLowerCase().replace(/^@[^/]+\//, '').replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 54) || 'lasm-app';
 };
 
-/** result: buildApplication's result with linkWork (keepLinkWork). */
-export async function buildEdgeTarget({ target, source, projectDirectory, result, nodeRuntime, sdk, log = console.error, verbose = false, output }) {
-  if (!edgeTargets[target]) throw new Error(`Unknown edge target ${target}`);
-  if (!result.linkWork) throw new Error('The edge build needs the Node build\'s link inputs (internal error)');
+// Inputs of the linked edge program besides the Node build: the edge link and
+// its glue. The host modules (edge-*.mjs) are copied at delivery, not linked.
+const linkSources = ['edge-link.mjs', 'edge-pre.js', 'edge-library.js', 'lasm_js_edge.c'];
+const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+
+/** The edge program's cache identity: the Node build's signature (its objects
+ * and initializer plan), the edge runtime, the edge link and its settings. */
+export function edgeProgramKey({ result, edge, suspend = 'jspi' }) {
+  return sha256(JSON.stringify({ schema: 1, node: result.signature, runtime: edge.manifest.files, settings: edgeLinkSettings, suspend,
+    sources: Object.fromEntries(linkSources.map(file => [file, sha256(readFileSync(join(here, file)))])) }));
+}
+
+/** Edge programs are cached beside the Node build's cache entry (one per key). */
+const cacheRoot = result => join(dirname(dirname(result.cached)), 'edge');
+function cachedProgram(result, key) {
+  const directory = join(cacheRoot(result), key);
+  try {
+    const meta = JSON.parse(readFileSync(join(directory, 'program.json'), 'utf8'));
+    if (meta.key !== key) return null;
+    for (const [file, digest] of Object.entries(meta.files)) if (sha256(readFileSync(join(directory, file))) !== digest) return null;
+    return { directory, meta };
+  } catch { return null; }
+}
+
+/** Phase 1 of an edge build: the cached program for an unchanged Node build, or null. */
+export async function findEdgeProgram({ result, nodeRuntime }) {
   const edge = await edgeRuntime(nodeRuntime);
+  const key = edgeProgramKey({ result, edge });
+  return { edge, key, cached: cachedProgram(result, key) };
+}
+
+/** Phase 2 (cache miss): link the program from a build made with keepLinkWork and cache it. */
+export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, verbose = false }) {
+  if (!result.linkWork) throw new Error('The edge build needs the Node build\'s link inputs (internal error)');
+  const root = cacheRoot(result), directory = join(root, key), staging = join(root, '.' + key + '.' + process.pid + '.partial');
+  rmSync(staging, { recursive: true, force: true });
+  let link;
+  try { link = linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: result.linkWork, out: join(staging, '.link'), verbose }); }
+  catch (error) { rmSync(staging, { recursive: true, force: true }); throw error; }
+  copyFileSync(link.program, join(staging, 'program.mjs'));
+  copyFileSync(link.wasm, join(staging, 'program.wasm'));
+  rmSync(join(staging, '.link'), { recursive: true, force: true });
+  const meta = { key, suspend: link.suspend, files: Object.fromEntries(['program.mjs', 'program.wasm'].map(file => [file, sha256(readFileSync(join(staging, file)))])) };
+  writeFileSync(join(staging, 'program.json'), JSON.stringify(meta, null, 2) + '\n');
+  // One cached program per application: older keys are superseded.
+  for (const entry of readdirSync(root)) if (entry !== key && !entry.startsWith('.')) rmSync(join(root, entry), { recursive: true, force: true });
+  rmSync(directory, { recursive: true, force: true });
+  renameSync(staging, directory);
+  return { directory, meta };
+}
+
+/** Phase 3: write the target's output (program, host, entry module, config). */
+export function writeEdgeOutput({ target, source, projectDirectory, result, edge, program, log = console.error, output, cacheHit = false }) {
+  if (!edgeTargets[target]) throw new Error(`Unknown edge target ${target}`);
   const destination = resolve(output ?? join(projectDirectory, edgeTargets[target].output));
   if (destination === resolve(projectDirectory) || !relative(destination, source).startsWith('..'))
     throw new Error('The edge output directory must not contain the Lean sources');
@@ -113,26 +169,20 @@ export async function buildEdgeTarget({ target, source, projectDirectory, result
   const staging = destination + '.lasm-staging';
   rmSync(staging, { recursive: true, force: true });
   const programDirectory = join(staging, 'lasm');
-  const link = linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: result.linkWork, out: join(staging, '.link'), verbose });
   mkdirSync(programDirectory, { recursive: true });
-  copyFileSync(link.program, join(programDirectory, 'program.mjs'));
-  copyFileSync(link.wasm, join(programDirectory, 'program.wasm'));
+  for (const file of ['program.mjs', 'program.wasm']) copyFileSync(join(program.directory, file), join(programDirectory, file));
   for (const file of edgeHostFiles) copyFileSync(join(here, file), join(programDirectory, file));
   const modules = edgeModules(projectDirectory, result.jsBindings ?? []);
-  writeFileSync(join(staging, 'worker.mjs'), workersEntry(modules));
-  const rootConfig = ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc'].find(name => existsSync(join(projectDirectory, name)));
-  if (!rootConfig) writeFileSync(join(staging, 'wrangler.toml'), workersConfig(workerName(projectDirectory)));
+  const written = edgeTargets[target].write({ staging, projectDirectory, modules });
   copyFileSync(join(result.output, 'THIRD_PARTY_NOTICES.txt'), join(staging, 'THIRD_PARTY_NOTICES.txt'));
-  const hash = file => createHash('sha256').update(readFileSync(file)).digest('hex');
   const info = { schema: 1, target, profile: 'edge', experimental: true, nodeBuildSignature: result.signature, lean: result.lean,
-    edgeRuntime: edge.manifest.files, link: { ...edgeLinkSettings, suspend: link.suspend }, modules,
-    files: { 'lasm/program.wasm': hash(join(programDirectory, 'program.wasm')), 'lasm/program.mjs': hash(join(programDirectory, 'program.mjs')) } };
+    edgeRuntime: edge.manifest.files, link: { ...edgeLinkSettings, suspend: program.meta.suspend }, programKey: program.meta.key, modules,
+    files: Object.fromEntries(Object.entries(program.meta.files).map(([file, digest]) => ['lasm/' + file, digest])) };
   writeFileSync(join(staging, 'build-info.json'), JSON.stringify(info, null, 2) + '\n');
-  rmSync(join(staging, '.link'), { recursive: true, force: true });
   rmSync(destination, { recursive: true, force: true });
   renameSync(staging, destination);
-  const wasmBytes = readFileSync(join(destination, 'lasm/program.wasm')).length;
-  log(`Built ${relative(process.cwd(), source) || source} for Cloudflare Workers (experimental): ${relative(process.cwd(), destination) || destination}`
-    + ` (program.wasm ${(wasmBytes / 1048576).toFixed(2)} MiB${rootConfig ? `; your ${rootConfig} must use main = "${relative(projectDirectory, join(destination, 'worker.mjs'))}" and the CompiledWasm rule` : ''})`);
-  return { output: destination, info, rootConfig };
+  const wasmBytes = statSync(join(destination, 'lasm/program.wasm')).size;
+  log(`${cacheHit ? 'Reused' : 'Built'} ${relative(process.cwd(), source) || source} for ${edgeTargets[target].label} (experimental): ${relative(process.cwd(), destination) || destination}`
+    + ` (program.wasm ${(wasmBytes / 1048576).toFixed(2)} MiB${written.note ? '; ' + written.note(relative(projectDirectory, destination)) : ''})`);
+  return { output: destination, info };
 }

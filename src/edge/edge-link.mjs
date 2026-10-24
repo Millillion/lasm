@@ -62,3 +62,10 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
   sdk.execute('em++', args, { stdio, env, timeout: 3_600_000, maxBuffer: 64 << 20 });
   return { program: join(out, 'program.mjs'), wasm: join(out, 'program.wasm'), usesJs, suspend };
 }
+
+/** The tools the edge link needs: Emscripten's own driver from the managed SDK
+ * (see the header). */
+export async function provisionEdgeLinker(options = {}) {
+  const { provisionSdk } = await import('../managed-sdk.mjs');
+  return provisionSdk(options);
+}
