@@ -92,15 +92,18 @@ native add-ons.
 
 ## Edge isolates (Phase 7, experimental)
 
-Cloudflare Workers is built on branch `phase-7`:
+Edge targets are in current source, unreleased and planned for 0.2.0:
 
-- the command is `lasm build --target workers`;
+- the commands are `lasm build --target workers|vercel-edge|netlify-edge|deno-deploy`;
 - the runtime is a single-threaded Lean runtime with a pure-JS host;
-- it is tested with `wrangler dev` and on Node 26, Deno and Bun by
-  [`workers.yml`](../.github/workflows/workers.yml).
+- [`workers.yml`](../.github/workflows/workers.yml) tests them with `wrangler dev`,
+  on Node 26, Deno and Bun, with `vercel build` and Vercel's `edge-runtime`,
+  with `netlify dev`, and with the Deno CLI.
 
-It is unreleased. See [deploy/workers.md](deploy/workers.md) and
-[EDGE.md](EDGE.md).
+Supabase Edge Functions are not supported: their runtime has no JSPI. See
+[deploy/workers.md](deploy/workers.md), [deploy/vercel-edge.md](deploy/vercel-edge.md),
+[deploy/netlify-edge.md](deploy/netlify-edge.md), [deploy/deno-deploy.md](deploy/deno-deploy.md)
+and [EDGE.md](EDGE.md).
 
 ## What the CI matrix runs
 

@@ -809,6 +809,11 @@ folded into Phases 5.2/5.3 and 7.
   `workers.yml` (Linux) builds from source, serves with `wrangler dev` and runs on
   Node 26, Deno and Bun with Free-plan budget gates ([deploy/workers.md](deploy/workers.md)).
   Open: a published edge runtime package and a Node-link-driver edge recipe.*
+  *Status (2026-10-24, branch `phase-7`): packaging done (`@lasm/lean-edge-runtime`
+  tool package; Node-link-driver edge recipe, byte-identical to emcc; edge output
+  cache). 7.3 in source: `--target vercel-edge` and `--target netlify-edge`. 7.4:
+  `--target deno-deploy` in source; Supabase Edge Functions not supported (its
+  runtime, V8 11.6, has no JSPI). See [EDGE.md](EDGE.md).*
 - **Phase 7 — Production hardening on Node.** Long soak and concurrency stress
   (tasks, channels, Std.Sync/Std.Async, cancellation, many threads incl.
   Windows stack commit), startup memory tuning (initial memory, 64 MiB worker

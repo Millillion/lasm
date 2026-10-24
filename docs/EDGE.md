@@ -1,7 +1,9 @@
 # Edge isolates (Phase 7)
 
-Status: **Phase 7.1 (prototype and decision), 2026-10-24, branch `phase-7`.**
-Everything here is experimental and outside 0.1.0. The Node build is unchanged.
+Status: **7.1 (prototype and decision), 7.2 (Cloudflare Workers), packaging,
+7.3 (Vercel and Netlify Edge) and 7.4 (Deno Deploy; Supabase not supported),
+2026-10-24.** Everything here is experimental, outside 0.1.0, and planned for
+0.2.0. The Node build is unchanged.
 Measured behaviour is marked as measured. Plans are marked as plans.
 
 - Prototype: [`experiments/edge/`](../experiments/edge/).
@@ -76,18 +78,113 @@ The same build also runs on Node 26.12.1, Deno 2.9.6 and **Bun 1.4.4**.
   | Hono template | 1.40 MiB (245 KiB gzip) | 51 / 48 / 19 ms | 0.070 / 0.071, 0.045 / 0.053, 0.033 / 0.037 ms | 26.6 MiB |
   | `examples/edge-pure` | 1.67 MiB (301 KiB gzip) | 113 / 55 / 19 ms | 0.117 / 0.270, 0.076 / 0.248, 0.075 / 0.206 ms | 26.6 MiB |
 
-**Not done in 7.2:**
+**Done after 7.2** (see the next sections): the packaged edge runtime, the
+Node link driver's edge recipe and the edge output cache.
 
-- **No published edge runtime package.** Builds need `LASM_EDGE_RUNTIME`
-  (the CI artifact) until the runtime is packaged and published with a release.
-- **The Node link driver.** The edge link uses the managed SDK's `emcc`
-  (about 300 MB once). A recorded edge recipe for the Node link driver would
-  remove that download.
-- **No edge output cache.** An edge build always relinks: about 20 s on top of
-  the Node build.
-- **No Workers-specific bindings API.** Workers bindings other than string
-  variables (KV, D1, R2, Durable Objects) reach Lean only as `Lasm.JS` values
-  through the `env` argument of the fetch handler.
+**Not done:** a Workers-specific bindings API. Workers bindings other than
+string variables (KV, D1, R2, Durable Objects) reach Lean only as `Lasm.JS`
+values through the `env` argument of the fetch handler.
+
+## Packaging, the Node link driver and the edge cache (after 7.2)
+
+**In current branch source.**
+
+- **The edge runtime is a tool package.** `@lasm/lean-edge-runtime`
+  (`4.35.0-lasm.1`) is an on-demand npm tool package in the 0.2 package set.
+  It carries `lean-4.35.0-wasm64-edge.tar.zst` byte for byte, with its
+  licences (`Apache-2.0 AND MIT AND (MIT OR NCSA) AND Apache-2.0 WITH
+  LLVM-exception`). Lasm provisions it like its other tools: the npm package
+  first, else the release archive (tag `lean-4.35.0-edge-v1`), both checked
+  against the SHA-256 in [`src/edge-runtimes.json`](../src/edge-runtimes.json).
+  `LASM_EDGE_RUNTIME` is only an override. The archive also holds the Lasm.JS
+  edge glue (`liblasmjsedge.a`) and the non-threaded system libraries.
+  [`edge-runtime.yml`](../.github/workflows/edge-runtime.yml) builds and packs
+  it deterministically (`scripts/edge/package-edge-runtime.mjs`), and
+  `check-edge-catalog.mjs` compares it with the pin.
+- **No Emscripten SDK for edge builds.** The Node link driver replays a
+  recorded edge link
+  ([`recipe-emscripten-6.0.9-edge.json`](../src/link-driver/recipe-emscripten-6.0.9-edge.json),
+  from `scripts/edge/derive-edge-recipe.mjs`) with the link toolchain that Node
+  builds already use. CI checks that it is byte-identical to `emcc`
+  (`compare-edge-link.mjs`). `LASM_LINK_DRIVER=emcc` uses the SDK instead.
+- **The edge cache.** The linked edge program is cached beside the Node build.
+  The key covers the Node build, the edge runtime, the link settings and the
+  link sources. An unchanged edge build takes about 3 s instead of about 75 s,
+  and a second target reuses the link.
+
+## Phase 7.3 status: Vercel Edge and Netlify Edge
+
+**In current branch source.** Both use the same program and host as Workers.
+Only the generated entry differs.
+
+- **`lasm build --target vercel-edge`** writes the zero-config function
+  `api/lasm.mjs` (`runtime: 'edge'`, the Wasm through `?module`) and its
+  files in `api/_lasm/`. `lasm init --deploy vercel-edge` adds `vercel.json`,
+  which runs `npm run build:vercel-edge` and routes every path to the function.
+  Guide: [deploy/vercel-edge.md](deploy/vercel-edge.md).
+- **`lasm build --target netlify-edge`** writes
+  `netlify/edge-functions/lasm.mjs` (inline `path: '/*'`) and `netlify/lasm/`.
+  The Wasm is embedded as a JavaScript module, because Netlify's Deno bundler
+  carries only JavaScript. `lasm init --deploy netlify-edge` adds
+  `netlify.toml`. Guide: [deploy/netlify-edge.md](deploy/netlify-edge.md).
+- **Local tests, no accounts** (in `workers.yml`):
+  - **Vercel:** `vercel build` runs offline. It produces the function and every
+    traced file. The built function is then bundled with esbuild and run in
+    Vercel's `edge-runtime` package. **Not fully faithful:** Vercel bundles at
+    deployment, and `vercel dev` needs a login, so the deployed bundle and
+    Vercel's production V8 are not reproduced.
+  - **Netlify:** `netlify build --offline` makes the eszip that Netlify
+    deploys, with Netlify's own bundler. `netlify dev --offline --no-open`
+    serves it in Netlify's local edge runtime, which is the Deno CLI. This is
+    close to production, but not Netlify's hosted Deno.
+
+| App | Vercel (gzip; Hobby limit 1 MB) | Netlify eszip (limit 20 MB) | Per request over HTTP, Netlify dev |
+| --- | --- | --- | --- |
+| Hono template | 244 KiB | 1.82 MiB | 2.8–3.3 ms |
+| `examples/edge-pure` | 301 KiB | 2.20 MiB | 3.5–3.8 ms |
+
+Measured locally (2026-10-24). Every route passed on both, including the
+stop-and-restart check on Netlify.
+
+## Phase 7.4 status: Deno Deploy; Supabase Edge Functions not supported
+
+**Deno Deploy: in current branch source.**
+
+- `lasm build --target deno-deploy` writes `deno/main.mjs`, which serves with
+  `Deno.serve` (on `PORT` when it is set), and `deno/lasm/`. `main.mjs` reads
+  `program.wasm` from the deployment at startup.
+- `lasm init --deploy deno-deploy` adds `build:deno-deploy` and
+  `start:deno` (`deno run -A deno/main.mjs`). The guide is
+  [deploy/deno-deploy.md](deploy/deno-deploy.md).
+- **Local test** (`workers.yml`): the pinned Deno CLI 2.9.6 runs
+  `deno/main.mjs`, and every route is checked. Deno Deploy runs the Deno
+  runtime, so this is close. Not reproduced: Deploy's own Deno version and
+  isolate limits. Nothing is deployed.
+- **Measured** (local): Hono template output 1.50 MiB, first response
+  112 ms after process start, 0.8 ms per request over HTTP; `edge-pure`
+  passes every route, including stop-and-restart.
+- **How much is Deno-specific:** about 20 lines, the generated `main.mjs`
+  (`denoEntry` in [`src/edge/edge-build.mjs`](../src/edge/edge-build.mjs)).
+  The program, the link, the host and the restart logic are shared with
+  Workers, Vercel and Netlify. Netlify Edge also runs on Deno.
+
+**Supabase Edge Functions: not supported.**
+
+- Supabase's edge runtime, even the latest release `v1.77.8`
+  (2026-10-21, the image `supabase functions serve` uses), runs **V8
+  11.6.189.12** ("compatible with Deno v2.1.4"). It has no JSPI:
+  `WebAssembly.Suspending` is undefined. The build fails at instantiation.
+- `supabase functions serve` also needs the whole local stack
+  (`supabase start`). The runtime image was run directly instead (Docker,
+  `--main-service`), with a per-function `deno.json` import map (`npm:hono@…`).
+- **Probe: a no-JSPI link works there.** A link with `suspend: 'none'` served
+  every Hono template route under that image. But blocking waits (`Task.get`
+  on unfinished work, `IO.sleep`, `Async.block`) would then fail, and that link
+  needs a second Node-driver recipe mode. That mode adds wasm-opt import and
+  export minification, which the Node driver does not port. Without it, the
+  build would need the 300 MB SDK.
+- **Decision:** this is not light, so it is not shipped
+  ([DECISIONS.md](DECISIONS.md)). Revisit when Supabase's runtime has JSPI.
 
 ## Platform facts
 
@@ -473,8 +570,9 @@ Free limit, and under Vercel Edge's 1 MB-gzip Hobby limit. The Node profile's
    recursion in user code fails on the edge. It stops the instance cleanly, but
    the request fails.
 3. **JSPI on platforms we cannot run locally.** Vercel Edge's production V8 is
-   unverified. Supabase's edge runtime version is checked in 7.4. Fallback:
-   the sync link (`Async` only).
+   unverified. Supabase's edge runtime (V8 11.6) has none, so Supabase is not
+   a target (7.4). Fallback: the sync link (`Async` only), which is not
+   shipped.
 4. **Bun's JSPI is young.** There is a 1.4.0–1.4.3 regression with tail calls.
    Pin and test Bun in CI.
 5. **Startup random bytes on Workers are not cryptographic** while initializers

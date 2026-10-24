@@ -1,7 +1,7 @@
 # Cloudflare Workers (experimental)
 
-Status: **experimental, unreleased.** It lives on branch `phase-7` (Phase 7.2) and
-is not in any candidate or in 0.1.0. CI tests it with `wrangler dev`, which runs
+Status: **experimental, unreleased** (Phase 7.2, planned for 0.2.0). It is not in
+any candidate or in 0.1.0. CI tests it with `wrangler dev`, which runs
 workerd (Cloudflare's runtime) locally
 ([`workers.yml`](../../.github/workflows/workers.yml)). Nothing is deployed to a
 Cloudflare account. The design, limits and measurements are in
@@ -49,12 +49,12 @@ Lasm owns `workers/` and replaces it on every build. Requirements:
 
 - **The edge runtime.** Lasm provisions it like its other tools: from the
   on-demand npm package `@lasm/lean-edge-runtime`, else the release archive
-  pinned in `src/edge-runtimes.json`, checked by SHA-256. The release stays a
-  draft until 0.2.0 publishes it, so on the branch CI and maintainers set
-  `LASM_EDGE_RUNTIME` to the
+  pinned in `src/edge-runtimes.json`, checked by SHA-256. Until 0.2.0
+  publishes them, CI and maintainers set `LASM_EDGE_RUNTIME` to the
   [`edge-runtime.yml`](../../.github/workflows/edge-runtime.yml) output.
-- **Emscripten's driver.** The first edge build downloads the managed
-  Emscripten SDK (about 300 MB, cached).
+- **No Emscripten SDK.** The edge link runs on the Node link driver with the
+  link toolchain that Node builds already download. The linked program is
+  cached, so an unchanged edge build takes seconds.
 
 ## Modules
 
