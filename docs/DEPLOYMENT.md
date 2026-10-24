@@ -10,7 +10,9 @@ every candidate's acceptance). **No claim here comes from a real cloud
 deployment**: by project policy, CI uses no cloud accounts. Platform recipes:
 [deploy/README.md](deploy/README.md).
 
-Status: candidate `.39988013618` (source `d8484c4`) passed this whole matrix,
+Node 24 on Windows x64 and macOS x64 (apps on 24.0.0 and 24.22.1, the compiler
+on 24.22.1) passed in [run 40069324836](https://github.com/Millillion/lasm/actions/runs/40069324836)
+with candidate `.58`. Status: candidate `.39988013618` (source `d8484c4`) passed this whole matrix,
 five-platform installed acceptance, the interop examples and the templates in
 [run 39988013618](https://github.com/Millillion/lasm/actions/runs/39988013618);
 it also passed the three-run cold-installation gate (runs 39994918847,
@@ -40,8 +42,8 @@ programs that start subprocesses use that helper.
 | Platform | Tested in CI with | Recipe |
 | --- | --- | --- |
 | Linux x64 and arm64, Node 24+ | `actions/setup-node` Node 24.0.0, 24.22.1 and 26.12.1 on `ubuntu-24.04` and `ubuntu-24.04-arm`; Node 22.23.4 must refuse | `node dist/main.mjs` |
-| macOS (x64, arm64) | the macOS arm64 build on `macos-15` (Node 24.22.1); five-platform installed acceptance on Node 26.12.1 | `node dist/main.mjs` |
-| Windows x64 | five-platform installed acceptance (as accepted today) | `node dist/main.mjs` |
+| macOS (x64, arm64) | the macOS x64 build on `macos-15-intel` with Node 24.0.0 and 24.22.1; the macOS arm64 build on `macos-15` (Node 24.22.1); five-platform installed acceptance on Node 26.12.1 | `node dist/main.mjs` |
+| Windows x64 | the Windows build on `windows-2025` with Node 24.0.0 and 24.22.1; five-platform installed acceptance on Node 26.12.1 | `node dist/main.mjs` |
 | Docker / Kubernetes | `node:24.22.1-bookworm-slim`, `node:26.12.1-bookworm-slim`, `node:24.20.0-bullseye-slim` (glibc 2.31), `ubuntu:22.04` and `ubuntu:24.04` with the official Node tarballs, all read-only with a 512 MB limit; `deploy/Dockerfile` built and reached over HTTP | [docker-kubernetes.md](deploy/docker-kubernetes.md), [`deploy/Dockerfile`](../deploy/Dockerfile) |
 | Google Cloud Run (gen2), Fly.io, Railway, Render, Heroku (container stack) | the same container images (these platforms run your image on Linux x64; Cloud Run gen1's gVisor is untested) | [cloud-run.md](deploy/cloud-run.md), [fly.md](deploy/fly.md), [railway.md](deploy/railway.md), [render.md](deploy/render.md), [heroku.md](deploy/heroku.md) |
 | AWS Lambda (container image, x86_64 and arm64) | `public.ecr.aws/lambda/nodejs:24` with the AWS Lambda Web Adapter 1.1.0, invoked through the image's Runtime Interface Emulator with API Gateway (HTTP API) events, read-only with 512 MB; `amazonlinux:2023` (glibc 2.34) with the Node 24 tarball | [lambda.md](deploy/lambda.md), [`deploy/lambda/Dockerfile`](../deploy/lambda/Dockerfile) |
@@ -63,11 +65,12 @@ listing records, 404s and 2 seconds of 16 concurrent clients
 
 | Job | Builds run | Where |
 | --- | --- | --- |
-| build | Linux x64 (compiler on Node 24.22.1), Linux arm64 (compiler on Node 24.0.0), macOS arm64 and Windows x64 (compiler on Node 26.12.1) | native runners |
+| build | Linux x64, Windows x64 and macOS x64 (compiler on Node 24.22.1), Linux arm64 (compiler on Node 24.0.0), macOS arm64 (compiler on Node 26.12.1) | native runners |
 | native | each runner's own Linux build plus the macOS and Windows builds | Node 24.0.0, 24.22.1, 26.12.1 on x64 and arm64; Node 22.23.4 must refuse every build |
 | containers | own Linux build in every image; macOS and Windows builds in Debian 12 and the recipe | Docker on x64 and arm64: `--read-only --tmpfs /tmp --memory=512m --memory-swap=512m`, default seccomp ([`images.json`](../scripts/platform/images.json)) |
 | lambda | Linux and macOS builds | Lambda Node 24 image + Lambda Web Adapter through the Runtime Interface Emulator, x64 and arm64 |
-| macOS | the macOS build; the Linux x64 build must refuse macOS clearly | `macos-15`, Node 24.22.1 |
+| macOS | the macOS arm64 build; the Linux x64 build must refuse macOS clearly | `macos-15`, Node 24.22.1 |
+| native-other | the Windows x64 and macOS x64 builds, with the same checks as native | `windows-2025` (the image's PostgreSQL service) and `macos-15-intel` (embedded-postgres), Node 24.0.0 and 24.22.1 |
 | compiler-glibc | the compiler itself builds all three applications | `amazonlinux:2023` (glibc 2.34) with the official Node 24 |
 
 Run it locally (Docker; no accounts): build the three applications with
@@ -78,7 +81,8 @@ Run it locally (Docker; no accounts): build the three applications with
 ## The compiler's own requirements
 
 The compiler (`npx lasm …`) runs on Node 24 or newer (candidates are tested on
-Node 24.22.1 and 26.12.1; the platform matrix also builds with 24.0.0) on the
+Node 24.22.1 and 26.12.1; the platform matrix builds with 24.0.0 on Linux arm64 and
+with 24.22.1 on Linux x64, Windows x64 and macOS x64) on the
 five build platforms in the [README](../README.md#supported-environments). On
 Linux it needs **glibc 2.34 or newer**. The floor was set by the formerly bundled
 Git (dugite-native 2.53.0, GLIBC_2.34; Lasm now uses the system Git, needed only for

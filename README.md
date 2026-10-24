@@ -12,7 +12,7 @@ It uses `lasm init` from current source (tested in candidates `.55` and later, n
 `.54` (Phase 3/4 candidates pin **Node 26.12.1**, same npm). Current source (Phase
 5.1, not yet in an accepted candidate) accepts **Node 24 or newer with npm**, for
 the compiler and for built applications, and is tested on Node 24.22.1 and 26.12.1
-(the compiler on Node 24 only on Linux; on macOS and Windows on Node 26.12.1).
+(the compiler on Node 24 on Linux, macOS x64 and Windows x64; on macOS arm64 on Node 26.12.1).
 Lasm downloads its matching **Lean 4.35.0**, Lake, and build tools; you do not install
 them yourself (the older candidate `.46` used Node 26.10.0 / Lean 4.34.1).
 **Git, only for Lake projects with dependencies:** Lasm uses the `git` on your PATH
@@ -189,8 +189,8 @@ cloud account or deployment. Details, requirements and the full matrix:
 | Platform | Tested in CI with |
 | --- | --- |
 | Linux x64 and arm64 (glibc 2.28+), Node 24+ | Node 24.0.0, 24.22.1 and 26.12.1 on `ubuntu-24.04` and `ubuntu-24.04-arm` |
-| macOS (x64, arm64) | arm64: Node 24.22.1 on `macos-15`; x64 and arm64: installed acceptance with Node 26.12.1 (`macos-15-intel`, `macos-15`). Node 24 on macOS x64 is untested. |
-| Windows x64 | installed acceptance with Node 26.12.1 on `windows-2025` (as accepted today). Node 24 on Windows is untested. |
+| macOS (x64, arm64) | x64: Node 24.0.0 and 24.22.1 on `macos-15-intel`; arm64: Node 24.22.1 on `macos-15`; x64 and arm64: installed acceptance with Node 26.12.1 |
+| Windows x64 | Node 24.0.0 and 24.22.1 on `windows-2025`; installed acceptance with Node 26.12.1 on `windows-2025` |
 | Docker / Kubernetes | `node:24-bookworm-slim`, `node:26-bookworm-slim`, `node:24-bullseye-slim` (glibc 2.31), Ubuntu 22.04/24.04 with Node tarballs; read-only, 512 MB, x64 and arm64, with Docker (Kubernetes manifests are not applied in CI) |
 | Google Cloud Run, Fly.io, Railway, Render, Heroku | only the same container images and Dockerfiles (container recipes); the platforms themselves are never deployed to |
 | AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` + AWS Lambda Web Adapter through the Runtime Interface Emulator, x86_64 and arm64; `amazonlinux:2023` |
