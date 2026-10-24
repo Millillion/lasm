@@ -30,6 +30,9 @@ jobs:
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Confirm latest stable acceptance pins
+        # Authenticated GitHub API requests get a far higher rate limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/ci/check-acceptance-versions.mjs .work/ci-application-runtime/versions.json
       - name: Enable process-tree guard
         run: |

@@ -2,7 +2,7 @@ name: Native Node installed-package acceptance
 on:
   push:
     branches: [main]
-    paths: ['src/**', 'bin/**', 'library/**', 'package*.json', 'scripts/package-node-release.mjs', 'scripts/bundle-installer.mjs', 'scripts/candidate-readme.mjs', 'integration/node-installed.mjs']
+    paths: ['src/**', 'bin/**', 'library/**', 'package*.json', 'scripts/package-node-release.mjs', 'scripts/bundle-installer.mjs', 'scripts/candidate-readme.mjs', 'integration/node-installed.mjs', 'scripts/ci/check-acceptance-versions.mjs', 'scripts/ci/release-lookup.mjs', '.github/workflows/node-linux-acceptance.yml']
   workflow_dispatch:
     inputs:
       candidate-version:
@@ -62,6 +62,9 @@ jobs:
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: Check Node and Lean acceptance pins
+        # Authenticated GitHub API requests get a far higher rate limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/ci/check-acceptance-versions.mjs .work/node-versions.json
       - name: Focused application and packaging controls
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/node-unit-resources.json -- node --max-old-space-size=256 --test --test-concurrency=1 test/candidate-readme.test.mjs test/darwin-resources.test.mjs test/application-output.test.mjs test/application-policy.test.mjs test/application-reachability.test.mjs test/application-symbols.test.mjs test/native-application-bundle.test.mjs test/native-directory.test.mjs test/native-temporary.test.mjs test/application-metadata.test.mjs test/application-support.test.mjs test/application-paths.test.mjs test/windows-tool-paths.test.mjs test/application-launcher.test.mjs test/build-progress.test.mjs test/cli-arguments.test.mjs test/application-files.test.mjs test/application-runtime.test.mjs test/node-cache-controls.test.mjs test/managed-artifacts.test.mjs test/system-git.test.mjs test/application-initialization.test.mjs test/application-native.test.mjs test/node-js.test.mjs test/application-npm.test.mjs test/init.test.mjs

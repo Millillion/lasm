@@ -39,6 +39,9 @@ jobs:
       - run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Confirm latest stable acceptance pins
+        # Authenticated GitHub API requests get a far higher rate limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/ci/check-acceptance-versions.mjs .work/application-io-controls-versions.json
       - name: Enable Linux resource guard
         if: runner.os == 'Linux'

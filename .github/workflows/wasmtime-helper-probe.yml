@@ -24,6 +24,9 @@ jobs:
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Verify current stable acceptance pins
+        # Authenticated GitHub API requests get a far higher rate limit.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: node --max-old-space-size=128 scripts/ci/check-acceptance-versions.mjs .work/wasmtime-probe-versions.json
       - name: Enable process-tree guard
         run: |
