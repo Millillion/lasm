@@ -673,6 +673,12 @@ folded into Phases 5.2/5.3 and 7.
     (docs/LICENSE_AUDIT.md, in progress; items with legal weight go to a
     lawyer's review); (6) Lasm's MIT notice in built apps and the `--help`
     fixes are folded into the audit fixes.
+  - **Decision 4 (user, 2026-10-23): no bundled Git.** Lasm uses the system
+    `git`; when Lake needs Git and none is installed, Lasm stops with a clear,
+    per-OS install message. The `@lasm/git-*` packages and dugite downloads are
+    removed. Licensing (user instruction 2026-10-23): resolve every compliance
+    question ourselves, choosing the over-complying reading; no items are
+    deferred to a lawyer.
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as
