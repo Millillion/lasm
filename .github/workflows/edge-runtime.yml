@@ -18,7 +18,9 @@ on:
       - 'runtime/node-async.cpp'
       - 'runtime/node.hpp'
 permissions:
-  contents: read
+  # Read access to the draft release that holds the pinned runtime handoff
+  # (drafts are visible only with write access). Nothing is written.
+  contents: write
 concurrency:
   group: edge-runtime-${{ github.ref }}
   cancel-in-progress: true

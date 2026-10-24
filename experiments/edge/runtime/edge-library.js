@@ -18,6 +18,10 @@ addToLibrary({
     }
     return 0;
   },
+  // Stops the instance with a message (edge-pre.js poisoning).
+  lasm_edge_fail__deps: ['$UTF8ToString'],
+  lasm_edge_fail__sig: 'vp',
+  lasm_edge_fail: (message) => Module.lasmEdge.fail(UTF8ToString(Number(message))),
   lasm_edge_initialized__sig: 'v',
   lasm_edge_initialized: () => Module.lasmEdge.initialized(),
   lasm_host_platform__sig: 'i',
@@ -39,7 +43,7 @@ addToLibrary({
   },
   // Synchronous host call. A host operation that completes asynchronously
   // (returns a promise) is kept and reported as pending (INT64_MIN); the
-  // runtime then calls lasm_edge_await_call, which can suspend.
+  // runtime then runs other work until lasm_edge_call_ready (runtime/edge.cpp).
   lasm_node_call__sig: 'jiijpp',
   lasm_node_call: (operation, handle, argument, input, length) => Module.lasmEdge.call(operation, handle, argument, Number(input), Number(length)),
   lasm_node_copy__sig: 'vpp',
@@ -53,16 +57,15 @@ addToLibrary({
   // suspending import with JavaScript frames on the stack throws SuspendError.
   lasm_edge_can_wait__sig: 'i',
   lasm_edge_can_wait: () => Module.lasmEdge.canSuspend() ? 1 : 0,
+  lasm_edge_call_ready__sig: 'i',
+  lasm_edge_call_ready: () => Module.lasmEdge.callReady() ? 1 : 0,
+  lasm_edge_take_call__sig: 'j',
+  lasm_edge_take_call: () => Module.lasmEdge.takeCall(),
 #if JSPI || ASYNCIFY
-  lasm_edge_await_call__async: 'auto',
-  lasm_edge_await_call__sig: 'j',
-  lasm_edge_await_call: () => Module.lasmEdge.awaitCall(),
   lasm_edge_wait__async: 'auto',
   lasm_edge_wait__sig: 'i',
   lasm_edge_wait: () => Module.lasmEdge.wait(),
 #else
-  lasm_edge_await_call__sig: 'j',
-  lasm_edge_await_call: () => Module.lasmEdge.cannotAwait(),
   lasm_edge_wait__sig: 'i',
   lasm_edge_wait: () => 0,
 #endif

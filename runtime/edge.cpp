@@ -24,6 +24,12 @@ __attribute__((weak)) bool lasm_js_edge_poll();
 int lasm_edge_wait(void);
 // Host: whether lasm_edge_wait may be called now (a plain import).
 int lasm_edge_can_wait(void);
+// Host: whether the innermost pending host call has settled; then its result
+// becomes the response (lasm_node_copy) and its signed length is returned.
+int lasm_edge_call_ready(void);
+LasmHostResult lasm_edge_take_call(void);
+// Host: stops this instance with a message (throws; does not return).
+[[noreturn]] void lasm_edge_fail(const char *message);
 
 // Host: Lean's module initializers have finished (main's own code starts).
 void lasm_edge_initialized(void);
@@ -42,15 +48,33 @@ static bool poll_events() {
 void lasm_coop_block(const char *reason) {
     if (poll_events()) return;
     if (!lasm_edge_can_wait() || !lasm_edge_wait()) {
-        // lean_internal_panic prints and aborts the instance.
         static char message[512];
         snprintf(message, sizeof(message),
             "Lasm edge runtime: %s waits for an event that has not happened, and this Lean code cannot suspend "
             "(the build has no JSPI, or the code runs inside a synchronous JavaScript callback). "
             "Await in Async (Std.Async) instead of blocking.", reason);
-        lean_internal_panic(message);
+        lasm_edge_fail(message);
     }
     poll_events();
+}
+
+// A host call returned LASM_EDGE_PENDING (node.hpp): its operation completes
+// asynchronously. Like a blocking task wait, run other queued Lean work and
+// host events until it settles; suspend (JSPI) when there is nothing to do.
+LasmHostResult lasm_edge_await_call(void) {
+    for (;;) {
+        if (lasm_edge_call_ready()) return lasm_edge_take_call();
+        if (lasm_coop_run_one()) continue;
+        if (poll_events()) continue;
+        if (!lasm_edge_can_wait() || !lasm_edge_wait())
+            lasm_edge_fail("Lasm edge runtime: a blocking host operation must wait, and this Lean code cannot suspend "
+                "(the build has no JSPI, or the code runs inside a synchronous JavaScript callback). Await in Async instead.");
+    }
+}
+
+// IO.sleep (lean_dbg_sleep in the edge patch): a host timer; other Lean work runs meanwhile.
+void lasm_coop_sleep(uint32_t ms) {
+    lasm::Reply sleep(35, 0, ms);
 }
 
 __attribute__((used)) void lasm_edge_pump(void) {

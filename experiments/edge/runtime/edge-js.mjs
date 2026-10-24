@@ -137,11 +137,18 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
     return w.result();
   }
   const pendingCalls = new Map();
-  let nextCall = 1n;
+  let nextCall = 1n, stopped = null;
+  // The Lean instance stopped (edge-pre.js): settle every waiting call.
+  function stop(error) {
+    stopped = error;
+    for (const { reject } of pendingCalls.values()) reject(error);
+    pendingCalls.clear(); events.length = 0;
+  }
   const leanFunctions = new FinalizationRegistry(fn => { stats.functionsCollected++; push({ kind: 3, fn }); });
   function asyncFunction(fn) {
     const f = function (...args) {
       return new Promise((resolve, reject) => {
+        if (stopped) return reject(stopped);
         const call = nextCall++;
         pendingCalls.set(call, { resolve, reject });
         stats.callbacks++;
@@ -213,7 +220,9 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
       switch (op) {
       case 200: return new Uint8Array(Uint32Array.of(1).buffer);
       case 201: return encode(load(decoder.decode(bytes)), modeOf(arg));
-      case 202: return encode(globalThis, modeOf(arg));
+      // Always a reference: Bun's globalThis has Object.prototype, so a data
+      // conversion would try to copy the whole global object.
+      case 202: return encode(globalThis, 'reference');
       case 203: {
         const key = decode(bytes), object = lookup(id);
         if (Array.isArray(key)) return encode(Object.fromEntries(key.map(k => [k, object?.[k]])), 'data');
@@ -286,6 +295,6 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
   }
   const snapshot = () => ({ values: values.size, pendingCalls: pendingCalls.size, queuedEvents: events.length,
     functionsLive: stats.functionsCreated - stats.functionsCollected, ...stats });
-  return { dispatch, snapshot, owns: id => id >= firstJsHandle, release(id) { if (values.delete(id)) stats.released++; },
+  return { dispatch, snapshot, stop, owns: id => id >= firstJsHandle, release(id) { if (values.delete(id)) stats.released++; },
     pendingEvents: () => events.length, concat };
 }

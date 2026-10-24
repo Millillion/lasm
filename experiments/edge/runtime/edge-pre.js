@@ -7,9 +7,27 @@
 // its next poll, a suspended one is resumed.
 Module.lasmEdge = (() => {
   const INT64_MIN = -(2n ** 63n);
-  const jspi = typeof WebAssembly.Suspending === 'function' && !!Module.lasmEdgeJspi;
-  let host, response = null, pending = null, waking = null;
-  let state = 'idle', syncDepth = 0;
+  // Whether Lean may suspend: JSPI (where the engine has it) or Asyncify builds.
+  const jspi = typeof Asyncify !== 'undefined' || typeof WebAssembly.Suspending === 'function' && !!Module.lasmEdgeJspi;
+  let host, response = null, waking = null;
+  // Pending host calls, innermost last (Lean's waits nest on its one stack).
+  const pendingCalls = [];
+  let state = 'idle', syncDepth = 0, poisoned = null;
+  // A JavaScript exception or trap that unwinds Lean's stack (Wasm stack
+  // exhaustion, a blocking wait that cannot suspend, an abort) leaves the
+  // runtime in an unknown state: no C++ cleanup ran and the task queue may be
+  // mid-update. The instance is then stopped: pending and later calls fail
+  // with the cause, and the embedder starts a fresh instance.
+  const listeners = [];
+  function poison(failure, sp) {
+    if (sp !== undefined) { try { stackRestore(sp); } catch { /* best effort */ } }
+    if (!poisoned) {
+      poisoned = failure instanceof Error ? failure : new Error(String(failure));
+      for (const listener of listeners) { try { listener(poisoned); } catch { /* keep going */ } }
+    }
+    state = 'idle';
+    return poisoned;
+  }
   const encoder = new TextEncoder();
   const hostError = message => {
     const bytes = new Uint8Array(16 + message.length * 3), view = new DataView(bytes.buffer);
@@ -19,23 +37,46 @@ Module.lasmEdge = (() => {
   };
   const length = result => { const n = BigInt(result.bytes.length); return result.error ? -n - 1n : n; };
   const canSuspend = () => jspi && state === 'running' && syncDepth === 0;
-  function finished(promise) {
-    // A promising entry returns a promise; a plain one returns its value.
-    const done = () => { state = 'idle'; if (host.pending()) controller.pump(); };
-    if (promise && typeof promise.then === 'function') return promise.then(value => { done(); return value; }, failure => { state = 'idle'; throw failure; });
-    done(); return promise;
+  // Runs one Lean entry: a promising export returns a promise, a plain one its value.
+  function enter(run) {
+    if (poisoned) throw poisoned;
+    state = 'running';
+    const sp = stackSave();
+    const done = () => { state = 'idle'; if (!poisoned && host.pending()) controller.pump(); };
+    let result;
+    try { result = run(); } catch (failure) { throw poison(failure, sp); }
+    // Asyncify builds: an export that unwound (Lean waits) returns at once;
+    // its completion is Asyncify.whenDone().
+    if (typeof Asyncify !== 'undefined' && Asyncify.currData) result = Asyncify.whenDone();
+    if (result && typeof result.then === 'function')
+      return result.then(value => { done(); return value; }, failure => { throw poison(failure, sp); });
+    done(); return result;
   }
   const controller = {
     jspi,
     attach(h) { host = h; },
+    onStop(listener) { listeners.push(listener); },
+    get stopped() { return poisoned; },
+    fail(message) { throw new Error(message); },
     initialized() { host.initialized?.(); },
     canSuspend,
     call(operation, handle, argument, input, size) {
       const bytes = size ? HEAPU8.slice(input, input + size) : new Uint8Array(0);
       let result = host.request(operation, handle, argument, bytes);
       if (result && typeof result.then === 'function') {
-        if (canSuspend()) { pending = result; return INT64_MIN; }
+        if (canSuspend()) {
+          const entry = { done: false, result: null };
+          entry.promise = result.then(value => { entry.result = value; }, failure => { entry.result = hostError(String(failure?.message ?? failure)); })
+            .then(() => { entry.done = true; controller.notify(); });
+          pendingCalls.push(entry);
+          return INT64_MIN;
+        }
         result.catch(() => {});
+        // Lasm.JS blocking awaits fail as Lean IO errors; other runtime
+        // operations (IO.sleep, file reads, …) cannot report it, so they stop
+        // the instance with the reason.
+        if (operation < 200 || operation > 219)
+          throw new Error(`Lean host operation ${operation} must wait, and this Lean code cannot suspend (${jspi ? 'inside a synchronous JavaScript callback' : 'the edge build has no JSPI'})`);
         result = hostError(`Lean host operation ${operation} completes asynchronously and cannot be waited for here (${jspi ? 'inside a synchronous JavaScript callback' : 'this edge build has no JSPI'}); await it in Async instead`);
       }
       response = result;
@@ -47,15 +88,11 @@ Module.lasmEdge = (() => {
       if (size) HEAPU8.set(r.bytes, output);
     },
     release(handle) { host.release(handle); },
-    cannotAwait() { throw new Error('lasm_edge_await_call without JSPI'); },
-    async awaitCall() {
-      state = 'suspended';
-      try { response = await pending; } finally { pending = null; state = 'running'; }
-      return length(response);
-    },
+    callReady() { return pendingCalls.length > 0 && pendingCalls[pendingCalls.length - 1].done; },
+    takeCall() { response = pendingCalls.pop().result; return length(response); },
     wait() {
       state = 'suspended';
-      return new Promise(resolve => { waking = resolve; if (host.pending()) controller.wake(); })
+      return new Promise(resolve => { waking = resolve; if (host.pending() || controller.callReady()) controller.wake(); })
         .then(() => { state = 'running'; return 1; });
     },
     wake() { const w = waking; waking = null; w?.(); },
@@ -64,27 +101,29 @@ Module.lasmEdge = (() => {
       else if (state === 'suspended' && waking) controller.wake();
     },
     pump() {
-      if (state !== 'idle') return;
-      state = 'running';
-      try { return finished(_lasm_edge_pump()); } catch (failure) { state = 'idle'; throw failure; }
+      if (state !== 'idle' || poisoned) return;
+      try {
+        const result = enter(() => _lasm_edge_pump());
+        if (result && typeof result.then === 'function') result.catch(() => {});
+      } catch { /* reported to onStop listeners */ }
     },
-    main(args = []) {
-      state = 'running';
-      try { return finished(callMain(args)); } catch (failure) { state = 'idle'; throw failure; }
-    },
+    main(args = []) { return enter(() => callMain(args)); },
     // A synchronous JavaScript → Lean call (Lasm.JS ofSyncFn): runs on this
     // stack; Lean cannot suspend inside it.
     syncCall(fn, payload) {
-      const previous = state;
+      if (poisoned) throw poisoned;
+      const previous = state, sp = stackSave();
       if (state === 'idle') state = 'running';
       syncDepth++;
       const input = _malloc(Math.max(1, payload.length)), size = _malloc(8);
-      try {
-        HEAPU8.set(payload, input);
-        const pointer = Number(_lasm_js_edge_sync(fn, input, payload.length, size));
-        const n = Number(HEAPU32[size >> 2]);
-        return HEAPU8.slice(pointer, pointer + n);
-      } finally { _free(input); _free(size); syncDepth--; state = previous; }
+      HEAPU8.set(payload, input);
+      let pointer;
+      try { pointer = Number(_lasm_js_edge_sync(fn, input, payload.length, size)); }
+      catch (failure) { syncDepth--; throw poison(failure, sp); }
+      const result = HEAPU8.slice(pointer, pointer + Number(HEAPU32[size >> 2]));
+      _free(input); _free(size);
+      syncDepth--; state = previous;
+      return result;
     },
   };
   return controller;

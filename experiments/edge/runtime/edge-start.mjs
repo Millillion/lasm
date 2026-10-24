@@ -20,6 +20,7 @@ export async function startLean({ createProgram, wasmModule, env = {}, modules =
   const host = createEdgeRuntimeHost({ env, args, modules, stdout, stderr,
     notify: () => Module.lasmEdge.notify(), syncCall: (fn, payload) => Module.lasmEdge.syncCall(fn, payload) });
   Module.lasmEdge.attach(host);
+  Module.lasmEdge.onStop(error => { host.js.stop(error); (stderr ?? console.error)(`[lasm] the Lean instance stopped: ${error.message}`); });
   await Module.lasmEdge.main(args);
   host.flush();
   return Module;

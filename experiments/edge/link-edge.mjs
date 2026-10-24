@@ -39,7 +39,7 @@ const args = [...inputs, ...jsGlue, ...runtimeObjects, opt, '-g1', '--output-eol
   '-sEXIT_RUNTIME=0', '-sFILESYSTEM=0', '-sALLOW_MEMORY_GROWTH=1', `-sINITIAL_MEMORY=${initial * 1048576}`,
   `-sMAXIMUM_MEMORY=${memory64 === 1 ? 4294967296 : 2147483648}`, `-sSTACK_SIZE=${stack * 1048576}`,
   '-sEXPORTED_RUNTIME_METHODS=callMain,HEAPU8,HEAPU32', '-sDYNAMIC_EXECUTION=0', '-sINCOMING_MODULE_JS_API=instantiateWasm,noInitialRun,print,printErr,lasmEdgeJspi,onAbort',
-  '-Wl,--export-if-defined=__cpp_exception', '-Wno-experimental', `-Wl,-Map=${join(out, 'program.map')}`,
+  '-sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$stackSave,$stackRestore', '-Wl,--export-if-defined=__cpp_exception', '-Wno-experimental', `-Wl,-Map=${join(out, 'program.map')}`,
   '-Wl,--start-group', ...libraries, '-Wl,--end-group',
   '--pre-js', join(work, 'application-pre.js'), '--pre-js', join(here, 'runtime/edge-pre.js'), '--js-library', join(here, 'runtime/edge-library.js'),
   ...(mode === 'jspi' ? ['-sJSPI', "-sJSPI_EXPORTS=['lasm_edge_pump','main']"] : []),

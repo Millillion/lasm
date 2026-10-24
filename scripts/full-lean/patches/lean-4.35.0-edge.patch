@@ -52,7 +52,7 @@ index 1ddaa41..057d9e4 100644
      return box(0);
  }
 diff --git a/src/runtime/object.cpp b/src/runtime/object.cpp
-index 48f06ce..92abf6b 100644
+index 48f06ce..90339f4 100644
 --- a/src/runtime/object.cpp
 +++ b/src/runtime/object.cpp
 @@ -768,6 +768,15 @@ struct scoped_current_task_object : flet<lean_task_object *> {
@@ -231,3 +231,21 @@ index 48f06ce..92abf6b 100644
      if (!g_task_manager) {
          lean_internal_panic(
              "`IO.Promise.new` called before the task manager is running; this typically "
+@@ -2890,9 +2969,17 @@ extern "C" LEAN_EXPORT object * lean_dbg_trace(obj_arg s, obj_arg fn) {
+     return lean_apply_1(fn, lean_box(0));
+ }
+ 
++#if defined(LASM_COOPERATIVE_TASKS)
++extern "C" void lasm_coop_sleep(uint32_t ms);
++#endif
+ extern "C" LEAN_EXPORT object * lean_dbg_sleep(uint32 ms, obj_arg fn) {
++#if defined(LASM_COOPERATIVE_TASKS)
++    // IO.sleep: a host timer, while other Lean work runs (runtime/edge.cpp).
++    lasm_coop_sleep(ms);
++#else
+     chrono::milliseconds c(ms);
+     this_thread::sleep_for(c);
++#endif
+     return lean_apply_1(fn, lean_box(0));
+ }
+ 
