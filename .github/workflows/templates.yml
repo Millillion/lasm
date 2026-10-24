@@ -58,22 +58,22 @@ jobs:
         with:
           persist-credentials: false
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: templates
+        id: lambda
         with:
-          path: ${{ runner.temp }}/image-cache/templates
-          key: ci-images-templates-${{ hashFiles('scripts/ci/images.lock.json') }}
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
           lookup-only: true
-      - name: Pull the pinned templates images for amd64 and arm64 by digest
-        if: steps.templates.outputs.cache-hit != 'true'
-        id: seed-templates
+      - name: Pull the pinned lambda images for amd64 and arm64 by digest
+        if: steps.lambda.outputs.cache-hit != 'true'
+        id: seed-lambda
         continue-on-error: true
-        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/templates" templates --seed amd64,arm64 --no-load
-      - if: steps.templates.outputs.cache-hit != 'true' && steps.seed-templates.outcome == 'success'
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda --seed amd64,arm64 --no-load
+      - if: steps.lambda.outputs.cache-hit != 'true' && steps.seed-lambda.outcome == 'success'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         continue-on-error: true
         with:
-          path: ${{ runner.temp }}/image-cache/templates
-          key: ci-images-templates-${{ hashFiles('scripts/ci/images.lock.json') }}
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
   templates:
     needs: images
     if: always() && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
@@ -124,19 +124,19 @@ jobs:
       # ECR Public and Docker Hub rate-limit anonymous pulls from shared runners.
       - if: inputs.docker && startsWith(matrix.platform, 'linux-')
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: images-templates
+        id: images-lambda
         with:
-          path: ${{ runner.temp }}/image-cache/templates
-          key: ci-images-templates-${{ hashFiles('scripts/ci/images.lock.json') }}
-      - name: Load the pinned template images (cache, else registry by digest)
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
+      - name: Load the pinned Lambda images (cache, else registry by digest)
         if: inputs.docker && startsWith(matrix.platform, 'linux-')
-        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/templates" templates
-      - if: inputs.docker && startsWith(matrix.platform, 'linux-') && steps.images-templates.outputs.cache-hit != 'true'
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
+      - if: inputs.docker && startsWith(matrix.platform, 'linux-') && steps.images-lambda.outputs.cache-hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         continue-on-error: true
         with:
-          path: ${{ runner.temp }}/image-cache/templates
-          key: ci-images-templates-${{ hashFiles('scripts/ci/images.lock.json') }}
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Dockerfiles (build on the runner's architecture, run with 512 MB and a read-only root)
         if: inputs.docker && startsWith(matrix.platform, 'linux-')
         run: |

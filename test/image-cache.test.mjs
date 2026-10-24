@@ -26,7 +26,6 @@ test('every grouped image is pinned for linux/amd64 and linux/arm64', () => {
 test('the pinned images are the ones the CI scripts use', () => {
   const images = JSON.parse(readFileSync(new URL('../scripts/platform/images.json', import.meta.url), 'utf8'));
   for (const ref of [images.lambda.image, images.lambda.adapter]) assert.ok(lock.groups.lambda.includes(ref), ref);
-  for (const ref of [...images.images.map(entry => entry.image), images.postgres, images.recipeNodeImage]) assert.ok(lock.groups.containers.includes(ref), ref);
 });
 
 test('identity and backoff', () => {

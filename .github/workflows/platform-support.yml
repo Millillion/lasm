@@ -267,25 +267,8 @@ jobs:
         with:
           path: ${{ runner.temp }}/image-cache/lambda
           key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: containers
-        with:
-          path: ${{ runner.temp }}/image-cache/containers
-          key: ci-images-containers-${{ hashFiles('scripts/ci/images.lock.json') }}
-          lookup-only: true
-      - name: Pull the pinned containers images for amd64 and arm64 by digest
-        if: steps.containers.outputs.cache-hit != 'true'
-        id: seed-containers
-        continue-on-error: true
-        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/containers" containers --seed amd64,arm64 --no-load
-      - if: steps.containers.outputs.cache-hit != 'true' && steps.seed-containers.outcome == 'success'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        continue-on-error: true
-        with:
-          path: ${{ runner.temp }}/image-cache/containers
-          key: ci-images-containers-${{ hashFiles('scripts/ci/images.lock.json') }}
   containers:
-    needs: [select, build, images]
+    needs: [select, build]
     if: always() && needs.select.outputs.active == 'true'
     name: containers ${{ matrix.runner }}
     strategy:
@@ -306,21 +289,6 @@ jobs:
         with:
           pattern: platform-apps-*
           path: ${{ runner.temp }}/artifacts
-      # Pinned images from the Actions cache (scripts/ci/images.lock.json); a miss
-      # pulls once by digest with long backoff and saves for later runs.
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: images-containers
-        with:
-          path: ${{ runner.temp }}/image-cache/containers
-          key: ci-images-containers-${{ hashFiles('scripts/ci/images.lock.json') }}
-      - name: Load the pinned containers images (cache, else registry by digest)
-        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/containers" containers
-      - if: steps.images-containers.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        continue-on-error: true
-        with:
-          path: ${{ runner.temp }}/image-cache/containers
-          key: ci-images-containers-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Linux images, read-only with 512 MB; the container recipe; macOS and Windows builds in Debian 12
         run: |
           own=linux-x64; [ "$(uname -m)" = aarch64 ] && own=linux-arm64
