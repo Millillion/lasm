@@ -70,7 +70,10 @@ texts are visible without extracting anything.
 terms of every section of the package's `THIRD_PARTY_NOTICES.txt` and the native
 helpers' notices, and every bundled npm package's licence. An unknown notice
 section fails packaging, so the field cannot silently fall behind the contents.
-For candidate `.58`: `MIT AND Apache-2.0 AND (MIT OR NCSA) AND Apache-2.0 WITH
+Measured in npm-dist run 40079094763 (current source on the GMP-free package input
+`0.1.0-experimental.40069568093`, all five platforms): `MIT AND Apache-2.0 WITH
+LLVM-exception AND ISC AND BSD-2-Clause AND Apache-2.0 AND (MIT OR NCSA) AND
+BlueOak-1.0.0`. For candidate `.58`: `MIT AND Apache-2.0 AND (MIT OR NCSA) AND Apache-2.0 WITH
 LLVM-exception AND (LGPL-3.0-or-later OR GPL-2.0-or-later) AND ISC AND
 BlueOak-1.0.0`; a GMP-free candidate drops the LGPL term and adds `BSD-2-Clause`
 (libuv `LICENSE-extra`). `LICENSE` stays Lasm's MIT text; every section's text is
