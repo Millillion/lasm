@@ -725,6 +725,19 @@ folded into Phases 5.2/5.3 and 7.
       own schedule; it never blocks a release, and regressions are reported.
       Implemented: `nightly.yml` ([LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md#nightly)).
     - 0.1.0 itself gets the full launch gate on all five targets (user choice).
+  - **Build speed is a 0.1.0 blocker (user, 2026-10-24).** Profile: tool
+    re-verification on every build (8-17 s), the initializer wrapper C compiled
+    three times (29-41 s), wasm-opt pinned to one core (8-14 s). Fixes: tool
+    fingerprints after the first full check; content-addressed caching of all
+    generated C; wasm-opt on up to 4 cores (byte-identical); smaller caches and
+    concurrency. **Dev profile (user decision 2026-10-24):** `lasm run`,
+    `npm run dev` and `lasm dev` skip wasm-opt -Oz/metadce/acorn DCE (about 16%
+    larger, same behavior, deterministic); `lasm build` and `--target` builds stay
+    release (byte-reproducible); `lasm build --dev` opts in; packaging refuses a
+    dev build without an override. Targets on CI-class machines: clean hello
+    about 11 s, Hono about 15-16 s, one-line edit about 9 s (release) or about
+    5 s (dev). Pre-linking the runtime was ruled out (the link itself is about
+    1.3 s).
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as
