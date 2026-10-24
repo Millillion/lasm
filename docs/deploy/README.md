@@ -25,7 +25,14 @@ Requirements on every platform:
 - **Node:** 24 or newer. Node 26's official binary needs `libatomic1`, which the
   official `node:26-*` images include; install it on minimal images that add the
   Node 26 tarball themselves.
-- **No Alpine/musl** images: use Debian- or Ubuntu-based Node images.
+- **Alpine/musl:** Debian, Ubuntu and Alpine (`node:24-alpine`) Node images all
+  work ([Alpine](docker-kubernetes.md#alpine-musl)).
+
+**Function platforms:** `lasm build Main.lean --target <lambda|lambda-edge|vercel|netlify|azure|gcf>`
+builds `dist/` and the platform's package. Lasm builds for a platform; it never
+installs or starts the platform's environment. Run your platform's own CLI
+(`vercel dev`, `netlify dev`, `func start`, `sam local`, `gcloud`, …) yourself to
+test and deploy.
 
 | Platform | Recipe | Notes |
 | --- | --- | --- |
@@ -35,7 +42,13 @@ Requirements on every platform:
 | Railway | [railway.md](railway.md) | Builds the Dockerfile; sets `PORT`. |
 | Render | [render.md](render.md) | Docker runtime; a plan with at least 512 MB. |
 | Heroku | [heroku.md](heroku.md) | Container stack (`heroku.yml`). |
-| AWS Lambda | [lambda.md](lambda.md) | Container image (`public.ecr.aws/lambda/nodejs:24`) behind the AWS Lambda Web Adapter; x86_64 and arm64. |
+| AWS Lambda | [lambda.md](lambda.md) | `.zip` for `nodejs24.x` (`lasm build --target lambda`) or a container image behind the AWS Lambda Web Adapter; x86_64 and arm64. |
+| Lambda@Edge | [lambda-edge.md](lambda-edge.md) | CloudFront origin-request trigger, x86_64, `lasm build --target lambda-edge`. |
+| Vercel Functions | [vercel.md](vercel.md) | `lasm build --target vercel` (Build Output API) or `lasm init --deploy vercel`. |
+| Netlify Functions | [netlify.md](netlify.md) | `lasm init --deploy netlify` (`netlify.toml` with `included_files`); 60 s synchronous limit. |
+| Azure Functions | [azure-functions.md](azure-functions.md) | `lasm init --deploy azure`; Node.js v4 model, Linux. |
+| Google Cloud Functions (gen2) | [cloud-functions.md](cloud-functions.md) | `lasm init --deploy gcf`; Functions Framework. |
+| DigitalOcean App Platform | [digitalocean.md](digitalocean.md) | Container recipe; AMD64; runs in gVisor (tested with `runsc`, Phase 6). |
 
 **What is tested.** Lasm's CI builds and runs every template's Dockerfile on
 Linux x64 and ARM64 with a 512 MB memory limit and a read-only root filesystem,

@@ -11,7 +11,9 @@ test('lasm init arguments', () => {
   assert.deepEqual(parseLasmArguments(['init', 'my-app', '--template', 'hono']), { command: 'init', template: 'hono', deploy: [], directory: 'my-app' });
   assert.deepEqual(parseLasmArguments(['init', '-t=std-http', 'x', '--deploy', 'lambda']), { command: 'init', template: 'std-http', deploy: ['lambda'], directory: 'x' });
   assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'lambda']), /needs a server template/);
-  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel']), /--deploy accepts lambda/);
+  assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel', '--deploy', 'lambda-zip', '--deploy', 'vercel']).deploy, ['vercel', 'lambda-zip']);
+  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=workers']), /--deploy accepts lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf/);
+  assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'netlify']), /--deploy netlify needs a server template/);
   assert.deepEqual(parseLasmArguments(['init', '--help']), { command: 'init-help' });
   assert.throws(() => parseLasmArguments(['init']), /Usage: lasm init/);
   assert.throws(() => parseLasmArguments(['init', 'a', 'b']), /Usage: lasm init/);
@@ -57,6 +59,24 @@ test('every template creates a complete project', () => {
     assert.match(recipe, /AWS_LWA_READINESS_CHECK_PATH=\/health/);
     assert.match(recipe, /printf '#!\/bin\/sh\\nexec node "\$LAMBDA_TASK_ROOT\/main\.mjs"\\n'/);
     assert.match(readFileSync(join(lambda, 'README.md'), 'utf8'), /Dockerfile\.lambda/);
+    // Function platforms: npm scripts that run lasm package, platform files and packages.
+    const functions = join(root, 'functions');
+    const created = initProject({ directory: functions, template: 'std-http', deploy: ['lambda-zip', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] }).files;
+    for (const file of ['vercel.json', 'netlify.toml', 'public/.gitkeep']) assert.ok(created.includes(file), file);
+    assert.ok(!created.includes('Dockerfile.lambda'));
+    const pkg = JSON.parse(readFileSync(join(functions, 'package.json'), 'utf8'));
+    for (const target of ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'])
+      assert.equal(pkg.scripts[`build:${target}`], `lasm build Main.lean --target ${target}`);
+    // Platform CLIs are the user's: never dependencies of a generated project.
+    for (const cli of ['vercel', 'netlify-cli', 'aws-sam-cli', 'azure-functions-core-tools', '@google-cloud/functions-framework-cli'])
+      assert.ok(!pkg.dependencies?.[cli] && !pkg.devDependencies?.[cli], cli);
+    assert.deepEqual(Object.keys(pkg.dependencies), ['@azure/functions', '@google-cloud/functions-framework']);
+    assert.equal(JSON.parse(readFileSync(join(functions, 'vercel.json'), 'utf8')).buildCommand, 'npm run build:vercel');
+    assert.match(readFileSync(join(functions, 'netlify.toml'), 'utf8'), /included_files = \["netlify\/functions\/lasm\/\*\*"\]/);
+    const notes = readFileSync(join(functions, 'README.md'), 'utf8');
+    for (const text of ['lambda.zip', 'lambda-edge.zip', '.vercel/output', 'netlify/functions/lasm', 'func start', 'gcloud functions deploy', "platform's own CLI"])
+      assert.ok(notes.includes(text), text);
+    assert.match(readFileSync(join(functions, '.gitignore'), 'utf8'), /^\.vercel\/$/m);
     // Never overwrite: a non-empty directory is refused; an empty one (or only .git) is used.
     assert.throws(() => initProject({ directory: join(root, 'app plain'), template: 'plain' }), /is not empty/);
     mkdirSync(join(root, 'empty', '.git'), { recursive: true });

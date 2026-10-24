@@ -25,15 +25,28 @@ test('build retains explicit output directories and existing binding configurati
   assert.equal(parseLasmArguments(['build', 'bindings.json', 'dist']).input, 'bindings.json');
 });
 
+test('build targets: node by default, or a function platform packaged after the build', () => {
+  assert.equal(parseLasmArguments(['build', 'Main.lean']).target, 'node');
+  for (const target of ['node', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf']) {
+    assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).target, target);
+    assert.equal(parseLasmArguments(['build', `--target=${target}`, 'Main.lean', '--output', 'out']).target, target);
+  }
+  assert.deepEqual(parseLasmArguments(['build', 'Main.lean', '--target', 'lambda', '--output', 'out']),
+    { command: 'build', input: 'Main.lean', output: 'out', target: 'lambda', rebuild: false, verbose: false, args: [] });
+});
+
 test('help needs no input or build-time side effects', () => {
   assert.deepEqual(parseLasmArguments(['--help']), { command: 'help' });
   assert.deepEqual(parseLasmArguments(['build', '-h']), { command: 'help' });
 });
 
 for (const [args, error] of [
-  [[], /Usage/], [['Main.lean', '--target', 'node'], /Unknown Lasm option: --target/],
-  [['Main.lean', '--target=node'], /Unknown Lasm option: --target=node/],
-  [['build', 'Main.lean', '--target', 'node'], /Unknown Lasm option: --target/],
+  [[], /Usage/], [['Main.lean', '--target', 'node'], /--target is available only with lasm build/],
+  [['Main.lean', '--target=node'], /--target is available only with lasm build/],
+  [['build', 'Main.lean', '--target', 'workers'], /Unknown build target "workers"/],
+  [['build', 'Main.lean', '--target'], /--target requires a value/],
+  [['build', 'Main.lean', '--target', 'lambda', '--target=vercel'], /Specify --target only once/],
+  [['build', 'bindings.json', '--target', 'lambda'], /applies to Lean applications/],
   [['Main.lean', '--output', 'one', '--output', 'two'], /only once/],
   [['build', 'Main.lean', '--output'], /requires a value/],
   [['Main.lean', '--node-version', '26'], /Unknown Lasm option/],

@@ -738,6 +738,15 @@ folded into Phases 5.2/5.3 and 7.
     in the Lambda image instead).
   - 6.3 Azure Functions (Core Tools), Google Cloud Functions (Functions
     Framework), DigitalOcean App Platform (gVisor), Alpine/musl images.
+  - Status (2026-10-24, merged into 0.1.0): `lasm build --target
+    lambda|lambda-edge|vercel|netlify|azure|gcf` (and `lasm package` for an existing build) plus
+    `lasm init --deploy …`; one handler design for every platform (the Lean
+    server runs in the function's Node process on a loopback port; chosen over
+    the Lambda Web Adapter layer, which cannot run on Lambda@Edge, at a measured
+    50–90 ms extra init); builds carry musl pieces for Alpine, which function
+    packages drop. Tested by `serverless.yml` (Linux runners only) with each
+    platform's local runtime (before the merge: candidate `.58` plus the
+    branch's sources); see [DEPLOYMENT.md](DEPLOYMENT.md#function-platforms-alpine-and-gvisor-phase-6).
 - **Developer workflow model (user decision 2026-10-24):** the runtime that runs
   the CLI is the default target: Node runs and builds for Node (full profile,
   npm only); from 7.5, Bun builds and runs on Bun, Deno on Deno (portable

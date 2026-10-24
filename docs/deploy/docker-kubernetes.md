@@ -15,6 +15,33 @@ is required. Push the image to any registry (`docker tag my-app REGISTRY/my-app:
 `docker buildx build --platform linux/amd64,linux/arm64 -t REGISTRY/my-app:1 --push .`;
 each architecture runs its own Lasm build inside its build stage.
 
+## Alpine (musl)
+
+Builds also carry the musl native pieces
+(koffi's musl binaries and Lasm's musl helpers, about 5 MB unpacked), so
+`dist/` runs on `node:24-alpine` and `node:26-alpine`. In the `lasm init`
+Dockerfile, change the final stage to `FROM node:24-alpine`; the build stage
+stays `node:24-trixie` (the Lasm compiler itself needs glibc). With
+[`deploy/Dockerfile`](../../deploy/Dockerfile): `docker build --build-arg
+NODE_IMAGE=node:24-alpine -t my-app .`. `lasm package` leaves the musl pieces
+out of function packages, whose platforms all use glibc.
+
+**No time zone database** (Alpine without `tzdata`, distroless): Lean's
+`Std.Time` reads `/etc/localtime` and `/usr/share/zoneinfo`, and `Std.Http`
+needs them for its `Date` header (natively, a server without them drops every
+connection). Lasm falls back to a UTC zone bundled with the build
+(`host/zoneinfo/UTC`, from the tz database) and prints once on stderr
+`[lasm] /usr/share/zoneinfo/UTC is missing (no time zone database): using UTC. …`.
+For local time zones, add `RUN apk add --no-cache tzdata` to the Alpine stage.
+
+**Tested in CI** (`.github/workflows/serverless.yml`, x64 and arm64):
+`node:24.22.1-alpine` and `node:26.12.1-alpine`, read-only with 512 MB, every
+server template (HTTP checks, `docker stop` exit code 0; std-http on plain
+Alpine, where the UTC fallback warning must appear, and again with `tzdata`,
+where it must not), the probe program
+(subprocess, files, environment) and `deploy/Dockerfile` built on the Alpine
+image.
+
 ## Kubernetes
 
 A complete Deployment and Service (`kubectl apply -f app.yaml`):

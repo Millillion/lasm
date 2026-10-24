@@ -3,10 +3,12 @@ import { join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { assertSupportedHost } from './platform.mjs';
 
-// Every deployment carries Linux x64 and arm64 (glibc) native pieces, so a build
-// on macOS, Windows or either Linux architecture deploys to Linux containers
-// and functions. The build host's own pieces are added when it is not Linux.
+// Every deployment carries Linux x64 and arm64 native pieces for glibc and
+// musl (Alpine), so a build on macOS, Windows or either Linux architecture
+// deploys to Linux containers and functions. The build host's own pieces are
+// added when it is not Linux.
 export const deploymentTargets = ['linux-x64', 'linux-arm64'];
+export const deploymentLinuxLibcs = ['glibc', 'musl'];
 
 /** The native targets a deployment built on this host carries. */
 export function applicationNativeTargets(platform = process.platform, arch = process.arch) {
@@ -32,7 +34,7 @@ export function copyApplicationNativeBundle(root, output, { platform = process.p
   };
   const targets = applicationNativeTargets(platform, arch);
   // Preserve the vendor's loaders and license, without its C++ source tree,
-  // build scripts, other platforms, or the musl binaries (glibc Linux only).
+  // build scripts or other platforms.
   const packageNames = targets.map(target => `@koromix/koffi-${target}`);
   const manifest = json('manifest.json');
   const packages = manifest.packages.filter(item => ['koffi', ...packageNames].includes(item.name));
@@ -42,13 +44,14 @@ export function copyApplicationNativeBundle(root, output, { platform = process.p
     copy('node_modules/koffi/' + name);
   for (const target of targets) {
     const [os, cpu] = target.split('-');
-    for (const name of ['index.js', 'package.json', `${os}_${cpu}/koffi.node`]) copy(`node_modules/@koromix/koffi-${target}/${name}`);
+    const binaries = os === 'linux' ? [`linux_${cpu}`, `musl_${cpu}`] : [`${os}_${cpu}`];
+    for (const name of ['index.js', 'package.json', ...binaries.map(binary => `${binary}/koffi.node`)]) copy(`node_modules/@koromix/koffi-${target}/${name}`);
   }
-  write('manifest.json', { ...manifest, packages, deployment: { target: 'node', targets, linuxLibc: 'glibc' } });
+  write('manifest.json', { ...manifest, packages, deployment: { target: 'node', targets, linuxLibc: deploymentLinuxLibcs } });
   const helpers = { process: [], signals: [] };
   for (const target of targets) {
     const [os, cpu] = target.split('-');
-    if (os === 'linux') { helpers.process.push(`linux-${cpu}-gnu`); helpers.signals.push(`linux-${cpu}-gnu.so`); }
+    if (os === 'linux') for (const abi of ['gnu', 'musl']) { helpers.process.push(`linux-${cpu}-${abi}`); helpers.signals.push(`linux-${cpu}-${abi}.so`); }
     else if (os === 'darwin') helpers.signals.push(`darwin-${cpu}.dylib`);
   }
   for (const [directory, names] of Object.entries(helpers)) {

@@ -1,8 +1,15 @@
 import { parseInitArguments } from './init.mjs';
+import { parsePackageArguments, packageTargets } from './package.mjs';
+
+// `lasm build --target`: `node` writes dist/ only; a function platform also
+// packages it (src/package.mjs). Lasm builds for the platform; it never
+// installs or starts the platform's own tools.
+export const buildTargets = ['node', ...Object.keys(packageTargets)];
 
 export const cliUsage = `Usage: lasm <Main.lean> [-- arguments…]
-       lasm build <Main.lean> [--output dist]
-       lasm init <directory> [--template plain|express|hono|std-http]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf]
+       lasm init <directory> [--template plain|express|hono|std-http] [--deploy …]
+       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
        lasm cache repair
 
@@ -13,6 +20,7 @@ Application arguments must follow --.`;
 export function parseLasmArguments(argv) {
   const tokens = [...argv];
   if (tokens[0] === 'init') return parseInitArguments(tokens.slice(1));
+  if (tokens[0] === 'package') return parsePackageArguments(tokens.slice(1));
   if (tokens[0] === 'cache') {
     if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
     if (tokens.length !== 2 || tokens[1] !== 'repair') throw new Error('Usage: lasm cache repair');
@@ -29,6 +37,16 @@ export function parseLasmArguments(argv) {
     }
     if (token === '--help' || token === '-h') return { command: 'help' };
     if (token === '--rebuild' || token === '--verbose') { result[token.slice(2)] = true; continue; }
+    const target = /^--target(?:=(.*))?$/.exec(token);
+    if (target) {
+      if (result.command !== 'build') throw new Error('--target is available only with lasm build');
+      if (supplied.has('target')) throw new Error('Specify --target only once');
+      supplied.add('target');
+      const value = target[1] ?? tokens[++i];
+      if (!value || value.startsWith('--')) throw new Error('--target requires a value: ' + buildTargets.join(', '));
+      if (!buildTargets.includes(value)) throw new Error(`Unknown build target "${value}". Choose one of: ${buildTargets.join(', ')}`);
+      result.target = value; continue;
+    }
     const match = /^--output(?:=(.*))?$/.exec(token);
     if (match) {
       if (supplied.has('output')) throw new Error('Specify --output only once');
@@ -47,6 +65,11 @@ export function parseLasmArguments(argv) {
   if (result.command === 'run' && result.output !== undefined) throw new Error('--output is available only with lasm build');
   if (!(result.input.endsWith('.lean') || result.command === 'build' && result.input.endsWith('.json')))
     throw new Error('Expected a Lean source file, or a binding configuration for lasm build');
-  if (result.command === 'build') result.output ??= 'dist';
+  if (result.command === 'build') {
+    result.output ??= 'dist';
+    // Today the CLI runs on Node, so `node` is the default host target.
+    result.target ??= 'node';
+    if (result.target !== 'node' && result.input.endsWith('.json')) throw new Error('--target applies to Lean applications, not binding configurations');
+  }
   return result;
 }

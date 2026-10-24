@@ -1,6 +1,8 @@
 import * as fsp from 'node:fs/promises';
 import { getSystemErrorMessage } from 'node:util';
 import { join } from 'node:path';
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { randomBytes } from 'node:crypto';
 import { createNodeNetwork } from './node-network.mjs';
@@ -22,6 +24,23 @@ import { checkLeanIOVersion, leanIOError } from './lean-io-errors.mjs';
 const empty = Buffer.alloc(0);
 // Larger reads of regular files keep using a file worker, off the host thread.
 const regularReadLimit = 64 * 1024;
+// Std.Time (and Std.Http's Date header) reads the local time zone from
+// /etc/localtime, or a TZ id such as UTC from /usr/share/zoneinfo. Minimal
+// images (Alpine without tzdata, distroless) have neither; native Lean then
+// fails, and a Std.Http server drops every connection. When these files are
+// missing, Lasm serves its bundled UTC zone (host/zoneinfo/UTC, from the tz
+// database) instead and says so once on stderr.
+const zoneFallbackPaths = new Set(['/etc/localtime', '/usr/share/zoneinfo/UTC', '/usr/share/zoneinfo/Etc/UTC']);
+const bundledUtcZone = new URL('./zoneinfo/UTC', import.meta.url);
+function zoneFallback(value) {
+  if (process.platform !== 'linux' || !zoneFallbackPaths.has(value) || existsSync(value) || !existsSync(bundledUtcZone)) return value;
+  if (!globalThis.__lasmZoneFallbackWarned) {
+    globalThis.__lasmZoneFallbackWarned = true;
+    process.stderr.write(`[lasm] ${value} is missing (no time zone database): using UTC. Install tzdata (apk add tzdata, apt-get install tzdata) for local time zones.\n`);
+  }
+  return fileURLToPath(bundledUtcZone);
+}
+
 export class LeanExit extends Error { constructor(code, force = false) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; this.force = force; } }
 export function numbers(...values) {
   const result = Buffer.alloc(values.length * 8);
@@ -96,7 +115,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
     return resource;
   }
   function pathAt(bytes, state) {
-    const value = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    const value = zoneFallback(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
     if (value.includes('\0')) throw Object.assign(error('EINVAL', 'string contains NUL bytes'), { errno: 22, nativeMessage: true });
     // Leave dot segments and trailing separators for the OS to resolve. In
     // particular, link/../file is not equivalent to lexical path normalization.

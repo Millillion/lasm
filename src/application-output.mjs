@@ -1,5 +1,5 @@
 import { mkdirSync, copyFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { copyNativeBundle, copyApplicationNativeBundle } from './native-bundle.mjs';
 import { glibcAtLeast, nodeAtLeast } from './application-support.mjs';
@@ -13,6 +13,8 @@ export const applicationHostFiles = [
   'native-clock.mjs', 'native-windows-timezone.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-message.mjs',
   'native-worker-cwd.cjs', 'worker-stdio.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native-abort.cjs',
   'node-fetch.mjs', 'node-js.mjs',
+  // The UTC zone (tz database, public domain) for systems without zoneinfo.
+  'zoneinfo/UTC',
 ];
 
 // Built applications run on any Node release from this one: memory64 and
@@ -28,7 +30,10 @@ export function copyApplicationHost(output, { platform = process.platform, arch 
   glibc = process.report?.getReport().header.glibcVersionRuntime, sourceRoot = root } = {}) {
   const directory = join(resolve(output), 'host');
   mkdirSync(directory, { recursive: true });
-  for (const name of applicationHostFiles) copyFileSync(join(sourceRoot, 'src', name), join(directory, name));
+  for (const name of applicationHostFiles) {
+    mkdirSync(dirname(join(directory, name)), { recursive: true });
+    copyFileSync(join(sourceRoot, 'src', name), join(directory, name));
+  }
   if ((['darwin', 'win32'].includes(platform) || platform === 'linux' && glibc) && ['x64', 'arm64'].includes(arch))
     copyApplicationNativeBundle(sourceRoot, directory, { platform, arch });
   else copyNativeBundle(sourceRoot, directory);
@@ -47,17 +52,21 @@ const host = process.platform + '-' + process.arch;
 let glibc;
 try { glibc = process.platform === 'linux' ? process.report?.getReport().header.glibcVersionRuntime : undefined; } catch { /* reported below */ }
 // The native pieces this deployment carries; absent in research outputs that carry every target.
-let nativeTargets = null;
-try { nativeTargets = JSON.parse(readFileSync(new URL('./host/native/manifest.json', import.meta.url), 'utf8')).deployment?.targets ?? null; }
-catch { /* checked when the host loads */ }
+let nativeTargets = null, nativeLibcs = ['glibc'];
+try {
+  const deployment = JSON.parse(readFileSync(new URL('./host/native/manifest.json', import.meta.url), 'utf8')).deployment;
+  nativeTargets = deployment?.targets ?? null;
+  // Older builds record one libc as a string; builds with musl list both.
+  nativeLibcs = [deployment?.linuxLibc ?? 'glibc'].flat();
+} catch { /* checked when the host loads */ }
 if (minimumNode && !nodeAtLeast(process.versions.node, minimumNode)) {
   console.error('This application requires Node ' + minimumNode + ' or newer; you are running Node ' + process.versions.node + '. Install Node 24 or newer.');
   process.exitCode = 1;
 } else if (nativeTargets && !nativeTargets.includes(host)) {
   console.error('This application includes native support for ' + nativeTargets.join(', ') + '; it is running on ' + host + '. Run it on one of those platforms, or rebuild the Lean source with Lasm on this platform.');
   process.exitCode = 1;
-} else if (process.platform === 'linux' && minimumGlibc && !glibcAtLeast(glibc, minimumGlibc)) {
-  console.error('This application requires Linux with glibc ' + minimumGlibc + ' or newer; this system reports ' + (glibc ? 'glibc ' + glibc : 'no glibc (musl/Alpine is not supported yet)') + '. Use a supported Linux system, such as a Debian or Ubuntu based image.');
+} else if (process.platform === 'linux' && minimumGlibc && !(glibc ? glibcAtLeast(glibc, minimumGlibc) : nativeLibcs.includes('musl'))) {
+  console.error('This application requires Linux with glibc ' + minimumGlibc + ' or newer' + (nativeLibcs.includes('musl') ? ' or musl' : '') + '; this system reports ' + (glibc ? 'glibc ' + glibc : 'no glibc (musl/Alpine needs a build with the current Lasm)') + '. Use a supported Linux system, such as a Debian or Ubuntu based image.');
   process.exitCode = 1;
 } else {
   const applicationPolicy = ${JSON.stringify(applicationPolicy)};

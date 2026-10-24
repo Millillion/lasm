@@ -31,11 +31,13 @@ export async function runApplicationCli(argv) {
   const options = parseLasmArguments(argv);
   const support = applicationSupport();
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [-- arguments…]\n       lasm build Main.lean [--output dist]\n       lasm init my-app [--template plain|express|hono|std-http]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nBuild and run ordinary Lean main in Node.' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf]\n       lasm init my-app [--template plain|express|hono|std-http] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nBuild and run ordinary Lean main in Node.' : cliUsage);
     return 0;
   }
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }
   if (options.command === 'init') return (await import('./init.mjs')).runInit(options);
+  if (options.command === 'package-help') { console.log((await import('./package.mjs')).packageUsage); return 0; }
+  if (options.command === 'package') return (await import('./package.mjs')).runPackage(options);
   assertSupportedHost();
   if (options.command === 'cache-repair') {
     const { repairManagedCache } = await import('./cache-repair.mjs');
@@ -58,9 +60,12 @@ export async function runApplicationCli(argv) {
     return 0;
   }
   const { buildApplicationWithProgress } = await import('./application-build-client.mjs');
-  const result = await buildApplicationWithProgress(options.input, options);
+  const { target, ...buildOptions } = options;
+  const result = await buildApplicationWithProgress(options.input, buildOptions);
   if (options.command === 'build') {
     console.error(`${result.cacheHit ? 'Reused' : 'Built'} Lean ${result.lean} for Node: ${result.output}`);
+    // A function platform: package dist/ where `lasm package` writes it.
+    if (target && target !== 'node') return (await import('./package.mjs')).runPackage({ input: result.output, target });
     return 0;
   }
   console.error('[lasm] Running ' + options.input + '…');

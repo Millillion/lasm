@@ -205,6 +205,25 @@ Recipes for each launch platform: [deployment guides](deploy/README.md)
 AWS Lambda as a container image: create the project with `--deploy lambda` to
 get a `Dockerfile.lambda`, see [lambda.md](deploy/lambda.md)).
 
+## 5. Build for a function platform
+
+`lasm build --target` compiles and packages for a function platform in one step
+(the default target, `node`, writes only `dist/`):
+
+```sh
+npx lasm build Main.lean --target lambda       # dist/ and lambda.zip (handler lasm-lambda.handler)
+npx lasm build Main.lean --target vercel       # dist/ and .vercel/output
+npx lasm build Main.lean --target netlify      # dist/ and netlify/functions/lasm
+```
+
+The other targets are `lambda-edge`, `azure` and `gcf`. `lasm init my-app
+--template hono --deploy lambda-zip` (or `vercel`, `netlify`, `lambda-edge`,
+`azure`, `gcf`) adds the platform files and a `npm run build:<target>` script.
+Lasm builds for the platform; it never installs or starts the platform's own
+tools: test and deploy with the platform's CLI (`vercel`, `netlify`, `func`,
+`gcloud`, `aws`/`sam`). To package one `dist/` for several platforms, use
+`npx lasm package --target <target>`. Guides: [deploy/](deploy/README.md).
+
 ## Which HTTP server to use
 
 | | Express or Hono with Lean handlers (`--template express`, `hono`) | `Std.Http` (`--template std-http`) |

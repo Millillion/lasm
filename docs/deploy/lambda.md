@@ -1,4 +1,80 @@
-# AWS Lambda (container image)
+# AWS Lambda
+
+Two ways: a **.zip package** for the managed `nodejs24.x` runtime (below) or a **container image** behind the AWS Lambda Web
+Adapter ([further down](#container-image)). For CloudFront, see
+[Lambda@Edge](lambda-edge.md).
+
+## Zip package (`nodejs24.x`, x86_64 and arm64)
+
+```sh
+npx lasm build Main.lean --target lambda   # dist/ (any server on $HOST:$PORT) and lambda.zip
+aws lambda create-function --function-name my-app --runtime nodejs24.x \
+  --handler lasm-lambda.handler --zip-file fileb://lambda.zip \
+  --memory-size 512 --timeout 10 --architectures arm64 --role ROLE_ARN
+aws lambda create-function-url-config --function-name my-app --auth-type AWS_IAM
+```
+
+With `lasm init my-app --template hono --deploy lambda-zip` the project has
+`npm run build:lambda` for the first step. `npx lasm package --target lambda`
+packages an existing `dist/` without rebuilding.
+
+**How it works.** `lambda.zip` is `dist/` plus two small files: `lasm-server.mjs`
+and the handler `lasm-lambda.mjs`. During Lambda's init phase the handler starts
+the Lean program in the function's own Node process with `HOST=127.0.0.1` and
+`PORT` set to a free loopback port, and waits until the port accepts
+connections. Each invocation becomes one HTTP request to that server, and the
+response goes back in the event's own shape. Supported events: API Gateway REST
+API (payload 1.0), API Gateway HTTP API (payload 2.0), Lambda function URLs,
+Application Load Balancer (single- and multi-value headers) and CloudFront
+(Lambda@Edge). Bodies are base64 when they are not text. Lambda's Node runtime
+starts Node with V8 flags (`--max-old-space-size=…` and others) that worker
+threads refuse; the Lean runtime's threads leave them out (as for
+`node --max-old-space-size=… dist/main.mjs`). Any server works: Express,
+Hono on `@hono/node-server` and pure-Lean `Std.Http` are tested.
+
+- **Both architectures in one zip:** every build carries the Linux x64 and arm64
+  native pieces; set `--architectures` to either.
+- **Permissions:** the zip records Unix permissions itself (`main.mjs` and the
+  process helpers 755, everything else 644), so a zip made on Windows works too.
+- **Limits:** the packaging step fails above Lambda's 250 MB unzipped limit and warns
+  above 50 MB zipped (upload through S3 then). The templates are 1.4–2.0 MB
+  zipped and 5.4–6.5 MB unpacked.
+- **Memory:** at least 512 MB.
+- **ALB:** a single-value target group can return only one `Set-Cookie`; enable
+  multi-value headers on the target group for more.
+- **Not supported:** response streaming and WebSockets; a program that does not
+  listen on `$PORT` fails the init phase with a message saying so.
+
+**Tested in CI** (`.github/workflows/serverless.yml`, Linux x64 and arm64 runners;
+no AWS account): every server template's zip, extracted with Info-ZIP `unzip` and
+mounted read-only at `/var/task` of `public.ecr.aws/lambda/nodejs:24`, invoked
+through the image's Runtime Interface Emulator with AWS's documented sample
+events for each type above (`scripts/serverless/events/`), with 512 MB and a
+read-only root; AWS SAM CLI 1.170.0 `sam local invoke` (REST and HTTP API events)
+and `sam local start-api` with the zip as `CodeUri`; the size limits; cold starts.
+
+**Measured in CI** (runs 40074644572 and 40078265584, emulator on GitHub's
+`ubuntu-24.04` and `ubuntu-24.04-arm`, 512 MB, three cold starts per template
+per run; the init phase is the emulator's INIT REPORT, which includes Node's
+start, the handler's import and the Lean server's start):
+
+| Template | Zip / unpacked | Init phase x64 / arm64 | Warm invocation x64 / arm64 | Memory in use x64 / arm64 |
+| --- | --- | --- | --- | --- |
+| Hono | 1.8 / 5.7 MB | 470–510 / 401–427 ms | 2.1–3.2 / 2.4–2.7 ms | 206 / 134 MiB |
+| Express | 2.0 / 6.5 MB | 503–640 / 456–480 ms | 2.1–3.2 / 2.3–2.8 ms | 213 / 143 MiB |
+| Std.Http | 1.4 / 5.4 MB | 444–501 / 394–426 ms | 3.9–5.7 / 4.6–5.8 ms | 312 / 186 MiB |
+
+**Why a handler, not the Web Adapter layer.** The same run measured the Lambda
+Web Adapter 1.1.0 in its layer layout (adapter extension, `/opt/bootstrap`, a
+`run.sh` handler) for the Hono template: init 423–497 ms (x64) and 390–394 ms
+(arm64), warm 1.6–1.9 / 2.0 ms, so about 15–90 ms faster to start and under
+1 ms faster per invocation. The handler was chosen anyway: it needs no layer, no
+environment variables and no extension, so the same zip works on Lambda@Edge
+(which allows none of them); it maps ALB and CloudFront events; and the zip is
+self-contained, with no layer ARN per region and architecture to keep current.
+The Web Adapter remains the container-image route.
+
+## Container image
 
 A Lasm server runs on AWS Lambda as a **container image** built on Lambda's
 managed Node 24 image, behind the
@@ -15,7 +91,7 @@ through the image's built-in Runtime Interface Emulator with API Gateway HTTP AP
 ([`run-lambda.mjs`](../../scripts/platform/run-lambda.mjs), part of
 [DEPLOYMENT.md](../DEPLOYMENT.md)). It has not been deployed to AWS by Lasm's CI.
 
-## From a `lasm init` project
+### From a `lasm init` project
 
 `lasm init my-app --template hono --deploy lambda` (any server template) writes
 this file as `Dockerfile.lambda` next to the ordinary `Dockerfile`; build it with
@@ -53,7 +129,7 @@ in a directory that contains `dist/`.
 - **Timeout:** the first request after a cold start includes server start-up
   (under a second for the examples in CI); a 10 s timeout leaves headroom.
 
-## Try it locally (no AWS account)
+### Try it locally (no AWS account)
 
 ```sh
 docker build --platform linux/amd64 -t my-app .
@@ -68,7 +144,7 @@ curl -s -X POST http://localhost:9000/2015-03-31/functions/function/invocations 
 # {"statusCode":200,...,"body":"{\"ok\":true}",...}
 ```
 
-## Deploy
+### Deploy
 
 Push the image to Amazon ECR and create the function from it, for example:
 
@@ -83,4 +159,3 @@ aws lambda create-function --function-name my-app --package-type Image \
 aws lambda create-function-url-config --function-name my-app --auth-type AWS_IAM
 ```
 
-Lambda zip packages on `nodejs24.x` with the adapter layer are planned (Phase 6).

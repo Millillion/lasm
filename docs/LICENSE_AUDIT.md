@@ -174,10 +174,18 @@ Lasm code only, MIT, copyright Jordan Last.
 | `program.wasm` | Lean runtime + standard library (patched), Emscripten libc (musl), libc++, libc++abi, libunwind, compiler-rt, mimalloc, libuv 1.48.0, Lasm glue, the app's code and its Lake dependencies' Lean and C code. **No GNU MP** with a GMP-free runtime | Apache-2.0, MIT OR NCSA, MIT, Apache-2.0 WITH LLVM-exception, ISC, BSD-2-Clause, the dependencies' own | `THIRD_PARTY_NOTICES.txt` |
 | `program.cjs` | Emscripten JS runtime (with Lasm's repairs), Lasm host prelude | MIT OR NCSA, MIT | yes |
 | `main.mjs`, `host/*` | Lasm host | MIT | Lasm's notice |
-| `host/native/node_modules/koffi*` | koffi 3.3.0 | MIT | `LICENSE.txt`, node-addon-api text |
-| `host/native/{process,signals}` | Lasm helpers | MIT | their notices |
+| `host/native/node_modules/koffi*` | koffi 3.3.0, glibc and musl binaries for Linux x64/arm64 (the musl ones are from the same `@koromix/koffi-linux-*` packages) | MIT | `LICENSE.txt`, node-addon-api text |
+| `host/native/{process,signals}` | Lasm helpers; the `-musl` variants link musl and Zig's compiler_rt statically | MIT | their `THIRD_PARTY_NOTICES.txt` (with musl's and compiler_rt's texts), copied beside them |
+| `host/zoneinfo/UTC` | the UTC zone of the IANA tz database (TZif, 114 bytes; `src/zoneinfo/UTC`), served when the system has no time zone database | public domain (the tz database is in the public domain) | none required |
 | `licenses/<package>/` | **licence files of every Lake dependency compiled in** | the dependencies' | also appended to `THIRD_PARTY_NOTICES.txt` |
 | `node_modules/` (npm interop) | the project's npm packages | each package's | each package's files |
+
+`lasm package` outputs (Lambda, Lambda@Edge, Vercel, Netlify, Azure Functions,
+Google Cloud Functions) are this `dist/` plus two Lasm handler files
+(`lasm-server.mjs` and the platform's `lasm-*.mjs`, MIT, from `src/serverless/`),
+and, for Azure and Google, a generated `package.json`/`host.json`. They drop the
+musl binaries and keep every notice and licence file. The `@lasm/cli` npm package
+carries `src/serverless/` and `src/zoneinfo/UTC` with the rest of `src/`.
 
 Verified on `lean-zip` (current source, 2026-10-24): `dist/licenses/lean-zip/LICENSE`
 and `dist/licenses/lean-zip-common/LICENSE` (Apache-2.0), listed and appended in the

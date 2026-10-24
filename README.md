@@ -115,11 +115,13 @@ These are all commands and options in the ordinary Node application interface:
 | Explicit run | `npx lasm run Main.lean` | Same as the default command. |
 | Program arguments | `npx lasm Main.lean -- hello "two words"` | Pass arguments to `main (args : List String)`. |
 | Build | `npx lasm build Main.lean` | Write `dist/`; do not run the application. |
+| Build for a function platform | `npx lasm build Main.lean --target lambda` | Build `dist/`, then package it for the platform where `lasm package` writes it: `node` (default; `dist/` only), `lambda` (`lambda.zip`), `lambda-edge` (`lambda-edge.zip`), `vercel` (`.vercel/output`), `netlify` (`netlify/functions/lasm`), `azure` (`azure-functions/`), `gcf` (`gcf/`). `--target=vercel` also works. Lasm never installs or starts the platform's own CLI; use it yourself to test and deploy. [Recipes](docs/deploy/README.md). |
 | Output directory | `npx lasm build Main.lean --output "app dist"` | Choose the deployment directory. `lasm build Main.lean "app dist"` is an alias. |
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
-| New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono`; after publication also `npm create lasm@latest my-app -- --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
+| New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono`; after publication also `npm create lasm@latest my-app -- --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. `--deploy lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` (repeatable): `npm run build:<target>` scripts (`lasm build --target`), `vercel.json`/`netlify.toml`, and the platform npm package for `azure` and `gcf`. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
+| Package an existing build | `npx lasm package --target lambda` | Package a built server (default `dist/`; any server that listens on `$HOST:$PORT`) for one or more platforms without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output; `lasm package dist2 --target lambda` packages another build. Checks the platform's size limit and leaves out the musl pieces (function platforms use glibc). Files only, no network. |
 | Cache repair | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
 `--rebuild` and `--verbose` work with both run and build. `--output` is build-only;
@@ -190,11 +192,18 @@ cloud account or deployment. Details, requirements and the full matrix:
 | Docker / Kubernetes | `node:24-bookworm-slim`, `node:26-bookworm-slim`, `node:24-bullseye-slim` (glibc 2.31), Ubuntu 22.04/24.04 with Node tarballs; read-only, 512 MB, x64 and arm64, with Docker (Kubernetes manifests are not applied in CI) |
 | Google Cloud Run, Fly.io, Railway, Render, Heroku | only the same container images and Dockerfiles (container recipes); the platforms themselves are never deployed to |
 | AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` + AWS Lambda Web Adapter through the Runtime Interface Emulator, x86_64 and arm64; `amazonlinux:2023` |
+| AWS Lambda (.zip, `nodejs24.x`) | `lasm build --target lambda` zips of every server template in `public.ecr.aws/lambda/nodejs:24` through the Runtime Interface Emulator, x86_64 and arm64, with API Gateway REST/HTTP API, function URL and ALB sample events; AWS SAM CLI `sam local invoke` and `sam local start-api` |
+| Lambda@Edge (origin request, x86_64) | the same image and emulator with CloudFront origin-request sample events; CloudFront itself is not emulated |
+| Vercel Functions (Node.js 24, x86_64) | Vercel CLI `vercel build` offline; the built function under Vercel's own Node launcher (`@vercel/node`) in `public.ecr.aws/lambda/nodejs:24`. `vercel dev` needs a login and is not used; Vercel's router is not emulated |
+| Netlify Functions (v2, x86_64) | Netlify CLI `netlify build --offline` (the deploy zip) and `netlify dev --offline`; the deploy zip in `public.ecr.aws/lambda/nodejs:24` with Netlify's bundled bootstrap |
+| Azure Functions (Node.js v4 model, Linux) | Azure Functions Core Tools `func start` |
+| Google Cloud Functions (gen2, `nodejs24`) | Functions Framework on Ubuntu 24.04; Google Cloud's buildpacks (`pack`, `google-24` builder) image |
+| Alpine/musl containers | `node:24-alpine` and `node:26-alpine`, x64 and arm64, read-only, 512 MB, including `Std.Http` without `tzdata` (bundled UTC zone, one stderr warning) |
+| DigitalOcean App Platform (gVisor) | the container images under Docker with gVisor's `runsc`, x64; App Platform itself is never deployed to |
 
 Every build carries the Linux x64 and arm64 native pieces, so `dist/` built on a
-Mac or Windows machine deploys to Linux containers. Not yet supported: Alpine/musl,
-Lambda zip packages, Vercel, Netlify, Azure Functions, Cloudflare Workers and
-other isolate platforms ([plan](docs/PLAN.md)).
+Mac or Windows machine deploys to Linux containers, including Alpine (musl). Not yet supported: Cloudflare Workers and other isolate
+platforms, including Vercel and Netlify Edge ([plan](docs/PLAN.md)).
 
 ## Lean support and restrictions
 
@@ -351,7 +360,7 @@ A summary; the sections above and the linked pages have the details.
 - **Native code.** Prebuilt native libraries (`-l` options, shared libraries)
   cannot be linked; a package's bundled C source is compiled for Node, and
   `dlopen` always fails. On macOS, C projects need the Xcode Command Line Tools SDK.
-- **Platforms.** No Windows ARM64, Alpine/musl, browsers, other JavaScript runtimes
+- **Platforms.** No Windows ARM64, Alpine/musl build machines (built applications run on Alpine; the compiler needs glibc), browsers, other JavaScript runtimes
   or isolate platforms. On Windows a `dist\program.wasm` path over 260 characters
   fails to build, and a `dist/` built on Windows and copied to Linux other than
   through `docker build` needs `chmod 755 dist/host/native/process/linux-*`
