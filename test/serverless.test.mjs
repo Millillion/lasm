@@ -141,6 +141,31 @@ test('Lambda zip: every event shape reaches the server and returns its response 
   assert.equal(JSON.parse(Buffer.from(output['apigw-v2-http'].get.body, 'base64')).cookie, 'cookie1; cookie2');
 });
 
+test('function packages leave out the musl (Alpine) native pieces', { skip: process.platform === 'win32' || spawnSync('unzip', ['-v']).status !== 0 }, () => {
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-musl-'));
+  const app = fakeApplication(join(directory, 'dist'));
+  const write = (name, text) => { mkdirSync(join(app, name, '..'), { recursive: true }); writeFileSync(join(app, name), text); };
+  write('host/native/manifest.json', JSON.stringify({ nodeApi: 8, deployment: { target: 'node', targets: ['linux-x64', 'linux-arm64'], linuxLibc: ['glibc', 'musl'] } }));
+  write('host/native/node_modules/@koromix/koffi-linux-x64/linux_x64/koffi.node', 'gnu');
+  write('host/native/node_modules/@koromix/koffi-linux-x64/musl_x64/koffi.node', 'musl');
+  write('host/native/process/linux-x64-musl', 'musl');
+  write('host/native/process/manifest.json', JSON.stringify({ protocol: 1, files: { 'linux-x64-gnu': { sha256: 'a' }, 'linux-x64-musl': { sha256: 'b' } } }));
+  write('host/native/signals/linux-x64-gnu.so', 'gnu');
+  write('host/native/signals/linux-x64-musl.so', 'musl');
+  write('host/native/signals/manifest.json', JSON.stringify({ protocol: 1, files: { 'linux-x64-gnu.so': { sha256: 'c' }, 'linux-x64-musl.so': { sha256: 'd' } } }));
+  packageApplication({ input: app, target: 'lambda', output: join(directory, 'lambda.zip') });
+  execFileSync('unzip', ['-q', 'lambda.zip', '-d', 'task'], { cwd: directory });
+  const task = join(directory, 'task'), json = name => JSON.parse(readFileSync(join(task, name), 'utf8'));
+  const listing = execFileSync('unzip', ['-Z1', 'lambda.zip'], { cwd: directory, encoding: 'utf8' });
+  assert.doesNotMatch(listing, /musl/);
+  assert.match(listing, /linux_x64\/koffi\.node/);
+  assert.deepEqual(json('host/native/manifest.json').deployment.linuxLibc, ['glibc']);
+  assert.deepEqual(Object.keys(json('host/native/process/manifest.json').files), ['linux-x64-gnu']);
+  assert.deepEqual(Object.keys(json('host/native/signals/manifest.json').files), ['linux-x64-gnu.so']);
+  // The build itself keeps them, for Alpine containers.
+  assert.match(readFileSync(join(app, 'host/native/process/linux-x64-musl'), 'utf8'), /musl/);
+});
+
 function pathToEvents() { return new URL('../scripts/serverless/lambda-events.mjs', import.meta.url).href; }
 
 test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () => {

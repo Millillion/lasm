@@ -91,6 +91,26 @@ function checkApplication(input) {
   return targets;
 }
 
+// Function platforms run glibc Linux (Amazon Linux 2023, Ubuntu, Debian), so
+// packages leave out the musl (Alpine) native pieces that every build carries
+// for containers, and record that in the native manifests.
+const muslPiece = /^host\/native\/(?:node_modules\/@koromix\/koffi-linux-[^/]+\/musl_[^/]+\/|process\/linux-[^/]+-musl$|signals\/linux-[^/]+-musl\.so$)/;
+function withoutMusl(input, files) {
+  const kept = files.filter(file => !muslPiece.test(file.name));
+  if (kept.length === files.length) return { files, generated: {} };
+  const read = name => JSON.parse(readFileSync(join(input, ...name.split('/')), 'utf8'));
+  const generated = {};
+  const native = read('host/native/manifest.json');
+  generated['host/native/manifest.json'] = { ...native, deployment: { ...native.deployment, linuxLibc: ['glibc'] } };
+  for (const helper of ['process', 'signals']) {
+    const name = `host/native/${helper}/manifest.json`;
+    if (!existsSync(join(input, ...name.split('/')))) continue;
+    const manifest = read(name);
+    generated[name] = { ...manifest, files: Object.fromEntries(Object.entries(manifest.files).filter(([file]) => !/-musl(\.so)?$/.test(file))) };
+  }
+  return { files: kept.filter(file => !generated[file.name]), generated };
+}
+
 function shimFiles(target) {
   return ['lasm-server.mjs', packageTargets[target].shim].map(name => ({ name, source: join(serverless, name), mode: 0o644 }));
 }
@@ -100,7 +120,7 @@ function writeTree(output, files, extra = {}) {
   for (const file of files) {
     const path = join(output, ...file.name.split('/'));
     mkdirSync(dirname(path), { recursive: true });
-    copyFileSync(file.source, path);
+    if (file.data) writeFileSync(path, file.data); else copyFileSync(file.source, path);
     chmodSync(path, file.mode);
   }
   for (const [name, text] of Object.entries(extra)) {
@@ -127,14 +147,18 @@ export function packageApplication({ input = 'dist', target, output }) {
   output = resolve(output ?? spec.output);
   if (output === input || input.startsWith(output + sep)) throw new Error('The output must not contain the build directory');
   const shims = shimFiles(target);
+  const glibc = withoutMusl(input, applicationFiles(input));
+  // Generated files (the glibc-only manifests) are written from memory.
+  const generatedFiles = Object.entries(glibc.generated).map(([name, value]) => ({ name, data: Buffer.from(JSON.stringify(value, null, 2) + '\n'), mode: 0o644 }));
   // A shim from an earlier package step copied into the build is replaced.
-  const files = [...applicationFiles(input).filter(file => !shims.some(shim => shim.name === file.name)), ...shims];
+  const files = [...glibc.files.filter(file => !shims.some(shim => shim.name === file.name)), ...generatedFiles, ...shims]
+    .sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
   const unzipped = sizeOf(files);
   if (spec.unzipped && unzipped > spec.unzipped)
     throw new Error(`The package is ${format(unzipped)} unpacked; ${target} allows ${format(spec.unzipped)}.`);
   const summary = { target, input, output, files: files.length, unzippedBytes: unzipped, nativeTargets, warnings: [] };
   if (target === 'lambda' || target === 'lambda-edge') {
-    const archive = zip(files.map(file => ({ name: file.name, data: readFileSync(file.source), mode: file.mode })));
+    const archive = zip(files.map(file => ({ name: file.name, data: file.data ?? readFileSync(file.source), mode: file.mode })));
     summary.zippedBytes = archive.length;
     if (archive.length > spec.zipped) {
       if (spec.zippedHard) throw new Error(`The package is ${format(archive.length)} zipped; ${target} allows ${format(spec.zipped)}.`);

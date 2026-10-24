@@ -16,6 +16,12 @@ name: Serverless platforms
 #   - Netlify (x64): `netlify build --offline` (the deploy zip), `netlify dev
 #     --offline`, and the deploy zip in the Lambda Node 24 image with Netlify's
 #     bundled bootstrap.
+#   - Azure Functions (x64): Azure Functions Core Tools `func start`.
+#   - Google Cloud Functions (x64): the Functions Framework, and the source
+#     built by Google Cloud's buildpacks (pack, google-24 builder).
+#   - Alpine/musl (x64, arm64): node:24-alpine and node:26-alpine.
+#   - gVisor (x64): Docker with gVisor's runsc runtime (DigitalOcean App
+#     Platform's sandbox).
 on:
   workflow_dispatch:
     inputs:
@@ -31,7 +37,7 @@ on:
         default: ""
   push:
     branches: [phase-6]
-    paths: ['src/serverless/**', 'src/package.mjs', 'src/init.mjs', 'src/cli-arguments.mjs', 'src/application-cli.mjs',
+    paths: ['src/serverless/**', 'src/package.mjs', 'src/init.mjs', 'src/cli-arguments.mjs', 'src/application-cli.mjs', 'src/native-bundle.mjs', 'src/application-output.mjs',
       'scripts/serverless/**', 'test/serverless.test.mjs', '.github/workflows/serverless.yml']
 permissions:
   contents: read
@@ -50,7 +56,7 @@ jobs:
         with:
           node-version: 24.22.1
           package-manager-cache: false
-      - run: node --test --test-concurrency=1 test/serverless.test.mjs test/init.test.mjs test/cli-arguments.test.mjs
+      - run: node --test --test-concurrency=1 test/serverless.test.mjs test/init.test.mjs test/cli-arguments.test.mjs test/native-application-bundle.test.mjs test/application-output.test.mjs
   input:
     if: github.event.repository.visibility == 'public'
     runs-on: ubuntu-24.04
@@ -100,7 +106,7 @@ jobs:
           - { runner: ubuntu-24.04, arch: x64, sam: x86_64 }
           - { runner: ubuntu-24.04-arm, arch: arm64, sam: arm64 }
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -134,13 +140,40 @@ jobs:
       - name: Netlify (netlify build and netlify dev offline; the deploy zip in the Lambda Node 24 image)
         if: always() && matrix.arch == 'x64' && hashFiles('.work/lambda.json') != ''
         run: node scripts/serverless/run-netlify.mjs "$RUNNER_TEMP/apps/apps.json" .work/netlify.json "$RUNNER_TEMP/tools/node_modules/.bin/netlify"
+      - name: Install Azure Functions Core Tools 4.16.0 and pack 0.38.2 (pinned)
+        if: always() && matrix.arch == 'x64'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund azure-functions-core-tools@4.16.0
+          curl -fsSL -o "$RUNNER_TEMP/pack.tgz" https://github.com/buildpacks/pack/releases/download/v0.38.2/pack-v0.38.2-linux.tgz
+          tar -xzf "$RUNNER_TEMP/pack.tgz" -C "$RUNNER_TEMP/tools"
+      - name: Azure Functions (func start) and Google Cloud Functions (Functions Framework, buildpacks)
+        if: always() && matrix.arch == 'x64' && hashFiles('.work/lambda.json') != ''
+        run: node scripts/serverless/run-hosted.mjs "$RUNNER_TEMP/apps/apps.json" .work/hosted.json --func "$RUNNER_TEMP/tools/node_modules/.bin/func" --pack "$RUNNER_TEMP/tools/pack"
+      - name: Alpine/musl (node:24-alpine, node:26-alpine)
+        if: always() && hashFiles('.work/lambda.json') != ''
+        run: node scripts/serverless/run-linux-variants.mjs "$RUNNER_TEMP/apps/apps.json" .work/alpine.json --images node:24.22.1-alpine,node:26.12.1-alpine
+      - name: Install gVisor release-20261019.0 as a Docker runtime
+        if: always() && matrix.arch == 'x64'
+        run: |
+          url=https://storage.googleapis.com/gvisor/releases/release/20261019.0/x86_64
+          curl -fsSL -o "$RUNNER_TEMP/gvisor.tar.bz2" "$url/gvisor.tar.bz2"
+          echo "7cbc2aeeee809dcccfb40e612504a1b76f2c119790cee59e482f7b35428cccc4f71705e7e322442d07d1f7d29b5d9e72e31319fc3088d6dcbec9fc7c1f0d8881  $RUNNER_TEMP/gvisor.tar.bz2" | sha512sum -c -
+          mkdir -p "$RUNNER_TEMP/gvisor" && tar -xjf "$RUNNER_TEMP/gvisor.tar.bz2" -C "$RUNNER_TEMP/gvisor"
+          sudo install -m 755 "$RUNNER_TEMP/gvisor/runsc" "$RUNNER_TEMP/gvisor/containerd-shim-runsc-v1" /usr/local/bin/
+          sudo /usr/local/bin/runsc install
+          sudo systemctl restart docker
+          runsc --version
+          docker run --rm --runtime=runsc node:24.22.1-bookworm-slim node -e "console.log(require('os').release())"
+      - name: gVisor (docker --runtime=runsc, node:24-bookworm-slim)
+        if: always() && matrix.arch == 'x64' && hashFiles('.work/lambda.json') != ''
+        run: node scripts/serverless/run-linux-variants.mjs "$RUNNER_TEMP/apps/apps.json" .work/gvisor.json --images node:24.22.1-bookworm-slim --runtime runsc
       - name: Preserve evidence
         if: always()
         run: |
           mkdir -p .work/evidence
           cp .work/overlay/overlay.json .work/evidence/ 2>/dev/null || true
           [ -f "$RUNNER_TEMP/apps/apps.json" ] && cp "$RUNNER_TEMP/apps/apps.json" .work/evidence/apps.json
-          for f in .work/lambda.json .work/sam.json .work/vercel.json .work/netlify.json; do [ -f "$f" ] && cp "$f" .work/evidence/; done
+          for f in .work/lambda.json .work/sam.json .work/vercel.json .work/netlify.json .work/hosted.json .work/alpine.json .work/gvisor.json; do [ -f "$f" ] && cp "$f" .work/evidence/; done
           node -e "for (const f of ['.work/lambda.json']) { try { const r = JSON.parse(require('fs').readFileSync(f)); console.log(JSON.stringify(r.runs.map(x => ({ app: x.app, target: x.target, ok: x.ok, zipBytes: x.zipBytes, unzippedBytes: x.unzippedBytes, coldStarts: x.coldStarts, warmMedianMs: x.warmMedianMs, memory: x.memoryUsage })), null, 1)); } catch {} }"
       - if: always()
         uses: actions/upload-artifact@v7

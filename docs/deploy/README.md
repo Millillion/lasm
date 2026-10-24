@@ -25,7 +25,8 @@ Requirements on every platform:
 - **Node:** 24 or newer. Node 26's official binary needs `libatomic1`, which the
   official `node:26-*` images include; install it on minimal images that add the
   Node 26 tarball themselves.
-- **No Alpine/musl** images: use Debian- or Ubuntu-based Node images.
+- **Alpine/musl:** candidates need Debian- or Ubuntu-based Node images; Phase 6
+  source also runs on `node:24-alpine` ([Alpine](docker-kubernetes.md#alpine-musl)).
 
 | Platform | Recipe | Notes |
 | --- | --- | --- |
@@ -39,6 +40,9 @@ Requirements on every platform:
 | Lambda@Edge | [lambda-edge.md](lambda-edge.md) | Phase 6 source. CloudFront origin-request trigger, x86_64, `lasm package --target lambda-edge`. |
 | Vercel Functions | [vercel.md](vercel.md) | Phase 6 source. `lasm package --target vercel` (Build Output API) or `lasm init --deploy vercel`. |
 | Netlify Functions | [netlify.md](netlify.md) | Phase 6 source. `lasm init --deploy netlify` (`netlify.toml` with `included_files`); 60 s synchronous limit. |
+| Azure Functions | [azure-functions.md](azure-functions.md) | Phase 6 source. `lasm init --deploy azure`; Node.js v4 model, Linux. |
+| Google Cloud Functions (gen2) | [cloud-functions.md](cloud-functions.md) | Phase 6 source. `lasm init --deploy gcf`; Functions Framework. |
+| DigitalOcean App Platform | [digitalocean.md](digitalocean.md) | Container recipe; AMD64; runs in gVisor (tested with `runsc`, Phase 6). |
 
 **What is tested.** Lasm's CI builds and runs every template's Dockerfile on
 Linux x64 and ARM64 with a 512 MB memory limit and a read-only root filesystem,

@@ -737,6 +737,15 @@ folded into Phases 5.2/5.3 and 7.
     in the Lambda image instead).
   - 6.3 Azure Functions (Core Tools), Google Cloud Functions (Functions
     Framework), DigitalOcean App Platform (gVisor), Alpine/musl images.
+  - Status (2026-10-24, branch `phase-6`, awaiting review and a candidate):
+    `lasm package --target lambda|lambda-edge|vercel|netlify|azure|gcf` plus
+    `lasm init --deploy …`; one handler design for every platform (the Lean
+    server runs in the function's Node process on a loopback port; chosen over
+    the Lambda Web Adapter layer, which cannot run on Lambda@Edge, at a measured
+    50–90 ms extra init); builds carry musl pieces for Alpine, which function
+    packages drop. Tested by `serverless.yml` (Linux runners only) with each
+    platform's local runtime, using candidate `.58` plus the branch's source
+    overlay; see [DEPLOYMENT.md](DEPLOYMENT.md#phase-6-platforms-source-not-yet-in-a-candidate).
 - **Phase 7 — Production hardening on Node.** Long soak and concurrency stress
   (tasks, channels, Std.Sync/Std.Async, cancellation, many threads incl.
   Windows stack commit), startup memory tuning (initial memory, 64 MiB worker

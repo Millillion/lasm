@@ -69,10 +69,15 @@ for (const app of apps.filter(app => app.packages.netlify)) {
     assert.equal(manifest.runtimeVersion, 'nodejs24.x');
     assert.equal(manifest.routes[0].pattern, '/*');
     const listing = execFileSync('zipinfo', [zip], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    // Netlify chooses the zip's base directory; find the function's files under it.
+    const names = execFileSync('zipinfo', ['-1', zip], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\n');
+    const entry = names.find(name => /(^|\/)lasm\.mjs$/.test(name));
+    assert.ok(entry, 'lasm.mjs is in the deploy zip: ' + names.slice(0, 20).join(' '));
+    const prefix = run.zipPrefix = entry.slice(0, -'lasm.mjs'.length);
     for (const file of ['program.wasm', 'program.cjs', 'main.mjs', 'lasm-server.mjs', 'host/node-host.mjs', 'host/native/manifest.json',
       'host/native/node_modules/@koromix/koffi-linux-x64/linux_x64/koffi.node', 'host/native/process/linux-x64-gnu'])
-      assert.match(listing, new RegExp(` ${file.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}$`, 'm'), `${file} is in the deploy zip`);
-    assert.match(listing, /^-rwxr-xr-x .* host\/native\/process\/linux-x64-gnu$/m, 'the helper stays executable');
+      assert.ok(names.includes(prefix + file), `${prefix + file} is in the deploy zip (${names.length} entries, e.g. ${names.slice(0, 8).join(' ')})`);
+    assert.ok(listing.split('\n').some(line => line.startsWith('-rwxr-xr-x') && line.endsWith(' ' + prefix + 'host/native/process/linux-x64-gnu')), 'the helper stays executable');
     const total = /(\d+) files, (\d+) bytes uncompressed, (\d+) bytes compressed/.exec(listing);
     run.zipBytes = Number(total[3]); run.unzippedBytes = Number(total[2]);
     assert.ok(run.zipBytes < 50 * 1024 * 1024 && run.unzippedBytes < 250 * 1024 * 1024, 'within 50 MB zipped and 250 MB unzipped');

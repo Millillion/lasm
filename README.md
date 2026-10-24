@@ -199,10 +199,14 @@ cloud account or deployment. Details, requirements and the full matrix:
 | Lambda@Edge (origin request, x86_64; Phase 6 source) | the same image and emulator with CloudFront origin-request sample events; CloudFront itself is not emulated |
 | Vercel Functions (Node.js 24, x86_64; Phase 6 source) | Vercel CLI `vercel build` offline; the built function under Vercel's own Node launcher (`@vercel/node`) in `public.ecr.aws/lambda/nodejs:24`. `vercel dev` needs a login and is not used; Vercel's router is not emulated |
 | Netlify Functions (v2, x86_64; Phase 6 source) | Netlify CLI `netlify build --offline` (the deploy zip) and `netlify dev --offline`; the deploy zip in `public.ecr.aws/lambda/nodejs:24` with Netlify's bundled bootstrap |
+| Azure Functions (Node.js v4 model, Linux; Phase 6 source) | Azure Functions Core Tools `func start` |
+| Google Cloud Functions (gen2, `nodejs24`; Phase 6 source) | Functions Framework on Ubuntu 24.04; Google Cloud's buildpacks (`pack`, `google-24` builder) image |
+| Alpine/musl containers (Phase 6 source) | `node:24-alpine` and `node:26-alpine`, x64 and arm64, read-only, 512 MB |
+| DigitalOcean App Platform (gVisor; Phase 6 source) | the container images under Docker with gVisor's `runsc`, x64; App Platform itself is never deployed to |
 
 Every build carries the Linux x64 and arm64 native pieces, so `dist/` built on a
-Mac or Windows machine deploys to Linux containers. Not yet supported: Alpine/musl,
-Azure Functions, Google Cloud Functions, Cloudflare Workers and other isolate
+Mac or Windows machine deploys to Linux containers (Phase 6 source adds the musl
+pieces for Alpine). Not yet supported: Cloudflare Workers and other isolate
 platforms, including Vercel and Netlify Edge ([plan](docs/PLAN.md)).
 
 ## Lean support and restrictions
@@ -361,7 +365,7 @@ A summary; the sections above and the linked pages have the details.
 - **Native code.** Prebuilt native libraries (`-l` options, shared libraries)
   cannot be linked; a package's bundled C source is compiled for Node, and
   `dlopen` always fails. On macOS, C projects need the Xcode Command Line Tools SDK.
-- **Platforms.** No Windows ARM64, Alpine/musl, browsers, other JavaScript runtimes
+- **Platforms.** No Windows ARM64, Alpine/musl (Phase 6 source runs built applications on Alpine; the compiler still needs glibc), browsers, other JavaScript runtimes
   or isolate platforms. On Windows a `dist\program.wasm` path over 260 characters
   fails to build, and a `dist/` built on Windows and copied to Linux other than
   through `docker build` needs `chmod 755 dist/host/native/process/linux-*`

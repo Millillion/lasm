@@ -23,7 +23,7 @@ preceding candidate `.56` (run 39977543832).
 | --- | --- | --- |
 | Node.js | **24.0.0 or newer** (24.x and 26.x tested) | The Wasm module uses memory64 and table64 without flags (V8 13.6, Node 24.0.0), shared memory, threads and Wasm exceptions. Node 22 and older stop with `This application requires Node 24.0.0 or newer; you are running Node 22.23.4. Install Node 24 or newer.` |
 | OS and CPU | Linux x64 or arm64 with **glibc 2.28 or newer**; plus the build machine's own platform | Every build carries the Linux x64 and arm64 native pieces (koffi and two small helpers), so a build made on macOS, Windows or either Linux deploys to Linux. Another platform stops with `This application includes native support for linux-x64, linux-arm64, darwin-arm64; it is running on … Run it on one of those platforms, or rebuild the Lean source with Lasm on this platform.` |
-| glibc | 2.28 (the floor of the official Node 24/26 binaries) | koffi needs 2.25 and Lasm's helpers 2.17. Alpine/musl stops with a message naming musl. |
+| glibc | 2.28 (the floor of the official Node 24/26 binaries) | koffi needs 2.25 and Lasm's helpers 2.17. Candidates stop on Alpine/musl with a message naming musl; Phase 6 source also carries musl pieces and runs there (below). |
 | Memory | **512 MB or more** (1 GB for real traffic) | A small server uses about 140–200 MB resident. It reserves about 22 GB of *virtual* address space (the 8 GiB Wasm memory maximum, guard regions, worker stacks), which is not memory use; a host that limits virtual memory (`ulimit -v`, `vm.overcommit_memory=2`) will refuse it. |
 | Files | read-only is fine | The application writes nothing next to itself; only what your Lean code writes (use `/tmp`). |
 | `libatomic1` | needed by **Node 26**'s official binary | Official `node:26-*` images include it. On a minimal image with the Node 26 tarball, install it (`apt-get install -y libatomic1`). Node 24 does not need it. |
@@ -46,9 +46,10 @@ programs that start subprocesses use that helper.
 | Google Cloud Run (gen2), Fly.io, Railway, Render, Heroku (container stack) | the same container images (these platforms run your image on Linux x64; Cloud Run gen1's gVisor is untested) | [cloud-run.md](deploy/cloud-run.md), [fly.md](deploy/fly.md), [railway.md](deploy/railway.md), [render.md](deploy/render.md), [heroku.md](deploy/heroku.md) |
 | AWS Lambda (container image, x86_64 and arm64) | `public.ecr.aws/lambda/nodejs:24` with the AWS Lambda Web Adapter 1.1.0, invoked through the image's Runtime Interface Emulator with API Gateway (HTTP API) events, read-only with 512 MB; `amazonlinux:2023` (glibc 2.34) with the Node 24 tarball | [lambda.md](deploy/lambda.md), [`deploy/lambda/Dockerfile`](../deploy/lambda/Dockerfile) |
 
-## Function platforms (Phase 6 source, not yet in a candidate)
+## Phase 6 platforms (source, not yet in a candidate)
 
-`lasm package --target …` turns `dist/` into a function package: a small handler
+Function platforms, Alpine/musl and gVisor. `lasm package --target …` turns
+`dist/` into a function package: a small handler
 starts the Lean server inside the platform's Node process on a loopback port and
 forwards each request to it ([`src/serverless/`](../src/serverless/)). These are
 tested by [`serverless.yml`](../.github/workflows/serverless.yml) on Linux x64
@@ -63,11 +64,14 @@ candidate includes them.
 | Lambda@Edge (origin request, x86_64) | the same, with the CloudFront origin-request sample event | [lambda-edge.md](deploy/lambda-edge.md) |
 | Vercel Functions (Node.js 24) | Vercel CLI 65.2.0 `vercel build` offline (local `.vercel/project.json`); the built function under `@vercel/node`'s Node launcher in `public.ecr.aws/lambda/nodejs:24`, helpers on and off. `vercel dev` needs a login | [vercel.md](deploy/vercel.md) |
 | Netlify Functions (v2) | Netlify CLI 27.14.2 `netlify build --offline` and `netlify dev --offline`; the deploy zip in `public.ecr.aws/lambda/nodejs:24` with Netlify's bundled bootstrap | [netlify.md](deploy/netlify.md) |
+| Azure Functions (Node.js v4 model) | Azure Functions Core Tools 4.16.0 `func start` | [azure-functions.md](deploy/azure-functions.md) |
+| Google Cloud Functions (gen2) | Functions Framework 5.0.5 on Ubuntu 24.04; Google Cloud's buildpacks (`pack` 0.38.2, `google-24` builder) image | [cloud-functions.md](deploy/cloud-functions.md) |
+| Alpine/musl containers | `node:24.22.1-alpine`, `node:26.12.1-alpine`, x64 and arm64, read-only, 512 MB; `deploy/Dockerfile` on Alpine | [docker-kubernetes.md](deploy/docker-kubernetes.md#alpine-musl) |
+| gVisor (DigitalOcean App Platform, Cloud Run gen1) | Docker with gVisor `runsc` release 20261019.0, `node:24.22.1-bookworm-slim`, x64 | [digitalocean.md](deploy/digitalocean.md) |
 
-Not yet supported (later phases, see [PLAN.md](PLAN.md)): Azure Functions,
-Google Cloud Functions, DigitalOcean App Platform (gVisor),
-Alpine/musl, and isolate platforms (Cloudflare Workers, Vercel and Netlify Edge,
-Fastly), which have no threads or native add-ons.
+Not yet supported (later phases, see [PLAN.md](PLAN.md)): isolate platforms
+(Cloudflare Workers, Vercel and Netlify Edge, Fastly), which have no threads or
+native add-ons.
 
 ## What the CI matrix runs
 

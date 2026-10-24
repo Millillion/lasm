@@ -6,12 +6,15 @@
 // Functions add their platform's npm package to the deployment:
 //   <template>          --deploy lambda-zip lambda-edge vercel netlify
 //   <template>-hosted   --deploy azure gcf
+// Plus `probe` (scripts/serverless/probe/Main.lean), a program that uses the
+// native pieces (subprocess, files, environment) for the Linux variants.
 // Writes OUTPUT/apps.json for the run-*.mjs scripts.
 //   node build-apps.mjs CANDIDATE_TGZ WORK_DIR [--templates hono,express,std-http]
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const args = process.argv.slice(2);
 const flag = name => { const i = args.indexOf(name); if (i < 0) return undefined; const [, value] = args.splice(i, 2); return value; };
@@ -57,6 +60,15 @@ for (const template of templates) {
     }
     apps.push({ name, template, framework: frameworks[template], project, dist: join(project, 'dist'), distBytes: size(join(project, 'dist')), packages });
   }
+}
+{
+  const project = join(work, 'probe');
+  run('lasm init probe', lasm, ['init', project, '--template', 'plain'], work);
+  copyFileSync(fileURLToPath(new URL('./probe/Main.lean', import.meta.url)), join(project, 'Main.lean'));
+  run('npm install -D Lasm (probe)', bin('npm'), ['install', '-D', tgz], project);
+  run('npm run build (probe)', bin('npm'), ['run', 'build'], project);
+  apps.push({ name: 'probe', kind: 'program', project, dist: join(project, 'dist'), distBytes: size(join(project, 'dist')), packages: {},
+    expectedStdout: 'process: 0 child\nfile: data\nenv: probe\ntime: true\n' });
 }
 writeFileSync(join(work, 'apps.json'), JSON.stringify({ host: `${process.platform}-${process.arch}`, node: process.version,
   candidate: tgz.split(/[\\/]/).pop(), builtAt: new Date().toISOString(), steps, apps }, null, 2) + '\n');
