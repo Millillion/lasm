@@ -30,7 +30,8 @@ out of function packages, whose platforms all use glibc.
 `Std.Time` reads `/etc/localtime` and `/usr/share/zoneinfo`, and `Std.Http`
 needs them for its `Date` header (natively, a server without them drops every
 connection). Lasm falls back to a UTC zone bundled with the build
-(`host/zoneinfo/UTC`, from the tz database) and prints once on stderr
+(`host/zoneinfo/UTC`, from the tz database), also when a sandbox denies reading
+the zone files, and prints once on stderr
 `[lasm] /usr/share/zoneinfo/UTC is missing (no time zone database): using UTC. …`.
 For local time zones, add `RUN apk add --no-cache tzdata` to the Alpine stage.
 

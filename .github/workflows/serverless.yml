@@ -53,7 +53,7 @@ jobs:
         with:
           node-version: 24.22.1
           package-manager-cache: false
-      - run: node --test --test-concurrency=1 test/serverless.test.mjs test/init.test.mjs test/cli-arguments.test.mjs test/native-application-bundle.test.mjs test/application-output.test.mjs
+      - run: node --test --test-concurrency=1 test/serverless.test.mjs test/init.test.mjs test/cli-arguments.test.mjs test/native-application-bundle.test.mjs test/application-output.test.mjs test/node-host-zone.test.mjs
   input:
     if: github.event.repository.visibility == 'public'
     runs-on: ubuntu-24.04

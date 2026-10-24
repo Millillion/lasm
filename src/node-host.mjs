@@ -1,7 +1,7 @@
 import * as fsp from 'node:fs/promises';
 import { getSystemErrorMessage } from 'node:util';
 import { join } from 'node:path';
-import { existsSync } from 'node:fs';
+import { closeSync, existsSync, openSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { randomBytes } from 'node:crypto';
@@ -25,20 +25,42 @@ const empty = Buffer.alloc(0);
 // Larger reads of regular files keep using a file worker, off the host thread.
 const regularReadLimit = 64 * 1024;
 // Std.Time (and Std.Http's Date header) reads the local time zone from
-// /etc/localtime, or a TZ id such as UTC from /usr/share/zoneinfo. Minimal
-// images (Alpine without tzdata, distroless) have neither; native Lean then
-// fails, and a Std.Http server drops every connection. When these files are
-// missing, Lasm serves its bundled UTC zone (host/zoneinfo/UTC, from the tz
-// database) instead and says so once on stderr.
-const zoneFallbackPaths = new Set(['/etc/localtime', '/usr/share/zoneinfo/UTC', '/usr/share/zoneinfo/Etc/UTC']);
-const bundledUtcZone = new URL('./zoneinfo/UTC', import.meta.url);
-function zoneFallback(value) {
-  if (process.platform !== 'linux' || !zoneFallbackPaths.has(value) || existsSync(value) || !existsSync(bundledUtcZone)) return value;
-  if (!globalThis.__lasmZoneFallbackWarned) {
-    globalThis.__lasmZoneFallbackWarned = true;
-    process.stderr.write(`[lasm] ${value} is missing (no time zone database): using UTC. Install tzdata (apk add tzdata, apt-get install tzdata) for local time zones.\n`);
+// /etc/localtime (on macOS a link into /var/db/timezone), or a TZ id such as
+// UTC from /usr/share/zoneinfo. Minimal images (Alpine without tzdata,
+// distroless) lack them, and sandboxes (Landlock, seccomp, macOS sandbox
+// profiles) can deny reading them; native Lean then fails, and a Std.Http
+// server closes every connection. When one of these files is missing or cannot
+// be read, Lasm serves its bundled UTC zone (host/zoneinfo/UTC, from the tz
+// database) instead and says so once on stderr. Windows uses its own zone API.
+const zoneFallbackPaths = new Set(['/etc/localtime', '/usr/share/zoneinfo/UTC', '/usr/share/zoneinfo/Etc/UTC',
+  '/var/db/timezone/zoneinfo/UTC']);
+const bundledUtcZone = fileURLToPath(new URL('./zoneinfo/UTC', import.meta.url));
+// Landlock does not restrict stat or access(2), so a read is tried: these
+// errors mean the zone cannot be used; any other leaves the path to Lean.
+const zoneUnusable = new Set(['ENOENT', 'EACCES', 'EPERM', 'ELOOP', 'ENOTDIR']);
+
+/** The file Lean should read for `value`, and a warning when it is the bundled UTC zone. */
+export function timeZoneFile(value, { platform = process.platform, open = path => closeSync(openSync(path, 'r')),
+  bundled = bundledUtcZone, bundledExists = existsSync(bundled) } = {}) {
+  if (!['linux', 'darwin'].includes(platform) || !zoneFallbackPaths.has(value) || !bundledExists) return { path: value };
+  try { open(value); return { path: value }; }
+  catch (error) {
+    if (!zoneUnusable.has(error.code)) return { path: value };
+    const reason = error.code === 'ENOENT' ? `${value} is missing (no time zone database)` : `cannot read ${value} (${error.code})`;
+    return { path: bundled, warning: `[lasm] ${reason}: using UTC. Install tzdata (apk add tzdata, apt-get install tzdata) or allow reading it for local time zones.` };
   }
-  return fileURLToPath(bundledUtcZone);
+}
+const zoneFiles = new Map();
+function zoneFallback(value) {
+  if (!zoneFallbackPaths.has(value)) return value;
+  // Checked once per path and thread: a zone file rarely appears later.
+  if (!zoneFiles.has(value)) zoneFiles.set(value, timeZoneFile(value));
+  const { path, warning } = zoneFiles.get(value);
+  if (warning && !globalThis.__lasmZoneFallbackWarned) {
+    globalThis.__lasmZoneFallbackWarned = true;
+    process.stderr.write(warning + '\n');
+  }
+  return path;
 }
 
 export class LeanExit extends Error { constructor(code, force = false) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; this.force = force; } }

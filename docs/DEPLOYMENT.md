@@ -73,6 +73,13 @@ candidate; it overlays only sources changed since `main`
 
 Without a time zone database (`/etc/localtime`, `/usr/share/zoneinfo/UTC`),
 the host serves a bundled UTC zone to `Std.Time` and warns once on stderr.
+**Sandboxed hosts** (Landlock, seccomp or AppArmor profiles, the macOS sandbox)
+that deny reading those files, or `/var/db/timezone` on macOS, get the same UTC
+fallback and the warning `[lasm] cannot read /usr/share/zoneinfo/UTC (EACCES):
+using UTC. …`; allow reading them for local time zones. Without it a pure-Lean
+`Std.Http` server would close every connection (its `Date` header needs a zone).
+Tested under Landlock rules that deny the zone files (the std-http template
+answers with a `+0000` `Date` header) and by `test/node-host-zone.test.mjs`.
 
 **Merged into `main` for 0.1.0** (2026-10-24). The first candidate with these
 sources runs `serverless.yml` with no source overlay; until it passes, the rows
