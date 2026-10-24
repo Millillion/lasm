@@ -1,15 +1,14 @@
-import { createReadStream, readdirSync, lstatSync, readFileSync } from 'node:fs';
+import { createReadStream, readdirSync, lstatSync, readFileSync, mkdirSync, openSync, writeSync, closeSync } from 'node:fs';
 import { mkdir, readFile, readdir, readlink, lstat, realpath, rename, writeFile, symlink, link, copyFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { dirname, join, resolve, relative, isAbsolute, posix } from 'node:path';
 import { homedir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { pipeline } from 'node:stream/promises';
-import { Transform } from 'node:stream';
 import { createZstdDecompress, createGunzip } from 'node:zlib';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { x as extractTar, Parser as TarParser } from 'tar';
+import { Parser as TarParser } from 'tar';
 import { isDeepStrictEqual } from 'node:util';
 import { downloadArtifact } from './managed-download.mjs';
 import { acquireArtifact } from './npm-artifacts.mjs';
@@ -63,6 +62,36 @@ function cleanArchivePath(name) {
   return !!name && !/[\\:\0]/.test(name) && parts.every(part => part && part !== '.' && part !== '..');
 }
 
+/** Writes the accepted regular files and directories of a tar stream under
+ * `directory`, synchronously one file at a time (node-tar's asynchronous
+ * writer was 2-4x slower on Windows and macOS for Lean's many small files),
+ * hashing each file from the bytes it writes (`hashes`: name -> sha256, size).
+ * Links are never written here (accept defers them); with no link in the
+ * tree yet, no write can be redirected outside it. */
+function archiveWriter(directory, { strip, accept, hashes, failed }) {
+  const parser = new TarParser({ strict: true });
+  const made = new Set([directory]);
+  const ensure = path => { if (!made.has(path)) { mkdirSync(path, { recursive: true }); made.add(path); } };
+  parser.on('entry', entry => {
+    if (failed() || !accept(entry.path, entry)) { entry.resume(); return; }
+    const name = entry.path.replace(/^\.\//, '').replace(/\/$/, '').split('/').slice(strip).join('/');
+    if (!name) { entry.resume(); return; }
+    const target = join(directory, ...name.split('/'));
+    if (entry.type === 'Directory') { ensure(target); entry.resume(); return; }
+    ensure(dirname(target));
+    const fd = openSync(target, 'wx', (entry.mode ?? 0o644) & 0o777 | 0o600);
+    const hash = createHash('sha256');
+    let bytes = 0, open = true;
+    const close = () => { if (open) { open = false; closeSync(fd); } };
+    entry.on('data', chunk => {
+      try { writeSync(fd, chunk); } catch (error) { close(); parser.abort(error); return; }
+      hash.update(chunk); bytes += chunk.length;
+    });
+    entry.on('end', () => { close(); hashes?.set(name, { sha256: hash.digest('hex'), size: bytes }); });
+  });
+  return parser;
+}
+
 async function extract(artifact, archive, directory, python, hashes) {
   // macOS /var and Windows short-path temp directories are aliases. Compare
   // resolved link targets with the same physical root, not its lexical alias.
@@ -73,8 +102,8 @@ async function extract(artifact, archive, directory, python, hashes) {
   const rootless = artifact.root === '.';
   const seen = new Set();
   const links = [];
-  const unpack = extractTar({ cwd: directory, strip: rootless ? 0 : 1, strict: true, preservePaths: false, preserveOwner: false,
-    filter(name, entry) {
+  // Which entries are written (the others are rejected or, for links, deferred).
+  const accept = (name, entry) => {
       if (error) return false;
       const canonical = (rootless ? name.replace(/^\.\//, '') : name).replace(/\/$/, '');
       if (rootless && (canonical === '.' || canonical === '') && entry.type === 'Directory') return false;
@@ -111,8 +140,8 @@ async function extract(artifact, archive, directory, python, hashes) {
         }
       }
       return true;
-    },
-  });
+  };
+  const unpack = archiveWriter(directory, { strip: rootless ? 0 : 1, accept, hashes, failed: () => error });
   if (['tar.xz', 'zip'].includes(artifact.format)) {
     const child = spawn(python, ['-I', '-B', fileURLToPath(new URL('./archive-stream.py', import.meta.url)), artifact.format, archive],
       { stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
@@ -134,24 +163,7 @@ async function extract(artifact, archive, directory, python, hashes) {
     }
   } else {
     const decompressor = artifact.format === 'tar.gz' ? createGunzip() : createZstdDecompress();
-    // A second parser hashes every regular file from the same decompressed
-    // bytes the extractor writes, so the receipt (inventory) need not read the
-    // freshly written tree again.
-    const hasher = new TarParser({ strict: true });
-    hasher.on('entry', entry => {
-      const canonical = (rootless ? entry.path.replace(/^\.\//, '') : entry.path).replace(/\/$/, '');
-      const name = rootless ? canonical : canonical.slice(artifact.root.length + 1);
-      if (entry.type !== 'File' || !name || !hashes) { entry.resume(); return; }
-      const hash = createHash('sha256');
-      let bytes = 0;
-      entry.on('data', chunk => { hash.update(chunk); bytes += chunk.length; });
-      entry.on('end', () => { hashes.set(name, { sha256: hash.digest('hex'), size: bytes }); });
-    });
-    const hashed = new Promise((resolve, reject) => { hasher.on('end', resolve); hasher.on('error', reject); });
-    const tee = new Transform({ transform(chunk, encoding, callback) { hasher.write(chunk); callback(null, chunk); } });
-    try { await pipeline(createReadStream(archive), decompressor, tee, unpack); }
-    finally { hasher.end(); }
-    await hashed;
+    await pipeline(createReadStream(archive), decompressor, unpack);
   }
   if (error) throw error;
   for (const entry of links) {
