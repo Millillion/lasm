@@ -292,8 +292,17 @@ new project, with the download time reported separately:
 Before these changes the first Hono build in a new project (tools for hello
 already installed) took 41 / 45 / 211 / 85 / 295 s on the same five runners.
 Since then the runtime archives' initializer analysis is shipped with the
-package (2.1 s → 0.04 s on a new machine) and the program-independent planning
-probe runs alongside the others.
+package (2.1 s → 0.04 s on a new machine), the program-independent planning
+probe runs alongside the others, and Lasm's planning objects and probe records
+are kept machine-wide (`<tool cache>/objects`, self-checking entries, at most
+600 entries / 768 MiB): a second new project on the same machine skips its
+planning (maintainer host, one job: Hono 36 → 18 s, hello 21 → 10.5 s).
+
+The Intel Mac runner stays at about 100 s for a new machine's first Hono
+build without the download: each wasm-ld probe link takes 2.5 s there (1.1 s
+on Linux) and `wasm-opt -Oz` 8 s. This is accepted for 0.1.0 as a hardware
+limit; on such machines use the dev profile (`lasm Main.lean`, `npm run dev`)
+for the edit loop.
 
 What remains, by platform:
 

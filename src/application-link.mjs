@@ -2,7 +2,7 @@
 // unchanged upstream foreign-runtime test drivers. The CLI owns provisioning,
 // project discovery and caching; this helper uses its verified inputs.
 import { writeFile } from 'node:fs/promises';
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { isAbsolute, join, relative } from 'node:path';
 import { execFile, execFileSync } from 'node:child_process';
@@ -66,6 +66,44 @@ export function selectedLinkDriver(value = process.env.LASM_LINK_DRIVER) {
   throw new Error(`Unsupported LASM_LINK_DRIVER ${JSON.stringify(value)}`);
 }
 
+/** Object-store entries (generated objects, probe records): a magic, the
+ * SHA-256 of the content, then the content; written atomically. */
+const storeMagic = Buffer.from('LASMSTO1');
+let storePartials = 0;
+export function writeStoreEntry(path, bytes) {
+  const partial = `${path}.${process.pid}.${storePartials++}.partial`;
+  writeFileSync(partial, Buffer.concat([storeMagic, createHash('sha256').update(bytes).digest(), bytes]));
+  renameSync(partial, path);
+}
+/** The content of a valid entry; a missing, damaged or foreign one is removed and reads as undefined. */
+export function readStoreEntry(path) {
+  let data;
+  try { data = readFileSync(path); } catch { return undefined; }
+  const bytes = data.subarray(storeMagic.length + 32);
+  if (data.length >= storeMagic.length + 32 && data.subarray(0, storeMagic.length).equals(storeMagic)
+      && createHash('sha256').update(bytes).digest().equals(data.subarray(storeMagic.length, storeMagic.length + 32))) return bytes;
+  rmSync(path, { force: true });
+  return undefined;
+}
+
+/** The machine-wide store of Lasm's planning objects and probe records keeps the
+ * most recently used entries within a bound; this build's entries are kept. */
+export const sharedStoreLimits = Object.freeze({ entries: 600, bytes: 768 * 1024 * 1024 });
+export function pruneSharedStore(directory, used, limits = sharedStoreLimits) {
+  const now = new Date();
+  for (const path of used) { try { utimesSync(path, now, now); } catch { /* removed meanwhile */ } }
+  let entries;
+  try { entries = readdirSync(directory).filter(name => !name.endsWith('.partial')).map(name => {
+    try { const stat = statSync(join(directory, name)); return { path: join(directory, name), size: stat.size, time: stat.mtimeMs }; }
+    catch { return undefined; } }).filter(Boolean); } catch { return; }
+  let bytes = entries.reduce((total, entry) => total + entry.size, 0), count = entries.length;
+  for (const entry of entries.sort((a, b) => a.time - b.time)) {
+    if (count <= limits.entries && bytes <= limits.bytes) break;
+    if (used.has(entry.path)) continue;
+    rmSync(entry.path, { force: true }); count--; bytes -= entry.size;
+  }
+}
+
 /** The code that turns a probe's arguments into wasm-ld's inputs. */
 let driverSources;
 function linkDriverSourceIdentity() {
@@ -124,7 +162,7 @@ function rejectionExplanation({ requirements, whyExtractFile, objects, runtime, 
 }
 
 export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
-  linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, analysisCache, profile = 'release', initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable: declaredUnavailable = [] }) {
+  linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, sharedCache, analysisCache, profile = 'release', initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable: declaredUnavailable = [] }) {
   const nativeUnavailable = [...declaredUnavailable];
   let initializationPlan;
   if (![1, 2].includes(memoryMode)) throw new Error('Invalid application memory mode');
@@ -209,12 +247,23 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // (the last planning round's wrappers are the final link's).
   const objectStore = objectCache ?? join(work, 'object-store');
   mkdirSync(objectStore, { recursive: true });
-  let partials = 0;
-  const storeObject = (object, cached) => { const partial = `${cached}.${process.pid}.${partials++}.partial`; copyFileSync(object, partial); renameSync(partial, cached); };
-  const compile = (source, object) => {
-    const cached = join(objectStore, objectKey(source) + '.o');
-    usedObjects.add(cached);
-    if (existsSync(cached)) { copyFileSync(cached, object); return; }
+  // Lasm's own generated C (initializer wrappers, stubs) and the planning probe
+  // records do not depend on the project: with `sharedCache` (the managed cache)
+  // a new project reuses them. Bounded below; entries are content-addressed.
+  const sharedStore = sharedCache ?? objectStore, sharedUsed = new Set();
+  mkdirSync(sharedStore, { recursive: true });
+  const use = (store, name) => { const path = join(store, name); (store === objectStore ? usedObjects : sharedUsed).add(path); return path; };
+  // Entries carry their own SHA-256 (readStoreEntry): a damaged, truncated or
+  // concurrently pruned entry is compiled again and replaced.
+  const reuse = (cached, object) => {
+    const bytes = readStoreEntry(cached);
+    if (!bytes) return false;
+    writeFileSync(object, bytes); return true;
+  };
+  const storeObject = (object, cached) => writeStoreEntry(cached, readFileSync(object));
+  const compile = (source, object, { shared = false } = {}) => {
+    const cached = use(shared ? sharedStore : objectStore, objectKey(source) + '.o');
+    if (existsSync(cached) && reuse(cached, object)) return;
     compileUncached(source, object);
     storeObject(object, cached);
   };
@@ -244,9 +293,8 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   const compileAll = async (pairs, { optimization } = {}) => {
     const pending = [];
     for (const [source, object] of pairs) {
-      const cached = join(objectStore, objectKey(source, optimization) + '.o');
-      usedObjects.add(cached);
-      if (existsSync(cached)) copyFileSync(cached, object); else pending.push({ source, object, cached });
+      const cached = use(sharedStore, objectKey(source, optimization) + '.o');
+      if (!(existsSync(cached) && reuse(cached, object))) pending.push({ source, object, cached });
     }
     // The emcc maintainer driver has no probe optimization level: it compiles as recorded.
     if (!nodeCompile || pending.length < 2 && !optimization) { for (const item of pending) { compileUncached(item.source, item.object); storeObject(item.object, item.cached); } return; }
@@ -273,7 +321,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     const key = createHash('sha256').update(JSON.stringify({ schema: 1, native: item.identity, args: item.extraArgs, runtime: runtime.identity,
       linkDriver, tools: sdk.toolchain ?? sdk.driverIdentity ?? null })).update(readFileSync(item.source)).digest('hex');
     const cached = objectCache && join(objectCache, key + '.o');
-    if (cached && existsSync(cached)) copyFileSync(cached, object);
+    if (cached && existsSync(cached) && reuse(cached, object)) { /* reused */ }
     else {
       if (!nodeCompile) throw new Error('Package C code requires the Node compile driver');
       try {
@@ -294,7 +342,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   }
   if (nativeObjects.length) {
     const stubC = join(work, 'package-dl.c'), stubObject = join(work, 'package-dl.o');
-    await writeFile(stubC, dynamicLoadingStubs); compile(stubC, stubObject); nativeObjects.push(stubObject);
+    await writeFile(stubC, dynamicLoadingStubs); compile(stubC, stubObject, { shared: true }); nativeObjects.push(stubObject);
   }
   const nativeInputs = nativeObjects.length ? ['-Wl,--start-lib', ...nativeObjects, '-Wl,--end-lib'] : [];
   progress?.({ stage: 'Preparing application symbols' });
@@ -302,7 +350,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     runtime.manifest.applicationSymbolHook);
   const probeC = join(work, 'reachability.c'), probeObject = join(work, 'reachability.o');
   await writeFile(probeC, reachabilityRegistry);
-  compile(probeC, probeObject);
+  compile(probeC, probeObject, { shared: true });
   const initializeObject = join(work, 'initialization.o');
   const specializeInitialization = canSpecializeInitialization(runtime);
   const analysis = { initializationFreeCppSymbols: specializeInitialization
@@ -311,7 +359,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   const initializationInputs = [];
   if (specializeInitialization) {
     const initializeC = join(work, 'initialization.c'); await writeFile(initializeC, selectiveInitialization);
-    compile(initializeC, initializeObject);
+    compile(initializeC, initializeObject, { shared: true });
     initializationInputs.push(initializeObject, '-Wl,--wrap=lean_initialize');
   }
   // A C entry point `int main(void)` defines only __main_void. The exported `main`
@@ -325,7 +373,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   if (definedEntries.has('__main_void') && !definedEntries.has('__main_argc_argv')) {
     const entryC = join(work, 'entry.c');
     await writeFile(entryC, 'int __main_void(void);\nint __main_argc_argv(int argc, char **argv) { return __main_void(); }\n');
-    compile(entryC, entryObject);
+    compile(entryC, entryObject, { shared: true });
     initializationInputs.push(entryObject);
   }
   const exportsFile = join(work, 'exports.json');
@@ -361,11 +409,10 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // (a later planning round, the program-independent probes of a one-line edit,
   // or the requirements check repeating the last round) is not relinked.
   const probeLink = async (args, map, rsp) => {
-    const cached = join(objectStore, `probe-${probeKey(args)}.json`);
-    usedObjects.add(cached);
+    const cached = use(sharedStore, `probe-${probeKey(args)}.json`);
     try {
-      const record = JSON.parse(readFileSync(cached, 'utf8'));
-      if (record.schema === 2) return { live: { data: new Set(record.data), code: new Set(record.code) },
+      const record = JSON.parse(readStoreEntry(cached)?.toString('utf8') ?? 'null');
+      if (record?.schema === 2) return { live: { data: new Set(record.data), code: new Set(record.code) },
         requirements: record.requirements, requirementsError: record.requirementsError };
     } catch { /* not recorded */ }
     await writeFile(rsp, responseFile(args));
@@ -374,9 +421,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     // Planning probes of initializer bodies have no application entry point.
     let requirements = null, requirementsError = null;
     try { requirements = await readApplicationLinkRequirements(map, analysis); } catch (error) { requirementsError = error.message; }
-    const partial = cached + '.' + process.pid + '.partial';
-    writeFileSync(partial, JSON.stringify({ schema: 2, data: [...live.data].sort(), code: [...live.code].sort(), requirements, requirementsError }));
-    renameSync(partial, cached);
+    writeStoreEntry(cached, Buffer.from(JSON.stringify({ schema: 2, data: [...live.data].sort(), code: [...live.code].sort(), requirements, requirementsError })));
     return { live, requirements, requirementsError };
   };
   const planInputs = [], planWrap = [], planObjects = [];
@@ -466,6 +511,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // Keep only this build's objects; the cache never grows across edits.
   if (objectCache) for (const name of readdirSync(objectCache))
     if (!usedObjects.has(join(objectCache, name))) rmSync(join(objectCache, name), { force: true });
+  if (sharedCache) pruneSharedStore(sharedStore, sharedUsed);
   progress?.({ stage: 'Preparing the application launcher' });
   const glue = join(dist, 'program.cjs');
   writeFileSync(glue, connectLeanSymbolLoader(relabelPreJs(readFileSync(glue, 'utf8'), preJs), true, { packageSymbols: true }));
