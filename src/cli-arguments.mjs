@@ -4,11 +4,13 @@ import { parsePackageArguments, packageTargets } from './package.mjs';
 // `lasm build --target`: `node` writes dist/ only; a function platform also
 // packages it (src/package.mjs). Lasm builds for the platform; it never
 // installs or starts the platform's own tools.
-// `workers` (experimental, docs/EDGE.md) relinks for edge isolates (src/edge/).
-export const buildTargets = ['node', ...Object.keys(packageTargets), 'workers'];
+// Edge targets (experimental, docs/EDGE.md) relink for edge isolates; the
+// list equals src/edge/edge-build.mjs edgeTargets (test/edge.test.mjs).
+export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge'];
+export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers] [--dev]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge] [--dev]
        lasm init <directory> [--template plain|express|hono|std-http] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]

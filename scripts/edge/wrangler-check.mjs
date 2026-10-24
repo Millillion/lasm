@@ -8,10 +8,11 @@ import { join, resolve, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { gzipSync } from 'node:zlib';
 import { apps } from './checks.mjs';
+import { headlessEnvironment } from './headless.mjs';
 
 const [wrangler, projectArg, appName, port, resultFile] = process.argv.slice(2);
 const project = resolve(projectArg), app = apps[appName];
-const env = { ...process.env, CI: '1', BROWSER: 'false', WRANGLER_SEND_METRICS: 'false', NO_COLOR: '1', WRANGLER_LOG: 'info' };
+const env = headlessEnvironment(process.env, { WRANGLER_LOG: 'info' });
 // wrangler's own package.json (node_modules/wrangler/bin/wrangler.js).
 const wranglerVersion = JSON.parse(readFileSync(join(dirname(realpathSync(wrangler)), '../package.json'), 'utf8')).version;
 const result = { app: appName, wrangler: wranglerVersion, checks: [] };

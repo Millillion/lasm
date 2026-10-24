@@ -26,6 +26,8 @@ export const deployTargets = {
   gcf: { summary: 'Google Cloud Functions gen2 (npm run build:gcf)', package: 'gcf', dependencies: { '@google-cloud/functions-framework': '5.0.5' } },
   // Experimental (docs/EDGE.md): the edge build, Hono template only.
   workers: { summary: 'Cloudflare Workers, experimental (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono'] },
+  'vercel-edge': { summary: 'Vercel Edge Function, experimental (vercel.json; Vercel runs npm run build:vercel-edge)', package: 'vercel-edge', templates: ['hono'], conflicts: ['vercel'] },
+  'netlify-edge': { summary: 'Netlify Edge Function, experimental (netlify.toml; Netlify runs npm run build:netlify-edge)', package: 'netlify-edge', templates: ['hono'], conflicts: ['netlify'] },
 };
 
 export const templates = {
@@ -77,8 +79,12 @@ export function parseInitArguments(tokens) {
     throw new Error(`Unknown template "${result.template}". Choose one of: ${Object.keys(templates).join(', ')}`);
   if (result.deploy.length && !templates[result.template].server)
     throw new Error(`--deploy ${result.deploy[0]} needs a server template (express, hono or std-http), not ${result.template}`);
-  for (const target of result.deploy) if (deployTargets[target].templates && !deployTargets[target].templates.includes(result.template))
-    throw new Error(`--deploy ${target} supports the ${deployTargets[target].templates.join(', ')} template, not ${result.template}`);
+  for (const target of result.deploy) {
+    if (deployTargets[target].templates && !deployTargets[target].templates.includes(result.template))
+      throw new Error(`--deploy ${target} supports the ${deployTargets[target].templates.join(', ')} template, not ${result.template}`);
+    for (const other of deployTargets[target].conflicts ?? [])
+      if (result.deploy.includes(other)) throw new Error(`--deploy ${target} and --deploy ${other} both configure the same platform; choose one`);
+  }
   result.directory = positional[0];
   return result;
 }
@@ -139,7 +145,7 @@ function packageJson(name, template, deploy = []) {
     if (platform) pkg.scripts[`build:${platform}`] = `lasm build Main.lean --target ${platform}`;
   }
   // Workers bundle the npm modules Lean binds; the Node server stays out.
-  if (deploy.includes('workers')) pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
+  if (deploy.some(target => ['workers', 'vercel-edge', 'netlify-edge'].includes(target))) pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
   const dependencies = Object.assign({}, npm[template], ...deploy.map(target => deployTargets[target].dependencies));
   if (Object.keys(dependencies).length) pkg.dependencies = Object.fromEntries(Object.entries(dependencies).sort(([a], [b]) => a < b ? -1 : 1));
   pkg.devDependencies = { [lasm.name]: lasm.version };
@@ -246,8 +252,26 @@ globs = ["**/*.wasm"]
 fallthrough = false
 `;
 
+// Vercel and Netlify edge functions: the platform runs the build, which writes
+// the function with lasm build --target vercel-edge|netlify-edge.
+const vercelEdgeJson = JSON.stringify({
+  $schema: 'https://openapi.vercel.sh/vercel.json',
+  framework: null,
+  installCommand: 'npm install',
+  buildCommand: 'npm run build:vercel-edge',
+  outputDirectory: 'public',
+  routes: [{ src: '/(.*)', dest: '/api/lasm' }],
+}, null, 2) + '\n';
+const netlifyEdgeToml = `# Netlify runs the build: lasm build --target netlify-edge writes the edge
+# function netlify/edge-functions/lasm.mjs, which serves every path.
+[build]
+  command = "npm run build:netlify-edge"
+  publish = "public"
+`;
+
 function deployGitignore(deploy) {
-  const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/' };
+  const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
+    'vercel-edge': '.vercel/\napi/lasm.mjs\napi/_lasm/', 'netlify-edge': '.netlify/\nnetlify/lasm/\nnetlify/edge-functions/lasm.mjs' };
   return gitignore + deploy.map(target => extra[target]).filter(Boolean).map(line => line + '\n').join('');
 }
 
@@ -368,6 +392,14 @@ See the [Netlify guide](${guide('netlify')}).
 Test with \`npx wrangler dev\` and deploy with \`npx wrangler deploy\`. The same \`Main.lean\`
 serves Node and Workers (\`Lasm.JS.onEdge\`). See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
 `,
+  'vercel-edge': () => `**Vercel Edge (experimental):** \`vercel.json\` makes Vercel run \`npm run build:vercel-edge\`,
+which writes the edge function \`api/lasm.mjs\` (and \`api/_lasm/\`); deploy with \`vercel deploy\`.
+Vercel recommends its Node runtime over the edge runtime; see the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
+`,
+  'netlify-edge': () => `**Netlify Edge (experimental):** \`netlify.toml\` makes Netlify run \`npm run build:netlify-edge\`,
+which writes the edge function \`netlify/edge-functions/lasm.mjs\` (and \`netlify/lasm/\`); test with
+\`netlify dev\`, deploy with \`netlify deploy --build\`. See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
+`,
   gcf: () => `**Google Cloud Functions:** \`npm run build:gcf\` writes \`gcf/\`; deploy with
 \`gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source gcf\`.
 See the [Cloud Functions guide](${guide('cloud-functions')}).
@@ -398,6 +430,9 @@ export function initProject({ directory, template, deploy = [] }) {
   if (deploy.includes('vercel')) files['vercel.json'] = vercelJson;
   if (deploy.includes('netlify')) { files['netlify.toml'] = netlifyToml; files['public/.gitkeep'] = ''; }
   if (deploy.includes('workers')) files['wrangler.toml'] = wranglerToml(name);
+  // Vercel refuses an empty output directory; every path still reaches the function (vercel.json routes).
+  if (deploy.includes('vercel-edge')) { files['vercel.json'] = vercelEdgeJson; files['public/lasm.txt'] = 'Requests are served by the Lean edge function api/lasm.mjs.\n'; }
+  if (deploy.includes('netlify-edge')) { files['netlify.toml'] = netlifyEdgeToml; files['public/.gitkeep'] = ''; }
   mkdirSync(target, { recursive: true });
   for (const [file, text] of Object.entries(files)) {
     mkdirSync(dirname(join(target, file)), { recursive: true });

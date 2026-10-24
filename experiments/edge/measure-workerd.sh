@@ -4,7 +4,7 @@
 # Needs CI=1 and no login; wrangler never opens a browser here.
 set -u
 F=$1; WR=$2; HERE=$(cd "$(dirname "$0")" && pwd)
-export CI=1 BROWSER=false WRANGLER_SEND_METRICS=false NO_COLOR=1
+unset DISPLAY WAYLAND_DISPLAY; export CI=1 BROWSER=none WRANGLER_SEND_METRICS=false NO_COLOR=1
 run() { # app build port
   cp "$F/$2/program.mjs" "$F/$2/program.wasm" "$HERE/workers/$1/build/"
   (cd "$HERE/workers/$1" && exec setsid "$WR" dev --port "$3" --ip 127.0.0.1 > "$F/$2.wrangler.log" 2>&1 < /dev/null) & local pid=$!

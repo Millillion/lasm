@@ -2,13 +2,13 @@
 // catalog (src/edge-runtimes.json) and the on-demand npm package
 // @lasm/lean-edge-runtime: lean-<version>-wasm64-edge.tar.zst with root
 // lean-<version>-wasm64-edge/ holding lib/{libleanrt,libleancpp,liblasmhost}.a,
-// libraries.json and THIRD_PARTY_NOTICES.txt. Deterministic: sorted names, fixed
-// owner and time, zstd -19 single-threaded.
+// libraries.json and THIRD_PARTY_NOTICES.txt. Deterministic on any host with
+// the same Node (its zstd): Lasm's tar writer with sorted names, fixed metadata.
 //   node scripts/edge/package-edge-runtime.mjs EDGE_RUNTIME_DIR NODE_RUNTIME_BUNDLE OUT_DIR
 // EDGE_RUNTIME_DIR: lib/*.a and libraries.json (edge-runtime.yml's assembly).
-import { cpSync, mkdirSync, readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { cpSync, mkdirSync, readFileSync, writeFileSync, existsSync, statSync, readdirSync, createWriteStream } from 'node:fs';
+import { join, resolve, relative, sep } from 'node:path';
+import { packArchive } from '../lean-dist/tiers.mjs';
 import { createHash } from 'node:crypto';
 import { edgeArchives, edgeExtras } from '../../src/edge/edge-runtime.mjs';
 
@@ -48,8 +48,17 @@ of Emscripten's libraries (the same components as the Node runtime's) follow.
 
 ` + readFileSync(join(node, 'THIRD_PARTY_NOTICES.txt'), 'utf8'));
 const name = `${root}.tar.zst`, file = join(out, name);
-execFileSync('tar', ['--sort=name', '--owner=0', '--group=0', '--numeric-owner', '--mtime=@315532800', '--format=gnu',
-  '-I', 'zstd -19 -T1 -q', '-cf', file, '-C', out, root]);
+// Lasm's deterministic tar writer and Node's zstd (scripts/lean-dist/tiers.mjs):
+// system tar and zstd builds differ between hosts.
+const members = [];
+(function walk(directory) {
+  for (const entry of readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : 1)) {
+    const source = join(directory, entry.name), path = relative(join(out, root), source).split(sep).join('/');
+    if (entry.isDirectory()) { walk(source); continue; }
+    members.push({ path, type: 'file', size: statSync(source).size, source, executable: false });
+  }
+})(join(out, root));
+await packArchive(root, members, { sink: createWriteStream(file), zstd: { level: 19, windowLog: 27, long: true } });
 const extracted = [...edgeArchives, ...edgeExtras].reduce((n, a) => n + statSync(join(out, root, 'lib', a)).size, 0)
   + Object.keys(manifest.sysroot.files).reduce((n, name) => n + statSync(join(out, root, 'sysroot/lib', manifest.sysroot.directory, name)).size, 0) + (1 << 20);
 const artifact = { name, root, sha256: sha256(file), bytes: statSync(file).size, format: 'tar.zst',
