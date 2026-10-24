@@ -5,13 +5,14 @@ import { writeFile } from 'node:fs/promises';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { isAbsolute, join, relative } from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { readApplicationSymbols, readInitializationFreeCppSymbols } from './application-symbols.mjs';
 import { readApplicationLinkRequirements, reachabilityRegistry, canSpecializeInitialization, selectiveInitialization } from './application-reachability.mjs';
 import { requireAotApplication } from './application-policy.mjs';
 import { describeLibrary, dynamicLoadingStubs, librariesForUndefinedSymbols, undefinedSymbols as linkUndefinedSymbols, UnsupportedNativeLibrary } from './application-native.mjs';
-import { cInitTargets, coreInitTargets, initializerWrappers, planInitializers, readLiveSymbols } from './application-initialization.mjs';
+import { cInitTargets, coreInitTargets, initializerWrapperParts, initializerWrappers, planInitializers, readLiveSymbols } from './application-initialization.mjs';
+import { buildJobs } from './managed-link-toolchain.mjs';
 import { archiveMembers, explainRejection, parseWhyExtract, undefinedSymbols } from './application-diagnosis.mjs';
 import { executableName, responseFile } from './platform.mjs';
 import { bundledRecipe, checkToolchainIdentity, compileObject, emscriptenCache } from './link-driver/compile.mjs';
@@ -213,6 +214,23 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     }
     return hash.digest('hex');
   };
+  // Several sources at once (the initializer wrapper parts): cached objects are
+  // copied, the others compile concurrently, up to the build's job count.
+  const compileAll = async pairs => {
+    const pending = [];
+    for (const [source, object] of pairs) {
+      const cached = join(objectStore, objectKey(source) + '.o');
+      usedObjects.add(cached);
+      if (existsSync(cached)) copyFileSync(cached, object); else pending.push({ source, object, cached });
+    }
+    if (!nodeCompile || pending.length < 2) { for (const item of pending) { compileUncached(item.source, item.object); storeObject(item.object, item.cached); } return; }
+    const run = item => compileObject({ sdk, flags: compileFlags, source: item.source, object: item.object,
+      execute: (program, args, options) => new Promise((resolve, reject) => execFile(program, args, options, (error, stdout, stderr) =>
+        error ? reject(Object.assign(error, { stdout, stderr })) : resolve(stdout))),
+      settings: { timeout: 1800_000, maxBuffer: 8 * 1024 * 1024 } }).then(() => { storeObject(item.object, item.cached); });
+    const queue = [...pending], jobs = Math.max(1, Math.min(buildJobs(sdk.env), queue.length));
+    await Promise.all(Array.from({ length: jobs }, async () => { while (queue.length) await run(queue.shift()); }));
+  };
   for (let index = 0; index < sources.length; index++) {
     progress?.({ stage: `Compiling application module ${index + 1} of ${sources.length}` });
     const object = join(work, `module-${index}.o`);
@@ -335,9 +353,15 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     renameSync(partial, cached);
     return { live, requirements, requirementsError };
   };
-  const planInputs = [], planWrap = [];
+  const planInputs = [], planWrap = [], planObjects = [];
   if (!['all', 'native'].includes(initialization)) {
-    const wrappersC = join(work, 'initializers.c'), wrappersObject = join(work, 'initializers.o');
+    const wrapperFiles = Array.from({ length: initializerWrapperParts }, (_, part) =>
+      [join(work, `initializers-${part}.c`), join(work, `initializers-${part}.o`)]);
+    const wrappersObjects = wrapperFiles.map(([, object]) => object);
+    const writeWrappers = async sources => {
+      for (let part = 0; part < wrapperFiles.length; part++) await writeFile(wrapperFiles[part][0], sources[part]);
+      await compileAll(wrapperFiles);
+    };
     const planMap = join(work, 'initializers.map'), planArguments = join(work, 'initializers.rsp');
     const bodiesExports = join(work, 'initializers-exports.json');
     await writeFile(bodiesExports, JSON.stringify(['_main', '_malloc', '_free']) + '\n');
@@ -348,16 +372,15 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
       forceKeep: process.env.LASM_INITIALIZATION_KEEP ? new RegExp(process.env.LASM_INITIALIZATION_KEEP) : undefined,
       initTargets: (core => core && new Set([...core, ...sources.flatMap(file => cInitTargets(readFileSync(file, 'utf8')))]))(coreInitTargets(leanVersion)),
       async probe(source, wrapFlags, { bodies = false, exclude } = {}) {
-        await writeFile(wrappersC, source); compile(wrappersC, wrappersObject);
-        const args = [...objects.filter(file => file !== exclude), ...nativeInputs, probeObject, wrappersObject,
+        await writeWrappers(source);
+        const args = [...objects.filter(file => file !== exclude), ...nativeInputs, probeObject, ...wrappersObjects,
           ...initializationInputs.filter(file => !bodies || file !== entryObject),
           '-O0', '-Wl,-Map=' + planMap, ...wrapFlags, ...linkWith(bodies ? bodiesExports : exportsFile)];
         return (await probeLink(args, planMap, planArguments)).live;
       } });
     if (plan?.skipped.length && !plan.shared.length) {
-      await writeFile(wrappersC, initializerWrappers(plan.units, plan.closure, { keep: plan.keep }));
-      compile(wrappersC, wrappersObject);
-      planInputs.push(wrappersObject, ...plan.wrap); planWrap.push(...plan.wrap);
+      await writeWrappers(initializerWrappers(plan.units, plan.closure, { keep: plan.keep, parts: initializerWrapperParts }));
+      planInputs.push(...wrappersObjects, ...plan.wrap); planWrap.push(...plan.wrap); planObjects.push(...wrappersObjects);
       initializationPlan = { units: plan.closure.length, kept: plan.keep.size, skipped: plan.skipped.length };
     } else if (plan) initializationPlan = { units: plan.closure.length, kept: plan.closure.length, skipped: 0,
       ...(plan.shared.length ? { sharedGlobals: plan.shared.slice(0, 20) } : {}) };
@@ -366,7 +389,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // runtime evaluator must not optimize the full compiler twice. The inputs are
   // the final link's (the planned wrappers, in the planning probes' order, so the
   // last planning round's identical link is reused).
-  const requirementsInputs = [...objects, ...nativeInputs, probeObject, ...planInputs.slice(0, 1), ...initializationInputs,
+  const requirementsInputs = [...objects, ...nativeInputs, probeObject, ...planObjects, ...initializationInputs,
     '-O0', '-Wl,-Map=' + mapFile, ...planWrap, ...link];
   progress?.({ stage: 'Checking required runtime code' });
   const checked = await probeLink(requirementsInputs, mapFile, argumentsFile);

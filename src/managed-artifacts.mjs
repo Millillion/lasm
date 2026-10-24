@@ -218,6 +218,18 @@ export async function verifyTreeOnce(stamps, key, directory, verify) {
   await verify();
   // A file changed while it was being hashed is not recorded as verified.
   if (treeFingerprint(directory) !== before) return;
+  await writeVerificationRecord(record, key, before);
+}
+
+/** A tree whose receipt was just computed from its bytes (a new install or
+ * derivation) is recorded as verified, so its first reuse is not re-hashed. */
+export async function recordTreeVerified(stamps, key, directory) {
+  if (!stamps) return;
+  await writeVerificationRecord(join(stamps, digest(key) + '.json'), key, treeFingerprint(directory));
+}
+
+async function writeVerificationRecord(record, key, fingerprint) {
+  const stamps = dirname(record), before = fingerprint;
   try {
     await mkdir(stamps, { recursive: true });
     const partial = `${record}.${process.pid}.${Date.now()}.partial`;
@@ -233,7 +245,7 @@ export async function verifyArtifactDirectory(directory, identity, { stamps } = 
   const receipt = JSON.parse(await readFile(join(directory, receiptName), 'utf8'));
   if (receipt.schema !== 1 || receipt.identity !== identity || !receipt.files || !Object.keys(receipt.files).length)
     throw new Error('Managed artifact receipt does not match the requested toolchain');
-  await verifyTreeOnce(stamps, `managed-artifact\0${identity}\0${resolve(directory)}`, directory, async () => {
+  await verifyTreeOnce(stamps, artifactRecordKey(identity, directory), directory, async () => {
     const observed = await inventory(directory);
     if (!isDeepStrictEqual(observed, receipt.files)) {
       const changed = [...new Set([...Object.keys(receipt.files), ...Object.keys(observed)])]
@@ -247,6 +259,7 @@ export async function verifyArtifactDirectory(directory, identity, { stamps } = 
 }
 // Builds re-check a cached tool fully only when its files' metadata changed.
 const verify = (directory, identity, cache) => verifyArtifactDirectory(directory, identity, { stamps: verificationRecords(cache) });
+const artifactRecordKey = (identity, directory) => `managed-artifact\0${identity}\0${resolve(directory)}`;
 
 /** Install into a private staging directory; expose only a verified complete tree.
  * An OS-owned per-artifact lock shares installs across independent processes.
@@ -303,8 +316,10 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
       if (!Object.keys(files).length) throw new Error('Managed artifact is empty');
       const receipt = { schema: 1, identity, artifact, source, files };
       await writeFile(join(tree, receiptName), JSON.stringify(receipt) + '\n', { flag: 'wx' });
-      try { await rename(tree, directory); }
-      catch (error) {
+      try {
+        await rename(tree, directory);
+        await recordTreeVerified(verificationRecords(cache), artifactRecordKey(identity, directory), directory);
+      } catch (error) {
         if (!['EEXIST', 'ENOTEMPTY', 'EPERM', 'EACCES'].includes(error.code)) throw error;
         // Another process won the atomic installation. Verify its complete tree.
         await verify(directory, identity, cache);
@@ -342,8 +357,10 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
       if (!Object.keys(files).length) throw new Error('Derived tool tree is empty');
       const receipt = { schema: 1, identity, provenance, files };
       await writeFile(join(tree, receiptName), JSON.stringify(receipt) + '\n', { flag: 'wx' });
-      try { await rename(tree, directory); }
-      catch (error) {
+      try {
+        await rename(tree, directory);
+        await recordTreeVerified(verificationRecords(cache), artifactRecordKey(identity, directory), directory);
+      } catch (error) {
         if (!['EEXIST', 'ENOTEMPTY', 'EPERM', 'EACCES'].includes(error.code)) throw error;
         await verify(directory, identity, cache);
       }

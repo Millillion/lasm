@@ -163,8 +163,10 @@ faster than a clean one:
 - a requirements probe link that also ran the full glue pipeline (1.4 s), only
   to read its map.
 
-What changed. Release outputs are byte-identical to before (`program.wasm` and
-`program.cjs`, both fixtures, compared by SHA-256):
+What changed. The caching and threading below left release outputs
+byte-identical (`program.wasm` and `program.cjs`, both fixtures, compared by
+SHA-256); the restructured initializer wrappers then changed the bytes once
+([DECISIONS.md](DECISIONS.md)). Release builds stay byte-reproducible:
 
 - tools and the runtime are re-hashed only when a file's size, inode or
   modification/change time differs from the machine's record of its last full
@@ -173,7 +175,13 @@ What changed. Release outputs are byte-identical to before (`program.wasm` and
   content, and so is the live set of each planning probe link (keyed by the
   bytes of its inputs, the runtime identity, the tools and the link-driver code);
   the requirements check reuses the last planning round's identical link;
-- the runtime archives' initializer analysis is cached per runtime identity;
+- the runtime archives' initializer analysis is cached per runtime identity, and
+  the Lasm.JS bindings read from unchanged module files are reused;
+- the generated initializer wrappers use out-of-line helpers and are split into
+  4 translation units that compile in parallel (a fixed split: the output does
+  not depend on the machine);
+- a newly installed or derived tool is recorded as verified when it is created,
+  so its first reuse is not re-hashed either;
 - `wasm-opt` uses the machine's CPUs (at most 8; `LASM_BUILD_JOBS`), which
   does not change its output (the benchmark run asserts this for both fixtures);
 - the **dev profile** (`lasm Main.lean`, `npm run dev`, `lasm build --dev`)

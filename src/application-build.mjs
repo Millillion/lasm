@@ -102,7 +102,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   let jsBindings;
   if (usesJs) {
     progress?.({ stage: 'Checking Lasm.JS bindings' });
-    jsBindings = checkBindings(directory, readBindings(lean, generated.env, generated.oleans()));
+    jsBindings = checkBindings(directory, readBindings(lean, generated.env, generated.oleans(), { cache: join(work, 'bindings') }));
     for (const warning of requireValidBindings(jsBindings)) log(`Lasm.JS binding warning: ${warning}`);
   }
   progress?.({ stage: 'Checking application inputs and cached build' });

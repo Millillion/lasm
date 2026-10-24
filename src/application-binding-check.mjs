@@ -4,15 +4,42 @@
 // loaded in a separate Node process from the project's node_modules, as the
 // deployment will load them.
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const reader = fileURLToPath(new URL('./lasm-js-bindings.lean', import.meta.url));
 
-export function readBindings(lean, env, oleans) {
+export function readBindings(lean, env, oleans, { cache } = {}) {
   const files = oleans.filter(file => existsSync(file));
   if (!files.length) return [];
+  // The bindings are a function of the module files and the reader: unchanged
+  // modules (a cache hit, or an edit elsewhere) are not read again by Lean.
+  let record;
+  if (cache) {
+    const hash = createHash('sha256').update(JSON.stringify({ schema: 1, lean: lean.identity ?? lean.commit ?? null }))
+      .update(readFileSync(reader));
+    for (const file of files) hash.update('\0' + file + '\0').update(readFileSync(file));
+    record = join(cache, `bindings-${hash.digest('hex')}.json`);
+    try {
+      const saved = JSON.parse(readFileSync(record, 'utf8'));
+      if (Array.isArray(saved)) return saved;
+    } catch { /* not recorded */ }
+  }
+  const bindings = readBindingsUncached(lean, env, files);
+  if (record) {
+    try {
+      mkdirSync(cache, { recursive: true });
+      for (const name of readdirSync(cache)) if (name.startsWith('bindings-')) rmSync(join(cache, name), { force: true });
+      writeFileSync(record + '.' + process.pid + '.partial', JSON.stringify(bindings));
+      renameSync(record + '.' + process.pid + '.partial', record);
+    } catch { /* an unwritable cache only costs the next build the read */ }
+  }
+  return bindings;
+}
+
+function readBindingsUncached(lean, env, files) {
   const result = spawnSync(lean.lean, ['--run', reader, ...files], { env, encoding: 'utf8', windowsHide: true,
     timeout: 300_000, maxBuffer: 16 * 1024 * 1024 });
   if (result.error) throw result.error;

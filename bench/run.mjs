@@ -24,7 +24,7 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileS
 import http from 'node:http';
 import net from 'node:net';
 import os from 'node:os';
-import { basename, dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { brotliCompressSync, gzipSync, constants as zlib } from 'node:zlib';
@@ -301,9 +301,14 @@ function buildPhase() {
     }
     writeFileSync(source, original);
     build(name);
-    // Release builds are byte-identical whatever the number of Binaryen threads.
-    build(name, ['--rebuild'], { output: 'dist-one-job', env: { LASM_BUILD_JOBS: '1' } });
-    assert.deepEqual(programHashes(join(projects[name], 'dist-one-job')), programHashes(join(projects[name], 'dist')),
+    // Release builds are byte-identical whatever the number of jobs (parallel C
+    // compilation and Binaryen threads): a one-job build in a new copy of the
+    // project, so nothing is reused from the default build.
+    const oneJob = join(work, 'projects', `${name}-one-job`);
+    cpSync(projects[name], oneJob, { recursive: true, filter: path => !/^(?:\.lake|dist[^\\/]*)$/.test(relative(projects[name], path)) });
+    run(`lasm build ${name} (one job)`, npxCli, ['lasm', 'build', 'Main.lean', '--output', 'dist'],
+      { cwd: oneJob, env: { ...baseEnv, LASM_BUILD_JOBS: '1' } });
+    assert.deepEqual(programHashes(join(oneJob, 'dist')), programHashes(join(projects[name], 'dist')),
       `${name}: a one-job release build differs from the default build`);
     build(name, ['--dev'], { output: 'dist-dev' });
     metric(`size.wasm_bytes_dev.${name}`, { value: lstatSync(join(projects[name], 'dist-dev', 'program.wasm')).size, unit: 'bytes', better: 'lower',
