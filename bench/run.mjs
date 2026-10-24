@@ -28,6 +28,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { brotliCompressSync, gzipSync, constants as zlib } from 'node:zlib';
+import { groupByOp } from './ops.mjs';
 
 const benchRoot = fileURLToPath(new URL('./', import.meta.url));
 const repoRoot = resolve(benchRoot, '..');
@@ -446,14 +447,10 @@ async function httpPhase() {
 }
 
 async function interopPhase() {
-  const ops = {};
-  for (let rep = 0; rep < settings.interopReps; rep++) {
-    const r = run('interop', [node], [join(projects.interop, 'dist/main.mjs'), String(settings.interopSamples), String(Math.ceil(settings.interopSamples / 10))]);
-    for (const line of r.stdout.trim().split('\n')) {
-      const o = JSON.parse(line);
-      (ops[o.op] ??= []).push(o);
-    }
-  }
+  const outputs = [];
+  for (let rep = 0; rep < settings.interopReps; rep++)
+    outputs.push(run('interop', [node], [join(projects.interop, 'dist/main.mjs'), String(settings.interopSamples), String(Math.ceil(settings.interopSamples / 10))]).stdout);
+  const grouped = groupByOp(outputs), ops = Object.fromEntries(grouped);
   result.raw.interop = ops;
   const labels = { call: 'Lean→JS synchronous call round trip (Math.max())', await: 'Lean awaits a resolved JS promise (Promise.resolve(1))' };
   for (const [op, runs] of Object.entries(ops)) {
@@ -466,14 +463,10 @@ async function interopPhase() {
 // big-number code, not GMP. Medians per operation on BENCH_BIGNUM_DIGITS-digit
 // operands, inside Lean with the monotonic clock (bench/fixtures/bignum).
 async function bignumPhase() {
-  const ops = {};
-  for (let rep = 0; rep < settings.bignumReps; rep++) {
-    const r = run('bignum', [node], [join(projects.bignum, 'dist/main.mjs'), String(settings.bignumDigits)]);
-    for (const line of r.stdout.trim().split('\n')) {
-      const o = JSON.parse(line);
-      (ops[o.op] ??= []).push(o);
-    }
-  }
+  const outputs = [];
+  for (let rep = 0; rep < settings.bignumReps; rep++)
+    outputs.push(run('bignum', [node], [join(projects.bignum, 'dist/main.mjs'), String(settings.bignumDigits)]).stdout);
+  const grouped = groupByOp(outputs), ops = Object.fromEntries(grouped);
   result.raw.bignum = ops;
   const digits = settings.bignumDigits, size = digits >= 1000 && digits % 1000 === 0 ? `${digits / 1000}k` : String(digits);
   const labels = { mul: 'multiplication', div: 'division (2n by n/2 digits)', mod: 'remainder', toString: 'toString (decimal)',
