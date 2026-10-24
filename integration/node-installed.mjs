@@ -207,6 +207,17 @@ try {
     matchesCli(npx('Lake local import', ['Main.lean'], directory), { code: 0, stdout: 'Lean module: 42\n' });
     assert.equal(npx('Lake deployment build', ['build', 'Main.lean'], directory).code, 0);
     result.lake = { directory, signature: buildInfo(join(directory, 'dist')).signature };
+    // Lasm ships no Git and this environment has none: a project with a Reservoir
+    // dependency stops before Lake runs, with the per-OS install commands.
+    const needsGit = join(project, 'lake project with dependency'); mkdirSync(needsGit);
+    writeFileSync(join(needsGit, 'lean-toolchain'), 'leanprover/lean4:v' + result.support.lean + '\n');
+    writeFileSync(join(needsGit, 'lakefile.toml'), 'name = "app"\n[[require]]\nname = "batteries"\nscope = "leanprover-community"\n[[lean_exe]]\nname = "app"\nroot = "Main"\n');
+    writeFileSync(join(needsGit, 'Main.lean'), 'def main : IO Unit := pure ()\n');
+    const withoutGit = npx('Lake dependency without Git', ['Main.lean'], needsGit);
+    assert.notEqual(withoutGit.code, 0);
+    assert.match(withoutGit.stderr, /needs Git \(Reservoir dependency batteries\)[\s\S]*xcode-select --install[\s\S]*sudo apt install git[\s\S]*sudo dnf install git[\s\S]*winget install --id Git\.Git -e/);
+    assert.ok(!existsSync(join(needsGit, 'lake-manifest.json')), 'Lake must not run without Git');
+    result.noGitStop = 'passed';
     // JS/npm interop (Lasm.JS, test/fixtures/js-interop): a local npm package,
     // typed bindings, callbacks, promises and the deployment's node_modules.
     // Native Lean cannot run it, so its expected output is the fixture's file.
