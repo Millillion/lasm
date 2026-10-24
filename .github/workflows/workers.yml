@@ -92,7 +92,7 @@ jobs:
           node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/edge-sdk-resources.json -- node --input-type=module -e "const { provisionSdk } = await import('./src/managed-sdk.mjs'); const sdk = await provisionSdk({ log: console.log }); console.log(sdk.identity)"
       - name: Extract the packaged edge runtime (what users get)
         run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
-      - name: Build, serve and check the edge apps (Workers, Vercel Edge, Netlify Edge)
+      - name: Build, serve and check the edge apps (Workers, Vercel Edge, Netlify Edge, Deno Deploy)
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge

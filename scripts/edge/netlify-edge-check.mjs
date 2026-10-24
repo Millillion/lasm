@@ -33,12 +33,14 @@ check('within Netlify Edge code limit (20 MB)', result.bundle.eszipBytes < 20 * 
 const child = spawn(join(bin, 'netlify'), ['dev', '--offline', '--no-open', '--port', port, '--dir', 'public'], { cwd: project, env, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
 let log = '';
 child.stdout.on('data', c => { log += c; }); child.stderr.on('data', c => { log += c; });
-const base = `http://127.0.0.1:${port}`;
+// netlify dev may listen on IPv6 only (localhost resolving to ::1): localhost tries both.
+const base = `http://localhost:${port}`;
+let last = 'no response';
 try {
   const deadline = Date.now() + 180_000;
   for (;;) {
-    try { const r = await fetch(base + app.checks[0].path); if (r.status === app.checks[0].status) break; } catch { /* starting */ }
-    if (Date.now() > deadline || child.exitCode !== null) throw new Error('netlify dev did not serve the edge function:\n' + log.slice(-4000));
+    try { const r = await fetch(base + app.checks[0].path); if (r.status === app.checks[0].status) break; last = `status ${r.status}: ${(await r.text()).slice(0, 500)}`; } catch (error) { last = String(error.cause ?? error); }
+    if (Date.now() > deadline || child.exitCode !== null) throw new Error(`netlify dev did not serve the edge function (last: ${last}; exit ${child.exitCode}):\n` + log.slice(-4000));
     await new Promise(r => setTimeout(r, 1000));
   }
   const request = async ({ method = 'GET', path, send, type }) => {

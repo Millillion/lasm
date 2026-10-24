@@ -28,6 +28,7 @@ export const deployTargets = {
   workers: { summary: 'Cloudflare Workers, experimental (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono'] },
   'vercel-edge': { summary: 'Vercel Edge Function, experimental (vercel.json; Vercel runs npm run build:vercel-edge)', package: 'vercel-edge', templates: ['hono'], conflicts: ['vercel'] },
   'netlify-edge': { summary: 'Netlify Edge Function, experimental (netlify.toml; Netlify runs npm run build:netlify-edge)', package: 'netlify-edge', templates: ['hono'], conflicts: ['netlify'] },
+  'deno-deploy': { summary: 'Deno Deploy, experimental (npm run build:deno-deploy, then deno task start:deno; entrypoint deno/main.mjs)', package: 'deno-deploy', templates: ['hono'] },
 };
 
 export const templates = {
@@ -144,8 +145,10 @@ function packageJson(name, template, deploy = []) {
     // Build and package in one step; Vercel's and Netlify's builds run these too.
     if (platform) pkg.scripts[`build:${platform}`] = `lasm build Main.lean --target ${platform}`;
   }
+  // Deno Deploy runs the same entrypoint as the Deno CLI.
+  if (deploy.includes('deno-deploy')) pkg.scripts['start:deno'] = 'deno run -A deno/main.mjs';
   // Workers bundle the npm modules Lean binds; the Node server stays out.
-  if (deploy.some(target => ['workers', 'vercel-edge', 'netlify-edge'].includes(target))) pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
+  if (deploy.some(target => ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy'].includes(target))) pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
   const dependencies = Object.assign({}, npm[template], ...deploy.map(target => deployTargets[target].dependencies));
   if (Object.keys(dependencies).length) pkg.dependencies = Object.fromEntries(Object.entries(dependencies).sort(([a], [b]) => a < b ? -1 : 1));
   pkg.devDependencies = { [lasm.name]: lasm.version };
@@ -271,7 +274,7 @@ const netlifyEdgeToml = `# Netlify runs the build: lasm build --target netlify-e
 
 function deployGitignore(deploy) {
   const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
-    'vercel-edge': '.vercel/\napi/lasm.mjs\napi/_lasm/', 'netlify-edge': '.netlify/\nnetlify/lasm/\nnetlify/edge-functions/lasm.mjs' };
+    'vercel-edge': '.vercel/\napi/lasm.mjs\napi/_lasm/', 'netlify-edge': '.netlify/\nnetlify/lasm/\nnetlify/edge-functions/lasm.mjs', 'deno-deploy': 'deno/' };
   return gitignore + deploy.map(target => extra[target]).filter(Boolean).map(line => line + '\n').join('');
 }
 
@@ -399,6 +402,11 @@ Vercel recommends its Node runtime over the edge runtime; see the [edge notes](h
   'netlify-edge': () => `**Netlify Edge (experimental):** \`netlify.toml\` makes Netlify run \`npm run build:netlify-edge\`,
 which writes the edge function \`netlify/edge-functions/lasm.mjs\` (and \`netlify/lasm/\`); test with
 \`netlify dev\`, deploy with \`netlify deploy --build\`. See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
+`,
+  'deno-deploy': () => `**Deno Deploy (experimental):** \`npm run build:deno-deploy\` writes \`deno/\` (the
+entrypoint \`deno/main.mjs\`, the Lean program and its host); test with \`deno task start:deno\`
+(PORT, default 8000). On Deno Deploy, set the build command to \`npm run build:deno-deploy\` and the
+entrypoint to \`deno/main.mjs\`. See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
 `,
   gcf: () => `**Google Cloud Functions:** \`npm run build:gcf\` writes \`gcf/\`; deploy with
 \`gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source gcf\`.

@@ -1,10 +1,10 @@
 // Phase 7 CI (.github/workflows/workers.yml): builds the Hono template
-// (lasm init --deploy workers|vercel-edge|netlify-edge) and examples/edge-pure
+// (lasm init --deploy workers|vercel-edge|netlify-edge|deno-deploy) and examples/edge-pure
 // for each edge target, and checks them with the platforms' local tools:
 // workers: `wrangler dev` (local workerd), plus Node 26, Deno and Bun on the
 // same output, and the Workers Free plan's budgets; vercel-edge: `vercel build`
 // offline and Vercel's edge-runtime; netlify-edge: `netlify build --offline`
-// and `netlify dev --offline`. Needs LASM_APPLICATION_RUNTIME and LASM_EDGE_RUNTIME.
+// and `netlify dev --offline`; deno-deploy: `deno run -A deno/main.mjs`. Needs LASM_APPLICATION_RUNTIME and LASM_EDGE_RUNTIME.
 //   node scripts/edge/workers-ci.mjs WORK_DIR TOOLS_DIR
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, readdirSync, statSync } from 'node:fs';
@@ -26,7 +26,7 @@ const results = { budget, apps: {} };
 // The apps.
 const hono = join(work, 'hono'), pure = join(work, 'pure');
 if (!existsSync(hono)) {
-  run(process.execPath, [join(root, 'bin/lasm.mjs'), 'init', hono, '--template', 'hono', '--deploy', 'workers', '--deploy', 'vercel-edge', '--deploy', 'netlify-edge']);
+  run(process.execPath, [join(root, 'bin/lasm.mjs'), 'init', hono, '--template', 'hono', '--deploy', 'workers', '--deploy', 'vercel-edge', '--deploy', 'netlify-edge', '--deploy', 'deno-deploy']);
   // The project's devDependency is the unpublished Lasm package; the source checkout builds instead.
   const pkg = JSON.parse(readFileSync(join(hono, 'package.json'), 'utf8')); delete pkg.devDependencies;
   writeFileSync(join(hono, 'package.json'), JSON.stringify(pkg, null, 2) + '\n');
@@ -47,7 +47,7 @@ for (const project of [hono, pure]) {
 const passed = ['LASM_APPLICATION_RUNTIME', 'LASM_EDGE_RUNTIME', 'LASM_BUILD_JOBS', 'LASM_KEEP_LINK_WORK'].filter(key => process.env[key]).map(key => `${key}=${resolve(process.env[key]) === process.env[key] || key === 'LASM_BUILD_JOBS' ? process.env[key] : resolve(process.env[key])}`);
 const bounded = [join(root, 'scripts/full-lean/run-bounded.mjs'), '--', 'python3', join(root, 'scripts/full-lean/base-pages.py'), 'env', ...passed];
 const lasmBuild = (project, target) => run(process.execPath, [...bounded, process.execPath, join(root, 'bin/lasm.mjs'), 'build', 'Main.lean', '--target', target], { cwd: project });
-for (const [name, project, served, ports] of [['hono', hono, hono, [8787, 8889]], ['pure', pure, join(pure, 'workers'), [8788, 8890]]]) {
+for (const [name, project, served, ports] of [['hono', hono, hono, [8787, 8889, 8891]], ['pure', pure, join(pure, 'workers'), [8788, 8890, 8892]]]) {
   const started = Date.now();
   lasmBuild(project, 'workers');
   const app = results.apps[name] = { buildSeconds: (Date.now() - started) / 1000 };
@@ -66,6 +66,9 @@ for (const [name, project, served, ports] of [['hono', hono, hono, [8787, 8889]]
   lasmBuild(project, 'netlify-edge');
   run(process.execPath, [join(root, 'scripts/edge/netlify-edge-check.mjs'), tools, project, name, String(ports[1]), file('netlify-edge')]);
   app['netlify-edge'] = JSON.parse(readFileSync(file('netlify-edge'), 'utf8'));
+  lasmBuild(project, 'deno-deploy');
+  run(process.execPath, [join(root, 'scripts/edge/deno-deploy-check.mjs'), bin('deno'), project, name, String(ports[2]), file('deno-deploy')]);
+  app['deno-deploy'] = JSON.parse(readFileSync(file('deno-deploy'), 'utf8'));
   const node = app.node;
   app.budget = {
     bundle: app.workerd.bundle.bytes < budget.bundleBytes,
@@ -90,9 +93,9 @@ if (process.env.LASM_KEEP_LINK_WORK) {
   results.edgeLinkCompare = JSON.parse(readFileSync(join(out, 'compare.json'), 'utf8'));
 }
 writeFileSync(join(work, 'workers-results.json'), JSON.stringify(results, null, 2) + '\n');
-const engines = ['workerd', 'node', 'deno', 'bun', 'vercel-edge', 'netlify-edge'];
-const rows = Object.entries(results.apps).map(([name, a]) => `| ${name} | ${(a.workerd.bundle.bytes / MiB).toFixed(2)} MiB (${(a.workerd.bundle.gzipBytes / 1024).toFixed(0)} KiB gzip); Vercel ${(a['vercel-edge'].bundle.gzipBytes / 1024).toFixed(0)} KiB gzip; Netlify eszip ${(a['netlify-edge'].bundle.eszipBytes / MiB).toFixed(2)} MiB | ${a.node.startupMs} / ${a.deno.startupMs} / ${a.bun.startupMs} ms | ${a.node.trivialMsPerRequest} / ${a.node.jsonMsPerRequest} ms | ${a.node.wasmMemoryAfterMiB} MiB | ${engines.map(e => `${e} ${a[e].passed ? 'pass' : 'FAIL'}`).join(', ')} |`);
-const summary = `### Edge targets (experimental)\n\n| App | Bundles (wrangler dry run; Vercel; Netlify) | Startup Node / Deno / Bun | Per request, trivial / heavier (Node) | Wasm memory | Checks |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\nBudgets: Workers Free (bundle < 64 MiB, startup < 1 s, CPU < 10 ms per request, memory < 128 MB), Vercel Edge Hobby (1 MB gzip), Netlify Edge (20 MB).\n`;
+const engines = ['workerd', 'node', 'deno', 'bun', 'vercel-edge', 'netlify-edge', 'deno-deploy'];
+const rows = Object.entries(results.apps).map(([name, a]) => `| ${name} | ${(a.workerd.bundle.bytes / MiB).toFixed(2)} MiB (${(a.workerd.bundle.gzipBytes / 1024).toFixed(0)} KiB gzip); Vercel ${(a['vercel-edge'].bundle.gzipBytes / 1024).toFixed(0)} KiB gzip; Netlify eszip ${(a['netlify-edge'].bundle.eszipBytes / MiB).toFixed(2)} MiB; Deno Deploy ${(a['deno-deploy'].bundle.bytes / MiB).toFixed(2)} MiB | ${a.node.startupMs} / ${a.deno.startupMs} / ${a.bun.startupMs} ms | ${a.node.trivialMsPerRequest} / ${a.node.jsonMsPerRequest} ms | ${a.node.wasmMemoryAfterMiB} MiB | ${engines.map(e => `${e} ${a[e].passed ? 'pass' : 'FAIL'}`).join(', ')} |`);
+const summary = `### Edge targets (experimental)\n\n| App | Bundles (wrangler dry run; Vercel; Netlify; Deno Deploy) | Startup Node / Deno / Bun | Per request, trivial / heavier (Node) | Wasm memory | Checks |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\nBudgets: Workers Free (bundle < 64 MiB, startup < 1 s, CPU < 10 ms per request, memory < 128 MB), Vercel Edge Hobby (1 MB gzip), Netlify Edge (20 MB).\n`;
 console.log(summary);
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
 const failed = Object.entries(results.apps).flatMap(([name, a]) => [
