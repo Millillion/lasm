@@ -5,7 +5,7 @@ import { release } from 'node:os';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
-const tests = ['managed-download', 'managed-network', 'network-git', 'installation-confidence', 'candidate-readme', 'candidate-retention', 'managed-artifacts', 'npm-artifacts', 'npm-dist-packages', 'managed-git',
+const tests = ['managed-download', 'managed-network', 'network-git', 'installation-confidence', 'candidate-readme', 'candidate-retention', 'managed-artifacts', 'npm-artifacts', 'npm-dist-packages', 'system-git',
   'cache-lifecycle', 'managed-lean-tiers', 'managed-link-toolchain', 'installer-bundle', 'sdk-archives', 'sdk-repairs', 'windows-tool-paths', 'windows-installer-faults',
   'application-lock', 'build-progress', 'cli-arguments', 'node-cache-controls',
   'darwin-resources', 'darwin-monitor-recovery'].map(name => `test/${name}.test.mjs`);

@@ -15,15 +15,13 @@ const platformParts = platform => {
 
 /** Version from an immutable release tag: <upstream version>-lasm.<release revision>.
  * lean-4.34.1-tiers-v1 -> 4.34.1-lasm.1, lean-4.35.0-c-v1 (the C tier) -> 4.35.0-lasm.1,
- * emscripten-6.0.9-lasm-toolchain-v1 -> 6.0.9-lasm.1, dugite v2.53.0-4 -> 2.53.0-dugite.4.
+ * emscripten-6.0.9-lasm-toolchain-v1 -> 6.0.9-lasm.1.
  * The package name already says which release series an archive belongs to, so a
  * rebuilt C tier (c-v2) becomes 4.35.0-lasm.2 of @lasm/lean-c-* without touching the others. */
 export function releaseVersion(url) {
   const tag = decodeURIComponent(new URL(url).pathname.split('/').at(-2));
   let match = /^(?:lean|emscripten)-(\d+\.\d+\.\d+)-(?:tiers|c|lasm-toolchain)-v(\d+)$/.exec(tag);
   if (match) return `${match[1]}-lasm.${match[2]}`;
-  match = /^v(\d+\.\d+\.\d+)-(\d+)$/.exec(tag);
-  if (match) return `${match[1]}-dugite.${match[2]}`;
   throw new Error(`No package version rule for release ${tag}`);
 }
 
@@ -113,40 +111,9 @@ function componentsOf(kind, platform) {
 }
 const spdxOf = components => [...new Set(components.map(([, spdx]) => spdx).filter(Boolean))].join(' AND ');
 
-/** Licence texts the dugite-native archives lack (Linux and macOS carry none of
- * them; Windows carries Git's and GCM's), copied from scripts/npm-dist/notices/ into
- * licenses/: Git v2.53.0 COPYING, Git LFS v3.7.1 LICENSE.md, GCM v2.9.0 LICENSE. */
-export function gitLicenseFiles(platform) {
-  return [['git-COPYING.txt', 'git/COPYING'], ['git-lfs-LICENSE.md', 'git-lfs/LICENSE.md'],
-    ...(platform === 'linux-arm64' ? [] : [['git-credential-manager-LICENSE.txt', 'git-credential-manager/LICENSE']])];
-}
-
-/** Git from dugite-native: too many components for one honest SPDX expression; the
- * README lists them and the GPL source locations. */
-const gitReadme = pkg => `## Licences
-
-\`license\`: \`SEE LICENSE IN README.md\`. This archive is dugite-native's release asset,
-unmodified. It contains Git 2.53.0 (\`GPL-2.0-only\`), Git LFS (\`MIT\`)${pkg.platform === 'linux-arm64' ? '' : ' and Git Credential\nManager (`MIT`, with the .NET runtime and libraries it bundles)'} and Mozilla's CA bundle
-(ssl/cacert.pem, \`MPL-2.0\`)${pkg.platform === 'win32-x64' ? `. On Windows it is Git for Windows' MinGit 2.53.0.windows.4,
-which also bundles the MSYS2 runtime and shell and MinGW-w64 libraries (curl, OpenSSL,
-libssh2, PCRE2, expat, zlib, zstd, brotli, nghttp2, libiconv, gettext, libunistring,
-OpenSSH and others) under their own licences, in mingw64/share/licenses/ and
-usr/share/licenses/ inside the archive; LICENSE.txt is Git's GPL-2.0` : `. On Linux and macOS Git links the
-operating system's libcurl, OpenSSL, zlib and expat dynamically; none of them is in
-the archive`}.
-
-Corresponding source (GPL-2.0 section 3): Git
-https://github.com/git/git/tree/v2.53.0 and dugite-native's build scripts and pinned
-submodules https://github.com/desktop/dugite-native/tree/v2.53.0-4${pkg.platform === 'win32-x64' ? `; MinGit
-https://github.com/git-for-windows/git/releases/tag/v2.53.0.windows.4 and its MSYS2 and
-MinGW-w64 package sources` : ''}. See Lasm's docs/LICENSE_AUDIT.md.
-
-Lasm adds these verbatim licence texts in \`${noticeDirectory}/\`: ${pkg.licenseFiles.map(([, to]) => `\`${to}\``).join(', ')}.
-`;
-
 /** Every tool package for one Lean version. install: optional (platform,
  * optionalDependencies), required (shared, dependencies), demand (npm pack on use). */
-export function toolPackages({ lean, toolchains, linkToolchain, git, scope = defaultScope, platforms }) {
+export function toolPackages({ lean, toolchains, linkToolchain, scope = defaultScope, platforms }) {
   assert.match(scope, /^@[a-z0-9][a-z0-9._-]*$/);
   const release = toolchains.lean[lean];
   assert.ok(release?.tiers, `No tiered Lean ${lean} in the catalog`);
@@ -179,8 +146,6 @@ export function toolPackages({ lean, toolchains, linkToolchain, git, scope = def
       notices: { tierArchive: true, bin: release.tiers.bin[platform] },
       description: `Lean ${lean} C tier (Lean's clang as cc, C library headers and link libraries) for Lasm Lake projects with C code on ${platform} (fetched on demand)` }));
   }
-  if (git) for (const platform of platforms) packages.push(tool(scope, `git-${platform}`, git.artifacts[platform], 'demand',
-    { platform, ...platformParts(platform), git: true, licenseFiles: gitLicenseFiles(platform), description: `Git ${git.version} (${git.distribution}, desktop/dugite-native) for Lasm Lake projects on ${platform} (fetched on demand)` }));
   assert.equal(new Set(packages.map(p => p.name)).size, packages.length, 'Duplicate tool package names');
   for (const pkg of packages) if (pkg.components) pkg.license = spdxOf(pkg.components);
   return packages;
@@ -191,7 +156,7 @@ export function toolPackageJson(pkg) {
     name: pkg.name, version: pkg.version, description: pkg.description,
     license: pkg.license ?? 'SEE LICENSE IN README.md',
     ...(pkg.os ? { os: pkg.os, cpu: pkg.cpu } : {}), ...(pkg.libc ? { libc: pkg.libc } : {}),
-    files: [archiveFileName(pkg.artifact), 'README.md', ...(pkg.notices || pkg.licenseFiles ? [noticeDirectory] : [])],
+    files: [archiveFileName(pkg.artifact), 'README.md', ...(pkg.notices ? [noticeDirectory] : [])],
     // Data only: no entry point, no scripts. Lasm verifies the archive's SHA-256.
     lasm: { schema: 1, artifact: { name: pkg.artifact.name, sha256: pkg.artifact.sha256, bytes: pkg.artifact.bytes, url: pkg.artifact.url } },
   };
@@ -214,11 +179,10 @@ release asset
     ${pkg.artifact.url}
     SHA-256 ${pkg.artifact.sha256}, ${pkg.artifact.bytes} bytes
 
-Lasm checks that digest and size before extracting it. ${pkg.git ? `Licence texts are in
-\`${noticeDirectory}/\` (below)` : `The licence texts and
+Lasm checks that digest and size before extracting it. The licence texts and
 notices of the contained software (LICENSE, LICENSES, NOTICE) are inside the
-archive, with the upstream sources it was repackaged from`}.
-${pkg.git ? '\n' + gitReadme(pkg) : pkg.components ? `
+archive, with the upstream sources it was repackaged from.
+${pkg.components ? `
 ## Licences
 
 \`license\`: \`${pkg.license}\`

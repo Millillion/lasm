@@ -7,8 +7,6 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { provisionLean } from '../../src/managed-lean.mjs';
 import { applicationSources, nativeLeanEnvironment, canonicalApplicationPath } from '../../src/application-sources.mjs';
-import { provisionGit } from '../../src/managed-git.mjs';
-import { managedGitEnvironment } from '../../src/managed-git.mjs';
 import { verifyNativeProgram } from '../../src/native-program.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 
@@ -83,7 +81,7 @@ try {
   writeFileSync(join(project, 'lakefile.lean'), 'import Lake\nopen Lake DSL\npackage longPaths\nlean_lib Greeting\n@[default_target]\nlean_exe hello where\n  root := `Main\n');
   writeFileSync(join(project, 'Greeting.lean'), 'def greeting : String := "Lake long cache path 42"\n');
   writeFileSync(source, 'import Greeting\ndef main : IO Unit := IO.println greeting\n');
-  const git = await provisionGit({ cache });
+  // Dependency-free Lake projects need no Git (Lasm ships none).
   // Preserve separate fresh workspaces so one command cannot hide another
   // command's config-elaboration problem behind a cached lakefile.olean.
   const adapter = fileURLToPath(new URL('../../src/lake-module.lean', import.meta.url));
@@ -109,7 +107,7 @@ try {
     const args = nativeCli ? ['--no-cache', '--keep-toolchain', '--quiet', '--json', 'query', '/+Main:lean']
       : ['-j1', '-s8192', '--plugin=' + join(tool.prefix, 'bin/libLake_shared.dll'), 'lakefile.lean'];
     const r = spawnSync(nativeCli ? tool.lake : tool.lean, args,
-      { cwd, env: managedGitEnvironment(git, environment), encoding: 'utf8', timeout: 120000, maxBuffer: 1024 ** 2 });
+      { cwd, env: environment, encoding: 'utf8', timeout: 120000, maxBuffer: 1024 ** 2 });
     assert.ifError(r.error); assert.equal(r.signal, null);
     result.checks.push({ label, code: r.status, stdout: r.stdout, stderr: r.stderr }); save();
     assert.equal(r.status, 0, label + ': ' + r.stdout + r.stderr);
@@ -125,7 +123,7 @@ try {
     const cwd = join(root, label); mkdirSync(cwd);
     for (const file of ['lean-toolchain', 'lakefile.lean', 'Greeting.lean', 'Main.lean'])
       writeFileSync(join(cwd, file), readFileSync(join(project, file)));
-    const environment = managedGitEnvironment(git, { ...env });
+    const environment = { ...env };
     if (!sysroot) delete environment.LEAN_SYSROOT;
     const args = helper ? ['-j1', '-s8192', ...(plugin ? ['--plugin=' + join(lean.prefix, 'bin/libLake_shared.dll')] : []),
       '--run', helper, join(cwd, 'Main.lean')] : ['--no-cache', '--keep-toolchain', '--quiet', '--json', 'query', '/+Main:lean'];
@@ -138,7 +136,7 @@ try {
     } else assert.equal(r.status, 0, label + ': ' + r.stdout + r.stderr);
   }
   result.activeCheck = 'Lake local import C generation'; save();
-  const lake = applicationSources(source, lean, work, { git });
+  const lake = applicationSources(source, lean, work);
   assert.ok(lake.sources.length >= 2 && lake.sources.every(file => statSync(file).size > 0));
   assert.ok(lake.sources.some(file => readFileSync(file, 'utf8').includes('Lake long cache path 42')));
   result.checks.push({ lakeLocalImportCGeneration: true, sources: lake.inputs });

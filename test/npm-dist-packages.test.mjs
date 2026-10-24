@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
 import { releaseVersion, toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, maximumPackageBytes,
   cTierLicense, createPackageJson, createPackageLicense } from '../scripts/npm-dist/packages.mjs';
 import { leanDistribution } from '../src/managed-lean.mjs';
@@ -9,14 +8,14 @@ import { validateNpmToolManifest, npmEntryFor } from '../src/npm-artifacts.mjs';
 
 const json = async path => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
 const catalogs = async () => ({ toolchains: await json('../src/toolchains.json'), linkToolchain: await json('../src/link-toolchain.json'),
-  git: await json('../src/git-tools.json') });
+});
 
 test('package versions come from the immutable release that published each archive', () => {
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v1/x.tar.zst'), '4.35.0-lasm.1');
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v1/x.tar.zst'), '4.35.0-lasm.1');
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v2/x.tar.zst'), '4.35.0-lasm.2');
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/emscripten-6.0.9-lasm-toolchain-v2/x'), '6.0.9-lasm.2');
-  assert.equal(releaseVersion('https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/x.tar.gz'), '2.53.0-dugite.4');
+  assert.throws(() => releaseVersion('https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/x.tar.gz'), /No package version rule/);
   assert.throws(() => releaseVersion('https://example.com/releases/download/latest/x'), /No package version rule/);
 });
 
@@ -29,8 +28,8 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
       .flatMap(p => [`@lasm/emscripten-${p}`, `@lasm/lean-${p}`]).sort());
     assert.deepEqual(by('required'), ['@lasm/emscripten-shared', '@lasm/lean-core-init', '@lasm/lean-core-std']);
     const cTier = c.toolchains.lean[lean].tiers.c ? Object.keys(c.toolchains.lean[lean].tiers.c).map(p => `@lasm/lean-c-${p}`) : [];
-    assert.deepEqual(by('demand'), ['@lasm/git-darwin-arm64', '@lasm/git-darwin-x64', '@lasm/git-linux-arm64', '@lasm/git-linux-x64',
-      '@lasm/git-win32-x64', ...cTier, '@lasm/lean-ext-elab', '@lasm/lean-ext-meta', '@lasm/lean-ext-rest'].sort());
+    assert.deepEqual(by('demand'), [...cTier, '@lasm/lean-ext-elab', '@lasm/lean-ext-meta', '@lasm/lean-ext-rest'].sort());
+    assert.ok(!packages.some(p => p.name.includes('/git-')), 'Lasm ships no Git');
     for (const pkg of packages) {
       assert.ok(pkg.artifact.bytes <= maximumPackageBytes);
       const metadata = toolPackageJson(pkg);
@@ -44,11 +43,6 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
         assert.equal(metadata.license, cTierLicense(pkg.platform));
         assert.deepEqual(metadata.files, [pkg.artifact.name, 'README.md', 'licenses']);
         assert.equal(pkg.notices.bin.sha256, c.toolchains.lean[lean].tiers.bin[pkg.platform].sha256);
-      } else if (pkg.name.includes('/git-')) {
-        assert.equal(metadata.license, 'SEE LICENSE IN README.md');
-        assert.deepEqual(metadata.files, [pkg.artifact.name, 'README.md', 'licenses']);
-        assert.match(toolPackageReadme(pkg), /GPL-2\.0-only[\s\S]*Corresponding source/);
-        for (const [from] of pkg.licenseFiles) assert.ok(existsSync(new URL(`../scripts/npm-dist/notices/${from}`, import.meta.url)), from);
       } else {
         assert.match(metadata.license, /^[A-Za-z0-9.()+ -]+$/, 'An SPDX expression');
         assert.ok(!metadata.license.includes('SEE LICENSE'));
@@ -60,8 +54,8 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
     // Shared Emscripten packages keep one version across Lean releases.
     assert.equal(packages.find(p => p.name === '@lasm/emscripten-shared').version, '6.0.9-lasm.1');
   }
-  const scoped = toolPackages({ lean: '4.35.0', ...c, git: undefined, scope: '@example-org' });
-  assert.ok(scoped.every(p => p.name.startsWith('@example-org/') && !p.name.includes('git-')));
+  const scoped = toolPackages({ lean: '4.35.0', ...c, scope: '@example-org' });
+  assert.ok(scoped.every(p => p.name.startsWith('@example-org/')));
   assert.throws(() => toolPackages({ lean: '4.35.0', ...c, scope: 'lasm' }));
 });
 

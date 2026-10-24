@@ -22,7 +22,7 @@ await mkdir(output); await mkdir(repository); await mkdir(project);
 const reportPath = '.work/node-network-result.json';
 const result = { schema: 1, platform: process.platform + '-' + process.arch, archiveSha256: acceptance.archiveSha256,
   packageVersion: acceptance.installation.packageVersion, startedAt: new Date().toISOString(),
-  scope: 'Installed CLI/Lake/managed-Git private CA and authenticated proxy control; prerequisite isolation is tested separately',
+  scope: 'Installed CLI/Lake/system-Git private CA and authenticated proxy control; prerequisite isolation is tested separately',
   steps: [], requests: [], passed: false };
 const save = () => writeFile(reportPath, JSON.stringify(result, null, 2) + '\n');
 await save();
@@ -41,9 +41,11 @@ const env = { ...process.env, LASM_TOOLCHAIN_CACHE: tools, LEAN_NUM_THREADS: '1'
 for (const name of Object.keys(env)) if (/proxy|NODE_EXTRA_CA_CERTS|NODE_TLS_REJECT_UNAUTHORIZED|GIT_SSL|GIT_CONFIG/i.test(name)) delete env[name];
 await writeFile(join(output, 'empty-git-config'), '');
 env.GIT_CONFIG_GLOBAL = join(output, 'empty-git-config'); env.GIT_CONFIG_NOSYSTEM = '1';
-const { provisionGit, managedGitEnvironment } = await import(pathToFileURL(join(compiler, 'src/managed-git.mjs')));
-const git = await provisionGit({ cache: tools });
-const gitEnv = managedGitEnvironment(git, env);
+// Lasm uses the system Git (it ships none); the fixture serves with the same Git.
+const { findSystemGit } = await import(pathToFileURL(join(compiler, 'src/system-git.mjs')));
+const git = findSystemGit(env);
+assert.ok(git, 'This control needs the system git on PATH');
+const gitEnv = env;
 const invoke = async (label, program, args, cwd, environment, expectSuccess = true) => {
   const started = performance.now(); let actual;
   try { const r = await execute(program, args, { cwd, env: environment, encoding: 'utf8', windowsHide: true, timeout: 1200_000, maxBuffer: 2 * 1024 * 1024 }); actual = { code: 0, ...r }; }
@@ -67,7 +69,7 @@ const fixture = createInstallerCertificate(), ca = join(output, 'ca.pem'); await
 const credential = 'fixture:ephemeral-proxy-password';
 const worker = new Worker(new URL('./network-fixture-worker.mjs', import.meta.url), { workerData: {
   repository: bare, certificate: fixture.certificate, privateKey: fixture.privateKey.export({ type: 'pkcs8', format: 'pem' }), proxyCredential: credential,
-  // The managed Git also serves the fixture through smart HTTP (`git http-backend`).
+  // The system Git also serves the fixture through smart HTTP (`git http-backend`).
   git: { executable: git.executable, env: gitEnv },
 } });
 worker.on('message', message => { if (message.type !== 'ready') result.requests.push(message); });
@@ -91,7 +93,7 @@ try {
   assert.ok(!result.requests.some(r => r.type === 'git-request-refused'), 'Git discovery requests were refused as recursive');
   assert.ok(!result.requests.some(r => r.type === 'git-backend-failure'), 'The fixture Git backend failed');
   assert.ok(result.requests.filter(r => r.type === 'git-request' && r.path.endsWith('/info/refs')).length <= 8, 'Bounded Git discovery requests');
-  result.git = { identity: git.identity, version: git.version, executable: git.executable };
+  result.git = { version: git.version, executable: git.executable };
   result.passed = true;
 } finally { await worker.terminate(); result.finishedAt = new Date().toISOString(); await save(); console.log(JSON.stringify(result, null, 2)); }
 } finally {

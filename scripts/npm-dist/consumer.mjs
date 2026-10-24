@@ -7,7 +7,7 @@
 //   node scripts/npm-dist/consumer.mjs --registry URL --dist BUILD_DIR --work DIR --scenario NAME
 // Scenarios:
 //   installed      npm install @lasm/cli@V in an empty project, then npx lasm Main.lean (empty Lasm cache)
-//   lake           a Lake project in the `installed` project (extended Lean tier and Git fetched on demand)
+//   lake           a Lake project in the `installed` project (extended Lean tier fetched on demand; no Git: the project has no dependencies)
 //   npx            npx --yes @lasm/cli@V Main.lean in an empty directory (empty npm and Lasm caches)
 //   c-tier         a Lake project with bundled C (scripts/ecosystem/projects/extern-lib) in the `installed`
 //                  project: Lean's C tier must come from @lasm/lean-c-<platform>, fetched on demand

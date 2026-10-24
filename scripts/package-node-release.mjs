@@ -10,7 +10,6 @@ import { toolchainCatalog } from '../src/managed-lean.mjs';
 import { sdkCatalog } from '../src/managed-sdk.mjs';
 import { pythonCatalog } from '../src/managed-python.mjs';
 import { linkToolchainCatalog } from '../src/managed-link-toolchain.mjs';
-import { gitCatalog } from '../src/managed-git.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 import { buildPlatforms } from '../src/platform.mjs';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
@@ -38,7 +37,7 @@ for (const platform of platforms) {
   assert.ok(buildPlatforms.includes(platform), `Unsupported candidate platform: ${platform}`);
   // The default link toolchain; the full SDK and Python remain for LASM_LINK_DRIVER=emcc.
   assert.ok(linkToolchainCatalog.native[platform], `Missing managed link toolchain for ${platform}`);
-  for (const catalog of [toolchainCatalog.lean[lean], sdkCatalog, pythonCatalog, gitCatalog])
+  for (const catalog of [toolchainCatalog.lean[lean], sdkCatalog, pythonCatalog])
     assert.ok(catalog.artifacts[platform], `Missing managed distribution for ${platform}`);
 }
 const sourceRevision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
@@ -69,8 +68,8 @@ const json = (path, value) => writeFileSync(join(staging, path), JSON.stringify(
 json('src/toolchains.json', { ...toolchainCatalog, defaultLean: lean, lean: { [lean]: toolchainCatalog.lean[lean] } });
 json('src/application-runtimes.json', { schema: 1, lean: { [lean]: expected } });
 // The compiler runs on Node >= 24 (tested on the pinned 24 and 26 releases). Its
-// Linux floor is the managed tools' newest glibc symbol (GLIBC_2.34, managed Git;
-// Lean's LLVM needs 2.30). Built applications carry their own, lower checks
+// Linux floor is the managed tools' newest glibc symbol. GLIBC_2.34 came from the
+// formerly bundled Git (Lean's LLVM needs 2.30); it is kept until re-measured. Built applications carry their own, lower checks
 // (src/application-output.mjs: Node 24.0.0, glibc 2.28).
 json('application-support.json', { schema: 1, platforms, node: pins.node, minimumNode: pins.minimumNode,
   testedNode: [pins.node24, pins.node], lean, minimumGlibc: '2.34' });

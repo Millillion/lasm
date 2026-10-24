@@ -4,7 +4,6 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { insideDirectory } from './platform.mjs';
-import { managedGitEnvironment } from './managed-git.mjs';
 
 // Lean's Windows source inventory expands DOS 8.3 aliases. Node's JS realpath
 // can retain them, so use the OS path identity before comparing source roots.
@@ -139,10 +138,10 @@ export function standaloneImportsModules(source, lean, roots) {
   return false;
 }
 
-export function applicationSources(source, lean, work, { log = console.error, git } = {}) {
+export function applicationSources(source, lean, work, { log = console.error } = {}) {
   source = resolve(source);
   const project = findApplicationProject(source);
-  const env = git ? managedGitEnvironment(git, nativeLeanEnvironment(lean)) : nativeLeanEnvironment(lean);
+  const env = nativeLeanEnvironment(lean);
   const run = (program, args, cwd) => execFileSync(program, args,
     { cwd, env, windowsHide: true, encoding: 'utf8', timeout: 900_000, maxBuffer: 32 * 1024 * 1024,
       stdio: ['ignore', 'pipe', 'inherit'] }).trim();

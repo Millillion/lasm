@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, writeFileSync, existsSync, lstatSync, readlinkSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { provisionGit, managedGitEnvironment } from '../src/managed-git.mjs';
+import { findSystemGit } from '../src/system-git.mjs';
 import { provisionPython } from '../src/managed-python.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
@@ -32,10 +32,11 @@ async function verifyOriginals() {
   }
   return checked;
 }
-const before = await verifyOriginals(), git = await provisionGit(), python = await provisionPython();
+const before = await verifyOriginals(), git = findSystemGit(), python = await provisionPython();
+if (!git) throw new Error('This maintainer check needs the system git on PATH');
 const config = join(output, 'empty-gitconfig'); writeFileSync(config, '');
-const env = managedGitEnvironment(git, { ...process.env, GIT_CONFIG_GLOBAL: config,
-  GIT_CONFIG_NOSYSTEM: '1', GIT_TERMINAL_PROMPT: '0', PYTHONDONTWRITEBYTECODE: '1' });
+const env = { ...process.env, GIT_CONFIG_GLOBAL: config,
+  GIT_CONFIG_NOSYSTEM: '1', GIT_TERMINAL_PROMPT: '0', PYTHONDONTWRITEBYTECODE: '1' };
 for (const name of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE']) delete env[name];
 const gitRun = args => execFileSync(git.executable, args,
   { cwd: source, env, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, timeout: 120_000 });
@@ -51,11 +52,11 @@ writeFileSync(join(output, 'stdout.txt'), execution.stdout); writeFileSync(join(
 const changed = gitRun(['diff', '--name-only']);
 const untracked = gitRun(['ls-files', '--others', '--exclude-standard']);
 const after = await verifyOriginals();
-const report = { scope: 'Unchanged upstream source lint using managed native Python/Git; no deployed runtime pass implied',
+const report = { scope: 'Unchanged upstream source lint using managed native Python and the system Git; no deployed runtime pass implied',
   test: tests[0], lean: inventory.lean, leanCommit: inventory.leanCommit,
   sourceArchiveSha256: inventory.sourceArchiveSha256,
   adaptation: 'Recreate an index of every file from the complete official source archive because lint.py uses git ls-files. No source file, root toolchain pin, assertion or expected output is changed.',
-  gitIdentity: git.identity, pythonIdentity: python.identity, trackedFiles: tracked,
+  git: git.version, pythonIdentity: python.identity, trackedFiles: tracked,
   originalEntries: { before, after }, changed, untracked,
   execution: { code: execution.status, signal: execution.signal, stdout: execution.stdout, stderr: execution.stderr },
   resourceReport: process.env.LASM_RESOURCE_REPORT, recordedAt: new Date().toISOString() };

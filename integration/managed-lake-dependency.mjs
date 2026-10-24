@@ -1,4 +1,5 @@
-// A real Lake project with a pinned Git dependency and non-default source roots.
+// A real Lake project with a pinned Git dependency and non-default source roots,
+// using the system Git (Lasm ships none); without Git the build stops before Lake.
 // Run inside run-bounded.mjs and base-pages.py; no compiler mocks are used.
 import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync, readFileSync, existsSync, statSync, renameSync, symlinkSync } from 'node:fs';
@@ -6,7 +7,7 @@ import { resolve, join, dirname, delimiter } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
-import { provisionGit, managedGitEnvironment } from '../src/managed-git.mjs';
+import { findSystemGit } from '../src/system-git.mjs';
 import { provisionLean } from '../src/managed-lean.mjs';
 import { nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
@@ -25,11 +26,12 @@ const pin = 'leanprover/lean4:v4.34.0\n';
 writeFileSync(join(project, 'lean-toolchain'), pin); writeFileSync(join(dependency, 'lean-toolchain'), pin);
 writeFileSync(join(dependency, 'lakefile.toml'), 'name = "dependency"\nversion = "0.1.0"\nsrcDir = "src"\n\n[[lean_lib]]\nname = "Dependency"\n');
 writeFileSync(join(dependency, 'src/Dependency.lean'), 'def dependencyValue : Nat := 37\n');
-const git = await provisionGit();
+const git = findSystemGit();
+assert.ok(git, 'This control needs the system git on PATH');
 const config = join(base, 'empty-gitconfig'); writeFileSync(config, '');
-const env = { ...process.env, PATH: dirname(process.execPath), GIT_CONFIG_GLOBAL: config, GIT_CONFIG_NOSYSTEM: '1', GIT_TERMINAL_PROMPT: '0' };
+const env = { ...process.env, PATH: [dirname(process.execPath), dirname(git.executable)].join(delimiter), GIT_CONFIG_GLOBAL: config, GIT_CONFIG_NOSYSTEM: '1', GIT_TERMINAL_PROMPT: '0' };
 for (const name of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(name) || ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE'].includes(name)) delete env[name];
-const gitEnv = managedGitEnvironment(git, env);
+const gitEnv = env;
 const gitRun = args => execFileSync(git.executable, args, { cwd: dependency, env: gitEnv, encoding: 'utf8', timeout: 60_000 }).trim();
 gitRun(['-c', 'init.defaultBranch=main', 'init']); gitRun(['add', '.']);
 gitRun(['-c', 'user.name=Lasm fixture', '-c', 'user.email=lasm-fixture@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '-m', 'Pinned dependency fixture']);
@@ -52,9 +54,14 @@ else {
 }
 const cli = args => execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), ...args],
   { cwd: project, env, encoding: 'utf8', timeout: 1800_000, stdio: ['ignore', 'pipe', 'inherit'] });
+// Without Git on PATH the build stops before Lake runs, with the install help.
+const withoutGit = spawnSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', source, '--output', dist],
+  { cwd: project, env: { ...env, PATH: dirname(process.execPath) }, encoding: 'utf8', timeout: 1800_000 });
+assert.notEqual(withoutGit.status, 0);
+assert.match(withoutGit.stderr, /needs Git \(Git dependency dependency\)[\s\S]*sudo apt install git[\s\S]*winget install --id Git\.Git -e/);
+assert.ok(!existsSync(join(project, 'lake-manifest.json')), 'Lake must not run without Git');
 cli(['build', source, '--output', dist]);
 const receipt = JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8'));
-assert.equal(receipt.gitIdentity, git.identity);
 assert.equal(receipt.modules.length, 3, 'Dependency, Local and Main must all be compiled');
 const manifest = JSON.parse(readFileSync(join(project, 'lake-manifest.json'), 'utf8'));
 assert.equal(manifest.packages.find(p => p.name === 'dependency').rev, revision);
@@ -70,8 +77,8 @@ assert.equal(readFileSync(join(dist, 'assets/data.txt'), 'utf8'), 'kept');
 assert.ok(statSync(join(dist, 'assets/empty')).isDirectory());
 
 const lean = await provisionLean(source);
-const nativeEnv = managedGitEnvironment(git, { ...nativeLeanEnvironment(lean), ...env,
-  PATH: [join(lean.prefix, 'bin'), dirname(process.execPath)].join(delimiter) });
+const nativeEnv = { ...nativeLeanEnvironment(lean), ...env,
+  PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), dirname(git.executable)].join(delimiter) };
 execFileSync(lean.lake, ['--no-cache', '--keep-toolchain', 'build', 'consumer'],
   { cwd: project, env: nativeEnv, stdio: 'inherit', timeout: 900_000 });
 const native = join(project, '.lake/build/bin', process.platform === 'win32' ? 'consumer.exe' : 'consumer');
@@ -100,9 +107,9 @@ assert.deepEqual(actual, expected);
 const result = { scope: 'Ordinary Lake Git dependency through application CLI, native control and relocated deployment',
   target, platform: process.platform + '-' + process.arch, node: process.version,
   engineVersion: execFileSync(engine, ['--version'], { encoding: 'utf8' }).trim(), compiler, entryKind,
-  dependencyRevision: revision, gitIdentity: git.identity, build: JSON.parse(readFileSync(join(deployed, 'build-info.json'), 'utf8')),
+  dependencyRevision: revision, git: git.version, build: JSON.parse(readFileSync(join(deployed, 'build-info.json'), 'utf8')),
   wasmSha256: await hashFile(join(deployed, 'program.wasm')), expected, actual,
-  checks: { pinnedGitDependency: 'passed', nonDefaultSourceRoots: 'passed', packageCompilerOptions: 'passed',
+  checks: { noGitStopsBeforeLake: 'passed', pinnedGitDependency: 'passed', nonDefaultSourceRoots: 'passed', packageCompilerOptions: 'passed',
     sourceSymlink: process.platform === 'win32' ? 'not-run: Windows link creation needs separate coverage' : 'passed',
     exactCacheReuse: 'passed', sourceInvalidation: 'passed', addedAssetsPreserved: 'passed', compatibilityLauncher: 'passed', relocatedDeployment: 'passed' },
   resourceReport: process.env.LASM_RESOURCE_REPORT, recordedAt: new Date().toISOString() };

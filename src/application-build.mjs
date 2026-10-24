@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
 import { provisionLean, selectLeanVersion, toolchainCatalog } from './managed-lean.mjs';
 import { provisionLinkToolchain, linkToolchainCatalog } from './managed-link-toolchain.mjs';
-import { provisionGit } from './managed-git.mjs';
+import { checkSystemGit } from './system-git.mjs';
 import { hashFile, managedCacheDirectory } from './managed-artifacts.mjs';
 import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
@@ -69,16 +69,18 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const emscripten = linkDriver === 'node' ? linkToolchainCatalog.version : sdkCatalog.version;
   if (emscripten !== runtime.manifest.emscripten) throw new Error('The managed compiler tools and application runtime do not match');
   const project = findApplicationProject(source), directory = project ?? dirname(source);
-  const git = project ? await provisionGit({ cache, log, progress }) : undefined;
+  // Lasm ships no Git: a project with Git or Reservoir dependencies needs the system
+  // `git` (src/system-git.mjs), checked before Lake runs.
+  if (project) checkSystemGit(project);
   const work = join(directory, '.lake/lasm/applications', digest(source).slice(0, 16));
   await mkdir(work, { recursive: true });
   progress?.({ stage: project ? 'Checking Lean sources and Lake dependencies' : 'Checking Lean sources and imports' });
-  let generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
+  let generated = applicationSources(source, lean, work, { log: verbose ? log : () => {} });
   if (generated.needsCCompiler) {
     // Lake packages with C code build it natively with Lean's own clang, as Lake does.
     progress?.({ stage: `Packages with C code (${generated.native.map(item => item.package).join(', ')}) need Lean's C compiler and headers` });
     lean = await provisionLean(source, { cache, log, progress, native: true });
-    generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
+    generated = applicationSources(source, lean, work, { log: verbose ? log : () => {} });
   }
   const { compilations: nativeCompilations, unavailable: nativeUnavailable } = generated.nativeLink
     ? planNativeInputs(generated.nativeLink, { leanPrefix: [lean.prefix, lean.executionPrefix], runtimeInclude: join(runtime.directory, 'include') })
@@ -114,7 +116,6 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
       ? { linkToolchainIdentity: digest(JSON.stringify(linkToolchainCatalog)) }
       : { sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)) }),
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
-    ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
     applicationPolicy,
     target: 'node', host: `${process.platform}-${process.arch}`, nativeTargets: applicationNativeTargets(),
     minimumNode: minimumApplicationNode, minimumGlibc: minimumApplicationGlibc, memoryMode, modules,

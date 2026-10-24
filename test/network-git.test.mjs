@@ -17,15 +17,8 @@ test('private Git fixture exercises CA rejection and authenticated proxy cloning
   const env = { ...process.env };
   for (const name of Object.keys(env)) if (/proxy|GIT_SSL|GIT_CONFIG/i.test(name)) delete env[name];
   Object.assign(env, { GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: config });
-  // Native controls set LASM_TEST_MANAGED_GIT=1 to exercise the bundled Git the product
-  // provisions (and the fixture serves with); otherwise the host Git is used.
-  let program = 'git', serving;
-  if (process.env.LASM_TEST_MANAGED_GIT === '1') {
-    const { provisionGit, managedGitEnvironment } = await import('../src/managed-git.mjs');
-    const managed = await provisionGit({ cache: process.env.LASM_TOOLCHAIN_CACHE ?? join(directory, 'tools') });
-    Object.assign(env, managedGitEnvironment(managed, env)); program = managed.executable;
-    serving = { executable: managed.executable, env: { ...env } };
-  }
+  // Lasm uses the system Git (it ships none), as this fixture does.
+  const program = 'git', serving = undefined;
   const execute = promisify(execFile);
   const git = (args, environment = env) => execute(program, args, { cwd: source, env: environment, windowsHide: true, timeout: 20_000, encoding: 'utf8' });
   await git(['init', '--initial-branch=main']); await git(['add', '.']);

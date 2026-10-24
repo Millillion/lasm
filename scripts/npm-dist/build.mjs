@@ -6,7 +6,7 @@
 // package. Never publishes.
 //
 //   node scripts/npm-dist/build.mjs --base CANDIDATE.tgz --out DIR --step plan [--overlay-source]
-//     [--scope @lasm] [--version V] [--license MIT] [--no-git]
+//     [--scope @lasm] [--version V] [--license MIT]
 //   node scripts/npm-dist/build.mjs --out DIR --step package --only @lasm/lean-linux-x64 [--assets DIR] [--seed DIR]...
 //   node scripts/npm-dist/build.mjs --out DIR --step main
 // scripts/npm-dist/build-all.mjs runs every step, each in its own resource guard:
@@ -41,7 +41,6 @@ const { values: args } = parseArgs({ options: {
   base: { type: 'string' }, out: { type: 'string' }, scope: { type: 'string', default: defaultScope },
   version: { type: 'string' }, license: { type: 'string' }, assets: { type: 'string', default: join(root, '.cache/npm-dist/assets') },
   seed: { type: 'string', multiple: true, default: [] }, 'overlay-source': { type: 'boolean', default: false },
-  'no-git': { type: 'boolean', default: false },
 } });
 assert.ok(['plan', 'package', 'main'].includes(args.step) && args.out, 'Usage: build.mjs --out DIR --step plan|package|main (see header)');
 const out = resolve(args.out), planFile = join(out, 'plan.json');
@@ -64,9 +63,8 @@ if (args.step === 'plan') {
   await rm(probe, { recursive: true });
   const catalogs = {
     toolchains: await json(join(root, 'src/toolchains.json')), linkToolchain: await json(join(root, 'src/link-toolchain.json')),
-    git: await json(join(root, 'src/git-tools.json')),
   };
-  const packages = toolPackages({ lean: support.lean, ...catalogs, git: args['no-git'] ? undefined : catalogs.git, scope: args.scope,
+  const packages = toolPackages({ lean: support.lean, ...catalogs, scope: args.scope,
     platforms: support.platforms });
   const plan = { schema: 1, base: { file: resolve(args.base), sha256: await hashFile(resolve(args.base)), version: basePackage.version },
     lean: support.lean, platforms: support.platforms, scope: args.scope, overlaySource: args['overlay-source'],
@@ -158,10 +156,6 @@ if (args.step === 'package') {
       await mkdir(join(notices, to, '..'), { recursive: true });
       await copyFile(join(root, 'scripts/lean-dist/notices', from), join(notices, to));
     }
-  }
-  for (const [from, to] of pkg.licenseFiles ?? []) {
-    await mkdir(join(directory, noticeDirectory, to, '..'), { recursive: true });
-    await copyFile(join(root, 'scripts/npm-dist/notices', from), join(directory, noticeDirectory, to));
   }
   await writeFile(join(directory, 'package.json'), JSON.stringify(toolPackageJson(pkg), null, 2) + '\n');
   await writeFile(join(directory, 'README.md'), toolPackageReadme(pkg));
