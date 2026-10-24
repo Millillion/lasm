@@ -1,0 +1,87 @@
+name: Cloudflare Workers (Phase 7)
+# Experimental edge build (docs/EDGE.md): builds the single-threaded runtime
+# (edge-runtime.yml), then the Hono template (lasm init --deploy workers) and
+# examples/edge-pure with `lasm build --target workers` from this source
+# checkout; serves them with `wrangler dev` (local workerd: CI=1, no account,
+# no browser), runs them on Node 26, Deno and Bun, and checks the Workers Free
+# plan's budgets (scripts/edge/workers-ci.mjs). Linux only, free runners, no
+# deployment and no publication.
+on:
+  workflow_dispatch:
+  push:
+    branches: [phase-7]
+    paths:
+      - '.github/workflows/workers.yml'
+      - '.github/workflows/edge-runtime.yml'
+      - 'src/edge/**'
+      - 'src/application-build.mjs'
+      - 'src/application-cli.mjs'
+      - 'src/init.mjs'
+      - 'library/**'
+      - 'templates/hono/**'
+      - 'examples/edge-pure/**'
+      - 'scripts/edge/**'
+      - 'runtime/edge.cpp'
+      - 'scripts/full-lean/patches/lean-4.35.0-edge.patch'
+permissions:
+  # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
+  contents: write
+concurrency:
+  group: workers-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  runtime:
+    if: github.ref != 'refs/heads/main'
+    uses: ./.github/workflows/edge-runtime.yml
+  workers:
+    needs: runtime
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      EMCC_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+      CI: '1'
+      BROWSER: 'false'
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Native host pieces (koffi, helpers)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      - name: Fetch the pinned Node runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-libraries
+          path: .work/edge-runtime
+      - name: Pinned local platform tools (wrangler with workerd, Deno, Bun)
+        run: npm install --prefix .work/edge-tools --no-audit --no-fund wrangler@4.152.0 deno@2.9.6 bun@1.4.4
+      - name: Build, serve and check the Workers apps
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime
+        run: node scripts/edge/workers-ci.mjs .work/edge-apps .work/edge-tools
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: workers-results
+          path: .work/edge-apps/*.json
+          retention-days: 14

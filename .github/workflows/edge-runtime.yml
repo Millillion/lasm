@@ -7,6 +7,8 @@ name: Edge runtime (Phase 7)
 # edge runtime's inputs, or on demand.
 on:
   workflow_dispatch:
+  # workers.yml builds the runtime first, then tests with it.
+  workflow_call:
   push:
     branches: [phase-7]
     paths:
@@ -22,7 +24,7 @@ permissions:
   # (drafts are visible only with write access). Nothing is written.
   contents: write
 concurrency:
-  group: edge-runtime-${{ github.ref }}
+  group: edge-runtime-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   runtime:
