@@ -20,10 +20,11 @@ assert.ok(!existsSync(output), 'Preserve previous acceptance evidence');
 assert.equal(await hashFile(archive), expectedSha);
 mkdirSync(output, { recursive: true });
 const workspace = realpathSync(mkdtempSync(join(tmpdir(), 'lasm node Mac λ-')));
-for (const name of ['node-installed.mjs', 'node-cache-controls.mjs']) copyFileSync(join(root, 'integration', name), join(workspace, name));
+for (const name of ['node-installed.mjs', 'node-cache-controls.mjs', 'node-exec-flags.mjs']) copyFileSync(join(root, 'integration', name), join(workspace, name));
 mkdirSync(join(workspace, 'fixtures'));
 for (const name of ['BundleFeatures.lean', 'BundleFeaturesLegacy.lean', 'FilesystemSurface.lean', 'CompileTimeFeatures.lean', 'StandaloneModuleData.lean', 'RuntimeModulePath.lean'])
   copyFileSync(join(root, 'integration/fixtures', name), join(workspace, 'fixtures', name));
+copyFileSync(join(root, 'integration/fixtures/exec-flags/Main.lean'), join(workspace, 'fixtures', 'ExecFlags.lean'));
 cpSync(join(root, 'test/fixtures/js-interop'), join(workspace, 'fixtures/js-interop'), { recursive: true,
   filter: file => !file.split(/[\\/]/).includes('node_modules') });
 for (const path of ['home', 'tmp', 'os-bin']) mkdirSync(join(workspace, path));

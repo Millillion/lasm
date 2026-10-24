@@ -18,13 +18,29 @@ if (ENVIRONMENT_IS_NODE) {
         && /call stack|stack overflow/i.test(failure.message)
         && /wasm-function|wasm:\/\//.test(failure.stack ?? '')) lasmStackOverflow();
   };
-  globalThis.Worker = class extends LasmHostWorker {
+  // Workers accept only per-thread Node options in execArgv. Per-process V8 and
+  // Node options (--max-old-space-size, --stack-size, --expose-gc, --jitless,
+  // --title, ...) make the Worker constructor throw ERR_WORKER_INVALID_EXEC_ARGV,
+  // although they already apply process-wide (V8 flags are global). Node names
+  // the rejected options in that error; drop them (with a separate value
+  // argument, which in execArgv is a token not starting with '-') and retry.
+  // The filtered list is kept for every later worker.
+  var lasmForwardedExecArgv;
+  var lasmDropExecArgv = function(argv, rejected) {
+    var result = [];
+    for (var i = 0; i < argv.length; i++) {
+      if (!rejected.includes(argv[i])) { result.push(argv[i]); continue; }
+      if (!argv[i].includes('=')) while (i + 1 < argv.length && !argv[i + 1].startsWith('-')) i++;
+    }
+    return result;
+  };
+  var LasmWorker = class extends LasmHostWorker {
     constructor(filename, options = {}) {
       options = {
         ...options, resourceLimits: { ...options.resourceLimits, stackSizeMb: lasmVmStackMb } };
       if (lasmWorkerHost) {
         options = { ...options, stdout: true, stderr: true,
-          execArgv: [...(options.execArgv ?? process.execArgv), '--require',
+          execArgv: [...(options.execArgv ?? lasmForwardedExecArgv ?? process.execArgv), '--require',
           require('node:url').fileURLToPath(new URL('./native-worker-cwd.cjs', lasmWorkerHost))] };
       }
       super(filename, options);
@@ -42,6 +58,22 @@ if (ENVIRONMENT_IS_NODE) {
       return super.emit(event, ...args);
     }
   };
+  globalThis.Worker = function Worker(filename, options = {}) {
+    for (var attempt = 0; ; attempt++) {
+      try { return new LasmWorker(filename, options); }
+      catch (error) {
+        var listed = error?.code === 'ERR_WORKER_INVALID_EXEC_ARGV' && options.execArgv === undefined && attempt < 2
+          && /invalid execArgv flags: (.+)$/.exec(String(error.message));
+        if (!listed) throw error;
+        var rejected = listed[1].split(', ');
+        var current = lasmForwardedExecArgv ?? process.execArgv;
+        var next = lasmDropExecArgv(current, rejected);
+        if (next.length === current.length) throw error;
+        lasmForwardedExecArgv = next;
+      }
+    }
+  };
+  globalThis.Worker.prototype = LasmWorker.prototype;
   Module.lasmFatalStackOverflow = lasmStackOverflow;
   var lasmPreviousOnAbort = Module.onAbort;
   Module.onAbort = function(reason) {

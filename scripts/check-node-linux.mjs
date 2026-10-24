@@ -22,11 +22,12 @@ assert.equal(await hashFile(archive), expectedSha, 'Test the exact packed candid
 mkdirSync(output, { recursive: true });
 const workspace = mkdtempSync(join(tmpdir(), 'lasm node Linux λ-'));
 const control = join(workspace, 'node-installed.mjs');
-for (const name of ['node-installed.mjs', 'node-cache-controls.mjs'])
+for (const name of ['node-installed.mjs', 'node-cache-controls.mjs', 'node-exec-flags.mjs'])
   copyFileSync(join(root, 'integration', name), join(workspace, name));
 mkdirSync(join(workspace, 'fixtures'));
 for (const name of ['BundleFeatures.lean', 'BundleFeaturesLegacy.lean', 'FilesystemSurface.lean', 'CompileTimeFeatures.lean', 'StandaloneModuleData.lean', 'RuntimeModulePath.lean'])
   copyFileSync(join(root, 'integration/fixtures', name), join(workspace, 'fixtures', name));
+copyFileSync(join(root, 'integration/fixtures/exec-flags/Main.lean'), join(workspace, 'fixtures', 'ExecFlags.lean'));
 cpSync(join(root, 'test/fixtures/js-interop'), join(workspace, 'fixtures/js-interop'), { recursive: true,
   filter: file => !file.split(/[\\/]/).includes('node_modules') });
 for (const path of ['home', 'tmp', 'os-bin']) mkdirSync(join(workspace, path));

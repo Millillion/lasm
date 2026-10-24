@@ -362,6 +362,11 @@ A summary; the sections above and the linked pages have the details.
   fails to build, and a `dist/` built on Windows and copied to Linux other than
   through `docker build` needs `chmod 755 dist/host/native/process/linux-*`
   ([DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+- **Node flags.** `node [flags] dist/main.mjs` and `NODE_OPTIONS` work, including
+  per-process flags such as `--max-old-space-size` (Lean's threads are Workers,
+  which do not accept those; they apply to the whole process anyway). `--jitless`
+  cannot work: it disables WebAssembly. Candidates up to `.58` crash on per-process
+  flags given on the command line (use `NODE_OPTIONS` with them).
 - **Memory.** Give an application at least 512 MB. It reserves about 22 GB of
   virtual address space, so hosts that cap virtual memory (`ulimit -v`,
   `vm.overcommit_memory=2`) refuse it. Node 26's official binary needs

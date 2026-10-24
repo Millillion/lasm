@@ -330,6 +330,16 @@ try {
       const expected = await oracle(fixture, args, project, false, true); assert.equal(expected.code, 0);
       await deployment(name, output, fixture, [{ args, expected }], project, false, true);
     }
+    // Node exec flags: per-process V8/Node options (--max-old-space-size, --expose-gc,
+    // --stack-size, --title, ...) must not reach pthread Workers' execArgv, and
+    // per-thread ones (--enable-source-maps, --inspect, ...) still work.
+    writeFileSync(join(project, 'ExecFlags.lean'), readFileSync(join(workspace, 'fixtures', 'ExecFlags.lean')));
+    const execFlagsOutput = join(project, 'exec flags dist');
+    assert.equal(npx('exec flags deployment', ['build', 'ExecFlags.lean', '--output', execFlagsOutput]).code, 0);
+    const execFlags = run('Node exec flags', process.execPath, [join(workspace, 'node-exec-flags.mjs'), join(workspace, 'exec-flags-result'), '--dist', execFlagsOutput]);
+    result.execFlags = JSON.parse(readFileSync(join(workspace, 'exec-flags-result/result.json'), 'utf8')).results
+      .map(({ node, flags, passed }) => ({ node, flags, passed })); save();
+    assert.equal(execFlags.code, 0, execFlags.stdout + execFlags.stderr);
     const unused = 'Unused.lean';
     writeFileSync(join(project, unused), Array.from({ length: 1000 }, (_, i) =>
       `def unused${i} (n : Nat) : Nat := (n + ${i}) * (n + ${i + 1})\n`).join('')
