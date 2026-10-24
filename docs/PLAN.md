@@ -729,7 +729,7 @@ folded into Phases 5.2/5.3 and 7.
     re-verification on every build (8-17 s), the initializer wrapper C compiled
     three times (29-41 s), wasm-opt pinned to one core (8-14 s). Fixes: tool
     fingerprints after the first full check; content-addressed caching of all
-    generated C; wasm-opt on up to 4 cores (byte-identical); smaller caches and
+    generated C; wasm-opt on up to 8 cores (`LASM_BUILD_JOBS`; byte-identical); smaller caches and
     concurrency. **Dev profile (user decision 2026-10-24):** `lasm run`,
     `npm run dev` and `lasm dev` skip wasm-opt -Oz/metadce/acorn DCE (about 16%
     larger, same behavior, deterministic); `lasm build` and `--target` builds stay
