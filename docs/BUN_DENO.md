@@ -1,7 +1,7 @@
 # Bun and Deno (Phase 7.5)
 
 Status: **experimental, unreleased** (planned for 0.2.0, 2026-10-24). It is tested
-on Linux only so far. macOS and Windows CI waits for the 0.1.0 gate. The Node
+on Linux x64 and arm64 only so far. macOS and Windows CI waits for the 0.1.0 gate. The Node
 build and its full profile are unchanged.
 
 Lasm runs on Bun and Deno in two ways:
@@ -55,9 +55,18 @@ SHA-256 checks:
   against its pinned sha512, then the archive against its SHA-256.
 - Anything missing falls back to the verified HTTPS download, as on Node.
 
-**Measured** (Linux x64, Bun 1.4.4, Deno 2.9.6; pure-Lean example and Hono
-template): builds under Bun and Deno give a `program.wasm` byte-identical to
-Node's, for both the Node build and the edge link.
+**Measured:**
+
+- Locally (Linux x64; pure-Lean example and Hono template), builds under Bun
+  and Deno give a `program.wasm` byte-identical to Node's, for both the Node
+  build and the edge link.
+- CI: run 40143173720, job `hosts`, on ubuntu-24.04 and ubuntu-24.04-arm
+  ([results](evidence/compiler-hosts-40143173720.json)). It builds the pure
+  example under Node, Bun 1.4.4 and Deno 2.9.6. All outputs are identical,
+  across both architectures too. Bun and Deno serve the build, and a
+  command-line program passes under both.
+- Cold build of the pure example: Bun 68 s and Deno 82 s on x64; 58 s and
+  72 s on arm64.
 
 ## Programs on Bun and Deno: `--target bun` and `--target deno`
 

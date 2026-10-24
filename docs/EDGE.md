@@ -146,6 +146,11 @@ Only the generated entry differs.
 Measured locally (2026-10-24). Every route passed on both, including the
 stop-and-restart check on Netlify.
 
+**CI: green in run 40143173720** (ubuntu-24.04, source `0994ce3`;
+[results](evidence/workers-ci-40143173720.json)). Every target passed for both
+apps: workerd, Node, Deno, Bun, Vercel Edge, Netlify Edge, Deno Deploy and
+the Bun build. The Node link driver's edge link was byte-identical to `emcc`.
+
 ## Phase 7.4 status: Deno Deploy; Supabase Edge Functions not supported
 
 **Deno Deploy: in current branch source.**
