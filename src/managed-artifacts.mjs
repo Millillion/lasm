@@ -5,10 +5,11 @@ import { dirname, join, resolve, relative, isAbsolute, posix } from 'node:path';
 import { homedir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { pipeline } from 'node:stream/promises';
+import { Transform } from 'node:stream';
 import { createZstdDecompress, createGunzip } from 'node:zlib';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { x as extractTar } from 'tar';
+import { x as extractTar, Parser as TarParser } from 'tar';
 import { isDeepStrictEqual } from 'node:util';
 import { downloadArtifact } from './managed-download.mjs';
 import { acquireArtifact } from './npm-artifacts.mjs';
@@ -62,7 +63,7 @@ function cleanArchivePath(name) {
   return !!name && !/[\\:\0]/.test(name) && parts.every(part => part && part !== '.' && part !== '..');
 }
 
-async function extract(artifact, archive, directory, python) {
+async function extract(artifact, archive, directory, python, hashes) {
   // macOS /var and Windows short-path temp directories are aliases. Compare
   // resolved link targets with the same physical root, not its lexical alias.
   directory = await realpath(directory);
@@ -133,7 +134,24 @@ async function extract(artifact, archive, directory, python) {
     }
   } else {
     const decompressor = artifact.format === 'tar.gz' ? createGunzip() : createZstdDecompress();
-    await pipeline(createReadStream(archive), decompressor, unpack);
+    // A second parser hashes every regular file from the same decompressed
+    // bytes the extractor writes, so the receipt (inventory) need not read the
+    // freshly written tree again.
+    const hasher = new TarParser({ strict: true });
+    hasher.on('entry', entry => {
+      const canonical = (rootless ? entry.path.replace(/^\.\//, '') : entry.path).replace(/\/$/, '');
+      const name = rootless ? canonical : canonical.slice(artifact.root.length + 1);
+      if (entry.type !== 'File' || !name || !hashes) { entry.resume(); return; }
+      const hash = createHash('sha256');
+      let bytes = 0;
+      entry.on('data', chunk => { hash.update(chunk); bytes += chunk.length; });
+      entry.on('end', () => { hashes.set(name, { sha256: hash.digest('hex'), size: bytes }); });
+    });
+    const hashed = new Promise((resolve, reject) => { hasher.on('end', resolve); hasher.on('error', reject); });
+    const tee = new Transform({ transform(chunk, encoding, callback) { hasher.write(chunk); callback(null, chunk); } });
+    try { await pipeline(createReadStream(archive), decompressor, tee, unpack); }
+    finally { hasher.end(); }
+    await hashed;
   }
   if (error) throw error;
   for (const entry of links) {
@@ -161,7 +179,7 @@ async function extract(artifact, archive, directory, python) {
   }
 }
 
-async function inventory(directory, { known } = {}) {
+async function inventory(directory, { known, extracted } = {}) {
   directory = await realpath(directory);
   const files = new Map();
   async function walk(base) {
@@ -178,8 +196,11 @@ async function inventory(directory, { known } = {}) {
         const stat = await lstat(file, { bigint: true });
         // A hard link to a verified original (linkArtifactTree), unchanged since.
         const same = known?.get(name);
+        // Or a file this process just extracted into its private staging tree,
+        // hashed from the archive stream (extract).
+        const written = extracted?.get(name);
         const sha256 = same && same.ino === stat.ino && same.dev === stat.dev && same.size === stat.size && same.mtimeNs === stat.mtimeNs
-          ? same.sha256 : await hashFile(file);
+          ? same.sha256 : written && BigInt(written.size) === stat.size ? written.sha256 : await hashFile(file);
         files.set(name, { type: 'file', bytes: Number(stat.size), sha256,
           ...(process.platform === 'win32' ? {} : { executable: !!(Number(stat.mode) & 0o111) }) });
       } else throw new Error(`Unexpected managed cache entry: ${name}`);
@@ -317,9 +338,10 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
           } }) });
       progress?.({ stage: `Extracting ${label}` });
       await mkdir(tree);
-      await extract(artifact, archive, tree, python);
+      const extracted = new Map();
+      await extract(artifact, archive, tree, python, extracted);
       progress?.({ stage: `Verifying installed ${label}` });
-      const files = await inventory(tree);
+      const files = await inventory(tree, { extracted });
       if (!Object.keys(files).length) throw new Error('Managed artifact is empty');
       const receipt = { schema: 1, identity, artifact, source, files };
       await writeFile(join(tree, receiptName), JSON.stringify(receipt) + '\n', { flag: 'wx' });
