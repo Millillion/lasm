@@ -66,17 +66,37 @@ jobs:
           INPUT_SHA256: ${{ inputs.sha256 }}
           INPUT_RELEASE: ${{ inputs.candidate-release }}
         run: node scripts/platform/select.mjs
+  # Standalone runs (push, dispatch) hand the verified candidate to the other
+  # jobs as a short-lived artifact. This avoids the shared cache-writer queue,
+  # which a multi-hour runtime build can hold (run 40063727878 waited behind
+  # run 40062871200). Only this job can read draft releases.
   input:
     needs: select
     if: needs.select.outputs.active == 'true' && inputs.cache-key == ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     permissions:
       contents: write
       actions: read
-    uses: ./.github/workflows/node-candidate-input.yml
-    with:
-      sha256: ${{ needs.select.outputs.sha256 }}
-      candidate-release: ${{ needs.select.outputs.release }}
-      candidate-version: ${{ needs.select.outputs.version }}
+    env:
+      LASM_CANDIDATE_SHA256: ${{ needs.select.outputs.sha256 }}
+      LASM_CANDIDATE_VERSION: ${{ needs.select.outputs.version }}
+      LASM_CANDIDATE_RELEASE: ${{ needs.select.outputs.release }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Fetch and verify the exact retained candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - uses: actions/upload-artifact@v7
+        with:
+          name: platform-candidate
+          path: .work/node-candidate/lasm-compiler-${{ needs.select.outputs.version }}.tgz
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
   build:
     needs: [select, input]
     if: always() && needs.select.outputs.active == 'true' && needs.input.result != 'failure' && needs.input.result != 'cancelled'
@@ -108,12 +128,18 @@ jobs:
           node-version: ${{ needs.select.outputs[matrix.node] }}
           architecture: ${{ matrix.architecture }}
           package-manager-cache: false
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - if: inputs.cache-key != ''
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .work/node-candidate/lasm-compiler-${{ needs.select.outputs.version }}.tgz
-          key: ${{ inputs.cache-key || needs.input.outputs.cache-key }}
+          key: ${{ inputs.cache-key }}
           enableCrossOsArchive: true
           fail-on-cache-miss: false
+      - if: inputs.cache-key == ''
+        uses: actions/download-artifact@v8
+        with:
+          name: platform-candidate
+          path: .work/node-candidate
       - name: Verify the candidate
         env:
           GH_TOKEN: ${{ github.token }}
@@ -152,12 +178,18 @@ jobs:
         with:
           node-version: ${{ needs.select.outputs.node24 }}
           package-manager-cache: false
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - if: inputs.cache-key != ''
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .work/node-candidate/lasm-compiler-${{ needs.select.outputs.version }}.tgz
-          key: ${{ inputs.cache-key || needs.input.outputs.cache-key }}
+          key: ${{ inputs.cache-key }}
           enableCrossOsArchive: true
           fail-on-cache-miss: false
+      - if: inputs.cache-key == ''
+        uses: actions/download-artifact@v8
+        with:
+          name: platform-candidate
+          path: .work/node-candidate
       - name: Verify the candidate
         env:
           GH_TOKEN: ${{ github.token }}
