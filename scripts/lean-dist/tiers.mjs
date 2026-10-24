@@ -98,6 +98,9 @@ export function cToolRoots(platform) {
  * headers, compiler runtime objects and the link-time C libraries (not Lean's
  * own static archives under lib/lean, which only native Lean executables use). */
 export function cDataMember(path) {
+  // Apple SDK text stubs (lib/libc/libSystem.tbd) are Apple's, not redistributed:
+  // Lasm links against the user's own SDK copy (src/managed-lean.mjs).
+  if (/\.tbd$/.test(path)) return false;
   return /^include\//.test(path) || /^lib\/(?:clang|glibc|libc)\//.test(path) || /^lib\/[^/]+$/.test(path);
 }
 

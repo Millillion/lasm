@@ -33,7 +33,7 @@ import { hashFile } from '../../src/managed-artifacts.mjs';
 import { downloadArtifact } from '../../src/managed-download.mjs';
 import { findNpm, archiveFileName } from '../../src/npm-artifacts.mjs';
 import { toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, defaultScope, maximumPackageBytes, noticeDirectory,
-  createPackageJson, createPackageLicense, cTierExtraNotices } from './packages.mjs';
+  createPackageJson, createPackageLicense, cTierExtraNotices, cTierFamilyNotices, noticeSections, cliLicense, slug } from './packages.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values: args } = parseArgs({ options: {
@@ -137,6 +137,20 @@ async function copyArchiveFiles(file, root, members, destination) {
   await rm(staging, { recursive: true });
 }
 
+/** Copy every licence-type member (LICENSE*, LICENSES, COPYING*, COPYRIGHT*, NOTICE*, and
+ * all of lasm-notices/) of a verified tar.zst archive into `destination`, keeping paths. */
+async function copyLicenseMembers(file, root, destination) {
+  const wanted = name => {
+    const path = name.split('/').slice(1).join('/'), base = path.split('/').pop();
+    return path.startsWith('lasm-notices/') || /^(?:licen[cs]es?|copying|copyright|notice)(?:[-._].*)?$/i.test(base);
+  };
+  let count = 0;
+  await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: destination, strip: 1, strict: true, preservePaths: false, preserveOwner: false,
+    filter: (name, header) => { const keep = header.type === 'File' && name.startsWith(root + '/') && wanted(name); if (keep) count++; return keep; } }));
+  assert.ok(count, `${basename(file)} has no licence files`);
+  for (const entry of await readdir(destination, { recursive: true, withFileTypes: true })) if (entry.isFile()) await chmod(join(entry.parentPath, entry.name), 0o644);
+}
+
 if (args.step === 'package') {
   const pkg = plan.packages.find(p => p.name === args.only);
   assert.ok(pkg, `No planned package ${args.only}`);
@@ -145,6 +159,11 @@ if (args.step === 'package') {
   await rm(directory, { recursive: true, force: true });
   await mkdir(directory, { recursive: true });
   try { await link(file, join(directory, name)); } catch { await copyFile(file, join(directory, name)); }
+  // Every package shows its archive's licence files in licenses/, without extracting anything.
+  if (!pkg.notices) {
+    await mkdir(join(directory, noticeDirectory), { recursive: true });
+    await copyLicenseMembers(file, artifact.root, join(directory, noticeDirectory));
+  }
   if (pkg.notices) {
     // The C tier's own notices, and the licences of the Lean release its files come from.
     const notices = join(directory, noticeDirectory), bin = pkg.notices.bin;
@@ -152,7 +171,7 @@ if (args.step === 'package') {
     await copyArchiveFiles(await releaseAsset(bin), bin.root, [['LICENSE', 'lean/LICENSE'], ['LICENSES', 'lean/LICENSES'],
       [`lasm-notices/${bin.root}/libuv-LICENSE`, 'libuv/LICENSE'], [`lasm-notices/${bin.root}/libuv-LICENSE-extra`, 'libuv/LICENSE-extra']], notices);
     // Texts that neither archive of release c-v1 carries (docs/LICENSE_AUDIT.md).
-    for (const [from, to] of cTierExtraNotices) {
+    for (const [from, to] of [...cTierExtraNotices, ...cTierFamilyNotices[pkg.platform.split('-')[0]]]) {
       await mkdir(join(notices, to, '..'), { recursive: true });
       await copyFile(join(root, 'scripts/lean-dist/notices', from), join(notices, to));
     }
@@ -196,10 +215,41 @@ if (args.step === 'main') {
     overlay = { sourceRevision, uncommittedChanges };
     await writeFile(join(main, 'provenance.json'), JSON.stringify({ ...provenance, npmDistributionOverlay: overlay }, null, 2) + '\n');
   }
-  // A publication licence (for example --license MIT): the field, and this checkout's LICENSE text in the package.
-  if (plan.main.license) await copyFile(join(root, 'LICENSE'), join(main, 'LICENSE'));
+  // A publication licence (for example --license MIT) is Lasm's own: LICENSE is this
+  // checkout's text. The `license` field is an SPDX expression of Lasm's licence and
+  // every bundled component, whose texts go to licenses/ (docs/LICENSE_AUDIT.md).
+  let mainMeta = plan.main;
+  if (plan.main.license) {
+    await copyFile(join(root, 'LICENSE'), join(main, 'LICENSE'));
+    const licenses = join(main, 'licenses'), headings = [];
+    const sections = async (file, prefix) => {
+      for (const [heading, text] of noticeSections(await readFile(file, 'utf8'))) {
+        headings.push(heading);
+        await mkdir(join(licenses, ...prefix), { recursive: true });
+        await writeFile(join(licenses, ...prefix, slug(heading) + '.txt'), text);
+      }
+    };
+    await sections(join(main, 'THIRD_PARTY_NOTICES.txt'), []);
+    for (const helper of ['process', 'signals']) {
+      const file = join(main, 'src/native', helper, 'THIRD_PARTY_NOTICES.txt');
+      if (existsSync(file)) await sections(file, ['native-' + helper]);
+    }
+    const bundled = [];
+    for (const name of await readdir(join(main, 'node_modules'))) {
+      const names = name.startsWith('@') ? (await readdir(join(main, 'node_modules', name))).map(child => name + '/' + child) : [name];
+      for (const pkgName of names) {
+        const directory = join(main, 'node_modules', pkgName), meta = await json(join(directory, 'package.json'));
+        bundled.push(meta.license);
+        for (const file of (await readdir(directory)).filter(file => /^(?:licen[cs]e|copying|notice)/i.test(file))) {
+          await mkdir(join(licenses, 'npm', pkgName), { recursive: true });
+          await copyFile(join(directory, file), join(licenses, 'npm', pkgName, file));
+        }
+      }
+    }
+    mainMeta = { ...plan.main, license: cliLicense(plan.main.license, headings, bundled), licenseFiles: true };
+  }
   await writeFile(join(main, 'src/npm-tools.json'), JSON.stringify(npmToolManifest(plan.packages, packed), null, 2) + '\n');
-  await writeFile(join(main, 'package.json'), JSON.stringify(mainPackageJson(basePackage, plan.packages, plan.main), null, 2) + '\n');
+  await writeFile(join(main, 'package.json'), JSON.stringify(mainPackageJson(basePackage, plan.packages, mainMeta), null, 2) + '\n');
   const mainPacked = await packTwice(main, plan.main.name);
   // create-lasm, in lockstep with the CLI (packages/create-lasm).
   const create = join(out, 'staging', 'create');
@@ -217,7 +267,7 @@ if (args.step === 'main') {
     schema: 1, scope: plan.scope, lean: plan.lean, platforms: plan.platforms, recordedAt: new Date().toISOString(),
     host: `${process.platform}-${process.arch}`, node: process.versions.node, npm: runNpm(['--version']).trim(), reproduciblePacking: true,
     base: { file: basename(plan.base.file), sha256: plan.base.sha256, version: plan.base.version }, overlay,
-    main: { ...plan.main, ...mainPacked },
+    main: { ...plan.main, license: mainMeta.license, ...mainPacked },
     create: { name: createMeta.name, version: createMeta.version, license: createMeta.license, ...createPacked },
     packages: plan.packages.map(pkg => ({ name: pkg.name, version: pkg.version, install: pkg.install, platform: pkg.platform,
       artifact: { name: pkg.artifact.name, sha256: pkg.artifact.sha256, bytes: pkg.artifact.bytes }, ...packed[pkg.name] })),

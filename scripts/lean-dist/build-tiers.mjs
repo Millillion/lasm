@@ -34,6 +34,9 @@ const { values: options } = parseArgs({ options: {
   twice: { type: 'boolean', default: false }, keep: { type: 'boolean', default: false },
   c: { type: 'boolean', default: false }, 'c-download': { type: 'string' },
   'c-sources': { type: 'string', default: join(here, 'c-tier-sources.json') },
+  // The release that publishes the archives also mirrors their (L)GPL sources
+  // (source-archives.json); the NOTICEs name them under this URL.
+  'sources-base': { type: 'string' },
 } });
 if (options.c && !options['c-download']) throw new Error('--c needs --c-download');
 for (const name of ['platform', 'archive', 'out', 'work']) if (!options[name]) throw new Error(`--${name} is required`);
@@ -140,10 +143,25 @@ if (members.has('lib/libuv.a')) {
 if (!members.has('LICENSE')) throw new Error('Upstream LICENSE is missing');
 
 // 4. Notices. The text depends only on pinned catalog values and the archive.
+const sourceArchives = JSON.parse(await readFile(join(here, 'source-archives.json'), 'utf8'))[options.version] ?? [];
+if (options['sources-base'] && !options['sources-base'].endsWith('/')) throw new Error('--sources-base must end with /');
+const sourcesBase = options['sources-base'] ?? 'https://github.com/Millillion/lasm/releases/download/lean-' + options.version + '-tiers-v2/';
+/** The mirrored source archives of the (L)GPL components in one archive kind. */
+const sourcesSection = piece => {
+  const items = sourceArchives.filter(item => item.archives.includes(piece) && item.platforms.includes(options.platform));
+  if (!items.length) return '';
+  return `Corresponding source, mirrored as assets of the release that publishes this archive
+(${sourcesBase}), each byte-identical to the upstream URL beside it:
+${items.map(item => `  ${sourcesBase}${item.name}
+    from ${item.url}
+    SHA-256 ${item.sha256}, ${item.bytes} bytes${item.about ? '\n    ' + item.about.replace(/(.{1,76})(\s+|$)/g, '$1\n    ').trimEnd() : ''}`).join('\n')}
+`;
+};
 const generated = (path, text) => ({ path, type: 'file', content: Buffer.from(text), size: Buffer.byteLength(text) });
 const upstreamRelease = new URL(upstream.url).hostname === 'github.com' && upstream.url.startsWith('https://github.com/leanprover/lean4/');
 const sourceLine = `Sources: ${release.release ?? 'https://github.com/leanprover/lean4'} (commit ${release.commit}),\nhttps://github.com/leanprover/lean4/tree/${release.commit}`;
 const binName = `lean-${options.version}-${options.platform}-bin`;
+const family0 = platformFamily(options.platform);
 const binNotice = `${binName}
 
 This archive is an unmodified subset of ${upstreamRelease ? 'the upstream Lean' : 'the Lasm-maintained native Lean'} ${options.version}
@@ -162,7 +180,15 @@ MIT license is not included in LICENSES; libuv-LICENSE and libuv-LICENSE-extra
 are verbatim copies of libuv's LICENSE and LICENSE-extra files. It also statically
 links mimalloc (MIT), likewise missing from LICENSES; mimalloc-LICENSE is the
 LICENSE of mimalloc v3.4.5, the version Lean 4.35.0's build fetches.
-Module data and Lean sources are distributed separately in the shared
+${family0 === 'linux' ? `lib/libatomic.so* is GCC's runtime (GPL-3.0-or-later WITH GCC-exception-3.1):
+gcc-COPYING3 and gcc-COPYING.RUNTIME are GCC's licence texts.
+` : family0 === 'win32' ? `The executables and DLLs contain MinGW-w64 runtime startup code, whose notices
+are in mingw-w64-runtime-COPYING.
+` : ''}libleanshared statically links GNU MP 6.3.0 (LGPL-3.0-or-later OR GPL-2.0-or-later;
+its LGPL text is in LICENSES). To relink it with a modified GNU MP, rebuild Lean
+from the mirrored Lean source below (its application code) against that GNU MP.
+
+${sourcesSection('bin')}Module data and Lean sources are distributed separately in the shared
 lean-${options.version}-core-* and lean-${options.version}-ext-* archives.
 `;
 const notices = join(here, 'notices');
@@ -172,7 +198,8 @@ const noticeFiles = async (archive, files) => Promise.all(files.map(async file =
 const binMembers = [...binary.values(), members.get('LICENSE'), ...(members.has('LICENSES') ? [members.get('LICENSES')] : []),
   generated(`lasm-notices/${binName}/NOTICE`, binNotice),
   ...await noticeFiles(binName, ['libuv-LICENSE']),
-  ...await noticeFiles(binName, ['libuv-LICENSE-extra', 'mimalloc-LICENSE'])];
+  ...await noticeFiles(binName, ['libuv-LICENSE-extra', 'mimalloc-LICENSE',
+    ...(family0 === 'linux' ? ['gcc-COPYING3', 'gcc-COPYING.RUNTIME'] : family0 === 'win32' ? ['mingw-w64-runtime-COPYING'] : [])])];
 
 // The Windows upstream LICENSE uses CRLF line endings. Shared data archives
 // carry the LF text published in the Linux and macOS archives.
@@ -275,8 +302,18 @@ and compiler-rt; the GNU C Library; GNU MP in lib/libgmp.a). LICENSES omits thes
 whose licences are beside this NOTICE: libuv (lib/libuv.a; libuv-LICENSE,
 libuv-LICENSE-extra), mimalloc (include/lean/mimalloc.h; mimalloc-LICENSE, v3.4.5)
 and OpenSSL 3 (lib/libssl.a, lib/libcrypto.a; openssl-LICENSE, Apache-2.0, from
-openssl-3.6.0). zlib, where present, is under the zlib licence.
-
+openssl-3.6.0)${family === 'linux' ? `, zlib 1.2.11 (lib/libz.so*; zlib-1.2.11-LICENSE) and GCC's runtime
+(lib/libgcc_s.so*, lib/libatomic.so; GPL-3.0-or-later WITH GCC-exception-3.1;
+gcc-COPYING3, gcc-COPYING.RUNTIME). lib/glibc and the crt objects in lib/ are the
+GNU C Library ${options.platform === 'linux-x64' ? '2.26' : '2.27'} (LGPL-2.1-or-later; its text is in LICENSES)`
+  : family === 'win32' ? `, zlib 1.3.2 (bin/zlib1.dll; zlib-1.3.2-LICENSE) and the MinGW-w64 CRT and
+winpthreads libraries in lib/ (mingw-w64-runtime-COPYING and the package COPYING files)`
+  : ''}.
+${family === 'darwin' ? `lib/libc holds LLVM's libc++.dylib only. Lean's archive also has Apple's
+libSystem.tbd (an Apple SDK file) there; the C tier leaves it out, and Lasm links
+against the libSystem.tbd of the user's own SDK (Xcode Command Line Tools).
+` : ''}
+${sourcesSection('c')}
 Added by Lasm:
 - ${cc.path}: ${family === 'win32' ? 'a byte-identical copy of bin/clang.exe' : 'a symbolic link to clang'}, so that Lake's default C
   compiler is Lean's clang.
@@ -293,7 +330,9 @@ ${staged.provenance.filter(item => item.use === 'C library headers').map(item =>
   // of the link libraries that LICENSES omits.
   for (const [path, member] of [['LICENSE', members.get('LICENSE')], ['LICENSES', members.get('LICENSES')]])
     if (member) selected.set(`lasm-notices/${name}/${path}`, { ...member, path: `lasm-notices/${name}/${path}` });
-  for (const member of await noticeFiles(name, ['libuv-LICENSE', 'libuv-LICENSE-extra', 'mimalloc-LICENSE', 'openssl-LICENSE']))
+  for (const member of await noticeFiles(name, ['libuv-LICENSE', 'libuv-LICENSE-extra', 'mimalloc-LICENSE', 'openssl-LICENSE',
+    ...(family === 'linux' ? ['zlib-1.2.11-LICENSE', 'gcc-COPYING3', 'gcc-COPYING.RUNTIME']
+      : family === 'win32' ? ['zlib-1.3.2-LICENSE', 'mingw-w64-runtime-COPYING'] : [])]))
     selected.set(member.path, member);
   const list = [...selected.values()].map(member => member.type === 'file' && !member.content ? { ...member } : member);
   cTier = { name, piece: 'c', members: list, mode: 'write', multiarch, resourceDirectory, provenance: staged.provenance };

@@ -34,3 +34,28 @@ test('a runtime that still links libgmp.a keeps the GNU MP notice', () => {
   const text = applicationNotices(manifest, '');
   assert.ok(text.includes('=== GNU MP ===')); assert.match(text, /  - GNU MP 6\.3\.0 \(LGPL-3\.0-or-later OR GPL-2\.0-or-later/);
 });
+
+test('licence files of compiled Lake dependencies are collected, the project and toolchain excluded', async () => {
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const { lakeDependencyLicenses, dependencyNotices } = await import('../src/notices.mjs');
+  const root = mkdtempSync(join(tmpdir(), 'lasm-dependency-licenses-'));
+  try {
+    const put = (path, text) => { mkdirSync(join(root, path, '..'), { recursive: true }); writeFileSync(join(root, path), text); };
+    put('app/lakefile.toml', 'name = "app"\n'); put('app/Main.lean', ''); put('app/LICENSE', 'own licence');
+    put('app/.lake/packages/zip/lakefile.lean', 'import Lake\nopen Lake DSL\npackage «lean-zip»\n');
+    put('app/.lake/packages/zip/Zip/Basic.lean', ''); put('app/.lake/packages/zip/c/io_ffi.c', '');
+    put('app/.lake/packages/zip/LICENSE', 'Apache zip'); put('app/.lake/packages/zip/NOTICE.md', 'zip notice');
+    put('app/.lake/packages/bare/lakefile.toml', 'name = "bare"\n'); put('app/.lake/packages/bare/B.lean', '');
+    put('toolchain/src/lean/Init.lean', '');
+    const files = ['app/Main.lean', 'app/.lake/packages/zip/Zip/Basic.lean', 'app/.lake/packages/zip/c/io_ffi.c',
+      'app/.lake/packages/bare/B.lean', 'toolchain/src/lean/Init.lean'].map(path => join(root, path));
+    const packages = lakeDependencyLicenses(join(root, 'app'), files, { exclude: [join(root, 'toolchain')] });
+    assert.deepEqual(packages.map(pkg => [pkg.name, pkg.files.map(file => file.name)]), [['bare', []], ['lean-zip', ['LICENSE', 'NOTICE.md']]]);
+    const text = dependencyNotices(packages);
+    assert.match(text, /- bare: no licence file found/);
+    assert.match(text, /=== Lake dependency lean-zip: LICENSE ===\nApache zip/);
+    assert.equal(dependencyNotices([]), '');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

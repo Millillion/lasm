@@ -123,3 +123,15 @@ test('the runtime manifest and main package pin every tool package exactly', asy
   assert.equal(licensed.license, 'MIT');
   assert.deepEqual(licensed.files, ['bin', 'src', 'LICENSE']);
 });
+
+test('the CLI licence field lists Lasm and every bundled component; unknown notice sections fail', async () => {
+  const { cliLicense, noticeSections, slug } = await import('../scripts/npm-dist/packages.mjs');
+  const text = '=== Lasm ===\nMIT text\n=== Lean ===\nApache\n=== GMP LGPLv3 ===\nLGPL\n=== LLVM libunwind ===\nx\n=== libuv LICENSE-extra ===\ny\n';
+  const sections = noticeSections(text);
+  assert.deepEqual(sections.map(([heading]) => heading), ['Lasm', 'Lean', 'GMP LGPLv3', 'LLVM libunwind', 'libuv LICENSE-extra']);
+  assert.equal(sections[1][1], 'Apache\n');
+  assert.equal(cliLicense('MIT', sections.map(([heading]) => heading), ['BlueOak-1.0.0', 'ISC', 'MIT']),
+    'MIT AND Apache-2.0 AND (LGPL-3.0-or-later OR GPL-2.0-or-later) AND Apache-2.0 WITH LLVM-exception AND ISC AND BSD-2-Clause AND BlueOak-1.0.0');
+  assert.throws(() => cliLicense('MIT', ['Something new']), /Unknown notice section/);
+  assert.equal(slug('LLVM libc++abi'), 'llvm-libcxxabi');
+});

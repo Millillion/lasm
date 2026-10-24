@@ -1,5 +1,6 @@
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { createHash } from 'node:crypto';
 
 export function referenceNotices({ leanSource, zig }) {
   const files = [
@@ -48,7 +49,8 @@ program.wasm statically links the GNU Multiple Precision Arithmetic Library
 (GNU MP) 6.3.0, unmodified, which is free software licensed under the GNU Lesser
 General Public License version 3 or later (or the GNU General Public License
 version 2 or later); both texts follow ("GMP LGPLv3", "GMP GPLv3"). Source:
-https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz (SHA-256
+https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz, mirrored at
+https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/gmp-6.3.0.tar.xz (SHA-256
 a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898), built by
 Lasm's scripts/ci/application-runtime-source.mjs at the runtime's source
 revision (emconfigure --host=none --disable-assembly --disable-shared
@@ -109,4 +111,54 @@ ${noticeText('libuv-LICENSE-extra.txt')}
 === node-addon-api (koffi build dependency) ===
 ${noticeText('node-addon-api-LICENSE.md')}
 ${runtimeNotices}`;
+}
+
+// Lake dependencies whose Lean or C code is compiled into program.wasm: their licence
+// files go into dist/licenses/<package>/ and their texts into THIRD_PARTY_NOTICES.txt.
+const licenseFileName = /^(?:licen[cs]e|copying|copyright|notice|unlicense)(?:[-._][^/]*)?$/i;
+const isFile = path => { try { return statSync(path).isFile(); } catch { return false; } };
+const lakePackageRoot = file => {
+  for (let directory = dirname(resolve(file)); ; directory = dirname(directory)) {
+    if (isFile(join(directory, 'lakefile.toml')) || isFile(join(directory, 'lakefile.lean'))) return directory;
+    if (dirname(directory) === directory) return null;
+  }
+};
+const packageName = directory => {
+  for (const file of ['lakefile.toml', 'lakefile.lean']) {
+    if (!isFile(join(directory, file))) continue;
+    const text = readFileSync(join(directory, file), 'utf8');
+    const name = file.endsWith('.toml') ? /^\s*name\s*=\s*"([^"]+)"/m.exec(text)?.[1]
+      : /^\s*package\s+(?:"([^"]+)"|«([^»]+)»|([\w.'-]+))/m.exec(text)?.slice(1).find(Boolean);
+    if (name) return name;
+  }
+  return basename(directory);
+};
+
+/** [{ name, directory, files: [{ name, path, sha256 }] }] for the Lake packages (other
+ * than `project` itself and anything under `exclude`) that contain any of `files`. */
+export function lakeDependencyLicenses(project, files, { exclude = [] } = {}) {
+  const root = resolve(project), skip = exclude.filter(Boolean).map(path => resolve(path));
+  const inside = (path, directory) => { const r = relative(directory, path); return !r.startsWith('..') && !isAbsolute(r); };
+  const packages = new Map();
+  for (const file of files) {
+    if (skip.some(directory => inside(resolve(file), directory))) continue;
+    const found = lakePackageRoot(file);
+    const directory = found && realpathSync(found);
+    if (!directory || directory === realpathSync(root) || packages.has(directory)) continue;
+    const licenses = readdirSync(directory, { withFileTypes: true })
+      .filter(entry => entry.isFile() && licenseFileName.test(entry.name)).map(entry => entry.name).sort()
+      .map(name => ({ name, path: join(directory, name),
+        sha256: createHash('sha256').update(readFileSync(join(directory, name))).digest('hex') }));
+    packages.set(directory, { name: packageName(directory).replace(/[^A-Za-z0-9._-]/g, '_'), directory, files: licenses });
+  }
+  return [...packages.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Notice sections for lakeDependencyLicenses() results. */
+export function dependencyNotices(packages) {
+  if (!packages.length) return '';
+  return `\n=== Lake dependencies compiled into program.wasm ===
+Their licence files are copied verbatim into licenses/<package>/ and below.
+${packages.map(pkg => `  - ${pkg.name}: ${pkg.files.length ? pkg.files.map(file => file.name).join(', ') : 'no licence file found in the package'}`).join('\n')}
+${packages.flatMap(pkg => pkg.files.map(file => `\n=== Lake dependency ${pkg.name}: ${file.name} ===\n${readFileSync(file.path, 'utf8')}`)).join('')}`;
 }

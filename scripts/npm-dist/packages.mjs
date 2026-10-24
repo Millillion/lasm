@@ -47,23 +47,32 @@ export const cTierComponents = Object.freeze({
     ['libuv (libuv.a); mimalloc (include/lean/mimalloc.h)', 'MIT'],
   ],
   linux: [
-    ['GNU C Library 2.35 headers, crt objects and link stubs (libc6-dev, Ubuntu 22.04)', 'LGPL-2.1-or-later'],
+    ['GNU C Library: 2.35 headers (libc6-dev, Ubuntu 22.04); 2.26 (x64) or 2.27 (arm64) link libraries, ld.so and crt objects from Lean\'s release', 'LGPL-2.1-or-later'],
     ['Linux 5.15 UAPI headers (linux-libc-dev, Ubuntu 22.04)', 'GPL-2.0-only WITH Linux-syscall-note'],
-    ['zlib (libz.so)', 'Zlib'],
-    ['GCC runtime (libatomic.so, libgcc_s.so link)', 'GPL-3.0-or-later WITH GCC-exception-3.1'],
+    ['zlib 1.2.11 (libz.so)', 'Zlib'],
+    ['GCC 7.3.0 (x64) or 7.4.0 (arm64) runtime: libgcc_s.so.1, libatomic.so', 'GPL-3.0-or-later WITH GCC-exception-3.1'],
   ],
-  darwin: [],
+  darwin: [
+    ['LLVM libc++.dylib (lib/libc; Apple\'s libSystem.tbd is not included: Lasm uses the SDK\'s)', 'Apache-2.0 WITH LLVM-exception'],
+  ],
   win32: [
-    ['MinGW-w64 headers and CRT import/runtime libraries', 'ZPL-2.1'],
+    ['MinGW-w64 headers, CRT objects and import libraries (r380.gb83511db8)', 'ZPL-2.1'],
     ['Wine-derived MinGW-w64 headers', 'LGPL-2.1-or-later'],
     ["GCC's stdarg.h in the MinGW-w64 headers", 'GPL-2.0-or-later WITH GCC-exception-2.0'],
+    ['MinGW-w64 runtime parts: getopt (ISC, BSD-2-Clause), gdtoa (dtoa), Sun math (SunPro), musl-derived functions (MIT), Cephes math', 'ISC AND BSD-2-Clause AND dtoa AND SunPro AND MIT AND LicenseRef-Cephes'],
     ['MinGW-w64 winpthreads', 'MIT AND BSD-3-Clause'],
-    ['zlib (zlib1.dll)', 'Zlib'],
+    ['zlib 1.3.2 (zlib1.dll)', 'Zlib'],
   ],
 });
 /** Verbatim texts from scripts/lean-dist/notices/ for components whose licence the
  * c-v1 archives and Lean's LICENSES omit (later C tier releases carry them inside). */
 export const cTierExtraNotices = Object.freeze([['openssl-LICENSE.txt', 'openssl/LICENSE'], ['mimalloc-LICENSE.txt', 'mimalloc/LICENSE']]);
+/** Per family, the further texts (same directory) the C tier archives carry since tiers-v2. */
+export const cTierFamilyNotices = Object.freeze({
+  linux: [['gcc-COPYING3.txt', 'gcc/COPYING3'], ['gcc-COPYING.RUNTIME.txt', 'gcc/COPYING.RUNTIME'], ['zlib-1.2.11-LICENSE.txt', 'zlib/LICENSE']],
+  darwin: [],
+  win32: [['zlib-1.3.2-LICENSE.txt', 'zlib/LICENSE'], ['mingw-w64-runtime-COPYING.txt', 'mingw-w64/COPYING.MinGW-w64-runtime.txt']],
+});
 
 export function cTierLicense(platform) {
   const family = platform.split('-')[0];
@@ -87,15 +96,15 @@ export const toolComponents = Object.freeze({
       ['GCC libatomic', 'GPL-3.0-or-later WITH GCC-exception-3.1']],
     darwin: [],
     win32: [['LLVM libc++ (libc++.dll)', 'Apache-2.0 WITH LLVM-exception'],
-      ['MinGW-w64 runtime startup code linked into the executables', 'ZPL-2.1']],
+      ['MinGW-w64 runtime startup code linked into the executables (lasm-notices: mingw-w64-runtime-COPYING)', 'ZPL-2.1 AND ISC AND BSD-2-Clause AND dtoa AND SunPro AND MIT AND LicenseRef-Cephes']],
   },
   'lean-data': { common: [['Lean module data (.olean, .ir) and Lean sources', 'Apache-2.0']] },
   'emscripten-native': {
     common: [['LLVM: clang, lld/wasm-ld, llvm-nm, llvm-objcopy, clang resource headers', 'Apache-2.0 WITH LLVM-exception'],
       ['Binaryen: wasm-opt, wasm-emscripten-finalize, wasm-metadce', 'Apache-2.0']],
-    linux: [['GNU libstdc++/libgcc, statically linked by the upstream build', 'GPL-3.0-or-later WITH GCC-exception-3.1']],
+    linux: [['GNU libstdc++/libgcc, statically linked by the upstream build (Debian gcc-6 6.3.0-18+deb9u1 on x64, gcc-10 10.2.1-6 on arm64; sources mirrored on the emscripten-6.0.9-lasm-toolchain-v1 release)', 'GPL-3.0-or-later WITH GCC-exception-3.1']],
     darwin: [],
-    win32: [['Microsoft C/C++ runtime, statically linked by the upstream build (Visual Studio redistribution terms)', null]],
+    win32: [['Microsoft C/C++ runtime, statically linked by the upstream build (Visual Studio licence: static linking of the runtime libraries is permitted for distribution; docs/LICENSE_AUDIT.md)', null]],
   },
   'emscripten-shared': {
     common: [['Emscripten JavaScript compiler and system library sources', '(MIT OR NCSA)'],
@@ -156,7 +165,7 @@ export function toolPackageJson(pkg) {
     name: pkg.name, version: pkg.version, description: pkg.description,
     license: pkg.license ?? 'SEE LICENSE IN README.md',
     ...(pkg.os ? { os: pkg.os, cpu: pkg.cpu } : {}), ...(pkg.libc ? { libc: pkg.libc } : {}),
-    files: [archiveFileName(pkg.artifact), 'README.md', ...(pkg.notices ? [noticeDirectory] : [])],
+    files: [archiveFileName(pkg.artifact), 'README.md', noticeDirectory],
     // Data only: no entry point, no scripts. Lasm verifies the archive's SHA-256.
     lasm: { schema: 1, artifact: { name: pkg.artifact.name, sha256: pkg.artifact.sha256, bytes: pkg.artifact.bytes, url: pkg.artifact.url } },
   };
@@ -180,8 +189,9 @@ release asset
     SHA-256 ${pkg.artifact.sha256}, ${pkg.artifact.bytes} bytes
 
 Lasm checks that digest and size before extracting it. The licence texts and
-notices of the contained software (LICENSE, LICENSES, NOTICE) are inside the
-archive, with the upstream sources it was repackaged from.
+notices of the contained software (LICENSE, LICENSES, COPYING, NOTICE and
+lasm-notices/, with the upstream sources it was repackaged from) are inside the
+archive and, copied verbatim with the same paths, in \`${noticeDirectory}/\`.
 ${pkg.components ? `
 ## Licences
 
@@ -249,13 +259,14 @@ export function npmToolManifest(packages, packed) {
 }
 
 /** Main package metadata: every tool package pinned to an exact version. */
-export function mainPackageJson(base, packages, { name, version, license }) {
+export function mainPackageJson(base, packages, { name, version, license, licenseFiles }) {
   const pins = install => Object.fromEntries(packages.filter(p => p.install === install).map(p => [p.name, p.version]).sort());
   const result = { ...base, name, version };
   delete result.private;
   if (license) {
     result.license = license;
-    if (Array.isArray(result.files) && !result.files.includes('LICENSE')) result.files = [...result.files, 'LICENSE'];
+    for (const file of ['LICENSE', ...(licenseFiles ? ['licenses'] : [])])
+      if (Array.isArray(result.files) && !result.files.includes(file)) result.files = [...result.files, file];
   }
   result.dependencies = Object.fromEntries(Object.entries({ ...base.dependencies, ...pins('required') }).sort());
   result.optionalDependencies = pins('optional');
@@ -300,3 +311,55 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 `;
+
+/** The CLI package's bundled components, by the section headings of its
+ * THIRD_PARTY_NOTICES.txt (src/notices.mjs, the runtime bundle's notices, the
+ * Koffi adapter) and of the native helpers' notices: SPDX, or null for a section
+ * that is a notice rather than a component. An unknown heading fails packaging. */
+export const cliNoticeSections = Object.freeze({
+  'Lasm': 'MIT',
+  'Changes to Lean (Apache-2.0 section 4(b))': null,
+  'GNU MP': null,
+  'Lean': 'Apache-2.0',
+  'Lean bundled dependencies': null,
+  'Emscripten': '(MIT OR NCSA)',
+  'LLVM libc++': 'Apache-2.0 WITH LLVM-exception',
+  'LLVM libc++abi': 'Apache-2.0 WITH LLVM-exception',
+  'LLVM compiler-rt': 'Apache-2.0 WITH LLVM-exception',
+  'LLVM libunwind': 'Apache-2.0 WITH LLVM-exception',
+  'musl': 'MIT',
+  'mimalloc': 'MIT',
+  'libuv': 'MIT',
+  'libuv LICENSE-extra': 'ISC AND BSD-2-Clause',
+  'GMP LGPLv3': '(LGPL-3.0-or-later OR GPL-2.0-or-later)',
+  'GMP GPLv3': '(LGPL-3.0-or-later OR GPL-2.0-or-later)',
+  'node-addon-api (koffi build dependency)': 'MIT',
+  'Koffi runtime adapter': 'MIT',
+  'Zig compiler runtime': 'MIT',
+});
+
+/** Split a notices file into [heading, text] sections (`=== heading ===` lines). */
+export function noticeSections(text) {
+  const sections = [];
+  const pattern = /^=== (.+) ===$/gm;
+  const marks = [...text.matchAll(pattern)];
+  marks.forEach((match, index) => sections.push([match[1], text.slice(match.index + match[0].length + 1, marks[index + 1]?.index ?? text.length)]));
+  return sections;
+}
+
+/** The CLI's SPDX expression: Lasm's own licence first, then every bundled component. */
+export function cliLicense(ownLicense, headings, bundledLicenses = []) {
+  const terms = [ownLicense];
+  for (const heading of headings) {
+    assert.ok(Object.hasOwn(cliNoticeSections, heading), `Unknown notice section in the CLI package: ${heading}`);
+    if (cliNoticeSections[heading]) terms.push(cliNoticeSections[heading]);
+  }
+  for (const license of bundledLicenses) {
+    assert.match(license, /^[A-Za-z0-9.+-]+$/, `Bundled npm package licence must be one SPDX identifier: ${license}`);
+    terms.push(license);
+  }
+  const split = [...new Set(terms.flatMap(term => /^\(.*\)$/.test(term) || / WITH /.test(term) && !/ AND /.test(term) ? [term] : term.split(' AND ')))];
+  return split.map(term => / OR /.test(term) && !/^\(/.test(term) ? `(${term})` : term).join(' AND ');
+}
+
+export const slug = text => text.toLowerCase().replaceAll('++', 'xx').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

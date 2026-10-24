@@ -1,0 +1,345 @@
+{
+  "schema": 1,
+  "about": "Exact source archives of every (L)GPL component, and of GNU MP's combined works, that Lasm's release archives contain in binary or header form, mirrored as assets of the release that publishes those archives (docs/LICENSE_AUDIT.md). Each is verified by SHA-256 before upload; the Debian/Ubuntu ones also match their signed .dsc.",
+  "4.35.0": [
+    {
+      "name": "gmp-6.3.0.tar.xz",
+      "url": "https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz",
+      "sha256": "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898",
+      "bytes": 2094196,
+      "platforms": [
+        "linux-x64",
+        "linux-arm64",
+        "darwin-x64",
+        "darwin-arm64",
+        "win32-x64"
+      ],
+      "archives": [
+        "bin",
+        "c"
+      ],
+      "about": "GNU MP 6.3.0, unmodified upstream source: statically linked into libleanshared (binaries) and lib/libgmp.a (C tier) on every platform; the Linux builds also apply the recipes in the nixexprs archives, the Windows build the MSYS2 package below, the macOS builds Homebrew's gmp 6.3.0 formula (no patches)."
+    },
+    {
+      "name": "lean4-eb6cafb7290e8bd5f2937522d8d804f58f02bafc.tar.gz",
+      "url": "https://codeload.github.com/leanprover/lean4/tar.gz/eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
+      "sha256": "a947ac7d535edf26ca5a2542615f8ba4b50756e099cd6c8913f789de96b6b92c",
+      "bytes": 90285029,
+      "platforms": [
+        "linux-x64",
+        "linux-arm64",
+        "darwin-x64",
+        "darwin-arm64",
+        "win32-x64"
+      ],
+      "archives": [
+        "bin",
+        "c"
+      ],
+      "about": "Lean 4.35.0 source (Apache-2.0): the application code linked with GNU MP in libleanshared (LGPL-3.0 4(d)(0) Corresponding Application Code) and the build scripts (flake.nix, script/prepare-llvm-*.sh) of the bundled GNU MP, glibc and GCC runtime pieces."
+    },
+    {
+      "name": "gcc-7.3.0.tar.xz",
+      "url": "https://ftp.gnu.org/gnu/gcc/gcc-7.3.0/gcc-7.3.0.tar.xz",
+      "sha256": "832ca6ae04636adbb430e865a1451adf6979ab44ca1c8374f61fba65645ce15c",
+      "bytes": 62462388,
+      "platforms": [
+        "linux-x64"
+      ],
+      "archives": [
+        "bin",
+        "c"
+      ],
+      "about": "GCC 7.3.0 source: libgcc_s.so.1 and libatomic.so (GPL-3.0-or-later WITH GCC-exception-3.1), built by nixpkgs 18.03."
+    },
+    {
+      "name": "gcc-7.4.0.tar.xz",
+      "url": "https://ftp.gnu.org/gnu/gcc/gcc-7.4.0/gcc-7.4.0.tar.xz",
+      "sha256": "eddde28d04f334aec1604456e536416549e9b1aa137fc69204e65eb0c009fe51",
+      "bytes": 62601888,
+      "platforms": [
+        "linux-arm64"
+      ],
+      "archives": [
+        "bin",
+        "c"
+      ],
+      "about": "GCC 7.4.0 source: libgcc_s.so.1 and libatomic.so (GPL-3.0-or-later WITH GCC-exception-3.1), built by nixpkgs 19.03."
+    },
+    {
+      "name": "glibc-2.26.tar.xz",
+      "url": "https://ftp.gnu.org/gnu/glibc/glibc-2.26.tar.xz",
+      "sha256": "e54e0a934cd2bc94429be79da5e9385898d2306b9eaf3c92d5a77af96190f6bd",
+      "bytes": 14682748,
+      "platforms": [
+        "linux-x64"
+      ],
+      "archives": [
+        "c"
+      ],
+      "about": "GNU C Library 2.26 source: lib/glibc/* (libc, libm, libdl, libpthread, librt, libutil, ld.so, the *_nonshared.a archives) and the crt objects in lib/ (LGPL-2.1-or-later), built by nixpkgs 18.03."
+    },
+    {
+      "name": "glibc-2.27.tar.xz",
+      "url": "https://ftp.gnu.org/gnu/glibc/glibc-2.27.tar.xz",
+      "sha256": "5172de54318ec0b7f2735e5a91d908afe1c9ca291fec16b5374d9faadfc1fc72",
+      "bytes": 15395316,
+      "platforms": [
+        "linux-arm64"
+      ],
+      "archives": [
+        "c"
+      ],
+      "about": "GNU C Library 2.27 source: lib/glibc/* and the crt objects in lib/ (LGPL-2.1-or-later), built by nixpkgs 19.03."
+    },
+    {
+      "name": "nixexprs-nixos-18.03.133402.cb0e20d6db9.tar.xz",
+      "url": "https://releases.nixos.org/nixos/18.03/nixos-18.03.133402.cb0e20d6db9/nixexprs.tar.xz",
+      "sha256": "0019e0d73dc0b9fe1b86b0c241d3d4e7ba08c4d648cb47d2d0eed16079f3d278",
+      "bytes": 10906152,
+      "platforms": [
+        "linux-x64"
+      ],
+      "archives": [
+        "bin",
+        "c"
+      ],
+      "about": "nixpkgs 18.03 (the nixpkgs-older input of Lean's flake.lock): the patches and build recipes of glibc 2.26, GCC 7.3.0, zlib and GNU MP as Lean's linux-x64 release built them."
+    },
+    {
+      "name": "nixexprs-nixos-19.03.173691.34c7eb7545d.tar.xz",
+      "url": "https://releases.nixos.org/nixos/19.03/nixos-19.03.173691.34c7eb7545d/nixexprs.tar.xz",
+      "sha256": "cf5c0edf7af79c44d37b7671ccba5a265294d8a8dec4f139e4c28c95fe7bebdd",
+      "bytes": 12890248,
+      "platforms": [
+        "linux-arm64"
+      ],
+      "archives": [
+        "bin",
+        "c"
+      ],
+      "about": "nixpkgs 19.03 (the nixpkgs-old input of Lean's flake.lock): the patches and build recipes of glibc 2.27, GCC 7.4.0, zlib and GNU MP as Lean's linux-arm64 release built them."
+    },
+    {
+      "name": "glibc_2.35.orig.tar.xz",
+      "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/glibc_2.35.orig.tar.xz",
+      "sha256": "5123732f6b67ccd319305efd399971d58592122bcc2a6518a1bd2510dd0cf52e",
+      "bytes": 18165952,
+      "platforms": [
+        "linux-x64",
+        "linux-arm64"
+      ],
+      "archives": [
+        "c"
+      ],
+      "about": "Ubuntu 22.04 glibc 2.35-0ubuntu3 source package (with the .debian.tar.xz, .dsc and .asc): lib/lasm-libc/include from libc6-dev 2.35-0ubuntu3 (LGPL-2.1-or-later)."
+    },
+    {
+      "name": "glibc_2.35-0ubuntu3.debian.tar.xz",
+      "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/glibc_2.35-0ubuntu3.debian.tar.xz",
+      "sha256": "aeb4a77f716630f7125260e31284a87326da2e46d2393b3c82f80c6d7814e423",
+      "bytes": 885776,
+      "platforms": [
+        "linux-x64",
+        "linux-arm64"
+      ],
+      "archives": [
+        "c"
+      ]
+    },
+    {
+      "name": "glibc_2.35-0ubuntu3.dsc",
+      "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/glibc_2.35-0ubuntu3.dsc",
+      "sha256": "c0b20b06aa0fe95819a28f577bb43113ec9aec5ffc3bd21ae6e461044b702876",
+      "bytes": 8876,
+      "platforms": [
+        "linux-x64",
+        "linux-arm64"
+      ],
+      "archives": [
+        "c"
+      ]
+    },
+    {
+      "name": "glibc_2.35.orig.tar.xz.asc",
+      "url": "http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/glibc_2.35.orig.tar.xz.asc",
+      "sha256": "853aaaf17d7366817e814057a467625ee7c0b26240e8b878db0f33c389c7bcb6",
+      "bytes": 833,
+      "platforms": [
+        "linux-x64",
+        "linux-arm64"
+      ],
+      "archives": [
+        "c"
+      ]
+    },
+    {
+      "name": "linux_5.15.0.orig.tar.gz",
+      "url": "http://archive.ubuntu.com/ubuntu/pool/main/l/linux/linux_5.15.0.orig.tar.gz",
+      "sha256": "4d7908da75ad50a70a0141721e259c2589b7bdcc317f7bd885b80c2ffa689211",
+      "bytes": 194969557,
+      "platforms": [
+        "linux-x64",
+        "linux-arm64"
+      ],
+      "archives": [
+        "c"
+      ],
+      "about": "Ubuntu 22.04 linux 5.15.0-25.25 source package (with the .diff.gz and .dsc): the Linux UAPI headers in lib/lasm-libc/include from linux-libc-dev 5.15.0-25.25 (GPL-2.0-only WITH Linux-syscall-note)."
+    },
+    {
+      "name": "linux_5.15.0-25.25.diff.gz",
+      "url": "http://archive.ubuntu.com/ubuntu/pool/main/l/linux/linux_5.15.0-25.25.diff.gz",
+      "sha256": "5bc06410bb6a8bc7f118cb2c4b173f4daa9aa4ff0e08186859e74b4255e3ddd4",
+      "bytes": 5785458,
+      "platforms": [
+        "linux-x64",
+        "linux-arm64"
+      ],
+      "archives": [
+        "c"
+      ]
+    },
+    {
+      "name": "linux_5.15.0-25.25.dsc",
+      "url": "http://archive.ubuntu.com/ubuntu/pool/main/l/linux/linux_5.15.0-25.25.dsc",
+      "sha256": "b999eabb29551d34bf55202e3016fb87724701326062781350f4362b9250e924",
+      "bytes": 7228,
+      "platforms": [
+        "linux-x64",
+        "linux-arm64"
+      ],
+      "archives": [
+        "c"
+      ]
+    },
+    {
+      "name": "mingw-w64-headers-git-13.0.0.r380.gb83511db8-1.src.tar.zst",
+      "url": "https://repo.msys2.org/mingw/sources/mingw-w64-headers-git-13.0.0.r380.gb83511db8-1.src.tar.zst",
+      "sha256": "6ccb2d5a1b5c1f43861d265ee302cc09d5639752558deb75e6872f771c93d2f6",
+      "bytes": 52147258,
+      "platforms": [
+        "win32-x64"
+      ],
+      "archives": [
+        "c"
+      ],
+      "about": "MSYS2 source package of mingw-w64 13.0.0.r380.gb83511db8 headers (the headers in the C tier; ZPL-2.1, partly LGPL-2.1-or-later, GPL-2.0-or-later WITH GCC-exception-2.0, public domain)."
+    },
+    {
+      "name": "mingw-w64-crt-git-13.0.0.r380.gb83511db8-1.src.tar.zst",
+      "url": "https://repo.msys2.org/mingw/sources/mingw-w64-crt-git-13.0.0.r380.gb83511db8-1.src.tar.zst",
+      "sha256": "67282e1aee0e14ff99a9ab82c73d4c9ce4224312d7bd998fb55af8a8e44e496c",
+      "bytes": 52636732,
+      "platforms": [
+        "win32-x64"
+      ],
+      "archives": [
+        "bin",
+        "c"
+      ],
+      "about": "MSYS2 source package of the mingw-w64 CRT at the same revision: the CRT objects and import libraries in the C tier and the startup code in Lean's Windows executables (ZPL-2.1, public domain, BSD/ISC parts). Lean's release used MSYS2's CRT build of its time; this is the pinned revision of the headers Lasm adds."
+    },
+    {
+      "name": "mingw-w64-winpthreads-13.0.0.r380.gb83511db8-1.src.tar.zst",
+      "url": "https://repo.msys2.org/mingw/sources/mingw-w64-winpthreads-13.0.0.r380.gb83511db8-1.src.tar.zst",
+      "sha256": "146f2ceeea6ffbee60dd5da08b7cfdf5d0d1bad8801d4c60a35349e0b13cd0dc",
+      "bytes": 52746946,
+      "platforms": [
+        "win32-x64"
+      ],
+      "archives": [
+        "c"
+      ],
+      "about": "MSYS2 source package of winpthreads at the same revision (libpthread.a; MIT AND BSD-3-Clause)."
+    },
+    {
+      "name": "mingw-w64-gmp-6.3.0-2.src.tar.zst",
+      "url": "https://repo.msys2.org/mingw/sources/mingw-w64-gmp-6.3.0-2.src.tar.zst",
+      "sha256": "f288f944fd9609db220bcf6a8dd0703a5674eeb906ef35eb8485bb8192135994",
+      "bytes": 2097066,
+      "platforms": [
+        "win32-x64"
+      ],
+      "archives": [
+        "bin",
+        "c"
+      ],
+      "about": "MSYS2's mingw-w64-gmp 6.3.0-2 source package: the build recipe of the Windows GNU MP (lib/libgmp.a, and libleanshared.dll)."
+    },
+    {
+      "name": "gcc-6_6.3.0.orig.tar.gz",
+      "url": "https://archive.debian.org/debian/pool/main/g/gcc-6/gcc-6_6.3.0.orig.tar.gz",
+      "sha256": "04552f04baf6974fb7521191859fb54717385ad659afd822b2995b66ee4e4151",
+      "bytes": 81587460,
+      "platforms": [
+        "emscripten-linux-x64"
+      ],
+      "archives": [
+        "emscripten"
+      ],
+      "about": "Debian 9 gcc-6 6.3.0-18+deb9u1 source package (with the .diff.gz and .dsc): the libstdc++/libgcc that emsdk's linux-x64 LLVM and Binaryen tools link statically (GPL-3.0-or-later WITH GCC-exception-3.1)."
+    },
+    {
+      "name": "gcc-6_6.3.0-18+deb9u1.diff.gz",
+      "url": "https://archive.debian.org/debian/pool/main/g/gcc-6/gcc-6_6.3.0-18+deb9u1.diff.gz",
+      "sha256": "8c705553bf211e064f3270e51e81a6b2a0bf122f39f7c98ce7f2fbdfd9fa9564",
+      "bytes": 2075943,
+      "platforms": [
+        "emscripten-linux-x64"
+      ],
+      "archives": [
+        "emscripten"
+      ]
+    },
+    {
+      "name": "gcc-6_6.3.0-18+deb9u1.dsc",
+      "url": "https://archive.debian.org/debian/pool/main/g/gcc-6/gcc-6_6.3.0-18+deb9u1.dsc",
+      "sha256": "8145f139255d35dac4c922321cb98ba11a73296a886a76563a5eef309e1d5bec",
+      "bytes": 27148,
+      "platforms": [
+        "emscripten-linux-x64"
+      ],
+      "archives": [
+        "emscripten"
+      ]
+    },
+    {
+      "name": "gcc-10_10.2.1.orig.tar.xz",
+      "url": "https://deb.debian.org/debian/pool/main/g/gcc-10/gcc-10_10.2.1.orig.tar.xz",
+      "sha256": "ea3c05faa381486e6b859c047dc14977418bf1ccda4567064e016493fd6fffec",
+      "bytes": 84547844,
+      "platforms": [
+        "emscripten-linux-arm64"
+      ],
+      "archives": [
+        "emscripten"
+      ],
+      "about": "Debian 11 gcc-10 10.2.1-6 source package (with the .debian.tar.xz and .dsc): the libstdc++/libgcc that emsdk's linux-arm64 tools link statically (GPL-3.0-or-later WITH GCC-exception-3.1)."
+    },
+    {
+      "name": "gcc-10_10.2.1-6.debian.tar.xz",
+      "url": "https://deb.debian.org/debian/pool/main/g/gcc-10/gcc-10_10.2.1-6.debian.tar.xz",
+      "sha256": "a95d6b9da2be83f9751850b002021281411ff1003d9feb77298b131da47820b3",
+      "bytes": 2366560,
+      "platforms": [
+        "emscripten-linux-arm64"
+      ],
+      "archives": [
+        "emscripten"
+      ]
+    },
+    {
+      "name": "gcc-10_10.2.1-6.dsc",
+      "url": "https://deb.debian.org/debian/pool/main/g/gcc-10/gcc-10_10.2.1-6.dsc",
+      "sha256": "24024c1e225ca968f37ce39047ff5f1058219976db9e88a807173c2f07fa6029",
+      "bytes": 27632,
+      "platforms": [
+        "emscripten-linux-arm64"
+      ],
+      "archives": [
+        "emscripten"
+      ]
+    }
+  ]
+}

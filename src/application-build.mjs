@@ -22,7 +22,7 @@ import { withApplicationLock } from './application-lock.mjs';
 import { applicationPolicy } from './application-policy.mjs';
 import { insideDirectory } from './platform.mjs';
 import { requireApplicationSupport } from './application-support.mjs';
-import { applicationNotices } from './notices.mjs';
+import { applicationNotices, lakeDependencyLicenses, dependencyNotices } from './notices.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const helpers = ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs',
@@ -85,6 +85,10 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const { compilations: nativeCompilations, unavailable: nativeUnavailable } = generated.nativeLink
     ? planNativeInputs(generated.nativeLink, { leanPrefix: [lean.prefix, lean.executionPrefix], runtimeInclude: join(runtime.directory, 'include') })
     : { compilations: [], unavailable: [] };
+  // Licence files of the Lake dependencies whose code is compiled in (dist/licenses/).
+  const dependencyLicenses = project ? lakeDependencyLicenses(project,
+    [...generated.inputs.map(input => input.source), ...nativeCompilations.map(item => item.source)],
+    { exclude: [lean.prefix, lean.executionPrefix] }) : [];
   // Programs that import Lasm.JS link its generated C and C glue.
   const usesJs = importsLibrary(generated.sources);
   if (usesJs) {
@@ -119,6 +123,8 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     applicationPolicy,
     target: 'node', host: `${process.platform}-${process.arch}`, nativeTargets: applicationNativeTargets(),
     minimumNode: minimumApplicationNode, minimumGlibc: minimumApplicationGlibc, memoryMode, modules,
+    ...(dependencyLicenses.length ? { dependencyLicenses: dependencyLicenses.map(({ name, files }) =>
+      ({ name, files: files.map(({ name, sha256 }) => ({ name, sha256 })) })) } : {}),
     ...(nativeCompilations.length ? { nativeObjects: nativeCompilations.map(item => ({ object: item.object, identity: item.identity,
       sourceSha256: createHash('sha256').update(readFileSync(item.source)).digest('hex'), args: item.extraArgs })) } : {}),
     ...(nativeUnavailable.length ? { nativeUnavailable } : {}),
@@ -154,7 +160,12 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   progress?.({ stage: 'Packaging the application and runtime support' });
   copyApplicationHost(dist); writeApplicationEntrypoint(dist);
   await writeFile(join(dist, 'THIRD_PARTY_NOTICES.txt'),
-    applicationNotices(runtime.manifest, await readFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8')));
+    applicationNotices(runtime.manifest, await readFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8'))
+    + dependencyNotices(dependencyLicenses));
+  for (const pkg of dependencyLicenses) for (const file of pkg.files) {
+    await mkdir(join(dist, 'licenses', pkg.name), { recursive: true });
+    await writeFile(join(dist, 'licenses', pkg.name, file.name), await readFile(file.path));
+  }
   if (nodeModules) {
     progress?.({ stage: `Copying ${nodeModules.packages.length} npm packages` });
     copyNodeModules(nodeModules, dist);

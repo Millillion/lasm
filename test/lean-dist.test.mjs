@@ -163,8 +163,9 @@ test('C tier selection: tools, headers and link libraries, but not Lean\'s stati
   assert.deepEqual(cToolRoots('darwin-arm64'), ['bin/clang', 'bin/ld64.lld', 'bin/llvm-ar']);
   assert.deepEqual(cToolRoots('win32-x64'), ['bin/clang.exe', 'bin/ld.lld.exe', 'bin/lld.exe', 'bin/llvm-ar.exe']);
   for (const path of ['include/lean/lean.h', 'include/clang/stddef.h', 'lib/clang/23/lib/linux/libclang_rt.builtins.a', 'lib/glibc/libc.so',
-    'lib/libc/libSystem.tbd', 'lib/crt1.o', 'lib/libgmp.a', 'lib/libLLVM.so.23.1']) assert.ok(cDataMember(path), path);
-  for (const path of ['lib/lean/libLean.a', 'lib/lean/Init.olean', 'src/lean/Init.lean', 'share/lean/lean.mk', 'bin/clang', 'LICENSE'])
+    'lib/libc/libc++.dylib', 'lib/crt1.o', 'lib/libgmp.a', 'lib/libLLVM.so.23.1']) assert.ok(cDataMember(path), path);
+  // Apple's SDK stub is not redistributed; the prefix takes the user's SDK copy.
+  for (const path of ['lib/libc/libSystem.tbd', 'lib/lean/libLean.a', 'lib/lean/Init.olean', 'src/lean/Init.lean', 'share/lean/lean.mk', 'bin/clang', 'LICENSE'])
     assert.ok(!cDataMember(path), path);
   assert.ok(cCandidate('bin/clang', 'linux-x64') && cCandidate('lib/glibc/libc.so', 'linux-x64') && !cCandidate('lib/lean/libInit.a', 'linux-x64'));
   assert.equal(cMultiarch('linux-arm64'), 'aarch64-linux-gnu');

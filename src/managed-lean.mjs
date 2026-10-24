@@ -1,12 +1,13 @@
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, stat, copyFile, mkdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { join, dirname, resolve, toNamespacedPath } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { provisionArtifact, deriveArtifact, validateArtifact, managedCacheDirectory, linkArtifactTree } from './managed-artifacts.mjs';
+import { provisionArtifact, deriveArtifact, validateArtifact, managedCacheDirectory, linkArtifactTree, hashFile } from './managed-artifacts.mjs';
 import { assertSupportedHost, executableName } from './platform.mjs';
 import { compileLibrary, libraryIdentity, libraryLeanVersions } from './lasm-library.mjs';
 import { verifyNativeProgram } from './native-program.mjs';
 import { windowsToolPrefix } from './windows-tool-paths.mjs';
-import { findApplicationProject, standaloneImportsModules } from './application-sources.mjs';
+import { findApplicationProject, standaloneImportsModules, macosSdk, macosSdkMissing } from './application-sources.mjs';
 
 export const toolchainCatalog = JSON.parse(await readFile(new URL('./toolchains.json', import.meta.url), 'utf8'));
 
@@ -61,6 +62,15 @@ export async function assembleLeanPrefix(version, release, components, options =
     components: components.map(({ artifact }) => validateArtifact(artifact)),
     // Lasm's own library (Lasm.JS), compiled into prefixes with Lean's elaborator.
     lasmLibrary: libraryIdentity() };
+  // macOS C tier: Lean's archive links against Apple's lib/libc/libSystem.tbd, an SDK
+  // file Lasm does not redistribute. The prefix takes the user's own SDK copy instead.
+  let libSystem;
+  if ((options.platform ?? process.platform) === 'darwin' && components.some(({ artifact }) => /-c\.tar\.zst$/.test(artifact.name))) {
+    const sdk = macosSdk();
+    if (!sdk) throw new Error(macosSdkMissing);
+    libSystem = join(sdk, 'usr', 'lib', 'libSystem.tbd');
+    provenance.macosSdkLibSystemSha256 = await hashFile(libSystem);
+  }
   options.progress?.({ stage: `Checking Lean ${version} installation` });
   return deriveArtifact(provenance, async tree => {
     const owners = new Map();
@@ -68,6 +78,11 @@ export async function assembleLeanPrefix(version, release, components, options =
       const installed = await provisionArtifact(artifact, { ...options, cache, label });
       options.progress?.({ stage: `Assembling Lean ${version}` });
       await linkArtifactTree(installed.directory, installed.receipt, tree, owners, artifact.name, 'Lean archive');
+    }
+    // A C tier that still carries the file (lean-4.35.0-c-v1) keeps its own copy.
+    if (libSystem && !existsSync(join(tree, 'lib', 'libc', 'libSystem.tbd'))) {
+      await mkdir(join(tree, 'lib', 'libc'), { recursive: true });
+      await copyFile(libSystem, join(tree, 'lib', 'libc', 'libSystem.tbd'));
     }
     if (libraryLeanVersions.includes(version)) options.progress?.({ stage: `Compiling Lasm's Lean library for Lean ${version}` });
     compileLibrary(tree, version, { platform: options.platform });

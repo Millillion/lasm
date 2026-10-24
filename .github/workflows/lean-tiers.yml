@@ -50,6 +50,7 @@ jobs:
       VERSION: ${{ inputs.version }}
       CATALOG: ${{ inputs.catalog }}
       SCOPE: ${{ inputs.scope }}
+      TAG: ${{ inputs.tag }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -82,7 +83,8 @@ jobs:
           [ "$SCOPE" = c ] && data=none
           node scripts/full-lean/run-bounded.mjs --memory-mib 8192 --report .work/lean-tiers-$PLATFORM-resources.json -- \
             node scripts/lean-dist/build-tiers.mjs --catalog "$CATALOG" --version "$VERSION" --platform "$PLATFORM" --archive .work/lean-tiers/dl/upstream \
-              --out .work/lean-tiers/out --work .work/lean-tiers/work --data $data --twice --c --c-download .work/lean-tiers/c-dl
+              --out .work/lean-tiers/out --work .work/lean-tiers/work --data $data --twice --c --c-download .work/lean-tiers/c-dl \
+              --sources-base "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/"
           rm -rf .work/lean-tiers/dl/upstream .work/lean-tiers/c-dl
           if [ "$SCOPE" = c ]; then
             # The C tier excludes the published binaries archive's files; it must be that archive.
@@ -219,6 +221,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
+          VERSION: ${{ inputs.version }}
         run: |
           cd .work/lean-tiers/all
           if [ "${{ inputs.scope }}" = c ]; then
@@ -227,13 +230,25 @@ jobs:
           else
             node ../../../scripts/lean-dist/catalog.mjs "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/" report-*.json > tiers.json
           fi
-          sha256sum *.tar.zst > SHA256SUMS
+          # The exact (L)GPL sources of what the archives contain in binary or header
+          # form (scripts/lean-dist/source-archives.json), mirrored beside them.
+          node -e '
+            const items = require("../../../scripts/lean-dist/source-archives.json")[process.env.VERSION];
+            for (const item of items.filter(i => i.archives.some(a => a === "bin" || a === "c"))) console.log(item.url + " " + item.name + " " + item.sha256);' > sources.txt
+          mkdir sources
+          while read -r url name sha; do
+            curl --fail --location --retry 5 --retry-all-errors --output "sources/$name" "$url"
+            echo "$sha  sources/$name" | sha256sum -c -
+          done < sources.txt
+          sources=$(cut -d' ' -f2 sources.txt | sed 's|^|sources/|' | tr '\n' ' ')
+          { sha256sum *.tar.zst; (cd sources && sha256sum *); } > SHA256SUMS
           cat > notes.md <<EOF
           Tiered Lean ${{ inputs.version }} archives for Lasm, produced by run ${GITHUB_RUN_ID} from ${GITHUB_SHA}.
           Each binaries and module-data archive is an unmodified subset of the pinned upstream Lean release. Each C tier archive (*-c.tar.zst) holds an unmodified subset (Lean's clang, linker, headers and link libraries) plus `cc` and pinned, unmodified third-party headers (clang resource headers; glibc/Linux or MinGW-w64 headers). See the NOTICE inside each archive.
           The per-platform report-*.json files record the upstream archive digests, archive digests and determinism checks.
+          The remaining assets are the exact corresponding sources of the (L)GPL components (GNU MP, the GNU C Library, GCC's runtime, the Linux UAPI headers, MinGW-w64) and Lean's own source, mirrored from their upstream URLs; each archive's NOTICE lists them (scripts/lean-dist/source-archives.json).
           EOF
           printf '\nSource revision: %s\n' "$GITHUB_SHA" >> notes.md
           RELEASE_TARGET="$GITHUB_SHA"; [ "$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_REF_NAME" --jq .sha)" = "$GITHUB_SHA" ] || RELEASE_TARGET="$GITHUB_REF_NAME"  # GitHub refuses non-tip SHAs as release targets
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$RELEASE_TARGET" --title "$TAG" --notes-file notes.md \
-            *.tar.zst report-*.json tiers.json SHA256SUMS
+            *.tar.zst $sources report-*.json tiers.json SHA256SUMS

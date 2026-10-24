@@ -12,7 +12,8 @@
 //   node scripts/lean-dist/check-c-tier.mjs --tiers <dir> --work <dir> [--platform linux-x64] [--report file]
 import assert from 'node:assert/strict';
 import { createReadStream, readFileSync, realpathSync } from 'node:fs';
-import { readdir, mkdir, writeFile, rm, link, symlink, readlink } from 'node:fs/promises';
+import { readdir, mkdir, writeFile, rm, link, symlink, readlink, copyFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { join, resolve, delimiter } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -20,7 +21,7 @@ import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress } from 'node:zlib';
 import { parseArgs } from 'node:util';
 import { x as extractTar } from 'tar';
-import { cCompilerEnvironment } from '../../src/application-sources.mjs';
+import { cCompilerEnvironment, macosSdk } from '../../src/application-sources.mjs';
 
 const { values: options } = parseArgs({ options: {
   tiers: { type: 'string' }, work: { type: 'string' }, report: { type: 'string' },
@@ -56,6 +57,14 @@ for (const item of [archive('bin'), c]) {
     filter: (name, entry) => entry.type === 'SymbolicLink' ? (links.push([name.split('/').slice(1).join('/'), entry.linkpath]), false) : true }));
   for (const [name, target] of links) await symlink(target, join(directory, ...name.split('/')));
   await linkTree(directory, prefix);
+}
+// macOS: the C tier leaves out Apple's libSystem.tbd; Lasm's prefix takes the user's
+// SDK copy (src/managed-lean.mjs assembleLeanPrefix), as done here.
+if (darwin) {
+  assert.ok(!existsSync(join(prefix, 'lib/libc/libSystem.tbd')), 'The C tier must not carry Apple\'s libSystem.tbd');
+  const sdk = macosSdk();
+  assert.ok(sdk, 'The macOS check needs the Command Line Tools SDK');
+  await copyFile(join(sdk, 'usr/lib/libSystem.tbd'), join(prefix, 'lib/libc/libSystem.tbd'));
 }
 const result = { schema: 1, platform, archive: c.name, bytes: c.bytes, fileBytes: c.fileBytes, node: process.versions.node, checks: [] };
 const env = { ...process.env };
@@ -127,6 +136,14 @@ const executed = linked.status === 0 ? run(join(work, windows ? 'probe.exe' : 'p
 result.checks.push({ check: 'link and run an executable', status: linked.status, stderr: linked.stderr.split(/\r?\n/).slice(-5).join('\n'),
   output: executed?.stdout.trim(), exit: executed?.status });
 if (executed) assert.equal(executed.stdout.trim(), '7 1.414 2 1');
+// 5. macOS: Lean's own link flags (LEANC_INTERNAL_LINKER_FLAGS: --sysroot ROOT -L ROOT/lib
+// -L ROOT/lib/libc -fuse-ld=lld), as Lake links precompiled modules, with the SDK's libSystem.
+if (darwin) {
+  const leanLinked = run('cc', ['-shared', '--sysroot', prefix, '-L', join(prefix, 'lib'), '-L', join(prefix, 'lib/libc'), '-fuse-ld=lld',
+    '-o', 'libprobe-lean.dylib', 'probe.o']);
+  ok(leanLinked, 'link with Lean\'s linker flags and the SDK libSystem');
+  result.checks.push({ check: 'link with Lean\'s linker flags against the user SDK\'s libSystem.tbd' });
+}
 result.passed = true;
 if (options.report) await writeFile(options.report, JSON.stringify(result, null, 2) + '\n');
 console.log(JSON.stringify(result, null, 2));

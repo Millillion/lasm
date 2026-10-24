@@ -60,15 +60,23 @@ export function cCompilerEnvironment(lean, env = process.env, { platform = proce
       .filter(Boolean).join(delimiter);
   } else if (platform === 'darwin' && !env.SDKROOT) {
     const sdk = sdkPath();
-    if (!sdk) throw new Error('This project has packages with C code. On macOS, compiling it needs the C library headers of the macOS SDK, '
-      + 'which Lasm cannot redistribute: install the Xcode Command Line Tools (xcode-select --install) or set SDKROOT to an SDK. '
-      + 'No C compiler other than Lean\'s own is used.');
+    if (!sdk) throw new Error(macosSdkMissing);
     result.SDKROOT = sdk;
   }
   return result;
 }
 
-function macosSdkPath() {
+export const macosSdkMissing = 'This project has packages with C code. On macOS, compiling it needs the C library headers and libSystem of the macOS SDK, '
+  + 'which Lasm cannot redistribute: install the Xcode Command Line Tools (xcode-select --install) or set SDKROOT to an SDK. '
+  + 'No C compiler other than Lean\'s own is used.';
+
+/** SDKROOT if it names an SDK, else the Command Line Tools SDK. */
+export function macosSdk(env = process.env) {
+  if (env.SDKROOT && existsSync(join(env.SDKROOT, 'usr', 'include', 'stdio.h'))) return env.SDKROOT;
+  return macosSdkPath();
+}
+
+export function macosSdkPath() {
   // Without developer tools, xcrun's stub opens an installation prompt.
   const tools = spawnSync('xcode-select', ['-p'], { encoding: 'utf8', timeout: 30_000, stdio: ['ignore', 'pipe', 'ignore'] });
   if (tools.status !== 0 || !tools.stdout.trim() || !existsSync(tools.stdout.trim())) return null;
