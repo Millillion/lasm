@@ -108,6 +108,7 @@ set stays small enough to run on every candidate on one free runner (about
 | HTTP throughput and p50/p99 latency at fixed concurrency | How much traffic does one instance serve, and how slow is the tail? Covers the recommended interop path (Hono, Express with Lean handlers) and Lean's own `Std.Http`. | GET `/` answering `{"ok":true}` |
 | Interop latency: Lean→JS call round trip; awaiting a resolved promise | What does each JavaScript call cost, so bindings can be designed coarse-grained? | `Math.max()`; `Promise.resolve(1)` |
 | Build time: clean (`--rebuild`) and incremental after a one-line change | How long is the edit–build loop? | trivial program; Hono app |
+| Big numbers: multiplication, division and `toString` of 10,000-digit `Nat`s | How slow is arbitrary-precision arithmetic without GMP? The runtime uses Lean's own big-number code ([below](#big-numbers-without-gmp)). | `bench/fixtures/bignum` |
 | `@lasm/cli` install: download size, installed size, `npm install` time; first build including the one-time tool download, and the tool cache size | What does getting started cost? | the candidate npm archive |
 
 Not in the set, on purpose: language-level microbenchmarks (they depend on the
@@ -116,6 +117,49 @@ injection (covered by the robustness suites in [SERVER_MVP.md](SERVER_MVP.md)
 and the 5.2 interop soak), and native-Lean comparisons (the Std.Http robustness
 suite already compares against native; here the reference is plain Node, which
 is what a user would otherwise write).
+
+## Big numbers without GMP
+
+Lasm's Wasm runtime is built with Lean's `-DUSE_GMP=OFF` (docs/PLAN.md decision 5,
+runtime `8b3e33e0…`): Lean's own big-number code (32-bit digits, schoolbook
+multiplication and division, Euclid's gcd) replaces GNU MP, so built apps contain
+no LGPL code. `Nat`/`Int` values that fit in 63 bits stay unboxed and never reach
+this code. Results are identical to native Lean (with GMP) on 22,849 checked
+lines of edge-case and pseudo-random operations
+([integration/bignum-differential.mjs](../integration/bignum-differential.mjs)).
+
+Median time per operation, one Linux x64 machine (local, Node 26), measured with
+[integration/bignum-throughput.mjs](../integration/bignum-throughput.mjs):
+native Lean 4.35.0 (GMP), the previous Wasm runtime `7aa5028c…` (GMP 6.3.0
+built for Wasm) and the current one. "a×a" has `digits`-digit operands; division
+and remainder divide the 2×`digits` product by a `digits`/2-digit number.
+
+| Operation | Digits | Native (GMP) | Wasm, GMP | Wasm, Lean's code | vs Wasm GMP | vs native |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| a×a | 100 | 1.0 µs | 2.6 µs | 2.4 µs | 0.9× | 2.4× |
+| a×a | 1,000 | 3.1 µs | 11.3 µs | 15.4 µs | 1.4× | 4.9× |
+| a×a | 10,000 | 56 µs | 250 µs | 1.28 ms | 5.1× | 23× |
+| a×a | 100,000 | 1.12 ms | 5.34 ms | 125 ms | 23× | 111× |
+| division | 1,000 | 2.8 µs | 11.6 µs | 38.9 µs | 3.3× | 14× |
+| division | 10,000 | 87 µs | 533 µs | 3.04 ms | 5.7× | 35× |
+| division | 100,000 | 2.73 ms | 14.3 ms | 308 ms | 22× | 113× |
+| `Nat.gcd` | 100 | 1.3 µs | 4.2 µs | 20.1 µs | 4.8× | 15× |
+| `Nat.gcd` | 300 | 3.6 µs | 6.4 µs | 87 µs | 14× | 25× |
+| `Nat.gcd` | 1,000 | 25 µs | 23 µs | 704 µs | 30× | 28× |
+| `Nat.gcd` | 10,000 | 257 µs | 887 µs | 53.5 ms | 60× | 208× |
+| `toString` | 1,000 | 0.68 ms | 1.40 ms | 2.74 ms | 2.0× | 4.0× |
+| `toString` | 10,000 | 31.8 ms | 70.9 ms | 233 ms | 3.3× | 7.3× |
+| `toString` | 100,000 | 2.76 s | 6.89 s | 23.7 s | 3.4× | 8.6× |
+| `String.toNat?` | 10,000 | 10.2 ms | 27.5 ms | 31.7 ms | 1.2× | 3.1× |
+
+Up to a few hundred digits the change is within noise except for `gcd`; the
+gap grows with size because GMP's subquadratic algorithms are gone. `Nat.gcd`
+(and so `Rat` normalization of large values) is the weakest case: Lean's
+fallback runs Euclid's algorithm with full divisions. `toString`/`String.toNat?`
+are quadratic Lean code even natively. Full rows (also 20 and 300 digits, `mod`,
+`String.toNat?`) are in [the evidence](evidence/bignum-no-gmp-2026-10-24.json).
+The release benchmarks record multiplication, division and `toString` at
+10,000 digits on every candidate.
 
 ## Method
 

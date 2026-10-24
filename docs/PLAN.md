@@ -686,6 +686,23 @@ folded into Phases 5.2/5.3 and 7.
     side module. GMP stays only in the compiler's native Lean binaries and the
     C tier, covered by notices and mirrored sources. The final release
     candidate and gate run after this rebuild.
+    *Status (2026-10-24, current source):* runtime `8b3e33e0…` (CI build
+    40066905228, source `c328a40`, handoff `6c985e0a…`) is built with
+    `-DUSE_GMP=OFF` and pinned; it has no `libgmp.a`, and apps' notices no longer
+    list GNU MP. USE_GMP changes only Lean's C++ runtime (libleanrt's mpz,
+    object, compact, sharecommon; six libleancpp objects): lean.h and the
+    generated C do not depend on it, so the build reused the previous runtime's
+    standard-library archives and symbol registry after header, patch, hash,
+    symbol-set and 60 byte-identical recompiled-module checks
+    (`node-linux-runtime.yml` input `reuse-standard-libraries`). Initialization
+    review: no initialization path changed (`canSpecializeInitialization`).
+    Correctness: the differential test (integration/bignum-differential.mjs)
+    matches native Lean on 22,849 checked lines; the smoke test compares
+    multi-limb results on CI. Speed: equal up to a few hundred digits, then
+    slower than GMP (10,000 digits: multiplication 5×, `Nat.gcd` 60×; 100,000
+    digits: multiplication 23×), [BENCHMARKS.md](BENCHMARKS.md#big-numbers-without-gmp).
+    Next: candidate, five-platform acceptance and the full upstream suite on
+    five targets against Phase 3.
   - **Release process (user decision 2026-10-24):** releases are version
     bumps. A release PR changes `package.json` `version` and adds
     `docs/release/<version>-notes.md`; CI runs the candidate checks; on merge to

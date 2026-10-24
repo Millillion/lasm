@@ -59,7 +59,7 @@ Status: **OK** met; **Fixed** met after the fixes in §10 (current source);
 | Lasm (bin/, src/, library/, templates/, scripts/full-lean/*.js) | 0.1.0 | MIT | Keep the notice | `LICENSE` (copyright Jordan Last, added by `--license MIT`) | Fixed (was "Millillion") |
 | Lean runtime and standard library, compiled for wasm64 (`targets/lean-4.35.0-wasm64/lib/lib{Init,Std,Lean,LeanExport,Lake,leancpp,leanrt}.a`, `include/lean/*.h`) | 4.35.0, commit eb6cafb | Apache-2.0 | Licence copy; §4(b) notices on changed files; keep notices | `THIRD_PARTY_NOTICES.txt`; patches listed (§4.1) | Fixed (lean.h comment: next runtime packaging) |
 | Lasm runtime glue (`liblasmhost.a`, `liblasmsymbols.a`) | 0.1.0 | MIT | Notice | as Lasm | OK |
-| GNU MP (`lib/libgmp.a`, unmodified) | 6.3.0 | LGPL-3.0-or-later OR GPL-2.0-or-later | Licence texts; source of the library (GPL-3 §6 via LGPL) | Texts in notices; source URL and recipe in notices | Lawyer (source "accompanies"?) |
+| GNU MP (`lib/libgmp.a`, unmodified) | 6.3.0 | LGPL-3.0-or-later OR GPL-2.0-or-later | Licence texts; source of the library (GPL-3 §6 via LGPL) | Texts in notices; source URL and recipe in notices | **Removed** in current source (runtime `8b3e33e0…`, built with `USE_GMP=OFF`, §8); candidates up to `.58` still contain it |
 | libuv (`lib/libuv.a`) | 1.48.0 | MIT (+ ISC `inet.c`, BSD-2-Clause `tree.h`) | Notices | MIT text; `LICENSE-extra` added | Fixed |
 | koffi + `@koromix/koffi-*` native add-ons (`src/native/node_modules`) | 3.3.0 | MIT | Notice | `koffi/LICENSE.txt` | OK |
 | node-addon-api headers compiled into `koffi.node` | koffi's vendored copy | MIT | Notice | added to notices | Fixed |
@@ -273,7 +273,7 @@ directions, as long as the object code is offered.
 | --- | --- | --- | --- | --- |
 | `@lasm/cli` `targets/…/libgmp.a` (the library itself, not a combined work) | Lasm | texts in notices | URL `ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz` + SHA-256 + build recipe in notices | n/a |
 | `@lasm/lean-<platform>` `libleanshared` (static) and `@lasm/lean-c-<platform>` `libgmp.a` | Lasm (repackaging Lean FRO's release) | `LICENSES` | Lean FRO's release has no GMP source archive; Lasm names upstream's | Lean's own sources are public (Apache-2.0) and build against any GMP ≥ 6.3.0, so the Corresponding Application Code is available; Lawyer |
-| Every built app's `program.wasm` (static) | **each user who distributes an app**, and Lasm when it ships examples | Fixed: notice + texts in `dist/THIRD_PARTY_NOTICES.txt` | named in the notice | **Open (§8)**: the user must provide relinkable application code or a shared-library mechanism; Lasm does not provide either today |
+| Every built app's `program.wasm` (static) | **each user who distributes an app**, and Lasm when it ships examples | Fixed: notice + texts in `dist/THIRD_PARTY_NOTICES.txt` | named in the notice | **Resolved in current source (§8, option C)**: runtime `8b3e33e0…` contains no GMP; apps built by candidates up to `.58` still do |
 
 Upstream context: Lean's own release links GMP statically, and Sebastian Ullrich
 noted in leanprover/lean4 PR #733 that static linking "is problematic with GMP
@@ -387,6 +387,14 @@ Facts:
 
 ## 8. Decision for you: GNU MP in built apps
 
+**Decided (user, 2026-10-24): option C.** Current source pins runtime
+`8b3e33e0…` (CI build 40066905228), built with `-DUSE_GMP=OFF`: no `libgmp.a` in
+the runtime bundle or `@lasm/cli`, and built apps' `THIRD_PARTY_NOTICES.txt` list
+no GNU MP (`src/notices.mjs` keeps the GNU MP notice only for a runtime that
+still links it). Correctness and speed: docs/BENCHMARKS.md, "Big numbers without
+GMP". GMP remains in the native tool packages and the C tier (§4.3). The facts
+and options below are kept as the record of the decision.
+
 Facts:
 - Lean 4.35.0 supports building without GMP: `option(USE_GMP "USE_GMP" ON)` in
   `src/CMakeLists.txt`; `-DUSE_GMP=OFF` uses Lean's own bignum code
@@ -468,7 +476,8 @@ and an SPDX field.
    but their `LICENSE` files are not copied. Recommended: copy each dependency's
    licence files from `.lake/packages/<name>/` into `dist/licenses/<name>/` and
    list them in the notices.
-3. **GMP relinking for users** (§8).
+3. ~~GMP relinking for users~~ (§8): resolved in current source by building the
+   Wasm runtime without GMP; it reaches users with the next candidate.
 4. Released archives `lean-4.35.0-tiers-v1` (mimalloc text) and `lean-4.35.0-c-v1`
    (Lean licences, OpenSSL and mimalloc texts) predate the fixes; the C tier npm
    packages cover all of them in `licenses/` (`ee06055`, `be64a89`), the GitHub

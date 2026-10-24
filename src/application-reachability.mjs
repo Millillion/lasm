@@ -119,7 +119,20 @@ export function canSpecializeInitialization(runtime) {
     // offsets of the added strings. The cold rebuild's Init/Std/Lean/LeanExport/
     // Lake/libleancpp/liblasmhost archives, headers, exports.json and
     // liblasmsymbols.a are byte-identical, so no initialization path changed.
-    '7aa5028c6226405b322961b289f955043824a49c997bec3f3e262647c045557c'].includes(runtime.identity);
+    '7aa5028c6226405b322961b289f955043824a49c997bec3f3e262647c045557c',
+    // Lean 4.35.0 without GMP (decision 5; CI build 40066905228, source c328a40,
+    // handoff 6c985e0a…): USE_GMP=OFF selects Lean's own mpz/mpn code. The
+    // Init/Std/Lean/LeanExport/Lake archives and liblasmsymbols.a are byte-identical
+    // to the entry above (reused after header, patch and sampled-object checks),
+    // as are liblasmhost.a and libuv.a; lib/libgmp.a is gone. In libleanrt.a only
+    // mpz.cpp.o, object.cpp.o, compact.cpp.o and sharecommon.cpp.o changed; in
+    // libleancpp.a only name, name_generator, ffi, module, num and print.cpp.o.
+    // Their initialize_*/finalize_* functions (name, name_generator, num, print,
+    // object) and object.cpp's static constructor disassemble identically apart
+    // from code offsets; none gained a static constructor, and the libleancpp
+    // members' data symbols are unchanged. init.cpp and init_module.cpp objects are
+    // byte-identical, so no initialization path changed.
+    '8b3e33e03df54e6125227b5d1d442fc8db072ffe1ea1dd3f3bf5df8707675562'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';

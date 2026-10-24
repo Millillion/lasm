@@ -373,6 +373,14 @@ A summary; the sections above and the linked pages have the details.
   ([JS_BINDINGS.md](docs/JS_BINDINGS.md), [interop soak](docs/INTEROP_SOAK.md)).
   `Lasm.JS` programs fail natively, and the Lean editor extension does not know
   `Lasm.JS`.
+- **Big numbers** (`Nat`/`Int` beyond 63 bits) use Lean's own arbitrary-precision
+  code instead of GNU MP, so apps contain no LGPL code. Results equal native
+  Lean's; speed is close to the earlier GMP runtime up to a few hundred digits,
+  then falls behind: at 10,000 digits multiplication is about 5× and `Nat.gcd`
+  about 60× slower than with GMP in Wasm (23× and 210× slower than native Lean),
+  and at 100,000 digits multiplication about 23×. Heavy multi-thousand-digit
+  arithmetic (and `Rat` with huge values) is a poor fit
+  ([numbers](docs/BENCHMARKS.md#big-numbers-without-gmp)).
 - **`Std.Http`** works but serves about 660 requests per second under Lasm; use
   Express or Hono with Lean handlers for production HTTP.
 - **Lake dependencies** use your system Git (and its SSH/credential setup); Lasm
@@ -405,17 +413,18 @@ license, how each obligation is met, the open gaps and the questions for a lawye
 - **Built `dist/`.** `THIRD_PARTY_NOTICES.txt` lists what `program.wasm`,
   `program.cjs` and `host/` contain: Lean's runtime and standard library
   (Apache-2.0, with Lasm's changes), Emscripten (MIT OR NCSA), musl, LLVM libc++,
-  libc++abi, libunwind and compiler-rt, mimalloc, libuv, GNU MP 6.3.0
-  (LGPL-3.0-or-later OR GPL-2.0-or-later, statically linked, as in native Lean
-  executables), koffi (MIT, `host/native`) and Lasm's own host code (MIT). Current
+  libc++abi, libunwind and compiler-rt, mimalloc, libuv, koffi (MIT,
+  `host/native`) and Lasm's own host code (MIT): permissive licences only. The
+  runtime uses Lean's own big-number code instead of GNU MP (see Known
+  limitations); apps built by candidates up to `.58` still link GNU MP 6.3.0
+  (LGPL-3.0-or-later OR GPL-2.0-or-later) and say so in their notices. Current
   source also writes Lasm's MIT notice, the notice of every Lean file Lasm changed
   and the compiler-rt, libunwind and libuv LICENSE-extra texts there; candidate
   `.58` has only the runtime bundle's notices. With npm interop, `node_modules/`
   holds each package with its own license. Lean and C code of your project and
   its Lake dependencies are compiled in under their own licenses, which the file
-  does not list. **Whoever distributes a `dist/`** must meet those licenses and
-  GNU MP's LGPL terms for combined works (notably letting recipients relink with
-  a modified GNU MP; see the audit).
+  does not list. **Whoever distributes a `dist/`** must meet those licenses
+  (keep the notices).
 - **Tool packages and release archives.** Each `@lasm/…` tool package has an SPDX
   `license` field (or, for Git, a README section) and the upstream license files:
   in the archive (`LICENSE`, `LICENSES`, `lasm-notices/`) and, for the C tier and
