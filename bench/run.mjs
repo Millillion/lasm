@@ -1,5 +1,6 @@
 // Lasm release benchmarks (docs/BENCHMARKS.md): install, build, bundle size,
-// cold start, memory, HTTP throughput/latency and interop latency of one
+// cold start, memory, HTTP throughput/latency, interop latency and big-number
+// throughput of one
 // candidate package, with plain-Node references measured on the same machine.
 //
 //   node bench/run.mjs CANDIDATE.tgz NEW_WORK_DIR NEW_RESULT.json
@@ -7,10 +8,11 @@
 // Prerequisites: the Node version the candidate requires, and `npm ci` in bench/
 // (the reference servers' dependencies). Settings (environment,
 // defaults in parentheses):
-//   BENCH_PHASES (install,build,start,http,interop)  BENCH_START_REPS (10)
+//   BENCH_PHASES (install,build,start,http,interop,bignum)  BENCH_START_REPS (10)
 //   BENCH_LOAD_REPS (3)  BENCH_LOAD_SECONDS (10)  BENCH_WARMUP_SECONDS (3)
 //   BENCH_CONNECTIONS (16)  BENCH_BUILD_REPS (3)  BENCH_INSTALL_REPS (3)
 //   BENCH_INTEROP_REPS (3)  BENCH_INTEROP_SAMPLES (5000)  BENCH_MAX_RSS_MIB (2048)
+//   BENCH_BIGNUM_REPS (3)  BENCH_BIGNUM_DIGITS (10000)
 //   BENCH_TOOL_CACHE (a new directory in the work directory; the first build
 //     then includes the one-time tool download; set it to reuse a warm cache)
 //   BENCH_REUSE=1 reuses an existing work directory's built projects (local
@@ -40,12 +42,13 @@ assert.ok(existsSync(join(benchRoot, 'node_modules/hono')), 'Run `npm ci` in ben
 
 const setting = (name, fallback) => Number(process.env[name] ?? fallback);
 const settings = {
-  phases: (process.env.BENCH_PHASES ?? 'install,build,start,http,interop').split(','),
+  phases: (process.env.BENCH_PHASES ?? 'install,build,start,http,interop,bignum').split(','),
   startReps: setting('BENCH_START_REPS', 10), loadReps: setting('BENCH_LOAD_REPS', 3),
   loadSeconds: setting('BENCH_LOAD_SECONDS', 10), warmupSeconds: setting('BENCH_WARMUP_SECONDS', 3),
   connections: setting('BENCH_CONNECTIONS', 16), buildReps: setting('BENCH_BUILD_REPS', 3),
   installReps: setting('BENCH_INSTALL_REPS', 3), interopReps: setting('BENCH_INTEROP_REPS', 3),
   interopSamples: setting('BENCH_INTEROP_SAMPLES', 5000), maxRssMiB: setting('BENCH_MAX_RSS_MIB', 2048),
+  bignumReps: setting('BENCH_BIGNUM_REPS', 3), bignumDigits: setting('BENCH_BIGNUM_DIGITS', 10000),
   idleSettleMs: 1000, reuse,
 };
 const has = phase => settings.phases.includes(phase);
@@ -226,7 +229,7 @@ const t=performance.now();createHash('sha256').update(b).digest();for(let k=0;k<
 
 // ---------- phases ----------
 const projects = {};
-const fixtures = ['hello', 'hono', 'express', 'std-http', 'interop'];
+const fixtures = ['hello', 'hono', 'express', 'std-http', 'interop', 'bignum'];
 function project(name) {
   const dir = join(work, 'projects', name);
   if (reuse && existsSync(join(dir, 'node_modules/.bin'))) return dir;
@@ -289,7 +292,7 @@ function buildPhase() {
     metric(`build.clean_ms.${name}`, { samples: clean, unit: 'ms', better: 'lower', group: 'build', label: `Clean build (--rebuild), ${name}`, normalize: 'cpu' });
     metric(`build.incremental_ms.${name}`, { samples: incremental, unit: 'ms', better: 'lower', group: 'build', label: `Incremental build after a one-line change, ${name}`, normalize: 'cpu' });
   }
-  for (const name of ['express', 'std-http', 'interop']) {
+  for (const name of ['express', 'std-http', 'interop', 'bignum']) {
     metric(`build.clean_ms.${name}`, { value: build(name), unit: 'ms', better: 'lower', group: 'build', label: `Clean build, ${name}`, normalize: 'cpu', spread: { n: 1 } });
     sizes(name);
   }
@@ -459,6 +462,27 @@ async function interopPhase() {
   }
 }
 
+// Big-number throughput (docs/PLAN.md decision 5): the runtime uses Lean's own
+// big-number code, not GMP. Medians per operation on BENCH_BIGNUM_DIGITS-digit
+// operands, inside Lean with the monotonic clock (bench/fixtures/bignum).
+async function bignumPhase() {
+  const ops = {};
+  for (let rep = 0; rep < settings.bignumReps; rep++) {
+    const r = run('bignum', [node], [join(projects.bignum, 'dist/main.mjs'), String(settings.bignumDigits)]);
+    for (const line of r.stdout.trim().split('\n')) {
+      const o = JSON.parse(line);
+      (ops[o.op] ??= []).push(o);
+    }
+  }
+  result.raw.bignum = ops;
+  const digits = settings.bignumDigits, size = digits >= 1000 && digits % 1000 === 0 ? `${digits / 1000}k` : String(digits);
+  const labels = { mul: 'multiplication', div: 'division (2n by n/2 digits)', mod: 'remainder', toString: 'toString (decimal)',
+    ofString: 'String.toNat? (decimal)', gcd: 'Nat.gcd' };
+  for (const [op, runs] of Object.entries(ops))
+    metric(`bignum.${op}_${size}_us`, { samples: runs.map(r => r.medianNs / 1000), unit: 'µs', better: 'lower', group: 'bignum',
+      label: `Big numbers, ${labels[op] ?? op}, ${digits}-digit operands`, normalize: 'cpu' });
+}
+
 // ---------- main ----------
 async function hashFile(path) { return createHash('sha256').update(readFileSync(path)).digest('hex'); }
 try {
@@ -477,10 +501,11 @@ try {
   save();
   const before = calibrate();
   if (has('install')) installPhase();
-  if (has('build') || has('start') || has('http') || has('interop')) buildPhase();
+  if (has('build') || has('start') || has('http') || has('interop') || has('bignum')) buildPhase();
   if (has('start')) await startPhase();
   if (has('http')) await httpPhase();
   if (has('interop')) await interopPhase();
+  if (has('bignum')) await bignumPhase();
   const after = calibrate();
   result.calibration = { cpuMs: summarize([...before, ...after]), beforeMs: summarize(before), afterMs: summarize(after),
     description: 'Fixed single-threaded JavaScript workload (SHA-256 of 64 MiB, JSON round trips, an integer loop) in a fresh Node process' };
