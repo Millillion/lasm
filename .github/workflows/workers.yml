@@ -45,8 +45,38 @@ jobs:
   runtime:
     if: github.ref != 'refs/heads/main'
     uses: ./.github/workflows/edge-runtime.yml
+  # The native host pieces (every platform's, cross-built with zig on x64:
+  # scripts/prepare-native.mjs), shared by the jobs below, including arm64.
+  native:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Native host pieces (koffi, helpers)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      # A tar keeps the executables' modes, which artifact zips drop.
+      - run: tar -cf .work/native-host.tar -C .cache native-host
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: native-host
+          path: .work/native-host.tar
+          retention-days: 3
   workers:
-    needs: runtime
+    needs: [runtime, native]
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
@@ -70,10 +100,11 @@ jobs:
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
-      - name: Native host pieces (koffi, helpers)
-        run: |
-          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
-          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      - uses: actions/download-artifact@v4
+        with:
+          name: native-host
+          path: .work/native-host
+      - run: mkdir -p .cache && tar -xf .work/native-host/native-host.tar -C .cache
       - name: Fetch the pinned Node runtime
         env:
           GH_TOKEN: ${{ github.token }}
@@ -115,7 +146,7 @@ jobs:
   # Phase 7.5: the compiler under Node, Bun and Deno (Linux only until the
   # 0.1.0 gate allows macOS and Windows on this branch).
   hosts:
-    needs: runtime
+    needs: [runtime, native]
     runs-on: ${{ matrix.runner }}
     name: Compiler on Bun and Deno ${{ matrix.platform }}
     timeout-minutes: 90
@@ -145,10 +176,11 @@ jobs:
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
-      - name: Native host pieces (koffi, helpers)
-        run: |
-          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
-          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      - uses: actions/download-artifact@v4
+        with:
+          name: native-host
+          path: .work/native-host
+      - run: mkdir -p .cache && tar -xf .work/native-host/native-host.tar -C .cache
       - name: Fetch the pinned Node runtime
         env:
           GH_TOKEN: ${{ github.token }}

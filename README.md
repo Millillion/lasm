@@ -182,7 +182,8 @@ applications run is under [Supported platforms](#supported-platforms).
 | macOS 15 (`macos-15-intel`, `macos-15`) | x86-64 and ARM64 | Candidate `.58` passed native installed-package and copied-deployment acceptance. |
 | Windows Server 2025 Datacenter (`windows-2025`) | x86-64 | Candidate `.58` passed native installed-package and copied-deployment acceptance. |
 | Windows ARM64 | ARM64 | **Not supported.** Removed on 2026-10-16: neither Lean nor Emscripten publishes Windows ARM64 prebuilts. Lasm stops with `Lasm supports Linux and macOS on x86-64 and ARM64, and Windows on x86-64. Windows ARM64 is not supported.` |
-| Other JavaScript runtimes, browsers, Cloudflare Workers | Any | Not supported as the compiler's host; Lasm runs on Node only. Built programs for edge isolates are experimental (see `--target workers` above). |
+| Bun and Deno as the compiler's runtime | Linux x86-64 and ARM64 | Experimental and unreleased (planned for 0.2.0): Bun 1.4.4 and Deno 2.9.6 are tested in CI on Linux; macOS and Windows are not yet tested. See [Bun and Deno](docs/BUN_DENO.md). |
+| Other JavaScript runtimes, browsers, Cloudflare Workers | Any | Not supported as the compiler's host. Built programs for edge isolates are experimental (see `--target workers` above). |
 
 Other OS releases and Node/npm/Lean versions are unverified. No engine flags are
 needed. Linux requires its ordinary OS libraries and shell, but no developer SDK.

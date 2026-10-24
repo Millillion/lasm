@@ -6,7 +6,7 @@
 //     [--sysroot-cache EM_CACHE]   (system libraries from an Emscripten cache instead of the edge runtime's)
 // LINK_WORK: a build's kept link directory (LASM_KEEP_LINK_WORK=1).
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { join, resolve, basename } from 'node:path';
+import { join, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
 import { linkEdgeProgram } from '../../src/edge/edge-link.mjs';
@@ -20,7 +20,7 @@ const { values: options, positionals } = parseArgs({ allowPositionals: true, opt
 const [work, edgeDirectory, nodeBundle, out] = positionals.map(p => resolve(p));
 const manifest = JSON.parse(readFileSync(join(nodeBundle, 'target.json'), 'utf8'));
 const nodeRuntime = await applicationRuntime({ version: manifest.lean, commit: toolchainCatalog.lean[manifest.lean].commit }, {
-  directory: nodeBundle, catalog: { lean: { [manifest.lean]: { name: basename(nodeBundle), manifestSha256: createHash('sha256').update(readFileSync(join(nodeBundle, 'target.json'))).digest('hex') } } } });
+  directory: nodeBundle, catalog: { lean: { [manifest.lean]: { name: manifest.name, manifestSha256: createHash('sha256').update(readFileSync(join(nodeBundle, 'target.json'))).digest('hex') } } } });
 const edge = await edgeRuntime(nodeRuntime, { directory: edgeDirectory });
 if (options['sysroot-cache']) edge.sysroot = { cache: resolve(options['sysroot-cache']), directory: 'wasm64-emscripten' };
 const sha256 = file => createHash('sha256').update(readFileSync(file)).digest('hex');
