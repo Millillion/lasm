@@ -713,6 +713,17 @@ folded into Phases 5.2/5.3 and 7.
     The agent merges release PRs once green; 0.1.0 waits for the user's go.
     Implemented: [RELEASING.md](RELEASING.md) (`release-checks.yml`, `release.yml`,
     `scripts/release/`).
+  - **CI test policy (user decision 2026-10-24):**
+    - every release PR: release checks (candidate build, five-platform
+      installed acceptance, platform matrix, templates, interop examples, npm
+      rehearsal), about 2-3 h;
+    - runtime re-pin or compiler-internals change: release checks plus the full
+      upstream suite on Linux x64 and arm64;
+    - toolchain upgrade (Lean, Emscripten or Node major): the full gate on all
+      five targets;
+    - nightly, when `main` changed: the full five-target upstream suite on its
+      own schedule; it never blocks a release, and regressions are reported.
+    - 0.1.0 itself gets the full launch gate on all five targets (user choice).
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as

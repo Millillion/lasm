@@ -23,6 +23,11 @@
   Never publish manually or with tokens. The agent may open and merge release
   PRs itself once their checks pass; the first public release (0.1.0) waits for
   the user's explicit go-ahead.
+- CI test policy (user decision 2026-10-24; see `docs/PLAN.md`): release PRs
+  need the release checks; runtime re-pins and compiler-internals changes also
+  need the full upstream suite on Linux x64 and arm64; toolchain upgrades need
+  the full five-target gate; a nightly full five-target suite runs when `main`
+  changed and never blocks releases.
 - Prioritize the ordinary Lean-on-Node installed workflow in `docs/PLAN.md`.
   Lasm targets five platforms: Linux and macOS on x86-64 and ARM64, and Windows
   on x86-64 (user decision, 2026-10-16; see `docs/PLAN.md`). Windows ARM64 was
