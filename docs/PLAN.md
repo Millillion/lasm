@@ -738,6 +738,23 @@ folded into Phases 5.2/5.3 and 7.
     in the Lambda image instead).
   - 6.3 Azure Functions (Core Tools), Google Cloud Functions (Functions
     Framework), DigitalOcean App Platform (gVisor), Alpine/musl images.
+- **Reordering (user decision 2026-10-24):** Phase 6 (serverless functions) is
+  merged into 0.1.0. Edge isolates move up to Phase 7, Fastly becomes Phase 8,
+  and production hardening moves last as Phase 9 (pieces the edge build needs,
+  such as lower startup memory and faster startup, are pulled forward into 7.1).
+  The entries below keep their earlier numbers for history: "Phase 8 — Isolate
+  build" is now Phase 7, "Phase 9 — Fastly" is now Phase 8, and "Phase 7 —
+  Production hardening" is now Phase 9.
+- **Phase 7 (now) — Edge isolates, scope (user decision 2026-10-24):** 7.1
+  prototype and decision (single-threaded runtime, JSPI vs Asyncify, wasm32,
+  pure-JS host; measured under `wrangler dev`/workerd for size, memory, startup
+  and CPU per request); 7.2 Cloudflare Workers (target the free plan's limits,
+  publish paid-plan numbers too); 7.3 Vercel Edge and Netlify Edge; 7.4 Deno
+  Deploy and **Supabase Edge Functions** (Supabase Edge Runtime), evaluated for
+  cost and built if light; they can be removed later. Deno is allowed only as
+  an edge *host* target, tested locally with the Deno CLI and
+  `supabase functions serve` (Docker); the Node build stays Node-only. The edge
+  build ships as a separate target (`--target workers`, etc.) beside Node.
 - **Phase 7 — Production hardening on Node.** Long soak and concurrency stress
   (tasks, channels, Std.Sync/Std.Async, cancellation, many threads incl.
   Windows stack commit), startup memory tuning (initial memory, 64 MiB worker
