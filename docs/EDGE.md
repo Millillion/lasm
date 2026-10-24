@@ -176,7 +176,7 @@ the Bun build. The Node link driver's edge link was byte-identical to `emcc`.
 Bun and Deno as program targets (`--target bun|deno`, Phase 7.5) share this
 entry: see [BUN_DENO.md](BUN_DENO.md).
 
-**Supabase Edge Functions: not supported.**
+**Supabase Edge Functions: not supported until Supabase's runtime ships JSPI.**
 
 - Supabase's edge runtime, even the latest release `v1.77.8`
   (2026-10-21, the image `supabase functions serve` uses), runs **V8
@@ -192,7 +192,18 @@ entry: see [BUN_DENO.md](BUN_DENO.md).
   export minification, which the Node driver does not port. Without it, the
   build would need the 300 MB SDK.
 - **Decision:** this is not light, so it is not shipped
-  ([DECISIONS.md](DECISIONS.md)). Revisit when Supabase's runtime has JSPI.
+  ([DECISIONS.md](DECISIONS.md)).
+- **How to revisit:**
+  1. Check a new `supabase/edge-runtime` release (the image `supabase functions
+     serve` pulls) for JSPI. Serve a function whose `index.ts` returns
+     `typeof WebAssembly.Suspending` and `Deno.version`, using the image's
+     `start --main-service`. That needs no Supabase account. Run it in CI only,
+     since platform CLIs are not run locally.
+  2. Once it reports `function`, add a `supabase-edge` target: an entry like
+     the Deno one (`portableEntry`) in `supabase/functions/lasm/`, the Wasm
+     inlined as a module, and a per-function `deno.json` import map of
+     `npm:` specifiers pinned to the installed versions.
+  3. Test it in `workers.yml` with the runtime image in Docker.
 
 ## Platform facts
 
