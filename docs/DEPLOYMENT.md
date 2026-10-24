@@ -46,10 +46,26 @@ programs that start subprocesses use that helper.
 | Google Cloud Run (gen2), Fly.io, Railway, Render, Heroku (container stack) | the same container images (these platforms run your image on Linux x64; Cloud Run gen1's gVisor is untested) | [cloud-run.md](deploy/cloud-run.md), [fly.md](deploy/fly.md), [railway.md](deploy/railway.md), [render.md](deploy/render.md), [heroku.md](deploy/heroku.md) |
 | AWS Lambda (container image, x86_64 and arm64) | `public.ecr.aws/lambda/nodejs:24` with the AWS Lambda Web Adapter 1.1.0, invoked through the image's Runtime Interface Emulator with API Gateway (HTTP API) events, read-only with 512 MB; `amazonlinux:2023` (glibc 2.34) with the Node 24 tarball | [lambda.md](deploy/lambda.md), [`deploy/lambda/Dockerfile`](../deploy/lambda/Dockerfile) |
 
-Not yet supported (later phases, see [PLAN.md](PLAN.md)): Lambda zip packages,
-Vercel, Netlify, Azure Functions, Google Cloud Functions, DigitalOcean App
-Platform (gVisor), Alpine/musl, and isolate platforms (Cloudflare Workers, Vercel
-and Netlify Edge, Fastly), which have no threads or native add-ons.
+## Function platforms (Phase 6 source, not yet in a candidate)
+
+`lasm package --target …` turns `dist/` into a function package: a small handler
+starts the Lean server inside the platform's Node process on a loopback port and
+forwards each request to it ([`src/serverless/`](../src/serverless/)). These are
+tested by [`serverless.yml`](../.github/workflows/serverless.yml) on Linux x64
+and arm64 runners with the platforms' own local runtimes, using an accepted
+candidate with the branch's sources overlaid
+([`overlay-candidate.mjs`](../scripts/serverless/overlay-candidate.mjs)) until a
+candidate includes them.
+
+| Platform | Tested in CI with | Recipe |
+| --- | --- | --- |
+| AWS Lambda (.zip, `nodejs24.x`, x86_64 and arm64) | `public.ecr.aws/lambda/nodejs:24` with its Runtime Interface Emulator, zip extracted with `unzip` and mounted read-only, 512 MB; API Gateway REST and HTTP API, function URL, ALB single/multi-value sample events; AWS SAM CLI 1.170.0 `sam local invoke` and `sam local start-api`; size limits; cold starts | [lambda.md](deploy/lambda.md) |
+| Lambda@Edge (origin request, x86_64) | the same, with the CloudFront origin-request sample event | [lambda-edge.md](deploy/lambda-edge.md) |
+
+Not yet supported (later phases, see [PLAN.md](PLAN.md)): Vercel, Netlify, Azure
+Functions, Google Cloud Functions, DigitalOcean App Platform (gVisor),
+Alpine/musl, and isolate platforms (Cloudflare Workers, Vercel and Netlify Edge,
+Fastly), which have no threads or native add-ons.
 
 ## What the CI matrix runs
 

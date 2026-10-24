@@ -1,4 +1,65 @@
-# AWS Lambda (container image)
+# AWS Lambda
+
+Two ways: a **.zip package** for the managed `nodejs24.x` runtime (below; Phase 6
+source, awaiting a candidate) or a **container image** behind the AWS Lambda Web
+Adapter ([further down](#container-image)). For CloudFront, see
+[Lambda@Edge](lambda-edge.md).
+
+## Zip package (`nodejs24.x`, x86_64 and arm64)
+
+```sh
+npx lasm build Main.lean            # dist/: any server that listens on $HOST:$PORT
+npx lasm package --target lambda    # lambda.zip
+aws lambda create-function --function-name my-app --runtime nodejs24.x \
+  --handler lasm-lambda.handler --zip-file fileb://lambda.zip \
+  --memory-size 512 --timeout 10 --architectures arm64 --role ROLE_ARN
+aws lambda create-function-url-config --function-name my-app --auth-type AWS_IAM
+```
+
+With `lasm init my-app --template hono --deploy lambda-zip` the project has
+`npm run package:lambda` for the second step.
+
+**How it works.** `lambda.zip` is `dist/` plus two small files: `lasm-server.mjs`
+and the handler `lasm-lambda.mjs`. During Lambda's init phase the handler starts
+the Lean program in the function's own Node process with `HOST=127.0.0.1` and
+`PORT` set to a free loopback port, and waits until the port accepts
+connections. Each invocation becomes one HTTP request to that server, and the
+response goes back in the event's own shape. Supported events: API Gateway REST
+API (payload 1.0), API Gateway HTTP API (payload 2.0), Lambda function URLs,
+Application Load Balancer (single- and multi-value headers) and CloudFront
+(Lambda@Edge). Bodies are base64 when they are not text. Any server works: Express,
+Hono on `@hono/node-server` and pure-Lean `Std.Http` are tested.
+
+- **Both architectures in one zip:** every build carries the Linux x64 and arm64
+  native pieces; set `--architectures` to either.
+- **Permissions:** the zip records Unix permissions itself (`main.mjs` and the
+  process helpers 755, everything else 644), so a zip made on Windows works too.
+- **Limits:** `lasm package` fails above Lambda's 250 MB unzipped limit and warns
+  above 50 MB zipped (upload through S3 then). The templates are 1.4–2.0 MB
+  zipped and 5.4–6.5 MB unpacked.
+- **Memory:** at least 512 MB.
+- **ALB:** a single-value target group can return only one `Set-Cookie`; enable
+  multi-value headers on the target group for more.
+- **Not supported:** response streaming and WebSockets; a program that does not
+  listen on `$PORT` fails the init phase with a message saying so.
+
+**Tested in CI** (`.github/workflows/serverless.yml`, Linux x64 and arm64 runners;
+no AWS account): every server template's zip, extracted with Info-ZIP `unzip` and
+mounted read-only at `/var/task` of `public.ecr.aws/lambda/nodejs:24`, invoked
+through the image's Runtime Interface Emulator with AWS's documented sample
+events for each type above (`scripts/serverless/events/`), with 512 MB and a
+read-only root; AWS SAM CLI 1.170.0 `sam local invoke` (REST and HTTP API events)
+and `sam local start-api` with the zip as `CodeUri`; the size limits; cold starts.
+
+**Why a handler, not the Web Adapter layer.** Measured in the emulator on Linux
+x64 (Hono template, three cold starts each, 2026-10-24): the handler's init phase
+took 530–600 ms against 505–520 ms for the Lambda Web Adapter layer layout
+(adapter extension + `run.sh`), and a warm invocation 3.4 ms against 2.6 ms.
+The handler needs no layer, no environment variables and no extension, works on
+Lambda@Edge (which allows none of them) and ALB/CloudFront events, and keeps the
+zip self-contained. The Web Adapter remains the container-image route.
+
+## Container image
 
 A Lasm server runs on AWS Lambda as a **container image** built on Lambda's
 managed Node 24 image, behind the
@@ -15,7 +76,7 @@ through the image's built-in Runtime Interface Emulator with API Gateway HTTP AP
 ([`run-lambda.mjs`](../../scripts/platform/run-lambda.mjs), part of
 [DEPLOYMENT.md](../DEPLOYMENT.md)). It has not been deployed to AWS by Lasm's CI.
 
-## From a `lasm init` project
+### From a `lasm init` project
 
 `lasm init my-app --template hono --deploy lambda` (any server template) writes
 this file as `Dockerfile.lambda` next to the ordinary `Dockerfile`; build it with
@@ -53,7 +114,7 @@ in a directory that contains `dist/`.
 - **Timeout:** the first request after a cold start includes server start-up
   (under a second for the examples in CI); a 10 s timeout leaves headroom.
 
-## Try it locally (no AWS account)
+### Try it locally (no AWS account)
 
 ```sh
 docker build --platform linux/amd64 -t my-app .
@@ -68,7 +129,7 @@ curl -s -X POST http://localhost:9000/2015-03-31/functions/function/invocations 
 # {"statusCode":200,...,"body":"{\"ok\":true}",...}
 ```
 
-## Deploy
+### Deploy
 
 Push the image to Amazon ECR and create the function from it, for example:
 
@@ -83,4 +144,3 @@ aws lambda create-function --function-name my-app --package-type Image \
 aws lambda create-function-url-config --function-name my-app --auth-type AWS_IAM
 ```
 
-Lambda zip packages on `nodejs24.x` with the adapter layer are planned (Phase 6).

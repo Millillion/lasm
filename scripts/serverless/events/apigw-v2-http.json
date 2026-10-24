@@ -1,0 +1,37 @@
+{
+  "version": "2.0",
+  "routeKey": "$default",
+  "rawPath": "/my/path",
+  "rawQueryString": "parameter1=value1&parameter1=value2&parameter2=value",
+  "cookies": ["cookie1", "cookie2"],
+  "headers": {
+    "accept": "*/*",
+    "content-length": "0",
+    "host": "r3pmxmplak.execute-api.us-east-1.amazonaws.com",
+    "user-agent": "curl/8.5.0",
+    "x-amzn-trace-id": "Root=1-5e6722a7-cc56xmpl46db7ae02d4da47e",
+    "x-forwarded-for": "205.255.255.176",
+    "x-forwarded-port": "443",
+    "x-forwarded-proto": "https"
+  },
+  "queryStringParameters": { "parameter1": "value1,value2", "parameter2": "value" },
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "r3pmxmplak",
+    "domainName": "r3pmxmplak.execute-api.us-east-1.amazonaws.com",
+    "domainPrefix": "r3pmxmplak",
+    "http": {
+      "method": "GET",
+      "path": "/my/path",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "205.255.255.176",
+      "userAgent": "curl/8.5.0"
+    },
+    "requestId": "JKJaXmPLvHcESHA=",
+    "routeKey": "$default",
+    "stage": "$default",
+    "time": "10/Mar/2020:05:16:23 +0000",
+    "timeEpoch": 1583817383220
+  },
+  "isBase64Encoded": false
+}

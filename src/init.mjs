@@ -1,7 +1,7 @@
 // `lasm init`: scaffold a new Lean-on-Node project from a template.
 // Writes files only: no network access, no Lean toolchain, no npm install.
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { basename, join, relative, resolve } from 'node:path';
+import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -14,6 +14,18 @@ const npm = {
 };
 export const templateDependencies = npm;
 
+// `--deploy` targets. Function platforms run the server through `lasm package`
+// (src/package.mjs); azure and gcf also deploy the platform's npm package.
+export const deployTargets = {
+  lambda: { summary: 'AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)' },
+  'lambda-zip': { summary: 'AWS Lambda .zip for nodejs24.x (npm run package:lambda)', package: 'lambda' },
+  'lambda-edge': { summary: 'Lambda@Edge .zip for CloudFront origin requests (npm run package:lambda-edge)', package: 'lambda-edge' },
+  vercel: { summary: 'Vercel Function (vercel.json; Vercel runs the build)', package: 'vercel' },
+  netlify: { summary: 'Netlify Function (netlify.toml; Netlify runs the build)', package: 'netlify' },
+  azure: { summary: 'Azure Functions app (npm run package:azure)', package: 'azure', dependencies: { '@azure/functions': '4.17.0' } },
+  gcf: { summary: 'Google Cloud Functions gen2 (npm run package:gcf)', package: 'gcf', dependencies: { '@google-cloud/functions-framework': '5.0.5' } },
+};
+
 export const templates = {
   plain: { summary: 'a Lean program (IO only)', server: false, interop: false },
   express: { summary: 'Express 5 with Lean request handlers (Lasm.JS)', server: true, interop: true },
@@ -21,13 +33,14 @@ export const templates = {
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
 };
 
-export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}] [--deploy lambda]
+export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}] [--deploy TARGET]…
 
 Creates a Lean project for Lasm: lakefile, lean-toolchain, package.json,
 Main.lean, README.md, Dockerfile, .dockerignore and .gitignore.
 The directory must be new or empty. The default template is plain.
---deploy lambda also writes Dockerfile.lambda: an AWS Lambda container image
-(Lambda's Node 24 image behind the AWS Lambda Web Adapter; server templates).
+--deploy (server templates; repeatable) adds a deployment target's files and
+npm scripts:
+${Object.entries(deployTargets).map(([name, t]) => `  ${name.padEnd(12)} ${t.summary}`).join('\n')}
 
 Templates:
 ${Object.entries(templates).map(([name, t]) => `  ${name.padEnd(9)} ${t.summary}`).join('\n')}
@@ -49,7 +62,7 @@ export function parseInitArguments(tokens) {
     const deploy = /^--deploy(?:=(.*))?$/.exec(token);
     if (deploy) {
       const value = deploy[1] ?? tokens[++i];
-      if (value !== 'lambda') throw new Error('--deploy accepts lambda\n\n' + initUsage);
+      if (!deployTargets[value]) throw new Error(`--deploy accepts ${Object.keys(deployTargets).join(', ')}\n\n` + initUsage);
       if (!result.deploy.includes(value)) result.deploy.push(value);
       continue;
     }
@@ -59,8 +72,8 @@ export function parseInitArguments(tokens) {
   if (positional.length !== 1) throw new Error(initUsage);
   if (!templates[result.template])
     throw new Error(`Unknown template "${result.template}". Choose one of: ${Object.keys(templates).join(', ')}`);
-  if (result.deploy.includes('lambda') && !templates[result.template].server)
-    throw new Error(`--deploy lambda needs a server template (express, hono or std-http), not ${result.template}`);
+  if (result.deploy.length && !templates[result.template].server)
+    throw new Error(`--deploy ${result.deploy[0]} needs a server template (express, hono or std-http), not ${result.template}`);
   result.directory = positional[0];
   return result;
 }
@@ -102,7 +115,7 @@ root = "Main"
 `;
 }
 
-function packageJson(name, template) {
+function packageJson(name, template, deploy = []) {
   const lasm = lasmPackage();
   const pkg = {
     name, version: '0.1.0', private: true,
@@ -115,7 +128,12 @@ function packageJson(name, template) {
     },
     engines: { node: '>=24' },
   };
-  if (npm[template]) pkg.dependencies = npm[template];
+  for (const target of deploy) {
+    const { package: platform } = deployTargets[target];
+    if (platform) pkg.scripts[`package:${platform}`] = `lasm package --target ${platform}`;
+  }
+  const dependencies = Object.assign({}, npm[template], ...deploy.map(target => deployTargets[target].dependencies));
+  if (Object.keys(dependencies).length) pkg.dependencies = Object.fromEntries(Object.entries(dependencies).sort(([a], [b]) => a < b ? -1 : 1));
   pkg.devDependencies = { [lasm.name]: lasm.version };
   return JSON.stringify(pkg, null, 2) + '\n';
 }
@@ -180,6 +198,32 @@ const gitignore = `node_modules/
 dist/
 .lake/
 `;
+
+// Vercel and Netlify run `npm run build` on their build machines (Linux x64),
+// then `lasm package` writes the function exactly as tested in CI.
+const vercelJson = JSON.stringify({
+  $schema: 'https://openapi.vercel.sh/vercel.json',
+  framework: null,
+  installCommand: 'npm install',
+  buildCommand: 'npm run build && npm run package:vercel',
+}, null, 2) + '\n';
+
+const netlifyToml = `# Netlify runs the build, then lasm package writes a v2 function that serves
+# every path from the Lean server (netlify/functions/lasm).
+[build]
+  command = "npm run build && npm run package:netlify"
+  publish = "public"
+
+[functions]
+  directory = "netlify/functions"
+  # The function loads program.wasm, host/** and native pieces at run time.
+  included_files = ["netlify/functions/lasm/**"]
+`;
+
+function deployGitignore(deploy) {
+  const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/' };
+  return gitignore + deploy.map(target => extra[target]).filter(Boolean).map(line => line + '\n').join('');
+}
 
 const dockerignore = `node_modules
 dist
@@ -257,7 +301,7 @@ docker run --rm ${t.server ? '-p 8080:8080 ' : ''}${name}
 
 The image sets \`PORT=8080\`; platforms that assign a port override it.` : ''}
 
-${deploy.includes('lambda') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image behind the
+${deploy.filter(target => target !== 'lambda').map(target => deployReadme[target](name) + '\n').join('')}${deploy.includes('lambda') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image behind the
 AWS Lambda Web Adapter): \`docker build -f Dockerfile.lambda -t ${name}-lambda .\`; see the
 [Lambda guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md).
 
@@ -267,6 +311,34 @@ platform's architecture (\`docker build --platform linux/amd64\` for amd64-only
 platforms). Platform recipes: [Lasm deployment guides](https://github.com/Millillion/lasm/blob/main/docs/deploy/README.md).
 `;
 }
+
+const guide = page => `https://github.com/Millillion/lasm/blob/main/docs/deploy/${page}.md`;
+const deployReadme = {
+  'lambda-zip': () => `**AWS Lambda (.zip):** \`npm run build && npm run package:lambda\` writes \`lambda.zip\` for the
+\`nodejs24.x\` runtime with handler \`lasm-lambda.handler\` (x86_64 or arm64, 512 MB or more); see the
+[Lambda guide](${guide('lambda')}).
+`,
+  'lambda-edge': () => `**Lambda@Edge:** \`npm run build && npm run package:lambda-edge\` writes \`lambda-edge.zip\` (x86_64,
+handler \`lasm-lambda.handler\`) for a CloudFront origin-request trigger; see the
+[Lambda@Edge guide](${guide('lambda-edge')}).
+`,
+  vercel: () => `**Vercel:** \`vercel.json\` makes Vercel run \`npm run build && npm run package:vercel\`, which writes
+the function to \`.vercel/output\`; deploy with \`npx vercel deploy\` (or push to a connected Git
+repository). See the [Vercel guide](${guide('vercel')}).
+`,
+  netlify: () => `**Netlify:** \`netlify.toml\` makes Netlify run \`npm run build && npm run package:netlify\`, which
+writes the function to \`netlify/functions/lasm\`; deploy with \`npx netlify deploy --build\`.
+See the [Netlify guide](${guide('netlify')}).
+`,
+  azure: () => `**Azure Functions:** \`npm run build && npm run package:azure\` writes the function app to
+\`azure-functions/\`; test it with \`func start\` there and publish with
+\`func azure functionapp publish APP_NAME\`. See the [Azure guide](${guide('azure-functions')}).
+`,
+  gcf: () => `**Google Cloud Functions:** \`npm run build && npm run package:gcf\` writes \`gcf/\`; deploy with
+\`gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source gcf\`.
+See the [Cloud Functions guide](${guide('cloud-functions')}).
+`,
+};
 
 /** Creates the project; returns { directory, files }. */
 export function initProject({ directory, template, deploy = [] }) {
@@ -280,17 +352,22 @@ export function initProject({ directory, template, deploy = [] }) {
   const files = {
     'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
     'lakefile.toml': lakefile(name),
-    'package.json': packageJson(name, template),
+    'package.json': packageJson(name, template, deploy),
     'App.lean': readFileSync(join(templateRoot, 'common/App.lean'), 'utf8'),
     'Main.lean': readFileSync(join(templateRoot, template, 'Main.lean'), 'utf8'),
     'README.md': readme(name, template, deploy),
     'Dockerfile': dockerfile(template),
     '.dockerignore': dockerignore,
-    '.gitignore': gitignore,
+    '.gitignore': deployGitignore(deploy),
   };
   if (deploy.includes('lambda')) files['Dockerfile.lambda'] = lambdaDockerfile();
+  if (deploy.includes('vercel')) files['vercel.json'] = vercelJson;
+  if (deploy.includes('netlify')) { files['netlify.toml'] = netlifyToml; files['public/.gitkeep'] = ''; }
   mkdirSync(target, { recursive: true });
-  for (const [file, text] of Object.entries(files)) writeFileSync(join(target, file), text, { flag: 'wx' });
+  for (const [file, text] of Object.entries(files)) {
+    mkdirSync(dirname(join(target, file)), { recursive: true });
+    writeFileSync(join(target, file), text, { flag: 'wx' });
+  }
   return { directory: target, name, files: Object.keys(files) };
 }
 

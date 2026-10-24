@@ -1,0 +1,46 @@
+{
+  "resource": "/{proxy+}",
+  "path": "/my/path",
+  "httpMethod": "GET",
+  "headers": {
+    "Accept": "*/*",
+    "Host": "1234567890.execute-api.us-east-1.amazonaws.com",
+    "User-Agent": "curl/8.5.0",
+    "X-Amzn-Trace-Id": "Root=1-5e66d96f-7491f09xmpl79d18acf3d050",
+    "X-Forwarded-For": "52.255.255.12",
+    "X-Forwarded-Port": "443",
+    "X-Forwarded-Proto": "https"
+  },
+  "multiValueHeaders": {
+    "Accept": ["*/*"],
+    "Host": ["1234567890.execute-api.us-east-1.amazonaws.com"],
+    "User-Agent": ["curl/8.5.0"],
+    "X-Amzn-Trace-Id": ["Root=1-5e66d96f-7491f09xmpl79d18acf3d050"],
+    "X-Forwarded-For": ["52.255.255.12"],
+    "X-Forwarded-Port": ["443"],
+    "X-Forwarded-Proto": ["https"]
+  },
+  "queryStringParameters": { "parameter1": "value2", "parameter2": "value" },
+  "multiValueQueryStringParameters": { "parameter1": ["value1", "value2"], "parameter2": ["value"] },
+  "pathParameters": { "proxy": "my/path" },
+  "stageVariables": null,
+  "requestContext": {
+    "resourceId": "2gxmpl",
+    "resourcePath": "/{proxy+}",
+    "httpMethod": "GET",
+    "extendedRequestId": "JJbxmplHYosFVYQ=",
+    "requestTime": "10/Mar/2020:00:03:59 +0000",
+    "path": "/Prod/my/path",
+    "accountId": "123456789012",
+    "protocol": "HTTP/1.1",
+    "stage": "Prod",
+    "domainPrefix": "1234567890",
+    "requestTimeEpoch": 1583798639428,
+    "requestId": "77375676-xmpl-4b79-853a-f982474efe18",
+    "identity": { "sourceIp": "52.255.255.12", "userAgent": "curl/8.5.0" },
+    "domainName": "1234567890.execute-api.us-east-1.amazonaws.com",
+    "apiId": "1234567890"
+  },
+  "body": null,
+  "isBase64Encoded": false
+}

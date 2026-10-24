@@ -1,8 +1,10 @@
 import { parseInitArguments } from './init.mjs';
+import { parsePackageArguments } from './package.mjs';
 
 export const cliUsage = `Usage: lasm <Main.lean> [-- arguments…]
        lasm build <Main.lean> [--output dist]
-       lasm init <directory> [--template plain|express|hono|std-http]
+       lasm init <directory> [--template plain|express|hono|std-http] [--deploy …]
+       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
        lasm cache repair
 
@@ -13,6 +15,7 @@ Application arguments must follow --.`;
 export function parseLasmArguments(argv) {
   const tokens = [...argv];
   if (tokens[0] === 'init') return parseInitArguments(tokens.slice(1));
+  if (tokens[0] === 'package') return parsePackageArguments(tokens.slice(1));
   if (tokens[0] === 'cache') {
     if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
     if (tokens.length !== 2 || tokens[1] !== 'repair') throw new Error('Usage: lasm cache repair');

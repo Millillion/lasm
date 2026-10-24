@@ -35,7 +35,8 @@ Requirements on every platform:
 | Railway | [railway.md](railway.md) | Builds the Dockerfile; sets `PORT`. |
 | Render | [render.md](render.md) | Docker runtime; a plan with at least 512 MB. |
 | Heroku | [heroku.md](heroku.md) | Container stack (`heroku.yml`). |
-| AWS Lambda | [lambda.md](lambda.md) | Container image (`public.ecr.aws/lambda/nodejs:24`) behind the AWS Lambda Web Adapter; x86_64 and arm64. |
+| AWS Lambda | [lambda.md](lambda.md) | `.zip` for `nodejs24.x` (`lasm package --target lambda`, Phase 6 source) or a container image behind the AWS Lambda Web Adapter; x86_64 and arm64. |
+| Lambda@Edge | [lambda-edge.md](lambda-edge.md) | Phase 6 source. CloudFront origin-request trigger, x86_64, `lasm package --target lambda-edge`. |
 
 **What is tested.** Lasm's CI builds and runs every template's Dockerfile on
 Linux x64 and ARM64 with a 512 MB memory limit and a read-only root filesystem,

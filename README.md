@@ -121,7 +121,8 @@ These are all commands and options in the ordinary Node application interface:
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
-| New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono`; after publication also `npm create lasm@latest my-app -- --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
+| New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono`; after publication also `npm create lasm@latest my-app -- --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. Phase 6 source (branch `phase-6`, not yet in a candidate) adds `--deploy lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` (repeatable): `npm run package:<target>` scripts, `vercel.json`/`netlify.toml`, and the platform npm package for `azure` and `gcf`. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
+| Function package (Phase 6 source, not yet in a candidate) | `npx lasm package --target lambda` | Package a built server (default `dist/`; any server that listens on `$HOST:$PORT`) for a function platform: `lambda` (`lambda.zip`, handler `lasm-lambda.handler`, `nodejs24.x`), `lambda-edge` (`lambda-edge.zip`), `vercel` (`.vercel/output`), `netlify` (`netlify/functions/lasm`), `azure` (`azure-functions/`), `gcf` (`gcf/`). `--output PATH` chooses the output; `lasm package dist2 --target lambda` packages another build. Checks the platform's size limit. Files only, no network. [Recipes](docs/deploy/README.md). |
 | Cache repair (new source; absent from `.46`) | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
 `--rebuild` and `--verbose` work with both run and build. `--output` is build-only;
@@ -194,10 +195,12 @@ cloud account or deployment. Details, requirements and the full matrix:
 | Docker / Kubernetes | `node:24-bookworm-slim`, `node:26-bookworm-slim`, `node:24-bullseye-slim` (glibc 2.31), Ubuntu 22.04/24.04 with Node tarballs; read-only, 512 MB, x64 and arm64, with Docker (Kubernetes manifests are not applied in CI) |
 | Google Cloud Run, Fly.io, Railway, Render, Heroku | only the same container images and Dockerfiles (container recipes); the platforms themselves are never deployed to |
 | AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` + AWS Lambda Web Adapter through the Runtime Interface Emulator, x86_64 and arm64; `amazonlinux:2023` |
+| AWS Lambda (.zip, `nodejs24.x`; Phase 6 source, not yet in a candidate) | `lasm package --target lambda` zips of every server template in `public.ecr.aws/lambda/nodejs:24` through the Runtime Interface Emulator, x86_64 and arm64, with API Gateway REST/HTTP API, function URL and ALB sample events; AWS SAM CLI `sam local invoke` and `sam local start-api` |
+| Lambda@Edge (origin request, x86_64; Phase 6 source) | the same image and emulator with CloudFront origin-request sample events; CloudFront itself is not emulated |
 
 Every build carries the Linux x64 and arm64 native pieces, so `dist/` built on a
 Mac or Windows machine deploys to Linux containers. Not yet supported: Alpine/musl,
-Lambda zip packages, Vercel, Netlify, Azure Functions, Cloudflare Workers and
+Vercel, Netlify, Azure Functions, Google Cloud Functions, Cloudflare Workers and
 other isolate platforms ([plan](docs/PLAN.md)).
 
 ## Lean support and restrictions
