@@ -1,0 +1,79 @@
+name: Edge runtime (Phase 7)
+# Builds Lean's C++ runtime and Lasm's host bridge single-threaded for edge
+# isolates (scripts/full-lean/build-application-runtime.mjs --profile edge,
+# docs/EDGE.md), reusing the pinned Node runtime's verified standard-library
+# archives. Linux only, free runner, no publication: the result is a
+# short-lived workflow artifact. Runs on pushes to phase-7 that change the
+# edge runtime's inputs, or on demand.
+on:
+  workflow_dispatch:
+  push:
+    branches: [phase-7]
+    paths:
+      - '.github/workflows/edge-runtime.yml'
+      - 'scripts/full-lean/patches/lean-4.35.0-edge.patch'
+      - 'scripts/full-lean/build-application-runtime.mjs'
+      - 'scripts/full-lean/configure-host.mjs'
+      - 'runtime/edge.cpp'
+      - 'runtime/node-async.cpp'
+      - 'runtime/node.hpp'
+permissions:
+  contents: read
+concurrency:
+  group: edge-runtime-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  runtime:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/ci-application-tools
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      EMCC_CORES: '1'
+      CMAKE_BUILD_PARALLEL_LEVEL: '2'
+      MAKEFLAGS: '-j2'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Managed Lean
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/lean-resources.json -- node scripts/ci/application-runtime-source.mjs lean
+      - name: Managed SDK
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sdk-resources.json -- node scripts/ci/application-runtime-source.mjs sdk
+      - name: Pinned public sources
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+      - name: Fetch the pinned Node runtime (standard-library archives to reuse)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/ci-application-runtime/restore-resources.json -- node scripts/ci/restore-node-runtime.mjs
+      - name: Build the single-threaded C++ runtime and host bridge
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/edge-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/build-application-runtime.mjs --profile edge --lean-version "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" --managed-sdk --tool-cache .cache/ci-application-tools --output .work/edge-libraries --reuse-standard-libraries .work/node-runtime-restored/runtime --reuse-manifest-sha256 "$(node -p "require('./scripts/ci/node-runtime-source.json').runtimeManifestSha256")"
+      - name: Assemble the edge runtime libraries
+        run: |
+          set -e
+          mkdir -p .work/edge-runtime/lib
+          for name in leanrt leancpp lasmhost; do cp .work/edge-libraries/build/lib/lean/lib$name.a .work/edge-runtime/lib/; done
+          cp .work/edge-libraries/build-inputs.json .work/edge-runtime/
+          node -e "const f=require('node:fs'),c=require('node:crypto');const d='.work/edge-runtime/lib';const files=Object.fromEntries(f.readdirSync(d).sort().map(n=>[n,c.createHash('sha256').update(f.readFileSync(d+'/'+n)).digest('hex')]));f.writeFileSync('.work/edge-runtime/libraries.json',JSON.stringify({schema:1,profile:'edge',baseRuntimeManifestSha256:require('./scripts/ci/node-runtime-source.json').runtimeManifestSha256,source:process.env.GITHUB_SHA,files},null,2)+'\n');console.log(JSON.stringify(files,null,2))"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: edge-runtime-libraries
+          path: .work/edge-runtime
+          retention-days: 14
+      - name: Preserve bounded build results in logs
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');for(const d of ['.work/ci-application-runtime','.work/edge-libraries'])if(f.existsSync(d))for(const n of f.readdirSync(d).filter(n=>n.endsWith('.json')&&n!=='standard-library-audit.json'))if(f.statSync(d+'/'+n).isFile())console.log(d+'/'+n+'\n'+f.readFileSync(d+'/'+n,'utf8'))"
