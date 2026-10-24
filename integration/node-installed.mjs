@@ -70,6 +70,12 @@ const matchesCli = (actual, expected) => {
   assert.equal(actual.code, expected.code);
   assert.equal(actual.stdout, expected.stdout);
 };
+// Every deployment also carries the Linux x64 and arm64 native pieces beside
+// its build host's: since Phase 5.1 for glibc (koffi and helpers, about 2.5 MB),
+// since Phase 6 also for musl/Alpine (koffi's musl binaries and the static musl
+// helpers, about 5 MB more): 7.4 MB on Linux, 10.3 MB for hello built on macOS.
+const nativeBytes = 8 * 1024 ** 2;
+
 function size(directory) {
   return readdirSync(directory, { withFileTypes: true }).reduce((total, entry) => {
     const path = join(directory, entry.name);
@@ -136,9 +142,6 @@ async function deployment(name, output, file, cases, directory = project, lake =
     assert.deepEqual(actual, native);
     checks.push({ args, expected: native });
   }
-  // Since Phase 5.1 every deployment also carries the Linux x64 and arm64 native
-  // pieces (koffi and helpers, about 2.5 MB) beside its build host's.
-  const nativeBytes = 3 * 1024 ** 2;
   const bytes = size(output), budgetBytes = (['features', 'features-legacy', 'filesystem'].includes(name) ? 16 * 1024 ** 2 : 5 * 1024 ** 2) + nativeBytes;
   assert.ok(bytes < budgetBytes, `${name}: deployment size regression (${bytes} bytes)`);
   assert.equal(buildInfo(output).linkRequirements.mode, mode);
@@ -232,7 +235,7 @@ try {
     assert.ok(existsSync(join(interopOutput, 'node_modules/local-lib/index.js')), 'The deployment includes npm dependencies');
     assert.deepEqual(run('plain Node: js-interop', process.execPath, [join(interopOutput, 'main.mjs')], interop), expectedInterop);
     result.deployments.push({ name: 'js-interop', output: interopOutput, source: join(interop, 'Main.lean'), build: buildInfo(interopOutput),
-      bytes: size(interopOutput), budgetBytes: 8 * 1024 ** 2 + 3 * 1024 ** 2, relocate: false, checks: [{ args: [], expected: expectedInterop }] }); save();
+      bytes: size(interopOutput), budgetBytes: 8 * 1024 ** 2 + nativeBytes, relocate: false, checks: [{ args: [], expected: expectedInterop }] }); save();
     // A binding to a missing export stops the build and names it.
     writeFileSync(join(interop, 'Broken.lean'), 'import Lasm.JS\nopen Lasm.JS\n@[js "local-lib" "nope"] opaque nope : IO Unit\ndef main : IO Unit := nope\n');
     const broken = npx('Lasm.JS binding check', ['build', 'Broken.lean', '--output', 'broken dist'], interop);

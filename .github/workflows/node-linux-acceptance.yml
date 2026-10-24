@@ -2,7 +2,7 @@ name: Native Node installed-package acceptance
 on:
   push:
     branches: [main]
-    paths: ['src/**', 'bin/**', 'library/**', 'package*.json', 'scripts/package-node-release.mjs', 'scripts/bundle-installer.mjs', 'scripts/candidate-readme.mjs']
+    paths: ['src/**', 'bin/**', 'library/**', 'package*.json', 'scripts/package-node-release.mjs', 'scripts/bundle-installer.mjs', 'scripts/candidate-readme.mjs', 'integration/node-installed.mjs']
   workflow_dispatch:
     inputs:
       candidate-version:
