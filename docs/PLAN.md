@@ -755,6 +755,14 @@ folded into Phases 5.2/5.3 and 7.
   an edge *host* target, tested locally with the Deno CLI and
   `supabase functions serve` (Docker); the Node build stays Node-only. The edge
   build ships as a separate target (`--target workers`, etc.) beside Node.
+  **7.5 Bun and Deno, end to end (user decision 2026-10-24, option B):** the
+  compiler runs under Bun and Deno on all five targets (`bunx`/`deno run
+  npm:@lasm/cli`, `bun install`/`deno install`, `bun create lasm`); on-demand
+  tool packages download straight from the registry when no `npm` exists, with
+  the same checksums; `lasm init` templates get Bun and Deno scripts; built apps
+  run on Bun and Deno with the portable (edge) profile; all tested in CI. The
+  full profile (threads, files, koffi, wasm64) stays Node-only. 7.1's JSPI vs
+  Asyncify choice must keep Bun working (verify Bun's JSPI support).
 - **Phase 7 — Production hardening on Node.** Long soak and concurrency stress
   (tasks, channels, Std.Sync/Std.Async, cancellation, many threads incl.
   Windows stack commit), startup memory tuning (initial memory, 64 MiB worker
