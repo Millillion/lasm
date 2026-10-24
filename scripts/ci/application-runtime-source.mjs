@@ -17,7 +17,7 @@ import { buildApplication } from '../../src/application-build.mjs';
 await ensureResourceGuard();
 assert.equal(process.platform + '-' + process.arch, 'linux-x64');
 const phase = process.argv[2];
-assert.ok(['lean', 'sdk', 'sources', 'gmp', 'hosts', 'smoke'].includes(phase));
+assert.ok(['lean', 'sdk', 'sources', 'hosts', 'smoke'].includes(phase));
 const output = resolve('.work/ci-application-runtime');
 const cache = resolve('.cache/ci-application-tools');
 const sourceBuild = resolve('.work/ci-application-libraries');
@@ -51,8 +51,6 @@ try {
     const inputs = [
       { name: `lean4-v${version}.tar.gz`, url: sourceRelease.url,
         bytes: sourceRelease.bytes, sha256: sourceRelease.sha256 },
-      { name: 'gmp-6.3.0.tar.xz', url: 'https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz', bytes: 2094196,
-        sha256: 'a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898', directory: 'gmp-6.3.0' },
       { name: 'zig-x86_64-linux-0.16.0.tar.xz', url: zig.url, bytes: zig.compressedBytes,
         sha256: zig.officialSha256, directory: 'zig-x86_64-linux-0.16.0' },
     ];
@@ -80,20 +78,6 @@ try {
       }
     }
     result.inputs = inputs;
-  } else if (phase === 'gmp') {
-    const sdk = await maintainerSdk({ managed: true, cache });
-    const build = join(output, 'gmp-build'), prefix = resolve('.cache/gmp-wasm64');
-    assert.ok(!existsSync(build) && !existsSync(prefix)); mkdirSync(build);
-    const flags = '-O2 -sMEMORY64=2 -pthread';
-    const env = { ...sdk.env, CFLAGS: flags, CXXFLAGS: flags, MAKEFLAGS: '-j1' };
-    run(sdk.tool('emconfigure'), [resolve('.cache/gmp-6.3.0/configure'), '--host=none',
-      '--disable-assembly', '--disable-shared', '--enable-cxx', '--prefix=' + prefix], { cwd: build, env });
-    run(sdk.tool('emmake'), ['make', '-j1'], { cwd: build, env });
-    run(sdk.tool('emmake'), ['make', '-j1', 'install'], { cwd: build, env });
-    result.gmp = { flags, archiveSha256: await hashFile(join(prefix, 'lib/libgmp.a')), sdkIdentity: sdk.identity };
-    const verified = await maintainerSdk({ managed: true, cache });
-    assert.equal(verified.identity, sdk.identity); assert.equal(verified.driverIdentity, sdk.driverIdentity);
-    result.gmp.toolTreesUnchanged = true;
   } else if (phase === 'hosts') {
     run(process.execPath, ['scripts/prepare-native.mjs']);
     result.manifests = Object.fromEntries(await Promise.all(['manifest.json', 'process/manifest.json', 'signals/manifest.json']
@@ -111,7 +95,16 @@ try {
     const project = join(output, 'smoke source'), deployed = join(output, 'relocated smoke deployment');
     mkdirSync(project); writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
     const file = join(project, 'Main.lean');
-    writeFileSync(file, 'def main : IO Unit := do\n  IO.FS.writeFile "value.txt" "ordinary Lean IO\\n"\n  IO.print (← IO.FS.readFile "value.txt")\n  IO.println ((2 : Nat)^130 + 17)\n');
+    // The runtime uses Lean's own big-number code (USE_GMP=OFF; native Lean uses
+    // GMP): a few multi-limb operations must print exactly what native Lean prints.
+    writeFileSync(file, ['def main : IO Unit := do', '  IO.FS.writeFile "value.txt" "ordinary Lean IO\\n"',
+      '  IO.print (← IO.FS.readFile "value.txt")', '  IO.println ((2 : Nat)^130 + 17)',
+      '  let a : Nat := 3^400 + 12345', '  let b : Nat := 7^150 + 1',
+      '  IO.println (a * b, a / b, a % b, Nat.gcd a b, a >>> 77, a &&& b, a ^^^ b)',
+      '  let i : Int := -(5 : Int)^120 - 3',
+      '  IO.println (i / 1000000007, i % 1000000007, Int.tdiv i (2^70), Int.fmod i (2^70), i.toNat, (-i).toNat)',
+      '  IO.println (((2 : Nat)^64 - 1).toUInt64, ((2 : Nat)^64 + 5).toUInt64, (10 : Nat)^30 |>.toFloat, (1e30 : Float).toUInt64)',
+      '  IO.println ((10 : Nat)^2000 / (3^1000 + 1) |> toString |>.length)', ''].join('\n'));
     const built = await buildApplication(file, { target: 'node', output: deployed, cache, runtimeDirectory: target });
     const lean = await provisionLean(project, { cache });
     const native = spawnSync(lean.lean, ['--run', file], { cwd: project, encoding: 'utf8', timeout: 60_000 });

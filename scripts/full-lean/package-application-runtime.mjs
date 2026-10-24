@@ -42,7 +42,11 @@ if (input.patches?.['wasm-build']) {
    (SHA-256 ${input.patches['wasm-build']}). Original: https://github.com/leanprover/lean4/blob/${input.leanCommit}/src/include/lean/lean.h */\n`
     + readFileSync(header, 'utf8'));
 }
-const libraries = [...groups, 'leancpp', 'leanrt', 'lasmhost', 'gmp'];
+// Decision 5: the runtime is built with USE_GMP=OFF (build-application-runtime.mjs);
+// refuse an older build directory that still links GNU MP.
+assert.equal(input.bignum, 'lean', 'Package only a runtime built without GMP (USE_GMP=OFF)');
+assert.ok(!existsSync(join(build, 'lib/lean/libgmp.a')), 'The runtime build must not contain libgmp.a');
+const libraries = [...groups, 'leancpp', 'leanrt', 'lasmhost'];
 for (const library of libraries) copyFileSync(join(build, `lib/lean/lib${library}.a`), join(target, `lib/lib${library}.a`));
 copyFileSync(join(build, 'libuv/src/libuv/libuv.a'), join(target, 'lib/libuv.a'));
 const exportsFile = join(target, 'exports.json'), registry = join(work, 'lean-symbols.c');
@@ -71,8 +75,6 @@ const notices = [
   ['musl', join(sdk.driver, 'system/lib/libc/musl/COPYRIGHT')],
   ['mimalloc', join(sdk.driver, 'system/lib/mimalloc/LICENSE')],
   ['libuv', join(build, 'libuv/src/libuv/LICENSE')],
-  ['GMP LGPLv3', join(root, '.cache/gmp-6.3.0/COPYING.LESSERv3')],
-  ['GMP GPLv3', join(root, '.cache/gmp-6.3.0/COPYINGv3')],
 ];
 writeFileSync(join(target, 'THIRD_PARTY_NOTICES.txt'), notices.map(([label, path]) =>
   `=== ${label} ===\n${readFileSync(path, 'utf8')}\n`).join('\n'));
@@ -89,9 +91,13 @@ async function inventory(directory) {
 }
 await inventory(target);
 const manifest = { schema: 1, name, lean: input.lean, leanCommit: input.leanCommit,
-  emscripten: input.emscripten, memoryLayout: 'wasm64', threading: 'pthreads', allocator: 'mimalloc',
+  emscripten: input.emscripten, bignum: input.bignum, memoryLayout: 'wasm64', threading: 'pthreads', allocator: 'mimalloc',
   sourceArchiveSha256: input.sourceArchiveSha256, patches: input.patches,
-  standardModules: audit.modules.length, standardLibraryAuditSha256: await hashFile(join(runtime, 'standard-library-audit.json')),
+  // A runtime-only rebuild (build-application-runtime.mjs --reuse-standard-libraries)
+  // carries the reused archives' module count and names the bundle they came from.
+  standardModules: audit.reusedStandardLibraries?.standardModules ?? audit.modules.length,
+  ...(audit.reusedStandardLibraries ? { standardLibrariesFrom: audit.reusedStandardLibraries.bundleManifestSha256 } : {}),
+  standardLibraryAuditSha256: await hashFile(join(runtime, 'standard-library-audit.json')),
   applicationSymbolHook: 'lasm_lookup_application_symbol',
   libraries: [...libraries, 'uv', 'lasmsymbols'].map(name => `lib/lib${name}.a`), files };
 writeFileSync(join(target, 'target.json'), JSON.stringify(manifest, null, 2) + '\n');

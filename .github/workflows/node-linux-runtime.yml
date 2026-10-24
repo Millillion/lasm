@@ -1,6 +1,11 @@
 name: Node Linux runtime inputs
 on:
   workflow_dispatch:
+    inputs:
+      reuse-standard-libraries:
+        description: Rebuild only the C++ runtime and host bridge; reuse the pinned runtime's verified standard-library archives (scripts/ci/node-runtime-source.json)
+        type: boolean
+        default: false
 permissions:
   contents: write
   actions: write
@@ -53,16 +58,28 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sdk-resources.json -- node scripts/ci/application-runtime-source.mjs sdk
       - name: Download and verify pinned public sources
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
-      - name: Build the pinned GMP dependency
-        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/gmp-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/ci/application-runtime-source.mjs gmp
       - name: Build host support from pinned inputs
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
       - name: Build runtime and Init Std application archives
+        if: ${{ !inputs.reuse-standard-libraries }}
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/init-std-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/with-cache-advice.mjs --cache .cache/ci-application-tools --report .work/ci-application-runtime/init-std-advice.json --runtime-build .work/ci-application-libraries -- node scripts/full-lean/build-application-runtime.mjs --lean-version "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" --archive-generated-c --managed-sdk --tool-cache .cache/ci-application-tools --output .work/ci-application-libraries --libraries Init,Std
       - name: Build Lean application archives
+        if: ${{ !inputs.reuse-standard-libraries }}
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/lean-library-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/with-cache-advice.mjs --cache .cache/ci-application-tools --report .work/ci-application-runtime/lean-library-advice.json --runtime-build .work/ci-application-libraries -- node scripts/full-lean/build-application-runtime.mjs --lean-version "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" --archive-generated-c --managed-sdk --tool-cache .cache/ci-application-tools --output .work/ci-application-libraries --libraries Lean
       - name: Build Lake and verify all cached modules
+        if: ${{ !inputs.reuse-standard-libraries }}
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/all-libraries-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/with-cache-advice.mjs --cache .cache/ci-application-tools --report .work/ci-application-runtime/all-libraries-advice.json --runtime-build .work/ci-application-libraries -- node scripts/full-lean/build-application-runtime.mjs --lean-version "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" --archive-generated-c --managed-sdk --tool-cache .cache/ci-application-tools --output .work/ci-application-libraries
+      - name: Fetch the pinned runtime whose standard-library archives are reused
+        if: ${{ inputs.reuse-standard-libraries }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        if: ${{ inputs.reuse-standard-libraries }}
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/ci-application-runtime/restore-resources.json -- node scripts/ci/restore-node-runtime.mjs
+      - name: Build the C++ runtime and reuse the verified standard-library archives
+        if: ${{ inputs.reuse-standard-libraries }}
+        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/reuse-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/with-cache-advice.mjs --cache .cache/ci-application-tools --report .work/ci-application-runtime/reuse-advice.json --runtime-build .work/ci-application-libraries -- node scripts/full-lean/build-application-runtime.mjs --lean-version "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" --archive-generated-c --managed-sdk --tool-cache .cache/ci-application-tools --output .work/ci-application-libraries --reuse-standard-libraries .work/node-runtime-restored/runtime --reuse-manifest-sha256 "$(node -p "require('./scripts/ci/node-runtime-source.json').runtimeManifestSha256")"
       - name: Assemble the verified application runtime
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/bundle-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/with-cache-advice.mjs --cache .cache/ci-application-tools --report .work/ci-application-runtime/bundle-advice.json --runtime-build .work/ci-application-libraries -- node scripts/full-lean/package-application-runtime.mjs .work/ci-application-libraries .work/ci-application-bundle
       - name: Compare relocated compiled Node output with native Lean

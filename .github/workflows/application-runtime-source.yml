@@ -47,8 +47,6 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sdk-resources.json -- node scripts/ci/application-runtime-source.mjs sdk
       - name: Download and verify pinned public sources
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
-      - name: Build the pinned GMP dependency
-        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/gmp-resources.json -- python3 scripts/full-lean/base-pages.py node scripts/ci/application-runtime-source.mjs gmp
       - name: Build host support from pinned inputs
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
       - name: Build runtime and Init Std application archives

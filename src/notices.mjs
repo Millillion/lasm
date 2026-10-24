@@ -38,9 +38,30 @@ export const leanRuntimeChanges = Object.freeze({
   'nonlinear-environment': ['src/runtime/object.cpp', 'read LEAN_ABORT_ON_NONLINEAR from the host'],
 });
 
+// Runtimes up to 7aa5028c… statically linked GNU MP. Runtimes built with
+// USE_GMP=OFF (decision 5, docs/PLAN.md) use Lean's own big-number code and list
+// no lib/libgmp.a, so their applications carry no GNU MP notice.
+const gmpComponent = `  - GNU MP 6.3.0 (LGPL-3.0-or-later OR GPL-2.0-or-later; see "GNU MP" below);
+`;
+const gmpNotice = `=== GNU MP ===
+program.wasm statically links the GNU Multiple Precision Arithmetic Library
+(GNU MP) 6.3.0, unmodified, which is free software licensed under the GNU Lesser
+General Public License version 3 or later (or the GNU General Public License
+version 2 or later); both texts follow ("GMP LGPLv3", "GMP GPLv3"). Source:
+https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz (SHA-256
+a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898), built by
+Lasm's scripts/ci/application-runtime-source.mjs at the runtime's source
+revision (emconfigure --host=none --disable-assembly --disable-shared
+--enable-cxx, -O2 -sMEMORY64=2 -pthread).
+Whoever distributes this application must meet the LGPL's terms for combined
+works, including letting recipients relink it with a modified GNU MP.
+
+`;
+export const runtimeLinksGmp = manifest => (manifest.libraries ?? []).some(name => /(?:^|\/)libgmp\.a$/.test(name));
+
 /** The notices Lasm adds before a runtime bundle's THIRD_PARTY_NOTICES.txt. */
 export function applicationNotices(manifest, runtimeNotices, { cli = false } = {}) {
-  const lean = manifest.lean, commit = manifest.leanCommit;
+  const lean = manifest.lean, commit = manifest.leanCommit, gmp = runtimeLinksGmp(manifest);
   const changes = Object.keys(manifest.patches ?? {}).map(name => {
     const change = leanRuntimeChanges[name];
     return change ? `  - ${name}: ${change.slice(0, -1).join('; ')} (${change.at(-1)})` : `  - ${name}`;
@@ -59,8 +80,7 @@ ${subject}
     (Apache-2.0 WITH LLVM-exception), mimalloc (MIT), with Lasm's recorded
     repairs to a few Emscripten files (src/sdk-repairs.json in Lasm);
   - libuv 1.48.0 (MIT; parts ISC and BSD-2-Clause, see "libuv LICENSE-extra");
-  - GNU MP 6.3.0 (LGPL-3.0-or-later OR GPL-2.0-or-later; see "GNU MP" below);
-  - Lasm's runtime glue (MIT, "Lasm" below).
+${gmp ? gmpComponent : ''}  - Lasm's runtime glue (MIT, "Lasm" below).
 host/ is Lasm's Node host (MIT) with koffi (MIT, host/native/node_modules/koffi)
 and, on Linux and macOS, small Lasm helpers that statically link musl and Zig's
 compiler runtime (MIT; host/native/*/THIRD_PARTY_NOTICES.txt). node_modules/, when
@@ -80,19 +100,7 @@ Lasm's host bridge replaces them. The SHA-256 of every applied patch is in the
 runtime's target.json ("patches"):
 ${changes}
 
-=== GNU MP ===
-program.wasm statically links the GNU Multiple Precision Arithmetic Library
-(GNU MP) 6.3.0, unmodified, which is free software licensed under the GNU Lesser
-General Public License version 3 or later (or the GNU General Public License
-version 2 or later); both texts follow ("GMP LGPLv3", "GMP GPLv3"). Source:
-https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz (SHA-256
-a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898), built by
-Lasm's scripts/ci/application-runtime-source.mjs (emconfigure --host=none
---disable-assembly --disable-shared --enable-cxx, -O2 -sMEMORY64=2 -pthread).
-Whoever distributes this application must meet the LGPL's terms for combined
-works, including letting recipients relink it with a modified GNU MP.
-
-=== LLVM compiler-rt ===
+${gmp ? gmpNotice : ''}=== LLVM compiler-rt ===
 ${noticeText('compiler-rt-LICENSE.TXT')}
 === LLVM libunwind ===
 ${noticeText('libunwind-LICENSE.TXT')}

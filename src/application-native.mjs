@@ -157,6 +157,7 @@ const knownLibraries = [
   [/^(?:blas|cblas|openblas|lapack)$/, 'BLAS/LAPACK', 'No Wasm BLAS is provided.'],
   [/^(?:sqlite3)$/, 'system SQLite', 'Use leansqlite, which bundles SQLite as C source.'],
   [/^(?:z|zlib)$/, 'zlib', 'Use lean-zip (pure Lean) or Node\'s zlib.'],
+  [/^(?:gmp|libgmp)$/, 'GNU MP', "Lasm's runtime uses Lean's own big-number code (no GMP); use Lean's Nat and Int."],
 ];
 /** A readable description of a prebuilt library that cannot be linked. */
 export function describeLibrary(name) {
@@ -218,7 +219,11 @@ export function planNativeInputs(info, { leanPrefix, runtimeInclude }) {
 // Undefined-symbol prefixes of common prebuilt libraries, for link failures.
 const symbolLibraries = [[/^curl_/, 'curl'], [/^(?:SSL_|SSL_CTX_|EVP_|OPENSSL_|BIO_|X509_|CRYPTO_|RAND_bytes|ERR_get_error)/, 'ssl'],
   [/^PQ/, 'pq'], [/^redis/, 'hiredis'], [/^(?:cblas_|dgemm_|sgemm_|LAPACKE_)/, 'blas'], [/^sqlite3_/, 'sqlite3'],
-  [/^(?:deflate|inflate|compress2?|uncompress)(?:Init|End|$)/, 'z']];
+  [/^(?:deflate|inflate|compress2?|uncompress)(?:Init|End|$)/, 'z'],
+  // Lasm's runtime uses Lean's own big-number code (USE_GMP=OFF, docs/PLAN.md
+  // decision 5): GMP's API and Lean's GMP-only lean_alloc_mpz/lean_extract_mpz_value
+  // are not available to native code.
+  [/^(?:__gmp[zqnf]?_|lean_alloc_mpz$|lean_extract_mpz_value$)/, 'gmp']];
 /** Undefined symbols reported by a failed link. */
 export const undefinedSymbols = output => [...new Set([...String(output).matchAll(/undefined symbol: ([A-Za-z_][A-Za-z0-9_]*)/g)].map(match => match[1]))];
 

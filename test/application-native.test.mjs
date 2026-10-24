@@ -58,6 +58,9 @@ test('prebuilt libraries are unavailable, and named when the program needs them'
   assert.deepEqual(describeLibrary('libssl.so.3').label, 'OpenSSL');
   assert.deepEqual(librariesForUndefinedSymbols('error: undefined symbol: redisConnect\nerror: undefined symbol: cblas_dgemm\nundefined symbol: lean_foo'),
     [{ library: 'hiredis', symbol: 'redisConnect' }, { library: 'blas', symbol: 'cblas_dgemm' }]);
+  // The runtime has no GMP (decision 5): native code calling GMP or Lean's GMP-only API is named.
+  assert.deepEqual(librariesForUndefinedSymbols('undefined symbol: __gmpz_mul\nundefined symbol: lean_alloc_mpz'),
+    [{ library: 'gmp', symbol: '__gmpz_mul' }]);
 });
 
 test('headers of another Lean installation named in a reused build record are never used for Wasm', () => {

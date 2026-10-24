@@ -13,6 +13,7 @@ import { ensureResourceGuard } from './resource-guard.mjs';
 import { maintainerSdk } from './maintainer-sdk.mjs';
 import { provisionLean, toolchainCatalog } from '../../src/managed-lean.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
+import { verifyApplicationRuntime } from '../../src/application-runtime.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../..', import.meta.url));
@@ -35,6 +36,19 @@ const archive = resolve(option('--source-archive', `.cache/downloads/lean4-v${ve
 // their own `main`, not application libraries.
 const libraryGroups = Number(version.split('.')[1]) >= 35 ? ['Init', 'Std', 'Lean', 'LeanExport', 'Lake'] : ['Init', 'Std', 'Lean', 'Lake'];
 const groups = option('--libraries', libraryGroups.join(',')).split(',');
+// --reuse-standard-libraries BUNDLE --reuse-manifest-sha256 SHA: take the compiled
+// standard-library archives (Init, Std, Lean, LeanExport, Lake) from a verified
+// earlier runtime bundle and rebuild only Lean's C++ runtime (leanrt, leancpp) and
+// Lasm's host bridge. Valid only when the archives' inputs are unchanged: the same
+// Lean source, native Lean, patches and Emscripten, byte-identical headers, and the
+// fixed compileFlags below. Generated C never depends on USE_GMP (it includes only
+// lean/lean.h, which has no LEAN_USE_GMP conditional, and the stdlib compile flags
+// do not define it). A deterministic sample of modules is regenerated and
+// recompiled; each object must be byte-identical to a member of the reused archive.
+const reuseBundle = option('--reuse-standard-libraries');
+const reuseManifest = option('--reuse-manifest-sha256');
+if (!!reuseBundle !== !!reuseManifest) throw new Error('Reuse needs both --reuse-standard-libraries and --reuse-manifest-sha256');
+if (reuseBundle && groups.join(',') !== libraryGroups.join(',')) throw new Error('Reuse covers every standard library');
 if (!groups.length || groups.some(group => !libraryGroups.includes(group))) throw new Error('Invalid library selection');
 const sourceHash = release.sha256;
 const expectedCommit = release.commit;
@@ -99,12 +113,14 @@ for (const { name, file } of patchInputs) {
 const sdkPatch = sdk.patchSha256;
 copyFileSync(join(root, 'scripts/full-lean/emscripten-pre.js'), join(source, 'src/lasm-emscripten-pre.js'));
 run(process.execPath, [join(root, 'scripts/full-lean/configure-host.mjs'), join(source, 'src')]);
-const gmp = resolve('.cache/gmp-wasm64');
-const gmpHash = await hashFile(join(gmp, 'lib/libgmp.a'));
+// Decision 5 (docs/PLAN.md): no GNU MP in applications. USE_GMP=OFF selects Lean's
+// own big-number code (src/runtime/mpn.cpp, mpz.cpp), so the runtime links no
+// copyleft library. Its .olean flag differs from the official native Lean's, which
+// matters only for module data, which Lasm applications never load (policy).
 run(sdk.tool('emcmake'), ['cmake', '-S', join(source, 'src'), '-B', build,
   '-G', 'Unix Makefiles', '-DSTAGE=1', `-DPREV_STAGE=${native.prefix}`, '-DCMAKE_BUILD_TYPE=Release',
   '-DLEAN_PLATFORM_TARGET=wasm64-unknown-emscripten', '-DUSE_LAKE=OFF', '-DMMAP=OFF',
-  '-DUSE_GMP=ON', `-DGMP_INSTALL_PREFIX=${gmp}`, '-DUSE_MIMALLOC=ON', '-DLASM_SDK_MIMALLOC=ON',
+  '-DUSE_GMP=OFF', '-DUSE_MIMALLOC=ON', '-DLASM_SDK_MIMALLOC=ON',
   `-DLASM_MIMALLOC_INCLUDE=${join(sdk.driver, 'system/lib/mimalloc/include')}`,
   '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG', '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',
   '-DCMAKE_C_FLAGS=-sMEMORY64=1', '-DLASM_MEMORY64=1', '-DLASM_HOST_BRIDGE=ON',
@@ -112,14 +128,13 @@ run(sdk.tool('emcmake'), ['cmake', '-S', join(source, 'src'), '-B', build,
 ]);
 const provenance = { schema: 1, lean: version, leanCommit: expectedCommit, sourceArchiveSha256: sourceHash,
   nativeArtifactIdentity: native.identity, patches, sdkPatchSha256: sdkPatch, emscripten: '6.0.9',
-  gmpSha256: gmpHash, memoryLayout: 'wasm64', threading: 'pthreads', allocator: 'mimalloc',
+  bignum: 'lean', memoryLayout: 'wasm64', threading: 'pthreads', allocator: 'mimalloc',
   purpose: 'AOT application libraries; no Wasm compiler executable', sdk: sdk.directory,
   ...(sdk.mode === 'managed' ? { sdkMode: sdk.mode, sdkIdentity: sdk.identity,
     sdkDriverIdentity: sdk.driverIdentity, sdkToolCache: sdk.toolCache } : {}), nativePrefix: native.prefix,
   source, build, resourceReport: process.env.LASM_RESOURCE_REPORT };
 writeFileSync(join(output, 'build-inputs.json'), JSON.stringify(provenance, null, 2) + '\n');
 run('cmake', ['--build', build, '--target', 'leanrt', 'leancpp', 'lasmhost', '-j1']);
-copyFileSync(join(gmp, 'lib/libgmp.a'), join(build, 'lib/lean/libgmp.a'));
 
 const headers = readdirSync(join(build, 'include/lean')).filter(name => name.endsWith('.h')).sort()
   .map(name => [name, hash(readFileSync(join(build, 'include/lean', name)))]);
@@ -147,7 +162,65 @@ function keepDiskReserve() {
 const files = directory => readdirSync(directory, { withFileTypes: true }).flatMap(entry => entry.isDirectory()
   ? files(join(directory, entry.name)) : [join(directory, entry.name)]);
 const audit = [];
-for (const group of groups) {
+let reused;
+if (reuseBundle) {
+  const name = `lean-${version}-wasm64`, bundle = resolve(reuseBundle);
+  const { manifest } = await verifyApplicationRuntime(bundle, { name, manifestSha256: reuseManifest });
+  for (const key of ['lean', 'leanCommit', 'sourceArchiveSha256', 'emscripten', 'memoryLayout', 'threading', 'allocator'])
+    if (manifest[key] !== provenance[key]) throw new Error(`Reused runtime differs in ${key}`);
+  if (JSON.stringify(manifest.patches) !== JSON.stringify(patches)) throw new Error('Reused runtime has other Lean patches');
+  // Headers: the packager prepends one comment to lean.h; every byte after it must match.
+  const shipped = readdirSync(join(bundle, 'include/lean')).filter(name => name.endsWith('.h')).sort();
+  if (JSON.stringify(shipped) !== JSON.stringify(headers.map(([name]) => name))) throw new Error('Reused runtime has other headers');
+  for (const [header, digest] of headers) {
+    let text = readFileSync(join(bundle, 'include/lean', header));
+    if (header === 'lean.h' && text.subarray(0, 23).toString() === '/* Modified by Lasm (ht') text = text.subarray(text.indexOf('*/\n') + 3);
+    if (hash(text) !== digest) throw new Error(`Reused runtime header differs: ${header}`);
+  }
+  const archives = {};
+  for (const group of groups) {
+    const library = join(build, `lib/lean/lib${group}.a`);
+    copyFileSync(join(bundle, `lib/lib${group}.a`), library + '.partial'); renameSync(library + '.partial', library);
+    archives[group] = await hashFile(library);
+    if (archives[group] !== manifest.files[`lib/lib${group}.a`].sha256) throw new Error(`Reused archive changed: ${group}`);
+  }
+  // A GNU/LLVM ar archive: the SHA-256 of every member's bytes.
+  const members = file => {
+    const bytes = readFileSync(file), found = new Set();
+    if (bytes.subarray(0, 8).toString() !== '!<arch>\n') throw new Error('Unrecognized archive');
+    for (let at = 8; at + 60 <= bytes.length;) {
+      const size = Number(bytes.subarray(at + 48, at + 58).toString().trim()), member = bytes.subarray(at, at + 16).toString().trim();
+      if (!(size >= 0) || bytes.subarray(at + 58, at + 60).toString() !== '`\n') throw new Error('Unrecognized archive member');
+      if (member !== '/' && member !== '//' && member !== '/SYM64/') found.add(hash(bytes.subarray(at + 60, at + 60 + size)));
+      at += 60 + size + (size % 2);
+    }
+    return found;
+  };
+  const sampled = [];
+  for (const group of groups) {
+    const moduleRoot = join(native.prefix, 'src/lean', ...(group === 'Lake' ? ['lake'] : []));
+    const sources = [...files(join(moduleRoot, group)).filter(file => file.endsWith('.lean')), join(moduleRoot, group + '.lean')].sort();
+    const available = members(join(build, `lib/lean/lib${group}.a`));
+    // Every 97th module of each library plus its root module and the Nat/Int modules.
+    const chosen = sources.filter((file, index) => index % 97 === 0 || file === join(moduleRoot, group + '.lean')
+      || /(?:^|\/)(?:Nat|Int)(?:\/Basic|\/Bitwise|\/Div|\/Gcd|\/Repr)?\.lean$/.test(relative(moduleRoot, file)));
+    for (const file of chosen) {
+      // The same paths as a full build, in case a tool records them.
+      const name = relative(moduleRoot, file).slice(0, -5), base = join(generated, name);
+      mkdirSync(dirname(base), { recursive: true });
+      run(native.lean, ['-j2', '-s8192', '-R', moduleRoot, '-Dcompiler.postponeCompile=false', '-c', base + '.c', file]);
+      run(compiler, [...compileFlags, '-c', base + '.c', '-o', base + '.o']);
+      const objectSha256 = await hashFile(base + '.o');
+      if (!available.has(objectSha256)) throw new Error(`Recompiled ${name} differs from the reused ${group} archive`);
+      sampled.push({ module: name, cSha256: await hashFile(base + '.c'), objectSha256 });
+      unlinkSync(base + '.c'); unlinkSync(base + '.o');
+    }
+  }
+  reused = { bundleManifestSha256: reuseManifest, standardModules: manifest.standardModules,
+    standardLibraryAuditSha256: manifest.standardLibraryAuditSha256, archives, sampledModules: sampled };
+  console.log(`Reused ${groups.join(', ')} from runtime ${reuseManifest}; ${sampled.length} sampled modules recompiled byte-identically`);
+}
+for (const group of reused ? [] : groups) {
   const moduleRoot = join(native.prefix, 'src/lean', ...(group === 'Lake' ? ['lake'] : []));
   const sources = [...files(join(moduleRoot, group)).filter(file => file.endsWith('.lean')), join(moduleRoot, group + '.lean')].sort();
   const objects = [];
@@ -189,7 +262,8 @@ for (const group of groups) {
   run(sdk.tool('emar'), ['rcs', library + '.partial', '@' + response]);
   renameSync(library + '.partial', library);
 }
-writeFileSync(join(output, 'standard-library-audit.json'), JSON.stringify({ ...provenance, compileIdentity, modules: audit }, null, 2) + '\n');
+writeFileSync(join(output, 'standard-library-audit.json'), JSON.stringify({ ...provenance, compileIdentity,
+  ...(reused ? { reusedStandardLibraries: reused } : {}), modules: audit }, null, 2) + '\n');
 // A group-subset run (CI builds Init,Std then Lean, then everything) is complete
 // only for its own groups; packaging checks the final run's groups.
 writeFileSync(join(output, 'progress.json'), JSON.stringify({ status: 'complete', completed: audit.length, groups }) + '\n');
