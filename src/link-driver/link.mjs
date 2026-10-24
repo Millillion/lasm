@@ -14,6 +14,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
+import { scriptPrefix } from '../js-runtime.mjs';
 import { executableName } from '../platform.mjs';
 import { Settings, instantiateSettings } from './settings.mjs';
 import { extractMetadata, updateMetadata } from './metadata.mjs';
@@ -161,7 +162,8 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   const parsed = parseLinkArguments(recipe, mode, args);
   const paths = platform === 'win32' ? path.win32 : path.posix;
   const emscripten = sdk.driver;
-  const node = process.execPath;
+  // Emscripten's JavaScript tools run on the compiler's own runtime (js-runtime.mjs).
+  const node = process.execPath, nodePrefix = scriptPrefix();
   const tool = name => name === 'node' ? node : paths.join(sdk.prefix, 'bin', executableName(name, platform));
   const env = sdk.env;
   mkdirSync(temp, { recursive: true });
@@ -169,7 +171,7 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   const saveText = (name, text) => { if (intermediates) { mkdirSync(intermediates, { recursive: true }); writeFileSync(path.join(intermediates, `emcc-${String(counter++).padStart(2, '0')}-${name}`), text); } };
   const saveFile = (name, file) => { if (intermediates) { mkdirSync(intermediates, { recursive: true }); copyFileSync(file, path.join(intermediates, `emcc-${String(counter++).padStart(2, '0')}-${name}`)); } };
   const run = (program, argv, { input, capture = false } = {}) => {
-    const output = execute(tool(program), argv, { env, input, timeout, windowsHide: true, maxBuffer: 512 * 1024 * 1024,
+    const output = execute(tool(program), program === 'node' ? [...nodePrefix, ...argv] : argv, { env, input, timeout, windowsHide: true, maxBuffer: 512 * 1024 * 1024,
       stdio: [input === undefined ? 'ignore' : 'pipe', capture ? 'pipe' : stdio[1], stdio[2]], encoding: capture ? 'utf8' : undefined });
     return capture ? universalNewlines(output) : output;
   };

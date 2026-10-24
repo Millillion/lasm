@@ -33,7 +33,7 @@ check('within Netlify Edge code limit (20 MB)', result.bundle.eszipBytes < 20 * 
 const child = spawn(join(bin, 'netlify'), ['dev', '--offline', '--no-open', '--port', port, '--dir', 'public'], { cwd: project, env, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
 let log = '';
 child.stdout.on('data', c => { log += c; }); child.stderr.on('data', c => { log += c; });
-// netlify dev may listen on IPv6 only (localhost resolving to ::1): localhost tries both.
+// localhost: whichever address family netlify dev listens on.
 const base = `http://localhost:${port}`;
 let last = 'no response';
 try {

@@ -6,11 +6,11 @@ import { parsePackageArguments, packageTargets } from './package.mjs';
 // installs or starts the platform's own tools.
 // Edge targets (experimental, docs/EDGE.md) relink for edge isolates; the
 // list equals src/edge/edge-build.mjs edgeTargets (test/edge.test.mjs).
-export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy'];
+export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy'];
 export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|deno-deploy] [--dev]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy] [--dev]
        lasm init <directory> [--template plain|express|hono|std-http] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]

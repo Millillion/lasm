@@ -15,4 +15,4 @@ try {
     stderr: error.stderr?.toString(), stdout: error.stdout?.toString(),
   } });
   process.exitCode = 1;
-} finally { parentPort.close(); }
+} finally { parentPort.close?.(); }  // Deno's parentPort has no close: its worker ends with the module.

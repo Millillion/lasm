@@ -4,7 +4,8 @@
 // `main` (module initializers included). Resolves to the Emscripten module.
 import { createEdgeRuntimeHost } from './edge-host.mjs';
 
-export async function startLean({ createProgram, wasmModule, env = {}, modules = {}, args = [], jspi = true, stdout, stderr }) {
+// writers and exit: see createEdgeRuntimeHost. Module.lasmExitCode is main's result.
+export async function startLean({ createProgram, wasmModule, env = {}, modules = {}, args = [], jspi = true, stdout, stderr, writers, exit }) {
   let Module;
   const instance = await createProgram({
     lasmEdgeJspi: jspi, noInitialRun: true,
@@ -18,12 +19,12 @@ export async function startLean({ createProgram, wasmModule, env = {}, modules =
     },
   });
   Module = instance;
-  const host = createEdgeRuntimeHost({ env, args, modules, stdout, stderr,
+  const host = createEdgeRuntimeHost({ env, args, modules, stdout, stderr, writers, exit,
     notify: () => Module.lasmEdge.notify(), syncCall: (fn, payload) => Module.lasmEdge.syncCall(fn, payload) });
   Module.lasmEdge.attach(host);
   Module.lasmEdgeHost = host;
   Module.lasmEdge.onStop(error => { host.js.stop(error); (stderr ?? console.error)(`[lasm] the Lean instance stopped: ${error.message}`); });
-  await Module.lasmEdge.main(args);
+  Module.lasmExitCode = await Module.lasmEdge.main(args);
   host.flush();
   return Module;
 }

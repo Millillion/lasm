@@ -4,11 +4,13 @@
 // workers: `wrangler dev` (local workerd), plus Node 26, Deno and Bun on the
 // same output, and the Workers Free plan's budgets; vercel-edge: `vercel build`
 // offline and Vercel's edge-runtime; netlify-edge: `netlify build --offline`
-// and `netlify dev --offline`; deno-deploy: `deno run -A deno/main.mjs`. Needs LASM_APPLICATION_RUNTIME and LASM_EDGE_RUNTIME.
+// and `netlify dev --offline`; deno-deploy: `deno run -A deno/main.mjs`; bun:
+// `bun bun/main.mjs`. Needs LASM_APPLICATION_RUNTIME and LASM_EDGE_RUNTIME.
 //   node scripts/edge/workers-ci.mjs WORK_DIR TOOLS_DIR
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { headlessEnvironment } from './headless.mjs';
 
@@ -36,6 +38,10 @@ if (!existsSync(pure)) cpSync(join(root, 'examples/edge-pure'), pure, { recursiv
 // The platforms' builds run nothing here: the harness builds with this source
 // checkout first (projects made by lasm init run npm run build:<target> instead).
 for (const project of [hono, pure]) {
+  // Each app is its own repository, as a user's project is: inside the Lasm
+  // checkout, netlify dev takes the checkout as the site root and finds no
+  // edge functions (CI run 40138055167).
+  if (!existsSync(join(project, '.git'))) run('git', ['init', '-q'], { cwd: project });
   mkdirSync(join(project, 'public'), { recursive: true });
   writeFileSync(join(project, 'public/lasm.txt'), 'Requests are served by the Lean edge function.\n');
   writeFileSync(join(project, 'vercel.json'), JSON.stringify({ framework: null, installCommand: 'true', buildCommand: 'true', outputDirectory: 'public',
@@ -67,8 +73,11 @@ for (const [name, project, served, ports] of [['hono', hono, hono, [8787, 8889, 
   run(process.execPath, [join(root, 'scripts/edge/netlify-edge-check.mjs'), tools, project, name, String(ports[1]), file('netlify-edge')]);
   app['netlify-edge'] = JSON.parse(readFileSync(file('netlify-edge'), 'utf8'));
   lasmBuild(project, 'deno-deploy');
-  run(process.execPath, [join(root, 'scripts/edge/deno-deploy-check.mjs'), bin('deno'), project, name, String(ports[2]), file('deno-deploy')]);
+  run(process.execPath, [join(root, 'scripts/edge/portable-check.mjs'), bin('deno'), 'deno/main.mjs', project, name, String(ports[2]), file('deno-deploy')]);
   app['deno-deploy'] = JSON.parse(readFileSync(file('deno-deploy'), 'utf8'));
+  lasmBuild(project, 'bun');
+  run(process.execPath, [join(root, 'scripts/edge/portable-check.mjs'), bin('bun'), 'bun/main.mjs', project, name, String(ports[2]), file('bun-portable')]);
+  app['bun-portable'] = JSON.parse(readFileSync(file('bun-portable'), 'utf8'));
   const node = app.node;
   app.budget = {
     bundle: app.workerd.bundle.bytes < budget.bundleBytes,
@@ -78,6 +87,23 @@ for (const [name, project, served, ports] of [['hono', hono, hono, [8787, 8889, 
     vercelEdgeCode: app['vercel-edge'].bundle.gzipBytes < 1024 * 1024,
     netlifyEdgeCode: app['netlify-edge'].bundle.eszipBytes < 20 * 1024 * 1024,
   };
+}
+// Phase 7.5: the compiler itself under Bun and Deno. Each builds the pure
+// example from scratch with its default target (its own runtime), which must
+// be byte-identical to the Node-built output, and the result is served.
+const sha256 = file => createHash('sha256').update(readFileSync(file)).digest('hex');
+results.compilerHosts = {};
+for (const [runtime, command, prefix, port] of [['bun', bin('bun'), [], 8895], ['deno', bin('deno'), ['run', '-A'], 8896]]) {
+  const project = join(work, `pure-on-${runtime}`);
+  if (!existsSync(project)) cpSync(join(root, 'examples/edge-pure'), project, { recursive: true });
+  const started = Date.now();
+  run(process.execPath, [...bounded, command, ...prefix, join(root, 'bin/lasm.mjs'), 'build', 'Main.lean'], { cwd: project });
+  const built = join(project, runtime, 'lasm/program.wasm');
+  const reference = join(pure, runtime === 'bun' ? 'bun' : 'deno', 'lasm/program.wasm');
+  const file = join(work, `pure-on-${runtime}.json`);
+  run(process.execPath, [join(root, 'scripts/edge/portable-check.mjs'), command, `${runtime}/main.mjs`, project, 'pure', String(port), file]);
+  const served = JSON.parse(readFileSync(file, 'utf8'));
+  results.compilerHosts[runtime] = { buildSeconds: (Date.now() - started) / 1000, identical: sha256(built) === sha256(reference), passed: served.passed };
 }
 // The Node link driver's edge recipe against emcc on the pure example's kept
 // link inputs (LASM_KEEP_LINK_WORK=1 in the workflow): byte-identical output.
@@ -93,13 +119,18 @@ if (process.env.LASM_KEEP_LINK_WORK) {
   results.edgeLinkCompare = JSON.parse(readFileSync(join(out, 'compare.json'), 'utf8'));
 }
 writeFileSync(join(work, 'workers-results.json'), JSON.stringify(results, null, 2) + '\n');
-const engines = ['workerd', 'node', 'deno', 'bun', 'vercel-edge', 'netlify-edge', 'deno-deploy'];
+const engines = ['workerd', 'node', 'deno', 'bun', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'bun-portable'];
 const rows = Object.entries(results.apps).map(([name, a]) => `| ${name} | ${(a.workerd.bundle.bytes / MiB).toFixed(2)} MiB (${(a.workerd.bundle.gzipBytes / 1024).toFixed(0)} KiB gzip); Vercel ${(a['vercel-edge'].bundle.gzipBytes / 1024).toFixed(0)} KiB gzip; Netlify eszip ${(a['netlify-edge'].bundle.eszipBytes / MiB).toFixed(2)} MiB; Deno Deploy ${(a['deno-deploy'].bundle.bytes / MiB).toFixed(2)} MiB | ${a.node.startupMs} / ${a.deno.startupMs} / ${a.bun.startupMs} ms | ${a.node.trivialMsPerRequest} / ${a.node.jsonMsPerRequest} ms | ${a.node.wasmMemoryAfterMiB} MiB | ${engines.map(e => `${e} ${a[e].passed ? 'pass' : 'FAIL'}`).join(', ')} |`);
-const summary = `### Edge targets (experimental)\n\n| App | Bundles (wrangler dry run; Vercel; Netlify; Deno Deploy) | Startup Node / Deno / Bun | Per request, trivial / heavier (Node) | Wasm memory | Checks |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\nBudgets: Workers Free (bundle < 64 MiB, startup < 1 s, CPU < 10 ms per request, memory < 128 MB), Vercel Edge Hobby (1 MB gzip), Netlify Edge (20 MB).\n`;
+const hosts = Object.entries(results.compilerHosts).map(([runtime, h]) => `${runtime}: ${h.buildSeconds} s, ${h.identical ? 'identical to Node' : 'DIFFERENT'}, ${h.passed ? 'pass' : 'FAIL'}`).join('; ');
+const summary = `### Edge targets (experimental)\n\n| App | Bundles (wrangler dry run; Vercel; Netlify; Deno Deploy) | Startup Node / Deno / Bun | Per request, trivial / heavier (Node) | Wasm memory | Checks |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\nBudgets: Workers Free (bundle < 64 MiB, startup < 1 s, CPU < 10 ms per request, memory < 128 MB), Vercel Edge Hobby (1 MB gzip), Netlify Edge (20 MB).\n\nThe compiler under Bun and Deno (pure example, default target): ${hosts}.\n`;
 console.log(summary);
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
 const failed = Object.entries(results.apps).flatMap(([name, a]) => [
   ...engines.filter(e => !a[e].passed).map(e => `${name} on ${e}`),
   ...Object.entries(a.budget).filter(([, ok]) => !ok).map(([what]) => `${name} ${what} budget`)]);
+for (const [runtime, host] of Object.entries(results.compilerHosts)) {
+  if (!host.identical) failed.push(`the compiler under ${runtime} built a different program.wasm`);
+  if (!host.passed) failed.push(`the program built under ${runtime} failed its checks`);
+}
 if (results.edgeLinkCompare && !results.edgeLinkCompare.identical) failed.push('the Node link driver\'s edge link differs from emcc\'s');
 if (failed.length) { console.error('Failed: ' + failed.join(', ')); process.exit(1); }

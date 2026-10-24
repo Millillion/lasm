@@ -30,10 +30,12 @@ const unavailable = (op, what) => error('ENOSYS', `${what} is not available in t
 /**
  * env: string variables (Workers bindings that are strings, Deno.env, …);
  * stdout/stderr: line sinks (default console.log / console.error);
- * modules: the JavaScript module map for Lasm.JS; notify(): called when events are queued.
+ * modules: the JavaScript module map for Lasm.JS; notify(): called when events are queued;
+ * writers: optional byte writers for streams 1 and 2 (Bun, Deno), used instead of the line sinks;
+ * exit(code): optional, lets IO.Process.exit end the process (Bun, Deno; never in an isolate).
  */
 export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => console.log(line), stderr = line => console.error(line),
-  modules = {}, notify = () => {}, syncCall, files = defaultEdgeFiles } = {}) {
+  modules = {}, notify = () => {}, syncCall, files = defaultEdgeFiles, writers = {}, exit } = {}) {
   // A read-only in-memory file system: absolute paths to bytes.
   const tree = new Map(Object.entries(files).map(([path, bytes]) => [path, bytes instanceof Uint8Array ? bytes : encoder.encode(String(bytes))]));
   const directories = new Set(['/']);
@@ -48,6 +50,7 @@ export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => co
   const streams = { 1: { sink: stdout, text: '' }, 2: { sink: stderr, text: '' } };
   const decoder = new TextDecoder();
   function write(id, bytes) {
+    if (writers[id]) { writers[id](bytes); return empty; }
     const s = streams[id];
     if (!s) throw unavailable(3, 'Writing files');
     s.text += decoder.decode(bytes, { stream: true });
@@ -146,7 +149,9 @@ export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => co
       }
       return out;
     }
-    case 30: throw Object.assign(error('EINVAL', `Lean called IO.Process.exit ${n}; an edge isolate cannot exit`), { exit: n });
+    case 30:
+      if (exit) { flush(1); flush(2); exit(n); }
+      throw Object.assign(error('EINVAL', `Lean called IO.Process.exit ${n}; an edge isolate cannot exit`), { exit: n });
     case 31: return encoder.encode(args.map(value => value + '\0').join(''));
     case 35: return new Promise(resolve => setTimeout(() => resolve(empty), Math.min(n, 2_147_483_647)));
     case 36: throw error('ENOMEM', 'out of memory');
