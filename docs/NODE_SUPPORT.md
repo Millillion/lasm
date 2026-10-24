@@ -63,12 +63,13 @@ and the Emscripten SDK and Python with a
 (clang, wasm-ld and Binaryen per platform, plus one shared archive with Emscripten's
 JavaScript compiler and a prebuilt system library tree, from this repository's
 GitHub releases). It never downloads or runs Python. With Lean 4.35.0
-([`lean-4.35.0-tiers-v1`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-tiers-v1)),
-its first-build downloads for an ordinary program are 269,699,059 bytes on Linux
-x86-64, 268,890,803 on Linux ARM64, 256,541,533 on Intel Mac, 247,041,001 on Apple
-Silicon and 249,048,232 on Windows x86-64; a Lake project or a program importing
-`Lean`/`Lake` downloads 592,151,416, 549,297,286, 579,860,731, 566,573,126 and
-553,351,191 bytes including Git (catalog sizes; the Lean 4.34.1 tiers measured
+([`lean-4.35.0-tiers-v2`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-tiers-v2),
+which also mirrors the corresponding sources of its (L)GPL contents),
+its first-build downloads for an ordinary program are 269,709,784 bytes on Linux
+x86-64, 268,899,276 on Linux ARM64, 256,540,284 on Intel Mac, 247,047,545 on Apple
+Silicon and 249,052,231 on Windows x86-64; a Lake project or a program importing
+`Lean`/`Lake` downloads 526,892,922, 526,082,414, 513,723,422, 504,230,683 and
+506,235,369 bytes (no Git; catalog sizes; the Lean 4.34.1 tiers measured
 273,804,773 bytes for an ordinary program on Linux x86-64).
 The current builder removes unreachable code and includes only the deployment
 architecture's native helpers. Current source builds reject runtime compiler,
@@ -107,7 +108,7 @@ filesystems and no-exec mounts are unsupported. See the
 use `extern_lib`, `precompileModules`, `moreLinkObjs`, `moreLinkLibs` or
 `moreLinkArgs` adds the C tier to the extended tiers, because Lake builds that C
 natively before Lasm recompiles it for Wasm. The C tier
-([release `lean-4.35.0-c-v1`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-c-v1),
+([release `lean-4.35.0-tiers-v2`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-tiers-v2), earlier `lean-4.35.0-c-v1`,
 built by the tier workflow from the pinned Lean archives and
 [`c-tier-sources.json`](../scripts/lean-dist/c-tier-sources.json)) holds Lean's clang,
 installed as `bin/cc` so that Lake's default compiler (`buildO`, `compileO`) is Lean's

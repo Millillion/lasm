@@ -81,9 +81,11 @@ Approved at the Phase 3 review ([PLAN.md](PLAN.md#language-coverage-phases-appro
   Command Line Tools SDK, which may not be redistributed (Lasm sets `SDKROOT` from `xcrun` and
   otherwise stops with `xcode-select --install`).
 - **C tier.** `lean-4.35.0-<platform>-c.tar.zst` in release
-  [`lean-4.35.0-c-v1`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-c-v1), built
-  and checked natively by the tier workflow (run [39788040414](https://github.com/Millillion/lasm/actions/runs/39788040414);
-  the binaries archive rebuilt alongside is byte-identical to the published one). It holds
+  [`lean-4.35.0-tiers-v2`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-tiers-v2)
+  (with the binaries and module data; run [40067638952](https://github.com/Millillion/lasm/actions/runs/40067638952),
+  which also checks on macOS that Lean's link flags work against the user's SDK
+  `libSystem.tbd`, no longer shipped); earlier
+  [`lean-4.35.0-c-v1`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-c-v1) (run [39788040414](https://github.com/Millillion/lasm/actions/runs/39788040414)). It holds
   Lean's clang, `ld.lld`/`ld64.lld`, `llvm-ar` and the libraries they load, `include/`,
   `lib/clang`, the link libraries outside `lib/lean`, and the pinned inputs of
   [`c-tier-sources.json`](../scripts/lean-dist/c-tier-sources.json). Sizes (compressed /

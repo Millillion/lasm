@@ -83,7 +83,7 @@ test('the C tier Lasm provisions is the archive its npm package carries', async 
     // As provisionLean({ native: true }) passes it to provisionArtifact.
     const { name, url, sha256, bytes, format, root, maximumExtractedBytes } = leanDistribution(c.toolchains.lean['4.35.0'], platform).c;
     const entry = npmEntryFor(manifest, { name, url, sha256, bytes, format, root, maximumExtractedBytes });
-    assert.deepEqual([entry.package, entry.version, entry.install, entry.platform], [`@lasm/lean-c-${platform}`, '4.35.0-lasm.1', 'demand', platform]);
+    assert.deepEqual([entry.package, entry.version, entry.install, entry.platform], [`@lasm/lean-c-${platform}`, '4.35.0-lasm.2', 'demand', platform]);
   }
 });
 
@@ -104,7 +104,7 @@ test('the runtime manifest and main package pin every tool package exactly', asy
   const manifest = validateNpmToolManifest(npmToolManifest(packages, packed));
   assert.equal(Object.keys(manifest.artifacts).length, packages.length);
   const bin = c.toolchains.lean['4.35.0'].tiers.bin['linux-x64'];
-  assert.deepEqual(npmEntryFor(manifest, bin), { package: '@lasm/lean-linux-x64', version: '4.35.0-lasm.1', file: bin.name,
+  assert.deepEqual(npmEntryFor(manifest, bin), { package: '@lasm/lean-linux-x64', version: '4.35.0-lasm.2', file: bin.name,
     bytes: bin.bytes, integrity: packed['@lasm/lean-linux-x64'].integrity, install: 'optional', platform: 'linux-x64' });
   const native = c.linkToolchain.native['win32-x64'];
   assert.equal(npmEntryFor(manifest, native).file, native.name + '.tar.zst');

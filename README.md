@@ -252,11 +252,12 @@ characters still fails to build. Per-platform results:
   leansqlite's SQLite) is compiled for Node with Lasm's compiler. Lake still builds
   that C natively first; Lasm then fetches a "C tier" once (39–52 MB; from the
   `@lasm/lean-c-<platform>` npm package in an npm installation, else the
-  `lean-4.35.0-c-v1` GitHub release): Lean's own
+  `lean-4.35.0-tiers-v2` GitHub release): Lean's own
   clang, which becomes Lake's default `cc`, its linker and headers, and C library
   headers. No system C compiler is needed. On Linux and Windows nothing else is
   needed either; on macOS the C library headers come from the Xcode Command Line
-  Tools SDK (`xcode-select --install`), which Lasm may not redistribute, and the
+  Tools SDK (`xcode-select --install`), which Lasm may not redistribute (Lasm also
+  links against that SDK's `libSystem.tbd` instead of shipping Apple's file), and the
   build says so when it is missing. C code that calls `dlopen` gets an
   implementation that always fails.
 - Prebuilt native libraries (shared libraries or `-l` link options, for example
@@ -406,29 +407,28 @@ provenance, and `npm audit signatures` in a project verifies it. Details:
 ## Licenses
 
 Lasm's own source is under the [MIT License](LICENSE) (copyright Jordan Last);
-`@lasm/cli` and `create-lasm` are MIT. Lasm is not legal advice; the
+`create-lasm` is MIT, and `@lasm/cli`'s `license` field is an SPDX expression of
+Lasm's MIT and every component it bundles, with their texts in `licenses/`. The
 [license audit](docs/LICENSE_AUDIT.md) lists every distributed component, its
-license, how each obligation is met, the open gaps and the questions for a lawyer.
+license and how each obligation is met.
 
-- **Built `dist/`.** `THIRD_PARTY_NOTICES.txt` lists what `program.wasm`,
-  `program.cjs` and `host/` contain: Lean's runtime and standard library
-  (Apache-2.0, with Lasm's changes), Emscripten (MIT OR NCSA), musl, LLVM libc++,
-  libc++abi, libunwind and compiler-rt, mimalloc, libuv, koffi (MIT,
-  `host/native`) and Lasm's own host code (MIT): permissive licences only. The
-  runtime uses Lean's own big-number code instead of GNU MP (see Known
-  limitations); apps built by candidates up to `.58` still link GNU MP 6.3.0
-  (LGPL-3.0-or-later OR GPL-2.0-or-later) and say so in their notices. Current
-  source also writes Lasm's MIT notice, the notice of every Lean file Lasm changed
-  and the compiler-rt, libunwind and libuv LICENSE-extra texts there; candidate
-  `.58` has only the runtime bundle's notices. With npm interop, `node_modules/`
-  holds each package with its own license. Lean and C code of your project and
-  its Lake dependencies are compiled in under their own licenses, which the file
-  does not list. **Whoever distributes a `dist/`** must meet those licenses
-  (keep the notices).
+- **Built `dist/`** (current source). `THIRD_PARTY_NOTICES.txt` starts with Lasm's
+  MIT notice and the list of Lean files Lasm changed, then the licenses of what
+  `program.wasm`, `program.cjs` and `host/` contain: Lean's runtime and standard
+  library (Apache-2.0), Emscripten (MIT OR NCSA), musl, LLVM libc++, libc++abi,
+  libunwind and compiler-rt, mimalloc, libuv, koffi and Lasm's host (MIT). The
+  runtime is built without GNU MP, so an app contains no copyleft code (runtimes
+  of candidates up to `.58` still link GNU MP, and their notices say so).
+  `licenses/<package>/` holds the license files of every Lake dependency compiled
+  into `program.wasm`, also appended to the notices; with npm interop,
+  `node_modules/` holds each package with its own license. Keep these files when
+  you distribute a `dist/`.
 - **Tool packages and release archives.** Each `@lasm/…` tool package has an SPDX
-  `license` field (or, for Git, a README section) and the upstream license files:
-  in the archive (`LICENSE`, `LICENSES`, `lasm-notices/`) and, for the C tier and
-  Git, in `licenses/`. Git (`@lasm/git-<platform>`, from dugite-native) is
-  GPL-2.0-only; its README names the corresponding source.
+  `license` field and the archive's license files in `licenses/`. The exact
+  sources of the (L)GPL pieces the Lean archives contain (GNU MP, the GNU C
+  Library, GCC's runtime libraries, the Linux UAPI headers, MinGW-w64) and Lean's
+  own source are mirrored as assets of the release that publishes them
+  ([`lean-4.35.0-tiers-v2`](https://github.com/Millillion/lasm/releases/tag/lean-4.35.0-tiers-v2));
+  each archive's NOTICE lists them. Lasm ships no Git and no Apple SDK files.
 - The Lean name and logos are trademarks of Lean FRO. Lasm is not affiliated with or endorsed
   by Lean FRO.
