@@ -2,11 +2,12 @@
 // per-process V8/Node options such as --max-old-space-size used to make every
 // pthread Worker throw ERR_WORKER_INVALID_EXEC_ARGV.
 //
-//   node integration/node-exec-flags.mjs OUTPUT [--dist BUILT_DIST] [--runtime DIR] [--node PATH]...
+//   node integration/node-exec-flags.mjs OUTPUT [--dist BUILT_DIST] [--runtime DIR] [--node PATH]... [--no-network]
 //
 // Without --dist, builds integration/fixtures/exec-flags with this source tree.
 // Each --node (default: this Node) runs the program and the Std.Http server
-// under every flag set; output must equal the run without flags.
+// under every flag set; output must equal the run without flags. --no-network
+// (for sandboxes that deny sockets) skips the server and the --inspect sets.
 import assert from 'node:assert/strict';
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -34,6 +35,7 @@ if (!dist) {
   await buildApplication(join(project, 'Main.lean'), { target: 'node', output: dist, log: () => {},
     runtimeDirectory: values('--runtime')[0] && resolve(values('--runtime')[0]) });
 }
+const network = !args.includes('--no-network');
 const nodes = values('--node').length ? values('--node').map(path => resolve(path)) : [process.execPath];
 const flagSets = [[], ['--max-old-space-size=2048'], ['--stack-size=2000'], ['--expose-gc'], ['--enable-source-maps'],
   ['--inspect=0'], ['--trace-warnings'], ['--no-warnings'], ['--title', 'lasm-exec-flags'],
@@ -59,20 +61,20 @@ const results = [];
 let baseline;
 for (const node of nodes) {
   const version = spawnSync(node, ['--version'], { encoding: 'utf8' }).stdout.trim();
-  for (const flags of flagSets) {
+  for (const flags of flagSets.filter(flags => network || !flags.some(flag => flag.startsWith('--inspect')))) {
     const run = spawnSync(node, [...flags, join(dist, 'main.mjs')], { cwd: dist, encoding: 'utf8', timeout: 120_000 });
     // --inspect prints its banner on stderr; nothing else may appear.
     const stderr = (run.stderr ?? '').replace(/Debugger listening on .*\n|For help, see: .*\n/g, '');
     const program = { code: run.status, signal: run.signal, stdout: run.stdout, stderr };
     baseline ??= program;
     let server, serverError;
-    try { server = await serve(node, flags); } catch (error) { serverError = error.message; }
+    if (network) try { server = await serve(node, flags); } catch (error) { serverError = error.message; }
     const passed = program.code === 0 && program.stderr === '' && program.stdout === baseline.stdout
-      && server?.status === 200 && server.body === '{"ok":true}' && server.stderr === '';
+      && (!network || server?.status === 200 && server.body === '{"ok":true}' && server.stderr === '');
     results.push({ node: version, flags, passed, program, server, serverError });
     console.log(`${passed ? 'PASS' : 'FAIL'} node ${version} ${flags.join(' ') || '(no flags)'}${passed ? '' : `: ${JSON.stringify({ program, server, serverError }).slice(0, 600)}`}`);
   }
 }
-const result = { scope: 'Built Lasm application under Node exec flags', dist, passed: results.every(r => r.passed), results };
+const result = { scope: 'Built Lasm application under Node exec flags', dist, network, passed: results.every(r => r.passed), results };
 writeFileSync(join(output, 'result.json'), JSON.stringify(result, null, 2) + '\n');
 if (!result.passed) process.exitCode = 1;

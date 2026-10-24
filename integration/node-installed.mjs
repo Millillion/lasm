@@ -238,6 +238,17 @@ try {
     const broken = npx('Lasm.JS binding check', ['build', 'Broken.lean', '--output', 'broken dist'], interop);
     assert.notEqual(broken.code, 0);
     assert.match(broken.stderr, /Lasm\.JS binding check failed:\n {2}nope: local-lib export "nope" is missing/);
+    // Node exec flags: per-process V8/Node options (--max-old-space-size, --expose-gc,
+    // --stack-size, --title, ...) must not reach pthread Workers' execArgv, and
+    // per-thread ones (--enable-source-maps, --inspect, ...) still work: a threaded
+    // program and a Std.Http server under each flag set (sockets are allowed here).
+    writeFileSync(join(project, 'ExecFlags.lean'), readFileSync(join(workspace, 'fixtures', 'ExecFlags.lean')));
+    result.execFlagsDist = join(project, 'exec flags dist');
+    assert.equal(npx('exec flags deployment', ['build', 'ExecFlags.lean', '--output', result.execFlagsDist]).code, 0);
+    const execFlags = run('Node exec flags', process.execPath, [join(workspace, 'node-exec-flags.mjs'), join(workspace, 'exec-flags-online'), '--dist', result.execFlagsDist]);
+    result.execFlags = JSON.parse(readFileSync(join(workspace, 'exec-flags-online/result.json'), 'utf8')).results
+      .map(({ node, flags, passed }) => ({ node, flags, passed })); save();
+    assert.equal(execFlags.code, 0, execFlags.stdout + execFlags.stderr);
   } else if (phase === 'offline') {
     // Kernel network restrictions, inherited by npm and every build tool.
     await assert.rejects(fetch(process.platform === 'win32' ? 'https://1.1.1.1:443' : 'https://127.0.0.1:443', { signal: AbortSignal.timeout(5000) }),
@@ -330,14 +341,11 @@ try {
       const expected = await oracle(fixture, args, project, false, true); assert.equal(expected.code, 0);
       await deployment(name, output, fixture, [{ args, expected }], project, false, true);
     }
-    // Node exec flags: per-process V8/Node options (--max-old-space-size, --expose-gc,
-    // --stack-size, --title, ...) must not reach pthread Workers' execArgv, and
-    // per-thread ones (--enable-source-maps, --inspect, ...) still work.
-    writeFileSync(join(project, 'ExecFlags.lean'), readFileSync(join(workspace, 'fixtures', 'ExecFlags.lean')));
-    const execFlagsOutput = join(project, 'exec flags dist');
-    assert.equal(npx('exec flags deployment', ['build', 'ExecFlags.lean', '--output', execFlagsOutput]).code, 0);
-    const execFlags = run('Node exec flags', process.execPath, [join(workspace, 'node-exec-flags.mjs'), join(workspace, 'exec-flags-result'), '--dist', execFlagsOutput]);
-    result.execFlags = JSON.parse(readFileSync(join(workspace, 'exec-flags-result/result.json'), 'utf8')).results
+    // Node exec flags, offline: the program part only (sockets are denied here;
+    // the lake phase ran the server and --inspect sets on the same deployment).
+    const execFlags = run('Node exec flags (no network)', process.execPath, [join(workspace, 'node-exec-flags.mjs'),
+      join(workspace, 'exec-flags-offline'), '--dist', result.execFlagsDist, '--no-network']);
+    result.execFlagsOffline = JSON.parse(readFileSync(join(workspace, 'exec-flags-offline/result.json'), 'utf8')).results
       .map(({ node, flags, passed }) => ({ node, flags, passed })); save();
     assert.equal(execFlags.code, 0, execFlags.stdout + execFlags.stderr);
     const unused = 'Unused.lean';
