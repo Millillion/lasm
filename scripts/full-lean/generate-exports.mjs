@@ -77,8 +77,8 @@ if (reuseRegistry) {
   const names = [...symbols].filter(isLeanSymbol).sort();
   const referenced = execFileSync(nm, ['--undefined-only', '--format=just-symbols', reuseRegistry],
     { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 }).split('\n').map(line => line.trim()).filter(isLeanSymbol).sort();
-  const expected = new Set(names), unexpected = referenced.filter(name => !expected.has(name));
-  const absent = names.filter(name => !new Set(referenced).has(name));
+  const expected = new Set(names), present = new Set(referenced);
+  const unexpected = referenced.filter(name => !expected.has(name)), absent = names.filter(name => !present.has(name));
   if (unexpected.length || absent.length || referenced.length !== names.length)
     throw new Error(`The reused symbol registry does not match the linked Lean symbols (${absent.length} new, ${unexpected.length} gone): ${[...absent, ...unexpected].slice(0, 20).join(', ')}`);
   console.log(JSON.stringify({ reusedRegistry: reuseRegistry, symbols: names.length }));
