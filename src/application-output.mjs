@@ -1,5 +1,5 @@
 import { mkdirSync, copyFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { copyNativeBundle, copyApplicationNativeBundle } from './native-bundle.mjs';
 import { glibcAtLeast, nodeAtLeast } from './application-support.mjs';
@@ -13,6 +13,8 @@ export const applicationHostFiles = [
   'native-clock.mjs', 'native-windows-timezone.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-message.mjs',
   'native-worker-cwd.cjs', 'worker-stdio.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native-abort.cjs',
   'node-fetch.mjs', 'node-js.mjs',
+  // The UTC zone (tz database, public domain) for systems without zoneinfo.
+  'zoneinfo/UTC',
 ];
 
 // Built applications run on any Node release from this one: memory64 and
@@ -28,7 +30,10 @@ export function copyApplicationHost(output, { platform = process.platform, arch 
   glibc = process.report?.getReport().header.glibcVersionRuntime, sourceRoot = root } = {}) {
   const directory = join(resolve(output), 'host');
   mkdirSync(directory, { recursive: true });
-  for (const name of applicationHostFiles) copyFileSync(join(sourceRoot, 'src', name), join(directory, name));
+  for (const name of applicationHostFiles) {
+    mkdirSync(dirname(join(directory, name)), { recursive: true });
+    copyFileSync(join(sourceRoot, 'src', name), join(directory, name));
+  }
   if ((['darwin', 'win32'].includes(platform) || platform === 'linux' && glibc) && ['x64', 'arm64'].includes(arch))
     copyApplicationNativeBundle(sourceRoot, directory, { platform, arch });
   else copyNativeBundle(sourceRoot, directory);

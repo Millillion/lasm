@@ -4,9 +4,10 @@
 // answers the templates' HTTP checks and stops cleanly on `docker stop`; the
 // probe program (subprocess, files, environment) prints its expected output;
 // on Alpine the deploy/Dockerfile recipe is also built with the Alpine image.
-// Std.Http needs the time zone database (its Date header), which Alpine images
-// lack: the std-http template runs on Alpine with `apk add tzdata`, as
-// docs/deploy/docker-kubernetes.md says.
+// Std.Http reads the time zone database (its Date header), which Alpine images
+// lack: Lasm then serves its bundled UTC zone and warns once. The std-http
+// template runs on plain Alpine (the warning must appear, every check must
+// pass) and again with `apk add tzdata` (no warning).
 //   node run-linux-variants.mjs WORK/apps.json RESULT.json [--images a,b] [--runtime runsc]
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -63,6 +64,8 @@ async function server(run, image, dist, framework, label = 'dist') {
     run[`${label}StopMs`] = Math.round(performance.now() - stopping);
     const code = Number(must(['inspect', '-f', '{{.State.ExitCode}}', id]));
     assert.equal(code, 0, 'docker stop (SIGTERM) ends the server with exit code 0');
+    const logs = docker(['logs', id]);
+    run[`${label}ZoneWarning`] = /\[lasm\] .* is missing \(no time zone database\): using UTC/.test(logs.stdout + logs.stderr);
   } finally { docker(['rm', '-f', id]); }
 }
 
@@ -79,14 +82,18 @@ for (const image of images) {
         assert.equal(r.status, 0, r.stderr);
         assert.equal(r.stdout, app.expectedStdout);
       } else {
-        let serverImage = image;
+        await server(run, image, app.dist, app.framework);
+        const noZoneinfo = docker(['run', '--rm', image, 'sh', '-c', 'test -e /etc/localtime || test -e /usr/share/zoneinfo/UTC']).status !== 0;
+        if (app.template === 'std-http')
+          assert.equal(run.distZoneWarning, noZoneinfo, noZoneinfo ? 'the UTC fallback warning appears once zoneinfo is missing' : 'no fallback warning with zoneinfo');
         if (/alpine/.test(image) && app.template === 'std-http') {
-          serverImage = run.serverImage = `lasm-variant-tzdata-${process.pid}`;
-          const build = docker(['build', '-q', '-t', serverImage, '-'], { input: `FROM ${image}\nRUN apk add --no-cache tzdata\n` });
+          const tzdata = run.tzdataImage = `lasm-variant-tzdata-${process.pid}`;
+          const build = docker(['build', '-q', '-t', tzdata, '-'], { input: `FROM ${image}\nRUN apk add --no-cache tzdata\n` });
           assert.equal(build.status, 0, build.stderr);
+          try { await server(run, tzdata, app.dist, app.framework, 'tzdata'); }
+          finally { docker(['rmi', '-f', tzdata]); }
+          assert.equal(run.tzdataZoneWarning, false, 'no fallback warning with tzdata');
         }
-        try { await server(run, serverImage, app.dist, app.framework); }
-        finally { if (serverImage !== image) docker(['rmi', '-f', serverImage]); }
         // The documented recipe, built on this image (Alpine only: the
         // Debian recipe is covered by the launch platform tests).
         if (/alpine/.test(image) && app.template === 'hono') {

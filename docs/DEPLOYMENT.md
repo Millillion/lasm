@@ -66,8 +66,21 @@ candidate includes them.
 | Netlify Functions (v2) | Netlify CLI 27.14.2 `netlify build --offline` and `netlify dev --offline`; the deploy zip in `public.ecr.aws/lambda/nodejs:24` with Netlify's bundled bootstrap | [netlify.md](deploy/netlify.md) |
 | Azure Functions (Node.js v4 model) | Azure Functions Core Tools 4.16.0 `func start` | [azure-functions.md](deploy/azure-functions.md) |
 | Google Cloud Functions (gen2) | Functions Framework 5.0.5 on Ubuntu 24.04; Google Cloud's buildpacks (`pack` 0.38.2, `google-24` builder) image | [cloud-functions.md](deploy/cloud-functions.md) |
-| Alpine/musl containers | `node:24.22.1-alpine`, `node:26.12.1-alpine`, x64 and arm64, read-only, 512 MB; `deploy/Dockerfile` on Alpine. A pure-Lean `Std.Http` server also needs `apk add tzdata` | [docker-kubernetes.md](deploy/docker-kubernetes.md#alpine-musl) |
+| Alpine/musl containers | `node:24.22.1-alpine`, `node:26.12.1-alpine`, x64 and arm64, read-only, 512 MB; `deploy/Dockerfile` on Alpine; `Std.Http` without `tzdata` (bundled UTC fallback, one stderr warning) and with it | [docker-kubernetes.md](deploy/docker-kubernetes.md#alpine-musl) |
 | gVisor (DigitalOcean App Platform, Cloud Run gen1) | Docker with gVisor `runsc` release 20261019.0, `node:24.22.1-bookworm-slim`, x64 | [digitalocean.md](deploy/digitalocean.md) |
+
+Without a time zone database (`/etc/localtime`, `/usr/share/zoneinfo/UTC`),
+the host serves a bundled UTC zone to `Std.Time` and warns once on stderr.
+
+**Merge checklist (branch `phase-6`, after 0.1.0 publishes):**
+1. Merge into `main`; reconcile the Lambda handler's worker `execArgv`
+   workaround (`src/serverless/lasm-server.mjs`) with the general fix made on
+   `main`.
+2. Build the next candidate; it includes the Phase 6 sources.
+3. Run `serverless.yml` with that candidate and an empty overlay (dispatch with
+   its version, SHA-256 and release); every job must pass.
+4. Replace "Phase 6 source, not yet in a candidate" in README.md, this page and
+   docs/deploy/ with the candidate that passed, and record the run.
 
 Not yet supported (later phases, see [PLAN.md](PLAN.md)): isolate platforms
 (Cloudflare Workers, Vercel and Netlify Edge, Fastly), which have no threads or

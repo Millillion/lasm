@@ -201,7 +201,7 @@ cloud account or deployment. Details, requirements and the full matrix:
 | Netlify Functions (v2, x86_64; Phase 6 source) | Netlify CLI `netlify build --offline` (the deploy zip) and `netlify dev --offline`; the deploy zip in `public.ecr.aws/lambda/nodejs:24` with Netlify's bundled bootstrap |
 | Azure Functions (Node.js v4 model, Linux; Phase 6 source) | Azure Functions Core Tools `func start` |
 | Google Cloud Functions (gen2, `nodejs24`; Phase 6 source) | Functions Framework on Ubuntu 24.04; Google Cloud's buildpacks (`pack`, `google-24` builder) image |
-| Alpine/musl containers (Phase 6 source) | `node:24-alpine` and `node:26-alpine`, x64 and arm64, read-only, 512 MB (a `Std.Http` server also needs `apk add tzdata`) |
+| Alpine/musl containers (Phase 6 source) | `node:24-alpine` and `node:26-alpine`, x64 and arm64, read-only, 512 MB, including `Std.Http` without `tzdata` (bundled UTC zone, one stderr warning) |
 | DigitalOcean App Platform (gVisor; Phase 6 source) | the container images under Docker with gVisor's `runsc`, x64; App Platform itself is never deployed to |
 
 Every build carries the Linux x64 and arm64 native pieces, so `dist/` built on a

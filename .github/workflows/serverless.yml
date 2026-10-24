@@ -19,7 +19,8 @@ name: Serverless platforms
 #   - Azure Functions (x64): Azure Functions Core Tools `func start`.
 #   - Google Cloud Functions (x64): the Functions Framework, and the source
 #     built by Google Cloud's buildpacks (pack, google-24 builder).
-#   - Alpine/musl (x64, arm64): node:24-alpine and node:26-alpine.
+#   - Alpine/musl (x64, arm64): node:24-alpine and node:26-alpine, including
+#     Std.Http without tzdata (Lasm's UTC fallback) and with it.
 #   - gVisor (x64): Docker with gVisor's runsc runtime (DigitalOcean App
 #     Platform's sandbox).
 on:
@@ -37,7 +38,7 @@ on:
         default: ""
   push:
     branches: [phase-6]
-    paths: ['src/serverless/**', 'src/package.mjs', 'src/init.mjs', 'src/cli-arguments.mjs', 'src/application-cli.mjs', 'src/native-bundle.mjs', 'src/application-output.mjs',
+    paths: ['src/serverless/**', 'src/package.mjs', 'src/init.mjs', 'src/cli-arguments.mjs', 'src/application-cli.mjs', 'src/native-bundle.mjs', 'src/application-output.mjs', 'src/node-host.mjs', 'src/zoneinfo/**',
       'scripts/serverless/**', 'test/serverless.test.mjs', '.github/workflows/serverless.yml']
 permissions:
   contents: read

@@ -19,7 +19,7 @@ const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8'
 const base = git('merge-base', 'HEAD', baseRef);
 // Sources the installed CLI runs (not src/native, which is generated, nor the runtime).
 const changed = git('diff', '--name-only', '--diff-filter=AMR', base, 'HEAD', '--', 'src', 'templates')
-  .split('\n').filter(path => path && !path.startsWith('src/native/') && /\.(mjs|cjs|js|json|lean)$/.test(path));
+  .split('\n').filter(path => path && !path.startsWith('src/native/') && (/\.(mjs|cjs|js|json|lean)$/.test(path) || path.startsWith('src/zoneinfo/')));
 const work = mkdtempSync(join(tmpdir(), 'lasm-overlay-'));
 const sha = file => createHash('sha256').update(readFileSync(file)).digest('hex');
 try {

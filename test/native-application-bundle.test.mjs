@@ -97,7 +97,7 @@ for (const arch of ['x64', 'arm64']) test(`a macOS ${arch} build carries its own
 
 for (const arch of ['x64']) test(`a Windows ${arch} build carries its adapter plus both Linux targets`, t => {
   const { root, source, output } = fixture(t);
-  for (const name of applicationHostFiles) writeFileSync(join(root, 'src', name), 'host fixture: ' + name);
+  for (const name of applicationHostFiles) { mkdirSync(dirname(join(root, 'src', name)), { recursive: true }); writeFileSync(join(root, 'src', name), 'host fixture: ' + name); }
   // Exercise the application's selector too: calling only the low-level copier
   // missed Windows falling back to the entire multi-platform native bundle.
   copyApplicationHost(output, { platform: 'win32', arch, sourceRoot: root });
@@ -117,7 +117,7 @@ for (const arch of ['x64']) test(`a Windows ${arch} build carries its adapter pl
 test('deployments never carry the unused pthread working-directory factory', t => {
   const { root, output } = fixture(t);
   assert.equal(applicationHostFiles.includes('native-pthread-factory.cjs'), false);
-  for (const name of applicationHostFiles) writeFileSync(join(root, 'src', name), 'host fixture');
+  for (const name of applicationHostFiles) { mkdirSync(dirname(join(root, 'src', name)), { recursive: true }); writeFileSync(join(root, 'src', name), 'host fixture'); }
   copyApplicationHost(output, { platform: 'linux', arch: 'x64', glibc: '2.39', sourceRoot: root });
   assert.equal(existsSync(join(output, 'host/native-pthread-factory.cjs')), false);
 });
