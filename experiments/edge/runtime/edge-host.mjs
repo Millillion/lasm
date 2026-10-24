@@ -131,7 +131,9 @@ export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => co
       throw unavailable(op, 'This runtime operation');
     }
   }
+  const counts = new Map();
   function request(op, id, arg, bytes) {
+    counts.set(op, (counts.get(op) ?? 0) + 1);
     if (op === 94) {
       // Start an asynchronous operation; its result completes into the queue.
       // Header: promise, resource, kind, check, operation, argument (u64 each).
@@ -156,5 +158,5 @@ export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => co
     } catch (err) { return encodeError(err); }
   }
   return { request, release(id) { if (js.owns(id)) js.release(id); else { resources.get(id)?.close?.(); resources.delete(id); } },
-    flush() { flush(1); flush(2); }, js, initialized() { initializing = false; }, pending: () => completions.length + js.pendingEvents() };
+    flush() { flush(1); flush(2); }, js, operationCounts: () => Object.fromEntries([...counts].sort((a, b) => a[0] - b[0])), initialized() { initializing = false; }, pending: () => completions.length + js.pendingEvents() };
 }

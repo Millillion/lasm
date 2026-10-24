@@ -12,6 +12,9 @@ import { startLean } from '../../../runtime/edge-start.mjs';
 const strings = Object.fromEntries(Object.entries(env).filter(([, v]) => typeof v === 'string'));
 await startLean({ createProgram, wasmModule, env: strings, modules: { hono } });
 const app = globalThis.lasmApp;
+// Baselines in plain JavaScript on the same app, for the measurements.
+app.get('/js/health', c => c.json({ ok: true }));
+app.get('/js/json', c => c.json({ items: Array.from({ length: 100 }, (_, i) => ({ id: i, name: `item ${i}`, even: i % 2 === 0, square: i * i })) }));
 
 export default {
   async fetch(request, env, ctx) {

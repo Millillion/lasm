@@ -38,6 +38,7 @@ for (const [name, path] of [['trivial', '/'], ['fib20', '/fib/20'], ['primes10k'
   result[name] = { usPerRequest: +((performance.now() - t) * 1000 / n).toFixed(1), cpuUsPerRequest: +((cpu() - c) * 1000 / n).toFixed(1) };
 }
 result.memoryAfterLoadMiB = +(Module.HEAPU8.length / 1048576).toFixed(1);
+result.hostOperations = Module.lasmEdgeHost.operationCounts();
 // Checks that may stop the instance; each later one gets a fresh instance.
 const fatal = async path => {
   if (Module.lasmEdge.stopped) Module = await fresh();

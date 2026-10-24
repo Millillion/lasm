@@ -224,7 +224,9 @@ cloud account or deployment. Details, requirements and the full matrix:
 
 Every build carries the Linux x64 and arm64 native pieces, so `dist/` built on a
 Mac or Windows machine deploys to Linux containers, including Alpine (musl). Not yet supported: Cloudflare Workers and other isolate
-platforms, including Vercel and Netlify Edge ([plan](docs/PLAN.md)).
+platforms, including Vercel and Netlify Edge ([plan](docs/PLAN.md)); an
+experimental prototype on the unreleased `phase-7` branch is described in
+[EDGE.md](docs/EDGE.md).
 
 ## Lean support and restrictions
 

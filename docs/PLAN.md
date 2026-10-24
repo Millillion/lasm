@@ -796,6 +796,13 @@ folded into Phases 5.2/5.3 and 7.
   run on Bun and Deno with the portable (edge) profile; all tested in CI. The
   full profile (threads, files, koffi, wasm64) stays Node-only. 7.1's JSPI vs
   Asyncify choice must keep Bun working (verify Bun's JSPI support).
+  *Status (2026-10-24, branch `phase-7`): 7.1 decided ([EDGE.md](EDGE.md)):
+  a cooperative single-threaded runtime (edge patch, `runtime/edge.cpp`, CI
+  `edge-runtime.yml`), JSPI for blocking waits (Bun 1.4.4 has JSPI; Asyncify
+  rejected: 2.2× size, 2–3× slower), wasm64 code lowered to 32-bit memory, a
+  pure-JS host. A Hono app with Lean routes and a pure-Lean handler answer
+  requests under `wrangler dev`: about 1.4 MiB per Worker (250 KiB gzip),
+  27 MiB of Wasm memory, 55–70 ms startup, 0.04–0.36 ms per request.*
 - **Phase 7 — Production hardening on Node.** Long soak and concurrency stress
   (tasks, channels, Std.Sync/Std.Async, cancellation, many threads incl.
   Windows stack commit), startup memory tuning (initial memory, 64 MiB worker
