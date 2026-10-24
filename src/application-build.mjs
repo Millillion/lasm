@@ -7,14 +7,14 @@ import { createHash, randomUUID } from 'node:crypto';
 import { provisionLean, selectLeanVersion, toolchainCatalog } from './managed-lean.mjs';
 import { provisionLinkToolchain, linkToolchainCatalog } from './managed-link-toolchain.mjs';
 import { checkSystemGit } from './system-git.mjs';
-import { hashFile, managedCacheDirectory } from './managed-artifacts.mjs';
+import { hashFile, managedCacheDirectory, verificationRecords } from './managed-artifacts.mjs';
 import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject } from './application-sources.mjs';
 import { importsLibrary, librarySources } from './lasm-library.mjs';
 import { planNodeModules, copyNodeModules } from './application-npm.mjs';
 import { readBindings, checkBindings, requireValidBindings } from './application-binding-check.mjs';
-import { linkApplication, selectedLinkDriver } from './application-link.mjs';
+import { linkApplication, selectedLinkDriver, buildProfiles } from './application-link.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint, minimumApplicationNode, minimumApplicationGlibc } from './application-output.mjs';
 import { applicationNativeTargets } from './native-bundle.mjs';
 import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './application-files.mjs';
@@ -53,12 +53,13 @@ export async function buildApplication(file, options = {}) {
 }
 
 async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
-  cache, runtimeDirectory, log = console.error, progress } = {}) {
+  cache, runtimeDirectory, log = console.error, progress, profile = 'release' } = {}) {
+  if (!buildProfiles.includes(profile)) throw new Error(`Unknown build profile ${JSON.stringify(profile)}: use ${buildProfiles.join(' or ')}`);
   // Check the bundle before expensive tool provisioning; a missing package must
   // never make an otherwise pointless multi-gigabyte compiler download.
   const selection = await selectLeanVersion(source);
   progress?.({ stage: `Checking Lean ${selection.version} runtime` });
-  const runtime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit }, { directory: runtimeDirectory });
+  const runtime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit }, { directory: runtimeDirectory, stamps: verificationRecords(cache ?? managedCacheDirectory()) });
   if (!progress) log(`Preparing Lean ${selection.version} for Node…`);
   let lean = await provisionLean(source, { cache, log, progress });
   // The default Node link driver uses the minimal link toolchain. The emcc and
@@ -113,7 +114,8 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const memoryMode = 1;
   // A tiered Lean is identified by its assembled prefix, which is keyed by the
   // identities of the binaries and every module-data archive it contains.
-  const recipe = { schema: 1, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
+  // The profile is part of the identity: dev and release outputs never share a cache entry.
+  const recipe = { schema: 1, profile, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
     ...(lean.distribution === 'tiers' ? { nativeLeanTier: lean.tier, nativeLeanComponents: lean.components } : {}),
     // Outputs of different link drivers and tool sets never share a cache entry.
     emscripten, linkDriver, ...(linkDriver === 'node'
@@ -150,7 +152,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   let linkRequirements;
   try {
     linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
-      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), nativeCompilations, nativeUnavailable });
+      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), analysisCache: join(cache ?? managedCacheDirectory(), 'analysis'), profile, nativeCompilations, nativeUnavailable });
   } catch (error) {
     // This unique staging directory contains only this failed build's files.
     // Preserve any previously delivered application and avoid retaining probes.

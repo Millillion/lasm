@@ -41,6 +41,7 @@ Reference runner: GitHub Actions ubuntu24 20261023.334.3, Ubuntu 24.04.5 LTS (li
 | Build | Clean build, trivial program | 34 s | 34 s – 34 s (n=3) |  |
 | Build | Incremental build after a one-line change, trivial program | 34 s | 34 s – 35 s (n=3) |  |
 | Build | Clean build, Hono app | 53 s | 53 s – 81 s (n=3) |  |
+| Build | Incremental build after a one-line change, Hono app | 54 s | 53 s – 54 s (n=3) |  |
 | Install | Package download (npm tarball) | 62 MiB |  |  |
 | Install | Installed size | 364 MiB |  |  |
 | Install | npm install, empty cache | 5.1 s | 5.0 s – 5.1 s (n=3) |  |
@@ -87,6 +88,7 @@ Flagged (informational; releases are not blocked on performance yet):
 | Clean build, trivial program | 44 s | 26 s | 34 s | 45 s | 34 s |
 | Incremental build after a one-line change, trivial program | 45 s | 26 s | 35 s | 43 s | 34 s |
 | Clean build, Hono app | 70 s | 42 s | 54 s | 68 s | 53 s |
+| Incremental build after a one-line change, Hono app | 71 s | 41 s | 54 s | 68 s | 54 s |
 | Package download (npm tarball) | 62 MiB | 62 MiB | 62 MiB | 62 MiB | 62 MiB |
 | Installed size | 363 MiB | 364 MiB | 364 MiB | 364 MiB | 364 MiB |
 | npm install, empty cache | 7.1 s | 4.3 s | 5.1 s | 6.9 s | 5.1 s |
@@ -107,7 +109,7 @@ set stays small enough to run on every candidate on one free runner (about
 | Memory: peak RSS of the trivial program; idle RSS and peak RSS under load for servers | Which instance size do I need? The 512 MB recommendation comes from these. | same |
 | HTTP throughput and p50/p99 latency at fixed concurrency | How much traffic does one instance serve, and how slow is the tail? Covers the recommended interop path (Hono, Express with Lean handlers) and Lean's own `Std.Http`. | GET `/` answering `{"ok":true}` |
 | Interop latency: Lean→JS call round trip; awaiting a resolved promise | What does each JavaScript call cost, so bindings can be designed coarse-grained? | `Math.max()`; `Promise.resolve(1)` |
-| Build time: clean (`--rebuild`) and incremental after a one-line change | How long is the edit–build loop? | trivial program; Hono app |
+| Build time: clean (`--rebuild`) and incremental after a one-line change, release and dev profile; a one-job release build must be byte-identical | How long is the edit–build loop? | trivial program; Hono app |
 | Big numbers: multiplication, division and `toString` of 10,000-digit `Nat`s | How slow is arbitrary-precision arithmetic without GMP? The runtime uses Lean's own big-number code ([below](#big-numbers-without-gmp)). | `bench/fixtures/bignum` |
 | `@lasm/cli` install: download size, installed size, `npm install` time; first build including the one-time tool download, and the tool cache size | What does getting started cost? | the candidate npm archive |
 
@@ -117,6 +119,63 @@ injection (covered by the robustness suites in [SERVER_MVP.md](SERVER_MVP.md)
 and the 5.2 interop soak), and native-Lean comparisons (the Std.Http robustness
 suite already compares against native; here the reference is plain Node, which
 is what a user would otherwise write).
+
+## Build time: where it goes, and the two profiles (current source)
+
+A profile of `lasm build` on 2026-10-24 (source `85f864a`) found that most of the
+40–70 s did not depend on the program, which is why an incremental build was no
+faster than a clean one:
+
+- tool re-verification on every build, cache hits included: SHA-256 of the whole
+  Lean prefix (7–16k files, 5–12 s), the link toolchain (2 s) and the runtime
+  bundle (1 s);
+- initializer planning: 3 compilations at `-O2` of the generated wrapper C
+  (2.5 MB for the Hono app, about 10 s each; the last round's source equals
+  the final link's), 5 probe links (about 1.3 s each), and parsing the runtime
+  archives (2.5 s);
+- the final link: `wasm-opt -Oz` (8–14 s) on one thread (`BINARYEN_CORES=1`
+  for every user), and about 3 s of JavaScript passes;
+- a requirements probe link that also ran the full glue pipeline (1.4 s), only
+  to read its map.
+
+What changed. Release outputs are byte-identical to before (`program.wasm` and
+`program.cjs`, both fixtures, compared by SHA-256):
+
+- tools and the runtime are re-hashed only when a file's size, inode or
+  modification/change time differs from the machine's record of its last full
+  check (`<tool cache>/verified/`); `lasm cache repair` always checks every byte;
+- every generated C file (Lean modules, initializer wrappers, stubs) is cached by
+  content, and so is the live set of each planning probe link (keyed by the
+  bytes of its inputs, the runtime identity, the tools and the link-driver code);
+  the requirements check reuses the last planning round's identical link;
+- the runtime archives' initializer analysis is cached per runtime identity;
+- `wasm-opt` uses the machine's CPUs (at most 8; `LASM_BUILD_JOBS`), which
+  does not change its output (the benchmark run asserts this for both fixtures);
+- the **dev profile** (`lasm Main.lean`, `npm run dev`, `lasm build --dev`)
+  skips `wasm-opt -Oz`, metadce and the JavaScript dead-code passes. It is
+  deterministic, labelled in `build-info.json` (`"profile"`) and on the summary
+  line, about 15–20 % larger, and refused by `lasm package` without `--allow-dev`.
+
+Measured on the maintainer host (Linux x64, inside the resource guard: base
+pages and **one** Binaryen thread, so the `wasm-opt` part is the single-thread
+worst case; CI's 4-vCPU runner has been about 1.6× faster on this work):
+
+| Build | Before | After, release | After, dev |
+| --- | ---: | ---: | ---: |
+| Trivial program, `--rebuild` | 55 s | 21 s | 3.4 s ¹ |
+| Trivial program, one-line change | 46 s | 18 s | 6.4 s |
+| Hono app, `--rebuild` | 81 s | 29 s | 5.8 s ¹ |
+| Hono app, one-line change | 66 s | 26 s | 9.7 s |
+| Unchanged program (cache hit), Hono | about 20 s ² | 2.1 s | 2.1 s |
+
+¹ after a release build of the same source, so the planning links were cached.
+² estimated from the measured verification cost; the hit itself was 2 s once records existed.
+
+Expected on the CI reference runner (to be confirmed by the next candidate's
+generated table above): release builds about 10–15 s for the trivial program
+and 13–18 s for the Hono app, dev edits about 4–6 s. The remaining release time
+is mostly `wasm-opt -Oz`, two planning probe links when the program changed, and
+Lean itself; a first build in a new project also compiles the wrapper C once.
 
 ## Big numbers without GMP
 

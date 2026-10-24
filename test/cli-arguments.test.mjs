@@ -4,7 +4,7 @@ import { parseLasmArguments } from '../src/cli-arguments.mjs';
 
 test('ordinary Lean files default to run on Node, and preserve arguments after --', () => {
   assert.deepEqual(parseLasmArguments(['Main.lean', '--', 'hello', '--target', 'user-option']), {
-    command: 'run', input: 'Main.lean', rebuild: false, verbose: false,
+    command: 'run', input: 'Main.lean', rebuild: false, verbose: false, profile: 'dev',
     args: ['hello', '--target', 'user-option'],
   });
   assert.deepEqual(parseLasmArguments(['run', 'Main.lean']), parseLasmArguments(['Main.lean']));
@@ -32,7 +32,23 @@ test('build targets: node by default, or a function platform packaged after the 
     assert.equal(parseLasmArguments(['build', `--target=${target}`, 'Main.lean', '--output', 'out']).target, target);
   }
   assert.deepEqual(parseLasmArguments(['build', 'Main.lean', '--target', 'lambda', '--output', 'out']),
-    { command: 'build', input: 'Main.lean', output: 'out', target: 'lambda', rebuild: false, verbose: false, args: [] });
+    { command: 'build', input: 'Main.lean', output: 'out', target: 'lambda', rebuild: false, verbose: false, profile: 'release', args: [] });
+});
+
+test('profiles: lasm build is release, lasm run is dev; --dev and --release choose', () => {
+  assert.equal(parseLasmArguments(['build', 'Main.lean']).profile, 'release');
+  assert.equal(parseLasmArguments(['build', 'Main.lean', '--dev']).profile, 'dev');
+  assert.equal(parseLasmArguments(['Main.lean']).profile, 'dev');
+  assert.equal(parseLasmArguments(['run', 'Main.lean', '--release']).profile, 'release');
+  assert.equal(parseLasmArguments(['build', 'Main.lean', '--dev', '--dev']).profile, 'dev');
+  assert.throws(() => parseLasmArguments(['build', 'Main.lean', '--dev', '--release']), /Choose one of --dev and --release/);
+  assert.throws(() => parseLasmArguments(['build', 'bindings.json', '--dev']), /apply to Lean applications/);
+  assert.equal(parseLasmArguments(['build', 'Main.lean', '--dev', '--target', 'lambda', '--allow-dev']).allowDev, true);
+  assert.throws(() => parseLasmArguments(['build', 'Main.lean', '--allow-dev']), /--allow-dev applies to/);
+  assert.throws(() => parseLasmArguments(['Main.lean', '--allow-dev']), /--allow-dev applies to/);
+  // Application arguments after -- are never Lasm options.
+  assert.deepEqual(parseLasmArguments(['Main.lean', '--', '--release']).args, ['--release']);
+  assert.equal(parseLasmArguments(['Main.lean', '--', '--release']).profile, 'dev');
 });
 
 test('help needs no input or build-time side effects', () => {

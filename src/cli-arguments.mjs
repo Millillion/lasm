@@ -6,14 +6,17 @@ import { parsePackageArguments, packageTargets } from './package.mjs';
 // installs or starts the platform's own tools.
 export const buildTargets = ['node', ...Object.keys(packageTargets)];
 
-export const cliUsage = `Usage: lasm <Main.lean> [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf]
+export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf] [--dev]
        lasm init <directory> [--template plain|express|hono|std-http] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
        lasm cache repair
 
 Options: --rebuild, --verbose, --help
+Profiles: lasm build makes release builds (optimized, byte-reproducible, for
+deployment); --dev skips the size optimizations for a faster build. lasm run
+(lasm Main.lean) makes dev builds; --release runs a release build.
 Application arguments must follow --.`;
 
 /** Parse independently of provisioning: help/errors must never download tools. */
@@ -37,6 +40,12 @@ export function parseLasmArguments(argv) {
     }
     if (token === '--help' || token === '-h') return { command: 'help' };
     if (token === '--rebuild' || token === '--verbose') { result[token.slice(2)] = true; continue; }
+    if (token === '--dev' || token === '--release') {
+      const profile = token.slice(2);
+      if (result.profile !== undefined && result.profile !== profile) throw new Error('Choose one of --dev and --release');
+      result.profile = profile; continue;
+    }
+    if (token === '--allow-dev') { result.allowDev = true; continue; }
     const target = /^--target(?:=(.*))?$/.exec(token);
     if (target) {
       if (result.command !== 'build') throw new Error('--target is available only with lasm build');
@@ -65,6 +74,11 @@ export function parseLasmArguments(argv) {
   if (result.command === 'run' && result.output !== undefined) throw new Error('--output is available only with lasm build');
   if (!(result.input.endsWith('.lean') || result.command === 'build' && result.input.endsWith('.json')))
     throw new Error('Expected a Lean source file, or a binding configuration for lasm build');
+  if (result.input.endsWith('.json') && result.profile !== undefined) throw new Error('--dev and --release apply to Lean applications');
+  // lasm build defaults to the release profile, lasm run to the dev profile.
+  if (result.input.endsWith('.lean')) result.profile ??= result.command === 'build' ? 'release' : 'dev';
+  if (result.allowDev && !(result.command === 'build' && result.target && result.target !== 'node'))
+    throw new Error('--allow-dev applies to lasm build --target <platform> and lasm package');
   if (result.command === 'build') {
     result.output ??= 'dist';
     // Today the CLI runs on Node, so `node` is the default host target.

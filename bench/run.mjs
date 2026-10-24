@@ -241,7 +241,10 @@ function project(name) {
   run(`npm install -D candidate (${name})`, npmCli, ['install', '-D', tgz], { cwd: dir });
   return dir;
 }
-const build = (name, extra = []) => run(`lasm build ${name}`, npxCli, ['lasm', 'build', 'Main.lean', '--output', 'dist', ...extra], { cwd: projects[name] }).ms;
+const build = (name, extra = [], { output = 'dist', env } = {}) => run(`lasm build ${name} ${extra.join(' ')}`, npxCli,
+  ['lasm', 'build', 'Main.lean', '--output', output, ...extra], { cwd: projects[name], ...(env ? { env: { ...baseEnv, ...env } } : {}) }).ms;
+const programHashes = dir => Object.fromEntries(['program.wasm', 'program.cjs', 'main.mjs']
+  .map(file => [file, createHash('sha256').update(readFileSync(join(dir, file))).digest('hex')]));
 
 function installPhase() {
   const samples = [];
@@ -288,10 +291,26 @@ function buildPhase() {
       writeFileSync(source, original + `\ndef benchmarkEdit : Nat := ${i + 1}\n`);
       incremental.push(build(name));
     }
+    // The dev profile (lasm run, lasm build --dev): the same edit loop without
+    // Binaryen's size optimization.
+    const devIncremental = [];
+    build(name, ['--dev'], { output: 'dist-dev' });
+    for (let i = 0; i < settings.buildReps; i++) {
+      writeFileSync(source, original + `\ndef benchmarkDevEdit : Nat := ${i + 1}\n`);
+      devIncremental.push(build(name, ['--dev'], { output: 'dist-dev' }));
+    }
     writeFileSync(source, original);
     build(name);
+    // Release builds are byte-identical whatever the number of Binaryen threads.
+    build(name, ['--rebuild'], { output: 'dist-one-job', env: { LASM_BUILD_JOBS: '1' } });
+    assert.deepEqual(programHashes(join(projects[name], 'dist-one-job')), programHashes(join(projects[name], 'dist')),
+      `${name}: a one-job release build differs from the default build`);
+    build(name, ['--dev'], { output: 'dist-dev' });
+    metric(`size.wasm_bytes_dev.${name}`, { value: lstatSync(join(projects[name], 'dist-dev', 'program.wasm')).size, unit: 'bytes', better: 'lower',
+      group: 'size', label: `program.wasm, dev profile, ${name}` });
     metric(`build.clean_ms.${name}`, { samples: clean, unit: 'ms', better: 'lower', group: 'build', label: `Clean build (--rebuild), ${name}`, normalize: 'cpu' });
     metric(`build.incremental_ms.${name}`, { samples: incremental, unit: 'ms', better: 'lower', group: 'build', label: `Incremental build after a one-line change, ${name}`, normalize: 'cpu' });
+    metric(`build.incremental_dev_ms.${name}`, { samples: devIncremental, unit: 'ms', better: 'lower', group: 'build', label: `Incremental dev build (--dev) after a one-line change, ${name}`, normalize: 'cpu' });
   }
   for (const name of ['express', 'std-http', 'interop', 'bignum']) {
     metric(`build.clean_ms.${name}`, { value: build(name), unit: 'ms', better: 'lower', group: 'build', label: `Clean build, ${name}`, normalize: 'cpu', spread: { n: 1 } });

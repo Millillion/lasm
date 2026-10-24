@@ -93,6 +93,20 @@ test('lasm package refuses what is not a Linux-capable Lasm build', () => {
   assert.throws(() => packageApplication({ input: app, target: 'vercel', output: directory }), /must not contain the build/);
 });
 
+test('lasm package refuses a dev-profile build unless --allow-dev', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-package-dev-'));
+  const app = fakeApplication(join(directory, 'dist'));
+  writeFileSync(join(app, 'build-info.json'), JSON.stringify({ profile: 'dev' }));
+  assert.throws(() => packageApplication({ input: app, target: 'netlify', output: join(directory, 'nf') }), /is a dev build.*--allow-dev/);
+  const allowed = packageApplication({ input: app, target: 'netlify', output: join(directory, 'nf'), allowDev: true });
+  assert.equal(allowed.profile, 'dev');
+  assert.match(allowed.warnings.join('\n'), /dev build/);
+  writeFileSync(join(app, 'build-info.json'), JSON.stringify({ profile: 'release' }));
+  const release = packageApplication({ input: app, target: 'netlify', output: join(directory, 'nf2') });
+  assert.equal(release.profile, 'release'); assert.deepEqual(release.warnings, []);
+  assert.deepEqual(parseLasmArguments(['package', '--target', 'lambda', '--allow-dev']), { command: 'package', target: 'lambda', input: 'dist', allowDev: true });
+});
+
 test('Lambda zip: every event shape reaches the server and returns its response shape', { skip: process.platform === 'win32' || spawnSync('unzip', ['-v']).status !== 0 }, () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-lambda-'));
   const app = fakeApplication(join(directory, 'dist'));

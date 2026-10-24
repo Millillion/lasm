@@ -6,6 +6,7 @@
 // emcc. The full SDK (src/managed-sdk.mjs) remains for the maintainer emcc driver.
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { availableParallelism } from 'node:os';
 import { provisionArtifact, deriveArtifact, validateArtifact, managedCacheDirectory, linkArtifactTree } from './managed-artifacts.mjs';
 import { assertSupportedHost, executableName } from './platform.mjs';
 import { verifyNativeProgram } from './native-program.mjs';
@@ -23,13 +24,24 @@ export function linkToolchainArtifacts(release, host) {
   return { native, shared: release.shared };
 }
 
+/** Worker threads for Binaryen (wasm-opt): LASM_BUILD_JOBS, else the machine's
+ * parallelism up to 8. Binaryen's output does not depend on its thread count
+ * (test/build-jobs.test.mjs compares builds); the maintainer resource guard
+ * (scripts/full-lean/run-bounded.mjs) sets LASM_BUILD_JOBS=1. */
+export function buildJobs(env = process.env, parallelism = availableParallelism()) {
+  const value = env.LASM_BUILD_JOBS;
+  if (value === undefined || value === '') return Math.max(1, Math.min(8, parallelism));
+  if (!/^[1-9]\d{0,2}$/.test(value)) throw new Error(`LASM_BUILD_JOBS must be a positive integer, not ${JSON.stringify(value)}`);
+  return Number(value);
+}
+
 /** Environment for the native tools and Emscripten's JavaScript compiler. Only
- * SOURCE_DATE_EPOCH (also set by the recipe) and BINARYEN_CORES are fixed, as
- * recorded; inherited Emscripten/Python/LLVM/Binaryen variables are removed. */
+ * SOURCE_DATE_EPOCH (also set by the recipe) and BINARYEN_CORES (buildJobs) are
+ * set; inherited Emscripten/Python/LLVM/Binaryen variables are removed. */
 export function linkToolchainEnvironment(env = process.env) {
   const result = { ...env };
   for (const key of Object.keys(result)) if (/^(?:EM_|EMCC_|EMSDK|PYTHON|LLVM_|BINARYEN_)/.test(key)) delete result[key];
-  return Object.assign(result, { BINARYEN_CORES: '1', SOURCE_DATE_EPOCH: '315532800' });
+  return Object.assign(result, { BINARYEN_CORES: String(buildJobs(env)), SOURCE_DATE_EPOCH: '315532800' });
 }
 
 /** Download (or reuse) both archives and hard-link them into one verified prefix

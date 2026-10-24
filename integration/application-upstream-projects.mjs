@@ -122,7 +122,7 @@ try {
   report.wasmSha256 = await hashFile(join(dist, 'program.wasm'));
   if (spaces) {
     const cached = build('unchanged installed application rebuild', entry, dist);
-    assert.ok(cached.stderr.includes(`Reused Lean ${leanVersion} for Node:`), 'Unchanged second build must reuse the verified cache');
+    assert.ok(cached.stderr.includes(`Reused Lean ${leanVersion} for Node (release profile):`), 'Unchanged second build must reuse the verified cache');
     assert.deepEqual(JSON.parse(readFileSync(join(dist, 'build-info.json'))), report.build);
     assert.equal(await hashFile(join(dist, 'program.wasm')), report.wasmSha256);
     report.cacheReused = true;

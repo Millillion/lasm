@@ -27,7 +27,7 @@ export const packageTargets = {
     shim: 'lasm-gcf.mjs', dependency: '@google-cloud/functions-framework' },
 };
 
-export const packageUsage = `Usage: lasm package [dist] --target ${Object.keys(packageTargets).join('|')} [--output PATH]
+export const packageUsage = `Usage: lasm package [dist] --target ${Object.keys(packageTargets).join('|')} [--output PATH] [--allow-dev]
 
 Packages a built Lasm HTTP server (lasm build output, default dist/) for a
 function platform. The server must listen on $HOST and $PORT (every lasm init
@@ -37,6 +37,8 @@ ${Object.entries(packageTargets).map(([name, t]) => `  ${name.padEnd(12)} ${t.ou
 lasm build Main.lean --target <target> builds and packages in one step; use
 lasm package to package one build for several platforms. Lasm never installs
 or starts a platform's own tools: test and deploy with the platform's CLI.
+Packages hold release builds; a dev build (lasm build --dev, lasm run) is
+refused unless --allow-dev is given.
 
 Example: npx lasm build Main.lean && npx lasm package --target lambda`;
 
@@ -46,6 +48,7 @@ export function parsePackageArguments(tokens) {
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
     if (token === '--help' || token === '-h') return { command: 'package-help' };
+    if (token === '--allow-dev') { result.allowDev = true; continue; }
     const match = /^--(target|output)(?:=(.*))?$/.exec(token);
     if (match) {
       const value = match[2] ?? tokens[++i];
@@ -83,6 +86,12 @@ function applicationFiles(input) {
   };
   walk(input);
   return files;
+}
+
+/** The build profile recorded in build-info.json (builds before profiles were release builds). */
+export function buildProfile(input) {
+  const info = JSON.parse(readFileSync(join(input, 'build-info.json'), 'utf8'));
+  return info.profile ?? 'release';
 }
 
 function checkApplication(input) {
@@ -143,11 +152,17 @@ function dependencyPackage(input, name) {
 }
 
 /** Packages `input` for `target`; returns a summary for the CLI and tests. */
-export function packageApplication({ input = 'dist', target, output }) {
+export function packageApplication({ input = 'dist', target, output, allowDev = false }) {
   const spec = packageTargets[target];
   if (!spec) throw new Error(`Unknown target "${target}"`);
   input = resolve(input);
   const nativeTargets = checkApplication(input);
+  // Dev builds (lasm run, lasm build --dev) skip Binaryen's size optimization:
+  // larger and not the reproducible release artifact. Deploy release builds.
+  const profile = buildProfile(input);
+  if (profile === 'dev' && !allowDev)
+    throw new Error(`${input} is a dev build (lasm build --dev or lasm run): unoptimized and not for deployment. `
+      + 'Rebuild it with lasm build Main.lean (the release profile), or pass --allow-dev to package it anyway.');
   output = resolve(output ?? spec.output);
   if (output === input || input.startsWith(output + sep)) throw new Error('The output must not contain the build directory');
   const shims = shimFiles(target);
@@ -160,7 +175,8 @@ export function packageApplication({ input = 'dist', target, output }) {
   const unzipped = sizeOf(files);
   if (spec.unzipped && unzipped > spec.unzipped)
     throw new Error(`The package is ${format(unzipped)} unpacked; ${target} allows ${format(spec.unzipped)}.`);
-  const summary = { target, input, output, files: files.length, unzippedBytes: unzipped, nativeTargets, warnings: [] };
+  const summary = { target, input, output, files: files.length, unzippedBytes: unzipped, nativeTargets, profile, warnings: [] };
+  if (profile === 'dev') summary.warnings.push('This package holds a dev build (--allow-dev): unoptimized and larger. Deploy release builds (lasm build).');
   if (target === 'lambda' || target === 'lambda-edge') {
     const archive = zip(files.map(file => ({ name: file.name, data: file.data ?? readFileSync(file.source), mode: file.mode })));
     summary.zippedBytes = archive.length;

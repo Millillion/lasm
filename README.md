@@ -111,23 +111,43 @@ These are all commands and options in the ordinary Node application interface:
 
 | Command or option | Example | Effect |
 | --- | --- | --- |
-| Run (default) | `npx lasm Main.lean` | Build and run Lean `main`. |
+| Run (default) | `npx lasm Main.lean` | Build (dev profile, below) and run Lean `main`. `npm run dev` in a `lasm init` project runs this. |
+| Run a release build | `npx lasm Main.lean --release` | Build and run exactly what `lasm build` deploys. |
 | Explicit run | `npx lasm run Main.lean` | Same as the default command. |
 | Program arguments | `npx lasm Main.lean -- hello "two words"` | Pass arguments to `main (args : List String)`. |
-| Build | `npx lasm build Main.lean` | Write `dist/`; do not run the application. |
+| Build | `npx lasm build Main.lean` | Write `dist/` (release profile); do not run the application. |
+| Dev build | `npx lasm build Main.lean --dev` | Write `dist/` faster, without the size optimizations (dev profile, below). |
 | Build for a function platform | `npx lasm build Main.lean --target lambda` | Build `dist/`, then package it for the platform where `lasm package` writes it: `node` (default; `dist/` only), `lambda` (`lambda.zip`), `lambda-edge` (`lambda-edge.zip`), `vercel` (`.vercel/output`), `netlify` (`netlify/functions/lasm`), `azure` (`azure-functions/`), `gcf` (`gcf/`). `--target=vercel` also works. Lasm never installs or starts the platform's own CLI; use it yourself to test and deploy. [Recipes](docs/deploy/README.md). |
 | Output directory | `npx lasm build Main.lean --output "app dist"` | Choose the deployment directory. `lasm build Main.lean "app dist"` is an alias. |
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
 | New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono`; after publication also `npm create lasm@latest my-app -- --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. `--deploy lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` (repeatable): `npm run build:<target>` scripts (`lasm build --target`), `vercel.json`/`netlify.toml`, and the platform npm package for `azure` and `gcf`. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
-| Package an existing build | `npx lasm package --target lambda` | Package a built server (default `dist/`; any server that listens on `$HOST:$PORT`) for one or more platforms without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output; `lasm package dist2 --target lambda` packages another build. Checks the platform's size limit and leaves out the musl pieces (function platforms use glibc). Files only, no network. |
+| Package an existing build | `npx lasm package --target lambda` | Package a built server (default `dist/`; any server that listens on `$HOST:$PORT`) for one or more platforms without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output; `lasm package dist2 --target lambda` packages another build. Checks the platform's size limit and leaves out the musl pieces (function platforms use glibc). Files only, no network. Refuses a dev build unless `--allow-dev` is given (then it warns). |
 | Cache repair | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
-`--rebuild` and `--verbose` work with both run and build. `--output` is build-only;
-arguments after `--` are run-only. The application's exit status is preserved.
-There is currently no Lasm install, clean, uninstall, or version subcommand.
-There is no `--target` option; passing it is an error.
+`--rebuild` and `--verbose` work with both run and build. `--output` and
+`--target` are build-only; arguments after `--` are run-only. The application's
+exit status is preserved. There is currently no Lasm install, clean, uninstall,
+or version subcommand.
+
+**Build profiles (current source).** Both profiles link the same program with the
+same settings and libraries, and both are deterministic:
+
+- **release** (`lasm build`, `lasm build --target …`, `lasm Main.lean --release`):
+  the full Binaryen size optimization (`wasm-opt -Oz`, metadce and the JavaScript
+  dead-code passes). Byte-reproducible and the one to deploy.
+- **dev** (`lasm Main.lean`, `npm run dev`, `lasm build --dev`): leaves those
+  passes out. It behaves the same, builds several seconds faster, and its
+  `program.wasm` is about 15–20 % larger. `build-info.json` records `"profile"`,
+  and the build's summary line says which profile it used. `lasm package` and
+  `lasm build --dev --target <platform>` refuse a dev build unless you pass
+  `--allow-dev`.
+
+Builds reuse unchanged work: generated C objects, Lasm's initialization-planning
+links, and the analysis of the runtime libraries. Tools are fully re-hashed only
+when their files' metadata changed since this machine verified them, and
+`lasm cache repair` always checks every byte.
 The source installer also accepts the [documented download environment settings](docs/INSTALLATION_HARDENING.md#transfers).
 
 Environment variables (all optional; set them before `npx lasm …`):
@@ -135,6 +155,7 @@ Environment variables (all optional; set them before `npx lasm …`):
 | Variable | Example | Effect |
 | --- | --- | --- |
 | `LASM_TOOLCHAIN_CACHE` | `LASM_TOOLCHAIN_CACHE=/data/lasm-cache npx lasm Main.lean` | Move the managed tool cache ([default locations](docs/NODE_SUPPORT.md)). |
+| `LASM_BUILD_JOBS` (current source) | `LASM_BUILD_JOBS=2 npx lasm build Main.lean` | Threads for Binaryen's optimizer (default: the machine's CPUs, at most 8). The output is the same for any value. |
 | `LASM_ARTIFACT_SOURCE` (current source) | `LASM_ARTIFACT_SOURCE=npm npx lasm Main.lean` | `auto` (default): `@lasm/…` npm tool packages when present, else HTTPS; `npm`: never download directly; `https`: ignore the npm packages. |
 | `LASM_DOWNLOAD_ATTEMPTS`, `LASM_DOWNLOAD_CONNECT_MS`, `LASM_DOWNLOAD_IDLE_MS`, `LASM_DOWNLOAD_TOTAL_MS` | `LASM_DOWNLOAD_TOTAL_MS=14400000 npx lasm Main.lean` | Download retries and timeouts ([defaults and ranges](docs/INSTALLATION_HARDENING.md#transfers)). |
 | `NODE_USE_ENV_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, `NODE_EXTRA_CA_CERTS` (Node's own) | `NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://proxy:8080 npx lasm Main.lean` | Proxies and private CAs ([corporate networks](docs/INSTALLATION_HARDENING.md#corporate-networks)). |

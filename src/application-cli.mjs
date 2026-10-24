@@ -31,7 +31,7 @@ export async function runApplicationCli(argv) {
   const options = parseLasmArguments(argv);
   const support = applicationSupport();
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf]\n       lasm init my-app [--template plain|express|hono|std-http] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nBuild and run ordinary Lean main in Node.' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf] [--dev]\n       lasm init my-app [--template plain|express|hono|std-http] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nBuild and run ordinary Lean main in Node.' : cliUsage);
     return 0;
   }
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }
@@ -60,15 +60,19 @@ export async function runApplicationCli(argv) {
     return 0;
   }
   const { buildApplicationWithProgress } = await import('./application-build-client.mjs');
-  const { target, ...buildOptions } = options;
+  const { target, allowDev, ...buildOptions } = options;
+  // A dev build refused by packaging is refused before it is built.
+  if (target && target !== 'node' && options.profile === 'dev' && !allowDev)
+    throw new Error(`lasm build --dev --target ${target}: dev builds are not for deployment. Drop --dev, or add --allow-dev to package a dev build anyway.`);
   const result = await buildApplicationWithProgress(options.input, buildOptions);
+  const profileNote = result.profile === 'dev' ? ' (dev profile: size optimizations skipped, not for deployment)' : ' (release profile)';
   if (options.command === 'build') {
-    console.error(`${result.cacheHit ? 'Reused' : 'Built'} Lean ${result.lean} for Node: ${result.output}`);
+    console.error(`${result.cacheHit ? 'Reused' : 'Built'} Lean ${result.lean} for Node${profileNote}: ${result.output}`);
     // A function platform: package dist/ where `lasm package` writes it.
-    if (target && target !== 'node') return (await import('./package.mjs')).runPackage({ input: result.output, target });
+    if (target && target !== 'node') return (await import('./package.mjs')).runPackage({ input: result.output, target, allowDev });
     return 0;
   }
-  console.error('[lasm] Running ' + options.input + '…');
+  console.error('[lasm] Running ' + options.input + (result.profile === 'dev' ? ' (dev build)' : ' (release build)') + '…');
   return runApplicationChild(process.execPath, [join(result.output, 'main.mjs'), ...options.args],
     'Could not start Node to run the application.');
 }

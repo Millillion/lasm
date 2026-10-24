@@ -26,7 +26,7 @@
 // Lean is that side effects of skipped initializers that are not visible through
 // Lean globals (for example printing during initialization) do not happen. This
 // matches upstream's `meta import` semantics.
-import { createReadStream, existsSync, readFileSync } from 'node:fs';
+import { closeSync, createReadStream, existsSync, openSync, readFileSync, readSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { wasmObjects } from './wasm-objects.mjs';
 
@@ -45,9 +45,32 @@ const ignoredData = name => /^_G_(?:runtime_|meta_)?initialized$/.test(name) || 
 
 /** Initializer units of the given objects and archives: ordered initializer calls
  * and the data symbols each body references (the globals it assigns). */
-export function initializerUnits(files, { graph } = {}) {
+export function initializerUnits(files, { graph, archiveUnits } = {}) {
   const units = new Map();
-  for (const { file, member, object } of wasmObjects(files)) {
+  for (const file of files) {
+    // Archive units (Lean's libraries) depend only on the archive's bytes; a
+    // cache (src/application-link.mjs) skips re-parsing an unchanged runtime.
+    const cached = graph ? undefined : archiveUnits?.load(file);
+    const list = cached?.map(unit => ({ ...unit, file, reaches: new Set(), siblings: new Set() })) ?? fileUnits(file, graph);
+    for (const unit of list) {
+      if (units.has(unit.name)) throw new Error(`Lean initializer ${unit.name} is defined twice (${units.get(unit.name).file}, ${file})`);
+      units.set(unit.name, unit);
+    }
+    if (!cached && !graph && archiveUnits && isArchive(file))
+      archiveUnits.save(file, list.map(({ name, calls, data, initTargets, effects, member }) => ({ name, calls, data, initTargets, effects, member })));
+  }
+  return units;
+}
+
+function isArchive(file) {
+  const fd = openSync(file, 'r'), bytes = Buffer.alloc(8);
+  try { readSync(fd, bytes, 0, 8, 0); } finally { closeSync(fd); }
+  return bytes.toString('latin1') === '!<arch>\n';
+}
+
+function fileUnits(file, graph) {
+  const units = [], names = new Set();
+  for (const { member, object } of wasmObjects([file])) {
     if (graph) {
       // Whole-program reference graph (definitions keyed by name; local symbols
       // by object), used only to attribute a shared global to skipped units.
@@ -92,9 +115,10 @@ export function initializerUnits(files, { graph } = {}) {
           afterInitFn = false;
         }
       }
-      if (units.has(name)) throw new Error(`Lean initializer ${name} is defined twice (${units.get(name).file}, ${file})`);
+      if (names.has(name)) throw new Error(`Lean initializer ${name} is defined twice (${file}, ${file})`);
+      names.add(name);
       const reached = reaches(name);
-      units.set(name, { name, calls, data: [...data], initTargets: [...initTargets], reaches: reached.data, effects: reached.effects,
+      units.push({ name, calls, data: [...data], initTargets: [...initTargets], reaches: reached.data, effects: reached.effects,
         file, member, siblings: defined });
     }
   }
@@ -195,9 +219,9 @@ export function coreInitTargets(version) {
   return list.initTargets.map(([symbol]) => symbol);
 }
 
-export async function planInitializers({ objects, archives, probe, log = () => {}, forceKeep, initTargets }) {
+export async function planInitializers({ objects, archives, probe, log = () => {}, forceKeep, initTargets, archiveUnits }) {
   const files = [...objects, ...archives];
-  const units = initializerUnits(files);
+  const units = initializerUnits(files, { archiveUnits });
   // The program's entry object: Lean's generated `main` calls its own module's initializer.
   const entry = [...units.values()].find(unit => !unit.member && ['main', '__main_argc_argv', '__main_void'].some(name => unit.siblings.has(name)));
   const roots = entry ? [...units.values()].filter(unit => unit.file === entry.file).map(unit => unit.name) : [];

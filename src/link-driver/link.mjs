@@ -143,9 +143,11 @@ export function expandArguments(template, values, platform = process.platform) {
   });
 }
 
+const jsSymbolsCache = new Map();
+
 /** tools/link.py: run one link mode. Returns { wasm, js, map } paths. */
 export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediates, nativeSigs, execute = execFileSync,
-  stdio = ['ignore', 'pipe', 'inherit'], timeout = 1800_000, platform = process.platform, warn, mapOnly = false }) {
+  stdio = ['ignore', 'pipe', 'inherit'], timeout = 1800_000, platform = process.platform, warn, mapOnly = false, optimize = true }) {
   // emcc's diagnostics reach the user only when its stderr does (Lasm --verbose).
   warn ??= stdio[2] === 'inherit' ? message => process.stderr.write(`emcc: warning: ${message}\n`) : () => {};
   const spec = recipe.link.modes[mode];
@@ -183,7 +185,17 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   const settingsJson = settings.serialize();
   saveText('settings.json', settingsJson);
   const symbolsStep = next('symbols');
-  const jsInfo = JSON.parse(run(symbolsStep.program, expandArguments(symbolsStep.args, values, platform), { input: settingsJson, capture: true }));
+  // A pure function of the settings and the pinned Emscripten: the probe links
+  // of one build share it (src/application-link.mjs plans with several probes).
+  const symbolsArgs = expandArguments(symbolsStep.args, values, platform);
+  const symbolsKey = createHash('sha256').update(JSON.stringify([tool(symbolsStep.program), symbolsArgs, settingsJson]))
+    .update(readFileSync(parsed.jsLibraries[0])).digest('hex');
+  let symbolsText = execute === execFileSync ? jsSymbolsCache.get(symbolsKey) : undefined;
+  if (symbolsText === undefined) {
+    symbolsText = run(symbolsStep.program, symbolsArgs, { input: settingsJson, capture: true });
+    if (execute === execFileSync) { jsSymbolsCache.set(symbolsKey, symbolsText); if (jsSymbolsCache.size > 16) jsSymbolsCache.delete(jsSymbolsCache.keys().next().value); }
+  }
+  const jsInfo = JSON.parse(symbolsText);
   const jsSyms = addJsDependencies(settings, jsInfo);
   const stub = paths.join(temp, 'libemscripten_js_symbols.so');
   writeFileSync(stub, stubObject(jsSyms));
@@ -242,8 +254,16 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
     writeFileSync(info, Buffer.concat([readFileSync(finalJs), Buffer.from('// EXTRA_INFO: ' + pythonJsonDumps(extra))]));
     return info;
   };
+  // The dev profile (optimize: false) runs the final link's settings, libraries
+  // and glue unchanged but leaves out the size optimizations: Binaryen's wasm-opt
+  // and metadce, and the JavaScript dead-code passes tied to them. Every other
+  // step (growableHeap, which the glue needs) runs as recorded.
+  const sizeOnly = entry => entry.kind === 'wasm-opt' || entry.kind === 'dce-graph' || entry.kind === 'metadce'
+    || entry.kind === 'acorn' && ['AJSDCE', 'applyDCEGraphRemovals'].includes(entry.pass);
+  if (!optimize && mode !== 'final') throw new Error('Only the final link has an unoptimized (dev) profile');
   while (step < steps.length) {
     const entry = steps[step];
+    if (!optimize && sizeOnly(entry)) { step++; continue; }
     if (entry.kind === 'wasm-opt') {
       step++;
       run(entry.program, expandArguments(entry.args, values, platform));

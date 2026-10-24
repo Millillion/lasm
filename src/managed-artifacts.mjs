@@ -1,4 +1,4 @@
-import { createReadStream } from 'node:fs';
+import { createReadStream, readdirSync, lstatSync, readFileSync } from 'node:fs';
 import { mkdir, readFile, readdir, readlink, lstat, realpath, rename, writeFile, symlink, link, copyFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { dirname, join, resolve, relative, isAbsolute, posix } from 'node:path';
@@ -185,23 +185,68 @@ async function inventory(directory) {
   return Object.fromEntries(files);
 }
 
-export async function verifyArtifactDirectory(directory, identity) {
+/** A cheap fingerprint of a tree's metadata: every entry's name, type, mode,
+ * size, inode and modification and change times (nanoseconds). Any write,
+ * truncation, rename, chmod or link-count change alters the change time. */
+export function treeFingerprint(directory) {
+  const hash = createHash('sha256');
+  const walk = (base, prefix) => {
+    for (const entry of readdirSync(base, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) {
+      const file = join(base, entry.name), name = prefix + entry.name;
+      const stat = lstatSync(file, { bigint: true });
+      hash.update(`${name}\0${stat.mode}\0${stat.size}\0${stat.ino}\0${stat.dev}\0${stat.mtimeNs}\0${stat.ctimeNs}\n`);
+      if (stat.isDirectory()) walk(file, name + '/');
+    }
+  };
+  walk(directory, '');
+  return hash.digest('hex');
+}
+
+/** Run `verify` (a full content check of `directory`) unless this machine
+ * already verified the same tree and no file's metadata changed since: the
+ * record (in `stamps`, inside the managed cache) holds the tree fingerprint
+ * taken before and after a successful full check. Without `stamps` (cache
+ * repair, release tooling) the full check always runs. */
+export async function verifyTreeOnce(stamps, key, directory, verify) {
+  if (!stamps) return verify();
+  const record = join(stamps, digest(key) + '.json');
+  const before = treeFingerprint(directory);
+  try {
+    const previous = JSON.parse(readFileSync(record, 'utf8'));
+    if (previous.schema === 1 && previous.key === key && previous.fingerprint === before) return;
+  } catch { /* No usable record: verify fully. */ }
+  await verify();
+  // A file changed while it was being hashed is not recorded as verified.
+  if (treeFingerprint(directory) !== before) return;
+  try {
+    await mkdir(stamps, { recursive: true });
+    const partial = `${record}.${process.pid}.${Date.now()}.partial`;
+    await writeFile(partial, JSON.stringify({ schema: 1, key, fingerprint: before }) + '\n');
+    await rename(partial, record);
+  } catch { /* An unwritable record only costs the next build a full check. */ }
+}
+export const verificationRecords = cache => join(resolve(cache), 'verified');
+
+export async function verifyArtifactDirectory(directory, identity, { stamps } = {}) {
   if (!(await lstat(directory)).isDirectory() || !(await lstat(join(directory, receiptName))).isFile())
     throw new Error(`Managed artifact directory and receipt must not be symbolic links: ${directory}`);
   const receipt = JSON.parse(await readFile(join(directory, receiptName), 'utf8'));
   if (receipt.schema !== 1 || receipt.identity !== identity || !receipt.files || !Object.keys(receipt.files).length)
     throw new Error('Managed artifact receipt does not match the requested toolchain');
-  const observed = await inventory(directory);
-  if (!isDeepStrictEqual(observed, receipt.files)) {
-    const changed = [...new Set([...Object.keys(receipt.files), ...Object.keys(observed)])]
-      .filter(name => !isDeepStrictEqual(observed[name], receipt.files[name]));
-    throw new Error(`Managed cache contents changed: ${directory}. Changed entries (${changed.length}): ` +
-      changed.slice(0, 10).map(name => JSON.stringify(name)).join(', ') +
-      (changed.length > 10 ? ', ...' : '') + '. Run lasm cache repair, then retry to download a verified replacement.');
-  }
+  await verifyTreeOnce(stamps, `managed-artifact\0${identity}\0${resolve(directory)}`, directory, async () => {
+    const observed = await inventory(directory);
+    if (!isDeepStrictEqual(observed, receipt.files)) {
+      const changed = [...new Set([...Object.keys(receipt.files), ...Object.keys(observed)])]
+        .filter(name => !isDeepStrictEqual(observed[name], receipt.files[name]));
+      throw new Error(`Managed cache contents changed: ${directory}. Changed entries (${changed.length}): ` +
+        changed.slice(0, 10).map(name => JSON.stringify(name)).join(', ') +
+        (changed.length > 10 ? ', ...' : '') + '. Run lasm cache repair, then retry to download a verified replacement.');
+    }
+  });
   return receipt;
 }
-const verify = verifyArtifactDirectory;
+// Builds re-check a cached tool fully only when its files' metadata changed.
+const verify = (directory, identity, cache) => verifyArtifactDirectory(directory, identity, { stamps: verificationRecords(cache) });
 
 /** Install into a private staging directory; expose only a verified complete tree.
  * An OS-owned per-artifact lock shares installs across independent processes.
@@ -222,7 +267,7 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
     try {
       await lstat(directory);
       progress?.({ stage: `Verifying cached ${label}` });
-      const receipt = await verify(directory, identity);
+      const receipt = await verify(directory, identity, cache);
       return { directory, identity, receipt, cacheHit: true };
     } catch (error) {
       // A damaged existing cache is never silently trusted or overwritten.
@@ -262,7 +307,7 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
       catch (error) {
         if (!['EEXIST', 'ENOTEMPTY', 'EPERM', 'EACCES'].includes(error.code)) throw error;
         // Another process won the atomic installation. Verify its complete tree.
-        await verify(directory, identity);
+        await verify(directory, identity, cache);
       }
       progress?.({ stage: `Finishing ${label} setup` });
       return { directory, identity, receipt, cacheHit: false };
@@ -283,7 +328,7 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
     await removeOwnedStaging(staging, { log });
     try {
       await lstat(directory);
-      return { directory, identity, receipt: await verify(directory, identity), cacheHit: true };
+      return { directory, identity, receipt: await verify(directory, identity, cache), cacheHit: true };
     } catch (error) {
       if (error.code !== 'ENOENT') throw error;
       try { await lstat(directory); throw new Error(`Incomplete derived tool cache: ${directory}`); }
@@ -300,7 +345,7 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
       try { await rename(tree, directory); }
       catch (error) {
         if (!['EEXIST', 'ENOTEMPTY', 'EPERM', 'EACCES'].includes(error.code)) throw error;
-        await verify(directory, identity);
+        await verify(directory, identity, cache);
       }
       return { directory, identity, receipt, cacheHit: false };
     } finally { await removeOwnedStaging(staging, { log }); }

@@ -185,14 +185,22 @@ try {
     assert.match(cold.stderr, /Linking application and Lean runtime/);
     assert.match(cold.stderr, /Build ready/);
     assert.match(cold.stderr, /\[lasm\] Running Main\.lean/);
+    // lasm Main.lean makes a dev-profile build; lasm build makes the release build.
+    assert.match(cold.stderr, /\[lasm\] Running Main\.lean \(dev build\)/);
     result.cached = cachedDist(project);
+    assert.equal(buildInfo(result.cached).profile, 'dev');
     result.originalSignature = buildInfo(result.cached).signature;
     result.originalMtime = statSync(join(result.cached, 'program.wasm')).mtimeMs;
     const built = npx('npx lasm build Main.lean', ['build', 'Main.lean']);
     assert.equal(built.code, 0); assert.equal(built.stdout, '', 'Build must not run the application');
-    assert.match(built.stderr, /Reused Lean/);
-    assert.match(built.stderr, /Reused cached build/);
-    assert.doesNotMatch(built.stderr, /First-time tool setup|\[lasm\] Running/);
+    assert.match(built.stderr, /Built Lean .* \(release profile\)/);
+    assert.doesNotMatch(built.stderr, /First-time tool setup|Downloading|\[lasm\] Running/);
+    assert.equal(buildInfo(join(project, 'dist')).profile, 'release');
+    result.releaseWasmBytes = statSync(join(project, 'dist', 'program.wasm')).size;
+    const rebuilt = npx('npx lasm build Main.lean again', ['build', 'Main.lean']);
+    assert.equal(rebuilt.code, 0);
+    assert.match(rebuilt.stderr, /Reused Lean .* \(release profile\)/);
+    assert.match(rebuilt.stderr, /Reused cached build/);
     await deployment('hello', join(project, 'dist'), 'Main.lean', [{ args: [], expected: basic }]);
     result.installBytes = size(join(project, 'node_modules'));
     result.coldToolsBytes = size(tools);
@@ -358,7 +366,7 @@ try {
       + readFileSync(join(compiler, 'examples/hello/Main.lean'), 'utf8'));
     const unusedOutput = join(project, 'unused dist');
     assert.equal(npx('unused definitions deployment', ['build', unused, '--output', unusedOutput]).code, 0);
-    assert.ok(statSync(join(unusedOutput, 'program.wasm')).size <= statSync(join(result.cached, 'program.wasm')).size + 4096,
+    assert.ok(statSync(join(unusedOutput, 'program.wasm')).size <= result.releaseWasmBytes + 4096,
       'A thousand unreachable functions must not scale deployment size');
     await deployment('unused', unusedOutput, unused, [{ args: [], expected: basic }]);
     for (const fixture of ['StandaloneModuleData.lean', 'RuntimeModulePath.lean']) {

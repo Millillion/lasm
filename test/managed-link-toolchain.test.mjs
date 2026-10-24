@@ -5,7 +5,7 @@ import { join, basename } from 'node:path';
 import { tmpdir } from 'node:os';
 import { Readable, Writable } from 'node:stream';
 import { packArchive } from '../scripts/lean-dist/tiers.mjs';
-import { provisionLinkToolchain, linkToolchainArtifacts, linkToolchainEnvironment, linkToolchainCatalog, linkToolchainPrograms }
+import { provisionLinkToolchain, linkToolchainArtifacts, linkToolchainEnvironment, linkToolchainCatalog, linkToolchainPrograms, buildJobs }
   from '../src/managed-link-toolchain.mjs';
 import { validateArtifact } from '../src/managed-artifacts.mjs';
 import { repairManagedCache } from '../src/cache-repair.mjs';
@@ -60,7 +60,7 @@ async function fixture(t, { version = '6.0.9' } = {}) {
 
 test('the link toolchain assembles one verified prefix from both archives without Python', async t => {
   const f = await fixture(t);
-  const options = { cache: f.cache, catalog: f.catalog, fetch: f.fetch, log() {}, env: { PATH: '/p', EM_CONFIG: 'x', PYTHONHOME: 'y', EMCC_DEBUG: '1' } };
+  const options = { cache: f.cache, catalog: f.catalog, fetch: f.fetch, log() {}, env: { PATH: '/p', EM_CONFIG: 'x', PYTHONHOME: 'y', EMCC_DEBUG: '1', LASM_BUILD_JOBS: '1' } };
   const tools = await provisionLinkToolchain(options);
   assert.deepEqual(f.requests.sort(), [f.native.artifact.name + '.tar.zst', f.shared.artifact.name + '.tar.zst'].sort());
   assert.equal(tools.prefix, tools.directory);
@@ -71,7 +71,7 @@ test('the link toolchain assembles one verified prefix from both archives withou
   assert.equal(emscriptenCache(tools), tools.cache);
   assert.deepEqual(tools.toolchain, { native: f.native.artifact.sha256, shared: f.shared.artifact.sha256 });
   assert.deepEqual(Object.keys(tools.nativePrograms).sort(), [...linkToolchainPrograms].sort());
-  assert.deepEqual(tools.env, { PATH: '/p', BINARYEN_CORES: '1', SOURCE_DATE_EPOCH: '315532800' });
+  assert.deepEqual(tools.env, { PATH: '/p', LASM_BUILD_JOBS: '1', BINARYEN_CORES: '1', SOURCE_DATE_EPOCH: '315532800' });
   assert.throws(() => tools.execute('emcc', []), /no emcc/);
   assert.deepEqual((await readdir(join(f.cache, 'derived'))).filter(name => !name.startsWith('.')), [tools.identity]);
   // A second build only verifies the assembled prefix.
@@ -96,8 +96,10 @@ test('the link toolchain refuses unknown hosts, malformed catalogs and other Ems
   assert.throws(() => linkToolchainArtifacts({ ...f.catalog, shared: { ...f.catalog.shared, sha256: 'x' } }, host), /managed artifact/);
   await assert.rejects(provisionLinkToolchain({ cache: f.cache, catalog: { ...f.catalog, version: '6.0.9' }, fetch: f.fetch, log() {} }),
     /version mismatch: 6.0.8/);
-  assert.deepEqual(linkToolchainEnvironment({ A: '1', LLVM_ROOT: 'x', BINARYEN_ROOT: 'y', EMSDK: 'z' }),
-    { A: '1', BINARYEN_CORES: '1', SOURCE_DATE_EPOCH: '315532800' });
+  assert.deepEqual(linkToolchainEnvironment({ A: '1', LLVM_ROOT: 'x', BINARYEN_ROOT: 'y', EMSDK: 'z', BINARYEN_CORES: '9', LASM_BUILD_JOBS: '3' }),
+    { A: '1', LASM_BUILD_JOBS: '3', BINARYEN_CORES: '3', SOURCE_DATE_EPOCH: '315532800' });
+  assert.equal(buildJobs({}, 2), 2); assert.equal(buildJobs({}, 64), 8); assert.equal(buildJobs({ LASM_BUILD_JOBS: '' }, 1), 1);
+  for (const value of ['0', '-1', '1.5', 'x', '1000']) assert.throws(() => buildJobs({ LASM_BUILD_JOBS: value }), /LASM_BUILD_JOBS/);
 });
 
 test('the recipe runs only against the published archives or the recorded SDK', () => {
