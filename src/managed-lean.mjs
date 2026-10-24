@@ -91,7 +91,7 @@ export async function assembleLeanPrefix(version, release, components, options =
       await copyFile(libSystem, join(tree, 'lib', 'libc', 'libSystem.tbd'));
     }
     if (libraryLeanVersions.includes(version)) options.progress?.({ stage: `Compiling Lasm's Lean library for Lean ${version}` });
-    compileLibrary(tree, version, { platform: options.platform });
+    compileLibrary(tree, version, { platform: options.platform, commit: release.commit });
     return known;
   }, { cache, log: options.log, signal: options.signal, progress: options.progress });
 }

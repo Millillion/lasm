@@ -27,9 +27,45 @@ export function libraryIdentity() {
   return hash.digest('hex');
 }
 
-/** Compiles the library into an assembled Lean prefix `tree` (bin/lean, lib/lean). */
-export function compileLibrary(tree, version, { platform = process.platform } = {}) {
+/** The library's outputs (the .olean, the generated C and the source copy of
+ * every module), relative to a Lean prefix. */
+export const libraryOutputs = () => libraryModules.flatMap(module => {
+  const parts = module.split('.');
+  return [['lib', 'lean', ...parts].join('/') + '.olean', ['lib', 'lasm', 'c', ...parts].join('/') + '.c',
+    ['src', 'lean', ...parts].join('/') + '.lean'];
+});
+const prebuiltDirectory = version => join(root, 'prebuilt', `lean-${version}`);
+
+/** The shipped compilation of the library for one Lean release, when it is the
+ * compilation of these sources by that release (scripts/build-library-prebuilt.mjs).
+ * Lean's .olean files and generated C do not depend on the host platform
+ * (Lean's own tier archives are shared by all five), so one build serves all. */
+export function prebuiltLibrary(version, commit) {
+  const directory = prebuiltDirectory(version), manifestFile = join(directory, 'manifest.json');
+  if (!existsSync(manifestFile)) return undefined;
+  const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'));
+  if (manifest.schema !== 1 || manifest.lean !== version || manifest.leanCommit !== commit || manifest.library !== libraryIdentity()) return undefined;
+  const outputs = libraryOutputs();
+  if (JSON.stringify(Object.keys(manifest.files).sort()) !== JSON.stringify([...outputs].sort())) return undefined;
+  for (const [name, sha256] of Object.entries(manifest.files))
+    if (createHash('sha256').update(readFileSync(join(directory, ...name.split('/')))).digest('hex') !== sha256)
+      throw new Error(`Lasm's prebuilt Lean library is damaged (${name}); reinstall the Lasm package`);
+  return { directory, files: manifest.files };
+}
+
+/** Compiles the library into an assembled Lean prefix `tree` (bin/lean, lib/lean),
+ * or copies its shipped compilation for this Lean release (`commit`). */
+export function compileLibrary(tree, version, { platform = process.platform, commit } = {}) {
   if (!libraryLeanVersions.includes(version) || !existsSync(join(tree, 'lib', 'lean', ...requiredOlean))) return false;
+  const prebuilt = commit && prebuiltLibrary(version, commit);
+  if (prebuilt) {
+    for (const name of Object.keys(prebuilt.files)) {
+      const target = join(tree, ...name.split('/'));
+      mkdirSync(dirname(target), { recursive: true });
+      copyFileSync(join(prebuilt.directory, ...name.split('/')), target);
+    }
+    return true;
+  }
   const lean = join(tree, 'bin', executableName('lean', platform));
   const env = { ...process.env };
   for (const key of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/i.test(key)) delete env[key];
