@@ -66,6 +66,16 @@ The same build also runs on Node 26.12.1, Deno 2.9.6 and **Bun 1.4.4**.
 
   The guide is [deploy/workers.md](deploy/workers.md).
 
+  **First green run: 40128600109** (ubuntu-24.04, source `2f42d1b`;
+  [results](evidence/workers-ci-40128600109.json)). Every route passed on
+  workerd, Node, Deno and Bun, including the stop-and-restart check, and every
+  budget passed.
+
+  | App | Bundle (dry run) | Startup Node / Deno / Bun | Per request, trivial / heavier: Node, Deno, Bun | Wasm memory |
+  | --- | --- | --- | --- | --- |
+  | Hono template | 1.40 MiB (245 KiB gzip) | 51 / 48 / 19 ms | 0.070 / 0.071, 0.045 / 0.053, 0.033 / 0.037 ms | 26.6 MiB |
+  | `examples/edge-pure` | 1.67 MiB (301 KiB gzip) | 113 / 55 / 19 ms | 0.117 / 0.270, 0.076 / 0.248, 0.075 / 0.206 ms | 26.6 MiB |
+
 **Not done in 7.2:**
 
 - **No published edge runtime package.** Builds need `LASM_EDGE_RUNTIME`
