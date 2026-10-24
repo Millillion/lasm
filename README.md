@@ -157,7 +157,7 @@ applications run is under [Supported platforms](#supported-platforms).
 | Environment | Architectures | Current status |
 | --- | --- | --- |
 | Ubuntu 24.04 LTS (`ubuntu-24.04`, `ubuntu-24.04-arm`) | x86-64 and ARM64 | Candidate `.58` passed native installed-package and copied-deployment acceptance (run 40012750099). |
-| Other Linux distributions | x86-64 and ARM64 | Unverified as build machines. Candidates need glibc 2.39; current source needs glibc 2.34 (the managed tools' newest symbol). Alpine/musl is unsupported. |
+| Other Linux distributions | x86-64 and ARM64 | Unverified as build machines. The compiler needs glibc 2.34 (the managed tools' newest symbol); Alpine/musl is unsupported as a build machine (built applications run there). |
 | macOS 15 (`macos-15-intel`, `macos-15`) | x86-64 and ARM64 | Candidate `.58` passed native installed-package and copied-deployment acceptance. |
 | Windows Server 2025 Datacenter (`windows-2025`) | x86-64 | Candidate `.58` passed native installed-package and copied-deployment acceptance. |
 | Windows ARM64 | ARM64 | **Not supported.** Removed on 2026-10-16: neither Lean nor Emscripten publishes Windows ARM64 prebuilts. Lasm stops with `Lasm supports Linux and macOS on x86-64 and ARM64, and Windows on x86-64. Windows ARM64 is not supported.` |
@@ -219,29 +219,23 @@ runtime restrictions as handwritten code. Import names are not banned, but
 initializers count as runtime dependencies: a broad `import Lean` can retain the
 compiler. Use ordinary Lean `meta import Lean` when it is needed only by macros or
 tactics in a module; use narrower imports for runtime data libraries.
-For example, accepted candidates reject `import Lean` with `Lean.Json.compress`,
-while `import Lean.Data.Json` builds and runs (current source accepts both; see below). **Current source** (not yet in a
-candidate) explains each rejection: it prints the chain from your code to the
-compiler code and, when a broad import is the cause, the narrower modules your code
+For example, both `import Lean` with `Lean.Json.compress` and `import Lean.Data.Json`
+build and run (see below). Each rejection is explained: Lasm prints the chain from
+your code to the compiler code and, when a broad import is the cause, the narrower modules your code
 uses (here `import Lean.Data.Json.Basic` and `import Lean.Data.Json.Printer`).
-Current source also links Lean 4.35's `LeanExport` library (candidates fail with an
-undefined `initialize_LeanExport_…` symbol). Its parser, `LeanExport.parseStream`,
+Lean 4.35's `LeanExport` library links. Its parser, `LeanExport.parseStream`,
 builds `Lean.Expr` values, whose constructors call Lean's C++ kernel, so programs
 using it are still rejected.
-Current source also fixes the following (in candidate `.39500947696`, which passed
-installed acceptance; its cold-installation gate is pending; accepted candidates
-behave as described in parentheses): deployed programs honor `LEAN_ABORT_ON_NONLINEAR=1`
-as native Lean does (ignored); on macOS and Windows a standalone source directory
-containing a file such as `init.lean` or `std.lean` no longer hides the standard
-`Init`/`Std` libraries (`Cyclic Lean module imports …/Init.lean`); on Windows,
-`IO.Process.spawn` with piped stdin/stdout/stderr works (fails with "bad file
-descriptor"), DNS lookups and `Std.Net.interfaceAddresses` work (fail),
-handle misuse reports the same error as native Lean, and projects in deep directories
-build. On Windows a project whose delivered `dist\program.wasm` path would exceed 260
+Deployed programs honor `LEAN_ABORT_ON_NONLINEAR=1` as native Lean does; on macOS
+and Windows a standalone source directory containing a file such as `init.lean` or
+`std.lean` does not hide the standard `Init`/`Std` libraries; on Windows,
+`IO.Process.spawn` with piped stdin/stdout/stderr, DNS lookups and
+`Std.Net.interfaceAddresses` work, handle misuse reports the same error as native
+Lean, and projects in deep directories build. On Windows a project whose delivered `dist\program.wasm` path would exceed 260
 characters still fails to build. Per-platform results:
 [language coverage](https://github.com/Millillion/lasm/blob/main/docs/LANGUAGE_COVERAGE.md).
 
-**Lake packages (current source, Phase 3 and its wrap-up; candidate `.39815056197` passed installed acceptance and the cold-installation gate):**
+**Lake packages:**
 
 - Modules imported only for compilation (tactics, elaborators, attributes, for
   example Aesop, Qq or `import Lean` for macros) no longer keep Lean's compiler
@@ -270,12 +264,11 @@ characters still fails to build. Per-platform results:
   code needs one, the build stops and names the library and the package that
   declares it; a library used only during compilation (a tactic's solver) is
   left out.
-- Outbound HTTP: accepted candidates make HTTP requests by running the `curl` tool
-  with `IO.Process` (where curl is installed), as natively. Current source calls
-  Node's own `fetch` through JS/npm interop (below). The experimental
+- Outbound HTTP: call Node's own `fetch` through JS/npm interop (below); code that
+  runs the `curl` tool with `IO.Process` also works where curl is installed. The experimental
   Millillion/fetch library tested in Phase 3 is superseded, archived and was never released.
 
-**JS/npm interop (current source, Phase 4; candidate `.39891445495` passed five-platform acceptance and the cold-installation gate, not yet accepted by the user):** `import Lasm.JS`
+**JS/npm interop:** `import Lasm.JS`
 calls Node built-ins, Node globals such as `fetch`, and npm packages from Lean, and
 lets JavaScript call Lean functions (HTTP handlers for Express or Hono, callbacks).
 Lasm ships the library: no Lake dependency is needed. Put a `package.json` next to
@@ -300,10 +293,9 @@ crosses to Node's main thread). On the benchmark runner (4-CPU GitHub Linux x64,
 candidate `.39891445495`, [BENCHMARKS.md](https://github.com/Millillion/lasm/blob/main/docs/BENCHMARKS.md)) a Hono server with a Lean handler serves about 9,700
 requests per second and Express about 6,300, against about 54,000 for a plain Node
 `http` server (0.18× and 0.12×) and about 660 for `Std.Http` under Lasm. Node's main
-thread is the limit: each request makes about four host calls. Current source cuts
-that to two or three (`Function.ofFnReply`; +16–30 % locally). In current source
-(candidate `.58` passed five-platform acceptance and the interop soak; awaiting the
-release gate), Lean handlers run in `Async` (Lean's `Std.Async`):
+thread is the limit: each request made about four host calls in that measurement;
+`Function.ofFnReply` cuts that to two or three (+16–30 % locally). Lean handlers run
+in `Async` (Lean's `Std.Async`):
 a handler that awaits JavaScript (`callMethodAwait`, a binding declared
 `→ Async R`) holds no Lean thread, so any number of requests can wait at once
 (1,000 concurrent 100 ms awaits in about 0.3 s on 2 CPUs); awaiting in `IO`, as
@@ -333,7 +325,7 @@ therefore need refactoring to keep compiler operations at build time.
 The launcher also rejects missing, stale, or incompatible capability records
 before loading the application. This checks the declared build capabilities; it is not
 a security sandbox against someone rewriting JavaScript or Wasm. There is **no
-large compatibility fallback** in current source builds.
+large compatibility fallback**.
 
 This restriction does not imply full compatibility for everything else. Console
 output, arguments, exit codes, local Lake imports, and selected language/filesystem
@@ -378,9 +370,8 @@ A summary; the sections above and the linked pages have the details.
   `libatomic1` on minimal images that install the Node tarball themselves.
 - **JS/npm interop.** Each JavaScript call crosses to Node's main thread (about
   25–35 µs). Lean code that awaits a promise in `IO` holds one of Lean's worker
-  threads (about one per CPU) while it waits; in the accepted candidates every
-  Lean handler does, so at most that many handlers wait at once. Current source
-  runs handlers in `Async`, which awaits without a thread
+  threads (about one per CPU) while it waits. Handlers run in `Async`, which
+  awaits without a thread
   ([JS_BINDINGS.md](docs/JS_BINDINGS.md), [interop soak](docs/INTEROP_SOAK.md)).
   `Lasm.JS` programs fail natively, and the Lean editor extension does not know
   `Lasm.JS`.
