@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "groups": {
+    "lambda": [
+      "public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0",
+      "public.ecr.aws/lambda/nodejs:24"
+    ]
+  },
+  "images": {
+    "public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0": {
+      "index": "sha256:17cfd08eff1dfea3f6a9a1e9c65fdac80aa4919b6085e746615530f43f57d2f1",
+      "platforms": {
+        "arm64": {
+          "manifest": "sha256:98d6d1dc9ad3f18c6af7baaa397fb033a57d82f5bffb58ff33bef1c2e1f4f0fe",
+          "config": "sha256:4a6e2adc697f3a983f1c4ed3d98b2bb0d5f3343f1cd5d4f7d3a027a471d52b2b"
+        },
+        "amd64": {
+          "manifest": "sha256:9d6b29a45b14a4a70f88d53c68b6d5bab1b22d75baca733958fee59308c509b8",
+          "config": "sha256:7a9181b2d1728ea84be5ce1c1391186835daf41ab15ad83cb7f9454fd733cfab"
+        }
+      }
+    },
+    "public.ecr.aws/lambda/nodejs:24": {
+      "index": "sha256:92b7cccd985332238af80ac8da42d6965d418552e88955e315da4e3c0c76ca79",
+      "platforms": {
+        "arm64": {
+          "manifest": "sha256:e6b1d506504ce1a6d9d4a3e5a0a3c90aad030517cee74a05bdd5116c2b8326ba",
+          "config": "sha256:f2a781916374654a266fa7ff051fda7c0768278a7cf3f6e648e236faf75e8630"
+        },
+        "amd64": {
+          "manifest": "sha256:b157a991e174a3696e77c991727001756bb4d4ea4bba426d3401e515b9285b0d",
+          "config": "sha256:2aab60b831fd8b9176b9bc5da122f473e573e4c6463695e4eb208034841cec04"
+        }
+      }
+    }
+  }
+}

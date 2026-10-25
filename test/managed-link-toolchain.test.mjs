@@ -98,7 +98,7 @@ test('the link toolchain refuses unknown hosts, malformed catalogs and other Ems
     /version mismatch: 6.0.8/);
   assert.deepEqual(linkToolchainEnvironment({ A: '1', LLVM_ROOT: 'x', BINARYEN_ROOT: 'y', EMSDK: 'z', BINARYEN_CORES: '9', LASM_BUILD_JOBS: '3' }),
     { A: '1', LASM_BUILD_JOBS: '3', BINARYEN_CORES: '3', SOURCE_DATE_EPOCH: '315532800' });
-  assert.equal(buildJobs({}, 2), 2); assert.equal(buildJobs({}, 64), 8); assert.equal(buildJobs({ LASM_BUILD_JOBS: '' }, 1), 1);
+  assert.equal(buildJobs({}, 2, Infinity), 2); assert.equal(buildJobs({}, 64, Infinity), 8); assert.equal(buildJobs({ LASM_BUILD_JOBS: '' }, 1, Infinity), 1);
   for (const value of ['0', '-1', '1.5', 'x', '1000']) assert.throws(() => buildJobs({ LASM_BUILD_JOBS: value }), /LASM_BUILD_JOBS/);
 });
 

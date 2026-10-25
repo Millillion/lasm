@@ -102,7 +102,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   let jsBindings;
   if (usesJs) {
     progress?.({ stage: 'Checking Lasm.JS bindings' });
-    jsBindings = checkBindings(directory, readBindings(lean, generated.env, generated.oleans()));
+    jsBindings = checkBindings(directory, readBindings(lean, generated.env, generated.oleans(), { cache: join(work, 'bindings') }));
     for (const warning of requireValidBindings(jsBindings)) log(`Lasm.JS binding warning: ${warning}`);
   }
   progress?.({ stage: 'Checking application inputs and cached build' });
@@ -152,7 +152,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   let linkRequirements;
   try {
     linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
-      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), analysisCache: join(cache ?? managedCacheDirectory(), 'analysis'), profile, nativeCompilations, nativeUnavailable });
+      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), sharedCache: join(cache ?? managedCacheDirectory(), 'objects'), analysisCache: join(cache ?? managedCacheDirectory(), 'analysis'), profile, nativeCompilations, nativeUnavailable });
   } catch (error) {
     // This unique staging directory contains only this failed build's files.
     // Preserve any previously delivered application and avoid retaining probes.

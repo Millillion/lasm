@@ -59,6 +59,12 @@ terminal shows progress and elapsed time; later builds reuse verified tools and
 unchanged outputs. See [cache locations, requirements, and recovery](docs/NODE_SUPPORT.md)
 and [installation hardening](docs/INSTALLATION_HARDENING.md) for retries, resume,
 offline repair, proxies and private CAs.
+The first build needs internet access and fetches about 250–275 MB for an ordinary
+program; Lake projects and programs importing `Lean` fetch more. After that, a new
+project's first Hono build takes 30–39 seconds on the Linux and Apple Silicon CI
+runners, 64 on Windows and 109 on the Intel Mac (a hardware limit there); use the dev
+profile (`npx lasm Main.lean`) for the edit loop on such machines
+([build time](docs/BENCHMARKS.md#build-time-where-it-goes-and-the-two-profiles-current-source)).
 
 Copy **all of `dist/`** to a supported machine: it runs on **Node 24 or newer**
 on Linux x64 and arm64 (glibc 2.28+, or musl/Alpine) from a build on any supported

@@ -89,7 +89,8 @@ test('core and extended prefixes are assembled once from shared verified compone
   }
   const again = await assembleLeanPrefix('9.9.9', f.release, core, options);
   assert.equal(again.cacheHit, true); assert.equal(again.identity, first.identity);
-  assert.deepEqual(f.requests, ['lean-9.9.9-test-bin.tar.zst', 'lean-9.9.9-core-init.tar.zst']);
+  // Components download in parallel (b1bc7e5): each exactly once, in either order.
+  assert.deepEqual([...f.requests].sort(), ['lean-9.9.9-core-init.tar.zst', 'lean-9.9.9-test-bin.tar.zst']);
   const extended = await assembleLeanPrefix('9.9.9', f.release, [...core, component(f.archives.lean.artifact)], options);
   assert.notEqual(extended.identity, first.identity, 'Every component contributes to the prefix identity');
   assert.equal(await readFile(join(extended.directory, 'lib/lean/Lean.olean'), 'utf8'), 'lean data');

@@ -78,11 +78,12 @@ export async function assembleLeanPrefix(version, release, components, options =
   }
   options.progress?.({ stage: `Checking Lean ${version} installation` });
   return deriveArtifact(provenance, async tree => {
-    const owners = new Map();
-    for (const { artifact, label } of components) {
-      const installed = await provisionArtifact(artifact, { ...options, cache, label });
+    const owners = new Map(), known = new Map();
+    // Independent archives download and extract concurrently; linking keeps their order.
+    const installed = await Promise.all(components.map(({ artifact, label }) => provisionArtifact(artifact, { ...options, cache, label })));
+    for (let index = 0; index < components.length; index++) {
       options.progress?.({ stage: `Assembling Lean ${version}` });
-      await linkArtifactTree(installed.directory, installed.receipt, tree, owners, artifact.name, 'Lean archive');
+      await linkArtifactTree(installed[index].directory, installed[index].receipt, tree, owners, components[index].artifact.name, 'Lean archive', known);
     }
     // A C tier that still carries the file (lean-4.35.0-c-v1) keeps its own copy.
     if (libSystem && !existsSync(join(tree, 'lib', 'libc', 'libSystem.tbd'))) {
@@ -90,7 +91,8 @@ export async function assembleLeanPrefix(version, release, components, options =
       await copyFile(libSystem, join(tree, 'lib', 'libc', 'libSystem.tbd'));
     }
     if (libraryLeanVersions.includes(version)) options.progress?.({ stage: `Compiling Lasm's Lean library for Lean ${version}` });
-    compileLibrary(tree, version, { platform: options.platform });
+    compileLibrary(tree, version, { platform: options.platform, commit: release.commit });
+    return known;
   }, { cache, log: options.log, signal: options.signal, progress: options.progress });
 }
 

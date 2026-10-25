@@ -1,0 +1,128 @@
+name: Build-time profile
+# Per-stage and per-tool build times of one candidate on all five platforms
+# (scripts/ci/build-profile.mjs; docs/BENCHMARKS.md "Build time"). Diagnostic
+# only: dispatched by hand, never a release dependency. Free standard runners.
+# Without a candidate, the package is packed from the dispatched commit (as the
+# acceptance package job does) and handed to the profile jobs as an artifact.
+on:
+  workflow_dispatch:
+    inputs:
+      candidate-version:
+        description: Exact candidate version (0.1.0-experimental.N); empty packs this commit
+        required: false
+        type: string
+      sha256:
+        description: SHA-256 of the candidate npm archive
+        required: false
+        type: string
+      candidate-release:
+        description: Draft release holding the candidate (node-package-N or node-linux-candidate-N)
+        required: false
+        type: string
+permissions:
+  contents: read
+jobs:
+  pack:
+    if: ${{ inputs.candidate-version == '' && github.event.repository.visibility == 'public' }}
+    # The retained runtime input is a draft release asset (needs contents: write to read).
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-restore-resources.json -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packed-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  input:
+    if: ${{ inputs.candidate-version != '' }}
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/node-candidate-input.yml
+    with:
+      sha256: ${{ inputs.sha256 }}
+      candidate-release: ${{ inputs.candidate-release }}
+      candidate-version: ${{ inputs.candidate-version }}
+  profile:
+    needs: [input, pack]
+    if: ${{ !cancelled() && github.event.repository.visibility == 'public' && (needs.input.result == 'success' || needs.pack.result == 'success') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: ubuntu-24.04, platform: linux-x64 }
+          - { runner: ubuntu-24.04-arm, platform: linux-arm64 }
+          - { runner: macos-15, platform: darwin-arm64 }
+          - { runner: macos-15-intel, platform: darwin-x64 }
+          - { runner: windows-2025, platform: win32-x64 }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    env:
+      LASM_CANDIDATE_VERSION: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
+      LASM_CANDIDATE_SHA256: ${{ inputs.sha256 }}
+      LASM_CANDIDATE_RELEASE: ${{ inputs.candidate-release }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - if: ${{ inputs.candidate-version == '' }}
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: packed-candidate
+          path: .work/node-candidate
+      - if: ${{ inputs.candidate-version != '' }}
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/node-candidate/lasm-compiler-${{ inputs.candidate-version }}.tgz
+          key: ${{ needs.input.outputs.cache-key }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+      - name: Verify the candidate
+        if: ${{ inputs.candidate-version != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-candidate.mjs
+      - name: Profile the builds
+        run: node scripts/ci/build-profile.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm build profile" ".work/build-profile-${{ matrix.platform }}.json"
+      - name: Preserve the result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: build-profile-${{ matrix.platform }}
+          path: .work/build-profile-${{ matrix.platform }}.json
+          retention-days: 7
+          if-no-files-found: ignore
