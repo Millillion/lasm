@@ -74,7 +74,7 @@ try {
   writeFileSync(resolve(lock, 'owner.json'), JSON.stringify({ unit, report, monitorPid: process.pid }));
   child = spawn(args[separator + 1], args.slice(separator + 2), { detached: true, stdio: 'inherit',
     env: { ...process.env, LASM_RESOURCE_UNIT: unit, LASM_RESOURCE_REPORT: report,
-      BINARYEN_CORES: '1', EMCC_CORES: '1', CMAKE_BUILD_PARALLEL_LEVEL: '1', CTEST_PARALLEL_LEVEL: '1', LEAN_NUM_THREADS: '1' } });
+      BINARYEN_CORES: '1', EMCC_CORES: '1', LASM_BUILD_JOBS: '1', CMAKE_BUILD_PARALLEL_LEVEL: '1', CTEST_PARALLEL_LEVEL: '1', LEAN_NUM_THREADS: '1' } });
   evidence.processGroup = child.pid; evidence.command = args.slice(separator + 1); evidence.status = 'running'; save();
   for (const [signal, handler] of handlers) process.on(signal, handler);
   console.error(`[lasm] macOS proactive RSS stop ${(evidence.limits.stopMemoryBytes / 1024 ** 3).toFixed(2)} GiB; no kernel aggregate cap; ${report}`);

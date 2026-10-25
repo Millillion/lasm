@@ -6,7 +6,9 @@
 // emcc. The full SDK (src/managed-sdk.mjs) remains for the maintainer emcc driver.
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { availableParallelism } from 'node:os';
+import { availableParallelism, freemem } from 'node:os';
+import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { provisionArtifact, deriveArtifact, validateArtifact, managedCacheDirectory, linkArtifactTree } from './managed-artifacts.mjs';
 import { assertSupportedHost, executableName } from './platform.mjs';
 import { verifyNativeProgram } from './native-program.mjs';
@@ -24,15 +26,74 @@ export function linkToolchainArtifacts(release, host) {
   return { native, shared: release.shared };
 }
 
-/** Worker threads for Binaryen (wasm-opt): LASM_BUILD_JOBS, else the machine's
- * parallelism up to 8. Binaryen's output does not depend on its thread count
- * (test/build-jobs.test.mjs compares builds); the maintainer resource guard
- * (scripts/full-lean/run-bounded.mjs) sets LASM_BUILD_JOBS=1. */
-export function buildJobs(env = process.env, parallelism = availableParallelism()) {
+/** Parallel jobs of a build: C compilations, Binaryen (wasm-opt) threads and
+ * the overlapped planning probe link. LASM_BUILD_JOBS overrides; otherwise the
+ * machine's CPUs (at most 8), capped by available memory: a build peaks at
+ * about 1.1-1.7 GiB with one job (one wasm-ld probe link, or Lean loading its
+ * libraries), and each further job can add up to about one more link. Outputs
+ * do not depend on the job count (test/build-jobs.test.mjs); the maintainer
+ * resource guards set LASM_BUILD_JOBS=1. */
+export const buildMemory = Object.freeze({ base: 2 * 1024 ** 3, perJob: 1024 ** 3 });
+export function buildJobs(env = process.env, parallelism = availableParallelism(), memory = availableBuildMemory()) {
   const value = env.LASM_BUILD_JOBS;
-  if (value === undefined || value === '') return Math.max(1, Math.min(8, parallelism));
-  if (!/^[1-9]\d{0,2}$/.test(value)) throw new Error(`LASM_BUILD_JOBS must be a positive integer, not ${JSON.stringify(value)}`);
-  return Number(value);
+  if (value !== undefined && value !== '') {
+    if (!/^[1-9]\d{0,2}$/.test(value)) throw new Error(`LASM_BUILD_JOBS must be a positive integer, not ${JSON.stringify(value)}`);
+    return Number(value);
+  }
+  const byMemory = Number.isFinite(memory) ? 1 + Math.floor(Math.max(0, memory - buildMemory.base) / buildMemory.perJob) : Infinity;
+  return Math.max(1, Math.min(8, parallelism, byMemory));
+}
+
+/** Memory a build can still use, in bytes. Linux: MemAvailable, lowered to the
+ * headroom of every enclosing cgroup with a limit (v2 memory.max - memory.current,
+ * v1 limit - usage), so containers are respected. macOS: free, inactive,
+ * speculative and purgeable pages (vm_stat), which the system hands out on
+ * demand. Elsewhere: the OS's available physical memory. */
+let measuredMemory;
+export function availableBuildMemory({ platform = process.platform, read = path => readFileSync(path, 'utf8'),
+  run = (command, args) => execFileSync(command, args, { encoding: 'utf8', timeout: 5000, stdio: ['ignore', 'pipe', 'ignore'] }),
+  free = freemem, cache = true } = {}) {
+  if (cache && measuredMemory !== undefined) return measuredMemory;
+  let memory;
+  try {
+    if (platform === 'linux') memory = linuxAvailableMemory(read);
+    else if (platform === 'darwin') memory = darwinAvailableMemory(run(`/usr/bin/vm_stat`, []));
+  } catch { memory = undefined; }
+  if (!(memory > 0)) memory = free();
+  if (cache) measuredMemory = memory;
+  return memory;
+}
+
+export function linuxAvailableMemory(read) {
+  const meminfo = /^MemAvailable:\s+(\d+) kB$/m.exec(read('/proc/meminfo'));
+  let memory = meminfo ? Number(meminfo[1]) * 1024 : Infinity;
+  const number = text => { const value = text.trim(); return /^\d+$/.test(value) ? Number(value) : undefined; };
+  const attempt = (fn) => { try { return fn(); } catch { return undefined; } };
+  for (const line of attempt(() => read('/proc/self/cgroup'))?.trim().split('\n') ?? []) {
+    const [, controllers, path] = line.split(':');
+    if (controllers === '' && path) {
+      // cgroup v2: this group and each ancestor may set memory.max.
+      for (let group = path; ; group = group.slice(0, group.lastIndexOf('/')) || '/') {
+        const base = '/sys/fs/cgroup' + (group === '/' ? '' : group);
+        const max = attempt(() => number(read(base + '/memory.max'))), current = attempt(() => number(read(base + '/memory.current')));
+        if (max !== undefined && current !== undefined) memory = Math.min(memory, Math.max(0, max - current));
+        if (group === '/') break;
+      }
+    } else if (controllers?.split(',').includes('memory') && path) {
+      const base = '/sys/fs/cgroup/memory' + (path === '/' ? '' : path);
+      const limit = attempt(() => number(read(base + '/memory.limit_in_bytes'))), usage = attempt(() => number(read(base + '/memory.usage_in_bytes')));
+      // v1 reports "no limit" as a huge number.
+      if (limit !== undefined && usage !== undefined && limit < 2 ** 60) memory = Math.min(memory, Math.max(0, limit - usage));
+    }
+  }
+  return memory;
+}
+
+export function darwinAvailableMemory(vmStat) {
+  const page = Number(/page size of (\d+) bytes/.exec(vmStat)?.[1] ?? 4096);
+  const pages = name => Number(new RegExp(`^${name}:\\s+(\\d+)\\.`, 'm').exec(vmStat)?.[1] ?? 0);
+  const total = ['Pages free', 'Pages inactive', 'Pages speculative', 'Pages purgeable'].reduce((sum, name) => sum + pages(name), 0);
+  return total > 0 ? total * page : undefined;
 }
 
 /** Environment for the native tools and Emscripten's JavaScript compiler. Only
