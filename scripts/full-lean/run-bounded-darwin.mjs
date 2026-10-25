@@ -13,7 +13,7 @@ import { recoverDarwinSample } from './darwin-monitor-recovery.mjs';
 assert.equal(process.platform, 'darwin');
 const args = process.argv.slice(2), separator = args.indexOf('--');
 assert.ok(separator >= 0 && separator < args.length - 1, 'Supply -- COMMAND [ARGS...]');
-const options = args.slice(0, separator), allowed = ['--memory-mib', '--report'];
+const options = args.slice(0, separator), allowed = ['--memory-mib', '--report', '--host-fraction'];
 for (let i = 0; i < options.length; i += 2) assert.ok(allowed.includes(options[i]) && options[i + 1]);
 const option = (name, fallback) => options.includes(name) ? options[options.indexOf(name) + 1] : fallback;
 const requested = Number(option('--memory-mib', '4096'));
@@ -29,7 +29,12 @@ const unit = randomUUID(), host = darwinMemory(), reserve = 1536 * 1024 ** 2;
 // stopped wasm-ld with 3.1 GB still available. Keep independent limits instead:
 // at most 40% of physical RAM in sampled aggregate RSS, plus the continuously
 // checked host reserve and early compression-pressure stop. No kernel cap is claimed.
-const budget = Math.floor(Math.min(requested * 1024 ** 2, host.total / 2));
+// --host-fraction raises the half of physical RAM (stop at 80 % of it) up to 0.7,
+// only on an ephemeral CI runner (GITHUB_ACTIONS): native Lean oracle steps of
+// the eval-io suite map more of Lean's libraries than a Lasm build uses.
+const fraction = Number(option('--host-fraction', '0.5'));
+assert.ok(fraction >= 0.3 && fraction <= (process.env.GITHUB_ACTIONS === 'true' ? 0.7 : 0.5), 'Unsupported --host-fraction');
+const budget = Math.floor(Math.min(requested * 1024 ** 2, host.total * fraction));
 const evidence = { unit, report, monitorPid: process.pid, mechanism: 'macOS process-tree RSS monitor', hardCap: false,
   limitations: 'Sampled accounting cannot enforce a kernel aggregate cap or capture unsampled detached descendants.',
   limits: { memoryMax: null, stopMemoryBytes: Math.floor(budget * 0.8), hostReserveBytes: reserve,
@@ -74,7 +79,7 @@ try {
   writeFileSync(resolve(lock, 'owner.json'), JSON.stringify({ unit, report, monitorPid: process.pid }));
   child = spawn(args[separator + 1], args.slice(separator + 2), { detached: true, stdio: 'inherit',
     env: { ...process.env, LASM_RESOURCE_UNIT: unit, LASM_RESOURCE_REPORT: report,
-      BINARYEN_CORES: '1', EMCC_CORES: '1', CMAKE_BUILD_PARALLEL_LEVEL: '1', CTEST_PARALLEL_LEVEL: '1', LEAN_NUM_THREADS: '1' } });
+      BINARYEN_CORES: '1', EMCC_CORES: '1', LASM_BUILD_JOBS: '1', CMAKE_BUILD_PARALLEL_LEVEL: '1', CTEST_PARALLEL_LEVEL: '1', LEAN_NUM_THREADS: '1' } });
   evidence.processGroup = child.pid; evidence.command = args.slice(separator + 1); evidence.status = 'running'; save();
   for (const [signal, handler] of handlers) process.on(signal, handler);
   console.error(`[lasm] macOS proactive RSS stop ${(evidence.limits.stopMemoryBytes / 1024 ** 3).toFixed(2)} GiB; no kernel aggregate cap; ${report}`);

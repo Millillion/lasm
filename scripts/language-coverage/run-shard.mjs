@@ -6,7 +6,7 @@
 // name (sorted), which spreads the expensive tests. A resource stop is retried
 // once in a fresh directory and both attempts are recorded.
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, readdirSync, statSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -67,14 +67,14 @@ const readJson = file => existsSync(file) ? JSON.parse(readFileSync(file, 'utf8'
 const readText = file => existsSync(file) ? readFileSync(file, 'utf8') : undefined;
 const summary = { harness, index, count, version, tests: names, startedAt: new Date().toISOString(), results: [] };
 const save = () => writeFileSync(join(output, 'shard.json'), JSON.stringify(summary, null, 1) + '\n');
-function bounded(label, command, timeoutMinutes) {
+function bounded(label, command, timeoutMinutes, { env = {}, guard = [] } = {}) {
   const report = join(output, 'resources', `${label}.json`);
   const started = Date.now();
   // Base pages are a Linux build wrapper; other platforms use their own guard as is.
   const pages = process.platform === 'linux' ? ['python3', join(root, 'scripts/full-lean/base-pages.py')] : [];
   const result = spawnSync(node, [join(root, 'scripts/full-lean/run-bounded.mjs'), '--memory-mib', process.env.LASM_L1_MEMORY_MIB ?? '10240',
-    '--report', report, '--', ...pages, ...command],
-    { cwd: root, encoding: 'utf8', maxBuffer: 256 << 20, timeout: timeoutMinutes * 60_000, killSignal: 'SIGTERM' });
+    ...guard, '--report', report, '--', ...pages, ...command],
+    { cwd: root, encoding: 'utf8', maxBuffer: 256 << 20, timeout: timeoutMinutes * 60_000, killSignal: 'SIGTERM', env: { ...process.env, ...env } });
   const resources = readJson(report);
   return { code: result.status, signal: result.signal, timedOut: result.error?.code === 'ETIMEDOUT', seconds: (Date.now() - started) / 1000,
     stdoutTail: tail(result.stdout, 3000), stderrTail: tail(result.stderr, 3000),
@@ -111,7 +111,18 @@ if (harness === 'projects') {
     for (let attempt = 1; attempt <= 2; attempt++) {
       const label = `${safe(name)}-${attempt}`, caseDir = join(output, 'cases', label);
       mkdirSync(join(output, 'cases'), { recursive: true });
-      const run = bounded(label, [node, join(root, script), caseDir, engine, compiler, pristine, name, version], 50);
+      const command = [node, join(root, script), caseDir, engine, compiler, pristine, name, version];
+      // macOS CI: native Lean's oracle steps (the unchanged upstream driver and
+      // syntax inspection) run as their own guarded workload with a larger share
+      // of the runner's RAM; the Lasm build and deployment keep the usual budget.
+      const split = harness === 'eval-io' && process.platform === 'darwin' && process.env.GITHUB_ACTIONS === 'true';
+      const native = split ? bounded(label + '-native', command, 50, { env: { LASM_EVAL_IO_PHASE: 'native' }, guard: ['--host-fraction', '0.7'] }) : undefined;
+      const run = !split ? bounded(label, command, 50)
+        : native.code === 0 ? { ...bounded(label, command, 50, { env: { LASM_EVAL_IO_PHASE: 'lasm' } }), nativePhase: native }
+        : { ...native, nativePhase: native };
+      // A stopped native phase is the attempt's result, with its resource evidence.
+      if (split && native.code !== 0 && existsSync(join(output, 'resources', `${label}-native.json`)))
+        copyFileSync(join(output, 'resources', `${label}-native.json`), join(output, 'resources', `${label}.json`));
       const compactFile = join(output, 'compact', `${label}.json`);
       const compaction = spawnSync(node, [join(root, 'scripts/server-mvp/compact-result.mjs'), join(caseDir, 'result.json'),
         join(output, 'resources', `${label}.json`), compactFile], { encoding: 'utf8', maxBuffer: 1 << 30 });

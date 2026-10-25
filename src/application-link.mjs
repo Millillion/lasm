@@ -2,19 +2,20 @@
 // unchanged upstream foreign-runtime test drivers. The CLI owns provisioning,
 // project discovery and caching; this helper uses its verified inputs.
 import { writeFile } from 'node:fs/promises';
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { isAbsolute, join, relative } from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { readApplicationSymbols, readInitializationFreeCppSymbols } from './application-symbols.mjs';
 import { readApplicationLinkRequirements, reachabilityRegistry, canSpecializeInitialization, selectiveInitialization } from './application-reachability.mjs';
 import { requireAotApplication } from './application-policy.mjs';
 import { describeLibrary, dynamicLoadingStubs, librariesForUndefinedSymbols, undefinedSymbols as linkUndefinedSymbols, UnsupportedNativeLibrary } from './application-native.mjs';
-import { cInitTargets, coreInitTargets, initializerWrappers, planInitializers, readLiveSymbols } from './application-initialization.mjs';
+import { cInitTargets, coreInitTargets, initializerWrapperParts, initializerWrappers, planInitializers, readLiveSymbols } from './application-initialization.mjs';
+import { buildJobs } from './managed-link-toolchain.mjs';
 import { archiveMembers, explainRejection, parseWhyExtract, undefinedSymbols } from './application-diagnosis.mjs';
 import { executableName, responseFile } from './platform.mjs';
-import { bundledRecipe, checkToolchainIdentity, compileObject, emscriptenCache } from './link-driver/compile.mjs';
+import { bundledRecipe, checkToolchainIdentity, compileObject, emscriptenCache, probeOptimization } from './link-driver/compile.mjs';
 import { bundledNativeSigs, linkTemporaryDirectory, linkWithNode, removeTemporary } from './link-driver/link.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
@@ -65,6 +66,44 @@ export function selectedLinkDriver(value = process.env.LASM_LINK_DRIVER) {
   throw new Error(`Unsupported LASM_LINK_DRIVER ${JSON.stringify(value)}`);
 }
 
+/** Object-store entries (generated objects, probe records): a magic, the
+ * SHA-256 of the content, then the content; written atomically. */
+const storeMagic = Buffer.from('LASMSTO1');
+let storePartials = 0;
+export function writeStoreEntry(path, bytes) {
+  const partial = `${path}.${process.pid}.${storePartials++}.partial`;
+  writeFileSync(partial, Buffer.concat([storeMagic, createHash('sha256').update(bytes).digest(), bytes]));
+  renameSync(partial, path);
+}
+/** The content of a valid entry; a missing, damaged or foreign one is removed and reads as undefined. */
+export function readStoreEntry(path) {
+  let data;
+  try { data = readFileSync(path); } catch { return undefined; }
+  const bytes = data.subarray(storeMagic.length + 32);
+  if (data.length >= storeMagic.length + 32 && data.subarray(0, storeMagic.length).equals(storeMagic)
+      && createHash('sha256').update(bytes).digest().equals(data.subarray(storeMagic.length, storeMagic.length + 32))) return bytes;
+  rmSync(path, { force: true });
+  return undefined;
+}
+
+/** The machine-wide store of Lasm's planning objects and probe records keeps the
+ * most recently used entries within a bound; this build's entries are kept. */
+export const sharedStoreLimits = Object.freeze({ entries: 600, bytes: 768 * 1024 * 1024 });
+export function pruneSharedStore(directory, used, limits = sharedStoreLimits) {
+  const now = new Date();
+  for (const path of used) { try { utimesSync(path, now, now); } catch { /* removed meanwhile */ } }
+  let entries;
+  try { entries = readdirSync(directory).filter(name => !name.endsWith('.partial')).map(name => {
+    try { const stat = statSync(join(directory, name)); return { path: join(directory, name), size: stat.size, time: stat.mtimeMs }; }
+    catch { return undefined; } }).filter(Boolean); } catch { return; }
+  let bytes = entries.reduce((total, entry) => total + entry.size, 0), count = entries.length;
+  for (const entry of entries.sort((a, b) => a.time - b.time)) {
+    if (count <= limits.entries && bytes <= limits.bytes) break;
+    if (used.has(entry.path)) continue;
+    rmSync(entry.path, { force: true }); count--; bytes -= entry.size;
+  }
+}
+
 /** The code that turns a probe's arguments into wasm-ld's inputs. */
 let driverSources;
 function linkDriverSourceIdentity() {
@@ -79,19 +118,25 @@ function linkDriverSourceIdentity() {
 /** Initializer units of the runtime's (verified, immutable) archives, kept per
  * machine: keyed by the runtime identity, the archive and the analysis code. */
 const analysisSources = ['application-initialization.mjs', 'wasm-objects.mjs'];
-export function archiveUnitCache(directory, runtime) {
+/** The analysis shipped beside the runtime bundle (scripts/package-node-release.mjs). */
+export const shippedAnalysisDirectory = runtime => join(runtime.directory + '.analysis');
+export function archiveUnitCache(directory, runtime, { shipped = shippedAnalysisDirectory(runtime) } = {}) {
   const analyzer = createHash('sha256');
   for (const name of analysisSources) analyzer.update(readFileSync(new URL(`./${name}`, import.meta.url)));
   const key = file => createHash('sha256').update(JSON.stringify({ schema: 1, runtime: runtime.identity,
     archive: relative(runtime.directory, file).replaceAll('\\', '/'), analyzer: analyzer.copy().digest('hex') })).digest('hex');
-  const path = file => join(directory, `initializer-units-${key(file)}.json`);
+  const name = file => `initializer-units-${key(file)}.json`;
+  const path = file => join(directory, name(file));
   return {
     load(file) {
       if (relative(runtime.directory, file).startsWith('..')) return undefined;
-      try {
-        const record = JSON.parse(readFileSync(path(file), 'utf8'));
-        return record.schema === 1 && record.key === key(file) && Array.isArray(record.units) ? record.units : undefined;
-      } catch { return undefined; }
+      for (const candidate of [path(file), ...(shipped ? [join(shipped, name(file))] : [])]) {
+        try {
+          const record = JSON.parse(readFileSync(candidate, 'utf8'));
+          if (record.schema === 1 && record.key === key(file) && Array.isArray(record.units)) return record.units;
+        } catch { /* try the next */ }
+      }
+      return undefined;
     },
     save(file, units) {
       if (relative(runtime.directory, file).startsWith('..')) return;
@@ -117,7 +162,7 @@ function rejectionExplanation({ requirements, whyExtractFile, objects, runtime, 
 }
 
 export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
-  linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, analysisCache, profile = 'release', initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable: declaredUnavailable = [] }) {
+  linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, sharedCache, analysisCache, profile = 'release', initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable: declaredUnavailable = [] }) {
   const nativeUnavailable = [...declaredUnavailable];
   let initializationPlan;
   if (![1, 2].includes(memoryMode)) throw new Error('Invalid application memory mode');
@@ -156,16 +201,33 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   };
   // A link that fails on undefined symbols names the native libraries the program
   // declared but Lasm could not compile, and known prebuilt libraries by symbol.
+  const linkFailure = error => {
+    const output = `${error.stderr ?? ''}\n${error.stdout ?? ''}\n${error.message ?? ''}`;
+    const symbols = linkUndefinedSymbols(output);
+    const known = librariesForUndefinedSymbols(output).filter(({ library }) => !nativeUnavailable.some(item => describeLibrary(item.library).name === library));
+    if (symbols.length && (nativeUnavailable.length || known.length))
+      return Object.assign(new UnsupportedNativeLibrary([...nativeUnavailable, ...known.map(({ library }) => ({ library }))], symbols), { cause: error });
+    return error;
+  };
   const runLink = (...args) => {
     try { return runLinkOnce(...args); }
-    catch (error) {
-      const output = `${error.stderr ?? ''}\n${error.stdout ?? ''}\n${error.message ?? ''}`;
-      const symbols = linkUndefinedSymbols(output);
-      const known = librariesForUndefinedSymbols(output).filter(({ library }) => !nativeUnavailable.some(item => describeLibrary(item.library).name === library));
-      if (symbols.length && (nativeUnavailable.length || known.length))
-        throw Object.assign(new UnsupportedNativeLibrary([...nativeUnavailable, ...known.map(({ library }) => ({ library }))], symbols), { cause: error });
-      throw error;
-    }
+    catch (error) { throw linkFailure(error); }
+  };
+  // A map-only probe link whose wasm-ld runs asynchronously, so independent
+  // planning probes overlap (the Node driver; the emcc driver links in turn).
+  const runProbeLink = async args => {
+    if (!nodeLink) return runLink('probe', args, { mapOnly: true });
+    const temp = linkTemporaryDirectory(work, 'probe');
+    try {
+      const command = linkWithNode({ recipe, mode: 'probe', args: args.flatMap(arg => arg.startsWith('@') ? readResponseArguments(arg.slice(1)) : [arg]),
+        sdk, cache: emscriptenCache(sdk), temp, nativeSigs: bundledNativeSigs(recipe), stdio: toolStdio, mapOnly: 'command' });
+      await new Promise((resolve, reject) => execFile(command.program, command.args, { env: command.env, windowsHide: true,
+        timeout: 1800_000, maxBuffer: 512 * 1024 * 1024 }, (error, stdout, stderr) => {
+        if (verbose) { process.stdout.write(stdout); process.stderr.write(stderr); }
+        error ? reject(Object.assign(error, { stdout, stderr })) : resolve();
+      }));
+    } catch (error) { throw linkFailure(error); }
+    finally { removeTemporary(temp); }
   };
   const compileUncached = (source, object) => nodeCompile
     ? compileObject({ sdk, flags: compileFlags, source, object, settings: {
@@ -176,19 +238,32 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // reuses its object from this or the project's previous build: the key covers
   // the C bytes, the compiler flags (without the runtime path), the runtime
   // identity, the compiler tools and the link driver. Same key, same object bytes.
-  const objectKey = source => createHash('sha256').update(JSON.stringify({ schema: 1, runtime: runtime.identity, linkDriver,
-    tools: sdk.toolchain ?? sdk.driverIdentity ?? null, flags: compileFlags.filter(flag => flag !== join(runtime.directory, 'include')) }))
+  const objectKey = (source, optimization) => createHash('sha256').update(JSON.stringify({ schema: 1, runtime: runtime.identity, linkDriver,
+    tools: sdk.toolchain ?? sdk.driverIdentity ?? null, flags: compileFlags.filter(flag => flag !== join(runtime.directory, 'include')),
+    ...(optimization ? { optimization } : {}) }))
     .update(readFileSync(source)).digest('hex');
   const usedObjects = new Set();
   // Without a project cache, identical C within this build still compiles once
   // (the last planning round's wrappers are the final link's).
   const objectStore = objectCache ?? join(work, 'object-store');
   mkdirSync(objectStore, { recursive: true });
-  const storeObject = (object, cached) => { const partial = cached + '.' + process.pid + '.partial'; copyFileSync(object, partial); renameSync(partial, cached); };
-  const compile = (source, object) => {
-    const cached = join(objectStore, objectKey(source) + '.o');
-    usedObjects.add(cached);
-    if (existsSync(cached)) { copyFileSync(cached, object); return; }
+  // Lasm's own generated C (initializer wrappers, stubs) and the planning probe
+  // records do not depend on the project: with `sharedCache` (the managed cache)
+  // a new project reuses them. Bounded below; entries are content-addressed.
+  const sharedStore = sharedCache ?? objectStore, sharedUsed = new Set();
+  mkdirSync(sharedStore, { recursive: true });
+  const use = (store, name) => { const path = join(store, name); (store === objectStore ? usedObjects : sharedUsed).add(path); return path; };
+  // Entries carry their own SHA-256 (readStoreEntry): a damaged, truncated or
+  // concurrently pruned entry is compiled again and replaced.
+  const reuse = (cached, object) => {
+    const bytes = readStoreEntry(cached);
+    if (!bytes) return false;
+    writeFileSync(object, bytes); return true;
+  };
+  const storeObject = (object, cached) => writeStoreEntry(cached, readFileSync(object));
+  const compile = (source, object, { shared = false } = {}) => {
+    const cached = use(shared ? sharedStore : objectStore, objectKey(source) + '.o');
+    if (existsSync(cached) && reuse(cached, object)) return;
     compileUncached(source, object);
     storeObject(object, cached);
   };
@@ -213,6 +288,23 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     }
     return hash.digest('hex');
   };
+  // Several sources at once (the initializer wrapper parts): cached objects are
+  // copied, the others compile concurrently, up to the build's job count.
+  const compileAll = async (pairs, { optimization } = {}) => {
+    const pending = [];
+    for (const [source, object] of pairs) {
+      const cached = use(sharedStore, objectKey(source, optimization) + '.o');
+      if (!(existsSync(cached) && reuse(cached, object))) pending.push({ source, object, cached });
+    }
+    // The emcc maintainer driver has no probe optimization level: it compiles as recorded.
+    if (!nodeCompile || pending.length < 2 && !optimization) { for (const item of pending) { compileUncached(item.source, item.object); storeObject(item.object, item.cached); } return; }
+    const run = item => compileObject({ sdk, flags: compileFlags, source: item.source, object: item.object, optimization,
+      execute: (program, args, options) => new Promise((resolve, reject) => execFile(program, args, options, (error, stdout, stderr) =>
+        error ? reject(Object.assign(error, { stdout, stderr })) : resolve(stdout))),
+      settings: { timeout: 1800_000, maxBuffer: 8 * 1024 * 1024 } }).then(() => { storeObject(item.object, item.cached); });
+    const queue = [...pending], jobs = Math.max(1, Math.min(buildJobs(sdk.env), queue.length));
+    await Promise.all(Array.from({ length: jobs }, async () => { while (queue.length) await run(queue.shift()); }));
+  };
   for (let index = 0; index < sources.length; index++) {
     progress?.({ stage: `Compiling application module ${index + 1} of ${sources.length}` });
     const object = join(work, `module-${index}.o`);
@@ -229,7 +321,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     const key = createHash('sha256').update(JSON.stringify({ schema: 1, native: item.identity, args: item.extraArgs, runtime: runtime.identity,
       linkDriver, tools: sdk.toolchain ?? sdk.driverIdentity ?? null })).update(readFileSync(item.source)).digest('hex');
     const cached = objectCache && join(objectCache, key + '.o');
-    if (cached && existsSync(cached)) copyFileSync(cached, object);
+    if (cached && existsSync(cached) && reuse(cached, object)) { /* reused */ }
     else {
       if (!nodeCompile) throw new Error('Package C code requires the Node compile driver');
       try {
@@ -250,7 +342,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   }
   if (nativeObjects.length) {
     const stubC = join(work, 'package-dl.c'), stubObject = join(work, 'package-dl.o');
-    await writeFile(stubC, dynamicLoadingStubs); compile(stubC, stubObject); nativeObjects.push(stubObject);
+    await writeFile(stubC, dynamicLoadingStubs); compile(stubC, stubObject, { shared: true }); nativeObjects.push(stubObject);
   }
   const nativeInputs = nativeObjects.length ? ['-Wl,--start-lib', ...nativeObjects, '-Wl,--end-lib'] : [];
   progress?.({ stage: 'Preparing application symbols' });
@@ -258,7 +350,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     runtime.manifest.applicationSymbolHook);
   const probeC = join(work, 'reachability.c'), probeObject = join(work, 'reachability.o');
   await writeFile(probeC, reachabilityRegistry);
-  compile(probeC, probeObject);
+  compile(probeC, probeObject, { shared: true });
   const initializeObject = join(work, 'initialization.o');
   const specializeInitialization = canSpecializeInitialization(runtime);
   const analysis = { initializationFreeCppSymbols: specializeInitialization
@@ -267,7 +359,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   const initializationInputs = [];
   if (specializeInitialization) {
     const initializeC = join(work, 'initialization.c'); await writeFile(initializeC, selectiveInitialization);
-    compile(initializeC, initializeObject);
+    compile(initializeC, initializeObject, { shared: true });
     initializationInputs.push(initializeObject, '-Wl,--wrap=lean_initialize');
   }
   // A C entry point `int main(void)` defines only __main_void. The exported `main`
@@ -281,7 +373,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   if (definedEntries.has('__main_void') && !definedEntries.has('__main_argc_argv')) {
     const entryC = join(work, 'entry.c');
     await writeFile(entryC, 'int __main_void(void);\nint __main_argc_argv(int argc, char **argv) { return __main_void(); }\n');
-    compile(entryC, entryObject);
+    compile(entryC, entryObject, { shared: true });
     initializationInputs.push(entryObject);
   }
   const exportsFile = join(work, 'exports.json');
@@ -317,47 +409,60 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // (a later planning round, the program-independent probes of a one-line edit,
   // or the requirements check repeating the last round) is not relinked.
   const probeLink = async (args, map, rsp) => {
-    const cached = join(objectStore, `probe-${probeKey(args)}.json`);
-    usedObjects.add(cached);
+    const cached = use(sharedStore, `probe-${probeKey(args)}.json`);
     try {
-      const record = JSON.parse(readFileSync(cached, 'utf8'));
-      if (record.schema === 2) return { live: { data: new Set(record.data), code: new Set(record.code) },
+      const record = JSON.parse(readStoreEntry(cached)?.toString('utf8') ?? 'null');
+      if (record?.schema === 2) return { live: { data: new Set(record.data), code: new Set(record.code) },
         requirements: record.requirements, requirementsError: record.requirementsError };
     } catch { /* not recorded */ }
     await writeFile(rsp, responseFile(args));
-    runLink('probe', ['@' + rsp], { mapOnly: true });
+    await runProbeLink(['@' + rsp]);
     const live = await readLiveSymbols(map);
     // Planning probes of initializer bodies have no application entry point.
     let requirements = null, requirementsError = null;
     try { requirements = await readApplicationLinkRequirements(map, analysis); } catch (error) { requirementsError = error.message; }
-    const partial = cached + '.' + process.pid + '.partial';
-    writeFileSync(partial, JSON.stringify({ schema: 2, data: [...live.data].sort(), code: [...live.code].sort(), requirements, requirementsError }));
-    renameSync(partial, cached);
+    writeStoreEntry(cached, Buffer.from(JSON.stringify({ schema: 2, data: [...live.data].sort(), code: [...live.code].sort(), requirements, requirementsError })));
     return { live, requirements, requirementsError };
   };
-  const planInputs = [], planWrap = [];
+  const planInputs = [], planWrap = [], planObjects = [];
   if (!['all', 'native'].includes(initialization)) {
-    const wrappersC = join(work, 'initializers.c'), wrappersObject = join(work, 'initializers.o');
-    const planMap = join(work, 'initializers.map'), planArguments = join(work, 'initializers.rsp');
+    const wrapperFiles = (kind = '') => Array.from({ length: initializerWrapperParts }, (_, part) =>
+      [join(work, `initializers${kind}-${part}.c`), join(work, `initializers${kind}-${part}.o`)]);
+    const finalWrappers = wrapperFiles(), probeWrappers = wrapperFiles('-probe');
+    // Planning probes only read wasm-ld's live set: their wrapper objects are
+    // compiled at -O0 (src/link-driver/compile.mjs probeOptimization). The
+    // wrappers of the delivered program are compiled as recorded.
+    let probeCount = 0;
+    const writeWrappers = async (sources, { probe = false, files = probe ? probeWrappers : finalWrappers } = {}) => {
+      for (let part = 0; part < files.length; part++) await writeFile(files[part][0], sources[part]);
+      await compileAll(files, nodeCompile && probe ? { optimization: probeOptimization } : {});
+      return files.map(([, object]) => object);
+    };
     const bodiesExports = join(work, 'initializers-exports.json');
     await writeFile(bodiesExports, JSON.stringify(['_main', '_malloc', '_free']) + '\n');
     progress?.({ stage: 'Planning runtime initialization' });
     const plan = await planInitializers({ objects, archives: runtime.manifest.libraries.map(name => join(runtime.directory, name)),
       archiveUnits: analysisCache && archiveUnitCache(analysisCache, runtime),
+      // One build job (LASM_BUILD_JOBS=1, the maintainer guard): probes in turn.
+      concurrent: nodeLink && buildJobs(sdk.env) > 1,
       log: verbose ? message => console.error(message) : () => {},
       forceKeep: process.env.LASM_INITIALIZATION_KEEP ? new RegExp(process.env.LASM_INITIALIZATION_KEEP) : undefined,
       initTargets: (core => core && new Set([...core, ...sources.flatMap(file => cInitTargets(readFileSync(file, 'utf8')))]))(coreInitTargets(leanVersion)),
       async probe(source, wrapFlags, { bodies = false, exclude } = {}) {
-        await writeFile(wrappersC, source); compile(wrappersC, wrappersObject);
-        const args = [...objects.filter(file => file !== exclude), ...nativeInputs, probeObject, wrappersObject,
+        // Probes may run concurrently: each has its own files.
+        const id = probeCount++, map = join(work, `initializers-${id}.map`);
+        const wrappersObjects = await writeWrappers(source, { probe: true, files: wrapperFiles(`-probe-${id}`) });
+        const args = [...objects.filter(file => file !== exclude), ...nativeInputs, probeObject, ...wrappersObjects,
           ...initializationInputs.filter(file => !bodies || file !== entryObject),
-          '-O0', '-Wl,-Map=' + planMap, ...wrapFlags, ...linkWith(bodies ? bodiesExports : exportsFile)];
-        return (await probeLink(args, planMap, planArguments)).live;
+          '-O0', '-Wl,-Map=' + map, ...wrapFlags, ...linkWith(bodies ? bodiesExports : exportsFile)];
+        return (await probeLink(args, map, join(work, `initializers-${id}.rsp`))).live;
       } });
     if (plan?.skipped.length && !plan.shared.length) {
-      await writeFile(wrappersC, initializerWrappers(plan.units, plan.closure, { keep: plan.keep }));
-      compile(wrappersC, wrappersObject);
-      planInputs.push(wrappersObject, ...plan.wrap); planWrap.push(...plan.wrap);
+      const planned = initializerWrappers(plan.units, plan.closure, { keep: plan.keep, parts: initializerWrapperParts });
+      planInputs.push(...await writeWrappers(planned), ...plan.wrap); planWrap.push(...plan.wrap);
+      // The requirements check repeats the last planning round's link (the same
+      // probe objects, from the object store), so its recorded result is reused.
+      planObjects.push(...await writeWrappers(planned, { probe: true }));
       initializationPlan = { units: plan.closure.length, kept: plan.keep.size, skipped: plan.skipped.length };
     } else if (plan) initializationPlan = { units: plan.closure.length, kept: plan.closure.length, skipped: 0,
       ...(plan.shared.length ? { sharedGlobals: plan.shared.slice(0, 20) } : {}) };
@@ -366,7 +471,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // runtime evaluator must not optimize the full compiler twice. The inputs are
   // the final link's (the planned wrappers, in the planning probes' order, so the
   // last planning round's identical link is reused).
-  const requirementsInputs = [...objects, ...nativeInputs, probeObject, ...planInputs.slice(0, 1), ...initializationInputs,
+  const requirementsInputs = [...objects, ...nativeInputs, probeObject, ...planObjects, ...initializationInputs,
     '-O0', '-Wl,-Map=' + mapFile, ...planWrap, ...link];
   progress?.({ stage: 'Checking required runtime code' });
   const checked = await probeLink(requirementsInputs, mapFile, argumentsFile);
@@ -406,6 +511,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   // Keep only this build's objects; the cache never grows across edits.
   if (objectCache) for (const name of readdirSync(objectCache))
     if (!usedObjects.has(join(objectCache, name))) rmSync(join(objectCache, name), { force: true });
+  if (sharedCache) pruneSharedStore(sharedStore, sharedUsed);
   progress?.({ stage: 'Preparing the application launcher' });
   const glue = join(dist, 'program.cjs');
   writeFileSync(glue, connectLeanSymbolLoader(relabelPreJs(readFileSync(glue, 'utf8'), preJs), true, { packageSymbols: true }));

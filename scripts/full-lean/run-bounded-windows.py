@@ -174,8 +174,9 @@ try:
     limits.basic.activeProcesses = 128
     limits.jobMemory = limit
     check(job_set(job, 9, C.byref(limits), C.sizeof(limits)))
+    # One Lasm build job inside the guard, as on Linux and macOS.
     os.environ.update(LASM_RESOURCE_UNIT=job_name, LASM_RESOURCE_REPORT=str(report),
-                      LASM_RESOURCE_PYTHON=sys.executable)
+                      LASM_RESOURCE_PYTHON=sys.executable, LASM_BUILD_JOBS="1")
     evidence["unit"] = job_name
     startup = STARTUP()
     startup.cb = C.sizeof(startup)

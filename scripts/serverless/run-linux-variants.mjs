@@ -36,6 +36,7 @@ const limits = ['--read-only', '--tmpfs', '/tmp', '--memory=512m', '--memory-swa
 let failed = false;
 
 async function pull(image) {
+  if (docker(['image', 'inspect', image]).status === 0) return;
   for (let attempt = 1; ; attempt++) {
     const r = docker(['pull', '-q', image]);
     if (r.status === 0) return;

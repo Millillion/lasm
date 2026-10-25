@@ -238,6 +238,35 @@ jobs:
       - name: Summary
         if: always()
         run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
+  # Fills the image cache for both architectures from an arm64 runner (ECR Public
+  # has refused x64 runners' addresses for hours: run 40136616607). A cache hit
+  # does nothing; consumers fall back to pulling their own architecture.
+  images:
+    needs: select
+    if: needs.select.outputs.active == 'true'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: lambda
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
+          lookup-only: true
+      - name: Pull the pinned lambda images for amd64 and arm64 by digest
+        if: steps.lambda.outputs.cache-hit != 'true'
+        id: seed-lambda
+        continue-on-error: true
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda --seed amd64,arm64 --no-load
+      - if: steps.lambda.outputs.cache-hit != 'true' && steps.seed-lambda.outcome == 'success'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
   containers:
     needs: [select, build]
     if: always() && needs.select.outputs.active == 'true'
@@ -267,25 +296,8 @@ jobs:
       - name: Summary
         if: always()
         run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
-  adapter:
-    needs: select
-    if: needs.select.outputs.active == 'true'
-    name: fetch the Lambda Web Adapter image
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - run: node scripts/platform/fetch-adapter.mjs "$RUNNER_TEMP/adapter"
-      - uses: actions/upload-artifact@v7
-        with:
-          name: lambda-web-adapter
-          path: ${{ runner.temp }}/adapter
-          retention-days: 1
-          if-no-files-found: error
   lambda:
-    needs: [select, build, adapter]
+    needs: [select, build, images]
     if: always() && needs.select.outputs.active == 'true'
     name: lambda ${{ matrix.runner }}
     strategy:
@@ -306,13 +318,23 @@ jobs:
         with:
           pattern: platform-apps-*
           path: ${{ runner.temp }}/artifacts
-      - uses: actions/download-artifact@v8
+      # Pinned images from the Actions cache (scripts/ci/images.lock.json); a miss
+      # pulls once by digest with long backoff and saves for later runs.
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: images-lambda
         with:
-          name: lambda-web-adapter
-          path: ${{ runner.temp }}/adapter
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
+      - name: Load the pinned lambda images (cache, else registry by digest)
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
+      - if: steps.images-lambda.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: Lambda image, Runtime Interface Emulator and Lambda Web Adapter (Linux and macOS builds)
         run: |
-          docker load -i "$RUNNER_TEMP/adapter/adapter-$([ "$(uname -m)" = aarch64 ] && echo arm64 || echo amd64).tar"
           own=linux-x64; [ "$(uname -m)" = aarch64 ] && own=linux-arm64
           node scripts/platform/run-matrix.mjs lambda "$RUNNER_TEMP/artifacts" "$RUNNER_TEMP/results" "$own" darwin-arm64
       - name: Summary

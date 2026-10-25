@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { buildMain } from '../src/main.mjs';
 import { root, resolveLean } from '../src/toolchain.mjs';
+import { launcherSource, programStderr } from './helpers/launcher-source.mjs';
 
 test('standalone Lean mains preserve native child behavior after cwd removal and permission revocation',
   { skip: process.platform !== 'linux' || process.getuid?.() === 0, timeout: 650_000 }, async t => {
@@ -24,11 +25,12 @@ test('standalone Lean mains preserve native child behavior after cwd removal and
       if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }
       for (const [mode, args] of [
         ['built', [join(built.output, 'main.mjs'), directory]],
-        ['source launcher', [join(root, `lasm-${name}.js`), source, directory]],
+        ['source launcher', [join(root, `lasm-${name}.js`), launcherSource(t, source), directory]],
       ]) await t.test(`${name}: ${mode}`, () => {
-        const result = spawnSync(executable, [...prefix, ...args], options);
+        // The source launcher compiles first (minutes on a cold cache).
+        const result = spawnSync(executable, [...prefix, ...args], mode === 'built' ? options : { ...options, timeout: 480_000 });
         assert.equal(result.status, 0, result.error?.message ?? result.stdout + result.stderr);
-        assert.equal(result.stderr, '');
+        assert.equal(mode === 'built' ? result.stderr : programStderr(result.stderr), '');
         assert.equal(result.stdout, native.stdout);
       });
     }

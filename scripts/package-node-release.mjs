@@ -13,6 +13,8 @@ import { linkToolchainCatalog } from '../src/managed-link-toolchain.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 import { buildPlatforms } from '../src/platform.mjs';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
+import { archiveUnitCache, shippedAnalysisDirectory } from '../src/application-link.mjs';
+import { initializerUnits } from '../src/application-initialization.mjs';
 import { bundleInstaller } from './bundle-installer.mjs';
 import { candidateReadme } from './candidate-readme.mjs';
 import { applicationNotices } from '../src/notices.mjs';
@@ -50,6 +52,15 @@ cpSync(resolve(nativeArg), join(staging, 'src/native'), { recursive: true });
 for (const file of ['manifest.json', 'process/manifest.json', 'signals/manifest.json', 'node_modules/koffi/LICENSE.txt'])
   assert.ok(existsSync(join(staging, 'src/native', file)), `Missing runtime dependency: ${file}`);
 cpSync(runtime.directory, join(staging, 'targets', runtime.manifest.name), { recursive: true });
+// The initializer analysis of the runtime's archives (a function of the runtime
+// and of Lasm's analysis code), so a new machine's first build need not parse
+// 360 MB of archives (src/application-link.mjs archiveUnitCache).
+{
+  const stagedRuntime = { ...runtime, directory: join(staging, 'targets', runtime.manifest.name) };
+  const shipped = shippedAnalysisDirectory(stagedRuntime);
+  initializerUnits(runtime.manifest.libraries.map(name => join(stagedRuntime.directory, name)),
+    { archiveUnits: archiveUnitCache(shipped, stagedRuntime, { shipped: null }) });
+}
 // Lasm's Lean library (import Lasm.JS), compiled into the managed Lean prefix on first use.
 cpSync(join(root, 'library'), join(staging, 'library'), { recursive: true });
 // `lasm init` project templates (src/init.mjs).

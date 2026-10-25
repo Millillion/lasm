@@ -1,4 +1,4 @@
-import { createReadStream, readdirSync, lstatSync, readFileSync } from 'node:fs';
+import { createReadStream, readdirSync, lstatSync, readFileSync, mkdirSync, openSync, writeSync, closeSync } from 'node:fs';
 import { mkdir, readFile, readdir, readlink, lstat, realpath, rename, writeFile, symlink, link, copyFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { dirname, join, resolve, relative, isAbsolute, posix } from 'node:path';
@@ -8,7 +8,7 @@ import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress, createGunzip } from 'node:zlib';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { x as extractTar } from 'tar';
+import { Parser as TarParser } from 'tar';
 import { isDeepStrictEqual } from 'node:util';
 import { downloadArtifact } from './managed-download.mjs';
 import { acquireArtifact } from './npm-artifacts.mjs';
@@ -62,7 +62,37 @@ function cleanArchivePath(name) {
   return !!name && !/[\\:\0]/.test(name) && parts.every(part => part && part !== '.' && part !== '..');
 }
 
-async function extract(artifact, archive, directory, python) {
+/** Writes the accepted regular files and directories of a tar stream under
+ * `directory`, synchronously one file at a time (node-tar's asynchronous
+ * writer was 2-4x slower on Windows and macOS for Lean's many small files),
+ * hashing each file from the bytes it writes (`hashes`: name -> sha256, size).
+ * Links are never written here (accept defers them); with no link in the
+ * tree yet, no write can be redirected outside it. */
+function archiveWriter(directory, { strip, accept, hashes, failed }) {
+  const parser = new TarParser({ strict: true });
+  const made = new Set([directory]);
+  const ensure = path => { if (!made.has(path)) { mkdirSync(path, { recursive: true }); made.add(path); } };
+  parser.on('entry', entry => {
+    if (failed() || !accept(entry.path, entry)) { entry.resume(); return; }
+    const name = entry.path.replace(/^\.\//, '').replace(/\/$/, '').split('/').slice(strip).join('/');
+    if (!name) { entry.resume(); return; }
+    const target = join(directory, ...name.split('/'));
+    if (entry.type === 'Directory') { ensure(target); entry.resume(); return; }
+    ensure(dirname(target));
+    const fd = openSync(target, 'wx', (entry.mode ?? 0o644) & 0o777 | 0o600);
+    const hash = createHash('sha256');
+    let bytes = 0, open = true;
+    const close = () => { if (open) { open = false; closeSync(fd); } };
+    entry.on('data', chunk => {
+      try { writeSync(fd, chunk); } catch (error) { close(); parser.abort(error); return; }
+      hash.update(chunk); bytes += chunk.length;
+    });
+    entry.on('end', () => { close(); hashes?.set(name, { sha256: hash.digest('hex'), size: bytes }); });
+  });
+  return parser;
+}
+
+async function extract(artifact, archive, directory, python, hashes) {
   // macOS /var and Windows short-path temp directories are aliases. Compare
   // resolved link targets with the same physical root, not its lexical alias.
   directory = await realpath(directory);
@@ -72,8 +102,8 @@ async function extract(artifact, archive, directory, python) {
   const rootless = artifact.root === '.';
   const seen = new Set();
   const links = [];
-  const unpack = extractTar({ cwd: directory, strip: rootless ? 0 : 1, strict: true, preservePaths: false, preserveOwner: false,
-    filter(name, entry) {
+  // Which entries are written (the others are rejected or, for links, deferred).
+  const accept = (name, entry) => {
       if (error) return false;
       const canonical = (rootless ? name.replace(/^\.\//, '') : name).replace(/\/$/, '');
       if (rootless && (canonical === '.' || canonical === '') && entry.type === 'Directory') return false;
@@ -110,8 +140,8 @@ async function extract(artifact, archive, directory, python) {
         }
       }
       return true;
-    },
-  });
+  };
+  const unpack = archiveWriter(directory, { strip: rootless ? 0 : 1, accept, hashes, failed: () => error });
   if (['tar.xz', 'zip'].includes(artifact.format)) {
     const child = spawn(python, ['-I', '-B', fileURLToPath(new URL('./archive-stream.py', import.meta.url)), artifact.format, archive],
       { stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
@@ -161,7 +191,7 @@ async function extract(artifact, archive, directory, python) {
   }
 }
 
-async function inventory(directory) {
+async function inventory(directory, { known, extracted } = {}) {
   directory = await realpath(directory);
   const files = new Map();
   async function walk(base) {
@@ -175,9 +205,16 @@ async function inventory(directory) {
           throw new Error(`Managed cache link escapes its toolchain: ${name}`);
         files.set(name, { type: 'symlink', target });
       } else if (entry.isFile()) {
-        const stat = await lstat(file);
-        files.set(name, { type: 'file', bytes: stat.size, sha256: await hashFile(file),
-          ...(process.platform === 'win32' ? {} : { executable: !!(stat.mode & 0o111) }) });
+        const stat = await lstat(file, { bigint: true });
+        // A hard link to a verified original made by this assembly (linkArtifactTree).
+        const same = known?.get(name);
+        // Or a file this process just extracted into its private staging tree,
+        // hashed from the archive stream (extract).
+        const written = extracted?.get(name);
+        const sha256 = same && same.size === stat.size ? same.sha256
+          : written && BigInt(written.size) === stat.size ? written.sha256 : await hashFile(file);
+        files.set(name, { type: 'file', bytes: Number(stat.size), sha256,
+          ...(process.platform === 'win32' ? {} : { executable: !!(Number(stat.mode) & 0o111) }) });
       } else throw new Error(`Unexpected managed cache entry: ${name}`);
     }
   }
@@ -185,16 +222,19 @@ async function inventory(directory) {
   return Object.fromEntries(files);
 }
 
-/** A cheap fingerprint of a tree's metadata: every entry's name, type, mode,
- * size, inode and modification and change times (nanoseconds). Any write,
- * truncation, rename, chmod or link-count change alters the change time. */
+/** A cheap fingerprint of a tree's metadata: every entry's name, type and
+ * permissions, size, inode and modification time (nanoseconds). Writing or
+ * truncating a file changes its modification time, replacing it changes the
+ * inode. The change time is left out on purpose: hard-linking a verified file
+ * into another tool prefix (Lean's tiers, Windows tool paths) changes it
+ * without changing any byte, which made the next build re-hash the prefix. */
 export function treeFingerprint(directory) {
   const hash = createHash('sha256');
   const walk = (base, prefix) => {
     for (const entry of readdirSync(base, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) {
       const file = join(base, entry.name), name = prefix + entry.name;
       const stat = lstatSync(file, { bigint: true });
-      hash.update(`${name}\0${stat.mode}\0${stat.size}\0${stat.ino}\0${stat.dev}\0${stat.mtimeNs}\0${stat.ctimeNs}\n`);
+      hash.update(`${name}\0${stat.mode}\0${stat.size}\0${stat.ino}\0${stat.dev}\0${stat.mtimeNs}\n`);
       if (stat.isDirectory()) walk(file, name + '/');
     }
   };
@@ -218,6 +258,18 @@ export async function verifyTreeOnce(stamps, key, directory, verify) {
   await verify();
   // A file changed while it was being hashed is not recorded as verified.
   if (treeFingerprint(directory) !== before) return;
+  await writeVerificationRecord(record, key, before);
+}
+
+/** A tree whose receipt was just computed from its bytes (a new install or
+ * derivation) is recorded as verified, so its first reuse is not re-hashed. */
+export async function recordTreeVerified(stamps, key, directory) {
+  if (!stamps) return;
+  await writeVerificationRecord(join(stamps, digest(key) + '.json'), key, treeFingerprint(directory));
+}
+
+async function writeVerificationRecord(record, key, fingerprint) {
+  const stamps = dirname(record), before = fingerprint;
   try {
     await mkdir(stamps, { recursive: true });
     const partial = `${record}.${process.pid}.${Date.now()}.partial`;
@@ -233,7 +285,7 @@ export async function verifyArtifactDirectory(directory, identity, { stamps } = 
   const receipt = JSON.parse(await readFile(join(directory, receiptName), 'utf8'));
   if (receipt.schema !== 1 || receipt.identity !== identity || !receipt.files || !Object.keys(receipt.files).length)
     throw new Error('Managed artifact receipt does not match the requested toolchain');
-  await verifyTreeOnce(stamps, `managed-artifact\0${identity}\0${resolve(directory)}`, directory, async () => {
+  await verifyTreeOnce(stamps, artifactRecordKey(identity, directory), directory, async () => {
     const observed = await inventory(directory);
     if (!isDeepStrictEqual(observed, receipt.files)) {
       const changed = [...new Set([...Object.keys(receipt.files), ...Object.keys(observed)])]
@@ -247,6 +299,7 @@ export async function verifyArtifactDirectory(directory, identity, { stamps } = 
 }
 // Builds re-check a cached tool fully only when its files' metadata changed.
 const verify = (directory, identity, cache) => verifyArtifactDirectory(directory, identity, { stamps: verificationRecords(cache) });
+const artifactRecordKey = (identity, directory) => `managed-artifact\0${identity}\0${resolve(directory)}`;
 
 /** Install into a private staging directory; expose only a verified complete tree.
  * An OS-owned per-artifact lock shares installs across independent processes.
@@ -297,14 +350,17 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
           } }) });
       progress?.({ stage: `Extracting ${label}` });
       await mkdir(tree);
-      await extract(artifact, archive, tree, python);
+      const extracted = new Map();
+      await extract(artifact, archive, tree, python, extracted);
       progress?.({ stage: `Verifying installed ${label}` });
-      const files = await inventory(tree);
+      const files = await inventory(tree, { extracted });
       if (!Object.keys(files).length) throw new Error('Managed artifact is empty');
       const receipt = { schema: 1, identity, artifact, source, files };
       await writeFile(join(tree, receiptName), JSON.stringify(receipt) + '\n', { flag: 'wx' });
-      try { await rename(tree, directory); }
-      catch (error) {
+      try {
+        await rename(tree, directory);
+        await recordTreeVerified(verificationRecords(cache), artifactRecordKey(identity, directory), directory);
+      } catch (error) {
         if (!['EEXIST', 'ENOTEMPTY', 'EPERM', 'EACCES'].includes(error.code)) throw error;
         // Another process won the atomic installation. Verify its complete tree.
         await verify(directory, identity, cache);
@@ -337,13 +393,16 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
     await createOwnedStaging(staging);
     try {
       const tree = join(staging, 'tree'); await mkdir(tree);
-      await produce(tree);
-      const files = await inventory(tree);
+      // produce may return the hashes of files it hard-linked from verified trees.
+      const known = await produce(tree);
+      const files = await inventory(tree, { known: known instanceof Map ? known : undefined });
       if (!Object.keys(files).length) throw new Error('Derived tool tree is empty');
       const receipt = { schema: 1, identity, provenance, files };
       await writeFile(join(tree, receiptName), JSON.stringify(receipt) + '\n', { flag: 'wx' });
-      try { await rename(tree, directory); }
-      catch (error) {
+      try {
+        await rename(tree, directory);
+        await recordTreeVerified(verificationRecords(cache), artifactRecordKey(identity, directory), directory);
+      } catch (error) {
         if (!['EEXIST', 'ENOTEMPTY', 'EPERM', 'EACCES'].includes(error.code)) throw error;
         await verify(directory, identity, cache);
       }
@@ -356,7 +415,12 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
 }
 
 /** Hard-link one verified artifact tree into a prefix under assembly. */
-export async function linkArtifactTree(source, receipt, destination, owners, name, kind = 'Archive') {
+/** Hard-link one verified artifact tree into a prefix under assembly. With
+ * `known` (a Map), every file linked to its verified original is recorded with
+ * the original's hash and inode, so the assembled prefix's receipt need not
+ * hash it again (inventory). Links are made concurrently. */
+export async function linkArtifactTree(source, receipt, destination, owners, name, kind = 'Archive', known) {
+  const files = [];
   for (const [path, entry] of Object.entries(receipt.files).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) {
     const target = join(destination, ...path.split('/'));
     if (entry.type === 'directory') {
@@ -367,13 +431,25 @@ export async function linkArtifactTree(source, receipt, destination, owners, nam
     }
     if (owners.has(path)) throw new Error(`${kind}s ${owners.get(path)} and ${name} both contain ${path}`);
     owners.set(path, name);
-    await mkdir(dirname(target), { recursive: true });
-    if (entry.type === 'symlink') { await symlink(entry.target, target); continue; }
+    files.push({ path, entry, target });
+  }
+  // Directories come first in the receipt and were created above.
+  const made = new Set();
+  const linkOne = async ({ path, entry, target }) => {
+    const parent = dirname(target);
+    if (!made.has(parent)) { await mkdir(parent, { recursive: true }); made.add(parent); }
+    if (entry.type === 'symlink') { await symlink(entry.target, target); return; }
     const from = join(source, ...path.split('/'));
-    try { await link(from, target); }
-    catch (error) {
+    try {
+      await link(from, target);
+      // A hard link is the verified original itself: inventory takes its hash
+      // when the size still matches.
+      known?.set(path, { sha256: entry.sha256, size: BigInt(entry.bytes), linked: true });
+    } catch (error) {
       if (!['EXDEV', 'EPERM', 'EACCES', 'ENOTSUP', 'EMLINK'].includes(error.code)) throw error;
       await copyFile(from, target, constants.COPYFILE_EXCL);
     }
-  }
+  };
+  const queue = [...files];
+  await Promise.all(Array.from({ length: Math.min(32, queue.length) }, async () => { while (queue.length) await linkOne(queue.shift()); }));
 }

@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "lean": "4.35.0",
+  "leanCommit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
+  "library": "a7eef416677e8a2877d8f2cb683f68d201bd3e3d0f4ad8d5fd8a17c429d78962",
+  "files": {
+    "lib/lean/Lasm/JS/Core.olean": "f90d994d10551dffba5625331edeb88e68b6e2b925436eb9c6f3d9553b436e9d",
+    "lib/lasm/c/Lasm/JS/Core.c": "a442223dab6b5ddf34016a09d3157ba6022eecde804710f6924c9487f57a2cc9",
+    "src/lean/Lasm/JS/Core.lean": "7fa8c8813ece8a4cbecb4013651cc6d9d98942b76f35d9133cbfce7b48d42f20",
+    "lib/lean/Lasm/JS/Json.olean": "0eeb006cad6b723e0f1a60e8ca768320df702b1179c10f4f61598aed5582e19b",
+    "lib/lasm/c/Lasm/JS/Json.c": "9b23dce15f0190adb019b77cc2f17058dc94a5228bd89ee6d74da548993d47de",
+    "src/lean/Lasm/JS/Json.lean": "6f27de37f4b11b76b863a994cce5456fd4c1ac2aac984b4c2acb9d3b623f1106",
+    "lib/lean/Lasm/JS/Meta.olean": "b4a892b62b5580f18f9ab31972ae1333f1f6e9ff02df23c6e1a6957696bf3c02",
+    "lib/lasm/c/Lasm/JS/Meta.c": "b2d670ac99e0d476a6b0a174d8f074105a36264cc81d24df0a40787c0e2aebae",
+    "src/lean/Lasm/JS/Meta.lean": "d1e1d38f21a43912f96e1868d1c51ba18cec4305fc0b40b7c45c32854e439c6f",
+    "lib/lean/Lasm/JS.olean": "86ff7b086af66cf3c25d463e485195ac7f9ac9cb56274e40b6d3fc31a9f50e6f",
+    "lib/lasm/c/Lasm/JS.c": "85410094cc88632811356f78a6e7beca93d2e13c19a8881b4aaec7f7dfaa1300",
+    "src/lean/Lasm/JS.lean": "325e710bcf3a1c9f87ec51cff49089e794f4b5ddf243949d641e497e1ecaaead"
+  }
+}

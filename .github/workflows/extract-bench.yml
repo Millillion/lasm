@@ -1,0 +1,42 @@
+name: Tool extraction benchmark
+# How fast Lean's tier archives can be written to disk on each platform
+# (scripts/ci/extract-bench.mjs). Diagnostic only, dispatched by hand.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bench:
+    if: github.event.repository.visibility == 'public'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: ubuntu-24.04, platform: linux-x64 }
+          - { runner: macos-15, platform: darwin-arm64 }
+          - { runner: macos-15-intel, platform: darwin-x64 }
+          - { runner: windows-2025, platform: win32-x64 }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Benchmark extraction
+        run: node scripts/ci/extract-bench.mjs "$RUNNER_TEMP/lasm extract" ".work/extract-${{ matrix.platform }}.json"
+      - name: Preserve the result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: extract-${{ matrix.platform }}
+          path: .work/extract-${{ matrix.platform }}.json
+          retention-days: 7
+          if-no-files-found: ignore

@@ -213,11 +213,15 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   const linkStep = next('wasm-ld');
   const { exports, exportIfDefined } = linkerExports(settings, jsSyms);
   const linkArgs = expandArguments(linkStep.args, { ...values, stub, exports, 'export-if-defined': exportIfDefined }, platform);
+  let wasmLdArgs = linkArgs;
   if (needsResponseFile([tool(linkStep.program), ...linkArgs])) {
     const responseFile = paths.join(temp, 'wasm-ld.rsp');
     writeFileSync(responseFile, emscriptenResponseFile(linkArgs, platform));
-    run(linkStep.program, ['@' + responseFile]);
-  } else run(linkStep.program, linkArgs);
+    wasmLdArgs = ['@' + responseFile];
+  }
+  // mapOnly 'command': the caller runs wasm-ld itself (concurrent planning probes).
+  if (mapOnly === 'command') return { program: tool(linkStep.program), args: wasmLdArgs, env };
+  run(linkStep.program, wasmLdArgs);
   // Planning probes (src/application-initialization.mjs) need only wasm-ld's map.
   if (mapOnly) return;
 

@@ -35,8 +35,8 @@ try {
   // Anonymous Amazon ECR Public pulls are rate limited per IP address, which CI
   // runners share ("toomanyrequests: Data limit exceeded"); retry with backoff.
   for (const image of [config.image, config.adapter]) {
-    // CI loads the adapter fetched once by fetch-adapter.mjs.
-    if (image === config.adapter && docker(['image', 'inspect', image]).status === 0) continue;
+    // CI preloads both pinned images from its cache (scripts/ci/image-cache.mjs).
+    if (docker(['image', 'inspect', image]).status === 0) continue;
     for (let attempt = 1; ; attempt++) {
       const pull = docker(['pull', '-q', image]);
       if (pull.status === 0) break;

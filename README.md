@@ -61,7 +61,12 @@ The first build needs internet access and downloads about 250–275 MB for an
 ordinary program (tiered Lean and a minimal compiler toolchain, no Python); Lake
 projects and programs importing `Lean` download more. Measured first builds of a
 small program took 42–60 seconds on Linux and Apple Silicon and about 3 minutes on
-the slower Intel Mac and Windows CI machines. Candidate `.54` passed acceptance and
+the slower Intel Mac and Windows CI machines. Current source (not yet in an
+accepted candidate) makes a new user's first Hono build, without the download,
+take 30–39 seconds on the Linux and Apple Silicon runners, 64 on Windows and
+109 on the Intel Mac, a hardware limit there; use the dev profile (`npx lasm
+Main.lean`) for the edit loop on such machines
+([build time](docs/BENCHMARKS.md#build-time-where-it-goes-and-the-two-profiles-current-source)). Candidate `.54` passed acceptance and
 three consecutive cold installations on all five targets (see
 [toolchain slimming](docs/TOOLCHAIN_SLIMMING.md)). The terminal shows progress
 and elapsed time. Later builds reuse verified tools and unchanged outputs. See
