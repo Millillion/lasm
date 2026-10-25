@@ -10,7 +10,7 @@ import { apps } from './checks.mjs';
 import { headlessEnvironment } from './headless.mjs';
 
 const [runtime, entry, projectArg, appName, port, resultFile] = process.argv.slice(2);
-const isDeno = /deno(\.exe)?$/.test(runtime);
+const isDeno = /deno(\.exe)?$/i.test(runtime);
 const project = resolve(projectArg), app = apps[appName];
 const env = headlessEnvironment(process.env, { PORT: port, DENO_NO_UPDATE_CHECK: '1', DENO_NO_PROMPT: '1' });
 const result = { app: appName, entry, runtime: execFileSync(runtime, ['--version'], { encoding: 'utf8' }).split('\n')[0], checks: [] };
@@ -19,7 +19,7 @@ const size = dir => readdirSync(dir, { withFileTypes: true }).reduce((n, e) => n
 result.bundle = { bytes: size(join(project, entry, '..')) };
 
 const started = performance.now();
-const child = spawn(runtime, [...(isDeno ? ['run', '-A'] : []), entry], { cwd: project, env, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
+const child = spawn(runtime, [...(isDeno ? ['run', '-A'] : []), entry], { cwd: project, env, stdio: ['ignore', 'pipe', 'pipe'], detached: true, windowsHide: true });
 let log = '';
 child.stdout.on('data', c => { log += c; }); child.stderr.on('data', c => { log += c; });
 const base = `http://127.0.0.1:${port}`;
@@ -49,7 +49,10 @@ try {
   const n = 300, t = performance.now();
   for (let i = 0; i < n; i++) await request({ path: app.bench.trivial });
   result.httpMsPerRequest = +((performance.now() - t) / n).toFixed(3);
-} finally { try { process.kill(-child.pid); } catch { /* exited */ } }
+} finally {
+  // The server and its children: a process group, or the tree on Windows.
+  try { if (process.platform === 'win32') execFileSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' }); else process.kill(-child.pid); } catch { /* exited */ }
+}
 result.passed = result.checks.every(c => c.ok);
 writeFileSync(resultFile, JSON.stringify(result, null, 2) + '\n');
 console.log(JSON.stringify(result));

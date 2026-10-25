@@ -24,6 +24,7 @@ on:
       - 'src/cli-arguments.mjs'
       - 'src/npm-artifacts.mjs'
       - 'packages/create-lasm/**'
+      - 'scripts/package-node-release.mjs'
       - 'src/init.mjs'
       - 'library/**'
       - 'templates/hono/**'
@@ -206,3 +207,104 @@ jobs:
           name: hosts-results-${{ matrix.platform }}
           path: .work/hosts/*.json
           retention-days: 14
+  # Phase 7.5 on macOS and Windows (allowed after the 0.1.0 gate, 2026-10-24):
+  # an installed candidate packed from this commit, as build-profile.yml does.
+  pack:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.2.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-restore-resources.json -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packed-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  platforms:
+    needs: [runtime, pack]
+    runs-on: ${{ matrix.runner }}
+    name: Bun and Deno ${{ matrix.platform }}
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: macos-15, platform: darwin-arm64 }
+          - { runner: macos-15-intel, platform: darwin-x64 }
+          - { runner: windows-2025, platform: win32-x64 }
+    defaults:
+      run:
+        shell: bash
+    env:
+      CI: '1'
+      BROWSER: 'false'
+      LASM_CANDIDATE_VERSION: 0.2.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'${{ matrix.platform }}')"
+      - uses: actions/download-artifact@v4
+        with:
+          name: packed-candidate
+          path: .work/node-candidate
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-archive
+          path: .work/edge-archive
+      - name: Pinned Bun and Deno
+        run: npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
+      - name: Install the candidate; build under Node, Bun and Deno; serve; templates
+        run: node scripts/edge/platform-ci.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst "$RUNNER_TEMP/lasm platform" .work/host-tools
+      - name: Keep the results
+        if: always()
+        run: mkdir -p .work/platform-results && cp "$RUNNER_TEMP/lasm platform"/*.json .work/platform-results/ || true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: platform-results-${{ matrix.platform }}
+          path: .work/platform-results/*.json
+          retention-days: 14
+  # The same program bytes on every platform and under every runtime.
+  compare:
+    needs: [hosts, platforms]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          path: .work/results
+          pattern: '*-results-*'
+      - run: node scripts/edge/compare-platforms.mjs .work/results
