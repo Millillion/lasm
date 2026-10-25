@@ -24,7 +24,7 @@ test('a release is a version change to an unpublished, untagged version with not
   assert.equal(ok.release, true); assert.equal(ok.distTag, 'latest');
   assert.equal(decide({ previous: '0.1.0', version: '0.2.0-rc.1', notes: true }).distTag, 'next');
   for (const [facts, pattern] of [[{ notes: false }, /notes\.md is missing/], [{ notes: true, cli: true }, /already on npm/],
-    [{ notes: true, create: true }, /create-lasm@0\.2\.0 is already/], [{ notes: true, tag: true }, /tag v0\.2\.0 already exists/]]) {
+    [{ notes: true, create: true }, /@lasm\/create@0\.2\.0 is already/], [{ notes: true, tag: true }, /tag v0\.2\.0 already exists/]]) {
     const decision = decide({ previous: '0.1.0', version: '0.2.0', ...facts });
     assert.equal(decision.release, false); assert.equal(decision.error, true); assert.match(decision.reason, pattern);
   }
@@ -71,8 +71,8 @@ test('release state: resume a partial release, refuse other bytes or a moved tag
 
 test('the published packages must be the rehearsed bytes', () => {
   const record = { npm: '11.20.0', base: { sha256: 'c' }, packages: [{ name: '@lasm/t', version: '1.0.0-lasm.1', integrity: 'sha512-t', filename: 't.tgz' }],
-    main: { name: '@lasm/cli', version: '0.1.0', integrity: 'sha512-m', filename: 'm.tgz' }, create: { name: 'create-lasm', version: '0.1.0', integrity: 'sha512-c', filename: 'c.tgz' } };
-  assert.deepEqual(publicationOrder(record).map(p => p.name), ['@lasm/t', '@lasm/cli', 'create-lasm']);
+    main: { name: '@lasm/cli', version: '0.1.0', integrity: 'sha512-m', filename: 'm.tgz' }, create: { name: '@lasm/create', version: '0.1.0', integrity: 'sha512-c', filename: 'c.tgz' } };
+  assert.deepEqual(publicationOrder(record).map(p => p.name), ['@lasm/t', '@lasm/cli', '@lasm/create']);
   assert.deepEqual(differences(record, structuredClone(record)), []);
   assert.match(differences(record, { ...record, main: { ...record.main, integrity: 'sha512-z' } }).join(), /@lasm\/cli@0\.1\.0: built sha512-z/);
   assert.match(differences(record, { ...record, npm: '11.21.0' }).join(), /npm 11\.21\.0/);
@@ -88,7 +88,7 @@ test('publication skips identical versions and never republishes other bytes', (
 
 test('bootstrap: placeholders, trust and deprecation only where missing', async () => {
   const names = (await releasePackages()).map(p => p.name);
-  assert.ok(names.includes('@lasm/cli') && names.at(-1) === 'create-lasm' && names.some(n => n.startsWith('@lasm/lean-c-')));
+  assert.ok(names.includes('@lasm/cli') && names.at(-1) === '@lasm/create' && names.some(n => n.startsWith('@lasm/lean-c-')));
   assert.ok(!names.some(n => n.includes('/git-')));
   const registry = 'https://registry.npmjs.org/';
   const fresh = packageSteps({ name: '@lasm/cli', exists: false, trust: 'missing' }, { registry });
@@ -96,7 +96,7 @@ test('bootstrap: placeholders, trust and deprecation only where missing', async 
   assert.ok(fresh[0].args.includes('--access') && fresh[0].args.includes('--provenance=false'));
   assert.deepEqual(fresh[1].args, ['trust', 'github', '@lasm/cli', '--repository', 'Millillion/lasm', '--file', 'release.yml', '--allow-publish', '--yes', '--registry', registry]);
   assert.deepEqual(fresh[2].args.slice(0, 3), ['deprecate', '@lasm/cli@0.0.0', 'placeholder; use 0.1.0 or later']);
-  assert.ok(!packageSteps({ name: 'create-lasm', exists: false, trust: 'missing' }, { registry })[0].args.includes('--access'), 'Unscoped');
+  assert.ok(!packageSteps({ name: 'unscoped-example', exists: false, trust: 'missing' }, { registry })[0].args.includes('--access'), 'Unscoped');
   assert.deepEqual(packageSteps({ name: 'x', exists: true, hasPlaceholder: true, deprecated: true, trust: 'present' }, { registry }), []);
   assert.deepEqual(packageSteps({ name: 'x', exists: true, hasPlaceholder: false, trust: 'missing' }, { registry }).map(s => s.kind), ['trust']);
   assert.equal(trustState([]), 'missing');

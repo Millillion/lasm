@@ -12,7 +12,7 @@
 //   c-tier         a Lake project with bundled C (scripts/ecosystem/projects/extern-lib) in the `installed`
 //                  project: Lean's C tier must come from @lasm/lean-c-<platform>, fetched on demand
 //   init           npx --yes @lasm/cli@V init app --template plain, then npm install, npm run build, node dist/main.mjs
-//   create         npm create lasm@V app -- --template hono, then npm install, npm run build, the server and HTTP
+//   create         npm create @lasm@V app -- --template hono, then npm install, npm run build, the server and HTTP
 //                  requests (registry.mjs publish --mirror-template hono supplies hono and @hono/node-server)
 //   omit-optional  npm install --omit=optional: Lasm must fail with the exact fix; the fix must repair it
 //   foreign-lock   lockfile created for another OS (npm --os/--cpu), then npm ci on this host
@@ -189,14 +189,14 @@ if (args.scenario === 'init') {
 }
 
 if (args.scenario === 'create') {
-  // The first command of the getting-started guide: npm create lasm, then a Hono server.
-  assert.ok(record.create, 'This build has no create-lasm package');
+  // The first command of the getting-started guide: npm create @lasm, then a Hono server.
+  assert.ok(record.create, 'This build has no @lasm/create package');
   const directory = join(work, 'create-empty');
   mkdirSync(directory, { recursive: true });
-  npmRun('npm create lasm', ['create', '--yes', `lasm@${record.create.version}`, 'app', '--', '--template', 'hono'], { cwd: directory });
+  npmRun('npm create @lasm', ['create', '--yes', `@lasm@${record.create.version}`, 'app', '--', '--template', 'hono'], { cwd: directory });
   const app = join(directory, 'app');
   const manifest = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8'));
-  assert.deepEqual(manifest.devDependencies, { [record.main.name]: record.main.version }, 'create-lasm scaffolds with the pinned CLI');
+  assert.deepEqual(manifest.devDependencies, { [record.main.name]: record.main.version }, '@lasm/create scaffolds with the pinned CLI');
   assert.ok(manifest.dependencies?.hono, 'The hono template');
   report.install = npmRun('npm install (created app)', ['install'], { cwd: app }).seconds;
   report.build = npmRun('npm run build', ['run', 'build'], { cwd: app }).seconds;

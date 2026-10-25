@@ -10,7 +10,7 @@ A release is a version bump: a pull request that changes the root `package.json`
 ## How a release works
 
 1. **Release PR.** It changes `version` in the root `package.json` (the version
-   `@lasm/cli` and `create-lasm` are published as) and adds
+   `@lasm/cli` and `@lasm/create` are published as) and adds
    `docs/release/<version>-notes.md` (the GitHub release body).
 2. **`release-checks`** ([workflow](../.github/workflows/release-checks.yml)) runs on
    every pull request to `main` and every push to `main`. Its `detect` job compares
@@ -47,13 +47,13 @@ A release is a version bump: a pull request that changes the root `package.json`
      Node 26.12.1 with npm 11.20.0), and checks every tarball's integrity against the
      rehearsal's `npm-dist-linux-x64` record ([compare.mjs](../scripts/release/compare.mjs));
    - it publishes, in order, the tool packages whose version is not on npm yet
-     (existing ones are skipped), then `@lasm/cli`, then `create-lasm`, with
+     (existing ones are skipped), then `@lasm/cli`, then `@lasm/create`, with
      `npm publish --access public --provenance --tag <dist-tag>` ([publish.mjs](../scripts/release/publish.mjs)).
      The dist-tag is `latest` for a normal version and `next` for a prerelease
      (`0.2.0-rc.1`). If any existing version has other bytes, it stops before
      publishing anything;
    - it verifies from the public registry, in a clean directory with empty npm
-     and Lasm caches: `npm create lasm@<version> app -- --template hono`, `npm
+     and Lasm caches: `npm create @lasm@<version> app -- --template hono`, `npm
      install`, `npm run build`, the server, and HTTP 200 with the expected bodies on
      `/`, `/hello/Ada` and `/health` ([verify-create.mjs](../scripts/release/verify-create.mjs));
    - it creates and pushes the annotated tag `v<version>` at that commit, and the
@@ -76,7 +76,7 @@ npm can attach a trusted publisher only to a package that already exists. The
 bootstrap script reserves every name with a `0.0.0` placeholder, trusts
 `release.yml` for each, and deprecates the placeholders. The package set comes
 from [`scripts/npm-dist/packages.mjs`](../scripts/npm-dist/packages.mjs) (today 23:
-21 tool packages, `@lasm/cli`, `create-lasm`). Run it on your own machine, in a
+21 tool packages, `@lasm/cli`, `@lasm/create`). Run it on your own machine, in a
 checkout of `main`:
 
 ```sh
@@ -96,7 +96,7 @@ re-run after an interruption):
 1. **Placeholder** (only if the name does not exist): `npm publish` of a package
    with `version` `0.0.0`, a README "placeholder; use the latest version", `license`
    `MIT` with the LICENSE text, and `repository` pointing at
-   github.com/Millillion/lasm; `@lasm/*` with `--access public`, `create-lasm`
+   github.com/Millillion/lasm; `@lasm/*` with `--access public`, `@lasm/create`
    (unscoped) under your account. npm asks for 2FA (browser or OTP) for each publish.
 2. **Trust**: `npm trust github <pkg> --repository Millillion/lasm --file release.yml --allow-publish --yes`.
    npm asks for 2FA on the first call. **In the browser prompt, tick "skip
@@ -133,7 +133,7 @@ not run; the trust step is untested until the real bootstrap.
 
 Tool packages keep their version across Lasm releases (it follows the immutable
 release that published the archive, for example `4.35.0-lasm.1`), so a release
-normally publishes only `@lasm/cli` and `create-lasm`. A change to a tool package's
+normally publishes only `@lasm/cli` and `@lasm/create`. A change to a tool package's
 metadata or README changes its bytes; with the same version, `release.yml`
 refuses ("on npm with different bytes"), so such a change needs a new tool release
 revision (`...-lasm.2`).

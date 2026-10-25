@@ -1,6 +1,6 @@
 // release.yml, after publication: the getting-started path from the registry, in
 // a clean directory with empty npm and Lasm caches and no npm configuration but
-// the registry: npm create lasm@<version> app -- --template hono, npm install,
+// the registry: npm create @lasm@<version> app -- --template hono, npm install,
 // npm run build, the server, and HTTP requests (docs/RELEASING.md).
 //
 //   node scripts/release/verify-create.mjs --registry https://registry.npmjs.org/ --version V --work NEW_DIR [--report FILE] [--stage S]
@@ -52,14 +52,14 @@ const report = does('create') ? { schema: 1, registry, version, startedAt: new D
 const save = () => writeFileSync(stateFile, JSON.stringify(report, null, 2) + '\n');
 if (does('create')) {
   // The registry serves both packages (the public registry's metadata can lag behind a publish).
-  for (const name of ['@lasm/cli', 'create-lasm']) {
+  for (const name of ['@lasm/cli', '@lasm/create']) {
     let state;
     for (let attempt = 0; attempt < 60 && !(state = await published(registry, name, version)).exists; attempt++) await delay(10_000);
     assert.ok(state.exists, `${name}@${version} is not on ${registry}`);
   }
-  report.create = npmRun('npm create lasm', ['create', '--yes', `lasm@${version}`, 'app', '--', '--template', 'hono'], work);
+  report.create = npmRun('npm create @lasm', ['create', '--yes', `@lasm@${version}`, 'app', '--', '--template', 'hono'], work);
   const manifest = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8'));
-  assert.deepEqual(manifest.devDependencies, { '@lasm/cli': version }, 'create-lasm scaffolds with the released CLI');
+  assert.deepEqual(manifest.devDependencies, { '@lasm/cli': version }, '@lasm/create scaffolds with the released CLI');
   report.install = npmRun('npm install', ['install'], app);
   save();
 }
@@ -104,5 +104,5 @@ try {
 }
 report.finishedAt = new Date().toISOString();
 if (args.report) { mkdirSync(dirname(resolve(args.report)), { recursive: true }); writeFileSync(resolve(args.report), JSON.stringify(report, null, 2) + '\n'); }
-summary(`### Verified from ${registry}\n\n\`npm create lasm@${version} app -- --template hono\` (${report.create}s), npm install (${report.install}s), npm run build (${report.build}s), server: ` +
+summary(`### Verified from ${registry}\n\n\`npm create @lasm@${version} app -- --template hono\` (${report.create}s), npm install (${report.install}s), npm run build (${report.build}s), server: ` +
   report.requests.map(r => `\`${r.path}\` ${r.status}`).join(', '));

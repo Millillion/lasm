@@ -152,7 +152,7 @@ headers (glibc 2.35 + Linux 5.15 UAPI from Ubuntu 22.04; mingw-w64 r380).
 
 The `license` field is the conjunction of the column for the platform.
 
-### 3.7 `create-lasm` 0.1.0
+### 3.7 `@lasm/create` 0.1.0
 
 Lasm code only, MIT, copyright Jordan Last.
 

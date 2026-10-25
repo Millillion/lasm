@@ -34,7 +34,7 @@ export function atLeast(a, b) {
 }
 
 /** The package names a release publishes, from the same catalogs and rules as
- * scripts/npm-dist/packages.mjs: every tool package, `@lasm/cli`, `create-lasm`. */
+ * scripts/npm-dist/packages.mjs: every tool package, `@lasm/cli`, `@lasm/create`. */
 export async function releasePackages({ scope } = {}) {
   const { toolPackages, defaultScope, createPackageName } = await import('../npm-dist/packages.mjs');
   scope ??= defaultScope;
@@ -45,7 +45,7 @@ export async function releasePackages({ scope } = {}) {
     { name: `${scope}/cli`, license: 'MIT', kind: 'cli' }, { name: createPackageName, license: 'MIT', kind: 'create' }];
 }
 
-/** Packages of an npm-dist.json record in publication order: tools, the CLI, create-lasm. */
+/** Packages of an npm-dist.json record in publication order: tools, the CLI, @lasm/create. */
 export const publicationOrder = record => [...record.packages, record.main, ...(record.create ? [record.create] : [])]
   .map(({ name, version, integrity, filename }) => ({ name, version, integrity, filename }));
 

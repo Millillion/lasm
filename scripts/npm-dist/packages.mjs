@@ -280,14 +280,14 @@ export function mainPackageJson(base, packages, { name, version, license, licens
   return result;
 }
 
-/** `create-lasm` (for `npm create lasm`): unscoped, in lockstep with the CLI it pins
+/** `@lasm/create` (for `npm create @lasm`): unscoped, in lockstep with the CLI it pins
  * exactly. Its sources are packages/create-lasm; it is MIT, copyright Jordan Last. */
-export const createPackageName = 'create-lasm';
+export const createPackageName = '@lasm/create';
 export const createPackageFiles = Object.freeze(['bin.mjs', 'create.mjs', 'README.md', 'LICENSE']);
 export function createPackageJson(main, { engines } = {}) {
   assert.match(main.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
   return {
-    name: createPackageName, version: main.version, description: 'Create a Lean-on-Node project with Lasm: npm create lasm@latest my-app',
+    name: createPackageName, version: main.version, description: 'Create a Lean-on-Node project with Lasm: npm create @lasm@latest my-app',
     license: 'MIT', type: 'module', bin: { 'create-lasm': 'bin.mjs' }, files: [...createPackageFiles],
     ...(engines ? { engines } : {}),
     repository: repository('packages/create-lasm'),

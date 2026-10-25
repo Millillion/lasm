@@ -2,7 +2,7 @@
 // One-time npm bootstrap for trusted publishing, run by the package owner, logged
 // in, on their own machine (docs/RELEASING.md). npm can attach a trusted publisher
 // only to a package that exists, so for every package of the release set
-// (scripts/npm-dist/packages.mjs: the tool packages, @lasm/cli, create-lasm):
+// (scripts/npm-dist/packages.mjs: the tool packages, @lasm/cli, @lasm/create):
 //   1. publish a minimal 0.0.0 placeholder when the name does not exist yet;
 //   2. trust .github/workflows/release.yml of Millillion/lasm (no environment):
 //      npm trust github <pkg> --repository Millillion/lasm --file release.yml --allow-publish --yes

@@ -17,7 +17,7 @@ name: release
 # proceeds only while something is missing (a package, the tag or the GitHub
 # release). `release` rebuilds the packages exactly as the rehearsal did, checks
 # them byte for byte against its record, publishes the missing ones in order
-# (tool packages, @lasm/cli, create-lasm), verifies `npm create lasm@<version>`
+# (tool packages, @lasm/cli, @lasm/create), verifies `npm create @lasm@<version>`
 # from the public registry, tags v<version> and creates the GitHub release.
 # Every step is idempotent: re-running after a partial failure skips what is done
 # and never republishes, unpublishes or moves a tag.
@@ -164,14 +164,14 @@ jobs:
       - name: Release - the public registry
         if: env.DRY_RUN != 'true'
         run: echo REGISTRY=https://registry.npmjs.org/ >> "$GITHUB_ENV"
-      - name: Publish what is missing (tool packages, @lasm/cli, create-lasm)
+      - name: Publish what is missing (tool packages, @lasm/cli, @lasm/create)
         run: node scripts/release/publish.mjs --dist .work/release/npm --tag "$DIST_TAG" --registry "$REGISTRY" $LOCAL --report .work/release/evidence/publish.json
       - name: Dry run - publishing again skips everything
         if: env.DRY_RUN == 'true'
         run: |
           node scripts/release/publish.mjs --dist .work/release/npm --tag "$DIST_TAG" --registry "$REGISTRY" $LOCAL --report .work/release/evidence/publish-again.json
           node -e "const r = require('./.work/release/evidence/publish-again.json'); if (r.packages.some(p => p.action !== 'skipped')) throw new Error('A second run published again'); console.log('second run: ' + r.packages.length + ' skipped')"
-      - name: npm create lasm@<version> from the registry (clean directory, empty caches)
+      - name: npm create @lasm@<version> from the registry (clean directory, empty caches)
         run: |
           # The guard caps a workload at host available memory minus 8 GiB and counts
           # page cache: free the packed tarballs and the cache, and run each stage in its own guard.
