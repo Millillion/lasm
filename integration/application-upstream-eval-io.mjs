@@ -24,7 +24,13 @@ assert.ok(outputArg && engineArg && compilerArg && referenceArg && !extra.length
 assert.ok(reviewedEvalIOTests.has(name));
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
-assert.ok(!existsSync(output), 'Preserve preceding evidence');
+// LASM_EVAL_IO_PHASE: 'all' (default), or 'native' then 'lasm' as two separately
+// guarded workloads, so native Lean's own elaboration memory (the oracle steps)
+// is not charged to the Lasm build and deployment budget (macOS CI).
+const phase = process.env.LASM_EVAL_IO_PHASE ?? 'all';
+assert.ok(['all', 'native', 'lasm'].includes(phase), `Unknown LASM_EVAL_IO_PHASE ${phase}`);
+if (phase === 'lasm') assert.ok(existsSync(join(output, 'result.json')), 'Run the native phase first');
+else assert.ok(!existsSync(output), 'Preserve preceding evidence');
 const { inventory, sources } = loadUpstreamEvidence(version);
 const test = inventory.tests.find(row => row.name === name);
 const review = reviewedEvalIOInput(version, name, sources[test.source].sha256);
@@ -59,6 +65,13 @@ const report = { scope: 'Original native driver plus separate byte-preserving IO
     'The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately.',
     'Copy and hash every reviewed CTest serial marker and its original CMake definition. Execute all phases sequentially under the single-workload guard; other sidecar kinds remain unsupported.',
   ], resourceReport: process.env.LASM_RESOURCE_REPORT };
+if (phase === 'lasm') {
+  // Continue the native phase's record: the same reviewed inputs, unchanged.
+  const native = JSON.parse(readFileSync(join(output, 'result.json'), 'utf8'));
+  assert.equal(native.nativePhaseComplete, true, 'The native phase did not complete');
+  assert.deepEqual(native.inputs, report.inputs, 'Reviewed inputs changed between phases');
+  Object.assign(report, native, { resourceReports: [native.resourceReport, process.env.LASM_RESOURCE_REPORT] });
+}
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 function run(label, program, args, cwd, environment = env, timeout = 900_000) {
   const result = spawnSync(program, args, { cwd, env: environment, encoding: 'utf8', timeout,
@@ -70,8 +83,11 @@ function run(label, program, args, cwd, environment = env, timeout = 900_000) {
 }
 save();
 try {
-  report.engineVersion = run('engine version', engine, ['--version'], output).stdout.trim();
   const original = join(output, 'original');
+  const originalFile = join(original, test.source), project = join(output, 'parallel-project');
+  const main = join(project, 'Main.lean');
+  if (phase !== 'lasm') {
+  report.engineVersion = run('engine version', engine, ['--version'], output).stdout.trim();
   for (const path of originals) {
     mkdirSync(dirname(join(original, path)), { recursive: true });
     copyFileSync(join(reference, path), join(original, path));
@@ -82,14 +98,13 @@ try {
     join(original, 'tests/elab'), { ...env, TEST_DIR: join(original, 'tests'), SRC_DIR: join(reference, 'src'),
       SCRIPT_DIR: join(reference, 'script'), BUILD_DIR: lean.prefix, STAGE: '1', TEST_CTEST: '1',
       LEAN_HEADER_SNAPSHOTS: '0', PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].join(delimiter) });
-  const originalFile = join(original, test.source), project = join(output, 'parallel-project');
   assert.equal(await hashFile(originalFile), report.sourceSha256, 'Original driver must not modify the test');
   mkdirSync(project); writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
   const parser = join(root, 'scripts/upstream/EvalCommandRanges.lean');
   const inspect = file => JSON.parse(run('inspect original syntax ranges', lean.lean,
     ['-j1', '--run', parser, file], output).stdout);
   const syntax = inspect(originalFile), source = readFileSync(originalFile);
-  const parallel = parallelEvalIOSource(source, syntax, name), main = join(project, 'Main.lean');
+  const parallel = parallelEvalIOSource(source, syntax, name);
   assert.equal(parallel.expressions.length, review.actions, 'Every reviewed action must remain present');
   writeFileSync(main, parallel.generated);
   assert.deepEqual(inspect(main).ranges, [], 'No test body may execute only at build time');
@@ -109,6 +124,17 @@ try {
     windows && lean.executionPrefix ? { ...env, LEAN_SYSROOT: lean.executionPrefix } : env);
   report.nativeCompiled = execute('native-compiled', [native], env);
   assert.deepEqual(report.nativeCompiled, report.nativeInterpreted);
+  report.nativePhaseComplete = true;
+  }
+  if (phase !== 'native') {
+  const marker = report.parallel.marker;
+  assert.equal(await hashFile(main), report.parallel.sourceSha256, 'The parallel main changed between phases');
+  const execute = (label, command, environment) => {
+    const cwd = join(output, label); mkdirSync(cwd);
+    const observed = run(label, command[0], command.slice(1), cwd, environment);
+    assert.ok(observed.stdout.endsWith(marker + '\n'), 'Every action must finish');
+    return observed;
+  };
   const dist = join(output, 'dist');
   run('installed application build', process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', main,
     '--output', dist], project, env, 1800_000);
@@ -126,6 +152,7 @@ try {
   for (const path of originals) assert.equal(await hashFile(join(original + '.hidden', path)), sources[path].sha256);
   report.deployment = { sourceHidden: true, path: '', buildEnvironmentRemoved: true };
   report.passed = true;
+  }
 } catch (error) { report.error = error.stack; throw error; }
 finally {
   report.inputsUnchanged = true;
