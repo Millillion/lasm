@@ -5,7 +5,8 @@
 // Heavy steps (Lake builds, Lasm builds) each run in their own resource-guarded
 // workload. The project's project.json selects the executable, arguments, an
 // optional local server (`resp`: a small Redis-protocol server), and expected
-// Lasm failures. Results: pass, mismatch, native-fail (the package does not
+// Lasm failures. Results: pass, mismatch, resource-stop (a guarded step stopped
+// at its memory budget), native-fail (the package does not
 // build or run natively: upstream), lasm-build-fail, lasm-run-fail, expected.
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -44,14 +45,28 @@ const result = { project: name, platform: `${process.platform}-${process.arch}`,
 const save = () => writeFileSync(out, JSON.stringify(result, null, 2) + '\n');
 const sha = text => createHash('sha256').update(text).digest('hex');
 
-function run(command, args, { cwd = work, timeout = 3_600_000, env = process.env, bounded = false, report } = {}) {
+// macOS CI: native Lean's own Lake steps (the oracle) run under a larger share
+// of the runner's RAM than the Lasm build (scripts/full-lean/run-bounded-darwin.mjs
+// --host-fraction, accepted only on GITHUB_ACTIONS runners), so the Lasm budget
+// still measures Lasm alone.
+const nativeGuard = process.platform === 'darwin' && process.env.GITHUB_ACTIONS === 'true' ? ['--host-fraction', '0.7'] : [];
+/** The guard's evidence when it stopped a bounded step (not a package or Lasm result). */
+function resourceStop(report, step) {
+  try {
+    const evidence = JSON.parse(readFileSync(report, 'utf8'));
+    if (!evidence.resourceLimited && !evidence.stoppedBecause) return undefined;
+    return { step, stoppedBecause: evidence.stoppedBecause ?? 'resource-limited', peakMemoryBytes: evidence.peakMemoryBytes,
+      stopMemoryBytes: evidence.limits?.stopMemoryBytes };
+  } catch { return undefined; }
+}
+function run(command, args, { cwd = work, timeout = 3_600_000, env = process.env, bounded = false, native = false, report } = {}) {
   if (bounded) {
     const pages = process.platform === 'linux' ? ['python3', join(root, 'scripts/full-lean/base-pages.py')] : [];
     // The guard starts workloads with a clean environment; pass what they need explicitly.
     const passed = ['PATH', 'LASM_TOOLCHAIN_CACHE', ...extraEnv.map(item => item.split('=')[0]), ...Object.keys(config.env ?? {})]
       .filter(key => env[key] !== undefined).map(key => `${key}=${env[key]}`);
     const envCommand = process.platform === 'win32' ? [] : ['env', ...passed];
-    args = ['--memory-mib', String(memoryMiB), ...(report ? ['--report', report] : []), '--', ...pages, ...envCommand, command, ...args];
+    args = ['--memory-mib', String(memoryMiB), ...(native ? nativeGuard : []), ...(report ? ['--report', report] : []), '--', ...pages, ...envCommand, command, ...args];
     command = process.execPath; args.unshift(join(root, 'scripts/full-lean/run-bounded.mjs'));
   }
   return new Promise(resolvePromise => {
@@ -97,20 +112,28 @@ try {
   // Native oracle: Lake resolves and builds exactly as for a native user.
   if (config.native !== 'skip') {
     // Mathlib's post-update hook unpacks its cache: unguarded in CI like its build (Tier C).
-    const update = await run(lake, ['update'], { env: prepareEnv, bounded: !config.nativeUnbounded,
+    const update = await run(lake, ['update'], { env: prepareEnv, bounded: !config.nativeUnbounded, native: true,
       report: join(dirname(out), `${name}-native-update-resources.json`) });
     let prepared = update;
     for (const [index, step] of prepare.entries()) if (prepared.status === 0)
       // Downloads and unpacking (Mathlib's cache) run outside the build guard.
-      prepared = await run(step[0] === 'lake' ? lake : step[0], step.slice(1), { env: prepareEnv, bounded: !!step.bounded, timeout: 7_200_000,
+      prepared = await run(step[0] === 'lake' ? lake : step[0], step.slice(1), { env: prepareEnv, bounded: !!step.bounded, native: true, timeout: 7_200_000,
         report: join(dirname(out), `${name}-native-prepare-${index}-resources.json`) });
     // Tier C: Mathlib's build unpacks its cache beyond the desktop guard's budget (CI only).
     // `elaborate`: only the program's modules are built natively (a package whose native
     // executable link needs manual setup, while the Lasm deployment does not).
-    const build = prepared.status === 0 ? await run(lake, ['build', ...(config.native === 'elaborate' ? ['Main'] : [config.exe])], { env, bounded: !config.nativeUnbounded, timeout: 14_400_000,
+    const build = prepared.status === 0 ? await run(lake, ['build', ...(config.native === 'elaborate' ? ['Main'] : [config.exe])], { env, bounded: !config.nativeUnbounded, native: true, timeout: 14_400_000,
       report: join(dirname(out), `${name}-native-build-resources.json`) }) : prepared;
     result.native = { buildSeconds: build.seconds, buildStatus: build.status };
-    if (build.status !== 0) { result.native.log = tail(build.stdout + build.stderr); result.result = 'native-fail'; save(); process.exit(0); }
+    if (build.status !== 0) {
+      result.native.log = tail(build.stdout + build.stderr);
+      // A native step the guard stopped is a resource stop in that step, not a package result.
+      const stop = resourceStop(join(dirname(out), `${name}-native-build-resources.json`), 'native lake build')
+        ?? resourceStop(join(dirname(out), `${name}-native-update-resources.json`), 'native lake update')
+        ?? prepare.map((_, index) => resourceStop(join(dirname(out), `${name}-native-prepare-${index}-resources.json`), `native prepare ${index}`)).find(Boolean);
+      if (stop) result.native.resourceStop = stop;
+      result.result = stop ? 'resource-stop' : 'native-fail'; save(); process.exit(0);
+    }
     await startModuleServer();
   }
   if (config.native !== 'skip' && config.native !== 'elaborate') {
@@ -126,8 +149,12 @@ try {
   }
   // Lasm: the installed CLI builds a deployment and Node runs it.
   if (config.native === 'skip' && typeof config.server === 'object') {
-    const update = await run(lake, ['update'], { env, bounded: true, report: join(dirname(out), `${name}-native-update-resources.json`) });
-    if (update.status !== 0) { result.result = 'native-fail'; result.native = { log: tail(update.stdout + update.stderr) }; save(); process.exit(0); }
+    const update = await run(lake, ['update'], { env, bounded: true, native: true, report: join(dirname(out), `${name}-native-update-resources.json`) });
+    if (update.status !== 0) {
+      const stop = resourceStop(join(dirname(out), `${name}-native-update-resources.json`), 'native lake update');
+      result.native = { log: tail(update.stdout + update.stderr), ...(stop ? { resourceStop: stop } : {}) };
+      result.result = stop ? 'resource-stop' : 'native-fail'; save(); process.exit(0);
+    }
     await startModuleServer();
   }
   if (beforeLasm) {
