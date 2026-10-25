@@ -1,0 +1,1025 @@
+{
+  "schema": 1,
+  "scope": "Lasm 0.1.0 launch gate: upstream runtime-capable suite, ecosystem, robustness, benchmarks, npm rehearsal, cold installation",
+  "recordedAt": "2026-10-25",
+  "candidates": {
+    "gate": {
+      "version": "0.1.0-experimental.40121836396",
+      "source": "6df8706",
+      "release": "node-package-40121836396",
+      "sha256": "f2b90704efefe631f2d84b1ff8e51e40c765641d6366b6e32a05f5f4d1016035",
+      "acceptance": "40121836396",
+      "acceptanceResult": "success"
+    },
+    "coldInstallation": {
+      "version": "0.1.0-experimental.40131225697",
+      "source": "453ac42",
+      "release": "node-linux-candidate-40131225697",
+      "sha256": "fdc1e4389cd813b93dbe7364cb59f79aea07c05eaf3673a1486ee88a87f99e22",
+      "acceptance": "40131225697",
+      "harnessCommit": "6eddec1",
+      "acceptanceResult": "success"
+    },
+    "freezeTip": {
+      "version": "0.1.0-experimental.40149908009",
+      "source": "16bb242",
+      "release": "node-package-40149908009",
+      "sha256": "60334b6a98403a21da659129dd11d9ab7476e0f3e577b937835c4d4c2da11a94",
+      "acceptance": "40149908009",
+      "acceptanceResult": "success"
+    }
+  },
+  "languageCoverage": [
+    {
+      "run": 40122360702,
+      "harness": "eval-io",
+      "platform": "linux-x64",
+      "tests": 22,
+      "tally": {
+        "pass": 22
+      }
+    },
+    {
+      "run": 40122383918,
+      "harness": "docparse",
+      "platform": "linux-x64",
+      "tests": 202,
+      "tally": {
+        "unsupported-by-design": 202
+      }
+    },
+    {
+      "run": 40122399485,
+      "harness": "lsp-server",
+      "platform": "linux-x64",
+      "tests": 4,
+      "tally": {
+        "pass": 4
+      }
+    },
+    {
+      "run": 40122421753,
+      "harness": "eval-io",
+      "platform": "linux-arm64",
+      "tests": 22,
+      "tally": {
+        "pass": 22
+      }
+    },
+    {
+      "run": 40122391680,
+      "harness": "lsp",
+      "platform": "linux-x64",
+      "tests": 153,
+      "tally": {
+        "pass": 153
+      }
+    },
+    {
+      "run": 40122406837,
+      "harness": "lsp-project",
+      "platform": "linux-x64",
+      "tests": 1,
+      "tally": {
+        "pass": 1
+      }
+    },
+    {
+      "run": 40122414425,
+      "harness": "runtime-adapter",
+      "platform": "linux-arm64",
+      "tests": 321,
+      "tally": {
+        "pass": 285,
+        "harness": 18,
+        "build-time-only": 10,
+        "pass-with-harness-exclusions": 8
+      }
+    },
+    {
+      "run": 40122428465,
+      "harness": "compiled-application",
+      "platform": "linux-arm64",
+      "tests": 118,
+      "tally": {
+        "pass": 110,
+        "upstream-disabled": 4,
+        "unsupported-by-design": 4
+      }
+    },
+    {
+      "run": 40122434985,
+      "harness": "projects",
+      "platform": "linux-arm64",
+      "tests": 33,
+      "tally": {
+        "pass": 25,
+        "unsupported-by-design": 6,
+        "upstream-disabled": 2
+      }
+    },
+    {
+      "run": 40122448798,
+      "harness": "eval-io",
+      "platform": "darwin-x64",
+      "tests": 22,
+      "tally": {
+        "pass": 22
+      }
+    },
+    {
+      "run": 40122510176,
+      "harness": "eval-io",
+      "platform": "win32-x64",
+      "tests": 22,
+      "tally": {
+        "pass": 22
+      }
+    },
+    {
+      "run": 40122353030,
+      "harness": "runtime-adapter",
+      "platform": "linux-x64",
+      "tests": 535,
+      "tally": {
+        "pass": 327,
+        "build-time-only": 146,
+        "harness": 31,
+        "pass-with-harness-exclusions": 9,
+        "unsupported-by-design": 22
+      }
+    },
+    {
+      "run": 40122368606,
+      "harness": "compiled-application",
+      "platform": "linux-x64",
+      "tests": 118,
+      "tally": {
+        "pass": 110,
+        "upstream-disabled": 4,
+        "unsupported-by-design": 4
+      }
+    },
+    {
+      "run": 40122376468,
+      "harness": "projects",
+      "platform": "linux-x64",
+      "tests": 33,
+      "tally": {
+        "pass": 25,
+        "unsupported-by-design": 6,
+        "upstream-disabled": 2
+      }
+    },
+    {
+      "run": 40122455861,
+      "harness": "compiled-application",
+      "platform": "darwin-x64",
+      "tests": 118,
+      "tally": {
+        "pass": 110,
+        "upstream-disabled": 4,
+        "unsupported-by-design": 4
+      }
+    },
+    {
+      "run": 40122479045,
+      "harness": "eval-io",
+      "platform": "darwin-arm64",
+      "tests": 22,
+      "tally": {
+        "resource-stop": 19,
+        "pass": 3
+      }
+    },
+    {
+      "run": 40122495320,
+      "harness": "projects",
+      "platform": "darwin-arm64",
+      "tests": 33,
+      "tally": {
+        "pass": 25,
+        "unsupported-by-design": 5,
+        "resource-stop": 1,
+        "upstream-disabled": 2
+      }
+    },
+    {
+      "run": 40122502604,
+      "harness": "runtime-adapter",
+      "platform": "win32-x64",
+      "tests": 321,
+      "tally": {
+        "pass": 284,
+        "harness": 19,
+        "build-time-only": 10,
+        "pass-with-harness-exclusions": 8
+      }
+    },
+    {
+      "run": 40122518471,
+      "harness": "compiled-application",
+      "platform": "win32-x64",
+      "tests": 118,
+      "tally": {
+        "pass": 110,
+        "upstream-disabled": 4,
+        "unsupported-by-design": 4
+      }
+    },
+    {
+      "run": 40122526485,
+      "harness": "projects",
+      "platform": "win32-x64",
+      "tests": 33,
+      "tally": {
+        "pass": 23,
+        "unsupported-by-design": 6,
+        "upstream-disabled": 2,
+        "harness": 2
+      }
+    },
+    {
+      "run": 40122441944,
+      "harness": "runtime-adapter",
+      "platform": "darwin-x64",
+      "tests": 321,
+      "tally": {
+        "pass": 285,
+        "harness": 18,
+        "build-time-only": 10,
+        "pass-with-harness-exclusions": 8
+      }
+    },
+    {
+      "run": 40122463433,
+      "harness": "projects",
+      "platform": "darwin-x64",
+      "tests": 33,
+      "tally": {
+        "pass": 25,
+        "unsupported-by-design": 6,
+        "upstream-disabled": 2
+      }
+    },
+    {
+      "run": 40122470895,
+      "harness": "runtime-adapter",
+      "platform": "darwin-arm64",
+      "tests": 321,
+      "tally": {
+        "pass": 285,
+        "harness": 18,
+        "build-time-only": 9,
+        "pass-with-harness-exclusions": 8,
+        "resource-stop": 1
+      }
+    },
+    {
+      "run": 40122487472,
+      "harness": "compiled-application",
+      "platform": "darwin-arm64",
+      "tests": 118,
+      "tally": {
+        "pass": 110,
+        "upstream-disabled": 4,
+        "unsupported-by-design": 4
+      }
+    }
+  ],
+  "ecosystem": {
+    "results": [
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "mathlib-deps",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "lean-regex",
+        "result": "native-fail"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "lean-redis",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "lspec",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "initialize",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "json-import-lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "native-tactic",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "plausible",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "leansqlite",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "json",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "aesop-qq",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "prebuilt-library",
+        "result": "expected"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "extern-lib",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "batteries",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "cli",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "unicode-parser",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "fetch",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "lean-zip",
+        "result": "pass"
+      },
+      {
+        "run": 40122534686,
+        "platform": "linux-x64",
+        "project": "md4lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "batteries",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "mathlib-deps",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "extern-lib",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "lean-regex",
+        "result": "native-fail"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "initialize",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "lean-redis",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "fetch",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "lean-zip",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "aesop-qq",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "prebuilt-library",
+        "result": "expected"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "json",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "leansqlite",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "json-import-lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "unicode-parser",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "lspec",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "md4lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "native-tactic",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "plausible",
+        "result": "pass"
+      },
+      {
+        "run": 40122542563,
+        "platform": "linux-arm64",
+        "project": "cli",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "aesop-qq",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "fetch",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "lspec",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "mathlib-deps",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "json",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "extern-lib",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "lean-regex",
+        "result": "native-fail"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "prebuilt-library",
+        "result": "expected"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "json-import-lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "cli",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "initialize",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "unicode-parser",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "leansqlite",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "lean-redis",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "lean-zip",
+        "result": "native-fail"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "md4lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "batteries",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "native-tactic",
+        "result": "pass"
+      },
+      {
+        "run": 40122550716,
+        "platform": "darwin-arm64",
+        "project": "plausible",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "native-tactic",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "fetch",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "lean-zip",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "batteries",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "prebuilt-library",
+        "result": "expected"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "extern-lib",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "mathlib-deps",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "plausible",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "aesop-qq",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "unicode-parser",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "leansqlite",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "lean-regex",
+        "result": "native-fail"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "md4lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "json",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "lspec",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "json-import-lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "lean-redis",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "cli",
+        "result": "pass"
+      },
+      {
+        "run": 40122558139,
+        "platform": "darwin-x64",
+        "project": "initialize",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "native-tactic",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "extern-lib",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "json-import-lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "batteries",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "aesop-qq",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "lean-regex",
+        "result": "native-fail"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "initialize",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "fetch",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "lspec",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "prebuilt-library",
+        "result": "expected"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "cli",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "leansqlite",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "mathlib-deps",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "lean-redis",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "lean-zip",
+        "result": "native-fail"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "json",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "plausible",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "unicode-parser",
+        "result": "pass"
+      },
+      {
+        "run": 40122565857,
+        "platform": "win32-x64",
+        "project": "md4lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122574016,
+        "platform": "linux-x64",
+        "project": "native-tactic",
+        "result": "pass"
+      },
+      {
+        "run": 40122574016,
+        "platform": "linux-x64",
+        "project": "leansqlite",
+        "result": "pass"
+      },
+      {
+        "run": 40122574016,
+        "platform": "linux-x64",
+        "project": "prebuilt-library",
+        "result": "expected"
+      },
+      {
+        "run": 40122574016,
+        "platform": "linux-x64",
+        "project": "extern-lib",
+        "result": "pass"
+      },
+      {
+        "run": 40122574016,
+        "platform": "linux-x64",
+        "project": "unicode-parser",
+        "result": "pass"
+      },
+      {
+        "run": 40122574016,
+        "platform": "linux-x64",
+        "project": "fetch",
+        "result": "pass"
+      },
+      {
+        "run": 40122574016,
+        "platform": "linux-x64",
+        "project": "lean-zip",
+        "result": "pass"
+      },
+      {
+        "run": 40122574016,
+        "platform": "linux-x64",
+        "project": "md4lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122582021,
+        "platform": "linux-x64",
+        "project": "leancopilot",
+        "result": "native-fail"
+      },
+      {
+        "run": 40122582021,
+        "platform": "linux-x64",
+        "project": "mathlib-subset",
+        "result": "pass"
+      },
+      {
+        "run": 40122590565,
+        "platform": "linux-arm64",
+        "project": "extern-lib",
+        "result": "pass"
+      },
+      {
+        "run": 40122590565,
+        "platform": "linux-arm64",
+        "project": "fetch",
+        "result": "pass"
+      },
+      {
+        "run": 40122590565,
+        "platform": "linux-arm64",
+        "project": "lean-zip",
+        "result": "pass"
+      },
+      {
+        "run": 40122590565,
+        "platform": "linux-arm64",
+        "project": "prebuilt-library",
+        "result": "expected"
+      },
+      {
+        "run": 40122590565,
+        "platform": "linux-arm64",
+        "project": "leansqlite",
+        "result": "pass"
+      },
+      {
+        "run": 40122590565,
+        "platform": "linux-arm64",
+        "project": "unicode-parser",
+        "result": "pass"
+      },
+      {
+        "run": 40122590565,
+        "platform": "linux-arm64",
+        "project": "md4lean",
+        "result": "pass"
+      },
+      {
+        "run": 40122590565,
+        "platform": "linux-arm64",
+        "project": "native-tactic",
+        "result": "pass"
+      },
+      {
+        "run": 40122598974,
+        "platform": "linux-arm64",
+        "project": "mathlib-subset",
+        "result": "pass"
+      },
+      {
+        "run": 40122598974,
+        "platform": "linux-arm64",
+        "project": "leancopilot",
+        "result": "lasm-build-fail"
+      }
+    ]
+  },
+  "targetedEvalIoDarwinArm64": {
+    "run": 40150186790,
+    "candidate": "0.1.0-experimental.40149908009",
+    "harnessCommit": "8222f94",
+    "tally": {
+      "pass": 22
+    },
+    "maxPeakGiB": 1.31
+  },
+  "coldInstallation": [
+    {
+      "run": 40142530979,
+      "result": "success"
+    },
+    {
+      "run": 40142541166,
+      "result": "success"
+    },
+    {
+      "run": 40142552637,
+      "result": "success"
+    }
+  ],
+  "other": {
+    "serverRobustness": {
+      "run": 40122606971,
+      "result": "success"
+    },
+    "releaseBenchmarks": {
+      "run": 40122614514,
+      "result": "success"
+    },
+    "npmRehearsal": {
+      "run": 40122621251,
+      "result": "success"
+    },
+    "templatesOn460b4f4": {
+      "run": 40118572688,
+      "result": "success"
+    }
+  }
+}
