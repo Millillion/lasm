@@ -214,7 +214,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      LASM_CANDIDATE_VERSION: 0.2.0-experimental.${{ github.run_id }}
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -261,7 +261,7 @@ jobs:
     env:
       CI: '1'
       BROWSER: 'false'
-      LASM_CANDIDATE_VERSION: 0.2.0-experimental.${{ github.run_id }}
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
