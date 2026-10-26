@@ -94,10 +94,11 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const dependencyLicenses = project ? lakeDependencyLicenses(project,
     [...generated.inputs.map(input => input.source), ...nativeCompilations.map(item => item.source)],
     { exclude: [lean.prefix, lean.executionPrefix] }) : [];
-  // Programs that import Lasm.JS link its generated C and C glue.
+  // Programs that import Lasm's library (Lasm.JS, Lasm.UI) link the generated
+  // C of the modules they use, and the Lasm.JS C glue.
   const usesJs = importsLibrary(generated.sources);
   if (usesJs) {
-    const library = librarySources(lean);
+    const library = librarySources(lean, generated.sources);
     generated = { ...generated, sources: [...generated.sources, ...library.sources], inputs: [...generated.inputs, ...library.inputs] };
   }
   // npm packages for Lasm.JS: package.json next to the lakefile (or the source).
