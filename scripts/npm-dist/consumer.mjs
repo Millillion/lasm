@@ -16,6 +16,8 @@
 //                  requests (registry.mjs publish --mirror-template hono supplies hono and @hono/node-server)
 //   omit-optional  npm install --omit=optional: Lasm must fail with the exact fix; the fix must repair it
 //   foreign-lock   lockfile created for another OS (npm --os/--cpu), then npm ci on this host
+//   edge           in the `installed` project: examples/edge-pure built for every edge target and for Bun and
+//                  Deno (lasm build --target …) from the edge runtime bundled in @lasm/cli (no download, no receipt)
 //   pnpm           pnpm add @lasm/cli@V (--pnpm path to the pnpm CLI script); package resolution only
 import assert from 'node:assert/strict';
 import { parseArgs } from 'node:util';
@@ -45,7 +47,7 @@ const npxCli = join(dirname(npmCli), 'npx-cli.js');
 // Empty npm and Lasm caches per scenario; the Lake scenario continues the installed project,
 // and init reuses its caches (a fresh extraction of every tool again filled the guard's
 // budget with page cache on the 6 GiB Linux setting; empty caches are covered by installed and npx).
-const cacheName = ['lake', 'c-tier', 'init', 'create'].includes(args.scenario) ? 'installed' : args.scenario;
+const cacheName = ['lake', 'c-tier', 'edge', 'init', 'create'].includes(args.scenario) ? 'installed' : args.scenario;
 const preload = join(root, 'scripts/npm-dist/network-audit.cjs');
 function environment(extra = {}) {
   const env = { ...process.env };
@@ -157,6 +159,31 @@ if (args.scenario === 'c-tier') {
   assert.deepEqual([c.source.kind, c.source.package, c.source.version], ['npm-fetched', cPackage.name, cPackage.version],
     'The C tier came from its npm package');
   report.cTier = { package: `${cPackage.name}@${cPackage.version}`, source: c.source };
+}
+
+if (args.scenario === 'edge') {
+  // Edge isolates and the portable profile (docs/EDGE.md): the published CLI carries the
+  // single-threaded runtime in targets/, so nothing is fetched for it.
+  assert.ok(record.edge?.directory, 'This build bundles no edge runtime');
+  const cli = join(work, 'installed', 'node_modules', record.main.name);
+  assert.ok(existsSync(join(cli, record.edge.directory, 'libraries.json')), `The installed CLI lacks ${record.edge.directory}`);
+  const app = join(work, 'installed', 'edge-pure');
+  assert.ok(!existsSync(app), `Use a new work directory: ${app}`);
+  // No package.json of its own: npx resolves lasm from the `installed` project, as in `lake`.
+  cpSync(join(root, 'examples/edge-pure'), app, { recursive: true, filter: file => !file.endsWith('package.json') });
+  const outputs = { workers: 'workers/lasm/program.wasm', 'vercel-edge': 'api/_lasm/lasm/program.wasm', 'netlify-edge': 'netlify/lasm/lasm/program.wasm.mjs',
+    'deno-deploy': 'deno/lasm/program.wasm', 'supabase-edge': 'supabase/functions', bun: 'bun/main.mjs', deno: 'deno/main.mjs' };
+  report.targets = {};
+  for (const [target, output] of Object.entries(outputs)) {
+    report.targets[target] = npxRun(`npx lasm build --target ${target}`, ['lasm', 'build', 'Main.lean', '--target', target], { cwd: app }).seconds;
+    assert.ok(existsSync(join(app, output)), `--target ${target} wrote no ${output}`);
+  }
+  const functions = join(app, 'supabase/functions');
+  assert.ok(readdirSync(functions).some(name => existsSync(join(functions, name, 'index.ts'))), 'supabase-edge wrote no function index.ts');
+  report.receipts = receipts();
+  const kinds = new Set(report.receipts.map(r => r.source?.kind));
+  assert.ok(!kinds.has('https') && !kinds.has(undefined), 'Every tool came from npm');
+  assert.ok(!report.receipts.some(r => r.artifact === record.edge.archive.name), 'The edge runtime came from the CLI package, not a download');
 }
 
 if (args.scenario === 'npx') {

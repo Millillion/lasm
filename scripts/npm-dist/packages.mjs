@@ -104,13 +104,6 @@ export const toolComponents = Object.freeze({
       ['MinGW-w64 runtime startup code linked into the executables (lasm-notices: mingw-w64-runtime-COPYING)', 'ZPL-2.1 AND ISC AND BSD-2-Clause AND dtoa AND SunPro AND MIT AND LicenseRef-Cephes']],
   },
   'lean-data': { common: [['Lean module data (.olean, .ir) and Lean sources', 'Apache-2.0']] },
-  // The edge runtime (docs/EDGE.md): wasm64 static libraries built from Lean's
-  // runtime sources with Lasm's patches, and Lasm's host bridge.
-  'lean-edge': { common: [["Lean's C++ runtime, built single-threaded for WebAssembly (libleanrt.a, libleancpp.a)", 'Apache-2.0'],
-    ["Lasm's host bridge and Lasm.JS edge glue (liblasmhost.a, liblasmjsedge.a)", 'MIT'],
-    ['Emscripten system libraries (sysroot/): Emscripten library code', '(MIT OR NCSA)'],
-    ['musl libc (in libc.a); mimalloc (libmimalloc.a)', 'MIT'],
-    ['LLVM libc++, libc++abi, libunwind, compiler-rt (sysroot/)', 'Apache-2.0 WITH LLVM-exception']] },
   'emscripten-native': {
     common: [['LLVM: clang, lld/wasm-ld, llvm-nm, llvm-objcopy, clang resource headers', 'Apache-2.0 WITH LLVM-exception'],
       ['Binaryen: wasm-opt, wasm-emscripten-finalize, wasm-metadce', 'Apache-2.0']],
@@ -126,6 +119,24 @@ export const toolComponents = Object.freeze({
       ['terser', 'BSD-2-Clause']],
   },
 });
+/** The edge runtime (docs/EDGE.md) for one Lean version, or null: bundled in the CLI
+ * package as targets/<root>/ (extracted from the catalog archive, which comes from its
+ * immutable release and is verified by SHA-256), not a tool package of its own. It is
+ * 1.3 MB packed (6 MB extracted), and bundling needs no npm package name beyond
+ * @lasm/cli (decision 2026-10-26, docs/DECISIONS.md). Its contents are Lean's runtime
+ * built single-threaded (Apache-2.0), Lasm's host bridge and Lasm.JS edge glue (MIT)
+ * and Emscripten's single-threaded system libraries (Emscripten, musl, mimalloc, LLVM
+ * libraries), all already in the CLI's licence; its THIRD_PARTY_NOTICES.txt sections
+ * go to licenses/edge-runtime/. */
+export function edgeRuntimeBundle({ lean, edgeRuntimes }) {
+  const edge = edgeRuntimes?.lean?.[lean];
+  if (!edge) return null;
+  const { source, baseRuntimeManifestSha256, ...artifact } = edge;
+  assert.ok(artifact.format === 'tar.zst' && artifact.root && /^[a-f0-9]{64}$/.test(artifact.sha256) && /^[a-f0-9]{64}$/.test(baseRuntimeManifestSha256),
+    `Unexpected edge runtime catalog entry for Lean ${lean}`);
+  return { artifact, baseRuntimeManifestSha256 };
+}
+
 function componentsOf(kind, platform) {
   const table = toolComponents[kind];
   return [...table.common, ...(platform ? table[platform.split('-')[0]] ?? [] : [])];
@@ -133,8 +144,9 @@ function componentsOf(kind, platform) {
 const spdxOf = components => [...new Set(components.map(([, spdx]) => spdx).filter(Boolean))].join(' AND ');
 
 /** Every tool package for one Lean version. install: optional (platform,
- * optionalDependencies), required (shared, dependencies), demand (npm pack on use). */
-export function toolPackages({ lean, toolchains, linkToolchain, edgeRuntimes, scope = defaultScope, platforms }) {
+ * optionalDependencies), required (shared, dependencies), demand (npm pack on use).
+ * The edge runtime is not a tool package (edgeRuntimeBundle). */
+export function toolPackages({ lean, toolchains, linkToolchain, scope = defaultScope, platforms }) {
   assert.match(scope, /^@[a-z0-9][a-z0-9._-]*$/);
   const release = toolchains.lean[lean];
   assert.ok(release?.tiers, `No tiered Lean ${lean} in the catalog`);
@@ -166,13 +178,6 @@ export function toolPackages({ lean, toolchains, linkToolchain, edgeRuntimes, sc
     packages.push(tool(scope, `lean-c-${platform}`, artifact, 'demand', { platform, ...platformParts(platform), license: cTierLicense(platform),
       notices: { tierArchive: true, bin: release.tiers.bin[platform] },
       description: `Lean ${lean} C tier (Lean's clang as cc, C library headers and link libraries) for Lasm Lake projects with C code on ${platform} (fetched on demand)` }));
-  }
-  // Edge targets (lasm build --target workers, …): the single-threaded runtime, on demand.
-  const edge = edgeRuntimes?.lean?.[lean];
-  if (edge) {
-    const { baseRuntimeManifestSha256, source, ...artifact } = edge;
-    packages.push(tool(scope, 'lean-edge-runtime', artifact, 'demand', { components: componentsOf('lean-edge'),
-      description: `Lean ${lean} runtime built single-threaded for edge isolates (Cloudflare Workers and others) for Lasm (fetched on demand)` }));
   }
   assert.equal(new Set(packages.map(p => p.name)).size, packages.length, 'Duplicate tool package names');
   for (const pkg of packages) if (pkg.components) pkg.license = spdxOf(pkg.components);

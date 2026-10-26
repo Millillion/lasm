@@ -12,13 +12,11 @@ on:
         description: Attach the packaged archive to the draft release lean-<version>-edge-v<n> named by src/edge-runtimes.json (it must match the catalog; the release stays a draft until 0.2.0)
         type: boolean
         default: false
-  # workers.yml builds the runtime first, then tests with it.
+  # workers.yml builds the runtime first, then tests with it (also for
+  # release-checks.yml, on main too: release-check).
   workflow_call:
     inputs:
-      allow-main:
-        description: Run on main too (release-checks.yml, through browser.yml)
-        type: boolean
-        default: false
+      release-check: { type: boolean, default: false }
 permissions:
   # Read access to the draft release that holds the pinned runtime handoff
   # (drafts are visible only with write access). Nothing is written.
@@ -28,7 +26,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   runtime:
-    if: github.ref != 'refs/heads/main' || inputs.allow-main
+    if: inputs.release-check || github.ref != 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     env:
