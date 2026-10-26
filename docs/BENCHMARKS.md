@@ -437,6 +437,44 @@ What this shows:
   every Worker. Fastify's own `require` and schema compiler take about 150 ms of
   the main thread; each Worker compiles `program.cjs` again (about 25 ms).
 
+### Where a cold start's CPU goes (Hono template, release build)
+
+Measured on the maintainer host, the process pinned to one core (`taskset`),
+CPU time per thread from `/proc` at the first "Listening" (10 ms ticks), and
+`node --cpu-prof` on every thread:
+
+| Part | CPU |
+| --- | ---: |
+| Plain Node + Hono + `@hono/node-server` (the same app in JavaScript) | 120 ms |
+| Lasm Hono app, total | 490 ms |
+| — Node's main thread (Node, `main.mjs` and host modules, Hono and undici's `Request`/`Response`, program.cjs, the Wasm compile) | 120–150 ms |
+| — Lean's threads: 5 `em-pthread` Workers, about 40–60 ms each | about 280 ms |
+| — V8 background threads (Wasm tier-up, GC) | about 40 ms |
+
+Findings:
+
+- **Initializers are not the cost.** The Node link already runs only what the
+  program needs: 6 of 2,794 module initializers (`build-info.json`
+  `linkRequirements.initializationPlan`), as the edge link does.
+- **Threads are.** A bare Node Worker costs about 30 ms of CPU to start (five:
+  163 ms over an empty process, same host), and each Lean thread then loads
+  `program.cjs` and instantiates the shared Wasm module. With no Worker
+  started before `main` (`LASM_THREAD_POOL=0`), the program still starts 5
+  threads on demand: Lean's main thread (`PROXY_TO_PTHREAD`), the host
+  completion thread (`runtime/node-async.cpp`), Lasm.JS's interop thread and
+  Lean task workers. Reporting fewer cores to Lean (`_emscripten_num_logical_cores`)
+  did not change the count.
+- **Evaluated, no gain:** a V8 code cache for `program.cjs` shared by every
+  Worker (`vm.Script` cachedData written to the temporary directory): 49 → 47–50
+  ticks; Node's compile cache: no change; lazy Wasm compilation is already
+  V8's default.
+- **The ≤ 250 ms target needs fewer Lean threads at start-up**, which is a
+  runtime change (the pinned runtime archives): run the completion loop on
+  the interop thread, start Lean task workers only when a task is queued, and
+  keep `LASM_THREAD_POOL=0`. Estimated from the measurements: 2 threads
+  (Lean main + one host thread) ≈ 120 + 2 × 55 + 40 ≈ 270 ms on one core. That
+  needs a runtime rebuild and the upstream suite, so it is not in this branch.
+
 ## Big numbers without GMP
 
 Lasm's Wasm runtime is built with Lean's `-DUSE_GMP=OFF` (docs/PLAN.md decision 5,
