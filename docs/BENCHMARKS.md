@@ -377,6 +377,14 @@ browser` per save, the browser branch alone) 16.8 s. After (run 40298525152):
 | `lasm dev --target browser` (warm worker), per edit | 16.8 s (a new process per save) | 1.9 s (first edit after the first build 3.5 s) |
 | A new `lasm build --dev --target browser` process | 16.8 s | 3.4 s |
 
+With Lasm.UI merged and the edge link's nm listings, compact initializer
+object and modularize wrapper reused (browser.yml 40310922142, all jobs green):
+`lasm dev --target browser` 1.7, 1.6, 1.7 s per edit (first 3.0 s); `lasm dev
+--target workers` 1.6 s (first 3.0 s); Vite dev (`@lasm/cli/vite`, warm worker)
+1.8, 2.7, 1.7 s from save to the remounted app; a new `lasm build --dev
+--target browser` process 3.6 s. The evidence gates the 2 s budget on the
+`lasm dev` number and records the other two.
+
 Where an edit's time goes after the change (maintainer host, one build job,
 `lasm dev --target browser`, 2.6 s there): Lake query with elaboration 0.7 s,
 clang 0.2 s, Node link (link only, live members) 0.4 s, edge link (live
