@@ -20,6 +20,7 @@ export const location = () => need('location');
 export const history = () => need('history');
 export const navigator = () => need('navigator');
 export const now = () => performance.now();
+export const nextFrame = () => new Promise(resolve => need('requestAnimationFrame')(resolve));
 
 // DOM
 export const createElement = tag => document().createElement(tag);
@@ -45,6 +46,40 @@ export function rect(element) {
 export const replaceChildren = (parent, nodes) => { parent.replaceChildren(...nodes); };
 export const append = (parent, nodes) => { parent.append(...nodes); };
 export const isConnected = node => !!node.isConnected;
+// Node and element operations that answer nothing (no handle crosses back).
+export const appendChild = (parent, child) => { parent.appendChild(child); };
+export const insertBefore = (parent, child, reference) => { parent.insertBefore(child, reference ?? null); };
+export const removeChild = (parent, child) => { parent.removeChild(child); };
+export const removeNode = node => { node.remove(); };
+export const replaceNode = (node, replacement) => { node.replaceWith(replacement); };
+export const getText = node => node.textContent ?? '';
+export const setText = (node, text) => { node.textContent = text; };
+export const parentNode = node => node.parentNode;
+export const parentElement = node => node.parentElement;
+export const firstChild = node => node.firstChild;
+export const lastChild = node => node.lastChild;
+export const nextSibling = node => node.nextSibling;
+export const previousSibling = node => node.previousSibling;
+export const contains = (node, other) => node.contains(other);
+export const cloneNode = (node, deep) => node.cloneNode(!!deep);
+export const getAttribute = (element, name) => element.getAttribute(name);
+export const setAttribute = (element, name, value) => { element.setAttribute(name, value); };
+export const removeAttribute = (element, name) => { element.removeAttribute(name); };
+export const hasAttribute = (element, name) => element.hasAttribute(name);
+export const toggleAttribute = (element, name, force) => force === undefined || force === null ? element.toggleAttribute(name) : element.toggleAttribute(name, force);
+export const getProp = (object, name) => object[name];
+export const setProp = (object, name, value) => { object[name] = value; };
+export const getInnerHTML = element => element.innerHTML;
+export const setInnerHTML = (element, html) => { element.innerHTML = html; };
+export const getValue = element => typeof element.value === 'string' ? element.value : String(element.value ?? '');
+export const setValue = (element, value) => { element.value = value; };
+export const getChecked = element => !!element.checked;
+export const setChecked = (element, checked) => { element.checked = checked; };
+export const focus = element => { element.focus(); };
+export const blur = element => { element.blur(); };
+export const click = element => { element.click(); };
+export const scrollIntoView = (element, smooth) => { element.scrollIntoView(smooth ? { behavior: 'smooth' } : undefined); };
+export const style = (element, name) => element.style.getPropertyValue(name);
 export const nodeName = node => node.nodeName;
 export const tagName = element => element.tagName;
 
@@ -52,7 +87,7 @@ export const tagName = element => element.tagName;
 export function eventInfo(event) {
   const t = event.target;
   return {
-    type: event.type, key: event.key ?? '', code: event.code ?? '', repeat: !!event.repeat,
+    type: event.type, key: event.key ?? '', code: event.code ?? '', keyRepeat: !!event.repeat,
     altKey: !!event.altKey, ctrlKey: !!event.ctrlKey, metaKey: !!event.metaKey, shiftKey: !!event.shiftKey,
     clientX: event.clientX ?? 0, clientY: event.clientY ?? 0, pageX: event.pageX ?? 0, pageY: event.pageY ?? 0,
     offsetX: event.offsetX ?? 0, offsetY: event.offsetY ?? 0, button: event.button ?? 0, buttons: event.buttons ?? 0,
@@ -233,9 +268,12 @@ export function lasmInstance(context) {
   return self;
 }
 const helpers = {
-  window, document, localStorage, sessionStorage, location, history, navigator, now, createElement, createElementNS, createTextNode,
+  window, document, localStorage, sessionStorage, location, history, navigator, now, nextFrame, createElement, createElementNS, createTextNode,
   createFragment, getElementById, querySelector, querySelectorAll, children, childNodes, setAttributes, setStyles, removeStyle, classAdd,
-  classRemove, classToggle, classContains, rect, replaceChildren, append, isConnected, nodeName, tagName, eventInfo, targetValue,
+  classRemove, classToggle, classContains, rect, replaceChildren, append, isConnected, appendChild, insertBefore, removeChild, removeNode,
+  replaceNode, getText, setText, parentNode, parentElement, firstChild, lastChild, nextSibling, previousSibling, contains, cloneNode,
+  getAttribute, setAttribute, removeAttribute, hasAttribute, toggleAttribute, getProp, setProp, getInnerHTML, setInnerHTML, getValue,
+  setValue, getChecked, setChecked, focus, blur, click, scrollIntoView, style, nodeName, tagName, eventInfo, targetValue,
   targetChecked, createEvent, createCustomEvent, dispatchEvent, fetch, responseInfo, responseText, responseJson, responseBytes,
   abortController, abortSignal, abort, timeoutSignal, parseUrl, searchParams, paramsEntries, encodeURIComponent, decodeURIComponent,
   formData, formEntries, formAppend, formAppendBytes, blobBytes, randomBytes, randomUUID, digest, log, context2d, draw, measureText,

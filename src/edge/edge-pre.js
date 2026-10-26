@@ -141,7 +141,8 @@ Module.lasmEdge = (() => {
       const input = _malloc(Math.max(1, payload.length)), size = _malloc(8);
       HEAPU8.set(payload, input);
       let pointer;
-      try { pointer = Number(_lasm_js_edge_sync(fn, input, payload.length, size)); }
+      // The export is not wrapped: its pointer and size_t parameters are i64 (BigInt).
+      try { pointer = Number(_lasm_js_edge_sync(fn, BigInt(input), BigInt(payload.length), BigInt(size))); }
       catch (failure) { syncDepth--; throw poison(failure, sp); }
       const result = HEAPU8.slice(pointer, pointer + Number(HEAPU32[size >> 2]));
       _free(input); _free(size);
