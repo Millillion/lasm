@@ -20,11 +20,11 @@ on:
         required: false
         type: string
       platforms:
-        description: all, or linux-x64 only (keeps CI concurrency free while iterating)
+        description: all, or one platform (keeps CI concurrency free while iterating)
         required: false
         default: all
         type: choice
-        options: [all, linux-x64]
+        options: [all, linux-x64, win32-x64]
       edit-loop-only:
         description: Only the dev edit loop (docs/BENCHMARKS.md "Edit loop")
         required: false
@@ -87,7 +87,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(inputs.platforms == 'linux-x64' && '[{"runner":"ubuntu-24.04","platform":"linux-x64"}]' || '[{"runner":"ubuntu-24.04","platform":"linux-x64"},{"runner":"ubuntu-24.04-arm","platform":"linux-arm64"},{"runner":"macos-15","platform":"darwin-arm64"},{"runner":"macos-15-intel","platform":"darwin-x64"},{"runner":"windows-2025","platform":"win32-x64"}]') }}
+        include: ${{ fromJSON(inputs.platforms == 'linux-x64' && '[{"runner":"ubuntu-24.04","platform":"linux-x64"}]' || inputs.platforms == 'win32-x64' && '[{"runner":"windows-2025","platform":"win32-x64"}]' || '[{"runner":"ubuntu-24.04","platform":"linux-x64"},{"runner":"ubuntu-24.04-arm","platform":"linux-arm64"},{"runner":"macos-15","platform":"darwin-arm64"},{"runner":"macos-15-intel","platform":"darwin-x64"},{"runner":"windows-2025","platform":"win32-x64"}]') }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     defaults:

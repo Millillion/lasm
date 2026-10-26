@@ -78,3 +78,23 @@ test('Lake adapter key: configuration, packages and imports count; bodies do not
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
+
+test('live members: map archive paths match however wasm-ld spelled them', async () => {
+  const { liveMembers } = await import('../src/application-live-members.mjs');
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-members-'));
+  try {
+    // An ar archive with a GNU symbol index: one member a.o defining `f` and `d`.
+    const member = Buffer.from('member-bytes');
+    const header = (name, size) => Buffer.from(name.padEnd(16) + '0'.padEnd(12) + '0'.padEnd(6) + '0'.padEnd(6) + '644'.padEnd(8) + String(size).padEnd(10) + '`\n');
+    const names = Buffer.from('f\0d\0');
+    const symbolTableSize = 4 + 2 * 4 + names.length;
+    const memberOffset = 8 + 60 + symbolTableSize + (symbolTableSize % 2);
+    const table = Buffer.alloc(symbolTableSize); table.writeUInt32BE(2, 0); table.writeUInt32BE(memberOffset, 4); table.writeUInt32BE(memberOffset, 8); names.copy(table, 12);
+    const archive = join(directory, 'libx.a');
+    writeFileSync(archive, Buffer.concat([Buffer.from('!<arch>\n'), header('/', symbolTableSize), table, symbolTableSize % 2 ? Buffer.from('\n') : Buffer.alloc(0), header('a.o/', member.length), member]));
+    const spelled = process.platform === 'win32' ? archive.replaceAll('\\', '\\\\') : archive.replaceAll('/', '//');
+    const map = ['    Addr      Off     Size Out     In      Symbol', '       -        0      100 CODE',
+      `       1        1       10         ${spelled}(a.o):(f)`].join('\n');
+    assert.deepEqual(liveMembers(map, [archive]), { [archive]: [memberOffset] });
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
