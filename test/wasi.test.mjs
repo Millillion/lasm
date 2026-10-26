@@ -126,7 +126,7 @@ test('lasm init --template fetch --deploy fastly|wasi|spin', () => {
     initProject(parseInitArguments([join(parent, 'cli'), '--deploy', 'wasi']));
     assert.equal(JSON.parse(readFileSync(join(parent, 'cli/package.json'), 'utf8')).scripts['build:wasi'], 'lasm build Main.lean --target wasi');
   } finally { rmSync(parent, { recursive: true, force: true }); }
-  assert.throws(() => parseInitArguments(['x', '--template', 'hono', '--deploy', 'fastly']), /supports the fetch template, not hono/);
+  assert.throws(() => parseInitArguments(['x', '--template', 'hono', '--deploy', 'fastly']), /supports the fetch or fullstack template, not hono/);
   assert.throws(() => parseInitArguments(['x', '--deploy', 'fastly']), /needs a server template/);
   assert.ok(deployTargets.workers.templates.includes('fetch'));
 });

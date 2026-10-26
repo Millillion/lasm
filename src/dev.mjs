@@ -199,6 +199,7 @@ function runtimeCommand(target, entry, args) {
 function createRunner() {
   let child, exited;
   return {
+    running() { return !!child && child.exitCode === null && child.signalCode === null; },
     async stop() {
       if (!child || child.exitCode !== null || child.signalCode !== null) { child = undefined; return; }
       const current = child;
@@ -208,8 +209,8 @@ function createRunner() {
       await exited;
       clearTimeout(timer);
     },
-    start(command, args, { cwd, label }) {
-      const started = spawn(command, args, { cwd, stdio: ['ignore', 'inherit', 'inherit'], windowsHide: true, env: process.env });
+    start(command, args, { cwd, label, env = process.env }) {
+      const started = spawn(command, args, { cwd, stdio: ['ignore', 'inherit', 'inherit'], windowsHide: true, env });
       child = started;
       exited = new Promise(resolve => started.once('exit', (code, signal) => {
         if (child === started) {
@@ -242,8 +243,20 @@ export async function runDev(options, hooks = {}) {
     return browserDev.runBrowserDev({ input: options.input, release: options.profile === 'release', watch: options.watch ?? true,
       port: options.port ?? 5173, host: options.host ?? '127.0.0.1', output: options.output });
   }
+  // Servers built by lasm dev read their static files at run time instead of
+  // embedding them (Lasm.Fetch's embed_dir!), so a rebuilt browser app needs no
+  // server rebuild. Set before the build worker starts (it copies the environment).
+  process.env.LASM_DEV_SERVER = '1';
   const service = createBuildService();
   const runner = createRunner();
+  // A server and a browser app (node=Server.lean,browser=Client.lean): one URL.
+  // The server runs on a private port behind a proxy on the user's port, which
+  // adds live reload; the browser app is built into --output, where the server
+  // serves it. No separate browser server.
+  const oneUrl = options.run && options.outputs.some(o => runtimeTargets.includes(o.target)) && options.outputs.some(o => o.target === 'browser');
+  const devProxy = oneUrl ? await import('./dev-proxy.mjs') : undefined;
+  const serverPort = oneUrl ? await devProxy.freePort() : undefined;
+  let lastBuilt = new Map(), changeAt;
   const tty = process.stderr.isTTY;
   let building = false, queued = false, previous = snapshot(project), lastGood, stopping = false, server;
   const browserOutput = resolve(options.output ?? join(project, '.lake/lasm/browser-dev'));
@@ -258,12 +271,18 @@ export async function runDev(options, hooks = {}) {
     if (!force && lastGood !== undefined && !changed.length) { building = false; return; }
     previous = next;
     if (reason) say(reason === 'change' ? `${changed.slice(0, 3).map(file => relative(project, file)).join(', ')}${changed.length > 3 ? ` and ${changed.length - 3} more` : ''} changed; rebuilding` : reason);
-    const stages = [], started = performance.now();
+    const stages = [], started = performance.now(), changedAt = changeAt ?? started;
+    changeAt = undefined;
     try {
       // Every output builds before any is used, so a server and its client stay in step.
+      // An output whose sources did not change (its import closure) keeps its last build.
       const built = [];
       let allCached = true;
       for (const entry of options.outputs) {
+        if (!force && lastBuilt.has(entry) && devProxy && !devProxy.affects(project, resolve(entry.input), changed)) {
+          built.push({ ...lastBuilt.get(entry), unchanged: true });
+          continue;
+        }
         const result = await service.build(resolve(entry.input), { profile: options.profile, verbose: options.verbose,
           ...(entry.target === 'browser' ? { output: browserOutput } : {}) }, {
           target: entry.target === 'node' ? undefined : entry.target,
@@ -274,15 +293,33 @@ export async function runDev(options, hooks = {}) {
           onLog: text => { clearStatus(); process.stderr.write(text + '\n'); },
         });
         allCached &&= !!result.cacheHit;
-        built.push({ ...entry, result, output: entry.target === 'browser' ? browserOutput : result.edgeOutput ?? result.output });
+        const item = { ...entry, result, output: entry.target === 'browser' ? browserOutput : result.edgeOutput ?? result.output };
+        lastBuilt.set(entry, item);
+        built.push(item);
       }
       const end = performance.now();
       clearStatus();
       say(`${color('32', allCached ? 'Up to date' : 'Built')} in ${((end - started) / 1000).toFixed(1)} s${allCached ? '' : ` (${summarizeStages(stages, end)})`}`
         + `${options.profile === 'release' ? ' — release profile' : ''}`);
       lastGood = built;
-      for (const item of built) await hooks.onBuilt?.(item);
+      for (const item of built) if (!item.unchanged) await hooks.onBuilt?.(item);
       if (!options.run) { /* rebuild only */ }
+      else if (oneUrl) {
+        const program = built.find(o => runtimeTargets.includes(o.target));
+        if (!program.unchanged || !runner.running()) {
+          await runner.stop();
+          const [command, args] = runtimeCommand(program.target, join(program.output, 'main.mjs'), options.args);
+          runner.start(command, args, { cwd: process.cwd(), label: basename(program.input), env: { ...process.env, PORT: String(serverPort), HOST: '127.0.0.1' } });
+          await devProxy.waitForPort(serverPort);
+        }
+        if (!server) {
+          server = await devProxy.startDevProxy({ port: options.port ?? (Number(process.env.PORT) || 3000), host: options.host ?? '127.0.0.1', upstreamPort: serverPort });
+          say(`Open ${color('1', server.url)}: ${basename(program.input)} with ${built.filter(o => o.target === 'browser').map(o => basename(o.input)).join(', ')}, live reload.`);
+        } else {
+          server.reload();
+          say(`Reloaded ${((performance.now() - changedAt) / 1000).toFixed(1)} s after the change${built.some(o => o.unchanged) ? ` (unchanged: ${built.filter(o => o.unchanged).map(o => basename(o.input)).join(', ')})` : ''}.`);
+        }
+      }
       else for (const { target, input, output } of built) {
         if (edgeOnlyTargets.includes(target))
           say(`${relative(process.cwd(), output) || output} is up to date; your platform's local server (for example npx wrangler dev) serves it.`);
@@ -313,7 +350,7 @@ export async function runDev(options, hooks = {}) {
   };
 
   let timer;
-  const watcher = watchProject(project, () => { clearTimeout(timer); timer = setTimeout(() => rebuild('change'), 120); });
+  const watcher = watchProject(project, () => { changeAt ??= performance.now(); clearTimeout(timer); timer = setTimeout(() => rebuild('change'), 120); });
   const files = projectFiles(project).length;
   say(`Watching ${files} file${files === 1 ? '' : 's'} in ${relative(process.cwd(), project) || '.'} (${watcher.mode}); target ${options.outputs.map(o => o.target).join(', ')}, ${options.profile} profile. Ctrl+C stops.`);
   process.stdin.setEncoding?.('utf8');

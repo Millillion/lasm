@@ -15,7 +15,7 @@ const root = fileURLToPath(new URL('../library/', import.meta.url));
 export const libraryLeanVersions = ['4.35.0'];
 export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
   // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
-  'Lasm.Fetch', 'Lasm.Fastly',
+  'Lasm.Fetch', 'Lasm.Fastly', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed', 'Lasm.KV',
   // Lasm.Web (docs/BROWSER.md): web-platform bindings on Lasm.JS.
   'Lasm.Web.Types', 'Lasm.Web.Dom', 'Lasm.Web.Events', 'Lasm.Web.Timers', 'Lasm.Web.Fetch', 'Lasm.Web.Url', 'Lasm.Web.Storage',
   'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web',
