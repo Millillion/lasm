@@ -91,7 +91,7 @@ export function lasmInstance(context) {
     },
     onUnmount: fn => { unmountHandlers.push(fn); },
     report: error => (context.report ?? console.error)(error),
-    // Hot reload (@lasm/vite): the state the previous instance saved, and the saver.
+    // Hot reload (the Vite plugin, @lasm/cli/vite): the state the previous instance saved, and the saver.
     hotState: () => context.hotState,
     onHotSave: fn => { hotSave = fn; },
   };

@@ -55,7 +55,9 @@ export function browserBundle({ programGlue, name, wasmFile, modules, suspend, a
   const sources = {
     './loader.mjs': read(join(here, 'loader.mjs')),
     './config.mjs': browserConfigModule({ name, wasmFile, modules, suspend, autoMount }),
-    './program.mjs': emscriptenModule(programGlue),
+    // The glue's own Wasm location is never used (the loader instantiates the
+    // module itself); as a plain string bundlers do not look for the file.
+    './program.mjs': emscriptenModule(programGlue.replace(/new URL\("program\.wasm",\s*import\.meta\.url\)/g, '"program.wasm"')),
     './edge-start.mjs': read(join(edge, 'edge-start.mjs')),
     './edge-host.mjs': read(join(edge, 'edge-host.mjs')),
     './edge-js.mjs': read(join(edge, 'edge-js.mjs')),
@@ -124,7 +126,7 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
   const builtins = [...new Set([...edgeModules(projectDirectory, result.jsBindings ?? []), 'lasm:app'])].sort();
   const bare = builtins.filter(m => !m.startsWith(builtinPrefix) && !/^https?:\/\//.test(m));
   if (bare.length && externals !== 'keep')
-    throw new Error(`The program uses npm modules (${bare.join(', ')}), which a static browser build cannot resolve. Build it with Vite and @lasm/vite (it bundles npm packages), or bind a URL module (@[js "https://…" …]).`);
+    throw new Error(`The program uses npm modules (${bare.join(', ')}), which a static browser build cannot resolve. Build it with Vite and the CLI's plugin, @lasm/cli/vite (it bundles npm packages), or bind a URL module (@[js "https://…" …]).`);
   const bundle = Buffer.from(browserBundle({ programGlue: readFileSync(join(program.directory, 'program.mjs'), 'utf8'), name, wasmFile: wasm, modules: builtins, suspend }));
   const entry = `app.${shortHash(bundle)}.js`;
   const staging = destination + '.lasm-staging';

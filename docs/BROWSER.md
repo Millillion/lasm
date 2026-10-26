@@ -2,7 +2,7 @@
 
 Status: **the platform half is in branch source and measured in CI
 (2026-10-26):** `lasm build --target browser`, the loader and mount API,
-builtin `lasm:*` modules, `Lasm.Web`, `@lasm/vite`, `lasm init --template web`
+builtin `lasm:*` modules, `Lasm.Web`, the Vite plugin (`@lasm/cli/vite`), `lasm init --template web`
 and the browser CI. `Lasm.UI` (Html, diff, patch protocol, `html!`, SSR,
 proofs) is built against it on branch `browser-ui`. This document is the
 contract; sections are marked *measured* as they land.
@@ -22,7 +22,7 @@ small downloads, fast start, fast updates, and a clean typed API.
 | Output | `lasm build --target browser` → `dist/`: `index.html` (only if the project has none), `app.<hash>.js` (ES-module loader, a few KiB), `app.<hash>.wasm`, precompressed `.br`/`.gz` siblings, `lasm-manifest.json`. | Content hashes allow immutable caching; precompressed files serve from any static host or CDN. |
 | Loading | `WebAssembly.compileStreaming(fetch(url))` started at module evaluation, in parallel with `<link rel="modulepreload">` and `<link rel="preload" as="fetch" crossorigin>`. Fallback to `arrayBuffer` + `compile` when the server sends the wrong MIME type. | Compilation overlaps download; no blocking on the parser. |
 | Mount API | `import { mount } from './app.<hash>.js'; const app = await mount(element, { flags })` returns `{ unmount(), send(msg), ports }`. Also auto-mount: `<div data-lasm-app></div>` + `<script type="module" src="app.<hash>.js">`. Several apps can mount on one page. | Works in a plain page, inside React/Vue/Svelte apps, and in CMS pages. |
-| Bundlers | `@lasm/vite` plugin: `import app from './Main.lean?lasm'` in dev and build; dev server rebuilds on save and hot-reloads, preserving the model when its type is unchanged. esbuild/webpack/Rollup consume `dist/` as plain ES modules and assets. | Vite is the default frontend toolchain; nothing else needs special support. |
+| Bundlers | The Vite plugin `@lasm/cli/vite` (shipped in the CLI package): `import app from './Main.lean?lasm'` in dev and build; dev server rebuilds on save and hot-reloads, preserving the model when its type is unchanged. esbuild/webpack/Rollup consume `dist/` as plain ES modules and assets. | Vite is the default frontend toolchain; nothing else needs special support. |
 | DOM model | **The Elm architecture (`Lasm.UI`)**: `init`, pure `update : Msg → Model → Model × Cmd Msg`, pure `view : Model → Html Msg`, `subscriptions`. Diffing runs **in Lean** and emits a compact binary patch stream; a small JS applier (`lasm:ui-dom`) applies it, one boundary crossing per frame (requestAnimationFrame batching). | Pure `update`/`view` are exactly what Lean can prove theorems about; one crossing per frame avoids per-node call overhead. |
 | Imperative escape hatch | `Lasm.Web`: typed bindings for the web platform (DOM nodes and events, `fetch`, timers, `requestAnimationFrame`, storage, `history`/`location`, `URL`, `FormData`, WebSocket, `crypto`, `console`, canvas 2D basics) on `Lasm.JS`. `Lasm.UI` interoperates through ports and `Cmd`s. | Core platform bindings, not premade npm bindings; anything else uses `@[js]` bindings as on Node. |
 | Markup | Both a function DSL (`div [class_ "x", onClick .inc] [text "hi"]`) and a JSX-like `html!` syntax (`<div class="x" onClick={.inc}>hi</div>`), with tag/attribute checking at elaboration. | Familiar to web developers; still plain Lean terms. |
@@ -52,7 +52,7 @@ Playwright 1.63.0: **Chromium 153** and **Firefox 155** on `ubuntu-24.04`,
   suite with `--suspend jspi` (Chromium suspends the blocking wait and goes on;
   Firefox's JSPI hung, so the loader runs Firefox without it: see Decisions), and
   the Vite bundle.
-- **`@lasm/vite` development** (headless Chromium): editing `Main.lean`'s view
+- **The Vite plugin in development** (`@lasm/cli/vite`, from a packed CLI tarball, headless Chromium): editing `Main.lean`'s view
   rebuilds and remounts the app in place, without a page reload (4/4 checks).
 - `Lasm.UI` (branch `browser-ui`): two TodoMVC edit checks failed in this run;
   after merging that branch's fixes, run **40293687681** (source `24c0ca6`)
@@ -231,23 +231,27 @@ app.unmount();                            // Lean: App.onUnmount; listeners, tim
 `Lasm.Web.background (work : Async Unit)` starts `Async` work from a handler.
 `IO.println` writes to the console; `IO.getRandomBytes` uses `crypto`.
 
-## Vite (`@lasm/vite`, measured: `vite build` in CI)
+## Vite (`@lasm/cli/vite`, measured in CI)
 
 ```js
-// vite.config.js
-import lasm from '@lasm/vite';
+// vite.config.js (npm install --save-dev vite @lasm/cli)
+import lasm from '@lasm/cli/vite';
 export default { plugins: [lasm()] };
 // main.js
 import app from './Main.lean?lasm';
 await app.mount(document.getElementById('app'));
 ```
 
+The plugin ships inside `@lasm/cli` (a subpath export) and runs that CLI, so
+its version always matches; a standalone `@lasm/vite` package may come later.
 `Main.lean?lasm` is built with `lasm build --target browser --bundler` (dev
-builds under `vite`, release under `vite build`). Vite emits the Wasm as a hashed
-asset and resolves npm modules the bindings name. Saving a `.lean` file rebuilds
-and remounts the app in place, passing it the state it saved
-(`App.onHotSave`/`App.hotState`). The package is in the npm release set
-(`scripts/npm-dist/packages.mjs`).
+builds under `vite`, release under `vite build`). Vite emits the Wasm as a
+hashed asset and resolves npm modules the bindings name. Saving a `.lean` file
+rebuilds and remounts the app in place, passing it the state it saved
+(`App.onHotSave`/`App.hotState`). CI installs the CLI from a packed tarball
+under its published name and runs `vite build` and `vite` (an edit in headless
+Chromium) against it. TypeScript: add `"@lasm/cli/vite/client"` to
+`compilerOptions.types`.
 
 ## Testing
 
@@ -265,5 +269,5 @@ Never run browsers locally on the desktop (no headed browsers, no `open`).
 - `library/Lasm/RPC.lean` — shared API definitions and adapters.
 - `src/edge/` (existing) and `src/browser/` — the browser entry, loader and
   `lasm:ui-dom` applier.
-- `packages/vite/` — `@lasm/vite`.
+- `src/vite/` — the Vite plugin (`@lasm/cli/vite`).
 - `templates/web`, `templates/fullstack`.

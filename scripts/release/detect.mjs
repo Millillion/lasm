@@ -12,7 +12,7 @@ import { pathToFileURL } from 'node:url';
 import { root, run, isVersion, distTag, notesFile, tagName, published, publicRegistry, output, summary } from './lib.mjs';
 
 /** The decision from the facts; pure, for tests. */
-export function decide({ previous, version, notes, cli, create, vite, tag }) {
+export function decide({ previous, version, notes, cli, create, tag }) {
   if (previous === version) return { release: false, reason: `version ${version} unchanged` };
   const problems = [];
   if (!isVersion(version)) problems.push(`package.json version ${JSON.stringify(version)} is not a semantic version`);
@@ -20,7 +20,6 @@ export function decide({ previous, version, notes, cli, create, vite, tag }) {
     if (!notes) problems.push(`${notesFile(version)} is missing; a release PR adds its notes`);
     if (cli) problems.push(`@lasm/cli@${version} is already on npm; versions are never reused`);
     if (create) problems.push(`@lasm/create@${version} is already on npm; versions are never reused`);
-    if (vite) problems.push(`@lasm/vite@${version} is already on npm; versions are never reused`);
     if (tag) problems.push(`tag ${tagName(version)} already exists`);
   }
   if (problems.length) return { release: false, error: true, reason: problems.join('; ') };
@@ -40,7 +39,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     facts.notes = existsSync(join(root, notesFile(version)));
     facts.cli = (await published(publicRegistry, '@lasm/cli', version)).exists;
     facts.create = (await published(publicRegistry, '@lasm/create', version)).exists;
-    facts.vite = (await published(publicRegistry, '@lasm/vite', version)).exists;
     facts.tag = run('git', ['ls-remote', '--tags', 'origin', `refs/tags/${tagName(version)}`], { cwd: root }).trim() !== '';
   }
   const decision = decide(facts);

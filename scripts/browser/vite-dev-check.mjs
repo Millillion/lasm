@@ -1,4 +1,4 @@
-// @lasm/vite in development (CI only, headless Chromium; .github/workflows/browser.yml):
+// The Vite plugin (@lasm/cli/vite) in development (CI only, headless Chromium; .github/workflows/browser.yml):
 // starts `vite` on the Vite fixture (built by scripts/browser/build-apps.mjs),
 // opens the page, clicks the counter, edits Main.lean's view, and checks that
 // the app is rebuilt and remounted in place without a page reload.
@@ -13,7 +13,9 @@ const [appArg, outArg, , playwrightArg] = process.argv.slice(2);
 const app = resolve(appArg), out = resolve(outArg);
 const { chromium } = await import(pathToFileURL(join(resolve(playwrightArg), 'node_modules/playwright-core/index.mjs')).href);
 const port = 5199;
-const env = { ...process.env, LASM_CLI: join(root, 'bin/lasm.mjs'), BROWSER: 'none', CI: '1' };
+// The installed CLI's plugin (node_modules/@lasm/cli), not this checkout's.
+const env = { ...process.env, BROWSER: 'none', CI: '1' };
+delete env.LASM_CLI;
 const server = spawn(process.execPath, [join(app, 'node_modules/vite/bin/vite.js'), '--port', String(port), '--strictPort'], { cwd: app, env, stdio: ['ignore', 'pipe', 'pipe'] });
 let log = '';
 server.stdout.on('data', c => { log += c; }); server.stderr.on('data', c => { log += c; process.stderr.write(c); });
