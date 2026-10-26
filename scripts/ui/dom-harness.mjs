@@ -18,7 +18,7 @@ export async function openApp(dist, { url = 'https://app.test/', html = '<div id
   const manifest = JSON.parse(readFileSync(join(dist, 'lasm-manifest.json'), 'utf8'));
   // The build's files, served from memory.
   const fetchFile = async input => {
-    const target = new URL(typeof input === 'string' ? input : input.url, url);
+    const target = new URL(typeof input === 'string' ? input : String(input.url ?? input), url);
     const file = join(dist, decodeURIComponent(target.pathname.split('/').at(-1)));
     const ext = file.slice(file.lastIndexOf('.'));
     return new Response(readFileSync(file), { status: 200, headers: { 'content-type': types[ext] ?? 'application/octet-stream' } });
