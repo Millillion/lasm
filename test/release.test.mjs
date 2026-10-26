@@ -119,7 +119,8 @@ test('release.yml is the trusted publisher: OIDC, no tokens, serialized, never c
   assert.match(checks, /\n  release-checks:\n    name: release-checks\n/);
   // The edge targets and Bun/Deno gate a release (0.2.0), and the rehearsal runs Bun and Deno from the loopback registry.
   assert.match(checks, /\n  edge:\n[\s\S]*?uses: \.\/\.github\/workflows\/workers\.yml\n/);
-  assert.match(checks, /needs: \[detect, candidate, rehearsal, edge\]/);
+  assert.match(checks, /needs: \[detect, candidate, rehearsal, edge, browser\]/);
+  assert.match(checks, /uses: \.\/\.github\/workflows\/browser\.yml/);
   assert.match(checks, /e\.EDGE === 'success'/);
   const dist = readFileSync(new URL('../.github/workflows/npm-dist.yml', import.meta.url), 'utf8');
   assert.match(dist, /scripts\/edge\/published-ci\.mjs/);
