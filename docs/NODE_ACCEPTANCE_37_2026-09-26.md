@@ -25,7 +25,7 @@ A maintainer with repository access can download the candidate using:
 gh release download node-linux-candidate-36276053827 --repo Millillion/lasm --pattern 'lasm-compiler-0.1.0-experimental.37.tgz' --pattern SHA256SUMS.txt
 ```
 
-Give the unchanged tarball to the developer, who needs only Node/npm. Follow the [README quick start](../README.md#get-started); GitHub CLI is a maintainer retrieval tool, not a Lasm prerequisite.
+Give the unchanged tarball to the developer, who needs only Node/npm. Follow the [README quick start](../README.md#quick-start); GitHub CLI is a maintainer retrieval tool, not a Lasm prerequisite.
 
 ## Native evidence
 

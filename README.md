@@ -41,6 +41,16 @@ curl http://localhost:3000/hello/Ada        # {"message":"Hello, Ada, from Lean!
    (`node dist/main.mjs`), or build for a platform:
    `npx lasm build Main.lean --target workers` (or `lambda`, `vercel`, `browser`, …).
 
+A single Lean file needs no project. Save this complete program as `Main.lean`:
+
+```lean
+def main : IO Unit := do
+  IO.println s!"Hello from Lean! 2 + 3 = {2 + 3}"
+```
+
+`npx @lasm/cli Main.lean` builds and runs it (`Hello from Lean! 2 + 3 = 5`);
+`npx @lasm/cli build Main.lean` writes `dist/`. For a project, pick a template:
+
 | Template (`--template …`) | What you get | Release |
 | --- | --- | --- |
 | `plain` (default) | A Lean command-line program | 0.1.0 |
@@ -225,12 +235,8 @@ machines and platforms, and exactly what a deployed Lean program cannot do.
 
 Install in a project with `npm install -D @lasm/cli` (the bin is `lasm`), or run
 without installing: `npx @lasm/cli Main.lean`. `npm create @lasm` runs `lasm init`
-of the same `@lasm/cli` version with the arguments unchanged. A complete program:
-
-```lean
-def main : IO Unit := do
-  IO.println s!"Hello from Lean! 2 + 3 = {2 + 3}"
-```
+of the same `@lasm/cli` version with the arguments unchanged. With the `Main.lean`
+from the [quick start](#quick-start):
 
 ```sh
 npx lasm Main.lean                          # build (dev profile) and run: Hello from Lean! 2 + 3 = 5
