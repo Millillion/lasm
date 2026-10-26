@@ -6,6 +6,8 @@ name: Edit loop and templates (branch dx)
 # only, one free runner; templates.yml runs the full five-platform set.
 on:
   workflow_dispatch:
+  # release-checks.yml gates releases on it.
+  workflow_call:
   push:
     branches: [dx, launch]
     paths:
@@ -54,7 +56,7 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packed-candidate
+          name: dx-packed-candidate
           path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
           retention-days: 3
           if-no-files-found: error
@@ -74,7 +76,7 @@ jobs:
           package-manager-cache: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: packed-candidate
+          name: dx-packed-candidate
           path: .work/node-candidate
       - name: Templates and the lasm dev loop
         run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates" .work/templates.json --dev-loop
@@ -106,7 +108,7 @@ jobs:
           package-manager-cache: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: packed-candidate
+          name: dx-packed-candidate
           path: .work/node-candidate
       - name: Install elan (no toolchain), as the Lean 4 VS Code extension does
         run: |
@@ -142,7 +144,7 @@ jobs:
           package-manager-cache: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: packed-candidate
+          name: dx-packed-candidate
           path: .work/node-candidate
       - name: Enable the systemd user session (CPU quotas)
         run: |

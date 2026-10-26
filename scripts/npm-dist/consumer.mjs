@@ -18,6 +18,10 @@
 //   foreign-lock   lockfile created for another OS (npm --os/--cpu), then npm ci on this host
 //   edge           in the `installed` project: examples/edge-pure built for every edge target and for Bun and
 //                  Deno (lasm build --target …) from the edge runtime bundled in @lasm/cli (no download, no receipt)
+//   launch         0.3.0's pieces from the installed package, in the `installed` caches: templates web
+//                  (--target browser), fetch (served; --target wasi|fastly|wasi-http), fastify and fullstack
+//                  (served), the Vite plugin (@lasm/cli/vite, vite build) and `lasm editor` with Lean
+//                  already cached (a stub elan records the link; no download, network audit on)
 //   pnpm           pnpm add @lasm/cli@V (--pnpm path to the pnpm CLI script); package resolution only
 import assert from 'node:assert/strict';
 import { parseArgs } from 'node:util';
@@ -29,6 +33,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { findNpm } from '../../src/npm-artifacts.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
+/** The Vite version the browser CI and the launch scenario use (registry.mjs mirrors it). */
+const viteVersion = '8.3.5';
 const { values: args } = parseArgs({ options: { registry: { type: 'string' }, dist: { type: 'string' }, work: { type: 'string' },
   scenario: { type: 'string' }, pnpm: { type: 'string' } } });
 assert.ok(args.registry && args.dist && args.work && args.scenario, 'Usage: consumer.mjs --registry URL --dist BUILD_DIR --work DIR --scenario NAME');
@@ -47,7 +53,7 @@ const npxCli = join(dirname(npmCli), 'npx-cli.js');
 // Empty npm and Lasm caches per scenario; the Lake scenario continues the installed project,
 // and init reuses its caches (a fresh extraction of every tool again filled the guard's
 // budget with page cache on the 6 GiB Linux setting; empty caches are covered by installed and npx).
-const cacheName = ['lake', 'c-tier', 'edge', 'init', 'create'].includes(args.scenario) ? 'installed' : args.scenario;
+const cacheName = ['lake', 'c-tier', 'edge', 'launch', 'init', 'create'].includes(args.scenario) ? 'installed' : args.scenario;
 const preload = join(root, 'scripts/npm-dist/network-audit.cjs');
 function environment(extra = {}) {
   const env = { ...process.env };
@@ -184,6 +190,102 @@ if (args.scenario === 'edge') {
   const kinds = new Set(report.receipts.map(r => r.source?.kind));
   assert.ok(!kinds.has('https') && !kinds.has(undefined), 'Every tool came from npm');
   assert.ok(!report.receipts.some(r => r.artifact === record.edge.archive.name), 'The edge runtime came from the CLI package, not a download');
+}
+
+if (args.scenario === 'launch') {
+  const directory = join(work, 'launch-empty');
+  assert.ok(!existsSync(directory), `Use a new work directory: ${directory}`);
+  mkdirSync(directory, { recursive: true });
+  report.launch = {};
+  const init = (name, template, deploy = []) => {
+    npxRun(`npx @lasm/cli init --template ${template}`, ['--yes', spec, 'init', name, '--template', template, ...deploy.flatMap(target => ['--deploy', target])], { cwd: directory });
+    const app = join(directory, name);
+    assert.deepEqual(JSON.parse(readFileSync(join(app, 'package.json'), 'utf8')).devDependencies?.[record.main.name], record.main.version, `${template} pins the published CLI`);
+    npmRun(`npm install (${template})`, ['install'], { cwd: app });
+    return app;
+  };
+  const freePort = () => new Promise((done, fail) => {
+    const server = createServer().once('error', fail);
+    server.listen(0, '127.0.0.1', () => { const { port } = server.address(); server.close(() => done(port)); });
+  });
+  // Starts `node entry`, polls GET path until it answers 200, checks the body, stops the server.
+  const serve = async (label, app, entry, path, check) => {
+    const port = await freePort();
+    const child = spawn(process.execPath, [join(app, entry)], { cwd: app, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true,
+      env: environment({ HOST: '127.0.0.1', PORT: String(port) }) });
+    let output = '';
+    child.stdout.setEncoding('utf8').on('data', text => { output += text; }); child.stderr.setEncoding('utf8').on('data', text => { output += text; });
+    const exited = new Promise(done => child.once('exit', done));
+    try {
+      const deadline = Date.now() + 120_000;
+      for (;;) {
+        assert.equal(child.exitCode, null, `${label}: the server exited:\n${output}`);
+        try {
+          const response = await fetch(`http://127.0.0.1:${port}${path}`, { signal: AbortSignal.timeout(10_000) });
+          const body = await response.text();
+          if (response.status === 200) { assert.ok(check(body), `${label} ${path}: ${body.slice(0, 300)}`); break; }
+        } catch (error) { if (error.code === 'ERR_ASSERTION') throw error; }
+        assert.ok(Date.now() < deadline, `${label}: no 200 on ${path} within 120 s:\n${output}`);
+        await new Promise(done => setTimeout(done, 500));
+      }
+      report.launch[label] = { served: path };
+    } finally {
+      if (child.exitCode === null) child.kill('SIGTERM');
+      await Promise.race([exited, new Promise(done => setTimeout(done, 15_000))]);
+      if (child.exitCode === null) child.kill('SIGKILL');
+      appendFileSync(log, `\n=== ${label} server output\n${output}\n`);
+    }
+  };
+  // The browser template: a static site.
+  const web = init('web', 'web');
+  npmRun('npm run build (web, --target browser)', ['run', 'build'], { cwd: web });
+  for (const file of ['dist/index.html', 'dist/lasm-manifest.json']) assert.ok(existsSync(join(web, file)), `web: no ${file}`);
+  // The Vite plugin as users import it: import lasm from '@lasm/cli/vite'.
+  const vite = join(directory, 'vite');
+  cpSync(join(root, 'test/browser/vite'), vite, { recursive: true });
+  for (const file of ['Main.lean', 'App.lean', 'lean-toolchain']) cpSync(join(web, file), join(vite, file));
+  writeFileSync(join(vite, 'package.json'), JSON.stringify({ name: 'vite-app', private: true, type: 'module',
+    devDependencies: { vite: viteVersion, [record.main.name]: record.main.version } }, null, 2) + '\n');
+  npmRun('npm install (Vite app)', ['install'], { cwd: vite });
+  run('vite build (@lasm/cli/vite)', process.execPath, [join(vite, 'node_modules/vite/bin/vite.js'), 'build', '--outDir', 'out'], { cwd: vite });
+  assert.ok(existsSync(join(vite, 'out/index.html')), 'vite: no out/index.html');
+  assert.ok(readdirSync(join(vite, 'out'), { recursive: true }).some(file => String(file).endsWith('.wasm')), 'vite: no .wasm in out/');
+  // The fetch template: Node, then the WASI targets.
+  const fetchApp = init('fetch', 'fetch', ['fastly', 'wasi-http']);
+  npmRun('npm run build (fetch)', ['run', 'build'], { cwd: fetchApp });
+  await serve('fetch', fetchApp, 'dist/main.mjs', '/', body => JSON.parse(body).message === 'Hello from Lean!');
+  for (const [target, output] of [['wasi', 'wasi/main.wasm'], ['fastly', 'bin/main.wasm'], ['wasi-http', 'wasi-http/main.wasm']]) {
+    npxRun(`npx lasm build --target ${target}`, ['lasm', 'build', 'Main.lean', '--target', target], { cwd: fetchApp });
+    assert.ok(existsSync(join(fetchApp, output)), `--target ${target} wrote no ${output}`);
+  }
+  // Fastify (npm dependencies mirrored into the loopback registry).
+  const fastify = init('fastify', 'fastify');
+  npmRun('npm run build (fastify)', ['run', 'build'], { cwd: fastify });
+  await serve('fastify', fastify, 'dist/main.mjs', '/', body => JSON.parse(body).message === 'Hello from Lean on Fastify!');
+  // The fullstack template: the browser app, then the server that renders the first page.
+  const fullstack = init('fullstack', 'fullstack');
+  npmRun('npm run build (fullstack)', ['run', 'build'], { cwd: fullstack });
+  await serve('fullstack', fullstack, 'dist/server/main.mjs', '/', body => body.includes('<li'));
+  // Editor support with Lean already cached: a stub elan records the link and the override.
+  const elanHome = join(directory, 'elan-home'), stub = join(directory, 'elan-stub'), calls = join(directory, 'elan-calls.txt');
+  mkdirSync(join(elanHome, 'toolchains'), { recursive: true }); mkdirSync(stub, { recursive: true });
+  if (process.platform !== 'win32') {
+    writeFileSync(join(stub, 'elan'), `#!/bin/sh\necho "$@" >> '${calls}'\n`, { mode: 0o755 });
+    const editorEnv = environment({ ELAN_HOME: elanHome, PATH: `${stub}${process.platform === 'win32' ? ';' : ':'}${process.env.PATH}` });
+    npxRun('npx lasm editor (Lean cached)', ['lasm', 'editor'], { cwd: fetchApp, env: editorEnv });
+    const lines = readFileSync(calls, 'utf8');
+    assert.match(lines, /^toolchain link lasm-\S+ \S+/m, `elan was not asked to link Lasm's Lean: ${lines}`);
+    assert.match(lines, /^override set lasm-/m, `elan was not asked to set the override: ${lines}`);
+    report.launch.editor = lines.trim().split('\n');
+  } else {
+    // No stub executable on Windows: without elan, lasm editor explains how to get it.
+    const result = npxRun('npx lasm editor (no elan)', ['lasm', 'editor'], { cwd: fetchApp, env: environment({ ELAN_HOME: elanHome }), expectFailure: true });
+    assert.match(result.stderr, /npx lasm editor/, 'lasm editor names the fix without elan');
+    report.launch.editor = 'no-elan message';
+  }
+  report.receipts = receipts();
+  const kinds = new Set(report.receipts.map(r => r.source?.kind));
+  assert.ok(!kinds.has('https') && !kinds.has(undefined), 'Every tool came from npm');
 }
 
 if (args.scenario === 'npx') {

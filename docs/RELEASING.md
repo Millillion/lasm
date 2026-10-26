@@ -34,6 +34,14 @@ A release is a version bump: a pull request that changes the root `package.json`
      `LASM_PUBLISHED_REQUIRE=1`, so nothing may be skipped): `bun add`, `bunx --bun`,
      `bun create @lasm`, `deno install`, `deno run -A npm:@lasm/cli`,
      `npm:@lasm/create`, the builds served by Bun and Deno;
+   - since 0.3.0, the **launch workflows**, each called for this commit: the browser
+     ([browser.yml](../.github/workflows/browser.yml)), Lasm.UI ([ui.yml](../.github/workflows/ui.yml)),
+     WASI/wasi-http/Fastly ([wasi.yml](../.github/workflows/wasi.yml)), the fullstack
+     template ([fullstack.yml](../.github/workflows/fullstack.yml)), the unit suite
+     ([unit.yml](../.github/workflows/unit.yml)) and the dev loop, editor and cold
+     start ([dx-dev-loop.yml](../.github/workflows/dx-dev-loop.yml)); the rehearsal's
+     `launch` scenario builds and serves the web, fetch, fastify and fullstack
+     templates, the WASI targets and a Vite build from the installed package;
    - the **edge and Bun/Deno checks** (since 0.2.0; [workers.yml](../.github/workflows/workers.yml),
      called with `release-check: true`): the edge runtime built and compared with
      its pin, the Hono template and `examples/edge-pure` served with `wrangler dev`

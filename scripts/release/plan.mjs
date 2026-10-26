@@ -25,6 +25,9 @@ export function selectChecksRun(runs, { sha, dryRun }) {
   return { run: completed, pending: !completed && eligible.some(r => r.status !== 'completed') };
 }
 
+/** The release-checks jobs (reusable workflows) that must pass, besides the candidate, the rehearsal and edge. */
+export const releaseGateJobs = Object.freeze(['browser', 'wasi', 'ui', 'fullstack', 'unit', 'dx']);
+
 /** The checks manifest must vouch for this commit and version. Pure, for tests. */
 export function manifestProblems(manifest, { sha, version, dryRun }) {
   const problems = [];
@@ -37,6 +40,9 @@ export function manifestProblems(manifest, { sha, version, dryRun }) {
   if (!dryRun && manifest.rehearsal?.overlaySource) problems.push('the rehearsal overlaid sources on the candidate (dry runs only)');
   // Since 0.2.0: the edge targets and Bun/Deno (workers.yml) gate every release.
   if (!dryRun && manifest.jobs?.edge !== 'success') problems.push('release-checks did not pass the edge and Bun/Deno checks (workers.yml)');
+  // Since 0.3.0: browser, Lasm.UI, WASI/Fastly, fullstack, unit and the dev loop.
+  for (const job of releaseGateJobs)
+    if (!dryRun && manifest.jobs?.[job] !== 'success') problems.push(`release-checks did not pass the ${job} checks`);
   if (!dryRun && manifest.event !== 'push') problems.push(`release-checks ran for a ${manifest.event} event; a release needs the push to main`);
   return problems;
 }

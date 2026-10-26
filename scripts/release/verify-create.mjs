@@ -3,7 +3,10 @@
 // the registry: npm create @lasm@<version> app -- --template hono, npm install,
 // npm run build, the server, and HTTP requests (docs/RELEASING.md).
 //
-//   node scripts/release/verify-create.mjs --registry https://registry.npmjs.org/ --version V --work NEW_DIR [--report FILE] [--stage S]
+//   node scripts/release/verify-create.mjs --registry https://registry.npmjs.org/ --version V --work NEW_DIR [--report FILE] [--stage S] [--template T]
+// --template hono (default; release.yml), web (the static browser build, served from
+// dist/) or fullstack (npm start: the server rendering the first page, with the
+// browser app); published-templates.yml runs all three after a release.
 // --stage create|warm|build|serve runs one part (default all), so that each can run in
 // its own resource guard: the guard counts page cache, and a fresh extraction of every
 // tool plus the build exceeded a CI runner's budget in one guard. `warm` builds a hello
@@ -19,10 +22,11 @@ import { published, summary } from './lib.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const { values: args } = parseArgs({ options: { registry: { type: 'string' }, version: { type: 'string' }, work: { type: 'string' },
-  report: { type: 'string' }, stage: { type: 'string', default: 'all' } } });
+  report: { type: 'string' }, stage: { type: 'string', default: 'all' }, template: { type: 'string', default: 'hono' } } });
 assert.ok(args.registry && args.version && args.work, 'Usage: verify-create.mjs --registry URL --version V --work NEW_DIR');
 const registry = new URL(args.registry).href, version = args.version, work = resolve(args.work);
-const stage = args.stage, does = name => stage === 'all' || stage === name;
+const stage = args.stage, does = name => stage === 'all' || stage === name, template = args.template;
+assert.ok(['hono', 'web', 'fullstack'].includes(template), `Unknown template ${template}`);
 assert.ok(['all', 'create', 'warm', 'build', 'serve'].includes(stage), `Unknown stage ${stage}`);
 if (does('create')) { assert.ok(!existsSync(work), `Use a new work directory: ${work}`); mkdirSync(work, { recursive: true }); }
 else assert.ok(existsSync(join(work, 'state.json')), 'Run the create stage first');
@@ -57,7 +61,7 @@ if (does('create')) {
     for (let attempt = 0; attempt < 60 && !(state = await published(registry, name, version)).exists; attempt++) await delay(10_000);
     assert.ok(state.exists, `${name}@${version} is not on ${registry}`);
   }
-  report.create = npmRun('npm create @lasm', ['create', '--yes', `@lasm@${version}`, 'app', '--', '--template', 'hono'], work);
+  report.create = npmRun('npm create @lasm', ['create', '--yes', `@lasm@${version}`, 'app', '--', '--template', template], work);
   const manifest = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8'));
   assert.deepEqual(manifest.devDependencies, { '@lasm/cli': version }, '@lasm/create scaffolds with the released CLI');
   report.install = npmRun('npm install', ['install'], app);
@@ -77,32 +81,57 @@ const port = await new Promise((done, fail) => {
   const server = createServer().once('error', fail);
   server.listen(0, '127.0.0.1', () => { const { port } = server.address(); server.close(() => done(port)); });
 });
-const child = spawn(process.execPath, [join(app, 'dist', 'main.mjs')], { cwd: app, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true,
+// web: a static host for dist/ (the loader, the Wasm and index.html).
+let staticServer;
+if (template === 'web') {
+  const { createServer: createHttpServer } = await import('node:http');
+  const types = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.wasm': 'application/wasm', '.json': 'application/json' };
+  staticServer = createHttpServer((request, response) => {
+    const path = decodeURIComponent(new URL(request.url, 'http://x').pathname);
+    const file = join(app, 'dist', path.endsWith('/') ? path + 'index.html' : path);
+    if (!file.startsWith(join(app, 'dist')) || !existsSync(file)) { response.writeHead(404).end(); return; }
+    response.writeHead(200, { 'content-type': types[file.slice(file.lastIndexOf('.'))] ?? 'application/octet-stream' }).end(readFileSync(file));
+  });
+  await new Promise(done => staticServer.listen(port, '127.0.0.1', done));
+}
+const child = template === 'web' ? spawn(process.execPath, ['-e', 'console.log("Listening on http://127.0.0.1:0 (static)"); setInterval(() => {}, 1000)'], { stdio: ['ignore', 'pipe', 'pipe'] })
+  : spawn(process.execPath, [join(app, 'dist', ...(template === 'fullstack' ? ['server', 'main.mjs'] : ['main.mjs']))], { cwd: app, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true,
   env: { ...env, HOST: '127.0.0.1', PORT: String(port) } });
 let serverOutput = '';
 const exited = new Promise(done => child.once('exit', done));
 try {
   await new Promise((done, fail) => {
     const timer = setTimeout(() => fail(new Error(`The server did not start within 120 s:\n${serverOutput}`)), 120_000);
-    const check = text => { serverOutput += text; if (/Listening on http:\/\/127\.0\.0\.1:\d+/.test(serverOutput)) { clearTimeout(timer); done(); } };
+    const check = text => { serverOutput += text; if (/Listening on http:\/\/(?:127\.0\.0\.1|localhost|0\.0\.0\.0):\d+/.test(serverOutput)) { clearTimeout(timer); done(); } };
     child.stdout.setEncoding('utf8').on('data', check); child.stderr.setEncoding('utf8').on('data', check);
     child.once('exit', code => { clearTimeout(timer); fail(new Error(`The server exited (${code}):\n${serverOutput}`)); });
   });
   report.requests = [];
-  for (const [path, expected] of [['/', { message: 'Hello from Lean on Hono!' }], ['/hello/Ada', { message: 'Hello, Ada, from Lean!' }], ['/health', { ok: true }]]) {
+  const get = async path => {
     const response = await fetch(`http://127.0.0.1:${port}${path}`, { signal: AbortSignal.timeout(30_000) });
     const body = await response.text();
-    assert.equal(response.status, 200, `${path}: ${body}`);
-    assert.deepEqual(JSON.parse(body), expected, path);
-    report.requests.push({ path, status: response.status, body });
+    assert.equal(response.status, 200, `${path}: ${body.slice(0, 500)}`);
+    report.requests.push({ path, status: response.status, body: body.slice(0, 200) });
+    return body;
+  };
+  if (template === 'hono')
+    for (const [path, expected] of [['/', { message: 'Hello from Lean on Hono!' }], ['/hello/Ada', { message: 'Hello, Ada, from Lean!' }], ['/health', { ok: true }]])
+      assert.deepEqual(JSON.parse(await get(path)), expected, path);
+  if (template === 'fullstack') assert.ok((await get('/')).includes('<li'), 'the server renders the todo list');
+  if (template === 'web') {
+    assert.match(await get('/'), /<html/i);
+    // Every file the build manifest names as entry or Wasm is served.
+    const manifest = JSON.parse(await get('/lasm-manifest.json'));
+    for (const file of [manifest.entry, manifest.wasm].flat().filter(value => typeof value === 'string')) await get('/' + file.replace(/^\.?\//, ''));
   }
 } finally {
   if (child.exitCode === null) child.kill('SIGTERM');
   await Promise.race([exited, delay(15_000)]);
   if (child.exitCode === null) child.kill('SIGKILL');
+  staticServer?.close();
   appendFileSync(log, `\n=== server output\n${serverOutput}\n`);
 }
 report.finishedAt = new Date().toISOString();
 if (args.report) { mkdirSync(dirname(resolve(args.report)), { recursive: true }); writeFileSync(resolve(args.report), JSON.stringify(report, null, 2) + '\n'); }
-summary(`### Verified from ${registry}\n\n\`npm create @lasm@${version} app -- --template hono\` (${report.create}s), npm install (${report.install}s), npm run build (${report.build}s), server: ` +
+summary(`### Verified from ${registry}\n\n\`npm create @lasm@${version} app -- --template ${template}\` (${report.create}s), npm install (${report.install}s), npm run build (${report.build}s), server: ` +
   report.requests.map(r => `\`${r.path}\` ${r.status}`).join(', '));

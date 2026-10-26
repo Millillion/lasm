@@ -17,12 +17,14 @@ on:
   workflow_call:
     inputs:
       release-check: { type: boolean, default: false }
+      # Distinct per calling workflow, so the calls inside one release-checks run do not cancel each other.
+      caller: { type: string, default: '' }
 permissions:
   # Read access to the draft release that holds the pinned runtime handoff
   # (drafts are visible only with write access). Nothing is written.
   contents: write
 concurrency:
-  group: edge-runtime-${{ github.workflow }}-${{ github.ref }}
+  group: edge-runtime-${{ github.workflow }}-${{ github.ref }}-${{ inputs.caller || 'direct' }}
   cancel-in-progress: true
 jobs:
   runtime:
@@ -79,7 +81,8 @@ jobs:
           node scripts/edge/check-edge-catalog.mjs .work/edge-package/artifact.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: edge-runtime-archive
+          # Suffixed with the caller: several callers share one release-checks run.
+          name: edge-runtime-archive${{ inputs.caller && format('-{0}', inputs.caller) || '' }}
           path: |
             .work/edge-package/*.tar.zst
             .work/edge-package/artifact.json
@@ -98,7 +101,7 @@ jobs:
           gh release upload "$tag" .work/edge-package/*.tar.zst --clobber
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: edge-runtime-libraries
+          name: edge-runtime-libraries${{ inputs.caller && format('-{0}', inputs.caller) || '' }}
           path: .work/edge-runtime
           retention-days: 14
       - name: Preserve bounded build results in logs

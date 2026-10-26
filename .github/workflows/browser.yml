@@ -60,6 +60,7 @@ jobs:
     uses: ./.github/workflows/edge-runtime.yml
     with:
       release-check: true
+      caller: browser
   # The native host pieces the Node build stage needs (as in workers.yml).
   native:
     runs-on: ubuntu-24.04
@@ -123,7 +124,7 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-archive
+          name: edge-runtime-archive-browser
           path: .work/edge-archive
       - name: Extract the packaged edge runtime (what users get)
         run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged

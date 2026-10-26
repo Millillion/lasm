@@ -53,6 +53,7 @@ jobs:
     uses: ./.github/workflows/edge-runtime.yml
     with:
       release-check: ${{ inputs.release-check == true }}
+      caller: workers
   # The native host pieces (every platform's, cross-built with zig on x64:
   # scripts/prepare-native.mjs), shared by the jobs below, including arm64.
   native:
@@ -121,11 +122,11 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-libraries
+          name: edge-runtime-libraries-workers
           path: .work/edge-runtime
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-archive
+          name: edge-runtime-archive-workers
           path: .work/edge-archive
       - name: Edge runtime provisioning from the packaged archive (unit tests)
         env:
@@ -199,7 +200,7 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-archive
+          name: edge-runtime-archive-workers
           path: .work/edge-archive
       - name: Extract the packaged edge runtime
         run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
@@ -295,7 +296,7 @@ jobs:
           path: .work/node-candidate
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-archive
+          name: edge-runtime-archive-workers
           path: .work/edge-archive
       - name: Pinned Bun and Deno
         run: npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
@@ -320,8 +321,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+      # Only this workflow's results: release-checks runs other workflows in the same run.
       - uses: actions/download-artifact@v4
         with:
           path: .work/results
-          pattern: '*-results-*'
+          pattern: 'hosts-results-*'
+      - uses: actions/download-artifact@v4
+        with:
+          path: .work/results
+          pattern: 'platform-results-*'
       - run: node scripts/edge/compare-platforms.mjs .work/results

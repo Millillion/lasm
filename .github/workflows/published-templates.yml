@@ -1,0 +1,74 @@
+name: Published templates
+# After a release (and on demand): the getting-started paths from the public
+# registry, as a user takes them, in clean directories with empty npm and Lasm
+# caches: `npm create @lasm@<version> app -- --template web|fullstack|hono`,
+# npm install, npm run build, then the app served and checked over HTTP
+# (scripts/release/verify-create.mjs). release.yml itself verifies hono before
+# tagging; this adds the browser and fullstack templates. Bun and Deno:
+# bun-deno-published.yml. Free runners, the public registry, no account.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '@lasm/cli version (default: the latest dist-tag)'
+        type: string
+        default: ''
+  workflow_run:
+    workflows: [release]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: published-templates-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  templates:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    name: npm create @lasm (${{ matrix.template }})
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [web, fullstack, hono]
+    env:
+      CI: '1'
+      BROWSER: 'none'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm create, install, build and serve from registry.npmjs.org
+        env:
+          VERSION: ${{ inputs.version }}
+          TEMPLATE: ${{ matrix.template }}
+        run: |
+          set -e
+          version="${VERSION:-$(npm view @lasm/cli dist-tags.latest --registry https://registry.npmjs.org/)}"
+          echo "Verifying @lasm/create@$version, template $TEMPLATE"
+          for stage in create warm build serve; do
+            node scripts/full-lean/run-bounded.mjs --memory-mib 8192 --report ".work/verify/$stage-resources.json" -- \
+              node scripts/release/verify-create.mjs --registry https://registry.npmjs.org/ --version "$version" --template "$TEMPLATE" \
+                --work "$RUNNER_TEMP/verify" --stage "$stage" --report .work/verify/verify.json
+          done
+      - name: Keep the evidence
+        if: always()
+        run: cp "$RUNNER_TEMP"/verify/verify-create.log .work/verify/ 2>/dev/null || true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: published-templates-${{ matrix.template }}
+          path: .work/verify/
+          retention-days: 14
+          if-no-files-found: warn

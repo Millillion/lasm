@@ -6,6 +6,8 @@ name: UI
 # Browser end-to-end tests are in browser.yml. Free runner only.
 on:
   workflow_dispatch:
+  # release-checks.yml gates releases on it.
+  workflow_call:
   push:
     branches: [browser, browser-ui, launch, fullstack]
     paths:

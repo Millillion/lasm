@@ -14,6 +14,10 @@ name: Fullstack
 # nothing is deployed. Free runners only.
 on:
   workflow_dispatch:
+  # release-checks.yml (release-check: true, so it also runs on main).
+  workflow_call:
+    inputs:
+      release-check: { type: boolean, default: false }
   push:
     branches: [fullstack, launch]
     paths:
@@ -37,6 +41,9 @@ env:
 jobs:
   runtime:
     uses: ./.github/workflows/edge-runtime.yml
+    with:
+      release-check: ${{ inputs.release-check == true }}
+      caller: fullstack
   native:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -99,7 +106,7 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-archive
+          name: edge-runtime-archive-fullstack
           path: .work/edge-archive
       - name: Extract the packaged edge runtime
         run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
@@ -346,7 +353,7 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-archive
+          name: edge-runtime-archive-fullstack
           path: .work/edge-archive
       - name: Extract the packaged edge runtime
         run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
