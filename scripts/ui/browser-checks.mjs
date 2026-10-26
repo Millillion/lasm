@@ -180,8 +180,13 @@ async function bench({ server, name, openPage, expect, report }) {
   try {
     await lasm.page.waitForSelector('#run', { timeout: 30_000 });
     await vanilla.page.waitForSelector('#run', { timeout: 30_000 });
+    // Warm-up: engines compile hot code (JavaScript and WebAssembly) in tiers
+    // over the first seconds; both pages run every operation a few times first.
+    for (let round = 0; round < 3; round++)
+      for (const op of operations.filter(o => !o.repeats))
+        for (const page of [lasm.page, vanilla.page]) await trial(page, op);
     // Trials alternate between the two pages, so both see the same machine
-    // state (shared CI runners vary over a run); one warm-up trial each.
+    // state (shared CI runners vary over a run); one more warm-up trial each.
     for (const op of operations) {
       const l = [], v = [], leanMs = [], applyMs = [];
       const n = (op.repeats ?? 10) + 1;
