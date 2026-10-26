@@ -80,11 +80,13 @@ export default function lasm(options = {}) {
       const file = resolve(importer ? dirname(importer) : config.root, id.slice(0, -suffix.length));
       if (!file.endsWith('.lean')) throw new Error(`${id}: ?lasm imports a Lean source file (Main.lean?lasm)`);
       if (!existsSync(file)) throw new Error(`${id}: ${file} does not exist`);
+      // The .lean suffix stays last, so Vite does not take the id for a JavaScript file type.
       return virtualPrefix + file;
     },
     async load(id) {
       if (!id.startsWith(virtualPrefix)) return null;
-      const source = id.slice(virtualPrefix.length);
+      // Vite may append its own queries (?import) to the virtual id.
+      const source = id.slice(virtualPrefix.length).replace(/\?.*$/, '');
       const { entry } = await (builds.get(source)?.promise ?? build(source));
       for (const file of leanFiles(dirname(source), new Set([outputFor(source)]))) this.addWatchFile(file);
       const loader = JSON.stringify(entry.split(sep).join('/'));
