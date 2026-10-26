@@ -35,6 +35,8 @@ export function manifestProblems(manifest, { sha, version, dryRun }) {
   if (manifest.version !== version) problems.push(`release-checks tested version ${manifest.version}, not ${version}`);
   if (!dryRun && !manifest.full) problems.push('release-checks reused a candidate (partial run; dry runs only)');
   if (!dryRun && manifest.rehearsal?.overlaySource) problems.push('the rehearsal overlaid sources on the candidate (dry runs only)');
+  // Since 0.2.0: the edge targets and Bun/Deno (workers.yml) gate every release.
+  if (!dryRun && manifest.jobs?.edge !== 'success') problems.push('release-checks did not pass the edge and Bun/Deno checks (workers.yml)');
   if (!dryRun && manifest.event !== 'push') problems.push(`release-checks ran for a ${manifest.event} event; a release needs the push to main`);
   return problems;
 }

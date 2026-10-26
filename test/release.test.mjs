@@ -42,8 +42,11 @@ test('release.yml accepts only a passed, full push run of release-checks for the
   assert.equal(selectChecksRun(runs, { sha, dryRun: true }).run.id, 3);
   assert.deepEqual(selectChecksRun([{ ...runs[1], status: 'in_progress' }], { sha }), { run: undefined, pending: true });
 
-  const manifest = { schema: 1, workflow: 'release-checks', release: true, passed: true, full: true, sha, version: '0.1.0', event: 'push' };
+  const manifest = { schema: 1, workflow: 'release-checks', release: true, passed: true, full: true, sha, version: '0.1.0', event: 'push',
+    jobs: { detect: 'success', candidate: 'success', rehearsal: 'success', edge: 'success' } };
   assert.deepEqual(manifestProblems(manifest, { sha, version: '0.1.0' }), []);
+  assert.match(manifestProblems({ ...manifest, jobs: { ...manifest.jobs, edge: 'skipped' } }, { sha, version: '0.1.0' }).join(), /edge and Bun\/Deno/);
+  assert.match(manifestProblems({ ...manifest, jobs: undefined }, { sha, version: '0.1.0' }).join(), /edge and Bun\/Deno/);
   assert.match(manifestProblems({ ...manifest, full: false }, { sha, version: '0.1.0' }).join(), /partial/);
   assert.deepEqual(manifestProblems({ ...manifest, full: false, event: 'workflow_dispatch' }, { sha, version: '0.1.0', dryRun: true }), []);
   assert.match(manifestProblems({ ...manifest, rehearsal: { overlaySource: true } }, { sha, version: '0.1.0' }).join(), /overlaid/);
@@ -114,4 +117,14 @@ test('release.yml is the trusted publisher: OIDC, no tokens, serialized, never c
   const checks = readFileSync(new URL('../.github/workflows/release-checks.yml', import.meta.url), 'utf8');
   assert.match(checks, /^name: release-checks$/m);
   assert.match(checks, /\n  release-checks:\n    name: release-checks\n/);
+  // The edge targets and Bun/Deno gate a release (0.2.0), and the rehearsal runs Bun and Deno from the loopback registry.
+  assert.match(checks, /\n  edge:\n[\s\S]*?uses: \.\/\.github\/workflows\/workers\.yml\n/);
+  assert.match(checks, /needs: \[detect, candidate, rehearsal, edge, browser\]/);
+  assert.match(checks, /uses: \.\/\.github\/workflows\/browser\.yml/);
+  assert.match(checks, /e\.EDGE === 'success'/);
+  const dist = readFileSync(new URL('../.github/workflows/npm-dist.yml', import.meta.url), 'utf8');
+  assert.match(dist, /scripts\/edge\/published-ci\.mjs/);
+  assert.match(dist, /LASM_PUBLISHED_REQUIRE: '1'/);
+  const workers = readFileSync(new URL('../.github/workflows/workers.yml', import.meta.url), 'utf8');
+  assert.match(workers, /\n  workflow_call:\n/);
 });

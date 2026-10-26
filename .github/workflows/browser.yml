@@ -56,7 +56,7 @@ jobs:
   runtime:
     uses: ./.github/workflows/edge-runtime.yml
     with:
-      allow-main: true
+      release-check: true
   # The native host pieces the Node build stage needs (as in workers.yml).
   native:
     runs-on: ubuntu-24.04
