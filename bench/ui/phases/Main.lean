@@ -34,6 +34,40 @@ def phases (label : String) (before after : Model) : IO Unit := do
   let (b, _) := Encode.frame {} r.ops
   IO.println s!"{label}: {r.ops.size} ops, {b.size} bytes"
 
+/-! Experiments: what the diff spends its time on. -/
+
+def plainRow (r : Row) : Html Msg :=
+  .elem .html "tr" (some (toString r.id)) [] [
+    .elem .html "td" none [] [.text (toString r.id)],
+    .elem .html "td" none [] [.elem .html "a" none [] [.text r.label]],
+    .elem .html "td" none [] [.elem .html "a" none [] [.elem .html "span" none [] []]],
+    .elem .html "td" none [] []]
+
+def flatRow (r : Row) : Html Msg := .elem .html "tr" (some (toString r.id)) [] []
+
+def experiment (label : String) (rowf : Row → Html Msg) (m : Model) : IO Unit := do
+  let v := fun (m : Model) => (Html.elem .html "tbody" none [] (m.rows.toList.map rowf) : Html Msg)
+  let m0 := mountOps [v m] 1
+  let nv := v m
+  let _ ← time s!"experiment {label}: diff of 1,000 unchanged rows" 20 fun _ => pure (diff m0.live [nv] m0.next)
+
+def encodeExperiment (label : String) (rowf : Row → Html Msg) (m : Model) : IO Unit := do
+  let v : Html Msg := .elem .html "tbody" none [] (m.rows.toList.map rowf)
+  let r := mountOps [v] 1
+  let (_, warm) := Encode.frame {} r.ops
+  let _ ← time s!"encode {label}: fresh tables" 20 fun _ => pure (Encode.frame {} r.ops).1.size
+  let _ ← time s!"encode {label}: tables already hold the names" 20 fun _ => pure (Encode.frame warm r.ops).1.size
+
+def experiments : IO Unit := do
+  let rows0 := update .run {}
+  encodeExperiment "rows with attributes" (row none) rows0
+  encodeExperiment "rows without attributes" plainRow rows0
+  encodeExperiment "one element per row" flatRow rows0
+  let rows := update .run {}
+  experiment "rows with attributes (the benchmark's)" (row none) rows
+  experiment "same rows without attributes" plainRow rows
+  experiment "one element per row" flatRow rows
+
 def main : IO Unit := do
   let empty : Model := {}
   let rows := update .run empty
@@ -43,3 +77,5 @@ def main : IO Unit := do
   phases "replace all" rows (update .run rows)
   let lots := update .runLots empty
   phases "update 10,000" lots (update .update lots)
+  experiments
+

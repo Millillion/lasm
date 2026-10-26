@@ -2,7 +2,7 @@
 A pure model of the DOM as the `lasm:ui-dom` applier changes it: nodes with
 ids, attribute slots as functions (so attribute order is unobservable, as in
 the DOM), and the semantics of every patch `Op` (`applyOps`). The applier in
-src/browser/ui-dom.mjs implements exactly these operations with the DOM API:
+src/lasm-modules/ui-dom.mjs implements exactly these operations with the DOM API:
 `insert` is `insertBefore`/`appendChild` of a new subtree, `move` is
 `insertBefore` of an existing child, `remove` is `Node.remove`, `clear` is
 `textContent = ""`. Lasm.UI.Proofs proves `diff` correct against this model.

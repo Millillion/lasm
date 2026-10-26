@@ -150,8 +150,9 @@ mount element is node 0.
 Integers are unsigned LEB128; strings are a byte length and UTF-8 bytes.
 Names (tags, attribute, property, style and event names) are interned across
 frames: `0` + string (appended to the table), `1` + string (not added; the
-table holds 8,192 names) or `index + 2`. A frame is the new decoder shapes
-followed by the ops:
+table holds 8,192 names) or `index + 2`. Attribute, property and style values
+of at most 40 bytes are interned the same way in a second table (4,096
+values). A frame is the new decoder shapes followed by the ops:
 
 | Op | Encoding | DOM |
 | --- | --- | --- |
@@ -164,9 +165,9 @@ followed by the ops:
 | decoder | `7 decoderId pathCount (segmentCount string*)*` | defines the event fields a handler reads |
 
 A node is `0 id string` (text) or `ns id tag attrCount attr* childCount node*`
-(`ns`: 1 HTML, 2 SVG, 3 MathML). An attribute is `0 name string`
-(`setAttribute`), `1 name string` / `2 name` / `3 name` (property: a string,
-false, true), `4 name string` (`style.setProperty`) or `5 event decoderId
+(`ns`: 1 HTML, 2 SVG, 3 MathML). An attribute is `0 name value`
+(`setAttribute`), `1 name value` / `2 name` / `3 name` (property: a string,
+false, true), `4 name value` (`style.setProperty`) or `5 event decoderId
 flags` (a listener; flags 1 `preventDefault`, 2 `stopPropagation`); `8`–`11`
 followed by a name remove an attribute, property, style or listener.
 
@@ -177,8 +178,9 @@ events) applies the static options and reads the decoder's paths from the
 event (`currentTarget` is that element). It then makes **one** synchronous
 call into Lean with the ids from the root to the target and, per handler, its
 depth and values. Lean runs `update` (and commands) at once; if the model
-changed it asks for a frame, and on the next `requestAnimationFrame` one call
-returns the patch. Hydration (`mount(el, { hydrate: true })`) applies the
+changed it asks for a frame: after discrete user input (click, keys, input,
+focus, submit) the applier renders at once, otherwise on the next
+`requestAnimationFrame`; one call returns the patch. Hydration (`mount(el, { hydrate: true })`) applies the
 first frame by adopting the existing children in order (comment nodes are
 dropped; a node whose kind, tag or namespace differs is replaced).
 
@@ -265,7 +267,7 @@ Never run browsers locally on the desktop (no headed browsers, no `open`).
 
 - `library/Lasm/Web/…` — web platform bindings.
 - `library/Lasm/UI/…` — `Html`, attributes, events, `diff`, the patch encoder,
-  `App`, `Cmd`, `Sub`, router, `html!` syntax, SSR, proofs.
+  `App`, `Cmd`, `Subs`, router, `html!` syntax, SSR, proofs.
 - `library/Lasm/RPC.lean` — shared API definitions and adapters.
 - `src/edge/` (existing) and `src/browser/` — the browser entry, loader and
   `lasm:ui-dom` applier.

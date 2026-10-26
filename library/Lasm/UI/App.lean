@@ -1,7 +1,7 @@
 /-
 The Elm architecture in the browser: `init`, a pure `update`, a pure `view`
 and `subscriptions`. `App.run` connects the app to the `lasm:ui-dom` applier
-(src/browser/ui-dom.mjs) of the element it is mounted on. Events reach Lean as
+(src/lasm-modules/ui-dom.mjs) of the element it is mounted on. Events reach Lean as
 one synchronous call each (the applier encodes the fields the handler's
 decoder declared); messages update the model; on the next animation frame
 Lean renders the view, diffs it against the live tree and returns one binary
@@ -304,16 +304,40 @@ def onSub (c : Ctx Flags Model Msg) (args : Array Data) : IO Data := do
 
 end Runtime
 
+/-- How a model survives a hot reload (`@lasm/vite` in development): saved as
+JavaScript data before the new version replaces the app, restored instead of
+`init` when it still converts. There is an instance for every model with
+`ToJS` and `FromJS` (for example `deriving ToJS, FromJS`); other models start
+from `init` on every reload. -/
+class HotModel (Model : Type) where
+  save? : Option (Model → Data)
+  load? : Option (Data → Option Model)
+
+instance (priority := low) : HotModel Model := ⟨none, none⟩
+instance [ToJS Model] [FromJS Model] : HotModel Model :=
+  ⟨some toJS, some fun d => match FromJS.fromJS d with | .ok m => some m | .error _ => none⟩
+
 open Lasm.UI.Runtime in
 /-- Runs `app` in the element it was mounted on. This is the program's `main`
 (`def main : IO Unit := app.run`); it returns once the first frame is on
 screen, and the app then runs on events. -/
-def App.run [FromJS Flags] (app : App Flags Model Msg) : IO Unit := do
+def App.run [FromJS Flags] [hot : HotModel Model] (app : App Flags Model Msg) : IO Unit := do
   let options ← Dom.options
   let flags ← decodeAs Flags "the app's flags" (options.field "flags")
   let url := (match options.field "url" with | .string s => Url.parse s | _ => none).getD {}
-  let (model, cmd₀) := app.init flags url
-  let c : Ctx Flags Model Msg := { app, ref := ← IO.mkRef { model } }
+  -- A hot reload restores the previous version's model (and skips init's command).
+  let restored : Option Model ← match hot.load? with
+    | some load => do
+      match ← Lasm.Web.App.Raw.hotState with
+      | .undefined => pure none
+      | d => pure (load d)
+    | none => pure none
+  let (model, cmd₀) := match restored with
+    | some m => (m, Cmd.none)
+    | none => app.init flags url
+  let c : Ctx Flags Model Msg := { app, ref := ← IO.mkRef ({ model := model } : State Model Msg) }
+  if let some save := hot.save? then
+    Lasm.Web.App.onHotSave do return save (← c.ref.get).model
   let frameFn ← Function.ofSyncFn fun _ => do return .bytes (← frame c)
   let eventFn ← Function.ofSyncFn (onEvent c)
   let subFn ← Function.ofSyncFn (onSub c)

@@ -144,58 +144,75 @@ const operations = [
   { name: 'clear 1,000 rows', setup: ['clear', 'run'], run: 'clear' },
 ];
 
-async function measure(page, ready) {
-  await page.waitForSelector(ready, { timeout: 30_000 });
-  return page.evaluate(async ops => {
+// One timed run of an operation in a page: the setup clicks (each followed by
+// a painted frame), then the click being timed, to the next painted frame.
+async function trial(page, op) {
+  // A page in the background may get no animation frames.
+  await page.bringToFront();
+  return page.evaluate(async op => {
     const paint = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
     const target = run => typeof run === 'string' ? document.getElementById(run)
       : run.select ? document.querySelector(`#tbody tr:nth-child(${run.select}) td:nth-child(2) a`)
       : document.querySelector(`#tbody tr:nth-child(${run.remove}) td:nth-child(3) a`);
-    const results = {};
-    for (const op of ops) {
-      const times = [];
-      // Warm up once, then measure.
-      for (let i = 0; i < (op.repeats ?? 8) + 1; i++) {
-        for (const s of op.setup) { document.getElementById(s).click(); await paint(); }
-        await paint();
-        const el = target(op.run);
-        const t0 = performance.now();
-        el.click();
-        await paint();
-        if (i > 0) times.push(performance.now() - t0);
-      }
-      results[op.name] = times;
-    }
-    // A last check that the DOM is right: 1,000 rows after run, labels and ids.
-    document.getElementById('clear').click(); await paint();
-    document.getElementById('run').click(); await paint();
-    document.getElementById('update').click(); await paint();
-    const rows = [...document.querySelectorAll('#tbody tr')];
-    results.check = { rows: rows.length, firstUpdated: rows[0]?.querySelector('a')?.textContent.endsWith(' !!!'),
-      secondPlain: !rows[1]?.querySelector('a')?.textContent.endsWith(' !!!') };
-    return results;
-  }, operations);
+    for (const s of op.setup) { document.getElementById(s).click(); await paint(); }
+    await paint();
+    const el = target(op.run);
+    const t0 = performance.now();
+    el.click();
+    await paint();
+    return performance.now() - t0;
+  }, op);
 }
+
+// The DOM after run then update: 1,000 rows, every 10th label updated.
+const checkRows = async page => (await page.bringToFront(), page.evaluate(async () => {
+  const paint = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+  for (const id of ['clear', 'run', 'update']) { document.getElementById(id).click(); await paint(); }
+  const rows = [...document.querySelectorAll('#tbody tr')];
+  return { rows: rows.length, firstUpdated: rows[0]?.querySelector('a')?.textContent.endsWith(' !!!'),
+    secondPlain: !rows[1]?.querySelector('a')?.textContent.endsWith(' !!!') };
+}));
 
 async function bench({ server, name, openPage, expect, report }) {
   const lasm = await openPage(server, `/${name}/`);
-  let lasmTimes, vanillaTimes;
-  try { lasmTimes = await measure(lasm.page, '#run'); }
-  finally { report.apps[name].console = lasm.consoleLines.slice(-30); await lasm.context.close(); }
   const vanilla = await openPage(server, '/vanilla/');
-  try { vanillaTimes = await measure(vanilla.page, '#run'); }
-  finally { await vanilla.context.close(); }
   const table = {};
-  for (const op of operations) {
-    const l = median(lasmTimes[op.name]), v = median(vanillaTimes[op.name]);
-    table[op.name] = { lasmMs: l, vanillaMs: v, ratio: v ? l / v : null, budget: op.budget ?? null, lasmAll: lasmTimes[op.name], vanillaAll: vanillaTimes[op.name] };
-    // Within the budget, or within 4 ms of vanilla (timer resolution and frame noise dominate there).
-    if (op.budget) expect(name, `bench.${op.name}`, l <= op.budget * v || l - v <= 4, `${l?.toFixed(1)} ms vs vanilla ${v?.toFixed(1)} ms`);
+  try {
+    await lasm.page.waitForSelector('#run', { timeout: 30_000 });
+    await vanilla.page.waitForSelector('#run', { timeout: 30_000 });
+    // Warm-up: engines compile hot code (JavaScript and WebAssembly) in tiers
+    // over the first seconds; both pages run every operation a few times first.
+    for (let round = 0; round < 3; round++)
+      for (const op of operations.filter(o => !o.repeats))
+        for (const page of [lasm.page, vanilla.page]) await trial(page, op);
+    // Trials alternate between the two pages, so both see the same machine
+    // state (shared CI runners vary over a run); one more warm-up trial each.
+    for (const op of operations) {
+      const l = [], v = [], leanMs = [], applyMs = [];
+      const n = (op.repeats ?? 10) + 1;
+      for (let i = 0; i < n; i++) {
+        const tl = await trial(lasm.page, op);
+        // Lean's part of the timed frame (view, diff, encoding) and the applier's.
+        const last = await lasm.page.evaluate(() => document.querySelector('[data-lasm-app]')?.lasmUi?.stats().last ?? null);
+        const tv = await trial(vanilla.page, op);
+        if (i > 0) { l.push(tl); v.push(tv); if (last) { leanMs.push(last.leanMs); applyMs.push(last.applyMs); } }
+      }
+      const lm = median(l), vm = median(v);
+      table[op.name] = { lasmMs: lm, vanillaMs: vm, ratio: vm ? lm / vm : null, budget: op.budget ?? null,
+        leanMs: median(leanMs), applyMs: median(applyMs), lasmAll: l, vanillaAll: v };
+      // Within the budget, or within 4 ms of vanilla (timer resolution and frame noise dominate there).
+      if (op.budget) expect(name, `bench.${op.name}`, lm <= op.budget * vm || lm - vm <= 4, `${lm?.toFixed(1)} ms vs vanilla ${vm?.toFixed(1)} ms`);
+    }
+    report.apps[name].bench = table;
+    const lc = await checkRows(lasm.page), vc = await checkRows(vanilla.page);
+    expect(name, 'bench.dom', lc.rows === 1000 && lc.firstUpdated && lc.secondPlain, JSON.stringify(lc));
+    expect(name, 'bench.vanilla-dom', vc.rows === 1000 && vc.firstUpdated, JSON.stringify(vc));
+    expect(name, 'bench.no-errors', noErrors(lasm.consoleLines), errorLines(lasm.consoleLines));
+  } finally {
+    report.apps[name].console = lasm.consoleLines.slice(-30);
+    await lasm.context.close();
+    await vanilla.context.close();
   }
-  report.apps[name].bench = table;
-  expect(name, 'bench.dom', lasmTimes.check.rows === 1000 && lasmTimes.check.firstUpdated && lasmTimes.check.secondPlain, JSON.stringify(lasmTimes.check));
-  expect(name, 'bench.vanilla-dom', vanillaTimes.check.rows === 1000 && vanillaTimes.check.firstUpdated, JSON.stringify(vanillaTimes.check));
-  expect(name, 'bench.no-errors', noErrors(lasm.consoleLines), errorLines(lasm.consoleLines));
 }
 
 async function demo({ server, name, manifest, openPage, expect, report }) {
