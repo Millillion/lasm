@@ -2,14 +2,23 @@ import assert from 'node:assert/strict';
 
 // A failed accounting command must never let an unobserved workload continue.
 // Retry one sample only while its entire known process group is stopped. Keep
-// each ps/vm_stat command's existing five-second deadline; repeated failures,
+// each ps/vm_stat command's existing five-second deadline; repeated failures
+// (three recoveries with no ordinary sample between them, or 30 in one run),
 // unsafe fresh samples, unknown detached children and excessive pauses fail closed.
+// A loaded macOS runner can stall ps now and then for a whole build, so the cap is
+// on consecutive recoveries: the caller marks a recovery `followedBySample` once an
+// ordinary sample succeeds after it.
+export const consecutiveRecoveries = recoveries => {
+  let n = 0;
+  for (let i = recoveries.length - 1; i >= 0 && !recoveries[i].followedBySample; i--) n++;
+  return n;
+};
 export function recoverDarwinSample(error, {
   group, previousProcesses, recoveries, sample, stopReason,
   signal = (pid, name) => process.kill(pid, name), now = Date.now,
 }) {
   assert.ok(Number.isInteger(group) && group > 0);
-  if (error.code !== 'ETIMEDOUT' || recoveries.length >= 3 || !previousProcesses?.length
+  if (error.code !== 'ETIMEDOUT' || consecutiveRecoveries(recoveries) >= 3 || recoveries.length >= 30 || !previousProcesses?.length
     || previousProcesses.some(p => p.group !== group)) throw error;
   const started = now(), recovery = { startedAt: new Date(started).toISOString(),
     error: error.message, recovered: false };

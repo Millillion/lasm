@@ -1,13 +1,18 @@
 name: Cloudflare Workers (Phase 7)
-# Experimental edge build (docs/EDGE.md): builds the single-threaded runtime
+# Edge targets and Bun/Deno (docs/EDGE.md, docs/BUN_DENO.md): builds the single-threaded runtime
 # (edge-runtime.yml), then the Hono template (lasm init --deploy workers) and
 # examples/edge-pure with `lasm build --target workers` from this source
 # checkout; serves them with `wrangler dev` (local workerd: CI=1, no account,
 # no browser), runs them on Node 26, Deno and Bun, and checks the Workers Free
 # plan's budgets (scripts/edge/workers-ci.mjs). Linux only, free runners, no
 # deployment and no publication.
+# release-checks.yml calls it (release-check: true) for every release commit,
+# including the merge commit on main: since 0.2.0 these checks gate releases.
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      release-check: { type: boolean, default: false }
   push:
     branches: [phase-7, dx]
     paths:
@@ -44,12 +49,14 @@ concurrency:
   cancel-in-progress: true
 jobs:
   runtime:
-    if: github.ref != 'refs/heads/main'
+    if: inputs.release-check || github.ref != 'refs/heads/main'
     uses: ./.github/workflows/edge-runtime.yml
+    with:
+      release-check: ${{ inputs.release-check == true }}
   # The native host pieces (every platform's, cross-built with zig on x64:
   # scripts/prepare-native.mjs), shared by the jobs below, including arm64.
   native:
-    if: github.ref != 'refs/heads/main'
+    if: inputs.release-check || github.ref != 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -144,8 +151,8 @@ jobs:
           name: workers-results
           path: .work/edge-apps/*.json
           retention-days: 14
-  # Phase 7.5: the compiler under Node, Bun and Deno (Linux only until the
-  # 0.1.0 gate allows macOS and Windows on this branch).
+  # Phase 7.5: the compiler from this source checkout under Node, Bun and
+  # Deno (Linux x64 and arm64; the installed package on all five is `platforms`).
   hosts:
     needs: [runtime, native]
     runs-on: ${{ matrix.runner }}
@@ -207,10 +214,10 @@ jobs:
           name: hosts-results-${{ matrix.platform }}
           path: .work/hosts/*.json
           retention-days: 14
-  # Phase 7.5 on macOS and Windows (allowed after the 0.1.0 gate, 2026-10-24):
-  # an installed candidate packed from this commit, as build-profile.yml does.
+  # Phase 7.5 on all five targets: an installed candidate packed from this
+  # commit, as build-profile.yml does.
   pack:
-    if: github.ref != 'refs/heads/main'
+    if: inputs.release-check || github.ref != 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -252,6 +259,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - { runner: ubuntu-24.04, platform: linux-x64 }
+          - { runner: ubuntu-24.04-arm, platform: linux-arm64 }
           - { runner: macos-15, platform: darwin-arm64 }
           - { runner: macos-15-intel, platform: darwin-x64 }
           - { runner: windows-2025, platform: win32-x64 }
@@ -272,6 +281,12 @@ jobs:
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'${{ matrix.platform }}')"
+      - name: Enable process-tree guard (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - uses: actions/download-artifact@v4
         with:
           name: packed-candidate

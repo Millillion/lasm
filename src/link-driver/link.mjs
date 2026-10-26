@@ -21,7 +21,7 @@ import { extractMetadata, updateMetadata } from './metadata.mjs';
 import { WasmModule, getWeakImports } from './wasm.mjs';
 import { addUnexpectedExports, asmjsMangle, assembleGlue, checkSupportedSettings, createAsmConsts, createEmJs,
   demangleCSymbolName, handleLicense, isCSymbol, isInternalSymbol, updateSettingsGlue } from './glue.mjs';
-import { dedupList, pythonJsonDumps, truthy, universalNewlines } from './python.mjs';
+import { dedupList, pythonJsonDumps, pythonStrip, truthy, universalNewlines } from './python.mjs';
 
 export const linkModes = Object.freeze(['probe', 'final']);
 const placeholder = /<([a-z-]+)>/g;
@@ -317,10 +317,11 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   // step (growableHeap, which the glue needs) runs as recorded.
   const sizeOnly = entry => entry.kind === 'wasm-opt' || entry.kind === 'dce-graph' || entry.kind === 'metadce'
     || entry.kind === 'acorn' && ['AJSDCE', 'applyDCEGraphRemovals'].includes(entry.pass);
-  if (!optimize && !['final', 'edge'].includes(mode)) throw new Error('Only the final and edge links have an unoptimized (dev) profile');
-  // The edge link lowers wasm64 to 32-bit memory in Binaryen: its dev profile
-  // keeps that wasm-opt step without -Oz (only the lowering passes run).
-  const devWasmOpt = !optimize && mode === 'edge';
+  const edgeMode = mode.startsWith('edge');
+  if (!optimize && mode !== 'final' && !edgeMode) throw new Error('Only the final and edge links have an unoptimized (dev) profile');
+  // The edge link lowers wasm64 to 32-bit memory (and may Asyncify) in Binaryen:
+  // its dev profile keeps that wasm-opt step without -Oz (only those passes run).
+  const devWasmOpt = !optimize && edgeMode;
   while (step < steps.length) {
     const entry = steps[step];
     if (!optimize && sizeOnly(entry) && !(devWasmOpt && entry.kind === 'wasm-opt')) { step++; continue; }
@@ -359,6 +360,20 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
         finalJs = output;
         saveFile('applyDCEGraphRemovals.js', finalJs);
       }
+    } else if (entry.kind === 'minify-names') {
+      // tools/building.py minify_wasm_imports_and_exports (the edge Asyncify
+      // link: MINIFY_WASM_IMPORTS_AND_EXPORTS): wasm-opt renames the imports
+      // and exports and prints the mapping, which the next acorn pass applies.
+      step++;
+      const mapping = parseMinifiedNames(run(entry.program, expandArguments(entry.args, values, platform), { capture: true }));
+      saveFile('wasm-opt.wasm', wasm);
+      const apply = steps[step];
+      if (apply?.kind !== 'acorn' || apply.pass !== 'applyImportAndExportNameChanges') throw new Error('The recipe must apply the minified names');
+      step++;
+      const output = acornOutput();
+      run(apply.program, expandArguments(apply.args, { ...values, info: writeInfo('emcc_acorn_info_', { mapping }), 'js-out': output }, platform));
+      finalJs = output;
+      saveFile('applyImportAndExportNameChanges.js', finalJs);
     } else if (entry.kind === 'modularize') {
       // tools/link.py modularize(): src/modularize.js, preprocessed with the
       // current settings and minified on its own, wraps the final JS.
@@ -391,6 +406,31 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   // phase_final_emitting: license handling, then the JS reaches its target.
   writeFileSync(target, handleLicense(settings, universalNewlines(readFileSync(finalJs, 'utf8'))));
   return { wasm, js: target, map: parsed.mapFile, requiredExports: [...userRequestedExports] };
+}
+
+/** tools/building.py minify_wasm_imports_and_exports: wasm-opt's mapping,
+ * either "OLD => NEW" lines or JSON { imports: [[module, old, new]], exports:
+ * [[old, new]] }. Insertion order is Python's dict order. */
+export function parseMinifiedNames(out) {
+  const mapping = {};
+  const add = (old, name, what) => {
+    if (Object.hasOwn(mapping, old)) throw new Error(`assertion failed: ${what} must be unique`);
+    if (/^(?:0|[1-9]\d*)$/.test(old)) throw new Error(`Unsupported minified name ${old}`);
+    mapping[old] = name;
+  };
+  if (!out || out[0] !== '{') {
+    for (const line of out.split('\n')) {
+      if (!line.includes(' => ')) continue;
+      const parts = pythonStrip(line).split(' => ');
+      if (parts.length !== 2) throw new Error(`Unexpected minified-name line ${line}`);
+      add(parts[0], parts[1], 'imports');
+    }
+  } else {
+    const parsed = JSON.parse(out);
+    for (const [, old, name] of parsed.imports) add(old, name, 'imports');
+    for (const [old, name] of parsed.exports) add(old, name, 'exports');
+  }
+  return mapping;
 }
 
 function jsInfoSymbols(compiled) {

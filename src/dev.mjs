@@ -10,7 +10,7 @@ import { basename, dirname, join, relative, resolve } from 'node:path';
 import { jsRuntime } from './js-runtime.mjs';
 
 const runtimeTargets = ['node', 'bun', 'deno'];
-const edgeOnlyTargets = ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy'];
+const edgeOnlyTargets = ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge'];
 export const devTargets = [...runtimeTargets, ...edgeOnlyTargets, 'browser'];
 
 export const devUsage = `Usage: lasm dev [Main.lean] [--target ${devTargets.join('|')}] [--release] [--port N] [--no-run] [-- arguments…]

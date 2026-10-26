@@ -1,7 +1,6 @@
-# Deno Deploy (experimental)
+# Deno Deploy
 
-Status: **experimental, unreleased** (Phase 7.4, planned for 0.2.0). It is not in
-any candidate or in 0.1.0. Nothing is deployed to a Deno Deploy account. The
+Status: **supported from 0.2.0** (Phase 7.4). Nothing is deployed to a Deno Deploy account. The
 design and limits are in [EDGE.md](../EDGE.md).
 
 ## Build
@@ -44,5 +43,6 @@ Lean features are those of the edge profile:
 
 ## Supabase Edge Functions
 
-Not supported. Supabase's edge runtime (v1.77.8, V8 11.6) has no JSPI. See
-[EDGE.md](../EDGE.md#phase-74-status-deno-deploy-supabase-edge-functions-not-supported).
+A separate target, `--target supabase-edge`: Supabase's edge runtime (v1.77.8,
+V8 11.6) has no JSPI, so it uses an Asyncify link. See
+[supabase-edge.md](supabase-edge.md).

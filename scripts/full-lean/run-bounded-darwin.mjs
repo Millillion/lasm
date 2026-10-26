@@ -22,6 +22,7 @@ const report = resolve(option('--report', `.work/resource-runs/darwin-${Date.now
 assert.ok(!existsSync(report), 'Preserve prior resource evidence');
 mkdirSync(dirname(report), { recursive: true });
 const lock = resolve('.work/resource-darwin.lock');
+mkdirSync(dirname(lock), { recursive: true });
 mkdirSync(lock); // Refuse concurrent workloads; a stale lock requires inspection.
 const unit = randomUUID(), host = darwinMemory(), reserve = 1536 * 1024 ** 2;
 // RSS includes clean mapped compiler archives and shared libraries. It is not
@@ -87,7 +88,11 @@ try {
     try {
       const sample = () => ({ processes: current(), memory: darwinMemory() });
       let fresh;
-      try { fresh = sample(); }
+      try {
+        fresh = sample();
+        const last = evidence.monitorRecoveries.at(-1);
+        if (last?.recovered) last.followedBySample = true;
+      }
       catch (error) {
         if (stopping) throw error;
         fresh = recoverDarwinSample(error, { group: child.pid, previousProcesses: evidence.lastSample?.processes,

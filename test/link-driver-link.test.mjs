@@ -12,7 +12,7 @@ import { asmjsMangle, createAsmConsts, createEmJs, makeInvoke, makeWasm64Wrapper
   assembleGlue, handleLicense, trimAsmConstBody, updateSettingsGlue, addUnexpectedExports, checkSupportedSettings,
   createPointerConversionWrappers } from '../src/link-driver/glue.mjs';
 import { emscriptenResponseFile, shlexJoin, needsResponseFile, responseFileThreshold, parseLinkArguments, expandArguments, stubObject, linkerExports, addJsDependencies,
-  prepareDceGraph, unusedFromMetadce, bundledNativeSigs } from '../src/link-driver/link.mjs';
+  prepareDceGraph, unusedFromMetadce, bundledNativeSigs, parseMinifiedNames } from '../src/link-driver/link.mjs';
 import { bundledRecipe } from '../src/link-driver/compile.mjs';
 
 // ---- A tiny Wasm module writer -------------------------------------------
@@ -156,7 +156,7 @@ test('the JS compiler output is completed with constants, module code and hooks'
   const settings = settingsOf({ ASSERTIONS: 1, INCOMING_MODULE_JS_API: ['a'], ALL_INCOMING_MODULE_JS_API: ['a', 'b'],
     MAIN_MODULE: 2, IMPORTED_MEMORY: 0, EXPORTED_FUNCTIONS: [], SIDE_MODULE_IMPORTS: [], MAYBE_CLOSURE_COMPILER: 0,
     EXPORT_KEEPALIVE: 1, DECLARE_ASM_MODULE_EXPORTS: 1, MEMORY64: 0, PTHREADS: 1, WASM_WORKERS: 0, SUPPORT_LONGJMP: 'wasm',
-    DISABLE_EXCEPTION_CATCHING: 1, HAS_MAIN: 1, MINIMAL_RUNTIME: 0, EXIT_RUNTIME: 0, EXPORTED_RUNTIME_METHODS: [] });
+    DISABLE_EXCEPTION_CATCHING: 1, HAS_MAIN: 1, MINIMAL_RUNTIME: 0, EXIT_RUNTIME: 0, EXPORTED_RUNTIME_METHODS: [], ASYNCIFY: 0 });
   const forwarded = { warnings: false, librarySymbols: [], nativeAliases: {}, extraExports: [], ATINITS: 'init();', ATMAINS: '' };
   const noInvokes = { ...metadata, invokeFuncs: [] };
   const glue = assembleGlue(settings, noInvokes, `PRE\n// EMSCRIPTEN_END_FUNCS\n<<< ATINITS >>>\n<<< ATMAINS >>>\n<<< ATEXITS >>>\r\n//FORWARDED_DATA:${JSON.stringify(forwarded)}`,
@@ -167,6 +167,29 @@ test('the JS compiler output is completed with constants, module code and hooks'
   assert.deepEqual(settings.values.ALIASES, []);
   assert.throws(() => assembleGlue(settings, noInvokes, 'no marker', { asmConsts: [], emJsFuncs: [], nativeSigs: {}, extraJsExports: new Set() }),
     /forwarded data/);
+});
+
+test('ASYNCIFY=1 glue: the asyncify exports join the function exports, as emscript adds them', () => {
+  const metadata = extractMetadata(testModule(), { STANDALONE_WASM: 0 });
+  const settings = settingsOf({ ASSERTIONS: 0, INCOMING_MODULE_JS_API: [], ALL_INCOMING_MODULE_JS_API: [],
+    MAIN_MODULE: 0, IMPORTED_MEMORY: 0, EXPORTED_FUNCTIONS: [], SIDE_MODULE_IMPORTS: [], MAYBE_CLOSURE_COMPILER: 0,
+    EXPORT_KEEPALIVE: 1, DECLARE_ASM_MODULE_EXPORTS: 1, MEMORY64: 0, PTHREADS: 0, WASM_WORKERS: 0, SUPPORT_LONGJMP: 'wasm',
+    DISABLE_EXCEPTION_CATCHING: 1, HAS_MAIN: 1, MINIMAL_RUNTIME: 0, EXIT_RUNTIME: 0, EXPORTED_RUNTIME_METHODS: [], ASYNCIFY: 1 });
+  const forwarded = { warnings: false, librarySymbols: [], nativeAliases: {}, extraExports: [] };
+  const asyncify = { ...metadata, invokeFuncs: [], functionExports: new Map(metadata.functionExports) };
+  const glue = assembleGlue(settings, asyncify, `PRE\n// EMSCRIPTEN_END_FUNCS\n//FORWARDED_DATA:${JSON.stringify(forwarded)}`,
+    { asmConsts: [], emJsFuncs: [], nativeSigs: {}, extraJsExports: new Set() });
+  assert.deepEqual([...asyncify.functionExports.keys()].slice(-4), ['asyncify_start_unwind', 'asyncify_stop_unwind', 'asyncify_start_rewind', 'asyncify_stop_rewind']);
+  assert.deepEqual(asyncify.functionExports.get('asyncify_start_unwind'), { params: [0x7f], returns: [] });
+  assert.ok(glue.includes("_asyncify_start_unwind = wasmExports['asyncify_start_unwind'];"));
+});
+
+test('minified import and export names: both wasm-opt formats, in order', () => {
+  assert.deepEqual(parseMinifiedNames('env.foo => a\nbar => b\n'), { 'env.foo': 'a', bar: 'b' });
+  const mapping = parseMinifiedNames(JSON.stringify({ imports: [['env', 'lasm_edge_wait', 'a'], ['wasi', 'fd_write', 'b']], exports: [['main', 'c'], ['memory', 'd']] }));
+  assert.deepEqual(Object.entries(mapping), [['lasm_edge_wait', 'a'], ['fd_write', 'b'], ['main', 'c'], ['memory', 'd']]);
+  assert.throws(() => parseMinifiedNames(JSON.stringify({ imports: [['env', 'x', 'a']], exports: [['x', 'b']] })), /must be unique/);
+  assert.deepEqual(parseMinifiedNames(''), {});
 });
 
 test('license blocks are removed unless the license is requested', () => {

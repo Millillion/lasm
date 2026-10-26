@@ -26,14 +26,15 @@ export function reportCliError(error) {
     : (error.stderr?.toString() || error.stdout?.toString() || error.message).slice(-12000));
 }
 
-/** Edge targets (experimental, docs/EDGE.md): the program relinked for edge
+/** Edge targets (docs/EDGE.md): the program relinked for edge
  * isolates. An unchanged Node build reuses its cached edge program; otherwise
  * the build runs again keeping its link inputs, and the edge link follows. */
 export async function buildEdge(input, target, buildOptions, verbose, { build, log = message => console.error(message) } = {}) {
   const { rm } = await import('node:fs/promises');
   const { dirname, resolve } = await import('node:path');
   const buildApplicationWithProgress = build ?? (await import('./application-build-client.mjs')).buildApplicationWithProgress;
-  const { findEdgeProgram, linkCachedEdgeProgram, writeEdgeOutput } = await import('./edge/edge-build.mjs');
+  const { findEdgeProgram, linkCachedEdgeProgram, writeEdgeOutput, edgeTargetSuspend } = await import('./edge/edge-build.mjs');
+  const suspend = edgeTargetSuspend(target);
   const { applicationRuntime } = await import('./application-runtime.mjs');
   const { selectLeanVersion, toolchainCatalog } = await import('./managed-lean.mjs');
   const { findApplicationProject } = await import('./application-sources.mjs');
@@ -41,17 +42,17 @@ export async function buildEdge(input, target, buildOptions, verbose, { build, l
   const selection = await selectLeanVersion(source);
   const nodeRuntime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit });
   let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built' });
-  const found = await findEdgeProgram({ result, nodeRuntime });
+  const found = await findEdgeProgram({ result, nodeRuntime, suspend });
   let program = found.cached;
   if (program && result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
   if (!program) {
     // A Node build reused from its cache kept no link inputs: link it again.
     if (!result.linkWork) result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: true });
     try {
-      log('[lasm] Linking for the edge (experimental edge build)…');
+      log(`[lasm] Linking the single-threaded (portable) program${suspend === 'asyncify' ? ' with Asyncify (this engine has no JSPI)' : ''}…`);
       const { provisionEdgeLinker } = await import('./edge/edge-link.mjs');
-      const sdk = await provisionEdgeLinker(found.edge, { log: message => log('[lasm] ' + message) });
-      program = linkCachedEdgeProgram({ result, nodeRuntime, edge: found.edge, key: found.key, sdk, verbose });
+      const sdk = await provisionEdgeLinker(found.edge, { log: message => log('[lasm] ' + message) }, process.env, suspend);
+      program = linkCachedEdgeProgram({ result, nodeRuntime, edge: found.edge, key: found.key, sdk, suspend, verbose });
     } finally {
       if (result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
     }
@@ -64,7 +65,7 @@ export async function runApplicationCli(argv) {
   const options = parseLasmArguments(argv);
   const support = applicationSupport();
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy] [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy] [--dev]\n       lasm init my-app [--template plain|express|hono|std-http] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nBuild and run ordinary Lean main in Node.' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy] [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge] [--dev]\n       lasm init my-app [--template plain|express|hono|fastify|std-http] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nBuild and run ordinary Lean main in Node.' : cliUsage);
     return 0;
   }
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }

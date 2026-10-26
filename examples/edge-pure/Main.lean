@@ -68,6 +68,12 @@ def route (method path body : String) : Async (Nat × String) := do
   | "GET", ["", "block"] =>
     let v ← (Std.Async.Async.block (do Std.Async.sleep 2; pure (42 : Nat)) : IO Nat)
     return (200, s!"\{\"blocked\":{v}}")
+  -- Task.get on unfinished work: the task sleeps, so the blocking get suspends.
+  | "GET", ["", "task", n] =>
+    let t ← (IO.asTask (do IO.sleep (n.toNat?.getD 10).toUInt32; pure (5 : Nat)) : IO _)
+    match t.get with
+    | .ok v => return (200, s!"\{\"task\":{v}}")
+    | .error e => throw e
   | "GET", ["", "mutex"] =>
     let m ← Std.Mutex.new (0 : Nat)
     let ts ← (List.range 8).mapM fun _ => (IO.asTask (m.atomically (modify (· + 1))) : IO _)
