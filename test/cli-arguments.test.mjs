@@ -80,7 +80,13 @@ test('lasm dev arguments', async () => {
   const parsed = parseLasmArguments(['dev']);
   assert.equal(parsed.command, 'dev'); assert.equal(parsed.input, 'Main.lean'); assert.equal(parsed.profile, 'dev'); assert.equal(parsed.target, 'node');
   assert.deepEqual(parseLasmArguments(['dev', 'App/Main.lean', '--target', 'workers', '--release', '--', 'a', '--b']),
-    { command: 'dev', profile: 'release', args: ['a', '--b'], run: true, verbose: false, target: 'workers', input: 'App/Main.lean' });
+    { command: 'dev', profile: 'release', args: ['a', '--b'], run: true, verbose: false, target: 'workers', input: 'App/Main.lean',
+      outputs: [{ target: 'workers', input: 'App/Main.lean' }] });
+  // Several outputs, each with its own source or the default one.
+  assert.deepEqual(parseDevArguments(['--target', 'node=Server.lean,browser=Client.lean', '--port', '5174']).outputs,
+    [{ target: 'node', input: 'Server.lean' }, { target: 'browser', input: 'Client.lean' }]);
+  assert.deepEqual(parseDevArguments(['App.lean', '--target', 'node,workers']).outputs, [{ target: 'node', input: 'App.lean' }, { target: 'workers', input: 'App.lean' }]);
+  assert.throws(() => parseDevArguments(['--target', 'node,bun']), /one program/);
   assert.equal(parseDevArguments(['--target=browser', '--port', '8080']).port, 8080);
   assert.equal(parseDevArguments(['--target', 'browser', '--release', '--no-watch']).watch, false);
   assert.throws(() => parseDevArguments(['--port', '8080']), /--port applies/);

@@ -139,9 +139,13 @@ npm run build:workers && npx wrangler deploy   # Cloudflare Workers (workers/ an
 | `Client.lean` | The `Lasm.UI` app. It mounts on the server's markup and hydrates it (keeping its nodes), then calls the endpoints. |
 | `wrangler.toml` | Workers: the server as a Worker (`workers/worker.mjs`), `dist/public` as static assets (served before the Worker). |
 
-`npm run dev` is `lasm dev Server.lean --client Client.lean`: on every change
-it rebuilds the browser app into `dist/public/client`, then the server, and
-restarts the server (a build error keeps the last good one running).
+`npm run dev` is `lasm dev --target node=Server.lean,browser=Client.lean
+--output dist/public/client`: on every change it rebuilds the browser app
+into `dist/public/client` and the server, then restarts the server (a build
+error keeps the last good one running). Open http://localhost:3000: the
+server renders the page and serves the new browser app; reload after a
+change. (`lasm dev` also serves the browser app alone on :5173 with live
+reload; its API calls need the server.)
 
 The todos live in memory, one copy per server process (or Workers isolate).
 For real data, call a database from the handlers (they run in `Async`; on

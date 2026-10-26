@@ -1,7 +1,7 @@
 import * as fsp from 'node:fs/promises';
 import { getSystemErrorMessage } from 'node:util';
 import { join } from 'node:path';
-import { closeSync, existsSync, openSync } from 'node:fs';
+import { closeSync, existsSync, openSync, writeSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { randomBytes } from 'node:crypto';
@@ -178,6 +178,19 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
   async function fileWrite(file, bytes) {
     const sink = file.standardId === 1 ? stdio.stdout : file.standardId === 2 ? stdio.stderr : undefined;
     if (sink) { await sink(bytes); return empty; }
+    // Standard output and error before any native stream exists for them: a
+    // synchronous write on this thread, as Node writes process.stdout to files
+    // and pipes. It spares a native file worker (about 50 ms of CPU at start-up,
+    // docs/BENCHMARKS.md). A descriptor that would block (EAGAIN) or a Windows
+    // host (a separate C runtime) keeps the native path.
+    if ((file.standardId === 1 || file.standardId === 2) && !file.stream && process.platform !== 'win32' && !file.nativeWrites) {
+      let written = 0;
+      try { while (written < bytes.length) written += writeSync(file.fd, bytes, written, bytes.length - written); return empty; }
+      catch (error) {
+        if (error.code !== 'EAGAIN' || written) throw nativeFiles().fromNodeError(error);
+        file.nativeWrites = true;
+      }
+    }
     await nativeFiles().write(nativeFile(file), bytes);
     return empty;
   }

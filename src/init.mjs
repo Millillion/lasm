@@ -706,7 +706,7 @@ name = "View"
       description: 'A full-stack Lean app (Lasm.RPC, Lasm.Fetch, Lasm.UI), compiled to WebAssembly by Lasm',
       scripts: {
         // The server on http://localhost:3000, rebuilt with the browser app on every change.
-        dev: 'lasm dev Server.lean --client Client.lean',
+        dev: 'lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client',
         build: 'npm run build:client && npm run build:server',
         'build:client': 'lasm build Client.lean --target browser --output dist/public/client',
         'build:server': 'lasm build Server.lean --output dist/server',

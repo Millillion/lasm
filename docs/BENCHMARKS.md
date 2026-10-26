@@ -377,6 +377,14 @@ browser` per save, the browser branch alone) 16.8 s. After (run 40298525152):
 | `lasm dev --target browser` (warm worker), per edit | 16.8 s (a new process per save) | 1.9 s (first edit after the first build 3.5 s) |
 | A new `lasm build --dev --target browser` process | 16.8 s | 3.4 s |
 
+With Lasm.UI merged and the edge link's nm listings, compact initializer
+object and modularize wrapper reused (browser.yml 40310922142, all jobs green):
+`lasm dev --target browser` 1.7, 1.6, 1.7 s per edit (first 3.0 s); `lasm dev
+--target workers` 1.6 s (first 3.0 s); Vite dev (`@lasm/cli/vite`, warm worker)
+1.8, 2.7, 1.7 s from save to the remounted app; a new `lasm build --dev
+--target browser` process 3.6 s. The evidence gates the 2 s budget on the
+`lasm dev` number and records the other two.
+
 Where an edit's time goes after the change (maintainer host, one build job,
 `lasm dev --target browser`, 2.6 s there): Lake query with elaboration 0.7 s,
 clang 0.2 s, Node link (link only, live members) 0.4 s, edge link (live
@@ -416,13 +424,18 @@ What this shows:
   at start; one Worker saves 30–40 ms of CPU and 4–6 % of the cold start at
   0.29–0.58 CPU and costs 5–12 % on 4 CPUs. The function shims (`lasm
   package`) default to 1; servers keep 4.
-- Not changed yet, measured on the maintainer host: Fastify's own `require`
-  and schema compiler take about 150 ms of the main thread; the first
-  `IO.println` starts a file-I/O Worker (about 50 ms of CPU); each Worker
-  compiles `program.cjs` again (about 25 ms). Snapshotting compiled Wasm is not
-  available to Node programs (no code cache for `WebAssembly.compile`), and
-  Node's compile cache needs a writable, warm directory, which a new function
-  instance does not have.
+- Standard output and error, and the working directory's name, no longer
+  start a native file Worker (synchronous writes on POSIX, libuv `readlink`).
+  On the maintainer host that took a Fastify start from 90 to 77 CPU ticks; on
+  the runner (run 40302884580, same table layout) the CPU used per start went
+  570 → 560 ms (Hono), 600 → 580 ms (Express), 650 ms (Fastify, unchanged) and
+  the 0.29 CPU cold starts 1,909 → 1,868 / 2,028 → 1,951 / 2,204 → 2,238 ms:
+  within the runner's noise for Fastify.
+- Evaluated, not used: Node's compile cache (`NODE_COMPILE_CACHE`) made no
+  difference (it caches 12 KiB here, and a new function instance starts with
+  an empty directory); the Wasm module is already compiled once and shared with
+  every Worker. Fastify's own `require` and schema compiler take about 150 ms of
+  the main thread; each Worker compiles `program.cjs` again (about 25 ms).
 
 ## Big numbers without GMP
 

@@ -382,15 +382,22 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
       const modularizeSettings = settings.serialize();
       saveText('settings.json', modularizeSettings);
       const cwd = expandArguments([entry.cwd], values, platform)[0];
-      let wrapper = universalNewlines(execute(tool(entry.program), expandArguments(entry.args, values, platform),
-        { env, input: modularizeSettings, cwd, timeout, windowsHide: true, maxBuffer: 512 * 1024 * 1024,
-          stdio: ['pipe', 'pipe', stdio[2]], encoding: 'utf8' }));
-      if (entry.minify) {
-        const source = paths.join(temp, 'modularize.js'), minified = paths.join(temp, 'modularize.min.js');
-        writeFileSync(source, wrapper);
-        run(entry.program, expandArguments(entry.minify, { ...values, js: source, 'js-out': minified }, platform));
-        wrapper = readFileSync(minified, 'utf8');
-        saveFile('--minify-whitespace.js', minified);
+      // The (minified) wrapper is a function of the settings and the pinned
+      // Emscripten: reused by content like the other JavaScript steps.
+      const wrapperKey = steps_ && steps_.key({ kind: 'modularize', program: entry.program, args: [entry.args, entry.minify ?? null] }, modularizeSettings);
+      let wrapper = wrapperKey ? steps_.get(wrapperKey) : undefined;
+      if (wrapper === undefined) {
+        wrapper = universalNewlines(execute(tool(entry.program), expandArguments(entry.args, values, platform),
+          { env, input: modularizeSettings, cwd, timeout, windowsHide: true, maxBuffer: 512 * 1024 * 1024,
+            stdio: ['pipe', 'pipe', stdio[2]], encoding: 'utf8' }));
+        if (entry.minify) {
+          const source = paths.join(temp, 'modularize.js'), minified = paths.join(temp, 'modularize.min.js');
+          writeFileSync(source, wrapper);
+          run(entry.program, expandArguments(entry.minify, { ...values, js: source, 'js-out': minified }, platform));
+          wrapper = readFileSync(minified, 'utf8');
+          saveFile('--minify-whitespace.js', minified);
+        }
+        if (wrapperKey) steps_.set(wrapperKey, wrapper);
       }
       const pattern = '"<<< INNER_JS_CODE >>>"';
       if (!wrapper.includes(pattern)) throw new Error(`expected to find pattern in input JS: ${pattern}`);

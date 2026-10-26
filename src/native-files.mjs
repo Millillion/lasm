@@ -3,6 +3,7 @@ import { existsSync, constants, statSync, fstatSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { homedir, tmpdir, userInfo } from 'node:os';
 import { callNativeFile } from './native-file-worker-pool.mjs';
+import { readlink as readlinkAsync } from 'node:fs/promises';
 
 // Only the Node host loads this private adapter. No Lean declaration or user
 // annotation depends on the FFI library, and no native compiler runs on install.
@@ -635,7 +636,15 @@ export function nativeFiles({ synchronous = false } = {}) {
     async getLine(file) { return buffer(await callNativeFile('getLine', [reference(file)])); },
     async readDirectory(path) { return (await callNativeFile('readDirectory', [path])).map(buffer); },
     async realPath(path) { return buffer(await callNativeFile('realPath', [path])); },
-    async readDirectoryName(path) { return buffer(await callNativeFile('readDirectoryName', [path])); },
+    // /proc/self/fd links never block: libuv's readlink, without a native file worker.
+    async readDirectoryName(path) {
+      if (process.platform === 'linux') {
+        const name = await readlinkAsync(path, { encoding: 'buffer' }).catch(error => { throw fromNodeError(error); });
+        if (name.length >= 4096) throw failure(ffi.os.errno.ERANGE);
+        return name;
+      }
+      return buffer(await callNativeFile('readDirectoryName', [path]));
+    },
     removeFile(path) { return callNativeFile('removeFile', [path]); },
     groupInfo(gid) { return callNativeFile('groupInfo', [gid]); },
     checkDirectorySearch(path) { return callNativeFile('checkDirectorySearch', [path]); },

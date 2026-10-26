@@ -154,7 +154,7 @@ test('the fullstack template: shared, server and client modules; Node and Worker
       'lean-toolchain', 'package.json', 'public/style.css', 'wrangler.toml']);
     const read = file => readFileSync(join(directory, file), 'utf8');
     const pkg = JSON.parse(read('package.json'));
-    assert.equal(pkg.scripts.dev, 'lasm dev Server.lean --client Client.lean');
+    assert.equal(pkg.scripts.dev, 'lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client');
     assert.equal(pkg.scripts['build:client'], 'lasm build Client.lean --target browser --output dist/public/client');
     assert.equal(pkg.scripts.start, 'node dist/server/main.mjs');
     assert.match(pkg.scripts["build:workers"], /lasm build Server\.lean --target workers --output dist\/server$/);
