@@ -257,13 +257,18 @@ end
 /-- One frame: the patch from the live tree to the current view (empty if the
 model did not change). -/
 def frame (c : Ctx Flags Model Msg) : IO ByteArray := do
-  let s ← c.ref.get
-  if !s.dirty then
-    c.ref.set { s with scheduled := false, touched := #[] }
+  -- Take the live tree out of the state (holding no other reference to it),
+  -- so the diff owns it and Lean reuses its memory for the new tree.
+  let (dirty, live, model, next, touched) ← c.ref.modifyGet fun s =>
+    ((s.dirty, s.live, s.model, s.next, s.touched), { s with live := [], touched := #[] })
+  if !dirty then
+    c.ref.modify fun s => { s with live, scheduled := false }
     return .empty
-  let r := diff s.live [c.app.view s.model] s.next
-  let (bytes, tables) := Encode.frame s.tables (r.ops ++ resync r.live s.touched)
-  c.ref.set { s with live := r.live, next := r.next, tables, dirty := false, scheduled := false, touched := #[] }
+  let r := diff live [c.app.view model] next
+  let extra := resync r.live touched
+  let tables ← c.ref.modifyGet fun s => (s.tables, { s with tables := {} })
+  let (bytes, tables) := Encode.frame tables (r.ops ++ extra)
+  c.ref.modify fun s => { s with live := r.live, next := r.next, tables, dirty := false, scheduled := false }
   return bytes
 
 /-- An event from the applier: the ids from the root to the target, the event

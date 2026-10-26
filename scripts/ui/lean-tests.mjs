@@ -57,6 +57,7 @@ try {
     }
     return theorems.join(', ') + ': only propext, Classical.choice, Quot.sound';
   });
+  check('html!, the DSL, render and URLs (test/ui/SyntaxTest.lean)', () => { run(['test/ui/SyntaxTest.lean']); return ''; });
   check('diff against the DOM model (test/ui/DiffModel.lean)', () => run(['--run', 'test/ui/DiffModel.lean']).trim().split('\n').join('; '));
   check('applier fixtures are current (test/ui/Fixtures.lean)', () => {
     const fixtures = run(['--run', 'test/ui/Fixtures.lean']);

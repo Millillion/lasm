@@ -78,7 +78,6 @@ def jsxName : Parser :=
 @[combinator_parenthesizer jsxName] def jsxName.parenthesizer : PrettyPrinter.Parenthesizer := pure ()
 
 declare_syntax_cat jsxElement
-declare_syntax_cat jsxChild
 declare_syntax_cat jsxAttr
 
 syntax jsxAttrVal := str <|> group("{" term "}")
@@ -87,11 +86,15 @@ syntax (name := attrSplice) "{" term "}" : jsxAttr
 syntax (name := attrFlag) jsxName : jsxAttr
 
 syntax (name := selfClosing) "<" jsxName jsxAttr* "/>" : jsxElement
+
+-- Children are ordered alternatives, not a syntax category: a category first
+-- reads a token, and text may start with a character no token starts with.
+syntax childText := jsxText
+syntax childTerm := "{" term "}"
+syntax childElement := jsxElement
+syntax jsxChild := childText <|> childTerm <|> childElement
 syntax (name := withChildren) "<" jsxName jsxAttr* ">" jsxChild* "</" jsxName ">" : jsxElement
 
-syntax (name := childText) jsxText : jsxChild
-syntax (name := childTerm) "{" term "}" : jsxChild
-syntax (name := childElement) jsxElement : jsxChild
 
 /-- JSX-like markup for `Html Msg` (see `Lasm.UI.Syntax`). -/
 syntax (name := htmlTerm) "html!" jsxElement : term
@@ -246,7 +249,7 @@ def expandAttr (a : Syntax) : MacroM (Option Term × Option Term) := do
       | s@(.node _ `str _) => some ⟨s⟩
       | _ => none
     let termVal? : Option Term := match v.raw[0] with
-      | .node _ _ #[_, t, _] => if t.getKind == `str then none else some ⟨t⟩
+      | .node _ _ #[_, t, _] => some ⟨t⟩
       | _ => none
     let termVal? := if strVal?.isSome then none else termVal?
     if name == "key" then
@@ -348,7 +351,7 @@ partial def expandElement (ns : Ns) (e : Syntax) : MacroM Term := do
     let lead := spaceAfter prev
     if let some t ← expandChild childNs lead c then childTerms := childTerms.push t
     prev := c
-  if !children.isEmpty && !(children.back!.getKind == ``childText) && spaceAfter prev then
+  if !children.isEmpty && !(children.back![0].getKind == ``childText) && spaceAfter prev then
     childTerms := childTerms.push (← `([Lasm.UI.Html.text " "]))
   let attrList ← concatLists attrTerms
   let childList ← concatLists childTerms
@@ -360,16 +363,17 @@ partial def expandElement (ns : Ns) (e : Syntax) : MacroM Term := do
 /-- One child; `lead`: a same-line space precedes it. -/
 partial def expandChild (ns : Ns) (lead : Bool) (c : Syntax) : MacroM (Option Term) := do
   let space (t : Term) : MacroM Term := if lead then `([Lasm.UI.Html.text " "] ++ $t) else pure t
+  let c := c[0]
   match c with
-  | `(jsxChild| $t:jsxText) =>
+  | `(childText| $t:jsxText) =>
     let raw := (if lead then " " else "") ++ nameOf t
     -- Whitespace-only text spanning lines is layout, not content.
     if raw.all Char.isWhitespace && raw.contains '\n' then return none
     let s := decodeEntities (jsxWhitespace raw)
     if s.isEmpty then return none
     return some (← `([Lasm.UI.Html.text $(quote s)]))
-  | `(jsxChild| { $t:term }) => return some (← space (← `(lasm_children% $t)))
-  | `(jsxChild| $e:jsxElement) =>
+  | `(childTerm| { $t:term }) => return some (← space (← `(lasm_children% $t)))
+  | `(childElement| $e:jsxElement) =>
     let el ← expandElement ns e
     if lead then return some (← `([Lasm.UI.Html.text " ", $el])) else return some (← `([$el]))
   | _ => Macro.throwErrorAt c "unsupported child"
