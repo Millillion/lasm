@@ -7,7 +7,7 @@ name: UI
 on:
   workflow_dispatch:
   push:
-    branches: [browser, browser-ui]
+    branches: [browser, browser-ui, launch]
     paths:
       - '.github/workflows/ui.yml'
       - 'library/**'

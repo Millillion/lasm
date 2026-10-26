@@ -15,7 +15,7 @@ on:
         default: ''
   workflow_call:
   push:
-    branches: [wasi]
+    branches: [wasi, launch]
     paths:
       - '.github/workflows/wasi.yml'
       - 'src/wasi/**'

@@ -14,7 +14,7 @@ on:
     inputs:
       release-check: { type: boolean, default: false }
   push:
-    branches: [phase-7]
+    branches: [phase-7, launch]
     paths:
       - '.github/workflows/workers.yml'
       - '.github/workflows/edge-runtime.yml'
