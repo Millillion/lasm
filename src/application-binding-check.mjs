@@ -110,7 +110,7 @@ export function checkBindingsAsync(project, bindings, { cache, identity } = {}) 
   if (record) try { const saved = JSON.parse(readFileSync(record, 'utf8')); if (Array.isArray(saved)) return Promise.resolve(saved); } catch { /* not recorded */ }
   const [command, args] = evalCommand(checker, [project]);
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { cwd: project, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    const child = spawn(command, args, { cwd: project, env: { ...process.env, LASM_BINDING_PROJECT: project }, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
     let stdout = '', stderr = '';
     const timer = setTimeout(() => child.kill(), 120_000);
     child.stdout.setEncoding('utf8').on('data', chunk => { stdout += chunk; });
