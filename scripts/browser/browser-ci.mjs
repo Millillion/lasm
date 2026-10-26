@@ -116,7 +116,9 @@ async function platform(server, name, manifest) {
     const pad = await page.$('#app #pad');
     const box = await pad.boundingBox();
     await page.mouse.move(box.x + 10, box.y + 20); await page.mouse.down(); await page.mouse.up();
-    expect(name, 'events.pointer', (await text('#pointer')) === '10,20,0', await text('#pointer'));
+    // Within a pixel: element boxes can sit at fractional positions.
+    const [px, py, pb] = (await text('#pointer')).split(',').map(Number);
+    expect(name, 'events.pointer', Math.abs(px - 10) <= 1 && Math.abs(py - 20) <= 1 && pb === 0, await text('#pointer'));
     await page.fill('#fixture-form input[name=name]', 'Ada');
     await page.click('#submit');
     expect(name, 'events.form-submit', (await text('#submitted')) === 'name=Ada, lang=Lean' && page.url().endsWith(`/${name}/`), `${await text('#submitted')} ${page.url()}`);
@@ -141,13 +143,14 @@ async function platform(server, name, manifest) {
       const app = await loader.mount('#second', { flags: 'platform' });
       await new Promise(resolve => { const t = setInterval(() => { if (document.querySelector('#second #done')) { clearInterval(t); resolve(); } }, 20); });
       const summary = document.querySelector('#second #done').textContent;
+      const failed = JSON.parse(document.querySelector('#second #results').textContent).filter(r => !r.ok);
       const first = loader.appOf(document.getElementById('app'));
       app.unmount();
-      return { summary, cleared: document.getElementById('second').childNodes.length === 0, unmountHandler: window.lasmUnmounted === true,
+      return { summary, failed, cleared: document.getElementById('second').childNodes.length === 0, unmountHandler: window.lasmUnmounted === true,
         stopped: app.stopped, firstAlive: !first.stopped };
     }, entry);
     const [passed, total] = second.summary.split('/').map(Number);
-    expect(name, 'app.second-instance', passed === total && total === results.length, second.summary);
+    expect(name, 'app.second-instance', passed === total && total === results.length, `${second.summary} ${JSON.stringify(second.failed)}`);
     expect(name, 'app.unmount', second.cleared && second.unmountHandler && second.stopped && second.firstAlive, JSON.stringify(second));
     await page.click('#app #click-me');
     expect(name, 'app.first-unaffected', (await text('#click-count')) === '3', await text('#click-count'));

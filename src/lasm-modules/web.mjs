@@ -111,6 +111,7 @@ function requestInit(init) {
   if (typeof init.keepalive === 'boolean') result.keepalive = init.keepalive;
   if (Array.isArray(init.headers)) result.headers = pairs(init.headers);
   if (init.body !== undefined && init.body !== null) result.body = init.body;
+  else if (init.json !== undefined) result.body = JSON.stringify(init.json);
   if (init.signal) result.signal = init.signal;
   return result;
 }

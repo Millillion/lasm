@@ -263,7 +263,7 @@ const workerName = directory => {
 
 // Inputs of the linked edge program besides the Node build: the edge link and
 // its glue. The host modules (edge-*.mjs) are copied at delivery, not linked.
-const linkSources = ['edge-link.mjs', 'edge-pre.js', 'edge-library.js', 'lasm_js_edge.c',
+const linkSources = ['edge-link.mjs', 'edge-initializers.mjs', 'edge-pre.js', 'edge-library.js', 'lasm_js_edge.c',
   ...['recipe-emscripten-6.0.9-edge.json', 'link.mjs', 'glue.mjs', 'settings.mjs', 'metadata.mjs', 'wasm.mjs', 'python.mjs'].map(file => '../link-driver/' + file)];
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 
@@ -303,7 +303,9 @@ export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, ver
   catch (error) { rmSync(staging, { recursive: true, force: true }); throw error; }
   copyFileSync(link.program, join(staging, 'program.mjs'));
   copyFileSync(link.wasm, join(staging, 'program.wasm'));
-  rmSync(join(staging, '.link'), { recursive: true, force: true });
+  // LASM_KEEP_LINK_WORK keeps the link's intermediates (its -Map file, for size analysis).
+  if (process.env.LASM_KEEP_LINK_WORK) renameSync(join(staging, '.link'), join(staging, 'link-work'));
+  else rmSync(join(staging, '.link'), { recursive: true, force: true });
   const meta = { key, suspend: link.suspend, files: Object.fromEntries(['program.mjs', 'program.wasm'].map(file => [file, sha256(readFileSync(join(staging, file)))])) };
   writeFileSync(join(staging, 'program.json'), JSON.stringify(meta, null, 2) + '\n');
   // One cached program per application: older keys are superseded.

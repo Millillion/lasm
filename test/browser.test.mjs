@@ -214,3 +214,16 @@ test('every lasm:web and lasm:app binding of Lasm.Web names an export', async ()
   }
   assert.ok(count > 80, `${count} bindings`);
 });
+
+test('compact initializers: kept units run once, in the original chain order', async () => {
+  const { initializationSchedule, compactInitializerWrappers } = await import('../src/edge/edge-initializers.mjs');
+  // initialize_Main -> A (skipped) -> [K1 (kept), B (skipped) -> K2 (kept)], K2 -> K1
+  const calls = { initialize_Main: ['initialize_A'], initialize_A: ['initialize_K1', 'initialize_B'], initialize_B: ['initialize_K2'],
+    initialize_K2: ['initialize_K1'], initialize_K1: [] };
+  const keep = new Set(['initialize_Main', 'initialize_K1', 'initialize_K2']);
+  assert.deepEqual(initializationSchedule('initialize_Main', calls, keep), ['initialize_K1', 'initialize_K2']);
+  const c = compactInitializerWrappers({ schema: 1, closure: Object.keys(calls), keep: [...keep], calls });
+  assert.match(c, /__wrap_initialize_A\(uint8_t\) __attribute__\(\(alias\("lasm_initializer_skip"\)\)\);/);
+  assert.match(c, /res = __wrap_initialize_K1\(builtin\);[^\n]*\n  res = __wrap_initialize_K2\(builtin\);[^\n]*\n  return __real_initialize_Main\(builtin\);/);
+  assert.throws(() => compactInitializerWrappers({ schema: 1, closure: ['bad name'], keep: [], calls: {} }), /Unexpected initializer name/);
+});

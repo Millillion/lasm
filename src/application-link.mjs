@@ -458,6 +458,11 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
         return (await probeLink(args, map, join(work, `initializers-${id}.rsp`))).live;
       } });
     if (plan?.skipped.length && !plan.shared.length) {
+      // The plan itself, for links that regenerate the wrappers from it (the
+      // edge and browser link's compact form: src/edge/edge-initializers.mjs).
+      const inPlan = new Set(plan.closure);
+      await writeFile(join(work, 'initialization-plan.json'), JSON.stringify({ schema: 1, closure: plan.closure, keep: [...plan.keep],
+        calls: Object.fromEntries(plan.closure.map(name => [name, plan.units.get(name).calls.filter(call => inPlan.has(call))])) }) + '\n');
       const planned = initializerWrappers(plan.units, plan.closure, { keep: plan.keep, parts: initializerWrapperParts });
       planInputs.push(...await writeWrappers(planned), ...plan.wrap); planWrap.push(...plan.wrap);
       // The requirements check repeats the last planning round's link (the same

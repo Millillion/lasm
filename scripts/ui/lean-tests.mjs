@@ -1,6 +1,8 @@
 // Lasm.UI's Lean checks, run natively with the managed Lean (no Wasm build):
-//   - assembling the Lean prefix compiles Lasm's library, so Lasm.UI, its
-//     proofs (Lasm.UI.Proofs) and every other module must elaborate;
+//   - assembling the Lean prefix compiles Lasm's library, so Lasm.UI and every
+//     other module must elaborate;
+//   - library/Lasm/UI/Proofs*: the proofs compile, with no `sorry`, and the main
+//     theorems use only Lean's standard axioms;
 //   - test/ui/DiffModel.lean: random diffs checked against the DOM model;
 //   - test/ui/Fixtures.lean: the applier test's patch fixtures must be current
 //     (--fixtures rewrites test/fixtures/ui/patches.json);
@@ -8,7 +10,7 @@
 //     no `sorry`.
 //   node scripts/ui/lean-tests.mjs [--fixtures]
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -23,7 +25,7 @@ try {
   writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v4.35.0\n');
   const started = Date.now();
   const lean = await provisionLean(join(work, 'Main.lean'), { modules: 'extended', progress: ({ stage }) => stage && console.error(`[lean] ${stage}`) });
-  console.log(`Lean prefix with Lasm's library (Lasm.UI and its proofs compiled): ${((Date.now() - started) / 1000).toFixed(1)} s`);
+  console.log(`Lean prefix with Lasm's library (Lasm.UI compiled): ${((Date.now() - started) / 1000).toFixed(1)} s`);
   const env = { ...process.env };
   for (const key of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(key)) delete env[key];
   const leanPath = extra => [...extra, join(lean.prefix, 'lib', 'lean')].join(process.platform === 'win32' ? ';' : ':');
@@ -34,6 +36,27 @@ try {
     try { const detail = fn(); console.log(`ok   ${name} (${((Date.now() - t) / 1000).toFixed(1)} s)${detail ? ': ' + detail : ''}`); }
     catch (error) { failures.push(name); console.log(`FAIL ${name}\n${error.stdout ?? ''}${error.stderr ?? ''}${error.stdout || error.stderr ? '' : error.message}`); }
   };
+  check('proofs (library/Lasm/UI/Proofs*)', () => {
+    const out = join(work, 'proofs');
+    // Lean takes a module's package (Lasm) from the first search path that has
+    // it, so the library's compiled modules go beside the proofs.
+    cpSync(join(lean.prefix, 'lib', 'lean', 'Lasm'), join(out, 'Lasm'), { recursive: true });
+    mkdirSync(join(out, 'Lasm', 'UI', 'Proofs'), { recursive: true });
+    let log = '';
+    for (const m of ['Basic', 'Lists', 'Children', 'TwoEnded', 'Diff'])
+      log += run(['-R', join(root, 'library'), '-o', join(out, 'Lasm/UI/Proofs', m + '.olean'), join(root, 'library/Lasm/UI/Proofs', m + '.lean')], [out]);
+    log += run(['-R', join(root, 'library'), '-o', join(out, 'Lasm/UI/Proofs.olean'), join(root, 'library/Lasm/UI/Proofs.lean')], [out]);
+    if (/declaration uses `sorry`|error:/.test(log)) throw Object.assign(new Error('sorry or error'), { stdout: log });
+    const theorems = ['diff_correct', 'mount_correct', 'session_correct', 'diffAttrs_correct'];
+    writeFileSync(join(out, 'Axioms.lean'), 'import Lasm.UI.Proofs\n' + theorems.map(t => `#print axioms Lasm.UI.Proofs.${t}\n`).join(''));
+    const axioms = run([join(out, 'Axioms.lean')], [out]);
+    if (/sorryAx/.test(axioms) || !/depends on axioms/.test(axioms)) throw Object.assign(new Error('unexpected axioms'), { stdout: axioms });
+    for (const line of axioms.trim().split('\n')) {
+      const list = line.match(/\[(.*)\]/)?.[1].split(',').map(x => x.trim()) ?? [];
+      for (const a of list) if (!['propext', 'Classical.choice', 'Quot.sound'].includes(a)) throw Object.assign(new Error(`axiom ${a}`), { stdout: axioms });
+    }
+    return theorems.join(', ') + ': only propext, Classical.choice, Quot.sound';
+  });
   check('diff against the DOM model (test/ui/DiffModel.lean)', () => run(['--run', 'test/ui/DiffModel.lean']).trim().split('\n').join('; '));
   check('applier fixtures are current (test/ui/Fixtures.lean)', () => {
     const fixtures = run(['--run', 'test/ui/Fixtures.lean']);
