@@ -1,28 +1,36 @@
 /-
-A counter written in Lean, running in the browser: `lasm build Main.lean
---target browser` compiles it to WebAssembly with a small loader (dist/).
-The browser mounts it on `<div data-lasm-app>`; `App.root` is that element.
+A counter written in Lean with Lasm.UI (the Elm architecture), running in the
+browser. `update` and `view` are pure functions: Lasm.UI diffs each new view
+in Lean and applies one patch per frame. `lasm build Main.lean --target
+browser` compiles it to WebAssembly with a small loader (dist/); the page
+mounts it on `<main data-lasm-app>`.
 -/
-import Lasm.Web
+import Lasm.UI
 import App
-open Lasm.Web
+open Lasm.UI
 
-def main : IO Unit := do
-  let root ← App.root
-  let count ← IO.mkRef (0 : Int)
-  let title ← createElement "h1"
-  title.setTextContent (App.greet "Lean")
-  let label ← createElement "output"
-  label.setTextContent "0"
-  let button (text : String) (change : Int → Int) : IO Element := do
-    let b ← createElement "button"
-    b.setTextContent text
-    discard <| b.on "click" fun _ => do
-      count.modify change
-      label.setTextContent (toString (← count.get))
-    return b
-  let minus ← button "−" (· - 1)
-  let plus ← button "+" (· + 1)
-  let row ← createElement "p"
-  row.append #[minus, label, plus]
-  root.append #[title, row]
+inductive Msg where
+  | increment
+  | decrement
+  | reset
+
+def update : Msg → Int → Int
+  | .increment, n => n + 1
+  | .decrement, n => n - 1
+  | .reset, _ => 0
+
+def view (n : Int) : Html Msg :=
+  html! <section class="counter">
+          <h1>{App.greet "Lean"}</h1>
+          <p>
+            <button id="dec" onClick={Msg.decrement}>-</button>
+            <output id="count">{n}</output>
+            <button id="inc" onClick={Msg.increment}>+</button>
+          </p>
+          <button id="reset" onClick={Msg.reset} disabled={n == 0}>Reset</button>
+        </section>
+
+-- Properties of `update` are theorems Lean checks, for every model.
+theorem update_reset (n : Int) : update .reset n = 0 := rfl
+
+def main : IO Unit := (App.sandbox 0 update view).run

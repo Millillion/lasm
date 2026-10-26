@@ -48,7 +48,7 @@ export const templates = {
   hono: { summary: 'Hono on @hono/node-server with Lean request handlers (Lasm.JS)', server: true, interop: true, portable: true },
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
   // The browser (docs/BROWSER.md): a static web app, built with --target browser.
-  web: { summary: 'a browser app in Lean (Lasm.Web): a counter', server: false, interop: true, browser: true },
+  web: { summary: 'a browser app in Lean (Lasm.UI): a counter', server: false, interop: true, browser: true },
 };
 
 export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}] [--deploy TARGET]…
@@ -206,14 +206,14 @@ Files:
 
 | File | What it is |
 | --- | --- |
-| \`Main.lean\` | The app: it builds the page with \`Lasm.Web\` (the DOM, events). |
+| \`Main.lean\` | The app: \`update\` and \`view\` with \`Lasm.UI\` (\`html!\` markup, the Elm architecture); \`Lasm.Web\` has the rest of the web platform. |
 | \`App.lean\` | Pure Lean logic used by \`Main.lean\`. |
 | \`index.html\`, \`public/style.css\` | The page; \`lasm build\` adds the loader before \`</head>\`, and copies \`public/\` into \`dist/\`. |
 | \`lakefile.toml\`, \`lean-toolchain\` | The Lake project, pinned to Lean ${defaultLean()}. |
 | \`package.json\` | npm scripts, and Lasm (\`${lasm.name}\`) as a dev dependency. |
 
 \`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
-\`Lasm.Web\`, which only Lasm provides.
+\`Lasm.UI\`, which only Lasm provides. Guide: [Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md).
 
 ## Deploy
 

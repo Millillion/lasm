@@ -76,7 +76,9 @@ async function counter(server, name, manifest) {
     const [minus, plus] = await page.$$('button');
     for (let i = 0; i < 3; i++) await plus.click();
     await minus.click();
-    expect(name, 'counter.clicks', (await page.textContent('output')) === '2', await page.textContent('output'));
+    // Lasm.UI renders on the next animation frame.
+    const counted = await page.waitForFunction(() => document.querySelector('output')?.textContent === '2', null, { timeout: 5_000 }).then(() => true, () => false);
+    expect(name, 'counter.clicks', counted, await page.textContent('output'));
     const cold = await page.waitForFunction(() => window.__lasm.mounts?.[0], null, { timeout: 10_000 }).then(h => h.jsonValue());
     report.apps[name].sizes = await resourceSizes(page);
     // Warm start: the same page again, with the content-hashed files in the HTTP cache.

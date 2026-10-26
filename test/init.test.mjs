@@ -136,7 +136,7 @@ test('the web template: a static browser app built with --target browser', () =>
     assert.equal(pkg.scripts.build, 'lasm build Main.lean --target browser');
     assert.equal(pkg.scripts.dev, 'lasm dev Main.lean --target browser');
     assert.equal(pkg.dependencies, undefined);
-    assert.match(read('Main.lean'), /^import Lasm\.Web$/m);
+    assert.match(read('Main.lean'), /^import Lasm\.UI$/m);
     assert.match(read('index.html'), /data-lasm-app/);
     assert.match(read('index.html'), /<\/head>/);
     assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'web', '--deploy', 'workers']), /needs a server template/);

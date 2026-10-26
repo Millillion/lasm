@@ -70,7 +70,7 @@ const dev = join(work, 'counter-dev');
 cpSync(counter, dev, { recursive: true });
 build(dev, join(work, 'counter-dev-out'), ['--dev']);
 const main = join(dev, 'Main.lean');
-writeFileSync(main, readFileSync(main, 'utf8').replace('b.setTextContent text', 'b.setTextContent (text ++ "")'));
+writeFileSync(main, readFileSync(main, 'utf8').replace('>Reset<', '>Reset!<'));
 record.rebuild = { what: 'counter: edit one view expression, lasm build --dev --target browser', seconds: build(dev, join(work, 'counter-dev-out'), ['--dev']) };
 writeFileSync(join(out, 'build.json'), JSON.stringify(record, null, 2) + '\n');
 console.log(JSON.stringify(record, (key, value) => key === 'files' ? undefined : value, 2));
