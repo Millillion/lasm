@@ -29,7 +29,7 @@ const engineList = option('--engines');
 const [workArg, toolsArg] = argv;
 if (!workArg || !toolsArg) { console.error('Usage: node scripts/wasi/wasi-ci.mjs WORK TOOLS [--engines …]'); process.exit(2); }
 const work = resolve(workArg), tools = resolve(toolsArg);
-const engines = new Set((engineList ?? 'wasmtime,wasmer,node,spin,viceroy,lasm-node,deno').split(','));
+const engines = new Set((engineList ?? 'wasmtime,wasmer,node,spin,viceroy,lasm-node,deno,component').split(','));
 mkdirSync(work, { recursive: true });
 const results = { started: new Date().toISOString(), host: `${process.platform}-${process.arch}`, node: process.version, tools: {}, builds: {}, cli: {}, fetch: {}, failures: [] };
 const save = () => writeFileSync(join(work, 'wasi-results.json'), JSON.stringify(results, null, 2) + '\n');
@@ -62,6 +62,20 @@ Object.assign(results.builds['cli-wasi'], sizes(join(cli, 'wasi/main.wasm')));
 lasm(fetchApp, ['build', 'Main.lean', '--target', 'wasi'], 'fetch-wasi');
 Object.assign(results.builds['fetch-wasi'], sizes(join(fetchApp, 'wasi/main.wasm')));
 lasm(fetchApp, ['build', 'Main.lean', '--target', 'fastly'], 'fetch-fastly');
+lasm(fetchApp, ['build', 'Main.lean', '--target', 'wasi-http'], 'fetch-wasi-http');
+Object.assign(results.builds['fetch-wasi-http'], sizes(join(fetchApp, 'wasi-http/main.wasm')));
+// The shipped component template must still be what wasm-tools makes, and the
+// build must equal wasm-tools' own component (scripts/wasi/make-component-template.mjs).
+if (engines.has('component')) {
+  const { extractCore } = await import(join(root, 'src/wasi/wasi-component.mjs'));
+  const coreFile = join(work, 'fetch-core.wasm');
+  writeFileSync(coreFile, extractCore(readFileSync(join(fetchApp, 'wasi-http/main.wasm'))));
+  try {
+    execFileSync(process.execPath, [join(root, 'scripts/wasi/make-component-template.mjs'), '--wasm-tools', join(tools, 'wasm-tools/wasm-tools'),
+      '--adapter', join(tools, 'adapter/wasi_snapshot_preview1.proxy.wasm'), coreFile, '--check', join(fetchApp, 'wasi-http/main.wasm')], { stdio: 'inherit' });
+    results.builds['fetch-wasi-http'].matchesWasmTools = true;
+  } catch (error) { fail('component template', error); }
+}
 Object.assign(results.builds['fetch-fastly'], sizes(join(fetchApp, 'bin/main.wasm')), { package: statSync(join(fetchApp, 'pkg/lasm-fetch-example.tar.gz')).size });
 // An unchanged second build reuses the cached program.
 lasm(fetchApp, ['build', 'Main.lean', '--target', 'wasi'], 'fetch-wasi-cached');
@@ -152,7 +166,7 @@ const routes = [
   { path: '/asleep/50', json: { sum: 16, waited: true } },
   { path: '/sleep/30', json: { slept: true } },
   { path: '/tasks', json: { total: 140 } },
-  { path: '/env/GREETING', json: { value: 'hello from the host' }, skip: ['viceroy'] },
+  { path: '/env/GREETING', json: { value: 'hello from the host' }, skip: ['viceroy', 'wasmtime-serve', 'spin'] },
   { path: '/time', json: { mono: true, random: 8 } },
   { path: '/throw', status: 500, text: 'Internal Server Error\n' },
   { path: '/nope', status: 404, text: 'Not Found\n' },
@@ -161,10 +175,10 @@ const routes = [
   { path: `/outbound-parallel?url=${encodeURIComponent(origin + '/origin/slow')}`, outbound: true,
     check: body => { const r = JSON.parse(body); assert.deepEqual(r.statuses, [200, 200, 200]); assert.ok(r.ms < 400, `three 150 ms requests took ${r.ms} ms`); } },
   { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}&backend=origin`, json: { status: 200, body: 'POST:ping', echoed: 'POST' }, only: ['viceroy'] },
-  { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}`, status: 500, text: 'Internal Server Error\n', only: ['cgi-wasmtime', 'cgi-wasmer', 'cgi-node', 'spin'] },
+  { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}`, status: 500, text: 'Internal Server Error\n', only: ['cgi-wasmtime', 'cgi-wasmer', 'cgi-node', 'spin-wagi'] },
 ];
 const applies = (host, route) => !(route.skip?.includes(host) || route.only && !route.only.includes(host)
-  || route.outbound && ['cgi-wasmtime', 'cgi-wasmer', 'cgi-node', 'spin'].includes(host));
+  || route.outbound && ['cgi-wasmtime', 'cgi-wasmer', 'cgi-node', 'spin-wagi'].includes(host));
 function checkResponse(host, route, { status, headers, body }) {
   const where = `${host} ${route.method ?? 'GET'} ${route.path}`;
   assert.equal(status, route.status ?? 200, `${where}: status ${status}\n${new TextDecoder().decode(body).slice(0, 2000)}`);
@@ -175,7 +189,7 @@ function checkResponse(host, route, { status, headers, body }) {
   if (route.type) assert.match(headers.get('content-type') ?? '', route.type, `${where}: content-type`);
   for (const [k, v] of Object.entries(route.reply ?? {})) assert.equal(headers.get(k), v, `${where}: header ${k}`);
   // Spin's wagi executor keeps one value per header name (crates/http/src/wagi).
-  if (route.cookies) assert.equal(headers.getSetCookie().length, host === 'spin' ? 1 : route.cookies, `${where}: set-cookie`);
+  if (route.cookies) assert.equal(headers.getSetCookie().length, host === 'spin-wagi' ? 1 : route.cookies, `${where}: set-cookie`);
 }
 
 // CGI under the three engines: one run per request.
@@ -260,7 +274,8 @@ async function serveAndCheck(name, command, args, { cwd, port, env = {}, skipHea
   }
 }
 if (engines.has('spin')) {
-  writeFileSync(join(fetchApp, 'spin.toml'), `spin_manifest_version = 2
+  // Spin's HTTP trigger with the wasi-http component, and its wagi executor with the CGI build.
+  const spinToml = (source, executor) => `spin_manifest_version = 2
 
 [application]
 name = "lasm-fetch"
@@ -269,14 +284,19 @@ version = "0.1.0"
 [[trigger.http]]
 route = "/..."
 component = "lasm"
-executor = { type = "wagi" }
-
+${executor}
 [component.lasm]
-source = "wasi/main.wasm"
+source = "${source}"
 environment = { GREETING = "hello from the host" }
-`);
+allowed_outbound_hosts = ["${origin}"]
+`;
+  writeFileSync(join(fetchApp, 'spin.toml'), spinToml('wasi-http/main.wasm', ''));
   await serveAndCheck('spin', toolPath.spin, ['up', '--listen', '127.0.0.1:3101'], { cwd: fetchApp, port: 3101, env: { SPIN_HOME: join(work, 'spin-home') } });
+  writeFileSync(join(fetchApp, 'spin.toml'), spinToml('wasi/main.wasm', 'executor = { type = "wagi" }\n'));
+  await serveAndCheck('spin-wagi', toolPath.spin, ['up', '--listen', '127.0.0.1:3106'], { cwd: fetchApp, port: 3106, env: { SPIN_HOME: join(work, 'spin-home') } });
 }
+if (engines.has('wasmtime'))
+  await serveAndCheck('wasmtime-serve', toolPath.wasmtime, ['serve', '--addr', '127.0.0.1:3105', 'wasi-http/main.wasm'], { cwd: fetchApp, port: 3105 });
 if (engines.has('viceroy')) {
   // A named backend for FetchOptions.backend (Fastly services name theirs).
   writeFileSync(join(fetchApp, 'fastly.toml'), readFileSync(join(fetchApp, 'fastly.toml'), 'utf8')

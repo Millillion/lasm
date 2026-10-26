@@ -246,3 +246,30 @@ export function moduleImports(input) {
   }
   return result;
 }
+
+/** The module with only the exports `keep(name)` accepts (the rest become
+ * internal, for wasm-opt to remove when unused). */
+export function keepExports(input, keep) {
+  const bytes = input instanceof Uint8Array ? input : new Uint8Array(input);
+  const decoder = new TextDecoder();
+  const out = new Bytes();
+  out.append(bytes.subarray(0, 8));
+  for (const r = new Reader(bytes, 8); r.at < bytes.length;) {
+    const id = r.byte(), size = r.u32(), start = r.at, end = start + size;
+    if (id !== 7) { out.push(id, ...u32(size)); out.append(bytes.subarray(start, end)); r.at = end; continue; }
+    const kept = [];
+    for (let n = r.u32(); n--;) {
+      const nameStart = r.at, length = r.u32(), name = decoder.decode(r.slice(length));
+      r.byte(); r.u32();
+      if (keep(name)) kept.push(bytes.subarray(nameStart, r.at));
+    }
+    const body = new Bytes();
+    body.push(...u32(kept.length));
+    for (const k of kept) body.append(k);
+    const result = body.result();
+    out.push(7, ...u32(result.length));
+    out.append(result);
+    r.at = end;
+  }
+  return out.result();
+}

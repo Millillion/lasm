@@ -165,7 +165,8 @@ def bodyless (method : String) (status : UInt16) : Bool :=
   method == "HEAD" || status == 101 || status == 204 || status == 205 || status == 304
 
 /-- Where the program runs: 0 a JavaScript host (Node, edge isolates, Bun,
-Deno: Lasm.JS), 1 WASI (CGI), 2 Fastly Compute, 3 a native Lean build. -/
+Deno: Lasm.JS), 1 WASI (CGI), 2 Fastly Compute, 3 a native Lean build,
+4 a wasi-http component (`wasmtime serve`, Spin). -/
 @[extern "lasm_fetch_platform"] opaque platformCode : Unit → UInt32
 /-- WASI and Fastly: this run's request (method, URL, headers, body). -/
 @[extern "lasm_fetch_take_request"] private opaque takeRequest : IO (String × String × Array (String × String) × ByteArray)
@@ -306,11 +307,12 @@ completely. Redirects are returned, not followed, on every platform.
 - Node, edge isolates, Bun, Deno: the platform's `fetch`.
 - Fastly Compute: a backend request (`FetchOptions.backend`, else a dynamic
   backend for the URL's host).
+- wasi-http (`--target wasi-http`): wasi:http/outgoing-handler.
 - WASI (`--target wasi`): unavailable, since WASI preview 1 has no sockets. -/
 def fetch (req : Request) (options : FetchOptions := {}) : Async Response := do
   match platformCode () with
   | 0 => jsFetch req
-  | 2 =>
+  | 2 | 4 =>
     let p : IO.Promise (Except IO.Error ByteArray) ← IO.Promise.new
     fastlySend p req.method req.url req.headers req.body (options.backend.getD "")
     let bytes ← (EAsync.ofTask <| ExceptT.mk <| p.result?.map (sync := true) fun
@@ -345,7 +347,7 @@ platforms it publishes the handler and returns; on WASI and Fastly it answers
 this run's request and returns. -/
 def serve (handler : Handler) : IO Unit := do
   match platformCode () with
-  | 1 | 2 =>
+  | 1 | 2 | 4 =>
     let (method, url, headers, body) ← takeRequest
     let r ← Async.block (respond handler { method, url, headers, body })
     sendResponse r.status r.headers (if bodyless method r.status then .empty else r.body)

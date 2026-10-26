@@ -117,7 +117,8 @@ test('lasm init --template fetch --deploy fastly|wasi|spin', () => {
     assert.equal(pkg.scripts['start:spin'], 'spin up');
     assert.equal(pkg.dependencies, undefined);
     assert.match(readFileSync(join(parent, 'app/Main.lean'), 'utf8'), /import Lasm\.Fetch/);
-    assert.match(readFileSync(join(parent, 'app/spin.toml'), 'utf8'), /executor = \{ type = "wagi" \}/);
+    assert.match(readFileSync(join(parent, 'app/spin.toml'), 'utf8'), /source = "wasi-http\/main.wasm"/);
+    assert.equal(pkg.scripts['build:wasi-http'], 'lasm build Main.lean --target wasi-http');
     assert.match(readFileSync(join(parent, 'app/fastly.toml'), 'utf8'), /^name = "app"$/m);
     assert.match(readFileSync(join(parent, 'app/.gitignore'), 'utf8'), /^pkg\/$/m);
     assert.match(readFileSync(join(parent, 'app/README.md'), 'utf8'), /Fastly Compute/);
@@ -140,4 +141,18 @@ test('Lasm.Fetch is part of Lasm\'s Lean library', () => {
     assert.equal(importsLibrary([join(directory, 'Main.c')]), true);
     assert.equal(importsLibrary([join(directory, 'Other.c')]), false);
   } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('wasi-http: the component template splices a core module in and out', async () => {
+  const { componentize, extractCore, placeholderModule } = await import('../src/wasi/wasi-component.mjs');
+  const { keepExports } = await import('../src/wasi/lower-atomics.mjs');
+  const core = moduleWith(atomics);
+  const component = componentize(core);
+  assert.deepEqual(extractCore(component), core);
+  assert.throws(() => componentize(core, componentize(core)), /0 matching core modules/);
+  assert.equal(placeholderModule()[8], 0);
+  // keepExports keeps the named exports only.
+  const kept = keepExports(core, name => name === 'memory' || name === 'add');
+  const { instance } = await WebAssembly.instantiate(kept);
+  assert.deepEqual(Object.keys(instance.exports).sort(), ['add', 'memory']);
 });

@@ -974,13 +974,29 @@ extern int __main_argc_argv(int argc, char **argv);
 static void initialize_host(void) {
     read_vector(true, &env_entries, &env_count);
     read_vector(false, &arg_entries, &arg_count);
+    if (!arg_count) { /* hosts without arguments (wasi-http): a program name */
+        static char *program[] = { "main.wasm", NULL };
+        arg_entries = program; arg_count = 1;
+    }
     read_preopens();
     for (uint32_t fd = 0; fd < 3; fd++) { standard[fd].type = R_FILE; standard[fd].fd = fd; }
 }
 void lasm_fastly_initialize(void);
-__attribute__((export_name("_start"))) void _start(void) {
-    __wasm_call_ctors();
-    initialize_host();
-    lasm_fastly_initialize();
-    exit(__main_argc_argv((int)arg_count, arg_entries));
+/* Runs Lean's main once (the command's _start, or a wasi-http request). */
+int lasm_wasi_run_main(void) {
+    static bool initialized = false;
+    if (!initialized) {
+        initialized = true;
+        __wasm_call_ctors();
+        initialize_host();
+        lasm_fastly_initialize();
+    }
+    int code = __main_argc_argv((int)arg_count, arg_entries);
+    fflush(NULL);
+    return code;
 }
+#ifndef LASM_WASI_HTTP
+__attribute__((export_name("_start"))) void _start(void) {
+    exit(lasm_wasi_run_main());
+}
+#endif

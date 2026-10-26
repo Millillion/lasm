@@ -10,11 +10,11 @@ import { jsRuntime } from './js-runtime.mjs';
 export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy', 'supabase-edge'];
 // WASI targets (docs/WASI.md): a standard WASI module with no JavaScript; the
 // list equals src/wasi/wasi-build.mjs wasiTargets (test/wasi.test.mjs).
-export const wasiBuildTargets = ['wasi', 'fastly'];
+export const wasiBuildTargets = ['wasi', 'fastly', 'wasi-http'];
 export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly] [--dev]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http] [--dev]
        lasm init <directory> [--template plain|express|hono|std-http|fetch] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]

@@ -35,7 +35,8 @@ export const deployTargets = {
   // WASI targets (docs/WASI.md): a standard WASI module, no JavaScript.
   fastly: { summary: 'Fastly Compute (fastly.toml; npm run build:fastly, then fastly compute serve)', package: 'fastly', templates: ['fetch'] },
   wasi: { summary: 'a WASI module (npm run build:wasi writes wasi/main.wasm; wasmtime run --dir . wasi/main.wasm)', package: 'wasi', templates: ['fetch', 'plain'], cli: true },
-  spin: { summary: 'Fermyon Spin (spin.toml, wagi executor; npm run build:wasi, then spin up)', package: 'wasi', templates: ['fetch'] },
+  'wasi-http': { summary: 'a wasi-http component (npm run build:wasi-http writes wasi-http/main.wasm; wasmtime serve wasi-http/main.wasm)', package: 'wasi-http', templates: ['fetch'] },
+  spin: { summary: 'Fermyon Spin (spin.toml; npm run build:wasi-http, then spin up)', package: 'wasi-http', templates: ['fetch'] },
 };
 
 /** The Supabase function lasm build --target supabase-edge writes
@@ -293,9 +294,8 @@ const vercelEdgeJson = JSON.stringify({
 }, null, 2) + '\n';
 // Fastly Compute: `fastly compute build|serve|deploy` runs npm run build:fastly,
 // which writes bin/main.wasm (src/wasi/wasi-build.mjs fastlyToml).
-// Spin: the wagi executor runs the WASI build once per request (CGI).
-const spinToml = name => `# Fermyon Spin (Lasm): npm run build:wasi writes wasi/main.wasm; spin up serves it.
-# Lasm.Fetch answers one CGI request per run, as Spin's wagi executor expects.
+// Spin: its HTTP trigger runs the wasi-http component, one instance per request.
+const spinToml = name => `# Fermyon Spin (Lasm): npm run build:wasi-http writes wasi-http/main.wasm; spin up serves it.
 spin_manifest_version = 2
 
 [application]
@@ -305,13 +305,14 @@ version = "0.1.0"
 [[trigger.http]]
 route = "/..."
 component = "${name}"
-executor = { type = "wagi" }
 
 [component.${name}]
-source = "wasi/main.wasm"
+source = "wasi-http/main.wasm"
+# Hosts Lasm.Fetch.fetch may reach, for example ["https://api.example.com"].
+allowed_outbound_hosts = []
 
 [component.${name}.build]
-command = "npm run build:wasi"
+command = "npm run build:wasi-http"
 `;
 const netlifyEdgeToml = `# Netlify runs the build: lasm build --target netlify-edge writes the edge
 # function netlify/edge-functions/lasm.mjs, which serves every path.
@@ -336,7 +337,7 @@ function deployGitignore(deploy, template, name) {
   const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
     'vercel-edge': '.vercel/\napi/lasm.mjs\napi/_lasm/', 'netlify-edge': '.netlify/\nnetlify/lasm/\nnetlify/edge-functions/lasm.mjs', 'deno-deploy': 'deno/',
     'supabase-edge': `supabase/functions/${supabaseFunctionNameOf(name)}/\nsupabase/.temp/\nsupabase/.branches/`,
-    fastly: 'bin/\npkg/', wasi: 'wasi/', spin: 'wasi/\n.spin/' };
+    fastly: 'bin/\npkg/', wasi: 'wasi/', 'wasi-http': 'wasi-http/', spin: 'wasi-http/\n.spin/' };
   const portable = templates[template]?.portable ? ['bun/', 'deno/'] : [];
   return gitignore + [...new Set([...portable, ...deploy.map(target => extra[target]).filter(Boolean)])].map(line => line + '\n').join('');
 }
@@ -489,9 +490,13 @@ with \`fastly compute deploy\`. See the [Fastly guide](${guide('fastly')}).
 module with no JavaScript: \`wasmtime run --dir . wasi/main.wasm\`, \`wasmer run\`, or Node's \`node:wasi\`.
 A Lasm.Fetch handler answers one CGI request per run. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
 `,
-  spin: () => `**Fermyon Spin:** \`spin.toml\` serves \`wasi/main.wasm\` with Spin's wagi executor
-(one CGI request per run); \`spin build\` runs \`npm run build:wasi\`, then \`spin up\` serves on port 3000.
-See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+  'wasi-http': () => `**wasi-http:** \`npm run build:wasi-http\` writes \`wasi-http/main.wasm\`, a
+wasi:http/proxy component: \`wasmtime serve wasi-http/main.wasm\` serves it on port 8080, and any
+wasi-http host (Spin, wasmCloud, …) runs it. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+`,
+  spin: () => `**Fermyon Spin:** \`spin.toml\` serves the wasi-http component \`wasi-http/main.wasm\`
+with Spin's HTTP trigger; \`spin build\` runs \`npm run build:wasi-http\`, then \`spin up\` serves on
+port 3000. List the hosts \`Lasm.Fetch.fetch\` reaches in \`allowed_outbound_hosts\`. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
 `,
   'deno-deploy': () => `**Deno Deploy:** \`npm run build:deno-deploy\` writes \`deno/\` (the
 entrypoint \`deno/main.mjs\`, the Lean program and its host); test with \`deno task start:deno\`

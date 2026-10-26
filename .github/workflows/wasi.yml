@@ -31,6 +31,7 @@ on:
       - 'src/edge/**'
       - 'runtime/edge.cpp'
       - 'test/wasi.test.mjs'
+      - 'src/managed-link-toolchain.mjs'
 permissions:
   # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
   contents: write
@@ -45,6 +46,9 @@ env:
   WASMER_SHA256: 07271f7ecf449135bbd44cfe9f38a65e54ab25f1564a9c6bd2d0d5cca5743963
   VICEROY_VERSION: v0.21.1
   VICEROY_SHA256: 54a5b46ab05ce1492f4df136728b2eb81b350cb42da5d9f2eec66558ddc1e233
+  WASM_TOOLS_VERSION: '1.262.0'
+  WASM_TOOLS_SHA256: 655b8df67d54c3ef9b52fc237c4e94bbfbb5f5f43825245cb0940a7002a9ed65
+  PROXY_ADAPTER_SHA256: 59c393eeaecf0d7f1c71af71b27d588ab21e9f159f67018ce4e036a565b097bb
   SPIN_VERSION: v4.2.2
   SPIN_SHA256: ff870e915b41216318e525198028fc1017e96f599f54bbfd4e983730d0a1fecd
 jobs:
@@ -137,7 +141,7 @@ jobs:
       - name: Pinned tools (wasmtime, wasmer, Viceroy, Spin; Deno from npm)
         run: |
           set -euo pipefail
-          T=.work/wasi-tools; mkdir -p $T/dl $T/wasmtime $T/wasmer $T/viceroy $T/spin
+          T=.work/wasi-tools; mkdir -p $T/dl $T/wasmtime $T/wasmer $T/viceroy $T/spin $T/wasm-tools $T/adapter
           get() { curl -fsSL --retry 3 -o "$T/dl/$2" "$1"; echo "$3  $T/dl/$2" | sha256sum -c; }
           get "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz" wasmtime.tar.xz "$WASMTIME_SHA256"
           tar -xJf $T/dl/wasmtime.tar.xz -C $T/wasmtime --strip-components=1
@@ -147,6 +151,10 @@ jobs:
           tar -xzf $T/dl/viceroy.tar.gz -C $T/viceroy
           get "https://github.com/spinframework/spin/releases/download/$SPIN_VERSION/spin-$SPIN_VERSION-static-linux-amd64.tar.gz" spin.tar.gz "$SPIN_SHA256"
           tar -xzf $T/dl/spin.tar.gz -C $T/spin
+          get "https://github.com/bytecodealliance/wasm-tools/releases/download/v$WASM_TOOLS_VERSION/wasm-tools-$WASM_TOOLS_VERSION-x86_64-linux.tar.gz" wasm-tools.tar.gz "$WASM_TOOLS_SHA256"
+          tar -xzf $T/dl/wasm-tools.tar.gz -C $T/wasm-tools --strip-components=1
+          get "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasi_snapshot_preview1.proxy.wasm" proxy.wasm "$PROXY_ADAPTER_SHA256"
+          cp $T/dl/proxy.wasm $T/adapter/wasi_snapshot_preview1.proxy.wasm
           rm -rf $T/dl
           npm install --prefix $T --no-audit --no-fund deno@2.9.6
           ls -la $T/wasmtime $T/wasmer/bin $T/viceroy $T/spin
@@ -164,6 +172,7 @@ jobs:
             .work/wasi-apps/wasi-results.json
             .work/wasi-apps/fetch/wasi/main.wasm
             .work/wasi-apps/fetch/bin/main.wasm
+            .work/wasi-apps/fetch/wasi-http/main.wasm
             .work/wasi-apps/fetch/pkg/*.tar.gz
             .work/wasi-apps/cli/wasi/main.wasm
           retention-days: 14
