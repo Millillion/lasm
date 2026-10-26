@@ -106,8 +106,34 @@ export function memberFiles(members, directory) {
 
 /** The module/name pairs a Wasm program imports, or undefined if this runtime cannot read it. */
 export function wasmImports(file) {
-  try { return WebAssembly.Module.imports(new WebAssembly.Module(readFileSync(file))).map(({ module, name, kind }) => `${module}\0${name}\0${kind}`).sort(); }
-  catch { return undefined; }
+  // Read the import section directly: compiling the module only to list its
+  // imports cost about 0.1 s per link.
+  try {
+    const bytes = readFileSync(file);
+    let at = 8;
+    const uleb = () => { let result = 0, shift = 0, byte; do { byte = bytes[at++]; result += (byte & 0x7f) * 2 ** shift; shift += 7; } while (byte & 0x80); return result; };
+    const name = () => { const length = uleb(), text = bytes.toString('utf8', at, at + length); at += length; return text; };
+    const kinds = ['function', 'table', 'memory', 'global', 'tag'];
+    if (bytes.readUInt32LE(0) !== 0x6d736100) return undefined;
+    while (at < bytes.length) {
+      const id = bytes[at++], size = uleb(), end = at + size;
+      if (id !== 2) { at = end; continue; }
+      const imports = [];
+      for (let count = uleb(); count > 0; count--) {
+        const module = name(), field = name(), kind = bytes[at++];
+        // Skip the import's type: enough structure to keep reading.
+        if (kind === 0) uleb();
+        else if (kind === 1) { at++; const flags = uleb(); uleb(); if (flags & 1) uleb(); }
+        else if (kind === 2) { const flags = uleb(); uleb(); if (flags & 1) uleb(); }
+        else if (kind === 3) { at++; at++; }
+        else if (kind === 4) { at++; uleb(); }
+        else return undefined;
+        imports.push(`${module}\0${field}\0${kinds[kind]}`);
+      }
+      return imports.sort();
+    }
+    return [];
+  } catch { return undefined; }
 }
 
 export const isMemberFile = file => file.endsWith('.lasm-member.o');
