@@ -1,8 +1,9 @@
 # Bun and Deno (Phase 7.5)
 
-Status: **experimental, unreleased** (planned for 0.2.0, 2026-10-24). It is tested
-on Linux x64 and arm64 only so far. macOS and Windows CI waits for the 0.1.0 gate. The Node
-build and its full profile are unchanged.
+Status: **supported from 0.2.0** on all five platforms (Linux x64 and arm64,
+macOS x64 and arm64, Windows x64), with Bun 1.4.4 and Deno 2.9.6 tested in CI.
+Releases before 0.2.0 (0.1.x) run the compiler on Node only. The Node build and
+its full profile are unchanged.
 
 Lasm runs on Bun and Deno in two ways:
 
@@ -17,11 +18,19 @@ The full profile (threads, files, processes, koffi, wasm64) stays Node-only.
 ## The compiler on Bun and Deno
 
 ```sh
-bunx --bun @lasm/cli Main.lean          # once published; --bun even when Node is installed
+bunx --bun @lasm/cli Main.lean          # --bun: Bun runs Lasm even when Node is installed
 bunx --bun @lasm/cli build Main.lean
 deno run -A npm:@lasm/cli Main.lean
 deno run -A npm:@lasm/cli build Main.lean
+bun create @lasm my-app --template hono  # @lasm/create, like npm create @lasm
+deno run -A npm:@lasm/create my-app --template hono
 ```
+
+**Deno and new releases.** Deno 2.9 ignores npm versions published in the last
+24 hours (its default minimum dependency age). For the first day after a Lasm
+release, `deno run npm:@lasm/cli` resolves to the previous release (or to none)
+unless you pass `--minimum-dependency-age=0` (also to `deno install`), or
+set `"minimumDependencyAge"` in `deno.json`. Bun has no such default.
 
 In a project made by `lasm init` (templates `plain` and `hono`):
 
@@ -116,12 +125,38 @@ stop-and-restart):
 | Hono template | 169 ms, 0.62 ms | 160 ms, 0.72 ms | 1.50 MiB |
 | `examples/edge-pure` | 196 ms, 0.82 ms | 172 ms, 0.92 ms | 1.84 MiB |
 
-## Not done yet
+## Tested in CI
 
-- **macOS and Windows** (the compiler under Bun and Deno on all five
-  platforms). This waits until the 0.1.0 gate allows macOS and Windows CI on
-  this branch.
-- **Installing the published packages with `bun install` and `deno install`**
-  (platform `optionalDependencies`, `bun create lasm`). This needs the 0.2.0
-  packages on a registry. Nothing is published from this branch.
+Every push to `phase-7` that touches the compiler runs these on free GitHub
+runners (`ubuntu-24.04`, `ubuntu-24.04-arm`, `macos-15`, `macos-15-intel`,
+`windows-2025`):
+
+- **`workers.yml`, job `platforms`** (all five): a candidate packed from the
+  commit and installed with npm. The pure example is built under Node, Bun and
+  Deno (the Node build, every edge target from Node, and the default target
+  under Bun and Deno), the Bun and Deno builds are served by Bun and Deno, a
+  command-line program runs with `lasm Main.lean -- …` under both, and the Hono
+  template from `lasm init` is built with `bun run build:bun` and
+  `deno task build:deno` and served. Job `compare` requires the same
+  `program.wasm` on every platform and under every runtime.
+- **`workers.yml`, job `hosts`** (Linux x64 and arm64): the same builds from the
+  source checkout.
+- **`bun-deno-published.yml`** (all five; after each release and daily): the
+  published `@lasm/cli` and `@lasm/create` installed and run with Bun and Deno
+  only, with Node and npm removed from `PATH`: `bun add`, `bun x --bun lasm
+  build`, `bunx --bun @lasm/cli Main.lean`, `bun create @lasm`, `bun run
+  build:bun`; `deno install`, `deno run -A npm:@lasm/cli`, `deno run -A
+  npm:@lasm/create`, `deno task build:deno`; each build served. It skips while
+  no release is on the registry, and for a release before 0.2.0 it checks only
+  the installs.
+
+Results: `workers.yml` run 40277505987 passed every job on all five targets
+(2026-10-26), including the cross-platform byte comparison. The first
+`bun-deno-published.yml` run (40277505832) skipped cleanly on all five: only
+the 0.0.0 placeholders were on the registry.
+
+## Not supported
+
 - **Standard input** in the portable profile.
+- **The full profile** (threads, files, sockets, processes, koffi, wasm64) on
+  Bun or Deno: use `--target node`.

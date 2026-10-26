@@ -822,8 +822,12 @@ folded into Phases 5.2/5.3 and 7.
   compiler under Bun 1.4.4 and Deno 2.9.6 (byte-identical builds),
   `--target bun|deno` (portable profile; CLI programs and servers), default
   target = the CLI's runtime, registry fetch without npm, init scripts for
-  Bun and Deno. Open: macOS/Windows CI (after the 0.1.0 gate), installing the
-  published packages with bun/deno. See [BUN_DENO.md](BUN_DENO.md).*
+  Bun and Deno. See [BUN_DENO.md](BUN_DENO.md).*
+  *Status (2026-10-26, branch `phase-7`): 7.5 CI on all five targets
+  (`workers.yml` job `platforms`: an installed candidate under Node, Bun and
+  Deno, the Hono template's Bun/Deno scripts, one `program.wasm` everywhere) and
+  `bun-deno-published.yml` (the published `@lasm/cli`/`@lasm/create` with Bun
+  and Deno only; skips until a release exists). Ships as supported in 0.2.0.*
 - **Phase 7 — Production hardening on Node.** Long soak and concurrency stress
   (tasks, channels, Std.Sync/Std.Async, cancellation, many threads incl.
   Windows stack commit), startup memory tuning (initial memory, 64 MiB worker
