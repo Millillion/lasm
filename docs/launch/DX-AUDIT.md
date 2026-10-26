@@ -42,6 +42,8 @@ Severity: **high** = a newcomer is likely to hit it and lose time or trust;
 | L9 Workers note | **Fixed** | Only when `wrangler.toml` lacks the worker entry and CompiledWasm rule |
 | L10 "— 0s elapsed" lines | **Fixed** | A stage prints its name when it starts; time every 10 s |
 
+CI on commit 0c60379: dx-dev-loop run 40336918991 green (`templates` with the rename saves and the no-double-build check, `editor`: all eight templates open with no error in `lake serve` through real elan, `cold-start`); unit run 40336919429 green (including `dev-watch` and `editor` tests).
+
 ## Results per template
 
 | Template | `npm install` | First `npm run dev` until listening | Edit → rebuilt and restarted | Notes |
