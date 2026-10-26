@@ -182,12 +182,14 @@ export function lakeConfigurationKey(project, source, lean) {
   const hash = createHash('sha256').update(JSON.stringify({ schema: 1, lean: lean.identity ?? lean.commit ?? null, source }))
     .update(readFileSync(new URL('./lake-module.lean', import.meta.url)));
   const directories = [project];
-  try {
-    const manifest = JSON.parse(readFileSync(join(project, 'lake-manifest.json'), 'utf8'));
-    hash.update('manifest\0').update(JSON.stringify(manifest));
-    for (const pkg of manifest.packages ?? []) directories.push(pkg.type === 'path'
-      ? resolve(project, pkg.dir) : resolve(project, manifest.packagesDir ?? '.lake/packages', pkg.name));
-  } catch (error) { if (error.code !== 'ENOENT') return undefined; }
+  // The manifest's packages: a missing manifest is the empty one Lake writes on the
+  // first build, so that write does not change the key (lasm dev: a second adapter run).
+  let manifest = { packagesDir: '.lake/packages', packages: [] };
+  try { manifest = JSON.parse(readFileSync(join(project, 'lake-manifest.json'), 'utf8')); }
+  catch (error) { if (error.code !== 'ENOENT') return undefined; }
+  hash.update('manifest\0').update(JSON.stringify({ packagesDir: manifest.packagesDir ?? '.lake/packages', packages: manifest.packages ?? [] }));
+  for (const pkg of manifest.packages ?? []) directories.push(pkg.type === 'path'
+    ? resolve(project, pkg.dir) : resolve(project, manifest.packagesDir ?? '.lake/packages', pkg.name));
   for (const directory of directories) {
     for (const name of ['lakefile.toml', 'lakefile.lean', 'lean-toolchain']) {
       let text;
