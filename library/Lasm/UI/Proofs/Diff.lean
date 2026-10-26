@@ -67,12 +67,12 @@ theorem diffChildren_spec (val : β → Html Msg) (f : Live Msg → β → Nat �
   · rename_i o b
     split
     · rename_i hs
-      have e : (⟨(f o b next).ops.toArray, [(f o b next).live], (f o b next).next⟩ : ChildrenResult Msg) =
+      have e : (⟨if (f o b next).ops.isEmpty then #[] else (f o b next).ops.toArray, [(f o b next).live], (f o b next).next⟩ : ChildrenResult Msg) =
           prefixPhase val f [o] [b] next #[] #[] := by
         rw [prefixPhase]
         simp only [hs, ↓reduceIte]
         rw [prefixPhase, insertAll]
-        simp
+        cases h : (f o b next).ops <;> simp_all
       rw [e]
       exact prefixPhase_spec val f hf _ _ _ _ next #[] #[] (by simp) (by simp)
         (by simpa using h.1) (by simp)

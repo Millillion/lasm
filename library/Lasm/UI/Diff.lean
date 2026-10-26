@@ -280,7 +280,7 @@ kept node. -/
   | [o], [b] =>
     if o.same (val b) then
       let r := f o b next
-      ⟨r.ops.toArray, [r.live], r.next⟩
+      ⟨if r.ops.isEmpty then #[] else r.ops.toArray, [r.live], r.next⟩
     else prefixPhase val f [o] [b] next #[] (Array.emptyWithCapacity 1)
   | old, new => prefixPhase val f old new next #[] (Array.emptyWithCapacity new.length)
 
