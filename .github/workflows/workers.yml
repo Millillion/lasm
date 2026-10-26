@@ -9,7 +9,7 @@ name: Cloudflare Workers (Phase 7)
 on:
   workflow_dispatch:
   push:
-    branches: [phase-7]
+    branches: [phase-7, dx]
     paths:
       - '.github/workflows/workers.yml'
       - '.github/workflows/edge-runtime.yml'

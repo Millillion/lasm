@@ -47,6 +47,8 @@ test('every template creates a complete project', () => {
       assert.match(read('lakefile.toml'), /root = "Main"/);
       const pkg = JSON.parse(read('package.json'));
       assert.equal(pkg.scripts.build, 'lasm build Main.lean');
+      // Servers rebuild and restart on save (lasm dev); the plain program runs once with arguments.
+      assert.equal(pkg.scripts.dev, templates[template].server ? 'lasm dev Main.lean' : 'lasm Main.lean --');
       assert.equal(pkg.engines.node, '>=24');
       assert.equal(Object.keys(pkg.devDependencies).length, 1);
       assert.equal(Boolean(pkg.dependencies), templates[template].interop);
@@ -94,7 +96,7 @@ test('every template creates a complete project', () => {
     assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^deno\/$/m);
     assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /entrypoint to `deno\/main\.mjs`/);
     // Bun and Deno scripts (portable templates: plain and hono only).
-    assert.equal(edgePkg.scripts['dev:bun'], 'bun x --bun lasm Main.lean --');
+    assert.equal(edgePkg.scripts['dev:bun'], 'bun x --bun lasm dev Main.lean');
     assert.equal(edgePkg.scripts['build:deno'], 'lasm build Main.lean --target deno');
     assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /## Bun and Deno/);
     assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^bun\/$/m);

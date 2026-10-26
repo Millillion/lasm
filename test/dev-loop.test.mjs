@@ -77,3 +77,27 @@ test('Lake adapter key: configuration, packages and imports count; bodies do not
     assert.equal(typeof lakeConfigurationKey(directory, main, lean), 'string');
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
+
+test('lasm dev browser server: files, live-reload script, reload events, no escapes', async () => {
+  const { serveDirectory, liveReloadPath } = await import('../src/dev-server.mjs');
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-dev-server-'));
+  writeFileSync(join(directory, 'index.html'), '<!doctype html><html><head><title>x</title></head><body></body></html>');
+  writeFileSync(join(directory, 'app.wasm'), Buffer.from([0, 0x61, 0x73, 0x6d]));
+  const server = await serveDirectory(directory, { port: 0 });
+  try {
+    const page = await fetch(server.url);
+    const html = await page.text();
+    assert.match(html, new RegExp(`EventSource\\(${JSON.stringify(liveReloadPath).replaceAll('/', '\\/')}\\)[\\s\\S]*</script>\\n</head>`));
+    assert.equal((await fetch(server.url + 'app.wasm')).headers.get('content-type'), 'application/wasm');
+    assert.equal((await fetch(server.url + 'some/route')).status, 200, 'client routes fall back to index.html');
+    assert.doesNotMatch(await (await fetch(server.url + '%2e%2e/%2e%2e/etc/passwd')).text(), /root:/, 'never outside the directory');
+    assert.equal((await fetch(server.url + 'missing.js')).status, 404);
+    const events = await fetch(server.url + liveReloadPath.slice(1));
+    const reader = events.body.getReader();
+    await reader.read();
+    server.reload();
+    const { value } = await reader.read();
+    assert.match(Buffer.from(value).toString(), /event: reload/);
+    await reader.cancel();
+  } finally { await server.close(); rmSync(directory, { recursive: true, force: true }); }
+});

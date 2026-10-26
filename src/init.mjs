@@ -12,6 +12,7 @@ const templateRoot = join(root, 'templates');
 const npm = {
   express: { express: '5.2.1' },
   hono: { '@hono/node-server': '2.1.3', hono: '4.13.13' },
+  fastify: { fastify: '5.12.7' },
 };
 export const templateDependencies = npm;
 
@@ -37,6 +38,7 @@ export const templates = {
   plain: { summary: 'a Lean program (IO only)', server: false, interop: false, portable: true },
   express: { summary: 'Express 5 with Lean request handlers (Lasm.JS)', server: true, interop: true },
   hono: { summary: 'Hono on @hono/node-server with Lean request handlers (Lasm.JS)', server: true, interop: true, portable: true },
+  fastify: { summary: 'Fastify 5 with Lean route handlers (Lasm.JS)', server: true, interop: true },
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
 };
 
@@ -81,7 +83,7 @@ export function parseInitArguments(tokens) {
   if (!templates[result.template])
     throw new Error(`Unknown template "${result.template}". Choose one of: ${Object.keys(templates).join(', ')}`);
   if (result.deploy.length && !templates[result.template].server)
-    throw new Error(`--deploy ${result.deploy[0]} needs a server template (express, hono or std-http), not ${result.template}`);
+    throw new Error(`--deploy ${result.deploy[0]} needs a server template (express, hono, fastify or std-http), not ${result.template}`);
   for (const target of result.deploy) {
     if (deployTargets[target].templates && !deployTargets[target].templates.includes(result.template))
       throw new Error(`--deploy ${target} supports the ${deployTargets[target].templates.join(', ')} template, not ${result.template}`);
@@ -135,8 +137,9 @@ function packageJson(name, template, deploy = []) {
     name, version: '0.1.0', private: true,
     description: `${templates[template].summary}, compiled to WebAssembly by Lasm`,
     scripts: {
-      // `npm run dev -- a b` passes a and b to main.
-      dev: 'lasm Main.lean --',
+      // Servers: `npm run dev` rebuilds and restarts on every change (lasm dev).
+      // The plain program: `npm run dev -- a b` builds and runs main with a and b.
+      dev: templates[template].server ? 'lasm dev Main.lean' : 'lasm Main.lean --',
       build: 'lasm build Main.lean',
       start: 'node dist/main.mjs',
     },
@@ -151,7 +154,7 @@ function packageJson(name, template, deploy = []) {
   // Bun (bun x --bun, even when Node is installed); `deno task dev` runs it on
   // Deno. Deno Deploy runs the same deno/main.mjs.
   if (templates[template].portable) Object.assign(pkg.scripts, {
-    'dev:bun': 'bun x --bun lasm Main.lean --', 'build:bun': 'bun x --bun lasm build Main.lean --target bun', 'start:bun': 'bun bun/main.mjs',
+    'dev:bun': templates[template].server ? 'bun x --bun lasm dev Main.lean' : 'bun x --bun lasm Main.lean --', 'build:bun': 'bun x --bun lasm build Main.lean --target bun', 'start:bun': 'bun bun/main.mjs',
     'build:deno': 'lasm build Main.lean --target deno', 'start:deno': 'deno run -A deno/main.mjs' });
   else if (deploy.includes('deno-deploy')) pkg.scripts['start:deno'] = 'deno run -A deno/main.mjs';
   // Edge and portable builds import the npm modules Lean binds; the Node server stays out.
@@ -302,7 +305,7 @@ npm run build               # write dist/
 node dist/main.mjs Ada      # run the build: only Node is needed
 \`\`\``
     : `\`\`\`sh
-npm run dev                 # build and run: Listening on http://0.0.0.0:3000
+npm run dev                 # lasm dev: Listening on http://0.0.0.0:3000; rebuilds and restarts on save
 curl http://localhost:3000/hello/Ada
 # {"message":"Hello, Ada, from Lean!"}
 curl -X POST http://localhost:3000/echo -H 'content-type: application/json' -d '{"n":1}'
@@ -312,7 +315,9 @@ PORT=8080 npm start         # run the build (node dist/main.mjs): only Node is n
 \`\`\`
 
 The server listens on \`$HOST\` (default \`0.0.0.0\`) and \`$PORT\` (default 3000) and
-exits cleanly on SIGTERM or SIGINT.`;
+exits cleanly on SIGTERM or SIGINT. \`npm run dev\` (\`lasm dev\`) watches the Lean files, rebuilds
+in about 2 s after an ordinary edit and restarts the server; a build error is shown with its
+file and line while the last good server keeps running.`;
   const native = t.interop
     ? `\`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
 \`Lasm.JS\`, which only Lasm provides, so it builds and runs only with Lasm (the Lean

@@ -74,3 +74,22 @@ for (const [args, error] of [
 ]) test(`invalid CLI input fails before compilation: ${JSON.stringify(args)}`, () => {
   assert.throws(() => parseLasmArguments(args), error);
 });
+
+test('lasm dev arguments', async () => {
+  const { parseDevArguments, relevantFile, changedFiles, formatLeanDiagnostics, summarizeStages } = await import('../src/dev.mjs');
+  const parsed = parseLasmArguments(['dev']);
+  assert.equal(parsed.command, 'dev'); assert.equal(parsed.input, 'Main.lean'); assert.equal(parsed.profile, 'dev'); assert.equal(parsed.target, 'node');
+  assert.deepEqual(parseLasmArguments(['dev', 'App/Main.lean', '--target', 'workers', '--release', '--', 'a', '--b']),
+    { command: 'dev', profile: 'release', args: ['a', '--b'], run: true, verbose: false, target: 'workers', input: 'App/Main.lean' });
+  assert.equal(parseDevArguments(['--target=browser', '--port', '8080']).port, 8080);
+  assert.throws(() => parseDevArguments(['--port', '8080']), /--port applies/);
+  assert.throws(() => parseDevArguments(['--target', 'lambda']), /accepts/);
+  assert.throws(() => parseDevArguments(['--watch']), /Unknown lasm dev option/);
+  assert.equal(parseDevArguments(['--help']).command, 'dev-help');
+  assert.ok(relevantFile('src/A.lean') && relevantFile('lakefile.toml') && relevantFile('package.json') && !relevantFile('dist/main.mjs'));
+  assert.deepEqual(changedFiles(new Map([['a', '1'], ['b', '2']]), new Map([['a', '1'], ['b', '3'], ['c', '4']])), ['b', 'c']);
+  const text = formatLeanDiagnostics('trace: .> lean x\nerror: ./Missing.lean:3:4: unknown identifier \'x\'\nerror: build failed', process.cwd());
+  assert.equal(text, "Missing.lean:3:4: error: unknown identifier 'x'");
+  assert.equal(summarizeStages([{ stage: 'Checking Lean sources and Lake dependencies', at: 0 }, { stage: 'Compiling application module 1 of 2', at: 500 },
+    { stage: 'Linking application and Lean runtime', at: 700 }], 1500), 'Lean 0.5s · C 0.2s · link 0.8s');
+});
