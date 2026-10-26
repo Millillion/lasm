@@ -439,12 +439,34 @@ theorem diffAttrs_correct (old new : List (Attr Msg)) : applyAttrOps (diffAttrs 
 The js-framework-benchmark operations (keyed), timed in the page from the click
 to the next painted frame, against hand-written vanilla JavaScript with the
 same markup ([bench/ui/vanilla](../bench/ui/vanilla),
-[examples/ui/bench](../examples/ui/bench/Main.lean)); measured by the browser
-suite in CI (headless Chromium, Firefox and WebKit on free GitHub runners).
-Results are in the `browser-results-*` artifacts and in
-[BROWSER.md](BROWSER.md#lasmui-measurements). The budget is within 2× of
-vanilla for creating 1,000 rows, updating every 10th row, swapping rows and
-clearing.
+[examples/ui/bench](../examples/ui/bench/Main.lean)), in headless browsers on
+free GitHub runners (browser CI run 40302274897, source `7d7aa37`; the two
+pages warm up, then their trials alternate). Lasm.UI / vanilla:
+
+| Operation | chromium 153.0.8010.12 (linux-x64) | firefox 155.0 (linux-x64) | webkit 26.6 (linux-x64) | webkit 26.6 (darwin-arm64) |
+| --- | --- | --- | --- | --- |
+| create 1,000 rows | 50 / 52 ms (0.96×) [Lean 3.3, applier 7.3] | 45 / 41 ms (1.10×) [Lean 3.0, applier 16.0] | 84 / 73 ms (1.15×) [Lean 4.0, applier 11.0] | 64 / 51 ms (1.25×) [Lean 4.0, applier 9.0] |
+| replace all rows | 55 / 50 ms (1.11×) [Lean 5.1, applier 12.8] | 60 / 36 ms (1.67×) [Lean 5.0, applier 26.0] | 93 / 78 ms (1.19×) [Lean 6.0, applier 22.0] | 56 / 58 ms (0.97×) [Lean 3.0, applier 15.0] |
+| update every 10th row | 27 / 28 ms (0.99×) [Lean 3.1, applier 0.2] | 20 / 22 ms (0.91×) [Lean 2.0, applier 0.0] | 25 / 16 ms (1.56×) [Lean 3.0, applier 0.0] | 27 / 16 ms (1.69×) [Lean 1.0, applier 0.0] |
+| select row | 8 / 11 ms (0.74×) [Lean 2.1, applier 0.0] | 10 / 7 ms (1.43×) [Lean 2.0, applier 0.0] | 6 / 10 ms (0.60×) [Lean 3.0, applier 0.0] | 17 / 10 ms (1.70×) [Lean 2.0, applier 0.0] |
+| swap rows | 19 / 18 ms (1.06×) [Lean 2.5, applier 0.1] | 7 / 13 ms (0.54×) [Lean 2.0, applier 0.0] | 8 / 7 ms (1.14×) [Lean 3.0, applier 0.0] | 13 / 15 ms (0.87×) [Lean 2.0, applier 1.0] |
+| remove row | 17 / 18 ms (0.95×) [Lean 2.5, applier 0.1] | 11 / 12 ms (0.92×) [Lean 2.0, applier 0.0] | 8 / 10 ms (0.80×) [Lean 4.0, applier 0.0] | 20 / 17 ms (1.18×) [Lean 2.0, applier 0.0] |
+| create 10,000 rows | 522 / 483 ms (1.08×) [Lean 31.2, applier 86.2] | 498 / 350 ms (1.42×) [Lean 26.0, applier 176.0] | 885 / 766 ms (1.16×) [Lean 31.0, applier 104.0] | 542 / 400 ms (1.35×) [Lean 25.0, applier 78.0] |
+| append 1,000 rows | 54 / 57 ms (0.95×) [Lean 5.1, applier 7.6] | 56 / 39 ms (1.44×) [Lean 5.0, applier 16.0] | 92 / 80 ms (1.15×) [Lean 6.0, applier 12.0] | 57 / 51 ms (1.12×) [Lean 3.0, applier 9.0] |
+| clear 1,000 rows | 17 / 16 ms (1.07×) [Lean 0.8, applier 4.0] | 8 / 9 ms (0.89×) [Lean 1.0, applier 4.0] | 14 / 11 ms (1.27×) [Lean 1.0, applier 10.0] | 20 / 16 ms (1.25×) [Lean 1.0, applier 8.0] |
+
+Lasm.UI / vanilla JavaScript: medians of 10 runs (3 for 10,000 rows), click to painted frame, alternating; in brackets, Lean's part (view, diff, encoding) and the applier's.
+
+The budget ([BROWSER.md](BROWSER.md#budgets-measured-in-ci-recorded-per-release))
+is within 2× of vanilla for creating 1,000 rows and updating every 10th row;
+every operation was within 1.7× in this run, most within 1.2×. Lean's work
+(view, diff, encoding, in WebAssembly) is 1–6 ms for 1,000 rows; the rest is
+the browser's. Sizes: the counter is 155 KiB brotli in total (Wasm and
+loader), TodoMVC 173 KiB.
+
+To reproduce locally without a browser, `node scripts/ui/node-e2e.mjs bench
+DIST` runs a built benchmark against happy-dom and prints Lean's time per
+operation; `bench/ui/phases` splits a frame into view, diff and encoding.
 
 ## API reference
 
