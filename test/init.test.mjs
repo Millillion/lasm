@@ -15,7 +15,7 @@ test('lasm init arguments', () => {
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
   // Cloudflare Workers (edge build): the Hono template only.
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=workers']).deploy, ['workers']);
-  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'workers']), /--deploy workers supports the hono or fetch template, not express/);
+  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'workers']), /--deploy workers supports the hono or fetch or fullstack template, not express/);
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy', 'vercel-edge', '--deploy', 'netlify-edge', '--deploy', 'workers']).deploy, ['vercel-edge', 'netlify-edge', 'workers']);
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy', 'vercel-edge', '--deploy', 'vercel']), /choose one/);
   assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'netlify']), /--deploy netlify needs a server template/);
@@ -162,6 +162,14 @@ test('the fullstack template: shared, server and client modules; Node and Worker
     assert.match(read('Server.lean'), /^import Lasm\.RPC\.Server$/m);
     assert.match(read('Client.lean'), /^import Lasm\.RPC\.Client$/m);
     assert.match(read('lakefile.toml'), /name = "Shared"/);
-    assert.throws(() => initProject({ directory: join(root, 'other'), template: 'fullstack', deploy: ['workers'] }), /takes no --deploy/);
+    // Every Lasm.Fetch target: the browser app is embedded in the server program.
+    const all = initProject({ directory: join(root, 'all'), template: 'fullstack', deploy: ['fastly', 'wasi-http', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'spin'] });
+    assert.ok(['fastly.toml', 'spin.toml', 'vercel.json', 'netlify.toml'].every(f => all.files.includes(f)), all.files.join(' '));
+    const scripts = JSON.parse(readFileSync(join(root, 'all', 'package.json'), 'utf8')).scripts;
+    for (const t of ['workers', 'bun', 'deno', 'fastly', 'wasi-http', 'vercel-edge', 'netlify-edge', 'deno-deploy'])
+      assert.equal(scripts[`build:${t}`], `npm run build:client && lasm build Server.lean --target ${t} --output dist/server`, t);
+    assert.match(readFileSync(join(root, 'all', 'fastly.toml'), 'utf8'), /\[local_server\.kv_stores\]\n  TODOS = \[\]/);
+    assert.match(read('Server.lean'), /embed_dir! "dist\/public"/);
+    assert.match(read('Server.lean'), /Lasm\.KV\.open "TODOS"/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
