@@ -48,7 +48,7 @@ async function buildEdge(input, target, buildOptions, verbose) {
     // A Node build reused from its cache kept no link inputs: link it again.
     if (!result.linkWork) result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: true });
     try {
-      console.error('[lasm] Linking for the edge (experimental edge build)…');
+      console.error('[lasm] Linking the single-threaded (portable) program…');
       const { provisionEdgeLinker } = await import('./edge/edge-link.mjs');
       const sdk = await provisionEdgeLinker(found.edge, { log: message => console.error('[lasm] ' + message) });
       program = linkCachedEdgeProgram({ result, nodeRuntime, edge: found.edge, key: found.key, sdk, verbose });

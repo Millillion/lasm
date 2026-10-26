@@ -42,12 +42,12 @@ export const edgeTargets = {
   // Lean's main with the command-line arguments and exits with its code; a
   // program that publishes a handler (Lasm.JS.exportDefault) is served with
   // Bun.serve or Deno.serve instead. Deno Deploy runs the same entry.
-  bun: { label: 'Bun', summary: 'Bun: bun/ (main.mjs, the program and its host; bun bun/main.mjs)', output: 'bun',
+  bun: { label: 'Bun', supported: true, summary: 'Bun: bun/ (main.mjs, the program and its host; bun bun/main.mjs)', output: 'bun',
     write({ staging, modules }) {
       writeFileSync(join(staging, 'main.mjs'), portableEntry('bun', modules));
       return { note: () => 'run it with bun bun/main.mjs' };
     } },
-  deno: { label: 'Deno', summary: 'Deno: deno/ (main.mjs, the program and its host; deno run -A deno/main.mjs)', output: 'deno',
+  deno: { label: 'Deno', supported: true, summary: 'Deno: deno/ (main.mjs, the program and its host; deno run -A deno/main.mjs)', output: 'deno',
     write({ staging, modules }) {
       writeFileSync(join(staging, 'main.mjs'), portableEntry('deno', modules));
       return { note: () => 'run it with deno run -A deno/main.mjs' };
@@ -343,7 +343,7 @@ export function writeEdgeOutput({ target, source, projectDirectory, result, edge
   renameSync(staging, destination);
   written = edgeTargets[target].write({ staging: destination, projectDirectory, modules });
   const wasmBytes = statSync(join(program.directory, 'program.wasm')).size;
-  log(`${cacheHit ? 'Reused' : 'Built'} ${relative(process.cwd(), source) || source} for ${edgeTargets[target].label} (experimental): ${relative(process.cwd(), destination) || destination}`
+  log(`${cacheHit ? 'Reused' : 'Built'} ${relative(process.cwd(), source) || source} for ${edgeTargets[target].label}${edgeTargets[target].supported ? '' : ' (experimental)'}: ${relative(process.cwd(), destination) || destination}`
     + ` (program.wasm ${(wasmBytes / 1048576).toFixed(2)} MiB${written.note ? '; ' + written.note(relative(projectDirectory, destination)) : ''})`);
   return { output: destination, info };
 }
