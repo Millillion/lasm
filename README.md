@@ -132,6 +132,18 @@ def main : IO Unit := (App.sandbox 0 update view).run
 lasm build Main.lean --target browser   # dist/: index.html, app.<hash>.js, app.<hash>.wasm
 ```
 
+## The whole stack in Lean (Lasm.RPC)
+
+**In branch source (`fullstack`).** `lasm init my-app --template fullstack`
+creates one Lean project with a server (`Lasm.Fetch`), a browser app
+(`Lasm.UI`) and the API between them (`Lasm.RPC`): request and response types
+and their validation are declared once in shared code. The browser checks a
+request before sending it; the server checks it again and hands the handler
+the proof, so a theorem about the validation holds on both sides. The server
+renders the first page and the browser app hydrates it; `npm run dev` rebuilds
+both, `npm run build` targets Node and `npm run build:workers` Cloudflare
+Workers. Guide: [docs/RPC.md](docs/RPC.md).
+
 ## CLI reference
 
 These are all commands and options in the ordinary Node application interface:

@@ -7,7 +7,7 @@ name: UI
 on:
   workflow_dispatch:
   push:
-    branches: [browser, browser-ui]
+    branches: [browser, browser-ui, fullstack]
     paths:
       - '.github/workflows/ui.yml'
       - 'library/**'
@@ -19,6 +19,7 @@ on:
       - 'test/fixtures/ui/**'
       - 'examples/ui/**'
       - 'scripts/ui/**'
+      - 'templates/fullstack/**'
 concurrency:
   group: ui-${{ github.ref }}
   cancel-in-progress: true

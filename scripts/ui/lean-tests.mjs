@@ -6,8 +6,8 @@
 //   - test/ui/DiffModel.lean: random diffs checked against the DOM model;
 //   - test/ui/Fixtures.lean: the applier test's patch fixtures must be current
 //     (--fixtures rewrites test/fixtures/ui/patches.json);
-//   - examples/ui/*: every example elaborates (TodoMVC's proofs included), with
-//     no `sorry`.
+//   - examples/ui/* and templates/fullstack: they elaborate (TodoMVC's and the
+//     template's proofs included), with no `sorry`.
 //   node scripts/ui/lean-tests.mjs [--fixtures]
 import { execFileSync } from 'node:child_process';
 import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
@@ -83,6 +83,16 @@ try {
       return modules.length ? `with ${modules.join(', ')}` : '';
     });
   }
+  // The fullstack template: shared modules first (Lake's libraries), then both programs.
+  check('templates/fullstack elaborates (its theorems included)', () => {
+    const dir = join(root, 'templates/fullstack'), out = join(work, 'fullstack');
+    mkdirSync(out, { recursive: true });
+    let log = '';
+    for (const m of ['Shared', 'View']) log += run(['-R', dir, '-o', join(out, m + '.olean'), join(dir, m + '.lean')], [out]);
+    for (const m of ['Client', 'Server']) log += run(['-R', dir, join(dir, m + '.lean')], [out]);
+    if (/declaration uses `sorry`|error:/.test(log)) throw Object.assign(new Error('sorry or error'), { stdout: log });
+    return '';
+  });
 } finally { rmSync(work, { recursive: true, force: true }); }
 if (failures.length) { console.log(`${failures.length} failed: ${failures.join(', ')}`); process.exit(1); }
 console.log('All Lasm.UI Lean checks passed');

@@ -20,6 +20,11 @@ partial def dataToJson : Data → Except String Json
   | .null | .undefined => .ok .null
   | .bool b => .ok (.bool b)
   | .number n =>
+    -- Integers stay integers (JSON.parse gives `1` as the number 1.0), so
+    -- `FromJson Nat`/`Int` read them.
+    if n == n.round && n.abs ≤ 9007199254740991 then
+      .ok (.num (JsonNumber.fromInt (if n < 0 then -((-n).toUInt64.toNat : Int) else (n.toUInt64.toNat : Int))))
+    else
     match JsonNumber.fromFloat? n with
     | .inr j => .ok (.num j)
     | .inl e => .error s!"number {n} is not representable in JSON ({e})"

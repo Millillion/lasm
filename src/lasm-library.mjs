@@ -21,7 +21,9 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
-  'Lasm.UI.Url', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI'];
+  'Lasm.UI.Url', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
+  // Lasm.RPC (docs/RPC.md): typed endpoints shared by a Lasm.Fetch server and a Lasm.UI app.
+  'Lasm.RPC.Core', 'Lasm.RPC.Server', 'Lasm.RPC.Client', 'Lasm.RPC'];
 // Lasm.UI's proofs (library/Lasm/UI/Proofs*) are checked by scripts/ui/lean-tests.mjs, not shipped.
 
 export const glueSource = join(root, 'c', 'lasm_js.c');

@@ -59,6 +59,9 @@ export const templates = {
   web: { summary: 'a browser app in Lean (Lasm.UI): a counter', server: false, interop: true, browser: true },
   // Lasm.Fetch (docs/FETCH.md): one handler for Node, WASI, Fastly, Spin, the edge, Bun and Deno.
   fetch: { summary: 'an HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge', server: true, interop: false, library: 'Lasm.Fetch', portable: true },
+  // The whole stack in Lean (docs/RPC.md): shared types, API and validation; a
+  // Lasm.Fetch server with server-side rendering; a Lasm.UI app that hydrates it.
+  fullstack: { summary: 'a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node and Cloudflare Workers', server: true, interop: false, fullstack: true },
 };
 
 export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}] [--deploy TARGET]…
@@ -625,6 +628,10 @@ export function initProject({ directory, template, deploy = [] }) {
     if (entries.length) throw new Error(`${directory} is not empty. Choose a new or empty directory.`);
   }
   const name = packageName(target);
+  if (templates[template].fullstack) {
+    if (deploy.length) throw new Error('lasm init --template fullstack writes its Node and Workers setup itself; it takes no --deploy');
+    return writeFiles(target, name, fullstackFiles(name));
+  }
   const files = templates[template].browser ? {
     'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
     'lakefile.toml': lakefile(name),
@@ -657,12 +664,126 @@ export function initProject({ directory, template, deploy = [] }) {
   if (deploy.includes('supabase-edge')) files['supabase/config.toml'] = supabaseConfig(supabaseFunctionNameOf(name));
   if (deploy.includes('fastly')) files['fastly.toml'] = fastlyToml(fastlyName(target));
   if (deploy.includes('spin')) files['spin.toml'] = spinToml(spinName(name));
+  return writeFiles(target, name, files);
+}
+
+function writeFiles(target, name, files) {
   mkdirSync(target, { recursive: true });
   for (const [file, text] of Object.entries(files)) {
     mkdirSync(dirname(join(target, file)), { recursive: true });
     writeFileSync(join(target, file), text, { flag: 'wx' });
   }
   return { directory: target, name, files: Object.keys(files) };
+}
+
+/** The fullstack template (docs/RPC.md): one Lake project with shared, server
+ * and client modules; the client is built for the browser into
+ * dist/public/client, which the Node server serves and Workers serves as
+ * static assets. */
+function fullstackFiles(name) {
+  const lasm = lasmPackage();
+  const read = file => readFileSync(join(templateRoot, 'fullstack', file), 'utf8');
+  const worker = name.replace(/[^a-z0-9-]+/g, '-').slice(0, 54) || 'lean-app';
+  return {
+    'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
+    'lakefile.toml': `name = "${lakeName(name)}"
+version = "0.1.0"
+defaultTargets = ["Shared", "View"]
+
+# Shared by the server and the browser app: data, API, validation (Shared)
+# and the page (View). \`lake build\` checks them, proofs included.
+[[lean_lib]]
+name = "Shared"
+
+[[lean_lib]]
+name = "View"
+
+# Server.lean and Client.lean are the two programs: lasm builds them
+# (npm run build). They are not Lake targets.
+`,
+    'package.json': JSON.stringify({
+      name, version: '0.1.0', private: true, type: 'module',
+      description: 'A full-stack Lean app (Lasm.RPC, Lasm.Fetch, Lasm.UI), compiled to WebAssembly by Lasm',
+      scripts: {
+        // The server on http://localhost:3000, rebuilt with the browser app on every change.
+        dev: 'lasm dev Server.lean --client Client.lean',
+        build: 'npm run build:client && npm run build:server',
+        'build:client': 'lasm build Client.lean --target browser --output dist/public/client',
+        'build:server': 'lasm build Server.lean --output dist/server',
+        start: 'node dist/server/main.mjs',
+        // Cloudflare Workers: the server as a Worker, the browser app as static assets (wrangler.toml).
+        'build:workers': 'npm run build:client && lasm build Server.lean --target workers',
+      },
+      engines: { node: '>=24' },
+      devDependencies: { [lasm.name]: lasm.version },
+    }, null, 2) + '\n',
+    'Shared.lean': read('Shared.lean'),
+    'View.lean': read('View.lean'),
+    'Server.lean': read('Server.lean'),
+    'Client.lean': read('Client.lean'),
+    'public/style.css': read('public/style.css'),
+    'wrangler.toml': `# Cloudflare Workers: npm run build:workers writes workers/ (the server) and
+# dist/public (the browser app); test with npx wrangler dev, deploy with npx wrangler deploy.
+name = "${worker}"
+main = "workers/worker.mjs"
+compatibility_date = "2026-10-01"
+
+# The browser app and its files, served by Workers before the Worker runs.
+[assets]
+directory = "./dist/public"
+
+# Lasm's program.wasm is imported as a precompiled module.
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false
+`,
+    'README.md': fullstackReadme(name),
+    '.gitignore': gitignore + 'workers/\n.wrangler/\n',
+  };
+}
+
+function fullstackReadme(name) {
+  return `# ${name}
+
+A full-stack app written entirely in Lean and compiled to WebAssembly by
+[Lasm](https://github.com/Millillion/lasm): the server, the browser app, and
+the API between them, whose types and validation are written once.
+
+| File | What it is |
+| --- | --- |
+| \`Shared.lean\` | The data (\`Todo\`), the API (\`Lasm.RPC\` endpoints) and its validation, with a theorem about it. Imported by both sides. |
+| \`View.lean\` | The page (\`Lasm.UI\`): rendered to HTML by the server for the first visit, kept up to date by the browser. |
+| \`Server.lean\` | The server (\`Lasm.Fetch\`): serves the API and the first page. Its \`addTodo\` handler can only store titles that passed the shared check: the type asks for the proof. |
+| \`Client.lean\` | The browser app (\`Lasm.UI\`): hydrates the server's page and calls the API. A theorem shows it never sends an invalid title. |
+| \`public/style.css\` | Copied next to the browser app. |
+| \`wrangler.toml\` | Cloudflare Workers: the server as a Worker, the browser app as static assets. |
+
+## Requirements
+
+Node.js 24 or newer with npm. Lasm downloads Lean ${defaultLean()} and its build tools on
+the first build (a few hundred MB, cached for later builds).
+
+## Run
+
+\`\`\`sh
+npm install
+npm run dev        # http://localhost:3000: rebuilds the server and the browser app on every change
+npm run build      # dist/server (Node) and dist/public (the browser app)
+npm start          # serves the release build on http://localhost:3000 (PORT, HOST)
+\`\`\`
+
+## Deploy
+
+- **Node** (any host, container or VM): \`npm run build\`, then \`npm start\` with \`dist/\`.
+- **Cloudflare Workers**: \`npm run build:workers\`, then \`npx wrangler deploy\`
+  (\`npx wrangler dev\` runs it locally). The todos live in memory, one copy per
+  isolate; keep data in a database for production.
+
+Guides: [Lasm.RPC](https://github.com/Millillion/lasm/blob/main/docs/RPC.md),
+[Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md),
+[Lasm.Fetch](https://github.com/Millillion/lasm/blob/main/docs/FETCH.md).
+`;
 }
 
 export function runInit(options) {
@@ -683,6 +804,7 @@ export function nextSteps(template, runtime = 'node') {
   const portable = templates[template].portable;
   const server = templates[template].server;
   if (templates[template].browser) return `  npm install\n  npm run dev          # then open http://localhost:5173`;
+  if (templates[template].fullstack) return `  npm install\n  npm run dev          # then open http://localhost:3000`;
   if (runtime === 'bun' && portable) return `  bun install\n  bun run dev:bun${server ? '      # then: curl http://localhost:3000/hello/Ada' : ''}`;
   if (runtime === 'deno' && portable) return `  deno install\n  deno task dev${server ? '        # then: curl http://localhost:8000/hello/Ada' : ''}`;
   return `  npm install\n  npm run dev${server ? '          # then: curl http://localhost:3000/hello/Ada' : ''}`;

@@ -29,6 +29,9 @@ is done) and restarts the program. Arguments after -- are passed to main.
   browser           serve the browser build on http://127.0.0.1:5173 (--port,
                     --host) with live reload (src/browser/browser-dev.mjs);
                     --no-watch serves once built; open it yourself
+--client Client.lean (full-stack apps, lasm init --template fullstack): also
+                    rebuild that browser app into --client-output (default
+                    dist/public/client) before each server build
 --release builds the release profile instead; --no-run only rebuilds.
 Type rs and Enter to rebuild and restart; Ctrl+C stops.`;
 
@@ -44,7 +47,7 @@ export function parseDevArguments(tokens) {
     if (token === '--no-run') { result.run = false; continue; }
     if (token === '--verbose') { result.verbose = true; continue; }
     if (token === '--no-watch') { result.watch = false; continue; }
-    const option = /^--(target|port|host|output)(?:=(.*))?$/.exec(token);
+    const option = /^--(target|port|host|output|client|client-output)(?:=(.*))?$/.exec(token);
     if (option) {
       const value = option[2] ?? tokens[++i];
       if (!value || value.startsWith('--')) throw new Error(`--${option[1]} requires a value\n\n${devUsage}`);
@@ -54,7 +57,11 @@ export function parseDevArguments(tokens) {
       } else if (option[1] === 'port') {
         if (!/^\d{1,5}$/.test(value) || Number(value) > 65535) throw new Error(`--port needs a port number, not "${value}"`);
         result.port = Number(value);
-      } else result[option[1]] = value;
+      } else if (option[1] === 'client') {
+        if (!value.endsWith('.lean')) throw new Error(`--client expects the browser app's Lean source (Client.lean), not ${value}`);
+        result.client = value;
+      } else if (option[1] === 'client-output') result.clientOutput = value;
+      else result[option[1]] = value;
       continue;
     }
     if (token.startsWith('-')) throw new Error(`Unknown lasm dev option: ${token}. Program arguments follow --.\n\n${devUsage}`);
@@ -64,6 +71,8 @@ export function parseDevArguments(tokens) {
   result.input = positional[0] ?? 'Main.lean';
   if (!result.input.endsWith('.lean')) throw new Error(`lasm dev expects a Lean source (Main.lean), not ${result.input}`);
   result.target ??= jsRuntime;
+  if (result.clientOutput && !result.client) throw new Error('--client-output applies with --client');
+  if (result.client && result.target === 'browser') throw new Error('--client goes with a server target (lasm dev Server.lean --client Client.lean)');
   for (const option of ['port', 'host', 'output', 'watch'])
     if (result[option] !== undefined && result.target !== 'browser') throw new Error(`--${option === 'watch' ? 'no-watch' : option} applies to lasm dev --target browser (servers read $PORT and $HOST)`);
   return result;
@@ -240,6 +249,13 @@ export async function runDev(options) {
     if (reason) say(reason === 'change' ? `${changed.slice(0, 3).map(file => relative(project, file)).join(', ')}${changed.length > 3 ? ` and ${changed.length - 3} more` : ''} changed; rebuilding` : reason);
     const stages = [], started = performance.now();
     try {
+      // A full-stack app's browser side first, so the restarted server serves it.
+      if (options.client) await service.build(resolve(options.client), { profile: options.profile, verbose: options.verbose,
+        output: resolve(options.clientOutput ?? join('dist', 'public', 'client')) }, {
+        target: 'browser',
+        onProgress: event => { if (stages.at(-1)?.stage !== event.stage) stages.push({ stage: event.stage, at: performance.now() }); status('browser app: ' + event.stage + '…'); },
+        onLog: text => { clearStatus(); process.stderr.write(text + '\n'); },
+      });
       const result = await service.build(source, { profile: options.profile, verbose: options.verbose }, {
         target: target === 'node' ? undefined : target,
         onProgress: event => {
