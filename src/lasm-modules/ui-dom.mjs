@@ -13,7 +13,7 @@ const decoder = new TextDecoder();
 export function createUi({ root, flags = null, hydrate = false, window: win = root.ownerDocument.defaultView ?? globalThis } = {}) {
   const doc = root.ownerDocument;
   const nodes = new Map([[0, root]]);
-  const names = [], decoders = [];
+  const names = [], values = [], decoders = [];
   const listening = new Set();
   const subs = new Map();
   let lean = null, pending = false, stopped = false, hydrating = hydrate, focusQueue = [];
@@ -55,14 +55,21 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     if (x === 0) names.push(s);
     return s;
   }
+  function value() {
+    const x = v();
+    if (x > 1) return values[x - 2];
+    const s = str();
+    if (x === 0) values.push(s);
+    return s;
+  }
   // Attribute ops 0–5 (set) and 8–11 (remove) on element n.
   function attr(n, k) {
     switch (k) {
-    case 0: { const a = name(); n.setAttribute(a, str()); return; }
-    case 1: { const a = name(), s = str(); if (n[a] !== s) n[a] = s; return; }
+    case 0: { const a = name(); n.setAttribute(a, value()); return; }
+    case 1: { const a = name(), s = value(); if (n[a] !== s) n[a] = s; return; }
     case 2: { const a = name(); if (n[a] !== false) n[a] = false; return; }
     case 3: { const a = name(); if (n[a] !== true) n[a] = true; return; }
-    case 4: { const a = name(); n.style.setProperty(a, str()); return; }
+    case 4: { const a = name(); n.style.setProperty(a, value()); return; }
     case 5: { const e = name(), d = v(), f = v(); (n.$l ??= Object.create(null))[e] = d * 4 + f; listen(e); return; }
     case 8: n.removeAttribute(name()); return;
     case 9: { const a = name(), t = typeof n[a]; n[a] = t === 'boolean' ? false : t === 'number' ? 0 : ''; return; }

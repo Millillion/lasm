@@ -98,8 +98,8 @@ test('events are delegated, with declared fields, bubbling and options', async (
   e.byte(7); e.v(0); e.v(2); e.v(2); e.s('target'); e.s('id'); e.v(2); e.s('currentTarget'); e.s('id'); // decoder 0
   e.byte(1); e.v(0); e.v(0);                                  // insert under root, append
   e.byte(1); e.v(1); e.name('ul'); e.v(1); e.byte(5); e.name('click'); e.v(0); e.v(0); e.v(1);
-  e.byte(1); e.v(2); e.name('li'); e.v(2); e.byte(0); e.name('id'); e.s('item'); e.byte(5); e.name('click'); e.v(0); e.v(2); e.v(1);
-  e.byte(1); e.v(3); e.name('b'); e.v(1); e.byte(0); e.name('id'); e.s('bold'); e.v(1);
+  e.byte(1); e.v(2); e.name('li'); e.v(2); e.byte(0); e.name('id'); e.v(1); e.s('item'); e.byte(5); e.name('click'); e.v(0); e.v(2); e.v(1);
+  e.byte(1); e.v(3); e.name('b'); e.v(1); e.byte(0); e.name('id'); e.v(0); e.s('bold'); e.v(1);
   e.byte(0); e.v(4); e.s('x');
   ui.applyForTest(Uint8Array.from(e.out));
   assert.equal(root.innerHTML, '<ul><li id="item"><b id="bold">x</b></li></ul>');

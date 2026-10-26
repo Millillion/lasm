@@ -4,6 +4,8 @@ Format (docs/BROWSER.md, "Patch protocol"): unsigned LEB128 integers, strings as
 a byte length and UTF-8 bytes. Names (tags, attribute, property, style and event
 names) are interned: a name is `0` + string (added to
 the table), `1` + string (not added; the table is full) or `index + 2`.
+Attribute, property and style values are interned the same way in a second
+table (values of at most 40 bytes; 4,096 of them), written `value` below.
 A frame is the decoder definitions (new decoder shapes, numbered from 0 in
 order) followed by the ops.
 
@@ -17,9 +19,9 @@ order) followed by the ops.
     node    0 id string                     a text node
             ns id tag attrCount attr* childCount node*
                                             ns: 1 html, 2 svg, 3 mathml
-    attr    0 name string                   setAttribute
-            1 name string | 2 name | 3 name property: a string, false, true
-            4 name string                   style.setProperty
+    attr    0 name value                    setAttribute
+            1 name value | 2 name | 3 name  property: a string, false, true
+            4 name value                    style.setProperty
             5 event decoderId flags         listener; flags: 1 preventDefault, 2 stopPropagation
     attrop  attr, or 8 name | 9 name | 10 name | 11 event
                                             remove an attribute, property, style, listener
@@ -32,11 +34,17 @@ namespace Lasm.UI.Encode
 /-- The interning tables, shared with the applier across frames. -/
 structure Tables where
   names : Std.HashMap String Nat := {}
+  /-- Short attribute, property and style values (class lists, types, …). -/
+  values : Std.HashMap String Nat := {}
   decoders : Std.HashMap (List Path) Nat := {}
   deriving Inhabited
 
 /-- At most this many interned names (beyond it names are sent in full). -/
 def maxNames : Nat := 8192
+
+/-- At most this many interned values, each at most `maxValueBytes` long. -/
+def maxValues : Nat := 4096
+def maxValueBytes : Nat := 40
 
 structure Enc where
   tables : Tables
@@ -71,6 +79,17 @@ def name (e : Enc) (s : String) : Enc :=
   let (t, out) := nameInto e.tables e.out s
   { e with tables := t, out }
 
+/-- An attribute, property or style value: interned like names when short
+(its own table), else in full. -/
+def value (e : Enc) (s : String) : Enc :=
+  let t := e.tables
+  match t.values[s]? with
+  | some i => { e with out := pushVar e.out (i + 2) }
+  | none =>
+    if s.utf8ByteSize ≤ maxValueBytes && t.values.size < maxValues then
+      { e with tables := { t with values := t.values.insert s t.values.size }, out := pushStr (e.out.push 0) s }
+    else { e with out := pushStr (e.out.push 1) s }
+
 /-- The id of a decoder shape, defining it first if new. -/
 def decoder (e : Enc) (paths : List Path) : Enc × Nat :=
   match e.tables.decoders[paths]? with
@@ -87,11 +106,11 @@ def flags (l : Listener) : Nat := (if l.preventDefault then 1 else 0) + (if l.st
 /-- An attribute slot set to a value (`attr` above). -/
 def setAttr (e : Enc) (k : AttrKey) (v : AttrVal) : Enc :=
   match k, v with
-  | .attr n, .str s => (e.byte 0).name n |>.str s
-  | .prop n, .prop (.str s) => (e.byte 1).name n |>.str s
+  | .attr n, .str s => (e.byte 0).name n |>.value s
+  | .prop n, .prop (.str s) => (e.byte 1).name n |>.value s
   | .prop n, .prop (.bool false) => (e.byte 2).name n
   | .prop n, .prop (.bool true) => (e.byte 3).name n
-  | .style n, .str s => (e.byte 4).name n |>.str s
+  | .style n, .str s => (e.byte 4).name n |>.value s
   | .on ev, .listener l =>
     let (e, d) := e.decoder l.paths
     ((e.byte 5).name ev).var d |>.var (flags l)
