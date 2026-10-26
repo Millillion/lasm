@@ -5,6 +5,7 @@ import { nativeFiles } from './native-files.mjs';
 /** OS-owned locks survive slow compiles and are released when a process dies.
  * Keep the empty lock file: unlinking it would split waiters across inodes.
  * Descriptors are close-on-exec and are never inherited by compiler children.
+ * `action(release)`: release() unlocks early (synchronously, once).
  */
 export async function withApplicationLock(path, action, { onWait, exclusive = true, tryOnly = false, signal } = {}) {
   signal?.throwIfAborted();
@@ -15,6 +16,8 @@ export async function withApplicationLock(path, action, { onWait, exclusive = tr
   } catch (error) { if (error.code !== 'ENOENT') throw error; }
   const files = nativeFiles({ synchronous: true });
   const file = await files.open(path, 4, 0o600);
+  let held = true;
+  const release = () => { if (held) { held = false; files.close(file); } };
   try {
     let announced = false;
     while (!(await files.lock(file, exclusive, true))) {
@@ -24,6 +27,6 @@ export async function withApplicationLock(path, action, { onWait, exclusive = tr
       await new Promise(resolve => setTimeout(resolve, 50));
     }
     signal?.throwIfAborted();
-    return await action();
-  } finally { files.close(file); }
+    return await action(release);
+  } finally { release(); }
 }

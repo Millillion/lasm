@@ -60,3 +60,23 @@ test('exceptions release a build lock for the next operation', async t => {
   await assert.rejects(withApplicationLock(lock, () => { throw new Error('compile failed'); }), /compile failed/);
   assert.equal(await withApplicationLock(lock, () => 'recovered'), 'recovered');
 });
+
+test('release() lets another build take the lock before the first one finishes', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'lasm-application-lock-release-'));
+  const lock = join(directory, 'build.lock'), order = [];
+  try {
+    let firstReleased;
+    const released = new Promise(resolve => { firstReleased = resolve; });
+    let finishFirst;
+    const first = withApplicationLock(lock, async release => {
+      order.push('first: imports'); release(); release(); firstReleased();
+      await new Promise(resolve => { finishFirst = resolve; });
+      order.push('first: link');
+    });
+    await released;
+    await withApplicationLock(lock, async () => { order.push('second: imports'); }, { tryOnly: true });
+    finishFirst();
+    await first;
+    assert.deepEqual(order, ['first: imports', 'second: imports', 'first: link']);
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});

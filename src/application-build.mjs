@@ -50,8 +50,12 @@ export async function buildApplication(file, options = {}) {
   const source = resolve(file);
   if (!source.endsWith('.lean') || !(await stat(source)).isFile()) throw new Error(`Expected an existing Lean source: ${source}`);
   const directory = findApplicationProject(source) ?? dirname(source);
-  return withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), () =>
-    withCacheLease(options.cache ?? managedCacheDirectory(), () => buildLockedApplication(source, options), {
+  // releaseAfterImports (lasm dev's concurrent outputs): the project lock covers
+  // Lake building the shared imports only; elaborating this program and linking
+  // it run alongside the other outputs' builds (their work directories differ).
+  return withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), release =>
+    withCacheLease(options.cache ?? managedCacheDirectory(), () => buildLockedApplication(source,
+      options.releaseAfterImports ? { ...options, afterImports: release } : options), {
       onWait: () => options.progress?.({ stage: 'Waiting for tool cache repair to finish' }),
     }), {
     onWait: () => options.progress?.({ stage: 'Waiting for another build in this project to finish' }),
@@ -59,7 +63,7 @@ export async function buildApplication(file, options = {}) {
 }
 
 async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
-  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false } = {}) {
+  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false, afterImports } = {}) {
   // linkOnly (dev edge and browser builds, src/application-cli.mjs buildEdge):
   // the Node program is only planned and linked for its link inputs; its
   // JavaScript glue, host and npm packages are not produced. A separate cache identity.
@@ -90,7 +94,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const work = join(directory, '.lake/lasm/applications', digest(source).slice(0, 16));
   await mkdir(work, { recursive: true });
   progress?.({ stage: project ? 'Checking Lean sources and Lake dependencies' : 'Checking Lean sources and imports' });
-  let generated = applicationSources(source, lean, work, { log: verbose ? log : () => {} });
+  let generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, afterImports });
   if (generated.needsCCompiler) {
     // Lake packages with C code build it natively with Lean's own clang, as Lake does.
     progress?.({ stage: `Packages with C code (${generated.native.map(item => item.package).join(', ')}) need Lean's C compiler and headers` });

@@ -1,12 +1,15 @@
-// The main-thread side of `lasm dev`'s long-lived build worker.
+// The main-thread side of `lasm dev`'s long-lived build workers.
 import { Worker } from 'node:worker_threads';
 
-/** unref: the worker does not keep the process alive (a Vite dev server owns its lifetime). */
-export function createBuildService({ workerUrl = new URL('./dev-build-worker.mjs', import.meta.url), unref = false } = {}) {
-  let worker, nextId = 0;
+/** unref: the workers do not keep the process alive (a Vite dev server owns its lifetime).
+ * workers: how many builds may run at once (lasm dev's outputs, one worker each);
+ * build(…, { slot }) picks the worker, so each output keeps its warm worker. */
+export function createBuildService({ workerUrl = new URL('./dev-build-worker.mjs', import.meta.url), unref = false, workers: count = 1 } = {}) {
+  const slots = Array.from({ length: Math.max(1, count) }, () => ({ worker: undefined }));
+  let nextId = 0;
   const pending = new Map();
-  const start = () => {
-    const self = worker = new Worker(workerUrl, { stdout: true, stderr: true });
+  const start = slot => {
+    const self = slot.worker = new Worker(workerUrl, { stdout: true, stderr: true });
     if (unref) self.unref();
     self.stdout.pipe(process.stdout, { end: false });
     self.stderr.pipe(process.stderr, { end: false });
@@ -21,23 +24,29 @@ export function createBuildService({ workerUrl = new URL('./dev-build-worker.mjs
         else request.reject(Object.assign(new Error(message.error.message), message.error));
       }
     });
-    // A crashed worker fails its build; the next build starts a new one.
+    // A crashed worker fails its builds; the next build starts a new one.
     const fail = error => {
-      for (const request of pending.values()) request.reject(error);
-      pending.clear(); if (worker === self) worker = undefined;
+      for (const [id, request] of pending) if (request.worker === self) { pending.delete(id); request.reject(error); }
+      if (slot.worker === self) slot.worker = undefined;
     };
     self.once('error', fail);
     self.once('exit', code => fail(new Error(`The Lasm build worker stopped (exit ${code}).`)));
   };
   return {
-    build(file, options, { target, onProgress, onLog } = {}) {
-      if (!worker) start();
+    workers: slots.length,
+    build(file, options, { target, onProgress, onLog, slot: index = 0 } = {}) {
+      const slot = slots[index % slots.length];
+      if (!slot.worker) start(slot);
       const id = nextId++;
       return new Promise((resolve, reject) => {
-        pending.set(id, { resolve, reject, onProgress, onLog });
-        worker.postMessage({ id, file, options, target });
+        pending.set(id, { resolve, reject, onProgress, onLog, worker: slot.worker });
+        slot.worker.postMessage({ id, file, options, target });
       });
     },
-    async close() { const current = worker; worker = undefined; await current?.terminate(); },
+    async close() {
+      const current = slots.map(slot => slot.worker).filter(Boolean);
+      for (const slot of slots) slot.worker = undefined;
+      await Promise.all(current.map(worker => worker.terminate()));
+    },
   };
 }

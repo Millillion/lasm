@@ -6,6 +6,7 @@
 // The result is accepted only when its imports are a subset of that full
 // link's: a symbol the edit newly needs from an omitted member would surface as
 // a new import, and the build then links in full again.
+import { threadId } from 'node:worker_threads';
 import { closeSync, existsSync, mkdirSync, openSync, readFileSync, readSync, renameSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 
@@ -96,7 +97,7 @@ export function memberFiles(members, directory) {
         const header = Buffer.alloc(60); readSync(fd, header, 0, 60, offset);
         const size = Number(latin1.decode(header).slice(48, 58).trim());
         const data = Buffer.alloc(size); readSync(fd, data, 0, size, offset + 60);
-        const partial = `${file}.${process.pid}.partial`;
+        const partial = `${file}.${process.pid}.${threadId}.partial`;
         writeFileSync(partial, data); renameSync(partial, file);
       }
     } finally { if (fd !== undefined) closeSync(fd); }
