@@ -69,7 +69,7 @@ Playwright 1.63.0: **Chromium 153** and **Firefox 155** on `ubuntu-24.04`,
 | Start, module evaluated → first frame, counter, warm | **30 ms Chromium**, 43 ms Firefox, 46 ms WebKit Linux, 64 ms WebKit macOS |
 | Same, cold (first visit) | 26 / 46 / 86 / 91 ms |
 | First build / unchanged rebuild, counter (Linux runner) | 53 s / 3.5 s |
-| Dev rebuild after editing one view expression | 12.9 s `lasm build --dev`; 11.4 s through `vite` (budget 2 s: not met; the Node build stage dominates, see the DX branch's edit-loop work) |
+| Dev rebuild after editing one view expression | In this run 12.9 s (`lasm build --dev`) and 11.4 s (`vite`). **Superseded** after the edit-loop work: `lasm dev --target browser` 1.6–1.7 s per edit, Vite 1.7–2.7 s, a new `lasm build --dev` process 3.6 s (browser.yml 40310922142; [BENCHMARKS.md](BENCHMARKS.md#browser-target-branch-dx-browser)). |
 | Same source, local and CI | byte-identical `app.<hash>.wasm` and `.js` |
 
 **How the link is shared.** The browser uses the edge program linked with the

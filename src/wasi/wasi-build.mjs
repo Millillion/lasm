@@ -144,8 +144,8 @@ export async function writeWasiOutput({ target, source, projectDirectory, result
     const tomlName = /^\s*name\s*=\s*"([^"]+)"/m.exec(readFileSync(toml, 'utf8'))?.[1] ?? name;
     const pkg = await writeFastlyPackage(projectDirectory, tomlName.replace(/[^A-Za-z0-9_-]+/g, '-'), wasm, join(destination, 'THIRD_PARTY_NOTICES.txt'));
     note = `; package ${relative(process.cwd(), pkg) || pkg}; run locally with fastly compute serve`;
-  } else if (target === 'wasi-http') note = '; serve it with wasmtime serve or Spin (see docs/WASI.md)';
-  else note = '; run it with wasmtime, wasmer or node:wasi (see docs/WASI.md)';
+  } else if (target === 'wasi-http') note = '; serve it with wasmtime serve or Spin; guide: https://github.com/Millillion/lasm/blob/main/docs/WASI.md';
+  else note = '; run it with wasmtime, wasmer or node:wasi; guide: https://github.com/Millillion/lasm/blob/main/docs/WASI.md';
   log(`${cacheHit ? 'Reused' : 'Built'} ${relative(process.cwd(), source) || source} for ${spec.label}: ${relative(process.cwd(), wasm) || wasm}`
     + ` (${(bytes / 1048576).toFixed(2)} MiB${note})`);
   return { output: destination, wasm, info };

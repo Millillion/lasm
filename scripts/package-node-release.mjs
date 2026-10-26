@@ -90,7 +90,7 @@ json('provenance.json', { sourceRevision, runtimeManifestSha256: manifestSha256,
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json')));
 json('package.json', {
   name: sourcePackage.name, version, private: true, license: 'UNLICENSED', type: 'module',
-  description: 'Compile ordinary Lean applications to run in Node',
+  description: 'Compile Lean 4 to WebAssembly for Node, Bun, Deno, edge functions, WASI, Fastly and the browser',
   bin: sourcePackage.bin, exports: sourcePackage.exports, engines: { node: '>=' + pins.minimumNode }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
   files: ['bin', 'src', 'library', 'templates', 'scripts', 'targets', 'docs', 'examples', 'README.md',
     'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json', 'installer-dependencies.json'],

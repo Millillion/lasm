@@ -1,8 +1,7 @@
 # Supabase Edge Functions
 
-Status: **in branch source, planned for 0.2.0** (Phase 7.4). It is not in any
-candidate or in 0.1.0. Nothing is deployed to a Supabase account: CI serves the
-functions in Supabase's own edge runtime image. The design and limits are in
+Status: **supported from 0.2.0** (Phase 7.4). Nothing is deployed to a Supabase
+account: CI serves the functions in Supabase's own edge runtime image. The design and limits are in
 [EDGE.md](../EDGE.md).
 
 ## Build and deploy

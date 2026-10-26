@@ -246,13 +246,22 @@ private def jsResponse (method : String) (r : Response) : Async Value := do
     let content : Data := if bodyless method r.status then .null else .bytes r.body
     (← g.get "Response").new #[content, init]
 
+/-- The platform's per-handler environment on edge isolates (Cloudflare
+Workers' `env`: KV namespaces, D1, secrets), as the last request brought it;
+`.undefined` elsewhere. Lasm.KV reads its bindings from it. -/
+initialize platformEnv : IO.Ref Lasm.JS.Data ← IO.mkRef .undefined
+
 open Lasm.JS in
-/-- A JavaScript fetch handler `(request) => Promise<Response>` that runs `handler`. -/
+/-- A JavaScript fetch handler `(request, env) => Promise<Response>` that runs `handler`. -/
 def jsFetchHandler (handler : Handler) (options : ServeOptions := {}) : IO Value := do
   let g ← global
   let uint8Array ← g.get "Uint8Array"
   let arrayClass ← g.get "Array"
   Function.ofFn fun args => do
+    -- Workers' env is a plain object (its bindings arrive as references); keep either form.
+    match (args[1]? : Option Data) with
+    | some env@(.ref _ _) | some env@(.object _) => platformEnv.set env
+    | _ => pure ()
     let .ref request _ := args[0]?.getD .undefined | throw (IO.userError "Lasm.Fetch: the fetch handler expected a Request")
     let fields ← request.getFields #["method", "url", "headers", "body"]
     let method := match fields.field "method" with | .string s => s | _ => "GET"

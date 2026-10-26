@@ -123,33 +123,95 @@ answer: `.ok res`, or `Error.invalid` (the server refused it, 400),
 ## The fullstack template
 
 ```sh
-lasm init my-app --template fullstack
+lasm init my-app --template fullstack [--deploy fastly --deploy wasi-http …]
 cd my-app && npm install
-npm run dev          # http://localhost:3000; rebuilds the server and the browser app on every change
-npm run build        # dist/server (Node) and dist/public (the browser app)
+npm run dev          # one URL, http://localhost:3000: the server and the browser app, live reload
+npm run build        # dist/public (the browser app), then dist/server (Node) with it embedded
 npm start            # the release build on $PORT (3000)
-npm run build:workers && npx wrangler deploy   # Cloudflare Workers (workers/ and dist/public)
+npm run build:workers && npx wrangler deploy   # Cloudflare Workers (workers/; dist/public as assets)
 ```
 
 | File | |
 | --- | --- |
 | `Shared.lean` | Data, endpoints, validation and its theorem (a Lake library: `lake build` checks it). |
 | `View.lean` | The page (`Lasm.UI`), shared: the server renders it to HTML, the browser keeps it up to date. |
-| `Server.lean` | `Lasm.Fetch.serve`: the endpoints, and `GET /` rendering the view with the todos embedded as the app's flags (`data-lasm-flags`, `data-lasm-hydrate`); on Node also the files of `dist/public`. |
+| `Server.lean` | `Lasm.Fetch.serve`: the endpoints, `GET /` rendering the view with the todos embedded as the app's flags (`data-lasm-flags`, `data-lasm-hydrate`), and `dist/public` (the browser app and `public/`) embedded with `embed_dir!`. The todos are kept with `Lasm.KV`. |
 | `Client.lean` | The `Lasm.UI` app. It mounts on the server's markup and hydrates it (keeping its nodes), then calls the endpoints. |
-| `wrangler.toml` | Workers: the server as a Worker (`workers/worker.mjs`), `dist/public` as static assets (served before the Worker). |
+| `wrangler.toml` | Workers: the server as a Worker (`workers/worker.mjs`), `dist/public` as static assets (served before the Worker), and a commented-out `TODOS` KV binding. |
+
+### npm run dev: one URL
 
 `npm run dev` is `lasm dev --target node=Server.lean,browser=Client.lean
---output dist/public/client`: on every change it rebuilds the browser app
-into `dist/public/client` and the server, then restarts the server (a build
-error keeps the last good one running). Open http://localhost:3000: the
-server renders the page and serves the new browser app; reload after a
-change. (`lasm dev` also serves the browser app alone on :5173 with live
-reload; its API calls need the server.)
+--output dist/public/client`. It starts one URL (`$PORT`, default 3000): a
+small proxy in front of the server program (which runs on a private port).
+The server serves the page, the API and the browser app; the proxy adds the
+live-reload script to HTML pages and reloads open pages after every rebuild.
+There is no separate browser server.
 
-The todos live in memory, one copy per server process (or Workers isolate).
-For real data, call a database from the handlers (they run in `Async`; on
-Workers, D1 and KV through `Lasm.JS`).
+An edit rebuilds only the outputs whose sources import the changed file: a
+`Client.lean` edit rebuilds the browser app and keeps the server running
+(dev servers read `dist/public` from disk instead of embedding it), a
+`Server.lean` edit rebuilds and restarts the server only, and a `View.lean`
+or `Shared.lean` edit rebuilds both. A build error keeps the last good build
+running and shows the error in the page's console. CI times edit → reload on
+linux-x64 ([`fullstack.yml`](../.github/workflows/fullstack.yml), job `dev`,
+step summary).
+
+### Static files on every target
+
+```lean
+def assets : Assets := embed_dir! "dist/public"   -- Lasm.Fetch.Embed
+
+def main : IO Unit := serve <| assets.wrap <| handler routes fallback
+```
+
+`embed_dir! "dir"` (relative to the Lean file) reads the directory when the
+server is compiled and puts every file in the program, with its content type
+and its `.br` copy when the browser build wrote one (sent to clients that
+accept Brotli). Hashed names (`app.1a2b3c4d5e6f.js`) are served as immutable,
+the rest with `cache-control: no-cache`. `Assets.wrap` answers `GET`/`HEAD`
+for those paths and passes everything else to the handler; `..` and dotfiles
+are refused. So one server build serves the whole app on every `Lasm.Fetch`
+target, including those without an asset mechanism (Fastly, wasi-http, Deno,
+Bun). Workers also serve `dist/public` through `[assets]`, before the Worker
+runs. Under `lasm dev` (`LASM_DEV_SERVER` set) nothing is embedded and the
+files are read from disk on each request. Build the browser app first (`npm
+run build` and every `build:<target>` script do).
+
+| `--deploy` | Build | Run locally |
+| --- | --- | --- |
+| (Node) | `npm run build` | `npm start` |
+| `workers` (always: `wrangler.toml`) | `npm run build:workers` | `npx wrangler dev` |
+| Bun, Deno (always) | `npm run build:bun`, `npm run build:deno` | `npm run start:bun`, `npm run start:deno` |
+| `vercel-edge` | `npm run build:vercel-edge` (Vercel runs it) | |
+| `netlify-edge` | `npm run build:netlify-edge` (Netlify runs it) | |
+| `deno-deploy` | `npm run build:deno-deploy` | `deno run -A --unstable-kv deno/main.mjs` |
+| `fastly` | `npm run build:fastly` | `fastly compute serve` |
+| `wasi-http`, `spin` | `npm run build:wasi-http` | `wasmtime serve wasi-http/main.wasm`, `spin up` |
+
+### Persistence: Lasm.KV
+
+```lean
+let kv ← Lasm.KV.open "TODOS"      -- the best store the platform has
+kv.put "state" json; let s ← kv.get "state"; kv.delete "state"
+```
+
+`Lasm.KV.Store` is three operations (`get`, `put`, `delete` on string keys
+and values, in `Async`). `Lasm.KV.open name` picks:
+
+| Platform | Store |
+| --- | --- |
+| Cloudflare Workers with a KV namespace bound as `name` | Workers KV (`Lasm.KV.workers`) |
+| Deno with `--unstable-kv`, Deno Deploy | Deno KV (`Lasm.KV.deno`), keys `[name, key]` |
+| Fastly with a KV Store named `name` (`fastly.toml` declares a local one for Viceroy) | Fastly KV Store (`Lasm.KV.fastly`) |
+| everything else (Node, Bun, unbound Workers, Vercel and Netlify Edge, wasi-http) | memory (`Lasm.KV.memory`): one copy per process or isolate |
+
+The template stores the whole todo list as one JSON document under the key
+`state`, so every backend needs only those three operations. On wasi-http
+(and WASI CGI) each request is a new instance, so the memory store does not
+outlive a request there: bind a real store for those. Backends that need an
+account to test (Vercel KV, Netlify Blobs, Upstash) are not included; call
+them from the handlers through `Lasm.JS`.
 
 ## Wire format
 
@@ -191,9 +253,14 @@ CI tests them end to end.
 | `Lasm.RPC.Server` | `Endpoint.serve`, `Endpoint.serve'`, `Route`, `handler` |
 | `Lasm.RPC.Client` | `Endpoint.call`, `call_invalid` |
 | `Lasm.RPC` | all three |
+| `Lasm.Fetch.Assets`, `Lasm.Fetch.Embed` | `Assets`, `Assets.serve`, `Assets.wrap`; `embed_dir!` |
+| `Lasm.KV` | `Store`, `memory`, `workers`, `deno`, `fastly`, `open` |
 
 CI: [`fullstack.yml`](../.github/workflows/fullstack.yml) builds the template
-as `lasm init` writes it and runs it end to end in Chromium, Firefox and
-WebKit against the Node server, and in Chromium against the Worker under
-`wrangler dev`; [`ui.yml`](../.github/workflows/ui.yml) checks that the
+as `lasm init` writes it, for Node, Workers, Bun, Deno, Fastly and wasi-http,
+and runs it end to end in Chromium, Firefox and WebKit against the Node
+server and in Chromium against the Worker (`wrangler dev`, local KV), Bun,
+Deno (Deno KV) and Fastly (Viceroy, local KV Store), with HTTP checks of the
+embedded files and of persistence across restarts, and on `wasmtime serve`;
+it also times `npm run dev`'s edit → reload; [`ui.yml`](../.github/workflows/ui.yml) checks that the
 template and its theorems elaborate.

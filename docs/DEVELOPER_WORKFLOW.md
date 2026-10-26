@@ -1,15 +1,15 @@
-# Node applications with normal Lake projects
+# The edit loop: `lasm dev` and Lake projects
 
-For the current Lean 4.34 application pipeline, start with an ordinary `main` in
-a standalone file or Lake project and run `lasm Main.lean`. Build deployable
-output with `lasm build Main.lean`, then `node dist/main.mjs`. Node is the only
-deployment target. No `lasm.json` or Lean dependency
-on Lasm is needed. See [current implementation status](APPLICATION_PIPELINE.md)
-for managed-tool, package, and platform acceptance; the package is not published.
+Start with an ordinary `main` in a standalone file or a Lake project (Lean 4.35.0).
+`lasm Main.lean` builds and runs it once; `lasm dev` (0.3.0) watches, rebuilds and
+restarts; `lasm build Main.lean` writes the deployable `dist/` (`node dist/main.mjs`,
+or another `--target`). No `lasm.json` and no Lake dependency on Lasm is needed:
+`Lasm.*` libraries ship with the compiler. Every command and option is in the
+[README's CLI reference](../README.md#cli-reference).
 
 ## lasm dev
 
-`lasm dev [Main.lean]` (after 0.2.0, branch `dx`; `npm run dev` in the server
+`lasm dev [Main.lean]` (0.3.0; `npm run dev` in the server
 templates) is the edit loop:
 
 ```text
