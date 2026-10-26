@@ -25,6 +25,9 @@
 const char *lasm_wasi_getenv(const char *name);
 size_t lasm_wasi_environment(const char *const **entries);
 extern bool lasm_wasi_stdout_to_stderr;
+/* Queues a completion for the cooperative runtime (header: promise, resource, kind). */
+void lasm_wasi_complete(const uint8_t header[24], bool failed, const void *data, size_t size);
+void lasm_wasi_complete_error(const uint8_t header[24], uint64_t kind, uint64_t code, const char *message);
 
 static lean_obj_res fail(const char *message) {
     return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string(message)));
@@ -53,7 +56,7 @@ static void grow_put(growable *g, const void *data, size_t size) {
     }
     memcpy(g->data + g->size, data, size); g->size += size;
 }
-static const char *reason(unsigned status) {
+__attribute__((unused)) static const char *reason(unsigned status) {
     switch (status) {
     case 200: return "OK"; case 201: return "Created"; case 202: return "Accepted"; case 204: return "No Content";
     case 301: return "Moved Permanently"; case 302: return "Found"; case 303: return "See Other"; case 304: return "Not Modified";
@@ -65,7 +68,7 @@ static const char *reason(unsigned status) {
     }
 }
 /* A header name or value, as text a header line can carry (no CR, LF or NUL). */
-static void put_clean(growable *g, lean_object *s) {
+__attribute__((unused)) static void put_clean(growable *g, lean_object *s) {
     const char *p = lean_string_cstr(s);
     size_t n = lean_string_size(s) - 1;
     for (size_t i = 0; i < n; i++) { char c = p[i] == '\r' || p[i] == '\n' || p[i] == 0 ? ' ' : p[i]; grow_put(g, &c, 1); }
@@ -172,6 +175,15 @@ LEAN_EXPORT lean_obj_res lasm_fetch_send_response(uint16_t status, b_lean_obj_ar
     return lean_io_result_mk_ok(lean_box(0));
 }
 void lasm_fastly_initialize(void) {}
+LEAN_EXPORT lean_obj_res lasm_fetch_send(b_lean_obj_arg promise, b_lean_obj_arg method, b_lean_obj_arg url, b_lean_obj_arg headers,
+    b_lean_obj_arg body, b_lean_obj_arg backend) {
+    (void)promise; (void)method; (void)url; (void)headers; (void)body; (void)backend;
+    return fail("Lasm.Fetch.fetch: outbound HTTP is not available in a WASI preview 1 program (it has no sockets)");
+}
+/* The event loop's hooks for host I/O (Fastly: pending backend requests). */
+bool lasm_wasi_io_poll(void) { return false; }
+bool lasm_wasi_io_pending(void) { return false; }
+void lasm_wasi_io_wait(uint64_t timeout_ns, bool bounded) { (void)timeout_ns; (void)bounded; }
 #else
 /* ---- Fastly Compute ---- */
 #define FASTLY(module, name) __attribute__((import_module(#module), import_name(#name)))
@@ -191,8 +203,59 @@ FASTLY(fastly_http_resp, status_set) uint32_t f_resp_status_set(uint32_t resp, u
 FASTLY(fastly_http_resp, header_append) uint32_t f_resp_header_append(uint32_t resp, uint32_t name, uint32_t name_length,
     uint32_t value, uint32_t value_length);
 FASTLY(fastly_http_resp, send_downstream) uint32_t f_resp_send_downstream(uint32_t resp, uint32_t body, uint32_t streaming);
+FASTLY(fastly_http_req, new) uint32_t f_req_new(uint32_t req_out);
+FASTLY(fastly_http_req, method_set) uint32_t f_req_method_set(uint32_t req, uint32_t method, uint32_t length);
+FASTLY(fastly_http_req, uri_set) uint32_t f_req_uri_set(uint32_t req, uint32_t uri, uint32_t length);
+FASTLY(fastly_http_req, header_append) uint32_t f_req_header_append(uint32_t req, uint32_t name, uint32_t name_length, uint32_t value, uint32_t value_length);
+FASTLY(fastly_http_req, send_async) uint32_t f_req_send_async(uint32_t req, uint32_t body, uint32_t backend, uint32_t backend_length, uint32_t pending_out);
+FASTLY(fastly_http_req, pending_req_wait) uint32_t f_req_pending_wait(uint32_t pending, uint32_t resp_out, uint32_t body_out);
+FASTLY(fastly_http_req, register_dynamic_backend) uint32_t f_req_register_dynamic_backend(uint32_t name, uint32_t name_length,
+    uint32_t target, uint32_t target_length, uint32_t mask, uint32_t config);
+FASTLY(fastly_http_resp, status_get) uint32_t f_resp_status_get(uint32_t resp, uint32_t status_out);
+FASTLY(fastly_http_resp, header_names_get) uint32_t f_resp_header_names_get(uint32_t resp, uint32_t buf, uint32_t length,
+    uint32_t cursor, uint32_t ending_cursor, uint32_t nwritten);
+FASTLY(fastly_http_resp, header_values_get) uint32_t f_resp_header_values_get(uint32_t resp, uint32_t name, uint32_t name_length,
+    uint32_t buf, uint32_t length, uint32_t cursor, uint32_t ending_cursor, uint32_t nwritten);
+FASTLY(fastly_async_io, select) uint32_t f_async_select(uint32_t handles, uint32_t count, uint32_t timeout_ms, uint32_t ready_out);
+FASTLY(fastly_async_io, is_ready) uint32_t f_async_is_ready(uint32_t handle, uint32_t ready_out);
 
 enum { FASTLY_OK = 0, FASTLY_BUFLEN = 4 };
+typedef uint32_t (*names_getter)(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
+typedef uint32_t (*values_getter)(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
+/* Every (name, value) header of a request or response, calling `each` per value. */
+static uint32_t each_header(names_getter names_get, values_getter values_get, uint32_t handle,
+    void (*each)(void *, const char *, size_t, const char *, size_t), void *context) {
+    uint32_t names_capacity = 16384, values_capacity = 65536, cursor = 0, status = 0;
+    char *names = malloc(names_capacity), *values = malloc(values_capacity);
+    for (;;) {
+        int64_t ending = -1; uint32_t written = 0;
+        status = names_get(handle, P(names), names_capacity, cursor, P(&ending), P(&written));
+        if (status) break;
+        for (uint32_t at = 0; at < written;) {
+            const char *name = names + at;
+            size_t n = strnlen(name, written - at);
+            uint32_t vcursor = 0;
+            for (;;) {
+                int64_t vending = -1; uint32_t vwritten = 0;
+                status = values_get(handle, P(name), (uint32_t)n, P(values), values_capacity, vcursor, P(&vending), P(&vwritten));
+                if (status) goto done;
+                for (uint32_t v = 0; v < vwritten;) {
+                    size_t m = strnlen(values + v, vwritten - v);
+                    each(context, name, n, values + v, m);
+                    v += (uint32_t)m + 1;
+                }
+                if (vending < 0) break;
+                vcursor = (uint32_t)vending;
+            }
+            at += (uint32_t)n + 1;
+        }
+        if (ending < 0) break;
+        cursor = (uint32_t)ending;
+    }
+done:
+    free(names); free(values);
+    return status;
+}
 LEAN_EXPORT uint32_t lasm_fetch_platform(lean_obj_arg unit) { (void)unit; return 2; }
 void lasm_fastly_initialize(void) { (void)f_abi_init(1); }
 
@@ -288,5 +351,175 @@ LEAN_EXPORT lean_obj_res lasm_fetch_send_response(uint16_t code, b_lean_obj_arg 
     }
     if ((status = f_resp_send_downstream(response, out, 0))) return fastly_fail("sending the response", status);
     return lean_io_result_mk_ok(lean_box(0));
+}
+#endif
+
+#ifdef LASM_WASI_FASTLY
+/* ---- Outbound requests: send_async, completed by the event loop. ---- */
+typedef struct { uint8_t header[24]; uint32_t pending; bool active; } outbound;
+static outbound *outbounds; static size_t outbound_count;
+static char **dynamic_backends; static size_t dynamic_count;
+
+/* A dynamic backend named for the URL's scheme, host and port. */
+static uint32_t dynamic_backend(const char *url, size_t url_length, char *name, size_t name_size) {
+    const char *scheme_end = strstr(url, "://");
+    if (!scheme_end || (size_t)(scheme_end - url) > url_length) return 2;
+    bool tls = scheme_end - url == 5 && !strncmp(url, "https", 5);
+    const char *host = scheme_end + 3, *end = host;
+    while (*end && *end != '/' && *end != '?' && *end != '#') end++;
+    const char *at = memchr(host, '@', (size_t)(end - host));
+    if (at) host = at + 1;
+    char authority[512];
+    size_t n = (size_t)(end - host);
+    if (!n || n >= sizeof(authority) - 8) return 2;
+    memcpy(authority, host, n); authority[n] = 0;
+    char hostname[512];
+    strcpy(hostname, authority);
+    char *colon = hostname[0] == '[' ? strchr(hostname, ']') : strrchr(hostname, ':');
+    if (colon && *colon == ']') colon = colon[1] == ':' ? colon + 1 : NULL;
+    if (colon) *colon = 0; else strcat(authority, tls ? ":443" : ":80");
+    if (hostname[0] == '[') { memmove(hostname, hostname + 1, strlen(hostname)); char *close = strchr(hostname, ']'); if (close) *close = 0; }
+    snprintf(name, name_size, "lasm-%s-", tls ? "tls" : "tcp");
+    for (const char *p = authority; *p && strlen(name) + 1 < name_size; p++) {
+        char c = (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p >= '0' && *p <= '9') || *p == '-' || *p == '.' ? *p : '_';
+        size_t len = strlen(name); name[len] = c; name[len + 1] = 0;
+    }
+    for (size_t i = 0; i < dynamic_count; i++) if (!strcmp(dynamic_backends[i], name)) return 0;
+    /* dynamic_backend_config (compute-at-edge typenames.witx): 108 bytes. */
+    uint8_t config[128];
+    memset(config, 0, sizeof(config));
+    uint32_t host_length = (uint32_t)strlen(hostname);
+    uint32_t pointer = P(hostname);
+    uint32_t mask = 1u << 1; /* host_override */
+    memcpy(config + 0, &pointer, 4); memcpy(config + 4, &host_length, 4);
+    if (tls) {
+        mask |= (1u << 5) | (1u << 8) | (1u << 11); /* use_ssl, cert_hostname, sni_hostname */
+        memcpy(config + 28, &pointer, 4); memcpy(config + 32, &host_length, 4);
+        memcpy(config + 52, &pointer, 4); memcpy(config + 56, &host_length, 4);
+    }
+    uint32_t status = f_req_register_dynamic_backend(P(name), (uint32_t)strlen(name), P(authority), (uint32_t)strlen(authority), mask, P(config));
+    if (status) return status;
+    char **grown = realloc(dynamic_backends, (dynamic_count + 1) * sizeof(char *));
+    if (!grown) abort();
+    dynamic_backends = grown; dynamic_backends[dynamic_count++] = strdup(name);
+    return 0;
+}
+
+LEAN_EXPORT lean_obj_res lasm_fetch_send(b_lean_obj_arg promise, b_lean_obj_arg method, b_lean_obj_arg url, b_lean_obj_arg headers,
+    b_lean_obj_arg body, b_lean_obj_arg backend) {
+    uint32_t request = 0, out = 0, pending = 0, status;
+    if ((status = f_req_new(P(&request)))) return fastly_fail("creating a backend request", status);
+    if ((status = f_req_method_set(request, P(lean_string_cstr(method)), (uint32_t)(lean_string_size(method) - 1))))
+        return fastly_fail("setting the request method", status);
+    if ((status = f_req_uri_set(request, P(lean_string_cstr(url)), (uint32_t)(lean_string_size(url) - 1))))
+        return fastly_fail("setting the request URL", status);
+    size_t n = lean_array_size(headers);
+    for (size_t i = 0; i < n; i++) {
+        lean_object *h = lean_array_get_core(headers, i), *name = lean_ctor_get(h, 0), *value = lean_ctor_get(h, 1);
+        status = f_req_header_append(request, P(lean_string_cstr(name)), (uint32_t)(lean_string_size(name) - 1),
+            P(lean_string_cstr(value)), (uint32_t)(lean_string_size(value) - 1));
+        if (status) return fastly_fail("setting a request header", status);
+    }
+    if ((status = f_body_new(P(&out)))) return fastly_fail("creating the request body", status);
+    const uint8_t *p = lean_sarray_cptr(body);
+    size_t left = lean_sarray_size(body);
+    while (left) {
+        uint32_t written = 0;
+        status = f_body_write(out, P(p), (uint32_t)(left > (1u << 20) ? (1u << 20) : left), 0, P(&written));
+        if (status) return fastly_fail("writing the request body", status);
+        p += written; left -= written;
+    }
+    char name[600];
+    if (lean_string_size(backend) > 1) snprintf(name, sizeof(name), "%s", lean_string_cstr(backend));
+    else if ((status = dynamic_backend(lean_string_cstr(url), lean_string_size(url) - 1, name, sizeof(name)))) {
+        char message[200];
+        snprintf(message, sizeof(message), "Lasm.Fetch.fetch on Fastly: registering a dynamic backend for this URL failed (FastlyStatus %u); "
+            "enable dynamic backends for the service or pass FetchOptions.backend", (unsigned)status);
+        return fail(message);
+    }
+    status = f_req_send_async(request, out, P(name), (uint32_t)strlen(name), P(&pending));
+    if (status) return fastly_fail("sending the backend request", status);
+    outbound o = { .pending = pending, .active = true };
+    uint64_t header[3] = { (uint64_t)(uintptr_t)promise, (uint64_t)(uintptr_t)lean_box(0), 8 };
+    memcpy(o.header, header, 24);
+    lean_inc(promise);
+    outbound *grown = realloc(outbounds, (outbound_count + 1) * sizeof(*grown));
+    if (!grown) abort();
+    outbounds = grown; outbounds[outbound_count++] = o;
+    return lean_io_result_mk_ok(lean_box(0));
+}
+
+typedef struct { growable *out; uint64_t count; } header_sink;
+static void add_header(void *context, const char *name, size_t n, const char *value, size_t m) {
+    header_sink *sink = context;
+    uint64_t length = n;
+    grow_put(sink->out, &length, 8); grow_put(sink->out, name, n);
+    length = m;
+    grow_put(sink->out, &length, 8); grow_put(sink->out, value, m);
+    sink->count++;
+}
+/* Finishes a ready pending request: status, headers and the whole body. */
+static void finish_outbound(outbound *o) {
+    uint32_t response = 0, body = 0, status = f_req_pending_wait(o->pending, P(&response), P(&body));
+    o->active = false;
+    char message[160];
+    if (status) {
+        snprintf(message, sizeof(message), "Lasm.Fetch.fetch on Fastly: the backend request failed (FastlyStatus %u)", (unsigned)status);
+        lasm_wasi_complete_error(o->header, 0, 5, message);
+        return;
+    }
+    uint16_t code = 0;
+    f_resp_status_get(response, P(&code));
+    growable headers = { 0 };
+    header_sink sink = { &headers, 0 };
+    each_header(f_resp_header_names_get, f_resp_header_values_get, response, add_header, &sink);
+    growable out = { 0 };
+    uint64_t value = code;
+    grow_put(&out, &value, 8); grow_put(&out, &sink.count, 8);
+    if (headers.size) grow_put(&out, headers.data, headers.size);
+    uint8_t chunk[16384];
+    for (;;) {
+        uint32_t n = 0;
+        status = f_body_read(body, P(chunk), sizeof(chunk), P(&n));
+        if (status) {
+            snprintf(message, sizeof(message), "Lasm.Fetch.fetch on Fastly: reading the response body failed (FastlyStatus %u)", (unsigned)status);
+            lasm_wasi_complete_error(o->header, 0, 5, message);
+            free(headers.data); free(out.data);
+            return;
+        }
+        if (!n) break;
+        grow_put(&out, chunk, n);
+    }
+    lasm_wasi_complete(o->header, false, out.data, out.size);
+    free(headers.data); free(out.data);
+}
+static void compact(void) {
+    size_t k = 0;
+    for (size_t i = 0; i < outbound_count; i++) if (outbounds[i].active) outbounds[k++] = outbounds[i];
+    outbound_count = k;
+}
+/* Completes the requests that are ready, without waiting. */
+bool lasm_wasi_io_poll(void) {
+    bool any = false;
+    for (size_t i = 0; i < outbound_count; i++) {
+        uint32_t ready = 0;
+        if (!f_async_is_ready(outbounds[i].pending, P(&ready)) && ready) { finish_outbound(&outbounds[i]); any = true; }
+    }
+    compact();
+    return any;
+}
+bool lasm_wasi_io_pending(void) { return outbound_count > 0; }
+/* Waits until a request is ready or the timeout (a timer's) passes. */
+void lasm_wasi_io_wait(uint64_t timeout_ns, bool bounded) {
+    if (!outbound_count) return;
+    uint32_t *handles = malloc(outbound_count * sizeof(uint32_t));
+    for (size_t i = 0; i < outbound_count; i++) handles[i] = outbounds[i].pending;
+    uint64_t ms = bounded ? (timeout_ns + 999999) / 1000000 : 0;
+    if (bounded && !ms) ms = 1;
+    if (ms > 0xfffffffeu) ms = 0xfffffffeu;
+    uint32_t ready = 0;
+    (void)f_async_select(P(handles), (uint32_t)outbound_count, (uint32_t)ms, P(&ready));
+    free(handles);
+    lasm_wasi_io_poll();
 }
 #endif

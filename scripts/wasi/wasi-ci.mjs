@@ -122,6 +122,16 @@ for (const engine of ['wasmtime', 'wasmer', 'node'].filter(e => engines.has(e)))
 
 // ---- Lasm.Fetch ----
 const MiB = 1048576;
+// The origin server for outbound requests.
+const http = await import('node:http');
+const originServer = http.createServer(async (req, res) => {
+  const chunks = []; for await (const c of req) chunks.push(c);
+  if (req.url.startsWith('/origin/slow')) { await new Promise(r => setTimeout(r, 150)); res.writeHead(200, { 'content-type': 'text/plain' }); res.end('slow'); return; }
+  res.writeHead(200, { 'content-type': 'text/plain', 'x-echo-method': req.method });
+  res.end(`${req.method}:${Buffer.concat(chunks).toString()}`);
+});
+await new Promise(r => originServer.listen(3110, '127.0.0.1', r));
+const origin = 'http://127.0.0.1:3110';
 const bytes = Uint8Array.from({ length: 256 }, (_, i) => i);
 // The routes of examples/fetch/Main.lean. `skip` names hosts where a check does not apply.
 const routes = [
@@ -146,13 +156,22 @@ const routes = [
   { path: '/time', json: { mono: true, random: 8 } },
   { path: '/throw', status: 500, text: 'Internal Server Error\n' },
   { path: '/nope', status: 404, text: 'Not Found\n' },
+  // Outbound HTTP (Lasm.Fetch.fetch) to the harness's origin server; WASI preview 1 has no sockets.
+  { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}`, json: { status: 200, body: 'POST:ping', echoed: 'POST' }, outbound: true },
+  { path: `/outbound-parallel?url=${encodeURIComponent(origin + '/origin/slow')}`, outbound: true,
+    check: body => { const r = JSON.parse(body); assert.deepEqual(r.statuses, [200, 200, 200]); assert.ok(r.ms < 400, `three 150 ms requests took ${r.ms} ms`); } },
+  { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}&backend=origin`, json: { status: 200, body: 'POST:ping', echoed: 'POST' }, only: ['viceroy'] },
+  { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}`, status: 500, text: 'Internal Server Error\n', only: ['cgi-wasmtime', 'cgi-wasmer', 'cgi-node', 'spin'] },
 ];
+const applies = (host, route) => !(route.skip?.includes(host) || route.only && !route.only.includes(host)
+  || route.outbound && ['cgi-wasmtime', 'cgi-wasmer', 'cgi-node', 'spin'].includes(host));
 function checkResponse(host, route, { status, headers, body }) {
   const where = `${host} ${route.method ?? 'GET'} ${route.path}`;
   assert.equal(status, route.status ?? 200, `${where}: status ${status}\n${new TextDecoder().decode(body).slice(0, 2000)}`);
   if (route.json) assert.deepEqual(JSON.parse(new TextDecoder().decode(body)), route.json, where);
   if (route.text !== undefined) assert.equal(new TextDecoder().decode(body), route.text, where);
   if (route.bytes) assert.deepEqual([...body], [...route.bytes], where);
+  if (route.check) route.check(new TextDecoder().decode(body));
   if (route.type) assert.match(headers.get('content-type') ?? '', route.type, `${where}: content-type`);
   for (const [k, v] of Object.entries(route.reply ?? {})) assert.equal(headers.get(k), v, `${where}: header ${k}`);
   // Spin's wagi executor keeps one value per header name (crates/http/src/wagi).
@@ -182,7 +201,7 @@ function cgi(engine, route) {
 for (const engine of ['wasmtime', 'wasmer', 'node'].filter(e => engines.has(e))) {
   const out = results.fetch[`cgi-${engine}`] = { passed: 0 };
   for (const route of routes) {
-    if (route.skip?.includes(engine)) continue;
+    if (!applies(`cgi-${engine}`, route)) continue;
     try { checkResponse(`cgi-${engine}`, route, cgi(engine, route)); out.passed++; } catch (error) { fail(`fetch cgi-${engine} ${route.path}`, error); }
   }
   try {
@@ -213,7 +232,7 @@ async function serveAndCheck(name, command, args, { cwd, port, env = {}, skipHea
       return { status: response.status, headers: response.headers, body: new Uint8Array(await response.arrayBuffer()) };
     };
     for (const route of routes) {
-      if (route.skip?.includes(name)) continue;
+      if (!applies(name, route)) continue;
       try { checkResponse(name, route, await request(route)); out.passed++; } catch (error) { fail(`fetch ${name} ${route.path}`, error); }
     }
     if (!skipHead) {
@@ -258,6 +277,11 @@ environment = { GREETING = "hello from the host" }
 `);
   await serveAndCheck('spin', toolPath.spin, ['up', '--listen', '127.0.0.1:3101'], { cwd: fetchApp, port: 3101, env: { SPIN_HOME: join(work, 'spin-home') } });
 }
+if (engines.has('viceroy')) {
+  // A named backend for FetchOptions.backend (Fastly services name theirs).
+  writeFileSync(join(fetchApp, 'fastly.toml'), readFileSync(join(fetchApp, 'fastly.toml'), 'utf8')
+    + `\n[local_server]\n  [local_server.backends]\n    [local_server.backends.origin]\n      url = "${origin}"\n`);
+}
 if (engines.has('viceroy'))
   await serveAndCheck('viceroy', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3102', '-C', 'fastly.toml', 'bin/main.wasm'], { cwd: fetchApp, port: 3102 });
 if (engines.has('lasm-node'))
@@ -265,6 +289,7 @@ if (engines.has('lasm-node'))
 if (engines.has('deno'))
   await serveAndCheck('deno', toolPath.deno, ['run', '-A', 'deno/main.mjs'], { cwd: fetchApp, port: 3104, env: { PORT: '3104', GREETING: 'hello from the host' } });
 
+originServer.close();
 results.finished = new Date().toISOString();
 save();
 console.log(JSON.stringify({ builds: results.builds, cli: Object.fromEntries(Object.entries(results.cli).map(([k, v]) => [k, v.startupMs])),

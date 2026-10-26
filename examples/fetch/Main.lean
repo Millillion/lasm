@@ -78,6 +78,21 @@ def handle (req : Request) : Async Response := do
   | "GET", ["env", name] => return .json s!"\{\"value\":{jsonString ((← IO.getEnv name).getD "")}}"
   | "GET", ["time"] => return .json s!"\{\"mono\":{decide ((← IO.monoNanosNow) > 0)},\"random\":{(← IO.getRandomBytes 8).size}}"
   | "GET", ["throw"] => throw (IO.userError "thrown from Lean")
+  -- Outbound HTTP (Lasm.Fetch.fetch): a POST to `url` (CI runs the origin), relayed as JSON.
+  | "GET", ["outbound"] =>
+    let url := (req.queryParam? "url").getD ""
+    let options : FetchOptions := { backend := req.queryParam? "backend" }
+    let r ← fetch { method := "POST", url, headers := #[("x-lasm-out", "1"), ("content-type", "text/plain")], body := "ping".toUTF8 } options
+    return .json s!"\{\"status\":{r.status},\"body\":{jsonString (r.text?.getD "")},\"echoed\":{jsonString ((r.header? "x-echo-method").getD "")}}"
+  -- Three outbound requests at once: they overlap.
+  | "GET", ["outbound-parallel"] =>
+    let url := (req.queryParam? "url").getD ""
+    let options : FetchOptions := { backend := req.queryParam? "backend" }
+    let t ← IO.monoMsNow
+    let tasks ← (List.range 3).mapM fun _ => Std.Async.async (get url (options := options))
+    let mut statuses := #[]
+    for task in tasks do statuses := statuses.push (← Std.Async.await task).status
+    return .json s!"\{\"statuses\":{statuses.toList},\"ms\":{(← IO.monoMsNow) - t}}"
   | _, _ => return .notFound
 
 def main : IO Unit := serve handle

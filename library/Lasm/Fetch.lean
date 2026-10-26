@@ -244,6 +244,101 @@ def serveNode (handler : Handler) : IO Unit := do
     let _ : Value ← process.callMethod "once" #[toJS signal, .ref stop ""]
   waitForever
 
+/-! Outbound requests -/
+
+/-- Options of `fetch`. -/
+structure FetchOptions where
+  /-- Fastly Compute: the backend to send the request to, as named in the
+  service (and `fastly.toml`'s `[local_server.backends]` for Viceroy). By
+  default a dynamic backend for the URL's host is registered (the service
+  must allow dynamic backends). Ignored elsewhere. -/
+  backend : Option String := none
+  deriving Inhabited
+
+/-- Fastly Compute: starts sending a request; the promise receives the encoded response. -/
+@[extern "lasm_fetch_send"] private opaque fastlySend (p : @& IO.Promise (Except IO.Error ByteArray)) (method url : @& String)
+  (headers : @& Array (String × String)) (body : @& ByteArray) (backend : @& String) : IO Unit
+
+/-- The encoded response of the C glue: u64 status, u64 header count, each
+header as (u64 length, name, u64 length, value), then the body. -/
+private def decodeResponse (b : ByteArray) : Except String Response := do
+  let u64 (pos : Nat) : Except String Nat := do
+    if pos + 8 > b.size then throw "Lasm.Fetch: truncated response"
+    return (List.range 8).foldl (fun acc i => acc + b[pos + i]!.toNat * 256 ^ i) 0
+  let text (pos n : Nat) : Except String String :=
+    if pos + n > b.size then throw "Lasm.Fetch: truncated response"
+    else match String.fromUTF8? (b.extract pos (pos + n)) with
+      | some s => pure s
+      | none => pure (String.fromUTF8! ((b.extract pos (pos + n)).toList.map (fun c => if c < 128 then c else 63) |>.toByteArray))
+  let status ← u64 0
+  let count ← u64 8
+  let mut pos := 16
+  let mut headers := #[]
+  for _ in [0:count] do
+    let n ← u64 pos
+    let name ← text (pos + 8) n
+    pos := pos + 8 + n
+    let m ← u64 pos
+    let value ← text (pos + 8) m
+    pos := pos + 8 + m
+    headers := headers.push (name, value)
+  return { status := status.toUInt16, headers, body := b.extract pos b.size }
+
+open Lasm.JS in
+/-- The JavaScript platform's `fetch` (Node, edge isolates, Bun, Deno). -/
+private def jsFetch (req : Request) : Async Response := do
+  let g ← global
+  let fetchFn ← g.get "fetch"
+  let body : Data := if req.method == "GET" || req.method == "HEAD" then .undefined else .bytes req.body
+  let init := obj [("method", toJS req.method), ("headers", toJS req.headers), ("body", body), ("redirect", toJS "manual")]
+  let response ← fetchFn.callAwait #[toJS req.url, init] Value
+  let fields ← response.getFields #["status", "headers"]
+  let status := match fields.field "status" with | .number n => n.toUInt16 | _ => 0
+  let headers ← match fields.field "headers" with
+    | .ref h _ => (← g.get "Array").callMethod "from" #[.ref h ""] (Array (String × String))
+    | _ => pure #[]
+  let buffer ← response.callMethodAwait "arrayBuffer" #[] Value
+  let bytes ← (← g.get "Uint8Array").new #[.ref buffer ""] ByteArray
+  return { status, headers, body := bytes }
+
+/-- Sends an HTTP request and returns the response; the body is read
+completely. Redirects are returned, not followed, on every platform.
+- Node, edge isolates, Bun, Deno: the platform's `fetch`.
+- Fastly Compute: a backend request (`FetchOptions.backend`, else a dynamic
+  backend for the URL's host).
+- WASI (`--target wasi`): unavailable, since WASI preview 1 has no sockets. -/
+def fetch (req : Request) (options : FetchOptions := {}) : Async Response := do
+  match platformCode () with
+  | 0 => jsFetch req
+  | 2 =>
+    let p : IO.Promise (Except IO.Error ByteArray) ← IO.Promise.new
+    fastlySend p req.method req.url req.headers req.body (options.backend.getD "")
+    let bytes ← (EAsync.ofTask <| ExceptT.mk <| p.result?.map (sync := true) fun
+      | some (.ok bytes) => .ok bytes
+      | some (.error e) => .error e
+      | none => .error (IO.userError "Lasm.Fetch.fetch: the response was lost (internal error)") : Async ByteArray)
+    match decodeResponse bytes with
+    | .ok r => return r
+    | .error e => throw (IO.userError e)
+  | 1 => throw (IO.userError "Lasm.Fetch.fetch: outbound HTTP is not available in a WASI preview 1 program (it has no sockets); build with --target fastly or --target wasi-http, or for Node or an edge platform")
+  | _ => throw (IO.userError "Lasm.Fetch.fetch: needs a program built by Lasm; this program runs natively")
+
+/-- `GET url`. -/
+def get (url : String) (headers : Array (String × String) := #[]) (options : FetchOptions := {}) : Async Response :=
+  fetch { method := "GET", url, headers } options
+
+/-- `POST url` with a body. -/
+def post (url : String) (body : ByteArray) (contentType : String := "application/octet-stream")
+    (headers : Array (String × String) := #[]) (options : FetchOptions := {}) : Async Response :=
+  fetch { method := "POST", url, headers := #[("content-type", contentType)] ++ headers, body } options
+
+/-- The response body as UTF-8 text (empty if it is not valid UTF-8). -/
+def Response.text? (r : Response) : Option String := String.fromUTF8? r.body
+/-- The first response header named `name`, ignoring case. -/
+def Response.header? (r : Response) (name : String) : Option String :=
+  let n := lower name
+  (r.headers.find? fun (k, _) => lower k == n).map (·.2)
+
 /-- Serves HTTP requests with `handler` on the platform the program was built
 for (see the module documentation). On Node it does not return; on edge
 platforms it publishes the handler and returns; on WASI and Fastly it answers

@@ -2,7 +2,7 @@
   "schema": 1,
   "lean": "4.35.0",
   "leanCommit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
-  "library": "9b0add214a041b04e935013aed8a52959cd2e5f175bd332ad6b4034137e8b901",
+  "library": "0be9c6025bda4cfeb1ad7e8d1a9d3a0586394db51bfeb725fe09595607ac7693",
   "files": {
     "lib/lean/Lasm/JS/Core.olean": "f4f6bf39c4803c5a68f33912c527a2d409a7e5e98864f93d44f293b875a7f262",
     "lib/lasm/c/Lasm/JS/Core.c": "cdc090e667c5e0c653c34a2a1df9a2fa97452927b612860ac5fcd233b19ad6d5",
@@ -16,8 +16,8 @@
     "lib/lean/Lasm/JS.olean": "86ff7b086af66cf3c25d463e485195ac7f9ac9cb56274e40b6d3fc31a9f50e6f",
     "lib/lasm/c/Lasm/JS.c": "85410094cc88632811356f78a6e7beca93d2e13c19a8881b4aaec7f7dfaa1300",
     "src/lean/Lasm/JS.lean": "325e710bcf3a1c9f87ec51cff49089e794f4b5ddf243949d641e497e1ecaaead",
-    "lib/lean/Lasm/Fetch.olean": "399f0217b456046af3dd33ec4dc94ecdf8b3bf2e7e8f8fec7d521e54115e4fde",
-    "lib/lasm/c/Lasm/Fetch.c": "1499f605e9ba5243572ce6ab857fdaeb32b554e63344cf8b0bea0787ba18ab25",
-    "src/lean/Lasm/Fetch.lean": "3489f73fa0a70798fe366edf13ab18618fe5e8024d4d404f673f6854452a31a8"
+    "lib/lean/Lasm/Fetch.olean": "bf7d9e2ad2e7986311d5fa0ecf90b89960bb4c25697a792338b6f949be377801",
+    "lib/lasm/c/Lasm/Fetch.c": "dcbba0a33765eb661371e557eb272dc662131c5e6b03a57b5c3899806fc6c3d3",
+    "src/lean/Lasm/Fetch.lean": "6ce4074e93a3efb4fe1febfb0c4cdbe73bbf85ece0f20494b7ba2208740a6bf2"
   }
 }

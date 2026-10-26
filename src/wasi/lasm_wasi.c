@@ -552,6 +552,18 @@ static void complete(const uint8_t header[24], bool failed, const void *data, si
     put_u64(&completions, failed ? 1 : 0);
     put(&completions, data, size);
 }
+void lasm_wasi_complete(const uint8_t header[24], bool failed, const void *data, size_t size) { complete(header, failed, data, size); }
+void lasm_wasi_complete_error(const uint8_t header[24], uint64_t kind, uint64_t code, const char *message) {
+    buffer b = { 0 };
+    put_u64(&b, kind); put_u64(&b, code); put_text(&b, message);
+    complete(header, true, b.data, b.size);
+    free(b.data);
+}
+/* Host I/O of the target (src/wasi/lasm_fetch_wasi.c: Fastly's pending backend requests). */
+bool lasm_wasi_io_poll(void);
+bool lasm_wasi_io_pending(void);
+void lasm_wasi_io_wait(uint64_t timeout_ns, bool bounded);
+
 /* Asynchronous waits for a timer's current promise (op 72 through op 94). */
 typedef struct { uint8_t header[24]; uint32_t timer; uint64_t generation; } waiter;
 static waiter *waiters; static size_t waiter_count;
@@ -617,11 +629,14 @@ int lasm_edge_wait(void) {
     for (;;) {
         if (completions.size || (blocking_count && blocked_ready(&blocking[blocking_count - 1]))) return 1;
         if (fire_timers()) return 1;
+        if (lasm_wasi_io_poll()) return 1;
         uint64_t due;
-        if (!next_deadline(&due))
-            lasm_wasi_fail("Lasm WASI: Lean is waiting for an event that cannot happen (no timer or sleep is pending): "
+        bool timed = next_deadline(&due), io = lasm_wasi_io_pending();
+        if (!timed && !io)
+            lasm_wasi_fail("Lasm WASI: Lean is waiting for an event that cannot happen (no timer, sleep or request is pending): "
                 "a task waits for a promise or task that nothing will complete (deadlock)");
         uint64_t now = now_ns();
+        if (io) { lasm_wasi_io_wait(timed && due > now ? due - now : 0, timed); continue; }
         if (due > now) {
             /* poll_oneoff: one relative monotonic clock subscription. */
             struct { uint64_t userdata; uint8_t tag; uint8_t pad[7]; uint32_t id; uint32_t pad2; uint64_t timeout, precision; uint16_t flags; uint8_t pad3[6]; } in;
@@ -712,6 +727,7 @@ int64_t lasm_node_call(uint32_t op, uint32_t id, uint64_t arg, const uint8_t *by
     }
     if (op == 95) {
         fire_timers();
+        lasm_wasi_io_poll();
         int64_t r = reply_bytes(completions.data, completions.size);
         completions.size = 0;
         return r;
