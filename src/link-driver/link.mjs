@@ -154,8 +154,31 @@ export function expandArguments(template, values, platform = process.platform) {
 const jsSymbolsCache = new Map();
 
 /** tools/link.py: run one link mode. Returns { wasm, js, map } paths. */
+/** Emscripten's JavaScript steps (compiler.mjs, acorn-optimizer.mjs) are pure
+ * functions of their arguments, standard input, input file and the pinned
+ * Emscripten. With `stepCache` ({ get(key) → text, set(key, text) }) their
+ * output is reused by content: an ordinary edit leaves the program's JS
+ * interface, and so the glue, unchanged. The build's own directories differ per
+ * build; they are replaced by placeholders in keys and stored output. */
+export function jsStepCache({ recipe, sdk, stepCache, volatile, files, platform = process.platform }) {
+  if (!stepCache) return undefined;
+  const forms = [...new Set(volatile.filter(Boolean))].sort((a, b) => b.length - a.length)
+    .flatMap((value, index) => [[value, `\u0001lasm-v${index}\u0001`], [JSON.stringify(value).slice(1, -1), `\u0001lasm-j${index}\u0001`]]);
+  const normalize = text => forms.reduce((result, [from, to]) => result.split(from).join(to), text);
+  const restore = text => forms.reduceRight((result, [from, to]) => result.split(to).join(from), text);
+  const base = createHash('sha256').update(JSON.stringify({ schema: 1, platform, recipe: createHash('sha256').update(JSON.stringify(recipe)).digest('hex'),
+    tools: sdk.identity ?? sdk.driverIdentity ?? null, runtime: `${process.release?.name} ${process.version}`, emscripten: normalize(sdk.driver ?? '') }));
+  for (const file of files) base.update(normalize(file) + '\0').update(readFileSync(file)).update('\0');
+  return {
+    key: (entry, input, inputFile) => base.copy().update(JSON.stringify([entry.kind, entry.pass ?? null, entry.program, entry.args]))
+      .update('\0').update(normalize(input ?? '')).update('\0').update(inputFile ? normalize(readFileSync(inputFile, 'utf8')) : '').digest('hex'),
+    get: key => { const text = stepCache.get(key); return text === undefined ? undefined : restore(text); },
+    set: (key, text) => stepCache.set(key, normalize(text)),
+  };
+}
+
 export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediates, nativeSigs, execute = execFileSync,
-  stdio = ['ignore', 'pipe', 'inherit'], timeout = 1800_000, platform = process.platform, warn, mapOnly = false, optimize = true }) {
+  stdio = ['ignore', 'pipe', 'inherit'], timeout = 1800_000, platform = process.platform, warn, mapOnly = false, optimize = true, stepCache }) {
   // emcc's diagnostics reach the user only when its stderr does (Lasm --verbose).
   warn ??= stdio[2] === 'inherit' ? message => process.stderr.write(`emcc: warning: ${message}\n`) : () => {};
   const spec = recipe.link.modes[mode];
@@ -177,6 +200,21 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   };
 
   const target = parsed.output, wasm = target.replace(/\.[cm]js$/, '.wasm');
+  const steps_ = execute === execFileSync && jsStepCache({ recipe, sdk, stepCache, platform,
+    volatile: [temp, path.dirname(path.resolve(parsed.exportsFile)), path.dirname(path.resolve(target))],
+    files: [...parsed.preJs, ...parsed.jsLibraries] });
+  // A JavaScript step through the cache: the captured output, or the output file.
+  const runJs = (entry, argv, { input, inputFile, outputFile } = {}) => {
+    const key = steps_ && steps_.key(entry, input, inputFile);
+    const hit = key && steps_.get(key);
+    if (hit !== undefined && hit !== false) {
+      if (!outputFile) return hit;
+      writeFileSync(outputFile, hit); return;
+    }
+    const output = run(entry.program, argv, { input, capture: !outputFile });
+    if (key) steps_.set(key, outputFile ? readFileSync(outputFile, 'utf8') : output);
+    return output;
+  };
   const settings = new Settings(instantiateSettings(spec.settings, { userExports: readExportsFile(parsed.exportsFile),
     preJs: parsed.preJs, jsLibrary: parsed.jsLibraries[0], emscripten, platform }), recipe.link.settingsDefaults);
   checkSupportedSettings(settings, spec.supported);
@@ -201,7 +239,7 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
     .update(readFileSync(parsed.jsLibraries[0])).digest('hex');
   let symbolsText = execute === execFileSync ? jsSymbolsCache.get(symbolsKey) : undefined;
   if (symbolsText === undefined) {
-    symbolsText = run(symbolsStep.program, symbolsArgs, { input: settingsJson, capture: true });
+    symbolsText = runJs(symbolsStep, symbolsArgs, { input: settingsJson });
     if (execute === execFileSync) { jsSymbolsCache.set(symbolsKey, symbolsText); if (jsSymbolsCache.size > 16) jsSymbolsCache.delete(jsSymbolsCache.keys().next().value); }
   }
   const jsInfo = JSON.parse(symbolsText);
@@ -255,7 +293,7 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   const glueSettings = settings.serialize();
   saveText('settings.json', glueSettings);
   const glueStep = next('glue');
-  const compiled = run(glueStep.program, expandArguments(glueStep.args, values, platform), { input: glueSettings, capture: true });
+  const compiled = runJs(glueStep, expandArguments(glueStep.args, values, platform), { input: glueSettings });
   const extraJsExports = new Set();
   const glue = assembleGlue(settings, metadata, compiled, { asmConsts, emJsFuncs, nativeSigs, extraJsExports, warn });
   reportMissingExports(settings, jsInfoSymbols(compiled), warn);
@@ -292,7 +330,7 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
       const pass = entry.pass;
       if (entry.minify && !preclean) { saveFile('preclean.js', finalJs); saveFile('preclean.wasm', wasm); preclean = true; }
       const output = acornOutput();
-      run(entry.program, expandArguments(entry.args, { ...values, js: finalJs, 'js-out': output }, platform));
+      runJs(entry, expandArguments(entry.args, { ...values, js: finalJs, 'js-out': output }, platform), { inputFile: finalJs, outputFile: output });
       finalJs = output;
       saveFile(`${pass}.js`, finalJs);
     } else if (entry.kind === 'dce-graph') {

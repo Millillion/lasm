@@ -161,9 +161,39 @@ function rejectionExplanation({ requirements, whyExtractFile, objects, runtime, 
   } catch { return []; }
 }
 
-export async function linkApplication({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
-  linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, sharedCache, analysisCache, profile = 'release', initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable: declaredUnavailable = [] }) {
+export async function linkApplication(options) {
+  const { runtime, profile = 'release', linkDriver = selectedLinkDriver(), initializationSeed } = options;
+  // initializationSeed: a file recording the initializer units the project's
+  // previous build kept. A dev build starts its plan from them and lets the
+  // delivered link itself be the planning round (one wasm-ld instead of three);
+  // release builds only write it. A seeded build that the application policy
+  // rejects is retried unseeded, so the seed never changes what is accepted.
+  const seedRecord = readInitializationSeed(initializationSeed, runtime);
+  const seeded = profile === 'dev' && linkDriver === 'node' && !!seedRecord && !process.env.LASM_LINK_DEBUG;
+  if (seeded) {
+    try { return await linkApplicationOnce(options, new Set(seedRecord.keep)); }
+    catch (error) {
+      if (error.code !== 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE') throw error;
+    }
+  }
+  return linkApplicationOnce(options);
+}
+
+/** The seed record of a previous build of this project (see linkApplication). */
+function readInitializationSeed(file, runtime) {
+  if (!file) return undefined;
+  try {
+    const record = JSON.parse(readFileSync(file, 'utf8'));
+    if (record.schema === 1 && record.runtime === runtime.identity && Array.isArray(record.keep)) return record;
+  } catch { /* none yet */ }
+  return undefined;
+}
+
+async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
+  linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, sharedCache, analysisCache, profile = 'release', initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable: declaredUnavailable = [],
+  initializationSeed, timings }, seed) {
   const nativeUnavailable = [...declaredUnavailable];
+  const time = (name, start) => { if (timings) timings[name] = (timings[name] ?? 0) + performance.now() - start; };
   let initializationPlan;
   if (![1, 2].includes(memoryMode)) throw new Error('Invalid application memory mode');
   // The recipe records memory mode 1 only (MEMORY64=1, 8 GiB maximum).
@@ -190,13 +220,14 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   if (nodeCompile) checkToolchainIdentity(recipe, sdk);
   // Tool diagnostics as emcc shows them: inherited with --verbose, else captured for the error reporter.
   const toolStdio = verbose ? ['ignore', 'inherit', 'inherit'] : ['ignore', 'pipe', 'pipe'];
+  let jsSteps;
   const runLinkOnce = (mode, args, { mapOnly = false, optimize = true } = {}) => {
     if (!nodeLink) return execute('em++', args);
     const temp = linkTemporaryDirectory(work, mode);
     try {
       return linkWithNode({ recipe, mode, args: args.flatMap(arg => arg.startsWith('@') ? readResponseArguments(arg.slice(1)) : [arg]),
         sdk, cache: emscriptenCache(sdk), temp, intermediates: linkIntermediates && join(linkIntermediates, mode),
-        nativeSigs: bundledNativeSigs(recipe), stdio: toolStdio, mapOnly, optimize });
+        nativeSigs: bundledNativeSigs(recipe), stdio: toolStdio, mapOnly, optimize, stepCache: jsSteps });
     } finally { removeTemporary(temp); }
   };
   // A link that fails on undefined symbols names the native libraries the program
@@ -220,7 +251,7 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     const temp = linkTemporaryDirectory(work, 'probe');
     try {
       const command = linkWithNode({ recipe, mode: 'probe', args: args.flatMap(arg => arg.startsWith('@') ? readResponseArguments(arg.slice(1)) : [arg]),
-        sdk, cache: emscriptenCache(sdk), temp, nativeSigs: bundledNativeSigs(recipe), stdio: toolStdio, mapOnly: 'command' });
+        sdk, cache: emscriptenCache(sdk), temp, nativeSigs: bundledNativeSigs(recipe), stdio: toolStdio, mapOnly: 'command', stepCache: jsSteps });
       await new Promise((resolve, reject) => execFile(command.program, command.args, { env: command.env, windowsHide: true,
         timeout: 1800_000, maxBuffer: 512 * 1024 * 1024 }, (error, stdout, stderr) => {
         if (verbose) { process.stdout.write(stdout); process.stderr.write(stderr); }
@@ -253,6 +284,9 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   const sharedStore = sharedCache ?? objectStore, sharedUsed = new Set();
   mkdirSync(sharedStore, { recursive: true });
   const use = (store, name) => { const path = join(store, name); (store === objectStore ? usedObjects : sharedUsed).add(path); return path; };
+  // Emscripten's JavaScript link steps, reused by content (src/link-driver/link.mjs jsStepCache).
+  jsSteps = { get: key => readStoreEntry(use(sharedStore, `js-${key}.txt`))?.toString('utf8'),
+    set: (key, text) => { try { writeStoreEntry(use(sharedStore, `js-${key}.txt`), Buffer.from(text)); } catch { /* not cached */ } } };
   // Entries carry their own SHA-256 (readStoreEntry): a damaged, truncated or
   // concurrently pruned entry is compiled again and replaced.
   const reuse = (cached, object) => {
@@ -425,6 +459,20 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     return { live, requirements, requirementsError };
   };
   const planInputs = [], planWrap = [], planObjects = [];
+  // The delivered link. -g1 preserves checked JS loader shapes without Wasm
+  // names or DWARF. Maintainer diagnostics only: LASM_LINK_DEBUG delivers the
+  // unoptimized probe link (with Wasm names).
+  const finalMap = join(work, 'final.map');
+  const debug = !!process.env.LASM_LINK_DEBUG;
+  const finalLink = async plannedInputs => {
+    await writeFile(argumentsFile, responseFile([...objects, ...nativeInputs, ...initializationInputs, ...plannedInputs,
+      ...(debug ? ['-O0'] : ['-Oz', '-g1']), '-Wl,-Map=' + finalMap, ...link]));
+    progress?.({ stage: 'Linking application and Lean runtime' });
+    const start = performance.now();
+    try { runLink(debug ? 'probe' : 'final', ['@' + argumentsFile], { optimize: debug || profile === 'release' }); }
+    finally { time('final link', start); }
+  };
+  let seededFinal;
   if (!['all', 'native'].includes(initialization)) {
     const wrapperFiles = (kind = '') => Array.from({ length: initializerWrapperParts }, (_, part) =>
       [join(work, `initializers${kind}-${part}.c`), join(work, `initializers${kind}-${part}.o`)]);
@@ -448,7 +496,16 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
       log: verbose ? message => console.error(message) : () => {},
       forceKeep: process.env.LASM_INITIALIZATION_KEEP ? new RegExp(process.env.LASM_INITIALIZATION_KEEP) : undefined,
       initTargets: (core => core && new Set([...core, ...sources.flatMap(file => cInitTargets(readFileSync(file, 'utf8')))]))(coreInitTargets(leanVersion)),
+      seed,
       async probe(source, wrapFlags, { bodies = false, exclude } = {}) {
+        // A seeded dev build: each planning round is the delivered link itself.
+        if (seed && !bodies) {
+          const wrappers = await writeWrappers(source);
+          await finalLink([probeObject, ...wrappers, ...wrapFlags]);
+          seededFinal = { source, wrapFlags };
+          const start = performance.now();
+          try { return await readLiveSymbols(finalMap); } finally { time('read map', start); }
+        }
         // Probes may run concurrently: each has its own files.
         const id = probeCount++, map = join(work, `initializers-${id}.map`);
         const wrappersObjects = await writeWrappers(source, { probe: true, files: wrapperFiles(`-probe-${id}`) });
@@ -459,14 +516,22 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
       } });
     if (plan?.skipped.length && !plan.shared.length) {
       const planned = initializerWrappers(plan.units, plan.closure, { keep: plan.keep, parts: initializerWrapperParts });
+      // A seeded plan whose last round linked exactly these wrappers is delivered as linked.
+      if (seededFinal && seededFinal.wrapFlags.join('\0') === plan.wrap.join('\0')
+          && seededFinal.source.every((text, part) => text === planned[part])) seededFinal.delivered = true;
       planInputs.push(...await writeWrappers(planned), ...plan.wrap); planWrap.push(...plan.wrap);
       // The requirements check repeats the last planning round's link (the same
       // probe objects, from the object store), so its recorded result is reused.
-      planObjects.push(...await writeWrappers(planned, { probe: true }));
+      if (!seededFinal?.delivered) planObjects.push(...await writeWrappers(planned, { probe: true }));
       initializationPlan = { units: plan.closure.length, kept: plan.keep.size, skipped: plan.skipped.length };
     } else if (plan) initializationPlan = { units: plan.closure.length, kept: plan.closure.length, skipped: 0,
       ...(plan.shared.length ? { sharedGlobals: plan.shared.slice(0, 20) } : {}) };
+    if (plan && initializationSeed) {
+      try { writeFileSync(initializationSeed, JSON.stringify({ schema: 1, runtime: runtime.identity, keep: [...plan.keep].sort() }) + '\n'); }
+      catch { /* an unwritable seed only costs the next dev build its planning */ }
+    }
   }
+  const delivered = !!seededFinal?.delivered;
   // Classify the live graph before expensive optimization. In particular, a
   // runtime evaluator must not optimize the full compiler twice. The inputs are
   // the final link's (the planned wrappers, in the planning probes' order, so the
@@ -474,7 +539,10 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
   const requirementsInputs = [...objects, ...nativeInputs, probeObject, ...planObjects, ...initializationInputs,
     '-O0', '-Wl,-Map=' + mapFile, ...planWrap, ...link];
   progress?.({ stage: 'Checking required runtime code' });
-  const checked = await probeLink(requirementsInputs, mapFile, argumentsFile);
+  // A delivered seeded link included the lookup marker, as the probes do: its
+  // map answers the same question.
+  const checked = delivered ? { requirements: await readApplicationLinkRequirements(finalMap, analysis) }
+    : await probeLink(requirementsInputs, mapFile, argumentsFile);
   if (!checked.requirements) throw new Error(checked.requirementsError ?? 'Unreadable application linker map');
   const requirements = structuredClone(checked.requirements);
   // --why-extract (rejection diagnostics only) comes from one more probe link.
@@ -494,17 +562,11 @@ export async function linkApplication({ sources, sdk, runtime, work, dist, leanV
     requireAotApplication(requirements, { explanation: rejectionExplanation({ requirements, whyExtractFile, objects, runtime,
       nm: join(sdk.prefix, 'bin', executableName('llvm-nm')) }) });
   }
-  {
+  if (!delivered) {
     // The lookup marker is dead. Omit its object from the final link so no
     // delivered executable contains a null implementation of dynamic lookup.
-    // -g1 preserves checked JS loader shapes without Wasm names or DWARF.
-    const finalMap = join(work, 'final.map');
-    // Maintainer diagnostics only: LASM_LINK_DEBUG delivers the unoptimized probe link (with Wasm names).
-    const debug = !!process.env.LASM_LINK_DEBUG;
-    await writeFile(argumentsFile, responseFile([...objects, ...nativeInputs, ...initializationInputs, ...planInputs,
-      ...(debug ? ['-O0'] : ['-Oz', '-g1']), '-Wl,-Map=' + finalMap, ...link]));
-    progress?.({ stage: 'Linking application and Lean runtime' });
-    runLink(debug ? 'probe' : 'final', ['@' + argumentsFile], { optimize: debug || profile === 'release' });
+    // (A seeded dev link keeps it: had it survived, the check above rejected the build.)
+    await finalLink(planInputs);
     const finalRequirements = await readApplicationLinkRequirements(finalMap, analysis);
     requireAotApplication(finalRequirements);
   }

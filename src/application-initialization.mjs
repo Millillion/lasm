@@ -233,7 +233,11 @@ export function coreInitTargets(version) {
   return list.initTargets.map(([symbol]) => symbol);
 }
 
-export async function planInitializers({ objects, archives, probe, log = () => {}, forceKeep, initTargets, archiveUnits, concurrent = true }) {
+/** `seed`: initializer units a previous build kept (dev profile). Keeping more
+ * units than needed is always correct (it is closer to native initialization),
+ * so the rounds below start from them and only add; a dev rebuild then usually
+ * needs one round. Release builds plan from the roots alone (reproducible). */
+export async function planInitializers({ objects, archives, probe, log = () => {}, forceKeep, initTargets, archiveUnits, concurrent = true, seed }) {
   const files = [...objects, ...archives];
   const units = initializerUnits(files, { archiveUnits });
   // The program's entry object: Lean's generated `main` calls its own module's initializer.
@@ -250,6 +254,7 @@ export async function planInitializers({ objects, archives, probe, log = () => {
   const keep = new Set([...roots, ...closure.filter(name => !units.get(name).member && units.get(name).effects)]);
   // Maintainer diagnostics only: force-keep units whose names match.
   if (forceKeep) for (const name of closure) if (forceKeep.test(name)) keep.add(name);
+  if (seed) for (const name of closure) if (seed.has(name)) keep.add(name);
   // Only `initialize` results can refer to mutable state (IO.Ref and similar);
   // nullary constants are immutable. Without a list, every assigned global counts.
   const mutable = initTargets ?? new Set(closure.flatMap(name => units.get(name).data));
