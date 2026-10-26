@@ -5,13 +5,13 @@
     "4.35.0": {
       "name": "lean-4.35.0-wasm64-edge.tar.zst",
       "root": "lean-4.35.0-wasm64-edge",
-      "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-edge-v1/lean-4.35.0-wasm64-edge.tar.zst",
-      "sha256": "f31ae954ac07dab2d83befaeae851916ab3faaf864da78d7afc4b88d60b91de4",
-      "bytes": 1281085,
+      "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-edge-v2/lean-4.35.0-wasm64-edge.tar.zst",
+      "sha256": "219df4ff28e1ef2c0a5a42cecc79cc7125075cce6a9193d05aa80e5186396ca0",
+      "bytes": 1281134,
       "format": "tar.zst",
-      "maximumExtractedBytes": 14766504,
-      "baseRuntimeManifestSha256": "8b3e33e03df54e6125227b5d1d442fc8db072ffe1ea1dd3f3bf5df8707675562",
-      "source": "edge-runtime.yml run 40128600109 archives, with scripts/edge/build-edge-extras.mjs (Lasm.JS glue, Emscripten system libraries) and package-edge-runtime.mjs"
+      "maximumExtractedBytes": 14766660,
+      "baseRuntimeManifestSha256": "1b868b43e734e0ab3d67e53179522c8e248b91e5f2e1727d343c760370d1b4fb",
+      "source": "edge-runtime.yml run 40336641648 (branch cold-start, on runtime 1b868b43…), with scripts/edge/build-edge-extras.mjs (Lasm.JS glue, Emscripten system libraries) and package-edge-runtime.mjs"
     }
   }
 }

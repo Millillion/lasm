@@ -61,14 +61,15 @@ export function initializerStubs(stubs) {
 }
 
 /** The recorded link starts 4 Lean threads' Workers before main runs
- * (-sPTHREAD_POOL_SIZE=4). LASM_THREAD_POOL (0–64) chooses that number when the
- * program starts; further threads start on demand either way. Function
- * platforms run on a fraction of a CPU, where each pre-started Worker's start-up
- * delays the cold start (docs/BENCHMARKS.md "Cold start"). */
+ * (-sPTHREAD_POOL_SIZE=4). Lasm starts 1 (the Worker of Lean's main thread);
+ * LASM_THREAD_POOL (0–64) chooses the number when the program starts, and
+ * further threads start on demand either way. Each pre-started Worker costs
+ * 30–40 ms of CPU, and a Lasm program starts few threads (docs/BENCHMARKS.md
+ * "Cold start"). */
 export function configurableThreadPool(glue) {
   const recorded = 'var pthreadPoolSize = 4;';
   if (glue.split(recorded).length !== 2) throw new Error('Unexpected Emscripten thread pool in the application glue');
-  return glue.replace(recorded, 'var pthreadPoolSize = (value => /^(?:[0-9]|[1-5][0-9]|6[0-4])$/.test(value ?? \'\') ? Number(value) : 4)'
+  return glue.replace(recorded, 'var pthreadPoolSize = (value => /^(?:[0-9]|[1-5][0-9]|6[0-4])$/.test(value ?? \'\') ? Number(value) : 1)'
     + '(globalThis.process?.env?.LASM_THREAD_POOL);');
 }
 

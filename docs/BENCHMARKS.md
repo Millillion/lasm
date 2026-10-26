@@ -400,79 +400,47 @@ vCPU at 1,769 MB, so about 0.29 vCPU at 512 MB and 0.58 at 1,024 MB, enforced
 by a CFS quota. [`scripts/serverless/cold-start-cpu.mjs`](../scripts/serverless/cold-start-cpu.mjs)
 starts `node dist/main.mjs` under such a quota (systemd `CPUQuota`) and times
 the first answered `GET /health`, five fresh processes per cell, interleaved
-(`ubuntu-24.04`, Node 26.12.1, release builds of the templates; run
-40289814978):
+(`ubuntu-24.04`, Node 26.12.1, release builds of the templates). Runtime
+`1b868b43…` with fewer Lean threads at start-up (run 40336699599; previous
+runtime `8b3e33e0…`, run 40289814978, in brackets):
 
 | Template | 4 CPUs | 1 CPU | 0.58 CPU | 0.29 CPU | CPU time used |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Hono | 343 ms | 532 ms | 948 ms | 1,909 ms | 570 ms |
-| Express | 372 ms | 578 ms | 983 ms | 2,028 ms | 600 ms |
-| Fastify | 408 ms | 638 ms | 1,095 ms | 2,204 ms | 650 ms |
-| Hono, `LASM_THREAD_POOL=1` | 363 ms | 526 ms | 885 ms | 1,818 ms | 540 ms |
-| Express, `LASM_THREAD_POOL=1` | 409 ms | 537 ms | 924 ms | 1,866 ms | 570 ms |
-| Fastify, `LASM_THREAD_POOL=1` | 449 ms | 621 ms | 1,053 ms | 2,073 ms | 610 ms |
+| Hono, 1 pre-started Worker (now the default) | 275 ms (363) | 355 ms (526) | 642 ms (885) | 1,289 ms (1,818) | 380 ms (540) |
+| Express, 1 pre-started Worker | 301 ms (409) | 394 ms (537) | 705 ms (924) | 1,423 ms (1,866) | 410 ms (570) |
+| Fastify, 1 pre-started Worker | 338 ms (449) | 483 ms (621) | 776 ms (1,053) | 1,615 ms (2,073) | 480 ms (610) |
+| Hono, 4 pre-started Workers (the earlier default) | 288 ms (343) | 465 ms (532) | 752 ms (948) | 1,596 ms (1,909) | 460 ms (570) |
+| Hono, none (`LASM_THREAD_POOL=0`) | 284 ms | 359 ms | 578 ms | 1,250 ms | 370 ms |
 
 What this shows:
 
-- A cold start is CPU-bound: about 0.55–0.65 s of CPU (Node's start, the
-  program's Workers, Wasm compilation, Lean's initialization and the
-  framework's own `require`), so its time is roughly that divided by the CPU
-  share. On Lambda, 1,024 MB halves the 512 MB cold start; the deployment
-  guides' "at least 512 MB" is the floor, not the recommendation for latency.
-- The recorded link starts four Lean thread Workers before `main`
-  (`-sPTHREAD_POOL_SIZE=4`). `LASM_THREAD_POOL` (0–64) now chooses that number
-  at start; one Worker saves 30–40 ms of CPU and 4–6 % of the cold start at
-  0.29–0.58 CPU and costs 5–12 % on 4 CPUs. The function shims (`lasm
-  package`) default to 1; servers keep 4.
-- Tried and reverted: writing standard output synchronously instead of
-  through the native file Worker (maintainer host 90 → 77 CPU ticks; runner
-  run 40302884580 within noise). It broke the guarantee that a full stdout pipe
-  never blocks the host's event loop (`test/stdio-backpressure.test.mjs`) and
-  Lean's stdout ownership. The working directory's name is now read without
-  the Worker on Linux.
-- Evaluated, not used: Node's compile cache (`NODE_COMPILE_CACHE`) made no
-  difference (it caches 12 KiB here, and a new function instance starts with
-  an empty directory); the Wasm module is already compiled once and shared with
-  every Worker. Fastify's own `require` and schema compiler take about 150 ms of
-  the main thread; each Worker compiles `program.cjs` again (about 25 ms).
-
-### Where a cold start's CPU goes (Hono template, release build)
-
-Measured on the maintainer host, the process pinned to one core (`taskset`),
-CPU time per thread from `/proc` at the first "Listening" (10 ms ticks), and
-`node --cpu-prof` on every thread:
-
-| Part | CPU |
-| --- | ---: |
-| Plain Node + Hono + `@hono/node-server` (the same app in JavaScript) | 120 ms |
-| Lasm Hono app, total | 490 ms |
-| — Node's main thread (Node, `main.mjs` and host modules, Hono and undici's `Request`/`Response`, program.cjs, the Wasm compile) | 120–150 ms |
-| — Lean's threads: 5 `em-pthread` Workers, about 40–60 ms each | about 280 ms |
-| — V8 background threads (Wasm tier-up, GC) | about 40 ms |
-
-Findings:
-
-- **Initializers are not the cost.** The Node link already runs only what the
-  program needs: 6 of 2,794 module initializers (`build-info.json`
-  `linkRequirements.initializationPlan`), as the edge link does.
-- **Threads are.** A bare Node Worker costs about 30 ms of CPU to start (five:
-  163 ms over an empty process, same host), and each Lean thread then loads
-  `program.cjs` and instantiates the shared Wasm module. With no Worker
-  started before `main` (`LASM_THREAD_POOL=0`), the program still starts 5
-  threads on demand: Lean's main thread (`PROXY_TO_PTHREAD`), the host
-  completion thread (`runtime/node-async.cpp`), Lasm.JS's interop thread and
-  Lean task workers. Reporting fewer cores to Lean (`_emscripten_num_logical_cores`)
-  did not change the count.
-- **Evaluated, no gain:** a V8 code cache for `program.cjs` shared by every
-  Worker (`vm.Script` cachedData written to the temporary directory): 49 → 47–50
-  ticks; Node's compile cache: no change; lazy Wasm compilation is already
-  V8's default.
-- **The ≤ 250 ms target needs fewer Lean threads at start-up**, which is a
-  runtime change (the pinned runtime archives): run the completion loop on
-  the interop thread, start Lean task workers only when a task is queued, and
-  keep `LASM_THREAD_POOL=0`. Estimated from the measurements: 2 threads
-  (Lean main + one host thread) ≈ 120 + 2 × 55 + 40 ≈ 270 ms on one core. That
-  needs a runtime rebuild and the upstream suite, so it is not in this branch.
+- A cold start is CPU-bound, so its time is roughly the CPU it uses divided by
+  the CPU share. Hono now uses about 0.38 s of CPU (was 0.54 s), and at 0.29
+  vCPU (Lambda at 512 MB) answers in about 1.3 s instead of 1.8 s.
+- Every Lean thread is a Node Worker that costs 40–60 ms of CPU to start. A
+  Hono start used to start six: Lean's main thread (`PROXY_TO_PTHREAD`), a
+  second thread that upstream's `lean_run_main` starts for `main`, the host
+  completion thread, Lasm.JS's interop thread and two task workers. Now `main`
+  runs on the main thread (patch `lean-4.35.0-node-threads`), the completion
+  thread starts with the first asynchronous host request, and `waitForever`
+  makes `main` Lasm.JS's interop poller; three remain (main and two task workers,
+  one for the "listening" callback and one for the first request). Programs
+  that never call `waitForever` get a poller thread when JavaScript first calls
+  them (decisions of 2026-10-26).
+- With few threads needed, pre-starting Workers no longer pays even on 4 CPUs:
+  `LASM_THREAD_POOL` (0–64) now defaults to 1, the Worker that runs Lean's main
+  thread.
+- Still not at the ≤ 300 ms CPU target for Hono on one core: about 380 ms
+  remain, of which Node's main thread (Node itself, `main.mjs` and the host
+  modules, Hono and undici, `program.cjs`, the Wasm compile) is 120–180 ms,
+  the three Workers about 150 ms and V8's background threads about 40 ms.
+  Lean's task manager starts a worker per task queued while none is idle, so
+  the burst of two callbacks at start costs a second task Worker; changing that
+  upstream scheduling rule is left open (decisions of 2026-10-26).
+- Tried and reverted earlier: writing standard output synchronously instead of
+  through the native file Worker (broke the guarantee that a full stdout pipe
+  never blocks the host's event loop, `test/stdio-backpressure.test.mjs`); a V8
+  code cache for `program.cjs` and Node's compile cache made no difference.
 
 ## Big numbers without GMP
 
