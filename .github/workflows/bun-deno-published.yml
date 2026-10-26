@@ -22,7 +22,7 @@ on:
   schedule:
     - cron: '17 9 * * *'
   push:
-    branches: [phase-7, bun-deno-ci]
+    branches: [phase-7]
     paths:
       - '.github/workflows/bun-deno-published.yml'
       - 'scripts/edge/published-ci.mjs'

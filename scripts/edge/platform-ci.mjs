@@ -149,11 +149,6 @@ sh(process.execPath, [lasmBin, 'init', app, '--template', 'hono']);
 }
 sh(bun, ['install'], { cwd: app });
 sh(npm, ['install', '--no-save', '--no-audit', '--no-fund', tgz], { cwd: app });
-// Diagnostics only (logged, never fatal): how Bun passes -e arguments and resolves the app's modules.
-{ const probe = `const m=require('node:module'),p=require('node:path'),u=require('node:url');console.log(JSON.stringify({argv:process.argv,cwd:process.cwd()}));`
-    + `for(const base of [process.argv.at(-1),process.cwd()]){for(const f of [x=>p.join(x,'package.json'),x=>u.pathToFileURL(p.join(x,'package.json')).href]){try{console.log(f(base),'->',m.createRequire(f(base)).resolve('hono'))}catch(e){console.log(f(base),'-> FAIL',e.code,String(e.message).split('\\n')[0])}}}`;
-  const r = spawnSync(bun, ['-e', probe, app], { cwd: app, env, encoding: 'utf8', windowsHide: true });
-  console.log('bun -e probe:', r.status, r.stdout, r.stderr); }
 const script = (runtime, args) => spawnSync(process.execPath, [...bounded(), ...(runtime === 'bun' ? [bun, 'run'] : [deno, 'task']), ...args],
   { cwd: app, env, stdio: 'inherit', windowsHide: true });
 for (const [runtime, port] of [['bun', 8901], ['deno', 8902]]) {

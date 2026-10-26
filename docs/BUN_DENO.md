@@ -150,6 +150,11 @@ runners (`ubuntu-24.04`, `ubuntu-24.04-arm`, `macos-15`, `macos-15-intel`,
   no release is on the registry, and for a release before 0.2.0 it checks only
   the installs.
 
+Results: `workers.yml` run 40277505987 passed every job on all five targets
+(2026-10-26), including the cross-platform byte comparison. The first
+`bun-deno-published.yml` run (40277505832) skipped cleanly on all five: only
+the 0.0.0 placeholders were on the registry.
+
 ## Not supported
 
 - **Standard input** in the portable profile.
