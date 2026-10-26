@@ -82,7 +82,9 @@ test('lasm dev arguments', async () => {
   assert.deepEqual(parseLasmArguments(['dev', 'App/Main.lean', '--target', 'workers', '--release', '--', 'a', '--b']),
     { command: 'dev', profile: 'release', args: ['a', '--b'], run: true, verbose: false, target: 'workers', input: 'App/Main.lean' });
   assert.equal(parseDevArguments(['--target=browser', '--port', '8080']).port, 8080);
+  assert.equal(parseDevArguments(['--target', 'browser', '--release', '--no-watch']).watch, false);
   assert.throws(() => parseDevArguments(['--port', '8080']), /--port applies/);
+  assert.throws(() => parseDevArguments(['--no-watch']), /--no-watch applies/);
   assert.throws(() => parseDevArguments(['--target', 'lambda']), /accepts/);
   assert.throws(() => parseDevArguments(['--watch']), /Unknown lasm dev option/);
   assert.equal(parseDevArguments(['--help']).command, 'dev-help');

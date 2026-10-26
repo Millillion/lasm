@@ -2,7 +2,8 @@
 // long-lived build worker, and restart the program after each good build.
 // Edge targets are rebuilt into their output directory for the platform's own
 // local tool (wrangler dev, netlify dev, …), which Lasm never starts; browser
-// output is served on localhost with live reload. Lasm never opens a browser.
+// output is served on localhost with live reload (src/browser/browser-dev.mjs).
+// Lasm never opens a browser.
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync, watch } from 'node:fs';
@@ -13,7 +14,8 @@ const runtimeTargets = ['node', 'bun', 'deno'];
 const edgeOnlyTargets = ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge'];
 export const devTargets = [...runtimeTargets, ...edgeOnlyTargets, 'browser'];
 
-export const devUsage = `Usage: lasm dev [Main.lean] [--target ${devTargets.join('|')}] [--release] [--port N] [--no-run] [-- arguments…]
+export const devUsage = `Usage: lasm dev [Main.lean] [--target ${devTargets.join('|')}] [--release] [--no-run] [-- arguments…]
+       lasm dev [Main.lean] --target browser [--release] [--no-watch] [--port 5173] [--host 127.0.0.1] [--output DIR]
 
 Watches the project's Lean sources and Lake/npm configuration, rebuilds after
 each change (dev profile: about 2 s for an ordinary edit once the first build
@@ -24,8 +26,9 @@ is done) and restarts the program. Arguments after -- are passed to main.
                     rebuild the edge output only; run the platform's own local
                     server yourself (for example npx wrangler dev). Lasm never
                     starts platform tools.
-  browser           serve the browser build on http://127.0.0.1:5173 (--port)
-                    with live reload; open it yourself
+  browser           serve the browser build on http://127.0.0.1:5173 (--port,
+                    --host) with live reload (src/browser/browser-dev.mjs);
+                    --no-watch serves once built; open it yourself
 --release builds the release profile instead; --no-run only rebuilds.
 Type rs and Enter to rebuild and restart; Ctrl+C stops.`;
 
@@ -40,17 +43,18 @@ export function parseDevArguments(tokens) {
     if (token === '--dev') { result.profile = 'dev'; continue; }
     if (token === '--no-run') { result.run = false; continue; }
     if (token === '--verbose') { result.verbose = true; continue; }
-    const option = /^--(target|port)(?:=(.*))?$/.exec(token);
+    if (token === '--no-watch') { result.watch = false; continue; }
+    const option = /^--(target|port|host|output)(?:=(.*))?$/.exec(token);
     if (option) {
       const value = option[2] ?? tokens[++i];
       if (!value || value.startsWith('--')) throw new Error(`--${option[1]} requires a value\n\n${devUsage}`);
       if (option[1] === 'target') {
         if (!devTargets.includes(value)) throw new Error(`lasm dev --target accepts ${devTargets.join(', ')}, not "${value}"`);
         result.target = value;
-      } else {
+      } else if (option[1] === 'port') {
         if (!/^\d{1,5}$/.test(value) || Number(value) > 65535) throw new Error(`--port needs a port number, not "${value}"`);
         result.port = Number(value);
-      }
+      } else result[option[1]] = value;
       continue;
     }
     if (token.startsWith('-')) throw new Error(`Unknown lasm dev option: ${token}. Program arguments follow --.\n\n${devUsage}`);
@@ -60,7 +64,8 @@ export function parseDevArguments(tokens) {
   result.input = positional[0] ?? 'Main.lean';
   if (!result.input.endsWith('.lean')) throw new Error(`lasm dev expects a Lean source (Main.lean), not ${result.input}`);
   result.target ??= jsRuntime;
-  if (result.port !== undefined && result.target !== 'browser') throw new Error('--port applies to lasm dev --target browser (servers read $PORT)');
+  for (const option of ['port', 'host', 'output', 'watch'])
+    if (result[option] !== undefined && result.target !== 'browser') throw new Error(`--${option === 'watch' ? 'no-watch' : option} applies to lasm dev --target browser (servers read $PORT and $HOST)`);
   return result;
 }
 
@@ -210,14 +215,18 @@ export async function runDev(options) {
   if (!existsSync(source)) throw new Error(`${options.input} does not exist. Run lasm dev in the project directory, or name the Lean source.`);
   const project = findApplicationProject(source) ?? dirname(source);
   const target = options.target;
+  // The browser target's dev server (docs/BROWSER.md) builds and serves dist/ itself.
   if (target === 'browser') {
-    const { edgeTargets } = await import('./edge/edge-build.mjs');
-    if (!edgeTargets.browser) throw new Error('The browser target is not part of this Lasm version yet (docs/BROWSER.md).');
+    let browserDev;
+    try { browserDev = await import('./browser/browser-dev.mjs'); }
+    catch (error) { if (error.code === 'ERR_MODULE_NOT_FOUND') throw new Error('The browser target is not part of this Lasm version yet (docs/BROWSER.md).'); throw error; }
+    return browserDev.runBrowserDev({ input: options.input, release: options.profile === 'release', watch: options.watch ?? true,
+      port: options.port ?? 5173, host: options.host ?? '127.0.0.1', output: options.output });
   }
   const service = createBuildService();
   const runner = createRunner();
   const tty = process.stderr.isTTY;
-  let server, building = false, queued = false, previous = snapshot(project), lastGood, stopping = false;
+  let building = false, queued = false, previous = snapshot(project), lastGood, stopping = false;
   const status = text => { if (tty) process.stderr.write(`\r\x1b[K${color('2', '[lasm dev] ' + text)}`); };
   const clearStatus = () => { if (tty) process.stderr.write('\r\x1b[K'); };
 
@@ -248,13 +257,7 @@ export async function runDev(options) {
       if (!options.run) { /* rebuild only */ }
       else if (edgeOnlyTargets.includes(target))
         say(`${relative(process.cwd(), output) || output} is up to date; your platform's local server (for example npx wrangler dev) serves it.`);
-      else if (target === 'browser') {
-        if (!server) {
-          const { serveDirectory } = await import('./dev-server.mjs');
-          server = await serveDirectory(() => lastGood, { port: options.port ?? 5173 });
-          say(`Serving ${relative(process.cwd(), output) || output} at ${color('1', server.url)} with live reload (open it in your browser).`);
-        } else server.reload();
-      } else {
+      else {
         await runner.stop();
         const entry = join(output, 'main.mjs');
         const [command, args] = runtimeCommand(target, entry, options.args);
@@ -267,7 +270,6 @@ export async function runDev(options) {
       process.stderr.write(text.slice(-12000) + '\n');
       if (detail && !text.includes(error.message.split('\n')[0]) && !/Command failed/.test(error.message)) process.stderr.write(error.message.split('\n')[0] + '\n');
       say(color('31', `Build failed after ${((performance.now() - started) / 1000).toFixed(1)} s`) + (lastGood ? '; the last good build keeps running. Fix the error and save.' : '. Fix the error and save.'));
-      server?.report(error.message.split('\n')[0]);
     } finally {
       building = false;
       if (queued && !stopping) { queued = false; setTimeout(() => rebuild('change'), 0); }
@@ -285,7 +287,7 @@ export async function runDev(options) {
     const stop = async () => {
       if (stopping) return; stopping = true;
       clearTimeout(timer); watcher.close();
-      await runner.stop(); await server?.close(); await service.close();
+      await runner.stop(); await service.close();
       process.stdin.pause?.();
       resolveExit(0);
     };
