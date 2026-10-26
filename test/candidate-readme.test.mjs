@@ -15,7 +15,7 @@ for (const newline of ['\n', '\r\n']) test(`a packed README installs its own arc
   // The environment table (the earlier accepted baseline) is kept.
   assert.match(text, /\| Ubuntu 24\.04 LTS \| x86-64, ARM64 \| Installed-package and copied-deployment acceptance/);
   // The candidate section comes before the quick start.
-  assert.ok(text.indexOf('## This candidate archive') < text.indexOf('## Quick start'));
+  assert.ok(text.indexOf('## This candidate archive') < text.indexOf('## Platforms'));
   assert.match(text, /actions\/runs\/12345/);
   assert.doesNotMatch(text, /\]\(docs\//);
 });

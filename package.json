@@ -6,7 +6,7 @@
     "examples/express"
   ],
   "type": "module",
-  "description": "Experimental Lean-to-WebAssembly compiler for JavaScript hosts",
+  "description": "Lean 4 to WebAssembly compiler for Node, Bun, Deno, edge functions, WASI and the browser",
   "bin": {
     "lasm": "bin/lasm.mjs"
   },

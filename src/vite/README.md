@@ -20,9 +20,9 @@ const counter = await app.mount(document.getElementById('app'), { flags: { start
 counter.ports.saved.subscribe(value => console.log('Lean saved', value));
 ```
 
-- `vite` (development): `Main.lean` is built with `lasm build --target browser
-  --dev`. Saving any `.lean` file in its directory rebuilds it and remounts the
-  app in place. State the app saves with `Lasm.Web.App.onHotSave` comes back
+- `vite` (development): `Main.lean` is built in the dev profile by one
+  long-lived Lasm build worker. Saving any `.lean` file in its directory rebuilds
+  it (about 2 s per edit on the Linux CI runner) and remounts the app in place. State the app saves with `Lasm.Web.App.onHotSave` comes back
   through `Lasm.Web.App.hotState` when its type still converts.
 - `vite build`: a release build. Vite bundles the loader with your code, emits
   the `.wasm` as a hashed asset, and resolves the npm modules your Lean bindings
@@ -35,6 +35,7 @@ counter.ports.saved.subscribe(value => console.log('Lean saved', value));
   plugin ships in); `release: true` uses release builds in development too.
 - TypeScript: add `"@lasm/cli/vite/client"` to `compilerOptions.types`.
 
-The plugin ships inside `@lasm/cli`; a standalone `@lasm/vite` package may come later.
-Lasm builds need Node 24 or newer; the first build downloads Lean and the build
-tools (cached).
+Available from `@lasm/cli` 0.3.0. The plugin ships inside `@lasm/cli`, so it and
+the compiler always have the same version. Lasm builds need Node 24 or newer (or
+Bun or Deno); the first build downloads Lean and the build tools once. Writing the
+app itself: [Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md).

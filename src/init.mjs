@@ -1,4 +1,4 @@
-// `lasm init`: scaffold a new Lean-on-Node project from a template.
+// `lasm init`: scaffold a new Lean project from a template.
 // Writes files only: no network access, no Lean toolchain, no npm install.
 import { jsRuntime } from './js-runtime.mjs';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -473,7 +473,7 @@ editor marks \`import ${t.library ?? 'Lasm.JS'}\` as unknown).`
   return `# ${name}
 
 ${t.summary[0].toUpperCase() + t.summary.slice(1)}, compiled ahead of time to WebAssembly by
-[Lasm](https://github.com/Millillion/lasm) and run by Node.js.
+[Lasm](https://github.com/Millillion/lasm)${t.portable ? '. It runs on Node.js, and also on Bun and Deno' : ' and run by Node.js'}.
 
 ## Requirements
 

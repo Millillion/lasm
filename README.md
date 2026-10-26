@@ -1,13 +1,52 @@
 # Lasm
 
 **Lean 4 for the JavaScript and WebAssembly world.** Write servers, serverless
-functions, edge functions and browser frontends in Lean, compile them ahead of
-time to WebAssembly, and prove things about the code you actually ship.
+functions, edge functions and browser frontends in Lean, compile them ahead of time
+to WebAssembly, and prove things about the code you actually ship.
 
-Lasm is a compiler and toolchain distributed on npm. It takes ordinary Lean 4.35.0
-(Lake projects, dependencies, `IO`, tasks, `Std`) and produces a `dist/` that runs on
-Node, Bun, Deno, edge isolates, WASI hosts and in the browser. The only prerequisite
-is **Node 24+ with npm**: Lasm brings Lean, Lake and its build tools as npm packages.
+Lasm is a compiler and toolchain on npm. It builds ordinary Lean 4.35.0 (Lake
+projects, dependencies, `IO`, tasks, `Std`) into a `dist/` for the platform you
+choose. You install only a JavaScript runtime; Lasm brings Lean, Lake and its build
+tools as npm packages. No Lean, C compiler or Emscripten to set up.
+
+## Platforms
+
+Releases: **0.1.0** and **0.2.0** are on npm; **0.3.0 (next)** is the
+[`launch`](https://github.com/Millillion/lasm/tree/launch) branch, shipping next.
+Every row is tested in CI with the platform's own local runtime, image or emulator;
+by project policy CI never deploys to a real cloud account
+([how each is tested](#supported-platforms)).
+
+**Develop on** (where the `lasm` compiler runs):
+
+| | Supported | Since |
+| --- | --- | --- |
+| Operating systems | Linux x64 and arm64 (glibc 2.34+), macOS x64 and arm64, Windows x64 | 0.1.0 |
+| Node | 24 or newer (tested 24.0.0, 24.22.1, 26.12.1) | 0.1.0 |
+| Bun, Deno (as the only runtime, no Node needed) | Bun 1.4.4, Deno 2.9.6 tested | 0.2.0 |
+
+Windows ARM64 and Alpine/musl are not build machines (built apps run on Alpine).
+
+**Deploy to** (`lasm build --target …`):
+
+| Kind | Platforms | Target | Since |
+| --- | --- | --- | --- |
+| Node servers and programs | Any Linux, macOS or Windows host with Node 24+; Docker/Kubernetes, Cloud Run, Fly.io, Railway, Render, Heroku, DigitalOcean | `node` (default) | 0.1.0 |
+| Serverless functions | AWS Lambda (zip or container image), Lambda@Edge, Vercel Functions, Netlify Functions, Azure Functions, Google Cloud Functions | `lambda`, `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf` | 0.1.0 |
+| Edge functions | Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy, Supabase Edge Functions | `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy`, `supabase-edge` | 0.2.0 |
+| Bun and Deno servers and programs | Bun 1.3.14+, Deno 2.x | `bun`, `deno` | 0.2.0 |
+| Fastly Compute | Fastly (tested with Viceroy) | `fastly` | 0.3.0 (next) |
+| WASI | wasmtime, wasmer, Node's `node:wasi` | `wasi` | 0.3.0 (next) |
+| wasi-http | `wasmtime serve`, Spin | `wasi-http` | 0.3.0 (next) |
+| Browsers | Chrome, Edge, Firefox, Safari: a static site, or a Vite app (`@lasm/cli/vite`) | `browser` | 0.3.0 (next) |
+
+Node builds have Lean's full runtime (threads, files, processes, sockets). The
+edge, Bun/Deno, WASI and browser builds run Lean single-threaded, without sockets
+or processes (and without files, except on WASI); the rest of Lean works.
+
+## 60-second start
+
+You need Node 24+ with npm (or Bun or Deno, [see here](docs/BUN_DENO.md)).
 
 ```sh
 npm create @lasm@latest my-app -- --template hono
@@ -15,75 +54,35 @@ cd my-app && npm install && npm run dev
 curl http://localhost:3000/hello/Ada        # {"message":"Hello, Ada, from Lean!"}
 ```
 
-> **Release status.** `@lasm/cli` **0.1.0** (Node servers, CLI programs, function
-> platforms, npm interop) and **0.2.0** (edge isolates, Bun and Deno) are on npm.
-> Features marked **0.3.0 (next)** are in the [`launch`](https://github.com/Millillion/lasm/tree/launch)
-> branch and ship with the next release: browser apps, `Lasm.UI`, `Lasm.RPC`,
-> `Lasm.Fetch`, WASI/Fastly/Spin, the Fastify template and `lasm dev`.
+The first build on a new machine fetches Lean and the build tools once (about
+250–275 MB; the first build including that took 24 s on the Linux CI runner).
+`npm run build` writes `dist/`, which needs only Node (`node dist/main.mjs`); or
+build for a platform: `npx lasm build Main.lean --target workers`. With 0.3.0,
+`npm run dev` is `lasm dev`, which rebuilds and restarts in about 2 s per edit.
 
-## Quick start
-
-1. **Prerequisite:** Node 24 or newer with npm (`node --version`). Linux or macOS
-   on x86-64 or ARM64, or Windows on x86-64. Nothing else: no Lean, no C compiler,
-   no Emscripten.
-2. **Create a project** from a template (the `--` passes the option through npm):
-
-   ```sh
-   npm create @lasm@latest my-app -- --template hono
-   ```
-
-3. **Run it:** `cd my-app && npm install && npm run dev`. The first build on a new
-   machine fetches Lean and Lasm's build tools once (about 250–275 MB; 24 s for the
-   first build including that download on the Linux CI runner, longer on a laptop
-   connection). After that, `lasm dev` (**0.3.0 (next)**) rebuilds and restarts in
-   about 2 s per edit.
-4. **Ship it:** `npm run build` writes `dist/`, which needs only Node
-   (`node dist/main.mjs`), or build for a platform:
-   `npx lasm build Main.lean --target workers` (or `lambda`, `vercel`, `browser`, …).
-
-A single Lean file needs no project. Save this complete program as `Main.lean`:
+A single file needs no project. Save this complete program as `Main.lean`:
 
 ```lean
 def main : IO Unit := do
   IO.println s!"Hello from Lean! 2 + 3 = {2 + 3}"
 ```
 
-`npx @lasm/cli Main.lean` builds and runs it (`Hello from Lean! 2 + 3 = 5`);
-`npx @lasm/cli build Main.lean` writes `dist/`. For a project, pick a template:
+`npx @lasm/cli Main.lean` builds and runs it (`Hello from Lean! 2 + 3 = 5`).
 
-| Template (`--template …`) | What you get | Release |
+| Template (`--template …`) | What you get | Since |
 | --- | --- | --- |
 | `plain` (default) | A Lean command-line program | 0.1.0 |
-| `hono`, `express` | A Hono or Express server on Node with Lean request handlers (`Lasm.JS`); Hono also deploys to the edge | 0.1.0 |
-| `std-http` | An HTTP server in pure Lean (`Std.Http`), also builds natively | 0.1.0 |
+| `hono`, `express` | A Hono or Express server with Lean request handlers (`Lasm.JS`); Hono also deploys to the edge, Bun and Deno | 0.1.0 |
+| `std-http` | An HTTP server in pure Lean (`Std.Http`); also builds natively | 0.1.0 |
 | `fastify` | A Fastify 5 server with Lean route handlers | 0.3.0 (next) |
 | `fetch` | One pure-Lean HTTP handler (`Lasm.Fetch`) for Node, the edge, Bun, Deno, Fastly, WASI and Spin | 0.3.0 (next) |
-| `web` | A browser app in Lean (`Lasm.UI`): a counter | 0.3.0 (next) |
-| `fullstack` | Server, browser app and a typed API between them, with validation proved once for both sides | 0.3.0 (next) |
+| `web` | A browser app in Lean (`Lasm.UI`) | 0.3.0 (next) |
+| `fullstack` | A server, a browser app and a typed API between them, validation proved once for both sides | 0.3.0 (next) |
 
-Add `--deploy <target>` (repeatable) for a platform's files and an
-`npm run build:<target>` script. [Getting started](docs/GETTING_STARTED.md) walks
-through a server, an npm package called from Lean, a container and a function
-platform; [docs/README.md](docs/README.md) indexes all documentation.
-
-## Where it runs
-
-One Lean code base, many targets. Every row is tested in CI with the platform's own
-local runtime, image or emulator; by project policy nothing is deployed to a real
-cloud account ([Supported platforms](#supported-platforms) names each test).
-
-| Kind | Targets (`lasm build --target …`) | Release | Guide |
-| --- | --- | --- | --- |
-| Node server or program | `node` (default): Linux, macOS, Windows; Docker/Kubernetes, Cloud Run, Fly.io, Railway, Render, Heroku, DigitalOcean | 0.1.0 | [deploy/](docs/deploy/README.md) |
-| Serverless functions | `lambda`, `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf` | 0.1.0 | [deploy/](docs/deploy/README.md) |
-| Edge isolates | `workers` (Cloudflare), `vercel-edge`, `netlify-edge`, `deno-deploy`, `supabase-edge` | 0.2.0 | [EDGE.md](docs/EDGE.md) |
-| Bun and Deno (compiler and programs) | `bun`, `deno` | 0.2.0 | [BUN_DENO.md](docs/BUN_DENO.md) |
-| WASI, wasi-http, Fastly Compute, Spin | `wasi`, `wasi-http`, `fastly` (no JavaScript at all) | 0.3.0 (next) | [WASI.md](docs/WASI.md), [fastly.md](docs/deploy/fastly.md) |
-| Browser (DOM and web APIs) | `browser`: a static site, or `@lasm/cli/vite` in a Vite app | 0.3.0 (next) | [BROWSER.md](docs/BROWSER.md), [UI.md](docs/UI.md) |
-
-The edge, Bun/Deno, WASI and browser targets use a single-threaded Lean runtime: no
-threads, sockets, processes or (outside WASI) files there; everything else in Lean
-works. The Node target has the full runtime.
+`--deploy <target>` (repeatable) adds a platform's files and `npm run build:<target>`.
+Next: [Getting started](docs/GETTING_STARTED.md) (a server, an npm package called
+from Lean, a container, a function platform) and the
+[documentation index](docs/README.md).
 
 ## The whole stack in Lean, verified
 
@@ -236,7 +235,7 @@ machines and platforms, and exactly what a deployed Lean program cannot do.
 Install in a project with `npm install -D @lasm/cli` (the bin is `lasm`), or run
 without installing: `npx @lasm/cli Main.lean`. `npm create @lasm` runs `lasm init`
 of the same `@lasm/cli` version with the arguments unchanged. With the `Main.lean`
-from the [quick start](#quick-start):
+from the [quick start](#60-second-start):
 
 ```sh
 npx lasm Main.lean                          # build (dev profile) and run: Hello from Lean! 2 + 3 = 5
@@ -264,7 +263,7 @@ npx lasm build Main.lean --target lambda    # dist/ and an AWS Lambda zip
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help`, `npx lasm init --help` | Show usage; `-h` is an alias. |
-| New project | `npm create @lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory (`Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `README.md`, `.gitignore`, and for servers a `Dockerfile` and `.dockerignore`). Templates: see [Quick start](#quick-start). `--deploy` (repeatable) adds a platform's files and `npm run build:<target>`: `lambda` (`Dockerfile.lambda`, a container image), `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf`; `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` (templates `hono`, `fetch`, `fullstack`), `supabase-edge` (`hono`); `fastly`, `wasi-http`, `spin` (`fetch`, `fullstack`), `wasi` (`fetch`, `plain`). The `fetch` and `fullstack` templates and their targets are 0.3.0 (next). Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` also works. |
+| New project | `npm create @lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory (`Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `README.md`, `.gitignore`, and for servers a `Dockerfile` and `.dockerignore`). Templates: see [Quick start](#60-second-start). `--deploy` (repeatable) adds a platform's files and `npm run build:<target>`: `lambda` (`Dockerfile.lambda`, a container image), `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf`; `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` (templates `hono`, `fetch`, `fullstack`), `supabase-edge` (`hono`); `fastly`, `wasi-http`, `spin` (`fetch`, `fullstack`), `wasi` (`fetch`, `plain`). The `fetch` and `fullstack` templates and their targets are 0.3.0 (next). Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` also works. |
 | Package an existing build | `npx lasm package --target lambda` | Package a built server (default `dist/`) for a function platform without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output. Checks the platform's size limit. Refuses a dev build unless `--allow-dev`. For a browser build, `npx lasm package dist --target browser` checks every file against `lasm-manifest.json` and writes `_headers`. |
 | Cache repair | `npx lasm cache repair` | Offline verification and removal of invalid tools and abandoned staging. Refuses an active build. |
 

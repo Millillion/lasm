@@ -7,7 +7,7 @@ export function candidateReadme(source, { version, sourceRevision, runId }) {
   assert.match(version, /^0\.1\.0-experimental\.\d+$/);
   assert.match(sourceRevision, /^[a-f0-9]{40}$/);
   if (runId !== undefined) assert.match(runId, /^\d+$/);
-  // The candidate section goes before the first second-level heading (the quick start).
+  // The candidate section goes before the first second-level heading (the platform list).
   const at = source.indexOf('\n## ');
   assert.ok(at > 0, 'Review the packaged quick start when README structure changes');
   const text = `${source.slice(0, at)}

@@ -1,5 +1,10 @@
 # Express task board with Lean endpoints
 
+> **Maintainer example of the legacy `lasm.json` interface** (a Lean module called
+> from JavaScript), kept as a regression test. To start a new Express app with Lean
+> handlers, use `npm create @lasm@latest my-app -- --template express`
+> ([Getting started](../../docs/GETTING_STARTED.md)).
+
 A runnable Node.js application with task CRUD, filtering, pagination, optimistic
 version checks, aggregate statistics, persistent JSON storage, and imports from
 an HTTP template service. Endpoint routing, validation, application logic,

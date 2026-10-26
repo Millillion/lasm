@@ -32,7 +32,7 @@ gh release download node-linux-candidate-36398226921 --repo Millillion/lasm --pa
 ```
 
 Give the unchanged tarball to the developer, who needs only Node/npm. Follow the
-[README quick start](../README.md#quick-start). GitHub CLI is only a maintainer
+[README quick start](../README.md#60-second-start). GitHub CLI is only a maintainer
 retrieval tool. The README and support guide embedded in this unchanged archive
 predate completion of these tests; the linked repository documentation records
 the current acceptance status. Repacking documentation would require a new hash
