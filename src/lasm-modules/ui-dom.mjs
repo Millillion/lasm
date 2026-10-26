@@ -142,18 +142,25 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
       hydrating = false;
     }
     bytes = null;
-    if (focusQueue.length) {
-      const queue = focusQueue; focusQueue = [];
-      for (const [id, blur] of queue) { const el = doc.getElementById(id); if (el) blur ? el.blur() : el.focus(); }
-    }
+  }
+  // Cmd.focus / Cmd.blur, after the frame that may create the element.
+  function focusQueued() {
+    const queue = focusQueue; focusQueue = [];
+    for (const [id, blur] of queue) { const el = doc.getElementById(id); if (el) blur ? el.blur() : el.focus(); }
   }
 
   // ---- frames ----
+  // Timings of the last frame (Lean's view, diff and encoding; the applier), for tools.
+  const last = { leanMs: 0, applyMs: 0, bytes: 0, frames: 0 };
   function frame() {
     pending = false;
     if (stopped) return;
+    const t0 = performance.now();
     const patch = lean.frame();
+    const t1 = performance.now();
     if (patch.length) apply(patch);
+    if (focusQueue.length) focusQueued();
+    last.leanMs = t1 - t0; last.applyMs = performance.now() - t1; last.bytes = patch.length; last.frames++;
   }
   function schedule() { if (!pending && !stopped) { pending = true; raf(frame); } }
   const after = needsFrame => { if (needsFrame) schedule(); };
@@ -265,7 +272,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     storageSet(which, key, value) { try { storage(which).setItem(key, value); } catch { /* storage unavailable */ } },
     storageRemove(which, key) { try { storage(which).removeItem(key); } catch { /* storage unavailable */ } },
     storageGet(which, key) { try { return storage(which).getItem(key); } catch { return null; } },
-    focus(id, blur) { if (pending) focusQueue.push([id, blur]); else { const el = doc.getElementById(id); if (el) blur ? el.blur() : el.focus(); } },
+    focus(id, blur) { focusQueue.push([id, blur]); schedule(); },
     title(t) { doc.title = t; },
   };
   return {
@@ -281,7 +288,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
       root.textContent = '';
     },
     // For tests and tools.
-    stats: () => ({ nodes: nodes.size - 1, names: names.length, decoders: decoders.length }),
+    stats: () => ({ nodes: nodes.size - 1, names: names.length, decoders: decoders.length, last: { ...last } }),
     applyForTest: apply,
   };
 }
@@ -291,7 +298,9 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
 export function lasmInstance(context) {
   if (!context.root) return standIn;
   const ui = createUi({ root: context.root, flags: context.flags, hydrate: context.hydrate });
-  context.onDispose?.(() => ui.unmount());
+  context.onDispose?.(() => { ui.unmount(); delete context.root.lasmUi; });
+  // For tools and tests: element.lasmUi.stats() (node count, last frame's timings).
+  context.root.lasmUi = { stats: ui.stats };
   return ui.module;
 }
 

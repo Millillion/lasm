@@ -149,6 +149,9 @@ theorem lastVal_cons (k : AttrKey) (a : Attr Msg) (l : List (Attr Msg)) :
     rw [lastVal_none_iff] at hv
     simp [hv]
 
+theorem Attr.same_spec {a b : Attr Msg} (h : a.same b = true) : a.key = b.key ∧ a.val = b.val := by
+  cases a <;> cases b <;> simp_all [Attr.same, Attr.key, Attr.val]
+
 theorem attrsEq_lastVal {old new : List (Attr Msg)} (h : attrsEq old new = true) (k : AttrKey) :
     lastVal k old = lastVal k new := by
   induction old generalizing new with
@@ -157,8 +160,9 @@ theorem attrsEq_lastVal {old new : List (Attr Msg)} (h : attrsEq old new = true)
     cases new with
     | nil => simp [attrsEq] at h
     | cons b bs =>
-      simp only [attrsEq, Bool.and_eq_true, beq_iff_eq] at h
-      obtain ⟨⟨hk, hv⟩, ht⟩ := h
+      simp only [attrsEq, Bool.and_eq_true] at h
+      obtain ⟨hs, ht⟩ := h
+      obtain ⟨hk, hv⟩ := Attr.same_spec hs
       simp only [lastVal, ih ht, hk, hv]
 
 theorem applyAttrOps_append (xs ys : List AttrOp) (a : Attrs) :

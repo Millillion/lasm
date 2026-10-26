@@ -358,7 +358,10 @@ theorem add_appends (m : Model) (h : clean m.field ≠ "") :
 
 ## What is proved
 
-`import Lasm.UI.Proofs` ([Proofs.lean](../library/Lasm/UI/Proofs.lean)):
+[library/Lasm/UI/Proofs.lean](../library/Lasm/UI/Proofs.lean) and
+[Proofs/](../library/Lasm/UI/Proofs) (about 1,260 lines, checked by CI on
+every change with `node scripts/ui/lean-tests.mjs`; they are not part of the
+compiled library in the npm package, since apps do not import them):
 
 ```lean
 theorem diff_correct (old : List (Live Msg)) (new : List (Html Msg)) (next : Nat) (h : WF old next) :
@@ -379,7 +382,8 @@ theorem diffAttrs_correct (old new : List (Attr Msg)) : applyAttrOps (diffAttrs 
   replacement of nodes whose tag or namespace changed, text changes,
   attributes, properties, styles and listeners, and nested patches. Any
   sequence of frames keeps the DOM equal to the DOM of the live tree, which
-  shows the latest view. No `sorry`, no axioms beyond Lean's standard three.
+  shows the latest view. No `sorry`; `#print axioms` shows only `propext`,
+  `Classical.choice` and `Quot.sound` (checked in CI).
 - **The model** ([Model.lean](../library/Lasm/UI/Model.lean)): DOM nodes with
   ids; attribute slots as functions, so their order is unobservable as in the
   DOM; `insertBefore`, `remove`, `textContent = ""` and setting/removing
@@ -426,7 +430,7 @@ clearing.
 
 ## API reference
 
-Modules (all in `import Lasm.UI` except the proofs):
+Modules (all in `import Lasm.UI` except the DOM model, `import Lasm.UI.Model`, and the proofs):
 
 | Module | Contents |
 | --- | --- |
@@ -441,7 +445,7 @@ Modules (all in `import Lasm.UI` except the proofs):
 | `Lasm.UI.Diff` | `Live`, `Op`, `AttrOp`, `create`, `diff`, `diffNode`, `diffChildren`, `diffAttrs`, `mountOps` |
 | `Lasm.UI.Encode` | `Encode.frame`, `Encode.Tables` (the patch stream) |
 | `Lasm.UI.Model` | `Dom`, `toDom`, `attrsOf`, `applyOps`, `applyAttrOps` (the DOM model) |
-| `Lasm.UI.Proofs` | `WF`, `diff_correct`, `mount_correct`, `session_correct`, `diffAttrs_correct` |
+| `Lasm.UI.Proofs` (source only) | `WF`, `diff_correct`, `mount_correct`, `session_correct`, `diffAttrs_correct` |
 
 Examples: [counter](../examples/ui/counter/Main.lean),
 [TodoMVC](../examples/ui/todomvc) (with proofs),

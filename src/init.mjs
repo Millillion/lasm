@@ -206,14 +206,22 @@ Files:
 
 | File | What it is |
 | --- | --- |
+<<<<<<< ours
 | \`Main.lean\` | The app: \`update\` and \`view\` with \`Lasm.UI\` (\`html!\` markup, the Elm architecture); \`Lasm.Web\` has the rest of the web platform. |
+=======
+| \`Main.lean\` | The app: a pure \`update\` and \`view\` with \`Lasm.UI\` ([guide](https://github.com/Millillion/lasm/blob/main/docs/UI.md)). |
+>>>>>>> theirs
 | \`App.lean\` | Pure Lean logic used by \`Main.lean\`. |
 | \`index.html\`, \`public/style.css\` | The page; \`lasm build\` adds the loader before \`</head>\`, and copies \`public/\` into \`dist/\`. |
 | \`lakefile.toml\`, \`lean-toolchain\` | The Lake project, pinned to Lean ${defaultLean()}. |
 | \`package.json\` | npm scripts, and Lasm (\`${lasm.name}\`) as a dev dependency. |
 
 \`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
+<<<<<<< ours
 \`Lasm.UI\`, which only Lasm provides. Guide: [Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md).
+=======
+\`Lasm.UI\`, which only Lasm provides.
+>>>>>>> theirs
 
 ## Deploy
 

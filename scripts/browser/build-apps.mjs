@@ -70,7 +70,13 @@ const dev = join(work, 'counter-dev');
 cpSync(counter, dev, { recursive: true });
 build(dev, join(work, 'counter-dev-out'), ['--dev']);
 const main = join(dev, 'Main.lean');
+<<<<<<< ours
 writeFileSync(main, readFileSync(main, 'utf8').replace('>Reset<', '>Reset!<'));
+=======
+const before = readFileSync(main, 'utf8'), edited = before.replace('{App.greet "Lean"}', '{App.greet "Lean!"}');
+if (edited === before) throw new Error('the counter template changed: update the view edit in build-apps.mjs');
+writeFileSync(main, edited);
+>>>>>>> theirs
 record.rebuild = { what: 'counter: edit one view expression, lasm build --dev --target browser', seconds: build(dev, join(work, 'counter-dev-out'), ['--dev']) };
 writeFileSync(join(out, 'build.json'), JSON.stringify(record, null, 2) + '\n');
 console.log(JSON.stringify(record, (key, value) => key === 'files' ? undefined : value, 2));

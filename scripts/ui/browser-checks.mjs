@@ -5,8 +5,10 @@
 // { server, name, manifest, openPage, expect, report }.
 
 const median = xs => { const s = [...xs].sort((a, b) => a - b); return s.length ? s[Math.floor(s.length / 2)] : null; };
-const noErrors = lines => !lines.some(line => /^(error|pageerror)/.test(line));
-const errorLines = lines => lines.filter(l => /^(error|pageerror)/.test(l)).join(' | ');
+// Browsers log failed requests as console errors; the demo requests a missing page on purpose.
+const isError = line => /^(error|pageerror)/.test(line) && !/status of 404/.test(line);
+const noErrors = lines => !lines.some(isError);
+const errorLines = lines => lines.filter(isError).join(' | ');
 
 async function counter({ server, name, openPage, expect, report }) {
   const { context, page, consoleLines } = await openPage(server, `/${name}/`);
