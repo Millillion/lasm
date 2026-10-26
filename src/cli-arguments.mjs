@@ -8,10 +8,14 @@ import { jsRuntime } from './js-runtime.mjs';
 // Edge targets (experimental, docs/EDGE.md) relink for edge isolates; the
 // list equals src/edge/edge-build.mjs edgeTargets (test/edge.test.mjs).
 export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy'];
-export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets];
+// The browser (docs/BROWSER.md): the edge program as a static web app.
+export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, 'browser'];
+// --suspend (browser): none (the default: blocking waits stop the instance) or
+// jspi (they suspend in browsers that have JSPI).
+export const suspendModes = ['none', 'jspi'];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy] [--dev]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|browser] [--suspend none|jspi] [--dev]
        lasm init <directory> [--template plain|express|hono|std-http] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
@@ -60,6 +64,14 @@ export function parseLasmArguments(argv) {
       if (!buildTargets.includes(value)) throw new Error(`Unknown build target "${value}". Choose one of: ${buildTargets.join(', ')}`);
       result.target = value; continue;
     }
+    const suspend = /^--suspend(?:=(.*))?$/.exec(token);
+    if (suspend) {
+      if (supplied.has('suspend')) throw new Error('Specify --suspend only once');
+      supplied.add('suspend');
+      const value = suspend[1] ?? tokens[++i];
+      if (!suspendModes.includes(value)) throw new Error(`--suspend requires one of: ${suspendModes.join(', ')}`);
+      result.suspend = value; continue;
+    }
     const match = /^--output(?:=(.*))?$/.exec(token);
     if (match) {
       if (supplied.has('output')) throw new Error('Specify --output only once');
@@ -83,6 +95,7 @@ export function parseLasmArguments(argv) {
   if (result.input.endsWith('.lean')) result.profile ??= result.command === 'build' ? 'release' : 'dev';
   if (result.allowDev && !(result.command === 'build' && result.target && result.target !== 'node'))
     throw new Error('--allow-dev applies to lasm build --target <platform> and lasm package');
+  if (result.suspend !== undefined && result.target !== 'browser') throw new Error('--suspend applies to lasm build --target browser');
   if (result.command === 'build') {
     result.output ??= 'dist';
     // The default target is the runtime the CLI runs on: node, bun or deno.

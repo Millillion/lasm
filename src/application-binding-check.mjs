@@ -11,6 +11,8 @@ import { fileURLToPath } from 'node:url';
 import { evalCommand } from './js-runtime.mjs';
 
 const reader = fileURLToPath(new URL('./lasm-js-bindings.lean', import.meta.url));
+// Lasm's builtin JavaScript modules (lasm:<name>; src/edge/builtin-modules.mjs).
+const builtins = fileURLToPath(new URL('./lasm-modules/', import.meta.url));
 
 export function readBindings(lean, env, oleans, { cache } = {}) {
   const files = oleans.filter(file => existsSync(file));
@@ -48,17 +50,26 @@ function readBindingsUncached(lean, env, files) {
   return result.stdout.split(/\r?\n/).filter(line => line.startsWith('{')).map(line => JSON.parse(line));
 }
 
-// Runs in the child: the last argument is the project directory, stdin the bindings.
+// Runs in the child: the last argument is the project directory, the one
+// before it Lasm's builtin module directory, stdin the bindings.
 const checker = `
 const { createRequire } = require('node:module');
 const { join } = require('node:path');
 const bindings = JSON.parse(require('node:fs').readFileSync(0, 'utf8'));
-const load = createRequire(join(process.argv.at(-1), 'package.json'));
+const project = createRequire(join(process.argv.at(-1), 'package.json'));
+const load = specifier => {
+  if (!specifier.startsWith('lasm:')) return project(specifier);
+  const name = specifier.slice(5);
+  if (!/^[a-z][a-z0-9-]*$/.test(name) || !require('node:fs').existsSync(join(process.argv.at(-2), name + '.mjs')))
+    throw Object.assign(new Error('unknown Lasm builtin module ' + specifier), { code: 'LASM_UNKNOWN_BUILTIN' });
+  return require(join(process.argv.at(-2), name + '.mjs'));
+};
 const results = bindings.map(b => {
   const where = b.module + (b.path ? ' export ' + JSON.stringify(b.path) : '');
   let value;
   try { value = b.module === 'globalThis' ? globalThis : load(b.module); } catch (error) {
-    return { ...b, error: error.code === 'MODULE_NOT_FOUND' ? 'module ' + JSON.stringify(b.module) + ' is not installed (add it to package.json and run npm install)' : 'loading ' + b.module + ' failed: ' + error.message };
+    return { ...b, error: error.code === 'MODULE_NOT_FOUND' ? 'module ' + JSON.stringify(b.module) + ' is not installed (add it to package.json and run npm install)'
+      : error.code === 'LASM_UNKNOWN_BUILTIN' ? error.message : 'loading ' + b.module + ' failed: ' + error.message };
   }
   for (const key of b.path ? b.path.split('.') : []) {
     if (value === null || value === undefined) { value = undefined; break; }
@@ -75,7 +86,7 @@ process.stdout.write(JSON.stringify(results));
 
 export function checkBindings(project, bindings) {
   if (!bindings.length) return [];
-  const [command, args] = evalCommand(checker, [project]);
+  const [command, args] = evalCommand(checker, [builtins, project]);
   const result = spawnSync(command, args, { input: JSON.stringify(bindings), encoding: 'utf8',
     cwd: project, windowsHide: true, timeout: 120_000, maxBuffer: 16 * 1024 * 1024 });
   if (result.status !== 0) throw new Error(`The Lasm.JS binding check failed to run: ${result.stderr}`);

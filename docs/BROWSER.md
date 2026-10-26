@@ -36,6 +36,38 @@ small downloads, fast start, fast updates, and a clean typed API.
 | 1,000-row create / update every 10th row (js-framework-benchmark style) | within 2× vanilla JS |
 | Incremental rebuild after editing one `view` function (dev profile) | ≤ 2 s on the Linux runner |
 
+## Builtin JavaScript modules (`lasm:*`)
+
+**In branch source (2026-10-26).** Lasm ships its own JavaScript modules for the
+Lean libraries that need a JavaScript side (`lasm:web` for `Lasm.Web`,
+`lasm:app` for the mounted app, `lasm:ui-dom` for `Lasm.UI`'s patch applier):
+
+- **Name and file.** `lasm:<name>` is the ES module
+  [`src/lasm-modules/<name>.mjs`](../src/lasm-modules/). Names are lower case
+  (`[a-z][a-z0-9-]*`). A builtin module uses web-standard APIs only (no Node
+  built-ins, no `Buffer`, no `process`), and imports only other builtin modules,
+  by relative path on a line of its own (`import { x } from './web.mjs';`).
+- **Lean side.** Bind it like any module: `@[js "lasm:ui-dom" "apply"] opaque
+  apply : Value → ByteArray → IO Unit`, or `Lasm.JS.require "lasm:ui-dom"`.
+  Bindings declared in Lasm's own library (`library/Lasm/…`) are read from the
+  library's module data when a program links that library module, so they are
+  checked at build time and resolved statically like the program's own.
+- **Resolution, per target.** Browser builds bundle the module (and the
+  builtins it imports) into the loader `app.<hash>.js`. Edge and portable builds
+  (`workers`, `vercel-edge`, `netlify-edge`, `deno`, `bun`, `deno-deploy`)
+  copy it to `lasm/modules/<name>.mjs` and import it from the generated entry.
+  Node builds copy every builtin to `host/lasm-modules/`. The build-time binding
+  check loads it from `src/lasm-modules/`, so every export a binding names must
+  exist there (as a function) even if it only works in a browser.
+- **Per-app state.** A module that keeps state per app (a node table, listeners)
+  exports `lasmInstance(context)`; each Lean instance then sees the object it
+  returns instead of the shared module. `context` is `{ target, root, flags,
+  hydrate, report(error), onDispose(fn) }`: `target` is `'browser'` or `'edge'`,
+  `root` the mounted element (browser), `onDispose` registers cleanup run on
+  unmount or when the instance stops. Several apps on one page therefore never
+  share builtin-module state.
+- **Unknown names** fail the build with the list of builtins.
+
 ## Patch protocol (`lasm:ui-dom`)
 
 Lean keeps the previous `Html` tree and node ids; `diff` writes ops into a
