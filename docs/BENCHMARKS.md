@@ -341,7 +341,18 @@ example `Built in 1.9 s (Lean 1.0s · C 0.1s · link 0.6s · output 0.2s)`.
 
 Release builds keep their bytes (the Hono fixture's `program.wasm` and
 `program.cjs` compared by SHA-256 before and after) and get faster from the
-cached JavaScript steps (maintainer host, one-line edit: 20.3 → 17.2 s).
+cached JavaScript steps (maintainer host, one-line edit: 20.3 → 17.2 s). The
+whole profile on the runner (linux-x64; before: run 40127904162, after: run
+40290721986, same harness):
+
+| Build (seconds) | Before | After |
+| --- | ---: | ---: |
+| Hono new machine, without download | 37.3 | 37.7 |
+| hello: --rebuild / one-line edit | 5.7 / 7.8 | 4.0 / 5.9 |
+| hello: dev, one-line edit | 4.5 | 1.6 |
+| hono: first build in a new project | 28.6 | 30.5 |
+| hono: --rebuild / one-line edit | 7.9 / 10.9 | 6.2 / 8.9 |
+| hono: dev, one-line edit (first after a release build) | 6.4 | 2.6 |
 Edge targets in `lasm dev` use an edge dev profile (Binaryen lowering only).
 
 ## Cold start on a fraction of a CPU
