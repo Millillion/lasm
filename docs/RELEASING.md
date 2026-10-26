@@ -90,6 +90,15 @@ node scripts/release/bootstrap-npm.mjs --dry-run   # prints every command, chang
 node scripts/release/bootstrap-npm.mjs             # does it
 ```
 
+npm requires two-factor for every trust command, reads (`npm trust list`) included,
+and ignores the browser's "skip for 5 minutes" option for them, so the bootstrap's
+trust step costs several prompts per package. After the placeholders exist, link
+trust with one authenticator code for all packages instead:
+
+```sh
+node scripts/release/trust-all.mjs   # one code, reused until it expires; 409 = already trusted
+```
+
 What it does, per package (each step is skipped when already done, so it can be
 re-run after an interruption):
 
@@ -97,7 +106,7 @@ re-run after an interruption):
    with `version` `0.0.0`, a README "placeholder; use the latest version", `license`
    `MIT` with the LICENSE text, and `repository` pointing at
    github.com/Millillion/lasm; `@lasm/*` with `--access public`, `@lasm/create`
-   (unscoped) under your account. npm asks for 2FA (browser or OTP) for each publish.
+   included. npm asks for 2FA (browser or OTP) for each publish.
 2. **Trust**: `npm trust github <pkg> --repository Millillion/lasm --file release.yml --allow-publish --yes`.
    npm asks for 2FA on the first call. **In the browser prompt, tick "skip
    two-factor authentication for the next 5 minutes"**: the following calls then
