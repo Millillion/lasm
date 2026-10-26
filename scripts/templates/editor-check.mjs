@@ -43,9 +43,14 @@ const timer = setTimeout(() => { console.error(`editor-check: timed out after ${
 await request('initialize', { processId: process.pid, rootUri: pathToFileURL(project).href, capabilities: {} });
 send({ method: 'initialized', params: {} });
 const uris = files.map(name => pathToFileURL(join(project, name)).href);
-files.forEach((name, index) => send({ method: 'textDocument/didOpen', params: { textDocument: {
-  uri: uris[index], languageId: 'lean4', version: 1, text: readFileSync(join(project, name), 'utf8') } } }));
-await new Promise(resolve => { notify = () => { if (uris.every(uri => finished.has(uri))) resolve(); }; notify(); });
+// One file at a time, as a user opens them: each open runs `lake setup-file`, and
+// several at once built the shared modules concurrently, so one setup-file could
+// fail on a half-written .olean (dx-dev-loop run 40375240718).
+for (const [index, name] of files.entries()) {
+  send({ method: 'textDocument/didOpen', params: { textDocument: {
+    uri: uris[index], languageId: 'lean4', version: 1, text: readFileSync(join(project, name), 'utf8') } } });
+  await new Promise(resolve => { notify = () => { if (finished.has(uris[index])) resolve(); }; notify(); });
+}
 // Diagnostics follow the final progress notification closely.
 await new Promise(resolve => setTimeout(resolve, 1000));
 clearTimeout(timer);
