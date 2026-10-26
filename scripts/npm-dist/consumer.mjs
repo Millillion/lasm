@@ -18,7 +18,8 @@
 //   foreign-lock   lockfile created for another OS (npm --os/--cpu), then npm ci on this host
 //   edge           in the `installed` project: examples/edge-pure built for every edge target and for Bun and
 //                  Deno (lasm build --target …) from the edge runtime bundled in @lasm/cli (no download, no receipt)
-//   launch         0.3.0's pieces from the installed package, in the `installed` caches: templates web
+//   launch-web|-fetch|-fastify|-fullstack (one process each: the resource guard counts page cache)
+//                  0.3.0's pieces from the installed package, in the `installed` caches: templates web
 //                  (--target browser), fetch (served; --target wasi|fastly|wasi-http), fastify and fullstack
 //                  (served), the Vite plugin (@lasm/cli/vite, vite build) and `lasm editor` with Lean
 //                  already cached (a stub elan records the link; no download, network audit on)
@@ -53,7 +54,7 @@ const npxCli = join(dirname(npmCli), 'npx-cli.js');
 // Empty npm and Lasm caches per scenario; the Lake scenario continues the installed project,
 // and init reuses its caches (a fresh extraction of every tool again filled the guard's
 // budget with page cache on the 6 GiB Linux setting; empty caches are covered by installed and npx).
-const cacheName = ['lake', 'c-tier', 'edge', 'launch', 'init', 'create'].includes(args.scenario) ? 'installed' : args.scenario;
+const cacheName = ['lake', 'c-tier', 'edge', 'launch-web', 'launch-fetch', 'launch-fastify', 'launch-fullstack', 'init', 'create'].includes(args.scenario) ? 'installed' : args.scenario;
 const preload = join(root, 'scripts/npm-dist/network-audit.cjs');
 function environment(extra = {}) {
   const env = { ...process.env };
@@ -192,8 +193,10 @@ if (args.scenario === 'edge') {
   assert.ok(!report.receipts.some(r => r.artifact === record.edge.archive.name), 'The edge runtime came from the CLI package, not a download');
 }
 
-if (args.scenario === 'launch') {
-  const directory = join(work, 'launch-empty');
+if (args.scenario.startsWith('launch-')) {
+  const part = args.scenario.slice('launch-'.length);
+  assert.ok(['web', 'fetch', 'fastify', 'fullstack'].includes(part), `Unknown scenario ${args.scenario}`);
+  const directory = join(work, `${args.scenario}-empty`);
   assert.ok(!existsSync(directory), `Use a new work directory: ${directory}`);
   mkdirSync(directory, { recursive: true });
   report.launch = {};
@@ -237,6 +240,7 @@ if (args.scenario === 'launch') {
     }
   };
   // The browser template: a static site.
+  if (part === 'web') {
   const web = init('web', 'web');
   npmRun('npm run build (web, --target browser)', ['run', 'build'], { cwd: web });
   for (const file of ['dist/index.html', 'dist/lasm-manifest.json']) assert.ok(existsSync(join(web, file)), `web: no ${file}`);
@@ -250,7 +254,9 @@ if (args.scenario === 'launch') {
   run('vite build (@lasm/cli/vite)', process.execPath, [join(vite, 'node_modules/vite/bin/vite.js'), 'build', '--outDir', 'out'], { cwd: vite });
   assert.ok(existsSync(join(vite, 'out/index.html')), 'vite: no out/index.html');
   assert.ok(readdirSync(join(vite, 'out'), { recursive: true }).some(file => String(file).endsWith('.wasm')), 'vite: no .wasm in out/');
-  // The fetch template: Node, then the WASI targets.
+  }
+  // The fetch template: Node, then the WASI targets, then the editor support.
+  if (part === 'fetch') {
   const fetchApp = init('fetch', 'fetch', ['fastly', 'wasi-http']);
   npmRun('npm run build (fetch)', ['run', 'build'], { cwd: fetchApp });
   await serve('fetch', fetchApp, 'dist/main.mjs', '/', body => JSON.parse(body).message === 'Hello from Lean!');
@@ -258,14 +264,6 @@ if (args.scenario === 'launch') {
     npxRun(`npx lasm build --target ${target}`, ['lasm', 'build', 'Main.lean', '--target', target], { cwd: fetchApp });
     assert.ok(existsSync(join(fetchApp, output)), `--target ${target} wrote no ${output}`);
   }
-  // Fastify (npm dependencies mirrored into the loopback registry).
-  const fastify = init('fastify', 'fastify');
-  npmRun('npm run build (fastify)', ['run', 'build'], { cwd: fastify });
-  await serve('fastify', fastify, 'dist/main.mjs', '/', body => JSON.parse(body).message === 'Hello from Lean on Fastify!');
-  // The fullstack template: the browser app, then the server that renders the first page.
-  const fullstack = init('fullstack', 'fullstack');
-  npmRun('npm run build (fullstack)', ['run', 'build'], { cwd: fullstack });
-  await serve('fullstack', fullstack, 'dist/server/main.mjs', '/', body => body.includes('<li'));
   // Editor support with Lean already cached: a stub elan records the link and the override.
   const elanHome = join(directory, 'elan-home'), stub = join(directory, 'elan-stub'), calls = join(directory, 'elan-calls.txt');
   mkdirSync(join(elanHome, 'toolchains'), { recursive: true }); mkdirSync(stub, { recursive: true });
@@ -282,6 +280,19 @@ if (args.scenario === 'launch') {
     const result = npxRun('npx lasm editor (no elan)', ['lasm', 'editor'], { cwd: fetchApp, env: environment({ ELAN_HOME: elanHome }), expectFailure: true });
     assert.match(result.stderr, /npx lasm editor/, 'lasm editor names the fix without elan');
     report.launch.editor = 'no-elan message';
+  }
+  }
+  // Fastify (npm dependencies mirrored into the loopback registry).
+  if (part === 'fastify') {
+  const fastify = init('fastify', 'fastify');
+  npmRun('npm run build (fastify)', ['run', 'build'], { cwd: fastify });
+  await serve('fastify', fastify, 'dist/main.mjs', '/', body => JSON.parse(body).message === 'Hello from Lean on Fastify!');
+  }
+  // The fullstack template: the browser app, then the server that renders the first page.
+  if (part === 'fullstack') {
+  const fullstack = init('fullstack', 'fullstack');
+  npmRun('npm run build (fullstack)', ['run', 'build'], { cwd: fullstack });
+  await serve('fullstack', fullstack, 'dist/server/main.mjs', '/', body => body.includes('<li'));
   }
   report.receipts = receipts();
   const kinds = new Set(report.receipts.map(r => r.source?.kind));

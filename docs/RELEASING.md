@@ -40,7 +40,7 @@ A release is a version bump: a pull request that changes the root `package.json`
      template ([fullstack.yml](../.github/workflows/fullstack.yml)), the unit suite
      ([unit.yml](../.github/workflows/unit.yml)) and the dev loop, editor and cold
      start ([dx-dev-loop.yml](../.github/workflows/dx-dev-loop.yml)); the rehearsal's
-     `launch` scenario builds and serves the web, fetch, fastify and fullstack
+     `launch-*` scenarios build and serve the web, fetch, fastify and fullstack
      templates, the WASI targets and a Vite build from the installed package;
    - the **edge and Bun/Deno checks** (since 0.2.0; [workers.yml](../.github/workflows/workers.yml),
      called with `release-check: true`): the edge runtime built and compared with

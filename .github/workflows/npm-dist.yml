@@ -131,7 +131,7 @@ jobs:
           node scripts/npm-dist/registry.mjs publish --dir "$RUNNER_TEMP/verdaccio" --dist .work/npm-dist/build --mirror-template hono --mirror-template fastify --mirror-closure vite@8.3.5 --mirror-bundled
       - name: Install from the registry and build (empty caches, npm only, non-loopback requests blocked)
         run: |
-          for scenario in installed lake c-tier edge launch npx init create omit-optional foreign-lock; do
+          for scenario in installed lake c-tier edge launch-web launch-fetch launch-fastify launch-fullstack npx init create omit-optional foreign-lock; do
             node scripts/full-lean/run-bounded.mjs --memory-mib "$MEMORY" --report ".work/npm-consumer-$scenario-resources.json" -- \
               node scripts/npm-dist/consumer.mjs --registry http://127.0.0.1:4873/ --dist .work/npm-dist/build --work "$RUNNER_TEMP/consumer" --scenario "$scenario"
           done
