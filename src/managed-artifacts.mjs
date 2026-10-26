@@ -247,7 +247,21 @@ export function treeFingerprint(directory) {
  * record (in `stamps`, inside the managed cache) holds the tree fingerprint
  * taken before and after a successful full check. Without `stamps` (cache
  * repair, release tooling) the full check always runs. */
+/** `lasm dev` (one long-lived build service): a tree verified once in this
+ * process is not walked again on each rebuild. Ordinary commands still stat
+ * every file on every build. */
+const sessionVerified = new Set();
+let sessionTrust = false;
+export function trustVerifiedTreesForSession(enabled = true) { sessionTrust = enabled; if (!enabled) sessionVerified.clear(); }
+export const sessionTrusted = () => sessionTrust;
+
 export async function verifyTreeOnce(stamps, key, directory, verify) {
+  if (sessionTrust && sessionVerified.has(key + '\0' + directory)) return;
+  await verifyTreeOnceUncached(stamps, key, directory, verify);
+  if (sessionTrust) sessionVerified.add(key + '\0' + directory);
+}
+
+async function verifyTreeOnceUncached(stamps, key, directory, verify) {
   if (!stamps) return verify();
   const record = join(stamps, digest(key) + '.json');
   const before = treeFingerprint(directory);

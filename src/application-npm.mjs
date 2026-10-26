@@ -5,6 +5,7 @@
 // same layout. devDependencies are not deployed. Developers install with npm.
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
+import { copyFile, mkdir } from 'node:fs/promises';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { insideDirectory } from './platform.mjs';
 
@@ -85,4 +86,14 @@ export function copyNodeModules(plan, output) {
     mkdirSync(dirname(target), { recursive: true });
     copyFileSync(file.source, target);
   }
+}
+
+/** copyNodeModules on libuv's thread pool: it proceeds while the build links. */
+export async function copyNodeModulesAsync(plan, output, { jobs = 8 } = {}) {
+  const directories = [...new Set(plan.files.map(file => dirname(join(output, file.path))))];
+  for (const directory of directories) await mkdir(directory, { recursive: true });
+  const queue = [...plan.files];
+  await Promise.all(Array.from({ length: Math.min(jobs, queue.length) }, async () => {
+    while (queue.length) { const file = queue.shift(); await copyFile(file.source, join(output, file.path)); }
+  }));
 }

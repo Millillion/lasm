@@ -1,7 +1,7 @@
 import { parseInitArguments } from './init.mjs';
 import { parsePackageArguments, packageTargets } from './package.mjs';
 import { jsRuntime } from './js-runtime.mjs';
-import { parseDevArguments } from './browser/browser-dev.mjs';
+import { parseDevArguments } from './dev.mjs';
 
 // `lasm build --target`: `node` writes dist/ only; a function platform also
 // packages it (src/package.mjs). Lasm builds for the platform; it never
@@ -19,9 +19,9 @@ export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuil
 export const suspendModes = ['none', 'jspi'];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
+       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [-- arguments…]
        lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]
-       lasm dev [Main.lean] --target browser [--release] [--no-watch] [--port 5173]
-       lasm init <directory> [--template plain|express|hono|std-http|fetch|web|fullstack] [--deploy …]
+       lasm init <directory> [--template plain|express|hono|fastify|std-http|fetch|web|fullstack] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
        lasm cache repair
@@ -36,6 +36,7 @@ Application arguments must follow --.`;
 export function parseLasmArguments(argv) {
   const tokens = [...argv];
   if (tokens[0] === 'init') return parseInitArguments(tokens.slice(1));
+  if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
   if (tokens[0] === 'package') return parsePackageArguments(tokens.slice(1));
   if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
   if (tokens[0] === 'cache') {

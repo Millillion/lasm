@@ -40,12 +40,18 @@ export function startLeanServer({ main = new URL('./main.mjs', import.meta.url),
     const port = Number(process.env.LASM_SERVER_PORT) || await freePort();
     process.env.PORT = String(port);
     process.env.HOST = host;
+    // Function platforms give a fraction of a CPU: one Worker (Lean's main
+    // thread) starts before main instead of four; further Lean threads start
+    // on demand (src/application-link.mjs configurableThreadPool; 5 % faster
+    // cold starts at 0.29 and 0.58 CPU in docs/BENCHMARKS.md). An explicit
+    // LASM_THREAD_POOL in the function's environment wins.
+    process.env.LASM_THREAD_POOL ??= '1';
     // Lean reads the C environment. In a worker thread (local function
     // runtimes such as `netlify functions:serve`), process.env is the thread's
     // own copy, so set the process environment through Lasm's native host too.
     if (!isMainThread) {
       const { nativeFiles } = await import(new URL('./host/native-files.mjs', main).href);
-      for (const [name, value] of [['PORT', String(port)], ['HOST', host]]) nativeFiles().setEnvironment(name, value);
+      for (const [name, value] of [['PORT', String(port)], ['HOST', host], ['LASM_THREAD_POOL', process.env.LASM_THREAD_POOL]]) nativeFiles().setEnvironment(name, value);
     }
     // The program sees only its own path as arguments, as with `node main.mjs`.
     const argv = process.argv;

@@ -38,7 +38,9 @@ asks for one and for a template on an interactive terminal. Until publication,
 `npm create @lasm` is rehearsed only against a local test registry on all five
 platforms ([`npm-dist.yml`](../.github/workflows/npm-dist.yml), scenario `create`).
 
-`npm run dev` builds the program and starts it (`lasm Main.lean`). The first build
+`npm run dev` builds the program and starts it (`lasm Main.lean`; in projects made by
+the release after 0.2.0 it is `lasm dev Main.lean`, which also rebuilds and restarts the
+server about 2 s after each save: [lasm dev](DEVELOPER_WORKFLOW.md#lasm-dev)). The first build
 takes a few minutes while Lasm downloads Lean; then it prints
 `Listening on http://0.0.0.0:3000 (Hono)`. In another terminal:
 
@@ -226,7 +228,7 @@ tools: test and deploy with the platform's CLI (`vercel`, `netlify`, `func`,
 
 ## Which HTTP server to use
 
-| | Express or Hono with Lean handlers (`--template express`, `hono`) | `Std.Http` (`--template std-http`) |
+| | Express, Hono or Fastify with Lean handlers (`--template express`, `hono`, `fastify`) | `Std.Http` (`--template std-http`) |
 | --- | --- | --- |
 | Use for | **Production HTTP services on Node.** | Pure-Lean code that must also build natively, or that is shared with native Lean servers. |
 | Throughput ([benchmark runner](BENCHMARKS.md), 4-CPU Linux x64; plain Node `http`: about 54,000 req/s) | about 9,700 (Hono, 0.18× plain Node) and 6,300 (Express, 0.12×) requests per second | about 660 requests per second (0.01×) |

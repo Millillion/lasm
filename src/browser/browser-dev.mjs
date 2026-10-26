@@ -4,13 +4,11 @@
 // and reloads the page; build errors are shown in the terminal and in the
 // page's console. --release serves a release build; --no-watch serves once
 // built (npm run preview). It never opens a browser.
-import { spawn } from 'node:child_process';
 import { existsSync, watch } from 'node:fs';
 import { dirname, join, resolve, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
+
 import { startStaticServer } from './static-server.mjs';
 
-const lasm = fileURLToPath(new URL('../../bin/lasm.mjs', import.meta.url));
 
 export const devUsage = `Usage: lasm dev [Main.lean] --target browser [--release] [--no-watch] [--port 5173] [--host 127.0.0.1] [--output DIR]
 
@@ -49,14 +47,23 @@ export async function runBrowserDev(options) {
   if (!existsSync(source)) throw new Error(`${options.input} does not exist`);
   const project = dirname(source);
   const output = resolve(options.output ?? (options.release ? join(project, 'dist') : join(project, '.lake/lasm/browser-dev')));
-  const build = () => new Promise(done => {
+  // One long-lived build worker (src/dev-build-service.mjs, as lasm dev uses
+  // for every target): loaded code, verified tools and caches carry over.
+  const { createBuildService } = await import('../dev-build-service.mjs');
+  const { formatLeanDiagnostics } = await import('../dev.mjs');
+  const service = createBuildService();
+  const build = async () => {
     const started = Date.now();
-    const child = spawn(process.execPath, [lasm, 'build', source, '--target', 'browser', '--output', output, ...(options.release ? [] : ['--dev'])],
-      { stdio: ['ignore', 'inherit', 'pipe'], env: { ...process.env, BROWSER: 'none' } });
-    let errors = '';
-    child.stderr.on('data', chunk => { errors += chunk; process.stderr.write(chunk); });
-    child.once('exit', code => done({ ok: code === 0, seconds: (Date.now() - started) / 1000, errors }));
-  });
+    try {
+      await service.build(source, { profile: options.release ? 'release' : 'dev', output }, { target: 'browser',
+        onLog: text => process.stderr.write(text + '\n') });
+      return { ok: true, seconds: (Date.now() - started) / 1000 };
+    } catch (error) {
+      const errors = formatLeanDiagnostics([error.stdout, error.stderr].filter(Boolean).join('\n').trim() || error.message, project);
+      process.stderr.write(errors + '\n');
+      return { ok: false, seconds: (Date.now() - started) / 1000, errors };
+    }
+  };
   const first = await build();
   if (!first.ok && !existsSync(join(output, 'index.html'))) return 1;
   const server = await startStaticServer(output, { port: options.port, host: options.host, liveReload: options.watch });

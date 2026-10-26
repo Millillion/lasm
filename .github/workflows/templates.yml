@@ -1,5 +1,5 @@
 name: lasm init templates
-# Phase 5.2: every `lasm init` template (plain, express, hono, std-http) is
+# Phase 5.2: every `lasm init` template (plain, express, hono, fastify, std-http) is
 # created, built and run end to end with the installed candidate package on all
 # five targets: init, npm install, build, run, HTTP requests, expected
 # responses and SIGTERM shutdown (scripts/templates/run-templates.mjs).
@@ -117,7 +117,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: node scripts/ci/fetch-node-candidate.mjs
       - name: Init, build, run and request every template
-        run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates λ" .work/templates.json
+        run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates λ" .work/templates.json --dev-loop
       - name: Node exec flags (per-process flags, --inspect, Std.Http server) on a built app
         run: node scripts/ci/exec-flags-candidate.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm exec flags λ" .work/exec-flags.json
       # Pinned images from the Actions cache (scripts/ci/images.lock.json): Amazon

@@ -229,9 +229,12 @@ test('compact initializers: kept units run once, in the original chain order', a
 });
 
 test('lasm dev --target browser: arguments', () => {
-  assert.deepEqual(parseLasmArguments(['dev', '--target', 'browser']), { command: 'dev', target: 'browser', release: false, watch: true, port: 5173, host: '127.0.0.1', input: 'Main.lean' });
-  assert.equal(parseLasmArguments(['dev', 'App.lean', '--target=browser', '--release', '--no-watch', '--port', '8080']).port, 8080);
-  assert.throws(() => parseLasmArguments(['dev', 'Main.lean']), /needs --target browser/);
+  // One lasm dev for every target (src/dev.mjs); browser flags as before.
+  const parsed = parseLasmArguments(['dev', '--target', 'browser']);
+  assert.equal(parsed.command, 'dev'); assert.equal(parsed.target, 'browser'); assert.equal(parsed.profile, 'dev'); assert.equal(parsed.input, 'Main.lean');
+  const custom = parseLasmArguments(['dev', 'App.lean', '--target=browser', '--release', '--no-watch', '--port', '8080', '--host', '0.0.0.0']);
+  assert.deepEqual([custom.port, custom.profile, custom.watch, custom.host], [8080, 'release', false, '0.0.0.0']);
+  assert.throws(() => parseLasmArguments(['dev', 'Main.lean', '--no-watch']), /applies to lasm dev --target browser/);
   assert.deepEqual(parseLasmArguments(['dev', '--help']), { command: 'dev-help' });
 });
 
