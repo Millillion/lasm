@@ -15,7 +15,7 @@
 // through Lasm's own provisioning code (the release does not exist before 0.2.0).
 //   node scripts/edge/platform-ci.mjs CANDIDATE.tgz EDGE_ARCHIVE.tar.zst WORK_DIR TOOLS_DIR
 import { execFileSync, spawnSync } from 'node:child_process';
-import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { join, resolve, dirname } from 'node:path';
@@ -36,9 +36,14 @@ const toolsRequire = createRequire(join(tools, 'package.json'));
 const bun = join(dirname(toolsRequire.resolve('bun/package.json')), 'bin', 'bun.exe');
 const deno = toolsRequire(join(dirname(toolsRequire.resolve('deno/package.json')), 'install_api.cjs')).runInstall();
 const runtimes = { node: [process.execPath], bun: [bun], deno: [deno, 'run', '-A'] };
-// The template scripts call `bun` and `deno` by name.
+// The template scripts call `bun` and `deno` by name. Bun's npm package names
+// its executable bin/bun.exe on every platform, so outside Windows a `bun`
+// link stands in for the one a Bun install puts on PATH.
 { const key = Object.keys(env).find(k => k.toUpperCase() === 'PATH') ?? 'PATH';
-  env[key] = [dirname(bun), dirname(deno), env[key]].join(windows ? ';' : ':'); }
+  const shims = join(work, 'runtime-bin');
+  mkdirSync(shims, { recursive: true });
+  if (!windows && !existsSync(join(shims, 'bun'))) symlinkSync(bun, join(shims, 'bun'));
+  env[key] = [shims, dirname(bun), dirname(deno), env[key]].join(windows ? ';' : ':'); }
 
 // The candidate, installed as a user installs it.
 const install = join(work, 'install');
@@ -57,8 +62,10 @@ const lasmBin = join(compiler, 'bin/lasm.mjs');
   await edgeRuntime(nodeRuntime, { directory: undefined, fetch, log: console.log });
 }
 
-const bounded = [join(root, 'scripts/full-lean/run-bounded.mjs'), '--'];
-const lasm = (runtime, project, args, options = {}) => spawnSync(process.execPath, [...bounded, ...runtimes[runtime], lasmBin, ...args],
+// Each workload in the resource guard, with its own report (required on Windows).
+let workloads = 0;
+const bounded = () => [join(root, 'scripts/full-lean/run-bounded.mjs'), '--report', join(work, 'resource-runs', `${++workloads}.json`), '--'];
+const lasm = (runtime, project, args, options = {}) => spawnSync(process.execPath, [...bounded(), ...runtimes[runtime], lasmBin, ...args],
   { cwd: project, env, encoding: 'utf8', maxBuffer: 64 << 20, windowsHide: true, ...options });
 const sha256 = file => createHash('sha256').update(readFileSync(file)).digest('hex');
 const versions = { node: process.version, bun: execFileSync(bun, ['--version'], { encoding: 'utf8' }).trim(),
@@ -93,6 +100,7 @@ for (const runtime of ['bun', 'deno']) {
 }
 for (const [runtime, port] of [['bun', 8897], ['deno', 8898]]) {
   const file = join(work, `served-${runtime}.json`);
+  if (!b[runtime][runtime]) { results.served[runtime] = { passed: false, skipped: 'the build failed' }; failed.push(`the pure example built and served by ${runtime}`); continue; }
   const check = spawnSync(process.execPath, [join(root, 'scripts/edge/portable-check.mjs'), runtime === 'bun' ? bun : deno, `${runtime}/main.mjs`, join(work, `pure-${runtime}`), 'pure', String(port), file], { env, stdio: 'inherit' });
   results.served[runtime] = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : { passed: false };
   if (check.status !== 0 || !results.served[runtime].passed) failed.push(`the pure example built and served by ${runtime}`);
@@ -140,7 +148,7 @@ sh(process.execPath, [lasmBin, 'init', app, '--template', 'hono']);
 }
 sh(bun, ['install'], { cwd: app });
 sh(npm, ['install', '--no-save', '--no-audit', '--no-fund', tgz], { cwd: app });
-const script = (runtime, args) => spawnSync(process.execPath, [...bounded, ...(runtime === 'bun' ? [bun, 'run'] : [deno, 'task']), ...args],
+const script = (runtime, args) => spawnSync(process.execPath, [...bounded(), ...(runtime === 'bun' ? [bun, 'run'] : [deno, 'task']), ...args],
   { cwd: app, env, stdio: 'inherit', windowsHide: true });
 for (const [runtime, port] of [['bun', 8901], ['deno', 8902]]) {
   const r = timed(`template build:${runtime}`, () => script(runtime, [`build:${runtime}`]));
