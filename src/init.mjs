@@ -4,6 +4,7 @@ import { jsRuntime } from './js-runtime.mjs';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { fastlyToml } from './wasi/wasi-build.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const templateRoot = join(root, 'templates');
@@ -25,12 +26,17 @@ export const deployTargets = {
   netlify: { summary: 'Netlify Function (netlify.toml; Netlify runs the build)', package: 'netlify' },
   azure: { summary: 'Azure Functions app (npm run build:azure)', package: 'azure', dependencies: { '@azure/functions': '4.17.0' } },
   gcf: { summary: 'Google Cloud Functions gen2 (npm run build:gcf)', package: 'gcf', dependencies: { '@google-cloud/functions-framework': '5.0.5' } },
-  // Edge targets (docs/EDGE.md): the edge build, Hono template only.
-  workers: { summary: 'Cloudflare Workers (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono'] },
-  'vercel-edge': { summary: 'Vercel Edge Function (vercel.json; Vercel runs npm run build:vercel-edge)', package: 'vercel-edge', templates: ['hono'], conflicts: ['vercel'] },
-  'netlify-edge': { summary: 'Netlify Edge Function (netlify.toml; Netlify runs npm run build:netlify-edge)', package: 'netlify-edge', templates: ['hono'], conflicts: ['netlify'] },
-  'deno-deploy': { summary: 'Deno Deploy (npm run build:deno-deploy, then deno task start:deno; entrypoint deno/main.mjs)', package: 'deno-deploy', templates: ['hono'] },
+  // Edge targets (docs/EDGE.md): the edge build, Hono and fetch templates.
+  workers: { summary: 'Cloudflare Workers (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono', 'fetch'] },
+  'vercel-edge': { summary: 'Vercel Edge Function (vercel.json; Vercel runs npm run build:vercel-edge)', package: 'vercel-edge', templates: ['hono', 'fetch'], conflicts: ['vercel'] },
+  'netlify-edge': { summary: 'Netlify Edge Function (netlify.toml; Netlify runs npm run build:netlify-edge)', package: 'netlify-edge', templates: ['hono', 'fetch'], conflicts: ['netlify'] },
+  'deno-deploy': { summary: 'Deno Deploy (npm run build:deno-deploy, then deno task start:deno; entrypoint deno/main.mjs)', package: 'deno-deploy', templates: ['hono', 'fetch'] },
   'supabase-edge': { summary: 'Supabase Edge Function (supabase/config.toml; npm run build:supabase-edge, then npx supabase functions deploy NAME)', package: 'supabase-edge', templates: ['hono'] },
+  // WASI targets (docs/WASI.md): a standard WASI module, no JavaScript.
+  fastly: { summary: 'Fastly Compute (fastly.toml; npm run build:fastly, then fastly compute serve)', package: 'fastly', templates: ['fetch'] },
+  wasi: { summary: 'a WASI module (npm run build:wasi writes wasi/main.wasm; wasmtime run --dir . wasi/main.wasm)', package: 'wasi', templates: ['fetch', 'plain'], cli: true },
+  'wasi-http': { summary: 'a wasi-http component (npm run build:wasi-http writes wasi-http/main.wasm; wasmtime serve wasi-http/main.wasm)', package: 'wasi-http', templates: ['fetch'] },
+  spin: { summary: 'Fermyon Spin (spin.toml; npm run build:wasi-http, then spin up)', package: 'wasi-http', templates: ['fetch'] },
 };
 
 /** The Supabase function lasm build --target supabase-edge writes
@@ -49,6 +55,8 @@ export const templates = {
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
   // The browser (docs/BROWSER.md): a static web app, built with --target browser.
   web: { summary: 'a browser app in Lean (Lasm.UI): a counter', server: false, interop: true, browser: true },
+  // Lasm.Fetch (docs/FETCH.md): one handler for Node, WASI, Fastly, Spin, the edge, Bun and Deno.
+  fetch: { summary: 'an HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge', server: true, interop: false, library: 'Lasm.Fetch', portable: true },
 };
 
 export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}] [--deploy TARGET]…
@@ -56,7 +64,7 @@ export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys
 Creates a Lean project for Lasm: lakefile, lean-toolchain, package.json,
 Main.lean, README.md, Dockerfile, .dockerignore and .gitignore.
 The directory must be new or empty. The default template is plain.
---deploy (server templates; repeatable) adds a deployment target's files and
+--deploy (repeatable; server templates, and wasi for plain too) adds a target's files and
 npm scripts (build:<target> runs lasm build --target <target>). Lasm never
 installs or starts a platform's own tools; use the platform's CLI for that:
 ${Object.entries(deployTargets).map(([name, t]) => `  ${name.padEnd(12)} ${t.summary}`).join('\n')}
@@ -91,11 +99,12 @@ export function parseInitArguments(tokens) {
   if (positional.length !== 1) throw new Error(initUsage);
   if (!templates[result.template])
     throw new Error(`Unknown template "${result.template}". Choose one of: ${Object.keys(templates).join(', ')}`);
-  if (result.deploy.length && !templates[result.template].server)
-    throw new Error(`--deploy ${result.deploy[0]} needs a server template (express, hono or std-http), not ${result.template}`);
+  const serverOnly = result.deploy.find(target => !deployTargets[target].cli);
+  if (serverOnly && !templates[result.template].server)
+    throw new Error(`--deploy ${serverOnly} needs a server template (express, hono, std-http or fetch), not ${result.template}`);
   for (const target of result.deploy) {
     if (deployTargets[target].templates && !deployTargets[target].templates.includes(result.template))
-      throw new Error(`--deploy ${target} supports the ${deployTargets[target].templates.join(', ')} template, not ${result.template}`);
+      throw new Error(`--deploy ${target} supports the ${deployTargets[target].templates.join(' or ')} template, not ${result.template}`);
     for (const other of deployTargets[target].conflicts ?? [])
       if (result.deploy.includes(other)) throw new Error(`--deploy ${target} and --deploy ${other} both configure the same platform; choose one`);
   }
@@ -244,6 +253,8 @@ function packageJson(name, template, deploy = []) {
     // Build and package in one step; Vercel's and Netlify's builds run these too.
     if (platform) pkg.scripts[`build:${platform}`] = `lasm build Main.lean --target ${platform}`;
   }
+  if (deploy.includes('spin')) pkg.scripts['start:spin'] = 'spin up';
+  if (deploy.includes('fastly')) pkg.scripts['start:fastly'] = 'fastly compute serve';
   // Bun and Deno (portable profile): `bun run dev:bun` runs Lasm itself on
   // Bun (bun x --bun, even when Node is installed); `deno task dev` runs it on
   // Deno. Deno Deploy runs the same deno/main.mjs.
@@ -369,6 +380,28 @@ const vercelEdgeJson = JSON.stringify({
   outputDirectory: 'public',
   routes: [{ src: '/(.*)', dest: '/api/lasm' }],
 }, null, 2) + '\n';
+// Fastly Compute: `fastly compute build|serve|deploy` runs npm run build:fastly,
+// which writes bin/main.wasm (src/wasi/wasi-build.mjs fastlyToml).
+// Spin: its HTTP trigger runs the wasi-http component, one instance per request.
+const spinToml = name => `# Fermyon Spin (Lasm): npm run build:wasi-http writes wasi-http/main.wasm; spin up serves it.
+spin_manifest_version = 2
+
+[application]
+name = "${name}"
+version = "0.1.0"
+
+[[trigger.http]]
+route = "/..."
+component = "${name}"
+
+[component.${name}]
+source = "wasi-http/main.wasm"
+# Hosts Lasm.Fetch.fetch may reach, for example ["https://api.example.com"].
+allowed_outbound_hosts = []
+
+[component.${name}.build]
+command = "npm run build:wasi-http"
+`;
 const netlifyEdgeToml = `# Netlify runs the build: lasm build --target netlify-edge writes the edge
 # function netlify/edge-functions/lasm.mjs, which serves every path.
 [build]
@@ -391,7 +424,8 @@ import_map = "./functions/${name}/deno.json"
 function deployGitignore(deploy, template, name) {
   const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
     'vercel-edge': '.vercel/\napi/lasm.mjs\napi/_lasm/', 'netlify-edge': '.netlify/\nnetlify/lasm/\nnetlify/edge-functions/lasm.mjs', 'deno-deploy': 'deno/',
-    'supabase-edge': `supabase/functions/${supabaseFunctionNameOf(name)}/\nsupabase/.temp/\nsupabase/.branches/` };
+    'supabase-edge': `supabase/functions/${supabaseFunctionNameOf(name)}/\nsupabase/.temp/\nsupabase/.branches/`,
+    fastly: 'bin/\npkg/', wasi: 'wasi/', 'wasi-http': 'wasi-http/', spin: 'wasi-http/\n.spin/' };
   const portable = templates[template]?.portable ? ['bun/', 'deno/'] : [];
   return gitignore + [...new Set([...portable, ...deploy.map(target => extra[target]).filter(Boolean)])].map(line => line + '\n').join('');
 }
@@ -416,17 +450,17 @@ npm run dev                 # build and run: Listening on http://0.0.0.0:3000
 curl http://localhost:3000/hello/Ada
 # {"message":"Hello, Ada, from Lean!"}
 curl -X POST http://localhost:3000/echo -H 'content-type: application/json' -d '{"n":1}'
-# {"echo":{"n":1}}
+# ${template === 'fetch' ? '{"n":1}' : '{"echo":{"n":1}}'}
 npm run build               # write dist/
 PORT=8080 npm start         # run the build (node dist/main.mjs): only Node is needed
 \`\`\`
 
 The server listens on \`$HOST\` (default \`0.0.0.0\`) and \`$PORT\` (default 3000) and
 exits cleanly on SIGTERM or SIGINT.`;
-  const native = t.interop
+  const native = t.interop || t.library
     ? `\`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
-\`Lasm.JS\`, which only Lasm provides, so it builds and runs only with Lasm (the Lean
-editor marks \`import Lasm.JS\` as unknown).`
+\`${t.library ?? 'Lasm.JS'}\`, which only Lasm provides, so it builds and runs only with Lasm (the Lean
+editor marks \`import ${t.library ?? 'Lasm.JS'}\` as unknown).`
     : `This is an ordinary Lake project: \`lake build\` also builds it natively.`;
   return `# ${name}
 
@@ -535,6 +569,23 @@ Vercel recommends its Node runtime over the edge runtime; see the [edge notes](h
 which writes the edge function \`netlify/edge-functions/lasm.mjs\` (and \`netlify/lasm/\`); test with
 \`netlify dev\`, deploy with \`netlify deploy --build\`. See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
 `,
+  fastly: name => `**Fastly Compute:** \`npm run build:fastly\` writes \`bin/main.wasm\` and
+\`pkg/${name}.tar.gz\`, the package Fastly deploys; \`fastly.toml\` makes \`fastly compute build\`,
+\`serve\` and \`deploy\` run it. Test locally with \`fastly compute serve\` (Fastly's Viceroy) and deploy
+with \`fastly compute deploy\`. See the [Fastly guide](${guide('fastly')}).
+`,
+  wasi: () => `**WASI:** \`npm run build:wasi\` writes \`wasi/main.wasm\`, a standard WASI (preview 1)
+module with no JavaScript: \`wasmtime run --dir . wasi/main.wasm\`, \`wasmer run\`, or Node's \`node:wasi\`.
+A Lasm.Fetch handler answers one CGI request per run. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+`,
+  'wasi-http': () => `**wasi-http:** \`npm run build:wasi-http\` writes \`wasi-http/main.wasm\`, a
+wasi:http/proxy component: \`wasmtime serve wasi-http/main.wasm\` serves it on port 8080, and any
+wasi-http host (Spin, wasmCloud, …) runs it. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+`,
+  spin: () => `**Fermyon Spin:** \`spin.toml\` serves the wasi-http component \`wasi-http/main.wasm\`
+with Spin's HTTP trigger; \`spin build\` runs \`npm run build:wasi-http\`, then \`spin up\` serves on
+port 3000. List the hosts \`Lasm.Fetch.fetch\` reaches in \`allowed_outbound_hosts\`. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+`,
   'deno-deploy': () => `**Deno Deploy:** \`npm run build:deno-deploy\` writes \`deno/\` (the
 entrypoint \`deno/main.mjs\`, the Lean program and its host); test with \`deno task start:deno\`
 (PORT, default 8000). On Deno Deploy, set the build command to \`npm run build:deno-deploy\` and the
@@ -555,6 +606,10 @@ after \`/${fn}\`. Supabase's runtime has no JSPI, so the build uses Asyncify. Se
 See the [Cloud Functions guide](${guide('cloud-functions')}).
 `,
 };
+
+const fastlyName = directory => packageName(directory).replace(/[^a-z0-9_-]+/g, '-');
+// Spin component and application names: lowercase words joined by '-'.
+const spinName = name => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/^(?=[0-9])/, 'app-') || 'lean-app';
 
 /** Creates the project; returns { directory, files }. */
 export function initProject({ directory, template, deploy = [] }) {
@@ -595,6 +650,8 @@ export function initProject({ directory, template, deploy = [] }) {
   if (deploy.includes('vercel-edge')) { files['vercel.json'] = vercelEdgeJson; files['public/lasm.txt'] = 'Requests are served by the Lean edge function api/lasm.mjs.\n'; }
   if (deploy.includes('netlify-edge')) { files['netlify.toml'] = netlifyEdgeToml; files['public/.gitkeep'] = ''; }
   if (deploy.includes('supabase-edge')) files['supabase/config.toml'] = supabaseConfig(supabaseFunctionNameOf(name));
+  if (deploy.includes('fastly')) files['fastly.toml'] = fastlyToml(fastlyName(target));
+  if (deploy.includes('spin')) files['spin.toml'] = spinToml(spinName(name));
   mkdirSync(target, { recursive: true });
   for (const [file, text] of Object.entries(files)) {
     mkdirSync(dirname(join(target, file)), { recursive: true });

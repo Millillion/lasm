@@ -9,16 +9,19 @@ import { parseDevArguments } from './browser/browser-dev.mjs';
 // Edge targets (experimental, docs/EDGE.md) relink for edge isolates; the
 // list equals src/edge/edge-build.mjs edgeTargets (test/edge.test.mjs).
 export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy', 'supabase-edge'];
+// WASI targets (docs/WASI.md): a standard WASI module with no JavaScript; the
+// list equals src/wasi/wasi-build.mjs wasiTargets (test/wasi.test.mjs).
+export const wasiBuildTargets = ['wasi', 'fastly', 'wasi-http'];
 // The browser (docs/BROWSER.md): the edge program as a static web app.
-export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, 'browser'];
+export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets, 'browser'];
 // --suspend (browser): none (the default: blocking waits stop the instance) or
 // jspi (they suspend in browsers that have JSPI).
 export const suspendModes = ['none', 'jspi'];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|browser] [--suspend none|jspi] [--bundler] [--dev]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]
        lasm dev [Main.lean] --target browser [--release] [--no-watch] [--port 5173]
-       lasm init <directory> [--template plain|express|hono|std-http|web] [--deploy …]
+       lasm init <directory> [--template plain|express|hono|std-http|fetch|web|fullstack] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
        lasm cache repair

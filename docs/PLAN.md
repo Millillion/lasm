@@ -864,6 +864,12 @@ folded into Phases 5.2/5.3 and 7.
     as an edge host.
 - **Phase 9 — Fastly Compute:** a standard WASI Wasm backend (tested with
   Viceroy).
+  *Status (2026-10-26, branch `wasi`): in source. `lasm build --target wasi|fastly`
+  ([WASI.md](WASI.md)): one `wasi_snapshot_preview1` module, no JavaScript;
+  `Lasm.Fetch` ([FETCH.md](FETCH.md)) serves one pure-Lean handler on Node,
+  the edge, WASI (CGI; Spin's wagi executor) and Fastly. CI `wasi.yml` green
+  in run 40283046831 on wasmtime, wasmer, `node:wasi`, Spin and Viceroy; it is
+  part of the release checks for release pull requests.*
 - **Parked — Lean as a runtime library** (old Phase 5): pure `Lean.*` code at
   run time beyond what already works (JSON, `import Lean`, LSP types); runtime
   parser/elaboration policy decided by the user if a real package needs it.
