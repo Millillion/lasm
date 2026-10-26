@@ -51,8 +51,13 @@ export function archiveIndex(archive) {
 }
 
 /** Runtime members with live sections in a wasm-ld map: { archive: [offsets] }. */
+/** Archive paths as maps spell them: on Windows wasm-ld keeps a response
+ * file's escaped (doubled) backslashes, and drive letters may differ in case. */
+const mapPath = path => path.replace(/[\\/]+/g, '/').replace(/^[A-Za-z]:/, drive => drive.toLowerCase());
+
 export function liveMembers(mapText, archives) {
   const wanted = new Map(archives.map(archive => [archive, new Set()]));
+  const byMapPath = new Map(archives.map(archive => [mapPath(archive), archive]));
   const unattributed = new Map();
   let region = '';
   for (const line of mapText.split('\n')) {
@@ -61,8 +66,9 @@ export function liveMembers(mapText, archives) {
     const text = row[2];
     if (row[1].length === 1) { if (/^[A-Z]+(?:\(|$)/.test(text)) region = text.replace(/\(.*$/, ''); continue; }
     const match = /^(.*\.a)\(([^)]+)\):\((.+)\)$/.exec(text);
-    if (!match || !wanted.has(match[1])) continue;
-    const [, archive, member, section] = match;
+    const archive = match && byMapPath.get(mapPath(match[1]));
+    if (!archive) continue;
+    const [, , member, section] = match;
     const { symbols, names } = archiveIndex(archive);
     const symbol = region === 'CODE' ? section : section.replace(/^\.(?:rodata|data|bss|tdata|tbss|data\.rel\.ro)\./, '');
     const offset = symbols.get(symbol);
