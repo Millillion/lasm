@@ -1,31 +1,38 @@
 // Runs a `lasm build --target workers` output (workers/) on Node 26, Deno or
 // Bun without wrangler: the same program, host and handler as the Worker, for
-// correctness and cost (startup, memory, time per request).
-//   node|deno run -A|bun check-worker.mjs WORKERS_DIR hono|pure RESULT.json
+// correctness and cost (startup, memory, time per request). Also runs other
+// edge outputs (supabase-edge: the Wasm as a JavaScript module), given the
+// project directory whose node_modules has the imported modules.
+//   node|deno run -A|bun check-worker.mjs WORKERS_DIR hono|pure RESULT.json [PROJECT_DIR]
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { apps } from './checks.mjs';
 
-const [dir, appName, resultFile] = process.argv.slice(2);
-const workers = resolve(dir), app = apps[appName];
+const [dir, appName, resultFile, projectArg] = process.argv.slice(2);
+const workers = resolve(dir), app = apps[appName], project = projectArg ? resolve(projectArg) : join(workers, '..');
+const info = JSON.parse(readFileSync(join(workers, 'build-info.json'), 'utf8'));
 const engine = globalThis.Bun ? `bun ${Bun.version}` : globalThis.Deno ? `deno ${Deno.version.deno}` : `node ${process.version}`;
-const result = { engine, app: appName, checks: [] };
+const result = { engine, app: appName, suspend: null, checks: [] };
 const modules = {};
 // The modules the generated entry imports, from the project's node_modules (ESM entry).
-for (const name of JSON.parse(readFileSync(join(workers, 'build-info.json'), 'utf8')).modules) {
-  const base = join(workers, '..', 'node_modules', name), pkg = JSON.parse(readFileSync(join(base, 'package.json'), 'utf8'));
+for (const name of info.modules) {
+  const base = join(project, 'node_modules', name), pkg = JSON.parse(readFileSync(join(base, 'package.json'), 'utf8'));
   const entry = pkg.exports?.['.']?.import ?? pkg.module ?? pkg.main ?? 'index.js';
   modules[name] = await import(pathToFileURL(join(base, typeof entry === 'string' ? entry : entry.default)).href);
 }
 const { startLean } = await import(pathToFileURL(join(workers, 'lasm/edge-start.mjs')).href);
 const createProgram = (await import(pathToFileURL(join(workers, 'lasm/program.mjs')).href)).default;
 let t = performance.now();
-const wasmModule = await WebAssembly.compile(readFileSync(join(workers, 'lasm/program.wasm')));
+const bytes = info.wasm.endsWith('.mjs') ? (await import(pathToFileURL(join(workers, info.wasm)).href)).default : readFileSync(join(workers, info.wasm));
+result.suspend = info.link?.suspend ?? null;
+result.wasmBytes = bytes.length;
+const wasmModule = await WebAssembly.compile(bytes);
 result.compileMs = +(performance.now() - t).toFixed(1);
 const start = async () => {
   delete globalThis.__lasmDefaultExport;
-  const lean = await startLean({ createProgram, wasmModule, modules, stdout: () => {}, stderr: () => {} });
+  // jspi: false for an Asyncify build, so only Asyncify can suspend (as on Supabase).
+  const lean = await startLean({ createProgram, wasmModule, modules, jspi: info.link?.suspend !== 'asyncify', stdout: () => {}, stderr: () => {} });
   return { lean, handler: globalThis.__lasmDefaultExport };
 };
 t = performance.now();

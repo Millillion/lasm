@@ -5,9 +5,10 @@
 // same output, and the Workers Free plan's budgets; vercel-edge: `vercel build`
 // offline and Vercel's edge-runtime; netlify-edge: `netlify build --offline`
 // and `netlify dev --offline`; deno-deploy: `deno run -A deno/main.mjs`; bun:
-// `bun bun/main.mjs`. Needs LASM_APPLICATION_RUNTIME and LASM_EDGE_RUNTIME.
+// `bun bun/main.mjs`; supabase-edge: scripts/edge/supabase-ci.mjs (Supabase's
+// edge runtime image in Docker). Needs LASM_APPLICATION_RUNTIME and LASM_EDGE_RUNTIME.
 //   node scripts/edge/workers-ci.mjs WORK_DIR TOOLS_DIR
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -110,4 +111,8 @@ const failed = Object.entries(results.apps).flatMap(([name, a]) => [
   ...engines.filter(e => !a[e].passed).map(e => `${name} on ${e}`),
   ...Object.entries(a.budget).filter(([, ok]) => !ok).map(([what]) => `${name} ${what} budget`)]);
 if (results.edgeLinkCompare && !results.edgeLinkCompare.identical) failed.push('the Node link driver\'s edge link differs from emcc\'s');
+// Supabase Edge Functions (Asyncify link; Supabase's edge runtime image in
+// Docker): scripts/edge/supabase-ci.mjs, results beside these.
+const supabase = spawnSync(process.execPath, [join(root, 'scripts/edge/supabase-ci.mjs'), join(work, 'supabase'), work], { stdio: 'inherit' });
+if (supabase.status !== 0) failed.push('supabase-edge (scripts/edge/supabase-ci.mjs)');
 if (failed.length) { console.error('Failed: ' + failed.join(', ')); process.exit(1); }

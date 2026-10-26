@@ -44,5 +44,6 @@ Lean features are those of the edge profile:
 
 ## Supabase Edge Functions
 
-Not supported. Supabase's edge runtime (v1.77.8, V8 11.6) has no JSPI. See
-[EDGE.md](../EDGE.md#phase-74-status-deno-deploy-supabase-edge-functions-not-supported).
+A separate target, `--target supabase-edge`: Supabase's edge runtime (v1.77.8,
+V8 11.6) has no JSPI, so it uses an Asyncify link. See
+[supabase-edge.md](supabase-edge.md).
