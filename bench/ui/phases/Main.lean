@@ -51,7 +51,18 @@ def experiment (label : String) (rowf : Row → Html Msg) (m : Model) : IO Unit 
   let nv := v m
   let _ ← time s!"experiment {label}: diff of 1,000 unchanged rows" 20 fun _ => pure (diff m0.live [nv] m0.next)
 
+def encodeExperiment (label : String) (rowf : Row → Html Msg) (m : Model) : IO Unit := do
+  let v : Html Msg := .elem .html "tbody" none [] (m.rows.toList.map rowf)
+  let r := mountOps [v] 1
+  let (_, warm) := Encode.frame {} r.ops
+  let _ ← time s!"encode {label}: fresh tables" 20 fun _ => pure (Encode.frame {} r.ops).1.size
+  let _ ← time s!"encode {label}: tables already hold the names" 20 fun _ => pure (Encode.frame warm r.ops).1.size
+
 def experiments : IO Unit := do
+  let rows0 := update .run {}
+  encodeExperiment "rows with attributes" (row none) rows0
+  encodeExperiment "rows without attributes" plainRow rows0
+  encodeExperiment "one element per row" flatRow rows0
   let rows := update .run {}
   experiment "rows with attributes (the benchmark's)" (row none) rows
   experiment "same rows without attributes" plainRow rows
