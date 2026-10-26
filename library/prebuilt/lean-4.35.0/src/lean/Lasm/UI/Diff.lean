@@ -276,6 +276,12 @@ kept node. -/
   match old, new with
   | [], [] => ⟨#[], [], next⟩
   | _ :: _, [] => ⟨#[.clear], [], next⟩
+  -- One child kept (a text in a cell, a link's label): no arrays.
+  | [o], [b] =>
+    if o.same (val b) then
+      let r := f o b next
+      ⟨r.ops.toArray, [r.live], r.next⟩
+    else prefixPhase val f [o] [b] next #[] (Array.emptyWithCapacity 1)
   | old, new => prefixPhase val f old new next #[] (Array.emptyWithCapacity new.length)
 
 end Children
