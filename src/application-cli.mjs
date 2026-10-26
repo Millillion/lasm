@@ -125,7 +125,7 @@ export async function runApplicationCli(argv) {
   const options = parseLasmArguments(argv);
   const support = applicationSupport();
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|browser|wasi|fastly|wasi-http] [--suspend none|jspi] [--bundler] [--dev]\n       lasm init my-app [--template plain|express|hono|fastify|std-http|web|fetch] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nBuild and run ordinary Lean main in Node.' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]\n       lasm init my-app [--template plain|express|hono|fastify|std-http|fetch|web|fullstack] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nBuild and run ordinary Lean main in Node.' : cliUsage);
     return 0;
   }
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }
@@ -162,7 +162,7 @@ export async function runApplicationCli(argv) {
   const { jsRuntime, scriptPrefix, runtimeExecutable } = await import('./js-runtime.mjs');
   const target = requested ?? (jsRuntime === 'node' ? undefined : jsRuntime);
   // A dev build refused by packaging is refused before it is built.
-  if (target && !['node', 'bun', 'deno', 'browser', 'wasi'].includes(target) && options.profile === 'dev' && !allowDev)
+  if (target && !['node', 'bun', 'deno', 'wasi', 'browser'].includes(target) && options.profile === 'dev' && !allowDev)
     throw new Error(`lasm build --dev --target ${target}: dev builds are not for deployment. Drop --dev, or add --allow-dev to package a dev build anyway.`);
   if ((await import('./wasi/wasi-build.mjs')).wasiTargets[target]) {
     await buildWasi(options.input, target, buildOptions, options.verbose);

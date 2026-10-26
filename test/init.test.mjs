@@ -37,7 +37,7 @@ test('project names', () => {
 test('every template creates a complete project', () => {
   const root = mkdtempSync(join(tmpdir(), 'lasm-init-'));
   try {
-    for (const template of Object.keys(templates).filter(name => !templates[name].browser)) {
+    for (const template of Object.keys(templates).filter(name => !templates[name].browser && !templates[name].fullstack)) {
       const directory = join(root, `app ${template}`);
       const result = initProject({ directory, template });
       assert.deepEqual(result.files.sort(), ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Main.lean', 'README.md',
@@ -142,5 +142,26 @@ test('the web template: a static browser app built with --target browser', () =>
     assert.match(read('index.html'), /data-lasm-app/);
     assert.match(read('index.html'), /<\/head>/);
     assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'web', '--deploy', 'workers']), /needs a server template/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('the fullstack template: shared, server and client modules; Node and Workers scripts', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-init-fullstack-'));
+  try {
+    const directory = join(root, 'todos');
+    const result = initProject({ directory, template: 'fullstack' });
+    assert.deepEqual(result.files.sort(), ['.gitignore', 'Client.lean', 'README.md', 'Server.lean', 'Shared.lean', 'View.lean', 'lakefile.toml',
+      'lean-toolchain', 'package.json', 'public/style.css', 'wrangler.toml']);
+    const read = file => readFileSync(join(directory, file), 'utf8');
+    const pkg = JSON.parse(read('package.json'));
+    assert.equal(pkg.scripts.dev, 'lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client');
+    assert.equal(pkg.scripts['build:client'], 'lasm build Client.lean --target browser --output dist/public/client');
+    assert.equal(pkg.scripts.start, 'node dist/server/main.mjs');
+    assert.match(pkg.scripts["build:workers"], /lasm build Server\.lean --target workers --output dist\/server$/);
+    assert.match(read('wrangler.toml'), /\[assets\]\ndirectory = "\.\/dist\/public"/);
+    assert.match(read('Server.lean'), /^import Lasm\.RPC\.Server$/m);
+    assert.match(read('Client.lean'), /^import Lasm\.RPC\.Client$/m);
+    assert.match(read('lakefile.toml'), /name = "Shared"/);
+    assert.throws(() => initProject({ directory: join(root, 'other'), template: 'fullstack', deploy: ['workers'] }), /takes no --deploy/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

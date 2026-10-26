@@ -72,7 +72,8 @@ export function parseDevArguments(tokens) {
     positional.push(token);
   }
   if (positional.length > 1) throw new Error(`lasm dev takes one Lean source.\n\n${devUsage}`);
-  result.input = positional[0] ?? 'Main.lean';
+  // With per-output sources only (--target node=Server.lean,…), the first names the project.
+  result.input = positional[0] ?? result.outputs?.find(o => o.input)?.input ?? 'Main.lean';
   if (!result.input.endsWith('.lean')) throw new Error(`lasm dev expects a Lean source (Main.lean), not ${result.input}`);
   result.target ??= jsRuntime;
   result.outputs ??= [{ target: result.target }];

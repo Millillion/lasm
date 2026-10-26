@@ -2,14 +2,14 @@
   "schema": 1,
   "lean": "4.35.0",
   "leanCommit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
-  "library": "4aeae4177a95c01f36e1a6b1c9750786a1659dd29ad998067049abc26e52309e",
+  "library": "c8387f08c9b48a7073bdecf932c550a79009c89796c0a25c9b0f5668bafe7038",
   "files": {
     "lib/lean/Lasm/JS/Core.olean": "f4f6bf39c4803c5a68f33912c527a2d409a7e5e98864f93d44f293b875a7f262",
     "lib/lasm/c/Lasm/JS/Core.c": "cdc090e667c5e0c653c34a2a1df9a2fa97452927b612860ac5fcd233b19ad6d5",
     "src/lean/Lasm/JS/Core.lean": "e651a7d18e85e92bdf364d39abef5b94bc53bf661c5881ee4c489b94018e7b00",
-    "lib/lean/Lasm/JS/Json.olean": "0eeb006cad6b723e0f1a60e8ca768320df702b1179c10f4f61598aed5582e19b",
-    "lib/lasm/c/Lasm/JS/Json.c": "9b23dce15f0190adb019b77cc2f17058dc94a5228bd89ee6d74da548993d47de",
-    "src/lean/Lasm/JS/Json.lean": "6f27de37f4b11b76b863a994cce5456fd4c1ac2aac984b4c2acb9d3b623f1106",
+    "lib/lean/Lasm/JS/Json.olean": "27c6588294d8725f764dbee0a3e46bc774a1fb3a7ccf7a5b6990b9e26a34f098",
+    "lib/lasm/c/Lasm/JS/Json.c": "1247bae8e1a0b385bc36e5f9fbd5b364fae302c502ae6af51e61ea9059155f6a",
+    "src/lean/Lasm/JS/Json.lean": "54fec18424aa626fdf3408b40b5dc6a698f6c35c4ef4897fa6333194f7b56f44",
     "lib/lean/Lasm/JS/Meta.olean": "b4a892b62b5580f18f9ab31972ae1333f1f6e9ff02df23c6e1a6957696bf3c02",
     "lib/lasm/c/Lasm/JS/Meta.c": "b2d670ac99e0d476a6b0a174d8f074105a36264cc81d24df0a40787c0e2aebae",
     "src/lean/Lasm/JS/Meta.lean": "d1e1d38f21a43912f96e1868d1c51ba18cec4305fc0b40b7c45c32854e439c6f",
@@ -99,6 +99,18 @@
     "src/lean/Lasm/UI/Syntax.lean": "1224572601f4df2463b71ba896eddbb7746c62d2b5d0dcc7105c9ec5e576356c",
     "lib/lean/Lasm/UI.olean": "feb775171f617f1928b36db9fb8381352372ae7b3541f74f620fb4bb522b3b74",
     "lib/lasm/c/Lasm/UI.c": "d2397a60f2556e7cf6809b75d3fbc015a94edf8900995060f73c9da2d075c3c3",
-    "src/lean/Lasm/UI.lean": "2dbfa0fae390a329ca1867cc3aff6acb057cea1ff8104f942d60538cf94a9933"
+    "src/lean/Lasm/UI.lean": "2dbfa0fae390a329ca1867cc3aff6acb057cea1ff8104f942d60538cf94a9933",
+    "lib/lean/Lasm/RPC/Core.olean": "1938322c6f5c989c14cd770af36ba5d697b7c0a5b15c0fe96d250f902598c11e",
+    "lib/lasm/c/Lasm/RPC/Core.c": "7a7575a054f0065254257bcc4b0a827e5fd06e70db8897ef18a8e80ccff52654",
+    "src/lean/Lasm/RPC/Core.lean": "993d0a80ba1dc8bf42a088deeb3f255435651795bd3276b24828d904323635f9",
+    "lib/lean/Lasm/RPC/Server.olean": "ae133874cea62b572fc8a7c89e22c731aebbf3f769166e254414b9c7a2d573f4",
+    "lib/lasm/c/Lasm/RPC/Server.c": "ed3b32ad8433e3e0cb1c0d036e39f868a5dca4e04a97865574fd7d63e4d6243b",
+    "src/lean/Lasm/RPC/Server.lean": "b0feed803f8bba5251cf88d02f4cf28f3461c9887941961366c55d19eb8e04ec",
+    "lib/lean/Lasm/RPC/Client.olean": "594eac2aa197a3bc98ef8adfa4a848a1ed27fc715748996f587f233de5d0386a",
+    "lib/lasm/c/Lasm/RPC/Client.c": "32706ebf8e5e13006a15d8fd7bb216455ddcd96cfdfa76f806b8006745287c1a",
+    "src/lean/Lasm/RPC/Client.lean": "0d2227ba20833b6f8a7673200d81092c6b10c7c2614f8b7026541bab977eba32",
+    "lib/lean/Lasm/RPC.olean": "46dcf5cbc63e5b4cf81d088b6a258170d07a21635293a1c1ab3690a97f61c6c4",
+    "lib/lasm/c/Lasm/RPC.c": "67ab69a1d8180fad479e6266d55ce6be4c98b08d7ba2f8ab79f782ea4dc9c18d",
+    "src/lean/Lasm/RPC.lean": "364ac457eaf0f694e53bc4017cb155e8a2bbda8c6ba42e809636cd6b3baacc12"
   }
 }

@@ -132,6 +132,18 @@ def main : IO Unit := (App.sandbox 0 update view).run
 lasm build Main.lean --target browser   # dist/: index.html, app.<hash>.js, app.<hash>.wasm
 ```
 
+## The whole stack in Lean (Lasm.RPC)
+
+**In branch source (`fullstack`).** `lasm init my-app --template fullstack`
+creates one Lean project with a server (`Lasm.Fetch`), a browser app
+(`Lasm.UI`) and the API between them (`Lasm.RPC`): request and response types
+and their validation are declared once in shared code. The browser checks a
+request before sending it; the server checks it again and hands the handler
+the proof, so a theorem about the validation holds on both sides. The server
+renders the first page and the browser app hydrates it; `npm run dev` rebuilds
+both, `npm run build` targets Node and `npm run build:workers` Cloudflare
+Workers. Guide: [docs/RPC.md](docs/RPC.md).
+
 ## CLI reference
 
 These are all commands and options in the ordinary Node application interface:
@@ -156,6 +168,7 @@ These are all commands and options in the ordinary Node application interface:
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
 | New project | `npm create @lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express`, `hono` and `fastify` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server), `fetch` (from 0.3.0: a pure-Lean `Lasm.Fetch` handler for every server target), `web` (a browser counter with `Lasm.UI`: `Main.lean`, `index.html`, `public/style.css`, and `build`/`dev`/`preview` scripts; no Dockerfile). `fastify` (after 0.2.0, branch `dx`): Fastify 5 with Lean route handlers. `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. `--deploy lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` (repeatable): `npm run build:<target>` scripts (`lasm build --target`), `vercel.json`/`netlify.toml`, and the platform npm package for `azure` and `gcf`. `--deploy workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` and `supabase-edge` (Hono template, and `fetch` except `supabase-edge`; from 0.2.0) add the edge platform files (`supabase-edge`: `supabase/config.toml`) and `build:<target>` scripts. Template `fetch` is a pure-Lean `Lasm.Fetch` handler; `--deploy fastly` adds `fastly.toml`, `--deploy spin` adds `spin.toml` (wagi executor), and `--deploy wasi` (also for `plain`) adds `build:wasi`. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
+| New project | `npm create @lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express`, `hono` and `fastify` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server), `web` (a browser counter with `Lasm.UI`: `Main.lean`, `index.html`, `public/style.css`, and `build`/`dev`/`preview` scripts; no Dockerfile). `fastify` (after 0.2.0, branch `dx`): Fastify 5 with Lean route handlers. `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. `--deploy lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` (repeatable): `npm run build:<target>` scripts (`lasm build --target`), `vercel.json`/`netlify.toml`, and the platform npm package for `azure` and `gcf`. `--deploy workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` and `supabase-edge` (Hono template; from 0.2.0) add the edge platform files (`supabase-edge`: `supabase/config.toml`) and `build:<target>` scripts. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
 | Package an existing build | `npx lasm package --target lambda` | For a browser build, `npx lasm package dist --target browser` checks every file against `lasm-manifest.json` (and the `.br`/`.gz` copies) and writes `_headers` (caching and the Wasm type for Netlify and Cloudflare Pages), in place. Package a built server (default `dist/`; any server that listens on `$HOST:$PORT`) for one or more platforms without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output; `lasm package dist2 --target lambda` packages another build. Checks the platform's size limit and leaves out the musl pieces (function platforms use glibc). Files only, no network. Refuses a dev build unless `--allow-dev` is given (then it warns). |
 | Cache repair | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
