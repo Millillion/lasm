@@ -123,7 +123,7 @@ test('the web template: a static browser app built with --target browser', () =>
     const read = file => readFileSync(join(directory, file), 'utf8');
     const pkg = JSON.parse(read('package.json'));
     assert.equal(pkg.scripts.build, 'lasm build Main.lean --target browser');
-    assert.equal(pkg.scripts.dev, 'lasm dev Main.lean');
+    assert.equal(pkg.scripts.dev, 'lasm dev Main.lean --target browser');
     assert.equal(pkg.dependencies, undefined);
     assert.match(read('Main.lean'), /^import Lasm\.Web$/m);
     assert.match(read('index.html'), /data-lasm-app/);

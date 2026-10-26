@@ -227,3 +227,33 @@ test('compact initializers: kept units run once, in the original chain order', a
   assert.match(c, /res = __wrap_initialize_K1\(builtin\);[^\n]*\n  res = __wrap_initialize_K2\(builtin\);[^\n]*\n  return __real_initialize_Main\(builtin\);/);
   assert.throws(() => compactInitializerWrappers({ schema: 1, closure: ['bad name'], keep: [], calls: {} }), /Unexpected initializer name/);
 });
+
+test('lasm dev --target browser: arguments', () => {
+  assert.deepEqual(parseLasmArguments(['dev', '--target', 'browser']), { command: 'dev', target: 'browser', release: false, watch: true, port: 5173, host: '127.0.0.1', input: 'Main.lean' });
+  assert.equal(parseLasmArguments(['dev', 'App.lean', '--target=browser', '--release', '--no-watch', '--port', '8080']).port, 8080);
+  assert.throws(() => parseLasmArguments(['dev', 'Main.lean']), /needs --target browser/);
+  assert.deepEqual(parseLasmArguments(['dev', '--help']), { command: 'dev-help' });
+});
+
+test('static server: MIME types, precompressed files, caching, live reload', async () => {
+  const { startStaticServer } = await import('../src/browser/static-server.mjs');
+  const { brotliCompressSync } = await import('node:zlib');
+  const root = mkdtempSync(join(tmpdir(), 'lasm-static-'));
+  writeFileSync(join(root, 'index.html'), '<html><body>hi</body></html>');
+  writeFileSync(join(root, 'app.0123456789ab.wasm'), Buffer.from([0, 97, 115, 109]));
+  writeFileSync(join(root, 'app.0123456789ab.wasm.br'), brotliCompressSync(Buffer.from([0, 97, 115, 109])));
+  const server = await startStaticServer(root, { liveReload: true });
+  try {
+    const wasm = await fetch(server.url + 'app.0123456789ab.wasm', { headers: { 'accept-encoding': 'br' } });
+    assert.equal(wasm.headers.get('content-type'), 'application/wasm');
+    assert.equal(wasm.headers.get('content-encoding'), 'br');
+    assert.match(wasm.headers.get('cache-control'), /immutable/);
+    assert.deepEqual([...new Uint8Array(await wasm.arrayBuffer())], [0, 97, 115, 109]);
+    const page = await fetch(server.url + 'some/route');
+    assert.match(await page.text(), /EventSource\('\/__lasm\/events'\)/, 'SPA fallback with the reload client');
+    // A raw request path that tries to leave the root stays inside it (URL normalization).
+    const { request } = await import('node:http');
+    const body = await new Promise((resolve, reject) => request(server.url + 'x', { path: '/../../etc/passwd' }, r => { let t = ''; r.on('data', c => t += c).on('end', () => resolve(t)); }).on('error', reject).end());
+    assert.doesNotMatch(body, /root:/);
+  } finally { await server.close(); }
+});

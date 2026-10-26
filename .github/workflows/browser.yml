@@ -52,6 +52,8 @@ env:
 jobs:
   runtime:
     uses: ./.github/workflows/edge-runtime.yml
+    with:
+      allow-main: true
   # The native host pieces the Node build stage needs (as in workers.yml).
   native:
     runs-on: ubuntu-24.04
@@ -161,8 +163,15 @@ jobs:
         with:
           node-version: 26.12.1
           package-manager-cache: false
+      - name: Playwright's browser builds, cached per version
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.os == 'macOS' && '~/Library/Caches/ms-playwright' || '~/.cache/ms-playwright' }}
+          key: playwright-${{ env.PLAYWRIGHT }}-${{ matrix.browser }}-${{ matrix.runner }}
       - name: Pinned Playwright and its ${{ matrix.browser }} build
         if: steps.gate.outputs.run == 'true'
+        timeout-minutes: 15
         shell: bash
         run: |
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"

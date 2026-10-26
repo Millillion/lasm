@@ -138,11 +138,11 @@ function browserPackageJson(name, template) {
     description: `${templates[template].summary}, compiled to WebAssembly by Lasm`,
     scripts: {
       // A dev server on http://localhost:5173 that rebuilds on save and reloads the page.
-      dev: 'lasm dev Main.lean',
+      dev: 'lasm dev Main.lean --target browser',
       // dist/: the static site (loader, Wasm, precompressed copies, index.html).
       build: 'lasm build Main.lean --target browser',
       // Serves the release build in dist/ as a static host would.
-      preview: 'lasm dev Main.lean --release --no-watch',
+      preview: 'lasm dev Main.lean --target browser --release --no-watch',
     },
     engines: { node: '>=24' },
     devDependencies: { [lasm.name]: lasm.version },

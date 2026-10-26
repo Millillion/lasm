@@ -26,6 +26,8 @@ namespace Raw
 @[js "lasm:app" "port"] opaque port : String → IO Port
 @[js "lasm:app" "onMessage"] opaque onMessage : Value → IO Unit
 @[js "lasm:app" "onUnmount"] opaque onUnmount : Value → IO Unit
+@[js "lasm:app" "hotState"] opaque hotState : IO Data
+@[js "lasm:app" "onHotSave"] opaque onHotSave : Value → IO Unit
 end Raw
 
 /-- The element the app is mounted on. -/
@@ -62,5 +64,16 @@ def onMessageAsync (f : Data → Async Unit) : IO Unit := do
 /-- Runs `f` when the app is unmounted (`app.unmount()`), before its listeners,
 timers and sockets are removed. -/
 def onUnmount (f : IO Unit) : IO Unit := do Raw.onUnmount (← callback fun _ => f)
+
+/-- During a hot reload (`@lasm/vite` in development), the state the previous
+version saved with `onHotSave`, converted to `α`; `none` otherwise or when it
+no longer converts (its type changed). -/
+def hotState (α : Type := Data) [FromJS α] : IO (Option α) := do
+  match ← Raw.hotState with
+  | .undefined => pure none
+  | d => match FromJS.fromJS d with | .ok a => pure (some a) | .error _ => pure none
+/-- Saves state across a hot reload: `f` runs just before this version is replaced. -/
+def onHotSave (f : IO Data) : IO Unit := do
+  Raw.onHotSave (← Function.ofSyncFn fun _ => f)
 
 end Lasm.Web.App

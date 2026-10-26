@@ -54,7 +54,7 @@ export async function mount(target, options = {}) {
   if (apps.has(element)) throw new Error(`Lasm app ${name}: this element already has a mounted app; unmount it first`);
   const record = { app: null };
   apps.set(element, record);
-  const { flags, hydrate = false, jspi = suspend === 'jspi', onError, stdout = line => console.log(line) } = options;
+  const { flags, hydrate = false, jspi = suspend === 'jspi', onError, stdout = line => console.log(line), hotState } = options;
   const errors = [];
   const stderr = line => { errors.push(line); if (errors.length > 20) errors.shift(); (options.stderr ?? (l => console.error(l)))(line); };
   let lean;
@@ -62,7 +62,7 @@ export async function mount(target, options = {}) {
     const wasmModule = await preload();
     const started = performance.now();
     lean = await startLean({ createProgram, wasmModule, modules, jspi, stdout, stderr, args: [],
-      context: { target: 'browser', root: element, flags, hydrate: !!hydrate, report: error => (onError ?? (e => console.error(e)))(error) } });
+      context: { target: 'browser', root: element, flags, hydrate: !!hydrate, hotState, report: error => (onError ?? (e => console.error(e)))(error) } });
     mark('lasm:mounted', { name, startMs: performance.now() - started });
   } catch (error) {
     apps.delete(element);
@@ -86,6 +86,10 @@ export async function mount(target, options = {}) {
     /** ports.<name>.send(value) (to Lean) and ports.<name>.subscribe(fn) (from Lean). */
     ports: embedder ? embedder.ports : Object.freeze({}),
     get stopped() { return unmounted || !!lean.lasmEdge.stopped; },
+    /** The state the app saves for a hot reload (Lasm.Web.App.onHotSave); mount({ hotState }) restores it. */
+    hotSave: () => embedder?.hotSave(),
+    /** The options this app was mounted with. */
+    options: Object.freeze({ ...options }),
     /** Runs Lean's unmount handlers, removes the app's listeners, timers and
      * sockets, ends the instance and (unless clear is false) empties the element. */
     unmount({ clear = true } = {}) {
