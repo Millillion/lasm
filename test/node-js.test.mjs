@@ -177,3 +177,41 @@ test('a Lean reply can be a method call the host makes (Reply.callMethod)', asyn
   js.dispatch(208, 0, 0n, reply2);
   await assert.rejects(failing, { message: 'closed' });
 });
+
+// Regression (0.3.0 release-checks run 40398073777, darwin-x64): the Lean
+// thread may make its first host call as soon as the call is posted. Node's
+// main thread must serve it, not take its sequence as already served (both
+// threads then waited for each other forever).
+test('a synchronous callback serves a host call the Lean thread makes the moment the call is posted', () => {
+  const memory = new WebAssembly.Memory({ initial: 1, maximum: 1, shared: true });
+  const i32 = new Int32Array(memory.buffer), view = new DataView(memory.buffer);
+  const channel = 64, slot = 256, buffer = 1024;
+  view.setBigUint64(channel + 16, BigInt(buffer), true);
+  view.setBigUint64(channel + 24, 4096n, true);
+  const served = [];
+  const js = createNodeJs({ wasmMemory: () => memory, serveSync: pointer => {
+    served.push(Atomics.load(i32, pointer / 4));
+    // The host replies; the Lean thread finishes the callback with 42.
+    const result = wire(42);
+    new Uint8Array(memory.buffer).set(result, buffer);
+    view.setBigUint64(channel + 32, BigInt(result.length), true);
+    Atomics.store(i32, channel / 4, 2);
+  } });
+  const registration = Buffer.alloc(16);
+  registration.writeBigUInt64LE(BigInt(channel), 0); registration.writeBigUInt64LE(BigInt(slot), 8);
+  js.dispatch(211, 0, 0n, registration);
+  const reference = js.dispatch(210, 7, 2n, Buffer.alloc(0));
+  const f = js.values.get(reference.readUInt32LE(1));
+  const notify = Atomics.notify, wait = Atomics.wait;
+  let waits = 0;
+  // The Lean thread wakes on the posted call and makes a host call before Node's
+  // main thread runs again (the race, made deterministic).
+  Atomics.notify = (array, index, count) => {
+    if (array.buffer === memory.buffer && index === channel / 4 && Atomics.load(i32, index) === 1) Atomics.add(i32, slot / 4, 1);
+    return notify(array, index, count);
+  };
+  Atomics.wait = (...args) => { if (++waits > 3) throw new Error('the posted host call was never served'); return wait(...args); };
+  try { assert.equal(f(5), 42); }
+  finally { Atomics.notify = notify; Atomics.wait = wait; }
+  assert.deepEqual(served, [1]);
+});

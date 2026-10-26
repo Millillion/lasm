@@ -127,6 +127,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       status = 3;
     } else if (bytes.length) u8.set(bytes, Number(view.getBigUint64(p + 48, true)));
     view.setInt32(p + 20, status, true);
+    slot.pending = undefined;
     Atomics.store(i32, (p + 4) / 4, 1);
     Atomics.notify(i32, (p + 4) / 4);
   };
@@ -150,6 +151,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     const operation = view.getInt32(p + 12, true), handle = view.getUint32(p + 16, true);
     const argument = view.getBigUint64(p + 24, true);
     const input = Number(view.getBigUint64(p + 32, true)), length = Number(view.getBigUint64(p + 40, true));
+    slot.pending = { kind, operation, since: Date.now() };
     // Copy: hosts and completion queues may retain request bytes.
     const bytes = length ? u8.slice(input, input + length) : new Uint8Array(0);
     const context = { fiber: Number(view.getBigUint64(p + 72, true)),
@@ -213,6 +215,10 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     lasmFullReply(slot, result);
   };
   var lasmFullSlots = new Map();
+  // Diagnostics (scripts/ci/lasm-js-stress.mjs): every Lean thread's host slot
+  // and the request it waits on, if any.
+  globalThis[Symbol.for('lasm.full.slots')] = () => ({ served: lasmFullServed, completionsQueued: lasmFullCompletions.length,
+    completionWaiter: !!lasmFullCompletionWaiter, slots: [...lasmFullSlots.values()].map(s => ({ pointer: s.pointer, sequence: s.sequence, pending: s.pending ?? null })) });
   // CMD_CALL_HANDLER from a Lean thread's first call at a nesting depth.
   Module.lasmFullHostSlot = function (pointer) {
     const slot = { pointer, sequence: 0 };

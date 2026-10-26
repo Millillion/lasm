@@ -1,0 +1,111 @@
+name: Lasm.JS stress
+# Runs Lasm.JS programs hundreds of times per platform with a short per-run
+# timeout (scripts/ci/lasm-js-stress.mjs): the installed acceptance's js-interop
+# program (also through `lasm Main.lean`), a callback program without
+# `waitForever` and a Hono server. A run that hangs leaves a Node diagnostic
+# report, Lasm.JS's poller state and every Lean thread's pending host request
+# in the `lasm-js-stress-<platform>` artifact. Dispatched by hand; free runners.
+on:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: Runs per program (after the first)
+        default: '200'
+        type: string
+      cli-runs:
+        description: Of the js-interop runs, how many go through `lasm Main.lean`
+        default: '20'
+        type: string
+      timeout-s:
+        description: Per-run timeout (seconds)
+        default: '30'
+        type: string
+      platforms:
+        description: all, or one of linux-x64, darwin-x64, darwin-arm64, win32-x64
+        default: all
+        type: string
+permissions:
+  contents: read
+jobs:
+  pack:
+    if: github.event.repository.visibility == 'public'
+    # The retained runtime input is a draft release asset (needs contents: write to read).
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packed-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  stress:
+    needs: pack
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.platforms == 'all' && '[{"runner":"ubuntu-24.04","platform":"linux-x64"},{"runner":"macos-15-intel","platform":"darwin-x64"},{"runner":"macos-15","platform":"darwin-arm64"},{"runner":"windows-2025","platform":"win32-x64"}]' || inputs.platforms == 'linux-x64' && '[{"runner":"ubuntu-24.04","platform":"linux-x64"}]' || inputs.platforms == 'darwin-x64' && '[{"runner":"macos-15-intel","platform":"darwin-x64"}]' || inputs.platforms == 'darwin-arm64' && '[{"runner":"macos-15","platform":"darwin-arm64"}]' || '[{"runner":"windows-2025","platform":"win32-x64"}]') }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 240
+    defaults:
+      run:
+        shell: bash
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: packed-candidate
+          path: .work/node-candidate
+      - name: Stress
+        run: node scripts/ci/lasm-js-stress.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm js stress λ" ".work/lasm-js-stress-${{ matrix.platform }}.json" --runs "${{ inputs.runs }}" --cli-runs "${{ inputs.cli-runs }}" --timeout-s "${{ inputs.timeout-s }}"
+      - name: Collect hang diagnostics
+        if: always()
+        run: |
+          mkdir -p .work/hangs
+          if [ -d "$RUNNER_TEMP/lasm js stress λ/hangs" ]; then cp -R "$RUNNER_TEMP/lasm js stress λ/hangs/." .work/hangs/; fi
+      - name: Preserve the result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: lasm-js-stress-${{ matrix.platform }}
+          path: |
+            .work/lasm-js-stress-${{ matrix.platform }}.json
+            .work/hangs
+          retention-days: 14
+          if-no-files-found: ignore

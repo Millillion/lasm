@@ -239,9 +239,13 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, prog
       view.setUint32(channel + 8, fn, true);
       syncBusy = true; stats.syncCallbacks++;
       try {
+        // Read the slot's sequence and the doorbell before posting the call: once
+        // state is 1 the Lean thread runs and may make its first host call at
+        // once. Read after posting, that request's sequence would be taken as
+        // already served, and both threads would wait for each other forever.
+        let bell = Atomics.load(i32, channel / 4 + 1), sequence = Atomics.load(i32, slot / 4);
         Atomics.store(i32, channel / 4, 1);
         Atomics.notify(i32, channel / 4);
-        let bell = Atomics.load(i32, channel / 4 + 1), sequence = Atomics.load(i32, slot / 4);
         for (;;) {
           if (memory.buffer !== buffer) { buffer = memory.buffer; i32 = new Int32Array(buffer); view = new DataView(buffer); }
           const state = Atomics.load(i32, channel / 4);
@@ -255,7 +259,9 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, prog
           }
           const current = Atomics.load(i32, slot / 4);
           if (current !== sequence) { sequence = current; serveSync(slot); continue; }
-          Atomics.wait(i32, channel / 4 + 1, bell, 1000);
+          // A wait that times out asks the host anyway (it serves a request only
+          // once), so no lost wake-up can stop the callback for good.
+          if (Atomics.wait(i32, channel / 4 + 1, bell, 1000) === 'timed-out') serveSync(slot);
           bell = Atomics.load(i32, channel / 4 + 1);
         }
       } finally { syncBusy = false; }
@@ -426,7 +432,8 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, prog
   // Live counts for leak checks (Lasm.JS.stats, and the soak diagnostics through
   // globalThis[Symbol.for('lasm.js.stats')]).
   const snapshot = () => ({ values: values.size, pendingCalls: pendingCalls.size, queuedEvents: events.length,
-    functionsLive: stats.functionsCreated - stats.functionsCollected, ...stats });
+    functionsLive: stats.functionsCreated - stats.functionsCollected, ...stats,
+    poller: { polled, waiting: !!waiter, spawnTimer: !!pollerTimer } });
   globalThis[Symbol.for('lasm.js.stats')] = snapshot;
   return {
     dispatch,
