@@ -50,7 +50,8 @@ def view (n : Int) : Html Msg :=
 def main : IO Unit := (App.sandbox 0 update view).run
 ```
 
-Build and serve it:
+Build and serve it (or start from `lasm init my-app --template web`, which
+sets up `npm run dev`, `build` and `preview`):
 
 ```sh
 lasm build Main.lean --target browser     # writes dist/: index.html, app.<hash>.js, app.<hash>.wasm
@@ -337,8 +338,10 @@ each adopts its own node.
 `update` and `view` are pure, so test them as ordinary Lean:
 
 ```lean
-#guard (update .increment 1) == 2
-example : (Todo.step .clearCompleted m).todos.all (!·.completed) := by …
+#guard update .increment 1 == 2
+#guard render (view 3) == "<main><button>-</button><output>3</output><button>+</button></main>"
+
+theorem update_increment (n : Int) : update .increment n = n + 1 := rfl
 ```
 
 [examples/ui/todomvc/Todo.lean](../examples/ui/todomvc/Todo.lean) proves an
