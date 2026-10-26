@@ -120,15 +120,16 @@ def resync (live : List (Live Msg)) (touched : Array (List Nat)) : Array (Op Msg
       if sets.isEmpty then ops else ops.push (.attrs id sets)
     | _ => ops
 
-/-- The handler a node has for an event (the last one wins). -/
-def handlerFor (event : String) : List (Attr Msg) → Option (List EvVal → Option Msg)
-  | [] => none
-  | a :: rest =>
-    match handlerFor event rest with
-    | some h => some h
-    | none => match a with
-      | .on l h => if l.event == event then some h else none
-      | _ => none
+/-- The handlers an element has for an event, in order. The DOM slot holds
+the last one's listener (its fields are what the applier sends); every handler
+for the event that reads the same fields runs, as with several
+`addEventListener` calls (`onEnter` and `onEscape` on one input both work). -/
+def handlersFor (event : String) (attrs : List (Attr Msg)) : List (List EvVal → Option Msg) :=
+  match lastVal (.on event) attrs with
+  | some (.listener l) => attrs.filterMap fun
+    | .on l' h => if l'.event == event && l'.paths == l.paths then some h else none
+    | _ => none
+  | _ => []
 
 def specData : SubSpec → Data
   | .every ms => .array #[.string "every", toJS ms]
@@ -286,8 +287,9 @@ def onEvent (c : Ctx Flags Model Msg) (args : Array Data) : IO Data := do
   while i + 1 < calls.size do
     if let (.number depth, .array vals) := (calls[i]!, calls[i+1]!) then
       if let some (.elem _ _ _ _ attrs _) := nodes[depth.toUInt64.toNat]? then
-        if let some h := handlerFor type attrs then
-          if let some m := h (vals.toList.map Subs.evVal) then msgs := msgs.push m
+        let vs := vals.toList.map Subs.evVal
+        for h in handlersFor type attrs do
+          if let some m := h vs then msgs := msgs.push m
     i := i + 2
   for m in msgs do deliver c m
   return .bool (← takeFrame c)

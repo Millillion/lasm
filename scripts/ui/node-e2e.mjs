@@ -24,6 +24,7 @@ if (kind === 'counter') {
   console.log('ok counter');
 } else if (kind === 'todomvc') {
   const items = () => [...doc.querySelectorAll('.todo-list li')].map(li => [li.querySelector('label').textContent, li.className]);
+  await page.settle();
   assert.equal(doc.activeElement?.id, 'new-todo', 'focus on load');
   for (const t of ['one', '  two  ', 'three']) { page.type('.new-todo', t); page.key('.new-todo', 'Enter'); }
   await page.settle();

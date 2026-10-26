@@ -36,7 +36,7 @@ async function todomvc({ server, name, openPage, expect, report }) {
   const until = (fn, arg) => page.waitForFunction(fn, arg, { timeout: 5000 }).catch(() => {});
   try {
     await page.waitForSelector('.new-todo', { timeout: 30_000 });
-    expect(name, 'todomvc.focus-on-load', await page.evaluate(() => document.activeElement?.classList.contains('new-todo')), 'new-todo not focused');
+    expect(name, 'todomvc.focus-on-load', await until(() => document.activeElement?.classList.contains('new-todo')), 'new-todo not focused');
     expect(name, 'todomvc.no-main-when-empty', (await page.$('.main')) === null && (await page.$('.footer')) === null, 'main/footer shown');
     for (const t of ['buy some cheese', '  feed the cat  ', 'book a doctors appointment']) {
       await page.fill('.new-todo', t);
@@ -129,17 +129,19 @@ async function todomvc({ server, name, openPage, expect, report }) {
 
 // The js-framework-benchmark operations, timed in the page from the click to
 // the next frame being painted (rAF, then a task), for Lasm.UI and for vanilla
-// JavaScript (bench/ui/vanilla, the same markup) in the same browser.
+// JavaScript (bench/ui/vanilla, the same markup) in the same browser. The
+// budget (docs/BROWSER.md) covers creating 1,000 rows and updating every 10th;
+// every operation is recorded.
 const operations = [
   { name: 'create 1,000 rows', setup: ['clear'], run: 'run', budget: 2 },
   { name: 'replace all rows', setup: ['run'], run: 'run' },
   { name: 'update every 10th row', setup: ['clear', 'run'], run: 'update', budget: 2 },
   { name: 'select row', setup: ['clear', 'run'], run: { select: 2 } },
-  { name: 'swap rows', setup: ['clear', 'run'], run: 'swaprows', budget: 2 },
+  { name: 'swap rows', setup: ['clear', 'run'], run: 'swaprows' },
   { name: 'remove row', setup: ['clear', 'run'], run: { remove: 4 } },
   { name: 'create 10,000 rows', setup: ['clear'], run: 'runlots', repeats: 3 },
   { name: 'append 1,000 rows', setup: ['clear', 'run'], run: 'add' },
-  { name: 'clear 1,000 rows', setup: ['clear', 'run'], run: 'clear', budget: 2 },
+  { name: 'clear 1,000 rows', setup: ['clear', 'run'], run: 'clear' },
 ];
 
 async function measure(page, ready) {

@@ -39,7 +39,7 @@ uint8_t lean_uint8_of_nat(lean_object*);
 lean_object* lean_nat_shiftr(lean_object*, lean_object*);
 lean_object* lean_string_utf8_byte_size(lean_object*);
 lean_object* lean_string_to_utf8(lean_object*);
-lean_object* l_Std_DHashMap_Internal_Raw_u2080_Const_get_x3f___at___00Lasm_UI_twoEnded_spec__0___redArg(lean_object*, lean_object*);
+lean_object* l_Std_DHashMap_Internal_Raw_u2080_Const_get_x3f___at___00Lasm_UI_twoEnded___at___00Lasm_UI_prefixPhase___at___00Lasm_UI_diffChildren___at___00Lasm_UI_diffNode_spec__0_spec__0_spec__3_spec__5___redArg(lean_object*, lean_object*);
 lean_object* l_Std_DHashMap_Internal_Raw_u2080_insert___at___00Lasm_UI_keyIndex_spec__0___redArg(lean_object*, lean_object*, lean_object*);
 lean_object* l_List_lengthTR___redArg(lean_object*);
 lean_object* l_Lasm_UI_Attr_key___redArg(lean_object*);
@@ -459,7 +459,7 @@ lean_object* v_names_99_; lean_object* v_decoders_100_; lean_object* v___x_101_;
 v_names_99_ = lean_ctor_get(v_t_96_, 0);
 lean_inc_ref(v_names_99_);
 v_decoders_100_ = lean_ctor_get(v_t_96_, 1);
-v___x_101_ = l_Std_DHashMap_Internal_Raw_u2080_Const_get_x3f___at___00Lasm_UI_twoEnded_spec__0___redArg(v_names_99_, v_s_98_);
+v___x_101_ = l_Std_DHashMap_Internal_Raw_u2080_Const_get_x3f___at___00Lasm_UI_twoEnded___at___00Lasm_UI_prefixPhase___at___00Lasm_UI_diffChildren___at___00Lasm_UI_diffNode_spec__0_spec__0_spec__3_spec__5___redArg(v_names_99_, v_s_98_);
 if (lean_obj_tag(v___x_101_) == 0)
 {
 lean_object* v_size_102_; lean_object* v___x_103_; uint8_t v___x_104_; 

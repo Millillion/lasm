@@ -188,7 +188,9 @@ that starts with `currentTarget` reads the element whose handler runs.
 decision made in Lean would come too late. `onSubmit` always prevents the
 page load.
 
-Events bubble as in the DOM: a click on a `<b>` inside a `<li onClick>` runs
+Several handlers for the same event on one element all run, in order, when
+they read the same fields (as `onEnter` and `onEscape` on one input do);
+otherwise the last one's fields are read. Events bubble as in the DOM: a click on a `<b>` inside a `<li onClick>` runs
 the `<li>`'s handler. Non-bubbling events (`focus`, `blur`, `mouseenter`, …)
 reach only their target.
 
