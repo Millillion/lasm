@@ -185,14 +185,14 @@ jobs:
           ../tools/node_modules/.bin/wrangler dev --port 8787 --ip 127.0.0.1 > wrangler.log 2>&1 &
           echo $! > wrangler.pid
           cd ../..
-          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8787/ --label workers --add 'Kept in Workers KV' --out .work/results/workers-smoke.json || (cat .work/app/wrangler.log; exit 1)
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8787/ --label workers --platform-assets --add 'Kept in Workers KV' --out .work/results/workers-smoke.json || (cat .work/app/wrangler.log; exit 1)
           node scripts/fullstack/fullstack-ci.mjs --browser chromium --label workers --url http://127.0.0.1:8787/ --out .work/results/workers-chromium.json --playwright .work/pw || (cat .work/app/wrangler.log; exit 1)
           pkill -f 'wrangler dev' || true; pkill -f workerd || true
           for i in $(seq 50); do curl -s -o /dev/null http://127.0.0.1:8787/ || break; sleep 0.2; done
           cd .work/app
           ../tools/node_modules/.bin/wrangler dev --port 8787 --ip 127.0.0.1 > wrangler-2.log 2>&1 &
           cd ../..
-          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8787/ --label workers-restarted --expect 'Kept in Workers KV' --out .work/results/workers-restart.json || (cat .work/app/wrangler-2.log; exit 1)
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8787/ --label workers-restarted --platform-assets --expect 'Kept in Workers KV' --out .work/results/workers-restart.json || (cat .work/app/wrangler-2.log; exit 1)
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
