@@ -4,8 +4,8 @@
 // docs/BROWSER.md checked. Exits 1 when an engine failed a check or a budget
 // marked enforced is exceeded.
 //   node scripts/browser/evidence.mjs BUILD_JSON RESULTS_DIR OUT
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 const [buildFile, resultsDirectory, out] = process.argv.slice(2);
 const build = JSON.parse(readFileSync(buildFile, 'utf8'));
@@ -28,11 +28,12 @@ const record = {
   schema: 1, kind: 'browser-ci', run: process.env.RUN_ID ?? null, source: process.env.SOURCE ?? null, recordedAt: new Date().toISOString(),
   build: { platform: build.platform, node: build.node, rebuild: build.rebuild,
     apps: Object.fromEntries(Object.entries(build.apps).map(([name, app]) => [name, { buildSeconds: app.buildSeconds, unchangedSeconds: app.unchangedSeconds,
-      transfer: app.transfer, entry: { file: app.entry, ...app.files[app.entry] }, wasm: { file: app.wasm, ...app.files[app.wasm] } }])) },
+      transfer: app.transfer, entry: { file: app.entry, ...app.files?.[app.entry] }, wasm: { file: app.wasm, ...app.files?.[app.wasm] } }])) },
   engines: engines.map(e => ({ engine: e.engine, platform: e.platform, version: e.browserVersion,
     checks: Object.values(e.apps).reduce((n, a) => n + (a.checks?.length ?? 0), 0), failures: e.failures,
     start: Object.fromEntries(Object.entries(e.apps).map(([name, a]) => [name, a.start])),
     transferred: Object.fromEntries(Object.entries(e.apps).filter(([, a]) => a.sizes).map(([name, a]) => [name, a.sizes])) })),
+  viteDev: (file => existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null)(join(dirname(buildFile), 'vite-dev.json')),
   startMedianMs: median(engines.map(e => e.apps.counter?.start?.warm?.startMs)),
   budgets,
 };
@@ -42,5 +43,7 @@ for (const budget of budgets)
   console.log(`${budget.pass ? 'PASS' : budget.enforced ? 'FAIL' : 'OVER'} ${budget.name}: ${budget.actual === null ? 'not measured' : budget.unit === 'bytes' ? (budget.actual / KiB).toFixed(1) + ' KiB' : budget.actual.toFixed(budget.unit === 's' ? 1 : 0) + ' ' + budget.unit} (budget ${budget.unit === 'bytes' ? budget.limit / KiB + ' KiB' : budget.limit + ' ' + budget.unit}${budget.enforced ? '' : ', recorded'})`);
 for (const e of engines) console.log(`${e.engine} ${e.browserVersion} (${e.platform}): ${e.failures.length ? e.failures.length + ' failures' : 'passed'}`);
 if (process.env.BROWSERS_RESULT && process.env.BROWSERS_RESULT !== 'success') console.log(`The browser jobs ended with ${process.env.BROWSERS_RESULT}.`);
-const failed = failedEngines.length || budgets.some(b => b.enforced && !b.pass) || (process.env.BROWSERS_RESULT && process.env.BROWSERS_RESULT !== 'success');
+const viteFailed = record.viteDev?.checks?.some(c => !c.ok) ?? false;
+if (record.viteDev) console.log(`vite dev: ${record.viteDev.checks.filter(c => c.ok).length}/${record.viteDev.checks.length} checks, update ${record.viteDev.updateSeconds}s`);
+const failed = viteFailed || failedEngines.length || budgets.some(b => b.enforced && !b.pass) || (process.env.BROWSERS_RESULT && process.env.BROWSERS_RESULT !== 'success');
 process.exit(failed ? 1 : 0);

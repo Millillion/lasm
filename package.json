@@ -1,6 +1,6 @@
 {
   "name": "@lasm/compiler",
-  "version": "0.1.0-experimental.3",
+  "version": "0.1.0",
   "private": true,
   "workspaces": [
     "examples/express"

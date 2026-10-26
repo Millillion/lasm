@@ -1,7 +1,7 @@
 // Edge targets (Phase 7, docs/EDGE.md): `lasm build --target workers|vercel-edge|
-// netlify-edge|deno-deploy`. The Node build's compiled program relinked for edge isolates
+// netlify-edge|deno-deploy|supabase-edge`. The Node build's compiled program relinked for edge isolates
 // (edge-link.mjs, cached per Node build), the pure-JS host, and a generated
-// entry module per platform. Experimental.
+// entry module per platform.
 import { mkdirSync, readFileSync, writeFileSync, copyFileSync, existsSync, rmSync, renameSync, readdirSync, statSync } from 'node:fs';
 import { basename, join, relative, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import { edgeRuntime } from './edge-runtime.mjs';
 import { linkEdgeProgram, edgeLinkSettings } from './edge-link.mjs';
 import { builtinModuleClosure, builtinModuleFile, builtinPrefix, isBuiltinModule } from './builtin-modules.mjs';
+import { supabaseFunctionNameOf } from '../init.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 export const edgeHostFiles = ['edge-start.mjs', 'edge-host.mjs', 'edge-js.mjs'];
@@ -16,7 +17,7 @@ export const edgeHostFiles = ['edge-start.mjs', 'edge-host.mjs', 'edge-js.mjs'];
 // configuration each platform needs beside the program. An entry outside the
 // owned directory is replaced only when Lasm generated it.
 export const edgeTargets = {
-  workers: { label: 'Cloudflare Workers', summary: 'Cloudflare Workers: workers/ (worker.mjs, the program and its host; wrangler.toml when the project has none)', output: 'workers',
+  workers: { label: 'Cloudflare Workers', supported: true, summary: 'Cloudflare Workers: workers/ (worker.mjs, the program and its host; wrangler.toml when the project has none)', output: 'workers',
     write({ staging, projectDirectory, modules }) {
       writeFileSync(join(staging, 'worker.mjs'), workersEntry(modules));
       const rootConfig = ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc'].find(name => existsSync(join(projectDirectory, name)));
@@ -26,7 +27,7 @@ export const edgeTargets = {
   // Vercel's edge runtime: a zero-config function api/lasm.mjs (Vercel bundles
   // it at deployment); its support files in api/_lasm/, which Vercel does not
   // treat as functions. vercel.json routes every path to it.
-  'vercel-edge': { label: 'Vercel Edge', summary: 'Vercel Edge Function: api/lasm.mjs and api/_lasm/ (route every path to /api/lasm in vercel.json)', output: 'api/_lasm',
+  'vercel-edge': { label: 'Vercel Edge', supported: true, summary: 'Vercel Edge Function: api/lasm.mjs and api/_lasm/ (route every path to /api/lasm in vercel.json)', output: 'api/_lasm',
     write({ projectDirectory, modules }) {
       writeGeneratedFile(join(projectDirectory, 'api/lasm.mjs'), vercelEdgeEntry(modules));
       return { note: () => 'the function is api/lasm.mjs' };
@@ -34,7 +35,7 @@ export const edgeTargets = {
   // Netlify Edge Functions (Deno): netlify/edge-functions/lasm.mjs serves every
   // path (inline config); the program and host in netlify/lasm/. The Wasm is a
   // JavaScript module, so Netlify's Deno bundler carries it.
-  'netlify-edge': { label: 'Netlify Edge', summary: 'Netlify Edge Function: netlify/edge-functions/lasm.mjs and netlify/lasm/ (serves every path)', output: 'netlify/lasm', inlineWasm: true,
+  'netlify-edge': { label: 'Netlify Edge', supported: true, summary: 'Netlify Edge Function: netlify/edge-functions/lasm.mjs and netlify/lasm/ (serves every path)', output: 'netlify/lasm', inlineWasm: true,
     write({ projectDirectory, modules }) {
       writeGeneratedFile(join(projectDirectory, 'netlify/edge-functions/lasm.mjs'), netlifyEdgeEntry(modules));
       return { note: () => 'the edge function is netlify/edge-functions/lasm.mjs' };
@@ -43,20 +44,32 @@ export const edgeTargets = {
   // Lean's main with the command-line arguments and exits with its code; a
   // program that publishes a handler (Lasm.JS.exportDefault) is served with
   // Bun.serve or Deno.serve instead. Deno Deploy runs the same entry.
-  bun: { label: 'Bun', summary: 'Bun: bun/ (main.mjs, the program and its host; bun bun/main.mjs)', output: 'bun',
+  bun: { label: 'Bun', supported: true, summary: 'Bun: bun/ (main.mjs, the program and its host; bun bun/main.mjs)', output: 'bun',
     write({ staging, modules }) {
       writeFileSync(join(staging, 'main.mjs'), portableEntry('bun', modules));
       return { note: () => 'run it with bun bun/main.mjs' };
     } },
-  deno: { label: 'Deno', summary: 'Deno: deno/ (main.mjs, the program and its host; deno run -A deno/main.mjs)', output: 'deno',
+  deno: { label: 'Deno', supported: true, summary: 'Deno: deno/ (main.mjs, the program and its host; deno run -A deno/main.mjs)', output: 'deno',
     write({ staging, modules }) {
       writeFileSync(join(staging, 'main.mjs'), portableEntry('deno', modules));
       return { note: () => 'run it with deno run -A deno/main.mjs' };
     } },
-  'deno-deploy': { label: 'Deno Deploy', summary: 'Deno Deploy: deno/ (main.mjs, the program and its host; entrypoint deno/main.mjs)', output: 'deno',
+  'deno-deploy': { label: 'Deno Deploy', supported: true, summary: 'Deno Deploy: deno/ (main.mjs, the program and its host; entrypoint deno/main.mjs)', output: 'deno',
     write({ staging, modules }) {
       writeFileSync(join(staging, 'main.mjs'), portableEntry('deno-deploy', modules));
       return { note: () => 'the entrypoint is deno/main.mjs (deno run -A deno/main.mjs locally)' };
+    } },
+  // Supabase Edge Functions: supabase/functions/<name>/ (index.ts, a deno.json
+  // import map of the npm modules pinned to the installed versions, the
+  // program with the Wasm as a JavaScript module). Supabase's edge runtime
+  // (V8 11.6) has no JSPI, so blocking waits suspend with Asyncify.
+  'supabase-edge': { label: 'Supabase Edge Functions', summary: 'Supabase Edge Function: supabase/functions/<name>/ (index.ts, deno.json and the program; <name> from package.json)',
+    output: projectDirectory => `supabase/functions/${supabaseFunctionName(projectDirectory)}`, inlineWasm: true, suspend: 'asyncify', supported: true,
+    write({ staging, projectDirectory, modules }) {
+      const name = supabaseFunctionName(projectDirectory);
+      writeFileSync(join(staging, 'index.ts'), supabaseEntry(modules, name));
+      writeFileSync(join(staging, 'deno.json'), JSON.stringify(supabaseImportMap(projectDirectory, modules), null, 2) + '\n');
+      return { note: () => `deploy it with supabase functions deploy ${name}` };
     } },
 };
 
@@ -159,6 +172,61 @@ if (globalThis.Bun) {
   console.error(\`Listening on \${server.url}\`);
 } else if (deno) deno.serve(env.PORT ? { port: Number(env.PORT) } : {}, async (request, info) => respond(await ready(), request, env, info));
 else throw new Error('Serving a Lasm.JS handler needs Bun or Deno; on Node, build with lasm build --target node');
+`;
+}
+
+/** The Supabase function's name: package.json's name (else the directory's),
+ * in the form Supabase accepts (a letter, then letters, digits, - and _). */
+export function supabaseFunctionName(projectDirectory) {
+  const file = join(projectDirectory, 'package.json');
+  return supabaseFunctionNameOf(existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')).name ?? basename(projectDirectory) : basename(projectDirectory));
+}
+
+/** deno.json for the function: every npm module the entry imports, mapped to
+ * the version installed in the project (npm:name@version), with subpaths. */
+export function supabaseImportMap(projectDirectory, modules, resolveVersion = name => installedVersion(projectDirectory, name)) {
+  const imports = {};
+  for (const specifier of modules) {
+    if (/^(?:node|npm|jsr|https?|data|lasm):/.test(specifier) || specifier.startsWith('.') || specifier.startsWith('/')) continue;
+    const parts = specifier.split('/');
+    const name = specifier.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0];
+    if (imports[name]) continue;
+    const version = resolveVersion(name);
+    imports[name] = `npm:${name}@${version}`;
+    imports[name + '/'] = `npm:${name}@${version}/`;
+  }
+  return { imports };
+}
+function installedVersion(projectDirectory, name) {
+  // node_modules of the project or of a directory above it (workspaces).
+  for (let directory = resolve(projectDirectory); ; directory = dirname(directory)) {
+    const file = join(directory, 'node_modules', name, 'package.json');
+    if (existsSync(file)) return JSON.parse(readFileSync(file, 'utf8')).version;
+    if (dirname(directory) === directory) break;
+  }
+  throw new Error(`The Supabase function imports ${name}, which is not installed: run npm install ${name}, so its version can be pinned in deno.json`);
+}
+
+export function supabaseEntry(modules, name) {
+  return `// Generated by Lasm (lasm build --target supabase-edge). Rebuilt on every build; do not edit.
+// @ts-nocheck
+// A Supabase Edge Function serving the Lean program's handler
+// (Lasm.JS.exportDefault). Supabase passes /functions/v1/${name}/PATH to the
+// function as /${name}/PATH; the handler sees /PATH, as on every other target.
+import wasmBytes from './lasm/program.wasm.mjs';
+import createProgram from './lasm/program.mjs';
+import { startLean } from './lasm/edge-start.mjs';
+${moduleImports(modules)}
+${moduleMap(modules)}
+const compiled = WebAssembly.compile(wasmBytes);
+${lazyStart('await compiled', 'Deno.env.toObject()')}const prefix = ${JSON.stringify('/' + name)};
+const route = request => {
+  const url = new URL(request.url);
+  if (url.pathname !== prefix && !url.pathname.startsWith(prefix + '/')) return request;
+  url.pathname = url.pathname.slice(prefix.length) || '/';
+  return new Request(url, request);
+};
+Deno.serve(async (request, info) => respond(await ready(), route(request), env, info));
 `;
 }
 
@@ -270,11 +338,14 @@ const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 /** The edge program's cache identity: the Node build's signature (its objects
  * and initializer plan), the edge runtime, the edge link and its settings. */
 export function edgeProgramKey({ result, edge, suspend = 'jspi' }) {
+  // Schema 1 keys (JSPI) are unchanged.
   return sha256(JSON.stringify({ schema: 1, node: result.signature, runtime: edge.identity, settings: edgeLinkSettings, suspend,
     sources: Object.fromEntries(linkSources.map(file => [file, sha256(readFileSync(join(here, file)))])) }));
 }
 
 /** Edge programs are cached beside the Node build's cache entry (one per key). */
+/** How the target's blocking waits suspend (edge-link.mjs edgeSuspendModes). */
+export const edgeTargetSuspend = target => edgeTargets[target]?.suspend ?? 'jspi';
 const cacheRoot = result => join(dirname(dirname(result.cached)), 'edge');
 function cachedProgram(result, key) {
   const directory = join(cacheRoot(result), key);
@@ -287,19 +358,19 @@ function cachedProgram(result, key) {
 }
 
 /** Phase 1 of an edge build: the cached program for an unchanged Node build, or null. */
-export async function findEdgeProgram({ result, nodeRuntime }) {
+export async function findEdgeProgram({ result, nodeRuntime, suspend = 'jspi' }) {
   const edge = await edgeRuntime(nodeRuntime);
-  const key = edgeProgramKey({ result, edge });
-  return { edge, key, cached: cachedProgram(result, key) };
+  const key = edgeProgramKey({ result, edge, suspend });
+  return { edge, key, suspend, cached: cachedProgram(result, key) };
 }
 
 /** Phase 2 (cache miss): link the program from a build made with keepLinkWork and cache it. */
-export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, verbose = false }) {
+export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, suspend = 'jspi', verbose = false }) {
   if (!result.linkWork) throw new Error('The edge build needs the Node build\'s link inputs (internal error)');
   const root = cacheRoot(result), directory = join(root, key), staging = join(root, '.' + key + '.' + process.pid + '.partial');
   rmSync(staging, { recursive: true, force: true });
   let link;
-  try { link = linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: result.linkWork, out: join(staging, '.link'), verbose }); }
+  try { link = linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: result.linkWork, out: join(staging, '.link'), suspend, verbose }); }
   catch (error) { rmSync(staging, { recursive: true, force: true }); throw error; }
   copyFileSync(link.program, join(staging, 'program.mjs'));
   copyFileSync(link.wasm, join(staging, 'program.wasm'));
@@ -308,8 +379,10 @@ export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, ver
   else rmSync(join(staging, '.link'), { recursive: true, force: true });
   const meta = { key, suspend: link.suspend, files: Object.fromEntries(['program.mjs', 'program.wasm'].map(file => [file, sha256(readFileSync(join(staging, file)))])) };
   writeFileSync(join(staging, 'program.json'), JSON.stringify(meta, null, 2) + '\n');
-  // One cached program per application: older keys are superseded.
-  for (const entry of readdirSync(root)) if (entry !== key && !entry.startsWith('.')) rmSync(join(root, entry), { recursive: true, force: true });
+  // One cached program per application and suspension: older keys are superseded.
+  const suspendOf = entry => { try { return JSON.parse(readFileSync(join(root, entry, 'program.json'), 'utf8')).suspend; } catch { return null; } };
+  for (const entry of readdirSync(root)) if (entry !== key && !entry.startsWith('.') && [link.suspend, null].includes(suspendOf(entry)))
+    rmSync(join(root, entry), { recursive: true, force: true });
   rmSync(directory, { recursive: true, force: true });
   renameSync(staging, directory);
   return { directory, meta };
@@ -318,7 +391,8 @@ export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, ver
 /** Phase 3: write the target's output (program, host, entry module, config). */
 export function writeEdgeOutput({ target, source, projectDirectory, result, edge, program, log = console.error, output, cacheHit = false }) {
   if (!edgeTargets[target]) throw new Error(`Unknown edge target ${target}`);
-  const destination = resolve(output ?? join(projectDirectory, edgeTargets[target].output));
+  const owned = edgeTargets[target].output;
+  const destination = resolve(output ?? join(projectDirectory, typeof owned === 'function' ? owned(projectDirectory) : owned));
   if (destination === resolve(projectDirectory) || !relative(destination, source).startsWith('..'))
     throw new Error('The edge output directory must not contain the Lean sources');
   // The output directory belongs to Lasm: replace only an earlier edge build.
@@ -344,7 +418,7 @@ export function writeEdgeOutput({ target, source, projectDirectory, result, edge
   // The entry module is written after the owned directory is in place.
   let written;
   copyFileSync(join(result.output, 'THIRD_PARTY_NOTICES.txt'), join(staging, 'THIRD_PARTY_NOTICES.txt'));
-  const info = { schema: 1, target, profile: 'edge', experimental: true, nodeBuildSignature: result.signature, lean: result.lean,
+  const info = { schema: 1, target, profile: 'edge', experimental: !edgeTargets[target].supported, nodeBuildSignature: result.signature, lean: result.lean,
     edgeRuntime: edge.manifest.files, link: { ...edgeLinkSettings, suspend: program.meta.suspend }, wasm: inline ? 'lasm/program.wasm.mjs' : 'lasm/program.wasm', programKey: program.meta.key, modules,
     files: Object.fromEntries(Object.entries(program.meta.files).map(([file, digest]) => ['lasm/' + file, digest])) };
   writeFileSync(join(staging, 'build-info.json'), JSON.stringify(info, null, 2) + '\n');
@@ -353,7 +427,7 @@ export function writeEdgeOutput({ target, source, projectDirectory, result, edge
   renameSync(staging, destination);
   written = edgeTargets[target].write({ staging: destination, projectDirectory, modules });
   const wasmBytes = statSync(join(program.directory, 'program.wasm')).size;
-  log(`${cacheHit ? 'Reused' : 'Built'} ${relative(process.cwd(), source) || source} for ${edgeTargets[target].label} (experimental): ${relative(process.cwd(), destination) || destination}`
+  log(`${cacheHit ? 'Reused' : 'Built'} ${relative(process.cwd(), source) || source} for ${edgeTargets[target].label}${edgeTargets[target].supported ? '' : ' (experimental)'}: ${relative(process.cwd(), destination) || destination}`
     + ` (program.wasm ${(wasmBytes / 1048576).toFixed(2)} MiB${written.note ? '; ' + written.note(relative(projectDirectory, destination)) : ''})`);
   return { output: destination, info };
 }

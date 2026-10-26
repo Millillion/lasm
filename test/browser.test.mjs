@@ -227,3 +227,52 @@ test('compact initializers: kept units run once, in the original chain order', a
   assert.match(c, /res = __wrap_initialize_K1\(builtin\);[^\n]*\n  res = __wrap_initialize_K2\(builtin\);[^\n]*\n  return __real_initialize_Main\(builtin\);/);
   assert.throws(() => compactInitializerWrappers({ schema: 1, closure: ['bad name'], keep: [], calls: {} }), /Unexpected initializer name/);
 });
+
+test('lasm dev --target browser: arguments', () => {
+  assert.deepEqual(parseLasmArguments(['dev', '--target', 'browser']), { command: 'dev', target: 'browser', release: false, watch: true, port: 5173, host: '127.0.0.1', input: 'Main.lean' });
+  assert.equal(parseLasmArguments(['dev', 'App.lean', '--target=browser', '--release', '--no-watch', '--port', '8080']).port, 8080);
+  assert.throws(() => parseLasmArguments(['dev', 'Main.lean']), /needs --target browser/);
+  assert.deepEqual(parseLasmArguments(['dev', '--help']), { command: 'dev-help' });
+});
+
+test('static server: MIME types, precompressed files, caching, live reload', async () => {
+  const { startStaticServer } = await import('../src/browser/static-server.mjs');
+  const { brotliCompressSync } = await import('node:zlib');
+  const root = mkdtempSync(join(tmpdir(), 'lasm-static-'));
+  writeFileSync(join(root, 'index.html'), '<html><body>hi</body></html>');
+  writeFileSync(join(root, 'app.0123456789ab.wasm'), Buffer.from([0, 97, 115, 109]));
+  writeFileSync(join(root, 'app.0123456789ab.wasm.br'), brotliCompressSync(Buffer.from([0, 97, 115, 109])));
+  const server = await startStaticServer(root, { liveReload: true });
+  try {
+    const wasm = await fetch(server.url + 'app.0123456789ab.wasm', { headers: { 'accept-encoding': 'br' } });
+    assert.equal(wasm.headers.get('content-type'), 'application/wasm');
+    assert.equal(wasm.headers.get('content-encoding'), 'br');
+    assert.match(wasm.headers.get('cache-control'), /immutable/);
+    assert.deepEqual([...new Uint8Array(await wasm.arrayBuffer())], [0, 97, 115, 109]);
+    const page = await fetch(server.url + 'some/route');
+    assert.match(await page.text(), /EventSource\('\/__lasm\/events'\)/, 'SPA fallback with the reload client');
+    // A raw request path that tries to leave the root stays inside it (URL normalization).
+    const { request } = await import('node:http');
+    const body = await new Promise((resolve, reject) => request(server.url + 'x', { path: '/../../etc/passwd' }, r => { let t = ''; r.on('data', c => t += c).on('end', () => resolve(t)); }).on('error', reject).end());
+    assert.doesNotMatch(body, /root:/);
+  } finally { await server.close(); }
+});
+
+test('lasm package --target browser: checks the build against its manifest, writes _headers', async () => {
+  const { packageBrowser } = await import('../src/browser/browser-package.mjs');
+  const { brotliCompressSync, gzipSync } = await import('node:zlib');
+  const { createHash } = await import('node:crypto');
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-package-'));
+  const wasm = Buffer.from([0, 97, 115, 109, 1, 0, 0, 0]), sha256 = createHash('sha256').update(wasm).digest('hex');
+  writeFileSync(join(directory, 'app.0123456789ab.wasm'), wasm);
+  writeFileSync(join(directory, 'app.0123456789ab.wasm.br'), brotliCompressSync(wasm));
+  writeFileSync(join(directory, 'app.0123456789ab.wasm.gz'), gzipSync(wasm));
+  const manifest = { schema: 1, target: 'browser', entry: 'app.ba9876543210.js', wasm: 'app.0123456789ab.wasm', index: 'index.html', stableEntry: 'app.js',
+    transfer: { brotli: 10 }, files: { 'app.0123456789ab.wasm': { bytes: 8, sha256, brotli: 1, gzip: 1 } } };
+  writeFileSync(join(directory, 'lasm-manifest.json'), JSON.stringify(manifest));
+  assert.equal(packageBrowser({ input: directory, log: () => {} }), 0);
+  assert.match(readFileSync(join(directory, '_headers'), 'utf8'), /\/app\.0123456789ab\.wasm\n  Cache-Control: public, max-age=31536000, immutable\n  Content-Type: application\/wasm/);
+  writeFileSync(join(directory, 'app.0123456789ab.wasm'), Buffer.from([1]));
+  assert.throws(() => packageBrowser({ input: directory, log: () => {} }), /changed since lasm build/);
+  assert.equal(parseLasmArguments(['package', 'dist', '--target', 'browser']).target, 'browser');
+});

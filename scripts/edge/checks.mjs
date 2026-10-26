@@ -21,6 +21,7 @@ export const apps = {
       { path: '/asleep/20', status: 200, body: '{"sum":16}' },
       { path: '/sleep/20', status: 200, match: /^\{"sleptMs":(19|2\d|3\d|4\d)\}$/ },
       { path: '/block', status: 200, body: '{"blocked":42}' },
+      { path: '/task/20', status: 200, body: '{"task":5}' },
       { path: '/mutex', status: 200, body: '{"count":8}' },
       { path: '/date', status: 200, match: /^\{"now":"20\d\d-\d\d-\d\dT/ },
       { path: '/deep/5000', status: 200, body: '{"depth":5000}' },

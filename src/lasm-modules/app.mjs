@@ -14,12 +14,14 @@ export const port = unavailable('ports');
 export const onMessage = unavailable('messages');
 export const onUnmount = unavailable('onUnmount');
 export const report = error => console.error(error);
+export const hotState = () => undefined;
+export const onHotSave = () => {};
 
 /** One app instance. context (src/edge/edge-start.mjs): { target, root, flags,
  * hydrate, onDispose(fn), report(error) }; it also receives `app`, the
  * embedder's side (deliver, ports) that mount() returns to JavaScript. */
 export function lasmInstance(context) {
-  let handler = null;
+  let handler = null, hotSave = null;
   const inbox = [];
   const unmountHandlers = [];
   const ports = new Map();
@@ -59,6 +61,8 @@ export function lasmInstance(context) {
   });
   const app = {
     // What mount() hands to JavaScript.
+    /** The state Lean saves for a hot reload (Lasm.Web.App.onHotSave), if any. */
+    hotSave() { return hotSave ? hotSave() : undefined; },
     deliver(message) {
       if (disposed) return Promise.reject(new Error('The Lasm app is unmounted'));
       if (!handler) { return new Promise((resolve, reject) => inbox.push({ message, resolve, reject })); }
@@ -87,5 +91,8 @@ export function lasmInstance(context) {
     },
     onUnmount: fn => { unmountHandlers.push(fn); },
     report: error => (context.report ?? console.error)(error),
+    // Hot reload (@lasm/vite): the state the previous instance saved, and the saver.
+    hotState: () => context.hotState,
+    onHotSave: fn => { hotSave = fn; },
   };
 }

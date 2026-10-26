@@ -308,6 +308,22 @@ export function createPackageJson(main, { engines } = {}) {
     dependencies: { [main.name]: main.version },
   };
 }
+/** `@lasm/vite`: the Vite plugin for Lean browser apps (packages/vite), in lockstep
+ * with the CLI it runs (a peer dependency); MIT, copyright Jordan Last. */
+export const vitePackageName = '@lasm/vite';
+export const vitePackageFiles = Object.freeze(['index.mjs', 'index.d.ts', 'client.d.ts', 'README.md', 'LICENSE']);
+export function vitePackageJson(main, { engines } = {}) {
+  assert.match(main.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
+  return {
+    name: vitePackageName, version: main.version, description: 'Lean apps in Vite: import app from "./Main.lean?lasm" (Lasm, Lean compiled to WebAssembly)',
+    license: 'MIT', type: 'module', files: [...vitePackageFiles],
+    exports: { '.': { types: './index.d.ts', default: './index.mjs' }, './client': { types: './client.d.ts' } },
+    keywords: ['lean', 'lean4', 'webassembly', 'vite-plugin', 'lasm'],
+    ...(engines ? { engines } : {}),
+    repository: repository('packages/vite'),
+    peerDependencies: { vite: '>=6', [main.name]: main.version },
+  };
+}
 export const createPackageLicense = year => `MIT License
 
 Copyright (c) ${year} Jordan Last

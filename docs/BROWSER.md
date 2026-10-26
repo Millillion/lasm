@@ -1,7 +1,11 @@
 # Lean in the browser (Phase 8)
 
-Status: **design, 2026-10-26.** This document is the contract the browser work
-is built against. Sections move from *plan* to *measured* as they land.
+Status: **the platform half is in branch source and measured in CI
+(2026-10-26):** `lasm build --target browser`, the loader and mount API,
+builtin `lasm:*` modules, `Lasm.Web`, `@lasm/vite`, `lasm init --template web`
+and the browser CI. `Lasm.UI` (Html, diff, patch protocol, `html!`, SSR,
+proofs) is built against it on branch `browser-ui`. This document is the
+contract; sections are marked *measured* as they land.
 
 Goal: a whole frontend written in Lean, DOM and all, so that a full stack
 (browser, server, serverless, edge) can be written and formally verified in one
@@ -13,7 +17,7 @@ small downloads, fast start, fast updates, and a clean typed API.
 | Topic | Decision | Why |
 | --- | --- | --- |
 | Runtime | The **edge runtime** (single-threaded cooperative Lean runtime, wasm64 code lowered to 32-bit memory, pure-JS host, web-standard APIs only). | Already built and verified on V8, JSC and workerd; no threads, no `SharedArrayBuffer`, so no COOP/COEP headers are needed. |
-| Suspension | The **sync (no-JSPI) link** by default. `Async`, timers, `fetch`, promises and events work through the event pump; blocking waits (`Task.get` on unfinished work, `IO.sleep`, `Async.block`) stop with a clear message. | Safari has no JSPI; a UI thread must never block anyway. One build runs in Chrome, Edge, Firefox and Safari. `--suspend jspi` stays available. |
+| Suspension | **Sync behaviour** by default (measured: the recorded JSPI link run without JSPI; see Measured below). `Async`, timers, `fetch`, promises and events work through the event pump; blocking waits (`Task.get` on unfinished work, `IO.sleep`, `Async.block`) stop with a clear message. | Safari has no JSPI; a UI thread must never block anyway. One build runs in Chrome, Edge, Firefox and Safari. `--suspend jspi` stays available. |
 | Exceptions | Legacy Wasm EH (what the edge build emits). | Supported by every evergreen engine including Safari 15.2+. |
 | Output | `lasm build --target browser` → `dist/`: `index.html` (only if the project has none), `app.<hash>.js` (ES-module loader, a few KiB), `app.<hash>.wasm`, precompressed `.br`/`.gz` siblings, `lasm-manifest.json`. | Content hashes allow immutable caching; precompressed files serve from any static host or CDN. |
 | Loading | `WebAssembly.compileStreaming(fetch(url))` started at module evaluation, in parallel with `<link rel="modulepreload">` and `<link rel="preload" as="fetch" crossorigin>`. Fallback to `arrayBuffer` + `compile` when the server sends the wrong MIME type. | Compilation overlaps download; no blocking on the parser. |
@@ -26,7 +30,51 @@ small downloads, fast start, fast updates, and a clean typed API.
 | Full stack | `Lasm.RPC`: shared Lean API types and functions; the server mounts them on Hono/Fastify/edge fetch handlers, the browser calls them through generated typed clients over `fetch` (JSON via `ToJson`/`FromJson` derivations). Template `fullstack`. | One language, one set of types, end to end. |
 | Verification story | Ship proofs, not claims: the TodoMVC example proves invariants of `update`; `Lasm.UI` proves its diff correct against a pure DOM model (`apply (diff a b) (render a) = render b`). | The pitch is formal verification of the whole stack. |
 
+## Measured (browser CI run 40283097537, source `609d391`, 2026-10-26)
+
+[`browser.yml`](../.github/workflows/browser.yml) builds the web template
+(`lasm init --template web`), the [`Lasm.Web` platform suite](../test/browser/platform/Main.lean)
+and a Vite app, and runs them headless in pinned Playwright 1.63.0. Every check
+passed on **Chromium 153** and **Firefox 155** (`ubuntu-24.04`) and **WebKit 26.6**
+(`macos-15`, and `ubuntu-24.04`): 3 counter checks and 60 platform checks per
+engine (all `Lasm.Web` areas, clicks, typing, keys with modifiers,
+`preventDefault`, pointer offsets, form submission with `FormData`, `fetch`
+(text, JSON, bytes, headers, 404, form bodies, timeouts and aborts) to the local
+server, WebSocket echo (text and binary), canvas pixels, history, storage,
+crypto digests, the console, ports and messages, a second app on the page,
+unmount, and a blocking wait stopping its instance).
+
+| Measure | Value |
+| --- | --- |
+| Web template (counter, `Lasm.Web`), transfer | **129.1 KiB brotli** (wasm 109.9 KiB + loader 19.2 KiB), 164.9 KiB gzip, 549 KiB uncompressed |
+| Platform suite (every `Lasm.Web` module), transfer | 185.3 KiB brotli |
+| Start, module evaluated → first frame, counter, warm (HTTP-cached files) | **38 ms Chromium**, 62 ms Firefox, 45 ms WebKit macOS |
+| First build / unchanged rebuild, counter (Linux runner) | 62 s / 3.9 s |
+| Dev rebuild after editing one view expression | 11.8 s (budget 2 s: not met; the Node build stage dominates) |
+| Same source, local and CI | byte-identical `app.<hash>.wasm` and `.js` |
+
+**How the link is shared.** The browser uses the edge program linked with the
+recorded JSPI link (the same cached link as `--target workers`): its Wasm has no
+JSPI transformation, only its glue wraps one import (`lasm_edge_wait`) and two
+exports in `WebAssembly.Suspending`/`promising`. Inside the module those become
+identities when the engine has no JSPI or the loader runs without it (the
+default), so blocking waits stop the instance with a message, as a sync link
+would. `--suspend jspi` lets them suspend where the browser has JSPI. This
+replaces the planned separate sync link (which would have needed a second
+recorded link mode for under 1 KB of saving).
+
+**Size work so far.** Edge and browser links regenerate the initializer
+wrappers without call chains ([edge-initializers.mjs](../src/edge/edge-initializers.mjs)):
+the web template keeps 6 of 2,807 module initializers, and the chains of the
+skipped ones were 460 KB of pre-optimization code. Counter: 167.3 → 129.1 KiB
+brotli. The loader drops comment lines and indentation of Lasm's own modules.
+Programs link only the `Lasm.*` library modules they import.
+
 ## Budgets (measured in CI, recorded per release)
+
+`scripts/browser/evidence.mjs` checks them on every run: the counter transfer
+and the Chromium start are enforced; the rebuild time is recorded.
+
 
 | Metric | Budget |
 | --- | --- |
@@ -113,6 +161,73 @@ changed it asks for a frame, and on the next `requestAnimationFrame` one call
 returns the patch. Hydration (`mount(el, { hydrate: true })`) applies the
 first frame by adopting the existing children in order (comment nodes are
 dropped; a node whose kind, tag or namespace differs is replaced).
+
+## Loader and mount API (measured)
+
+```js
+import { mount, mountAll, preload, appOf, name } from './app.<hash>.js'; // or './app.js'
+const app = await mount(document.querySelector('#app'), {
+  flags: { user: 'ada' },     // Lasm.Web.App.flags
+  hydrate: false,             // Lasm.Web.App.hydrating (adopt server-rendered DOM)
+  jspi: false,                // default from --suspend
+  onError: error => {},       // the instance stopped (a trap, a blocking wait)
+});
+app.ports.saved.subscribe(value => {});   // Lean: (← App.port "saved").send v
+await app.ports.load.send(42);            // Lean: (← App.port "load").subscribe f
+await app.send({ kind: 'refresh' });      // Lean: App.onMessage f
+app.unmount();                            // Lean: App.onUnmount; listeners, timers, sockets removed
+```
+
+- Evaluating the module starts the Wasm download and compilation
+  (`compileStreaming` when the server sends `application/wasm`, else buffered).
+- `<div data-lasm-app>` (empty, or the app's name) is mounted automatically, with
+  `data-lasm-flags` (JSON) and `data-lasm-hydrate`; the element then receives a
+  `lasm:mounted` or `lasm:error` event.
+- Each mount is its own Lean instance (its own memory), sharing the compiled
+  module: several apps on one page are independent.
+- User Timing marks: `lasm:evaluated`, `lasm:compiled`, `lasm:mounted`.
+
+## Lasm.Web (measured)
+
+`import Lasm.Web` ([library/Lasm/Web/](../library/Lasm/Web/)). Handles are typed
+(`Element extends Node extends EventTarget`, `Document`, `Window`, `Event`,
+`Response`, `WebSocket`, …); every operation is one call into `lasm:web`.
+
+| Module | Contents |
+| --- | --- |
+| `Dom` | `document`, `window`, `createElement`/`NS`, text nodes, fragments, `getElementById`, `querySelector(All)`, append/insert/remove/replace, text, attributes, `data-*`, classes, styles, `innerHTML`, `value`/`checked`, any property (`prop`, `setProp`), focus, `rect` |
+| `Events` | `target.on "click" fun e => …` (synchronous: `preventDefault` works), options (capture, passive, once), `Listener.remove`, `Event.info` (key, code, modifiers, pointer, wheel, `target.value`/`checked` in one call), custom events, `dispatchEvent` |
+| `Timers` | `setTimeout`, `setInterval`, `requestAnimationFrame`, `queueMicrotask`, `nextFrame : Async Float`, `now` |
+| `Fetch` | `fetch url { method, headers, body := .json d / .text / .bytes / .form / .params, signal }`, `Response.info/text/json/bytes/header`, `fetchText`, `fetchJson`, `AbortController`, `AbortSignal.timeout` |
+| `Url` | `Url.parse` (with a base), `SearchParams`, `encodeURIComponent`, `FormData` (from a form, files) |
+| `Storage` | `localStorage`, `sessionStorage`: get, set, remove, clear, keys |
+| `History` | `location`, `Location.assign/replace/reload`, `History.pushState/replaceState/back/go/state`, `onPopState`, `onHashChange` |
+| `WebSocket` | `connect`, `send`, `sendBytes`, `close`, `onOpen/onMessage/onClose/onError`, `readyState` |
+| `Crypto` | `randomBytes`, `randomUUID`, `digest`, `sha256`, `hex` |
+| `Console` | `Console.log/info/warn/error/debug` with JavaScript values |
+| `Canvas` | `Element.context2d`, batched `Context2D.draw #[.fillStyle …, .fillRect …]`, `measureText`, `imageData`, `putImageData` |
+| `App` | `root`, `flags`, `hydrating`, `port`, `onMessage`, `onUnmount`, `hotState`/`onHotSave` (Vite hot reload) |
+
+`Lasm.Web.background (work : Async Unit)` starts `Async` work from a handler.
+`IO.println` writes to the console; `IO.getRandomBytes` uses `crypto`.
+
+## Vite (`@lasm/vite`, measured: `vite build` in CI)
+
+```js
+// vite.config.js
+import lasm from '@lasm/vite';
+export default { plugins: [lasm()] };
+// main.js
+import app from './Main.lean?lasm';
+await app.mount(document.getElementById('app'));
+```
+
+`Main.lean?lasm` is built with `lasm build --target browser --bundler` (dev
+builds under `vite`, release under `vite build`). Vite emits the Wasm as a hashed
+asset and resolves npm modules the bindings name. Saving a `.lean` file rebuilds
+and remounts the app in place, passing it the state it saved
+(`App.onHotSave`/`App.hotState`). The package is in the npm release set
+(`scripts/npm-dist/packages.mjs`).
 
 ## Testing
 

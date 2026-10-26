@@ -1,13 +1,14 @@
 import { parseInitArguments } from './init.mjs';
 import { parsePackageArguments, packageTargets } from './package.mjs';
 import { jsRuntime } from './js-runtime.mjs';
+import { parseDevArguments } from './browser/browser-dev.mjs';
 
 // `lasm build --target`: `node` writes dist/ only; a function platform also
 // packages it (src/package.mjs). Lasm builds for the platform; it never
 // installs or starts the platform's own tools.
 // Edge targets (experimental, docs/EDGE.md) relink for edge isolates; the
 // list equals src/edge/edge-build.mjs edgeTargets (test/edge.test.mjs).
-export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy'];
+export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy', 'supabase-edge'];
 // The browser (docs/BROWSER.md): the edge program as a static web app.
 export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, 'browser'];
 // --suspend (browser): none (the default: blocking waits stop the instance) or
@@ -15,8 +16,9 @@ export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuil
 export const suspendModes = ['none', 'jspi'];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|browser] [--suspend none|jspi] [--dev]
-       lasm init <directory> [--template plain|express|hono|std-http] [--deploy …]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|browser] [--suspend none|jspi] [--bundler] [--dev]
+       lasm dev [Main.lean] --target browser [--release] [--no-watch] [--port 5173]
+       lasm init <directory> [--template plain|express|hono|std-http|web] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
        lasm cache repair
@@ -32,6 +34,7 @@ export function parseLasmArguments(argv) {
   const tokens = [...argv];
   if (tokens[0] === 'init') return parseInitArguments(tokens.slice(1));
   if (tokens[0] === 'package') return parsePackageArguments(tokens.slice(1));
+  if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
   if (tokens[0] === 'cache') {
     if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
     if (tokens.length !== 2 || tokens[1] !== 'repair') throw new Error('Usage: lasm cache repair');
@@ -54,6 +57,8 @@ export function parseLasmArguments(argv) {
       result.profile = profile; continue;
     }
     if (token === '--allow-dev') { result.allowDev = true; continue; }
+    // --bundler (browser): the output is input to a bundler (Vite, esbuild, webpack): npm imports stay imports.
+    if (token === '--bundler') { result.bundler = true; continue; }
     const target = /^--target(?:=(.*))?$/.exec(token);
     if (target) {
       if (result.command !== 'build') throw new Error('--target is available only with lasm build');
@@ -96,6 +101,7 @@ export function parseLasmArguments(argv) {
   if (result.allowDev && !(result.command === 'build' && result.target && result.target !== 'node'))
     throw new Error('--allow-dev applies to lasm build --target <platform> and lasm package');
   if (result.suspend !== undefined && result.target !== 'browser') throw new Error('--suspend applies to lasm build --target browser');
+  if (result.bundler && result.target !== 'browser') throw new Error('--bundler applies to lasm build --target browser');
   if (result.command === 'build') {
     result.output ??= 'dist';
     // The default target is the runtime the CLI runs on: node, bun or deno.

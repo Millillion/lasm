@@ -14,6 +14,11 @@ on:
         default: false
   # workers.yml builds the runtime first, then tests with it.
   workflow_call:
+    inputs:
+      allow-main:
+        description: Run on main too (release-checks.yml, through browser.yml)
+        type: boolean
+        default: false
 permissions:
   # Read access to the draft release that holds the pinned runtime handoff
   # (drafts are visible only with write access). Nothing is written.
@@ -23,7 +28,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   runtime:
-    if: github.ref != 'refs/heads/main'
+    if: github.ref != 'refs/heads/main' || inputs.allow-main
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     env:

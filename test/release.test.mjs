@@ -88,7 +88,7 @@ test('publication skips identical versions and never republishes other bytes', (
 
 test('bootstrap: placeholders, trust and deprecation only where missing', async () => {
   const names = (await releasePackages()).map(p => p.name);
-  assert.ok(names.includes('@lasm/cli') && names.at(-1) === '@lasm/create' && names.some(n => n.startsWith('@lasm/lean-c-')));
+  assert.ok(names.includes('@lasm/cli') && names.at(-2) === '@lasm/create' && names.at(-1) === '@lasm/vite' && names.some(n => n.startsWith('@lasm/lean-c-')));
   assert.ok(!names.some(n => n.includes('/git-')));
   const registry = 'https://registry.npmjs.org/';
   const fresh = packageSteps({ name: '@lasm/cli', exists: false, trust: 'missing' }, { registry });

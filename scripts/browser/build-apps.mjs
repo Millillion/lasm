@@ -49,6 +49,22 @@ for (const [name, project] of projects) {
   record.apps[name].unchangedSeconds = build(project, join(work, name + '-again'));
 }
 
+// The platform suite built with --suspend jspi: blocking waits suspend where the browser has JSPI.
+record.apps['platform-jspi'] = { buildSeconds: build(join(work, 'platform'), join(out, 'platform-jspi'), ['--suspend', 'jspi']) };
+
+// @lasm/vite: the template's Main.lean imported by a Vite app (test/browser/vite), built with pinned Vite.
+const viteApp = join(work, 'vite');
+cpSync(join(root, 'test/browser/vite'), viteApp, { recursive: true });
+for (const file of ['Main.lean', 'App.lean', 'lean-toolchain']) cpSync(join(counter, file), join(viteApp, file));
+execFileSync('npm', ['install', '--no-audit', '--no-fund', '--save-dev', 'vite@8.3.5', `@lasm/vite@file:${join(root, 'packages/vite')}`],
+  { cwd: viteApp, stdio: 'inherit', env, shell: process.platform === 'win32' });
+{
+  const started = Date.now();
+  run([...bounded, `LASM_CLI=${join(root, 'bin/lasm.mjs')}`, process.execPath, join(viteApp, 'node_modules/vite/bin/vite.js'), 'build', '--outDir', join(out, 'vite'), '--emptyOutDir'], { cwd: viteApp });
+  writeFileSync(join(out, 'vite', 'lasm-manifest.json'), JSON.stringify({ schema: 1, generator: 'vite', target: 'browser' }) + '\n');
+  record.apps.vite = { buildSeconds: (Date.now() - started) / 1000, files: {} };
+}
+
 // Dev rebuild after editing one view function: a dev build, an edit, a dev build.
 const dev = join(work, 'counter-dev');
 cpSync(counter, dev, { recursive: true });

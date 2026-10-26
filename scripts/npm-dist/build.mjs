@@ -33,7 +33,7 @@ import { hashFile } from '../../src/managed-artifacts.mjs';
 import { downloadArtifact } from '../../src/managed-download.mjs';
 import { findNpm, archiveFileName } from '../../src/npm-artifacts.mjs';
 import { toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, defaultScope, maximumPackageBytes, noticeDirectory,
-  createPackageJson, createPackageLicense, cTierExtraNotices, cTierFamilyNotices, noticeSections, cliLicense, slug } from './packages.mjs';
+  createPackageJson, createPackageLicense, vitePackageJson, vitePackageFiles, cTierExtraNotices, cTierFamilyNotices, noticeSections, cliLicense, slug } from './packages.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values: args } = parseArgs({ options: {
@@ -186,6 +186,12 @@ if (args.step === 'package') {
   console.log(`packed ${pkg.name}@${pkg.version} ${packed.size} bytes ${packed.integrity}`);
 }
 
+/** README.md for npm: newlines normalized, relative links to github.com at tag v<version>. */
+function publishedReadme(text, version) {
+  return text.replaceAll('\r\n', '\n').replace(/\]\(((?!https?:|#|mailto:)[^)]+)\)/g,
+    (_, path) => `](https://github.com/Millillion/lasm/blob/v${version}/${path})`);
+}
+
 if (args.step === 'main') {
   const packed = {};
   for (const pkg of plan.packages) packed[pkg.name] = await json(join(out, 'packed', pkg.name.replace('/', '__') + '.json'));
@@ -222,6 +228,9 @@ if (args.step === 'main') {
   let mainMeta = plan.main;
   if (plan.main.license) {
     await copyFile(join(root, 'LICENSE'), join(main, 'LICENSE'));
+    // The published README is this checkout's (npm shows it), not the candidate's
+    // "install this tarball" text; repository links point at the release tag.
+    await writeFile(join(main, 'README.md'), publishedReadme(await readFile(join(root, 'README.md'), 'utf8'), plan.main.version));
     const licenses = join(main, 'licenses'), headings = [];
     const sections = async (file, prefix) => {
       for (const [heading, text] of noticeSections(await readFile(file, 'utf8'))) {
@@ -262,6 +271,15 @@ if (args.step === 'main') {
   const createMeta = createPackageJson(plan.main, { engines: basePackage.engines });
   await writeFile(join(create, 'package.json'), JSON.stringify(createMeta, null, 2) + '\n');
   const createPacked = await packTwice(create, createMeta.name);
+  // @lasm/vite, in lockstep with the CLI (packages/vite).
+  const vite = join(out, 'staging', 'vite');
+  await rm(vite, { recursive: true, force: true });
+  await mkdir(vite, { recursive: true });
+  for (const name of vitePackageFiles.filter(name => name !== 'LICENSE')) await copyFile(join(root, 'packages/vite', name), join(vite, name));
+  await writeFile(join(vite, 'LICENSE'), createPackageLicense(2026));
+  const viteMeta = vitePackageJson(plan.main, { engines: basePackage.engines });
+  await writeFile(join(vite, 'package.json'), JSON.stringify(viteMeta, null, 2) + '\n');
+  const vitePacked = await packTwice(vite, viteMeta.name);
   await rm(directory, { recursive: true });
   await rm(join(out, 'staging'), { recursive: true, force: true });
   const record = {
@@ -270,6 +288,7 @@ if (args.step === 'main') {
     base: { file: basename(plan.base.file), sha256: plan.base.sha256, version: plan.base.version }, overlay,
     main: { ...plan.main, license: mainMeta.license, ...mainPacked },
     create: { name: createMeta.name, version: createMeta.version, license: createMeta.license, ...createPacked },
+    vite: { name: viteMeta.name, version: viteMeta.version, license: viteMeta.license, ...vitePacked },
     packages: plan.packages.map(pkg => ({ name: pkg.name, version: pkg.version, install: pkg.install, platform: pkg.platform,
       artifact: { name: pkg.artifact.name, sha256: pkg.artifact.sha256, bytes: pkg.artifact.bytes }, ...packed[pkg.name] })),
   };

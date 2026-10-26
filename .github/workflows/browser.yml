@@ -55,6 +55,8 @@ env:
 jobs:
   runtime:
     uses: ./.github/workflows/edge-runtime.yml
+    with:
+      allow-main: true
   # The native host pieces the Node build stage needs (as in workers.yml).
   native:
     runs-on: ubuntu-24.04
@@ -133,6 +135,21 @@ jobs:
             uicounter=examples/ui/counter todomvc=examples/ui/todomvc bench=examples/ui/bench demo=examples/ui/demo
           # The benchmark's baseline (vanilla JavaScript, no build).
           cp -r bench/ui/vanilla .work/browser-apps/vanilla
+      - name: Playwright's Chromium, cached per version (for vite dev)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ env.PLAYWRIGHT }}-chromium-ubuntu-24.04
+      - name: Pinned Playwright and Chromium
+        timeout-minutes: 15
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
+          node .work/pw/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: '@lasm/vite in development: edit Main.lean, the app is rebuilt and remounted in place'
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: node scripts/browser/vite-dev-check.mjs .work/browser-work/vite .work/browser-apps/vite-dev.json --playwright .work/pw
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: browser-apps
@@ -168,8 +185,15 @@ jobs:
         with:
           node-version: 26.12.1
           package-manager-cache: false
+      - name: Playwright's browser builds, cached per version
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.os == 'macOS' && '~/Library/Caches/ms-playwright' || '~/.cache/ms-playwright' }}
+          key: playwright-${{ env.PLAYWRIGHT }}-${{ matrix.browser }}-${{ matrix.runner }}
       - name: Pinned Playwright and its ${{ matrix.browser }} build
         if: steps.gate.outputs.run == 'true'
+        timeout-minutes: 15
         shell: bash
         run: |
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"

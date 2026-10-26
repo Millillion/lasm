@@ -77,8 +77,8 @@ async function counter(server, name, manifest) {
     for (let i = 0; i < 3; i++) await plus.click();
     await minus.click();
     // Lasm.UI renders on the next animation frame.
-    await page.waitForFunction(() => document.querySelector('output')?.textContent === '2', null, { timeout: 5000 }).catch(() => {});
-    expect(name, 'counter.clicks', (await page.textContent('output')) === '2', await page.textContent('output'));
+    const counted = await page.waitForFunction(() => document.querySelector('output')?.textContent === '2', null, { timeout: 5_000 }).then(() => true, () => false);
+    expect(name, 'counter.clicks', counted, await page.textContent('output'));
     const cold = await page.waitForFunction(() => window.__lasm.mounts?.[0], null, { timeout: 10_000 }).then(h => h.jsonValue());
     report.apps[name].sizes = await resourceSizes(page);
     // Warm start: the same page again, with the content-hashed files in the HTTP cache.
@@ -157,9 +157,16 @@ async function platform(server, name, manifest) {
     await page.click('#app #click-me');
     expect(name, 'app.first-unaffected', (await text('#click-count')) === '3', await text('#click-count'));
     await page.click('#app #block');
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(200);
     const stopped = await page.evaluate(async entry => (await import(entry)).appOf(document.getElementById('app')).stopped, entry);
-    expect(name, 'app.blocking-wait-stops', stopped && consoleLines.some(l => l.includes('the Lean instance stopped') && l.includes('cannot suspend')),
+    // --suspend jspi in a browser with JSPI: the wait suspends and the app goes on.
+    const suspends = manifest.suspend === 'jspi' && await page.evaluate(() => typeof WebAssembly.Suspending === 'function');
+    report.apps[name].jspi = suspends;
+    if (suspends) {
+      await page.click('#app #click-me');
+      expect(name, 'app.blocking-wait-suspends', !stopped && (await text('#slept')) === 'slept' && (await text('#click-count')) === '4',
+        `${stopped} ${await text('#slept')} ${await text('#click-count')}`);
+    } else expect(name, 'app.blocking-wait-stops', stopped && consoleLines.some(l => l.includes('the Lean instance stopped') && l.includes('cannot suspend')),
       consoleLines.filter(l => l.includes('stopped')).join(' | '));
     report.apps[name].start = await page.evaluate(() => window.__lasm.mounts);
   } finally { report.apps[name].console = consoleLines.slice(-80); await context.close(); }
@@ -183,7 +190,7 @@ try {
     const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'));
     report.apps[name] = { transfer: manifest.transfer, entry: manifest.entry, wasm: manifest.wasm };
     const ui = uiChecks[name];
-    const run = name === 'counter' ? counter : name === 'platform' ? platform
+    const run = name === 'counter' ? counter : name === 'platform' || name === 'platform-jspi' ? platform
       : ui ? (s, n, m) => ui({ server: s, name: n, manifest: m, openPage, expect, report }) : generic;
     try { await run(server, name, manifest); }
     catch (error) { expect(name, 'runner', false, error.stack ?? error.message); }
