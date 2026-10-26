@@ -69,11 +69,56 @@ files (Fastly gives an instance no directories), and `IO.getEnv` sees
 Fastly's environment (`FASTLY_HOSTNAME`, `FASTLY_SERVICE_VERSION`, …).
 `Std.Async` timers and `IO.sleep` wait inside the instance.
 
+## Backend requests
+
+`Lasm.Fetch.fetch` (and `get`, `post`) sends backend requests
+([FETCH.md](../FETCH.md#outbound-requests)):
+
+- `fetch req { backend := some "origin" }` uses a backend the service
+  defines. For Viceroy, define it in `fastly.toml`:
+
+  ```toml
+  [local_server.backends.origin]
+    url = "https://api.example.com"
+  ```
+
+- Without `backend`, Lasm registers a dynamic backend for the URL's scheme,
+  host and port (TLS with SNI and the certificate host for `https`). Fastly
+  enables dynamic backends per service; Viceroy always allows them.
+
+Requests are sent with `send_async` and completed by the event loop
+(`fastly_async_io.select`), so several can be in flight at once. Responses
+are read completely; redirects are not followed.
+
+## Stores
+
+`import Lasm.Fastly` reads Config Stores and Secret Stores and reads, writes
+and deletes KV Store keys ([FETCH.md](../FETCH.md#fastlys-stores)). Viceroy
+reads local stores from `fastly.toml`:
+
+```toml
+[local_server.config_stores.settings]
+  format = "inline-toml"
+[local_server.config_stores.settings.contents]
+  color = "blue"
+
+[[local_server.secret_stores.secrets]]
+  key = "token"
+  data = "s3cret"
+
+[[local_server.kv_stores.kv]]
+  key = "greeting"
+  data = "hello kv"
+```
+
+On Fastly, link the stores to the service (`fastly config-store create`,
+`fastly kv-store create`, `fastly resource-link create`, …).
+
 ## Limits and what is not bound
 
 - Fastly Compute's resource limits (memory, CPU time, package size) apply; a
   Lean module is about 0.8 MiB.
-- Only the downstream request and response are bound. Back-end requests,
-  KV/config/secret stores, the cache, geolocation and the other Fastly APIs
-  have no Lean bindings yet.
-- Responses are sent whole (not streamed).
+- Bound: the downstream request and response (streamed or whole), backend
+  requests, and Config, Secret and KV Stores. Not yet: the cache APIs,
+  geolocation, device detection, logging endpoints, rate limiting and KV
+  metadata, generations and listing.

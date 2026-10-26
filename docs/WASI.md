@@ -1,25 +1,28 @@
-# WASI and Fastly Compute
+# WASI, wasi-http and Fastly Compute
 
 `lasm build Main.lean --target wasi` turns a Lean program into one standard
 WebAssembly System Interface module (`wasi_snapshot_preview1`): no
 JavaScript, no host program, nothing to install beside the engine.
-`--target fastly` builds the same module with Fastly Compute's host calls, in
-the layout `fastly compute serve|deploy` uses.
+`--target wasi-http` builds a wasi:http/proxy component for `wasmtime serve`,
+Spin and other wasi-http hosts, and `--target fastly` a module with Fastly
+Compute's host calls, in the layout `fastly compute serve|deploy` uses.
 
-| | `--target wasi` | `--target fastly` |
-| --- | --- | --- |
-| Output | `wasi/main.wasm` (+ `build-info.json`, `THIRD_PARTY_NOTICES.txt`) | `bin/main.wasm`, `pkg/<name>.tar.gz`; `fastly.toml` when the project has none |
-| Runs on | wasmtime, wasmer, Node's `node:wasi`, Spin (wagi executor), any preview 1 host | Fastly Compute; Viceroy (`fastly compute serve`) locally |
-| `main` | A command: arguments, environment, standard streams, exit status | Runs once per request |
-| HTTP | [`Lasm.Fetch.serve`](FETCH.md) answers one CGI request per run | [`Lasm.Fetch.serve`](FETCH.md) answers the instance's request |
-| Imports | `wasi_snapshot_preview1` only | `wasi_snapshot_preview1` and `fastly_abi`, `fastly_http_req`, `fastly_http_body`, `fastly_http_resp` |
+| | `--target wasi` | `--target wasi-http` | `--target fastly` |
+| --- | --- | --- | --- |
+| Output | `wasi/main.wasm` (+ `build-info.json`, `THIRD_PARTY_NOTICES.txt`) | `wasi-http/main.wasm`, a component | `bin/main.wasm`, `pkg/<name>.tar.gz`; `fastly.toml` when the project has none |
+| Runs on | wasmtime, wasmer, Node's `node:wasi`, any preview 1 host | `wasmtime serve`, Spin's HTTP trigger, any wasi:http/proxy@0.2 host | Fastly Compute; Viceroy (`fastly compute serve`) locally |
+| `main` | A command: arguments, environment, standard streams, exit status | Runs once per request | Runs once per request |
+| HTTP served | [`Lasm.Fetch.serve`](FETCH.md): one CGI request per run | wasi:http/incoming-handler | Fastly's downstream request |
+| HTTP sent ([`fetch`](FETCH.md#outbound-requests)) | Not available (no sockets) | wasi:http/outgoing-handler | Backend requests |
+| Imports | `wasi_snapshot_preview1` | wasi:http, wasi:io, wasi:clocks, wasi:random, wasi:cli 0.2.12 | `wasi_snapshot_preview1` and Fastly's `fastly_*` modules |
 
 CI ([`wasi.yml`](../.github/workflows/wasi.yml),
 [`scripts/wasi/wasi-ci.mjs`](../scripts/wasi/wasi-ci.mjs)) builds
 [`examples/wasi-cli`](../examples/wasi-cli/Main.lean) and
 [`examples/fetch`](../examples/fetch/Main.lean) from source on every change
-and checks them on pinned wasmtime 49.0.4, wasmer 7.4.2, Node 26.12.1's
-`node:wasi`, Spin 4.2.2 and Viceroy 0.21.1. The command-line program's output
+and checks them on pinned wasmtime 49.0.4 (`run` and `serve`), wasmer 7.4.2,
+Node 26.12.1's `node:wasi`, Spin 4.2.2 (HTTP trigger and wagi) and Viceroy
+0.21.1. The command-line program's output
 and exit status must equal native Lean's (`lean --run`) on every engine.
 
 ## Quick start
@@ -43,8 +46,16 @@ fastly compute serve                        # Viceroy on http://127.0.0.1:7676
 fastly compute deploy                       # needs a Fastly account
 ```
 
-The [Fastly guide](deploy/fastly.md) has the details. With `--deploy spin`,
-`spin up` serves the WASI build through Spin's wagi executor.
+The [Fastly guide](deploy/fastly.md) has the details. A wasi-http component
+for `wasmtime serve` or Spin:
+
+```sh
+npx lasm init my-service --template fetch --deploy spin
+cd my-service && npm install
+npm run build:wasi-http                     # wasi-http/main.wasm
+wasmtime serve wasi-http/main.wasm          # http://0.0.0.0:8080
+spin up                                     # spin.toml (HTTP trigger), http://127.0.0.1:3000
+```
 
 Node's `node:wasi` runs the module with a few lines:
 
@@ -135,6 +146,32 @@ Lean ─▶ C ─▶ wasm64 objects (the Node build, cached) ──┐
 - **Cache.** The linked module is cached beside the Node build, per target; an
   unchanged build relinks nothing.
 
+### The wasi-http component
+
+`--target wasi-http` links the same program with
+[`lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c) instead of the CGI glue:
+the core module exports wasi:http/incoming-handler@0.2.12's `handle` (which
+runs `main` for the request) and `cabi_realloc`, and imports wasi:http's
+`types` and `outgoing-handler`, `wasi:io` and the monotonic clock directly,
+with hand-written canonical ABI bindings (wit-bindgen's C uses native
+pointers, which the wasm64 code cannot). libc's preview 1 calls go through
+Wasmtime's `wasi_snapshot_preview1.proxy.wasm` adapter.
+
+Turning a core module into a component is normally `wasm-tools component
+new`. Every Lasm program's core module has the same imports and exports, so
+the component around it is the same for every program: Lasm ships it as a
+38 KB template ([`src/wasi/component/`](../src/wasi/component/), made by
+[`make-component-template.mjs`](../scripts/wasi/make-component-template.mjs)
+with pinned wasm-tools 1.262.0 and the adapter pinned by SHA-256) and splices
+the program's module into it. No Rust tool runs at build time. CI rebuilds
+the template and requires the build's component to equal wasm-tools' own
+output byte for byte.
+
+One instance serves one request (as `wasmtime serve` and Spin run it): the
+Lean runtime starts, `main` runs, and `serve` answers through the response
+outparam. The proxy world has no environment, arguments or files, so
+`IO.getEnv` sees nothing and file operations fail.
+
 The decisions and their alternatives are rows in [DECISIONS.md](DECISIONS.md).
 
 ## Measurements
@@ -187,9 +224,10 @@ version"; it is the executor for preview 1 modules today.
 
 ## Not done
 
-- **wasi-http and the component model** (`wasmtime serve`, Spin's native
-  HTTP trigger, wasmCloud): they need a component built from WIT bindings.
-  `Lasm.Fetch` serves Spin through the wagi executor instead.
-- **Fastly back-end requests, KV stores and other Fastly APIs**: only the
-  downstream request and response are bound.
-- **WASI preview 2 sockets**: preview 1 has none.
+- **A wasi-http component with `wasi:cli` imports** (environment,
+  arguments, files through `wasi:filesystem`): the component targets the
+  proxy world, which has none.
+- **Fastly APIs beyond requests and stores**: cache, geolocation, device
+  detection, logging endpoints, rate limiting.
+- **Sockets in `--target wasi`**: preview 1 has none; `--target wasi-http`
+  sends HTTP requests instead.
