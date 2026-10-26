@@ -93,12 +93,29 @@ void lasm_wasi_complete(const uint8_t header[24], bool failed, const void *data,
 void lasm_wasi_complete_error(const uint8_t header[24], uint64_t kind, uint64_t code, const char *message);
 extern bool lasm_wasi_stdout_to_stderr;
 
-/* The canonical ABI's allocator: lists the host returns land here. */
+/* The canonical ABI's allocator: lists the host returns land here, and the
+   preview 1 adapter allocates its state and stack with it on its first call
+   (from libc's static constructors). It must not call malloc then: mimalloc's
+   initialization reads the clock through the adapter, which is not yet set
+   up. So allocations come from a static arena first, and from malloc once it
+   is used up. */
+static _Alignas(16) uint8_t cabi_arena[256 * 1024];
+static size_t cabi_used;
+static bool in_arena(const void *p) { return (const uint8_t *)p >= cabi_arena && (const uint8_t *)p < cabi_arena + sizeof(cabi_arena); }
+static void cabi_free(void *p) { if (p && !in_arena(p)) free(p); }
 __attribute__((export_name("cabi_realloc"))) uint32_t cabi_realloc(uint32_t pointer, uint32_t old_size, uint32_t align, uint32_t size) {
-    (void)old_size;
     if (!size) return align;
-    void *result = realloc((void *)(uintptr_t)pointer, size);
-    if (!result) abort();
+    void *old = (void *)(uintptr_t)pointer;
+    if (old && !in_arena(old)) {
+        void *result = realloc(old, size);
+        if (!result) abort();
+        return P(result);
+    }
+    size_t a = align < 16 ? 16 : align, at = (cabi_used + a - 1) & ~(a - 1);
+    void *result;
+    if (at + size <= sizeof(cabi_arena)) { result = cabi_arena + at; cabi_used = at + size; }
+    else { result = aligned_alloc(a, (size + a - 1) & ~(a - 1)); if (!result) abort(); }
+    if (old && old_size) memcpy(result, old, old_size < size ? old_size : size);
     return P(result);
 }
 
@@ -142,7 +159,7 @@ static lean_object *string_at(const uint8_t *area, size_t offset) {
     const char *text = at32(u32_at(area + offset));
     uint32_t length = u32_at(area + offset + 4);
     lean_object *s = lean_mk_string_from_bytes(text, length);
-    free((void *)text);
+    cabi_free((void *)text);
     return s;
 }
 
@@ -154,7 +171,7 @@ static bool read_stream(uint32_t stream, growable *out) {
         if (area[0] == 0) {
             void *data = at32(u32_at(area + 4));
             grow_put(out, data, u32_at(area + 8));
-            free(data);
+            cabi_free(data);
             continue;
         }
         bool closed = area[4] == 1;
@@ -200,7 +217,7 @@ static lean_object *headers_of(uint32_t fields) {
         lean_object *name = string_at(e, 0), *value = string_at(e, 8);
         headers = lean_array_push(headers, pair(name, value));
     }
-    free(entries);
+    cabi_free(entries);
     h_drop_fields(fields);
     return headers;
 }
@@ -232,13 +249,13 @@ LEAN_EXPORT lean_obj_res lasm_fetch_take_request(void) {
     h_request_scheme(request, P(area));
     const char *scheme = "http";
     if (area[0] && area[4] == 1) scheme = "https";
-    if (area[0] && area[4] == 2) { free(at32(u32_at(area + 8))); }
+    if (area[0] && area[4] == 2) { cabi_free(at32(u32_at(area + 8))); }
     grow_put(&url, scheme, strlen(scheme)); grow_put(&url, "://", 3);
     h_request_authority(request, P(area));
-    if (area[0]) { void *p = at32(u32_at(area + 4)); grow_put(&url, p, u32_at(area + 8)); free(p); }
+    if (area[0]) { void *p = at32(u32_at(area + 4)); grow_put(&url, p, u32_at(area + 8)); cabi_free(p); }
     else grow_put(&url, "localhost", 9);
     h_request_path(request, P(area));
-    if (area[0]) { void *p = at32(u32_at(area + 4)); grow_put(&url, p, u32_at(area + 8)); free(p); }
+    if (area[0]) { void *p = at32(u32_at(area + 4)); grow_put(&url, p, u32_at(area + 8)); cabi_free(p); }
     else grow_put(&url, "/", 1);
     lean_object *headers = headers_of(h_request_headers(request));
     growable body = { 0 };
@@ -372,7 +389,7 @@ void lasm_wasi_io_wait(uint64_t timeout_ns, bool bounded) {
     if (bounded) list[n++] = timer = c_subscribe_duration((int64_t)timeout_ns);
     _Alignas(8) uint8_t area[8];
     p_poll(P(list), (uint32_t)n, P(area));
-    free(at32(u32_at(area)));
+    cabi_free(at32(u32_at(area)));
     if (timer) p_drop(timer);
     free(list);
     lasm_wasi_io_poll();
