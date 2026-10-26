@@ -484,9 +484,13 @@ signatures` in a project verifies it. Details: [RELEASING.md](docs/RELEASING.md)
 
 ## Licenses
 
-Lasm's own source is under the [MIT License](LICENSE) (copyright Jordan Last);
-`@lasm/create` is MIT, and `@lasm/cli`'s `license` field is an SPDX expression of
-Lasm's MIT and every component it bundles, with their texts in `licenses/`. The
+Lasm's own source is under the [MIT License](LICENSE) (copyright Jordan Last).
+The starter code — everything `lasm init` and `npm create @lasm` put in a new
+project, `templates/`, `examples/` and the code samples in this README and
+`docs/` — is also under [MIT No Attribution](LICENSE-MIT-0) (MIT-0), in every
+version: it is yours, no attribution needed. `@lasm/create` is MIT, and
+`@lasm/cli`'s `license` field is an SPDX expression of Lasm's MIT, MIT-0 and
+every component it bundles, with their texts in `licenses/`. The
 [license audit](docs/LICENSE_AUDIT.md) lists every distributed component, its
 license and how each obligation is met.
 

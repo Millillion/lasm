@@ -10,6 +10,16 @@ Lasm puts no licence on your program. Your Lean code, C code and npm
 dependencies keep their own licences, and you can ship the result under any
 licence you choose, open or closed.
 
+**Starter code is yours, no attribution needed.** Everything `lasm init` and
+`npm create @lasm` write into a new project (the template's Lean files,
+`package.json`, `README.md`, the lakefile and the deployment files), Lasm's
+`examples/`, and the code samples in Lasm's README and docs are licensed under
+MIT No Attribution (MIT-0, [LICENSE-MIT-0](../LICENSE-MIT-0)) as well as MIT.
+Under MIT-0 you need not keep any notice: edit, relicense or close the code as
+you like. This applies to projects made with every Lasm version, 0.1.0 onward.
+`lasm init` writes no licence file, header or `license` field into your project;
+choosing one is up to you.
+
 ## What Lasm adds to your output
 
 A build links your code with a small set of open-source components. All of them

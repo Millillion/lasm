@@ -580,7 +580,29 @@ or MIT-0 relicensing; the maintainer decides that separately). Code of Lasm that
 ends up in users' outputs (runtime glue, host, loader, `lasm:*` modules, Lean
 library) is therefore MIT, and its notice is satisfied automatically: Lasm's MIT
 text is the first section of every output's notices (file, embedded section) and
-the banner names it. Open for the maintainer: `lasm init` copies template Lean
-files (Lasm's, MIT) into users' source trees; their outputs carry Lasm's notice,
-but a user who publishes the generated *source* would, strictly, keep Lasm's MIT
-notice too. A permissive licence for the templates (MIT-0) would remove that.
+the banner names it.
+
+**Starter code under MIT-0 (closed, 0.3.1; maintainer approval of 2026-10-26).**
+`lasm init` copies template Lean files and writes project files into users'
+source trees; under MIT alone, a user publishing that *source* would strictly
+have to keep Lasm's notice. Lasm's copyright holder therefore also licenses, under
+MIT No Attribution (SPDX `MIT-0`, OSI-approved), `templates/`, every file and file
+content `lasm init`/`npm create @lasm` write into a project, `examples/`, and the
+code samples in the README and `docs/` — in every version, 0.1.0 onward, so the
+grant covers projects already generated (the holder of all rights can grant an
+additional licence at any time; MIT recipients lose nothing). The scope and text
+are in `LICENSE-MIT-0`; `templates/LICENSE` and `examples/LICENSE` carry the
+MIT-0 text. Third-party material inside those parts keeps its own licence (the
+TodoMVC stylesheet, §14). The compiler, `src/`, `library/`, `runtime/` and the
+runtime code in outputs stay MIT only. Precedent: MIT-0 was published by AWS
+(https://github.com/aws/mit-0) for exactly this case and is the licence of the AWS
+samples (`aws-samples`) and AWS documentation code examples; scaffolding tools commonly
+leave generated code unlicensed for the user. `lasm init` writes no `LICENSE`
+file, no licence header and no `license` field (generated `package.json` files are
+`private: true`; tested), so the user's own choice stays open. `@lasm/cli`'s SPDX
+expression gains `MIT-0` (it ships `templates/`, `examples/hello` and
+`LICENSE-MIT-0`; `cliLicense(..., { starter })`); `@lasm/create` contains only its
+launcher code and stays `MIT`. The root `LICENSE` stays the unmodified MIT text, so
+GitHub's and npm's licence detection and the copy embedded in every output's
+notices (`src/notices/LASM-LICENSE.txt`) keep matching; `LICENSE-MIT-0` beside it,
+the README and `docs/LICENSING.md` reference the grant.

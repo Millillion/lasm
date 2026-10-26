@@ -75,6 +75,8 @@ writeFileSync(join(staging, 'README.md'), candidateReadme(readFileSync(join(root
 }));
 copyFileSync(join(root, 'docs/NODE_SUPPORT.md'), join(staging, 'docs/NODE_SUPPORT.md'));
 cpSync(join(root, 'examples/hello'), join(staging, 'examples/hello'), { recursive: true });
+// examples/ and templates/ are also MIT-0 (LICENSE-MIT-0); templates/LICENSE comes with templates/.
+copyFileSync(join(root, 'examples/LICENSE'), join(staging, 'examples/LICENSE'));
 const json = (path, value) => writeFileSync(join(staging, path), JSON.stringify(value, null, 2) + '\n');
 json('src/toolchains.json', { ...toolchainCatalog, defaultLean: lean, lean: { [lean]: toolchainCatalog.lean[lean] } });
 json('src/application-runtimes.json', { schema: 1, lean: { [lean]: expected } });

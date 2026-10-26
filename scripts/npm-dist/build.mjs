@@ -254,6 +254,9 @@ if (args.step === 'main') {
   let mainMeta = plan.main;
   if (plan.main.license) {
     await copyFile(join(root, 'LICENSE'), join(main, 'LICENSE'));
+    // The starter code (templates/, examples/, the files lasm init writes) is also MIT-0.
+    const starter = existsSync(join(root, 'LICENSE-MIT-0'));
+    if (starter) await copyFile(join(root, 'LICENSE-MIT-0'), join(main, 'LICENSE-MIT-0'));
     // The published README is this checkout's (npm shows it), not the candidate's
     // "install this tarball" text; repository links point at the release tag.
     await writeFile(join(main, 'README.md'), publishedReadme(await readFile(join(root, 'README.md'), 'utf8'), plan.main.version));
@@ -287,7 +290,7 @@ if (args.step === 'main') {
         }
       }
     }
-    mainMeta = { ...plan.main, license: cliLicense(plan.main.license, headings, bundled), licenseFiles: true };
+    mainMeta = { ...plan.main, license: cliLicense(plan.main.license, headings, bundled, { starter }), licenseFiles: true, starterLicense: starter };
   }
   await writeFile(join(main, 'src/npm-tools.json'), JSON.stringify(npmToolManifest(plan.packages, packed), null, 2) + '\n');
   await writeFile(join(main, 'package.json'), JSON.stringify(mainPackageJson(basePackage, plan.packages, mainMeta), null, 2) + '\n');
