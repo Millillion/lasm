@@ -40,6 +40,9 @@ on:
       - 'templates/common/**'
       - 'test/browser/**'
       - 'scripts/browser/**'
+      - 'scripts/ui/**'
+      - 'examples/ui/**'
+      - 'bench/ui/**'
       - 'runtime/edge.cpp'
 permissions:
   # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
@@ -121,11 +124,15 @@ jobs:
         run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
       - name: Unit tests of the browser target
         run: node --test test/browser.test.mjs test/edge.test.mjs test/init.test.mjs
-      - name: Build the apps (web template, platform suite) for the browser
+      - name: Build the apps (web template, platform suite, Lasm.UI examples) for the browser
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
-        run: node scripts/browser/build-apps.mjs .work/browser-work .work/browser-apps
+        run: |
+          node scripts/browser/build-apps.mjs .work/browser-work .work/browser-apps \
+            uicounter=examples/ui/counter todomvc=examples/ui/todomvc bench=examples/ui/bench demo=examples/ui/demo
+          # The benchmark's baseline (vanilla JavaScript, no build).
+          cp -r bench/ui/vanilla .work/browser-apps/vanilla
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: browser-apps
