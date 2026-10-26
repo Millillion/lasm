@@ -106,7 +106,7 @@ export function encodeError(err, leanVersion = '4.32.0') {
 
 /** Private Node implementation of Lean's runtime primitives, not a Lean API. */
 export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.' : process.cwd(), args = [], stdio = {}, appPath = process.execPath,
-  applicationCommand, propagateCwd = false, processExit = false, leanVersion = '4.32.0', wasmMemory, serveSync } = {}) {
+  applicationCommand, propagateCwd = false, processExit = false, leanVersion = '4.32.0', wasmMemory, serveSync, spawnPoller, progress } = {}) {
   checkLeanIOVersion(leanVersion);
   if (!Array.isArray(args) || args.some(value => typeof value !== 'string' || !value.isWellFormed() || value.includes('\0')))
     throw new TypeError('Lean main arguments must be Unicode strings without NUL characters');
@@ -203,7 +203,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
   const system = createNodeSystem();
   const signals = createNodeSignals({ add, get });
   const outbound = createNodeFetch({ add, get });
-  const js = createNodeJs({ appPath, wasmMemory, serveSync });
+  const js = createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, progress });
   const pending = new HandleTable();
   function dispatch(op, id, arg, bytes, context, state) {
     const path = bytes => pathAt(bytes, state);

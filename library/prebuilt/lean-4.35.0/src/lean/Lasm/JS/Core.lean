@@ -312,6 +312,9 @@ private initialize registry : IO.Ref Registry ← IO.mkRef {}
 
 @[extern "lasm_js_start"] private opaque startThread (dispatch : UInt8 → UInt32 → UInt64 → ByteArray → IO Unit) : IO Unit
 @[extern "lasm_js_await_into"] private opaque awaitInto (p : @& IO.Promise (Except String ByteArray)) (value : @& ByteArray) (keep : @& Data) : IO Unit
+/-- On the thread running `main`, becomes Lasm.JS's interop poller and never
+returns; elsewhere (or once a poller runs) returns `false`. -/
+@[extern "lasm_js_park"] private opaque park : IO Bool
 @[extern "lasm_js_sync_start"] private opaque startSync (dispatch : UInt32 → ByteArray → IO (ByteArray × Data)) : IO Unit
 
 private def errorText (e : IO.Error) : String := toString e
@@ -635,6 +638,10 @@ In an edge build it returns at once: the platform owns the isolate's lifetime,
 and requests arrive after `main` has returned. -/
 def waitForever : IO Unit := do
   if ← onEdge then return
+  -- On the thread running `main`, serve JavaScript's events here (Lasm.JS's
+  -- interop loop, which never returns) rather than in a thread of their own:
+  -- each thread is a Node Worker that costs start-up time. Elsewhere, wait.
+  if ← park then return
   let p : IO.Promise Unit ← IO.Promise.new
   -- Keep `p` alive: a dropped promise would resolve `result?` with `none`.
   let r ← IO.mkRef (some p)

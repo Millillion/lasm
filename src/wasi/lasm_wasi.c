@@ -943,6 +943,8 @@ LEAN_EXPORT lean_obj_res lasm_js_call_into(b_lean_obj_arg p, uint32_t op, uint32
 }
 LEAN_EXPORT lean_obj_res lasm_js_sync_start(lean_obj_arg dispatch) { lean_dec(dispatch); return js_unavailable(); }
 LEAN_EXPORT uint8_t lasm_js_available(lean_obj_arg unit) { (void)unit; return 0; }
+/* waitForever: no interop poller to become here (it returns before on edge). */
+LEAN_EXPORT lean_obj_res lasm_js_park(void) { return lean_io_result_mk_ok(lean_box(0)); }
 
 /* ---- C++ exceptions: the module has no exception handling (wasm-opt
    --strip-eh), so a throw ends the program like an uncaught exception. ---- */

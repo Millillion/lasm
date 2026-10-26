@@ -40,6 +40,9 @@ if (!ENVIRONMENT_IS_PTHREAD) {
         // Lasm.JS synchronous callbacks: the Wasm memory and inline serving of
         // one thread's slot while the main thread waits in a JS callback.
         wasmMemory: () => wasmMemory, serveSync: pointer => lasmFullServeSync(pointer),
+        // Lasm.JS: start the interop poller thread (library/c/lasm_js.c) when an
+        // event waits and Lean makes no progress (host calls served) meanwhile.
+        spawnPoller: () => Module._lasm_js_spawn_poller?.(), progress: () => lasmFullServed,
         applicationCommand: process.env.LASM_FULL_APP_PATH ? {
           executable: process.execPath,
           arguments: [],
@@ -133,7 +136,9 @@ if (!ENVIRONMENT_IS_PTHREAD) {
   };
   // Serve one request. Undefined when it was answered synchronously,
   // otherwise a promise that settles after the reply.
+  var lasmFullServed = 0;
   var lasmFullServeOne = function (slot) {
+    lasmFullServed++;
     const { view, u8 } = lasmFullViews(), p = slot.pointer;
     const kind = view.getInt32(p + 8, true);
     if (kind === 3) {

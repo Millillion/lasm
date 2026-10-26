@@ -37,6 +37,7 @@ export const leanRuntimeChanges = Object.freeze({
   'host-backtrace': ['src/runtime/object.cpp', 'panic backtraces from the JavaScript host'],
   'libuv-source': ['src/CMakeLists.txt', 'pin the libuv v1.48.0 source by commit'],
   'nonlinear-environment': ['src/runtime/object.cpp', 'read LEAN_ABORT_ON_NONLINEAR from the host'],
+  'node-threads': ['src/runtime/thread.cpp', "run main on the program's main thread instead of a further thread"],
 });
 
 // Runtimes up to 7aa5028c… statically linked GNU MP. Runtimes built with

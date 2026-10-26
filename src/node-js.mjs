@@ -99,10 +99,10 @@ class Reader {
   done() { return this.offset === this.bytes.length; }
 }
 
-export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
+export function createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, progress } = {}) {
   const values = new HandleTable({ first: firstJsHandle });
   const moduleRequire = createRequire(appPath ? join(dirname(appPath), 'package.json') : join(process.cwd(), 'package.json'));
-  const stats = { released: 0, callbacks: 0, syncCallbacks: 0, functionsCreated: 0, functionsCollected: 0 };
+  const stats = { released: 0, callbacks: 0, syncCallbacks: 0, functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0 };
   const bindings = new Map();
 
   function reference(value) { return values.allocate(value); }
@@ -158,12 +158,32 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
   function decode(bytes) { const r = new Reader(bytes); const value = read(r); if (!r.done()) throw failure('Malformed Lasm.JS value (trailing bytes)'); return value; }
   const modeOf = arg => (Number(arg) & 1) ? 'reference' : 'data';
 
-  // ---- events delivered to Lean's interop thread (op 209 long poll) ----
+  // ---- events delivered to Lean's interop poller (op 209 long poll) ----
+  // Lean starts no poller for callbacks alone (library/c/lasm_js.c): the thread
+  // running `main` becomes it when `main` reaches `waitForever`. Until a Lean
+  // thread polls, an event waits here; if Lean makes no host call for
+  // pollerGrace ms (or pollerPatience ms pass), spawnPoller starts a poller thread.
   const events = [];
-  let waiter;
+  let waiter, polled = false, pollerTimer;
+  const pollerGrace = 20, pollerPatience = 500;
+  function wantPoller() {
+    if (polled || pollerTimer || !spawnPoller) return;
+    const since = performance.now();
+    let seen = progress?.();
+    const check = () => {
+      pollerTimer = undefined;
+      if (polled) return;
+      const now = progress?.();
+      if (now !== seen && performance.now() - since < pollerPatience) { seen = now; pollerTimer = setTimeout(check, pollerGrace); return; }
+      stats.pollerSpawns++;
+      spawnPoller();
+    };
+    pollerTimer = setTimeout(check, pollerGrace);
+  }
   const push = event => {
     events.push(event);
     if (waiter) { const w = waiter; waiter = undefined; w(); }
+    else wantPoller();
   };
   function takeEvents() {
     const w = new Writer();
@@ -362,6 +382,8 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
         return Buffer.alloc(0);
       }
       case 209:
+        polled = true;
+        if (pollerTimer) { clearTimeout(pollerTimer); pollerTimer = undefined; }
         if (events.length) return takeEvents();
         return new Promise(resolve => { waiter = () => resolve(takeEvents()); });
       case 210: {
@@ -411,7 +433,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
     snapshot,
     owns: id => id >= firstJsHandle,
     release(id) { if (values.delete(id)) stats.released++; },
-    close() { values.clear(); pendingCalls.clear(); events.length = 0; },
+    close() { values.clear(); pendingCalls.clear(); events.length = 0; clearTimeout(pollerTimer); pollerTimer = undefined; },
     // Tests and diagnostics.
     encode, decode, values,
   };

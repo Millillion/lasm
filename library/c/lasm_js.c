@@ -5,9 +5,14 @@
  * 200-219 through the runtime's lasm_node_call ABI). Design: docs/JS_INTEROP.md.
  *
  * Threads (both created lazily, detached, like the runtime's completion thread):
- *   - the interop thread long-polls the host (op 209) for promise completions,
+ *   - the interop poller long-polls the host (op 209) for promise completions,
  *     which it resolves here, and for calls of Lean functions from JavaScript,
- *     which the Lean dispatcher runs as tasks;
+ *     which the Lean dispatcher runs as tasks. Each thread is a Node Worker
+ *     (tens of milliseconds of CPU at start-up), so the poller is the thread
+ *     running `main` when `main` ends in `waitForever` (lasm_js_park), and
+ *     otherwise a thread started when Lean first waits for a JavaScript promise
+ *     or when the host has queued an event and no Lean thread polls
+ *     (lasm_js_spawn_poller, called by src/node-js.mjs);
  *   - the synchronous-callback thread runs Lean functions that JavaScript calls
  *     synchronously, while Node's main thread waits (op 211 channel).
  */
@@ -29,6 +34,9 @@ extern int emscripten_futex_wait(volatile void *address, uint32_t value, double 
 extern int emscripten_futex_wake(volatile void *address, int count);
 extern void lean_initialize_thread(void);
 extern lean_object *lean_io_promise_resolve(lean_object *value, lean_object *promise);
+/* Lasm's runtime (Lean's thread.cpp, patch node-threads): whether the calling
+   thread runs the program's `main`. */
+extern _Bool lasm_main_thread_is_current(void);
 
 typedef struct { int failed; uint8_t *bytes; size_t size; } reply_t;
 /* Handles of freed Values. Instead of one host call per finalizer, they travel
@@ -111,15 +119,18 @@ LEAN_EXPORT lean_obj_res lasm_js_value_of_handle(uint32_t handle) {
 /* (v : @& Value) : UInt32 */
 LEAN_EXPORT uint32_t lasm_js_value_handle(b_lean_obj_arg v) { return (uint32_t)(uintptr_t)lean_get_external_data(v); }
 
-/* ---- the interop thread ---- */
+/* ---- the interop poller ---- */
 static lean_object *dispatcher; /* UInt8 -> UInt32 -> UInt64 -> ByteArray -> IO Unit */
-static pthread_once_t interop_once = PTHREAD_ONCE_INIT;
+/* Set once, by the first thread that becomes the poller (a started thread or `main`). */
+static int poller_claimed;
 static uint64_t read_u64(const uint8_t *p) { uint64_t v; memcpy(&v, p, 8); return v; }
 static uint32_t read_u32(const uint8_t *p) { uint32_t v; memcpy(&v, p, 4); return v; }
 static void fatal(const char *message) { lean_internal_panic(message); }
-static void *interop_main(void *unused) {
-    (void)unused;
-    lean_initialize_thread();
+static int claim_poller(void) {
+    int expected = 0;
+    return __atomic_compare_exchange_n(&poller_claimed, &expected, 1, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+}
+static void interop_loop(void) {
     for (;;) {
         reply_t batch = host_call(209, 0, 0, NULL, 0);
         if (batch.failed) fatal("Lasm.JS: the interop event queue failed");
@@ -153,16 +164,25 @@ static void *interop_main(void *unused) {
                 if (offset + size > batch.size) fatal("Lasm.JS: malformed callback");
                 lean_object *args = bytes_of(batch.bytes + offset, size);
                 offset += size;
-                lean_inc(dispatcher);
-                lean_object *r = lean_apply_5(dispatcher, lean_box(kind), lean_box_uint32(fn), lean_box_uint64(call), args, lean_io_mk_world());
+                lean_object *d = __atomic_load_n(&dispatcher, __ATOMIC_ACQUIRE);
+                if (!d) fatal("Lasm.JS: a JavaScript event arrived before Lasm.JS started");
+                lean_inc(d);
+                lean_object *r = lean_apply_5(d, lean_box(kind), lean_box_uint32(fn), lean_box_uint64(call), args, lean_io_mk_world());
                 lean_dec(r);
             } else fatal("Lasm.JS: unknown interop event");
         }
         free(batch.bytes);
     }
+}
+static void *interop_main(void *unused) {
+    (void)unused;
+    lean_initialize_thread();
+    interop_loop();
     return NULL;
 }
-static void interop_start(void) {
+/* Starts the poller thread unless a thread already is (or will become) the poller. */
+static void start_poller(void) {
+    if (!claim_poller()) return;
     pthread_t thread;
     pthread_attr_t attributes;
     pthread_attr_init(&attributes);
@@ -171,17 +191,34 @@ static void interop_start(void) {
     pthread_detach(thread);
     pthread_attr_destroy(&attributes);
 }
-/* (dispatch : UInt8 → UInt32 → UInt64 → ByteArray → IO Unit) : IO Unit -- once. */
+/* The host (Node's main thread) asks for a poller: JavaScript queued an event
+   and no Lean thread has polled. Exported to JavaScript (Module._lasm_js_spawn_poller). */
+void lasm_js_spawn_poller(void) {
+    if (__atomic_load_n(&dispatcher, __ATOMIC_ACQUIRE)) start_poller();
+}
+/* (dispatch : UInt8 → UInt32 → UInt64 → ByteArray → IO Unit) : IO Unit -- once.
+   Registers the dispatcher; the poller starts on demand (above). */
 LEAN_EXPORT lean_obj_res lasm_js_start(lean_obj_arg dispatch) {
-    if (!dispatcher) { lean_mark_mt(dispatch); dispatcher = dispatch; } else lean_dec(dispatch);
-    pthread_once(&interop_once, interop_start);
+    lean_object *expected = NULL;
+    lean_mark_mt(dispatch);
+    if (!__atomic_compare_exchange_n(&dispatcher, &expected, dispatch, 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)) lean_dec(dispatch);
     return lean_io_result_mk_ok(lean_box(0));
+}
+/* : IO Bool (no world argument in Lean 4.35's C) -- `waitForever` on the thread that runs `main`: unless
+   a poller exists already, this thread becomes it and never returns. Elsewhere
+   (a task, or a poller already started) it returns false at once, and the caller
+   waits as before. */
+LEAN_EXPORT lean_obj_res lasm_js_park(void) {
+    if (!lasm_main_thread_is_current() || !claim_poller()) return lean_io_result_mk_ok(lean_box(0));
+    interop_loop();
+    return lean_io_result_mk_ok(lean_box(1));
 }
 /* (p : @& IO.Promise (Except String ByteArray)) (value : @& ByteArray) : IO Unit
    The host resolves p when the JavaScript value (a promise or not) settles. */
 LEAN_EXPORT lean_obj_res lasm_js_await_into(b_lean_obj_arg promise, b_lean_obj_arg value, b_lean_obj_arg keep) {
     (void)keep;
     if (!dispatcher) return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string("Lasm.JS is not started (internal error)")));
+    start_poller(); /* the host resolves p through the poller */
     lean_inc(promise); lean_mark_mt(promise);
     reply_t r = host_call(207, 0, (uint64_t)(uintptr_t)promise, lean_sarray_cptr(value), lean_sarray_size(value));
     if (r.failed) { lean_dec(promise); return lean_io_result_mk_error(lean_mk_io_user_error(failure_message(r))); }
@@ -203,6 +240,7 @@ LEAN_EXPORT lean_obj_res lasm_js_call_into(b_lean_obj_arg promise, uint32_t op, 
     uint64_t pointer = (uint64_t)(uintptr_t)promise;
     memcpy(request, &pointer, 8);
     if (length) memcpy(request + 8, lean_sarray_cptr(input), length);
+    start_poller(); /* the host resolves p through the poller */
     lean_inc(promise); lean_mark_mt(promise);
     reply_t r = host_call(op, handle, arg | 16, request, 8 + length);
     free(request);
@@ -303,6 +341,7 @@ LEAN_EXPORT lean_obj_res lasm_js_call(uint32_t op, uint32_t handle, uint64_t arg
 LEAN_EXPORT lean_obj_res lasm_js_value_of_handle(uint32_t handle) { (void)handle; return unavailable(); }
 LEAN_EXPORT uint32_t lasm_js_value_handle(b_lean_obj_arg v) { (void)v; return 0; }
 LEAN_EXPORT lean_obj_res lasm_js_start(lean_obj_arg dispatch) { lean_dec(dispatch); return unavailable(); }
+LEAN_EXPORT lean_obj_res lasm_js_park(void) { return lean_io_result_mk_ok(lean_box(0)); }
 LEAN_EXPORT lean_obj_res lasm_js_await_into(b_lean_obj_arg p, b_lean_obj_arg v, b_lean_obj_arg k) { (void)p; (void)v; (void)k; return unavailable(); }
 LEAN_EXPORT lean_obj_res lasm_js_call_into(b_lean_obj_arg p, uint32_t op, uint32_t handle, uint64_t arg, b_lean_obj_arg input, b_lean_obj_arg keep) {
     (void)p; (void)op; (void)handle; (void)arg; (void)input; (void)keep; return unavailable();

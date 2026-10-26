@@ -21,7 +21,7 @@ concurrency:
 # the verified runtime to the Linux installed-package campaign. No publication.
 jobs:
   runtime:
-    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/cold-start')
     runs-on: ubuntu-24.04
     timeout-minutes: 300
     env:
