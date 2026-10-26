@@ -281,14 +281,24 @@ def expandAttr (a : Syntax) : MacroM (Option Term × Option Term) := do
     | _, _ => Macro.throwErrorAt v "bad attribute value"
   | _ => Macro.throwErrorAt a "unsupported attribute"
 
-/-- `a ++ b ++ …`, or a list literal when every part is a singleton literal. -/
+/-- The parts joined into one list: singletons (`[x]`) are consed, so a run of
+them is one list literal with no intermediate lists; splices are appended. -/
 def concatLists (parts : Array Term) : MacroM Term := do
-  if parts.isEmpty then `([])
-  else
-    let mut acc := parts.back!
-    for p in parts.pop.reverse do
-      acc ← `($p ++ $acc)
-    return acc
+  -- From the end: `singles` are the singleton elements waiting to be consed.
+  let mut tail : Option Term := none
+  let mut singles : Array Term := #[]
+  let flush (singles : Array Term) (tail : Option Term) : MacroM Term := do
+    match tail with
+    | none => `([$singles,*])
+    | some t => singles.foldrM (fun x acc => `($x :: $acc)) t
+  for p in parts.reverse do
+    match p with
+    | `([$x]) => singles := #[x] ++ singles
+    | _ =>
+      let rest ← if singles.isEmpty && tail.isNone then pure none else some <$> flush singles tail
+      singles := #[]
+      tail := some (← match rest with | none => pure p | some r => `($p ++ $r))
+  flush singles tail
 
 def nsTerm : Ns → MacroM Term
   | .html => `(Lasm.UI.Ns.html)
