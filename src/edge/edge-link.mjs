@@ -16,6 +16,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
 import { linkWithNode, bundledNativeSigs, linkTemporaryDirectory, removeTemporary } from '../link-driver/link.mjs';
+import { liveMembers, memberFiles, wasmImports } from '../application-live-members.mjs';
 import { compileObject } from '../link-driver/compile.mjs';
 import { compactInitializerWrappers } from './edge-initializers.mjs';
 
@@ -45,7 +46,10 @@ export const edgeLinkSettings = Object.freeze({ memory64: 2, initialMiB: 4, stac
 /** optimize false (dev profile): Binaryen runs only the passes the program
  * needs (memory64 lowering, Asyncify; no -Oz) and the JavaScript dead-code
  * passes are skipped; the Node link driver only. */
-export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend = 'jspi', verbose = false, driver = sdk.toolchain ? 'node' : 'emcc', optimize = true, stepCache }) {
+/** `members` (dev, src/application-live-members.mjs): { record, directory,
+ * save(record) }: link with the archive members the previous full edge link of
+ * this program kept, accepted when the program imports nothing new. */
+export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend = 'jspi', verbose = false, driver = sdk.toolchain ? 'node' : 'emcc', optimize = true, stepCache, members }) {
   if (!edgeSuspendModes.includes(suspend)) throw new Error(`Unknown edge suspension ${JSON.stringify(suspend)}`);
   const s = edgeLinkSettings;
   const rsp = readResponse(join(linkWork, 'link.rsp'));
@@ -117,11 +121,32 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
     const recipe = edgeRecipe();
     if (!edgeRecipeHas(suspend, recipe)) throw new Error(`The edge recipe has no recording of the ${suspend} link`);
     if (!edge.sysroot) throw new Error('This edge runtime has no system libraries for the Node link driver');
-    const temp = linkTemporaryDirectory(out, 'edge');
-    try {
-      linkWithNode({ recipe, mode: edgeRecipeMode(suspend), args, sdk, cache: edge.sysroot.cache, temp, nativeSigs: bundledNativeSigs(recipe),
-        stdio: verbose ? ['ignore', 'inherit', 'inherit'] : ['ignore', 'pipe', 'pipe'], optimize, stepCache });
-    } finally { removeTemporary(temp); }
+    const link = linkArgs => {
+      const temp = linkTemporaryDirectory(out, 'edge');
+      try {
+        linkWithNode({ recipe, mode: edgeRecipeMode(suspend), args: linkArgs, sdk, cache: edge.sysroot.cache, temp, nativeSigs: bundledNativeSigs(recipe),
+          stdio: verbose ? ['ignore', 'inherit', 'inherit'] : ['ignore', 'pipe', 'pipe'], optimize, stepCache });
+      } finally { removeTemporary(temp); }
+    };
+    const record = members?.record;
+    let fast = false;
+    if (!optimize && record?.liveMembers && record.imports && Object.keys(record.liveMembers).every(archive => libraries.includes(archive))) {
+      try {
+        const files = memberFiles(record.liveMembers, members.directory);
+        link(args.flatMap(arg => arg === libraries[0] ? files : libraries.includes(arg) ? [] : [arg]));
+        const imports = wasmImports(join(out, 'program.wasm')), allowed = new Set(record.imports);
+        fast = !!imports && imports.every(item => allowed.has(item));
+      } catch { /* link in full */ }
+    }
+    if (!fast) {
+      link(args);
+      if (!optimize && members) {
+        try {
+          const imports = wasmImports(join(out, 'program.wasm'));
+          if (imports) members.save({ liveMembers: liveMembers(readFileSync(join(out, 'program.map'), 'utf8'), libraries), imports });
+        } catch { /* no fast link next time */ }
+      }
+    }
   } else {
     if (!optimize) throw new Error('The edge dev profile needs the Node link driver');
     sdk.execute('em++', args, { stdio, env, timeout: 3_600_000, maxBuffer: 64 << 20 });

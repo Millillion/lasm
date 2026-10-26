@@ -13,7 +13,7 @@ parentPort.on('message', async ({ id, file, options, target }) => {
   try {
     let result;
     const { edgeTargets } = await import('./edge/edge-build.mjs');
-    if (edgeTargets[target]) {
+    if (edgeTargets[target] || target === 'browser') {
       const { buildEdge } = await import('./application-cli.mjs');
       let node;
       const output = await buildEdge(file, target, options, options.verbose, { build: async (input, buildOptions) => (node = await build(input, buildOptions)), log });

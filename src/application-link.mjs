@@ -218,7 +218,7 @@ function readInitializationSeed(file, runtime) {
 
 async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
   linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, sharedCache, analysisCache, profile = 'release', initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable: declaredUnavailable = [],
-  initializationSeed, timings }, seedRecord) {
+  initializationSeed, timings, linkOnly = false }, seedRecord) {
   const seed = seedRecord && new Set(seedRecord.keep);
   const nativeUnavailable = [...declaredUnavailable];
   const time = (name, start) => { if (timings) timings[name] = (timings[name] ?? 0) + performance.now() - start; };
@@ -532,7 +532,9 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   const runtimeArchives = runtime.manifest.libraries.map(name => join(runtime.directory, name));
   const memberDirectory = join(dirname(sharedStore), 'members', runtime.identity.slice(0, 32));
   let fullLinked = false;
-  const fastMembers = profile === 'dev' && nodeLink && seedRecord?.liveMembers && seedRecord?.imports
+  // A link-only build checks the linked Wasm before Emscripten's finalize step: its own import record.
+  const importsKey = linkOnly ? 'importsLinked' : 'imports';
+  const fastMembers = profile === 'dev' && nodeLink && seedRecord?.liveMembers && seedRecord?.[importsKey]
     && Object.keys(seedRecord.liveMembers).every(archive => runtimeArchives.includes(archive)) ? seedRecord : undefined;
   const linkOnce = async (plannedInputs, members) => {
     const libraries = members ? memberFiles(members, memberDirectory) : undefined;
@@ -541,14 +543,14 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
       ...(debug ? ['-O0'] : ['-Oz', '-g1']), '-Wl,-Map=' + finalMap, ...args]));
     progress?.({ stage: 'Linking application and Lean runtime' });
     const start = performance.now();
-    try { runLink(debug ? 'probe' : 'final', ['@' + argumentsFile], { optimize: debug || profile === 'release' }); }
+    try { runLink(debug ? 'probe' : 'final', ['@' + argumentsFile], { optimize: debug || profile === 'release', mapOnly: linkOnly }); }
     finally { time('final link', start); }
   };
   const finalLink = async plannedInputs => {
     if (fastMembers) {
       try {
         await linkOnce(plannedInputs, fastMembers.liveMembers);
-        const imports = wasmImports(join(dist, 'program.wasm')), allowed = new Set(fastMembers.imports);
+        const imports = wasmImports(join(dist, 'program.wasm')), allowed = new Set(fastMembers[importsKey]);
         if (imports && imports.every(item => allowed.has(item))) { fullLinked = false; return; }
       } catch { /* link in full below */ }
     }
@@ -671,11 +673,14 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
       if (profile === 'dev' && nodeLink && !debug) {
         if (fullLinked && statSync(finalMap).size < 64 * 1024 * 1024) {
           const imports = wasmImports(join(dist, 'program.wasm'));
-          try { if (imports) Object.assign(seedOut, { liveMembers: liveMembers(readFileSync(finalMap, 'utf8'), runtimeArchives), imports }); }
+          try { if (imports) Object.assign(seedOut, { liveMembers: liveMembers(readFileSync(finalMap, 'utf8'), runtimeArchives), [importsKey]: imports }); }
           catch { /* no fast link next time */ }
-        } else if (!fullLinked && fastMembers) Object.assign(seedOut, { liveMembers: fastMembers.liveMembers, imports: fastMembers.imports });
+        } else if (!fullLinked && fastMembers) Object.assign(seedOut, { liveMembers: fastMembers.liveMembers, [importsKey]: fastMembers[importsKey] });
       }
       if (seedRecord?.probes) seedOut.probes = { ...seedRecord.probes, ...seedOut.probes };
+      // The other link kind's import record stays valid while the member set is the same.
+      for (const key of ['imports', 'importsLinked'])
+        if (!(key in seedOut) && seedRecord?.[key] && JSON.stringify(seedRecord.liveMembers) === JSON.stringify(seedOut.liveMembers)) seedOut[key] = seedRecord[key];
       writeFileSync(initializationSeed, JSON.stringify({ schema: 1, runtime: runtime.identity, ...seedOut }) + '\n');
     } catch { /* an unwritable seed only costs the next dev build its planning */ }
   }
@@ -683,6 +688,7 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   if (objectCache) for (const name of readdirSync(objectCache))
     if (!usedObjects.has(join(objectCache, name))) rmSync(join(objectCache, name), { force: true });
   if (sharedCache) pruneSharedStore(sharedStore, sharedUsed);
+  if (linkOnly) return requirements;
   progress?.({ stage: 'Preparing the application launcher' });
   const glue = join(dist, 'program.cjs');
   writeFileSync(glue, connectLeanSymbolLoader(relabelPreJs(readFileSync(glue, 'utf8'), preJs), true, { packageSymbols: true }));

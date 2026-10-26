@@ -21,7 +21,7 @@ on:
         type: boolean
         default: true
   push:
-    branches: [browser, browser-ui]
+    branches: [browser, browser-ui, dx-browser]
     paths:
       - '.github/workflows/browser.yml'
       - '.github/workflows/edge-runtime.yml'
@@ -135,6 +135,13 @@ jobs:
             uicounter=examples/ui/counter todomvc=examples/ui/todomvc bench=examples/ui/bench demo=examples/ui/demo
           # The benchmark's baseline (vanilla JavaScript, no build).
           cp -r bench/ui/vanilla .work/browser-apps/vanilla
+      - name: lasm dev --target browser (edit, rebuild, reload) on the web template
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: |
+          node bin/lasm.mjs init .work/browser-work/dev-loop --template web
+          node scripts/browser/dev-loop-check.mjs .work/browser-work/dev-loop .work/browser-apps/dev-loop.json
       - name: Playwright's Chromium, cached per version (for vite dev)
         uses: actions/cache@v4
         with:

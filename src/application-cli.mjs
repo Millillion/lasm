@@ -54,13 +54,15 @@ export async function buildEdge(input, target, buildOptions, verbose, { build, l
     buildOptions = { ...buildOptions, output: join(temporary, 'dist') };
   }
   try {
-    let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built' });
+    // A dev build whose Node output nobody runs (lasm dev, the browser) only links the Node program for its inputs.
+    const linkOnly = buildOptions.profile === 'dev' && (browser || buildOptions.output === undefined);
+    let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built', linkOnly });
     const found = await findEdgeProgram({ result, nodeRuntime, suspend });
     let program = found.cached;
     if (program && result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
     if (!program) {
       // A Node build reused from its cache kept no link inputs: link it again.
-      if (!result.linkWork) result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: true });
+      if (!result.linkWork) result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: true, linkOnly });
       try {
         log(browser ? '[lasm] Linking for the browser…'
           : `[lasm] Linking the single-threaded (portable) program${suspend === 'asyncify' ? ' with Asyncify (this engine has no JSPI)' : ''}…`);

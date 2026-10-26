@@ -120,9 +120,9 @@ export function checkBindingsAsync(project, bindings, { cache, identity } = {}) 
   const record = cache && identity && join(cache, `checked-${createHash('sha256').update(JSON.stringify({ schema: 1, identity,
     runtime: `${process.release?.name} ${process.version}`, checker, bindings })).digest('hex')}.json`);
   if (record) try { const saved = JSON.parse(readFileSync(record, 'utf8')); if (Array.isArray(saved)) return Promise.resolve(saved); } catch { /* not recorded */ }
-  const [command, args] = evalCommand(checker, [project]);
+  const [command, args] = evalCommand(checker, [builtins, project]);
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { cwd: project, env: { ...process.env, LASM_BINDING_PROJECT: project }, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    const child = spawn(command, args, { cwd: project, env: { ...process.env, LASM_BINDING_PROJECT: project, LASM_BINDING_BUILTINS: builtins }, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
     let stdout = '', stderr = '';
     const timer = setTimeout(() => child.kill(), 120_000);
     child.stdout.setEncoding('utf8').on('data', chunk => { stdout += chunk; });

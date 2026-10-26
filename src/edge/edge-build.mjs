@@ -376,6 +376,15 @@ function edgeStepCache() {
   };
 }
 
+/** Dev edge links (src/edge/edge-link.mjs `members`): the record lives beside the cached programs. */
+function edgeMembers(root, edge) {
+  const file = join(root, '.dev-members.json');
+  let record;
+  try { record = JSON.parse(readFileSync(file, 'utf8')); if (record.edge !== edge.identity) record = undefined; } catch { /* none yet */ }
+  return { record, directory: join(managedCacheDirectory(), 'members', 'edge-' + String(edge.identity).slice(0, 32)),
+    save(next) { try { mkdirSync(root, { recursive: true }); writeFileSync(file, JSON.stringify({ edge: edge.identity, ...next })); } catch { /* not recorded */ } } };
+}
+
 /** Phase 2 (cache miss): link the program from a build made with keepLinkWork and cache it. */
 export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, suspend = 'jspi', verbose = false }) {
   if (!result.linkWork) throw new Error('The edge build needs the Node build\'s link inputs (internal error)');
@@ -384,7 +393,7 @@ export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, sus
   let link;
   // A dev Node build (lasm dev) gets the edge link's dev profile; deployable edge builds are release builds.
   try { link = linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: result.linkWork, out: join(staging, '.link'), suspend, verbose,
-    optimize: result.profile !== 'dev', stepCache: edgeStepCache() }); }
+    optimize: result.profile !== 'dev', stepCache: edgeStepCache(), members: result.profile === 'dev' ? edgeMembers(root, edge) : undefined }); }
   catch (error) { rmSync(staging, { recursive: true, force: true }); throw error; }
   copyFileSync(link.program, join(staging, 'program.mjs'));
   copyFileSync(link.wasm, join(staging, 'program.wasm'));

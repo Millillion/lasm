@@ -59,7 +59,11 @@ export async function buildApplication(file, options = {}) {
 }
 
 async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
-  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false } = {}) {
+  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false } = {}) {
+  // linkOnly (dev edge and browser builds, src/application-cli.mjs buildEdge):
+  // the Node program is only planned and linked for its link inputs; its
+  // JavaScript glue, host and npm packages are not produced. A separate cache identity.
+  if (linkOnly && (profile !== 'dev' || !keepLinkWork)) throw new Error('linkOnly applies to dev builds that keep their link work');
   // Edge targets (src/edge/edge-build.mjs) relink the compiled program: they
   // need this build's link inputs. true: a cached result is linked again;
   // 'if-built': keep them only when this build links anyway.
@@ -131,7 +135,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // A tiered Lean is identified by its assembled prefix, which is keyed by the
   // identities of the binaries and every module-data archive it contains.
   // The profile is part of the identity: dev and release outputs never share a cache entry.
-  const recipe = { schema: 1, profile, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
+  const recipe = { schema: 1, profile, ...(linkOnly ? { linkOnly } : {}), lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
     ...(lean.distribution === 'tiers' ? { nativeLeanTier: lean.tier, nativeLeanComponents: lean.components } : {}),
     // Outputs of different link drivers and tool sets never share a cache entry.
     emscripten, linkDriver, ...(linkDriver === 'node'
@@ -169,12 +173,12 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   await mkdir(dist, { recursive: true });
   let linkRequirements;
   // npm packages are copied into dist/ while the program compiles and links.
-  const npmCopy = nodeModules ? copyNodeModulesAsync(nodeModules, dist) : Promise.resolve();
+  const npmCopy = nodeModules && !linkOnly ? copyNodeModulesAsync(nodeModules, dist) : Promise.resolve();
   npmCopy.catch(() => {});
   try {
     linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
       leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), sharedCache: join(cache ?? managedCacheDirectory(), 'objects'), analysisCache: join(cache ?? managedCacheDirectory(), 'analysis'), profile, nativeCompilations, nativeUnavailable,
-      initializationSeed: join(work, 'initialization-seed.json') });
+      initializationSeed: join(work, 'initialization-seed.json'), linkOnly });
   } catch (error) {
     // This unique staging directory contains only this failed build's files.
     // Preserve any previously delivered application and avoid retaining probes.
@@ -187,7 +191,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   if (usesJs) progress?.({ stage: 'Checking Lasm.JS bindings' });
   const jsBindings = await bindingCheck;
   progress?.({ stage: 'Packaging the application and runtime support' });
-  copyApplicationHost(dist); writeApplicationEntrypoint(dist);
+  if (!linkOnly) { copyApplicationHost(dist); writeApplicationEntrypoint(dist); }
   await writeFile(join(dist, 'THIRD_PARTY_NOTICES.txt'),
     applicationNotices(runtime.manifest, await readFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8'))
     + dependencyNotices(dependencyLicenses));
@@ -195,7 +199,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     await mkdir(join(dist, 'licenses', pkg.name), { recursive: true });
     await writeFile(join(dist, 'licenses', pkg.name, file.name), await readFile(file.path));
   }
-  if (nodeModules) {
+  if (nodeModules && !linkOnly) {
     progress?.({ stage: `Copying ${nodeModules.packages.length} npm packages` });
     await npmCopy;
   }

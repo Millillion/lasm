@@ -137,7 +137,11 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
     cpSync(publicDirectory, staging, { recursive: true });
   }
   const files = {};
+  // Dev builds (lasm dev) are served from this machine: no precompressed copies
+  // (brotli at quality 11 took about 2 s of every rebuild).
+  const precompress = result.profile !== 'dev';
   const emit = (file, bytes, { compress = false } = {}) => {
+    compress &&= precompress;
     writeFileSync(join(staging, file), bytes);
     files[file] = { bytes: bytes.length, sha256: sha256(bytes) };
     if (compress) {
@@ -154,12 +158,12 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
   const html = existsSync(projectIndex) ? injectIndexHtml(readFileSync(projectIndex, 'utf8'), { entry, wasm }) : defaultIndexHtml({ name, entry, wasm });
   emit('index.html', Buffer.from(html), { compress: true });
   copyFileSync(join(result.output, 'THIRD_PARTY_NOTICES.txt'), join(staging, 'THIRD_PARTY_NOTICES.txt'));
-  const transfer = { brotli: files[wasm].brotli + files[entry].brotli, gzip: files[wasm].gzip + files[entry].gzip,
+  const transfer = { ...(precompress ? { brotli: files[wasm].brotli + files[entry].brotli, gzip: files[wasm].gzip + files[entry].gzip } : {}),
     uncompressed: files[wasm].bytes + files[entry].bytes };
   const manifest = { schema: 1, generator: 'lasm', target: 'browser', name, lasm: lasmVersion ?? null, lean: result.lean,
     entry, wasm, stableEntry: 'app.js', index: 'index.html', suspend, modules: builtins,
     // Content-hashed files are immutable; the others change with every build.
-    immutable: [entry, wasm, ...[entry, wasm].flatMap(file => [file + '.br', file + '.gz'])],
+    immutable: [entry, wasm, ...(precompress ? [entry, wasm].flatMap(file => [file + '.br', file + '.gz']) : [])],
     transfer, files, programKey: program.meta.key, nodeBuildSignature: result.signature };
   writeFileSync(join(staging, 'lasm-manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
   rmSync(destination, { recursive: true, force: true });
@@ -167,6 +171,6 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
   renameSync(staging, destination);
   const kib = n => (n / 1024).toFixed(1) + ' KiB';
   log(`${cacheHit ? 'Reused' : 'Built'} ${relative(process.cwd(), source) || source} for the browser: ${relative(process.cwd(), destination) || destination}`
-    + ` (${entry} + ${wasm}: ${kib(transfer.brotli)} brotli, ${kib(transfer.gzip)} gzip, ${kib(transfer.uncompressed)} uncompressed)`);
+    + ` (${entry} + ${wasm}: ${precompress ? `${kib(transfer.brotli)} brotli, ${kib(transfer.gzip)} gzip, ` : 'dev build, not precompressed, '}${kib(transfer.uncompressed)} uncompressed)`);
   return { output: destination, manifest };
 }
