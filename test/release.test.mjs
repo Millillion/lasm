@@ -91,7 +91,7 @@ test('publication skips identical versions and never republishes other bytes', (
 
 test('bootstrap: placeholders, trust and deprecation only where missing', async () => {
   const names = (await releasePackages()).map(p => p.name);
-  assert.ok(names.includes('@lasm/cli') && names.at(-1) === '@lasm/create' && names.some(n => n.startsWith('@lasm/lean-c-')));
+  assert.ok(names.includes('@lasm/cli') && names.at(-2) === '@lasm/create' && names.at(-1) === '@lasm/vite' && names.some(n => n.startsWith('@lasm/lean-c-')));
   assert.ok(!names.some(n => n.includes('/git-')));
   const registry = 'https://registry.npmjs.org/';
   const fresh = packageSteps({ name: '@lasm/cli', exists: false, trust: 'missing' }, { registry });
@@ -119,7 +119,8 @@ test('release.yml is the trusted publisher: OIDC, no tokens, serialized, never c
   assert.match(checks, /\n  release-checks:\n    name: release-checks\n/);
   // The edge targets and Bun/Deno gate a release (0.2.0), and the rehearsal runs Bun and Deno from the loopback registry.
   assert.match(checks, /\n  edge:\n[\s\S]*?uses: \.\/\.github\/workflows\/workers\.yml\n/);
-  assert.match(checks, /needs: \[detect, candidate, rehearsal, edge\]/);
+  assert.match(checks, /needs: \[detect, candidate, rehearsal, edge, browser\]/);
+  assert.match(checks, /uses: \.\/\.github\/workflows\/browser\.yml/);
   assert.match(checks, /e\.EDGE === 'success'/);
   const dist = readFileSync(new URL('../.github/workflows/npm-dist.yml', import.meta.url), 'utf8');
   assert.match(dist, /scripts\/edge\/published-ci\.mjs/);

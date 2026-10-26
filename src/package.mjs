@@ -33,6 +33,7 @@ Packages a built Lasm HTTP server (lasm build output, default dist/) for a
 function platform. The server must listen on $HOST and $PORT (every lasm init
 server template does). Writes, by target:
 ${Object.entries(packageTargets).map(([name, t]) => `  ${name.padEnd(12)} ${t.output.padEnd(23)} ${t.summary}`).join('\n')}
+  ${'browser'.padEnd(12)} ${'(in place)'.padEnd(23)} a browser build (lasm build --target browser): checked against its manifest, _headers added
 
 lasm build Main.lean --target <target> builds and packages in one step; use
 lasm package to package one build for several platforms. Lasm never installs
@@ -61,7 +62,8 @@ export function parsePackageArguments(tokens) {
   }
   if (positional.length > 1) throw new Error(packageUsage);
   if (!result.target) throw new Error('--target is required\n\n' + packageUsage);
-  if (!packageTargets[result.target]) throw new Error(`Unknown target "${result.target}". Choose one of: ${Object.keys(packageTargets).join(', ')}`);
+  if (!packageTargets[result.target] && result.target !== 'browser') throw new Error(`Unknown target "${result.target}". Choose one of: ${[...Object.keys(packageTargets), 'browser'].join(', ')}`);
+  if (result.target === 'browser' && result.output !== undefined) throw new Error('lasm package --target browser checks the build in place; --output does not apply');
   result.input = positional[0] ?? 'dist';
   return result;
 }
@@ -243,7 +245,12 @@ export function packageApplication({ input = 'dist', target, output, allowDev = 
   return summary;
 }
 
-export function runPackage(options) {
+export async function runPackage(options) {
+  // A browser build (lasm build --target browser): checked in place, with host configuration added.
+  if (options.target === 'browser') return (await import('./browser/browser-package.mjs')).packageBrowser({ input: options.input });
+  return runFunctionPackage(options);
+}
+function runFunctionPackage(options) {
   const result = packageApplication(options);
   const where = relative(process.cwd(), result.output) || '.';
   const size = result.zippedBytes ? `${format(result.zippedBytes)} zipped, ${format(result.unzippedBytes)} unpacked`

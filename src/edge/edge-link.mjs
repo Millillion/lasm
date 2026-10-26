@@ -10,12 +10,14 @@
 // the suspending import list limited to the host's one wait (lasm_edge_wait). The Node link driver replays it from its recording
 // (src/link-driver/recipe-emscripten-<version>-edge.json, byte-identical to
 // emcc's output: scripts/edge/compare-edge-link.mjs); emcc remains the fallback.
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
 import { linkWithNode, bundledNativeSigs, linkTemporaryDirectory, removeTemporary } from '../link-driver/link.mjs';
+import { compileObject } from '../link-driver/compile.mjs';
+import { compactInitializerWrappers } from './edge-initializers.mjs';
 
 let recipeCache;
 /** The Node link driver's recording of the edge link (scripts/edge/derive-edge-recipe.mjs). */
@@ -55,7 +57,7 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
   // object reachability.o, which the edge program never contains, and the Node
   // runtime's members (application-live-members.mjs) in place of its archives.
   const kept = rsp.filter(arg => arg.endsWith('.o') && basename(arg) !== 'reachability.o' && !arg.endsWith('.lasm-member.o') || arg.startsWith('-Wl,--wrap='));
-  const objects = kept.filter(arg => !(arg.endsWith('.o') && /^lasm_js_available$/m.test(nm(arg))));
+  let objects = kept.filter(arg => !(arg.endsWith('.o') && /^lasm_js_available$/m.test(nm(arg))));
   const usesJs = objects.length !== kept.length;
   mkdirSync(out, { recursive: true });
   const stdio = verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'];
@@ -72,6 +74,22 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
         '-fPIC', '-ffunction-sections', '-fdata-sections', '-I', join(nodeRuntime.directory, 'include'), '-c', join(here, 'lasm_js_edge.c'), '-o', glue[0]],
       { stdio, env, timeout: 600_000 });
     }
+  }
+  // The Node build's initializer wrappers, regenerated without call chains
+  // (src/edge/edge-initializers.mjs) from its plan, compiled as the Node build
+  // compiles its generated C (src/application-link.mjs compileFlags).
+  const planFile = join(linkWork, 'initialization-plan.json');
+  const wrappers = /[\\/]initializers-\d+\.o$/;
+  if (existsSync(planFile) && objects.some(arg => wrappers.test(arg))) {
+    const source = join(out, 'initializers-compact.c'), object = join(out, 'initializers-compact.o');
+    writeFileSync(source, compactInitializerWrappers(JSON.parse(readFileSync(planFile, 'utf8'))));
+    const flags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1',
+      '-ffunction-sections', '-fdata-sections', '-I', join(nodeRuntime.directory, 'include')];
+    if (driver === 'node') compileObject({ sdk, flags, source, object, settings: { stdio, timeout: 600_000, maxBuffer: 8 << 20 } });
+    else sdk.execute('emcc', [...flags, '-c', source, '-o', object], { stdio, env, timeout: 600_000 });
+    const first = objects.findIndex(arg => wrappers.test(arg));
+    objects = objects.filter(arg => !wrappers.test(arg));
+    objects.splice(first, 0, object);
   }
   const exportsList = JSON.parse(readFileSync(join(linkWork, 'exports.json'), 'utf8')).filter(name => !name.startsWith('_lasm_js_'));
   const exportsFile = join(out, 'exports.json');

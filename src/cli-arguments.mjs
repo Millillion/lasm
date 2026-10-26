@@ -9,12 +9,16 @@ import { parseDevArguments } from './dev.mjs';
 // Edge targets (experimental, docs/EDGE.md) relink for edge isolates; the
 // list equals src/edge/edge-build.mjs edgeTargets (test/edge.test.mjs).
 export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy', 'supabase-edge'];
-export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets];
+// The browser (docs/BROWSER.md): the edge program as a static web app.
+export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, 'browser'];
+// --suspend (browser): none (the default: blocking waits stop the instance) or
+// jspi (they suspend in browsers that have JSPI).
+export const suspendModes = ['none', 'jspi'];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge] [--dev]
-       lasm init <directory> [--template plain|express|hono|fastify|std-http] [--deploy …]
+       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [-- arguments…]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|browser] [--suspend none|jspi] [--bundler] [--dev]
+       lasm init <directory> [--template plain|express|hono|fastify|std-http|web] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
        lasm cache repair
@@ -31,6 +35,7 @@ export function parseLasmArguments(argv) {
   if (tokens[0] === 'init') return parseInitArguments(tokens.slice(1));
   if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
   if (tokens[0] === 'package') return parsePackageArguments(tokens.slice(1));
+  if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
   if (tokens[0] === 'cache') {
     if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
     if (tokens.length !== 2 || tokens[1] !== 'repair') throw new Error('Usage: lasm cache repair');
@@ -53,6 +58,8 @@ export function parseLasmArguments(argv) {
       result.profile = profile; continue;
     }
     if (token === '--allow-dev') { result.allowDev = true; continue; }
+    // --bundler (browser): the output is input to a bundler (Vite, esbuild, webpack): npm imports stay imports.
+    if (token === '--bundler') { result.bundler = true; continue; }
     const target = /^--target(?:=(.*))?$/.exec(token);
     if (target) {
       if (result.command !== 'build') throw new Error('--target is available only with lasm build');
@@ -62,6 +69,14 @@ export function parseLasmArguments(argv) {
       if (!value || value.startsWith('--')) throw new Error('--target requires a value: ' + buildTargets.join(', '));
       if (!buildTargets.includes(value)) throw new Error(`Unknown build target "${value}". Choose one of: ${buildTargets.join(', ')}`);
       result.target = value; continue;
+    }
+    const suspend = /^--suspend(?:=(.*))?$/.exec(token);
+    if (suspend) {
+      if (supplied.has('suspend')) throw new Error('Specify --suspend only once');
+      supplied.add('suspend');
+      const value = suspend[1] ?? tokens[++i];
+      if (!suspendModes.includes(value)) throw new Error(`--suspend requires one of: ${suspendModes.join(', ')}`);
+      result.suspend = value; continue;
     }
     const match = /^--output(?:=(.*))?$/.exec(token);
     if (match) {
@@ -86,6 +101,8 @@ export function parseLasmArguments(argv) {
   if (result.input.endsWith('.lean')) result.profile ??= result.command === 'build' ? 'release' : 'dev';
   if (result.allowDev && !(result.command === 'build' && result.target && result.target !== 'node'))
     throw new Error('--allow-dev applies to lasm build --target <platform> and lasm package');
+  if (result.suspend !== undefined && result.target !== 'browser') throw new Error('--suspend applies to lasm build --target browser');
+  if (result.bundler && result.target !== 'browser') throw new Error('--bundler applies to lasm build --target browser');
   if (result.command === 'build') {
     result.output ??= 'dist';
     // The default target is the runtime the CLI runs on: node, bun or deno.

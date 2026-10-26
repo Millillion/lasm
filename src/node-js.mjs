@@ -30,6 +30,7 @@
 //   211 register the synchronous-callback channel   213 statistics
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { HandleTable } from './handle-table.mjs';
 
 export const jsProtocolVersion = 1;
@@ -273,6 +274,16 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
   function load(specifier) {
     // Global functions (fetch, setTimeout, structuredClone, …) bind to module "globalThis".
     if (specifier === 'globalThis') return globalThis;
+    // Lasm's builtin modules (lasm:<name>, src/edge/builtin-modules.mjs), copied beside the host.
+    if (specifier.startsWith('lasm:')) {
+      const name = specifier.slice(5);
+      if (!/^[a-z][a-z0-9-]*$/.test(name)) throw failure(`Unknown Lasm builtin JavaScript module ${JSON.stringify(specifier)}`);
+      try { return moduleRequire(fileURLToPath(new URL(`./lasm-modules/${name}.mjs`, import.meta.url))); }
+      catch (error) {
+        if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND') throw failure(`Unknown Lasm builtin JavaScript module ${JSON.stringify(specifier)}`);
+        throw jsFailure(error);
+      }
+    }
     try { return moduleRequire(specifier); }
     catch (error) {
       if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND')

@@ -5,19 +5,32 @@
 // host operations, Lasm.JS events) are queued by the host, which calls
 // notify(); an idle runtime is pumped at once, a running one takes them at
 // its next poll, a suspended one is resumed.
+//
+// Without JSPI (an engine that has none, such as Safari, or an embedder that
+// asks for the sync behaviour, Module.lasmEdgeJspi false: the browser default)
+// the JSPI-linked program runs as a plain one. Its Wasm is the same; only the
+// glue wraps the one suspending import and the promising exports, so inside
+// this module those wrappers become identities. Blocking waits then stop the
+// instance with a message, as in a link without JSPI.
+var WebAssembly = (() => {
+  const engine = globalThis.WebAssembly;
+  if (typeof engine.Suspending === 'function' && Module.lasmEdgeJspi) return engine;
+  return Object.assign(Object.create(engine), { Suspending: function Suspending(fn) { return fn; }, promising: fn => fn });
+})();
 Module.lasmEdge = (() => {
   const INT64_MIN = -(2n ** 63n);
   // Whether Lean may suspend: Asyncify builds (ASYNCIFY=1, whose Asyncify
-  // object has currData), or JSPI builds where the engine has it. Checked when
-  // first needed: this pre-JS runs before the module defines Asyncify (a
-  // hoisted var, still undefined here).
+  // object has currData), or JSPI where the engine has it and the embedder
+  // allows it (WebAssembly is this module's own, above). Checked when first
+  // needed: this pre-JS runs before the module defines Asyncify (a hoisted
+  // var, still undefined here).
   let suspendable;
   const jspi = () => suspendable ??= typeof Asyncify !== 'undefined' && 'currData' in Asyncify
-    || typeof WebAssembly.Suspending === 'function' && !!Module.lasmEdgeJspi;
+    || WebAssembly === globalThis.WebAssembly && typeof WebAssembly.Suspending === 'function' && !!Module.lasmEdgeJspi;
   let host, response = null, waking = null;
   // Pending host calls, innermost last (Lean's waits nest on its one stack).
   const pendingCalls = [];
-  let state = 'idle', syncDepth = 0, poisoned = null;
+  let state = 'idle', syncDepth = 0, poisoned = null, scheduled = false;
   // A JavaScript exception or trap that unwinds Lean's stack (Wasm stack
   // exhaustion, a blocking wait that cannot suspend, an abort) leaves the
   // runtime in an unknown state: no C++ cleanup ran and the task queue may be
@@ -62,6 +75,12 @@ Module.lasmEdge = (() => {
     attach(h) { host = h; },
     onStop(listener) { listeners.push(listener); },
     get stopped() { return poisoned; },
+    // Ends the instance without reporting a failure (an unmounted browser app):
+    // later events and calls fail with the reason.
+    close(reason = 'The Lean instance was closed') {
+      if (!poisoned) poisoned = new Error(reason);
+      state = 'idle';
+    },
     fail(message) { throw new Error(message); },
     initialized() { host.initialized?.(); },
     canSuspend,
@@ -81,8 +100,8 @@ Module.lasmEdge = (() => {
         // operations (IO.sleep, file reads, …) cannot report it, so they stop
         // the instance with the reason.
         if (operation < 200 || operation > 219)
-          throw new Error(`Lean host operation ${operation} must wait, and this Lean code cannot suspend (${jspi() ? 'inside a synchronous JavaScript callback' : 'the edge build cannot suspend: no JSPI'})`);
-        result = hostError(`Lean host operation ${operation} completes asynchronously and cannot be waited for here (${jspi() ? 'inside a synchronous JavaScript callback' : 'this edge build cannot suspend: no JSPI'}); await it in Async instead`);
+          throw new Error(`Lean host operation ${operation} must wait, and this Lean code cannot suspend (${jspi() ? 'inside a synchronous JavaScript callback' : 'this Lean instance runs without JSPI'})`);
+        result = hostError(`Lean host operation ${operation} completes asynchronously and cannot be waited for here (${jspi() ? 'inside a synchronous JavaScript callback' : 'this Lean instance runs without JSPI'}); await it in Async instead`);
       }
       response = result;
       return length(result);
@@ -123,11 +142,15 @@ Module.lasmEdge = (() => {
       const input = _malloc(Math.max(1, payload.length)), size = _malloc(8);
       HEAPU8.set(payload, input);
       let pointer;
-      try { pointer = Number(_lasm_js_edge_sync(fn, input, payload.length, size)); }
+      // The export is not wrapped: its pointer and size_t parameters are i64 (BigInt).
+      try { pointer = Number(_lasm_js_edge_sync(fn, BigInt(input), BigInt(payload.length), BigInt(size))); }
       catch (failure) { syncDepth--; throw poison(failure, sp); }
       const result = HEAPU8.slice(pointer, pointer + Number(HEAPU32[size >> 2]));
       _free(input); _free(size);
       syncDepth--; state = previous;
+      // Lean tasks the callback queued (IO.asTask, Async work, settled
+      // promises) run when the JavaScript that called it has returned.
+      if (previous === 'idle' && !scheduled) { scheduled = true; queueMicrotask(() => { scheduled = false; controller.pump(); }); }
       return result;
     },
   };

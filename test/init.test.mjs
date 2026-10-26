@@ -37,7 +37,7 @@ test('project names', () => {
 test('every template creates a complete project', () => {
   const root = mkdtempSync(join(tmpdir(), 'lasm-init-'));
   try {
-    for (const template of Object.keys(templates)) {
+    for (const template of Object.keys(templates).filter(name => !templates[name].browser)) {
       const directory = join(root, `app ${template}`);
       const result = initProject({ directory, template });
       assert.deepEqual(result.files.sort(), ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Main.lean', 'README.md',
@@ -123,5 +123,24 @@ test('every template creates a complete project', () => {
     mkdirSync(join(root, 'other')); writeFileSync(join(root, 'other', 'notes.txt'), 'keep');
     assert.throws(() => initProject({ directory: join(root, 'other'), template: 'hono' }), /is not empty/);
     assert.equal(readFileSync(join(root, 'other', 'notes.txt'), 'utf8'), 'keep');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('the web template: a static browser app built with --target browser', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-init-web-'));
+  try {
+    const directory = join(root, 'web app');
+    const result = initProject({ directory, template: 'web' });
+    assert.deepEqual(result.files.sort(), ['.gitignore', 'App.lean', 'Main.lean', 'README.md', 'index.html', 'lakefile.toml', 'lean-toolchain',
+      'package.json', 'public/style.css']);
+    const read = file => readFileSync(join(directory, file), 'utf8');
+    const pkg = JSON.parse(read('package.json'));
+    assert.equal(pkg.scripts.build, 'lasm build Main.lean --target browser');
+    assert.equal(pkg.scripts.dev, 'lasm dev Main.lean --target browser');
+    assert.equal(pkg.dependencies, undefined);
+    assert.match(read('Main.lean'), /^import Lasm\.UI$/m);
+    assert.match(read('index.html'), /data-lasm-app/);
+    assert.match(read('index.html'), /<\/head>/);
+    assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'web', '--deploy', 'workers']), /needs a server template/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

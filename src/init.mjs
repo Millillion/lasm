@@ -49,6 +49,8 @@ export const templates = {
   hono: { summary: 'Hono on @hono/node-server with Lean request handlers (Lasm.JS)', server: true, interop: true, portable: true },
   fastify: { summary: 'Fastify 5 with Lean route handlers (Lasm.JS)', server: true, interop: true },
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
+  // The browser (docs/BROWSER.md): a static web app, built with --target browser.
+  web: { summary: 'a browser app in Lean (Lasm.UI): a counter', server: false, interop: true, browser: true },
 };
 
 export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}] [--deploy TARGET]…
@@ -140,7 +142,93 @@ root = "Main"
 `;
 }
 
+function browserPackageJson(name, template) {
+  const lasm = lasmPackage();
+  return JSON.stringify({
+    name, version: '0.1.0', private: true, type: 'module',
+    description: `${templates[template].summary}, compiled to WebAssembly by Lasm`,
+    scripts: {
+      // A dev server on http://localhost:5173 that rebuilds on save and reloads the page.
+      dev: 'lasm dev Main.lean --target browser',
+      // dist/: the static site (loader, Wasm, precompressed copies, index.html).
+      build: 'lasm build Main.lean --target browser',
+      // Serves the release build in dist/ as a static host would.
+      preview: 'lasm dev Main.lean --target browser --release',
+    },
+    engines: { node: '>=24' },
+    devDependencies: { [lasm.name]: lasm.version },
+  }, null, 2) + '\n';
+}
+
+const browserIndexHtml = name => `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${name}</title>
+    <link rel="stylesheet" href="./style.css">
+    <!-- lasm build injects the app's loader and preload hints here. -->
+  </head>
+  <body>
+    <main id="app" data-lasm-app></main>
+    <noscript>This app needs JavaScript and WebAssembly.</noscript>
+  </body>
+</html>
+`;
+const browserStyle = `:root { font-family: system-ui, sans-serif; color-scheme: light dark; }
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; }
+main { text-align: center; }
+p { display: flex; gap: 1rem; align-items: center; justify-content: center; }
+button { font-size: 1.5rem; min-width: 3rem; }
+output { font-size: 2rem; min-width: 3ch; font-variant-numeric: tabular-nums; }
+`;
+
+function browserReadme(name, template) {
+  const lasm = lasmPackage();
+  return `# ${name}
+
+${templates[template].summary[0].toUpperCase() + templates[template].summary.slice(1)}, compiled ahead of time to WebAssembly by
+[Lasm](https://github.com/Millillion/lasm). It runs in Chrome, Edge, Firefox and Safari.
+
+## Requirements
+
+Node.js 24 or newer with npm. Lasm downloads Lean ${defaultLean()} and its build tools on
+the first build (a few hundred MB, cached for later builds).
+
+## Run
+
+\`\`\`sh
+npm install
+npm run dev        # http://localhost:5173: rebuilds when a .lean file changes, then reloads the page
+npm run build      # dist/: the static site
+npm run preview    # the release build, served on http://localhost:5173
+\`\`\`
+
+Files:
+
+| File | What it is |
+| --- | --- |
+| \`Main.lean\` | The app: a pure \`update\` and \`view\` with \`Lasm.UI\` ([guide](https://github.com/Millillion/lasm/blob/main/docs/UI.md)). |
+| \`App.lean\` | Pure Lean logic used by \`Main.lean\`. |
+| \`index.html\`, \`public/style.css\` | The page; \`lasm build\` adds the loader before \`</head>\`, and copies \`public/\` into \`dist/\`. |
+| \`lakefile.toml\`, \`lean-toolchain\` | The Lake project, pinned to Lean ${defaultLean()}. |
+| \`package.json\` | npm scripts, and Lasm (\`${lasm.name}\`) as a dev dependency. |
+
+\`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
+\`Lasm.UI\`, which only Lasm provides.
+
+## Deploy
+
+\`dist/\` is a static site: upload it to any static host or CDN (GitHub Pages,
+Cloudflare Pages, Netlify, Vercel, S3 and CloudFront, nginx). Serve \`.wasm\` as
+\`application/wasm\`; the \`.br\` and \`.gz\` copies let the host send compressed files
+without compressing them itself. Files named \`app.<hash>.*\` never change and can be
+cached forever. See the [browser deployment guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/browser.md).
+`;
+}
+
 function packageJson(name, template, deploy = []) {
+  if (templates[template].browser) return browserPackageJson(name, template);
   const lasm = lasmPackage();
   const pkg = {
     name, version: '0.1.0', private: true,
@@ -482,7 +570,17 @@ export function initProject({ directory, template, deploy = [] }) {
     if (entries.length) throw new Error(`${directory} is not empty. Choose a new or empty directory.`);
   }
   const name = packageName(target);
-  const files = {
+  const files = templates[template].browser ? {
+    'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
+    'lakefile.toml': lakefile(name),
+    'package.json': packageJson(name, template),
+    'App.lean': readFileSync(join(templateRoot, 'common/App.lean'), 'utf8'),
+    'Main.lean': readFileSync(join(templateRoot, template, 'Main.lean'), 'utf8'),
+    'index.html': browserIndexHtml(name),
+    'public/style.css': browserStyle,
+    'README.md': browserReadme(name, template),
+    '.gitignore': gitignore,
+  } : {
     'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
     'lakefile.toml': lakefile(name),
     'package.json': packageJson(name, template, deploy),
@@ -494,6 +592,7 @@ export function initProject({ directory, template, deploy = [] }) {
     '.gitignore': deployGitignore(deploy, template, name),
   };
   if (deploy.includes('lambda')) files['Dockerfile.lambda'] = lambdaDockerfile();
+  if (templates[template].browser) delete files['Dockerfile'];
   if (deploy.includes('vercel')) files['vercel.json'] = vercelJson;
   if (deploy.includes('netlify')) { files['netlify.toml'] = netlifyToml; files['public/.gitkeep'] = ''; }
   if (deploy.includes('workers')) files['wrangler.toml'] = wranglerToml(name);
@@ -525,7 +624,8 @@ ${cd}${nextSteps(options.template, jsRuntime)}`);
 /** The first commands, for the runtime that ran lasm init (Bun and Deno: portable templates). */
 export function nextSteps(template, runtime = 'node') {
   const portable = templates[template].portable;
-  const server = template !== 'plain';
+  const server = templates[template].server;
+  if (templates[template].browser) return `  npm install\n  npm run dev          # then open http://localhost:5173`;
   if (runtime === 'bun' && portable) return `  bun install\n  bun run dev:bun${server ? '      # then: curl http://localhost:3000/hello/Ada' : ''}`;
   if (runtime === 'deno' && portable) return `  deno install\n  deno task dev${server ? '        # then: curl http://localhost:8000/hello/Ada' : ''}`;
   return `  npm install\n  npm run dev${server ? '          # then: curl http://localhost:3000/hello/Ada' : ''}`;
