@@ -86,6 +86,8 @@ structure State (Model Msg : Type) where
   subs : Std.HashMap SubSpec Nat := {}
   handlers : Std.HashMap Nat (List (Array Data → Option Msg)) := {}
   nextSub : Nat := 1
+  /-- Elements that received events since the last frame (paths of ids). -/
+  touched : Array (List Nat) := #[]
   /-- Ports whose values are delivered (`Subs.port`); a port stays listened to. -/
   ports : List String := []
 
@@ -97,6 +99,26 @@ def findPath (live : List (Live Msg)) : List Nat → Array (Live Msg) → Array 
     | some n@(.elem _ _ _ _ _ cs) => findPath cs rest (acc.push n)
     | some n => acc.push n
     | none => acc
+
+/-- The properties the user changes in the DOM (typing, clicking). -/
+def userProp (name : String) : Bool := name == "value" || name == "checked" || name == "selected"
+
+/-- Sets again the user-changeable properties (`value`, `checked`, `selected`)
+of the elements that received events since the last frame, as the new view
+gives them. The diff compares views, and between two frames the user may have
+changed the DOM (typed, then pressed Enter, and `update` cleared the field to
+the value the last frame had). The applier sets a property only when the DOM's
+differs, so the caret does not move. For the DOM model these ops change
+nothing: the slot already holds that value. -/
+def resync (live : List (Live Msg)) (touched : Array (List Nat)) : Array (Op Msg) :=
+  touched.foldl (init := #[]) fun ops path =>
+    match (findPath live path #[]).back? with
+    | some (.elem id _ _ _ attrs _) =>
+      let sets := attrs.filterMap fun
+        | .prop n v => if userProp n then some (AttrOp.set (.prop n) (.prop v)) else none
+        | _ => none
+      if sets.isEmpty then ops else ops.push (.attrs id sets)
+    | _ => ops
 
 /-- The handler a node has for an event (the last one wins). -/
 def handlerFor (event : String) : List (Attr Msg) → Option (List EvVal → Option Msg)
@@ -237,11 +259,11 @@ model did not change). -/
 def frame (c : Ctx Flags Model Msg) : IO ByteArray := do
   let s ← c.ref.get
   if !s.dirty then
-    c.ref.set { s with scheduled := false }
+    c.ref.set { s with scheduled := false, touched := #[] }
     return .empty
   let r := diff s.live [c.app.view s.model] s.next
-  let (bytes, tables) := Encode.frame s.tables r.ops
-  c.ref.set { s with live := r.live, next := r.next, tables, dirty := false, scheduled := false }
+  let (bytes, tables) := Encode.frame s.tables (r.ops ++ resync r.live s.touched)
+  c.ref.set { s with live := r.live, next := r.next, tables, dirty := false, scheduled := false, touched := #[] }
   return bytes
 
 /-- An event from the applier: the ids from the root to the target, the event
@@ -253,6 +275,7 @@ def onEvent (c : Ctx Flags Model Msg) (args : Array Data) : IO Data := do
     | .ok p => pure p
     | .error _ => return .bool false
   let nodes := findPath (← c.ref.get).live path.toList #[]
+  c.ref.modify fun s => { s with touched := s.touched.push path.toList }
   let mut msgs := #[]
   let mut i := 0
   while i + 1 < calls.size do

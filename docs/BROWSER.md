@@ -70,15 +70,48 @@ Lean libraries that need a JavaScript side (`lasm:web` for `Lasm.Web`,
 
 ## Patch protocol (`lasm:ui-dom`)
 
-Lean keeps the previous `Html` tree and node ids; `diff` writes ops into a
-`ByteArray` (LEB128 integers, UTF-8 strings, interned tag/attribute names).
-The applier keeps an id → `Node` table. Ops: create element/text (with
-namespace for SVG), set/remove attribute, set property, set style, add/remove
-event listener (by handler id and decoder id), insert before, remove, replace
-text, keyed move. Events are delegated: the applier encodes the event fields a
-handler's decoder asks for (`target.value`, `checked`, `key`, modifiers, pointer
-coordinates, …) and calls Lean's dispatch once; Lean runs `update`, then `view`
-and `diff` on the next animation frame.
+**In branch source (2026-10-26).** Lasm.UI ([UI.md](UI.md)) keeps the live
+tree (the last view with node ids) in Lean; `diff` (proved correct against a
+DOM model, [UI.md](UI.md#what-is-proved)) produces a patch, which
+[Encode.lean](../library/Lasm/UI/Encode.lean) writes as one `ByteArray` per
+frame. The applier [`lasm:ui-dom`](../src/lasm-modules/ui-dom.mjs) (one
+instance per mounted app, about 300 lines) keeps an id → `Node` table; the
+mount element is node 0.
+
+Integers are unsigned LEB128; strings are a byte length and UTF-8 bytes.
+Names (tags, attribute, property, style and event names) are interned across
+frames: `0` + string (appended to the table), `1` + string (not added; the
+table holds 8,192 names) or `index + 2`. A frame is the new decoder shapes
+followed by the ops:
+
+| Op | Encoding | DOM |
+| --- | --- | --- |
+| insert | `1 parent before node` (`before`: 0 appends, else id + 1) | build the subtree, `insertBefore` |
+| move | `2 parent id before` | `insertBefore` of an existing child |
+| remove | `3 id` | `remove()`, ids of the subtree forgotten |
+| clear | `4 parent` | `textContent = ""` |
+| text | `5 id string` | `data = string` |
+| attributes | `6 id count attrop*` | as below |
+| decoder | `7 decoderId pathCount (segmentCount string*)*` | defines the event fields a handler reads |
+
+A node is `0 id string` (text) or `ns id tag attrCount attr* childCount node*`
+(`ns`: 1 HTML, 2 SVG, 3 MathML). An attribute is `0 name string`
+(`setAttribute`), `1 name string` / `2 name` / `3 name` (property: a string,
+false, true), `4 name string` (`style.setProperty`) or `5 event decoderId
+flags` (a listener; flags 1 `preventDefault`, 2 `stopPropagation`); `8`–`11`
+followed by a name remove an attribute, property, style or listener.
+
+Events are delegated: the applier listens on the mount element (capture
+phase) for each event type in use, walks from the target to the root, and for
+each element with a listener for the type (only the target for non-bubbling
+events) applies the static options and reads the decoder's paths from the
+event (`currentTarget` is that element). It then makes **one** synchronous
+call into Lean with the ids from the root to the target and, per handler, its
+depth and values. Lean runs `update` (and commands) at once; if the model
+changed it asks for a frame, and on the next `requestAnimationFrame` one call
+returns the patch. Hydration (`mount(el, { hydrate: true })`) applies the
+first frame by adopting the existing children in order (comment nodes are
+dropped; a node whose kind, tag or namespace differs is replaced).
 
 ## Testing
 

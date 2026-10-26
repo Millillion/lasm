@@ -110,6 +110,44 @@ npm on first use; this was validated only against a local test registry
 ([npm distribution](docs/TOOLCHAIN_SLIMMING.md#phase-3-2026-10-16-npm-distribution)).
 `LASM_ARTIFACT_SOURCE=npm` forbids direct downloads; `https` ignores the packages.
 
+## Frontends in Lean (Lasm.UI)
+
+**In branch source (`browser`), planned for the next release.** `Lasm.UI` is a
+frontend framework for browser apps written entirely in Lean: the Elm
+architecture (`init`, a pure `update`, a pure `view`, subscriptions), JSX-like
+`html!` markup checked while Lean elaborates, commands (HTTP, timers, storage,
+navigation, ports), routing, server-side rendering and hydration. Diffing runs
+in Lean and is proved correct against a model of the DOM, keyed moves
+included; your own `update` can carry proofs too
+([TodoMVC](examples/ui/todomvc/Todo.lean)). Guide and API reference:
+[docs/UI.md](docs/UI.md).
+
+```lean
+import Lasm.UI
+open Lasm.UI
+
+inductive Msg where
+  | increment
+  | decrement
+
+def update : Msg → Int → Int
+  | .increment, n => n + 1
+  | .decrement, n => n - 1
+
+def view (n : Int) : Html Msg :=
+  html! <main>
+          <button onClick={Msg.decrement}>-</button>
+          <output>{n}</output>
+          <button onClick={Msg.increment}>+</button>
+        </main>
+
+def main : IO Unit := (App.sandbox 0 update view).run
+```
+
+```sh
+lasm build Main.lean --target browser   # dist/: index.html, app.<hash>.js, app.<hash>.wasm
+```
+
 ## CLI reference
 
 These are all commands and options in the ordinary Node application interface:
