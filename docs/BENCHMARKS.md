@@ -300,6 +300,89 @@ What remains, by platform:
   Lasm.JS program; it now imports only `Lean.Environment` (1.2 → 0.4 s here).
 
 
+## Edit loop (lasm dev)
+
+Branch `dx` (after 0.2.0). Goal: an ordinary one-function edit rebuilt in at
+most 2 s on the Linux x64 runner. A profile of a dev edit before the work
+(maintainer host, one build job, Hono fixture: 8.0 s; template project 5.9 s):
+
+| Step | Before | What changed |
+| --- | ---: | --- |
+| Lake adapter (`lake-module.lean`, Lake plugin) | 1.35 s | Cached by Lake configuration and import headers |
+| Lake transitive imports, `.olean` list queries | 0.3 s | Cached the same way |
+| Lean elaboration of the edited module (Lake `:c` query) | 0.8 s | — (the floor) |
+| Lasm.JS binding read (`lean --run`) and check | 0.4 s | Runs while the program compiles and links; the check is cached by bindings and npm closure |
+| clang of the edited module | 0.45 s | `-O1` in dev (0.40 s; more on large modules) |
+| Planning probes (wasm-ld, 2 per edit) | 2.6 s | Seeded plan: the delivered link is the planning round; body probes reuse cached results (trivial initializers stubbed) |
+| Final wasm-ld | 1.3 s | Links only the runtime members the previous link kept (0.13 s), checked by imports |
+| Emscripten JS steps (symbols, glue, growableHeap) | 1.2 s | Cached by content (also in release) |
+| npm copy, output hashing | 0.3 s | Copy overlaps the link |
+| Tool verification walks, `lean --githash`, driver identity | 0.4 s | Once per `lasm dev` session |
+
+Measured on the free `ubuntu-24.04` runner (4 vCPUs) with
+[`build-profile.yml`](../.github/workflows/build-profile.yml) (`platforms:
+linux-x64`, `edit-loop-only`), in-process as `lasm dev`'s build worker runs,
+after the first dev build; "new process" is `lasm build --dev` after an edit
+(as `npm run dev` in a plain project). Edits add a definition before `main`.
+
+| Dev rebuild after a one-function edit (s) | Before (run 40127904162) | After (run 40289712451) |
+| --- | ---: | ---: |
+| Hono fixture (standalone `Main.lean`), steady state | 6.4 | 1.5, 1.5 (first edit after the first build 2.4) |
+| Template project (`lasm init --template hono`, Lake), steady state | — | 1.8, 1.8 (first edit 4.0: Lake caches fill) |
+| Hono fixture, new process | 6.4 | 2.5 |
+| Template project, new process | — | 2.7 |
+
+End to end with `npm run dev` (`lasm dev`) on the runner, editing `App.lean`
+in the template projects and timing until the restarted server listens
+(`dx-dev-loop.yml`, `scripts/templates/dev-loop-check.mjs`, run 40289814978,
+before the trivial-initializer stubs): Hono 2.3 s build (2.8 s to listening),
+Fastify 3.3 s (3.9 s). The `lasm dev` summary line names the parts, for
+example `Built in 1.9 s (Lean 1.0s · C 0.1s · link 0.6s · output 0.2s)`.
+
+Release builds keep their bytes (the Hono fixture's `program.wasm` and
+`program.cjs` compared by SHA-256 before and after) and get faster from the
+cached JavaScript steps (maintainer host, one-line edit: 20.3 → 17.2 s).
+Edge targets in `lasm dev` use an edge dev profile (Binaryen lowering only).
+
+## Cold start on a fraction of a CPU
+
+Function platforms run a function with a share of a CPU: AWS Lambda gives one
+vCPU at 1,769 MB, so about 0.29 vCPU at 512 MB and 0.58 at 1,024 MB, enforced
+by a CFS quota. [`scripts/serverless/cold-start-cpu.mjs`](../scripts/serverless/cold-start-cpu.mjs)
+starts `node dist/main.mjs` under such a quota (systemd `CPUQuota`) and times
+the first answered `GET /health`, five fresh processes per cell, interleaved
+(`ubuntu-24.04`, Node 26.12.1, release builds of the templates; run
+40289814978):
+
+| Template | 4 CPUs | 1 CPU | 0.58 CPU | 0.29 CPU | CPU time used |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Hono | 343 ms | 532 ms | 948 ms | 1,909 ms | 570 ms |
+| Express | 372 ms | 578 ms | 983 ms | 2,028 ms | 600 ms |
+| Fastify | 408 ms | 638 ms | 1,095 ms | 2,204 ms | 650 ms |
+| Hono, `LASM_THREAD_POOL=1` | 363 ms | 526 ms | 885 ms | 1,818 ms | 540 ms |
+| Express, `LASM_THREAD_POOL=1` | 409 ms | 537 ms | 924 ms | 1,866 ms | 570 ms |
+| Fastify, `LASM_THREAD_POOL=1` | 449 ms | 621 ms | 1,053 ms | 2,073 ms | 610 ms |
+
+What this shows:
+
+- A cold start is CPU-bound: about 0.55–0.65 s of CPU (Node's start, the
+  program's Workers, Wasm compilation, Lean's initialization and the
+  framework's own `require`), so its time is roughly that divided by the CPU
+  share. On Lambda, 1,024 MB halves the 512 MB cold start; the deployment
+  guides' "at least 512 MB" is the floor, not the recommendation for latency.
+- The recorded link starts four Lean thread Workers before `main`
+  (`-sPTHREAD_POOL_SIZE=4`). `LASM_THREAD_POOL` (0–64) now chooses that number
+  at start; one Worker saves 30–40 ms of CPU and 4–6 % of the cold start at
+  0.29–0.58 CPU and costs 5–12 % on 4 CPUs. The function shims (`lasm
+  package`) default to 1; servers keep 4.
+- Not changed yet, measured on the maintainer host: Fastify's own `require`
+  and schema compiler take about 150 ms of the main thread; the first
+  `IO.println` starts a file-I/O Worker (about 50 ms of CPU); each Worker
+  compiles `program.cjs` again (about 25 ms). Snapshotting compiled Wasm is not
+  available to Node programs (no code cache for `WebAssembly.compile`), and
+  Node's compile cache needs a writable, warm directory, which a new function
+  instance does not have.
+
 ## Big numbers without GMP
 
 Lasm's Wasm runtime is built with Lean's `-DUSE_GMP=OFF` (docs/PLAN.md decision 5,
