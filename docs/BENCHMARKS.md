@@ -366,6 +366,23 @@ whole profile on the runner (linux-x64; before: run 40127904162, after: run
 | hono: dev, one-line edit (first after a release build) | 6.4 | 2.6 |
 Edge targets in `lasm dev` use an edge dev profile (Binaryen lowering only).
 
+### Browser target (branch `dx-browser`)
+
+The web template (`Lasm.UI` counter), one view expression edited, Linux x64
+runner, browser.yml: before (run 40293687681, `lasm build --dev --target
+browser` per save, the browser branch alone) 16.8 s. After (run 40298525152):
+
+| Step | Before | After |
+| --- | --- | --- |
+| Lean (Lake query, elaboration) | about 2 s | 0.7 s |
+| Node link: planning probes, final link, glue | about 6 s | link only, live members: 0.4 s |
+| Edge (browser) link | about 4 s (full archives, Binaryen) | live members 0.1 s, Binaryen lowering only 0.2 s |
+| brotli 11 + gzip 9 of the outputs | about 2 s | skipped in dev |
+| Total, `lasm dev --target browser` (warm worker) | 16.8 s | 1.9 s (first edit after the first build 3.5 s) |
+| Total, a new `lasm build --dev --target browser` process | 16.8 s | 3.4 s |
+
+The "before" split is from a local profile of the same steps; the totals are CI.
+
 ## Cold start on a fraction of a CPU
 
 Function platforms run a function with a share of a CPU: AWS Lambda gives one
