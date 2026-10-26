@@ -712,7 +712,7 @@ name = "View"
         'build:server': 'lasm build Server.lean --output dist/server',
         start: 'node dist/server/main.mjs',
         // Cloudflare Workers: the server as a Worker, the browser app as static assets (wrangler.toml).
-        'build:workers': 'npm run build:client && lasm build Server.lean --target workers',
+        'build:workers': 'npm run build:client && lasm build Server.lean --target workers --output dist/server',
       },
       engines: { node: '>=24' },
       devDependencies: { [lasm.name]: lasm.version },

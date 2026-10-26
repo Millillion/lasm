@@ -157,7 +157,7 @@ test('the fullstack template: shared, server and client modules; Node and Worker
     assert.equal(pkg.scripts.dev, 'lasm dev Server.lean --client Client.lean');
     assert.equal(pkg.scripts['build:client'], 'lasm build Client.lean --target browser --output dist/public/client');
     assert.equal(pkg.scripts.start, 'node dist/server/main.mjs');
-    assert.match(pkg.scripts['build:workers'], /lasm build Server\.lean --target workers$/);
+    assert.match(pkg.scripts["build:workers"], /lasm build Server\.lean --target workers --output dist\/server$/);
     assert.match(read('wrangler.toml'), /\[assets\]\ndirectory = "\.\/dist\/public"/);
     assert.match(read('Server.lean'), /^import Lasm\.RPC\.Server$/m);
     assert.match(read('Client.lean'), /^import Lasm\.RPC\.Client$/m);

@@ -128,7 +128,7 @@ cd my-app && npm install
 npm run dev          # http://localhost:3000; rebuilds the server and the browser app on every change
 npm run build        # dist/server (Node) and dist/public (the browser app)
 npm start            # the release build on $PORT (3000)
-npm run build:workers && npx wrangler deploy   # Cloudflare Workers
+npm run build:workers && npx wrangler deploy   # Cloudflare Workers (workers/ and dist/public)
 ```
 
 | File | |
