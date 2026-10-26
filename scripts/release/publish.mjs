@@ -58,11 +58,15 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     run(npm.command, [...npm.args, 'publish', join(dist, 'packages', pkg.filename), '--registry', registry, '--userconfig', userconfig,
       '--access', 'public', '--tag', args.tag, local ? '--provenance=false' : '--provenance', '--ignore-scripts', '--loglevel=notice'],
     { env, stdio: 'inherit' });
-    // The registry must serve the bytes that were packed (the public registry can lag a little).
+    // The registry must serve the bytes that were packed. The public registry can lag:
+    // a 58 MB tool package took over 10 min to appear (release run 40292403922), so wait
+    // up to 30 min, reporting each minute.
     let remote;
-    for (let attempt = 0; attempt < 60; attempt++) {
+    const started = Date.now();
+    for (let attempt = 0; attempt < 180; attempt++) {
       remote = await published(registry, pkg.name, pkg.version);
       if (remote.exists) break;
+      if (attempt % 6 === 5) console.log(`waiting for the registry to serve ${pkg.name}@${pkg.version} (${Math.round((Date.now() - started) / 60_000)} min of at most 30)`);
       await delay(10_000);
     }
     assert.equal(remote.integrity, pkg.integrity, `${pkg.name}@${pkg.version}: the registry serves ${remote.integrity}`);
