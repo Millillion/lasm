@@ -397,13 +397,18 @@ What this shows:
   at start; one Worker saves 30–40 ms of CPU and 4–6 % of the cold start at
   0.29–0.58 CPU and costs 5–12 % on 4 CPUs. The function shims (`lasm
   package`) default to 1; servers keep 4.
-- Not changed yet, measured on the maintainer host: Fastify's own `require`
-  and schema compiler take about 150 ms of the main thread; the first
-  `IO.println` starts a file-I/O Worker (about 50 ms of CPU); each Worker
-  compiles `program.cjs` again (about 25 ms). Snapshotting compiled Wasm is not
-  available to Node programs (no code cache for `WebAssembly.compile`), and
-  Node's compile cache needs a writable, warm directory, which a new function
-  instance does not have.
+- Standard output and error, and the working directory's name, no longer
+  start a native file Worker (synchronous writes on POSIX, libuv `readlink`).
+  On the maintainer host that took a Fastify start from 90 to 77 CPU ticks; on
+  the runner (run 40302884580, same table layout) the CPU used per start went
+  570 → 560 ms (Hono), 600 → 580 ms (Express), 650 ms (Fastify, unchanged) and
+  the 0.29 CPU cold starts 1,909 → 1,868 / 2,028 → 1,951 / 2,204 → 2,238 ms:
+  within the runner's noise for Fastify.
+- Evaluated, not used: Node's compile cache (`NODE_COMPILE_CACHE`) made no
+  difference (it caches 12 KiB here, and a new function instance starts with
+  an empty directory); the Wasm module is already compiled once and shared with
+  every Worker. Fastify's own `require` and schema compiler take about 150 ms of
+  the main thread; each Worker compiles `program.cjs` again (about 25 ms).
 
 ## Big numbers without GMP
 
