@@ -43,6 +43,7 @@ Severity: **high** = a newcomer is likely to hit it and lose time or trust;
 | L10 "— 0s elapsed" lines | **Fixed** | A stage prints its name when it starts; time every 10 s |
 
 CI on commit 0c60379: dx-dev-loop run 40336918991 green (`templates` with the rename saves and the no-double-build check, `editor`: all eight templates open with no error in `lake serve` through real elan, `cold-start`); unit run 40336919429 green (including `dev-watch` and `editor` tests).
+On f785eb5 (with the licence work merged): fullstack run 40339354955 green (including the `npm run dev` one-URL job), Workers 40339354883, WASI 40339354772, dx-dev-loop 40339354672, unit 40339354673. With the pinned elan hash (4a2bd5a): dx-dev-loop 40346546888 and unit 40346546998 green; Browser (dispatched) 40346589282 green on Chromium, Firefox and WebKit (Linux and macOS). Browser run 40339354782 failed twice in its edge-runtime build: the resource guard stopped the build at 4.66 GiB on a runner with a 5.82 GiB cap. That is a runner-memory flake, not a code failure; the same build passed in fullstack 40339354955 and Browser 40346589282.
 
 ## Results per template
 
