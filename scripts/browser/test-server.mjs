@@ -84,8 +84,10 @@ function attachEcho(server) {
   });
 }
 
+// The strict policy docs/deploy/browser.md recommends: the apps run under it.
+export const contentSecurityPolicy = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' ws://127.0.0.1:*; style-src 'self' 'unsafe-inline'; img-src 'self' data:";
 export async function startTestServer(root, options = {}) {
-  const started = await startStaticServer(root, { ...options, routes: apiRoutes });
+  const started = await startStaticServer(root, { ...options, routes: apiRoutes, headers: { 'content-security-policy': contentSecurityPolicy } });
   attachEcho(started.server);
   return started;
 }

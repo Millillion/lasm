@@ -33,7 +33,7 @@ source.addEventListener('error-report', event => console.error('[lasm dev] ' + J
  * paths without an extension get the page, for client-side routing), log.
  * Resolves to { server, url, reload(), report(message), close() }.
  */
-export function startStaticServer(root, { port = 0, host = '127.0.0.1', liveReload = false, routes, fallback = 'index.html', log = () => {} } = {}) {
+export function startStaticServer(root, { port = 0, host = '127.0.0.1', liveReload = false, routes, fallback = 'index.html', headers: extraHeaders = {}, log = () => {} } = {}) {
   root = resolve(root);
   const clients = new Set();
   const send = (event, data) => { for (const client of clients) client.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`); };
@@ -59,7 +59,7 @@ export function startStaticServer(root, { port = 0, host = '127.0.0.1', liveRelo
       }
       const extension = extname(file);
       const headers = { 'content-type': mimeTypes[extension] ?? 'application/octet-stream', vary: 'accept-encoding',
-        'cache-control': hashedFile.test(file) ? 'public, max-age=31536000, immutable' : 'no-cache', 'x-content-type-options': 'nosniff' };
+        'cache-control': hashedFile.test(file) ? 'public, max-age=31536000, immutable' : 'no-cache', 'x-content-type-options': 'nosniff', ...extraHeaders };
       if (liveReload && extension === '.html') {
         const html = readFileSync(file, 'utf8');
         const body = html.includes('</body>') ? html.replace('</body>', reloadClient + '\n</body>') : html + reloadClient;
