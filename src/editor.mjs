@@ -59,21 +59,31 @@ export function setupEditor({ project, prefix, version, log = console.error, env
     return { status: 'failed', toolchain, message };
   }
   writeMarker(project, { toolchain, prefix, elanHome: elan.home });
-  log(`[lasm] Editor: the Lean editor now uses Lasm's Lean ${version} for this project (elan toolchain ${toolchain}), `
-    + 'so `import Lasm.*` resolves. Restart the Lean server in your editor if it is open. Undo: elan override unset.');
+  log(`[lasm] Editor: linked Lasm's Lean ${version} as the elan toolchain ${toolchain} and set it as this directory's `
+    + 'elan override, so the Lean editor resolves `import Lasm.*` (restart its Lean server if it is open). '
+    + `Nothing else in elan changes. Undo: elan override unset${explicit ? '' : '; LASM_EDITOR=0 stops lasm doing this'}.`);
   return { status: 'linked', toolchain };
 }
 
 /** After a good build: set up the editor for a Lake project, unless disabled
  * (LASM_EDITOR=0) or on CI. Never fails the build. */
-export async function autoSetupEditor(source, { log = console.error, env = process.env } = {}) {
+export async function autoSetupEditor(source, { log = console.error, env = process.env, cachedOnly = false } = {}) {
   if (env.LASM_EDITOR === '0' || (env.CI && env.CI !== 'false' && env.LASM_EDITOR !== '1')) return undefined;
   try {
     const { findApplicationProject } = await import('./application-sources.mjs');
     const project = findApplicationProject(source);
     if (!project) return undefined;
     const { provisionLean } = await import('./managed-lean.mjs');
-    const lean = await provisionLean(project, { log: () => {} });
+    let lean;
+    try { lean = await provisionLean(project, { log: () => {}, cachedOnly }); }
+    catch (error) {
+      // lasm init on a machine without Lasm's Lean yet: the first build sets the editor up.
+      if (error.code === 'ERR_LASM_NOT_CACHED') {
+        log('[lasm] Editor: the first npm run dev (or npx lasm editor) links Lasm\'s Lean for the Lean editor; Lasm installs it then.');
+        return { status: 'not-cached' };
+      }
+      throw error;
+    }
     return setupEditor({ project, prefix: lean.executionPrefix, version: lean.version, log, env });
   } catch (error) {
     log(`[lasm] Editor setup skipped: ${String(error.message).split('\n')[0]}`);

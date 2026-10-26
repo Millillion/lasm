@@ -93,7 +93,7 @@ export async function assembleLeanPrefix(version, release, components, options =
     if (libraryLeanVersions.includes(version)) options.progress?.({ stage: `Compiling Lasm's Lean library for Lean ${version}` });
     compileLibrary(tree, version, { platform: options.platform, commit: release.commit });
     return known;
-  }, { cache, log: options.log, signal: options.signal, progress: options.progress });
+  }, { cache, log: options.log, signal: options.signal, progress: options.progress, cachedOnly: options.cachedOnly });
 }
 
 const githashes = new Map();
@@ -131,6 +131,7 @@ export async function provisionLean(file, options = {}) {
     return { ...selection, ...installed, prefix: installed.directory, executionPrefix, lean, lake, commit, platform: host, nativePrograms,
       ...details };
   };
+  if (distribution.kind === 'full' && options.cachedOnly) throw Object.assign(new Error('Not in the tool cache yet'), { code: 'ERR_LASM_NOT_CACHED' });
   if (distribution.kind === 'full')
     return finish(await provisionArtifact(distribution.artifact, { ...options, label: `Lean ${selection.version} and Lake` }),
       { distribution: 'full' });

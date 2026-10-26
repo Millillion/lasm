@@ -389,7 +389,7 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
 }
 
 /** Record immutable build-tool derivations separately from upstream downloads. */
-export async function deriveArtifact(provenance, produce, { cache = managedCacheDirectory(), log = console.error, signal, progress } = {}) {
+export async function deriveArtifact(provenance, produce, { cache = managedCacheDirectory(), log = console.error, signal, progress, cachedOnly = false } = {}) {
   const identity = digest(JSON.stringify(provenance)), directory = resolve(cache, 'derived', identity);
   if (pending.has(directory)) return pending.get(directory);
   const operation = withCacheEntryLock(cache, 'derived', identity, async () => {
@@ -404,6 +404,8 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
       try { await lstat(directory); throw new Error(`Incomplete derived tool cache: ${directory}`); }
       catch (missing) { if (missing.code !== 'ENOENT') throw missing; }
     }
+    // cachedOnly: report instead of downloading or assembling (lasm init's editor setup).
+    if (cachedOnly) throw Object.assign(new Error('Not in the tool cache yet'), { code: 'ERR_LASM_NOT_CACHED' });
     await createOwnedStaging(staging);
     try {
       const tree = join(staging, 'tree'); await mkdir(tree);

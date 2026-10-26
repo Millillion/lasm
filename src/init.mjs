@@ -832,7 +832,7 @@ Guides: [Lasm.RPC](https://github.com/Millillion/lasm/blob/main/docs/RPC.md),
 `;
 }
 
-export function runInit(options) {
+export async function runInit(options) {
   const result = initProject(options);
   const near = relative(process.cwd(), result.directory) || '.';
   const where = near.startsWith('..') ? result.directory : near;
@@ -842,6 +842,8 @@ export function runInit(options) {
 
 Next:
 ${cd}${nextSteps(options.template, jsRuntime)}`);
+  // Editor support up front when Lasm's Lean is already on this machine (no download here).
+  await (await import('./editor.mjs')).autoSetupEditor(join(result.directory, 'Main.lean'), { cachedOnly: true });
   return 0;
 }
 
