@@ -120,7 +120,8 @@ const cliSource = `def main (args : List String) : IO UInt32 := do
 `;
 const cliProject = name => { const dir = join(work, name); mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'Main.lean'), cliSource); cpSync(join(root, 'examples/edge-pure/lean-toolchain'), join(dir, 'lean-toolchain')); return dir; };
-const cliCheck = r => (r.stdout.replaceAll('\r\n', '\n').endsWith('args: [a b, c]\n') && r.stderr.includes('to stderr')) || `stdout ${JSON.stringify(r.stdout.slice(-300))}`;
+// The Windows guard appends its JSON record to stdout after the program's.
+const cliCheck = r => (r.stdout.replaceAll('\r\n', '\n')[windows ? 'includes' : 'endsWith']('args: [a b, c]\n') && r.stderr.includes('to stderr')) || `stdout ${JSON.stringify(r.stdout.slice(-300))}`;
 // The installed CLI: its version, its platform package, and whether it runs on Bun/Deno.
 const installed = dir => {
   const cli = join(dir, 'node_modules/@lasm/cli');
