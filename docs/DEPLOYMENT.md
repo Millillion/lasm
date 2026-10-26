@@ -90,11 +90,11 @@ Not yet supported (later phases, see [PLAN.md](PLAN.md)): isolate platforms
 (Cloudflare Workers, Vercel and Netlify Edge, Fastly), which have no threads or
 native add-ons.
 
-## Edge isolates (Phase 7, experimental)
+## Edge isolates (Phase 7)
 
-Edge targets are in current source, unreleased and planned for 0.2.0:
+Edge targets are supported from 0.2.0:
 
-- the commands are `lasm build --target workers|vercel-edge|netlify-edge|deno-deploy`;
+- the commands are `lasm build --target workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge`;
 - the runtime is a single-threaded Lean runtime with a pure-JS host;
 - [`workers.yml`](../.github/workflows/workers.yml) tests them with `wrangler dev`,
   on Node 26, Deno and Bun, with `vercel build` and Vercel's `edge-runtime`,

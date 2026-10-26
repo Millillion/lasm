@@ -26,11 +26,11 @@ export const deployTargets = {
   netlify: { summary: 'Netlify Function (netlify.toml; Netlify runs the build)', package: 'netlify' },
   azure: { summary: 'Azure Functions app (npm run build:azure)', package: 'azure', dependencies: { '@azure/functions': '4.17.0' } },
   gcf: { summary: 'Google Cloud Functions gen2 (npm run build:gcf)', package: 'gcf', dependencies: { '@google-cloud/functions-framework': '5.0.5' } },
-  // Experimental (docs/EDGE.md): the edge build, Hono template only.
-  workers: { summary: 'Cloudflare Workers, experimental (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono', 'fetch'] },
-  'vercel-edge': { summary: 'Vercel Edge Function, experimental (vercel.json; Vercel runs npm run build:vercel-edge)', package: 'vercel-edge', templates: ['hono', 'fetch'], conflicts: ['vercel'] },
-  'netlify-edge': { summary: 'Netlify Edge Function, experimental (netlify.toml; Netlify runs npm run build:netlify-edge)', package: 'netlify-edge', templates: ['hono', 'fetch'], conflicts: ['netlify'] },
-  'deno-deploy': { summary: 'Deno Deploy, experimental (npm run build:deno-deploy, then deno task start:deno; entrypoint deno/main.mjs)', package: 'deno-deploy', templates: ['hono', 'fetch'] },
+  // Edge targets (docs/EDGE.md): the edge build, Hono and fetch templates.
+  workers: { summary: 'Cloudflare Workers (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono', 'fetch'] },
+  'vercel-edge': { summary: 'Vercel Edge Function (vercel.json; Vercel runs npm run build:vercel-edge)', package: 'vercel-edge', templates: ['hono', 'fetch'], conflicts: ['vercel'] },
+  'netlify-edge': { summary: 'Netlify Edge Function (netlify.toml; Netlify runs npm run build:netlify-edge)', package: 'netlify-edge', templates: ['hono', 'fetch'], conflicts: ['netlify'] },
+  'deno-deploy': { summary: 'Deno Deploy (npm run build:deno-deploy, then deno task start:deno; entrypoint deno/main.mjs)', package: 'deno-deploy', templates: ['hono', 'fetch'] },
   'supabase-edge': { summary: 'Supabase Edge Function (supabase/config.toml; npm run build:supabase-edge, then npx supabase functions deploy NAME)', package: 'supabase-edge', templates: ['hono'] },
   // WASI targets (docs/WASI.md): a standard WASI module, no JavaScript.
   fastly: { summary: 'Fastly Compute (fastly.toml; npm run build:fastly, then fastly compute serve)', package: 'fastly', templates: ['fetch'] },
@@ -268,7 +268,7 @@ const netlifyToml = `# Netlify runs the build: lasm build --target netlify write
 
 // Cloudflare Workers: wrangler serves and deploys workers/worker.mjs, which
 // `lasm build --target workers` writes with the Lean program.
-const wranglerToml = name => `# Cloudflare Workers (experimental Lasm edge build): npm run build:workers
+const wranglerToml = name => `# Cloudflare Workers (Lasm edge build): npm run build:workers
 # writes workers/; test with npx wrangler dev, deploy with npx wrangler deploy.
 name = "${name.replace(/[^a-z0-9-]+/g, '-').slice(0, 54)}"
 main = "workers/worker.mjs"
@@ -467,16 +467,16 @@ See the [Netlify guide](${guide('netlify')}).
 \`azure-functions/\`; test it with \`func start\` there and publish with
 \`func azure functionapp publish APP_NAME\`. See the [Azure guide](${guide('azure-functions')}).
 `,
-  workers: () => `**Cloudflare Workers (experimental):** \`npm run build:workers\` writes
+  workers: () => `**Cloudflare Workers:** \`npm run build:workers\` writes
 \`workers/\` (the Worker entry, the Lean program and its host); \`wrangler.toml\` points at it.
 Test with \`npx wrangler dev\` and deploy with \`npx wrangler deploy\`. The same \`Main.lean\`
 serves Node and Workers (\`Lasm.JS.onEdge\`). See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
 `,
-  'vercel-edge': () => `**Vercel Edge (experimental):** \`vercel.json\` makes Vercel run \`npm run build:vercel-edge\`,
+  'vercel-edge': () => `**Vercel Edge:** \`vercel.json\` makes Vercel run \`npm run build:vercel-edge\`,
 which writes the edge function \`api/lasm.mjs\` (and \`api/_lasm/\`); deploy with \`vercel deploy\`.
 Vercel recommends its Node runtime over the edge runtime; see the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
 `,
-  'netlify-edge': () => `**Netlify Edge (experimental):** \`netlify.toml\` makes Netlify run \`npm run build:netlify-edge\`,
+  'netlify-edge': () => `**Netlify Edge:** \`netlify.toml\` makes Netlify run \`npm run build:netlify-edge\`,
 which writes the edge function \`netlify/edge-functions/lasm.mjs\` (and \`netlify/lasm/\`); test with
 \`netlify dev\`, deploy with \`netlify deploy --build\`. See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
 `,
@@ -493,7 +493,7 @@ A Lasm.Fetch handler answers one CGI request per run. See [WASI](https://github.
 (one CGI request per run); \`spin build\` runs \`npm run build:wasi\`, then \`spin up\` serves on port 3000.
 See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
 `,
-  'deno-deploy': () => `**Deno Deploy (experimental):** \`npm run build:deno-deploy\` writes \`deno/\` (the
+  'deno-deploy': () => `**Deno Deploy:** \`npm run build:deno-deploy\` writes \`deno/\` (the
 entrypoint \`deno/main.mjs\`, the Lean program and its host); test with \`deno task start:deno\`
 (PORT, default 8000). On Deno Deploy, set the build command to \`npm run build:deno-deploy\` and the
 entrypoint to \`deno/main.mjs\`. See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).

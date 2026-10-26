@@ -8,7 +8,7 @@ out, and everything in between is ordinary Lean. The same `Main.lean` serves:
 | `lasm build Main.lean` | Node 24+ (`node dist/main.mjs`), containers, VMs | An HTTP server (`node:http`) on `$HOST:$PORT`, default `0.0.0.0:3000` |
 | `lasm build Main.lean --target fastly` | Fastly Compute (`fastly compute serve`, `fastly compute deploy`) | Fastly's host calls: one request per instance |
 | `lasm build Main.lean --target wasi` | Spin (`executor = { type = "wagi" }`), wasmtime, wasmer, Node's `node:wasi`, any CGI host | CGI: one request per run (environment variables and standard input in, standard output out) |
-| `--target workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` | Edge isolates (experimental, [EDGE.md](EDGE.md)) | The platform's `fetch` handler |
+| `--target workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` | Edge isolates ([EDGE.md](EDGE.md)) | The platform's `fetch` handler |
 | `--target bun`, `--target deno` | Bun, Deno ([BUN_DENO.md](BUN_DENO.md)) | `Bun.serve` / `Deno.serve` on `$PORT` |
 
 No npm package, JavaScript or platform SDK is involved: Lasm supplies the

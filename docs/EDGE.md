@@ -2,8 +2,7 @@
 
 Status: **7.1 (prototype and decision), 7.2 (Cloudflare Workers), packaging,
 7.3 (Vercel and Netlify Edge) and 7.4 (Deno Deploy; Supabase Edge Functions with Asyncify),
-2026-10-24.** Everything here is experimental, outside 0.1.0, and planned for
-0.2.0. The Node build is unchanged.
+2026-10-24.** Every edge target here is supported from 0.2.0. The Node build is unchanged.
 Measured behaviour is marked as measured. Plans are marked as plans.
 
 - Prototype: [`experiments/edge/`](../experiments/edge/).
