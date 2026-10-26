@@ -65,7 +65,7 @@ def view (m : Model) : Html Msg :=
   html! <section class="todoapp">
           <header class="header">
             <h1>todos</h1>
-            <input class="new-todo" placeholder="What needs to be done?" autofocus value={m.field}
+            <input class="new-todo" id="new-todo" placeholder="What needs to be done?" autofocus value={m.field}
               onInput={Msg.updateField} onEnter={Msg.add} />
           </header>
           {if m.todos.isEmpty then [] else
@@ -92,7 +92,8 @@ def view (m : Model) : Html Msg :=
 /-! The app -/
 
 def app : App Unit Model Msg where
-  init _ url := ({ filter := filterOf url }, Cmd.storageGet storageKey fun s => .loaded (fromJson (s.getD "[]")))
+  init _ url := ({ filter := filterOf url },
+    Cmd.batch [Cmd.storageGet storageKey fun s => .loaded (fromJson (s.getD "[]")), Cmd.focus "new-todo"])
   update msg m :=
     let (m', cmd) := Todo.update toJson msg m
     match msg with

@@ -8,6 +8,9 @@
 //     interactive ones (clicks, typing, keys, prevented defaults, pointer, forms),
 //     the console, ports and messages, a second app on the page, unmount, and a
 //     blocking wait stopping the instance;
+//   - the Lasm.UI examples (scripts/ui/browser-checks.mjs): TodoMVC end to end,
+//     the js-framework-benchmark against vanilla JavaScript, the counter and
+//     the feature demo;
 //   - any other app directory: it mounts and reports no error.
 // Writes OUT (JSON); exits 1 when a check fails.
 //   node scripts/browser/browser-ci.mjs --browser chromium --apps DIR --out FILE [--playwright DIR]
@@ -16,6 +19,7 @@ import { join, resolve, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { startTestServer } from './test-server.mjs';
+import { uiChecks } from '../ui/browser-checks.mjs';
 
 const { values } = parseArgs({ options: { browser: { type: 'string' }, apps: { type: 'string' }, out: { type: 'string' }, playwright: { type: 'string' } } });
 const engine = values.browser;
@@ -173,7 +177,9 @@ try {
     if (!existsSync(manifestFile)) continue;
     const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'));
     report.apps[name] = { transfer: manifest.transfer, entry: manifest.entry, wasm: manifest.wasm };
-    const run = name === 'counter' ? counter : name === 'platform' ? platform : generic;
+    const ui = uiChecks[name];
+    const run = name === 'counter' ? counter : name === 'platform' ? platform
+      : ui ? (s, n, m) => ui({ server: s, name: n, manifest: m, openPage, expect, report }) : generic;
     try { await run(server, name, manifest); }
     catch (error) { expect(name, 'runner', false, error.stack ?? error.message); }
   }

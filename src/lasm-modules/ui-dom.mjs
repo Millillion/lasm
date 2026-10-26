@@ -299,8 +299,22 @@ export function lasmInstance(context) {
 const browserOnly = name => () => {
   throw new Error(`lasm:ui-dom ${name}: Lasm.UI apps run in the browser; build with lasm build --target browser and mount the app (docs/UI.md)`);
 };
-const standIn = {};
-for (const name of ['options', 'connect', 'apply', 'schedule', 'error', 'sub', 'unsub', 'timeout', 'http', 'now', 'navigate', 'go',
-  'load', 'storageSet', 'storageRemove', 'storageGet', 'focus', 'title']) standIn[name] = browserOnly(name);
-export const { options, connect, apply, schedule, error, sub, unsub, timeout, http, now, navigate, go, load,
-  storageSet, storageRemove, storageGet, focus, title } = standIn;
+export const options = browserOnly('options');
+export const connect = browserOnly('connect');
+export const apply = browserOnly('apply');
+export const schedule = browserOnly('schedule');
+export const error = browserOnly('error');
+export const sub = browserOnly('sub');
+export const unsub = browserOnly('unsub');
+export const timeout = browserOnly('timeout');
+export const http = browserOnly('http');
+export const now = browserOnly('now');
+export const navigate = browserOnly('navigate');
+export const go = browserOnly('go');
+export const load = browserOnly('load');
+export const storageSet = browserOnly('storageSet');
+export const storageRemove = browserOnly('storageRemove');
+export const storageGet = browserOnly('storageGet');
+export const focus = browserOnly('focus');
+export const title = browserOnly('title');
+const standIn = { options, connect, apply, schedule, error, sub, unsub, timeout, http, now, navigate, go, load, storageSet, storageRemove, storageGet, focus, title };
