@@ -86,10 +86,16 @@ env[pathKey] = [shims, ...(env[pathKey] ?? '').split(delimiter).filter(dir => {
 for (const key of Object.keys(env)) if (/^npm_/i.test(key)) delete env[key];
 // Another registry than npm's (the rehearsal's loopback Verdaccio): Bun, Deno and Lasm's
 // own registry fetch all use it.
+// The Linux resource guard passes only a few variables (HOME among them), so a private
+// HOME holds an .npmrc naming the registry too; Bun and Deno both read ~/.npmrc.
 if (registry !== 'https://registry.npmjs.org/') {
   Object.assign(env, { NPM_CONFIG_REGISTRY: registry, BUN_CONFIG_REGISTRY: registry });
   if (!windows) env.npm_config_registry = registry;
-  results.registryOverride = true;
+  const home = join(work, 'home');
+  mkdirSync(home, { recursive: true });
+  writeFileSync(join(home, '.npmrc'), `registry=${registry}\n`);
+  env.HOME = home;
+  results.registryOverride = { home };
 }
 results.pathWithoutNode = removed;
 const denoAge = '--minimum-dependency-age=0';

@@ -1,0 +1,5 @@
+{
+  "name": "lasm-fetch-example",
+  "private": true,
+  "description": "One pure-Lean HTTP handler (Lasm.Fetch) on every Lasm server target: lasm build Main.lean --target node|wasi|fastly|workers|…"
+}

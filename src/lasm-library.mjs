@@ -1,4 +1,4 @@
-// Lasm's own Lean library (`import Lasm.JS`, `import Lasm.UI`), shipped with the compiler package
+// Lasm's own Lean library (`import Lasm.JS`, `import Lasm.UI`, `import Lasm.Fetch`), shipped with the compiler package
 // in library/ and compiled into the managed Lean prefix when Lasm assembles it
 // (so `import Lasm.JS` resolves like a standard library module, from standalone
 // sources and Lake projects alike, with no Lake dependency). The generated C of
@@ -14,12 +14,16 @@ const root = fileURLToPath(new URL('../library/', import.meta.url));
 // Lean versions the library is compiled for, and its modules in import order.
 export const libraryLeanVersions = ['4.35.0'];
 export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
+  // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
+  'Lasm.Fetch', 'Lasm.Fastly',
   // Lasm.Web (docs/BROWSER.md): web-platform bindings on Lasm.JS.
   'Lasm.Web.Types', 'Lasm.Web.Dom', 'Lasm.Web.Events', 'Lasm.Web.Timers', 'Lasm.Web.Fetch', 'Lasm.Web.Url', 'Lasm.Web.Storage',
   'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI'];
+// Lasm.Fetch's glue on Node and the edge (WASI builds link src/wasi/lasm_fetch_wasi.c).
+export const fetchGlueSource = join(root, 'c', 'lasm_fetch.c');
 // Lasm.UI's proofs (library/Lasm/UI/Proofs*) are checked by scripts/ui/lean-tests.mjs, not shipped.
 
 export const glueSource = join(root, 'c', 'lasm_js.c');
@@ -127,7 +131,7 @@ export function importsLibrary(sources) {
  * module data (for the binding check: library bindings name their JS modules). */
 export function librarySources(lean, programSources) {
   const missing = module => !existsSync(libraryC(lean, module));
-  if (libraryModules.some(missing)) throw new Error(`This program imports Lasm.JS, which needs Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
+  if (libraryModules.some(missing)) throw new Error(`This program imports Lasm.JS or Lasm.Fetch, which need Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
   const cache = new Map();
   const libraryText = module => { if (!cache.has(module)) cache.set(module, readFileSync(libraryC(lean, module), 'latin1')); return cache.get(module); };
   const modules = linkedLibraryModules(programSources, { libraryText });
@@ -135,7 +139,8 @@ export function librarySources(lean, programSources) {
   for (const module of modules) {
     sources.push(libraryC(lean, module)); inputs.push({ module: '+' + module, source: join(lean.prefix, 'src', 'lean', ...module.split('.')) + '.lean' });
   }
-  sources.push(glueSource); inputs.push({ module: 'lasm_js.c', source: glueSource });
+  sources.push(glueSource, fetchGlueSource);
+  inputs.push({ module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource });
   const oleans = modules.map(module => join(lean.prefix, 'lib', 'lean', ...module.split('.')) + '.olean');
   return { sources, inputs, modules, oleans };
 }

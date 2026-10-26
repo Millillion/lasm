@@ -83,12 +83,49 @@ export async function buildEdge(input, target, buildOptions, verbose, { build, l
   } finally { if (temporary) await rm(temporary, { recursive: true, force: true }); }
 }
 
+/** WASI targets (docs/WASI.md): the program relinked as a standard WASI
+ * module with Lasm's C WASI host. Like edge builds, an unchanged Node build
+ * reuses its cached program; otherwise the build keeps its link inputs. */
+async function buildWasi(input, target, buildOptions, verbose) {
+  const { rm } = await import('node:fs/promises');
+  const { dirname, resolve } = await import('node:path');
+  const { buildApplicationWithProgress } = await import('./application-build-client.mjs');
+  const { edgeRuntime } = await import('./edge/edge-runtime.mjs');
+  const { wasiProgramKey, cachedWasiProgram, linkCachedWasiProgram, writeWasiOutput } = await import('./wasi/wasi-build.mjs');
+  const { provisionLinkToolchain } = await import('./managed-link-toolchain.mjs');
+  const { applicationRuntime } = await import('./application-runtime.mjs');
+  const { selectLeanVersion, toolchainCatalog } = await import('./managed-lean.mjs');
+  const { findApplicationProject } = await import('./application-sources.mjs');
+  const source = resolve(input), projectDirectory = findApplicationProject(source) ?? dirname(source);
+  const selection = await selectLeanVersion(source);
+  const nodeRuntime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit });
+  let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built' });
+  const log = message => console.error('[lasm] ' + message);
+  const edge = await edgeRuntime(nodeRuntime, { log });
+  const toolchain = await provisionLinkToolchain({ log });
+  const key = wasiProgramKey({ result, edge, toolchain, target });
+  const cached = cachedWasiProgram(result, target, key);
+  let program = cached;
+  if (program && result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
+  if (!program) {
+    // A Node build reused from its cache kept no link inputs: link it again.
+    if (!result.linkWork) result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: true });
+    try {
+      console.error(`[lasm] Linking for ${{ fastly: 'Fastly Compute', 'wasi-http': 'wasi-http' }[target] ?? 'WASI'}…`);
+      program = linkCachedWasiProgram({ result, nodeRuntime, edge, toolchain, target, key, verbose });
+    } finally {
+      if (result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
+    }
+  }
+  return writeWasiOutput({ target, source, projectDirectory, result, edge, program, cacheHit: !!cached });
+}
+
 /** Shared by the primary CLI and the source-checkout launcher. */
 export async function runApplicationCli(argv) {
   const options = parseLasmArguments(argv);
   const support = applicationSupport();
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|browser] [--suspend none|jspi] [--bundler] [--dev]\n       lasm init my-app [--template plain|express|hono|fastify|std-http|web] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nBuild and run ordinary Lean main in Node.' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|browser|wasi|fastly|wasi-http] [--suspend none|jspi] [--bundler] [--dev]\n       lasm init my-app [--template plain|express|hono|fastify|std-http|web|fetch] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nBuild and run ordinary Lean main in Node.' : cliUsage);
     return 0;
   }
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }
@@ -125,8 +162,12 @@ export async function runApplicationCli(argv) {
   const { jsRuntime, scriptPrefix } = await import('./js-runtime.mjs');
   const target = requested ?? (jsRuntime === 'node' ? undefined : jsRuntime);
   // A dev build refused by packaging is refused before it is built.
-  if (target && !['node', 'bun', 'deno', 'browser'].includes(target) && options.profile === 'dev' && !allowDev)
+  if (target && !['node', 'bun', 'deno', 'browser', 'wasi'].includes(target) && options.profile === 'dev' && !allowDev)
     throw new Error(`lasm build --dev --target ${target}: dev builds are not for deployment. Drop --dev, or add --allow-dev to package a dev build anyway.`);
+  if ((await import('./wasi/wasi-build.mjs')).wasiTargets[target]) {
+    await buildWasi(options.input, target, buildOptions, options.verbose);
+    return 0;
+  }
   if (target === 'browser') {
     await buildEdge(options.input, target, buildOptions, options.verbose, { browserSuspend: suspend ?? 'none', bundler });
     return 0;
