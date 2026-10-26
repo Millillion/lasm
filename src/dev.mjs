@@ -329,7 +329,10 @@ export async function runDev(options, hooks = {}) {
       let allCached = true;
       const toBuild = options.outputs.filter(entry =>
         force || !lastBuilt.has(entry) || !devProxy || devProxy.affects(project, resolve(entry.input), changed));
-      const concurrent = service.workers > 1 && toBuild.length > 1;
+      // Incremental rebuilds only: a first (cold) build compiles the whole library's C
+      // and would double the memory peak (5 GiB on a CI runner); its outputs build one
+      // after the other, each in its own worker, which warms both.
+      const concurrent = service.workers > 1 && toBuild.length > 1 && toBuild.every(entry => lastBuilt.has(entry));
       const outputStages = new Map();
       const buildOne = async entry => {
         const own = concurrent ? [] : stages;
