@@ -137,6 +137,17 @@ call `Event.preventDefault` before the browser acts on the event. -/
 def callback (f : Array Data → IO Unit) : IO Value :=
   Function.ofSyncFn fun args => do f args; pure .undefined
 
+/-- Starts `Async` work from synchronous code (an event handler, `main`)
+without waiting for it: a `fetch`, a sleep, a WebSocket round trip. A failure
+is reported on the console (`console.error`). -/
+def background (work : Async Unit) : IO Unit := do
+  let task ← (work.toEIO : IO (Std.Async.AsyncTask Unit))
+  discard <| IO.mapTask (t := task) fun
+    | .ok _ => pure ()
+    | .error e => do
+      let console ← (← global).get "console"
+      discard <| console.callMethod "error" #[.string s!"Lasm.Web.background: {e}"] (α := Unit)
+
 /-- The first argument of a callback, converted. -/
 def argument (α : Type) [FromJS α] (context : String) (args : Array Data) : IO α :=
   decodeAs α context (args[0]?.getD .undefined)

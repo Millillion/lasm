@@ -59,7 +59,7 @@ uint8_t lean_nat_dec_le(lean_object*, lean_object*);
 extern lean_object* l_Lasm_JS_instFromJSBool;
 extern lean_object* l_Lasm_JS_instFromJSString;
 extern lean_object* l_Lasm_JS_instFromJSNat;
-lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_Web_Event_preventDefault_spec__0(lean_object*, lean_object*, lean_object*);
+lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_Web_background_spec__1(lean_object*, lean_object*, lean_object*);
 lean_object* lean_nat_abs(lean_object*);
 double l_Float_ofInt(lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_Web_Message_ctorIdx(lean_object*);
@@ -3092,7 +3092,7 @@ lean_ctor_set(v___x_962_, 0, v_text_959_);
 v___x_963_ = lean_unsigned_to_nat(1u);
 v___x_964_ = lean_mk_empty_array_with_capacity(v___x_963_);
 v___x_965_ = lean_array_push(v___x_964_, v___x_962_);
-v___x_966_ = l_Lasm_JS_Value_callMethod___at___00Lasm_Web_Event_preventDefault_spec__0(v_ws_958_, v___x_961_, v___x_965_);
+v___x_966_ = l_Lasm_JS_Value_callMethod___at___00Lasm_Web_background_spec__1(v_ws_958_, v___x_961_, v___x_965_);
 return v___x_966_;
 }
 }
@@ -3114,7 +3114,7 @@ lean_ctor_set(v___x_975_, 0, v_bytes_972_);
 v___x_976_ = lean_unsigned_to_nat(1u);
 v___x_977_ = lean_mk_empty_array_with_capacity(v___x_976_);
 v___x_978_ = lean_array_push(v___x_977_, v___x_975_);
-v___x_979_ = l_Lasm_JS_Value_callMethod___at___00Lasm_Web_Event_preventDefault_spec__0(v_ws_971_, v___x_974_, v___x_978_);
+v___x_979_ = l_Lasm_JS_Value_callMethod___at___00Lasm_Web_background_spec__1(v_ws_971_, v___x_974_, v___x_978_);
 return v___x_979_;
 }
 }
@@ -3163,7 +3163,7 @@ v___x_993_ = lean_unsigned_to_nat(2u);
 v___x_994_ = lean_mk_empty_array_with_capacity(v___x_993_);
 v___x_995_ = lean_array_push(v___x_994_, v___y_991_);
 v___x_996_ = lean_array_push(v___x_995_, v___x_992_);
-v___x_997_ = l_Lasm_JS_Value_callMethod___at___00Lasm_Web_Event_preventDefault_spec__0(v_ws_985_, v___x_989_, v___x_996_);
+v___x_997_ = l_Lasm_JS_Value_callMethod___at___00Lasm_Web_background_spec__1(v_ws_985_, v___x_989_, v___x_996_);
 return v___x_997_;
 }
 }

@@ -209,7 +209,8 @@ export const queueMicrotask = shared.queueMicrotask;
 export const webSocket = shared.webSocket;
 
 function createTracking(context) {
-  const listeners = new Set(), timeouts = new Set(), intervals = new Set(), frames = new Set(), sockets = new Set();
+  const listeners = new Set(), timeouts = new Map(), intervals = new Map(), frames = new Set(), sockets = new Set();
+  let nextTimer = 1;
   let disposed = false;
   const report = error => (context.report ?? console.error)(error);
   // A Lean callback throwing must not break the page's own dispatch: report it.
@@ -224,8 +225,8 @@ function createTracking(context) {
   context.onDispose(() => {
     disposed = true;
     for (const l of listeners) l.target.removeEventListener(l.type, l.handler, l.options);
-    for (const id of timeouts) globalThis.clearTimeout(id);
-    for (const id of intervals) globalThis.clearInterval(id);
+    for (const handle of timeouts.values()) globalThis.clearTimeout(handle);
+    for (const handle of intervals.values()) globalThis.clearInterval(handle);
     for (const id of frames) globalThis.cancelAnimationFrame?.(id);
     for (const socket of sockets) { try { socket.close(1001, 'app unmounted'); } catch { /* already closed */ } }
     listeners.clear(); timeouts.clear(); intervals.clear(); frames.clear(); sockets.clear();
@@ -240,10 +241,15 @@ function createTracking(context) {
       return { remove() { if (listeners.delete(entry)) target.removeEventListener(type, entry.handler, opts); } };
     },
     unlisten(handle) { handle?.remove?.(); },
-    setTimeout(fn, ms) { const id = globalThis.setTimeout(() => { timeouts.delete(id); guarded(fn)(); }, ms); timeouts.add(id); return id; },
-    clearTimeout(id) { timeouts.delete(id); globalThis.clearTimeout(id); },
-    setInterval(fn, ms) { const id = globalThis.setInterval(guarded(fn), ms); intervals.add(id); return id; },
-    clearInterval(id) { intervals.delete(id); globalThis.clearInterval(id); },
+    // Timers get numeric ids of their own on every host (Node's setTimeout returns an object).
+    setTimeout(fn, ms) {
+      const id = nextTimer++;
+      timeouts.set(id, globalThis.setTimeout(() => { timeouts.delete(id); guarded(fn)(); }, ms));
+      return id;
+    },
+    clearTimeout(id) { globalThis.clearTimeout(timeouts.get(id)); timeouts.delete(id); },
+    setInterval(fn, ms) { const id = nextTimer++; intervals.set(id, globalThis.setInterval(guarded(fn), ms)); return id; },
+    clearInterval(id) { globalThis.clearInterval(intervals.get(id)); intervals.delete(id); },
     requestAnimationFrame(fn) {
       const raf = need('requestAnimationFrame', 'requestAnimationFrame');
       const id = raf(time => { frames.delete(id); guarded(fn)(time); });

@@ -191,3 +191,26 @@ test('lasm:web: listeners and timers of an app are removed when it unmounts', as
   assert.equal(web.parseUrl('not a url'), null);
   assert.throws(() => web.document(), /Lasm.Web: document needs a browser \(document is not defined here\)/);
 });
+
+test('lasm:web: an app instance has every export of the module', async () => {
+  const web = await import('../src/lasm-modules/web.mjs');
+  const instance = web.lasmInstance({ onDispose() {} });
+  assert.deepEqual(Object.keys(web).filter(name => name !== 'lasmInstance' && !(name in instance)), []);
+  const id = instance.setTimeout(() => {}, 1000);
+  assert.equal(typeof id, 'number', 'numeric timer ids on every host');
+  instance.clearTimeout(id);
+});
+
+test('every lasm:web and lasm:app binding of Lasm.Web names an export', async () => {
+  const { readdirSync } = await import('node:fs');
+  const exports = { 'lasm:web': await import('../src/lasm-modules/web.mjs'), 'lasm:app': await import('../src/lasm-modules/app.mjs') };
+  const directory = new URL('../library/Lasm/Web/', import.meta.url);
+  let count = 0;
+  for (const file of readdirSync(directory).filter(f => f.endsWith('.lean'))) {
+    for (const [, module, name] of readFileSync(new URL(file, directory), 'utf8').matchAll(/@\[js "(lasm:[a-z-]+)" "([^"]+)"\]/g)) {
+      count++;
+      assert.equal(typeof exports[module][name], 'function', `${file}: ${module} ${name}`);
+    }
+  }
+  assert.ok(count > 80, `${count} bindings`);
+});
