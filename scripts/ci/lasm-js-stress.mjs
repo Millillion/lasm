@@ -89,11 +89,16 @@ const result = { platform: `${process.platform}-${process.arch}`, node: process.
 const save = () => writeFileSync(output, JSON.stringify(result, null, 2) + '\n');
 async function stress(name, project, { expected, viaCli = 0, server = false }) {
   const record = result.programs[name] = { pass: 0, hang: 0, fail: 0, failures: [], msMax: 0, msTotal: 0 };
+  // Build first, untimed (a cold build downloads tools): every timed run then
+  // reuses the cached build, as the acceptance's run does after its first build.
+  if (!server) {
+    execFileSync(process.execPath, [lasm, 'Main.lean'], { cwd: project, stdio: ['ignore', 'ignore', 'inherit'], env: { ...process.env, CI: '1' }, timeout: 30 * 60_000 });
+  }
   const total = viaCli + runs;
   for (let i = 0; i < total; i++) {
     const diagDir = join(work, 'hangs', `${name}-${i}`);
     let r;
-    if (!server && (i < viaCli || i === 0)) r = await once(process.execPath, [lasm, 'Main.lean'], project, diagDir);
+    if (!server && i < viaCli) r = await once(process.execPath, [lasm, 'Main.lean'], project, diagDir);
     else {
       const dist = server ? join(project, 'dist') : cachedDist(project);
       if (server) {
