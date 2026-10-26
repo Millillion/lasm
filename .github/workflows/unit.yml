@@ -1,0 +1,65 @@
+name: Unit tests
+# The whole unit suite (test/*.test.mjs) on Linux x64 for the integration
+# branches, including the host's IO guarantees (test/stdio-backpressure.test.mjs,
+# the node-host and native-files tests). The pinned Node runtime and the native
+# host pieces are restored as the other workflows do, so tests that build and run
+# Lean programs run too. Tests that need tools this job does not provide are
+# listed in scripts/ci/unit-tests.mjs with the reason; every other failure fails
+# the job. Free runner, one job.
+on:
+  workflow_dispatch:
+  push:
+    branches: [launch, cold-start]
+permissions:
+  contents: read
+concurrency:
+  group: unit-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  unit:
+    if: github.event.repository.visibility == 'public'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    permissions:
+      contents: write # the pinned runtime input is a draft release asset
+      actions: read
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_BUILD_JOBS: '2'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Native host pieces (koffi, helpers)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      - name: Fetch the pinned Node runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - name: Unit tests
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+        run: node scripts/ci/unit-tests.mjs .work/unit-tests.json
+      - name: Preserve the result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: unit-tests
+          path: .work/unit-tests.json
+          retention-days: 7
+          if-no-files-found: ignore
