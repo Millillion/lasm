@@ -209,6 +209,8 @@ typedef struct { uint32_t fd; bool absolute; char *name; /* normalized, without 
 static preopen *preopens; static size_t preopen_count;
 static char *cwd; /* normalized: "/" + components, or "." + "/" + components */
 
+static char *normalize(const char *path, size_t length);
+static bool locate(const char *normal, uint32_t *dirfd, const char **inside);
 static void read_preopens(void) {
     for (uint32_t fd = 3; fd < 1024; fd++) {
         struct { uint8_t tag; uint8_t pad[3]; uint32_t length; } prestat;
@@ -231,14 +233,25 @@ static void read_preopens(void) {
         if (!grown) lasm_wasi_fail("Lasm WASI: out of memory");
         preopens = grown; preopens[preopen_count++] = p;
     }
-    /* The working directory starts at the relative root when "." is preopened
-       (wasmtime --dir ., node:wasi { '.': ... }), else at "/". */
-    bool relative = false, root = false;
+    /* The working directory: the relative root when "." is preopened
+       (wasmtime --dir ., node:wasi { '.': … }); else $PWD when it lies in a
+       preopened directory (wasmer --volume … --cwd …); else the only
+       preopened directory; else "/". */
+    size_t relative = 0, absolute = 0, last = 0;
     for (size_t i = 0; i < preopen_count; i++) {
-        if (!preopens[i].absolute) relative = true;
-        else if (!preopens[i].name[0]) root = true;
+        if (!preopens[i].absolute) relative++;
+        else { absolute++; last = i; }
     }
-    cwd = strdup(relative || !root ? "." : "/");
+    const char *pwd = env_lookup("PWD", 3);
+    char *normal = pwd && pwd[0] == '/' && !relative ? normalize(pwd, strlen(pwd)) : NULL;
+    uint32_t fd; const char *inside;
+    if (relative) cwd = strdup(".");
+    else if (normal && locate(normal, &fd, &inside)) { cwd = normal; normal = NULL; }
+    else if (absolute == 1) {
+        cwd = malloc(strlen(preopens[last].name) + 2);
+        cwd[0] = '/'; strcpy(cwd + 1, preopens[last].name);
+    } else cwd = strdup("/");
+    free(normal);
 }
 
 /* Joins `path` to the working directory and normalizes it ("." and ".."). */

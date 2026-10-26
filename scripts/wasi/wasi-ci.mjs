@@ -72,7 +72,9 @@ save();
 // ---- The command-line program ----
 const runners = {
   wasmtime: (wasm, args, { env = {} } = {}) => [toolPath.wasmtime, ['run', '--dir', '.', ...Object.entries(env).flatMap(([k, v]) => ['--env', `${k}=${v}`]), wasm, ...args]],
-  wasmer: (wasm, args, { env = {} } = {}) => [toolPath.wasmer, ['run', '--dir=.', ...Object.entries(env).map(([k, v]) => `--env=${k}=${v}`), wasm, '--', ...args]],
+  // wasmer 7.4: --volume=.:/ makes the current directory the guest's root and "." (its --dir . maps "." to a
+  // missing /home for preview 1 modules); it rejects empty --env values.
+  wasmer: (wasm, args, { env = {} } = {}) => [toolPath.wasmer, ['run', '--volume=.:/', ...Object.entries(env).filter(([, v]) => v !== '').map(([k, v]) => `--env=${k}=${v}`), wasm, '--', ...args]],
   node: (wasm, args) => [process.execPath, [join(root, 'scripts/wasi/node-wasi-run.mjs'), wasm, ...args]],
 };
 function run(engine, cwd, wasm, args, { env = {}, input } = {}) {
@@ -183,9 +185,11 @@ for (const engine of ['wasmtime', 'wasmer', 'node'].filter(e => engines.has(e)))
     if (route.skip?.includes(engine)) continue;
     try { checkResponse(`cgi-${engine}`, route, cgi(engine, route)); out.passed++; } catch (error) { fail(`fetch cgi-${engine} ${route.path}`, error); }
   }
-  const times = [];
-  for (let i = 0; i < 10; i++) times.push(cgi(engine, routes[0]).ms);
-  out.perRequestMs = { min: Math.round(Math.min(...times) * 10) / 10, mean: Math.round(times.reduce((a, b) => a + b) / times.length * 10) / 10 };
+  try {
+    const times = [];
+    for (let i = 0; i < 10; i++) times.push(cgi(engine, routes[0]).ms);
+    out.perRequestMs = { min: Math.round(Math.min(...times) * 10) / 10, mean: Math.round(times.reduce((a, b) => a + b) / times.length * 10) / 10 };
+  } catch (error) { fail(`fetch cgi-${engine} timing`, error); }
   save();
 }
 
