@@ -36,7 +36,7 @@ async function todomvc({ server, name, openPage, expect, report }) {
   const until = (fn, arg) => page.waitForFunction(fn, arg, { timeout: 5000 }).catch(() => {});
   try {
     await page.waitForSelector('.new-todo', { timeout: 30_000 });
-    expect(name, 'todomvc.focus-on-load', await page.evaluate(() => document.activeElement?.classList.contains('new-todo')), 'new-todo not focused');
+    expect(name, 'todomvc.focus-on-load', await until(() => document.activeElement?.classList.contains('new-todo')), 'new-todo not focused');
     expect(name, 'todomvc.no-main-when-empty', (await page.$('.main')) === null && (await page.$('.footer')) === null, 'main/footer shown');
     for (const t of ['buy some cheese', '  feed the cat  ', 'book a doctors appointment']) {
       await page.fill('.new-todo', t);
