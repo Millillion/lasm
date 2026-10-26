@@ -123,4 +123,8 @@ choice when you want those frameworks' middleware.
 
 ## Measurements
 
-From CI run 40299999999 (see [WASI.md](WASI.md#measurements)).
+CI run 40283046831 ([WASI.md](WASI.md#measurements)): `GET /` takes a median
+of 1.6 ms on Viceroy (a fresh Fastly instance per request), 1.9 ms on Spin,
+0.86 ms on Node and 0.82 ms on Deno, measured over HTTP; 20 concurrent
+requests that each wait 200 ms on a `Std.Async` timer finish together in
+214–222 ms on all four.

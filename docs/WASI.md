@@ -139,10 +139,51 @@ The decisions and their alternatives are rows in [DECISIONS.md](DECISIONS.md).
 
 ## Measurements
 
-Measured in CI run 40299999999 (ubuntu-24.04, x64; the evidence file
-[wasi-ci-40299999999.json](evidence/wasi-ci-40299999999.json)).
+Measured in CI run 40283046831 (ubuntu-24.04 x64, a free GitHub runner;
+source `085100d`; every check passed;
+[evidence](evidence/wasi-ci-40283046831.json)).
 
-(The table is filled in from that run.)
+**Size.**
+
+| Module | `main.wasm` | gzip -9 |
+| --- | --- | --- |
+| `examples/wasi-cli` (`--target wasi`) | 841,170 bytes (0.80 MiB) | 211,887 |
+| `examples/fetch` (`--target wasi`) | 847,707 bytes (0.81 MiB) | 213,318 |
+| `examples/fetch` (`--target fastly`) | 846,278 bytes; `pkg/*.tar.gz` 212,893 | 212,412 |
+
+**Build.** 37–39 s from a clean checkout for the Node build plus the WASI link
+(the link itself is about 5 s); a second target reuses the Node build (15 s),
+and an unchanged build takes 1.2 s.
+
+**Command-line program** (`examples/wasi-cli`): the whole process, from start
+to exit, of a run that exits at once (best of 5), and the `check` run (files,
+two sleeps of 25 and 20 ms, tasks, Std.Time):
+
+| Engine | Startup + exit | `check` |
+| --- | --- | --- |
+| wasmtime 49.0.4 | 13.7 ms | 529 ms |
+| wasmer 7.4.2 | 30.1 ms | 511 ms |
+| Node 26.12.1 `node:wasi` (includes Node's own start) | 67.2 ms | 120 ms |
+
+**HTTP** (`examples/fetch`, `Lasm.Fetch`): 22 checks per host (21 routes and
+`HEAD`; Viceroy has no host environment, so the `/env` route is skipped
+there). Per request: 50 sequential `GET /` from the harness, over HTTP;
+CGI runs start one engine process per request.
+
+| Host | Per request (median / p90) | Ready after start | 20 concurrent 200 ms `Std.Async` waits |
+| --- | --- | --- | --- |
+| Viceroy 0.21.1 (Fastly; a fresh instance per request) | 1.61 / 1.75 ms | 611 ms | 216 ms |
+| Spin 4.2.2, wagi (a fresh instance per request) | 1.93 / 2.51 ms | 1,039 ms | 222 ms |
+| Node (`lasm build`, `node:http`) | 0.86 / 1.00 ms | 413 ms | 214 ms |
+| Deno 2.9.6 (`--target deno`) | 0.82 / 0.98 ms | 215 ms | 219 ms |
+| CGI under wasmtime (process per request) | 15.9 ms mean | — | — |
+| CGI under wasmer | 31.7 ms mean | — | — |
+| CGI under `node:wasi` | 68.4 ms mean | — | — |
+
+Viceroy and Spin start a new instance of the module for every request and
+still answer in under 2 ms: Lean's initialization of the reachable modules is
+cheap. Spin 4.2 prints that its wagi executor "will be deprecated in a future
+version"; it is the executor for preview 1 modules today.
 
 ## Not done
 

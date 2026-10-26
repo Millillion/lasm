@@ -536,7 +536,7 @@ Free limit, and under Vercel Edge's 1 MB-gzip Hobby limit. The Node profile's
     function, so one `main` serves both.
   - `waitForever` returns at once on the edge, because the isolate's lifetime
     is the platform's.
-- **Planned: a pure-Lean `Lasm.Fetch` handler API.** `Lasm.Fetch.serve
+- **Done (2026-10-26, [FETCH.md](FETCH.md)): a pure-Lean `Lasm.Fetch` handler API.** `Lasm.Fetch.serve
   (handler : Request → Async Response)` with Lean `Request`/`Response`
   structures (method, URL, headers, body bytes). It would be implemented on
   `Lasm.JS` and work on Node too: the "pure Lean" path with no npm package.
