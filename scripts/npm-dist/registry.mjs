@@ -7,6 +7,9 @@
 // --mirror-template copies the exact npm dependencies a `lasm init` template pins
 // (src/init.mjs) from registry.npmjs.org into the loopback registry, read-only and
 // integrity-checked, so a consumer can install a scaffolded app without uplinks.
+// --mirror-bundled copies the CLI's bundled dependencies (bundleDependencies, at the
+// bundled versions) the same way: npm installs them from the CLI tarball, but Bun and
+// Deno resolve them from the registry.
 //   node scripts/npm-dist/registry.mjs mirror  --dir DIR --mirror-template hono   (only the template dependencies)
 //   node scripts/npm-dist/registry.mjs stop    --dir DIR
 import assert from 'node:assert/strict';
@@ -26,7 +29,7 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const [command, ...rest] = process.argv.slice(2);
 const { values: args } = parseArgs({ args: rest, options: { dir: { type: 'string' }, port: { type: 'string', default: '4873' },
   dist: { type: 'string' }, tool: { type: 'string', default: join(root, '.cache/npm-dist/verdaccio') },
-  'mirror-template': { type: 'string', multiple: true, default: [] } } });
+  'mirror-template': { type: 'string', multiple: true, default: [] }, 'mirror-bundled': { type: 'boolean', default: false } } });
 assert.ok(['start', 'publish', 'mirror', 'stop'].includes(command) && args.dir, 'Usage: registry.mjs start|publish|mirror|stop --dir DIR');
 const dir = resolve(args.dir), npm = findNpm();
 const runNpm = (npmArgs, options = {}) => execFileSync(npm.command, [...npm.args, ...npmArgs],
@@ -120,24 +123,52 @@ if (command === 'publish' || command === 'mirror') {
   };
   // Third-party dependencies of scaffolded templates, byte for byte from the public registry.
   const mirrored = [];
-  if (args['mirror-template'].length) {
-    const { templateDependencies } = await import('../../src/init.mjs');
-    const mirror = join(dir, 'mirror'), publicConfig = join(dir, 'npmrc-public');
+  const mirror = join(dir, 'mirror'), publicConfig = join(dir, 'npmrc-public');
+  const publicEnv = { ...env, npm_config_registry: 'https://registry.npmjs.org/', npm_config_userconfig: publicConfig };
+  const mirrorPublic = async (name, version) => {
+    const [packed] = JSON.parse(runNpm(['pack', `${name}@${version}`, '--json', '--ignore-scripts', '--pack-destination', mirror,
+      '--registry', 'https://registry.npmjs.org/', '--userconfig', publicConfig, '--loglevel=error'], { env: publicEnv }));
+    const meta = JSON.parse(runNpm(['view', `${name}@${version}`, '--json', '--registry', 'https://registry.npmjs.org/',
+      '--userconfig', publicConfig], { env: publicEnv }));
+    assert.equal(packed.integrity, meta.dist?.integrity, `${name}@${version} differs from the public registry`);
+    await upload(join(mirror, packed.filename), packed.integrity);
+    mirrored.push({ name, version, integrity: packed.integrity });
+    return meta;
+  };
+  if (args['mirror-template'].length || args['mirror-bundled']) {
     await mkdir(mirror, { recursive: true });
     await writeFile(publicConfig, 'registry=https://registry.npmjs.org/\n');
-    const publicEnv = { ...env, npm_config_registry: 'https://registry.npmjs.org/', npm_config_userconfig: publicConfig };
+  }
+  if (args['mirror-bundled']) {
+    assert.ok(command === 'publish', '--mirror-bundled needs publish (the CLI tarball)');
+    // Every package directory under the CLI's node_modules (nested ones too), at its bundled version.
+    const scratch = join(dir, 'bundled-' + process.pid);
+    await rm(scratch, { recursive: true, force: true }); await mkdir(scratch, { recursive: true });
+    const root = /^package\/(?:node_modules\/(?:@[^/]+\/)?[^/@][^/]*\/)+package\.json$/;
+    await extractTar({ file: join(tarballs, record.main.filename), cwd: scratch, strict: true, preservePaths: false, preserveOwner: false, filter: name => root.test(name) });
+    const bundled = new Map();
+    for (const entry of await readdir(scratch, { recursive: true, withFileTypes: true })) {
+      if (!entry.isFile() || entry.name !== 'package.json') continue;
+      const meta = JSON.parse(await readFile(join(entry.parentPath, entry.name), 'utf8'));
+      if (meta.name && meta.version) bundled.set(`${meta.name}@${meta.version}`, meta);
+    }
+    await rm(scratch, { recursive: true });
+    assert.ok(bundled.size, 'The CLI bundles no dependencies');
+    const names = new Set([...bundled.values()].map(meta => meta.name));
+    for (const meta of bundled.values()) {
+      const published = await mirrorPublic(meta.name, meta.version);
+      for (const dependency of Object.keys(published.dependencies ?? {}))
+        assert.ok(names.has(dependency), `${meta.name}@${meta.version} depends on ${dependency}, which the CLI does not bundle`);
+    }
+  }
+  if (args['mirror-template'].length) {
+    const { templateDependencies } = await import('../../src/init.mjs');
     for (const template of args['mirror-template']) {
       assert.ok(templateDependencies[template], `Template ${template} has no npm dependencies`);
       for (const [name, version] of Object.entries(templateDependencies[template])) {
-        const [packed] = JSON.parse(runNpm(['pack', `${name}@${version}`, '--json', '--ignore-scripts', '--pack-destination', mirror,
-          '--registry', 'https://registry.npmjs.org/', '--userconfig', publicConfig, '--loglevel=error'], { env: publicEnv }));
-        const meta = JSON.parse(runNpm(['view', `${name}@${version}`, '--json', '--registry', 'https://registry.npmjs.org/',
-          '--userconfig', publicConfig], { env: publicEnv }));
-        assert.equal(packed.integrity, meta.dist?.integrity, `${name}@${version} differs from the public registry`);
+        const meta = await mirrorPublic(name, version);
         // Peer dependencies are other pinned template packages; real dependencies would need mirroring too.
         assert.deepEqual(meta.dependencies ?? {}, {}, `${name}@${version} has dependencies; mirror them too`);
-        await upload(join(mirror, packed.filename), packed.integrity);
-        mirrored.push({ name, version, integrity: packed.integrity });
       }
     }
   }
