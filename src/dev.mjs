@@ -312,6 +312,18 @@ export async function runDev(options, hooks = {}) {
   const status = text => { if (tty) process.stderr.write(`\r\x1b[K${color('2', '[lasm dev] ' + text)}`); };
   const clearStatus = () => { if (tty) process.stderr.write('\r\x1b[K'); };
 
+  // The server program behind the proxy (one URL), on its private port.
+  const restartProgram = async program => {
+    await runner.stop();
+    const [command, args] = runtimeCommand(program.target, join(program.output, 'main.mjs'), options.args);
+    // The program listens on a private port behind the proxy: its own
+    // "Listening on http://127.0.0.1:<private port>" names the user's URL instead.
+    const privateUrl = new RegExp(`\\bhttps?://(?:127\\.0\\.0\\.1|localhost|0\\.0\\.0\\.0|\\[::1?\\]):${serverPort}\\b/?`, 'g');
+    runner.start(command, args, { cwd: process.cwd(), label: basename(program.input), env: { ...process.env, PORT: String(serverPort), HOST: '127.0.0.1' },
+      rewrite: line => line.replace(privateUrl, publicUrl) });
+    await devProxy.waitForPort(serverPort);
+  };
+
   const rebuild = async (reason, { force = false } = {}) => {
     if (building) { queued = true; return; }
     building = true;
@@ -334,6 +346,7 @@ export async function runDev(options, hooks = {}) {
       // after the other, each in its own worker, which warms both.
       const concurrent = service.workers > 1 && toBuild.length > 1 && toBuild.every(entry => lastBuilt.has(entry));
       const outputStages = new Map();
+      let restarting;
       const buildOne = async entry => {
         const own = concurrent ? [] : stages;
         outputStages.set(entry, own);
@@ -351,6 +364,9 @@ export async function runDev(options, hooks = {}) {
         allCached &&= !!result.cacheHit;
         const item = { ...entry, result, output: entry.target === 'browser' ? browserOutput : result.edgeOutput ?? result.output, finished: performance.now() };
         lastBuilt.set(entry, item);
+        // One URL, concurrent outputs: restart the server while the browser app still builds
+        // (pages reload once every output is built).
+        if (concurrent && oneUrl && server && runtimeTargets.includes(entry.target)) { restarting = restartProgram(item); restarting.catch(() => {}); }
         return item;
       };
       if (concurrent) {
@@ -376,16 +392,8 @@ export async function runDev(options, hooks = {}) {
       if (!options.run) { /* rebuild only */ }
       else if (oneUrl) {
         const program = built.find(o => runtimeTargets.includes(o.target));
-        if (!program.unchanged || !runner.running()) {
-          await runner.stop();
-          const [command, args] = runtimeCommand(program.target, join(program.output, 'main.mjs'), options.args);
-          // The program listens on a private port behind the proxy: its own
-          // "Listening on http://127.0.0.1:<private port>" names the user's URL instead.
-          const privateUrl = new RegExp(`\\bhttps?://(?:127\\.0\\.0\\.1|localhost|0\\.0\\.0\\.0|\\[::1?\\]):${serverPort}\\b/?`, 'g');
-          runner.start(command, args, { cwd: process.cwd(), label: basename(program.input), env: { ...process.env, PORT: String(serverPort), HOST: '127.0.0.1' },
-            rewrite: line => line.replace(privateUrl, publicUrl) });
-          await devProxy.waitForPort(serverPort);
-        }
+        if (restarting) await restarting;
+        else if (!program.unchanged || !runner.running()) await restartProgram(program);
         if (!server) {
           server = await devProxy.startDevProxy({ port: options.port ?? (Number(process.env.PORT) || 3000), host: options.host ?? '127.0.0.1', upstreamPort: serverPort });
           say(`Open ${color('1', server.url)}: ${basename(program.input)} with ${built.filter(o => o.target === 'browser').map(o => basename(o.input)).join(', ')}, live reload.`);

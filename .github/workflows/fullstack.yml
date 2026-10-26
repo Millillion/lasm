@@ -305,10 +305,16 @@ jobs:
           retention-days: 14
   dev:
     needs: [runtime, native]
-    name: npm run dev (one URL; edit to reload)
+    name: npm run dev (one URL; edit to reload; ${{ matrix.workers }} build worker(s))
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # 2: the default on this runner (outputs build concurrently); 1: one after the other, for comparison.
+        workers: ['2', '1']
     env:
+      LASM_DEV_WORKERS: ${{ matrix.workers }}
       LEAN_NUM_THREADS: '2'
       BINARYEN_CORES: '1'
       LASM_BUILD_JOBS: '2'
@@ -352,7 +358,7 @@ jobs:
           node bin/lasm.mjs init .work/dev-app --template fullstack
           # The resource guard starts a fresh environment: pass the runtimes on (as build-app.mjs does).
           node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py \
-            env LASM_APPLICATION_RUNTIME="$LASM_APPLICATION_RUNTIME" LASM_EDGE_RUNTIME="$LASM_EDGE_RUNTIME" LASM_BUILD_JOBS="$LASM_BUILD_JOBS" LEAN_NUM_THREADS="$LEAN_NUM_THREADS" BINARYEN_CORES="$BINARYEN_CORES" CI=1 BROWSER=none LASM_DEV_TRACE=1 \
+            env LASM_APPLICATION_RUNTIME="$LASM_APPLICATION_RUNTIME" LASM_EDGE_RUNTIME="$LASM_EDGE_RUNTIME" LASM_BUILD_JOBS="$LASM_BUILD_JOBS" LEAN_NUM_THREADS="$LEAN_NUM_THREADS" BINARYEN_CORES="$BINARYEN_CORES" CI=1 BROWSER=none LASM_DEV_TRACE=1 LASM_DEV_WORKERS="$LASM_DEV_WORKERS" \
             node scripts/fullstack/dev-reload.mjs .work/dev-app 3000 .work/results/dev-reload.json -- \
             node "$GITHUB_WORKSPACE/bin/lasm.mjs" dev --target node=Server.lean,browser=Client.lean --output dist/public/client
       - name: Edit-to-reload times
@@ -362,12 +368,12 @@ jobs:
           node -e "
             const r = require('./.work/results/dev-reload.json');
             const rows = Object.entries(r.reloads).map(([f, x]) => '| ' + f + ' | ' + (x.seconds?.toFixed(2) ?? 'none') + ' s | ' + x.rebuilds + ' |');
-            console.log(['### npm run dev: edit to reload (linux-x64)', '', '| Edited | Edit to reload | Rebuilt |', '| --- | --- | --- |', ...rows].join('\n'));
+            console.log(['### npm run dev: edit to reload (linux-x64, ' + process.env.LASM_DEV_WORKERS + ' build worker(s))', '', '| Edited | Edit to reload | Rebuilt |', '| --- | --- | --- |', ...rows].join('\n'));
             for (const [f, x] of Object.entries(r.reloads)) if (x.seconds > 3) console.log('::warning::' + f + ' edit to reload took ' + x.seconds.toFixed(2) + ' s (target 3 s)');
           " | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
-          name: fullstack-results-dev
+          name: fullstack-results-dev-${{ matrix.workers }}
           path: .work/results
           retention-days: 14

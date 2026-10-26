@@ -236,6 +236,13 @@ export function applicationSources(source, lean, work, { log = console.error, af
   // (the CLI and `lasm dev` report them with the error); warnings of a
   // successful step are passed on as they were printed.
   const run = (program, args, cwd) => {
+    const started = performance.now();
+    try { return runTool(program, args, cwd); } finally {
+      // LASM_DEV_TRACE (lasm dev): how long each Lean and Lake step took.
+      if (process.env.LASM_DEV_TRACE) process.stderr.write(`[lasm dev] trace ${((performance.now() - started) / 1000).toFixed(2)} s: ${program.split(/[\\/]/).pop()} ${args.filter(arg => !arg.startsWith('-')).join(' ').slice(0, 100)}\n`);
+    }
+  };
+  const runTool = (program, args, cwd) => {
     const result = spawnSync(program, args, { cwd, env, windowsHide: true, encoding: 'utf8', timeout: 900_000, maxBuffer: 32 * 1024 * 1024,
       stdio: ['ignore', 'pipe', 'pipe'] });
     if (result.error) throw Object.assign(result.error, { stdout: result.stdout, stderr: result.stderr });
