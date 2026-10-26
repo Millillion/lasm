@@ -48,7 +48,7 @@ permissions:
   contents: read
 jobs:
   inventory:
-    if: inputs.harness == 'inventory' && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/cold-start')
+    if: inputs.harness == 'inventory' && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     env:
@@ -96,7 +96,7 @@ jobs:
           include-hidden-files: true
           if-no-files-found: warn
   plan:
-    if: inputs.harness != 'inventory' && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/cold-start')
+    if: inputs.harness != 'inventory' && github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
