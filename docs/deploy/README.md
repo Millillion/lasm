@@ -37,6 +37,7 @@ test and deploy.
 | Platform | Recipe | Notes |
 | --- | --- | --- |
 | Docker, Kubernetes | [docker-kubernetes.md](docker-kubernetes.md) | The reference: what CI runs. |
+| Fastly Compute (planned for 0.2.0) | [fastly.md](fastly.md) | A standard WASI module with Fastly's host calls, not a Node process: `lasm build --target fastly`, tested with Viceroy. |
 | Cloudflare Workers (experimental, planned for 0.2.0) | [workers.md](workers.md) | An edge isolate, not a Node process: `lasm build --target workers`, tested with `wrangler dev`. |
 | Vercel Edge Functions (experimental, planned for 0.2.0) | [vercel-edge.md](vercel-edge.md) | `lasm build --target vercel-edge`, tested with `vercel build` offline and Vercel's `edge-runtime` package. |
 | Netlify Edge Functions (experimental, planned for 0.2.0) | [netlify-edge.md](netlify-edge.md) | `lasm build --target netlify-edge`, tested with `netlify build --offline` and `netlify dev --offline`. |

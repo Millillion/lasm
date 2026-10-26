@@ -4,10 +4,12 @@
 // (minus Node's own NODE_* variables); standard streams are inherited. Exits
 // with the module's status. LASM_WASI_TIMING=1 prints the startup time
 // (compile + instantiate + _start) on stderr.
-import { WASI } from 'node:wasi';
 import { readFileSync } from 'node:fs';
 
-process.removeAllListeners('warning'); // node:wasi's ExperimentalWarning
+// node:wasi's ExperimentalWarning would mix with the program's standard error.
+const emitWarning = process.emitWarning;
+process.emitWarning = (warning, ...rest) => (rest[0] === 'ExperimentalWarning' || rest[0]?.type === 'ExperimentalWarning') ? undefined : emitWarning.call(process, warning, ...rest);
+const { WASI } = await import('node:wasi');
 const [file, ...args] = process.argv.slice(2);
 if (!file) { console.error('Usage: node node-wasi-run.mjs MODULE.wasm [arguments…]'); process.exit(2); }
 const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('NODE_') && key !== 'LASM_WASI_TIMING'));

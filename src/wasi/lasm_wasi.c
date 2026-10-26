@@ -298,6 +298,14 @@ static int64_t reply_unreachable(const place *p) {
     (void)p;
     return reply_error(1, 2, "no such file or directory (not inside a directory the WASI host preopened; for example, run wasmtime with --dir .)");
 }
+/* Rights to request, as wasi-libc does: hosts such as Node's uvwasi choose
+   the native open mode (read-only, write-only, both) from them. */
+enum { R_READ = (1 << 1) | (1 << 2) | (1 << 3) | (1 << 5) | (1 << 7) | (1 << 21) | (1 << 27),
+    R_WRITE = (1 << 0) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 6) | (1 << 7) | (1 << 8) | (1 << 21) | (1 << 22) | (1 << 23) | (1 << 27),
+    R_DIRECTORY = (1 << 3) | (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 13) | (1 << 14) | (1 << 15) | (1 << 16) | (1 << 17)
+        | (1 << 18) | (1 << 19) | (1 << 20) | (1 << 21) | (1 << 24) | (1 << 25) | (1 << 26) };
+static uint64_t inherited_rights(uint32_t fd);
+static uint64_t rights_for(uint32_t fd, uint64_t wanted) { return wanted & inherited_rights(fd); }
 static uint64_t inherited_rights(uint32_t fd) {
     struct { uint8_t filetype; uint8_t pad; uint16_t flags; uint32_t pad2; uint64_t base, inheriting; } stat;
     return w_fd_fdstat_get(fd, P(&stat)) ? ~(uint64_t)0 : stat.inheriting;
@@ -330,8 +338,9 @@ static int64_t open_file(const uint8_t *path, size_t length, uint64_t mode) {
     static const uint16_t oflags[] = { 0, 1 | 8, 1 | 4, 0, 1 };
     uint16_t fdflags = mode == 4 ? 1 : 0;
     uint32_t fd = 0;
+    static const uint64_t rights[] = { R_READ, R_WRITE, R_WRITE, R_READ | R_WRITE, R_WRITE };
     uint32_t error = mode > 4 ? W_EINVAL : w_path_open(p.fd, 1, P(p.inside), (uint32_t)strlen(p.inside), oflags[mode],
-        inherited_rights(p.fd), inherited_rights(p.fd), fdflags, P(&fd));
+        rights_for(p.fd, rights[mode]), 0, fdflags, P(&fd));
     if (!error) {
         uint8_t stat[64];
         if (!w_fd_filestat_get(fd, P(stat)) && stat[16] == 3) { w_fd_close(fd); error = W_EISDIR; }
@@ -436,7 +445,8 @@ static int64_t read_directory(const uint8_t *path, size_t length) {
     place p = resolve(path, length);
     if (!p.found) { int64_t r = reply_unreachable(&p); free(p.normal); return r; }
     uint32_t fd = 0;
-    uint32_t error = w_path_open(p.fd, 1, P(p.inside), (uint32_t)strlen(p.inside), 2, inherited_rights(p.fd), inherited_rights(p.fd), 0, P(&fd));
+    uint32_t error = w_path_open(p.fd, 1, P(p.inside), (uint32_t)strlen(p.inside), 2, rights_for(p.fd, R_DIRECTORY | R_READ),
+        rights_for(p.fd, R_DIRECTORY | R_READ | R_WRITE), 0, P(&fd));
     free(p.normal);
     if (error) return reply_wasi_error(error);
     buffer names = { 0 };
@@ -731,6 +741,7 @@ static int64_t dispatch(uint32_t op, uint32_t id, uint64_t arg, const uint8_t *b
         int64_t r;
         uint8_t stat[64];
         if (p.found && !w_path_filestat_get(p.fd, 1, P(p.inside), (uint32_t)strlen(p.inside), P(stat))) r = reply_text(p.normal);
+        else if (is_zone_path(p.normal)) r = reply_text("/usr/share/zoneinfo/UTC");
         else r = reply_error(1, 2, "no such file or directory");
         free(p.normal); return r;
     }

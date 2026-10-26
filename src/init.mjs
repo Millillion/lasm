@@ -92,7 +92,7 @@ export function parseInitArguments(tokens) {
     throw new Error(`--deploy ${serverOnly} needs a server template (express, hono, std-http or fetch), not ${result.template}`);
   for (const target of result.deploy) {
     if (deployTargets[target].templates && !deployTargets[target].templates.includes(result.template))
-      throw new Error(`--deploy ${target} supports the ${deployTargets[target].templates.join(', ')} template, not ${result.template}`);
+      throw new Error(`--deploy ${target} supports the ${deployTargets[target].templates.join(' or ')} template, not ${result.template}`);
     for (const other of deployTargets[target].conflicts ?? [])
       if (result.deploy.includes(other)) throw new Error(`--deploy ${target} and --deploy ${other} both configure the same platform; choose one`);
   }
