@@ -155,7 +155,8 @@ An edit rebuilds only the outputs whose sources import the changed file: a
 or `Shared.lean` edit rebuilds both. A build error keeps the last good build
 running and shows the error in the page's console. CI times edit → reload on
 linux-x64 ([`fullstack.yml`](../.github/workflows/fullstack.yml), job `dev`,
-step summary).
+step summary): about 2.5 s for `Client.lean`, 2 s for `Server.lean`, 7 s for
+`View.lean` (both programs, one after the other).
 
 ### Static files on every target
 
