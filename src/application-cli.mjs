@@ -97,7 +97,7 @@ export async function runApplicationCli(argv) {
   const { target: requested, allowDev, ...buildOptions } = options;
   // Under Bun or Deno the default target is that runtime: the portable
   // profile, run and built with it (Phase 7.5, docs/BUN_DENO.md).
-  const { jsRuntime, scriptPrefix } = await import('./js-runtime.mjs');
+  const { jsRuntime, scriptPrefix, runtimeExecutable } = await import('./js-runtime.mjs');
   const target = requested ?? (jsRuntime === 'node' ? undefined : jsRuntime);
   // A dev build refused by packaging is refused before it is built.
   if (target && !['node', 'bun', 'deno'].includes(target) && options.profile === 'dev' && !allowDev)
@@ -106,7 +106,7 @@ export async function runApplicationCli(argv) {
     const output = await buildEdge(options.input, target, buildOptions, options.verbose);
     if (options.command === 'build') return 0;
     console.error(`[lasm] Running ${options.input} on ${target === 'bun' ? 'Bun' : 'Deno'}` + (options.profile === 'release' ? ' (release build)…' : ' (dev build)…'));
-    return runApplicationChild(process.execPath, [...scriptPrefix(), join(output, 'main.mjs'), ...options.args],
+    return runApplicationChild(runtimeExecutable, [...scriptPrefix(), join(output, 'main.mjs'), ...options.args],
       `Could not start ${target === 'bun' ? 'Bun' : 'Deno'} to run the application.`);
   }
   const result = await buildApplicationWithProgress(options.input, buildOptions);

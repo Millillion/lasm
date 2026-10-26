@@ -14,7 +14,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
-import { scriptPrefix } from '../js-runtime.mjs';
+import { scriptPrefix, runtimeExecutable } from '../js-runtime.mjs';
 import { executableName } from '../platform.mjs';
 import { Settings, instantiateSettings } from './settings.mjs';
 import { extractMetadata, updateMetadata } from './metadata.mjs';
@@ -163,7 +163,7 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   const paths = platform === 'win32' ? path.win32 : path.posix;
   const emscripten = sdk.driver;
   // Emscripten's JavaScript tools run on the compiler's own runtime (js-runtime.mjs).
-  const node = process.execPath, nodePrefix = scriptPrefix();
+  const node = runtimeExecutable, nodePrefix = scriptPrefix();
   const tool = name => name === 'node' ? node : paths.join(sdk.prefix, 'bin', executableName(name, platform));
   const env = sdk.env;
   mkdirSync(temp, { recursive: true });
