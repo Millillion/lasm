@@ -1,0 +1,251 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index ff042a4..852c5b5 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -177,8 +177,16 @@ if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+   option(LASM_LINK_LAKE "Link Lake into the full Wasm compiler" OFF)
+   option(LASM_LINK_TOOLS "Link original Lean tool entry points into Wasm" OFF)
+   set(LASM_WASM_LINK_OPTIMIZATION "-O1" CACHE STRING "Wasm link optimization for development iterations")
+-  set(EMSCRIPTEN_SETTINGS "-s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=${LASM_MEMORY64} -fwasm-exceptions -pthread")
+-  string(APPEND LEANC_EXTRA_CC_FLAGS " -pthread")
++  # Lasm edge profile (Phase 7): Lean's C++ runtime without threads, with
++  # cooperative tasks (runtime/object.cpp LASM_COOPERATIVE_TASKS); configure
++  # with -DMULTI_THREAD=OFF.
++  option(LASM_EDGE "Single-threaded cooperative runtime for edge isolates" OFF)
++  if(LASM_EDGE)
++    set(EMSCRIPTEN_SETTINGS "-s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=${LASM_MEMORY64} -fwasm-exceptions -D LASM_COOPERATIVE_TASKS")
++  else()
++    set(EMSCRIPTEN_SETTINGS "-s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=${LASM_MEMORY64} -fwasm-exceptions -pthread")
++    string(APPEND LEANC_EXTRA_CC_FLAGS " -pthread")
++  endif()
+   string(APPEND LEANC_EXTRA_CC_FLAGS " -D LEAN_EMSCRIPTEN ${EMSCRIPTEN_SETTINGS}")
+   string(APPEND LEAN_EXTRA_CXX_FLAGS " -D LEAN_EMSCRIPTEN ${EMSCRIPTEN_SETTINGS}")
+   string(APPEND LEAN_EXTRA_LINKER_FLAGS " ${EMSCRIPTEN_SETTINGS}")
+diff --git a/src/runtime/mutex.cpp b/src/runtime/mutex.cpp
+index 1ddaa41..057d9e4 100644
+--- a/src/runtime/mutex.cpp
++++ b/src/runtime/mutex.cpp
+@@ -11,6 +11,13 @@ Authors: Gabriel Ebner, Henrik Böving
+ #include "runtime/thread.h"
+ 
+ namespace lean {
++#if defined(LASM_COOPERATIVE_TASKS)
++// One thread: locks never contend between threads. A condition-variable wait
++// lets other queued Lean tasks (or host events) run before returning, so
++// `while !cond do wait` loops make progress (spurious wakeups are allowed).
++extern "C" bool lasm_coop_run_one();
++extern "C" void lasm_coop_block(const char * reason);
++#endif
+ 
+ static lean_external_class * g_basemutex_external_class = nullptr;
+ static void basemutex_finalizer(void * h) {
+@@ -57,7 +64,11 @@ extern "C" LEAN_EXPORT obj_res lean_io_condvar_new() {
+ 
+ extern "C" LEAN_EXPORT obj_res lean_io_condvar_wait(b_obj_arg condvar, b_obj_arg mtx) {
+     unique_lock<mutex> lock(*basemutex_get(mtx), std::adopt_lock_t());
++#if defined(LASM_COOPERATIVE_TASKS)
++    if (!lasm_coop_run_one()) lasm_coop_block("a condition variable wait");
++#else
+     condvar_get(condvar)->wait(lock);
++#endif
+     lock.release();
+     return box(0);
+ }
+diff --git a/src/runtime/object.cpp b/src/runtime/object.cpp
+index 48f06ce..90339f4 100644
+--- a/src/runtime/object.cpp
++++ b/src/runtime/object.cpp
+@@ -768,6 +768,15 @@ struct scoped_current_task_object : flet<lean_task_object *> {
+     scoped_current_task_object(lean_task_object * t):flet(g_current_task_object, t) {}
+ };
+ 
++#if defined(LASM_COOPERATIVE_TASKS)
++// Lasm edge profile: one thread, no workers. Queued tasks run when the host
++// pumps (lasm_coop_run_one, from Lasm's edge event loop) or while Lean code
++// waits for a task (wait_for runs other queued tasks on the waiting stack).
++// When nothing is runnable and the awaited task depends on an external event,
++// lasm_coop_block asks the host for events (suspending the Wasm stack with
++// JSPI where available) or fails with a clear error.
++extern "C" void lasm_coop_block(const char * reason);
++#endif
+ class task_manager {
+     mutex                                         m_mutex;
+     std::vector<std::unique_ptr<lthread>>         m_std_workers;
+@@ -808,8 +817,12 @@ class task_manager {
+             return;
+         }
+         if (prio > LEAN_MAX_PRIO) {
++#if defined(LASM_COOPERATIVE_TASKS)
++            prio = LEAN_MAX_PRIO; // dedicated tasks share the one thread
++#else
+             spawn_dedicated_worker(t);
+             return;
++#endif
+         }
+         if (prio > m_max_prio)
+             m_max_prio = prio;
+@@ -842,6 +855,9 @@ class task_manager {
+     }
+ 
+     void spawn_worker() {
++#if defined(LASM_COOPERATIVE_TASKS)
++        return;
++#endif
+         if (m_shutting_down)
+             return;
+ 
+@@ -983,6 +999,9 @@ public:
+     }
+ 
+     ~task_manager() {
++#if defined(LASM_COOPERATIVE_TASKS)
++        return;
++#endif
+         {
+             unique_lock<mutex> lock(m_mutex);
+             m_shutting_down = true;
+@@ -1035,9 +1054,27 @@ public:
+         t1->m_imp.load(std::memory_order_relaxed)->m_head_dep = t2;
+     }
+ 
++#if defined(LASM_COOPERATIVE_TASKS)
++    bool run_one() {
++        unique_lock<mutex> lock(m_mutex);
++        if (m_queues_size == 0) return false;
++        lean_task_object * t = dequeue();
++        run_task(lock, t);
++        return true;
++    }
++#endif
+     void wait_for(lean_task_object * t) {
+         if (t->m_value)
+             return;
++#if defined(LASM_COOPERATIVE_TASKS)
++        if (g_current_task_object && g_current_task_object->m_imp.load(std::memory_order_relaxed)->m_prio == LEAN_SYNC_PRIO) {
++            lean_panic("`Task.get` called from a `(sync := true)` task");
++        }
++        while (!t->m_value) {
++            if (!run_one()) lasm_coop_block("Task.get / IO.wait");
++        }
++        return;
++#endif
+         unique_lock<mutex> lock(m_mutex);
+         if (t->m_value)
+             return;
+@@ -1062,6 +1099,13 @@ public:
+     object * wait_any(object * task_list) {
+         if (object * t = wait_any_check(task_list))
+             return t;
++#if defined(LASM_COOPERATIVE_TASKS)
++        while (true) {
++            if (object * t = wait_any_check(task_list))
++                return t;
++            if (!run_one()) lasm_coop_block("IO.waitAny");
++        }
++#endif
+         unique_lock<mutex> lock(m_mutex);
+         while (true) {
+             if (object * t = wait_any_check(task_list))
+@@ -1112,7 +1156,21 @@ public:
+ 
+ static task_manager * g_task_manager = nullptr;
+ 
++#if defined(LASM_COOPERATIVE_TASKS)
++extern "C" LEAN_EXPORT bool lasm_coop_run_one() {
++    return g_task_manager && g_task_manager->run_one();
++}
++static void lasm_coop_ensure_task_manager() {
++    if (!g_task_manager) g_task_manager = new task_manager(0);
++}
++#endif
+ extern "C" LEAN_EXPORT void lean_init_task_manager_using(unsigned num_workers) {
++#if defined(LASM_COOPERATIVE_TASKS)
++    // Module initializers may already have created it (lean_promise_new).
++    (void)num_workers;
++    lasm_coop_ensure_task_manager();
++    return;
++#endif
+     lean_assert(g_task_manager == nullptr);
+ #if defined(LEAN_MULTI_THREAD)
+     if (num_workers > 0) {
+@@ -1130,6 +1188,9 @@ static unsigned get_lean_num_threads() {
+ 
+ /* getHardwareConcurrency (_ : Unit) : UInt32 */
+ extern "C" LEAN_EXPORT uint32 lean_internal_get_hardware_concurrency(obj_arg) {
++#if defined(LASM_COOPERATIVE_TASKS)
++    return 1;
++#endif
+     return hardware_concurrency();
+ }
+ 
+@@ -1138,6 +1199,10 @@ extern "C" LEAN_EXPORT void lean_init_task_manager() {
+ }
+ 
+ extern "C" LEAN_EXPORT void lean_finalize_task_manager() {
++#if defined(LASM_COOPERATIVE_TASKS)
++    // The isolate keeps serving events after `main` returns.
++    return;
++#endif
+     if (g_task_manager) {
+         delete g_task_manager;
+         g_task_manager = nullptr;
+@@ -1145,6 +1210,11 @@ extern "C" LEAN_EXPORT void lean_finalize_task_manager() {
+ }
+ 
+ scoped_task_manager::scoped_task_manager(unsigned num_workers) {
++#if defined(LASM_COOPERATIVE_TASKS)
++    (void)num_workers;
++    lasm_coop_ensure_task_manager();
++    return;
++#endif
+     lean_assert(g_task_manager == nullptr);
+ #if defined(LEAN_MULTI_THREAD)
+     if (num_workers > 0) {
+@@ -1154,6 +1224,9 @@ scoped_task_manager::scoped_task_manager(unsigned num_workers) {
+ }
+ 
+ scoped_task_manager::~scoped_task_manager() {
++#if defined(LASM_COOPERATIVE_TASKS)
++    return;
++#endif
+     if (g_task_manager) {
+         delete g_task_manager;
+         g_task_manager = nullptr;
+@@ -1198,6 +1271,9 @@ static lean_task_object * alloc_task(obj_arg v) {
+ 
+ 
+ extern "C" LEAN_EXPORT obj_res lean_task_spawn_core(obj_arg c, unsigned prio, bool keep_alive) {
++#if defined(LASM_COOPERATIVE_TASKS)
++    lasm_coop_ensure_task_manager();
++#endif
+     if (!g_task_manager) {
+         return lean_task_pure(apply_1(c, box(0)));
+     } else {
+@@ -1319,6 +1395,9 @@ extern "C" LEAN_EXPORT b_obj_res lean_io_wait_any_core(b_obj_arg task_list) {
+ }
+ 
+ obj_res lean_promise_new() {
++#if defined(LASM_COOPERATIVE_TASKS)
++    lasm_coop_ensure_task_manager();
++#endif
+     if (!g_task_manager) {
+         lean_internal_panic(
+             "`IO.Promise.new` called before the task manager is running; this typically "
+@@ -2890,9 +2969,17 @@ extern "C" LEAN_EXPORT object * lean_dbg_trace(obj_arg s, obj_arg fn) {
+     return lean_apply_1(fn, lean_box(0));
+ }
+ 
++#if defined(LASM_COOPERATIVE_TASKS)
++extern "C" void lasm_coop_sleep(uint32_t ms);
++#endif
+ extern "C" LEAN_EXPORT object * lean_dbg_sleep(uint32 ms, obj_arg fn) {
++#if defined(LASM_COOPERATIVE_TASKS)
++    // IO.sleep: a host timer, while other Lean work runs (runtime/edge.cpp).
++    lasm_coop_sleep(ms);
++#else
+     chrono::milliseconds c(ms);
+     this_thread::sleep_for(c);
++#endif
+     return lean_apply_1(fn, lean_box(0));
+ }
+ 

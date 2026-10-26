@@ -816,6 +816,38 @@ folded into Phases 5.2/5.3 and 7.
   run on Bun and Deno with the portable (edge) profile; all tested in CI. The
   full profile (threads, files, koffi, wasm64) stays Node-only. 7.1's JSPI vs
   Asyncify choice must keep Bun working (verify Bun's JSPI support).
+  *Status (2026-10-24, branch `phase-7`): 7.1 decided ([EDGE.md](EDGE.md)):
+  a cooperative single-threaded runtime (edge patch, `runtime/edge.cpp`, CI
+  `edge-runtime.yml`), JSPI for blocking waits (Bun 1.4.4 has JSPI; Asyncify
+  rejected: 2.2× size, 2–3× slower), wasm64 code lowered to 32-bit memory, a
+  pure-JS host. A Hono app with Lean routes and a pure-Lean handler answer
+  requests under `wrangler dev`: about 1.4 MiB per Worker (250 KiB gzip),
+  27 MiB of Wasm memory, 55–70 ms startup, 0.04–0.36 ms per request.*
+  *Status (2026-10-24, branch `phase-7`): 7.2 in source: `lasm build --target
+  workers`, `lasm init --deploy workers` (Hono), `Lasm.JS.onEdge` /
+  `exportDefault`, a read-only VFS (UTC zone) and instance restart; CI
+  `workers.yml` (Linux) builds from source, serves with `wrangler dev` and runs on
+  Node 26, Deno and Bun with Free-plan budget gates ([deploy/workers.md](deploy/workers.md)).
+  Open: a published edge runtime package and a Node-link-driver edge recipe.*
+  *Status (2026-10-24, branch `phase-7`): packaging done (the edge runtime, bundled in
+  `@lasm/cli` since 2026-10-26; Node-link-driver edge recipe, byte-identical to emcc; edge output
+  cache). 7.3 in source: `--target vercel-edge` and `--target netlify-edge`. 7.4:
+  `--target deno-deploy` in source; Supabase Edge Functions not supported (its
+  runtime, V8 11.6, has no JSPI). See [EDGE.md](EDGE.md).*
+  *Status (2026-10-26, branch `phase-7`): `--target supabase-edge` in source
+  for 0.2.0, with an Asyncify link (Binaryen's asyncify pass, recorded for the
+  Node link driver) instead of JSPI; tested in Supabase's edge runtime image in
+  CI ([deploy/supabase-edge.md](deploy/supabase-edge.md)).*
+  *Status (2026-10-24, branch `phase-7`): 7.5 in source, Linux-tested: the
+  compiler under Bun 1.4.4 and Deno 2.9.6 (byte-identical builds),
+  `--target bun|deno` (portable profile; CLI programs and servers), default
+  target = the CLI's runtime, registry fetch without npm, init scripts for
+  Bun and Deno. See [BUN_DENO.md](BUN_DENO.md).*
+  *Status (2026-10-26, branch `phase-7`): 7.5 CI on all five targets
+  (`workers.yml` job `platforms`: an installed candidate under Node, Bun and
+  Deno, the Hono template's Bun/Deno scripts, one `program.wasm` everywhere) and
+  `bun-deno-published.yml` (the published `@lasm/cli`/`@lasm/create` with Bun
+  and Deno only; skips until a release exists). Ships as supported in 0.2.0.*
 - **Phase 7 — Production hardening on Node.** Long soak and concurrency stress
   (tasks, channels, Std.Sync/Std.Async, cancellation, many threads incl.
   Windows stack commit), startup memory tuning (initial memory, 64 MiB worker

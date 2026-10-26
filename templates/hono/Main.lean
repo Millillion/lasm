@@ -4,7 +4,8 @@ A Hono app on Node (@hono/node-server) whose request handlers are Lean functions
   GET  /hello/:name  {"message": "Hello, NAME, from Lean!"}
   POST /echo         {"echo": <the JSON request body>}
   GET  /health       {"ok": true}
-Listens on $HOST (default 0.0.0.0) and $PORT (default 3000).
+Listens on $HOST (default 0.0.0.0) and $PORT (default 3000). Built with
+`--target workers`, the same app runs on Cloudflare Workers.
 -/
 import App
 import Lasm.JS
@@ -41,6 +42,12 @@ def main : IO Unit := do
     let body ← (← c.get "req").callMethodAwait "json" #[] Data
     json c (obj [("echo", body)])
   route "get" "/health" fun c => json c (obj [("ok", toJS true)])
+
+  -- Cloudflare Workers (`lasm build Main.lean --target workers`):
+  -- the Worker serves the app; the platform owns the process.
+  if ← onEdge then
+    exportDefault app
+    return
 
   let host := (← IO.getEnv "HOST").getD "0.0.0.0"
   let port := ((← IO.getEnv "PORT").bind String.toNat?).getD 3000

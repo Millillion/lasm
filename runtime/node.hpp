@@ -25,6 +25,14 @@ extern "C" LASM_HOST_IMPORT("node_copy")
 void lasm_node_copy(uint8_t *output, LasmHostSize length);
 extern "C" LASM_HOST_IMPORT("node_release")
 void lasm_node_release(uint32_t handle);
+#ifdef LASM_EDGE
+// Edge profile (Phase 7): host calls are direct JavaScript calls on the one
+// thread. A host operation that completes asynchronously makes lasm_node_call
+// return LASM_EDGE_PENDING; lasm_edge_await_call then waits for it, suspending
+// the Wasm stack (JSPI), or fails as a host error where that is impossible.
+#define LASM_EDGE_PENDING INT64_MIN
+extern "C" LasmHostResult lasm_edge_await_call(void);
+#endif
 
 namespace lasm {
 using O = lean_object;
@@ -36,6 +44,9 @@ struct Reply {
     std::vector<uint8_t> bytes;
     Reply(uint32_t op, uint32_t handle = 0, uint64_t arg = 0, const void *data = nullptr, LasmHostSize size = 0) {
         LasmHostResult n = lasm_node_call(op, handle, arg, (const uint8_t*)data, size);
+#ifdef LASM_EDGE
+        if (n == LASM_EDGE_PENDING) n = lasm_edge_await_call();
+#endif
         failed = n < 0;
         LasmHostSize length = failed ? LasmHostSize(-(n + 1)) : LasmHostSize(n);
         bytes.resize(length);

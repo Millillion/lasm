@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "note": "Edge runtimes (docs/EDGE.md): Lean's C++ runtime and Lasm's host bridge built single-threaded (edge-runtime.yml, scripts/edge/package-edge-runtime.mjs). Each replaces three archives of the Node runtime named by baseRuntimeManifestSha256. The release is a draft until 0.2.0 publishes it.",
+  "lean": {
+    "4.35.0": {
+      "name": "lean-4.35.0-wasm64-edge.tar.zst",
+      "root": "lean-4.35.0-wasm64-edge",
+      "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-edge-v1/lean-4.35.0-wasm64-edge.tar.zst",
+      "sha256": "f31ae954ac07dab2d83befaeae851916ab3faaf864da78d7afc4b88d60b91de4",
+      "bytes": 1281085,
+      "format": "tar.zst",
+      "maximumExtractedBytes": 14766504,
+      "baseRuntimeManifestSha256": "8b3e33e03df54e6125227b5d1d442fc8db072ffe1ea1dd3f3bf5df8707675562",
+      "source": "edge-runtime.yml run 40128600109 archives, with scripts/edge/build-edge-extras.mjs (Lasm.JS glue, Emscripten system libraries) and package-edge-runtime.mjs"
+    }
+  }
+}

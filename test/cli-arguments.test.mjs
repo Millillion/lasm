@@ -59,7 +59,7 @@ test('help needs no input or build-time side effects', () => {
 for (const [args, error] of [
   [[], /Usage/], [['Main.lean', '--target', 'node'], /--target is available only with lasm build/],
   [['Main.lean', '--target=node'], /--target is available only with lasm build/],
-  [['build', 'Main.lean', '--target', 'workers'], /Unknown build target "workers"/],
+  [['build', 'Main.lean', '--target', 'pages'], /Unknown build target "pages"/],
   [['build', 'Main.lean', '--target'], /--target requires a value/],
   [['build', 'Main.lean', '--target', 'lambda', '--target=vercel'], /Specify --target only once/],
   [['build', 'bindings.json', '--target', 'lambda'], /applies to Lean applications/],

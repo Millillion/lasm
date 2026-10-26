@@ -150,7 +150,7 @@ test('fetchNpmPackage extracts only the archive member', async t => {
   const work = join(f.base, 'work'); await mkdir(work);
   await assert.rejects(fetchNpmPackage({ ...f.entry, integrity: integrity(tgz) }, work, { npm: { command: 'npm', args: [] }, run }),
     /lacks tool-1\.tar\.zst/);
-  await assert.rejects(fetchNpmPackage(f.entry, work, { npm: null }), /npm was not found/);
+  await assert.rejects(fetchNpmPackage(f.entry, work, { npm: null, registryFallback: false }), /npm was not found/);
 });
 
 test('missing-package messages name the exact package and version', () => {
@@ -199,4 +199,27 @@ test('manifest validation, entry matching and installed-package checks', async t
   assert.deepEqual((await checkInstalledToolPackages(f.manifest, { resolveFrom: f.product, platform: 'darwin', arch: 'arm64' })).missing, []);
   // A source checkout has no packed manifest and keeps downloading directly.
   assert.equal(await bundledNpmToolManifest(pathToFileURL(join(f.base, 'nonexistent', 'npm-tools.json'))), null);
+});
+
+test('without npm, Bun and Deno fetch the pinned tarball from the registry', async t => {
+  const { registryTarballUrl } = await import('../src/npm-artifacts.mjs');
+  const entry = { package: '@lasm/lean-edge-runtime', version: '4.35.0-lasm.1' };
+  assert.equal(registryTarballUrl(entry, {}), 'https://registry.npmjs.org/@lasm/lean-edge-runtime/-/lean-edge-runtime-4.35.0-lasm.1.tgz');
+  assert.equal(registryTarballUrl(entry, { npm_config_registry: 'https://mirror.example/npm' }), 'https://mirror.example/npm/@lasm/lean-edge-runtime/-/lean-edge-runtime-4.35.0-lasm.1.tgz');
+  const f = await fixture(t, { install: 'demand', installed: false });
+  const tarballSource = join(f.base, 'registry-source');
+  await mkdir(join(tarballSource, 'package'), { recursive: true });
+  await writeFile(join(tarballSource, 'package', f.entry.file), 'archive bytes');
+  await createTar({ cwd: tarballSource, file: join(f.base, 'reg.tgz'), gzip: true, portable: true }, ['package']);
+  const tgz = await readFile(join(f.base, 'reg.tgz'));
+  const requested = [];
+  const fetch = async url => { requested.push(url); return new Response(tgz); };
+  const work = join(f.base, 'registry-work'); await mkdir(work);
+  const file = await fetchNpmPackage({ ...f.entry, integrity: integrity(tgz) }, work, { npm: null, registryFallback: true, fetch, env: {} });
+  assert.equal(await readFile(file, 'utf8'), 'archive bytes');
+  assert.match(requested[0], /^https:\/\/registry\.npmjs\.org\//);
+  await assert.rejects(fetchNpmPackage({ ...f.entry, integrity: 'sha512-' + 'A'.repeat(86) + '==' }, join(f.base, 'w2'), { npm: null, registryFallback: true, fetch, env: {} }),
+    /does not match its pinned integrity/);
+  await assert.rejects(fetchNpmPackage(f.entry, join(f.base, 'w3'), { npm: null, registryFallback: true, fetch, env: { npm_config_registry: 'http://mirror.example/' } }),
+    /credential-free HTTPS/);
 });

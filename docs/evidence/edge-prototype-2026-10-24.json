@@ -1,0 +1,1399 @@
+{
+ "schema": 1,
+ "date": "2026-10-24T19:09:24.128Z",
+ "host": {
+  "cpus": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+  "platform": "linux",
+  "arch": "x64"
+ },
+ "sizes": {
+  "hono-asyncify": {
+   "wasm": 2960465,
+   "wasmGzip9": 422404,
+   "wasmBrotli11": 268281,
+   "glueJs": 59349,
+   "link": "asyncify"
+  },
+  "hono-jspi": {
+   "wasm": 1330754,
+   "wasmGzip9": 217788,
+   "wasmBrotli11": 157819,
+   "glueJs": 44389,
+   "link": "jspi"
+  },
+  "hono-sync": {
+   "wasm": 1329785,
+   "wasmGzip9": 217248,
+   "wasmBrotli11": 157646,
+   "glueJs": 40901,
+   "link": "sync"
+  },
+  "pure-asyncify": {
+   "wasm": 3242571,
+   "wasmGzip9": 453948,
+   "wasmBrotli11": 287255,
+   "glueJs": 59064,
+   "link": "asyncify"
+  },
+  "pure-jspi": {
+   "wasm": 1453476,
+   "wasmGzip9": 235327,
+   "wasmBrotli11": 169725,
+   "glueJs": 44389,
+   "link": "jspi"
+  },
+  "pure-jspi-m64": {
+   "wasm": 1372859,
+   "wasmGzip9": 232236,
+   "wasmBrotli11": 169512,
+   "glueJs": 44108,
+   "link": "jspi"
+  },
+  "pure-sync": {
+   "wasm": 1452507,
+   "wasmGzip9": 234906,
+   "wasmBrotli11": 169158,
+   "glueJs": 40901,
+   "link": "sync"
+  }
+ },
+ "runs": [
+  {
+   "engine": "node v26.12.1",
+   "build": "pure-jspi",
+   "jspi": true,
+   "compileMs": 5.9,
+   "startMs": 53,
+   "startCpuMs": 58.6,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":131,\"random\":714003}"
+    ],
+    "/block": [
+     200,
+     "{\"blocked\":42}"
+    ],
+    "/sleep/20": [
+     200,
+     "{\"sleptMs\":21}"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 74,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 29.6,
+    "cpuUsPerRequest": 54.1
+   },
+   "fib20": {
+    "usPerRequest": 115.4,
+    "cpuUsPerRequest": 125.7
+   },
+   "primes10k": {
+    "usPerRequest": 232,
+    "cpuUsPerRequest": 241.8
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 21,
+    "results": [
+     200,
+     200,
+     200,
+     200,
+     200
+    ],
+    "stopped": false
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "Maximum call stack size exceeded",
+    "100000": "Maximum call stack size exceeded",
+    "300000": "Maximum call stack size exceeded",
+    "1000000": "Maximum call stack size exceeded"
+   }
+  },
+  {
+   "engine": "deno 2.9.6",
+   "build": "pure-jspi",
+   "jspi": true,
+   "compileMs": 7.4,
+   "startMs": 56.7,
+   "startCpuMs": 69.1,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":140,\"random\":903970}"
+    ],
+    "/block": [
+     200,
+     "{\"blocked\":42}"
+    ],
+    "/sleep/20": [
+     200,
+     "{\"sleptMs\":22}"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 69,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 29.2,
+    "cpuUsPerRequest": 63.3
+   },
+   "fib20": {
+    "usPerRequest": 126.8,
+    "cpuUsPerRequest": 135.5
+   },
+   "primes10k": {
+    "usPerRequest": 330.4,
+    "cpuUsPerRequest": 344.1
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 21,
+    "results": [
+     200,
+     200,
+     200,
+     200,
+     200
+    ],
+    "stopped": false
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "Maximum call stack size exceeded",
+    "100000": "Maximum call stack size exceeded",
+    "300000": "Maximum call stack size exceeded",
+    "1000000": "Maximum call stack size exceeded"
+   }
+  },
+  {
+   "engine": "bun 1.4.4",
+   "build": "pure-jspi",
+   "jspi": true,
+   "compileMs": 13.8,
+   "startMs": 21.7,
+   "startCpuMs": 72.8,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":80,\"random\":896880}"
+    ],
+    "/block": [
+     200,
+     "{\"blocked\":42}"
+    ],
+    "/sleep/20": [
+     200,
+     "{\"sleptMs\":20}"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 65,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 31.4,
+    "cpuUsPerRequest": 105.8
+   },
+   "fib20": {
+    "usPerRequest": 159.9,
+    "cpuUsPerRequest": 196
+   },
+   "primes10k": {
+    "usPerRequest": 233.2,
+    "cpuUsPerRequest": 263.8
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 21,
+    "results": [
+     200,
+     200,
+     200,
+     200,
+     200
+    ],
+    "stopped": false
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "ok",
+    "100000": "Maximum call stack size exceeded.",
+    "300000": "Maximum call stack size exceeded.",
+    "1000000": "Maximum call stack size exceeded."
+   }
+  },
+  {
+   "engine": "node v26.12.1",
+   "build": "pure-sync",
+   "jspi": false,
+   "compileMs": 4.6,
+   "startMs": 52.5,
+   "startCpuMs": 55.3,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":121,\"random\":324236}"
+    ],
+    "/block": [
+     "stopped",
+     "Lasm edge runtime: Task.get / IO.wait waits for an event that has not happened, and this Lean code cannot suspend (the b"
+    ],
+    "/sleep/20": [
+     "stopped",
+     "Lean host operation 35 must wait, and this Lean code cannot suspend (the edge build has no JSPI)"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 62,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 24.6,
+    "cpuUsPerRequest": 47.4
+   },
+   "fib20": {
+    "usPerRequest": 111.9,
+    "cpuUsPerRequest": 117.5
+   },
+   "primes10k": {
+    "usPerRequest": 226.6,
+    "cpuUsPerRequest": 235.8
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 0,
+    "results": [
+     "error",
+     "error",
+     "error",
+     "error",
+     "error"
+    ],
+    "stopped": true
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "Maximum call stack size exceeded",
+    "100000": "Maximum call stack size exceeded",
+    "300000": "Maximum call stack size exceeded",
+    "1000000": "Maximum call stack size exceeded"
+   }
+  },
+  {
+   "engine": "deno 2.9.6",
+   "build": "pure-sync",
+   "jspi": false,
+   "compileMs": 6.5,
+   "startMs": 63.6,
+   "startCpuMs": 75.6,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":140,\"random\":919722}"
+    ],
+    "/block": [
+     "stopped",
+     "Lasm edge runtime: Task.get / IO.wait waits for an event that has not happened, and this Lean code cannot suspend (the b"
+    ],
+    "/sleep/20": [
+     "stopped",
+     "Lean host operation 35 must wait, and this Lean code cannot suspend (the edge build has no JSPI)"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 73,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 28.1,
+    "cpuUsPerRequest": 61.5
+   },
+   "fib20": {
+    "usPerRequest": 121.1,
+    "cpuUsPerRequest": 129.5
+   },
+   "primes10k": {
+    "usPerRequest": 322.8,
+    "cpuUsPerRequest": 335.6
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 0,
+    "results": [
+     "error",
+     "error",
+     "error",
+     "error",
+     "error"
+    ],
+    "stopped": true
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "Maximum call stack size exceeded",
+    "100000": "Maximum call stack size exceeded",
+    "300000": "Maximum call stack size exceeded",
+    "1000000": "Maximum call stack size exceeded"
+   }
+  },
+  {
+   "engine": "bun 1.4.4",
+   "build": "pure-sync",
+   "jspi": false,
+   "compileMs": 15.1,
+   "startMs": 20.1,
+   "startCpuMs": 72.2,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":80,\"random\":949596}"
+    ],
+    "/block": [
+     "stopped",
+     "Lasm edge runtime: Task.get / IO.wait waits for an event that has not happened, and this Lean code cannot suspend (the b"
+    ],
+    "/sleep/20": [
+     "stopped",
+     "Lean host operation 35 must wait, and this Lean code cannot suspend (the edge build has no JSPI)"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 70,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 25.3,
+    "cpuUsPerRequest": 91.7
+   },
+   "fib20": {
+    "usPerRequest": 161.7,
+    "cpuUsPerRequest": 183.8
+   },
+   "primes10k": {
+    "usPerRequest": 268.2,
+    "cpuUsPerRequest": 294
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 0,
+    "results": [
+     "error",
+     "error",
+     "error",
+     "error",
+     "error"
+    ],
+    "stopped": true
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "ok",
+    "100000": "Maximum call stack size exceeded.",
+    "300000": "Maximum call stack size exceeded.",
+    "1000000": "Maximum call stack size exceeded."
+   }
+  },
+  {
+   "engine": "node v26.12.1",
+   "build": "pure-asyncify",
+   "jspi": true,
+   "compileMs": 11.4,
+   "startMs": 109,
+   "startCpuMs": 127.9,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":188,\"random\":725662}"
+    ],
+    "/block": [
+     200,
+     "{\"blocked\":42}"
+    ],
+    "/sleep/20": [
+     200,
+     "{\"sleptMs\":21}"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 63,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 38.8,
+    "cpuUsPerRequest": 97.8
+   },
+   "fib20": {
+    "usPerRequest": 324.1,
+    "cpuUsPerRequest": 336.1
+   },
+   "primes10k": {
+    "usPerRequest": 510,
+    "cpuUsPerRequest": 536.2
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 21,
+    "results": [
+     200,
+     200,
+     200,
+     200,
+     200
+    ],
+    "stopped": false
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "Maximum call stack size exceeded",
+    "100000": "Maximum call stack size exceeded",
+    "300000": "Maximum call stack size exceeded",
+    "1000000": "Maximum call stack size exceeded"
+   }
+  },
+  {
+   "engine": "deno 2.9.6",
+   "build": "pure-asyncify",
+   "jspi": true,
+   "compileMs": 16.9,
+   "startMs": 124.7,
+   "startCpuMs": 156.7,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":224,\"random\":264114}"
+    ],
+    "/block": [
+     200,
+     "{\"blocked\":42}"
+    ],
+    "/sleep/20": [
+     200,
+     "{\"sleptMs\":82}"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 78,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 39.7,
+    "cpuUsPerRequest": 128.6
+   },
+   "fib20": {
+    "usPerRequest": 334.3,
+    "cpuUsPerRequest": 344.7
+   },
+   "primes10k": {
+    "usPerRequest": 595.1,
+    "cpuUsPerRequest": 617.8
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 21,
+    "results": [
+     200,
+     200,
+     200,
+     200,
+     200
+    ],
+    "stopped": false
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "Maximum call stack size exceeded",
+    "100000": "Maximum call stack size exceeded",
+    "300000": "Maximum call stack size exceeded",
+    "1000000": "Maximum call stack size exceeded"
+   }
+  },
+  {
+   "engine": "bun 1.4.4",
+   "build": "pure-asyncify",
+   "jspi": true,
+   "compileMs": 28.7,
+   "startMs": 29.7,
+   "startCpuMs": 132.6,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":103,\"random\":500654}"
+    ],
+    "/block": [
+     200,
+     "{\"blocked\":42}"
+    ],
+    "/sleep/20": [
+     200,
+     "{\"sleptMs\":20}"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 64,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 50.8,
+    "cpuUsPerRequest": 340.4
+   },
+   "fib20": {
+    "usPerRequest": 521.4,
+    "cpuUsPerRequest": 1666.7
+   },
+   "primes10k": {
+    "usPerRequest": 634.3,
+    "cpuUsPerRequest": 915.3
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 21,
+    "results": [
+     200,
+     200,
+     200,
+     200,
+     200
+    ],
+    "stopped": false
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "ok",
+    "100000": "Maximum call stack size exceeded.",
+    "300000": "Maximum call stack size exceeded.",
+    "1000000": "Maximum call stack size exceeded."
+   }
+  },
+  {
+   "engine": "node v26.12.1",
+   "build": "pure-jspi-m64",
+   "jspi": true,
+   "compileMs": 5.5,
+   "startMs": 67.9,
+   "startCpuMs": 76.8,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":133,\"random\":886539}"
+    ],
+    "/block": [
+     200,
+     "{\"blocked\":42}"
+    ],
+    "/sleep/20": [
+     200,
+     "{\"sleptMs\":20}"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 63,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 27.1,
+    "cpuUsPerRequest": 51.4
+   },
+   "fib20": {
+    "usPerRequest": 129.9,
+    "cpuUsPerRequest": 142.2
+   },
+   "primes10k": {
+    "usPerRequest": 281.6,
+    "cpuUsPerRequest": 292.5
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 21,
+    "results": [
+     200,
+     200,
+     200,
+     200,
+     200
+    ],
+    "stopped": false
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "Maximum call stack size exceeded",
+    "100000": "Maximum call stack size exceeded",
+    "300000": "Maximum call stack size exceeded",
+    "1000000": "Maximum call stack size exceeded"
+   }
+  },
+  {
+   "engine": "deno 2.9.6",
+   "build": "pure-jspi-m64",
+   "jspi": true,
+   "compileMs": 6.5,
+   "startMs": 51.7,
+   "startCpuMs": 63,
+   "memoryAfterStartMiB": 26.6,
+   "checks": {
+    "/": [
+     200,
+     "{\"message\":\"Hello from pure Lean on the edge!\"}"
+    ],
+    "/fib/20": [
+     200,
+     "{\"fib\":6765}"
+    ],
+    "/bignum": [
+     200,
+     "{\"twoTo200\":\"1606938044258990275541962092341162602522202993782792835301376\"}"
+    ],
+    "/asleep/20": [
+     200,
+     "{\"sum\":16}"
+    ],
+    "/mutex": [
+     200,
+     "{\"count\":8}"
+    ],
+    "/throw": [
+     "error",
+     "thrown from Lean"
+    ],
+    "/env": [
+     200,
+     "{\"GREETING\":\"hi\"}"
+    ],
+    "/time": [
+     200,
+     "{\"monoMs\":120,\"random\":257161}"
+    ],
+    "/block": [
+     200,
+     "{\"blocked\":42}"
+    ],
+    "/sleep/20": [
+     200,
+     "{\"sleptMs\":22}"
+    ]
+   },
+   "async100x50ms": {
+    "ms": 72,
+    "ok": true
+   },
+   "trivial": {
+    "usPerRequest": 29.1,
+    "cpuUsPerRequest": 60.8
+   },
+   "fib20": {
+    "usPerRequest": 126.9,
+    "cpuUsPerRequest": 136.2
+   },
+   "primes10k": {
+    "usPerRequest": 274.7,
+    "cpuUsPerRequest": 288.4
+   },
+   "memoryAfterLoadMiB": 26.6,
+   "blocking5x20ms": {
+    "ms": 46,
+    "results": [
+     200,
+     200,
+     200,
+     200,
+     200
+    ],
+    "stopped": false
+   },
+   "deep": {
+    "1000": "ok",
+    "3000": "ok",
+    "10000": "ok",
+    "30000": "Maximum call stack size exceeded",
+    "100000": "Maximum call stack size exceeded",
+    "300000": "Maximum call stack size exceeded",
+    "1000000": "Maximum call stack size exceeded"
+   }
+  },
+  {
+   "engine": "bun",
+   "build": "pure-jspi-m64",
+   "skipped": "Bun has no Wasm memory64 by default"
+  }
+ ],
+ "workerd": {
+  "wrangler": "4.152.0",
+  "workerd": "1.20261019.1 (V8 15.7)",
+  "note": "wrangler dev, local workerd; times measured inside the isolate (local workerd advances its clock during a request)",
+  "results": [
+   {
+    "app": "pure",
+    "build": "pure-jspi",
+    "bench": {
+     "path": "/",
+     "n": 2000,
+     "msPerCall": 0.0375
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-jspi",
+    "bench": {
+     "path": "/fib/20",
+     "n": 2000,
+     "msPerCall": 0.129
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-jspi",
+    "bench": {
+     "path": "/primes/10000",
+     "n": 2000,
+     "msPerCall": 0.2575
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-jspi",
+    "path": "/sleep/20",
+    "response": "{\"sleptMs\":22}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-jspi",
+    "path": "/block",
+    "response": "{\"blocked\":42}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-jspi",
+    "path": "/asleep/20",
+    "response": "{\"sum\":16}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-jspi",
+    "path": "/deep/10000",
+    "response": "{\"depth\":10000}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-jspi",
+    "path": "/deep/30000",
+    "response": "{\"error\":\"Maximum call stack size exceeded\",\"stopped\":true}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-jspi",
+    "startup": {
+     "startupMs": 70,
+     "start": "request",
+     "instances": 1,
+     "wasmMemoryMiB": 26.5625
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-sync",
+    "bench": {
+     "path": "/",
+     "n": 2000,
+     "msPerCall": 0.046
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-sync",
+    "bench": {
+     "path": "/fib/20",
+     "n": 2000,
+     "msPerCall": 0.118
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-sync",
+    "bench": {
+     "path": "/primes/10000",
+     "n": 2000,
+     "msPerCall": 0.2525
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-sync",
+    "path": "/sleep/20",
+    "response": "{\"error\":\"Lasm edge runtime: a blocking host operation must wait, and this Lean code cannot suspend (the build has no JSPI, or the code runs inside a synchronous JavaScript callback). Await in Async instead.\",\"stopped\":true}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-sync",
+    "path": "/block",
+    "response": "{\"error\":\"Lasm edge runtime: Task.get / IO.wait waits for an event that has not happened, and this Lean code cannot suspend (the build has no JSPI, or the code runs inside a synchronous JavaScript callback). Await in Async (Std.Async) instead of blocking.\",\"stopped\":true}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-sync",
+    "path": "/asleep/20",
+    "response": "{\"sum\":16}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-sync",
+    "path": "/deep/10000",
+    "response": "{\"depth\":10000}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-sync",
+    "path": "/deep/30000",
+    "response": "{\"error\":\"Maximum call stack size exceeded\",\"stopped\":true}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-sync",
+    "startup": {
+     "startupMs": 86,
+     "start": "request",
+     "instances": 1,
+     "wasmMemoryMiB": 26.5625
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-asyncify",
+    "bench": {
+     "path": "/",
+     "n": 2000,
+     "msPerCall": 0.0665
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-asyncify",
+    "bench": {
+     "path": "/fib/20",
+     "n": 2000,
+     "msPerCall": 0.3205
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-asyncify",
+    "bench": {
+     "path": "/primes/10000",
+     "n": 2000,
+     "msPerCall": 0.557
+    }
+   },
+   {
+    "app": "pure",
+    "build": "pure-asyncify",
+    "path": "/sleep/20",
+    "response": "{\"sleptMs\":23}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-asyncify",
+    "path": "/block",
+    "response": "{\"blocked\":42}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-asyncify",
+    "path": "/asleep/20",
+    "response": "{\"sum\":16}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-asyncify",
+    "path": "/deep/10000",
+    "response": "{\"depth\":10000}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-asyncify",
+    "path": "/deep/30000",
+    "response": "{\"error\":\"Maximum call stack size exceeded\",\"stopped\":true}"
+   },
+   {
+    "app": "pure",
+    "build": "pure-asyncify",
+    "startup": {
+     "startupMs": 126,
+     "start": "request",
+     "instances": 1,
+     "wasmMemoryMiB": 26.5625
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-jspi",
+    "bench": {
+     "path": "/js/health",
+     "n": 2000,
+     "msPerRequest": 0.059
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-jspi",
+    "bench": {
+     "path": "/health",
+     "n": 2000,
+     "msPerRequest": 0.0985
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-jspi",
+    "bench": {
+     "path": "/js/json",
+     "n": 2000,
+     "msPerRequest": 0.078
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-jspi",
+    "bench": {
+     "path": "/json",
+     "n": 2000,
+     "msPerRequest": 0.357
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-sync",
+    "bench": {
+     "path": "/js/health",
+     "n": 2000,
+     "msPerRequest": 0.053
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-sync",
+    "bench": {
+     "path": "/health",
+     "n": 2000,
+     "msPerRequest": 0.0905
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-sync",
+    "bench": {
+     "path": "/js/json",
+     "n": 2000,
+     "msPerRequest": 0.075
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-sync",
+    "bench": {
+     "path": "/json",
+     "n": 2000,
+     "msPerRequest": 0.349
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-asyncify",
+    "bench": {
+     "path": "/js/health",
+     "n": 2000,
+     "msPerRequest": 0.0575
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-asyncify",
+    "bench": {
+     "path": "/health",
+     "n": 2000,
+     "msPerRequest": 0.1055
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-asyncify",
+    "bench": {
+     "path": "/js/json",
+     "n": 2000,
+     "msPerRequest": 0.081
+    }
+   },
+   {
+    "app": "hono",
+    "build": "hono-asyncify",
+    "bench": {
+     "path": "/json",
+     "n": 2000,
+     "msPerRequest": 0.412
+    }
+   }
+  ]
+ },
+ "bundles": {
+  "note": "wrangler deploy --dry-run (no login): Total Upload / gzip",
+  "hono": {
+   "totalKiB": 1419.25,
+   "gzipKiB": 246.58
+  },
+  "pure": {
+   "totalKiB": 1482.45,
+   "gzipKiB": 249.68
+  }
+ },
+ "featureProbe": {
+  "note": "Tiny Wasm modules: JSPI (Suspending+promising, real suspension), memory64, legacy EH, exnref, shared memory",
+  "node 24.13.1": {
+   "jspi": false,
+   "memory64": true,
+   "legacyEH": true,
+   "exnref": false
+  },
+  "node 26.12.1": {
+   "jspi": true,
+   "memory64": true,
+   "legacyEH": true
+  },
+  "bun 1.4.4": {
+   "jspi": true,
+   "memory64": false,
+   "legacyEH": true,
+   "exnref": true
+  },
+  "deno 2.9.6 (V8 15.0)": {
+   "jspi": true,
+   "memory64": true,
+   "legacyEH": true,
+   "exnref": true
+  },
+  "workerd 1.20261019.1 (wrangler 4.152.0)": {
+   "jspi": true,
+   "memory64": true,
+   "legacyEH": true,
+   "exnref": true,
+   "sharedMemoryInstantiates": true,
+   "threads": false
+  }
+ },
+ "workersGlobalScope": {
+  "note": "Probed under wrangler dev: in the global scope crypto.getRandomValues and crypto.randomUUID throw (\"Disallowed operation called within global scope\"), Math.random works, Date.now() and performance.now() return 0. Lean startup in the global scope works once random bytes there come from a fallback (allocator seeding, Lean initializers). The prototype instantiates synchronously (new WebAssembly.Instance); asynchronous instantiation there was not tested on its own."
+ }
+}

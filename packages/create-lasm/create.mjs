@@ -65,10 +65,12 @@ export async function main(args = process.argv.slice(2), { stdin = process.stdin
   return run(cli, ['init', ...args]);
 }
 
-/** Run `lasm init …` with this Node, forwarding the exit status (or signal). */
+/** Run `lasm init …` with this runtime (Node, Bun, or Deno with `run -A`:
+ * `deno run -A npm:create-lasm`), forwarding the exit status (or signal). */
 export function runCli(cli, args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [cli.bin, ...args], { stdio: 'inherit', windowsHide: false });
+    const prefix = typeof globalThis.Deno?.version?.deno === 'string' ? ['run', '--allow-all', '--no-lock'] : [];
+    const child = spawn(process.execPath, [...prefix, cli.bin, ...args], { stdio: 'inherit', windowsHide: false });
     const forward = signal => child.kill(signal);
     for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, forward);
     child.once('error', reject);

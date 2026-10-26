@@ -1,13 +1,17 @@
 import { parseInitArguments } from './init.mjs';
 import { parsePackageArguments, packageTargets } from './package.mjs';
+import { jsRuntime } from './js-runtime.mjs';
 
 // `lasm build --target`: `node` writes dist/ only; a function platform also
 // packages it (src/package.mjs). Lasm builds for the platform; it never
 // installs or starts the platform's own tools.
-export const buildTargets = ['node', ...Object.keys(packageTargets)];
+// Edge targets (experimental, docs/EDGE.md) relink for edge isolates; the
+// list equals src/edge/edge-build.mjs edgeTargets (test/edge.test.mjs).
+export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy', 'supabase-edge'];
+export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf] [--dev]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge] [--dev]
        lasm init <directory> [--template plain|express|hono|std-http] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
@@ -81,8 +85,8 @@ export function parseLasmArguments(argv) {
     throw new Error('--allow-dev applies to lasm build --target <platform> and lasm package');
   if (result.command === 'build') {
     result.output ??= 'dist';
-    // Today the CLI runs on Node, so `node` is the default host target.
-    result.target ??= 'node';
+    // The default target is the runtime the CLI runs on: node, bun or deno.
+    result.target ??= jsRuntime === 'node' || result.input.endsWith('.json') ? 'node' : jsRuntime;
     if (result.target !== 'node' && result.input.endsWith('.json')) throw new Error('--target applies to Lean applications, not binding configurations');
   }
   return result;

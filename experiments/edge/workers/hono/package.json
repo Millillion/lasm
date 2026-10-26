@@ -1,0 +1,1 @@
+{ "name": "lasm-edge-hono-worker", "private": true, "type": "module", "dependencies": { "hono": "4.13.13" } }

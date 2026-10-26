@@ -2,16 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { releaseVersion, toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, maximumPackageBytes,
-  cTierLicense, createPackageJson, createPackageLicense } from '../scripts/npm-dist/packages.mjs';
+  cTierLicense, createPackageJson, createPackageLicense, edgeRuntimeBundle } from '../scripts/npm-dist/packages.mjs';
 import { leanDistribution } from '../src/managed-lean.mjs';
 import { validateNpmToolManifest, npmEntryFor } from '../src/npm-artifacts.mjs';
 
 const json = async path => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
 const catalogs = async () => ({ toolchains: await json('../src/toolchains.json'), linkToolchain: await json('../src/link-toolchain.json'),
+  edgeRuntimes: await json('../src/edge-runtimes.json'),
 });
 
 test('package versions come from the immutable release that published each archive', () => {
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v1/x.tar.zst'), '4.35.0-lasm.1');
+  assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-edge-v1/x.tar.zst'), '4.35.0-lasm.1');
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v1/x.tar.zst'), '4.35.0-lasm.1');
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/lean-4.35.0-c-v2/x.tar.zst'), '4.35.0-lasm.2');
   assert.equal(releaseVersion('https://github.com/Millillion/lasm/releases/download/emscripten-6.0.9-lasm-toolchain-v2/x'), '6.0.9-lasm.2');
@@ -29,6 +31,7 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
     assert.deepEqual(by('required'), ['@lasm/emscripten-shared', '@lasm/lean-core-init', '@lasm/lean-core-std']);
     const cTier = c.toolchains.lean[lean].tiers.c ? Object.keys(c.toolchains.lean[lean].tiers.c).map(p => `@lasm/lean-c-${p}`) : [];
     assert.deepEqual(by('demand'), [...cTier, '@lasm/lean-ext-elab', '@lasm/lean-ext-meta', '@lasm/lean-ext-rest'].sort());
+    assert.ok(!packages.some(p => p.name.includes('edge')), 'The edge runtime is bundled in the CLI, not a tool package');
     assert.ok(!packages.some(p => p.name.includes('/git-')), 'Lasm ships no Git');
     for (const pkg of packages) {
       assert.ok(pkg.artifact.bytes <= maximumPackageBytes);
@@ -58,6 +61,17 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
   const scoped = toolPackages({ lean: '4.35.0', ...c, scope: '@example-org' });
   assert.ok(scoped.every(p => p.name.startsWith('@example-org/')));
   assert.throws(() => toolPackages({ lean: '4.35.0', ...c, scope: 'lasm' }));
+});
+
+test('the edge runtime is bundled in the CLI package from its cataloged release archive', async () => {
+  const c = await catalogs();
+  const edge = edgeRuntimeBundle({ lean: '4.35.0', edgeRuntimes: c.edgeRuntimes });
+  const pinned = c.edgeRuntimes.lean['4.35.0'];
+  assert.equal(edge.baseRuntimeManifestSha256, pinned.baseRuntimeManifestSha256);
+  assert.deepEqual(Object.keys(edge.artifact).sort(), ['bytes', 'format', 'maximumExtractedBytes', 'name', 'root', 'sha256', 'url']);
+  assert.equal(edge.artifact.root, 'lean-4.35.0-wasm64-edge', 'src/edge/edge-runtime.mjs looks for targets/<runtime>-edge');
+  assert.match(edge.artifact.url, /^https:\/\/github\.com\/Millillion\/lasm\/releases\/download\/lean-4\.35\.0-edge-v1\//);
+  assert.equal(edgeRuntimeBundle({ lean: '9.9.9', edgeRuntimes: c.edgeRuntimes }), null);
 });
 
 test('C tier packages carry an SPDX expression of every component', () => {

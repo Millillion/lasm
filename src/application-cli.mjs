@@ -26,12 +26,46 @@ export function reportCliError(error) {
     : (error.stderr?.toString() || error.stdout?.toString() || error.message).slice(-12000));
 }
 
+/** Edge targets (docs/EDGE.md): the program relinked for edge
+ * isolates. An unchanged Node build reuses its cached edge program; otherwise
+ * the build runs again keeping its link inputs, and the edge link follows. */
+async function buildEdge(input, target, buildOptions, verbose) {
+  const { rm } = await import('node:fs/promises');
+  const { dirname, resolve } = await import('node:path');
+  const { buildApplicationWithProgress } = await import('./application-build-client.mjs');
+  const { findEdgeProgram, linkCachedEdgeProgram, writeEdgeOutput, edgeTargetSuspend } = await import('./edge/edge-build.mjs');
+  const suspend = edgeTargetSuspend(target);
+  const { applicationRuntime } = await import('./application-runtime.mjs');
+  const { selectLeanVersion, toolchainCatalog } = await import('./managed-lean.mjs');
+  const { findApplicationProject } = await import('./application-sources.mjs');
+  const source = resolve(input), projectDirectory = findApplicationProject(source) ?? dirname(source);
+  const selection = await selectLeanVersion(source);
+  const nodeRuntime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit });
+  let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built' });
+  const found = await findEdgeProgram({ result, nodeRuntime, suspend });
+  let program = found.cached;
+  if (program && result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
+  if (!program) {
+    // A Node build reused from its cache kept no link inputs: link it again.
+    if (!result.linkWork) result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: true });
+    try {
+      console.error(`[lasm] Linking the single-threaded (portable) program${suspend === 'asyncify' ? ' with Asyncify (this engine has no JSPI)' : ''}…`);
+      const { provisionEdgeLinker } = await import('./edge/edge-link.mjs');
+      const sdk = await provisionEdgeLinker(found.edge, { log: message => console.error('[lasm] ' + message) }, process.env, suspend);
+      program = linkCachedEdgeProgram({ result, nodeRuntime, edge: found.edge, key: found.key, sdk, suspend, verbose });
+    } finally {
+      if (result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
+    }
+  }
+  return writeEdgeOutput({ target, source, projectDirectory, result, edge: found.edge, program, cacheHit: !!found.cached }).output;
+}
+
 /** Shared by the primary CLI and the source-checkout launcher. */
 export async function runApplicationCli(argv) {
   const options = parseLasmArguments(argv);
   const support = applicationSupport();
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf] [--dev]\n       lasm init my-app [--template plain|express|hono|std-http] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nBuild and run ordinary Lean main in Node.' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge] [--dev]\n       lasm init my-app [--template plain|express|hono|std-http] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf [--allow-dev]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nBuild and run ordinary Lean main in Node.' : cliUsage);
     return 0;
   }
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }
@@ -60,10 +94,21 @@ export async function runApplicationCli(argv) {
     return 0;
   }
   const { buildApplicationWithProgress } = await import('./application-build-client.mjs');
-  const { target, allowDev, ...buildOptions } = options;
+  const { target: requested, allowDev, ...buildOptions } = options;
+  // Under Bun or Deno the default target is that runtime: the portable
+  // profile, run and built with it (Phase 7.5, docs/BUN_DENO.md).
+  const { jsRuntime, scriptPrefix, runtimeExecutable } = await import('./js-runtime.mjs');
+  const target = requested ?? (jsRuntime === 'node' ? undefined : jsRuntime);
   // A dev build refused by packaging is refused before it is built.
-  if (target && target !== 'node' && options.profile === 'dev' && !allowDev)
+  if (target && !['node', 'bun', 'deno'].includes(target) && options.profile === 'dev' && !allowDev)
     throw new Error(`lasm build --dev --target ${target}: dev builds are not for deployment. Drop --dev, or add --allow-dev to package a dev build anyway.`);
+  if ((await import('./edge/edge-build.mjs')).edgeTargets[target]) {
+    const output = await buildEdge(options.input, target, buildOptions, options.verbose);
+    if (options.command === 'build') return 0;
+    console.error(`[lasm] Running ${options.input} on ${target === 'bun' ? 'Bun' : 'Deno'}` + (options.profile === 'release' ? ' (release build)…' : ' (dev build)…'));
+    return runApplicationChild(runtimeExecutable, [...scriptPrefix(), join(output, 'main.mjs'), ...options.args],
+      `Could not start ${target === 'bun' ? 'Bun' : 'Deno'} to run the application.`);
+  }
   const result = await buildApplicationWithProgress(options.input, buildOptions);
   const profileNote = result.profile === 'dev' ? ' (dev profile: size optimizations skipped, not for deployment)' : ' (release profile)';
   if (options.command === 'build') {

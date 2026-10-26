@@ -1,0 +1,10 @@
+name = "lasm-edge-pure"
+main = "src/worker.mjs"
+compatibility_date = "2026-10-01"
+[vars]
+GREETING = "hello from wrangler vars"
+JSPI = "1"
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false

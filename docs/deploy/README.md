@@ -37,6 +37,11 @@ test and deploy.
 | Platform | Recipe | Notes |
 | --- | --- | --- |
 | Docker, Kubernetes | [docker-kubernetes.md](docker-kubernetes.md) | The reference: what CI runs. |
+| Cloudflare Workers | [workers.md](workers.md) | An edge isolate, not a Node process: `lasm build --target workers`, tested with `wrangler dev`. |
+| Vercel Edge Functions | [vercel-edge.md](vercel-edge.md) | `lasm build --target vercel-edge`, tested with `vercel build` offline and Vercel's `edge-runtime` package. |
+| Netlify Edge Functions | [netlify-edge.md](netlify-edge.md) | `lasm build --target netlify-edge`, tested with `netlify build --offline` and `netlify dev --offline`. |
+| Deno Deploy | [deno-deploy.md](deno-deploy.md) | `lasm build --target deno-deploy`, tested with the Deno CLI. |
+| Supabase Edge Functions (planned for 0.2.0) | [supabase-edge.md](supabase-edge.md) | `lasm build --target supabase-edge` (Asyncify: Supabase's runtime has no JSPI), tested in Supabase's edge runtime image in Docker. |
 | Google Cloud Run | [cloud-run.md](cloud-run.md) | amd64 only; use the second-generation execution environment. |
 | Fly.io | [fly.md](fly.md) | Set the VM memory to 512 MB or more. |
 | Railway | [railway.md](railway.md) | Builds the Dockerfile; sets `PORT`. |

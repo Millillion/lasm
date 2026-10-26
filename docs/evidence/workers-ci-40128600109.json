@@ -1,0 +1,449 @@
+{
+  "budget": {
+    "bundleBytes": 67108864,
+    "startupMs": 1000,
+    "cpuMsPerRequest": 10,
+    "memoryMiB": 128
+  },
+  "apps": {
+    "hono": {
+      "buildSeconds": 230.126,
+      "workerd": {
+        "app": "hono",
+        "wrangler": "4.152.0",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/hello/Ada",
+            "ok": true
+          },
+          {
+            "path": "/echo",
+            "ok": true
+          },
+          {
+            "path": "/health",
+            "ok": true
+          },
+          {
+            "path": "/missing",
+            "ok": true
+          },
+          {
+            "path": "50 concurrent /",
+            "ok": true
+          }
+        ],
+        "bundle": {
+          "files": 2,
+          "bytes": 1464741,
+          "gzipBytes": 250853
+        },
+        "httpMsPerRequest": 4.422,
+        "passed": true
+      },
+      "node": {
+        "engine": "node v26.12.1",
+        "app": "hono",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/hello/Ada",
+            "ok": true
+          },
+          {
+            "path": "/echo",
+            "ok": true
+          },
+          {
+            "path": "/health",
+            "ok": true
+          },
+          {
+            "path": "/missing",
+            "ok": true
+          }
+        ],
+        "compileMs": 5.7,
+        "startupMs": 50.6,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.0704,
+        "jsonMsPerRequest": 0.0706,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "deno": {
+        "engine": "deno 2.9.6",
+        "app": "hono",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/hello/Ada",
+            "ok": true
+          },
+          {
+            "path": "/echo",
+            "ok": true
+          },
+          {
+            "path": "/health",
+            "ok": true
+          },
+          {
+            "path": "/missing",
+            "ok": true
+          }
+        ],
+        "compileMs": 6.3,
+        "startupMs": 47.6,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.0445,
+        "jsonMsPerRequest": 0.0532,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "bun": {
+        "engine": "bun 1.4.4",
+        "app": "hono",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/hello/Ada",
+            "ok": true
+          },
+          {
+            "path": "/echo",
+            "ok": true
+          },
+          {
+            "path": "/health",
+            "ok": true
+          },
+          {
+            "path": "/missing",
+            "ok": true
+          }
+        ],
+        "compileMs": 19.4,
+        "startupMs": 18.7,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.0327,
+        "jsonMsPerRequest": 0.0367,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "budget": {
+        "bundle": true,
+        "startup": true,
+        "cpu": true,
+        "memory": true
+      }
+    },
+    "pure": {
+      "buildSeconds": 99.482,
+      "workerd": {
+        "app": "pure",
+        "wrangler": "4.152.0",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/fib/25",
+            "ok": true
+          },
+          {
+            "path": "/primes/100000",
+            "ok": true
+          },
+          {
+            "path": "/bignum",
+            "ok": true
+          },
+          {
+            "path": "/words",
+            "ok": true
+          },
+          {
+            "path": "/asleep/20",
+            "ok": true
+          },
+          {
+            "path": "/sleep/20",
+            "ok": true
+          },
+          {
+            "path": "/block",
+            "ok": true
+          },
+          {
+            "path": "/mutex",
+            "ok": true
+          },
+          {
+            "path": "/date",
+            "ok": true
+          },
+          {
+            "path": "/deep/5000",
+            "ok": true
+          },
+          {
+            "path": "/nope",
+            "ok": true
+          },
+          {
+            "path": "/deep/1000000",
+            "ok": true,
+            "got": 500
+          },
+          {
+            "path": "/fib/10",
+            "ok": true
+          },
+          {
+            "path": "50 concurrent /",
+            "ok": true
+          }
+        ],
+        "bundle": {
+          "files": 2,
+          "bytes": 1755370,
+          "gzipBytes": 308297
+        },
+        "instanceRestarted": true,
+        "httpMsPerRequest": 4.624,
+        "passed": true
+      },
+      "node": {
+        "engine": "node v26.12.1",
+        "app": "pure",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/fib/25",
+            "ok": true
+          },
+          {
+            "path": "/primes/100000",
+            "ok": true
+          },
+          {
+            "path": "/bignum",
+            "ok": true
+          },
+          {
+            "path": "/words",
+            "ok": true
+          },
+          {
+            "path": "/asleep/20",
+            "ok": true
+          },
+          {
+            "path": "/sleep/20",
+            "ok": true
+          },
+          {
+            "path": "/block",
+            "ok": true
+          },
+          {
+            "path": "/mutex",
+            "ok": true
+          },
+          {
+            "path": "/date",
+            "ok": true
+          },
+          {
+            "path": "/deep/5000",
+            "ok": true
+          },
+          {
+            "path": "/nope",
+            "ok": true
+          },
+          {
+            "path": "/deep/1000000",
+            "ok": true,
+            "stopped": true
+          },
+          {
+            "path": "/fib/10",
+            "ok": true
+          }
+        ],
+        "compileMs": 6.3,
+        "startupMs": 112.5,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.1167,
+        "jsonMsPerRequest": 0.2701,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "deno": {
+        "engine": "deno 2.9.6",
+        "app": "pure",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/fib/25",
+            "ok": true
+          },
+          {
+            "path": "/primes/100000",
+            "ok": true
+          },
+          {
+            "path": "/bignum",
+            "ok": true
+          },
+          {
+            "path": "/words",
+            "ok": true
+          },
+          {
+            "path": "/asleep/20",
+            "ok": true
+          },
+          {
+            "path": "/sleep/20",
+            "ok": true
+          },
+          {
+            "path": "/block",
+            "ok": true
+          },
+          {
+            "path": "/mutex",
+            "ok": true
+          },
+          {
+            "path": "/date",
+            "ok": true
+          },
+          {
+            "path": "/deep/5000",
+            "ok": true
+          },
+          {
+            "path": "/nope",
+            "ok": true
+          },
+          {
+            "path": "/deep/1000000",
+            "ok": true,
+            "stopped": true
+          },
+          {
+            "path": "/fib/10",
+            "ok": true
+          }
+        ],
+        "compileMs": 11.1,
+        "startupMs": 55.2,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.0761,
+        "jsonMsPerRequest": 0.2481,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "bun": {
+        "engine": "bun 1.4.4",
+        "app": "pure",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/fib/25",
+            "ok": true
+          },
+          {
+            "path": "/primes/100000",
+            "ok": true
+          },
+          {
+            "path": "/bignum",
+            "ok": true
+          },
+          {
+            "path": "/words",
+            "ok": true
+          },
+          {
+            "path": "/asleep/20",
+            "ok": true
+          },
+          {
+            "path": "/sleep/20",
+            "ok": true
+          },
+          {
+            "path": "/block",
+            "ok": true
+          },
+          {
+            "path": "/mutex",
+            "ok": true
+          },
+          {
+            "path": "/date",
+            "ok": true
+          },
+          {
+            "path": "/deep/5000",
+            "ok": true
+          },
+          {
+            "path": "/nope",
+            "ok": true
+          },
+          {
+            "path": "/deep/1000000",
+            "ok": true,
+            "stopped": true
+          },
+          {
+            "path": "/fib/10",
+            "ok": true
+          }
+        ],
+        "compileMs": 24.6,
+        "startupMs": 19,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.0752,
+        "jsonMsPerRequest": 0.2056,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "budget": {
+        "bundle": true,
+        "startup": true,
+        "cpu": true,
+        "memory": true
+      }
+    }
+  }
+}

@@ -150,8 +150,15 @@ jobs:
             const h = c.createHash('sha256').update(f.readFileSync('.work/release/base/' + files[0])).digest('hex');
             if (h !== process.env.CANDIDATE_SHA256) throw new Error('candidate digest ' + h);
             console.log(files[0], h);"
+      - name: Fetch the edge runtime archive from its tool release (also while a draft; checked by SHA-256 when packed)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .work/edge-seed
+          tag=$(node -p "const c=require('./src/edge-runtimes.json'),t=require('./src/toolchains.json'),e=c.lean[t.defaultLean];e?decodeURIComponent(new URL(e.url).pathname.split('/').at(-2)):''")
+          if [ -n "$tag" ]; then gh release download "$tag" --repo "$GITHUB_REPOSITORY" --dir .work/edge-seed --pattern '*.tar.zst'; fi
       - name: Build every package as the rehearsal did (each step guarded; npm pack twice)
-        run: node scripts/npm-dist/build-all.mjs --base .work/release/base/*.tgz --out .work/release/npm $OVERLAY --version "$VERSION" --license MIT --memory-mib 2048
+        run: node scripts/npm-dist/build-all.mjs --base .work/release/base/*.tgz --out .work/release/npm --seed .work/edge-seed $OVERLAY --version "$VERSION" --license MIT --memory-mib 2048
       - name: Byte-identical to the rehearsal
         run: node scripts/release/compare.mjs .work/release/rehearsal/linux-x64/npm-dist.json .work/release/npm/npm-dist.json
       - name: Dry run - a loopback registry instead of npm

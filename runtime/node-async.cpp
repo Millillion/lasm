@@ -167,7 +167,31 @@ void ensure_completion_thread() {
 #endif
     return promise;
 }
-#ifdef LASM_FULL_NATIVE_THREADS
+#ifdef LASM_EDGE
+// Op 95's reply: every completion queued so far, in order, as (u64 size,
+// packet) records. Packet: promise, resource, kind, failed, then the result
+// bytes (begin_request's op 94: the completion carries its result).
+void complete_batch(const Reply &batch) {
+    for (size_t offset = 0; offset < batch.bytes.size();) {
+        const uint64_t size = batch.number(offset);
+        offset += 8;
+        if (size < 4 * sizeof(uint64_t) || size > batch.bytes.size() - offset) {
+            lean_internal_panic("Invalid asynchronous completion packet");
+            __builtin_trap();
+        }
+        auto *promise = reinterpret_cast<O *>(batch.number(offset));
+        auto *resource = reinterpret_cast<O *>(batch.number(offset + 8));
+        const Reply result(Reply::Carried{}, batch.number(offset + 24) != 0,
+            batch.bytes.data() + offset + 32, size - 32);
+        lean_dec(resolve_request(promise, resource, result, batch.number(offset + 16)));
+        offset += size;
+    }
+}
+#endif
+#ifdef LASM_EDGE
+void ensure_completion_thread() {}
+#endif
+#if defined(LASM_FULL_NATIVE_THREADS) || defined(LASM_EDGE)
 // One host call starts the operation and registers its completion (op 94).
 // The completion thread then receives the result with the completion itself.
 // With check, a synchronous startup failure is returned instead, as native
@@ -259,7 +283,20 @@ O *lean_uv_interface_addresses() {
 #ifdef LASM_FULL_NATIVE_THREADS
 void initialize_libuv() { ensure_completion_thread(); }
 #endif
-#ifndef LASM_FULL_NATIVE_THREADS
+#ifdef LASM_EDGE
+// Edge profile: there is no completion thread. The edge pump (runtime/edge.cpp)
+// asks the host for completed operations without waiting (op 95, which
+// replies empty when none is queued) and resolves their promises.
+void initialize_libuv() {}
+bool lasm_edge_poll_completions() {
+    Reply batch(95);
+    if (batch.failed) { lean_internal_panic("Invalid asynchronous completion packet"); __builtin_trap(); }
+    if (batch.bytes.empty()) return false;
+    complete_batch(batch);
+    return true;
+}
+#endif
+#if !defined(LASM_FULL_NATIVE_THREADS) && !defined(LASM_EDGE)
 O *lean_io_basemutex_new() { return wrap_handle(Reply(40).number()); }
 O *lean_io_baserecmutex_new() { return wrap_handle(Reply(40, 0, 1).number()); }
 O *lean_io_basemutex_lock(O *h) { return lock_call(41, h); }

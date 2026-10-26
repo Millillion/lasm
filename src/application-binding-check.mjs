@@ -8,6 +8,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, w
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { evalCommand } from './js-runtime.mjs';
 
 const reader = fileURLToPath(new URL('./lasm-js-bindings.lean', import.meta.url));
 
@@ -47,12 +48,16 @@ function readBindingsUncached(lean, env, files) {
   return result.stdout.split(/\r?\n/).filter(line => line.startsWith('{')).map(line => JSON.parse(line));
 }
 
-// Runs in the child: argv[2] is the project directory, stdin the bindings.
+// Runs in the child: the last argument is the project directory, stdin the bindings.
 const checker = `
 const { createRequire } = require('node:module');
 const { join } = require('node:path');
+const { pathToFileURL } = require('node:url');
 const bindings = JSON.parse(require('node:fs').readFileSync(0, 'utf8'));
-const load = createRequire(join(process.argv[1], 'package.json'));
+// The project from the environment (Bun's -e on Windows does not reliably pass
+// trailing arguments), resolved through a file URL, which every runtime accepts.
+const project = process.env.LASM_BINDING_PROJECT || process.argv.at(-1);
+const load = createRequire(pathToFileURL(join(project, 'package.json')).href);
 const results = bindings.map(b => {
   const where = b.module + (b.path ? ' export ' + JSON.stringify(b.path) : '');
   let value;
@@ -74,8 +79,9 @@ process.stdout.write(JSON.stringify(results));
 
 export function checkBindings(project, bindings) {
   if (!bindings.length) return [];
-  const result = spawnSync(process.execPath, ['-e', checker, project], { input: JSON.stringify(bindings), encoding: 'utf8',
-    cwd: project, windowsHide: true, timeout: 120_000, maxBuffer: 16 * 1024 * 1024 });
+  const [command, args] = evalCommand(checker, [project]);
+  const result = spawnSync(command, args, { input: JSON.stringify(bindings), encoding: 'utf8',
+    cwd: project, env: { ...process.env, LASM_BINDING_PROJECT: project }, windowsHide: true, timeout: 120_000, maxBuffer: 16 * 1024 * 1024 });
   if (result.status !== 0) throw new Error(`The Lasm.JS binding check failed to run: ${result.stderr}`);
   return JSON.parse(result.stdout);
 }

@@ -33,7 +33,7 @@ import { hashFile } from '../../src/managed-artifacts.mjs';
 import { downloadArtifact } from '../../src/managed-download.mjs';
 import { findNpm, archiveFileName } from '../../src/npm-artifacts.mjs';
 import { toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, defaultScope, maximumPackageBytes, noticeDirectory,
-  createPackageJson, createPackageLicense, cTierExtraNotices, cTierFamilyNotices, noticeSections, cliLicense, slug } from './packages.mjs';
+  createPackageJson, createPackageLicense, edgeRuntimeBundle, cTierExtraNotices, cTierFamilyNotices, noticeSections, cliLicense, slug } from './packages.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values: args } = parseArgs({ options: {
@@ -63,15 +63,18 @@ if (args.step === 'plan') {
   await rm(probe, { recursive: true });
   const catalogs = {
     toolchains: await json(join(root, 'src/toolchains.json')), linkToolchain: await json(join(root, 'src/link-toolchain.json')),
+    edgeRuntimes: await json(join(root, 'src/edge-runtimes.json')),
   };
   const packages = toolPackages({ lean: support.lean, ...catalogs, scope: args.scope,
     platforms: support.platforms });
+  // The edge runtime goes into the CLI package itself (targets/<root>/), not a tool package.
+  const edge = edgeRuntimeBundle({ lean: support.lean, edgeRuntimes: catalogs.edgeRuntimes });
   const plan = { schema: 1, base: { file: resolve(args.base), sha256: await hashFile(resolve(args.base)), version: basePackage.version },
     lean: support.lean, platforms: support.platforms, scope: args.scope, overlaySource: args['overlay-source'],
     main: { name: `${args.scope}/cli`, version: args.version ?? `${basePackage.version}.npm.1`, ...(args.license ? { license: args.license } : {}) },
     // The catalog this source pins, kept with the plan so later steps cannot drift.
     catalog: { toolchains: { ...catalogs.toolchains, defaultLean: support.lean, lean: { [support.lean]: catalogs.toolchains.lean[support.lean] } } },
-    packages };
+    packages, edge };
   await writeFile(planFile, JSON.stringify(plan, null, 2) + '\n');
   console.log(packages.map(p => p.name).join('\n'));
   process.exit(0);
@@ -224,6 +227,29 @@ if (args.step === 'main') {
   // A publication licence (for example --license MIT) is Lasm's own: LICENSE is this
   // checkout's text. The `license` field is an SPDX expression of Lasm's licence and
   // every bundled component, whose texts go to licenses/ (docs/LICENSE_AUDIT.md).
+  // The edge runtime (docs/EDGE.md), extracted from its verified release archive into
+  // targets/, where src/edge/edge-runtime.mjs finds it before any download.
+  let edgeBundle;
+  if (plan.edge) {
+    const { artifact, baseRuntimeManifestSha256 } = plan.edge;
+    const provenance = await json(join(main, 'provenance.json'));
+    assert.equal(baseRuntimeManifestSha256, provenance.runtimeManifestSha256,
+      `The cataloged edge runtime belongs to runtime ${baseRuntimeManifestSha256}, not this candidate's ${provenance.runtimeManifestSha256}`);
+    const file = await releaseAsset(artifact), target = join(main, 'targets', artifact.root);
+    assert.ok(!existsSync(target), `The candidate already has ${target}`);
+    await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: join(main, 'targets'), strict: true, preservePaths: false, preserveOwner: false,
+      filter: (name, header) => (name === artifact.root || name.startsWith(artifact.root + '/')) && ['File', 'Directory'].includes(header.type) }));
+    // Fixed modes, so the tarball is byte-identical on every runner.
+    await chmod(target, 0o755);
+    for (const entry of await readdir(target, { recursive: true, withFileTypes: true }))
+      await chmod(join(entry.parentPath, entry.name), entry.isDirectory() ? 0o755 : 0o644);
+    const manifest = await json(join(target, 'libraries.json'));
+    assert.ok(manifest.schema === 1 && manifest.profile === 'edge' && manifest.baseRuntimeManifestSha256 === baseRuntimeManifestSha256, 'Unexpected edge runtime manifest');
+    for (const [name, digest] of Object.entries(manifest.files)) assert.equal(await hashFile(join(target, 'lib', name)), digest, `Edge runtime ${name}`);
+    for (const [name, digest] of Object.entries(manifest.sysroot?.files ?? {}))
+      assert.equal(await hashFile(join(target, 'sysroot/lib', manifest.sysroot.directory, name)), digest, `Edge runtime system library ${name}`);
+    edgeBundle = { directory: `targets/${artifact.root}`, archive: { name: artifact.name, sha256: artifact.sha256, bytes: artifact.bytes, url: artifact.url } };
+  }
   let mainMeta = plan.main;
   if (plan.main.license) {
     await copyFile(join(root, 'LICENSE'), join(main, 'LICENSE'));
@@ -243,6 +269,7 @@ if (args.step === 'main') {
       const file = join(main, 'src/native', helper, 'THIRD_PARTY_NOTICES.txt');
       if (existsSync(file)) await sections(file, ['native-' + helper]);
     }
+    if (edgeBundle) await sections(join(main, edgeBundle.directory, 'THIRD_PARTY_NOTICES.txt'), ['edge-runtime']);
     const bundled = [];
     for (const name of await readdir(join(main, 'node_modules'))) {
       const names = name.startsWith('@') ? (await readdir(join(main, 'node_modules', name))).map(child => name + '/' + child) : [name];
@@ -275,7 +302,7 @@ if (args.step === 'main') {
   const record = {
     schema: 1, scope: plan.scope, lean: plan.lean, platforms: plan.platforms, recordedAt: new Date().toISOString(),
     host: `${process.platform}-${process.arch}`, node: process.versions.node, npm: runNpm(['--version']).trim(), reproduciblePacking: true,
-    base: { file: basename(plan.base.file), sha256: plan.base.sha256, version: plan.base.version }, overlay,
+    base: { file: basename(plan.base.file), sha256: plan.base.sha256, version: plan.base.version }, overlay, edge: edgeBundle,
     main: { ...plan.main, license: mainMeta.license, ...mainPacked },
     create: { name: createMeta.name, version: createMeta.version, license: createMeta.license, ...createPacked },
     packages: plan.packages.map(pkg => ({ name: pkg.name, version: pkg.version, install: pkg.install, platform: pkg.platform,

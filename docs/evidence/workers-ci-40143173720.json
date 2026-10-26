@@ -1,0 +1,1004 @@
+{
+  "budget": {
+    "bundleBytes": 67108864,
+    "startupMs": 1000,
+    "cpuMsPerRequest": 10,
+    "memoryMiB": 128
+  },
+  "apps": {
+    "hono": {
+      "buildSeconds": 109.243,
+      "workerd": {
+        "app": "hono",
+        "wrangler": "4.152.0",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/hello/Ada",
+            "ok": true
+          },
+          {
+            "path": "/echo",
+            "ok": true
+          },
+          {
+            "path": "/health",
+            "ok": true
+          },
+          {
+            "path": "/missing",
+            "ok": true
+          },
+          {
+            "path": "50 concurrent /",
+            "ok": true
+          }
+        ],
+        "bundle": {
+          "files": 2,
+          "bytes": 1464991,
+          "gzipBytes": 250929
+        },
+        "httpMsPerRequest": 2.974,
+        "passed": true
+      },
+      "node": {
+        "engine": "node v26.12.1",
+        "app": "hono",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/hello/Ada",
+            "ok": true
+          },
+          {
+            "path": "/echo",
+            "ok": true
+          },
+          {
+            "path": "/health",
+            "ok": true
+          },
+          {
+            "path": "/missing",
+            "ok": true
+          }
+        ],
+        "compileMs": 5,
+        "startupMs": 40.6,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.0337,
+        "jsonMsPerRequest": 0.034,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "deno": {
+        "engine": "deno 2.9.6",
+        "app": "hono",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/hello/Ada",
+            "ok": true
+          },
+          {
+            "path": "/echo",
+            "ok": true
+          },
+          {
+            "path": "/health",
+            "ok": true
+          },
+          {
+            "path": "/missing",
+            "ok": true
+          }
+        ],
+        "compileMs": 4.9,
+        "startupMs": 37.1,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.024,
+        "jsonMsPerRequest": 0.0313,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "bun": {
+        "engine": "bun 1.4.4",
+        "app": "hono",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/hello/Ada",
+            "ok": true
+          },
+          {
+            "path": "/echo",
+            "ok": true
+          },
+          {
+            "path": "/health",
+            "ok": true
+          },
+          {
+            "path": "/missing",
+            "ok": true
+          }
+        ],
+        "compileMs": 15.3,
+        "startupMs": 14.5,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.0259,
+        "jsonMsPerRequest": 0.022,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "vercelEdgeBuildSeconds": 8.308,
+      "vercel-edge": {
+        "app": "hono",
+        "vercel": "65.2.0",
+        "edgeRuntime": "4.0.1",
+        "node": "v26.12.1",
+        "checks": [
+          {
+            "name": "vercel build: an edge function",
+            "ok": true,
+            "config": {
+              "runtime": "edge",
+              "deploymentTarget": "v8-worker",
+              "entrypoint": "api/lasm.mjs"
+            }
+          },
+          {
+            "name": "vercel build traced api/lasm.mjs",
+            "ok": true
+          },
+          {
+            "name": "vercel build traced api/_lasm/lasm/program.wasm",
+            "ok": true
+          },
+          {
+            "name": "vercel build traced api/_lasm/lasm/program.mjs",
+            "ok": true
+          },
+          {
+            "name": "vercel build traced api/_lasm/lasm/edge-start.mjs",
+            "ok": true
+          },
+          {
+            "name": "vercel build traced api/_lasm/lasm/edge-host.mjs",
+            "ok": true
+          },
+          {
+            "name": "vercel build traced api/_lasm/lasm/edge-js.mjs",
+            "ok": true
+          },
+          {
+            "name": "within Vercel Edge Hobby code limit (1 MB gzip)",
+            "ok": true,
+            "gzip": 250303
+          },
+          {
+            "name": "edge-runtime GET /",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /hello/Ada",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime POST /echo",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /health",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /missing",
+            "ok": true
+          }
+        ],
+        "bundle": {
+          "jsBytes": 125969,
+          "wasmBytes": 1339952,
+          "gzipBytes": 250303
+        },
+        "msPerRequest": 0.09,
+        "passed": true
+      },
+      "netlify-edge": {
+        "app": "hono",
+        "netlifyCli": "27.14.2",
+        "deno": "deno 2.9.6 (stable, release, x86_64-unknown-linux-gnu)",
+        "checks": [
+          {
+            "name": "netlify build bundled the edge function",
+            "ok": true,
+            "routes": [
+              {
+                "function": "lasm",
+                "pattern": "^(?:/(.*))/?$",
+                "excluded_patterns": [],
+                "path": "/*"
+              }
+            ]
+          },
+          {
+            "name": "within Netlify Edge code limit (20 MB)",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /hello/Ada",
+            "ok": true
+          },
+          {
+            "name": "netlify dev POST /echo",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /health",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /missing",
+            "ok": true
+          }
+        ],
+        "bundle": {
+          "eszipBytes": 1912104
+        },
+        "httpMsPerRequest": 2.222,
+        "passed": true
+      },
+      "deno-deploy": {
+        "app": "hono",
+        "entry": "deno/main.mjs",
+        "runtime": "deno 2.9.6 (stable, release, x86_64-unknown-linux-gnu)",
+        "checks": [
+          {
+            "name": "deno/main.mjs GET /",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /hello/Ada",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs POST /echo",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /health",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /missing",
+            "ok": true
+          }
+        ],
+        "bundle": {
+          "bytes": 1575046
+        },
+        "firstResponseMs": 161,
+        "httpMsPerRequest": 0.573,
+        "passed": true
+      },
+      "bun-portable": {
+        "app": "hono",
+        "entry": "bun/main.mjs",
+        "runtime": "1.4.4",
+        "checks": [
+          {
+            "name": "bun/main.mjs GET /",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /hello/Ada",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs POST /echo",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /health",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /missing",
+            "ok": true
+          }
+        ],
+        "bundle": {
+          "bytes": 1575021
+        },
+        "firstResponseMs": 158,
+        "httpMsPerRequest": 0.551,
+        "passed": true
+      },
+      "budget": {
+        "bundle": true,
+        "startup": true,
+        "cpu": true,
+        "memory": true,
+        "vercelEdgeCode": true,
+        "netlifyEdgeCode": true
+      }
+    },
+    "pure": {
+      "buildSeconds": 64.614,
+      "workerd": {
+        "app": "pure",
+        "wrangler": "4.152.0",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/fib/25",
+            "ok": true
+          },
+          {
+            "path": "/primes/100000",
+            "ok": true
+          },
+          {
+            "path": "/bignum",
+            "ok": true
+          },
+          {
+            "path": "/words",
+            "ok": true
+          },
+          {
+            "path": "/asleep/20",
+            "ok": true
+          },
+          {
+            "path": "/sleep/20",
+            "ok": true
+          },
+          {
+            "path": "/block",
+            "ok": true
+          },
+          {
+            "path": "/mutex",
+            "ok": true
+          },
+          {
+            "path": "/date",
+            "ok": true
+          },
+          {
+            "path": "/deep/5000",
+            "ok": true
+          },
+          {
+            "path": "/nope",
+            "ok": true
+          },
+          {
+            "path": "/deep/1000000",
+            "ok": true,
+            "got": 500
+          },
+          {
+            "path": "/fib/10",
+            "ok": true
+          },
+          {
+            "path": "50 concurrent /",
+            "ok": true
+          }
+        ],
+        "bundle": {
+          "files": 2,
+          "bytes": 1755620,
+          "gzipBytes": 308364
+        },
+        "instanceRestarted": true,
+        "httpMsPerRequest": 2.986,
+        "passed": true
+      },
+      "node": {
+        "engine": "node v26.12.1",
+        "app": "pure",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/fib/25",
+            "ok": true
+          },
+          {
+            "path": "/primes/100000",
+            "ok": true
+          },
+          {
+            "path": "/bignum",
+            "ok": true
+          },
+          {
+            "path": "/words",
+            "ok": true
+          },
+          {
+            "path": "/asleep/20",
+            "ok": true
+          },
+          {
+            "path": "/sleep/20",
+            "ok": true
+          },
+          {
+            "path": "/block",
+            "ok": true
+          },
+          {
+            "path": "/mutex",
+            "ok": true
+          },
+          {
+            "path": "/date",
+            "ok": true
+          },
+          {
+            "path": "/deep/5000",
+            "ok": true
+          },
+          {
+            "path": "/nope",
+            "ok": true
+          },
+          {
+            "path": "/deep/1000000",
+            "ok": true,
+            "stopped": true
+          },
+          {
+            "path": "/fib/10",
+            "ok": true
+          }
+        ],
+        "compileMs": 4.6,
+        "startupMs": 73.4,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.0564,
+        "jsonMsPerRequest": 0.1899,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "deno": {
+        "engine": "deno 2.9.6",
+        "app": "pure",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/fib/25",
+            "ok": true
+          },
+          {
+            "path": "/primes/100000",
+            "ok": true
+          },
+          {
+            "path": "/bignum",
+            "ok": true
+          },
+          {
+            "path": "/words",
+            "ok": true
+          },
+          {
+            "path": "/asleep/20",
+            "ok": true
+          },
+          {
+            "path": "/sleep/20",
+            "ok": true
+          },
+          {
+            "path": "/block",
+            "ok": true
+          },
+          {
+            "path": "/mutex",
+            "ok": true
+          },
+          {
+            "path": "/date",
+            "ok": true
+          },
+          {
+            "path": "/deep/5000",
+            "ok": true
+          },
+          {
+            "path": "/nope",
+            "ok": true
+          },
+          {
+            "path": "/deep/1000000",
+            "ok": true,
+            "stopped": true
+          },
+          {
+            "path": "/fib/10",
+            "ok": true
+          }
+        ],
+        "compileMs": 7.9,
+        "startupMs": 46.4,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.0401,
+        "jsonMsPerRequest": 0.1789,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "bun": {
+        "engine": "bun 1.4.4",
+        "app": "pure",
+        "checks": [
+          {
+            "path": "/",
+            "ok": true
+          },
+          {
+            "path": "/fib/25",
+            "ok": true
+          },
+          {
+            "path": "/primes/100000",
+            "ok": true
+          },
+          {
+            "path": "/bignum",
+            "ok": true
+          },
+          {
+            "path": "/words",
+            "ok": true
+          },
+          {
+            "path": "/asleep/20",
+            "ok": true
+          },
+          {
+            "path": "/sleep/20",
+            "ok": true
+          },
+          {
+            "path": "/block",
+            "ok": true
+          },
+          {
+            "path": "/mutex",
+            "ok": true
+          },
+          {
+            "path": "/date",
+            "ok": true
+          },
+          {
+            "path": "/deep/5000",
+            "ok": true
+          },
+          {
+            "path": "/nope",
+            "ok": true
+          },
+          {
+            "path": "/deep/1000000",
+            "ok": true,
+            "stopped": true
+          },
+          {
+            "path": "/fib/10",
+            "ok": true
+          }
+        ],
+        "compileMs": 20,
+        "startupMs": 15.7,
+        "wasmMemoryMiB": 26.6,
+        "trivialMsPerRequest": 0.0466,
+        "jsonMsPerRequest": 0.1618,
+        "wasmMemoryAfterMiB": 26.6,
+        "passed": true
+      },
+      "vercelEdgeBuildSeconds": 3.989,
+      "vercel-edge": {
+        "app": "pure",
+        "vercel": "65.2.0",
+        "edgeRuntime": "4.0.1",
+        "node": "v26.12.1",
+        "checks": [
+          {
+            "name": "vercel build: an edge function",
+            "ok": true,
+            "config": {
+              "runtime": "edge",
+              "deploymentTarget": "v8-worker",
+              "entrypoint": "api/lasm.mjs"
+            }
+          },
+          {
+            "name": "vercel build traced api/lasm.mjs",
+            "ok": true
+          },
+          {
+            "name": "vercel build traced api/_lasm/lasm/program.wasm",
+            "ok": true
+          },
+          {
+            "name": "vercel build traced api/_lasm/lasm/program.mjs",
+            "ok": true
+          },
+          {
+            "name": "vercel build traced api/_lasm/lasm/edge-start.mjs",
+            "ok": true
+          },
+          {
+            "name": "vercel build traced api/_lasm/lasm/edge-host.mjs",
+            "ok": true
+          },
+          {
+            "name": "vercel build traced api/_lasm/lasm/edge-js.mjs",
+            "ok": true
+          },
+          {
+            "name": "within Vercel Edge Hobby code limit (1 MB gzip)",
+            "ok": true,
+            "gzip": 308597
+          },
+          {
+            "name": "edge-runtime GET /",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /fib/25",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /primes/100000",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /bignum",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime POST /words",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /asleep/20",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /sleep/20",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /block",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /mutex",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /date",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /deep/5000",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime GET /nope",
+            "ok": true
+          },
+          {
+            "name": "edge-runtime /deep/1000000 fails the request",
+            "ok": true
+          },
+          {
+            "name": "a stopped instance is replaced",
+            "ok": true,
+            "after": {
+              "status": 200,
+              "body": "{\"fib\":55}"
+            }
+          }
+        ],
+        "bundle": {
+          "jsBytes": 65361,
+          "wasmBytes": 1689517,
+          "gzipBytes": 308597
+        },
+        "msPerRequest": 0.125,
+        "passed": true
+      },
+      "netlify-edge": {
+        "app": "pure",
+        "netlifyCli": "27.14.2",
+        "deno": "deno 2.9.6 (stable, release, x86_64-unknown-linux-gnu)",
+        "checks": [
+          {
+            "name": "netlify build bundled the edge function",
+            "ok": true,
+            "routes": [
+              {
+                "function": "lasm",
+                "pattern": "^(?:/(.*))/?$",
+                "excluded_patterns": [],
+                "path": "/*"
+              }
+            ]
+          },
+          {
+            "name": "within Netlify Edge code limit (20 MB)",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /fib/25",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /primes/100000",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /bignum",
+            "ok": true
+          },
+          {
+            "name": "netlify dev POST /words",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /asleep/20",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /sleep/20",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /block",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /mutex",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /date",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /deep/5000",
+            "ok": true
+          },
+          {
+            "name": "netlify dev GET /nope",
+            "ok": true
+          },
+          {
+            "name": "netlify dev /deep/1000000 fails the request",
+            "ok": true
+          },
+          {
+            "name": "a stopped instance is replaced",
+            "ok": true,
+            "after": {
+              "status": 200,
+              "body": "{\"fib\":55}"
+            }
+          }
+        ],
+        "bundle": {
+          "eszipBytes": 2310694
+        },
+        "httpMsPerRequest": 2.48,
+        "passed": true
+      },
+      "deno-deploy": {
+        "app": "pure",
+        "entry": "deno/main.mjs",
+        "runtime": "deno 2.9.6 (stable, release, x86_64-unknown-linux-gnu)",
+        "checks": [
+          {
+            "name": "deno/main.mjs GET /",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /fib/25",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /primes/100000",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /bignum",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs POST /words",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /asleep/20",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /sleep/20",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /block",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /mutex",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /date",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /deep/5000",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /nope",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs /deep/1000000 fails the request",
+            "ok": true
+          },
+          {
+            "name": "a stopped instance is replaced",
+            "ok": true,
+            "after": {
+              "status": 200,
+              "body": "{\"fib\":55}"
+            }
+          }
+        ],
+        "bundle": {
+          "bytes": 1924560
+        },
+        "firstResponseMs": 154,
+        "httpMsPerRequest": 0.667,
+        "passed": true
+      },
+      "bun-portable": {
+        "app": "pure",
+        "entry": "bun/main.mjs",
+        "runtime": "1.4.4",
+        "checks": [
+          {
+            "name": "bun/main.mjs GET /",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /fib/25",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /primes/100000",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /bignum",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs POST /words",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /asleep/20",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /sleep/20",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /block",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /mutex",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /date",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /deep/5000",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /nope",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs /deep/1000000 fails the request",
+            "ok": true
+          },
+          {
+            "name": "a stopped instance is replaced",
+            "ok": true,
+            "after": {
+              "status": 200,
+              "body": "{\"fib\":55}"
+            }
+          }
+        ],
+        "bundle": {
+          "bytes": 1924535
+        },
+        "firstResponseMs": 157,
+        "httpMsPerRequest": 0.706,
+        "passed": true
+      },
+      "budget": {
+        "bundle": true,
+        "startup": true,
+        "cpu": true,
+        "memory": true,
+        "vercelEdgeCode": true,
+        "netlifyEdgeCode": true
+      }
+    }
+  },
+  "edgeLinkCompare": {
+    "files": {
+      "program.wasm": {
+        "emcc": "496537b2242cc8262563931c6b71c6c662bd5b2e710e461297c88f5b7b237d58",
+        "node": "496537b2242cc8262563931c6b71c6c662bd5b2e710e461297c88f5b7b237d58"
+      },
+      "program.mjs": {
+        "emcc": "a5c731690a393e5caa627f00dc91ab50c931721e1fe2ca854af95b62fc735019",
+        "node": "a5c731690a393e5caa627f00dc91ab50c931721e1fe2ca854af95b62fc735019"
+      }
+    },
+    "emccSeconds": 74.646,
+    "nodeSeconds": 13.396,
+    "identical": true
+  }
+}

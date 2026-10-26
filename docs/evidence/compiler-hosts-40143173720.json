@@ -1,0 +1,442 @@
+{
+  "run": 40143173720,
+  "source": "0994ce3",
+  "linux-x64": {
+    "platform": "linux-x64",
+    "versions": {
+      "bun": "1.4.4",
+      "deno": "deno 2.9.6 (stable, release, x86_64-unknown-linux-gnu)"
+    },
+    "builds": {
+      "node": {
+        "seconds": 171.07,
+        "dist": "0b8c9b5b96b062896d26a7569077a0ac9616f9f42bfa5b586b448585cef755b1",
+        "bun": "496537b2242cc8262563931c6b71c6c662bd5b2e710e461297c88f5b7b237d58",
+        "deno": "496537b2242cc8262563931c6b71c6c662bd5b2e710e461297c88f5b7b237d58"
+      },
+      "bun": {
+        "seconds": 68.198,
+        "dist": "0b8c9b5b96b062896d26a7569077a0ac9616f9f42bfa5b586b448585cef755b1",
+        "bun": "496537b2242cc8262563931c6b71c6c662bd5b2e710e461297c88f5b7b237d58"
+      },
+      "deno": {
+        "seconds": 82.105,
+        "dist": "0b8c9b5b96b062896d26a7569077a0ac9616f9f42bfa5b586b448585cef755b1",
+        "deno": "496537b2242cc8262563931c6b71c6c662bd5b2e710e461297c88f5b7b237d58"
+      }
+    },
+    "served": {
+      "bun": {
+        "app": "pure",
+        "entry": "bun/main.mjs",
+        "runtime": "1.4.4",
+        "checks": [
+          {
+            "name": "bun/main.mjs GET /",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /fib/25",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /primes/100000",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /bignum",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs POST /words",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /asleep/20",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /sleep/20",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /block",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /mutex",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /date",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /deep/5000",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /nope",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs /deep/1000000 fails the request",
+            "ok": true
+          },
+          {
+            "name": "a stopped instance is replaced",
+            "ok": true,
+            "after": {
+              "status": 200,
+              "body": "{\"fib\":55}"
+            }
+          }
+        ],
+        "bundle": {
+          "bytes": 1924535
+        },
+        "firstResponseMs": 188,
+        "httpMsPerRequest": 0.75,
+        "passed": true
+      },
+      "deno": {
+        "app": "pure",
+        "entry": "deno/main.mjs",
+        "runtime": "deno 2.9.6 (stable, release, x86_64-unknown-linux-gnu)",
+        "checks": [
+          {
+            "name": "deno/main.mjs GET /",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /fib/25",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /primes/100000",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /bignum",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs POST /words",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /asleep/20",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /sleep/20",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /block",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /mutex",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /date",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /deep/5000",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /nope",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs /deep/1000000 fails the request",
+            "ok": true
+          },
+          {
+            "name": "a stopped instance is replaced",
+            "ok": true,
+            "after": {
+              "status": 200,
+              "body": "{\"fib\":55}"
+            }
+          }
+        ],
+        "bundle": {
+          "bytes": 1924546
+        },
+        "firstResponseMs": 175,
+        "httpMsPerRequest": 0.757,
+        "passed": true
+      }
+    },
+    "cli": {
+      "bun": [
+        {
+          "args": [],
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "args": [
+            "a b",
+            "c"
+          ],
+          "exit": 3,
+          "ok": true
+        },
+        {
+          "args": [
+            "exit5"
+          ],
+          "exit": 5,
+          "ok": true
+        }
+      ],
+      "deno": [
+        {
+          "args": [],
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "args": [
+            "a b",
+            "c"
+          ],
+          "exit": 3,
+          "ok": true
+        },
+        {
+          "args": [
+            "exit5"
+          ],
+          "exit": 5,
+          "ok": true
+        }
+      ]
+    }
+  },
+  "linux-arm64": {
+    "platform": "linux-arm64",
+    "versions": {
+      "bun": "1.4.4",
+      "deno": "deno 2.9.6 (stable, release, aarch64-unknown-linux-gnu)"
+    },
+    "builds": {
+      "node": {
+        "seconds": 160.575,
+        "dist": "0b8c9b5b96b062896d26a7569077a0ac9616f9f42bfa5b586b448585cef755b1",
+        "bun": "496537b2242cc8262563931c6b71c6c662bd5b2e710e461297c88f5b7b237d58",
+        "deno": "496537b2242cc8262563931c6b71c6c662bd5b2e710e461297c88f5b7b237d58"
+      },
+      "bun": {
+        "seconds": 58.498,
+        "dist": "0b8c9b5b96b062896d26a7569077a0ac9616f9f42bfa5b586b448585cef755b1",
+        "bun": "496537b2242cc8262563931c6b71c6c662bd5b2e710e461297c88f5b7b237d58"
+      },
+      "deno": {
+        "seconds": 71.678,
+        "dist": "0b8c9b5b96b062896d26a7569077a0ac9616f9f42bfa5b586b448585cef755b1",
+        "deno": "496537b2242cc8262563931c6b71c6c662bd5b2e710e461297c88f5b7b237d58"
+      }
+    },
+    "served": {
+      "bun": {
+        "app": "pure",
+        "entry": "bun/main.mjs",
+        "runtime": "1.4.4",
+        "checks": [
+          {
+            "name": "bun/main.mjs GET /",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /fib/25",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /primes/100000",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /bignum",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs POST /words",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /asleep/20",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /sleep/20",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /block",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /mutex",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /date",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /deep/5000",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs GET /nope",
+            "ok": true
+          },
+          {
+            "name": "bun/main.mjs /deep/1000000 fails the request",
+            "ok": true
+          },
+          {
+            "name": "a stopped instance is replaced",
+            "ok": true,
+            "after": {
+              "status": 200,
+              "body": "{\"fib\":55}"
+            }
+          }
+        ],
+        "bundle": {
+          "bytes": 1924535
+        },
+        "firstResponseMs": 156,
+        "httpMsPerRequest": 0.822,
+        "passed": true
+      },
+      "deno": {
+        "app": "pure",
+        "entry": "deno/main.mjs",
+        "runtime": "deno 2.9.6 (stable, release, aarch64-unknown-linux-gnu)",
+        "checks": [
+          {
+            "name": "deno/main.mjs GET /",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /fib/25",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /primes/100000",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /bignum",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs POST /words",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /asleep/20",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /sleep/20",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /block",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /mutex",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /date",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /deep/5000",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs GET /nope",
+            "ok": true
+          },
+          {
+            "name": "deno/main.mjs /deep/1000000 fails the request",
+            "ok": true
+          },
+          {
+            "name": "a stopped instance is replaced",
+            "ok": true,
+            "after": {
+              "status": 200,
+              "body": "{\"fib\":55}"
+            }
+          }
+        ],
+        "bundle": {
+          "bytes": 1924546
+        },
+        "firstResponseMs": 154,
+        "httpMsPerRequest": 0.805,
+        "passed": true
+      }
+    },
+    "cli": {
+      "bun": [
+        {
+          "args": [],
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "args": [
+            "a b",
+            "c"
+          ],
+          "exit": 3,
+          "ok": true
+        },
+        {
+          "args": [
+            "exit5"
+          ],
+          "exit": 5,
+          "ok": true
+        }
+      ],
+      "deno": [
+        {
+          "args": [],
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "args": [
+            "a b",
+            "c"
+          ],
+          "exit": 3,
+          "ok": true
+        },
+        {
+          "args": [
+            "exit5"
+          ],
+          "exit": 5,
+          "ok": true
+        }
+      ]
+    }
+  }
+}

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
 import { assertSupportedHost, bundledTools, executableName, insideDirectory, responseFile } from './platform.mjs';
+import { scriptCommand } from './js-runtime.mjs';
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const lean = process.env.LEAN ?? executableName('lean');
@@ -123,9 +124,9 @@ export function optimizeWasm(input, output) {
   if (existsSync(bundled)) {
     const metadata = JSON.parse(readFileSync(join(root, 'tools/tooling.json')));
     if (metadata.binaryen !== '132.0.0' || metadata.sha256 !== sha256(readFileSync(bundled))) throw new Error('Packaged Binaryen checksum mismatch');
-    return run(process.execPath, [bundled, ...args], options);
+    return run(...scriptCommand(bundled, args), options);
   }
   if (existsSync(join(root, 'targets'))) throw new Error('Packaged Binaryen optimizer is missing; reinstall the complete compiler package');
   const binaryen = fileURLToPath(new URL('./bin/wasm-opt', import.meta.resolve('binaryen')));
-  return run(process.execPath, [binaryen, ...args], options);
+  return run(...scriptCommand(binaryen, args), options);
 }

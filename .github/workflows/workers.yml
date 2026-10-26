@@ -1,0 +1,325 @@
+name: Cloudflare Workers (Phase 7)
+# Edge targets and Bun/Deno (docs/EDGE.md, docs/BUN_DENO.md): builds the single-threaded runtime
+# (edge-runtime.yml), then the Hono template (lasm init --deploy workers) and
+# examples/edge-pure with `lasm build --target workers` from this source
+# checkout; serves them with `wrangler dev` (local workerd: CI=1, no account,
+# no browser), runs them on Node 26, Deno and Bun, and checks the Workers Free
+# plan's budgets (scripts/edge/workers-ci.mjs). Linux only, free runners, no
+# deployment and no publication.
+# release-checks.yml calls it (release-check: true) for every release commit,
+# including the merge commit on main: since 0.2.0 these checks gate releases.
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      release-check: { type: boolean, default: false }
+  push:
+    branches: [phase-7]
+    paths:
+      - '.github/workflows/workers.yml'
+      - '.github/workflows/edge-runtime.yml'
+      - 'src/edge/**'
+      - 'src/application-build.mjs'
+      - 'src/application-cli.mjs'
+      - 'src/js-runtime.mjs'
+      - 'src/lake.mjs'
+      - 'src/application-binding-check.mjs'
+      - 'src/application-build-worker.mjs'
+      - 'src/link-driver/**'
+      - 'src/cli-arguments.mjs'
+      - 'src/npm-artifacts.mjs'
+      - 'packages/create-lasm/**'
+      - 'scripts/package-node-release.mjs'
+      - 'src/init.mjs'
+      - 'library/**'
+      - 'templates/hono/**'
+      - 'examples/edge-pure/**'
+      - 'scripts/edge/**'
+      - 'runtime/edge.cpp'
+      - 'runtime/node-async.cpp'
+      - 'runtime/node.hpp'
+      - 'scripts/full-lean/build-application-runtime.mjs'
+      - 'scripts/full-lean/configure-host.mjs'
+      - 'scripts/full-lean/patches/lean-4.35.0-edge.patch'
+permissions:
+  # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
+  contents: write
+concurrency:
+  group: workers-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  runtime:
+    if: inputs.release-check || github.ref != 'refs/heads/main'
+    uses: ./.github/workflows/edge-runtime.yml
+    with:
+      release-check: ${{ inputs.release-check == true }}
+  # The native host pieces (every platform's, cross-built with zig on x64:
+  # scripts/prepare-native.mjs), shared by the jobs below, including arm64.
+  native:
+    if: inputs.release-check || github.ref != 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Native host pieces (koffi, helpers)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      # A tar keeps the executables' modes, which artifact zips drop.
+      - run: tar -cf .work/native-host.tar -C .cache native-host
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: native-host
+          path: .work/native-host.tar
+          retention-days: 3
+  workers:
+    needs: [runtime, native]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      EMCC_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+      CI: '1'
+      BROWSER: 'false'
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: native-host
+          path: .work/native-host
+      - run: mkdir -p .cache && tar -xf .work/native-host/native-host.tar -C .cache
+      - name: Fetch the pinned Node runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-libraries
+          path: .work/edge-runtime
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-archive
+          path: .work/edge-archive
+      - name: Edge runtime provisioning from the packaged archive (unit tests)
+        env:
+          LASM_TEST_EDGE_ARCHIVE: ${{ github.workspace }}/.work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst
+          LASM_TEST_EDGE_ARTIFACT: ${{ github.workspace }}/.work/edge-archive/artifact.json
+        run: node --test test/edge.test.mjs
+      - name: Pinned local platform tools (wrangler with workerd, Deno, Bun, Vercel CLI and edge-runtime, Netlify CLI)
+        run: npm install --prefix .work/edge-tools --no-audit --no-fund wrangler@4.152.0 deno@2.9.6 bun@1.4.4 vercel@65.2.0 netlify-cli@27.14.2 edge-runtime@4.0.1 esbuild@0.28.2
+      - name: Managed Emscripten SDK (emcc, for the edge recipe's byte comparison)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/edge-sdk-resources.json -- node --input-type=module -e "const { provisionSdk } = await import('./src/managed-sdk.mjs'); const sdk = await provisionSdk({ log: console.log }); console.log(sdk.identity)"
+      - name: Extract the packaged edge runtime (what users get)
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+      - name: Build, serve and check the edge apps (Workers, Vercel Edge, Netlify Edge, Deno Deploy, Bun; compiler under Bun and Deno)
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+          LASM_KEEP_LINK_WORK: '1'
+        run: node scripts/edge/workers-ci.mjs .work/edge-apps .work/edge-tools
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: workers-results
+          path: .work/edge-apps/*.json
+          retention-days: 14
+  # Phase 7.5: the compiler from this source checkout under Node, Bun and
+  # Deno (Linux x64 and arm64; the installed package on all five is `platforms`).
+  hosts:
+    needs: [runtime, native]
+    runs-on: ${{ matrix.runner }}
+    name: Compiler on Bun and Deno ${{ matrix.platform }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+    env:
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+      CI: '1'
+      BROWSER: 'false'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'${{ matrix.platform }}')"
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: native-host
+          path: .work/native-host
+      - run: mkdir -p .cache && tar -xf .work/native-host/native-host.tar -C .cache
+      - name: Fetch the pinned Node runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-archive
+          path: .work/edge-archive
+      - name: Extract the packaged edge runtime
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+      - name: Pinned Bun and Deno
+        run: npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
+      - name: Build under Node, Bun and Deno; serve and run on Bun and Deno
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: node scripts/edge/compiler-hosts-ci.mjs .work/hosts .work/host-tools
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: hosts-results-${{ matrix.platform }}
+          path: .work/hosts/*.json
+          retention-days: 14
+  # Phase 7.5 on all five targets: an installed candidate packed from this
+  # commit, as build-profile.yml does.
+  pack:
+    if: inputs.release-check || github.ref != 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-restore-resources.json -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packed-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  platforms:
+    needs: [runtime, pack]
+    runs-on: ${{ matrix.runner }}
+    name: Bun and Deno ${{ matrix.platform }}
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: ubuntu-24.04, platform: linux-x64 }
+          - { runner: ubuntu-24.04-arm, platform: linux-arm64 }
+          - { runner: macos-15, platform: darwin-arm64 }
+          - { runner: macos-15-intel, platform: darwin-x64 }
+          - { runner: windows-2025, platform: win32-x64 }
+    defaults:
+      run:
+        shell: bash
+    env:
+      CI: '1'
+      BROWSER: 'false'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'${{ matrix.platform }}')"
+      - name: Enable process-tree guard (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: packed-candidate
+          path: .work/node-candidate
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-archive
+          path: .work/edge-archive
+      - name: Pinned Bun and Deno
+        run: npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
+      - name: Install the candidate; build under Node, Bun and Deno; serve; templates
+        run: node scripts/edge/platform-ci.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst "$RUNNER_TEMP/lasm platform" .work/host-tools
+      - name: Keep the results
+        if: always()
+        run: mkdir -p .work/platform-results && cp "$RUNNER_TEMP/lasm platform"/*.json .work/platform-results/ || true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: platform-results-${{ matrix.platform }}
+          path: .work/platform-results/*.json
+          retention-days: 14
+  # The same program bytes on every platform and under every runtime.
+  compare:
+    needs: [hosts, platforms]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          path: .work/results
+          pattern: '*-results-*'
+      - run: node scripts/edge/compare-platforms.mjs .work/results

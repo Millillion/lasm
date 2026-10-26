@@ -1,0 +1,11 @@
+import { writeFileSync } from 'node:fs';
+const h=[0,0x61,0x73,0x6d,1,0,0,0];
+const sec=(id,b)=>[id,b.length,...b];
+const str=s=>[s.length,...Buffer.from(s)];
+const m = (...secs)=>new Uint8Array([...h,...secs.flat()]);
+const jspi = m(sec(1,[1,0x60,0,1,0x7f]), sec(2,[1,...str('m'),...str('f'),0,0]), sec(3,[1,0]), sec(7,[1,...str('g'),0,1]), sec(10,[1,4,0,0x10,0,0x0b]));
+const mem64 = m(sec(5,[1,0x04,1]));
+const legacyEH = m(sec(1,[1,0x60,0,0]), sec(3,[1,0]), sec(10,[1,5,0,0x06,0x40,0x0b,0x0b]));
+const exnref = m(sec(1,[1,0x60,0,0]), sec(3,[1,0]), sec(10,[1,6,0,0x1f,0x40,0,0x0b,0x0b]));
+const shared = m(sec(5,[1,0x03,1,1]));
+for (const [n,b] of Object.entries({jspi,mem64,legacyEH,exnref,shared})) writeFileSync(`src/${n}.wasm`, b);

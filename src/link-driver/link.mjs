@@ -14,13 +14,14 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
+import { scriptPrefix, runtimeExecutable } from '../js-runtime.mjs';
 import { executableName } from '../platform.mjs';
 import { Settings, instantiateSettings } from './settings.mjs';
 import { extractMetadata, updateMetadata } from './metadata.mjs';
 import { WasmModule, getWeakImports } from './wasm.mjs';
 import { addUnexpectedExports, asmjsMangle, assembleGlue, checkSupportedSettings, createAsmConsts, createEmJs,
   demangleCSymbolName, handleLicense, isCSymbol, isInternalSymbol, updateSettingsGlue } from './glue.mjs';
-import { dedupList, pythonJsonDumps, truthy, universalNewlines } from './python.mjs';
+import { dedupList, pythonJsonDumps, pythonStrip, truthy, universalNewlines } from './python.mjs';
 
 export const linkModes = Object.freeze(['probe', 'final']);
 const placeholder = /<([a-z-]+)>/g;
@@ -82,8 +83,9 @@ export function parseLinkArguments(recipe, mode, args) {
   const expected = spec?.emccFlags ?? flags;
   if (flags.length !== expected.length || flags.some((flag, index) => flag !== expected[index]))
     throw new Error(`The Node link driver has no recording for these ${mode} link flags: ${JSON.stringify(flags)}`);
-  if (!result.output?.endsWith('.cjs') || !result.exportsFile || !result.mapFile || result.jsLibraries.length !== 1 || !result.preJs.length)
-    throw new Error('The Node link driver needs -o FILE.cjs, -sEXPORTED_FUNCTIONS=@FILE, -Wl,-Map=FILE, --pre-js and one --js-library');
+  const extension = spec?.output ?? '.cjs';
+  if (!result.output?.endsWith(extension) || !result.exportsFile || !result.mapFile || result.jsLibraries.length !== 1 || !result.preJs.length)
+    throw new Error(`The Node link driver needs -o FILE${extension}, -sEXPORTED_FUNCTIONS=@FILE, -Wl,-Map=FILE, --pre-js and one --js-library`);
   return result;
 }
 
@@ -111,6 +113,12 @@ export function addJsDependencies(settings, jsInfo) {
   for (const symbol of settings.get('EXPORTED_RUNTIME_METHODS')) add(demangleCSymbolName(symbol));
   for (const symbol of settings.get('EXPORTED_FUNCTIONS')) add(demangleCSymbolName(symbol));
   settings.set('REQUIRED_EXPORTS', required);
+  // tools/link.py phase_calculate_system_libraries… js_info: JS library
+  // functions marked async are suspending imports (ASYNCIFY, and JSPI's 2).
+  if (truthy(settings.get('ASYNCIFY'))) {
+    settings.set('ASYNCIFY_IMPORTS_EXCEPT_JS_LIBS', [...settings.get('ASYNCIFY_IMPORTS')]);
+    settings.set('ASYNCIFY_IMPORTS', [...settings.get('ASYNCIFY_IMPORTS'), ...jsInfo.asyncFuncs.map(name => '*.' + name)]);
+  }
   // phase_link: remove duplicates added by the driver and libraries.
   for (const key of ['EXPORTED_FUNCTIONS', 'REQUIRED_EXPORTS', 'EXPORT_IF_DEFINED']) settings.set(key, dedupList(settings.get(key)));
   return jsSyms;
@@ -154,7 +162,8 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   const parsed = parseLinkArguments(recipe, mode, args);
   const paths = platform === 'win32' ? path.win32 : path.posix;
   const emscripten = sdk.driver;
-  const node = process.execPath;
+  // Emscripten's JavaScript tools run on the compiler's own runtime (js-runtime.mjs).
+  const node = runtimeExecutable, nodePrefix = scriptPrefix();
   const tool = name => name === 'node' ? node : paths.join(sdk.prefix, 'bin', executableName(name, platform));
   const env = sdk.env;
   mkdirSync(temp, { recursive: true });
@@ -162,15 +171,15 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   const saveText = (name, text) => { if (intermediates) { mkdirSync(intermediates, { recursive: true }); writeFileSync(path.join(intermediates, `emcc-${String(counter++).padStart(2, '0')}-${name}`), text); } };
   const saveFile = (name, file) => { if (intermediates) { mkdirSync(intermediates, { recursive: true }); copyFileSync(file, path.join(intermediates, `emcc-${String(counter++).padStart(2, '0')}-${name}`)); } };
   const run = (program, argv, { input, capture = false } = {}) => {
-    const output = execute(tool(program), argv, { env, input, timeout, windowsHide: true, maxBuffer: 512 * 1024 * 1024,
+    const output = execute(tool(program), program === 'node' ? [...nodePrefix, ...argv] : argv, { env, input, timeout, windowsHide: true, maxBuffer: 512 * 1024 * 1024,
       stdio: [input === undefined ? 'ignore' : 'pipe', capture ? 'pipe' : stdio[1], stdio[2]], encoding: capture ? 'utf8' : undefined });
     return capture ? universalNewlines(output) : output;
   };
 
-  const target = parsed.output, wasm = target.replace(/\.cjs$/, '.wasm');
+  const target = parsed.output, wasm = target.replace(/\.[cm]js$/, '.wasm');
   const settings = new Settings(instantiateSettings(spec.settings, { userExports: readExportsFile(parsed.exportsFile),
     preJs: parsed.preJs, jsLibrary: parsed.jsLibraries[0], emscripten, platform }), recipe.link.settingsDefaults);
-  checkSupportedSettings(settings);
+  checkSupportedSettings(settings, spec.supported);
   const systemLibraries = paths.join(cache, 'sysroot', 'lib', ...recipe.link.systemLibraryDirectory.split('/'));
   const values = { emscripten, wasm, syslib: systemLibraries, inputs: parsed.inputs };
   const steps = spec.pipeline;
@@ -222,10 +231,14 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   const stripStep = next('strip');
   run(stripStep.program, expandArguments(stripStep.args, values, platform));
   const metadata = extractMetadata(readFileSync(wasm), settings);
-  const finalizeStep = next('finalize');
-  run(finalizeStep.program, expandArguments(finalizeStep.args, values, platform));
-  saveFile('wasm-emscripten-finalize.wasm', wasm);
-  updateMetadata(readFileSync(wasm), metadata);
+  // finalize_wasm runs wasm-emscripten-finalize only when the module needs it
+  // (the recipe says: Lasm's Node links do, the edge link does not).
+  if (steps[step]?.kind === 'finalize') {
+    const finalizeStep = next('finalize');
+    run(finalizeStep.program, expandArguments(finalizeStep.args, values, platform));
+    saveFile('wasm-emscripten-finalize.wasm', wasm);
+    updateMetadata(readFileSync(wasm), metadata);
+  }
   const userRequestedExports = new Set(settings.get('EXPORTED_FUNCTIONS'));
   addUnexpectedExports(settings, metadata, jsSyms, userRequestedExports);
 
@@ -233,7 +246,8 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   settings.set('TARGET_BASENAME', paths.basename(target).replace(/\.[^.]*$/, ''));
   settings.set('TARGET_JS_NAME', paths.basename(target));
   settings.set('WASM_BINARY_FILE', paths.basename(wasm).replaceAll('\\', '/').replaceAll("'", "\\'").replaceAll('"', '\\"'));
-  const features = updateSettingsGlue(settings, metadata, getWeakImports(new WasmModule(readFileSync(wasm))));
+  // emscripten.py update_settings_glue reads weak imports for MAIN_MODULE only.
+  const features = updateSettingsGlue(settings, metadata, truthy(settings.get('MAIN_MODULE')) ? getWeakImports(new WasmModule(readFileSync(wasm))) : []);
   values.features = features;
   const asmConsts = createAsmConsts(metadata), emJsFuncs = createEmJs(settings, metadata);
   settings.set('EM_JS_SNIPPETS', [...emJsFuncs, ...asmConsts.map(([, func]) => func)]);
@@ -303,6 +317,45 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
         finalJs = output;
         saveFile('applyDCEGraphRemovals.js', finalJs);
       }
+    } else if (entry.kind === 'minify-names') {
+      // tools/building.py minify_wasm_imports_and_exports (the edge Asyncify
+      // link: MINIFY_WASM_IMPORTS_AND_EXPORTS): wasm-opt renames the imports
+      // and exports and prints the mapping, which the next acorn pass applies.
+      step++;
+      const mapping = parseMinifiedNames(run(entry.program, expandArguments(entry.args, values, platform), { capture: true }));
+      saveFile('wasm-opt.wasm', wasm);
+      const apply = steps[step];
+      if (apply?.kind !== 'acorn' || apply.pass !== 'applyImportAndExportNameChanges') throw new Error('The recipe must apply the minified names');
+      step++;
+      const output = acornOutput();
+      run(apply.program, expandArguments(apply.args, { ...values, info: writeInfo('emcc_acorn_info_', { mapping }), 'js-out': output }, platform));
+      finalJs = output;
+      saveFile('applyImportAndExportNameChanges.js', finalJs);
+    } else if (entry.kind === 'modularize') {
+      // tools/link.py modularize(): src/modularize.js, preprocessed with the
+      // current settings and minified on its own, wraps the final JS.
+      step++;
+      if (preclean) { saveFile('postclean.js', finalJs); saveFile('postclean.wasm', wasm); preclean = false; }
+      const modularizeSettings = settings.serialize();
+      saveText('settings.json', modularizeSettings);
+      const cwd = expandArguments([entry.cwd], values, platform)[0];
+      let wrapper = universalNewlines(execute(tool(entry.program), expandArguments(entry.args, values, platform),
+        { env, input: modularizeSettings, cwd, timeout, windowsHide: true, maxBuffer: 512 * 1024 * 1024,
+          stdio: ['pipe', 'pipe', stdio[2]], encoding: 'utf8' }));
+      if (entry.minify) {
+        const source = paths.join(temp, 'modularize.js'), minified = paths.join(temp, 'modularize.min.js');
+        writeFileSync(source, wrapper);
+        run(entry.program, expandArguments(entry.minify, { ...values, js: source, 'js-out': minified }, platform));
+        wrapper = readFileSync(minified, 'utf8');
+        saveFile('--minify-whitespace.js', minified);
+      }
+      const pattern = '"<<< INNER_JS_CODE >>>"';
+      if (!wrapper.includes(pattern)) throw new Error(`expected to find pattern in input JS: ${pattern}`);
+      const modular = finalJs + '.modular.js';
+      // shared.py do_replace: str.replace, every occurrence.
+      writeFileSync(modular, wrapper.split(pattern).join(readFileSync(finalJs, 'utf8')));
+      finalJs = modular;
+      saveFile('modularized.js', finalJs);
     } else throw new Error(`Unknown link-driver step ${entry.kind}`);
   }
   if (preclean) { saveFile('postclean.js', finalJs); saveFile('postclean.wasm', wasm); }
@@ -310,6 +363,31 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   // phase_final_emitting: license handling, then the JS reaches its target.
   writeFileSync(target, handleLicense(settings, universalNewlines(readFileSync(finalJs, 'utf8'))));
   return { wasm, js: target, map: parsed.mapFile, requiredExports: [...userRequestedExports] };
+}
+
+/** tools/building.py minify_wasm_imports_and_exports: wasm-opt's mapping,
+ * either "OLD => NEW" lines or JSON { imports: [[module, old, new]], exports:
+ * [[old, new]] }. Insertion order is Python's dict order. */
+export function parseMinifiedNames(out) {
+  const mapping = {};
+  const add = (old, name, what) => {
+    if (Object.hasOwn(mapping, old)) throw new Error(`assertion failed: ${what} must be unique`);
+    if (/^(?:0|[1-9]\d*)$/.test(old)) throw new Error(`Unsupported minified name ${old}`);
+    mapping[old] = name;
+  };
+  if (!out || out[0] !== '{') {
+    for (const line of out.split('\n')) {
+      if (!line.includes(' => ')) continue;
+      const parts = pythonStrip(line).split(' => ');
+      if (parts.length !== 2) throw new Error(`Unexpected minified-name line ${line}`);
+      add(parts[0], parts[1], 'imports');
+    }
+  } else {
+    const parsed = JSON.parse(out);
+    for (const [, old, name] of parsed.imports) add(old, name, 'imports');
+    for (const [old, name] of parsed.exports) add(old, name, 'exports');
+  }
+  return mapping;
 }
 
 function jsInfoSymbols(compiled) {

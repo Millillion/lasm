@@ -53,7 +53,11 @@ export async function buildApplication(file, options = {}) {
 }
 
 async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
-  cache, runtimeDirectory, log = console.error, progress, profile = 'release' } = {}) {
+  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false } = {}) {
+  // Edge targets (src/edge/edge-build.mjs) relink the compiled program: they
+  // need this build's link inputs. true: a cached result is linked again;
+  // 'if-built': keep them only when this build links anyway.
+  if (keepLinkWork === true) rebuild = true;
   if (!buildProfiles.includes(profile)) throw new Error(`Unknown build profile ${JSON.stringify(profile)}: use ${buildProfiles.join(' or ')}`);
   // Check the bundle before expensive tool provisioning; a missing package must
   // never make an otherwise pointless multi-gigabyte compiler download.
@@ -188,6 +192,6 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   progress?.({ stage: 'Verifying and writing application output' });
   await deliverOutput(cached, output, signature);
   // Maintainer diagnostics only: LASM_KEEP_LINK_WORK keeps the link probes and maps.
-  if (!process.env.LASM_KEEP_LINK_WORK) await rm(temporary, { recursive: true, force: true });
-  return { ...buildInfo, output, cached, signature, cacheHit: false };
+  if (!process.env.LASM_KEEP_LINK_WORK && !keepLinkWork) await rm(temporary, { recursive: true, force: true });
+  return { ...buildInfo, output, cached, signature, cacheHit: false, ...(keepLinkWork ? { linkWork: temporary } : {}) };
 }
