@@ -241,7 +241,9 @@ export function applicationSources(source, lean, work, { log = console.error } =
     if (result.error) throw Object.assign(result.error, { stdout: result.stdout, stderr: result.stderr });
     if (result.status !== 0) throw Object.assign(new Error(`Command failed: ${program} ${args.join(' ')}\n${result.stderr ?? ''}`),
       { status: result.status, signal: result.signal, stdout: result.stdout, stderr: result.stderr });
-    if (result.stderr) process.stderr.write(result.stderr);
+    // Lake's routine notice on a project's first build is not a warning.
+    const stderr = (result.stderr ?? '').replace(/^info: [^\n]*: no previous manifest, creating one from scratch\r?\n?/gm, '');
+    if (stderr) process.stderr.write(stderr);
     return result.stdout.trim();
   };
   if (project) {

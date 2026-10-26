@@ -17,6 +17,31 @@ retained Node and edge runtimes supplied through `LASM_APPLICATION_RUNTIME` and
 Severity: **high** = a newcomer is likely to hit it and lose time or trust;
 **medium** = confusing or noisy but recoverable; **low** = polish.
 
+## Fix status (2026-10-26, launch branch)
+
+| Finding | Status | Fix and check |
+| --- | --- | --- |
+| H1 watcher after save-by-rename | **Fixed** | Per-directory watchers (`src/dev.mjs` `watchProject`); `test/dev-watch.test.mjs` (fails on the old watcher at the 2nd rename save); `dev-loop-check.mjs` saves by rename 3× in CI (local: 2.0–2.2 s each, all rebuilt) |
+| H2 docs: GETTING_STARTED unpublished | **Fixed** | Rewritten |
+| H3 docs: README contradictions | **Fixed** | Rewritten |
+| H4 editor support for `Lasm.*` | **Fixed** | `lasm editor` (also after a good `lasm dev`/`lasm build`): elan toolchain + directory override for Lasm's Lean (`src/editor.mjs`); all 8 templates open with no error in `lake serve` (`scripts/templates/editor-check.mjs`, CI job `editor` with real elan); GETTING_STARTED#editor |
+| M1 double first build | **Fixed** | Build-written `lake-manifest.json` adopted; no-change events never rebuild; asserted in `dev-loop-check.mjs` |
+| M2 two URLs in full-stack dev | **Fixed** | The program's private URL is rewritten to the public one (`Listening on http://127.0.0.1:3000/`) |
+| M3 wrong "Reloaded … s" | **Fixed** | Change time reset on no-change events (local: "Reloaded 9.5 s" for a 9.0 s build) |
+| M4 raw Lake output outside `lasm dev` | **Fixed** | `reportCliError` uses `formatLeanDiagnostics` (file:line, source line, caret) |
+| M5 fetch template JSON | **Fixed** | `Lean.Json`; `/hello/a%22b%5Cc` → `{"message":"Hello, a\"b\\c, from Lean!"}` |
+| M6 silent link stages | **Fixed** | `— Ns elapsed` every 10 s during edge/browser/WASI/Fastly links (`src/elapsed-ticker.mjs`) |
+| M7 missing input file | **Fixed** | `Mian.lean not found in …. Did you mean Main.lean? Lean files there: …` (run, build, dev) |
+| M8 misspelled command | **Fixed** | `Unknown command "biuld" (did you mean lasm build?)`; `--target cloudflare` suggests `workers` |
+| M9, M10, L1–L3 | **Fixed** | Docs and messages (first pass) |
+| L4 init message, help order | **Fixed** | `Created app-x (template x):`; one template order everywhere |
+| L5 Lake manifest notice | **Fixed** | Filtered |
+| L6 browser dev prefix | **Fixed** | `[lasm dev]` |
+| L7 localhost vs 127.0.0.1 | **Fixed** | Generated READMEs say `127.0.0.1` where the dev servers bind it |
+| L8 deploy message grammar | **Fixed** | "supports the hono, fetch and fullstack templates" |
+| L9 Workers note | **Fixed** | Only when `wrangler.toml` lacks the worker entry and CompiledWasm rule |
+| L10 "— 0s elapsed" lines | **Fixed** | A stage prints its name when it starts; time every 10 s |
+
 ## Results per template
 
 | Template | `npm install` | First `npm run dev` until listening | Edit → rebuilt and restarted | Notes |

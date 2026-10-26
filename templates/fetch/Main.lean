@@ -10,14 +10,18 @@ On Node it listens on $HOST (default 0.0.0.0) and $PORT (default 3000).
 -/
 import App
 import Lasm.Fetch
-open Lasm.Fetch
+import Lean.Data.Json
+open Lasm.Fetch Lean
+
+/-- A JSON body, escaped by `Lean.Json` (a name may contain `"` or `\`). -/
+def json (fields : List (String × Json)) : Response := .json (Json.mkObj fields).compress
 
 def handle (req : Request) : Async Response := do
   match req.method, req.segments with
-  | "GET", [] => return .json "{\"message\":\"Hello from Lean!\"}"
-  | "GET", ["hello", name] => return .json s!"\{\"message\":\"{App.greet name}\"}"
+  | "GET", [] => return json [("message", "Hello from Lean!")]
+  | "GET", ["hello", name] => return json [("message", App.greet name)]
   | "POST", ["echo"] => return .bytes req.body ((req.header? "content-type").getD "application/octet-stream")
-  | "GET", ["health"] => return .json "{\"ok\":true}"
+  | "GET", ["health"] => return json [("ok", true)]
   | _, _ => return .notFound
 
 def main : IO Unit := serve handle
