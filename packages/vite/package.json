@@ -1,9 +1,0 @@
-{
-  "name": "@lasm/vite",
-  "version": "0.0.0-source",
-  "private": true,
-  "description": "Source of @lasm/vite; scripts/npm-dist/build.mjs writes the published package.json (vitePackageJson).",
-  "type": "module",
-  "exports": { ".": { "types": "./index.d.ts", "default": "./index.mjs" }, "./client": { "types": "./client.d.ts" } },
-  "peerDependencies": { "vite": ">=6" }
-}

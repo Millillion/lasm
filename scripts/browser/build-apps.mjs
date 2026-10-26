@@ -52,15 +52,26 @@ for (const [name, project] of projects) {
 // The platform suite built with --suspend jspi: blocking waits suspend where the browser has JSPI.
 record.apps['platform-jspi'] = { buildSeconds: build(join(work, 'platform'), join(out, 'platform-jspi'), ['--suspend', 'jspi']) };
 
-// @lasm/vite: the template's Main.lean imported by a Vite app (test/browser/vite), built with pinned Vite.
+// The Vite plugin as users get it (import lasm from '@lasm/cli/vite'): the CLI
+// installed from a packed tarball under its published name, not from this
+// checkout; the Vite fixture (test/browser/vite) imports the template's Main.lean.
+const packageDirectory = join(work, 'cli-package');
+mkdirSync(packageDirectory, { recursive: true });
+for (const path of ['bin', 'src', 'library', 'templates', 'scripts']) cpSync(join(root, path), join(packageDirectory, path), { recursive: true });
+// The native host pieces, where an installed package carries them (src/native).
+if (existsSync(join(root, '.cache/native-host'))) cpSync(join(root, '.cache/native-host'), join(packageDirectory, 'src/native'), { recursive: true });
+const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+writeFileSync(join(packageDirectory, 'package.json'), JSON.stringify({ name: '@lasm/cli', version: sourcePackage.version, type: 'module',
+  bin: sourcePackage.bin, exports: sourcePackage.exports, engines: sourcePackage.engines, dependencies: sourcePackage.dependencies }, null, 2) + '\n');
+const tarball = join(work, execFileSync('npm', ['pack', '--silent', '--pack-destination', work], { cwd: packageDirectory, env, encoding: 'utf8', shell: process.platform === 'win32' }).trim().split('\n').at(-1));
 const viteApp = join(work, 'vite');
 cpSync(join(root, 'test/browser/vite'), viteApp, { recursive: true });
 for (const file of ['Main.lean', 'App.lean', 'lean-toolchain']) cpSync(join(counter, file), join(viteApp, file));
-execFileSync('npm', ['install', '--no-audit', '--no-fund', '--save-dev', 'vite@8.3.5', `@lasm/vite@file:${join(root, 'packages/vite')}`],
+execFileSync('npm', ['install', '--no-audit', '--no-fund', '--save-dev', 'vite@8.3.5', tarball],
   { cwd: viteApp, stdio: 'inherit', env, shell: process.platform === 'win32' });
 {
   const started = Date.now();
-  run([...bounded, `LASM_CLI=${join(root, 'bin/lasm.mjs')}`, process.execPath, join(viteApp, 'node_modules/vite/bin/vite.js'), 'build', '--outDir', join(out, 'vite'), '--emptyOutDir'], { cwd: viteApp });
+  run([...bounded, process.execPath, join(viteApp, 'node_modules/vite/bin/vite.js'), 'build', '--outDir', join(out, 'vite'), '--emptyOutDir'], { cwd: viteApp });
   writeFileSync(join(out, 'vite', 'lasm-manifest.json'), JSON.stringify({ schema: 1, generator: 'vite', target: 'browser' }) + '\n');
   record.apps.vite = { buildSeconds: (Date.now() - started) / 1000, files: {} };
 }

@@ -1,4 +1,4 @@
-// Types of `import app from './Main.lean?lasm'` (add "@lasm/vite/client" to compilerOptions.types).
+// Types of `import app from './Main.lean?lasm'` (add "@lasm/cli/vite/client" to compilerOptions.types).
 declare module '*.lean?lasm' {
   export interface LasmMountOptions {
     /** Any JSON-like value: Lasm.Web.App.flags. */

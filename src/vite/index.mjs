@@ -1,5 +1,5 @@
-// @lasm/vite: Lean apps in Vite projects (docs/BROWSER.md).
-//   import lasm from '@lasm/vite';  export default { plugins: [lasm()] };
+// The Vite plugin of the Lasm CLI (docs/BROWSER.md): Lean apps in Vite projects.
+//   import lasm from '@lasm/cli/vite';  export default { plugins: [lasm()] };
 //   import app from './Main.lean?lasm';  await app.mount(document.getElementById('app'));
 // `Main.lean?lasm` is the app's loader (lasm build Main.lean --target browser
 // --bundler): Vite bundles it with the page's code, emits the Wasm as an asset
@@ -9,26 +9,17 @@
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import { dirname, join, relative, resolve, sep } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 const suffix = '?lasm';
 const virtualPrefix = '\0lasm:';
 
-/** The Lasm CLI: options.cli, LASM_CLI, or @lasm/cli installed in the project. */
+/** The Lasm CLI: options.cli, LASM_CLI, else the CLI this plugin ships in. */
 function findCli(root, configured) {
   if (configured) return resolve(root, configured);
   if (process.env.LASM_CLI) return resolve(process.env.LASM_CLI);
-  const require = createRequire(join(root, 'package.json'));
-  for (const name of ['@lasm/cli', '@lasm/compiler']) {
-    try {
-      const manifest = require.resolve(`${name}/package.json`);
-      const bin = JSON.parse(readFileSync(manifest, 'utf8')).bin;
-      return join(dirname(manifest), typeof bin === 'string' ? bin : bin.lasm);
-    } catch { /* not installed under this name */ }
-  }
-  throw new Error('@lasm/vite needs the Lasm CLI: npm install --save-dev @lasm/cli');
+  return fileURLToPath(new URL('../../bin/lasm.mjs', import.meta.url));
 }
 
 /** .lean files under a directory (skipping node_modules, .lake and output). */
