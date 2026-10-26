@@ -28,7 +28,7 @@
 // matches upstream's `meta import` semantics.
 import { closeSync, createReadStream, existsSync, openSync, readFileSync, readSync } from 'node:fs';
 import { createInterface } from 'node:readline';
-import { wasmObjects } from './wasm-objects.mjs';
+import { parseWasmObject, wasmObjects } from './wasm-objects.mjs';
 
 // Lean IO primitives with effects outside Lean's heap: console, files, processes,
 // environment and exit. Allocation, references, tasks and clocks are excluded.
@@ -237,7 +237,11 @@ export function coreInitTargets(version) {
  * units than needed is always correct (it is closer to native initialization),
  * so the rounds below start from them and only add; a dev rebuild then usually
  * needs one round. Release builds plan from the roots alone (reproducible). */
-export async function planInitializers({ objects, archives, probe, log = () => {}, forceKeep, initTargets, archiveUnits, concurrent = true, seed }) {
+/** `trimBodies` (dev profile): the skipped-bodies and empty-program probes
+ * leave out every program object that defines no skipped unit (Lean's
+ * libraries cannot reach a program's code), so an edit to a kept module does
+ * not invalidate their cached results. */
+export async function planInitializers({ objects, archives, probe, log = () => {}, forceKeep, initTargets, archiveUnits, concurrent = true, seed, trimBodies = false }) {
   const files = [...objects, ...archives];
   const units = initializerUnits(files, { archiveUnits });
   // The program's entry object: Lean's generated `main` calls its own module's initializer.
@@ -262,12 +266,34 @@ export async function planInitializers({ objects, archives, probe, log = () => {
   // The empty-program probe depends only on the closure: it runs while the
   // rounds below do (its result is used only when some unit is skipped).
   let baselineProbe;
-  const startBaseline = () => {
-    baselineProbe ??= probe(initializerWrappers(units, closure, { bodies: [], parts: initializerWrapperParts }), wrap, { bodies: true, exclude });
-    baselineProbe.catch(() => {});
-    return baselineProbe;
+  const baselines = new Map();
+  // Program objects the skipped bodies can reach: those defining a skipped
+  // unit and, transitively, the program objects defining symbols they use.
+  let symbolTables;
+  const bodyExclude = () => {
+    if (!trimBodies) return exclude;
+    symbolTables ??= new Map(objects.map(file => {
+      const { symbols } = parseWasmObject(readFileSync(file));
+      return [file, { defined: new Set(symbols.filter(s => !s.undefined && !s.local && s.name).map(s => s.name)),
+        used: symbols.filter(s => s.undefined && s.name).map(s => s.name) }];
+    }));
+    const included = new Set(objects.filter(file => file !== exclude && skipped.some(name => units.get(name).file === file)));
+    for (const pending = [...included]; pending.length;) {
+      const { used } = symbolTables.get(pending.pop());
+      for (const [file, table] of symbolTables) if (file !== exclude && !included.has(file) && used.some(name => table.defined.has(name))) { included.add(file); pending.push(file); }
+    }
+    return objects.filter(file => !included.has(file));
   };
-  if (concurrent) startBaseline();
+  const startBaseline = (excluded = exclude) => {
+    const key = [excluded].flat().join('\0');
+    if (!baselines.has(key)) {
+      const pending = probe(initializerWrappers(units, closure, { bodies: [], parts: initializerWrapperParts }), wrap, { bodies: true, exclude: excluded, kind: 'baseline' });
+      pending.catch(() => {});
+      baselines.set(key, pending);
+    }
+    return baselineProbe = baselines.get(key);
+  };
+  if (concurrent && !trimBodies) startBaseline();
   for (let attempt = 1; ; attempt++) {
     for (let round = 1; ; round++) {
       live = await probe(initializerWrappers(units, closure, { keep, parts: initializerWrapperParts }), wrap);
@@ -284,8 +310,10 @@ export async function planInitializers({ objects, archives, probe, log = () => {
     // are immutable. C and C++ runtime tables are read-only or internal, and
     // Lean's C++ compiler/kernel state is rejected by the application policy.
     // Compare the skipped bodies alone with an empty program.
-    const reached = await probe(initializerWrappers(units, closure, { bodies: skipped, parts: initializerWrapperParts }), wrap, { bodies: true, exclude });
-    baseline ??= await startBaseline();
+    const excluded = bodyExclude();
+    const baselineRun = trimBodies ? startBaseline(excluded) : undefined;
+    const reached = await probe(initializerWrappers(units, closure, { bodies: skipped, parts: initializerWrapperParts }), wrap, { bodies: true, exclude: excluded, kind: 'reached' });
+    baseline = trimBodies ? await baselineRun : baseline ?? await startBaseline();
     shared = [...reached.data].filter(symbol => mutable.has(symbol) && live.data.has(symbol) && !baseline.data.has(symbol));
     log(`Initialization plan: ${skipped.length} of ${closure.length} initializers skipped; ${shared.length} shared globals${shared.length ? ': ' + shared.slice(0, 40).join(' ') : ''}`);
     if (!shared.length) break;

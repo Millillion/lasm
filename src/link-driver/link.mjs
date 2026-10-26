@@ -201,7 +201,8 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
 
   const target = parsed.output, wasm = target.replace(/\.[cm]js$/, '.wasm');
   const steps_ = execute === execFileSync && jsStepCache({ recipe, sdk, stepCache, platform,
-    volatile: [temp, path.dirname(path.resolve(parsed.exportsFile)), path.dirname(path.resolve(target))],
+    volatile: [temp, path.dirname(path.resolve(parsed.exportsFile)), path.dirname(path.resolve(target)),
+      ...[...parsed.preJs, ...parsed.jsLibraries].map(file => path.dirname(path.resolve(file)))],
     files: [...parsed.preJs, ...parsed.jsLibraries] });
   // A JavaScript step through the cache: the captured output, or the output file.
   const runJs = (entry, argv, { input, inputFile, outputFile } = {}) => {
@@ -316,13 +317,16 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   // step (growableHeap, which the glue needs) runs as recorded.
   const sizeOnly = entry => entry.kind === 'wasm-opt' || entry.kind === 'dce-graph' || entry.kind === 'metadce'
     || entry.kind === 'acorn' && ['AJSDCE', 'applyDCEGraphRemovals'].includes(entry.pass);
-  if (!optimize && mode !== 'final') throw new Error('Only the final link has an unoptimized (dev) profile');
+  if (!optimize && !['final', 'edge'].includes(mode)) throw new Error('Only the final and edge links have an unoptimized (dev) profile');
+  // The edge link lowers wasm64 to 32-bit memory in Binaryen: its dev profile
+  // keeps that wasm-opt step without -Oz (only the lowering passes run).
+  const devWasmOpt = !optimize && mode === 'edge';
   while (step < steps.length) {
     const entry = steps[step];
-    if (!optimize && sizeOnly(entry)) { step++; continue; }
+    if (!optimize && sizeOnly(entry) && !(devWasmOpt && entry.kind === 'wasm-opt')) { step++; continue; }
     if (entry.kind === 'wasm-opt') {
       step++;
-      run(entry.program, expandArguments(entry.args, values, platform));
+      run(entry.program, expandArguments(devWasmOpt ? entry.args.filter(arg => !/^-O[0-4sz]$/.test(arg)) : entry.args, values, platform));
       saveFile('wasm-opt.wasm', wasm);
       saveFile('byn.wasm', wasm);
     } else if (entry.kind === 'acorn') {

@@ -67,9 +67,8 @@ ${names.length ? `  size_t first = 0, end = sizeof(lasm_application_symbols) / s
     && !initializers.has(name.slice(1))), symbols: names.length };
 }
 
-export function readApplicationSymbols(sources, objects, nm, hook) {
-  const symbols = objects.flatMap(file => parseDefinedSymbols(execFileSync(nm,
-    ['--defined-only', '--extern-only', '--format=posix', file],
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true })));
+export function readApplicationSymbols(sources, objects, nm, hook, { nmText } = {}) {
+  const run = nmText ?? ((args, file) => execFileSync(nm, [...args, file], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true }));
+  const symbols = objects.flatMap(file => parseDefinedSymbols(run(['--defined-only', '--extern-only', '--format=posix'], file)));
   return applicationSymbolRegistry(sources.map(file => readFileSync(file, 'utf8')), symbols, hook);
 }

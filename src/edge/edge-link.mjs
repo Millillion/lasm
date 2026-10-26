@@ -9,7 +9,7 @@
 // (src/link-driver/recipe-emscripten-<version>-edge.json, byte-identical to
 // emcc's output: scripts/edge/compare-edge-link.mjs); emcc remains the fallback.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
@@ -28,7 +28,9 @@ const readResponse = file => readFileSync(file, 'utf8').split('\n').filter(Boole
 export const edgeLinkSettings = Object.freeze({ memory64: 2, initialMiB: 4, stackMiB: 1, maximumMiB: 2048, malloc: 'mimalloc', optimize: '-Oz' });
 
 /** linkWork: the Node build's kept link directory (link.rsp, objects, exports.json). */
-export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend = 'jspi', verbose = false, driver = sdk.toolchain ? 'node' : 'emcc' }) {
+/** optimize false (dev profile): Binaryen only lowers memory64 (no -Oz) and the
+ * JavaScript dead-code passes are skipped; the Node link driver only. */
+export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend = 'jspi', verbose = false, driver = sdk.toolchain ? 'node' : 'emcc', optimize = true, stepCache }) {
   if (!['jspi', 'none'].includes(suspend)) throw new Error(`Unknown edge suspension ${JSON.stringify(suspend)}`);
   const s = edgeLinkSettings;
   const rsp = readResponse(join(linkWork, 'link.rsp'));
@@ -36,7 +38,10 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
     { encoding: 'utf8', maxBuffer: 64 << 20, windowsHide: true });
   // Application objects and initializer wraps; Lasm.JS's Node glue (the object
   // defining lasm_js_available) is replaced by the edge glue.
-  const kept = rsp.filter(arg => arg.endsWith('.o') || arg.startsWith('-Wl,--wrap='));
+  // A seeded dev link (src/application-link.mjs) also lists the lookup marker
+  // object reachability.o, which the edge program never contains, and the Node
+  // runtime's members (application-live-members.mjs) in place of its archives.
+  const kept = rsp.filter(arg => arg.endsWith('.o') && basename(arg) !== 'reachability.o' && !arg.endsWith('.lasm-member.o') || arg.startsWith('-Wl,--wrap='));
   const objects = kept.filter(arg => !(arg.endsWith('.o') && /^lasm_js_available$/m.test(nm(arg))));
   const usesJs = objects.length !== kept.length;
   mkdirSync(out, { recursive: true });
@@ -83,9 +88,12 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
     const temp = linkTemporaryDirectory(out, 'edge');
     try {
       linkWithNode({ recipe, mode: 'edge', args, sdk, cache: edge.sysroot.cache, temp, nativeSigs: bundledNativeSigs(recipe),
-        stdio: verbose ? ['ignore', 'inherit', 'inherit'] : ['ignore', 'pipe', 'pipe'] });
+        stdio: verbose ? ['ignore', 'inherit', 'inherit'] : ['ignore', 'pipe', 'pipe'], optimize, stepCache });
     } finally { removeTemporary(temp); }
-  } else sdk.execute('em++', args, { stdio, env, timeout: 3_600_000, maxBuffer: 64 << 20 });
+  } else {
+    if (!optimize) throw new Error('The edge dev profile needs the Node link driver');
+    sdk.execute('em++', args, { stdio, env, timeout: 3_600_000, maxBuffer: 64 << 20 });
+  }
   return { program: join(out, 'program.mjs'), wasm: join(out, 'program.wasm'), usesJs, suspend, driver };
 }
 

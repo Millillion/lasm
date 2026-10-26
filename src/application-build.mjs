@@ -7,7 +7,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { provisionLean, selectLeanVersion, toolchainCatalog } from './managed-lean.mjs';
 import { provisionLinkToolchain, linkToolchainCatalog } from './managed-link-toolchain.mjs';
 import { checkSystemGit } from './system-git.mjs';
-import { hashFile, managedCacheDirectory, verificationRecords } from './managed-artifacts.mjs';
+import { hashFile, managedCacheDirectory, sessionTrusted, verificationRecords } from './managed-artifacts.mjs';
 import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject } from './application-sources.mjs';
@@ -29,7 +29,13 @@ const helpers = ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-sy
   'function-table-index.mjs', 'table-growth.mjs'];
 const digest = value => createHash('sha256').update(value).digest('hex');
 
+let sessionDriverIdentity;
 async function buildDriverIdentity() {
+  // lasm dev: Lasm's own files do not change during a session.
+  if (sessionTrusted() && sessionDriverIdentity) return sessionDriverIdentity;
+  return sessionDriverIdentity = await computeDriverIdentity();
+}
+async function computeDriverIdentity() {
   const files = await fileInventory(join(root, 'src'));
   for (const name of helpers) files['scripts/' + name] = await hashFile(join(root, 'scripts/full-lean', name));
   files.package = await hashFile(join(root, 'package.json'));

@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { edgeRuntime } from './edge-runtime.mjs';
 import { linkEdgeProgram, edgeLinkSettings } from './edge-link.mjs';
+import { managedCacheDirectory } from '../managed-artifacts.mjs';
+import { readStoreEntry, writeStoreEntry } from '../application-link.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 export const edgeHostFiles = ['edge-start.mjs', 'edge-host.mjs', 'edge-js.mjs'];
@@ -289,13 +291,25 @@ export async function findEdgeProgram({ result, nodeRuntime }) {
   return { edge, key, cached: cachedProgram(result, key) };
 }
 
+/** Emscripten's JavaScript link steps reused by content (src/link-driver/link.mjs
+ * jsStepCache), in the same machine-wide store as the Node link's. */
+function edgeStepCache() {
+  const store = join(managedCacheDirectory(), 'objects');
+  return {
+    get: key => readStoreEntry(join(store, `js-${key}.txt`))?.toString('utf8'),
+    set: (key, text) => { try { mkdirSync(store, { recursive: true }); writeStoreEntry(join(store, `js-${key}.txt`), Buffer.from(text)); } catch { /* not cached */ } },
+  };
+}
+
 /** Phase 2 (cache miss): link the program from a build made with keepLinkWork and cache it. */
 export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, verbose = false }) {
   if (!result.linkWork) throw new Error('The edge build needs the Node build\'s link inputs (internal error)');
   const root = cacheRoot(result), directory = join(root, key), staging = join(root, '.' + key + '.' + process.pid + '.partial');
   rmSync(staging, { recursive: true, force: true });
   let link;
-  try { link = linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: result.linkWork, out: join(staging, '.link'), verbose }); }
+  // A dev Node build (lasm dev) gets the edge link's dev profile; deployable edge builds are release builds.
+  try { link = linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: result.linkWork, out: join(staging, '.link'), verbose,
+    optimize: result.profile !== 'dev', stepCache: edgeStepCache() }); }
   catch (error) { rmSync(staging, { recursive: true, force: true }); throw error; }
   copyFileSync(link.program, join(staging, 'program.mjs'));
   copyFileSync(link.wasm, join(staging, 'program.wasm'));
@@ -334,7 +348,7 @@ export function writeEdgeOutput({ target, source, projectDirectory, result, edge
   // The entry module is written after the owned directory is in place.
   let written;
   copyFileSync(join(result.output, 'THIRD_PARTY_NOTICES.txt'), join(staging, 'THIRD_PARTY_NOTICES.txt'));
-  const info = { schema: 1, target, profile: 'edge', experimental: true, nodeBuildSignature: result.signature, lean: result.lean,
+  const info = { schema: 1, target, profile: 'edge', buildProfile: result.profile ?? 'release', experimental: true, nodeBuildSignature: result.signature, lean: result.lean,
     edgeRuntime: edge.manifest.files, link: { ...edgeLinkSettings, suspend: program.meta.suspend }, wasm: inline ? 'lasm/program.wasm.mjs' : 'lasm/program.wasm', programKey: program.meta.key, modules,
     files: Object.fromEntries(Object.entries(program.meta.files).map(([file, digest]) => ['lasm/' + file, digest])) };
   writeFileSync(join(staging, 'build-info.json'), JSON.stringify(info, null, 2) + '\n');

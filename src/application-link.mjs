@@ -4,7 +4,7 @@
 import { writeFile } from 'node:fs/promises';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { isAbsolute, join, relative } from 'node:path';
+import { dirname, isAbsolute, join, relative } from 'node:path';
 import { execFile, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { readApplicationSymbols, readInitializationFreeCppSymbols } from './application-symbols.mjs';
@@ -15,11 +15,12 @@ import { cInitTargets, coreInitTargets, initializerWrapperParts, initializerWrap
 import { buildJobs } from './managed-link-toolchain.mjs';
 import { archiveMembers, explainRejection, parseWhyExtract, undefinedSymbols } from './application-diagnosis.mjs';
 import { executableName, responseFile } from './platform.mjs';
-import { bundledRecipe, checkToolchainIdentity, compileObject, emscriptenCache, probeOptimization } from './link-driver/compile.mjs';
+import { bundledRecipe, checkToolchainIdentity, compileObject, devOptimization, emscriptenCache, probeOptimization } from './link-driver/compile.mjs';
 import { bundledNativeSigs, linkTemporaryDirectory, linkWithNode, removeTemporary } from './link-driver/link.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
 import { optimizeMainTableGrowth } from '../scripts/full-lean/table-growth.mjs';
+import { liveMembers, memberFiles, wasmImports } from './application-live-members.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
@@ -171,7 +172,7 @@ export async function linkApplication(options) {
   const seedRecord = readInitializationSeed(initializationSeed, runtime);
   const seeded = profile === 'dev' && linkDriver === 'node' && !!seedRecord && !process.env.LASM_LINK_DEBUG;
   if (seeded) {
-    try { return await linkApplicationOnce(options, new Set(seedRecord.keep)); }
+    try { return await linkApplicationOnce(options, seedRecord); }
     catch (error) {
       if (error.code !== 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE') throw error;
     }
@@ -191,7 +192,8 @@ function readInitializationSeed(file, runtime) {
 
 async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
   linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, sharedCache, analysisCache, profile = 'release', initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable: declaredUnavailable = [],
-  initializationSeed, timings }, seed) {
+  initializationSeed, timings }, seedRecord) {
+  const seed = seedRecord && new Set(seedRecord.keep);
   const nativeUnavailable = [...declaredUnavailable];
   const time = (name, start) => { if (timings) timings[name] = (timings[name] ?? 0) + performance.now() - start; };
   let initializationPlan;
@@ -260,8 +262,8 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
     } catch (error) { throw linkFailure(error); }
     finally { removeTemporary(temp); }
   };
-  const compileUncached = (source, object) => nodeCompile
-    ? compileObject({ sdk, flags: compileFlags, source, object, settings: {
+  const compileUncached = (source, object, optimization) => nodeCompile
+    ? compileObject({ sdk, flags: compileFlags, source, object, optimization, settings: {
       stdio: verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'], timeout: 1800_000, maxBuffer: 8 * 1024 * 1024 } })
     : execute('emcc', [...compileFlags, '-c', source, '-o', object]);
   const objects = [];
@@ -295,10 +297,10 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
     writeFileSync(object, bytes); return true;
   };
   const storeObject = (object, cached) => writeStoreEntry(cached, readFileSync(object));
-  const compile = (source, object, { shared = false } = {}) => {
-    const cached = use(shared ? sharedStore : objectStore, objectKey(source) + '.o');
+  const compile = (source, object, { shared = false, optimization } = {}) => {
+    const cached = use(shared ? sharedStore : objectStore, objectKey(source, optimization) + '.o');
     if (existsSync(cached) && reuse(cached, object)) return;
-    compileUncached(source, object);
+    compileUncached(source, object, optimization);
     storeObject(object, cached);
   };
   // Identity of a planning probe link: the bytes of every input Lasm generated,
@@ -342,7 +344,7 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   for (let index = 0; index < sources.length; index++) {
     progress?.({ stage: `Compiling application module ${index + 1} of ${sources.length}` });
     const object = join(work, `module-${index}.o`);
-    compile(sources[index], object);
+    compile(sources[index], object, { optimization: profile === 'dev' && nodeCompile ? devOptimization : undefined });
     objects.push(object);
   }
   // Package C code (src/application-native.mjs), linked like archive members:
@@ -380,8 +382,17 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   }
   const nativeInputs = nativeObjects.length ? ['-Wl,--start-lib', ...nativeObjects, '-Wl,--end-lib'] : [];
   progress?.({ stage: 'Preparing application symbols' });
-  const registry = readApplicationSymbols(sources, objects, join(sdk.prefix, 'bin', executableName('llvm-nm')),
-    runtime.manifest.applicationSymbolHook);
+  // llvm-nm listings of this build's objects, reused by object content.
+  const nmProgram = join(sdk.prefix, 'bin', executableName('llvm-nm'));
+  const nmText = (args, file) => {
+    const cached = use(objectStore, `nm-${createHash('sha256').update(JSON.stringify(args)).update(readFileSync(file)).digest('hex')}.txt`);
+    const saved = readStoreEntry(cached);
+    if (saved) return saved.toString('utf8');
+    const text = execFileSync(nmProgram, [...args, file], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true });
+    writeStoreEntry(cached, Buffer.from(text));
+    return text;
+  };
+  const registry = readApplicationSymbols(sources, objects, nmProgram, runtime.manifest.applicationSymbolHook, { nmText });
   const probeC = join(work, 'reachability.c'), probeObject = join(work, 'reachability.o');
   await writeFile(probeC, reachabilityRegistry);
   compile(probeC, probeObject, { shared: true });
@@ -400,9 +411,7 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   // (__main_argc_argv) would then resolve to the first archive member defining it:
   // since Lean 4.35, upstream LeanExport's tool `main`, which pulls Lean's compiler
   // (upstream misc_dir/rc_sticky was rejected). Define it as Emscripten's libc does.
-  const definedEntries = new Set(objects.flatMap(file => execFileSync(join(sdk.prefix, 'bin', executableName('llvm-nm')),
-    ['--defined-only', '--extern-only', '--just-symbol-name', file], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true })
-    .split(/\r?\n/)));
+  const definedEntries = new Set(objects.flatMap(file => nmText(['--defined-only', '--extern-only', '--just-symbol-name'], file).split(/\r?\n/)));
   const entryObject = join(work, 'entry.o');
   if (definedEntries.has('__main_void') && !definedEntries.has('__main_argc_argv')) {
     const entryC = join(work, 'entry.c');
@@ -424,7 +433,9 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   // The checked loader transformations use LF templates. Emscripten otherwise
   // defaults to host line endings, making identical Windows output look like
   // semantic drift. Ask the pinned driver to emit the same format everywhere.
-  const linkWith = exports => ['--output-eol=linux', '-pthread', '-fwasm-exceptions', `-sMEMORY64=${memoryMode}`, '-sMALLOC=mimalloc',
+  // Planning probes write their own (discarded) program: one may still be
+  // running when a seeded dev build's delivered link has written dist/.
+  const linkWith = (exports, output = join(dist, 'program.cjs')) => ['--output-eol=linux', '-pthread', '-fwasm-exceptions', `-sMEMORY64=${memoryMode}`, '-sMALLOC=mimalloc',
     '-sMAIN_MODULE=2', `-sEXPORTED_FUNCTIONS=@${exports}`, '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=4',
     '-sEXPORTED_RUNTIME_METHODS=stringToNewUTF8', '-sEXIT_RUNTIME=1', '-sNODERAWFS=1',
     '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=1', '-sSTACK_OVERFLOW_CHECK=2',
@@ -433,7 +444,7 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
     '-Wno-experimental', '-Wno-pthreads-mem-growth', '-Wl,--start-group',
     ...runtime.manifest.libraries.map(name => join(runtime.directory, name)), '-Wl,--end-group',
     ...preJs.flatMap(file => ['--pre-js', file]),
-    '--js-library', join(root, 'scripts/full-lean/host-library.js'), '-o', join(dist, 'program.cjs')];
+    '--js-library', join(root, 'scripts/full-lean/host-library.js'), '-o', output];
   const link = linkWith(exportsFile);
   const argumentsFile = join(work, 'link.rsp');
   // Runtime initialization plan (src/application-initialization.mjs): initializers
@@ -442,19 +453,44 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   // from its map are a function of the link inputs (probeKey): an unchanged probe
   // (a later planning round, the program-independent probes of a one-line edit,
   // or the requirements check repeating the last round) is not relinked.
-  const probeLink = async (args, map, rsp) => {
+  const probeLink = async (args, map, rsp, { kind, output } = {}) => {
     const cached = use(sharedStore, `probe-${probeKey(args)}.json`);
     try {
       const record = JSON.parse(readStoreEntry(cached)?.toString('utf8') ?? 'null');
       if (record?.schema === 2) return { live: { data: new Set(record.data), code: new Set(record.code) },
         requirements: record.requirements, requirementsError: record.requirementsError };
     } catch { /* not recorded */ }
-    await writeFile(rsp, responseFile(args));
-    await runProbeLink(['@' + rsp]);
+    // Dev builds: the body probes link with the runtime members their previous
+    // full run kept (as the final link does), checked by its imports. The live
+    // set is then the full link's, so it is recorded under the same key.
+    const subset = kind && output && profile === 'dev' && nodeLink && seedRecord?.probes?.[kind];
+    let linked = false;
+    if (subset && Object.keys(subset.liveMembers).every(archive => runtimeArchives.includes(archive))) {
+      try {
+        const libraries = memberFiles(subset.liveMembers, memberDirectory);
+        await writeFile(rsp, responseFile(args.flatMap(arg => arg === runtimeArchives[0] ? libraries : runtimeArchives.includes(arg) ? [] : [arg])));
+        await runProbeLink(['@' + rsp]);
+        const imports = wasmImports(output), allowed = new Set(subset.imports);
+        linked = !!imports && imports.every(item => allowed.has(item));
+        if (linked) (seedOut ??= {}).probes = { ...seedOut.probes, [kind]: subset };
+      } catch { /* link in full */ }
+    }
+    if (!linked) {
+      await writeFile(rsp, responseFile(args));
+      await runProbeLink(['@' + rsp]);
+      if (kind && output && profile === 'dev' && nodeLink && statSync(map).size < 64 * 1024 * 1024) {
+        try {
+          const imports = wasmImports(output);
+          if (imports) (seedOut ??= {}).probes = { ...seedOut.probes, [kind]: { liveMembers: liveMembers(readFileSync(map, 'utf8'), runtimeArchives), imports } };
+        } catch { /* no subset next time */ }
+      }
+    }
     const live = await readLiveSymbols(map);
     // Planning probes of initializer bodies have no application entry point.
     let requirements = null, requirementsError = null;
-    try { requirements = await readApplicationLinkRequirements(map, analysis); } catch (error) { requirementsError = error.message; }
+    // Body probes (kind) have no entry point: their requirements are never read.
+    if (kind) requirementsError = 'initializer body probe';
+    else try { requirements = await readApplicationLinkRequirements(map, analysis); } catch (error) { requirementsError = error.message; }
     writeStoreEntry(cached, Buffer.from(JSON.stringify({ schema: 2, data: [...live.data].sort(), code: [...live.code].sort(), requirements, requirementsError })));
     return { live, requirements, requirementsError };
   };
@@ -464,15 +500,36 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   // unoptimized probe link (with Wasm names).
   const finalMap = join(work, 'final.map');
   const debug = !!process.env.LASM_LINK_DEBUG;
-  const finalLink = async plannedInputs => {
+  // Dev builds (src/application-live-members.mjs): the runtime members the
+  // previous full link kept, instead of the archives; accepted only when the
+  // program imports nothing that link did not.
+  const runtimeArchives = runtime.manifest.libraries.map(name => join(runtime.directory, name));
+  const memberDirectory = join(dirname(sharedStore), 'members', runtime.identity.slice(0, 32));
+  let fullLinked = false;
+  const fastMembers = profile === 'dev' && nodeLink && seedRecord?.liveMembers && seedRecord?.imports
+    && Object.keys(seedRecord.liveMembers).every(archive => runtimeArchives.includes(archive)) ? seedRecord : undefined;
+  const linkOnce = async (plannedInputs, members) => {
+    const libraries = members ? memberFiles(members, memberDirectory) : undefined;
+    const args = libraries ? link.flatMap(arg => arg === runtimeArchives[0] ? libraries : runtimeArchives.includes(arg) ? [] : [arg]) : link;
     await writeFile(argumentsFile, responseFile([...objects, ...nativeInputs, ...initializationInputs, ...plannedInputs,
-      ...(debug ? ['-O0'] : ['-Oz', '-g1']), '-Wl,-Map=' + finalMap, ...link]));
+      ...(debug ? ['-O0'] : ['-Oz', '-g1']), '-Wl,-Map=' + finalMap, ...args]));
     progress?.({ stage: 'Linking application and Lean runtime' });
     const start = performance.now();
     try { runLink(debug ? 'probe' : 'final', ['@' + argumentsFile], { optimize: debug || profile === 'release' }); }
     finally { time('final link', start); }
   };
-  let seededFinal;
+  const finalLink = async plannedInputs => {
+    if (fastMembers) {
+      try {
+        await linkOnce(plannedInputs, fastMembers.liveMembers);
+        const imports = wasmImports(join(dist, 'program.wasm')), allowed = new Set(fastMembers.imports);
+        if (imports && imports.every(item => allowed.has(item))) { fullLinked = false; return; }
+      } catch { /* link in full below */ }
+    }
+    await linkOnce(plannedInputs);
+    fullLinked = true;
+  };
+  let seededFinal, seedOut;
   if (!['all', 'native'].includes(initialization)) {
     const wrapperFiles = (kind = '') => Array.from({ length: initializerWrapperParts }, (_, part) =>
       [join(work, `initializers${kind}-${part}.c`), join(work, `initializers${kind}-${part}.o`)]);
@@ -496,8 +553,8 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
       log: verbose ? message => console.error(message) : () => {},
       forceKeep: process.env.LASM_INITIALIZATION_KEEP ? new RegExp(process.env.LASM_INITIALIZATION_KEEP) : undefined,
       initTargets: (core => core && new Set([...core, ...sources.flatMap(file => cInitTargets(readFileSync(file, 'utf8')))]))(coreInitTargets(leanVersion)),
-      seed,
-      async probe(source, wrapFlags, { bodies = false, exclude } = {}) {
+      seed, trimBodies: profile === 'dev',
+      async probe(source, wrapFlags, { bodies = false, exclude, kind } = {}) {
         // A seeded dev build: each planning round is the delivered link itself.
         if (seed && !bodies) {
           const wrappers = await writeWrappers(source);
@@ -509,10 +566,11 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
         // Probes may run concurrently: each has its own files.
         const id = probeCount++, map = join(work, `initializers-${id}.map`);
         const wrappersObjects = await writeWrappers(source, { probe: true, files: wrapperFiles(`-probe-${id}`) });
-        const args = [...objects.filter(file => file !== exclude), ...nativeInputs, probeObject, ...wrappersObjects,
+        const excluded = new Set([exclude].flat());
+        const args = [...objects.filter(file => !excluded.has(file)), ...nativeInputs, probeObject, ...wrappersObjects,
           ...initializationInputs.filter(file => !bodies || file !== entryObject),
-          '-O0', '-Wl,-Map=' + map, ...wrapFlags, ...linkWith(bodies ? bodiesExports : exportsFile)];
-        return (await probeLink(args, map, join(work, `initializers-${id}.rsp`))).live;
+          '-O0', '-Wl,-Map=' + map, ...wrapFlags, ...linkWith(bodies ? bodiesExports : exportsFile, join(work, `initializers-${id}.cjs`))];
+        return (await probeLink(args, map, join(work, `initializers-${id}.rsp`), { kind: bodies ? kind : undefined, output: join(work, `initializers-${id}.wasm`) })).live;
       } });
     if (plan?.skipped.length && !plan.shared.length) {
       const planned = initializerWrappers(plan.units, plan.closure, { keep: plan.keep, parts: initializerWrapperParts });
@@ -526,10 +584,7 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
       initializationPlan = { units: plan.closure.length, kept: plan.keep.size, skipped: plan.skipped.length };
     } else if (plan) initializationPlan = { units: plan.closure.length, kept: plan.closure.length, skipped: 0,
       ...(plan.shared.length ? { sharedGlobals: plan.shared.slice(0, 20) } : {}) };
-    if (plan && initializationSeed) {
-      try { writeFileSync(initializationSeed, JSON.stringify({ schema: 1, runtime: runtime.identity, keep: [...plan.keep].sort() }) + '\n'); }
-      catch { /* an unwritable seed only costs the next dev build its planning */ }
-    }
+    if (plan) seedOut = { ...seedOut, keep: [...plan.keep].sort() };
   }
   const delivered = !!seededFinal?.delivered;
   // Classify the live graph before expensive optimization. In particular, a
@@ -569,6 +624,21 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
     await finalLink(planInputs);
     const finalRequirements = await readApplicationLinkRequirements(finalMap, analysis);
     requireAotApplication(finalRequirements);
+  }
+  // The seed for the next build: the plan, and after a dev build's full link
+  // the runtime members it kept and its imports (the fast link's reference).
+  if (initializationSeed && seedOut) {
+    try {
+      if (profile === 'dev' && nodeLink && !debug) {
+        if (fullLinked && statSync(finalMap).size < 64 * 1024 * 1024) {
+          const imports = wasmImports(join(dist, 'program.wasm'));
+          try { if (imports) Object.assign(seedOut, { liveMembers: liveMembers(readFileSync(finalMap, 'utf8'), runtimeArchives), imports }); }
+          catch { /* no fast link next time */ }
+        } else if (!fullLinked && fastMembers) Object.assign(seedOut, { liveMembers: fastMembers.liveMembers, imports: fastMembers.imports });
+      }
+      if (seedRecord?.probes) seedOut.probes = { ...seedRecord.probes, ...seedOut.probes };
+      writeFileSync(initializationSeed, JSON.stringify({ schema: 1, runtime: runtime.identity, ...seedOut }) + '\n');
+    } catch { /* an unwritable seed only costs the next dev build its planning */ }
   }
   // Keep only this build's objects; the cache never grows across edits.
   if (objectCache) for (const name of readdirSync(objectCache))

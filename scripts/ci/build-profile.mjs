@@ -98,10 +98,13 @@ if (!process.env.BUILD_PROFILE_SKIP_TEMPLATE) {
 // one-function edit, in this process (as `lasm dev` rebuilds) and as a new
 // `lasm build --dev` process (as `npm run dev` after an edit).
 const editLoop = async name => {
+  // As in lasm dev's long-lived build worker (src/dev-build-worker.mjs).
+  (await import(pathToFileURL(join(compiler, 'src/managed-artifacts.mjs')).href)).trustVerifiedTreesForSession(true);
   const source = join(projects[name], 'Main.lean'), original = readFileSync(source, 'utf8');
   const edit = n => writeFileSync(source, original.replace(/\ndef main/, `\ndef editLoop : Nat := ${n}\n\ndef main`));
   await build(`${name}: dev, first`, name, { profile: 'dev' });
   for (let n = 1; n <= 3; n++) { edit(n); await build(`${name}: dev, function edit ${n}`, name, { profile: 'dev' }); }
+  (await import(pathToFileURL(join(compiler, 'src/managed-artifacts.mjs')).href)).trustVerifiedTreesForSession(false);
   edit(4);
   const start = now();
   cp.execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', 'Main.lean', '--dev', '--output', 'dist-dev'], { cwd: projects[name], stdio: 'inherit' });

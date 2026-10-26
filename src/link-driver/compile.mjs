@@ -133,6 +133,9 @@ const separator = platform => platform === 'win32' ? '\\' : '/';
  * that are only analysed and never linked into a delivered program (Lasm's
  * initializer-planning probes); emcc passes -O levels to clang unchanged. */
 export const probeOptimization = '-O0';
+/** The dev profile compiles the program's own modules at -O1 (about half the
+ * clang time of the recorded -O2 for a large module). */
+export const devOptimization = '-O1';
 export function clangArguments(recipe, { flags, source, object, sysroot, platform = process.platform, extraArgs = [], optimization }) {
   for (const [name, value] of Object.entries({ source, object, sysroot }))
     if (typeof value !== 'string' || !value) throw new Error(`Missing ${name} for the Node compile driver`);
@@ -140,7 +143,7 @@ export function clangArguments(recipe, { flags, source, object, sysroot, platfor
   // Package C sources (src/application-native.mjs) add preprocessor options only.
   if (extraArgs.some(arg => typeof arg !== 'string' || !/^-(?:I|isystem|iquote|idirafter|include|imacros|D|U|std=|x$|c$|w$)/.test(arg) && arg.startsWith('-')))
     throw new Error(`Unsupported package compiler option: ${JSON.stringify(extraArgs)}`);
-  if (optimization !== undefined && optimization !== probeOptimization) throw new Error(`Unsupported probe optimization ${optimization}`);
+  if (optimization !== undefined && optimization !== probeOptimization && optimization !== devOptimization) throw new Error(`Unsupported optimization ${optimization}`);
   const levels = flags.filter(flag => /^-O[0-3sz]$/.test(flag));
   if (optimization !== undefined && levels.length !== 1) throw new Error('The recorded compile flags need exactly one optimization level');
   const translated = translateEmccFlags(recipe, [...(optimization === undefined ? flags : flags.map(flag => flag === levels[0] ? optimization : flag)),

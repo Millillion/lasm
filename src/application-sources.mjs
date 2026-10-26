@@ -200,13 +200,50 @@ export function lakeConfigurationKey(project, source, lean) {
   return hash.digest('hex');
 }
 
+/** The workspace's Lake package directories: the project and its manifest's packages. */
+function lakePackageDirectories(project) {
+  const directories = [project];
+  try {
+    const manifest = JSON.parse(readFileSync(join(project, 'lake-manifest.json'), 'utf8'));
+    for (const pkg of manifest.packages ?? []) directories.push(pkg.type === 'path'
+      ? resolve(project, pkg.dir) : resolve(project, manifest.packagesDir ?? '.lake/packages', pkg.name));
+  } catch { /* no manifest */ }
+  return directories;
+}
+
+/** Identity of the workspace's module graph: the configuration key and the
+ * import header of every Lean source in its packages. */
+export function workspaceImportsKey(project, configKey) {
+  const hash = createHash('sha256').update(configKey);
+  const walk = directory => {
+    let entries;
+    try { entries = readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0); } catch { return; }
+    for (const entry of entries) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) { if (!entry.name.startsWith('.') && entry.name !== 'node_modules') walk(path); }
+      else if (entry.isFile() && entry.name.endsWith('.lean')) hash.update(path + '\0').update(leanHeader(readFileSync(path, 'utf8'))).update('\0');
+    }
+  };
+  for (const directory of lakePackageDirectories(project)) walk(directory);
+  return hash.digest('hex');
+}
+
 export function applicationSources(source, lean, work, { log = console.error } = {}) {
   source = resolve(source);
   const project = findApplicationProject(source);
   const env = nativeLeanEnvironment(lean);
-  const run = (program, args, cwd) => execFileSync(program, args,
-    { cwd, env, windowsHide: true, encoding: 'utf8', timeout: 900_000, maxBuffer: 32 * 1024 * 1024,
-      stdio: ['ignore', 'pipe', 'inherit'] }).trim();
+  // Lean's and Lake's diagnostics are captured, so that a failure carries them
+  // (the CLI and `lasm dev` report them with the error); warnings of a
+  // successful step are passed on as they were printed.
+  const run = (program, args, cwd) => {
+    const result = spawnSync(program, args, { cwd, env, windowsHide: true, encoding: 'utf8', timeout: 900_000, maxBuffer: 32 * 1024 * 1024,
+      stdio: ['ignore', 'pipe', 'pipe'] });
+    if (result.error) throw Object.assign(result.error, { stdout: result.stdout, stderr: result.stderr });
+    if (result.status !== 0) throw Object.assign(new Error(`Command failed: ${program} ${args.join(' ')}\n${result.stderr ?? ''}`),
+      { status: result.status, signal: result.signal, stdout: result.stdout, stderr: result.stderr });
+    if (result.stderr) process.stderr.write(result.stderr);
+    return result.stdout.trim();
+  };
   if (project) {
     const query = target => JSON.parse(run(lean.lake,
       ['--no-cache', '--keep-toolchain', '--quiet', '--json', 'query', target], project));
@@ -240,12 +277,18 @@ export function applicationSources(source, lean, work, { log = console.error } =
     if (!Array.isArray(entry.metadataRoots) || entry.metadataRoots.some(name => typeof name !== 'string'))
       throw new Error('Unexpected Lake module-data paths');
     const targets = [];
+    // Lake's transitive import query, reused while no import header changed.
+    const importsRecord = configKey && join(work, `lake-imports-${workspaceImportsKey(project, configKey)}.json`);
+    const savedImports = importsRecord && readJsonRecord(importsRecord);
+    const transImports = {};
     for (const target of configured ? [entry.module] : entry.imports.map(name => '+' + name)) {
-      const modules = query(target + ':transImports');
+      const modules = savedImports?.[target] ?? query(target + ':transImports');
+      transImports[target] = modules;
       if (!Array.isArray(modules) || modules.some(module => typeof module !== 'string'))
         throw new Error('Unexpected Lake transitive module inventory');
       targets.push(...modules.map(name => '+' + name), target);
     }
+    if (importsRecord && !savedImports) writeJsonRecord(importsRecord, transImports, 'lake-imports-');
     const sources = [], inputs = [];
     // One Lake query per batch of modules prints one JSON result per line, in order
     // (a separate Lake process per module dominated large dependency graphs).
