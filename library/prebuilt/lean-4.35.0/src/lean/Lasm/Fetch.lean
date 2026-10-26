@@ -152,9 +152,10 @@ end Response
 
 /-! Running handlers -/
 
-/-- Runs the handler; an error becomes a 500 response (and a line on stderr). -/
+/-- Runs the handler; an error becomes a 500 response (and a line on stderr).
+A `HEAD` request runs the handler as `GET` (its body is not sent). -/
 def respond (handler : Handler) (req : Request) : Async Response := do
-  try handler req
+  try handler (if req.method == "HEAD" then { req with method := "GET" } else req)
   catch e =>
     IO.eprintln s!"Lasm.Fetch: the handler failed for {req.method} {req.path}: {e}"
     return Response.text "Internal Server Error\n" 500

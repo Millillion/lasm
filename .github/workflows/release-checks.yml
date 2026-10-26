@@ -7,7 +7,8 @@ name: release-checks
 # five-platform installed acceptance, platform-support, templates and
 # js-interop-examples, all in node-linux-acceptance.yml), then the npm-dist
 # loopback-registry rehearsal of the accepted candidate with version=<version>
-# license=MIT. `release-checks` passes only when all of them pass, and records
+# license=MIT, and (pull requests) the WASI and Fastly checks of wasi.yml.
+# `release-checks` passes only when all of them pass, and records
 # the result in the `release-checks` artifact, which release.yml reads before it
 # publishes anything (it accepts only a full run for a push to main).
 #
@@ -101,9 +102,21 @@ jobs:
       license: MIT
       overlay-source: ${{ inputs.overlay-source == true }}
 
+  # The WASI and Fastly Compute targets (wasi.yml, docs/WASI.md) built from the
+  # release pull request's sources and checked on wasmtime, wasmer, node:wasi,
+  # Spin and Viceroy. Pull requests only: wasi.yml builds the edge runtime,
+  # which edge-runtime.yml does not do on main.
+  wasi:
+    needs: detect
+    if: needs.detect.outputs.release == 'true' && github.event_name == 'pull_request'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/wasi.yml
+
   release-checks:
     name: release-checks
-    needs: [detect, candidate, rehearsal]
+    needs: [detect, candidate, rehearsal, wasi]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -117,6 +130,7 @@ jobs:
           DIST_TAG: ${{ needs.detect.outputs.dist-tag }}
           CANDIDATE: ${{ needs.candidate.result }}
           REHEARSAL: ${{ needs.rehearsal.result }}
+          WASI: ${{ needs.wasi.result }}
           REUSE: ${{ inputs.candidate-release }}
           REUSE_SHA256: ${{ inputs.candidate-sha256 }}
           OVERLAY: ${{ inputs.overlay-source == true }}
@@ -127,10 +141,11 @@ jobs:
           mkdir -p manifest
           node -e "
             const e = process.env, release = e.RELEASE === 'true', full = !e.REUSE && e.OVERLAY !== 'true';
-            const passed = e.DETECT === 'success' && (!release || (full ? e.CANDIDATE === 'success' : e.CANDIDATE === 'skipped') && e.REHEARSAL === 'success');
+            const wasi = e.GITHUB_EVENT_NAME !== 'pull_request' || e.WASI === 'success';
+            const passed = e.DETECT === 'success' && (!release || (full ? e.CANDIDATE === 'success' : e.CANDIDATE === 'skipped') && e.REHEARSAL === 'success' && wasi);
             const manifest = { schema: 1, workflow: 'release-checks', passed, release, full, version: e.VERSION, previous: e.PREVIOUS, distTag: e.DIST_TAG,
               sha: e.GITHUB_SHA, headSha: e.HEAD_SHA, event: e.GITHUB_EVENT_NAME, ref: e.GITHUB_REF, runId: e.GITHUB_RUN_ID, runAttempt: e.GITHUB_RUN_ATTEMPT,
-              jobs: { detect: e.DETECT, candidate: e.CANDIDATE, rehearsal: e.REHEARSAL },
+              jobs: { detect: e.DETECT, candidate: e.CANDIDATE, rehearsal: e.REHEARSAL, wasi: e.WASI },
               candidate: release ? { release: e.REUSE || e.TESTED_RELEASE, sha256: e.REUSE_SHA256 || e.TESTED_SHA256 } : null,
               rehearsal: release ? { version: e.VERSION, license: 'MIT', node: '26.12.1', overlaySource: e.OVERLAY === 'true', record: 'npm-dist-linux-x64/linux-x64/npm-dist.json' } : null };
             require('node:fs').writeFileSync('manifest/release-checks.json', JSON.stringify(manifest, null, 2) + '\n');

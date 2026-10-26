@@ -78,8 +78,8 @@ await `Std.Async` timers and tasks, and `IO` actions run in it unchanged.
 | `r.withHeader k v`, `r.withStatus s` | Add a header (repeatable, as `set-cookie` is) or replace the status. |
 
 **Errors.** A handler that throws answers `500 Internal Server Error`; the
-error goes to standard error with the method and path. **HEAD** and the
-statuses 101, 204, 205 and 304 are sent without a body.
+error goes to standard error with the method and path. **HEAD** requests run the handler as `GET`; their responses, and those
+with status 101, 204, 205 or 304, are sent without a body.
 
 **Lower-level pieces.** `Lasm.Fetch.respond` runs a handler with that error
 handling; `jsFetchHandler` makes a JavaScript `fetch` function of a handler
