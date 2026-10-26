@@ -3,7 +3,8 @@
 // to reach the page. Starts the given dev command in APP, waits for the proxy,
 // checks that the page, the client build and the RPC endpoints are all served
 // on that one URL (with the live-reload client injected), then edits
-// Client.lean, View.lean and Server.lean in turn and times edit → reload event
+// Client.lean, View.lean and Server.lean in turn (a new definition in each) and
+// times edit → reload event
 // on /__lasm/events. Writes a JSON report.
 //
 //   node scripts/fullstack/dev-reload.mjs APP PORT REPORT -- lasm dev …
@@ -76,7 +77,9 @@ try {
     const path = join(app, file), before = readFileSync(path, 'utf8');
     const seen = events.length, mark = output.length;
     const start = performance.now();
-    appendFileSync(path, `\n-- edited by dev-reload.mjs at ${Date.now()}\n`);
+    // A code change (a new definition), so the module's C and the program change too.
+    const stamp = Date.now();
+    appendFileSync(path, `\n/-- Edited by dev-reload.mjs. -/\ndef devReloadMarker${stamp} : String := "${stamp}"\n`);
     const reloaded = await until(() => events.slice(seen).some(e => e.event === 'reload'), 10 * 60 * 1000);
     const seconds = reloaded ? (events.slice(seen).find(e => e.event === 'reload').at - start) / 1000 : null;
     await until(() => output.slice(mark).includes('Reloaded'), 5000);
