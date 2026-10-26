@@ -397,13 +397,12 @@ What this shows:
   at start; one Worker saves 30–40 ms of CPU and 4–6 % of the cold start at
   0.29–0.58 CPU and costs 5–12 % on 4 CPUs. The function shims (`lasm
   package`) default to 1; servers keep 4.
-- Standard output and error, and the working directory's name, no longer
-  start a native file Worker (synchronous writes on POSIX, libuv `readlink`).
-  On the maintainer host that took a Fastify start from 90 to 77 CPU ticks; on
-  the runner (run 40302884580, same table layout) the CPU used per start went
-  570 → 560 ms (Hono), 600 → 580 ms (Express), 650 ms (Fastify, unchanged) and
-  the 0.29 CPU cold starts 1,909 → 1,868 / 2,028 → 1,951 / 2,204 → 2,238 ms:
-  within the runner's noise for Fastify.
+- Tried and reverted: writing standard output synchronously instead of
+  through the native file Worker (maintainer host 90 → 77 CPU ticks; runner
+  run 40302884580 within noise). It broke the guarantee that a full stdout pipe
+  never blocks the host's event loop (`test/stdio-backpressure.test.mjs`) and
+  Lean's stdout ownership. The working directory's name is now read without
+  the Worker on Linux.
 - Evaluated, not used: Node's compile cache (`NODE_COMPILE_CACHE`) made no
   difference (it caches 12 KiB here, and a new function instance starts with
   an empty directory); the Wasm module is already compiled once and shared with
