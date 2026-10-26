@@ -1,0 +1,43 @@
+name: CI image pins
+# Weekly: re-pins the images CI loads from its cache (scripts/ci/images.lock.json,
+# scripts/ci/image-cache.mjs refresh) to what their upstream tags point to now,
+# and opens a pull request when a digest moved, so CI does not drift silently
+# from what users of public.ecr.aws/lambda/nodejs:24 (and the adapter) get.
+# The PR is opened with the workflow token, so its own checks do not start by
+# themselves: review it, then push to it or dispatch the serverless workflow.
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: image-pins
+  cancel-in-progress: false
+jobs:
+  refresh:
+    if: github.event.repository.visibility == 'public'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Re-pin every cached CI image from its tag
+        run: node scripts/ci/image-cache.mjs refresh
+      - name: Open a pull request when a digest moved
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- scripts/ci/images.lock.json; then echo "Pins unchanged"; exit 0; fi
+          git diff -- scripts/ci/images.lock.json
+          branch="image-pins-$(date -u +%Y-%m-%d)"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then echo "$branch already exists"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -m "CI image pins: upstream digests moved" -- scripts/ci/images.lock.json
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" --title "CI image pins: upstream digests moved ($(date -u +%Y-%m-%d))" \
+            --body "The weekly image-pins workflow found new upstream digests for images CI caches (scripts/ci/images.lock.json). Merging changes the cache key, so the next run pulls and caches the new images once. Run the serverless workflow on this branch (or let the next acceptance do it) before merging."

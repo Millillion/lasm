@@ -29,7 +29,7 @@ The package is experimental and **has not been published to npm**.
 Once `@lasm/cli` 0.1.0 is published (**not yet**), a new project starts with
 
 ```sh
-npm create lasm@latest my-app -- --template hono   # or: npx @lasm/cli init my-app --template hono
+npm create @lasm@latest my-app -- --template hono   # or: npx @lasm/cli init my-app --template hono
 cd my-app && npm install && npm run dev
 ```
 
@@ -98,7 +98,7 @@ unchanged. Current source has a per-package
 [compatibility list](https://github.com/Millillion/lasm/blob/main/docs/COMPATIBILITY.md) (Batteries, Cli, LSpec,
 Plausible, Aesop, Qq, leansqlite, UnicodeBasic, MD4Lean, lean-zip, lean4-parser, lean-redis
 and others); packages not on it are untested.
-After an authorized npm release, `npm create lasm` (the `create-lasm` package runs
+After an authorized npm release, `npm create @lasm` (the `@lasm/create` package runs
 `lasm init` of the same `@lasm/cli` version with the arguments unchanged) creates
 projects, and installation is `npm install @lasm/cli` (or `npx @lasm/cli Main.lean`
 without installing); the bin stays `lasm`. These registry commands are **not
@@ -129,7 +129,7 @@ These are all commands and options in the ordinary Node application interface:
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help` | Show usage; `-h` is an alias. |
-| New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono`; after publication also `npm create lasm@latest my-app -- --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. `--deploy lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` (repeatable): `npm run build:<target>` scripts (`lasm build --target`), `vercel.json`/`netlify.toml`, and the platform npm package for `azure` and `gcf`. `--deploy workers`, `vercel-edge`, `netlify-edge` and `deno-deploy` (Hono template; experimental, unreleased) add the edge platform files and `build:<target>` scripts. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
+| New project (current source; not yet in an accepted candidate) | `npx lasm init my-app --template hono`; after publication also `npm create @lasm@latest my-app -- --template hono` | Create a Lake project in a new or empty directory: `Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`. Templates: `plain` (default; a program), `express` and `hono` (Lean request handlers through `Lasm.JS`), `std-http` (pure-Lean `Std.Http` server). `--deploy lambda` (server templates) adds `Dockerfile.lambda`, an AWS Lambda container image. `--deploy lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` (repeatable): `npm run build:<target>` scripts (`lasm build --target`), `vercel.json`/`netlify.toml`, and the platform npm package for `azure` and `gcf`. `--deploy workers`, `vercel-edge`, `netlify-edge` and `deno-deploy` (Hono template; experimental, unreleased) add the edge platform files and `build:<target>` scripts. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` and `--deploy=lambda` also work. `lasm init --help` lists the templates. |
 | Package an existing build | `npx lasm package --target lambda` | Package a built server (default `dist/`; any server that listens on `$HOST:$PORT`) for one or more platforms without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output; `lasm package dist2 --target lambda` packages another build. Checks the platform's size limit and leaves out the musl pieces (function platforms use glibc). Files only, no network. Refuses a dev build unless `--allow-dev` is given (then it warns). |
 | Cache repair | `npx lasm cache repair` | Offline verification and removal of invalid tools and owned abandoned staging. Refuses an active build; keeps valid tools and unrelated files. |
 
@@ -430,7 +430,7 @@ A summary; the sections above and the linked pages have the details.
 
 ## Releases and provenance
 
-Nothing is published yet. Lasm's npm packages (`@lasm/cli`, `create-lasm` and the
+Nothing is published yet. Lasm's npm packages (`@lasm/cli`, `@lasm/create` and the
 `@lasm/…` tool packages) will be published only by the
 [`release.yml`](.github/workflows/release.yml) GitHub Actions workflow, through npm
 trusted publishing with provenance: no npm tokens exist, and each package trusts
@@ -445,7 +445,7 @@ provenance, and `npm audit signatures` in a project verifies it. Details:
 ## Licenses
 
 Lasm's own source is under the [MIT License](LICENSE) (copyright Jordan Last);
-`create-lasm` is MIT, and `@lasm/cli`'s `license` field is an SPDX expression of
+`@lasm/create` is MIT, and `@lasm/cli`'s `license` field is an SPDX expression of
 Lasm's MIT and every component it bundles, with their texts in `licenses/`. The
 [license audit](docs/LICENSE_AUDIT.md) lists every distributed component, its
 license and how each obligation is met.

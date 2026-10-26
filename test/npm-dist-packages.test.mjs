@@ -91,9 +91,9 @@ test('the C tier Lasm provisions is the archive its npm package carries', async 
   }
 });
 
-test('create-lasm pins the CLI exactly and is MIT', () => {
+test('@lasm/create pins the CLI exactly and is MIT', () => {
   const meta = createPackageJson({ name: '@lasm/cli', version: '0.1.0' }, { engines: { node: '>=24' } });
-  assert.deepEqual([meta.name, meta.version, meta.license, meta.bin], ['create-lasm', '0.1.0', 'MIT', { 'create-lasm': 'bin.mjs' }]);
+  assert.deepEqual([meta.name, meta.version, meta.license, meta.bin], ['@lasm/create', '0.1.0', 'MIT', { 'create-lasm': 'bin.mjs' }]);
   assert.deepEqual(meta.dependencies, { '@lasm/cli': '0.1.0' });
   assert.equal(meta.scripts, undefined);
   assert.equal(meta.repository.url, 'git+https://github.com/Millillion/lasm.git');

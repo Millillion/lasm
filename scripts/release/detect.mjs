@@ -19,7 +19,7 @@ export function decide({ previous, version, notes, cli, create, tag }) {
   else {
     if (!notes) problems.push(`${notesFile(version)} is missing; a release PR adds its notes`);
     if (cli) problems.push(`@lasm/cli@${version} is already on npm; versions are never reused`);
-    if (create) problems.push(`create-lasm@${version} is already on npm; versions are never reused`);
+    if (create) problems.push(`@lasm/create@${version} is already on npm; versions are never reused`);
     if (tag) problems.push(`tag ${tagName(version)} already exists`);
   }
   if (problems.length) return { release: false, error: true, reason: problems.join('; ') };
@@ -38,7 +38,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   if (previous !== version && isVersion(version)) {
     facts.notes = existsSync(join(root, notesFile(version)));
     facts.cli = (await published(publicRegistry, '@lasm/cli', version)).exists;
-    facts.create = (await published(publicRegistry, 'create-lasm', version)).exists;
+    facts.create = (await published(publicRegistry, '@lasm/create', version)).exists;
     facts.tag = run('git', ['ls-remote', '--tags', 'origin', `refs/tags/${tagName(version)}`], { cwd: root }).trim() !== '';
   }
   const decision = decide(facts);

@@ -9,6 +9,7 @@
 //                                            load or pull GROUP's images for this runner's architecture;
 //                                            --seed also writes the other architectures' archives
 //   node image-cache.mjs lock GROUP REF...    pin REF... (tags) by digest into the lock (maintainers; needs registry access)
+//   node image-cache.mjs refresh              re-pin every grouped image from its tag
 //
 // A loaded or pulled image must have the pinned identity: its image ID is the
 // pinned config digest (classic image store) or platform manifest digest
@@ -146,6 +147,11 @@ if (import.meta.url === new URL(process.argv[1], 'file:').href || process.argv[1
     const seedIndex = flags.indexOf('--seed');
     await ensure(directory, group, { seed: seedIndex >= 0 ? flags[seedIndex + 1].split(',') : [], load: !flags.includes('--no-load') });
   }
+  else if (command === 'refresh') {
+    // Re-pins every grouped image from its tag (the weekly image-pins workflow).
+    const lock = readLock();
+    for (const [group, refs] of Object.entries(lock.groups)) await lockImages(group, refs);
+  }
   else if (command === 'lock') { const [group, ...refs] = rest; assert.ok(group && refs.length, 'Usage: image-cache.mjs lock GROUP REF...'); await lockImages(group, refs); }
-  else if (command !== undefined) throw new Error('Usage: image-cache.mjs ensure DIR GROUP | lock GROUP REF...');
+  else if (command !== undefined) throw new Error('Usage: image-cache.mjs ensure DIR GROUP | lock GROUP REF... | refresh');
 }

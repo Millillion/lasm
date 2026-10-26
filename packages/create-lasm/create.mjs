@@ -1,4 +1,4 @@
-// create-lasm: `npm create lasm@latest my-app -- --template hono` runs
+// create-lasm: `npm create @lasm@latest my-app -- --template hono` runs
 // `lasm init my-app --template hono` with the @lasm/cli this package pins exactly.
 // No dependencies besides @lasm/cli; arguments are passed through unchanged.
 import { spawn } from 'node:child_process';
@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { pathToFileURL } from 'node:url';
 
-export const usage = 'Usage: npm create lasm@latest <directory> -- [--template plain|express|hono|std-http] [--deploy lambda]';
+export const usage = 'Usage: npm create @lasm@latest <directory> -- [--template plain|express|hono|std-http] [--deploy lambda]';
 
 /** Whether `lasm init` gets a directory (or --help) from these arguments, as lasm init parses them. */
 export function hasDirectory(args) {

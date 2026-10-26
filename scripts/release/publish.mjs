@@ -2,7 +2,7 @@
 // the registry with the same bytes (docs/RELEASING.md). Safe to re-run: it never
 // republishes, unpublishes or moves a dist-tag of an existing version, and it
 // stops before publishing anything if any existing version has other bytes.
-// Order: tool packages (the CLI pins them), @lasm/cli, create-lasm (pins the CLI).
+// Order: tool packages (the CLI pins them), @lasm/cli, @lasm/create (pins the CLI).
 //
 //   node scripts/release/publish.mjs --dist BUILD_DIR --tag latest|next --registry https://registry.npmjs.org/ --report FILE
 //     npm trusted publishing (OIDC) with provenance; only inside GitHub Actions with id-token: write.

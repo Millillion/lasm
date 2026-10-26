@@ -82,7 +82,7 @@ if (command === 'publish' || command === 'mirror') {
   const host = new URL(url).host;
   await writeFile(userconfig, `registry=${url}\n//${host}/:_authToken=lasm-local-validation\n`);
   const tarballs = command === 'publish' ? join(resolve(args.dist), 'packages') : undefined;
-  // Tool packages first, then the CLI that pins them, then create-lasm, which pins the CLI.
+  // Tool packages first, then the CLI that pins them, then @lasm/create, which pins the CLI.
   const published = command === 'publish' ? [...record.packages, record.main, ...(record.create ? [record.create] : [])] : [];
   const files = published.map(p => p.filename);
   if (command === 'publish') assert.deepEqual([...files].sort(), (await readdir(tarballs)).sort(), 'Publish exactly the recorded tarballs');
