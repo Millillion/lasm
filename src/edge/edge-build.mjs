@@ -405,9 +405,12 @@ export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, sus
   const meta = { key, suspend: link.suspend, files: Object.fromEntries(['program.mjs', 'program.wasm'].map(file => [file, sha256(readFileSync(join(staging, file)))])) };
   writeFileSync(join(staging, 'program.json'), JSON.stringify(meta, null, 2) + '\n');
   // One cached program per application and suspension: older keys are superseded.
+  // Dev builds (lasm dev) keep the two before it too, so undoing an edit reuses its program.
   const suspendOf = entry => { try { return JSON.parse(readFileSync(join(root, entry, 'program.json'), 'utf8')).suspend; } catch { return null; } };
-  for (const entry of readdirSync(root)) if (entry !== key && !entry.startsWith('.') && [link.suspend, null].includes(suspendOf(entry)))
-    rmSync(join(root, entry), { recursive: true, force: true });
+  const mtime = entry => { try { return statSync(join(root, entry)).mtimeMs; } catch { return 0; } };
+  const older = readdirSync(root).filter(entry => entry !== key && !entry.startsWith('.') && [link.suspend, null].includes(suspendOf(entry)))
+    .sort((a, b) => mtime(b) - mtime(a));
+  for (const entry of older.slice(result.profile === 'dev' ? 2 : 0)) rmSync(join(root, entry), { recursive: true, force: true });
   rmSync(directory, { recursive: true, force: true });
   renameSync(staging, directory);
   return { directory, meta };
