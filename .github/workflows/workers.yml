@@ -1,13 +1,18 @@
 name: Cloudflare Workers (Phase 7)
-# Experimental edge build (docs/EDGE.md): builds the single-threaded runtime
+# Edge targets and Bun/Deno (docs/EDGE.md, docs/BUN_DENO.md): builds the single-threaded runtime
 # (edge-runtime.yml), then the Hono template (lasm init --deploy workers) and
 # examples/edge-pure with `lasm build --target workers` from this source
 # checkout; serves them with `wrangler dev` (local workerd: CI=1, no account,
 # no browser), runs them on Node 26, Deno and Bun, and checks the Workers Free
 # plan's budgets (scripts/edge/workers-ci.mjs). Linux only, free runners, no
 # deployment and no publication.
+# release-checks.yml calls it (release-check: true) for every release commit,
+# including the merge commit on main: since 0.2.0 these checks gate releases.
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      release-check: { type: boolean, default: false }
   push:
     branches: [phase-7]
     paths:
@@ -44,12 +49,14 @@ concurrency:
   cancel-in-progress: true
 jobs:
   runtime:
-    if: github.ref != 'refs/heads/main'
+    if: inputs.release-check || github.ref != 'refs/heads/main'
     uses: ./.github/workflows/edge-runtime.yml
+    with:
+      release-check: ${{ inputs.release-check == true }}
   # The native host pieces (every platform's, cross-built with zig on x64:
   # scripts/prepare-native.mjs), shared by the jobs below, including arm64.
   native:
-    if: github.ref != 'refs/heads/main'
+    if: inputs.release-check || github.ref != 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -210,7 +217,7 @@ jobs:
   # Phase 7.5 on all five targets: an installed candidate packed from this
   # commit, as build-profile.yml does.
   pack:
-    if: github.ref != 'refs/heads/main'
+    if: inputs.release-check || github.ref != 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:

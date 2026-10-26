@@ -28,4 +28,4 @@ run(argv.filter((_, i) => !['--seed', '--assets', '--memory-mib'].includes(argv[
 mkdirSync(join(out, 'resources'), { recursive: true });
 const plan = JSON.parse(readFileSync(join(out, 'plan.json'), 'utf8'));
 for (const pkg of plan.packages) run(['--out', out, '--step', 'package', '--only', pkg.name, ...shared], true, pkg.name.replace('/', '__'));
-run(['--out', out, '--step', 'main'], true, 'main');
+run(['--out', out, '--step', 'main', ...shared], true, 'main');

@@ -89,14 +89,19 @@ values through the `env` argument of the fetch handler.
 
 **In current branch source.**
 
-- **The edge runtime is a tool package.** `@lasm/lean-edge-runtime`
-  (`4.35.0-lasm.1`) is an on-demand npm tool package in the 0.2 package set.
-  It carries `lean-4.35.0-wasm64-edge.tar.zst` byte for byte, with its
-  licences (`Apache-2.0 AND MIT AND (MIT OR NCSA) AND Apache-2.0 WITH
-  LLVM-exception`). Lasm provisions it like its other tools: the npm package
-  first, else the release archive (tag `lean-4.35.0-edge-v1`), both checked
-  against the SHA-256 in [`src/edge-runtimes.json`](../src/edge-runtimes.json).
-  `LASM_EDGE_RUNTIME` is only an override. The archive also holds the Lasm.JS
+- **The edge runtime ships inside `@lasm/cli`.** The published CLI package
+  carries `targets/lean-4.35.0-wasm64-edge/`, extracted at packaging time from
+  `lean-4.35.0-wasm64-edge.tar.zst` (release `lean-4.35.0-edge-v1`) after
+  checking it against the SHA-256 in
+  [`src/edge-runtimes.json`](../src/edge-runtimes.json) and every library
+  against its `libraries.json` (`scripts/npm-dist/build.mjs`). It adds about
+  1.7 MB to the package (6 MB installed), needs no npm package of its own and no
+  download at build time, and its licences (`Apache-2.0`, `MIT`, `MIT OR NCSA`,
+  `Apache-2.0 WITH LLVM-exception`) are already in the CLI's; its notices are in
+  the package's `licenses/edge-runtime/`. A source checkout or a candidate
+  tarball fetches the same archive from the release instead, which needs that
+  release to be public (it is a draft until the owner publishes it). `LASM_EDGE_RUNTIME`
+  is only an override. The archive also holds the Lasm.JS
   edge glue (`liblasmjsedge.a`) and the non-threaded system libraries.
   [`edge-runtime.yml`](../.github/workflows/edge-runtime.yml) builds and packs
   it deterministically (`scripts/edge/package-edge-runtime.mjs`), and

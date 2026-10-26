@@ -150,6 +150,11 @@ runners (`ubuntu-24.04`, `ubuntu-24.04-arm`, `macos-15`, `macos-15-intel`,
   no release is on the registry, and for a release before 0.2.0 it checks only
   the installs.
 
+- **`release-checks`** (every release since 0.2.0): `workers.yml` in full,
+  and in the npm rehearsal on all five platforms the release's own packages
+  installed from a loopback registry with Bun and Deno only (the steps of
+  `bun-deno-published.yml`, nothing skipped), before anything is published.
+
 Results: `workers.yml` run 40277505987 passed every job on all five targets
 (2026-10-26), including the cross-platform byte comparison. The first
 `bun-deno-published.yml` run (40277505832) skipped cleanly on all five: only

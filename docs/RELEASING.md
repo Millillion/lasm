@@ -25,8 +25,23 @@ A release is a version bump: a pull request that changes the root `package.json`
    - the **npm rehearsal** ([npm-dist.yml](../.github/workflows/npm-dist.yml)): every
      package built from the accepted candidate with `version=<version> license=MIT`,
      published to a loopback Verdaccio on all five platforms and installed from it
-     (`installed`, `lake`, `c-tier`, `npx`, `init`, `create`, ...), with tool packages
-     byte-identical across runners.
+     (`installed`, `lake`, `c-tier`, `edge`, `npx`, `init`, `create`, ...), with tool
+     packages byte-identical across runners. `edge` builds `examples/edge-pure` for
+     every edge target and for Bun and Deno from the edge runtime that `@lasm/cli`
+     bundles. Then Bun 1.4.4 and Deno 2.9.6 install and run the same packages from
+     the same registry with no Node or npm on `PATH`
+     ([published-ci.mjs](../scripts/edge/published-ci.mjs) with
+     `LASM_PUBLISHED_REQUIRE=1`, so nothing may be skipped): `bun add`, `bunx --bun`,
+     `bun create @lasm`, `deno install`, `deno run -A npm:@lasm/cli`,
+     `npm:@lasm/create`, the builds served by Bun and Deno;
+   - the **edge and Bun/Deno checks** (since 0.2.0; [workers.yml](../.github/workflows/workers.yml),
+     called with `release-check: true`): the edge runtime built and compared with
+     its pin, the Hono template and `examples/edge-pure` served with `wrangler dev`
+     (workerd), checked with `vercel build` and Vercel's `edge-runtime`, `netlify
+     build`/`netlify dev` offline, Deno and Supabase's edge-runtime image; the
+     compiler under Bun and Deno (Linux x64 and arm64); a candidate packed from the
+     commit installed and run under Node, Bun and Deno on all five platforms, with
+     the same program bytes everywhere. All local tools and images, no account.
 
    The single status **`release-checks`** passes only if all of them pass. It
    uploads a `release-checks` artifact (the manifest: commit, version, dist-tag,
@@ -38,7 +53,7 @@ A release is a version bump: a pull request that changes the root `package.json`
    complete, and the `release-checks` run *for this exact commit*, from the push to
    `main`, succeeded with the full candidate checks. It verifies this through the
    API: the workflow run, its `release-checks` check run on the commit, and the
-   manifest. The checks take hours, so the push run usually stops with "still
+   manifest (which must record the edge job as passed). The checks take hours, so the push run usually stops with "still
    running"; the `workflow_run` trigger starts `release.yml` again when
    `release-checks` completes. Both share the concurrency group `npm-release`,
    which never cancels. Then, on Linux x64:
@@ -139,6 +154,14 @@ not run; the trust step is untested until the real bootstrap.
    the user's go-ahead). `release-checks` runs again for the merge commit, then
    `release.yml` publishes. Watch the `release` workflow; its summary lists every
    package as published or skipped.
+
+The edge runtime is not a tool package: `build.mjs` extracts its archive into
+`@lasm/cli` (`targets/<root>/`), downloading it from its release (`lean-4.35.0-edge-v1`,
+pinned in `src/edge-runtimes.json`). `npm-dist.yml` and `release.yml` fetch that
+archive with `gh release download`, which also works while the release is a draft
+(`edge-runtime.yml` with `draft-release` attaches the reproduced archive to one), and
+pass it to `build-all.mjs --seed`, which checks its SHA-256. Source checkouts
+download the same archive over HTTPS, which needs the release to be public.
 
 Tool packages keep their version across Lasm releases (it follows the immutable
 release that published the archive, for example `4.35.0-lasm.1`), so a release

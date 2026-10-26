@@ -7,8 +7,14 @@ name: release-checks
 # five-platform installed acceptance, platform-support, templates and
 # js-interop-examples, all in node-linux-acceptance.yml), then the npm-dist
 # loopback-registry rehearsal of the accepted candidate with version=<version>
-# license=MIT, and (pull requests) the WASI and Fastly checks of wasi.yml.
-# `release-checks` passes only when all of them pass, and records
+# license=MIT, which also installs them with Bun and Deno (no Node or npm on
+# PATH) from the loopback registry and builds every edge target from the
+# installed CLI; and, in parallel, the edge and Bun/Deno checks (workers.yml:
+# the edge runtime build, wrangler dev/workerd, vercel build and Vercel's
+# edge-runtime, netlify build/dev offline, Deno, Supabase's edge-runtime image,
+# the compiler under Bun and Deno, and an installed candidate under Bun and
+# Deno on all five platforms); and (pull requests) the WASI, wasi-http and
+# Fastly checks of wasi.yml. `release-checks` passes only when all of them pass, and records
 # the result in the `release-checks` artifact, which release.yml reads before it
 # publishes anything (it accepts only a full run for a push to main).
 #
@@ -102,6 +108,17 @@ jobs:
       license: MIT
       overlay-source: ${{ inputs.overlay-source == true }}
 
+  # The edge targets and Bun/Deno for this commit (since 0.2.0; docs/EDGE.md,
+  # docs/BUN_DENO.md): every job of workers.yml must pass.
+  edge:
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/workers.yml
+    with:
+      release-check: true
+
   # The WASI and Fastly Compute targets (wasi.yml, docs/WASI.md) built from the
   # release pull request's sources and checked on wasmtime, wasmer, node:wasi,
   # Spin and Viceroy. Pull requests only: wasi.yml builds the edge runtime,
@@ -116,7 +133,7 @@ jobs:
 
   release-checks:
     name: release-checks
-    needs: [detect, candidate, rehearsal, wasi]
+    needs: [detect, candidate, rehearsal, edge, wasi]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -130,6 +147,7 @@ jobs:
           DIST_TAG: ${{ needs.detect.outputs.dist-tag }}
           CANDIDATE: ${{ needs.candidate.result }}
           REHEARSAL: ${{ needs.rehearsal.result }}
+          EDGE: ${{ needs.edge.result }}
           WASI: ${{ needs.wasi.result }}
           REUSE: ${{ inputs.candidate-release }}
           REUSE_SHA256: ${{ inputs.candidate-sha256 }}
@@ -142,10 +160,10 @@ jobs:
           node -e "
             const e = process.env, release = e.RELEASE === 'true', full = !e.REUSE && e.OVERLAY !== 'true';
             const wasi = e.GITHUB_EVENT_NAME !== 'pull_request' || e.WASI === 'success';
-            const passed = e.DETECT === 'success' && (!release || (full ? e.CANDIDATE === 'success' : e.CANDIDATE === 'skipped') && e.REHEARSAL === 'success' && wasi);
+            const passed = e.DETECT === 'success' && (!release || (full ? e.CANDIDATE === 'success' : e.CANDIDATE === 'skipped') && e.REHEARSAL === 'success' && e.EDGE === 'success' && wasi);
             const manifest = { schema: 1, workflow: 'release-checks', passed, release, full, version: e.VERSION, previous: e.PREVIOUS, distTag: e.DIST_TAG,
               sha: e.GITHUB_SHA, headSha: e.HEAD_SHA, event: e.GITHUB_EVENT_NAME, ref: e.GITHUB_REF, runId: e.GITHUB_RUN_ID, runAttempt: e.GITHUB_RUN_ATTEMPT,
-              jobs: { detect: e.DETECT, candidate: e.CANDIDATE, rehearsal: e.REHEARSAL, wasi: e.WASI },
+              jobs: { detect: e.DETECT, candidate: e.CANDIDATE, rehearsal: e.REHEARSAL, edge: e.EDGE, wasi: e.WASI },
               candidate: release ? { release: e.REUSE || e.TESTED_RELEASE, sha256: e.REUSE_SHA256 || e.TESTED_SHA256 } : null,
               rehearsal: release ? { version: e.VERSION, license: 'MIT', node: '26.12.1', overlaySource: e.OVERLAY === 'true', record: 'npm-dist-linux-x64/linux-x64/npm-dist.json' } : null };
             require('node:fs').writeFileSync('manifest/release-checks.json', JSON.stringify(manifest, null, 2) + '\n');

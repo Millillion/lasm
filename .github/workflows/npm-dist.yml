@@ -6,6 +6,10 @@ name: npm distribution (local registry)
 # against registry.npmjs.org), and install and build from it in empty directories with an empty
 # Lasm tool cache, LASM_ARTIFACT_SOURCE=npm (no direct downloads) and a network
 # audit that blocks every non-loopback request. Nothing is published anywhere else.
+# The `edge` scenario builds every edge target from the edge runtime the CLI
+# bundles. With bun-deno (the default when called), Bun and Deno then install and
+# run the same packages from the same registry with no Node or npm on PATH
+# (scripts/edge/published-ci.mjs, LASM_PUBLISHED_REQUIRE=1: nothing may be skipped).
 #
 # The packed input is a retained candidate (its runtime, native helpers and bundled
 # installer dependencies). Release mode (the default since Phase 5.3) packs the
@@ -23,6 +27,7 @@ on:
       version: { type: string, default: '' }
       license: { type: string, default: '' }
       overlay-source: { type: boolean, default: false }
+      bun-deno: { type: boolean, default: true }
   workflow_dispatch:
     inputs:
       base-release:
@@ -49,6 +54,10 @@ on:
         description: Replace the candidate's bin/ and src/ with this ref's (maintainer test package)
         type: boolean
         default: false
+      bun-deno:
+        description: Also install and run the packages with Bun and Deno from the registry (needs a candidate with Bun/Deno support, 0.2.0 or later)
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -60,7 +69,7 @@ jobs:
     # The retained candidate is a draft release asset, readable only with write access.
     permissions:
       contents: write
-    timeout-minutes: 150
+    timeout-minutes: 240
     strategy:
       fail-fast: false
       matrix:
@@ -101,22 +110,43 @@ jobs:
           mkdir -p .work/npm-base
           gh release download "$BASE_RELEASE" --repo "$GITHUB_REPOSITORY" --dir .work/npm-base --pattern '*.tgz'
           node -e "const c=require('node:crypto'),f=require('node:fs'),[n]=f.readdirSync('.work/npm-base');const h=c.createHash('sha256').update(f.readFileSync('.work/npm-base/'+n)).digest('hex');if(h!==process.env.BASE_SHA256)throw new Error('candidate digest '+h);console.log(n,h)"
+      - name: Fetch the edge runtime archive from its tool release (also while a draft; checked by SHA-256 when packed)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .work/edge-seed
+          tag=$(node -p "const c=require('./src/edge-runtimes.json'),t=require('./src/toolchains.json'),e=c.lean[t.defaultLean];e?decodeURIComponent(new URL(e.url).pathname.split('/').at(-2)):''")
+          if [ -n "$tag" ]; then gh release download "$tag" --repo "$GITHUB_REPOSITORY" --dir .work/edge-seed --pattern '*.tar.zst'; fi
       - name: Build all packages (each step guarded; npm pack twice per package)
         env:
           OVERLAY: ${{ inputs.overlay-source && '--overlay-source' || '' }}
           CLI_VERSION: ${{ inputs.version }}
           CLI_LICENSE: ${{ inputs.license }}
-        run: node scripts/npm-dist/build-all.mjs --base .work/npm-base/*.tgz --out .work/npm-dist/build $OVERLAY ${CLI_VERSION:+--version "$CLI_VERSION"} ${CLI_LICENSE:+--license "$CLI_LICENSE"} --memory-mib 2048
+        run: node scripts/npm-dist/build-all.mjs --base .work/npm-base/*.tgz --out .work/npm-dist/build --seed .work/edge-seed $OVERLAY ${CLI_VERSION:+--version "$CLI_VERSION"} ${CLI_LICENSE:+--license "$CLI_LICENSE"} --memory-mib 2048
       - name: Start a loopback Verdaccio and publish to it
         run: |
           node scripts/npm-dist/registry.mjs start --dir "$RUNNER_TEMP/verdaccio" --port 4873
           node scripts/npm-dist/registry.mjs publish --dir "$RUNNER_TEMP/verdaccio" --dist .work/npm-dist/build --mirror-template hono
       - name: Install from the registry and build (empty caches, npm only, non-loopback requests blocked)
         run: |
-          for scenario in installed lake c-tier npx init create omit-optional foreign-lock; do
+          for scenario in installed lake c-tier edge npx init create omit-optional foreign-lock; do
             node scripts/full-lean/run-bounded.mjs --memory-mib "$MEMORY" --report ".work/npm-consumer-$scenario-resources.json" -- \
               node scripts/npm-dist/consumer.mjs --registry http://127.0.0.1:4873/ --dist .work/npm-dist/build --work "$RUNNER_TEMP/consumer" --scenario "$scenario"
           done
+      - name: Pinned Bun and Deno
+        if: inputs.bun-deno
+        run: npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
+      - name: Install and run from the registry with Bun and Deno (no Node or npm on PATH)
+        if: inputs.bun-deno
+        env:
+          npm_config_registry: http://127.0.0.1:4873/
+          LASM_PUBLISHED_REQUIRE: '1'
+          CI: '1'
+          BROWSER: 'false'
+          LEAN_NUM_THREADS: '2'
+          BINARYEN_CORES: '1'
+          LASM_BUILD_JOBS: '2'
+        run: node scripts/edge/published-ci.mjs "$RUNNER_TEMP/bun-deno" .work/host-tools "$(node -p "require('./.work/npm-dist/build/npm-dist.json').main.version")"
       - name: pnpm resolution
         continue-on-error: true
         run: |
@@ -130,6 +160,7 @@ jobs:
           mkdir -p ".work/upload/$PLATFORM"
           cp .work/npm-dist/build/npm-dist.json ".work/upload/$PLATFORM/" 2>/dev/null || true
           cp -R .work/npm-dist/build/resources ".work/upload/$PLATFORM/build-resources" 2>/dev/null || true
+          cp "$RUNNER_TEMP"/bun-deno/*.json ".work/upload/$PLATFORM/" 2>/dev/null || true
           cp .work/npm-consumer-*-resources.json "$RUNNER_TEMP"/consumer/*.json "$RUNNER_TEMP"/consumer/*.jsonl "$RUNNER_TEMP"/consumer/*.log ".work/upload/$PLATFORM/" 2>/dev/null || true
           cp "$RUNNER_TEMP/verdaccio/verdaccio.log" ".work/upload/$PLATFORM/" 2>/dev/null || true
           for f in "$RUNNER_TEMP"/consumer/report-*.json; do [ -f "$f" ] && { echo "### $PLATFORM $(basename "$f")"; echo '```json'; cat "$f"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"; done; true

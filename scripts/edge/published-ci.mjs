@@ -16,6 +16,11 @@
 // @lasm/cli yet (only the 0.0.0 placeholders). A release before 0.2.0 has no
 // Bun/Deno runtime support (src/js-runtime.mjs): Bun and Deno then only install
 // it, and the runtime checks are skipped with a notice.
+// Pre-release rehearsal (npm-dist.yml): with npm_config_registry set to the
+// loopback Verdaccio holding this commit's packages, Bun and Deno use that
+// registry (NPM_CONFIG_REGISTRY, BUN_CONFIG_REGISTRY), and with
+// LASM_PUBLISHED_REQUIRE=1 a missing release, missing @lasm/create or missing
+// Bun/Deno support fails instead of being skipped.
 //   node scripts/edge/published-ci.mjs WORK_DIR TOOLS_DIR [VERSION]
 import { execFileSync, spawnSync } from 'node:child_process';
 import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
@@ -33,7 +38,11 @@ mkdirSync(work, { recursive: true });
 const results = { platform: `${process.platform}-${process.arch}`, registry, steps: [] };
 const save = () => writeFileSync(join(work, 'published-results.json'), JSON.stringify(results, null, 2) + '\n');
 const summarize = text => { console.log(text); if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, text + '\n'); };
-const notice = text => { console.log(`::notice::${text}`); results.notices = [...(results.notices ?? []), text]; };
+const required = process.env.LASM_PUBLISHED_REQUIRE === '1';
+const notice = text => {
+  if (required) { console.error(`::error::${text} (LASM_PUBLISHED_REQUIRE=1)`); results.failed = [text]; save(); process.exit(1); }
+  console.log(`::notice::${text}`); results.notices = [...(results.notices ?? []), text];
+};
 
 // The release to test: the argument, else the `latest` dist-tag.
 const packument = async name => { const r = await fetch(registry + name.replace('/', '%2f'), { headers: { accept: 'application/json' } }); return r.ok ? r.json() : null; };
@@ -75,6 +84,19 @@ env[pathKey] = [shims, ...(env[pathKey] ?? '').split(delimiter).filter(dir => {
   return dir && !hasNode;
 })].join(delimiter);
 for (const key of Object.keys(env)) if (/^npm_/i.test(key)) delete env[key];
+// Another registry than npm's (the rehearsal's loopback Verdaccio): Bun, Deno and Lasm's
+// own registry fetch all use it.
+// The Linux resource guard passes only a few variables (HOME among them), so a private
+// HOME holds an .npmrc naming the registry too; Bun and Deno both read ~/.npmrc.
+if (registry !== 'https://registry.npmjs.org/') {
+  Object.assign(env, { NPM_CONFIG_REGISTRY: registry, BUN_CONFIG_REGISTRY: registry });
+  if (!windows) env.npm_config_registry = registry;
+  const home = join(work, 'home');
+  mkdirSync(home, { recursive: true });
+  writeFileSync(join(home, '.npmrc'), `registry=${registry}\n`);
+  env.HOME = home;
+  results.registryOverride = { home };
+}
 results.pathWithoutNode = removed;
 const denoAge = '--minimum-dependency-age=0';
 
