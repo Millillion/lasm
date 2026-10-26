@@ -99,7 +99,8 @@ values through the `env` argument of the fetch handler.
   download at build time, and its licences (`Apache-2.0`, `MIT`, `MIT OR NCSA`,
   `Apache-2.0 WITH LLVM-exception`) are already in the CLI's; its notices are in
   the package's `licenses/edge-runtime/`. A source checkout or a candidate
-  tarball fetches the same archive from the release instead. `LASM_EDGE_RUNTIME`
+  tarball fetches the same archive from the release instead, which needs that
+  release to be public (it is a draft until the owner publishes it). `LASM_EDGE_RUNTIME`
   is only an override. The archive also holds the Lasm.JS
   edge glue (`liblasmjsedge.a`) and the non-threaded system libraries.
   [`edge-runtime.yml`](../.github/workflows/edge-runtime.yml) builds and packs

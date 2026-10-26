@@ -157,9 +157,11 @@ not run; the trust step is untested until the real bootstrap.
 
 The edge runtime is not a tool package: `build.mjs` extracts its archive into
 `@lasm/cli` (`targets/<root>/`), downloading it from its release (`lean-4.35.0-edge-v1`,
-pinned in `src/edge-runtimes.json`) like every tool archive. That release must be
-public before `release-checks` runs (`edge-runtime.yml` with `draft-release` attaches
-the reproduced archive to a draft; publish the draft).
+pinned in `src/edge-runtimes.json`). `npm-dist.yml` and `release.yml` fetch that
+archive with `gh release download`, which also works while the release is a draft
+(`edge-runtime.yml` with `draft-release` attaches the reproduced archive to one), and
+pass it to `build-all.mjs --seed`, which checks its SHA-256. Source checkouts
+download the same archive over HTTPS, which needs the release to be public.
 
 Tool packages keep their version across Lasm releases (it follows the immutable
 release that published the archive, for example `4.35.0-lasm.1`), so a release

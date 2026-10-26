@@ -49,7 +49,7 @@ Lasm owns `workers/` and replaces it on every build. Requirements:
 - **The edge runtime.** It ships inside `@lasm/cli` (`targets/lean-4.35.0-wasm64-edge/`,
   about 1.7 MB of the package), so edge builds download nothing more. A source
   checkout fetches the release archive pinned in `src/edge-runtimes.json`
-  (tag `lean-4.35.0-edge-v1`), checked by SHA-256; `LASM_EDGE_RUNTIME` overrides
+  (tag `lean-4.35.0-edge-v1`, once that release is public), checked by SHA-256; `LASM_EDGE_RUNTIME` overrides
   both (CI uses the [`edge-runtime.yml`](../../.github/workflows/edge-runtime.yml) output).
 - **No Emscripten SDK.** The edge link runs on the Node link driver with the
   link toolchain that Node builds already download. The linked program is

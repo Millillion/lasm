@@ -110,12 +110,19 @@ jobs:
           mkdir -p .work/npm-base
           gh release download "$BASE_RELEASE" --repo "$GITHUB_REPOSITORY" --dir .work/npm-base --pattern '*.tgz'
           node -e "const c=require('node:crypto'),f=require('node:fs'),[n]=f.readdirSync('.work/npm-base');const h=c.createHash('sha256').update(f.readFileSync('.work/npm-base/'+n)).digest('hex');if(h!==process.env.BASE_SHA256)throw new Error('candidate digest '+h);console.log(n,h)"
+      - name: Fetch the edge runtime archive from its tool release (also while a draft; checked by SHA-256 when packed)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .work/edge-seed
+          tag=$(node -p "const c=require('./src/edge-runtimes.json'),t=require('./src/toolchains.json'),e=c.lean[t.defaultLean];e?decodeURIComponent(new URL(e.url).pathname.split('/').at(-2)):''")
+          if [ -n "$tag" ]; then gh release download "$tag" --repo "$GITHUB_REPOSITORY" --dir .work/edge-seed --pattern '*.tar.zst'; fi
       - name: Build all packages (each step guarded; npm pack twice per package)
         env:
           OVERLAY: ${{ inputs.overlay-source && '--overlay-source' || '' }}
           CLI_VERSION: ${{ inputs.version }}
           CLI_LICENSE: ${{ inputs.license }}
-        run: node scripts/npm-dist/build-all.mjs --base .work/npm-base/*.tgz --out .work/npm-dist/build $OVERLAY ${CLI_VERSION:+--version "$CLI_VERSION"} ${CLI_LICENSE:+--license "$CLI_LICENSE"} --memory-mib 2048
+        run: node scripts/npm-dist/build-all.mjs --base .work/npm-base/*.tgz --out .work/npm-dist/build --seed .work/edge-seed $OVERLAY ${CLI_VERSION:+--version "$CLI_VERSION"} ${CLI_LICENSE:+--license "$CLI_LICENSE"} --memory-mib 2048
       - name: Start a loopback Verdaccio and publish to it
         run: |
           node scripts/npm-dist/registry.mjs start --dir "$RUNNER_TEMP/verdaccio" --port 4873
