@@ -13,6 +13,7 @@ on:
       - 'templates/**'
       - 'library/**'
       - 'scripts/templates/**'
+      - 'scripts/serverless/**'
       - '.github/workflows/dx-dev-loop.yml'
 permissions:
   contents: read
@@ -83,5 +84,47 @@ jobs:
         with:
           name: dx-templates
           path: .work/templates.json
+          retention-days: 7
+          if-no-files-found: ignore
+  cold-start:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: packed-candidate
+          path: .work/node-candidate
+      - name: Enable the systemd user session (CPU quotas)
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Build hono, express and fastify apps
+        run: |
+          set -e
+          tgz="$PWD/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
+          mkdir -p "$RUNNER_TEMP/cs/cli" && cd "$RUNNER_TEMP/cs/cli" && npm install --no-save --no-audit --no-fund "$tgz"
+          for t in hono express fastify; do
+            node node_modules/@lasm/compiler/bin/lasm.mjs init "$RUNNER_TEMP/cs/$t" --template $t
+            (cd "$RUNNER_TEMP/cs/$t" && npm install -D --no-audit --no-fund "$tgz" && npm run build)
+          done
+      - name: Cold start under CPU quotas
+        run: node scripts/serverless/cold-start-cpu.mjs .work/cold-start.json --apps "hono=$RUNNER_TEMP/cs/hono/dist,express=$RUNNER_TEMP/cs/express/dist,fastify=$RUNNER_TEMP/cs/fastify/dist" --quotas 400,100,58,29 --runs 5 --variants 'default;LASM_THREAD_POOL=0;LASM_THREAD_POOL=1'
+      - name: Preserve the result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dx-cold-start
+          path: .work/cold-start.json
           retention-days: 7
           if-no-files-found: ignore

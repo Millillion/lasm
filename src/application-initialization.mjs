@@ -118,8 +118,16 @@ function fileUnits(file, graph) {
       if (names.has(name)) throw new Error(`Lean initializer ${name} is defined twice (${file}, ${file})`);
       names.add(name);
       const reached = reaches(name);
+      // A body that only calls other initializers (a module without closed
+      // terms or `initialize` declarations): planning probes can link a stub.
+      const trivial = !member && references.every(reference => {
+        const symbol = object.symbols[reference];
+        return symbol.kind === 0 && isInitializerUnit(symbol.name) || symbol.kind === 1 && ignoredData(symbol.name)
+          || symbol.kind === 0 && symbol.undefined && /^lean_/.test(symbol.name) && !hasExternalEffect(symbol.name) && !isForeignFunction(symbol.name)
+          || symbol.kind === 2 && ['__stack_pointer', '__memory_base', '__table_base', '__tls_base'].includes(symbol.name);
+      });
       units.push({ name, calls, data: [...data], initTargets: [...initTargets], reaches: reached.data, effects: reached.effects,
-        file, member, siblings: defined });
+        file, member, siblings: defined, ...(trivial ? { trivial } : {}) });
     }
   }
   return units;
@@ -277,17 +285,20 @@ export async function planInitializers({ objects, archives, probe, log = () => {
       return [file, { defined: new Set(symbols.filter(s => !s.undefined && !s.local && s.name).map(s => s.name)),
         used: symbols.filter(s => s.undefined && s.name).map(s => s.name) }];
     }));
-    const included = new Set(objects.filter(file => file !== exclude && skipped.some(name => units.get(name).file === file)));
+    const included = new Set(objects.filter(file => file !== exclude && skipped.some(name => units.get(name).file === file && !units.get(name).trivial)));
     for (const pending = [...included]; pending.length;) {
       const { used } = symbolTables.get(pending.pop());
       for (const [file, table] of symbolTables) if (file !== exclude && !included.has(file) && used.some(name => table.defined.has(name))) { included.add(file); pending.push(file); }
     }
     return objects.filter(file => !included.has(file));
   };
+  // Skipped trivial units of left-out objects: the probe links an equivalent stub.
+  const bodyStubs = excluded => trimBodies ? skipped.filter(name => excluded.includes(units.get(name).file) && units.get(name).file !== exclude)
+    .map(name => ({ name, calls: units.get(name).calls })) : [];
   const startBaseline = (excluded = exclude) => {
     const key = [excluded].flat().join('\0');
     if (!baselines.has(key)) {
-      const pending = probe(initializerWrappers(units, closure, { bodies: [], parts: initializerWrapperParts }), wrap, { bodies: true, exclude: excluded, kind: 'baseline' });
+      const pending = probe(initializerWrappers(units, closure, { bodies: [], parts: initializerWrapperParts }), wrap, { bodies: true, exclude: excluded, kind: 'baseline', stubs: Array.isArray(excluded) ? bodyStubs(excluded) : [] });
       pending.catch(() => {});
       baselines.set(key, pending);
     }
@@ -312,7 +323,7 @@ export async function planInitializers({ objects, archives, probe, log = () => {
     // Compare the skipped bodies alone with an empty program.
     const excluded = bodyExclude();
     const baselineRun = trimBodies ? startBaseline(excluded) : undefined;
-    const reached = await probe(initializerWrappers(units, closure, { bodies: skipped, parts: initializerWrapperParts }), wrap, { bodies: true, exclude: excluded, kind: 'reached' });
+    const reached = await probe(initializerWrappers(units, closure, { bodies: skipped, parts: initializerWrapperParts }), wrap, { bodies: true, exclude: excluded, kind: 'reached', stubs: Array.isArray(excluded) ? bodyStubs(excluded) : [] });
     baseline = trimBodies ? await baselineRun : baseline ?? await startBaseline();
     shared = [...reached.data].filter(symbol => mutable.has(symbol) && live.data.has(symbol) && !baseline.data.has(symbol));
     log(`Initialization plan: ${skipped.length} of ${closure.length} initializers skipped; ${shared.length} shared globals${shared.length ? ': ' + shared.slice(0, 40).join(' ') : ''}`);
