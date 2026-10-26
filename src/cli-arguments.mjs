@@ -8,7 +8,7 @@ import { parseDevArguments } from './browser/browser-dev.mjs';
 // installs or starts the platform's own tools.
 // Edge targets (experimental, docs/EDGE.md) relink for edge isolates; the
 // list equals src/edge/edge-build.mjs edgeTargets (test/edge.test.mjs).
-export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy'];
+export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy', 'supabase-edge'];
 // The browser (docs/BROWSER.md): the edge program as a static web app.
 export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, 'browser'];
 // --suspend (browser): none (the default: blocking waits stop the instance) or
@@ -16,7 +16,7 @@ export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuil
 export const suspendModes = ['none', 'jspi'];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|browser] [--suspend none|jspi] [--bundler] [--dev]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|browser] [--suspend none|jspi] [--bundler] [--dev]
        lasm dev [Main.lean] --target browser [--release] [--no-watch] [--port 5173]
        lasm init <directory> [--template plain|express|hono|std-http|web] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf

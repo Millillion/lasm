@@ -4,17 +4,29 @@
 // input-dependent values as placeholders, the emcc flags, the system libraries,
 // and every tool emcc ran, as argument templates. The Node recipe supplies the
 // compile section and the defaults the driver reads.
-//   node scripts/edge/derive-edge-recipe.mjs RECORDING_DIR EMCC_LOG OUT.json
-// RECORDING_DIR has temp/emscripten_temp/ (EMCC_TEMP_DIR) and out/link-args.json.
+//   node scripts/edge/derive-edge-recipe.mjs RECORDING_DIR EMCC_LOG OUT.json [--mode edge|edge-asyncify]
+// RECORDING_DIR has temp/emscripten_temp/ (EMCC_TEMP_DIR) and out/link-args.json
+// (scripts/edge/record-edge-link.mjs makes one). The mode is the JSPI link
+// (edge, the default) or the Asyncify link (edge-asyncify); an existing OUT.json
+// keeps its other mode.
 // scripts/edge/compare-edge-link.mjs checks a recipe: the Node driver must
 // produce emcc's bytes.
-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readSettingsDefaults } from '../../src/link-driver/settings.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
-const [recordingArg, logArg, outArg] = process.argv.slice(2);
+const argv0 = process.argv.slice(2);
+const modeAt = argv0.indexOf('--mode');
+const mode = modeAt < 0 ? 'edge' : argv0.splice(modeAt, 2)[1];
+// The settings each mode was recorded with (src/link-driver/glue.mjs checkSupportedSettings).
+const supportedByMode = {
+  edge: { MODULARIZE: 1, ASYNCIFY: 2, MAIN_MODULE: 0, MEMORY64: 2 },
+  'edge-asyncify': { MODULARIZE: 1, ASYNCIFY: 1, DYNCALLS: 1, MINIFY_WASM_IMPORTS_AND_EXPORTS: 1, MAIN_MODULE: 0, MEMORY64: 2 },
+};
+if (!supportedByMode[mode]) throw new Error(`Unknown recipe mode ${mode}`);
+const [recordingArg, logArg, outArg] = argv0;
 const recording = resolve(recordingArg), temp = join(recording, 'temp/emscripten_temp');
 const log = readFileSync(resolve(logArg), 'utf8');
 const base = JSON.parse(readFileSync(join(root, 'src/link-driver/recipe-emscripten-6.0.9.json'), 'utf8'));
@@ -51,7 +63,7 @@ for (const command of executed) {
       const flags = argv.slice(pass ? 3 : 2).filter((arg, i, all) => arg !== '-o' && all[i - 1] !== '-o');
       if (pass === 'emitDCEGraph') pipeline.push({ kind: 'dce-graph', program: 'node', pass, minify: true,
         args: ['<emscripten>/tools/acorn-optimizer.mjs', '<info>', pass, ...flags] });
-      else if (pass === 'applyDCEGraphRemovals') pipeline.push({ kind: 'acorn', program: 'node', pass, minify: true,
+      else if (pass === 'applyDCEGraphRemovals' || pass === 'applyImportAndExportNameChanges') pipeline.push({ kind: 'acorn', program: 'node', pass, minify: true,
         args: ['<emscripten>/tools/acorn-optimizer.mjs', '<info>', pass, ...flags, '-o', '<js-out>'] });
       else if (pass) pipeline.push({ kind: 'acorn', program: 'node', pass, minify: true,
         args: ['<emscripten>/tools/acorn-optimizer.mjs', '<js>', pass, ...flags, '-o', '<js-out>'] });
@@ -88,7 +100,9 @@ for (const command of executed) {
     pipeline.push({ kind: 'wasm-ld', program: 'wasm-ld', args: template });
   } else if (program === 'llvm-objcopy') pipeline.push({ kind: 'strip', program: 'llvm-objcopy',
     args: argv.map(arg => arg === wasm ? '<wasm>' : arg) });
-  else if (program === 'wasm-opt') pipeline.push({ kind: 'wasm-opt', program: 'wasm-opt', args: features(argv.map(arg => arg === wasm ? '<wasm>' : arg)) });
+  else if (program === 'wasm-opt') pipeline.push({ kind: argv.some(arg => arg.startsWith('--minify-imports')) ? 'minify-names' : 'wasm-opt',
+    program: 'wasm-opt', args: features(argv.map(arg => arg === wasm ? '<wasm>' : arg)) });
+  else if (program === 'wasm-emscripten-finalize') pipeline.push({ kind: 'finalize', program, args: argv.map(arg => arg === wasm ? '<wasm>' : arg) });
   else if (program === 'wasm-metadce') {
     const metadce = { kind: 'metadce', program: 'wasm-metadce', args: features(argv.map(arg => arg === wasm ? '<wasm>' : arg.startsWith('--graph-file=') ? '--graph-file=<graph>' : arg)) };
     // The DCE graph step's removals follow the metadce run in the pipeline.
@@ -96,8 +110,9 @@ for (const command of executed) {
   } else if (!/clang/.test(program)) throw new Error(`Unrecorded tool ${program}`);
 }
 const order = pipeline.map(step => step.kind).join(' ');
-if (order !== 'symbols wasm-ld strip glue wasm-opt acorn dce-graph metadce acorn acorn modularize')
-  throw new Error(`Unexpected edge pipeline: ${order}`);
+const expectedOrder = { edge: 'symbols wasm-ld strip glue wasm-opt acorn dce-graph metadce acorn acorn modularize',
+  'edge-asyncify': 'symbols wasm-ld strip finalize glue wasm-opt acorn dce-graph metadce acorn acorn minify-names acorn modularize' }[mode];
+if (order !== expectedOrder) throw new Error(`Unexpected ${mode} pipeline: ${order}`);
 
 const settings = JSON.parse(readFileSync(join(temp, 'emcc-00-settings.json'), 'utf8'));
 const libraryFile = settings.JS_LIBRARIES.at(-1);
@@ -108,13 +123,21 @@ for (const [key, value] of Object.entries(settings))
 const libraries = pipeline.find(step => step.kind === 'wasm-ld').args.filter(arg => /^-l/.test(arg)).map(arg => `lib${arg.slice(2)}.a`);
 // The defaults of every setting the driver may read: the SDK's own defaults.
 const defaults = readSettingsDefaults(emscripten);
+// Both modes share one recipe file: the system libraries must agree (the edge
+// runtime package carries one set, scripts/edge/build-edge-extras.mjs).
+const existing = existsSync(resolve(outArg)) ? JSON.parse(readFileSync(resolve(outArg), 'utf8')) : null;
+const modes = { ...(existing?.link.modes ?? {}) };
+modes[mode] = { output: '.mjs', supported: supportedByMode[mode], emccFlags, settings, pipeline };
+const known = existing?.sysroot.libraries ?? libraries;
+if (existing && (known.length !== libraries.length || known.some(name => !libraries.includes(name))))
+  throw new Error(`The ${mode} link uses other system libraries than the recipe's: ${libraries.join(' ')}`);
 const recipe = { schema: base.schema, kind: base.kind, emscripten: base.emscripten, sdk: base.sdk,
   recordedFrom: { platform: `${process.platform}-${process.arch}`, node: process.version, by: 'scripts/edge/derive-edge-recipe.mjs' },
   compile: base.compile,
-  sysroot: { libraries, usedBy: Object.fromEntries(libraries.map(name => [name, ['edge']])),
+  sysroot: { libraries: known, usedBy: Object.fromEntries(known.map(name => [name, ['edge']])),
     source: 'the edge runtime package (scripts/edge/build-edge-extras.mjs)' },
   link: { systemLibraryDirectory: 'wasm64-emscripten', nativeSigs: base.link.nativeSigs, settingsDefaults: defaults,
-    modes: { edge: { output: '.mjs', supported: { MODULARIZE: 1, ASYNCIFY: 2, MAIN_MODULE: 0, MEMORY64: 2 }, emccFlags, settings, pipeline } } },
+    modes: Object.fromEntries(Object.keys(supportedByMode).filter(name => modes[name]).map(name => [name, modes[name]])) },
   toolchain: base.toolchain };
 writeFileSync(resolve(outArg), JSON.stringify(recipe, null, 1) + '\n');
 console.log(JSON.stringify({ order, libraries, flags: emccFlags.length, settings: Object.keys(settings).length }));

@@ -366,6 +366,13 @@ export function assembleGlue(settings, metadata, compilerOutput, { asmConsts, em
   if (pairs.length || truthy(settings.get('MAIN_MODULE'))) pre += 'var ASM_CONSTS = {\n  ' + pairs.join(',  \n ') + '\n};\n';
   if (emJsFuncs.length) pre += emJsFuncs.join('\n') + '\n';
   const otherExports = metadata.otherExports.filter(([entry]) => !isInternalGlobal(entry.name));
+  // ASYNCIFY=1: the asyncify pass (run later by wasm-opt) adds these exports;
+  // emscript adds them to the metadata's function exports, which the
+  // pointer-conversion wrappers and the sending list read too.
+  if (Number(settings.get('ASYNCIFY')) === 1) {
+    for (const [name, params] of [['asyncify_start_unwind', [Type.I32]], ['asyncify_stop_unwind', []],
+      ['asyncify_start_rewind', [Type.I32]], ['asyncify_stop_rewind', []]]) metadata.functionExports.set(name, { params, returns: [] });
+  }
   const module = createModule(settings, metadata, { functionExports: metadata.functionExports, otherExports,
     librarySymbols: forwarded.librarySymbols, aliases: forwarded.nativeAliases, extraJsExports, nativeSigs });
   settings.set('ALIASES', Object.keys(forwarded.nativeAliases));

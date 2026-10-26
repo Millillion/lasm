@@ -19,13 +19,14 @@ var WebAssembly = (() => {
 })();
 Module.lasmEdge = (() => {
   const INT64_MIN = -(2n ** 63n);
-  // Whether Lean may suspend: Asyncify builds (ASYNCIFY=1, whose Asyncify has
-  // no JSPI makeAsyncFunction; it is defined after this pre-js runs, so it is
-  // checked at call time), or JSPI where the engine has it and the embedder
-  // allows it.
-  const asyncify = () => typeof Asyncify !== 'undefined' && typeof Asyncify.makeAsyncFunction !== 'function';
-  const engineJspi = WebAssembly === globalThis.WebAssembly && typeof WebAssembly.Suspending === 'function' && !!Module.lasmEdgeJspi;
-  const suspends = () => engineJspi || asyncify();
+  // Whether Lean may suspend: Asyncify builds (ASYNCIFY=1, whose Asyncify
+  // object has currData), or JSPI where the engine has it and the embedder
+  // allows it (WebAssembly is this module's own, above). Checked when first
+  // needed: this pre-JS runs before the module defines Asyncify (a hoisted
+  // var, still undefined here).
+  let suspendable;
+  const jspi = () => suspendable ??= typeof Asyncify !== 'undefined' && 'currData' in Asyncify
+    || WebAssembly === globalThis.WebAssembly && typeof WebAssembly.Suspending === 'function' && !!Module.lasmEdgeJspi;
   let host, response = null, waking = null;
   // Pending host calls, innermost last (Lean's waits nest on its one stack).
   const pendingCalls = [];
@@ -53,7 +54,7 @@ Module.lasmEdge = (() => {
     return { error: true, bytes: bytes.subarray(0, 16 + written) };
   };
   const length = result => { const n = BigInt(result.bytes.length); return result.error ? -n - 1n : n; };
-  const canSuspend = () => suspends() && state === 'running' && syncDepth === 0;
+  const canSuspend = () => jspi() && state === 'running' && syncDepth === 0;
   // Runs one Lean entry: a promising export returns a promise, a plain one its value.
   function enter(run) {
     if (poisoned) throw poisoned;
@@ -64,13 +65,13 @@ Module.lasmEdge = (() => {
     try { result = run(); } catch (failure) { throw poison(failure, sp); }
     // Asyncify builds: an export that unwound (Lean waits) returns at once;
     // its completion is Asyncify.whenDone().
-    if (asyncify() && Asyncify.currData) result = Asyncify.whenDone();
+    if (typeof Asyncify !== 'undefined' && Asyncify.currData) result = Asyncify.whenDone();
     if (result && typeof result.then === 'function')
       return result.then(value => { done(); return value; }, failure => { throw poison(failure, sp); });
     done(); return result;
   }
   const controller = {
-    get jspi() { return suspends(); },
+    get jspi() { return jspi(); },
     attach(h) { host = h; },
     onStop(listener) { listeners.push(listener); },
     get stopped() { return poisoned; },
@@ -99,8 +100,8 @@ Module.lasmEdge = (() => {
         // operations (IO.sleep, file reads, …) cannot report it, so they stop
         // the instance with the reason.
         if (operation < 200 || operation > 219)
-          throw new Error(`Lean host operation ${operation} must wait, and this Lean code cannot suspend (${suspends() ? 'inside a synchronous JavaScript callback' : 'this Lean instance runs without JSPI'})`);
-        result = hostError(`Lean host operation ${operation} completes asynchronously and cannot be waited for here (${suspends() ? 'inside a synchronous JavaScript callback' : 'this Lean instance runs without JSPI'}); await it in Async instead`);
+          throw new Error(`Lean host operation ${operation} must wait, and this Lean code cannot suspend (${jspi() ? 'inside a synchronous JavaScript callback' : 'this Lean instance runs without JSPI'})`);
+        result = hostError(`Lean host operation ${operation} completes asynchronously and cannot be waited for here (${jspi() ? 'inside a synchronous JavaScript callback' : 'this Lean instance runs without JSPI'}); await it in Async instead`);
       }
       response = result;
       return length(result);

@@ -186,6 +186,12 @@ if (args.step === 'package') {
   console.log(`packed ${pkg.name}@${pkg.version} ${packed.size} bytes ${packed.integrity}`);
 }
 
+/** README.md for npm: newlines normalized, relative links to github.com at tag v<version>. */
+function publishedReadme(text, version) {
+  return text.replaceAll('\r\n', '\n').replace(/\]\(((?!https?:|#|mailto:)[^)]+)\)/g,
+    (_, path) => `](https://github.com/Millillion/lasm/blob/v${version}/${path})`);
+}
+
 if (args.step === 'main') {
   const packed = {};
   for (const pkg of plan.packages) packed[pkg.name] = await json(join(out, 'packed', pkg.name.replace('/', '__') + '.json'));
@@ -222,6 +228,9 @@ if (args.step === 'main') {
   let mainMeta = plan.main;
   if (plan.main.license) {
     await copyFile(join(root, 'LICENSE'), join(main, 'LICENSE'));
+    // The published README is this checkout's (npm shows it), not the candidate's
+    // "install this tarball" text; repository links point at the release tag.
+    await writeFile(join(main, 'README.md'), publishedReadme(await readFile(join(root, 'README.md'), 'utf8'), plan.main.version));
     const licenses = join(main, 'licenses'), headings = [];
     const sections = async (file, prefix) => {
       for (const [heading, text] of noticeSections(await readFile(file, 'utf8'))) {

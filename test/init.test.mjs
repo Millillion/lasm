@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseLasmArguments } from '../src/cli-arguments.mjs';
-import { initProject, lakeName, packageName, templates } from '../src/init.mjs';
+import { initProject, lakeName, packageName, supabaseFunctionNameOf, templates } from '../src/init.mjs';
 
 test('lasm init arguments', () => {
   assert.deepEqual(parseLasmArguments(['init', 'my-app']), { command: 'init', template: 'plain', deploy: [], directory: 'my-app' });
@@ -12,8 +12,8 @@ test('lasm init arguments', () => {
   assert.deepEqual(parseLasmArguments(['init', '-t=std-http', 'x', '--deploy', 'lambda']), { command: 'init', template: 'std-http', deploy: ['lambda'], directory: 'x' });
   assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'lambda']), /needs a server template/);
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel', '--deploy', 'lambda-zip', '--deploy', 'vercel']).deploy, ['vercel', 'lambda-zip']);
-  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy/);
-  // Cloudflare Workers (experimental edge build): the Hono template only.
+  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
+  // Cloudflare Workers (edge build): the Hono template only.
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=workers']).deploy, ['workers']);
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'workers']), /--deploy workers supports the hono template, not express/);
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy', 'vercel-edge', '--deploy', 'netlify-edge', '--deploy', 'workers']).deploy, ['vercel-edge', 'netlify-edge', 'workers']);
@@ -82,7 +82,7 @@ test('every template creates a complete project', () => {
     for (const text of ['lambda.zip', 'lambda-edge.zip', '.vercel/output', 'netlify/functions/lasm', 'func start', 'gcloud functions deploy', "platform's own CLI"])
       assert.ok(notes.includes(text), text);
     assert.match(readFileSync(join(functions, '.gitignore'), 'utf8'), /^\.vercel\/$/m);
-    // Edge targets (experimental): build scripts, platform files, and the Node server left out of the edge build.
+    // Edge targets: build scripts, platform files, and the Node server left out of the edge build.
     const edge = join(root, 'edge');
     const edgeFiles = initProject({ directory: edge, template: 'hono', deploy: ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy'] }).files;
     for (const file of ['wrangler.toml', 'vercel.json', 'netlify.toml', 'public/lasm.txt']) assert.ok(edgeFiles.includes(file), file);
@@ -99,6 +99,17 @@ test('every template creates a complete project', () => {
     assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /## Bun and Deno/);
     assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^bun\/$/m);
     assert.equal(readFileSync(join(edge, '.gitignore'), 'utf8').match(/^deno\/$/gm).length, 1);
+    // Supabase Edge Functions: config.toml, the build script and the ignored function directory.
+    const supabase = join(root, 'Supa App');
+    const supabaseFiles = initProject({ directory: supabase, template: 'hono', deploy: ['supabase-edge'] }).files;
+    assert.ok(supabaseFiles.includes('supabase/config.toml'));
+    const supabaseConfig = readFileSync(join(supabase, 'supabase/config.toml'), 'utf8');
+    assert.match(supabaseConfig, /^\[functions\.supa-app\]\nverify_jwt = true\nimport_map = "\.\/functions\/supa-app\/deno\.json"$/m);
+    assert.equal(JSON.parse(readFileSync(join(supabase, 'package.json'), 'utf8')).scripts['build:supabase-edge'], 'lasm build Main.lean --target supabase-edge');
+    assert.match(readFileSync(join(supabase, '.gitignore'), 'utf8'), /^supabase\/functions\/supa-app\/$/m);
+    assert.match(readFileSync(join(supabase, 'README.md'), 'utf8'), /npx supabase functions deploy supa-app --project-ref PROJECT_REF/);
+    assert.equal(supabaseFunctionNameOf('supa-app'), 'supa-app');
+    assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'supabase-edge']), /--deploy supabase-edge supports the hono template/);
     initProject({ directory: join(root, 'express-app'), template: 'express' });
     const expressPkg = JSON.parse(readFileSync(join(root, 'express-app', 'package.json'), 'utf8'));
     assert.ok(!expressPkg.scripts['dev:bun'] && !expressPkg.lasm, 'Express needs Node');

@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { once } from 'node:events';
-import { recoverDarwinSample } from '../scripts/full-lean/darwin-monitor-recovery.mjs';
+import { recoverDarwinSample, consecutiveRecoveries } from '../scripts/full-lean/darwin-monitor-recovery.mjs';
 
 const timeout = () => Object.assign(new Error('spawnSync /bin/ps ETIMEDOUT'), { code: 'ETIMEDOUT' });
 function fixture() {
@@ -34,15 +34,26 @@ test('persistent accounting failure, unsafe memory and excessive pauses kill wit
     assert.equal(f.recoveries[0].recovered, false);
   }
 });
-test('recovery refuses unaccounted or detached work, non-timeouts and more than three recoveries', () => {
-  for (const kind of ['initial', 'detached', 'other-error', 'too-many']) {
+test('recovery refuses unaccounted or detached work, non-timeouts and too many recoveries', () => {
+  for (const kind of ['initial', 'detached', 'other-error', 'too-many', 'lifetime']) {
     const f = fixture(), error = kind === 'other-error' ? new Error('invalid accounting') : timeout();
     if (kind === 'initial') f.previousProcesses = undefined;
     if (kind === 'detached') f.previousProcesses = [{ group: 456 }];
-    if (kind === 'too-many') f.recoveries.push({}, {}, {});
+    if (kind === 'too-many') f.recoveries.push({ followedBySample: true }, {}, {}, {});
+    if (kind === 'lifetime') f.recoveries.push(...Array.from({ length: 30 }, () => ({ followedBySample: true })));
     assert.throws(() => recoverDarwinSample(error, f), e => e === error);
     assert.deepEqual(f.signals, []);
   }
+});
+
+test('recoveries separated by ordinary samples do not accumulate toward the consecutive cap', () => {
+  const f = fixture();
+  f.recoveries.push(...Array.from({ length: 5 }, () => ({ recovered: true, followedBySample: true })), { recovered: true }, { recovered: true });
+  assert.equal(consecutiveRecoveries(f.recoveries), 2);
+  recoverDarwinSample(timeout(), f);
+  assert.equal(f.recoveries.at(-1).recovered, true);
+  assert.equal(consecutiveRecoveries(f.recoveries), 3);
+  assert.throws(() => recoverDarwinSample(timeout(), f));
 });
 
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
