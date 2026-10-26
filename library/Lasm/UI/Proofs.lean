@@ -12,7 +12,7 @@ Lasm.UI's diff is proved correct against the DOM model (Lasm.UI.Model).
 * `diffAttrs_correct`: the attribute diff.
 
 What is modelled (and so outside the theorem): that the binary encoding
-(Lasm.UI.Encode) and the JavaScript applier (src/browser/ui-dom.mjs) implement
+(Lasm.UI.Encode) and the JavaScript applier (src/lasm-modules/ui-dom.mjs) implement
 `applyOps` (tested, not proved), and that the DOM behaves as the model.
 
 Proof files: Proofs/Basic (unfolding, `WF`, `create`, attributes),

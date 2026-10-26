@@ -241,7 +241,7 @@ Never run browsers locally on the desktop (no headed browsers, no `open`).
 
 - `library/Lasm/Web/…` — web platform bindings.
 - `library/Lasm/UI/…` — `Html`, attributes, events, `diff`, the patch encoder,
-  `App`, `Cmd`, `Sub`, router, `html!` syntax, SSR, proofs.
+  `App`, `Cmd`, `Subs`, router, `html!` syntax, SSR, proofs.
 - `library/Lasm/RPC.lean` — shared API definitions and adapters.
 - `src/edge/` (existing) and `src/browser/` — the browser entry, loader and
   `lasm:ui-dom` applier.

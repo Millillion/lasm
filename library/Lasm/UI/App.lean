@@ -1,7 +1,7 @@
 /-
 The Elm architecture in the browser: `init`, a pure `update`, a pure `view`
 and `subscriptions`. `App.run` connects the app to the `lasm:ui-dom` applier
-(src/browser/ui-dom.mjs) of the element it is mounted on. Events reach Lean as
+(src/lasm-modules/ui-dom.mjs) of the element it is mounted on. Events reach Lean as
 one synchronous call each (the applier encodes the fields the handler's
 decoder declared); messages update the model; on the next animation frame
 Lean renders the view, diffs it against the live tree and returns one binary

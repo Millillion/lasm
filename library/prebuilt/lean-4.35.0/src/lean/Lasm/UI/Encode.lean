@@ -1,5 +1,5 @@
 /-
-The binary patch stream read by the `lasm:ui-dom` applier (src/browser/ui-dom.mjs).
+The binary patch stream read by the `lasm:ui-dom` applier (src/lasm-modules/ui-dom.mjs).
 Format (docs/BROWSER.md, "Patch protocol"): unsigned LEB128 integers, strings as
 a byte length and UTF-8 bytes. Names (tags, attribute, property, style and event
 names) are interned: a name is `0` + string (added to
