@@ -21,6 +21,7 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
+import { emscriptenResponseFile } from '../link-driver/link.mjs';
 import { lowerAtomics, moduleImports, keepExports } from './lower-atomics.mjs';
 import { componentize, httpHandlerExport } from './wasi-component.mjs';
 
@@ -98,7 +99,13 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
     '-mwasm64', '--no-entry', '--stack-first', '-z', `stack-size=${settings.stackMiB * MiB}`,
     `--initial-memory=${settings.initialMiB * MiB}`, `--max-memory=${settings.maximumMiB * MiB}`, '--table-base=1'];
   writeFileSync(join(out, 'link-args.json'), JSON.stringify({ target, settings, args: linkArgs }, null, 1) + '\n');
-  run('wasm-ld', linkArgs);
+  // Windows limits a command line to 32,767 characters, which the inputs of a
+  // larger program exceed (ENAMETOOLONG): pass them in a response file there.
+  if (process.platform === 'win32') {
+    const responseFile = join(out, 'wasm-ld.rsp');
+    writeFileSync(responseFile, emscriptenResponseFile(linkArgs, 'win32'));
+    run('wasm-ld', ['@' + responseFile]);
+  } else run('wasm-ld', linkArgs);
 
   // 3. Atomics to plain memory instructions.
   const lowered = join(out, 'lowered.wasm');
