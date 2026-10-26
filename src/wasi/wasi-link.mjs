@@ -43,7 +43,7 @@ const inputFeatures = ['--enable-bulk-memory', '--enable-bulk-memory-opt', '--en
 /** Import modules each target's program may use. */
 export const allowedImportModules = Object.freeze({
   wasi: ['wasi_snapshot_preview1'],
-  fastly: ['wasi_snapshot_preview1', 'fastly_abi', 'fastly_http_req', 'fastly_http_body', 'fastly_http_resp'],
+  fastly: ['wasi_snapshot_preview1', 'fastly_abi', 'fastly_http_req', 'fastly_http_body', 'fastly_http_resp', 'fastly_async_io'],
 });
 
 const readResponse = file => readFileSync(file, 'utf8').split('\n').filter(Boolean).map(line => line.slice(1, -1).replace(/\\(.)/g, '$1'));
