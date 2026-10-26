@@ -104,6 +104,15 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     nodes.delete(n.$i);
     for (let c = n.firstChild; c; c = c.nextSibling) forget(c);
   }
+  // Removed subtrees leave the id table after the frame is painted (a clear of
+  // 1,000 rows otherwise walks 12,000 nodes before the paint). Ids are never
+  // reused, so a late removal cannot hit a new node.
+  let doomed = [], sweeping = false;
+  function sweep() { sweeping = false; const list = doomed; doomed = []; for (const d of list) forget(d); }
+  function forgetLater(n) {
+    doomed.push(n);
+    if (!sweeping) { sweeping = true; setTimeout(sweep, 0); }
+  }
   const at = id => { const n = nodes.get(id); if (!n) throw new Error(`Lasm.UI: no node ${id}`); return n; };
   function apply(frame) {
     bytes = frame; p = 0;
@@ -124,8 +133,14 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
         break;
       }
       case 2: { const parent = at(v()), n = at(v()), b = v(); parent.insertBefore(n, b ? at(b - 1) : null); break; }
-      case 3: { const n = at(v()); forget(n); n.remove(); break; }
-      case 4: { const parent = at(v()); for (let c = parent.firstChild; c; c = c.nextSibling) forget(c); parent.textContent = ''; break; }
+      case 3: { const n = at(v()); nodes.delete(n.$i); if (n.firstChild) forgetLater(n); n.remove(); break; }
+      case 4: {
+        const parent = at(v());
+        const kids = [...parent.childNodes];
+        parent.textContent = '';
+        for (const c of kids) { nodes.delete(c.$i); if (c.firstChild) forgetLater(c); }
+        break;
+      }
       case 5: { const n = at(v()); n.data = str(); break; }
       case 6: { const n = at(v()); for (let c = v(); c > 0; c--) attr(n, bytes[p++]); break; }
       case 7: {
@@ -285,10 +300,11 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
       root.removeEventListener('click', onLinkClick);
       win.removeEventListener('popstate', urlChanged);
       for (let c = root.firstChild; c; c = c.nextSibling) forget(c);
+      doomed = [];
       root.textContent = '';
     },
     // For tests and tools.
-    stats: () => ({ nodes: nodes.size - 1, names: names.length, decoders: decoders.length, last: { ...last } }),
+    stats: () => (sweep(), { nodes: nodes.size - 1, names: names.length, decoders: decoders.length, last: { ...last } }),
     applyForTest: apply,
   };
 }
