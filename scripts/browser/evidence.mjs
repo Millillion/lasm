@@ -28,7 +28,7 @@ const record = {
   schema: 1, kind: 'browser-ci', run: process.env.RUN_ID ?? null, source: process.env.SOURCE ?? null, recordedAt: new Date().toISOString(),
   build: { platform: build.platform, node: build.node, rebuild: build.rebuild,
     apps: Object.fromEntries(Object.entries(build.apps).map(([name, app]) => [name, { buildSeconds: app.buildSeconds, unchangedSeconds: app.unchangedSeconds,
-      transfer: app.transfer, entry: { file: app.entry, ...app.files[app.entry] }, wasm: { file: app.wasm, ...app.files[app.wasm] } }])) },
+      transfer: app.transfer, entry: { file: app.entry, ...app.files?.[app.entry] }, wasm: { file: app.wasm, ...app.files?.[app.wasm] } }])) },
   engines: engines.map(e => ({ engine: e.engine, platform: e.platform, version: e.browserVersion,
     checks: Object.values(e.apps).reduce((n, a) => n + (a.checks?.length ?? 0), 0), failures: e.failures,
     start: Object.fromEntries(Object.entries(e.apps).map(([name, a]) => [name, a.start])),
