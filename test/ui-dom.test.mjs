@@ -1,14 +1,14 @@
-// The lasm:ui-dom applier (src/browser/ui-dom.mjs) against a DOM implementation
+// The lasm:ui-dom applier (src/lasm-modules/ui-dom.mjs) against a DOM implementation
 // (happy-dom): the patch frames Lean's diff and encoder write
 // (test/fixtures/ui/patches.json, from test/ui/Fixtures.lean) must produce the
 // DOM of each view; hydration must adopt server-rendered nodes; events must be
-// delegated with the declared fields; subscriptions, ports and navigation must
-// reach Lean.
+// delegated with the declared fields; subscriptions and navigation must reach
+// Lean.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Window } from 'happy-dom';
-import { createUi } from '../src/browser/ui-dom.mjs';
+import { createUi, lasmInstance, connect } from '../src/lasm-modules/ui-dom.mjs';
 
 const scenarios = JSON.parse(readFileSync(new URL('./fixtures/ui/patches.json', import.meta.url), 'utf8'));
 const unhex = h => Uint8Array.from(h.match(/../g) ?? [], b => parseInt(b, 16));
@@ -119,7 +119,7 @@ test('frames are batched on animation frames and subscriptions fire', async () =
   let frames = 0;
   const subs = [];
   ui.module.connect({ frame: () => { frames++; return new Uint8Array(0); }, sub: (id, values) => { subs.push([id, values]); return true; },
-    receive: v => { subs.push(['receive', v]); return false; }, url: href => { subs.push(['url', href]); return false; }, application: true });
+    url: href => { subs.push(['url', href]); return false; }, application: true });
   ui.module.schedule(); ui.module.schedule();
   await new Promise(r => window.requestAnimationFrame(r));
   await new Promise(r => window.requestAnimationFrame(r));
@@ -127,18 +127,9 @@ test('frames are batched on animation frames and subscriptions fire', async () =
   ui.module.sub(7, ['window', 'resize', [['currentTarget', 'innerWidth']], false, false]);
   window.dispatchEvent(new window.Event('resize'));
   assert.deepEqual(subs.at(-1), [7, [window.innerWidth]]);
-  ui.module.sub(8, ['port', 'inbox']);
-  ui.ports.inbox.send({ a: 1 });
-  assert.deepEqual(subs.at(-1), [8, [{ a: 1 }]]);
-  ui.module.unsub(8);
-  ui.ports.inbox.send(2);
-  assert.deepEqual(subs.at(-1), [8, [{ a: 1 }]]);
-  const out = [];
-  ui.ports.outbox.subscribe(v => out.push(v));
-  ui.module.portOut('outbox', 'hi');
-  assert.deepEqual(out, ['hi']);
-  ui.send(42);
-  assert.deepEqual(subs.at(-1), ['receive', 42]);
+  ui.module.unsub(7);
+  window.dispatchEvent(new window.Event('resize'));
+  assert.equal(subs.length, 1);
   ui.module.navigate('/posts/3?x=1', false);
   assert.equal(window.location.href, 'https://app.test/posts/3?x=1');
   assert.deepEqual(subs.at(-1), ['url', 'https://app.test/posts/3?x=1']);
@@ -164,4 +155,17 @@ test('same-origin link clicks navigate in place when the app routes', () => {
   root.querySelector('#out').dispatchEvent(outside);
   assert.equal(outside.defaultPrevented, false);
   assert.deepEqual(urls, ['https://app.test/about']);
+});
+
+test('one instance per mounted app; other targets get a stand-in', () => {
+  const a = page(), b = page();
+  const disposers = [];
+  const ia = lasmInstance({ root: a.root, flags: 1, onDispose: f => disposers.push(f) });
+  const ib = lasmInstance({ root: b.root, flags: 2, onDispose: f => disposers.push(f) });
+  assert.notEqual(ia, ib);
+  assert.equal(ia.options().flags, 1);
+  assert.equal(ib.options().flags, 2);
+  assert.throws(() => lasmInstance({ root: null }).options(), /run in the browser/);
+  assert.throws(() => connect({}), /run in the browser/);
+  assert.equal(disposers.length, 2);
 });

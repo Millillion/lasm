@@ -4,12 +4,9 @@
 // the mount root (one synchronous call into Lean per event, carrying only the
 // fields each handler's decoder declared), batches renders on animation
 // frames, adopts server-rendered DOM (hydrate), and performs the commands and
-// subscriptions Lean asks for. One instance per mounted app:
-//
-//   const ui = createUi({ root, flags, hydrate })
-//   modules['lasm:ui-dom'] = ui.module      // what Lean's App.run requires
-//   ui.ready                                // resolves after the first frame
-//   ui.ports.name.send(v) / .subscribe(f)   ui.send(v)   ui.unmount()
+// subscriptions Lean asks for (library/Lasm/UI/App.lean binds these exports).
+// Each mounted app gets its own instance (lasmInstance); ports and app.send
+// go through lasm:app. Web-standard JavaScript only.
 const NS = [, 'http://www.w3.org/1999/xhtml', 'http://www.w3.org/2000/svg', 'http://www.w3.org/1998/Math/MathML'];
 const decoder = new TextDecoder();
 
@@ -19,10 +16,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   const names = [], decoders = [];
   const listening = new Set();
   const subs = new Map();
-  const portSubscribers = new Map(), portIn = new Map();
   let lean = null, pending = false, stopped = false, hydrating = hydrate, focusQueue = [];
-  let readyResolve, readyReject;
-  const ready = new Promise((resolve, reject) => { readyResolve = resolve; readyReject = reject; });
   const raf = win.requestAnimationFrame ? f => win.requestAnimationFrame(f) : f => setTimeout(() => f(performance.now()), 16);
   const cancelRaf = win.cancelAnimationFrame ? h => win.cancelAnimationFrame(h) : h => clearTimeout(h);
 
@@ -214,21 +208,6 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     if (url.href !== win.location.href) { win.history.pushState(null, '', url.href); urlChanged(); }
   }
 
-  // ---- ports ----
-  const port = portName => {
-    let pt = portIn.get(portName);
-    if (!pt) {
-      pt = {
-        send(value) { const ids = [...subs].filter(([, s]) => s.port === portName).map(([id]) => id); for (const id of ids) fire(id, [value]); },
-        subscribe(f) { (portSubscribers.get(portName) ?? portSubscribers.set(portName, new Set()).get(portName)).add(f); },
-        unsubscribe(f) { portSubscribers.get(portName)?.delete(f); },
-      };
-      portIn.set(portName, pt);
-    }
-    return pt;
-  };
-  const ports = new Proxy({}, { get: (_, key) => typeof key === 'string' ? port(key) : undefined });
-
   // ---- subscriptions ----
   const fire = (id, values) => { if (!stopped && lean && subs.has(id)) after(lean.sub(id, values)); };
   function subscribe(id, spec) {
@@ -250,7 +229,6 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
       sub.stop = () => target.removeEventListener(type, handler);
       break;
     }
-    case 'port': sub.port = spec[1]; break;
     default: throw new Error(`Lasm.UI: unknown subscription ${kind}`);
     }
     subs.set(id, sub);
@@ -266,7 +244,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
         win.addEventListener('popstate', urlChanged);
       }
     },
-    apply(frameBytes) { if (frameBytes.length) apply(frameBytes); readyResolve(); },
+    apply(frameBytes) { if (frameBytes.length) apply(frameBytes); },
     schedule,
     error(message) { console.error(`[lasm:ui] ${message}`); },
     sub: subscribe,
@@ -288,13 +266,10 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     storageRemove(which, key) { try { storage(which).removeItem(key); } catch { /* storage unavailable */ } },
     storageGet(which, key) { try { return storage(which).getItem(key); } catch { return null; } },
     focus(id, blur) { if (pending) focusQueue.push([id, blur]); else { const el = doc.getElementById(id); if (el) blur ? el.blur() : el.focus(); } },
-    portOut(portName, value) { for (const f of portSubscribers.get(portName) ?? []) f(value); },
     title(t) { doc.title = t; },
   };
   return {
-    module, ready, ports,
-    fail: readyReject,
-    send(value) { if (lean) after(lean.receive(value)); },
+    module,
     unmount() {
       stopped = true;
       for (const s of subs.values()) s.stop();
@@ -310,3 +285,22 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     applyForTest: apply,
   };
 }
+
+/** One instance per mounted app (src/edge/edge-start.mjs): its root element,
+ * flags and hydrate option come from mount(). */
+export function lasmInstance(context) {
+  if (!context.root) return standIn;
+  const ui = createUi({ root: context.root, flags: context.flags, hydrate: context.hydrate });
+  context.onDispose?.(() => ui.unmount());
+  return ui.module;
+}
+
+// What builds for other targets (and Lasm's binding check) see.
+const browserOnly = name => () => {
+  throw new Error(`lasm:ui-dom ${name}: Lasm.UI apps run in the browser; build with lasm build --target browser and mount the app (docs/UI.md)`);
+};
+const standIn = {};
+for (const name of ['options', 'connect', 'apply', 'schedule', 'error', 'sub', 'unsub', 'timeout', 'http', 'now', 'navigate', 'go',
+  'load', 'storageSet', 'storageRemove', 'storageGet', 'focus', 'title']) standIn[name] = browserOnly(name);
+export const { options, connect, apply, schedule, error, sub, unsub, timeout, http, now, navigate, go, load,
+  storageSet, storageRemove, storageGet, focus, title } = standIn;

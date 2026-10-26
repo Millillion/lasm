@@ -27,18 +27,18 @@ structure SubItem (Msg : Type) where
   spec : SubSpec
   handle : Array Lasm.JS.Data → Option Msg
 
-structure Sub (Msg : Type) where
+structure Subs (Msg : Type) where
   items : List (SubItem Msg) := []
 
-namespace Sub
+namespace Subs
 
-def none : Sub Msg := {}
-instance : Inhabited (Sub Msg) := ⟨none⟩
-instance : Append (Sub Msg) := ⟨fun a b => ⟨a.items ++ b.items⟩⟩
+def none : Subs Msg := {}
+instance : Inhabited (Subs Msg) := ⟨none⟩
+instance : Append (Subs Msg) := ⟨fun a b => ⟨a.items ++ b.items⟩⟩
 
-def batch (subs : List (Sub Msg)) : Sub Msg := ⟨subs.flatMap (·.items)⟩
+def batch (subs : List (Subs Msg)) : Subs Msg := ⟨subs.flatMap (·.items)⟩
 
-def map (f : α → β) (s : Sub α) : Sub β :=
+def map (f : α → β) (s : Subs α) : Subs β :=
   ⟨s.items.map fun i => { spec := i.spec, handle := fun vs => (i.handle vs).map f }⟩
 
 /-- An event value as a decoder sees it. -/
@@ -56,37 +56,37 @@ private def number : Array Lasm.JS.Data → Float
   | _ => 0
 
 /-- Every `ms` milliseconds, with the time (`Date.now()`). -/
-def every (ms : Nat) (f : Float → Msg) : Sub Msg := ⟨[{ spec := .every ms, handle := fun vs => some (f (number vs)) }]⟩
+def every (ms : Nat) (f : Float → Msg) : Subs Msg := ⟨[{ spec := .every ms, handle := fun vs => some (f (number vs)) }]⟩
 
 /-- Every animation frame, with its timestamp (`requestAnimationFrame`). -/
-def onAnimationFrame (f : Float → Msg) : Sub Msg := ⟨[{ spec := .frame, handle := fun vs => some (f (number vs)) }]⟩
+def onAnimationFrame (f : Float → Msg) : Subs Msg := ⟨[{ spec := .frame, handle := fun vs => some (f (number vs)) }]⟩
 
 /-- An event on `window`, decoded. -/
-def onWindow (event : String) (d : Decoder Msg) (preventDefault stopPropagation : Bool := false) : Sub Msg :=
+def onWindow (event : String) (d : Decoder Msg) (preventDefault stopPropagation : Bool := false) : Subs Msg :=
   ⟨[{ spec := .window event d.paths preventDefault stopPropagation, handle := fun vs => d.run (vs.toList.map evVal) }]⟩
 
 /-- An event on `document`, decoded. -/
-def onDocument (event : String) (d : Decoder Msg) (preventDefault stopPropagation : Bool := false) : Sub Msg :=
+def onDocument (event : String) (d : Decoder Msg) (preventDefault stopPropagation : Bool := false) : Subs Msg :=
   ⟨[{ spec := .document event d.paths preventDefault stopPropagation, handle := fun vs => d.run (vs.toList.map evVal) }]⟩
 
-def onKeyDown (d : Decoder Msg) : Sub Msg := onDocument "keydown" d
-def onKeyUp (d : Decoder Msg) : Sub Msg := onDocument "keyup" d
-def onMouseMove (d : Decoder Msg) : Sub Msg := onDocument "mousemove" d
-def onMouseUp (d : Decoder Msg) : Sub Msg := onDocument "mouseup" d
-def onClick (d : Decoder Msg) : Sub Msg := onDocument "click" d
+def onKeyDown (d : Decoder Msg) : Subs Msg := onDocument "keydown" d
+def onKeyUp (d : Decoder Msg) : Subs Msg := onDocument "keyup" d
+def onMouseMove (d : Decoder Msg) : Subs Msg := onDocument "mousemove" d
+def onMouseUp (d : Decoder Msg) : Subs Msg := onDocument "mouseup" d
+def onClick (d : Decoder Msg) : Subs Msg := onDocument "click" d
 
 /-- Window size changes, with `innerWidth` and `innerHeight`. -/
-def onResize (f : Float → Float → Msg) : Sub Msg :=
+def onResize (f : Float → Float → Msg) : Subs Msg :=
   onWindow "resize" (Decoder.map2 f (Decoder.float ["currentTarget", "innerWidth"]) (Decoder.float ["currentTarget", "innerHeight"]))
 
 /-- `document.visibilityState` changes (`"visible"` or `"hidden"`). -/
-def onVisibilityChange (f : String → Msg) : Sub Msg :=
+def onVisibilityChange (f : String → Msg) : Subs Msg :=
   onDocument "visibilitychange" ((Decoder.string ["currentTarget", "visibilityState"]).map f)
 
 /-- Values sent from JavaScript through the port `name`. -/
-def port (name : String) (f : Lasm.JS.Data → Option Msg) : Sub Msg :=
+def port (name : String) (f : Lasm.JS.Data → Option Msg) : Subs Msg :=
   ⟨[{ spec := .port name, handle := fun vs => if h : 0 < vs.size then f vs[0] else f .undefined }]⟩
 
-end Sub
+end Subs
 
 end Lasm.UI

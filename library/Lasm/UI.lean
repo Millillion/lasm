@@ -10,7 +10,7 @@ import Lasm.UI.Elements
 import Lasm.UI.Diff
 import Lasm.UI.Encode
 import Lasm.UI.Cmd
-import Lasm.UI.Sub
+import Lasm.UI.Subs
 import Lasm.UI.Url
 import Lasm.UI.App
 import Lasm.UI.Render

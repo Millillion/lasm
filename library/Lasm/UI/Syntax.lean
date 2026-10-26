@@ -25,24 +25,11 @@ This module only runs while Lean elaborates (it imports Lean's parser); Lasm's
 initializer planning keeps it out of the Wasm program.
 -/
 import Lean.Parser
+import Lean.Elab.SyntheticMVars
 import Lasm.UI.Html
 import Lasm.UI.Elements
 
 namespace Lasm.UI
-
-/-- Values `{term}` can be as children in `html!`: views, lists, arrays and
-options of views, and strings and numbers (text nodes). -/
-class ToChildren (α : Type) (Msg : Type) where
-  toChildren : α → List (Html Msg)
-
-instance : ToChildren (Html Msg) Msg := ⟨fun h => [h]⟩
-instance : ToChildren (List (Html Msg)) Msg := ⟨id⟩
-instance : ToChildren (Array (Html Msg)) Msg := ⟨Array.toList⟩
-instance : ToChildren (Option (Html Msg)) Msg := ⟨fun | some h => [h] | none => []⟩
-instance : ToChildren String Msg := ⟨fun s => [.text s]⟩
-instance : ToChildren Nat Msg := ⟨fun n => [.text (toString n)]⟩
-instance : ToChildren Int Msg := ⟨fun n => [.text (toString n)]⟩
-instance : ToChildren Float Msg := ⟨fun n => [.text (toString n)]⟩
 
 /-- Attribute values given as `{term}`. -/
 class ToAttrValue (α : Type) where
@@ -52,14 +39,6 @@ instance : ToAttrValue String := ⟨id⟩
 instance : ToAttrValue Nat := ⟨toString⟩
 instance : ToAttrValue Int := ⟨toString⟩
 instance : ToAttrValue Float := ⟨toString⟩
-
-/-- Attribute lists spliced with `{attrs}`. -/
-class ToAttrs (α : Type) (Msg : Type) where
-  toAttrs : α → List (Attr Msg)
-
-instance : ToAttrs (Attr Msg) Msg := ⟨fun a => [a]⟩
-instance : ToAttrs (List (Attr Msg)) Msg := ⟨id⟩
-instance : ToAttrs (Option (Attr Msg)) Msg := ⟨fun | some a => [a] | none => []⟩
 
 /-- Inline styles from `style={[("color", "red")]}`. -/
 def stylesOf (l : List (String × String)) : List (Attr Msg) := l.map fun (n, v) => .style n v
@@ -116,6 +95,66 @@ syntax (name := childElement) jsxElement : jsxChild
 
 /-- JSX-like markup for `Html Msg` (see `Lasm.UI.Syntax`). -/
 syntax (name := htmlTerm) "html!" jsxElement : term
+
+/-- The children `{t}` stands for in `html!`: `t` is an `Html Msg`, a list,
+array or option of them, a `String` (a text node) or a number. -/
+syntax (name := childrenTerm) "lasm_children% " term:max : term
+/-- The attributes `{t}` stands for in `html!`: an `Attr Msg`, a list or an option of them. -/
+syntax (name := attrsTerm) "lasm_attrs% " term:max : term
+
+open Elab Term Meta in
+/-- Elaborates `t`, then fits it to `List (Html Msg)` (children) or `List (Attr Msg)`
+(attributes) by its type, so the message type flows from the context into
+nested `html!` and lambdas. -/
+def elabSplice (kind : Name) (t : Syntax) (expected? : Option Expr) : TermElabM Expr := do
+  let msg ← match expected? with
+    | some e =>
+      let e ← whnfR (← instantiateMVars e)
+      if e.isAppOfArity ``List 1 then
+        let inner ← whnfR (← instantiateMVars e.appArg!)
+        if inner.isAppOfArity kind 1 then pure inner.appArg! else mkFreshTypeMVar
+      else mkFreshTypeMVar
+    | none => mkFreshTypeMVar
+  let elemTy := mkApp (mkConst kind) msg
+  let listTy ← mkAppM ``List #[elemTy]
+  let e ← elabTerm t none
+  synthesizeSyntheticMVars (postpone := .yes)
+  let ty ← whnfR (← instantiateMVars (← inferType e))
+  -- Not known yet (a lambda's parameter): wait until it is.
+  if ty.getAppFn.isMVar then tryPostpone
+  let fail {α} : TermElabM α := do
+    let what := if kind == ``Lasm.UI.Html then "children must be an Html, a list, array or option of Html, a String or a number"
+      else "attributes must be an Attr, a list or an option of Attr"
+    throwErrorAt t m!"html!: this has type{indentExpr ty}\n{what}"
+  match ty.getAppFn.constName? with
+  | some c =>
+    if c == kind then
+      unless ← isDefEq ty elemTy do fail
+      mkListLit elemTy [e]
+    else if c == ``List then
+      unless ← isDefEq ty listTy do fail
+      return e
+    else if c == ``Array then
+      unless ← isDefEq ty (← mkAppM ``Array #[elemTy]) do fail
+      mkAppM ``Array.toList #[e]
+    else if c == ``Option then
+      unless ← isDefEq ty (← mkAppM ``Option #[elemTy]) do fail
+      mkAppM ``Option.toList #[e]
+    else if kind == ``Lasm.UI.Html && c == ``String then
+      mkListLit elemTy [mkApp2 (mkConst ``Lasm.UI.Html.text) msg e]
+    else if kind == ``Lasm.UI.Html && (c == ``Nat || c == ``Int || c == ``Float || c == ``Char) then
+      mkListLit elemTy [mkApp2 (mkConst ``Lasm.UI.Html.text) msg (← mkAppM ``toString #[e])]
+    else fail
+  | none =>
+    if ← isDefEq ty listTy then return e else fail
+
+open Elab Term in
+@[term_elab childrenTerm] def elabChildren : TermElab := fun stx expected? =>
+  elabSplice ``Lasm.UI.Html stx[1] expected?
+
+open Elab Term in
+@[term_elab attrsTerm] def elabAttrs : TermElab := fun stx expected? =>
+  elabSplice ``Lasm.UI.Attr stx[1] expected?
 
 def nameOf (stx : Syntax) : String :=
   match stx with
@@ -193,7 +232,7 @@ def lowerFirst (s : String) : String :=
 /-- The terms for one attribute, and the key if it is `key`. -/
 def expandAttr (a : Syntax) : MacroM (Option Term × Option Term) := do
   match a with
-  | `(jsxAttr| { $t:term }) => return (some (← `(Lasm.UI.ToAttrs.toAttrs $t)), none)
+  | `(jsxAttr| { $t:term }) => return (some (← `(lasm_attrs% $t)), none)
   | `(jsxAttr| $n:jsxName) =>
     let name := nameOf n
     if let some p := boolProps.lookup name then
@@ -303,7 +342,7 @@ partial def expandChild (ns : Ns) (c : Syntax) : MacroM (Option Term) := do
     let s := decodeEntities (jsxWhitespace (nameOf t))
     if s.isEmpty || s == " " then return none
     return some (← `([Lasm.UI.Html.text $(quote s)]))
-  | `(jsxChild| { $t:term }) => return some (← `(Lasm.UI.ToChildren.toChildren $t))
+  | `(jsxChild| { $t:term }) => return some (← `(lasm_children% $t))
   | `(jsxChild| $e:jsxElement) => return some (← `([$(← expandElement ns e)]))
   | _ => Macro.throwErrorAt c "unsupported child"
 end

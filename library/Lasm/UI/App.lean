@@ -10,10 +10,12 @@ here through the same module.
 -/
 import Std.Data.HashMap
 import Lasm.JS.Core
+import Lasm.JS.Meta
+import Lasm.Web.App
 import Lasm.UI.Diff
 import Lasm.UI.Encode
 import Lasm.UI.Cmd
-import Lasm.UI.Sub
+import Lasm.UI.Subs
 import Lasm.UI.Url
 
 namespace Lasm.UI
@@ -25,12 +27,12 @@ structure App (Flags Model Msg : Type) where
   init : Flags → Url → Model × Cmd Msg
   update : Msg → Model → Model × Cmd Msg
   view : Model → Html Msg
-  subscriptions : Model → Sub Msg := fun _ => .none
+  subscriptions : Model → Subs Msg := fun _ => .none
   /-- Single-page navigation: when set, clicks on same-origin links inside the
   app, `Cmd.pushUrl`/`replaceUrl` and the back and forward buttons change the
   URL without loading a page and deliver this message. -/
   onUrlChange : Option (Url → Msg) := none
-  /-- Messages from `app.send(value)` in JavaScript. -/
+  /-- Messages from `app.send(value)` in JavaScript (the app `mount` returns). -/
   receive : Option (Data → Option Msg) := none
 
 /-- An app with no effects: a model, a pure update and a view. -/
@@ -41,13 +43,35 @@ def App.sandbox (init : Model) (update : Msg → Model → Model) (view : Model 
 
 /-- An app with commands and subscriptions but no routing. -/
 def App.element (init : Flags → Model × Cmd Msg) (update : Msg → Model → Model × Cmd Msg)
-    (view : Model → Html Msg) (subscriptions : Model → Sub Msg := fun _ => .none) : App Flags Model Msg where
+    (view : Model → Html Msg) (subscriptions : Model → Subs Msg := fun _ => .none) : App Flags Model Msg where
   init flags _ := init flags
   update := update
   view := view
   subscriptions := subscriptions
 
 namespace Runtime
+
+-- The exports of `lasm:ui-dom` (src/lasm-modules/ui-dom.mjs), per mounted app.
+namespace Dom
+@[js "lasm:ui-dom" "options"] opaque options : IO Data
+@[js "lasm:ui-dom" "connect"] opaque connect : Data → IO Unit
+@[js "lasm:ui-dom" "apply"] opaque apply : ByteArray → IO Unit
+@[js "lasm:ui-dom" "schedule"] opaque schedule : IO Unit
+@[js "lasm:ui-dom" "error"] opaque error : String → IO Unit
+@[js "lasm:ui-dom" "sub"] opaque sub : Nat → Data → IO Unit
+@[js "lasm:ui-dom" "unsub"] opaque unsub : Nat → IO Unit
+@[js "lasm:ui-dom" "timeout"] opaque timeout : Nat → Value → IO Unit
+@[js "lasm:ui-dom" "http"] opaque http : String → String → Data → Option String → String → Value → IO Unit
+@[js "lasm:ui-dom" "now"] opaque now : IO Float
+@[js "lasm:ui-dom" "navigate"] opaque navigate : String → Bool → IO Unit
+@[js "lasm:ui-dom" "go"] opaque go : Int → IO Unit
+@[js "lasm:ui-dom" "load"] opaque load : String → IO Unit
+@[js "lasm:ui-dom" "storageSet"] opaque storageSet : String → String → String → IO Unit
+@[js "lasm:ui-dom" "storageRemove"] opaque storageRemove : String → String → IO Unit
+@[js "lasm:ui-dom" "storageGet"] opaque storageGet : String → String → IO (Option String)
+@[js "lasm:ui-dom" "focus"] opaque focus : String → Bool → IO Unit
+@[js "lasm:ui-dom" "title"] opaque title : String → IO Unit
+end Dom
 
 structure State (Model Msg : Type) where
   model : Model
@@ -62,6 +86,8 @@ structure State (Model Msg : Type) where
   subs : Std.HashMap SubSpec Nat := {}
   handlers : Std.HashMap Nat (List (Array Data → Option Msg)) := {}
   nextSub : Nat := 1
+  /-- Ports whose values are delivered (`Subs.port`); a port stays listened to. -/
+  ports : List String := []
 
 /-- The live nodes along a path of ids from the root. -/
 def findPath (live : List (Live Msg)) : List Nat → Array (Live Msg) → Array (Live Msg)
@@ -96,13 +122,12 @@ def storageName : Storage → String
 /-- What the runtime's functions share. -/
 structure Ctx (Flags Model Msg : Type) where
   app : App Flags Model Msg
-  ui : Value
   ref : IO.Ref (State Model Msg)
 
 variable {Flags Model Msg : Type}
 
-def report (c : Ctx Flags Model Msg) (what : String) (e : IO.Error) : IO Unit := do
-  discard <| (c.ui.callMethod "error" #[.string s!"{what}: {e}"] Unit).toBaseIO
+def report (what : String) (e : IO.Error) : IO Unit := do
+  discard <| (Dom.error s!"{what}: {e}").toBaseIO
 
 /-- Requests a frame now if the model changed and none is requested; true if
 the caller (the applier, which made this call) should schedule it. -/
@@ -114,10 +139,11 @@ def takeFrame (c : Ctx Flags Model Msg) : IO Bool := do
   return false
 
 def requestFrame (c : Ctx Flags Model Msg) : IO Unit := do
-  if ← takeFrame c then c.ui.callMethod "schedule" #[] Unit
+  if ← takeFrame c then Dom.schedule
 
+mutual
 /-- Starts and stops subscriptions so they match `subscriptions model`. -/
-def syncSubs (c : Ctx Flags Model Msg) : IO Unit := do
+partial def syncSubs (c : Ctx Flags Model Msg) : IO Unit := do
   let s ← c.ref.get
   let items := (c.app.subscriptions s.model).items
   let mut wanted : Std.HashMap SubSpec (List (Array Data → Option Msg)) := {}
@@ -129,7 +155,7 @@ def syncSubs (c : Ctx Flags Model Msg) : IO Unit := do
   for (spec, sid) in s.subs do
     unless wanted.contains spec do
       subs := subs.erase spec
-      c.ui.callMethod "unsub" #[toJS sid] Unit
+      unless spec matches .port _ do Dom.unsub sid
   for (spec, hs) in wanted do
     match subs[spec]? with
     | some sid => handlers := handlers.insert sid hs.reverse
@@ -138,10 +164,11 @@ def syncSubs (c : Ctx Flags Model Msg) : IO Unit := do
       nextSub := nextSub + 1
       subs := subs.insert spec sid
       handlers := handlers.insert sid hs.reverse
-      c.ui.callMethod "sub" #[toJS sid, specData spec] Unit
+      match spec with
+      | .port name => if !(← c.ref.get).ports.contains name then listenPort c name
+      | _ => Dom.sub sid (specData spec)
   c.ref.modify fun s => { s with subs, handlers, nextSub }
 
-mutual
 /-- Queues `msg` and, unless an update is running, runs `update` on every queued
 message, performing their commands, then updates the subscriptions. -/
 partial def deliver (c : Ctx Flags Model Msg) (msg : Msg) : IO Unit := do
@@ -156,7 +183,7 @@ partial def deliver (c : Ctx Flags Model Msg) (msg : Msg) : IO Unit := do
         let (model, cmd) := c.app.update m s.model
         c.ref.set { s with model, queue := s.queue.extract 1 s.queue.size, dirty := true }
         for e in cmd.effects do
-          try perform c e catch err => report c "a command failed" err
+          try perform c e catch err => report "a command failed" err
       else break
     syncSubs c
   finally
@@ -164,12 +191,11 @@ partial def deliver (c : Ctx Flags Model Msg) (msg : Msg) : IO Unit := do
 
 /-- Performs one effect through the applier's module. -/
 partial def perform (c : Ctx Flags Model Msg) (e : Effect Msg) : IO Unit := do
-  let ui := c.ui
   match e with
   | .msg m => deliver c m
   | .delay ms m =>
     let f ← Function.ofSyncFn fun _ => do deliver c m; return .bool (← takeFrame c)
-    ui.callMethod "timeout" #[toJS ms, toJS f] Unit
+    Dom.timeout ms f
   | .http r h =>
     let f ← Function.ofSyncFn fun args => do
       let res : Except String Http.Response := match args with
@@ -180,20 +206,30 @@ partial def perform (c : Ctx Flags Model Msg) (e : Effect Msg) : IO Unit := do
         | _ => .error "malformed response"
       deliver c (h res)
       return .bool (← takeFrame c)
-    ui.callMethod "http" #[.string r.method, .string r.url,
-      toJS (r.headers.map fun (k, v) => #[k, v]).toArray, toJS r.body, .string r.credentials, toJS f] Unit
+    Dom.http r.method r.url (toJS (r.headers.map fun (k, v) => #[k, v]).toArray) r.body r.credentials f
   | .randomBytes n h => deliver c (h (← IO.getRandomBytes n.toUSize))
-  | .now h => deliver c (h (← ui.callMethod "now" #[] Float))
-  | .navigate u replace => ui.callMethod "navigate" #[.string u, .bool replace] Unit
-  | .go n => ui.callMethod "go" #[toJS n] Unit
-  | .load u => ui.callMethod "load" #[.string u] Unit
-  | .storageSet st k v => ui.callMethod "storageSet" #[.string (storageName st), .string k, .string v] Unit
-  | .storageRemove st k => ui.callMethod "storageRemove" #[.string (storageName st), .string k] Unit
-  | .storageGet st k h => deliver c (h (← ui.callMethod "storageGet" #[.string (storageName st), .string k] (Option String)))
-  | .focus i blur => ui.callMethod "focus" #[.string i, .bool blur] Unit
-  | .port name v => ui.callMethod "portOut" #[.string name, v] Unit
-  | .title t => ui.callMethod "title" #[.string t] Unit
+  | .now h => deliver c (h (← Dom.now))
+  | .navigate u replace => Dom.navigate u replace
+  | .go n => Dom.go n
+  | .load u => Dom.load u
+  | .storageSet st k v => Dom.storageSet (storageName st) k v
+  | .storageRemove st k => Dom.storageRemove (storageName st) k
+  | .storageGet st k h => deliver c (h (← Dom.storageGet (storageName st) k))
+  | .focus i blur => Dom.focus i blur
+  | .port name v => (← Lasm.Web.App.port name).send v
+  | .title t => Dom.title t
   | .io run => run fun m => do deliver c m; requestFrame c
+
+/-- Delivers the values JavaScript sends through port `name` (`app.ports[name].send`)
+to the current `Subs.port` handlers. -/
+partial def listenPort (c : Ctx Flags Model Msg) (name : String) : IO Unit := do
+  c.ref.modify fun s => { s with ports := name :: s.ports }
+  (← Lasm.Web.App.port name).subscribe fun v => do
+    let s ← c.ref.get
+    if let some sid := s.subs[SubSpec.port name]? then
+      for h in s.handlers.getD sid [] do
+        if let some m := h #[v] then deliver c m
+      requestFrame c
 end
 
 /-- One frame: the patch from the live tree to the current view (empty if the
@@ -223,7 +259,7 @@ def onEvent (c : Ctx Flags Model Msg) (args : Array Data) : IO Data := do
     if let (.number depth, .array vals) := (calls[i]!, calls[i+1]!) then
       if let some (.elem _ _ _ _ attrs _) := nodes[depth.toUInt64.toNat]? then
         if let some h := handlerFor type attrs then
-          if let some m := h (vals.toList.map Sub.evVal) then msgs := msgs.push m
+          if let some m := h (vals.toList.map Subs.evVal) then msgs := msgs.push m
     i := i + 2
   for m in msgs do deliver c m
   return .bool (← takeFrame c)
@@ -243,13 +279,11 @@ open Lasm.UI.Runtime in
 (`def main : IO Unit := app.run`); it returns once the first frame is on
 screen, and the app then runs on events. -/
 def App.run [FromJS Flags] (app : App Flags Model Msg) : IO Unit := do
-  let ui ← try require "lasm:ui-dom" catch _ =>
-    throw (IO.userError "Lasm.UI apps run in the browser: build with lasm build --target browser and mount the app (docs/UI.md)")
-  let options : Data ← ui.callMethod "options" #[] Data
+  let options ← Dom.options
   let flags ← decodeAs Flags "the app's flags" (options.field "flags")
   let url := (match options.field "url" with | .string s => Url.parse s | _ => none).getD {}
   let (model, cmd₀) := app.init flags url
-  let c : Ctx Flags Model Msg := { app, ui, ref := ← IO.mkRef { model } }
+  let c : Ctx Flags Model Msg := { app, ref := ← IO.mkRef { model } }
   let frameFn ← Function.ofSyncFn fun _ => do return .bytes (← frame c)
   let eventFn ← Function.ofSyncFn (onEvent c)
   let subFn ← Function.ofSyncFn (onSub c)
@@ -257,18 +291,18 @@ def App.run [FromJS Flags] (app : App Flags Model Msg) : IO Unit := do
     if let (some f, some (Data.string href)) := (app.onUrlChange, args[0]?) then
       if let some u := Url.parse href then deliver c (f u)
     return .bool (← takeFrame c)
-  let receiveFn ← Function.ofSyncFn fun args => do
-    if let some f := app.receive then
-      if let some m := f (args[0]?.getD .undefined) then deliver c m
-    return .bool (← takeFrame c)
-  ui.callMethod "connect" #[obj [("frame", toJS frameFn), ("event", toJS eventFn), ("sub", toJS subFn),
-    ("url", toJS urlFn), ("receive", toJS receiveFn), ("application", .bool app.onUrlChange.isSome)]] Unit
+  if let some f := app.receive then
+    Lasm.Web.App.onMessage fun d => do
+      if let some m := f d then deliver c m
+      requestFrame c
+  Dom.connect (obj [("frame", toJS frameFn), ("event", toJS eventFn), ("sub", toJS subFn),
+    ("url", toJS urlFn), ("application", .bool app.onUrlChange.isSome)])
   -- The first frame, synchronously; then the initial command (its messages
   -- are queued while it runs and delivered after it).
-  ui.callMethod "apply" #[.bytes (← frame c)] Unit
+  Dom.apply (← frame c)
   c.ref.modify fun s => { s with busy := true }
   for e in cmd₀.effects do
-    try perform c e catch err => report c "a command failed" err
+    try perform c e catch err => report "a command failed" err
   c.ref.modify fun s => { s with busy := false }
   let s ← c.ref.get
   if h : 0 < s.queue.size then

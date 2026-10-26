@@ -18,7 +18,7 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   'Lasm.Web.Types', 'Lasm.Web.Dom', 'Lasm.Web.Events', 'Lasm.Web.Timers', 'Lasm.Web.Fetch', 'Lasm.Web.Url', 'Lasm.Web.Storage',
   'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework, with its proofs.
-  'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Sub',
+  'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
   'Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.Proofs.Children', 'Lasm.UI.Proofs.TwoEnded',
   'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs'];
