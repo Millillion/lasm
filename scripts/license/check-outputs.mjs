@@ -1,7 +1,8 @@
 // Licence check of built Lasm outputs (docs/LICENSE_AUDIT.md §11, docs/LICENSING.md).
-//   node scripts/license/check-outputs.mjs DIRECTORY… [--expect node,edge,browser,wasi,fastly,wasi-http] [--report FILE]
+//   node scripts/license/check-outputs.mjs DIRECTORY… [--expect node,edge,browser,vite,wasi,fastly,wasi-http] [--report FILE]
 // Finds every Lasm output under the directories (Node dist/ and edge/WASI
-// outputs by build-info.json, browser outputs by lasm-manifest.json) and checks:
+// outputs by build-info.json, browser outputs by lasm-manifest.json, Vite builds
+// that CI marks with { generator: 'vite' }) and checks:
 //   - THIRD_PARTY_NOTICES.txt is there, starts with Lasm's notices, carries
 //     Lasm's MIT licence and Lean's Apache-2.0 licence, and has no GNU MP section
 //     or GNU licence text (no copyleft component is linked);
@@ -29,7 +30,8 @@ export function findOutputs(root) {
   for (const file of walk(resolve(root))) {
     const directory = resolve(file, '..');
     if (file.endsWith('/lasm-manifest.json') || file.endsWith('\\lasm-manifest.json')) {
-      try { if (JSON.parse(read(file, 'utf8')).target === 'browser') outputs.push({ directory, kind: 'browser' }); } catch { /* not ours */ }
+      // CI marks a Vite build's output with { generator: 'vite', target: 'browser' }.
+      try { const m = JSON.parse(read(file, 'utf8')); if (m.target === 'browser') outputs.push({ directory, kind: m.generator === 'vite' ? 'vite' : 'browser' }); } catch { /* not ours */ }
     } else if (/[\\/](?:lasm-)?build-info\.json$/.test(file)) {
       let info;
       try { info = JSON.parse(read(file, 'utf8')); } catch { continue; }
@@ -49,8 +51,9 @@ const wasmFromModule = text => {
 /** Problems with one output ([] when it complies). */
 export function checkOutput({ directory, kind }) {
   const problems = [];
-  const noticesFile = join(directory, 'THIRD_PARTY_NOTICES.txt');
-  if (!existsSync(noticesFile)) return ['no THIRD_PARTY_NOTICES.txt'];
+  const noticesName = kind === 'vite' ? 'THIRD_PARTY_NOTICES.lasm.txt' : 'THIRD_PARTY_NOTICES.txt';
+  const noticesFile = join(directory, noticesName);
+  if (!existsSync(noticesFile)) return [`no ${noticesName}`];
   const notices = read(noticesFile, 'utf8');
   if (!notices.startsWith('THIRD-PARTY AND LASM NOTICES\n')) problems.push('THIRD_PARTY_NOTICES.txt was not written by Lasm');
   for (const [what, pattern] of [['Lasm\'s MIT licence', /\n=== Lasm ===\nMIT License\n\nCopyright \(c\) 2026 Jordan Last\n/],
@@ -76,6 +79,10 @@ export function checkOutput({ directory, kind }) {
     const manifest = JSON.parse(read(join(directory, 'lasm-manifest.json'), 'utf8'));
     const entry = read(join(directory, manifest.entry), 'utf8');
     if (!/^\/\/ [^\n]*\n\/\*! [\s\S]*?Licence texts: THIRD_PARTY_NOTICES/.test(entry)) problems.push(`${manifest.entry} has no legal banner`);
+  } else if (kind === 'vite') {
+    // The plugin puts the loader's banner back after minification (src/vite/index.mjs).
+    if (!walk(directory).some(file => file.endsWith('.js') && /\/\*! [^\n]*built by Lasm\.[\s\S]*?Licence texts: THIRD_PARTY_NOTICES\.lasm\.txt/.test(read(file, 'utf8'))))
+      problems.push('no JavaScript chunk carries the Lasm licence banner');
   } else if (['wasi', 'fastly', 'wasi-http'].includes(kind)) {
     hasNotices(read(join(directory, 'main.wasm')), 'main.wasm');
     if (kind === 'fastly') {
