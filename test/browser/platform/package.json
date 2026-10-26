@@ -1,0 +1,1 @@
+{ "name": "platform", "private": true, "description": "The Lasm.Web platform suite (docs/BROWSER.md), run by .github/workflows/browser.yml" }

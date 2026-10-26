@@ -14,10 +14,15 @@ const root = fileURLToPath(new URL('../library/', import.meta.url));
 // Lean versions the library is compiled for, and its modules in import order.
 export const libraryLeanVersions = ['4.35.0'];
 export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
+  // Lasm.Web (docs/BROWSER.md): web-platform bindings on Lasm.JS.
+  'Lasm.Web.Types', 'Lasm.Web.Dom', 'Lasm.Web.Events', 'Lasm.Web.Timers', 'Lasm.Web.Fetch', 'Lasm.Web.Url', 'Lasm.Web.Storage',
+  'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web',
+  // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework, with its proofs.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Sub',
   'Lasm.UI.Url', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
   'Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.Proofs.Children', 'Lasm.UI.Proofs.TwoEnded',
   'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs'];
+
 export const glueSource = join(root, 'c', 'lasm_js.c');
 // Lasm.JS.Meta (deriving, `@[js]`) uses Lean's elaborator: only prefixes that
 // contain it (the extended tier) get the library.
@@ -92,43 +97,48 @@ export function compileLibrary(tree, version, { platform = process.platform, com
   return true;
 }
 
-/** Whether any generated C initializes a library module (its Lean code imports it). */
+// A module's initializer in Lean's generated C (module names here have no underscores).
+const initializerCall = module => 'initialize_' + module.replaceAll('.', '_') + '(';
+const libraryC = (lean, module) => join(lean.prefix, 'lib', 'lasm', 'c', ...module.split('.')) + '.c';
+
+/** The library modules a program links: those whose initializer the program's
+ * generated C calls, and the library modules those import, in import order. */
+export function linkedLibraryModules(sources, { read = file => readFileSync(file, 'latin1'), libraryText } = {}) {
+  const texts = sources.map(read);
+  const linked = new Set();
+  for (let changed = true; changed;) {
+    changed = false;
+    for (const module of libraryModules) {
+      if (linked.has(module)) continue;
+      const call = initializerCall(module);
+      if (texts.some(text => text.includes(call)) || [...linked].some(other => libraryText(other).includes(call))) { linked.add(module); changed = true; }
+    }
+  }
+  return libraryModules.filter(module => linked.has(module));
+}
+
+/** Whether any generated C initializes a module of Lasm's library (its Lean code imports it). */
 export function importsLibrary(sources) {
-  return sources.some(file => /initialize_Lasm_(?:JS|UI)\b|initialize_Lasm_(?:JS|UI)_/.test(readFileSync(file, 'latin1')));
+  const texts = sources.map(file => readFileSync(file, 'latin1'));
+  return libraryModules.some(module => texts.some(text => text.includes(initializerCall(module))));
 }
 
-const initializer = module => new RegExp(`initialize_${module.replaceAll('.', '_')}\\b`);
-
-/** The library modules a program's generated C needs: those it initializes and,
- * transitively, the ones their initializers initialize. */
-export function neededLibraryModules(texts, cText) {
-  const needed = new Set();
-  const queue = libraryModules.filter(module => texts.some(text => initializer(module).test(text)));
-  while (queue.length) {
-    const module = queue.pop();
-    if (needed.has(module)) continue;
-    needed.add(module);
-    const text = cText(module);
-    for (const other of libraryModules) if (!needed.has(other) && initializer(other).test(text)) queue.push(other);
-  }
-  return libraryModules.filter(module => needed.has(module));
-}
-
-/** The generated C (from the prefix) of the library modules the program uses,
- * and the Lasm.JS C glue when it uses Lasm.JS, for the link. */
-export function librarySources(lean, programSources = []) {
+/** The generated C (from the prefix) of the library modules the program links,
+ * and the C glue, for the link; `modules` are those modules, `oleans` their
+ * module data (for the binding check: library bindings name their JS modules). */
+export function librarySources(lean, programSources) {
+  const missing = module => !existsSync(libraryC(lean, module));
+  if (libraryModules.some(missing)) throw new Error(`This program imports Lasm.JS, which needs Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
+  const cache = new Map();
+  const libraryText = module => { if (!cache.has(module)) cache.set(module, readFileSync(libraryC(lean, module), 'latin1')); return cache.get(module); };
+  const modules = linkedLibraryModules(programSources, { libraryText });
   const sources = [], inputs = [];
-  const cFile = module => join(lean.prefix, 'lib', 'lasm', 'c', ...module.split('.')) + '.c';
-  for (const module of libraryModules)
-    if (!existsSync(cFile(module))) throw new Error(`This program imports Lasm's library (${module}), which needs Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
-  const texts = programSources.map(file => readFileSync(file, 'latin1'));
-  const modules = programSources.length ? neededLibraryModules(texts, module => readFileSync(cFile(module), 'latin1')) : libraryModules;
   for (const module of modules) {
-    const parts = module.split('.');
-    sources.push(cFile(module)); inputs.push({ module: '+' + module, source: join(lean.prefix, 'src', 'lean', ...parts) + '.lean' });
+    sources.push(libraryC(lean, module)); inputs.push({ module: '+' + module, source: join(lean.prefix, 'src', 'lean', ...module.split('.')) + '.lean' });
   }
-  if (modules.includes('Lasm.JS.Core')) { sources.push(glueSource); inputs.push({ module: 'lasm_js.c', source: glueSource }); }
-  return { sources, inputs };
+  sources.push(glueSource); inputs.push({ module: 'lasm_js.c', source: glueSource });
+  const oleans = modules.map(module => join(lean.prefix, 'lib', 'lean', ...module.split('.')) + '.olean');
+  return { sources, inputs, modules, oleans };
 }
 
 /** Every file of the library, for package checks. */

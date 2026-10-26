@@ -97,8 +97,9 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // Programs that import Lasm's library (Lasm.JS, Lasm.UI) link the generated
   // C of the modules they use, and the Lasm.JS C glue.
   const usesJs = importsLibrary(generated.sources);
+  let library;
   if (usesJs) {
-    const library = librarySources(lean, generated.sources);
+    library = librarySources(lean, generated.sources);
     generated = { ...generated, sources: [...generated.sources, ...library.sources], inputs: [...generated.inputs, ...library.inputs] };
   }
   // npm packages for Lasm.JS: package.json next to the lakefile (or the source).
@@ -107,7 +108,9 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   let jsBindings;
   if (usesJs) {
     progress?.({ stage: 'Checking Lasm.JS bindings' });
-    jsBindings = checkBindings(directory, readBindings(lean, generated.env, generated.oleans(), { cache: join(work, 'bindings') }));
+    // The program's bindings and those of the library modules it links (Lasm.Web's
+    // name Lasm's builtin modules, which edge and browser builds import statically).
+    jsBindings = checkBindings(directory, readBindings(lean, generated.env, [...generated.oleans(), ...library.oleans], { cache: join(work, 'bindings') }));
     for (const warning of requireValidBindings(jsBindings)) log(`Lasm.JS binding warning: ${warning}`);
   }
   progress?.({ stage: 'Checking application inputs and cached build' });
