@@ -332,6 +332,17 @@ after the first dev build; "new process" is `lasm build --dev` after an edit
 | Hono fixture, new process | 6.4 | 2.5 |
 | Template project, new process | — | 2.7 |
 
+All five runners (run 40296021942; Windows after the map-path fix, run
+40298630380), steady-state in-process dev edits / a new `lasm build --dev`
+process:
+
+| Fixture | linux-x64 | linux-arm64 | darwin-arm64 | darwin-x64 | win32-x64 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Hono fixture | 1.5 / 2.5 | 1.5 / 2.3 | 2.1–2.8 / 4.9 | 4.2 / 7.0 | 4.2 / 6.2 |
+| Template project | 1.8–1.9 / 2.7 | 1.8 / 2.5 | 2.9–3.2 / 5.4 | 4.5–5.4 / 7.0 | 4.0–4.1 / 6.3 |
+
+On Windows, Lean's three processes per edit take 1.7 s (0.7 s on Linux).
+
 End to end with `npm run dev` (`lasm dev`) on the runner, editing `App.lean`
 in the template projects and timing until the restarted server listens
 (`dx-dev-loop.yml`, `scripts/templates/dev-loop-check.mjs`, run 40289814978,
