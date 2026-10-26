@@ -29,6 +29,9 @@ is done) and restarts the program. Arguments after -- are passed to main.
   browser           serve the browser build on http://127.0.0.1:5173 (--port,
                     --host) with live reload (src/browser/browser-dev.mjs);
                     --no-watch serves once built; open it yourself
+Several outputs of one project rebuild together: --target node,browser, or
+with their own sources --target node=Server.lean,browser=Client.lean (one
+program runs; the browser output is served with live reload).
 --release builds the release profile instead; --no-run only rebuilds.
 Type rs and Enter to rebuild and restart; Ctrl+C stops.`;
 
@@ -49,8 +52,16 @@ export function parseDevArguments(tokens) {
       const value = option[2] ?? tokens[++i];
       if (!value || value.startsWith('--')) throw new Error(`--${option[1]} requires a value\n\n${devUsage}`);
       if (option[1] === 'target') {
-        if (!devTargets.includes(value)) throw new Error(`lasm dev --target accepts ${devTargets.join(', ')}, not "${value}"`);
-        result.target = value;
+        // Several outputs of one project: --target node,browser, or with their
+        // own sources: --target node=Server.lean,browser=Client.lean.
+        result.outputs = value.split(',').map(item => {
+          const [target, input] = item.split('=');
+          if (!devTargets.includes(target)) throw new Error(`lasm dev --target accepts ${devTargets.join(', ')}, not "${target}"`);
+          if (input !== undefined && !input.endsWith('.lean')) throw new Error(`--target ${item}: the source must be a .lean file`);
+          return { target, ...(input ? { input } : {}) };
+        });
+        if (result.outputs.filter(o => runtimeTargets.includes(o.target)).length > 1) throw new Error('lasm dev runs one program: choose one of node, bun and deno');
+        result.target = result.outputs[0].target;
       } else if (option[1] === 'port') {
         if (!/^\d{1,5}$/.test(value) || Number(value) > 65535) throw new Error(`--port needs a port number, not "${value}"`);
         result.port = Number(value);
@@ -64,8 +75,11 @@ export function parseDevArguments(tokens) {
   result.input = positional[0] ?? 'Main.lean';
   if (!result.input.endsWith('.lean')) throw new Error(`lasm dev expects a Lean source (Main.lean), not ${result.input}`);
   result.target ??= jsRuntime;
+  result.outputs ??= [{ target: result.target }];
+  for (const output of result.outputs) output.input ??= result.input;
+  const browser = result.outputs.some(o => o.target === 'browser');
   for (const option of ['port', 'host', 'output', 'watch'])
-    if (result[option] !== undefined && result.target !== 'browser') throw new Error(`--${option === 'watch' ? 'no-watch' : option} applies to lasm dev --target browser (servers read $PORT and $HOST)`);
+    if (result[option] !== undefined && !browser) throw new Error(`--${option === 'watch' ? 'no-watch' : option} applies to lasm dev --target browser (servers read $PORT and $HOST)`);
   return result;
 }
 
@@ -208,7 +222,11 @@ function createRunner() {
   };
 }
 
-export async function runDev(options) {
+/** hooks (for templates and tools that drive lasm dev, such as a full-stack
+ * template): onBuilt({ target, input, output, result }) after each good build of
+ * an output; routes(request, response) → true when handled, for the browser
+ * output's server (for example an API proxy to the Node server). */
+export async function runDev(options, hooks = {}) {
   const { createBuildService } = await import('./dev-build-service.mjs');
   const { findApplicationProject } = await import('./application-sources.mjs');
   const source = resolve(options.input);
@@ -216,7 +234,7 @@ export async function runDev(options) {
   const project = findApplicationProject(source) ?? dirname(source);
   const target = options.target;
   // The browser target's dev server (docs/BROWSER.md) builds and serves dist/ itself.
-  if (target === 'browser') {
+  if (target === 'browser' && options.outputs.length === 1 && !hooks.routes && !hooks.onBuilt) {
     let browserDev;
     try { browserDev = await import('./browser/browser-dev.mjs'); }
     catch (error) { if (error.code === 'ERR_MODULE_NOT_FOUND') throw new Error('The browser target is not part of this Lasm version yet (docs/BROWSER.md).'); throw error; }
@@ -226,7 +244,8 @@ export async function runDev(options) {
   const service = createBuildService();
   const runner = createRunner();
   const tty = process.stderr.isTTY;
-  let building = false, queued = false, previous = snapshot(project), lastGood, stopping = false;
+  let building = false, queued = false, previous = snapshot(project), lastGood, stopping = false, server;
+  const browserOutput = resolve(options.output ?? join(project, '.lake/lasm/browser-dev'));
   const status = text => { if (tty) process.stderr.write(`\r\x1b[K${color('2', '[lasm dev] ' + text)}`); };
   const clearStatus = () => { if (tty) process.stderr.write('\r\x1b[K'); };
 
@@ -240,28 +259,43 @@ export async function runDev(options) {
     if (reason) say(reason === 'change' ? `${changed.slice(0, 3).map(file => relative(project, file)).join(', ')}${changed.length > 3 ? ` and ${changed.length - 3} more` : ''} changed; rebuilding` : reason);
     const stages = [], started = performance.now();
     try {
-      const result = await service.build(source, { profile: options.profile, verbose: options.verbose }, {
-        target: target === 'node' ? undefined : target,
-        onProgress: event => {
-          if (stages.at(-1)?.stage !== event.stage) stages.push({ stage: event.stage, at: performance.now() });
-          status(event.stage + '…');
-        },
-        onLog: text => { clearStatus(); process.stderr.write(text + '\n'); },
-      });
+      // Every output builds before any is used, so a server and its client stay in step.
+      const built = [];
+      let allCached = true;
+      for (const entry of options.outputs) {
+        const result = await service.build(resolve(entry.input), { profile: options.profile, verbose: options.verbose,
+          ...(entry.target === 'browser' ? { output: browserOutput } : {}) }, {
+          target: entry.target === 'node' ? undefined : entry.target,
+          onProgress: event => {
+            if (stages.at(-1)?.stage !== event.stage) stages.push({ stage: event.stage, at: performance.now() });
+            status((options.outputs.length > 1 ? entry.target + ': ' : '') + event.stage + '…');
+          },
+          onLog: text => { clearStatus(); process.stderr.write(text + '\n'); },
+        });
+        allCached &&= !!result.cacheHit;
+        built.push({ ...entry, result, output: entry.target === 'browser' ? browserOutput : result.edgeOutput ?? result.output });
+      }
       const end = performance.now();
       clearStatus();
-      const output = result.edgeOutput ?? result.output;
-      say(`${color('32', result.cacheHit ? 'Up to date' : 'Built')} in ${((end - started) / 1000).toFixed(1)} s${result.cacheHit ? '' : ` (${summarizeStages(stages, end)})`}`
+      say(`${color('32', allCached ? 'Up to date' : 'Built')} in ${((end - started) / 1000).toFixed(1)} s${allCached ? '' : ` (${summarizeStages(stages, end)})`}`
         + `${options.profile === 'release' ? ' — release profile' : ''}`);
-      lastGood = output;
+      lastGood = built;
+      for (const item of built) await hooks.onBuilt?.(item);
       if (!options.run) { /* rebuild only */ }
-      else if (edgeOnlyTargets.includes(target))
-        say(`${relative(process.cwd(), output) || output} is up to date; your platform's local server (for example npx wrangler dev) serves it.`);
-      else {
-        await runner.stop();
-        const entry = join(output, 'main.mjs');
-        const [command, args] = runtimeCommand(target, entry, options.args);
-        runner.start(command, args, { cwd: process.cwd(), label: basename(source) });
+      else for (const { target, input, output } of built) {
+        if (edgeOnlyTargets.includes(target))
+          say(`${relative(process.cwd(), output) || output} is up to date; your platform's local server (for example npx wrangler dev) serves it.`);
+        else if (target === 'browser') {
+          if (!server) {
+            const { startStaticServer } = await import('./browser/static-server.mjs');
+            server = await startStaticServer(output, { port: options.port ?? 5173, host: options.host ?? '127.0.0.1', liveReload: true, routes: hooks.routes });
+            say(`Serving ${relative(process.cwd(), output) || output} at ${color('1', server.url)} with live reload (open it in your browser).`);
+          } else server.reload();
+        } else {
+          await runner.stop();
+          const [command, args] = runtimeCommand(target, join(output, 'main.mjs'), options.args);
+          runner.start(command, args, { cwd: process.cwd(), label: basename(input) });
+        }
       }
     } catch (error) {
       clearStatus();
@@ -269,6 +303,7 @@ export async function runDev(options) {
       const text = formatLeanDiagnostics(detail || error.message, project);
       process.stderr.write(text.slice(-12000) + '\n');
       if (detail && !text.includes(error.message.split('\n')[0]) && !/Command failed/.test(error.message)) process.stderr.write(error.message.split('\n')[0] + '\n');
+      server?.report(error.message.split('\n')[0]);
       say(color('31', `Build failed after ${((performance.now() - started) / 1000).toFixed(1)} s`) + (lastGood ? '; the last good build keeps running. Fix the error and save.' : '. Fix the error and save.'));
     } finally {
       building = false;
@@ -279,7 +314,7 @@ export async function runDev(options) {
   let timer;
   const watcher = watchProject(project, () => { clearTimeout(timer); timer = setTimeout(() => rebuild('change'), 120); });
   const files = projectFiles(project).length;
-  say(`Watching ${files} file${files === 1 ? '' : 's'} in ${relative(process.cwd(), project) || '.'} (${watcher.mode}); target ${target}, ${options.profile} profile. Ctrl+C stops.`);
+  say(`Watching ${files} file${files === 1 ? '' : 's'} in ${relative(process.cwd(), project) || '.'} (${watcher.mode}); target ${options.outputs.map(o => o.target).join(', ')}, ${options.profile} profile. Ctrl+C stops.`);
   process.stdin.setEncoding?.('utf8');
   if (process.stdin.isTTY || process.env.LASM_DEV_STDIN) process.stdin.on('data', text => { if (text.trim() === 'rs') rebuild('Rebuilding (rs)', { force: true }); });
   await rebuild('Building ' + relative(process.cwd(), source), { force: true });
@@ -287,7 +322,7 @@ export async function runDev(options) {
     const stop = async () => {
       if (stopping) return; stopping = true;
       clearTimeout(timer); watcher.close();
-      await runner.stop(); await service.close();
+      await runner.stop(); await server?.close?.(); await service.close();
       process.stdin.pause?.();
       resolveExit(0);
     };
