@@ -1,5 +1,10 @@
 // Vanilla keyed implementation of the benchmark operations (direct DOM code,
 // a template row cloned per row). Same labels as examples/ui/bench/Main.lean.
+// Written for Lasm; the operations, the table markup and the label word lists
+// follow js-framework-benchmark (https://github.com/krausest/js-framework-benchmark,
+// by Stefan Krause and contributors, Apache License 2.0,
+// https://www.apache.org/licenses/LICENSE-2.0), whose keyed vanillajs
+// implementation this is not a copy of.
 'use strict';
 const adjectives = ['pretty', 'large', 'big', 'small', 'tall', 'short', 'long', 'handsome', 'plain', 'quaint', 'clean',
   'elegant', 'easy', 'angry', 'crazy', 'helpful', 'mushy', 'odd', 'unsightly', 'adorable', 'important', 'inexpensive',

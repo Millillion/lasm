@@ -145,6 +145,8 @@ jobs:
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
           LASM_KEEP_LINK_WORK: '1'
         run: node scripts/edge/workers-ci.mjs .work/edge-apps .work/edge-tools
+      - name: Licence check of every built output (notices file, banner, embedded notices, no copyleft code)
+        run: node scripts/license/check-outputs.mjs .work/edge-apps --expect edge --report .work/edge-apps/license-check.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:

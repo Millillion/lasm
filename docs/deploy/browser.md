@@ -13,7 +13,8 @@ dist/
   app.<hash>.{js,wasm}.gz  gzip copies (level 9)
   app.js                   a stable name that re-exports app.<hash>.js
   lasm-manifest.json       file names, sizes, digests, transfer totals
-  THIRD_PARTY_NOTICES.txt  licences of the Lean runtime and libraries in the Wasm
+  THIRD_PARTY_NOTICES.txt  licences of the Lean runtime and libraries in the Wasm; serve it
+                           with the app (the loader's /*! banner names it, docs/LICENSING.md)
   …                        your public/ files, copied as they are
 ```
 

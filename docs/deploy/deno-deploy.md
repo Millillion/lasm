@@ -23,7 +23,7 @@ project's `package.json`, as with the Deno CLI.
 | --- | --- |
 | `deno/main.mjs` | The generated entrypoint. It reads `lasm/program.wasm`, starts Lean, and serves the handler published with `Lasm.JS.exportDefault` with `Deno.serve`. A stopped instance is replaced. |
 | `deno/lasm/` | The program and the pure-JS host. |
-| `deno/build-info.json`, `THIRD_PARTY_NOTICES.txt` | Build record and notices. |
+| `deno/build-info.json`, `THIRD_PARTY_NOTICES.txt` | Build record and notices (also inside `program.wasm`: [LICENSING.md](../LICENSING.md)). |
 
 Lasm owns `deno/` and replaces it on every build.
 

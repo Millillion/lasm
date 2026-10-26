@@ -32,6 +32,7 @@ import { createZstdDecompress } from 'node:zlib';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { downloadArtifact } from '../../src/managed-download.mjs';
 import { findNpm, archiveFileName } from '../../src/npm-artifacts.mjs';
+import { wasmtimeAdapterNotice } from '../../src/notices.mjs';
 import { toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, defaultScope, maximumPackageBytes, noticeDirectory,
   createPackageJson, createPackageLicense, edgeRuntimeBundle, cTierExtraNotices, cTierFamilyNotices, noticeSections, cliLicense, slug } from './packages.mjs';
 
@@ -264,6 +265,10 @@ if (args.step === 'main') {
         await writeFile(join(licenses, ...prefix, slug(heading) + '.txt'), text);
       }
     };
+    // Candidates packaged before the wasi-http template's notice: add it (src/notices.mjs).
+    const mainNotices = await readFile(join(main, 'THIRD_PARTY_NOTICES.txt'), 'utf8');
+    if (existsSync(join(main, 'src/wasi/component/proxy-template.wasm')) && !mainNotices.includes('\n=== Wasmtime proxy adapter ===\n'))
+      await writeFile(join(main, 'THIRD_PARTY_NOTICES.txt'), mainNotices + '\n' + wasmtimeAdapterNotice('src/wasi/component/proxy-template.wasm (the wasi-http component template)'));
     await sections(join(main, 'THIRD_PARTY_NOTICES.txt'), []);
     for (const helper of ['process', 'signals']) {
       const file = join(main, 'src/native', helper, 'THIRD_PARTY_NOTICES.txt');

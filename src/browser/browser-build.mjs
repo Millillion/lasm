@@ -18,6 +18,7 @@ import { brotliCompressSync, gzipSync, constants as zlib } from 'node:zlib';
 import { bundleModules, compactModule, emscriptenModule } from './bundle.mjs';
 import { builtinModuleClosure, builtinModuleFile, builtinPrefix } from '../edge/builtin-modules.mjs';
 import { edgeModules } from '../edge/edge-build.mjs';
+import { noticeBanner, targetNotices } from '../notices.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 const edge = fileURLToPath(new URL('../edge/', import.meta.url));
@@ -48,7 +49,8 @@ export function browserConfigModule({ name, wasmFile, modules, suspend, autoMoun
 }
 
 /** The loader bundle's text for a program (its glue program.mjs) and builtin modules. */
-export function browserBundle({ programGlue, name, wasmFile, modules, suspend, autoMount = true, compact = true }) {
+/** banner: the legal comment (src/notices.mjs noticeBanner) that names the licences and THIRD_PARTY_NOTICES.txt. */
+export function browserBundle({ programGlue, name, wasmFile, modules, suspend, autoMount = true, compact = true, banner = '' }) {
   const builtins = builtinModuleClosure(modules);
   const external = modules.filter(m => !m.startsWith(builtinPrefix));
   const read = file => { const text = readFileSync(file, 'utf8'); return compact ? compactModule(text) : text; };
@@ -63,7 +65,7 @@ export function browserBundle({ programGlue, name, wasmFile, modules, suspend, a
     './edge-js.mjs': read(join(edge, 'edge-js.mjs')),
   };
   for (const specifier of builtins) sources[`./modules/${specifier.slice(builtinPrefix.length)}.mjs`] = read(builtinModuleFile(specifier));
-  return bundleModules(sources, './loader.mjs', { header: `// ${generatedMarker}: the ${name} app's loader, Lean runtime host and program glue. Do not edit.`,
+  return bundleModules(sources, './loader.mjs', { header: `// ${generatedMarker}: the ${name} app's loader, Lean runtime host and program glue. Do not edit.` + (banner ? '\n' + banner.trimEnd() : ''),
     external: specifier => external.includes(specifier) });
 }
 
@@ -127,7 +129,11 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
   const bare = builtins.filter(m => !m.startsWith(builtinPrefix) && !/^https?:\/\//.test(m));
   if (bare.length && externals !== 'keep')
     throw new Error(`The program uses npm modules (${bare.join(', ')}), which a static browser build cannot resolve. Build it with Vite and the CLI's plugin, @lasm/cli/vite (it bundles npm packages), or bind a URL module (@[js "https://…" …]).`);
-  const bundle = Buffer.from(browserBundle({ programGlue: readFileSync(join(program.directory, 'program.mjs'), 'utf8'), name, wasmFile: wasm, modules: builtins, suspend }));
+  // Licences (src/notices.mjs): THIRD_PARTY_NOTICES.txt is served beside the app and
+  // named by the loader's legal banner; the Wasm stays as small as it can be.
+  const notices = targetNotices(readFileSync(join(result.output, 'THIRD_PARTY_NOTICES.txt'), 'utf8'), 'browser', { label: 'browser' });
+  const bundle = Buffer.from(browserBundle({ programGlue: readFileSync(join(program.directory, 'program.mjs'), 'utf8'), name, wasmFile: wasm, modules: builtins, suspend,
+    banner: noticeBanner(notices, `The ${name} web app`, externals === 'keep' ? 'THIRD_PARTY_NOTICES.lasm.txt (emitted by the Lasm Vite plugin)' : undefined) }));
   const entry = `app.${shortHash(bundle)}.js`;
   const staging = destination + '.lasm-staging';
   rmSync(staging, { recursive: true, force: true });
@@ -159,11 +165,11 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
   const projectIndex = join(projectDirectory, 'index.html');
   const html = existsSync(projectIndex) ? injectIndexHtml(readFileSync(projectIndex, 'utf8'), { entry, wasm }) : defaultIndexHtml({ name, entry, wasm });
   emit('index.html', Buffer.from(html), { compress: true });
-  copyFileSync(join(result.output, 'THIRD_PARTY_NOTICES.txt'), join(staging, 'THIRD_PARTY_NOTICES.txt'));
+  writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), notices);
   const transfer = { ...(precompress ? { brotli: files[wasm].brotli + files[entry].brotli, gzip: files[wasm].gzip + files[entry].gzip } : {}),
     uncompressed: files[wasm].bytes + files[entry].bytes };
   const manifest = { schema: 1, generator: 'lasm', target: 'browser', name, lasm: lasmVersion ?? null, lean: result.lean,
-    entry, wasm, stableEntry: 'app.js', index: 'index.html', suspend, modules: builtins,
+    entry, wasm, stableEntry: 'app.js', index: 'index.html', notices: 'THIRD_PARTY_NOTICES.txt', suspend, modules: builtins,
     // Content-hashed files are immutable; the others change with every build.
     immutable: [entry, wasm, ...(precompress ? [entry, wasm].flatMap(file => [file + '.br', file + '.gz']) : [])],
     transfer, files, programKey: program.meta.key, nodeBuildSignature: result.signature };

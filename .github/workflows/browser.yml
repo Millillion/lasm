@@ -138,6 +138,8 @@ jobs:
             uicounter=examples/ui/counter todomvc=examples/ui/todomvc bench=examples/ui/bench demo=examples/ui/demo
           # The benchmark's baseline (vanilla JavaScript, no build).
           cp -r bench/ui/vanilla .work/browser-apps/vanilla
+      - name: Licence check of every built output (notices file, loader banner, no copyleft code)
+        run: node scripts/license/check-outputs.mjs .work/browser-work .work/browser-apps --expect browser,vite
       - name: lasm dev --target browser (edit, rebuild, reload) on the web template
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime

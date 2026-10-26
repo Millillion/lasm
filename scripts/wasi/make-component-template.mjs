@@ -52,7 +52,11 @@ try {
     if (Buffer.compare(Buffer.from(template), readFileSync(templateFile)) !== 0)
       throw new Error('src/wasi/component/proxy-template.wasm is stale: run scripts/wasi/make-component-template.mjs');
     for (const built of checks) {
-      const bytes = readFileSync(built), coreFile = join(work, 'core.wasm');
+      // Builds append their licence notices as a top-level custom section (src/notices.mjs).
+      const { customSections, noticesSectionName, withoutCustomSection } = await import('../../src/notices.mjs');
+      const shipped = readFileSync(built), coreFile = join(work, 'core.wasm');
+      if (!customSections(shipped).some(section => section.name === noticesSectionName)) throw new Error(`${built} has no ${noticesSectionName} section`);
+      const bytes = withoutCustomSection(shipped, noticesSectionName);
       writeFileSync(coreFile, extractCore(bytes));
       if (Buffer.compare(component(coreFile), bytes) !== 0) throw new Error(`${built} differs from wasm-tools' component for its core module`);
       console.log(`${built}: identical to wasm-tools component new`);

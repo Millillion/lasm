@@ -2,6 +2,7 @@
   "name": "@lasm/compiler",
   "version": "0.2.0",
   "private": true,
+  "license": "MIT",
   "workspaces": [
     "examples/express"
   ],

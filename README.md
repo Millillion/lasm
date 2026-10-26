@@ -496,6 +496,14 @@ license and how each obligation is met.
   license files of every Lake dependency compiled into `program.wasm`; with npm
   interop, `node_modules/` holds each package with its own license. Keep these
   files when you distribute a `dist/`.
+- **Edge, browser, WASI, Fastly and wasi-http outputs** get the same notices,
+  rewritten to say what their files contain, written automatically: a
+  `THIRD_PARTY_NOTICES.txt` in every output directory, a short `/*! … */` licence
+  banner on the JavaScript a platform bundles (the edge glue, the browser loader),
+  the whole notices file inside the Wasm of server-side outputs (a `lasm.notices`
+  custom section, so it travels with every deployment), the file in the Fastly
+  package, and `THIRD_PARTY_NOTICES.lasm.txt` in Vite builds. What this means for
+  your app: [docs/LICENSING.md](docs/LICENSING.md).
 - **Tool packages and release archives.** Each `@lasm/…` tool package has an SPDX
   `license` field and the archive's license files. The exact sources of the (L)GPL
   pieces the Lean archives contain (GNU MP, the GNU C Library, GCC's runtime
