@@ -814,6 +814,10 @@ folded into Phases 5.2/5.3 and 7.
   cache). 7.3 in source: `--target vercel-edge` and `--target netlify-edge`. 7.4:
   `--target deno-deploy` in source; Supabase Edge Functions not supported (its
   runtime, V8 11.6, has no JSPI). See [EDGE.md](EDGE.md).*
+  *Status (2026-10-26, branch `phase-7`): `--target supabase-edge` in source
+  for 0.2.0, with an Asyncify link (Binaryen's asyncify pass, recorded for the
+  Node link driver) instead of JSPI; tested in Supabase's edge runtime image in
+  CI ([deploy/supabase-edge.md](deploy/supabase-edge.md)).*
   *Status (2026-10-24, branch `phase-7`): 7.5 in source, Linux-tested: the
   compiler under Bun 1.4.4 and Deno 2.9.6 (byte-identical builds),
   `--target bun|deno` (portable profile; CLI programs and servers), default

@@ -62,7 +62,8 @@ CI ([`workers.yml`](../../.github/workflows/workers.yml), through
 - builds the Hono template and [`examples/edge-pure`](../../examples/edge-pure/)
   with `--target supabase-edge`;
 - runs Supabase's edge runtime image (`supabase/edge-runtime:v1.77.8`, the
-  image `supabase functions serve` uses, pinned by digest) in Docker with
+  image `supabase functions serve` uses, pinned by digest and pulled from
+  Supabase's GHCR copy, which has the same index digest) in Docker with
   `start --main-service`. The main service starts each function as a user
   worker with the Supabase CLI's options and limits (256 MB, 1 s soft / 2 s
   hard CPU) and its `deno.json` import map;
@@ -77,7 +78,25 @@ CI ([`workers.yml`](../../.github/workflows/workers.yml), through
 Not reproduced: Supabase's hosted platform (its bundling at deployment, its
 isolate scheduling and its JWT gateway).
 
-MEASUREMENTS
+## Measured (CI run 40278642433, ubuntu-24.04)
+
+| App | Function directory (gzip) | `program.wasm`, Asyncify / JSPI | Startup on Node 26, Asyncify / JSPI | Per request on Node 26, Asyncify / JSPI | Supabase runtime: first request (cold worker) | Supabase runtime: per request over HTTP |
+| --- | --- | --- | --- | --- | --- | --- |
+| Hono template | 3.14 MiB (590 KiB) | 2.18 / 0.69 MiB (3.2×) | 79 / 38 ms | `/health` 0.081 / 0.069 ms | 578 ms | 2.0 ms |
+| `examples/edge-pure` | 4.00 MiB (780 KiB) | 2.83 / 0.97 MiB (2.9×) | 114 / 78 ms | `/` 0.141 / 0.114 ms; `/primes/10000` 0.47 / 0.26 ms (1.8×) | 442 ms | 2.1 ms |
+
+- Every route passed in the Supabase runtime, including five concurrent
+  blocking waits (`IO.sleep 30` and `Task.get` on a sleeping task: 43 ms in
+  total, so they interleave) and the instance restart after stack exhaustion.
+- The first request includes creating the worker, evaluating the module
+  (the Wasm is decoded from base64; V8 11.6 has no `Uint8Array.fromBase64`),
+  compiling it and Lean's startup; for the Hono app it also includes the
+  runtime fetching `npm:hono` from the registry. Supabase's limits are 20 MB
+  per function, 256 MB memory and 2 s CPU per request: all are far away.
+- Wasm memory after the checks: 26.6 MiB, as with JSPI.
+- The Node link driver's Asyncify link is byte-identical to emcc's
+  (`program.wasm` 091f6153…, `program.mjs` 14905595…), and a fresh recording
+  matches the committed recipe.
 
 Lean features are those of the edge profile:
 [EDGE.md: Edge profile](../EDGE.md#edge-profile-lean-features).

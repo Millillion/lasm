@@ -1,7 +1,7 @@
 # Edge isolates (Phase 7)
 
 Status: **7.1 (prototype and decision), 7.2 (Cloudflare Workers), packaging,
-7.3 (Vercel and Netlify Edge) and 7.4 (Deno Deploy; Supabase not supported),
+7.3 (Vercel and Netlify Edge) and 7.4 (Deno Deploy; Supabase Edge Functions with Asyncify),
 2026-10-24.** Everything here is experimental, outside 0.1.0, and planned for
 0.2.0. The Node build is unchanged.
 Measured behaviour is marked as measured. Plans are marked as plans.
@@ -42,8 +42,9 @@ The same build also runs on Node 26.12.1, Deno 2.9.6 and **Bun 1.4.4**.
 - wasm64 code lowered to 32-bit memory (`-sMEMORY64=2`). This reuses the
   verified standard-library archives.
 - A pure-JS host that uses web-standard APIs only.
-- **Asyncify is rejected:** it makes builds 2.2× larger and 2–3× slower to
-  compute, and JSPI is available on every runtime we target.
+- **Asyncify only where JSPI is missing:** it makes builds 2.2–3.2× larger and
+  up to 2–3× slower to compute. Every target has JSPI except Supabase's edge
+  runtime, which gets the Asyncify link (7.4).
 
 ## Phase 7.2 status: Cloudflare Workers (branch `phase-7`)
 
@@ -151,7 +152,7 @@ stop-and-restart check on Netlify.
 apps: workerd, Node, Deno, Bun, Vercel Edge, Netlify Edge, Deno Deploy and
 the Bun build. The Node link driver's edge link was byte-identical to `emcc`.
 
-## Phase 7.4 status: Deno Deploy; Supabase Edge Functions not supported
+## Phase 7.4 status: Deno Deploy and Supabase Edge Functions
 
 **Deno Deploy: in current branch source.**
 
@@ -176,34 +177,47 @@ the Bun build. The Node link driver's edge link was byte-identical to `emcc`.
 Bun and Deno as program targets (`--target bun|deno`, Phase 7.5) share this
 entry: see [BUN_DENO.md](BUN_DENO.md).
 
-**Supabase Edge Functions: not supported until Supabase's runtime ships JSPI.**
+**Supabase Edge Functions: in current branch source, with an Asyncify link.**
 
 - Supabase's edge runtime, even the latest release `v1.77.8`
   (2026-10-21, the image `supabase functions serve` uses), runs **V8
-  11.6.189.12** ("compatible with Deno v2.1.4"). It has no JSPI:
-  `WebAssembly.Suspending` is undefined. The build fails at instantiation.
-- `supabase functions serve` also needs the whole local stack
-  (`supabase start`). The runtime image was run directly instead (Docker,
-  `--main-service`), with a per-function `deno.json` import map (`npm:hono@…`).
-- **Probe: a no-JSPI link works there.** A link with `suspend: 'none'` served
-  every Hono template route under that image. But blocking waits (`Task.get`
-  on unfinished work, `IO.sleep`, `Async.block`) would then fail, and that link
-  needs a second Node-driver recipe mode. That mode adds wasm-opt import and
-  export minification, which the Node driver does not port. Without it, the
-  build would need the 300 MB SDK.
-- **Decision:** this is not light, so it is not shipped
-  ([DECISIONS.md](DECISIONS.md)).
-- **How to revisit:**
-  1. Check a new `supabase/edge-runtime` release (the image `supabase functions
-     serve` pulls) for JSPI. Serve a function whose `index.ts` returns
-     `typeof WebAssembly.Suspending` and `Deno.version`, using the image's
-     `start --main-service`. That needs no Supabase account. Run it in CI only,
-     since platform CLIs are not run locally.
-  2. Once it reports `function`, add a `supabase-edge` target: an entry like
-     the Deno one (`portableEntry`) in `supabase/functions/lasm/`, the Wasm
-     inlined as a module, and a per-function `deno.json` import map of
-     `npm:` specifiers pinned to the installed versions.
-  3. Test it in `workers.yml` with the runtime image in Docker.
+  11.6.189.12** ("compatible with Deno v2.1.4"). It has no JSPI
+  (`WebAssembly.Suspending` is undefined; CI probes it on every run).
+- So `lasm build --target supabase-edge` links the same program with
+  Binaryen's asyncify pass (`-sASYNCIFY`, a 1 MiB Asyncify data buffer). The
+  suspending imports are Emscripten's asynchronous JS library functions; the
+  only one the edge program imports that suspends is the host's wait,
+  `lasm_edge_wait`. The edge controller (`edge-pre.js`) already drove Asyncify:
+  an export that unwinds returns at once, and `Asyncify.whenDone()` completes
+  it. Blocking waits work: `Task.get` on unfinished work, `IO.wait`,
+  `IO.sleep`, `Async.block`.
+- The Node link driver replays it from a second recording in
+  `recipe-emscripten-6.0.9-edge.json` (mode `edge-asyncify`; no SDK). It
+  needed what the JSPI link does not: `ASYNCIFY=1`'s glue exports
+  (`asyncify_start_unwind` …), `DYNCALLS=1` (`wasm-emscripten-finalize`), and
+  wasm-opt's import and export minification with its name mapping
+  (`minify_wasm_imports_and_exports`). CI records it with emcc
+  (`scripts/edge/record-edge-link.mjs`, `derive-edge-recipe.mjs --mode
+  edge-asyncify`) and requires byte-identical output.
+- The output is `supabase/functions/<name>/`: `index.ts` (it strips the
+  `/<name>` prefix Supabase passes, so routes match the other targets),
+  `deno.json` (the npm imports pinned to the installed versions) and the
+  program with the Wasm as a JavaScript module. `lasm init --deploy
+  supabase-edge` adds `supabase/config.toml` and `build:supabase-edge`. Guide:
+  [deploy/supabase-edge.md](deploy/supabase-edge.md).
+- **Test** (in `workers.yml`, `scripts/edge/supabase-ci.mjs`): the pinned
+  runtime image in Docker, `start --main-service` with a main service that
+  starts user workers with the Supabase CLI's options and limits. No Supabase
+  CLI and no account. Every Hono and `edge-pure` route passes, including
+  concurrent blocking waits and the restart. **First green run: 40278642433.**
+- **Measured** (that run): `program.wasm` 2.9–3.2× the JSPI build (Hono 2.18
+  MiB), startup on Node 79 vs 38 ms, a trivial request about 1.2× and a
+  compute-heavy one 1.8× the JSPI time; in the Supabase runtime a cold worker
+  answers in 440–580 ms and later requests take about 2 ms over HTTP. Details:
+  [deploy/supabase-edge.md](deploy/supabase-edge.md#measured-ci-run-40278642433-ubuntu-2404).
+- **When Supabase ships JSPI** (the probe reports `function`), switch the
+  target's `suspend` to `jspi` in `src/edge/edge-build.mjs`: the standard
+  link, smaller and faster.
 
 ## Platform facts
 
@@ -350,9 +364,10 @@ request).
 Asyncify works (wasm exceptions included) but costs size, speed and startup on
 every route. Bun is not a reason to use it, because Bun 1.4.4 has JSPI.
 
-**Decision: JSPI**, with a no-JSPI (sync) link kept as a per-target fallback for
-hosts whose engine lacks JSPI. Under that fallback, `Async` programs work
-fully; only blocking waits stop the instance.
+**Decision: JSPI**, with an Asyncify link for engines that lack it (2026-10-26:
+Supabase's edge runtime, V8 11.6; `--target supabase-edge`). Asyncify keeps
+blocking waits working at the measured cost above. The no-JSPI (sync) link,
+where blocking waits stop the instance, is not used by any target.
 
 ### 3. wasm32 vs wasm64
 
@@ -589,9 +604,8 @@ Free limit, and under Vercel Edge's 1 MB-gzip Hobby limit. The Node profile's
    recursion in user code fails on the edge. It stops the instance cleanly, but
    the request fails.
 3. **JSPI on platforms we cannot run locally.** Vercel Edge's production V8 is
-   unverified. Supabase's edge runtime (V8 11.6) has none, so Supabase is not
-   a target (7.4). Fallback: the sync link (`Async` only), which is not
-   shipped.
+   unverified (fallback: the Asyncify link, as for Supabase). Supabase's edge
+   runtime (V8 11.6) has none, so `supabase-edge` uses the Asyncify link (7.4).
 4. **Bun's JSPI is young.** There is a 1.4.0–1.4.3 regression with tail calls.
    Pin and test Bun in CI.
 5. **Startup random bytes on Workers are not cryptographic** while initializers
