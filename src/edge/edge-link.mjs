@@ -12,6 +12,7 @@
 // emcc's output: scripts/edge/compare-edge-link.mjs); emcc remains the fallback.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { basename, join } from 'node:path';
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
@@ -49,12 +50,21 @@ export const edgeLinkSettings = Object.freeze({ memory64: 2, initialMiB: 4, stac
 /** `members` (dev, src/application-live-members.mjs): { record, directory,
  * save(record) }: link with the archive members the previous full edge link of
  * this program kept, accepted when the program imports nothing new. */
+const nmListings = new Map(), compactObjects = new Map();
 export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend = 'jspi', verbose = false, driver = sdk.toolchain ? 'node' : 'emcc', optimize = true, stepCache, members }) {
   if (!edgeSuspendModes.includes(suspend)) throw new Error(`Unknown edge suspension ${JSON.stringify(suspend)}`);
   const s = edgeLinkSettings;
   const rsp = readResponse(join(linkWork, 'link.rsp'));
-  const nm = file => execFileSync(join(sdk.prefix, 'bin', executableName('llvm-nm')), ['--defined-only', '--just-symbol-name', file],
-    { encoding: 'utf8', maxBuffer: 64 << 20, windowsHide: true });
+  // Listings by object content: a rebuild changes one or two objects.
+  const nm = file => {
+    const key = createHash('sha256').update(readFileSync(file)).digest('hex');
+    if (!nmListings.has(key)) {
+      nmListings.set(key, execFileSync(join(sdk.prefix, 'bin', executableName('llvm-nm')), ['--defined-only', '--just-symbol-name', file],
+        { encoding: 'utf8', maxBuffer: 64 << 20, windowsHide: true }));
+      if (nmListings.size > 512) nmListings.delete(nmListings.keys().next().value);
+    }
+    return nmListings.get(key);
+  };
   // Application objects and initializer wraps; Lasm.JS's Node glue (the object
   // defining lasm_js_available) is replaced by the edge glue.
   // A seeded dev link (src/application-link.mjs) also lists the lookup marker
@@ -86,11 +96,20 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
   const wrappers = /[\\/]initializers-\d+\.o$/;
   if (existsSync(planFile) && objects.some(arg => wrappers.test(arg))) {
     const source = join(out, 'initializers-compact.c'), object = join(out, 'initializers-compact.o');
-    writeFileSync(source, compactInitializerWrappers(JSON.parse(readFileSync(planFile, 'utf8'))));
+    const text = compactInitializerWrappers(JSON.parse(readFileSync(planFile, 'utf8')));
+    writeFileSync(source, text);
     const flags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1',
       '-ffunction-sections', '-fdata-sections', '-I', join(nodeRuntime.directory, 'include')];
-    if (driver === 'node') compileObject({ sdk, flags, source, object, settings: { stdio, timeout: 600_000, maxBuffer: 8 << 20 } });
-    else sdk.execute('emcc', [...flags, '-c', source, '-o', object], { stdio, env, timeout: 600_000 });
+    // Reused by content (the plan rarely changes between edits) with the tools and runtime.
+    const key = createHash('sha256').update(JSON.stringify({ schema: 1, driver, tools: sdk.toolchain ?? sdk.driverIdentity ?? null, runtime: nodeRuntime.identity, flags: flags.slice(0, -1) })).update(text).digest('hex');
+    const cached = compactObjects.get(key);
+    if (cached) writeFileSync(object, cached);
+    else {
+      if (driver === 'node') compileObject({ sdk, flags, source, object, settings: { stdio, timeout: 600_000, maxBuffer: 8 << 20 } });
+      else sdk.execute('emcc', [...flags, '-c', source, '-o', object], { stdio, env, timeout: 600_000 });
+      compactObjects.set(key, readFileSync(object));
+      if (compactObjects.size > 16) compactObjects.delete(compactObjects.keys().next().value);
+    }
     const first = objects.findIndex(arg => wrappers.test(arg));
     objects = objects.filter(arg => !wrappers.test(arg));
     objects.splice(first, 0, object);
