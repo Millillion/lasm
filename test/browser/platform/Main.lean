@@ -281,7 +281,8 @@ def fetchChecks (checks : Checks) : Async Unit := do
     let i ← r.info
     let echoed ← r.json
     let ct := i.headers.find? (·.1 == "x-request-content-type") |>.map (·.2)
-    return (i.status == 200 && (echoed.field "n" matches .number 41) && ct == some "application/json", s!"{i.status} {ct}")
+    let n := match echoed.field "n" with | .number n => n | _ => 0
+    return (i.status == 200 && n == 41 && ct == some "application/json", s!"{i.status} {ct} {n}")
   checkAsync checks "fetch.bytes-headers" do
     let r ← fetch "/api/bytes" { headers := #[("x-lasm", "yes")] }
     let bytes ← r.bytes
@@ -346,7 +347,8 @@ def platformChecks (checks : Checks) : IO Unit := do
     let after ← location
     let state ← History.state
     History.replaceState before.pathname
-    return (after.pathname == "/pushed" && after.search == "?x=1" && (state.field "step" matches .number 1) && (← location).pathname == before.pathname, after.href)
+    let step := match state.field "step" with | .number n => n | _ => 0
+    return (after.pathname == "/pushed" && after.search == "?x=1" && step == 1 && (← location).pathname == before.pathname, after.href)
   check checks "crypto.random" do
     let bytes ← Crypto.randomBytes 32
     let uuid ← Crypto.randomUUID
