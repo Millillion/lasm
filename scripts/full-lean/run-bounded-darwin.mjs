@@ -87,7 +87,11 @@ try {
     try {
       const sample = () => ({ processes: current(), memory: darwinMemory() });
       let fresh;
-      try { fresh = sample(); }
+      try {
+        fresh = sample();
+        const last = evidence.monitorRecoveries.at(-1);
+        if (last?.recovered) last.followedBySample = true;
+      }
       catch (error) {
         if (stopping) throw error;
         fresh = recoverDarwinSample(error, { group: child.pid, previousProcesses: evidence.lastSample?.processes,
