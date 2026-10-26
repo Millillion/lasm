@@ -17,10 +17,10 @@ export const edgeArchives = ['libleanrt.a', 'libleancpp.a', 'liblasmhost.a'];
 export const edgeExtras = ['liblasmjsedge.a'];
 
 /** Locates and verifies the edge runtime for a verified Node runtime bundle:
- * LASM_EDGE_RUNTIME (maintainers, CI), the package's targets/<name>-edge, or the
- * catalog's archive (src/edge-runtimes.json), provisioned like every other tool:
- * from the on-demand npm package @lasm/lean-edge-runtime when present, else over
- * HTTPS, verified by SHA-256 before extraction. */
+ * LASM_EDGE_RUNTIME (maintainers, CI), the package's targets/<name>-edge (the
+ * published @lasm/cli bundles it: scripts/npm-dist/build.mjs), or, for a source
+ * checkout or a candidate tarball, the catalog's archive (src/edge-runtimes.json)
+ * from its release over HTTPS, verified by SHA-256 before extraction. */
 export async function edgeRuntime(nodeRuntime, { directory = process.env.LASM_EDGE_RUNTIME, catalog = edgeRuntimeCatalog, ...provision } = {}) {
   const lean = nodeRuntime.manifest.lean;
   const name = `${nodeRuntime.manifest.name ?? 'lean-' + lean + '-wasm64'}-edge`;
