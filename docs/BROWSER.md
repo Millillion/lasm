@@ -54,8 +54,12 @@ Playwright 1.63.0: **Chromium 153** and **Firefox 155** on `ubuntu-24.04`,
   the Vite bundle.
 - **`@lasm/vite` development** (headless Chromium): editing `Main.lean`'s view
   rebuilds and remounts the app in place, without a page reload (4/4 checks).
-- `Lasm.UI` (branch `browser-ui`): every check passed except two TodoMVC edit
-  checks (commit on blur), which that branch is fixing.
+- `Lasm.UI` (branch `browser-ui`): two TodoMVC edit checks failed in this run;
+  after merging that branch's fixes, run **40293687681** (source `24c0ca6`)
+  passed every check on every engine (TodoMVC 25/25, the demo 18/18) except
+  one frame-benchmark timing on WebKit macOS (update every 10th row: 35 ms vs
+  vanilla 16 ms, over the 2× budget). Counter there: 154.1 KiB brotli, start
+  29 ms Chromium (both budgets pass); dev rebuild 16.8 s.
 
 | Measure | Value |
 | --- | --- |
