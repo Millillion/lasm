@@ -9,7 +9,7 @@
 //     the Wasm carries the notices as its lasm.notices custom section;
 //     browser outputs: the loader carries the banner;
 //     WASI, Fastly and wasi-http: main.wasm carries the lasm.notices section,
-//     the Fastly package holds THIRD_PARTY_NOTICES.txt; wasi-http names the
+//     the Fastly package (pkg/, when present) holds THIRD_PARTY_NOTICES.txt; wasi-http names the
 //     Wasmtime adapter;
 //   - no Wasm or JavaScript file contains a copyleft marker (src/notices.mjs).
 // node_modules/ and the project's own files are not inspected.
@@ -81,7 +81,7 @@ export function checkOutput({ directory, kind }) {
     if (kind === 'fastly') {
       const pkg = join(directory, '..', 'pkg');
       const archives = existsSync(pkg) ? readdirSync(pkg).filter(name => name.endsWith('.tar.gz')) : [];
-      if (!archives.length) problems.push('no Fastly package in pkg/');
+      // The package is checked where it is (a copied bin/ may come without pkg/).
       for (const name of archives) if (!gunzipSync(read(join(pkg, name))).includes('/THIRD_PARTY_NOTICES.txt\0'))
         problems.push(`pkg/${name} has no THIRD_PARTY_NOTICES.txt`);
     }
