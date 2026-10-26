@@ -178,8 +178,9 @@ events) applies the static options and reads the decoder's paths from the
 event (`currentTarget` is that element). It then makes **one** synchronous
 call into Lean with the ids from the root to the target and, per handler, its
 depth and values. Lean runs `update` (and commands) at once; if the model
-changed it asks for a frame, and on the next `requestAnimationFrame` one call
-returns the patch. Hydration (`mount(el, { hydrate: true })`) applies the
+changed it asks for a frame: after discrete user input (click, keys, input,
+focus, submit) the applier renders at once, otherwise on the next
+`requestAnimationFrame`; one call returns the patch. Hydration (`mount(el, { hydrate: true })`) applies the
 first frame by adopting the existing children in order (comment nodes are
 dropped; a node whose kind, tag or namespace differs is replaced).
 

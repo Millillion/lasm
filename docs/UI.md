@@ -213,8 +213,20 @@ structure App (Flags Model Msg : Type) where
   or `data-lasm-flags`), the page URL, routing and messages from JavaScript.
 
 `App.run app` is `main`. Updates are synchronous: an event's message runs
-`update` at once; the view is rendered and diffed on the next animation
-frame, however many messages arrived, and the patch is applied in one call.
+`update` at once. After discrete user input (a click, a key, typing, focus
+changes, a submit) the view is rendered, diffed and patched in the same task,
+so the page shows the result as hand-written DOM code would; after anything
+else (pointer moves, scrolling, timers, HTTP responses, subscriptions) it is
+rendered on the next animation frame, however many messages arrived. Either
+way one patch is applied in one call.
+
+**Hot reload.** With [`@lasm/vite`](BROWSER.md) in development, editing a
+`.lean` file rebuilds the app and remounts it without a page reload. When the
+model type has `ToJS` and `FromJS` instances (`deriving ToJS, FromJS`, or
+`Int`, `String`, structures of them, …), the model survives: the old version
+saves it and the new one starts from it instead of `init` (and skips `init`'s
+command); if it no longer converts (its type changed), the app starts from
+`init`. Other models start from `init` on every reload (`Lasm.UI.HotModel`).
 
 ## Commands: `Cmd`
 
@@ -408,7 +420,8 @@ theorem diffAttrs_correct (old new : List (Attr Msg)) : applyAttrOps (diffAttrs 
 ```
  event ─▶ lasm:ui-dom: delegated listener on the mount root
           encodes the decoder's fields ──one call──▶ Lean: update (pure), commands
- next animation frame ──one call──▶ Lean: view (pure), diff (proved), encode
+ then (at once for user input, else on the next animation frame)
+          ──one call──▶ Lean: view (pure), diff (proved), encode
           ◀── one binary patch ── applier: id → node table, DOM operations
 ```
 

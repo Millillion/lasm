@@ -44,9 +44,12 @@ try {
   result.updateSeconds = (Date.now() - edited) / 1000;
   expect('vite-dev.update', updated, await page.textContent('#app h1').catch(() => ''));
   expect('vite-dev.no-reload', loads === 1, `${loads} page loads`);
+  // Lasm.UI keeps the model across the reload (its type, Int, has ToJS and FromJS).
+  expect('vite-dev.model-kept', (await page.textContent('#app output').catch(() => '')) === '2', await page.textContent('#app output').catch(() => ''));
   expect('vite-dev.logged', lines.some(l => l.includes('[lasm]') && l.includes('updated')), lines.slice(-5).join(' | '));
   await (await page.$$('#app button'))[1].click();
-  expect('vite-dev.still-interactive', await page.waitForFunction(() => /^\d+$/.test(document.querySelector('#app output')?.textContent ?? ''), null, { timeout: 5000 }).then(() => true, () => false));
+  expect('vite-dev.still-interactive', await page.waitForFunction(() => document.querySelector('#app output')?.textContent === '3', null, { timeout: 5000 }).then(() => true, () => false),
+    await page.textContent('#app output').catch(() => ''));
   writeFileSync(main, before);
 } catch (error) {
   expect('vite-dev.runner', false, error.stack ?? error.message);

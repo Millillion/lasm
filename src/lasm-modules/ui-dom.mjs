@@ -174,8 +174,8 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   // ---- frames ----
   // Timings of the last frame (Lean's view, diff and encoding; the applier), for tools.
   const last = { leanMs: 0, applyMs: 0, bytes: 0, frames: 0 };
-  function frame() {
-    pending = false;
+  function frame() { pending = false; render(); }
+  function render() {
     if (stopped) return;
     const t0 = performance.now();
     const patch = lean.frame();
@@ -217,8 +217,16 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     if (!calls.length) return;
     const path = new Array(chain.length);
     for (let i = 0; i < chain.length; i++) path[i] = chain[chain.length - 1 - i].$i;
-    after(lean.event(path, type, calls));
+    // Discrete user input (a click, a key, typing) shows its result at once,
+    // in the same task, as hand-written DOM code would; continuous events
+    // (pointer moves, scrolling, timers) wait for the next animation frame, so
+    // many of them cost one render.
+    // (Events that applying a patch causes, such as a blur, wait for the frame.)
+    if (lean.event(path, type, calls)) { if (discrete.has(type) && bytes === null) render(); else schedule(); }
   }
+  const discrete = new Set(['click', 'dblclick', 'auxclick', 'contextmenu', 'mousedown', 'mouseup', 'pointerdown', 'pointerup',
+    'touchstart', 'touchend', 'keydown', 'keyup', 'keypress', 'input', 'change', 'beforeinput', 'submit', 'reset', 'focus', 'blur',
+    'focusin', 'focusout', 'compositionend', 'paste', 'cut', 'copy', 'drop']);
   function listen(type) {
     if (listening.has(type)) return;
     listening.add(type);
