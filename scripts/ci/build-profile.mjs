@@ -74,7 +74,7 @@ async function build(label, name, options = {}) {
   for (const [k, v] of Object.entries(record.tools).slice(0, 6)) console.log(`    ${v.seconds.toFixed(1).padStart(6)} s  ${k} x${v.count}`);
 }
 // A new user's first Hono build: a new machine (an empty tool cache), a new project.
-{
+if (!process.env.BUILD_PROFILE_EDIT_LOOP_ONLY) {
   const fresh = join(work, 'projects', 'hono-new-machine');
   cpSync(projects.hono, fresh, { recursive: true });
   projects['hono-new-machine'] = fresh;
@@ -84,6 +84,37 @@ async function build(label, name, options = {}) {
   record.withoutDownloadSeconds = +(record.seconds - record.downloadSeconds).toFixed(2);
   console.log(`  download ${record.downloadSeconds} s; without download ${record.withoutDownloadSeconds} s`);
   writeFileSync(output, JSON.stringify(result, null, 2) + '\n');
+}
+// A Lake project as `lasm init --template hono` writes it (the edit loop users get).
+if (!process.env.BUILD_PROFILE_SKIP_TEMPLATE) {
+  const dir = projects.template = join(work, 'projects', 'template-hono');
+  cp.execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'init', dir, '--template', 'hono'], { stdio: 'inherit' });
+  const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+  delete pkg.devDependencies;
+  writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg, null, 2) + '\n');
+  cp.execFileSync(npm, ['install', '--no-audit', '--no-fund'], { cwd: dir, stdio: 'inherit', shell });
+}
+// The edit loop (docs/BENCHMARKS.md "Edit loop"): dev rebuilds after a
+// one-function edit, in this process (as `lasm dev` rebuilds) and as a new
+// `lasm build --dev` process (as `npm run dev` after an edit).
+const editLoop = async name => {
+  const source = join(projects[name], 'Main.lean'), original = readFileSync(source, 'utf8');
+  const edit = n => writeFileSync(source, original.replace(/\ndef main/, `\ndef editLoop : Nat := ${n}\n\ndef main`));
+  await build(`${name}: dev, first`, name, { profile: 'dev' });
+  for (let n = 1; n <= 3; n++) { edit(n); await build(`${name}: dev, function edit ${n}`, name, { profile: 'dev' }); }
+  edit(4);
+  const start = now();
+  cp.execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', 'Main.lean', '--dev', '--output', 'dist-dev'], { cwd: projects[name], stdio: 'inherit' });
+  result.builds.push({ label: `${name}: dev, function edit, new process`, fixture: name, profile: 'dev', seconds: (now() - start) / 1000 });
+  console.log(`${result.builds.at(-1).label}: ${result.builds.at(-1).seconds.toFixed(1)} s`);
+  writeFileSync(source, original);
+  writeFileSync(output, JSON.stringify(result, null, 2) + '\n');
+};
+if (process.env.BUILD_PROFILE_EDIT_LOOP_ONLY) {
+  for (const name of ['hono', ...(projects.template ? ['template'] : [])]) await editLoop(name);
+  result.finishedAt = new Date().toISOString();
+  writeFileSync(output, JSON.stringify(result, null, 2) + '\n');
+  process.exit(0);
 }
 for (const name of ['hello', 'hono']) {
   const source = join(projects[name], 'Main.lean'), original = readFileSync(source, 'utf8');
@@ -97,5 +128,6 @@ for (const name of ['hello', 'hono']) {
   await build(`${name}: dev, one-line edit`, name, { profile: 'dev' });
   writeFileSync(source, original);
 }
+for (const name of ['hono', ...(projects.template ? ['template'] : [])]) await editLoop(name);
 result.finishedAt = new Date().toISOString();
 writeFileSync(output, JSON.stringify(result, null, 2) + '\n');
