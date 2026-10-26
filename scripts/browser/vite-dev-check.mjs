@@ -38,10 +38,17 @@ try {
   await page.waitForFunction(() => document.querySelector('#app output')?.textContent === '2', null, { timeout: 5000 });
   const main = join(app, 'Main.lean');
   const before = readFileSync(main, 'utf8');
-  writeFileSync(main, before.replace('{App.greet "Lean"}', '{App.greet "hot Lean"}'));
-  const edited = Date.now();
-  const updated = await page.waitForFunction(() => document.querySelector('#app h1')?.textContent.includes('hot Lean'), null, { timeout: 240_000 }).then(() => true, () => false);
-  result.updateSeconds = (Date.now() - edited) / 1000;
+  // Three edits: the first after the initial build also records the warm build
+  // worker's caches; the steady-state number is the last one.
+  let updated = true;
+  result.updates = [];
+  for (const text of ['hot Lean', 'hot Lean 2', 'hot Lean 3']) {
+    writeFileSync(main, before.replace('{App.greet "Lean"}', `{App.greet "${text}"}`));
+    const edited = Date.now();
+    updated &&= await page.waitForFunction(t => document.querySelector('#app h1')?.textContent.includes(t), text, { timeout: 240_000 }).then(() => true, () => false);
+    result.updates.push((Date.now() - edited) / 1000);
+  }
+  result.updateSeconds = result.updates.at(-1);
   expect('vite-dev.update', updated, await page.textContent('#app h1').catch(() => ''));
   expect('vite-dev.no-reload', loads === 1, `${loads} page loads`);
   expect('vite-dev.logged', lines.some(l => l.includes('[lasm]') && l.includes('updated')), lines.slice(-5).join(' | '));
@@ -56,6 +63,6 @@ try {
   writeFileSync(out, JSON.stringify(result, null, 2) + '\n');
 }
 const failed = result.checks.filter(c => !c.ok);
-console.log(`vite dev: ${result.checks.length - failed.length}/${result.checks.length} checks; first build ${result.firstBuildSeconds}s, update ${result.updateSeconds}s`);
+console.log(`vite dev: ${result.checks.length - failed.length}/${result.checks.length} checks; first build ${result.firstBuildSeconds}s, updates ${result.updates?.join(', ')} s`);
 for (const f of failed) console.log('  FAIL ' + f.name + ': ' + f.detail);
 process.exit(failed.length ? 1 : 0);

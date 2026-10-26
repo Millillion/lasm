@@ -27,6 +27,9 @@ on:
       - '.github/workflows/edge-runtime.yml'
       - 'src/browser/**'
       - 'src/edge/**'
+      - 'scripts/edge/**'
+      - 'src/dev*.mjs'
+      - 'src/vite/**'
       - 'src/lasm-modules/**'
       - 'src/lasm-library.mjs'
       - 'src/application-build.mjs'
@@ -142,6 +145,14 @@ jobs:
         run: |
           node bin/lasm.mjs init .work/browser-work/dev-loop --template web
           node scripts/browser/dev-loop-check.mjs .work/browser-work/dev-loop .work/browser-apps/dev-loop.json
+      - name: lasm dev --target workers (rebuild workers/ only, no platform CLI)
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: |
+          node bin/lasm.mjs init .work/browser-work/dev-edge --template hono --deploy workers
+          (cd .work/browser-work/dev-edge && node -e "const p=require('./package.json');delete p.devDependencies;require('fs').writeFileSync('package.json',JSON.stringify(p,null,2))" && npm install --no-audit --no-fund)
+          node scripts/edge/dev-edge-check.mjs .work/browser-work/dev-edge .work/browser-apps/dev-edge.json
       - name: Playwright's Chromium, cached per version (for vite dev)
         uses: actions/cache@v4
         with:

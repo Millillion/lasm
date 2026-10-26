@@ -16,7 +16,9 @@ parentPort.on('message', async ({ id, file, options, target }) => {
     if (edgeTargets[target] || target === 'browser') {
       const { buildEdge } = await import('./application-cli.mjs');
       let node;
-      const output = await buildEdge(file, target, options, options.verbose, { build: async (input, buildOptions) => (node = await build(input, buildOptions)), log });
+      const { suspend, bundler, ...buildOptions } = options;
+      const output = await buildEdge(file, target, buildOptions, options.verbose, { build: async (input, nodeOptions) => (node = await build(input, nodeOptions)), log,
+        browserSuspend: suspend ?? 'none', bundler: !!bundler });
       result = { ...node, edgeOutput: output, linkWork: undefined };
     } else result = await build(file, options);
     parentPort.postMessage({ id, type: 'result', result });

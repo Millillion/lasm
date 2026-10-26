@@ -51,11 +51,26 @@ export default function lasm(options = {}) {
     child.once('error', fail);
     child.once('exit', code => code === 0 ? done() : fail(new Error(`lasm build ${relative(config.root, source)} failed:\n${errors.slice(-8000)}`)));
   });
+  // Development: one long-lived build worker per dev server (src/dev-build-service.mjs,
+  // as lasm dev uses), so loaded code, verified tools and caches carry over between
+  // saves. A configured other CLI (options.cli, LASM_CLI) runs as a process per build.
+  let service;
+  const runInWorker = async (source, output, dev) => {
+    service ??= (await import('../dev-build-service.mjs')).createBuildService({ unref: true });
+    try {
+      await service.build(source, { profile: dev ? 'dev' : 'release', output, bundler: true, ...(options.suspend ? { suspend: options.suspend } : {}) },
+        { target: 'browser', onLog: text => process.stderr.write(text + '\n') });
+    } catch (error) {
+      const detail = [error.stdout, error.stderr].filter(Boolean).join('\n').trim();
+      throw new Error(`lasm build ${relative(config.root, source)} failed:\n${(detail || error.message).slice(-8000)}`);
+    }
+  };
+  const ownCli = () => !options.cli && !process.env.LASM_CLI;
   const outputFor = source => join(config.cacheDir, 'lasm', createHash('sha256').update(source).digest('hex').slice(0, 16));
   const build = source => {
     const output = outputFor(source);
     const dev = command === 'serve' && !options.release;
-    const promise = run(source, output, dev).then(() => {
+    const promise = (command === 'serve' && ownCli() ? runInWorker : run)(source, output, dev).then(() => {
       const manifest = JSON.parse(readFileSync(join(output, 'lasm-manifest.json'), 'utf8'));
       return { output, entry: join(output, manifest.entry), manifest };
     });
@@ -66,6 +81,7 @@ export default function lasm(options = {}) {
     name: 'lasm',
     enforce: 'pre',
     configResolved(resolved) { config = resolved; command = resolved.command; cli = findCli(resolved.root, options.cli); },
+    configureServer(server) { server.httpServer?.once('close', () => { service?.close(); service = undefined; }); },
     async resolveId(id, importer) {
       if (!id.endsWith(suffix)) return null;
       const file = resolve(importer ? dirname(importer) : config.root, id.slice(0, -suffix.length));

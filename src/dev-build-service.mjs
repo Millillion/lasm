@@ -1,11 +1,13 @@
 // The main-thread side of `lasm dev`'s long-lived build worker.
 import { Worker } from 'node:worker_threads';
 
-export function createBuildService({ workerUrl = new URL('./dev-build-worker.mjs', import.meta.url) } = {}) {
+/** unref: the worker does not keep the process alive (a Vite dev server owns its lifetime). */
+export function createBuildService({ workerUrl = new URL('./dev-build-worker.mjs', import.meta.url), unref = false } = {}) {
   let worker, nextId = 0;
   const pending = new Map();
   const start = () => {
     const self = worker = new Worker(workerUrl, { stdout: true, stderr: true });
+    if (unref) self.unref();
     self.stdout.pipe(process.stdout, { end: false });
     self.stderr.pipe(process.stderr, { end: false });
     self.on('message', message => {

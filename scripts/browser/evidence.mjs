@@ -13,6 +13,8 @@ const engines = readdirSync(resultsDirectory).filter(name => name.endsWith('.jso
   .map(name => JSON.parse(readFileSync(join(resultsDirectory, name), 'utf8')));
 const KiB = 1024;
 const median = values => { const v = values.filter(x => typeof x === 'number').sort((a, b) => a - b); return v.length ? v[Math.floor(v.length / 2)] : null; };
+const readSibling = name => (file => existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null)(join(dirname(buildFile), name));
+const devLoop = readSibling('dev-loop.json'), viteDev = readSibling('vite-dev.json');
 const chromium = engines.find(e => e.engine === 'chromium' && e.platform.startsWith('linux'));
 // Budgets (docs/BROWSER.md). `enforced` budgets fail the run; the others are recorded.
 export const budgets = [
@@ -20,7 +22,13 @@ export const budgets = [
     actual: build.apps.counter?.transfer?.brotli ?? null },
   { name: 'Start (module evaluated → first frame), wasm cached, CI Chromium', limit: 60, unit: 'ms', enforced: true,
     actual: chromium?.apps.counter?.start?.warm?.startMs ?? null },
-  { name: 'Incremental rebuild after editing one view function (dev profile), Linux runner', limit: 2, unit: 's', enforced: false,
+  // The edit loop as developers run it: lasm dev's warm build worker, the
+  // median of the edits after the first (scripts/browser/dev-loop-check.mjs).
+  { name: 'Incremental rebuild after editing one view function (lasm dev --target browser, warm), Linux runner', limit: 2, unit: 's', enforced: true,
+    actual: median((devLoop?.rebuilds ?? []).slice(1).map(r => r.seconds)) },
+  { name: 'Vite dev: edit one view function to the remounted app (warm), Linux runner', limit: 2, unit: 's', enforced: false,
+    actual: viteDev?.updates ? median(viteDev.updates.slice(1)) : viteDev?.updateSeconds ?? null },
+  { name: 'Cold dev rebuild: a new lasm build --dev --target browser process after one view edit, Linux runner', limit: 2, unit: 's', enforced: false,
     actual: build.rebuild?.seconds ?? null },
 ];
 for (const budget of budgets) budget.pass = budget.actual !== null && budget.actual <= budget.limit;
@@ -33,7 +41,7 @@ const record = {
     checks: Object.values(e.apps).reduce((n, a) => n + (a.checks?.length ?? 0), 0), failures: e.failures,
     start: Object.fromEntries(Object.entries(e.apps).map(([name, a]) => [name, a.start])),
     transferred: Object.fromEntries(Object.entries(e.apps).filter(([, a]) => a.sizes).map(([name, a]) => [name, a.sizes])) })),
-  viteDev: (file => existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null)(join(dirname(buildFile), 'vite-dev.json')),
+  viteDev, devLoop,
   startMedianMs: median(engines.map(e => e.apps.counter?.start?.warm?.startMs)),
   budgets,
 };

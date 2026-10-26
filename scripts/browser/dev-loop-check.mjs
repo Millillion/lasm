@@ -26,7 +26,7 @@ try {
   await wait(/Serving .* at (http\S+)/, 0);
   const page = await (await fetch(`http://127.0.0.1:${port}/`)).text();
   assert.match(page, /EventSource/, 'the page carries the live-reload script');
-  for (const [index, text] of ['Lean!', 'Lean!!', 'Lean!!!'].entries()) {
+  for (const [index, text] of ['Lean!', 'Lean!!', 'Lean!!!', 'Lean!!!!'].entries()) {
     const edited = original.replace('{App.greet "Lean"}', `{App.greet "${text}"}`);
     assert.notEqual(edited, original, 'the web template changed: update the view edit');
     const mark = out.length, started = performance.now();
