@@ -13,7 +13,7 @@ test('lasm init arguments', () => {
   assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'lambda']), /needs a server template/);
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel', '--deploy', 'lambda-zip', '--deploy', 'vercel']).deploy, ['vercel', 'lambda-zip']);
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
-  // Cloudflare Workers (experimental edge build): the Hono template only.
+  // Cloudflare Workers (edge build): the Hono template only.
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=workers']).deploy, ['workers']);
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'workers']), /--deploy workers supports the hono template, not express/);
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy', 'vercel-edge', '--deploy', 'netlify-edge', '--deploy', 'workers']).deploy, ['vercel-edge', 'netlify-edge', 'workers']);
@@ -82,7 +82,7 @@ test('every template creates a complete project', () => {
     for (const text of ['lambda.zip', 'lambda-edge.zip', '.vercel/output', 'netlify/functions/lasm', 'func start', 'gcloud functions deploy', "platform's own CLI"])
       assert.ok(notes.includes(text), text);
     assert.match(readFileSync(join(functions, '.gitignore'), 'utf8'), /^\.vercel\/$/m);
-    // Edge targets (experimental): build scripts, platform files, and the Node server left out of the edge build.
+    // Edge targets: build scripts, platform files, and the Node server left out of the edge build.
     const edge = join(root, 'edge');
     const edgeFiles = initProject({ directory: edge, template: 'hono', deploy: ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy'] }).files;
     for (const file of ['wrangler.toml', 'vercel.json', 'netlify.toml', 'public/lasm.txt']) assert.ok(edgeFiles.includes(file), file);

@@ -1,7 +1,6 @@
-# Deno Deploy (experimental)
+# Deno Deploy
 
-Status: **experimental, unreleased** (Phase 7.4, planned for 0.2.0). It is not in
-any candidate or in 0.1.0. Nothing is deployed to a Deno Deploy account. The
+Status: **supported from 0.2.0** (Phase 7.4). Nothing is deployed to a Deno Deploy account. The
 design and limits are in [EDGE.md](../EDGE.md).
 
 ## Build

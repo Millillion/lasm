@@ -1,7 +1,6 @@
-# Vercel Edge Functions (experimental)
+# Vercel Edge Functions
 
-Status: **experimental, unreleased** (Phase 7.3, planned for 0.2.0). It is not in
-any candidate or in 0.1.0. Nothing is deployed to a Vercel account. For a full
+Status: **supported from 0.2.0** (Phase 7.3). Nothing is deployed to a Vercel account. For a full
 Node process on Vercel, use [vercel.md](vercel.md). Vercel itself recommends its
 Node runtime over the edge runtime. The design and limits are in
 [EDGE.md](../EDGE.md).

@@ -1,7 +1,6 @@
-# Cloudflare Workers (experimental)
+# Cloudflare Workers
 
-Status: **experimental, unreleased** (Phase 7.2, planned for 0.2.0). It is not in
-any candidate or in 0.1.0. CI tests it with `wrangler dev`, which runs
+Status: **supported from 0.2.0** (Phase 7.2). CI tests it with `wrangler dev`, which runs
 workerd (Cloudflare's runtime) locally
 ([`workers.yml`](../../.github/workflows/workers.yml)). Nothing is deployed to a
 Cloudflare account. The design, limits and measurements are in

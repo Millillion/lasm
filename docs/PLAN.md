@@ -737,7 +737,27 @@ folded into Phases 5.2/5.3 and 7.
     dev build without an override. Targets on CI-class machines: clean hello
     about 11 s, Hono about 15-16 s, one-line edit about 9 s (release) or about
     5 s (dev). Pre-linking the runtime was ruled out (the link itself is about
-    1.3 s).
+    1.3 s). Delivered for 0.1.0 at `453ac42` (measured per platform in
+    [BENCHMARKS.md](BENCHMARKS.md#build-time-where-it-goes-and-the-two-profiles-current-source)).
+  - **Build-speed ideas for 0.1.x / Phase 9** (not started; each keeps release
+    bytes reproducible unless noted):
+    - Run Emscripten's JavaScript passes (acorn-optimizer, compiler.mjs) in one
+      Node worker instead of 5–7 processes per link (about 1–2 s per release link).
+    - Replace the planning probe links with an in-process reachability pass over
+      the parsed objects (removes 2–4 wasm-ld runs per edit; must match lld's
+      liveness exactly, so it needs a differential check against wasm-ld).
+    - Ship the planning objects and probe records for the `lasm init` templates
+      with the runtime, so a new machine's first template build skips planning
+      (today the machine-wide cache helps from the second project on).
+    - Host-independent object keys, then ship Lasm.JS's compiled objects with the
+      prebuilt library (about 2–4 s on a new machine).
+    - Avoid assembling Lean tier prefixes by hard links (LEAN_PATH over the tier
+      trees, if Lean and Lake accept it): 3–14 s on Windows.
+    - Windows guidance: a Dev Drive or a Defender exclusion for the tool cache
+      (documentation only; Lasm never changes security settings).
+    - Dev profile: an incremental planning mode that starts from the previous plan
+      (changes which initializers a dev build keeps only if proven minimal; needs
+      a proof or a differential check before it is allowed).
   - **5.4 Publish `@lasm/cli` 0.1 to npm** — only with the user's explicit
     approval at that point.
   - Launch support list: Node 24+ on Linux (x64/arm64) and macOS (Windows as

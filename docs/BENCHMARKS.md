@@ -266,6 +266,30 @@ on Linux) and `wasm-opt -Oz` 8 s. This is accepted for 0.1.0 as a hardware
 limit; on such machines use the dev profile (`lasm Main.lean`, `npm run dev`)
 for the edit loop.
 
+The 0.1.0 source (`453ac42`, with everything above; run 40131930601):
+
+| Build (seconds) | linux-x64 | linux-arm64 | win32-x64 | darwin-arm64 | darwin-x64 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Hono new machine, download | 14.2 | 20.4 | 17.2 | 9.3 | 13.1 |
+| Hono new machine, without download | 25.7 | 27.8 | 44.4 | 58.7 | 141.9 |
+| hono: first build on a new machine | 39.9 | 48.2 | 61.6 | 68.0 | 154.9 |
+| hello: first build in a new project | 21.7 | 28.2 | 53.9 | 19.9 | 73.8 |
+| hello: --rebuild | 4.5 | 4.6 | 8.1 | 4.3 | 14.9 |
+| hello: one-line edit | 6.3 | 6.5 | 11.0 | 6.5 | 18.6 |
+| hello: dev, one-line edit | 3.6 | 3.9 | 5.5 | 4.0 | 11.1 |
+| hono: first build in a new project | 26.6 | 29.7 | 61.0 | 32.7 | 88.8 |
+| hono: --rebuild | 6.5 | 6.4 | 11.7 | 6.8 | 21.4 |
+| hono: unchanged (cache hit) | 0.6 | 0.7 | 1.4 | 0.6 | 2.3 |
+| hono: one-line edit | 9.1 | 9.2 | 15.8 | 11.4 | 29.5 |
+| hono: dev, one-line edit | 5.4 | 6.1 | 8.7 | 7.1 | 17.7 |
+
+Against the 0.1.0 targets (CI-class machines): a new user's first Hono build
+without the download meets "about 30 s" on Linux (26–28 s) and "about 60 s"
+on Windows (44 s) and Apple Silicon (59 s; 39 s in the previous run, the
+3-vCPU runner varies); release rebuilds take 4–8 s on Linux and Apple
+Silicon and 8–12 s on Windows; dev edits 3.6–7 s there. The Intel Mac runner
+is the accepted exception (142 s new machine, 18 s Hono dev edit).
+
 What remains, by platform:
 
 - **Linux** (x64, arm64) meets the targets: release rebuilds 4–8 s, edits

@@ -26,7 +26,7 @@ export function reportCliError(error) {
     : (error.stderr?.toString() || error.stdout?.toString() || error.message).slice(-12000));
 }
 
-/** Edge targets (experimental, docs/EDGE.md): the program relinked for edge
+/** Edge targets (docs/EDGE.md): the program relinked for edge
  * isolates. An unchanged Node build reuses its cached edge program; otherwise
  * the build runs again keeping its link inputs, and the edge link follows. */
 async function buildEdge(input, target, buildOptions, verbose) {

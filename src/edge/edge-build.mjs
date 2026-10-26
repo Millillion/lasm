@@ -1,7 +1,7 @@
 // Edge targets (Phase 7, docs/EDGE.md): `lasm build --target workers|vercel-edge|
 // netlify-edge|deno-deploy|supabase-edge`. The Node build's compiled program relinked for edge isolates
 // (edge-link.mjs, cached per Node build), the pure-JS host, and a generated
-// entry module per platform. Experimental.
+// entry module per platform.
 import { mkdirSync, readFileSync, writeFileSync, copyFileSync, existsSync, rmSync, renameSync, readdirSync, statSync } from 'node:fs';
 import { basename, join, relative, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,7 +16,7 @@ export const edgeHostFiles = ['edge-start.mjs', 'edge-host.mjs', 'edge-js.mjs'];
 // configuration each platform needs beside the program. An entry outside the
 // owned directory is replaced only when Lasm generated it.
 export const edgeTargets = {
-  workers: { label: 'Cloudflare Workers', summary: 'Cloudflare Workers: workers/ (worker.mjs, the program and its host; wrangler.toml when the project has none)', output: 'workers',
+  workers: { label: 'Cloudflare Workers', supported: true, summary: 'Cloudflare Workers: workers/ (worker.mjs, the program and its host; wrangler.toml when the project has none)', output: 'workers',
     write({ staging, projectDirectory, modules }) {
       writeFileSync(join(staging, 'worker.mjs'), workersEntry(modules));
       const rootConfig = ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc'].find(name => existsSync(join(projectDirectory, name)));
@@ -26,7 +26,7 @@ export const edgeTargets = {
   // Vercel's edge runtime: a zero-config function api/lasm.mjs (Vercel bundles
   // it at deployment); its support files in api/_lasm/, which Vercel does not
   // treat as functions. vercel.json routes every path to it.
-  'vercel-edge': { label: 'Vercel Edge', summary: 'Vercel Edge Function: api/lasm.mjs and api/_lasm/ (route every path to /api/lasm in vercel.json)', output: 'api/_lasm',
+  'vercel-edge': { label: 'Vercel Edge', supported: true, summary: 'Vercel Edge Function: api/lasm.mjs and api/_lasm/ (route every path to /api/lasm in vercel.json)', output: 'api/_lasm',
     write({ projectDirectory, modules }) {
       writeGeneratedFile(join(projectDirectory, 'api/lasm.mjs'), vercelEdgeEntry(modules));
       return { note: () => 'the function is api/lasm.mjs' };
@@ -34,7 +34,7 @@ export const edgeTargets = {
   // Netlify Edge Functions (Deno): netlify/edge-functions/lasm.mjs serves every
   // path (inline config); the program and host in netlify/lasm/. The Wasm is a
   // JavaScript module, so Netlify's Deno bundler carries it.
-  'netlify-edge': { label: 'Netlify Edge', summary: 'Netlify Edge Function: netlify/edge-functions/lasm.mjs and netlify/lasm/ (serves every path)', output: 'netlify/lasm', inlineWasm: true,
+  'netlify-edge': { label: 'Netlify Edge', supported: true, summary: 'Netlify Edge Function: netlify/edge-functions/lasm.mjs and netlify/lasm/ (serves every path)', output: 'netlify/lasm', inlineWasm: true,
     write({ projectDirectory, modules }) {
       writeGeneratedFile(join(projectDirectory, 'netlify/edge-functions/lasm.mjs'), netlifyEdgeEntry(modules));
       return { note: () => 'the edge function is netlify/edge-functions/lasm.mjs' };
@@ -53,7 +53,7 @@ export const edgeTargets = {
       writeFileSync(join(staging, 'main.mjs'), portableEntry('deno', modules));
       return { note: () => 'run it with deno run -A deno/main.mjs' };
     } },
-  'deno-deploy': { label: 'Deno Deploy', summary: 'Deno Deploy: deno/ (main.mjs, the program and its host; entrypoint deno/main.mjs)', output: 'deno',
+  'deno-deploy': { label: 'Deno Deploy', supported: true, summary: 'Deno Deploy: deno/ (main.mjs, the program and its host; entrypoint deno/main.mjs)', output: 'deno',
     write({ staging, modules }) {
       writeFileSync(join(staging, 'main.mjs'), portableEntry('deno-deploy', modules));
       return { note: () => 'the entrypoint is deno/main.mjs (deno run -A deno/main.mjs locally)' };
