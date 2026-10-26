@@ -26,7 +26,7 @@ export function selectChecksRun(runs, { sha, dryRun }) {
 }
 
 /** The release-checks jobs (reusable workflows) that must pass, besides the candidate, the rehearsal and edge. */
-export const releaseGateJobs = Object.freeze(['browser', 'wasi', 'ui', 'fullstack', 'unit', 'dx']);
+export const releaseGateJobs = Object.freeze(['browser', 'wasi', 'ui', 'fullstack', 'unit', 'dx', 'stress']);
 
 /** The checks manifest must vouch for this commit and version. Pure, for tests. */
 export function manifestProblems(manifest, { sha, version, dryRun }) {

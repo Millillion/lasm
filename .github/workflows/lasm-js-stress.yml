@@ -9,6 +9,13 @@ name: Lasm.JS stress
 on:
   push:
     branches: [hang-stress]
+  # release-checks.yml: a bounded run gates every release (since 0.3.0).
+  workflow_call:
+    inputs:
+      runs: { type: string, default: '50' }
+      cli-runs: { type: string, default: '10' }
+      timeout-s: { type: string, default: '30' }
+      platforms: { type: string, default: all }
   workflow_dispatch:
     inputs:
       runs:
@@ -64,7 +71,7 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packed-candidate
+          name: stress-packed-candidate
           path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
           retention-days: 3
           if-no-files-found: error
@@ -93,7 +100,7 @@ jobs:
           package-manager-cache: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: packed-candidate
+          name: stress-packed-candidate
           path: .work/node-candidate
       - name: Stress
         run: node scripts/ci/lasm-js-stress.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm js stress λ" ".work/lasm-js-stress-${{ matrix.platform }}.json" --runs "${{ inputs.runs || '200' }}" --cli-runs "${{ inputs.cli-runs || '20' }}" --timeout-s "${{ inputs.timeout-s || '30' }}"

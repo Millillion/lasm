@@ -16,7 +16,8 @@ name: release-checks
 # Deno on all five platforms); the browser target (browser.yml), Lasm.UI
 # (ui.yml), the WASI, wasi-http and Fastly checks (wasi.yml), the fullstack
 # template on every host (fullstack.yml), the unit suite (unit.yml) and the dev
-# loop, editor and cold start (dx-dev-loop.yml), each called with this
+# loop, editor and cold start (dx-dev-loop.yml) and the Lasm.JS hang stress
+# (lasm-js-stress.yml, 50 runs per program on four platforms), each called with this
 # commit's sources (release-check: true where a workflow skips main otherwise).
 # `release-checks` passes only when all of them pass, and records
 # the result in the `release-checks` artifact, which release.yml reads before it
@@ -174,6 +175,20 @@ jobs:
       actions: read
     uses: ./.github/workflows/unit.yml
 
+  # Lasm.JS programs run many times with a short timeout on four platforms; a hang
+  # fails it and leaves diagnostics (lasm-js-stress.yml, since 0.3.0).
+  stress:
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/lasm-js-stress.yml
+    with:
+      runs: '50'
+      cli-runs: '10'
+      timeout-s: '30'
+
   # The templates' dev loop, the editor support and cold start (dx-dev-loop.yml).
   dx:
     needs: detect
@@ -185,7 +200,7 @@ jobs:
 
   release-checks:
     name: release-checks
-    needs: [detect, candidate, rehearsal, edge, browser, wasi, ui, fullstack, unit, dx]
+    needs: [detect, candidate, rehearsal, edge, browser, wasi, ui, fullstack, unit, dx, stress]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -206,6 +221,7 @@ jobs:
           FULLSTACK: ${{ needs.fullstack.result }}
           UNIT: ${{ needs.unit.result }}
           DX: ${{ needs.dx.result }}
+          STRESS: ${{ needs.stress.result }}
           REUSE: ${{ inputs.candidate-release }}
           REUSE_SHA256: ${{ inputs.candidate-sha256 }}
           OVERLAY: ${{ inputs.overlay-source == true }}
@@ -216,11 +232,11 @@ jobs:
           mkdir -p manifest
           node -e "
             const e = process.env, release = e.RELEASE === 'true', full = !e.REUSE && e.OVERLAY !== 'true';
-            const gates = [e.EDGE, e.BROWSER, e.WASI, e.UI, e.FULLSTACK, e.UNIT, e.DX];
+            const gates = [e.EDGE, e.BROWSER, e.WASI, e.UI, e.FULLSTACK, e.UNIT, e.DX, e.STRESS];
             const passed = e.DETECT === 'success' && (!release || (full ? e.CANDIDATE === 'success' : e.CANDIDATE === 'skipped') && e.REHEARSAL === 'success' && gates.every(r => r === 'success'));
             const manifest = { schema: 1, workflow: 'release-checks', passed, release, full, version: e.VERSION, previous: e.PREVIOUS, distTag: e.DIST_TAG,
               sha: e.GITHUB_SHA, headSha: e.HEAD_SHA, event: e.GITHUB_EVENT_NAME, ref: e.GITHUB_REF, runId: e.GITHUB_RUN_ID, runAttempt: e.GITHUB_RUN_ATTEMPT,
-              jobs: { detect: e.DETECT, candidate: e.CANDIDATE, rehearsal: e.REHEARSAL, edge: e.EDGE, browser: e.BROWSER, wasi: e.WASI, ui: e.UI, fullstack: e.FULLSTACK, unit: e.UNIT, dx: e.DX },
+              jobs: { detect: e.DETECT, candidate: e.CANDIDATE, rehearsal: e.REHEARSAL, edge: e.EDGE, browser: e.BROWSER, wasi: e.WASI, ui: e.UI, fullstack: e.FULLSTACK, unit: e.UNIT, dx: e.DX, stress: e.STRESS },
               candidate: release ? { release: e.REUSE || e.TESTED_RELEASE, sha256: e.REUSE_SHA256 || e.TESTED_SHA256 } : null,
               rehearsal: release ? { version: e.VERSION, license: 'MIT', node: '26.12.1', overlaySource: e.OVERLAY === 'true', record: 'npm-dist-linux-x64/linux-x64/npm-dist.json' } : null };
             require('node:fs').writeFileSync('manifest/release-checks.json', JSON.stringify(manifest, null, 2) + '\n');
