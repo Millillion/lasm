@@ -362,6 +362,9 @@ export async function runDev(options, hooks = {}) {
       const built = options.outputs.map(entry => toBuild.includes(entry) ? lastBuilt.get(entry) : { ...lastBuilt.get(entry), unchanged: true });
       const end = performance.now();
       clearStatus();
+      // LASM_DEV_TRACE=1: each output's stages with their start times (CI's edit-to-reload job).
+      if (process.env.LASM_DEV_TRACE) for (const [entry, list] of outputStages) say(`trace ${entry.target}: ${list.filter((x, i) => !/^Compiling application module (?!1 of)/.test(x.stage) || i === 0)
+        .map(x => `${((x.at - started) / 1000).toFixed(2)} ${x.stage}`).join(' | ')} | ${((lastBuilt.get(entry).finished - started) / 1000).toFixed(2)} done`);
       const stageSummary = concurrent
         ? toBuild.map(entry => `${entry.target}: ${summarizeStages(outputStages.get(entry), lastBuilt.get(entry).finished)}`).join('; ') + '; concurrently'
         : summarizeStages(stages, end);
