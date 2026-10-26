@@ -30,27 +30,42 @@ small downloads, fast start, fast updates, and a clean typed API.
 | Full stack | `Lasm.RPC`: shared Lean API types and functions; the server mounts them on Hono/Fastify/edge fetch handlers, the browser calls them through generated typed clients over `fetch` (JSON via `ToJson`/`FromJson` derivations). Template `fullstack`. | One language, one set of types, end to end. |
 | Verification story | Ship proofs, not claims: the TodoMVC example proves invariants of `update`; `Lasm.UI` proves its diff correct against a pure DOM model (`apply (diff a b) (render a) = render b`). | The pitch is formal verification of the whole stack. |
 
-## Measured (browser CI run 40283097537, source `609d391`, 2026-10-26)
+## Measured (browser CI run 40288509500, source `43f5b99`, 2026-10-26)
 
 [`browser.yml`](../.github/workflows/browser.yml) builds the web template
-(`lasm init --template web`), the [`Lasm.Web` platform suite](../test/browser/platform/Main.lean)
-and a Vite app, and runs them headless in pinned Playwright 1.63.0. Every check
-passed on **Chromium 153** and **Firefox 155** (`ubuntu-24.04`) and **WebKit 26.6**
-(`macos-15`, and `ubuntu-24.04`): 3 counter checks and 60 platform checks per
-engine (all `Lasm.Web` areas, clicks, typing, keys with modifiers,
-`preventDefault`, pointer offsets, form submission with `FormData`, `fetch`
-(text, JSON, bytes, headers, 404, form bodies, timeouts and aborts) to the local
-server, WebSocket echo (text and binary), canvas pixels, history, storage,
-crypto digests, the console, ports and messages, a second app on the page,
-unmount, and a blocking wait stopping its instance).
+(`lasm init --template web`: the `Lasm.UI` counter), the
+[`Lasm.Web` platform suite](../test/browser/platform/Main.lean) (also with
+`--suspend jspi`), the `Lasm.UI` examples (TodoMVC, the benchmark, the demo) and
+a Vite app, serves them under a strict Content Security Policy
+(`script-src 'self' 'wasm-unsafe-eval'`), and runs them headless in pinned
+Playwright 1.63.0: **Chromium 153** and **Firefox 155** on `ubuntu-24.04`,
+**WebKit 26.6** on `ubuntu-24.04` and `macos-15`. Evidence:
+[browser-ci-40288509500.json](evidence/browser-ci-40288509500.json).
+
+- **Platform (this document's scope): every check passed on every engine** — the
+  counter, 60 platform checks (all `Lasm.Web` areas; clicks, typing, keys with
+  modifiers, `preventDefault`, pointer offsets, form submission with
+  `FormData`; `fetch` text, JSON, bytes, headers, 404, form bodies, timeouts and
+  aborts to the local server; WebSocket text and binary echo; canvas pixels;
+  history; storage; crypto digests; the console; ports and messages; a second
+  app on the page; unmount; a blocking wait stopping its instance), the same
+  suite with `--suspend jspi` (Chromium suspends the blocking wait and goes on;
+  Firefox's JSPI hung, so the loader runs Firefox without it: see Decisions), and
+  the Vite bundle.
+- **`@lasm/vite` development** (headless Chromium): editing `Main.lean`'s view
+  rebuilds and remounts the app in place, without a page reload (4/4 checks).
+- `Lasm.UI` (branch `browser-ui`): every check passed except two TodoMVC edit
+  checks (commit on blur), which that branch is fixing.
 
 | Measure | Value |
 | --- | --- |
-| Web template (counter, `Lasm.Web`), transfer | **129.1 KiB brotli** (wasm 109.9 KiB + loader 19.2 KiB), 164.9 KiB gzip, 549 KiB uncompressed |
-| Platform suite (every `Lasm.Web` module), transfer | 185.3 KiB brotli |
-| Start, module evaluated → first frame, counter, warm (HTTP-cached files) | **38 ms Chromium**, 62 ms Firefox, 45 ms WebKit macOS |
-| First build / unchanged rebuild, counter (Linux runner) | 62 s / 3.9 s |
-| Dev rebuild after editing one view expression | 11.8 s (budget 2 s: not met; the Node build stage dominates) |
+| Web template (`Lasm.UI` counter), transfer | **152.2 KiB brotli** (wasm 133.6 KiB + loader 18.6 KiB) |
+| Platform suite (every `Lasm.Web` module), transfer | 185.4 KiB brotli |
+| TodoMVC (`Lasm.UI`), transfer | 170.2 KiB brotli |
+| Start, module evaluated → first frame, counter, warm | **30 ms Chromium**, 43 ms Firefox, 46 ms WebKit Linux, 64 ms WebKit macOS |
+| Same, cold (first visit) | 26 / 46 / 86 / 91 ms |
+| First build / unchanged rebuild, counter (Linux runner) | 53 s / 3.5 s |
+| Dev rebuild after editing one view expression | 12.9 s `lasm build --dev`; 11.4 s through `vite` (budget 2 s: not met; the Node build stage dominates, see the DX branch's edit-loop work) |
 | Same source, local and CI | byte-identical `app.<hash>.wasm` and `.js` |
 
 **How the link is shared.** The browser uses the edge program linked with the
@@ -65,9 +80,11 @@ recorded link mode for under 1 KB of saving).
 
 **Size work so far.** Edge and browser links regenerate the initializer
 wrappers without call chains ([edge-initializers.mjs](../src/edge/edge-initializers.mjs)):
-the web template keeps 6 of 2,807 module initializers, and the chains of the
-skipped ones were 460 KB of pre-optimization code. Counter: 167.3 → 129.1 KiB
-brotli. The loader drops comment lines and indentation of Lasm's own modules.
+the `Lasm.Web` counter keeps 6 of 2,807 module initializers, and the chains of
+the skipped ones were 460 KB of pre-optimization code: 167.3 → 129.1 KiB brotli.
+(The `Lasm.UI` counter that is now the template is 152.2 KiB.) Further
+`wasm-opt` passes (`--converge`, a second `-Oz`) gained under 0.5 % and are not
+used; the rest is Lean's runtime, mimalloc and libc++. The loader drops comment lines and indentation of Lasm's own modules.
 Programs link only the `Lasm.*` library modules they import.
 
 ## Budgets (measured in CI, recorded per release)

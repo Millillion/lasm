@@ -1,0 +1,648 @@
+{
+  "schema": 1,
+  "kind": "browser-ci",
+  "run": "40288509500",
+  "source": "43f5b99a6165267a5f08a6c3dea1cd9bba937082",
+  "recordedAt": "2026-10-26T08:21:53.074Z",
+  "build": {
+    "platform": "linux-x64",
+    "node": "v26.12.1",
+    "rebuild": {
+      "what": "counter: edit one view expression, lasm build --dev --target browser",
+      "seconds": 12.914
+    },
+    "apps": {
+      "counter": {
+        "buildSeconds": 52.686,
+        "unchangedSeconds": 3.544,
+        "transfer": {
+          "brotli": 155862,
+          "gzip": 204032,
+          "uncompressed": 730879
+        },
+        "entry": {
+          "file": "app.c5122ed22724.js",
+          "bytes": 69840,
+          "sha256": "c5122ed22724f8e0f7cb76c8c7962703f3f164b688a40c7eb1d1df133ea19e9c",
+          "brotli": 19049,
+          "gzip": 21351
+        },
+        "wasm": {
+          "file": "app.bde160d1e1e7.wasm",
+          "bytes": 661039,
+          "sha256": "bde160d1e1e707ef746276abf2162c688e449ce54c5066d0e898c28d271c1ac0",
+          "brotli": 136813,
+          "gzip": 182681
+        }
+      },
+      "platform": {
+        "buildSeconds": 33.379,
+        "unchangedSeconds": 2.782,
+        "transfer": {
+          "brotli": 189887,
+          "gzip": 262929,
+          "uncompressed": 1043739
+        },
+        "entry": {
+          "file": "app.9302d79d434b.js",
+          "bytes": 75308,
+          "sha256": "9302d79d434b9a98330680ce3c1621cdc5016bb57328d48ec5f21611275953b6",
+          "brotli": 19739,
+          "gzip": 22195
+        },
+        "wasm": {
+          "file": "app.729f80bc14a4.wasm",
+          "bytes": 968431,
+          "sha256": "729f80bc14a41458e075dc45e9c3af097a65a3a8c376ed85d8f80caf255cbc44",
+          "brotli": 170148,
+          "gzip": 240734
+        }
+      },
+      "uicounter": {
+        "buildSeconds": 26.866,
+        "unchangedSeconds": 2.34,
+        "transfer": {
+          "brotli": 155909,
+          "gzip": 204067,
+          "uncompressed": 731111
+        },
+        "entry": {
+          "file": "app.d066d82a2985.js",
+          "bytes": 69844,
+          "sha256": "d066d82a298574deb04bfad0f0d0cb7f0f4be55cf508904bdcf2d49c4c643f13",
+          "brotli": 19063,
+          "gzip": 21353
+        },
+        "wasm": {
+          "file": "app.c5eca240eadd.wasm",
+          "bytes": 661267,
+          "sha256": "c5eca240eaddd79fc1197bfef4f229737937db6ef4cdd68dcfd8406011c5ed9a",
+          "brotli": 136846,
+          "gzip": 182714
+        }
+      },
+      "todomvc": {
+        "buildSeconds": 30.004,
+        "unchangedSeconds": 2.585,
+        "transfer": {
+          "brotli": 174260,
+          "gzip": 231036,
+          "uncompressed": 858527
+        },
+        "entry": {
+          "file": "app.c566df645d96.js",
+          "bytes": 69840,
+          "sha256": "c566df645d960678b2f040028b6e845bd1fce5464114509f08722728e3882adf",
+          "brotli": 19053,
+          "gzip": 21354
+        },
+        "wasm": {
+          "file": "app.a98b76a4bf14.wasm",
+          "bytes": 788687,
+          "sha256": "a98b76a4bf140add90bc814dec19dcd717bbb1fbe2ce39b7f29759be6cd672d6",
+          "brotli": 155207,
+          "gzip": 209682
+        }
+      },
+      "bench": {
+        "buildSeconds": 22.824,
+        "unchangedSeconds": 2.346,
+        "transfer": {
+          "brotli": 158295,
+          "gzip": 207757,
+          "uncompressed": 744670
+        },
+        "entry": {
+          "file": "app.8257fbd909c1.js",
+          "bytes": 69836,
+          "sha256": "8257fbd909c1707d30a194a767148dfd576e3bb28c7442f8926bf267e98fefd8",
+          "brotli": 19055,
+          "gzip": 21352
+        },
+        "wasm": {
+          "file": "app.f4fd3176b927.wasm",
+          "bytes": 674834,
+          "sha256": "f4fd3176b927386fd3a352752a534f436a8af4e4d79c240d23821a810d6fa0ef",
+          "brotli": 139240,
+          "gzip": 186405
+        }
+      },
+      "demo": {
+        "buildSeconds": 26.517,
+        "unchangedSeconds": 2.481,
+        "transfer": {
+          "brotli": 171928,
+          "gzip": 228060,
+          "uncompressed": 810736
+        },
+        "entry": {
+          "file": "app.2fded7e953d2.js",
+          "bytes": 69834,
+          "sha256": "2fded7e953d29231749e91330977ff6ce9c3ac5c9c1ee5271999c1491908dfc5",
+          "brotli": 19024,
+          "gzip": 21350
+        },
+        "wasm": {
+          "file": "app.9a75f01e0e40.wasm",
+          "bytes": 740902,
+          "sha256": "9a75f01e0e40829d9474527c022c83b5c65431c1c8a827ce448090f167313163",
+          "brotli": 152904,
+          "gzip": 206710
+        }
+      },
+      "platform-jspi": {
+        "buildSeconds": 2.769,
+        "entry": {},
+        "wasm": {}
+      },
+      "vite": {
+        "buildSeconds": 27.588,
+        "entry": {},
+        "wasm": {}
+      }
+    }
+  },
+  "engines": [
+    {
+      "engine": "chromium",
+      "platform": "linux-x64",
+      "version": "153.0.8010.12",
+      "checks": 181,
+      "failures": [
+        "todomvc: todomvc.edit-commit: [{\"text\":\"buy some cheese\",\"cls\":\"completed\"},{\"text\":\"feed the cat\",\"cls\":\"editing\"},{\"text\":\"book a doctors appointment\",\"cls\":\"\"}]",
+        "todomvc: todomvc.edit-empty-deletes: [{\"text\":\"buy some cheese\",\"cls\":\"completed\"},{\"text\":\"blur commits\",\"cls\":\"editing\"},{\"text\":\"book a doctors appointment\",\"cls\":\"\"}]"
+      ],
+      "start": {
+        "counter": {
+          "cold": {
+            "id": "app",
+            "evaluated": 20.800000000046566,
+            "compiled": 31.300000000046566,
+            "mountedAt": 48,
+            "firstFrame": 47.3,
+            "startMs": 26.49999999995343
+          },
+          "warm": {
+            "id": "app",
+            "evaluated": 11.599999999976717,
+            "compiled": 18.20000000006985,
+            "mountedAt": 21.20000000006985,
+            "firstFrame": 41.2,
+            "startMs": 29.600000000023286
+          }
+        },
+        "demo": [
+          {
+            "id": "app",
+            "evaluated": 24.599999999976717,
+            "compiled": 34.300000000046566,
+            "mountedAt": 56.800000000046566,
+            "firstFrame": 49.232,
+            "startMs": 24.632000000023282
+          }
+        ],
+        "platform": [
+          {
+            "id": "app",
+            "evaluated": 21.300000000046566,
+            "compiled": 31.099999999976717,
+            "mountedAt": 73.19999999995343,
+            "firstFrame": 72.5,
+            "startMs": 51.199999999953434
+          }
+        ],
+        "platform-jspi": [
+          {
+            "id": "app",
+            "evaluated": 21.599999999976717,
+            "compiled": 31.899999999906868,
+            "mountedAt": 74.29999999993015,
+            "firstFrame": 66.664,
+            "startMs": 45.064000000023285
+          }
+        ],
+        "todomvc": [
+          {
+            "id": "app",
+            "evaluated": 11.400000000023283,
+            "compiled": 19.5,
+            "mountedAt": 24,
+            "firstFrame": 44.5,
+            "startMs": 33.09999999997672
+          }
+        ],
+        "uicounter": [
+          {
+            "id": "app",
+            "evaluated": 20.099999999976717,
+            "compiled": 28.899999999906868,
+            "mountedAt": 46,
+            "firstFrame": 46.6,
+            "startMs": 26.500000000023284
+          }
+        ],
+        "vite": [
+          {
+            "id": "app",
+            "evaluated": 16.599999999976717,
+            "compiled": 28.5,
+            "mountedAt": 45,
+            "firstFrame": 43.8,
+            "startMs": 27.20000000002328
+          }
+        ]
+      },
+      "transferred": {
+        "counter": [
+          {
+            "name": "app.c5122ed22724.js",
+            "transferSize": 19349,
+            "encodedBodySize": 19049,
+            "decodedBodySize": 69840
+          },
+          {
+            "name": "app.bde160d1e1e7.wasm",
+            "transferSize": 137113,
+            "encodedBodySize": 136813,
+            "decodedBodySize": 661039
+          }
+        ]
+      }
+    },
+    {
+      "engine": "firefox",
+      "platform": "linux-x64",
+      "version": "155.0",
+      "checks": 122,
+      "failures": [
+        "platform-jspi: runner: page.waitForSelector: Timeout 60000ms exceeded.\nCall log:\n  - waiting for locator('#app #done') to be visible\n\n    at platform (/home/runner/work/lasm/lasm/scripts/browser/browser-ci.mjs:97:16)\n    at async file:///home/runner/work/lasm/lasm/scripts/browser/browser-ci.mjs:195:11",
+        "todomvc: todomvc.edit-commit: [{\"text\":\"buy some cheese\",\"cls\":\"completed\"},{\"text\":\"feed the cat\",\"cls\":\"editing\"},{\"text\":\"book a doctors appointment\",\"cls\":\"\"}]",
+        "todomvc: todomvc.edit-empty-deletes: [{\"text\":\"buy some cheese\",\"cls\":\"completed\"},{\"text\":\"blur commits\",\"cls\":\"editing\"},{\"text\":\"book a doctors appointment\",\"cls\":\"\"}]"
+      ],
+      "start": {
+        "counter": {
+          "cold": {
+            "id": "app",
+            "evaluated": 38,
+            "compiled": 67,
+            "mountedAt": 71,
+            "firstFrame": 84.18,
+            "startMs": 46.18000000000001
+          },
+          "warm": {
+            "id": "app",
+            "evaluated": 24,
+            "compiled": 49,
+            "mountedAt": 53,
+            "firstFrame": 66.62,
+            "startMs": 42.620000000000005
+          }
+        },
+        "demo": [
+          {
+            "id": "app",
+            "evaluated": 36,
+            "compiled": 66,
+            "mountedAt": 71,
+            "firstFrame": 90.6,
+            "startMs": 54.599999999999994
+          }
+        ],
+        "platform": [
+          {
+            "id": "app",
+            "evaluated": 41,
+            "compiled": 76,
+            "mountedAt": 92,
+            "firstFrame": 103.82,
+            "startMs": 62.81999999999999
+          }
+        ],
+        "todomvc": [
+          {
+            "id": "app",
+            "evaluated": 31,
+            "compiled": 58,
+            "mountedAt": 62,
+            "firstFrame": 87.46,
+            "startMs": 56.459999999999994
+          }
+        ],
+        "uicounter": [
+          {
+            "id": "app",
+            "evaluated": 32,
+            "compiled": 59,
+            "mountedAt": 63,
+            "firstFrame": 78.56,
+            "startMs": 46.56
+          }
+        ],
+        "vite": [
+          {
+            "id": "app",
+            "evaluated": 31,
+            "compiled": 82,
+            "mountedAt": 84,
+            "firstFrame": 111.98,
+            "startMs": 80.98
+          }
+        ]
+      },
+      "transferred": {
+        "counter": [
+          {
+            "name": "app.c5122ed22724.js",
+            "transferSize": 19349,
+            "encodedBodySize": 19049,
+            "decodedBodySize": 69840
+          },
+          {
+            "name": "app.bde160d1e1e7.wasm",
+            "transferSize": 137113,
+            "encodedBodySize": 136813,
+            "decodedBodySize": 661039
+          }
+        ]
+      }
+    },
+    {
+      "engine": "webkit",
+      "platform": "linux-x64",
+      "version": "26.6",
+      "checks": 181,
+      "failures": [
+        "todomvc: todomvc.edit-commit: [{\"text\":\"buy some cheese\",\"cls\":\"completed\"},{\"text\":\"feed the cat\",\"cls\":\"editing\"},{\"text\":\"book a doctors appointment\",\"cls\":\"\"}]",
+        "todomvc: todomvc.edit-empty-deletes: [{\"text\":\"buy some cheese\",\"cls\":\"completed\"},{\"text\":\"blur commits\",\"cls\":\"editing\"},{\"text\":\"book a doctors appointment\",\"cls\":\"\"}]"
+      ],
+      "start": {
+        "counter": {
+          "cold": {
+            "id": "app",
+            "evaluated": 23,
+            "compiled": 51,
+            "mountedAt": 65,
+            "firstFrame": 109,
+            "startMs": 86
+          },
+          "warm": {
+            "id": "app",
+            "evaluated": 11,
+            "compiled": 29,
+            "mountedAt": 33,
+            "firstFrame": 57,
+            "startMs": 46
+          }
+        },
+        "demo": [
+          {
+            "id": "app",
+            "evaluated": 22,
+            "compiled": 53,
+            "mountedAt": 73,
+            "firstFrame": 165,
+            "startMs": 143
+          }
+        ],
+        "platform": [
+          {
+            "id": "app",
+            "evaluated": 22,
+            "compiled": 53,
+            "mountedAt": 90,
+            "firstFrame": 187,
+            "startMs": 165
+          }
+        ],
+        "platform-jspi": [
+          {
+            "id": "app",
+            "evaluated": 19,
+            "compiled": 53,
+            "mountedAt": 94,
+            "firstFrame": 110,
+            "startMs": 91
+          }
+        ],
+        "todomvc": [
+          {
+            "id": "app",
+            "evaluated": 10,
+            "compiled": 31,
+            "mountedAt": 39,
+            "firstFrame": 58,
+            "startMs": 48
+          }
+        ],
+        "uicounter": [
+          {
+            "id": "app",
+            "evaluated": 17,
+            "compiled": 48,
+            "mountedAt": 65,
+            "firstFrame": 95,
+            "startMs": 78
+          }
+        ],
+        "vite": [
+          {
+            "id": "app",
+            "evaluated": 10,
+            "compiled": 39,
+            "mountedAt": 51,
+            "firstFrame": 83,
+            "startMs": 73
+          }
+        ]
+      },
+      "transferred": {
+        "counter": [
+          {
+            "name": "app.c5122ed22724.js",
+            "transferSize": 21651,
+            "encodedBodySize": 21351,
+            "decodedBodySize": 69840
+          },
+          {
+            "name": "app.bde160d1e1e7.wasm",
+            "transferSize": 182981,
+            "encodedBodySize": 182681,
+            "decodedBodySize": 661039
+          },
+          {
+            "name": "app.bde160d1e1e7.wasm",
+            "transferSize": 182981,
+            "encodedBodySize": 182681,
+            "decodedBodySize": 661039
+          }
+        ]
+      }
+    },
+    {
+      "engine": "webkit",
+      "platform": "darwin-arm64",
+      "version": "26.6",
+      "checks": 181,
+      "failures": [
+        "todomvc: todomvc.edit-commit: [{\"text\":\"buy some cheese\",\"cls\":\"completed\"},{\"text\":\"feed the cat\",\"cls\":\"editing\"},{\"text\":\"book a doctors appointment\",\"cls\":\"\"}]",
+        "todomvc: todomvc.edit-empty-deletes: [{\"text\":\"buy some cheese\",\"cls\":\"completed\"},{\"text\":\"blur commits\",\"cls\":\"editing\"},{\"text\":\"book a doctors appointment\",\"cls\":\"\"}]"
+      ],
+      "start": {
+        "counter": {
+          "cold": {
+            "id": "app",
+            "evaluated": 85,
+            "compiled": 109,
+            "mountedAt": 135,
+            "firstFrame": 176,
+            "startMs": 91
+          },
+          "warm": {
+            "id": "app",
+            "evaluated": 12,
+            "compiled": 49,
+            "mountedAt": 60,
+            "firstFrame": 76,
+            "startMs": 64
+          }
+        },
+        "demo": [
+          {
+            "id": "app",
+            "evaluated": 23,
+            "compiled": 42,
+            "mountedAt": 107,
+            "firstFrame": 233,
+            "startMs": 210
+          }
+        ],
+        "platform": [
+          {
+            "id": "app",
+            "evaluated": 80,
+            "compiled": 128,
+            "mountedAt": 1058,
+            "firstFrame": 1078,
+            "startMs": 998
+          }
+        ],
+        "platform-jspi": [
+          {
+            "id": "app",
+            "evaluated": 67,
+            "compiled": 96,
+            "mountedAt": 775,
+            "firstFrame": 789,
+            "startMs": 722
+          }
+        ],
+        "todomvc": [
+          {
+            "id": "app",
+            "evaluated": 30,
+            "compiled": 70,
+            "mountedAt": 85,
+            "firstFrame": 118,
+            "startMs": 88
+          }
+        ],
+        "uicounter": [
+          {
+            "id": "app",
+            "evaluated": 31,
+            "compiled": 79,
+            "mountedAt": 97,
+            "firstFrame": 138,
+            "startMs": 107
+          }
+        ],
+        "vite": [
+          {
+            "id": "app",
+            "evaluated": 30,
+            "compiled": 63,
+            "mountedAt": 80,
+            "firstFrame": 109,
+            "startMs": 79
+          }
+        ]
+      },
+      "transferred": {
+        "counter": [
+          {
+            "name": "app.c5122ed22724.js",
+            "transferSize": 21651,
+            "encodedBodySize": 21351,
+            "decodedBodySize": 69840
+          },
+          {
+            "name": "app.bde160d1e1e7.wasm",
+            "transferSize": 182981,
+            "encodedBodySize": 182681,
+            "decodedBodySize": 661039
+          },
+          {
+            "name": "app.bde160d1e1e7.wasm",
+            "transferSize": 182981,
+            "encodedBodySize": 182681,
+            "decodedBodySize": 661039
+          }
+        ]
+      }
+    }
+  ],
+  "viteDev": {
+    "schema": 1,
+    "checks": [
+      {
+        "name": "vite-dev.update",
+        "ok": true,
+        "detail": "Hello, hot Lean, from Lean!"
+      },
+      {
+        "name": "vite-dev.no-reload",
+        "ok": true,
+        "detail": "1 page loads"
+      },
+      {
+        "name": "vite-dev.logged",
+        "ok": true,
+        "detail": "[vite] connecting... | [vite] connected. | [lasm] Main.lean updated"
+      },
+      {
+        "name": "vite-dev.still-interactive",
+        "ok": true,
+        "detail": ""
+      }
+    ],
+    "firstBuildSeconds": 8.476,
+    "updateSeconds": 11.409
+  },
+  "startMedianMs": 46,
+  "budgets": [
+    {
+      "name": "Counter app, total transfer (brotli)",
+      "limit": 163840,
+      "unit": "bytes",
+      "enforced": true,
+      "actual": 155862,
+      "pass": true
+    },
+    {
+      "name": "Start (module evaluated → first frame), wasm cached, CI Chromium",
+      "limit": 60,
+      "unit": "ms",
+      "enforced": true,
+      "actual": 29.600000000023286,
+      "pass": true
+    },
+    {
+      "name": "Incremental rebuild after editing one view function (dev profile), Linux runner",
+      "limit": 2,
+      "unit": "s",
+      "enforced": false,
+      "actual": 12.914,
+      "pass": false
+    }
+  ]
+}
