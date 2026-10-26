@@ -348,7 +348,9 @@ jobs:
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
         run: |
           node bin/lasm.mjs init .work/dev-app --template fullstack
+          # The resource guard starts a fresh environment: pass the runtimes on (as build-app.mjs does).
           node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py \
+            env LASM_APPLICATION_RUNTIME="$LASM_APPLICATION_RUNTIME" LASM_EDGE_RUNTIME="$LASM_EDGE_RUNTIME" LASM_BUILD_JOBS="$LASM_BUILD_JOBS" LEAN_NUM_THREADS="$LEAN_NUM_THREADS" BINARYEN_CORES="$BINARYEN_CORES" CI=1 BROWSER=none \
             node scripts/fullstack/dev-reload.mjs .work/dev-app 3000 .work/results/dev-reload.json -- \
             node "$GITHUB_WORKSPACE/bin/lasm.mjs" dev --target node=Server.lean,browser=Client.lean --output dist/public/client
       - name: Edit-to-reload times

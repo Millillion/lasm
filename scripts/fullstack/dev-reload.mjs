@@ -31,7 +31,7 @@ process.on('exit', stop);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function until(check, ms) {
   const deadline = Date.now() + ms;
-  while (Date.now() < deadline) { try { if (await check()) return true; } catch { /* not yet */ } await sleep(100); }
+  while (Date.now() < deadline) { try { if (await check()) return true; } catch (error) { if (error.fatal) throw error; /* not yet */ } await sleep(100); }
   return false;
 }
 
@@ -58,7 +58,8 @@ function listen() {
 }
 
 try {
-  const up = await until(async () => (await fetch(base)).ok, 30 * 60 * 1000);
+  // The first build is cold; a failed first build will not come back by itself.
+  const up = await until(async () => { if (/Build failed/.test(output)) throw Object.assign(new Error('build failed'), { fatal: true }); return (await fetch(base)).ok; }, 30 * 60 * 1000).catch(() => false);
   expect('dev.one-url', up, output.slice(-2000));
   if (!up) throw new Error('the dev server did not come up');
   const html = await (await fetch(base)).text();
