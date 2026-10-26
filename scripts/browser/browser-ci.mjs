@@ -160,7 +160,8 @@ async function platform(server, name, manifest) {
     await page.waitForTimeout(200);
     const stopped = await page.evaluate(async entry => (await import(entry)).appOf(document.getElementById('app')).stopped, entry);
     // --suspend jspi in a browser with JSPI: the wait suspends and the app goes on.
-    const suspends = manifest.suspend === 'jspi' && await page.evaluate(() => typeof WebAssembly.Suspending === 'function');
+    const suspends = await page.evaluate(async entry => (await import(entry)).appOf(document.getElementById('app')).jspi, entry);
+    if (manifest.suspend === 'jspi' && engine === 'chromium') expect(name, 'app.jspi-in-chromium', suspends, String(suspends));
     report.apps[name].jspi = suspends;
     if (suspends) {
       await page.click('#app #click-me');

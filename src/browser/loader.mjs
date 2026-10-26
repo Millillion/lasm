@@ -54,7 +54,10 @@ export async function mount(target, options = {}) {
   if (apps.has(element)) throw new Error(`Lasm app ${name}: this element already has a mounted app; unmount it first`);
   const record = { app: null };
   apps.set(element, record);
-  const { flags, hydrate = false, jspi = suspend === 'jspi', onError, stdout = line => console.log(line), hotState } = options;
+  const { flags, hydrate = false, jspi: wantJspi = suspend === 'jspi', onError, stdout = line => console.log(line), hotState } = options;
+  // JSPI where it is verified: Firefox 155's JSPI did not complete a suspending
+  // Lean program in CI (docs/BROWSER.md), so Firefox runs without it.
+  const jspi = wantJspi && !(typeof navigator !== 'undefined' && /\bFirefox\//.test(navigator.userAgent ?? ''));
   const errors = [];
   const stderr = line => { errors.push(line); if (errors.length > 20) errors.shift(); (options.stderr ?? (l => console.error(l)))(line); };
   let lean;
@@ -86,6 +89,8 @@ export async function mount(target, options = {}) {
     /** ports.<name>.send(value) (to Lean) and ports.<name>.subscribe(fn) (from Lean). */
     ports: embedder ? embedder.ports : Object.freeze({}),
     get stopped() { return unmounted || !!lean.lasmEdge.stopped; },
+    /** Whether Lean's blocking waits can suspend in this app (JSPI). */
+    get jspi() { return !!lean.lasmEdge.jspi; },
     /** The state the app saves for a hot reload (Lasm.Web.App.onHotSave); mount({ hotState }) restores it. */
     hotSave: () => embedder?.hotSave(),
     /** The options this app was mounted with. */
