@@ -34,6 +34,10 @@ structure Request where
   url : String
   headers : Array (String × String) := #[]
   body : ByteArray := .empty
+  /-- When `ServeOptions.streamRequestBody` selects the request, the body is
+  not read into `body`: each call returns its next chunk, `none` at the end.
+  Otherwise `none` at once. -/
+  read : Async (Option ByteArray) := pure none
   deriving Inhabited
 
 /-- An HTTP response. -/
@@ -41,6 +45,9 @@ structure Response where
   status : UInt16 := 200
   headers : Array (String × String) := #[]
   body : ByteArray := .empty
+  /-- A streamed body: after the status and headers are sent, it is called
+  with a function that sends one chunk; `body` is then ignored. -/
+  stream : Option ((ByteArray → Async Unit) → Async Unit) := none
   deriving Inhabited
 
 /-- A request handler. It runs in `Std.Async.Async`: it can await timers and
@@ -114,6 +121,14 @@ def text? (r : Request) : Option String := String.fromUTF8? r.body
 /-- The body as UTF-8 text (empty if it is not valid UTF-8). -/
 def text (r : Request) : String := r.text?.getD ""
 
+/-- The whole body: `body` followed by every chunk `read` still returns. -/
+partial def readAll (r : Request) : Async ByteArray := do
+  let rec loop (acc : ByteArray) : Async ByteArray := do
+    match ← r.read with
+    | some chunk => loop (acc ++ chunk)
+    | none => return acc
+  loop r.body
+
 end Request
 
 namespace Response
@@ -137,6 +152,11 @@ def bytes (body : ByteArray) (contentType : String := "application/octet-stream"
 /-- A redirect (`Location`), 302 by default. -/
 def redirect (location : String) (status : UInt16 := 302) : Response :=
   { status, headers := #[("location", location)] }
+/-- A response whose body `produce` sends in chunks as it computes them
+(`produce send` calls `send chunk` for each). -/
+def streaming (produce : (ByteArray → Async Unit) → Async Unit) (contentType : String := "application/octet-stream")
+    (status : UInt16 := 200) : Response :=
+  { status, headers := #[("content-type", contentType)], stream := some produce }
 /-- An empty response with this status. -/
 def empty (status : UInt16 := 204) : Response := { status }
 /-- 404, as text. -/
@@ -172,34 +192,90 @@ Deno: Lasm.JS), 1 WASI (CGI), 2 Fastly Compute, 3 a native Lean build,
 @[extern "lasm_fetch_take_request"] private opaque takeRequest : IO (String × String × Array (String × String) × ByteArray)
 /-- WASI and Fastly: sends this run's response. -/
 @[extern "lasm_fetch_send_response"] private opaque sendResponse (status : UInt16) (headers : @& Array (String × String)) (body : @& ByteArray) : IO Unit
+/-- WASI and Fastly: this run's request line and headers; the body is read with `readChunk`. -/
+@[extern "lasm_fetch_take_request_head"] private opaque takeRequestHead : IO (String × String × Array (String × String))
+/-- WASI and Fastly: the next chunk of the request body (at most `max` bytes; empty at the end). -/
+@[extern "lasm_fetch_read"] private opaque readChunk (max : UInt32) : IO ByteArray
+/-- WASI and Fastly: sends the status and headers of a streamed response. -/
+@[extern "lasm_fetch_start_response"] private opaque startResponse (status : UInt16) (headers : @& Array (String × String)) : IO Unit
+/-- WASI and Fastly: sends one chunk of a streamed response. -/
+@[extern "lasm_fetch_write"] private opaque writeChunk (chunk : @& ByteArray) : IO Unit
+/-- WASI and Fastly: ends a streamed response (`ok` false: abandons it, so the client sees an incomplete body). -/
+@[extern "lasm_fetch_finish"] private opaque finishResponse (ok : Bool) : IO Unit
+
+/-- Options of `serveWith`. -/
+structure ServeOptions where
+  /-- Which requests, by path, read their body on demand with `Request.read`
+  (`Request.readAll`) instead of into `Request.body` before the handler runs:
+  `fun _ => true` for all, `(·.startsWith "/upload")` for some. -/
+  streamRequestBody : String → Bool := fun _ => false
+  deriving Inhabited
+
+open Lasm.JS in
+/-- A web `ReadableStream`'s chunks, read on demand (`stream.getReader()`). -/
+private def jsChunks (stream : Value) : IO (Async (Option ByteArray)) := do
+  let reader ← stream.callMethod "getReader" #[]
+  return do
+    let result ← reader.callMethodAwait "read" #[] Data
+    match result.field "done", result.field "value" with
+    | .bool true, _ => return none
+    | _, .bytes b => return some b
+    | _, _ => return none
+
+open Lasm.JS in
+/-- A web `Response` for `r`; a streamed body flows through a `TransformStream`
+written by a background task. -/
+private def jsResponse (method : String) (r : Response) : Async Value := do
+  let g ← global
+  let init := obj [("status", toJS r.status), ("headers", toJS r.headers)]
+  match r.stream with
+  | some produce =>
+    if bodyless method r.status then return ← (← g.get "Response").new #[.null, init]
+    let pipe ← (← g.get "TransformStream").new #[]
+    let readable ← pipe.get "readable"
+    let writer ← (← pipe.get "writable").callMethod "getWriter" #[]
+    discard <| Std.Async.async (do
+      try
+        produce fun chunk => do let _ : Data ← writer.callMethodAwait "write" #[.bytes chunk]
+        let _ : Data ← writer.callMethodAwait "close" #[]
+      catch e =>
+        IO.eprintln s!"Lasm.Fetch: the streamed response failed: {e}"
+        let _ : Data ← writer.callMethodAwait "abort" #[toJS (toString e)])
+    (← g.get "Response").new #[.ref readable "", init]
+  | none =>
+    let content : Data := if bodyless method r.status then .null else .bytes r.body
+    (← g.get "Response").new #[content, init]
 
 open Lasm.JS in
 /-- A JavaScript fetch handler `(request) => Promise<Response>` that runs `handler`. -/
-def jsFetchHandler (handler : Handler) : IO Value := do
+def jsFetchHandler (handler : Handler) (options : ServeOptions := {}) : IO Value := do
   let g ← global
-  let responseClass ← g.get "Response"
   let uint8Array ← g.get "Uint8Array"
   let arrayClass ← g.get "Array"
   Function.ofFn fun args => do
     let .ref request _ := args[0]?.getD .undefined | throw (IO.userError "Lasm.Fetch: the fetch handler expected a Request")
-    let fields ← request.getFields #["method", "url", "headers"]
+    let fields ← request.getFields #["method", "url", "headers", "body"]
     let method := match fields.field "method" with | .string s => s | _ => "GET"
     let url := match fields.field "url" with | .string s => s | _ => "/"
     let headers ← match fields.field "headers" with
       | .ref h _ => arrayClass.callMethod "from" #[.ref h ""] (Array (String × String))
       | _ => pure #[]
-    let body ← if method == "GET" || method == "HEAD" then pure .empty else do
-      let buffer ← request.callMethodAwait "arrayBuffer" #[] Value
-      uint8Array.new #[.ref buffer ""] ByteArray
-    let r ← respond handler { method, url, headers, body }
-    let init := obj [("status", toJS r.status), ("headers", toJS r.headers)]
-    let content : Data := if bodyless method r.status then .null else .bytes r.body
-    return toJS (← responseClass.new #[content, init])
+    let req : Request ← if options.streamRequestBody ({ method, url : Request }.path) then
+        match fields.field "body" with
+        | .ref stream _ => pure { method, url, headers, read := ← jsChunks stream }
+        | _ => pure { method, url, headers }
+      else if method == "GET" || method == "HEAD" then pure { method, url, headers }
+      else do
+        let buffer ← request.callMethodAwait "arrayBuffer" #[] Value
+        pure { method, url, headers, body := ← uint8Array.new #[.ref buffer ""] ByteArray }
+    let r ← respond handler req
+    return toJS (← jsResponse method r)
 
 open Lasm.JS in
 /-- Node: an HTTP server (node:http) on $HOST:$PORT that runs `handler`. -/
-def serveNode (handler : Handler) : IO Unit := do
+def serveNode (handler : Handler) (options : ServeOptions := {}) : IO Unit := do
   let http ← require "node:http"
+  let readableClass ← (← require "node:stream").get "Readable"
   let bufferClass ← (← global).get "Buffer"
   let host := (← IO.getEnv "HOST").getD "0.0.0.0"
   let port := ((← IO.getEnv "PORT").bind String.toNat?).getD 3000
@@ -219,14 +295,25 @@ def serveNode (handler : Handler) : IO Unit := do
       return out
     let hostHeader := (headers.find? fun (k, _) => lower k == "host").map (·.2) |>.getD s!"localhost:{port}"
     let hasBody := headers.any fun (k, _) => let k := lower k; k == "content-length" || k == "transfer-encoding"
-    let body ← if !hasBody then pure .empty else do
-      let chunks ← req.callMethodAwait "toArray" #[] Value
-      bufferClass.callMethod "concat" #[.ref chunks ""] ByteArray
     let url := if target.startsWith "/" then s!"http://{hostHeader}{target}" else target
-    let r ← respond handler { method, url, headers, body }
+    let request : Request ← if !hasBody then pure { method, url, headers }
+      else if options.streamRequestBody ({ method, url : Request }.path) then
+        pure { method, url, headers, read := ← jsChunks (← readableClass.callMethod "toWeb" #[.ref req ""]) }
+      else do
+        let chunks ← req.callMethodAwait "toArray" #[] Value
+        pure { method, url, headers, body := ← bufferClass.callMethod "concat" #[.ref chunks ""] ByteArray }
+    let r ← respond handler request
     let flat : Array Data := r.headers.foldl (fun acc (k, v) => acc.push (toJS k) |>.push (toJS v)) #[]
     let _ : Value ← res.callMethod "writeHead" #[toJS r.status, .array flat]
-    return .callMethod res "end" #[if bodyless method r.status then .undefined else .bytes r.body]
+    match r.stream with
+    | some produce =>
+      if !bodyless method r.status then
+        try produce fun chunk => do let _ : Data ← res.callMethod "write" #[.bytes chunk] Data
+        catch e =>
+          IO.eprintln s!"Lasm.Fetch: the streamed response failed: {e}"
+          return .callMethod res "destroy" #[]
+      return .callMethod res "end" #[]
+    | none => return .callMethod res "end" #[if bodyless method r.status then .undefined else .bytes r.body]
   let server ← http.callMethod "createServer" #[.ref onRequest ""]
   let listening ← Function.ofFn fun _ => do
     IO.println s!"Listening on http://{host}:{port}"
@@ -341,19 +428,39 @@ def Response.header? (r : Response) (name : String) : Option String :=
   let n := lower name
   (r.headers.find? fun (k, _) => lower k == n).map (·.2)
 
+/-- WASI, Fastly and wasi-http: answers this run's request. -/
+private def serveOnce (handler : Handler) (options : ServeOptions) : IO Unit := do
+  let (method, url, headers) ← takeRequestHead
+  let read : Async (Option ByteArray) := do
+    let chunk ← (readChunk 65536 : IO ByteArray)
+    return if chunk.isEmpty then none else some chunk
+  let streamed : Request := { method, url, headers, read }
+  let req ← if options.streamRequestBody streamed.path then pure streamed
+    else do pure { method, url, headers, body := ← Async.block streamed.readAll }
+  let r ← Async.block (respond handler req)
+  match r.stream with
+  | none => sendResponse r.status r.headers (if bodyless req.method r.status then .empty else r.body)
+  | some produce =>
+    startResponse r.status r.headers
+    if bodyless req.method r.status then finishResponse true
+    else
+      let ok ← try Async.block (produce fun chunk => (writeChunk chunk : IO Unit)); pure true
+        catch e => IO.eprintln s!"Lasm.Fetch: the streamed response failed: {e}"; pure false
+      finishResponse ok
+
 /-- Serves HTTP requests with `handler` on the platform the program was built
-for (see the module documentation). On Node it does not return; on edge
-platforms it publishes the handler and returns; on WASI and Fastly it answers
-this run's request and returns. -/
-def serve (handler : Handler) : IO Unit := do
+for (see the module documentation), with `options`. On Node it does not
+return; on edge platforms it publishes the handler and returns; on WASI,
+Fastly and wasi-http it answers this run's request and returns. -/
+def serveWith (options : ServeOptions) (handler : Handler) : IO Unit := do
   match platformCode () with
-  | 1 | 2 | 4 =>
-    let (method, url, headers, body) ← takeRequest
-    let r ← Async.block (respond handler { method, url, headers, body })
-    sendResponse r.status r.headers (if bodyless method r.status then .empty else r.body)
+  | 1 | 2 | 4 => serveOnce handler options
   | 0 =>
-    if ← Lasm.JS.onEdge then Lasm.JS.exportDefault (← jsFetchHandler handler)
-    else serveNode handler
-  | _ => throw (IO.userError "Lasm.Fetch.serve: serving needs a program built by Lasm (lasm build, or lasm build --target wasi|fastly|workers|…); this program runs natively")
+    if ← Lasm.JS.onEdge then Lasm.JS.exportDefault (← jsFetchHandler handler options)
+    else serveNode handler options
+  | _ => throw (IO.userError "Lasm.Fetch.serve: serving needs a program built by Lasm (lasm build, or lasm build --target wasi|fastly|wasi-http|workers|…); this program runs natively")
+
+/-- `serveWith {}`: request bodies are read before the handler runs. -/
+def serve (handler : Handler) : IO Unit := serveWith {} handler
 
 end Lasm.Fetch

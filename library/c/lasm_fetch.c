@@ -25,3 +25,8 @@ LEAN_EXPORT lean_obj_res lasm_fetch_send(b_lean_obj_arg promise, b_lean_obj_arg 
     b_lean_obj_arg body, b_lean_obj_arg backend) {
     (void)promise; (void)method; (void)url; (void)headers; (void)body; (void)backend; return unavailable();
 }
+LEAN_EXPORT lean_obj_res lasm_fetch_take_request_head(void) { return unavailable(); }
+LEAN_EXPORT lean_obj_res lasm_fetch_read(uint32_t max) { (void)max; return unavailable(); }
+LEAN_EXPORT lean_obj_res lasm_fetch_start_response(uint16_t status, b_lean_obj_arg headers) { (void)status; (void)headers; return unavailable(); }
+LEAN_EXPORT lean_obj_res lasm_fetch_write(b_lean_obj_arg chunk) { (void)chunk; return unavailable(); }
+LEAN_EXPORT lean_obj_res lasm_fetch_finish(uint8_t ok) { (void)ok; return unavailable(); }

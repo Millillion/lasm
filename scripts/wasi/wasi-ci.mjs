@@ -170,6 +170,10 @@ const routes = [
   { path: '/time', json: { mono: true, random: 8 } },
   { path: '/throw', status: 500, text: 'Internal Server Error\n' },
   { path: '/nope', status: 404, text: 'Not Found\n' },
+  // Streamed bodies (/stream/… requests are read on demand).
+  { path: '/stream/out/5', text: Array.from({ length: 5 }, (_, i) => `chunk ${i}\n`).join('') },
+  { path: '/stream/in', method: 'POST', body: new Uint8Array(300000).fill(7), headers: { 'content-type': 'application/octet-stream' }, json: { bytes: 300000, chunks: true } },
+  { path: '/stream/echo', method: 'POST', body: bytes, headers: { 'content-type': 'application/x-lasm-test' }, bytes },
   // Outbound HTTP (Lasm.Fetch.fetch) to the harness's origin server; WASI preview 1 has no sockets.
   { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}`, json: { status: 200, body: 'POST:ping', echoed: 'POST' }, outbound: true },
   { path: `/outbound-parallel?url=${encodeURIComponent(origin + '/origin/slow')}`, outbound: true,
@@ -254,6 +258,21 @@ async function serveAndCheck(name, command, args, { cwd, port, env = {}, skipHea
         const response = await fetch(base + '/', { method: 'HEAD' });
         assert.equal(response.status, 200); assert.equal((await response.arrayBuffer()).byteLength, 0); out.passed++;
       } catch (error) { fail(`fetch ${name} HEAD /`, error); }
+    }
+    // A streamed response arrives in pieces: the first chunk well before the last
+    // (Spin's wagi executor collects a CGI program's whole output first).
+    if (name !== 'spin-wagi') {
+      try {
+        const t0 = performance.now();
+        const reader = (await fetch(base + '/stream/out/40')).body.getReader();
+        let first, text = '';
+        for (;;) { const { done, value } = await reader.read(); if (done) break; first ??= performance.now() - t0; text += new TextDecoder().decode(value); }
+        const total = performance.now() - t0;
+        out.streamFirstChunkMs = Math.round(first); out.streamTotalMs = Math.round(total);
+        assert.equal(text.split('\n').length, 41, `${name}: streamed body`);
+        assert.ok(first < total - 100, `${name}: the first chunk came after ${Math.round(first)} of ${Math.round(total)} ms`);
+        out.passed++;
+      } catch (error) { fail(`fetch ${name} streaming`, error); }
     }
     // Per request: 50 sequential GET /; 20 concurrent waits of 200 ms.
     const times = [];

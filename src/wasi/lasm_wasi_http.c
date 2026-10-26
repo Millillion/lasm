@@ -48,6 +48,7 @@ WIT(TYPES, "[method]outgoing-response.set-status-code") uint32_t h_response_set_
 WIT(TYPES, "[method]outgoing-response.body") void h_response_body(uint32_t, uint32_t);
 WIT(TYPES, "[method]outgoing-body.write") void h_outgoing_body_write(uint32_t, uint32_t);
 WIT(TYPES, "[static]outgoing-body.finish") void h_outgoing_body_finish(uint32_t, uint32_t, uint32_t, uint32_t);
+WIT(TYPES, "[resource-drop]outgoing-body") void h_drop_outgoing_body(uint32_t);
 WIT(TYPES, "[static]response-outparam.set") void h_outparam_set(uint32_t, uint32_t, uint32_t, uint32_t, int64_t, uint32_t, uint32_t, uint32_t, uint32_t);
 WIT(TYPES, "[constructor]outgoing-request") uint32_t h_outgoing_request_new(uint32_t);
 WIT(TYPES, "[method]outgoing-request.set-method") uint32_t h_outgoing_set_method(uint32_t, uint32_t, uint32_t, uint32_t);
@@ -80,7 +81,7 @@ __attribute__((used)) void *const lasm_wasi_http_imports[] = {
     (void *)h_request_consume, (void *)h_drop_incoming_request, (void *)h_fields_new, (void *)h_fields_entries, (void *)h_fields_append,
     (void *)h_drop_fields, (void *)h_incoming_body_stream, (void *)h_incoming_body_finish, (void *)h_drop_incoming_body,
     (void *)h_drop_future_trailers, (void *)h_response_new, (void *)h_response_set_status, (void *)h_response_body,
-    (void *)h_outgoing_body_write, (void *)h_outgoing_body_finish, (void *)h_outparam_set, (void *)h_outgoing_request_new,
+    (void *)h_outgoing_body_write, (void *)h_outgoing_body_finish, (void *)h_drop_outgoing_body, (void *)h_outparam_set, (void *)h_outgoing_request_new,
     (void *)h_outgoing_set_method, (void *)h_outgoing_set_path, (void *)h_outgoing_set_scheme, (void *)h_outgoing_set_authority,
     (void *)h_outgoing_request_body, (void *)h_drop_outgoing_request, (void *)h_future_subscribe, (void *)h_future_get,
     (void *)h_drop_future, (void *)h_incoming_status, (void *)h_incoming_headers, (void *)h_incoming_consume,
@@ -238,7 +239,9 @@ LEAN_EXPORT uint32_t lasm_fetch_platform(lean_obj_arg unit) { (void)unit; return
 void lasm_fastly_initialize(void) {}
 
 static const char *const method_names[] = { "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH" };
-LEAN_EXPORT lean_obj_res lasm_fetch_take_request(void) {
+/* The request's body stream, read on demand (Lasm.Fetch's streamRequestBody). */
+static uint32_t request_body, request_stream;
+static lean_obj_res request_head(lean_object **method_out, lean_object **url_out, lean_object **headers_out) {
     if (!incoming_request) return fail("Lasm.Fetch.serve: the request was already taken");
     uint32_t request = incoming_request;
     incoming_request = 0;
@@ -249,7 +252,7 @@ LEAN_EXPORT lean_obj_res lasm_fetch_take_request(void) {
     h_request_scheme(request, P(area));
     const char *scheme = "http";
     if (area[0] && area[4] == 1) scheme = "https";
-    if (area[0] && area[4] == 2) { cabi_free(at32(u32_at(area + 8))); }
+    if (area[0] && area[4] == 2) cabi_free(at32(u32_at(area + 8)));
     grow_put(&url, scheme, strlen(scheme)); grow_put(&url, "://", 3);
     h_request_authority(request, P(area));
     if (area[0]) { void *p = at32(u32_at(area + 4)); grow_put(&url, p, u32_at(area + 8)); cabi_free(p); }
@@ -257,30 +260,121 @@ LEAN_EXPORT lean_obj_res lasm_fetch_take_request(void) {
     h_request_path(request, P(area));
     if (area[0]) { void *p = at32(u32_at(area + 4)); grow_put(&url, p, u32_at(area + 8)); cabi_free(p); }
     else grow_put(&url, "/", 1);
-    lean_object *headers = headers_of(h_request_headers(request));
-    growable body = { 0 };
+    *headers_out = headers_of(h_request_headers(request));
     h_request_consume(request, P(area));
-    if (area[0] == 0) read_body(u32_at(area + 4), &body);
+    if (area[0] == 0) {
+        request_body = u32_at(area + 4);
+        h_incoming_body_stream(request_body, P(area));
+        if (area[0] == 0) request_stream = u32_at(area + 4);
+    }
     h_drop_incoming_request(request);
-    lean_object *body_bytes = lean_alloc_sarray(1, body.size, body.size);
-    if (body.size) memcpy(lean_sarray_cptr(body_bytes), body.data, body.size);
-    lean_object *result = pair(method, pair(lean_mk_string_from_bytes((const char *)url.data, url.size), pair(headers, body_bytes)));
-    free(url.data); free(body.data);
-    return lean_io_result_mk_ok(result);
+    *method_out = method;
+    *url_out = lean_mk_string_from_bytes((const char *)url.data, url.size);
+    free(url.data);
+    return NULL;
 }
-LEAN_EXPORT lean_obj_res lasm_fetch_send_response(uint16_t status, b_lean_obj_arg headers, b_lean_obj_arg body) {
+/* Reads up to `max` bytes of the request body (0 at its end, which closes it). */
+static size_t read_request(growable *out, uint32_t max) {
+    if (!request_stream) return 0;
+    _Alignas(8) uint8_t area[16];
+    for (;;) {
+        s_blocking_read(request_stream, max, P(area));
+        if (area[0] == 0) {
+            void *data = at32(u32_at(area + 4));
+            uint32_t n = u32_at(area + 8);
+            grow_put(out, data, n);
+            cabi_free(data);
+            if (n) return n;
+            continue;
+        }
+        if (area[4] == 0) e_drop_error(u32_at(area + 8));
+        s_drop_input(request_stream); request_stream = 0;
+        h_drop_future_trailers(h_incoming_body_finish(request_body)); request_body = 0;
+        return 0;
+    }
+}
+LEAN_EXPORT lean_obj_res lasm_fetch_take_request(void) {
+    lean_object *method, *url, *headers;
+    lean_obj_res error = request_head(&method, &url, &headers);
+    if (error) return error;
+    growable body = { 0 };
+    while (read_request(&body, 65536)) {}
+    lean_object *bytes = lean_alloc_sarray(1, body.size, body.size);
+    if (body.size) memcpy(lean_sarray_cptr(bytes), body.data, body.size);
+    free(body.data);
+    return lean_io_result_mk_ok(pair(method, pair(url, pair(headers, bytes))));
+}
+LEAN_EXPORT lean_obj_res lasm_fetch_take_request_head(void) {
+    lean_object *method, *url, *headers;
+    lean_obj_res error = request_head(&method, &url, &headers);
+    if (error) return error;
+    return lean_io_result_mk_ok(pair(method, pair(url, headers)));
+}
+LEAN_EXPORT lean_obj_res lasm_fetch_read(uint32_t max) {
+    growable chunk = { 0 };
+    read_request(&chunk, max ? max : 1);
+    lean_object *bytes = lean_alloc_sarray(1, chunk.size, chunk.size);
+    if (chunk.size) memcpy(lean_sarray_cptr(bytes), chunk.data, chunk.size);
+    free(chunk.data);
+    return lean_io_result_mk_ok(bytes);
+}
+
+/* The response: the outparam is set first, so the host sends the status and
+   headers and then the body as it is written. */
+static uint32_t response_body, response_stream;
+static lean_obj_res start(uint16_t status, b_lean_obj_arg headers) {
     if (responded || !response_outparam) return fail("Lasm.Fetch: the response was already sent");
     uint32_t response = h_response_new(fields_from(headers));
     h_response_set_status(response, status);
     _Alignas(8) uint8_t area[8];
     h_response_body(response, P(area));
     if (area[0] != 0) return fail("Lasm.Fetch: the response body is unavailable");
-    uint32_t out = u32_at(area + 4);
-    /* The outparam first: the host reads the body as it is written. */
+    response_body = u32_at(area + 4);
     h_outparam_set(response_outparam, 0, response, 0, 0, 0, 0, 0, 0);
     responded = true;
-    if (!write_body(out, lean_sarray_cptr(body), lean_sarray_size(body))) return fail("Lasm.Fetch: writing the response body failed");
+    h_outgoing_body_write(response_body, P(area));
+    if (area[0] != 0) return fail("Lasm.Fetch: the response body is unavailable");
+    response_stream = u32_at(area + 4);
+    return NULL;
+}
+static bool write_stream(uint32_t stream, const uint8_t *data, size_t size) {
+    _Alignas(8) uint8_t area[16];
+    while (size) {
+        uint32_t n = size > 4096 ? 4096 : (uint32_t)size; /* blocking-write-and-flush takes at most 4096 bytes */
+        s_blocking_write(stream, P(data), n, P(area));
+        if (area[0] != 0) { if (area[4] == 0) e_drop_error(u32_at(area + 8)); return false; }
+        data += n; size -= n;
+    }
+    return true;
+}
+static bool finish(bool ok) {
+    _Alignas(8) uint8_t area[64];
+    if (response_stream) { s_drop_output(response_stream); response_stream = 0; }
+    if (!response_body) return false;
+    uint32_t body = response_body;
+    response_body = 0;
+    /* Dropping the body without finishing it tells the host the body is incomplete. */
+    if (!ok) { h_drop_outgoing_body(body); return true; }
+    h_outgoing_body_finish(body, 0, 0, P(area));
+    return area[0] == 0;
+}
+LEAN_EXPORT lean_obj_res lasm_fetch_send_response(uint16_t status, b_lean_obj_arg headers, b_lean_obj_arg body) {
+    lean_obj_res error = start(status, headers);
+    if (error) return error;
+    bool ok = write_stream(response_stream, lean_sarray_cptr(body), lean_sarray_size(body));
+    if (!finish(ok) || !ok) return fail("Lasm.Fetch: writing the response body failed");
     return lean_io_result_mk_ok(lean_box(0));
+}
+LEAN_EXPORT lean_obj_res lasm_fetch_start_response(uint16_t status, b_lean_obj_arg headers) {
+    lean_obj_res error = start(status, headers);
+    return error ? error : lean_io_result_mk_ok(lean_box(0));
+}
+LEAN_EXPORT lean_obj_res lasm_fetch_write(b_lean_obj_arg chunk) {
+    return response_stream && write_stream(response_stream, lean_sarray_cptr(chunk), lean_sarray_size(chunk))
+        ? lean_io_result_mk_ok(lean_box(0)) : fail("Lasm.Fetch: writing the response body failed");
+}
+LEAN_EXPORT lean_obj_res lasm_fetch_finish(uint8_t ok) {
+    return finish(ok) ? lean_io_result_mk_ok(lean_box(0)) : fail("Lasm.Fetch: ending the response body failed");
 }
 
 /* ---- Outbound requests: wasi:http/outgoing-handler, completed by the event loop. ---- */

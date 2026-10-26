@@ -78,6 +78,21 @@ def handle (req : Request) : Async Response := do
   | "GET", ["env", name] => return .json s!"\{\"value\":{jsonString ((← IO.getEnv name).getD "")}}"
   | "GET", ["time"] => return .json s!"\{\"mono\":{decide ((← IO.monoNanosNow) > 0)},\"random\":{(← IO.getRandomBytes 8).size}}"
   | "GET", ["throw"] => throw (IO.userError "thrown from Lean")
+  -- Streamed bodies: a response sent in chunks as they are made, and a request read in chunks.
+  | "GET", ["stream", "out", n] =>
+    return Response.streaming (contentType := "text/plain") fun send => do
+      for i in [0:(n.toNat?.getD 3).min 100] do
+        send s!"chunk {i}\n".toUTF8
+        Std.Async.sleep 5
+  | "POST", ["stream", "in"] =>
+    let mut chunks := 0
+    let mut bytes := 0
+    repeat
+      match ← req.read with
+      | some chunk => chunks := chunks + 1; bytes := bytes + chunk.size
+      | none => break
+    return .json s!"\{\"bytes\":{bytes},\"chunks\":{decide (chunks ≥ 1)}}"
+  | "POST", ["stream", "echo"] => return .bytes (← req.readAll) ((req.header? "content-type").getD "application/octet-stream")
   -- Outbound HTTP (Lasm.Fetch.fetch): a POST to `url` (CI runs the origin), relayed as JSON.
   | "GET", ["outbound"] =>
     let url := (req.queryParam? "url").getD ""
@@ -95,4 +110,5 @@ def handle (req : Request) : Async Response := do
     return .json s!"\{\"statuses\":{statuses.toList},\"ms\":{(← IO.monoMsNow) - t}}"
   | _, _ => return .notFound
 
-def main : IO Unit := serve handle
+-- Bodies of /stream/… requests are read as they arrive (Request.read); the others before the handler runs.
+def main : IO Unit := serveWith { streamRequestBody := (·.startsWith "/stream/") } handle
