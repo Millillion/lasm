@@ -8,11 +8,14 @@ import { jsRuntime } from './js-runtime.mjs';
 // Edge targets (experimental, docs/EDGE.md) relink for edge isolates; the
 // list equals src/edge/edge-build.mjs edgeTargets (test/edge.test.mjs).
 export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy'];
-export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets];
+// WASI targets (docs/WASI.md): a standard WASI module with no JavaScript; the
+// list equals src/wasi/wasi-build.mjs wasiTargets (test/wasi.test.mjs).
+export const wasiBuildTargets = ['wasi', 'fastly'];
+export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets];
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy] [--dev]
-       lasm init <directory> [--template plain|express|hono|std-http] [--deploy …]
+       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|wasi|fastly] [--dev]
+       lasm init <directory> [--template plain|express|hono|std-http|fetch] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
        lasm cache repair

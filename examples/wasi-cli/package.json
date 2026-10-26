@@ -1,0 +1,5 @@
+{
+  "name": "lasm-wasi-cli-example",
+  "private": true,
+  "description": "A Lean command-line program as a WASI module: lasm build Main.lean --target wasi, then wasmtime run --dir . wasi/main.wasm"
+}

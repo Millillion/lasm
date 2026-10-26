@@ -1,4 +1,4 @@
-// Lasm's own Lean library (`import Lasm.JS`), shipped with the compiler package
+// Lasm's own Lean library (`import Lasm.JS`, `import Lasm.Fetch`), shipped with the compiler package
 // in library/ and compiled into the managed Lean prefix when Lasm assembles it
 // (so `import Lasm.JS` resolves like a standard library module, from standalone
 // sources and Lake projects alike, with no Lake dependency). The generated C of
@@ -13,8 +13,10 @@ import { executableName } from './platform.mjs';
 const root = fileURLToPath(new URL('../library/', import.meta.url));
 // Lean versions the library is compiled for, and its modules in import order.
 export const libraryLeanVersions = ['4.35.0'];
-export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS'];
+export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS', 'Lasm.Fetch'];
 export const glueSource = join(root, 'c', 'lasm_js.c');
+// Lasm.Fetch's glue on Node and the edge (WASI builds link src/wasi/lasm_fetch_wasi.c).
+export const fetchGlueSource = join(root, 'c', 'lasm_fetch.c');
 // Lasm.JS.Meta (deriving, `@[js]`) uses Lean's elaborator: only prefixes that
 // contain it (the extended tier) get the library.
 const requiredOlean = ['Lean', 'Elab', 'Deriving', 'Basic.olean'];
@@ -88,9 +90,9 @@ export function compileLibrary(tree, version, { platform = process.platform, com
   return true;
 }
 
-/** Whether any generated C initializes a Lasm.JS module (its Lean code imports it). */
+/** Whether any generated C initializes a module of Lasm's library (its Lean code imports Lasm.JS or Lasm.Fetch). */
 export function importsLibrary(sources) {
-  return sources.some(file => readFileSync(file, 'latin1').includes('initialize_Lasm_JS'));
+  return sources.some(file => /initialize_Lasm_(?:JS|Fetch)/.test(readFileSync(file, 'latin1')));
 }
 
 /** The library's generated C (from the prefix) and the glue, for the link. */
@@ -99,10 +101,11 @@ export function librarySources(lean) {
   for (const module of libraryModules) {
     const parts = module.split('.');
     const c = join(lean.prefix, 'lib', 'lasm', 'c', ...parts) + '.c';
-    if (!existsSync(c)) throw new Error(`This program imports Lasm.JS, which needs Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
+    if (!existsSync(c)) throw new Error(`This program imports Lasm.JS or Lasm.Fetch, which need Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
     sources.push(c); inputs.push({ module: '+' + module, source: join(lean.prefix, 'src', 'lean', ...parts) + '.lean' });
   }
-  sources.push(glueSource); inputs.push({ module: 'lasm_js.c', source: glueSource });
+  sources.push(glueSource, fetchGlueSource);
+  inputs.push({ module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource });
   return { sources, inputs };
 }
 

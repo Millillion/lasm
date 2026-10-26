@@ -1,0 +1,169 @@
+name: WASI and Fastly Compute
+# The WASI targets (docs/WASI.md, docs/FETCH.md): builds the single-threaded
+# runtime (edge-runtime.yml, or reuses a run's archive), then
+# examples/wasi-cli and examples/fetch with `lasm build --target wasi|fastly`
+# from this source checkout, and checks them with pinned wasmtime, wasmer,
+# Node's node:wasi, Spin (wagi executor) and Viceroy, Fastly's local
+# simulator; Lasm.Fetch also on Node and Deno (scripts/wasi/wasi-ci.mjs).
+# Linux only, free runners, no account, no deployment and no publication.
+on:
+  workflow_dispatch:
+    inputs:
+      edge-runtime-run:
+        description: Reuse the edge-runtime-archive artifact of this workflow run (a run ID) instead of building the runtime
+        type: string
+        default: ''
+  workflow_call:
+  push:
+    branches: [wasi]
+    paths:
+      - '.github/workflows/wasi.yml'
+      - 'src/wasi/**'
+      - 'scripts/wasi/**'
+      - 'library/**'
+      - 'examples/fetch/**'
+      - 'examples/wasi-cli/**'
+      - 'templates/fetch/**'
+      - 'src/application-cli.mjs'
+      - 'src/cli-arguments.mjs'
+      - 'src/init.mjs'
+      - 'src/lasm-library.mjs'
+      - 'src/edge/**'
+      - 'runtime/edge.cpp'
+      - 'test/wasi.test.mjs'
+permissions:
+  # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
+  contents: write
+  actions: read
+concurrency:
+  group: wasi-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  WASMTIME_VERSION: v49.0.4
+  WASMTIME_SHA256: 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
+  WASMER_VERSION: v7.4.2
+  WASMER_SHA256: 07271f7ecf449135bbd44cfe9f38a65e54ab25f1564a9c6bd2d0d5cca5743963
+  VICEROY_VERSION: v0.21.1
+  VICEROY_SHA256: 54a5b46ab05ce1492f4df136728b2eb81b350cb42da5d9f2eec66558ddc1e233
+  SPIN_VERSION: v4.2.2
+  SPIN_SHA256: ff870e915b41216318e525198028fc1017e96f599f54bbfd4e983730d0a1fecd
+jobs:
+  runtime:
+    if: github.ref != 'refs/heads/main' && (github.event_name != 'workflow_dispatch' || inputs.edge-runtime-run == '')
+    uses: ./.github/workflows/edge-runtime.yml
+  # The native host pieces for the Node build (as workers.yml).
+  native:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Native host pieces (koffi, helpers)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      - run: tar -cf .work/native-host.tar -C .cache native-host
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: wasi-native-host
+          path: .work/native-host.tar
+          retention-days: 3
+  wasi:
+    needs: [runtime, native]
+    if: ${{ !cancelled() && needs.native.result == 'success' && (needs.runtime.result == 'success' || needs.runtime.result == 'skipped') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      EMCC_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+      CI: '1'
+      BROWSER: 'false'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: wasi-native-host
+          path: .work/native-host
+      - run: mkdir -p .cache && tar -xf .work/native-host/native-host.tar -C .cache
+      - name: Fetch the pinned Node runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - uses: actions/download-artifact@v4
+        if: github.event_name != 'workflow_dispatch' || inputs.edge-runtime-run == ''
+        with:
+          name: edge-runtime-archive
+          path: .work/edge-archive
+      - uses: actions/download-artifact@v4
+        if: github.event_name == 'workflow_dispatch' && inputs.edge-runtime-run != ''
+        with:
+          name: edge-runtime-archive
+          path: .work/edge-archive
+          run-id: ${{ inputs.edge-runtime-run }}
+          github-token: ${{ github.token }}
+      - name: The packaged edge runtime (checked against its catalog pin)
+        run: |
+          node -e "const a=require('./.work/edge-archive/artifact.json'), c=require('./src/edge-runtimes.json').lean['4.35.0']; if (a.sha256!==c.sha256) throw new Error('edge runtime archive '+a.sha256+' is not the cataloged '+c.sha256)"
+          echo "$(node -p "require('./src/edge-runtimes.json').lean['4.35.0'].sha256")  .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst" | sha256sum -c
+          mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+      - name: Unit tests (atomics lowering, WASI targets, Lasm.Fetch, init)
+        run: node --test test/wasi.test.mjs
+      - name: Pinned tools (wasmtime, wasmer, Viceroy, Spin; Deno from npm)
+        run: |
+          set -euo pipefail
+          T=.work/wasi-tools; mkdir -p $T/dl $T/wasmtime $T/wasmer $T/viceroy $T/spin
+          get() { curl -fsSL --retry 3 -o "$T/dl/$2" "$1"; echo "$3  $T/dl/$2" | sha256sum -c; }
+          get "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz" wasmtime.tar.xz "$WASMTIME_SHA256"
+          tar -xJf $T/dl/wasmtime.tar.xz -C $T/wasmtime --strip-components=1
+          get "https://github.com/wasmerio/wasmer/releases/download/$WASMER_VERSION/wasmer-linux-amd64.tar.gz" wasmer.tar.gz "$WASMER_SHA256"
+          tar -xzf $T/dl/wasmer.tar.gz -C $T/wasmer
+          get "https://github.com/fastly/Viceroy/releases/download/$VICEROY_VERSION/viceroy_${VICEROY_VERSION}_linux-amd64.tar.gz" viceroy.tar.gz "$VICEROY_SHA256"
+          tar -xzf $T/dl/viceroy.tar.gz -C $T/viceroy
+          get "https://github.com/spinframework/spin/releases/download/$SPIN_VERSION/spin-$SPIN_VERSION-static-linux-amd64.tar.gz" spin.tar.gz "$SPIN_SHA256"
+          tar -xzf $T/dl/spin.tar.gz -C $T/spin
+          rm -rf $T/dl
+          npm install --prefix $T --no-audit --no-fund deno@2.9.6
+          ls -la $T/wasmtime $T/wasmer/bin $T/viceroy $T/spin
+      - name: Build and check on wasmtime, wasmer, node:wasi, Spin, Viceroy, Node and Deno
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+          SPIN_DISABLE_TELEMETRY: '1'
+        run: node scripts/wasi/wasi-ci.mjs .work/wasi-apps .work/wasi-tools
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: wasi-results
+          path: |
+            .work/wasi-apps/wasi-results.json
+            .work/wasi-apps/fetch/wasi/main.wasm
+            .work/wasi-apps/fetch/bin/main.wasm
+            .work/wasi-apps/fetch/pkg/*.tar.gz
+            .work/wasi-apps/cli/wasi/main.wasm
+          retention-days: 14
