@@ -306,7 +306,7 @@ export const createPackageFiles = Object.freeze(['bin.mjs', 'create.mjs', 'READM
 export function createPackageJson(main, { engines } = {}) {
   assert.match(main.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
   return {
-    name: createPackageName, version: main.version, description: 'Create a Lean-on-Node project with Lasm: npm create @lasm@latest my-app',
+    name: createPackageName, version: main.version, description: 'Create a Lean project with Lasm (Lean 4 to WebAssembly): npm create @lasm@latest my-app',
     license: 'MIT', type: 'module', bin: { 'create-lasm': 'bin.mjs' }, files: [...createPackageFiles],
     ...(engines ? { engines } : {}),
     repository: repository('packages/create-lasm'),
@@ -360,6 +360,7 @@ export const cliNoticeSections = Object.freeze({
   'node-addon-api (koffi build dependency)': 'MIT',
   'Koffi runtime adapter': 'MIT',
   'Zig compiler runtime': 'MIT',
+  'Wasmtime proxy adapter': 'Apache-2.0 WITH LLVM-exception',
 });
 
 /** Split a notices file into [heading, text] sections (`=== heading ===` lines). */

@@ -89,6 +89,8 @@ export function relevantFile(name) {
   const file = basename(name);
   return file.endsWith('.lean') || ['lakefile.toml', 'lakefile.lean', 'lake-manifest.json', 'lean-toolchain', 'package.json', 'package-lock.json'].includes(file);
 }
+/** Files a build writes into the project itself (Lake's manifest). */
+export const generatedByBuild = file => basename(file) === 'lake-manifest.json';
 const ignoredDirectory = name => name === 'node_modules' || name.startsWith('.') || ['dist', 'build'].includes(name);
 
 /** The watched files under `directory` (for content comparison and polling). */
@@ -116,18 +118,48 @@ export function changedFiles(before, after) {
   return changed;
 }
 
-/** Recursive fs.watch where the platform has it, else polling (1 s). */
-export function watchProject(directory, onEvent, { pollMs = 1000 } = {}) {
-  try {
-    const watcher = watch(directory, { recursive: true }, (event, name) => {
+/** One non-recursive fs.watch per project directory (node_modules, dist,
+ * build and dot directories excluded), re-armed when a directory is replaced
+ * and extended to new directories; polling (1 s) where watching fails.
+ * Node's recursive watcher on Linux stops reporting a file after it is
+ * replaced by a rename (the save of Vim, JetBrains' safe write, sed -i and many
+ * formatters), so it is not used: a directory watcher sees every rename. */
+export function watchProject(directory, onEvent, { pollMs = 1000, watchFile = watch } = {}) {
+  const watchers = new Map();
+  let closed = false;
+  const arm = dir => {
+    if (closed || watchers.has(dir)) return;
+    const watcher = watchFile(dir, (event, name) => {
+      if (closed) return;
       if (!name) return onEvent();
-      const parts = String(name).split(/[\\/]/);
-      if (parts.slice(0, -1).some(ignoredDirectory)) return;
+      const file = join(dir, String(name));
+      if (event === 'rename' && !ignoredDirectory(String(name))) {
+        let isDirectory = false;
+        try { isDirectory = statSync(file).isDirectory(); } catch {}
+        if (isDirectory) { armTree(file); return onEvent(); }
+        if (watchers.has(file)) { watchers.get(file).close(); watchers.delete(file); return onEvent(); }
+      }
       if (relevantFile(String(name))) onEvent();
     });
-    watcher.on('error', () => {});
-    return { mode: 'events', close: () => watcher.close() };
+    watcher.on('error', () => {
+      watcher.close();
+      if (watchers.get(dir) === watcher) watchers.delete(dir);
+      // A replaced directory: watch the new one.
+      if (!closed && existsSync(dir)) setTimeout(() => { try { armTree(dir); } catch {} }, 50);
+    });
+    watchers.set(dir, watcher);
+  };
+  const armTree = dir => {
+    arm(dir);
+    for (const entry of readdirSync(dir, { withFileTypes: true }))
+      if (entry.isDirectory() && !ignoredDirectory(entry.name)) armTree(join(dir, entry.name));
+  };
+  try {
+    armTree(directory);
+    return { mode: 'events', directories: () => watchers.size, close: () => { closed = true; for (const w of watchers.values()) w.close(); watchers.clear(); } };
   } catch {
+    for (const w of watchers.values()) w.close();
+    watchers.clear();
     let previous = snapshot(directory);
     const timer = setInterval(() => {
       const next = snapshot(directory);
@@ -209,8 +241,18 @@ function createRunner() {
       await exited;
       clearTimeout(timer);
     },
-    start(command, args, { cwd, label, env = process.env }) {
-      const started = spawn(command, args, { cwd, stdio: ['ignore', 'inherit', 'inherit'], windowsHide: true, env });
+    start(command, args, { cwd, label, env = process.env, rewrite }) {
+      const started = spawn(command, args, { cwd, stdio: ['ignore', rewrite ? 'pipe' : 'inherit', 'inherit'], windowsHide: true, env });
+      if (rewrite) {
+        let pending = '';
+        started.stdout.setEncoding('utf8');
+        started.stdout.on('data', chunk => {
+          const lines = (pending + chunk).split('\n');
+          pending = lines.pop();
+          if (lines.length) process.stdout.write(lines.map(rewrite).join('\n') + '\n');
+        });
+        started.stdout.on('end', () => { if (pending) process.stdout.write(rewrite(pending) + '\n'); });
+      }
       child = started;
       exited = new Promise(resolve => started.once('exit', (code, signal) => {
         if (child === started) {
@@ -232,7 +274,7 @@ export async function runDev(options, hooks = {}) {
   const { createBuildService } = await import('./dev-build-service.mjs');
   const { findApplicationProject } = await import('./application-sources.mjs');
   const source = resolve(options.input);
-  if (!existsSync(source)) throw new Error(`${options.input} does not exist. Run lasm dev in the project directory, or name the Lean source.`);
+  if (!existsSync(source)) (await import('./application-cli.mjs')).assertSourceExists(options.input);
   const project = findApplicationProject(source) ?? dirname(source);
   const target = options.target;
   // The browser target's dev server (docs/BROWSER.md) builds and serves dist/ itself.
@@ -256,7 +298,8 @@ export async function runDev(options, hooks = {}) {
   const oneUrl = options.run && options.outputs.some(o => runtimeTargets.includes(o.target)) && options.outputs.some(o => o.target === 'browser');
   const devProxy = oneUrl ? await import('./dev-proxy.mjs') : undefined;
   const serverPort = oneUrl ? await devProxy.freePort() : undefined;
-  let lastBuilt = new Map(), changeAt;
+  const publicUrl = `http://${options.host ?? '127.0.0.1'}:${options.port ?? (Number(process.env.PORT) || 3000)}/`;
+  let lastBuilt = new Map(), changeAt, editorChecked = false;
   const tty = process.stderr.isTTY;
   let building = false, queued = false, previous = snapshot(project), lastGood, stopping = false, server;
   const browserOutput = resolve(options.output ?? join(project, '.lake/lasm/browser-dev'));
@@ -268,7 +311,8 @@ export async function runDev(options, hooks = {}) {
     building = true;
     const next = snapshot(project);
     const changed = changedFiles(previous, next);
-    if (!force && lastGood !== undefined && !changed.length) { building = false; return; }
+    // Nothing changed (an editor touched a file, or the build wrote its own files): no rebuild.
+    if (!force && !changed.length) { building = false; changeAt = undefined; return; }
     previous = next;
     if (reason) say(reason === 'change' ? `${changed.slice(0, 3).map(file => relative(project, file)).join(', ')}${changed.length > 3 ? ` and ${changed.length - 3} more` : ''} changed; rebuilding` : reason);
     const stages = [], started = performance.now(), changedAt = changeAt ?? started;
@@ -302,6 +346,7 @@ export async function runDev(options, hooks = {}) {
       say(`${color('32', allCached ? 'Up to date' : 'Built')} in ${((end - started) / 1000).toFixed(1)} s${allCached ? '' : ` (${summarizeStages(stages, end)})`}`
         + `${options.profile === 'release' ? ' — release profile' : ''}`);
       lastGood = built;
+      if (!editorChecked) { editorChecked = true; await (await import('./editor.mjs')).autoSetupEditor(source, { log: text => say(text.replace(/^\[lasm\] /, '')) }); }
       for (const item of built) if (!item.unchanged) await hooks.onBuilt?.(item);
       if (!options.run) { /* rebuild only */ }
       else if (oneUrl) {
@@ -309,7 +354,11 @@ export async function runDev(options, hooks = {}) {
         if (!program.unchanged || !runner.running()) {
           await runner.stop();
           const [command, args] = runtimeCommand(program.target, join(program.output, 'main.mjs'), options.args);
-          runner.start(command, args, { cwd: process.cwd(), label: basename(program.input), env: { ...process.env, PORT: String(serverPort), HOST: '127.0.0.1' } });
+          // The program listens on a private port behind the proxy: its own
+          // "Listening on http://127.0.0.1:<private port>" names the user's URL instead.
+          const privateUrl = new RegExp(`\\bhttps?://(?:127\\.0\\.0\\.1|localhost|0\\.0\\.0\\.0|\\[::1?\\]):${serverPort}\\b/?`, 'g');
+          runner.start(command, args, { cwd: process.cwd(), label: basename(program.input), env: { ...process.env, PORT: String(serverPort), HOST: '127.0.0.1' },
+            rewrite: line => line.replace(privateUrl, publicUrl) });
           await devProxy.waitForPort(serverPort);
         }
         if (!server) {
@@ -344,6 +393,10 @@ export async function runDev(options, hooks = {}) {
       server?.report(error.message.split('\n')[0]);
       say(color('31', `Build failed after ${((performance.now() - started) / 1000).toFixed(1)} s`) + (lastGood ? '; the last good build keeps running. Fix the error and save.' : '. Fix the error and save.'));
     } finally {
+      // Lake writes lake-manifest.json during a build (the first one creates it):
+      // that is the build's own output, not a change to rebuild for.
+      const after = snapshot(project);
+      for (const [file, hash] of after) if (generatedByBuild(file) && previous.get(file) !== hash) previous.set(file, hash);
       building = false;
       if (queued && !stopping) { queued = false; setTimeout(() => rebuild('change'), 0); }
     }

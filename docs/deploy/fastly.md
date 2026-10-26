@@ -47,7 +47,7 @@ Viceroy can also run the module directly:
 | Path | Contents |
 | --- | --- |
 | `bin/main.wasm` | The program: a `wasi_snapshot_preview1` command that imports Fastly's `fastly_abi`, `fastly_http_req`, `fastly_http_body` and `fastly_http_resp` host calls. |
-| `bin/lasm-build-info.json`, `bin/THIRD_PARTY_NOTICES.txt` | Build record and the licences of the code in the module. |
+| `bin/lasm-build-info.json`, `bin/THIRD_PARTY_NOTICES.txt` | Build record and the licences of the code in the module (also inside `main.wasm` and in the package: [LICENSING.md](../LICENSING.md)). |
 | `pkg/<name>.tar.gz` | `<name>/fastly.toml` and `<name>/bin/main.wasm`, the package `fastly compute deploy --package` uploads (`<name>` from `fastly.toml`). |
 | `fastly.toml` | Only when the project has none. |
 

@@ -86,6 +86,46 @@ jobs:
           path: .work/templates.json
           retention-days: 7
           if-no-files-found: ignore
+  editor:
+    # Editor support (docs/GETTING_STARTED.md#editor): every template's files open
+    # without errors in the Lean language server after `lasm editor`.
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+      ELAN_VERSION: v4.2.3
+      ELAN_SHA256: df0b2b3a439961ffcbb3985214365ffe40f49bc871df04dff268c7d8e21ca8b2
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: packed-candidate
+          path: .work/node-candidate
+      - name: Install elan (no toolchain), as the Lean 4 VS Code extension does
+        run: |
+          set -e
+          curl -fsSL -o "$RUNNER_TEMP/elan.tar.gz" "https://github.com/leanprover/elan/releases/download/$ELAN_VERSION/elan-x86_64-unknown-linux-gnu.tar.gz"
+          echo "$ELAN_SHA256  $RUNNER_TEMP/elan.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/elan.tar.gz" -C "$RUNNER_TEMP"
+          "$RUNNER_TEMP/elan-init" -y --default-toolchain none --no-modify-path
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Every template in the language server
+        run: node scripts/templates/editor-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm editor" .work/editor.json
+      - name: Preserve the result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dx-editor
+          path: .work/editor.json
+          retention-days: 7
+          if-no-files-found: ignore
   cold-start:
     needs: pack
     runs-on: ubuntu-24.04

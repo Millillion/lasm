@@ -31,7 +31,7 @@ every other target (`/`, `/hello/:name`, …).
 | `supabase/functions/<name>/index.ts` | The generated entry. It compiles the Wasm, starts Lean once per worker, and serves the handler published with `Lasm.JS.exportDefault` with `Deno.serve`. A stopped instance is replaced on the next request. |
 | `supabase/functions/<name>/deno.json` | The import map: every npm module the program imports (from `@[js "module" …]` bindings and `lasm.edge.modules`), pinned to the version installed in `node_modules` (`"hono": "npm:hono@4.13.13"`, and `"hono/"` for subpaths). Run `npm install` before building. |
 | `supabase/functions/<name>/lasm/` | The program (`program.wasm.mjs`: the Wasm as a JavaScript module, so Supabase's bundler carries it) and the pure-JS host. |
-| `supabase/functions/<name>/build-info.json`, `THIRD_PARTY_NOTICES.txt` | Build record and notices. |
+| `supabase/functions/<name>/build-info.json`, `THIRD_PARTY_NOTICES.txt` | Build record and notices (also inside the inlined Wasm: [LICENSING.md](../LICENSING.md)). |
 | `supabase/config.toml` (from `lasm init`) | `[functions.<name>]` with `verify_jwt = true` and the import map. Keep it, or merge it into the file `supabase init` writes. |
 
 Lasm owns `supabase/functions/<name>/` and replaces it on every build; put

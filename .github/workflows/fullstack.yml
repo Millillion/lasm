@@ -108,6 +108,8 @@ jobs:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
         run: node scripts/fullstack/build-app.mjs .work/fullstack-work .work/fullstack-app
+      - name: Licence check of every built output (server dist, browser client, Workers)
+        run: node scripts/license/check-outputs.mjs .work/fullstack-work .work/fullstack-app --expect browser
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: fullstack-app
@@ -185,14 +187,14 @@ jobs:
           ../tools/node_modules/.bin/wrangler dev --port 8787 --ip 127.0.0.1 > wrangler.log 2>&1 &
           echo $! > wrangler.pid
           cd ../..
-          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8787/ --label workers --add 'Kept in Workers KV' --out .work/results/workers-smoke.json || (cat .work/app/wrangler.log; exit 1)
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8787/ --label workers --platform-assets --add 'Kept in Workers KV' --out .work/results/workers-smoke.json || (cat .work/app/wrangler.log; exit 1)
           node scripts/fullstack/fullstack-ci.mjs --browser chromium --label workers --url http://127.0.0.1:8787/ --out .work/results/workers-chromium.json --playwright .work/pw || (cat .work/app/wrangler.log; exit 1)
           pkill -f 'wrangler dev' || true; pkill -f workerd || true
           for i in $(seq 50); do curl -s -o /dev/null http://127.0.0.1:8787/ || break; sleep 0.2; done
           cd .work/app
           ../tools/node_modules/.bin/wrangler dev --port 8787 --ip 127.0.0.1 > wrangler-2.log 2>&1 &
           cd ../..
-          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8787/ --label workers-restarted --expect 'Kept in Workers KV' --out .work/results/workers-restart.json || (cat .work/app/wrangler-2.log; exit 1)
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8787/ --label workers-restarted --platform-assets --expect 'Kept in Workers KV' --out .work/results/workers-restart.json || (cat .work/app/wrangler-2.log; exit 1)
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -348,7 +350,9 @@ jobs:
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
         run: |
           node bin/lasm.mjs init .work/dev-app --template fullstack
+          # The resource guard starts a fresh environment: pass the runtimes on (as build-app.mjs does).
           node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py \
+            env LASM_APPLICATION_RUNTIME="$LASM_APPLICATION_RUNTIME" LASM_EDGE_RUNTIME="$LASM_EDGE_RUNTIME" LASM_BUILD_JOBS="$LASM_BUILD_JOBS" LEAN_NUM_THREADS="$LEAN_NUM_THREADS" BINARYEN_CORES="$BINARYEN_CORES" CI=1 BROWSER=none \
             node scripts/fullstack/dev-reload.mjs .work/dev-app 3000 .work/results/dev-reload.json -- \
             node "$GITHUB_WORKSPACE/bin/lasm.mjs" dev --target node=Server.lean,browser=Client.lean --output dist/public/client
       - name: Edit-to-reload times

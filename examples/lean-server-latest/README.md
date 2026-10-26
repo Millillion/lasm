@@ -1,5 +1,9 @@
 # Ordinary Lean HTTP server on the current application runtime
 
+> **Historical maintainer harness** (written for Lean 4.34 before the managed CLI
+> existed). Lasm now supports Lean 4.35.0 through `lasm build`; to start a new
+> server, use `npm create @lasm@latest` ([Getting started](../../docs/GETTING_STARTED.md)).
+
 This Lake project uses Lean 4.34, `Std.Http`, `Std.Async`, `Std.Mutex`, JSON and
 ordinary `IO.FS`. It implements persistent todos, revision checks, validation,
 binary echo, streamed events and graceful shutdown. No Lasm Lean imports or

@@ -8,7 +8,7 @@
 // remounts it in place, passing it the state it saved (Lasm.Web.App.onHotSave).
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -42,6 +42,7 @@ function leanFiles(directory, skip) {
 export default function lasm(options = {}) {
   let config, cli, command = 'serve';
   const builds = new Map(); // source → { output, promise }
+  const notices = new Map(); // source → its THIRD_PARTY_NOTICES.txt (production builds)
   const run = (source, output, dev) => new Promise((done, fail) => {
     const args = [cli, 'build', source, '--target', 'browser', '--bundler', '--output', output,
       ...(options.suspend ? ['--suspend', options.suspend] : []), ...(dev ? ['--dev'] : [])];
@@ -94,10 +95,16 @@ export default function lasm(options = {}) {
       if (!id.startsWith(virtualPrefix)) return null;
       // Vite may append its own queries (?import) to the virtual id.
       const source = id.slice(virtualPrefix.length).replace(/\?.*$/, '');
-      const { entry } = await (builds.get(source)?.promise ?? build(source));
+      const built = await (builds.get(source)?.promise ?? build(source)), { entry } = built;
       for (const file of leanFiles(dirname(source), new Set([outputFor(source)]))) this.addWatchFile(file);
       const loader = JSON.stringify(entry.split(sep).join('/'));
-      if (command !== 'serve') return `export * from ${loader};\nexport { default } from ${loader};\n`;
+      if (command !== 'serve') {
+        // The licence texts of what the app's loader and Wasm contain (src/notices.mjs),
+        // emitted as THIRD_PARTY_NOTICES.lasm.txt (generateBundle), as the loader's banner says.
+        notices.set(source, { text: readFileSync(join(built.output, built.manifest.notices ?? 'THIRD_PARTY_NOTICES.txt'), 'utf8'),
+          entry, banner: /^\/\*! [\s\S]*?\*\/\n/m.exec(readFileSync(entry, 'utf8'))?.[0] });
+        return `export * from ${loader};\nexport { default } from ${loader};\n`;
+      }
       // Development: a stable handle per mounted app; a rebuilt loader remounts it.
       return `import * as initial from ${loader};
 let current = initial;
@@ -137,6 +144,26 @@ if (import.meta.hot) {
   });
 }
 `;
+    },
+    generateBundle(_, bundle) {
+      if (command === 'serve' || !notices.size) return;
+      // Minifiers may drop the loader's licence banner: put it back on the chunks
+      // that contain a Lean app's loader, after minification, at the end (esbuild's
+      // "eof" legal comments), before any sourceMappingURL, so source maps still match.
+      for (const chunk of Object.values(bundle)) {
+        if (chunk.type !== 'chunk') continue;
+        const real = id => { try { return realpathSync(id); } catch { return id; } };
+        const ids = new Set((chunk.moduleIds ?? Object.keys(chunk.modules ?? {})).map(real));
+        for (const { entry, banner } of notices.values()) {
+          if (!banner || !ids.has(real(entry)) || chunk.code.includes(banner)) continue;
+          const at = chunk.code.search(/\n?\/\/# sourceMappingURL=[^\n]*\s*$/);
+          const end = at < 0 ? chunk.code.length : at;
+          chunk.code = chunk.code.slice(0, end) + (chunk.code.slice(0, end).endsWith('\n') ? '' : '\n') + banner + chunk.code.slice(end).replace(/^\n/, '');
+        }
+      }
+      const texts = [...new Set([...notices.values()].map(notice => notice.text))];
+      this.emitFile({ type: 'asset', fileName: 'THIRD_PARTY_NOTICES.lasm.txt',
+        source: texts.length === 1 ? texts[0] : texts.join('\n\n=============================== next Lean app ===============================\n\n') });
     },
     async handleHotUpdate({ file, server }) {
       if (!file.endsWith('.lean')) return;

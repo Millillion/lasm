@@ -12,6 +12,7 @@ import { managedCacheDirectory } from '../managed-artifacts.mjs';
 import { readStoreEntry, writeStoreEntry } from '../application-link.mjs';
 import { builtinModuleClosure, builtinModuleFile, builtinPrefix, isBuiltinModule } from './builtin-modules.mjs';
 import { supabaseFunctionNameOf } from '../init.mjs';
+import { noticeBanner, noticesSectionName, targetNotices, withCustomSection } from '../notices.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 export const edgeHostFiles = ['edge-start.mjs', 'edge-host.mjs', 'edge-js.mjs'];
@@ -24,7 +25,8 @@ export const edgeTargets = {
       writeFileSync(join(staging, 'worker.mjs'), workersEntry(modules));
       const rootConfig = ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc'].find(name => existsSync(join(projectDirectory, name)));
       if (!rootConfig) writeFileSync(join(staging, 'wrangler.toml'), workersConfig(workerName(projectDirectory)));
-      return { note: rootConfig && (out => `your ${rootConfig} must use main = "${out}/worker.mjs" and the CompiledWasm rule`) };
+      const configured = rootConfig && /worker\.mjs/.test(readFileSync(join(projectDirectory, rootConfig), 'utf8')) && /CompiledWasm/.test(readFileSync(join(projectDirectory, rootConfig), 'utf8'));
+      return { note: rootConfig && (out => configured ? `run it with npx wrangler dev (${rootConfig})` : `your ${rootConfig} must use main = "${out}/worker.mjs" and the CompiledWasm rule`) };
     } },
   // Vercel's edge runtime: a zero-config function api/lasm.mjs (Vercel bundles
   // it at deployment); its support files in api/_lasm/, which Vercel does not
@@ -430,8 +432,14 @@ export function writeEdgeOutput({ target, source, projectDirectory, result, edge
   mkdirSync(programDirectory, { recursive: true });
   // Targets whose bundlers carry only JavaScript get the Wasm as a module instead.
   const inline = edgeTargets[target].inlineWasm;
-  for (const file of ['program.mjs', ...(inline ? [] : ['program.wasm'])]) copyFileSync(join(program.directory, file), join(programDirectory, file));
-  if (inline) writeFileSync(join(programDirectory, 'program.wasm.mjs'), inlineWasmModule(readFileSync(join(program.directory, 'program.wasm'))));
+  // Licences travel with the deployment (src/notices.mjs): THIRD_PARTY_NOTICES.txt,
+  // a legal banner on the bundled glue, and the notices inside the Wasm.
+  const notices = targetNotices(readFileSync(join(result.output, 'THIRD_PARTY_NOTICES.txt'), 'utf8'), 'edge', { label: edgeTargets[target].label });
+  const glue = Buffer.from(noticeBanner(notices, edgeTargets[target].label, 'THIRD_PARTY_NOTICES.txt, also embedded in program.wasm as its lasm.notices section') + readFileSync(join(program.directory, 'program.mjs'), 'utf8'));
+  const wasmBytes = withCustomSection(readFileSync(join(program.directory, 'program.wasm')), noticesSectionName, notices);
+  writeFileSync(join(programDirectory, 'program.mjs'), glue);
+  if (inline) writeFileSync(join(programDirectory, 'program.wasm.mjs'), inlineWasmModule(wasmBytes));
+  else writeFileSync(join(programDirectory, 'program.wasm'), wasmBytes);
   for (const file of edgeHostFiles) copyFileSync(join(here, file), join(programDirectory, file));
   const modules = edgeModules(projectDirectory, result.jsBindings ?? []);
   // Lasm's builtin modules (lasm:<name>) the program uses, with those they import.
@@ -440,17 +448,17 @@ export function writeEdgeOutput({ target, source, projectDirectory, result, edge
   for (const name of builtins) copyFileSync(builtinModuleFile(name), join(programDirectory, 'modules', name.slice(builtinPrefix.length) + '.mjs'));
   // The entry module is written after the owned directory is in place.
   let written;
-  copyFileSync(join(result.output, 'THIRD_PARTY_NOTICES.txt'), join(staging, 'THIRD_PARTY_NOTICES.txt'));
+  writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), notices);
   const info = { schema: 1, target, profile: 'edge', buildProfile: result.profile ?? 'release', experimental: !edgeTargets[target].supported, nodeBuildSignature: result.signature, lean: result.lean,
     edgeRuntime: edge.manifest.files, link: { ...edgeLinkSettings, suspend: program.meta.suspend }, wasm: inline ? 'lasm/program.wasm.mjs' : 'lasm/program.wasm', programKey: program.meta.key, modules,
-    files: Object.fromEntries(Object.entries(program.meta.files).map(([file, digest]) => ['lasm/' + file, digest])) };
+    files: { 'lasm/program.mjs': sha256(glue), 'lasm/program.wasm': sha256(wasmBytes) } };
   writeFileSync(join(staging, 'build-info.json'), JSON.stringify(info, null, 2) + '\n');
   rmSync(destination, { recursive: true, force: true });
   mkdirSync(dirname(destination), { recursive: true });
   renameSync(staging, destination);
   written = edgeTargets[target].write({ staging: destination, projectDirectory, modules });
-  const wasmBytes = statSync(join(program.directory, 'program.wasm')).size;
+  const wasmSize = wasmBytes.length;
   log(`${cacheHit ? 'Reused' : 'Built'} ${relative(process.cwd(), source) || source} for ${edgeTargets[target].label}${edgeTargets[target].supported ? '' : ' (experimental)'}: ${relative(process.cwd(), destination) || destination}`
-    + ` (program.wasm ${(wasmBytes / 1048576).toFixed(2)} MiB${written.note ? '; ' + written.note(relative(projectDirectory, destination)) : ''})`);
+    + ` (program.wasm ${(wasmSize / 1048576).toFixed(2)} MiB${written.note ? '; ' + written.note(relative(projectDirectory, destination)) : ''})`);
   return { output: destination, info };
 }

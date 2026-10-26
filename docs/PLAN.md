@@ -1,5 +1,9 @@
 # Lasm current implementation plan
 
+> Platform scope has grown since this plan: edge isolates and Bun/Deno (0.2.0),
+> WASI, Fastly and browsers (0.3.0). Statements below that Node is the only engine
+> describe the first milestones. Current scope: [README](../README.md#platforms).
+
 Agreed 2026-09-25; scope extended 2026-09-26. The immediate milestone is an excellent installation,
 compilation, CLI, packaging, and deployment experience for a basic ordinary Lean
 program running in Node. Complete language and standard-library compatibility
@@ -906,7 +910,9 @@ the same installed CLI and CI pipeline one separately scoped chunk at a time:
    separately scoped serverless deployment adapters.
 
 **Deno and Bun support removed — 2026-10-16:** by the user's decision, Deno and
-Bun support was removed from Lasm. Lasm targets Node only.
+Bun support was removed from Lasm. Lasm targets Node only. *(Superseded: Bun and
+Deno returned in 0.2.0 with the edge targets; browsers and WASI follow in 0.3.0.
+See [DECISIONS.md](DECISIONS.md) and the [README](../README.md#platforms).)*
 
 Runtime Lean compilation, elaboration, dynamic module loading/evaluation and
 executable plugin loading are now explicitly unavailable in deployed applications.

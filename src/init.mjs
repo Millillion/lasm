@@ -1,4 +1,4 @@
-// `lasm init`: scaffold a new Lean-on-Node project from a template.
+// `lasm init`: scaffold a new Lean project from a template.
 // Writes files only: no network access, no Lean toolchain, no npm install.
 import { jsRuntime } from './js-runtime.mjs';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -109,7 +109,11 @@ export function parseInitArguments(tokens) {
     throw new Error(`--deploy ${serverOnly} needs a server template (express, hono, fastify, std-http or fetch), not ${result.template}`);
   for (const target of result.deploy) {
     if (deployTargets[target].templates && !deployTargets[target].templates.includes(result.template))
-      throw new Error(`--deploy ${target} supports the ${deployTargets[target].templates.join(' or ')} template, not ${result.template}`);
+      {
+        const names = deployTargets[target].templates;
+        const list = names.length === 1 ? `the ${names[0]} template` : `the ${names.slice(0, -1).join(', ')} and ${names.at(-1)} templates`;
+        throw new Error(`--deploy ${target} supports ${list}, not ${result.template}`);
+      }
     for (const other of deployTargets[target].conflicts ?? [])
       if (result.deploy.includes(other)) throw new Error(`--deploy ${target} and --deploy ${other} both configure the same platform; choose one`);
   }
@@ -211,9 +215,9 @@ the first build (a few hundred MB, cached for later builds).
 
 \`\`\`sh
 npm install
-npm run dev        # http://localhost:5173: rebuilds when a .lean file changes, then reloads the page
+npm run dev        # http://127.0.0.1:5173: rebuilds when a .lean file changes, then reloads the page
 npm run build      # dist/: the static site
-npm run preview    # the release build, served on http://localhost:5173
+npm run preview    # the release build, served on http://127.0.0.1:5173
 \`\`\`
 
 Files:
@@ -227,7 +231,8 @@ Files:
 | \`package.json\` | npm scripts, and Lasm (\`${lasm.name}\`) as a dev dependency. |
 
 \`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
-\`Lasm.UI\`, which only Lasm provides.
+\`Lasm.UI\`, which ships with Lasm: \`npx lasm editor\` (also run by \`npm run dev\`) makes the Lean
+editor resolve it ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
 
 ## Deploy
 
@@ -467,13 +472,14 @@ in about 2 s after an ordinary edit and restarts the server; a build error is sh
 file and line while the last good server keeps running.`;
   const native = t.interop || t.library
     ? `\`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
-\`${t.library ?? 'Lasm.JS'}\`, which only Lasm provides, so it builds and runs only with Lasm (the Lean
-editor marks \`import ${t.library ?? 'Lasm.JS'}\` as unknown).`
+\`${t.library ?? 'Lasm.JS'}\`, which ships with Lasm, so it builds and runs only with Lasm. \`npx lasm editor\`
+(also run by \`npm run dev\`) makes the Lean editor resolve it
+([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).`
     : `This is an ordinary Lake project: \`lake build\` also builds it natively.`;
   return `# ${name}
 
 ${t.summary[0].toUpperCase() + t.summary.slice(1)}, compiled ahead of time to WebAssembly by
-[Lasm](https://github.com/Millillion/lasm) and run by Node.js.
+[Lasm](https://github.com/Millillion/lasm)${t.portable ? '. It runs on Node.js, and also on Bun and Deno' : ' and run by Node.js'}.
 
 ## Requirements
 
@@ -798,10 +804,14 @@ the first build (a few hundred MB, cached for later builds).
 
 \`\`\`sh
 npm install
-npm run dev        # one URL, http://localhost:3000: rebuilds what an edit affects, reloads the page
+npm run dev        # one URL, http://127.0.0.1:3000: rebuilds what an edit affects, reloads the page
 npm run build      # dist/public (the browser app), then dist/server (Node) with it embedded
 npm start          # serves the release build on http://localhost:3000 (PORT, HOST)
 \`\`\`
+
+The Lean editor resolves \`import Lasm.*\` once \`npx lasm editor\` (also run by \`npm run dev\`)
+has linked Lasm's Lean for this directory; restart the Lean server in your editor afterwards
+([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
 
 ## Deploy
 
@@ -822,16 +832,18 @@ Guides: [Lasm.RPC](https://github.com/Millillion/lasm/blob/main/docs/RPC.md),
 `;
 }
 
-export function runInit(options) {
+export async function runInit(options) {
   const result = initProject(options);
   const near = relative(process.cwd(), result.directory) || '.';
   const where = near.startsWith('..') ? result.directory : near;
   const cd = where === '.' ? '' : `  cd ${/\s/.test(where) ? JSON.stringify(where) : where}\n`;
-  console.log(`Created ${result.name} (template ${options.template}) in ${where}:
+  console.log(`Created ${where === result.name ? result.name : `${result.name} in ${where}`} (template ${options.template}):
   ${result.files.join(', ')}
 
 Next:
 ${cd}${nextSteps(options.template, jsRuntime)}`);
+  // Editor support up front when Lasm's Lean is already on this machine (no download here).
+  await (await import('./editor.mjs')).autoSetupEditor(join(result.directory, 'Main.lean'), { cachedOnly: true });
   return 0;
 }
 
@@ -839,8 +851,8 @@ ${cd}${nextSteps(options.template, jsRuntime)}`);
 export function nextSteps(template, runtime = 'node') {
   const portable = templates[template].portable;
   const server = templates[template].server;
-  if (templates[template].browser) return `  npm install\n  npm run dev          # then open http://localhost:5173`;
-  if (templates[template].fullstack) return `  npm install\n  npm run dev          # then open http://localhost:3000`;
+  if (templates[template].browser) return `  npm install\n  npm run dev          # then open http://127.0.0.1:5173`;
+  if (templates[template].fullstack) return `  npm install\n  npm run dev          # then open http://127.0.0.1:3000`;
   if (runtime === 'bun' && portable) return `  bun install\n  bun run dev:bun${server ? '      # then: curl http://localhost:3000/hello/Ada' : ''}`;
   if (runtime === 'deno' && portable) return `  deno install\n  deno task dev${server ? '        # then: curl http://localhost:8000/hello/Ada' : ''}`;
   return `  npm install\n  npm run dev${server ? '          # then: curl http://localhost:3000/hello/Ada' : ''}`;

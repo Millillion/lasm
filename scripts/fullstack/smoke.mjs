@@ -5,18 +5,20 @@
 // persistence through Lasm.KV.
 //
 //   node scripts/fullstack/smoke.mjs --url URL --label NAME --out FILE
-//        [--add TITLE] [--expect TITLE] [--no-persist]
+//        [--add TITLE] [--expect TITLE] [--no-persist] [--platform-assets]
 //
 // --add stores a todo; --expect checks a todo is listed (after a restart:
 // the KV backend kept it); --no-persist (wasi-http: one instance per request,
-// memory store) only checks that adding succeeds.
+// memory store) only checks that adding succeeds. --platform-assets (Workers:
+// [assets] serves dist/public before the Worker, with its own cache headers)
+// skips the immutable-caching check of the embedded files.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 const args = process.argv.slice(2);
 const option = name => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
 const base = option('--url'), label = option('--label') ?? 'smoke', out = option('--out');
-const add = option('--add'), expected = option('--expect'), persist = !args.includes('--no-persist');
+const add = option('--add'), expected = option('--expect'), persist = !args.includes('--no-persist'), platformAssets = args.includes('--platform-assets');
 if (!base) { console.error('usage: smoke.mjs --url URL [--label NAME] [--out FILE] [--add TITLE] [--expect TITLE] [--no-persist]'); process.exit(2); }
 const results = { label, url: base, checks: {} };
 let failed = false;
@@ -47,7 +49,7 @@ try {
     const hashed = await fetch(url(`/client/${loader}`));
     const hashedText = await hashed.text();
     expect('client-hashed-js', hashed.ok, String(hashed.status));
-    expect('client-hashed-immutable', /immutable/.test(hashed.headers.get('cache-control') ?? ''), hashed.headers.get('cache-control') ?? '(none)');
+    if (!platformAssets) expect('client-hashed-immutable', /immutable/.test(hashed.headers.get('cache-control') ?? ''), hashed.headers.get('cache-control') ?? '(none)');
     const wasmName = /(app\.[0-9a-f]+\.wasm)/.exec(hashedText)?.[1];
     if (wasmName) {
       const wasm = await fetch(url(`/client/${wasmName}`));
