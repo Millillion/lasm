@@ -312,7 +312,7 @@ function lambdaDockerfile() {
 # AWS Lambda container image: Lambda's managed Node 24 image, with the AWS Lambda
 # Web Adapter forwarding each invocation to the server's HTTP port.
 #   docker build --platform linux/amd64 -f Dockerfile.lambda -t my-app-lambda .
-# Give the function at least 512 MB of memory. See docs/deploy/lambda.md.
+# Give the function at least 512 MB of memory. See https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md
 
 FROM node:24-trixie AS build
 WORKDIR /app
@@ -503,13 +503,13 @@ ${t.portable ? `
 ## Bun and Deno
 
 The same \`Main.lean\` also runs on Bun and Deno with Lasm's portable profile. Lean
-runs single-threaded there, with no files, sockets or processes${t.server ? ', and the Hono app is\nserved with \`Bun.serve\` or \`Deno.serve\`' : ''}:
+runs single-threaded there, with no files, sockets or processes${t.server ? `, and ${template === 'hono' ? 'the Hono app' : 'the handler'} is\nserved with \`Bun.serve\` or \`Deno.serve\`` : ''}:
 
 \`\`\`sh
-bun install && bun run dev:bun${template === 'plain' ? ' Ada' : ''}      # Lasm itself runs on Bun
-bun run build:bun && bun run start:bun                # bun/main.mjs
-deno install && deno task dev${template === 'plain' ? ' Ada' : ''}       # Lasm itself runs on Deno
-deno task build:deno && deno task start:deno         # deno/main.mjs
+bun install && bun run dev:bun${template === 'plain' ? ' Ada' : '   '}       # Lasm itself runs on Bun
+bun run build:bun && bun run start:bun     # bun/main.mjs
+deno install && deno task dev${template === 'plain' ? ' Ada' : '   '}        # Lasm itself runs on Deno
+deno task build:deno && deno task start:deno   # deno/main.mjs
 \`\`\`
 
 See [Bun and Deno](https://github.com/Millillion/lasm/blob/main/docs/BUN_DENO.md).
@@ -517,7 +517,8 @@ See [Bun and Deno](https://github.com/Millillion/lasm/blob/main/docs/BUN_DENO.md
 ## Deploy
 
 \`dist/\` is the whole deployment${t.interop ? ', including the production `node_modules`' : ''}: copy it to a machine
-with Node 24+ and the same OS and architecture, and run \`node dist/main.mjs\`.
+with Node 24+ (Linux x64 or arm64 from a build on any platform, or the build machine's
+own OS and architecture) and run \`node dist/main.mjs\`.
 
 With Docker:
 

@@ -22,7 +22,7 @@ export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
        lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [-- arguments…]
        lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]
        lasm init <directory> [--template plain|express|hono|fastify|std-http|fetch|web|fullstack] [--deploy …]
-       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
+       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser
        lasm build <lasm.json> [output-directory]
        lasm cache repair
 

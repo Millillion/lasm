@@ -151,6 +151,6 @@ export function requireValidBindings(results) {
   const errors = results.filter(r => r.error);
   if (errors.length) throw Object.assign(new Error('Lasm.JS binding check failed:\n'
     + errors.map(r => `  ${r.name}: ${r.error}`).join('\n')
-    + '\nFix the @[js "module" "export"] declarations or install the packages; see docs/JS_BINDINGS.md.'), { code: 'ERR_LASM_JS_BINDING' });
+    + '\nFix the @[js "module" "export"] declarations or install the packages; see https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md'), { code: 'ERR_LASM_JS_BINDING' });
   return results.filter(r => r.warning).map(r => `${r.name}: ${r.warning}`);
 }
