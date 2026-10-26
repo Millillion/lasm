@@ -13,14 +13,8 @@ published, record from a packed `launch` candidate.
 - Pre-create the project (`npm create @lasm@latest todo -- --template fullstack
   && cd todo && npm install`) and run `npm run dev` once, then stop it. The first
   full-stack build takes about a minute; later ones reuse the cache.
-- Use an editor that saves in place (VS Code's default). Until the watcher fix
-  lands ([DX audit H1](DX-AUDIT.md)), editors that save by rename stop `lasm dev`
-  noticing changes after the first save.
-- After starting `npm run dev`, wait for the second build (`lake-manifest.json
-  changed; rebuilding`, [DX audit M1](DX-AUDIT.md)) before the first edit, or the
-  `Reloaded … s after the change` line can show a misleading time (M3). The
-  server's own `Listening on http://127.0.0.1:<port>` line is an internal port;
-  point at the `Open http://127.0.0.1:3000/` line instead (M2).
+- Run `npx lasm editor` once in the project and restart the Lean server in VS Code,
+  so `import Lasm.*` resolves on camera (hovers on `Endpoint`, `checkTitle`).
 - Terminal at 120 columns, large font; browser beside it at `http://localhost:3000`.
 - Have `Shared.lean`, `Server.lean` and `Client.lean` open in tabs.
 

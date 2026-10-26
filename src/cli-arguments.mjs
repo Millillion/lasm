@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { parseInitArguments } from './init.mjs';
 import { parsePackageArguments, packageTargets } from './package.mjs';
 import { jsRuntime } from './js-runtime.mjs';
@@ -17,13 +18,22 @@ export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuil
 // --suspend (browser): none (the default: blocking waits stop the instance) or
 // jspi (they suspend in browsers that have JSPI).
 export const suspendModes = ['none', 'jspi'];
+// Names people try for a target, and the target they mean.
+const targetAliases = { cloudflare: 'workers', 'cloudflare-workers': 'workers', worker: 'workers', aws: 'lambda', 'aws-lambda': 'lambda',
+  cloudfront: 'lambda-edge', supabase: 'supabase-edge', 'deno-deploy-edge': 'deno-deploy', spin: 'wasi-http', wasmtime: 'wasi', web: 'browser',
+  vite: 'browser', 'azure-functions': 'azure', 'google-cloud-functions': 'gcf', 'cloud-functions': 'gcf', 'vercel-functions': 'vercel', 'netlify-functions': 'netlify' };
+export function targetHint(value) {
+  const guess = targetAliases[value.toLowerCase()] ?? closest(value, buildTargets);
+  return guess ? ` (did you mean --target ${guess}?)` : '';
+}
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
        lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [-- arguments…]
        lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]
-       lasm init <directory> [--template plain|express|hono|fastify|std-http|fetch|web|fullstack] [--deploy …]
+       lasm init <directory> [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser
        lasm build <lasm.json> [output-directory]
+       lasm editor [project-directory]
        lasm cache repair
 
 Options: --rebuild, --verbose, --help
@@ -32,6 +42,32 @@ deployment); --dev skips the size optimizations for a faster build. lasm run
 (lasm Main.lean) makes dev builds; --release runs a release build.
 Application arguments must follow --.`;
 
+export const commandNames = ['build', 'run', 'dev', 'init', 'package', 'editor', 'cache'];
+
+/** Levenshtein distance, for "did you mean" suggestions. */
+export function editDistance(a, b) {
+  const row = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    let previous = row[0]; row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const current = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, previous + (a[i - 1] === b[j - 1] ? 0 : 1));
+      previous = current;
+    }
+  }
+  return row[b.length];
+}
+
+/** The closest candidate within a third of its length (at least 2 edits), or undefined. */
+export function closest(word, candidates) {
+  let best, distance = Infinity;
+  for (const candidate of candidates) {
+    const d = editDistance(word.toLowerCase(), candidate.toLowerCase());
+    if (d < distance) { best = candidate; distance = d; }
+  }
+  return distance <= Math.max(2, Math.floor((best?.length ?? 0) / 3)) ? best : undefined;
+}
+
 /** Parse independently of provisioning: help/errors must never download tools. */
 export function parseLasmArguments(argv) {
   const tokens = [...argv];
@@ -39,6 +75,11 @@ export function parseLasmArguments(argv) {
   if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
   if (tokens[0] === 'package') return parsePackageArguments(tokens.slice(1));
   if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
+  if (tokens[0] === 'editor') {
+    if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
+    if (tokens.length > 2 || tokens[1]?.startsWith('-')) throw new Error('Usage: lasm editor [project-directory]');
+    return { command: 'editor', input: tokens[1] ?? '.' };
+  }
   if (tokens[0] === 'cache') {
     if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
     if (tokens.length !== 2 || tokens[1] !== 'repair') throw new Error('Usage: lasm cache repair');
@@ -70,7 +111,7 @@ export function parseLasmArguments(argv) {
       supplied.add('target');
       const value = target[1] ?? tokens[++i];
       if (!value || value.startsWith('--')) throw new Error('--target requires a value: ' + buildTargets.join(', '));
-      if (!buildTargets.includes(value)) throw new Error(`Unknown build target "${value}". Choose one of: ${buildTargets.join(', ')}`);
+      if (!buildTargets.includes(value)) throw new Error(`Unknown build target "${value}"${targetHint(value)}. Choose one of: ${buildTargets.join(', ')}`);
       result.target = value; continue;
     }
     const suspend = /^--suspend(?:=(.*))?$/.exec(token);
@@ -93,6 +134,11 @@ export function parseLasmArguments(argv) {
     positional.push(token);
   }
   if (!positional.length) throw new Error(cliUsage);
+  // `lasm biuld Main.lean`: a word that is neither a source nor a command.
+  if (result.command === 'run' && !/[./\\]/.test(positional[0])) {
+    const guess = existsSync(positional[0] + '.lean') ? positional[0] + '.lean' : closest(positional[0], commandNames);
+    throw new Error(`Unknown command "${positional[0]}"${guess ? ` (did you mean lasm ${guess}?)` : ''}. Commands: ${commandNames.join(', ')}; or run a program with lasm Main.lean.`);
+  }
   result.input = positional.shift();
   if (result.command === 'build' && positional.length === 1 && result.output === undefined) result.output = positional.shift();
   if (positional.length) throw new Error('Unexpected positional arguments. Put application arguments after --.');

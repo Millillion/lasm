@@ -188,11 +188,10 @@ numbers with thousands of digits is slower than native Lean (no GMP).
   macros and `#eval` run while compiling, as usual.
 - **Lean 4.35.0 exactly.** Other `lean-toolchain` versions are rejected with a
   message.
-- **Editor support.** `Lasm.*` libraries (`Lasm.JS`, `Lasm.UI`, `Lasm.Fetch`, …)
-  ship inside Lasm, so the Lean editor extension does not know them yet: files
-  that import them show an unknown-import error in the editor, while `lasm` builds
-  them. Keep pure logic in modules without `Lasm` imports (the templates' `App.lean`
-  and `Shared.lean`) to edit and `lake build` them natively.
+- **Editor support needs one step.** `Lasm.*` libraries ship inside Lasm, so the
+  Lean editor resolves `import Lasm.UI` (and the rest) only after `npx lasm editor`
+  (0.3.0 (next); `lasm dev` and `lasm build` also run it) links Lasm's Lean as an
+  elan toolchain for the project ([editor setup](docs/GETTING_STARTED.md#editor)).
 - **Node:** at least 512 MB of memory per app; about 22 GB of virtual address
   space reserved; no prebuilt native libraries (`-l`, shared libraries); a
   package's bundled C source is compiled for you.
@@ -265,6 +264,7 @@ npx lasm build Main.lean --target lambda    # dist/ and an AWS Lambda zip
 | Help | `npx lasm --help`, `npx lasm init --help` | Show usage; `-h` is an alias. |
 | New project | `npm create @lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory (`Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `README.md`, `.gitignore`, and for servers a `Dockerfile` and `.dockerignore`). Templates: see [Quick start](#60-second-start). `--deploy` (repeatable) adds a platform's files and `npm run build:<target>`: `lambda` (`Dockerfile.lambda`, a container image), `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf`; `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` (templates `hono`, `fetch`, `fullstack`), `supabase-edge` (`hono`); `fastly`, `wasi-http`, `spin` (`fetch`, `fullstack`), `wasi` (`fetch`, `plain`). The `fetch` and `fullstack` templates and their targets are 0.3.0 (next). Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` also works. |
 | Package an existing build | `npx lasm package --target lambda` | Package a built server (default `dist/`) for a function platform without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output. Checks the platform's size limit. Refuses a dev build unless `--allow-dev`. For a browser build, `npx lasm package dist --target browser` checks every file against `lasm-manifest.json` and writes `_headers`. |
+| Editor support (0.3.0 (next)) | `npx lasm editor` | Make the Lean editor (VS Code's Lean 4 extension, any Lean language server client) resolve `import Lasm.*` in this Lake project: links Lasm's Lean 4.35.0 with its library as the elan toolchain `lasm-4.35.0-…` and sets it as the directory's elan override (`elan override unset` undoes it). `lasm dev` and `lasm build` do the same after a good build, except on CI or with `LASM_EDITOR=0`. [Editor setup](docs/GETTING_STARTED.md#editor). |
 | Cache repair | `npx lasm cache repair` | Offline verification and removal of invalid tools and abandoned staging. Refuses an active build. |
 
 `--rebuild` and `--verbose` work with run and build. `--output` and `--target` are
@@ -287,6 +287,7 @@ refuse a dev build unless you pass `--allow-dev`.
 | --- | --- | --- |
 | `LASM_TOOLCHAIN_CACHE` | `LASM_TOOLCHAIN_CACHE=/data/lasm-cache npx lasm Main.lean` | Move the managed tool cache ([default locations](docs/NODE_SUPPORT.md)). |
 | `LASM_BUILD_JOBS` | `LASM_BUILD_JOBS=2 npx lasm build Main.lean` | Threads for Binaryen's optimizer (default: the CPUs, at most 8). The output is the same for any value. |
+| `LASM_EDITOR` | `LASM_EDITOR=0 npx lasm build Main.lean` | `0`: `lasm dev` and `lasm build` leave the editor setup alone ([editor setup](docs/GETTING_STARTED.md#editor)). |
 | `LASM_THREAD_POOL` (built apps; 0.3.0 (next)) | `LASM_THREAD_POOL=0 node dist/main.mjs` | Lean thread Workers started before `main` (0–64, default 4; the function-platform shims default to 1). [Measurements](docs/BENCHMARKS.md#cold-start-on-a-fraction-of-a-cpu). |
 | `LASM_ARTIFACT_SOURCE` | `LASM_ARTIFACT_SOURCE=npm npx lasm Main.lean` | `auto` (default): `@lasm/…` npm tool packages when present, else HTTPS; `npm`: never download directly; `https`: ignore the npm packages. |
 | `LASM_DOWNLOAD_ATTEMPTS`, `LASM_DOWNLOAD_CONNECT_MS`, `LASM_DOWNLOAD_IDLE_MS`, `LASM_DOWNLOAD_TOTAL_MS` | `LASM_DOWNLOAD_TOTAL_MS=14400000 npx lasm Main.lean` | Download retries and timeouts ([defaults and ranges](docs/INSTALLATION_HARDENING.md#transfers)). |

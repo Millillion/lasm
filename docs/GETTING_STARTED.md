@@ -87,6 +87,29 @@ server on Express 5 (`app.get(path, (req, res) => …)` with Lean handlers).
 `--template std-http` creates it in pure Lean with `Std.Http`, and `--template plain`
 a command-line program. See [which HTTP server to use](#which-http-server-to-use).
 
+### Editor
+
+Lean's editor support (the [Lean 4 extension for VS Code](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4),
+or any editor running Lean's language server) works on Lasm projects once the
+editor uses Lasm's own Lean, whose standard library includes `Lasm.JS`,
+`Lasm.Fetch`, `Lasm.UI` and the rest (0.3.0):
+
+```sh
+npx lasm editor        # in the project; lasm dev and lasm build also do it after a good build
+```
+
+`lasm editor` links Lasm's Lean 4.35.0 (with its library) as an
+[elan](https://github.com/leanprover/elan) toolchain named `lasm-4.35.0-…` and sets
+it as this directory's elan override. The editor then resolves every
+`import Lasm.*`, with hovers, completion and go-to-definition, using exactly the
+Lean that `lasm build` uses. Your files are not changed (`lean-toolchain` stays
+`leanprover/lean4:v4.35.0`); the override is per machine and per directory, and
+`elan override unset` removes it. After it runs the first time, restart the Lean
+server in the editor (VS Code: *Lean 4: Restart Server*). elan comes with the
+VS Code extension; without elan, `lasm` prints how to get it. `LASM_EDITOR=0`
+stops `lasm dev` and `lasm build` from doing this automatically (they never do it
+on CI).
+
 ## 3. Call an npm package from Lean
 
 Add [marked](https://www.npmjs.com/package/marked), a Markdown renderer:

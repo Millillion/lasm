@@ -25,7 +25,8 @@ export const edgeTargets = {
       writeFileSync(join(staging, 'worker.mjs'), workersEntry(modules));
       const rootConfig = ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc'].find(name => existsSync(join(projectDirectory, name)));
       if (!rootConfig) writeFileSync(join(staging, 'wrangler.toml'), workersConfig(workerName(projectDirectory)));
-      return { note: rootConfig && (out => `your ${rootConfig} must use main = "${out}/worker.mjs" and the CompiledWasm rule`) };
+      const configured = rootConfig && /worker\.mjs/.test(readFileSync(join(projectDirectory, rootConfig), 'utf8')) && /CompiledWasm/.test(readFileSync(join(projectDirectory, rootConfig), 'utf8'));
+      return { note: rootConfig && (out => configured ? `run it with npx wrangler dev (${rootConfig})` : `your ${rootConfig} must use main = "${out}/worker.mjs" and the CompiledWasm rule`) };
     } },
   // Vercel's edge runtime: a zero-config function api/lasm.mjs (Vercel bundles
   // it at deployment); its support files in api/_lasm/, which Vercel does not

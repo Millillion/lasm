@@ -6,7 +6,7 @@
 // COMMAND defaults to `npm run dev`; the app must have its npm packages installed.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, renameSync, writeFileSync } from 'node:fs';
 import net from 'node:net';
 import { dirname, join, resolve } from 'node:path';
 
@@ -49,16 +49,33 @@ try {
   await waitFor(/Listening on http:\/\/127\.0\.0\.1:\d+/, mark);
   result.firstBuild = Number((/Built in ([\d.]+) s/.exec(output.text) ?? [])[1]);
   assert.deepEqual((await get('/hello/Ada')).body, { message: 'Hello, Ada, from Lean!' });
+  // The first build's own files (Lake's new lake-manifest.json) start no second build.
+  await new Promise(done => setTimeout(done, 3000));
+  assert.doesNotMatch(output.text, /lake-manifest\.json changed/, 'no rebuild for the build\'s own lake-manifest.json');
   // Three ordinary edits: each must rebuild, restart and answer with the new text.
   for (const [index, greeting] of ['Hi', 'Hey', 'Hello again'].entries()) {
     mark = output.text.length;
     const before = performance.now();
     writeFileSync(appLean, original.replace('s!"Hello, {name}, from Lean!"', `s!"${greeting}, {name}, from Lean!"`));
-    const built = await waitFor(/Built in ([\d.]+) s(?: \(([^)]*)\))?/, mark);
+    const built = await waitFor(/(?:Built|Up to date) in ([\d.]+) s(?: \(([^)]*)\))?/, mark);
     await waitFor(/Listening on http:\/\/127\.0\.0\.1:\d+/, mark);
     const served = performance.now() - before;
     assert.deepEqual((await get('/hello/Ada')).body, { message: `${greeting}, Ada, from Lean!` }, `edit ${index + 1}`);
     result.rebuilds.push({ edit: index + 1, buildSeconds: Number(built[1]), stages: built[2] ?? '', editToListeningSeconds: +(served / 1000).toFixed(2) });
+  }
+  // Three saves the way Vim, JetBrains' safe write, sed -i and many formatters
+  // save: write a temporary file, rename it over App.lean. Every one must rebuild
+  // (Node's recursive watcher on Linux stopped seeing the file after the first).
+  for (const [index, greeting] of ['Saved by rename', 'Renamed again', 'And again'].entries()) {
+    mark = output.text.length;
+    const before = performance.now();
+    const temporary = join(app, `.App.lean.${index}.swp`);
+    writeFileSync(temporary, original.replace('s!"Hello, {name}, from Lean!"', `s!"${greeting}, {name}, from Lean!"`));
+    renameSync(temporary, appLean);
+    const built = await waitFor(/(?:Built|Up to date) in ([\d.]+) s(?: \(([^)]*)\))?/, mark, 120_000);
+    await waitFor(/Listening on http:\/\/127\.0\.0\.1:\d+/, mark);
+    assert.deepEqual((await get('/hello/Ada')).body, { message: `${greeting}, Ada, from Lean!` }, `rename save ${index + 1}`);
+    result.rebuilds.push({ edit: `rename ${index + 1}`, buildSeconds: Number(built[1]), stages: built[2] ?? '', editToListeningSeconds: +((performance.now() - before) / 1000).toFixed(2) });
   }
   // A type error: the build fails with the Lean diagnostic and the last good server keeps answering.
   mark = output.text.length;
@@ -66,7 +83,7 @@ try {
   await waitFor(/Build failed/, mark);
   const failure = output.text.slice(mark);
   assert.match(failure, /App\.lean:\d+:\d+: error/, 'the error names the file and line');
-  assert.deepEqual((await get('/hello/Ada')).body, { message: 'Hello again, Ada, from Lean!' }, 'the last good server keeps running');
+  assert.deepEqual((await get('/hello/Ada')).body, { message: 'And again, Ada, from Lean!' }, 'the last good server keeps running');
   result.errorReport = failure.slice(0, 2000);
   mark = output.text.length;
   writeFileSync(appLean, original);

@@ -67,7 +67,7 @@ export async function runBrowserDev(options) {
   const first = await build();
   if (!first.ok && !existsSync(join(output, 'index.html'))) return 1;
   const server = await startStaticServer(output, { port: options.port, host: options.host, liveReload: options.watch });
-  console.error(`[lasm] Serving ${relative(process.cwd(), output) || output} at ${server.url}${options.watch ? ' (rebuilds on save; Ctrl+C stops)' : ''}`);
+  console.error(`[lasm dev] Serving ${relative(process.cwd(), output) || output} at ${server.url}${options.watch ? ' (rebuilds on save; Ctrl+C stops)' : ''}`);
   if (!options.watch) return new Promise(() => {});
   let timer = null, building = false, again = false;
   const rebuild = async () => {
@@ -75,7 +75,7 @@ export async function runBrowserDev(options) {
     building = true;
     const result = await build();
     building = false;
-    if (result.ok) { server.reload(); console.error(`[lasm] Rebuilt in ${result.seconds.toFixed(1)} s; reloading`); }
+    if (result.ok) { server.reload(); console.error(`[lasm dev] Rebuilt in ${result.seconds.toFixed(1)} s; reloading`); }
     else server.report(result.errors.slice(-4000));
     if (again) { again = false; rebuild(); }
   };

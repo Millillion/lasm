@@ -146,10 +146,10 @@ costs, and we measure them on every release on the same free GitHub runner
   package bundles is compiled for you).
 - **Single-threaded** on the edge, Bun/Deno, WASI and in the browser; no sockets
   or processes there.
-- **Editor support:** the `Lasm.*` libraries ship inside Lasm, so the Lean editor
-  extension does not resolve `import Lasm.UI` yet. Keep pure logic in modules
-  without `Lasm` imports to edit them with full tooling. **[check: may be fixed
-  before launch]**
+- **Editor support takes one command:** the `Lasm.*` libraries ship inside Lasm,
+  so `npx lasm editor` (which `lasm dev` also runs) links Lasm's Lean as an elan
+  toolchain for the project; then VS Code's Lean extension resolves
+  `import Lasm.UI` with hovers and completion.
 - **No premade npm bindings.** You write one `@[js]` line per JavaScript function
   you call. It is quick by hand, and an AI agent does it well; the
   [binding guide](../JS_BINDINGS.md) is written for both.
