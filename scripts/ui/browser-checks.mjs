@@ -132,6 +132,7 @@ async function todomvc({ server, name, openPage, expect, report }) {
 // JavaScript (bench/ui/vanilla, the same markup) in the same browser. The
 // budget (docs/BROWSER.md) covers creating 1,000 rows and updating every 10th;
 // every operation is recorded.
+const frameMs = 1000 / 60, minimumGateTrials = 7;
 const operations = [
   { name: 'create 1,000 rows', setup: ['clear'], run: 'run', budget: 2 },
   { name: 'replace all rows', setup: ['run'], run: 'run' },
@@ -199,9 +200,15 @@ async function bench({ server, name, openPage, expect, report }) {
       }
       const lm = median(l), vm = median(v);
       table[op.name] = { lasmMs: lm, vanillaMs: vm, ratio: vm ? lm / vm : null, budget: op.budget ?? null,
-        leanMs: median(leanMs), applyMs: median(applyMs), lasmAll: l, vanillaAll: v };
-      // Within the budget, or within 4 ms of vanilla (timer resolution and frame noise dominate there).
-      if (op.budget) expect(name, `bench.${op.name}`, lm <= op.budget * vm || lm - vm <= 4, `${lm?.toFixed(1)} ms vs vanilla ${vm?.toFixed(1)} ms`);
+        leanMs: median(leanMs), applyMs: median(applyMs), lasmAll: l, vanillaAll: v,
+        ratios: l.map((t, i) => v[i] ? t / v[i] : null) };
+      // The gate (docs/UI.md "Benchmark gate"): the median of at least 7
+      // alternating trials after warm-up within the budget (2× vanilla) or
+      // within one 60 Hz frame (16.7 ms) of vanilla, whichever is looser.
+      if (op.budget) {
+        if (l.length < minimumGateTrials) throw new Error(`bench.${op.name}: ${l.length} trials; the gate needs ${minimumGateTrials}`);
+        expect(name, `bench.${op.name}`, lm <= Math.max(op.budget * vm, vm + frameMs), `${lm?.toFixed(1)} ms vs vanilla ${vm?.toFixed(1)} ms (limit ${Math.max(op.budget * vm, vm + frameMs).toFixed(1)} ms)`);
+      }
     }
     report.apps[name].bench = table;
     const lc = await checkRows(lasm.page), vc = await checkRows(vanilla.page);

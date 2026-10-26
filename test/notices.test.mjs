@@ -95,6 +95,30 @@ test('every target gets notices that name its files, with Lasm\'s MIT licence an
   assert.throws(() => notices.targetNotices('not ours', 'edge'), /not written by this Lasm/);
 });
 
+test('Apache-2.0 4(b): Node outputs list the node-threads patch; outputs on the edge runtime list its own patches', () => {
+  const node = applicationNotices(runtimeManifest(runtimeLibraries), '');
+  assert.match(node, /\n  - node-threads: src\/runtime\/thread\.cpp \(run main on the program's main thread/);
+  const patches = Object.keys(leanRuntimeChanges).filter(name => name !== 'edge');
+  const real = applicationNotices({ ...runtimeManifest(runtimeLibraries), patches: Object.fromEntries(patches.map(name => [name, '0'.repeat(64)])) }, '');
+  for (const kind of notices.noticeKinds.filter(kind => kind !== 'node')) {
+    const text = notices.targetNotices(real, kind);
+    assert.doesNotMatch(text, /\n  - node-threads: /, kind);
+    assert.match(text, /\n  - edge: src\/CMakeLists\.txt, src\/runtime\/mutex\.cpp, src\/runtime\/object\.cpp \(build the runtime single-threaded/, kind);
+    for (const name of patches.filter(name => !notices.nodeOnlyLeanPatches.includes(name))) assert.match(text, new RegExp(`\\n  - ${name}: `), `${kind} ${name}`);
+  }
+  assert.deepEqual(notices.edgeLeanPatches(['wasm-build', 'node-threads', 'nonlinear-environment']), ['wasm-build', 'nonlinear-environment', 'edge']);
+  // Every patch file under scripts/full-lean/patches that a runtime applies has notice text.
+  const build = read('../scripts/full-lean/build-application-runtime.mjs');
+  for (const [, name] of build.matchAll(/name: '([a-z-]+)', file: 'lean-/g)) assert.ok(leanRuntimeChanges[name], name);
+});
+
+test('the edge runtime archive carries the Lasm MIT text and its own list of Lean changes', () => {
+  const script = read('../scripts/edge/package-edge-runtime.mjs');
+  assert.match(script, /=== Lasm ===\n\$\{noticeText\('LASM-LICENSE\.txt'\)\}/);
+  assert.match(script, /=== Changes to Lean \(Apache-2\.0 section 4\(b\)\) ===/);
+  assert.match(script, /edgeLeanPatches\(Object\.keys\(nodeManifest\.patches\)\)/);
+});
+
 test('the Wasmtime licence copies are identical (component template, WIT files, notices)', () => {
   const text = read('../src/notices/wasmtime-LICENSE.txt');
   assert.match(text, /--- LLVM Exceptions to the Apache 2\.0 License ----/);

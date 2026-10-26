@@ -102,7 +102,7 @@ and the Chromium start are enforced; the rebuild time is recorded.
 | Counter app, total transfer (brotli) | ≤ 160 KiB |
 | TodoMVC, total transfer (brotli) | ≤ 200 KiB |
 | Start (module evaluated → first frame), wasm cached, CI Chromium | ≤ 60 ms |
-| 1,000-row create / update every 10th row (js-framework-benchmark style) | within 2× vanilla JS |
+| 1,000-row create / update every 10th row (js-framework-benchmark style) | within 2× vanilla JS or one 60 Hz frame (16.7 ms) of it, whichever is looser; median of ≥ 7 alternating trials ([UI.md](UI.md#benchmark-gate)) |
 | Incremental rebuild after editing one `view` function (dev profile) | ≤ 2 s on the Linux runner |
 
 ## Builtin JavaScript modules (`lasm:*`)

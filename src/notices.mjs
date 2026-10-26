@@ -20,7 +20,7 @@ export function referenceNotices({ leanSource, zig }) {
 // Notices that Lasm adds to every built application (dist/THIRD_PARTY_NOTICES.txt)
 // and to the CLI package, beside the runtime bundle's own THIRD_PARTY_NOTICES.txt
 // (docs/LICENSE_AUDIT.md). Every text under notices/ is a verbatim copy.
-const noticeText = name => readFileSync(new URL(`./notices/${name}`, import.meta.url), 'utf8');
+export const noticeText = name => readFileSync(new URL(`./notices/${name}`, import.meta.url), 'utf8');
 
 /** What each recorded runtime patch changes in Lean's sources (Apache-2.0 §4(b)). */
 export const leanRuntimeChanges = Object.freeze({
@@ -38,7 +38,31 @@ export const leanRuntimeChanges = Object.freeze({
   'libuv-source': ['src/CMakeLists.txt', 'pin the libuv v1.48.0 source by commit'],
   'nonlinear-environment': ['src/runtime/object.cpp', 'read LEAN_ABORT_ON_NONLINEAR from the host'],
   'node-threads': ['src/runtime/thread.cpp', "run main on the program's main thread instead of a further thread"],
+  'edge': ['src/CMakeLists.txt, src/runtime/mutex.cpp, src/runtime/object.cpp', 'build the runtime single-threaded for edge isolates'],
 });
+// The Node runtime's patches that the single-threaded edge runtime (scripts/full-lean/
+// build-application-runtime.mjs --profile edge) does not apply; it applies 'edge' instead.
+export const nodeOnlyLeanPatches = Object.freeze(['node-threads']);
+const changeLine = name => {
+  const change = leanRuntimeChanges[name];
+  return change ? `  - ${name}: ${change.slice(0, -1).join('; ')} (${change.at(-1)})` : `  - ${name}`;
+};
+/** The edge runtime's patch list, from the Node runtime's (shared patches, then 'edge'). */
+export const edgeLeanPatches = nodePatches => [...nodePatches.filter(name => !nodeOnlyLeanPatches.includes(name) && name !== 'edge'), 'edge'];
+/** The "Changes to Lean" lines of an edge, browser or WASI output: its Wasm links the edge runtime. */
+function withEdgeChanges(body) {
+  const start = body.indexOf('runtime\'s target.json ("patches"):\n');
+  if (start < 0) return body;
+  const from = body.indexOf('\n', start) + 1;
+  let end = from;
+  const names = [];
+  while (body.startsWith('  - ', end)) {
+    const line = body.slice(end, body.indexOf('\n', end));
+    names.push(/^  - ([^:]+)/.exec(line)[1]);
+    end += line.length + 1;
+  }
+  return body.slice(0, from) + edgeLeanPatches(names).map(changeLine).join('\n') + '\n' + body.slice(end);
+}
 
 // Runtimes up to 7aa5028c… statically linked GNU MP. Runtimes built with
 // USE_GMP=OFF (decision 5, docs/PLAN.md) use Lean's own big-number code and list
@@ -89,10 +113,7 @@ export function withoutLeanReleaseLicenses(runtimeNotices) {
 export function applicationNotices(manifest, runtimeNotices, { cli = false } = {}) {
   if (!cli) runtimeNotices = withoutLeanReleaseLicenses(runtimeNotices);
   const lean = manifest.lean, commit = manifest.leanCommit, gmp = runtimeLinksGmp(manifest);
-  const changes = Object.keys(manifest.patches ?? {}).map(name => {
-    const change = leanRuntimeChanges[name];
-    return change ? `  - ${name}: ${change.slice(0, -1).join('; ')} (${change.at(-1)})` : `  - ${name}`;
-  }).join('\n');
+  const changes = Object.keys(manifest.patches ?? {}).map(changeLine).join('\n');
   const subject = cli ? `This is the Lasm compiler package. Its targets/${manifest.name}/ runtime
 bundle holds the libraries that Lasm links into every application, so that an
 application's program.wasm and program.cjs contain, statically linked or generated:`
@@ -281,7 +302,7 @@ packages are at the end of this file.
 
 ${headers[kind](noticeVersions(body), label)}
 Lasm adds no copyleft (GPL, LGPL or similar) code to its outputs.${tail}
-${body.slice(at + 1)}${kind === 'wasi-http' ? '\n' + wasmtimeAdapterNotice() : ''}`;
+${withEdgeChanges(body.slice(at + 1))}${kind === 'wasi-http' ? '\n' + wasmtimeAdapterNotice() : ''}`;
 }
 
 /** The legal banner of a target's JavaScript (bundlers keep /*! comments). */

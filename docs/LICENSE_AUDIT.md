@@ -221,11 +221,17 @@ runtime (recorded in the runtime's `target.json` `patches`, files in
 | `lean-4.34.0-host-backtrace` | `src/runtime/object.cpp` | host backtraces |
 | `lean-4.34.0-libuv-source` | `src/CMakeLists.txt` | pin libuv v1.48.0 by commit |
 | `lean-4.35.0-nonlinear-environment` | `src/runtime/object.cpp` | `LEAN_ABORT_ON_NONLINEAR` |
+| `lean-4.35.0-node-threads` (Node runtime `1b868b43…` on) | `src/runtime/thread.cpp` | run `main` on the program's main thread instead of a further thread |
+| `lean-4.35.0-edge` (edge runtime only, instead of `node-threads`) | `src/CMakeLists.txt`, `src/runtime/mutex.cpp`, `src/runtime/object.cpp` | single-threaded runtime for edge isolates |
 
 `scripts/full-lean/configure-host.mjs` also renames runtime functions that Lasm's
 `runtime/node-*.cpp` replace. **Met by:** the list in every `dist/` and CLI notice
 (object form), and a modification comment in the only modified source file shipped,
-`include/lean/lean.h` (from the next runtime packaging).
+`include/lean/lean.h` (from the next runtime packaging). Outputs linked with the edge runtime (edge, browser, WASI, Fastly, wasi-http) list
+that runtime's patches (`edgeLeanPatches` in `src/notices.mjs`), and the edge runtime
+archive's own `THIRD_PARTY_NOTICES.txt` carries the list and Lasm's full MIT text
+(from `lean-4.35.0-edge-v2`; `v1` named the MIT licence without its text). Tested in
+`test/notices.test.mjs`.
 
 ### 4.2 Permissive licences (MIT, BSD-2/3-Clause, ISC, Zlib, BlueOak-1.0.0, dtoa, SunPro, ZPL-2.1, Cephes)
 

@@ -457,6 +457,17 @@ pages warm up, then their trials alternate). Lasm.UI / vanilla:
 
 Lasm.UI / vanilla JavaScript: medians of 10 runs (3 for 10,000 rows), click to painted frame, alternating; in brackets, Lean's part (view, diff, encoding) and the applier's.
 
+### Benchmark gate
+
+CI (`scripts/ui/browser-checks.mjs`) gates creating 1,000 rows and updating
+every 10th row: after warm-up, the two pages' trials alternate, at least 7 per
+operation (10 by default), and the median Lasm.UI time must be within 2× the
+median vanilla time **or** within one 60 Hz frame (16.7 ms) of it, whichever is
+looser. A frame is the smallest difference a user can see; below it, WebKit's
+timer and frame scheduling on shared macOS runners made a pure ratio flaky
+(27 vs 13 ms on an otherwise 1.2× operation). The raw trials and per-trial
+ratios are kept in the evidence (`lasmAll`, `vanillaAll`, `ratios`).
+
 The budget ([BROWSER.md](BROWSER.md#budgets-measured-in-ci-recorded-per-release))
 is within 2× of vanilla for creating 1,000 rows and updating every 10th row;
 every operation was within 1.7× in this run, most within 1.2×. Lean's work
