@@ -228,7 +228,7 @@ export function workspaceImportsKey(project, configKey) {
   return hash.digest('hex');
 }
 
-export function applicationSources(source, lean, work, { log = console.error } = {}) {
+export function applicationSources(source, lean, work, { log = console.error, afterImports } = {}) {
   source = resolve(source);
   const project = findApplicationProject(source);
   const env = nativeLeanEnvironment(lean);
@@ -309,6 +309,8 @@ export function applicationSources(source, lean, work, { log = console.error } =
         inputs.push({ module: target, source: resolve(project, lean) });
       });
     }
+    // The imported modules are built: the caller may let other builds of this project use Lake now.
+    afterImports?.();
     if (!configured) {
       const file = join(work, 'script.c');
       // Lake supplies dependency artifacts, package options and build-time

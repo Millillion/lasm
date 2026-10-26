@@ -2,6 +2,7 @@
 // unchanged upstream foreign-runtime test drivers. The CLI owns provisioning,
 // project discovery and caching; this helper uses its verified inputs.
 import { writeFile } from 'node:fs/promises';
+import { threadId } from 'node:worker_threads';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, isAbsolute, join, relative } from 'node:path';
@@ -99,7 +100,8 @@ export function selectedLinkDriver(value = process.env.LASM_LINK_DRIVER) {
 const storeMagic = Buffer.from('LASMSTO1');
 let storePartials = 0;
 export function writeStoreEntry(path, bytes) {
-  const partial = `${path}.${process.pid}.${storePartials++}.partial`;
+  // Two build workers of one process (lasm dev) may write the same entry: the thread is part of the name.
+  const partial = `${path}.${process.pid}.${threadId}.${storePartials++}.partial`;
   writeFileSync(partial, Buffer.concat([storeMagic, createHash('sha256').update(bytes).digest(), bytes]));
   renameSync(partial, path);
 }
@@ -170,7 +172,7 @@ export function archiveUnitCache(directory, runtime, { shipped = shippedAnalysis
       if (relative(runtime.directory, file).startsWith('..')) return;
       try {
         mkdirSync(directory, { recursive: true });
-        const partial = `${path(file)}.${process.pid}.partial`;
+        const partial = `${path(file)}.${process.pid}.${threadId}.partial`;
         writeFileSync(partial, JSON.stringify({ schema: 1, key: key(file), units }));
         renameSync(partial, path(file));
       } catch { /* An unwritable cache only costs the next build the analysis. */ }

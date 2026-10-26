@@ -4,6 +4,7 @@
 // local tool (wrangler dev, netlify dev, …), which Lasm never starts; browser
 // output is served on localhost with live reload (src/browser/browser-dev.mjs).
 // Lasm never opens a browser.
+import { totalmem } from 'node:os';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync, watch } from 'node:fs';
@@ -289,7 +290,12 @@ export async function runDev(options, hooks = {}) {
   // embedding them (Lasm.Fetch's embed_dir!), so a rebuilt browser app needs no
   // server rebuild. Set before the build worker starts (it copies the environment).
   process.env.LASM_DEV_SERVER = '1';
-  const service = createBuildService();
+  // Several outputs build at once, one long-lived worker each, when memory allows
+  // (each link peaks around 1.5 GiB): the project's Lake work runs once, under
+  // its lock, then each program elaborates and links alongside the others.
+  // LASM_DEV_WORKERS=1 builds them one after the other.
+  const workers = Math.max(1, Math.min(options.outputs.length, Number(process.env.LASM_DEV_WORKERS) || (totalmem() >= 6 * 2 ** 30 ? 2 : 1)));
+  const service = createBuildService({ workers });
   const runner = createRunner();
   // A server and a browser app (node=Server.lean,browser=Client.lean): one URL.
   // The server runs on a private port behind a proxy on the user's port, which
@@ -320,30 +326,43 @@ export async function runDev(options, hooks = {}) {
     try {
       // Every output builds before any is used, so a server and its client stay in step.
       // An output whose sources did not change (its import closure) keeps its last build.
-      const built = [];
       let allCached = true;
-      for (const entry of options.outputs) {
-        if (!force && lastBuilt.has(entry) && devProxy && !devProxy.affects(project, resolve(entry.input), changed)) {
-          built.push({ ...lastBuilt.get(entry), unchanged: true });
-          continue;
-        }
+      const toBuild = options.outputs.filter(entry =>
+        force || !lastBuilt.has(entry) || !devProxy || devProxy.affects(project, resolve(entry.input), changed));
+      const concurrent = service.workers > 1 && toBuild.length > 1;
+      const outputStages = new Map();
+      const buildOne = async entry => {
+        const own = concurrent ? [] : stages;
+        outputStages.set(entry, own);
         const result = await service.build(resolve(entry.input), { profile: options.profile, verbose: options.verbose,
+          ...(concurrent ? { releaseAfterImports: true } : {}),
           ...(entry.target === 'browser' ? { output: browserOutput } : {}) }, {
           target: entry.target === 'node' ? undefined : entry.target,
+          slot: options.outputs.indexOf(entry),
           onProgress: event => {
-            if (stages.at(-1)?.stage !== event.stage) stages.push({ stage: event.stage, at: performance.now() });
+            if (own.at(-1)?.stage !== event.stage) own.push({ stage: event.stage, at: performance.now() });
             status((options.outputs.length > 1 ? entry.target + ': ' : '') + event.stage + '…');
           },
           onLog: text => { clearStatus(); process.stderr.write(text + '\n'); },
         });
         allCached &&= !!result.cacheHit;
-        const item = { ...entry, result, output: entry.target === 'browser' ? browserOutput : result.edgeOutput ?? result.output };
+        const item = { ...entry, result, output: entry.target === 'browser' ? browserOutput : result.edgeOutput ?? result.output, finished: performance.now() };
         lastBuilt.set(entry, item);
-        built.push(item);
-      }
+        return item;
+      };
+      if (concurrent) {
+        // All settle before any error is reported, so no build is left running into the next one.
+        const results = await Promise.allSettled(toBuild.map(buildOne));
+        const failure = results.find(r => r.status === 'rejected');
+        if (failure) throw failure.reason;
+      } else for (const entry of toBuild) await buildOne(entry);
+      const built = options.outputs.map(entry => toBuild.includes(entry) ? lastBuilt.get(entry) : { ...lastBuilt.get(entry), unchanged: true });
       const end = performance.now();
       clearStatus();
-      say(`${color('32', allCached ? 'Up to date' : 'Built')} in ${((end - started) / 1000).toFixed(1)} s${allCached ? '' : ` (${summarizeStages(stages, end)})`}`
+      const stageSummary = concurrent
+        ? toBuild.map(entry => `${entry.target}: ${summarizeStages(outputStages.get(entry), lastBuilt.get(entry).finished)}`).join('; ') + '; concurrently'
+        : summarizeStages(stages, end);
+      say(`${color('32', allCached ? 'Up to date' : 'Built')} in ${((end - started) / 1000).toFixed(1)} s${allCached ? '' : ` (${stageSummary})`}`
         + `${options.profile === 'release' ? ' — release profile' : ''}`);
       lastGood = built;
       if (!editorChecked) { editorChecked = true; await (await import('./editor.mjs')).autoSetupEditor(source, { log: text => say(text.replace(/^\[lasm\] /, '')) }); }
