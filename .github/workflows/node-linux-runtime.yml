@@ -93,6 +93,9 @@ jobs:
         id: inputs
         run: node -e "const f=require('node:fs'),r=JSON.parse(f.readFileSync('.work/node-runtime-inputs-result.json'));f.appendFileSync(process.env.GITHUB_OUTPUT,'sha256='+r.sha256+'\ncache-key='+r.cacheKey+'\n')"
       - name: Check the included cache storage budget
+        # Cache writes are for main only (scripts/ci/cache-budget.mjs); a
+        # branch build keeps only the durable release asset below.
+        if: github.ref == 'refs/heads/main'
         id: budget
         env:
           GITHUB_TOKEN: ${{ github.token }}
