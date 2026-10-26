@@ -4,6 +4,7 @@
 // and require byte-identical program.wasm and program.mjs.
 //   node scripts/edge/compare-edge-link.mjs LINK_WORK EDGE_RUNTIME_DIR NODE_RUNTIME_BUNDLE OUT
 //     [--sysroot-cache EM_CACHE]   (system libraries from an Emscripten cache instead of the edge runtime's)
+//     [--suspend jspi|asyncify]    (the JSPI link, or the Asyncify link of supabase-edge)
 // LINK_WORK: a build's kept link directory (LASM_KEEP_LINK_WORK=1).
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -16,7 +17,8 @@ import { provisionSdk } from '../../src/managed-sdk.mjs';
 import { provisionLinkToolchain } from '../../src/managed-link-toolchain.mjs';
 import { toolchainCatalog } from '../../src/managed-lean.mjs';
 
-const { values: options, positionals } = parseArgs({ allowPositionals: true, options: { 'sysroot-cache': { type: 'string' }, 'skip-emcc': { type: 'boolean' } } });
+const { values: options, positionals } = parseArgs({ allowPositionals: true, options: { 'sysroot-cache': { type: 'string' }, 'skip-emcc': { type: 'boolean' }, suspend: { type: 'string', default: 'jspi' } } });
+const suspend = options.suspend;
 const [work, edgeDirectory, nodeBundle, out] = positionals.map(p => resolve(p));
 const manifest = JSON.parse(readFileSync(join(nodeBundle, 'target.json'), 'utf8'));
 const nodeRuntime = await applicationRuntime({ version: manifest.lean, commit: toolchainCatalog.lean[manifest.lean].commit }, {
@@ -24,14 +26,14 @@ const nodeRuntime = await applicationRuntime({ version: manifest.lean, commit: t
 const edge = await edgeRuntime(nodeRuntime, { directory: edgeDirectory });
 if (options['sysroot-cache']) edge.sysroot = { cache: resolve(options['sysroot-cache']), directory: 'wasm64-emscripten' };
 const sha256 = file => createHash('sha256').update(readFileSync(file)).digest('hex');
-const result = { files: {} };
+const result = { suspend, files: {} };
 const timed = (name, run) => { const t = Date.now(); run(); result[name + 'Seconds'] = (Date.now() - t) / 1000; };
 if (!options['skip-emcc']) {
   const sdk = await provisionSdk({ log: () => {} });
-  timed('emcc', () => linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: work, out: join(out, 'emcc'), driver: 'emcc' }));
+  timed('emcc', () => linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: work, out: join(out, 'emcc'), driver: 'emcc', suspend }));
 }
 const toolchain = await provisionLinkToolchain({ log: () => {} });
-timed('node', () => linkEdgeProgram({ sdk: toolchain, nodeRuntime, edge, linkWork: work, out: join(out, 'node'), driver: 'node' }));
+timed('node', () => linkEdgeProgram({ sdk: toolchain, nodeRuntime, edge, linkWork: work, out: join(out, 'node'), driver: 'node', suspend }));
 for (const file of ['program.wasm', 'program.mjs']) {
   const a = join(out, 'emcc', file), b = join(out, 'node', file);
   result.files[file] = { emcc: existsSync(a) ? sha256(a) : null, node: sha256(b) };
