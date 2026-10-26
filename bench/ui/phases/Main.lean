@@ -19,7 +19,17 @@ def time (label : String) (reps : Nat) (act : Unit → IO α) : IO α := do
 def phases (label : String) (before after : Model) : IO Unit := do
   let m0 := mountOps [view before] 1
   let v ← time s!"{label}: view" 20 fun _ => pure (view after)
-  let r ← time s!"{label}: diff" 20 fun _ => pure (diff m0.live [v] m0.next)
+  let r ← time s!"{label}: diff (old tree shared)" 20 fun _ => pure (diff m0.live [v] m0.next)
+  -- The runtime owns the old tree, so the diff can reuse its memory: time a
+  -- fresh copy's diff, minus making the copy.
+  let mk ← time s!"{label}:   (copy the old tree)" 20 fun _ => do
+    let t ← IO.monoNanosNow
+    pure (mountOps [view before] (t % 2 + 1)).live.length
+  let _ ← time s!"{label}:   (copy + diff, old tree unique)" 20 fun _ => do
+    let t ← IO.monoNanosNow
+    let m := mountOps [view before] (t % 2 + 1)
+    pure (diff m.live [v] m.next).next
+  let _ := mk
   let _ ← time s!"{label}: encode" 20 fun _ => pure (Encode.frame {} r.ops)
   let (b, _) := Encode.frame {} r.ops
   IO.println s!"{label}: {r.ops.size} ops, {b.size} bytes"

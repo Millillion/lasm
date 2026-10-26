@@ -336,9 +336,20 @@ partial def expandElement (ns : Ns) (e : Syntax) : MacroM Term := do
       if key.isSome then Macro.throwErrorAt a "the element already has a key"
       key := some k
   let childNs := if ns == .svg && tag == "foreignObject" then Ns.html else ns
+  -- JSX spacing: whitespace on one line between children (consumed by the
+  -- previous token) is a space; whitespace containing a line break is not.
+  let spaceAfter (stx : Syntax) : Bool :=
+    match stx.getTailInfo with
+    | .original _ _ trailing _ => let w := trailing.toString; !w.isEmpty && !w.contains '\n'
+    | _ => false
   let mut childTerms := #[]
+  let mut prev : Syntax := e[3]
   for c in children do
-    if let some t ← expandChild childNs c then childTerms := childTerms.push t
+    let lead := spaceAfter prev
+    if let some t ← expandChild childNs lead c then childTerms := childTerms.push t
+    prev := c
+  if !children.isEmpty && !(children.back!.getKind == ``childText) && spaceAfter prev then
+    childTerms := childTerms.push (← `([Lasm.UI.Html.text " "]))
   let attrList ← concatLists attrTerms
   let childList ← concatLists childTerms
   let keyTerm ← match key with
@@ -346,14 +357,21 @@ partial def expandElement (ns : Ns) (e : Syntax) : MacroM Term := do
     | none => `(none)
   `(Lasm.UI.Html.elem $(← nsTerm ns) $(quote tag) $keyTerm $attrList $childList)
 
-partial def expandChild (ns : Ns) (c : Syntax) : MacroM (Option Term) := do
+/-- One child; `lead`: a same-line space precedes it. -/
+partial def expandChild (ns : Ns) (lead : Bool) (c : Syntax) : MacroM (Option Term) := do
+  let space (t : Term) : MacroM Term := if lead then `([Lasm.UI.Html.text " "] ++ $t) else pure t
   match c with
   | `(jsxChild| $t:jsxText) =>
-    let s := decodeEntities (jsxWhitespace (nameOf t))
-    if s.isEmpty || s == " " then return none
+    let raw := (if lead then " " else "") ++ nameOf t
+    -- Whitespace-only text spanning lines is layout, not content.
+    if raw.all Char.isWhitespace && raw.contains '\n' then return none
+    let s := decodeEntities (jsxWhitespace raw)
+    if s.isEmpty then return none
     return some (← `([Lasm.UI.Html.text $(quote s)]))
-  | `(jsxChild| { $t:term }) => return some (← `(lasm_children% $t))
-  | `(jsxChild| $e:jsxElement) => return some (← `([$(← expandElement ns e)]))
+  | `(jsxChild| { $t:term }) => return some (← space (← `(lasm_children% $t)))
+  | `(jsxChild| $e:jsxElement) =>
+    let el ← expandElement ns e
+    if lead then return some (← `([Lasm.UI.Html.text " ", $el])) else return some (← `([$el]))
   | _ => Macro.throwErrorAt c "unsupported child"
 end
 

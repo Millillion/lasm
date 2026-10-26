@@ -108,10 +108,18 @@ def hasKey (k : AttrKey) : List (Attr Msg) → Bool
   | [] => false
   | a :: l => a.key == k || hasKey k l
 
+/-- Same slot and value (`a.key == b.key && a.val == b.val`, without building them). -/
+def Attr.same : Attr Msg → Attr Msg → Bool
+  | .attr n v, .attr n' v' => n == n' && v == v'
+  | .prop n v, .prop n' v' => n == n' && v == v'
+  | .style n v, .style n' v' => n == n' && v == v'
+  | .on l _, .on l' _ => l.event == l'.event && l == l'
+  | _, _ => false
+
 /-- The two lists give the same slots the same values, in the same order. -/
 def attrsEq : List (Attr Msg) → List (Attr Msg) → Bool
   | [], [] => true
-  | a :: as, b :: bs => a.key == b.key && a.val == b.val && attrsEq as bs
+  | a :: as, b :: bs => a.same b && attrsEq as bs
   | _, _ => false
 
 /-- Sets for every slot whose last value in `new` differs from `old`'s. -/
@@ -268,7 +276,7 @@ def diffChildren (old : List (Live Msg)) (new : List β) (next : Nat) : Children
   match old, new with
   | [], [] => ⟨#[], [], next⟩
   | _ :: _, [] => ⟨#[.clear], [], next⟩
-  | old, new => prefixPhase val f old new next #[] #[]
+  | old, new => prefixPhase val f old new next #[] (Array.emptyWithCapacity new.length)
 
 end Children
 
