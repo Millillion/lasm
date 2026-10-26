@@ -171,3 +171,14 @@ test('supabase-edge: function directory, entry, pinned import map and Asyncify',
     { imports: { '@scope/pkg': 'npm:@scope/pkg@1.2.3', '@scope/pkg/': 'npm:@scope/pkg@1.2.3/' } });
   assert.throws(() => supabaseImportMap(project, ['jose']), /jose, which is not installed: run npm install jose/);
 });
+
+test('js runtime: under bunx (a renamed bun) child scripts run with the bun beside it', async () => {
+  const { runtimeExecutableFor } = await import('../src/js-runtime.mjs');
+  const { join } = await import('node:path');
+  const dir = join('C:', 'bun', 'bin');
+  assert.equal(runtimeExecutableFor({ runtime: 'bun', execPath: join(dir, 'bunx.exe'), exists: () => true }), join(dir, 'bun.exe'));
+  assert.equal(runtimeExecutableFor({ runtime: 'bun', execPath: join(dir, 'bunx'), exists: () => true }), join(dir, 'bun'));
+  assert.equal(runtimeExecutableFor({ runtime: 'bun', execPath: join(dir, 'bunx.exe'), exists: () => false }), join(dir, 'bunx.exe'));
+  assert.equal(runtimeExecutableFor({ runtime: 'bun', execPath: join(dir, 'bun.exe'), exists: () => true }), join(dir, 'bun.exe'));
+  assert.equal(runtimeExecutableFor({ runtime: 'node', execPath: '/usr/bin/bunx', exists: () => true }), '/usr/bin/bunx');
+});

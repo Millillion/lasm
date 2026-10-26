@@ -23,7 +23,7 @@
 // Bun/Deno support fails instead of being skipped.
 //   node scripts/edge/published-ci.mjs WORK_DIR TOOLS_DIR [VERSION]
 import { execFileSync, spawnSync } from 'node:child_process';
-import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
+import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, realpathSync, symlinkSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { delimiter, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -150,9 +150,12 @@ const installed = dir => {
   const pkg = JSON.parse(readFileSync(join(cli, 'package.json'), 'utf8'));
   if (pkg.version !== version) return `installed @lasm/cli ${pkg.version}, not ${version}`;
   const libc = process.platform === 'linux' ? ['glibc'] : undefined;
+  // Resolved from the CLI's real directory, as Lasm resolves them: Deno does not hoist
+  // a package's optional dependencies to the project's node_modules.
+  const cliRequire = createRequire(realpathSync(join(cli, 'package.json')));
   const mine = Object.keys(pkg.optionalDependencies ?? {}).filter(name => {
-    const file = join(dir, 'node_modules', name, 'package.json');
-    if (!existsSync(file)) return false;
+    let file;
+    try { file = cliRequire.resolve(`${name}/package.json`); } catch { return false; }
     const p = JSON.parse(readFileSync(file, 'utf8'));
     return (!p.os || p.os.includes(process.platform)) && (!p.cpu || p.cpu.includes(process.arch)) && (!p.libc || !libc || p.libc.includes(libc[0]));
   });
