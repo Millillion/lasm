@@ -14,7 +14,7 @@ export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuil
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
        lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy] [-- arguments…]
        lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge] [--dev]
-       lasm init <directory> [--template plain|express|hono|std-http] [--deploy …]
+       lasm init <directory> [--template plain|express|hono|fastify|std-http] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf
        lasm build <lasm.json> [output-directory]
        lasm cache repair
