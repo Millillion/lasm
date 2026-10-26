@@ -164,6 +164,8 @@ jobs:
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
           SPIN_DISABLE_TELEMETRY: '1'
         run: node scripts/wasi/wasi-ci.mjs .work/wasi-apps .work/wasi-tools
+      - name: Licence check of every built output (notices file, embedded notices, no copyleft code)
+        run: node scripts/license/check-outputs.mjs .work/wasi-apps --expect wasi,fastly,wasi-http --report .work/wasi-apps/license-check.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:

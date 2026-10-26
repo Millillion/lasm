@@ -42,7 +42,7 @@ app, then branches on `Lasm.JS.onEdge`:
 | `workers/lasm/program.wasm`, `program.mjs` | The Lean program: no threads, 32-bit memory, JSPI. |
 | `workers/lasm/edge-*.mjs` | The pure-JavaScript host (web-standard APIs only). |
 | `workers/wrangler.toml` | Only when the project has no wrangler configuration. |
-| `workers/build-info.json`, `THIRD_PARTY_NOTICES.txt` | Build record and notices. |
+| `workers/build-info.json`, `THIRD_PARTY_NOTICES.txt` | Build record and notices (also inside `program.wasm` and named by `program.mjs`'s licence banner, so every deployment carries them: [LICENSING.md](../LICENSING.md)). |
 
 Lasm owns `workers/` and replaces it on every build. Requirements:
 

@@ -99,6 +99,8 @@ jobs:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
         run: node scripts/fullstack/build-app.mjs .work/fullstack-work .work/fullstack-app
+      - name: Licence check of every built output (server dist, browser client, Workers)
+        run: node scripts/license/check-outputs.mjs .work/fullstack-work .work/fullstack-app --expect browser
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: fullstack-app

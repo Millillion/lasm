@@ -3,6 +3,8 @@ The js-framework-benchmark app (keyed) in Lean with Lasm.UI: create 1,000 or
 10,000 rows, append 1,000, update every 10th row, swap two rows, select and
 remove rows, clear. Compared with vanilla JavaScript by
 scripts/ui/bench-browser.mjs (CI, headless browsers) and docs/UI.md.
+The operations and the label word lists follow js-framework-benchmark
+(https://github.com/krausest/js-framework-benchmark, Apache-2.0).
 -/
 import Lasm.UI
 open Lasm.UI

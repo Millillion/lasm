@@ -360,6 +360,7 @@ export const cliNoticeSections = Object.freeze({
   'node-addon-api (koffi build dependency)': 'MIT',
   'Koffi runtime adapter': 'MIT',
   'Zig compiler runtime': 'MIT',
+  'Wasmtime proxy adapter': 'Apache-2.0 WITH LLVM-exception',
 });
 
 /** Split a notices file into [heading, text] sections (`=== heading ===` lines). */

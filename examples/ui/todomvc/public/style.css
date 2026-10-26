@@ -1,4 +1,11 @@
-/* A TodoMVC look for the Lasm.UI example (hand-written, small). */
+/* A TodoMVC look for the Lasm.UI example: a short rewrite, with Lasm's changes, of
+ * the look of todomvc-app-css (https://github.com/tastejs/todomvc-app-css),
+ * Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com), licensed
+ * under Creative Commons Attribution 4.0 International (CC BY 4.0,
+ * https://creativecommons.org/licenses/by/4.0/), provided as is, without warranties
+ * (CC BY 4.0 section 5). This file is modified from that work (rewritten and much
+ * shortened); Lasm's changes are under Lasm's MIT licence. The class names follow
+ * the TodoMVC application specification (https://github.com/tastejs/todomvc, MIT). */
 :root { color-scheme: light; --accent: #b83f45; --text: #111; --muted: #777; --line: #ededed; }
 * { box-sizing: border-box; }
 body { margin: 0; padding: 0 16px; background: #f5f5f5; font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--text); }

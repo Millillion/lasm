@@ -9,7 +9,7 @@ Compute's host calls, in the layout `fastly compute serve|deploy` uses.
 
 | | `--target wasi` | `--target wasi-http` | `--target fastly` |
 | --- | --- | --- | --- |
-| Output | `wasi/main.wasm` (+ `build-info.json`, `THIRD_PARTY_NOTICES.txt`) | `wasi-http/main.wasm`, a component | `bin/main.wasm`, `pkg/<name>.tar.gz`; `fastly.toml` when the project has none |
+| Output | `wasi/main.wasm` (+ `build-info.json`, `THIRD_PARTY_NOTICES.txt`, also embedded in the Wasm as its `lasm.notices` section) | `wasi-http/main.wasm`, a component | `bin/main.wasm`, `pkg/<name>.tar.gz`; `fastly.toml` when the project has none |
 | Runs on | wasmtime, wasmer, Node's `node:wasi`, any preview 1 host | `wasmtime serve`, Spin's HTTP trigger, any wasi:http/proxy@0.2 host | Fastly Compute; Viceroy (`fastly compute serve`) locally |
 | `main` | A command: arguments, environment, standard streams, exit status | Runs once per request | Runs once per request |
 | HTTP served | [`Lasm.Fetch.serve`](FETCH.md): one CGI request per run | wasi:http/incoming-handler | Fastly's downstream request |
