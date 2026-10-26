@@ -49,6 +49,9 @@ for (const [name, project] of projects) {
   record.apps[name].unchangedSeconds = build(project, join(work, name + '-again'));
 }
 
+// The platform suite built with --suspend jspi: blocking waits suspend where the browser has JSPI.
+record.apps['platform-jspi'] = { buildSeconds: build(join(work, 'platform'), join(out, 'platform-jspi'), ['--suspend', 'jspi']) };
+
 // @lasm/vite: the template's Main.lean imported by a Vite app (test/browser/vite), built with pinned Vite.
 const viteApp = join(work, 'vite');
 cpSync(join(root, 'test/browser/vite'), viteApp, { recursive: true });

@@ -197,8 +197,14 @@ def eventFixtures (root : Element) : IO Unit := do
   -- A blocking wait in a handler: without JSPI the instance stops with a message.
   let block ← createElement "button"
   block.setId "block"
-  discard <| block.on "click" fun _ => IO.sleep 5
-  root.append #[button, count, onceOut, input, mirror, keys, link, prevented, removable, removedOut, pad, where_, block]
+  -- (In Async work, not the handler itself: a synchronous callback can never suspend.)
+  let slept ← createElement "output"
+  slept.setId "slept"
+  discard <| block.on "click" fun _ => background do
+    Std.Async.sleep 1  -- continue in a Lean task, outside the callback
+    (IO.sleep 5 : IO Unit)
+    slept.setTextContent "slept"
+  root.append #[button, count, onceOut, input, mirror, keys, link, prevented, removable, removedOut, pad, where_, block, slept]
 
 def customEventChecks (checks : Checks) (root : Element) : IO Unit := do
   check checks "events.custom-dispatch" do
