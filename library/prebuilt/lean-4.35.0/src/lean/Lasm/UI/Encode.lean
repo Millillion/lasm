@@ -120,6 +120,17 @@ def setAttr (e : Enc) (k : AttrKey) (v : AttrVal) : Enc :=
   | .style n, _ => (e.byte 10).name n
   | .on ev, _ => (e.byte 11).name ev
 
+/-- An attribute of a new element (`setAttr a.key a.val`, without building them). -/
+def attr (e : Enc) : Attr Msg → Enc
+  | .attr n s => (e.byte 0).name n |>.value s
+  | .prop n (.str s) => (e.byte 1).name n |>.value s
+  | .prop n (.bool false) => (e.byte 2).name n
+  | .prop n (.bool true) => (e.byte 3).name n
+  | .style n s => (e.byte 4).name n |>.value s
+  | .on l _ =>
+    let (e, d) := e.decoder l.paths
+    ((e.byte 5).name l.event).var d |>.var (flags l)
+
 def attrOp (e : Enc) : AttrOp → Enc
   | .set k v => e.setAttr k v
   | .remove (.attr n) => (e.byte 8).name n
@@ -137,7 +148,7 @@ def node (e : Enc) : Live Msg → Enc
   | .text id s => ((e.byte 0).var id).str s
   | .elem id ns tag _ attrs cs =>
     let e := ((e.byte (nsByte ns)).var id).name tag
-    let e := attrs.foldl (init := e.var attrs.length) fun e a => e.setAttr a.key a.val
+    let e := attrs.foldl (init := e.var attrs.length) fun e a => e.attr a
     nodes (e.var cs.length) cs
 def nodes (e : Enc) : List (Live Msg) → Enc
   | [] => e

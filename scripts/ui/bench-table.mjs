@@ -16,8 +16,9 @@ console.log(`| --- | ${runs.map(() => '---').join(' | ')} |`);
 for (const op of ops) {
   const cells = runs.map(r => {
     const b = r.report.apps.bench.bench[op];
-    return `${b.lasmMs.toFixed(0)} / ${b.vanillaMs.toFixed(0)} ms (${b.ratio.toFixed(2)}×)`;
+    const parts = b.leanMs != null ? ` [Lean ${b.leanMs.toFixed(1)}, applier ${b.applyMs.toFixed(1)}]` : '';
+    return `${b.lasmMs.toFixed(0)} / ${b.vanillaMs.toFixed(0)} ms (${b.ratio.toFixed(2)}×)${parts}`;
   });
   console.log(`| ${op} | ${cells.join(' | ')} |`);
 }
-console.log('\nLasm.UI / vanilla JavaScript, medians of 8 runs (3 for 10,000 rows), click to painted frame.');
+console.log('\nLasm.UI / vanilla JavaScript: medians of 10 runs (3 for 10,000 rows), click to painted frame, alternating; in brackets, Lean\'s part (view, diff, encoding) and the applier\'s.');
