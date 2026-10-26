@@ -12,11 +12,12 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const out = resolve(process.argv[2] ?? '.work/unit-tests.json');
 // Files whose tests need tools the unit job does not install, with the reason.
-export const needsTools = {
-  // The earlier Lean 4.32 callable-library pipeline (src/build.mjs) builds its own runtime with zig.
-  'runtime.test.mjs': 'the Lean 4.32 library pipeline (zig toolchain from npm run setup)',
-  'wall-clock.test.mjs': 'the Lean 4.32 library pipeline (zig toolchain from npm run setup)',
-};
+// These build Lean programs with the earlier Lean 4.32 library pipeline
+// (src/main.mjs, src/build.mjs): a system `lean` 4.32 (Elan) and the zig-built
+// runtime of `npm run setup`, which this job does not install (CI run 40323882076:
+// every one stops at `spawnSync lean ENOENT`).
+const legacy = 'the Lean 4.32 library pipeline (system lean 4.32 and zig from npm run setup)';
+export const needsTools = Object.fromEntries(['compiler', 'conformance', 'finalizers', 'io', 'lake', 'node-console-buffering', 'node-cwd-permissions', 'node-cwd-removed-permissions', 'node-cwd-tracking', 'node-cwd', 'node-environment-bytes', 'node-getline-state', 'node-platform', 'node-process-cwd', 'node-process-exit', 'node-process-nul', 'node-process', 'node-realpath', 'node-spawn', 'node-system-directories', 'node-temporary-files', 'node-temporary-path-bytes', 'node-truncate-errors', 'platform', 'runtime-metadata', 'runtime', 'standard-io', 'tcp-binding', 'wall-clock'].map(name => [name + '.test.mjs', legacy]));
 const files = readdirSync(join(root, 'test')).filter(name => name.endsWith('.test.mjs')).sort();
 const result = { startedAt: new Date().toISOString(), node: process.version, files: [] };
 let failed = 0;
