@@ -31,7 +31,8 @@ const wasmModule = await WebAssembly.compile(bytes);
 result.compileMs = +(performance.now() - t).toFixed(1);
 const start = async () => {
   delete globalThis.__lasmDefaultExport;
-  const lean = await startLean({ createProgram, wasmModule, modules, stdout: () => {}, stderr: () => {} });
+  // jspi: false for an Asyncify build, so only Asyncify can suspend (as on Supabase).
+  const lean = await startLean({ createProgram, wasmModule, modules, jspi: info.link?.suspend !== 'asyncify', stdout: () => {}, stderr: () => {} });
   return { lean, handler: globalThis.__lasmDefaultExport };
 };
 t = performance.now();
