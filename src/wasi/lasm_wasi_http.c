@@ -89,35 +89,44 @@ __attribute__((used)) void *const lasm_wasi_http_imports[] = {
     (void *)s_drop_input, (void *)s_drop_output, (void *)e_drop_error, (void *)p_poll, (void *)p_drop, (void *)c_subscribe_duration };
 
 /* From lasm_wasi.c. */
+_Noreturn void lasm_wasi_fail(const char *message);
 int lasm_wasi_run_main(void);
 void lasm_wasi_complete(const uint8_t header[24], bool failed, const void *data, size_t size);
 void lasm_wasi_complete_error(const uint8_t header[24], uint64_t kind, uint64_t code, const char *message);
 extern bool lasm_wasi_stdout_to_stderr;
 
-/* The canonical ABI's allocator: lists the host returns land here, and the
-   preview 1 adapter allocates its state and stack with it on its first call
-   (from libc's static constructors). It must not call malloc then: mimalloc's
-   initialization reads the clock through the adapter, which is not yet set
-   up. So allocations come from a static arena first, and from malloc once it
-   is used up. */
+/* The canonical ABI's allocator. The host calls it while it lifts a list or
+   string into the module (and the preview 1 adapter calls it for its state on
+   its first call), when the module may not call out of the component; so it
+   must never reach malloc, whose mimalloc reads the clock through the adapter.
+   It bumps memory that is set aside beforehand instead:
+   - before every host call that can return lists, `armed` selects a scratch
+     buffer (2 MiB, from malloc, made before the call), reset at each call:
+     callers copy what they need before the next host call;
+   - otherwise (the adapter's own allocations) a static arena that is never
+     reused. */
+#define SCRATCH_SIZE ((size_t)2 << 20)
 static _Alignas(16) uint8_t cabi_arena[256 * 1024];
 static size_t cabi_used;
-static bool in_arena(const void *p) { return (const uint8_t *)p >= cabi_arena && (const uint8_t *)p < cabi_arena + sizeof(cabi_arena); }
-static void cabi_free(void *p) { if (p && !in_arena(p)) free(p); }
+static uint8_t *scratch; static size_t scratch_used; static bool armed;
+static void arm(void) {
+    if (!scratch && !(scratch = malloc(SCRATCH_SIZE))) abort();
+    scratch_used = 0; armed = true;
+}
+static void disarm(void) { armed = false; }
+static void cabi_free(void *p) { (void)p; }
 __attribute__((export_name("cabi_realloc"))) uint32_t cabi_realloc(uint32_t pointer, uint32_t old_size, uint32_t align, uint32_t size) {
     if (!size) return align;
+    size_t a = align < 8 ? 8 : align;
+    uint8_t *base = armed ? scratch : cabi_arena;
+    size_t *used = armed ? &scratch_used : &cabi_used, capacity = armed ? SCRATCH_SIZE : sizeof(cabi_arena);
+    size_t at = (*used + a - 1) & ~(a - 1);
+    if (at + size > capacity) lasm_wasi_fail(armed ? "Lasm wasi-http: a value from the host exceeds the 2 MiB buffer for it"
+        : "Lasm wasi-http: the preview 1 adapter's state exceeds its 256 KiB arena");
+    *used = at + size;
     void *old = (void *)(uintptr_t)pointer;
-    if (old && !in_arena(old)) {
-        void *result = realloc(old, size);
-        if (!result) abort();
-        return P(result);
-    }
-    size_t a = align < 16 ? 16 : align, at = (cabi_used + a - 1) & ~(a - 1);
-    void *result;
-    if (at + size <= sizeof(cabi_arena)) { result = cabi_arena + at; cabi_used = at + size; }
-    else { result = aligned_alloc(a, (size + a - 1) & ~(a - 1)); if (!result) abort(); }
-    if (old && old_size) memcpy(result, old, old_size < size ? old_size : size);
-    return P(result);
+    if (old && old_size) memcpy(base + at, old, old_size < size ? old_size : size);
+    return P(base + at);
 }
 
 static uint32_t incoming_request, response_outparam;
@@ -168,7 +177,7 @@ static lean_object *string_at(const uint8_t *area, size_t offset) {
 static bool read_stream(uint32_t stream, growable *out) {
     _Alignas(8) uint8_t area[16];
     for (;;) {
-        s_blocking_read(stream, 65536, P(area));
+        arm(); s_blocking_read(stream, 65536, P(area)); disarm();
         if (area[0] == 0) {
             void *data = at32(u32_at(area + 4));
             grow_put(out, data, u32_at(area + 8));
@@ -204,12 +213,12 @@ static bool write_body(uint32_t body, const uint8_t *data, size_t size) {
         data += n; size -= n;
     }
     s_drop_output(stream);
-    h_outgoing_body_finish(body, 0, 0, P(area));
+    arm(); h_outgoing_body_finish(body, 0, 0, P(area)); disarm();
     return ok && area[0] == 0;
 }
 static lean_object *headers_of(uint32_t fields) {
     _Alignas(8) uint8_t area[16];
-    h_fields_entries(fields, P(area));
+    arm(); h_fields_entries(fields, P(area)); disarm();
     uint8_t *entries = at32(u32_at(area));
     uint32_t count = u32_at(area + 4);
     lean_object *headers = lean_mk_empty_array();
@@ -246,18 +255,18 @@ static lean_obj_res request_head(lean_object **method_out, lean_object **url_out
     uint32_t request = incoming_request;
     incoming_request = 0;
     _Alignas(8) uint8_t area[32];
-    h_request_method(request, P(area));
+    arm(); h_request_method(request, P(area)); disarm();
     lean_object *method = area[0] < 9 ? lean_mk_string(method_names[area[0]]) : string_at(area, 4);
     growable url = { 0 };
-    h_request_scheme(request, P(area));
+    arm(); h_request_scheme(request, P(area)); disarm();
     const char *scheme = "http";
     if (area[0] && area[4] == 1) scheme = "https";
     if (area[0] && area[4] == 2) cabi_free(at32(u32_at(area + 8)));
     grow_put(&url, scheme, strlen(scheme)); grow_put(&url, "://", 3);
-    h_request_authority(request, P(area));
+    arm(); h_request_authority(request, P(area)); disarm();
     if (area[0]) { void *p = at32(u32_at(area + 4)); grow_put(&url, p, u32_at(area + 8)); cabi_free(p); }
     else grow_put(&url, "localhost", 9);
-    h_request_path(request, P(area));
+    arm(); h_request_path(request, P(area)); disarm();
     if (area[0]) { void *p = at32(u32_at(area + 4)); grow_put(&url, p, u32_at(area + 8)); cabi_free(p); }
     else grow_put(&url, "/", 1);
     *headers_out = headers_of(h_request_headers(request));
@@ -278,7 +287,7 @@ static size_t read_request(growable *out, uint32_t max) {
     if (!request_stream) return 0;
     _Alignas(8) uint8_t area[16];
     for (;;) {
-        s_blocking_read(request_stream, max, P(area));
+        arm(); s_blocking_read(request_stream, max > 65536 ? 65536 : max, P(area)); disarm();
         if (area[0] == 0) {
             void *data = at32(u32_at(area + 4));
             uint32_t n = u32_at(area + 8);
@@ -355,7 +364,7 @@ static bool finish(bool ok) {
     response_body = 0;
     /* Dropping the body without finishing it tells the host the body is incomplete. */
     if (!ok) { h_drop_outgoing_body(body); return true; }
-    h_outgoing_body_finish(body, 0, 0, P(area));
+    arm(); h_outgoing_body_finish(body, 0, 0, P(area)); disarm();
     return area[0] == 0;
 }
 LEAN_EXPORT lean_obj_res lasm_fetch_send_response(uint16_t status, b_lean_obj_arg headers, b_lean_obj_arg body) {
@@ -407,7 +416,7 @@ LEAN_EXPORT lean_obj_res lasm_fetch_send(b_lean_obj_arg promise, b_lean_obj_arg 
     h_outgoing_request_body(request, P(area));
     if (area[0] != 0) { h_drop_outgoing_request(request); return fail("Lasm.Fetch.fetch: the request body is unavailable"); }
     uint32_t out = u32_at(area + 4);
-    h_outgoing_handle(request, 0, 0, P(area));
+    arm(); h_outgoing_handle(request, 0, 0, P(area)); disarm();
     if (area[0] != 0) {
         char message[128];
         snprintf(message, sizeof(message), "Lasm.Fetch.fetch: the host refused the request (wasi:http error-code %u)", (unsigned)area[8]);
@@ -427,7 +436,7 @@ LEAN_EXPORT lean_obj_res lasm_fetch_send(b_lean_obj_arg promise, b_lean_obj_arg 
 /* Completes one request if its response has arrived (future.get is non-blocking). */
 static bool try_finish(outbound *o) {
     _Alignas(8) uint8_t area[64];
-    h_future_get(o->future, P(area));
+    arm(); h_future_get(o->future, P(area)); disarm();
     if (area[0] == 0) return false;
     o->active = false;
     p_drop(o->pollable);
@@ -482,9 +491,20 @@ void lasm_wasi_io_wait(uint64_t timeout_ns, bool bounded) {
     uint32_t timer = 0;
     if (bounded) list[n++] = timer = c_subscribe_duration((int64_t)timeout_ns);
     _Alignas(8) uint8_t area[8];
-    p_poll(P(list), (uint32_t)n, P(area));
+    arm(); p_poll(P(list), (uint32_t)n, P(area)); disarm();
     cabi_free(at32(u32_at(area)));
     if (timer) p_drop(timer);
     free(list);
     lasm_wasi_io_poll();
 }
+
+/* Lasm.Fastly (library/Lasm/Fastly.lean): only on --target fastly. */
+static lean_obj_res fastly_only(void) {
+    return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string(
+        "Lasm.Fastly: Fastly stores are available only in programs built with lasm build --target fastly")));
+}
+LEAN_EXPORT lean_obj_res lasm_fastly_config_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_secret_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_put(b_lean_obj_arg store, b_lean_obj_arg key, b_lean_obj_arg value) { (void)store; (void)key; (void)value; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_delete(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }

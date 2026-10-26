@@ -8,6 +8,7 @@ every route below on each of them.
 import Std.Data.HashMap
 import Std.Async
 import Lasm.Fetch
+import Lasm.Fastly
 open Lasm.Fetch
 
 def fib : Nat → Nat
@@ -78,6 +79,17 @@ def handle (req : Request) : Async Response := do
   | "GET", ["env", name] => return .json s!"\{\"value\":{jsonString ((← IO.getEnv name).getD "")}}"
   | "GET", ["time"] => return .json s!"\{\"mono\":{decide ((← IO.monoNanosNow) > 0)},\"random\":{(← IO.getRandomBytes 8).size}}"
   | "GET", ["throw"] => throw (IO.userError "thrown from Lean")
+  -- Fastly Compute's Config, Secret and KV Stores (Lasm.Fastly; Viceroy reads them from fastly.toml).
+  | "GET", ["fastly", "stores"] =>
+    let color ← Lasm.Fastly.configGet "settings" "color"
+    let missing ← Lasm.Fastly.configGet "settings" "nope"
+    let secret ← Lasm.Fastly.secretText "secrets" "token"
+    let greeting ← Lasm.Fastly.kvGetText "kv" "greeting"
+    Lasm.Fastly.kvPut "kv" "counter" "41".toUTF8
+    let counter ← Lasm.Fastly.kvGetText "kv" "counter"
+    Lasm.Fastly.kvDelete "kv" "counter"
+    let gone ← Lasm.Fastly.kvGet "kv" "counter"
+    return .json s!"\{\"color\":{jsonString (color.getD "")},\"missing\":{missing.isNone},\"secret\":{jsonString (secret.getD "")},\"greeting\":{jsonString (greeting.getD "")},\"counter\":{jsonString (counter.getD "")},\"deleted\":{gone.isNone}}"
   -- Streamed bodies: a response sent in chunks as they are made, and a request read in chunks.
   | "GET", ["stream", "out", n] =>
     return Response.streaming (contentType := "text/plain") fun send => do

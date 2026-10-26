@@ -13,7 +13,7 @@ import { executableName } from './platform.mjs';
 const root = fileURLToPath(new URL('../library/', import.meta.url));
 // Lean versions the library is compiled for, and its modules in import order.
 export const libraryLeanVersions = ['4.35.0'];
-export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS', 'Lasm.Fetch'];
+export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS', 'Lasm.Fetch', 'Lasm.Fastly'];
 export const glueSource = join(root, 'c', 'lasm_js.c');
 // Lasm.Fetch's glue on Node and the edge (WASI builds link src/wasi/lasm_fetch_wasi.c).
 export const fetchGlueSource = join(root, 'c', 'lasm_fetch.c');
@@ -92,7 +92,7 @@ export function compileLibrary(tree, version, { platform = process.platform, com
 
 /** Whether any generated C initializes a module of Lasm's library (its Lean code imports Lasm.JS or Lasm.Fetch). */
 export function importsLibrary(sources) {
-  return sources.some(file => /initialize_Lasm_(?:JS|Fetch)/.test(readFileSync(file, 'latin1')));
+  return sources.some(file => /initialize_Lasm_(?:JS|Fetch|Fastly)/.test(readFileSync(file, 'latin1')));
 }
 
 /** The library's generated C (from the prefix) and the glue, for the link. */

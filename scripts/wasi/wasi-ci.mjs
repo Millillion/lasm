@@ -170,6 +170,7 @@ const routes = [
   { path: '/time', json: { mono: true, random: 8 } },
   { path: '/throw', status: 500, text: 'Internal Server Error\n' },
   { path: '/nope', status: 404, text: 'Not Found\n' },
+  { path: '/fastly/stores', json: { color: 'blue', missing: true, secret: 's3cret', greeting: 'hello kv', counter: '41', deleted: true }, only: ['viceroy'] },
   // Streamed bodies (/stream/… requests are read on demand).
   { path: '/stream/out/5', text: Array.from({ length: 5 }, (_, i) => `chunk ${i}\n`).join('') },
   { path: '/stream/in', method: 'POST', body: new Uint8Array(300000).fill(7), headers: { 'content-type': 'application/octet-stream' }, json: { bytes: 300000, chunks: true } },
@@ -319,7 +320,10 @@ if (engines.has('wasmtime'))
 if (engines.has('viceroy')) {
   // A named backend for FetchOptions.backend (Fastly services name theirs).
   writeFileSync(join(fetchApp, 'fastly.toml'), readFileSync(join(fetchApp, 'fastly.toml'), 'utf8')
-    + `\n[local_server]\n  [local_server.backends]\n    [local_server.backends.origin]\n      url = "${origin}"\n`);
+    + `\n[local_server]\n  [local_server.backends]\n    [local_server.backends.origin]\n      url = "${origin}"\n`
+    + `  [local_server.config_stores]\n    [local_server.config_stores.settings]\n      format = "inline-toml"\n    [local_server.config_stores.settings.contents]\n      color = "blue"\n`
+    + `  [local_server.secret_stores]\n    [[local_server.secret_stores.secrets]]\n      key = "token"\n      data = "s3cret"\n`
+    + `  [local_server.kv_stores]\n    [[local_server.kv_stores.kv]]\n      key = "greeting"\n      data = "hello kv"\n`);
 }
 if (engines.has('viceroy'))
   await serveAndCheck('viceroy', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3102', '-C', 'fastly.toml', 'bin/main.wasm'], { cwd: fetchApp, port: 3102 });

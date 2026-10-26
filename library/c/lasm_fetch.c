@@ -30,3 +30,14 @@ LEAN_EXPORT lean_obj_res lasm_fetch_read(uint32_t max) { (void)max; return unava
 LEAN_EXPORT lean_obj_res lasm_fetch_start_response(uint16_t status, b_lean_obj_arg headers) { (void)status; (void)headers; return unavailable(); }
 LEAN_EXPORT lean_obj_res lasm_fetch_write(b_lean_obj_arg chunk) { (void)chunk; return unavailable(); }
 LEAN_EXPORT lean_obj_res lasm_fetch_finish(uint8_t ok) { (void)ok; return unavailable(); }
+
+/* Lasm.Fastly (library/Lasm/Fastly.lean): only on --target fastly. */
+static lean_obj_res fastly_only(void) {
+    return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string(
+        "Lasm.Fastly: Fastly stores are available only in programs built with lasm build --target fastly")));
+}
+LEAN_EXPORT lean_obj_res lasm_fastly_config_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_secret_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_put(b_lean_obj_arg store, b_lean_obj_arg key, b_lean_obj_arg value) { (void)store; (void)key; (void)value; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_delete(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }

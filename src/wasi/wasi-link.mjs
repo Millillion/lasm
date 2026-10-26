@@ -49,7 +49,8 @@ const inputFeatures = ['--enable-bulk-memory', '--enable-bulk-memory-opt', '--en
 /** Import modules each target's program may use. */
 export const allowedImportModules = Object.freeze({
   wasi: ['wasi_snapshot_preview1'],
-  fastly: ['wasi_snapshot_preview1', 'fastly_abi', 'fastly_http_req', 'fastly_http_body', 'fastly_http_resp', 'fastly_async_io'],
+  fastly: ['wasi_snapshot_preview1', 'fastly_abi', 'fastly_http_req', 'fastly_http_body', 'fastly_http_resp', 'fastly_async_io',
+    'fastly_config_store', 'fastly_secret_store', 'fastly_kv_store'],
   'wasi-http': ['wasi_snapshot_preview1', 'wasi:http/types@0.2.12', 'wasi:http/outgoing-handler@0.2.12', 'wasi:io/poll@0.2.12',
     'wasi:io/streams@0.2.12', 'wasi:io/error@0.2.12', 'wasi:clocks/monotonic-clock@0.2.12'],
 });

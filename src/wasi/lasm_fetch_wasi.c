@@ -227,6 +227,15 @@ LEAN_EXPORT lean_obj_res lasm_fetch_send(b_lean_obj_arg promise, b_lean_obj_arg 
 bool lasm_wasi_io_poll(void) { return false; }
 bool lasm_wasi_io_pending(void) { return false; }
 void lasm_wasi_io_wait(uint64_t timeout_ns, bool bounded) { (void)timeout_ns; (void)bounded; }
+static lean_obj_res fastly_only(void) {
+    return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string(
+        "Lasm.Fastly: Fastly stores are available only in programs built with lasm build --target fastly")));
+}
+LEAN_EXPORT lean_obj_res lasm_fastly_config_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_secret_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_put(b_lean_obj_arg store, b_lean_obj_arg key, b_lean_obj_arg value) { (void)store; (void)key; (void)value; return fastly_only(); }
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_delete(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
 #else
 /* ---- Fastly Compute ---- */
 #define FASTLY(module, name) __attribute__((import_module(#module), import_name(#name)))
@@ -589,5 +598,112 @@ void lasm_wasi_io_wait(uint64_t timeout_ns, bool bounded) {
     (void)f_async_select(P(handles), (uint32_t)outbound_count, (uint32_t)ms, P(&ready));
     free(handles);
     lasm_wasi_io_poll();
+}
+#endif
+
+#ifdef LASM_WASI_FASTLY
+/* ---- Lasm.Fastly: Config, Secret and KV Stores (blocking host calls). ---- */
+FASTLY(fastly_config_store, open) uint32_t f_config_open(uint32_t name, uint32_t length, uint32_t handle_out);
+FASTLY(fastly_config_store, get) uint32_t f_config_get(uint32_t handle, uint32_t key, uint32_t key_length, uint32_t value, uint32_t max, uint32_t nwritten);
+FASTLY(fastly_secret_store, open) uint32_t f_secret_open(uint32_t name, uint32_t length, uint32_t handle_out);
+FASTLY(fastly_secret_store, get) uint32_t f_secret_get(uint32_t store, uint32_t key, uint32_t key_length, uint32_t secret_out);
+FASTLY(fastly_secret_store, plaintext) uint32_t f_secret_plaintext(uint32_t secret, uint32_t buf, uint32_t length, uint32_t nwritten);
+FASTLY(fastly_kv_store, open) uint32_t f_kv_open(uint32_t name, uint32_t length, uint32_t handle_out);
+FASTLY(fastly_kv_store, lookup) uint32_t f_kv_lookup(uint32_t store, uint32_t key, uint32_t key_length, uint32_t mask, uint32_t config, uint32_t handle_out);
+FASTLY(fastly_kv_store, lookup_wait) uint32_t f_kv_lookup_wait(uint32_t handle, uint32_t body_out, uint32_t metadata, uint32_t metadata_length,
+    uint32_t nwritten, uint32_t generation, uint32_t error_out);
+FASTLY(fastly_kv_store, insert) uint32_t f_kv_insert(uint32_t store, uint32_t key, uint32_t key_length, uint32_t body, uint32_t mask, uint32_t config, uint32_t handle_out);
+FASTLY(fastly_kv_store, insert_wait) uint32_t f_kv_insert_wait(uint32_t handle, uint32_t error_out);
+FASTLY(fastly_kv_store, delete) uint32_t f_kv_delete(uint32_t store, uint32_t key, uint32_t key_length, uint32_t mask, uint32_t config, uint32_t handle_out);
+FASTLY(fastly_kv_store, delete_wait) uint32_t f_kv_delete_wait(uint32_t handle, uint32_t error_out);
+enum { FASTLY_NONE = 10, KV_OK = 1, KV_NOT_FOUND = 3 };
+static lean_object *some_of(lean_object *v) { lean_object *o = lean_alloc_ctor(1, 1, 0); lean_ctor_set(o, 0, v); return o; }
+static const char *kv_errors[] = { "uninitialized", "ok", "bad request", "not found", "precondition failed", "payload too large", "internal error", "too many requests" };
+static lean_obj_res kv_fail(const char *what, uint32_t status, uint32_t kv_error) {
+    char message[200];
+    snprintf(message, sizeof(message), "Lasm.Fastly: %s failed (FastlyStatus %u, KV error %s)", what, (unsigned)status, kv_error < 8 ? kv_errors[kv_error] : "unknown");
+    return fail(message);
+}
+#define STR(s) P(lean_string_cstr(s)), (uint32_t)(lean_string_size(s) - 1)
+/* A text getter retried with the size the host asks for (BUFLEN). */
+static uint32_t sized_get(uint32_t (*get)(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t), uint32_t handle, b_lean_obj_arg key, growable *out) {
+    uint32_t size = 4096;
+    for (int attempt = 0; attempt < 8; attempt++) {
+        if (out->capacity < size) { uint8_t *next = realloc(out->data, size); if (!next) abort(); out->data = next; out->capacity = size; }
+        uint32_t written = 0, status = get(handle, STR(key), P(out->data), size, P(&written));
+        if (status != FASTLY_BUFLEN) { out->size = status ? 0 : written; return status; }
+        size = written > size ? written : size * 4;
+    }
+    return FASTLY_BUFLEN;
+}
+LEAN_EXPORT lean_obj_res lasm_fastly_config_get(b_lean_obj_arg store, b_lean_obj_arg key) {
+    uint32_t handle = 0, status = f_config_open(STR(store), P(&handle));
+    if (status) return fastly_fail("opening the Config Store", status);
+    growable value = { 0 };
+    status = sized_get(f_config_get, handle, key, &value);
+    lean_object *result = status == FASTLY_NONE ? lean_box(0) : status ? NULL : some_of(string_of((const char *)value.data, value.size));
+    free(value.data);
+    return result ? lean_io_result_mk_ok(result) : fastly_fail("reading the Config Store", status);
+}
+LEAN_EXPORT lean_obj_res lasm_fastly_secret_get(b_lean_obj_arg store, b_lean_obj_arg key) {
+    uint32_t handle = 0, secret = 0, status = f_secret_open(STR(store), P(&handle));
+    if (status) return fastly_fail("opening the Secret Store", status);
+    status = f_secret_get(handle, STR(key), P(&secret));
+    if (status == FASTLY_NONE) return lean_io_result_mk_ok(lean_box(0));
+    if (status) return fastly_fail("reading the Secret Store", status);
+    uint32_t size = 4096;
+    for (int attempt = 0; attempt < 8; attempt++) {
+        uint8_t *buf = malloc(size);
+        uint32_t written = 0;
+        status = f_secret_plaintext(secret, P(buf), size, P(&written));
+        if (status == FASTLY_BUFLEN) { free(buf); size = written > size ? written : size * 4; continue; }
+        if (status) { free(buf); return fastly_fail("reading a secret", status); }
+        lean_object *bytes = bytes_of(buf, written);
+        free(buf);
+        return lean_io_result_mk_ok(some_of(bytes));
+    }
+    return fastly_fail("reading a secret", status);
+}
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_get(b_lean_obj_arg store, b_lean_obj_arg key) {
+    uint32_t handle = 0, lookup = 0, body = 0, status = f_kv_open(STR(store), P(&handle));
+    if (status) return fastly_fail("opening the KV Store", status);
+    uint8_t config[16] = { 0 };
+    if ((status = f_kv_lookup(handle, STR(key), 0, P(config), P(&lookup)))) return kv_fail("looking up a key", status, 0);
+    uint8_t metadata[1024];
+    uint32_t written = 0, generation = 0, kv_error = 0;
+    status = f_kv_lookup_wait(lookup, P(&body), P(metadata), sizeof(metadata), P(&written), P(&generation), P(&kv_error));
+    if (kv_error == KV_NOT_FOUND || status == FASTLY_NONE) return lean_io_result_mk_ok(lean_box(0));
+    if (status || (kv_error != KV_OK && kv_error != 0)) return kv_fail("looking up a key", status, kv_error);
+    growable value = { 0 };
+    uint8_t chunk[16384];
+    for (;;) {
+        uint32_t n = 0;
+        if ((status = f_body_read(body, P(chunk), sizeof(chunk), P(&n)))) { free(value.data); return fastly_fail("reading a KV value", status); }
+        if (!n) break;
+        grow_put(&value, chunk, n);
+    }
+    lean_object *bytes = bytes_of(value.data, value.size);
+    free(value.data);
+    return lean_io_result_mk_ok(some_of(bytes));
+}
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_put(b_lean_obj_arg store, b_lean_obj_arg key, b_lean_obj_arg value) {
+    uint32_t handle = 0, body = 0, insert = 0, kv_error = 0, status = f_kv_open(STR(store), P(&handle));
+    if (status) return fastly_fail("opening the KV Store", status);
+    if ((status = f_body_new(P(&body)))) return fastly_fail("creating a KV value", status);
+    if ((status = write_all_body(body, lean_sarray_cptr(value), lean_sarray_size(value)))) return fastly_fail("writing a KV value", status);
+    uint8_t config[32] = { 0 }; /* kv_insert_config, mode overwrite */
+    if ((status = f_kv_insert(handle, STR(key), body, 0, P(config), P(&insert)))) return kv_fail("storing a key", status, 0);
+    status = f_kv_insert_wait(insert, P(&kv_error));
+    if (status || (kv_error != KV_OK && kv_error != 0)) return kv_fail("storing a key", status, kv_error);
+    return lean_io_result_mk_ok(lean_box(0));
+}
+LEAN_EXPORT lean_obj_res lasm_fastly_kv_delete(b_lean_obj_arg store, b_lean_obj_arg key) {
+    uint32_t handle = 0, del = 0, kv_error = 0, status = f_kv_open(STR(store), P(&handle));
+    if (status) return fastly_fail("opening the KV Store", status);
+    uint8_t config[16] = { 0 };
+    if ((status = f_kv_delete(handle, STR(key), 0, P(config), P(&del)))) return kv_fail("deleting a key", status, 0);
+    status = f_kv_delete_wait(del, P(&kv_error));
+    if (status || (kv_error != KV_OK && kv_error != 0 && kv_error != KV_NOT_FOUND)) return kv_fail("deleting a key", status, kv_error);
+    return lean_io_result_mk_ok(lean_box(0));
 }
 #endif
