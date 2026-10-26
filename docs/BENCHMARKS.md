@@ -372,16 +372,18 @@ The web template (`Lasm.UI` counter), one view expression edited, Linux x64
 runner, browser.yml: before (run 40293687681, `lasm build --dev --target
 browser` per save, the browser branch alone) 16.8 s. After (run 40298525152):
 
-| Step | Before | After |
-| --- | --- | --- |
-| Lean (Lake query, elaboration) | about 2 s | 0.7 s |
-| Node link: planning probes, final link, glue | about 6 s | link only, live members: 0.4 s |
-| Edge (browser) link | about 4 s (full archives, Binaryen) | live members 0.1 s, Binaryen lowering only 0.2 s |
-| brotli 11 + gzip 9 of the outputs | about 2 s | skipped in dev |
-| Total, `lasm dev --target browser` (warm worker) | 16.8 s | 1.9 s (first edit after the first build 3.5 s) |
-| Total, a new `lasm build --dev --target browser` process | 16.8 s | 3.4 s |
+| | Before | After |
+| --- | ---: | ---: |
+| `lasm dev --target browser` (warm worker), per edit | 16.8 s (a new process per save) | 1.9 s (first edit after the first build 3.5 s) |
+| A new `lasm build --dev --target browser` process | 16.8 s | 3.4 s |
 
-The "before" split is from a local profile of the same steps; the totals are CI.
+Where an edit's time goes after the change (maintainer host, one build job,
+`lasm dev --target browser`, 2.6 s there): Lake query with elaboration 0.7 s,
+clang 0.2 s, Node link (link only, live members) 0.4 s, edge link (live
+members) 0.1 s, Binaryen lowering 0.2 s, Emscripten modularize 0.2 s, the
+rest Lasm's own work (bindings, bundle, output). Removed from every edit: the
+Node glue and host, the planning probes, a full edge link, and brotli 11 /
+gzip 9 of the outputs (about 2 s alone).
 
 ## Cold start on a fraction of a CPU
 
