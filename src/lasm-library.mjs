@@ -1,4 +1,4 @@
-// Lasm's own Lean library (`import Lasm.JS`), shipped with the compiler package
+// Lasm's own Lean library (`import Lasm.JS`, `import Lasm.UI`), shipped with the compiler package
 // in library/ and compiled into the managed Lean prefix when Lasm assembles it
 // (so `import Lasm.JS` resolves like a standard library module, from standalone
 // sources and Lake projects alike, with no Lake dependency). The generated C of
@@ -16,7 +16,13 @@ export const libraryLeanVersions = ['4.35.0'];
 export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
   // Lasm.Web (docs/BROWSER.md): web-platform bindings on Lasm.JS.
   'Lasm.Web.Types', 'Lasm.Web.Dom', 'Lasm.Web.Events', 'Lasm.Web.Timers', 'Lasm.Web.Fetch', 'Lasm.Web.Url', 'Lasm.Web.Storage',
-  'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web'];
+  'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web',
+  // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework, with its proofs.
+  'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
+  'Lasm.UI.Url', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
+  'Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.Proofs.Children', 'Lasm.UI.Proofs.TwoEnded',
+  'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs'];
+
 export const glueSource = join(root, 'c', 'lasm_js.c');
 // Lasm.JS.Meta (deriving, `@[js]`) uses Lean's elaborator: only prefixes that
 // contain it (the extended tier) get the library.
