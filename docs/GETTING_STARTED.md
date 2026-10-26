@@ -7,7 +7,7 @@ copy them as they are. CI runs these exact steps on Linux, macOS and Windows
 ([`scripts/templates/run-templates.mjs`](../scripts/templates/run-templates.mjs)).
 
 **Status (current source, 2026-10-23).** `lasm init` is in current source and not yet
-in an accepted candidate, and `@lasm/cli` and `create-lasm` are **not published to npm yet**. Until it
+in an accepted candidate, and `@lasm/cli` and `@lasm/create` are **not published to npm yet**. Until it
 is, use a candidate tarball as shown in [Before npm publication](#before-npm-publication).
 
 ## 1. Prerequisites
@@ -24,18 +24,18 @@ node --version   # v24.0.0 or newer
 ## 2. Create and run a Hono server with Lean handlers
 
 ```sh
-npm create lasm@latest my-app -- --template hono
+npm create @lasm@latest my-app -- --template hono
 cd my-app
 npm install
 npm run dev
 ```
 
-`npm create lasm` runs the `create-lasm` package, which runs `lasm init` from the
+`npm create @lasm` runs the `@lasm/create` package, which runs `lasm init` from the
 `@lasm/cli` release of the same version with your arguments unchanged; the `--`
 passes `--template hono` through npm. The equivalent without it is
-`npx @lasm/cli init my-app --template hono`. Without a directory, `npm create lasm`
+`npx @lasm/cli init my-app --template hono`. Without a directory, `npm create @lasm`
 asks for one and for a template on an interactive terminal. Until publication,
-`npm create lasm` is rehearsed only against a local test registry on all five
+`npm create @lasm` is rehearsed only against a local test registry on all five
 platforms ([`npm-dist.yml`](../.github/workflows/npm-dist.yml), scenario `create`).
 
 `npm run dev` builds the program and starts it (`lasm Main.lean`). The first build
@@ -78,7 +78,7 @@ How a Lean handler works (`Main.lean` from the template):
 The full API (values, conversions, `deriving ToJS, FromJS`, callbacks, errors,
 costs) is in [JS_BINDINGS.md](JS_BINDINGS.md).
 
-**Prefer Express?** `npm create lasm@latest my-app -- --template express` creates the same
+**Prefer Express?** `npm create @lasm@latest my-app -- --template express` creates the same
 server on Express 5 (`app.get(path, (req, res) => …)` with Lean handlers).
 `--template std-http` creates it in pure Lean with `Std.Http`, and `--template plain`
 a command-line program. See [which HTTP server to use](#which-http-server-to-use).
