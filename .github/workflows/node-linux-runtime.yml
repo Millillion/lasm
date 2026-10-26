@@ -117,7 +117,7 @@ jobs:
             --title "Lasm runtime input $GITHUB_RUN_ID" \
             --notes "Pinned runtime handoff; no package acceptance or npm publication is implied. Preserve the recorded SHA-256 when updating scripts/ci/node-runtime-source.json. Source revision: $GITHUB_SHA"
       - name: Record the exact handoff
-        run: cat .work/node-runtime-inputs-result.json .work/node-runtime-cache-budget.json
+        run: cat .work/node-runtime-inputs-result.json; [ ! -f .work/node-runtime-cache-budget.json ] || cat .work/node-runtime-cache-budget.json
       - name: Preserve bounded build results in logs
         if: always()
         run: |

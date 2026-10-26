@@ -132,7 +132,17 @@ export function canSpecializeInitialization(runtime) {
     // from code offsets; none gained a static constructor, and the libleancpp
     // members' data symbols are unchanged. init.cpp and init_module.cpp objects are
     // byte-identical, so no initialization path changed.
-    '8b3e33e03df54e6125227b5d1d442fc8db072ffe1ea1dd3f3bf5df8707675562'].includes(runtime.identity);
+    '8b3e33e03df54e6125227b5d1d442fc8db072ffe1ea1dd3f3bf5df8707675562',
+    // Lean 4.35.0 (CI build 40332716905, source e5eb6b9, handoff 17c98bbc…, patch
+    // node-threads): only libleanrt's thread.cpp.o and liblasmhost's node-async.cpp.o
+    // differ from the entry above (every other file except exports.json, which adds
+    // _lasm_main_thread_is_current, is byte-identical). thread.cpp.o: lean_run_main
+    // runs `main` on the calling thread and records it (lasm_main_thread_is_current);
+    // node-async.cpp.o: initialize_libuv no longer starts the completion thread, which
+    // starts with the first asynchronous request. Neither object has a static
+    // constructor; no module initializer, init.cpp or init_module.cpp object changed,
+    // so no Lean initialization path changed.
+    '1b868b43e734e0ab3d67e53179522c8e248b91e5f2e1727d343c760370d1b4fb'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';
