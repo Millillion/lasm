@@ -41,13 +41,23 @@ def memory : IO Store := do
            put := fun k v => table.modify (·.insert k v),
            delete := fun k => table.modify (·.erase k) }
 
+/-- The binding `name` of the edge platform's `env` (Workers), if it is an object. -/
+def binding (name : String) : IO (Option Value) := do
+  let found : Data ← match ← Lasm.Fetch.platformEnv.get with
+    | .ref env _ => (try env.get name Data catch _ => pure .undefined)
+    | env@(.object _) => pure (env.field name)
+    | _ => pure .undefined
+  match found with
+  | .ref v _ => return some v
+  | _ => return none
+
 /-- Workers KV: the binding `name` of the Worker's `env` (read on every call,
 as each request brings it). -/
 def workers (name : String) : Store :=
   let ns : IO Value := do
-    match ← Lasm.Fetch.platformEnv.get with
-    | .ref env _ => env.get name
-    | _ => throw (IO.userError s!"Lasm.KV: no Workers environment with a binding {name}")
+    match ← binding name with
+    | some v => pure v
+    | none => throw (IO.userError s!"Lasm.KV: no Workers environment with a binding {name}")
   let get (k : String) : Async (Option String) := do
     match ← (← ns).callMethodAwait "get" #[.string k] Data with
     | .string s => return some s
@@ -64,8 +74,8 @@ def deno (name : String) : IO Store := do
   let denoNs ← g.get "Deno"
   let kv : Value ← denoNs.callMethodAwait "openKv" #[] Value
   let get (k : String) : Async (Option String) := do
-    let entry : Data ← kv.callMethodAwait "get" #[.array #[.string name, .string k]] Data
-    match entry.field "value" with
+    let entry : Value ← kv.callMethodAwait "get" #[.array #[.string name, .string k]] Value
+    match ← entry.get "value" Data with
     | .string s => return some s
     | _ => return none
   let put (k v : String) : Async Unit := do
@@ -94,21 +104,19 @@ def «open» (name : String) : IO Store := do
     catch _ => memory
   | 0 =>
     let g ← global
+    -- `Deno` is a plain object: read it as a reference (reading a field of
+    -- undefined throws elsewhere), then look for openKv.
     let hasDenoKv ← try
-        let d ← g.get "Deno" Data
-        match d with
-        | .ref denoNs _ => do let f ← denoNs.get "openKv" Data; pure (f matches .ref _ _)
-        | _ => pure false
+        let denoNs ← g.get "Deno" Value
+        let f ← denoNs.get "openKv" Data
+        pure (f matches .ref _ _)
       catch _ => pure false
     if hasDenoKv then
       try return ← deno name catch _ => memory
     else if ← Lasm.JS.onEdge then
       let mem ← memory
       let w := workers name
-      let bound : IO Bool := do
-        match ← Lasm.Fetch.platformEnv.get with
-        | .ref env _ => do let b ← env.get name Data; pure (b matches .ref _ _)
-        | _ => pure false
+      let bound : IO Bool := return (← binding name).isSome
       let get (k : String) : Async (Option String) := do if ← bound then w.get k else mem.get k
       let put (k v : String) : Async Unit := do if ← bound then w.put k v else mem.put k v
       let delete (k : String) : Async Unit := do if ← bound then w.delete k else mem.delete k

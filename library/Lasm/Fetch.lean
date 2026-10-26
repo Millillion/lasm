@@ -258,7 +258,10 @@ def jsFetchHandler (handler : Handler) (options : ServeOptions := {}) : IO Value
   let uint8Array ← g.get "Uint8Array"
   let arrayClass ← g.get "Array"
   Function.ofFn fun args => do
-    if let some env@(Data.ref _ _) := (args[1]? : Option Data) then platformEnv.set env
+    -- Workers' env is a plain object (its bindings arrive as references); keep either form.
+    match (args[1]? : Option Data) with
+    | some env@(.ref _ _) | some env@(.object _) => platformEnv.set env
+    | _ => pure ()
     let .ref request _ := args[0]?.getD .undefined | throw (IO.userError "Lasm.Fetch: the fetch handler expected a Request")
     let fields ← request.getFields #["method", "url", "headers", "body"]
     let method := match fields.field "method" with | .string s => s | _ => "GET"
