@@ -154,7 +154,7 @@ section Children
 variable {Msg β : Type} (val : β → Html Msg) (f : Live Msg → β → Nat → NodeResult Msg)
 
 /-- Creates `bs` and inserts each before `before` (or appends). -/
-def insertAll (before : Option Nat) : List β → Nat → Array (Op Msg) → Array (Live Msg) →
+@[specialize] def insertAll (before : Option Nat) : List β → Nat → Array (Op Msg) → Array (Live Msg) →
     Array (Op Msg) × Array (Live Msg) × Nat
   | [], n, ops, acc => (ops, acc, n)
   | b :: bs, n, ops, acc =>
@@ -166,7 +166,7 @@ def removeAll : List (Live Msg) → Array (Op Msg) → Array (Op Msg)
   | o :: os, ops => removeAll os (ops.push (.remove o.id))
 
 /-- Creates `new[i]` for `lo ≤ i < hi` and inserts each before `before`. -/
-def insertRange (na : Array β) (before : Option Nat) (lo hi : Nat) (n : Nat) (ops : Array (Op Msg))
+@[specialize] def insertRange (na : Array β) (before : Option Nat) (lo hi : Nat) (n : Nat) (ops : Array (Op Msg))
     (acc : Array (Live Msg)) : Array (Op Msg) × Array (Live Msg) × Nat :=
   if _h : lo < hi then
     match na[lo]? with
@@ -201,7 +201,7 @@ termination_by hi - lo
 /-- The two-ended children diff (as in snabbdom): the window `old[oLo:oHi]`
 (consumed slots are `none`) against `new[nLo:nHi]`. The DOM children are
 `pre ++ (the window's nodes) ++ suf` throughout. -/
-def twoEnded (oa : Array (Option (Live Msg))) (oLo oHi : Nat) (na : Array β) (nLo nHi : Nat)
+@[specialize] def twoEnded (oa : Array (Option (Live Msg))) (oLo oHi : Nat) (na : Array β) (nLo nHi : Nat)
     (pre : Array (Live Msg)) (suf : List (Live Msg)) (ops : Array (Op Msg)) (next : Nat)
     (keys : Option (Std.HashMap String Nat)) : ChildrenResult Msg :=
   if _hO : oLo < oHi then
@@ -256,7 +256,7 @@ termination_by (oHi - oLo) + (nHi - nLo)
 
 /-- The common prefix (on lists, no allocation: most frames end here), then the
 two-ended diff of the rest. -/
-def prefixPhase : List (Live Msg) → List β → Nat → Array (Op Msg) → Array (Live Msg) → ChildrenResult Msg
+@[specialize] def prefixPhase : List (Live Msg) → List β → Nat → Array (Op Msg) → Array (Live Msg) → ChildrenResult Msg
   | [], bs, next, ops, pre =>
     let r := insertAll val none bs next ops pre
     ⟨r.1, r.2.1.toList, r.2.2⟩
@@ -272,7 +272,7 @@ def prefixPhase : List (Live Msg) → List β → Nat → Array (Op Msg) → Arr
 
 /-- The patch for a parent's children: `old` (rendered) to `new`. `f` diffs one
 kept node. -/
-def diffChildren (old : List (Live Msg)) (new : List β) (next : Nat) : ChildrenResult Msg :=
+@[specialize] def diffChildren (old : List (Live Msg)) (new : List β) (next : Nat) : ChildrenResult Msg :=
   match old, new with
   | [], [] => ⟨#[], [], next⟩
   | _ :: _, [] => ⟨#[.clear], [], next⟩
