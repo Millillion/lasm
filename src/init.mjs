@@ -151,7 +151,7 @@ function browserPackageJson(name, template) {
       // dist/: the static site (loader, Wasm, precompressed copies, index.html).
       build: 'lasm build Main.lean --target browser',
       // Serves the release build in dist/ as a static host would.
-      preview: 'lasm dev Main.lean --target browser --release --no-watch',
+      preview: 'lasm dev Main.lean --target browser --release',
     },
     engines: { node: '>=24' },
     devDependencies: { [lasm.name]: lasm.version },
@@ -199,7 +199,7 @@ the first build (a few hundred MB, cached for later builds).
 npm install
 npm run dev        # http://localhost:5173: rebuilds when a .lean file changes, then reloads the page
 npm run build      # dist/: the static site
-npm run preview    # serves dist/ (the release build) on http://localhost:5173
+npm run preview    # the release build, served on http://localhost:5173
 \`\`\`
 
 Files:
