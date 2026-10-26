@@ -145,7 +145,7 @@ jobs:
         run: |
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
           node .work/pw/node_modules/playwright-core/cli.js install --with-deps chromium
-      - name: '@lasm/vite in development: edit Main.lean, the app is rebuilt and remounted in place'
+      - name: 'The Vite plugin (@lasm/cli/vite, installed from a packed CLI) in development: edit Main.lean, the app is rebuilt and remounted in place'
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge

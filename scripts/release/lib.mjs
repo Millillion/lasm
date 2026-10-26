@@ -36,19 +36,18 @@ export function atLeast(a, b) {
 /** The package names a release publishes, from the same catalogs and rules as
  * scripts/npm-dist/packages.mjs: every tool package, `@lasm/cli`, `@lasm/create`. */
 export async function releasePackages({ scope } = {}) {
-  const { toolPackages, defaultScope, createPackageName, vitePackageName } = await import('../npm-dist/packages.mjs');
+  const { toolPackages, defaultScope, createPackageName } = await import('../npm-dist/packages.mjs');
   scope ??= defaultScope;
   const toolchains = JSON.parse(readFileSync(join(root, 'src/toolchains.json'), 'utf8'));
   const linkToolchain = JSON.parse(readFileSync(join(root, 'src/link-toolchain.json'), 'utf8'));
   const edgeRuntimes = JSON.parse(readFileSync(join(root, 'src/edge-runtimes.json'), 'utf8'));
   const tools = toolPackages({ lean: toolchains.defaultLean, toolchains, linkToolchain, edgeRuntimes, scope });
   return [...tools.map(p => ({ name: p.name, version: p.version, license: p.license, kind: 'tool' })),
-    { name: `${scope}/cli`, license: 'MIT', kind: 'cli' }, { name: createPackageName, license: 'MIT', kind: 'create' },
-    { name: vitePackageName, license: 'MIT', kind: 'vite' }];
+    { name: `${scope}/cli`, license: 'MIT', kind: 'cli' }, { name: createPackageName, license: 'MIT', kind: 'create' }];
 }
 
-/** Packages of an npm-dist.json record in publication order: tools, the CLI, @lasm/create, @lasm/vite. */
-export const publicationOrder = record => [...record.packages, record.main, ...(record.create ? [record.create] : []), ...(record.vite ? [record.vite] : [])]
+/** Packages of an npm-dist.json record in publication order: tools, the CLI, @lasm/create. */
+export const publicationOrder = record => [...record.packages, record.main, ...(record.create ? [record.create] : [])]
   .map(({ name, version, integrity, filename }) => ({ name, version, integrity, filename }));
 
 /** The registry document of a package, or undefined when the name does not exist. */

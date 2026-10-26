@@ -91,7 +91,7 @@ const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json')));
 json('package.json', {
   name: sourcePackage.name, version, private: true, license: 'UNLICENSED', type: 'module',
   description: 'Compile ordinary Lean applications to run in Node',
-  bin: sourcePackage.bin, engines: { node: '>=' + pins.minimumNode }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
+  bin: sourcePackage.bin, exports: sourcePackage.exports, engines: { node: '>=' + pins.minimumNode }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
   files: ['bin', 'src', 'library', 'templates', 'scripts', 'targets', 'docs', 'examples', 'README.md',
     'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json', 'installer-dependencies.json'],
   dependencies: { tar: sourcePackage.dependencies.tar },

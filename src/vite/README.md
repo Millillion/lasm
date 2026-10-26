@@ -1,15 +1,15 @@
-# @lasm/vite
+# Lasm's Vite plugin (`@lasm/cli/vite`)
 
 Lean apps in [Vite](https://vite.dev) projects, compiled to WebAssembly by
 [Lasm](https://github.com/Millillion/lasm).
 
 ```sh
-npm install --save-dev vite @lasm/vite @lasm/cli
+npm install --save-dev vite @lasm/cli
 ```
 
 ```js
 // vite.config.js
-import lasm from '@lasm/vite';
+import lasm from '@lasm/cli/vite';
 export default { plugins: [lasm()] };
 ```
 
@@ -31,9 +31,10 @@ counter.ports.saved.subscribe(value => console.log('Lean saved', value));
   `{ element, send(message), ports, unmount(), stopped }`; see the
   [browser guide](https://github.com/Millillion/lasm/blob/main/docs/BROWSER.md).
 - Options: `lasm({ suspend: 'jspi' })` lets blocking Lean waits suspend in
-  browsers with JSPI; `cli` names the Lasm CLI (default: `@lasm/cli` in the
-  project); `release: true` uses release builds in development too.
-- TypeScript: add `"@lasm/vite/client"` to `compilerOptions.types`.
+  browsers with JSPI; `cli` names another Lasm CLI (default: the one the
+  plugin ships in); `release: true` uses release builds in development too.
+- TypeScript: add `"@lasm/cli/vite/client"` to `compilerOptions.types`.
 
+The plugin ships inside `@lasm/cli`; a standalone `@lasm/vite` package may come later.
 Lasm builds need Node 24 or newer; the first build downloads Lean and the build
-tools (cached). MIT licence, copyright Jordan Last.
+tools (cached).

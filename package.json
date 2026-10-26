@@ -10,6 +10,17 @@
   "bin": {
     "lasm": "bin/lasm.mjs"
   },
+  "exports": {
+    "./vite": {
+      "types": "./src/vite/index.d.ts",
+      "default": "./src/vite/index.mjs"
+    },
+    "./vite/client": {
+      "types": "./src/vite/client.d.ts"
+    },
+    "./package.json": "./package.json",
+    "./*": "./*"
+  },
   "scripts": {
     "setup": "node scripts/bootstrap.mjs",
     "probe": "node experiments/feasibility/run.mjs",
