@@ -17,6 +17,9 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   const listening = new Set();
   const subs = new Map();
   let lean = null, pending = false, stopped = false, hydrating = hydrate, focusQueue = [];
+  // History changes asked for by Cmd.pushUrl/replaceUrl, made by the next
+  // frame: the address bar and the page it shows change in the same task.
+  let historyQueue = [];
   const raf = win.requestAnimationFrame ? f => win.requestAnimationFrame(f) : f => setTimeout(() => f(performance.now()), 16);
   const cancelRaf = win.cancelAnimationFrame ? h => win.cancelAnimationFrame(h) : h => clearTimeout(h);
 
@@ -177,6 +180,10 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   function frame() { pending = false; render(); }
   function render() {
     if (stopped) return;
+    if (historyQueue.length) {
+      const queue = historyQueue; historyQueue = [];
+      for (const [href, replace] of queue) win.history[replace ? 'replaceState' : 'pushState'](null, '', href);
+    }
     const t0 = performance.now();
     const patch = lean.frame();
     const t1 = performance.now();
@@ -235,6 +242,12 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
 
   // ---- navigation ----
   const urlChanged = () => { if (lean) after(lean.url(win.location.href)); };
+  // A click on a link is discrete user input: like other clicks, its result
+  // (the new page) is shown in the same task as the address changes.
+  const urlClicked = href => {
+    if (!lean) return;
+    if (lean.url(href) && bytes === null) render(); else schedule();
+  };
   function onLinkClick(event) {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const a = event.target.closest?.('a[href]');
@@ -242,7 +255,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     const url = new URL(a.href, win.location.href);
     if (url.origin !== win.location.origin) return;
     event.preventDefault();
-    if (url.href !== win.location.href) { win.history.pushState(null, '', url.href); urlChanged(); }
+    if (url.href !== win.location.href) { win.history.pushState(null, '', url.href); urlClicked(url.href); }
   }
 
   // ---- subscriptions ----
@@ -294,8 +307,12 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     },
     now: () => Date.now(),
     navigate(url, replace) {
-      win.history[replace ? 'replaceState' : 'pushState'](null, '', new URL(url, win.location.href).href);
-      urlChanged();
+      // Called from Lean's update: the app gets the URL now, and the history
+      // entry is made by the frame that shows the new page (render above).
+      const href = new URL(url, historyQueue.at(-1)?.[0] ?? win.location.href).href;
+      historyQueue.push([href, replace]);
+      if (lean) lean.url(href);
+      schedule();
     },
     go(n) { win.history.go(n); },
     load(url) { win.location.assign(url); },
