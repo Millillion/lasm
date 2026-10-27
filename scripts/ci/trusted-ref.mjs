@@ -5,8 +5,7 @@ import { readFileSync } from 'node:fs';
 
 export function trustedRef(env = process.env) {
   if (env.GITHUB_REPOSITORY !== 'Millillion/lasm') return false;
-  // release-0.3.3: runtime work validated before it reaches the integration branch.
-  if (env.GITHUB_REF === 'refs/heads/main' || env.GITHUB_REF === 'refs/heads/release-0.3.3') return true;
+  if (env.GITHUB_REF === 'refs/heads/main') return true;
   if (env.GITHUB_EVENT_NAME !== 'pull_request' || !/^refs\/pull\/\d+\/merge$/.test(env.GITHUB_REF ?? '')) return false;
   try {
     const event = JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, 'utf8'));
