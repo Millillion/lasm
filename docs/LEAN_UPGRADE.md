@@ -38,7 +38,9 @@ node scripts/lean-upgrade/bump.mjs 4.35.0 4.36.0-rc1
 Rewrites `lean-toolchain` pins, `leanprover/lean4:v…` strings, runtime archive
 names and catalog lookups in workflows and scripts, workflow input defaults,
 script default versions, and appends the new release to reviewed version
-allow-lists. It prints every file that still names the old release: per-release
+allow-lists. Read its diff of `test/`: a test that pins the old release on
+purpose (e.g. "this release is rejected") must be rewritten against the
+catalog's release rather than renamed. It prints every file that still names the old release: per-release
 data, handled below, and comments. Review the allow-list additions: each one
 claims that a reviewed property still holds (e.g. `src/lean-io-errors.mjs`:
 `Init/System/IOError.lean` and the error mapping of `runtime/io.cpp` unchanged;
@@ -122,9 +124,15 @@ gh workflow run lean-tiers.yml --ref lean-<version> -f version=<version> -f cata
 ```
 
 Without publishing it proves the archives are reproducible and checks them
-natively. The release PR publishes (`publish=true`) and adds the `tiers` block
-to `src/toolchains.json`. Until then the branch uses the full upstream archives
-(about 600 MB per platform), which also carry Lasm's library.
+natively. For a stable release, publish them here (`publish=true`) and add the
+`tiers` block to `src/toolchains.json` before step 8: without tiers the branch
+uses the full upstream archives (about 600 MB per platform, about 2.5 GB
+extracted), which also carry Lasm's library but whose page cache pushes the
+heavier CI builds past the resource guard's proactive stop (4.36.0-rc1: the
+Workers build and the fullstack `npm run dev` job, about 1 GB more than with
+tiers). The npm tool-package tests skip while the release has no tiers; a
+release candidate's archives are never published to npm (their package versions,
+e.g. `4.36.0-rc1-lasm.1`, would sort above the stable release's).
 
 ## 7. Edge runtime
 
