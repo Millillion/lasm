@@ -58,19 +58,19 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
     // Shared Emscripten packages keep one version across Lean releases.
     assert.equal(packages.find(p => p.name === '@lasm/emscripten-shared').version, '6.0.9-lasm.1');
   }
-  const scoped = toolPackages({ lean: '4.35.0', ...c, scope: '@example-org' });
+  const scoped = toolPackages({ lean: c.toolchains.defaultLean, ...c, scope: '@example-org' });
   assert.ok(scoped.every(p => p.name.startsWith('@example-org/')));
-  assert.throws(() => toolPackages({ lean: '4.35.0', ...c, scope: 'lasm' }));
+  assert.throws(() => toolPackages({ lean: c.toolchains.defaultLean, ...c, scope: 'lasm' }));
 });
 
 test('the edge runtime is bundled in the CLI package from its cataloged release archive', async () => {
   const c = await catalogs();
-  const edge = edgeRuntimeBundle({ lean: '4.35.0', edgeRuntimes: c.edgeRuntimes });
+  const edge = edgeRuntimeBundle({ lean: c.toolchains.defaultLean, edgeRuntimes: c.edgeRuntimes });
   const pinned = c.edgeRuntimes.lean['4.36.0-rc1'];
   assert.equal(edge.baseRuntimeManifestSha256, pinned.baseRuntimeManifestSha256);
   assert.deepEqual(Object.keys(edge.artifact).sort(), ['bytes', 'format', 'maximumExtractedBytes', 'name', 'root', 'sha256', 'url']);
   assert.equal(edge.artifact.root, 'lean-4.36.0-rc1-wasm64-edge', 'src/edge/edge-runtime.mjs looks for targets/<runtime>-edge');
-  assert.match(edge.artifact.url, /^https:\/\/github\.com\/Millillion\/lasm\/releases\/download\/lean-4\.35\.0-edge-v\d+\//);
+  assert.match(edge.artifact.url, /^https:\/\/github\.com\/Millillion\/lasm\/releases\/download\/lean-4\.\d+\.\d+(?:-rc\d+)?-edge-v\d+\//);
   assert.equal(edgeRuntimeBundle({ lean: '9.9.9', edgeRuntimes: c.edgeRuntimes }), null);
 });
 
@@ -90,7 +90,7 @@ test('C tier packages carry an SPDX expression of every component', () => {
 
 test('the C tier Lasm provisions is the archive its npm package carries', async () => {
   const c = await catalogs();
-  const packages = toolPackages({ lean: '4.35.0', ...c });
+  const packages = toolPackages({ lean: c.toolchains.defaultLean, ...c });
   const packed = Object.fromEntries(packages.map((p, i) => [p.name, { integrity: 'sha512-' + Buffer.alloc(64, i).toString('base64') }]));
   const manifest = validateNpmToolManifest(npmToolManifest(packages, packed));
   for (const platform of ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64', 'win32-x64']) {

@@ -25,7 +25,10 @@ const platformParts = platform => {
  * rebuilt C tier (c-v2) becomes 4.35.0-lasm.2 of @lasm/lean-c-* without touching the others. */
 export function releaseVersion(url) {
   const tag = decodeURIComponent(new URL(url).pathname.split('/').at(-2));
-  let match = /^(?:lean|emscripten)-(\d+\.\d+\.\d+)-(?:tiers|c|edge|lasm-toolchain)-v(\d+)$/.exec(tag);
+  // A Lean release candidate (an upgrade branch, docs/LEAN_UPGRADE.md) maps to
+  // 4.36.0-rc1-lasm.1; such packages are never published (they would sort above the
+  // stable release's 4.36.0-lasm.1), only packed for branch validation.
+  let match = /^(?:lean|emscripten)-(\d+\.\d+\.\d+(?:-rc\d+)?)-(?:tiers|c|edge|lasm-toolchain)-v(\d+)$/.exec(tag);
   if (match) return `${match[1]}-lasm.${match[2]}`;
   throw new Error(`No package version rule for release ${tag}`);
 }
