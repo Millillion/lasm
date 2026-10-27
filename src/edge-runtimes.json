@@ -5,13 +5,13 @@
     "4.36.0-rc1": {
       "name": "lean-4.36.0-rc1-wasm64-edge.tar.zst",
       "root": "lean-4.36.0-rc1-wasm64-edge",
-      "url": "https://github.com/Millillion/lasm/releases/download/lean-4.36.0-rc1-edge-v2/lean-4.36.0-rc1-wasm64-edge.tar.zst",
-      "sha256": "63f9be8203b8cc716c9df96408b52c555f8ca5d65334a42df5b93ae8083d83a4",
-      "bytes": 1228874,
+      "url": "https://github.com/Millillion/lasm/releases/download/lean-4.36.0-rc1-edge-v3/lean-4.36.0-rc1-wasm64-edge.tar.zst",
+      "sha256": "a32a443e38eb4106574979c49df95ade961a3547664821e4eafa52d06b42deec",
+      "bytes": 1228786,
       "format": "tar.zst",
-      "maximumExtractedBytes": 14213520,
-      "baseRuntimeManifestSha256": "b9fde4b18f92626f3906ee95fa1abd394dfecfc987bf5d9fffd05c30d46e4416",
-      "source": "edge-runtime.yml run 40474907202 (branch lean-4.36, on runtime b9fde4b1…), with scripts/edge/build-edge-extras.mjs and package-edge-runtime.mjs"
+      "maximumExtractedBytes": 14212848,
+      "baseRuntimeManifestSha256": "8103c016651f2258d3777a9b62418bdbb2c4622779e1b8664a6226d26d7eeff0",
+      "source": "edge-runtime.yml run 40494486462 (branch lean-4.36, on runtime 8103c016…), with scripts/edge/build-edge-extras.mjs and package-edge-runtime.mjs"
     }
   }
 }
