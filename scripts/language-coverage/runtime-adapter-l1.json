@@ -3227,9 +3227,6 @@
       }
      ]
     },
-    "elab/async_cancellation_reasons.lean": {
-     "sha256": "43e2405f5d7d5a01d1f192fc437fd0329976fa75b4b99099e3471f9620489866"
-    },
     "elab/async_dns.lean": {
      "sha256": "83d1465e23fedf9dfc98332f65924da429e8af97f1f71eaaf782090d4232c4b7",
      "sidecars": [
@@ -3240,69 +3237,14 @@
       }
      ]
     },
-    "elab/async_http_body.lean": {
-     "sha256": "526c7bc0e86f13faaf7836d9dbf757abf8b218f6d5fe5a3edeeb236c51ab5f50"
-    },
-    "elab/async_http_body_framing.lean": {
-     "sha256": "5f2afaf502d03d88af27527c7561dbb2e7edcb303daa6f3de31f32d399428ebd"
-    },
-    "elab/async_http_dispatch.lean": {
-     "sha256": "0c0efd8472df0e93dde0e2aa9d120297c2239d1a411dcad6fcb86838e008475d"
-    },
     "elab/async_http_encode.lean": {
      "sha256": "edcc76d98953edf844b294dfaf29df4fb116c1e1153ad0f4f82960da44086501"
     },
     "elab/async_http_expect.lean": {
      "sha256": "4772a9339dd4dc025438d6d486e43963fa111752781141ea72a4df071e0378ae"
     },
-    "elab/async_http_fuzz.lean": {
-     "sha256": "d28901076d0af0f77f860777032bd01b486970d1d8fe017a9c7f14ce0daf2da2",
-     "sidecars": [
-      {
-       "path": "tests/elab/async_http_fuzz.lean.serial",
-       "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
-       "kind": "ctest-run-serial"
-      }
-     ]
-    },
-    "elab/async_http_fuzz_limits.lean": {
-     "sha256": "ef9e819611a80bee8c957b1b9c7409d18cb8552661399ed8eebb545eff74529f",
-     "sidecars": [
-      {
-       "path": "tests/elab/async_http_fuzz_limits.lean.serial",
-       "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
-       "kind": "ctest-run-serial"
-      }
-     ]
-    },
-    "elab/async_http_fuzz_random.lean": {
-     "sha256": "ab96c3e1cbdd2927896c10826317b92bc64be1dc2ae4510516756ae8f017c982",
-     "sidecars": [
-      {
-       "path": "tests/elab/async_http_fuzz_random.lean.serial",
-       "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
-       "kind": "ctest-run-serial"
-      }
-     ]
-    },
-    "elab/async_http_h1_incremental.lean": {
-     "sha256": "e58511a83608ef50cf7fc04b92d75eb57aa11f3f9c13b0693e68a63d2a757269"
-    },
-    "elab/async_http_h1_parser_fuzz.lean": {
-     "sha256": "f55c98e43646bfd6b38cc287667cc9882f78345f1a57d788f52d744161ed8484"
-    },
     "elab/async_http_h1_rfc_compliance.lean": {
      "sha256": "909f372d83fd7a7d876019bab07a8a620dc8fd603ce23f8d1907775541c819e9"
-    },
-    "elab/async_http_hang_regressions.lean": {
-     "sha256": "b75a003ded614169a1b4017243a0c67ce0f0f41674223194e0f2cf18ea45e258",
-     "sidecars": [
-      {
-       "path": "tests/elab/async_http_hang_regressions.lean.serial",
-       "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
-       "kind": "ctest-run-serial"
-      }
-     ]
     },
     "elab/async_http_headers.lean": {
      "sha256": "aa1775ed75c56c778999ae168ff04ba9ce9f42cd1ae87cb8da94f94f7215ab11"
@@ -3310,29 +3252,11 @@
     "elab/async_http_idle_timeout.lean": {
      "sha256": "957fefe6f3c9a12c29ee8aef9e7900d93c07169f4ca761b1d48e33efd609919c"
     },
-    "elab/async_http_keepalive.lean": {
-     "sha256": "c76c6717f8593179f2c22de29be12b4d0a6a79ef7225719c34205fde7208e1fb"
-    },
     "elab/async_http_redirect.lean": {
      "sha256": "3297cfb1ca103de16e50b0fc9e85713fc0887c08c0bd07234e6b6a63234a24f6"
     },
-    "elab/async_http_replayable.lean": {
-     "sha256": "3eba8c240409484a9c1910d90d8f69e10f7d73ae37225c302040af1db54ad045"
-    },
-    "elab/async_http_request_headers.lean": {
-     "sha256": "0f70c9cd4267f2c47ad285b806ed40c4fb336612732859d1d20ccdc5d3ce16f0"
-    },
-    "elab/async_http_request_line.lean": {
-     "sha256": "83b3b71bceff873f957cce8b0e6dfe74214ea88933694ecc53bd195f6f36cdf1"
-    },
-    "elab/async_http_response_framing.lean": {
-     "sha256": "7060468048cd67ce5fcc2eaea23ac13979848783b78330eb546a88649b9c7ef0"
-    },
     "elab/async_http_string_quoting.lean": {
      "sha256": "8a0bddbc058c9a93257c1cc8826584c66fade3f0d83b622b45c282158d9d9b80"
-    },
-    "elab/async_http_trailers.lean": {
-     "sha256": "f96ab03abd812d854471323973cffbbff1e1d11e26a80a41baf334489eec072b"
     },
     "elab/async_http_uri.lean": {
      "sha256": "f8a4773d4fdf8781f8189b6771a9b7186e209a297b4c8b9f2ae37016c8f57565"
@@ -3389,18 +3313,6 @@
        "kind": "ignored-output"
       }
      ]
-    },
-    "elab/async_tcp_fname_errors.lean": {
-     "sha256": "d37535c6d32c5761c23968e7ba1ae84e86933cba5097df54798c27ab1e9eb27b"
-    },
-    "elab/async_tcp_half.lean": {
-     "sha256": "714436bdf6c6f1975983b817af4de6639f6bde69621c9d8e95921f6b60bf8feb"
-    },
-    "elab/async_tcp_server_client.lean": {
-     "sha256": "5471ef0ce0cbfa9a4a3ad25fbe7b1a617d39390be1257f83eb6ee07e752a6290"
-    },
-    "elab/async_udp_sockets.lean": {
-     "sha256": "566a8a4c9e6715d098ab49682cfde49c4786aeaee775bbf8827ff33df4b5e4ae"
     },
     "elab/backtrackable_estate.lean": {
      "sha256": "24bc2491a1bb7ff679e0c278910800fa774df62cc69fae68f15b1a7891ecb67e"
@@ -5257,9 +5169,6 @@
        "kind": "ignored-output"
       }
      ]
-    },
-    "elab/tempfile.lean": {
-     "sha256": "aaf51d63382e0aae22cb6ec054a34c96ae78b4b47f3eb5da1c0c6f7119c17e4e"
     },
     "elab/termElab.lean": {
      "sha256": "aa7f3ea6b54c554f20abac00e8a7d7b040966376ea7380f2758e17ae865b73e4"

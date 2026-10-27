@@ -23,14 +23,15 @@
   "runtime: compiled application": 133,
   "runtime: compiled test driver (docparse)": 334,
   "native build-time only: no runtime-checkable command": 2847,
-  "runtime candidate: parallel adapter": 603,
+  "runtime candidate: parallel adapter": 582,
   "separate review: unsupported sidecar": 9,
   "review: syntax survey failed": 1,
+  "runtime: reviewed eval-io adapter": 21,
   "separate review: #exit": 1,
   "native build-time only: expected-error test": 316,
   "runtime: compiled LSP client with native compiler children": 160
  },
- "runtimeActionsInCandidates": 5846,
+ "runtimeActionsInCandidates": 5632,
  "tests": [
   {
    "name": "tests/lake/examples/deps/test.sh",
@@ -21731,7 +21732,7 @@
     "runtime": 11
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_dns.lean",
@@ -21785,7 +21786,7 @@
     "runtime": 69
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_body_framing.lean",
@@ -21810,7 +21811,7 @@
     "runtime": 12
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_dispatch.lean",
@@ -21835,7 +21836,7 @@
     "runtime": 2
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_encode.lean",
@@ -21916,7 +21917,7 @@
     "runtime": 10
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_fuzz_limits.lean",
@@ -21944,7 +21945,7 @@
     "runtime": 10
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_fuzz_random.lean",
@@ -21972,7 +21973,7 @@
     "runtime": 8
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_h1_incremental.lean",
@@ -21997,7 +21998,7 @@
     "runtime": 6
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_h1_parser_fuzz.lean",
@@ -22023,7 +22024,7 @@
     "runtime": 4
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_h1_rfc_compliance.lean",
@@ -22077,7 +22078,7 @@
     "runtime": 22
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_headers.lean",
@@ -22154,7 +22155,7 @@
     "runtime": 5
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_redirect.lean",
@@ -22204,7 +22205,7 @@
     "runtime": 13
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_request_headers.lean",
@@ -22229,7 +22230,7 @@
     "runtime": 4
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_request_line.lean",
@@ -22254,7 +22255,7 @@
     "runtime": 7
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_response_framing.lean",
@@ -22279,7 +22280,7 @@
     "runtime": 7
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_string_quoting.lean",
@@ -22331,7 +22332,7 @@
     "runtime": 14
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_uri.lean",
@@ -22623,7 +22624,7 @@
     "runtime": 1
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_tcp_half.lean",
@@ -22650,7 +22651,7 @@
     "runtime": 1
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_tcp_server_client.lean",
@@ -22677,7 +22678,7 @@
     "runtime": 2
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_udp_sockets.lean",
@@ -22704,7 +22705,7 @@
     "runtime": 2
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/atomValidation.lean",
@@ -81957,7 +81958,7 @@
     "runtime": 4
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/termElab.lean",
