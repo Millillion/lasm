@@ -13,7 +13,7 @@ name: Conduit
 # - e2e-node, e2e-workers: the official RealWorld end-to-end suite
 #   (specs/e2e, Playwright, unmodified, fullstack mode) against the
 #   server-rendered, hydrated Lasm.UI app: Node on Chromium, Firefox and
-#   WebKit; Workers (wrangler dev, local D1) on Chromium;
+#   WebKit; Workers (wrangler dev, local D1) and Bun on Chromium; no retries;
 # - pinned: test/realworld is byte-identical to the upstream commit.
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
 # Free runners only.
@@ -282,6 +282,55 @@ jobs:
         if: always()
         with:
           name: conduit-e2e-workers-chromium
+          path: examples/conduit/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  e2e-bun:
+    name: E2E on Bun (bun:sqlite), chromium
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci, and the pinned Bun
+        working-directory: examples/conduit
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund bun@1.4.4
+          echo "$RUNNER_TEMP/tools/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: npm run build:bun
+        working-directory: examples/conduit
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:bun
+      - name: The pinned Playwright's chromium
+        timeout-minutes: 30
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
+          bash scripts/ci/playwright-install.sh chromium
+      - name: The official RealWorld end-to-end suite against Bun
+        working-directory: examples/conduit
+        env:
+          BROWSERS: chromium
+          E2E_NAME: bun-chromium
+          E2E_SERVER: bun bun/main.mjs
+        run: |
+          rm -f conduit.db*
+          npm run test:e2e -- --retries=0 || status=$?
+          node test/e2e-summary.mjs test-results/e2e-bun-chromium.json
+          exit ${status:-0}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: conduit-e2e-bun-chromium
           path: examples/conduit/test-results/
           retention-days: 14
           if-no-files-found: warn
