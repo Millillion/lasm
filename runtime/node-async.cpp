@@ -229,6 +229,30 @@ O *start_io_request(uint32_t op, O *resource, uint64_t arg, const void *data, si
 }
 #endif
 O *unit_call(uint32_t op, O *h, uint64_t arg = 0) { return Reply(op, handle_id(h), arg).result(); }
+// Native libuv drops a cancelled operation's promise on the cancelling thread,
+// after releasing the loop lock (Lean 4.36 runtime/uv). Dropping the last
+// reference runs (sync := true) continuations inline, which may block or
+// re-enter the handle, so it must not happen on the completion thread or under
+// a handle mutex. The host diverts the cancelled completions of this handle
+// (op 96): release their promise and resource references here instead.
+void release_cancelled(uint32_t handle) {
+#ifdef LASM_FULL_NATIVE_THREADS
+    Reply dropped(96, handle);
+    // A failure leaves the completions with the completion thread.
+    if (dropped.failed) return;
+    for (size_t offset = 0; offset + 24 <= dropped.bytes.size(); offset += 24) {
+        lean_dec(reinterpret_cast<O *>(dropped.number(offset)));
+        lean_dec(reinterpret_cast<O *>(dropped.number(offset + 8)));
+    }
+#else
+    (void)handle;
+#endif
+}
+O *cancel_call(uint32_t op, O *h) {
+    auto r = Reply(op, handle_id(h));
+    release_cancelled(handle_id(h));
+    return r.result();
+}
 O *lock_call(uint32_t op, O *h, uint64_t arg = 0) {
     auto r = Reply(op, handle_id(h), arg);
     if (r.failed) { lean_internal_panic("Invalid synchronization operation"); __builtin_trap(); }
@@ -250,6 +274,12 @@ void timer_foreach(void *ptr, O *fn) {
 }
 }
 extern "C" {
+// Std.Internal.UV.Loop.configure: libuv's idle-time metrics and SIGPROF
+// blocking have no observable effect without a libuv loop. Lean 4.36 borrows
+// the options (4.35 leaks its owned argument, as native Lean does).
+O *lean_uv_event_loop_configure(O *) { return ok(lean_box(0)); }
+// Std.Internal.UV.Loop.alive : BaseIO Bool
+uint8_t lean_uv_event_loop_alive() { Reply r(145); return !r.failed && r.number() != 0; }
 O *lean_uv_interface_addresses() {
     Reply r(144);
     if (r.failed) return lean_io_result_mk_error(lean_mk_io_error_invalid_argument(22, lean_mk_string("failed to get interface addresses")));
@@ -310,15 +340,19 @@ O *lean_uv_tcp_bind(O *socket, O *addr) {
     auto bytes = address_bytes(addr); return Reply(51, handle_id(socket), 0, bytes.data(), bytes.size()).result();
 }
 O *lean_uv_tcp_listen(O *socket, uint32_t backlog) { return unit_call(52, socket, backlog); }
-O *lean_uv_tcp_accept(O *socket) { return ok(start_request(53, socket, 0, nullptr, 0, 1)); }
+// Lean 4.36 rejects a parallel accept, or an accept on a socket that is not
+// listening, before creating the promise.
+O *lean_uv_tcp_accept(O *socket) { return start_io_request(53, socket, 0, nullptr, 0, 1); }
 O *lean_uv_tcp_try_accept(O *socket) {
+    // Native tryAccept reports every failure as an IO error, not in the Except.
     auto r = Reply(54, handle_id(socket));
-    return ok(r.failed ? except(true, r.error()) : except(false, r.number() ? some(wrap_handle(r.number())) : lean_box(0)));
+    if (r.failed) return r.result();
+    return ok(except(false, r.number() ? some(wrap_handle(r.number())) : lean_box(0)));
 }
-O *lean_uv_tcp_cancel_accept(O *socket) { return unit_call(55, socket); }
+O *lean_uv_tcp_cancel_accept(O *socket) { return cancel_call(55, socket); }
 O *lean_uv_tcp_recv(O *socket, uint64_t size) { return start_io_request(56, socket, size, nullptr, 0, 2); }
 O *lean_uv_tcp_wait_readable(O *socket) { return start_io_request(57, socket, 0, nullptr, 0, 3); }
-O *lean_uv_tcp_cancel_recv(O *socket) { return unit_call(58, socket); }
+O *lean_uv_tcp_cancel_recv(O *socket) { return cancel_call(58, socket); }
 O *lean_uv_tcp_send(O *socket, O *data) {
     std::vector<uint8_t> bytes;
     const auto count = lean_array_size(data);
@@ -362,7 +396,7 @@ O *lean_uv_udp_send(O *socket, O *data, O *addr) {
 }
 O *lean_uv_udp_recv(O *socket, uint64_t size) { return ok(start_request(104, socket, size, nullptr, 0, 5)); }
 O *lean_uv_udp_wait_readable(O *socket) { return ok(start_request(105, socket, 0, nullptr, 0, 0)); }
-O *lean_uv_udp_cancel_recv(O *socket) { return unit_call(106, socket); }
+O *lean_uv_udp_cancel_recv(O *socket) { return cancel_call(106, socket); }
 O *lean_uv_udp_getpeername(O *socket) { auto r = Reply(107, handle_id(socket)); return r.failed ? r.result() : ok(socket_address(r)); }
 O *lean_uv_udp_getsockname(O *socket) { auto r = Reply(108, handle_id(socket)); return r.failed ? r.result() : ok(socket_address(r)); }
 O *lean_uv_udp_set_broadcast(O *socket, uint8_t enabled) { return unit_call(109, socket, enabled); }
@@ -427,12 +461,21 @@ O *lean_uv_timer_next(O *timer) {
 O *lean_uv_timer_reset(O *timer) { return Reply(73, ((Timer*)lean_get_external_data(timer))->id).result(); }
 static O *stop_timer(O *timer, unsigned op) {
     auto *t = (Timer*)lean_get_external_data(timer);
+    O *dropped = nullptr;
+    O *result;
+    {
 #ifdef LASM_FULL_NATIVE_THREADS
-    std::lock_guard<std::mutex> guard(t->mutex);
+        std::lock_guard<std::mutex> guard(t->mutex);
 #endif
-    auto r = Reply(op, t->id);
-    if (!r.failed && r.number() && t->promise) { lean_dec(t->promise); t->promise = nullptr; }
-    return r.result();
+        auto r = Reply(op, t->id);
+        if (!r.failed && r.number()) { dropped = t->promise; t->promise = nullptr; }
+        result = r.result();
+    }
+    // Released outside the handle mutex: dropping the last reference runs
+    // continuations inline, which may stop or wait on this handle again.
+    release_cancelled(t->id);
+    if (dropped) lean_dec(dropped);
+    return result;
 }
 O *lean_uv_timer_stop(O *timer) { return stop_timer(timer, 74); }
 O *lean_uv_timer_cancel(O *timer) { return stop_timer(timer, 75); }

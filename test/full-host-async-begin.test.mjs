@@ -11,7 +11,7 @@ const prelude = readFileSync(new URL('../scripts/full-lean/host-pre.js', import.
 
 function mainThread(host) {
   const context = { ENVIRONMENT_IS_PTHREAD: false, Module: {}, wasmMemory: { buffer: new SharedArrayBuffer(64) },
-    Atomics, Int32Array, Uint8Array, DataView, BigUint64Array, Buffer, lasmFullHost: Promise.resolve(host), process };
+    Atomics, Int32Array, Uint8Array, DataView, BigUint64Array, Buffer, setTimeout, lasmFullHost: Promise.resolve(host), process };
   runInNewContext(prelude, context);
   // The transport (test/full-host-rpc-channel.test.mjs) delivers exactly this result.
   const call = async (operation, handle, input) => {
@@ -111,4 +111,27 @@ test('the batched poll returns every queued completion in order, and a failure a
   await new Promise(resolve => setImmediate(resolve));
   await assert.rejects(call(95, 0, []), /host defect/);
   assert.equal(records((await call(95, 0, [])).bytes)[0].readBigUInt64LE(0), 0xdn);
+});
+
+test('a cancel call diverts its handle\'s cancelled completions to the cancelling thread (op 96)', async () => {
+  const cancelled = { error: true, bytes: Buffer.concat([u64(10, 0), Buffer.from('Operation cancelled')]) };
+  const waits = new Map();
+  const host = { request(op, id) {
+    if (op === 53 || op === 56) return new Promise(resolve => waits.set(id, resolve));
+    if (op === 55) { waits.get(id)(cancelled); return { error: false, bytes: Buffer.alloc(0) }; }
+    return { error: false, bytes: Buffer.alloc(0) };
+  } };
+  const { call, close } = mainThread(host);
+  await call(94, 7, begin(53, 0n, { check: true, kind: 1, promise: 0x10, resource: 0x20 }));
+  await call(94, 8, begin(56, 64n, { check: true, kind: 2, promise: 0x30, resource: 0x40 }));
+  await call(55, 7, []);
+  // Released by the cancelling thread: promise, resource and kind; nothing else.
+  assert.deepEqual((await call(96, 7, [])).bytes, u64(0x10, 0x20, 1));
+  assert.deepEqual((await call(96, 7, [])).bytes, Buffer.alloc(0));
+  // A cancellation without a cancel call on its handle stays a completion.
+  waits.get(8)(cancelled);
+  const packet = (await call(92, 0, [])).bytes;
+  assert.equal(packet.readBigUInt64LE(0), 0x30n);
+  assert.equal(packet.readBigUInt64LE(32), 10n);
+  close();
 });
