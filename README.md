@@ -17,7 +17,7 @@ index, and [docs/AI.md](docs/AI.md) lists the rules that save you from wrong tur
 
 | Fact | Value |
 | --- | --- |
-| Current version | `@lasm/cli` 0.3.3 ([release notes](docs/release/)); `npm view @lasm/cli version` |
+| Current version | `@lasm/cli` 0.3.4 ([release notes](docs/release/)); `npm view @lasm/cli version` |
 | Install | `npm install -D @lasm/cli` (bin: `lasm`), or no install: `npx @lasm/cli …`; new project: `npm create @lasm@latest` |
 | Lean | exactly **4.35.0** (`lean-toolchain`: `leanprover/lean4:v4.35.0`); Lasm installs it, and you need no elan to build |
 | Develop on | Linux x64/arm64 (glibc 2.34+), macOS x64/arm64, Windows x64 |
@@ -398,7 +398,7 @@ npx lasm build Main.lean --target lambda    # dist/ and an AWS Lambda zip
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help`, `npx lasm init --help` | Show usage; `-h` is an alias. |
-| Version | `npx lasm --version` | Print `lasm 0.3.3 (@lasm/cli; Lean 4.35.0; Node 26.12.1; linux-x64)`; `-v` is an alias. |
+| Version | `npx lasm --version` | Print `lasm 0.3.4 (@lasm/cli; Lean 4.35.0; Node 26.12.1; linux-x64)`; `-v` is an alias. |
 | New project | `npm create @lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory (`Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `README.md`, `.gitignore`, and for servers a `Dockerfile` and `.dockerignore`). Templates: see [Start here](#start-here). `--deploy` (repeatable) adds a platform's files and `npm run build:<target>`: `lambda` (`Dockerfile.lambda`, a container image), `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf`; `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` (templates `hono`, `fetch`, `fullstack`), `supabase-edge` (`hono`); `fastly`, `wasi-http`, `spin` (`fetch`, `fullstack`), `wasi` (`fetch`, `plain`). The `fetch` and `fullstack` templates and their targets are 0.3.0. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` also works. |
 | Package an existing build | `npx lasm package --target lambda` | Package a built server (default `dist/`) for a function platform without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output. Checks the platform's size limit. Refuses a dev build unless `--allow-dev`. For a browser build, `npx lasm package dist --target browser` checks every file against `lasm-manifest.json` and writes `_headers`. |
 | Editor support (0.3.0) | `npx lasm editor` | Make the Lean editor (VS Code's Lean 4 extension, any Lean language server client) resolve `import Lasm.*` in this Lake project: links Lasm's Lean 4.35.0 with its library as the elan toolchain `lasm-4.35.0-…` and sets it as the directory's elan override (`elan override unset` undoes it). `lasm init` (when Lasm's Lean is already installed), `lasm dev` and `lasm build` do the same, printing one line per project, except on CI or with `LASM_EDITOR=0`. [Editor setup](docs/GETTING_STARTED.md#editor). |
