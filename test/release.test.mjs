@@ -8,6 +8,9 @@ import { selectChecksRun, manifestProblems, releaseState } from '../scripts/rele
 import { differences } from '../scripts/release/compare.mjs';
 import { publicationPlan } from '../scripts/release/publish.mjs';
 import { packageSteps, trustState, placeholderManifest } from '../scripts/release/bootstrap-npm.mjs';
+// A Lean upgrade branch has no published tiers until its release PR (docs/LEAN_UPGRADE.md step 6).
+const catalog = JSON.parse(readFileSync(new URL('../src/toolchains.json', import.meta.url), 'utf8'));
+const untiered = catalog.lean[catalog.defaultLean].tiers ? false : `Lean ${catalog.defaultLean} has no published tiers yet (Lean upgrade branch)`;
 
 const sha = 'a'.repeat(40), other = 'b'.repeat(40);
 
@@ -91,7 +94,7 @@ test('publication skips identical versions and never republishes other bytes', (
   assert.throws(() => publicationPlan([{ name: 'a', version: '1', integrity: 'x', remote: { exists: true, integrity: 'z' } }]), /never republish/);
 });
 
-test('bootstrap: placeholders, trust and deprecation only where missing', async () => {
+test('bootstrap: placeholders, trust and deprecation only where missing', { skip: untiered }, async () => {
   const names = (await releasePackages()).map(p => p.name);
   assert.ok(names.includes('@lasm/cli') && names.at(-1) === '@lasm/create' && names.some(n => n.startsWith('@lasm/lean-c-')));
   assert.ok(!names.some(n => n.includes('/git-')));
