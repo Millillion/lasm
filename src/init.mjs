@@ -1,9 +1,10 @@
-// `lasm init`: scaffold a new Lean-on-Node project from a template.
+// `lasm init`: scaffold a new Lean project from a template.
 // Writes files only: no network access, no Lean toolchain, no npm install.
 import { jsRuntime } from './js-runtime.mjs';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { fastlyToml } from './wasi/wasi-build.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const templateRoot = join(root, 'templates');
@@ -12,6 +13,7 @@ const templateRoot = join(root, 'templates');
 const npm = {
   express: { express: '5.2.1' },
   hono: { '@hono/node-server': '2.1.3', hono: '4.13.13' },
+  fastify: { fastify: '5.12.7' },
 };
 export const templateDependencies = npm;
 
@@ -25,12 +27,17 @@ export const deployTargets = {
   netlify: { summary: 'Netlify Function (netlify.toml; Netlify runs the build)', package: 'netlify' },
   azure: { summary: 'Azure Functions app (npm run build:azure)', package: 'azure', dependencies: { '@azure/functions': '4.17.0' } },
   gcf: { summary: 'Google Cloud Functions gen2 (npm run build:gcf)', package: 'gcf', dependencies: { '@google-cloud/functions-framework': '5.0.5' } },
-  // Edge targets (docs/EDGE.md): the edge build, Hono template only.
-  workers: { summary: 'Cloudflare Workers (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono'] },
-  'vercel-edge': { summary: 'Vercel Edge Function (vercel.json; Vercel runs npm run build:vercel-edge)', package: 'vercel-edge', templates: ['hono'], conflicts: ['vercel'] },
-  'netlify-edge': { summary: 'Netlify Edge Function (netlify.toml; Netlify runs npm run build:netlify-edge)', package: 'netlify-edge', templates: ['hono'], conflicts: ['netlify'] },
-  'deno-deploy': { summary: 'Deno Deploy (npm run build:deno-deploy, then deno task start:deno; entrypoint deno/main.mjs)', package: 'deno-deploy', templates: ['hono'] },
+  // Edge targets (docs/EDGE.md): the edge build, Hono and fetch templates.
+  workers: { summary: 'Cloudflare Workers (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono', 'fetch', 'fullstack'] },
+  'vercel-edge': { summary: 'Vercel Edge Function (vercel.json; Vercel runs npm run build:vercel-edge)', package: 'vercel-edge', templates: ['hono', 'fetch', 'fullstack'], conflicts: ['vercel'] },
+  'netlify-edge': { summary: 'Netlify Edge Function (netlify.toml; Netlify runs npm run build:netlify-edge)', package: 'netlify-edge', templates: ['hono', 'fetch', 'fullstack'], conflicts: ['netlify'] },
+  'deno-deploy': { summary: 'Deno Deploy (npm run build:deno-deploy, then deno task start:deno; entrypoint deno/main.mjs)', package: 'deno-deploy', templates: ['hono', 'fetch', 'fullstack'] },
   'supabase-edge': { summary: 'Supabase Edge Function (supabase/config.toml; npm run build:supabase-edge, then npx supabase functions deploy NAME)', package: 'supabase-edge', templates: ['hono'] },
+  // WASI targets (docs/WASI.md): a standard WASI module, no JavaScript.
+  fastly: { summary: 'Fastly Compute (fastly.toml; npm run build:fastly, then fastly compute serve)', package: 'fastly', templates: ['fetch', 'fullstack'] },
+  wasi: { summary: 'a WASI module (npm run build:wasi writes wasi/main.wasm; wasmtime run --dir . wasi/main.wasm)', package: 'wasi', templates: ['fetch', 'plain'], cli: true },
+  'wasi-http': { summary: 'a wasi-http component (npm run build:wasi-http writes wasi-http/main.wasm; wasmtime serve wasi-http/main.wasm)', package: 'wasi-http', templates: ['fetch', 'fullstack'] },
+  spin: { summary: 'Fermyon Spin (spin.toml; npm run build:wasi-http, then spin up)', package: 'wasi-http', templates: ['fetch', 'fullstack'] },
 };
 
 /** The Supabase function lasm build --target supabase-edge writes
@@ -46,7 +53,15 @@ export const templates = {
   plain: { summary: 'a Lean program (IO only)', server: false, interop: false, portable: true },
   express: { summary: 'Express 5 with Lean request handlers (Lasm.JS)', server: true, interop: true },
   hono: { summary: 'Hono on @hono/node-server with Lean request handlers (Lasm.JS)', server: true, interop: true, portable: true },
+  fastify: { summary: 'Fastify 5 with Lean route handlers (Lasm.JS)', server: true, interop: true },
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
+  // The browser (docs/BROWSER.md): a static web app, built with --target browser.
+  web: { summary: 'a browser app in Lean (Lasm.UI): a counter', server: false, interop: true, browser: true },
+  // Lasm.Fetch (docs/FETCH.md): one handler for Node, WASI, Fastly, Spin, the edge, Bun and Deno.
+  fetch: { summary: 'an HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge', server: true, interop: false, library: 'Lasm.Fetch', portable: true },
+  // The whole stack in Lean (docs/RPC.md): shared types, API and validation; a
+  // Lasm.Fetch server with server-side rendering; a Lasm.UI app that hydrates it.
+  fullstack: { summary: 'a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target', server: true, interop: false, fullstack: true },
 };
 
 export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}] [--deploy TARGET]…
@@ -54,7 +69,7 @@ export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys
 Creates a Lean project for Lasm: lakefile, lean-toolchain, package.json,
 Main.lean, README.md, Dockerfile, .dockerignore and .gitignore.
 The directory must be new or empty. The default template is plain.
---deploy (server templates; repeatable) adds a deployment target's files and
+--deploy (repeatable; server templates, and wasi for plain too) adds a target's files and
 npm scripts (build:<target> runs lasm build --target <target>). Lasm never
 installs or starts a platform's own tools; use the platform's CLI for that:
 ${Object.entries(deployTargets).map(([name, t]) => `  ${name.padEnd(12)} ${t.summary}`).join('\n')}
@@ -89,11 +104,16 @@ export function parseInitArguments(tokens) {
   if (positional.length !== 1) throw new Error(initUsage);
   if (!templates[result.template])
     throw new Error(`Unknown template "${result.template}". Choose one of: ${Object.keys(templates).join(', ')}`);
-  if (result.deploy.length && !templates[result.template].server)
-    throw new Error(`--deploy ${result.deploy[0]} needs a server template (express, hono or std-http), not ${result.template}`);
+  const serverOnly = result.deploy.find(target => !deployTargets[target].cli);
+  if (serverOnly && !templates[result.template].server)
+    throw new Error(`--deploy ${serverOnly} needs a server template (express, hono, fastify, std-http or fetch), not ${result.template}`);
   for (const target of result.deploy) {
     if (deployTargets[target].templates && !deployTargets[target].templates.includes(result.template))
-      throw new Error(`--deploy ${target} supports the ${deployTargets[target].templates.join(', ')} template, not ${result.template}`);
+      {
+        const names = deployTargets[target].templates;
+        const list = names.length === 1 ? `the ${names[0]} template` : `the ${names.slice(0, -1).join(', ')} and ${names.at(-1)} templates`;
+        throw new Error(`--deploy ${target} supports ${list}, not ${result.template}`);
+      }
     for (const other of deployTargets[target].conflicts ?? [])
       if (result.deploy.includes(other)) throw new Error(`--deploy ${target} and --deploy ${other} both configure the same platform; choose one`);
   }
@@ -138,14 +158,102 @@ root = "Main"
 `;
 }
 
+function browserPackageJson(name, template) {
+  const lasm = lasmPackage();
+  return JSON.stringify({
+    name, version: '0.1.0', private: true, type: 'module',
+    description: `${templates[template].summary}, compiled to WebAssembly by Lasm`,
+    scripts: {
+      // A dev server on http://localhost:5173 that rebuilds on save and reloads the page.
+      dev: 'lasm dev Main.lean --target browser',
+      // dist/: the static site (loader, Wasm, precompressed copies, index.html).
+      build: 'lasm build Main.lean --target browser',
+      // Serves the release build in dist/ as a static host would.
+      preview: 'lasm dev Main.lean --target browser --release',
+    },
+    engines: { node: '>=24' },
+    devDependencies: { [lasm.name]: lasm.version },
+  }, null, 2) + '\n';
+}
+
+const browserIndexHtml = name => `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${name}</title>
+    <link rel="stylesheet" href="./style.css">
+    <!-- lasm build injects the app's loader and preload hints here. -->
+  </head>
+  <body>
+    <main id="app" data-lasm-app></main>
+    <noscript>This app needs JavaScript and WebAssembly.</noscript>
+  </body>
+</html>
+`;
+const browserStyle = `:root { font-family: system-ui, sans-serif; color-scheme: light dark; }
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; }
+main { text-align: center; }
+p { display: flex; gap: 1rem; align-items: center; justify-content: center; }
+button { font-size: 1.5rem; min-width: 3rem; }
+output { font-size: 2rem; min-width: 3ch; font-variant-numeric: tabular-nums; }
+`;
+
+function browserReadme(name, template) {
+  const lasm = lasmPackage();
+  return `# ${name}
+
+${templates[template].summary[0].toUpperCase() + templates[template].summary.slice(1)}, compiled ahead of time to WebAssembly by
+[Lasm](https://github.com/Millillion/lasm). It runs in Chrome, Edge, Firefox and Safari.
+
+## Requirements
+
+Node.js 24 or newer with npm. Lasm downloads Lean ${defaultLean()} and its build tools on
+the first build (a few hundred MB, cached for later builds).
+
+## Run
+
+\`\`\`sh
+npm install
+npm run dev        # http://127.0.0.1:5173: rebuilds when a .lean file changes, then reloads the page
+npm run build      # dist/: the static site
+npm run preview    # the release build, served on http://127.0.0.1:5173
+\`\`\`
+
+Files:
+
+| File | What it is |
+| --- | --- |
+| \`Main.lean\` | The app: a pure \`update\` and \`view\` with \`Lasm.UI\` ([guide](https://github.com/Millillion/lasm/blob/main/docs/UI.md)). |
+| \`App.lean\` | Pure Lean logic used by \`Main.lean\`. |
+| \`index.html\`, \`public/style.css\` | The page; \`lasm build\` adds the loader before \`</head>\`, and copies \`public/\` into \`dist/\`. |
+| \`lakefile.toml\`, \`lean-toolchain\` | The Lake project, pinned to Lean ${defaultLean()}. |
+| \`package.json\` | npm scripts, and Lasm (\`${lasm.name}\`) as a dev dependency. |
+
+\`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
+\`Lasm.UI\`, which ships with Lasm: \`npx lasm editor\` (also run by \`npm run dev\`) makes the Lean
+editor resolve it ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
+
+## Deploy
+
+\`dist/\` is a static site: upload it to any static host or CDN (GitHub Pages,
+Cloudflare Pages, Netlify, Vercel, S3 and CloudFront, nginx). Serve \`.wasm\` as
+\`application/wasm\`; the \`.br\` and \`.gz\` copies let the host send compressed files
+without compressing them itself. Files named \`app.<hash>.*\` never change and can be
+cached forever. See the [browser deployment guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/browser.md).
+`;
+}
+
 function packageJson(name, template, deploy = []) {
+  if (templates[template].browser) return browserPackageJson(name, template);
   const lasm = lasmPackage();
   const pkg = {
     name, version: '0.1.0', private: true,
     description: `${templates[template].summary}, compiled to WebAssembly by Lasm`,
     scripts: {
-      // `npm run dev -- a b` passes a and b to main.
-      dev: 'lasm Main.lean --',
+      // Servers: `npm run dev` rebuilds and restarts on every change (lasm dev).
+      // The plain program: `npm run dev -- a b` builds and runs main with a and b.
+      dev: templates[template].server ? 'lasm dev Main.lean' : 'lasm Main.lean --',
       build: 'lasm build Main.lean',
       start: 'node dist/main.mjs',
     },
@@ -156,11 +264,13 @@ function packageJson(name, template, deploy = []) {
     // Build and package in one step; Vercel's and Netlify's builds run these too.
     if (platform) pkg.scripts[`build:${platform}`] = `lasm build Main.lean --target ${platform}`;
   }
+  if (deploy.includes('spin')) pkg.scripts['start:spin'] = 'spin up';
+  if (deploy.includes('fastly')) pkg.scripts['start:fastly'] = 'fastly compute serve';
   // Bun and Deno (portable profile): `bun run dev:bun` runs Lasm itself on
   // Bun (bun x --bun, even when Node is installed); `deno task dev` runs it on
   // Deno. Deno Deploy runs the same deno/main.mjs.
   if (templates[template].portable) Object.assign(pkg.scripts, {
-    'dev:bun': 'bun x --bun lasm Main.lean --', 'build:bun': 'bun x --bun lasm build Main.lean --target bun', 'start:bun': 'bun bun/main.mjs',
+    'dev:bun': templates[template].server ? 'bun x --bun lasm dev Main.lean' : 'bun x --bun lasm Main.lean --', 'build:bun': 'bun x --bun lasm build Main.lean --target bun', 'start:bun': 'bun bun/main.mjs',
     'build:deno': 'lasm build Main.lean --target deno', 'start:deno': 'deno run -A deno/main.mjs' });
   else if (deploy.includes('deno-deploy')) pkg.scripts['start:deno'] = 'deno run -A deno/main.mjs';
   // Edge and portable builds import the npm modules Lean binds; the Node server stays out.
@@ -207,7 +317,7 @@ function lambdaDockerfile() {
 # AWS Lambda container image: Lambda's managed Node 24 image, with the AWS Lambda
 # Web Adapter forwarding each invocation to the server's HTTP port.
 #   docker build --platform linux/amd64 -f Dockerfile.lambda -t my-app-lambda .
-# Give the function at least 512 MB of memory. See docs/deploy/lambda.md.
+# Give the function at least 512 MB of memory. See https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md
 
 FROM node:24-trixie AS build
 WORKDIR /app
@@ -281,6 +391,28 @@ const vercelEdgeJson = JSON.stringify({
   outputDirectory: 'public',
   routes: [{ src: '/(.*)', dest: '/api/lasm' }],
 }, null, 2) + '\n';
+// Fastly Compute: `fastly compute build|serve|deploy` runs npm run build:fastly,
+// which writes bin/main.wasm (src/wasi/wasi-build.mjs fastlyToml).
+// Spin: its HTTP trigger runs the wasi-http component, one instance per request.
+const spinToml = name => `# Fermyon Spin (Lasm): npm run build:wasi-http writes wasi-http/main.wasm; spin up serves it.
+spin_manifest_version = 2
+
+[application]
+name = "${name}"
+version = "0.1.0"
+
+[[trigger.http]]
+route = "/..."
+component = "${name}"
+
+[component.${name}]
+source = "wasi-http/main.wasm"
+# Hosts Lasm.Fetch.fetch may reach, for example ["https://api.example.com"].
+allowed_outbound_hosts = []
+
+[component.${name}.build]
+command = "npm run build:wasi-http"
+`;
 const netlifyEdgeToml = `# Netlify runs the build: lasm build --target netlify-edge writes the edge
 # function netlify/edge-functions/lasm.mjs, which serves every path.
 [build]
@@ -303,7 +435,8 @@ import_map = "./functions/${name}/deno.json"
 function deployGitignore(deploy, template, name) {
   const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
     'vercel-edge': '.vercel/\napi/lasm.mjs\napi/_lasm/', 'netlify-edge': '.netlify/\nnetlify/lasm/\nnetlify/edge-functions/lasm.mjs', 'deno-deploy': 'deno/',
-    'supabase-edge': `supabase/functions/${supabaseFunctionNameOf(name)}/\nsupabase/.temp/\nsupabase/.branches/` };
+    'supabase-edge': `supabase/functions/${supabaseFunctionNameOf(name)}/\nsupabase/.temp/\nsupabase/.branches/`,
+    fastly: 'bin/\npkg/', wasi: 'wasi/', 'wasi-http': 'wasi-http/', spin: 'wasi-http/\n.spin/' };
   const portable = templates[template]?.portable ? ['bun/', 'deno/'] : [];
   return gitignore + [...new Set([...portable, ...deploy.map(target => extra[target]).filter(Boolean)])].map(line => line + '\n').join('');
 }
@@ -324,26 +457,29 @@ npm run build               # write dist/
 node dist/main.mjs Ada      # run the build: only Node is needed
 \`\`\``
     : `\`\`\`sh
-npm run dev                 # build and run: Listening on http://0.0.0.0:3000
+npm run dev                 # lasm dev: Listening on http://0.0.0.0:3000; rebuilds and restarts on save
 curl http://localhost:3000/hello/Ada
 # {"message":"Hello, Ada, from Lean!"}
 curl -X POST http://localhost:3000/echo -H 'content-type: application/json' -d '{"n":1}'
-# {"echo":{"n":1}}
+# ${template === 'fetch' ? '{"n":1}' : '{"echo":{"n":1}}'}
 npm run build               # write dist/
 PORT=8080 npm start         # run the build (node dist/main.mjs): only Node is needed
 \`\`\`
 
 The server listens on \`$HOST\` (default \`0.0.0.0\`) and \`$PORT\` (default 3000) and
-exits cleanly on SIGTERM or SIGINT.`;
-  const native = t.interop
+exits cleanly on SIGTERM or SIGINT. \`npm run dev\` (\`lasm dev\`) watches the Lean files, rebuilds
+in about 2 s after an ordinary edit and restarts the server; a build error is shown with its
+file and line while the last good server keeps running.`;
+  const native = t.interop || t.library
     ? `\`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
-\`Lasm.JS\`, which only Lasm provides, so it builds and runs only with Lasm (the Lean
-editor marks \`import Lasm.JS\` as unknown).`
+\`${t.library ?? 'Lasm.JS'}\`, which ships with Lasm, so it builds and runs only with Lasm. \`npx lasm editor\`
+(also run by \`npm run dev\`) makes the Lean editor resolve it
+([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).`
     : `This is an ordinary Lake project: \`lake build\` also builds it natively.`;
   return `# ${name}
 
 ${t.summary[0].toUpperCase() + t.summary.slice(1)}, compiled ahead of time to WebAssembly by
-[Lasm](https://github.com/Millillion/lasm) and run by Node.js.
+[Lasm](https://github.com/Millillion/lasm)${t.portable ? '. It runs on Node.js, and also on Bun and Deno' : ' and run by Node.js'}.
 
 ## Requirements
 
@@ -373,13 +509,13 @@ ${t.portable ? `
 ## Bun and Deno
 
 The same \`Main.lean\` also runs on Bun and Deno with Lasm's portable profile. Lean
-runs single-threaded there, with no files, sockets or processes${t.server ? ', and the Hono app is\nserved with \`Bun.serve\` or \`Deno.serve\`' : ''}:
+runs single-threaded there, with no files, sockets or processes${t.server ? `, and ${template === 'hono' ? 'the Hono app' : 'the handler'} is\nserved with \`Bun.serve\` or \`Deno.serve\`` : ''}:
 
 \`\`\`sh
-bun install && bun run dev:bun${template === 'plain' ? ' Ada' : ''}      # Lasm itself runs on Bun
-bun run build:bun && bun run start:bun                # bun/main.mjs
-deno install && deno task dev${template === 'plain' ? ' Ada' : ''}       # Lasm itself runs on Deno
-deno task build:deno && deno task start:deno         # deno/main.mjs
+bun install && bun run dev:bun${template === 'plain' ? ' Ada' : '   '}       # Lasm itself runs on Bun
+bun run build:bun && bun run start:bun     # bun/main.mjs
+deno install && deno task dev${template === 'plain' ? ' Ada' : '   '}        # Lasm itself runs on Deno
+deno task build:deno && deno task start:deno   # deno/main.mjs
 \`\`\`
 
 See [Bun and Deno](https://github.com/Millillion/lasm/blob/main/docs/BUN_DENO.md).
@@ -387,7 +523,8 @@ See [Bun and Deno](https://github.com/Millillion/lasm/blob/main/docs/BUN_DENO.md
 ## Deploy
 
 \`dist/\` is the whole deployment${t.interop ? ', including the production `node_modules`' : ''}: copy it to a machine
-with Node 24+ and the same OS and architecture, and run \`node dist/main.mjs\`.
+with Node 24+ (Linux x64 or arm64 from a build on any platform, or the build machine's
+own OS and architecture) and run \`node dist/main.mjs\`.
 
 With Docker:
 
@@ -447,6 +584,23 @@ Vercel recommends its Node runtime over the edge runtime; see the [edge notes](h
 which writes the edge function \`netlify/edge-functions/lasm.mjs\` (and \`netlify/lasm/\`); test with
 \`netlify dev\`, deploy with \`netlify deploy --build\`. See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
 `,
+  fastly: name => `**Fastly Compute:** \`npm run build:fastly\` writes \`bin/main.wasm\` and
+\`pkg/${name}.tar.gz\`, the package Fastly deploys; \`fastly.toml\` makes \`fastly compute build\`,
+\`serve\` and \`deploy\` run it. Test locally with \`fastly compute serve\` (Fastly's Viceroy) and deploy
+with \`fastly compute deploy\`. See the [Fastly guide](${guide('fastly')}).
+`,
+  wasi: () => `**WASI:** \`npm run build:wasi\` writes \`wasi/main.wasm\`, a standard WASI (preview 1)
+module with no JavaScript: \`wasmtime run --dir . wasi/main.wasm\`, \`wasmer run\`, or Node's \`node:wasi\`.
+A Lasm.Fetch handler answers one CGI request per run. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+`,
+  'wasi-http': () => `**wasi-http:** \`npm run build:wasi-http\` writes \`wasi-http/main.wasm\`, a
+wasi:http/proxy component: \`wasmtime serve wasi-http/main.wasm\` serves it on port 8080, and any
+wasi-http host (Spin, wasmCloud, …) runs it. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+`,
+  spin: () => `**Fermyon Spin:** \`spin.toml\` serves the wasi-http component \`wasi-http/main.wasm\`
+with Spin's HTTP trigger; \`spin build\` runs \`npm run build:wasi-http\`, then \`spin up\` serves on
+port 3000. List the hosts \`Lasm.Fetch.fetch\` reaches in \`allowed_outbound_hosts\`. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+`,
   'deno-deploy': () => `**Deno Deploy:** \`npm run build:deno-deploy\` writes \`deno/\` (the
 entrypoint \`deno/main.mjs\`, the Lean program and its host); test with \`deno task start:deno\`
 (PORT, default 8000). On Deno Deploy, set the build command to \`npm run build:deno-deploy\` and the
@@ -468,6 +622,10 @@ See the [Cloud Functions guide](${guide('cloud-functions')}).
 `,
 };
 
+const fastlyName = directory => packageName(directory).replace(/[^a-z0-9_-]+/g, '-');
+// Spin component and application names: lowercase words joined by '-'.
+const spinName = name => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/^(?=[0-9])/, 'app-') || 'lean-app';
+
 /** Creates the project; returns { directory, files }. */
 export function initProject({ directory, template, deploy = [] }) {
   if (!templates[template]) throw new Error(`Unknown template "${template}"`);
@@ -477,7 +635,26 @@ export function initProject({ directory, template, deploy = [] }) {
     if (entries.length) throw new Error(`${directory} is not empty. Choose a new or empty directory.`);
   }
   const name = packageName(target);
-  const files = {
+  if (templates[template].fullstack) {
+    const files = fullstackFiles(name, deploy);
+    if (deploy.includes('vercel-edge')) { files['vercel.json'] = vercelEdgeJson; files['public/lasm.txt'] = 'Requests are served by the Lean edge function api/lasm.mjs.\n'; }
+    if (deploy.includes('netlify-edge')) { files['netlify.toml'] = netlifyEdgeToml; files['public/.gitkeep'] = ''; }
+    // Fastly: the TODOS KV Store (Lasm.KV); Viceroy's local copy starts empty.
+    if (deploy.includes('fastly')) files['fastly.toml'] = fastlyToml(fastlyName(target)) + '\n[local_server.kv_stores]\n  TODOS = []\n';
+    if (deploy.includes('spin')) files['spin.toml'] = spinToml(spinName(name));
+    return writeFiles(target, name, files);
+  }
+  const files = templates[template].browser ? {
+    'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
+    'lakefile.toml': lakefile(name),
+    'package.json': packageJson(name, template),
+    'App.lean': readFileSync(join(templateRoot, 'common/App.lean'), 'utf8'),
+    'Main.lean': readFileSync(join(templateRoot, template, 'Main.lean'), 'utf8'),
+    'index.html': browserIndexHtml(name),
+    'public/style.css': browserStyle,
+    'README.md': browserReadme(name, template),
+    '.gitignore': gitignore,
+  } : {
     'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
     'lakefile.toml': lakefile(name),
     'package.json': packageJson(name, template, deploy),
@@ -489,6 +666,7 @@ export function initProject({ directory, template, deploy = [] }) {
     '.gitignore': deployGitignore(deploy, template, name),
   };
   if (deploy.includes('lambda')) files['Dockerfile.lambda'] = lambdaDockerfile();
+  if (templates[template].browser) delete files['Dockerfile'];
   if (deploy.includes('vercel')) files['vercel.json'] = vercelJson;
   if (deploy.includes('netlify')) { files['netlify.toml'] = netlifyToml; files['public/.gitkeep'] = ''; }
   if (deploy.includes('workers')) files['wrangler.toml'] = wranglerToml(name);
@@ -496,6 +674,12 @@ export function initProject({ directory, template, deploy = [] }) {
   if (deploy.includes('vercel-edge')) { files['vercel.json'] = vercelEdgeJson; files['public/lasm.txt'] = 'Requests are served by the Lean edge function api/lasm.mjs.\n'; }
   if (deploy.includes('netlify-edge')) { files['netlify.toml'] = netlifyEdgeToml; files['public/.gitkeep'] = ''; }
   if (deploy.includes('supabase-edge')) files['supabase/config.toml'] = supabaseConfig(supabaseFunctionNameOf(name));
+  if (deploy.includes('fastly')) files['fastly.toml'] = fastlyToml(fastlyName(target));
+  if (deploy.includes('spin')) files['spin.toml'] = spinToml(spinName(name));
+  return writeFiles(target, name, files);
+}
+
+function writeFiles(target, name, files) {
   mkdirSync(target, { recursive: true });
   for (const [file, text] of Object.entries(files)) {
     mkdirSync(dirname(join(target, file)), { recursive: true });
@@ -504,23 +688,171 @@ export function initProject({ directory, template, deploy = [] }) {
   return { directory: target, name, files: Object.keys(files) };
 }
 
-export function runInit(options) {
+/** The fullstack template (docs/RPC.md): one Lake project with shared, server
+ * and client modules; the client is built for the browser into
+ * dist/public/client, which the Node server serves and Workers serves as
+ * static assets. */
+function fullstackFiles(name, deploy = []) {
+  const lasm = lasmPackage();
+  const read = file => readFileSync(join(templateRoot, 'fullstack', file), 'utf8');
+  const worker = name.replace(/[^a-z0-9-]+/g, '-').slice(0, 54) || 'lean-app';
+  return {
+    'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
+    'lakefile.toml': `name = "${lakeName(name)}"
+version = "0.1.0"
+defaultTargets = ["Shared", "View"]
+
+# Shared by the server and the browser app: data, API, validation (Shared)
+# and the page (View). \`lake build\` checks them, proofs included.
+[[lean_lib]]
+name = "Shared"
+
+[[lean_lib]]
+name = "View"
+
+# Server.lean and Client.lean are the two programs: lasm builds them
+# (npm run build). They are not Lake targets.
+`,
+    'package.json': JSON.stringify({
+      name, version: '0.1.0', private: true, type: 'module',
+      description: 'A full-stack Lean app (Lasm.RPC, Lasm.Fetch, Lasm.UI), compiled to WebAssembly by Lasm',
+      scripts: {
+        // The server on http://localhost:3000, rebuilt with the browser app on every change.
+        dev: 'lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client',
+        build: 'npm run build:client && npm run build:server',
+        'build:client': 'lasm build Client.lean --target browser --output dist/public/client',
+        'build:server': 'lasm build Server.lean --output dist/server',
+        start: 'node dist/server/main.mjs',
+        // Every other target: the browser app is embedded in the server program
+        // (embed_dir! in Server.lean), so the same build serves everything.
+        // Cloudflare Workers (wrangler.toml; Workers also serve dist/public as static assets).
+        'build:workers': 'npm run build:client && lasm build Server.lean --target workers --output dist/server',
+        // Bun and Deno: bun bun/main.mjs, deno run -A --unstable-kv deno/main.mjs (on $PORT; Deno KV keeps the todos).
+        'build:bun': 'npm run build:client && lasm build Server.lean --target bun --output dist/server',
+        'start:bun': 'bun bun/main.mjs',
+        'build:deno': 'npm run build:client && lasm build Server.lean --target deno --output dist/server',
+        'start:deno': 'deno run -A --unstable-kv deno/main.mjs',
+        ...Object.fromEntries(deploy.filter(t => !['workers'].includes(t)).map(t => [`build:${deployTargets[t].package}`,
+          `npm run build:client && lasm build Server.lean --target ${deployTargets[t].package} --output dist/server`])),
+        ...(deploy.includes('fastly') ? { 'start:fastly': 'fastly compute serve' } : {}),
+        ...(deploy.includes('spin') ? { 'start:spin': 'spin up' } : {}),
+        ...(deploy.includes('wasi-http') ? { 'start:wasi-http': 'wasmtime serve wasi-http/main.wasm' } : {}),
+      },
+      engines: { node: '>=24' },
+      devDependencies: { [lasm.name]: lasm.version },
+    }, null, 2) + '\n',
+    'Shared.lean': read('Shared.lean'),
+    'View.lean': read('View.lean'),
+    'Server.lean': read('Server.lean'),
+    'Client.lean': read('Client.lean'),
+    'public/style.css': read('public/style.css'),
+    'wrangler.toml': `# Cloudflare Workers: npm run build:workers writes workers/ (the server) and
+# dist/public (the browser app); test with npx wrangler dev, deploy with npx wrangler deploy.
+name = "${worker}"
+main = "workers/worker.mjs"
+compatibility_date = "2026-10-01"
+
+# The browser app and its files, served by Workers before the Worker runs.
+[assets]
+directory = "./dist/public"
+
+# Lasm.KV keeps the todos in this KV namespace when it is bound (create one with
+# npx wrangler kv namespace create TODOS and put its id here); without it they
+# live in the isolate's memory. wrangler dev keeps a local copy.
+# [[kv_namespaces]]
+# binding = "TODOS"
+# id = "…"
+
+# Lasm's program.wasm is imported as a precompiled module.
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false
+`,
+    'README.md': fullstackReadme(name),
+    '.gitignore': gitignore + 'workers/\n.wrangler/\nbun/\ndeno/\nbin/\npkg/\nwasi-http/\napi/\nnetlify/\n',
+  };
+}
+
+function fullstackReadme(name) {
+  return `# ${name}
+
+A full-stack app written entirely in Lean and compiled to WebAssembly by
+[Lasm](https://github.com/Millillion/lasm): the server, the browser app, and
+the API between them, whose types and validation are written once.
+
+| File | What it is |
+| --- | --- |
+| \`Shared.lean\` | The data (\`Todo\`), the API (\`Lasm.RPC\` endpoints) and its validation, with a theorem about it. Imported by both sides. |
+| \`View.lean\` | The page (\`Lasm.UI\`): rendered to HTML by the server for the first visit, kept up to date by the browser. |
+| \`Server.lean\` | The server (\`Lasm.Fetch\`): serves the API and the first page. Its \`addTodo\` handler can only store titles that passed the shared check: the type asks for the proof. |
+| \`Client.lean\` | The browser app (\`Lasm.UI\`): hydrates the server's page and calls the API. A theorem shows it never sends an invalid title. |
+| \`public/style.css\` | Copied next to the browser app. |
+| \`wrangler.toml\` | Cloudflare Workers: the server as a Worker, the browser app as static assets. |
+
+The server embeds \`dist/public\` (the browser app and \`public/\`) when it is
+built (\`embed_dir!\`), so one build serves the whole app on every platform.
+The todos are kept with \`Lasm.KV\`: Workers KV, Deno KV or a Fastly KV Store
+where one is bound, otherwise memory.
+
+## Requirements
+
+Node.js 24 or newer with npm. Lasm downloads Lean ${defaultLean()} and its build tools on
+the first build (a few hundred MB, cached for later builds).
+
+## Run
+
+\`\`\`sh
+npm install
+npm run dev        # one URL, http://127.0.0.1:3000: rebuilds what an edit affects, reloads the page
+npm run build      # dist/public (the browser app), then dist/server (Node) with it embedded
+npm start          # serves the release build on http://localhost:3000 (PORT, HOST)
+\`\`\`
+
+The Lean editor resolves \`import Lasm.*\` once \`npx lasm editor\` (also run by \`npm run dev\`)
+has linked Lasm's Lean for this directory; restart the Lean server in your editor afterwards
+([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
+
+## Deploy
+
+- **Node** (any host, container or VM): \`npm run build\`, then \`npm start\` with \`dist/\`.
+- **Cloudflare Workers**: \`npm run build:workers\`, then \`npx wrangler deploy\`
+  (\`npx wrangler dev\` runs it locally). Bind a KV namespace as \`TODOS\`
+  (\`wrangler.toml\`) to keep the todos in Workers KV; otherwise each isolate
+  keeps its own copy in memory.
+- **Bun**: \`npm run build:bun\`, then \`npm run start:bun\` (memory).
+- **Deno**: \`npm run build:deno\`, then \`npm run start:deno\` (Deno KV).
+- Other platforms: \`lasm init --deploy …\` adds their files and a
+  \`build:<platform>\` script (\`vercel-edge\`, \`netlify-edge\`, \`deno-deploy\`,
+  \`fastly\` with a \`TODOS\` KV Store, \`wasi-http\`, \`spin\`).
+
+Guides: [Lasm.RPC](https://github.com/Millillion/lasm/blob/main/docs/RPC.md),
+[Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md),
+[Lasm.Fetch](https://github.com/Millillion/lasm/blob/main/docs/FETCH.md).
+`;
+}
+
+export async function runInit(options) {
   const result = initProject(options);
   const near = relative(process.cwd(), result.directory) || '.';
   const where = near.startsWith('..') ? result.directory : near;
   const cd = where === '.' ? '' : `  cd ${/\s/.test(where) ? JSON.stringify(where) : where}\n`;
-  console.log(`Created ${result.name} (template ${options.template}) in ${where}:
+  console.log(`Created ${where === result.name ? result.name : `${result.name} in ${where}`} (template ${options.template}):
   ${result.files.join(', ')}
 
 Next:
 ${cd}${nextSteps(options.template, jsRuntime)}`);
+  // Editor support up front when Lasm's Lean is already on this machine (no download here).
+  await (await import('./editor.mjs')).autoSetupEditor(join(result.directory, 'Main.lean'), { cachedOnly: true });
   return 0;
 }
 
 /** The first commands, for the runtime that ran lasm init (Bun and Deno: portable templates). */
 export function nextSteps(template, runtime = 'node') {
   const portable = templates[template].portable;
-  const server = template !== 'plain';
+  const server = templates[template].server;
+  if (templates[template].browser) return `  npm install\n  npm run dev          # then open http://127.0.0.1:5173`;
+  if (templates[template].fullstack) return `  npm install\n  npm run dev          # then open http://127.0.0.1:3000`;
   if (runtime === 'bun' && portable) return `  bun install\n  bun run dev:bun${server ? '      # then: curl http://localhost:3000/hello/Ada' : ''}`;
   if (runtime === 'deno' && portable) return `  deno install\n  deno task dev${server ? '        # then: curl http://localhost:8000/hello/Ada' : ''}`;
   return `  npm install\n  npm run dev${server ? '          # then: curl http://localhost:3000/hello/Ada' : ''}`;

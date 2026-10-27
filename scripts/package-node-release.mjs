@@ -17,7 +17,7 @@ import { archiveUnitCache, shippedAnalysisDirectory } from '../src/application-l
 import { initializerUnits } from '../src/application-initialization.mjs';
 import { bundleInstaller } from './bundle-installer.mjs';
 import { candidateReadme } from './candidate-readme.mjs';
-import { applicationNotices } from '../src/notices.mjs';
+import { applicationNotices, wasmtimeAdapterNotice } from '../src/notices.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -90,15 +90,16 @@ json('provenance.json', { sourceRevision, runtimeManifestSha256: manifestSha256,
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json')));
 json('package.json', {
   name: sourcePackage.name, version, private: true, license: 'UNLICENSED', type: 'module',
-  description: 'Compile ordinary Lean applications to run in Node',
-  bin: sourcePackage.bin, engines: { node: '>=' + pins.minimumNode }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
+  description: 'Compile Lean 4 to WebAssembly for Node, Bun, Deno, edge functions, WASI, Fastly and the browser',
+  bin: sourcePackage.bin, exports: sourcePackage.exports, engines: { node: '>=' + pins.minimumNode }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
   files: ['bin', 'src', 'library', 'templates', 'scripts', 'targets', 'docs', 'examples', 'README.md',
     'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json', 'installer-dependencies.json'],
   dependencies: { tar: sourcePackage.dependencies.tar },
   bundleDependencies: ['tar'],
 });
 writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), applicationNotices(runtime.manifest, readFileSync(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8'), { cli: true })
-  + '\n=== Koffi runtime adapter ===\n' + readFileSync(join(staging, 'src/native/node_modules/koffi/LICENSE.txt'), 'utf8'));
+  + '\n=== Koffi runtime adapter ===\n' + readFileSync(join(staging, 'src/native/node_modules/koffi/LICENSE.txt'), 'utf8')
+  + (existsSync(join(staging, 'src/wasi/component/proxy-template.wasm')) ? '\n' + wasmtimeAdapterNotice('src/wasi/component/proxy-template.wasm (the wasi-http component template)') : ''));
 const pack = () => JSON.parse(execFileSync('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', output,
   '--cache', join(root, '.cache/npm')], { cwd: staging, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 }))[0];
 const packed = pack(), archive = join(output, packed.filename), sha256 = await hashFile(archive);

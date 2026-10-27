@@ -1,0 +1,360 @@
+// lasm:ui-dom — the browser side of Lasm.UI (docs/UI.md, docs/BROWSER.md
+// "Patch protocol"). It applies the binary patches Lean's diff writes
+// (library/Lasm/UI/Encode.lean), keeps the id → node table, delegates events to
+// the mount root (one synchronous call into Lean per event, carrying only the
+// fields each handler's decoder declared), batches renders on animation
+// frames, adopts server-rendered DOM (hydrate), and performs the commands and
+// subscriptions Lean asks for (library/Lasm/UI/App.lean binds these exports).
+// Each mounted app gets its own instance (lasmInstance); ports and app.send
+// go through lasm:app. Web-standard JavaScript only.
+const NS = [, 'http://www.w3.org/1999/xhtml', 'http://www.w3.org/2000/svg', 'http://www.w3.org/1998/Math/MathML'];
+const decoder = new TextDecoder();
+
+export function createUi({ root, flags = null, hydrate = false, window: win = root.ownerDocument.defaultView ?? globalThis } = {}) {
+  const doc = root.ownerDocument;
+  const nodes = new Map([[0, root]]);
+  const names = [], values = [], decoders = [];
+  const listening = new Set();
+  const subs = new Map();
+  let lean = null, pending = false, stopped = false, hydrating = hydrate, focusQueue = [];
+  const raf = win.requestAnimationFrame ? f => win.requestAnimationFrame(f) : f => setTimeout(() => f(performance.now()), 16);
+  const cancelRaf = win.cancelAnimationFrame ? h => win.cancelAnimationFrame(h) : h => clearTimeout(h);
+
+  // ---- patches ----
+  let bytes = null, p = 0;
+  function v() {
+    let x = bytes[p++];
+    if (x < 128) return x;
+    x &= 127;
+    for (let shift = 128; ; shift *= 128) {
+      const b = bytes[p++];
+      x += (b & 127) * shift;
+      if (b < 128) return x;
+    }
+  }
+  function str() {
+    const n = v(), end = p + n;
+    if (n < 24) {
+      let s = '';
+      for (let i = p; i < end; i++) {
+        const c = bytes[i];
+        if (c > 127) { s = decoder.decode(bytes.subarray(p, end)); break; }
+        s += String.fromCharCode(c);
+      }
+      p = end;
+      return s;
+    }
+    const s = decoder.decode(bytes.subarray(p, end));
+    p = end;
+    return s;
+  }
+  function name() {
+    const x = v();
+    if (x > 1) return names[x - 2];
+    const s = str();
+    if (x === 0) names.push(s);
+    return s;
+  }
+  function value() {
+    const x = v();
+    if (x > 1) return values[x - 2];
+    const s = str();
+    if (x === 0) values.push(s);
+    return s;
+  }
+  // Attribute ops 0–5 (set) and 8–11 (remove) on element n.
+  function attr(n, k) {
+    switch (k) {
+    case 0: { const a = name(); n.setAttribute(a, value()); return; }
+    case 1: { const a = name(), s = value(); if (n[a] !== s) n[a] = s; return; }
+    case 2: { const a = name(); if (n[a] !== false) n[a] = false; return; }
+    case 3: { const a = name(); if (n[a] !== true) n[a] = true; return; }
+    case 4: { const a = name(); n.style.setProperty(a, value()); return; }
+    case 5: { const e = name(), d = v(), f = v(); (n.$l ??= Object.create(null))[e] = d * 4 + f; listen(e); return; }
+    case 8: n.removeAttribute(name()); return;
+    case 9: { const a = name(), t = typeof n[a]; n[a] = t === 'boolean' ? false : t === 'number' ? 0 : ''; return; }
+    case 10: n.style.removeProperty(name()); return;
+    case 11: { const e = name(); if (n.$l) delete n.$l[e]; return; }
+    default: throw new Error(`Lasm.UI: bad attribute op ${k}`);
+    }
+  }
+  // A node from the stream (created, or adopted from `existing` when hydrating).
+  function node(existing) {
+    const kind = bytes[p++], id = v();
+    let n;
+    if (kind === 0) {
+      const s = str();
+      if (existing && existing.nodeType === 3) { n = existing; if (n.data !== s) n.data = s; }
+      else n = doc.createTextNode(s);
+    } else {
+      const tag = name();
+      const adopt = existing && existing.nodeType === 1 && existing.localName === tag && existing.namespaceURI === NS[kind];
+      n = adopt ? existing : kind === 1 ? doc.createElement(tag) : doc.createElementNS(NS[kind], tag);
+      for (let c = v(); c > 0; c--) attr(n, bytes[p++]);
+      let count = v();
+      if (adopt) {
+        let cur = n.firstChild;
+        for (; count > 0; count--) {
+          while (cur && cur.nodeType === 8) { const next = cur.nextSibling; cur.remove(); cur = next; }
+          const c = node(cur);
+          if (c === cur) cur = cur.nextSibling;
+          else n.insertBefore(c, cur);
+        }
+        while (cur) { const next = cur.nextSibling; cur.remove(); cur = next; }
+      } else for (; count > 0; count--) n.appendChild(node(null));
+    }
+    n.$i = id;
+    nodes.set(id, n);
+    return n;
+  }
+  function forget(n) {
+    nodes.delete(n.$i);
+    for (let c = n.firstChild; c; c = c.nextSibling) forget(c);
+  }
+  // Removed subtrees leave the id table after the frame is painted (a clear of
+  // 1,000 rows otherwise walks 12,000 nodes before the paint). Ids are never
+  // reused, so a late removal cannot hit a new node.
+  let doomed = [], sweeping = false;
+  function sweep() { sweeping = false; const list = doomed; doomed = []; for (const d of list) forget(d); }
+  function forgetLater(n) {
+    doomed.push(n);
+    if (!sweeping) { sweeping = true; setTimeout(sweep, 0); }
+  }
+  const at = id => { const n = nodes.get(id); if (!n) throw new Error(`Lasm.UI: no node ${id}`); return n; };
+  function apply(frame) {
+    bytes = frame; p = 0;
+    // Hydration: the first frame's inserts under the root adopt its children in order.
+    let cursor = hydrating ? root.firstChild : null;
+    while (p < bytes.length) {
+      switch (bytes[p++]) {
+      case 1: {
+        const parent = at(v()), b = v();
+        if (hydrating && parent === root && b === 0) {
+          while (cursor && cursor.nodeType === 8) { const next = cursor.nextSibling; cursor.remove(); cursor = next; }
+          const n = node(cursor);
+          if (n === cursor) cursor = cursor.nextSibling; else root.insertBefore(n, cursor);
+        } else {
+          const n = node(null);
+          parent.insertBefore(n, b ? at(b - 1) : null);
+        }
+        break;
+      }
+      case 2: { const parent = at(v()), n = at(v()), b = v(); parent.insertBefore(n, b ? at(b - 1) : null); break; }
+      case 3: { const n = at(v()); nodes.delete(n.$i); if (n.firstChild) forgetLater(n); n.remove(); break; }
+      case 4: {
+        const parent = at(v());
+        const kids = [...parent.childNodes];
+        parent.textContent = '';
+        for (const c of kids) { nodes.delete(c.$i); if (c.firstChild) forgetLater(c); }
+        break;
+      }
+      case 5: { const n = at(v()); n.data = str(); break; }
+      case 6: { const n = at(v()); for (let c = v(); c > 0; c--) attr(n, bytes[p++]); break; }
+      case 7: {
+        const d = v(), paths = [];
+        for (let c = v(); c > 0; c--) { const path = []; for (let k = v(); k > 0; k--) path.push(str()); paths.push(path); }
+        decoders[d] = paths;
+        break;
+      }
+      default: throw new Error(`Lasm.UI: bad patch op ${bytes[p - 1]} at byte ${p - 1}`);
+      }
+    }
+    if (hydrating) {
+      while (cursor) { const next = cursor.nextSibling; cursor.remove(); cursor = next; }
+      hydrating = false;
+    }
+    bytes = null;
+  }
+  // Cmd.focus / Cmd.blur, after the frame that may create the element.
+  function focusQueued() {
+    const queue = focusQueue; focusQueue = [];
+    for (const [id, blur] of queue) { const el = doc.getElementById(id); if (el) blur ? el.blur() : el.focus(); }
+  }
+
+  // ---- frames ----
+  // Timings of the last frame (Lean's view, diff and encoding; the applier), for tools.
+  const last = { leanMs: 0, applyMs: 0, bytes: 0, frames: 0 };
+  function frame() { pending = false; render(); }
+  function render() {
+    if (stopped) return;
+    const t0 = performance.now();
+    const patch = lean.frame();
+    const t1 = performance.now();
+    if (patch.length) apply(patch);
+    if (focusQueue.length) focusQueued();
+    last.leanMs = t1 - t0; last.applyMs = performance.now() - t1; last.bytes = patch.length; last.frames++;
+  }
+  function schedule() { if (!pending && !stopped) { pending = true; raf(frame); } }
+  const after = needsFrame => { if (needsFrame) schedule(); };
+
+  // ---- events ----
+  const prim = x => x === null || typeof x === 'string' || typeof x === 'number' || typeof x === 'boolean' ? x : undefined;
+  function read(event, current, paths) {
+    const out = new Array(paths.length);
+    for (let i = 0; i < paths.length; i++) {
+      const path = paths[i];
+      let x = path[0] === 'currentTarget' ? current : event[path[0]];
+      for (let j = 1; j < path.length && x != null; j++) x = x[path[j]];
+      out[i] = prim(x);
+    }
+    return out;
+  }
+  function onEvent(event) {
+    if (stopped || !lean) return;
+    const chain = [];
+    let n = event.target;
+    for (; n && n !== root; n = n.parentNode) if (n.$i !== undefined) chain.push(n);
+    if (n !== root || !chain.length) return;
+    const type = event.type, calls = [];
+    const limit = event.bubbles ? chain.length : chain[0] === event.target ? 1 : 0;
+    for (let i = 0; i < limit; i++) {
+      const el = chain[i], l = el.$l && el.$l[type];
+      if (l === undefined) continue;
+      if (l & 1) event.preventDefault();
+      calls.push(chain.length - 1 - i, read(event, el, decoders[l >> 2]));
+      if (l & 2) { event.stopPropagation(); break; }
+    }
+    if (!calls.length) return;
+    const path = new Array(chain.length);
+    for (let i = 0; i < chain.length; i++) path[i] = chain[chain.length - 1 - i].$i;
+    // Discrete user input (a click, a key, typing) shows its result at once,
+    // in the same task, as hand-written DOM code would; continuous events
+    // (pointer moves, scrolling, timers) wait for the next animation frame, so
+    // many of them cost one render.
+    // (Events that applying a patch causes, such as a blur, wait for the frame.)
+    if (lean.event(path, type, calls)) { if (discrete.has(type) && bytes === null) render(); else schedule(); }
+  }
+  const discrete = new Set(['click', 'dblclick', 'auxclick', 'contextmenu', 'mousedown', 'mouseup', 'pointerdown', 'pointerup',
+    'touchstart', 'touchend', 'keydown', 'keyup', 'keypress', 'input', 'change', 'beforeinput', 'submit', 'reset', 'focus', 'blur',
+    'focusin', 'focusout', 'compositionend', 'paste', 'cut', 'copy', 'drop']);
+  function listen(type) {
+    if (listening.has(type)) return;
+    listening.add(type);
+    root.addEventListener(type, onEvent, true);
+  }
+
+  // ---- navigation ----
+  const urlChanged = () => { if (lean) after(lean.url(win.location.href)); };
+  function onLinkClick(event) {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const a = event.target.closest?.('a[href]');
+    if (!a || !root.contains(a) || (a.target && a.target !== '_self') || a.hasAttribute('download')) return;
+    const url = new URL(a.href, win.location.href);
+    if (url.origin !== win.location.origin) return;
+    event.preventDefault();
+    if (url.href !== win.location.href) { win.history.pushState(null, '', url.href); urlChanged(); }
+  }
+
+  // ---- subscriptions ----
+  const fire = (id, values) => { if (!stopped && lean && subs.has(id)) after(lean.sub(id, values)); };
+  function subscribe(id, spec) {
+    const [kind] = spec;
+    const sub = { stop: () => {} };
+    switch (kind) {
+    case 'every': { const t = setInterval(() => fire(id, [Date.now()]), spec[1]); sub.stop = () => clearInterval(t); break; }
+    case 'frame': {
+      let h;
+      const loop = ts => { h = raf(loop); fire(id, [ts]); };
+      h = raf(loop);
+      sub.stop = () => cancelRaf(h);
+      break;
+    }
+    case 'window': case 'document': {
+      const target = kind === 'window' ? win : doc, [, type, paths, pd, sp] = spec;
+      const handler = event => { if (pd) event.preventDefault(); if (sp) event.stopPropagation(); fire(id, read(event, target, paths)); };
+      target.addEventListener(type, handler);
+      sub.stop = () => target.removeEventListener(type, handler);
+      break;
+    }
+    default: throw new Error(`Lasm.UI: unknown subscription ${kind}`);
+    }
+    subs.set(id, sub);
+  }
+
+  const storage = which => which === 'session' ? win.sessionStorage : win.localStorage;
+  const module = {
+    options: () => ({ flags, url: win.location?.href ?? 'http://localhost/', hydrate }),
+    connect(callbacks) {
+      lean = callbacks;
+      if (callbacks.application) {
+        root.addEventListener('click', onLinkClick);
+        win.addEventListener('popstate', urlChanged);
+      }
+    },
+    apply(frameBytes) { if (frameBytes.length) apply(frameBytes); },
+    schedule,
+    error(message) { console.error(`[lasm:ui] ${message}`); },
+    sub: subscribe,
+    unsub(id) { subs.get(id)?.stop(); subs.delete(id); },
+    timeout(ms, f) { setTimeout(() => { if (!stopped) after(f()); }, ms); },
+    http(method, url, headers, body, credentials, f) {
+      win.fetch(url, { method, headers, body: body ?? undefined, credentials })
+        .then(async r => [true, r.status, r.statusText, [...r.headers], await r.text()], e => [false, String(e?.message ?? e)])
+        .then(result => { if (!stopped) after(f(...result)); });
+    },
+    now: () => Date.now(),
+    navigate(url, replace) {
+      win.history[replace ? 'replaceState' : 'pushState'](null, '', new URL(url, win.location.href).href);
+      urlChanged();
+    },
+    go(n) { win.history.go(n); },
+    load(url) { win.location.assign(url); },
+    storageSet(which, key, value) { try { storage(which).setItem(key, value); } catch { /* storage unavailable */ } },
+    storageRemove(which, key) { try { storage(which).removeItem(key); } catch { /* storage unavailable */ } },
+    storageGet(which, key) { try { return storage(which).getItem(key); } catch { return null; } },
+    focus(id, blur) { focusQueue.push([id, blur]); schedule(); },
+    title(t) { doc.title = t; },
+  };
+  return {
+    module,
+    unmount() {
+      stopped = true;
+      for (const s of subs.values()) s.stop();
+      subs.clear();
+      for (const type of listening) root.removeEventListener(type, onEvent, true);
+      root.removeEventListener('click', onLinkClick);
+      win.removeEventListener('popstate', urlChanged);
+      for (let c = root.firstChild; c; c = c.nextSibling) forget(c);
+      doomed = [];
+      root.textContent = '';
+    },
+    // For tests and tools.
+    stats: () => (sweep(), { nodes: nodes.size - 1, names: names.length, decoders: decoders.length, last: { ...last } }),
+    applyForTest: apply,
+  };
+}
+
+/** One instance per mounted app (src/edge/edge-start.mjs): its root element,
+ * flags and hydrate option come from mount(). */
+export function lasmInstance(context) {
+  if (!context.root) return standIn;
+  const ui = createUi({ root: context.root, flags: context.flags, hydrate: context.hydrate });
+  context.onDispose?.(() => { ui.unmount(); delete context.root.lasmUi; });
+  // For tools and tests: element.lasmUi.stats() (node count, last frame's timings).
+  context.root.lasmUi = { stats: ui.stats };
+  return ui.module;
+}
+
+// What builds for other targets (and Lasm's binding check) see.
+const browserOnly = name => () => {
+  throw new Error(`lasm:ui-dom ${name}: Lasm.UI apps run in the browser; build with lasm build --target browser and mount the app (docs/UI.md)`);
+};
+export const options = browserOnly('options');
+export const connect = browserOnly('connect');
+export const apply = browserOnly('apply');
+export const schedule = browserOnly('schedule');
+export const error = browserOnly('error');
+export const sub = browserOnly('sub');
+export const unsub = browserOnly('unsub');
+export const timeout = browserOnly('timeout');
+export const http = browserOnly('http');
+export const now = browserOnly('now');
+export const navigate = browserOnly('navigate');
+export const go = browserOnly('go');
+export const load = browserOnly('load');
+export const storageSet = browserOnly('storageSet');
+export const storageRemove = browserOnly('storageRemove');
+export const storageGet = browserOnly('storageGet');
+export const focus = browserOnly('focus');
+export const title = browserOnly('title');
+const standIn = { options, connect, apply, schedule, error, sub, unsub, timeout, http, now, navigate, go, load, storageSet, storageRemove, storageGet, focus, title };

@@ -247,7 +247,21 @@ export function treeFingerprint(directory) {
  * record (in `stamps`, inside the managed cache) holds the tree fingerprint
  * taken before and after a successful full check. Without `stamps` (cache
  * repair, release tooling) the full check always runs. */
+/** `lasm dev` (one long-lived build service): a tree verified once in this
+ * process is not walked again on each rebuild. Ordinary commands still stat
+ * every file on every build. */
+const sessionVerified = new Set();
+let sessionTrust = false;
+export function trustVerifiedTreesForSession(enabled = true) { sessionTrust = enabled; if (!enabled) sessionVerified.clear(); }
+export const sessionTrusted = () => sessionTrust;
+
 export async function verifyTreeOnce(stamps, key, directory, verify) {
+  if (sessionTrust && sessionVerified.has(key + '\0' + directory)) return;
+  await verifyTreeOnceUncached(stamps, key, directory, verify);
+  if (sessionTrust) sessionVerified.add(key + '\0' + directory);
+}
+
+async function verifyTreeOnceUncached(stamps, key, directory, verify) {
   if (!stamps) return verify();
   const record = join(stamps, digest(key) + '.json');
   const before = treeFingerprint(directory);
@@ -375,7 +389,7 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
 }
 
 /** Record immutable build-tool derivations separately from upstream downloads. */
-export async function deriveArtifact(provenance, produce, { cache = managedCacheDirectory(), log = console.error, signal, progress } = {}) {
+export async function deriveArtifact(provenance, produce, { cache = managedCacheDirectory(), log = console.error, signal, progress, cachedOnly = false } = {}) {
   const identity = digest(JSON.stringify(provenance)), directory = resolve(cache, 'derived', identity);
   if (pending.has(directory)) return pending.get(directory);
   const operation = withCacheEntryLock(cache, 'derived', identity, async () => {
@@ -390,6 +404,8 @@ export async function deriveArtifact(provenance, produce, { cache = managedCache
       try { await lstat(directory); throw new Error(`Incomplete derived tool cache: ${directory}`); }
       catch (missing) { if (missing.code !== 'ENOENT') throw missing; }
     }
+    // cachedOnly: report instead of downloading or assembling (lasm init's editor setup).
+    if (cachedOnly) throw Object.assign(new Error('Not in the tool cache yet'), { code: 'ERR_LASM_NOT_CACHED' });
     await createOwnedStaging(staging);
     try {
       const tree = join(staging, 'tree'); await mkdir(tree);

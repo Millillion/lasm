@@ -7,7 +7,9 @@ name: npm distribution (local registry)
 # Lasm tool cache, LASM_ARTIFACT_SOURCE=npm (no direct downloads) and a network
 # audit that blocks every non-loopback request. Nothing is published anywhere else.
 # The `edge` scenario builds every edge target from the edge runtime the CLI
-# bundles. With bun-deno (the default when called), Bun and Deno then install and
+# bundles; `launch` builds and serves the web, fetch, fastify and fullstack templates,
+# the WASI targets, the Vite plugin (@lasm/cli/vite) and `lasm editor` (vite and
+# fastify are mirrored with their dependency trees). With bun-deno (the default when called), Bun and Deno then install and
 # run the same packages from the same registry with no Node or npm on PATH
 # (scripts/edge/published-ci.mjs, LASM_PUBLISHED_REQUIRE=1: nothing may be skipped).
 #
@@ -126,12 +128,24 @@ jobs:
       - name: Start a loopback Verdaccio and publish to it
         run: |
           node scripts/npm-dist/registry.mjs start --dir "$RUNNER_TEMP/verdaccio" --port 4873
-          node scripts/npm-dist/registry.mjs publish --dir "$RUNNER_TEMP/verdaccio" --dist .work/npm-dist/build --mirror-template hono --mirror-bundled
+          node scripts/npm-dist/registry.mjs publish --dir "$RUNNER_TEMP/verdaccio" --dist .work/npm-dist/build --mirror-template hono --mirror-template fastify --mirror-closure vite@8.3.5 --mirror-bundled
       - name: Install from the registry and build (empty caches, npm only, non-loopback requests blocked)
         run: |
-          for scenario in installed lake c-tier edge npx init create omit-optional foreign-lock; do
+          for scenario in installed lake c-tier edge launch-web launch-fetch launch-fastify launch-fullstack npx init create omit-optional foreign-lock; do
             node scripts/full-lean/run-bounded.mjs --memory-mib "$MEMORY" --report ".work/npm-consumer-$scenario-resources.json" -- \
               node scripts/npm-dist/consumer.mjs --registry http://127.0.0.1:4873/ --dist .work/npm-dist/build --work "$RUNNER_TEMP/consumer" --scenario "$scenario"
+          done
+      - name: The post-publish template checks (published-templates.yml) against this registry
+        if: matrix.platform == 'linux-x64'
+        run: |
+          set -e
+          version=$(node -p "require('./.work/npm-dist/build/npm-dist.json').main.version")
+          for template in web fullstack; do
+            for stage in create warm build serve; do
+              node scripts/full-lean/run-bounded.mjs --memory-mib "$MEMORY" --report ".work/verify-$template-$stage-resources.json" -- \
+                node scripts/release/verify-create.mjs --registry http://127.0.0.1:4873/ --version "$version" --template "$template" \
+                  --work "$RUNNER_TEMP/verify-$template" --stage "$stage" --report ".work/verify-$template.json"
+            done
           done
       - name: Pinned Bun and Deno
         if: inputs.bun-deno

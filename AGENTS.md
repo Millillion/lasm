@@ -36,8 +36,15 @@
   scoped native installed/deployment workflow on all five (and historically on
   Windows ARM64), with ahead-of-time restrictions. Exact accepted OS/tool
   versions and artifact identities are in `docs/NODE_ACCEPTANCE.md`.
-  Lasm targets Node only (user decision, 2026-10-16; see `docs/PLAN.md`); do not
-  add other JavaScript engines. Broader API parity and experimental helper integration remain
+  Deployment scope (superseding the 2026-10-16 "Node only" decision, per the
+  user's later decisions; see `docs/DECISIONS.md`): Node with the full runtime
+  (0.1.0); edge isolates (Cloudflare Workers, Vercel Edge, Netlify Edge, Deno
+  Deploy, Supabase Edge Functions) and Bun and Deno as both the compiler's runtime
+  and a program target (0.2.0); WASI, wasi-http/Spin, Fastly Compute and browsers
+  (0.3.0). Never label these "experimental". Platforms are tested only with
+  their local runtimes, images and emulators in CI, never real deployments, and
+  platform CLIs never run locally. Add a new engine or platform only on the
+  user's decision. Broader API parity and experimental helper integration remain
   deferred. Preserve their source, tests, artifacts and failures. Recheck
   official Node/Lean releases before a new acceptance campaign and pin exact
   versions within it. Keep Lean selectable through `lean-toolchain`.

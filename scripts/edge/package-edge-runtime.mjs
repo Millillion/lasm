@@ -11,6 +11,7 @@ import { join, resolve, relative, sep } from 'node:path';
 import { packArchive } from '../lean-dist/tiers.mjs';
 import { createHash } from 'node:crypto';
 import { edgeArchives, edgeExtras } from '../../src/edge/edge-runtime.mjs';
+import { edgeLeanPatches, leanRuntimeChanges, noticeText } from '../../src/notices.mjs';
 
 const [edgeArg, nodeArg, outArg] = process.argv.slice(2);
 const edge = resolve(edgeArg), node = resolve(nodeArg), out = resolve(outArg);
@@ -36,6 +37,11 @@ for (const [name, digest] of Object.entries(manifest.sysroot.files)) {
 writeFileSync(join(out, root, 'libraries.json'), JSON.stringify({ schema: 1, profile: 'edge', lean: nodeManifest.lean,
   leanCommit: nodeManifest.leanCommit, emscripten: nodeManifest.emscripten, baseRuntimeManifestSha256: manifest.baseRuntimeManifestSha256,
   files: manifest.files, sysroot: manifest.sysroot }, null, 2) + '\n');
+// The edge build's own patch list when the assembly recorded it, else the Node
+// runtime's shared patches plus 'edge' (how build-application-runtime.mjs builds it).
+const recorded = existsSync(join(edge, 'build-inputs.json')) ? JSON.parse(readFileSync(join(edge, 'build-inputs.json'), 'utf8')).patches : null;
+const edgePatches = recorded ? Object.keys(recorded) : edgeLeanPatches(Object.keys(nodeManifest.patches));
+for (const name of edgePatches) if (!leanRuntimeChanges[name]) throw new Error(`No notice text for Lean patch ${name} (src/notices.mjs leanRuntimeChanges)`);
 // The same components as the Node runtime's archives (Lean's C++ runtime,
 // Apache-2.0; Lasm's host bridge, MIT), so its notices apply unchanged.
 writeFileSync(join(out, root, 'THIRD_PARTY_NOTICES.txt'), `Lasm edge runtime for Lean ${nodeManifest.lean}: Lean's C++ runtime (libleanrt, libleancpp),
@@ -43,8 +49,16 @@ Lasm's host bridge (liblasmhost) and Lasm.JS edge glue (liblasmjsedge), built si
 sources and patches recorded in scripts/full-lean/ and src/edge/ of https://github.com/Millillion/lasm;
 and Emscripten ${nodeManifest.emscripten}'s single-threaded system libraries (sysroot/: musl libc, LLVM libc++,
 libc++abi, libunwind, compiler-rt, mimalloc and Emscripten's own libraries), built by its embuilder.
-Lasm's host bridge and glue: MIT License, Copyright (c) 2026 Jordan Last. The notices of the runtime and
+Lasm's host bridge and glue are under the MIT License ("Lasm" below). The notices of the runtime and
 of Emscripten's libraries (the same components as the Node runtime's) follow.
+
+=== Lasm ===
+${noticeText('LASM-LICENSE.txt')}
+=== Changes to Lean (Apache-2.0 section 4(b)) ===
+Lasm changed these files of Lean ${nodeManifest.lean} (https://github.com/leanprover/lean4/tree/${nodeManifest.leanCommit})
+before compiling this runtime; the patches are in
+https://github.com/Millillion/lasm/tree/main/scripts/full-lean/patches:
+${edgePatches.map(name => `  - ${name}: ${leanRuntimeChanges[name].slice(0, -1).join('; ')} (${leanRuntimeChanges[name].at(-1)})`).join('\n')}
 
 ` + readFileSync(join(node, 'THIRD_PARTY_NOTICES.txt'), 'utf8'));
 const name = `${root}.tar.zst`, file = join(out, name);

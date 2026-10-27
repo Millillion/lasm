@@ -13,7 +13,13 @@ name: release-checks
 # the edge runtime build, wrangler dev/workerd, vercel build and Vercel's
 # edge-runtime, netlify build/dev offline, Deno, Supabase's edge-runtime image,
 # the compiler under Bun and Deno, and an installed candidate under Bun and
-# Deno on all five platforms). `release-checks` passes only when all of them pass, and records
+# Deno on all five platforms); the browser target (browser.yml), Lasm.UI
+# (ui.yml), the WASI, wasi-http and Fastly checks (wasi.yml), the fullstack
+# template on every host (fullstack.yml), the unit suite (unit.yml) and the dev
+# loop, editor and cold start (dx-dev-loop.yml) and the Lasm.JS hang stress
+# (lasm-js-stress.yml, 50 runs per program on four platforms), each called with this
+# commit's sources (release-check: true where a workflow skips main otherwise).
+# `release-checks` passes only when all of them pass, and records
 # the result in the `release-checks` artifact, which release.yml reads before it
 # publishes anything (it accepts only a full run for a push to main).
 #
@@ -107,6 +113,16 @@ jobs:
       license: MIT
       overlay-source: ${{ inputs.overlay-source == true }}
 
+  # The browser target (docs/BROWSER.md): every engine, the budgets (browser.yml).
+  browser:
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/browser.yml
+    with:
+      macos: true
+
   # The edge targets and Bun/Deno for this commit (since 0.2.0; docs/EDGE.md,
   # docs/BUN_DENO.md): every job of workers.yml must pass.
   edge:
@@ -118,9 +134,73 @@ jobs:
     with:
       release-check: true
 
+  # The WASI and Fastly Compute targets (wasi.yml, docs/WASI.md) checked on
+  # wasmtime, wasmer, node:wasi, Spin and Viceroy (on main too: release-check).
+  wasi:
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/wasi.yml
+    with:
+      release-check: true
+
+  # Lasm.UI: the library, its proofs, the diff model and the DOM applier (ui.yml).
+  ui:
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ui.yml
+
+  # The fullstack template end to end on Node, Workers, Bun, Deno, Fastly and
+  # wasmtime serve, and `npm run dev` (fullstack.yml).
+  fullstack:
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/fullstack.yml
+    with:
+      release-check: true
+
+  # The whole unit suite (unit.yml).
+  unit:
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/unit.yml
+
+  # Lasm.JS programs run many times with a short timeout on four platforms; a hang
+  # fails it and leaves diagnostics (lasm-js-stress.yml, since 0.3.0).
+  stress:
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/lasm-js-stress.yml
+    with:
+      runs: '50'
+      cli-runs: '10'
+      timeout-s: '30'
+
+  # The templates' dev loop, the editor support and cold start (dx-dev-loop.yml).
+  dx:
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/dx-dev-loop.yml
+
   release-checks:
     name: release-checks
-    needs: [detect, candidate, rehearsal, edge]
+    needs: [detect, candidate, rehearsal, edge, browser, wasi, ui, fullstack, unit, dx, stress]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -134,7 +214,14 @@ jobs:
           DIST_TAG: ${{ needs.detect.outputs.dist-tag }}
           CANDIDATE: ${{ needs.candidate.result }}
           REHEARSAL: ${{ needs.rehearsal.result }}
+          BROWSER: ${{ needs.browser.result }}
           EDGE: ${{ needs.edge.result }}
+          WASI: ${{ needs.wasi.result }}
+          UI: ${{ needs.ui.result }}
+          FULLSTACK: ${{ needs.fullstack.result }}
+          UNIT: ${{ needs.unit.result }}
+          DX: ${{ needs.dx.result }}
+          STRESS: ${{ needs.stress.result }}
           REUSE: ${{ inputs.candidate-release }}
           REUSE_SHA256: ${{ inputs.candidate-sha256 }}
           OVERLAY: ${{ inputs.overlay-source == true }}
@@ -145,10 +232,11 @@ jobs:
           mkdir -p manifest
           node -e "
             const e = process.env, release = e.RELEASE === 'true', full = !e.REUSE && e.OVERLAY !== 'true';
-            const passed = e.DETECT === 'success' && (!release || (full ? e.CANDIDATE === 'success' : e.CANDIDATE === 'skipped') && e.REHEARSAL === 'success' && e.EDGE === 'success');
+            const gates = [e.EDGE, e.BROWSER, e.WASI, e.UI, e.FULLSTACK, e.UNIT, e.DX, e.STRESS];
+            const passed = e.DETECT === 'success' && (!release || (full ? e.CANDIDATE === 'success' : e.CANDIDATE === 'skipped') && e.REHEARSAL === 'success' && gates.every(r => r === 'success'));
             const manifest = { schema: 1, workflow: 'release-checks', passed, release, full, version: e.VERSION, previous: e.PREVIOUS, distTag: e.DIST_TAG,
               sha: e.GITHUB_SHA, headSha: e.HEAD_SHA, event: e.GITHUB_EVENT_NAME, ref: e.GITHUB_REF, runId: e.GITHUB_RUN_ID, runAttempt: e.GITHUB_RUN_ATTEMPT,
-              jobs: { detect: e.DETECT, candidate: e.CANDIDATE, rehearsal: e.REHEARSAL, edge: e.EDGE },
+              jobs: { detect: e.DETECT, candidate: e.CANDIDATE, rehearsal: e.REHEARSAL, edge: e.EDGE, browser: e.BROWSER, wasi: e.WASI, ui: e.UI, fullstack: e.FULLSTACK, unit: e.UNIT, dx: e.DX, stress: e.STRESS },
               candidate: release ? { release: e.REUSE || e.TESTED_RELEASE, sha256: e.REUSE_SHA256 || e.TESTED_SHA256 } : null,
               rehearsal: release ? { version: e.VERSION, license: 'MIT', node: '26.12.1', overlaySource: e.OVERLAY === 'true', record: 'npm-dist-linux-x64/linux-x64/npm-dist.json' } : null };
             require('node:fs').writeFileSync('manifest/release-checks.json', JSON.stringify(manifest, null, 2) + '\n');

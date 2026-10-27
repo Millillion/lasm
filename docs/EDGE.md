@@ -91,7 +91,7 @@ values through the `env` argument of the fetch handler.
 
 - **The edge runtime ships inside `@lasm/cli`.** The published CLI package
   carries `targets/lean-4.35.0-wasm64-edge/`, extracted at packaging time from
-  `lean-4.35.0-wasm64-edge.tar.zst` (release `lean-4.35.0-edge-v1`) after
+  `lean-4.35.0-wasm64-edge.tar.zst` (release `lean-4.35.0-edge-v2`) after
   checking it against the SHA-256 in
   [`src/edge-runtimes.json`](../src/edge-runtimes.json) and every library
   against its `libraries.json` (`scripts/npm-dist/build.mjs`). It adds about
@@ -540,7 +540,7 @@ Free limit, and under Vercel Edge's 1 MB-gzip Hobby limit. The Node profile's
     function, so one `main` serves both.
   - `waitForever` returns at once on the edge, because the isolate's lifetime
     is the platform's.
-- **Planned: a pure-Lean `Lasm.Fetch` handler API.** `Lasm.Fetch.serve
+- **Done (2026-10-26, [FETCH.md](FETCH.md)): a pure-Lean `Lasm.Fetch` handler API.** `Lasm.Fetch.serve
   (handler : Request → Async Response)` with Lean `Request`/`Response`
   structures (method, URL, headers, body bytes). It would be implemented on
   `Lasm.JS` and work on Node too: the "pure Lean" path with no npm package.

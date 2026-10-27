@@ -105,20 +105,16 @@ O *resolve_request(O *promise, O *resource, const Reply &r, unsigned k) {
 #ifdef LASM_FULL_NATIVE_THREADS
 // Native libuv completes promises outside Lean's task pool. Preserve that
 // property: pending socket reads must never occupy all ordinary Lean workers.
+// The thread starts with the program's first asynchronous host request, not at
+// initialization: each thread is a Node Worker (tens of milliseconds of CPU at
+// start-up), and many programs (servers whose work happens in JavaScript
+// callbacks) never make one. Completions queue in the host until the thread's
+// first poll, so the requesting thread does not wait for it to start (it could
+// not while Node's main thread waits in a synchronous JavaScript callback).
 void ensure_completion_thread() {
     static std::once_flag initialized;
     std::call_once(initialized, [] {
-        std::mutex mutex;
-        std::condition_variable ready;
-        bool started = false;
-        lean::lthread worker([&] {
-            // Load the host and complete worker startup before Lean application
-            // timers begin. Native Lean also starts its UV loop at initialization.
-            Reply startup(23);
-            {
-                std::lock_guard<std::mutex> guard(mutex);
-                started = true; ready.notify_one();
-            }
+        lean::lthread worker([] {
             for (;;) {
                 // Op 95 returns every completion queued so far, in order, as
                 // (u64 size, packet) records. Packet: promise, resource, kind,
@@ -145,8 +141,6 @@ void ensure_completion_thread() {
                 }
             }
         }); // lthread detaches; Emscripten terminates it with the process runtime.
-        std::unique_lock<std::mutex> lock(mutex);
-        ready.wait(lock, [&] { return started; });
     });
 }
 #endif
@@ -281,7 +275,8 @@ O *lean_uv_interface_addresses() {
     return ok(array);
 }
 #ifdef LASM_FULL_NATIVE_THREADS
-void initialize_libuv() { ensure_completion_thread(); }
+// The completion thread starts on demand (ensure_completion_thread).
+void initialize_libuv() {}
 #endif
 #ifdef LASM_EDGE
 // Edge profile: there is no completion thread. The edge pump (runtime/edge.cpp)

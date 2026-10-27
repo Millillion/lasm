@@ -24,7 +24,9 @@ export function createBuildProgress({ log = console.error, now = () => performan
       if (received < current.totalBytes && now() - lastData >= intervalMs)
         detail += `; waiting for download data (${seconds(now() - lastData)})`;
     }
-    write(`${current.stage}${detail} — ${seconds(now() - stageStarted)} elapsed`);
+    // A stage that has only just started shows its name; time follows every 10 s.
+    const elapsed = seconds(now() - stageStarted);
+    write(`${current.stage}${detail}${elapsed === '0s' ? '' : ` — ${elapsed} elapsed`}`);
   };
   const timer = schedule(render, intervalMs);
   timer?.unref?.();

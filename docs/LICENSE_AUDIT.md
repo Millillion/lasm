@@ -1,6 +1,7 @@
-# License compliance audit (before the first npm publication)
+# License compliance audit (0.1.0, updated for 0.2.0 and 0.3.0)
 
-**Status: audit of 2026-10-23, updated 2026-10-24, written by an AI agent.** It
+**Status: audit of 2026-10-23, updated 2026-10-24, extended on 2026-10-26 for
+0.2.0 (published) and 0.3.0 (§11–§16), written by an AI agent.** It
 records what Lasm distributes, which licence terms apply, how each obligation is
 met, and the reasoning. Per the user's instruction of 2026-10-23, nothing is left
 for a lawyer: every question is decided here, choosing the **over-complying**
@@ -45,6 +46,10 @@ Inspected byte for byte:
 | Lake dependencies' licences | Copied into every `dist/` automatically |
 | Lean trademark | Names permitted by the policy; disclaimer kept |
 | Old Windows ARM64 releases | Converted to drafts (no longer public) |
+| **0.2.0/0.3.0 targets** (edge, Bun/Deno, browser, Vite, WASI, Fastly, wasi-http) | **No copyleft code in any output** (§12); every output carries target-specific notices, a licence banner on bundled JavaScript and, server-side, the notices inside the Wasm (§13) |
+| Lean's `LICENSES` in apps | Replaced in application notices by a note: it lists Lean's native release components (glibc, GNU MP, …), none of which is in an app (§13) |
+| Wasmtime adapter in wasi-http components | Apache-2.0 WITH LLVM-exception; text in every wasi-http output and in the CLI package (§14) |
+| Lasm's own licence | MIT everywhere, unchanged; its notice is in every output's notices file (§16) |
 
 ## 3. Inventory and compliance, per package
 
@@ -216,11 +221,17 @@ runtime (recorded in the runtime's `target.json` `patches`, files in
 | `lean-4.34.0-host-backtrace` | `src/runtime/object.cpp` | host backtraces |
 | `lean-4.34.0-libuv-source` | `src/CMakeLists.txt` | pin libuv v1.48.0 by commit |
 | `lean-4.35.0-nonlinear-environment` | `src/runtime/object.cpp` | `LEAN_ABORT_ON_NONLINEAR` |
+| `lean-4.35.0-node-threads` (Node runtime `1b868b43…` on) | `src/runtime/thread.cpp` | run `main` on the program's main thread instead of a further thread |
+| `lean-4.35.0-edge` (edge runtime only, instead of `node-threads`) | `src/CMakeLists.txt`, `src/runtime/mutex.cpp`, `src/runtime/object.cpp` | single-threaded runtime for edge isolates |
 
 `scripts/full-lean/configure-host.mjs` also renames runtime functions that Lasm's
 `runtime/node-*.cpp` replace. **Met by:** the list in every `dist/` and CLI notice
 (object form), and a modification comment in the only modified source file shipped,
-`include/lean/lean.h` (from the next runtime packaging).
+`include/lean/lean.h` (from the next runtime packaging). Outputs linked with the edge runtime (edge, browser, WASI, Fastly, wasi-http) list
+that runtime's patches (`edgeLeanPatches` in `src/notices.mjs`), and the edge runtime
+archive's own `THIRD_PARTY_NOTICES.txt` carries the list and Lasm's full MIT text
+(from `lean-4.35.0-edge-v2`; `v1` named the MIT licence without its text). Tested in
+`test/notices.test.mjs`.
 
 ### 4.2 Permissive licences (MIT, BSD-2/3-Clause, ISC, Zlib, BlueOak-1.0.0, dtoa, SunPro, ZPL-2.1, Cephes)
 
@@ -427,3 +438,149 @@ Parallel work: `ee06055`, `be64a89` (C tier npm packages and their notices),
   They stay available for the accepted history; current source uses `tiers-v2`.
 - `lean-4.34.1-tiers-v1` (an older, still selectable Lean) has the `tiers-v1` gaps;
   rebuild it the same way if 4.34.1 is kept beyond 0.1.0.
+
+
+## 11. Scope of the 0.2.0 and 0.3.0 extension (2026-10-26)
+
+Inspected: the published `@lasm/cli@0.2.0` tarball (`npm pack`, every file),
+including the bundled Node runtime `targets/lean-4.35.0-wasm64/` (manifest
+`8b3e33e0…`) and edge runtime `targets/lean-4.35.0-wasm64-edge/`; the
+`lean-4.35.0-edge-v1` release asset; the `launch` branch at `7d97c52` (0.3.0):
+`src/edge/`, `src/browser/`, `src/vite/`, `src/lasm-modules/`, `src/wasi/`
+(including `component/proxy-template.wasm`), `library/Lasm/{Web,UI,RPC,Fetch,Fastly}`,
+`library/c/`, `runtime/`, `templates/`, `examples/`, `bench/`, `scripts/wasi/wit/`;
+and built outputs of every target (Node `dist/`, Workers, Netlify Edge (inlined
+Wasm), Bun, Deno, browser, Vite, WASI, Fastly, wasi-http) from the 0.2.0 code and
+from this change. Archives were checked with `llvm-nm -A` (every defined and
+undefined symbol) and `strings`; outputs with `scripts/license/check-outputs.mjs`.
+The whole repository was searched for licence headers, SPDX tags, copyright lines
+and "adapted/derived/copied from" provenance notes.
+
+## 12. What each target's output contains
+
+Every non-Node target is the Node build's objects relinked; the inputs are the
+same archives, so the components are the same set. **No copyleft code is linked
+into any output.**
+
+| Target | Files a user ships | Third-party code in them | Licences |
+| --- | --- | --- | --- |
+| `node` (and `lasm package` for Lambda, Lambda@Edge, Vercel, Netlify, Azure, Google) | `dist/` (§3.9) | Lean runtime + stdlib; Emscripten system libraries and JS runtime; musl; libc++/libc++abi/libunwind/compiler-rt; mimalloc; libuv; koffi; Lasm's helpers (musl, Zig compiler-rt) | Apache-2.0; MIT OR NCSA; MIT; Apache-2.0 WITH LLVM-exception; ISC; BSD-2-Clause |
+| Edge: `workers`, `vercel-edge`, `netlify-edge`, `deno`, `deno-deploy`, `bun`, `supabase-edge` | `lasm/program.wasm` (or `program.wasm.mjs`), `lasm/program.mjs`, `lasm/edge-*.mjs`, `lasm/modules/*.mjs`, the generated entry | The edge runtime's single-threaded Lean runtime, Lasm host bridge and Lasm.JS glue; Emscripten's single-threaded system libraries from the edge runtime's `sysroot/` (libc = musl + Emscripten's own libc code, libc++, libc++abi, libunwind, compiler-rt builtins, mimalloc, stubs/noexit/sockets/html5/al/GL-getprocaddr — all Emscripten's MIT OR NCSA code); the Node runtime's stdlib archives and libuv members where referenced; Emscripten's JS runtime | as above, without koffi |
+| `browser` (and the Vite plugin) | `app.<hash>.js`, `app.<hash>.wasm`, `index.html`, `public/` | the same as edge (the same cached JSPI link) plus Lasm's loader | as edge |
+| `wasi`, `fastly` | `main.wasm` (Fastly: `pkg/<name>.tar.gz` with it) | the edge runtime's Lean runtime and Emscripten system libraries (musl), linked by wasm-ld with Lasm's C WASI host (`src/wasi/*.c`): **no wasi-libc, no WASI SDK** — libc's `__wasi_*` calls are Lasm's own translations to preview 1 (`lasm_wasi_libc.c`) | Apache-2.0; MIT OR NCSA; MIT; Apache-2.0 WITH LLVM-exception; ISC; BSD-2-Clause |
+| `wasi-http` | `main.wasm` (a component) | as `wasi`, plus Wasmtime's `wasi_snapshot_preview1.proxy.wasm` adapter (Rust; may contain Rust `core`, MIT OR Apache-2.0) and wasm-tools-generated canonical ABI glue/type information from the WASI 0.2.12 WIT files | + Apache-2.0 WITH LLVM-exception |
+
+Evidence: the edge runtime's archives (`libleanrt.a`, `libleancpp.a`,
+`liblasmhost.a`, `liblasmjsedge.a`) and its 13 system libraries, and the Node
+runtime's 10 archives: **no `__gmp*`, `gnu_get_libc*`, `__libc_start_main` or
+GCC runtime symbol** defined or referenced (`llvm-nm -A`); the only `mpz` names are
+Lean's own `lean::mpz` class (`USE_GMP=OFF`, decision 5). Built outputs of every
+target contain no copyleft marker (`copyleftMarkers`, src/notices.mjs); the
+scanner finds GNU MP in an old pre-decision-5 build, so it does detect it. Binaryen
+(`wasm-opt`) and wasm-ld only transform the code; their output carries no Binaryen
+or LLVM code beyond the runtime libraries listed. Lasm's Node host calls the
+system C library's `gnu_get_libc_version` through koffi to detect glibc; calling
+the system library is not distributing it.
+
+Bun and Deno as compiler hosts, and as targets (the edge build), add nothing.
+CI-only tools — Playwright and its browsers, wrangler/workerd, the Vercel and
+Netlify CLIs, edge-runtime, Viceroy, wasmtime, wasmer, Spin, wasm-tools, the
+Supabase image, AWS SAM, Azure Functions Core Tools — are downloaded by CI and
+**never redistributed** by Lasm: not in any npm package, release asset or output.
+
+## 13. Notices in every output (fixes in 0.3.0)
+
+0.2.0 copied the Node build's `THIRD_PARTY_NOTICES.txt` into every edge output
+directory. The texts were complete, but: the file described `program.cjs` and
+`host/` (Node files); the files a platform deploys (`lasm/program.mjs`,
+`program.wasm`) carried no notice at all — Lasm's glue compaction drops
+Emscripten's `@license` comments — so a Workers/Vercel/Netlify/Deno/Supabase
+deployment uploaded no licence text; and the file included Lean's `LICENSES`
+(81 KB), which lists the GNU C Library's and GNU MP's licences for Lean's native
+releases although no such code is in an app. 0.3.0 (src/notices.mjs):
+
+- `targetNotices(nodeNotices, kind)`: each target's notices say what its files
+  contain (§12), followed by the same licence texts (Lasm's MIT, the Lean §4(b)
+  change list, Lean's Apache-2.0, Emscripten, LLVM, musl, mimalloc, libuv, Lake
+  dependencies' licence files); wasi-http adds Wasmtime's licence.
+- Lean's `LICENSES` is replaced in application notices (all targets, Node too)
+  by a note naming what it covers; the CLI package keeps it in full.
+- **Banner:** `lasm/program.mjs` (edge) and `app.<hash>.js` (browser) start with
+  a `/*! … */` comment naming every component, its licence, Lasm's copyright and
+  the notices file. Bundlers keep `/*!` comments by default (esbuild:
+  `legalComments: eof` when bundling).
+- **Embedded notices:** edge `program.wasm` (and the inlined `program.wasm.mjs`),
+  `wasi`/`fastly` `main.wasm` and the `wasi-http` component carry the whole
+  notices file as a `lasm.notices` custom section (about 97 KB, 14 KB gzip; Workers'
+  3 MB compressed limit loses under 0.5%). Engines ignore custom sections. The
+  deployed artifact is thus self-describing even when a platform uploads only the
+  bundled script and the Wasm.
+- **Browser:** no embedded copy (the Wasm is size-budgeted): `THIRD_PARTY_NOTICES.txt`
+  is written beside `index.html` and named by the banner; `lasm-manifest.json`
+  names it (`notices`).
+- **Vite:** the plugin emits `THIRD_PARTY_NOTICES.lasm.txt` into Vite's output
+  (one per distinct notices text; several Lean apps are concatenated), and the
+  loader's banner names that file.
+- **Fastly:** `pkg/<name>.tar.gz` holds `<name>/THIRD_PARTY_NOTICES.txt` beside
+  `fastly.toml` and `bin/main.wasm`.
+- **Checks:** `scripts/license/check-outputs.mjs` finds every output under a
+  directory and checks the notices file (Lasm's MIT, Lean's licence, the change
+  list, Emscripten, musl, mimalloc; no GNU MP section or GNU licence text outside
+  Lake dependencies' own files), the banner, the embedded section (equal to the
+  file), the Fastly package, and scans every `.wasm`/`.mjs`/`.cjs`/`.js` for
+  copyleft markers (GNU MP and glibc symbols, GCC identification, GNU/MPL/EPL
+  licence words). It runs after the builds in `wasi.yml`, `workers.yml`,
+  `browser.yml` and `fullstack.yml`; `test/notices.test.mjs` covers every kind
+  with synthetic outputs (passing and failing) and runs in `unit.yml`.
+
+The LLVM exception already waives attribution for libc++, libc++abi, libunwind and
+compiler-rt compiled into a program; their texts are kept anyway (over-complying).
+
+## 14. New components since 0.1.0
+
+| Component | Where | Licence | Obligation and how it is met |
+| --- | --- | --- | --- |
+| Edge runtime `lean-4.35.0-wasm64-edge` (release `lean-4.35.0-edge-v1`; bundled in `@lasm/cli` 0.2.0 as `targets/lean-4.35.0-wasm64-edge/`) | Lean runtime built single-threaded (Apache-2.0, Lasm's patches), Lasm host bridge and Lasm.JS edge glue (MIT), Emscripten's single-threaded system libraries | Apache-2.0, MIT, MIT OR NCSA, Apache-2.0 WITH LLVM-exception | Its `THIRD_PARTY_NOTICES.txt` (Lasm's MIT stated in the preamble, then the Node runtime's notices); in the CLI as `licenses/edge-runtime/`. **No GMP, no glibc** (§12). No source obligation (permissive only). |
+| Wasmtime `wasi_snapshot_preview1.proxy.wasm` v49.0.4, in `src/wasi/component/proxy-template.wasm` | `@lasm/cli` (0.3.0) and every wasi-http output | Apache-2.0 WITH LLVM-exception (Wasmtime has no NOTICE file) | Licence text: `src/wasi/component/LICENSE`, `src/notices/wasmtime-LICENSE.txt`; provenance `src/wasi/component/README.md`; notice section "Wasmtime proxy adapter" in wasi-http outputs and in the CLI's `THIRD_PARTY_NOTICES.txt` (`scripts/package-node-release.mjs`; `scripts/npm-dist/build.mjs` adds it to a candidate that lacks it); `license` field term `Apache-2.0 WITH LLVM-exception` (`cliNoticeSections`). The LLVM exception does not obviously cover an adapter that is not "a result of compiling your source code", so §4(a) is met in full. |
+| wasm-tools 1.262.0 output (component glue) | same | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | the same text (wasm-tools' `LICENSE-Apache-2.0_WITH_LLVM-exception` is byte-identical to Wasmtime's `LICENSE`) |
+| WASI 0.2.12 WIT files, `scripts/wasi/wit/deps/*.wit` | `@lasm/cli` (`scripts/` ships), CI only in use | Apache-2.0 WITH LLVM-exception | Unmodified copies of Wasmtime v49.0.4 `crates/wasi-http/wit/deps` (byte-compared); `LICENSE` and `README.md` (provenance) added beside them |
+| Emscripten-derived code in Lasm sources: `src/wasmtime-console.mjs` (UTF8ToString's short-string decoder), `src/link-driver/glue.mjs` (keeps one Emscripten `@license` header) | CLI | MIT | Header comments name Emscripten and its SPDX tag; Emscripten's licence is in the CLI's notices |
+| libuv error messages in `src/lean-io-errors.mjs` | CLI | MIT | libuv's MIT notice kept in the file |
+| `examples/ui/todomvc/public/style.css` | repository and CLI (`examples/` ships) | todomvc-app-css is CC BY 4.0 (since 2.4; earlier MIT) — attribution only, **not** share-alike | The file is a short rewrite of that look: over-complying, it is treated as Adapted Material: creator, copyright, licence name and URI, the disclaimer reference and a modification statement are now in its header (CC BY 4.0 §3(a)). The TodoMVC class names follow the TodoMVC spec (MIT) |
+| `bench/ui/vanilla/app.js`, `examples/ui/bench/Main.lean`, `bench/ui/phases/Bench.lean` | repository and CLI | js-framework-benchmark: Apache-2.0 | Hand-written; they reuse the benchmark's operations and its label word lists (data). Attribution with licence name and URI added |
+| Template npm dependencies installed by `lasm init` (express 5.2.1, hono 4.13.13, @hono/node-server 2.1.3, fastify 5.12.7, @azure/functions 4.17.0 — MIT; @google-cloud/functions-framework 5.0.5 — Apache-2.0) and Vite (MIT) | the user's `node_modules`, installed by npm | permissive | Not redistributed by Lasm. When a user's bundler bundles them (Workers, Vite), their licences travel per the user's bundler; a Node `dist/` copies `node_modules/` with each package's files |
+| `@lasm/cli` bundled npm packages | unchanged since 0.1.0: tar, minipass, chownr, yallist, minizlib, @isaacs/fs-minipass | BlueOak-1.0.0, ISC, MIT | `licenses/npm/` |
+
+No file in the repository carries a GPL, LGPL, AGPL, MPL, EPL or CC BY-SA header,
+and no provenance note names such a source. `runtime/*.cpp` are Lasm's own (some
+code follows Lean's runtime, Apache-2.0, whose licence is already in every output);
+`library/Lasm/**` and `src/lasm-modules/**` are original; the patch
+`lean-4.32.0-thread-runtime` quotes a few lines of LLVM's `clang/lib/Basic/Stack.cpp`
+(Apache-2.0 WITH LLVM-exception, attributed by URL in the patch).
+
+## 15. Published versions: findings and remedies
+
+| Version | Finding | Remedy |
+| --- | --- | --- |
+| 0.1.0 (`@lasm/cli`, `@lasm/create`, tool packages) | Compliant as audited (§2–§10). Node `dist/` notices include Lean's `LICENSES` (glibc/GMP texts for Lean's native releases) — accurate but misleading, not a violation | Fixed forward in 0.3.0 (§13) |
+| 0.2.0 `@lasm/cli` | **No copyleft** in the package's runtimes (Node `8b3e33e0…`, edge `lean-4.35.0-wasm64-edge`); `license` = `MIT AND Apache-2.0 WITH LLVM-exception AND ISC AND BSD-2-Clause AND Apache-2.0 AND (MIT OR NCSA) AND BlueOak-1.0.0` is accurate; `licenses/edge-runtime/` complete | none needed |
+| 0.2.0 edge/Bun/Deno outputs | Complete texts in the output directory's `THIRD_PARTY_NOTICES.txt`, but the deployed script and Wasm carried no notice (Emscripten's `@license` comment stripped by Lasm's compaction), so a platform deployment uploaded no licence text; the notices described Node files. Permissive licences only, and a platform upload is at most distribution to the platform — not copyleft exposure | **Fixed forward in 0.3.0** (banner + embedded notices + accurate file); not worth deprecating 0.2.0. Users of 0.2.0 comply by keeping the output directory's `THIRD_PARTY_NOTICES.txt` with any copy they distribute |
+| `lean-4.35.0-edge-v1` release asset | Permissive contents only. Its `THIRD_PARTY_NOTICES.txt` states Lasm's MIT licence and copyright in its preamble but not the MIT permission text (the CLI package that bundles it has `LICENSE`) | Lasm's `LICENSE` added to the release as the asset `LASM-LICENSE.txt` (2026-10-26); the archive itself is pinned by SHA-256 (src/edge-runtimes.json), so its preamble gets the full text at the next re-pin (`scripts/edge/package-edge-runtime.mjs`) rather than now |
+| `lean-4.35.0-tiers-v1`, `lean-4.35.0-c-v1`, `lean-4.34.1-tiers-v1` (§3.8, §10) | No longer listed as published releases (2026-10-26); `tiers-v2` (with mirrored sources) is current | none |
+
+## 16. Lasm's own licence (0.3.0)
+
+`LICENSE` is the MIT License, copyright (c) 2026 Jordan Last; the root
+`package.json` now says `"license": "MIT"` too (it had no field; it is private),
+`@lasm/create` is MIT, and `@lasm/cli`'s SPDX expression starts with `MIT`. No
+Lasm file is under another licence, and nothing copyleft was copied in (§14), so
+the MIT grant is valid for the whole of Lasm's own code. Lasm's licence terms are
+unchanged in 0.3.0 (coordinator instruction of 2026-10-26: no runtime exception
+or MIT-0 relicensing; the maintainer decides that separately). Code of Lasm that
+ends up in users' outputs (runtime glue, host, loader, `lasm:*` modules, Lean
+library) is therefore MIT, and its notice is satisfied automatically: Lasm's MIT
+text is the first section of every output's notices (file, embedded section) and
+the banner names it. Open for the maintainer: `lasm init` copies template Lean
+files (Lasm's, MIT) into users' source trees; their outputs carry Lasm's notice,
+but a user who publishes the generated *source* would, strictly, keep Lasm's MIT
+notice too. A permissive licence for the templates (MIT-0) would remove that.

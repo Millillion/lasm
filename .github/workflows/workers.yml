@@ -14,7 +14,7 @@ on:
     inputs:
       release-check: { type: boolean, default: false }
   push:
-    branches: [phase-7]
+    branches: [phase-7, launch]
     paths:
       - '.github/workflows/workers.yml'
       - '.github/workflows/edge-runtime.yml'
@@ -53,6 +53,7 @@ jobs:
     uses: ./.github/workflows/edge-runtime.yml
     with:
       release-check: ${{ inputs.release-check == true }}
+      caller: workers
   # The native host pieces (every platform's, cross-built with zig on x64:
   # scripts/prepare-native.mjs), shared by the jobs below, including arm64.
   native:
@@ -121,11 +122,11 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-libraries
+          name: edge-runtime-libraries-workers
           path: .work/edge-runtime
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-archive
+          name: edge-runtime-archive-workers
           path: .work/edge-archive
       - name: Edge runtime provisioning from the packaged archive (unit tests)
         env:
@@ -145,6 +146,8 @@ jobs:
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
           LASM_KEEP_LINK_WORK: '1'
         run: node scripts/edge/workers-ci.mjs .work/edge-apps .work/edge-tools
+      - name: Licence check of every built output (notices file, banner, embedded notices, no copyleft code)
+        run: node scripts/license/check-outputs.mjs .work/edge-apps --expect edge --report .work/edge-apps/license-check.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -197,7 +200,7 @@ jobs:
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-archive
+          name: edge-runtime-archive-workers
           path: .work/edge-archive
       - name: Extract the packaged edge runtime
         run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
@@ -293,7 +296,7 @@ jobs:
           path: .work/node-candidate
       - uses: actions/download-artifact@v4
         with:
-          name: edge-runtime-archive
+          name: edge-runtime-archive-workers
           path: .work/edge-archive
       - name: Pinned Bun and Deno
         run: npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
@@ -318,8 +321,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+      # Only this workflow's results: release-checks runs other workflows in the same run.
       - uses: actions/download-artifact@v4
         with:
           path: .work/results
-          pattern: '*-results-*'
+          pattern: 'hosts-results-*'
+      - uses: actions/download-artifact@v4
+        with:
+          path: .work/results
+          pattern: 'platform-results-*'
       - run: node scripts/edge/compare-platforms.mjs .work/results

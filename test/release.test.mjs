@@ -43,10 +43,12 @@ test('release.yml accepts only a passed, full push run of release-checks for the
   assert.deepEqual(selectChecksRun([{ ...runs[1], status: 'in_progress' }], { sha }), { run: undefined, pending: true });
 
   const manifest = { schema: 1, workflow: 'release-checks', release: true, passed: true, full: true, sha, version: '0.1.0', event: 'push',
-    jobs: { detect: 'success', candidate: 'success', rehearsal: 'success', edge: 'success' } };
+    jobs: { detect: 'success', candidate: 'success', rehearsal: 'success', edge: 'success', browser: 'success', wasi: 'success', ui: 'success', fullstack: 'success', unit: 'success', dx: 'success', stress: 'success' } };
   assert.deepEqual(manifestProblems(manifest, { sha, version: '0.1.0' }), []);
   assert.match(manifestProblems({ ...manifest, jobs: { ...manifest.jobs, edge: 'skipped' } }, { sha, version: '0.1.0' }).join(), /edge and Bun\/Deno/);
   assert.match(manifestProblems({ ...manifest, jobs: undefined }, { sha, version: '0.1.0' }).join(), /edge and Bun\/Deno/);
+  for (const job of ['browser', 'wasi', 'ui', 'fullstack', 'unit', 'dx', 'stress'])
+    assert.match(manifestProblems({ ...manifest, jobs: { ...manifest.jobs, [job]: 'skipped' } }, { sha, version: '0.1.0' }).join(), new RegExp(`the ${job} checks`));
   assert.match(manifestProblems({ ...manifest, full: false }, { sha, version: '0.1.0' }).join(), /partial/);
   assert.deepEqual(manifestProblems({ ...manifest, full: false, event: 'workflow_dispatch' }, { sha, version: '0.1.0', dryRun: true }), []);
   assert.match(manifestProblems({ ...manifest, rehearsal: { overlaySource: true } }, { sha, version: '0.1.0' }).join(), /overlaid/);
@@ -119,8 +121,10 @@ test('release.yml is the trusted publisher: OIDC, no tokens, serialized, never c
   assert.match(checks, /\n  release-checks:\n    name: release-checks\n/);
   // The edge targets and Bun/Deno gate a release (0.2.0), and the rehearsal runs Bun and Deno from the loopback registry.
   assert.match(checks, /\n  edge:\n[\s\S]*?uses: \.\/\.github\/workflows\/workers\.yml\n/);
-  assert.match(checks, /needs: \[detect, candidate, rehearsal, edge\]/);
-  assert.match(checks, /e\.EDGE === 'success'/);
+  assert.match(checks, /needs: \[detect, candidate, rehearsal, edge, browser, wasi, ui, fullstack, unit, dx, stress\]/);
+  assert.match(checks, /uses: \.\/\.github\/workflows\/wasi\.yml/);
+  assert.match(checks, /uses: \.\/\.github\/workflows\/browser\.yml/);
+  assert.match(checks, /gates = \[e\.EDGE, e\.BROWSER, e\.WASI, e\.UI, e\.FULLSTACK, e\.UNIT, e\.DX, e\.STRESS\]/);
   const dist = readFileSync(new URL('../.github/workflows/npm-dist.yml', import.meta.url), 'utf8');
   assert.match(dist, /scripts\/edge\/published-ci\.mjs/);
   assert.match(dist, /LASM_PUBLISHED_REQUIRE: '1'/);

@@ -1,5 +1,9 @@
 # Lasm current implementation plan
 
+> Platform scope has grown since this plan: edge isolates and Bun/Deno (0.2.0),
+> WASI, Fastly and browsers (0.3.0). Statements below that Node is the only engine
+> describe the first milestones. Current scope: [README](../README.md#platforms).
+
 Agreed 2026-09-25; scope extended 2026-09-26. The immediate milestone is an excellent installation,
 compilation, CLI, packaging, and deployment experience for a basic ordinary Lean
 program running in Node. Complete language and standard-library compatibility
@@ -864,6 +868,12 @@ folded into Phases 5.2/5.3 and 7.
     as an edge host.
 - **Phase 9 — Fastly Compute:** a standard WASI Wasm backend (tested with
   Viceroy).
+  *Status (2026-10-26, branch `wasi`): in source. `lasm build --target wasi|fastly`
+  ([WASI.md](WASI.md)): one `wasi_snapshot_preview1` module, no JavaScript;
+  `Lasm.Fetch` ([FETCH.md](FETCH.md)) serves one pure-Lean handler on Node,
+  the edge, WASI (CGI; Spin's wagi executor) and Fastly. CI `wasi.yml` green
+  in run 40283046831 on wasmtime, wasmer, `node:wasi`, Spin and Viceroy; it is
+  part of the release checks for release pull requests.*
 - **Parked — Lean as a runtime library** (old Phase 5): pure `Lean.*` code at
   run time beyond what already works (JSON, `import Lean`, LSP types); runtime
   parser/elaboration policy decided by the user if a real package needs it.
@@ -900,7 +910,9 @@ the same installed CLI and CI pipeline one separately scoped chunk at a time:
    separately scoped serverless deployment adapters.
 
 **Deno and Bun support removed — 2026-10-16:** by the user's decision, Deno and
-Bun support was removed from Lasm. Lasm targets Node only.
+Bun support was removed from Lasm. Lasm targets Node only. *(Superseded: Bun and
+Deno returned in 0.2.0 with the edge targets; browsers and WASI follow in 0.3.0.
+See [DECISIONS.md](DECISIONS.md) and the [README](../README.md#platforms).)*
 
 Runtime Lean compilation, elaboration, dynamic module loading/evaluation and
 executable plugin loading are now explicitly unavailable in deployed applications.

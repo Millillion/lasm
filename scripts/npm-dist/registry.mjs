@@ -4,7 +4,10 @@
 //
 //   node scripts/npm-dist/registry.mjs start   --dir DIR [--port 4873]
 //   node scripts/npm-dist/registry.mjs publish --dir DIR --dist BUILD_DIR [--mirror-template hono]...
-// --mirror-template copies the exact npm dependencies a `lasm init` template pins
+// --mirror-template copies the exact npm dependencies a `lasm init` template pins,
+// with their whole dependency tree (npm's lockfile resolution against registry.npmjs.org,
+// every platform's optional packages included); --mirror-closure NAME@VERSION does the
+// same for another package (the launch rehearsal's vite).
 // (src/init.mjs) from registry.npmjs.org into the loopback registry, read-only and
 // integrity-checked, so a consumer can install a scaffolded app without uplinks.
 // --mirror-bundled copies the CLI's bundled dependencies (bundleDependencies, at the
@@ -29,7 +32,8 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const [command, ...rest] = process.argv.slice(2);
 const { values: args } = parseArgs({ args: rest, options: { dir: { type: 'string' }, port: { type: 'string', default: '4873' },
   dist: { type: 'string' }, tool: { type: 'string', default: join(root, '.cache/npm-dist/verdaccio') },
-  'mirror-template': { type: 'string', multiple: true, default: [] }, 'mirror-bundled': { type: 'boolean', default: false } } });
+  'mirror-template': { type: 'string', multiple: true, default: [] }, 'mirror-bundled': { type: 'boolean', default: false },
+  'mirror-closure': { type: 'string', multiple: true, default: [] } } });
 assert.ok(['start', 'publish', 'mirror', 'stop'].includes(command) && args.dir, 'Usage: registry.mjs start|publish|mirror|stop --dir DIR');
 const dir = resolve(args.dir), npm = findNpm();
 const runNpm = (npmArgs, options = {}) => execFileSync(npm.command, [...npm.args, ...npmArgs],
@@ -135,7 +139,7 @@ if (command === 'publish' || command === 'mirror') {
     mirrored.push({ name, version, integrity: packed.integrity });
     return meta;
   };
-  if (args['mirror-template'].length || args['mirror-bundled']) {
+  if (args['mirror-template'].length || args['mirror-bundled'] || args['mirror-closure'].length) {
     await mkdir(mirror, { recursive: true });
     await writeFile(publicConfig, 'registry=https://registry.npmjs.org/\n');
   }
@@ -161,15 +165,42 @@ if (command === 'publish' || command === 'mirror') {
         assert.ok(names.has(dependency), `${meta.name}@${meta.version} depends on ${dependency}, which the CLI does not bundle`);
     }
   }
-  if (args['mirror-template'].length) {
+  if (args['mirror-template'].length || args['mirror-closure'].length) {
     const { templateDependencies } = await import('../../src/init.mjs');
+    const roots = {};
     for (const template of args['mirror-template']) {
       assert.ok(templateDependencies[template], `Template ${template} has no npm dependencies`);
-      for (const [name, version] of Object.entries(templateDependencies[template])) {
-        const meta = await mirrorPublic(name, version);
-        // Peer dependencies are other pinned template packages; real dependencies would need mirroring too.
-        assert.deepEqual(meta.dependencies ?? {}, {}, `${name}@${version} has dependencies; mirror them too`);
-      }
+      Object.assign(roots, templateDependencies[template]);
+    }
+    for (const spec of args['mirror-closure']) {
+      const at = spec.lastIndexOf('@');
+      assert.ok(at > 0, `--mirror-closure takes NAME@VERSION: ${spec}`);
+      roots[spec.slice(0, at)] = spec.slice(at + 1);
+    }
+    // npm resolves the whole tree against the public registry (no install, no scripts).
+    const resolver = join(dir, 'mirror-resolve');
+    await rm(resolver, { recursive: true, force: true }); await mkdir(resolver, { recursive: true });
+    await writeFile(join(resolver, 'package.json'), JSON.stringify({ name: 'lasm-mirror', private: true, dependencies: roots }, null, 2) + '\n');
+    runNpm(['install', '--package-lock-only', '--ignore-scripts', '--no-audit', '--no-fund', '--registry', 'https://registry.npmjs.org/',
+      '--userconfig', publicConfig, '--loglevel=error'], { cwd: resolver, env: publicEnv });
+    const lock = JSON.parse(await readFile(join(resolver, 'package-lock.json'), 'utf8'));
+    const seen = new Set(mirrored.map(p => `${p.name}@${p.version}`));
+    for (const [path, entry] of Object.entries(lock.packages)) {
+      if (!path) continue;
+      const name = entry.name ?? path.slice(path.lastIndexOf('node_modules/') + 'node_modules/'.length);
+      if (seen.has(`${name}@${entry.version}`) || name.startsWith('@lasm/')) continue;
+      seen.add(`${name}@${entry.version}`);
+      assert.ok(entry.resolved?.startsWith('https://registry.npmjs.org/') && /^sha512-/.test(entry.integrity ?? ''), `${name}@${entry.version}: unexpected lock entry`);
+      // The tarball npm resolved, checked against the lockfile's (the registry's) integrity.
+      const response = await fetch(entry.resolved, { signal: AbortSignal.timeout(300_000) });
+      assert.ok(response.ok, `${entry.resolved}: HTTP ${response.status}`);
+      const data = Buffer.from(await response.arrayBuffer());
+      const integrity = 'sha512-' + createHash('sha512').update(data).digest('base64');
+      assert.equal(integrity, entry.integrity, `${name}@${entry.version} differs from the public registry`);
+      const file = join(mirror, `${name.replace('/', '__')}-${entry.version}.tgz`);
+      await writeFile(file, data);
+      await upload(file, integrity);
+      mirrored.push({ name, version: entry.version, integrity });
     }
   }
   for (const file of files) await publish(join(tarballs, file));

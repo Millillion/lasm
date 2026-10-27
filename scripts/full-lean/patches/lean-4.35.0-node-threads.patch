@@ -1,0 +1,50 @@
+--- a/src/runtime/thread.cpp
++++ b/src/runtime/thread.cpp
+@@ -8,6 +8,7 @@ Author: Leonardo de Moura
+ #include <vector>
+ #include <iostream>
+ #include <cstring>
++#include <atomic>
+ #ifdef LEAN_WINDOWS
+ #include <windows.h>
+ #else
+@@ -194,10 +195,39 @@ LEAN_EXPORT void run_with_thread_stack(std::function<void()> const & fn) {
+     }
+ }
+ 
++#if defined(LEAN_EMSCRIPTEN) && defined(LEAN_MULTI_THREAD)
++// Lasm: the thread that runs the program's `main`.
++static pthread_t g_lasm_main_thread;
++static std::atomic<bool> g_lasm_main_thread_known{false};
++static void lasm_note_main_thread() {
++    g_lasm_main_thread = pthread_self();
++    g_lasm_main_thread_known.store(true, std::memory_order_release);
++}
++/* Whether the calling thread runs the program's `main` (Lasm.JS lets it serve
++   JavaScript events while `main` waits forever). */
++extern "C" LEAN_EXPORT bool lasm_main_thread_is_current() {
++    return g_lasm_main_thread_known.load(std::memory_order_acquire) && pthread_equal(g_lasm_main_thread, pthread_self());
++}
++#endif
++
+ extern "C" LEAN_EXPORT lean_object * lean_run_main(lean_object * (*main_fn)(int, char **), int argc, char ** argv) {
+     set_thread_stack_size_from_env();
+     lean_object * res = nullptr;
++#if defined(LEAN_EMSCRIPTEN) && defined(LEAN_MULTI_THREAD)
++    // Lasm: under PROXY_TO_PTHREAD the caller already is a dedicated pthread
++    // whose stack is the link's STACK_SIZE (larger than an lthread's default),
++    // and every further thread costs a Worker at start-up. Run `main` here
++    // unless a thread is asked for (LEAN_MAIN_USE_THREAD=1) or LEAN_STACK_SIZE_KB
++    // requests a specific stack size.
++    const char * use_thread_env = std::getenv("LEAN_MAIN_USE_THREAD");
++    if (!std::getenv("LEAN_STACK_SIZE_KB") && !(use_thread_env && std::strcmp(use_thread_env, "1") == 0)) {
++        lasm_note_main_thread();
++        return main_fn(argc, argv);
++    }
++    run_with_thread_stack([&]() { lasm_note_main_thread(); res = main_fn(argc, argv); });
++#else
+     run_with_thread_stack([&]() { res = main_fn(argc, argv); });
++#endif
+     return res;
+ }
+ 

@@ -15,7 +15,7 @@ test('lasm init arguments', () => {
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
   // Cloudflare Workers (edge build): the Hono template only.
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=workers']).deploy, ['workers']);
-  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'workers']), /--deploy workers supports the hono template, not express/);
+  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'workers']), /--deploy workers supports the hono, fetch and fullstack templates, not express/);
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy', 'vercel-edge', '--deploy', 'netlify-edge', '--deploy', 'workers']).deploy, ['vercel-edge', 'netlify-edge', 'workers']);
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy', 'vercel-edge', '--deploy', 'vercel']), /choose one/);
   assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'netlify']), /--deploy netlify needs a server template/);
@@ -37,7 +37,7 @@ test('project names', () => {
 test('every template creates a complete project', () => {
   const root = mkdtempSync(join(tmpdir(), 'lasm-init-'));
   try {
-    for (const template of Object.keys(templates)) {
+    for (const template of Object.keys(templates).filter(name => !templates[name].browser && !templates[name].fullstack)) {
       const directory = join(root, `app ${template}`);
       const result = initProject({ directory, template });
       assert.deepEqual(result.files.sort(), ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Main.lean', 'README.md',
@@ -47,6 +47,8 @@ test('every template creates a complete project', () => {
       assert.match(read('lakefile.toml'), /root = "Main"/);
       const pkg = JSON.parse(read('package.json'));
       assert.equal(pkg.scripts.build, 'lasm build Main.lean');
+      // Servers rebuild and restart on save (lasm dev); the plain program runs once with arguments.
+      assert.equal(pkg.scripts.dev, templates[template].server ? 'lasm dev Main.lean' : 'lasm Main.lean --');
       assert.equal(pkg.engines.node, '>=24');
       assert.equal(Object.keys(pkg.devDependencies).length, 1);
       assert.equal(Boolean(pkg.dependencies), templates[template].interop);
@@ -94,7 +96,7 @@ test('every template creates a complete project', () => {
     assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^deno\/$/m);
     assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /entrypoint to `deno\/main\.mjs`/);
     // Bun and Deno scripts (portable templates: plain and hono only).
-    assert.equal(edgePkg.scripts['dev:bun'], 'bun x --bun lasm Main.lean --');
+    assert.equal(edgePkg.scripts['dev:bun'], 'bun x --bun lasm dev Main.lean');
     assert.equal(edgePkg.scripts['build:deno'], 'lasm build Main.lean --target deno');
     assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /## Bun and Deno/);
     assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^bun\/$/m);
@@ -121,5 +123,53 @@ test('every template creates a complete project', () => {
     mkdirSync(join(root, 'other')); writeFileSync(join(root, 'other', 'notes.txt'), 'keep');
     assert.throws(() => initProject({ directory: join(root, 'other'), template: 'hono' }), /is not empty/);
     assert.equal(readFileSync(join(root, 'other', 'notes.txt'), 'utf8'), 'keep');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('the web template: a static browser app built with --target browser', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-init-web-'));
+  try {
+    const directory = join(root, 'web app');
+    const result = initProject({ directory, template: 'web' });
+    assert.deepEqual(result.files.sort(), ['.gitignore', 'App.lean', 'Main.lean', 'README.md', 'index.html', 'lakefile.toml', 'lean-toolchain',
+      'package.json', 'public/style.css']);
+    const read = file => readFileSync(join(directory, file), 'utf8');
+    const pkg = JSON.parse(read('package.json'));
+    assert.equal(pkg.scripts.build, 'lasm build Main.lean --target browser');
+    assert.equal(pkg.scripts.dev, 'lasm dev Main.lean --target browser');
+    assert.equal(pkg.dependencies, undefined);
+    assert.match(read('Main.lean'), /^import Lasm\.UI$/m);
+    assert.match(read('index.html'), /data-lasm-app/);
+    assert.match(read('index.html'), /<\/head>/);
+    assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'web', '--deploy', 'workers']), /needs a server template/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('the fullstack template: shared, server and client modules; Node and Workers scripts', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-init-fullstack-'));
+  try {
+    const directory = join(root, 'todos');
+    const result = initProject({ directory, template: 'fullstack' });
+    assert.deepEqual(result.files.sort(), ['.gitignore', 'Client.lean', 'README.md', 'Server.lean', 'Shared.lean', 'View.lean', 'lakefile.toml',
+      'lean-toolchain', 'package.json', 'public/style.css', 'wrangler.toml']);
+    const read = file => readFileSync(join(directory, file), 'utf8');
+    const pkg = JSON.parse(read('package.json'));
+    assert.equal(pkg.scripts.dev, 'lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client');
+    assert.equal(pkg.scripts['build:client'], 'lasm build Client.lean --target browser --output dist/public/client');
+    assert.equal(pkg.scripts.start, 'node dist/server/main.mjs');
+    assert.match(pkg.scripts["build:workers"], /lasm build Server\.lean --target workers --output dist\/server$/);
+    assert.match(read('wrangler.toml'), /\[assets\]\ndirectory = "\.\/dist\/public"/);
+    assert.match(read('Server.lean'), /^import Lasm\.RPC\.Server$/m);
+    assert.match(read('Client.lean'), /^import Lasm\.RPC\.Client$/m);
+    assert.match(read('lakefile.toml'), /name = "Shared"/);
+    // Every Lasm.Fetch target: the browser app is embedded in the server program.
+    const all = initProject({ directory: join(root, 'all'), template: 'fullstack', deploy: ['fastly', 'wasi-http', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'spin'] });
+    assert.ok(['fastly.toml', 'spin.toml', 'vercel.json', 'netlify.toml'].every(f => all.files.includes(f)), all.files.join(' '));
+    const scripts = JSON.parse(readFileSync(join(root, 'all', 'package.json'), 'utf8')).scripts;
+    for (const t of ['workers', 'bun', 'deno', 'fastly', 'wasi-http', 'vercel-edge', 'netlify-edge', 'deno-deploy'])
+      assert.equal(scripts[`build:${t}`], `npm run build:client && lasm build Server.lean --target ${t} --output dist/server`, t);
+    assert.match(readFileSync(join(root, 'all', 'fastly.toml'), 'utf8'), /\[local_server\.kv_stores\]\n  TODOS = \[\]/);
+    assert.match(read('Server.lean'), /embed_dir! "dist\/public"/);
+    assert.match(read('Server.lean'), /Lasm\.KV\.open "TODOS"/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

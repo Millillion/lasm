@@ -93,6 +93,9 @@ jobs:
         id: inputs
         run: node -e "const f=require('node:fs'),r=JSON.parse(f.readFileSync('.work/node-runtime-inputs-result.json'));f.appendFileSync(process.env.GITHUB_OUTPUT,'sha256='+r.sha256+'\ncache-key='+r.cacheKey+'\n')"
       - name: Check the included cache storage budget
+        # Cache writes are for main only (scripts/ci/cache-budget.mjs); a
+        # branch build keeps only the durable release asset below.
+        if: github.ref == 'refs/heads/main'
         id: budget
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -114,7 +117,7 @@ jobs:
             --title "Lasm runtime input $GITHUB_RUN_ID" \
             --notes "Pinned runtime handoff; no package acceptance or npm publication is implied. Preserve the recorded SHA-256 when updating scripts/ci/node-runtime-source.json. Source revision: $GITHUB_SHA"
       - name: Record the exact handoff
-        run: cat .work/node-runtime-inputs-result.json .work/node-runtime-cache-budget.json
+        run: cat .work/node-runtime-inputs-result.json; [ ! -f .work/node-runtime-cache-budget.json ] || cat .work/node-runtime-cache-budget.json
       - name: Preserve bounded build results in logs
         if: always()
         run: |

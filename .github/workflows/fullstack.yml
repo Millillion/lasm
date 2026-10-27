@@ -1,0 +1,386 @@
+name: Fullstack
+# The whole stack in Lean (docs/RPC.md): `lasm init --template fullstack`
+# built as a user builds it (scripts/fullstack/build-app.mjs: the Lasm.UI
+# browser app, and the Lasm.Fetch server for Node, Workers, Bun, Deno, Fastly
+# and wasi-http, each embedding the browser app), then tested end to end
+# (scripts/fullstack/fullstack-ci.mjs: server-side rendering, hydration, the
+# shared validation on both sides, the RPC endpoints) in headless Playwright
+# against every host, plus HTTP checks of the embedded assets and of Lasm.KV
+# persistence (scripts/fullstack/smoke.mjs): Node (Chromium, Firefox, WebKit),
+# Workers under `wrangler dev` with a local KV namespace, Bun, Deno with Deno KV,
+# Fastly under Viceroy with a local KV Store, and wasmtime serve. `npm run dev`
+# (one URL, live reload, edit-to-reload time) is timed by
+# scripts/fullstack/dev-reload.mjs. Local emulators only: no account, CI=1,
+# nothing is deployed. Free runners only.
+on:
+  workflow_dispatch:
+  # release-checks.yml (release-check: true, so it also runs on main).
+  workflow_call:
+    inputs:
+      release-check: { type: boolean, default: false }
+  push:
+    branches: [fullstack, launch]
+    paths:
+      - '.github/workflows/fullstack.yml'
+      - 'library/**'
+      - 'templates/fullstack/**'
+      - 'scripts/fullstack/**'
+      - 'src/**'
+permissions:
+  # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
+  contents: write
+concurrency:
+  group: fullstack-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  PLAYWRIGHT: 1.63.0
+  WASMTIME_VERSION: v49.0.4
+  WASMTIME_SHA256: 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
+  VICEROY_VERSION: v0.21.1
+  VICEROY_SHA256: 54a5b46ab05ce1492f4df136728b2eb81b350cb42da5d9f2eec66558ddc1e233
+jobs:
+  runtime:
+    uses: ./.github/workflows/edge-runtime.yml
+    with:
+      release-check: ${{ inputs.release-check == true }}
+      caller: fullstack
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Native host pieces (koffi, helpers)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      - run: tar -cf .work/native-host.tar -C .cache native-host
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fullstack-native-host
+          path: .work/native-host.tar
+          retention-days: 3
+  build:
+    needs: [runtime, native]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+      CI: '1'
+      BROWSER: 'none'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: fullstack-native-host
+          path: .work/native-host
+      - run: mkdir -p .cache && tar -xf .work/native-host/native-host.tar -C .cache
+      - name: Fetch the pinned Node runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-archive-fullstack
+          path: .work/edge-archive
+      - name: Extract the packaged edge runtime
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+      - name: lasm init --template fullstack, then npm run build and build:workers
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: node scripts/fullstack/build-app.mjs .work/fullstack-work .work/fullstack-app
+      - name: Licence check of every built output (server dist, browser client, Workers)
+        run: node scripts/license/check-outputs.mjs .work/fullstack-work .work/fullstack-app --expect browser
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fullstack-app
+          path: .work/fullstack-app
+          retention-days: 7
+          if-no-files-found: error
+  node:
+    needs: build
+    name: Node server, ${{ matrix.browser }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      CI: '1'
+      BROWSER: 'none'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Pinned Playwright and its ${{ matrix.browser }} build
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
+          node .work/pw/node_modules/playwright-core/cli.js install --with-deps "${{ matrix.browser }}"
+      - uses: actions/download-artifact@v4
+        with:
+          name: fullstack-app
+          path: .work/app
+      - name: The template's server (npm start) and the end-to-end checks
+        run: |
+          cd .work/app
+          PORT=3000 HOST=127.0.0.1 node dist/server/main.mjs > server.log 2>&1 &
+          cd ../..
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:3000/ --label node --out .work/results/node-smoke-${{ matrix.browser }}.json || (cat .work/app/server.log; exit 1)
+          node scripts/fullstack/fullstack-ci.mjs --browser ${{ matrix.browser }} --url http://127.0.0.1:3000/ --out .work/results/node-${{ matrix.browser }}.json --playwright .work/pw || (cat .work/app/server.log; exit 1)
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: fullstack-results-node-${{ matrix.browser }}
+          path: .work/results
+          retention-days: 14
+  workers:
+    needs: build
+    name: Workers (wrangler dev, local workerd and KV), chromium
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Pinned wrangler (with workerd), Playwright and Chromium
+        run: |
+          npm install --prefix .work/tools --no-audit --no-fund wrangler@4.152.0
+          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
+          node .work/pw/node_modules/playwright-core/cli.js install --with-deps chromium
+      - uses: actions/download-artifact@v4
+        with:
+          name: fullstack-app
+          path: .work/app
+      - name: wrangler dev (local) with a local TODOS KV namespace, the end-to-end checks, then a restart (Lasm.KV kept the data)
+        run: |
+          cd .work/app
+          # The commented-out binding of the template's wrangler.toml, with a placeholder id: wrangler dev keeps a local copy.
+          printf '\n[[kv_namespaces]]\nbinding = "TODOS"\nid = "local-todos"\n' >> wrangler.toml
+          ../tools/node_modules/.bin/wrangler dev --port 8787 --ip 127.0.0.1 > wrangler.log 2>&1 &
+          echo $! > wrangler.pid
+          cd ../..
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8787/ --label workers --platform-assets --add 'Kept in Workers KV' --out .work/results/workers-smoke.json || (cat .work/app/wrangler.log; exit 1)
+          node scripts/fullstack/fullstack-ci.mjs --browser chromium --label workers --url http://127.0.0.1:8787/ --out .work/results/workers-chromium.json --playwright .work/pw || (cat .work/app/wrangler.log; exit 1)
+          pkill -f 'wrangler dev' || true; pkill -f workerd || true
+          for i in $(seq 50); do curl -s -o /dev/null http://127.0.0.1:8787/ || break; sleep 0.2; done
+          cd .work/app
+          ../tools/node_modules/.bin/wrangler dev --port 8787 --ip 127.0.0.1 > wrangler-2.log 2>&1 &
+          cd ../..
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8787/ --label workers-restarted --platform-assets --expect 'Kept in Workers KV' --out .work/results/workers-restart.json || (cat .work/app/wrangler-2.log; exit 1)
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: fullstack-results-workers
+          path: .work/results
+          retention-days: 14
+  bun-deno:
+    needs: build
+    name: Bun, and Deno with Deno KV, chromium
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      DENO_NO_UPDATE_CHECK: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Pinned Bun, Deno (from npm), Playwright and Chromium
+        run: |
+          npm install --prefix .work/tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
+          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
+          node .work/pw/node_modules/playwright-core/cli.js install --with-deps chromium
+          .work/tools/node_modules/.bin/bun --version
+          .work/tools/node_modules/.bin/deno --version
+      - uses: actions/download-artifact@v4
+        with:
+          name: fullstack-app
+          path: .work/app
+      - name: Bun (npm run start:bun; the todos in memory)
+        run: |
+          cd .work/app
+          PORT=3001 HOST=127.0.0.1 ../tools/node_modules/.bin/bun bun/main.mjs > bun.log 2>&1 &
+          cd ../..
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:3001/ --label bun --add 'Kept by Bun' --out .work/results/bun-smoke.json || (cat .work/app/bun.log; exit 1)
+          node scripts/fullstack/fullstack-ci.mjs --browser chromium --label bun --url http://127.0.0.1:3001/ --out .work/results/bun-chromium.json --playwright .work/pw || (cat .work/app/bun.log; exit 1)
+      - name: Deno with Deno KV (--unstable-kv; Deno Deploy has it built in), then a restart
+        run: |
+          cd .work/app
+          PORT=3002 HOST=127.0.0.1 ../tools/node_modules/.bin/deno run -A --unstable-kv deno/main.mjs > deno.log 2>&1 &
+          echo $! > ../deno.pid
+          cd ../..
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:3002/ --label deno --add 'Kept in Deno KV' --out .work/results/deno-smoke.json || (cat .work/app/deno.log; exit 1)
+          node scripts/fullstack/fullstack-ci.mjs --browser chromium --label deno --url http://127.0.0.1:3002/ --out .work/results/deno-chromium.json --playwright .work/pw || (cat .work/app/deno.log; exit 1)
+          kill "$(cat .work/deno.pid)"; pkill -f 'deno/main.mjs' || true
+          for i in $(seq 50); do curl -s -o /dev/null http://127.0.0.1:3002/ || break; sleep 0.2; done
+          cd .work/app
+          PORT=3002 HOST=127.0.0.1 ../tools/node_modules/.bin/deno run -A --unstable-kv deno/main.mjs > deno-2.log 2>&1 &
+          cd ../..
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:3002/ --label deno-restarted --expect 'Kept in Deno KV' --out .work/results/deno-restart.json || (cat .work/app/deno-2.log; exit 1)
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: fullstack-results-bun-deno
+          path: .work/results
+          retention-days: 14
+  wasm-hosts:
+    needs: build
+    name: Fastly (Viceroy, local KV Store) and wasmtime serve
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CI: '1'
+      BROWSER: 'none'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Pinned wasmtime, Viceroy, Playwright and Chromium
+        run: |
+          set -euo pipefail
+          T=.work/tools; mkdir -p $T/dl $T/wasmtime $T/viceroy
+          get() { curl -fsSL --retry 3 -o "$T/dl/$2" "$1"; echo "$3  $T/dl/$2" | sha256sum -c; }
+          get "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz" wasmtime.tar.xz "$WASMTIME_SHA256"
+          tar -xJf $T/dl/wasmtime.tar.xz -C $T/wasmtime --strip-components=1
+          get "https://github.com/fastly/Viceroy/releases/download/$VICEROY_VERSION/viceroy_${VICEROY_VERSION}_linux-amd64.tar.gz" viceroy.tar.gz "$VICEROY_SHA256"
+          tar -xzf $T/dl/viceroy.tar.gz -C $T/viceroy
+          rm -rf $T/dl
+          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
+          node .work/pw/node_modules/playwright-core/cli.js install --with-deps chromium
+      - uses: actions/download-artifact@v4
+        with:
+          name: fullstack-app
+          path: .work/app
+      - name: Fastly Compute under Viceroy (fastly.toml's local TODOS KV Store; one instance per request, so only the KV keeps the todos)
+        run: |
+          cd .work/app
+          ../tools/viceroy/viceroy serve --addr 127.0.0.1:7676 -C fastly.toml bin/main.wasm > viceroy.log 2>&1 &
+          cd ../..
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:7676/ --label fastly --add 'Kept in the Fastly KV Store' --out .work/results/fastly-smoke.json || (cat .work/app/viceroy.log; exit 1)
+          node scripts/fullstack/fullstack-ci.mjs --browser chromium --label fastly --url http://127.0.0.1:7676/ --out .work/results/fastly-chromium.json --playwright .work/pw || (cat .work/app/viceroy.log; exit 1)
+      - name: wasi-http under wasmtime serve (one instance per request, memory store; pages, assets and the API)
+        run: |
+          cd .work/app
+          ../tools/wasmtime/wasmtime serve --addr 127.0.0.1:8080 wasi-http/main.wasm > wasmtime.log 2>&1 &
+          cd ../..
+          node scripts/fullstack/smoke.mjs --url http://127.0.0.1:8080/ --label wasi-http --add 'Accepted by wasi-http' --no-persist --out .work/results/wasi-http-smoke.json || (cat .work/app/wasmtime.log; exit 1)
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: fullstack-results-wasm-hosts
+          path: .work/results
+          retention-days: 14
+  dev:
+    needs: [runtime, native]
+    name: npm run dev (one URL; edit to reload; ${{ matrix.workers }} build worker(s))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # 2: the default on this runner (outputs build concurrently); 1: one after the other, for comparison.
+        workers: ['2', '1']
+    env:
+      LASM_DEV_WORKERS: ${{ matrix.workers }}
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+      CI: '1'
+      BROWSER: 'none'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: fullstack-native-host
+          path: .work/native-host
+      - run: mkdir -p .cache && tar -xf .work/native-host/native-host.tar -C .cache
+      - name: Fetch the pinned Node runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-archive-fullstack
+          path: .work/edge-archive
+      - name: Extract the packaged edge runtime
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+      - name: lasm init --template fullstack, then npm run dev; edit Client.lean, View.lean, Server.lean
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: |
+          node bin/lasm.mjs init .work/dev-app --template fullstack
+          # The resource guard starts a fresh environment: pass the runtimes on (as build-app.mjs does).
+          node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py \
+            env LASM_APPLICATION_RUNTIME="$LASM_APPLICATION_RUNTIME" LASM_EDGE_RUNTIME="$LASM_EDGE_RUNTIME" LASM_BUILD_JOBS="$LASM_BUILD_JOBS" LEAN_NUM_THREADS="$LEAN_NUM_THREADS" BINARYEN_CORES="$BINARYEN_CORES" CI=1 BROWSER=none LASM_DEV_TRACE=1 LASM_DEV_WORKERS="$LASM_DEV_WORKERS" \
+            node scripts/fullstack/dev-reload.mjs .work/dev-app 3000 .work/results/dev-reload.json -- \
+            node "$GITHUB_WORKSPACE/bin/lasm.mjs" dev --target node=Server.lean,browser=Client.lean --output dist/public/client
+      - name: Edit-to-reload times
+        if: always()
+        run: |
+          test -f .work/results/dev-reload.json || exit 0
+          node -e "
+            const r = require('./.work/results/dev-reload.json');
+            const rows = Object.entries(r.reloads).map(([f, x]) => '| ' + f + ' | ' + (x.seconds?.toFixed(2) ?? 'none') + ' s | ' + x.rebuilds + ' |');
+            console.log(['### npm run dev: edit to reload (linux-x64, ' + process.env.LASM_DEV_WORKERS + ' build worker(s))', '', '| Edited | Edit to reload | Rebuilt |', '| --- | --- | --- |', ...rows].join('\n'));
+            for (const [f, x] of Object.entries(r.reloads)) if (x.seconds > 3) console.log('::warning::' + f + ' edit to reload took ' + x.seconds.toFixed(2) + ' s (target 3 s)');
+          " | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: fullstack-results-dev-${{ matrix.workers }}
+          path: .work/results
+          retention-days: 14

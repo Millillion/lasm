@@ -1,0 +1,271 @@
+name: Browser
+# The browser target (docs/BROWSER.md): builds the web template and the Lasm.Web
+# platform suite with `lasm build --target browser` from this source checkout
+# (scripts/browser/build-apps.mjs), serves them as a static host does
+# (scripts/browser/test-server.mjs, with fetch routes and a WebSocket echo), and
+# runs them headless in pinned Playwright browsers (scripts/browser/browser-ci.mjs):
+# Chromium, Firefox and WebKit on Linux, WebKit on macOS. Records sizes, start
+# times and rebuild times, checks the budgets, and writes one evidence file
+# (scripts/browser/evidence.mjs). Free runners only; nothing is deployed or published.
+on:
+  workflow_dispatch:
+    inputs:
+      macos:
+        description: Also run WebKit on macOS 15
+        type: boolean
+        default: true
+  # release-checks.yml runs it for release candidates.
+  workflow_call:
+    inputs:
+      macos:
+        type: boolean
+        default: true
+  push:
+    branches: [browser, browser-ui, dx-browser, launch]
+    paths:
+      - '.github/workflows/browser.yml'
+      - '.github/workflows/edge-runtime.yml'
+      - 'src/browser/**'
+      - 'src/edge/**'
+      - 'scripts/edge/**'
+      - 'src/dev*.mjs'
+      - 'src/vite/**'
+      - 'src/lasm-modules/**'
+      - 'src/lasm-library.mjs'
+      - 'src/application-build.mjs'
+      - 'src/application-binding-check.mjs'
+      - 'src/application-cli.mjs'
+      - 'src/cli-arguments.mjs'
+      - 'src/init.mjs'
+      - 'src/link-driver/**'
+      - 'library/**'
+      - 'templates/web/**'
+      - 'templates/common/**'
+      - 'test/browser/**'
+      - 'scripts/browser/**'
+      - 'scripts/ui/**'
+      - 'examples/ui/**'
+      - 'bench/ui/**'
+      - 'runtime/edge.cpp'
+permissions:
+  # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
+  contents: write
+concurrency:
+  group: browser-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+env:
+  PLAYWRIGHT: 1.63.0
+jobs:
+  runtime:
+    uses: ./.github/workflows/edge-runtime.yml
+    with:
+      release-check: true
+      caller: browser
+  # The native host pieces the Node build stage needs (as in workers.yml).
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Native host pieces (koffi, helpers)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      - run: tar -cf .work/native-host.tar -C .cache native-host
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: browser-native-host
+          path: .work/native-host.tar
+          retention-days: 3
+  build:
+    needs: [runtime, native]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+      CI: '1'
+      BROWSER: 'none'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: browser-native-host
+          path: .work/native-host
+      - run: mkdir -p .cache && tar -xf .work/native-host/native-host.tar -C .cache
+      - name: Fetch the pinned Node runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-archive-browser
+          path: .work/edge-archive
+      - name: Extract the packaged edge runtime (what users get)
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+      - name: Unit tests of the browser target
+        run: node --test test/browser.test.mjs test/edge.test.mjs test/init.test.mjs
+      - name: Build the apps (web template, platform suite, Lasm.UI examples) for the browser
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: |
+          node scripts/browser/build-apps.mjs .work/browser-work .work/browser-apps \
+            uicounter=examples/ui/counter todomvc=examples/ui/todomvc bench=examples/ui/bench demo=examples/ui/demo
+          # The benchmark's baseline (vanilla JavaScript, no build).
+          cp -r bench/ui/vanilla .work/browser-apps/vanilla
+      - name: Licence check of every built output (notices file, loader banner, no copyleft code)
+        run: node scripts/license/check-outputs.mjs .work/browser-work .work/browser-apps --expect browser,vite
+      - name: lasm dev --target browser (edit, rebuild, reload) on the web template
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: |
+          node bin/lasm.mjs init .work/browser-work/dev-loop --template web
+          node scripts/browser/dev-loop-check.mjs .work/browser-work/dev-loop .work/browser-apps/dev-loop.json
+      - name: lasm dev --target workers (rebuild workers/ only, no platform CLI)
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: |
+          node bin/lasm.mjs init .work/browser-work/dev-edge --template hono --deploy workers
+          (cd .work/browser-work/dev-edge && node -e "const p=require('./package.json');delete p.devDependencies;require('fs').writeFileSync('package.json',JSON.stringify(p,null,2))" && npm install --no-audit --no-fund)
+          node scripts/edge/dev-edge-check.mjs .work/browser-work/dev-edge .work/browser-apps/dev-edge.json
+      - name: Playwright's Chromium, cached per version (for vite dev)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ env.PLAYWRIGHT }}-chromium-ubuntu-24.04
+      - name: Pinned Playwright and Chromium
+        timeout-minutes: 15
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
+          node .work/pw/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: 'The Vite plugin (@lasm/cli/vite, installed from a packed CLI) in development: edit Main.lean, the app is rebuilt and remounted in place'
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: node scripts/browser/vite-dev-check.mjs .work/browser-work/vite .work/browser-apps/vite-dev.json --playwright .work/pw
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: browser-apps
+          path: .work/browser-apps
+          retention-days: 7
+          if-no-files-found: error
+  browsers:
+    needs: build
+    name: ${{ matrix.browser }} on ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: ubuntu-24.04, browser: chromium }
+          - { runner: ubuntu-24.04, browser: firefox }
+          - { runner: ubuntu-24.04, browser: webkit }
+          - { runner: macos-15, browser: webkit, macos: true }
+    env:
+      CI: '1'
+      BROWSER: 'none'
+    steps:
+      - name: Skip macOS when not requested
+        id: gate
+        shell: bash
+        run: |
+          if [ "${{ matrix.macos }}" = "true" ] && [ "${{ inputs.macos }}" = "false" ]; then echo "run=false" >> "$GITHUB_OUTPUT"; else echo "run=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: steps.gate.outputs.run == 'true'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        if: steps.gate.outputs.run == 'true'
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Playwright's browser builds, cached per version
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.os == 'macOS' && '~/Library/Caches/ms-playwright' || '~/.cache/ms-playwright' }}
+          key: playwright-${{ env.PLAYWRIGHT }}-${{ matrix.browser }}-${{ matrix.runner }}
+      - name: Pinned Playwright and its ${{ matrix.browser }} build
+        if: steps.gate.outputs.run == 'true'
+        timeout-minutes: 15
+        shell: bash
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            node .work/pw/node_modules/playwright-core/cli.js install --with-deps "${{ matrix.browser }}"
+          else
+            node .work/pw/node_modules/playwright-core/cli.js install "${{ matrix.browser }}"
+          fi
+      - uses: actions/download-artifact@v4
+        if: steps.gate.outputs.run == 'true'
+        with:
+          name: browser-apps
+          path: .work/browser-apps
+      - name: Run the apps in ${{ matrix.browser }}
+        if: steps.gate.outputs.run == 'true'
+        run: node scripts/browser/browser-ci.mjs --browser ${{ matrix.browser }} --apps .work/browser-apps --out .work/browser-results/${{ matrix.browser }}-${{ runner.os }}.json --playwright .work/pw
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always() && steps.gate.outputs.run == 'true'
+        with:
+          name: browser-results-${{ matrix.browser }}-${{ runner.os }}
+          path: .work/browser-results
+          retention-days: 14
+  evidence:
+    needs: [build, browsers]
+    if: always() && needs.build.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: browser-results-*
+          path: .work/browser-results
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: browser-apps
+          path: .work/browser-apps
+      - name: Budgets and the evidence file
+        env:
+          RUN_ID: ${{ github.run_id }}
+          SOURCE: ${{ github.sha }}
+          BROWSERS_RESULT: ${{ needs.browsers.result }}
+        run: node scripts/browser/evidence.mjs .work/browser-apps/build.json .work/browser-results .work/browser-evidence.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: browser-evidence
+          path: .work/browser-evidence.json
+          retention-days: 30

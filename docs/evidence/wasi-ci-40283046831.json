@@ -1,0 +1,200 @@
+{
+  "started": "2026-10-26T07:03:41.259Z",
+  "host": "linux-x64",
+  "node": "v26.12.1",
+  "tools": {
+    "wasmtime": "wasmtime 49.0.4 (2c2970205 2026-10-19)",
+    "wasmer": "wasmer 7.4.2",
+    "viceroy": "viceroy 0.21.1",
+    "spin": "spin 4.2.2 (7ca44be 2026-10-06)",
+    "deno": "deno 2.9.6 (stable, release, x86_64-unknown-linux-gnu)"
+  },
+  "builds": {
+    "cli-wasi": {
+      "seconds": 38.693,
+      "bytes": 841170,
+      "gzipBytes": 211887
+    },
+    "fetch-wasi": {
+      "seconds": 37.336,
+      "bytes": 847707,
+      "gzipBytes": 213318
+    },
+    "fetch-fastly": {
+      "seconds": 14.55,
+      "bytes": 846278,
+      "gzipBytes": 212412,
+      "package": 212893
+    },
+    "fetch-wasi-cached": {
+      "seconds": 1.238
+    },
+    "fetch-node": {
+      "seconds": 0.775
+    },
+    "fetch-deno": {
+      "seconds": 15.322
+    }
+  },
+  "cli": {
+    "wasmtime": {
+      "cases": {
+        "check": {
+          "status": 0,
+          "ms": 529.2
+        },
+        "sum": {
+          "status": 0,
+          "ms": 15.5
+        },
+        "exit": {
+          "status": 7,
+          "ms": 16.7
+        },
+        "fail": {
+          "status": 1,
+          "ms": 14.2
+        },
+        "deep": {
+          "status": 0,
+          "ms": 15.8
+        },
+        "usage": {
+          "status": 2,
+          "ms": 14.1
+        }
+      },
+      "startupMs": 13.7
+    },
+    "wasmer": {
+      "cases": {
+        "check": {
+          "status": 0,
+          "ms": 510.5
+        },
+        "sum": {
+          "status": 0,
+          "ms": 29.3
+        },
+        "exit": {
+          "status": 7,
+          "ms": 30.6
+        },
+        "fail": {
+          "status": 1,
+          "ms": 33.9
+        },
+        "deep": {
+          "status": 0,
+          "ms": 32.3
+        },
+        "usage": {
+          "status": 2,
+          "ms": 31.6
+        }
+      },
+      "startupMs": 30.1
+    },
+    "node": {
+      "cases": {
+        "check": {
+          "status": 0,
+          "ms": 120
+        },
+        "sum": {
+          "status": 0,
+          "ms": 82.3
+        },
+        "exit": {
+          "status": 7,
+          "ms": 69.2
+        },
+        "fail": {
+          "status": 1,
+          "ms": 77.4
+        },
+        "deep": {
+          "status": 0,
+          "ms": 69.8
+        },
+        "usage": {
+          "status": 2,
+          "ms": 77.8
+        }
+      },
+      "startupMs": 67.2
+    }
+  },
+  "fetch": {
+    "cgi-wasmtime": {
+      "passed": 21,
+      "perRequestMs": {
+        "min": 13.5,
+        "mean": 15.9
+      }
+    },
+    "cgi-wasmer": {
+      "passed": 21,
+      "perRequestMs": {
+        "min": 30.4,
+        "mean": 31.7
+      }
+    },
+    "cgi-node": {
+      "passed": 21,
+      "perRequestMs": {
+        "min": 63.5,
+        "mean": 68.4
+      }
+    },
+    "spin": {
+      "passed": 22,
+      "readyMs": 1039,
+      "perRequestMs": {
+        "median": 1.93,
+        "p90": 2.51,
+        "min": 1.78
+      },
+      "concurrentAsleep200Ms": 222
+    },
+    "viceroy": {
+      "passed": 21,
+      "readyMs": 611,
+      "perRequestMs": {
+        "median": 1.61,
+        "p90": 1.75,
+        "min": 1.41
+      },
+      "concurrentAsleep200Ms": 216
+    },
+    "lasm-node": {
+      "passed": 22,
+      "readyMs": 413,
+      "perRequestMs": {
+        "median": 0.86,
+        "p90": 1,
+        "min": 0.67
+      },
+      "concurrentAsleep200Ms": 214
+    },
+    "deno": {
+      "passed": 22,
+      "readyMs": 215,
+      "perRequestMs": {
+        "median": 0.82,
+        "p90": 0.98,
+        "min": 0.71
+      },
+      "concurrentAsleep200Ms": 219
+    }
+  },
+  "failures": [],
+  "finished": "2026-10-26T07:05:46.397Z",
+  "run": {
+    "id": 40283046831,
+    "workflow": "wasi.yml",
+    "runner": "ubuntu-24.04",
+    "sourceSha": "085100d8996fde22d82ad8b1e8cb3ffddd046845",
+    "edgeRuntimeArchiveFromRun": 40280986468
+  }
+}

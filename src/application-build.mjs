@@ -7,13 +7,13 @@ import { createHash, randomUUID } from 'node:crypto';
 import { provisionLean, selectLeanVersion, toolchainCatalog } from './managed-lean.mjs';
 import { provisionLinkToolchain, linkToolchainCatalog } from './managed-link-toolchain.mjs';
 import { checkSystemGit } from './system-git.mjs';
-import { hashFile, managedCacheDirectory, verificationRecords } from './managed-artifacts.mjs';
+import { hashFile, managedCacheDirectory, sessionTrusted, verificationRecords } from './managed-artifacts.mjs';
 import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject } from './application-sources.mjs';
 import { importsLibrary, librarySources } from './lasm-library.mjs';
-import { planNodeModules, copyNodeModules } from './application-npm.mjs';
-import { readBindings, checkBindings, requireValidBindings } from './application-binding-check.mjs';
+import { planNodeModules, copyNodeModulesAsync } from './application-npm.mjs';
+import { readBindingsAsync, checkBindingsAsync, requireValidBindings } from './application-binding-check.mjs';
 import { linkApplication, selectedLinkDriver, buildProfiles } from './application-link.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint, minimumApplicationNode, minimumApplicationGlibc } from './application-output.mjs';
 import { applicationNativeTargets } from './native-bundle.mjs';
@@ -29,7 +29,13 @@ const helpers = ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-sy
   'function-table-index.mjs', 'table-growth.mjs'];
 const digest = value => createHash('sha256').update(value).digest('hex');
 
+let sessionDriverIdentity;
 async function buildDriverIdentity() {
+  // lasm dev: Lasm's own files do not change during a session.
+  if (sessionTrusted() && sessionDriverIdentity) return sessionDriverIdentity;
+  return sessionDriverIdentity = await computeDriverIdentity();
+}
+async function computeDriverIdentity() {
   const files = await fileInventory(join(root, 'src'));
   for (const name of helpers) files['scripts/' + name] = await hashFile(join(root, 'scripts/full-lean', name));
   files.package = await hashFile(join(root, 'package.json'));
@@ -44,8 +50,12 @@ export async function buildApplication(file, options = {}) {
   const source = resolve(file);
   if (!source.endsWith('.lean') || !(await stat(source)).isFile()) throw new Error(`Expected an existing Lean source: ${source}`);
   const directory = findApplicationProject(source) ?? dirname(source);
-  return withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), () =>
-    withCacheLease(options.cache ?? managedCacheDirectory(), () => buildLockedApplication(source, options), {
+  // releaseAfterImports (lasm dev's concurrent outputs): the project lock covers
+  // Lake building the shared imports only; elaborating this program and linking
+  // it run alongside the other outputs' builds (their work directories differ).
+  return withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), release =>
+    withCacheLease(options.cache ?? managedCacheDirectory(), () => buildLockedApplication(source,
+      options.releaseAfterImports ? { ...options, afterImports: release } : options), {
       onWait: () => options.progress?.({ stage: 'Waiting for tool cache repair to finish' }),
     }), {
     onWait: () => options.progress?.({ stage: 'Waiting for another build in this project to finish' }),
@@ -53,7 +63,11 @@ export async function buildApplication(file, options = {}) {
 }
 
 async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
-  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false } = {}) {
+  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false, afterImports } = {}) {
+  // linkOnly (dev edge and browser builds, src/application-cli.mjs buildEdge):
+  // the Node program is only planned and linked for its link inputs; its
+  // JavaScript glue, host and npm packages are not produced. A separate cache identity.
+  if (linkOnly && (profile !== 'dev' || !keepLinkWork)) throw new Error('linkOnly applies to dev builds that keep their link work');
   // Edge targets (src/edge/edge-build.mjs) relink the compiled program: they
   // need this build's link inputs. true: a cached result is linked again;
   // 'if-built': keep them only when this build links anyway.
@@ -80,7 +94,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const work = join(directory, '.lake/lasm/applications', digest(source).slice(0, 16));
   await mkdir(work, { recursive: true });
   progress?.({ stage: project ? 'Checking Lean sources and Lake dependencies' : 'Checking Lean sources and imports' });
-  let generated = applicationSources(source, lean, work, { log: verbose ? log : () => {} });
+  let generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, afterImports });
   if (generated.needsCCompiler) {
     // Lake packages with C code build it natively with Lean's own clang, as Lake does.
     progress?.({ stage: `Packages with C code (${generated.native.map(item => item.package).join(', ')}) need Lean's C compiler and headers` });
@@ -94,20 +108,26 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const dependencyLicenses = project ? lakeDependencyLicenses(project,
     [...generated.inputs.map(input => input.source), ...nativeCompilations.map(item => item.source)],
     { exclude: [lean.prefix, lean.executionPrefix] }) : [];
-  // Programs that import Lasm.JS link its generated C and C glue.
+  // Programs that import Lasm's library (Lasm.JS, Lasm.UI) link the generated
+  // C of the modules they use, and the Lasm.JS C glue.
   const usesJs = importsLibrary(generated.sources);
+  let library;
   if (usesJs) {
-    const library = librarySources(lean);
+    library = librarySources(lean, generated.sources);
     generated = { ...generated, sources: [...generated.sources, ...library.sources], inputs: [...generated.inputs, ...library.inputs] };
   }
   // npm packages for Lasm.JS: package.json next to the lakefile (or the source).
   const nodeModules = planNodeModules(directory);
-  // Lasm.JS bindings must name existing JavaScript functions.
-  let jsBindings;
+  // Lasm.JS bindings must name existing JavaScript functions. Lean reads them
+  // from the module files and Node loads the packages while the build compiles
+  // and links (separate processes); the result is awaited before any output.
+  let bindingCheck = Promise.resolve(undefined);
   if (usesJs) {
-    progress?.({ stage: 'Checking Lasm.JS bindings' });
-    jsBindings = checkBindings(directory, readBindings(lean, generated.env, generated.oleans(), { cache: join(work, 'bindings') }));
-    for (const warning of requireValidBindings(jsBindings)) log(`Lasm.JS binding warning: ${warning}`);
+    const cache = join(work, 'bindings');
+    bindingCheck = readBindingsAsync(lean, generated.env, [...generated.oleans(), ...library.oleans], { cache })
+      .then(bindings => checkBindingsAsync(directory, bindings, { cache, identity: nodeModules?.identity ?? 'none' }))
+      .then(results => { for (const warning of requireValidBindings(results)) log(`Lasm.JS binding warning: ${warning}`); return results; });
+    bindingCheck.catch(() => {});
   }
   progress?.({ stage: 'Checking application inputs and cached build' });
   const modules = [];
@@ -119,7 +139,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // A tiered Lean is identified by its assembled prefix, which is keyed by the
   // identities of the binaries and every module-data archive it contains.
   // The profile is part of the identity: dev and release outputs never share a cache entry.
-  const recipe = { schema: 1, profile, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
+  const recipe = { schema: 1, profile, ...(linkOnly ? { linkOnly } : {}), lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
     ...(lean.distribution === 'tiers' ? { nativeLeanTier: lean.tier, nativeLeanComponents: lean.components } : {}),
     // Outputs of different link drivers and tool sets never share a cache entry.
     emscripten, linkDriver, ...(linkDriver === 'node'
@@ -141,6 +161,8 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)
     throw new Error('Output directory must not contain application sources or its build cache');
   if (!rebuild && await reusableOutput(cached, signature)) {
+    if (usesJs) progress?.({ stage: 'Checking Lasm.JS bindings' });
+    await bindingCheck;
     progress?.({ stage: 'Reusing verified application build' });
     await deliverOutput(cached, output, signature);
     return { ...JSON.parse(await readFile(join(cached, 'build-info.json'), 'utf8')), output, cached, signature, cacheHit: true };
@@ -154,17 +176,26 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const temporary = join(work, '.build-' + randomUUID()), dist = join(temporary, 'dist');
   await mkdir(dist, { recursive: true });
   let linkRequirements;
+  // npm packages are copied into dist/ while the program compiles and links.
+  const npmCopy = nodeModules && !linkOnly ? copyNodeModulesAsync(nodeModules, dist) : Promise.resolve();
+  npmCopy.catch(() => {});
   try {
     linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
-      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), sharedCache: join(cache ?? managedCacheDirectory(), 'objects'), analysisCache: join(cache ?? managedCacheDirectory(), 'analysis'), profile, nativeCompilations, nativeUnavailable });
+      leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), sharedCache: join(cache ?? managedCacheDirectory(), 'objects'), analysisCache: join(cache ?? managedCacheDirectory(), 'analysis'), profile, nativeCompilations, nativeUnavailable,
+      initializationSeed: join(work, 'initialization-seed.json'), linkOnly });
   } catch (error) {
     // This unique staging directory contains only this failed build's files.
     // Preserve any previously delivered application and avoid retaining probes.
+    await npmCopy.catch(() => {});
     if (!process.env.LASM_KEEP_LINK_WORK) await rm(temporary, { recursive: true, force: true });
+    // A broken binding explains more than a link failure it may have caused.
+    await bindingCheck;
     throw error;
   }
+  if (usesJs) progress?.({ stage: 'Checking Lasm.JS bindings' });
+  const jsBindings = await bindingCheck;
   progress?.({ stage: 'Packaging the application and runtime support' });
-  copyApplicationHost(dist); writeApplicationEntrypoint(dist);
+  if (!linkOnly) { copyApplicationHost(dist); writeApplicationEntrypoint(dist); }
   await writeFile(join(dist, 'THIRD_PARTY_NOTICES.txt'),
     applicationNotices(runtime.manifest, await readFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8'))
     + dependencyNotices(dependencyLicenses));
@@ -172,9 +203,9 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     await mkdir(join(dist, 'licenses', pkg.name), { recursive: true });
     await writeFile(join(dist, 'licenses', pkg.name, file.name), await readFile(file.path));
   }
-  if (nodeModules) {
+  if (nodeModules && !linkOnly) {
     progress?.({ stage: `Copying ${nodeModules.packages.length} npm packages` });
-    copyNodeModules(nodeModules, dist);
+    await npmCopy;
   }
   const buildInfo = { ...recipe, signature, linkRequirements, ...(jsBindings ? { jsBindings } : {}),
     ...(linkDriver === 'node' ? { linkToolchain: { identity: sdk.identity, ...sdk.toolchain } }

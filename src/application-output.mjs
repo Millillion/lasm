@@ -1,4 +1,4 @@
-import { mkdirSync, copyFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, copyFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { copyNativeBundle, copyApplicationNativeBundle } from './native-bundle.mjs';
@@ -34,6 +34,11 @@ export function copyApplicationHost(output, { platform = process.platform, arch 
     mkdirSync(dirname(join(directory, name)), { recursive: true });
     copyFileSync(join(sourceRoot, 'src', name), join(directory, name));
   }
+  // Lasm's builtin JavaScript modules (lasm:<name>; src/edge/builtin-modules.mjs).
+  const builtins = join(sourceRoot, 'src', 'lasm-modules');
+  if (existsSync(builtins)) mkdirSync(join(directory, 'lasm-modules'), { recursive: true });
+  for (const name of existsSync(builtins) ? readdirSync(builtins).filter(file => file.endsWith('.mjs')) : [])
+    copyFileSync(join(sourceRoot, 'src', 'lasm-modules', name), join(directory, 'lasm-modules', name));
   if ((['darwin', 'win32'].includes(platform) || platform === 'linux' && glibc) && ['x64', 'arm64'].includes(arch))
     copyApplicationNativeBundle(sourceRoot, directory, { platform, arch });
   else copyNativeBundle(sourceRoot, directory);

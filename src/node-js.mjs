@@ -30,6 +30,7 @@
 //   211 register the synchronous-callback channel   213 statistics
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { HandleTable } from './handle-table.mjs';
 
 export const jsProtocolVersion = 1;
@@ -98,10 +99,10 @@ class Reader {
   done() { return this.offset === this.bytes.length; }
 }
 
-export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
+export function createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, progress } = {}) {
   const values = new HandleTable({ first: firstJsHandle });
   const moduleRequire = createRequire(appPath ? join(dirname(appPath), 'package.json') : join(process.cwd(), 'package.json'));
-  const stats = { released: 0, callbacks: 0, syncCallbacks: 0, functionsCreated: 0, functionsCollected: 0 };
+  const stats = { released: 0, callbacks: 0, syncCallbacks: 0, functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0 };
   const bindings = new Map();
 
   function reference(value) { return values.allocate(value); }
@@ -157,12 +158,32 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
   function decode(bytes) { const r = new Reader(bytes); const value = read(r); if (!r.done()) throw failure('Malformed Lasm.JS value (trailing bytes)'); return value; }
   const modeOf = arg => (Number(arg) & 1) ? 'reference' : 'data';
 
-  // ---- events delivered to Lean's interop thread (op 209 long poll) ----
+  // ---- events delivered to Lean's interop poller (op 209 long poll) ----
+  // Lean starts no poller for callbacks alone (library/c/lasm_js.c): the thread
+  // running `main` becomes it when `main` reaches `waitForever`. Until a Lean
+  // thread polls, an event waits here; if Lean makes no host call for
+  // pollerGrace ms (or pollerPatience ms pass), spawnPoller starts a poller thread.
   const events = [];
-  let waiter;
+  let waiter, polled = false, pollerTimer;
+  const pollerGrace = 20, pollerPatience = 500;
+  function wantPoller() {
+    if (polled || pollerTimer || !spawnPoller) return;
+    const since = performance.now();
+    let seen = progress?.();
+    const check = () => {
+      pollerTimer = undefined;
+      if (polled) return;
+      const now = progress?.();
+      if (now !== seen && performance.now() - since < pollerPatience) { seen = now; pollerTimer = setTimeout(check, pollerGrace); return; }
+      stats.pollerSpawns++;
+      spawnPoller();
+    };
+    pollerTimer = setTimeout(check, pollerGrace);
+  }
   const push = event => {
     events.push(event);
     if (waiter) { const w = waiter; waiter = undefined; w(); }
+    else wantPoller();
   };
   function takeEvents() {
     const w = new Writer();
@@ -218,9 +239,13 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
       view.setUint32(channel + 8, fn, true);
       syncBusy = true; stats.syncCallbacks++;
       try {
+        // Read the slot's sequence and the doorbell before posting the call: once
+        // state is 1 the Lean thread runs and may make its first host call at
+        // once. Read after posting, that request's sequence would be taken as
+        // already served, and both threads would wait for each other forever.
+        let bell = Atomics.load(i32, channel / 4 + 1), sequence = Atomics.load(i32, slot / 4);
         Atomics.store(i32, channel / 4, 1);
         Atomics.notify(i32, channel / 4);
-        let bell = Atomics.load(i32, channel / 4 + 1), sequence = Atomics.load(i32, slot / 4);
         for (;;) {
           if (memory.buffer !== buffer) { buffer = memory.buffer; i32 = new Int32Array(buffer); view = new DataView(buffer); }
           const state = Atomics.load(i32, channel / 4);
@@ -234,7 +259,9 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
           }
           const current = Atomics.load(i32, slot / 4);
           if (current !== sequence) { sequence = current; serveSync(slot); continue; }
-          Atomics.wait(i32, channel / 4 + 1, bell, 1000);
+          // A wait that times out asks the host anyway (it serves a request only
+          // once), so no lost wake-up can stop the callback for good.
+          if (Atomics.wait(i32, channel / 4 + 1, bell, 1000) === 'timed-out') serveSync(slot);
           bell = Atomics.load(i32, channel / 4 + 1);
         }
       } finally { syncBusy = false; }
@@ -273,6 +300,16 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
   function load(specifier) {
     // Global functions (fetch, setTimeout, structuredClone, …) bind to module "globalThis".
     if (specifier === 'globalThis') return globalThis;
+    // Lasm's builtin modules (lasm:<name>, src/edge/builtin-modules.mjs), copied beside the host.
+    if (specifier.startsWith('lasm:')) {
+      const name = specifier.slice(5);
+      if (!/^[a-z][a-z0-9-]*$/.test(name)) throw failure(`Unknown Lasm builtin JavaScript module ${JSON.stringify(specifier)}`);
+      try { return moduleRequire(fileURLToPath(new URL(`./lasm-modules/${name}.mjs`, import.meta.url))); }
+      catch (error) {
+        if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND') throw failure(`Unknown Lasm builtin JavaScript module ${JSON.stringify(specifier)}`);
+        throw jsFailure(error);
+      }
+    }
     try { return moduleRequire(specifier); }
     catch (error) {
       if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND')
@@ -351,6 +388,8 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
         return Buffer.alloc(0);
       }
       case 209:
+        polled = true;
+        if (pollerTimer) { clearTimeout(pollerTimer); pollerTimer = undefined; }
         if (events.length) return takeEvents();
         return new Promise(resolve => { waiter = () => resolve(takeEvents()); });
       case 210: {
@@ -393,14 +432,15 @@ export function createNodeJs({ appPath, wasmMemory, serveSync } = {}) {
   // Live counts for leak checks (Lasm.JS.stats, and the soak diagnostics through
   // globalThis[Symbol.for('lasm.js.stats')]).
   const snapshot = () => ({ values: values.size, pendingCalls: pendingCalls.size, queuedEvents: events.length,
-    functionsLive: stats.functionsCreated - stats.functionsCollected, ...stats });
+    functionsLive: stats.functionsCreated - stats.functionsCollected, ...stats,
+    poller: { polled, waiting: !!waiter, spawnTimer: !!pollerTimer } });
   globalThis[Symbol.for('lasm.js.stats')] = snapshot;
   return {
     dispatch,
     snapshot,
     owns: id => id >= firstJsHandle,
     release(id) { if (values.delete(id)) stats.released++; },
-    close() { values.clear(); pendingCalls.clear(); events.length = 0; },
+    close() { values.clear(); pendingCalls.clear(); events.length = 0; clearTimeout(pollerTimer); pollerTimer = undefined; },
     // Tests and diagnostics.
     encode, decode, values,
   };

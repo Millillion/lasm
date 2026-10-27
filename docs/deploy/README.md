@@ -1,4 +1,10 @@
-# Deploying a Lasm server
+# Deploying Lasm applications
+
+One recipe per platform. Servers and functions first; for a browser app (a static
+site) see [browser.md](browser.md), and for Fastly Compute, WASI hosts and Spin see
+[fastly.md](fastly.md) and [WASI.md](../WASI.md).
+
+## Node servers and functions
 
 A Lasm server is an ordinary Node.js process: `node dist/main.mjs`. Every platform
 that runs a Node 24+ container or VM on Linux (glibc) runs it. The `Dockerfile`
@@ -34,14 +40,19 @@ installs or starts the platform's environment. Run your platform's own CLI
 (`vercel dev`, `netlify dev`, `func start`, `sam local`, `gcloud`, …) yourself to
 test and deploy.
 
+## Platforms
+
 | Platform | Recipe | Notes |
 | --- | --- | --- |
 | Docker, Kubernetes | [docker-kubernetes.md](docker-kubernetes.md) | The reference: what CI runs. |
-| Cloudflare Workers | [workers.md](workers.md) | An edge isolate, not a Node process: `lasm build --target workers`, tested with `wrangler dev`. |
-| Vercel Edge Functions | [vercel-edge.md](vercel-edge.md) | `lasm build --target vercel-edge`, tested with `vercel build` offline and Vercel's `edge-runtime` package. |
-| Netlify Edge Functions | [netlify-edge.md](netlify-edge.md) | `lasm build --target netlify-edge`, tested with `netlify build --offline` and `netlify dev --offline`. |
-| Deno Deploy | [deno-deploy.md](deno-deploy.md) | `lasm build --target deno-deploy`, tested with the Deno CLI. |
-| Supabase Edge Functions (planned for 0.2.0) | [supabase-edge.md](supabase-edge.md) | `lasm build --target supabase-edge` (Asyncify: Supabase's runtime has no JSPI), tested in Supabase's edge runtime image in Docker. |
+| Static hosting and CDNs (browser apps, from 0.3.0) | [browser.md](browser.md) | `lasm build --target browser` writes a static site (GitHub Pages, Cloudflare Pages, Netlify, Vercel, S3 + CloudFront, nginx); `lasm package dist --target browser` checks it and writes `_headers`. |
+| Fastly Compute (from 0.3.0) | [fastly.md](fastly.md) | A standard WASI module with Fastly's host calls, not a Node process: `lasm build --target fastly`, tested with Viceroy. |
+| WASI hosts, wasi-http and Spin (from 0.3.0) | [WASI.md](../WASI.md) | `--target wasi` (wasmtime, wasmer, `node:wasi`), `--target wasi-http` (`wasmtime serve`, Spin's HTTP trigger); `lasm init --template fetch --deploy spin` adds `spin.toml`. |
+| Cloudflare Workers (from 0.2.0) | [workers.md](workers.md) | An edge isolate, not a Node process: `lasm build --target workers`, tested with `wrangler dev`. |
+| Vercel Edge Functions (from 0.2.0) | [vercel-edge.md](vercel-edge.md) | `lasm build --target vercel-edge`, tested with `vercel build` offline and Vercel's `edge-runtime` package. |
+| Netlify Edge Functions (from 0.2.0) | [netlify-edge.md](netlify-edge.md) | `lasm build --target netlify-edge`, tested with `netlify build --offline` and `netlify dev --offline`. |
+| Deno Deploy (from 0.2.0) | [deno-deploy.md](deno-deploy.md) | `lasm build --target deno-deploy`, tested with the Deno CLI. |
+| Supabase Edge Functions (from 0.2.0) | [supabase-edge.md](supabase-edge.md) | `lasm build --target supabase-edge` (Asyncify: Supabase's runtime has no JSPI), tested in Supabase's edge runtime image in Docker. |
 | Google Cloud Run | [cloud-run.md](cloud-run.md) | amd64 only; use the second-generation execution environment. |
 | Fly.io | [fly.md](fly.md) | Set the VM memory to 512 MB or more. |
 | Railway | [railway.md](railway.md) | Builds the Dockerfile; sets `PORT`. |

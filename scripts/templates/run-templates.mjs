@@ -1,7 +1,7 @@
 // End-to-end check of `lasm init` templates with an installed Lasm package (a
 // candidate tarball): init, npm install, lasm build, run, HTTP requests,
 // expected responses, SIGTERM shutdown; optionally the template's Dockerfile.
-//   node run-templates.mjs CANDIDATE_TGZ WORK_DIR RESULT.json [--docker] [--templates plain,express,…]
+//   node run-templates.mjs CANDIDATE_TGZ WORK_DIR RESULT.json [--docker] [--dev-loop] [--templates plain,express,…]
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -12,12 +12,15 @@ import { fileURLToPath } from 'node:url';
 const args = process.argv.slice(2);
 const flag = name => { const i = args.indexOf(name); if (i < 0) return undefined; const [, value] = args.splice(i, 2); return value; };
 const docker = args.includes('--docker') ? (args.splice(args.indexOf('--docker'), 1), true) : false;
+// --dev-loop: also run `npm run dev` (lasm dev) on the hono and fastify apps
+// through scripts/templates/dev-loop-check.mjs (edits, restarts, a build error).
+const devLoop = args.includes('--dev-loop') ? (args.splice(args.indexOf('--dev-loop'), 1), true) : false;
 const only = flag('--templates');
 const [tgzArg, workArg, resultArg] = args;
 assert.ok(tgzArg && workArg && resultArg, 'Usage: node run-templates.mjs CANDIDATE_TGZ WORK_DIR RESULT.json [--docker] [--templates a,b]');
 const tgz = resolve(tgzArg), work = resolve(workArg), resultFile = resolve(resultArg);
 assert.ok(!existsSync(work), 'Use a new work directory');
-const templates = only ? only.split(',') : docker ? ['plain', 'express', 'hono', 'std-http'] : ['plain', 'express', 'hono', 'std-http', 'guide'];
+const templates = only ? only.split(',') : docker ? ['plain', 'express', 'hono', 'fastify', 'std-http'] : ['plain', 'express', 'hono', 'fastify', 'std-http', 'guide'];
 const result = { platform: `${process.platform}-${process.arch}`, node: process.version, candidate: tgz, docker,
   startedAt: new Date().toISOString(), templates: [], steps: [] };
 const save = () => writeFileSync(resultFile, JSON.stringify(result, null, 2) + '\n');
@@ -127,7 +130,7 @@ async function checkLambda(app, template) {
   }
 }
 
-const framework = { express: 'Express', hono: 'Hono', 'std-http': 'Std.Http' };
+const framework = { express: 'Express', hono: 'Hono', fastify: 'Fastify', 'std-http': 'Std.Http' };
 assert.ok(templates.every(t => t === 'plain' || t === 'guide' || framework[t]), `Unknown template in ${templates}`);
 
 try {
@@ -205,6 +208,11 @@ try {
       if (stopped === 'timeout') { child.kill('SIGKILL'); assert.fail(`${template}: no exit within 15 s of SIGTERM`); }
       // Windows has no SIGTERM: Node terminates the process.
       if (process.platform !== 'win32') assert.deepEqual(stopped, { code: 0, signal: null }, `${template}: SIGTERM exit`);
+      if (devLoop && process.platform !== 'win32' && ['hono', 'fastify'].includes(template)) {
+        const check = run(`${template}: npm run dev (lasm dev: edits, restarts, a build error)`, [process.execPath],
+          [fileURLToPath(new URL('./dev-loop-check.mjs', import.meta.url)), app, framework[base]], app, { timeout: 1800_000 });
+        entry.devLoop = JSON.parse(check.stdout.slice(check.stdout.lastIndexOf('\n{') + 1));
+      }
     }
     if (docker && !guide) {
       const image = `lasm-template-${template}:test`;

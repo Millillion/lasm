@@ -6,9 +6,11 @@ deploys the server in a container. Every command and every file below is complet
 copy them as they are. CI runs these exact steps on Linux, macOS and Windows
 ([`scripts/templates/run-templates.mjs`](../scripts/templates/run-templates.mjs)).
 
-**Status (current source, 2026-10-23).** `lasm init` is in current source and not yet
-in an accepted candidate, and `@lasm/cli` and `@lasm/create` are **not published to npm yet**. Until it
-is, use a candidate tarball as shown in [Before npm publication](#before-npm-publication).
+**Status.** `@lasm/cli` and `@lasm/create` are on npm (0.1.0 and 0.2.0). Every
+command below works with the published release unless it is marked **0.3.0**:
+those parts are in the `launch` branch source and ship with the next release.
+This guide builds a Node server; for the other kinds of app, see
+[other starting points](#other-starting-points) at the end.
 
 ## 1. Prerequisites
 
@@ -34,13 +36,15 @@ npm run dev
 `@lasm/cli` release of the same version with your arguments unchanged; the `--`
 passes `--template hono` through npm. The equivalent without it is
 `npx @lasm/cli init my-app --template hono`. Without a directory, `npm create @lasm`
-asks for one and for a template on an interactive terminal. Until publication,
-`npm create @lasm` is rehearsed only against a local test registry on all five
-platforms ([`npm-dist.yml`](../.github/workflows/npm-dist.yml), scenario `create`).
+asks for one and for a template on an interactive terminal.
 
-`npm run dev` builds the program and starts it (`lasm Main.lean`). The first build
-takes a few minutes while Lasm downloads Lean; then it prints
-`Listening on http://0.0.0.0:3000 (Hono)`. In another terminal:
+`npm run dev` runs `lasm dev Main.lean`: it builds the program, starts it, and
+rebuilds and restarts the server about 2 s after each save
+([lasm dev](DEVELOPER_WORKFLOW.md#lasm-dev)); a build error is printed with its file
+and line while the last good server keeps running. (Projects made by 0.1.0 run
+`lasm Main.lean`, which builds and starts once.) The first build on a new machine
+fetches Lean and Lasm's build tools (about 250–275 MB) and takes a minute or two;
+then it prints `Listening on http://0.0.0.0:3000 (Hono)`. In another terminal:
 
 ```sh
 curl http://localhost:3000/hello/Ada
@@ -82,6 +86,31 @@ costs) is in [JS_BINDINGS.md](JS_BINDINGS.md).
 server on Express 5 (`app.get(path, (req, res) => …)` with Lean handlers).
 `--template std-http` creates it in pure Lean with `Std.Http`, and `--template plain`
 a command-line program. See [which HTTP server to use](#which-http-server-to-use).
+
+### Editor
+
+Lean's editor support (the [Lean 4 extension for VS Code](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4),
+or any editor running Lean's language server) works on Lasm projects once the
+editor uses Lasm's own Lean, whose standard library includes `Lasm.JS`,
+`Lasm.Fetch`, `Lasm.UI` and the rest (0.3.0):
+
+```sh
+npx lasm editor        # in the project; lasm init, lasm dev and lasm build also do it
+```
+
+`lasm editor` links Lasm's Lean 4.35.0 (with its library) as an
+[elan](https://github.com/leanprover/elan) toolchain named `lasm-4.35.0-…` and sets
+it as this directory's elan override. The editor then resolves every
+`import Lasm.*`, with hovers, completion and go-to-definition, using exactly the
+Lean that `lasm build` uses. Your files are not changed (`lean-toolchain` stays
+`leanprover/lean4:v4.35.0`); the override is per machine and per directory, and
+`elan override unset` removes it. `lasm init` does it up front when Lasm's Lean is
+already installed on the machine (it never downloads); otherwise the first build
+does. Each project gets one line saying what was done; later runs are silent. After it runs the first time, restart the Lean
+server in the editor (VS Code: *Lean 4: Restart Server*). elan comes with the
+VS Code extension; without elan, `lasm` prints how to get it. `LASM_EDITOR=0`
+stops `lasm init`, `lasm dev` and `lasm build` from doing this automatically (they never do it
+on CI).
 
 ## 3. Call an npm package from Lean
 
@@ -226,7 +255,7 @@ tools: test and deploy with the platform's CLI (`vercel`, `netlify`, `func`,
 
 ## Which HTTP server to use
 
-| | Express or Hono with Lean handlers (`--template express`, `hono`) | `Std.Http` (`--template std-http`) |
+| | Express, Hono or Fastify with Lean handlers (`--template express`, `hono`, `fastify`) | `Std.Http` (`--template std-http`) |
 | --- | --- | --- |
 | Use for | **Production HTTP services on Node.** | Pure-Lean code that must also build natively, or that is shared with native Lean servers. |
 | Throughput ([benchmark runner](BENCHMARKS.md), 4-CPU Linux x64; plain Node `http`: about 54,000 req/s) | about 9,700 (Hono, 0.18× plain Node) and 6,300 (Express, 0.12×) requests per second | about 660 requests per second (0.01×) |
@@ -239,21 +268,18 @@ thread and Node's main thread (sockets, timers, the `Date` header); with Express
 or Hono, Node does the HTTP work and Lean runs only the handler (about 4 round
 trips). Details: [Std.Http performance](SERVER_MVP.md#launch-position-2026-10-23).
 
-## Before npm publication
+## Other starting points
 
-`@lasm/cli` is not on npm yet. With a candidate tarball from a maintainer
-(`lasm-compiler-<version>.tgz`; see the [acceptance report](NODE_ACCEPTANCE.md)):
+| You want | Start with | Guide |
+| --- | --- | --- |
+| A command-line program | `npm create @lasm@latest my-tool` (template `plain`) | [README](../README.md) |
+| An HTTP handler in pure Lean for Node, the edge, Fastly, WASI and Spin (**0.3.0**) | `--template fetch` | [FETCH.md](FETCH.md) |
+| An edge function (Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy, Supabase) | `--template hono --deploy workers` (or another edge target) | [EDGE.md](EDGE.md), [deploy/](deploy/README.md) |
+| A browser app (**0.3.0**) | `--template web` | [UI.md](UI.md), [BROWSER.md](BROWSER.md) |
+| A full-stack app with a verified API (**0.3.0**) | `--template fullstack` | [RPC.md](RPC.md) |
+| Bun or Deno | `bun create @lasm my-app --template hono` | [BUN_DENO.md](BUN_DENO.md) |
 
-```sh
-npx --package ./lasm-compiler-<version>.tgz lasm init my-app --template hono
-cd my-app
-npm install -D ../lasm-compiler-<version>.tgz   # instead of plain npm install
-npm run dev
-```
-
-For the Docker build, copy the tarball into the project first and install it from
-there (`npm install -D ./lasm-compiler-<version>.tgz`), so that it is inside the
-build context (the Dockerfile copies the whole project before `npm ci`).
+All documentation: [docs/README.md](README.md).
 
 ## Next steps
 

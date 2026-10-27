@@ -13,7 +13,7 @@ on:
       validation-scope:
         description: Target a Windows repair or run the complete acceptance matrix
         type: choice
-        options: [all, windows-x64]
+        options: [all, windows-x64, linux]
         default: all
   # release-checks.yml: the candidate checks of a release PR or release commit.
   # nightly.yml: validation-scope `package` packs and retains the input draft only.
@@ -99,7 +99,7 @@ jobs:
       candidate-release: ${{ needs.package.outputs.candidate-release }}
       candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   linux-x64:
-    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    if: github.event_name == 'push' || inputs.validation-scope == 'all' || inputs.validation-scope == 'linux'
     needs: [package, input, faults]
     uses: ./.github/workflows/node-linux-consumer.yml
     with:
@@ -110,7 +110,7 @@ jobs:
       candidate-release: ${{ needs.package.outputs.candidate-release }}
       candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   linux-arm64:
-    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    if: github.event_name == 'push' || inputs.validation-scope == 'all' || inputs.validation-scope == 'linux'
     needs: [package, input, faults, linux-x64]
     uses: ./.github/workflows/node-linux-consumer.yml
     with:
@@ -154,7 +154,7 @@ jobs:
       candidate-release: ${{ needs.package.outputs.candidate-release }}
       candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}
   js-interop:
-    if: github.event_name == 'push' || inputs.validation-scope == 'all'
+    if: github.event_name == 'push' || inputs.validation-scope == 'all' || inputs.validation-scope == 'linux'
     needs: [package, input, faults]
     permissions:
       contents: read

@@ -2,7 +2,7 @@ import { readFile, stat, copyFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, dirname, resolve, toNamespacedPath } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { provisionArtifact, deriveArtifact, validateArtifact, managedCacheDirectory, linkArtifactTree, hashFile } from './managed-artifacts.mjs';
+import { provisionArtifact, deriveArtifact, validateArtifact, managedCacheDirectory, linkArtifactTree, hashFile, sessionTrusted } from './managed-artifacts.mjs';
 import { assertSupportedHost, executableName } from './platform.mjs';
 import { compileLibrary, libraryIdentity, libraryLeanVersions } from './lasm-library.mjs';
 import { verifyNativeProgram } from './native-program.mjs';
@@ -93,9 +93,10 @@ export async function assembleLeanPrefix(version, release, components, options =
     if (libraryLeanVersions.includes(version)) options.progress?.({ stage: `Compiling Lasm's Lean library for Lean ${version}` });
     compileLibrary(tree, version, { platform: options.platform, commit: release.commit });
     return known;
-  }, { cache, log: options.log, signal: options.signal, progress: options.progress });
+  }, { cache, log: options.log, signal: options.signal, progress: options.progress, cachedOnly: options.cachedOnly });
 }
 
+const githashes = new Map();
 export async function provisionLean(file, options = {}) {
   const catalog = options.catalog ?? toolchainCatalog;
   const selection = await selectLeanVersion(file, catalog);
@@ -124,11 +125,13 @@ export async function provisionLean(file, options = {}) {
       nativePrograms[name] = await verifyNativeProgram(program, platform, arch);
     // An archive checksum is provenance; this check also prevents accidentally
     // pairing a native compiler with another release's runtime/serialized files.
-    const commit = execFileSync(lean, ['--githash'], { encoding: 'utf8', timeout: 30_000, windowsHide: true }).trim();
+    const commit = (sessionTrusted() && githashes.get(lean)) || execFileSync(lean, ['--githash'], { encoding: 'utf8', timeout: 30_000, windowsHide: true }).trim();
+    githashes.set(lean, commit);
     if (commit !== release.commit) throw new Error(`Managed Lean identity mismatch: expected ${release.commit}, received ${commit}`);
     return { ...selection, ...installed, prefix: installed.directory, executionPrefix, lean, lake, commit, platform: host, nativePrograms,
       ...details };
   };
+  if (distribution.kind === 'full' && options.cachedOnly) throw Object.assign(new Error('Not in the tool cache yet'), { code: 'ERR_LASM_NOT_CACHED' });
   if (distribution.kind === 'full')
     return finish(await provisionArtifact(distribution.artifact, { ...options, label: `Lean ${selection.version} and Lake` }),
       { distribution: 'full' });

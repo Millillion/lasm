@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync, realpathSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, realpathSync, readdirSync, statSync, renameSync, rmSync } from 'node:fs';
 import { dirname, join, resolve, relative, delimiter, toNamespacedPath } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -146,13 +146,115 @@ export function standaloneImportsModules(source, lean, roots) {
   return false;
 }
 
-export function applicationSources(source, lean, work, { log = console.error } = {}) {
+const readJsonRecord = file => { try { return JSON.parse(readFileSync(file, 'utf8')); } catch { return undefined; } };
+/** Records replace their predecessors (same prefix); write failures only cost a later build the query. */
+function writeJsonRecord(file, value, prefix) {
+  try {
+    for (const name of readdirSync(dirname(file))) if (name.startsWith(prefix) && join(dirname(file), name) !== file) rmSync(join(dirname(file), name), { force: true });
+    writeFileSync(file + '.' + process.pid + '.partial', JSON.stringify(value));
+    renameSync(file + '.' + process.pid + '.partial', file);
+  } catch { /* not recorded */ }
+}
+
+/** The import header of a Lean source: everything before its first command
+ * other than `module`, `prelude` and imports (comments included). Generous on
+ * purpose: any change in that region counts. */
+export function leanHeader(text) {
+  const lines = text.split(/\r?\n/), header = [];
+  let depth = 0;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (depth === 0 && trimmed && !/^(?:--|\/-)/.test(trimmed)
+        && !/^(?:(?:public|private|meta|all)\s+)*(?:import|prelude|module)\b/.test(trimmed) && !/^-\/\s*$/.test(trimmed)) break;
+    header.push(line);
+    depth += (line.match(/\/-/g) ?? []).length - (line.match(/-\//g) ?? []).length;
+    if (depth < 0) depth = 0;
+  }
+  return header.join('\n');
+}
+
+/** Identity of what Lasm's Lake adapter reads: the workspace's and its
+ * packages' Lake configuration, manifest and toolchain, the source path and
+ * import header, the adapter and the Lean installation. Undefined (no reuse)
+ * when a lakefile.lean imports more than Lake: its configuration could then
+ * depend on other files. */
+export function lakeConfigurationKey(project, source, lean) {
+  const hash = createHash('sha256').update(JSON.stringify({ schema: 1, lean: lean.identity ?? lean.commit ?? null, source }))
+    .update(readFileSync(new URL('./lake-module.lean', import.meta.url)));
+  const directories = [project];
+  // The manifest's packages: a missing manifest is the empty one Lake writes on the
+  // first build, so that write does not change the key (lasm dev: a second adapter run).
+  let manifest = { packagesDir: '.lake/packages', packages: [] };
+  try { manifest = JSON.parse(readFileSync(join(project, 'lake-manifest.json'), 'utf8')); }
+  catch (error) { if (error.code !== 'ENOENT') return undefined; }
+  hash.update('manifest\0').update(JSON.stringify({ packagesDir: manifest.packagesDir ?? '.lake/packages', packages: manifest.packages ?? [] }));
+  for (const pkg of manifest.packages ?? []) directories.push(pkg.type === 'path'
+    ? resolve(project, pkg.dir) : resolve(project, manifest.packagesDir ?? '.lake/packages', pkg.name));
+  for (const directory of directories) {
+    for (const name of ['lakefile.toml', 'lakefile.lean', 'lean-toolchain']) {
+      let text;
+      try { text = readFileSync(join(directory, name), 'utf8'); } catch { continue; }
+      if (name === 'lakefile.lean' && [...text.matchAll(/^\s*import\s+(\S+)/gm)].some(match => match[1] !== 'Lake')) return undefined;
+      hash.update(`${directory}\0${name}\0`).update(text).update('\0');
+    }
+  }
+  try { hash.update('header\0').update(leanHeader(readFileSync(source, 'utf8'))); } catch { return undefined; }
+  return hash.digest('hex');
+}
+
+/** The workspace's Lake package directories: the project and its manifest's packages. */
+function lakePackageDirectories(project) {
+  const directories = [project];
+  try {
+    const manifest = JSON.parse(readFileSync(join(project, 'lake-manifest.json'), 'utf8'));
+    for (const pkg of manifest.packages ?? []) directories.push(pkg.type === 'path'
+      ? resolve(project, pkg.dir) : resolve(project, manifest.packagesDir ?? '.lake/packages', pkg.name));
+  } catch { /* no manifest */ }
+  return directories;
+}
+
+/** Identity of the workspace's module graph: the configuration key and the
+ * import header of every Lean source in its packages. */
+export function workspaceImportsKey(project, configKey) {
+  const hash = createHash('sha256').update(configKey);
+  const walk = directory => {
+    let entries;
+    try { entries = readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0); } catch { return; }
+    for (const entry of entries) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) { if (!entry.name.startsWith('.') && entry.name !== 'node_modules') walk(path); }
+      else if (entry.isFile() && entry.name.endsWith('.lean')) hash.update(path + '\0').update(leanHeader(readFileSync(path, 'utf8'))).update('\0');
+    }
+  };
+  for (const directory of lakePackageDirectories(project)) walk(directory);
+  return hash.digest('hex');
+}
+
+export function applicationSources(source, lean, work, { log = console.error, afterImports } = {}) {
   source = resolve(source);
   const project = findApplicationProject(source);
   const env = nativeLeanEnvironment(lean);
-  const run = (program, args, cwd) => execFileSync(program, args,
-    { cwd, env, windowsHide: true, encoding: 'utf8', timeout: 900_000, maxBuffer: 32 * 1024 * 1024,
-      stdio: ['ignore', 'pipe', 'inherit'] }).trim();
+  // Lean's and Lake's diagnostics are captured, so that a failure carries them
+  // (the CLI and `lasm dev` report them with the error); warnings of a
+  // successful step are passed on as they were printed.
+  const run = (program, args, cwd) => {
+    const started = performance.now();
+    try { return runTool(program, args, cwd); } finally {
+      // LASM_DEV_TRACE (lasm dev): how long each Lean and Lake step took.
+      if (process.env.LASM_DEV_TRACE) process.stderr.write(`[lasm dev] trace ${((performance.now() - started) / 1000).toFixed(2)} s: ${program.split(/[\\/]/).pop()} ${args.filter(arg => !arg.startsWith('-')).join(' ').slice(0, 100)}\n`);
+    }
+  };
+  const runTool = (program, args, cwd) => {
+    const result = spawnSync(program, args, { cwd, env, windowsHide: true, encoding: 'utf8', timeout: 900_000, maxBuffer: 32 * 1024 * 1024,
+      stdio: ['ignore', 'pipe', 'pipe'] });
+    if (result.error) throw Object.assign(result.error, { stdout: result.stdout, stderr: result.stderr });
+    if (result.status !== 0) throw Object.assign(new Error(`Command failed: ${program} ${args.join(' ')}\n${result.stderr ?? ''}`),
+      { status: result.status, signal: result.signal, stdout: result.stdout, stderr: result.stderr });
+    // Lake's routine notice on a project's first build is not a warning.
+    const stderr = (result.stderr ?? '').replace(/^info: [^\n]*: no previous manifest, creating one from scratch\r?\n?/gm, '');
+    if (stderr) process.stderr.write(stderr);
+    return result.stdout.trim();
+  };
   if (project) {
     const query = target => JSON.parse(run(lean.lake,
       ['--no-cache', '--keep-toolchain', '--quiet', '--json', 'query', target], project));
@@ -166,7 +268,16 @@ export function applicationSources(source, lean, work, { log = console.error } =
       : join(lean.prefix, 'lib/lean', `libLake_shared.${platform === 'darwin' ? 'dylib' : 'so'}`);
     const adapter = (...args) => JSON.parse(run(lean.lean, ['-j1', '-s8192', '--plugin=' + lakePlugin, '--run',
       fileURLToPath(new URL('./lake-module.lean', import.meta.url)), ...args], project).split(/\r?\n/).filter(Boolean).pop());
-    const entry = adapter(configuredSource);
+    // The adapter starts Lake and elaborates its script (about 1.3 s). Its answer
+    // is a function of the Lake configuration and the source's imports: an
+    // ordinary edit reuses it (lakeConfigurationKey).
+    const configKey = lakeConfigurationKey(project, configuredSource, lean);
+    const adapterRecord = configKey && join(work, `lake-module-${configKey}.json`);
+    let entry = adapterRecord && readJsonRecord(adapterRecord);
+    if (!entry) {
+      entry = adapter(configuredSource);
+      if (adapterRecord) writeJsonRecord(adapterRecord, entry, 'lake-module-');
+    }
     // Packages with C code (extern_lib, precompiled modules, extra link objects)
     // need Lean's own C compiler, headers and libraries: the C tier.
     if (Array.isArray(entry?.native) && entry.native.length && lean.distribution === 'tiers' && !lean.cCompiler)
@@ -177,12 +288,18 @@ export function applicationSources(source, lean, work, { log = console.error } =
     if (!Array.isArray(entry.metadataRoots) || entry.metadataRoots.some(name => typeof name !== 'string'))
       throw new Error('Unexpected Lake module-data paths');
     const targets = [];
+    // Lake's transitive import query, reused while no import header changed.
+    const importsRecord = configKey && join(work, `lake-imports-${workspaceImportsKey(project, configKey)}.json`);
+    const savedImports = importsRecord && readJsonRecord(importsRecord);
+    const transImports = {};
     for (const target of configured ? [entry.module] : entry.imports.map(name => '+' + name)) {
-      const modules = query(target + ':transImports');
+      const modules = savedImports?.[target] ?? query(target + ':transImports');
+      transImports[target] = modules;
       if (!Array.isArray(modules) || modules.some(module => typeof module !== 'string'))
         throw new Error('Unexpected Lake transitive module inventory');
       targets.push(...modules.map(name => '+' + name), target);
     }
+    if (importsRecord && !savedImports) writeJsonRecord(importsRecord, transImports, 'lake-imports-');
     const sources = [], inputs = [];
     // One Lake query per batch of modules prints one JSON result per line, in order
     // (a separate Lake process per module dominated large dependency graphs).
@@ -201,6 +318,8 @@ export function applicationSources(source, lean, work, { log = console.error } =
         inputs.push({ module: target, source: resolve(project, lean) });
       });
     }
+    // The imported modules are built: the caller may let other builds of this project use Lake now.
+    afterImports?.();
     if (!configured) {
       const file = join(work, 'script.c');
       // Lake supplies dependency artifacts, package options and build-time
@@ -218,12 +337,16 @@ export function applicationSources(source, lean, work, { log = console.error } =
       nativeLink = adapter('--link', configuredSource);
     }
     // .olean files of the workspace modules (for Lasm.JS's binding check).
+    const oleanRecord = configKey && join(work, `lake-oleans-${createHash('sha256').update(configKey).update(JSON.stringify(unique)).digest('hex')}.json`);
     const oleans = () => {
+      const saved = oleanRecord && readJsonRecord(oleanRecord);
+      if (Array.isArray(saved) && saved.every(file => existsSync(file))) return [...saved, ...inputs.filter(input => input.olean).map(input => input.olean)];
       const files = [];
       for (let start = 0; start < unique.length; start += 64) {
         const batch = unique.slice(start, start + 64);
         for (const file of queryAll(batch.map(target => target + ':olean'))) if (typeof file === 'string') files.push(resolve(project, file));
       }
+      if (oleanRecord) writeJsonRecord(oleanRecord, files, 'lake-oleans-');
       return [...files, ...inputs.filter(input => input.olean).map(input => input.olean)];
     };
     return { project, sources, inputs, env, metadataRoots: entry.metadataRoots.map(path => resolve(project, path)),

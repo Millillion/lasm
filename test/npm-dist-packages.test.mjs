@@ -70,7 +70,7 @@ test('the edge runtime is bundled in the CLI package from its cataloged release 
   assert.equal(edge.baseRuntimeManifestSha256, pinned.baseRuntimeManifestSha256);
   assert.deepEqual(Object.keys(edge.artifact).sort(), ['bytes', 'format', 'maximumExtractedBytes', 'name', 'root', 'sha256', 'url']);
   assert.equal(edge.artifact.root, 'lean-4.35.0-wasm64-edge', 'src/edge/edge-runtime.mjs looks for targets/<runtime>-edge');
-  assert.match(edge.artifact.url, /^https:\/\/github\.com\/Millillion\/lasm\/releases\/download\/lean-4\.35\.0-edge-v1\//);
+  assert.match(edge.artifact.url, /^https:\/\/github\.com\/Millillion\/lasm\/releases\/download\/lean-4\.35\.0-edge-v\d+\//);
   assert.equal(edgeRuntimeBundle({ lean: '9.9.9', edgeRuntimes: c.edgeRuntimes }), null);
 });
 

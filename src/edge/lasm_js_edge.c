@@ -185,3 +185,5 @@ LEAN_EXPORT lean_obj_res lasm_js_sync_start(lean_obj_arg dispatch) {
     return lean_io_result_mk_ok(lean_box(0));
 }
 LEAN_EXPORT uint8_t lasm_js_available(lean_obj_arg unit) { (void)unit; return 1; }
+/* waitForever: no interop poller to become here (it returns before on edge). */
+LEAN_EXPORT lean_obj_res lasm_js_park(void) { return lean_io_result_mk_ok(lean_box(0)); }

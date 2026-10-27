@@ -42,14 +42,14 @@ app, then branches on `Lasm.JS.onEdge`:
 | `workers/lasm/program.wasm`, `program.mjs` | The Lean program: no threads, 32-bit memory, JSPI. |
 | `workers/lasm/edge-*.mjs` | The pure-JavaScript host (web-standard APIs only). |
 | `workers/wrangler.toml` | Only when the project has no wrangler configuration. |
-| `workers/build-info.json`, `THIRD_PARTY_NOTICES.txt` | Build record and notices. |
+| `workers/build-info.json`, `THIRD_PARTY_NOTICES.txt` | Build record and notices (also inside `program.wasm` and named by `program.mjs`'s licence banner, so every deployment carries them: [LICENSING.md](../LICENSING.md)). |
 
 Lasm owns `workers/` and replaces it on every build. Requirements:
 
 - **The edge runtime.** It ships inside `@lasm/cli` (`targets/lean-4.35.0-wasm64-edge/`,
   about 1.7 MB of the package), so edge builds download nothing more. A source
   checkout fetches the release archive pinned in `src/edge-runtimes.json`
-  (tag `lean-4.35.0-edge-v1`, once that release is public), checked by SHA-256; `LASM_EDGE_RUNTIME` overrides
+  (tag `lean-4.35.0-edge-v2`, once that release is public), checked by SHA-256; `LASM_EDGE_RUNTIME` overrides
   both (CI uses the [`edge-runtime.yml`](../../.github/workflows/edge-runtime.yml) output).
 - **No Emscripten SDK.** The edge link runs on the Node link driver with the
   link toolchain that Node builds already download. The linked program is

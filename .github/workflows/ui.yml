@@ -1,0 +1,46 @@
+name: UI
+# Lasm.UI (docs/UI.md) without a browser: the library and its proofs compile
+# with the managed Lean, random diffs are checked against the DOM model, the
+# applier's patch fixtures are current, the examples (TodoMVC's proofs
+# included) elaborate, and the lasm:ui-dom applier is tested against happy-dom.
+# Browser end-to-end tests are in browser.yml. Free runner only.
+on:
+  workflow_dispatch:
+  # release-checks.yml gates releases on it.
+  workflow_call:
+  push:
+    branches: [browser, browser-ui, launch, fullstack]
+    paths:
+      - '.github/workflows/ui.yml'
+      - 'library/**'
+      - 'src/lasm-modules/ui-dom.mjs'
+      - 'src/lasm-library.mjs'
+      - 'src/managed-lean.mjs'
+      - 'test/ui/**'
+      - 'test/ui-dom.test.mjs'
+      - 'test/fixtures/ui/**'
+      - 'examples/ui/**'
+      - 'scripts/ui/**'
+      - 'templates/fullstack/**'
+concurrency:
+  group: ui-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  ui:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CI: '1'
+      BROWSER: 'none'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: The applier against happy-dom
+        run: node --test test/ui-dom.test.mjs
+      - name: Lean checks (library and proofs, diff model, fixtures, examples)
+        run: node scripts/ui/lean-tests.mjs

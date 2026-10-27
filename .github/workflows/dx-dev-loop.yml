@@ -1,0 +1,172 @@
+name: Edit loop and templates (branch dx)
+# Developer-experience checks while iterating on branch dx: a candidate packed
+# from the pushed commit; the hono, fastify and plain templates end to end
+# (scripts/templates/run-templates.mjs) including `lasm dev` edits, restarts and
+# a build error (--dev-loop, scripts/templates/dev-loop-check.mjs). Linux x64
+# only, one free runner; templates.yml runs the full five-platform set.
+on:
+  workflow_dispatch:
+  # release-checks.yml gates releases on it.
+  workflow_call:
+  push:
+    branches: [dx, launch]
+    paths:
+      - 'src/**'
+      - 'templates/**'
+      - 'library/**'
+      - 'scripts/templates/**'
+      - 'scripts/serverless/**'
+      - '.github/workflows/dx-dev-loop.yml'
+permissions:
+  contents: read
+concurrency:
+  group: dx-dev-loop-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  pack:
+    # The retained runtime input is a draft release asset (needs contents: write to read).
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-restore-resources.json -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/node-package-resources.json -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dx-packed-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  templates:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: dx-packed-candidate
+          path: .work/node-candidate
+      - name: Templates and the lasm dev loop
+        run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates" .work/templates.json --dev-loop
+      - name: Preserve the result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dx-templates
+          path: .work/templates.json
+          retention-days: 7
+          if-no-files-found: ignore
+  editor:
+    # Editor support (docs/GETTING_STARTED.md#editor): every template's files open
+    # without errors in the Lean language server after `lasm editor`.
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+      ELAN_VERSION: v4.2.3
+      ELAN_SHA256: df0b2b3a439961ffcbb3985214365ffe40f49bc871df04dff268c7d8e21ca8b2
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: dx-packed-candidate
+          path: .work/node-candidate
+      - name: Install elan (no toolchain), as the Lean 4 VS Code extension does
+        run: |
+          set -e
+          curl -fsSL -o "$RUNNER_TEMP/elan.tar.gz" "https://github.com/leanprover/elan/releases/download/$ELAN_VERSION/elan-x86_64-unknown-linux-gnu.tar.gz"
+          echo "$ELAN_SHA256  $RUNNER_TEMP/elan.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/elan.tar.gz" -C "$RUNNER_TEMP"
+          "$RUNNER_TEMP/elan-init" -y --default-toolchain none --no-modify-path
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Every template in the language server
+        run: node scripts/templates/editor-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm editor" .work/editor.json
+      - name: Preserve the result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dx-editor
+          path: .work/editor.json
+          retention-days: 7
+          if-no-files-found: ignore
+  cold-start:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: dx-packed-candidate
+          path: .work/node-candidate
+      - name: Enable the systemd user session (CPU quotas)
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Build hono, express and fastify apps
+        run: |
+          set -e
+          tgz="$PWD/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
+          mkdir -p "$RUNNER_TEMP/cs/cli" && cd "$RUNNER_TEMP/cs/cli" && npm install --no-save --no-audit --no-fund "$tgz"
+          for t in hono express fastify; do
+            node node_modules/@lasm/compiler/bin/lasm.mjs init "$RUNNER_TEMP/cs/$t" --template $t
+            (cd "$RUNNER_TEMP/cs/$t" && npm install -D --no-audit --no-fund "$tgz" && npm run build)
+          done
+      - name: Cold start under CPU quotas
+        run: node scripts/serverless/cold-start-cpu.mjs .work/cold-start.json --apps "hono=$RUNNER_TEMP/cs/hono/dist,express=$RUNNER_TEMP/cs/express/dist,fastify=$RUNNER_TEMP/cs/fastify/dist" --quotas 400,100,58,29 --runs 5 --variants 'default;LASM_THREAD_POOL=0;LASM_THREAD_POOL=1'
+      - name: Preserve the result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dx-cold-start
+          path: .work/cold-start.json
+          retention-days: 7
+          if-no-files-found: ignore

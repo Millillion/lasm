@@ -107,7 +107,15 @@ if (Number(version.split('.')[1]) >= 35)
 if (edge) {
   if (version !== '4.35.0') throw new Error('The edge profile has a runtime patch for Lean 4.35.0 only');
   patchInputs.push({ name: 'edge', file: 'lean-4.35.0-edge.patch' });
+} else if (Number(version.split('.')[1]) >= 35) {
+  // Fewer Workers at start-up (docs/DECISIONS.md, 2026-10-26): `main` runs on
+  // the PROXY_TO_PTHREAD main thread instead of a further lthread, which
+  // Lasm.JS can identify (lasm_main_thread_is_current). Node profile only.
+  patchInputs.push({ name: 'node-threads', file: 'lean-4.35.0-node-threads.patch' });
 }
+// Patches that change only Lean's C++ runtime (no header, no generated C), so a
+// build with or without them can share the standard-library archives.
+const runtimeOnlyPatches = new Set(['edge', 'node-threads']);
 for (const { name, file } of patchInputs) {
   // These reviewed runtime changes still apply to 4.34 and, with the ports above,
   // to 4.35. Record the actual patch bytes and source commit; never treat older
@@ -184,8 +192,8 @@ if (reuseBundle) {
   const { manifest } = await verifyApplicationRuntime(bundle, { name, manifestSha256: reuseManifest });
   for (const key of ['lean', 'leanCommit', 'sourceArchiveSha256', 'emscripten', 'memoryLayout', ...(edge ? [] : ['threading']), 'allocator'])
     if (manifest[key] !== provenance[key]) throw new Error(`Reused runtime differs in ${key}`);
-  const { edge: edgePatch, ...sharedPatches } = patches;
-  if (JSON.stringify(manifest.patches) !== JSON.stringify(edge ? sharedPatches : patches)) throw new Error('Reused runtime has other Lean patches');
+  const shared = all => JSON.stringify(Object.fromEntries(Object.entries(all).filter(([name]) => !runtimeOnlyPatches.has(name))));
+  if (shared(manifest.patches) !== shared(patches)) throw new Error('Reused runtime has other Lean patches');
   // Headers: the packager prepends one comment to lean.h; every byte after it must match.
   const shipped = readdirSync(join(bundle, 'include/lean')).filter(name => name.endsWith('.h')).sort();
   if (JSON.stringify(shipped) !== JSON.stringify(headers.map(([name]) => name))) throw new Error('Reused runtime has other headers');
