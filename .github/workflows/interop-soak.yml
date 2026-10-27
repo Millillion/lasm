@@ -39,7 +39,7 @@ jobs:
     if: inputs.cache-key == ''
     permissions:
       contents: write
-      actions: read
+      actions: write # cache-budget.mjs may evict old candidate caches
     uses: ./.github/workflows/node-candidate-input.yml
     with:
       sha256: ${{ inputs.sha256 }}
