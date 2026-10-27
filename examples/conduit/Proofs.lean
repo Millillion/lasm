@@ -9,3 +9,5 @@ import Proofs.Slug
 import Proofs.Paging
 import Proofs.Favorites
 import Proofs.Endpoints
+import Proofs.Markdown
+import Proofs.Client

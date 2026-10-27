@@ -28,23 +28,24 @@ inductive Block where
 
 /-! ## Links -/
 
-/-- Lowercase ASCII, for scheme checks. -/
-def lowerAscii (s : String) : String := s.map Char.toLower
+/-- The scheme of a URL (`javascript` in `javascript:…`), lowercased: the
+characters before the first `:`, unless a `/`, `?` or `#` comes first (then
+the colon is part of a path, query or fragment and there is no scheme). -/
+def schemeOf : List Char → Option (List Char)
+  | [] => none
+  | ':' :: _ => some []
+  | c :: cs => if c == '/' || c == '?' || c == '#' then none else (schemeOf cs).map (c.toLower :: ·)
 
 /-- Whether a link target is harmless: `http:`, `https:`, `mailto:`, or a
 URL without a scheme (`/path`, `page`, `#anchor`). -/
 def allowedHref (href : String) : Bool :=
-  let h := lowerAscii href
-  match h.splitOn ":" with
-  | [_] => true
-  | scheme :: _ =>
-    -- A colon after a `/`, `?` or `#` belongs to the path, not a scheme.
-    scheme == "http" || scheme == "https" || scheme == "mailto" || scheme.any (fun c => c == '/' || c == '?' || c == '#')
-  | [] => true
+  match schemeOf href.toList with
+  | none => true
+  | some s => s == ['h', 't', 't', 'p'] || s == ['h', 't', 't', 'p', 's'] || s == ['m', 'a', 'i', 'l', 't', 'o']
 
 /-- The link target shown: the author's, or `#` when it is not allowed
 (`javascript:`, `data:`, …). -/
-def safeHref (href : String) : String := if allowedHref href then href else "#"
+def safeHref (href : String) : String := if allowedHref href then href else String.ofList ['#']
 
 /-! ## Inline syntax -/
 

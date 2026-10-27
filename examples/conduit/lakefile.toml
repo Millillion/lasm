@@ -8,7 +8,8 @@ defaultTargets = ["Conduit", "Proofs"]
 [[lean_lib]]
 name = "Conduit"
 
-# The theorems about Conduit (PROOFS.md), also plain Lean.
+# The theorems about Conduit (PROOFS.md). Those about the browser app import
+# Lasm.UI, so check them with `npm run proofs` (Lasm's own Lean).
 [[lean_lib]]
 name = "Proofs"
 

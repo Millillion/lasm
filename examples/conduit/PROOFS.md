@@ -13,8 +13,9 @@ npm run proofs     # builds Conduit/ and Proofs/, then test/Axioms.lean
 only Lean's three standard axioms (`propext`, `Classical.choice`,
 `Quot.sound`): a `sorry` anywhere would show up as the axiom `sorryAx`. CI runs
 it on every change ([conduit.yml](../../.github/workflows/conduit.yml), job
-`proofs`). The proofs use only Lean's own library (no Mathlib) and check with
-plain Lean 4.35.0, so `lake build` works too.
+`proofs`). The proofs use only Lean's own library (no Mathlib). The server-side ones
+check with plain Lean 4.35.0; the browser app's (`Proofs/Client.lean`) also
+need Lasm's library (`Lasm.UI`), which `npm run proofs` provides.
 
 ## How the proofs reach the real code
 
@@ -101,6 +102,22 @@ endpoint cannot receive anything that has not passed them.
 | `validateLogin_ok`, `validateNewComment_ok`, `validateNewComment_error` | Logins have an email and a password; comments have a body, and a blank one is `{"errors":{"body":["can't be blank"]}}`. | `validateLogin`, `validateNewComment` |
 | `cleanTags_not_blank`, `cleanTags_nodup` | Stored tags are never blank and never repeated. | `cleanTags` |
 
+### The browser app ([`Proofs/Client.lean`](Proofs/Client.lean), [`Proofs/Markdown.lean`](Proofs/Markdown.lean))
+
+The browser app's `update` is pure, so its submit handlers can be proved
+about directly. Each one validates the form with the server's own function
+first.
+
+| Theorem | In plain English | Code |
+| --- | --- | --- |
+| `submitRegister_sends_valid`, `submitLogin_sends_valid` | **The app never sends an invalid registration or login**: submitting either sends nothing (and shows the validation's messages) or sends exactly the encoding of a request that passed `validateNewUser` / `validateLogin`. | `Frontend.submitRegister`, `Frontend.submitLogin` |
+| `publish_sends_valid` | Publishing sends nothing, or an article that passed `validateNewArticle`: as `POST /api/articles`, or as a `PUT` with every field and the tag list (so removed tags are removed). | `Frontend.publish` |
+| `postComment_sends_valid` | Posting a comment sends nothing, or a comment with a body. | `Frontend.postComment` |
+| `inlines_safe`, `safeHref_allowed` | **No `javascript:` links**: every link the Markdown reader builds has an `http:`, `https:`, `mailto:` or relative target. Article bodies become element and text nodes (never HTML text), so a link's `href` is the only URL an author controls. | `Markdown.inlines`, `Markdown.safeHref` |
+
+| `registration_accepted`, `login_accepted`, `article_accepted`, `comment_accepted` | **What the app sends, the server accepts as is**: the server unwraps the body, decodes it into exactly the request the app validated (the JSON round trips below), and its own validation accepts that request unchanged. | the server's `Api.bodyOf` and `validate…` |
+| `validateNewUser_again`, `validateLogin_again`, `validateNewArticle_again`, `validateNewComment_again`, `clean_idem`, `cleanTags_idem` | Validating what already passed changes nothing: trimming and tag cleaning are idempotent. | `Conduit/Validation.lean` |
+
 ### The wire format ([`Proofs/Json.lean`](Proofs/Json.lean))
 
 | Theorem | In plain English |
@@ -120,6 +137,8 @@ same module does the opposite. These theorems say the two directions agree.
   The schema backs the important ones up: `PRIMARY KEY (follower, followed)`,
   `CHECK (follower <> followed)`, `PRIMARY KEY (user, article)`,
   `UNIQUE` slugs, usernames and emails.
+- **JSON text.** The theorems are about `Lean.Json` values; that Lean's
+  `Json.compress` (printing) and `Json.parse` agree is Lean's, not proved here.
 - **Lean, Lasm and the JavaScript runtime**: that Lean's kernel is sound, that
   Lasm compiles the Lean faithfully to WebAssembly, and that SQLite, Web
   Crypto and the HTTP layer behave as documented.
