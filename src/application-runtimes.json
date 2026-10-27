@@ -3,7 +3,7 @@
   "lean": {
     "4.36.0-rc1": {
       "name": "lean-4.36.0-rc1-wasm64",
-      "manifestSha256": "b9fde4b18f92626f3906ee95fa1abd394dfecfc987bf5d9fffd05c30d46e4416"
+      "manifestSha256": "8103c016651f2258d3777a9b62418bdbb2c4622779e1b8664a6226d26d7eeff0"
     }
   }
 }

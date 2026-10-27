@@ -2,11 +2,11 @@
   "schema": 1,
   "kind": "handoff",
   "repository": "Millillion/lasm",
-  "release": "node-runtime-inputs-40472316997",
+  "release": "node-runtime-inputs-40491677407",
   "asset": "node-runtime-inputs.tgz",
-  "sha256": "0fbf1b31ae15064cb16e798b52cc8babe88354f6a9081bfef4342395cfaa96cd",
+  "sha256": "10e4c9b3af6563ffb8d90341ab22d2d043ce302d879e977e36ad99162559504c",
   "runtimeName": "lean-4.36.0-rc1-wasm64",
-  "runtimeManifestSha256": "b9fde4b18f92626f3906ee95fa1abd394dfecfc987bf5d9fffd05c30d46e4416",
+  "runtimeManifestSha256": "8103c016651f2258d3777a9b62418bdbb2c4622779e1b8664a6226d26d7eeff0",
   "lean": "4.36.0-rc1",
-  "sourceRevision": "2d5336f231872fb7d6adcdc965069959083de111"
+  "sourceRevision": "03a516bdf3a14107685a89327315452324f08795"
 }
