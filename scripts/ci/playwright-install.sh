@@ -3,14 +3,15 @@
 # system packages on Linux. The Azure apt mirror sometimes stalls on a large
 # package (libavcodec60) until the step's 15-minute limit; apt now gives up on
 # a stalled connection after 30 s and retries, and the whole install is
-# retried up to three times, each bounded.
+# retried up to three times, each bounded. A retry waits for the dpkg lock
+# (an earlier attempt's apt-get can outlive its timeout) instead of failing.
 #   bash scripts/ci/playwright-install.sh BROWSER
 set -euo pipefail
 browser="$1"
 cli=.work/pw/node_modules/playwright-core/cli.js
 args=(install "$browser")
 if [ "$(uname -s)" = Linux ]; then
-  printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\nAcquire::https::Timeout "30";\n' | sudo tee /etc/apt/apt.conf.d/80-lasm-retries >/dev/null
+  printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\nAcquire::https::Timeout "30";\nDPkg::Lock::Timeout "600";\n' | sudo tee /etc/apt/apt.conf.d/80-lasm-retries >/dev/null
   args=(install --with-deps "$browser")
 fi
 # GNU timeout (Linux; gtimeout where Homebrew coreutils is installed); unbounded otherwise.
