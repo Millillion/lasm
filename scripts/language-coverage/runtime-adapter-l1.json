@@ -3240,9 +3240,6 @@
     "elab/async_http_encode.lean": {
      "sha256": "edcc76d98953edf844b294dfaf29df4fb116c1e1153ad0f4f82960da44086501"
     },
-    "elab/async_http_expect.lean": {
-     "sha256": "4772a9339dd4dc025438d6d486e43963fa111752781141ea72a4df071e0378ae"
-    },
     "elab/async_http_h1_rfc_compliance.lean": {
      "sha256": "909f372d83fd7a7d876019bab07a8a620dc8fd603ce23f8d1907775541c819e9"
     },

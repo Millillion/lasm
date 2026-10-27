@@ -23,15 +23,15 @@
   "runtime: compiled application": 133,
   "runtime: compiled test driver (docparse)": 334,
   "native build-time only: no runtime-checkable command": 2847,
-  "runtime candidate: parallel adapter": 582,
+  "runtime candidate: parallel adapter": 581,
   "separate review: unsupported sidecar": 9,
   "review: syntax survey failed": 1,
-  "runtime: reviewed eval-io adapter": 21,
+  "runtime: reviewed eval-io adapter": 22,
   "separate review: #exit": 1,
   "native build-time only: expected-error test": 316,
   "runtime: compiled LSP client with native compiler children": 160
  },
- "runtimeActionsInCandidates": 5632,
+ "runtimeActionsInCandidates": 5627,
  "tests": [
   {
    "name": "tests/lake/examples/deps/test.sh",
@@ -21888,7 +21888,7 @@
     "runtime": 5
    },
    "exited": false,
-   "execution": "runtime candidate: parallel adapter"
+   "execution": "runtime: reviewed eval-io adapter"
   },
   {
    "name": "elab/async_http_fuzz.lean",
