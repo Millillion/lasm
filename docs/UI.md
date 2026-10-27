@@ -288,8 +288,12 @@ def subscriptions (m : Model) : Subs Msg :=
 Set `onUrlChange` to make a single-page app. Then clicks on same-origin links
 inside the app (without modifier keys, `target` or `download`),
 `Cmd.pushUrl`/`replaceUrl`, and the back and forward buttons change the URL
-without loading a page and deliver `onUrlChange url`. `init` gets the initial
-URL. Routes are ordinary pattern matches:
+without loading a page and deliver `onUrlChange url`. The address and the page
+change together: a link click is discrete input, so the new page is rendered
+in the same task (as other clicks are), and `Cmd.pushUrl`/`replaceUrl` make
+the history entry with the frame that shows the new page, so nothing (a user,
+or a test waiting for the URL) sees the new address over the old page. `init`
+gets the initial URL. Routes are ordinary pattern matches:
 
 ```lean
 inductive Route where
