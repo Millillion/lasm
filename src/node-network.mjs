@@ -3,7 +3,7 @@ import { constants } from 'node:os';
 import { getSystemErrorMap } from 'node:util';
 import { numbers, cancellation } from './node-host.mjs';
 import { nativeTcp } from './native-tcp.mjs';
-import { leanAtLeast } from './lean-io-errors.mjs';
+import { leanAtLeast, receiveSizeError } from './lean-io-errors.mjs';
 
 const empty = Buffer.alloc(0);
 const failure = (code, message) => Object.assign(new Error(message), { code });
@@ -241,7 +241,12 @@ export function createNodeNetwork({ add, get, release, leanVersion = '4.32.0' })
       return new Promise((resolve, reject) => { t.acceptWait = { queue: true, resolve, reject }; });
     }
     case 55: { const t = getTcp(id); t.acceptWait?.reject(cancelled()); t.acceptWait = null; return empty; }
-    case 56: return receive(getTcp(id), n, false);
+    case 56: {
+      const t = getTcp(id);
+      if (t.readWait) throw tcpFailure('EALREADY');
+      if (!n && leanAtLeast(leanVersion, '4.36.0')) throw receiveSizeError();
+      return receive(t, n, false);
+    }
     case 57: return receive(getTcp(id), 0, true);
     case 58: getTcp(id).readWait?.reject(cancelled()); return empty;
     case 59: {

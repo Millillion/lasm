@@ -152,3 +152,20 @@ test('Lean 4.35 one-shot signal waiters stop listening after a cancel', { skip: 
   assert.equal(r.get(id).phase, 'initial');
   r.close();
 });
+
+for (const leanVersion of ['4.35.0', '4.36.0']) {
+  test(`Lean ${leanVersion}: receive buffers of size 0 and a second UDP receive`, async t => {
+    const r = resources(); t.after(() => r.close());
+    const udp = createNodeUdp({ ...r, leanVersion });
+    const socket = Number(udp.dispatch(100, 0, 0n, Buffer.alloc(0)).readBigUInt64LE());
+    await udp.dispatch(101, socket, 0n, loopback(0));
+    if (leanVersion === '4.36.0')
+      assert.deepEqual(decoded((() => { try { udp.dispatch(104, socket, 0n, Buffer.alloc(0)); } catch (err) { return err; } })()),
+        { kind: 4, errno: 22, message: 'receive buffer size must be positive' });
+    const pending = udp.dispatch(104, socket, 64n, Buffer.alloc(0));
+    const again = (() => { try { udp.dispatch(104, socket, 64n, Buffer.alloc(0)); } catch (err) { return err; } })();
+    assert.equal(decoded(again).message, 'connection already in progress');
+    udp.dispatch(106, socket, 0n, Buffer.alloc(0));
+    await assert.rejects(pending, { code: 'ECANCELED' });
+  });
+}

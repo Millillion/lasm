@@ -148,6 +148,11 @@ export function leanAtLeast(version, minimum) {
   return true;
 }
 
+// Lean 4.36 (runtime/uv/event_loop.cpp recv_size_error): a receive buffer of
+// size 0 is invalidArgument EINVAL, not libuv's UV_ENOBUFS.
+export const receiveSizeError = () => Object.assign(new Error('receive buffer size must be positive'),
+  { code: 'EINVAL', errno: 22, nativeMessage: true });
+
 export function checkLeanIOVersion(version) {
   // The verified 4.34.1 archives preserve both Init.System.IO and runtime/io.cpp
   // byte-for-byte. Lean 4.35.0 leaves Init/System/IOError.lean and the error
