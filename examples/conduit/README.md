@@ -1,9 +1,9 @@
 # Conduit in Lean
 
 **[Conduit](https://github.com/gothinkster/realworld), the RealWorld app, written in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm).**
-The REST API follows the RealWorld spec exactly and passes its official API test suite, unmodified (13/13 files, 154 requests).
+The REST API follows the RealWorld spec exactly and passes its official API test suite, unmodified (13/13 files, 154 requests), on Node, Cloudflare Workers and Bun.
 The rules (validation, slugs, pagination, authorization, every endpoint) are pure Lean, written once for any database, so they can be proved correct in Lean.
-SQLite comes from JavaScript (Node's built-in `node:sqlite`) through a few hand-written `@[js]` bindings; passwords and tokens use Web Crypto.
+SQLite comes from JavaScript (`node:sqlite`, Cloudflare D1, `bun:sqlite`) through one small hand-written binding module per target; passwords and tokens use Web Crypto.
 `npm install && npm run build && npm start` serves it on http://localhost:3000; `npm test` runs the official suite against it.
 
 ```sh
@@ -11,6 +11,10 @@ npm install      # Lasm (@lasm/cli) and Hurl, the API suite's runner
 npm run build    # dist/server: the Node server (Lasm downloads Lean on the first build)
 npm start        # http://localhost:3000/api (DATABASE_PATH, PORT, HOST, JWT_SECRET)
 npm test         # the official RealWorld API suite against a fresh server and database
+
+npm run build:workers && npx wrangler dev   # Cloudflare Workers with a local D1 database (wrangler.toml)
+npm run build:bun && npm run start:bun      # Bun with bun:sqlite (needs Bun; Lasm runs on Bun to build it)
+npm run test:workers                        # the suite against wrangler dev; test:bun against Bun
 ```
 
 Requirements: Node.js 24 or newer and npm. Nothing else: Lasm brings Lean 4.35.0 and its
@@ -26,10 +30,11 @@ implementations exist in every language; this one is Lean.
 | | |
 | --- | --- |
 | API | Every endpoint of the spec, under `/api`, with its status codes and error bodies (`{"errors": {"field": ["message"]}}`), `Authorization: Token <jwt>` |
-| Database | SQLite through `node:sqlite` (Node 24+), parameterized SQL only |
+| Targets | Node 24+ (`node:sqlite`), Cloudflare Workers (D1), Bun (`bun:sqlite`): the same Lean, one binding module each |
+| Database | SQLite, parameterized SQL only; tables created on first start |
 | Passwords | PBKDF2-HMAC-SHA-256, 100,000 iterations, random 16-byte salt per user (Web Crypto) |
 | Tokens | JWT, HS256, 30 days, signed with `JWT_SECRET` (Web Crypto) |
-| Tests | The official [Hurl suite](test/realworld/specs/api/hurl), run by its own script, on Node 24 and 26 in CI ([conduit.yml](../../.github/workflows/conduit.yml)) |
+| Tests | The official [Hurl suite](test/realworld/specs/api/hurl), run by its own script, in CI ([conduit.yml](../../.github/workflows/conduit.yml)) on Node 24 and 26, on Workers under `wrangler dev` (local workerd and D1) and on Bun 1.4: 13/13 files, 154 requests on each |
 
 ## Layout
 
@@ -45,10 +50,15 @@ Conduit/              the app, pure Lean (no Lasm, no JavaScript): checked by `l
   Api.lean            every endpoint and the router, written once for any monad
 Server/               the server (Lasm.Fetch and Lasm.JS)
   Sql.lean            every SQL statement; Conduit's Store on a SQLite connection
-  NodeSqlite.lean     the node:sqlite binding (the only Node-specific file)
+  NodeSqlite.lean     node:sqlite (Node)        ┐
+  D1.lean             Cloudflare D1 (Workers)   ├ the only target-specific files: each makes a `Sql`
+  BunSqlite.lean      bun:sqlite (Bun)          ┘
   Crypto.lean         PBKDF2 and JWT with Web Crypto
   App.lean            HTTP: /api/… → Conduit.Api.handle
 ServerNode.lean       main for Node: open the database, serve
+ServerWorkers.lean    main for Workers (D1 binding `DB`)
+ServerBun.lean        main for Bun
+wrangler.toml         the Worker and its D1 binding
 test/
   api.mjs             starts a server on a fresh database and runs the official suite
   realworld/          gothinkster/realworld's specs, unmodified, at the commit in PINNED
@@ -74,8 +84,17 @@ let rows ← st.callMethod "all" #[toJS email] (Array Data)
 ```
 
 It returns a `Sql` (three functions: `all`, `run`, `batch`), and `Server/Sql.lean` builds
-Conduit's `Store` from that, so moving to another SQLite (Cloudflare D1, `bun:sqlite`) means
-writing another `Sql`. Web Crypto needs no binding at all: `Server/Crypto.lean` reads
+Conduit's `Store` from that, so another SQLite means another `Sql`:
+
+- `Server/D1.lean` needs no import at all: D1 is an object in the Worker's `env`
+  (`Lasm.Fetch.platformEnv`), its methods return promises that `callMethodAwait` awaits in
+  `Async`, and `batch` is D1's own `db.batch` (one transaction).
+- `Server/BunSqlite.lean` binds `@[js "bun:sqlite" "new Database"]`. Lasm checks every
+  binding against the real module at build time, so this one is built with Lasm running on
+  Bun (`bunx --bun lasm build …`, as `npm run build:bun` does).
+
+Each target has its own entry file because Lasm imports a program's bound modules into its
+bundle: the Workers build must not mention `node:sqlite`. Web Crypto needs no binding at all: `Server/Crypto.lean` reads
 `globalThis.crypto.subtle` and calls `importKey`, `deriveBits`, `sign` and `verify`, awaiting
 their promises in `Async` (no Lean thread is held while they run). The full guide is
 [docs/JS_BINDINGS.md](../../docs/JS_BINDINGS.md).
@@ -91,9 +110,16 @@ their promises in `Async` (no Lean thread is held while they run). The full guid
 
 ## Deploy
 
-`npm run build` writes `dist/server` (the program, the Lean runtime and `main.mjs`); run it
-with `node dist/server/main.mjs` on any machine with Node 24+, in a container or a VM. Keep
-`DATABASE_PATH` on a persistent disk.
+- **Node**: `npm run build` writes `dist/server` (the program, the Lean runtime and
+  `main.mjs`); run `node dist/server/main.mjs` on any machine with Node 24+, in a container or
+  a VM. Keep `DATABASE_PATH` on a persistent disk.
+- **Cloudflare Workers**: `npx wrangler d1 create conduit` and put its id in `wrangler.toml`,
+  `npx wrangler secret put JWT_SECRET`, then `npm run build:workers` and `npx wrangler deploy`.
+  Conduit creates its tables on first use. PBKDF2 with 100,000 iterations takes a few
+  milliseconds of CPU per login or registration, which fits the Paid plan; the Free plan's
+  10 ms CPU limit is tight for it.
+- **Bun**: `npm run build:bun` writes `bun/`; run `bun bun/main.mjs` (`DATABASE_PATH`, `PORT`,
+  `JWT_SECRET`).
 
 ## Behaviour where the spec leaves a choice
 
