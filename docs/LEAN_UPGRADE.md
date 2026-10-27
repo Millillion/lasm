@@ -206,6 +206,9 @@ What a second version costs:
   serving both runtime ABIs (4.36 added one primitive; adding an operation is
   backward compatible).
 
+**Decided (2026-10-27): one Lean release per Lasm release, no two-version support.**
+The recommendation below was accepted without the optional overlap.
+
 **Recommendation: no standing two-version support; a short overlap instead.**
 Keep "one Lean release per Lasm release", and make upgrades fast with this
 runbook (a release within days of Lean's). For users who cannot move at once,
