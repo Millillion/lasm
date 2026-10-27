@@ -394,8 +394,10 @@ O *lean_uv_udp_send(O *socket, O *data, O *addr) {
     auto *promise = start_request(103, socket, count, bytes.data(), bytes.size(), 0);
     lean_dec(data); return ok(promise);
 }
-O *lean_uv_udp_recv(O *socket, uint64_t size) { return ok(start_request(104, socket, size, nullptr, 0, 5)); }
-O *lean_uv_udp_wait_readable(O *socket) { return ok(start_request(105, socket, 0, nullptr, 0, 0)); }
+// Native libuv rejects a second receive (EALREADY), a receive buffer of size 0
+// (Lean 4.36) and a failed recv_start before creating the promise.
+O *lean_uv_udp_recv(O *socket, uint64_t size) { return start_io_request(104, socket, size, nullptr, 0, 5); }
+O *lean_uv_udp_wait_readable(O *socket) { return start_io_request(105, socket, 0, nullptr, 0, 0); }
 O *lean_uv_udp_cancel_recv(O *socket) { return cancel_call(106, socket); }
 O *lean_uv_udp_getpeername(O *socket) { auto r = Reply(107, handle_id(socket)); return r.failed ? r.result() : ok(socket_address(r)); }
 O *lean_uv_udp_getsockname(O *socket) { auto r = Reply(108, handle_id(socket)); return r.failed ? r.result() : ok(socket_address(r)); }
