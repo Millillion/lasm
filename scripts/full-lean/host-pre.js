@@ -30,6 +30,13 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     process.exit(error.code);
   };
   var lasmFullHostValue;
+  // Cancel calls whose cancelled completions the calling thread releases
+  // (runtime/node-async.cpp release_cancelled): TCP accept and receive, UDP
+  // receive, timer and signal stop and cancel.
+  var lasmFullCancelOperations = new Set([55, 58, 74, 75, 106, 163, 164]);
+  var lasmFullCancelling = new Map();
+  // Started operations (op 94) per handle whose results have not settled.
+  var lasmFullWaiting = new Map();
   var lasmFullLoadHost = function () {
     if (!lasmFullHost) {
       const path = process.env.LASM_FULL_HOST_MODULE;
@@ -75,12 +82,42 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       const started = host.request(Number(input.readBigUInt64LE(32)), handle, input.readBigUInt64LE(40),
         input.subarray(48), context);
       if (input.readBigUInt64LE(24) !== 0n && !started.then && started.error) return started;
-      Promise.resolve(started).then(done => lasmFullComplete({ error: false,
-        bytes: Buffer.concat([header, Buffer.from([done.error ? 1 : 0, 0, 0, 0, 0, 0, 0, 0]), done.bytes]) }),
-      error => error?.name === 'LeanExit' ? lasmFullExit(error)
-        : lasmFullComplete({ failure: error?.stack ?? String(error) }));
+      const waiting = started.then !== undefined;
+      if (waiting) lasmFullWaiting.set(handle, (lasmFullWaiting.get(handle) ?? 0) + 1);
+      const settled = () => {
+        if (!waiting) return;
+        const count = lasmFullWaiting.get(handle) - 1;
+        if (count) lasmFullWaiting.set(handle, count); else lasmFullWaiting.delete(handle);
+      };
+      Promise.resolve(started).then(done => {
+        settled();
+        // A cancellation (error kind 10) during a cancel call on this handle
+        // is released by the cancelling thread (op 96), as native libuv does.
+        const dropped = done.error && done.bytes.length >= 8 && Buffer.from(done.bytes.buffer, done.bytes.byteOffset, 8).readBigUInt64LE() === 10n
+          ? lasmFullCancelling.get(handle) : undefined;
+        if (dropped) return void dropped.push(header);
+        lasmFullComplete({ error: false,
+          bytes: Buffer.concat([header, Buffer.from([done.error ? 1 : 0, 0, 0, 0, 0, 0, 0, 0]), done.bytes]) });
+      },
+      error => { settled(); return error?.name === 'LeanExit' ? lasmFullExit(error)
+        : lasmFullComplete({ failure: error?.stack ?? String(error) }); });
       return { error: false, bytes: new Uint8Array(0) };
     }
+    if (operation === 96) {
+      // After a cancel call on this handle: the cancelled completions it
+      // diverted, as 24-byte packet headers (promise, resource, kind). The
+      // rejections settle in microtasks, all of which run before this
+      // macrotask callback.
+      const take = () => {
+        const dropped = lasmFullCancelling.get(handle) ?? [];
+        lasmFullCancelling.delete(handle);
+        return { error: false, bytes: Buffer.concat(dropped) };
+      };
+      // Nothing of this handle is still settling: reply now.
+      if (!lasmFullWaiting.has(handle)) return take();
+      return new Promise(resolve => (typeof setImmediate === 'function' ? setImmediate : setTimeout)(() => resolve(take())));
+    }
+    if (lasmFullCancelOperations.has(operation) && !lasmFullCancelling.has(handle)) lasmFullCancelling.set(handle, []);
     if (operation === 92) {
       return lasmFullCompletions.length ? lasmFullCompletions.shift()
         : new Promise(resolve => { lasmFullCompletionWaiter = resolve; });

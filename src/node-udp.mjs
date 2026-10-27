@@ -1,5 +1,7 @@
 import dgram from 'node:dgram';
+import { getSystemErrorMap } from 'node:util';
 import { numbers, cancellation } from './node-host.mjs';
+import { leanAtLeast } from './lean-io-errors.mjs';
 
 const empty = Buffer.alloc(0);
 const error = (code, message) => Object.assign(new Error(message), { code });
@@ -9,7 +11,15 @@ const encodeAddress = value => Buffer.concat([
   numbers(value.family === 'IPv6' ? 6 : 4, value.port), Buffer.from(value.address),
 ]);
 
-export function createNodeUdp({ add, get }) {
+// Lean 4.36 reports a datagram larger than the receive buffer (UV_UDP_PARTIAL)
+// as UV_EMSGSIZE; earlier releases return the truncated prefix.
+const messageTooLong = () => {
+  const [errno, [code, message]] = [...getSystemErrorMap()].find(([, [name]]) => name === 'EMSGSIZE');
+  return Object.assign(new Error(message), { code, errno });
+};
+
+export function createNodeUdp({ add, get, leanVersion = '4.32.0' }) {
+  const reportTruncation = leanAtLeast(leanVersion, '4.36.0');
   function socket(resource, family = 4) {
     if (resource.socket) {
       if (resource.family !== family) throw error('EAFNOSUPPORT', 'Address family does not match socket');
@@ -40,6 +50,7 @@ export function createNodeUdp({ add, get }) {
     if (waiter.peek) { waiter.resolve(empty); return; }
     const message = resource.messages.shift();
     const peer = encodeAddress(message.peer);
+    if (reportTruncation && message.bytes.length > waiter.count) { waiter.reject(messageTooLong()); return; }
     waiter.resolve(Buffer.concat([numbers(peer.length), peer, message.bytes.subarray(0, waiter.count)]));
   }
   function eventCall(resource, event, action) {

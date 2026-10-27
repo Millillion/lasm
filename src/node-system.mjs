@@ -4,13 +4,15 @@ import { numbers } from './node-host.mjs';
 import { nativeFiles } from './native-files.mjs';
 import { nativeInterfaces } from './native-interfaces.mjs';
 import { createLinuxMemory } from './linux-memory.mjs';
+import { leanAtLeast } from './lean-io-errors.mjs';
 
 const string = value => { const bytes = Buffer.from(value); return Buffer.concat([numbers(bytes.length), bytes]); };
 const optionalString = value => value == null ? numbers(0) : Buffer.concat([numbers(1), string(value)]);
 const empty = Buffer.alloc(0);
 function invalidArgument() { return Object.assign(new Error('invalid argument'), { code: 'EINVAL', errno: -22 }); }
 
-export function createNodeSystem() {
+export function createNodeSystem({ leanVersion = '4.32.0' } = {}) {
+  const grow = leanAtLeast(leanVersion, '4.36.0');
   let linuxMemory;
   const memory = () => linuxMemory ??= createLinuxMemory(nativeFiles());
   return { dispatch(op, id, argument, bytes) {
@@ -26,8 +28,8 @@ export function createNodeSystem() {
       return Buffer.concat([numbers(cpus.length), ...cpus.flatMap(cpu => [string(cpu.model),
         numbers(cpu.speed, cpu.times.user, cpu.times.nice, cpu.times.sys, cpu.times.idle, cpu.times.irq)])]);
     }
-    case 126: return nativeFiles().homeDirectory();
-    case 127: return nativeFiles().temporaryDirectory();
+    case 126: return nativeFiles().homeDirectory({ grow });
+    case 127: return nativeFiles().temporaryDirectory({ grow });
     case 128: {
       const user = os.userInfo();
       return Buffer.concat([string(user.username), numbers(user.uid, user.gid), optionalString(user.shell), optionalString(user.homedir)]);

@@ -11,7 +11,7 @@ tools as npm packages. No Lean, C compiler or Emscripten to set up.
 
 ## Platforms
 
-Releases: **0.1.0**, **0.2.0**, **0.3.0** and **0.3.1** are on npm ([0.3.0 notes](docs/release/0.3.0-notes.md), [0.3.1](docs/release/0.3.1-notes.md)).
+Releases: **0.1.0**, **0.2.0**, **0.3.0**, **0.3.1** and **0.3.2** are on npm ([0.3.0 notes](docs/release/0.3.0-notes.md), [0.3.1](docs/release/0.3.1-notes.md), [0.3.2](docs/release/0.3.2-notes.md)).
 Every row is tested in CI with the platform's own local runtime, image or emulator;
 by project policy CI never deploys to a real cloud account
 ([how each is tested](#supported-platforms)).
@@ -473,7 +473,8 @@ your system Git ([system Git](docs/MANAGED_GIT.md)).
 edge targets and Bun/Deno ([notes](docs/release/0.2.0-notes.md)); 0.3.0 adds the
 browser, `Lasm.UI`, full-stack apps, WASI/Fastly and the editor support
 ([notes](docs/release/0.3.0-notes.md)); 0.3.1 puts the starter code under MIT-0 and
-adds bug-report pointers ([notes](docs/release/0.3.1-notes.md)). Lasm's npm
+adds bug-report pointers ([notes](docs/release/0.3.1-notes.md)); 0.3.2 fixes
+`Std.Internal.UV` sockets, timers and signals ([notes](docs/release/0.3.2-notes.md)). Lasm's npm
 packages (`@lasm/cli`, `@lasm/create` and the `@lasm/…` tool packages) are
 published only by the [`release.yml`](.github/workflows/release.yml) workflow,
 through npm trusted publishing with provenance: no npm tokens exist. A release is a

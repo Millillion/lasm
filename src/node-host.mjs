@@ -19,7 +19,7 @@ import { createNodeSignals } from './node-signal.mjs';
 import nativeThreadId from './thread-id.cjs';
 import { HandleTable } from './handle-table.mjs';
 import { createWorkingDirectory } from './working-directory.mjs';
-import { checkLeanIOVersion, leanIOError } from './lean-io-errors.mjs';
+import { checkLeanIOVersion, leanIOError, leanAtLeast } from './lean-io-errors.mjs';
 
 const empty = Buffer.alloc(0);
 // Larger reads of regular files keep using a file worker, off the host thread.
@@ -102,6 +102,18 @@ export function encodeError(err, leanVersion = '4.32.0') {
     catch { /* preserve non-system errors */ }
   }
   return { error: true, bytes: Buffer.concat([numbers(kind, err.errno ?? 0), Buffer.from(message)]) };
+}
+
+// Std.Internal.UV.Loop.alive from Lean 4.36: whether libuv would have an
+// active request or handle other than the loop's own wake-up handle.
+export function loopAlive(resources, activeRequests = 0) {
+  if (activeRequests) return true;
+  for (const r of resources) {
+    if ((r.type === 'timer' || r.type === 'signal') && r.phase === 'running') return true;
+    if (r.type === 'tcp' && (r.server?.listening || r.acceptWait || r.readWait)) return true;
+    if (r.type === 'udp' && r.waiter) return true;
+  }
+  return false;
 }
 
 /** Private Node implementation of Lean's runtime primitives, not a Lean API. */
@@ -196,16 +208,34 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
     return closeResource(resource, asynchronous);
   }
   const network = createNodeNetwork({ add, get, release, leanVersion });
-  const udp = createNodeUdp({ add, get });
+  const udp = createNodeUdp({ add, get, leanVersion });
   const processes = createNodeProcesses({ add, get, release, cwd: state => directory.spawn(state),
     applicationCommand: applicationCommand && { ...applicationCommand, path: appPath },
     flushStdout: () => flushStandard(1) });
-  const system = createNodeSystem();
-  const signals = createNodeSignals({ add, get });
+  const system = createNodeSystem({ leanVersion });
+  const signals = createNodeSignals({ add, get, leanVersion });
   const outbound = createNodeFetch({ add, get });
   const js = createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, progress });
   const pending = new HandleTable();
+  // Std.Internal.UV.Loop.alive: whether libuv would have an active handle or
+  // request other than the loop's own wake-up handle. Requests (connect,
+  // write, shutdown, send, DNS, random) are counted while they run; handles
+  // are active while a timer runs, a signal is watched, a TCP socket listens
+  // or reads, or a UDP socket receives.
+  const loopRequests = new Set([59, 60, 65, 103, 115, 116, 143]);
+  let activeRequests = 0;
   function dispatch(op, id, arg, bytes, context, state) {
+    if (loopRequests.has(op)) {
+      const result = dispatchOperation(op, id, arg, bytes, context, state);
+      if (!result?.then) return result;
+      activeRequests++;
+      return result.finally(() => { activeRequests--; });
+    }
+    // Lean 4.35 counts the loop's always-active wake-up handle (always alive).
+    if (op === 145) return numbers(leanAtLeast(leanVersion, '4.36.0') ? Number(loopAlive(resources.values(), activeRequests)) : 1);
+    return dispatchOperation(op, id, arg, bytes, context, state);
+  }
+  function dispatchOperation(op, id, arg, bytes, context, state) {
     const path = bytes => pathAt(bytes, state);
     if (op === 180) {
       const zone = nativeWindowsTimeZone().nextTransition(bytes, arg, id !== 0);
