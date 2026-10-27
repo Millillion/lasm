@@ -423,6 +423,9 @@ export async function runDev(options, hooks = {}) {
       const text = formatLeanDiagnostics(detail || error.message, project);
       process.stderr.write(text.slice(-12000) + '\n');
       if (detail && !text.includes(error.message.split('\n')[0]) && !/Command failed/.test(error.message)) process.stderr.write(error.message.split('\n')[0] + '\n');
+      // An unexpected internal error (not a Lean diagnostic): its stack and where to report it.
+      const { isInternalError, bugReportLine } = await import('./application-cli.mjs');
+      if (isInternalError(error)) process.stderr.write(`${error.stack ?? ''}\n${bugReportLine}\n`);
       server?.report(error.message.split('\n')[0]);
       say(color('31', `Build failed after ${((performance.now() - started) / 1000).toFixed(1)} s`) + (lastGood ? '; the last good build keeps running. Fix the error and save.' : '. Fix the error and save.'));
     } finally {

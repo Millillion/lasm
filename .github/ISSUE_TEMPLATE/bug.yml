@@ -1,0 +1,66 @@
+name: Bug report
+description: Something in Lasm does not work as documented (a build, a target, the runtime, an install).
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. A Lean error in your own code (for example an unknown identifier) is not a Lasm bug; [Lean's Zulip](https://leanprover.zulipchat.com) is the place for those. Please do not paste secrets or tokens.
+  - type: input
+    id: version
+    attributes:
+      label: lasm --version
+      description: The output of `npx lasm --version` in your project.
+      placeholder: lasm 0.3.1 (@lasm/cli; Lean 4.35.0; Node 26.12.1; linux-x64)
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [Linux x64, Linux arm64, macOS arm64 (Apple Silicon), macOS x64 (Intel), Windows x64, Other]
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Node, Bun or Deno version
+      description: '`node --version` (or `bun --version`, `deno --version` if Lasm runs on Bun or Deno).'
+      placeholder: v26.12.1
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      description: The `--target` of the failing build (node when you passed none).
+      options: [node, lambda, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge, bun, deno, wasi, wasi-http, fastly, browser, not a build (install, lasm init, lasm editor, …)]
+    validations:
+      required: true
+  - type: input
+    id: template
+    attributes:
+      label: Template or project
+      description: The `lasm init` template you started from, or a link to a small project that shows the problem.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The command you ran and its full output. Lasm prints "If this looks like a Lasm bug, please report it" after an unexpected internal error; include everything above that line.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. npm create @lasm@latest my-app -- --template hono
+        2. cd my-app && npm install
+        3. npm run build

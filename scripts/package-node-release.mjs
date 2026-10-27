@@ -112,7 +112,7 @@ const files = new Set(packed.files.map(file => file.path));
 for (const file of ['bin/lasm.mjs', 'src/application-support.mjs', 'src/application-build-client.mjs',
   'src/application-build-worker.mjs', 'src/build-progress.mjs', 'src/native/node_modules/koffi/index.cjs',
   'src/native/process/manifest.json', 'src/native/signals/manifest.json',
-  'scripts/full-lean/host-library.js', 'src/init.mjs', 'templates/common/App.lean', 'templates/hono/Main.lean', 'application-support.json', 'provenance.json', 'THIRD_PARTY_NOTICES.txt',
+  'scripts/full-lean/host-library.js', 'src/init.mjs', 'templates/common/App.lean', 'templates/LICENSE', 'examples/LICENSE', 'templates/hono/Main.lean', 'application-support.json', 'provenance.json', 'THIRD_PARTY_NOTICES.txt',
   `targets/${runtime.manifest.name}/target.json`]) assert.ok(files.has(file), `npm pack omitted ${file}`);
 for (const [path, dependency] of Object.entries(installer.manifest.packages)) {
   for (const file of Object.keys(dependency.files)) assert.ok(files.has(`${path}/${file}`), `npm pack omitted bundled installer file ${path}/${file}`);

@@ -1,0 +1,26 @@
+name: Feature request
+description: Suggest a target, an API, a template or an improvement.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The use case, in a sentence or two. What does Lasm make hard or impossible today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help
+      description: The command, option, target or Lean API you have in mind, if any.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Workarounds, other tools, or Lasm features you tried.
+  - type: input
+    id: version
+    attributes:
+      label: lasm --version
+      description: Optional; the version you use today.

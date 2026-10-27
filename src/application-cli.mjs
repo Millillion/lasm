@@ -25,8 +25,41 @@ export async function runApplicationChild(executable, args, missingMessage) {
   } finally { signals.forEach((signal, index) => process.off(signal, handlers[index])); }
 }
 
+/** Where to report a Lasm bug (the bug report form, .github/ISSUE_TEMPLATE/bug.yml). */
+export const bugReportUrl = 'https://github.com/Millillion/lasm/issues/new?template=bug.yml';
+export const bugReportLine = `If this looks like a Lasm bug, please report it: ${bugReportUrl}`;
+
+/** An unexpected internal error: a programming error inside Lasm (a TypeError,
+ * a failed internal assertion, …) or one marked `lasmInternal`, as opposed to
+ * the errors Lasm reports on purpose (usage, Lean diagnostics, missing tools,
+ * a program's own exceptions), which already say what to do. */
+export function isInternalError(error) {
+  if (!error || typeof error !== 'object') return false;
+  if (error.lasmInternal === true) return true;
+  if (error.lasmInternal === false || error.name === 'LeanIOError') return false;
+  return error instanceof TypeError || error instanceof RangeError || error instanceof ReferenceError || error instanceof SyntaxError
+    || error instanceof EvalError || error.code === 'ERR_ASSERTION' || error.name === 'AssertionError'
+    // Errors rebuilt from a build worker keep their name but not their class.
+    || ['TypeError', 'RangeError', 'ReferenceError', 'EvalError'].includes(error.name);
+}
+
+/** `lasm --version`: the package, its Lean, the JavaScript runtime and the host. */
+export async function versionText() {
+  const { readFileSync } = await import('node:fs');
+  const { jsRuntime, jsRuntimeVersion } = await import('./js-runtime.mjs');
+  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  let lean = applicationSupport()?.lean;
+  if (!lean) try { lean = JSON.parse(readFileSync(new URL('./toolchains.json', import.meta.url), 'utf8')).defaultLean; } catch {}
+  return `lasm ${pkg.version} (${pkg.name}; Lean ${lean ?? 'unknown'}; ${jsRuntime === 'node' ? 'Node' : jsRuntime === 'bun' ? 'Bun' : 'Deno'} ${jsRuntimeVersion}; ${process.platform}-${process.arch})`;
+}
+
 export function reportCliError(error) {
   if (error.name === 'LeanIOError') { console.error('uncaught exception: ' + error.message); return; }
+  if (isInternalError(error)) {
+    console.error(`${error.stack ?? error.message}`.slice(-12000));
+    console.error(bugReportLine);
+    return;
+  }
   const text = (error.stderr?.toString() || error.stdout?.toString() || error.message);
   // Lean and Lake errors: file:line, the source line and a caret, without Lake's
   // command traces (as lasm dev prints them).
@@ -157,8 +190,9 @@ export function assertSourceExists(input) {
 export async function runApplicationCli(argv) {
   const options = parseLasmArguments(argv);
   const support = applicationSupport();
+  if (options.command === 'version') { console.log(await versionText()); return 0; }
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]\n       lasm init my-app [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser [--allow-dev]\n       lasm editor [project-directory]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nlasm editor makes the Lean editor resolve import Lasm.* (elan toolchain for this project).' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]\n       lasm init my-app [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser [--allow-dev]\n       lasm editor [project-directory]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help, --version\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nlasm editor makes the Lean editor resolve import Lasm.* (elan toolchain for this project).' : cliUsage);
     return 0;
   }
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }
