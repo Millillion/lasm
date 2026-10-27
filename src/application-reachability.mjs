@@ -142,7 +142,16 @@ export function canSpecializeInitialization(runtime) {
     // starts with the first asynchronous request. Neither object has a static
     // constructor; no module initializer, init.cpp or init_module.cpp object changed,
     // so no Lean initialization path changed.
-    '1b868b43e734e0ab3d67e53179522c8e248b91e5f2e1727d343c760370d1b4fb'].includes(runtime.identity);
+    '1b868b43e734e0ab3d67e53179522c8e248b91e5f2e1727d343c760370d1b4fb',
+    // Lean 4.36.0-rc1 (CI build 40446052241, source 9d7a4a5, handoff fb7ee613…), reviewed
+    // against 4.35.0: initialize/init.cpp's `lean_initialize` moved into
+    // `initialize_impl(false)` and still initializes Init, Std and the whole Lean
+    // package, then the kernel and library modules (the minimal variant is separate);
+    // runtime/init_module.cpp adds only `initialize_cadical`, which this runtime
+    // builds without CaDiCaL (an empty function); libleancpp's library and util
+    // modules dropped `num` and `ascii`. The runtime's own initialization therefore
+    // still stands alone, so the specialization's premise holds.
+    '4c0ef41ae6ff3f1d9a089a4eadfaf82bf63e0c5e9b7e03e5f72bdecd920899cb'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';
