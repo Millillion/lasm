@@ -144,7 +144,7 @@ jobs:
       - name: Pinned Playwright and its ${{ matrix.browser }} build
         run: |
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          node .work/pw/node_modules/playwright-core/cli.js install --with-deps "${{ matrix.browser }}"
+          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
       - uses: actions/download-artifact@v4
         with:
           name: fullstack-app
@@ -181,7 +181,7 @@ jobs:
         run: |
           npm install --prefix .work/tools --no-audit --no-fund wrangler@4.152.0
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          node .work/pw/node_modules/playwright-core/cli.js install --with-deps chromium
+          bash scripts/ci/playwright-install.sh chromium
       - uses: actions/download-artifact@v4
         with:
           name: fullstack-app
@@ -227,7 +227,7 @@ jobs:
         run: |
           npm install --prefix .work/tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          node .work/pw/node_modules/playwright-core/cli.js install --with-deps chromium
+          bash scripts/ci/playwright-install.sh chromium
           .work/tools/node_modules/.bin/bun --version
           .work/tools/node_modules/.bin/deno --version
       - uses: actions/download-artifact@v4
@@ -286,7 +286,7 @@ jobs:
           tar -xzf $T/dl/viceroy.tar.gz -C $T/viceroy
           rm -rf $T/dl
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          node .work/pw/node_modules/playwright-core/cli.js install --with-deps chromium
+          bash scripts/ci/playwright-install.sh chromium
       - uses: actions/download-artifact@v4
         with:
           name: fullstack-app
