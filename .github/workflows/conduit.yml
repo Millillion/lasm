@@ -1,0 +1,166 @@
+name: Conduit
+# examples/conduit, the RealWorld app in Lean, built as a user builds it
+# (npm ci with the published @lasm/cli pinned in its package.json):
+# - api-node: the Node server (node:sqlite) on Node 24 and 26, against the
+#   official RealWorld API suite (gothinkster/realworld specs/api/hurl at the
+#   commit in test/realworld/PINNED, run unmodified with its own script);
+# - api-workers: the Workers build (D1) under `wrangler dev` (local workerd
+#   and a local D1 database), against the same suite;
+# - api-bun: the Bun build (bun:sqlite), built by Lasm running on Bun,
+#   against the same suite;
+# - pinned: test/realworld is byte-identical to the upstream commit.
+# Local runtimes and emulators only: no account, nothing deployed, CI=1.
+# Free runners only.
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    paths:
+      - '.github/workflows/conduit.yml'
+      - 'examples/conduit/**'
+  push:
+    branches: [main, conduit]
+    paths:
+      - '.github/workflows/conduit.yml'
+      - 'examples/conduit/**'
+permissions:
+  contents: read
+concurrency:
+  group: conduit-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CI: '1'
+  BROWSER: 'none'
+jobs:
+  pinned:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: test/realworld matches gothinkster/realworld at the pinned commit
+        working-directory: examples/conduit/test/realworld
+        run: |
+          set -e
+          commit=$(sed -n 2p PINNED)
+          git init -q "$RUNNER_TEMP/rw" && cd "$RUNNER_TEMP/rw"
+          git fetch -q --depth 1 https://github.com/gothinkster/realworld.git "$commit"
+          git checkout -q FETCH_HEAD
+          cd "$GITHUB_WORKSPACE/examples/conduit/test/realworld"
+          cmp LICENSE "$RUNNER_TEMP/rw/LICENSE"
+          for f in $(find specs -type f); do cmp "$f" "$RUNNER_TEMP/rw/$f"; done
+          echo "$(find specs -type f | wc -l) files identical to gothinkster/realworld@$commit"
+  api-node:
+    name: API on Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['24', '26.12.1']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: examples/conduit
+        run: npm ci --no-audit --no-fund
+      - name: npm run build
+        working-directory: examples/conduit
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+      - name: npm test (the official RealWorld API suite)
+        working-directory: examples/conduit
+        run: node test/api.mjs --name "node-${{ matrix.node }}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: conduit-api-node-${{ matrix.node }}
+          path: examples/conduit/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  api-workers:
+    name: API on Cloudflare Workers (wrangler dev, local D1)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci, and the pinned wrangler (with workerd)
+        working-directory: examples/conduit
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund wrangler@4.152.0
+          echo "$RUNNER_TEMP/tools/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: npm run build:workers
+        working-directory: examples/conduit
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:workers
+      - name: The official RealWorld API suite against wrangler dev
+        working-directory: examples/conduit
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: node test/api.mjs --name workers --command "wrangler dev --port {port} --ip 127.0.0.1"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: conduit-api-workers
+          path: examples/conduit/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  api-bun:
+    name: API on Bun (bun:sqlite)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci, and the pinned Bun
+        working-directory: examples/conduit
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund bun@1.4.4
+          echo "$RUNNER_TEMP/tools/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: npm run build:bun (Lasm running on Bun)
+        working-directory: examples/conduit
+        run: |
+          bun --version
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:bun
+      - name: The official RealWorld API suite against Bun
+        working-directory: examples/conduit
+        run: node test/api.mjs --name bun --command "bun bun/main.mjs"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: conduit-api-bun
+          path: examples/conduit/test-results/
+          retention-days: 14
+          if-no-files-found: warn

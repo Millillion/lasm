@@ -2,14 +2,16 @@
 
 Lasm compiles Lean 4 ahead of time to WebAssembly for Node, Bun, Deno, edge
 isolates, WASI hosts and browsers. This page lists every document in the order a
-newcomer needs them. Marks: **0.1.0** and **0.2.0** are on npm; **0.3.0** is the
-`launch` branch, shipping in the next release.
+newcomer needs them. Marks give the release a feature arrived in; everything here is
+in the current release on npm (`npm view @lasm/cli version`).
 
 ## 1. Getting started
 
 | Read | For |
 | --- | --- |
-| [README](../README.md) | What Lasm is, the 60-second start, where it runs, measured numbers, limitations, and the full reference |
+| [README](../README.md) | Quick facts, the start-here table, recipes per target, measured numbers, limitations and the full reference |
+| [Examples](../examples/README.md) | Every example with its one-command run |
+| [For AI agents](AI.md) · [llms.txt](../llms.txt) | Rules and pitfalls for agents; the link index |
 | [Getting started](GETTING_STARTED.md) | A Hono server with Lean handlers, an npm package called from Lean, a container, a function platform |
 | [The edit loop (`lasm dev`)](DEVELOPER_WORKFLOW.md) | Rebuild-and-restart on save, build errors, several outputs at once (0.3.0) |
 

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.lake/
+*.db
+*.db-shm
+*.db-wal
+.wrangler/
+workers/
+bun/
+test-results/
+playwright-report/
