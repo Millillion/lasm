@@ -6,6 +6,7 @@ For a new project, use `npm create @lasm@latest` with a [template](../README.md#
 
 | Example | What it shows | Run |
 | --- | --- | --- |
+| **[conduit](conduit)** (flagship) | The RealWorld "Conduit" REST API in Lean, one code base on Node (`node:sqlite`), Cloudflare Workers (D1) and Bun (`bun:sqlite`); PBKDF2, JWT, `Lasm.Fetch`; passes the official RealWorld API suite (154 requests) on every target. Coming: proofs (in progress), the `Lasm.UI` frontend | `npm install && npm run build && npm start` (also `build:workers`, `build:bun`; `npm test`: the official suite) |
 | [hello](hello) | The smallest program | `npx @lasm/cli Main.lean` |
 | [js-fetch](js-fetch) | A `@[js]` binding to Node's `fetch`, awaiting in `Async` | `npx @lasm/cli Main.lean -- https://example.com` |
 | [js-crud](js-crud) | A REST API with Postgres (`pg`) and JWT (`jose`), on Express and on Hono | `npm install && npx @lasm/cli Express.lean` |
@@ -13,7 +14,6 @@ For a new project, use `npm create @lasm@latest` with a [template](../README.md#
 | [edge-pure](edge-pure) | A pure-Lean Cloudflare Worker (also Vercel/Netlify Edge, Deno Deploy, Supabase) | `npx @lasm/cli build Main.lean --target workers` |
 | [wasi-cli](wasi-cli) | A command-line program as a standard WASI module | `npx @lasm/cli build Main.lean --target wasi` |
 | [ui](ui) | Browser apps with `Lasm.UI`: counter, TodoMVC with proofs, feature demo, benchmark | `npx @lasm/cli dev Main.lean --target browser` |
-| conduit (coming) | The RealWorld "Conduit" app in Lean, with proofs: the flagship full-stack example | — |
 
 Maintainer fixtures, kept as regression tests and not the way to start:
 [basic](basic), [io](io), [worker](worker), [express](express) (the earlier
