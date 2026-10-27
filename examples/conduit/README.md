@@ -2,7 +2,7 @@
 
 **[Conduit](https://github.com/gothinkster/realworld), the RealWorld app, written in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm).**
 The REST API follows the RealWorld spec exactly and passes its official API test suite, unmodified (13/13 files, 154 requests), on Node, Cloudflare Workers and Bun.
-The rules (validation, slugs, pagination, authorization, every endpoint) are pure Lean, written once for any database, so they can be proved correct in Lean.
+The rules (validation, slugs, pagination, authorization, every endpoint) are pure Lean, and 80+ theorems prove properties of the code the server runs: [PROOFS.md](PROOFS.md).
 SQLite comes from JavaScript (`node:sqlite`, Cloudflare D1, `bun:sqlite`) through one small hand-written binding module per target; passwords and tokens use Web Crypto.
 `npm install && npm run build && npm start` serves it on http://localhost:3000; `npm test` runs the official suite against it.
 
@@ -15,6 +15,7 @@ npm test         # the official RealWorld API suite against a fresh server and d
 npm run build:workers && npx wrangler dev   # Cloudflare Workers with a local D1 database (wrangler.toml)
 npm run build:bun && npm run start:bun      # Bun with bun:sqlite (needs Bun; Lasm runs on Bun to build it)
 npm run test:workers                        # the suite against wrangler dev; test:bun against Bun
+npm run proofs                              # check every theorem (no sorry; only Lean's standard axioms)
 ```
 
 Requirements: Node.js 24 or newer and npm. Nothing else: Lasm brings Lean 4.35.0 and its
@@ -30,6 +31,7 @@ implementations exist in every language; this one is Lean.
 | | |
 | --- | --- |
 | API | Every endpoint of the spec, under `/api`, with its status codes and error bodies (`{"errors": {"field": ["message"]}}`), `Authorization: Token <jwt>` |
+| Proofs | Only an author may change or delete an article or comment; following is irreflexive and idempotent; `favoritesCount` counts distinct users; slugs are never reused; pages never skip or repeat; validation is sound; every API type's JSON round-trips: [PROOFS.md](PROOFS.md) |
 | Targets | Node 24+ (`node:sqlite`), Cloudflare Workers (D1), Bun (`bun:sqlite`): the same Lean, one binding module each |
 | Database | SQLite, parameterized SQL only; tables created on first start |
 | Passwords | PBKDF2-HMAC-SHA-256, 100,000 iterations, random 16-byte salt per user (Web Crypto) |
@@ -48,6 +50,7 @@ Conduit/              the app, pure Lean (no Lasm, no JavaScript): checked by `l
   Rules.lean          who may edit what; rows → articles, comments, profiles
   Store.lean          what the endpoints need: Store (one function per SQL statement), Services
   Api.lean            every endpoint and the router, written once for any monad
+Proofs/               the theorems (PROOFS.md); Model.lean is the database as Lean lists
 Server/               the server (Lasm.Fetch and Lasm.JS)
   Sql.lean            every SQL statement; Conduit's Store on a SQLite connection
   NodeSqlite.lean     node:sqlite (Node)        ┐
@@ -61,13 +64,15 @@ ServerBun.lean        main for Bun
 wrangler.toml         the Worker and its D1 binding
 test/
   api.mjs             starts a server on a fresh database and runs the official suite
+  proofs.mjs          npm run proofs: lake build, then Axioms.lean (only the standard axioms)
   realworld/          gothinkster/realworld's specs, unmodified, at the commit in PINNED
 ```
 
 The endpoint code (`Conduit/Api.lean`) does not know about SQL or HTTP. It is written against
 `Store m` and `Services m`, records of functions over any monad `m`. The server passes the
-SQLite store in `Async`; a proof can pass a model of the tables in `StateM`, so theorems are
-about the code the server runs, not a copy of it.
+SQLite store in `Async`; the proofs pass a model of the tables in `StateM`
+([`Proofs/Model.lean`](Proofs/Model.lean)), so the theorems are about the code the server
+runs, not a copy of it.
 
 ## How the JavaScript bindings are written
 

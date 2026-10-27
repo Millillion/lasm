@@ -8,6 +8,8 @@ name: Conduit
 #   and a local D1 database), against the same suite;
 # - api-bun: the Bun build (bun:sqlite), built by Lasm running on Bun,
 #   against the same suite;
+# - proofs: every theorem in Proofs/ compiles and uses only propext,
+#   Classical.choice and Quot.sound (no sorry), with Lasm's managed Lean;
 # - pinned: test/realworld is byte-identical to the upstream commit.
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
 # Free runners only.
@@ -51,6 +53,25 @@ jobs:
           cmp LICENSE "$RUNNER_TEMP/rw/LICENSE"
           for f in $(find specs -type f); do cmp "$f" "$RUNNER_TEMP/rw/$f"; done
           echo "$(find specs -type f | wc -l) files identical to gothinkster/realworld@$commit"
+  proofs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: npm ci
+        working-directory: examples/conduit
+        run: npm ci --no-audit --no-fund
+      - name: npm run proofs (no sorry; only Lean's standard axioms)
+        working-directory: examples/conduit
+        run: |
+          if grep -rnw sorry Conduit Proofs; then echo "::error::sorry in the sources"; exit 1; fi
+          npm run proofs
   api-node:
     name: API on Node ${{ matrix.node }}
     runs-on: ubuntu-24.04

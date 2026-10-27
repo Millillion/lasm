@@ -12,7 +12,8 @@
     "test:workers": "node test/api.mjs --name workers --command \"npx wrangler dev --port {port} --ip 127.0.0.1\"",
     "build:bun": "bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
     "start:bun": "bun bun/main.mjs",
-    "test:bun": "node test/api.mjs --name bun --command \"bun bun/main.mjs\""
+    "test:bun": "node test/api.mjs --name bun --command \"bun bun/main.mjs\"",
+    "proofs": "node test/proofs.mjs"
   },
   "engines": {
     "node": ">=24"
