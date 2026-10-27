@@ -11,7 +11,7 @@ the work is mechanical. It was first run for **Lean 4.36.0-rc1** on branch
 
 Work on a branch named `lean-<version>` (for a release candidate too, e.g.
 `lean-4.36` for 4.36.0-rc1 and then 4.36.0). Workflows that publish drafts or
-build runtimes accept `main` and `lean-*` branches. Nothing is published:
+build runtimes accept `main` and `lean-<version>` branches (`scripts/ci/trusted-ref.mjs`, the workflow gates of the runtime, tiers, candidate, acceptance and upstream-suite workflows). Nothing is published:
 runtimes, tiers and edge archives are drafts or workflow artifacts until the
 release PR.
 
