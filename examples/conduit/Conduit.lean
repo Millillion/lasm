@@ -11,3 +11,4 @@ import Conduit.Time
 import Conduit.Store
 import Conduit.Rules
 import Conduit.Api
+import Conduit.Markdown

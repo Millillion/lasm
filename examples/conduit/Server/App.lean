@@ -9,6 +9,8 @@ import Lasm.JS
 import Conduit.Api
 import Server.Sql
 import Server.Crypto
+import Server.Pages
+import Lasm.Fetch.Assets
 open Lasm.JS Lean
 
 namespace Conduit.Server
@@ -62,13 +64,19 @@ def api (store : Store Async) (req : Lasm.Fetch.Request) (path : List String) : 
     | none => .empty reply.status.toUInt16
   return { response with headers := response.headers ++ cors }
 
-/-- The whole site: the API, then (later) the browser app. -/
+/-- The whole site: the API under `/api`, and every other URL's page,
+server-rendered (the browser app's files are served before this, by `run`). -/
 def site (store : Store Async) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
   match req.segments with
   | "api" :: path => api store req path
-  | _ => return .notFound
+  | _ =>
+    if req.method == "GET" || req.method == "HEAD" then pageResponse store services req
+    else return .notFound
 
-/-- Serves Conduit on a database (whose binding module created the tables). -/
-def run (db : Sql) : IO Unit := Lasm.Fetch.serve (site (store db))
+/-- Serves Conduit on a database (whose binding module created the tables),
+with the browser app's files (`assets`: `embed_dir! "dist/public"` in the
+entry file). -/
+def run (db : Sql) (assets : Lasm.Fetch.Assets) : IO Unit :=
+  Lasm.Fetch.serve (assets.wrap (site (store db)))
 
 end Conduit.Server

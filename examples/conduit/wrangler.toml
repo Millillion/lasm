@@ -13,6 +13,11 @@ binding = "DB"
 database_name = "conduit"
 database_id = "00000000-0000-4000-8000-000000000000"
 
+# The browser app and its files, served by Workers before the Worker runs
+# (the Worker also embeds them, as every target does).
+[assets]
+directory = "./dist/public"
+
 # Set the token secret before deploying: npx wrangler secret put JWT_SECRET
 # (locally: JWT_SECRET=… in .dev.vars; without it a development secret is used).
 
