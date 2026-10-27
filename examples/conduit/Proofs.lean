@@ -11,3 +11,4 @@ import Proofs.Favorites
 import Proofs.Endpoints
 import Proofs.Markdown
 import Proofs.Client
+import Proofs.Route

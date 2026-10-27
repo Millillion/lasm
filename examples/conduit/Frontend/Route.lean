@@ -59,23 +59,35 @@ def encodeSegment (s : String) : String :=
       let hex := "0123456789ABCDEF".toList
       acc.push '%' |>.push (hex[b.toNat / 16]!) |>.push (hex[b.toNat % 16]!)
 
-/-- `?page=N`, or `&page=N` after other parameters; nothing for page 1. -/
-def pageQuery (page : Nat) (first : Bool) : String :=
-  if page ≤ 1 then "" else (if first then "?" else "&") ++ s!"page={page}"
+/-- A route's path segments (before encoding). -/
+def Route.segments : Route → List String
+  | .home .global _ | .home .following _ | .notFound => []
+  | .home (.tag t) _ => ["tag", t]
+  | .login => ["login"]
+  | .register => ["register"]
+  | .settings => ["settings"]
+  | .editor none => ["editor"]
+  | .editor (some s) => ["editor", s]
+  | .article s => ["article", s]
+  | .profile u false _ => ["profile", u]
+  | .profile u true _ => ["profile", u, "favorites"]
 
-def Route.href : Route → String
-  | .home .global p => "/" ++ pageQuery p true
-  | .home .following p => "/?feed=following" ++ pageQuery p false
-  | .home (.tag t) p => "/tag/" ++ encodeSegment t ++ pageQuery p true
-  | .login => "/login"
-  | .register => "/register"
-  | .settings => "/settings"
-  | .editor none => "/editor"
-  | .editor (some s) => "/editor/" ++ encodeSegment s
-  | .article s => "/article/" ++ encodeSegment s
-  | .profile u false p => "/profile/" ++ encodeSegment u ++ pageQuery p true
-  | .profile u true p => "/profile/" ++ encodeSegment u ++ "/favorites" ++ pageQuery p true
-  | .notFound => "/"
+/-- `page=N` for pages after the first. -/
+def pageParam (page : Nat) : List (String × String) :=
+  if page ≤ 1 then [] else [("page", toString page)]
+
+/-- A route's query parameters. -/
+def Route.query : Route → List (String × String)
+  | .home .following p => ("feed", "following") :: pageParam p
+  | .home _ p | .profile _ _ p => pageParam p
+  | _ => []
+
+/-- The URL of a route: its segments, percent-encoded, and its query. -/
+def Route.href (r : Route) : String :=
+  "/" ++ "/".intercalate (r.segments.map encodeSegment) ++
+  (match r.query with
+   | [] => ""
+   | q => "?" ++ "&".intercalate (q.map fun (k, v) => k ++ "=" ++ v))
 
 /-- Pages only a logged-in user can see. -/
 def Route.needsUser : Route → Bool
