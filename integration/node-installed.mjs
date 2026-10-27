@@ -314,7 +314,9 @@ try {
     const info = buildInfo(result.cached);
     for (const [label, file, message] of [
       // A tiered Lean is one assembled prefix of hard links to its verified archives.
-      ['native tool drift', join(tools, info.nativeLeanTier ? 'derived' : 'artifacts', info.nativeLeanIdentity, 'LICENSE'), /cache contents changed/],
+      // (A release without tiers, on a Lean upgrade branch, is an assembled prefix too.)
+      ['native tool drift', ['derived', 'artifacts'].map(kind => join(tools, kind, info.nativeLeanIdentity, 'LICENSE')).find(file => existsSync(file))
+        ?? join(tools, 'artifacts', info.nativeLeanIdentity, 'LICENSE'), /cache contents changed/],
       ['runtime drift', join(compiler, 'targets', `lean-${info.lean}-wasm64`, 'exports.json'), /runtime integrity check failed/],
     ]) {
       const original = readFileSync(file);
