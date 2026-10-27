@@ -137,7 +137,7 @@ export async function provisionLean(file, options = {}) {
   // for the plain upstream archive (the runtime build, distribution: 'full').
   if (distribution.kind === 'full' && options.distribution !== 'full')
     return finish(await assembleLeanPrefix(selection.version, release,
-      [{ artifact: distribution.artifact, label: `Lean ${selection.version} and Lake` }], options), { distribution: 'full' });
+      [{ artifact: distribution.artifact, label: `Lean ${selection.version} and Lake` }], options), { distribution: 'full', assembled: true });
   if (distribution.kind === 'full')
     return finish(await provisionArtifact(distribution.artifact, { ...options, label: `Lean ${selection.version} and Lake` }),
       { distribution: 'full' });

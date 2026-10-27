@@ -112,7 +112,7 @@ try {
   }
   const denied = [join(root, 'package.json'), join(result.installation.compiler, 'bin/lasm.mjs'),
     ...programs.flatMap(p => [p.source, join(p.output, 'program.wasm')]),
-    join(result.installation.tools, programs[0].build.nativeLeanTier ? 'derived' : 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean.exe')];
+    join(result.installation.tools, programs[0].build.nativeLeanTier || programs[0].build.nativeLeanAssembled ? 'derived' : 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean.exe')];
   const env = { PATH: '', SystemRoot: process.env.SystemRoot, WINDIR: process.env.SystemRoot,
     OPENSSL_CONF: opensslConfig,
     HOME: cwd, USERPROFILE: cwd, LOCALAPPDATA: cwd, APPDATA: cwd, TMP: temporary, TEMP: temporary, LEAN_NUM_THREADS: '1' };

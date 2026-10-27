@@ -51,7 +51,7 @@ if (info.moduleDataIdentity) {
 }
 // Tiered Lean (4.35+) ships no leanc: the native oracle uses the full release.
 const lean = info.nativeLeanTier ? await provisionLean(join(project, 'Main.lean'), { distribution: 'full' }) : (() => {
-  const prefix = join(process.env.LASM_TOOLCHAIN_CACHE, 'artifacts', info.nativeLeanIdentity);
+  const prefix = join(process.env.LASM_TOOLCHAIN_CACHE, info.nativeLeanAssembled ? 'derived' : 'artifacts', info.nativeLeanIdentity);
   return { prefix, commit: info.leanCommit, lean: join(prefix, 'bin', executableName('lean')),
     lake: join(prefix, 'bin', executableName('lake')) };
 })();

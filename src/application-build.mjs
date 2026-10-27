@@ -141,6 +141,8 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // The profile is part of the identity: dev and release outputs never share a cache entry.
   const recipe = { schema: 1, profile, ...(linkOnly ? { linkOnly } : {}), lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
     ...(lean.distribution === 'tiers' ? { nativeLeanTier: lean.tier, nativeLeanComponents: lean.components } : {}),
+    // A release without tiers yet: its full archive, assembled with Lasm's library (tool cache derived/).
+    ...(lean.assembled ? { nativeLeanAssembled: true } : {}),
     // Outputs of different link drivers and tool sets never share a cache entry.
     emscripten, linkDriver, ...(linkDriver === 'node'
       ? { linkToolchainIdentity: digest(JSON.stringify(linkToolchainCatalog)) }

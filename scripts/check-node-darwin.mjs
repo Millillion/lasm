@@ -112,7 +112,7 @@ try {
   writeFileSync(profile, darwinSandbox({ executables: [engine], reads: programs.map(p => p.copied), writes: [cwd, temporary], offline: true }));
   const denied = [join(root, 'package.json'), join(result.installation.compiler, 'bin/lasm.mjs'),
     ...programs.flatMap(p => [p.source, join(p.output, 'program.wasm')]),
-    join(result.installation.tools, programs[0].build.nativeLeanTier ? 'derived' : 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean')];
+    join(result.installation.tools, programs[0].build.nativeLeanTier || programs[0].build.nativeLeanAssembled ? 'derived' : 'artifacts', programs[0].build.nativeLeanIdentity, 'bin/lean')];
   const env = { PATH: '', HOME: cwd, TMPDIR: temporary, LANG: 'en_US.UTF-8', LEAN_NUM_THREADS: '1' };
   const control = isolated(profile, [engine, '--input-type=module', '-e',
     `import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';for(const path of ${JSON.stringify(denied)})assert.throws(()=>readFileSync(path),{code:'EPERM'});`], cwd, env, 30_000);
