@@ -151,7 +151,15 @@ export function canSpecializeInitialization(runtime) {
     // builds without CaDiCaL (an empty function); libleancpp's library and util
     // modules dropped `num` and `ascii`. The runtime's own initialization therefore
     // still stands alone, so the specialization's premise holds.
-    '4c0ef41ae6ff3f1d9a089a4eadfaf82bf63e0c5e9b7e03e5f72bdecd920899cb'].includes(runtime.identity);
+    '4c0ef41ae6ff3f1d9a089a4eadfaf82bf63e0c5e9b7e03e5f72bdecd920899cb',
+    // Lean 4.36.0-rc1 (CI build 40472316997, source 2d5336f, handoff 0fbf1b31…, standard
+    // libraries reused): only libleanrt's event_loop.cpp.o and cadical.cpp.o (the
+    // overridden lean_uv_event_loop_alive/_configure and lean_cadical_solver_new
+    // renamed lasm_original_*) and liblasmhost's node-async.cpp.o and
+    // node-system.cpp.o (the overrides, cancel_call, release_cancelled) differ from
+    // the entry above. None has a static constructor; no module initializer,
+    // init.cpp or init_module.cpp object changed.
+    'b9fde4b18f92626f3906ee95fa1abd394dfecfc987bf5d9fffd05c30d46e4416'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';
