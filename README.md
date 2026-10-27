@@ -72,12 +72,40 @@ or processes (and without files, except on WASI); the rest of Lean works.
 | An edge function (Workers, Vercel/Netlify Edge, Deno Deploy, Supabase) | `npm create @lasm@latest my-edge -- --template hono --deploy workers` (or `fetch`) | [examples/edge-pure](examples/edge-pure), [docs/EDGE.md](docs/EDGE.md) |
 | A Fastly, WASI or Spin service | `npm create @lasm@latest my-svc -- --template fetch --deploy fastly` (or `wasi-http`, `spin`, `wasi`) | [examples/fetch](examples/fetch), [docs/WASI.md](docs/WASI.md) |
 | A browser app | `npm create @lasm@latest my-web -- --template web` | [examples/ui](examples/ui) (counter, TodoMVC with proofs, feature demo, benchmark) |
-| A full-stack app with a verified API | `npm create @lasm@latest my-app -- --template fullstack` | [templates/fullstack](templates/fullstack); **coming:** `examples/conduit`, the RealWorld (Conduit) app in Lean with proofs |
+| A real-world REST API (users, auth, articles, comments, SQLite) | `cd examples/conduit && npm install && npm run build && npm start` | [examples/conduit](examples/conduit), the flagship (below) |
+| A full-stack app with a verified API | `npm create @lasm@latest my-app -- --template fullstack` | [templates/fullstack](templates/fullstack) |
 | To call npm packages or `fetch` from Lean | add `import Lasm.JS` and one `@[js]` line per function | [examples/js-fetch](examples/js-fetch), [JS bindings](#calling-javascript-and-npm-from-lean) |
 | To run on Bun or Deno | `bun create @lasm my-app --template hono` / `deno run -A npm:@lasm/create my-app --template hono` | [docs/BUN_DENO.md](docs/BUN_DENO.md) |
 
 Every example has a README with a one-command run; [examples/README.md](examples/README.md)
 lists them all.
+
+## Flagship example: Conduit
+
+[examples/conduit](examples/conduit) is [Conduit](https://github.com/gothinkster/realworld),
+the RealWorld app (a Medium clone), written in Lean. Today it is the **REST API on
+Node**, and it passes the official RealWorld API suite unmodified: 13 of 13 files and
+154 requests, on Node 24 and 26 (gothinkster/realworld `ebbcdeb8`; CI
+[conduit.yml](.github/workflows/conduit.yml), run 40521772087).
+
+- **Pure Lean core.** Validation, slugs, pagination, authorization and every
+  endpoint (`Conduit/*.lean`) contain no Lasm and no JavaScript, and `lake build`
+  checks them natively. The endpoints are written against a `Store` of functions
+  over any monad, so proofs can run the same code on a model of the tables.
+- **Server** with `Lasm.Fetch`. SQLite comes from Node's built-in `node:sqlite`
+  through a few hand-written `@[js]` bindings. Passwords use PBKDF2-HMAC-SHA-256
+  and tokens are HS256 JWTs, both through Web Crypto.
+
+```sh
+cd examples/conduit
+npm install          # @lasm/cli 0.3.2 and Hurl (the suite's runner)
+npm run build        # dist/server
+npm start            # http://localhost:3000/api (PORT, HOST, DATABASE_PATH, JWT_SECRET)
+npm test             # the official RealWorld API suite against a fresh server and database
+```
+
+**Coming** (not done yet): Cloudflare Workers with D1, Bun, proofs about the
+endpoints, and the `Lasm.UI` frontend.
 
 ## 60-second start
 
