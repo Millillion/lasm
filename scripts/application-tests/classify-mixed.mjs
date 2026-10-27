@@ -83,7 +83,7 @@ for (const name of nativeOther) add(name, 'native-build-time',
 for (const [name, rationale] of Object.entries(runtimeOther)) add(name, 'native-and-compiled-application', rationale);
 add('pkg/user_plugin', 'native-and-foreign-application',
   'Retain native --plugin controls; run the unchanged Lean.loadPlugin clients with compatible deployed dynamic libraries and initialization symbols.');
-if (['4.34.1', '4.35.0'].includes(version)) add('misc_dir/rc_sticky', 'native-and-foreign-application',
+if (['4.34.1', '4.35.0', '4.36.0-rc1'].includes(version)) add('misc_dir/rc_sticky', 'native-and-foreign-application',
   'Run the unchanged C reference-count regression against the matching native and deployed Lean runtimes. Preserve every assertion and original leanc flags; native success alone does not cover the Wasm runtime.');
 
 if (version === '4.35.0') {

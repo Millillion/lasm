@@ -30,7 +30,7 @@ on:
         required: true
       lean:
         type: string
-        default: 4.35.0
+        default: 4.36.0-rc1
       remove-system-c:
         description: Linux only - after the native oracle, purge the system C compiler and C library headers (libc6-dev and everything that depends on it) before the Lasm build
         type: boolean

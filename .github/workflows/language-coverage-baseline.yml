@@ -43,7 +43,7 @@ on:
         default: a976ec4e386d1c238bcb08b6a6df3f37b22d5b9af7d7bfda904bed10bb1972a3
       lean:
         type: string
-        default: 4.35.0
+        default: 4.36.0-rc1
 permissions:
   contents: read
 jobs:

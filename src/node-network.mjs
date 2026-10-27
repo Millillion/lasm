@@ -186,7 +186,9 @@ export function createNodeNetwork({ add, get, release, leanVersion = '4.32.0' })
         if (!t.bound && t.keepAlive) socket.setKeepAlive(...t.keepAlive);
         let client;
         try { client = add(tcp(socket)); } catch { socket.destroy(); return; }
-        if (t.acceptWait) { const waiter = t.acceptWait; t.acceptWait = null; waiter.resolve(numbers(client)); }
+        // A waitAcceptable (op 66) leaves the connection queued for tryAccept.
+        if (t.acceptWait?.queue) { const waiter = t.acceptWait; t.acceptWait = null; t.accepted.push(client); waiter.resolve(empty); }
+        else if (t.acceptWait) { const waiter = t.acceptWait; t.acceptWait = null; waiter.resolve(numbers(client)); }
         else t.accepted.push(client);
       });
       t.server.once('close', () => t.bound?.forget());
@@ -208,6 +210,16 @@ export function createNodeNetwork({ add, get, release, leanVersion = '4.32.0' })
       return new Promise((resolve, reject) => { t.acceptWait = { resolve, reject }; });
     }
     case 54: { const t = getTcp(id); if (t.error) throw t.error; return numbers(t.accepted.shift() ?? 0); }
+    case 66: {
+      // Std.Internal.UV.TCP.Socket.waitAcceptable (Lean 4.36): resolves once a
+      // connection is queued, without accepting it.
+      const t = getTcp(id);
+      if (t.error) throw t.error;
+      if (t.acceptWait) throw failure('EALREADY', 'connection already in progress');
+      if (!t.server?.listening) throw failure('EINVAL', 'Socket is not listening');
+      if (t.accepted.length) return empty;
+      return new Promise((resolve, reject) => { t.acceptWait = { queue: true, resolve, reject }; });
+    }
     case 55: { const t = getTcp(id); t.acceptWait?.reject(cancelled()); t.acceptWait = null; return empty; }
     case 56: return receive(getTcp(id), n, false);
     case 57: return receive(getTcp(id), 0, true);

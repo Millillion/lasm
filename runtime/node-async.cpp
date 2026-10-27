@@ -316,6 +316,10 @@ O *lean_uv_tcp_try_accept(O *socket) {
     return ok(r.failed ? except(true, r.error()) : except(false, r.number() ? some(wrap_handle(r.number())) : lean_box(0)));
 }
 O *lean_uv_tcp_cancel_accept(O *socket) { return unit_call(55, socket); }
+// Lean 4.36: a promise resolved once a connection is queued for tryAccept, which
+// it leaves queued (op 66). Failures at the start (already waiting, not
+// listening) are IO errors, as in native libuv.
+O *lean_uv_tcp_wait_acceptable(O *socket) { return start_io_request(66, socket, 0, nullptr, 0, 0); }
 O *lean_uv_tcp_recv(O *socket, uint64_t size) { return start_io_request(56, socket, size, nullptr, 0, 2); }
 O *lean_uv_tcp_wait_readable(O *socket) { return start_io_request(57, socket, 0, nullptr, 0, 3); }
 O *lean_uv_tcp_cancel_recv(O *socket) { return unit_call(58, socket); }

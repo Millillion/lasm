@@ -130,7 +130,7 @@ jobs:
           path: .work/edge-archive
       - name: Edge runtime provisioning from the packaged archive (unit tests)
         env:
-          LASM_TEST_EDGE_ARCHIVE: ${{ github.workspace }}/.work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst
+          LASM_TEST_EDGE_ARCHIVE: ${{ github.workspace }}/.work/edge-archive/lean-4.36.0-rc1-wasm64-edge.tar.zst
           LASM_TEST_EDGE_ARTIFACT: ${{ github.workspace }}/.work/edge-archive/artifact.json
         run: node --test test/edge.test.mjs
       - name: Pinned local platform tools (wrangler with workerd, Deno, Bun, Vercel CLI and edge-runtime, Netlify CLI)
@@ -139,11 +139,11 @@ jobs:
         run: |
           node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/edge-sdk-resources.json -- node --input-type=module -e "const { provisionSdk } = await import('./src/managed-sdk.mjs'); const sdk = await provisionSdk({ log: console.log }); console.log(sdk.identity)"
       - name: Extract the packaged edge runtime (what users get)
-        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.36.0-rc1-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
       - name: Build, serve and check the edge apps (Workers, Vercel Edge, Netlify Edge, Deno Deploy, Bun; compiler under Bun and Deno)
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
-          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc1-wasm64-edge
           LASM_KEEP_LINK_WORK: '1'
         run: node scripts/edge/workers-ci.mjs .work/edge-apps .work/edge-tools
       - name: Licence check of every built output (notices file, banner, embedded notices, no copyleft code)
@@ -203,13 +203,13 @@ jobs:
           name: edge-runtime-archive-workers
           path: .work/edge-archive
       - name: Extract the packaged edge runtime
-        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.36.0-rc1-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
       - name: Pinned Bun and Deno
         run: npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
       - name: Build under Node, Bun and Deno; serve and run on Bun and Deno
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
-          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc1-wasm64-edge
         run: node scripts/edge/compiler-hosts-ci.mjs .work/hosts .work/host-tools
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
@@ -301,7 +301,7 @@ jobs:
       - name: Pinned Bun and Deno
         run: npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
       - name: Install the candidate; build under Node, Bun and Deno; serve; templates
-        run: node scripts/edge/platform-ci.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst "$RUNNER_TEMP/lasm platform" .work/host-tools
+        run: node scripts/edge/platform-ci.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" .work/edge-archive/lean-4.36.0-rc1-wasm64-edge.tar.zst "$RUNNER_TEMP/lasm platform" .work/host-tools
       - name: Keep the results
         if: always()
         run: mkdir -p .work/platform-results && cp "$RUNNER_TEMP/lasm platform"/*.json .work/platform-results/ || true

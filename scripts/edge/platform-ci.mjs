@@ -56,9 +56,9 @@ const lasmBin = join(compiler, 'bin/lasm.mjs');
 // The edge runtime into Lasm's managed cache, through the compiler's provisioning.
 {
   const { edgeRuntime, edgeRuntimeCatalog } = await import(pathToFileURL(join(compiler, 'src/edge/edge-runtime.mjs')).href);
-  const artifact = edgeRuntimeCatalog.lean['4.35.0'];
+  const artifact = edgeRuntimeCatalog.lean['4.36.0-rc1'];
   const fetch = async url => { if (String(url) !== artifact.url) throw new Error(`unexpected ${url}`); return new Response(readFileSync(archive)); };
-  const nodeRuntime = { identity: artifact.baseRuntimeManifestSha256, manifest: { lean: '4.35.0', name: 'lean-4.35.0-wasm64' } };
+  const nodeRuntime = { identity: artifact.baseRuntimeManifestSha256, manifest: { lean: '4.35.0', name: 'lean-4.36.0-rc1-wasm64' } };
   await edgeRuntime(nodeRuntime, { directory: undefined, fetch, log: console.log });
 }
 

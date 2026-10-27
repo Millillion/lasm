@@ -20,7 +20,7 @@ import { planActions, generateRuntimeSource, actionsWithErrors, modes } from '..
 await ensureResourceGuard();
 // Windows runs the unchanged shell drivers with Git Bash from PATH.
 const windows = process.platform === 'win32', bash = windows ? 'bash' : '/bin/bash';
-const [outputArg, engineArg, compilerArg, referenceArg, name, version = '4.35.0', ...extra] = process.argv.slice(2);
+const [outputArg, engineArg, compilerArg, referenceArg, name, version = '4.36.0-rc1', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && engineArg && compilerArg && referenceArg && name && !extra.length,
   'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE REVIEWED_TEST [LEAN_VERSION]');
 const root = fileURLToPath(new URL('..', import.meta.url));

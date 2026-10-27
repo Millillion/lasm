@@ -14,7 +14,7 @@ import { compileLibrary, libraryIdentity, libraryOutputs } from '../src/lasm-lib
 import { provisionLean, toolchainCatalog } from '../src/managed-lean.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const version = process.argv[2] ?? '4.35.0';
+const version = process.argv[2] ?? toolchainCatalog.defaultLean;
 const release = toolchainCatalog.lean[version];
 if (!release) throw new Error(`Unknown Lean ${version}`);
 // The extended tier (Lean's elaborator), as for any program that imports Lasm.JS.

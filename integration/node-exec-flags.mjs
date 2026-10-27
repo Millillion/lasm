@@ -31,7 +31,7 @@ if (!dist) {
     const { hashFile } = await import('../src/managed-artifacts.mjs');
     const { applicationRuntimeCatalog } = await import('../src/application-runtime.mjs');
     const directory = resolve(values('--runtime')[0]);
-    applicationRuntimeCatalog.lean['4.35.0'] = { name: 'lean-4.35.0-wasm64', manifestSha256: await hashFile(join(directory, 'target.json')) };
+    applicationRuntimeCatalog.lean['4.36.0-rc1'] = { name: 'lean-4.36.0-rc1-wasm64', manifestSha256: await hashFile(join(directory, 'target.json')) };
   }
   dist = join(output, 'dist');
   await buildApplication(join(project, 'Main.lean'), { target: 'node', output: dist, log: () => {},

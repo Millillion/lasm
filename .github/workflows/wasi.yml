@@ -139,9 +139,9 @@ jobs:
           github-token: ${{ github.token }}
       - name: The packaged edge runtime (checked against its catalog pin)
         run: |
-          node -e "const a=require('./.work/edge-archive/artifact.json'), c=require('./src/edge-runtimes.json').lean['4.35.0']; if (a.sha256!==c.sha256) throw new Error('edge runtime archive '+a.sha256+' is not the cataloged '+c.sha256)"
-          echo "$(node -p "require('./src/edge-runtimes.json').lean['4.35.0'].sha256")  .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst" | sha256sum -c
-          mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+          node -e "const a=require('./.work/edge-archive/artifact.json'), c=require('./src/edge-runtimes.json').lean['4.36.0-rc1']; if (a.sha256!==c.sha256) throw new Error('edge runtime archive '+a.sha256+' is not the cataloged '+c.sha256)"
+          echo "$(node -p "require('./src/edge-runtimes.json').lean['4.36.0-rc1'].sha256")  .work/edge-archive/lean-4.36.0-rc1-wasm64-edge.tar.zst" | sha256sum -c
+          mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.36.0-rc1-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
       - name: Unit tests (atomics lowering, WASI targets, Lasm.Fetch, init)
         run: node --test test/wasi.test.mjs
       - name: Pinned tools (wasmtime, wasmer, Viceroy, Spin; Deno from npm)
@@ -167,7 +167,7 @@ jobs:
       - name: Build and check on wasmtime, wasmer, node:wasi, Spin, Viceroy, Node and Deno
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
-          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc1-wasm64-edge
           SPIN_DISABLE_TELEMETRY: '1'
         run: node scripts/wasi/wasi-ci.mjs .work/wasi-apps .work/wasi-tools
       - name: Licence check of every built output (notices file, embedded notices, no copyleft code)

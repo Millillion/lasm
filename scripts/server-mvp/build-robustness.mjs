@@ -17,7 +17,7 @@ import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
-const [outputArg, compilerArg, version = '4.35.0', ...extra] = process.argv.slice(2);
+const [outputArg, compilerArg, version = '4.36.0-rc1', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && compilerArg && /^\d+\.\d+\.\d+$/.test(version) && !extra.length,
   'Supply NEW_OUTPUT INSTALLED_COMPILER [LEAN_VERSION]');
 const output = resolve(outputArg), compiler = resolve(compilerArg);
