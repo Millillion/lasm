@@ -21,7 +21,7 @@ export async function selectLeanVersion(file, catalog = toolchainCatalog) {
     try { text = (await readFile(pin, 'utf8')).trim(); }
     catch (error) { if (error.code !== 'ENOENT') throw error; }
     if (text !== undefined) {
-      const match = /^(?:leanprover\/lean4:)?v?(\d+\.\d+\.\d+)$/.exec(text);
+      const match = /^(?:leanprover\/lean4:)?v?(\d+\.\d+\.\d+(?:-rc\d+)?)$/.exec(text);
       if (!match || !catalog.lean[match[1]]) {
         // Lasm supports exactly one Lean release (user decision 2026-10-24).
         const supported = Object.keys(catalog.lean);

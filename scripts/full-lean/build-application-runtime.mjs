@@ -13,6 +13,7 @@ import { ensureResourceGuard } from './resource-guard.mjs';
 import { maintainerSdk } from './maintainer-sdk.mjs';
 import { provisionLean, toolchainCatalog } from '../../src/managed-lean.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
+import { leanPatchInputs } from './lean-patches.mjs';
 import { verifyApplicationRuntime } from '../../src/application-runtime.mjs';
 
 await ensureResourceGuard();
@@ -88,31 +89,7 @@ if (!existsSync(source)) {
 }
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const patches = {};
-// Lean 4.35 moved mimalloc into the runtime (`runtime/mimalloc.cpp`), added
-// LEANC_DEPS upstream and fixed several declarations the 4.32 build patch
-// touched; these three patches were ported to its sources.
-const ported = Number(version.split('.')[1]) >= 35 ? new Set(['wasm-build', 'sdk-mimalloc', 'c-inputs']) : new Set();
-const patchInputs = ['wasm-build', 'compact-alignment', 'thread-runtime', 'sdk-mimalloc', 'c-inputs', 'region-allocation', 'host-platform']
-  .map(name => ({ name, file: `lean-${ported.has(name) ? '4.35.0' : '4.32.0'}-${name}.patch` }));
-// getIsLinux was added after the original host-platform patch. Keep the older
-// version's patch applicable to its own sources.
-patchInputs.push({ name: 'host-linux', file: 'lean-4.34.0-host-linux.patch' });
-patchInputs.push({ name: 'host-backtrace', file: 'lean-4.34.0-host-backtrace.patch' });
-patchInputs.push({ name: 'libuv-source', file: 'lean-4.34.0-libuv-source.patch' });
-// Lean 4.35 added `LEAN_ABORT_ON_NONLINEAR` behind a `LEAN_EMSCRIPTEN` guard that
-// always returns false. Lasm's C runtime sees the host environment (Emscripten
-// NODE_HOST_ENV), as `LEAN_ABORT_ON_PANIC` already does after thread-runtime.
-if (Number(version.split('.')[1]) >= 35)
-  patchInputs.push({ name: 'nonlinear-environment', file: 'lean-4.35.0-nonlinear-environment.patch' });
-if (edge) {
-  if (version !== '4.35.0') throw new Error('The edge profile has a runtime patch for Lean 4.35.0 only');
-  patchInputs.push({ name: 'edge', file: 'lean-4.35.0-edge.patch' });
-} else if (Number(version.split('.')[1]) >= 35) {
-  // Fewer Workers at start-up (docs/DECISIONS.md, 2026-10-26): `main` runs on
-  // the PROXY_TO_PTHREAD main thread instead of a further lthread, which
-  // Lasm.JS can identify (lasm_main_thread_is_current). Node profile only.
-  patchInputs.push({ name: 'node-threads', file: 'lean-4.35.0-node-threads.patch' });
-}
+const patchInputs = leanPatchInputs(version, { edge });
 // Patches that change only Lean's C++ runtime (no header, no generated C), so a
 // build with or without them can share the standard-library archives.
 const runtimeOnlyPatches = new Set(['edge', 'node-threads']);

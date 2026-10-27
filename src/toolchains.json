@@ -1,215 +1,58 @@
 {
   "schema": 1,
-  "defaultLean": "4.35.0",
+  "defaultLean": "4.36.0-rc1",
   "lean": {
-    "4.35.0": {
-      "commit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
-      "release": "https://github.com/leanprover/lean4/releases/tag/v4.35.0",
-      "publishedAt": "2026-10-12T18:13:12Z",
-      "verifiedAt": "2026-10-16",
+    "4.36.0-rc1": {
+      "commit": "c9afcddf514a6772bd4d649f7cfc04eff0b9f15e",
+      "release": "https://github.com/leanprover/lean4/releases/tag/v4.36.0-rc1",
+      "publishedAt": "2026-10-14T18:30:03Z",
+      "verifiedAt": "2026-10-27",
+      "prerelease": true,
       "artifacts": {
         "linux-x64": {
-          "name": "lean-4.35.0-linux.tar.zst",
-          "root": "lean-4.35.0-linux",
-          "url": "https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-linux.tar.zst",
-          "sha256": "7289597a44543246c9227b8cae501767e095ce17f6d448b95fc4a8dc97268f6d",
-          "bytes": 594481375,
+          "name": "lean-4.36.0-rc1-linux.tar.zst",
+          "root": "lean-4.36.0-rc1-linux",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc1/lean-4.36.0-rc1-linux.tar.zst",
+          "sha256": "26b3cea1a006ad419215520b8668dcd3f6a9eeba1a123756563a739f9c6274b2",
+          "bytes": 605563669,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
         },
         "linux-arm64": {
-          "name": "lean-4.35.0-linux_aarch64.tar.zst",
-          "root": "lean-4.35.0-linux_aarch64",
-          "url": "https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-linux_aarch64.tar.zst",
-          "sha256": "c8f0f8a3920e839718b1343e6781fd80a3e9b1024fbcd7078eb30f54e806b028",
-          "bytes": 594868592,
+          "name": "lean-4.36.0-rc1-linux_aarch64.tar.zst",
+          "root": "lean-4.36.0-rc1-linux_aarch64",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc1/lean-4.36.0-rc1-linux_aarch64.tar.zst",
+          "sha256": "ed33fe9d78aca31e23b03159747b07b024c833c18e9d3fd1c01bd33f7aada731",
+          "bytes": 605835688,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
         },
         "darwin-x64": {
-          "name": "lean-4.35.0-darwin.tar.zst",
-          "root": "lean-4.35.0-darwin",
-          "url": "https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-darwin.tar.zst",
-          "sha256": "0b43be5c7ecfb36016566a41005ab62bdb04743e6bfd5837e45f796ef4750b4e",
-          "bytes": 576516478,
+          "name": "lean-4.36.0-rc1-darwin.tar.zst",
+          "root": "lean-4.36.0-rc1-darwin",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc1/lean-4.36.0-rc1-darwin.tar.zst",
+          "sha256": "9e49807d982860e354309afa4c998fda352583a9b7dc22a1ed8d2ba5d56906a0",
+          "bytes": 644879425,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
         },
         "darwin-arm64": {
-          "name": "lean-4.35.0-darwin_aarch64.tar.zst",
-          "root": "lean-4.35.0-darwin_aarch64",
-          "url": "https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-darwin_aarch64.tar.zst",
-          "sha256": "c0c6f34f35ba1dcc5c4a5fd106fefab9eb5e8469712624dd2c868d51b63177c2",
-          "bytes": 570422530,
+          "name": "lean-4.36.0-rc1-darwin_aarch64.tar.zst",
+          "root": "lean-4.36.0-rc1-darwin_aarch64",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc1/lean-4.36.0-rc1-darwin_aarch64.tar.zst",
+          "sha256": "9fbb1102490bfcb64ee8650b2c13f31c01985003028486cde818fffaaa45129e",
+          "bytes": 635143803,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
         },
         "win32-x64": {
-          "name": "lean-4.35.0-windows.tar.zst",
-          "root": "lean-4.35.0-windows",
-          "url": "https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-windows.tar.zst",
-          "sha256": "893fde3f52b48c647e3edcf33844cbb61f8ef70fcd88e0536bfc83f29844081e",
-          "bytes": 622724192,
+          "name": "lean-4.36.0-rc1-windows.tar.zst",
+          "root": "lean-4.36.0-rc1-windows",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc1/lean-4.36.0-rc1-windows.tar.zst",
+          "sha256": "2d8cd8cc897c8bf2681f7fc4c5118a71e8f91e40886b68f920efe2d385c5c51a",
+          "bytes": 615788282,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
-        }
-      },
-      "tiers": {
-        "bin": {
-          "darwin-arm64": {
-            "name": "lean-4.35.0-darwin-arm64-bin.tar.zst",
-            "root": "lean-4.35.0-darwin-arm64-bin",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-darwin-arm64-bin.tar.zst",
-            "sha256": "888f3fc564dd27a9c7c59ac2509e0590e0044e1d7c69b0f9fa0d983d390b9ae5",
-            "bytes": 31527800,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 213909504
-          },
-          "darwin-x64": {
-            "name": "lean-4.35.0-darwin-x64-bin.tar.zst",
-            "root": "lean-4.35.0-darwin-x64-bin",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-darwin-x64-bin.tar.zst",
-            "sha256": "3c30a6bf8b9e14ecb808be5c981241e7c5db3e1faa24ffc662bc783129542320",
-            "bytes": 33512334,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 221249536
-          },
-          "linux-arm64": {
-            "name": "lean-4.35.0-linux-arm64-bin.tar.zst",
-            "root": "lean-4.35.0-linux-arm64-bin",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-linux-arm64-bin.tar.zst",
-            "sha256": "3126b65091235efbe31d5685c39e346d4bde72bee723feb1480737025e7fcbe6",
-            "bytes": 41359764,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 307232768
-          },
-          "linux-x64": {
-            "name": "lean-4.35.0-linux-x64-bin.tar.zst",
-            "root": "lean-4.35.0-linux-x64-bin",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-linux-x64-bin.tar.zst",
-            "sha256": "a9ede03ddf9e058c4702be7c9500cb93d820a452b59d5d2c1e21d929a788e073",
-            "bytes": 39657491,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 279969792
-          },
-          "win32-x64": {
-            "name": "lean-4.35.0-win32-x64-bin.tar.zst",
-            "root": "lean-4.35.0-win32-x64-bin",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-win32-x64-bin.tar.zst",
-            "sha256": "751233ba7c6b22d7d618253d8e74e025ebffe27186e1e6695b5c3833e583be96",
-            "bytes": 35566605,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 252706816
-          }
-        },
-        "core": [
-          {
-            "name": "lean-4.35.0-core-init.tar.zst",
-            "root": "lean-4.35.0-core-init",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-core-init.tar.zst",
-            "sha256": "e0a7dfcf09e70fdbcb413a7effe807a2b435432998505759bdaf496a7d81d0ed",
-            "bytes": 96093735,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 443547648
-          },
-          {
-            "name": "lean-4.35.0-core-std.tar.zst",
-            "root": "lean-4.35.0-core-std",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-core-std.tar.zst",
-            "sha256": "1fb24c7655a1cd13733929c8c37437771762419937d16f3faedbd7c147f5c26e",
-            "bytes": 72439227,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 370147328
-          }
-        ],
-        "extended": [
-          {
-            "name": "lean-4.35.0-ext-meta.tar.zst",
-            "root": "lean-4.35.0-ext-meta",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-ext-meta.tar.zst",
-            "sha256": "99b4ced4fb344948d388a75348860ec148cd9d51c74efa841979474bd07dc93c",
-            "bytes": 82217270,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 526385152
-          },
-          {
-            "name": "lean-4.35.0-ext-elab.tar.zst",
-            "root": "lean-4.35.0-ext-elab",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-ext-elab.tar.zst",
-            "sha256": "f9f185ef117016eefabee03857b9610e9ac0848f6699a6b9d5b83c6179ec732b",
-            "bytes": 79592078,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 506462208
-          },
-          {
-            "name": "lean-4.35.0-ext-rest.tar.zst",
-            "root": "lean-4.35.0-ext-rest",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-ext-rest.tar.zst",
-            "sha256": "ea5fd9fa471014630fe76f5f7ea360e5d111195a61b56b54a278fa0b16708628",
-            "bytes": 95373790,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 584056832
-          }
-        ],
-        "extendedModules": [
-          "Lake",
-          "LakeMain",
-          "Lean",
-          "LeanChecker",
-          "LeanExport",
-          "LeanIR"
-        ],
-        "c": {
-          "darwin-arm64": {
-            "name": "lean-4.35.0-darwin-arm64-c.tar.zst",
-            "root": "lean-4.35.0-darwin-arm64-c",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-darwin-arm64-c.tar.zst",
-            "sha256": "54618b2f177accb9ddead2a745bbbcfc8cd9844696564aa9f689b1f13e49ea02",
-            "bytes": 39256606,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 198180864,
-            "multiarch": null
-          },
-          "darwin-x64": {
-            "name": "lean-4.35.0-darwin-x64-c.tar.zst",
-            "root": "lean-4.35.0-darwin-x64-c",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-darwin-x64-c.tar.zst",
-            "sha256": "db7970d6541c19de3f702adf4556c4bd43151c6ef9496f5fab811b8dcd07d2c0",
-            "bytes": 41005817,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 207618048,
-            "multiarch": null
-          },
-          "linux-arm64": {
-            "name": "lean-4.35.0-linux-arm64-c.tar.zst",
-            "root": "lean-4.35.0-linux-arm64-c",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-linux-arm64-c.tar.zst",
-            "sha256": "c6e3b2c5ded93b34b28213164e3f1803d5445e912d6442246f805ec23de8ca81",
-            "bytes": 43925520,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 218103808,
-            "multiarch": "aarch64-linux-gnu"
-          },
-          "linux-x64": {
-            "name": "lean-4.35.0-linux-x64-c.tar.zst",
-            "root": "lean-4.35.0-linux-x64-c",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-linux-x64-c.tar.zst",
-            "sha256": "1f7a2921bf94ca2275312d1a201f32d897cee6d08e19d303a2b85456d7867445",
-            "bytes": 45162282,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 225443840,
-            "multiarch": "x86_64-linux-gnu"
-          },
-          "win32-x64": {
-            "name": "lean-4.35.0-win32-x64-c.tar.zst",
-            "root": "lean-4.35.0-win32-x64-c",
-            "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-tiers-v2/lean-4.35.0-win32-x64-c.tar.zst",
-            "sha256": "13434c7c4c993ed27eb11de52ad4ee45f5fbcf2d7bd247c2cb14df05eff39e4b",
-            "bytes": 51790225,
-            "format": "tar.zst",
-            "maximumExtractedBytes": 354418688,
-            "multiarch": null
-          }
         }
       }
     }
