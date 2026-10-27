@@ -1,7 +1,7 @@
 # Conduit in Lean
 
 **[Conduit](https://github.com/gothinkster/realworld), the RealWorld app, written entirely in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm): the REST API, the server-rendered browser app, and the proofs.**
-The API passes RealWorld's official API suite unmodified (13/13 files, 154 requests) on Node, Cloudflare Workers and Bun; the browser app passes RealWorld's official Playwright suite (all 74 tests of its fullstack mode) on Chromium, Firefox and WebKit.
+The API passes RealWorld's official API suite unmodified (13/13 files, 154 requests) on Node, Cloudflare Workers and Bun; the browser app passes RealWorld's official Playwright suite (all 74 tests of its fullstack mode, no retries) on Chromium, Firefox and WebKit, served by Node, Workers or Bun.
 More than 100 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: only authors can change their articles and comments, following is irreflexive, slugs never collide, pages never skip or repeat, the app never sends what the server would reject ([PROOFS.md](PROOFS.md)).
 SQLite comes from JavaScript (`node:sqlite`, Cloudflare D1, `bun:sqlite`) through one small hand-written `@[js]` binding module per target; passwords and tokens use Web Crypto.
 Start: `npm install && npm run build && npm start`, then open http://localhost:3000.
@@ -41,7 +41,7 @@ database query to the DOM.
 | Passwords | PBKDF2-HMAC-SHA-256, 100,000 iterations, a random 16-byte salt per user (Web Crypto) |
 | Tokens | JWT, HS256, 30 days, signed with `JWT_SECRET` (Web Crypto); kept in `localStorage` (`jwtToken`) by the app |
 | Proofs | [PROOFS.md](PROOFS.md): authorization, following, favorites, slugs, pagination, validation, the browser app's requests, Markdown links, JSON round trips |
-| Tests | [conduit.yml](../../.github/workflows/conduit.yml): the official API suite on Node 24 and 26, Workers (`wrangler dev`, local workerd and D1) and Bun 1.4; the official end-to-end suite on Node with Chromium, Firefox and WebKit and on Workers with Chromium, without retries; the proofs |
+| Tests | [conduit.yml](../../.github/workflows/conduit.yml): the official API suite on Node 24 and 26, Workers (`wrangler dev`, local workerd and D1) and Bun 1.4; the official end-to-end suite on Node with Chromium, Firefox and WebKit and on Workers and Bun with Chromium, without retries; the proofs |
 
 ## Layout
 
