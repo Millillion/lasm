@@ -16,7 +16,7 @@ fi
 # GNU timeout (Linux; gtimeout where Homebrew coreutils is installed); unbounded otherwise.
 bound=(); if command -v timeout >/dev/null; then bound=(timeout 420); elif command -v gtimeout >/dev/null; then bound=(gtimeout 420); fi
 for attempt in 1 2 3; do
-  if "${bound[@]}" node "$cli" "${args[@]}"; then exit 0; fi
+  if ${bound[@]+"${bound[@]}"} node "$cli" "${args[@]}"; then exit 0; fi
   echo "::warning::Playwright install of $browser failed or stalled (attempt $attempt of 3)"
   sleep $((attempt * 10))
 done
