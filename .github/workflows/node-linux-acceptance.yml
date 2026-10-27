@@ -32,7 +32,10 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: node-installed-acceptance-${{ github.ref }}
+  # The call from release-checks gets its own group: on a release merge the push to
+  # main also starts this workflow, and one shared queue held both runs pending
+  # (release-checks run 40450305219).
+  group: node-installed-acceptance-${{ github.ref }}-${{ inputs.release-check && 'release' || 'direct' }}
   queue: max
   cancel-in-progress: false
 jobs:
