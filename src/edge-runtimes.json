@@ -6,12 +6,12 @@
       "name": "lean-4.35.0-wasm64-edge.tar.zst",
       "root": "lean-4.35.0-wasm64-edge",
       "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-edge-v4/lean-4.35.0-wasm64-edge.tar.zst",
-      "sha256": "fc707caf307539003018552c4f546ab49c53411deb34b339cd505164b14fcbfe",
-      "bytes": 1281176,
+      "sha256": "a5e7536cbe61b67d6c00acf9ce28200c53507acdbd7dc2c7cb16c906f6283350",
+      "bytes": 1281123,
       "format": "tar.zst",
       "maximumExtractedBytes": 14767084,
       "baseRuntimeManifestSha256": "9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a",
-      "source": "edge-runtime.yml run 40521170673 (release-0.3.3, on runtime 9921c696…: UDP receive startup check), with scripts/edge/build-edge-extras.mjs (Lasm.JS glue, Emscripten system libraries) and package-edge-runtime.mjs"
+      "source": "edge-runtime.yml run 40543222257 (release-0.3.3, on runtime 9921c696…: UDP receive startup check; canonical system-library member names), with scripts/edge/build-edge-extras.mjs (Lasm.JS glue, Emscripten system libraries) and package-edge-runtime.mjs"
     }
   }
 }
