@@ -96,10 +96,11 @@ export function nativeFiles({ synchronous = false } = {}) {
     return Object.assign(new Error(strerror(errno)), { code: codes[errno], errno, nativeMessage: true, errorOrigin: 'crt' });
   }
   const fromNodeError = error => failure(ffi.os.errno[error.code] ?? ffi.os.errno.EIO);
-  function directoryBuffer(bytes) {
-    // Lean passes PATH_MAX bytes to libuv, including the terminating NUL.
-    // Check before removing a trailing separator, as libuv does.
-    if (bytes.length >= (process.platform === 'darwin' ? 1024 : 4096)) {
+  function directoryBuffer(bytes, grow) {
+    // Before 4.36, Lean passes PATH_MAX bytes to libuv, including the
+    // terminating NUL. Check before removing a trailing separator, as libuv
+    // does. Lean 4.36 retries with the size libuv asks for (get_uv_string).
+    if (!grow && bytes.length >= (process.platform === 'darwin' ? 1024 : 4096)) {
       const errno = ffi.os.errno.ENOBUFS;
       throw Object.assign(failure(errno), { errno: -errno, nativeMessage: false });
     }
@@ -210,20 +211,20 @@ export function nativeFiles({ synchronous = false } = {}) {
       if (!getpagesize) throw new Error('Linux page size is unavailable');
       return BigInt(getpagesize());
     },
-    homeDirectory() {
+    homeDirectory({ grow = false } = {}) {
       if (windows) return Buffer.from(homedir());
       // An empty HOME is present. Only an absent value uses the passwd entry.
       return directoryBuffer(adapter.environmentValue('HOME')
-        ?? Buffer.from(userInfo({ encoding: 'buffer' }).homedir));
+        ?? Buffer.from(userInfo({ encoding: 'buffer' }).homedir), grow);
     },
-    temporaryDirectory() {
+    temporaryDirectory({ grow = false } = {}) {
       if (windows) return Buffer.from(tmpdir());
       let bytes;
       for (const name of ['TMPDIR', 'TMP', 'TEMP', 'TEMPDIR']) {
         bytes = adapter.environmentValue(name);
         if (bytes !== undefined) break;
       }
-      bytes = directoryBuffer(bytes ?? Buffer.from(process.platform === 'android' ? '/data/local/tmp' : '/tmp'));
+      bytes = directoryBuffer(bytes ?? Buffer.from(process.platform === 'android' ? '/data/local/tmp' : '/tmp'), grow);
       return bytes.length > 1 && bytes[bytes.length - 1] === 47 ? bytes.subarray(0, -1) : bytes;
     },
     environmentValue(name) {
