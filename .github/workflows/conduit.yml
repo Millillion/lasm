@@ -216,17 +216,22 @@ jobs:
       - name: npm run build (the browser app, then the Node server embedding it)
         working-directory: examples/conduit
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
-      - name: The pinned Playwright's ${{ matrix.browser }}
+      - name: The pinned Playwright's ${{ matrix.browser }}, with its system packages
+        # One unbounded apt run (the Azure mirror is sometimes slow for minutes;
+        # a killed apt-get keeps the dpkg lock), bounded by the step's timeout.
+        timeout-minutes: 30
         run: |
           npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
-          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
+          printf 'Acquire::Retries "5";\nAcquire::http::Timeout "60";\nAcquire::https::Timeout "60";\nDPkg::Lock::Timeout "900";\n' | sudo tee /etc/apt/apt.conf.d/80-conduit >/dev/null
+          node .work/pw/node_modules/playwright-core/cli.js install-deps "${{ matrix.browser }}"
+          node .work/pw/node_modules/playwright-core/cli.js install "${{ matrix.browser }}"
       - name: The official RealWorld end-to-end suite
         working-directory: examples/conduit
         env:
           BROWSERS: ${{ matrix.browser }}
           E2E_NAME: node-${{ matrix.browser }}
         run: |
-          npm run test:e2e || status=$?
+          npm run test:e2e -- --retries=0 || status=$?
           node test/e2e-summary.mjs test-results/e2e-node-${{ matrix.browser }}.json
           exit ${status:-0}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -274,7 +279,7 @@ jobs:
           E2E_SERVER: wrangler dev --port 4100 --ip 127.0.0.1
           WRANGLER_SEND_METRICS: 'false'
         run: |
-          npm run test:e2e || status=$?
+          npm run test:e2e -- --retries=0 || status=$?
           node test/e2e-summary.mjs test-results/e2e-workers-chromium.json
           exit ${status:-0}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
