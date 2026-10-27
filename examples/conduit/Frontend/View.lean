@@ -15,7 +15,9 @@ abbrev H := Html Msg
 
 def defaultAvatar : String := "/client/default-avatar.svg"
 
-/-- A user's picture, or the default avatar when they have none. -/
+/-- A user's picture, or the default avatar when they have none. (Avatars
+carry the username as `alt`: WebKit draws a picture that fails to load with an
+empty `alt` as nothing at all, whatever its CSS size.) -/
 def avatar (image : Option String) : String :=
   match image with
   | some i => if i.trimAscii.isEmpty then defaultAvatar else i
@@ -53,7 +55,7 @@ def header (m : Model) : H :=
         | .user u => [
             navItem m.route (.editor none) [i [class_ "ion-compose"] [], text " New Article"],
             navItem m.route .settings [i [class_ "ion-gear-a"] [], text " Settings"],
-            navItem m.route (.profile u.username false 1) [img [class_ "user-pic", src (avatar u.image), alt ""], text u.username]]
+            navItem m.route (.profile u.username false 1) [img [class_ "user-pic", src (avatar u.image), alt u.username], text u.username]]
         | _ => [navItem m.route .login [text "Sign in"], navItem m.route .register [text "Sign up"]])]]
 
 def footer_ : H :=
@@ -83,7 +85,7 @@ def favoriteButton (m : Model) (art : Article) (label : Option String) (extra : 
 def preview (m : Model) (art : Article) : H :=
   keyed art.slug <| div [class_ "article-preview"] [
     div [class_ "article-meta"] [
-      link (Route.profile art.author.username false 1).href [] [img [src (avatar art.author.image), alt ""]],
+      link (Route.profile art.author.username false 1).href [] [img [src (avatar art.author.image), alt art.author.username]],
       div [class_ "info"] [
         link (Route.profile art.author.username false 1).href [class_ "author"] [text art.author.username],
         span [class_ "date"] [text (formatDate art.createdAt)]],
@@ -227,7 +229,7 @@ def articleMeta (m : Model) (art : Article) : H :=
     | .user u => u.username == art.author.username
     | _ => false
   div [class_ "article-meta"] ([
-    link (Route.profile art.author.username false 1).href [] [img [src (avatar art.author.image), alt ""]],
+    link (Route.profile art.author.username false 1).href [] [img [src (avatar art.author.image), alt art.author.username]],
     div [class_ "info"] [
       link (Route.profile art.author.username false 1).href [class_ "author"] [text art.author.username],
       span [class_ "date"] [text (formatDate art.createdAt)]]] ++
@@ -246,7 +248,7 @@ def commentCard (m : Model) (c : Comment) : H :=
     div [class_ "card-block"] [p [class_ "card-text"] [text c.body]],
     div [class_ "card-footer"] ([
       link (Route.profile c.author.username false 1).href [class_ "comment-author"]
-        [img [class_ "comment-author-img", src (avatar c.author.image), alt ""]],
+        [img [class_ "comment-author-img", src (avatar c.author.image), alt c.author.username]],
       text " ",
       link (Route.profile c.author.username false 1).href [class_ "comment-author"] [text c.author.username],
       span [class_ "date-posted"] [text (formatDate c.createdAt)]] ++
@@ -259,7 +261,7 @@ def commentSection (m : Model) (art : Article) : H :=
          div [class_ "card-block"] [textarea [class_ "form-control", placeholder "Write a comment...", rows "3",
            value m.form.comment, disabled (!m.ready), onInput (.set .comment)] []],
          div [class_ "card-footer"] [
-           img [class_ "comment-author-img", src (avatar u.image), alt ""],
+           img [class_ "comment-author-img", src (avatar u.image), alt u.username],
            button [class_ "btn btn-sm btn-primary", type_ "submit", disabled (!m.ready || m.busy)] [text "Post Comment"]]]]
      | .guest => [p [] [
          link (Route.login.href ++ "?next=" ++ (Route.article art.slug).href) [] [text "Sign in"], text " or ",
@@ -293,7 +295,7 @@ def profilePage (m : Model) (username : String) (favorites : Bool) (page : Nat) 
     | _ => false
   let info : List H := match m.profile with
     | .ready prof => [
-        img [class_ "user-img", src (avatar prof.image), alt ""],
+        img [class_ "user-img", src (avatar prof.image), alt prof.username],
         h4 [] [text prof.username],
         p [] [text (prof.bio.getD "")],
         if mine then link "/settings" [class_ "btn btn-sm btn-outline-secondary action-btn"]

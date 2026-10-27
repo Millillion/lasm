@@ -217,14 +217,10 @@ jobs:
         working-directory: examples/conduit
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
       - name: The pinned Playwright's ${{ matrix.browser }}, with its system packages
-        # One unbounded apt run (the Azure mirror is sometimes slow for minutes;
-        # a killed apt-get keeps the dpkg lock), bounded by the step's timeout.
         timeout-minutes: 30
         run: |
           npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
-          printf 'Acquire::Retries "5";\nAcquire::http::Timeout "60";\nAcquire::https::Timeout "60";\nDPkg::Lock::Timeout "900";\n' | sudo tee /etc/apt/apt.conf.d/80-conduit >/dev/null
-          node .work/pw/node_modules/playwright-core/cli.js install-deps "${{ matrix.browser }}"
-          node .work/pw/node_modules/playwright-core/cli.js install "${{ matrix.browser }}"
+          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
       - name: The official RealWorld end-to-end suite
         working-directory: examples/conduit
         env:
