@@ -11,7 +11,7 @@ on:
   # release-checks.yml gates releases on it.
   workflow_call:
   push:
-    branches: [launch]
+    branches: [launch, release-0.3.3]
 permissions:
   contents: read
 concurrency:

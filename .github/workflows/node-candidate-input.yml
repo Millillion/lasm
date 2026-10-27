@@ -12,7 +12,7 @@ permissions:
   contents: read
 jobs:
   prepare:
-    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/release-0.3.3' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     # GitHub hides draft assets from read-only tokens. Only this retrieval job
