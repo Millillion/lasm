@@ -72,7 +72,7 @@ or processes (and without files, except on WASI); the rest of Lean works.
 | An edge function (Workers, Vercel/Netlify Edge, Deno Deploy, Supabase) | `npm create @lasm@latest my-edge -- --template hono --deploy workers` (or `fetch`) | [examples/edge-pure](examples/edge-pure), [docs/EDGE.md](docs/EDGE.md) |
 | A Fastly, WASI or Spin service | `npm create @lasm@latest my-svc -- --template fetch --deploy fastly` (or `wasi-http`, `spin`, `wasi`) | [examples/fetch](examples/fetch), [docs/WASI.md](docs/WASI.md) |
 | A browser app | `npm create @lasm@latest my-web -- --template web` | [examples/ui](examples/ui) (counter, TodoMVC with proofs, feature demo, benchmark) |
-| A real-world REST API (users, auth, articles, comments, SQLite) | `cd examples/conduit && npm install && npm run build && npm start` | [examples/conduit](examples/conduit), the flagship (below) |
+| A real-world REST API (users, auth, articles, comments, SQL) on Node, Workers or Bun | `cd examples/conduit && npm install && npm run build && npm start` | [examples/conduit](examples/conduit), the flagship (below) |
 | A full-stack app with a verified API | `npm create @lasm@latest my-app -- --template fullstack` | [templates/fullstack](templates/fullstack) |
 | To call npm packages or `fetch` from Lean | add `import Lasm.JS` and one `@[js]` line per function | [examples/js-fetch](examples/js-fetch), [JS bindings](#calling-javascript-and-npm-from-lean) |
 | To run on Bun or Deno | `bun create @lasm my-app --template hono` / `deno run -A npm:@lasm/create my-app --template hono` | [docs/BUN_DENO.md](docs/BUN_DENO.md) |
@@ -83,29 +83,33 @@ lists them all.
 ## Flagship example: Conduit
 
 [examples/conduit](examples/conduit) is [Conduit](https://github.com/gothinkster/realworld),
-the RealWorld app (a Medium clone), written in Lean. Today it is the **REST API on
-Node**, and it passes the official RealWorld API suite unmodified: 13 of 13 files and
-154 requests, on Node 24 and 26 (gothinkster/realworld `ebbcdeb8`; CI
-[conduit.yml](.github/workflows/conduit.yml), run 40521772087).
+the RealWorld app (a Medium clone), written in Lean. Today it is the **REST API**, and
+the same Lean code runs on **Node** (`node:sqlite`), **Cloudflare Workers** (D1) and
+**Bun** (`bun:sqlite`). Each target needs one hand-written binding module
+(`Server/NodeSqlite.lean`, `Server/D1.lean`, `Server/BunSqlite.lean`). The official
+RealWorld API suite passes unmodified on every target: 13 of 13 files and 154
+requests on Node 24, Node 26.12.1, Workers (`wrangler dev` 4.152.0, local workerd and
+D1) and Bun 1.4.4 (gothinkster/realworld `ebbcdeb8`; CI
+[conduit.yml](.github/workflows/conduit.yml), run 40523094526).
 
 - **Pure Lean core.** Validation, slugs, pagination, authorization and every
   endpoint (`Conduit/*.lean`) contain no Lasm and no JavaScript, and `lake build`
   checks them natively. The endpoints are written against a `Store` of functions
   over any monad, so proofs can run the same code on a model of the tables.
-- **Server** with `Lasm.Fetch`. SQLite comes from Node's built-in `node:sqlite`
-  through a few hand-written `@[js]` bindings. Passwords use PBKDF2-HMAC-SHA-256
-  and tokens are HS256 JWTs, both through Web Crypto.
+- **Server** with `Lasm.Fetch`. Passwords use PBKDF2-HMAC-SHA-256 and tokens are
+  HS256 JWTs, both through Web Crypto.
 
 ```sh
 cd examples/conduit
-npm install          # @lasm/cli 0.3.2 and Hurl (the suite's runner)
-npm run build        # dist/server
-npm start            # http://localhost:3000/api (PORT, HOST, DATABASE_PATH, JWT_SECRET)
-npm test             # the official RealWorld API suite against a fresh server and database
+npm install                                   # @lasm/cli and Hurl (the suite's runner)
+npm run build && npm start                    # Node: http://localhost:3000/api
+npm run build:workers && npx wrangler dev     # Cloudflare Workers with local D1
+npm run build:bun && npm run start:bun        # Bun with bun:sqlite
+npm test                                      # the official suite (also test:workers, test:bun)
 ```
 
-**Coming** (not done yet): Cloudflare Workers with D1, Bun, proofs about the
-endpoints, and the `Lasm.UI` frontend.
+**Coming** (not done yet): proofs about the endpoints (in progress) and the
+`Lasm.UI` frontend.
 
 ## 60-second start
 

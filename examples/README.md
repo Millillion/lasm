@@ -6,7 +6,7 @@ For a new project, use `npm create @lasm@latest` with a [template](../README.md#
 
 | Example | What it shows | Run |
 | --- | --- | --- |
-| **[conduit](conduit)** (flagship) | The RealWorld "Conduit" REST API in Lean on Node: SQLite via `node:sqlite` bindings, PBKDF2 passwords, JWTs, `Lasm.Fetch`; passes the official RealWorld API suite (154 requests). Coming: Workers (D1), Bun, proofs, the `Lasm.UI` frontend | `npm install && npm run build && npm start` (`npm test`: the official suite) |
+| **[conduit](conduit)** (flagship) | The RealWorld "Conduit" REST API in Lean, one code base on Node (`node:sqlite`), Cloudflare Workers (D1) and Bun (`bun:sqlite`); PBKDF2, JWT, `Lasm.Fetch`; passes the official RealWorld API suite (154 requests) on every target. Coming: proofs (in progress), the `Lasm.UI` frontend | `npm install && npm run build && npm start` (also `build:workers`, `build:bun`; `npm test`: the official suite) |
 | [hello](hello) | The smallest program | `npx @lasm/cli Main.lean` |
 | [js-fetch](js-fetch) | A `@[js]` binding to Node's `fetch`, awaiting in `Async` | `npx @lasm/cli Main.lean -- https://example.com` |
 | [js-crud](js-crud) | A REST API with Postgres (`pg`) and JWT (`jose`), on Express and on Hono | `npm install && npx @lasm/cli Express.lean` |
