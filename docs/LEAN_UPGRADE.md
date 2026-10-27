@@ -138,14 +138,15 @@ the packaged archive in `src/edge-runtimes.json` (new tag
 
 ## 8. Upstream suite and Lasm's suites
 
-1. Language-coverage inventory (native Lean against the pristine source):
+1. Language-coverage inventory (native Lean against the pristine source; after item 2):
    `gh workflow run language-coverage-baseline.yml --ref lean-<version> -f harness=inventory -f lean=<version>`;
    commit `docs/evidence/lean-<version>-language-coverage-inventory.json` and
    write the adapter review: `node scripts/language-coverage/make-adapter-review.mjs <version>`.
-2. Application inventory and source manifest
-   (`scripts/inventory-upstream-applications.py --runtime BUILD --archive SOURCE --output DIR`,
-   from the runtime build tree) → `docs/evidence/lean-<version>-upstream-*.json`,
-   then the eval-io review (`scripts/application-tests/eval-io-reviewed.json`)
+2. Application inventory and source manifest, from the patched tree of step 3
+   configured (not built) as the runtime build configures it:
+   `node scripts/lean-upgrade/upstream-inventory.mjs <version> .work/lean-upgrade`
+   → `docs/evidence/lean-<version>-upstream-*.json` (a few minutes, local).
+   It must precede item 1 (the language-coverage inventory reads it). Then the eval-io review (`scripts/application-tests/eval-io-reviewed.json`)
    and the mixed-driver classification (`classify-mixed.mjs`).
 3. A candidate from the branch (`node-linux-acceptance.yml`, scope `linux`
    while iterating), then the harnesses of `scripts/nightly/layout.json` on it,
