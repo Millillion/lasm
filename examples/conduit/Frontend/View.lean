@@ -42,8 +42,11 @@ def errorList (errors : List String) : List H :=
 
 /-! ## Layout -/
 
+/-- Navigation items are keyed by their target: when the viewer becomes known
+and items appear (Your Feed, New Article, …), the existing links keep their
+elements instead of being rewritten into other links under a pending click. -/
 def navItem (current : Route) (target : Route) (children : List H) : H :=
-  li [class_ "nav-item"] [link target.href [class_ (if current == target then "nav-link active" else "nav-link")] children]
+  keyed target.href <| li [class_ "nav-item"] [link target.href [class_ (if current == target then "nav-link active" else "nav-link")] children]
 
 def header (m : Model) : H :=
   nav [class_ "navbar navbar-light"] [
@@ -116,7 +119,7 @@ def articleList (m : Model) (emptyMessage : List H) (hrefOf : Nat → String) (p
 
 def homePage (m : Model) (feed : Feed) (page : Nat) : H :=
   let tab (f : Feed) (label : List H) : H :=
-    li [class_ "nav-item"] [link (Route.home f 1).href [class_ (if feed == f then "nav-link active" else "nav-link")] label]
+    keyed (Route.home f 1).href <| li [class_ "nav-item"] [link (Route.home f 1).href [class_ (if feed == f then "nav-link active" else "nav-link")] label]
   let tabs :=
     (if (m.auth.user?).isSome then [tab .following [text "Your Feed"]] else []) ++
     [tab .global [text "Global Feed"]] ++
@@ -233,12 +236,12 @@ def articleMeta (m : Model) (art : Article) : H :=
     div [class_ "info"] [
       link (Route.profile art.author.username false 1).href [class_ "author"] [text art.author.username],
       span [class_ "date"] [text (formatDate art.createdAt)]]] ++
+    -- Keyed: the author's buttons and a reader's are different elements.
     (if mine then [
-      link (Route.editor (some art.slug)).href [class_ "btn btn-sm btn-outline-secondary"] [i [class_ "ion-edit"] [], text " Edit Article"],
-      text " ",
-      button [class_ "btn btn-sm btn-outline-danger", disabled (!canAct m), onClick (.deleteArticle art.slug)]
+      keyed "edit" <| link (Route.editor (some art.slug)).href [class_ "btn btn-sm btn-outline-secondary"] [i [class_ "ion-edit"] [], text " Edit Article"],
+      keyed "delete" <| button [class_ "btn btn-sm btn-outline-danger", disabled (!canAct m), onClick (.deleteArticle art.slug)]
         [i [class_ "ion-trash-a"] [], text " Delete Article"]]
-    else [followButton m art.author "", text " ", favoriteButton m art (some "Article") ""]))
+    else [keyed "follow" <| followButton m art.author "", keyed "favorite" <| favoriteButton m art (some "Article") ""]))
 
 def commentCard (m : Model) (c : Comment) : H :=
   let mine := match m.auth with
@@ -304,7 +307,7 @@ def profilePage (m : Model) (username : String) (favorites : Bool) (page : Nat) 
     | .loading => [h4 [] [text username], p [] []]
     | .failed e => errorList [e]
   let tab (fav : Bool) (label : String) :=
-    li [class_ "nav-item"] [link (Route.profile username fav 1).href
+    keyed (Route.profile username fav 1).href <| li [class_ "nav-item"] [link (Route.profile username fav 1).href
       [class_ (if favorites == fav then "nav-link active" else "nav-link")] [text label]]
   div [class_ "profile-page"] [
     div [class_ "user-info"] [div [class_ "container"] [div [class_ "row"] [
