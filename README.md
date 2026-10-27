@@ -434,6 +434,7 @@ The deployed application cannot use:
 | Evaluate or compile new Lean code | `Lean.Environment.evalConst`, interpreter evaluation, a Lean REPL, runtime elaboration/compilation, evaluation of declarations loaded by name. Calling an ordinary compiled function is allowed. |
 | Use Lean's compiler/kernel runtime state | Runtime elaboration, kernel proof checking, compiler environments, language-server machinery needing Lean's C++ compiler/kernel. Pure Lean data operations are allowed if their reachable dependencies pass the check. `LeanExport.parseStream` builds `Lean.Expr` values through the kernel and is rejected. |
 | Load executable plugins dynamically | Lean/Wasm plugin loading, `dlopen`/`dlsym` (C code calling `dlopen` gets an implementation that always fails), runtime Lean symbol lookup. |
+| Run the CaDiCaL SAT solver | `Lean.Cadical` (the solver behind `bv_decide`, Lean 4.36): CaDiCaL is not compiled into the WebAssembly runtime. `Solver.new` stops the program with the message "CaDiCaL (the SAT solver behind bv_decide) is not available in Lasm applications"; `Lean.Cadical.Internal.signature` is empty. `bv_decide` proofs still check when you build, on your machine's native Lean. |
 
 The build checks **reachable runtime dependencies**, including imported libraries
 and indirect calls; a reachable forbidden call is rejected even if your input would

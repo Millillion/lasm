@@ -273,9 +273,21 @@ New upstream tests that fail on Lasm (new coverage, not regressions; work for
   between two selects is lost), `elab/uv_system_long_strings` (ENOBUFS for long
   system strings), `compile/uv_loop_configure` (`lean_uv_event_loop_configure`
   unsupported), `compile/uv_stop_reentrancy` (timeout), and
-  `compile/uv_cancel_releases_outside_lock` (output differs);
-- CaDiCaL: `elab/cadical`, `elab/cadical_signature`: the Wasm runtime has no
-  solver (decide: unsupported by design, or link CaDiCaL 2.1.2, MIT, into the
-  runtime);
-- `elab/versoSyntaxView`: a deprecation warning
-  (`Lean.Parser.InputContext.input`) appears in the adapter's output.
+  `compile/uv_cancel_releases_outside_lock` (output differs). Fixed on branch
+  `uv-semantics` for `main` (0.3.x, where 4.35 has the same behaviour) and
+  merged here; see docs/DECISIONS.md (2026-10-27);
+- CaDiCaL: `elab/cadical`, `elab/cadical_signature`: unsupported by design
+  (decided 2026-10-27). The Wasm runtime does not compile CaDiCaL;
+  `Solver.new` stops the program with "CaDiCaL (the SAT solver behind
+  bv_decide) is not available in Lasm applications" (runtime/node-system.cpp)
+  and the signature is empty. The README lists it under the unavailable Lean
+  capabilities; scripts/language-coverage/assemble.mjs classifies both tests
+  `unsupported-by-design`.
+- `elab/versoSyntaxView`: an adapter difference, not a Lasm result. The upstream
+  driver and the adapter's native steps pass `-Dlinter.all=false`; `lasm build`
+  takes no Lean options, so a deprecation warning
+  (`Lean.Parser.InputContext.input`) entered a `#guard_msgs` that stays a
+  command. The parallel copy now sets `set_option linter.all false` itself
+  (scripts/application-tests/runtime-adapter-source.mjs).
+- `elab/async_http_expect`: reviewed afresh for eval-io (4.36 adds one
+  `assertContains r " GMT\r\n"`; same 5 actions).

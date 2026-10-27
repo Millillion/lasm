@@ -243,7 +243,7 @@
       }
     },
     "4.36.0-rc1": {
-      "review": "Carried from the 4.35.0 review (2026-10-27, scripts/lean-upgrade/carry-reviews.mjs): every listed source and sidecar is byte-identical in the pinned 4.36.0-rc1 archive; changed or removed tests need a fresh review: elab/async_http_expect.lean.",
+      "review": "Carried from the 4.35.0 review (2026-10-27, scripts/lean-upgrade/carry-reviews.mjs): every listed source and sidecar is byte-identical in the pinned 4.36.0-rc1 archive. Fresh review (2026-10-27) of elab/async_http_expect.lean, the one changed test: 4.36.0-rc1 only adds `assertContains r \" GMT\\x0d\\n\"` after the `Date: ` check in an existing action (the same 5 flat IO Unit actions, no new commands, sidecars or timeouts); the same parser, command-kind and native type-check gates apply.",
       "tests": {
         "elab/async_http_body.lean": {
           "sha256": "526c7bc0e86f13faaf7836d9dbf757abf8b218f6d5fe5a3edeeb236c51ab5f50",
@@ -356,6 +356,10 @@
               "kind": "ctest-run-serial"
             }
           ]
+        },
+        "elab/async_http_expect.lean": {
+          "sha256": "4772a9339dd4dc025438d6d486e43963fa111752781141ea72a4df071e0378ae",
+          "actions": 5
         }
       }
     }

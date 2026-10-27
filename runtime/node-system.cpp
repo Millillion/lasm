@@ -131,4 +131,12 @@ O *lean_uv_get_free_memory() { return number_call(139); }
 O *lean_uv_get_total_memory() { return number_call(140); }
 O *lean_uv_get_constrained_memory() { return number_call(141); }
 O *lean_uv_get_available_memory() { return number_call(142); }
+// Lean 4.36's Lean.Cadical: CaDiCaL is not compiled into the Wasm runtime
+// (unsupported by design, README). Solver.new is a BaseIO action, so, as in a
+// native Lean built without CaDiCaL, it stops the program, with this message.
+// Every other solver function needs a Solver and is unreachable.
+O *lean_cadical_solver_new() {
+    lean_internal_panic("CaDiCaL (the SAT solver behind bv_decide) is not available in Lasm applications: "
+        "it is not compiled into the WebAssembly runtime");
+}
 }
