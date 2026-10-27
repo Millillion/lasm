@@ -82,7 +82,7 @@ jobs:
     if: needs.gate.outputs.proceed == 'true'
     permissions:
       contents: write
-      actions: read
+      actions: write # cache-budget.mjs may evict old candidate caches
     uses: ./.github/workflows/node-linux-acceptance.yml
     with:
       candidate-version: 0.1.0-experimental.${{ github.run_id }}

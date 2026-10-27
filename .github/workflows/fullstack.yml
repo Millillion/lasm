@@ -127,7 +127,7 @@ jobs:
     needs: build
     name: Node server, ${{ matrix.browser }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -142,6 +142,7 @@ jobs:
           node-version: 26.12.1
           package-manager-cache: false
       - name: Pinned Playwright and its ${{ matrix.browser }} build
+        timeout-minutes: 30
         run: |
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
           bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
@@ -166,7 +167,7 @@ jobs:
     needs: build
     name: Workers (wrangler dev, local workerd and KV), chromium
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       CI: '1'
       BROWSER: 'none'
@@ -178,6 +179,7 @@ jobs:
           node-version: 26.12.1
           package-manager-cache: false
       - name: Pinned wrangler (with workerd), Playwright and Chromium
+        timeout-minutes: 30
         run: |
           npm install --prefix .work/tools --no-audit --no-fund wrangler@4.152.0
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
@@ -212,7 +214,7 @@ jobs:
     needs: build
     name: Bun, and Deno with Deno KV, chromium
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       CI: '1'
       BROWSER: 'none'
@@ -224,6 +226,7 @@ jobs:
           node-version: 26.12.1
           package-manager-cache: false
       - name: Pinned Bun, Deno (from npm), Playwright and Chromium
+        timeout-minutes: 30
         run: |
           npm install --prefix .work/tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
@@ -265,7 +268,7 @@ jobs:
     needs: build
     name: Fastly (Viceroy, local KV Store) and wasmtime serve
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       CI: '1'
       BROWSER: 'none'
@@ -276,6 +279,7 @@ jobs:
           node-version: 26.12.1
           package-manager-cache: false
       - name: Pinned wasmtime, Viceroy, Playwright and Chromium
+        timeout-minutes: 30
         run: |
           set -euo pipefail
           T=.work/tools; mkdir -p $T/dl $T/wasmtime $T/viceroy

@@ -95,7 +95,7 @@ jobs:
     needs: package
     permissions:
       contents: write
-      actions: read
+      actions: write # cache-budget.mjs may evict old candidate caches
     uses: ./.github/workflows/node-candidate-input.yml
     with:
       sha256: ${{ needs.package.outputs.sha256 }}
@@ -234,7 +234,7 @@ jobs:
     needs: [package, candidate]
     permissions:
       contents: write
-      actions: read
+      actions: write # cache-budget.mjs may evict old candidate caches
     uses: ./.github/workflows/release-benchmarks.yml
     with:
       candidate-version: ${{ inputs.candidate-version || format('0.1.0-experimental.{0}', github.run_id) }}

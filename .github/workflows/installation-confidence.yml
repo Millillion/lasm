@@ -40,7 +40,7 @@ jobs:
     needs: select
     permissions:
       contents: write
-      actions: read
+      actions: write # cache-budget.mjs may evict old candidate caches
     uses: ./.github/workflows/node-candidate-input.yml
     with:
       sha256: ${{ needs.select.outputs.sha256 }}
