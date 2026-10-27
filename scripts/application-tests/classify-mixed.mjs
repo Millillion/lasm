@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { loadUpstreamEvidence } from './upstream-evidence.mjs';
+import { atMost } from '../full-lean/lean-patches.mjs';
 
 const [version = '4.34.0', sourceRoot = '.cache/lean4-' + version, outputArg] = process.argv.slice(2);
 assert.ok(process.argv.length <= 5, 'Supply [LEAN_VERSION [PRISTINE_SOURCE [NEW_OUTPUT]]]');
@@ -83,10 +84,10 @@ for (const name of nativeOther) add(name, 'native-build-time',
 for (const [name, rationale] of Object.entries(runtimeOther)) add(name, 'native-and-compiled-application', rationale);
 add('pkg/user_plugin', 'native-and-foreign-application',
   'Retain native --plugin controls; run the unchanged Lean.loadPlugin clients with compatible deployed dynamic libraries and initialization symbols.');
-if (['4.34.1', '4.35.0', '4.36.0-rc1'].includes(version)) add('misc_dir/rc_sticky', 'native-and-foreign-application',
+if (atMost('4.34.1', version)) add('misc_dir/rc_sticky', 'native-and-foreign-application',
   'Run the unchanged C reference-count regression against the matching native and deployed Lean runtimes. Preserve every assertion and original leanc flags; native success alone does not cover the Wasm runtime.');
 
-if (version === '4.35.0') {
+if (atMost('4.35.0', version)) {
   // Registrations added in 4.35.0 (language coverage L1 review, 2026-10-20).
   for (const name of `builtin-lint-package-check challenge-bad-config challenge-def-hole-axiom-issue
       challenge-def-hole-kind-mismatch challenge-def-hole-type-mismatch challenge-def-hole
@@ -103,9 +104,20 @@ if (version === '4.35.0') {
   for (const name of ['pkg/con-leche', 'pkg/con-ron', 'pkg/lean4lean', 'pkg/nanoda']) add(name, 'native-build-time',
     'External kernel checker fed by the native leanexport tool; the unchanged script skips unless that third-party checker is installed.');
 }
+if (atMost('4.36.0', version)) {
+  // Registrations added in 4.36.0-rc1 (reviewed 2026-10-27, docs/LEAN_UPGRADE.md).
+  for (const name of ['15435', 'samply', 'shakeAddDownstream']) add(`tests/lake/tests/${name}/test.sh`, 'native-build-time',
+    'Lake job output, profiling (mock samply) or shake behavior executes in the managed native build toolchain.');
+  add('tests/lake/tests/moduleCodegen/test.sh', 'native-and-compiled-application',
+    'Run the codegen executable (its 42 output); module code generation, IR artifacts and server setup checks remain native.');
+  add('pkg/tracked_ext', 'native-build-time', 'Original package build of environment extensions executes in the managed native build toolchain.');
+}
 const tests = inventory.tests.filter(test => test.category === 'mixed-driver-review-required');
 assert.equal(tests.length, inventory.categories['mixed-driver-review-required']);
-assert.equal(decisions.size, tests.length);
+{
+  const missing = tests.filter(test => !decisions.has(test.name)).map(test => test.name), stale = [...decisions.keys()].filter(name => !tests.some(test => test.name === name));
+  assert.ok(!missing.length && !stale.length, `Mixed-driver decisions to review for Lean ${version}: new ${JSON.stringify(missing)}, gone ${JSON.stringify(stale)}`);
+}
 const counts = {}, rows = tests.map(test => {
   const decision = decisions.get(test.name); assert.ok(decision, 'Missing decision: ' + test.name);
   const content = readFileSync(join(sourceRoot, test.source));

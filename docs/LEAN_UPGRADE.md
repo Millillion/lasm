@@ -146,8 +146,13 @@ the packaged archive in `src/edge-runtimes.json` (new tag
    configured (not built) as the runtime build configures it:
    `node scripts/lean-upgrade/upstream-inventory.mjs <version> .work/lean-upgrade`
    → `docs/evidence/lean-<version>-upstream-*.json` (a few minutes, local).
-   It must precede item 1 (the language-coverage inventory reads it). Then the eval-io review (`scripts/application-tests/eval-io-reviewed.json`)
-   and the mixed-driver classification (`classify-mixed.mjs`).
+   It must precede item 1 (the language-coverage inventory reads it).
+   Then carry the hash-bound reviews forward:
+   `node scripts/lean-upgrade/carry-reviews.mjs <old> <new>` keeps every
+   reviewed test whose source and sidecars are byte-identical and lists the
+   changed ones for a fresh review (Server MVP adapter, L2/L3 adapter and
+   eval-io reviews); regenerate the mixed-driver classification
+   (`scripts/application-tests/classify-mixed.mjs`).
 3. A candidate from the branch (`node-linux-acceptance.yml`, scope `linux`
    while iterating), then the harnesses of `scripts/nightly/layout.json` on it,
    compared with the previous release's Phase 3 baseline
