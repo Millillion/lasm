@@ -4,7 +4,7 @@
 //
 //   node test/api.mjs                       # the Node build (npm run build first)
 //   node test/api.mjs --url http://host:port # a server that is already running
-//   node test/api.mjs --command "bun bun/main.mjs"   # any other server command
+//   node test/api.mjs --command "bun bun/main.mjs"   # any other server command ({port}: its port)
 //
 // Writes the pass counts to test-results/api-<name>.json.
 import { spawn, spawnSync } from 'node:child_process';
@@ -43,14 +43,16 @@ try {
   if (!base) {
     const port = await freePort();
     work = mkdtempSync(join(tmpdir(), 'conduit-api-'));
-    const command = option('--command') ?? `node ${JSON.stringify(join(root, 'dist/server/main.mjs'))}`;
+    // {port} in a command is replaced by the port (wrangler dev takes it as an option).
+    const command = (option('--command') ?? `node ${JSON.stringify(join(root, 'dist/server/main.mjs'))}`)
+      .replaceAll('{port}', String(port));
     child = spawn(command, {
       shell: true, cwd: root, stdio: ['ignore', 'inherit', 'inherit'], detached: process.platform !== 'win32',
       env: { ...process.env, PORT: String(port), HOST: '127.0.0.1', DATABASE_PATH: join(work, 'conduit.db') },
     });
     base = `http://127.0.0.1:${port}`;
   }
-  await waitFor(`${base}/api/tags`, child);
+  await waitFor(`${base}/api/tags`, child, 180_000);
   // The official runner (bash, hurl from node_modules/.bin).
   const run = spawnSync('bash', [join(root, 'test/realworld/specs/api/run-api-tests-hurl.sh')], {
     cwd: root, encoding: 'utf8',

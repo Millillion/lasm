@@ -68,9 +68,7 @@ def site (store : Store Async) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Res
   | "api" :: path => api store req path
   | _ => return .notFound
 
-/-- Creates the tables, then serves. -/
-def run (db : Sql) : IO Unit := do
-  (migrate db).block
-  Lasm.Fetch.serve (site (store db))
+/-- Serves Conduit on a database (whose binding module created the tables). -/
+def run (db : Sql) : IO Unit := Lasm.Fetch.serve (site (store db))
 
 end Conduit.Server

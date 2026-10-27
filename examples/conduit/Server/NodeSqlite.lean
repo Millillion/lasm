@@ -15,6 +15,7 @@ namespace Conduit.Server.NodeSqlite
 /-- `new DatabaseSync(path)` from node:sqlite. -/
 @[js "node:sqlite" "new DatabaseSync"] opaque openDatabase : String → IO Value
 
+/-- Opens (or creates) the database file and its tables. -/
 def «open» (path : String) : IO Sql := do
   let db ← openDatabase path
   for pragma in ["PRAGMA journal_mode = WAL", "PRAGMA foreign_keys = ON", "PRAGMA busy_timeout = 5000"] do
@@ -33,7 +34,7 @@ def «open» (path : String) : IO Sql := do
   let runOne (sql : String) (params : Array Data) : IO Nat := do
     let r ← (← prepare sql).callMethod "run" params Data
     return num r "lastInsertRowid"
-  return {
+  let sql : Sql := {
     all := fun sql params => do (← prepare sql).callMethod "all" params (Array Data)
     run := fun sql params => locked (runOne sql params)
     batch := fun stmts => locked do
@@ -44,5 +45,7 @@ def «open» (path : String) : IO Sql := do
       catch e =>
         let _ ← db.callMethod "exec" #[toJS "ROLLBACK"] Data
         throw e }
+  (migrate sql).block
+  return sql
 
 end Conduit.Server.NodeSqlite
