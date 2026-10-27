@@ -3,6 +3,7 @@ import { constants } from 'node:os';
 import { getSystemErrorMap } from 'node:util';
 import { numbers, cancellation } from './node-host.mjs';
 import { nativeTcp } from './native-tcp.mjs';
+import { leanAtLeast } from './lean-io-errors.mjs';
 
 const empty = Buffer.alloc(0);
 const failure = (code, message) => Object.assign(new Error(message), { code });
@@ -12,6 +13,17 @@ const tcpFailure = code => {
   const value = uvErrors.get(code);
   return Object.assign(new Error(value?.message ?? code), { code, errno: value?.errno });
 };
+// Lean 4.36 rejects a second accept as IO.Error.otherError (-UV_EALREADY) with
+// this message; earlier releases decode UV_EALREADY (and then never release the
+// event loop lock, so no later operation completes: there is nothing to match).
+// Accepting on a socket that is not listening fails with invalidArgument EINVAL
+// instead of waiting forever (runtime/uv/tcp.cpp, tcp_not_listening_error).
+const parallelAccept = version => leanAtLeast(version, '4.36.0')
+  ? Object.assign(new Error('parallel accept is not allowed! consider binding multiple sockets to the same address and accepting on them instead'),
+    { code: 'EALREADY', errno: -uvErrors.get('EALREADY').errno, nativeMessage: true })
+  : tcpFailure('EALREADY');
+const notListening = () => Object.assign(new Error('socket is not listening'),
+  { code: 'EINVAL', errno: constants.errno.EINVAL, nativeMessage: true });
 function address(bytes) {
   // Lean calls uv_tcp_bind with flags=0, permitting IPv4-mapped connections on
   // an IPv6 wildcard listener where the host supports dual-stack sockets.
@@ -204,19 +216,27 @@ export function createNodeNetwork({ add, get, release, leanVersion = '4.32.0' })
     case 53: {
       const t = getTcp(id);
       if (t.error) throw t.error;
-      if (!t.server?.listening) throw failure('EINVAL', 'Socket is not listening');
-      if (t.acceptWait) throw failure('EBUSY', 'Parallel accepts are not allowed');
+      if (t.acceptWait) throw parallelAccept(leanVersion);
+      if (!t.server?.listening) throw notListening();
       if (t.accepted.length) return numbers(t.accepted.shift());
       return new Promise((resolve, reject) => { t.acceptWait = { resolve, reject }; });
     }
-    case 54: { const t = getTcp(id); if (t.error) throw t.error; return numbers(t.accepted.shift() ?? 0); }
-    case 66: {
-      // Std.Internal.UV.TCP.Socket.waitAcceptable (Lean 4.36): resolves once a
-      // connection is queued, without accepting it.
+    case 54: {
       const t = getTcp(id);
       if (t.error) throw t.error;
-      if (t.acceptWait) throw failure('EALREADY', 'connection already in progress');
-      if (!t.server?.listening) throw failure('EINVAL', 'Socket is not listening');
+      if (t.acceptWait) throw parallelAccept(leanVersion);
+      // Before 4.36, uv_accept on a socket that is not listening reports EAGAIN: none.
+      if (!t.server?.listening && leanAtLeast(leanVersion, '4.36.0')) throw notListening();
+      return numbers(t.accepted.shift() ?? 0);
+    }
+    case 66: {
+      // Std.Internal.UV.TCP.Socket.waitAcceptable (Lean 4.36): resolves once a
+      // connection is queued, without accepting it. A pending accept or wait
+      // is libuv's EALREADY (not the parallel-accept message).
+      const t = getTcp(id);
+      if (t.error) throw t.error;
+      if (t.acceptWait) throw tcpFailure('EALREADY');
+      if (!t.server?.listening) throw notListening();
       if (t.accepted.length) return empty;
       return new Promise((resolve, reject) => { t.acceptWait = { queue: true, resolve, reject }; });
     }

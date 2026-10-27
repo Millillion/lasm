@@ -139,6 +139,15 @@ const windowsCrtCases = new Set(`
   EDEADLK EDEADLOCK EDOM EIDRM EINPROGRESS ENETRESET ENOLCK ENOLINK ENOSR ENOSTR ETIME
 `.trim().split(/\s+/));
 
+// Whether a Lean release (x.y.z, or a prerelease x.y.z-rcN of that release) is
+// at least minimum. A prerelease carries its release's runtime semantics.
+export function leanAtLeast(version, minimum) {
+  const parts = value => value.split('-')[0].split('.').map(Number);
+  const [a, b] = [parts(version), parts(minimum)];
+  for (let i = 0; i < 3; i++) if (a[i] !== b[i]) return a[i] > b[i];
+  return true;
+}
+
 export function checkLeanIOVersion(version) {
   // The verified 4.34.1 archives preserve both Init.System.IO and runtime/io.cpp
   // byte-for-byte. Lean 4.35.0 leaves Init/System/IOError.lean and the error
