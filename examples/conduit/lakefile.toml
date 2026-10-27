@@ -1,0 +1,22 @@
+name = "conduit"
+version = "0.1.0"
+defaultTargets = ["Conduit", "Proofs"]
+
+# The pure Conduit: API types and JSON, validation, slugs, pagination,
+# authorization and every endpoint's logic (generic over the store).
+# Shared by the server and the browser app. `lake build` checks it and the
+# proofs with plain Lean 4.35.0: no Lasm, no JavaScript.
+[[lean_lib]]
+name = "Conduit"
+
+# The theorems about Conduit (PROOFS.md).
+[[lean_lib]]
+name = "Proofs"
+
+# The server's modules (Lasm.Fetch, Lasm.JS): the SQL layer, Web Crypto,
+# the HTTP glue, and one SQLite binding module per target.
+[[lean_lib]]
+name = "Server"
+
+# Server*.lean, Client.lean and View.lean use Lasm (Lasm.Fetch, Lasm.JS,
+# Lasm.UI): lasm builds them (npm run build). They are not Lake targets.
