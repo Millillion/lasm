@@ -266,6 +266,8 @@ CI on branch `lean-4.36` (runs, all against 4.36.0-rc1):
 | UI, WASI, dev loop | 40458014838, 40458017420, 40458026156 | pass |
 | Linux acceptance (x64, arm64, JS interop) | 40465566277 | pass |
 | Upstream suite, Linux x64 and arm64 (runtime adapter, compiled applications, eval-io) | 40460043775, 40460058645, 40460066282, 40460073165, 40466615512 | 0 regressions against the 4.35.0 Phase 3 baseline; 1 changed test awaits review (`elab/async_http_expect.lean`) |
+| Re-pinned (runtime `8103c016…`, edge `a32a443e…`): Linux acceptance | 40496635223 | pass (candidate `0.1.0-experimental.44600000008`) |
+| Re-pinned: upstream suite, Linux x64 and arm64 | 40499335353, 40499347567, 40499360755, 40499373080, 40499385326 | 0 regressions, 0 missing; all 9 uv tests and `elab/async_http_expect` pass; `elab/cadical`, `elab/cadical_signature` and `elab/versoSyntaxView` (`import Lean`, ahead-of-time policy) unsupported by design; arm64 `elab/646` prints a timing (`timeit`) whose two native runs happened to agree, so it shows as `lasm-bug` (it was `native-output-varies` in the previous run) |
 | Browser, Workers (Bun/Deno compiler job), fullstack `npm run dev` | 40459821345, 40459824146, 40459827094 | stopped by the resource guard (full archive page cache, step 6); the Workers build itself passes |
 
 New upstream tests that fail on Lasm (new coverage, not regressions; work for
