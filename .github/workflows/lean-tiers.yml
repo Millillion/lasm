@@ -38,7 +38,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   repackage:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/lean-')
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     strategy:

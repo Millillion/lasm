@@ -179,7 +179,7 @@ statically links libuv${libuv ? ` ${libuv} (version recorded in the archive's li
 MIT license is not included in LICENSES; libuv-LICENSE and libuv-LICENSE-extra
 are verbatim copies of libuv's LICENSE and LICENSE-extra files. It also statically
 links mimalloc (MIT), likewise missing from LICENSES; mimalloc-LICENSE is the
-LICENSE of mimalloc v3.4.5, the version Lean 4.35.0's build fetches.
+LICENSE of mimalloc v3.4.5, the version Lean ${options.version}'s build fetches.
 ${family0 === 'linux' ? `lib/libatomic.so* is GCC's runtime (GPL-3.0-or-later WITH GCC-exception-3.1):
 gcc-COPYING3 and gcc-COPYING.RUNTIME are GCC's licence texts.
 ` : family0 === 'win32' ? `The executables and DLLs contain MinGW-w64 runtime startup code, whose notices
