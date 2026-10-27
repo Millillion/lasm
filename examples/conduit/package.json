@@ -1,0 +1,20 @@
+{
+  "name": "conduit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Conduit, the RealWorld app, in Lean: a REST API and a browser app compiled to WebAssembly by Lasm, with proofs",
+  "scripts": {
+    "build": "lasm build ServerNode.lean --output dist/server",
+    "start": "node dist/server/main.mjs",
+    "test": "node test/api.mjs",
+    "test:api": "node test/api.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@lasm/cli": "0.3.2",
+    "@orangeopensource/hurl": "8.0.4"
+  }
+}

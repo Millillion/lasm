@@ -1,0 +1,88 @@
+name: Conduit
+# examples/conduit, the RealWorld app in Lean, built as a user builds it
+# (npm ci with the published @lasm/cli pinned in its package.json):
+# - api-node: the Node server (node:sqlite) on Node 24 and 26, against the
+#   official RealWorld API suite (gothinkster/realworld specs/api/hurl at the
+#   commit in test/realworld/PINNED, run unmodified with its own script);
+# - proofs: Conduit's theorems compile with no sorry and use only propext,
+#   Classical.choice and Quot.sound;
+# - pinned: test/realworld is byte-identical to the upstream commit.
+# Local runtimes and emulators only: no account, nothing deployed, CI=1.
+# Free runners only.
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    paths:
+      - '.github/workflows/conduit.yml'
+      - 'examples/conduit/**'
+  push:
+    branches: [main, conduit]
+    paths:
+      - '.github/workflows/conduit.yml'
+      - 'examples/conduit/**'
+permissions:
+  contents: read
+concurrency:
+  group: conduit-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CI: '1'
+  BROWSER: 'none'
+jobs:
+  pinned:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: test/realworld matches gothinkster/realworld at the pinned commit
+        working-directory: examples/conduit/test/realworld
+        run: |
+          set -e
+          commit=$(sed -n 2p PINNED)
+          git init -q "$RUNNER_TEMP/rw" && cd "$RUNNER_TEMP/rw"
+          git fetch -q --depth 1 https://github.com/gothinkster/realworld.git "$commit"
+          git checkout -q FETCH_HEAD
+          cd "$GITHUB_WORKSPACE/examples/conduit/test/realworld"
+          cmp LICENSE "$RUNNER_TEMP/rw/LICENSE"
+          for f in $(find specs -type f); do cmp "$f" "$RUNNER_TEMP/rw/$f"; done
+          echo "$(find specs -type f | wc -l) files identical to gothinkster/realworld@$commit"
+  api-node:
+    name: API on Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['24', '26.12.1']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: examples/conduit
+        run: npm ci --no-audit --no-fund
+      - name: npm run build
+        working-directory: examples/conduit
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+      - name: npm test (the official RealWorld API suite)
+        working-directory: examples/conduit
+        run: node test/api.mjs --name "node-${{ matrix.node }}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: conduit-api-node-${{ matrix.node }}
+          path: examples/conduit/test-results/
+          retention-days: 14
+          if-no-files-found: warn
