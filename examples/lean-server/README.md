@@ -1,8 +1,8 @@
 # A complete Lean HTTP application on Node
 
-> **Maintainer example**, kept as a regression test (`lasm-node.js` is a
+> **Maintainer example (Lean 4.32)**, kept as a regression test (`lasm-node.js` is a
 > source-checkout launcher). To start a new pure-Lean server, use
-> `npm create @lasm@latest my-app -- --template std-http` (or `fetch` from 0.3.0);
+> `npm create @lasm@latest my-app -- --template std-http` (or `fetch`);
 > see [Getting started](../../docs/GETTING_STARTED.md).
 
 Routing, validation, HTTP parsing/streaming, state, and file persistence are Lean.
