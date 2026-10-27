@@ -257,6 +257,8 @@ CI on branch `lean-4.36` (runs, all against 4.36.0-rc1):
 | --- | --- | --- |
 | Node runtime (full build) | 40446052241 | runtime `4c0ef41a…`, draft handoff `node-runtime-inputs-40446052241` |
 | Edge runtime | 40456857716, draft 40457974714 | `lean-4.36.0-rc1-wasm64-edge.tar.zst` `591084a3…`, draft release `lean-4.36.0-rc1-edge-v1` |
+| Node runtime re-pin (uv semantics, CaDiCaL message; reused standard libraries) | 40472316997 | runtime `b9fde4b1…` |
+| Edge runtime re-pin | 40474907202 | `63f9be82…`, draft release `lean-4.36.0-rc1-edge-v2` |
 | Tiers and C tier, five platforms | 40445440886 | built twice, reproducible, checked natively; not published |
 | Language-coverage inventory | 40461379892 | 4561 registrations (4.35: 4219); L1 adapter review 582 tests (525) |
 | Unit | 40458648352 | pass (npm tool-package checks skip without tiers) |
