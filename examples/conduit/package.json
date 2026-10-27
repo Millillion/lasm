@@ -8,8 +8,7 @@
     "build": "lasm build ServerNode.lean --output dist/server",
     "start": "node dist/server/main.mjs",
     "test": "node test/api.mjs",
-    "test:api": "node test/api.mjs",
-    "proofs": "node test/proofs.mjs"
+    "test:api": "node test/api.mjs"
   },
   "engines": {
     "node": ">=24"
