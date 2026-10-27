@@ -1,5 +1,5 @@
 /-
-A pure-Lean request handler for edge isolates (Lasm Phase 7, experimental; see
+A pure-Lean request handler for edge isolates (supported from Lasm 0.2.0; see
 docs/EDGE.md), with no npm package: `lasm build Main.lean --target workers`, then
 `npx wrangler dev` in workers/. All routing and work is Lean code; Lasm.JS reads
 the Request and makes the Response. `main` runs once per isolate at startup.

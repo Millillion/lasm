@@ -1,5 +1,5 @@
 {
   "name": "lasm-edge-pure",
   "private": true,
-  "description": "A pure-Lean request handler for edge isolates (Lasm Phase 7, experimental): lasm build Main.lean --target workers"
+  "description": "A pure-Lean request handler for edge isolates (supported from Lasm 0.2.0): lasm build Main.lean --target workers"
 }
