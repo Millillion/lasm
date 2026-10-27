@@ -11,7 +11,7 @@ tools as npm packages. No Lean, C compiler or Emscripten to set up.
 
 ## Platforms
 
-Releases: **0.1.0**, **0.2.0** and **0.3.0** are on npm ([0.3.0 notes](docs/release/0.3.0-notes.md)).
+Releases: **0.1.0**, **0.2.0**, **0.3.0**, **0.3.1** and **0.3.2** are on npm ([0.3.0 notes](docs/release/0.3.0-notes.md), [0.3.1](docs/release/0.3.1-notes.md), [0.3.2](docs/release/0.3.2-notes.md)).
 Every row is tested in CI with the platform's own local runtime, image or emulator;
 by project policy CI never deploys to a real cloud account
 ([how each is tested](#supported-platforms)).
@@ -238,6 +238,7 @@ from the [quick start](#60-second-start):
 ```sh
 npx lasm Main.lean                          # build (dev profile) and run: Hello from Lean! 2 + 3 = 5
 npx lasm build Main.lean                    # write dist/ (release profile)
+npx lasm --version                          # version, Lean, runtime and platform (for bug reports)
 node dist/main.mjs                          # run the deployment: only Node is needed
 npx lasm build Main.lean --target lambda    # dist/ and an AWS Lambda zip
 ```
@@ -472,7 +473,9 @@ your system Git ([system Git](docs/MANAGED_GIT.md)).
 0.1.0 was the first npm release ([notes](docs/release/0.1.0-notes.md)); 0.2.0 adds
 edge targets and Bun/Deno ([notes](docs/release/0.2.0-notes.md)); 0.3.0 adds the
 browser, `Lasm.UI`, full-stack apps, WASI/Fastly and the editor support
-([notes](docs/release/0.3.0-notes.md)). Lasm's npm
+([notes](docs/release/0.3.0-notes.md)); 0.3.1 puts the starter code under MIT-0 and
+adds bug-report pointers ([notes](docs/release/0.3.1-notes.md)); 0.3.2 fixes
+`Std.Internal.UV` sockets, timers and signals ([notes](docs/release/0.3.2-notes.md)). Lasm's npm
 packages (`@lasm/cli`, `@lasm/create` and the `@lasm/…` tool packages) are
 published only by the [`release.yml`](.github/workflows/release.yml) workflow,
 through npm trusted publishing with provenance: no npm tokens exist. A release is a
@@ -480,14 +483,19 @@ pull request that bumps the `package.json` version and is published only after t
 `release-checks` status (five-platform candidate checks; edge, Bun/Deno, browser,
 Lasm.UI, WASI/Fastly, fullstack, unit and dev-loop checks; and an npm rehearsal of
 the exact packages) passed for the released
-commit. `npm view @lasm/cli@<version>` shows the provenance, and `npm audit
+commit. Found a bug? `npx lasm --version` gives the version line the
+[bug report form](https://github.com/Millillion/lasm/issues/new?template=bug.yml) asks for. `npm view @lasm/cli@<version>` shows the provenance, and `npm audit
 signatures` in a project verifies it. Details: [RELEASING.md](docs/RELEASING.md).
 
 ## Licenses
 
-Lasm's own source is under the [MIT License](LICENSE) (copyright Jordan Last);
-`@lasm/create` is MIT, and `@lasm/cli`'s `license` field is an SPDX expression of
-Lasm's MIT and every component it bundles, with their texts in `licenses/`. The
+Lasm's own source is under the [MIT License](LICENSE) (copyright Jordan Last).
+The starter code — everything `lasm init` and `npm create @lasm` put in a new
+project, `templates/`, `examples/` and the code samples in this README and
+`docs/` — is also under [MIT No Attribution](LICENSE-MIT-0) (MIT-0), in every
+version: it is yours, no attribution needed. `@lasm/create` is MIT, and
+`@lasm/cli`'s `license` field is an SPDX expression of Lasm's MIT, MIT-0 and
+every component it bundles, with their texts in `licenses/`. The
 [license audit](docs/LICENSE_AUDIT.md) lists every distributed component, its
 license and how each obligation is met.
 

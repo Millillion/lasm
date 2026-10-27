@@ -165,7 +165,7 @@ jobs:
         timeout-minutes: 15
         run: |
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          node .work/pw/node_modules/playwright-core/cli.js install --with-deps chromium
+          bash scripts/ci/playwright-install.sh chromium
       - name: 'The Vite plugin (@lasm/cli/vite, installed from a packed CLI) in development: edit Main.lean, the app is rebuilt and remounted in place'
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
@@ -218,11 +218,7 @@ jobs:
         shell: bash
         run: |
           npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          if [ "$RUNNER_OS" = "Linux" ]; then
-            node .work/pw/node_modules/playwright-core/cli.js install --with-deps "${{ matrix.browser }}"
-          else
-            node .work/pw/node_modules/playwright-core/cli.js install "${{ matrix.browser }}"
-          fi
+          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
       - uses: actions/download-artifact@v4
         if: steps.gate.outputs.run == 'true'
         with:

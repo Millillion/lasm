@@ -237,3 +237,55 @@ test("Lasm's own licence is MIT everywhere", async () => {
   const { createPackageJson } = await import('../scripts/npm-dist/packages.mjs');
   assert.equal(createPackageJson({ name: '@lasm/cli', version: '0.3.0' }, {}).license, 'MIT');
 });
+
+// ---- Starter code under MIT-0 (LICENSE-MIT-0, docs/LICENSE_AUDIT.md §16) ----
+test('templates/ and examples/ carry the MIT-0 text, and LICENSE-MIT-0 states the grant', () => {
+  const mit0 = read('../src/notices/MIT-0.txt');
+  assert.match(mit0, /^MIT No Attribution\n\nCopyright 2026 Jordan Last\n/);
+  assert.doesNotMatch(mit0, /shall be included/);
+  assert.equal(read('../templates/LICENSE'), mit0);
+  assert.equal(read('../examples/LICENSE'), mit0);
+  const grant = read('../LICENSE-MIT-0');
+  assert.ok(grant.endsWith(mit0));
+  for (const phrase of ['templates/', 'lasm init', 'npm create @lasm', 'examples/', 'README.md and in docs/', 'past and future', '0.1.0, 0.2.0 and 0.3.0', 'MIT License only'])
+    assert.ok(grant.includes(phrase), phrase);
+  // The root LICENSE stays the plain MIT text (licence detection, the copy in every output's notices).
+  assert.equal(read('../LICENSE'), read('../src/notices/LASM-LICENSE.txt'));
+});
+
+test("the CLI's SPDX expression adds MIT-0 when it carries the starter code; @lasm/create stays MIT", async () => {
+  const { cliLicense, createPackageJson, mainPackageJson } = await import('../scripts/npm-dist/packages.mjs');
+  assert.equal(cliLicense('MIT', ['Lasm', 'Lean'], [], { starter: true }), 'MIT AND MIT-0 AND Apache-2.0');
+  assert.equal(cliLicense('MIT', ['Lasm', 'Lean']), 'MIT AND Apache-2.0');
+  assert.equal(createPackageJson({ name: '@lasm/cli', version: '0.3.1' }, {}).license, 'MIT');
+  const main = mainPackageJson({ files: ['bin'], dependencies: {} }, [], { name: '@lasm/cli', version: '0.3.1', license: 'MIT AND MIT-0', licenseFiles: true, starterLicense: true });
+  assert.deepEqual(main.files, ['bin', 'LICENSE', 'LICENSE-MIT-0', 'licenses']);
+});
+
+test('lasm init writes no licence file, header or license field into a project', async () => {
+  const { mkdtempSync, rmSync, readdirSync, readFileSync: readText, statSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const { initProject, templates, deployTargets } = await import('../src/init.mjs');
+  const root = mkdtempSync(join(tmpdir(), 'lasm-init-licence-'));
+  const walk = directory => readdirSync(directory).flatMap(name => statSync(join(directory, name)).isDirectory() ? walk(join(directory, name)) : [join(directory, name)]);
+  let projects = 0;
+  try {
+    for (const template of Object.keys(templates)) {
+      const deploys = [[], ...Object.entries(deployTargets).filter(([, t]) => !t.templates || t.templates.includes(template)).map(([name]) => [name])];
+      for (const deploy of deploys) {
+        const directory = join(root, `${template}-${deploy[0] ?? 'none'}`);
+        try { initProject({ directory, template, deploy }); } catch (error) { if (/not (?:available|supported)|only|cannot|does not/i.test(error.message)) continue; throw error; }
+        projects++;
+        for (const file of walk(directory)) {
+          const name = file.slice(directory.length + 1);
+          assert.doesNotMatch(name, /(?:^|\/)(?:licen[cs]e|copying)(?:[.-]|$)/i, `${template} ${deploy}: ${name}`);
+          const text = readText(file, 'utf8');
+          assert.doesNotMatch(text, /MIT License|MIT No Attribution|SPDX-License-Identifier|Copyright \(c\)|Jordan Last/, `${template} ${deploy}: ${name}`);
+          if (name.endsWith('package.json')) assert.equal(Object.hasOwn(JSON.parse(text), 'license'), false, `${template} ${deploy}: ${name}`);
+        }
+      }
+    }
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  assert.ok(projects >= Object.keys(templates).length);
+});

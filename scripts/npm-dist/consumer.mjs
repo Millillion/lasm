@@ -129,6 +129,12 @@ if (args.scenario === 'installed' || args.scenario === 'lake') {
     report.installedPackages = tools;
     assert.deepEqual(tools, [...expected('optional'), ...expected('required'), { name: record.main.name }].map(p => short(p.name)).sort(),
       'npm installs exactly this platform\'s packages and the shared ones');
+    // Starter code is also MIT-0 (0.3.1): the licence texts ship and the SPDX expression names it.
+    const cli = join(directory, 'node_modules', record.main.name), cliMeta = JSON.parse(readFileSync(join(cli, 'package.json'), 'utf8'));
+    if (existsSync(join(root, 'LICENSE-MIT-0'))) {
+      for (const file of ['LICENSE', 'LICENSE-MIT-0', 'templates/LICENSE', 'examples/LICENSE']) assert.ok(existsSync(join(cli, file)), `The installed CLI lacks ${file}`);
+      assert.match(cliMeta.license, /(?:^| AND )MIT-0(?: AND |$)/, `The CLI licence names MIT-0: ${cliMeta.license}`);
+    }
     const result = npxRun('npx lasm Main.lean', ['lasm', 'Main.lean'], { cwd: directory });
     assert.match(result.stdout, /Hello from Lean! 2 \+ 3 = 5/);
     report.build = result.seconds;

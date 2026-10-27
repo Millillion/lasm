@@ -36,7 +36,7 @@ export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
        lasm editor [project-directory]
        lasm cache repair
 
-Options: --rebuild, --verbose, --help
+Options: --rebuild, --verbose, --help, --version
 Profiles: lasm build makes release builds (optimized, byte-reproducible, for
 deployment); --dev skips the size optimizations for a faster build. lasm run
 (lasm Main.lean) makes dev builds; --release runs a release build.
@@ -71,6 +71,7 @@ export function closest(word, candidates) {
 /** Parse independently of provisioning: help/errors must never download tools. */
 export function parseLasmArguments(argv) {
   const tokens = [...argv];
+  if (tokens.length === 1 && ['--version', '-v', 'version'].includes(tokens[0])) return { command: 'version' };
   if (tokens[0] === 'init') return parseInitArguments(tokens.slice(1));
   if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
   if (tokens[0] === 'package') return parsePackageArguments(tokens.slice(1));

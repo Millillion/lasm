@@ -286,13 +286,13 @@ export function npmToolManifest(packages, packed) {
 }
 
 /** Main package metadata: every tool package pinned to an exact version. */
-export function mainPackageJson(base, packages, { name, version, license, licenseFiles }) {
+export function mainPackageJson(base, packages, { name, version, license, licenseFiles, starterLicense }) {
   const pins = install => Object.fromEntries(packages.filter(p => p.install === install).map(p => [p.name, p.version]).sort());
   const result = { ...base, name, version, repository: repository() };
   delete result.private;
   if (license) {
     result.license = license;
-    for (const file of ['LICENSE', ...(licenseFiles ? ['licenses'] : [])])
+    for (const file of ['LICENSE', ...(starterLicense ? ['LICENSE-MIT-0'] : []), ...(licenseFiles ? ['licenses'] : [])])
       if (Array.isArray(result.files) && !result.files.includes(file)) result.files = [...result.files, file];
   }
   result.dependencies = Object.fromEntries(Object.entries({ ...base.dependencies, ...pins('required') }).sort());
@@ -375,9 +375,11 @@ export function noticeSections(text) {
   return sections;
 }
 
-/** The CLI's SPDX expression: Lasm's own licence first, then every bundled component. */
-export function cliLicense(ownLicense, headings, bundledLicenses = []) {
-  const terms = [ownLicense];
+/** The CLI's SPDX expression: Lasm's own licence first (and MIT-0, the starter
+ * code's additional licence, LICENSE-MIT-0, when the package carries it), then
+ * every bundled component. */
+export function cliLicense(ownLicense, headings, bundledLicenses = [], { starter = false } = {}) {
+  const terms = [ownLicense, ...(starter ? ['MIT-0'] : [])];
   for (const heading of headings) {
     assert.ok(Object.hasOwn(cliNoticeSections, heading), `Unknown notice section in the CLI package: ${heading}`);
     if (cliNoticeSections[heading]) terms.push(cliNoticeSections[heading]);

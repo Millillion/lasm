@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/Millillion/lasm/blob/main/docs/README.md
+    about: Guides, targets, APIs and limits (start with Getting started).
+  - name: Getting started
+    url: https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md
+    about: Install, the first project, the editor setup and common fixes.
+  - name: Lean questions
+    url: https://leanprover.zulipchat.com
+    about: Questions about Lean itself (errors in your own Lean code, tactics, Mathlib) belong on Lean's Zulip.

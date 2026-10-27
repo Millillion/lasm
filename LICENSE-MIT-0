@@ -1,0 +1,41 @@
+Lasm starter code: also available under MIT No Attribution (MIT-0)
+
+Lasm is licensed under the MIT License (LICENSE). In addition, its copyright
+holder, Jordan Last, licenses the following parts of Lasm under the MIT No
+Attribution License (SPDX: MIT-0), whose text follows, at the recipient's
+option. You may use them under either licence; under MIT-0 you owe no
+attribution and need not keep any notice.
+
+  1. Everything in templates/.
+  2. Every file, and the content of every file, that `lasm init` or
+     `npm create @lasm` writes into a new project (the template files and the
+     project files that src/init.mjs generates: package.json, README.md,
+     lakefile, configuration and deployment files). The code of the Lasm
+     compiler that generates them stays under MIT only.
+  3. Everything in examples/.
+  4. The code samples (code blocks and inline code) in README.md and in docs/.
+
+This grant applies to these parts in every version of Lasm, past and future,
+including 0.1.0, 0.2.0 and 0.3.0, so it also covers projects generated with
+those versions. It does not cover third-party material inside these parts,
+which keeps its own licence where a file says so (for example
+examples/ui/todomvc/public/style.css). Everything else in Lasm (the compiler,
+src/, library/, runtime/, scripts/, the runtime code compiled into
+applications) is under the MIT License only.
+
+MIT No Attribution
+
+Copyright 2026 Jordan Last
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
