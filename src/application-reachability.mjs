@@ -142,7 +142,14 @@ export function canSpecializeInitialization(runtime) {
     // starts with the first asynchronous request. Neither object has a static
     // constructor; no module initializer, init.cpp or init_module.cpp object changed,
     // so no Lean initialization path changed.
-    '1b868b43e734e0ab3d67e53179522c8e248b91e5f2e1727d343c760370d1b4fb'].includes(runtime.identity);
+    '1b868b43e734e0ab3d67e53179522c8e248b91e5f2e1727d343c760370d1b4fb',
+    // Lean 4.35.0 (CI build 40471483055, source 9f91d31, handoff d0809622…, standard
+    // libraries reused): only libleanrt's event_loop.cpp.o (lean_uv_event_loop_alive
+    // and _configure renamed lasm_original_*, overridden by the host bridge) and
+    // liblasmhost's node-async.cpp.o (those two, cancel_call, release_cancelled)
+    // differ from the entry above. Neither has a static constructor; no module
+    // initializer, init.cpp or init_module.cpp object changed.
+    '79968781629d674bc8b506b3050c367ebc14503c869bc45436244c49ee5aee02'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';
