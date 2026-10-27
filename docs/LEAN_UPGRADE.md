@@ -247,3 +247,35 @@ What porting took (see docs/DECISIONS.md, 2026-10-27, for the run IDs):
   Lasm.UI's proofs, examples and template elaborate with only the standard
   axioms.
 - **Initializers.** 6 new `initialize` targets in Lean's libraries, none removed.
+
+CI on branch `lean-4.36` (runs, all against 4.36.0-rc1):
+
+| Step | Run | Result |
+| --- | --- | --- |
+| Node runtime (full build) | 40446052241 | runtime `4c0ef41a…`, draft handoff `node-runtime-inputs-40446052241` |
+| Edge runtime | 40456857716, draft 40457974714 | `lean-4.36.0-rc1-wasm64-edge.tar.zst` `591084a3…`, draft release `lean-4.36.0-rc1-edge-v1` |
+| Tiers and C tier, five platforms | 40445440886 | built twice, reproducible, checked natively; not published |
+| Language-coverage inventory | 40461379892 | 4561 registrations (4.35: 4219); L1 adapter review 582 tests (525) |
+| Unit | 40458648352 | pass (npm tool-package checks skip without tiers) |
+| UI, WASI, dev loop | 40458014838, 40458017420, 40458026156 | pass |
+| Linux acceptance (x64, arm64, JS interop) | 40465566277 | pass |
+| Upstream suite, Linux x64 and arm64 (runtime adapter, compiled applications, eval-io) | 40460043775, 40460058645, 40460066282, 40460073165, 40466615512 | 0 regressions against the 4.35.0 Phase 3 baseline; 1 changed test awaits review (`elab/async_http_expect.lean`) |
+| Browser, Workers (Bun/Deno compiler job), fullstack `npm run dev` | 40459821345, 40459824146, 40459827094 | stopped by the resource guard (full archive page cache, step 6); the Workers build itself passes |
+
+New upstream tests that fail on Lasm (new coverage, not regressions; work for
+4.36.0 support):
+
+- host bridge semantics: `elab/uv_tcp_parallel_accept` (a second concurrent
+  accept must be rejected), `elab/uv_socket_argument_ranges` (accept on a
+  socket that is not listening must fail), `elab/uv_udp_truncated_datagram` (a
+  truncated datagram must fail), `elab/uv_loop_alive_idle` (the loop is alive
+  while a timer runs), `elab/signal_selector_keeps_listening` (a signal sent
+  between two selects is lost), `elab/uv_system_long_strings` (ENOBUFS for long
+  system strings), `compile/uv_loop_configure` (`lean_uv_event_loop_configure`
+  unsupported), `compile/uv_stop_reentrancy` (timeout), and
+  `compile/uv_cancel_releases_outside_lock` (output differs);
+- CaDiCaL: `elab/cadical`, `elab/cadical_signature`: the Wasm runtime has no
+  solver (decide: unsupported by design, or link CaDiCaL 2.1.2, MIT, into the
+  runtime);
+- `elab/versoSyntaxView`: a deprecation warning
+  (`Lean.Parser.InputContext.input`) appears in the adapter's output.
