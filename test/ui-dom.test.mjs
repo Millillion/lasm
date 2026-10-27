@@ -130,9 +130,15 @@ test('frames are batched on animation frames and subscriptions fire', async () =
   ui.module.unsub(7);
   window.dispatchEvent(new window.Event('resize'));
   assert.equal(subs.length, 1);
+  // Cmd.pushUrl: the app gets the URL at once; the address changes with the
+  // frame that shows the new page.
   ui.module.navigate('/posts/3?x=1', false);
-  assert.equal(window.location.href, 'https://app.test/posts/3?x=1');
   assert.deepEqual(subs.at(-1), ['url', 'https://app.test/posts/3?x=1']);
+  assert.equal(window.location.href, 'https://app.test/start');
+  await new Promise(r => window.requestAnimationFrame(r));
+  await new Promise(r => window.requestAnimationFrame(r));
+  assert.equal(window.location.href, 'https://app.test/posts/3?x=1');
+  assert.equal(frames, 2);
   ui.module.storageSet('local', 'k', 'v');
   assert.equal(ui.module.storageGet('local', 'k'), 'v');
   ui.module.storageRemove('local', 'k');
@@ -145,12 +151,17 @@ test('same-origin link clicks navigate in place when the app routes', () => {
   const { root, window } = page();
   const ui = createUi({ root });
   const urls = [];
-  ui.module.connect({ url: href => { urls.push(href); return false; }, frame: () => new Uint8Array(0), application: true });
+  let frames = 0;
+  ui.module.connect({ url: href => { urls.push(href); return true; }, frame: () => { frames++; return new Uint8Array(0); },
+    application: true });
   root.innerHTML = '<a id="in" href="/about">About</a><a id="out" href="https://elsewhere.test/">Away</a>';
   const inside = new window.MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
   root.querySelector('#in').dispatchEvent(inside);
   assert.equal(inside.defaultPrevented, true);
   assert.deepEqual(urls, ['https://app.test/about']);
+  // A click is discrete input: the new page is rendered in the same task.
+  assert.equal(frames, 1);
+  assert.equal(window.location.href, 'https://app.test/about');
   const outside = new window.MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
   root.querySelector('#out').dispatchEvent(outside);
   assert.equal(outside.defaultPrevented, false);
