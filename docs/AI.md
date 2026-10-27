@@ -61,6 +61,7 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
 
 | Task | Read | Copy from |
 | --- | --- | --- |
+| A complete real-world API (auth, SQL, pure-Lean core) | [examples/conduit/README.md](../examples/conduit/README.md) | [examples/conduit](../examples/conduit) |
 | Server with npm framework | [GETTING_STARTED](GETTING_STARTED.md) | `--template hono`, [examples/js-crud](../examples/js-crud) |
 | Pure-Lean HTTP on any target | [FETCH.md](FETCH.md) | `--template fetch`, [examples/fetch](../examples/fetch) |
 | Browser UI | [UI.md](UI.md) | `--template web`, [examples/ui](../examples/ui) |
