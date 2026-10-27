@@ -28,24 +28,30 @@ jobs:
   # the checks still running, or nothing to release, skips that job.
   gate:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       actions: read
+      contents: read
     outputs:
       published: ${{ steps.check.outputs.published }}
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: github.event_name == 'workflow_run'
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/release
       - id: check
         env:
           GH_TOKEN: ${{ github.token }}
           RUN: ${{ github.event.workflow_run.id }}
           EVENT: ${{ github.event_name }}
-          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        # The jobs API can lag behind the workflow_run event (0.3.2: the release
+        # job read as missing); published-gate.mjs waits for final run and job data.
         run: |
           if [ "$EVENT" = workflow_dispatch ]; then echo published=true >> "$GITHUB_OUTPUT"; exit 0; fi
-          release=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN/jobs?per_page=100" --jq '[.jobs[] | select(.name == "release") | .conclusion] | first // "none"')
-          echo "release run $RUN ($CONCLUSION): release job $release"
-          if [ "$CONCLUSION" = success ] && [ "$release" = success ]; then echo published=true >> "$GITHUB_OUTPUT"
-          else echo published=false >> "$GITHUB_OUTPUT"; echo "::notice::Skipped: release run $RUN published nothing (release job: $release)"; fi
+          result=$(node scripts/release/published-gate.mjs "$RUN")
+          echo "$result" >> "$GITHUB_OUTPUT"
+          [ "$result" = published=true ] || echo "::notice::Skipped: release run $RUN published nothing"
   templates:
     needs: gate
     if: needs.gate.outputs.published == 'true'
