@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { provisionSdk } from '../../src/managed-sdk.mjs';
 import { executableName } from '../../src/platform.mjs';
+import { normalizeArchive } from './normalize-archive.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const { values: options, positionals } = parseArgs({ allowPositionals: true, options: { cache: { type: 'string' } } });
@@ -51,6 +52,9 @@ const objcopy = join(sdk.prefix, 'bin', executableName('llvm-objcopy'));
 for (const name of recipe.sysroot.libraries) {
   if (!existsSync(join(built, name))) throw new Error(`embuilder did not build ${name}`);
   execFileSync(objcopy, ['--strip-debug', join(built, name), join(destination, name)], { stdio: 'inherit' });
+  // Member names independent of the build machine's directory order (normalize-archive.mjs).
+  const renamed = normalizeArchive(join(sdk.prefix, 'bin', executableName('llvm-ar')), join(destination, name));
+  if (renamed.length) console.error(`${name}: canonical member names for ${renamed.map(([from, to]) => `${from} → ${to}`).join(', ')}`);
 }
 rmSync(work, { recursive: true, force: true });
 
