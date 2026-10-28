@@ -16,7 +16,7 @@ assert.ok(workArg && outputArg, 'Usage: node scripts/ci/extract-bench.mjs NEW_WO
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const work = resolve(workArg), output = resolve(outputArg);
 assert.ok(!existsSync(work)); mkdirSync(work, { recursive: true }); mkdirSync(dirname(output), { recursive: true });
-const release = JSON.parse(readFileSync(join(root, 'src/toolchains.json'), 'utf8')).lean['4.36.0-rc1'].tiers;
+const release = JSON.parse(readFileSync(join(root, 'src/toolchains.json'), 'utf8')).lean['4.36.0-rc2'].tiers;
 const archives = [...release.core, ...release.extended];
 const result = { platform: `${process.platform}-${process.arch}`, cpus: availableParallelism(), cpu: cpus()[0]?.model, runs: [] };
 const save = () => writeFileSync(output, JSON.stringify(result, null, 2) + '\n');

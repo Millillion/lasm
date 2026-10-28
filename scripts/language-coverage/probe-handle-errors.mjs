@@ -12,7 +12,7 @@ const output = resolve(outputArg), compiler = resolve(compilerArg);
 if (existsSync(output)) throw new Error('Use a fresh output');
 mkdirSync(output, { recursive: true });
 const windows = process.platform === 'win32';
-writeFileSync(join(output, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc1\n');
+writeFileSync(join(output, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc2\n');
 writeFileSync(join(output, 'Main.lean'), `deriving instance Repr for IO.Error
 
 def attempt (label : String) (action : IO Unit) : IO Unit := do

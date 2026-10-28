@@ -82,12 +82,12 @@ test('edge runtime: the cataloged archive is provisioned, verified and used', as
   const { readFileSync } = await import('node:fs');
   // The archive's own description (CI: the one just packaged), else the catalog's.
   const described = process.env.LASM_TEST_EDGE_ARTIFACT ? JSON.parse(readFileSync(process.env.LASM_TEST_EDGE_ARTIFACT, 'utf8')) : {};
-  const artifact = { ...edgeRuntimeCatalog.lean['4.36.0-rc1'], ...described };
+  const artifact = { ...edgeRuntimeCatalog.lean['4.36.0-rc2'], ...described };
   const catalog = { lean: { '4.35.0': artifact } };
   const cache = mkdtempSync(join(tmpdir(), 'lasm-edge-cache-'));
   let requested;
   const fetch = async url => { requested = String(url); return new Response(readFileSync(archive)); };
-  const nodeRuntime = { identity: artifact.baseRuntimeManifestSha256, manifest: { lean: '4.35.0', name: 'lean-4.36.0-rc1-wasm64' } };
+  const nodeRuntime = { identity: artifact.baseRuntimeManifestSha256, manifest: { lean: '4.35.0', name: 'lean-4.36.0-rc2-wasm64' } };
   const edge = await edgeRuntime(nodeRuntime, { directory: undefined, catalog, cache, fetch, log: () => {} });
   assert.equal(requested, artifact.url);
   assert.deepEqual(Object.keys(edge.libraries).sort(), ['liblasmhost.a', 'liblasmjsedge.a', 'libleancpp.a', 'libleanrt.a']);

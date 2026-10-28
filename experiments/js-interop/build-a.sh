@@ -2,7 +2,7 @@
 # Build configuration A of the prototype with the current source checkout's
 # Lasm CLI, under the maintainer resource guard (base pages, one Binaryen/emcc
 # worker). Usage: experiments/js-interop/build-a.sh RUNTIME_DIR WORK_DIR TAG
-#   RUNTIME_DIR: an application runtime bundle (targets/lean-4.36.0-rc1-wasm64)
+#   RUNTIME_DIR: an application runtime bundle (targets/lean-4.36.0-rc2-wasm64)
 #   WORK_DIR: a scratch directory under .work/ (receives proto-src/ and dist-a/)
 set -eu
 root=$(cd "$(dirname "$0")/../.." && pwd)

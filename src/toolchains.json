@@ -1,56 +1,56 @@
 {
   "schema": 1,
-  "defaultLean": "4.36.0-rc1",
+  "defaultLean": "4.36.0-rc2",
   "lean": {
-    "4.36.0-rc1": {
-      "commit": "c9afcddf514a6772bd4d649f7cfc04eff0b9f15e",
-      "release": "https://github.com/leanprover/lean4/releases/tag/v4.36.0-rc1",
-      "publishedAt": "2026-10-14T18:30:03Z",
-      "verifiedAt": "2026-10-27",
+    "4.36.0-rc2": {
+      "commit": "b35cb10cf2ced51a2fd1880cfdbf75c71ab7a35a",
+      "release": "https://github.com/leanprover/lean4/releases/tag/v4.36.0-rc2",
+      "publishedAt": "2026-10-27T18:38:15Z",
+      "verifiedAt": "2026-10-28",
       "prerelease": true,
       "artifacts": {
         "linux-x64": {
-          "name": "lean-4.36.0-rc1-linux.tar.zst",
-          "root": "lean-4.36.0-rc1-linux",
-          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc1/lean-4.36.0-rc1-linux.tar.zst",
-          "sha256": "26b3cea1a006ad419215520b8668dcd3f6a9eeba1a123756563a739f9c6274b2",
-          "bytes": 605563669,
+          "name": "lean-4.36.0-rc2-linux.tar.zst",
+          "root": "lean-4.36.0-rc2-linux",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc2/lean-4.36.0-rc2-linux.tar.zst",
+          "sha256": "0a0a3208617e9eab92f1041efa83ad94d405e69d172fb654a62dbfa9fbc5313b",
+          "bytes": 608393640,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
         },
         "linux-arm64": {
-          "name": "lean-4.36.0-rc1-linux_aarch64.tar.zst",
-          "root": "lean-4.36.0-rc1-linux_aarch64",
-          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc1/lean-4.36.0-rc1-linux_aarch64.tar.zst",
-          "sha256": "ed33fe9d78aca31e23b03159747b07b024c833c18e9d3fd1c01bd33f7aada731",
-          "bytes": 605835688,
+          "name": "lean-4.36.0-rc2-linux_aarch64.tar.zst",
+          "root": "lean-4.36.0-rc2-linux_aarch64",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc2/lean-4.36.0-rc2-linux_aarch64.tar.zst",
+          "sha256": "7ac84c80ddd19dfbe4277bc50ee916fca0fec36500d30dadaae9c5e904ec618d",
+          "bytes": 608915737,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
         },
         "darwin-x64": {
-          "name": "lean-4.36.0-rc1-darwin.tar.zst",
-          "root": "lean-4.36.0-rc1-darwin",
-          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc1/lean-4.36.0-rc1-darwin.tar.zst",
-          "sha256": "9e49807d982860e354309afa4c998fda352583a9b7dc22a1ed8d2ba5d56906a0",
-          "bytes": 644879425,
+          "name": "lean-4.36.0-rc2-darwin.tar.zst",
+          "root": "lean-4.36.0-rc2-darwin",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc2/lean-4.36.0-rc2-darwin.tar.zst",
+          "sha256": "6e311b8fecc10ab9e6294908c7993aceee9b900e2d59a0fe44db295b4c36a91d",
+          "bytes": 647283918,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
         },
         "darwin-arm64": {
-          "name": "lean-4.36.0-rc1-darwin_aarch64.tar.zst",
-          "root": "lean-4.36.0-rc1-darwin_aarch64",
-          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc1/lean-4.36.0-rc1-darwin_aarch64.tar.zst",
-          "sha256": "9fbb1102490bfcb64ee8650b2c13f31c01985003028486cde818fffaaa45129e",
-          "bytes": 635143803,
+          "name": "lean-4.36.0-rc2-darwin_aarch64.tar.zst",
+          "root": "lean-4.36.0-rc2-darwin_aarch64",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc2/lean-4.36.0-rc2-darwin_aarch64.tar.zst",
+          "sha256": "800c09adb81ac667fd9e8e4211d54bdc5cc5e193b107599f6ae72f69ee9b91ad",
+          "bytes": 637514990,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
         },
         "win32-x64": {
-          "name": "lean-4.36.0-rc1-windows.tar.zst",
-          "root": "lean-4.36.0-rc1-windows",
-          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc1/lean-4.36.0-rc1-windows.tar.zst",
-          "sha256": "2d8cd8cc897c8bf2681f7fc4c5118a71e8f91e40886b68f920efe2d385c5c51a",
-          "bytes": 615788282,
+          "name": "lean-4.36.0-rc2-windows.tar.zst",
+          "root": "lean-4.36.0-rc2-windows",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.36.0-rc2/lean-4.36.0-rc2-windows.tar.zst",
+          "sha256": "d77b52e782abba4e0d06a8f58c2124c9161ecd555eec491dde6a3320880bc74e",
+          "bytes": 615761579,
           "format": "tar.zst",
           "maximumExtractedBytes": 8589934592
         }

@@ -16,7 +16,7 @@ const root = resolve(process.argv[2] ?? '.work/windows-lean-path-controls');
 assert.ok(!existsSync(root)); mkdirSync(root, { recursive: true });
 const project = join(root, 'project 日本語'), work = join(root, 'generated');
 mkdirSync(project); mkdirSync(work);
-writeFileSync(join(project, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc1\n');
+writeFileSync(join(project, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc2\n');
 const source = join(project, 'Main.lean');
 writeFileSync(source, 'def main : IO Unit := IO.println "long cache path 42"\n');
 const cache = join(root, 'managed cache λ ' + 'x'.repeat(72));

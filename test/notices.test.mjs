@@ -11,7 +11,7 @@ test("the copy of Lasm's licence in built applications is the repository LICENSE
 
 const runtimeLibraries = ['Init', 'Std', 'Lean', 'LeanExport', 'Lake', 'leancpp', 'leanrt', 'lasmhost', 'uv', 'lasmsymbols']
   .map(name => `lib/lib${name}.a`);
-const runtimeManifest = libraries => ({ name: 'lean-4.36.0-rc1-wasm64', lean: '4.35.0', leanCommit: 'eb6cafb7290e8bd5f2937522d8d804f58f02bafc', emscripten: '6.0.9',
+const runtimeManifest = libraries => ({ name: 'lean-4.36.0-rc2-wasm64', lean: '4.35.0', leanCommit: 'eb6cafb7290e8bd5f2937522d8d804f58f02bafc', emscripten: '6.0.9',
   libraries, patches: Object.fromEntries(Object.keys(leanRuntimeChanges).map(name => [name, '0'.repeat(64)])) });
 
 test('application notices name Lasm, every Lean change and the added licence texts, and no GNU MP', () => {

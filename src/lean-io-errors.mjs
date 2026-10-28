@@ -159,7 +159,7 @@ export function checkLeanIOVersion(version) {
   // mapping in runtime/io.cpp unchanged (reviewed 2026-10-16: its io.cpp changes
   // are the ST.Ref put/take primitives; IO.lean changes only getLine docs).
   // Keep unreviewed releases explicit instead of a version range.
-  if (!['4.32.0', '4.34.0', '4.34.1', '4.35.0', '4.36.0-rc1'].includes(version))
+  if (!['4.32.0', '4.34.0', '4.34.1', '4.35.0', '4.36.0-rc1', '4.36.0-rc2'].includes(version))
     throw new Error('No verified IO error policy for Lean ' + version);
 }
 

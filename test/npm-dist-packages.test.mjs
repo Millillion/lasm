@@ -70,10 +70,10 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
 test('the edge runtime is bundled in the CLI package from its cataloged release archive', async () => {
   const c = await catalogs();
   const edge = edgeRuntimeBundle({ lean: c.toolchains.defaultLean, edgeRuntimes: c.edgeRuntimes });
-  const pinned = c.edgeRuntimes.lean['4.36.0-rc1'];
+  const pinned = c.edgeRuntimes.lean['4.36.0-rc2'];
   assert.equal(edge.baseRuntimeManifestSha256, pinned.baseRuntimeManifestSha256);
   assert.deepEqual(Object.keys(edge.artifact).sort(), ['bytes', 'format', 'maximumExtractedBytes', 'name', 'root', 'sha256', 'url']);
-  assert.equal(edge.artifact.root, 'lean-4.36.0-rc1-wasm64-edge', 'src/edge/edge-runtime.mjs looks for targets/<runtime>-edge');
+  assert.equal(edge.artifact.root, 'lean-4.36.0-rc2-wasm64-edge', 'src/edge/edge-runtime.mjs looks for targets/<runtime>-edge');
   assert.match(edge.artifact.url, /^https:\/\/github\.com\/Millillion\/lasm\/releases\/download\/lean-4\.\d+\.\d+(?:-rc\d+)?-edge-v\d+\//);
   assert.equal(edgeRuntimeBundle({ lean: '9.9.9', edgeRuntimes: c.edgeRuntimes }), null);
 });
@@ -99,7 +99,7 @@ test('the C tier Lasm provisions is the archive its npm package carries', { skip
   const manifest = validateNpmToolManifest(npmToolManifest(packages, packed));
   for (const platform of ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64', 'win32-x64']) {
     // As provisionLean({ native: true }) passes it to provisionArtifact.
-    const { name, url, sha256, bytes, format, root, maximumExtractedBytes } = leanDistribution(c.toolchains.lean['4.36.0-rc1'], platform).c;
+    const { name, url, sha256, bytes, format, root, maximumExtractedBytes } = leanDistribution(c.toolchains.lean['4.36.0-rc2'], platform).c;
     const entry = npmEntryFor(manifest, { name, url, sha256, bytes, format, root, maximumExtractedBytes });
     assert.deepEqual([entry.package, entry.version, entry.install, entry.platform], [`@lasm/lean-c-${platform}`, '4.35.0-lasm.2', 'demand', platform]);
   }
@@ -121,7 +121,7 @@ test('the runtime manifest and main package pin every tool package exactly', { s
   const packed = Object.fromEntries(packages.map((p, i) => [p.name, { integrity: 'sha512-' + Buffer.alloc(64, i).toString('base64') }]));
   const manifest = validateNpmToolManifest(npmToolManifest(packages, packed));
   assert.equal(Object.keys(manifest.artifacts).length, packages.length);
-  const bin = c.toolchains.lean['4.36.0-rc1'].tiers.bin['linux-x64'];
+  const bin = c.toolchains.lean['4.36.0-rc2'].tiers.bin['linux-x64'];
   assert.deepEqual(npmEntryFor(manifest, bin), { package: '@lasm/lean-linux-x64', version: '4.35.0-lasm.2', file: bin.name,
     bytes: bin.bytes, integrity: packed['@lasm/lean-linux-x64'].integrity, install: 'optional', platform: 'linux-x64' });
   const native = c.linkToolchain.native['win32-x64'];

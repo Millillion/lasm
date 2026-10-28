@@ -12,7 +12,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
-const [harness, indexArg, countArg, outputArg, engine, compiler, pristine, version = '4.36.0-rc1'] = process.argv.slice(2);
+const [harness, indexArg, countArg, outputArg, engine, compiler, pristine, version = '4.36.0-rc2'] = process.argv.slice(2);
 const index = Number(indexArg), count = Number(countArg);
 assert.ok(Number.isInteger(index) && Number.isInteger(count) && index >= 0 && index < count, 'INDEX COUNT');
 const root = fileURLToPath(new URL('../../', import.meta.url));

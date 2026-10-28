@@ -9,7 +9,7 @@ const [outputArg, compilerArg] = process.argv.slice(2);
 const output = resolve(outputArg), compiler = resolve(compilerArg);
 if (existsSync(output)) throw new Error('Use a fresh output');
 mkdirSync(output, { recursive: true });
-writeFileSync(join(output, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc1\n');
+writeFileSync(join(output, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc2\n');
 writeFileSync(join(output, 'Main.lean'), `def main (args : List String) : IO UInt32 := do
   let cmd :: rest := args | return 2
   let child ← IO.Process.spawn { cmd, args := rest.toArray, stdout := .piped }

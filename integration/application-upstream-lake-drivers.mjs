@@ -22,7 +22,7 @@ import { loadUpstreamEvidence } from '../scripts/application-tests/upstream-evid
 
 await ensureResourceGuard();
 const windows = process.platform === 'win32', bash = windows ? 'bash' : '/bin/bash';
-const [outputArg, engineArg, compilerArg, referenceArg, name, version = '4.36.0-rc1', ...extra] = process.argv.slice(2);
+const [outputArg, engineArg, compilerArg, referenceArg, name, version = '4.36.0-rc2', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && engineArg && compilerArg && referenceArg && name && !extra.length,
   'Supply NEW_OUTPUT ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE NAME [LEAN_VERSION]');
 const root = fileURLToPath(new URL('..', import.meta.url));

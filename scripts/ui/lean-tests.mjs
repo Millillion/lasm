@@ -22,7 +22,7 @@ const work = mkdtempSync(join(tmpdir(), 'lasm-ui-lean-'));
 const failures = [];
 try {
   writeFileSync(join(work, 'Main.lean'), 'import Lean\ndef main : IO Unit := pure ()\n');
-  writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc1\n');
+  writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc2\n');
   const started = Date.now();
   const lean = await provisionLean(join(work, 'Main.lean'), { modules: 'extended', progress: ({ stage }) => stage && console.error(`[lean] ${stage}`) });
   console.log(`Lean prefix with Lasm's library (Lasm.UI compiled): ${((Date.now() - started) / 1000).toFixed(1)} s`);

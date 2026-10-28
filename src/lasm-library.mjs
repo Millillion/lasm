@@ -12,7 +12,7 @@ import { executableName } from './platform.mjs';
 
 const root = fileURLToPath(new URL('../library/', import.meta.url));
 // Lean versions the library is compiled for, and its modules in import order.
-export const libraryLeanVersions = ['4.36.0-rc1'];
+export const libraryLeanVersions = ['4.36.0-rc1', '4.36.0-rc2'];
 export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
   // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
   'Lasm.Fetch', 'Lasm.Fastly', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed', 'Lasm.KV',

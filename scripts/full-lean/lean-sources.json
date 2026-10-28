@@ -22,5 +22,11 @@
     "url": "https://codeload.github.com/leanprover/lean4/tar.gz/c9afcddf514a6772bd4d649f7cfc04eff0b9f15e",
     "bytes": 93341138,
     "sha256": "dfa2e65cb0bc9964ea88bdec3083766747b829ebdec0904698e4cc9e900e9c8f"
+  },
+  "4.36.0-rc2": {
+    "commit": "b35cb10cf2ced51a2fd1880cfdbf75c71ab7a35a",
+    "url": "https://codeload.github.com/leanprover/lean4/tar.gz/b35cb10cf2ced51a2fd1880cfdbf75c71ab7a35a",
+    "bytes": 93342924,
+    "sha256": "4c12ea8ced7a220b9efbf34cb80076182b0d345dab5d9507cc449ce36dc70f29"
   }
 }

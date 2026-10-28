@@ -13,7 +13,7 @@ on:
       version:
         description: Pinned Lean version in src/toolchains.json
         type: string
-        default: 4.36.0-rc1
+        default: 4.36.0-rc2
       catalog:
         description: Catalog naming the pinned upstream archives (a maintainer pin file before the product catalog adopts the release)
         type: string
@@ -21,7 +21,7 @@ on:
       tag:
         description: Release tag for the archives (only used when publishing)
         type: string
-        default: lean-4.36.0-rc1-tiers-v1
+        default: lean-4.36.0-rc2-tiers-v1
       scope:
         description: all (binaries, module data and C tier) or c (C tier only)
         type: choice

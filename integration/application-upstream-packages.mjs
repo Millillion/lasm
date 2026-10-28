@@ -20,7 +20,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const [outputArg, engineArg, compilerArg, referenceArg, name, leanVersion = '4.34.0'] = process.argv.slice(2);
 // Historical 4.34.0 evidence keeps its original lean-4.34 filenames.
 const evidenceStem = leanVersion === '4.34.0' ? 'lean-4.34' : 'lean-' + leanVersion;
-assert.ok(['4.34.0', '4.35.0', '4.36.0-rc1'].includes(leanVersion), 'Unsupported Lean version ' + leanVersion);
+assert.ok(['4.34.0', '4.35.0', '4.36.0-rc1', '4.36.0-rc2'].includes(leanVersion), 'Unsupported Lean version ' + leanVersion);
 const target = 'node';
 assert.ok(outputArg && engineArg && compilerArg && referenceArg
   && ['float', 'ofScientific', 'exe_private_lean_import'].includes(name),

@@ -26,7 +26,7 @@ on:
         default: 567ea838eb672249d4dfd071c9e659de3dc9eedd3a503570cacc82a60c2aad77
       lean:
         type: string
-        default: 4.36.0-rc1
+        default: 4.36.0-rc2
 permissions:
   contents: read
 concurrency:

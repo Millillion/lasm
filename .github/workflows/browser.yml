@@ -127,13 +127,13 @@ jobs:
           name: edge-runtime-archive-browser
           path: .work/edge-archive
       - name: Extract the packaged edge runtime (what users get)
-        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.36.0-rc1-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.36.0-rc2-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
       - name: Unit tests of the browser target
         run: node --test test/browser.test.mjs test/edge.test.mjs test/init.test.mjs
       - name: Build the apps (web template, platform suite, Lasm.UI examples) for the browser
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
-          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc1-wasm64-edge
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc2-wasm64-edge
         run: |
           node scripts/browser/build-apps.mjs .work/browser-work .work/browser-apps \
             uicounter=examples/ui/counter todomvc=examples/ui/todomvc bench=examples/ui/bench demo=examples/ui/demo
@@ -144,14 +144,14 @@ jobs:
       - name: lasm dev --target browser (edit, rebuild, reload) on the web template
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
-          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc1-wasm64-edge
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc2-wasm64-edge
         run: |
           node bin/lasm.mjs init .work/browser-work/dev-loop --template web
           node scripts/browser/dev-loop-check.mjs .work/browser-work/dev-loop .work/browser-apps/dev-loop.json
       - name: lasm dev --target workers (rebuild workers/ only, no platform CLI)
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
-          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc1-wasm64-edge
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc2-wasm64-edge
         run: |
           node bin/lasm.mjs init .work/browser-work/dev-edge --template hono --deploy workers
           (cd .work/browser-work/dev-edge && node -e "const p=require('./package.json');delete p.devDependencies;require('fs').writeFileSync('package.json',JSON.stringify(p,null,2))" && npm install --no-audit --no-fund)
@@ -169,7 +169,7 @@ jobs:
       - name: 'The Vite plugin (@lasm/cli/vite, installed from a packed CLI) in development: edit Main.lean, the app is rebuilt and remounted in place'
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
-          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc1-wasm64-edge
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.36.0-rc2-wasm64-edge
         run: node scripts/browser/vite-dev-check.mjs .work/browser-work/vite .work/browser-apps/vite-dev.json --playwright .work/pw
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:

@@ -44,11 +44,11 @@ function applyPatch(name) {
 if (mode !== 'transport') applyPatch('host-rpc-channel-reuse.patch');
 const base = mode === 'transport' ? '36cf596b617bea6e360a96321aff1e41b8e5c4ee20abdc7d8a7e474b9a5cc6e4'
   : '7482333e0a70a6aee12a540e11a48f31fd56c86761e7b3477f4a46ae310f80d3';
-const target = join(compiler, 'targets/lean-4.36.0-rc1-wasm64');
+const target = join(compiler, 'targets/lean-4.36.0-rc2-wasm64');
 function repin(identity) {
   const pins = join(compiler, 'src/application-runtimes.json'), runtimes = JSON.parse(readFileSync(pins, 'utf8'));
-  assert.equal(runtimes.lean['4.36.0-rc1'].manifestSha256, base);
-  runtimes.lean['4.36.0-rc1'].manifestSha256 = identity;
+  assert.equal(runtimes.lean['4.36.0-rc2'].manifestSha256, base);
+  runtimes.lean['4.36.0-rc2'].manifestSha256 = identity;
   writeFileSync(pins, JSON.stringify(runtimes, null, 2) + '\n');
   const policy = join(compiler, 'src/application-reachability.mjs'), source = readFileSync(policy, 'utf8');
   const quoted = `'${base}']`;

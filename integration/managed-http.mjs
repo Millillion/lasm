@@ -16,7 +16,7 @@ import { reclaimBuildMetadata } from '../scripts/application-tests/reclaim-metad
 await ensureResourceGuard();
 
 const root = resolve(fileURLToPath(new URL('../', import.meta.url)));
-const [outputArg, engineArg, compilerArg = root, version = '4.36.0-rc1', ...extra] = process.argv.slice(2);
+const [outputArg, engineArg, compilerArg = root, version = '4.36.0-rc2', ...extra] = process.argv.slice(2);
 const target = 'node';
 if (!outputArg || !engineArg ||
     !/^\d+\.\d+\.\d+$/.test(version) || extra.length)

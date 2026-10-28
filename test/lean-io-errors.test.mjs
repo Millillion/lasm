@@ -15,7 +15,7 @@ test('unknown Lean releases cannot silently use an unverified error ABI', () => 
 });
 
 test('explicit Lean errors retain their messages and constructors under either ABI', () => {
-  for (const version of ['4.32.0', '4.34.0', '4.34.1', '4.35.0', '4.36.0-rc1']) {
+  for (const version of ['4.32.0', '4.34.0', '4.34.1', '4.35.0', '4.36.0-rc1', '4.36.0-rc2']) {
     assert.deepEqual(fields(encodeError({ code: 'EINVAL', errno: 22, nativeMessage: true,
       message: 'string contains NUL bytes' }, version)), { kind: 4, code: 22, message: 'string contains NUL bytes' });
     assert.deepEqual(fields(encodeError({ code: 'ENOENT', errno: 2, nativeMessage: true,
