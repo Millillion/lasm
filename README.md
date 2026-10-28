@@ -15,6 +15,8 @@ npm create @lasm@latest my-app -- --template hono    # then: cd my-app && npm in
 AI agents: this README is complete on its own. [`llms.txt`](llms.txt) is the short
 index, and [docs/AI.md](docs/AI.md) lists the rules that save you from wrong turns.
 
+If Lasm is useful to you, I'd appreciate your [sponsorship](https://github.com/sponsors/lastmjs) ([more below](#support-lasm)).
+
 ## Quick facts
 
 | Fact | Value |
@@ -370,6 +372,15 @@ is slower than native Lean (no GMP).
   [decisions](docs/DECISIONS.md)
 
 ---
+
+## Support Lasm
+
+If Lasm is useful to you or you want to see it succeed, I'd appreciate your
+sponsorship: [github.com/sponsors/lastmjs](https://github.com/sponsors/lastmjs).
+It supports me and the work on Lasm and the other [Millillion](https://millillion.org)
+projects. My first goal is $250 a month, enough for one dedicated Claude Code account
+for Lasm. You can also help by starring the repo, trying it, and
+[reporting what breaks](https://github.com/Millillion/lasm/issues/new/choose).
 
 # Reference
 
