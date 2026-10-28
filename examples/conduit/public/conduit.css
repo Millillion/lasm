@@ -1,0 +1,6 @@
+/* Conduit in Lean: small additions to the RealWorld theme (styles.css). */
+/* The icons come from the Ionicons font; give the clickable ones a size even
+   before (or without) the font, so they can always be clicked. */
+.mod-options i, .tag-list .tag-pill i { display: inline-block; min-width: 0.8em; min-height: 1em; cursor: pointer; }
+/* Controls are disabled until the app has started and knows the viewer. */
+button[disabled], input[disabled], textarea[disabled] { cursor: progress; }

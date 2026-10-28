@@ -7,11 +7,15 @@ returns a taken slug.
 -/
 namespace Conduit
 
-/-- The characters a slug keeps: ASCII letters (lowercased) and digits. -/
-def slugChar? (c : Char) : Option Char :=
-  if c.isLower || c.isDigit then some c
-  else if c.isUpper then some c.toLower
-  else none
+/-- The characters a slug may contain besides `-`. -/
+def slugAlphabet : List Char := "abcdefghijklmnopqrstuvwxyz0123456789".toList
+
+/-- What each kept character becomes: itself, or its lowercase letter. -/
+def slugTable : List (Char × Char) :=
+  slugAlphabet.map (fun c => (c, c)) ++ ("ABCDEFGHIJKLMNOPQRSTUVWXYZ".toList.zip "abcdefghijklmnopqrstuvwxyz".toList)
+
+/-- The character a slug keeps for `c`: ASCII letters (lowercased) and digits. -/
+def slugChar? (c : Char) : Option Char := (slugTable.find? (·.1 == c)).map (·.2)
 
 /-- Groups of characters between separators (`none`), possibly empty. -/
 def groups : List (Option Char) → List (List Char)
@@ -30,7 +34,7 @@ def slugWords (cs : List Char) : List (List Char) :=
 def slugify (title : String) : String :=
   match slugWords title.toList with
   | [] => "article"
-  | ws => "-".intercalate (ws.map String.ofList)
+  | ws => String.ofList (['-'].intercalate ws)
 
 /-- The `n`th candidate: the base, then `base-2`, `base-3`, … -/
 def candidate (base : String) (n : Nat) : String :=

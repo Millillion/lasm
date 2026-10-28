@@ -5,20 +5,26 @@
   "type": "module",
   "description": "Conduit, the RealWorld app, in Lean: a REST API and a browser app compiled to WebAssembly by Lasm, with proofs",
   "scripts": {
-    "build": "lasm build ServerNode.lean --output dist/server",
+    "dev": "lasm dev --target node=ServerNode.lean,browser=Client.lean --output dist/public/client",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "lasm build Client.lean --target browser --output dist/public/client",
+    "build:server": "lasm build ServerNode.lean --output dist/server",
     "start": "node dist/server/main.mjs",
     "test": "node test/api.mjs",
-    "build:workers": "lasm build ServerWorkers.lean --target workers --output dist/server",
+    "build:workers": "npm run build:client && lasm build ServerWorkers.lean --target workers --output dist/server",
     "test:workers": "node test/api.mjs --name workers --command \"npx wrangler dev --port {port} --ip 127.0.0.1\"",
-    "build:bun": "bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
+    "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
     "start:bun": "bun bun/main.mjs",
-    "test:bun": "node test/api.mjs --name bun --command \"bun bun/main.mjs\""
+    "test:bun": "node test/api.mjs --name bun --command \"bun bun/main.mjs\"",
+    "proofs": "node test/proofs.mjs",
+    "test:e2e": "playwright test -c test/playwright.config.ts"
   },
   "engines": {
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.3.2",
-    "@orangeopensource/hurl": "8.0.4"
+    "@lasm/cli": "0.3.4",
+    "@orangeopensource/hurl": "8.0.4",
+    "@playwright/test": "1.63.0"
   }
 }

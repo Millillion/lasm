@@ -8,6 +8,12 @@ name: Conduit
 #   and a local D1 database), against the same suite;
 # - api-bun: the Bun build (bun:sqlite), built by Lasm running on Bun,
 #   against the same suite;
+# - proofs: every theorem in Proofs/ compiles and uses only propext,
+#   Classical.choice and Quot.sound (no sorry), with Lasm's managed Lean;
+# - e2e-node, e2e-workers: the official RealWorld end-to-end suite
+#   (specs/e2e, Playwright, unmodified, fullstack mode) against the
+#   server-rendered, hydrated Lasm.UI app: Node on Chromium, Firefox and
+#   WebKit; Workers (wrangler dev, local D1) and Bun on Chromium; no retries;
 # - pinned: test/realworld is byte-identical to the upstream commit.
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
 # Free runners only.
@@ -51,6 +57,25 @@ jobs:
           cmp LICENSE "$RUNNER_TEMP/rw/LICENSE"
           for f in $(find specs -type f); do cmp "$f" "$RUNNER_TEMP/rw/$f"; done
           echo "$(find specs -type f | wc -l) files identical to gothinkster/realworld@$commit"
+  proofs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: npm ci
+        working-directory: examples/conduit
+        run: npm ci --no-audit --no-fund
+      - name: npm run proofs (no sorry; only Lean's standard axioms)
+        working-directory: examples/conduit
+        run: |
+          if grep -rnw sorry Conduit Proofs; then echo "::error::sorry in the sources"; exit 1; fi
+          npm run proofs
   api-node:
     name: API on Node ${{ matrix.node }}
     runs-on: ubuntu-24.04
@@ -161,6 +186,151 @@ jobs:
         if: always()
         with:
           name: conduit-api-bun
+          path: examples/conduit/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  e2e-node:
+    name: E2E on Node, ${{ matrix.browser }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: examples/conduit
+        run: npm ci --no-audit --no-fund
+      - name: npm run build (the browser app, then the Node server embedding it)
+        working-directory: examples/conduit
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+      - name: The pinned Playwright's ${{ matrix.browser }}, with its system packages
+        timeout-minutes: 30
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
+          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
+      - name: The official RealWorld end-to-end suite
+        working-directory: examples/conduit
+        env:
+          BROWSERS: ${{ matrix.browser }}
+          E2E_NAME: node-${{ matrix.browser }}
+        run: |
+          npm run test:e2e -- --retries=0 || status=$?
+          node test/e2e-summary.mjs test-results/e2e-node-${{ matrix.browser }}.json
+          exit ${status:-0}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: conduit-e2e-node-${{ matrix.browser }}
+          path: examples/conduit/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  e2e-workers:
+    name: E2E on Cloudflare Workers (wrangler dev, local D1), chromium
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci, and the pinned wrangler (with workerd)
+        working-directory: examples/conduit
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund wrangler@4.152.0
+          echo "$RUNNER_TEMP/tools/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: npm run build:workers
+        working-directory: examples/conduit
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:workers
+      - name: The pinned Playwright's chromium
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
+          bash scripts/ci/playwright-install.sh chromium
+      - name: The official RealWorld end-to-end suite against wrangler dev
+        working-directory: examples/conduit
+        env:
+          BROWSERS: chromium
+          E2E_NAME: workers-chromium
+          E2E_SERVER: wrangler dev --port 4100 --ip 127.0.0.1
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          npm run test:e2e -- --retries=0 || status=$?
+          node test/e2e-summary.mjs test-results/e2e-workers-chromium.json
+          exit ${status:-0}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: conduit-e2e-workers-chromium
+          path: examples/conduit/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  e2e-bun:
+    name: E2E on Bun (bun:sqlite), chromium
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci, and the pinned Bun
+        working-directory: examples/conduit
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund bun@1.4.4
+          echo "$RUNNER_TEMP/tools/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: npm run build:bun
+        working-directory: examples/conduit
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:bun
+      - name: The pinned Playwright's chromium
+        timeout-minutes: 30
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
+          bash scripts/ci/playwright-install.sh chromium
+      - name: The official RealWorld end-to-end suite against Bun
+        working-directory: examples/conduit
+        env:
+          BROWSERS: chromium
+          E2E_NAME: bun-chromium
+          E2E_SERVER: bun bun/main.mjs
+        run: |
+          rm -f conduit.db*
+          npm run test:e2e -- --retries=0 || status=$?
+          node test/e2e-summary.mjs test-results/e2e-bun-chromium.json
+          exit ${status:-0}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: conduit-e2e-bun-chromium
           path: examples/conduit/test-results/
           retention-days: 14
           if-no-files-found: warn

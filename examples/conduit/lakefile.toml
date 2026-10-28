@@ -1,6 +1,6 @@
 name = "conduit"
 version = "0.1.0"
-defaultTargets = ["Conduit"]
+defaultTargets = ["Conduit", "Proofs"]
 
 # The pure Conduit: API types and JSON, validation, slugs, pagination,
 # authorization and every endpoint's logic (generic over the store).
@@ -8,10 +8,20 @@ defaultTargets = ["Conduit"]
 [[lean_lib]]
 name = "Conduit"
 
+# The theorems about Conduit (PROOFS.md). Those about the browser app import
+# Lasm.UI, so check them with `npm run proofs` (Lasm's own Lean).
+[[lean_lib]]
+name = "Proofs"
+
+# The browser app's pages (Lasm.UI): routes, model, views and update. The
+# server renders the same views for the first page of every URL.
+[[lean_lib]]
+name = "Frontend"
+
 # The server's modules (Lasm.Fetch, Lasm.JS): the SQL layer, Web Crypto,
 # the HTTP glue, and one SQLite binding module per target.
 [[lean_lib]]
 name = "Server"
 
-# ServerNode.lean is the program: lasm builds it (npm run build); it is not
-# a Lake target.
+# ServerNode.lean, ServerWorkers.lean, ServerBun.lean and Client.lean are
+# the programs: lasm builds them (npm run build); they are not Lake targets.
