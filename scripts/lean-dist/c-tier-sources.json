@@ -83,7 +83,7 @@
       }
     }
   },
-  "4.36.0-rc1": {
+  "4.36.0-rc2": {
     "clangVersion": "23.1.1",
     "resourceHeaders": {
       "name": "clang+llvm-23.1.1-x86_64-pc-windows-msvc.tar.zst",
