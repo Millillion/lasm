@@ -21,6 +21,26 @@ export function planCacheUpload(payloadBytes, reportedBytes, listedBytes) {
     includedAllowanceBytes: 10 * GiB, maximumAfterUpload: usedBytes + uploadUpperBound };
 }
 
+// Before an upload would cross the ceiling, the writer may evict its own
+// workflow's oldest caches (LASM_CACHE_EVICT_PREFIX, e.g. `node-candidate-`):
+// oldest last access first, never one accessed in the last `keepHours` (an
+// in-flight run may still restore it), until the upload fits. Returns the
+// caches to delete, or null when evicting every eligible one is not enough.
+export function planEviction(caches, { payloadBytes, usedBytes, prefix, now = Date.now(), keepHours = 24, ceilingBytes = 8 * GiB }) {
+  if (!prefix) return null;
+  const uploadUpperBound = Math.ceil(payloadBytes * 1.02) + 16 * 1024 ** 2;
+  const eligible = caches
+    .filter(c => c.key.startsWith(prefix) && now - Date.parse(c.last_accessed_at) > keepHours * 3600_000)
+    .sort((a, b) => Date.parse(a.last_accessed_at) - Date.parse(b.last_accessed_at) || a.id - b.id);
+  const evict = [];
+  let used = usedBytes;
+  for (const cache of eligible) {
+    if (used + uploadUpperBound <= ceilingBytes) break;
+    evict.push(cache); used -= cache.size_in_bytes;
+  }
+  return used + uploadUpperBound <= ceilingBytes ? evict : null;
+}
+
 async function main() {
   if (!trustedRef())
     throw new Error('Cache writes are restricted to the authorized repository main branch and its own pull requests');
@@ -51,7 +71,7 @@ async function main() {
   if (repo.private !== false || repo.visibility !== 'public') throw new Error('Standard public-runner eligibility is required');
   const usage = await api('/actions/cache/usage');
   let listedBytes = 0, count = 0;
-  const ids = new Set();
+  const ids = new Set(), caches = [];
   for (let page = 1; ; page++) {
     if (page > 20) throw new Error('Too many cache records to verify the budget');
     const result = await api(`/actions/caches?per_page=100&page=${page}`);
@@ -61,10 +81,30 @@ async function main() {
         throw new Error('Inconsistent cache inventory');
       ids.add(entry.id); listedBytes += entry.size_in_bytes; count++;
     }
+    caches.push(...result.actions_caches);
     if (result.actions_caches.length < 100) break;
   }
-  const plan = planCacheUpload(info.size, usage.active_caches_size_in_bytes, listedBytes);
-  const result = { ...plan, cacheEntries: count, repository: repo.full_name,
+  let reportedBytes = usage.active_caches_size_in_bytes;
+  let evicted = [];
+  try { planCacheUpload(info.size, reportedBytes, listedBytes); } catch (error) {
+    if (!/repository ceiling/.test(error.message)) throw error;
+    const evict = planEviction(caches, { payloadBytes: info.size, usedBytes: Math.max(reportedBytes, listedBytes),
+      prefix: process.env.LASM_CACHE_EVICT_PREFIX });
+    if (!evict) throw error;
+    for (const cache of evict) {
+      const response = await fetch(`https://api.github.com/repos/Millillion/lasm/actions/caches/${cache.id}`, { method: 'DELETE',
+        headers: { Authorization: 'Bearer ' + process.env.GITHUB_TOKEN, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
+        signal: AbortSignal.timeout(15_000) });
+      if (!response.ok && response.status !== 404) throw new Error(`Cache eviction failed: HTTP ${response.status}`);
+      console.error(`Evicted cache ${cache.key} (${cache.size_in_bytes} bytes, last used ${cache.last_accessed_at})`);
+    }
+    evicted = evict.map(({ id, key, size_in_bytes }) => ({ id, key, bytes: size_in_bytes }));
+    const freed = evict.reduce((n, c) => n + c.size_in_bytes, 0);
+    // The usage report lags deletions; count them out of both figures.
+    listedBytes -= freed; reportedBytes = Math.max(0, reportedBytes - freed);
+  }
+  const plan = planCacheUpload(info.size, reportedBytes, listedBytes);
+  const result = { ...plan, evicted, cacheEntries: count, repository: repo.full_name,
     payload: fileArg, serializedWriterGroup: process.env.LASM_CACHE_WRITER_GROUP,
     checkedAt: new Date().toISOString(),
     billingSource: 'https://docs.github.com/en/billing/concepts/product-billing/github-actions' };

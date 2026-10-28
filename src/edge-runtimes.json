@@ -5,13 +5,13 @@
     "4.35.0": {
       "name": "lean-4.35.0-wasm64-edge.tar.zst",
       "root": "lean-4.35.0-wasm64-edge",
-      "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-edge-v3/lean-4.35.0-wasm64-edge.tar.zst",
-      "sha256": "3d50f14397bb7902f398241b47d4571b5e5aed847df622bc95ae525452618946",
-      "bytes": 1281335,
+      "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-edge-v4/lean-4.35.0-wasm64-edge.tar.zst",
+      "sha256": "a5e7536cbe61b67d6c00acf9ce28200c53507acdbd7dc2c7cb16c906f6283350",
+      "bytes": 1281123,
       "format": "tar.zst",
-      "maximumExtractedBytes": 14767756,
-      "baseRuntimeManifestSha256": "79968781629d674bc8b506b3050c367ebc14503c869bc45436244c49ee5aee02",
-      "source": "edge-runtime.yml run 40473380897 (uv-semantics, on runtime 79968781…: Loop.alive/configure, cancel drops on the calling thread), with scripts/edge/build-edge-extras.mjs (Lasm.JS glue, Emscripten system libraries) and package-edge-runtime.mjs"
+      "maximumExtractedBytes": 14767084,
+      "baseRuntimeManifestSha256": "9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a",
+      "source": "edge-runtime.yml run 40543222257 (release-0.3.3, on runtime 9921c696…: UDP receive startup check; canonical system-library member names), with scripts/edge/build-edge-extras.mjs (Lasm.JS glue, Emscripten system libraries) and package-edge-runtime.mjs"
     }
   }
 }

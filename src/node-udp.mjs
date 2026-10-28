@@ -1,7 +1,7 @@
 import dgram from 'node:dgram';
 import { getSystemErrorMap } from 'node:util';
 import { numbers, cancellation } from './node-host.mjs';
-import { leanAtLeast } from './lean-io-errors.mjs';
+import { leanAtLeast, receiveSizeError } from './lean-io-errors.mjs';
 
 const empty = Buffer.alloc(0);
 const error = (code, message) => Object.assign(new Error(message), { code });
@@ -13,10 +13,11 @@ const encodeAddress = value => Buffer.concat([
 
 // Lean 4.36 reports a datagram larger than the receive buffer (UV_UDP_PARTIAL)
 // as UV_EMSGSIZE; earlier releases return the truncated prefix.
-const messageTooLong = () => {
-  const [errno, [code, message]] = [...getSystemErrorMap()].find(([, [name]]) => name === 'EMSGSIZE');
+const uvError = name => {
+  const [errno, [code, message]] = [...getSystemErrorMap()].find(([, [entry]]) => entry === name);
   return Object.assign(new Error(message), { code, errno });
 };
+const messageTooLong = () => uvError('EMSGSIZE');
 
 export function createNodeUdp({ add, get, leanVersion = '4.32.0' }) {
   const reportTruncation = leanAtLeast(leanVersion, '4.36.0');
@@ -63,7 +64,8 @@ export function createNodeUdp({ add, get, leanVersion = '4.32.0' }) {
     });
   }
   function receive(resource, count, peek) {
-    if (resource.waiter) throw error('EALREADY', 'A receive is already pending');
+    if (resource.waiter) throw uvError('EALREADY');
+    if (!peek && !count && reportTruncation) throw receiveSizeError();
     socket(resource, resource.family);
     return new Promise((resolve, reject) => {
       resource.waiter = { count, peek, resolve, reject };

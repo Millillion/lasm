@@ -19,7 +19,7 @@ jobs:
     # gets draft access; native validation jobs retain contents: read.
     permissions:
       contents: write
-      actions: read
+      actions: write # cache-budget.mjs may evict this workflow's old candidate caches
     concurrency:
       group: lasm-cache-writer
       queue: max
@@ -46,6 +46,7 @@ jobs:
       - name: Bound the short-lived handoff below included cache storage
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          LASM_CACHE_EVICT_PREFIX: node-candidate-
         run: node scripts/ci/cache-budget.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" .work/node-candidate-cache-budget.json
       - name: Hand authenticated bytes to read-only native consumers
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

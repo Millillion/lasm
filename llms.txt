@@ -1,6 +1,6 @@
 # Lasm
 
-> Lasm compiles Lean 4.35.0 programs ahead of time to WebAssembly for Node servers, serverless functions (AWS Lambda, Vercel, Netlify, Azure, Google Cloud Functions), edge functions (Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy, Supabase), Bun, Deno, Fastly Compute, WASI/wasi-http/Spin and browsers. It ships on npm as `@lasm/cli` (bin `lasm`, current version 0.3.2) and installs Lean and all build tools itself; the only prerequisite is Node 24+ (or Bun/Deno). Lean code calls JavaScript and npm through `import Lasm.JS` with one `@[js "module" "export"]` declaration per function. Proofs and tactics run at build time; a deployed program cannot elaborate or evaluate new Lean.
+> Lasm compiles Lean 4.35.0 programs ahead of time to WebAssembly for Node servers, serverless functions (AWS Lambda, Vercel, Netlify, Azure, Google Cloud Functions), edge functions (Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy, Supabase), Bun, Deno, Fastly Compute, WASI/wasi-http/Spin and browsers. It ships on npm as `@lasm/cli` (bin `lasm`, current version 0.3.4) and installs Lean and all build tools itself; the only prerequisite is Node 24+ (or Bun/Deno). Lean code calls JavaScript and npm through `import Lasm.JS` with one `@[js "module" "export"]` declaration per function. Proofs and tactics run at build time; a deployed program cannot elaborate or evaluate new Lean.
 
 Key commands:
 

@@ -149,7 +149,10 @@ export function canSpecializeInitialization(runtime) {
     // liblasmhost's node-async.cpp.o (those two, cancel_call, release_cancelled)
     // differ from the entry above. Neither has a static constructor; no module
     // initializer, init.cpp or init_module.cpp object changed.
-    '79968781629d674bc8b506b3050c367ebc14503c869bc45436244c49ee5aee02'].includes(runtime.identity);
+    '79968781629d674bc8b506b3050c367ebc14503c869bc45436244c49ee5aee02',
+    // Lean 4.35.0 (CI build 40518682274, source af51365, handoff 0646c068…): only
+    // liblasmhost's node-async.cpp.o differs (UDP receives use the startup check).
+    '9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';
