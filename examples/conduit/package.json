@@ -23,7 +23,7 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.3.2",
+    "@lasm/cli": "0.3.4",
     "@orangeopensource/hurl": "8.0.4",
     "@playwright/test": "1.63.0"
   }
