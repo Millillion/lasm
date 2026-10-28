@@ -35,3 +35,7 @@ Key commands:
 - [Where apps run](https://github.com/Millillion/lasm/blob/main/docs/DEPLOYMENT.md) and how each platform is tested
 - [Language coverage](https://github.com/Millillion/lasm/blob/main/docs/LANGUAGE_COVERAGE.md), [compatible Lean packages](https://github.com/Millillion/lasm/blob/main/docs/COMPATIBILITY.md)
 - [All documentation](https://github.com/Millillion/lasm/blob/main/docs/README.md), [decisions](https://github.com/Millillion/lasm/blob/main/docs/DECISIONS.md), [release notes](https://github.com/Millillion/lasm/tree/main/docs/release)
+
+## Support
+
+- Sponsor Lasm's author: https://github.com/sponsors/lastmjs
