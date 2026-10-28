@@ -51,9 +51,12 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
 7. **Never run platform CLIs on the user's behalf without being asked**
    (`wrangler deploy`, `vercel`, `fastly compute deploy`). Lasm only builds;
    deployment is the platform's tool.
-8. **Proofs are checked by the build.** A broken proof is a build error. Don't
-   leave `sorry` in shipped code; Lasm's own proofs contain none
-   (`node scripts/ui/lean-tests.mjs` checks them in a checkout).
+8. **Proofs are checked by the build.** A broken proof is a build error. Don't leave
+   `sorry` in shipped code; Lasm's own proofs contain none
+   (`node scripts/ui/lean-tests.mjs` checks them in a checkout). To prove things
+   about server code, write the endpoints against a record of functions (a `Store`)
+   and prove them on a model of it, as Conduit does
+   ([PROOFS.md](../examples/conduit/PROOFS.md), `npm run proofs`).
 9. **Report bugs** with `npx lasm --version` output:
    https://github.com/Millillion/lasm/issues/new?template=bug.yml
 
@@ -61,7 +64,7 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
 
 | Task | Read | Copy from |
 | --- | --- | --- |
-| A complete real-world API (auth, SQL, pure-Lean core) | [examples/conduit/README.md](../examples/conduit/README.md) | [examples/conduit](../examples/conduit) |
+| A complete real-world app (API, frontend, auth, SQL) with proofs | [examples/conduit/README.md](../examples/conduit/README.md), [PROOFS.md](../examples/conduit/PROOFS.md) | [examples/conduit](../examples/conduit) (proofs over a `Store` model: `Proofs/Model.lean`) |
 | Server with npm framework | [GETTING_STARTED](GETTING_STARTED.md) | `--template hono`, [examples/js-crud](../examples/js-crud) |
 | Pure-Lean HTTP on any target | [FETCH.md](FETCH.md) | `--template fetch`, [examples/fetch](../examples/fetch) |
 | Browser UI | [UI.md](UI.md) | `--template web`, [examples/ui](../examples/ui) |

@@ -3,7 +3,9 @@
 **Lean 4 for the JavaScript and WebAssembly world.** Lasm compiles ordinary Lean 4
 programs ahead of time to WebAssembly. One Lean code base can become a Node server,
 a serverless or edge function, a WASI/Fastly module or a browser app. Because it is
-Lean, you can prove properties of the code you deploy. Lasm ships on npm and brings
+Lean, you can prove properties of the code you deploy. The flagship example,
+[Conduit](#flagship-example-conduit-with-117-proved-theorems), is the RealWorld app
+with 117 proved theorems. Lasm ships on npm and brings
 Lean, Lake and its build tools with it; you only need Node (or Bun or Deno).
 
 ```sh
@@ -72,7 +74,7 @@ or processes (and without files, except on WASI); the rest of Lean works.
 | An edge function (Workers, Vercel/Netlify Edge, Deno Deploy, Supabase) | `npm create @lasm@latest my-edge -- --template hono --deploy workers` (or `fetch`) | [examples/edge-pure](examples/edge-pure), [docs/EDGE.md](docs/EDGE.md) |
 | A Fastly, WASI or Spin service | `npm create @lasm@latest my-svc -- --template fetch --deploy fastly` (or `wasi-http`, `spin`, `wasi`) | [examples/fetch](examples/fetch), [docs/WASI.md](docs/WASI.md) |
 | A browser app | `npm create @lasm@latest my-web -- --template web` | [examples/ui](examples/ui) (counter, TodoMVC with proofs, feature demo, benchmark) |
-| A real-world REST API (users, auth, articles, comments, SQL) on Node, Workers or Bun | `cd examples/conduit && npm install && npm run build && npm start` | [examples/conduit](examples/conduit), the flagship (below) |
+| A complete real-world app (API, browser frontend, SQL, auth) with proofs, on Node, Workers or Bun | `cd examples/conduit && npm install && npm run build && npm start` | [examples/conduit](examples/conduit), the flagship (below) |
 | A full-stack app with a verified API | `npm create @lasm@latest my-app -- --template fullstack` | [templates/fullstack](templates/fullstack) |
 | To call npm packages or `fetch` from Lean | add `import Lasm.JS` and one `@[js]` line per function | [examples/js-fetch](examples/js-fetch), [JS bindings](#calling-javascript-and-npm-from-lean) |
 | To run on Bun or Deno | `bun create @lasm my-app --template hono` / `deno run -A npm:@lasm/create my-app --template hono` | [docs/BUN_DENO.md](docs/BUN_DENO.md) |
@@ -80,36 +82,45 @@ or processes (and without files, except on WASI); the rest of Lean works.
 Every example has a README with a one-command run; [examples/README.md](examples/README.md)
 lists them all.
 
-## Flagship example: Conduit
+## Flagship example: Conduit, with 117 proved theorems
 
 [examples/conduit](examples/conduit) is [Conduit](https://github.com/gothinkster/realworld),
-the RealWorld app (a Medium clone), written in Lean. Today it is the **REST API**, and
-the same Lean code runs on **Node** (`node:sqlite`), **Cloudflare Workers** (D1) and
-**Bun** (`bun:sqlite`). Each target needs one hand-written binding module
-(`Server/NodeSqlite.lean`, `Server/D1.lean`, `Server/BunSqlite.lean`). The official
-RealWorld API suite passes unmodified on every target: 13 of 13 files and 154
-requests on Node 24, Node 26.12.1, Workers (`wrangler dev` 4.152.0, local workerd and
-D1) and Bun 1.4.4 (gothinkster/realworld `ebbcdeb8`; CI
-[conduit.yml](.github/workflows/conduit.yml), run 40523094526).
+the RealWorld app (a Medium clone), written entirely in Lean: the REST API, the
+server-rendered browser app and the proofs.
 
-- **Pure Lean core.** Validation, slugs, pagination, authorization and every
-  endpoint (`Conduit/*.lean`) contain no Lasm and no JavaScript, and `lake build`
-  checks them natively. The endpoints are written against a `Store` of functions
-  over any monad, so proofs can run the same code on a model of the tables.
-- **Server** with `Lasm.Fetch`. Passwords use PBKDF2-HMAC-SHA-256 and tokens are
-  HS256 JWTs, both through Web Crypto.
+- **117 theorems** about the code that actually runs, checked with no `sorry` and
+  only Lean's standard axioms (`npm run proofs`; [PROOFS.md](examples/conduit/PROOFS.md)
+  lists each one in plain English). They cover authorization (only authors change
+  their articles and comments), follows and favorites, slugs that never collide,
+  pagination that never skips or repeats, validation shared by client and server
+  (the app never sends what the server would reject), JSON round trips and
+  Markdown link safety. The endpoints are written against a `Store` of functions,
+  and the proofs run that same code on a model of the tables.
+- **What is trusted, not proved:** that each SQL statement does what its model
+  says, the JSON text layer, concurrency between requests, and Lean, Lasm and the
+  JavaScript runtime. Conformance to the whole RealWorld spec is tested, not
+  proved.
+- **API:** the official RealWorld API suite passes unmodified (13 of 13 files,
+  154 requests) on Node (`node:sqlite`), Cloudflare Workers (D1) and Bun
+  (`bun:sqlite`). Each target has one hand-written `@[js]` binding module.
+- **Frontend:** `Lasm.UI` on RealWorld's official templates, with server-side
+  rendering, hydration and Markdown parsed in Lean. The official Playwright
+  end-to-end suite passes with no retries on Node with Chromium, Firefox and
+  WebKit, and on Workers and Bun with Chromium.
+
+All of this runs in CI ([conduit.yml](.github/workflows/conduit.yml), run 40615274657,
+with `@lasm/cli` 0.3.4).
 
 ```sh
 cd examples/conduit
-npm install                                   # @lasm/cli and Hurl (the suite's runner)
-npm run build && npm start                    # Node: http://localhost:3000/api
+npm install                                   # @lasm/cli, Hurl and Playwright (the official suites' runners)
+npm run build && npm start                    # http://localhost:3000: the app and its API on Node
+npm run proofs                                # check all 117 theorems
+npm test                                      # the official API suite (also test:workers, test:bun)
+npx playwright install chromium && npm run test:e2e   # the official end-to-end suite
 npm run build:workers && npx wrangler dev     # Cloudflare Workers with local D1
 npm run build:bun && npm run start:bun        # Bun with bun:sqlite
-npm test                                      # the official suite (also test:workers, test:bun)
 ```
-
-**Coming** (not done yet): proofs about the endpoints (in progress) and the
-`Lasm.UI` frontend.
 
 ## 60-second start
 
@@ -250,6 +261,7 @@ theorem add_invalid (m : Model) (e : String) (h : checkTitle m.draft = .error e)
 | Your theorems (like `checkTitle_ok`, `add_invalid`) | your `.lean` files | every `lasm build`/`lasm dev` (Lean elaborates them; a broken proof is a build error); pure modules also with `lake build` |
 | `Lasm.RPC`: the handler only runs on requests that pass `validate` (`Endpoint.decodeRequest_valid`); the client never sends one that fails it (`Endpoint.call_invalid`) | [library/Lasm/RPC](library/Lasm/RPC) | compiled into Lasm's library on every build |
 | `Lasm.UI`: the DOM diff is correct against a DOM model, keyed moves included (`diff_correct`, `mount_correct`, `session_correct`) | [library/Lasm/UI/Proofs](library/Lasm/UI/Proofs) (about 1,260 lines, no `sorry`, standard axioms only) | `node scripts/ui/lean-tests.mjs` in a checkout (CI: `ui.yml`) |
+| Conduit: 117 theorems about authorization, follows, favorites, slugs, pagination, shared validation, JSON round trips and Markdown link safety | [examples/conduit/Proofs](examples/conduit/Proofs), listed in [PROOFS.md](examples/conduit/PROOFS.md) | `npm run proofs` in `examples/conduit` (no `sorry`, standard axioms only; CI `conduit.yml`) |
 | TodoMVC: every reachable model is valid | [examples/ui/todomvc/Todo.lean](examples/ui/todomvc/Todo.lean) | `lasm build`; CI `ui.yml` |
 
 Not proved, tested in CI instead: the JSON/HTTP transport between client and
@@ -575,7 +587,8 @@ edge targets and Bun/Deno ([notes](docs/release/0.2.0-notes.md)); 0.3.0 adds the
 browser, `Lasm.UI`, full-stack apps, WASI/Fastly and the editor support
 ([notes](docs/release/0.3.0-notes.md)); 0.3.1 puts the starter code under MIT-0 and
 adds bug-report pointers ([notes](docs/release/0.3.1-notes.md)); 0.3.2 fixes
-`Std.Internal.UV` sockets, timers and signals ([notes](docs/release/0.3.2-notes.md)). Lasm's npm
+`Std.Internal.UV` sockets, timers and signals ([notes](docs/release/0.3.2-notes.md)); 0.3.3 was never
+published, and its changes shipped in 0.3.4 ([notes](docs/release/0.3.4-notes.md)). Lasm's npm
 packages (`@lasm/cli`, `@lasm/create` and the `@lasm/…` tool packages) are
 published only by the [`release.yml`](.github/workflows/release.yml) workflow,
 through npm trusted publishing with provenance: no npm tokens exist. A release is a
