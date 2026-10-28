@@ -39,11 +39,38 @@ env:
   VICEROY_VERSION: v0.21.1
   VICEROY_SHA256: 54a5b46ab05ce1492f4df136728b2eb81b350cb42da5d9f2eec66558ddc1e233
 jobs:
+  # The pinned edge runtime (src/edge-runtimes.json) from its release, checked by
+  # SHA-256, instead of a rebuild: the single-threaded runtime build peaks at
+  # 4.5 GiB and the resource guard stopped it on standard runners (release-checks
+  # 40589750210). The rebuild and its comparison with the catalog run in
+  # workers.yml's edge job.
   runtime:
-    uses: ./.github/workflows/edge-runtime.yml
-    with:
-      release-check: ${{ inputs.release-check == true }}
-      caller: fullstack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            src/edge-runtimes.json
+            scripts/ci/acceptance-versions.json
+          sparse-checkout-cone-mode: false
+      - name: Fetch the pinned edge runtime (also while its release is a draft)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .work/edge-package
+          node -e "const c=require('./src/edge-runtimes.json'),v=require('./scripts/ci/acceptance-versions.json').lean,e=c.lean[v];if(!e)throw new Error('no edge runtime for Lean '+v);const {url,source,...a}=e;require('fs').writeFileSync('.work/edge-package/artifact.json',JSON.stringify(a,null,2)+'\\n');console.log(decodeURIComponent(new URL(url).pathname.split('/').at(-2)))" > .work/edge-tag
+          gh release download "$(cat .work/edge-tag)" --repo "$GITHUB_REPOSITORY" --dir .work/edge-package --pattern '*.tar.zst'
+          node -e "const f=require('fs'),c=require('crypto'),a=require('./.work/edge-package/artifact.json'),b=f.readFileSync('.work/edge-package/'+a.name);const h=c.createHash('sha256').update(b).digest('hex');if(h!==a.sha256||b.length!==a.bytes)throw new Error('edge runtime '+a.name+' is '+h+' ('+b.length+' bytes), not the cataloged '+a.sha256);console.log('pinned edge runtime',a.name,h)"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: edge-runtime-archive-fullstack
+          path: |
+            .work/edge-package/*.tar.zst
+            .work/edge-package/artifact.json
+          retention-days: 3
   native:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
