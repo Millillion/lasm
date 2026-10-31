@@ -1,0 +1,21 @@
+# Fastly Compute: npm run build:fastly writes bin/main.wasm and pkg/conduit.tar.gz.
+# Run locally with fastly compute serve (Fastly's Viceroy); deploy with
+# fastly compute deploy, after creating a KV Store and a secret store named
+# conduit (JWT_SECRET) and linking them to the service.
+manifest_version = 3
+name = "conduit"
+description = "Conduit, the RealWorld app in Lean"
+authors = []
+language = "other"
+
+[scripts]
+build = "npm run build:fastly"
+
+# Viceroy's stores (fastly compute serve): an empty KV Store, and the secret.
+[local_server]
+  [local_server.kv_stores]
+    conduit = []
+  [local_server.secret_stores]
+    [[local_server.secret_stores.conduit]]
+      key = "JWT_SECRET"
+      data = "a local development secret"

@@ -1,0 +1,31 @@
+# Conduit on AWS Lambda, .zip package (nodejs24.x), behind an API Gateway HTTP API.
+#   npm run build:lambda          (npm run build, then lasm package: lambda.zip)
+#   sam local start-api -t deploy/lambda/template.yaml --warm-containers EAGER --parameter-overrides JwtSecret=…
+#   sam deploy --guided -t deploy/lambda/template.yaml
+# The database is /tmp/conduit.db: it lasts as long as the function instance
+# (see the README).
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Conduit, the RealWorld app in Lean (.zip package)
+Parameters:
+  JwtSecret:
+    Type: String
+    NoEcho: true
+    Description: The secret that signs Conduit's tokens
+Resources:
+  Conduit:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../lambda.zip
+      Handler: lasm-lambda.handler
+      Runtime: nodejs24.x
+      Architectures: [x86_64]
+      MemorySize: 1024
+      Timeout: 30
+      Environment:
+        Variables:
+          DATABASE_PATH: /tmp/conduit.db
+          JWT_SECRET: !Ref JwtSecret
+      Events:
+        Api:
+          Type: HttpApi

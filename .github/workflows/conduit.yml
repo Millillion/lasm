@@ -18,6 +18,7 @@ name: Conduit
 #   (specs/e2e, Playwright, unmodified, fullstack mode) against the
 #   server-rendered, hydrated Lasm.UI app: Node on Chromium, Firefox and
 #   WebKit; Workers (wrangler dev, local D1) and Bun on Chromium; no retries;
+# - conduit-platforms.yml: every other platform, with its own local tooling;
 # - pinned: test/realworld is byte-identical to the upstream commit.
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
 # Free runners only.

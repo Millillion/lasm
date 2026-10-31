@@ -3,7 +3,9 @@
 Status: **methodology, 2026-10-31.** Differential testing, target equivalence and
 the test-quality audit below are implemented and run in CI; the other layers
 are marked as existing (with their workflow) or planned. The plan is issue #21
-(testing and verification half).
+(testing and verification half); the long-term strategy (second oracle,
+optimization and engine differentials, evidence levels, tier consolidation) is
+the proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 
 ## Principles
 

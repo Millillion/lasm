@@ -1,0 +1,19 @@
+# Fermyon Spin: npm run build:wasi-http writes wasi-http/main.wasm; spin up serves it.
+# Conduit keeps its data in Postgres through PostgREST (CONDUIT_STORE_URL at build
+# time, default http://127.0.0.1:3000): allow that host below.
+spin_manifest_version = 2
+
+[application]
+name = "conduit"
+version = "0.1.0"
+
+[[trigger.http]]
+route = "/..."
+component = "conduit"
+
+[component.conduit]
+source = "wasi-http/main.wasm"
+allowed_outbound_hosts = ["http://127.0.0.1:3000"]
+
+[component.conduit.build]
+command = "npm run build:wasi-http"
