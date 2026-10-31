@@ -320,10 +320,10 @@ theorem find_none {α : Type} {p : α → Bool} {l : List α} (h : l.find? p = n
   intro x hx; rw [List.find?_eq_none] at h; simpa using h x hx
 
 theorem register_effect (r : Request) (D : DB) :
-    ((register store e.svc r).run.run D).2 = D ∨ Register D ((register store e.svc r).run.run D).2 := by
+    ((register store e.svc r).run.run D).2 = D ∨ Register e D ((register store e.svc r).run.run D).2 := by
   unfold register
-  refine with_body r _ _ _ D (fun D' => D' = D ∨ Register D D') (Or.inl rfl) fun b => ?_
-  refine with_liftE _ _ D (fun D' => D' = D ∨ Register D D') (Or.inl rfl) fun v _ => ?_
+  refine with_body r _ _ _ D (fun D' => D' = D ∨ Register e D D') (Or.inl rfl) fun b => ?_
+  refine with_liftE _ _ D (fun D' => D' = D ∨ Register e D D') (Or.inl rfl) fun v _ => ?_
   cases hu : D.users.find? (·.username == v.val.username) with
   | some _ => rw [read_bind (x := store.userByUsername _) (fun _ => rfl) hu]; left; rfl
   | none =>
@@ -335,7 +335,7 @@ theorem register_effect (r : Request) (D : DB) :
   rw [read_bind (x := store.userByEmail _) (fun _ => rfl) he]
   simp only [Option.isSome_none, Bool.false_eq_true, ↓reduceIte]
   right
-  refine ⟨v.val.username, v.val.email, e.hash v.val.password, fun u hu' => ⟨?_, ?_⟩, rfl⟩
+  refine ⟨v.val.username, v.val.email, v.val.password, fun u hu' => ⟨?_, ?_⟩, rfl⟩
   · have := find_none hu u hu'; simpa using this
   · have := find_none he u hu'; simpa using this
 
@@ -354,7 +354,7 @@ theorem handle_writes : Spec.handle_writes := by
   rw [handle_state]
   have hro : ∀ {α : Type} {x : M S α}, RO x → (x.run.run D).2 = D := fun h => h.state D
   have eff : ∀ {α : Type} {x : M S α}, Eff e r D ((x.run.run D).2) →
-      (x.run.run D).2 = D ∨ (r.method = "POST" ∧ r.path = ["users"] ∧ Register D (x.run.run D).2) ∨
+      (x.run.run D).2 = D ∨ (r.method = "POST" ∧ r.path = ["users"] ∧ Register e D (x.run.run D).2) ∨
       ∃ me tok, LoggedIn e D r me tok ∧ Write me D (x.run.run D).2 := by
     intro _ _ h; rcases h with h | h
     · exact Or.inl h

@@ -317,4 +317,7 @@ theorem articlesOk_preserved : Spec.articlesOk_preserved := by
         · exact h4 s hs
         · exact hres
 
+theorem replies_hide_password : Spec.replies_hide_password :=
+  ⟨fun u tok => by cases u.bio <;> cases u.image <;> rfl, fun u f => by cases u.bio <;> cases u.image <;> rfl⟩
+
 end Conduit.Proofs

@@ -114,7 +114,7 @@ is listed at the end of PROOFS.md.
 | S9 | **Client and server agree on validation**: the app never sends a body the server would reject, and the server reads back exactly what the app validated | `Spec.update_sends_accepted`, `Spec.validate_again`, `Spec.requests_roundtrip` | proved |
 | S10 | Pagination covers every article once | `Spec.pages_cover`, `Spec.pagination_links` | proved |
 | S11 | JSON round trips | `Spec.responses_roundtrip`, `Spec.requests_roundtrip`, `Spec.error_roundtrip` | proved |
-| S12 | Passwords are stored hashed, never in clear; replies never include the hash | `Api.register` stores `svc.hashPassword`; `userOf` has no password field | not proved (reading the code; a proposition about `Register`'s hash is a planned addition) |
+| S12 | Passwords are stored hashed, never in clear; replies never include the hash | `Spec.handle_writes` (`Register`: the stored value is `hash password`), `Spec.replies_hide_password` | proved |
 | S13 | Concurrency (two requests at once) | the database's `UNIQUE` and `PRIMARY KEY` constraints | out of scope: the propositions are about one request at a time |
 | S14 | Token and password cryptography (PBKDF2, HMAC-SHA-256 tokens, expiry) | Web Crypto (`Server/Crypto.lean`); `Env` is arbitrary in every proposition | out of scope: cryptographic security is not a functional property |
 
@@ -163,8 +163,8 @@ the proofs do not model.
 <!-- Kept by hand; `npm run proofs` checks only the proposition names. -->
 - API (section 1): 43 requirements: 34 proved (wholly, or for the part a
   proposition can reach, the rest tested), 9 tested only, none out of scope.
-- Implicit safety (section 2): 14 properties: 10 proved, 1 tested only, 1 not
-  proved yet (S12), 2 out of scope.
+- Implicit safety (section 2): 14 properties: 11 proved, 1 tested only, 2 out
+  of scope.
 - Browser app (section 3): 16 requirements: 9 proved, 7 tested only.
 - Layout (section 4): 8 properties: 5 proved, 2 gaps, 1 out of scope.
 
@@ -220,7 +220,7 @@ lifted from a helper to the endpoint or page that uses it); 6 were weak or
 trivial (the five `…_ok`, whose hypothesis was unused, and `nullable_empty`)
 and are replaced by exact characterisations; 4 were removed (three
 contentless `rfl` unfoldings of the model, `store_*`, and the redundant
-`window_consecutive`). The 49 propositions of `Proofs/Spec.lean` also add
+`window_consecutive`). The 50 propositions of `Proofs/Spec.lean` also add
 what the previous set did not cover: the write set of every endpoint
 (`Spec.handle_writes`), reads never writing, the token check first, data
 integrity across all requests, the browser app's state invariants, the

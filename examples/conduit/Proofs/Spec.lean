@@ -66,10 +66,11 @@ inductive Write (me : UserRow) (D : DB) : DB → Prop
   /-- `DELETE /articles/:slug/comments/:id`: one of my comments. -/
   | deleteComment (c : CommentRow) : c ∈ D.comments → c.author = me.id → Write me D (D.removeComment c.id)
 
-/-- `POST /users`: a new user whose username and email no user has. -/
-def Register (D D' : DB) : Prop :=
-  ∃ username email hash, (∀ u ∈ D.users, u.username ≠ username ∧ u.email ≠ email) ∧
-    D' = D.addUser username email hash
+/-- `POST /users`: a new user whose username and email no user has, with the
+hash of their password (never the password itself). -/
+def Register (e : Env) (D D' : DB) : Prop :=
+  ∃ username email password, (∀ u ∈ D.users, u.username ≠ username ∧ u.email ≠ email) ∧
+    D' = D.addUser username email (e.hash password)
 
 /-- No user follows themselves. -/
 def NoSelfFollow (D : DB) : Prop := ∀ p ∈ D.follows, p.1 ≠ p.2
@@ -352,7 +353,7 @@ or comes from a logged-in user `me` and makes one change `me` may make
 comments). -/
 def handle_writes : Prop :=
   ∀ (e : Env) (r : Request) (D : DB),
-    after e r D = D ∨ (r.method = "POST" ∧ r.path = ["users"] ∧ Register D (after e r D)) ∨
+    after e r D = D ∨ (r.method = "POST" ∧ r.path = ["users"] ∧ Register e D (after e r D)) ∨
     ∃ me tok, LoggedIn e D r me tok ∧ Write me D (after e r D)
 
 /-- **Reads never write**: every `GET` request, and every login, leaves the
@@ -368,6 +369,13 @@ or user that does not exist). -/
 def protected_needs_token : Prop :=
   ∀ (e : Env) (r : Request) (D : DB), r.authorization = none → Protected r.method r.path →
     run e r D = (Reply.error (.unauthorized "is missing"), D)
+
+/-- **Password hashes never leave the server**: the user and profile objects
+the API sends have no `password` field (the stored value is a hash, see
+`Register`). -/
+def replies_hide_password : Prop :=
+  (∀ (u : UserRow) (tok : String), Decode.get? (userOf u tok).encode "password" = none) ∧
+  (∀ (u : UserRow) (f : Bool), Decode.get? (profileOf u f).encode "password" = none)
 
 /-- **Nobody else's data changes** *(consequence)*: after any request from
 `me` (or from nobody), other users' rows, articles, follows and favorites,
