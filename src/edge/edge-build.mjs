@@ -156,8 +156,17 @@ ${moduleImports(modules, './_lasm/lasm/')}
 export const config = { runtime: 'edge' };
 ${moduleMap(modules)}
 ${lazyStart('wasmModule', "Object.fromEntries(Object.entries(globalThis.process?.env ?? {}).filter(([, value]) => typeof value === 'string'))")}
+// Vercel's edge runtime drops a response's Content-Encoding (Vercel compresses
+// responses itself), so the handler must not see Accept-Encoding: otherwise
+// Lasm.Fetch.Assets would answer with Brotli bytes labelled as plain ones.
+const identity = request => {
+  if (!request.headers.has('accept-encoding')) return request;
+  const headers = new Headers(request.headers);
+  headers.delete('accept-encoding');
+  return new Request(request, { headers });
+};
 export default async function lasm(request, context) {
-  return respond(await ready(), request, globalThis.process?.env ?? {}, context);
+  return respond(await ready(), identity(request), globalThis.process?.env ?? {}, context);
 }
 `;
 }
