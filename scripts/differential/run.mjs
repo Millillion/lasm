@@ -100,6 +100,23 @@ function normalize(r) {
   const stderr = r.stderr.replace(/\r\n/g, '\n').split('\n').filter(l => !/^\S+\(\+0x[0-9a-f]+\) \[0x[0-9a-f]+\]$/.test(l)).join('\n');
   return { stdout: r.stdout.replace(/\r\n/g, '\n'), stderr, code: r.timedOut ? 'timeout' : r.signal ? `signal ${r.signal}` : r.code };
 }
+// Known divergences with an open issue: applied to a target's output before the
+// comparison and counted in the summary, so they are visible without failing
+// every run. Remove an entry when its issue is fixed.
+const KNOWN = [
+  { issue: 'https://github.com/Millillion/lasm/issues/26', targets: ['deno'],
+    what: 'edge profile prints panic backtraces despite LEAN_BACKTRACE=0',
+    apply: r => ({ ...r, stderr: r.stderr.replace(/^backtrace:\n(?: {4}at .*\n?)*/gm, '') }) },
+];
+const knownApplied = {};
+function applyKnown(target, r) {
+  for (const k of KNOWN) if (k.targets.includes(target)) {
+    const next = k.apply(r);
+    if (next.stderr !== r.stderr || next.stdout !== r.stdout) knownApplied[k.issue] = (knownApplied[k.issue] ?? 0) + 1;
+    r = next;
+  }
+  return r;
+}
 async function runIn(projectDir, cmdArgs, label) {
   const runDir = join(projectDir, `run-${label}`);
   rmSync(runDir, { recursive: true, force: true }); mkdirSync(runDir);
@@ -107,7 +124,7 @@ async function runIn(projectDir, cmdArgs, label) {
   return { ...normalize(r), ms: r.ms };
 }
 const runNative = dir => runIn(dir, [join(dir, 'main'), []], 'native');
-const runTarget = (dir, target) => runIn(dir, TARGETS[target].run(dir), target);
+const runTarget = async (dir, target) => applyKnown(target, await runIn(dir, TARGETS[target].run(dir), target));
 
 // Output lines grouped by the case that printed them: stdout lines start with
 // the case id ("cN ...", "cNvM ...", "r_name ..."); stderr has an "@id" marker
@@ -306,6 +323,7 @@ try {
 }
 summary.finished = new Date().toISOString();
 summary.buildMs = Object.fromEntries(builtTargets);
+summary.knownDivergences = KNOWN.map(k => ({ issue: k.issue, targets: k.targets, what: k.what, applied: knownApplied[k.issue] ?? 0 }));
 save();
 const realDivergences = summary.divergences.length;
 console.log(`\n${summary.programs.length} programs, ${summary.programs.reduce((s, p) => s + p.cases, 0)} cases, ${realDivergences} divergences, ${summary.harnessErrors.length} harness errors (summary: ${summaryFile})`);
