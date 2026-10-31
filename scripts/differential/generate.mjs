@@ -112,7 +112,7 @@ function stringExpr(s) {
 // ---------- types and operations ----------
 // An op: { t: result type, args: [arg types], r: (...rendered) => string, w: weight,
 //          lit?: r => string (a leaf), bind?: { t, body } (a lambda with one variable),
-//          inexact?: true (libm-dependent result; the value is printed, not its bits) }
+//          inexact?: true (libm-dependent result: rounded by `approx`, never used for bits) }
 export const TYPES = ['Nat', 'Int', 'UInt8', 'UInt16', 'UInt32', 'UInt64', 'Bool', 'Float', 'String', 'Char',
   'ListNat', 'ArrayInt', 'OptNat', 'Tree', 'Pt', 'ListString'];
 export const LEAN_TYPE = { ListNat: 'List Nat', ArrayInt: 'Array Int', OptNat: 'Option Nat', ListString: 'List String' };
@@ -421,7 +421,11 @@ export function renderExpr(e) {
   const k = e.k.map(renderExpr);
   // Every result is ascribed its type, so Lean never infers an operation's
   // type from the context it appears in (Nat-valued folds inside Int sums).
-  return `(${o.bind ? o.rb(k[0], e.x, k[1]) : o.r(...k)} : ${lt(o.t)})`;
+  const out = `(${o.bind ? o.rb(k[0], e.x, k[1]) : o.r(...k)} : ${lt(o.t)})`;
+  // libm functions (sin, pow, …) are not correctly rounded and differ in the last
+  // bits between glibc (the oracle) and musl (Emscripten): their results are kept
+  // to 9 significant digits (campaign 41241443151: pow differed in digit 17).
+  return o.inexact ? `(approx ${out})` : out;
 }
 export function exprSize(e) { return e.var || e.v !== undefined ? 1 : 1 + e.k.reduce((s, c) => s + exprSize(c), 0); }
 export function exprType(e) { return e.var ? e.t : ops[e.op].t; }
@@ -651,6 +655,14 @@ def wordCount (xs : List String) : Nat :=
 def stCount (n : Nat) : IO Nat := do
   let ((), s) ← (StateT.run (do for i in [0:(n % 20)] do modify (· + i)) 0 : IO (Unit × Nat))
   return s
+/-- A libm result to 9 significant digits (only exact operations after the
+`log10`, whose floor alone is used). -/
+def approx (x : Float) : Float :=
+  if x.isNaN || x.isInf || x == 0 then x else
+  let k := (Float.log10 x.abs).floor
+  let shift : Int := 8 - (if k.isNaN || k.isInf then 0 else k.toInt64.toInt)
+  let scale := if shift ≥ 0 then Float.ofScientific 1 false shift.toNat else Float.ofScientific 1 true (-shift).toNat
+  (x * scale).round / scale
 def deepSum : Nat → Nat | 0 => 0 | n + 1 => (n + 1) + deepSum n
 abbrev EmitM := StateT Nat (ExceptT String (StateM (Array String)))
 def emit (s : String) : EmitM Unit := (modify (·.push s) : StateM (Array String) Unit)

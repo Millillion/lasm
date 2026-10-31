@@ -17,7 +17,7 @@
 // The tools are the managed link toolchain's (clang, wasm-ld, llvm-nm,
 // wasm-opt): no Emscripten SDK, Python or WASI SDK.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
@@ -86,7 +86,13 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
   const rsp = readResponse(join(linkWork, 'link.rsp'));
   const nm = file => execFileSync(tool('llvm-nm'), ['--defined-only', '--just-symbol-name', file],
     { encoding: 'utf8', maxBuffer: 64 << 20, windowsHide: true });
-  const inputs = rsp.filter(arg => arg.endsWith('.o') || arg.startsWith('-Wl,--wrap='))
+  // A seeded dev link (src/application-link.mjs) also lists the lookup marker
+  // reachability.o and the Node runtime's archive members
+  // (application-live-members.mjs, *.lasm-member.o) in place of its archives:
+  // the WASI link uses the edge runtime's archives instead, so both are dropped,
+  // as in src/edge/edge-link.mjs. Kept, a Node dev build followed by
+  // `lasm build --target wasi --dev` failed with duplicate host symbols.
+  const inputs = rsp.filter(arg => arg.endsWith('.o') && basename(arg) !== 'reachability.o' && !arg.endsWith('.lasm-member.o') || arg.startsWith('-Wl,--wrap='))
     .filter(arg => !(arg.endsWith('.o') && /^(?:lasm_js_available|lasm_fetch_platform)$/m.test(nm(arg))))
     .map(arg => arg.startsWith('-Wl,') ? arg.slice(4) : arg);
   const archive = name => edge.libraries[`lib${name}.a`] ?? join(nodeRuntime.directory, 'lib', `lib${name}.a`);

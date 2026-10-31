@@ -159,6 +159,15 @@ jobs:
             --seed "$SEED" $AMOUNT --cases 150 --fs-cases 25 --targets node,wasi,wasi-node,deno \
             --profile "${{ matrix.profile }}" --regressions test/differential/regressions \
             --wasmtime "$RUNNER_TEMP/tools/wasmtime/wasmtime" --deno "$RUNNER_TEMP/tools/node_modules/.bin/deno" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
+      # The regression corpus in the dev profile too (node, then the other targets,
+      # in one project: how a Node dev build followed by a WASI dev build failed).
+      - name: Regressions in the dev profile
+        if: matrix.profile == 'release'
+        run: |
+          node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest-dev" \
+            --programs 0 --targets node,wasi,wasi-node,deno --profile dev --regressions test/differential/regressions \
+            --wasmtime "$RUNNER_TEMP/tools/wasmtime/wasmtime" --deno "$RUNNER_TEMP/tools/node_modules/.bin/deno"
       - name: Summary
         if: always()
         run: |
