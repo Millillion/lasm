@@ -1,13 +1,15 @@
 // Vercel Edge with no account (Phase 7.3): `vercel build` offline (a local
-// .vercel/project.json stands in for `vercel link`) must emit the function as an
-// edge function with every Lasm file traced; then the built function, bundled
-// with esbuild (Vercel bundles edge functions at deployment, which cannot run
+// .vercel/project.json stands in for `vercel link`), from a tree without the
+// generated function (vercel.json's build command writes it), must emit the
+// function as an edge function with every Lasm file; then the built function,
+// copied out of the project (so only its own files resolve) and bundled with
+// esbuild (Vercel bundles edge functions at deployment, which cannot run
 // locally), runs in Vercel's open-source edge runtime (the `edge-runtime`
 // package, which `next dev` uses for edge code), where every route is checked.
 // `vercel dev` needs a login and is not used. JSPI comes from the host Node.
 //   node vercel-edge-check.mjs TOOLS_DIR PROJECT hono|pure RESULT.json
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, statSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createRequire } from 'node:module';
@@ -32,11 +34,14 @@ check('vercel build: an edge function', config.runtime === 'edge' && config.entr
 for (const file of ['api/lasm.mjs', 'api/_lasm/lasm/program.wasm', 'api/_lasm/lasm/program.mjs', 'api/_lasm/lasm/edge-start.mjs', 'api/_lasm/lasm/edge-host.mjs', 'api/_lasm/lasm/edge-js.mjs'])
   check(`vercel build traced ${file}`, existsSync(join(func, file)));
 
-// Bundle as Vercel would (one script; .wasm?module becomes a WebAssembly.Module).
+// Bundle as Vercel would (one script; .wasm?module becomes a WebAssembly.Module),
+// from a copy of the function alone: its imports must resolve within it.
 const esbuild = require('esbuild');
 const wasmFiles = [];
-const bundle = await esbuild.build({ entryPoints: [join(func, 'api/lasm.mjs')], bundle: true, write: false, format: 'iife', globalName: 'lasmFunction',
-  platform: 'browser', target: 'es2022', nodePaths: [join(project, 'node_modules')], logLevel: 'silent',
+const alone = join(mkdtempSync(join(tmpdir(), 'lasm-vercel-func-')), 'lasm.func');
+cpSync(func, alone, { recursive: true });
+const bundle = await esbuild.build({ entryPoints: [join(alone, 'api/lasm.mjs')], bundle: true, write: false, format: 'iife', globalName: 'lasmFunction',
+  platform: 'browser', target: 'es2022', logLevel: 'silent',
   plugins: [{ name: 'wasm-module', setup(build) {
     build.onResolve({ filter: /\.wasm\?module$/ }, args => ({ path: resolve(args.resolveDir, args.path.replace(/\?module$/, '')), namespace: 'wasm' }));
     build.onLoad({ filter: /.*/, namespace: 'wasm' }, args => { wasmFiles.push(args.path); return { contents: `export default globalThis.__lasmWasm[${wasmFiles.length - 1}];`, loader: 'js' }; });

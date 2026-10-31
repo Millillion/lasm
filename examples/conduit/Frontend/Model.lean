@@ -175,20 +175,6 @@ def succeeded (r : Answer) : Bool :=
 
 /-! ## Flags: the data the server rendered the first page with -/
 
-/-- The page data the server puts in the flags. -/
-def Model.flags (m : Model) : Json :=
-  let entry {α : Type} (k : String) (r : Remote α) (enc : α → Json) : List (String × Json) :=
-    match r with
-    | .ready a => [(k, enc a)]
-    | _ => []
-  Json.mkObj (entry "articles" m.articles ArticleList.encode ++
-    entry "tags" m.tags Json'.strs ++
-    entry "article" m.article Article.encode ++
-    entry "comments" m.comments (fun cs => .arr (cs.map Comment.encode).toArray) ++
-    entry "profile" m.profile Profile.encode ++
-    (if m.form.loaded then [("form", Json.mkObj [("title", .str m.form.title), ("description", .str m.form.description),
-      ("body", .str m.form.body), ("tags", Json'.strs m.form.tags)])] else []))
-
 def decodeComments (j : Json) : Except String (List Comment) :=
   match j with
   | .arr a => a.toList.mapM Comment.decode
@@ -207,5 +193,10 @@ def Model.ofFlags (route : Route) (flags : Json) : Model :=
   { route, articles := get "articles" ArticleList.decode, tags := get "tags" (Decode.strList "tags"),
     article := get "article" Article.decode, comments := get "comments" decodeComments,
     profile := get "profile" Profile.decode, form, stale := true }
+
+/-- The browser app's first model: the server's (`Model.ofFlags`), plus where
+to go after signing in (`?next=`), which the page does not show. -/
+def Model.init (route : Route) (flags : Json) (next : Option String) : Model :=
+  { Model.ofFlags route flags with next }
 
 end Conduit.Frontend

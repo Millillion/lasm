@@ -6,6 +6,7 @@ with the same functions; so the two sides agree on every field, including
 `null` versus absent (`bio`, `image`, update fields) and lists without a body.
 -/
 import Conduit.Types
+import Proofs.Spec
 
 namespace Conduit.Proofs
 open Lean
@@ -109,5 +110,14 @@ theorem ApiError.decode_encode_one (s : Nat) (k : String) (msgs : List String) :
   show (do let errors ← ([(k, Json'.strs msgs)]).mapM (fun (x : String × Json) => do return (x.1, ← Decode.strList x.1 x.2))
            return ({ status := s, errors } : ApiError)) = _
   simp [strList_strs]; rfl
+
+theorem responses_roundtrip : Spec.responses_roundtrip :=
+  ⟨User.decode_encode, Profile.decode_encode, Article.decode_encode, Comment.decode_encode, ArticleList.decode_encode⟩
+
+theorem requests_roundtrip : Spec.requests_roundtrip :=
+  ⟨LoginUser.decode_encode, NewUser.decode_encode, UpdateUser.decode_encode, NewArticle.decode_encode,
+   UpdateArticle.decode_encode, NewComment.decode_encode⟩
+
+theorem error_roundtrip : Spec.error_roundtrip := ApiError.decode_encode_one
 
 end Conduit.Proofs

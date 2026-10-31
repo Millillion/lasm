@@ -10,8 +10,8 @@ npm create @lasm@latest my-app -- --template hono
 cd my-app && npm install && npm run dev
 ```
 
-The flagship example, [Conduit](#flagship-example-conduit-with-117-proved-theorems),
-is the RealWorld app written entirely in Lean, with 117 proved theorems. It passes
+The flagship example, [Conduit](#flagship-example-conduit-with-294-proved-theorems),
+is the RealWorld app written entirely in Lean, with 294 proved theorems. It passes
 RealWorld's official API and browser test suites on Node, Workers and Bun.
 
 If Lasm is useful to you, I'd appreciate your [sponsorship](https://github.com/sponsors/lastmjs) ([more below](#support-lasm)).
@@ -79,13 +79,13 @@ files, except on WASI); the rest of Lean works.
 Every example has a README with a one-command run; [examples/README.md](examples/README.md)
 lists them all.
 
-## Flagship example: Conduit, with 117 proved theorems
+## Flagship example: Conduit, with 294 proved theorems
 
 [examples/conduit](examples/conduit) is [Conduit](https://github.com/gothinkster/realworld),
 the RealWorld app (a Medium clone), written entirely in Lean: the REST API, the
 server-rendered browser app and the proofs.
 
-- **117 theorems** about the code that actually runs, checked with no `sorry` and
+- **294 theorems** about the code that actually runs, checked with no `sorry` and
   only Lean's standard axioms (`npm run proofs`; [PROOFS.md](examples/conduit/PROOFS.md)
   lists each one in plain English). They cover authorization (only authors change
   their articles and comments), follows and favorites, slugs that never collide,
@@ -112,7 +112,7 @@ with `@lasm/cli` 0.3.4).
 cd examples/conduit
 npm install                                   # @lasm/cli, Hurl and Playwright (the official suites' runners)
 npm run build && npm start                    # http://localhost:3000: the app and its API on Node
-npm run proofs                                # check all 117 theorems
+npm run proofs                                # check all 294 theorems
 npm test                                      # the official API suite (also test:workers, test:bun)
 npx playwright install chromium && npm run test:e2e   # the official end-to-end suite
 npm run build:workers && npx wrangler dev     # Cloudflare Workers with local D1
@@ -258,7 +258,7 @@ theorem add_invalid (m : Model) (e : String) (h : checkTitle m.draft = .error e)
 | Your theorems (like `checkTitle_ok`, `add_invalid`) | your `.lean` files | every `lasm build`/`lasm dev` (Lean elaborates them; a broken proof is a build error); pure modules also with `lake build` |
 | `Lasm.RPC`: the handler only runs on requests that pass `validate` (`Endpoint.decodeRequest_valid`); the client never sends one that fails it (`Endpoint.call_invalid`) | [library/Lasm/RPC](library/Lasm/RPC) | compiled into Lasm's library on every build |
 | `Lasm.UI`: the DOM diff is correct against a DOM model, keyed moves included (`diff_correct`, `mount_correct`, `session_correct`) | [library/Lasm/UI/Proofs](library/Lasm/UI/Proofs) (about 1,260 lines, no `sorry`, standard axioms only) | `node scripts/ui/lean-tests.mjs` in a checkout (CI: `ui.yml`) |
-| Conduit: 117 theorems about authorization, follows, favorites, slugs, pagination, shared validation, JSON round trips and Markdown link safety | [examples/conduit/Proofs](examples/conduit/Proofs), listed in [PROOFS.md](examples/conduit/PROOFS.md) | `npm run proofs` in `examples/conduit` (no `sorry`, standard axioms only; CI `conduit.yml`) |
+| Conduit: 294 theorems about authorization, follows, favorites, slugs, pagination, shared validation, JSON round trips and Markdown link safety | [examples/conduit/Proofs](examples/conduit/Proofs), listed in [PROOFS.md](examples/conduit/PROOFS.md) | `npm run proofs` in `examples/conduit` (no `sorry`, standard axioms only; CI `conduit.yml`) |
 | TodoMVC: every reachable model is valid | [examples/ui/todomvc/Todo.lean](examples/ui/todomvc/Todo.lean) | `lasm build`; CI `ui.yml` |
 
 Not proved, tested in CI instead: the JSON/HTTP transport between client and

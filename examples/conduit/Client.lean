@@ -53,8 +53,7 @@ def update' (msg : Msg) (m : Model) : Model × Cmd Msg :=
 
 def app : App Json Model Msg where
   init flags url :=
-    let m := Model.ofFlags (Route.parse url.segments url.params) flags
-    ({ m with next := url.param? "next" },
+    (Model.init (Route.parse url.segments url.params) flags (url.param? "next"),
      Cmd.batch [Cmd.send .hydrated, Cmd.storageGet "jwtToken" .tokenLoaded])
   update := update'
   view := view
