@@ -108,8 +108,9 @@ server-rendered browser app and the proofs.
   end-to-end suite passes with no retries on Node with Chromium, Firefox and
   WebKit, and on every other platform with Chromium.
 
-All of this runs in CI ([conduit.yml](.github/workflows/conduit.yml), run 40615274657,
-with `@lasm/cli` 0.3.4).
+All of this runs in CI ([conduit.yml](.github/workflows/conduit.yml) and
+[conduit-platforms.yml](.github/workflows/conduit-platforms.yml), runs 41237971322
+and 41237971361, with `@lasm/cli` 0.3.5).
 
 ```sh
 cd examples/conduit
