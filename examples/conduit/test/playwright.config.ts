@@ -6,14 +6,17 @@
 //
 //   npm run test:e2e                                  # Chromium against the Node build
 //   BROWSERS=chromium,firefox,webkit npm run test:e2e
-//   E2E_SERVER="npx wrangler dev --port 4100 --ip 127.0.0.1" npm run test:e2e
+//   E2E_PLATFORM=deno npm run test:e2e                 # any platform of test/platforms.mjs
+//   E2E_SERVER="bun bun/main.mjs" npm run test:e2e      # any other server command (PORT, HOST)
 import { defineConfig, devices } from '@playwright/test';
 import { baseConfig } from './realworld/specs/e2e/playwright.base';
+import { baseUrl } from './platforms.mjs';
 
 // The suite's mode (read by specs/e2e/helpers/config.ts in every worker).
 process.env.TEST_MODE ??= 'fullstack';
 
 const port = Number(process.env.E2E_PORT ?? 4100);
+const base = baseUrl(process.env.E2E_PLATFORM ?? 'node', port);
 const browsers = (process.env.BROWSERS ?? 'chromium').split(',').map(b => b.trim()).filter(Boolean);
 const device: Record<string, string> = { chromium: 'Desktop Chrome', firefox: 'Desktop Firefox', webkit: 'Desktop Safari' };
 
@@ -22,14 +25,16 @@ export default defineConfig({
   testDir: './realworld/specs/e2e',
   outputDir: '../test-results/e2e-output',
   reporter: [['list'], ['json', { outputFile: `../test-results/e2e-${process.env.E2E_NAME ?? browsers.join('-')}.json` }]],
-  use: { ...baseConfig.use, baseURL: `http://127.0.0.1:${port}` },
+  use: { ...baseConfig.use, baseURL: base },
   webServer: {
     command: process.env.E2E_SERVER ?? `node test/e2e-server.mjs`,
     cwd: '..',
-    url: `http://127.0.0.1:${port}/api/tags`,
+    url: `${base}/api/tags`,
     env: { PORT: String(port), HOST: '127.0.0.1' },
     reuseExistingServer: false,
-    timeout: 180_000,
+    // SIGTERM first, so test/e2e-server.mjs removes the platform's containers.
+    gracefulShutdown: { signal: 'SIGTERM', timeout: 60_000 },
+    timeout: 600_000,
     stdout: 'ignore',
     stderr: 'pipe',
   },

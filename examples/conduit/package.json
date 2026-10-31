@@ -16,6 +16,22 @@
     "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
     "start:bun": "bun bun/main.mjs",
     "test:bun": "node test/api.mjs --name bun --command \"bun bun/main.mjs\"",
+    "build:deno": "npm run build:client && lasm build ServerNode.lean --target deno --output dist/server",
+    "start:deno": "deno run -A deno/main.mjs",
+    "build:deno-deploy": "npm run build:client && lasm build ServerEdge.lean --target deno-deploy --output dist/edge",
+    "build:vercel-edge": "npm run build:client && lasm build ServerVercelEdge.lean --target vercel-edge --output dist/edge",
+    "build:netlify-edge": "npm run build:client && lasm build ServerNetlifyEdge.lean --target netlify-edge --output dist/edge",
+    "build:supabase-edge": "npm run build:client && lasm build ServerSupabase.lean --target supabase-edge --output dist/edge",
+    "build:fastly": "npm run build:client && lasm build ServerFastly.lean --target fastly --output dist/wasm",
+    "build:wasi-http": "npm run build:client && lasm build ServerWasiHttp.lean --target wasi-http --output dist/wasm",
+    "build:docker": "npm run build && docker build -t conduit .",
+    "build:lambda": "npm run build && lasm package dist/server --target lambda",
+    "build:lambda-image": "npm run build && docker build -f deploy/lambda-image/Dockerfile -t conduit-lambda:local .",
+    "build:vercel": "npm run build && lasm package dist/server --target vercel",
+    "build:netlify": "npm run build && lasm package dist/server --target netlify",
+    "build:azure": "npm run build && node deploy/package-hosted.mjs azure",
+    "build:gcf": "npm run build && node deploy/package-hosted.mjs gcf",
+    "test:platform": "node test/api.mjs --platform",
     "proofs": "node test/proofs.mjs",
     "proofs:paranoid": "node test/paranoid.mjs",
     "test:e2e": "playwright test -c test/playwright.config.ts"
@@ -24,7 +40,8 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.3.4",
+    "@lasm/cli": "0.3.5",
+    "@netlify/blobs": "11.1.7",
     "@orangeopensource/hurl": "8.0.4",
     "@playwright/test": "1.63.0"
   }

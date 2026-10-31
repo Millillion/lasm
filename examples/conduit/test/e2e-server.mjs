@@ -1,17 +1,14 @@
-// The Node server on a fresh, temporary database, for the end-to-end suite
-// (test/playwright.config.ts starts it; PORT and HOST come from there).
-import { spawn } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+// The server for the end-to-end suite (test/playwright.config.ts starts it;
+// PORT and HOST come from there): the platform E2E_PLATFORM of
+// test/platforms.mjs (default node, the Node build), on a fresh database,
+// served by the platform's own local tooling. It stays in Playwright's
+// process group, so Playwright's stop reaches every process; on SIGTERM it
+// also runs the platform's clean-up (containers).
+import { startServer } from './platforms.mjs';
 
-const root = fileURLToPath(new URL('..', import.meta.url));
-const work = mkdtempSync(join(tmpdir(), 'conduit-e2e-'));
-const server = spawn(process.execPath, [join(root, 'dist/server/main.mjs')], {
-  stdio: 'inherit', env: { ...process.env, DATABASE_PATH: join(work, 'conduit.db') },
-});
-const stop = () => server.kill('SIGTERM');
-process.on('SIGTERM', stop);
-process.on('SIGINT', stop);
-server.on('exit', code => { rmSync(work, { recursive: true, force: true }); process.exit(code ?? 0); });
+const name = process.env.E2E_PLATFORM ?? 'node';
+const { child, stop } = startServer(name, Number(process.env.PORT ?? 4100), { stdio: ['ignore', 'ignore', 'inherit'], detached: false });
+const end = code => { stop(); process.exit(code ?? 0); };
+process.on('SIGTERM', () => end(0));
+process.on('SIGINT', () => end(0));
+child.on('exit', code => end(code));

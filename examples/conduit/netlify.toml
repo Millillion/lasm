@@ -1,0 +1,12 @@
+# Netlify Functions: Netlify runs the build (npm run build:netlify), which
+# writes a v2 function serving every path from the Lean server
+# (netlify/functions/lasm). Netlify's CDN serves the browser app's files.
+# Locally: netlify build --offline, then netlify dev --offline.
+[build]
+  command = "npm run build:netlify"
+  publish = "dist/public"
+
+[functions]
+  directory = "netlify/functions"
+  # The function loads program.wasm, host/** and native pieces at run time.
+  included_files = ["netlify/functions/lasm/**"]
