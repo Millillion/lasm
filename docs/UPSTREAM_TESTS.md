@@ -1,5 +1,19 @@
 # Testing against Lean itself
 
+> **Historical (Lean 4.32.0, superseded).** This page describes the 2026-09
+> research harness on Lean 4.32.0 (`scripts/upstream-tests.mjs`, its inventories
+> and API audits). Current Lasm pins **Lean 4.35.0** and tests the upstream suite
+> through the application pipeline (the installed package, not the compiler in Wasm):
+> - the current baseline and harnesses: [UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)
+>   (4.35.0 inventory: 4,219 registrations) and [SERVER_MVP.md](SERVER_MVP.md);
+> - the 0.1.0 gate's results on all five targets (runtime adapter, eval-io,
+>   compiled applications, projects; 0 regressions against Phase 3):
+>   [release/0.1.0-gate.md](release/0.1.0-gate.md#upstream-runtime-capable-suite-language-coverage-baselineyml);
+> - the language coverage workflows: [LANGUAGE_COVERAGE.md](LANGUAGE_COVERAGE.md);
+> - how this fits with Lasm's other test layers: [TESTING.md](TESTING.md).
+>
+> The 4.32.0 text is kept unchanged below as a record.
+
 Lasm uses Lean 4.32.0, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`. The source downloaded by
 `npm run setup` includes Lean's own [test suite](https://github.com/leanprover/lean4/tree/v4.32.0/tests).

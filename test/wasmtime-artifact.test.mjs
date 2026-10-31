@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { readWasmtimeArtifact, hashWasmtimeFile, wasmtimeHostFiles, wasmtimeCpuTarget } from '../src/wasmtime-artifact.mjs';
 import { applicationHostFiles } from '../src/application-output.mjs';
+import { isolatedImportFailures } from './helpers/isolated-import.mjs';
 
 async function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'lasm-native-cache-'));
@@ -72,12 +73,9 @@ test('native-inferred and mismatched CPU caches cannot claim baseline deployment
   await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), /native platform/);
 });
 
+// Behavioural (docs/TESTING.md#test-quality-audit): a standalone deployment's
+// host files alone, outside the checkout, loaded by Node's module loader.
 test('standalone deployment carries every local JavaScript dependency', () => {
-  const names = new Set([...applicationHostFiles, ...wasmtimeHostFiles]);
-  for (const name of wasmtimeHostFiles) {
-    const source = readFileSync(new URL('../src/' + name, import.meta.url), 'utf8');
-    assert.doesNotMatch(source, /from ['"]\.\.\//, name + ' must not depend on checkout parents');
-    for (const [, dependency] of source.matchAll(/(?:from\s*|import\s*\(|require\s*\(|new URL\s*\()\s*['"]\.\/([^'"]+\.(?:mjs|cjs))['"]/g))
-      assert.ok(names.has(dependency) || dependency.startsWith('native/'), `${name} needs ${dependency}`);
-  }
+  const names = [...new Set([...applicationHostFiles, ...wasmtimeHostFiles])];
+  assert.deepEqual(isolatedImportFailures(names), []);
 });

@@ -53,15 +53,24 @@ jobs:
         run: node scripts/ci/fetch-node-runtime.mjs
       - name: Verify and restore the pinned runtime
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      # Every Node process the tests start records V8 coverage (docs/TESTING.md#coverage-and-mutation-testing).
       - name: Unit tests
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          NODE_V8_COVERAGE: ${{ runner.temp }}/v8-coverage
         run: node scripts/ci/unit-tests.mjs .work/unit-tests.json
+      - name: Coverage (c8; fails on a drop of more than 1 point below docs/evidence/coverage-baseline.json)
+        if: always()
+        run: |
+          node scripts/coverage/report.mjs "$RUNNER_TEMP/v8-coverage" .work/coverage.json --check docs/evidence/coverage-baseline.json --tolerance 1
+          rm -rf "$RUNNER_TEMP/v8-coverage"
       - name: Preserve the result
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: unit-tests
-          path: .work/unit-tests.json
+          path: |
+            .work/unit-tests.json
+            .work/coverage.json
           retention-days: 7
           if-no-files-found: ignore

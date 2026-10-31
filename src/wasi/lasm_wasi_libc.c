@@ -47,7 +47,13 @@ uint16_t __wasi_random_get(uint8_t *buf, size_t length) {
 }
 
 /* libc reads the environment in a static constructor, before malloc may be
-   used: pass through, widening the 32-bit pointers in place. */
+   used: pass through, widening the 32-bit pointers in place. The host writes
+   uint32_t offsets into the char * array, so both views alias: every access goes
+   through memcpy (char-typed), and the widening runs from the last entry down so
+   that no offset is overwritten before it is read. Typed loads and stores here
+   let clang -O2 reorder them (strict aliasing): from the fourth variable on,
+   libc's getenv lost entries (LEAN_BACKTRACE, LEAN_ABORT_ON_PANIC, TZ...).
+   Found by differential testing (docs/TESTING.md). */
 uint16_t __wasi_environ_sizes_get(size_t *count, size_t *size) {
     uint32_t n = 0, bytes = 0;
     uint16_t e = (uint16_t)w_environ_sizes_get(P(&n), P(&bytes));
@@ -59,6 +65,12 @@ uint16_t __wasi_environ_get(char **environ, char *buf) {
     uint32_t *small = (uint32_t *)environ;
     uint16_t e = (uint16_t)w_environ_get(P(small), P(buf));
     if (e) return e;
-    for (size_t i = count; i-- > 0;) environ[i] = (char *)(uintptr_t)small[i];
+    (void)small;
+    for (size_t i = count; i-- > 0;) {
+        uint32_t offset;
+        __builtin_memcpy(&offset, (char *)environ + 4 * i, 4);
+        char *pointer = (char *)(uintptr_t)offset;
+        __builtin_memcpy((char *)environ + sizeof(char *) * i, &pointer, sizeof pointer);
+    }
     return 0;
 }

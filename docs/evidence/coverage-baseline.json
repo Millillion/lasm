@@ -1,0 +1,2742 @@
+{
+ "measuredAt": "2026-10-31T19:29:30.539Z",
+ "node": "v26.12.1",
+ "commit": "b2768b549908c4334951209ae0c20da4f7f482ca",
+ "run": "41234188450",
+ "tool": "c8 12.0.0 over NODE_V8_COVERAGE of scripts/ci/unit-tests.mjs (unit.yml)",
+ "total": {
+  "lines": {
+   "covered": 14151,
+   "total": 20968,
+   "pct": 67.49
+  },
+  "branches": {
+   "covered": 5562,
+   "total": 7085,
+   "pct": 78.5
+  },
+  "functions": {
+   "covered": 1067,
+   "total": 1517,
+   "pct": 70.34
+  }
+ },
+ "areas": {
+  "bin": {
+   "covered": 7,
+   "total": 11,
+   "pct": 63.64
+  },
+  "packages": {
+   "covered": 62,
+   "total": 86,
+   "pct": 72.09
+  },
+  "src": {
+   "covered": 10191,
+   "total": 14705,
+   "pct": 69.3
+  },
+  "src/browser": {
+   "covered": 363,
+   "total": 681,
+   "pct": 53.3
+  },
+  "src/edge": {
+   "covered": 781,
+   "total": 1619,
+   "pct": 48.24
+  },
+  "src/lasm-modules": {
+   "covered": 695,
+   "total": 763,
+   "pct": 91.09
+  },
+  "src/link-driver": {
+   "covered": 1526,
+   "total": 1855,
+   "pct": 82.26
+  },
+  "src/serverless": {
+   "covered": 52,
+   "total": 392,
+   "pct": 13.27
+  },
+  "src/vite": {
+   "covered": 0,
+   "total": 185,
+   "pct": 0
+  },
+  "src/wasi": {
+   "covered": 474,
+   "total": 671,
+   "pct": 70.64
+  }
+ },
+ "files": [
+  {
+   "file": "bin/lasm.mjs",
+   "lines": {
+    "covered": 7,
+    "total": 11,
+    "pct": 63.64
+   },
+   "branches": {
+    "covered": 1,
+    "total": 3,
+    "pct": 33.33
+   },
+   "functions": {
+    "covered": 0,
+    "total": 0,
+    "pct": 100
+   }
+  },
+  {
+   "file": "packages/create-lasm/bin.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 4,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "packages/create-lasm/create.mjs",
+   "lines": {
+    "covered": 62,
+    "total": 82,
+    "pct": 75.61
+   },
+   "branches": {
+    "covered": 22,
+    "total": 25,
+    "pct": 88
+   },
+   "functions": {
+    "covered": 5,
+    "total": 7,
+    "pct": 71.43
+   }
+  },
+  {
+   "file": "src/application-binding-check.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 156,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/application-build-client.mjs",
+   "lines": {
+    "covered": 36,
+    "total": 36,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 22,
+    "total": 22,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 3,
+    "total": 3,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-build-worker.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 18,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/application-build.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 228,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/application-cli.mjs",
+   "lines": {
+    "covered": 127,
+    "total": 268,
+    "pct": 47.39
+   },
+   "branches": {
+    "covered": 36,
+    "total": 69,
+    "pct": 52.17
+   },
+   "functions": {
+    "covered": 6,
+    "total": 11,
+    "pct": 54.55
+   }
+  },
+  {
+   "file": "src/application-diagnosis.mjs",
+   "lines": {
+    "covered": 184,
+    "total": 190,
+    "pct": 96.84
+   },
+   "branches": {
+    "covered": 95,
+    "total": 110,
+    "pct": 86.36
+   },
+   "functions": {
+    "covered": 15,
+    "total": 15,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-files.mjs",
+   "lines": {
+    "covered": 102,
+    "total": 104,
+    "pct": 98.08
+   },
+   "branches": {
+    "covered": 65,
+    "total": 72,
+    "pct": 90.28
+   },
+   "functions": {
+    "covered": 7,
+    "total": 7,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-initialization.mjs",
+   "lines": {
+    "covered": 243,
+    "total": 343,
+    "pct": 70.85
+   },
+   "branches": {
+    "covered": 64,
+    "total": 88,
+    "pct": 72.73
+   },
+   "functions": {
+    "covered": 16,
+    "total": 18,
+    "pct": 88.89
+   }
+  },
+  {
+   "file": "src/application-link.mjs",
+   "lines": {
+    "covered": 136,
+    "total": 702,
+    "pct": 19.37
+   },
+   "branches": {
+    "covered": 38,
+    "total": 42,
+    "pct": 90.48
+   },
+   "functions": {
+    "covered": 6,
+    "total": 16,
+    "pct": 37.5
+   }
+  },
+  {
+   "file": "src/application-live-members.mjs",
+   "lines": {
+    "covered": 90,
+    "total": 140,
+    "pct": 64.29
+   },
+   "branches": {
+    "covered": 21,
+    "total": 35,
+    "pct": 60
+   },
+   "functions": {
+    "covered": 4,
+    "total": 7,
+    "pct": 57.14
+   }
+  },
+  {
+   "file": "src/application-lock.mjs",
+   "lines": {
+    "covered": 32,
+    "total": 32,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 17,
+    "total": 20,
+    "pct": 85
+   },
+   "functions": {
+    "covered": 2,
+    "total": 2,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-metadata-runtime.mjs",
+   "lines": {
+    "covered": 16,
+    "total": 16,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 9,
+    "total": 10,
+    "pct": 90
+   },
+   "functions": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-metadata.mjs",
+   "lines": {
+    "covered": 73,
+    "total": 73,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 37,
+    "total": 41,
+    "pct": 90.24
+   },
+   "functions": {
+    "covered": 4,
+    "total": 4,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-native.mjs",
+   "lines": {
+    "covered": 235,
+    "total": 236,
+    "pct": 99.58
+   },
+   "branches": {
+    "covered": 105,
+    "total": 137,
+    "pct": 76.64
+   },
+   "functions": {
+    "covered": 13,
+    "total": 14,
+    "pct": 92.86
+   }
+  },
+  {
+   "file": "src/application-npm.mjs",
+   "lines": {
+    "covered": 92,
+    "total": 99,
+    "pct": 92.93
+   },
+   "branches": {
+    "covered": 50,
+    "total": 60,
+    "pct": 83.33
+   },
+   "functions": {
+    "covered": 5,
+    "total": 6,
+    "pct": 83.33
+   }
+  },
+  {
+   "file": "src/application-output.mjs",
+   "lines": {
+    "covered": 92,
+    "total": 93,
+    "pct": 98.92
+   },
+   "branches": {
+    "covered": 7,
+    "total": 13,
+    "pct": 53.85
+   },
+   "functions": {
+    "covered": 3,
+    "total": 3,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-policy.mjs",
+   "lines": {
+    "covered": 33,
+    "total": 33,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 28,
+    "total": 28,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 2,
+    "total": 2,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-reachability.mjs",
+   "lines": {
+    "covered": 156,
+    "total": 158,
+    "pct": 98.73
+   },
+   "branches": {
+    "covered": 43,
+    "total": 45,
+    "pct": 95.56
+   },
+   "functions": {
+    "covered": 6,
+    "total": 6,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-runtime.mjs",
+   "lines": {
+    "covered": 48,
+    "total": 61,
+    "pct": 78.69
+   },
+   "branches": {
+    "covered": 31,
+    "total": 35,
+    "pct": 88.57
+   },
+   "functions": {
+    "covered": 2,
+    "total": 3,
+    "pct": 66.67
+   }
+  },
+  {
+   "file": "src/application-signals.mjs",
+   "lines": {
+    "covered": 16,
+    "total": 16,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 8,
+    "total": 9,
+    "pct": 88.89
+   },
+   "functions": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-sources.mjs",
+   "lines": {
+    "covered": 191,
+    "total": 399,
+    "pct": 47.87
+   },
+   "branches": {
+    "covered": 72,
+    "total": 98,
+    "pct": 73.47
+   },
+   "functions": {
+    "covered": 12,
+    "total": 19,
+    "pct": 63.16
+   }
+  },
+  {
+   "file": "src/application-support.mjs",
+   "lines": {
+    "covered": 39,
+    "total": 39,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 36,
+    "total": 38,
+    "pct": 94.74
+   },
+   "functions": {
+    "covered": 5,
+    "total": 5,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/application-symbols.mjs",
+   "lines": {
+    "covered": 67,
+    "total": 74,
+    "pct": 90.54
+   },
+   "branches": {
+    "covered": 33,
+    "total": 34,
+    "pct": 97.06
+   },
+   "functions": {
+    "covered": 4,
+    "total": 6,
+    "pct": 66.67
+   }
+  },
+  {
+   "file": "src/browser/browser-build.mjs",
+   "lines": {
+    "covered": 112,
+    "total": 184,
+    "pct": 60.87
+   },
+   "branches": {
+    "covered": 23,
+    "total": 28,
+    "pct": 82.14
+   },
+   "functions": {
+    "covered": 9,
+    "total": 15,
+    "pct": 60
+   }
+  },
+  {
+   "file": "src/browser/browser-dev.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 88,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/browser/browser-package.mjs",
+   "lines": {
+    "covered": 43,
+    "total": 43,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 13,
+    "total": 21,
+    "pct": 61.9
+   },
+   "functions": {
+    "covered": 3,
+    "total": 3,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/browser/bundle.mjs",
+   "lines": {
+    "covered": 121,
+    "total": 121,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 79,
+    "total": 88,
+    "pct": 89.77
+   },
+   "functions": {
+    "covered": 9,
+    "total": 9,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/browser/loader.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 149,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/browser/static-server.mjs",
+   "lines": {
+    "covered": 87,
+    "total": 96,
+    "pct": 90.63
+   },
+   "branches": {
+    "covered": 16,
+    "total": 34,
+    "pct": 47.06
+   },
+   "functions": {
+    "covered": 3,
+    "total": 6,
+    "pct": 50
+   }
+  },
+  {
+   "file": "src/build-progress.mjs",
+   "lines": {
+    "covered": 54,
+    "total": 54,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 41,
+    "total": 46,
+    "pct": 89.13
+   },
+   "functions": {
+    "covered": 9,
+    "total": 9,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/build.mjs",
+   "lines": {
+    "covered": 132,
+    "total": 276,
+    "pct": 47.83
+   },
+   "branches": {
+    "covered": 6,
+    "total": 37,
+    "pct": 16.22
+   },
+   "functions": {
+    "covered": 2,
+    "total": 6,
+    "pct": 33.33
+   }
+  },
+  {
+   "file": "src/cache-lifecycle.mjs",
+   "lines": {
+    "covered": 78,
+    "total": 81,
+    "pct": 96.3
+   },
+   "branches": {
+    "covered": 32,
+    "total": 36,
+    "pct": 88.89
+   },
+   "functions": {
+    "covered": 7,
+    "total": 7,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/cache-repair.mjs",
+   "lines": {
+    "covered": 56,
+    "total": 57,
+    "pct": 98.25
+   },
+   "branches": {
+    "covered": 26,
+    "total": 36,
+    "pct": 72.22
+   },
+   "functions": {
+    "covered": 3,
+    "total": 3,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/cli-arguments.mjs",
+   "lines": {
+    "covered": 156,
+    "total": 163,
+    "pct": 95.71
+   },
+   "branches": {
+    "covered": 134,
+    "total": 147,
+    "pct": 91.16
+   },
+   "functions": {
+    "covered": 4,
+    "total": 4,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/dev-build-service.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 52,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/dev-build-worker.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 31,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/dev-proxy.mjs",
+   "lines": {
+    "covered": 111,
+    "total": 127,
+    "pct": 87.4
+   },
+   "branches": {
+    "covered": 49,
+    "total": 52,
+    "pct": 94.23
+   },
+   "functions": {
+    "covered": 9,
+    "total": 11,
+    "pct": 81.82
+   }
+  },
+  {
+   "file": "src/dev.mjs",
+   "lines": {
+    "covered": 198,
+    "total": 458,
+    "pct": 43.23
+   },
+   "branches": {
+    "covered": 103,
+    "total": 130,
+    "pct": 79.23
+   },
+   "functions": {
+    "covered": 12,
+    "total": 21,
+    "pct": 57.14
+   }
+  },
+  {
+   "file": "src/edge/builtin-modules.mjs",
+   "lines": {
+    "covered": 53,
+    "total": 53,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 15,
+    "total": 17,
+    "pct": 88.24
+   },
+   "functions": {
+    "covered": 5,
+    "total": 5,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/edge/edge-build.mjs",
+   "lines": {
+    "covered": 339,
+    "total": 467,
+    "pct": 72.59
+   },
+   "branches": {
+    "covered": 55,
+    "total": 61,
+    "pct": 90.16
+   },
+   "functions": {
+    "covered": 20,
+    "total": 36,
+    "pct": 55.56
+   }
+  },
+  {
+   "file": "src/edge/edge-host.mjs",
+   "lines": {
+    "covered": 148,
+    "total": 213,
+    "pct": 69.48
+   },
+   "branches": {
+    "covered": 63,
+    "total": 108,
+    "pct": 58.33
+   },
+   "functions": {
+    "covered": 15,
+    "total": 25,
+    "pct": 60
+   }
+  },
+  {
+   "file": "src/edge/edge-initializers.mjs",
+   "lines": {
+    "covered": 53,
+    "total": 53,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 22,
+    "total": 25,
+    "pct": 88
+   },
+   "functions": {
+    "covered": 4,
+    "total": 4,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/edge/edge-js.mjs",
+   "lines": {
+    "covered": 104,
+    "total": 301,
+    "pct": 34.55
+   },
+   "branches": {
+    "covered": 3,
+    "total": 22,
+    "pct": 13.64
+   },
+   "functions": {
+    "covered": 2,
+    "total": 46,
+    "pct": 4.35
+   }
+  },
+  {
+   "file": "src/edge/edge-library.js",
+   "lines": {
+    "covered": 0,
+    "total": 72,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/edge/edge-link.mjs",
+   "lines": {
+    "covered": 60,
+    "total": 187,
+    "pct": 32.09
+   },
+   "branches": {
+    "covered": 3,
+    "total": 3,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 2,
+    "total": 6,
+    "pct": 33.33
+   }
+  },
+  {
+   "file": "src/edge/edge-pre.js",
+   "lines": {
+    "covered": 0,
+    "total": 158,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/edge/edge-runtime.mjs",
+   "lines": {
+    "covered": 24,
+    "total": 62,
+    "pct": 38.71
+   },
+   "branches": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/edge/edge-start.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 53,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/editor.mjs",
+   "lines": {
+    "covered": 75,
+    "total": 109,
+    "pct": 68.81
+   },
+   "branches": {
+    "covered": 25,
+    "total": 33,
+    "pct": 75.76
+   },
+   "functions": {
+    "covered": 7,
+    "total": 9,
+    "pct": 77.78
+   }
+  },
+  {
+   "file": "src/elapsed-ticker-worker.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 9,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/elapsed-ticker.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 17,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/handle-table.mjs",
+   "lines": {
+    "covered": 23,
+    "total": 23,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 9,
+    "total": 10,
+    "pct": 90
+   },
+   "functions": {
+    "covered": 3,
+    "total": 3,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/host.mjs",
+   "lines": {
+    "covered": 7,
+    "total": 101,
+    "pct": 6.93
+   },
+   "branches": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/init.mjs",
+   "lines": {
+    "covered": 838,
+    "total": 859,
+    "pct": 97.56
+   },
+   "branches": {
+    "covered": 202,
+    "total": 208,
+    "pct": 97.12
+   },
+   "functions": {
+    "covered": 41,
+    "total": 43,
+    "pct": 95.35
+   }
+  },
+  {
+   "file": "src/js-runtime.mjs",
+   "lines": {
+    "covered": 42,
+    "total": 49,
+    "pct": 85.71
+   },
+   "branches": {
+    "covered": 13,
+    "total": 18,
+    "pct": 72.22
+   },
+   "functions": {
+    "covered": 1,
+    "total": 4,
+    "pct": 25
+   }
+  },
+  {
+   "file": "src/lake.mjs",
+   "lines": {
+    "covered": 19,
+    "total": 47,
+    "pct": 40.43
+   },
+   "branches": {
+    "covered": 9,
+    "total": 13,
+    "pct": 69.23
+   },
+   "functions": {
+    "covered": 1,
+    "total": 2,
+    "pct": 50
+   }
+  },
+  {
+   "file": "src/lasm-library.mjs",
+   "lines": {
+    "covered": 110,
+    "total": 156,
+    "pct": 70.51
+   },
+   "branches": {
+    "covered": 29,
+    "total": 35,
+    "pct": 82.86
+   },
+   "functions": {
+    "covered": 9,
+    "total": 14,
+    "pct": 64.29
+   }
+  },
+  {
+   "file": "src/lasm-modules/app.mjs",
+   "lines": {
+    "covered": 98,
+    "total": 98,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 36,
+    "total": 43,
+    "pct": 83.72
+   },
+   "functions": {
+    "covered": 20,
+    "total": 33,
+    "pct": 60.61
+   }
+  },
+  {
+   "file": "src/lasm-modules/ui-dom.mjs",
+   "lines": {
+    "covered": 362,
+    "total": 377,
+    "pct": 96.02
+   },
+   "branches": {
+    "covered": 145,
+    "total": 187,
+    "pct": 77.54
+   },
+   "functions": {
+    "covered": 38,
+    "total": 55,
+    "pct": 69.09
+   }
+  },
+  {
+   "file": "src/lasm-modules/web.mjs",
+   "lines": {
+    "covered": 235,
+    "total": 288,
+    "pct": 81.6
+   },
+   "branches": {
+    "covered": 23,
+    "total": 32,
+    "pct": 71.88
+   },
+   "functions": {
+    "covered": 11,
+    "total": 152,
+    "pct": 7.24
+   }
+  },
+  {
+   "file": "src/launcher.mjs",
+   "lines": {
+    "covered": 21,
+    "total": 22,
+    "pct": 95.45
+   },
+   "branches": {
+    "covered": 12,
+    "total": 13,
+    "pct": 92.31
+   },
+   "functions": {
+    "covered": 2,
+    "total": 2,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/lean-io-errors.mjs",
+   "lines": {
+    "covered": 180,
+    "total": 180,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 32,
+    "total": 39,
+    "pct": 82.05
+   },
+   "functions": {
+    "covered": 5,
+    "total": 5,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/link-driver/compile.mjs",
+   "lines": {
+    "covered": 194,
+    "total": 194,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 128,
+    "total": 159,
+    "pct": 80.5
+   },
+   "functions": {
+    "covered": 15,
+    "total": 15,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/link-driver/glue.mjs",
+   "lines": {
+    "covered": 370,
+    "total": 388,
+    "pct": 95.36
+   },
+   "branches": {
+    "covered": 140,
+    "total": 195,
+    "pct": 71.79
+   },
+   "functions": {
+    "covered": 27,
+    "total": 28,
+    "pct": 96.43
+   }
+  },
+  {
+   "file": "src/link-driver/link.mjs",
+   "lines": {
+    "covered": 257,
+    "total": 516,
+    "pct": 49.81
+   },
+   "branches": {
+    "covered": 119,
+    "total": 137,
+    "pct": 86.86
+   },
+   "functions": {
+    "covered": 20,
+    "total": 26,
+    "pct": 76.92
+   }
+  },
+  {
+   "file": "src/link-driver/metadata.mjs",
+   "lines": {
+    "covered": 207,
+    "total": 225,
+    "pct": 92
+   },
+   "branches": {
+    "covered": 78,
+    "total": 107,
+    "pct": 72.9
+   },
+   "functions": {
+    "covered": 19,
+    "total": 21,
+    "pct": 90.48
+   }
+  },
+  {
+   "file": "src/link-driver/python.mjs",
+   "lines": {
+    "covered": 104,
+    "total": 109,
+    "pct": 95.41
+   },
+   "branches": {
+    "covered": 56,
+    "total": 70,
+    "pct": 80
+   },
+   "functions": {
+    "covered": 13,
+    "total": 13,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/link-driver/settings.mjs",
+   "lines": {
+    "covered": 80,
+    "total": 92,
+    "pct": 86.96
+   },
+   "branches": {
+    "covered": 25,
+    "total": 32,
+    "pct": 78.13
+   },
+   "functions": {
+    "covered": 7,
+    "total": 9,
+    "pct": 77.78
+   }
+  },
+  {
+   "file": "src/link-driver/wasm.mjs",
+   "lines": {
+    "covered": 314,
+    "total": 331,
+    "pct": 94.86
+   },
+   "branches": {
+    "covered": 92,
+    "total": 126,
+    "pct": 73.02
+   },
+   "functions": {
+    "covered": 33,
+    "total": 35,
+    "pct": 94.29
+   }
+  },
+  {
+   "file": "src/linux-memory.mjs",
+   "lines": {
+    "covered": 89,
+    "total": 89,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 65,
+    "total": 67,
+    "pct": 97.01
+   },
+   "functions": {
+    "covered": 13,
+    "total": 13,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/main.mjs",
+   "lines": {
+    "covered": 62,
+    "total": 124,
+    "pct": 50
+   },
+   "branches": {
+    "covered": 18,
+    "total": 29,
+    "pct": 62.07
+   },
+   "functions": {
+    "covered": 4,
+    "total": 7,
+    "pct": 57.14
+   }
+  },
+  {
+   "file": "src/managed-artifacts.mjs",
+   "lines": {
+    "covered": 456,
+    "total": 471,
+    "pct": 96.82
+   },
+   "branches": {
+    "covered": 256,
+    "total": 303,
+    "pct": 84.49
+   },
+   "functions": {
+    "covered": 37,
+    "total": 39,
+    "pct": 94.87
+   }
+  },
+  {
+   "file": "src/managed-download.mjs",
+   "lines": {
+    "covered": 186,
+    "total": 187,
+    "pct": 99.47
+   },
+   "branches": {
+    "covered": 137,
+    "total": 149,
+    "pct": 91.95
+   },
+   "functions": {
+    "covered": 13,
+    "total": 13,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/managed-lean.mjs",
+   "lines": {
+    "covered": 107,
+    "total": 166,
+    "pct": 64.46
+   },
+   "branches": {
+    "covered": 49,
+    "total": 65,
+    "pct": 75.38
+   },
+   "functions": {
+    "covered": 5,
+    "total": 8,
+    "pct": 62.5
+   }
+  },
+  {
+   "file": "src/managed-link-toolchain.mjs",
+   "lines": {
+    "covered": 146,
+    "total": 146,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 73,
+    "total": 82,
+    "pct": 89.02
+   },
+   "functions": {
+    "covered": 13,
+    "total": 14,
+    "pct": 92.86
+   }
+  },
+  {
+   "file": "src/managed-python.mjs",
+   "lines": {
+    "covered": 26,
+    "total": 26,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 2,
+    "total": 6,
+    "pct": 33.33
+   },
+   "functions": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/managed-sdk.mjs",
+   "lines": {
+    "covered": 14,
+    "total": 60,
+    "pct": 23.33
+   },
+   "branches": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/native-abort.cjs",
+   "lines": {
+    "covered": 0,
+    "total": 19,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/native-bundle.mjs",
+   "lines": {
+    "covered": 81,
+    "total": 94,
+    "pct": 86.17
+   },
+   "branches": {
+    "covered": 41,
+    "total": 44,
+    "pct": 93.18
+   },
+   "functions": {
+    "covered": 5,
+    "total": 7,
+    "pct": 71.43
+   }
+  },
+  {
+   "file": "src/native-clock.mjs",
+   "lines": {
+    "covered": 37,
+    "total": 47,
+    "pct": 78.72
+   },
+   "branches": {
+    "covered": 10,
+    "total": 14,
+    "pct": 71.43
+   },
+   "functions": {
+    "covered": 4,
+    "total": 5,
+    "pct": 80
+   }
+  },
+  {
+   "file": "src/native-dns.mjs",
+   "lines": {
+    "covered": 87,
+    "total": 91,
+    "pct": 95.6
+   },
+   "branches": {
+    "covered": 32,
+    "total": 53,
+    "pct": 60.38
+   },
+   "functions": {
+    "covered": 6,
+    "total": 7,
+    "pct": 85.71
+   }
+  },
+  {
+   "file": "src/native-file-message.mjs",
+   "lines": {
+    "covered": 34,
+    "total": 35,
+    "pct": 97.14
+   },
+   "branches": {
+    "covered": 37,
+    "total": 38,
+    "pct": 97.37
+   },
+   "functions": {
+    "covered": 3,
+    "total": 3,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/native-file-worker-pool.mjs",
+   "lines": {
+    "covered": 56,
+    "total": 76,
+    "pct": 73.68
+   },
+   "branches": {
+    "covered": 8,
+    "total": 12,
+    "pct": 66.67
+   },
+   "functions": {
+    "covered": 3,
+    "total": 6,
+    "pct": 50
+   }
+  },
+  {
+   "file": "src/native-file-worker.mjs",
+   "lines": {
+    "covered": 31,
+    "total": 33,
+    "pct": 93.94
+   },
+   "branches": {
+    "covered": 12,
+    "total": 14,
+    "pct": 85.71
+   },
+   "functions": {
+    "covered": 1,
+    "total": 3,
+    "pct": 33.33
+   }
+  },
+  {
+   "file": "src/native-files.mjs",
+   "lines": {
+    "covered": 552,
+    "total": 656,
+    "pct": 84.15
+   },
+   "branches": {
+    "covered": 212,
+    "total": 345,
+    "pct": 61.45
+   },
+   "functions": {
+    "covered": 63,
+    "total": 73,
+    "pct": 86.3
+   }
+  },
+  {
+   "file": "src/native-interfaces.mjs",
+   "lines": {
+    "covered": 10,
+    "total": 65,
+    "pct": 15.38
+   },
+   "branches": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/native-process.mjs",
+   "lines": {
+    "covered": 127,
+    "total": 130,
+    "pct": 97.69
+   },
+   "branches": {
+    "covered": 24,
+    "total": 43,
+    "pct": 55.81
+   },
+   "functions": {
+    "covered": 4,
+    "total": 5,
+    "pct": 80
+   }
+  },
+  {
+   "file": "src/native-program.mjs",
+   "lines": {
+    "covered": 38,
+    "total": 38,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 24,
+    "total": 26,
+    "pct": 92.31
+   },
+   "functions": {
+    "covered": 3,
+    "total": 3,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/native-pthread-factory.cjs",
+   "lines": {
+    "covered": 108,
+    "total": 136,
+    "pct": 79.41
+   },
+   "branches": {
+    "covered": 35,
+    "total": 57,
+    "pct": 61.4
+   },
+   "functions": {
+    "covered": 10,
+    "total": 13,
+    "pct": 76.92
+   }
+  },
+  {
+   "file": "src/native-signals.mjs",
+   "lines": {
+    "covered": 65,
+    "total": 68,
+    "pct": 95.59
+   },
+   "branches": {
+    "covered": 24,
+    "total": 37,
+    "pct": 64.86
+   },
+   "functions": {
+    "covered": 6,
+    "total": 7,
+    "pct": 85.71
+   }
+  },
+  {
+   "file": "src/native-tcp.mjs",
+   "lines": {
+    "covered": 134,
+    "total": 147,
+    "pct": 91.16
+   },
+   "branches": {
+    "covered": 43,
+    "total": 76,
+    "pct": 56.58
+   },
+   "functions": {
+    "covered": 18,
+    "total": 21,
+    "pct": 85.71
+   }
+  },
+  {
+   "file": "src/native-windows-timezone.mjs",
+   "lines": {
+    "covered": 29,
+    "total": 101,
+    "pct": 28.71
+   },
+   "branches": {
+    "covered": 7,
+    "total": 9,
+    "pct": 77.78
+   },
+   "functions": {
+    "covered": 4,
+    "total": 5,
+    "pct": 80
+   }
+  },
+  {
+   "file": "src/native-worker-cwd.cjs",
+   "lines": {
+    "covered": 9,
+    "total": 12,
+    "pct": 75
+   },
+   "branches": {
+    "covered": 2,
+    "total": 3,
+    "pct": 66.67
+   },
+   "functions": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/node-fetch.mjs",
+   "lines": {
+    "covered": 25,
+    "total": 81,
+    "pct": 30.86
+   },
+   "branches": {
+    "covered": 2,
+    "total": 2,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 1,
+    "total": 6,
+    "pct": 16.67
+   }
+  },
+  {
+   "file": "src/node-host.mjs",
+   "lines": {
+    "covered": 414,
+    "total": 436,
+    "pct": 94.95
+   },
+   "branches": {
+    "covered": 258,
+    "total": 310,
+    "pct": 83.23
+   },
+   "functions": {
+    "covered": 35,
+    "total": 37,
+    "pct": 94.59
+   }
+  },
+  {
+   "file": "src/node-js.mjs",
+   "lines": {
+    "covered": 409,
+    "total": 447,
+    "pct": 91.5
+   },
+   "branches": {
+    "covered": 164,
+    "total": 218,
+    "pct": 75.23
+   },
+   "functions": {
+    "covered": 46,
+    "total": 49,
+    "pct": 93.88
+   }
+  },
+  {
+   "file": "src/node-network.mjs",
+   "lines": {
+    "covered": 281,
+    "total": 330,
+    "pct": 85.15
+   },
+   "branches": {
+    "covered": 136,
+    "total": 190,
+    "pct": 71.58
+   },
+   "functions": {
+    "covered": 27,
+    "total": 31,
+    "pct": 87.1
+   }
+  },
+  {
+   "file": "src/node-process.mjs",
+   "lines": {
+    "covered": 133,
+    "total": 155,
+    "pct": 85.81
+   },
+   "branches": {
+    "covered": 57,
+    "total": 81,
+    "pct": 70.37
+   },
+   "functions": {
+    "covered": 10,
+    "total": 10,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/node-signal.mjs",
+   "lines": {
+    "covered": 80,
+    "total": 80,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 45,
+    "total": 52,
+    "pct": 86.54
+   },
+   "functions": {
+    "covered": 11,
+    "total": 11,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/node-system.mjs",
+   "lines": {
+    "covered": 64,
+    "total": 79,
+    "pct": 81.01
+   },
+   "branches": {
+    "covered": 24,
+    "total": 41,
+    "pct": 58.54
+   },
+   "functions": {
+    "covered": 5,
+    "total": 6,
+    "pct": 83.33
+   }
+  },
+  {
+   "file": "src/node-udp.mjs",
+   "lines": {
+    "covered": 131,
+    "total": 150,
+    "pct": 87.33
+   },
+   "branches": {
+    "covered": 63,
+    "total": 86,
+    "pct": 73.26
+   },
+   "functions": {
+    "covered": 14,
+    "total": 16,
+    "pct": 87.5
+   }
+  },
+  {
+   "file": "src/notices.mjs",
+   "lines": {
+    "covered": 356,
+    "total": 370,
+    "pct": 96.22
+   },
+   "branches": {
+    "covered": 98,
+    "total": 109,
+    "pct": 89.91
+   },
+   "functions": {
+    "covered": 29,
+    "total": 30,
+    "pct": 96.67
+   }
+  },
+  {
+   "file": "src/npm-artifacts.mjs",
+   "lines": {
+    "covered": 256,
+    "total": 271,
+    "pct": 94.46
+   },
+   "branches": {
+    "covered": 133,
+    "total": 157,
+    "pct": 84.71
+   },
+   "functions": {
+    "covered": 20,
+    "total": 21,
+    "pct": 95.24
+   }
+  },
+  {
+   "file": "src/package.mjs",
+   "lines": {
+    "covered": 245,
+    "total": 269,
+    "pct": 91.08
+   },
+   "branches": {
+    "covered": 108,
+    "total": 125,
+    "pct": 86.4
+   },
+   "functions": {
+    "covered": 12,
+    "total": 15,
+    "pct": 80
+   }
+  },
+  {
+   "file": "src/platform.mjs",
+   "lines": {
+    "covered": 37,
+    "total": 42,
+    "pct": 88.1
+   },
+   "branches": {
+    "covered": 18,
+    "total": 18,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 5,
+    "total": 6,
+    "pct": 83.33
+   }
+  },
+  {
+   "file": "src/posix-arguments.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 34,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/process-exec.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 91,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/process-launcher.mjs",
+   "lines": {
+    "covered": 45,
+    "total": 45,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 22,
+    "total": 28,
+    "pct": 78.57
+   },
+   "functions": {
+    "covered": 4,
+    "total": 4,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/runtime.mjs",
+   "lines": {
+    "covered": 11,
+    "total": 269,
+    "pct": 4.09
+   },
+   "branches": {
+    "covered": 1,
+    "total": 2,
+    "pct": 50
+   },
+   "functions": {
+    "covered": 0,
+    "total": 2,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/scheduler.mjs",
+   "lines": {
+    "covered": 3,
+    "total": 192,
+    "pct": 1.56
+   },
+   "branches": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/sdk-repairs.mjs",
+   "lines": {
+    "covered": 21,
+    "total": 36,
+    "pct": 58.33
+   },
+   "branches": {
+    "covered": 7,
+    "total": 8,
+    "pct": 87.5
+   },
+   "functions": {
+    "covered": 2,
+    "total": 3,
+    "pct": 66.67
+   }
+  },
+  {
+   "file": "src/serverless/lasm-azure.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 27,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/serverless/lasm-gcf.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 17,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/serverless/lasm-lambda.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 95,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/serverless/lasm-netlify.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 14,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/serverless/lasm-server.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 173,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/serverless/lasm-vercel.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 14,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/serverless/zip.mjs",
+   "lines": {
+    "covered": 52,
+    "total": 52,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 16,
+    "total": 20,
+    "pct": 80
+   },
+   "functions": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/system-git.mjs",
+   "lines": {
+    "covered": 115,
+    "total": 115,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 50,
+    "total": 63,
+    "pct": 79.37
+   },
+   "functions": {
+    "covered": 6,
+    "total": 6,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/thread-id.cjs",
+   "lines": {
+    "covered": 21,
+    "total": 34,
+    "pct": 61.76
+   },
+   "branches": {
+    "covered": 4,
+    "total": 8,
+    "pct": 50
+   },
+   "functions": {
+    "covered": 2,
+    "total": 5,
+    "pct": 40
+   }
+  },
+  {
+   "file": "src/toolchain.mjs",
+   "lines": {
+    "covered": 73,
+    "total": 132,
+    "pct": 55.3
+   },
+   "branches": {
+    "covered": 29,
+    "total": 36,
+    "pct": 80.56
+   },
+   "functions": {
+    "covered": 7,
+    "total": 12,
+    "pct": 58.33
+   }
+  },
+  {
+   "file": "src/vite/index.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 185,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/wasi.mjs",
+   "lines": {
+    "covered": 65,
+    "total": 65,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 26,
+    "total": 37,
+    "pct": 70.27
+   },
+   "functions": {
+    "covered": 11,
+    "total": 11,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/wasi/lower-atomics.mjs",
+   "lines": {
+    "covered": 247,
+    "total": 275,
+    "pct": 89.82
+   },
+   "branches": {
+    "covered": 115,
+    "total": 167,
+    "pct": 68.86
+   },
+   "functions": {
+    "covered": 27,
+    "total": 28,
+    "pct": 96.43
+   }
+  },
+  {
+   "file": "src/wasi/wasi-build.mjs",
+   "lines": {
+    "covered": 66,
+    "total": 152,
+    "pct": 43.42
+   },
+   "branches": {
+    "covered": 3,
+    "total": 6,
+    "pct": 50
+   },
+   "functions": {
+    "covered": 2,
+    "total": 9,
+    "pct": 22.22
+   }
+  },
+  {
+   "file": "src/wasi/wasi-component.mjs",
+   "lines": {
+    "covered": 89,
+    "total": 104,
+    "pct": 85.58
+   },
+   "branches": {
+    "covered": 21,
+    "total": 24,
+    "pct": 87.5
+   },
+   "functions": {
+    "covered": 8,
+    "total": 10,
+    "pct": 80
+   }
+  },
+  {
+   "file": "src/wasi/wasi-link.mjs",
+   "lines": {
+    "covered": 72,
+    "total": 140,
+    "pct": 51.43
+   },
+   "branches": {
+    "covered": 5,
+    "total": 5,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 1,
+    "total": 3,
+    "pct": 33.33
+   }
+  },
+  {
+   "file": "src/wasm-objects.mjs",
+   "lines": {
+    "covered": 133,
+    "total": 143,
+    "pct": 93.01
+   },
+   "branches": {
+    "covered": 37,
+    "total": 52,
+    "pct": 71.15
+   },
+   "functions": {
+    "covered": 9,
+    "total": 10,
+    "pct": 90
+   }
+  },
+  {
+   "file": "src/wasmtime-artifact.mjs",
+   "lines": {
+    "covered": 40,
+    "total": 40,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 25,
+    "total": 25,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 2,
+    "total": 2,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/wasmtime-bundle.mjs",
+   "lines": {
+    "covered": 51,
+    "total": 51,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 32,
+    "total": 36,
+    "pct": 88.89
+   },
+   "functions": {
+    "covered": 2,
+    "total": 2,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/wasmtime-console.mjs",
+   "lines": {
+    "covered": 63,
+    "total": 63,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 32,
+    "total": 32,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 4,
+    "total": 4,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/wasmtime-file-host.mjs",
+   "lines": {
+    "covered": 10,
+    "total": 66,
+    "pct": 15.15
+   },
+   "branches": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/wasmtime-file-imports.mjs",
+   "lines": {
+    "covered": 65,
+    "total": 66,
+    "pct": 98.48
+   },
+   "branches": {
+    "covered": 51,
+    "total": 53,
+    "pct": 96.23
+   },
+   "functions": {
+    "covered": 2,
+    "total": 2,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/wasmtime-guest-memory.mjs",
+   "lines": {
+    "covered": 50,
+    "total": 50,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 13,
+    "total": 13,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 5,
+    "total": 5,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/wasmtime-module-data.mjs",
+   "lines": {
+    "covered": 52,
+    "total": 52,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 22,
+    "total": 22,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/wasmtime-native-stdio.mjs",
+   "lines": {
+    "covered": 23,
+    "total": 33,
+    "pct": 69.7
+   },
+   "branches": {
+    "covered": 2,
+    "total": 2,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 0,
+    "total": 2,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/wasmtime-process-host.mjs",
+   "lines": {
+    "covered": 62,
+    "total": 79,
+    "pct": 78.48
+   },
+   "branches": {
+    "covered": 18,
+    "total": 24,
+    "pct": 75
+   },
+   "functions": {
+    "covered": 5,
+    "total": 6,
+    "pct": 83.33
+   }
+  },
+  {
+   "file": "src/wasmtime-runtime.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 477,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/wasmtime-standalone.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 63,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/wasmtime-wasi-stdio.mjs",
+   "lines": {
+    "covered": 45,
+    "total": 45,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 20,
+    "total": 22,
+    "pct": 90.91
+   },
+   "functions": {
+    "covered": 2,
+    "total": 2,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/wasmtime-worker.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 4,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/web-host.mjs",
+   "lines": {
+    "covered": 0,
+    "total": 114,
+    "pct": 0
+   },
+   "branches": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   },
+   "functions": {
+    "covered": 0,
+    "total": 1,
+    "pct": 0
+   }
+  },
+  {
+   "file": "src/windows-tool-paths.mjs",
+   "lines": {
+    "covered": 113,
+    "total": 119,
+    "pct": 94.96
+   },
+   "branches": {
+    "covered": 47,
+    "total": 67,
+    "pct": 70.15
+   },
+   "functions": {
+    "covered": 7,
+    "total": 8,
+    "pct": 87.5
+   }
+  },
+  {
+   "file": "src/worker-stdio.cjs",
+   "lines": {
+    "covered": 23,
+    "total": 26,
+    "pct": 88.46
+   },
+   "branches": {
+    "covered": 6,
+    "total": 7,
+    "pct": 85.71
+   },
+   "functions": {
+    "covered": 1,
+    "total": 1,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/working-directory.mjs",
+   "lines": {
+    "covered": 84,
+    "total": 89,
+    "pct": 94.38
+   },
+   "branches": {
+    "covered": 39,
+    "total": 50,
+    "pct": 78
+   },
+   "functions": {
+    "covered": 12,
+    "total": 12,
+    "pct": 100
+   }
+  }
+ ]
+}

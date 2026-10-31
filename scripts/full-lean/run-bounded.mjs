@@ -95,7 +95,9 @@ if (args[0] === '--capture') {
   const capture = ':' + [process.execPath, self, '--capture', report + '.service.json'].map(systemdWord).join(' ');
   const keys = ['PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDIR', 'XDG_RUNTIME_DIR',
     'LASM_EMSDK', 'LASM_LEAN32_DEPS', 'LASM_GMP_WASM64', 'LEAN_PATH', 'LEAN_SRC_PATH',
-    'LEAN_SYSROOT', 'LEAN_STACK_SIZE_KB', 'LEAN_NUM_THREADS', 'LASM_VM_STACK_MB'];
+    'LEAN_SYSROOT', 'LEAN_STACK_SIZE_KB', 'LEAN_NUM_THREADS', 'LASM_VM_STACK_MB',
+    // V8 coverage of the workload (unit.yml; docs/TESTING.md#coverage-and-mutation-testing).
+    'NODE_V8_COVERAGE'];
   const env = Object.fromEntries(keys.filter(key => process.env[key] !== undefined).map(key => [key, process.env[key]]));
   Object.assign(env, { LASM_RESOURCE_UNIT: unit, LASM_RESOURCE_REPORT: report,
     BINARYEN_CORES: '1', EMCC_CORES: '1', LASM_BUILD_JOBS: '1', CMAKE_BUILD_PARALLEL_LEVEL: '1', CTEST_PARALLEL_LEVEL: '1' });
