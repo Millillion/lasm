@@ -17,6 +17,7 @@ import { createServer } from 'node:net';
 import { createHash } from 'node:crypto';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { headlessEnvironment } from '../edge/headless.mjs';
 
 const argv = process.argv.slice(2);
 const opt = (name, fallback) => { const i = argv.indexOf(name); return i < 0 ? fallback : argv[i + 1]; };
@@ -31,7 +32,8 @@ const wrap = (opt('--wrap', '') || '').split(' ').filter(Boolean);
 const corpusFile = join(root, 'test/equivalence', `${app}.json`);
 const corpus = JSON.parse(readFileSync(corpusFile, 'utf8'));
 mkdirSync(work, { recursive: true });
-const env = { ...process.env, CI: '1', BROWSER: 'none', LASM_EDITOR: '0', NO_COLOR: '1', LASM_EQ_VALUE: 'same everywhere' };
+// No telemetry, no browser, no display (platform tools run only in CI).
+const env = headlessEnvironment(process.env, { LASM_EDITOR: '0', LASM_EQ_VALUE: 'same everywhere' });
 
 // ---------- the project ----------
 const project = join(work, app);

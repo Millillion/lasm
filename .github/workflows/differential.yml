@@ -175,3 +175,56 @@ jobs:
             ${{ runner.temp }}/difftest/repros
           retention-days: 30
           if-no-files-found: ignore
+  # Target equivalence (docs/TESTING.md#target-equivalence): the fetch template
+  # (from `lasm init`) and examples/fetch built for every server target this
+  # runner can serve locally, the recorded corpus replayed on each.
+  equivalence:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [fetch-template, fetch-example]
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: differential-packed-candidate
+          path: .work/node-candidate
+      - name: Install the candidate, wasmtime, Deno, Bun and wrangler (local workerd only)
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
+          echo '{"private":true}' > package.json
+          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T/wasmtime"
+          curl -fsSL --retry 3 -o "$T/wasmtime.tar.xz" "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz"
+          echo "$WASMTIME_SHA256  $T/wasmtime.tar.xz" | sha256sum -c
+          tar -xJf "$T/wasmtime.tar.xz" -C "$T/wasmtime" --strip-components=1
+          npm install --prefix "$T" --no-audit --no-fund deno@2.9.6 bun@1.4.4 wrangler@4.152.0
+      - name: Replay the corpus on every target
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/equivalence/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --work "$RUNNER_TEMP/equivalence" --app ${{ matrix.app }} --targets node,deno,bun,wasi-http,workers \
+            --deno "$T/node_modules/.bin/deno" --bun "$T/node_modules/.bin/bun" --wasmtime "$T/wasmtime/wasmtime" --wrangler "$T/node_modules/.bin/wrangler"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: equivalence-${{ matrix.app }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/equivalence/*-results.json
+          retention-days: 30
+          if-no-files-found: ignore
