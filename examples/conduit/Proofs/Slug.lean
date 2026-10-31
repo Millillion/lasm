@@ -5,6 +5,7 @@ ASCII letters, digits and `-`, and never the empty string.
 -/
 import Conduit.Slug
 import Std.Data.String.ToNat
+import Proofs.Spec
 
 namespace Conduit.Proofs
 
@@ -158,5 +159,9 @@ theorem slugify_ne_empty (title : String) : slugify title ≠ "" := by
     cases w with
     | nil => exact hne [] (by simp) rfl
     | cons c cs => cases ws <;> simp [List.intercalate_cons_of_ne_nil] at this
+
+theorem slugify_spec : Spec.slugify_spec := fun t => ⟨slugify_chars t, slugify_ne_empty t⟩
+
+theorem uniqueSlug_spec : Spec.uniqueSlug_spec := fun b t => ⟨uniqueSlug_fresh b t, uniqueSlug_of_free b t⟩
 
 end Conduit.Proofs

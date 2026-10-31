@@ -8,8 +8,12 @@ name: Conduit
 #   and a local D1 database), against the same suite;
 # - api-bun: the Bun build (bun:sqlite), built by Lasm running on Bun,
 #   against the same suite;
-# - proofs: every theorem in Proofs/ compiles and uses only propext,
-#   Classical.choice and Quot.sound (no sorry), with Lasm's managed Lean;
+# - proofs: every proposition of Proofs/Spec.lean has its theorem, every
+#   theorem in Proofs/ compiles and uses only propext, Classical.choice and
+#   Quot.sound (no sorry), with Lasm's managed Lean; PROOFS.md, SPEC.md and
+#   the stated theorem counts agree with what was checked; then the export
+#   of the proofs is replayed by Lean's kernel and every external checker
+#   Lean 4.35.0 ships (`lake check --paranoid`, sandboxed);
 # - e2e-node, e2e-workers: the official RealWorld end-to-end suite
 #   (specs/e2e, Playwright, unmodified, fullstack mode) against the
 #   server-rendered, hydrated Lasm.UI app: Node on Chromium, Firefox and
@@ -60,7 +64,7 @@ jobs:
           echo "$(find specs -type f | wc -l) files identical to gothinkster/realworld@$commit"
   proofs:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -77,6 +81,14 @@ jobs:
         run: |
           if grep -rnw sorry Conduit Proofs; then echo "::error::sorry in the sources"; exit 1; fi
           npm run proofs
+      - name: lake check --paranoid (Lean's kernel and the external checkers)
+        working-directory: examples/conduit
+        run: |
+          # Lake's sandbox (bwrap) needs unprivileged user namespaces, which
+          # Ubuntu 24.04 restricts through AppArmor by default.
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          command -v bwrap || sudo apt-get install -y --no-install-recommends bubblewrap
+          npm run proofs:paranoid
   api-node:
     name: API on Node ${{ matrix.node }}
     runs-on: ubuntu-24.04

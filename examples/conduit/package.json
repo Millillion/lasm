@@ -33,6 +33,7 @@
     "build:gcf": "npm run build && node deploy/package-hosted.mjs gcf",
     "test:platform": "node test/api.mjs --platform",
     "proofs": "node test/proofs.mjs",
+    "proofs:paranoid": "node test/paranoid.mjs",
     "test:e2e": "playwright test -c test/playwright.config.ts"
   },
   "engines": {

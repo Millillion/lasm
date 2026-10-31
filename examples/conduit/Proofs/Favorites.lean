@@ -6,6 +6,7 @@ Without Mathlib's `Finset`, "the number of distinct users" is stated as: the
 length of a list with no repeats whose members are exactly those users.
 -/
 import Conduit.Rules
+import Proofs.Spec
 
 namespace Conduit.Proofs
 
@@ -36,11 +37,8 @@ theorem fansOf_nodup (favorites : List (Nat × Nat)) (id : Nat) : (fansOf favori
 
 /-- **`favoritesCount` counts distinct users, and `favorited` is the
 viewer's own favorite**, for every article the API shows. -/
-theorem articleOf_favorites (viewer : Option Nat) (withBody : Bool) (d : Loaded) (a : ArticleRow) (art : Article)
-    (h : articleOf viewer withBody d a = some art) :
-    ∃ fans : List Nat, fans.Nodup ∧ (∀ u, u ∈ fans ↔ (a.id, u) ∈ d.favorites) ∧
-      art.favoritesCount = fans.length ∧
-      (art.favorited = true ↔ ∃ v, viewer = some v ∧ (a.id, v) ∈ d.favorites) := by
+theorem articleOf_favorites : Spec.articleOf_favorites := by
+  intro viewer withBody d a art h
   unfold articleOf at h
   simp only [Option.bind_eq_bind, Option.bind_eq_some_iff, Option.pure_def, Option.some.injEq] at h
   obtain ⟨u, _, rfl⟩ := h
