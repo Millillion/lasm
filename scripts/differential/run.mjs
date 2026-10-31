@@ -282,7 +282,16 @@ async function campaignProgram(seed, kind) {
         [t]: { stdout: target?.stdout.slice(0, 2000), stderr: target?.stderr.slice(0, 2000), code: target?.code } });
       console.log(`  minimized to ${repro.dir}`);
     }
-    if (!reproduced) summary.divergences.push({ seed, kind, target: t, cases: suspects.slice(0, 4), what: 'diverges only in combination with other cases', reproduce: `--seed ${seed} --programs 1` });
+    if (!reproduced) {
+      // Keep the whole program and both outputs: the divergence depends on context.
+      const combo = join(work, 'repros', `combination-${t}-${seed}-${kind}`);
+      mkdirSync(combo, { recursive: true });
+      cpSync(join(dir, 'Main.lean'), join(combo, 'Main.lean'));
+      const pick = (r, ids) => { const o = byCase(r.stdout), e = byCase(r.stderr, true); return Object.fromEntries(ids.map(id => [id, { stdout: o.get(id) ?? null, stderr: e.get(id) ?? null }])); };
+      const ids = suspects.slice(0, 4);
+      writeFileSync(join(combo, 'outputs.json'), JSON.stringify({ native: { code: ev.nat.code, cases: pick(ev.nat, ids) }, [t]: { code: res.run.code, cases: pick(res.run, ids) } }, null, 1) + '\n');
+      summary.divergences.push({ seed, kind, target: t, cases: ids, what: 'diverges only in combination with other cases', repro: combo, reproduce: `--seed ${seed} --programs 1` });
+    }
   }
   save();
 }
