@@ -17,6 +17,7 @@
     "start:bun": "bun bun/main.mjs",
     "test:bun": "node test/api.mjs --name bun --command \"bun bun/main.mjs\"",
     "proofs": "node test/proofs.mjs",
+    "proofs:paranoid": "node test/paranoid.mjs",
     "test:e2e": "playwright test -c test/playwright.config.ts"
   },
   "engines": {

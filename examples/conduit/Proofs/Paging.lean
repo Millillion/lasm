@@ -6,6 +6,8 @@ keep the order; consecutive pages fit together exactly, so walking the pages
 never skips or repeats an article; and every article is on some page.
 -/
 import Conduit.Paging
+import Proofs.Spec
+import Std.Data.String.ToNat
 
 namespace Conduit.Proofs
 
@@ -41,7 +43,7 @@ theorem pages_concat {α : Type} (k n : Nat) (l : List α) :
     rw [Nat.succ_mul, List.take_add]
 
 /-- Enough pages show every item exactly once, in order. -/
-theorem pages_cover {α : Type} (k n : Nat) (l : List α) (h : l.length ≤ n * k) :
+theorem pages_cover_all {α : Type} (k n : Nat) (l : List α) (h : l.length ≤ n * k) :
     (List.range n).flatMap (fun i => ({ limit := k, offset := i * k } : Page).window l) = l := by
   rw [pages_concat]; exact List.take_of_length_le h
 
@@ -58,5 +60,19 @@ theorem newestFirst_perm (ids : List Nat) : (newestFirst ids).Perm ids := List.m
 /-- So every page of a list is sorted newest first. -/
 theorem window_newestFirst_sorted (p : Page) (ids : List Nat) : (p.window (newestFirst ids)).Pairwise (· ≥ ·) :=
   (newestFirst_sorted ids).sublist (window_infix p _).sublist
+
+theorem newestFirst_spec : Spec.newestFirst_spec := fun ids => ⟨newestFirst_sorted ids, newestFirst_perm ids⟩
+
+theorem window_spec : Spec.window_spec := fun p l => ⟨window_infix p l, window_length_le p l⟩
+
+theorem pages_cover : Spec.pages_cover := fun k n l => ⟨pages_concat k n l, pages_cover_all k n l⟩
+
+theorem parsePage_spec : Spec.parsePage_spec := by
+  refine ⟨rfl, fun l o hl => ?_, ⟨.invalid [("limit", ["must be greater than 0"])], by have h0 : "0".toNat? = some 0 := Nat.toNat?_repr 0; simp [parsePage]; rw [h0]; rfl, rfl⟩, fun s hs => ?_, fun s hs => ?_⟩
+  · have h1 : (toString l).toNat? = some l := Nat.toNat?_repr l
+    have h2 : (toString o).toNat? = some o := Nat.toNat?_repr o
+    simp [parsePage, h1, h2, Nat.pos_iff_ne_zero.mp hl]; rfl
+  · exact ⟨_, by simp [parsePage, hs]; rfl, rfl⟩
+  · exact ⟨_, by simp [parsePage, hs]; rfl, rfl⟩
 
 end Conduit.Proofs
