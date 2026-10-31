@@ -1,6 +1,6 @@
-/- Conduit on the platforms without SQL, on a key-value store (`Lasm.KV`): Deno KV on Deno Deploy
-(`npm run build:deno-deploy`; locally `deno run -A --unstable-kv`), Fastly's KV Store `conduit`,
-else memory (Vercel Edge, Supabase Edge Functions; one copy per isolate). JWT_SECRET as everywhere. -/
+/- Conduit on Deno Deploy, on Deno KV (`Lasm.KV`): `npm run build:deno-deploy`; locally
+`deno run -A --unstable-kv deno/main.mjs` (elsewhere `Lasm.KV.open` falls back to memory).
+JWT_SECRET as everywhere. -/
 import Server.App
 import Lasm.Fetch.Embed
 import Server.Kv

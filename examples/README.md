@@ -6,7 +6,7 @@ For a new project, use `npm create @lasm@latest` with a [template](../README.md#
 
 | Example | What it shows | Run |
 | --- | --- | --- |
-| **[conduit](conduit)** (flagship) | The RealWorld "Conduit" app entirely in Lean: REST API, server-rendered `Lasm.UI` frontend, and **117 proved theorems** ([PROOFS.md](conduit/PROOFS.md)). The official API and Playwright suites pass on Node, Cloudflare Workers (D1) and Bun | `npm install && npm run build && npm start`; `npm run proofs`; `npm test` |
+| **[conduit](conduit)** (flagship) | The RealWorld "Conduit" app entirely in Lean: REST API, server-rendered `Lasm.UI` frontend, and **117 proved theorems** ([PROOFS.md](conduit/PROOFS.md)). The official API and Playwright suites pass on every platform Lasm supports, each with its own local tooling ([platforms](conduit#platforms)) | `npm install && npm run build && npm start`; `npm run proofs`; `npm test` |
 | [hello](hello) | The smallest program | `npx @lasm/cli Main.lean` |
 | [js-fetch](js-fetch) | A `@[js]` binding to Node's `fetch`, awaiting in `Async` | `npx @lasm/cli Main.lean -- https://example.com` |
 | [js-crud](js-crud) | A REST API with Postgres (`pg`) and JWT (`jose`), on Express and on Hono | `npm install && npx @lasm/cli Express.lean` |
