@@ -656,7 +656,7 @@ def stCount (n : Nat) : IO Nat := do
   let ((), s) ← (StateT.run (do for i in [0:(n % 20)] do modify (· + i)) 0 : IO (Unit × Nat))
   return s
 /-- A libm result to 9 significant digits (only exact operations after the
-`log10`, whose floor alone is used). -/
+log10, whose floor alone is used). -/
 def approx (x : Float) : Float :=
   if x.isNaN || x.isInf || x == 0 then x else
   let k := (Float.log10 x.abs).floor
