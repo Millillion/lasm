@@ -110,11 +110,12 @@ differences between targets.
 **What it cannot catch:** bugs that native Lean has too (it is the oracle);
 anything outside the generator's grammar (today: no `Std.Http`, sockets,
 processes, `Std.Time`, typeclass-heavy or universe-polymorphic code, deep
-recursion beyond 10,000 frames, which is a documented limit of the edge and
+recursion beyond a few thousand frames, which is a documented limit of the edge and
 WASI targets: the engine's Wasm stack, [EDGE.md](EDGE.md), [WASI.md](WASI.md);
-the generator's `deep` cases stay within it and so test that claim, and a
-campaign that went to 50,000 frames confirmed that wasmtime, `node:wasi` and the
-edge runtime stop there while native Lean and Node's full profile do not; large
+the generator's `deep` cases stay at or below 5,000 frames, and campaigns that
+went to 10,000 and 50,000 frames showed wasmtime, `node:wasi` and the edge runtime
+stopping just below 10,000 frames (issue #30) while native Lean and Node's full
+profile do not; large
 heaps); nondeterministic behaviour (output order across
 threads is never printed); performance; the browser (planned: the same programs
 under Playwright).
@@ -264,4 +265,7 @@ when coverage improves.
 | --- | --- | --- |
 | Differential testing, seed 1 (`wasi-node`) | **WASI:** libc's environment lost every variable after the third: `__wasi_environ_get` in `src/wasi/lasm_wasi_libc.c` widened the 32-bit WASI pointers in place with typed loads and stores that alias, which clang `-O2` may reorder. The Lean runtime's `LEAN_BACKTRACE` and `LEAN_ABORT_ON_PANIC` (and any libc `getenv`) were ignored unless among the first three variables; `IO.getEnv` was unaffected | Fixed in #25 (char-typed copies); regression `r_wasi_env_backtrace` |
 | Differential testing, regression replay (`deno`) | **Edge profile:** the C runtime's `getenv` sees none of the host's variables, so `LEAN_BACKTRACE=0` and `LEAN_ABORT_ON_PANIC` have no effect on the edge targets, Bun, Deno and the browser | [#26](https://github.com/Millillion/lasm/issues/26), listed in `KNOWN` |
+| Target equivalence (fetch template, `examples/fetch`) | `GET /hello/../hello/Ada`: Node, Deno and wasi-http route the raw dot segments (404); Bun and Workers remove them first (200). Same handler, different routing per platform, and `..` reaches handlers on Node | [#27](https://github.com/Millillion/lasm/issues/27) (proposal: `remove_dot_segments` in `Request.path`), listed as `known` |
+| Differential testing, `deep` and `ending` cases | wasmtime turns an exit status of 126–255 into exit 1 with an error (docs/WASI.md says modulo 256); edge and WASI recursion stops just below 10,000 frames of a small function (docs/EDGE.md says 10,000 pass) | [#30](https://github.com/Millillion/lasm/issues/30) (documentation), `KNOWN` / generator bound 5,000 |
+| Target equivalence, first CI run | Bun answered some requests with "socket hang up": the harness's pooled keep-alive sockets, not Lasm (fresh connections per request fixed it) | Harness fix |
 | Test-quality audit | `candidate-readme.test.mjs` broke on `main` when the README's headings changed (PR #22), failing `installer-faults.yml` on every PR | Fixed in #25 |

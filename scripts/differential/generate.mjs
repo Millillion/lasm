@@ -556,10 +556,10 @@ export function genCase(seed, index, { kinds = ['expr', 'state', 'io', 'task', '
   const r = rng(seed, index);
   uniq = index * 1000;
   const kind = r.weighted(kinds.map(k => ({ k, w: k === 'expr' ? 8 : k === 'deep' ? 0.4 : 1 }))).k;
-  // At most 10,000 frames of non-tail recursion: the documented bound of the edge
-  // profile and WASI (docs/EDGE.md, docs/WASI.md: the engine's Wasm stack), which
-  // this turns into a tested claim. Deeper recursion is a documented difference.
-  if (kind === 'deep') return { kind, f: r.int(0, DEEP.length - 1), n: r.pick([100, 1000, 5000, 10000]) };
+  // At most 5,000 frames of non-tail recursion: the edge profile and WASI are
+  // bounded by the engine's Wasm stack (docs/EDGE.md, docs/WASI.md), about 9,000
+  // frames of a small function (issue #30). Deeper recursion is a known difference.
+  if (kind === 'deep') return { kind, f: r.int(0, DEEP.length - 1), n: r.pick([100, 1000, 3000, 5000]) };
   if (kind === 'expr') {
     const t = r.weighted(TYPES.map(t => ({ t, w: ['Nat', 'Int', 'String', 'Float', 'UInt64'].includes(t) ? 3 : 1 }))).t;
     return { kind, t, e: genExpr(r, t, r.int(1, depth), [], {}) };
@@ -702,7 +702,7 @@ function* stmtShrinks(ss) {
   }
 }
 export function shrinkCandidates(c, limit = 60) {
-  if (c.kind === 'deep') return [10, 100, 1000, 5000].filter(n => n < c.n).map(n => ({ ...c, n }));
+  if (c.kind === 'deep') return [10, 100, 1000, 3000].filter(n => n < c.n).map(n => ({ ...c, n }));
   const out = [], seen = new Set([JSON.stringify(c)]);
   const gen = c.kind === 'expr' ? (function* () { for (const e of exprShrinks(c.e)) yield { ...c, e }; })() : (function* () { for (const s of stmtShrinks(c.s)) yield { ...c, s }; })();
   for (const x of gen) {

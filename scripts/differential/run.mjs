@@ -107,11 +107,15 @@ const KNOWN = [
   { issue: 'https://github.com/Millillion/lasm/issues/26', targets: ['deno'],
     what: 'edge profile prints panic backtraces despite LEAN_BACKTRACE=0',
     apply: r => ({ ...r, stderr: r.stderr.replace(/^backtrace:\n(?: {4}at .*\n?)*/gm, '') }) },
+  { issue: 'https://github.com/Millillion/lasm/issues/30', targets: ['wasi'],
+    what: 'wasmtime rejects exit statuses of 126 and above (exit 1 with an error)',
+    apply: (r, nat) => typeof nat?.code === 'number' && nat.code >= 126 && r.code === 1 && /invalid exit status outside of \[0\.\.126\)/.test(r.stderr)
+      ? { ...r, code: nat.code, stderr: r.stderr.replace(/Error: failed to run main module[\s\S]*$/, '') + (nat.stderr.endsWith('\n') && !r.stderr.endsWith('\n') ? '\n' : '') } : r },
 ];
 const knownApplied = {};
-function applyKnown(target, r) {
+function applyKnown(target, r, nat) {
   for (const k of KNOWN) if (k.targets.includes(target)) {
-    const next = k.apply(r);
+    const next = k.apply(r, nat);
     if (next.stderr !== r.stderr || next.stdout !== r.stdout) knownApplied[k.issue] = (knownApplied[k.issue] ?? 0) + 1;
     r = next;
   }
@@ -124,7 +128,7 @@ async function runIn(projectDir, cmdArgs, label) {
   return { ...normalize(r), ms: r.ms };
 }
 const runNative = dir => runIn(dir, [join(dir, 'main'), []], 'native');
-const runTarget = async (dir, target) => applyKnown(target, await runIn(dir, TARGETS[target].run(dir), target));
+const runTarget = async (dir, target, nat) => applyKnown(target, await runIn(dir, TARGETS[target].run(dir), target), nat);
 
 // Output lines grouped by the case that printed them: stdout lines start with
 // the case id ("cN ...", "cNvM ...", "r_name ..."); stderr has an "@id" marker
@@ -164,7 +168,7 @@ async function evaluate(dir, list, tlist, { ending } = {}) {
       if (!b.ok) { results[t] = { buildFailed: true, log: b.log }; continue; }
       built.add(out); builtTargets.set(t, (builtTargets.get(t) ?? 0) + b.ms);
     }
-    const r = await runTarget(dir, t);
+    const r = await runTarget(dir, t, nat);
     results[t] = { run: r, diff: diverging(ids, nat, r) };
   }
   return { nat, ids, results };
@@ -173,13 +177,13 @@ async function evaluate(dir, list, tlist, { ending } = {}) {
 // ---------- shrinking ----------
 // Keep the smallest diverging candidate, one round per build, until no candidate
 // diverges or the round budget is spent.
-async function shrink(dirBase, item, target, nativeAlone) {
+async function shrink(dirBase, item, target, ending) {
   let best = item, round = 0;
   while (round++ < shrinkRounds) {
     const cands = g.shrinkCandidates(best.c, 40);
     if (!cands.length) break;
     const list = cands.map((c, j) => ({ index: best.index, c, name: `c${best.index}v${j}` }));
-    const ev = await evaluate(join(dirBase, `shrink-${round}`), list, [target]);
+    const ev = await evaluate(join(dirBase, `shrink-${round}`), list, [target], { ending });
     if (ev.nativeBuildFailed) { console.log(`  shrink round ${round}: candidates do not compile natively; stopping`); break; }
     const res = ev.results[target];
     if (!res || res.buildFailed) { console.log(`  shrink round ${round}: Lasm build failed on candidates (keeping current)`); break; }
@@ -196,13 +200,13 @@ async function shrink(dirBase, item, target, nativeAlone) {
 
 // ---------- reproducers and regressions ----------
 function sha(s) { return createHash('sha256').update(s).digest('hex').slice(0, 12); }
-function writeRepro(target, seed, item, nat, tgt, note) {
+function writeRepro(target, seed, item, nat, tgt, ending, note) {
   const name = `r_${target.replace(/-/g, '_')}_${seed}_${item.index}`;
   const dir = join(work, 'repros', name);
   mkdirSync(dir, { recursive: true });
-  const program = g.renderProgram([{ ...item, name }]);
+  const program = g.renderProgram([{ ...item, name }], { ending });
   writeFileSync(join(dir, 'Main.lean'), program);
-  writeFileSync(join(dir, `${name}.lean`), `-- Differential regression (docs/TESTING.md#differential-testing): ${target}, seed ${seed}, case ${item.index}.\n-- ${note}\n` + g.renderCase(item.c, name));
+  writeFileSync(join(dir, `${name}.lean`), `-- Differential regression (docs/TESTING.md#differential-testing): ${target}, seed ${seed}, case ${item.index}; main ends with "${(ending ?? '  return 0').trim()}" (see Main.lean).\n-- ${note.replace(/\n/g, ' ')}\n` + g.renderCase(item.c, name));
   writeFileSync(join(dir, 'case.json'), JSON.stringify({ target, seed, index: item.index, case: item.c }, null, 1) + '\n');
   writeFileSync(join(dir, 'native.json'), JSON.stringify(nat, null, 1) + '\n');
   writeFileSync(join(dir, `${target}.json`), JSON.stringify(tgt, null, 1) + '\n');
@@ -261,18 +265,18 @@ async function campaignProgram(seed, kind) {
       if (reproduced >= 2) break;
       const item = list.find(x => `c${x.index}` === id);
       if (!item) continue;
-      const alone = await evaluate(join(dir, `alone-${id}-${t}`), [item], [t]);
+      const alone = await evaluate(join(dir, `alone-${id}-${t}`), [item], [t], { ending });
       const ar = alone.results?.[t];
       if (!ar || ar.buildFailed || !ar.diff.any) continue;
       reproduced++;
-      let small = await shrink(join(dir, `shrink-${id}-${t}`), item, t);
-      let fin = await evaluate(join(dir, `final-${id}-${t}`), [small], [t]);
+      let small = await shrink(join(dir, `shrink-${id}-${t}`), item, t, ending);
+      let fin = await evaluate(join(dir, `final-${id}-${t}`), [small], [t], { ending });
       // A shrink step accepted inside a batch (where an earlier crash hides later
       // cases) may not diverge alone: fall back to the verified case.
       if (!fin.results?.[t]?.diff?.any) { small = item; fin = alone; }
       const fr = fin.results?.[t];
       const native = fin.nat, target = fr?.run;
-      const repro = writeRepro(t, seed, small, native, target, `native: ${JSON.stringify(native?.stdout?.slice(0, 200))} ${t}: ${JSON.stringify(target?.stdout?.slice(0, 200))}`);
+      const repro = writeRepro(t, seed, small, native, target, ending, `native: ${JSON.stringify(native?.stdout?.slice(0, 200))} ${t}: ${JSON.stringify(target?.stdout?.slice(0, 200))}`);
       summary.divergences.push({ seed, kind, target: t, case: item.index, size: g.caseSize(small.c), repro: repro.dir, regression: `${repro.name}.lean`,
         native: { stdout: native?.stdout.slice(0, 2000), stderr: native?.stderr.slice(0, 2000), code: native?.code },
         [t]: { stdout: target?.stdout.slice(0, 2000), stderr: target?.stderr.slice(0, 2000), code: target?.code } });
@@ -305,7 +309,7 @@ async function regressionRun() {
     for (const t of tlist) {
       const b = await buildLasm(d, t);
       if (!b.ok) { summary.divergences.push({ regressions: true, target: t, what: 'lasm build failed', log: b.log }); console.log(`regressions ${t}: BUILD FAILED`); continue; }
-      const r = await runTarget(d, t);
+      const r = await runTarget(d, t, nat);
       const diff = diverging(ids, nat, r);
       if (diff.any) {
         summary.divergences.push({ regressions: true, target: t, cases: diff.bad, code: [nat.code, r.code], native: { stdout: nat.stdout.slice(0, 3000), stderr: nat.stderr.slice(0, 2000) }, [t]: { stdout: r.stdout.slice(0, 3000), stderr: r.stderr.slice(0, 2000) } });
