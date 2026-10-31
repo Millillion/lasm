@@ -86,6 +86,11 @@ jobs:
     needs: pack
     runs-on: ubuntu-24.04
     timeout-minutes: 150
+    # Nightly: the release and the dev profile (different Binaryen passes), 60 minutes each.
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: ${{ fromJSON(github.event_name == 'schedule' && '["release","dev"]' || format('["{0}"]', inputs.profile || 'release')) }}
     env:
       CI: '1'
       BROWSER: 'none'
@@ -145,14 +150,14 @@ jobs:
           if [ -z "$BUDGET" ]; then if [ "${{ github.event_name }}" = schedule ]; then BUDGET=60; else BUDGET=0; fi; fi
           SEED="${{ inputs.seed || '' }}"
           if [ -z "$SEED" ]; then
-            if [ "$BUDGET" = 0 ]; then SEED=$(( 16#$(echo "${{ github.event.pull_request.head.sha || github.sha }}" | cut -c1-7) )); else SEED=$(( ${{ github.run_id }} % 1000000000 )); fi
+            if [ "$BUDGET" = 0 ]; then SEED=$(( 16#$(echo "${{ github.event.pull_request.head.sha || github.sha }}" | cut -c1-7) )); else SEED=$(( (${{ github.run_id }} + ${{ matrix.profile == 'dev' && '500000000' || '0' }}) % 1000000000 )); fi
           fi
           echo "seed $SEED, budget $BUDGET min"
           if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3"; else AMOUNT="--budget-min $BUDGET"; fi
           node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
             --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest" \
             --seed "$SEED" $AMOUNT --cases 150 --fs-cases 25 --targets node,wasi,wasi-node,deno \
-            --profile "${{ inputs.profile || 'release' }}" --regressions test/differential/regressions \
+            --profile "${{ matrix.profile }}" --regressions test/differential/regressions \
             --wasmtime "$RUNNER_TEMP/tools/wasmtime/wasmtime" --deno "$RUNNER_TEMP/tools/node_modules/.bin/deno" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
       - name: Summary
         if: always()
@@ -168,7 +173,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: differential-${{ github.run_id }}
+          name: differential-${{ matrix.profile }}-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/difftest.log
             ${{ runner.temp }}/difftest/summary.json

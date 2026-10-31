@@ -109,8 +109,13 @@ strings, hashing, panics, uncaught errors, exit codes, tasks, refs, files),
 differences between targets.
 **What it cannot catch:** bugs that native Lean has too (it is the oracle);
 anything outside the generator's grammar (today: no `Std.Http`, sockets,
-processes, `Std.Time`, typeclass-heavy or universe-polymorphic code, very deep
-recursion or large heaps); nondeterministic behaviour (output order across
+processes, `Std.Time`, typeclass-heavy or universe-polymorphic code, deep
+recursion beyond 10,000 frames, which is a documented limit of the edge and
+WASI targets: the engine's Wasm stack, [EDGE.md](EDGE.md), [WASI.md](WASI.md);
+the generator's `deep` cases stay within it and so test that claim, and a
+campaign that went to 50,000 frames confirmed that wasmtime, `node:wasi` and the
+edge runtime stop there while native Lean and Node's full profile do not; large
+heaps); nondeterministic behaviour (output order across
 threads is never printed); performance; the browser (planned: the same programs
 under Playwright).
 
@@ -182,9 +187,10 @@ never exhibits on the tested CPUs.
 
 ### Coverage and mutation testing
 
-`node scripts/coverage/run.mjs` runs the unit suite under c8 (V8's own coverage,
-including child processes such as the CLI) and writes the summary to
-[`docs/evidence/coverage-baseline.json`](evidence/coverage-baseline.json).
+`unit.yml` runs the unit suite with `NODE_V8_COVERAGE` set, so V8 records the
+coverage of every Node process the tests start (the CLI, build workers, hosts),
+and [`scripts/coverage/report.mjs`](../scripts/coverage/report.mjs) turns it into
+a summary with c8, counting files that never loaded as 0 %.
 The [baseline](#coverage-baseline) is published below. Coverage says which lines
 ran, not that their results were checked; mutation testing (Stryker on the dev
 build service, link driver, notices and DOM applier; planned, nightly, rotating
@@ -195,7 +201,7 @@ modules) says whether the tests would notice a change.
 | Tier | When | Adds (beyond existing checks) | Budget |
 | --- | --- | --- | --- |
 | PR | every pull request and push to `main` | differential: regressions + three seeded program pairs (525 cases) on node, wasi, node:wasi, edge; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers (one candidate pack, then two parallel jobs) | measured: pack 1.5 min, differential about 5 min (one pair took 2.7 min, run 41232604865) |
-| Nightly | 04:41 UTC | differential: 60-minute campaign; the nightly upstream suite (`nightly.yml`) | about 1.5 h |
+| Nightly | 04:41 UTC | differential: 60-minute campaigns for the release and the dev profile (two jobs); the nightly upstream suite (`nightly.yml`) | about 1.5 h |
 | Release | release PR (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) | as today |
 
 ## Test-quality audit
@@ -216,14 +222,41 @@ run. Verdicts:
 | `release.test.mjs`: release.yml is the trusted publisher | regexes over four workflow files | **Keep the no-secrets lint; to replace the rest**: parse the YAML and test the `needs` graph; move the inline gate list into a tested module |
 | `nightly.test.mjs`: nightly.yml is scheduled, serialized, never a release dependency | regexes over workflows | **To replace** with structural YAML checks (the deferral logic is already tested through `nextStep`) |
 | `notices.test.mjs`: the edge runtime archive carries the MIT text and its change list | the packager's source | **To replace**: call the notice builder on a manifest (built outputs are already checked by `scripts/license/check-outputs.mjs`) |
-| `notices.test.mjs` (3 lines of the Apache 4(b) test) | patch names regex-parsed from a build script | **To replace**: import the patch table |
+| `notices.test.mjs` (3 lines of the Apache 4(b) test; the rest is behavioural) | patch names regex-parsed from `build-application-runtime.mjs` | **Keep as a cross-reference lint** until the patch table moves into an importable module (the build script runs when imported) |
 | `notices.test.mjs`: Lasm's licence copy, Wasmtime licence copies, MIT everywhere, MIT-0 texts | file equality and headers | **Keep**: consistency guards; licence text is what must be shipped |
 | 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never runs them (their failures are reported, not fatal) | **To port or retire**: the behaviours they cover (host IO, processes, cwd, signals) are partly covered by the installed-package acceptance and the differential tester's IO and file cases; each file should be ported to the current pipeline or deleted |
 | `browser.test.mjs`: every `lasm:web`/`lasm:app` binding names an export | `@[js …]` attributes in `library/Lasm/Web` cross-checked against real exports | **Keep**: a cheap cross-reference lint; a full behavioural check would link a program using every binding |
 
 ## Coverage baseline
 
-(Filled by `scripts/coverage/run.mjs`; see the evidence file for per-file numbers.)
+Measured by `unit.yml` run [41234188450](https://github.com/Millillion/lasm/actions/runs/41234188450)
+(commit `b2768b5`, Node 26.12.1, Linux x64), 148 JavaScript files under `src/`,
+`bin/` and `packages/`; per-file numbers in
+[evidence/coverage-baseline.json](evidence/coverage-baseline.json).
+
+| Scope | Lines | Branches | Functions |
+| --- | ---: | ---: | ---: |
+| **Total** | **67.5 %** (14,151 / 20,968) | 78.5 % | 70.3 % |
+| `src/` (CLI, build, Node host) | 69.3 % | | |
+| `src/link-driver` | 82.3 % | | |
+| `src/lasm-modules` (builtin `lasm:` modules) | 91.1 % | | |
+| `src/wasi` | 70.6 % | | |
+| `src/edge` | 48.2 % | | |
+| `src/browser` | 53.3 % | | |
+| `src/serverless` | 13.3 % | | |
+| `src/vite` | 0 % | | |
+
+The host bridge is well covered (`src/node-js.mjs` 91.5 %, `src/node-host.mjs`
+95.0 %); `src/dev.mjs` (`lasm dev`) is at 43 %. The 0 % files fall in two
+groups. Some run only inside built outputs (`src/edge/edge-pre.js`,
+`src/browser/loader.mjs`, `src/wasmtime-runtime.mjs`, `src/serverless/lasm-*.mjs`):
+they are copied into `dist/` and executed there by the integration workflows, and
+this measurement only counts files at their `src/` path. The others are simply
+not unit-tested (`src/vite/index.mjs`, `src/application-binding-check.mjs`,
+`src/application-build.mjs`). The 29 legacy files of the [audit](#test-quality-audit)
+contribute nothing. `unit.yml` (a release gate) fails when the total line
+coverage falls more than one point below this baseline; raise the baseline file
+when coverage improves.
 
 ## Bugs found
 

@@ -252,18 +252,24 @@ async function campaignProgram(seed, kind) {
     if (!res.diff.any) { console.log(`seed ${seed} ${kind} ${t}: same (${list.length} cases, native ${ev.nat.ms} ms, ${t} ${res.run.ms} ms)`); continue; }
     console.log(`seed ${seed} ${kind} ${t}: DIVERGES: cases ${res.diff.bad.slice(0, 10).join(' ')}${res.diff.code ? ` exit ${ev.nat.code} vs ${res.run.code}` : ''}${res.diff.stderr ? ' (stderr differs)' : ''}`);
     // Each diverging case (at most 3 per program and target) alone, then shrunk.
+    // The first diverging cases (a crash also cuts off every later case), each
+    // re-run alone; the ones that diverge alone are shrunk. If none does, the
+    // divergence needs other cases with it and is reported as such.
     const suspects = res.diff.bad.length ? res.diff.bad : ev.ids.slice(-1);
-    for (const id of suspects.slice(0, 3)) {
+    let reproduced = 0;
+    for (const id of suspects.slice(0, 4)) {
+      if (reproduced >= 2) break;
       const item = list.find(x => `c${x.index}` === id);
       if (!item) continue;
       const alone = await evaluate(join(dir, `alone-${id}-${t}`), [item], [t]);
       const ar = alone.results?.[t];
-      if (!ar || ar.buildFailed || !ar.diff.any) {
-        summary.divergences.push({ seed, kind, target: t, case: item.index, what: 'diverges only in combination with other cases', reproduce: `--seed ${seed} --programs 1` });
-        continue;
-      }
-      const small = await shrink(join(dir, `shrink-${id}-${t}`), item, t);
-      const fin = await evaluate(join(dir, `final-${id}-${t}`), [small], [t]);
+      if (!ar || ar.buildFailed || !ar.diff.any) continue;
+      reproduced++;
+      let small = await shrink(join(dir, `shrink-${id}-${t}`), item, t);
+      let fin = await evaluate(join(dir, `final-${id}-${t}`), [small], [t]);
+      // A shrink step accepted inside a batch (where an earlier crash hides later
+      // cases) may not diverge alone: fall back to the verified case.
+      if (!fin.results?.[t]?.diff?.any) { small = item; fin = alone; }
       const fr = fin.results?.[t];
       const native = fin.nat, target = fr?.run;
       const repro = writeRepro(t, seed, small, native, target, `native: ${JSON.stringify(native?.stdout?.slice(0, 200))} ${t}: ${JSON.stringify(target?.stdout?.slice(0, 200))}`);
@@ -272,6 +278,7 @@ async function campaignProgram(seed, kind) {
         [t]: { stdout: target?.stdout.slice(0, 2000), stderr: target?.stderr.slice(0, 2000), code: target?.code } });
       console.log(`  minimized to ${repro.dir}`);
     }
+    if (!reproduced) summary.divergences.push({ seed, kind, target: t, cases: suspects.slice(0, 4), what: 'diverges only in combination with other cases', reproduce: `--seed ${seed} --programs 1` });
   }
   save();
 }

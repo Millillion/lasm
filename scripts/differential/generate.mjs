@@ -152,9 +152,9 @@ op('Nat', ['String'], a => `${a}.utf8ByteSize`, 1);
 op('Nat', ['String'], a => `(${a}.toNat?.getD 7)`, 1);
 op('Nat', ['ListNat'], a => `${a}.length`, 1);
 op('Nat', ['ListNat'], a => `${a}.sum`, 2);
-op('Nat', ['ListNat'], a => `(${a}.foldl (fun acc x => acc * 31 + x) 17)`, 1);
+op('Nat', ['ListNat'], a => `(${a}.foldl (fun (acc : Nat) (x : Nat) => acc * 31 + x) 17)`, 1);
 op('Nat', ['ArrayInt'], a => `${a}.size`, 1);
-op('Nat', ['ArrayInt'], a => `(${a}.foldl (fun acc x => acc + x.natAbs) 0)`, 1);
+op('Nat', ['ArrayInt'], a => `(${a}.foldl (fun (acc : Nat) (x : Int) => acc + x.natAbs) 0)`, 1);
 op('Nat', ['OptNat'], a => `(${a}.getD 42)`, 2);
 op('Nat', ['Int'], a => `${a}.toNat`, 1);
 op('Nat', ['Int'], a => `${a}.natAbs`, 1);
@@ -192,17 +192,17 @@ op('Int', ['Int', 'Int'], (a, b) => `(Int.fmod ${a} ${b})`, 1);
 op('Int', ['Int', 'Nat'], (a, b) => `(Int.bmod ${a} (${b} % 1000 + 1))`, 1);
 op('Int', ['Int', 'Nat'], (a, b) => `(${a} ^ (${b} % 40))`, 1);
 op('Int', ['Int', 'Nat'], (a, b) => `(${a} >>> (${b} % 200))`, 1);
-op('Int', ['Int'], a => `(-${a})`, 2);
+op('Int', ['Int'], a => `(-(${a}))`, 2);
 op('Int', ['Int', 'Int'], (a, b) => `(min ${a} ${b})`, 1);
 op('Int', ['Int', 'Int'], (a, b) => `(max ${a} ${b})`, 1);
 op('Int', ['Int'], a => `(Int.sign ${a})`, 1);
 op('Int', ['Nat'], a => `(Int.ofNat ${a})`, 2);
 op('Int', ['Nat', 'Nat'], (a, b) => `((${a} : Int) - (${b} : Int))`, 1);
 op('Int', ['Float'], a => `(Int.ofNat ${a}.toUInt32.toNat - 7)`, 1);
-op('Int', ['ArrayInt'], a => `(${a}.foldl (· + ·) 0)`, 1);
+op('Int', ['ArrayInt'], a => `(${a}.foldl (fun (acc x : Int) => acc + x) 0)`, 1);
 op('Int', ['ArrayInt'], a => `(${a}.getD 2 (-1))`, 1);
-op('Int', ['Pt'], a => `${a}.x`, 1);
-op('Int', ['Pt'], a => `(${a}.x * ${a}.y)`, 1);
+op('Int', ['Pt'], a => `(${a}.x : Int)`, 1);
+op('Int', ['Pt'], a => `((${a}.x * ${a}.y : Int))`, 1);
 op('Int', ['Int'], a => `(Int.toNat ${a} : Int)`, 1);
 
 // Fixed-width unsigned integers
@@ -218,8 +218,8 @@ for (const t of ['UInt8', 'UInt16', 'UInt32', 'UInt64']) {
   op(t, [t, t], (a, b) => `(${a} ^^^ ${b})`, 1);
   op(t, [t, t], (a, b) => `(${a} <<< ${b})`, 1);
   op(t, [t, t], (a, b) => `(${a} >>> ${b})`, 1);
-  op(t, [t], a => `(~~~${a})`, 1);
-  op(t, [t], a => `(-${a})`, 1);
+  op(t, [t], a => `(~~~(${a}))`, 1);
+  op(t, [t], a => `(-(${a}))`, 1);
   op(t, [t], a => `${a}.log2`, 1);
   op(t, ['Nat'], a => `(${t}.ofNat ${a})`, 2);
   op(t, ['Float'], a => `${a}.to${t}`, 1);
@@ -245,7 +245,7 @@ op('Bool', ['Float'], a => `${a}.isInf`, 1);
 op('Bool', ['Float'], a => `${a}.isFinite`, 1);
 op('Bool', ['Bool', 'Bool'], (a, b) => `(${a} && ${b})`, 1);
 op('Bool', ['Bool', 'Bool'], (a, b) => `(${a} || ${b})`, 1);
-op('Bool', ['Bool'], a => `(!${a})`, 1);
+op('Bool', ['Bool'], a => `(!(${a}))`, 1);
 op('Bool', ['String', 'String'], (a, b) => `(${a}.startsWith ${b})`, 1);
 op('Bool', ['String', 'String'], (a, b) => `(${a}.endsWith ${b})`, 1);
 op('Bool', ['String'], a => `${a}.isEmpty`, 1);
@@ -264,7 +264,7 @@ op('Float', ['Float', 'Float'], (a, b) => `(${a} + ${b})`, 3);
 op('Float', ['Float', 'Float'], (a, b) => `(${a} - ${b})`, 2);
 op('Float', ['Float', 'Float'], (a, b) => `(${a} * ${b})`, 2);
 op('Float', ['Float', 'Float'], (a, b) => `(${a} / ${b})`, 2);
-op('Float', ['Float'], a => `(-${a})`, 1);
+op('Float', ['Float'], a => `(-(${a}))`, 1);
 op('Float', ['Float'], a => `${a}.sqrt`, 1);
 op('Float', ['Float'], a => `${a}.abs`, 1);
 op('Float', ['Float'], a => `${a}.floor`, 1);
@@ -378,7 +378,7 @@ op('Tree', ['Tree'], a => `${a}.mirror`, 1);
 op('Tree', ['Tree', 'Nat'], (a, b) => `(${a}.insert ${b})`, 1);
 op('Tree', ['Tree', 'Nat', 'Tree'], (a, b, c) => `(Tree.node ${a} ${b} ${c})`, 1);
 op('Pt', ['Int', 'Int', 'String'], (a, b, c) => `({ x := ${a}, y := ${b}, tag := ${c} } : Pt)`, 3);
-op('Pt', ['Pt', 'Int'], (a, b) => `{ ${a} with x := ${b} }`, 1);
+op('Pt', ['Pt', 'Int'], (a, b) => `({ ${a} with x := ${b} } : Pt)`, 1);
 op('Pt', ['Pt', 'Pt'], (a, b) => `(Pt.add ${a} ${b})`, 1);
 
 export const OPS = ops;
@@ -419,8 +419,9 @@ export function renderExpr(e) {
     return e.bb ? `(bb (${v} : ${ty}))` : v;
   }
   const k = e.k.map(renderExpr);
-  if (o.bind) return o.rb(k[0], e.x, k[1]);
-  return o.r(...k);
+  // Every result is ascribed its type, so Lean never infers an operation's
+  // type from the context it appears in (Nat-valued folds inside Int sums).
+  return `(${o.bind ? o.rb(k[0], e.x, k[1]) : o.r(...k)} : ${lt(o.t)})`;
 }
 export function exprSize(e) { return e.var || e.v !== undefined ? 1 : 1 + e.k.reduce((s, c) => s + exprSize(c), 0); }
 export function exprType(e) { return e.var ? e.t : ops[e.op].t; }
@@ -555,7 +556,10 @@ export function genCase(seed, index, { kinds = ['expr', 'state', 'io', 'task', '
   const r = rng(seed, index);
   uniq = index * 1000;
   const kind = r.weighted(kinds.map(k => ({ k, w: k === 'expr' ? 8 : k === 'deep' ? 0.4 : 1 }))).k;
-  if (kind === 'deep') return { kind, f: r.int(0, DEEP.length - 1), n: r.pick([100, 1000, 10000, 50000, 100000]) };
+  // At most 10,000 frames of non-tail recursion: the documented bound of the edge
+  // profile and WASI (docs/EDGE.md, docs/WASI.md: the engine's Wasm stack), which
+  // this turns into a tested claim. Deeper recursion is a documented difference.
+  if (kind === 'deep') return { kind, f: r.int(0, DEEP.length - 1), n: r.pick([100, 1000, 5000, 10000]) };
   if (kind === 'expr') {
     const t = r.weighted(TYPES.map(t => ({ t, w: ['Nat', 'Int', 'String', 'Float', 'UInt64'].includes(t) ? 3 : 1 }))).t;
     return { kind, t, e: genExpr(r, t, r.int(1, depth), [], {}) };
@@ -698,7 +702,7 @@ function* stmtShrinks(ss) {
   }
 }
 export function shrinkCandidates(c, limit = 60) {
-  if (c.kind === 'deep') return [10, 100, 1000, 10000, 50000].filter(n => n < c.n).map(n => ({ ...c, n }));
+  if (c.kind === 'deep') return [10, 100, 1000, 5000].filter(n => n < c.n).map(n => ({ ...c, n }));
   const out = [], seen = new Set([JSON.stringify(c)]);
   const gen = c.kind === 'expr' ? (function* () { for (const e of exprShrinks(c.e)) yield { ...c, e }; })() : (function* () { for (const s of stmtShrinks(c.s)) yield { ...c, s }; })();
   for (const x of gen) {
