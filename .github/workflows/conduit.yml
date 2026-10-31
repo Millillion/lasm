@@ -22,7 +22,9 @@ name: Conduit
 #   Cloud Functions (Functions Framework); Deno Deploy (Deno KV); Vercel
 #   Edge (vercel build, edge-runtime); Netlify Edge (netlify build and
 #   netlify dev, Netlify Blobs); Supabase Edge Functions (the Supabase CLI's
-#   local stack and functions serve, Postgres). Each runs the API suite and the end-to-end
+#   local stack and functions serve, Postgres); Fastly Compute (Viceroy,
+#   Fastly KV); wasi-http on wasmtime serve and Spin (Postgres through
+#   PostgREST). Each runs the API suite and the end-to-end
 #   suite (Chromium, no retries);
 # - pinned: test/realworld is byte-identical to the upstream commit.
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
@@ -366,7 +368,7 @@ jobs:
             title: AWS Lambda .zip (sam local start-api, nodejs24.x)
             build: npm run build:lambda
           - platform: lambda-image
-            title: AWS Lambda container image (sam local start-api, Lambda Web Adapter)
+            title: AWS Lambda container image (sam local start-api, AWS base image)
             build: npm run build:lambda-image
           - platform: vercel
             title: Vercel Functions (vercel build offline, Vercel's Node launcher)
@@ -385,10 +387,21 @@ jobs:
             build: npm run build:deno-deploy
           - platform: vercel-edge
             title: Vercel Edge (vercel build offline, edge-runtime)
-            build: cp deploy/vercel-edge/vercel.json vercel.json && vercel build --yes
+            # api/lasm.mjs must exist before vercel build detects functions (it
+            # does not detect the one its build command writes; DECISIONS.md).
+            build: npm run build:vercel-edge && cp deploy/vercel-edge/vercel.json vercel.json && vercel build --yes
           - platform: netlify-edge
             title: Netlify Edge (netlify build and netlify dev, offline; Netlify Blobs)
             build: cp deploy/netlify-edge/netlify.toml netlify.toml && netlify build --offline
+          - platform: fastly
+            title: Fastly Compute (Viceroy 0.21.1, Fastly KV)
+            build: npm run build:fastly
+          - platform: wasi-http
+            title: wasi-http (wasmtime 49.0.4 serve; Postgres through PostgREST)
+            build: npm run build:wasi-http && node test/postgrest.mjs up
+          - platform: spin
+            title: Spin 4.2.2 (wasi-http; Postgres through PostgREST)
+            build: npm run build:wasi-http && node test/postgrest.mjs up
           - platform: supabase-edge
             title: Supabase Edge Functions (supabase start, supabase functions serve; Postgres)
             build: npm run build:supabase-edge && supabase start
@@ -405,7 +418,10 @@ jobs:
       NETLIFY_AUTH_TOKEN: ''
       FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT: '1'
       SUPABASE_TELEMETRY_DISABLED: '1'
+      SPIN_DISABLE_TELEMETRY: '1'
       DO_NOT_TRACK: '1'
+      # The example's directory (the Netlify jobs use a copy, below).
+      CONDUIT: examples/conduit
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -419,8 +435,13 @@ jobs:
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Netlify only, the example outside this repository (Netlify's CLI takes the repository, whose package.json has workspaces, for a monorepo and serves no function)
+        if: matrix.platform == 'netlify' || matrix.platform == 'netlify-edge'
+        run: |
+          cp -a examples/conduit "$RUNNER_TEMP/conduit"
+          echo "CONDUIT=$RUNNER_TEMP/conduit" >> "$GITHUB_ENV"
       - name: npm ci
-        working-directory: examples/conduit
+        working-directory: ${{ env.CONDUIT }}
         run: npm ci --no-audit --no-fund
       - name: The platform's pinned tools
         env:
@@ -439,19 +460,39 @@ jobs:
               echo "VERCEL_NODE_MODULES=$T/node_modules" >> "$GITHUB_ENV"
               echo "VERCEL_EDGE_TOOLS=$T" >> "$GITHUB_ENV"
               # A local project link stands in for `vercel link` (no account).
-              mkdir -p examples/conduit/.vercel
-              echo '{"projectId":"prj_conduit_ci","orgId":"team_conduit_ci","settings":{}}' > examples/conduit/.vercel/project.json
+              mkdir -p "$CONDUIT/.vercel"
+              echo '{"projectId":"prj_conduit_ci","orgId":"team_conduit_ci","settings":{}}' > "$CONDUIT/.vercel/project.json"
               # No credentials: a home of its own.
               echo "XDG_DATA_HOME=$RUNNER_TEMP/vercel-home/data" >> "$GITHUB_ENV"
               echo "XDG_CONFIG_HOME=$RUNNER_TEMP/vercel-home/config" >> "$GITHUB_ENV" ;;
             # Deno from npm: Netlify's edge runtime is the Deno CLI on PATH (nothing downloaded).
             supabase-edge) npm install --prefix "$T" --no-audit --no-fund supabase@2.122.0 ;;
+            fastly|wasi-http|spin)
+              get() { curl -fsSL --retry 3 -o "$RUNNER_TEMP/$2" "$1"; echo "$3  $RUNNER_TEMP/$2" | sha256sum -c; }
+              mkdir -p "$T/node_modules/.bin" "$RUNNER_TEMP/wasi-tools"
+              case "$PLATFORM" in
+                fastly)
+                  get https://github.com/fastly/Viceroy/releases/download/v0.21.1/viceroy_v0.21.1_linux-amd64.tar.gz viceroy.tgz 54a5b46ab05ce1492f4df136728b2eb81b350cb42da5d9f2eec66558ddc1e233
+                  tar -xzf "$RUNNER_TEMP/viceroy.tgz" -C "$T/node_modules/.bin" viceroy ;;
+                wasi-http)
+                  get https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.4/wasmtime-v49.0.4-x86_64-linux.tar.xz wasmtime.tar.xz 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
+                  tar -xJf "$RUNNER_TEMP/wasmtime.tar.xz" -C "$RUNNER_TEMP/wasi-tools" --strip-components=1
+                  ln -s "$RUNNER_TEMP/wasi-tools/wasmtime" "$T/node_modules/.bin/wasmtime" ;;
+                spin)
+                  get https://github.com/spinframework/spin/releases/download/v4.2.2/spin-v4.2.2-static-linux-amd64.tar.gz spin.tgz ff870e915b41216318e525198028fc1017e96f599f54bbfd4e983730d0a1fecd
+                  tar -xzf "$RUNNER_TEMP/spin.tgz" -C "$RUNNER_TEMP/wasi-tools"
+                  ln -s "$RUNNER_TEMP/wasi-tools/spin" "$T/node_modules/.bin/spin" ;;
+              esac ;;
             netlify|netlify-edge) npm install --prefix "$T" --no-audit --no-fund netlify-cli@27.14.2 deno@2.9.6 ;;
             azure)
-              npm install --prefix "$T" --no-audit --no-fund azure-functions-core-tools@4.16.0
-              # npm 11 skips install scripts unless allowed; this one downloads func.
-              (cd "$T/node_modules/azure-functions-core-tools" && node lib/install.js)
-              "$T/node_modules/.bin/func" --version ;;
+              # Azure Functions Core Tools 4.16.0, the archive its npm package downloads
+              # (npm 11 skips that package's install script), checked by SHA-256.
+              curl -fsSL --retry 3 -o "$RUNNER_TEMP/func.zip" https://cdn.functions.azure.com/public/4.0.308342/Azure.Functions.Cli.linux-x64.4.16.0.zip
+              echo "c68c7780d94c7583157f7a7d1a05e0ec3e34057c3d55e4c7be71fc4aa0c23667  $RUNNER_TEMP/func.zip" | sha256sum -c
+              unzip -q "$RUNNER_TEMP/func.zip" -d "$RUNNER_TEMP/func" && rm "$RUNNER_TEMP/func.zip"
+              chmod 755 "$RUNNER_TEMP/func/func" "$RUNNER_TEMP/func/in-proc8/func" "$RUNNER_TEMP/func/in-proc6/func"
+              mkdir -p "$T/node_modules/.bin" && ln -s "$RUNNER_TEMP/func/func" "$T/node_modules/.bin/func"
+              func() { "$RUNNER_TEMP/func/func" "$@"; }; func --version ;;
           esac
           mkdir -p "$T/node_modules/.bin"
           echo "$T/node_modules/.bin" >> "$GITHUB_PATH"
@@ -465,10 +506,10 @@ jobs:
         if: matrix.platform == 'lambda' || matrix.platform == 'lambda-image' || matrix.platform == 'vercel'
         run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
       - name: Build (${{ matrix.build }})
-        working-directory: examples/conduit
-        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- bash -c "${{ matrix.build }}"
+        working-directory: ${{ env.CONDUIT }}
+        run: node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- bash -c "${{ matrix.build }}"
       - name: The official RealWorld API suite
-        working-directory: examples/conduit
+        working-directory: ${{ env.CONDUIT }}
         run: node test/api.mjs --platform ${{ matrix.platform }}
       - name: The pinned Playwright's chromium
         timeout-minutes: 30
@@ -476,7 +517,7 @@ jobs:
           npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
           bash scripts/ci/playwright-install.sh chromium
       - name: The official RealWorld end-to-end suite
-        working-directory: examples/conduit
+        working-directory: ${{ env.CONDUIT }}
         env:
           BROWSERS: chromium
           E2E_NAME: ${{ matrix.platform }}-chromium
@@ -489,6 +530,6 @@ jobs:
         if: always()
         with:
           name: conduit-${{ matrix.platform }}
-          path: examples/conduit/test-results/
+          path: ${{ env.CONDUIT }}/test-results/
           retention-days: 14
           if-no-files-found: warn

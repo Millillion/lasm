@@ -1,16 +1,16 @@
 /-
-The server: `Conduit.Api.handle` (pure Lean, written against `Store` and
-`Services`) served over HTTP with `Lasm.Fetch`, on a SQLite connection from
-one of the binding modules, or on a key-value store (`Server/Kv.lean`). The
-same code runs on every platform; only the store it is given differs.
+The server on the JavaScript targets (Node, Bun, Deno, the edge platforms
+and the function platforms): `Server/Http.lean` with the clock, passwords
+and tokens from Web Crypto, on a SQLite connection from one of the binding
+modules, or on a key-value store (`Server/Kv.lean`). The same code runs on
+every platform; only the store it is given differs.
 -/
 import Lasm.Fetch
 import Lasm.JS
 import Conduit.Api
 import Server.Sql
 import Server.Crypto
-import Server.Pages
-import Lasm.Fetch.Assets
+import Server.Http
 open Lasm.JS Lean
 
 namespace Conduit.Server
@@ -28,9 +28,6 @@ def setting (name : String) : IO (Option String) := do
     | _ => return none
   | _ => return none
 
-/-- Signs development tokens when `JWT_SECRET` is not set. -/
-def developmentSecret : String := "conduit development secret: set JWT_SECRET in production"
-
 def secret : IO String := do return (← setting "JWT_SECRET").getD developmentSecret
 
 /-- Milliseconds since the epoch (`Date.now()`). -/
@@ -46,37 +43,10 @@ def services : Services Async where
   issueToken id := do Crypto.issueToken (← secret) id ((← nowMs) / 1000)
   readToken token := do Crypto.readToken (← secret) token ((← nowMs) / 1000)
 
-/-- Any origin may call the API (it uses tokens, not cookies), so other
-RealWorld frontends work with this backend too. -/
-def cors : Array (String × String) := #[
-  ("access-control-allow-origin", "*"),
-  ("access-control-allow-headers", "authorization, content-type"),
-  ("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS")]
-
-/-- `/api/…`: the RealWorld API. -/
-def api (store : Store Async) (req : Lasm.Fetch.Request) (path : List String) : Async Lasm.Fetch.Response := do
-  if req.method == "OPTIONS" then return { status := 204, headers := cors }
-  let r : Request := { method := if req.method == "HEAD" then "GET" else req.method, path,
-                       query := req.queryParams, authorization := req.header? "authorization", body := req.text }
-  let reply ← Api.handle store services r
-  let response : Lasm.Fetch.Response := match reply.body with
-    | some j => .json j.compress reply.status.toUInt16
-    | none => .empty reply.status.toUInt16
-  return { response with headers := response.headers ++ cors }
-
-/-- The whole site: the API under `/api`, and every other URL's page,
-server-rendered (the browser app's files are served before this, by `run`). -/
-def site (store : Store Async) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
-  match req.segments with
-  | "api" :: path => api store req path
-  | _ =>
-    if req.method == "GET" || req.method == "HEAD" then pageResponse store services req
-    else return .notFound
-
 /-- Serves Conduit on a store, with the browser app's files (`assets`:
 `embed_dir! "dist/public"` in the entry file). -/
 def serveStore (store : Store Async) (assets : Lasm.Fetch.Assets) : IO Unit :=
-  Lasm.Fetch.serve (assets.wrap (site store))
+  serveWith store services assets
 
 /-- Serves Conduit on a SQL database (whose binding module created the tables). -/
 def run (db : Sql) (assets : Lasm.Fetch.Assets) : IO Unit := serveStore (store db) assets

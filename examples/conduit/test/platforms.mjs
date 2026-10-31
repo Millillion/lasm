@@ -62,6 +62,25 @@ export const platforms = {
     serve: 'node test/supabase-serve.mjs {port}',
     store: 'Postgres (table conduit_kv, through Supabase\'s REST API)',
   },
+  // Viceroy, Fastly's local simulator (what fastly compute serve runs), with
+  // fastly.toml's local KV Store: a fresh instance for every request.
+  fastly: {
+    build: 'build:fastly',
+    serve: 'viceroy serve --addr 127.0.0.1:{port} -C fastly.toml bin/main.wasm',
+    store: 'Fastly KV Store (Viceroy: in memory)',
+  },
+  // wasi:http: wasmtime serve and Spin's HTTP trigger, a fresh instance for
+  // every request; the data is in Postgres through PostgREST (test/postgrest.mjs up).
+  'wasi-http': {
+    build: 'build:wasi-http',
+    serve: 'node test/postgrest.mjs truncate && exec wasmtime serve --addr 127.0.0.1:{port} wasi-http/main.wasm',
+    store: 'Postgres through PostgREST (outgoing wasi:http requests)',
+  },
+  spin: {
+    build: 'build:wasi-http',
+    serve: 'node test/postgrest.mjs truncate && SPIN_HOME={data}/spin exec spin up --listen 127.0.0.1:{port}',
+    store: 'Postgres through PostgREST (outgoing wasi:http requests)',
+  },
   workers: {
     build: 'build:workers',
     // Its local D1 in the run's own directory: each run starts empty.
@@ -88,7 +107,8 @@ export const platforms = {
     ownDatabase: true,
     store: 'node:sqlite in /tmp (per instance)',
   },
-  // The same API Gateway in front of the container image (deploy/lambda-image).
+  // The same API Gateway in front of the container image (deploy/lambda-image:
+  // AWS's Node 24 base image with the .zip package's handler).
   'lambda-image': {
     build: 'build:lambda-image',
     serve: 'sam local start-api -t deploy/lambda-image/template.yaml --port {port} --host 127.0.0.1 --warm-containers EAGER --parameter-overrides JwtSecret=local-test-secret',

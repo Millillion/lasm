@@ -23,3 +23,7 @@ netlify/edge-functions/lasm.mjs
 supabase/functions/
 supabase/.temp/
 supabase/.branches/
+bin/
+pkg/
+wasi-http/
+.spin/
