@@ -202,7 +202,7 @@ modules) says whether the tests would notice a change.
 
 An HN commenter mocked "tests that assert certain strings exist in the
 codebase". An audit of `test/`, `integration/` and the CI check scripts on
-2026-10-31 found 13 tests whose assertions read repository files as text. All
+2026-10-31 found 13 tests whose assertions read repository files as text, and 29 test files that CI never runs. All
 `integration/` harnesses and `scripts/**/check*.mjs` check things they build or
 run. Verdicts:
 
@@ -218,6 +218,7 @@ run. Verdicts:
 | `notices.test.mjs`: the edge runtime archive carries the MIT text and its change list | the packager's source | **To replace**: call the notice builder on a manifest (built outputs are already checked by `scripts/license/check-outputs.mjs`) |
 | `notices.test.mjs` (3 lines of the Apache 4(b) test) | patch names regex-parsed from a build script | **To replace**: import the patch table |
 | `notices.test.mjs`: Lasm's licence copy, Wasmtime licence copies, MIT everywhere, MIT-0 texts | file equality and headers | **Keep**: consistency guards; licence text is what must be shipped |
+| 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never runs them (their failures are reported, not fatal) | **To port or retire**: the behaviours they cover (host IO, processes, cwd, signals) are partly covered by the installed-package acceptance and the differential tester's IO and file cases; each file should be ported to the current pipeline or deleted |
 | `browser.test.mjs`: every `lasm:web`/`lasm:app` binding names an export | `@[js …]` attributes in `library/Lasm/Web` cross-checked against real exports | **Keep**: a cheap cross-reference lint; a full behavioural check would link a program using every binding |
 
 ## Coverage baseline
