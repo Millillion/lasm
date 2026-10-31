@@ -7,15 +7,10 @@ Lasm.UI's `Url`, not proved here.)
 -/
 import Frontend.Route
 import Std.Data.String.ToNat
+import Proofs.Spec
 
 namespace Conduit.Proofs
-open Conduit.Frontend
-
-/-- A route the app links to: page numbers start at 1. -/
-def Linkable : Route → Prop
-  | .home _ p | .profile _ _ p => 1 ≤ p
-  | .notFound => False
-  | _ => True
+open Conduit.Frontend Spec
 
 theorem pageOf_pageParam (p : Nat) (h : 1 ≤ p) (extra : List (String × String))
     (hx : extra.lookup "page" = none) : pageOf (extra ++ pageParam p) = p := by
@@ -26,7 +21,8 @@ theorem pageOf_pageParam (p : Nat) (h : 1 ≤ p) (extra : List (String × String
   · simp [h1, hx, List.lookup_append, Nat.toNat?_repr]; omega
 
 /-- **Every link the app writes leads back to its page.** -/
-theorem parse_href (r : Route) (h : Linkable r) : Route.parse r.segments r.query = r := by
+theorem parse_href : Spec.parse_href := by
+  intro r h
   cases r with
   | home feed p =>
     have hp : 1 ≤ p := h
