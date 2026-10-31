@@ -33,6 +33,27 @@ export const platforms = {
     serve: 'deno run -A deno/main.mjs',
     store: 'node:sqlite in Deno (a file)',
   },
+  // Deno Deploy's build, on Deno KV: the Deno CLI's local KV (a SQLite file
+  // under DENO_DIR, here the run's own directory).
+  'deno-deploy': {
+    build: 'build:deno-deploy',
+    serve: 'DENO_DIR={data}/deno deno run -A --unstable-kv deno/main.mjs',
+    store: 'Deno KV (deno run --unstable-kv: a local file)',
+  },
+  // `vercel build` (offline) output in Vercel's edge-runtime package; the
+  // store is memory (Vercel Edge has no store of its own): one copy per isolate.
+  'vercel-edge': {
+    build: 'build:vercel-edge',
+    serve: 'node test/vercel-edge-serve.mjs {port}',
+    store: 'memory (one copy per isolate)',
+  },
+  // `netlify build` (offline) output, served by `netlify dev --offline`
+  // (Netlify's local edge runtime, Deno), with its local Netlify Blobs.
+  'netlify-edge': {
+    build: 'build:netlify-edge',
+    serve: 'netlify dev --offline --no-open --port {port}',
+    store: 'Netlify Blobs (netlify dev: local blobs)',
+  },
   workers: {
     build: 'build:workers',
     // Its local D1 in the run's own directory: each run starts empty.
@@ -45,6 +66,7 @@ export const platforms = {
     build: 'build:docker',
     serve: 'docker run --rm --init --name conduit-{port} --read-only --tmpfs /tmp --memory=512m --memory-swap=512m -p 127.0.0.1:{port}:3000 conduit',
     stop: 'docker rm -f conduit-{port}',
+    ownDatabase: true,
     store: 'node:sqlite on the /data volume',
   },
   // AWS SAM's local API Gateway in front of the .zip package in Lambda's
@@ -53,6 +75,9 @@ export const platforms = {
     build: 'build:lambda',
     serve: 'sam local start-api -t deploy/lambda/template.yaml --port {port} --host 127.0.0.1 --warm-containers EAGER --parameter-overrides JwtSecret=local-test-secret',
     stop: samStop,
+    // A fresh container: the template's DATABASE_PATH (sam local would take
+    // a DATABASE_PATH from this environment instead).
+    ownDatabase: true,
     store: 'node:sqlite in /tmp (per instance)',
   },
   // The same API Gateway in front of the container image (deploy/lambda-image).
@@ -60,6 +85,9 @@ export const platforms = {
     build: 'build:lambda-image',
     serve: 'sam local start-api -t deploy/lambda-image/template.yaml --port {port} --host 127.0.0.1 --warm-containers EAGER --parameter-overrides JwtSecret=local-test-secret',
     stop: samStop,
+    // A fresh container: the template's DATABASE_PATH (sam local would take
+    // a DATABASE_PATH from this environment instead).
+    ownDatabase: true,
     store: 'node:sqlite in /tmp (per instance)',
   },
   // `vercel build` (offline) output, served by Vercel's own Node launcher
@@ -102,10 +130,9 @@ export function serveCommand(name, port, data) {
  */
 export function startServer(name, port, { stdio = ['ignore', 'inherit', 'inherit'] } = {}) {
   const data = mkdtempSync(join(tmpdir(), `conduit-${name}-`));
-  const child = spawn(serveCommand(name, port, data), {
-    shell: true, cwd: root, stdio, detached: process.platform !== 'win32',
-    env: { ...process.env, PORT: String(port), HOST: '127.0.0.1', DATABASE_PATH: join(data, 'conduit.db') },
-  });
+  const env = { ...process.env, PORT: String(port), HOST: '127.0.0.1', DATABASE_PATH: join(data, 'conduit.db') };
+  if (platforms[name].ownDatabase) delete env.DATABASE_PATH;
+  const child = spawn(serveCommand(name, port, data), { shell: true, cwd: root, stdio, detached: process.platform !== 'win32', env });
   let stopped = false;
   const stop = () => {
     if (stopped) return;

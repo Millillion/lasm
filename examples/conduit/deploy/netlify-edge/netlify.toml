@@ -1,0 +1,8 @@
+# Netlify Edge Functions: copy this file to netlify.toml (in place of the
+# Functions one). Netlify runs the build (npm run build:netlify-edge), which
+# writes the edge function netlify/edge-functions/lasm.mjs serving every
+# path, with Netlify Blobs as the store. Locally: netlify build --offline,
+# then netlify dev --offline.
+[build]
+  command = "npm run build:netlify-edge"
+  publish = "dist/public"

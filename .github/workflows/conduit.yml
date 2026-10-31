@@ -19,8 +19,10 @@ name: Conduit
 #   container image (sam local start-api); Vercel Functions (vercel build,
 #   Vercel's Node launcher in the Lambda image); Netlify Functions (netlify
 #   build and netlify dev, offline); Azure Functions (func start); Google
-#   Cloud Functions (Functions Framework). Each runs the API suite and the
-#   end-to-end suite (Chromium, no retries);
+#   Cloud Functions (Functions Framework); Deno Deploy (Deno KV); Vercel
+#   Edge (vercel build, edge-runtime); Netlify Edge (netlify build and
+#   netlify dev, Netlify Blobs). Each runs the API suite and the end-to-end
+#   suite (Chromium, no retries);
 # - pinned: test/realworld is byte-identical to the upstream commit.
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
 # Free runners only.
@@ -377,6 +379,15 @@ jobs:
           - platform: gcf
             title: Google Cloud Functions (Functions Framework)
             build: npm run build:gcf
+          - platform: deno-deploy
+            title: Deno Deploy (Deno 2.9.6, Deno KV)
+            build: npm run build:deno-deploy
+          - platform: vercel-edge
+            title: Vercel Edge (vercel build offline, edge-runtime)
+            build: cp deploy/vercel-edge/vercel.json vercel.json && vercel build --yes
+          - platform: netlify-edge
+            title: Netlify Edge (netlify build and netlify dev, offline; Netlify Blobs)
+            build: cp deploy/netlify-edge/netlify.toml netlify.toml && netlify build --offline
     env:
       # No account or credentials of any platform, and no telemetry.
       SAM_CLI_TELEMETRY: '0'
@@ -412,22 +423,28 @@ jobs:
           set -euo pipefail
           T="$RUNNER_TEMP/tools"; mkdir -p "$T"
           case "$PLATFORM" in
-            deno) npm install --prefix "$T" --no-audit --no-fund deno@2.9.6 ;;
+            deno|deno-deploy) npm install --prefix "$T" --no-audit --no-fund deno@2.9.6 ;;
             lambda|lambda-image)
               curl -fsSL --retry 3 -o "$RUNNER_TEMP/sam.zip" https://github.com/aws/aws-sam-cli/releases/download/v1.170.0/aws-sam-cli-linux-x86_64.zip
               unzip -q "$RUNNER_TEMP/sam.zip" -d "$RUNNER_TEMP/sam-installer"
               "$RUNNER_TEMP/sam-installer/install" --install-dir "$RUNNER_TEMP/sam" --bin-dir "$T/node_modules/.bin" ;;
-            vercel)
-              npm install --prefix "$T" --no-audit --no-fund vercel@65.2.0
+            vercel|vercel-edge)
+              npm install --prefix "$T" --no-audit --no-fund vercel@65.2.0 edge-runtime@4.0.1 esbuild@0.28.2
               echo "VERCEL_NODE_MODULES=$T/node_modules" >> "$GITHUB_ENV"
+              echo "VERCEL_EDGE_TOOLS=$T" >> "$GITHUB_ENV"
               # A local project link stands in for `vercel link` (no account).
               mkdir -p examples/conduit/.vercel
               echo '{"projectId":"prj_conduit_ci","orgId":"team_conduit_ci","settings":{}}' > examples/conduit/.vercel/project.json
               # No credentials: a home of its own.
               echo "XDG_DATA_HOME=$RUNNER_TEMP/vercel-home/data" >> "$GITHUB_ENV"
               echo "XDG_CONFIG_HOME=$RUNNER_TEMP/vercel-home/config" >> "$GITHUB_ENV" ;;
-            netlify) npm install --prefix "$T" --no-audit --no-fund netlify-cli@27.14.2 ;;
-            azure) npm install --prefix "$T" --no-audit --no-fund azure-functions-core-tools@4.16.0 ;;
+            # Deno from npm: Netlify's edge runtime is the Deno CLI on PATH (nothing downloaded).
+            netlify|netlify-edge) npm install --prefix "$T" --no-audit --no-fund netlify-cli@27.14.2 deno@2.9.6 ;;
+            azure)
+              npm install --prefix "$T" --no-audit --no-fund azure-functions-core-tools@4.16.0
+              # npm 11 skips install scripts unless allowed; this one downloads func.
+              (cd "$T/node_modules/azure-functions-core-tools" && node lib/install.js)
+              "$T/node_modules/.bin/func" --version ;;
           esac
           mkdir -p "$T/node_modules/.bin"
           echo "$T/node_modules/.bin" >> "$GITHUB_PATH"
@@ -442,7 +459,7 @@ jobs:
         run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
       - name: Build (${{ matrix.build }})
         working-directory: examples/conduit
-        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- ${{ matrix.build }}
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- bash -c "${{ matrix.build }}"
       - name: The official RealWorld API suite
         working-directory: examples/conduit
         run: node test/api.mjs --platform ${{ matrix.platform }}

@@ -16,3 +16,7 @@ lambda.zip
 netlify/functions/lasm/
 azure-functions/
 gcf/
+api/lasm.mjs
+api/_lasm/
+netlify/lasm/
+netlify/edge-functions/lasm.mjs

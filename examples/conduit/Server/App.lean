@@ -1,8 +1,8 @@
 /-
 The server: `Conduit.Api.handle` (pure Lean, written against `Store` and
 `Services`) served over HTTP with `Lasm.Fetch`, on a SQLite connection from
-one of the binding modules. The same code runs on Node, Cloudflare Workers
-and Bun; only the `Sql` it is given differs.
+one of the binding modules, or on a key-value store (`Server/Kv.lean`). The
+same code runs on every platform; only the store it is given differs.
 -/
 import Lasm.Fetch
 import Lasm.JS
@@ -73,10 +73,12 @@ def site (store : Store Async) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Res
     if req.method == "GET" || req.method == "HEAD" then pageResponse store services req
     else return .notFound
 
-/-- Serves Conduit on a database (whose binding module created the tables),
-with the browser app's files (`assets`: `embed_dir! "dist/public"` in the
-entry file). -/
-def run (db : Sql) (assets : Lasm.Fetch.Assets) : IO Unit :=
-  Lasm.Fetch.serve (assets.wrap (site (store db)))
+/-- Serves Conduit on a store, with the browser app's files (`assets`:
+`embed_dir! "dist/public"` in the entry file). -/
+def serveStore (store : Store Async) (assets : Lasm.Fetch.Assets) : IO Unit :=
+  Lasm.Fetch.serve (assets.wrap (site store))
+
+/-- Serves Conduit on a SQL database (whose binding module created the tables). -/
+def run (db : Sql) (assets : Lasm.Fetch.Assets) : IO Unit := serveStore (store db) assets
 
 end Conduit.Server
