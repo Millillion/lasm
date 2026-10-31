@@ -2,7 +2,7 @@
 
 > **Historical (2026-10-16).** Superseded: Bun and Deno are supported again from
 > 0.2.0 ([BUN_DENO.md](BUN_DENO.md)), and edge isolates, WASI and browsers are
-> targets ([README](../README.md#platforms)). This page records the Node-only phase.
+> targets ([README](../README.md#where-it-runs-and-the-evidence)). This page records the Node-only phase.
 
 Lasm targets Node only. The source launcher runs an ordinary Lean entry point in
 Node:
