@@ -1,5 +1,23 @@
 # Experimental runtime and callable modules
 
+> **Historical (Lean 4.32.0 and the Zig-built runtime, superseded).** This page
+> records the 2026-09 runtime prototype: Lean 4.32.0, a Zig wasm32-wasi
+> sysroot and the callable-module experiments. None of that is how Lasm builds
+> today. Current Lasm pins **Lean 4.35.0** and links programs with Lasm-managed
+> **Emscripten 6.0.9** (no Zig): a wasm64 threaded runtime for Node and a
+> single-threaded edge runtime for the edge, Bun/Deno, browser and WASI targets.
+> Current sources:
+> - the application pipeline and its managed tools: [APPLICATION_PIPELINE.md](APPLICATION_PIPELINE.md),
+>   [PLAN.md](PLAN.md) (the Lean 4.35.0 upgrade and runtime patches);
+> - the runtime build: `scripts/full-lean/build-application-runtime.mjs` and
+>   `scripts/full-lean/patches/lean-4.35.0-*.patch`; the edge runtime: [EDGE.md](EDGE.md);
+> - the host bridge: [IO.md](IO.md), [THREAD_REVIEW.md](THREAD_REVIEW.md); WASI: [WASI.md](WASI.md);
+> - accepted candidates and gates: [NODE_ACCEPTANCE.md](NODE_ACCEPTANCE.md),
+>   [release/0.1.0-gate.md](release/0.1.0-gate.md); test layers: [TESTING.md](TESTING.md).
+>
+> The prototype's text is kept unchanged below as a record.
+
+
 Original core evidence recorded on 2026-09-17; Node application runtime added
 on 2026-09-18. Tested locally on Linux x64, Node 24.13.1, Lean
 4.32.0 (`8c9756b28d64dab099da31a4c09229a9e6a2ef35`), Zig 0.16.0.

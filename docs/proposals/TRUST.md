@@ -213,14 +213,22 @@ inputs tested. This is what exists today, all in CI:
   suite on Node, Workers and Bun and its Playwright suite in three browsers
   ([examples/conduit](../../examples/conduit/README.md)).
 
-Planned in workstream 1 of the robustness plan, and not yet written up (there
-is no `docs/TESTING.md` on `main` as of this draft): differential testing
-with randomly generated well-typed Lean programs, run as native Lean and as
-Lasm builds for every target, with native Lean as the oracle and every
-failure shrunk to a regression test; replaying recorded HTTP requests
-against every target; fuzzing at the boundaries (HTTP parsing, `Lasm.RPC`,
-the patch decoder); and deterministic simulation of the host bridge's
-concurrency.
+- **Differential testing against native Lean** ([TESTING.md](../TESTING.md#differential-testing),
+  since 2026-10-31). Randomly generated well-typed Lean programs are built
+  with upstream Lean 4.35.0 natively and with a candidate packed from the
+  commit for node, WASI (wasmtime and `node:wasi`) and the edge runtime;
+  stdout, stderr and exit status must be identical, and every divergence is
+  shrunk to a regression case. Every pull request runs 525 generated cases,
+  nightly runs a 60-minute campaign. It found a WASI environment bug (fixed)
+  and an edge-profile one (issue #26).
+- **Target equivalence** ([TESTING.md](../TESTING.md#target-equivalence)).
+  A recorded request corpus is replayed against the fetch template and
+  `examples/fetch` on Node, Deno, Bun, wasi-http and Workers (workerd), and
+  the responses must match.
+
+Still planned (also in [TESTING.md](../TESTING.md)): fuzzing at the boundaries
+(HTTP parsing, `Lasm.RPC`, the patch decoder) and deterministic simulation of
+the host bridge's concurrency.
 
 The limits should be stated with the evidence: the upstream suite runs on
 the Node target, not on every target; matched output covers the executions

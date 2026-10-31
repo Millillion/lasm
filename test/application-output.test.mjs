@@ -7,6 +7,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { applicationHostFiles, writeApplicationEntrypoint } from '../src/application-output.mjs';
 import { applicationPolicy } from '../src/application-policy.mjs';
+import { isolatedImportFailures } from './helpers/isolated-import.mjs';
 
 test('entrypoint resolves host/glue relative to deployment, independent of build and working directory', t => {
   const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-deployment-')));
@@ -91,14 +92,14 @@ test('a deployment that carries this host\'s native pieces runs on any Node from
   assert.equal(execFileSync(process.execPath, [join(base, 'main.mjs')], { encoding: 'utf8' }), 'started\n');
 });
 
-test('all full-runtime host support files exist with their dependencies', () => {
+// Behavioural (docs/TESTING.md#test-quality-audit): the shipped host files alone,
+// outside the checkout, loaded by Node's module loader.
+test('all full-runtime host support files load from an isolated copy', () => {
   const names = new Set(applicationHostFiles);
   assert.equal(names.size, applicationHostFiles.length);
-  for (const file of names) {
-    const source = readFileSync(new URL('../src/' + file, import.meta.url), 'utf8');
-    for (const [, dependency] of source.matchAll(/(?:from\s*|import\s*\(|require\s*\()\s*['"]\.\/([^'"]+\.(?:mjs|cjs))['"]/g))
-      assert.ok(names.has(dependency) || dependency.startsWith('native/'), `${file} needs ${dependency}`);
-  }
+  assert.deepEqual(isolatedImportFailures(applicationHostFiles), []);
+  // The probe notices a missing dependency (guards the guard).
+  assert.match(isolatedImportFailures(applicationHostFiles.filter(name => name !== 'handle-table.mjs')).join('\n'), /handle-table\.mjs/);
 });
 
 test('retained callable and frozen compiler outputs include transitive host dependencies', () => {

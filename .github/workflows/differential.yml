@@ -1,0 +1,237 @@
+name: Differential testing
+# Black-box differential testing of the compiler (docs/TESTING.md#differential-testing):
+# random well-typed Lean programs (scripts/differential/generate.mjs) built with
+# upstream Lean 4.35.0 natively (the oracle) and with a candidate packed from
+# this commit and installed with npm, as a user installs @lasm/cli, for node,
+# wasi (wasmtime and node:wasi) and the edge runtime (--target deno, run by
+# Deno). Any difference in stdout, stderr or exit status fails the job; the
+# divergence is shrunk and its reproducer (a regression case for
+# test/differential/regressions/) is in the `differential-<run>` artifact.
+#   - pull requests and pushes to main: the regression corpus plus one seeded
+#     three program pairs (3 × (150 + 25) cases) from a seed derived from the commit (reproducible: the
+#     seed is in the log and the summary);
+#   - nightly (and by hand): a campaign of `budget-min` minutes from a fresh seed.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '41 4 * * *'
+  workflow_call:
+    inputs:
+      budget-min: { type: string, default: '0' }
+  workflow_dispatch:
+    inputs:
+      budget-min:
+        description: Campaign length in minutes (0 = one program pair)
+        default: '60'
+        type: string
+      seed:
+        description: First seed (empty = derived from the run)
+        default: ''
+        type: string
+      profile:
+        description: release or dev
+        default: release
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: differential-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+env:
+  WASMTIME_VERSION: v49.0.4
+  WASMTIME_SHA256: 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
+jobs:
+  pack:
+    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    # The retained runtime input is a draft release asset (needs contents: write to read).
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: differential-packed-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  differential:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    # Nightly: the release and the dev profile (different Binaryen passes), 60 minutes each.
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: ${{ fromJSON(github.event_name == 'schedule' && '["release","dev"]' || format('["{0}"]', inputs.profile || 'release')) }}
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: differential-packed-candidate
+          path: .work/node-candidate
+      - name: Install the candidate as a user would
+        run: |
+          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
+          echo '{"private":true}' > package.json
+          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+          node node_modules/@lasm/compiler/bin/lasm.mjs --version
+      - name: The oracle's pin (upstream Lean 4.35.0 release archive)
+        id: lean
+        run: |
+          node -e "const a=require('./scripts/lean-dist/lean-4.35.0-upstream.json').lean['4.35.0'].artifacts['linux-x64']; console.log('url='+a.url); console.log('sha256='+a.sha256); console.log('root='+a.root)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: lean-cache
+        with:
+          path: ${{ runner.temp }}/lean-archive
+          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
+      - name: Native Lean (the oracle), wasmtime and Deno
+        run: |
+          set -euo pipefail
+          A="$RUNNER_TEMP/lean-archive"; mkdir -p "$A"
+          [ -f "$A/lean.tar.zst" ] || curl -fsSL --retry 3 -o "$A/lean.tar.zst" "${{ steps.lean.outputs.url }}"
+          echo "${{ steps.lean.outputs.sha256 }}  $A/lean.tar.zst" | sha256sum -c
+          mkdir -p "$RUNNER_TEMP/lean" && tar --zstd -xf "$A/lean.tar.zst" -C "$RUNNER_TEMP/lean"
+          "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin/lean" --version
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T/wasmtime"
+          curl -fsSL --retry 3 -o "$T/wasmtime.tar.xz" "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz"
+          echo "$WASMTIME_SHA256  $T/wasmtime.tar.xz" | sha256sum -c
+          tar -xJf "$T/wasmtime.tar.xz" -C "$T/wasmtime" --strip-components=1
+          npm install --prefix "$T" --no-audit --no-fund deno@2.9.6
+          "$T/wasmtime/wasmtime" --version; "$T/node_modules/.bin/deno" --version
+      - if: steps.lean-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/lean-archive
+          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
+      - name: Differential run
+        id: run
+        run: |
+          set -o pipefail
+          BUDGET="${{ inputs.budget-min || '' }}"
+          if [ -z "$BUDGET" ]; then if [ "${{ github.event_name }}" = schedule ]; then BUDGET=60; else BUDGET=0; fi; fi
+          SEED="${{ inputs.seed || '' }}"
+          if [ -z "$SEED" ]; then
+            if [ "$BUDGET" = 0 ]; then SEED=$(( 16#$(echo "${{ github.event.pull_request.head.sha || github.sha }}" | cut -c1-7) )); else SEED=$(( (${{ github.run_id }} + ${{ matrix.profile == 'dev' && '500000000' || '0' }}) % 1000000000 )); fi
+          fi
+          echo "seed $SEED, budget $BUDGET min"
+          if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3"; else AMOUNT="--budget-min $BUDGET"; fi
+          node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest" \
+            --seed "$SEED" $AMOUNT --cases 150 --fs-cases 25 --targets node,wasi,wasi-node,deno \
+            --profile "${{ matrix.profile }}" --regressions test/differential/regressions \
+            --wasmtime "$RUNNER_TEMP/tools/wasmtime/wasmtime" --deno "$RUNNER_TEMP/tools/node_modules/.bin/deno" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
+      - name: Summary
+        if: always()
+        run: |
+          node -e "
+          const s = JSON.parse(require('fs').readFileSync(process.env.RUNNER_TEMP + '/difftest/summary.json', 'utf8'));
+          const cases = s.programs.reduce((n, p) => n + p.cases, 0);
+          let md = '### Differential testing\n\nSeed ' + s.seed0 + ', ' + s.programs.length + ' programs, ' + cases + ' cases, targets ' + s.targets.join(', ') + ' (' + s.profile + '): **' + s.divergences.length + ' divergences**, ' + s.harnessErrors.length + ' harness errors.\n';
+          for (const d of s.divergences) md += '\n- ' + (d.target ?? '') + ' seed ' + (d.seed ?? 'regressions') + ' case ' + (d.case ?? d.cases ?? '') + ': ' + (d.what ?? 'output differs') + (d.regression ? ' (reproducer ' + d.regression + ')' : '');
+          require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY, md + '\n');
+          " || true
+      - name: Preserve reproducers and the summary
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: differential-${{ matrix.profile }}-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/difftest.log
+            ${{ runner.temp }}/difftest/summary.json
+            ${{ runner.temp }}/difftest/repros
+          retention-days: 30
+          if-no-files-found: ignore
+  # Target equivalence (docs/TESTING.md#target-equivalence): the fetch template
+  # (from `lasm init`) and examples/fetch built for every server target this
+  # runner can serve locally, the recorded corpus replayed on each.
+  equivalence:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [fetch-template, fetch-example]
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: differential-packed-candidate
+          path: .work/node-candidate
+      - name: Install the candidate, wasmtime, Deno, Bun and wrangler (local workerd only)
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
+          echo '{"private":true}' > package.json
+          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T/wasmtime"
+          curl -fsSL --retry 3 -o "$T/wasmtime.tar.xz" "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz"
+          echo "$WASMTIME_SHA256  $T/wasmtime.tar.xz" | sha256sum -c
+          tar -xJf "$T/wasmtime.tar.xz" -C "$T/wasmtime" --strip-components=1
+          npm install --prefix "$T" --no-audit --no-fund deno@2.9.6 bun@1.4.4 wrangler@4.152.0
+      - name: Replay the corpus on every target
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/equivalence/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --work "$RUNNER_TEMP/equivalence" --app ${{ matrix.app }} --targets node,deno,bun,wasi-http,workers \
+            --deno "$T/node_modules/.bin/deno" --bun "$T/node_modules/.bin/bun" --wasmtime "$T/wasmtime/wasmtime" --wrangler "$T/node_modules/.bin/wrangler"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: equivalence-${{ matrix.app }}-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/equivalence/*-results.json
+            ${{ runner.temp }}/equivalence/*.json
+          retention-days: 30
+          if-no-files-found: ignore
