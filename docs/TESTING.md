@@ -96,7 +96,7 @@ node scripts/differential/run.mjs --lasm node_modules/@lasm/cli/bin/lasm.mjs \
 
 **CI** ([differential.yml](../.github/workflows/differential.yml)): every pull
 request and push to `main` packs a candidate from the commit, installs it with
-npm, replays the regressions and runs one program pair (150 + 25 cases) with a
+npm, replays the regressions and runs three program pairs (3 × (150 + 25) cases) from a
 seed derived from the commit; nightly runs a 60-minute campaign from a fresh
 seed. A divergence fails the job and the reproducers are in the run's artifact.
 Known divergences with an open issue are listed in `KNOWN` in `run.mjs`,
@@ -194,7 +194,7 @@ modules) says whether the tests would notice a change.
 
 | Tier | When | Adds (beyond existing checks) | Budget |
 | --- | --- | --- | --- |
-| PR | every pull request and push to `main` | differential: regressions + one seeded program pair on node, wasi, node:wasi, edge; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers (one candidate pack, then two parallel jobs) | about 20–30 min wall time |
+| PR | every pull request and push to `main` | differential: regressions + three seeded program pairs (525 cases) on node, wasi, node:wasi, edge; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers (one candidate pack, then two parallel jobs) | measured: pack 1.5 min, differential about 5 min (one pair took 2.7 min, run 41232604865) |
 | Nightly | 04:41 UTC | differential: 60-minute campaign; the nightly upstream suite (`nightly.yml`) | about 1.5 h |
 | Release | release PR (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) | as today |
 

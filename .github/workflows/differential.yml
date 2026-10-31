@@ -8,7 +8,7 @@ name: Differential testing
 # divergence is shrunk and its reproducer (a regression case for
 # test/differential/regressions/) is in the `differential-<run>` artifact.
 #   - pull requests and pushes to main: the regression corpus plus one seeded
-#     program pair (150 + 25 cases) derived from the commit (reproducible: the
+#     three program pairs (3 × (150 + 25) cases) from a seed derived from the commit (reproducible: the
 #     seed is in the log and the summary);
 #   - nightly (and by hand): a campaign of `budget-min` minutes from a fresh seed.
 on:
@@ -148,7 +148,7 @@ jobs:
             if [ "$BUDGET" = 0 ]; then SEED=$(( 16#$(echo "${{ github.event.pull_request.head.sha || github.sha }}" | cut -c1-7) )); else SEED=$(( ${{ github.run_id }} % 1000000000 )); fi
           fi
           echo "seed $SEED, budget $BUDGET min"
-          if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 1"; else AMOUNT="--budget-min $BUDGET"; fi
+          if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3"; else AMOUNT="--budget-min $BUDGET"; fi
           node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
             --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest" \
             --seed "$SEED" $AMOUNT --cases 150 --fs-cases 25 --targets node,wasi,wasi-node,deno \
@@ -225,6 +225,8 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: equivalence-${{ matrix.app }}-${{ github.run_id }}
-          path: ${{ runner.temp }}/equivalence/*-results.json
+          path: |
+            ${{ runner.temp }}/equivalence/*-results.json
+            ${{ runner.temp }}/equivalence/*.json
           retention-days: 30
           if-no-files-found: ignore

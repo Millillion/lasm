@@ -122,10 +122,15 @@ for (const target of targets) {
     try { process.platform === 'win32' ? child.kill() : process.kill(-child.pid, 'SIGTERM'); } catch {}
   }
   results.targets[target] = observed;
-  if (record && target === 'node') {
+  // Without recorded responses (or with --record) the node target's responses
+  // become the reference for the other targets, and the recorded corpus is
+  // written next to the results (to be committed after review).
+  if (target === 'node' && (record || !corpus.expected)) {
+    if (!corpus.expected) console.log('  no recorded responses yet: node is the reference for this run');
     corpus.expected = observed;
-    writeFileSync(corpusFile, JSON.stringify(corpus, null, 2) + '\n');
-    console.log(`recorded ${Object.keys(observed).length} responses into ${corpusFile}`);
+    const recorded = record ? corpusFile : join(work, `${app}.json`);
+    writeFileSync(recorded, JSON.stringify(corpus, null, 2) + '\n');
+    console.log(`  recorded ${Object.keys(observed).length} responses into ${recorded}`);
   }
   const expected = corpus.expected ?? {};
   for (const req of corpus.requests) {
