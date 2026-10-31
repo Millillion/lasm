@@ -148,9 +148,9 @@ function diverging(ids, nat, tgt) {
 
 // One program: native + every target. Returns per-target outcomes.
 const builtTargets = new Map();
-async function evaluate(dir, list, tlist, { exit = 0 } = {}) {
+async function evaluate(dir, list, tlist, { ending } = {}) {
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, 'Main.lean'), g.renderProgram(list, { exit }));
+  writeFileSync(join(dir, 'Main.lean'), g.renderProgram(list, { ending }));
   const nb = await buildNative(dir);
   if (!nb.ok) return { nativeBuildFailed: true, log: nb.log };
   const nat = await runNative(dir);
@@ -228,9 +228,9 @@ async function campaignProgram(seed, kind) {
   const list = fsProgram
     ? g.genProgram(seed, { cases: nFsCases, kinds: ['fs', 'io'] })
     : g.genProgram(seed, { cases: nCases });
-  const exit = [0, 0, 0, 1, 3, 255][seed % 6];
+  const ending = g.ENDINGS[seed % g.ENDINGS.length];
   const dir = join(work, `s${seed}-${kind}`);
-  const ev = await evaluate(dir, list, tlist, { exit });
+  const ev = await evaluate(dir, list, tlist, { ending });
   const rec = { seed, kind, cases: list.length, targets: {} };
   summary.programs.push(rec);
   if (ev.nativeBuildFailed) {

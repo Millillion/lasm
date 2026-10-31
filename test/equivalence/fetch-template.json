@@ -56,7 +56,14 @@
     {
       "name": "dot-segments",
       "method": "GET",
-      "path": "/hello/../hello/Ada"
+      "path": "/hello/../hello/Ada",
+      "known": {
+        "targets": [
+          "bun",
+          "workers"
+        ],
+        "issue": "https://github.com/Millillion/lasm/issues/27"
+      }
     },
     {
       "name": "echo-text",

@@ -67,7 +67,9 @@ function send(port, req, timeoutMs = 30_000) {
     const body = req.bodyBase64 ? Buffer.from(req.bodyBase64, 'base64') : req.bodyRepeat ? Buffer.from(req.bodyRepeat.text.repeat(req.bodyRepeat.times)) : req.body !== undefined ? Buffer.from(req.body) : null;
     const headers = { ...(req.headers ?? {}), connection: 'close' };
     if (body) headers['content-length'] = String(body.length);
-    const r = request({ host: '127.0.0.1', port, method: req.method, path: req.path, headers, timeout: timeoutMs }, res => {
+    // A fresh connection per request (agent: false): a pooled keep-alive socket
+    // that the server has just closed would fail with "socket hang up" on reuse.
+    const r = request({ host: '127.0.0.1', port, method: req.method, path: req.path, headers, timeout: timeoutMs, agent: false }, res => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
       res.on('end', () => ok({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks) }));
@@ -98,7 +100,7 @@ async function waitReady(port, child, logs, ms = 120_000) {
   throw new Error(`server not ready after ${ms} ms:\n${logs.join('').slice(-3000)}`);
 }
 
-const results = { app, targets: {}, differences: [] };
+const results = { app, targets: {}, differences: [], known: [] };
 for (const target of targets) {
   console.log(`== ${app} on ${target}`);
   try { build(target); } catch (e) { results.targets[target] = { error: String(e.message) }; results.differences.push({ target, error: 'build failed', detail: String(e.message).slice(-2000) }); console.log(e.message); continue; }
@@ -113,7 +115,7 @@ for (const target of targets) {
     for (const req of corpus.requests) {
       if (req.skip?.includes(target)) continue;
       try { observed[req.name] = observe(await send(port, req)); }
-      catch (e) { observed[req.name] = { error: String(e.message) }; }
+      catch (e) { observed[req.name] = { error: String(e.message) }; console.log(`  ${req.name}: ${e.message}; server log: ${logs.join('').slice(-1500)}`); }
     }
   } catch (e) {
     results.differences.push({ target, error: String(e.message).slice(0, 3000) });
@@ -137,12 +139,14 @@ for (const target of targets) {
     if (req.skip?.includes(target) || !(req.name in observed)) continue;
     const want = JSON.stringify(expected[req.name]), got = JSON.stringify(observed[req.name]);
     if (want !== got) {
-      results.differences.push({ target, request: req.name, expected: expected[req.name], observed: observed[req.name] });
-      console.log(`  DIFFERS ${req.name}: expected ${want?.slice(0, 300)}\n           got      ${got.slice(0, 300)}`);
+      // A difference with an open issue ("known": { "targets": [...], "issue": URL }) is reported, not failed.
+      const known = req.known?.targets?.includes(target) ? req.known.issue : null;
+      (known ? results.known : results.differences).push({ target, request: req.name, ...(known ? { issue: known } : {}), expected: expected[req.name], observed: observed[req.name] });
+      console.log(`  ${known ? `KNOWN (${known})` : 'DIFFERS'} ${req.name}: expected ${want?.slice(0, 300)}\n           got      ${got.slice(0, 300)}`);
     }
   }
   console.log(`  ${Object.keys(observed).length} requests, ${results.differences.filter(d => d.target === target).length} differences`);
 }
 writeFileSync(join(work, `${app}-results.json`), JSON.stringify(results, null, 2) + '\n');
-console.log(`${results.differences.length} differences (${join(work, `${app}-results.json`)})`);
+console.log(`${results.differences.length} differences, ${results.known.length} known (${join(work, `${app}-results.json`)})`);
 process.exit(results.differences.length ? 1 : 0);

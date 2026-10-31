@@ -343,7 +343,7 @@ op('ListNat', ['ListNat'], null, 1, { bind: { t: 'Nat', body: 'Bool' }, rb: (a, 
 // List String
 lit('ListString', r => `[${Array.from({ length: r.int(0, 4) }, () => stringExpr(stringLit(r))).join(', ')}]`, 2);
 op('ListString', ['String', 'String'], (a, b) => `(${a}.splitOn (${b}.take 2).copy)`, 1);
-op('ListString', ['String'], a => `((${a}.split Char.isWhitespace).toList.map (·.copy))`, 1);
+op('ListString', ['String'], a => `((${a}.split Char.isWhitespace).toList.map (fun (x : String.Slice) => x.copy))`, 1);
 op('ListString', ['ListString', 'ListString'], (a, b) => `(${a} ++ ${b})`, 1);
 op('ListString', ['ListNat'], a => `(${a}.map toString)`, 1);
 op('ListString', ['ListString'], a => `(${a}.mergeSort (fun a b => decide (a ≤ b)))`, 1);
@@ -539,11 +539,23 @@ function renderFsStmts(ss, d, id) {
 }
 
 // ---------- cases ----------
-export const CASE_KINDS = ['expr', 'state', 'io', 'task', 'fs'];
-export function genCase(seed, index, { kinds = ['expr', 'state', 'io', 'task'], depth = 4 } = {}) {
+export const CASE_KINDS = ['expr', 'state', 'io', 'task', 'fs', 'deep'];
+// Larger workloads: deep non-tail recursion, big heaps, long strings, huge numbers.
+const DEEP = [
+  n => `((List.range ${n}).foldr (· + ·) 0)`,
+  n => `(deepSum ${n})`,
+  n => `((Tree.ofList (List.range (min ${n} 3000))).depth)`,
+  n => `(String.join (List.replicate ${n} "ab€")).length`,
+  n => `(toString ((3 : Nat) ^ ${n})).length`,
+  n => `(((List.range ${n}).map (fun i => i * i)).toArray.qsort (· > ·)).size`,
+  n => `((Array.range ${n}).foldl (fun (m : HashMap Nat Nat) i => m.insert (i * 7919 % ${n}) i) {}).size`,
+  n => `(Nat.repr ((10 : Nat) ^ ${n} - 1)).length`,
+];
+export function genCase(seed, index, { kinds = ['expr', 'state', 'io', 'task', 'deep'], depth = 4 } = {}) {
   const r = rng(seed, index);
   uniq = index * 1000;
-  const kind = r.weighted(kinds.map(k => ({ k, w: k === 'expr' ? 8 : 1 }))).k;
+  const kind = r.weighted(kinds.map(k => ({ k, w: k === 'expr' ? 8 : k === 'deep' ? 0.4 : 1 }))).k;
+  if (kind === 'deep') return { kind, f: r.int(0, DEEP.length - 1), n: r.pick([100, 1000, 10000, 50000, 100000]) };
   if (kind === 'expr') {
     const t = r.weighted(TYPES.map(t => ({ t, w: ['Nat', 'Int', 'String', 'Float', 'UInt64'].includes(t) ? 3 : 1 }))).t;
     return { kind, t, e: genExpr(r, t, r.int(1, depth), [], {}) };
@@ -552,6 +564,7 @@ export function genCase(seed, index, { kinds = ['expr', 'state', 'io', 'task'], 
 }
 export function renderCase(c, name) {
   if (c.kind === 'expr') return `def ${name} : IO Unit := do\n  IO.println (${leanString(name + ' ')} ++ ${show(c.t, renderExpr(c.e))})\n`;
+  if (c.kind === 'deep') return `def ${name} : IO Unit := do\n  IO.println s!"${name} {${DEEP[c.f](`(bb ${c.n})`)}}"\n`;
   if (c.kind === 'state') {
     return `def ${name}Prog : StateT Nat (ExceptT String (StateM (Array String))) Unit := do\n${renderStateStmts(c.s, 1).join('\n')}\n  pure ()\n` +
       `def ${name} : IO Unit := do\n  let (res, log) := ((${name}Prog.run 0).run).run #[]\n` +
@@ -565,6 +578,7 @@ export function renderCase(c, name) {
 }
 export function caseSize(c) {
   if (c.kind === 'expr') return exprSize(c.e);
+  if (c.kind === 'deep') return Math.log10(c.n);
   const count = ss => ss.reduce((s, st) => s + 1 + (st.e ?? []).reduce((a, e) => a + exprSize(e), 0) + count(st.b ?? []) + count(st.c ?? []), 0);
   return count(c.s);
 }
@@ -633,6 +647,7 @@ def wordCount (xs : List String) : Nat :=
 def stCount (n : Nat) : IO Nat := do
   let ((), s) ← (StateT.run (do for i in [0:(n % 20)] do modify (· + i)) 0 : IO (Unit × Nat))
   return s
+def deepSum : Nat → Nat | 0 => 0 | n + 1 => (n + 1) + deepSum n
 abbrev EmitM := StateT Nat (ExceptT String (StateM (Array String)))
 def emit (s : String) : EmitM Unit := (modify (·.push s) : StateM (Array String) Unit)
 `;
@@ -641,11 +656,13 @@ export function genProgram(seed, { cases = 100, kinds, depth, indices } = {}) {
   const ids = indices ?? Array.from({ length: cases }, (_, i) => i);
   return ids.map(i => ({ index: i, c: genCase(seed, i, { kinds, depth }) }));
 }
-export function renderProgram(list, { exit } = {}) {
+// How main ends: an exit status, an uncaught IO error, or IO.Process.exit.
+export const ENDINGS = ['  return 0', '  return 0', '  return 1', '  return 255', '  throw (IO.userError "uncaught: the end ✓")', '  IO.Process.exit 7'];
+export function renderProgram(list, { exit, ending } = {}) {
   const defs = list.map(({ index, c, name }) => renderCase(c, name ?? `c${index}`)).join('\n');
   // A marker on stderr before each case attributes panics and warnings to it.
   const calls = list.map(({ index, name }) => `  IO.eprintln "@${name ?? `c${index}`}"\n  ${name ?? `c${index}`}`).join('\n');
-  return `${PREAMBLE}\n${defs}\ndef main : IO UInt32 := do\n${calls || '  pure ()'}\n  IO.eprintln "done"\n  return ${exit ?? 0}\n`;
+  return `${PREAMBLE}\n${defs}\ndef main : IO UInt32 := do\n${calls || '  pure ()'}\n  IO.eprintln "done"\n${ending ?? `  return ${exit ?? 0}`}\n`;
 }
 
 // ---------- shrinking ----------
@@ -681,6 +698,7 @@ function* stmtShrinks(ss) {
   }
 }
 export function shrinkCandidates(c, limit = 60) {
+  if (c.kind === 'deep') return [10, 100, 1000, 10000, 50000].filter(n => n < c.n).map(n => ({ ...c, n }));
   const out = [], seen = new Set([JSON.stringify(c)]);
   const gen = c.kind === 'expr' ? (function* () { for (const e of exprShrinks(c.e)) yield { ...c, e }; })() : (function* () { for (const s of stmtShrinks(c.s)) yield { ...c, s }; })();
   for (const x of gen) {
