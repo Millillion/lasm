@@ -2,12 +2,12 @@
 // generated Worker entry. The Wasm program itself is tested by workers.yml.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, mkdirSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createEdgeRuntimeHost } from '../src/edge/edge-host.mjs';
 import { edgeModules, workersEntry, workersConfig, edgeTargets, vercelEdgeEntry, netlifyEdgeEntry, portableEntry, inlineWasmModule,
-  supabaseEntry, supabaseImportMap, supabaseFunctionName, edgeTargetSuspend, edgeProgramKey } from '../src/edge/edge-build.mjs';
+  supabaseEntry, supabaseImportMap, supabaseFunctionName, edgeTargetSuspend, edgeProgramKey, writeVercelEdgeOutput } from '../src/edge/edge-build.mjs';
 import { edgeRecipe, edgeRecipeMode, edgeSuspendModes } from '../src/edge/edge-link.mjs';
 import { edgeBuildTargets } from '../src/cli-arguments.mjs';
 
@@ -113,6 +113,31 @@ test('edge targets: the CLI list, and the Vercel, Netlify, Bun and Deno entries'
   const file = join(mkdtempSync(join(tmpdir(), 'lasm-inline-')), 'w.mjs');
   writeFileSync(file, inlineWasmModule(bytes));
   assert.deepEqual([...(await import(file)).default], [...bytes]);
+});
+
+test('vercel-edge: the Build Output API function, so vercel build deploys it from a clean checkout', () => {
+  const project = mkdtempSync(join(tmpdir(), 'lasm-vercel-edge-'));
+  writeFileSync(join(project, 'package.json'), JSON.stringify({ name: 'app', dependencies: { hono: '^4.0.0' }, devDependencies: { tool: '1.0.0' } }));
+  for (const [name, version] of [['hono', '4.9.0'], ['tool', '1.0.0']]) {
+    mkdirSync(join(project, 'node_modules', name), { recursive: true });
+    writeFileSync(join(project, 'node_modules', name, 'package.json'), JSON.stringify({ name, version }));
+    writeFileSync(join(project, 'node_modules', name, 'index.js'), 'export default 1;\n');
+  }
+  mkdirSync(join(project, 'api/_lasm/lasm'), { recursive: true });
+  writeFileSync(join(project, 'api/lasm.mjs'), vercelEdgeEntry(['hono']));
+  writeFileSync(join(project, 'api/_lasm/lasm/program.wasm'), 'wasm');
+  // A stale function and routes from an earlier build are replaced.
+  mkdirSync(join(project, '.vercel/output/functions/api/lasm.func/old'), { recursive: true });
+  writeFileSync(join(project, '.vercel/output/config.json'), '{"version":3,"routes":[{"src":"/(.*)","dest":"/index"}]}');
+  const func = writeVercelEdgeOutput(project);
+  assert.equal(func, join(project, '.vercel/output/functions/api/lasm.func'));
+  assert.deepEqual(JSON.parse(readFileSync(join(func, '.vc-config.json'), 'utf8')), { runtime: 'edge', entrypoint: 'api/lasm.mjs' });
+  assert.equal(readFileSync(join(func, 'api/lasm.mjs'), 'utf8'), vercelEdgeEntry(['hono']));
+  assert.equal(readFileSync(join(func, 'api/_lasm/lasm/program.wasm'), 'utf8'), 'wasm');
+  assert.ok(existsSync(join(func, 'node_modules/hono/index.js')), 'production dependencies travel with the function');
+  assert.ok(!existsSync(join(func, 'node_modules/tool')), 'devDependencies do not');
+  assert.ok(!existsSync(join(func, 'old')));
+  assert.deepEqual(JSON.parse(readFileSync(join(project, '.vercel/output/config.json'), 'utf8')).routes.at(-1), { src: '/(.*)', dest: '/api/lasm' });
 });
 
 test('supabase-edge: function directory, entry, pinned import map and Asyncify', async () => {
