@@ -1,21 +1,47 @@
 # Lasm
 
-**Lean 4 for the JavaScript and WebAssembly world.** Lasm compiles ordinary Lean 4
-programs ahead of time to WebAssembly. One Lean code base can become a Node server,
-a serverless or edge function, a WASI/Fastly module or a browser app. Because it is
-Lean, you can prove properties of the code you deploy. The flagship example,
-[Conduit](#flagship-example-conduit-with-117-proved-theorems), is the RealWorld app
-with 117 proved theorems. Lasm ships on npm and brings
-Lean, Lake and its build tools with it; you only need Node (or Bun or Deno).
+Lasm compiles Lean 4 to WebAssembly. You write your app in Lean, prove what matters
+about it, and run it on Node.js, Bun, Deno, Cloudflare Workers, Vercel, Netlify,
+Deno Deploy, Supabase, AWS Lambda, Azure Functions, Google Cloud Functions, Fastly
+Compute, WASI runtimes and the browser.
 
 ```sh
-npm create @lasm@latest my-app -- --template hono    # then: cd my-app && npm install && npm run dev
+npm create @lasm@latest my-app -- --template hono
+cd my-app && npm install && npm run dev
 ```
 
-AI agents: this README is complete on its own. [`llms.txt`](llms.txt) is the short
-index, and [docs/AI.md](docs/AI.md) lists the rules that save you from wrong turns.
+The flagship example, [Conduit](#flagship-example-conduit-with-117-proved-theorems),
+is the RealWorld app written entirely in Lean, with 117 proved theorems. It passes
+RealWorld's official API and browser test suites on Node, Workers and Bun.
 
 If Lasm is useful to you, I'd appreciate your [sponsorship](https://github.com/sponsors/lastmjs) ([more below](#support-lasm)).
+
+## Where it runs, and the evidence
+
+Every platform below is tested in CI, using the platform's own
+runtime, container image or local emulator. CI never deploys to a real cloud
+account, so "tested" means the platform's local tooling, not production
+([full details](#supported-platforms)).
+
+| Platform | Build with `--target` | Tested in CI with | Since |
+| --- | --- | --- | --- |
+| Node.js 24+ (Linux, macOS, Windows; Docker, Kubernetes, Cloud Run, Fly.io, Railway, Render, Heroku) | `node` (default) | Node 24 and 26 on Linux (x64, arm64), macOS (x64, arm64) and Windows x64; Docker images, read-only, 512 MB | 0.1.0 |
+| Bun / Deno | `bun` / `deno` | Bun 1.4.4 and Deno 2.9.6 on the same five platforms | 0.2.0 |
+| Cloudflare Workers | `workers` | `wrangler dev` (workerd), Free-plan budgets enforced | 0.2.0 |
+| Vercel Functions / Vercel Edge | `vercel` / `vercel-edge` | `vercel build` offline; Lambda Node 24 image; Vercel's `edge-runtime` | 0.1.0 / 0.2.0 |
+| Netlify Functions / Netlify Edge | `netlify` / `netlify-edge` | `netlify build` and `netlify dev`, offline | 0.1.0 / 0.2.0 |
+| Deno Deploy | `deno-deploy` | Deno 2.9.6 | 0.2.0 |
+| Supabase Edge Functions | `supabase-edge` | Supabase's `edge-runtime` image | 0.2.0 |
+| AWS Lambda (.zip or container) / Lambda@Edge | `lambda` / `lambda-edge` | `public.ecr.aws/lambda/nodejs:24` via the Runtime Interface Emulator, x86_64 and arm64; `sam local` | 0.1.0 |
+| Azure Functions | `azure` | Azure Functions Core Tools `func start` | 0.1.0 |
+| Google Cloud Functions (gen2) | `gcf` | Functions Framework; Google Cloud's buildpacks image | 0.1.0 |
+| Fastly Compute | `fastly` | Viceroy 0.21.1 | 0.3.0 |
+| WASI / wasi-http / Spin | `wasi` / `wasi-http` | wasmtime 49 (`run`, `serve`), wasmer 7.4, `node:wasi`, Spin 4.2 | 0.3.0 |
+| Browsers | `browser` (or the Vite plugin) | Playwright: Chromium, Firefox and WebKit (Linux and macOS) | 0.3.0 |
+
+Node builds have Lean's full runtime (threads, files, processes, sockets). The
+other targets run Lean single-threaded, without sockets or processes (and without
+files, except on WASI); the rest of Lean works.
 
 ## Quick facts
 
@@ -33,37 +59,6 @@ If Lasm is useful to you, I'd appreciate your [sponsorship](https://github.com/s
 | Not available at run time | elaboration, `#eval`-style evaluation, loading `.olean`, Lean's kernel ([exact list](#lean-support-and-restrictions)); all of these work at build time |
 | License | MIT (Lasm); templates, examples and README code samples also MIT-0 |
 | Repository / issues | https://github.com/Millillion/lasm · [report a bug](https://github.com/Millillion/lasm/issues/new?template=bug.yml) (include `npx lasm --version`) |
-
-## Platforms
-
-Every row is tested in CI with the platform's own local runtime, image or emulator.
-By project policy CI never deploys to a real cloud account
-([how each is tested](#supported-platforms)).
-
-| Deploy to | `lasm build Main.lean --target …` | Output | Since |
-| --- | --- | --- | --- |
-| Node server or program (any host, Docker/Kubernetes, Cloud Run, Fly.io, Railway, Render, Heroku, DigitalOcean) | `node` (default) | `dist/` → `node dist/main.mjs` | 0.1.0 |
-| AWS Lambda (.zip, `nodejs24.x`) | `lambda` | `lambda.zip` | 0.1.0 |
-| AWS Lambda (container image) | `lasm init … --deploy lambda` | `Dockerfile.lambda` | 0.1.0 |
-| Lambda@Edge | `lambda-edge` | `lambda-edge.zip` | 0.1.0 |
-| Vercel Functions | `vercel` | `.vercel/output` | 0.1.0 |
-| Netlify Functions | `netlify` | `netlify/functions/lasm` | 0.1.0 |
-| Azure Functions | `azure` | `azure-functions/` | 0.1.0 |
-| Google Cloud Functions (gen2) | `gcf` | `gcf/` | 0.1.0 |
-| Cloudflare Workers | `workers` | `workers/` | 0.2.0 |
-| Vercel Edge | `vercel-edge` | `api/lasm.mjs`, `api/_lasm/` | 0.2.0 |
-| Netlify Edge | `netlify-edge` | `netlify/edge-functions/lasm.mjs` | 0.2.0 |
-| Deno Deploy | `deno-deploy` | `deno/main.mjs` | 0.2.0 |
-| Supabase Edge Functions | `supabase-edge` | `supabase/functions/<name>/` | 0.2.0 |
-| Bun (≥ 1.3.14) / Deno (2.x) | `bun` / `deno` | `bun/main.mjs` / `deno/main.mjs` | 0.2.0 |
-| Fastly Compute | `fastly` | `bin/main.wasm`, `pkg/<name>.tar.gz` | 0.3.0 |
-| WASI (wasmtime, wasmer, `node:wasi`) | `wasi` | `wasi/main.wasm` | 0.3.0 |
-| wasi-http (`wasmtime serve`, Spin) | `wasi-http` | `wasi-http/main.wasm` | 0.3.0 |
-| Browsers (Chrome, Edge, Firefox, Safari) | `browser` (or the Vite plugin `@lasm/cli/vite`) | `dist/` static site | 0.3.0 |
-
-Node builds have Lean's full runtime (threads, files, processes, sockets). The
-edge, Bun/Deno, WASI and browser builds run Lean single-threaded, without sockets
-or processes (and without files, except on WASI); the rest of Lean works.
 
 ## Start here
 
