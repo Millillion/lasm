@@ -9,8 +9,10 @@ every request body and the browser app runs before it sends a form.
 -/
 import Conduit.Validation
 import Proofs.Favorites
+import Proofs.Spec
 
 namespace Conduit.Proofs
+open Spec
 
 theorem usernameErrors_nil {s : String} : (usernameErrors s).isEmpty = true ↔ isBlank s = false ∧ (clean s).length ≤ maxUsername := by
   unfold usernameErrors; split <;> (try split) <;> simp_all <;> omega
@@ -25,18 +27,6 @@ theorem passwordErrors_nil {s : String} :
   · rename_i h; simp [String.isEmpty_iff] at h; subst h; simp
   · split <;> (try split) <;> simp_all <;> omega
 
-/-- **A registration that passes validation is a valid one**: a username
-that is not blank and at most 64 characters, a plausible email, and a
-password of 8 to 128 characters. -/
-theorem validateNewUser_ok {u : NewUser} {v : { v : NewUser // v.valid }} (_ : validateNewUser u = .ok v) :
-    isBlank v.val.username = false ∧ (clean v.val.username).length ≤ maxUsername ∧
-    emailOk (clean v.val.email) = true ∧ minPassword ≤ v.val.password.length ∧ v.val.password.length ≤ maxPassword := by
-  have h := v.property
-  simp only [NewUser.valid, Bool.and_eq_true] at h
-  obtain ⟨⟨hu, he⟩, hp⟩ := h
-  rw [usernameErrors_nil] at hu; rw [emailErrors_nil] at he; rw [passwordErrors_nil] at hp
-  exact ⟨hu.1, hu.2, he.2, hp.1, hp.2⟩
-
 /-- `collect` keeps only fields with messages. -/
 theorem collect_messages {fields : List (String × Check)} : ∀ f ∈ collect fields, f.2 ≠ [] := by
   intro f hf
@@ -49,10 +39,6 @@ theorem collect_ne_nil {fields : List (String × Check)} (h : ∃ f ∈ fields, 
   intro hnil
   have : f ∈ fields.filter (fun f => !f.2.isEmpty) := by simp [hf, hne]
   rw [hnil] at this; simp at this
-
-/-- What a well-formed validation error is: status 422, at least one field,
-every field with at least one message. -/
-def WellFormed422 (e : ApiError) : Prop := e.status = 422 ∧ e.errors ≠ [] ∧ ∀ f ∈ e.errors, f.2 ≠ []
 
 theorem invalid_wellFormed {fields : List (String × Check)} (h : ∃ f ∈ fields, f.2 ≠ []) :
     WellFormed422 (.invalid (collect fields)) :=
@@ -77,13 +63,6 @@ theorem validateNewUser_error {u : NewUser} {e : ApiError} (h : validateNewUser 
       · exact ⟨("email", emailErrors u.normalize.email), by simp, by simpa [List.isEmpty_iff] using he⟩
     · exact ⟨("username", usernameErrors u.normalize.username), by simp, by simpa [List.isEmpty_iff] using hu⟩
 
-/-- A login that passes has an email and a password. -/
-theorem validateLogin_ok {u : LoginUser} {v : { v : LoginUser // v.valid }} (_ : validateLogin u = .ok v) :
-    isBlank v.val.email = false ∧ v.val.password ≠ "" := by
-  have h := v.property
-  simp only [LoginUser.valid, Bool.and_eq_true, Bool.not_eq_true'] at h
-  exact ⟨h.1, by simpa [String.isEmpty_iff] using h.2⟩
-
 /-- Cleaned tags are never blank … -/
 theorem cleanTags_not_blank (tags : List String) : (cleanTags tags).all (!isBlank ·) = true := by
   simp only [cleanTags, List.all_eq_true, List.mem_eraseDups, List.mem_filter]
@@ -91,15 +70,6 @@ theorem cleanTags_not_blank (tags : List String) : (cleanTags tags).all (!isBlan
 
 /-- … and never repeated. -/
 theorem cleanTags_nodup (tags : List String) : (cleanTags tags).Nodup := nodup_eraseDups _
-
-/-- **An article that passes validation has a title, a description and a
-body, and its tags are neither blank nor repeated.** -/
-theorem validateNewArticle_ok {a : NewArticle} {v : { v : NewArticle // v.valid }} (_ : validateNewArticle a = .ok v) :
-    isBlank v.val.title = false ∧ isBlank v.val.description = false ∧ isBlank v.val.body = false ∧
-    v.val.tagList.all (!isBlank ·) = true ∧ v.val.tagList.Nodup := by
-  have h := v.property
-  simp only [NewArticle.valid, Bool.and_eq_true, Bool.not_eq_true', decide_eq_true_eq] at h
-  exact ⟨h.1.1.1.1, h.1.1.1.2, h.1.1.2, h.1.2, h.2⟩
 
 /-- **A rejected article says what is wrong**: the tags never make an
 article invalid (they are cleaned), so a missing title, description or body
@@ -125,32 +95,11 @@ theorem validateNewArticle_error {a : NewArticle} {e : ApiError} (h : validateNe
           simp only [Bool.not_eq_true] at h1 h2 h3
           exact ⟨⟨⟨⟨h1, h2⟩, h3⟩, ht⟩, hn⟩
 
-/-- A comment that passes has a body. -/
-theorem validateNewComment_ok {c : NewComment} {v : { v : NewComment // v.valid }} (_ : validateNewComment c = .ok v) :
-    isBlank v.val.body = false := by
-  have h := v.property
-  simpa [NewComment.valid] using h
-
 /-- A rejected comment is `{"errors": {"body": ["can't be blank"]}}`. -/
 theorem validateNewComment_error {c : NewComment} {e : ApiError} (h : validateNewComment c = .error e) :
     e = .blank "body" := by
   unfold validateNewComment at h
   split at h <;> cases h; rfl
-
-/-- **A user update that passes validation only sets valid values**:
-emails, usernames and passwords obey the registration rules, and `bio`/`image`
-are set to text or cleared, never to `""` (the spec's normalization). -/
-theorem validateUpdateUser_ok {u : UpdateUser} {p : { p : UserPatch // p.valid }} (_ : validateUpdateUser u = .ok p) :
-    p.val.email.all (fun e => (emailErrors e).isEmpty) = true ∧
-    p.val.username.all (fun n => (usernameErrors n).isEmpty) = true ∧
-    p.val.password.all (fun s => (passwordErrors s).isEmpty) = true ∧
-    p.val.bio.all (fun b => b.all (! ·.isEmpty)) = true ∧ p.val.image.all (fun i => i.all (! ·.isEmpty)) = true := by
-  have h := p.property
-  simp only [UserPatch.valid, Bool.and_eq_true] at h
-  exact ⟨h.1.1.1.1, h.1.1.1.2, h.1.1.2, h.1.2, h.2⟩
-
-/-- `""` and `null` both clear `bio` and `image`. -/
-theorem nullable_empty : nullable (.value "") = some none ∧ nullable .null = some none := ⟨rfl, rfl⟩
 
 /-! ## Validating twice: what passed once passes again
 
@@ -273,5 +222,249 @@ theorem validateNewComment_again {c : NewComment} {v : { v : NewComment // v.val
   split at h
   · rename_i hv; cases h; simp only [hv, dite_true]
   · cases h
+
+/-! ## Trimming keeps what matters -/
+
+theorem mem_dropWhile_of_not {α : Type} (p : α → Bool) : ∀ {l : List α} {x : α}, x ∈ l → p x = false → x ∈ l.dropWhile p
+  | [], _, h, _ => by simp at h
+  | a :: l, x, h, hx => by
+    simp only [List.dropWhile_cons]
+    split
+    · rename_i ha
+      rcases List.mem_cons.mp h with rfl | h
+      · rw [hx] at ha; cases ha
+      · exact mem_dropWhile_of_not p h hx
+    · exact h
+
+/-- Trimming keeps every character that is not whitespace … -/
+theorem mem_clean {s : String} {c : Char} (h : c ∈ s.toList) (hc : c.isWhitespace = false) : c ∈ (clean s).toList := by
+  unfold clean
+  rw [String.toList_ofList, List.mem_reverse]
+  exact mem_dropWhile_of_not _ (List.mem_reverse.mpr (mem_dropWhile_of_not _ h hc)) hc
+
+/-- … and adds nothing. -/
+theorem clean_sub {s : String} {c : Char} (h : c ∈ (clean s).toList) : c ∈ s.toList := by
+  unfold clean at h
+  rw [String.toList_ofList, List.mem_reverse] at h
+  exact (List.dropWhile_suffix _).subset (List.mem_reverse.mp ((List.dropWhile_suffix _).subset h))
+
+/-- A text is blank exactly when its trimmed form is. -/
+theorem isBlank_clean (s : String) : isBlank (clean s) = isBlank s := by
+  unfold isBlank
+  apply Bool.eq_iff_iff.mpr
+  simp only [List.all_eq_true]
+  constructor
+  · intro h c hc
+    cases hw : c.isWhitespace
+    · exact absurd (h c (mem_clean hc hw)) (by simp [hw])
+    · rfl
+  · intro h c hc; exact h c (clean_sub hc)
+
+/-! ## The specification of each validation -/
+
+theorem validateNewUser_spec : Spec.validateNewUser_spec := by
+  intro u
+  refine ⟨fun v h => ?_, ?_⟩
+  · unfold validateNewUser at h; dsimp only at h
+    split at h
+    · cases h; rfl
+    · cases h
+  · have hiff : (∃ v, validateNewUser u = .ok v) ↔ u.normalize.valid = true := by
+      unfold validateNewUser; dsimp only
+      constructor
+      · rintro ⟨v, h⟩; split at h
+        · assumption
+        · cases h
+      · intro h; exact ⟨⟨_, h⟩, dif_pos h⟩
+    rw [hiff]
+    simp only [NewUser.valid, NewUser.normalize, Bool.and_eq_true, usernameErrors_nil, emailErrors_nil,
+      passwordErrors_nil, isBlank_clean, clean_idem]
+    constructor
+    · rintro ⟨⟨⟨h1, h2⟩, h3, h4⟩, h5, h6⟩; exact ⟨h1, h2, h3, h4, h5, h6⟩
+    · rintro ⟨h1, h2, h3, h4, h5, h6⟩; exact ⟨⟨⟨h1, h2⟩, h3, h4⟩, h5, h6⟩
+
+theorem validateLogin_spec : Spec.validateLogin_spec := by
+  intro u
+  refine ⟨fun v h => ?_, ?_⟩
+  · unfold validateLogin at h; dsimp only at h
+    split at h
+    · cases h; rfl
+    · cases h
+  · have hiff : (∃ v, validateLogin u = .ok v) ↔ ({ u with email := clean u.email } : LoginUser).valid = true := by
+      unfold validateLogin; dsimp only
+      constructor
+      · rintro ⟨v, h⟩; split at h
+        · assumption
+        · cases h
+      · intro h; exact ⟨⟨_, h⟩, dif_pos h⟩
+    rw [hiff]
+    simp [LoginUser.valid, isBlank_clean, String.isEmpty_iff]
+
+theorem ok_iff_of_dite {α ε : Type} {q : α → Bool} {x : α} {e : ε} :
+    (∃ v, (if h : q x = true then .ok ⟨x, h⟩ else .error e : Except ε {v // q v = true}) = .ok v) ↔ q x = true := by
+  by_cases h : q x = true
+  · simp [h]
+  · simp [h]
+
+theorem newArticle_valid_iff (a : NewArticle) :
+    a.normalize.valid = true ↔ (isBlank a.title = false ∧ isBlank a.description = false ∧ isBlank a.body = false) := by
+  have ht := cleanTags_not_blank a.tagList
+  have hn := cleanTags_nodup a.tagList
+  show (!isBlank (clean a.title) && !isBlank (clean a.description) && !isBlank a.body &&
+    (cleanTags a.tagList).all (!isBlank ·) && decide (cleanTags a.tagList).Nodup) = true ↔ _
+  rw [ht, decide_eq_true hn]
+  simp only [Bool.and_true, Bool.and_eq_true, Bool.not_eq_true', isBlank_clean, and_assoc]
+
+theorem validateNewArticle_spec : Spec.validateNewArticle_spec := by
+  intro a
+  refine ⟨fun v h => ?_, ?_⟩
+  · unfold validateNewArticle at h; dsimp only at h
+    split at h
+    · cases h; rfl
+    · cases h
+  · rw [← newArticle_valid_iff]
+    exact ok_iff_of_dite
+
+theorem validateNewComment_spec : Spec.validateNewComment_spec := by
+  intro c
+  refine ⟨fun v h => ?_, ?_, fun err h => validateNewComment_error h⟩
+  · unfold validateNewComment at h
+    split at h
+    · cases h; rfl
+    · cases h
+  · unfold validateNewComment
+    constructor
+    · rintro ⟨v, h⟩; split at h
+      · rename_i hv; simpa [NewComment.valid] using hv
+      · cases h
+    · intro h; exact ⟨⟨c, by simpa [NewComment.valid] using h⟩, dif_pos _⟩
+
+theorem validateLogin_error {u : LoginUser} {err : ApiError} (h : validateLogin u = .error err) : WellFormed422 err := by
+  unfold validateLogin at h; dsimp only at h
+  split at h
+  · cases h
+  · rename_i hv
+    cases h
+    apply invalid_wellFormed
+    by_cases he : isBlank (clean u.email) = true
+    · exact ⟨("email", presentErrors (clean u.email)), by simp, by simp [presentErrors, he]⟩
+    · have hp : u.password.isEmpty = true := by
+        cases hq : u.password.isEmpty
+        · exact absurd (by simp [LoginUser.valid, hq, he]) hv
+        · rfl
+      exact ⟨("password", ["can't be blank"]), by simp [hp], by simp⟩
+
+theorem validateUpdateUser_error {u : UpdateUser} {err : ApiError} (h : validateUpdateUser u = .error err) :
+    WellFormed422 err := by
+  unfold validateUpdateUser at h; dsimp only at h
+  split at h
+  · split at h
+    · cases h
+    · cases h; exact ⟨rfl, by simp [ApiError.invalid], by simp [ApiError.invalid]⟩
+  · rename_i hne
+    cases h
+    refine ⟨rfl, by simpa [ApiError.invalid, List.isEmpty_iff] using hne, collect_messages⟩
+
+theorem validateUpdateArticle_error {a : UpdateArticle} {err : ApiError} (h : validateUpdateArticle a = .error err) :
+    WellFormed422 err := by
+  unfold validateUpdateArticle at h; dsimp only at h
+  split at h
+  · split at h
+    · cases h
+    · cases h; exact ⟨rfl, by simp [ApiError.invalid], by simp [ApiError.invalid]⟩
+  · rename_i hne
+    cases h
+    refine ⟨rfl, by simpa [ApiError.invalid, List.isEmpty_iff] using hne, collect_messages⟩
+
+theorem validation_errors_wellFormed : Spec.validation_errors_wellFormed :=
+  ⟨fun _ _ h => validateNewUser_error h, fun _ _ h => validateLogin_error h, fun _ _ h => validateNewArticle_error h,
+   fun _ _ h => validateUpdateUser_error h, fun _ _ h => validateUpdateArticle_error h⟩
+
+theorem mem_collect {fields : List (String × Check)} {f : String × Check} (h : f ∈ fields) (hf : f.2 ≠ []) :
+    f ∈ collect fields := by
+  unfold collect; simp [h, hf]
+
+theorem blank_fields_named : Spec.blank_fields_named := by
+  refine ⟨fun u hb => ?_, fun u hb => ?_, fun u hb => ?_, fun u hb => ?_, fun u hb => ?_, fun a hb => ?_,
+    fun a hb => ?_, fun a hb => ?_⟩
+  · have hu : usernameErrors (clean u.username) = ["can't be blank"] := by simp [usernameErrors, isBlank_clean, hb]
+    have hv : ¬ u.normalize.valid = true := by simp [NewUser.valid, NewUser.normalize, hu]
+    unfold validateNewUser; dsimp only; rw [dif_neg hv]
+    exact ⟨_, rfl, by simp [ApiError.invalid, NewUser.errors, collect, NewUser.normalize, hu]⟩
+  · have hu : emailErrors (clean u.email) = ["can't be blank"] := by simp [emailErrors, isBlank_clean, hb]
+    have hv : ¬ u.normalize.valid = true := by simp [NewUser.valid, NewUser.normalize, hu]
+    unfold validateNewUser; dsimp only; rw [dif_neg hv]
+    exact ⟨_, rfl, by simp [ApiError.invalid, NewUser.errors, collect, NewUser.normalize, hu]⟩
+  · have hu : passwordErrors u.password = ["can't be blank"] := by simp [passwordErrors, hb]
+    have hv : ¬ u.normalize.valid = true := by simp [NewUser.valid, NewUser.normalize, hu]
+    unfold validateNewUser; dsimp only; rw [dif_neg hv]
+    exact ⟨_, rfl, by simp [ApiError.invalid, NewUser.errors, collect, NewUser.normalize, hu]⟩
+  · have hu : presentErrors (clean u.email) = ["can't be blank"] := by simp [presentErrors, isBlank_clean, hb]
+    have hv : ¬ ({ u with email := clean u.email } : LoginUser).valid = true := by
+      simp [LoginUser.valid, isBlank_clean, hb]
+    unfold validateLogin; dsimp only; rw [dif_neg hv]
+    exact ⟨_, rfl, by simp [ApiError.invalid, LoginUser.errors, collect, hu]⟩
+  · have hv : ¬ ({ u with email := clean u.email } : LoginUser).valid = true := by simp [LoginUser.valid, hb]
+    unfold validateLogin; dsimp only; rw [dif_neg hv]
+    exact ⟨_, rfl, by simp [ApiError.invalid, LoginUser.errors, collect, hb]⟩
+  all_goals
+    have hv : ¬ a.normalize.valid = true := by
+      rw [newArticle_valid_iff]; simp [hb]
+    unfold validateNewArticle; rw [dif_neg hv]
+  · exact ⟨_, rfl, by simp [ApiError.invalid, NewArticle.errors, collect, NewArticle.normalize, presentErrors, isBlank_clean, hb]⟩
+  · exact ⟨_, rfl, by simp [ApiError.invalid, NewArticle.errors, collect, NewArticle.normalize, presentErrors, isBlank_clean, hb]⟩
+  · exact ⟨_, rfl, by simp [ApiError.invalid, NewArticle.errors, collect, NewArticle.normalize, presentErrors, hb]⟩
+
+theorem validateUpdateUser_spec : Spec.validateUpdateUser_spec := by
+  intro u
+  refine ⟨fun p h => ?_, fun hn => ?_, fun hb => ?_, fun hi => ?_⟩
+  · have hp := p.property
+    simp only [UserPatch.valid, Bool.and_eq_true] at hp
+    unfold validateUpdateUser at h; dsimp only at h
+    split at h
+    · split at h
+      · cases h; exact ⟨rfl, hp.1.1.1.1, hp.1.1.1.2, hp.1.1.2⟩
+      · cases h
+    · cases h
+  · have hne : u.errors.isEmpty = false := by
+      rcases hn with h | h | h | h | h | h <;>
+        simp [UpdateUser.errors, collect, h, requiredField, emailErrors, usernameErrors, passwordErrors, isBlank]
+    unfold validateUpdateUser; dsimp only
+    rw [if_neg (by simp [hne])]
+    exact ⟨_, rfl, rfl⟩
+  · rcases hb with h | h <;> simp [UpdateUser.toPatch, h, nullable]
+  · rcases hi with h | h <;> simp [UpdateUser.toPatch, h, nullable]
+
+theorem validateUpdateArticle_spec : Spec.validateUpdateArticle_spec := by
+  intro a
+  refine ⟨fun p h => ?_, fun hn => ?_⟩
+  · have hpv : p.val = a.toPatch := by
+      unfold validateUpdateArticle at h; dsimp only at h
+      split at h
+      · split at h
+        · cases h; rfl
+        · cases h
+      · cases h
+    refine ⟨hpv, fun ht => ?_, fun ts ht => ?_⟩
+    · rw [hpv]; simp [UpdateArticle.toPatch, ht]
+    · rw [hpv]; simp [UpdateArticle.toPatch, ht]
+  · have hne : a.errors.isEmpty = false := by
+      rcases hn with h | h | h | h <;> simp [UpdateArticle.errors, collect, h, requiredField]
+    unfold validateUpdateArticle; dsimp only
+    rw [if_neg (by simp [hne])]
+    exact ⟨_, rfl, rfl⟩
+
+theorem cleanTags_spec : Spec.cleanTags_spec := by
+  intro tags
+  refine ⟨cleanTags_nodup tags, fun t ht => ?_, fun t ht hb => ?_⟩
+  · simp only [cleanTags, List.mem_eraseDups, List.mem_filter, List.mem_map] at ht
+    obtain ⟨⟨t₀, h₀, rfl⟩, hb⟩ := ht
+    exact ⟨by simpa using hb, t₀, h₀, rfl⟩
+  · simp only [cleanTags, List.mem_eraseDups, List.mem_filter, List.mem_map]
+    exact ⟨⟨t, ht, rfl⟩, by simp [isBlank_clean, hb]⟩
+
+theorem validate_again : Spec.validate_again :=
+  ⟨fun _ _ h => validateNewUser_again h, fun _ _ h => validateLogin_again h,
+   fun _ _ h => validateNewArticle_again h, fun _ _ h => validateNewComment_again h⟩
 
 end Conduit.Proofs
