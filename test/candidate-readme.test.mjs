@@ -14,8 +14,9 @@ for (const newline of ['\n', '\r\n']) test(`a packed README installs its own arc
   assert.match(text, /do not\nclaim that this candidate has passed/);
   // The environment table (the earlier accepted baseline) is kept.
   assert.match(text, /\| Ubuntu 24\.04 LTS \| x86-64, ARM64 \| Installed-package and copied-deployment acceptance/);
-  // The candidate section comes before the quick start.
-  assert.ok(text.indexOf('## This candidate archive') < text.indexOf('## Platforms'));
+  // The candidate section comes before the source's first second-level heading.
+  const first = source.replace(/\r\n/g, '\n').match(/\n(## [^\n]+)/)[1];
+  assert.ok(text.indexOf('## This candidate archive') < text.indexOf('\n' + first), first);
   assert.match(text, /actions\/runs\/12345/);
   assert.doesNotMatch(text, /\]\(docs\//);
 });

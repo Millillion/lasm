@@ -9,7 +9,7 @@
 // edge runtime image in Docker). Needs LASM_APPLICATION_RUNTIME and LASM_EDGE_RUNTIME.
 //   node scripts/edge/workers-ci.mjs WORK_DIR TOOLS_DIR
 import { execFileSync, spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, readdirSync, statSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { headlessEnvironment } from './headless.mjs';
@@ -44,8 +44,10 @@ for (const project of [hono, pure]) {
   if (!existsSync(join(project, '.git'))) run('git', ['init', '-q'], { cwd: project });
   mkdirSync(join(project, 'public'), { recursive: true });
   writeFileSync(join(project, 'public/lasm.txt'), 'Requests are served by the Lean edge function.\n');
-  writeFileSync(join(project, 'vercel.json'), JSON.stringify({ framework: null, installCommand: 'true', buildCommand: 'true', outputDirectory: 'public',
-    routes: [{ src: '/(.*)', dest: '/api/lasm' }] }, null, 2) + '\n');
+  // vercel build runs the build itself, as on Vercel (from a clean tree below).
+  writeFileSync(join(project, 'vercel.json'), JSON.stringify({ framework: null, installCommand: 'true',
+    buildCommand: `${JSON.stringify(process.execPath)} ${JSON.stringify(join(root, 'bin/lasm.mjs'))} build Main.lean --target vercel-edge`,
+    outputDirectory: 'public', routes: [{ src: '/(.*)', dest: '/api/lasm' }] }, null, 2) + '\n');
   writeFileSync(join(project, 'netlify.toml'), '[build]\n  command = "true"\n  publish = "public"\n');
 }
 
@@ -67,6 +69,9 @@ for (const [name, project, served, ports] of [['hono', hono, hono, [8787, 8889, 
   const reused = Date.now();
   lasmBuild(project, 'vercel-edge');
   app.vercelEdgeBuildSeconds = (Date.now() - reused) / 1000;
+  // A clean checkout has no generated function (lasm init gitignores it): vercel
+  // build must deploy the one its build command writes (the cached link makes it quick).
+  for (const generated of ['api/lasm.mjs', 'api/_lasm', '.vercel/output']) rmSync(join(project, generated), { recursive: true, force: true });
   run(process.execPath, [join(root, 'scripts/edge/vercel-edge-check.mjs'), tools, project, name, file('vercel-edge')]);
   app['vercel-edge'] = JSON.parse(readFileSync(file('vercel-edge'), 'utf8'));
   lasmBuild(project, 'netlify-edge');
