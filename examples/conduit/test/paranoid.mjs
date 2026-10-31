@@ -50,7 +50,8 @@ const version = bin => execFileSync(bin, ['--version'], { encoding: 'utf8' }).tr
 const a = version(join(official, 'bin', 'lean')), b = version(join(dirname(lasmLean.lake), 'lean'));
 if (a.match(/commit (\w+)/)?.[1] !== b.match(/commit (\w+)/)?.[1]) throw new Error(`different Lean builds: ${a} / ${b}`);
 
-const env = { ...process.env, LEAN_PATH: [lasmLib, join(root, '.lake', 'build', 'lib', 'lean')].join(':') };
+const env = { ...process.env, LEAN_PATH: [lasmLib, join(root, '.lake', 'build', 'lib', 'lean')].join(':'),
+  PATH: `${join(official, 'bin')}:${process.env.PATH}` };
 for (const key of Object.keys(env)) if (/^(?:LAKE_|ELAN_)/.test(key)) delete env[key];
 const exportFile = join(cache, 'proofs.ndjson');
 console.error('[paranoid] leanexport Proofs');
@@ -58,5 +59,5 @@ execFileSync('sh', ['-c', `"${join(official, 'bin', 'leanexport')}" Proofs > "${
 console.error(`[paranoid] ${(statSync(exportFile).size / 2 ** 20).toFixed(0)} MiB exported; lake check --paranoid`);
 const started = Date.now();
 execFileSync(join(official, 'bin', 'lake'), ['check', '--from-export', exportFile, '--paranoid'],
-  { cwd: root, env: { ...env, PATH: `${join(official, 'bin')}:${env.PATH}` }, stdio: 'inherit' });
+  { cwd: root, env, stdio: 'inherit' });
 console.log(`All of Lean's kernels accept the proofs (${((Date.now() - started) / 1000).toFixed(0)} s).`);
