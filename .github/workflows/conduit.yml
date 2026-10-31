@@ -14,6 +14,13 @@ name: Conduit
 #   (specs/e2e, Playwright, unmodified, fullstack mode) against the
 #   server-rendered, hydrated Lasm.UI app: Node on Chromium, Firefox and
 #   WebKit; Workers (wrangler dev, local D1) and Bun on Chromium; no retries;
+# - platform: every other platform with its own local tooling, one job each
+#   (examples/conduit/test/platforms.mjs): Deno; Docker; AWS Lambda .zip and
+#   container image (sam local start-api); Vercel Functions (vercel build,
+#   Vercel's Node launcher in the Lambda image); Netlify Functions (netlify
+#   build and netlify dev, offline); Azure Functions (func start); Google
+#   Cloud Functions (Functions Framework). Each runs the API suite and the
+#   end-to-end suite (Chromium, no retries);
 # - pinned: test/realworld is byte-identical to the upstream commit.
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
 # Free runners only.
@@ -331,6 +338,133 @@ jobs:
         if: always()
         with:
           name: conduit-e2e-bun-chromium
+          path: examples/conduit/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  # Every other platform, each served by its own local tooling
+  # (examples/conduit/test/platforms.mjs): one job per platform builds
+  # Conduit as the platform builds it, then runs the official API suite and
+  # the official end-to-end suite (Chromium, no retries) against it.
+  platform:
+    name: ${{ matrix.title }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: deno
+            title: Deno 2.9.6 (node:sqlite)
+            build: npm run build:deno
+          - platform: docker
+            title: Docker (node:24-bookworm-slim, read-only, 512 MB)
+            build: npm run build:docker
+          - platform: lambda
+            title: AWS Lambda .zip (sam local start-api, nodejs24.x)
+            build: npm run build:lambda
+          - platform: lambda-image
+            title: AWS Lambda container image (sam local start-api, Lambda Web Adapter)
+            build: npm run build:lambda-image
+          - platform: vercel
+            title: Vercel Functions (vercel build offline, Vercel's Node launcher)
+            build: vercel build --yes
+          - platform: netlify
+            title: Netlify Functions (netlify build and netlify dev, offline)
+            build: netlify build --offline
+          - platform: azure
+            title: Azure Functions (func start)
+            build: npm run build:azure
+          - platform: gcf
+            title: Google Cloud Functions (Functions Framework)
+            build: npm run build:gcf
+    env:
+      # No account or credentials of any platform, and no telemetry.
+      SAM_CLI_TELEMETRY: '0'
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ''
+      AWS_SECRET_ACCESS_KEY: ''
+      AWS_SESSION_TOKEN: ''
+      VERCEL_TELEMETRY_DISABLED: '1'
+      VERCEL_TOKEN: ''
+      NETLIFY_TELEMETRY_DISABLED: '1'
+      NETLIFY_AUTH_TOKEN: ''
+      FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: examples/conduit
+        run: npm ci --no-audit --no-fund
+      - name: The platform's pinned tools
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          case "$PLATFORM" in
+            deno) npm install --prefix "$T" --no-audit --no-fund deno@2.9.6 ;;
+            lambda|lambda-image)
+              curl -fsSL --retry 3 -o "$RUNNER_TEMP/sam.zip" https://github.com/aws/aws-sam-cli/releases/download/v1.170.0/aws-sam-cli-linux-x86_64.zip
+              unzip -q "$RUNNER_TEMP/sam.zip" -d "$RUNNER_TEMP/sam-installer"
+              "$RUNNER_TEMP/sam-installer/install" --install-dir "$RUNNER_TEMP/sam" --bin-dir "$T/node_modules/.bin" ;;
+            vercel)
+              npm install --prefix "$T" --no-audit --no-fund vercel@65.2.0
+              echo "VERCEL_NODE_MODULES=$T/node_modules" >> "$GITHUB_ENV"
+              # A local project link stands in for `vercel link` (no account).
+              mkdir -p examples/conduit/.vercel
+              echo '{"projectId":"prj_conduit_ci","orgId":"team_conduit_ci","settings":{}}' > examples/conduit/.vercel/project.json
+              # No credentials: a home of its own.
+              echo "XDG_DATA_HOME=$RUNNER_TEMP/vercel-home/data" >> "$GITHUB_ENV"
+              echo "XDG_CONFIG_HOME=$RUNNER_TEMP/vercel-home/config" >> "$GITHUB_ENV" ;;
+            netlify) npm install --prefix "$T" --no-audit --no-fund netlify-cli@27.14.2 ;;
+            azure) npm install --prefix "$T" --no-audit --no-fund azure-functions-core-tools@4.16.0 ;;
+          esac
+          mkdir -p "$T/node_modules/.bin"
+          echo "$T/node_modules/.bin" >> "$GITHUB_PATH"
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: matrix.platform == 'lambda' || matrix.platform == 'lambda-image' || matrix.platform == 'vercel'
+        id: images-lambda
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
+      - name: The pinned Lambda images (cache, else registry by digest)
+        if: matrix.platform == 'lambda' || matrix.platform == 'lambda-image' || matrix.platform == 'vercel'
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
+      - name: Build (${{ matrix.build }})
+        working-directory: examples/conduit
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- ${{ matrix.build }}
+      - name: The official RealWorld API suite
+        working-directory: examples/conduit
+        run: node test/api.mjs --platform ${{ matrix.platform }}
+      - name: The pinned Playwright's chromium
+        timeout-minutes: 30
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
+          bash scripts/ci/playwright-install.sh chromium
+      - name: The official RealWorld end-to-end suite
+        working-directory: examples/conduit
+        env:
+          BROWSERS: chromium
+          E2E_NAME: ${{ matrix.platform }}-chromium
+          E2E_PLATFORM: ${{ matrix.platform }}
+        run: |
+          npm run test:e2e -- --retries=0 || status=$?
+          node test/e2e-summary.mjs test-results/e2e-${{ matrix.platform }}-chromium.json
+          exit ${status:-0}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: conduit-${{ matrix.platform }}
           path: examples/conduit/test-results/
           retention-days: 14
           if-no-files-found: warn

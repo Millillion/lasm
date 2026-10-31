@@ -16,6 +16,16 @@
     "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
     "start:bun": "bun bun/main.mjs",
     "test:bun": "node test/api.mjs --name bun --command \"bun bun/main.mjs\"",
+    "build:deno": "npm run build:client && lasm build ServerNode.lean --target deno --output dist/server",
+    "start:deno": "deno run -A deno/main.mjs",
+    "build:docker": "npm run build && docker build -t conduit .",
+    "build:lambda": "npm run build && lasm package dist/server --target lambda",
+    "build:lambda-image": "npm run build && docker build -f deploy/lambda-image/Dockerfile -t conduit-lambda:local .",
+    "build:vercel": "npm run build && lasm package dist/server --target vercel",
+    "build:netlify": "npm run build && lasm package dist/server --target netlify",
+    "build:azure": "npm run build && node deploy/package-hosted.mjs azure",
+    "build:gcf": "npm run build && node deploy/package-hosted.mjs gcf",
+    "test:platform": "node test/api.mjs --platform",
     "proofs": "node test/proofs.mjs",
     "test:e2e": "playwright test -c test/playwright.config.ts"
   },
@@ -23,7 +33,7 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.3.4",
+    "@lasm/cli": "0.3.5",
     "@orangeopensource/hurl": "8.0.4",
     "@playwright/test": "1.63.0"
   }

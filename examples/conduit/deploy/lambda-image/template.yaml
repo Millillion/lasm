@@ -1,0 +1,28 @@
+# Conduit on AWS Lambda, container image (deploy/lambda-image/Dockerfile),
+# behind an API Gateway HTTP API.
+#   npm run build:lambda-image
+#   sam local start-api -t deploy/lambda-image/template.yaml --warm-containers EAGER --parameter-overrides JwtSecret=…
+# To deploy, push the image to Amazon ECR, set ImageUri to it, and run sam deploy.
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Conduit, the RealWorld app in Lean (container image)
+Parameters:
+  JwtSecret:
+    Type: String
+    NoEcho: true
+    Description: The secret that signs Conduit's tokens
+Resources:
+  Conduit:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: conduit-lambda:local
+      Architectures: [x86_64]
+      MemorySize: 1024
+      Timeout: 30
+      Environment:
+        Variables:
+          JWT_SECRET: !Ref JwtSecret
+      Events:
+        Api:
+          Type: HttpApi

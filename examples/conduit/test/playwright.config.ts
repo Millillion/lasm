@@ -6,7 +6,8 @@
 //
 //   npm run test:e2e                                  # Chromium against the Node build
 //   BROWSERS=chromium,firefox,webkit npm run test:e2e
-//   E2E_SERVER="npx wrangler dev --port 4100 --ip 127.0.0.1" npm run test:e2e
+//   E2E_PLATFORM=deno npm run test:e2e                 # any platform of test/platforms.mjs
+//   E2E_SERVER="bun bun/main.mjs" npm run test:e2e      # any other server command (PORT, HOST)
 import { defineConfig, devices } from '@playwright/test';
 import { baseConfig } from './realworld/specs/e2e/playwright.base';
 
@@ -29,7 +30,7 @@ export default defineConfig({
     url: `http://127.0.0.1:${port}/api/tags`,
     env: { PORT: String(port), HOST: '127.0.0.1' },
     reuseExistingServer: false,
-    timeout: 180_000,
+    timeout: 600_000,
     stdout: 'ignore',
     stderr: 'pipe',
   },

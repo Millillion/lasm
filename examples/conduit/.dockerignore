@@ -1,0 +1,3 @@
+# Both images (Dockerfile, deploy/lambda-image/Dockerfile) copy only the build.
+*
+!dist/server

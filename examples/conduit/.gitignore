@@ -9,3 +9,10 @@ workers/
 bun/
 test-results/
 playwright-report/
+deno/
+lambda.zip
+.vercel/
+.netlify/
+netlify/functions/lasm/
+azure-functions/
+gcf/

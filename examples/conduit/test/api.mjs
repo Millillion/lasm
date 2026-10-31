@@ -4,6 +4,7 @@
 //
 //   node test/api.mjs                       # the Node build (npm run build first)
 //   node test/api.mjs --url http://host:port # a server that is already running
+//   node test/api.mjs --platform deno       # a platform of test/platforms.mjs, served by its own tooling
 //   node test/api.mjs --command "bun bun/main.mjs"   # any other server command ({port}: its port)
 //
 // Writes the pass counts to test-results/api-<name>.json.
@@ -13,11 +14,13 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { delimiter, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { startServer } from './platforms.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const args = process.argv.slice(2);
 const option = name => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
-const name = option('--name') ?? 'node';
+const platform = option('--platform');
+const name = option('--name') ?? platform ?? 'node';
 
 const freePort = () => new Promise((resolve, reject) => {
   const server = createServer().listen(0, '127.0.0.1', () => {
@@ -38,9 +41,15 @@ async function waitFor(url, child, timeoutMs = 60_000) {
 
 let child;
 let work;
+let server;
 let base = option('--url');
 try {
-  if (!base) {
+  if (!base && platform) {
+    const port = await freePort();
+    server = startServer(platform, port);
+    child = server.child;
+    base = `http://127.0.0.1:${port}`;
+  } else if (!base) {
     const port = await freePort();
     work = mkdtempSync(join(tmpdir(), 'conduit-api-'));
     // {port} in a command is replaced by the port (wrangler dev takes it as an option).
@@ -52,7 +61,8 @@ try {
     });
     base = `http://127.0.0.1:${port}`;
   }
-  await waitFor(`${base}/api/tags`, child, 180_000);
+  // Container images and function emulators can take minutes to pull and start.
+  await waitFor(`${base}/api/tags`, child, 600_000);
   // The official runner (bash, hurl from node_modules/.bin).
   const run = spawnSync('bash', [join(root, 'test/realworld/specs/api/run-api-tests-hurl.sh')], {
     cwd: root, encoding: 'utf8',
@@ -73,6 +83,7 @@ try {
     (run.status === 0 ? ', all passed' : ', FAILED'));
   process.exitCode = run.status === 0 && result.failedFiles === 0 ? 0 : 1;
 } finally {
+  server?.stop();
   // The whole process group: the shell and the server it started.
   if (child && child.exitCode === null) { try { process.kill(-child.pid, 'SIGTERM'); } catch { child.kill('SIGTERM'); } }
   if (work) rmSync(work, { recursive: true, force: true });
