@@ -71,6 +71,8 @@ function once(command, argv, cwd, diagDir, { untilOutput, onOutput } = {}) {
     let stdout = '', stderr = '', settled = false, hung = false;
     const finish = result => { if (!settled) { settled = true; clearTimeout(timer); done({ ...result, ms: Math.round(performance.now() - started), stdout, stderr }); } };
     const timer = setTimeout(() => { hung = true; child.kill('SIGKILL'); }, timeoutMs);
+    // UTF-8 decoded across chunk boundaries (a split character would otherwise be corrupted).
+    child.stdout.setEncoding('utf8'); child.stderr.setEncoding('utf8');
     child.stdout.on('data', d => { stdout += d; if (untilOutput && untilOutput.test(stdout)) { untilOutput = null; onOutput(child).then(ok => { child.kill('SIGKILL'); finish({ code: ok ? 0 : 1, hung: false }); }, () => { child.kill('SIGKILL'); finish({ code: 1, hung: false }); }); } });
     child.stderr.on('data', d => { stderr += d; });
     child.on('exit', code => finish({ code, hung }));

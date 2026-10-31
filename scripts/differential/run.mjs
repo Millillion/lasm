@@ -70,12 +70,15 @@ function exec(cmd, args, { cwd, timeout = 30 * 60_000 } = {}) {
   return new Promise(done => {
     const started = performance.now();
     const child = spawn(cmd, args, { cwd, env, stdio: ['ignore', 'pipe', 'pipe'] });
-    let stdout = '', stderr = '', timedOut = false;
+    // Bytes are collected and decoded once: decoding each pipe chunk on its own
+    // would corrupt a UTF-8 character split across two chunks (it did: the
+    // oracle's 4096-byte writes split "İ" in campaign 41246364549).
+    const out = [], err = []; let outBytes = 0, errBytes = 0, timedOut = false, spawnError = '';
     const timer = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, timeout);
-    child.stdout.on('data', d => { if (stdout.length < 8e6) stdout += d; });
-    child.stderr.on('data', d => { if (stderr.length < 8e6) stderr += d; });
-    child.on('error', e => { stderr += String(e); });
-    child.on('close', (code, signal) => { clearTimeout(timer); done({ code, signal, stdout, stderr, timedOut, ms: Math.round(performance.now() - started) }); });
+    child.stdout.on('data', d => { if (outBytes < 8e6) { out.push(d); outBytes += d.length; } });
+    child.stderr.on('data', d => { if (errBytes < 8e6) { err.push(d); errBytes += d.length; } });
+    child.on('error', e => { spawnError += String(e); });
+    child.on('close', (code, signal) => { clearTimeout(timer); done({ code, signal, stdout: Buffer.concat(out).toString('utf8'), stderr: Buffer.concat(err).toString('utf8') + spawnError, timedOut, ms: Math.round(performance.now() - started) }); });
   });
 }
 
@@ -282,7 +285,16 @@ async function campaignProgram(seed, kind) {
         [t]: { stdout: target?.stdout.slice(0, 2000), stderr: target?.stderr.slice(0, 2000), code: target?.code } });
       console.log(`  minimized to ${repro.dir}`);
     }
-    if (!reproduced) summary.divergences.push({ seed, kind, target: t, cases: suspects.slice(0, 4), what: 'diverges only in combination with other cases', reproduce: `--seed ${seed} --programs 1` });
+    if (!reproduced) {
+      // Keep the whole program and both outputs: the divergence depends on context.
+      const combo = join(work, 'repros', `combination-${t}-${seed}-${kind}`);
+      mkdirSync(combo, { recursive: true });
+      cpSync(join(dir, 'Main.lean'), join(combo, 'Main.lean'));
+      const pick = (r, ids) => { const o = byCase(r.stdout), e = byCase(r.stderr, true); return Object.fromEntries(ids.map(id => [id, { stdout: o.get(id) ?? null, stderr: e.get(id) ?? null }])); };
+      const ids = suspects.slice(0, 4);
+      writeFileSync(join(combo, 'outputs.json'), JSON.stringify({ native: { code: ev.nat.code, cases: pick(ev.nat, ids) }, [t]: { code: res.run.code, cases: pick(res.run, ids) } }, null, 1) + '\n');
+      summary.divergences.push({ seed, kind, target: t, cases: ids, what: 'diverges only in combination with other cases', repro: combo, reproduce: `--seed ${seed} --programs 1` });
+    }
   }
   save();
 }
