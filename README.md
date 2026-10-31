@@ -12,7 +12,7 @@ cd my-app && npm install && npm run dev
 
 The flagship example, [Conduit](#flagship-example-conduit-with-117-proved-theorems),
 is the RealWorld app written entirely in Lean, with 117 proved theorems. It passes
-RealWorld's official API and browser test suites on Node, Workers and Bun.
+RealWorld's official API and browser test suites on every platform in the table below.
 
 If Lasm is useful to you, I'd appreciate your [sponsorship](https://github.com/sponsors/lastmjs) ([more below](#support-lasm)).
 
@@ -71,7 +71,7 @@ files, except on WASI); the rest of Lean works.
 | An edge function (Workers, Vercel/Netlify Edge, Deno Deploy, Supabase) | `npm create @lasm@latest my-edge -- --template hono --deploy workers` (or `fetch`) | [examples/edge-pure](examples/edge-pure), [docs/EDGE.md](docs/EDGE.md) |
 | A Fastly, WASI or Spin service | `npm create @lasm@latest my-svc -- --template fetch --deploy fastly` (or `wasi-http`, `spin`, `wasi`) | [examples/fetch](examples/fetch), [docs/WASI.md](docs/WASI.md) |
 | A browser app | `npm create @lasm@latest my-web -- --template web` | [examples/ui](examples/ui) (counter, TodoMVC with proofs, feature demo, benchmark) |
-| A complete real-world app (API, browser frontend, SQL, auth) with proofs, on Node, Workers or Bun | `cd examples/conduit && npm install && npm run build && npm start` | [examples/conduit](examples/conduit), the flagship (below) |
+| A complete real-world app (API, browser frontend, SQL, auth) with proofs, on any platform above | `cd examples/conduit && npm install && npm run build && npm start` | [examples/conduit](examples/conduit), the flagship (below) |
 | A full-stack app with a verified API | `npm create @lasm@latest my-app -- --template fullstack` | [templates/fullstack](templates/fullstack) |
 | To call npm packages or `fetch` from Lean | add `import Lasm.JS` and one `@[js]` line per function | [examples/js-fetch](examples/js-fetch), [JS bindings](#calling-javascript-and-npm-from-lean) |
 | To run on Bun or Deno | `bun create @lasm my-app --template hono` / `deno run -A npm:@lasm/create my-app --template hono` | [docs/BUN_DENO.md](docs/BUN_DENO.md) |
@@ -98,12 +98,15 @@ server-rendered browser app and the proofs.
   JavaScript runtime. Conformance to the whole RealWorld spec is tested, not
   proved.
 - **API:** the official RealWorld API suite passes unmodified (13 of 13 files,
-  154 requests) on Node (`node:sqlite`), Cloudflare Workers (D1) and Bun
-  (`bun:sqlite`). Each target has one hand-written `@[js]` binding module.
+  154 requests) on every platform in the table above, each served by that
+  platform's own local tooling. Each platform has one small hand-written store
+  binding: SQLite where it has one (`node:sqlite`, D1, `bun:sqlite`), else its
+  key-value store (Deno KV, Netlify Blobs, Fastly KV) or Postgres (Supabase,
+  wasi-http) ([the platform table](examples/conduit#platforms)).
 - **Frontend:** `Lasm.UI` on RealWorld's official templates, with server-side
   rendering, hydration and Markdown parsed in Lean. The official Playwright
   end-to-end suite passes with no retries on Node with Chromium, Firefox and
-  WebKit, and on Workers and Bun with Chromium.
+  WebKit, and on every other platform with Chromium.
 
 All of this runs in CI ([conduit.yml](.github/workflows/conduit.yml), run 40615274657,
 with `@lasm/cli` 0.3.4).
@@ -113,10 +116,11 @@ cd examples/conduit
 npm install                                   # @lasm/cli, Hurl and Playwright (the official suites' runners)
 npm run build && npm start                    # http://localhost:3000: the app and its API on Node
 npm run proofs                                # check all 117 theorems
-npm test                                      # the official API suite (also test:workers, test:bun)
+npm test                                      # the official API suite
 npx playwright install chromium && npm run test:e2e   # the official end-to-end suite
 npm run build:workers && npx wrangler dev     # Cloudflare Workers with local D1
-npm run build:bun && npm run start:bun        # Bun with bun:sqlite
+npm run build:<platform>                      # any other platform: deno, docker, lambda, vercel, fastly, wasi-http, …
+npm run test:platform -- <platform>           # the API suite against that platform's local tooling
 ```
 
 ## 60-second start

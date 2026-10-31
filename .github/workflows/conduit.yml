@@ -18,10 +18,11 @@ name: Conduit
 #   (examples/conduit/test/platforms.mjs): Deno; Docker; AWS Lambda .zip and
 #   container image (sam local start-api); Vercel Functions (vercel build,
 #   Vercel's Node launcher in the Lambda image); Netlify Functions (netlify
-#   build and netlify dev, offline); Azure Functions (func start); Google
+#   build, Netlify's bootstrap in the Lambda image); Azure Functions (func
+#   start); Google
 #   Cloud Functions (Functions Framework); Deno Deploy (Deno KV); Vercel
-#   Edge (vercel build, edge-runtime); Netlify Edge (netlify build and
-#   netlify dev, Netlify Blobs); Supabase Edge Functions (the Supabase CLI's
+#   Edge (vercel build, edge-runtime); Netlify Edge (netlify build; Deno with
+#   Netlify Blobs' local server); Supabase Edge Functions (the Supabase CLI's
 #   local stack and functions serve, Postgres); Fastly Compute (Viceroy,
 #   Fastly KV); wasi-http on wasmtime serve and Spin (Postgres through
 #   PostgREST). Each runs the API suite and the end-to-end
@@ -374,7 +375,7 @@ jobs:
             title: Vercel Functions (vercel build offline, Vercel's Node launcher)
             build: vercel build --yes
           - platform: netlify
-            title: Netlify Functions (netlify build and netlify dev, offline)
+            title: Netlify Functions (netlify build offline; Netlify's bootstrap in the Lambda Node 24 image)
             build: netlify build --offline
           - platform: azure
             title: Azure Functions (func start)
@@ -391,7 +392,7 @@ jobs:
             # does not detect the one its build command writes; DECISIONS.md).
             build: npm run build:vercel-edge && cp deploy/vercel-edge/vercel.json vercel.json && vercel build --yes
           - platform: netlify-edge
-            title: Netlify Edge (netlify build and netlify dev, offline; Netlify Blobs)
+            title: Netlify Edge (netlify build offline; Deno with Netlify Blobs' local server)
             build: cp deploy/netlify-edge/netlify.toml netlify.toml && netlify build --offline
           - platform: fastly
             title: Fastly Compute (Viceroy 0.21.1, Fastly KV)
@@ -420,7 +421,7 @@ jobs:
       SUPABASE_TELEMETRY_DISABLED: '1'
       SPIN_DISABLE_TELEMETRY: '1'
       DO_NOT_TRACK: '1'
-      # The example's directory (the Netlify jobs use a copy, below).
+      # The example's directory.
       CONDUIT: examples/conduit
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -435,11 +436,6 @@ jobs:
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
-      - name: Netlify only, the example outside this repository (Netlify's CLI takes the repository, whose package.json has workspaces, for a monorepo and serves no function)
-        if: matrix.platform == 'netlify' || matrix.platform == 'netlify-edge'
-        run: |
-          cp -a examples/conduit "$RUNNER_TEMP/conduit"
-          echo "CONDUIT=$RUNNER_TEMP/conduit" >> "$GITHUB_ENV"
       - name: npm ci
         working-directory: ${{ env.CONDUIT }}
         run: npm ci --no-audit --no-fund
@@ -497,17 +493,21 @@ jobs:
           mkdir -p "$T/node_modules/.bin"
           echo "$T/node_modules/.bin" >> "$GITHUB_PATH"
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: matrix.platform == 'lambda' || matrix.platform == 'lambda-image' || matrix.platform == 'vercel'
+        if: matrix.platform == 'lambda' || matrix.platform == 'lambda-image' || matrix.platform == 'vercel' || matrix.platform == 'netlify'
         id: images-lambda
         with:
           path: ${{ runner.temp }}/image-cache/lambda
           key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
       - name: The pinned Lambda images (cache, else registry by digest)
-        if: matrix.platform == 'lambda' || matrix.platform == 'lambda-image' || matrix.platform == 'vercel'
+        if: matrix.platform == 'lambda' || matrix.platform == 'lambda-image' || matrix.platform == 'vercel' || matrix.platform == 'netlify'
         run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
       - name: Build (${{ matrix.build }})
         working-directory: ${{ env.CONDUIT }}
         run: node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- bash -c "${{ matrix.build }}"
+      - name: Fastly only, the pure-Lean crypto (Server/LeanCrypto.lean) against Node's crypto
+        if: matrix.platform == 'fastly'
+        working-directory: ${{ env.CONDUIT }}
+        run: node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- node test/crypto-check.mjs
       - name: The official RealWorld API suite
         working-directory: ${{ env.CONDUIT }}
         run: node test/api.mjs --platform ${{ matrix.platform }}

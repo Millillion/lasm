@@ -47,12 +47,11 @@ export const platforms = {
     serve: 'node test/vercel-edge-serve.mjs {port}',
     store: 'memory (one copy per isolate)',
   },
-  // `netlify build` (offline) output, served by `netlify dev --offline`
-  // (Netlify's local edge runtime, Deno), with its local Netlify Blobs.
+  // The edge function in Deno with Netlify Blobs' local server, as netlify dev
+  // runs it, without netlify dev's proxy (test/netlify-edge-serve.mjs).
   'netlify-edge': {
     build: 'build:netlify-edge',
-    serve: 'netlify dev --offline --no-open --port {port}',
-    host: 'localhost',
+    serve: 'node test/netlify-edge-serve.mjs {port}',
     store: 'Netlify Blobs (netlify dev: local blobs)',
   },
   // The Supabase CLI's local stack (supabase start) and supabase functions
@@ -126,11 +125,11 @@ export const platforms = {
     serve: 'node test/vercel-serve.mjs {port}',
     store: 'node:sqlite in /tmp (per instance)',
   },
-  // netlify dev listens on localhost (IPv6 or IPv4, whichever it gets).
+  // The zip `netlify build` makes, with Netlify's bootstrap in the Lambda Node
+  // 24 image (test/netlify-serve.mjs says why not netlify dev).
   netlify: {
     build: 'build:netlify',
-    serve: 'netlify dev --offline --no-open --port {port}',
-    host: 'localhost',
+    serve: 'node test/netlify-serve.mjs {port}',
     store: 'node:sqlite in the temporary directory (per instance)',
   },
   azure: {
