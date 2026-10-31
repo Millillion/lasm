@@ -1,0 +1,42 @@
+# Supabase project settings for Conduit (supabase start runs the local stack:
+# Postgres with supabase/migrations applied, its REST API and the gateway;
+# supabase functions serve runs the function). npm run build:supabase-edge
+# writes the function to supabase/functions/conduit/.
+project_id = "conduit"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+major_version = 17
+
+# Not used by Conduit (it signs its own tokens and stores no files).
+[studio]
+enabled = false
+
+[auth]
+enabled = false
+
+[inbucket]
+enabled = false
+
+[realtime]
+enabled = false
+
+[storage]
+enabled = false
+
+[analytics]
+enabled = false
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+
+[functions.conduit]
+# Conduit checks its own tokens (Authorization: Token …), not Supabase's.
+verify_jwt = false
+import_map = "./functions/conduit/deno.json"

@@ -21,6 +21,7 @@
     "build:deno-deploy": "npm run build:client && lasm build ServerEdge.lean --target deno-deploy --output dist/edge",
     "build:vercel-edge": "npm run build:client && lasm build ServerEdge.lean --target vercel-edge --output dist/edge",
     "build:netlify-edge": "npm run build:client && lasm build ServerNetlifyEdge.lean --target netlify-edge --output dist/edge",
+    "build:supabase-edge": "npm run build:client && lasm build ServerSupabase.lean --target supabase-edge --output dist/edge",
     "build:docker": "npm run build && docker build -t conduit .",
     "build:lambda": "npm run build && lasm package dist/server --target lambda",
     "build:lambda-image": "npm run build && docker build -f deploy/lambda-image/Dockerfile -t conduit-lambda:local .",

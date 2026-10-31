@@ -14,7 +14,7 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { delimiter, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { startServer } from './platforms.mjs';
+import { baseUrl, startServer } from './platforms.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const args = process.argv.slice(2);
@@ -48,7 +48,7 @@ try {
     const port = await freePort();
     server = startServer(platform, port);
     child = server.child;
-    base = `http://127.0.0.1:${port}`;
+    base = baseUrl(platform, port);
   } else if (!base) {
     const port = await freePort();
     work = mkdtempSync(join(tmpdir(), 'conduit-api-'));

@@ -20,3 +20,6 @@ api/lasm.mjs
 api/_lasm/
 netlify/lasm/
 netlify/edge-functions/lasm.mjs
+supabase/functions/
+supabase/.temp/
+supabase/.branches/

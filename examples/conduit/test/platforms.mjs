@@ -52,7 +52,15 @@ export const platforms = {
   'netlify-edge': {
     build: 'build:netlify-edge',
     serve: 'netlify dev --offline --no-open --port {port}',
+    host: 'localhost',
     store: 'Netlify Blobs (netlify dev: local blobs)',
+  },
+  // The Supabase CLI's local stack (supabase start) and supabase functions
+  // serve; the store is the stack's Postgres, through its REST API.
+  'supabase-edge': {
+    build: 'build:supabase-edge',
+    serve: 'node test/supabase-serve.mjs {port}',
+    store: 'Postgres (table conduit_kv, through Supabase\'s REST API)',
   },
   workers: {
     build: 'build:workers',
@@ -98,9 +106,11 @@ export const platforms = {
     serve: 'node test/vercel-serve.mjs {port}',
     store: 'node:sqlite in /tmp (per instance)',
   },
+  // netlify dev listens on localhost (IPv6 or IPv4, whichever it gets).
   netlify: {
     build: 'build:netlify',
     serve: 'netlify dev --offline --no-open --port {port}',
+    host: 'localhost',
     store: 'node:sqlite in the temporary directory (per instance)',
   },
   azure: {
@@ -115,6 +125,11 @@ export const platforms = {
   },
 };
 
+/** The URL `name` serves on `port`. */
+export function baseUrl(name, port) {
+  return `http://${platforms[name]?.host ?? '127.0.0.1'}:${port}`;
+}
+
 /** The command that serves `name` on `port`, keeping its data in `data`. */
 export function serveCommand(name, port, data) {
   const platform = platforms[name];
@@ -124,20 +139,22 @@ export function serveCommand(name, port, data) {
 
 /**
  * Starts platform `name` on 127.0.0.1:`port` with a new, empty data directory
- * (DATABASE_PATH is in it). Returns the child (a shell in its own process
- * group) and `stop`, which ends the group, runs the platform's own clean-up
- * and removes the data.
+ * (DATABASE_PATH is in it). Returns the child (a shell, in its own process
+ * group unless `detached` is false) and `stop`, which ends it, runs the
+ * platform's own clean-up and removes the data.
  */
-export function startServer(name, port, { stdio = ['ignore', 'inherit', 'inherit'] } = {}) {
+export function startServer(name, port, { stdio = ['ignore', 'inherit', 'inherit'], detached = process.platform !== 'win32' } = {}) {
   const data = mkdtempSync(join(tmpdir(), `conduit-${name}-`));
   const env = { ...process.env, PORT: String(port), HOST: '127.0.0.1', DATABASE_PATH: join(data, 'conduit.db') };
   if (platforms[name].ownDatabase) delete env.DATABASE_PATH;
-  const child = spawn(serveCommand(name, port, data), { shell: true, cwd: root, stdio, detached: process.platform !== 'win32', env });
+  const child = spawn(serveCommand(name, port, data), { shell: true, cwd: root, stdio, detached, env });
   let stopped = false;
   const stop = () => {
     if (stopped) return;
     stopped = true;
-    if (child.exitCode === null) { try { process.kill(-child.pid, 'SIGTERM'); } catch { child.kill('SIGTERM'); } }
+    if (child.exitCode === null) {
+      if (detached) { try { process.kill(-child.pid, 'SIGTERM'); } catch { child.kill('SIGTERM'); } } else child.kill('SIGTERM');
+    }
     const cleanUp = platforms[name].stop;
     if (cleanUp) spawnSync(cleanUp.replaceAll('{port}', String(port)), { shell: true, cwd: root, stdio: 'ignore', timeout: 60_000 });
     rmSync(data, { recursive: true, force: true });
