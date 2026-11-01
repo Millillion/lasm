@@ -37,7 +37,7 @@ proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
 | [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage | planned | nightly |
-| [Schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups or deadlocks | `lasm-js-stress.yml`, `test/node-js.test.mjs`; simulation planned | release |
+| [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (subset), release |
 | [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/` | release; nightly planned |
@@ -247,16 +247,116 @@ differential and equivalence oracles are for).
 
 The 0.3.0 hang was a lost wake-up in `src/node-js.mjs` `syncFunction`: the main
 thread read the Lean thread's host-call sequence after posting a call, so a
-call made at once counted as served. Today `test/node-js.test.mjs` makes that
+call made at once counted as served. `test/node-js.test.mjs` makes that
 interleaving deterministic, and `lasm-js-stress.yml` runs the Lasm.JS programs
 hundreds of times per platform with a short timeout and keeps diagnostics of
-any hang (a release gate). Planned: (1) a model of the host-call protocol
-(sequence numbers, doorbell, poller claim, completion thread) checked over all
-interleavings up to a bound; (2) schedule fuzzing: random delays and yields
-injected at every `Atomics.wait`/`notify` and host-call boundary under a seed,
-then the stress programs, so a hang reproduces from its seed. **Cannot catch:**
-races outside the modelled protocol, memory-model effects the JavaScript engine
-never exhibits on the tested CPUs.
+any hang (a release gate). Three layers now cover the protocol itself
+([bridge-verification.yml](../.github/workflows/bridge-verification.yml)).
+
+**1. A Lean model, checked over every interleaving**
+([`verification/host-bridge/`](../verification/host-bridge/), a self-contained
+Lake package, no dependencies). Two models, step for step as implemented, each
+step one access to a shared word:
+
+- `HostBridge/SyncCallback.lean`: one Lean thread's host-call slot (`seq`,
+  `ready`, the request and reply fields: `$lasmFullRPC.exchange` in
+  `host-library.js`), the host's asynchronous server of it (`lasmFullServe`,
+  `slot.sequence`, `Atomics.waitAsync`), the synchronous-callback channel
+  (`state`, the doorbell; `sync_main` and `post` in `library/c/lasm_js.c`), and
+  Node's main thread inside a synchronous callback (`syncFunction`,
+  `lasmFullServeSync`, work other threads proxy to the main thread). Waits
+  follow `Atomics.wait`/futex semantics; a blocked wait may also wake
+  spuriously and a timed wait may time out (each optional per configuration).
+- `HostBridge/Poller.lean`: the interop poller (`claim_poller`'s
+  compare-and-swap, `start_poller` from awaits and from the host's
+  `spawnPoller`, `lasm_js_park` for `waitForever`), the host's event queue,
+  waiter, `polled` flag and re-armed spawn timer, and the lazy completion thread
+  (`ensure_completion_thread`, op 94, the op 95 long poll, completions queued
+  before its first poll).
+
+`HostBridge/Checker.lean` is an explicit-state checker: breadth-first search
+over every reachable state, then **safety** (no request served twice, every
+reply and result belongs to its request or callback, at most one poller, no
+event or completion delivered twice), **deadlock freedom** (every non-final
+state has a successor) and **liveness under weak fairness** (no reachable
+cycle of non-final states in which every continuously enabled thread or
+event-loop task keeps stepping: Tarjan's strongly connected components;
+spurious wake-ups are allowed only finitely often). Counterexamples are
+shortest paths, printed step by step. `lake exe host-bridge check --large`
+runs every configuration (CI: about 1 s):
+
+| Configuration | Bound | States | Result |
+| --- | --- | ---: | --- |
+| Synchronous callbacks, no timeouts, no spurious wake-ups | callbacks with 1, 0, 2 host calls | 9,952 | ok: every host call is served by a notification alone |
+| … with spurious wake-ups and timeouts | 2 callbacks × 2 host calls; (large) 3, 0, 3, 2, 1, 3 | 17,277; 103,208 | ok |
+| … 4 and (large) 10 callbacks | 1 host call each | 18,756; 98,890 | ok |
+| Work proxied to the main thread inside callbacks | 1 + 1; (large) 5 callbacks, 8 host calls | 8,796; 54,756 | ok (it runs when the wait's 10 ms timeout expires) |
+| A generic Lean thread's slot, replies now or in a later task | 3; (large) 30 host calls | 280; 3,196 | ok |
+| Poller and completion thread | 5 scripts (callbacks with and without `waitForever`, awaits, async requests, timer races); (large) 4 calls, 2 awaits, 2 async requests | 84–1,588; up to 34,678 | ok |
+
+Each **mutation** reintroduces a bug and must be found, which tests the checker
+(and fails CI if it is not found): the 0.3.0 order (read after posting: a
+deadlock without timeouts), 0.3.0 as released (also no serve on timeout: a fair
+non-progress cycle), the wait before this change (proxied work never run: a
+non-progress cycle), host calls without the doorbell (deadlock), a host that
+forgets `slot.sequence` (a request served twice), `claim_poller` without
+compare-and-swap (two pollers), completions dropped before the first poll and
+no poller requested for queued events (deadlocks).
+
+**2. Schedule fuzzing of the real JavaScript**
+([`scripts/bridge-fuzz/schedule.cjs`](../scripts/bridge-fuzz/schedule.cjs)).
+A test-only preload, loaded explicitly with `NODE_OPTIONS=--require=…`, so
+published builds contain no hook at all (it is not packed); Node loads it in
+the main thread and in every Lean thread's worker. With `LASM_BRIDGE_SEED` it
+wraps `Atomics.load/store/add/notify/wait/waitAsync` on the Wasm memory: before
+and after each operation it may spin or sleep (a yield at every handshake step
+and host-call boundary), a blocking wait may return early (`ok`, or `timed-out`
+as if its time had passed) and a `waitAsync` may resolve late. Every decision
+comes from a generator seeded by (seed, thread), so a run's perturbations
+repeat from its seed. `scripts/ci/lasm-js-stress.mjs --seed S` runs the stress
+programs (js-interop, js-callbacks, the Hono server) with seed S + i for run i;
+a run passes with no timeout and the same output as the expected output or the
+first run (timings masked). A failure prints its seed and the command that
+replays it, and is replayed `--replays` times from the seed alone (real threads
+still schedule themselves, so the replay count is reported, not assumed).
+Locally: `node scripts/ci/lasm-js-stress.mjs - WORK RESULT.json --lasm
+node_modules/@lasm/cli/bin/lasm.mjs --only js-interop,js-callbacks --runs 20 --seed 1`.
+
+**3. Model-to-code conformance.** With `LASM_BRIDGE_TRACE=DIR` the preload
+also records every such operation in one global order (a lock around each, the
+comparison of a wait included) and at exit writes one trace per host-call slot
+(`slot sync` for the synchronous-callback thread, `slot generic` for every
+other Lean thread and nesting depth; roles from the diagnostics globals
+`lasm.js.sync` and `lasm.full.slots`). `host-bridge trace FILE…` checks each
+against the model's transition relation: every event must be a visible step,
+with any number of hidden steps (the Lean thread's Wasm futex waits and its C
+code, which the preload cannot see) in between. The fuzzed runs trace every
+fifth (PR) or twentieth (nightly) run. A local fuzzed run of js-interop and
+js-callbacks recorded 80 traces (up to 20,400 events each), all conforming.
+The self-test in `host-bridge check` accepts three real traces
+(`verification/host-bridge/traces/conforming/`) and must reject three drifted
+ones (`traces/drifted/`: the 0.3.0 order, a reply the host never stored, a
+request served twice).
+
+**CI.** Pull requests that touch the bridge (`src/node-js.mjs`,
+`src/node-host.mjs`, `host-pre.js`, `host-library.js`, `lasm_js.c`, the model,
+the fuzzer, the stress programs): the model, then 20 fuzzed runs per program on
+Linux and the conformance check of their traces. Nightly (03:17 UTC): 200
+fuzzed runs per program on Linux, macOS (Intel and Arm) and Windows. The
+release's unfuzzed stress gate is unchanged.
+
+**What it catches:** lost wake-ups, lost, duplicated or mismatched requests,
+replies and events, deadlocks and livelocks in the modelled protocol at the
+bounds above; a change to the code's sequence of shared-memory operations that
+the model does not allow; hangs and wrong output under perturbed schedules.
+**What it cannot catch:** races outside the modelled protocol (Lean's own
+runtime, Emscripten's internals beyond the proxied call, a host call made by a
+task proxied to the synchronous-callback thread while it waits, which uses the
+next depth's slot and is not served inline); behaviour beyond the bounds;
+memory-model effects (the model is sequentially consistent, as JavaScript's
+`Atomics` are); the Lean thread's Wasm-side steps are checked only through
+their effects in a trace. The model assumes each slot is used by one thread at a
+time and that the event loop eventually runs every queued task.
 
 ### Coverage and mutation testing
 
@@ -273,8 +373,8 @@ modules) says whether the tests would notice a change.
 
 | Tier | When | Adds (beyond existing checks) | Budget |
 | --- | --- | --- | --- |
-| PR | every pull request and push to `main` | differential: regressions + three seeded program pairs (525 cases) on node, wasi, node:wasi, edge, plus the interpreter, `node-O0` and the edge `.wasm` on Node, Bun and SpiderMonkey; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers (one candidate pack, then two parallel jobs) | measured: pack 1.5 min, differential about 5 min (one pair took 2.7 min, run 41232604865) |
-| Nightly | 04:41 UTC | differential: 60-minute campaigns for the release and the dev profile (two jobs), every oracle including `wasi-O0` and `deno-O0`; the nightly upstream suite (`nightly.yml`) | about 1.5 h |
+| PR | every pull request and push to `main` (bridge model and fuzzing: when the bridge changes) | host bridge: the model (about 1 s), 20 schedule-fuzzed runs per stress program on Linux and their traces' conformance; differential: regressions + three seeded program pairs (525 cases) on node, wasi, node:wasi, edge, plus the interpreter, `node-O0` and the edge `.wasm` on Node, Bun and SpiderMonkey; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers (one candidate pack, then two parallel jobs) | measured: pack 1.5 min, differential about 5 min (one pair took 2.7 min, run 41232604865) |
+| Nightly | 03:17, 04:41 UTC | host bridge: 200 schedule-fuzzed runs per stress program on four platforms, conformance of their traces; differential: 60-minute campaigns for the release and the dev profile (two jobs), every oracle including `wasi-O0` and `deno-O0`; the nightly upstream suite (`nightly.yml`) | about 1.5 h |
 | Release | release PR (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) | as today |
 
 ## Test-quality audit
@@ -344,3 +444,4 @@ when coverage improves.
 | Dev-profile campaign 41241443151 | `Float.pow` differed in the 17th digit between native (glibc) and Wasm (musl's libm): expected, libm functions are not correctly rounded | Generator: libm results go through `approx` (9 significant digits) |
 | Nightly-style campaign 41241440598 (9,450 cases) | Two "divergences" on every Wasm target were the harness's own: it decoded each pipe chunk of the oracle's output separately, so a UTF-8 character split by native Lean's 4,096-byte writes became U+FFFD (the Wasm targets wrote it whole). `scripts/ci/lasm-js-stress.mjs` had the same pattern | Harness fix (#33) |
 | Test-quality audit | `candidate-readme.test.mjs` broke on `main` when the README's headings changed (PR #22), failing `installer-faults.yml` on every PR | Fixed in #25 |
+| Host bridge model (proxied work in a synchronous callback) | **A synchronous Lasm.JS callback that made the program's first asynchronous runtime request (a timer, socket, DNS lookup) hung for good.** The request starts the completion thread; `pthread_create` on a Lean thread is proxied synchronously to Node's main thread, which waited in `syncFunction` on the doorbell and never ran proxied work. Found while modelling the lazy completion thread, then reproduced (0.3.5) | Fixed: the wait runs the main thread's mailbox (`serveMailbox`, Emscripten's `_emscripten_check_mailbox`) whenever it times out, every 10 ms; regression in `test/node-js.test.mjs` and part 4 of `test/fixtures/js-callbacks`; the model's mutation keeps the old wait |

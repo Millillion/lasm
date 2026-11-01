@@ -1,0 +1,198 @@
+name: Host bridge verification
+# The host bridge (Lean threads, Atomics, host calls; docs/TESTING.md#deterministic-simulation-and-schedule-fuzzing):
+# - model: the Lean model of the host-call protocol (verification/host-bridge),
+#   every interleaving up to its bounds: safety, deadlock freedom and liveness
+#   under fairness; every mutation (the 0.3.0 hang first) must be found, and the
+#   trace self-test must accept real traces and reject drifted ones;
+# - fuzz: the Lasm.JS stress programs, schedule-fuzzed with seeded delays,
+#   yields and early wake-ups at every Atomics operation (lasm-js-stress.yml
+#   with a seed): no hang, the same output; a failure prints its seed and is
+#   replayed from it;
+# - conformance: the traces those runs recorded of every host-call slot,
+#   checked against the model's transition relation.
+# Pull requests that touch the bridge: a short run on Linux; nightly: every
+# platform, many seeds. Free runners only; upstream Lean 4.35.0 (pinned archive).
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - src/node-js.mjs
+      - src/node-host.mjs
+      - scripts/full-lean/host-pre.js
+      - scripts/full-lean/host-library.js
+      - library/c/lasm_js.c
+      - library/Lasm/JS/**
+      - runtime/node-async.cpp
+      - verification/host-bridge/**
+      - scripts/bridge-fuzz/**
+      - scripts/ci/lasm-js-stress.mjs
+      - test/fixtures/js-interop/**
+      - test/fixtures/js-callbacks/**
+      - .github/workflows/bridge-verification.yml
+      - .github/workflows/lasm-js-stress.yml
+  push:
+    branches: [main]
+    paths:
+      - src/node-js.mjs
+      - scripts/full-lean/host-pre.js
+      - scripts/full-lean/host-library.js
+      - library/c/lasm_js.c
+      - runtime/node-async.cpp
+      - verification/host-bridge/**
+      - scripts/bridge-fuzz/**
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: Fuzzed runs per program and platform
+        default: '200'
+        type: string
+      seed:
+        description: First seed (empty = derived from the run)
+        default: ''
+        type: string
+      platforms:
+        description: all, or one of linux-x64, darwin-x64, darwin-arm64, win32-x64
+        default: all
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: bridge-verification-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  model:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Upstream Lean 4.35.0 (pinned release archive)
+        id: lean
+        run: |
+          node -e "const a=require('./scripts/lean-dist/lean-4.35.0-upstream.json').lean['4.35.0'].artifacts['linux-x64']; console.log('url='+a.url); console.log('sha256='+a.sha256); console.log('root='+a.root)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: lean-cache
+        with:
+          path: ${{ runner.temp }}/lean-archive
+          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
+      - name: Install Lean
+        run: |
+          set -euo pipefail
+          A="$RUNNER_TEMP/lean-archive"; mkdir -p "$A"
+          [ -f "$A/lean.tar.zst" ] || curl -fsSL --retry 3 -o "$A/lean.tar.zst" "${{ steps.lean.outputs.url }}"
+          echo "${{ steps.lean.outputs.sha256 }}  $A/lean.tar.zst" | sha256sum -c
+          mkdir -p "$RUNNER_TEMP/lean" && tar --zstd -xf "$A/lean.tar.zst" -C "$RUNNER_TEMP/lean"
+          echo "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin/lean" --version
+      - if: steps.lean-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/lean-archive
+          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
+      - name: Build the model checker
+        working-directory: verification/host-bridge
+        run: lake build
+      - name: Check every configuration, the mutations and the trace self-test
+        working-directory: verification/host-bridge
+        run: .lake/build/bin/host-bridge check --large | tee "$RUNNER_TEMP/model.txt"
+      - name: Summary
+        if: always()
+        run: |
+          { echo '### Host bridge model'; echo '```'; cat "$RUNNER_TEMP/model.txt" 2>/dev/null | grep -E '^(PASS|FAIL)|checks as' || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+  seed:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      seed: ${{ steps.seed.outputs.seed }}
+      runs: ${{ steps.seed.outputs.runs }}
+      platforms: ${{ steps.seed.outputs.platforms }}
+      trace-every: ${{ steps.seed.outputs.trace-every }}
+    steps:
+      - id: seed
+        env:
+          INPUT_SEED: ${{ inputs.seed || '' }}
+          INPUT_RUNS: ${{ inputs.runs || '' }}
+          INPUT_PLATFORMS: ${{ inputs.platforms || '' }}
+        run: |
+          # A seed from the run unless one is given: every failure names its seed.
+          seed="${INPUT_SEED:-$(( (GITHUB_RUN_ID % 1000000) * 1000 ))}"
+          if [ "$GITHUB_EVENT_NAME" = pull_request ] || [ "$GITHUB_EVENT_NAME" = push ]; then
+            runs=20; platforms=linux-x64; every=5
+          else
+            runs="${INPUT_RUNS:-200}"; platforms="${INPUT_PLATFORMS:-all}"; every=20
+          fi
+          echo "seed=$seed" >> "$GITHUB_OUTPUT"; echo "runs=$runs" >> "$GITHUB_OUTPUT"
+          echo "platforms=$platforms" >> "$GITHUB_OUTPUT"; echo "trace-every=$every" >> "$GITHUB_OUTPUT"
+          echo "Schedule fuzzing: seeds $seed.. ($runs runs per program, $platforms); traces every $every runs" >> "$GITHUB_STEP_SUMMARY"
+  fuzz:
+    needs: seed
+    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/lasm-js-stress.yml
+    with:
+      runs: ${{ needs.seed.outputs.runs }}
+      cli-runs: '0'
+      timeout-s: '60'
+      platforms: ${{ needs.seed.outputs.platforms }}
+      seed: ${{ needs.seed.outputs.seed }}
+      trace-every: ${{ needs.seed.outputs.trace-every }}
+  conformance:
+    needs: fuzz
+    if: always() && needs.fuzz.result != 'skipped' && needs.fuzz.result != 'cancelled'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Upstream Lean 4.35.0 (pinned release archive)
+        id: lean
+        run: |
+          node -e "const a=require('./scripts/lean-dist/lean-4.35.0-upstream.json').lean['4.35.0'].artifacts['linux-x64']; console.log('url='+a.url); console.log('sha256='+a.sha256); console.log('root='+a.root)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: lean-cache
+        with:
+          path: ${{ runner.temp }}/lean-archive
+          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
+      - name: Install Lean
+        run: |
+          set -euo pipefail
+          A="$RUNNER_TEMP/lean-archive"; mkdir -p "$A"
+          [ -f "$A/lean.tar.zst" ] || curl -fsSL --retry 3 -o "$A/lean.tar.zst" "${{ steps.lean.outputs.url }}"
+          echo "${{ steps.lean.outputs.sha256 }}  $A/lean.tar.zst" | sha256sum -c
+          mkdir -p "$RUNNER_TEMP/lean" && tar --zstd -xf "$A/lean.tar.zst" -C "$RUNNER_TEMP/lean"
+          echo "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin/lean" --version
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: lasm-js-stress-*
+          path: .work/stress
+      - name: Build the model checker
+        working-directory: verification/host-bridge
+        run: lake build
+      - name: Every recorded trace against the model
+        run: |
+          set -euo pipefail
+          find .work/stress -name '*.trace' -print0 | sort -z > "$RUNNER_TEMP/traces"
+          count=$(tr -cd '\0' < "$RUNNER_TEMP/traces" | wc -c)
+          echo "$count traces"
+          [ "$count" -gt 0 ] || { echo "::error::the fuzzed runs recorded no traces"; exit 1; }
+          xargs -0 -n 200 verification/host-bridge/.lake/build/bin/host-bridge trace < "$RUNNER_TEMP/traces" > "$RUNNER_TEMP/conformance.txt" || status=$?
+          grep -c '^OK' "$RUNNER_TEMP/conformance.txt" || true
+          grep -v '^OK' "$RUNNER_TEMP/conformance.txt" || true
+          { echo '### Model-to-code conformance'; echo "$(grep -c '^OK' "$RUNNER_TEMP/conformance.txt" || true) of $count traces conform"; } >> "$GITHUB_STEP_SUMMARY"
+          exit "${status:-0}"

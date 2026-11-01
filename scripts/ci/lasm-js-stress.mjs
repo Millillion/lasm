@@ -12,7 +12,14 @@
 // A run still going after the timeout gets a Node diagnostic report (every
 // thread's JavaScript and Wasm stack), Lasm.JS's poller state and every Lean
 // thread's pending host request (diag preload below), then is killed.
+// With --seed S, run i is schedule-fuzzed with seed S + i
+// (scripts/bridge-fuzz/schedule.cjs: seeded delays, yields and early wake-ups at
+// every Atomics operation of the bridge), its output must equal the first run's
+// (timings masked), a failure is replayed --replays times from its seed, and
+// every --trace-every'th run records traces of each host-call slot for the
+// model's conformance check (verification/host-bridge).
 //   node scripts/ci/lasm-js-stress.mjs CANDIDATE.tgz NEW_WORK_DIR RESULT.json [--runs 200] [--cli-runs 20] [--timeout-s 30]
+//     [--seed S] [--replays 3] [--trace-every 10] [--only js-interop,js-callbacks,hono] [--lasm INSTALLED/bin/lasm.mjs]
 import assert from 'node:assert/strict';
 import { spawn, execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -25,6 +32,9 @@ const args = process.argv.slice(2);
 const flag = (name, fallback) => { const i = args.indexOf(name); if (i < 0) return fallback; const [, v] = args.splice(i, 2); return v; };
 const runs = Number(flag('--runs', '200')), cliRuns = Number(flag('--cli-runs', '20')), timeoutMs = Number(flag('--timeout-s', '30')) * 1000;
 const only = flag('--only', '');
+const seedArg = flag('--seed', ''), fuzz = seedArg !== '', baseSeed = Number(seedArg || 0);
+const replays = Number(flag('--replays', '3')), traceEvery = Number(flag('--trace-every', '0'));
+const installedLasm = flag('--lasm', '');
 const [tgzArg, workArg, outputArg] = args;
 assert.ok(tgzArg && workArg && outputArg, 'Usage: node scripts/ci/lasm-js-stress.mjs CANDIDATE.tgz NEW_WORK_DIR RESULT.json [--runs N] [--cli-runs N] [--timeout-s S]');
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -36,8 +46,9 @@ const npm = windows ? 'npm.cmd' : 'npm';
 const install = join(work, 'install');
 mkdirSync(install);
 writeFileSync(join(install, 'package.json'), '{"private":true}\n');
-execFileSync(npm, ['install', tgz, '--no-audit', '--no-fund'], { cwd: install, stdio: 'inherit', shell: windows });
-const lasm = join(install, 'node_modules/@lasm/compiler/bin/lasm.mjs');
+if (!installedLasm) execFileSync(npm, ['install', tgz, '--no-audit', '--no-fund'], { cwd: install, stdio: 'inherit', shell: windows });
+const lasm = installedLasm ? resolve(installedLasm) : join(install, 'node_modules/@lasm/compiler/bin/lasm.mjs');
+const schedule = join(root, 'scripts/bridge-fuzz/schedule.cjs');
 
 // Loaded into every run (NODE_OPTIONS --import): after LASM_STRESS_DIAG_MS on
 // the main thread, write the state, then a diagnostic report. Unref'd: a run
@@ -57,17 +68,19 @@ if (isMainThread && ms && dir) setTimeout(() => {
   process.report.writeReport();
 }, ms).unref();
 `);
-const diagEnv = dir => ({ ...process.env, NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --import=${pathToFileURL(diag).href}`.trim(),
-  LASM_STRESS_DIAG_MS: String(timeoutMs - 3000), LASM_STRESS_DIAG_DIR: dir, CI: '1', BROWSER: 'none' });
+const diagEnv = (dir, { seed, trace } = {}) => ({ ...process.env,
+  NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --import=${pathToFileURL(diag).href}${seed !== undefined ? ` --require=${schedule}` : ''}`.trim(),
+  LASM_STRESS_DIAG_MS: String(timeoutMs - 3000), LASM_STRESS_DIAG_DIR: dir, CI: '1', BROWSER: 'none',
+  ...(seed !== undefined ? { LASM_BRIDGE_SEED: String(seed) } : {}), ...(trace ? { LASM_BRIDGE_TRACE: trace } : {}) });
 
 function freePort() {
   return new Promise((done, fail) => { const s = createServer(); s.once('error', fail); s.listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => done(port)); }); });
 }
 // One run: the exit code and output, or a hang (state and report written, then killed).
-function once(command, argv, cwd, diagDir, { untilOutput, onOutput } = {}) {
+function once(command, argv, cwd, diagDir, { untilOutput, onOutput, seed, trace } = {}) {
   return new Promise(done => {
     const started = performance.now();
-    const child = spawn(command, argv, { cwd, env: diagEnv(diagDir), stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(command, argv, { cwd, env: diagEnv(diagDir, { seed, trace }), stdio: ['ignore', 'pipe', 'pipe'] });
     let stdout = '', stderr = '', settled = false, hung = false;
     const finish = result => { if (!settled) { settled = true; clearTimeout(timer); done({ ...result, ms: Math.round(performance.now() - started), stdout, stderr }); } };
     const timer = setTimeout(() => { hung = true; child.kill('SIGKILL'); }, timeoutMs);
@@ -87,36 +100,61 @@ function cachedDist(directory) {
   return found[0];
 }
 
-const result = { platform: `${process.platform}-${process.arch}`, node: process.version, candidate: tgz, runs, cliRuns, timeoutMs, programs: {} };
+const result = { platform: `${process.platform}-${process.arch}`, node: process.version, candidate: installedLasm || tgz, runs, cliRuns, timeoutMs,
+  ...(fuzz ? { seed: baseSeed, replays, traceEvery } : {}), programs: {} };
+// Output that may differ between correct runs: timings.
+const normalize = text => text.replace(/\r\n/g, '\n').replace(/\d+ ms\b/g, 'N ms');
 const save = () => writeFileSync(output, JSON.stringify(result, null, 2) + '\n');
 async function stress(name, project, { expected, viaCli = 0, server = false }) {
   const record = result.programs[name] = { pass: 0, hang: 0, fail: 0, failures: [], msMax: 0, msTotal: 0 };
+  if (fuzz) viaCli = 0;
+  let reference = expected === undefined ? undefined : normalize(expected);
   // Build first, untimed (a cold build downloads tools): every timed run then
   // reuses the cached build, as the acceptance's run does after its first build.
   if (!server) {
     execFileSync(process.execPath, [lasm, 'Main.lean'], { cwd: project, stdio: ['ignore', 'ignore', 'inherit'], env: { ...process.env, CI: '1' }, timeout: 30 * 60_000 });
   }
   const total = viaCli + runs;
+  const run = async (i, diagDir, seed, trace) => {
+    if (!server && i < viaCli) return once(process.execPath, [lasm, 'Main.lean'], project, diagDir);
+    const dist = server ? join(project, 'dist') : cachedDist(project);
+    if (server) {
+      const port = await freePort();
+      process.env.PORT = String(port);
+      return once(process.execPath, [join(dist, 'main.mjs')], project, diagDir,
+        { untilOutput: /Listening on/, onOutput: async () => /"ok":true/.test(await httpGet(port)), seed, trace });
+    }
+    return once(process.execPath, [join(dist, 'main.mjs')], project, diagDir, { seed, trace });
+  };
+  const passes = r => {
+    if (r.hung || r.code !== 0 || !(server || r.stdout.length > 0)) return false;
+    if (server) return true;
+    // Every run's output equals the expected output or, without one, the first run's.
+    reference ??= normalize(r.stdout);
+    return normalize(r.stdout) === reference;
+  };
   for (let i = 0; i < total; i++) {
     const diagDir = join(work, 'hangs', `${name}-${i}`);
-    let r;
-    if (!server && i < viaCli) r = await once(process.execPath, [lasm, 'Main.lean'], project, diagDir);
-    else {
-      const dist = server ? join(project, 'dist') : cachedDist(project);
-      if (server) {
-        const port = await freePort();
-        process.env.PORT = String(port);
-        r = await once(process.execPath, [join(dist, 'main.mjs')], project, diagDir,
-          { untilOutput: /Listening on/, onOutput: async () => /"ok":true/.test(await httpGet(port)) });
-      } else r = await once(process.execPath, [join(dist, 'main.mjs')], project, diagDir);
-    }
+    const seed = fuzz ? baseSeed + i : undefined;
+    const trace = fuzz && traceEvery > 0 && i % traceEvery === 0 ? join(work, 'traces', `${name}-${i}`) : undefined;
+    const r = await run(i, diagDir, seed, trace);
     record.msMax = Math.max(record.msMax, r.ms); record.msTotal += r.ms;
-    const ok = !r.hung && r.code === 0 && (!expected || r.stdout.replace(/\r\n/g, '\n') === expected) && (server || r.stdout.length > 0);
+    const ok = passes(r);
     if (ok) record.pass++;
     else {
       r.hung ? record.hang++ : record.fail++;
-      record.failures.push({ run: i, hung: r.hung, code: r.code, ms: r.ms, stdoutTail: r.stdout.slice(-600), stderrTail: r.stderr.slice(-2000), diag: existsSync(diagDir) ? readdirSync(diagDir) : [] });
-      console.log(`${name} run ${i}: ${r.hung ? 'HANG' : 'FAIL ' + r.code} after ${r.ms} ms; last output: ${JSON.stringify(r.stdout.slice(-120))}`);
+      const failure = { run: i, seed, hung: r.hung, code: r.code, ms: r.ms, stdoutTail: r.stdout.slice(-600), stderrTail: r.stderr.slice(-2000), diag: existsSync(diagDir) ? readdirSync(diagDir) : [] };
+      record.failures.push(failure);
+      console.log(`${name} run ${i}${fuzz ? ` (seed ${seed})` : ''}: ${r.hung ? 'HANG' : 'FAIL ' + r.code} after ${r.ms} ms; last output: ${JSON.stringify(r.stdout.slice(-120))}`);
+      if (fuzz) {
+        // Replay from the seed alone.
+        failure.replays = [];
+        for (let k = 0; k < replays; k++) {
+          const again = await run(i, join(work, 'hangs', `${name}-${i}-replay-${k}`), seed);
+          failure.replays.push(passes(again) ? 'pass' : again.hung ? 'hang' : 'fail');
+        }
+        console.log(`${name} seed ${seed}: replays ${failure.replays.join(', ')}; replay with: node scripts/ci/lasm-js-stress.mjs CANDIDATE.tgz NEW_WORK_DIR RESULT.json --only ${name} --runs 1 --seed ${seed}`);
+      }
     }
     if ((i + 1) % 25 === 0) { console.log(`${name}: ${i + 1}/${total} (pass ${record.pass}, hang ${record.hang}, fail ${record.fail})`); save(); }
   }
@@ -144,6 +182,7 @@ if (want('hono')) {
   execFileSync(process.execPath, [lasm, 'build', 'Main.lean', '--dev'], { cwd: dir, stdio: 'inherit', env: { ...process.env, CI: '1' } });
   await stress('hono', dir, { server: true, viaCli: 0 });
 }
+if (fuzz && traceEvery > 0 && existsSync(join(work, 'traces'))) result.traces = join(work, 'traces');
 const bad = Object.values(result.programs).reduce((n, p) => n + p.hang + p.fail, 0);
 result.ok = bad === 0;
 save();
