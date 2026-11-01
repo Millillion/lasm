@@ -6,6 +6,10 @@ name: Lasm.JS stress
 # report, Lasm.JS's poller state and every Lean thread's pending host request
 # in the `lasm-js-stress-<platform>` artifact. Dispatched by hand (pushes to
 # hang-stress run it with the defaults while it is not on main); free runners.
+# With a seed (bridge-verification.yml), run i is schedule-fuzzed with seed
+# seed + i (scripts/bridge-fuzz/schedule.cjs) and every trace-every'th run
+# records traces of the host-call slots (in the artifact, under traces/) for
+# the model's conformance check.
 on:
   push:
     branches: [hang-stress]
@@ -16,6 +20,8 @@ on:
       cli-runs: { type: string, default: '10' }
       timeout-s: { type: string, default: '30' }
       platforms: { type: string, default: all }
+      seed: { type: string, default: '' }
+      trace-every: { type: string, default: '0' }
   workflow_dispatch:
     inputs:
       runs:
@@ -33,6 +39,14 @@ on:
       platforms:
         description: all, or one of linux-x64, darwin-x64, darwin-arm64, win32-x64
         default: all
+        type: string
+      seed:
+        description: Schedule-fuzz with seeds from this one (empty = no fuzzing)
+        default: ''
+        type: string
+      trace-every:
+        description: With a seed, record traces of every n-th run (0 = none)
+        default: '0'
         type: string
 permissions:
   contents: read
@@ -103,12 +117,19 @@ jobs:
           name: stress-packed-candidate
           path: .work/node-candidate
       - name: Stress
-        run: node scripts/ci/lasm-js-stress.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm js stress λ" ".work/lasm-js-stress-${{ matrix.platform }}.json" --runs "${{ inputs.runs || '200' }}" --cli-runs "${{ inputs.cli-runs || '20' }}" --timeout-s "${{ inputs.timeout-s || '30' }}"
-      - name: Collect hang diagnostics
+        env:
+          SEED: ${{ inputs.seed || '' }}
+          TRACE_EVERY: ${{ inputs.trace-every || '0' }}
+        run: |
+          fuzz=()
+          if [ -n "$SEED" ]; then fuzz=(--seed "$SEED" --trace-every "$TRACE_EVERY"); echo "Schedule fuzzing from seed $SEED"; fi
+          node scripts/ci/lasm-js-stress.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm js stress λ" ".work/lasm-js-stress-${{ matrix.platform }}.json" --runs "${{ inputs.runs || '200' }}" --cli-runs "${{ inputs.cli-runs || '20' }}" --timeout-s "${{ inputs.timeout-s || '30' }}" "${fuzz[@]}"
+      - name: Collect hang diagnostics and traces
         if: always()
         run: |
-          mkdir -p .work/hangs
+          mkdir -p .work/hangs .work/traces
           if [ -d "$RUNNER_TEMP/lasm js stress λ/hangs" ]; then cp -R "$RUNNER_TEMP/lasm js stress λ/hangs/." .work/hangs/; fi
+          if [ -d "$RUNNER_TEMP/lasm js stress λ/traces" ]; then cp -R "$RUNNER_TEMP/lasm js stress λ/traces/." .work/traces/; fi
       - name: Preserve the result
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -117,5 +138,6 @@ jobs:
           path: |
             .work/lasm-js-stress-${{ matrix.platform }}.json
             .work/hangs
+            .work/traces
           retention-days: 14
           if-no-files-found: ignore

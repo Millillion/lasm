@@ -47,6 +47,10 @@ if (!ENVIRONMENT_IS_PTHREAD) {
         // Lasm.JS synchronous callbacks: the Wasm memory and inline serving of
         // one thread's slot while the main thread waits in a JS callback.
         wasmMemory: () => wasmMemory, serveSync: pointer => lasmFullServeSync(pointer),
+        // Work other threads proxied to this one (pthread_create of a thread that
+        // starts on demand, such as the completion thread): the Lean thread of a
+        // synchronous callback waits for it, so it cannot wait for the event loop.
+        serveMailbox: () => __emscripten_check_mailbox(),
         // Lasm.JS: start the interop poller thread (library/c/lasm_js.c) when an
         // event waits and Lean makes no progress (host calls served) meanwhile.
         spawnPoller: () => Module._lasm_js_spawn_poller?.(), progress: () => lasmFullServed,
