@@ -80,9 +80,8 @@ jobs:
             build: npm run build:deno-deploy
           - platform: vercel-edge
             title: Vercel Edge (vercel build offline, edge-runtime)
-            # api/lasm.mjs must exist before vercel build detects functions (it
-            # does not detect the one its build command writes; DECISIONS.md).
-            build: npm run build:vercel-edge && cp deploy/vercel-edge/vercel.json vercel.json && vercel build --yes
+            # From a clean tree: vercel.json's build command writes the function.
+            build: cp deploy/vercel-edge/vercel.json vercel.json && vercel build --yes
           - platform: netlify-edge
             title: Netlify Edge (netlify build offline; Deno with Netlify Blobs' local server)
             build: cp deploy/netlify-edge/netlify.toml netlify.toml && netlify build --offline

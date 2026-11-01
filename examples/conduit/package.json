@@ -19,7 +19,7 @@
     "build:deno": "npm run build:client && lasm build ServerNode.lean --target deno --output dist/server",
     "start:deno": "deno run -A deno/main.mjs",
     "build:deno-deploy": "npm run build:client && lasm build ServerEdge.lean --target deno-deploy --output dist/edge",
-    "build:vercel-edge": "npm run build:client && lasm build ServerVercelEdge.lean --target vercel-edge --output dist/edge",
+    "build:vercel-edge": "npm run build:client && lasm build ServerEdge.lean --target vercel-edge --output dist/edge",
     "build:netlify-edge": "npm run build:client && lasm build ServerNetlifyEdge.lean --target netlify-edge --output dist/edge",
     "build:supabase-edge": "npm run build:client && lasm build ServerSupabase.lean --target supabase-edge --output dist/edge",
     "build:fastly": "npm run build:client && lasm build ServerFastly.lean --target fastly --output dist/wasm",
@@ -40,7 +40,7 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.3.5",
+    "@lasm/cli": "0.3.6",
     "@netlify/blobs": "11.1.7",
     "@orangeopensource/hurl": "8.0.4",
     "@playwright/test": "1.63.0"
