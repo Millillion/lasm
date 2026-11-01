@@ -20,6 +20,7 @@ import { applicationNativeTargets } from './native-bundle.mjs';
 import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './application-files.mjs';
 import { withApplicationLock } from './application-lock.mjs';
 import { applicationPolicy } from './application-policy.mjs';
+import { testUnoptimized } from './test-switches.mjs';
 import { insideDirectory } from './platform.mjs';
 import { requireApplicationSupport } from './application-support.mjs';
 import { applicationNotices, lakeDependencyLicenses, dependencyNotices } from './notices.mjs';
@@ -139,7 +140,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // A tiered Lean is identified by its assembled prefix, which is keyed by the
   // identities of the binaries and every module-data archive it contains.
   // The profile is part of the identity: dev and release outputs never share a cache entry.
-  const recipe = { schema: 1, profile, ...(linkOnly ? { linkOnly } : {}), lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
+  const recipe = { schema: 1, profile, ...(linkOnly ? { linkOnly } : {}), ...(testUnoptimized() ? { testUnoptimized: true } : {}), lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
     ...(lean.distribution === 'tiers' ? { nativeLeanTier: lean.tier, nativeLeanComponents: lean.components } : {}),
     // Outputs of different link drivers and tool sets never share a cache entry.
     emscripten, linkDriver, ...(linkDriver === 'node'

@@ -314,7 +314,7 @@ empty.
 | `Std.Mutex` with 8 `IO.asTask` writers | pass (count 8) |
 | Lean error in a handler → rejected JS promise | pass |
 | `Lasm.JS`: Hono routes, `callMethodAwait` in `Async`, typed binding (`@[js "hono" "new Hono"]`) | pass |
-| Non-tail recursion depth | 10,000 frames pass on Node, Deno and workerd, 30,000 on Bun. 30,000 exhausts V8's default stack. Node's full profile passes 1,000,000 |
+| Non-tail recursion depth | Just under 10,000 frames of a small function (`def deepSum : Nat → Nat \| 0 => 0 \| n + 1 => (n + 1) + deepSum n`, `--target deno`, measured 2026-10-31): Deno 2.9.6 9,682, Node 24.22.1 (`--experimental-wasm-jspi`) 9,289, SpiderMonkey 158.0.1 9,357, Bun 1.4.4 about 8,500 (8,583 passed once, failed once). 10,000 fails on all of them. Larger frames get less. workerd and Node 26 were not re-measured; the earlier figures (10,000 on workerd, 30,000 on Bun) were measured with another program. Node's full profile: 643,175 frames of this function (Node 24.22.1) |
 | Stack exhaustion or a trap | the instance stops: pending calls reject with the cause. The prototype Worker starts a fresh instance on the next request (measured: 3 ms with compiled code cached) |
 
 **What breaks or differs.** These are inherent to one thread:
@@ -326,8 +326,34 @@ empty.
 - **Locks never contend.** A task that blocks while it holds a `Std.Mutex` can
   let another task enter, because locks are no-ops.
 - **Recursion depth** is bounded by the engine's Wasm stack, not by Lean's 64 MiB
-  stack. Workers cannot raise it.
+  stack: just under 10,000 frames of a small function (table above). Workers
+  cannot raise it.
 - **`IO.Process.exit` fails.** An isolate cannot exit.
+
+### Environment variables
+
+The edge runtime has no process environment of its own. Each entry passes the
+host's string variables to the program, and both `IO.getEnv` (a host
+operation) and the C runtime's `getenv` see them:
+
+| Where | Variables |
+| --- | --- |
+| Deno, Deno Deploy, Netlify Edge (`--target deno`, `deno-deploy`, `netlify-edge`) | `Deno.env` (Netlify: `Netlify.env`) |
+| Bun (`--target bun`), Vercel Edge | `process.env`, string values |
+| Workers, Supabase | the string bindings (`cloudflare:workers` `env`), `Deno.env` |
+| The browser (`lasm:app`), an embedder calling `startLean` without `env` | none |
+
+The C runtime reads them once, while the module instantiates, so the Lean
+runtime's own switches work as on Linux: `LEAN_BACKTRACE=0` suppresses the
+JavaScript/Wasm backtrace after a panic, and `LEAN_ABORT_ON_PANIC=1` makes a
+panic abort, which stops the instance (`Aborted()`, then exit 1 on Bun and
+Deno, where native Lean dies with `SIGABRT`, status 134). libc also keeps
+Emscripten's default variables (`USER`, `LOGNAME`, `PATH`, `PWD`, `HOME`,
+`LANG`, `_`) unless the host overrides them; `IO.getEnv` does not see those
+defaults. Where there is no environment (the browser) neither sees anything,
+so `LEAN_BACKTRACE` and `LEAN_ABORT_ON_PANIC` take their defaults: a panic
+prints its message and a backtrace and the program continues. (Before issue
+#26 was fixed, libc saw only Emscripten's defaults on every edge target.)
 
 ### 2. Waiting on JS promises: JSPI vs Asyncify vs none
 
@@ -520,9 +546,9 @@ Free limit, and under Vercel Edge's 1 MB-gzip Hobby limit. The Node profile's
 | --- | --- | --- |
 | All pure Lean (`Init`, `Std` data structures, big numbers without GMP, strings, `HashMap`) | Tasks are cooperative: no parallelism; they interleave at waits | Threads, parallel speed-up |
 | `Task.spawn`/`map`/`bind`, `IO.asTask`, `Task.get`, `IO.wait`, `IO.waitAny` | Blocking waits (`Task.get`, `IO.wait`, `Async.block`, `IO.sleep`, `IO` awaits of JS promises) need JSPI. They run other Lean work while waiting, and nest | The file system (`IO.FS`), except the planned read-only VFS (7.2) |
-| `Std.Async` (`async`/`await`, `sleep`, timers), `IO.Promise` | Recursion depth about 10,000–30,000 frames (engine stack) | Processes, signals, sockets, UDP, DNS (`Std.Net`): use `fetch` through `Lasm.JS` |
+| `Std.Async` (`async`/`await`, `sleep`, timers), `IO.Promise` | Recursion depth just under 10,000 frames of a small function (engine stack; about 8,500 on Bun) | Processes, signals, sockets, UDP, DNS (`Std.Net`): use `fetch` through `Lasm.JS` |
 | `Std.Mutex`, condition variables (single thread) | Locks never contend | `Std.Http` server (no listening sockets on the edge; a fetch-handler API is planned) |
-| `IO.println`/`eprintln` (lines to `console`), `IO.getEnv` (string bindings), clocks, `IO.getRandomBytes` | Random bytes during startup on Workers are not cryptographic, and only for initializers | `IO.Process.exit`, `IO.appPath`, `IO.currentDir` (fixed values) |
+| `IO.println`/`eprintln` (lines to `console`), `IO.getEnv` (string bindings; the C runtime's `getenv`, which reads `LEAN_BACKTRACE` and `LEAN_ABORT_ON_PANIC`, sees the same variables: see [Environment variables](#environment-variables)), clocks, `IO.getRandomBytes` | Random bytes during startup on Workers are not cryptographic, and only for initializers | `IO.Process.exit`, `IO.appPath`, `IO.currentDir` (fixed values) |
 | `Lasm.JS`: values, calls, `Async` callbacks (`ofFn`, `ofFnReply`), `callAwait` in `Async`, typed bindings, `globalThis` | `require` and bindings resolve only modules the build imported statically | Native C (`extern_lib`) needing threads or POSIX; `import Lean` elaboration at run time (as on Node) |
 | Errors: Lean errors reject JS promises; stack exhaustion stops the instance cleanly | Synchronous callbacks (`ofSyncFn`) cannot wait | |
 
@@ -604,7 +630,8 @@ Free limit, and under Vercel Edge's 1 MB-gzip Hobby limit. The Node profile's
 
    Mitigation: document and diagnose. An idle blocking wait with nothing
    pending is a deadlock and could be reported instead of hanging.
-2. **Recursion depth** is about 10k frames, against Node's 1M. Deep non-tail
+2. **Recursion depth** is just under 10k frames of a small function, against
+   Node's 640k. Deep non-tail
    recursion in user code fails on the edge. It stops the instance cleanly, but
    the request fails.
 3. **JSPI on platforms we cannot run locally.** Vercel Edge's production V8 is

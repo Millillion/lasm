@@ -3,6 +3,14 @@
 // Host calls go straight to Module.lasmEdge (edge-pre.js), which owns the
 // JavaScript host (edge-host.mjs) and the event queue.
 addToLibrary({
+  // The C runtime's environment (libc getenv: LEAN_BACKTRACE,
+  // LEAN_ABORT_ON_PANIC, …) is Emscripten's ENV, read once by libc's environ
+  // constructor while the module instantiates. This postset runs before that,
+  // after ENV is defined: it copies the embedder's string variables
+  // (Module.lasmEnv, the env of startLean in edge-start.mjs) over Emscripten's
+  // defaults, so getenv sees what IO.getEnv sees (issue #26). Without an
+  // environment (the browser) libc keeps only Emscripten's defaults.
+  $ENV__postset: "for (var [key, value] of Object.entries(Module['lasmEnv'] ?? {})) if (typeof value == 'string' && key && !key.includes('=')) ENV[key] = value;",
   // WASI random_get (mimalloc and libc++ seed themselves from it in static
   // constructors). Cloudflare Workers forbid generating random values in the
   // global scope, where the program starts: there a fallback generator fills

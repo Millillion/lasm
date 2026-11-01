@@ -7,6 +7,11 @@ name: Differential testing
 # Deno). Any difference in stdout, stderr or exit status fails the job; the
 # divergence is shrunk and its reproducer (a regression case for
 # test/differential/regressions/) is in the `differential-<run>` artifact.
+# Three more comparisons (docs/TESTING.md#more-oracles): Lean's interpreter as a
+# second oracle (its disagreements with native Lean are upstream suspects,
+# reported, never failures), the same program built unoptimized
+# (LASM_TEST_UNOPTIMIZED: node-O0 on PRs; wasi-O0 and deno-O0 too in campaigns)
+# and the same edge .wasm on Node (V8), Bun (JavaScriptCore) and SpiderMonkey.
 #   - pull requests and pushes to main: the regression corpus plus one seeded
 #     three program pairs (3 × (150 + 25) cases) from a seed derived from the commit (reproducible: the
 #     seed is in the log and the summary);
@@ -43,6 +48,15 @@ concurrency:
 env:
   WASMTIME_VERSION: v49.0.4
   WASMTIME_SHA256: 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
+  # The engine differential's engines, official release binaries pinned by SHA-256:
+  # Bun (JavaScriptCore) from oven-sh/bun's release, SpiderMonkey's js shell from
+  # Mozilla's release archive (SHA256SUMS of the release).
+  BUN_VERSION: 1.4.4
+  BUN_SHA256: bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c
+  JSSHELL_VERSION: 158.0.1
+  JSSHELL_SHA256: 6b9158af52a3e687eec10ccd600356a1cab7d6e45f91f3fec9efbbf0bd2c7494
+  DIFF_TARGETS_PR: node,wasi,wasi-node,deno,interp,node-O0,edge-node,edge-bun,edge-sm
+  DIFF_TARGETS_FULL: node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm
 jobs:
   pack:
     if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
@@ -122,7 +136,7 @@ jobs:
         with:
           path: ${{ runner.temp }}/lean-archive
           key: upstream-lean-${{ steps.lean.outputs.sha256 }}
-      - name: Native Lean (the oracle), wasmtime and Deno
+      - name: Native Lean (the oracle), wasmtime, Deno, Bun and SpiderMonkey
         run: |
           set -euo pipefail
           A="$RUNNER_TEMP/lean-archive"; mkdir -p "$A"
@@ -135,7 +149,14 @@ jobs:
           echo "$WASMTIME_SHA256  $T/wasmtime.tar.xz" | sha256sum -c
           tar -xJf "$T/wasmtime.tar.xz" -C "$T/wasmtime" --strip-components=1
           npm install --prefix "$T" --no-audit --no-fund deno@2.9.6
-          "$T/wasmtime/wasmtime" --version; "$T/node_modules/.bin/deno" --version
+          curl -fsSL --retry 3 -o "$T/bun.zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-linux-x64.zip"
+          echo "$BUN_SHA256  $T/bun.zip" | sha256sum -c
+          unzip -q "$T/bun.zip" -d "$T"
+          mkdir -p "$T/jsshell"
+          curl -fsSL --retry 3 -o "$T/jsshell.zip" "https://archive.mozilla.org/pub/firefox/releases/$JSSHELL_VERSION/jsshell/jsshell-linux-x86_64.zip"
+          echo "$JSSHELL_SHA256  $T/jsshell.zip" | sha256sum -c
+          unzip -q "$T/jsshell.zip" -d "$T/jsshell"
+          "$T/wasmtime/wasmtime" --version; "$T/node_modules/.bin/deno" --version; "$T/bun-linux-x64/bun" --version; "$T/jsshell/js" --version
       - if: steps.lean-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         continue-on-error: true
@@ -153,21 +174,24 @@ jobs:
             if [ "$BUDGET" = 0 ]; then SEED=$(( 16#$(echo "${{ github.event.pull_request.head.sha || github.sha }}" | cut -c1-7) )); else SEED=$(( (${{ github.run_id }} + ${{ matrix.profile == 'dev' && '500000000' || '0' }}) % 1000000000 )); fi
           fi
           echo "seed $SEED, budget $BUDGET min"
-          if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3"; else AMOUNT="--budget-min $BUDGET"; fi
+          # Pull requests: the cheap subset of the extra oracles; campaigns: all of them.
+          if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3"; TARGETS="$DIFF_TARGETS_PR"; else AMOUNT="--budget-min $BUDGET"; TARGETS="$DIFF_TARGETS_FULL"; fi
+          T="$RUNNER_TEMP/tools"
           node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
             --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest" \
-            --seed "$SEED" $AMOUNT --cases 150 --fs-cases 25 --targets node,wasi,wasi-node,deno \
+            --seed "$SEED" $AMOUNT --cases 150 --fs-cases 25 --targets "$TARGETS" \
             --profile "${{ matrix.profile }}" --regressions test/differential/regressions \
-            --wasmtime "$RUNNER_TEMP/tools/wasmtime/wasmtime" --deno "$RUNNER_TEMP/tools/node_modules/.bin/deno" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
+            --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
       # The regression corpus in the dev profile too (node, then the other targets,
       # in one project: how a Node dev build followed by a WASI dev build failed).
       - name: Regressions in the dev profile
         if: matrix.profile == 'release'
         run: |
+          T="$RUNNER_TEMP/tools"
           node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
             --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest-dev" \
-            --programs 0 --targets node,wasi,wasi-node,deno --profile dev --regressions test/differential/regressions \
-            --wasmtime "$RUNNER_TEMP/tools/wasmtime/wasmtime" --deno "$RUNNER_TEMP/tools/node_modules/.bin/deno"
+            --programs 0 --targets "$DIFF_TARGETS_PR" --profile dev --regressions test/differential/regressions \
+            --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js"
       - name: Summary
         if: always()
         run: |
@@ -176,6 +200,10 @@ jobs:
           const cases = s.programs.reduce((n, p) => n + p.cases, 0);
           let md = '### Differential testing\n\nSeed ' + s.seed0 + ', ' + s.programs.length + ' programs, ' + cases + ' cases, targets ' + s.targets.join(', ') + ' (' + s.profile + '): **' + s.divergences.length + ' divergences**, ' + s.harnessErrors.length + ' harness errors.\n';
           for (const d of s.divergences) md += '\n- ' + (d.target ?? '') + ' seed ' + (d.seed ?? 'regressions') + ' case ' + (d.case ?? d.cases ?? '') + ': ' + (d.what ?? 'output differs') + (d.regression ? ' (reproducer ' + d.regression + ')' : '');
+          const up = s.upstreamSuspects ?? [];
+          md += '\n\n**' + up.length + ' upstream suspects** (native Lean and its interpreter disagree: an upstream Lean question, not a Lasm failure).\n';
+          for (const d of up) md += '\n- seed ' + (d.seed ?? 'regressions') + ' case ' + (d.case ?? d.cases ?? '') + ': ' + (d.what ?? 'output differs') + (d.regression ? ' (reproducer ' + d.regression + ')' : '');
+          for (const k of s.knownDivergences ?? []) if (k.applied) md += '\n- known: ' + k.what + ' (' + k.issue + '), applied ' + k.applied + ' times';
           require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY, md + '\n');
           " || true
       - name: Preserve reproducers and the summary

@@ -76,7 +76,7 @@ this script.)
 | Lean feature | WASI | Notes |
 | --- | --- | --- |
 | All pure Lean, big numbers, `Std` data structures, strings | ✓ | |
-| `main` arguments, exit status, `IO.Process.exit` | ✓ | Status modulo 256, as on Linux |
+| `main` arguments, exit status, `IO.Process.exit` | ✓ | The status is taken modulo 256, as on Linux (300 → 44). `node:wasi` and the edge runtime return 0–255. **wasmtime accepts only 0–125:** a status of 126–255 makes `wasmtime run` print `exit with invalid exit status outside of [0..126)` and exit with 1 (wasmtime 30.0.2 and 49.0.4, measured 2026-10-31). Use statuses below 126 for programs that run on wasmtime |
 | `IO.getEnv`, `IO.Process.getEnv` lists | ✓ | The host's environment (`wasmtime --env`, `wasmer --env`, `node:wasi` `env`) |
 | `IO.println`, `IO.eprintln`, binary output, `IO.getStdin` (`getLine`, `read`) | ✓ | Unbuffered writes to file descriptors 1 and 2 |
 | `IO.FS`: read, write, append, `lines`, metadata, `readDir`, `createDir`, `removeFile`, `removeDirAll`, `rename`, hard links, `createTempFile` | ✓ | Inside the directories the host preopens (`--dir`); paths resolve against a working directory that starts at `.` (or `/`) |
@@ -89,7 +89,7 @@ this script.)
 | HTTP serving | ✓ | [`Lasm.Fetch`](FETCH.md) |
 | Sockets, DNS (`Std.Net`, `Std.Http` server), processes, signals | — | Not in WASI preview 1: clear `unsupportedOperation` errors |
 | `Lasm.JS` | — | No JavaScript: `Lasm.JS.isAvailable` is false and calls fail clearly |
-| Deep recursion | Bounded | By the engine's Wasm stack (wasmtime: `-W max-wasm-stack=…`) and an 8 MiB C stack (1 MiB on Fastly) |
+| Deep recursion | Bounded | By the engine's Wasm stack and an 8 MiB C stack (1 MiB on Fastly). With default settings, a small non-tail recursive function (`deepSum n = (n + 1) + deepSum n`) passes 10,910 frames on wasmtime 49.0.4, 8,177 on wasmtime 30.0.2 and 9,651 on `node:wasi` (Node 24.22.1), measured 2026-10-31; larger frames get less. `wasmtime run -W max-wasm-stack=4194304` (4 MiB) passes 50,000 frames of it, 8 MiB 100,000 |
 
 ### Concurrency
 
