@@ -30,6 +30,9 @@ export async function startLean({ createProgram, wasmModule, env = {}, modules =
     instanceModules[name] = typeof value?.lasmInstance === 'function' ? value.lasmInstance(instanceContext) : value;
   const instance = await createProgram({
     lasmEdgeJspi: jspi, noInitialRun: true,
+    // The C runtime's environment (edge-library.js $ENV__postset): read by
+    // libc while the module instantiates, before main.
+    lasmEnv: Object.fromEntries(Object.entries(env ?? {}).filter(([, value]) => typeof value === 'string')),
     print: stdout ?? (line => console.log(line)), printErr: stderr ?? (line => console.error(line)),
     // Synchronous instantiation (the module is already compiled), so startup
     // needs no promise turn in the Workers global scope.

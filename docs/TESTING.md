@@ -1,11 +1,12 @@
 # How Lasm is tested
 
-Status: **methodology, 2026-10-31.** Differential testing, target equivalence and
-the test-quality audit below are implemented and run in CI; the other layers
-are marked as existing (with their workflow) or planned. The plan is issue #21
-(testing and verification half); the long-term strategy (second oracle,
-optimization and engine differentials, evidence levels, tier consolidation) is
-the proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
+Status: **methodology, 2026-10-31.** Differential testing (with its three
+extra oracles: Lean's interpreter, the optimization differential and the engine
+differential), target equivalence and the test-quality audit below are
+implemented and run in CI; the other layers are marked as existing (with their
+workflow) or planned. The plan is issue #21 (testing and verification half);
+the long-term strategy (evidence levels, tier consolidation, corpora) is the
+proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 
 ## Principles
 
@@ -30,7 +31,7 @@ the proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 
 | Layer | What it checks | Where | CI tier |
 | --- | --- | --- | --- |
-| [Differential testing](#differential-testing) | Lasm-compiled programs behave exactly like native Lean | `scripts/differential/` | PR, nightly |
+| [Differential testing](#differential-testing) | Lasm-compiled programs behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly |
 | [Target equivalence](#target-equivalence) | One server answers the same on every target | `scripts/equivalence/` | PR, nightly |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, after publish, daily |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
@@ -69,10 +70,13 @@ oracle is the untouched upstream toolchain.
 
 **Targets.** `node` (the full profile, `dist/main.mjs`), `wasi` (wasmtime 49.0.4),
 `wasi-node` (the same module under `node:wasi`) and `deno` (the edge runtime used
-by every edge platform, Bun, Deno and the browser, run by Deno 2.9.6). File-system
-cases run only where a file system exists (node, WASI). The program's
+by every edge platform, Bun, Deno and the browser, run by Deno 2.9.6), plus the
+targets of the [extra oracles](#more-oracles) (`interp`, `node-O0`, `wasi-O0`,
+`deno-O0`, `edge-node`, `edge-bun`, `edge-sm`). File-system cases run only where a
+file system exists (node, WASI, the interpreter). The program's
 environment always contains several variables before the ones Lean reads (that
-is how the [WASI `getenv` bug](#bugs-found) was found).
+is how the [WASI `getenv` bug](#bugs-found) was found), and `LEAN_BACKTRACE=0`
+on every target (how the [edge `getenv` bug](#bugs-found) was found).
 
 **Comparison.** Every output line starts with its case's id and every case is
 preceded by an `@id` marker on stderr, so a divergence names its case. A
@@ -92,6 +96,8 @@ node scripts/differential/run.mjs --lasm node_modules/@lasm/cli/bin/lasm.mjs \
   --lean-bin ~/.elan/toolchains/leanprover--lean4---v4.35.0/bin --work /tmp/dt \
   --seed 1 --programs 1 --targets node,wasi,wasi-node,deno \
   --regressions test/differential/regressions
+# every oracle: --targets node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm
+#   --bun PATH/bun --sm PATH/js (SpiderMonkey's js shell)
 # a campaign: --budget-min 60; dev profile: --profile dev; on a shared host,
 # serialize builds: --wrap "flock LOCK node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --"
 ```
@@ -99,10 +105,13 @@ node scripts/differential/run.mjs --lasm node_modules/@lasm/cli/bin/lasm.mjs \
 **CI** ([differential.yml](../.github/workflows/differential.yml)): every pull
 request and push to `main` packs a candidate from the commit, installs it with
 npm, replays the regressions and runs three program pairs (3 × (150 + 25) cases) from a
-seed derived from the commit; nightly runs a 60-minute campaign from a fresh
-seed. A divergence fails the job and the reproducers are in the run's artifact.
-Known divergences with an open issue are listed in `KNOWN` in `run.mjs`,
-applied before the comparison and counted in the summary.
+seed derived from the commit, on the base targets and the cheap extra oracles
+(`interp`, `node-O0`, `edge-node`, `edge-bun`, `edge-sm`); nightly runs a
+60-minute campaign from a fresh seed on every target (also `wasi-O0` and
+`deno-O0`). A divergence fails the job and the reproducers are in the run's
+artifact; upstream suspects are listed in the job summary and never fail it.
+Known divergences (an open issue or a documented host limit) are listed in
+`KNOWN` in `run.mjs`, applied before the comparison and counted in the summary.
 
 **What it catches:** miscompilation anywhere in Lasm's pipeline (Lean's C
 through clang/Emscripten, Binaryen's optimizer, Lasm's linking, the runtime
@@ -114,13 +123,74 @@ anything outside the generator's grammar (today: no `Std.Http`, sockets,
 processes, `Std.Time`, typeclass-heavy or universe-polymorphic code, deep
 recursion beyond a few thousand frames, which is a documented limit of the edge and
 WASI targets: the engine's Wasm stack, [EDGE.md](EDGE.md), [WASI.md](WASI.md);
-the generator's `deep` cases stay at or below 5,000 frames, and campaigns that
-went to 10,000 and 50,000 frames showed wasmtime, `node:wasi` and the edge runtime
-stopping just below 10,000 frames (issue #30) while native Lean and Node's full
-profile do not; large
+the generator's `deep` cases stay at or below 5,000 frames, because the measured
+bound of a small function is 8,177 frames (wasmtime 30) to 10,910 (wasmtime 49),
+about 8,500 on Bun and just under 9,700 on Deno and `node:wasi` (issue #30),
+while native Lean and Node's full profile go far deeper; large
 heaps); nondeterministic behaviour (output order across
 threads is never printed); performance; the browser (planned: the same programs
 under Playwright).
+
+### More oracles
+
+Three more comparisons from [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md)
+pillar 1, implemented as targets of the same harness, so every generated case,
+the shrinker and the regression replay cover them.
+
+**(a) Second oracle: Lean's interpreter** (target `interp`). The same
+`Main.lean` run by `lean --root=DIR --run Main.lean` from the same pinned upstream
+toolchain. The property is that native Lean and its interpreter agree. When they
+do not, upstream Lean is suspect, not Lasm: the case is shrunk like a
+divergence, written to `WORK/repros/`, listed under `upstreamSuspects` in the
+summary and the job summary, and never fails the run. *Catches:* differences
+between Lean's compiler (IR → C) and its IR interpreter, which would otherwise
+be inherited silently by the oracle. *Cannot catch:* bugs in the shared front
+end and runtime (both use them).
+
+**(b) Optimization differential** (targets `node-O0`, `wasi-O0`, `deno-O0`).
+The same program built through the same installed Lasm with optimization off,
+compared with native Lean like every target (the optimized builds are the base
+targets, so an `-O0`-only divergence points at clang or Binaryen optimizing
+something that changes behaviour, or at undefined behaviour in the generated or
+runtime C). The switch is a test-only environment variable of the build, not a
+CLI flag:
+
+| Variable | Effect | Used by |
+| --- | --- | --- |
+| `LASM_TEST_UNOPTIMIZED=1` | The program's own C at clang `-O0`; the Node link without Binaryen's optimization passes (the unoptimized link, as `LASM_LINK_DEBUG`); the edge link as in the dev profile (only the passes the program needs: memory64 lowering, JSPI/Asyncify); WASI's `wasm-opt` at `-O0` (lowering passes only). The precompiled runtime archives are unchanged. Part of the build's cache identity ([`src/test-switches.mjs`](../src/test-switches.mjs)) | `scripts/differential/run.mjs` (`*-O0` targets) |
+
+It is deliberately absent from the user documentation. *Catches:* optimizer
+bugs in clang/LLVM and Binaryen on Lasm's code paths, and UB that the optimizer
+exploits. *Cannot catch:* optimizer bugs inside the precompiled runtime
+archives (built once at `-O2`; their behaviour is covered by the base targets).
+
+**(c) Engine differential** (targets `edge-node`, `edge-bun`, `edge-sm`, with
+`deno`, `wasi` and `wasi-node`). One `.wasm` on several engines:
+
+| Output | Engines |
+| --- | --- |
+| `--target deno` (the edge runtime, JSPI) | Deno 2.9.6 (V8, `deno`), Node (V8, `edge-node`: `deno/main.mjs` is portable), Bun 1.4.4 (JavaScriptCore, `edge-bun`), SpiderMonkey 158.0.1 (`edge-sm`, the js shell through [`sm-runner.mjs`](../scripts/differential/sm-runner.mjs)) |
+| `--target wasi` | wasmtime 49.0.4 (Cranelift, `wasi`), Node's `node:wasi` (V8, `wasi-node`) |
+
+The js shell is not a web runtime: the runner provides the few web APIs the edge
+host needs and the shell lacks (`TextEncoder`/`TextDecoder`, `queueMicrotask`,
+`atob`/`btoa`, `crypto.getRandomValues` from `Math.random`, `console.error`);
+the shell's `quit` takes 0–127, so the runner also writes the exit status to a
+file the harness reads; standard error goes out line by line. CI downloads the
+official binaries pinned by SHA-256 (Bun's GitHub release, Mozilla's release
+archive). A JavaScriptCore shell (jsvu) is not used: Bun is JavaScriptCore with
+a real host. wasmtime cannot run the edge `.wasm` (it imports Emscripten's
+JavaScript glue), and SpiderMonkey and Bun do not run the WASI module (no WASI
+host in the shell; Bun's `node:wasi` was not evaluated). *Catches:* engine bugs
+and engine-dependent behaviour on Lasm's outputs (JSPI, Wasm exceptions, the
+lowered memory64, number formatting in the glue). *Cannot catch:* differences
+in engine stacks and limits beyond the generator's bounds (the recursion bounds
+differ per engine: [EDGE.md](EDGE.md)), and anything only browsers do.
+
+**First run** (2026-10-31, seed 11, one program pair, every target, `@lasm/cli`
+0.3.5 with this branch's sources): 175 cases, no divergence on any target; the
+interpreter matched native Lean on every case once its module name was fixed
+(without `--root`, `lean --run` names the module `_stdin` in panic messages).
 
 ### Target equivalence
 
@@ -303,8 +373,8 @@ modules) says whether the tests would notice a change.
 
 | Tier | When | Adds (beyond existing checks) | Budget |
 | --- | --- | --- | --- |
-| PR | every pull request and push to `main` (bridge model and fuzzing: when the bridge changes) | host bridge: the model (about 1 s), 20 schedule-fuzzed runs per stress program on Linux and their traces' conformance; differential: regressions + three seeded program pairs (525 cases) on node, wasi, node:wasi, edge; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers (one candidate pack, then two parallel jobs) | measured: pack 1.5 min, differential about 5 min (one pair took 2.7 min, run 41232604865) |
-| Nightly | 03:17, 04:41 UTC | host bridge: 200 schedule-fuzzed runs per stress program on four platforms, conformance of their traces; differential: 60-minute campaigns for the release and the dev profile (two jobs); the nightly upstream suite (`nightly.yml`) | about 1.5 h |
+| PR | every pull request and push to `main` (bridge model and fuzzing: when the bridge changes) | host bridge: the model (about 1 s), 20 schedule-fuzzed runs per stress program on Linux and their traces' conformance; differential: regressions + three seeded program pairs (525 cases) on node, wasi, node:wasi, edge, plus the interpreter, `node-O0` and the edge `.wasm` on Node, Bun and SpiderMonkey; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers (one candidate pack, then two parallel jobs) | measured: pack 1.5 min, differential about 5 min (one pair took 2.7 min, run 41232604865) |
+| Nightly | 03:17, 04:41 UTC | host bridge: 200 schedule-fuzzed runs per stress program on four platforms, conformance of their traces; differential: 60-minute campaigns for the release and the dev profile (two jobs), every oracle including `wasi-O0` and `deno-O0`; the nightly upstream suite (`nightly.yml`) | about 1.5 h |
 | Release | release PR (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) | as today |
 
 ## Test-quality audit
@@ -366,9 +436,9 @@ when coverage improves.
 | Found by | Bug | Status |
 | --- | --- | --- |
 | Differential testing, seed 1 (`wasi-node`) | **WASI:** libc's environment lost every variable after the third: `__wasi_environ_get` in `src/wasi/lasm_wasi_libc.c` widened the 32-bit WASI pointers in place with typed loads and stores that alias, which clang `-O2` may reorder. The Lean runtime's `LEAN_BACKTRACE` and `LEAN_ABORT_ON_PANIC` (and any libc `getenv`) were ignored unless among the first three variables; `IO.getEnv` was unaffected | Fixed in #25 (char-typed copies); regression `r_wasi_env_backtrace` |
-| Differential testing, regression replay (`deno`) | **Edge profile:** the C runtime's `getenv` sees none of the host's variables, so `LEAN_BACKTRACE=0` and `LEAN_ABORT_ON_PANIC` have no effect on the edge targets, Bun, Deno and the browser | [#26](https://github.com/Millillion/lasm/issues/26), listed in `KNOWN` |
+| Differential testing, regression replay (`deno`) | **Edge profile:** the C runtime's `getenv` sees none of the host's variables, so `LEAN_BACKTRACE=0` and `LEAN_ABORT_ON_PANIC` have no effect on the edge targets, Bun, Deno and the browser | Fixed ([#26](https://github.com/Millillion/lasm/issues/26)): the embedder's string variables are copied into Emscripten's `ENV` before libc reads it (`src/edge/edge-library.js`, `src/edge/edge-start.mjs`); regression `r_edge_env_backtrace`; [EDGE.md](EDGE.md#environment-variables) |
 | Target equivalence (fetch template, `examples/fetch`) | `GET /hello/../hello/Ada`: Node, Deno and wasi-http route the raw dot segments (404); Bun and Workers remove them first (200). Same handler, different routing per platform, and `..` reaches handlers on Node | [#27](https://github.com/Millillion/lasm/issues/27) (proposal: `remove_dot_segments` in `Request.path`), listed as `known` |
-| Differential testing, `deep` and `ending` cases | wasmtime turns an exit status of 126–255 into exit 1 with an error (docs/WASI.md says modulo 256); edge and WASI recursion stops just below 10,000 frames of a small function (docs/EDGE.md says 10,000 pass) | [#30](https://github.com/Millillion/lasm/issues/30) (documentation), `KNOWN` / generator bound 5,000 |
+| Differential testing, `deep` and `ending` cases | wasmtime turns an exit status of 126–255 into exit 1 with an error (docs/WASI.md says modulo 256); edge and WASI recursion stops just below 10,000 frames of a small function (docs/EDGE.md says 10,000 pass) | Documented ([#30](https://github.com/Millillion/lasm/issues/30)): measured bounds in [WASI.md](WASI.md) and [EDGE.md](EDGE.md); wasmtime's status limit stays in `KNOWN` (a host limit); generator bound 5,000 |
 | Target equivalence, first CI run | Bun answered some requests with "socket hang up": the harness's pooled keep-alive sockets, not Lasm (fresh connections per request fixed it) | Harness fix |
 | Dev-profile campaign 41241443151 | **`lasm build --dev` followed by `lasm build --target wasi --dev` in the same project failed** (also in 0.3.5): the WASI link took the seeded dev link's Node archive members (`*.lasm-member.o`) and `reachability.o` along with the edge runtime's archives, so every host symbol was defined twice. The edge link already dropped them | Fixed in `src/wasi/wasi-link.mjs` (#34); the PR tier now replays the regressions in the dev profile |
 | Dev-profile campaign 41241443151 | `Float.pow` differed in the 17th digit between native (glibc) and Wasm (musl's libm): expected, libm functions are not correctly rounded | Generator: libm results go through `approx` (9 significant digits) |
