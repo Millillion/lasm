@@ -38,8 +38,10 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 
 ### Releases
 - [x] 0.3.6: two Vercel Edge fixes.
-- [~] 0.3.7 (PR #40): the WASI dev-build fix (#34); the fix for a hang when a synchronous JS callback makes the program's first async runtime request (#37, found by schedule fuzzing).
-- [ ] 0.3.8: #26, and moving the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7).
+- [x] 0.3.7: version bumped on main (PR #40), **not published**. Its release check failed on a timing-dependent stress fixture (fixed in PR #42), and the fixed commit doesn't change the version, so it can't release (as with 0.3.3).
+- [ ] 0.3.8, first thing Monday: everything in 0.3.7 (the WASI dev-build fix #34, and the fix for a hang when a synchronous JS callback makes the program's first async runtime request, #37), plus #26 if it's ready.
+- [ ] Move the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7).
+- [ ] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms (a stalled thread, or a visibility bug?).
 
 ### Testing ([TESTING.md](docs/TESTING.md), [TESTING_STRATEGY.md](docs/proposals/TESTING_STRATEGY.md))
 - [x] Differential testing against upstream Lean: generator, shrinker, PR and nightly CI.
@@ -53,13 +55,14 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread.
 - [ ] Replace the remaining tests that only read files as text, and port or retire the 29 Lean 4.32 test files.
 - [ ] Browser and Bun targets in differential testing.
-- [~] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next).
-- [~] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week).
-- [~] Platform evidence levels L0–L3, generated from CI results, in the README's platform table.
+- [ ] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next).
+- [ ] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week).
+- [ ] Platform evidence levels L0–L3, generated from CI results, in the README's platform table.
 
 ### Conduit
 - [x] Specification map, 50 reviewable propositions, frontend and layout proofs, five independent proof checkers.
-- [~] Conduit on every platform, each tested in CI with its own local tooling and both official suites.
+- [x] Conduit on all 18 platforms, each tested in CI with its own local tooling and both official RealWorld suites (PRs #24, #29, #39).
+- [ ] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced.
 
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.
