@@ -1,0 +1,10 @@
+name = "host-bridge"
+version = "0.1.0"
+defaultTargets = ["host-bridge"]
+
+[[lean_lib]]
+name = "HostBridge"
+
+[[lean_exe]]
+name = "host-bridge"
+root = "Main"

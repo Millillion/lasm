@@ -215,3 +215,39 @@ test('a synchronous callback serves a host call the Lean thread makes the moment
   finally { Atomics.notify = notify; Atomics.wait = wait; }
   assert.deepEqual(served, [1]);
 });
+
+// Regression: a synchronous callback whose Lean thread makes the program's first
+// asynchronous runtime request starts the completion thread, and pthread_create
+// on a Lean thread waits for Node's main thread (Emscripten proxies it there).
+// That thread waits inside the callback, so it must run proxied work itself:
+// before, the callback hung (test/fixtures/js-callbacks, part 4).
+test('a synchronous callback runs work the Lean thread proxied to the main thread', () => {
+  const memory = new WebAssembly.Memory({ initial: 1, maximum: 1, shared: true });
+  const i32 = new Int32Array(memory.buffer), view = new DataView(memory.buffer);
+  const channel = 64, slot = 256, buffer = 1024;
+  view.setBigUint64(channel + 16, BigInt(buffer), true);
+  view.setBigUint64(channel + 24, 4096n, true);
+  let mailboxRuns = 0;
+  const js = createNodeJs({ wasmMemory: () => memory, serveSync: () => {}, serveMailbox: () => {
+    mailboxRuns++;
+    // The proxied pthread_create returns; the Lean thread finishes the callback.
+    if (Atomics.load(i32, channel / 4) !== 1) return;
+    const result = wire(9);
+    new Uint8Array(memory.buffer).set(result, buffer);
+    view.setBigUint64(channel + 32, BigInt(result.length), true);
+    Atomics.store(i32, channel / 4, 2);
+  } });
+  const registration = Buffer.alloc(16);
+  registration.writeBigUInt64LE(BigInt(channel), 0); registration.writeBigUInt64LE(BigInt(slot), 8);
+  js.dispatch(211, 0, 0n, registration);
+  const f = js.values.get(js.dispatch(210, 7, 2n, Buffer.alloc(0)).readUInt32LE(1));
+  const wait = Atomics.wait;
+  let waits = 0;
+  // The proxied work rings no doorbell: only the wait's timeout gets to it.
+  Atomics.wait = (...args) => { if (++waits > 20) throw new Error('the proxied work never ran'); return wait(...args); };
+  const started = performance.now();
+  try { assert.equal(f(), 9); }
+  finally { Atomics.wait = wait; }
+  assert.equal(mailboxRuns, 1);
+  assert.ok(performance.now() - started < 500, 'the wait is short');
+});

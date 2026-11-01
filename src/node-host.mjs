@@ -118,7 +118,7 @@ export function loopAlive(resources, activeRequests = 0) {
 
 /** Private Node implementation of Lean's runtime primitives, not a Lean API. */
 export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.' : process.cwd(), args = [], stdio = {}, appPath = process.execPath,
-  applicationCommand, propagateCwd = false, processExit = false, leanVersion = '4.32.0', wasmMemory, serveSync, spawnPoller, progress } = {}) {
+  applicationCommand, propagateCwd = false, processExit = false, leanVersion = '4.32.0', wasmMemory, serveSync, serveMailbox, spawnPoller, progress } = {}) {
   checkLeanIOVersion(leanVersion);
   if (!Array.isArray(args) || args.some(value => typeof value !== 'string' || !value.isWellFormed() || value.includes('\0')))
     throw new TypeError('Lean main arguments must be Unicode strings without NUL characters');
@@ -215,7 +215,7 @@ export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.'
   const system = createNodeSystem({ leanVersion });
   const signals = createNodeSignals({ add, get, leanVersion });
   const outbound = createNodeFetch({ add, get });
-  const js = createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, progress });
+  const js = createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spawnPoller, progress });
   const pending = new HandleTable();
   // Std.Internal.UV.Loop.alive: whether libuv would have an active handle or
   // request other than the loop's own wake-up handle. Requests (connect,

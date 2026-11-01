@@ -1,0 +1,101 @@
+slot sync
+lean store ready 0
+lean add seq 0
+lean notify seq
+lean add bell 0
+lean notify bell
+main load seq 1
+lean load ready 0
+main store ready 1
+main notify ready
+main load seq 1
+main waitasync seq 1 async
+lean load ready 1
+main load bell 1
+main load seq 1
+main store state 1
+main notify state
+main load state 1
+main load seq 1
+main wait bell 1 blocked
+lean store ready 0
+lean add seq 1
+lean notify seq
+lean add bell 1
+lean notify bell
+lean load ready 0
+main wake bell ok
+main load bell 2
+main load state 1
+main load seq 2
+main load seq 2
+main store ready 1
+main notify ready
+main store ready 1
+main notify ready
+main load state 1
+main load seq 2
+main wait bell 2 blocked
+lean load ready 1
+main wake bell ok
+main load bell 3
+main load state 2
+main store state 0
+main load bell 3
+main load seq 2
+main store state 1
+main notify state
+main load state 1
+main load seq 2
+main wait bell 3 blocked
+lean store ready 0
+lean add seq 2
+lean notify seq
+lean add bell 3
+lean notify bell
+lean load ready 0
+main wake bell ok
+main load bell 4
+main load state 1
+main load seq 3
+main load seq 3
+main store ready 1
+main notify ready
+main load state 1
+main load seq 3
+main wait bell 4 blocked
+lean load ready 1
+main wake bell ok
+main load bell 5
+main load state 2
+main store state 0
+main load bell 5
+main load seq 3
+main store state 1
+main notify state
+main load state 1
+main load seq 3
+main wait bell 5 blocked
+lean store ready 0
+lean add seq 3
+lean notify seq
+lean add bell 5
+lean notify bell
+lean load ready 0
+main wake bell ok
+main load bell 6
+main load state 1
+main load seq 4
+main load seq 4
+main store ready 1
+main notify ready
+main load state 1
+main load seq 4
+main wait bell 6 blocked
+lean load ready 1
+main wake bell ok
+main load bell 7
+main load state 2
+main store state 0
+main load seq 4
+main waitasync seq 4 async

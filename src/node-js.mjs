@@ -99,7 +99,7 @@ class Reader {
   done() { return this.offset === this.bytes.length; }
 }
 
-export function createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, progress } = {}) {
+export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spawnPoller, progress } = {}) {
   const values = new HandleTable({ first: firstJsHandle });
   const moduleRequire = createRequire(appPath ? join(dirname(appPath), 'package.json') : join(process.cwd(), 'package.json'));
   const stats = { released: 0, callbacks: 0, syncCallbacks: 0, functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0 };
@@ -223,6 +223,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, prog
   //   8 u32 function id   12 u32 reserved
   //  16 u64 buffer pointer  24 u64 buffer capacity  32 u64 payload length
   let syncChannel, syncBusy = false;
+  const syncPollMs = 10;
   function syncFunction(fn) {
     const f = function (...args) {
       if (!syncChannel) throw failure('Lasm.JS synchronous callbacks are not started (internal error)');
@@ -260,8 +261,12 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, prog
           const current = Atomics.load(i32, slot / 4);
           if (current !== sequence) { sequence = current; serveSync(slot); continue; }
           // A wait that times out asks the host anyway (it serves a request only
-          // once), so no lost wake-up can stop the callback for good.
-          if (Atomics.wait(i32, channel / 4 + 1, bell, 1000) === 'timed-out') serveSync(slot);
+          // once), so no lost wake-up can stop the callback for good. It also runs
+          // the work other threads proxied to this one: the Lean thread may wait
+          // for it (pthread_create of a thread started on demand, such as the
+          // completion thread), and the event loop that would run it is blocked
+          // here. Such work rings no doorbell, hence the short wait.
+          if (Atomics.wait(i32, channel / 4 + 1, bell, syncPollMs) === 'timed-out') { serveSync(slot); serveMailbox?.(); }
           bell = Atomics.load(i32, channel / 4 + 1);
         }
       } finally { syncBusy = false; }
@@ -435,6 +440,9 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, spawnPoller, prog
     functionsLive: stats.functionsCreated - stats.functionsCollected, ...stats,
     poller: { polled, waiting: !!waiter, spawnTimer: !!pollerTimer } });
   globalThis[Symbol.for('lasm.js.stats')] = snapshot;
+  // The synchronous-callback channel and slot, for the bridge's trace checker
+  // (scripts/bridge-fuzz/schedule.cjs, docs/TESTING.md).
+  globalThis[Symbol.for('lasm.js.sync')] = () => syncChannel ?? null;
   return {
     dispatch,
     snapshot,
