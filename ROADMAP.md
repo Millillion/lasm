@@ -33,6 +33,9 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] (J) Storytelling, about 80% of the effort per issue #21: posts, videos, launch follow-ups.
 - [ ] (J) GitHub Sponsors tiers and description (a manual edit; suggested text was given).
 - [ ] (J) Manual testing.
+- [ ] (J) Hone Ledger's 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
+- [ ] (J) Ledger's open API questions: `Lasm.Fetch` Brotli on Workers (`encodeBody: "manual"`); a cross-request async lock that works on Workers; the CLI's `--target wasi` failure when `dist/` already holds another build.
+- [ ] (J) Review Folio's 21 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean).
 
 ## Now (November 2026)
 
@@ -71,6 +74,12 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [x] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms (Lambda .zip and image, Vercel, Netlify, Azure, GCF), and the WASI auditor `ledger verify journal.ndjson` on wasmtime, wasmer and `node:wasi`. No Fastly build (its KV is eventually consistent).
 - [x] 4. The `Lasm.UI` page (accounts and journal, a ledger filter), four propositions about it, and its end-to-end tests on Chromium, Firefox and WebKit.
 - [ ] (J) Review and hone the 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
+
+### Folio ([examples/folio](examples/folio), the third flagship app: a Markdown site generator)
+- [x] 1. Pure core: a CommonMark 0.31.2 renderer (a port of commonmark.js) and a site generator (front matter, layouts, the page index, an RSS feed); all 652 specification examples pass, a differential test against commonmark.js; 21 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean) (escaping: no Markdown can inject HTML unless raw HTML is enabled; totality; the output tree; slugs; index links), `proofs:paranoid`.
+- [ ] 2. The CLI on Node (`folio build`), and the WASI build on wasmtime, wasmer and `node:wasi`.
+- [ ] 3. A live preview with `Lasm.UI` in the browser, on Bun and Deno, with Playwright tests.
+- [ ] 4. Fuzzing: a nightly differential job against commonmark.js, and a crash and timeout fuzzer for pathological input (deep nesting, the CommonMark pathological tests).
 
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.
