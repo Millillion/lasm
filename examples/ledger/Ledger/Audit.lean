@@ -60,37 +60,27 @@ def replay (journal : List Transfer) (id : Nat) : Balances := replayFrom [] {} i
 
 /-! ## The audit -/
 
-/-- `replay` for every account at once, in one pass over the journal (hash
-maps instead of list searches; the auditor runs this on large journals). It
-computes `replay journal id` for every `id`: each transfer changes its two
-accounts as `replayStep` does, with the pending transfer it names looked up
-among the transfers before it. -/
-def replayAll (journal : List Transfer) : Std.HashMap Nat Balances := Id.run do
-  let mut balances : Std.HashMap Nat Balances := {}
-  let mut seen : Std.HashMap Nat Transfer := {}
-  for t in journal do
-    let get (id : Nat) := balances.getD id {}
-    let dr := t.debitAccountId
-    let cr := t.creditAccountId
-    if t.flags.resolves then
-      let held := match seen.get? t.pendingId with | some p => p.amount | none => 0
-      let posted := if t.flags.postPendingTransfer then t.amount else 0
-      let b := get dr
-      balances := balances.insert dr { b with debitsPending := b.debitsPending - held, debitsPosted := b.debitsPosted + posted }
-      let b := get cr
-      balances := balances.insert cr { b with creditsPending := b.creditsPending - held, creditsPosted := b.creditsPosted + posted }
-    else if t.flags.pending then
-      let b := get dr
-      balances := balances.insert dr { b with debitsPending := b.debitsPending + t.amount }
-      let b := get cr
-      balances := balances.insert cr { b with creditsPending := b.creditsPending + t.amount }
-    else
-      let b := get dr
-      balances := balances.insert dr { b with debitsPosted := b.debitsPosted + t.amount }
-      let b := get cr
-      balances := balances.insert cr { b with creditsPosted := b.creditsPosted + t.amount }
-    unless seen.contains t.id do seen := seen.insert t.id t
-  return balances
+/-- What `replayAll` keeps: every account's balances so far, and the first
+transfer seen with each id. -/
+structure ReplayState where
+  balances : Std.HashMap Nat Balances := {}
+  seen : Std.HashMap Nat Transfer := {}
+
+/-- One transfer of `replayAll`: its two accounts' balances go through
+`replayStep`, given the pending transfer it names (if any) looked up by id. -/
+def replayAllStep (s : ReplayState) (t : Transfer) : ReplayState :=
+  let before := match s.seen.get? t.pendingId with
+    | some p => [p]
+    | none => []
+  let ids := if t.debitAccountId == t.creditAccountId then [t.debitAccountId] else [t.debitAccountId, t.creditAccountId]
+  { balances := ids.foldl (fun m id => m.insert id (replayStep before t id (s.balances.getD id {}))) s.balances,
+    seen := if (s.seen.get? t.id).isSome then s.seen else s.seen.insert t.id t }
+
+/-- `replay` for every account at once, in one pass over the journal with
+hash maps (the auditor runs this on large journals). It equals `replay` for
+every account (`Spec.fast_replay`). -/
+def replayAll (journal : List Transfer) : Std.HashMap Nat Balances :=
+  (journal.foldl replayAllStep {}).balances
 
 /-- The sum of `f` over the accounts of ledger `L`. -/
 def ledgerSum (accounts : List Account) (L : Nat) (f : Account → Nat) : Nat :=

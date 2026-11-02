@@ -64,78 +64,79 @@ propositions are then one field of `Inv`.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from Proofs/Spec.lean by `npm run proofs -- --write`; do not edit by hand. -->
 
-**26 propositions**, each proved by the theorem of the same name in `Proofs/` (181 theorems in all: the 26 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
+**27 propositions**, each proved by the theorem of the same name in `Proofs/` (187 theorems in all: the 27 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
 
 ### A. Money is neither created nor destroyed
 
 | Proposition | In plain English |
 | --- | --- |
-| [`conservation_posted`](Proofs/Spec.lean#L57) | **Conservation of posted amounts**: in every reachable database, in every ledger, the accounts' posted debits add up to their posted credits. |
-| [`conservation_pending`](Proofs/Spec.lean#L62) | **Conservation of pending amounts**: likewise for the pending debits and pending credits. |
+| [`conservation_posted`](Proofs/Spec.lean#L58) | **Conservation of posted amounts**: in every reachable database, in every ledger, the accounts' posted debits add up to their posted credits. |
+| [`conservation_pending`](Proofs/Spec.lean#L63) | **Conservation of pending amounts**: likewise for the pending debits and pending credits. |
 
 ### B. A transfer moves money between exactly two accounts
 
 | Proposition | In plain English |
 | --- | --- |
-| [`transfer_two_accounts`](Proofs/Spec.lean#L69) | **A created transfer changes exactly two accounts and adds one journal entry**: the debit and credit accounts it names (for a post or void, its pending transfer's), which are different and in the transfer's ledger, get new balances and nothing else; every other account, and every earlier transfer, is unchanged. |
-| [`transfer_equal_opposite`](Proofs/Spec.lean#L81) | **Equal and opposite**: in that transfer, the debit account's credits and the credit account's debits do not change, and what is added to the debit account's debits equals what is added to the credit account's credits, for the posted and for the pending balances (a post or void removes the same pending amount from both). |
+| [`transfer_two_accounts`](Proofs/Spec.lean#L70) | **A created transfer changes exactly two accounts and adds one journal entry**: the debit and credit accounts it names (for a post or void, its pending transfer's), which are different and in the transfer's ledger, get new balances and nothing else; every other account, and every earlier transfer, is unchanged. |
+| [`transfer_equal_opposite`](Proofs/Spec.lean#L82) | **Equal and opposite**: in that transfer, the debit account's credits and the credit account's debits do not change, and what is added to the debit account's debits equals what is added to the credit account's credits, for the posted and for the pending balances (a post or void removes the same pending amount from both). |
 
 ### C. Client-chosen ids: idempotency
 
 | Proposition | In plain English |
 | --- | --- |
-| [`transfer_exists`](Proofs/Spec.lean#L97) | **Resubmitting an existing transfer id changes nothing**: the answer is `exists` or one `exists_with_different_*` code, and the database is exactly as it was. |
-| [`transfer_exists_iff_same`](Proofs/Spec.lean#L104) | **`exists` means the same transfer**: for a transfer that is not a post or void, a stored transfer with its id answers `exists` exactly when every field the client chose is the same; otherwise the code names the first field that differs (flags, pending id, accounts, amount, user data, ledger, code). |
-| [`transfer_retry`](Proofs/Spec.lean#L115) | **A retried transfer is not applied twice**: once a transfer is created, submitting the same request again, in any later database, answers `exists` and changes nothing. |
-| [`failed_retry`](Proofs/Spec.lean#L122) | **A failed id stays failed**: once a transfer fails for a reason that depends on the ledger's state (an account or pending transfer missing, a balance limit), no transfer with its id is ever created afterwards: resubmitting it changes nothing. |
-| [`account_exists`](Proofs/Spec.lean#L131) | **Resubmitting an existing account id changes nothing**: the answer is `exists` or one `exists_with_different_*` code, and the database is exactly as it was. |
-| [`account_retry`](Proofs/Spec.lean#L138) | **A retried account is not created twice**: once an account is created, submitting the same request again, in any later database, answers `exists` and changes nothing. |
+| [`transfer_exists`](Proofs/Spec.lean#L98) | **Resubmitting an existing transfer id changes nothing**: the answer is `exists` or one `exists_with_different_*` code, and the database is exactly as it was. |
+| [`transfer_exists_iff_same`](Proofs/Spec.lean#L105) | **`exists` means the same transfer**: for a transfer that is not a post or void, a stored transfer with its id answers `exists` exactly when every field the client chose is the same; otherwise the code names the first field that differs (flags, pending id, accounts, amount, user data, ledger, code). |
+| [`transfer_retry`](Proofs/Spec.lean#L116) | **A retried transfer is not applied twice**: once a transfer is created, submitting the same request again, in any later database, answers `exists` and changes nothing. |
+| [`failed_retry`](Proofs/Spec.lean#L123) | **A failed id stays failed**: once a transfer fails for a reason that depends on the ledger's state (an account or pending transfer missing, a balance limit), no transfer with its id is ever created afterwards: resubmitting it changes nothing. |
+| [`account_exists`](Proofs/Spec.lean#L132) | **Resubmitting an existing account id changes nothing**: the answer is `exists` or one `exists_with_different_*` code, and the database is exactly as it was. |
+| [`account_retry`](Proofs/Spec.lean#L139) | **A retried account is not created twice**: once an account is created, submitting the same request again, in any later database, answers `exists` and changes nothing. |
 
 ### D. Balance limits
 
 | Proposition | In plain English |
 | --- | --- |
-| [`debits_must_not_exceed_credits`](Proofs/Spec.lean#L147) | **`debits_must_not_exceed_credits` holds**: in every reachable database, an account with this flag has debits (pending and posted) of at most its posted credits. |
-| [`credits_must_not_exceed_debits`](Proofs/Spec.lean#L154) | **`credits_must_not_exceed_debits` holds**: likewise for credits. |
+| [`debits_must_not_exceed_credits`](Proofs/Spec.lean#L148) | **`debits_must_not_exceed_credits` holds**: in every reachable database, an account with this flag has debits (pending and posted) of at most its posted credits. |
+| [`credits_must_not_exceed_debits`](Proofs/Spec.lean#L155) | **`credits_must_not_exceed_debits` holds**: likewise for credits. |
 
 ### E. Two-phase transfers
 
 | Proposition | In plain English |
 | --- | --- |
-| [`resolved_at_most_once`](Proofs/Spec.lean#L161) | **A pending transfer is posted or voided at most once**: in every reachable database, no two posts or voids name the same pending transfer. |
-| [`resolution_matches_pending`](Proofs/Spec.lean#L166) | **Posts and voids match their pending transfer**: every post or void in the journal names a pending transfer in the journal, with the same debit and credit accounts and ledger; a post moves at most the pending amount and a void exactly the pending amount. |
-| [`pending_balances`](Proofs/Spec.lean#L176) | **Pending balances are the open pending transfers**: every account's pending debits (credits) are the sum of the pending transfers that debit (credit) it and are not yet posted or voided. So posting or voiding releases exactly the pending amount. |
+| [`resolved_at_most_once`](Proofs/Spec.lean#L162) | **A pending transfer is posted or voided at most once**: in every reachable database, no two posts or voids name the same pending transfer. |
+| [`resolution_matches_pending`](Proofs/Spec.lean#L167) | **Posts and voids match their pending transfer**: every post or void in the journal names a pending transfer in the journal, with the same debit and credit accounts and ledger; a post moves at most the pending amount and a void exactly the pending amount. |
+| [`pending_balances`](Proofs/Spec.lean#L177) | **Pending balances are the open pending transfers**: every account's pending debits (credits) are the sum of the pending transfers that debit (credit) it and are not yet posted or voided. So posting or voiding releases exactly the pending amount. |
 
 ### F. Linked chains
 
 | Proposition | In plain English |
 | --- | --- |
-| [`chains_cut`](Proofs/Spec.lean#L186) | **How a batch is cut into chains**: the chains, in order, are the batch; none is empty; within a chain every event but the last is linked; and every chain but the last ends with an event that is not linked (so a chain is a maximal run of linked events and the event after it). |
-| [`chains_atomic`](Proofs/Spec.lean#L197) | **A linked chain succeeds or fails as a whole**: a batch gets one status per event, and within each chain either every event is `created` or none is. |
-| [`journal_is_created`](Proofs/Spec.lean#L205) | **The journal holds exactly the created transfers**: after a batch, the journal is the journal before followed by the batch's transfers whose status is `created`, in order (by id); nothing from a failed chain is written. |
+| [`chains_cut`](Proofs/Spec.lean#L187) | **How a batch is cut into chains**: the chains, in order, are the batch; none is empty; within a chain every event but the last is linked; and every chain but the last ends with an event that is not linked (so a chain is a maximal run of linked events and the event after it). |
+| [`chains_atomic`](Proofs/Spec.lean#L198) | **A linked chain succeeds or fails as a whole**: a batch gets one status per event, and within each chain either every event is `created` or none is. |
+| [`journal_is_created`](Proofs/Spec.lean#L206) | **The journal holds exactly the created transfers**: after a batch, the journal is the journal before followed by the batch's transfers whose status is `created`, in order (by id); nothing from a failed chain is written. |
 
 ### G. The audit
 
 | Proposition | In plain English |
 | --- | --- |
-| [`replay_balances`](Proofs/Spec.lean#L216) | **Replaying the journal reproduces every balance**: in every reachable database, each account's four balances are exactly what replaying the journal from zero gives (`Audit.replay`: each transfer applied in order, every account starting at zero). `ledger verify` computes the same replay for all accounts in one pass (`Audit.replayAll`). |
+| [`replay_balances`](Proofs/Spec.lean#L217) | **Replaying the journal reproduces every balance**: in every reachable database, each account's four balances are exactly what replaying the journal from zero gives (`Audit.replay`: each transfer applied in order, every account starting at zero). `ledger verify` computes the same replay for all accounts in one pass (`Audit.replayAll`). |
+| [`fast_replay`](Proofs/Spec.lean#L225) | **The auditor's fast replay is the replay**: for every journal and every account, the one-pass replay `ledger verify` runs (`Audit.replayAll`, with hash maps) gives exactly `Audit.replay`'s balances. |
 
 ### H. Ledgers, ids and bounds
 
 | Proposition | In plain English |
 | --- | --- |
-| [`same_ledger`](Proofs/Spec.lean#L226) | **Every transfer stays within one ledger**: in every reachable database, each transfer's debit and credit accounts exist, are different, and are in the transfer's ledger. |
-| [`cross_ledger_rejected`](Proofs/Spec.lean#L234) | **A transfer between ledgers is rejected**: a transfer (not a post or void) whose two accounts exist in different ledgers is never created, and changes nothing. |
-| [`within_bounds`](Proofs/Spec.lean#L242) | **Every amount fits the database**: in every reachable database, each account's debits (pending plus posted) and credits (pending plus posted), and each transfer's amount, are at most `2^63 - 1`, SQLite's largest integer, so no stored number overflows. |
-| [`ids_unique`](Proofs/Spec.lean#L250) | **Ids are unique**: in every reachable database no two accounts and no two transfers share an id, and no id is 0 or `2^128 - 1`. |
-| [`history_kept`](Proofs/Spec.lean#L256) | **Nothing is ever deleted or rewritten**: whatever requests follow, the journal only grows at its end, and every account stays, with the same id, user data, ledger, code, flags and timestamp (only its balances change). |
+| [`same_ledger`](Proofs/Spec.lean#L233) | **Every transfer stays within one ledger**: in every reachable database, each transfer's debit and credit accounts exist, are different, and are in the transfer's ledger. |
+| [`cross_ledger_rejected`](Proofs/Spec.lean#L241) | **A transfer between ledgers is rejected**: a transfer (not a post or void) whose two accounts exist in different ledgers is never created, and changes nothing. |
+| [`within_bounds`](Proofs/Spec.lean#L249) | **Every amount fits the database**: in every reachable database, each account's debits (pending plus posted) and credits (pending plus posted), and each transfer's amount, are at most `2^63 - 1`, SQLite's largest integer, so no stored number overflows. |
+| [`ids_unique`](Proofs/Spec.lean#L257) | **Ids are unique**: in every reachable database no two accounts and no two transfers share an id, and no id is 0 or `2^128 - 1`. |
+| [`history_kept`](Proofs/Spec.lean#L263) | **Nothing is ever deleted or rewritten**: whatever requests follow, the journal only grows at its end, and every account stays, with the same id, user data, ledger, code, flags and timestamp (only its balances change). |
 
 ### I. Requests
 
 | Proposition | In plain English |
 | --- | --- |
-| [`reads_change_nothing`](Proofs/Spec.lean#L265) | **Reads change nothing**: every `GET` request leaves the database as it was. |
-| [`writes_are_batches`](Proofs/Spec.lean#L269) | **Only the two create endpoints write**, and each writes exactly what one batch (`create_accounts` or `create_transfers`) writes. |
+| [`reads_change_nothing`](Proofs/Spec.lean#L272) | **Reads change nothing**: every `GET` request leaves the database as it was. |
+| [`writes_are_batches`](Proofs/Spec.lean#L276) | **Only the two create endpoints write**, and each writes exactly what one batch (`create_accounts` or `create_transfers`) writes. |
 <!-- END PROPOSITIONS -->
 
 ## What is trusted, not proved
@@ -156,10 +157,6 @@ propositions are then one field of `Inv`.
   names and numbers are TigerBeetle's. That the two agree is tested, not
   proved: the differential test sends the same random workloads to Ledger and
   to a real TigerBeetle and compares every status and balance.
-- **The auditor's fast replay.** `ledger verify` computes the replay for all
-  accounts in one pass with hash maps (`Audit.replayAll`); that it equals
-  `Audit.replay`, which the propositions are about, is tested (the auditor
-  accepts every exported journal in CI and rejects tampered ones), not proved.
 - **JSON text and HTTP.** The propositions are about the decoded requests and
   `Api.handle`; that `Lean.Json` parses the text the client sent, and that the
   HTTP layer splits the path into the segments the API matches, is not proved.

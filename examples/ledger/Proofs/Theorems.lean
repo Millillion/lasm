@@ -262,6 +262,8 @@ theorem journal_is_created : Spec.journal_is_created := fun D ts batch => create
 
 theorem replay_balances : Spec.replay_balances := fun _ h a ha => (inv_reachable h).replay a ha
 
+theorem fast_replay : Spec.fast_replay := replayAll_eq
+
 /-! ## H. Ledgers, ids and bounds -/
 
 theorem same_ledger : Spec.same_ledger := fun _ h t ht => (inv_reachable h).accountsOf t ht
