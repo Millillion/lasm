@@ -214,9 +214,10 @@ def journal_is_created : Prop :=
 /-! ## G. The audit -/
 
 /-- **Replaying the journal reproduces every balance**: in every reachable
-database, each account's four balances are exactly what the auditor
-computes by replaying the journal from zero (`Audit.replay`, the function
-`ledger verify` runs). -/
+database, each account's four balances are exactly what replaying the
+journal from zero gives (`Audit.replay`: each transfer applied in order,
+every account starting at zero). `ledger verify` computes the same replay
+for all accounts in one pass (`Audit.replayAll`). -/
 def replay_balances : Prop :=
   ∀ D, Reachable D → ∀ a ∈ D.accounts, a.balances = Audit.replay D.transfers a.id
 

@@ -5,6 +5,7 @@ outside auditor would, and checks the ledger's invariants. The WASI build
 balances the ledger stores are exactly `replay`'s (`Spec.replay_balances`).
 -/
 import Ledger.Types
+import Std.Data.HashMap
 
 namespace Ledger
 
@@ -59,6 +60,38 @@ def replay (journal : List Transfer) (id : Nat) : Balances := replayFrom [] {} i
 
 /-! ## The audit -/
 
+/-- `replay` for every account at once, in one pass over the journal (hash
+maps instead of list searches; the auditor runs this on large journals). It
+computes `replay journal id` for every `id`: each transfer changes its two
+accounts as `replayStep` does, with the pending transfer it names looked up
+among the transfers before it. -/
+def replayAll (journal : List Transfer) : Std.HashMap Nat Balances := Id.run do
+  let mut balances : Std.HashMap Nat Balances := {}
+  let mut seen : Std.HashMap Nat Transfer := {}
+  for t in journal do
+    let get (id : Nat) := balances.getD id {}
+    let dr := t.debitAccountId
+    let cr := t.creditAccountId
+    if t.flags.resolves then
+      let held := match seen.get? t.pendingId with | some p => p.amount | none => 0
+      let posted := if t.flags.postPendingTransfer then t.amount else 0
+      let b := get dr
+      balances := balances.insert dr { b with debitsPending := b.debitsPending - held, debitsPosted := b.debitsPosted + posted }
+      let b := get cr
+      balances := balances.insert cr { b with creditsPending := b.creditsPending - held, creditsPosted := b.creditsPosted + posted }
+    else if t.flags.pending then
+      let b := get dr
+      balances := balances.insert dr { b with debitsPending := b.debitsPending + t.amount }
+      let b := get cr
+      balances := balances.insert cr { b with creditsPending := b.creditsPending + t.amount }
+    else
+      let b := get dr
+      balances := balances.insert dr { b with debitsPosted := b.debitsPosted + t.amount }
+      let b := get cr
+      balances := balances.insert cr { b with creditsPosted := b.creditsPosted + t.amount }
+    unless seen.contains t.id do seen := seen.insert t.id t
+  return balances
+
 /-- The sum of `f` over the accounts of ledger `L`. -/
 def ledgerSum (accounts : List Account) (L : Nat) (f : Account → Nat) : Nat :=
   ((accounts.filter (·.ledger == L)).map f).sum
@@ -69,15 +102,17 @@ journal is consistent: every balance is what replaying the transfers gives,
 every ledger balances, and every rule of the ledger holds. -/
 def verify (accounts : List Account) (transfers : List Transfer) : List String := Id.run do
   let mut problems : Array String := #[]
-  let find (id : Nat) := accounts.find? (·.id == id)
+  let byId : Std.HashMap Nat Account := accounts.foldl (fun m a => if m.contains a.id then m else m.insert a.id a) {}
+  let find (id : Nat) := byId.get? id
   -- Ids.
-  unless (accounts.map (·.id)).Nodup do problems := problems.push "two accounts share an id"
-  unless (transfers.map (·.id)).Nodup do problems := problems.push "two transfers share an id"
+  if byId.size != accounts.length then problems := problems.push "two accounts share an id"
+  let tids : Std.HashMap Nat Unit := transfers.foldl (fun m t => m.insert t.id ()) {}
+  if tids.size != transfers.length then problems := problems.push "two transfers share an id"
   for a in accounts do
     if a.id == 0 || a.id == u128Max then problems := problems.push s!"account {a.id}: invalid id"
   -- Each transfer, in order.
-  let mut before : List Transfer := []
-  let mut resolved : List Nat := []
+  let mut before : Std.HashMap Nat Transfer := {}
+  let mut resolved : Std.HashMap Nat Unit := {}
   for t in transfers do
     if t.id == 0 || t.id == u128Max then problems := problems.push s!"transfer {t.id}: invalid id"
     if t.amount > limit then problems := problems.push s!"transfer {t.id}: amount past 2^63 - 1"
@@ -90,7 +125,7 @@ def verify (accounts : List Account) (transfers : List Transfer) : List String :
     if t.flags.resolves then
       if t.flags.pending || (t.flags.postPendingTransfer && t.flags.voidPendingTransfer) then
         problems := problems.push s!"transfer {t.id}: conflicting flags"
-      match before.find? (·.id == t.pendingId) with
+      match before.get? t.pendingId with
       | none => problems := problems.push s!"transfer {t.id}: resolves {t.pendingId}, which is not an earlier transfer"
       | some p =>
         if !p.flags.pending then problems := problems.push s!"transfer {t.id}: resolves {p.id}, which is not pending"
@@ -101,11 +136,12 @@ def verify (accounts : List Account) (transfers : List Transfer) : List String :
           problems := problems.push s!"transfer {t.id}: voids another amount than {p.id} holds"
       if resolved.contains t.pendingId then
         problems := problems.push s!"transfer {t.id}: {t.pendingId} was already posted or voided"
-      resolved := t.pendingId :: resolved
-    before := before ++ [t]
+      resolved := resolved.insert t.pendingId ()
+    unless before.contains t.id do before := before.insert t.id t
   -- Balances.
+  let replayed := replayAll transfers
   for a in accounts do
-    if a.balances != replay transfers a.id then
+    if a.balances != replayed.getD a.id {} then
       problems := problems.push s!"account {a.id}: its balances are not the journal's"
     if a.debitsPending + a.debitsPosted > limit || a.creditsPending + a.creditsPosted > limit then
       problems := problems.push s!"account {a.id}: a balance past 2^63 - 1"

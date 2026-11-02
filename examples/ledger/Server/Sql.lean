@@ -89,11 +89,11 @@ def transferFlagsOf (n : Nat) : TransferFlags :=
   { linked := n &&& 1 != 0, pending := n &&& 2 != 0, postPendingTransfer := n &&& 4 != 0,
     voidPendingTransfer := n &&& 8 != 0 }
 
-def AccountFlags.bits (f : AccountFlags) : Nat :=
+def _root_.Ledger.AccountFlags.bits (f : AccountFlags) : Nat :=
   (if f.linked then 1 else 0) + (if f.debitsMustNotExceedCredits then 2 else 0) +
   (if f.creditsMustNotExceedDebits then 4 else 0)
 
-def TransferFlags.bits (f : TransferFlags) : Nat :=
+def _root_.Ledger.TransferFlags.bits (f : TransferFlags) : Nat :=
   (if f.linked then 1 else 0) + (if f.pending then 2 else 0) + (if f.postPendingTransfer then 4 else 0) +
   (if f.voidPendingTransfer then 8 else 0)
 
@@ -198,12 +198,15 @@ def store (db : Sql) : Store Async where
       ORDER BY timestamp" #[dec id, dec id]).toList.map transferRow
   snapshot := do
     -- One read transaction where the store has them; elsewhere the version is checked around the reads.
-    let rec go (fuel : Nat) : Async (List Account × List Transfer) := do
-      let v ← version db
+    let read : Async (List Account × List Transfer) := do
       let accounts := (← db.all s!"SELECT {accountCols} FROM accounts ORDER BY timestamp" #[]).toList.map accountRow
       let transfers := (← db.all s!"SELECT {transferCols} FROM transfers ORDER BY timestamp" #[]).toList.map transferRow
-      if fuel = 0 || (← version db) == v then return (accounts, transfers) else go (fuel - 1)
-    go 100
+      return (accounts, transfers)
+    for _ in [0:100] do
+      let v ← version db
+      let r ← read
+      if (← version db) == v then return r
+    read
 
 /-- Creates the tables (each binding module runs this once at start). -/
 def migrate (db : Sql) : Async Unit := do

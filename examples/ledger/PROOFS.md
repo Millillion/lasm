@@ -118,24 +118,24 @@ propositions are then one field of `Inv`.
 
 | Proposition | In plain English |
 | --- | --- |
-| [`replay_balances`](Proofs/Spec.lean#L216) | **Replaying the journal reproduces every balance**: in every reachable database, each account's four balances are exactly what the auditor computes by replaying the journal from zero (`Audit.replay`, the function `ledger verify` runs). |
+| [`replay_balances`](Proofs/Spec.lean#L216) | **Replaying the journal reproduces every balance**: in every reachable database, each account's four balances are exactly what replaying the journal from zero gives (`Audit.replay`: each transfer applied in order, every account starting at zero). `ledger verify` computes the same replay for all accounts in one pass (`Audit.replayAll`). |
 
 ### H. Ledgers, ids and bounds
 
 | Proposition | In plain English |
 | --- | --- |
-| [`same_ledger`](Proofs/Spec.lean#L225) | **Every transfer stays within one ledger**: in every reachable database, each transfer's debit and credit accounts exist, are different, and are in the transfer's ledger. |
-| [`cross_ledger_rejected`](Proofs/Spec.lean#L233) | **A transfer between ledgers is rejected**: a transfer (not a post or void) whose two accounts exist in different ledgers is never created, and changes nothing. |
-| [`within_bounds`](Proofs/Spec.lean#L241) | **Every amount fits the database**: in every reachable database, each account's debits (pending plus posted) and credits (pending plus posted), and each transfer's amount, are at most `2^63 - 1`, SQLite's largest integer, so no stored number overflows. |
-| [`ids_unique`](Proofs/Spec.lean#L249) | **Ids are unique**: in every reachable database no two accounts and no two transfers share an id, and no id is 0 or `2^128 - 1`. |
-| [`history_kept`](Proofs/Spec.lean#L255) | **Nothing is ever deleted or rewritten**: whatever requests follow, the journal only grows at its end, and every account stays, with the same id, user data, ledger, code, flags and timestamp (only its balances change). |
+| [`same_ledger`](Proofs/Spec.lean#L226) | **Every transfer stays within one ledger**: in every reachable database, each transfer's debit and credit accounts exist, are different, and are in the transfer's ledger. |
+| [`cross_ledger_rejected`](Proofs/Spec.lean#L234) | **A transfer between ledgers is rejected**: a transfer (not a post or void) whose two accounts exist in different ledgers is never created, and changes nothing. |
+| [`within_bounds`](Proofs/Spec.lean#L242) | **Every amount fits the database**: in every reachable database, each account's debits (pending plus posted) and credits (pending plus posted), and each transfer's amount, are at most `2^63 - 1`, SQLite's largest integer, so no stored number overflows. |
+| [`ids_unique`](Proofs/Spec.lean#L250) | **Ids are unique**: in every reachable database no two accounts and no two transfers share an id, and no id is 0 or `2^128 - 1`. |
+| [`history_kept`](Proofs/Spec.lean#L256) | **Nothing is ever deleted or rewritten**: whatever requests follow, the journal only grows at its end, and every account stays, with the same id, user data, ledger, code, flags and timestamp (only its balances change). |
 
 ### I. Requests
 
 | Proposition | In plain English |
 | --- | --- |
-| [`reads_change_nothing`](Proofs/Spec.lean#L264) | **Reads change nothing**: every `GET` request leaves the database as it was. |
-| [`writes_are_batches`](Proofs/Spec.lean#L268) | **Only the two create endpoints write**, and each writes exactly what one batch (`create_accounts` or `create_transfers`) writes. |
+| [`reads_change_nothing`](Proofs/Spec.lean#L265) | **Reads change nothing**: every `GET` request leaves the database as it was. |
+| [`writes_are_batches`](Proofs/Spec.lean#L269) | **Only the two create endpoints write**, and each writes exactly what one batch (`create_accounts` or `create_transfers`) writes. |
 <!-- END PROPOSITIONS -->
 
 ## What is trusted, not proved
@@ -156,6 +156,10 @@ propositions are then one field of `Inv`.
   names and numbers are TigerBeetle's. That the two agree is tested, not
   proved: the differential test sends the same random workloads to Ledger and
   to a real TigerBeetle and compares every status and balance.
+- **The auditor's fast replay.** `ledger verify` computes the replay for all
+  accounts in one pass with hash maps (`Audit.replayAll`); that it equals
+  `Audit.replay`, which the propositions are about, is tested (the auditor
+  accepts every exported journal in CI and rejects tampered ones), not proved.
 - **JSON text and HTTP.** The propositions are about the decoded requests and
   `Api.handle`; that `Lean.Json` parses the text the client sent, and that the
   HTTP layer splits the path into the segments the API matches, is not proved.

@@ -1,8 +1,9 @@
 /-
 SQLite on Node (and Deno): the built-in `node:sqlite` module (Node 24 and
 later, no npm package). One binding, the rest is method calls. node:sqlite is
-synchronous; `batch` runs in `BEGIN IMMEDIATE … COMMIT`, under a lock so that
-two transactions never interleave.
+synchronous, but requests run concurrently, so every call takes one lock:
+`batch` runs in `BEGIN IMMEDIATE … COMMIT`, and no other statement on the
+connection (a read included) runs in the middle of it.
 -/
 import Lasm.JS
 import Std.Data.HashMap
@@ -34,7 +35,9 @@ def «open» (path : String) : IO Sql := do
   let runOne (sql : String) (params : Array Data) : IO Unit := do
     let _ ← (← prepare sql).callMethod "run" params Data
   let sql : Sql := {
-    all := fun sql params => do (← prepare sql).callMethod "all" params (Array Data)
+    -- Reads take the lock too: on this one connection, a read between a
+    -- batch's statements would see its uncommitted writes.
+    all := fun sql params => locked do (← prepare sql).callMethod "all" params (Array Data)
     run := fun sql params => locked (runOne sql params)
     batch := fun stmts => locked do
       let _ ← db.callMethod "exec" #[toJS "BEGIN IMMEDIATE"] Data

@@ -13,7 +13,8 @@ import Lasm.Fetch
 import Lasm.JS
 import Ledger.Api
 import Server.Sql
-open Lasm.JS Lean
+import Std.Sync.Semaphore
+open Lasm.JS Lean Std.Async
 
 namespace Ledger.Server
 
@@ -50,21 +51,31 @@ def runRequest (db : Sql) (r : Request) : Nat → Async Reply
       if (← version db) != v then runRequest db r fuel
       else return Reply.error 500 "the database rejected the writes"
 
+/-- Runs `act` holding the writers' permit (`run` makes one per process):
+one create request at a time, since concurrent writers would otherwise keep
+invalidating each other's reads and retry. The version check still guards
+against writers in other processes or isolates. -/
+def exclusive {α : Type} (writers : Std.Semaphore) (act : Async α) : Async α := do
+  let _ ← await (← writers.acquire).result?
+  try act finally writers.release
+
 /-- `/api/…`: the API. -/
-def api (db : Sql) (req : Lasm.Fetch.Request) (path : List String) : Async Lasm.Fetch.Response := do
+def api (writers : Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) (path : List String) : Async Lasm.Fetch.Response := do
   if req.method == "OPTIONS" then return { status := 204, headers := cors }
   let r : Request := { method := if req.method == "HEAD" then "GET" else req.method, path,
                        query := req.queryParams, body := req.text }
-  return response (← runRequest db r 50)
+  let reply ← if r.method == "POST" then exclusive writers (runRequest db r 50) else runRequest db r 50
+  return response reply
 
 /-- The whole site: the API under `/api`. -/
-def site (db : Sql) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
+def site (writers : Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
   match req.segments with
-  | "api" :: path => api db req path
+  | "api" :: path => api writers db req path
   | [] => return Lasm.Fetch.Response.text "Ledger: see /api/accounts and /api/transfers\n"
   | _ => return .notFound
 
 /-- Serves Ledger on a SQL database (whose binding module created the tables). -/
-def run (db : Sql) : IO Unit := Lasm.Fetch.serve (site db)
+def run (db : Sql) : IO Unit := do
+  Lasm.Fetch.serve (site (← Std.Semaphore.new 1) db)
 
 end Ledger.Server
