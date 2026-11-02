@@ -1,0 +1,17 @@
+{
+  "name": "porter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Porter, an OpenID Connect provider in Lean: authorization code flow with PKCE, signed ID tokens, refresh-token rotation, compiled to WebAssembly by Lasm, with proofs",
+  "scripts": {
+    "proofs": "node test/proofs.mjs",
+    "proofs:paranoid": "node test/paranoid.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@lasm/cli": "0.3.6"
+  }
+}
