@@ -10,6 +10,7 @@ import { edgeRuntime } from './edge-runtime.mjs';
 import { linkEdgeProgram, edgeLinkSettings } from './edge-link.mjs';
 import { managedCacheDirectory } from '../managed-artifacts.mjs';
 import { readStoreEntry, writeStoreEntry } from '../application-link.mjs';
+import { testUnoptimized } from '../test-switches.mjs';
 import { builtinModuleClosure, builtinModuleFile, builtinPrefix, isBuiltinModule } from './builtin-modules.mjs';
 import { supabaseFunctionNameOf } from '../init.mjs';
 import { noticeBanner, noticesSectionName, targetNotices, withCustomSection } from '../notices.mjs';
@@ -430,7 +431,7 @@ export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, sus
   let link;
   // A dev Node build (lasm dev) gets the edge link's dev profile; deployable edge builds are release builds.
   try { link = linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: result.linkWork, out: join(staging, '.link'), suspend, verbose,
-    optimize: result.profile !== 'dev', stepCache: edgeStepCache(), members: result.profile === 'dev' ? edgeMembers(root, edge) : undefined }); }
+    optimize: result.profile !== 'dev' && !testUnoptimized(), stepCache: edgeStepCache(), members: result.profile === 'dev' ? edgeMembers(root, edge) : undefined }); }
   catch (error) { rmSync(staging, { recursive: true, force: true }); throw error; }
   copyFileSync(link.program, join(staging, 'program.mjs'));
   copyFileSync(link.wasm, join(staging, 'program.wasm'));
