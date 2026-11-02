@@ -18,3 +18,9 @@ name = "Proofs"
 [[lean_exe]]
 name = "folio-batch"
 root = "Batch"
+
+# The `folio` command (Cli.lean), natively: `lake build folio`. The programs
+# users run are Lasm's builds: `npm run build` (Node) and `npm run build:wasi`.
+[[lean_exe]]
+name = "folio"
+root = "Cli"
