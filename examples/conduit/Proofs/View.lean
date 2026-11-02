@@ -34,13 +34,14 @@ end Every
 
 /-- What every element of every page satisfies: its `href`s are safe, it sets
 no `innerHTML`, an image has `alt`, a link has `href`, a form control has a
-placeholder. -/
+placeholder, a click handler is on a `button`. -/
 def Good (tag : String) (attrs : List (Attr Msg)) : Prop :=
   (∀ v, Attr.attr "href" v ∈ attrs → Markdown.allowedHref v = true) ∧
   (∀ v, Attr.prop "innerHTML" v ∉ attrs) ∧
   (tag = "img" → ∃ v, Attr.attr "alt" v ∈ attrs) ∧
   (tag = "a" → ∃ v, Attr.attr "href" v ∈ attrs) ∧
-  (tag = "input" ∨ tag = "textarea" → ∃ v, v ≠ "" ∧ Attr.attr "placeholder" v ∈ attrs)
+  (tag = "input" ∨ tag = "textarea" → ∃ v, v ≠ "" ∧ Attr.attr "placeholder" v ∈ attrs) ∧
+  (∀ l h, Attr.on l h ∈ attrs → l.event = "click" → tag = "button")
 
 /-! ## Links within the app have no scheme -/
 
@@ -67,8 +68,8 @@ theorem href_eq (r : Route) : ∃ s, r.href = "/" ++ s := ⟨_, by unfold Route.
 attribute [local simp] Good Lasm.UI.div Lasm.UI.nav Lasm.UI.ul Lasm.UI.li Lasm.UI.a Lasm.UI.i Lasm.UI.img Lasm.UI.footer
   Lasm.UI.span Lasm.UI.h1 Lasm.UI.h4 Lasm.UI.p Lasm.UI.button Lasm.UI.text Lasm.UI.keyed Lasm.UI.fieldset Lasm.UI.input
   Lasm.UI.form Lasm.UI.textarea Lasm.UI.hr Lasm.UI.strong Lasm.UI.em Lasm.UI.code Lasm.UI.pre Lasm.UI.ol
-  Lasm.UI.blockquote Lasm.UI.node Frontend.link class_ href src alt rel rows type_ name placeholder value disabled
-  onClick onInput onSubmit onEnter on preventDefaultOn Attr.onWith
+  Lasm.UI.blockquote Lasm.UI.node Frontend.link Frontend.iconButton class_ href src alt rel rows type_ name placeholder
+  value disabled aria onClick onInput onSubmit onEnter on preventDefaultOn Attr.onWith
 
 theorem header_good (m : Model) : Every Good (Frontend.header m) := by
   unfold Frontend.header navItem
@@ -202,8 +203,10 @@ theorem inlines_good : ∀ (cs : List Markdown.Inline), SafeLinks cs → ∀ c �
     rcases List.mem_cons.mp hc with rfl | hc
     · simp only [inlineView, Lasm.UI.a, every_elem]
       refine ⟨by simp [href, rel, h.1], fun x hx => ?_⟩
-      obtain ⟨⟨y, hy⟩, _, rfl⟩ := List.mem_map.mp hx
-      exact inlines_good cs h.2.1 y hy
+      split at hx
+      · simp only [List.mem_singleton] at hx; subst hx; simp
+      · obtain ⟨⟨y, hy⟩, _, rfl⟩ := List.mem_map.mp hx
+        exact inlines_good cs h.2.1 y hy
     · exact inlines_good rest h.2.2 c hc
 termination_by cs => sizeOf cs
 decreasing_by all_goals simp_wf <;> omega
@@ -322,7 +325,8 @@ theorem view_hrefs_safe : Spec.view_hrefs_safe := fun m => Every.mono (fun _ _ h
 theorem view_no_raw_html : Spec.view_no_raw_html := fun m => Every.mono (fun _ _ h => h.2.1) (view_good m)
 theorem view_imgs_alt_links_href : Spec.view_imgs_alt_links_href :=
   fun m => Every.mono (fun _ _ h => ⟨h.2.2.1, h.2.2.2.1⟩) (view_good m)
-theorem view_controls_described : Spec.view_controls_described := fun m => Every.mono (fun _ _ h => h.2.2.2.2) (view_good m)
+theorem view_controls_described : Spec.view_controls_described := fun m => Every.mono (fun _ _ h => h.2.2.2.2.1) (view_good m)
+theorem view_clickables_buttons : Spec.view_clickables_buttons := fun m => Every.mono (fun _ _ h => h.2.2.2.2.2) (view_good m)
 theorem article_body_no_h1 : Spec.article_body_no_h1 := fun body b hb => Every.mono (fun _ _ h => h.2) (parse_good body b hb)
 
 /-! ## Layout -/
@@ -374,5 +378,78 @@ theorem pagination_links : Spec.pagination_links := by
     induction (List.range ((count + pageSize - 1) / pageSize)) with
     | nil => rfl
     | cons a l ih => simp [List.flatMap_cons, ih]
+
+/-! ## Links in article bodies have text -/
+
+theorem textOf_elem {Msg : Type} (ns : Ns) (tag : String) (k : Option String) (attrs : List (Attr Msg)) (cs : List (Html Msg)) :
+    textOf (.elem ns tag k attrs cs) = cs.flatMap textOf := by
+  rw [textOf]; exact flatMap_attach _ _
+
+theorem linkTexts_elem {Msg : Type} (ns : Ns) (tag : String) (k : Option String) (attrs : List (Attr Msg))
+    (cs : List (Html Msg)) :
+    linkTexts (.elem ns tag k attrs cs) = (if tag = "a" then [cs.flatMap textOf] else []) ++ cs.flatMap linkTexts := by
+  rw [linkTexts, flatMap_attach (fun c => textOf c), flatMap_attach (fun c => linkTexts c)]
+
+@[simp] theorem textOf_text {Msg : Type} (s : String) : textOf (.text s : Html Msg) = s.toList := by rw [textOf]
+@[simp] theorem linkTexts_text {Msg : Type} (s : String) : linkTexts (.text s : Html Msg) = [] := by rw [linkTexts]
+
+/-- Every list of inlines in a block satisfies `Q`. -/
+def BlockInlines (Q : List Markdown.Inline → Prop) : Markdown.Block → Prop
+  | .para cs | .quote cs | .heading _ cs => Q cs
+  | .list _ items => ∀ cs ∈ items, Q cs
+  | .code _ | .rule => True
+
+theorem blocks_inlines (Q : List Markdown.Inline → Prop) (hQ : ∀ s, Q (Markdown.inlines s)) :
+    ∀ (fuel : Nat) (lines : List String), ∀ b ∈ Markdown.blocks fuel lines, BlockInlines Q b
+  | 0, _, b, hb => by simp [Markdown.blocks] at hb
+  | _ + 1, [], b, hb => by simp [Markdown.blocks] at hb
+  | fuel + 1, line :: rest, b, hb => by
+    unfold Markdown.blocks at hb
+    dsimp only at hb
+    repeat' split at hb
+    all_goals first
+      | exact blocks_inlines Q hQ fuel _ b hb
+      | rcases List.mem_cons.mp hb with rfl | hb
+        · first
+          | exact True.intro
+          | exact hQ _
+          | (intro cs hcs; obtain ⟨l, _, rfl⟩ := List.mem_map.mp hcs; exact hQ _)
+        · exact blocks_inlines Q hQ fuel _ b hb
+
+attribute [local simp] textOf_elem linkTexts_elem
+
+theorem inline_links_visible (c : Markdown.Inline) (h : LinkVisible c) :
+    ∀ t ∈ linkTexts (inlineView c), ∃ x ∈ t, x.isWhitespace = false := by
+  cases c with
+  | text s => simp [inlineView]
+  | code s => simp [inlineView]
+  | strong cs => obtain ⟨s, rfl⟩ := h; simp [inlineView]
+  | em cs => obtain ⟨s, rfl⟩ := h; simp [inlineView]
+  | link u cs =>
+    rcases h with ⟨rfl, h⟩ | ⟨s, rfl, h⟩ <;> simpa [inlineView] using h
+
+theorem inlines_links_visible (cs : List Markdown.Inline) (h : ∀ c ∈ cs, LinkVisible c) :
+    ∀ t ∈ (cs.map inlineView).flatMap linkTexts, ∃ x ∈ t, x.isWhitespace = false := by
+  intro t ht
+  obtain ⟨_, hc, ht⟩ := List.mem_flatMap.mp ht
+  obtain ⟨c, hc, rfl⟩ := List.mem_map.mp hc
+  exact inline_links_visible c (h c hc) t ht
+
+theorem article_links_visible : Spec.article_links_visible := by
+  intro body b hb
+  have hb := blocks_inlines (fun cs => ∀ c ∈ cs, LinkVisible c) inlines_visible _ _ b hb
+  cases b with
+  | para cs => simpa [blockView] using inlines_links_visible cs hb
+  | quote cs => simpa [blockView] using inlines_links_visible cs hb
+  | heading n cs =>
+    have : min 6 (n + 1) = 1 ∨ min 6 (n + 1) = 2 ∨ min 6 (n + 1) = 3 ∨ min 6 (n + 1) = 4 ∨ min 6 (n + 1) = 5 ∨
+      min 6 (n + 1) = 6 := by omega
+    rcases this with h | h | h | h | h | h <;> simp only [blockView, h] <;>
+      simpa using inlines_links_visible cs hb
+  | list ordered items =>
+    cases ordered <;> simp only [blockView] <;> simp <;> intro t cs hcs ht <;>
+      simpa using inlines_links_visible cs (hb cs hcs) t (by simpa using ht)
+  | code s => simp [blockView]
+  | rule => simp [blockView]
 
 end Conduit.Proofs
