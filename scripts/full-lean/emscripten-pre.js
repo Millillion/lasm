@@ -4,10 +4,39 @@
 if (ENVIRONMENT_IS_NODE) {
   var LasmHostWorker = globalThis.Worker;
   var lasmWorkerHost = process.env.LASM_FULL_HOST_MODULE;
-  var lasmVmStackMb = Number(process.env.LASM_VM_STACK_MB ?? 64);
+  // Each Lean thread's engine stack bounds non-tail recursion: a small Lean
+  // function's Wasm frame takes about 100 bytes of it, more than the same
+  // function natively (issue #66, docs/DECISIONS.md). The default, 1 GiB, about
+  // matches native Lean's depth. It is address space: memory is used only as deep
+  // as the recursion goes. Hosts with little memory get less (a quarter of the
+  // machine's or the container's memory), so a runaway recursion fails before it
+  // exhausts the host. Windows commits a thread's whole stack when it is created,
+  // so there the budget is shared by the threads Lean may start. 64 MiB (the
+  // previous default) is the floor. LASM_VM_STACK_MB overrides it.
+  var lasmDefaultVmStackMb = function() {
+    var os = require('node:os');
+    var memoryMb = os.totalmem() / 1048576;
+    var constrained = typeof process.constrainedMemory === 'function' ? process.constrainedMemory() / 1048576 : 0;
+    if (constrained > 0 && constrained < memoryMb) memoryMb = constrained;
+    var budget = process.platform === 'win32'
+      ? Math.min(256, memoryMb / (2 * (os.availableParallelism() + 5))) : Math.min(1024, memoryMb / 4);
+    return Math.max(64, Math.floor(budget));
+  };
+  var lasmVmStackExplicit = process.env.LASM_VM_STACK_MB !== undefined && process.env.LASM_VM_STACK_MB !== '';
+  var lasmVmStackMb = lasmVmStackExplicit ? Number(process.env.LASM_VM_STACK_MB) : lasmDefaultVmStackMb();
   if (!Number.isFinite(lasmVmStackMb) || lasmVmStackMb <= 0) throw new Error('Invalid LASM_VM_STACK_MB');
-  var lasmStackOverflow = function() {
-    require('node:fs').writeSync(2, '\nStack overflow detected. Aborting.\n');
+  // Native Lean's diagnostic and status (SIGABRT, 134), then what to do about it.
+  // Lean's runtime cannot continue after a thread's stack is exhausted (the
+  // thread is gone with its locks and references), so the process ends.
+  var lasmStackOverflow = function(kind) {
+    var advice = kind === 'linear'
+      ? 'Lasm: a Lean thread exhausted its 64 MiB C stack in WebAssembly linear memory.\n'
+        + 'Make the recursion tail recursive (an accumulator), or bound its depth.\n'
+      : 'Lasm: a Lean thread exhausted its ' + lasmVmStackMb + ' MiB WebAssembly stack (LASM_VM_STACK_MB'
+        + (lasmVmStackExplicit ? '' : ', default') + ').\n'
+        + 'Set LASM_VM_STACK_MB to a larger size in MiB, or make the recursion tail recursive (an accumulator).\n';
+    require('node:fs').writeSync(2, '\nStack overflow detected. Aborting.\n' + advice
+      + 'See https://github.com/Millillion/lasm/blob/main/FUNDAMENTAL_LIMITATIONS.md#recursion-depth\n');
     process.exit(134);
   };
   var lasmCheckWorkerFailure = function(event, args) {
@@ -16,7 +45,7 @@ if (ENVIRONMENT_IS_NODE) {
       : event === 'error' ? args[0] : undefined;
     if (failure?.name === 'RangeError'
         && /call stack|stack overflow/i.test(failure.message)
-        && /wasm-function|wasm:\/\//.test(failure.stack ?? '')) lasmStackOverflow();
+        && /wasm-function|wasm:\/\//.test(failure.stack ?? '')) lasmStackOverflow('engine');
   };
   // Workers accept only per-thread Node options in execArgv. Per-process V8 and
   // Node options (--max-old-space-size, --stack-size, --expose-gc, --jitless,
@@ -62,6 +91,12 @@ if (ENVIRONMENT_IS_NODE) {
     for (var attempt = 0; ; attempt++) {
       try { return new LasmWorker(filename, options); }
       catch (error) {
+        // A host that cannot reserve the default stack (little memory, strict
+        // overcommit, Windows commit limits) gets threads with a smaller one.
+        if (error?.code === 'ERR_WORKER_INIT_FAILED' && !lasmVmStackExplicit && lasmVmStackMb > 64 && attempt < 8) {
+          lasmVmStackMb = Math.max(64, Math.floor(lasmVmStackMb / 2));
+          continue;
+        }
         var listed = error?.code === 'ERR_WORKER_INVALID_EXEC_ARGV' && options.execArgv === undefined && attempt < 2
           && /invalid execArgv flags: (.+)$/.exec(String(error.message));
         if (!listed) throw error;
@@ -79,10 +114,10 @@ if (ENVIRONMENT_IS_NODE) {
   Module.onAbort = function(reason) {
     if (/^stack overflow/i.test(String(reason))) {
       if (ENVIRONMENT_IS_PTHREAD) {
-        require('node:worker_threads').parentPort.postMessage({ cmd: 9, handler: 'lasmFatalStackOverflow', args: [] });
+        require('node:worker_threads').parentPort.postMessage({ cmd: 9, handler: 'lasmFatalStackOverflow', args: ['linear'] });
         throw 'unwind';
       }
-      lasmStackOverflow();
+      lasmStackOverflow('linear');
     }
     lasmPreviousOnAbort?.(reason);
   };
