@@ -268,3 +268,150 @@ test('Lasm.JS operations go to the edge bridge; its handles are released through
   assert.equal(h.js.snapshot().values, 0);
   assert.deepEqual(failure(req(201, 0, 0, new Uint8Array([0, 0, 0, 0, ...text('nope')]))).kind, 18, 'a Lean user error');
 });
+
+test('default sinks are the console; flushing a stream that does not exist is harmless', () => {
+  const logged = [], errors = [];
+  const { log, error } = console;
+  console.log = line => logged.push(line); console.error = line => errors.push(line);
+  try {
+    const h = createEdgeRuntimeHost();
+    ok(h.request(3, 1, 0n, text('out\npartial')));
+    ok(h.request(3, 2, 0n, text('err\n')));
+    h.flush();
+  } finally { console.log = log; console.error = error; }
+  assert.deepEqual([logged, errors], [['out', 'partial'], ['err']]);
+  const { req } = host();
+  assert.equal(ok(req(4, 7)).length, 0);
+});
+
+test('resources: increasing handles, checked types, released without a close method', () => {
+  const { h, req } = host({ files: { '/a': '\nline', '/b': 'bytes' } });
+  const id = r => Number(u64s(ok(r))[0]);
+  const a = id(req(1, 0, 0, text('/a'))), b = id(req(1, 0, 0, text('/b')));
+  assert.ok(b > a && a >= 10, `${a} ${b}`);
+  // A line that is only its newline.
+  assert.equal(dec.decode(ok(req(7, a))), '\n');
+  assert.equal(dec.decode(ok(req(7, a))), 'line');
+  // Bytes returned are copies: changing them does not change the file.
+  const chunk = ok(req(2, b, 2)); chunk[0] = 0;
+  const line = ok(req(7, b)); line[0] = 0;
+  ok(req(5, b));
+  assert.equal(dec.decode(ok(req(2, b, 10))), 'bytes');
+  // A timer is not a file, a file is not a timer.
+  const t = id(req(70, 0, 1000));
+  for (const op of [2, 5, 7]) assert.equal(failure(req(op, t, 1)).message, 'Invalid or closed resource', `op ${op}`);
+  for (const op of [71, 72, 73, 74, 75]) assert.equal(failure(req(op, a)).message, 'Invalid or closed resource', `op ${op}`);
+  h.release(t);
+  // Files have no close method; release still drops them.
+  h.release(a);
+  assert.equal(failure(req(2, a, 1)).message, 'Invalid or closed resource');
+  // The root listing has no empty name; ops 14-21 say why they fail.
+  assert.deepEqual(dec.decode(ok(req(13, 0, 0, text('/')))).split('\0').filter(Boolean).sort(), ['a', 'b']);
+  assert.equal(dec.decode(ok(req(13, 0, 0, text('/')))), 'a\0b\0');
+  assert.equal(failure(req(14, 0, 0, text('/x'))).message, 'read-only file system (Lasm edge file system) (error code: 30, the edge file system is read-only)');
+  // Lasm.JS owns ops 200-219 only.
+  assert.match(failure(req(219, 0, 0, new Uint8Array(4))).message, /^\w*Error: Unsupported Lasm\.JS operation 219 on the edge$/);
+  assert.equal(failure(req(220)).message, 'This runtime operation is not available in the Lasm edge profile (host operation 220)');
+});
+
+test('random bytes after initialization: every byte of a large request; the fallback is random too', () => {
+  const { h, req } = host();
+  h.initialized();
+  const bytes = ok(req(28, 0, 200_000));
+  assert.equal(bytes.length, 200_000);
+  assert.ok(bytes.subarray(199_000).some(b => b !== 0), 'the last chunk is filled');
+  assert.equal(ok(req(28, 0, 70_000)).length, 70_000);
+  const original = crypto.getRandomValues;
+  crypto.getRandomValues = () => { throw new Error('forbidden'); };
+  try {
+    const fallback = host().req(28, 0, 64);
+    assert.ok(ok(fallback).some(b => b !== 0));
+  } finally { crypto.getRandomValues = original; }
+});
+
+test('exit flushes both streams before it calls exit', () => {
+  const codes = [];
+  const { req, out, err } = host({ exit: code => codes.push([code, out.length, err.length]) });
+  ok(req(3, 1, 0, text('o')));
+  ok(req(3, 2, 0, text('e')));
+  failure(req(30, 0, 4));
+  assert.deepEqual([codes, out, err], [[[4, 1, 1]], ['o'], ['e']]);
+});
+
+test('timers: generations, cancels and resets in every phase', async () => {
+  const { h, req } = host();
+  const id = r => Number(u64s(ok(r))[0]);
+  const generation = r => Number(u64s(ok(r))[0]);
+  // A cancelled timer that nobody waited for rejects nothing unhandled.
+  const unhandled = [];
+  const onUnhandled = reason => unhandled.push(reason);
+  process.on('unhandledRejection', onUnhandled);
+  try {
+    const quiet = id(req(70, 0, 1000));
+    req(71, quiet);
+    assert.deepEqual(u64s(ok(req(75, quiet))), [1n]);
+    h.release(quiet);
+    await tick(10);
+  } finally { process.off('unhandledRejection', onUnhandled); }
+  assert.deepEqual(unhandled, []);
+  // A one-shot that fired is finished: starting or cancelling it does nothing.
+  const once = id(req(70, 0, 5));
+  assert.equal(generation(req(71, once)), 1);
+  await req(72, once);
+  assert.equal(generation(req(71, once)), 1);
+  assert.deepEqual(u64s(ok(req(75, once))), [0n]);
+  // A one-shot cancelled before it fires can start again, later too.
+  const later = id(req(70, 0, 10));
+  req(71, later);
+  ok(req(75, later));
+  await tick(30);
+  assert.equal(generation(req(71, later)), 3);
+  ok(req(74, later));
+  // Resetting a timer that never started does not start it.
+  const idle = id(req(70, 0, 5));
+  ok(req(73, idle));
+  await tick(20);
+  assert.equal(generation(req(71, idle)), 1);
+  ok(req(74, idle));
+  // A delay beyond setTimeout's range waits (it is clamped, not wrapped to 1 ms).
+  const far = id(req(70, 0, 2 ** 40));
+  req(71, far);
+  let fired = false;
+  req(72, far).then(() => { fired = true; });
+  await tick(20);
+  assert.equal(fired, false);
+  ok(req(74, far));
+  // A repeating timer: a pending wait is kept by a second start; cancelling twice cancels once.
+  const rep = id(req(70, 1, 200));
+  assert.equal(generation(req(71, rep)), 1);
+  await req(72, rep);
+  assert.equal(generation(req(71, rep)), 2);
+  assert.equal(generation(req(71, rep)), 2, 'the wait is pending: no fresh one');
+  assert.deepEqual(u64s(ok(req(75, rep))), [1n]);
+  assert.deepEqual(u64s(ok(req(75, rep))), [0n], 'nothing left to cancel');
+  // Cancelling keeps a repeating timer's schedule: the next wait ends at the next interval, not at once.
+  const started = performance.now();
+  assert.equal(generation(req(71, rep)), 4);
+  await req(72, rep);
+  assert.ok(performance.now() - started >= 100, `${performance.now() - started} ms`);
+  // Closed: finished, never fresh again.
+  assert.deepEqual(u64s(ok(req(74, rep))), [1n]);
+  assert.equal(generation(req(71, rep)), 5);
+  assert.equal(generation(req(71, rep)), 5);
+  // A repeating timer with no interval fires once and finishes.
+  const zero = id(req(70, 1, 0));
+  req(71, zero);
+  await req(72, zero);
+  await tick(10);
+  assert.deepEqual(u64s(ok(req(75, zero))), [0n]);
+  h.release(zero);
+});
+
+test('pending counts queued completions and Lasm.JS events', async () => {
+  const { h, req } = host();
+  assert.equal(h.pending(), 0);
+  // Op 207 settles a Lasm.JS promise: one event.
+  ok(req(207, 0, 5, new Uint8Array([0, 0, 0, 0, 0])));
+  await tick(5);
+  assert.equal(h.pending(), 1);
+});

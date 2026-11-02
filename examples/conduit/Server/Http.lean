@@ -8,6 +8,7 @@ entry file gives (Web Crypto in `Server/App.lean`; pure Lean in
 import Lasm.Fetch
 import Lasm.Fetch.Assets
 import Std.Async.Basic
+import Std.Sync.Semaphore
 import Conduit.Api
 import Server.Pages
 open Lean Std.Async
@@ -45,9 +46,63 @@ def site (store : Store Async) (services : Services Async) (req : Lasm.Fetch.Req
     if req.method == "GET" || req.method == "HEAD" then pageResponse store services req
     else return .notFound
 
+/-! ## Isolation between requests -/
+
+/-- Isolation between the requests of one process: a request that may write
+(every API request but `GET`, `HEAD` and `OPTIONS`) runs alone, and reads
+(the other API requests and the pages) run together but never beside a
+write, so no request sees another one half done (a request writes in several
+statements). Fair: a waiting write holds back reads that arrive after it. -/
+structure Isolation where
+  /-- Taken by a waiting write; reads pass through it. -/
+  turnstile : Std.Semaphore
+  /-- Held by a write, or by the reads while any is running. -/
+  room : Std.Semaphore
+  /-- Guards `readers`. -/
+  guard : Std.Semaphore
+  readers : IO.Ref Nat
+
+def Isolation.new : IO Isolation :=
+  return { turnstile := ← Std.Semaphore.new 1, room := ← Std.Semaphore.new 1, guard := ← Std.Semaphore.new 1,
+           readers := ← IO.mkRef 0 }
+
+def take (s : Std.Semaphore) : Async Unit := do
+  let _ ← await (← s.acquire).result?
+
+/-- Runs a read: beside other reads, never beside a write. -/
+def Isolation.read {α : Type} (iso : Isolation) (act : Async α) : Async α := do
+  take iso.turnstile
+  iso.turnstile.release
+  take iso.guard
+  if (← iso.readers.modifyGet fun n => (n + 1, n + 1)) == 1 then take iso.room
+  iso.guard.release
+  try act finally
+    take iso.guard
+    if (← iso.readers.modifyGet fun n => (n - 1, n - 1)) == 0 then iso.room.release
+    iso.guard.release
+
+/-- Runs a write alone. -/
+def Isolation.write {α : Type} (iso : Isolation) (act : Async α) : Async α := do
+  take iso.turnstile
+  take iso.room
+  iso.turnstile.release
+  try act finally iso.room.release
+
+/-- Whether a request may write. -/
+def mayWrite (req : Lasm.Fetch.Request) : Bool :=
+  !(req.method == "GET" || req.method == "HEAD" || req.method == "OPTIONS")
+
 /-- Serves Conduit on a store with services, and the browser app's files
-(`assets`: `embed_dir! "dist/public"` in the entry file). -/
-def serveWith (store : Store Async) (services : Services Async) (assets : Lasm.Fetch.Assets) : IO Unit :=
-  Lasm.Fetch.serve (assets.wrap (site store services))
+(`assets`: `embed_dir! "dist/public"` in the entry file). `isolate`: run
+writes alone in this process (`Isolation`); off where one request may not
+wait on another's promise (Cloudflare Workers cancels it) or where every
+request has its own instance. -/
+def serveWith (store : Store Async) (services : Services Async) (assets : Lasm.Fetch.Assets)
+    (isolate := false) : IO Unit := do
+  let iso ← if isolate then some <$> Isolation.new else pure none
+  Lasm.Fetch.serve (assets.wrap fun req =>
+    match iso with
+    | none => site store services req
+    | some iso => if mayWrite req then iso.write (site store services req) else iso.read (site store services req))
 
 end Conduit.Server

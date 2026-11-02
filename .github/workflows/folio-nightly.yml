@@ -1,0 +1,90 @@
+name: Folio nightly
+# Long campaigns for examples/folio (the nightly tier of TESTING_STRATEGY.md),
+# on the renderer as Lasm builds it for Node (dist/batch):
+# - differential: random documents against commonmark.js 0.31.2, twenty
+#   seeds (each printed; replay with --seed), larger documents than on PRs;
+#   disagreements are shrunk and uploaded;
+# - fuzz: the crash and timeout fuzzer (test/fuzz.mjs) for 40 minutes:
+#   huge repetitions of syntax, deep nesting, random characters; every
+#   document must render within a time budget linear in its length, and the
+#   safe output must pass the strict tokenizer; failing documents uploaded;
+# - pathological: cmark 0.31.1's pathological inputs (test/pathological.mjs).
+# Runs when main changed in the last day, or on demand. Not a release gate.
+on:
+  schedule:
+    - cron: '23 4 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: folio-nightly
+  cancel-in-progress: false
+env:
+  CI: '1'
+  BROWSER: 'none'
+jobs:
+  changed:
+    runs-on: ubuntu-24.04
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 50
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -n "$(git log --since='26 hours ago' --format=%H -- examples/folio | head -1)" ]; then
+            echo run=true >> "$GITHUB_OUTPUT"
+          else
+            echo run=false >> "$GITHUB_OUTPUT"
+          fi
+  campaign:
+    needs: changed
+    if: needs.changed.outputs.run == 'true'
+    name: ${{ matrix.campaign }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        campaign: [differential, fuzz, pathological]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: examples/folio
+        run: npm ci --no-audit --no-fund
+      - name: npm run build:batch
+        working-directory: examples/folio
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:batch
+      - name: The campaign
+        working-directory: examples/folio
+        env:
+          CAMPAIGN: ${{ matrix.campaign }}
+        run: |
+          case "$CAMPAIGN" in
+            differential)
+              status=0
+              for i in $(seq 1 20); do node test/differential.mjs --docs 10000 --max-tokens 200 || status=1; done
+              exit $status ;;
+            fuzz) node test/fuzz.mjs --minutes 40 ;;
+            pathological) node test/pathological.mjs ;;
+          esac
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: folio-nightly-${{ matrix.campaign }}
+          path: examples/folio/test-results/
+          retention-days: 30
+          if-no-files-found: ignore

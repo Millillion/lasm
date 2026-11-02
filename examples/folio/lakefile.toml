@@ -1,0 +1,32 @@
+name = "folio"
+version = "0.1.0"
+defaultTargets = ["Folio", "Proofs"]
+
+# The pure core: the CommonMark renderer (Markdown to an HTML tree to text)
+# and the site generator (front matter, templates, the index, the feed).
+# `lake build` checks it with plain Lean 4.35.0: no Lasm, no JavaScript.
+[[lean_lib]]
+name = "Folio"
+
+# The theorems about Folio (PROOFS.md); those about the live preview need
+# Lasm's library (Lasm.UI), which `npm run proofs` provides.
+[[lean_lib]]
+name = "Proofs"
+
+# Renders many Markdown documents in one run, for the CommonMark test suite
+# and the differential tests (test/spec.mjs). `lake build folio-batch`
+# builds it natively; `npm run build:batch` builds it with Lasm.
+[[lean_exe]]
+name = "folio-batch"
+root = "Batch"
+
+# The `folio` command (Cli.lean), natively: `lake build folio`. The programs
+# users run are Lasm's builds: `npm run build` (Node) and `npm run build:wasi`.
+[[lean_exe]]
+name = "folio"
+root = "Cli"
+
+# The live preview's page (Lasm.UI): its model, update and view. Needs
+# Lasm's library (Lasm.UI), which `npm run proofs` provides.
+[[lean_lib]]
+name = "Preview"
