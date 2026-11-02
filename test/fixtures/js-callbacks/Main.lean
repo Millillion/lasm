@@ -17,7 +17,12 @@ def main : IO Unit := do
     return .undefined
   let g ← global
   let _ : Value ← g.callMethod "setTimeout" #[toJS f, toJS (10 : Nat)]
-  IO.sleep 400
+  -- Wait for the callback (up to 10 s) instead of a fixed time: a slow runner
+  -- delivers it late, and every run's output must equal the first run's.
+  let mut waited := 0
+  while !(← hit.get) && waited < 10000 do
+    IO.sleep 10
+    waited := waited + 10
   IO.println s!"callback ran: {← hit.get}"
   -- 2. An IO-mode await of a promise (kind-1 event).
   let timers ← require "node:timers/promises"

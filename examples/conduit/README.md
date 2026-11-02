@@ -147,8 +147,7 @@ Server/               the server (Lasm.Fetch; Lasm.JS where there is JavaScript)
 ServerNode.lean       main for Node, Deno and the Node function platforms (node:sqlite) ┐ open the
 ServerWorkers.lean    main for Workers (D1)                                             │ store, embed
 ServerBun.lean        main for Bun (bun:sqlite)                                         │ dist/public,
-ServerEdge.lean       main for Deno Deploy (Lasm.KV: Deno KV)                           │ serve
-ServerVercelEdge.lean main for Vercel Edge (memory; the app's files uncompressed)       │
+ServerEdge.lean       main for Deno Deploy and Vercel Edge (Lasm.KV: Deno KV, memory)   │ serve
 ServerNetlifyEdge.lean  main for Netlify Edge (Netlify Blobs)                           │
 ServerSupabase.lean   main for Supabase Edge Functions (Postgres)                       │
 ServerFastly.lean     main for Fastly Compute (Fastly KV; Lean crypto)                  │
@@ -225,8 +224,8 @@ Conduit's `Store` from it, so another SQLite is another `Sql`:
 
 Where there is no SQL, the store is `Server/Kv.lean` on a `Lasm.KV.Store` (get, put, delete):
 
-- `Lasm.KV.open "conduit"` is Deno KV on Deno Deploy and the KV Store `conduit` on Fastly;
-  Vercel Edge uses `Lasm.KV.memory`: no binding at all.
+- `Lasm.KV.open "conduit"` is Deno KV on Deno Deploy, the KV Store `conduit` on Fastly, and
+  memory elsewhere (Vercel Edge): no binding at all.
 - `Server/NetlifyBlobs.lean` binds `@[js "@netlify/blobs" "getStore"]` and calls `get`, `set`
   and `delete` on the store.
 - `Server/Postgrest.lean` is plain HTTP (`Lasm.Fetch.fetch`) to PostgREST, so it also works where

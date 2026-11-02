@@ -1,5 +1,6 @@
-/- Conduit on Deno Deploy, on Deno KV (`Lasm.KV`): `npm run build:deno-deploy`; locally
-`deno run -A --unstable-kv deno/main.mjs` (elsewhere `Lasm.KV.open` falls back to memory).
+/- Conduit on Deno Deploy and Vercel Edge, on `Lasm.KV.open`: Deno KV on Deno Deploy
+(`npm run build:deno-deploy`; locally `deno run -A --unstable-kv deno/main.mjs`), memory on Vercel
+Edge (`npm run build:vercel-edge`; Vercel Edge has no store of its own: one copy per isolate).
 JWT_SECRET as everywhere. -/
 import Server.App
 import Lasm.Fetch.Embed

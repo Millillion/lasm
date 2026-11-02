@@ -1,3 +1,5 @@
+> **Historical.** The current plan is [ROADMAP.md](ROADMAP.md) (agreed 2026-11-01). This file is kept as a record.
+
 # Next steps
 
 ## Current application product plan — 2026-09-23
