@@ -14,7 +14,8 @@ name: Folio
 #   pass with raw HTML enabled; with the safe defaults every difference must
 #   be raw HTML or an unsafe URL), then the differential test against
 #   commonmark.js 0.31.2, five random seeds of 5000 documents, each seed
-#   printed.
+#   printed; then cmark's pathological inputs and three minutes of the crash
+#   and timeout fuzzer (folio-nightly.yml runs the long campaigns).
 # - cli: `folio build` and `folio render` (the Node build, dist/cli) on Node
 #   24 and 26: the example site (site/) is built and checked (the expected
 #   files, the draft nowhere, no HTML from the untrusted page, every index
@@ -109,6 +110,12 @@ jobs:
         working-directory: examples/folio
         run: |
           for i in 1 2 3 4 5; do node test/differential.mjs --docs 5000 --max-tokens 60; done
+      - name: CommonMark's pathological inputs (cmark 0.31.1's list)
+        working-directory: examples/folio
+        run: node test/pathological.mjs
+      - name: The crash and timeout fuzzer, three minutes (the seed is printed first)
+        working-directory: examples/folio
+        run: node test/fuzz.mjs --minutes 3
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:

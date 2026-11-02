@@ -20,7 +20,8 @@ open Scan
 abbrev RefMap := Std.HashMap String LinkRef
 
 /-- A token: a finished inline, or a run of `*` or `_` with what it opens
-and closes (`true` for strong emphasis), in the order they were matched. -/
+and closes (`true` for strong emphasis), each list most recent match
+first. -/
 inductive Tok where
   | node (i : Inline)
   | run (c : Char) (n : Nat) (opens closes : List Bool)
@@ -42,7 +43,8 @@ structure Bracket where
   prevDelim : Option Nat
   index : Nat
   image : Bool
-  active : Bool := true
+  /-- Its position in the bracket stack (0 at the bottom). -/
+  depth : Nat
   bracketAfter : Bool := false
 
 structure St where
@@ -50,7 +52,22 @@ structure St where
   delims : Array Delim := #[]
   top : Option Nat := none
   brackets : List Bracket := []
+  /-- Link brackets below this depth are inactive (a link was made after
+  them; CommonMark's "set all [ delimiters before the opener to inactive",
+  in constant time). -/
+  linkFloor : Nat := 0
   pos : Nat := 0
+
+/-- The first index of a sorted array whose element is at least `x`. -/
+def bsearchFirst (arr : Array Nat) (x : Nat) : Nat := go 0 arr.size
+where
+  go (lo hi : Nat) : Nat :=
+    if _h : lo < hi then
+      let mid := (lo + hi) / 2
+      if arr[mid]! < x then go (mid + 1) hi else go lo mid
+    else lo
+  termination_by hi - lo
+  decreasing_by all_goals omega
 
 /-- Turns tokens into inlines: each run closes, shows its remaining
 characters, then opens (outermost first). -/
@@ -62,14 +79,14 @@ def build (toks : Array Tok) : List Inline := Id.run do
     match t with
     | .node i => frames := frames.modify (frames.size - 1) fun (s, cs) => (s, cs.push i)
     | .run c n opens closes =>
-      for _ in closes do
+      for _ in closes.reverse do
         if frames.size > 1 then
           let (s, cs) := frames.back!
           frames := frames.pop
           frames := frames.modify (frames.size - 1) fun (s', cs') => (s', cs'.push (wrap s cs))
       if n > 0 then
         frames := frames.modify (frames.size - 1) fun (s, cs) => (s, cs.push (.text (String.ofList (List.replicate n c))))
-      for st in opens.reverse do frames := frames.push (st, #[])
+      for st in opens do frames := frames.push (st, #[])
   for _ in [0:frames.size] do
     if frames.size > 1 then
       let (s, cs) := frames.back!
@@ -102,10 +119,10 @@ def useDelims (s : St) (opener closer use : Nat) : St := Id.run do
   let c := s.getD closer
   let strong := use == 2
   let toks := s.toks.modify o.tok fun
-    | .run ch n opens closes => .run ch (n - use) (opens ++ [strong]) closes
+    | .run ch n opens closes => .run ch (n - use) (strong :: opens) closes
     | t => t
   let toks := toks.modify c.tok fun
-    | .run ch n opens closes => .run ch (n - use) opens (closes ++ [strong])
+    | .run ch n opens closes => .run ch (n - use) opens (strong :: closes)
     | t => t
   return { s with toks }
 
@@ -113,8 +130,9 @@ def useDelims (s : St) (opener closer use : Nat) : St := Id.run do
 def processEmphasis (s : St) (bottom : Option Nat) (bound : Nat) : St := Id.run do
   let mut s := s
   let mut openersBottom : Array (Option Nat) := Array.replicate 14 bottom
-  -- the first delimiter above the bottom
-  let mut closer := s.top
+  -- the first delimiter above the bottom (none when the bottom is the top:
+  -- commonmark.js then walks the whole stack to find nothing)
+  let mut closer := if s.top == bottom then none else s.top
   for _ in [0:s.delims.size] do
     match closer with
     | some c => if (s.getD c).prev != bottom then closer := (s.getD c).prev else break
@@ -132,7 +150,13 @@ def processEmphasis (s : St) (bottom : Option Nat) (bound : Nat) : St := Id.run 
         match opener with
         | none => break
         | some oi =>
-          if opener == bottom || opener == openersBottom[idx]! then break
+          -- delimiters are numbered in text order, so "at or below a bottom"
+          -- is a comparison (commonmark.js compares for identity, and walks
+          -- past a bottom that has since been removed: issue #389)
+          let below (b : Option Nat) : Bool := match b with
+            | some bi => oi ≤ bi
+            | none => false
+          if below bottom || below openersBottom[idx]! then break
           let od := s.getD oi
           let oddMatch := (cd.canOpen || od.canClose) && cd.orig % 3 != 0 && (od.orig + cd.orig) % 3 == 0
           if od.cc == cd.cc && od.canOpen && !oddMatch then
@@ -203,56 +227,177 @@ def isMainChar (c : Char) : Bool :=
   !(c == '\n' || c == '`' || c == '[' || c == ']' || c == '\\' || c == '!' || c == '<' || c == '&' ||
     c == '*' || c == '_' || c == '\'' || c == '"')
 
+/-! ## Facts about the text, computed once
+
+They keep the parser linear on the CommonMark pathological inputs: without
+them, each backtick run, each `<!--`, and each `](` could scan to the end of
+the text again (commonmark.js does, and takes minutes on some of them). -/
+
+structure Pre where
+  /-- For each length, where the maximal runs of backticks of that length start, in order. -/
+  ticks : Std.HashMap Nat (Array Nat) := {}
+  /-- One past the last start of `-->`, `?>`, `]]>` and `>` (0: none). -/
+  lastComment : Nat := 0
+  lastPi : Nat := 0
+  lastCdata : Nat := 0
+  lastGt : Nat := 0
+  /-- For link destinations: the first ASCII whitespace at or after each
+  position, and the first position after it where the parenthesis balance
+  falls below the balance there (escaped parentheses do not count). -/
+  stop : Array Nat := #[]
+  less : Array Nat := #[]
+  /-- The balance of unescaped parentheses before each position. -/
+  bal : Array Int := #[]
+
+/-- The last position where `pat` starts, plus one (0: nowhere). -/
+def lastStart (a : Array Char) (pat : List Char) : Nat := Id.run do
+  let mut last := 0
+  for i in [0:a.size] do
+    if hasAt a i pat then last := i + 1
+  return last
+
+def Pre.of (a : Array Char) : Pre := Id.run do
+  let n := a.size
+  -- backtick runs
+  let mut ticks : Std.HashMap Nat (Array Nat) := {}
+  let mut i := 0
+  for _ in [0:n] do
+    if i ≥ n then break
+    if a[i]! == '`' then
+      let r := countWhile a i n (· == '`')
+      ticks := ticks.insert r ((ticks.getD r #[]).push i)
+      i := i + r
+    else i := i + 1
+  -- escapes (left to right, as a scan starting after a non-backslash sees
+  -- them), then the balance before each position
+  let mut bal : Array Int := Array.mkEmpty (n + 1)
+  let mut b : Int := 0
+  let mut j := 0
+  let mut escaped := Array.replicate n false
+  for _ in [0:n] do
+    if j ≥ n then break
+    if a[j]! == '\\' && (a[j + 1]?.map isEscapable).getD false then
+      escaped := escaped.set! (j + 1) true
+      j := j + 2
+    else j := j + 1
+  for k in [0:n] do
+    bal := bal.push b
+    if !escaped[k]! then
+      if a[k]! == '(' then b := b + 1
+      else if a[k]! == ')' then b := b - 1
+  bal := bal.push b
+  -- the first position after each where the balance is lower (n + 1: none)
+  let mut less := Array.replicate (n + 1) (n + 1)
+  let mut stack : Array Nat := #[]
+  for t in [0:n + 1] do
+    let k := n - t
+    for _ in [0:stack.size] do
+      match stack.back? with
+      | some top => if bal[top]! ≥ bal[k]! then stack := stack.pop else break
+      | none => break
+    less := less.set! k (stack.back?.getD (n + 1))
+    stack := stack.push k
+  -- the next ASCII whitespace
+  let mut stop := Array.replicate (n + 1) n
+  for t in [0:n] do
+    let k := n - 1 - t
+    stop := stop.set! k (if isAsciiSpace a[k]! then k else stop[k + 1]!)
+  return { ticks, stop, less, bal, lastComment := lastStart a "-->".toList, lastPi := lastStart a "?>".toList,
+           lastCdata := lastStart a "]]>".toList, lastGt := lastStart a ">".toList }
+
+/-- `destPlain` in constant time: the destination ends at the first ASCII
+whitespace, or at the first unescaped `)` that would close a parenthesis
+opened before it; it fails if parentheses are left open, or if it is empty
+and not followed by `)`. Requires that `a[i - 1]` is not a backslash. -/
+def Pre.destPlain (pre : Pre) (a : Array Char) (i : Nat) : Option Nat :=
+  let n := a.size
+  let s := pre.stop[i]!
+  let j := pre.less[i]!
+  if j ≤ n && j - 1 < s then some (j - 1)
+  else if s == i then none
+  else if pre.bal[s]! != pre.bal[i]! then none
+  else some s
+
+/-- A link destination at `i`, with the facts about the text. -/
+def linkDestPre (pre : Pre) (a : Array Char) (i : Nat) : Option (String × Nat) :=
+  match destBraces a i with
+  | some e => some (normalizeURI (unescape (slice a (i + 1) (e - 1))), e)
+  | none =>
+    if a[i]? == some '<' then none
+    else (pre.destPlain a i).map fun e => (normalizeURI (unescape (slice a i e)), e)
+
+/-- Raw HTML at `i`, with the facts about the text: a comment, processing
+instruction, CDATA section or declaration is only looked for when its end
+occurs later in the text. -/
+def htmlTagPre (pre : Pre) (a : Array Char) (i : Nat) : Option Nat :=
+  (openTag a i).orElse fun _ => (closeTag a i).orElse fun _ =>
+    (if pre.lastComment > i then comment a i
+     else if hasAt a i "<!--".toList && (a[i + 4]? == some '>' || hasAt a (i + 4) "->".toList) then comment a i
+     else none).orElse fun _ =>
+    (if pre.lastPi > i then processing a i else none).orElse fun _ =>
+    (if pre.lastGt > i then declaration a i else none).orElse fun _ =>
+    (if pre.lastCdata > i then cdata a i else none)
+
 def addBracket (s : St) (index : Nat) (image : Bool) : St :=
   let brackets := match s.brackets with
     | b :: rest => { b with bracketAfter := true } :: rest
     | [] => []
-  { s with brackets := { tok := s.toks.size - 1, prevDelim := s.top, index, image } :: brackets }
+  let depth := (s.brackets.head?.map (·.depth + 1)).getD 0
+  let b : Bracket := { tok := s.toks.size - 1, prevDelim := s.top, index := index, image := image, depth := depth }
+  { s with brackets := b :: brackets }
+
+/-- What follows a `]` whose opener is `op`: an inline link's destination,
+title and end, or a reference's (inlines.js `parseCloseBracket`). `startpos`
+is just after the `]`. -/
+def findLink (refs : RefMap) (pre : Pre) (a : Array Char) (op : Bracket) (startpos : Nat) :
+    Option (String × String × Nat) := Id.run do
+  -- an inline link: ( destination title? )
+  if a[startpos]? == some '(' then
+    let p := spnl a (startpos + 1)
+    if let some (dest, p) := linkDestPre pre a p then
+      let p := spnl a p
+      let (title, p) :=
+        if p > 0 && (a[p - 1]?.map isAsciiSpace).getD false then
+          match linkTitleAt a p with
+          | some (t, e) => (t, e)
+          | none => ("", p)
+        else ("", p)
+      let p := spnl a p
+      if a[p]? == some ')' then return some (dest, title, p + 1)
+  -- a reference link: full, collapsed or shortcut
+  let n := linkLabel a startpos
+  let label :=
+    if n > 2 then some (slice a startpos (startpos + n))
+    else if !op.bracketAfter then some (slice a op.index startpos)
+    else none
+  let endPos := if n == 0 then startpos else startpos + n
+  match label with
+  | some l =>
+    match refs.get? (normalizeLabel l) with
+    | some r => return some (r.dest, r.title, endPos)
+    | none => return none
+  | none => return none
 
 /-- A `]` (inlines.js `parseCloseBracket`). -/
-def closeBracket (refs : RefMap) (a : Array Char) (s : St) : St := Id.run do
-  let s := { s with pos := s.pos + 1 }
-  let startpos := s.pos
+def closeBracket (refs : RefMap) (pre : Pre) (a : Array Char) (s : St) : St :=
+  let startpos := s.pos + 1
   match s.brackets with
-  | [] => return s.text "]"
+  | [] => { s.text "]" with pos := startpos }
   | op :: rest =>
-    if !op.active then return { s.text "]" with brackets := rest }
-    let mut s := s
-    let mut found : Option (String × String) := none
-    -- an inline link: ( destination title? )
-    if a[s.pos]? == some '(' then
-      let p := spnl a (s.pos + 1)
-      if let some (dest, p) := linkDest a p then
-        let p := spnl a p
-        let (title, p) :=
-          if p > 0 && (a[p - 1]?.map isAsciiSpace).getD false then
-            match linkTitleAt a p with
-            | some (t, e) => (t, e)
-            | none => ("", p)
-          else ("", p)
-        let p := spnl a p
-        if a[p]? == some ')' then
-          found := some (dest, title)
-          s := { s with pos := p + 1 }
-    -- a reference link: full, collapsed or shortcut
-    if found.isNone then
-      let before := s.pos
-      let n := linkLabel a before
-      let label :=
-        if n > 2 then some (slice a before (before + n))
-        else if !op.bracketAfter then some (slice a op.index startpos)
-        else none
-      s := { s with pos := if n == 0 then startpos else before + n }
-      if let some l := label then
-        if let some r := refs.get? (normalizeLabel l) then found := some (r.dest, r.title)
-    match found with
-    | none => return { s.text "]" with brackets := rest, pos := startpos }
-    | some (dest, title) =>
-      s := s.processEmphasis op.prevDelim (2 * a.size + 2)
-      let children := build (s.toks.extract (op.tok + 1) s.toks.size)
-      let node := if op.image then Inline.image dest title children else .link dest title children
-      let rest := if op.image then rest else rest.map fun b => if b.image then b else { b with active := false }
-      return { s with toks := (s.toks.extract 0 op.tok).push (.node node), brackets := rest }
+    if !op.image && op.depth < s.linkFloor then
+      { s.text "]" with brackets := rest, linkFloor := min s.linkFloor op.depth, pos := startpos }
+    else
+      match findLink refs pre a op startpos with
+      | none => { s.text "]" with brackets := rest, pos := startpos, linkFloor := min s.linkFloor op.depth }
+      | some (dest, title, endPos) =>
+        let s := s.processEmphasis op.prevDelim (2 * a.size + 2)
+        let floor := if op.image then min s.linkFloor op.depth else op.depth
+        -- take the tokens out of `s` so that shrinking them does not copy them
+        let toks := s.toks
+        let s := { s with toks := #[], brackets := rest, linkFloor := floor, pos := endPos }
+        let children := build (toks.extract (op.tok + 1) toks.size)
+        let node := if op.image then Inline.image dest title children else .link dest title children
+        { s with toks := (toks.shrink op.tok).push (.node node) }
 
 /-- A line ending (inlines.js `parseNewline`): a hard break after two
 spaces, otherwise a soft break; spaces at the end of the line and at the
@@ -271,7 +416,7 @@ def newline (a : Array Char) (s : St) : St :=
   { s with pos := skip a s.pos (· == ' ') }
 
 /-- One inline element at `s.pos` (inlines.js `parseInline`). -/
-def step (refs : RefMap) (a : Array Char) (s : St) : St := Id.run do
+def step (refs : RefMap) (pre : Pre) (a : Array Char) (s : St) : St := Id.run do
   let some c := a[s.pos]? | return s
   match c with
   | '\n' => return newline a s
@@ -284,22 +429,19 @@ def step (refs : RefMap) (a : Array Char) (s : St) : St := Id.run do
   | '`' =>
     let n := countWhile a s.pos a.size (· == '`')
     let start := s.pos + n
-    let mut j := start
-    for _ in [0:a.size] do
-      match findChar a j '`' with
-      | none => break
-      | some e =>
-        let m := countWhile a (e - 1) a.size (· == '`')
-        if m == n then
-          let contents := (slice a start (e - 1)).map fun ch => if ch == '\n' then ' ' else ch
-          let cs := contents.toList
-          let contents :=
-            if cs.length > 0 && cs.any (· != ' ') && cs.head! == ' ' && cs.getLast! == ' ' then
-              String.ofList (cs.drop 1).dropLast
-            else contents
-          return { s.push (.code contents) with pos := e - 1 + m }
-        j := e - 1 + m
-    return { s.text (String.ofList (List.replicate n '`')) with pos := start }
+    -- the first run of exactly n backticks after the opening one
+    let runs := pre.ticks.getD n #[]
+    let k := (bsearchFirst runs start)
+    match runs[k]? with
+    | some e =>
+      let contents := (slice a start e).map fun ch => if ch == '\n' then ' ' else ch
+      let cs := contents.toList
+      let contents :=
+        if cs.length > 0 && cs.any (· != ' ') && cs.head! == ' ' && cs.getLast! == ' ' then
+          String.ofList (cs.drop 1).dropLast
+        else contents
+      return { s.push (.code contents) with pos := e + n }
+    | none => return { s.text (String.ofList (List.replicate n '`')) with pos := start }
   | '*' | '_' =>
     let (n, canOpen, canClose) := scanDelims a s.pos c
     let tok := s.toks.size
@@ -320,7 +462,7 @@ def step (refs : RefMap) (a : Array Char) (s : St) : St := Id.run do
       let s := { s.text "![" with pos := s.pos + 2 }
       return addBracket s (s.pos - 1) true
     return { s.text "!" with pos := s.pos + 1 }
-  | ']' => return closeBracket refs a s
+  | ']' => return closeBracket refs pre a s
   | '<' =>
     if let some e := emailAutolink a s.pos then
       let d := slice a (s.pos + 1) (e - 1)
@@ -328,7 +470,7 @@ def step (refs : RefMap) (a : Array Char) (s : St) : St := Id.run do
     if let some e := uriAutolink a s.pos then
       let d := slice a (s.pos + 1) (e - 1)
       return { s.push (.link (normalizeURI d) "" [.text d]) with pos := e }
-    if let some e := htmlTag a s.pos then
+    if let some e := htmlTagPre pre a s.pos then
       return { s.push (.html (slice a s.pos e)) with pos := e }
     return { s.text "<" with pos := s.pos + 1 }
   | '&' =>
@@ -343,23 +485,25 @@ def step (refs : RefMap) (a : Array Char) (s : St) : St := Id.run do
 /-- The inlines of a paragraph's or heading's text (already trimmed). -/
 def parse (refs : RefMap) (text : String) : List Inline := Id.run do
   let a := chars text
+  let pre := Pre.of a
   let mut s : St := {}
   for _ in [0:a.size + 1] do
     if s.pos ≥ a.size then break
-    s := step refs a s
+    s := step refs pre a s
   s := s.processEmphasis none (2 * a.size + 2)
   return build s.toks
 
 /-! ## Link reference definitions (inlines.js `parseReference`) -/
 
-/-- A link reference definition at the start of `a`: how many characters it
-takes, and its normalized label and reference. -/
-def reference (a : Array Char) : Option (Nat × String × LinkRef) := Id.run do
-  let n := linkLabel a 0
+/-- A link reference definition starting at `st` (the start of the
+paragraph's remaining text): where it ends, and its normalized label and
+reference. -/
+def reference (a : Array Char) (st : Nat) : Option (Nat × String × LinkRef) := Id.run do
+  let n := linkLabel a st
   if n == 0 then return none
-  let raw := slice a 0 n
-  if a[n]? != some ':' then return none
-  let p := spnl a (n + 1)
+  let raw := slice a st (st + n)
+  if a[st + n]? != some ':' then return none
+  let p := spnl a (st + n + 1)
   let some (dest, p) := linkDest a p | return none
   let beforeTitle := p
   let q := spnl a p

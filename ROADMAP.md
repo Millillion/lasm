@@ -79,7 +79,7 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [x] 1. Pure core: a CommonMark 0.31.2 renderer (a port of commonmark.js) and a site generator (front matter, layouts, the page index, an RSS feed); all 652 specification examples pass, a differential test against commonmark.js; 21 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean) (escaping: no Markdown can inject HTML unless raw HTML is enabled; totality; the output tree; slugs; index links), `proofs:paranoid`.
 - [x] 2. The `folio` command on Node (`folio build`, `folio render`) and on WASI (wasmtime, wasmer, `node:wasi`), each checked on an example site with a draft and a hostile page; every engine writes the same bytes as Node.
 - [x] 3. The live preview (`Lasm.UI`, the renderer running in the page), served on Node, Bun and Deno, with Playwright tests (hostile Markdown runs nothing) and `preview_safe` (22 propositions in all).
-- [ ] 4. Fuzzing: a nightly differential job against commonmark.js, and a crash and timeout fuzzer for pathological input (deep nesting, the CommonMark pathological tests).
+- [x] 4. Fuzzing: cmark's pathological inputs and a crash and timeout fuzzer on every PR, a nightly job (40 minutes of fuzzing, twenty differential seeds against commonmark.js). Found and fixed a stack overflow on WebAssembly and seven quadratic cases.
 
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.

@@ -20,7 +20,9 @@
     "build:bun": "npm run build:preview && bunx --bun lasm build PreviewServer.lean --target bun --output dist/server",
     "build:deno": "npm run build:preview && lasm build PreviewServer.lean --target deno --output dist/server",
     "start": "node dist/server/main.mjs",
-    "test:e2e": "playwright test -c test/playwright.config.mjs"
+    "test:e2e": "playwright test -c test/playwright.config.mjs",
+    "test:pathological": "node test/pathological.mjs",
+    "fuzz": "node test/fuzz.mjs"
   },
   "engines": {
     "node": ">=24"

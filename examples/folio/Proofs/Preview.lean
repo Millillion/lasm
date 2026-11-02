@@ -38,19 +38,28 @@ theorem uiAttrs_ok (as : List (Attr × String)) (h : ∀ p ∈ as, UrlAttrSafe p
   obtain ⟨p, hp, rfl⟩ := ha
   exact ⟨p.1, rfl, h p hp⟩
 
+theorem uiSafeList_append {Msg : Type} : ∀ (a b : List (Lasm.UI.Html Msg)), UiSafeList a → UiSafeList b → UiSafeList (a ++ b)
+  | [], _, _, hb => hb
+  | _ :: t, b, ⟨h1, h2⟩, hb => ⟨h1, uiSafeList_append t b h2 hb⟩
+
 mutual
 theorem toUI_safe : (h : Html) → h.SafeUrls → UiSafe (toUI h)
   | .text _, _ => trivial
   | .raw _, _ => trivial
-  | .elem t as cs, ⟨ha, hc⟩ => ⟨rfl, ⟨t, rfl⟩, uiAttrs_ok as ha, toUIList_safe cs hc⟩
+  | .elem t as cs, ⟨ha, hc⟩ => ⟨rfl, ⟨t, rfl⟩, uiAttrs_ok as ha, toUIList_safe #[] trivial cs hc⟩
   | .void t as, ha => ⟨rfl, ⟨t, rfl⟩, uiAttrs_ok as ha, trivial⟩
 
-theorem toUIList_safe : (hs : List Html) → Html.SafeUrlsList hs → UiSafeList (toUIList hs)
-  | [], _ => trivial
-  | h :: hs, ⟨h1, h2⟩ => ⟨toUI_safe h h1, toUIList_safe hs h2⟩
+theorem toUIList_safe (acc : Array (Lasm.UI.Html Msg)) (hacc : UiSafeList acc.toList) :
+    (hs : List Html) → Html.SafeUrlsList hs → UiSafeList (toUIList acc hs).toList
+  | [], _ => hacc
+  | h :: hs, ⟨h1, h2⟩ => by
+    simp only [toUIList]
+    refine toUIList_safe _ ?_ hs h2
+    rw [Array.toList_push]
+    exact uiSafeList_append _ _ hacc ⟨toUI_safe h h1, trivial⟩
 end
 
 theorem rendered_safe (m : Model) : UiSafeList (rendered m) :=
-  toUIList_safe _ ((tree_ok {} m.source).2.1 rfl)
+  toUIList_safe #[] trivial _ ((tree_ok {} m.source).2.1 rfl)
 
 end Folio.Proofs
