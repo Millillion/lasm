@@ -47,7 +47,7 @@
       "name": "notices",
       "description": "Licence and third-party notice generation",
       "mutate": ["src/notices.mjs"],
-      "tests": ["test/notices.test.mjs", "test/application-output.test.mjs", "test/managed-artifacts.test.mjs", "test/npm-dist-packages.test.mjs"],
+      "tests": ["test/notices.test.mjs", "test/notices-targets.test.mjs", "test/application-output.test.mjs", "test/managed-artifacts.test.mjs", "test/npm-dist-packages.test.mjs"],
       "target": 80
     }
   ]
