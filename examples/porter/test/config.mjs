@@ -1,7 +1,7 @@
 // The configuration the tests run Porter with (PORTER_CONFIG): one client per
 // combination the oracles exercise, and two users. Redirect URIs point at a
 // port nothing listens on: the tests read the redirect, they never follow it.
-export const cb = 'http://127.0.0.1:9/cb';
+export const cb = 'http://127.0.0.1:59999/cb';
 
 export const users = {
   alice: { password: 'wonderland', sub: '248289761001' },
@@ -24,16 +24,16 @@ export const clients = {
 export const testConfig = {
   clients: [
     { client_id: 'basic-es256', client_name: 'Basic ES256', client_secret: 'basic-es256-secret',
-      redirect_uris: [cb, 'http://127.0.0.1:9/cb?existing=1'], post_logout_redirect_uris: ['http://127.0.0.1:9/bye'],
+      redirect_uris: [cb, 'http://127.0.0.1:59999/cb?existing=1'], post_logout_redirect_uris: ['http://127.0.0.1:59999/bye'],
       id_token_signed_response_alg: 'ES256' },
     { client_id: 'post-eddsa', client_name: 'Post EdDSA', client_secret: 'post-eddsa-secret', redirect_uris: [cb],
       id_token_signed_response_alg: 'EdDSA' },
     { client_id: 'public-eddsa', client_name: 'Public EdDSA', redirect_uris: [cb],
-      post_logout_redirect_uris: ['http://127.0.0.1:9/bye'], id_token_signed_response_alg: 'EdDSA' },
+      post_logout_redirect_uris: ['http://127.0.0.1:59999/bye'], id_token_signed_response_alg: 'EdDSA' },
     { client_id: 'no-offline', client_name: 'No Offline', redirect_uris: [cb], scope: 'openid profile email',
       id_token_signed_response_alg: 'ES256' },
     { client_id: 'other-client', client_name: 'Other <b>Client</b>', client_secret: 'other-client-secret',
-      redirect_uris: ['http://127.0.0.1:9/other'], id_token_signed_response_alg: 'ES256' },
+      redirect_uris: ['http://127.0.0.1:59999/other'], id_token_signed_response_alg: 'ES256' },
   ],
   users: [
     { sub: '248289761001', username: 'alice', name: 'Alice Liddell', email: 'alice@example.com',

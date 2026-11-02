@@ -19,6 +19,11 @@ database_id = "00000000-0000-4000-8000-000000000000"
 # [vars]
 # ISSUER = "https://porter.example.workers.dev"
 
+# The browser app's files, served by Workers before the Worker runs (the
+# Worker also embeds them, as every target does).
+[assets]
+directory = "./dist/public"
+
 # Lasm's program.wasm is imported as a precompiled module.
 [[rules]]
 type = "CompiledWasm"

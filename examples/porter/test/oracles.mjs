@@ -143,7 +143,7 @@ await t.check('openid-client: prompt=consent asks again, and denying answers acc
 await t.check('openid-client: RP-initiated logout ends the session and returns to the registered URI', async () => {
   const { config, tokens, browser } = await openidClientFlow(clients.basic, 'basic');
   const url = client.buildEndSessionUrl(config, { id_token_hint: tokens.id_token,
-    post_logout_redirect_uri: 'http://127.0.0.1:9/bye', state: 'bye-state' });
+    post_logout_redirect_uri: 'http://127.0.0.1:59999/bye', state: 'bye-state' });
   const page = await browser.request(url.toString());
   assert.equal(page.status, 200);
   assert.match(page.text, /Sign out\?/);
@@ -151,7 +151,7 @@ await t.check('openid-client: RP-initiated logout ends the session and returns t
     .map(m => [m[1], m[2].replaceAll('&amp;', '&').replaceAll('&#39;', "'").replaceAll('&quot;', '"')]));
   const done = await browser.request(`${base}/logout`, { method: 'POST', form });
   assert.equal(done.status, 303);
-  assert.equal(done.location, 'http://127.0.0.1:9/bye?state=bye-state');
+  assert.equal(done.location, 'http://127.0.0.1:59999/bye?state=bye-state');
   assert.equal(browser.cookies.has('porter_session'), false);
   // Signed out: the next authorization asks for a password again.
   const verifier = client.randomPKCECodeVerifier();
