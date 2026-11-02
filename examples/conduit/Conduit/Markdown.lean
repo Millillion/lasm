@@ -134,7 +134,13 @@ def inlinesRev (acc : List Inline) : List Char → List Inline
       | some (href, after2) =>
         have := takeUntil_length h2
         have : after2.length < rest.length + 1 := by simp at *; omega
-        inlinesRev (.link (safeHref (String.ofList href)) [.text (String.ofList label)] :: acc) after2
+        -- Empty (or blank) text is a link with no text, as CommonMark reads
+        -- `[](url)`; the view shows its target as its text. With a blank
+        -- target too there is nothing to show or follow: it stays text.
+        if label.all Char.isWhitespace then
+          if href.all Char.isWhitespace then inlinesRev (pushText acc '[') rest
+          else inlinesRev (.link (safeHref (String.ofList href)) [] :: acc) after2
+        else inlinesRev (.link (safeHref (String.ofList href)) [.text (String.ofList label)] :: acc) after2
       | none => inlinesRev (pushText acc '[') rest
     | _ => inlinesRev (pushText acc '[') rest
   | c :: rest => inlinesRev (pushText acc c) rest

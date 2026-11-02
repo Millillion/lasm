@@ -22,19 +22,24 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] (J) `Lasm.Fetch`: keep it, narrow it, or remove it, compared with JS bindings. Deferred by Jordan.
 - [ ] (J) Issue #27: remove dot segments from `Request.path` on every platform (an API change).
 - [ ] (J) The next example apps: choose from [NEXT_EXAMPLE_APPS.md](docs/proposals/NEXT_EXAMPLE_APPS.md) (proposed: Ledger, Markdown site generator, OIDC provider, CRDT editor).
-- [ ] (J) Conduit's headline count: "294 theorems" (current) or "50 proved propositions".
-- [ ] (J) Conduit's two recorded gaps: empty Markdown link labels, and the delete and remove icons that aren't reachable by keyboard. Fix them? Both change what pages show.
+- [x] (J) Conduit's headline count: "N proved propositions (M theorems)", both checked by `npm run proofs` (Jordan, 2026-11-02).
+- [x] (J) Conduit's two recorded gaps: fixed and proved (Jordan, 2026-11-02): an empty-text link shows its target (SPEC L6), and the delete and remove icons are buttons (SPEC L7).
 
 ## Jordan's own work (from issue #21)
 - [ ] (J) Hone the README and every human-facing text.
 - [ ] (J) Review the public APIs: the Lean libraries and the CLI.
-- [ ] (J) Review Conduit's 50 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean).
+- [ ] (J) Review Conduit's 52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean).
 - [ ] (J) Hone [TRUST.md](docs/proposals/TRUST.md): what Lean, Lasm and the toolchain guarantee.
 - [ ] (J) Storytelling, about 80% of the effort per issue #21: posts, videos, launch follow-ups.
 - [ ] (J) GitHub Sponsors tiers and description (a manual edit; suggested text was given).
 - [ ] (J) Manual testing.
+- [ ] (J) Hone Ledger's 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
+- [ ] (J) Ledger's open API questions: `Lasm.Fetch` Brotli on Workers (`encodeBody: "manual"`); a cross-request async lock that works on Workers; the CLI's `--target wasi` failure when `dist/` already holds another build.
+- [ ] (J) Review Folio's 22 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean).
 
 ## Now (November 2026)
+
+- [x] Conduit: requests isolated on node:sqlite and bun:sqlite (issue #59; reads saw other requests' writes half done).
 
 ### Releases
 - [x] 0.3.6: two Vercel Edge fixes.
@@ -67,11 +72,17 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced.
 
 ### Ledger ([examples/ledger](examples/ledger), the second flagship app)
-- [x] 1. Pure core in TigerBeetle's data model and result codes (0.17.9 subset), the model, and the proofs: 26 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean), a requirements map ([SPEC.md](examples/ledger/SPEC.md)), `proofs:paranoid`.
+- [x] 1. Pure core in TigerBeetle's data model and result codes (0.17.9 subset), the model, and the proofs: 27 propositions (31 with the page) in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean), a requirements map ([SPEC.md](examples/ledger/SPEC.md)), `proofs:paranoid`.
 - [x] 2. Node server (`node:sqlite`), the differential test against a pinned TigerBeetle release, and the Jepsen-style bank workload.
 - [x] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms (Lambda .zip and image, Vercel, Netlify, Azure, GCF), and the WASI auditor `ledger verify journal.ndjson` on wasmtime, wasmer and `node:wasi`. No Fastly build (its KV is eventually consistent).
-- [ ] 4. The `Lasm.UI` page (accounts and journal) and its end-to-end tests.
-- [ ] (J) Review and hone the 26 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
+- [x] 4. The `Lasm.UI` page (accounts and journal, a ledger filter), four propositions about it, and its end-to-end tests on Chromium, Firefox and WebKit.
+- [ ] (J) Review and hone the 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
+
+### Folio ([examples/folio](examples/folio), the third flagship app: a Markdown site generator)
+- [x] 1. Pure core: a CommonMark 0.31.2 renderer (a port of commonmark.js) and a site generator (front matter, layouts, the page index, an RSS feed); all 652 specification examples pass, a differential test against commonmark.js; 21 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean) (escaping: no Markdown can inject HTML unless raw HTML is enabled; totality; the output tree; slugs; index links), `proofs:paranoid`.
+- [x] 2. The `folio` command on Node (`folio build`, `folio render`) and on WASI (wasmtime, wasmer, `node:wasi`), each checked on an example site with a draft and a hostile page; every engine writes the same bytes as Node.
+- [x] 3. The live preview (`Lasm.UI`, the renderer running in the page), served on Node, Bun and Deno, with Playwright tests (hostile Markdown runs nothing) and `preview_safe` (22 propositions in all).
+- [x] 4. Fuzzing: cmark's pathological inputs and a crash and timeout fuzzer on every PR, a nightly job (40 minutes of fuzzing, twenty differential seeds against commonmark.js). Found and fixed a stack overflow on WebAssembly and seven quadratic cases.
 
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.

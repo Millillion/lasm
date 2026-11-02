@@ -8,4 +8,6 @@ embedded in the program so every target serves them. -/
 def assets : Lasm.Fetch.Assets := embed_dir! "dist/public"
 
 def main : IO Unit := do
-  Conduit.Server.run (← Conduit.Server.D1.open "DB") assets
+  -- No isolation between requests: Workers cancels a request that waits on
+  -- another request's promise.
+  Conduit.Server.run (← Conduit.Server.D1.open "DB") assets (isolate := false)

@@ -10,6 +10,7 @@ start, so every committed request saw the database exactly as it was when
 it committed. Requests that only read never commit.
 -/
 import Lasm.Fetch
+import Lasm.Fetch.Assets
 import Lasm.JS
 import Ledger.Api
 import Server.Sql
@@ -70,19 +71,20 @@ def api (writers : Option Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) (
   let reply ← if r.method == "POST" then exclusive writers (runRequest db r 50) else runRequest db r 50
   return response reply
 
-/-- The whole site: the API under `/api`. -/
+/-- The whole site: the API under `/api` (the page's files are served before this). -/
 def site (writers : Option Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
   match req.segments with
   | "api" :: path => api writers db req path
-  | [] => return Lasm.Fetch.Response.text "Ledger: see /api/accounts and /api/transfers\n"
   | _ => return .notFound
 
-/-- Serves Ledger on a SQL database (whose binding module created the tables).
-`serializeWriters`: take turns between create requests in this process (off
-on Cloudflare Workers, which does not let one request wait on another's
-promise; there the version check alone keeps commits consistent). -/
-def run (db : Sql) (serializeWriters := true) : IO Unit := do
+/-- Serves Ledger on a SQL database (whose binding module created the
+tables), with the browser page's files (`assets`: `embed_dir! "dist/public"`
+in the entry file). `serializeWriters`: take turns between create requests
+in this process (off on Cloudflare Workers, which does not let one request
+wait on another's promise; there the version check alone keeps commits
+consistent). -/
+def run (db : Sql) (assets : Lasm.Fetch.Assets) (serializeWriters := true) : IO Unit := do
   let writers ← if serializeWriters then some <$> Std.Semaphore.new 1 else pure none
-  Lasm.Fetch.serve (site writers db)
+  Lasm.Fetch.serve (assets.wrap (site writers db))
 
 end Ledger.Server
