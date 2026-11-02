@@ -308,4 +308,25 @@ theorem writes_are_batches : Spec.writes_are_batches := by
   · rw [h]; exact .inr (.inl ⟨ts, b, rfl⟩)
   · rw [h]; exact .inr (.inr ⟨ts, b, rfl⟩)
 
+/-! ## J. The browser page -/
+
+theorem page_filter : Spec.page_filter := by
+  intro m
+  constructor
+  · intro a ha
+    unfold Page.Model.shownAccounts
+    cases h : m.ledger <;> simp [h, ha] <;> (try exact ⟨Eq.symm, Eq.symm⟩)
+  · intro t ht
+    unfold Page.Model.shownTransfers
+    cases h : m.ledger <;> simp [h, ht] <;> (try exact ⟨Eq.symm, Eq.symm⟩)
+
+theorem page_rows : Spec.page_rows :=
+  fun _ => ⟨rfl, rfl, fun _ => ⟨_, rfl⟩, fun _ => ⟨_, rfl⟩⟩
+
+theorem page_errors_keep_data : Spec.page_errors_keep_data := by
+  intro m e
+  exact ⟨rfl, rfl, rfl, rfl, rfl, rfl⟩
+
+theorem page_refresh : Spec.page_refresh := fun _ => rfl
+
 end Ledger.Proofs

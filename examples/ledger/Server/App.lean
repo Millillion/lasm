@@ -10,6 +10,7 @@ start, so every committed request saw the database exactly as it was when
 it committed. Requests that only read never commit.
 -/
 import Lasm.Fetch
+import Lasm.Fetch.Assets
 import Lasm.JS
 import Ledger.Api
 import Server.Sql
@@ -67,15 +68,16 @@ def api (writers : Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) (path : 
   let reply ← if r.method == "POST" then exclusive writers (runRequest db r 50) else runRequest db r 50
   return response reply
 
-/-- The whole site: the API under `/api`. -/
+/-- The whole site: the API under `/api` (the page's files are served before this). -/
 def site (writers : Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
   match req.segments with
   | "api" :: path => api writers db req path
-  | [] => return Lasm.Fetch.Response.text "Ledger: see /api/accounts and /api/transfers\n"
   | _ => return .notFound
 
-/-- Serves Ledger on a SQL database (whose binding module created the tables). -/
-def run (db : Sql) : IO Unit := do
-  Lasm.Fetch.serve (site (← Std.Semaphore.new 1) db)
+/-- Serves Ledger on a SQL database (whose binding module created the
+tables), with the browser page's files (`assets`: `embed_dir! "dist/public"`
+in the entry file). -/
+def run (db : Sql) (assets : Lasm.Fetch.Assets) : IO Unit := do
+  Lasm.Fetch.serve (assets.wrap (site (← Std.Semaphore.new 1) db))
 
 end Ledger.Server
