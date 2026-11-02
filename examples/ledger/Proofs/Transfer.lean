@@ -152,12 +152,12 @@ theorem inv_two {D : DB} (hI : Inv D) {tr : Transfer} {dr cr dr' cr' : Account}
       refine List.nodup_append.mpr ⟨hI.once, by simp, ?_⟩
       intro x hx y hy
       simp at hy; subst hy
-      intro e; subst e
-      obtain ⟨r, hrm, rfl⟩ := List.mem_map.mp hx
+      intro e
+      obtain ⟨r, hrm, hrx⟩ := List.mem_map.mp hx
       rw [List.mem_filter] at hrm
       unfold resolvedIn at this
       rw [List.any_eq_false] at this
-      exact this r hrm.1 (by simp [hrm.2])
+      exact this r hrm.1 (by simp at hrm; simp [hrm.2, hrx, e])
   · intro b hb
     rw [replay_append]
     rcases mem_two hn hi hj hb with rfl | rfl | ⟨m, n1, n2⟩
@@ -249,7 +249,7 @@ theorem inv_new {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {dr cr : Acco
   cases hp : t.flags.pending
   all_goals
     simp only [hp, Bool.false_eq_true, ite_false, ite_true]
-    apply inv_two hI (dr := dr) (cr := cr) hd hc hne b2.symm (b1.trans b2).symm hfresh hid
+    apply inv_two hI (dr := dr) (cr := cr) hd hc hne b2.symm (b1.symm.trans b2.symm) hfresh hid
       (by simp [hr]) (by simp [hr]) (by omega)
     · simp [Account.withBalances, Audit.replayStep, Account.balances, hr, hp, hx2, hy1]
     · simp [Account.withBalances, Audit.replayStep, Account.balances, hr, hp, hx1, hy2]
@@ -300,7 +300,7 @@ theorem inv_resolve {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {p : Tran
   have hdc : dr.id ≠ cr.id := by rw [hdid, hcid]; exact hne
   have hcd : cr.id ≠ dr.id := Ne.symm hdc
   have rfalse := resolvedIn_of_resolution hres
-  rw [hpid] at rfalse
+  rw [← hpid] at rfalse
   have hfind : D.transfers.find? (·.id == t.pendingId) = some p := hp
   have pdD := hI.pendingD dr hdm
   have pcD := hI.pendingC dr hdm
@@ -390,6 +390,7 @@ theorem inv_stepAccount {D : DB} (hI : Inv D) {ts : Nat} {a : NewAccount} : Inv 
   rcases h : decideAccount (D.account? a.id) ts a with ⟨s, _ | acc⟩
   · exact hI
   · have := (decideAccount_some h).1; subst this
+    show Inv (D.apply (Writes.ofAccount acc))
     rw [apply_ofAccount]; exact inv_account hI h
 
 /-- Every transfer keeps the invariant. -/
@@ -398,6 +399,7 @@ theorem inv_stepTransfer {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} : In
   rcases h : decideTransfer (ctxOf D t) ts t with ⟨s, _ | ⟨tr, dr, cr⟩⟩
   · exact hI
   · have := (decideTransfer_some h).1; subst this
+    show Inv (D.apply (Writes.ofTransfer tr dr cr))
     exact inv_transfer hI h
 
 end Ledger.Proofs

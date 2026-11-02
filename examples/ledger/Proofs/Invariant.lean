@@ -8,11 +8,6 @@ import Proofs.Sums
 namespace Ledger.Proofs
 open Ledger Rules
 
-/-- An account with its balances replaced. -/
-def Account.withBalances (a : Account) (b : Balances) : Account :=
-  { a with debitsPending := b.debitsPending, debitsPosted := b.debitsPosted,
-           creditsPending := b.creditsPending, creditsPosted := b.creditsPosted }
-
 /-- What holds of every reachable database. -/
 structure Inv (D : DB) : Prop where
   /-- Account ids are unique. -/

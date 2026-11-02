@@ -20,6 +20,11 @@ structure Balances where
 def Account.balances (a : Account) : Balances :=
   ⟨a.debitsPending, a.debitsPosted, a.creditsPending, a.creditsPosted⟩
 
+/-- An account with its balances replaced. -/
+def Account.withBalances (a : Account) (b : Balances) : Account :=
+  { a with debitsPending := b.debitsPending, debitsPosted := b.debitsPosted,
+           creditsPending := b.creditsPending, creditsPosted := b.creditsPosted }
+
 namespace Audit
 
 /-- How transfer `t` changes the balances `b` of account `id`, given the
