@@ -222,7 +222,7 @@ lifted from a helper to the endpoint or page that uses it); 6 were weak or
 trivial (the five `…_ok`, whose hypothesis was unused, and `nullable_empty`)
 and are replaced by exact characterisations; 4 were removed (three
 contentless `rfl` unfoldings of the model, `store_*`, and the redundant
-`window_consecutive`). The 50 propositions of `Proofs/Spec.lean` also add
+`window_consecutive`). The 52 propositions of `Proofs/Spec.lean` also add
 what the previous set did not cover: the write set of every endpoint
 (`Spec.handle_writes`), reads never writing, the token check first, data
 integrity across all requests, the browser app's state invariants, the

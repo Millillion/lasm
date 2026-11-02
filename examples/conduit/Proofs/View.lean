@@ -428,28 +428,50 @@ theorem inline_links_visible (c : Markdown.Inline) (h : LinkVisible c) :
   | link u cs =>
     rcases h with ⟨rfl, h⟩ | ⟨s, rfl, h⟩ <;> simpa [inlineView] using h
 
-theorem inlines_links_visible (cs : List Markdown.Inline) (h : ∀ c ∈ cs, LinkVisible c) :
-    ∀ t ∈ (cs.map inlineView).flatMap linkTexts, ∃ x ∈ t, x.isWhitespace = false := by
+/-- An element other than a link, whose children's links have visible text. -/
+theorem linkTexts_wrap {ns : Ns} {tag : String} {k : Option String} {attrs : List (Attr Msg)} (htag : tag ≠ "a")
+    (xs : List H) (hx : ∀ x ∈ xs, ∀ t ∈ linkTexts x, ∃ c ∈ t, c.isWhitespace = false) :
+    ∀ t ∈ linkTexts (Html.elem ns tag k attrs xs), ∃ c ∈ t, c.isWhitespace = false := by
+  rw [linkTexts_elem, if_neg htag, List.nil_append]
   intro t ht
-  obtain ⟨_, hc, ht⟩ := List.mem_flatMap.mp ht
-  obtain ⟨c, hc, rfl⟩ := List.mem_map.mp hc
-  exact inline_links_visible c (h c hc) t ht
+  obtain ⟨x, hx', ht⟩ := List.mem_flatMap.mp ht
+  exact hx x hx' t ht
+
+theorem inlines_links_visible (cs : List Markdown.Inline) (h : ∀ c ∈ cs, LinkVisible c) :
+    ∀ x ∈ cs.map inlineView, ∀ t ∈ linkTexts x, ∃ c ∈ t, c.isWhitespace = false := by
+  intro x hx
+  obtain ⟨c, hc, rfl⟩ := List.mem_map.mp hx
+  exact inline_links_visible c (h c hc)
 
 theorem article_links_visible : Spec.article_links_visible := by
   intro body b hb
   have hb := blocks_inlines (fun cs => ∀ c ∈ cs, LinkVisible c) inlines_visible _ _ b hb
   cases b with
-  | para cs => simpa [blockView] using inlines_links_visible cs hb
-  | quote cs => simpa [blockView] using inlines_links_visible cs hb
+  | para cs => exact linkTexts_wrap (by decide) _ (inlines_links_visible cs hb)
+  | quote cs =>
+    refine linkTexts_wrap (by decide) _ fun x hx => ?_
+    rw [List.mem_singleton] at hx; subst hx
+    exact linkTexts_wrap (by decide) _ (inlines_links_visible cs hb)
   | heading n cs =>
+    refine linkTexts_wrap ?_ _ (inlines_links_visible cs hb)
     have : min 6 (n + 1) = 1 ∨ min 6 (n + 1) = 2 ∨ min 6 (n + 1) = 3 ∨ min 6 (n + 1) = 4 ∨ min 6 (n + 1) = 5 ∨
       min 6 (n + 1) = 6 := by omega
-    rcases this with h | h | h | h | h | h <;> simp only [blockView, h] <;>
-      simpa using inlines_links_visible cs hb
+    rcases this with h | h | h | h | h | h <;> rw [h] <;> first | decide | (simp; done) | (simp; decide)
   | list ordered items =>
-    cases ordered <;> simp only [blockView] <;> simp <;> intro t cs hcs ht <;>
-      simpa using inlines_links_visible cs (hb cs hcs) t (by simpa using ht)
-  | code s => simp [blockView]
-  | rule => simp [blockView]
+    have hli : ∀ x ∈ items.map (fun cs => (li [] (cs.map inlineView) : H)), ∀ t ∈ linkTexts x,
+        ∃ c ∈ t, c.isWhitespace = false := by
+      intro x hx
+      obtain ⟨cs, hcs, rfl⟩ := List.mem_map.mp hx
+      exact linkTexts_wrap (by decide) _ (inlines_links_visible cs (hb cs hcs))
+    cases ordered
+    · exact linkTexts_wrap (by decide) _ hli
+    · exact linkTexts_wrap (by decide) _ hli
+  | code s =>
+    refine linkTexts_wrap (by decide) _ fun x hx => ?_
+    rw [List.mem_singleton] at hx; subst hx
+    refine linkTexts_wrap (by decide) _ fun x hx => ?_
+    rw [List.mem_singleton] at hx; subst hx
+    simp
+  | rule => exact linkTexts_wrap (by decide) _ (by simp)
 
 end Conduit.Proofs
