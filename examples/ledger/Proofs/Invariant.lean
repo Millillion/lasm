@@ -128,7 +128,8 @@ theorem inv_account {D : DB} (hI : Inv D) {ts : Nat} {a : NewAccount} {acc : Acc
   constructor
   · rw [List.map_append]
     exact List.nodup_append.mpr ⟨hI.accountIds, by simp, by
-      intro x hx y hy; simp at hy; subst hy; exact fun e => not_mem_ids_of_account?_none hex (e ▸ hx)⟩
+      intro x hx y hy; simp at hy; subst hy
+      exact fun e => not_mem_ids_of_account?_none hex (by rw [show a.id = (newAccount ts a).id from rfl, ← e]; exact hx)⟩
   · exact hI.transferIds
   · intro b hb
     rcases List.mem_append.mp hb with m | m

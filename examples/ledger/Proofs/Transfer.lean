@@ -275,4 +275,129 @@ theorem inv_new {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {dr cr : Acco
         simp [part, hl, hl'] at e1 e2 e3 e4
         constructor <;> omega
 
+/-! ## Posts and voids -/
+
+theorem inv_resolve {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {p : Transfer} {dr cr : Account}
+    (hr : t.flags.resolves = true) (hid : t.id ≠ 0 ∧ t.id ≠ u128Max) (hfresh : D.transfer? t.id = none)
+    (hrc : ∀ q ∈ resolveChecks t, q.1 = false) (hp : D.transfer? t.pendingId = some p)
+    (hpp : p.flags.pending = true) (hres : D.resolution? t.pendingId = none)
+    (hd : D.account? p.debitAccountId = some dr) (hc : D.account? p.creditAccountId = some cr)
+    (hpc : ∀ q ∈ pendingChecks t p, q.1 = false) :
+    Inv (D.apply (Writes.ofTransfer (resolveEffect ts t p dr cr).1 (resolveEffect ts t p dr cr).2.1
+      (resolveEffect ts t p dr cr).2.2)) := by
+  rw [apply_ofTransfer]
+  have hn := hrc; simp [resolveChecks] at hn
+  obtain ⟨r1, r2, -, -, -⟩ := hn
+  have hq := hpc; simp [pendingChecks] at hq
+  obtain ⟨-, -, -, -, q5, q6⟩ := hq
+  obtain ⟨hpm, hpid⟩ := transfer?_mem hp
+  obtain ⟨hdm, hdid⟩ := account?_mem hd
+  obtain ⟨hcm, hcid⟩ := account?_mem hc
+  obtain ⟨hne, ⟨x, hx, hxl⟩, ⟨y, hy, hyl⟩⟩ := hI.accountsOf p hpm
+  rw [hd] at hx; cases hx
+  rw [hc] at hy; cases hy
+  have hpa := hI.amounts p hpm
+  have hdc : dr.id ≠ cr.id := by rw [hdid, hcid]; exact hne
+  have hcd : cr.id ≠ dr.id := Ne.symm hdc
+  have rfalse := resolvedIn_of_resolution hres
+  rw [hpid] at rfalse
+  have hfind : D.transfers.find? (·.id == t.pendingId) = some p := hp
+  have pdD := hI.pendingD dr hdm
+  have pcD := hI.pendingC dr hdm
+  have pdC := hI.pendingD cr hcm
+  have pcC := hI.pendingC cr hcm
+  have bD := hI.bounds dr hdm
+  have bC := hI.bounds cr hcm
+  have dmD := hI.dmnec dr hdm
+  have cmD := hI.cmned dr hdm
+  have dmC := hI.dmnec cr hcm
+  have cmC := hI.cmned cr hcm
+  have hx1 : (p.debitAccountId == cr.id) = false := beq_eq_false_iff_ne.mpr (by rw [← hdid]; exact hdc)
+  have hx2 : (p.creditAccountId == dr.id) = false := beq_eq_false_iff_ne.mpr (by rw [← hcid]; exact hcd)
+  have hy1 : (p.debitAccountId == dr.id) = true := by simp [hdid]
+  have hy2 : (p.creditAccountId == cr.id) = true := by simp [hcid]
+  have hnp : t.flags.pending = false := by simpa using r2
+  -- the pending amounts after: `p` no longer counts
+  have po (side : Transfer → Nat) (i : Nat) (tr : Transfer) (htp : tr.pendingId = p.id)
+      (htr : tr.flags = t.flags) :
+      pendingOn side (D.transfers ++ [tr]) i + (if p.flags.pending && side p == i && !resolvedIn D.transfers p.id
+        then p.amount else 0) = pendingOn side D.transfers i :=
+    pendingOn_append_resolve side tr p i hI.transferIds hpm htp (by rw [htr]; exact hr) (by rw [htr]; exact hnp)
+  have hamt : resolvedAmount t p ≤ p.amount := by omega
+  unfold resolveEffect
+  cases hpost : t.flags.postPendingTransfer
+  all_goals
+    simp only [ite_true, ite_false, Bool.false_eq_true]
+    apply inv_two hI (dr := dr) (cr := cr) hd hc hne hxl hyl hfresh hid
+      (by simp [hnp]) (fun _ => ⟨⟨p, hp, hpp, rfl, rfl, rfl, hamt, fun hv => by
+        have : ¬ resolvedAmount t p < p.amount := fun h => by simp [hv] at q6; omega
+        omega⟩, hres⟩) (by omega)
+    · simp [Account.withBalances, Audit.replayStep, Account.balances, hr, hpost, hx2, hy1, hfind]
+    · simp [Account.withBalances, Audit.replayStep, Account.balances, hr, hpost, hx1, hy2, hfind]
+    · intro i h1 h2
+      have := po (·.debitAccountId) i _ hpid.symm rfl
+      have : (p.debitAccountId == i) = false := beq_eq_false_iff_ne.mpr (by rw [← hdid]; exact Ne.symm h1)
+      simp_all
+    · intro i h1 h2
+      have := po (·.creditAccountId) i _ hpid.symm rfl
+      have : (p.creditAccountId == i) = false := beq_eq_false_iff_ne.mpr (by rw [← hcid]; exact Ne.symm h2)
+      simp_all
+    · have e1 := po (·.debitAccountId) dr.id _ hpid.symm rfl
+      have e2 := po (·.creditAccountId) dr.id _ hpid.symm rfl
+      have e3 := po (·.debitAccountId) cr.id _ hpid.symm rfl
+      have e4 := po (·.creditAccountId) cr.id _ hpid.symm rfl
+      simp only [hpp, hx1, hx2, hy1, hy2, rfalse, Bool.true_and, Bool.and_true, Bool.not_false,
+        Bool.false_and, Bool.and_false, ite_true, ite_false, Bool.false_eq_true] at e1 e2 e3 e4
+      intro z hz
+      rcases hz with rfl | rfl
+      all_goals
+        simp only [Account.withBalances] at *
+        refine ⟨by omega, by omega, by omega, by omega, fun h => ?_, fun h => ?_⟩
+        all_goals first | (have := dmD h; omega) | (have := cmD h; omega) | (have := dmC h; omega) | (have := cmC h; omega)
+    · intro L
+      have h1 := total_two hI.accountIds (find_of_mem hI.accountIds hdm) (find_of_mem hI.accountIds hcm) hdc rfl rfl L
+      have e1 := h1 (·.debitsPosted)
+      have e2 := h1 (·.creditsPosted)
+      have e3 := h1 (·.debitsPending)
+      have e4 := h1 (·.creditsPending)
+      have := hI.posted L
+      have := hI.pending L
+      have f1 := po (·.debitAccountId) dr.id _ hpid.symm rfl
+      have f2 := po (·.creditAccountId) cr.id _ hpid.symm rfl
+      simp only [hpp, hy1, hy2, rfalse, Bool.true_and, Bool.not_false, Bool.and_true, ite_true] at f1 f2
+      by_cases hl : dr.ledger = L
+      all_goals
+        have hl' : cr.ledger = dr.ledger := hyl.trans hxl.symm
+        simp [part, hl, hl', Account.withBalances] at e1 e2 e3 e4
+        constructor <;> omega
+
+/-- Every created transfer keeps the invariant. -/
+theorem inv_transfer {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {e : Effect}
+    (h : decideTransfer (ctxOf D t) ts t = (.created, some e)) :
+    Inv (D.apply (Writes.ofTransfer e.1 e.2.1 e.2.2)) := by
+  obtain ⟨-, h0, h1, hex, -, hcase⟩ := decideTransfer_some h
+  have hfresh : D.transfer? t.id = none := hex
+  rcases hcase with ⟨hr, hnc, dr, cr, hd, hc, hbc, rfl⟩ | ⟨hr, hrc, p, dr, cr, hp, hpp, hres, hd, hc, hpc, rfl⟩
+  · simp only [ctxOf, hr, Bool.false_eq_true, ite_false] at hd hc
+    exact inv_new hI hr ⟨h0, h1⟩ hfresh hnc hd hc hbc
+  · simp only [ctxOf, hr, ite_true] at hp hres hd hc
+    rw [hp] at hd hc
+    exact inv_resolve hI hr ⟨h0, h1⟩ hfresh hrc hp hpp hres hd hc hpc
+
+/-- Every created account keeps the invariant. -/
+theorem inv_stepAccount {D : DB} (hI : Inv D) {ts : Nat} {a : NewAccount} : Inv (stepAccount D ts a).2 := by
+  unfold stepAccount
+  rcases h : decideAccount (D.account? a.id) ts a with ⟨s, _ | acc⟩
+  · exact hI
+  · have := (decideAccount_some h).1; subst this
+    rw [apply_ofAccount]; exact inv_account hI h
+
+/-- Every transfer keeps the invariant. -/
+theorem inv_stepTransfer {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} : Inv (stepTransfer D ts t).2 := by
+  unfold stepTransfer
+  rcases h : decideTransfer (ctxOf D t) ts t with ⟨s, _ | ⟨tr, dr, cr⟩⟩
+  · exact hI
+  · have := (decideTransfer_some h).1; subst this
+    exact inv_transfer hI h
+
 end Ledger.Proofs
