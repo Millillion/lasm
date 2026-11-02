@@ -8,6 +8,14 @@ name: Ledger
 #   the stated theorem count agree with what was checked; then the export of
 #   the proofs is replayed by Lean's kernel and every external checker Lean
 #   4.35.0 ships (`lake check --paranoid`, sandboxed).
+# - api-node: the Node server (node:sqlite) on Node 24 and 26: the API test
+#   (test/api.mjs), then the bank workload (test/bank.mjs: concurrent
+#   transfers and reads, every read sees the same total, the journal replays
+#   to every balance), seeded, the seed in the log;
+# - tigerbeetle: the differential test (test/tigerbeetle.mjs) against the
+#   official TigerBeetle 0.17.9 release binary (SHA-256 pinned) and its
+#   official Node client: random workloads, every result code and balance
+#   must agree. Several seeds per run, each printed.
 # Local runtimes only: no account, nothing deployed, CI=1. Free runners only.
 on:
   workflow_dispatch:
@@ -57,3 +65,84 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
           command -v bwrap || sudo apt-get install -y --no-install-recommends bubblewrap
           npm run proofs:paranoid
+  api-node:
+    name: API and bank workload on Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['24', '26.12.1']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: examples/ledger
+        run: npm ci --no-audit --no-fund
+      - name: npm run build
+        working-directory: examples/ledger
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+      - name: The API test
+        working-directory: examples/ledger
+        run: node test/api.mjs --name "node-${{ matrix.node }}"
+      - name: The bank workload (seeded; the seed is printed first)
+        working-directory: examples/ledger
+        run: node test/bank.mjs --seconds 30
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: ledger-api-node-${{ matrix.node }}
+          path: examples/ledger/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  tigerbeetle:
+    name: Differential test against TigerBeetle 0.17.9
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci, and the official TigerBeetle client at the pinned version
+        working-directory: examples/ledger
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/tb" --no-audit --no-fund tigerbeetle-node@0.17.9
+          echo "TIGERBEETLE_NODE=$RUNNER_TEMP/tb" >> "$GITHUB_ENV"
+      - name: io_uring (TigerBeetle needs it)
+        run: |
+          uname -r
+          cat /proc/sys/kernel/io_uring_disabled 2>/dev/null || echo "no io_uring_disabled sysctl (io_uring enabled)"
+      - name: npm run build
+        working-directory: examples/ledger
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+      - name: Random workloads, three seeds (each printed; replay with --seed)
+        working-directory: examples/ledger
+        run: |
+          for i in 1 2 3; do node test/tigerbeetle.mjs --batches 400; done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: ledger-tigerbeetle
+          path: examples/ledger/test-results/
+          retention-days: 14
+          if-no-files-found: warn

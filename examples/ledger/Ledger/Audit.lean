@@ -57,5 +57,68 @@ def replayFrom (before : List Transfer) (b : Balances) (id : Nat) : List Transfe
 /-- The balances of account `id` after the journal: every account starts at zero. -/
 def replay (journal : List Transfer) (id : Nat) : Balances := replayFrom [] {} id journal
 
+/-! ## The audit -/
+
+/-- The sum of `f` over the accounts of ledger `L`. -/
+def ledgerSum (accounts : List Account) (L : Nat) (f : Account → Nat) : Nat :=
+  ((accounts.filter (·.ledger == L)).map f).sum
+
+/-- Every problem the auditor finds in an exported journal: the accounts (with
+their stored balances) and the transfers, in order. An empty list means the
+journal is consistent: every balance is what replaying the transfers gives,
+every ledger balances, and every rule of the ledger holds. -/
+def verify (accounts : List Account) (transfers : List Transfer) : List String := Id.run do
+  let mut problems : Array String := #[]
+  let find (id : Nat) := accounts.find? (·.id == id)
+  -- Ids.
+  unless (accounts.map (·.id)).Nodup do problems := problems.push "two accounts share an id"
+  unless (transfers.map (·.id)).Nodup do problems := problems.push "two transfers share an id"
+  for a in accounts do
+    if a.id == 0 || a.id == u128Max then problems := problems.push s!"account {a.id}: invalid id"
+  -- Each transfer, in order.
+  let mut before : List Transfer := []
+  let mut resolved : List Nat := []
+  for t in transfers do
+    if t.id == 0 || t.id == u128Max then problems := problems.push s!"transfer {t.id}: invalid id"
+    if t.amount > limit then problems := problems.push s!"transfer {t.id}: amount past 2^63 - 1"
+    if t.debitAccountId == t.creditAccountId then problems := problems.push s!"transfer {t.id}: one account on both sides"
+    match find t.debitAccountId, find t.creditAccountId with
+    | some dr, some cr =>
+      if dr.ledger != t.ledger || cr.ledger != t.ledger then
+        problems := problems.push s!"transfer {t.id}: its accounts are not both in ledger {t.ledger}"
+    | _, _ => problems := problems.push s!"transfer {t.id}: an account is missing"
+    if t.flags.resolves then
+      if t.flags.pending || (t.flags.postPendingTransfer && t.flags.voidPendingTransfer) then
+        problems := problems.push s!"transfer {t.id}: conflicting flags"
+      match before.find? (·.id == t.pendingId) with
+      | none => problems := problems.push s!"transfer {t.id}: resolves {t.pendingId}, which is not an earlier transfer"
+      | some p =>
+        if !p.flags.pending then problems := problems.push s!"transfer {t.id}: resolves {p.id}, which is not pending"
+        if p.debitAccountId != t.debitAccountId || p.creditAccountId != t.creditAccountId || p.ledger != t.ledger then
+          problems := problems.push s!"transfer {t.id}: not the accounts and ledger of {p.id}"
+        if t.amount > p.amount then problems := problems.push s!"transfer {t.id}: posts more than {p.id} holds"
+        if t.flags.voidPendingTransfer && t.amount != p.amount then
+          problems := problems.push s!"transfer {t.id}: voids another amount than {p.id} holds"
+      if resolved.contains t.pendingId then
+        problems := problems.push s!"transfer {t.id}: {t.pendingId} was already posted or voided"
+      resolved := t.pendingId :: resolved
+    before := before ++ [t]
+  -- Balances.
+  for a in accounts do
+    if a.balances != replay transfers a.id then
+      problems := problems.push s!"account {a.id}: its balances are not the journal's"
+    if a.debitsPending + a.debitsPosted > limit || a.creditsPending + a.creditsPosted > limit then
+      problems := problems.push s!"account {a.id}: a balance past 2^63 - 1"
+    if a.flags.debitsMustNotExceedCredits && a.debitsPending + a.debitsPosted > a.creditsPosted then
+      problems := problems.push s!"account {a.id}: debits exceed credits"
+    if a.flags.creditsMustNotExceedDebits && a.creditsPending + a.creditsPosted > a.debitsPosted then
+      problems := problems.push s!"account {a.id}: credits exceed debits"
+  for L in (accounts.map (·.ledger)).eraseDups do
+    if ledgerSum accounts L (·.debitsPosted) != ledgerSum accounts L (·.creditsPosted) then
+      problems := problems.push s!"ledger {L}: posted debits and credits differ"
+    if ledgerSum accounts L (·.debitsPending) != ledgerSum accounts L (·.creditsPending) then
+      problems := problems.push s!"ledger {L}: pending debits and credits differ"
+  return problems.toList
+
 end Audit
 end Ledger
