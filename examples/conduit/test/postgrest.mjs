@@ -26,9 +26,12 @@ if (command === 'up') {
   spawnSync('docker', ['rm', '-f', db, rest], { stdio: 'ignore' });
   spawnSync('docker', ['network', 'create', network], { stdio: 'ignore' });
   docker(['run', '-d', '--name', db, '--network', network, '-e', 'POSTGRES_PASSWORD=conduit', 'postgres:17.6']);
+  // Over TCP: the image's entrypoint first runs a temporary server on the
+  // socket only (to initialise the database), then restarts; a socket check
+  // can pass against the temporary one and the next psql find no server.
   for (let i = 0; ; i++) {
-    if (spawnSync('docker', ['exec', db, 'pg_isready', '-U', 'postgres'], { stdio: 'ignore' }).status === 0
-      && spawnSync('docker', ['exec', db, 'psql', '-U', 'postgres', '-c', 'select 1'], { stdio: 'ignore' }).status === 0) break;
+    if (spawnSync('docker', ['exec', '-e', 'PGPASSWORD=conduit', db, 'pg_isready', '-h', '127.0.0.1', '-U', 'postgres'], { stdio: 'ignore' }).status === 0
+      && spawnSync('docker', ['exec', '-e', 'PGPASSWORD=conduit', db, 'psql', '-h', '127.0.0.1', '-U', 'postgres', '-c', 'select 1'], { stdio: 'ignore' }).status === 0) break;
     if (i > 120) throw new Error('Postgres did not start');
     await new Promise(r => setTimeout(r, 500));
   }
