@@ -43,7 +43,7 @@ test('refresh shows new transfers, posts and failed chains change nothing shown'
   await page.goto('/');
   await expect(page.locator('#journal tbody tr')).toHaveCount(2);
   expect(statuses(await post(request, '/transfers', [
-    { id: '1003', pending_id: '1002', amount: '0', flags: { post_pending_transfer: true } },
+    { id: '1003', pending_id: '1002', amount: '340282366920938463463374607431768211455', flags: { post_pending_transfer: true } },
     { id: '1004', debit_account_id: '12', credit_account_id: '11', amount: '1000', ledger: 1, code: 1, flags: { linked: true } },
     { id: '1005', debit_account_id: '11', credit_account_id: '12', amount: '1', ledger: 1, code: 1 }])))
     .toEqual(['created', 'exceeds_credits', 'linked_event_failed']);
