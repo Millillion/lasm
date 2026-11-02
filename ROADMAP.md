@@ -22,13 +22,13 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] (J) `Lasm.Fetch`: keep it, narrow it, or remove it, compared with JS bindings. Deferred by Jordan.
 - [ ] (J) Issue #27: remove dot segments from `Request.path` on every platform (an API change).
 - [ ] (J) The next example apps: choose from [NEXT_EXAMPLE_APPS.md](docs/proposals/NEXT_EXAMPLE_APPS.md) (proposed: Ledger, Markdown site generator, OIDC provider, CRDT editor).
-- [ ] (J) Conduit's headline count: "294 theorems" (current) or "50 proved propositions".
-- [ ] (J) Conduit's two recorded gaps: empty Markdown link labels, and the delete and remove icons that aren't reachable by keyboard. Fix them? Both change what pages show.
+- [x] (J) Conduit's headline count: "N proved propositions (M theorems)", both checked by `npm run proofs` (Jordan, 2026-11-02).
+- [x] (J) Conduit's two recorded gaps: fixed and proved (Jordan, 2026-11-02): an empty-text link shows its target (SPEC L6), and the delete and remove icons are buttons (SPEC L7).
 
 ## Jordan's own work (from issue #21)
 - [ ] (J) Hone the README and every human-facing text.
 - [ ] (J) Review the public APIs: the Lean libraries and the CLI.
-- [ ] (J) Review Conduit's 50 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean).
+- [ ] (J) Review Conduit's 52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean).
 - [ ] (J) Hone [TRUST.md](docs/proposals/TRUST.md): what Lean, Lasm and the toolchain guarantee.
 - [ ] (J) Storytelling, about 80% of the effort per issue #21: posts, videos, launch follow-ups.
 - [ ] (J) GitHub Sponsors tiers and description (a manual edit; suggested text was given).

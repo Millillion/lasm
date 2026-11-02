@@ -110,6 +110,22 @@ def hrefs {Msg : Type} : Html Msg → List String
 termination_by h => sizeOf h
 decreasing_by simp_wf; have := List.sizeOf_lt_of_mem ‹_›; omega
 
+/-- The characters of a view's text nodes, in document order. -/
+def textOf {Msg : Type} : Html Msg → List Char
+  | .text s => s.toList
+  | .elem _ _ _ _ children => children.attach.flatMap fun ⟨c, _⟩ => textOf c
+termination_by h => sizeOf h
+decreasing_by simp_wf; have := List.sizeOf_lt_of_mem ‹_›; omega
+
+/-- The text of each link (`a` element) in a view, in document order. -/
+def linkTexts {Msg : Type} : Html Msg → List (List Char)
+  | .text _ => []
+  | .elem _ tag _ _ children =>
+    (if tag = "a" then [children.attach.flatMap fun ⟨c, _⟩ => textOf c] else []) ++
+      children.attach.flatMap fun ⟨c, _⟩ => linkTexts c
+termination_by h => sizeOf h
+decreasing_by simp_wf; have := List.sizeOf_lt_of_mem ‹_›; omega
+
 /-- The `class` of an element (its first `class` attribute). -/
 def classOf {Msg : Type} : Html Msg → Option String
   | .elem _ _ _ attrs _ => attrs.findSome? fun | .attr "class" c => some c | _ => none
@@ -575,6 +591,18 @@ non-empty `placeholder` (the template's labels). -/
 def view_controls_described : Prop :=
   ∀ m : Model, Every (fun tag attrs => tag = "input" ∨ tag = "textarea" →
     ∃ v, v ≠ "" ∧ Attr.attr "placeholder" v ∈ attrs) (view m)
+
+/-- **Every clickable element is a button**: on every page, in every state,
+an element with a click handler is a `button`, which the keyboard reaches
+(Tab) and presses (Enter, Space). -/
+def view_clickables_buttons : Prop :=
+  ∀ m : Model, Every (fun tag attrs => ∀ l h, Attr.on l h ∈ attrs → l.event = "click" → tag = "button") (view m)
+
+/-- **Every link in an article body has visible text**: at least one character
+that is not whitespace. A link with empty text, `[](https://…)` (as CommonMark
+reads it), shows its target as its text. -/
+def article_links_visible : Prop :=
+  ∀ body : String, ∀ b ∈ Markdown.parse body, ∀ t ∈ linkTexts (blockView b), ∃ c ∈ t, c.isWhitespace = false
 
 /-- **An article body never adds an `h1`**: its headings start at `h2`, so the
 article's title is the page's only `h1`. -/
