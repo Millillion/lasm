@@ -36,6 +36,8 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 
 ## Now (November 2026)
 
+- [x] Conduit: requests isolated on node:sqlite and bun:sqlite (issue #59; reads saw other requests' writes half done).
+
 ### Releases
 - [x] 0.3.6: two Vercel Edge fixes.
 - [x] 0.3.7: version bumped on main (PR #40), **not published**. Its release check failed on a timing-dependent stress fixture (fixed in PR #42), and the fixed commit doesn't change the version, so it can't release (as with 0.3.3).
