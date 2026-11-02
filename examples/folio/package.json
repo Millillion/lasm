@@ -5,12 +5,16 @@
   "type": "module",
   "description": "Folio, a CommonMark Markdown renderer and static-site generator in Lean, compiled to WebAssembly by Lasm, with proofs",
   "scripts": {
+    "build": "lasm build Cli.lean --output dist/cli",
+    "build:wasi": "lasm build Cli.lean --target wasi --output dist/wasi",
     "build:batch": "lasm build Batch.lean --output dist/batch",
     "test": "node test/spec.mjs",
     "test:differential": "node test/differential.mjs",
     "proofs": "node test/proofs.mjs",
     "proofs:paranoid": "node test/paranoid.mjs",
-    "tables": "node tools/tables.mjs"
+    "tables": "node tools/tables.mjs",
+    "test:cli": "node test/cli.mjs --engine node",
+    "test:wasi": "node test/cli.mjs --engine node --engine wasmtime --engine wasmer --engine node-wasi"
   },
   "engines": {
     "node": ">=24"
