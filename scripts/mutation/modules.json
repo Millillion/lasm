@@ -19,28 +19,29 @@
       "name": "build-service",
       "description": "lasm dev build workers, the build client, output receipts and cache reuse checks, the cache lease",
       "mutate": ["src/dev-build-service.mjs", "src/application-build-client.mjs", "src/application-files.mjs", "src/cache-lifecycle.mjs"],
-      "tests": ["test/dev-build-service.test.mjs", "test/build-progress.test.mjs", "test/application-files.test.mjs", "test/cache-lifecycle.test.mjs", "test/build-cache-files.test.mjs"],
+      "tests": ["test/dev-build-service.test.mjs", "test/build-progress.test.mjs", "test/application-files.test.mjs", "test/application-files-faults.test.mjs", "test/cache-lifecycle.test.mjs", "test/build-cache-files.test.mjs"],
       "target": 80
     },
     {
       "name": "link-driver",
       "description": "The Node link driver: object compile plans, Wasm linking, glue generation, link metadata",
       "mutate": ["src/link-driver/link.mjs", "src/link-driver/glue.mjs", "src/link-driver/wasm.mjs", "src/link-driver/metadata.mjs", "src/link-driver/settings.mjs", "src/link-driver/compile.mjs"],
-      "tests": ["test/link-driver-link.test.mjs", "test/link-driver-compile.test.mjs", "test/dev-loop.test.mjs"],
+      "tests": ["test/link-driver-link.test.mjs", "test/link-driver-pipeline.test.mjs", "test/link-driver-recipe.test.mjs", "test/link-driver-glue.test.mjs", "test/link-driver-wasm.test.mjs", "test/link-driver-compile.test.mjs", "test/dev-loop.test.mjs"],
       "target": 80
     },
     {
       "name": "target-link",
       "description": "Application, edge and WASI linking (src/*link*.mjs)",
       "mutate": ["src/application-link.mjs", "src/edge/edge-link.mjs", "src/wasi/wasi-link.mjs"],
-      "tests": ["test/application-link-glue.test.mjs", "test/application-object-store.test.mjs", "test/full-application-link-mode.test.mjs", "test/link-driver-compile.test.mjs", "test/edge.test.mjs", "test/wasi.test.mjs"],
+      "tests": ["test/application-link-glue.test.mjs", "test/application-object-store.test.mjs", "test/full-application-link-mode.test.mjs", "test/link-driver-compile.test.mjs", "test/edge.test.mjs", "test/wasi.test.mjs",
+        "test/application-link-plan.test.mjs", "test/application-link-node.test.mjs", "test/edge-link-plan.test.mjs", "test/wasi-link-plan.test.mjs"],
       "target": 80
     },
     {
       "name": "edge-glue",
       "description": "Edge runtime glue: the edge host, Lasm.JS on the edge, the runtime loader and start-up",
       "mutate": ["src/edge/edge-host.mjs", "src/edge/edge-js.mjs", "src/edge/edge-runtime.mjs", "src/edge/edge-start.mjs"],
-      "tests": ["test/edge.test.mjs", "test/edge-js.test.mjs", "test/edge-host.test.mjs"],
+      "tests": ["test/edge.test.mjs", "test/edge-js.test.mjs", "test/edge-host.test.mjs", "test/edge-runtime.test.mjs"],
       "target": 80
     },
     {

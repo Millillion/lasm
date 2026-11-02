@@ -17,34 +17,34 @@
     },
     "build-service": {
       "initial": 52.4,
-      "score": 91.9,
+      "score": 94.5,
       "mutants": 460,
       "target": 80
     },
     "link-driver": {
       "initial": 53.9,
-      "score": 53.9,
+      "score": 93,
       "mutants": 3260,
       "target": 80
     },
     "target-link": {
       "initial": 5.9,
-      "score": 5.9,
+      "score": 86.8,
       "mutants": 1934,
       "target": 80
     },
     "edge-glue": {
       "initial": 15.2,
-      "score": 78.8,
-      "mutants": 1227,
+      "score": 97.2,
+      "mutants": 1229,
       "target": 80
     },
     "notices": {
       "initial": 62.5,
-      "score": 74.5,
+      "score": 91.5,
       "mutants": 475,
       "target": 80
     }
   },
-  "run": "mutation.yml run 41479365531 (Node 26.12.1) and a local run (Node 24.22.1); the lower of the two"
+  "run": "host-bridge, ui-dom: mutation.yml run 41479365531 (Node 26.12.1) and a local run (Node 24.22.1), the lower of the two; build-service, link-driver, target-link, edge-glue, notices: a local run (Node 24.22.1, 2026-11-02) after the stand-in toolchain and fault-injection tests, checked by the pull request's mutation.yml run"
 }
