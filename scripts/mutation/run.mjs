@@ -70,7 +70,9 @@ for (const module of selected) {
   const config = {
     $schema: './node_modules/@stryker-mutator/core/schema/stryker-schema.json',
     packageManager: 'npm', plugins: ['@stryker-mutator/tap-runner'], testRunner: 'tap',
-    tap: { testFiles: tests, nodeArgs: ['--test-reporter=tap', '--test-concurrency=1', '-r', '{{hookFile}}', '{{testFile}}'], forceBail: true },
+    // A mutant can turn a loop into one that allocates without end; a capped heap
+    // makes that test process fail at once instead of exhausting the machine.
+    tap: { testFiles: tests, nodeArgs: ['--max-old-space-size=768', '--test-reporter=tap', '--test-concurrency=1', '-r', '{{hookFile}}', '{{testFile}}'], forceBail: true },
     coverageAnalysis: 'perTest', mutate: module.mutate, ignorePatterns,
     concurrency, timeoutMS: 20000, timeoutFactor: 2, cleanTempDir: 'always',
     tempDirName: join('.work', 'stryker-tmp', module.name),

@@ -102,6 +102,7 @@ test('describe: every kind of value', () => {
     [new Proxy({}, { ownKeys() { throw new Error('exotic'); } }), 'object'],
   ];
   for (const [value, text] of cases) assert.equal(describe(value), text);
+  assert.equal(describe(Object.create(Object.create(null))), 'object');
   const nullProto = Object.assign(Object.create(null), { k: 1 });
   assert.equal(describe(nullProto), 'object {k}');
 });
@@ -158,6 +159,7 @@ test('wire: every tag decodes; malformed input is reported precisely', () => {
   const truncated = [Buffer.alloc(0), Buffer.from([4, 0, 0]), Buffer.from([5, 1, 0]), Buffer.from([5, 5, 0, 0, 0, 65]),
     Buffer.from([8, 2, 0, 0, 0, 1]), Buffer.from([9, 1, 0, 0, 0, 2, 0, 0, 0, 107]), Buffer.from([10, 1, 0])];
   for (const bytes of truncated) assert.throws(() => js.decode(bytes), { message: 'TypeError: Malformed Lasm.JS value (truncated)' }, bytes.toString('hex'));
+  assert.throws(() => js.dispatch(208, 0, 0n, Buffer.alloc(5)), { message: 'TypeError: Malformed Lasm.JS value (truncated)' });
   assert.throws(() => js.decode(Buffer.from([11])), { message: 'TypeError: Malformed Lasm.JS value (tag 11)' });
   assert.throws(() => js.decode(Buffer.from([1, 1])), { message: 'TypeError: Malformed Lasm.JS value (trailing bytes)' });
   assert.throws(() => js.decode(wire({ ref: firstJsHandle + 99 })), { message: `TypeError: Invalid or released Lasm.JS value handle ${firstJsHandle + 99}` });
@@ -170,9 +172,13 @@ test('requests: released handles come first; malformed heads and unknown operati
   assert.deepEqual([...js.values.values()], ['b']);
   assert.equal(js.snapshot().released, 2);
   assert.equal(js.dispatch(206, b, 0n).toString(), 'string "b"');
+  // Released handles ahead of a payload: the payload starts after them.
+  const d = hold(js, { k: 'v' }), e = hold(js, 'e');
+  assert.equal(js.decode(js.dispatch(203, d, 0n, wire('k'), [e])), 'v');
+  assert.equal(js.values.has(e), false);
   for (const head of [Buffer.alloc(0), Buffer.from([1, 0]), Buffer.concat([u32(2), u32(b)])])
     assert.throws(() => js.raw(200, 0, 0n, head), { message: 'TypeError: Malformed Lasm.JS request' });
-  assert.equal(js.values.size, 1, 'a malformed head releases nothing');
+  assert.equal(js.values.size, 2, 'a malformed head releases nothing');
   assert.throws(() => js.dispatch(212, 0, 0n), { message: 'TypeError: Unsupported Lasm.JS operation 212' });
   // Flag 16 requests start with an 8-byte promise pointer; exactly 8 bytes leave an empty value.
   assert.throws(() => js.dispatch(205, 0, 16n, Buffer.alloc(7)), { message: 'TypeError: Malformed Lasm.JS request' });
@@ -238,22 +244,35 @@ test('op 205: calls, methods and construction; their errors; awaiting', async ()
 test('op 214: typed bindings resolve once per module and path, and their errors', async () => {
   const root = project({
     lib: `let n = 0; module.exports = { count: () => ++n, a: { bc: () => 'a/bc' }, later: v => Promise.resolve(v),
-      reject: () => Promise.reject(new RangeError('bad')), notFn: 3, nil: null, zero: () => 0 };`,
+      reject: () => Promise.reject(new RangeError('bad')), notFn: 3, nil: null, zero: () => 0,
+      rejectUndefined: () => Promise.reject(undefined) };`,
     'lib.a': `module.exports = { bc: () => 'never' };`,
     fn: `module.exports = function whole(x) { return 'whole ' + x; };`,
+    ab: `module.exports = { c: () => 'ab + c' };`,
+    a: `module.exports = { bc: () => 'a + bc' };`,
+    'esm-broken': `throw Object.assign(new Error("Cannot find module './gone.js'"), { code: 'ERR_MODULE_NOT_FOUND' });`,
+    'throws-null': `throw null;`,
     throws: `throw new Error('load failed');`,
   });
   const js = host({ appPath: join(root, 'main.mjs') });
   const call = (module, path, args, flags = 0n) => js.dispatch(214, 0, flags, wire(['T.f', module, path, args]));
   assert.equal(js.decode(call('lib', 'count', [])), 1);
   // The binding is cached: replacing the export afterwards does not change it.
-  const lib = js.decode(js.dispatch(201, 0, 0n, Buffer.from('lib')));
+  // (Reference conversion: the module object itself, not a copy.)
+  const lib = js.decode(js.dispatch(201, 0, 1n, Buffer.from('lib')));
   lib.count = () => 'replaced';
   assert.equal(js.decode(call('lib', 'count', [])), 2);
   assert.equal(js.decode(call('lib', 'a.bc', [])), 'a/bc');
   // Module "lib" + path "a.bc" and module "lib.a" + path "bc" are different bindings.
   assert.equal(js.decode(call('lib.a', 'bc', [])), 'never');
   assert.equal(js.decode(call('fn', '', ['x'])), 'whole x');
+  // Module and path are kept apart in the binding cache.
+  assert.equal(js.decode(call('ab', 'c', [])), 'ab + c');
+  assert.equal(js.decode(call('a', 'bc', [])), 'a + bc');
+  assert.throws(() => call('esm-broken', '', []), { message: /^TypeError: Cannot find JavaScript module "esm-broken"/ });
+  assert.throws(() => call('throws-null', '', []), { message: 'Uncaught JavaScript value: null' });
+  // Flag 2 on a plain (truthy) result replies at once, not with a promise.
+  assert.equal(typeof call('lib', 'count', [], 2n).then, 'undefined');
   assert.throws(() => call('lib', 'nil.f', []), { message: 'TypeError: Cannot read "f" of null' });
   assert.throws(() => call('lib', 'missing.f', []), { message: 'TypeError: Cannot read "f" of undefined' });
   assert.throws(() => call('lib', 'notFn', []), { message: 'TypeError: export "notFn" of module "lib" is number 3, not a function' });
@@ -267,6 +286,7 @@ test('op 214: typed bindings resolve once per module and path, and their errors'
   assert.equal(js.decode(call('lib', 'zero', [], 2n)), 0);
   assert.equal(typeof js.decode(call('lib', 'later', ['p'])).then, 'function');
   await assert.rejects(call('lib', 'reject', [], 2n), { message: 'RangeError: bad' });
+  await assert.rejects(call('lib', 'rejectUndefined', [], 2n), { message: 'Uncaught JavaScript value: undefined' });
 });
 
 test('op 201: Lasm builtin modules load from beside the host; bad names fail', () => {
@@ -274,7 +294,7 @@ test('op 201: Lasm builtin modules load from beside the host; bad names fail', (
   const app = js.decode(js.dispatch(201, 0, 0n, Buffer.from('lasm:app')));
   assert.equal(app.target(), 'none');
   assert.equal(js.decode(js.dispatch(201, 0, 0n, Buffer.from('globalThis'))), globalThis);
-  for (const name of ['lasm:nope', 'lasm:', 'lasm:Bad', 'lasm:../node-js', 'lasm:9x', 'lasm:a/b', 'lasm:-x'])
+  for (const name of ['lasm:ui-dom.mjs?', 'lasm:app#x', 'lasm:nope', 'lasm:', 'lasm:Bad', 'lasm:../node-js', 'lasm:9x', 'lasm:a/b', 'lasm:-x'])
     assert.throws(() => js.dispatch(201, 0, 0n, Buffer.from(name)), { message: `TypeError: Unknown Lasm builtin JavaScript module ${JSON.stringify(name)}` }, name);
   // A package called lasm-something is an ordinary npm module.
   assert.throws(() => js.dispatch(201, 0, 0n, Buffer.from('xlasm:app')), /Cannot find JavaScript module "xlasm:app"/);
@@ -395,7 +415,21 @@ test('the poller is spawned only when no Lean thread polls, after Lean stops mak
   d.dispatch(207, 0, 1n, wire(1));
   await wait(1);
   assert.equal(d.snapshot().poller.spawnTimer, false);
-  for (const js of [a, b, c, d]) js.close();
+  // Several events while one spawn is pending: still one poller.
+  let spawnedE = 0;
+  const e = host({ spawnPoller: () => spawnedE++ });
+  for (let i = 0; i < 5; i++) { e.dispatch(207, 0, BigInt(i), wire(i)); await wait(2); }
+  await wait(80);
+  assert.equal(spawnedE, 1);
+  // close() cancels a pending spawn.
+  let spawnedF = 0;
+  const f = host({ spawnPoller: () => spawnedF++ });
+  f.dispatch(207, 0, 1n, wire(1));
+  await wait(1);
+  f.close();
+  await wait(80);
+  assert.equal(spawnedF, 0);
+  for (const js of [a, b, c, d, e]) js.close();
 });
 
 test('collected Lean functions are reported to Lean (event 3)', async () => {
@@ -521,12 +555,14 @@ test('synchronous callbacks serve the Lean thread’s nested host calls', async 
     await new Promise(resolve => setTimeout(resolve, 50));
     const f = js.values.get(js.dispatch(210, 2, 2n).readUInt32LE(1));
     const started = performance.now();
-    for (let i = 1; i <= 20; i++) assert.deepEqual(f(i), [[i], 2]);
-    assert.ok(performance.now() - started < 1000, 'served when the doorbell rings');
+    for (let i = 1; i <= 50; i++) assert.deepEqual(f(i), [[i], 2]);
+    // Each nested call is served when the doorbell rings, not by the 10 ms poll (50 calls: at least 500 ms).
+    const elapsed = performance.now() - started;
+    assert.ok(elapsed < 350, `50 nested host calls took ${elapsed.toFixed(0)} ms`);
     // Every request was served, for this slot, in order (a timed-out wait may serve again).
     assert.ok(served.every(([slot]) => slot === layout.slot));
     const sequences = served.map(([, sequence]) => sequence).filter((x, i, all) => x && x !== all[i - 1]);
-    assert.deepEqual(sequences, Array.from({ length: 20 }, (_, i) => i + 1));
+    assert.deepEqual(sequences, Array.from({ length: 50 }, (_, i) => i + 1));
   } finally {
     const i32 = new Int32Array(memory.buffer);
     view.setUint32(layout.channel + 8, 99, true); Atomics.store(i32, layout.channel / 4, 1); Atomics.notify(i32, layout.channel / 4);
