@@ -22,6 +22,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
 import { emscriptenResponseFile } from '../link-driver/link.mjs';
+import { testUnoptimized } from '../test-switches.mjs';
 import { lowerAtomics, moduleImports, keepExports } from './lower-atomics.mjs';
 import { componentize, httpHandlerExport } from './wasi-component.mjs';
 
@@ -121,7 +122,8 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
   writeFileSync(lowered, loweredBytes);
 
   // 4. No exception handling, 32-bit memory and tables, optimized.
-  run('wasm-opt', [...inputFeatures, '--strip-eh', '--memory64-lowering', '--table64-lowering', settings.optimize,
+  // LASM_TEST_UNOPTIMIZED (src/test-switches.mjs): the lowering passes only.
+  run('wasm-opt', [...inputFeatures, '--strip-eh', '--memory64-lowering', '--table64-lowering', testUnoptimized() ? '-O0' : settings.optimize,
     '--strip-debug', '--strip-producers', '--strip-target-features', lowered, '-o', program]);
 
   const bytes = readFileSync(program);

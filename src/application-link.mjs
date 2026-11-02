@@ -17,6 +17,7 @@ import { buildJobs } from './managed-link-toolchain.mjs';
 import { archiveMembers, explainRejection, parseWhyExtract, undefinedSymbols } from './application-diagnosis.mjs';
 import { executableName, responseFile } from './platform.mjs';
 import { bundledRecipe, checkToolchainIdentity, compileObject, devOptimization, emscriptenCache, probeOptimization } from './link-driver/compile.mjs';
+import { testUnoptimized } from './test-switches.mjs';
 import { bundledNativeSigs, linkTemporaryDirectory, linkWithNode, removeTemporary } from './link-driver/link.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
@@ -199,7 +200,7 @@ export async function linkApplication(options) {
   // release builds only write it. A seeded build that the application policy
   // rejects is retried unseeded, so the seed never changes what is accepted.
   const seedRecord = readInitializationSeed(initializationSeed, runtime);
-  const seeded = profile === 'dev' && linkDriver === 'node' && !!seedRecord && !process.env.LASM_LINK_DEBUG;
+  const seeded = profile === 'dev' && linkDriver === 'node' && !!seedRecord && !process.env.LASM_LINK_DEBUG && !testUnoptimized();
   if (seeded) {
     try { return await linkApplicationOnce(options, seedRecord); }
     catch (error) {
@@ -373,7 +374,8 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   for (let index = 0; index < sources.length; index++) {
     progress?.({ stage: `Compiling application module ${index + 1} of ${sources.length}` });
     const object = join(work, `module-${index}.o`);
-    compile(sources[index], object, { optimization: profile === 'dev' && nodeCompile ? devOptimization : undefined });
+    // LASM_TEST_UNOPTIMIZED (src/test-switches.mjs): the program's C at -O0.
+    compile(sources[index], object, { optimization: nodeCompile && testUnoptimized() ? probeOptimization : profile === 'dev' && nodeCompile ? devOptimization : undefined });
     objects.push(object);
   }
   // Package C code (src/application-native.mjs), linked like archive members:
@@ -528,7 +530,8 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   // names or DWARF. Maintainer diagnostics only: LASM_LINK_DEBUG delivers the
   // unoptimized probe link (with Wasm names).
   const finalMap = join(work, 'final.map');
-  const debug = !!process.env.LASM_LINK_DEBUG;
+  // LASM_TEST_UNOPTIMIZED delivers the same unoptimized link (src/test-switches.mjs).
+  const debug = !!process.env.LASM_LINK_DEBUG || testUnoptimized();
   // Dev builds (src/application-live-members.mjs): the runtime members the
   // previous full link kept, instead of the archives; accepted only when the
   // program imports nothing that link did not.
@@ -696,7 +699,7 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   const glue = join(dist, 'program.cjs');
   writeFileSync(glue, connectLeanSymbolLoader(relabelPreJs(readFileSync(glue, 'utf8'), preJs), true, { packageSymbols: true }));
   await indexFunctionTable(join(dist, 'program.wasm'), glue);
-  if (!process.env.LASM_LINK_DEBUG) writeFileSync(glue, optimizeMainTableGrowth(readFileSync(glue, 'utf8')));
+  if (!process.env.LASM_LINK_DEBUG && !testUnoptimized()) writeFileSync(glue, optimizeMainTableGrowth(readFileSync(glue, 'utf8')));
   writeFileSync(glue, configurableThreadPool(readFileSync(glue, 'utf8')));
   return requirements;
 }

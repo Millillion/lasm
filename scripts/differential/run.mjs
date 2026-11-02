@@ -7,16 +7,34 @@
 // program holding many candidate shrinks) and written as a reproducer plus a
 // regression case for test/differential/regressions/.
 //
+// Three more comparisons (docs/TESTING.md#more-oracles), all as targets:
+//   interp                   Lean's interpreter (`lean --run`, the same upstream
+//                            toolchain): a second oracle. Where it and native Lean
+//                            disagree, upstream Lean is suspect, not Lasm; those
+//                            are reported as upstream suspects and never fail a run.
+//   node-O0, wasi-O0, deno-O0  the same program built with optimization off
+//                            (clang -O0 for the program's C, no Binaryen
+//                            optimization passes): LASM_TEST_UNOPTIMIZED=1, a
+//                            test-only switch of the build.
+//   edge-node, edge-bun      the edge output (--target deno) on other engines:
+//                            Node (V8) and Bun (JavaScriptCore); deno runs it on
+//                            Deno (V8).
+//   edge-sm                  the same edge output on SpiderMonkey's js shell
+//                            (sm-runner.mjs).
+//
 //   node scripts/differential/run.mjs --lasm PATH/bin/lasm.mjs --lean-bin DIR --work NEW_DIR
 //     [--seed N] [--programs N | --budget-min M] [--cases 120] [--fs-cases 25]
-//     [--targets node,wasi,wasi-node,deno] [--profile release|dev]
-//     [--wasmtime PATH] [--deno PATH] [--wrap "CMD ARGS --"] [--regressions DIR]
+//     [--targets node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm]
+//     [--profile release|dev] [--wasmtime PATH] [--deno PATH] [--bun PATH] [--sm PATH]
+//     [--wrap "CMD ARGS --"] [--regressions DIR]
 //     [--shrink-rounds 12] [--summary FILE.json]
 //
 // Exit status: 0 = no divergence, 1 = divergence (reproducers in WORK/repros), 2 = harness error.
+// Upstream suspects (native vs interpreter) are in the summary and never change it.
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, rmSync, cpSync } from 'node:fs';
-import { join, resolve, basename } from 'node:path';
+import { join, resolve, basename, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import * as g from './generate.mjs';
 
@@ -35,6 +53,8 @@ const targets = opt('--targets', 'node,wasi,deno').split(',').filter(Boolean);
 const profile = opt('--profile', 'release');
 const wasmtime = opt('--wasmtime', 'wasmtime');
 const deno = opt('--deno', 'deno');
+const bun = opt('--bun', 'bun');
+const sm = opt('--sm', 'js');
 const wrap = (opt('--wrap', '') || '').split(' ').filter(Boolean);
 const regressionsDir = opt('--regressions');
 const shrinkRounds = Number(opt('--shrink-rounds', '12'));
@@ -45,13 +65,36 @@ mkdirSync(work, { recursive: true });
 
 // Targets: how Lasm builds each, and how its output runs. Edge-profile targets
 // have no file system, so the file-system program runs only on node and WASI.
+// `out` names the build output a target runs (targets sharing one are built
+// once); `variant` builds in a subdirectory of the program with extra
+// environment (the optimization differential); `oracle` targets are not Lasm
+// (no build) and their disagreements with native Lean are upstream suspects.
+const wasmtimeEnv = [...['A', 'B', 'C', 'D', 'E'].flatMap(k => ['--env', `LASM_DIFF_${k}=${k}`]), '--env', 'LEAN_BACKTRACE=0'];
+// Node runs the JSPI edge output only with JSPI (unflagged from Node 25).
+const nodeJspi = spawnSync(process.execPath, ['-e', 'process.exit(typeof WebAssembly.Suspending === "function" ? 0 : 1)']).status === 0 ? [] : ['--experimental-wasm-jspi'];
+const here = dirname(fileURLToPath(import.meta.url));
+const unoptimized = { LASM_TEST_UNOPTIMIZED: '1' };
 const TARGETS = {
   node: { build: [], run: dir => [process.execPath, [join(dir, 'dist/main.mjs')]], fs: true },
   // Several variables before LEAN_BACKTRACE: libc's getenv once lost every
   // variable after the third (src/wasi/lasm_wasi_libc.c).
-  wasi: { build: ['--target', 'wasi'], run: dir => [wasmtime, ['run', '--dir', '.', ...['A', 'B', 'C', 'D', 'E'].flatMap(k => ['--env', `LASM_DIFF_${k}=${k}`]), '--env', 'LEAN_BACKTRACE=0', join(dir, 'wasi/main.wasm')]], fs: true, out: 'wasi' },
+  wasi: { build: ['--target', 'wasi'], run: dir => [wasmtime, ['run', '--dir', '.', ...wasmtimeEnv, join(dir, 'wasi/main.wasm')]], fs: true, out: 'wasi' },
   'wasi-node': { build: ['--target', 'wasi'], run: dir => [process.execPath, ['--no-warnings', join(work, 'node-wasi-run.mjs'), join(dir, 'wasi/main.wasm')]], fs: true, out: 'wasi' },
   deno: { build: ['--target', 'deno'], run: dir => [deno, ['run', '-A', '--no-lock', join(dir, 'deno/main.mjs')]], fs: false, out: 'deno' },
+  // Second oracle: the upstream interpreter on the same source.
+  // (--root: the module is Main, as for `lean -c` in the program directory;
+  // otherwise panic messages would name it _stdin.)
+  interp: { oracle: true, run: dir => [join(leanBin, 'lean'), [`--root=${dir}`, '--run', join(dir, 'Main.lean')]], fs: true },
+  // Optimization differential: the same targets, unoptimized.
+  'node-O0': { build: [], variant: 'O0', buildEnv: unoptimized, run: dir => [process.execPath, [join(dir, 'dist/main.mjs')]], fs: true },
+  'wasi-O0': { build: ['--target', 'wasi'], variant: 'O0', buildEnv: unoptimized, run: dir => [wasmtime, ['run', '--dir', '.', ...wasmtimeEnv, join(dir, 'wasi/main.wasm')]], fs: true, out: 'wasi' },
+  'deno-O0': { build: ['--target', 'deno'], variant: 'O0', buildEnv: unoptimized, run: dir => [deno, ['run', '-A', '--no-lock', join(dir, 'deno/main.mjs')]], fs: false, out: 'deno' },
+  // Engine differential: one edge output (deno/main.mjs is portable) on V8 and JavaScriptCore.
+  'edge-node': { build: ['--target', 'deno'], run: dir => [process.execPath, [...nodeJspi, '--no-warnings', join(dir, 'deno/main.mjs')]], fs: false, out: 'deno' },
+  'edge-bun': { build: ['--target', 'deno'], run: dir => [bun, [join(dir, 'deno/main.mjs')]], fs: false, out: 'deno' },
+  // SpiderMonkey's js shell (sm-runner.mjs): the shell's quit takes 0–127, so the
+  // runner also writes the status to a file.
+  'edge-sm': { build: ['--target', 'deno'], run: dir => [sm, ['-m', join(here, 'sm-runner.mjs')], { LASM_SM_RUN: JSON.stringify({ program: join(dir, 'deno/lasm'), env: { LEAN_BACKTRACE: '0' }, jspi: true, exitFile: 'exit-status' }) }], exitFile: 'exit-status', fs: false, out: 'deno' },
 };
 for (const t of targets) if (!TARGETS[t]) { console.error(`unknown target ${t}`); process.exit(2); }
 writeFileSync(join(work, 'node-wasi-run.mjs'), `const emit = process.emitWarning;
@@ -66,10 +109,10 @@ process.exitCode = wasi.start(instance);
 `);
 
 const env = { ...process.env, CI: '1', BROWSER: 'none', LASM_EDITOR: '0', LEAN_BACKTRACE: '0', NO_COLOR: '1' };
-function exec(cmd, args, { cwd, timeout = 30 * 60_000 } = {}) {
+function exec(cmd, args, { cwd, timeout = 30 * 60_000, extraEnv } = {}) {
   return new Promise(done => {
     const started = performance.now();
-    const child = spawn(cmd, args, { cwd, env, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(cmd, args, { cwd, env: extraEnv ? { ...env, ...extraEnv } : env, stdio: ['ignore', 'pipe', 'pipe'] });
     // Bytes are collected and decoded once: decoding each pipe chunk on its own
     // would corrupt a UTF-8 character split across two chunks (it did: the
     // oracle's 4096-byte writes split "İ" in campaign 41246364549).
@@ -92,7 +135,7 @@ async function buildNative(dir) {
 async function buildLasm(dir, target) {
   const args = [lasm, 'build', 'Main.lean', ...TARGETS[target].build, ...(profile === 'dev' ? ['--dev'] : [])];
   const [cmd, ...rest] = wrap.length ? [...wrap, process.execPath, ...args] : [process.execPath, ...args];
-  const r = await exec(cmd, rest, { cwd: dir });
+  const r = await exec(cmd, rest, { cwd: dir, extraEnv: TARGETS[target].buildEnv });
   return { ok: r.code === 0, log: (r.stdout + r.stderr).slice(-6000), ms: r.ms };
 }
 // The observable behaviour: stdout, stderr (without native backtraces) and the
@@ -103,15 +146,12 @@ function normalize(r) {
   const stderr = r.stderr.replace(/\r\n/g, '\n').split('\n').filter(l => !/^\S+\(\+0x[0-9a-f]+\) \[0x[0-9a-f]+\]$/.test(l)).join('\n');
   return { stdout: r.stdout.replace(/\r\n/g, '\n'), stderr, code: r.timedOut ? 'timeout' : r.signal ? `signal ${r.signal}` : r.code };
 }
-// Known divergences with an open issue: applied to a target's output before the
-// comparison and counted in the summary, so they are visible without failing
-// every run. Remove an entry when its issue is fixed.
+// Known divergences: applied to a target's output before the comparison and
+// counted in the summary, so they are visible without failing every run. Each
+// is an open issue or a documented host limit; remove an entry when it is fixed.
 const KNOWN = [
-  { issue: 'https://github.com/Millillion/lasm/issues/26', targets: ['deno'],
-    what: 'edge profile prints panic backtraces despite LEAN_BACKTRACE=0',
-    apply: r => ({ ...r, stderr: r.stderr.replace(/^backtrace:\n(?: {4}at .*\n?)*/gm, '') }) },
-  { issue: 'https://github.com/Millillion/lasm/issues/30', targets: ['wasi'],
-    what: 'wasmtime rejects exit statuses of 126 and above (exit 1 with an error)',
+  { issue: 'https://github.com/Millillion/lasm/issues/30', targets: ['wasi', 'wasi-O0'],
+    what: 'wasmtime turns exit statuses of 126 and above into exit 1 with an error (a wasmtime limit, documented in docs/WASI.md)',
     apply: (r, nat) => typeof nat?.code === 'number' && nat.code >= 126 && r.code === 1 && /invalid exit status outside of \[0\.\.126\)/.test(r.stderr)
       ? { ...r, code: nat.code, stderr: r.stderr.replace(/Error: failed to run main module[\s\S]*$/, '') + (nat.stderr.endsWith('\n') && !r.stderr.endsWith('\n') ? '\n' : '') } : r },
 ];
@@ -124,14 +164,15 @@ function applyKnown(target, r, nat) {
   }
   return r;
 }
-async function runIn(projectDir, cmdArgs, label) {
+async function runIn(projectDir, cmdArgs, label, exitFile) {
   const runDir = join(projectDir, `run-${label}`);
   rmSync(runDir, { recursive: true, force: true }); mkdirSync(runDir);
-  const r = await exec(cmdArgs[0], cmdArgs[1], { cwd: runDir, timeout: runTimeoutMs });
+  const r = await exec(cmdArgs[0], cmdArgs[1], { cwd: runDir, timeout: runTimeoutMs, extraEnv: cmdArgs[2] });
+  if (exitFile && !r.timedOut && !r.signal && existsSync(join(runDir, exitFile))) r.code = Number(readFileSync(join(runDir, exitFile), 'utf8'));
   return { ...normalize(r), ms: r.ms };
 }
 const runNative = dir => runIn(dir, [join(dir, 'main'), []], 'native');
-const runTarget = async (dir, target, nat) => applyKnown(target, await runIn(dir, TARGETS[target].run(dir), target), nat);
+const runTarget = async (dir, target, nat) => applyKnown(target, await runIn(dir, TARGETS[target].run(dir), target, TARGETS[target].exitFile), nat);
 
 // Output lines grouped by the case that printed them: stdout lines start with
 // the case id ("cN ...", "cNvM ...", "r_name ..."); stderr has an "@id" marker
@@ -163,18 +204,28 @@ async function evaluate(dir, list, tlist, { ending } = {}) {
   const nat = await runNative(dir);
   const ids = list.map(({ index, name }) => name ?? `c${index}`);
   const results = {};
-  const built = new Set();
+  const built = new Map();
   for (const t of tlist) {
-    const out = TARGETS[t].out ?? t;
-    if (!built.has(out)) {
-      const b = await buildLasm(dir, t);
-      if (!b.ok) { results[t] = { buildFailed: true, log: b.log }; continue; }
-      built.add(out); builtTargets.set(t, (builtTargets.get(t) ?? 0) + b.ms);
-    }
-    const r = await runTarget(dir, t, nat);
-    results[t] = { run: r, diff: diverging(ids, nat, r) };
+    const r = await buildAndRun(dir, t, nat, built);
+    results[t] = r.buildFailed ? r : { run: r.run, diff: diverging(ids, nat, r.run) };
   }
   return { nat, ids, results };
+}
+// Builds a target's output once per program (a variant in its own
+// subdirectory), then runs it. Oracle targets run the source.
+async function buildAndRun(dir, t, nat, built) {
+  const spec = TARGETS[t];
+  const project = spec.variant ? join(dir, spec.variant) : dir;
+  if (!spec.oracle) {
+    const out = `${spec.variant ?? ''}:${spec.out ?? t}`;
+    if (!built.has(out)) {
+      if (spec.variant) { mkdirSync(project, { recursive: true }); cpSync(join(dir, 'Main.lean'), join(project, 'Main.lean')); }
+      const b = await buildLasm(project, t);
+      if (!b.ok) { built.set(out, b); return { buildFailed: true, log: b.log }; }
+      built.set(out, b); builtTargets.set(t, (builtTargets.get(t) ?? 0) + b.ms);
+    } else if (!built.get(out).ok) return { buildFailed: true, log: built.get(out).log };
+  }
+  return { run: await runTarget(project, t, nat) };
 }
 
 // ---------- shrinking ----------
@@ -224,7 +275,7 @@ export function loadRegressions(dir) {
 }
 
 // ---------- main ----------
-const summary = { started: new Date().toISOString(), seed0, targets, profile, cases: nCases, fsCases: nFsCases, programs: [], divergences: [], harnessErrors: [] };
+const summary = { started: new Date().toISOString(), seed0, targets, profile, cases: nCases, fsCases: nFsCases, programs: [], divergences: [], upstreamSuspects: [], harnessErrors: [] };
 const save = () => writeFileSync(summaryFile, JSON.stringify(summary, null, 2) + '\n');
 const startedAt = Date.now();
 
@@ -257,7 +308,10 @@ async function campaignProgram(seed, kind) {
     }
     rec.targets[t] = { ms: res.run.ms, same: !res.diff.any };
     if (!res.diff.any) { console.log(`seed ${seed} ${kind} ${t}: same (${list.length} cases, native ${ev.nat.ms} ms, ${t} ${res.run.ms} ms)`); continue; }
-    console.log(`seed ${seed} ${kind} ${t}: DIVERGES: cases ${res.diff.bad.slice(0, 10).join(' ')}${res.diff.code ? ` exit ${ev.nat.code} vs ${res.run.code}` : ''}${res.diff.stderr ? ' (stderr differs)' : ''}`);
+    // The interpreter is a second oracle: its disagreements with native Lean
+    // are upstream suspects, shrunk and kept like divergences, never failures.
+    const sink = TARGETS[t].oracle ? summary.upstreamSuspects : summary.divergences;
+    console.log(`seed ${seed} ${kind} ${t}: ${TARGETS[t].oracle ? 'UPSTREAM SUSPECT (native and interpreter differ)' : 'DIVERGES'}: cases ${res.diff.bad.slice(0, 10).join(' ')}${res.diff.code ? ` exit ${ev.nat.code} vs ${res.run.code}` : ''}${res.diff.stderr ? ' (stderr differs)' : ''}`);
     // Each diverging case (at most 3 per program and target) alone, then shrunk.
     // The first diverging cases (a crash also cuts off every later case), each
     // re-run alone; the ones that diverge alone are shrunk. If none does, the
@@ -280,7 +334,7 @@ async function campaignProgram(seed, kind) {
       const fr = fin.results?.[t];
       const native = fin.nat, target = fr?.run;
       const repro = writeRepro(t, seed, small, native, target, ending, `native: ${JSON.stringify(native?.stdout?.slice(0, 200))} ${t}: ${JSON.stringify(target?.stdout?.slice(0, 200))}`);
-      summary.divergences.push({ seed, kind, target: t, case: item.index, size: g.caseSize(small.c), repro: repro.dir, regression: `${repro.name}.lean`,
+      sink.push({ seed, kind, target: t, case: item.index, size: g.caseSize(small.c), repro: repro.dir, regression: `${repro.name}.lean`,
         native: { stdout: native?.stdout.slice(0, 2000), stderr: native?.stderr.slice(0, 2000), code: native?.code },
         [t]: { stdout: target?.stdout.slice(0, 2000), stderr: target?.stderr.slice(0, 2000), code: target?.code } });
       console.log(`  minimized to ${repro.dir}`);
@@ -293,7 +347,7 @@ async function campaignProgram(seed, kind) {
       const pick = (r, ids) => { const o = byCase(r.stdout), e = byCase(r.stderr, true); return Object.fromEntries(ids.map(id => [id, { stdout: o.get(id) ?? null, stderr: e.get(id) ?? null }])); };
       const ids = suspects.slice(0, 4);
       writeFileSync(join(combo, 'outputs.json'), JSON.stringify({ native: { code: ev.nat.code, cases: pick(ev.nat, ids) }, [t]: { code: res.run.code, cases: pick(res.run, ids) } }, null, 1) + '\n');
-      summary.divergences.push({ seed, kind, target: t, cases: ids, what: 'diverges only in combination with other cases', repro: combo, reproduce: `--seed ${seed} --programs 1` });
+      sink.push({ seed, kind, target: t, cases: ids, what: 'diverges only in combination with other cases', repro: combo, reproduce: `--seed ${seed} --programs 1` });
     }
   }
   save();
@@ -318,14 +372,16 @@ async function regressionRun() {
     if (!nb.ok) { summary.harnessErrors.push({ regressions: true, log: nb.log.slice(0, 4000) }); console.log(`regressions: native build failed\n${nb.log.slice(0, 3000)}`); continue; }
     const nat = await runNative(d);
     const ids = group.map(r => r.name);
+    const built = new Map();
     for (const t of tlist) {
-      const b = await buildLasm(d, t);
-      if (!b.ok) { summary.divergences.push({ regressions: true, target: t, what: 'lasm build failed', log: b.log }); console.log(`regressions ${t}: BUILD FAILED`); continue; }
-      const r = await runTarget(d, t, nat);
+      const res = await buildAndRun(d, t, nat, built);
+      if (res.buildFailed) { summary.divergences.push({ regressions: true, target: t, what: 'lasm build failed', log: res.log }); console.log(`regressions ${t}: BUILD FAILED`); continue; }
+      const r = res.run;
       const diff = diverging(ids, nat, r);
       if (diff.any) {
-        summary.divergences.push({ regressions: true, target: t, cases: diff.bad, code: [nat.code, r.code], native: { stdout: nat.stdout.slice(0, 3000), stderr: nat.stderr.slice(0, 2000) }, [t]: { stdout: r.stdout.slice(0, 3000), stderr: r.stderr.slice(0, 2000) } });
-        console.log(`regressions ${t}: DIVERGES: ${diff.bad.join(' ')}${diff.code ? ` exit ${nat.code} vs ${r.code}` : ''}${diff.stderr ? ' (stderr differs)' : ''}`);
+        const list = TARGETS[t].oracle ? summary.upstreamSuspects : summary.divergences;
+        list.push({ regressions: true, target: t, cases: diff.bad, code: [nat.code, r.code], native: { stdout: nat.stdout.slice(0, 3000), stderr: nat.stderr.slice(0, 2000) }, [t]: { stdout: r.stdout.slice(0, 3000), stderr: r.stderr.slice(0, 2000) } });
+        console.log(`regressions ${t}: ${TARGETS[t].oracle ? 'UPSTREAM SUSPECT (native and interpreter differ)' : 'DIVERGES'}: ${diff.bad.join(' ')}${diff.code ? ` exit ${nat.code} vs ${r.code}` : ''}${diff.stderr ? ' (stderr differs)' : ''}`);
       } else console.log(`regressions ${t}: same (${ids.length} cases)`);
     }
   }
@@ -349,5 +405,5 @@ summary.buildMs = Object.fromEntries(builtTargets);
 summary.knownDivergences = KNOWN.map(k => ({ issue: k.issue, targets: k.targets, what: k.what, applied: knownApplied[k.issue] ?? 0 }));
 save();
 const realDivergences = summary.divergences.length;
-console.log(`\n${summary.programs.length} programs, ${summary.programs.reduce((s, p) => s + p.cases, 0)} cases, ${realDivergences} divergences, ${summary.harnessErrors.length} harness errors (summary: ${summaryFile})`);
+console.log(`\n${summary.programs.length} programs, ${summary.programs.reduce((s, p) => s + p.cases, 0)} cases, ${realDivergences} divergences, ${summary.upstreamSuspects.length} upstream suspects (native vs interpreter, not Lasm), ${summary.harnessErrors.length} harness errors (summary: ${summaryFile})`);
 process.exit(realDivergences ? 1 : summary.harnessErrors.length ? 2 : 0);
