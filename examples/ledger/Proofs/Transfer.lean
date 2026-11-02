@@ -157,7 +157,7 @@ theorem inv_two {D : DB} (hI : Inv D) {tr : Transfer} {dr cr dr' cr' : Account}
       rw [List.mem_filter] at hrm
       unfold resolvedIn at this
       rw [List.any_eq_false] at this
-      exact this r hrm.1 (by simp at hrm; simp [hrm.2, hrx, e])
+      exact this r hrm.1 (by simp [hrm.2, hrx, e])
   · intro b hb
     rw [replay_append]
     rcases mem_two hn hi hj hb with rfl | rfl | ⟨m, n1, n2⟩
@@ -295,32 +295,36 @@ theorem inv_new {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {dr cr : Acco
       cases hp : t.flags.pending
       all_goals
         simp only [hp, ite_true, ite_false, Bool.false_eq_true] at pdd pcd ⊢
-        refine ⟨by simp; omega, by simp; omega, by simp; omega, by simp; omega, fun h => ?_, fun h => ?_⟩
-        · simp at h ⊢; have := b9 h; omega
-        · simp at h ⊢; have := cmD h; omega
+        refine ⟨by first | omega | (simp; omega), by first | omega | (simp; omega), by first | omega | (simp; omega),
+          by first | omega | (simp; omega), fun h => ?_, fun h => ?_⟩
+        · have := b9 h; first | omega | (simp; omega)
+        · have := cmD h; first | omega | (simp; omega)
     · rw [ecr]
       cases hp : t.flags.pending
       all_goals
         simp only [hp, ite_true, ite_false, Bool.false_eq_true] at pdc pcc ⊢
-        refine ⟨by simp; omega, by simp; omega, by simp; omega, by simp; omega, fun h => ?_, fun h => ?_⟩
-        · simp at h ⊢; have := dmC h; omega
-        · simp at h ⊢; have := b10 h; omega
+        refine ⟨by first | omega | (simp; omega), by first | omega | (simp; omega), by first | omega | (simp; omega),
+          by first | omega | (simp; omega), fun h => ?_, fun h => ?_⟩
+        · have := dmC h; first | omega | (simp; omega)
+        · have := b10 h; first | omega | (simp; omega)
   · intro L
-    have h1 := total_two hI.accountIds (find_of_mem hI.accountIds hdm) (find_of_mem hI.accountIds hcm) hdc
-      (dr' := dr') (cr' := cr') (by rw [edr]; split <;> rfl) (by rw [ecr]; split <;> rfl) L
-    have e1 := h1 (·.debitsPosted)
-    have e2 := h1 (·.creditsPosted)
-    have e3 := h1 (·.debitsPending)
-    have e4 := h1 (·.creditsPending)
     have := hI.posted L
     have := hI.pending L
     have hl' : cr.ledger = dr.ledger := b1.symm
-    rw [edr, ecr] at e1 e2 e3 e4
     cases hp : t.flags.pending
     all_goals
+      simp only [hp, ite_true, ite_false, Bool.false_eq_true] at edr ecr
+      have h1 := total_two (dr' := dr') (cr' := cr') hI.accountIds (find_of_mem hI.accountIds hdm)
+        (find_of_mem hI.accountIds hcm) hdc (by rw [edr]) (by rw [ecr]) L
+      subst edr ecr
+      have e1 := h1 (·.debitsPosted)
+      have e2 := h1 (·.creditsPosted)
+      have e3 := h1 (·.debitsPending)
+      have e4 := h1 (·.creditsPending)
+      clear h1
       by_cases hl : dr.ledger = L
       all_goals
-        simp [part, hl, hl', hp] at e1 e2 e3 e4
+        simp [part, hl, hl'] at e1 e2 e3 e4
         constructor <;> omega
 
 /-! ## Posts and voids -/
@@ -418,16 +422,19 @@ theorem inv_resolve {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {p : Tran
   · intro z hz
     rcases hz with rfl | rfl
     · rw [edr]
-      refine ⟨by simp; omega, by simp; omega, by simp; omega, by simp; omega, fun h => ?_, fun h => ?_⟩
-      · simp at h ⊢; have := dmD h; omega
-      · simp at h ⊢; have := cmD h; omega
+      refine ⟨by first | omega | (simp; omega), by first | omega | (simp; omega), by first | omega | (simp; omega),
+          by first | omega | (simp; omega), fun h => ?_, fun h => ?_⟩
+      · have := dmD h; first | omega | (simp; omega)
+      · have := cmD h; first | omega | (simp; omega)
     · rw [ecr]
-      refine ⟨by simp; omega, by simp; omega, by simp; omega, by simp; omega, fun h => ?_, fun h => ?_⟩
-      · simp at h ⊢; have := dmC h; omega
-      · simp at h ⊢; have := cmC h; omega
+      refine ⟨by first | omega | (simp; omega), by first | omega | (simp; omega), by first | omega | (simp; omega),
+          by first | omega | (simp; omega), fun h => ?_, fun h => ?_⟩
+      · have := dmC h; first | omega | (simp; omega)
+      · have := cmC h; first | omega | (simp; omega)
   · intro L
-    have h1 := total_two hI.accountIds (find_of_mem hI.accountIds hdm) (find_of_mem hI.accountIds hcm) hdc
-      (dr' := dr') (cr' := cr') (by rw [edr]) (by rw [ecr]) L
+    have h1 := total_two (dr' := dr') (cr' := cr') hI.accountIds (find_of_mem hI.accountIds hdm)
+      (find_of_mem hI.accountIds hcm) hdc (by rw [edr]) (by rw [ecr]) L
+    subst edr ecr
     have e1 := h1 (·.debitsPosted)
     have e2 := h1 (·.creditsPosted)
     have e3 := h1 (·.debitsPending)
@@ -435,7 +442,6 @@ theorem inv_resolve {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {p : Tran
     have := hI.posted L
     have := hI.pending L
     have hl' : cr.ledger = dr.ledger := hyl.trans hxl.symm
-    rw [edr, ecr] at e1 e2 e3 e4
     by_cases hl : dr.ledger = L
     all_goals
       simp [part, hl, hl'] at e1 e2 e3 e4
