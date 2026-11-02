@@ -18,9 +18,9 @@ The sources of the requirements are
 [RP-Initiated Logout 1.0](https://openid.net/specs/openid-connect-rpinitiated-1_0.html),
 and the proposal in [NEXT_EXAMPLE_APPS.md](../../docs/proposals/NEXT_EXAMPLE_APPS.md).
 
-The tests come with the server (milestone 2): the oracle tests (two client
-libraries validate everything Porter issues), the adversarial suite and the
-endpoint fuzzer.
+The tests are [`test/oracles.mjs`](test/oracles.mjs) (two client libraries
+as oracles), [`test/attacks.mjs`](test/attacks.mjs) (the adversarial suite)
+and [`test/fuzz.mjs`](test/fuzz.mjs) (the endpoint fuzzer).
 
 ## 1. Authorization codes
 
