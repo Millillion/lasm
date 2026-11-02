@@ -1,8 +1,9 @@
 /-
 SQLite on Bun: the built-in `bun:sqlite` module. One binding (the
 `Database` class); `db.query(sql)` caches the prepared statement. Like
-node:sqlite it is synchronous; writes take a lock so that a transaction
-(`batch`) never interleaves with another request's writes.
+node:sqlite it is synchronous, and every call takes one lock, so no statement
+(a read included) runs in the middle of a `batch`. Whole requests are isolated
+from each other by `Isolation` (`Server/Http.lean`).
 -/
 import Lasm.JS
 import Std.Sync.Mutex
@@ -27,7 +28,9 @@ def «open» (path : String) : IO Sql := do
     let r ← (← db.callMethod "query" #[toJS sql]).callMethod "run" params Data
     return num r "lastInsertRowid"
   let sql : Sql := {
-    all := fun sql params => do (← db.callMethod "query" #[toJS sql]).callMethod "all" params (Array Data)
+    -- Reads take the lock too: on this one connection, a read between a
+    -- batch's statements would see its uncommitted writes.
+    all := fun sql params => locked do (← db.callMethod "query" #[toJS sql]).callMethod "all" params (Array Data)
     run := fun sql params => locked (runOne sql params)
     batch := fun stmts => locked do
       let _ ← db.callMethod "run" #[toJS "BEGIN IMMEDIATE"] Data
