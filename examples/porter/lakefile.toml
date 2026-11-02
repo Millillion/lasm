@@ -1,0 +1,15 @@
+name = "porter"
+version = "0.1.0"
+defaultTargets = ["Porter", "Proofs"]
+
+# The pure provider: parsing, the authorization, token, userinfo and logout
+# endpoints, sessions and consent, the replies. Generic over the store and
+# the platform's cryptography. `lake build` checks it with plain Lean 4.35.0:
+# no Lasm, no JavaScript.
+[[lean_lib]]
+name = "Porter"
+
+# The theorems about Porter (PROOFS.md).
+[[lean_lib]]
+name = "Proofs"
+

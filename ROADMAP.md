@@ -52,6 +52,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] (J) Ledger's open API questions: `Lasm.Fetch` Brotli on Workers (`encodeBody: "manual"`); a cross-request async lock that works on Workers; the CLI's `--target wasi` failure when `dist/` already holds another build.
 - [ ] (J) Review Folio's 22 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean).
 - [ ] (J) Folio's API questions: a `Lasm.Markdown` library module from Folio's renderer (so Conduit can use it); consistent `--output` for the wasi, bun and deno targets; the name "Folio"; safe mode escaping raw HTML rather than dropping it.
+- [ ] (J) Review Porter's 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
 
 ## Now (November 2026)
 
@@ -106,6 +107,13 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] 2. The `folio` command on Node (`folio build`, `folio render`) and on WASI (wasmtime, wasmer, `node:wasi`), each checked on an example site with a draft and a hostile page; every engine writes the same bytes as Node.
 - [x] 3. The live preview (`Lasm.UI`, the renderer running in the page), served on Node, Bun and Deno, with Playwright tests (hostile Markdown runs nothing) and `preview_safe` (22 propositions in all).
 - [x] 4. Fuzzing: cmark's pathological inputs and a crash and timeout fuzzer on every PR, a nightly job (40 minutes of fuzzing, twenty differential seeds against commonmark.js). Found and fixed a stack overflow on WebAssembly and seven quadratic cases.
+
+### Porter ([examples/porter](examples/porter), the fourth flagship app: an OpenID Connect provider)
+- [x] 1. Pure core (authorization code flow with PKCE S256, discovery, JWKS, token, userinfo, ES256 and EdDSA ID tokens, refresh-token rotation with reuse detection, sessions, consent, logout), the model, and the proofs: 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean) (codes redeemed at most once and bound to client, redirect URI and verifier; exact redirect URIs; reuse revokes the family; claims match session and client; errors reveal nothing; totality), a requirements map ([SPEC.md](examples/porter/SPEC.md)), `proofs:paranoid`.
+- [ ] 2. Node server (Web Crypto, `node:sqlite`), openid-client and oauth4webapi as oracles, the adversarial suite (RFC 6749/6819/9700, OpenID Connect Core), the endpoint fuzzer.
+- [ ] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms.
+- [ ] 4. The `Lasm.UI` sign-in and consent pages with Playwright tests, and a nightly fuzzing job.
+- [ ] (J) Review the 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
 
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.
