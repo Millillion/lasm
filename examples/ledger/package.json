@@ -1,0 +1,17 @@
+{
+  "name": "ledger",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Ledger, a double-entry ledger in the style of TigerBeetle, in Lean: an HTTP API and an account view compiled to WebAssembly by Lasm, with proofs",
+  "scripts": {
+    "proofs": "node test/proofs.mjs",
+    "proofs:paranoid": "node test/paranoid.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@lasm/cli": "0.3.6"
+  }
+}

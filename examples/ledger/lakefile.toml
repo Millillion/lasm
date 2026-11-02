@@ -1,0 +1,13 @@
+name = "ledger"
+version = "0.1.0"
+defaultTargets = ["Ledger", "Proofs"]
+
+# The pure ledger: accounts, transfers, result codes, the rules (generic
+# over the store), JSON, the API and the journal auditor. `lake build`
+# checks it with plain Lean 4.35.0: no Lasm, no JavaScript.
+[[lean_lib]]
+name = "Ledger"
+
+# The theorems about the ledger (PROOFS.md).
+[[lean_lib]]
+name = "Proofs"
