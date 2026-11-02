@@ -13,29 +13,46 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [issue #21](https://github.com/Millillion/lasm/issues/21) is Jordan's original plan. Each of its points is placed below.
 - NEXT_STEPS.md is historical.
 
-## Decisions waiting on Jordan
-- [x] (J) Agree to this roadmap, and to keeping it as the single source of truth (2026-11-01).
-- [x] (J) Testing strategy: Claude's recommendations adopted for now (2026-11-01; see [TESTING_STRATEGY.md §7](docs/proposals/TESTING_STRATEGY.md#7-decisions)). Open to revisiting.
-- [ ] (J) Names for the platform evidence levels (L0–L3 for now).
-- [ ] (J) Apply to OSS-Fuzz as maintainer, once the fuzzers exist (around December).
-- [ ] (J) Whether "secure by default" becomes a fifth claim of the testing strategy.
-- [ ] (J) `Lasm.Fetch`: keep it, narrow it, or remove it, compared with JS bindings. Deferred by Jordan.
-- [ ] (J) Issue #27: remove dot segments from `Request.path` on every platform (an API change).
-- [ ] (J) The next example apps: choose from [NEXT_EXAMPLE_APPS.md](docs/proposals/NEXT_EXAMPLE_APPS.md) (proposed: Ledger, Markdown site generator, OIDC provider, CRDT editor).
-- [x] (J) Conduit's headline count: "N proved propositions (M theorems)", both checked by `npm run proofs` (Jordan, 2026-11-02).
-- [x] (J) Conduit's two recorded gaps: fixed and proved (Jordan, 2026-11-02): an empty-text link shows its target (SPEC L6), and the delete and remove icons are buttons (SPEC L7).
+## Who decides what (2026-11-02)
+- **Claude** owns testing, robustness, CI and platforms outright. Claude decides and logs each decision in [DECISIONS.md](docs/DECISIONS.md), and reports it; nothing here waits on Jordan.
+- **Claude** also chooses, builds and tests the next example apps.
+- **Jordan** owns everything a user touches that Lasm created: syntax, APIs, shapes, seams, the CLI, the examples' code and propositions, and all human-facing text.
+- Public API changes that come out of testing are proposals for Jordan, unless he has already approved them (#27 was approved on 2026-11-02).
 
-## Jordan's own work (from issue #21)
-- [ ] (J) Hone the README and every human-facing text.
-- [ ] (J) Review the public APIs: the Lean libraries and the CLI.
-- [ ] (J) Review Conduit's 52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean).
-- [ ] (J) Hone [TRUST.md](docs/proposals/TRUST.md): what Lean, Lasm and the toolchain guarantee.
+## Decisions for Jordan (only user-facing ones)
+- [x] (J) Agree to this roadmap, and to keeping it as the single source of truth (2026-11-01).
+- [x] (J) Issue #27: resolve dot segments in `Request.path` on every platform, as browsers do (approved 2026-11-02; ships in 0.3.9).
+- [x] (J) OSS-Fuzz: not doing it (2026-11-02). Fuzzing is built in this repo and runs on our own CI.
+- [ ] (J) `Lasm.Fetch`: keep it, narrow it, or remove it, compared with JS bindings. Deferred by Jordan.
+- [ ] (J) Issue #44 (lean-html's shared HTML model with Lasm.UI): on hold, by Jordan.
+- [x] (J) Conduit's headline count: "50 proved propositions (294 theorems)" (2026-11-02).
+- [x] (J) Conduit's two recorded gaps: fixed and proved (2026-11-02): an empty-text link shows its target (SPEC L6), and the delete and remove icons are buttons (SPEC L7).
+- [ ] (J) Where Lasm's educational content is published: the Lasm repo's `content/` directory as the source, the Millillion website as the place it's read (Claude's recommendation, 2026-11-02).
+
+Rule (Jordan, 2026-11-02): Claude never signs up for anything, and never creates a new repo, without Jordan's explicit permission.
+
+Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.md):
+- Evidence levels keep the names L0–L3, each with a one-line meaning. Jordan may reword them in the README.
+- "Untrusted input can't crash or subvert a Lasm program" becomes the fifth claim of the testing strategy.
+- Claim 4, dependable tooling, gets the same priority as claim 1.
+- The exit bar for the robustness phase is in [TESTING_STRATEGY.md §8](docs/proposals/TESTING_STRATEGY.md#8-exit-bar-for-the-robustness-phase).
+- The next example apps: **Ledger** (landed 2026-11-02), then the **Markdown site generator** (building now), following [NEXT_EXAMPLE_APPS.md](docs/proposals/NEXT_EXAMPLE_APPS.md)'s build plan. Ledger follows TigerBeetle's data model and result codes, so TigerBeetle can serve as its differential oracle.
+
+## Jordan's checklist (his words, 2026-11-02; from issue #21)
+- [ ] (J) Hone the Lean code of every example, especially the propositions and the theorem structure: Conduit first (52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean)), then Ledger (31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean)).
+- [ ] (J) Review the whole `lasm` CLI: its UX, and that it works.
+- [ ] (J) Hone the libraries Lasm added: Lasm.Fetch, Lasm.UI, Lasm.JS, Lasm.RPC, Lasm.Web, Lasm.KV.
+- [ ] (J) Work out the whole front-end UI story.
+- [ ] (J) Play with Lasm, front end to back end, and hone what comes up.
+- [ ] (J) Hone the README, [TRUST.md](docs/proposals/TRUST.md) and every human-facing text.
 - [ ] (J) Storytelling, about 80% of the effort per issue #21: posts, videos, launch follow-ups.
 - [ ] (J) GitHub Sponsors tiers and description (a manual edit; suggested text was given).
 - [ ] (J) Manual testing.
 - [ ] (J) Hone Ledger's 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
 - [ ] (J) Ledger's open API questions: `Lasm.Fetch` Brotli on Workers (`encodeBody: "manual"`); a cross-request async lock that works on Workers; the CLI's `--target wasi` failure when `dist/` already holds another build.
 - [ ] (J) Review Folio's 22 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean).
+- [ ] (J) Folio's API questions: a `Lasm.Markdown` library module from Folio's renderer (so Conduit can use it); consistent `--output` for the wasi, bun and deno targets; the name "Folio"; safe mode escaping raw HTML rather than dropping it.
+- [ ] (J) Review Porter's 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
 
 ## Now (November 2026)
 
@@ -44,7 +61,8 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 ### Releases
 - [x] 0.3.6: two Vercel Edge fixes.
 - [x] 0.3.7: version bumped on main (PR #40), **not published**. Its release check failed on a timing-dependent stress fixture (fixed in PR #42), and the fixed commit doesn't change the version, so it can't release (as with 0.3.3).
-- [ ] 0.3.8 (in progress, PR "Release 0.3.8"): everything in 0.3.7 (the WASI dev-build fix #34, the synchronous-callback hang fix #37), plus #26 (edge environment variables) and the #30 docs from PR #36.
+- [~] 0.3.8 (PR #45 merged; release checks running): everything in 0.3.7 (the WASI dev-build fix #34, and the fix for a hang when a synchronous JS callback makes the program's first async runtime request, #37), plus #26 and the #30 docs (PR #36).
+- [~] 0.3.9: #27, browser-style dot-segment resolution in `Request.path` on every platform, with a proof that `segments` never contains `.` or `..`.
 - [ ] Move the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7).
 - [ ] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms (a stalled thread, or a visibility bug?).
 
@@ -53,21 +71,28 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [x] Target equivalence on Node, Deno, Bun, wasi-http and Workers.
 - [x] Coverage baseline (67.5% of lines), with a CI gate on drops.
 - [x] Test-quality audit (13 tests that only read files as text).
-- [~] Three more oracles for differential testing: Lean's interpreter, `-O0` vs `-O2`, and four Wasm engines.
-- [~] Fix #26 (edge environment variables) and #30 (two docs that overstate limits).
+- [x] Three more oracles for differential testing: Lean's interpreter, `-O0` vs `-O2`, and three JS engines (PR #36).
+- [x] Fix #26 (edge environment variables) and #30 (two docs that overstate limits) (PR #36).
 - [x] Host bridge: a Lean model checked over every interleaving (8 reintroduced bugs, including the 0.3.0 hang, all caught), seeded schedule fuzzing, and checking traces from the real code against the model (#37).
 - [ ] Host bridge: awaiting an async operation inside a synchronous JS callback still hangs. Make it fail clearly, as `docs/JS_BINDINGS.md` says it does, or support it.
 - [ ] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread.
 - [ ] Replace the remaining tests that only read files as text, and port or retire the 29 Lean 4.32 test files.
 - [ ] Browser and Bun targets in differential testing.
 - [x] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next): seven modules, nightly and PR CI, host bridge 56→96 %, UI applier 55→93 %, build service 52→92 %, edge glue 15→79 %, notices 63→75 % (#53; bugs #49, #51).
-- [ ] Mutation scores to 80 % for the link driver (54 %) and the target links (6 %: unit tests of the link plans with a stand-in toolchain), notices and edge glue; then raise the targets.
+- [x] Mutation scores to 80 % for every module: link driver 54→93 %, target links 6→87 % (unit tests of the link plans with a stand-in toolchain), edge glue 79→97 %, notices 75→92 %, build service 92→95 % (fault injection into output delivery); no new bugs found.
+- [ ] Raise the mutation targets above 80 % now that every module passes them.
 - [ ] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week).
 - [ ] Platform evidence levels L0–L3, generated from CI results, in the README's platform table.
+- [ ] Claim 4, dependable tooling: metamorphic tests of `lasm dev` (an incremental build equals a clean one; the same input gives the same bytes; a rename changes nothing else).
+- [ ] Claim 4: fault injection in the installer and the build (a dropped network, a full disk, a killed process, a read-only cache).
+- [ ] Claim 4: every error a user can trigger prints a clear message, never a stack trace (an error corpus run against the published CLI).
+- [ ] Bun gives no response to an encoded slash, `/hello/a%2Fb` (found by target equivalence; investigate).
 
-### Conduit
+### Example apps
+- [~] Conduit: fix the two recorded gaps (empty Markdown link labels; keyboard access to the delete and remove icons), and change the headline to "50 proved propositions (294 theorems)".
 - [x] Specification map, 50 reviewable propositions, frontend and layout proofs, five independent proof checkers.
 - [x] Conduit on all 18 platforms, each tested in CI with its own local tooling and both official RealWorld suites (PRs #24, #29, #39).
+- [x] Ledger (example app 2), following TigerBeetle's model: proofs of conservation, idempotency and two-phase transfers; TigerBeetle as a differential oracle; a bank workload; then every platform with a strongly consistent store.
 - [ ] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced.
 
 ### Ledger ([examples/ledger](examples/ledger), the second flagship app)
@@ -83,18 +108,25 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [x] 3. The live preview (`Lasm.UI`, the renderer running in the page), served on Node, Bun and Deno, with Playwright tests (hostile Markdown runs nothing) and `preview_safe` (22 propositions in all).
 - [x] 4. Fuzzing: cmark's pathological inputs and a crash and timeout fuzzer on every PR, a nightly job (40 minutes of fuzzing, twenty differential seeds against commonmark.js). Found and fixed a stack overflow on WebAssembly and seven quadratic cases.
 
+### Porter ([examples/porter](examples/porter), the fourth flagship app: an OpenID Connect provider)
+- [x] 1. Pure core (authorization code flow with PKCE S256, discovery, JWKS, token, userinfo, ES256 and EdDSA ID tokens, refresh-token rotation with reuse detection, sessions, consent, logout), the model, and the proofs: 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean) (codes redeemed at most once and bound to client, redirect URI and verifier; exact redirect URIs; reuse revokes the family; claims match session and client; errors reveal nothing; totality), a requirements map ([SPEC.md](examples/porter/SPEC.md)), `proofs:paranoid`.
+- [ ] 2. Node server (Web Crypto, `node:sqlite`), openid-client and oauth4webapi as oracles, the adversarial suite (RFC 6749/6819/9700, OpenID Connect Core), the endpoint fuzzer.
+- [ ] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms.
+- [ ] 4. The `Lasm.UI` sign-in and consent pages with Playwright tests, and a nightly fuzzing job.
+- [ ] (J) Review the 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
+
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.
 - [ ] Deterministic simulation testing of the example apps: simulated clock, network and storage, with faults.
 - [ ] Target equivalence for Conduit's RealWorld traffic, with token and timestamp normalization.
 - [ ] Consolidate the 63 CI workflows into PR, nightly, weekly and release tiers.
-- [ ] Example app 2, once Jordan has chosen.
+- [ ] Example app 3: the Markdown site generator, held to CommonMark's 652 examples, on WASI, Fastly, the edge and the browser.
 - [ ] Organize the proofs of Lasm's own libraries (Lasm.UI, RPC, KV) like Conduit's Spec.lean, for human review (issue #21).
 - [ ] Lean 4.36: resume when 4.36.0 stable ships, around mid-November. It becomes Lasm 0.4.0.
 
 ## Later (first half of 2027)
-- [ ] Example apps 3 to 5.
-- [ ] Continuous fuzzing on OSS-Fuzz, after Jordan applies.
+- [ ] Example apps 4 and 5: the identity provider (OpenID conformance) and the collaborative editor (CRDT convergence).
+- [ ] Continuous fuzzing in our own CI: nightly and weekly campaigns on every boundary, corpora and crashes kept in the repo, coverage-guided (libFuzzer for the C host, Jazzer.js or fast-check for JavaScript, Plausible for Lean).
 - [ ] Move JavaScript glue code into Lean where it can be proved, starting with what mutation testing shows is riskiest (issue #21).
 - [ ] Translation validation for selected Binaryen passes. Assess verifying or replacing parts of the toolchain: Clang, LLVM, Emscripten, Binaryen (issue #21).
 - [ ] Simplify the codebase toward its irreducible state, once the tests are strong enough to allow it (issue #21).

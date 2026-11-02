@@ -96,6 +96,8 @@ for (const module of selected) {
 
 const table = Object.entries(results).map(([name, r]) => `${name.padEnd(14)} ${String(r.score).padStart(5)} %  ${String(r.mutants).padStart(4)} mutants  target ${r.target} %  ${r.minutes} min`);
 console.log('\n' + table.join('\n'));
+// No module may have run (a PR that changes none of them).
+mkdirSync(out, { recursive: true });
 writeFileSync(join(out, 'summary.json'), JSON.stringify({ measuredAt: new Date().toISOString(), node: process.version,
   commit: process.env.GITHUB_SHA ?? null, run: process.env.GITHUB_RUN_ID ?? null,
   modules: Object.fromEntries(Object.entries(results).map(([name, { survivors, ...rest }]) => [name, rest])) }, null, 2) + '\n');
