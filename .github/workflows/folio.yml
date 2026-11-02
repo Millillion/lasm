@@ -15,6 +15,16 @@ name: Folio
 #   be raw HTML or an unsafe URL), then the differential test against
 #   commonmark.js 0.31.2, five random seeds of 5000 documents, each seed
 #   printed.
+# - cli: `folio build` and `folio render` (the Node build, dist/cli) on Node
+#   24 and 26: the example site (site/) is built and checked (the expected
+#   files, the draft nowhere, no HTML from the untrusted page, every index
+#   link resolving, a well-formed RSS 2.0 feed in the index's order).
+# - wasi: the same command built for WASI (wasi/main.wasm) on wasmtime
+#   49.0.4, wasmer 7.4.2 and node:wasi, with the same checks, and every
+#   engine's output byte for byte the Node build's.
+# - preview: the live preview (Lasm.UI page, PreviewClient.lean) served by
+#   the preview server built for Node, Bun 1.4.4 and Deno 2.9.6, driven by
+#   Playwright in Chromium (and Firefox and WebKit on Node), no retries.
 # Local runtimes only: no account, nothing deployed, CI=1. Free runners only.
 on:
   workflow_dispatch:
@@ -103,6 +113,148 @@ jobs:
         if: always()
         with:
           name: folio-commonmark-node-${{ matrix.node }}
+          path: examples/folio/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  cli:
+    name: The folio command on Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['24', '26.12.1']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: examples/folio
+        run: npm ci --no-audit --no-fund
+      - name: npm run build (the folio command for Node)
+        working-directory: examples/folio
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+      - name: folio build and folio render, checked
+        working-directory: examples/folio
+        run: npm run test:cli
+  wasi:
+    name: The folio command on WASI (wasmtime 49.0.4, wasmer 7.4.2, node:wasi)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci, and the pinned engines
+        working-directory: examples/folio
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          W="$RUNNER_TEMP/wasi-tools"; mkdir -p "$W"
+          get() { curl -fsSL --retry 3 -o "$RUNNER_TEMP/$2" "$1"; echo "$3  $RUNNER_TEMP/$2" | sha256sum -c; }
+          get https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.4/wasmtime-v49.0.4-x86_64-linux.tar.xz wasmtime.tar.xz 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
+          tar -xJf "$RUNNER_TEMP/wasmtime.tar.xz" -C "$W" --strip-components=1
+          get https://github.com/wasmerio/wasmer/releases/download/v7.4.2/wasmer-linux-amd64.tar.gz wasmer.tar.gz 07271f7ecf449135bbd44cfe9f38a65e54ab25f1564a9c6bd2d0d5cca5743963
+          mkdir -p "$RUNNER_TEMP/wasmer" && tar -xzf "$RUNNER_TEMP/wasmer.tar.gz" -C "$RUNNER_TEMP/wasmer"
+          ln -s "$RUNNER_TEMP/wasmer/bin/wasmer" "$W/wasmer"
+          echo "$W" >> "$GITHUB_PATH"
+      - name: Build the folio command for Node and for WASI
+        working-directory: examples/folio
+        run: |
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:wasi
+      - name: The same checks on each engine, and the same bytes as on Node
+        working-directory: examples/folio
+        run: npm run test:wasi
+  preview:
+    name: The live preview on ${{ matrix.server }}, ${{ matrix.browser }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { server: node, browser: chromium }
+          - { server: node, browser: firefox }
+          - { server: node, browser: webkit }
+          - { server: bun, browser: chromium }
+          - { server: deno, browser: chromium }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci, and the pinned runtime
+        working-directory: examples/folio
+        env:
+          SERVER: ${{ matrix.server }}
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          case "$SERVER" in
+            bun) npm install --prefix "$T" --no-audit --no-fund bun@1.4.4 ;;
+            deno) npm install --prefix "$T" --no-audit --no-fund deno@2.9.6 ;;
+          esac
+          if [ -d "$T/node_modules/.bin" ]; then echo "$T/node_modules/.bin" >> "$GITHUB_PATH"; fi
+      - name: Build the page and the server
+        working-directory: examples/folio
+        env:
+          SERVER: ${{ matrix.server }}
+        run: |
+          case "$SERVER" in
+            node) script=build:server ;;
+            *) script=build:$SERVER ;;
+          esac
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run "$script"
+      - name: The pinned Playwright's ${{ matrix.browser }}, with its system packages
+        timeout-minutes: 30
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
+          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
+      - name: The end-to-end tests
+        working-directory: examples/folio
+        env:
+          BROWSERS: ${{ matrix.browser }}
+          E2E_NAME: ${{ matrix.server }}-${{ matrix.browser }}
+          SERVER: ${{ matrix.server }}
+        run: |
+          case "$SERVER" in
+            node) export E2E_SERVER="node dist/server/main.mjs" ;;
+            bun) export E2E_SERVER="bun bun/main.mjs" ;;
+            deno) export E2E_SERVER="deno run -A deno/main.mjs" ;;
+          esac
+          npm run test:e2e -- --retries=0
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: folio-preview-${{ matrix.server }}-${{ matrix.browser }}
           path: examples/folio/test-results/
           retention-days: 14
           if-no-files-found: warn
