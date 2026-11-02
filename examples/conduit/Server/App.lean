@@ -48,7 +48,11 @@ def services : Services Async where
 def serveStore (store : Store Async) (assets : Lasm.Fetch.Assets) : IO Unit :=
   serveWith store services assets
 
-/-- Serves Conduit on a SQL database (whose binding module created the tables). -/
-def run (db : Sql) (assets : Lasm.Fetch.Assets) : IO Unit := serveStore (store db) assets
+/-- Serves Conduit on a SQL database (whose binding module created the
+tables). `isolate`: run writes alone in this process (`Isolation` in
+`Server/Http.lean`); off on Cloudflare Workers, which cancels a request that
+waits on another request's promise. -/
+def run (db : Sql) (assets : Lasm.Fetch.Assets) (isolate := true) : IO Unit :=
+  serveWith (store db) services assets isolate
 
 end Conduit.Server
