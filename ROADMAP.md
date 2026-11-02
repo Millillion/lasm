@@ -87,7 +87,7 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 
 ### Porter ([examples/porter](examples/porter), the fourth flagship app: an OpenID Connect provider)
 - [x] 1. Pure core (authorization code flow with PKCE S256, discovery, JWKS, token, userinfo, ES256 and EdDSA ID tokens, refresh-token rotation with reuse detection, sessions, consent, logout), the model, and the proofs: 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean) (codes redeemed at most once and bound to client, redirect URI and verifier; exact redirect URIs; reuse revokes the family; claims match session and client; errors reveal nothing; totality), a requirements map ([SPEC.md](examples/porter/SPEC.md)), `proofs:paranoid`.
-- [ ] 2. Node server (Web Crypto, `node:sqlite`), openid-client and oauth4webapi as oracles, the adversarial suite (RFC 6749/6819/9700, OpenID Connect Core), the endpoint fuzzer.
+- [x] 2. Node server (Web Crypto, `node:sqlite`), openid-client 6.8.8, oauth4webapi 3.8.8 and jose 6.2.12 as oracles (13 checks), the adversarial suite (31 attacks from RFC 6749/6819/9700 and OpenID Connect Core), the endpoint fuzzer (three minutes per PR). Found #76 (`Lasm.Fetch` paths with `://` in the query).
 - [ ] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms.
 - [ ] 4. The `Lasm.UI` sign-in and consent pages with Playwright tests, and a nightly fuzzing job.
 - [ ] (J) Review the 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
