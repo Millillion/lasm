@@ -83,7 +83,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [~] Conduit: fix the two recorded gaps (empty Markdown link labels; keyboard access to the delete and remove icons), and change the headline to "50 proved propositions (294 theorems)".
 - [x] Specification map, 50 reviewable propositions, frontend and layout proofs, five independent proof checkers.
 - [x] Conduit on all 18 platforms, each tested in CI with its own local tooling and both official RealWorld suites (PRs #24, #29, #39).
-- [~] Ledger (example app 2), following TigerBeetle's model: proofs of conservation, idempotency and two-phase transfers; TigerBeetle as a differential oracle; a bank workload; then every platform with a strongly consistent store.
+- [x] Ledger (example app 2), following TigerBeetle's model: proofs of conservation, idempotency and two-phase transfers; TigerBeetle as a differential oracle; a bank workload; then every platform with a strongly consistent store.
 - [ ] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced.
 
 ### Ledger ([examples/ledger](examples/ledger), the second flagship app)
