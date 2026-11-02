@@ -1,0 +1,59 @@
+{
+  "title": "Call an npm package from Lean with Lasm.JS",
+  "project": "semver-check",
+  "steps": [
+    {
+      "run": "npm create @lasm@latest semver-check",
+      "cwd": "."
+    },
+    {
+      "run": "npm install"
+    },
+    {
+      "run": "npm install --save-exact semver@7.8.5"
+    },
+    {
+      "edit": "App.lean"
+    },
+    {
+      "edit": "Main.lean"
+    },
+    {
+      "run": "npm run dev -- '^1.2.0' 1.2.3 v1.4.0 2.0.0 banana",
+      "stdoutIncludes": [
+        "1.2.3: satisfies ^1.2.0",
+        "highest match: v1.4.0"
+      ]
+    },
+    {
+      "change": "Main.lean",
+      "from": "@[js \"semver\" \"satisfies\"]",
+      "to": "@[js \"semver\" \"satisfy\"]"
+    },
+    {
+      "run": "npm run build",
+      "fails": true,
+      "outputIncludes": [
+        "semver export \"satisfy\" is missing"
+      ]
+    },
+    {
+      "revert": "Main.lean"
+    },
+    {
+      "run": "npm run build",
+      "files": [
+        "dist/main.mjs",
+        "dist/node_modules/semver/package.json"
+      ]
+    },
+    {
+      "run": "ls dist/node_modules",
+      "stdout": "semver"
+    },
+    {
+      "run": "node dist/main.mjs '^1.2.0' 1.2.3 v1.4.0 2.0.0 banana",
+      "stdout": "1.2.3: satisfies ^1.2.0\n1.4.0: satisfies ^1.2.0\n2.0.0: does not satisfy ^1.2.0\nbanana: not a version\nhighest match: v1.4.0"
+    }
+  ]
+}

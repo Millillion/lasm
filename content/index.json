@@ -1,0 +1,225 @@
+{
+  "pages": [
+    {
+      "slug": "what-lasm-is",
+      "title": "What Lasm is and how it's tested",
+      "description": "Lasm compiles Lean 4 to WebAssembly for servers, edge platforms, WASI and the browser. What it does, and the layers of testing behind it.",
+      "date": "2026-11-02",
+      "kind": "overview",
+      "path": "content/learn/what-lasm-is.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/blob/main/README.md",
+        "https://github.com/Millillion/lasm/blob/main/docs/TESTING.md",
+        "https://github.com/Millillion/lasm/blob/main/.github/workflows/differential.yml",
+        "https://github.com/Millillion/lasm/pull/36",
+        "https://github.com/Millillion/lasm/pull/37",
+        "https://github.com/Millillion/lasm/blob/main/examples/conduit/PROOFS.md"
+      ]
+    },
+    {
+      "slug": "lean-on-cloudflare-workers",
+      "title": "From zero to Lean on Cloudflare Workers",
+      "description": "Create a Lean HTTP handler with npm, run it on Node, then build it for Cloudflare Workers and serve it locally with wrangler dev.",
+      "date": "2026-11-02",
+      "kind": "tutorial",
+      "order": 1,
+      "path": "content/learn/lean-on-cloudflare-workers.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/blob/main/README.md",
+        "https://github.com/Millillion/lasm/blob/main/docs/EDGE.md",
+        "https://github.com/Millillion/lasm/blob/main/docs/FETCH.md",
+        "https://github.com/Millillion/lasm/blob/main/templates/fetch/Main.lean",
+        "https://github.com/Millillion/lasm/blob/main/.github/workflows/content.yml"
+      ]
+    },
+    {
+      "slug": "npm-package-from-lean",
+      "title": "Call an npm package from Lean with Lasm.JS",
+      "description": "Bind three functions of the semver npm package with one @[js] line each, call them from a Lean program, and build it with the package included.",
+      "date": "2026-11-02",
+      "kind": "tutorial",
+      "order": 2,
+      "path": "content/learn/npm-package-from-lean.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md",
+        "https://github.com/Millillion/lasm/blob/main/README.md",
+        "https://github.com/npm/node-semver",
+        "https://github.com/Millillion/lasm/blob/main/.github/workflows/content.yml"
+      ]
+    },
+    {
+      "slug": "proof-in-a-fetch-handler",
+      "title": "A Lean function with a proof, deployed",
+      "description": "Write an HTTP handler whose page-size rule is proved in Lean, watch the build refuse a broken proof, then serve it on Node and Workers.",
+      "date": "2026-11-02",
+      "kind": "tutorial",
+      "order": 3,
+      "path": "content/learn/proof-in-a-fetch-handler.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/blob/main/README.md",
+        "https://github.com/Millillion/lasm/blob/main/docs/FETCH.md",
+        "https://github.com/Millillion/lasm/blob/main/examples/conduit/PROOFS.md",
+        "https://github.com/Millillion/lasm/blob/main/.github/workflows/content.yml"
+      ]
+    },
+    {
+      "slug": "edge-environment-variables",
+      "title": "Environment variables on the edge, found by differential testing",
+      "description": "On Workers, Deno, Bun and the other edge targets, LEAN_BACKTRACE=0 had no effect. How differential testing found it, the cause, the fix and the test.",
+      "date": "2026-11-02",
+      "kind": "bug-caught",
+      "path": "content/learn/edge-environment-variables.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/issues/26",
+        "https://github.com/Millillion/lasm/pull/36",
+        "https://github.com/Millillion/lasm/pull/45",
+        "https://github.com/Millillion/lasm/blob/main/docs/TESTING.md",
+        "https://github.com/Millillion/lasm/blob/main/test/differential/regressions/r_edge_env_backtrace.lean"
+      ]
+    },
+    {
+      "slug": "host-bridge-hang",
+      "title": "A hang found by modelling Lasm's host bridge in Lean",
+      "description": "A synchronous JavaScript callback that started a program's first timer hung forever. How we found it, the fix, and the tests that keep it fixed.",
+      "date": "2026-11-02",
+      "kind": "bug-caught",
+      "path": "content/learn/host-bridge-hang.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/pull/37",
+        "https://github.com/Millillion/lasm/pull/45",
+        "https://github.com/Millillion/lasm/blob/main/docs/TESTING.md",
+        "https://github.com/Millillion/lasm/blob/main/docs/JS_INTEROP.md"
+      ]
+    },
+    {
+      "slug": "wasi-dev-build",
+      "title": "A WASI build bug found by differential testing",
+      "description": "After a Node dev build, lasm build --target wasi --dev failed with duplicate symbols. How differential testing found it, the fix, and the regression check.",
+      "date": "2026-11-02",
+      "kind": "bug-caught",
+      "path": "content/learn/wasi-dev-build.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/pull/34",
+        "https://github.com/Millillion/lasm/pull/45",
+        "https://github.com/Millillion/lasm/blob/main/docs/TESTING.md",
+        "https://github.com/Millillion/lasm/blob/main/.github/workflows/differential.yml"
+      ]
+    },
+    {
+      "slug": "conduit-only-authors-delete",
+      "title": "Proved in Conduit: only an article's author can delete it",
+      "description": "One of Conduit's 50 proved propositions, read line by line, with how the proof reaches the endpoint the server runs and what it leaves to trust.",
+      "date": "2026-11-02",
+      "kind": "proof-spotlight",
+      "path": "content/learn/conduit-only-authors-delete.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/blob/main/examples/conduit/Proofs/Spec.lean",
+        "https://github.com/Millillion/lasm/blob/main/examples/conduit/Proofs/Endpoints.lean",
+        "https://github.com/Millillion/lasm/blob/main/examples/conduit/Conduit/Api.lean",
+        "https://github.com/Millillion/lasm/blob/main/examples/conduit/Server/Sql.lean",
+        "https://github.com/Millillion/lasm/blob/main/examples/conduit/Proofs/Model.lean",
+        "https://github.com/Millillion/lasm/blob/main/examples/conduit/PROOFS.md",
+        "https://github.com/Millillion/lasm/blob/main/examples/conduit/SPEC.md",
+        "https://github.com/Millillion/lasm/blob/main/README.md"
+      ]
+    },
+    {
+      "slug": "segments-no-dot-segments",
+      "title": "Coming in 0.3.9: a theorem that request paths never contain . or ..",
+      "description": "One Lean handler routed /hello/../hello/Ada differently on five platforms. The fix resolves dot segments in Lean, with a theorem about the result.",
+      "date": "2026-11-02",
+      "kind": "proof-spotlight",
+      "path": "content/learn/segments-no-dot-segments.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/issues/27",
+        "https://github.com/Millillion/lasm/pull/47",
+        "https://github.com/Millillion/lasm/blob/main/docs/TESTING.md",
+        "https://github.com/Millillion/lasm/blob/main/docs/FETCH.md"
+      ]
+    },
+    {
+      "slug": "conduit-on-18-platforms",
+      "title": "Conduit on 18 platforms, tested with each platform's local tooling",
+      "description": "One Lean app, the RealWorld Conduit, built for 18 platforms. How CI serves each one locally and runs RealWorld's official API and browser suites.",
+      "date": "2026-11-02",
+      "kind": "platform",
+      "path": "content/learn/conduit-on-18-platforms.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/blob/main/examples/conduit/README.md",
+        "https://github.com/Millillion/lasm/blob/main/README.md",
+        "https://github.com/Millillion/lasm/blob/main/ROADMAP.md",
+        "https://github.com/Millillion/lasm/blob/main/.github/workflows/conduit.yml",
+        "https://github.com/Millillion/lasm/blob/main/.github/workflows/conduit-platforms.yml",
+        "https://github.com/Millillion/lasm/pull/24",
+        "https://github.com/Millillion/lasm/pull/29",
+        "https://github.com/Millillion/lasm/pull/39"
+      ]
+    },
+    {
+      "slug": "release-0-3-6",
+      "title": "Lasm 0.3.6",
+      "description": "A fix release for Vercel Edge, found while running Conduit on every platform.",
+      "date": "2026-10-31",
+      "kind": "release",
+      "path": "docs/release/0.3.6-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.3.6"
+      ]
+    },
+    {
+      "slug": "release-0-3-5",
+      "title": "Lasm 0.3.5",
+      "description": "A documentation and example release, so that the npm page shows the current README.",
+      "date": "2026-10-28",
+      "kind": "release",
+      "path": "docs/release/0.3.5-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.3.5"
+      ]
+    },
+    {
+      "slug": "release-0-3-4",
+      "title": "Lasm 0.3.4",
+      "description": "A patch release.",
+      "date": "2026-10-27",
+      "kind": "release",
+      "path": "docs/release/0.3.4-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.3.4"
+      ]
+    },
+    {
+      "slug": "release-0-3-2",
+      "title": "Lasm 0.3.2",
+      "description": "A patch release that fixes how deployed programs handle Std.Internal.UV sockets, timers and signals, so that they match native Lean 4.35.",
+      "date": "2026-10-27",
+      "kind": "release",
+      "path": "docs/release/0.3.2-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.3.2"
+      ]
+    },
+    {
+      "slug": "release-0-3-1",
+      "title": "Lasm 0.3.1",
+      "description": "A small release after the 0.3.0 launch: the starter code is now MIT-0, and Lasm points you to a bug report when it hits an internal error.",
+      "date": "2026-10-26",
+      "kind": "release",
+      "path": "docs/release/0.3.1-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.3.1"
+      ]
+    },
+    {
+      "slug": "release-0-3-0",
+      "title": "Lasm 0.3.0",
+      "description": "Lasm compiles ordinary Lean 4.35.0 programs ahead of time to WebAssembly.",
+      "date": "2026-10-26",
+      "kind": "release",
+      "path": "docs/release/0.3.0-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.3.0"
+      ]
+    }
+  ]
+}

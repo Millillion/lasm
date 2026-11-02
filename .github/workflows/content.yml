@@ -1,0 +1,146 @@
+name: Content
+# content/ (content/README.md): the pages the Millillion website publishes from
+# main. The tutorials are run as a reader runs them, so they cannot rot.
+# - static: content/index.json is current, every page's front matter is complete
+#   and its relative links name files (scripts/content/index.mjs --check); every
+#   tutorial page shows each command, file and output its steps.json names
+#   (check-tutorials.mjs --static).
+# - sources (nightly and by hand): every source URL answers without an error.
+# - pack: a CLI packed from this commit, as differential.yml packs one.
+# - tutorials: each tutorial's steps in a new directory against that packed CLI,
+#   installed with npm, and its project/ compared with what the steps produced.
+#   `npx wrangler dev` is the pinned wrangler on local workerd: CI=1, no account,
+#   no deployment, no browser. Nothing is posted or published anywhere.
+# Pull requests that touch content/ and every night.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'content/**'
+      - 'scripts/content/**'
+      - 'docs/release/**'
+      - '.github/workflows/content.yml'
+  schedule:
+    - cron: '23 5 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: content-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+env:
+  CI: '1'
+  BROWSER: 'none'
+  WRANGLER_SEND_METRICS: 'false'
+jobs:
+  static:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          # Release pages take their date from the commit that added the notes.
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Pages (front matter, links) and content/index.json is current
+        run: node scripts/content/index.mjs --check
+      - name: Tutorials (each page shows its steps)
+        run: node scripts/content/check-tutorials.mjs --static
+  sources:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Every source URL answers
+        run: node scripts/content/index.mjs --check-sources
+  pack:
+    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    # The retained runtime input is a draft release asset (needs contents: write to read).
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: content-packed-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  tutorials:
+    needs: [static, pack]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        tutorial: [lean-on-cloudflare-workers, npm-package-from-lean, proof-in-a-fetch-handler]
+    name: tutorial ${{ matrix.tutorial }}
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: content-packed-candidate
+          path: .work/node-candidate
+      - name: Pinned wrangler (local workerd only), as differential.yml and workers.yml pin it
+        run: npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund wrangler@4.152.0
+      - name: Run the tutorial's steps against the packed CLI
+        run: |
+          node scripts/content/check-tutorials.mjs --tutorial ${{ matrix.tutorial }} \
+            --tgz ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" \
+            --work "$RUNNER_TEMP/tutorials" --wrangler "$RUNNER_TEMP/tools/node_modules/.bin/wrangler" \
+            --require-platform --report .work/tutorial-${{ matrix.tutorial }}.json
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: tutorial-${{ matrix.tutorial }}-${{ github.run_id }}
+          path: .work/tutorial-${{ matrix.tutorial }}.json
+          retention-days: 14
+          if-no-files-found: ignore

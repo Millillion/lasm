@@ -1,0 +1,25 @@
+{
+  "name": "semver-check",
+  "version": "0.1.0",
+  "private": true,
+  "description": "a Lean program (IO only), compiled to WebAssembly by Lasm",
+  "scripts": {
+    "dev": "lasm Main.lean --",
+    "build": "lasm build Main.lean",
+    "start": "node dist/main.mjs",
+    "dev:bun": "bun x --bun lasm Main.lean --",
+    "build:bun": "bun x --bun lasm build Main.lean --target bun",
+    "start:bun": "bun bun/main.mjs",
+    "build:deno": "lasm build Main.lean --target deno",
+    "start:deno": "deno run -A deno/main.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@lasm/cli": "0.3.6"
+  },
+  "dependencies": {
+    "semver": "7.8.5"
+  }
+}
