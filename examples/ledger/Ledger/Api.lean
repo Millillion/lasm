@@ -57,7 +57,46 @@ def journal (accounts : List Account) (transfers : List Transfer) : String :=
   String.join ((accounts.map fun a => journalLine "account" (Wire.account a) ++ "\n") ++
     (transfers.map fun t => journalLine "transfer" (Wire.transfer t) ++ "\n"))
 
-/-- The reply and the writes for a request at time `now`. -/
+/-- The reply to a request that writes nothing: the reads, and every error. -/
+def read (s : Store m) (r : Request) : m Reply := do
+  match r.method, r.path with
+  | "GET", ["accounts"] =>
+    let ledger := (query? r "ledger").bind num?
+    let accounts ← s.accounts ledger
+    return Reply.json (.arr (accounts.map Wire.account).toArray)
+  | "GET", ["accounts", id] =>
+    match num? id with
+    | none => return Reply.error 404 "no such account"
+    | some i =>
+      match ← s.reads.account i with
+      | some a => return Reply.json (Wire.account a)
+      | none => return Reply.error 404 "no such account"
+  | "GET", ["accounts", id, "transfers"] =>
+    match num? id with
+    | none => return Reply.error 404 "no such account"
+    | some i =>
+      let ts ← s.transfersOf i
+      return Reply.json (.arr (ts.map Wire.transfer).toArray)
+  | "GET", ["transfers"] =>
+    let after := ((query? r "after").bind num?).getD 0
+    let limit := min 1000 (((query? r "limit").bind num?).getD 100)
+    let ts ← s.transfers after limit
+    return Reply.json (.arr (ts.map Wire.transfer).toArray)
+  | "GET", ["transfers", id] =>
+    match num? id with
+    | none => return Reply.error 404 "no such transfer"
+    | some i =>
+      match ← s.reads.transfer i with
+      | some t => return Reply.json (Wire.transfer t)
+      | none => return Reply.error 404 "no such transfer"
+  | "GET", ["journal"] =>
+    let (accounts, transfers) ← s.snapshot
+    return { status := 200, contentType := "application/x-ndjson", body := journal accounts transfers }
+  | _, ["accounts"] | _, ["transfers"] => return Reply.error 405 "method not allowed"
+  | _, _ => return Reply.error 404 "not found"
+
+/-- The reply and the writes for a request at time `now`: the two create
+endpoints run a batch; every other request only reads. -/
 def handle (s : Store m) (now : Nat) (r : Request) : m (Reply × Writes) := do
   match r.method, r.path with
   | "POST", ["accounts"] =>
@@ -74,40 +113,7 @@ def handle (s : Store m) (now : Nat) (r : Request) : m (Reply × Writes) := do
       let ts := Rules.firstTimestamp now (← s.lastTimestamp)
       let (rs, w) ← Rules.createTransfers s.reads ts batch
       return (Reply.json (Wire.results (rs.map (·.name))), w)
-  | "GET", ["accounts"] =>
-    let ledger := (query? r "ledger").bind num?
-    let accounts ← s.accounts ledger
-    return (Reply.json (.arr (accounts.map Wire.account).toArray), {})
-  | "GET", ["accounts", id] =>
-    match num? id with
-    | none => return (Reply.error 404 "no such account", {})
-    | some i =>
-      match ← s.reads.account i with
-      | some a => return (Reply.json (Wire.account a), {})
-      | none => return (Reply.error 404 "no such account", {})
-  | "GET", ["accounts", id, "transfers"] =>
-    match num? id with
-    | none => return (Reply.error 404 "no such account", {})
-    | some i =>
-      let ts ← s.transfersOf i
-      return (Reply.json (.arr (ts.map Wire.transfer).toArray), {})
-  | "GET", ["transfers"] =>
-    let after := ((query? r "after").bind num?).getD 0
-    let limit := min 1000 (((query? r "limit").bind num?).getD 100)
-    let ts ← s.transfers after limit
-    return (Reply.json (.arr (ts.map Wire.transfer).toArray), {})
-  | "GET", ["transfers", id] =>
-    match num? id with
-    | none => return (Reply.error 404 "no such transfer", {})
-    | some i =>
-      match ← s.reads.transfer i with
-      | some t => return (Reply.json (Wire.transfer t), {})
-      | none => return (Reply.error 404 "no such transfer", {})
-  | "GET", ["journal"] =>
-    let (accounts, transfers) ← s.snapshot
-    return ({ status := 200, contentType := "application/x-ndjson", body := journal accounts transfers }, {})
-  | _, ["accounts"] | _, ["transfers"] => return (Reply.error 405 "method not allowed", {})
-  | _, _ => return (Reply.error 404 "not found", {})
+  | _, _ => return (← read s r, {})
 
 end Api
 end Ledger

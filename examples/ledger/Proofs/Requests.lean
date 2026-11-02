@@ -41,9 +41,7 @@ theorem handle_writes (D : DB) (now : Nat) (r : Request) :
   · split
     · exact .inl rfl
     · rename_i batch _; exact .inr (.inr ⟨_, batch, rfl⟩)
-  all_goals
-    left
-    repeat' (first | rfl | split)
+  · exact .inl rfl
 
 /-- The databases the API can reach from the empty one. -/
 inductive Reachable : DB → Prop

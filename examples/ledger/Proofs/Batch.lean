@@ -20,9 +20,12 @@ theorem applyChain_count (r : Reads Id) :
     rw [applyChain_cons]
     split
     · obtain ⟨h1, h2⟩ := applyChain_count r es (ts + 1) (w.merge (chainStep k step r e es.isEmpty ts w).2)
-      refine ⟨fun h => by simp [h1 h], fun e' s h => ?_⟩
-      have := h2 e' s h
-      simp only [List.length_cons]; omega
+      generalize applyChain k step r es (ts + 1) (w.merge (chainStep k step r e es.isEmpty ts w).2) = x at h1 h2 ⊢
+      obtain ⟨n, f, w'⟩ := x
+      simp only at h1 h2 ⊢
+      refine ⟨fun h => by rw [h1 h]; simp, fun e' s h => ?_⟩
+      obtain ⟨h3, h4⟩ := h2 e' s h
+      exact ⟨by simp only [List.length_cons]; omega, h4⟩
     · rename_i hs
       refine ⟨fun h => by simp at h, fun e' s h => ?_⟩
       simp at h; obtain ⟨-, rfl⟩ := h
@@ -37,8 +40,8 @@ theorem runChain_results (hf : k.linkedEventFailed ≠ k.created) (ho : k.linked
   obtain ⟨h1, h2⟩ := applyChain_count k step r c ts w
   rcases ha : applyChain k step r c ts w with ⟨n, _ | ⟨e, s⟩, w'⟩
   · rw [ha] at h1
-    simp only at h1 ⊢
     have := h1 rfl
+    simp only at this ⊢
     refine ⟨by simp [this], .inl fun x hx => ?_⟩
     exact (List.mem_replicate.mp hx).2
   · rw [ha] at h2
@@ -82,9 +85,15 @@ theorem runChains_results (hf : k.linkedEventFailed ≠ k.created) (ho : k.linke
 
 variable (out : Writes → List Nat) (key : ε → Nat)
 
+theorem zip_replicate_filter (x : ρ) (c : List ε) :
+    ((c.zip (List.replicate c.length x)).filter (fun p => decide (p.2 = x))).map (key ·.1) = c.map key := by
+  induction c with
+  | nil => rfl
+  | cons y ys ih => simp [List.replicate_succ, ih]
+
 theorem applyChain_out (ho : k.linkedEventChainOpen ≠ k.created)
     (hmerge : ∀ w d, out (w.merge d) = out w ++ out d)
-    (hstep : ∀ E ts e, (step E.reads ts e).1 = k.created → out (step E.reads ts e).2 = [key e]) (D : DB) :
+    (hstep : ∀ (E : DB) ts e, (step E.reads ts e).1 = k.created → out (step E.reads ts e).2 = [key e]) (D : DB) :
     ∀ (es : List ε) (ts : Nat) (w : Writes), (applyChain k step D.reads es ts w).2.1 = none →
       out (applyChain k step D.reads es ts w).2.2 = out w ++ es.map key
   | [], _, _, _ => by simp [applyChain_nil]
@@ -107,7 +116,7 @@ theorem applyChain_out (ho : k.linkedEventChainOpen ≠ k.created)
 
 theorem runChain_out (hf : k.linkedEventFailed ≠ k.created) (ho : k.linkedEventChainOpen ≠ k.created)
     (hmerge : ∀ w d, out (w.merge d) = out w ++ out d)
-    (hstep : ∀ E ts e, (step E.reads ts e).1 = k.created → out (step E.reads ts e).2 = [key e])
+    (hstep : ∀ (E : DB) ts e, (step E.reads ts e).1 = k.created → out (step E.reads ts e).2 = [key e])
     (hfail : ∀ e s, out (k.onFailure e s) = []) (D : DB) (c : List ε) (ts : Nat) (w : Writes) :
     out (runChain k step D.reads c ts w).2 =
       out w ++ ((c.zip (runChain k step D.reads c ts w).1).filter (fun p => decide (p.2 = k.created))).map (key ·.1) := by
@@ -116,13 +125,10 @@ theorem runChain_out (hf : k.linkedEventFailed ≠ k.created) (ho : k.linkedEven
   rw [runChain_eq] at hlen hall ⊢
   rcases ha : applyChain k step D.reads c ts w with ⟨n, _ | ⟨e, s⟩, w'⟩
   · have hout := applyChain_out k step out key ho hmerge hstep D c ts w (by rw [ha])
-    rw [ha] at hout hc
-    simp only at hout hc ⊢
-    rw [hout, hc.1 rfl]
-    congr 1
-    induction c with
-    | nil => rfl
-    | cons x xs ih => simp [List.replicate_succ, ih]
+    have hn : n = c.length := by have := hc.1; rw [ha] at this; exact this rfl
+    rw [ha] at hout
+    simp only at hout ⊢
+    rw [hout, hn, zip_replicate_filter]
   · rw [ha] at hall
     simp only at hall ⊢
     rw [hmerge, hfail]
@@ -133,14 +139,14 @@ theorem runChain_out (hf : k.linkedEventFailed ≠ k.created) (ho : k.linkedEven
       contradiction
     · simp only [List.append_nil]
       rw [List.filter_eq_nil_iff.mpr]
-      · rfl
+      · simp
       · intro p hp
         have := hall p.2 (List.of_mem_zip hp).2
         simp [this]
 
 theorem runChains_out (hf : k.linkedEventFailed ≠ k.created) (ho : k.linkedEventChainOpen ≠ k.created)
     (hmerge : ∀ w d, out (w.merge d) = out w ++ out d)
-    (hstep : ∀ E ts e, (step E.reads ts e).1 = k.created → out (step E.reads ts e).2 = [key e])
+    (hstep : ∀ (E : DB) ts e, (step E.reads ts e).1 = k.created → out (step E.reads ts e).2 = [key e])
     (hfail : ∀ e s, out (k.onFailure e s) = []) (D : DB) :
     ∀ (cs : List (List ε)) (ts : Nat) (w : Writes),
       out (runChains k step D.reads cs ts w).2 =
@@ -208,12 +214,14 @@ theorem createTransfers_one (D : DB) (ts : Nat) (t : NewTransfer) (hl : t.flags.
       else ([(createTransfer D.reads ts t).1], transferKind.onFailure t (createTransfer D.reads ts t).1) := by
   unfold createTransfers
   have hc : chains transferKind.linked [t] = [[t]] := by simp [chains, transferKind, hl]
-  rw [hc, runChains_cons, runChains_nil, runChain_eq, applyChain_cons, applyChain_nil]
-  simp only [chainStep, List.isEmpty_nil, Bool.true_and, transferKind, hl, Bool.false_eq_true, ite_false,
-    reads_over, apply_empty]
-  split
-  · rename_i h; rw [if_pos h]; simp [Writes.merge]
-  · rename_i h; rw [if_neg h]; simp [Writes.merge]
+  rw [hc]
+  by_cases hs : (createTransfer D.reads ts t).1 = .created
+  · rw [if_pos hs]
+    simp [runChains_cons, runChains_nil, runChain_eq, applyChain_cons, applyChain_nil, chainStep, transferKind, hl,
+      reads_over, apply_empty, hs, Writes.merge]
+  · rw [if_neg hs]
+    simp [runChains_cons, runChains_nil, runChain_eq, applyChain_cons, applyChain_nil, chainStep, transferKind, hl,
+      reads_over, apply_empty, hs, Writes.merge]
 
 theorem createAccounts_one (D : DB) (ts : Nat) (a : NewAccount) (hl : a.flags.linked = false) :
     createAccounts D.reads ts [a] =
@@ -221,11 +229,13 @@ theorem createAccounts_one (D : DB) (ts : Nat) (a : NewAccount) (hl : a.flags.li
       else ([(createAccount D.reads ts a).1], {}) := by
   unfold createAccounts
   have hc : chains accountKind.linked [a] = [[a]] := by simp [chains, accountKind, hl]
-  rw [hc, runChains_cons, runChains_nil, runChain_eq, applyChain_cons, applyChain_nil]
-  simp only [chainStep, List.isEmpty_nil, Bool.true_and, accountKind, hl, Bool.false_eq_true, ite_false,
-    reads_over, apply_empty]
-  split
-  · rename_i h; rw [if_pos h]; simp [Writes.merge]
-  · rename_i h; rw [if_neg h]; simp [Writes.merge]
+  rw [hc]
+  by_cases hs : (createAccount D.reads ts a).1 = .created
+  · rw [if_pos hs]
+    simp [runChains_cons, runChains_nil, runChain_eq, applyChain_cons, applyChain_nil, chainStep, accountKind, hl,
+      reads_over, apply_empty, hs, Writes.merge]
+  · rw [if_neg hs]
+    simp [runChains_cons, runChains_nil, runChain_eq, applyChain_cons, applyChain_nil, chainStep, accountKind, hl,
+      reads_over, apply_empty, hs, Writes.merge]
 
 end Ledger.Proofs
