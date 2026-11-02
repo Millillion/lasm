@@ -55,7 +55,7 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread.
 - [ ] Replace the remaining tests that only read files as text, and port or retire the 29 Lean 4.32 test files.
 - [ ] Browser and Bun targets in differential testing.
-- [ ] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next).
+- [~] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next).
 - [ ] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week).
 - [ ] Platform evidence levels L0–L3, generated from CI results, in the README's platform table.
 

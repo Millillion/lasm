@@ -40,7 +40,7 @@
       "name": "edge-glue",
       "description": "Edge runtime glue: the edge host, Lasm.JS on the edge, the runtime loader and start-up",
       "mutate": ["src/edge/edge-host.mjs", "src/edge/edge-js.mjs", "src/edge/edge-runtime.mjs", "src/edge/edge-start.mjs"],
-      "tests": ["test/edge.test.mjs", "test/edge-js.test.mjs"],
+      "tests": ["test/edge.test.mjs", "test/edge-js.test.mjs", "test/edge-host.test.mjs"],
       "target": 80
     },
     {

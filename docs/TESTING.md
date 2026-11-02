@@ -40,7 +40,7 @@ proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (subset), release |
-| [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/` | release; nightly planned |
+| [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/`, `scripts/mutation/` (`mutation.yml`) | release (coverage); nightly and PR, changed modules only (mutation) |
 
 ### Differential testing
 
@@ -365,9 +365,8 @@ coverage of every Node process the tests start (the CLI, build workers, hosts),
 and [`scripts/coverage/report.mjs`](../scripts/coverage/report.mjs) turns it into
 a summary with c8, counting files that never loaded as 0 %.
 The [baseline](#coverage-baseline) is published below. Coverage says which lines
-ran, not that their results were checked; mutation testing (Stryker on the dev
-build service, link driver, notices and DOM applier; planned, nightly, rotating
-modules) says whether the tests would notice a change.
+ran, not that their results were checked; [mutation testing](#mutation-testing)
+says whether the tests would notice a change.
 
 ## CI tiers
 
@@ -431,6 +430,76 @@ contribute nothing. `unit.yml` (a release gate) fails when the total line
 coverage falls more than one point below this baseline; raise the baseline file
 when coverage improves.
 
+## Mutation testing
+
+Stryker 10.0.0 changes one thing in the code at a time (a `<` becomes `<=`, a
+call is removed, a string emptied, …) and runs the tests against each such
+*mutant*. A mutant the tests notice is *killed*; one they do not notice
+*survives*. The **score** is killed (and timed-out) mutants over all mutants
+that ran, including those no test executes. Coverage says a line ran; the
+score says a test would notice if it were wrong.
+
+**How it runs** ([`scripts/mutation/run.mjs`](../scripts/mutation/run.mjs)).
+Each module of [`scripts/mutation/modules.json`](../scripts/mutation/modules.json)
+is mutated on its own, and only that module's `node:test` files run, through
+Stryker's tap runner: one process per test file, and per mutant only the files
+that executed it. None of these tests needs the managed Lean or the native
+helpers, so a fresh checkout after `npm ci` runs them.
+
+```sh
+node scripts/mutation/run.mjs ui-dom                 # one module (all: no name)
+node scripts/mutation/run.mjs --check docs/evidence/mutation-baseline.json
+node scripts/mutation/run.mjs ui-dom --update docs/evidence/mutation-baseline.json   # record a higher score
+# reports: .work/mutation/<module>/report.html, survivors.json (file, line, mutator, replacement)
+```
+
+**CI** (`mutation.yml`): every module nightly and on demand, one job each; on a
+pull request, only the modules whose sources or tests changed. A module more
+than 0.5 points below its recorded score in
+[evidence/mutation-baseline.json](evidence/mutation-baseline.json) fails the
+job. Raise the recorded score whenever tests improve; the target starts at 80 %
+for every module and is raised once a module reaches it.
+
+### Scores
+
+Measured 2026-11-02 (Linux x64). *Initial*: with the tests that existed before
+mutation testing; *now*: with the tests written to kill survivors (CI's
+measurement on Node 26 is the recorded floor).
+
+| Module | Files | Initial | Now | Target |
+| --- | --- | ---: | ---: | ---: |
+@@TABLE@@
+
+`target-link` and `edge-glue` are low because most of their code runs only
+while linking a real program or inside a built output (`workers.yml`, the
+platform workflows): no unit test reaches it, and every such mutant counts as
+not covered. Raising them means unit tests for `linkWasiProgram`'s and
+`linkEdgeProgram`'s plans (with a stand-in toolchain) and for
+`createEdgeRuntimeHost`.
+
+### Survivors that cannot be killed (equivalent mutants)
+
+A mutant is *equivalent* when no input can tell it from the original. These
+stay, with the reason; they are not chased with tests that look at the code.
+
+| Module | Mutant | Why it is equivalent |
+| --- | --- | --- |
+| ui-dom | `str()`'s ASCII fast path: `n < 24` → `true`/`false`/`<=`/`>=`, the block emptied, `c > 127` → `true`/`>=` | The fast path and `TextDecoder` return the same string; only speed differs |
+| ui-dom, host bridge | `new Array(n)` → `new Array()` (event fields, paths, decoded arrays) | Every slot is assigned before use; preallocation only |
+| ui-dom | `if (n.firstChild) forgetLater(n)` → always | Forgetting a leaf again deletes an id already deleted |
+| ui-dom | `listening.has(type)` → `false`, `listening.add` removed | `addEventListener` ignores a second identical listener |
+| ui-dom | `n !== root`, `!chain.length` in `onEvent` | The listener is on the root, so every target is inside it; an empty chain reaches no handler either way |
+| ui-dom | `{ stop: () => {} }` → `{}` | An unknown subscription throws before the object is stored |
+| host bridge, edge | `'data'` → `''` as a conversion mode | Only `'reference'` is tested for; any other string is data |
+| host bridge | `Buffer.write(s, offset, 'utf8')` → `''` | Node's default encoding is UTF-8 |
+| build service | `replaceAll('\\', '/')` → `replaceAll('\\', '')` in the inventory | Paths contain no backslash on Linux and macOS (the Windows jobs of `unit.yml` cover it) |
+| build service | the staging and previous-output name prefixes (`.lasm-`, `.previous-`) | Any unique sibling name works |
+| notices | the descriptions in `leanRuntimeChanges` | Text, not logic: a change of wording is not a defect, and a test that repeats each sentence would only read the source |
+
+Survivors that are real but need fault injection to reach (a failing `rename`
+during delivery in `src/application-files.mjs`, the restore of the previous
+output) are listed in each module's `survivors.json` and are next in line.
+
 ## Bugs found
 
 | Found by | Bug | Status |
@@ -445,3 +514,5 @@ when coverage improves.
 | Nightly-style campaign 41241440598 (9,450 cases) | Two "divergences" on every Wasm target were the harness's own: it decoded each pipe chunk of the oracle's output separately, so a UTF-8 character split by native Lean's 4,096-byte writes became U+FFFD (the Wasm targets wrote it whole). `scripts/ci/lasm-js-stress.mjs` had the same pattern | Harness fix (#33) |
 | Test-quality audit | `candidate-readme.test.mjs` broke on `main` when the README's headings changed (PR #22), failing `installer-faults.yml` on every PR | Fixed in #25 |
 | Host bridge model (proxied work in a synchronous callback) | **A synchronous Lasm.JS callback that made the program's first asynchronous runtime request (a timer, socket, DNS lookup) hung for good.** The request starts the completion thread; `pthread_create` on a Lean thread is proxied synchronously to Node's main thread, which waited in `syncFunction` on the doorbell and never ran proxied work. Found while modelling the lazy completion thread, then reproduced (0.3.5) | Fixed: the wait runs the main thread's mailbox (`serveMailbox`, Emscripten's `_emscripten_check_mailbox`) whenever it times out, every 10 ms; regression in `test/node-js.test.mjs` and part 4 of `test/fixtures/js-callbacks`; the model's mutation keeps the old wait |
+| Mutation testing (`build-service`, first run) | **`createBuildService({ unref: true })` did not let the process exit** (the Vite plugin's build worker): the worker's stdout and stderr were piped, and a worker stdio stream waiting for data refs the worker; `unref()` also came before the `'message'` listener, which refs it again | Fixed ([#49](https://github.com/Millillion/lasm/issues/49)): Node forwards the worker's output itself, and `unref()` comes last; regression in `test/dev-build-service.test.mjs` |
+| Mutation testing (`host-bridge`, `edge-glue`) | **Lasm.JS failures wrapped twice**: a settled value that could not be converted, or an awaited promise rejected with a Lasm.JS failure, reached Lean as `Error: TypeError: …`, on Node and the edge | Fixed ([#51](https://github.com/Millillion/lasm/issues/51)) in `src/node-js.mjs` and `src/edge/edge-js.mjs`; regressions in `test/node-js-bridge.test.mjs` and `test/edge-js.test.mjs` |
