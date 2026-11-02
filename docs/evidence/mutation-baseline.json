@@ -1,0 +1,50 @@
+{
+  "comment": "Mutation scores per module (scripts/mutation/run.mjs, docs/TESTING.md#mutation-testing). initial: before the tests were improved (2026-11-02, Node 24.22.1, Linux x64); score: the floor CI checks (nightly, PRs), raised as tests improve; target: the goal.",
+  "measuredAt": "2026-11-02",
+  "tool": "Stryker 10.0.0 with the tap runner over node:test (scripts/mutation/run.mjs)",
+  "modules": {
+    "host-bridge": {
+      "initial": 56.5,
+      "score": 96,
+      "mutants": 731,
+      "target": 80
+    },
+    "ui-dom": {
+      "initial": 55.1,
+      "score": 92.6,
+      "mutants": 684,
+      "target": 80
+    },
+    "build-service": {
+      "initial": 52.4,
+      "score": 91.9,
+      "mutants": 460,
+      "target": 80
+    },
+    "link-driver": {
+      "initial": 53.9,
+      "score": 53.9,
+      "mutants": 3260,
+      "target": 80
+    },
+    "target-link": {
+      "initial": 5.9,
+      "score": 5.9,
+      "mutants": 1934,
+      "target": 80
+    },
+    "edge-glue": {
+      "initial": 15.2,
+      "score": 78.8,
+      "mutants": 1227,
+      "target": 80
+    },
+    "notices": {
+      "initial": 62.5,
+      "score": 74.5,
+      "mutants": 475,
+      "target": 80
+    }
+  },
+  "run": "mutation.yml run 41479365531 (Node 26.12.1) and a local run (Node 24.22.1); the lower of the two"
+}

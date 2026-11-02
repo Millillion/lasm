@@ -174,7 +174,7 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
   function settle(promise, value, mode = 'data') {
     Promise.resolve(value).then(result => {
       let bytes, failed = false;
-      try { bytes = encode(result, mode); } catch (error) { failed = true; bytes = encoder.encode(jsFailure(error).message); }
+      try { bytes = encode(result, mode); } catch (error) { failed = true; bytes = encoder.encode((error?.leanUserError ? error : jsFailure(error)).message); }
       push({ kind: 1, promise, failed, bytes });
     }, error => push({ kind: 1, promise, failed: true, bytes: encoder.encode(jsFailure(error).message) }));
   }
@@ -243,7 +243,7 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
         const mode = modeOf(flags);
         if (into !== undefined) { settle(into, result, mode); return empty; }
         if (flags & 2 && result && typeof result.then === 'function')
-          return Promise.resolve(result).then(value => encode(value, mode), error => { throw jsFailure(error); });
+          return Promise.resolve(result).then(value => encode(value, mode), error => { throw error?.leanUserError ? error : jsFailure(error); });
         return encode(result, mode);
       }
       case 206: return encoder.encode(describe(lookup(id)));
@@ -285,7 +285,7 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
         const mode = modeOf(flags);
         if (into !== undefined) { settle(into, result, mode); return empty; }
         if (flags & 2 && result && typeof result.then === 'function')
-          return Promise.resolve(result).then(value => encode(value, mode), error => { throw jsFailure(error); });
+          return Promise.resolve(result).then(value => encode(value, mode), error => { throw error?.leanUserError ? error : jsFailure(error); });
         return encode(result, mode);
       }
       default: throw failure(`Unsupported Lasm.JS operation ${op} on the edge`);
