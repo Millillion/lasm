@@ -56,8 +56,7 @@
       "run": "npm run build",
       "fails": true,
       "outputIncludes": [
-        "omega could not prove the goal",
-        "a ≥ 101"
+        "App.lean:18:12: error: omega could not prove the goal:\n   18 |   split <;> omega\n      |             ^\na possible counterexample may satisfy the constraints\n  a ≥ 101\nwhere\n a := ↑n✝"
       ]
     },
     {
@@ -72,8 +71,8 @@
       "run": "npm run build",
       "fails": true,
       "outputIncludes": [
-        "declaration uses `sorry`",
-        "depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]"
+        "App.lean:15:8: warning: declaration uses `sorry`",
+        "App.lean:27:15: error: 'App.pageSize_bounds' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]"
       ]
     },
     {

@@ -197,13 +197,13 @@ npm run build
 Lean only warns about a `sorry`:
 
 ```
-warning: declaration uses `sorry`
+App.lean:15:8: warning: declaration uses `sorry`
 ```
 
 But `#print axioms` now lists `sorryAx`, so `#guard_msgs` fails the build:
 
 ```
-'App.pageSize_bounds' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+App.lean:27:15: error: 'App.pageSize_bounds' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
 ```
 
 Put the proof back.

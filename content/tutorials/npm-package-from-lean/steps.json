@@ -34,7 +34,7 @@
       "run": "npm run build",
       "fails": true,
       "outputIncludes": [
-        "semver export \"satisfy\" is missing"
+        "Lasm.JS binding check failed:\n  satisfies: semver export \"satisfy\" is missing"
       ]
     },
     {
