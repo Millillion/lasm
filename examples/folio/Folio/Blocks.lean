@@ -80,6 +80,13 @@ structure P where
   allClosed : Bool := true
   lastMatched : Nat := 0
   oldtip : Nat := 0
+  /-- Open containers `first` to `last` (indices in `stack`, `first ≥ 1`,
+  `last > first`) are lists and list items that have content: on a blank
+  line they all continue, so the walk can skip them (otherwise every blank
+  line in deeply nested lists walks the whole stack). `(0, 0)`: none known. -/
+  blankRun : Nat × Nat := (0, 0)
+  /-- On the current line, no thematic break starts before this position. -/
+  breakKill : Nat := 0
 
 /-- A line consisting only of spaces and tabs (`/^[ \t]*$/`). -/
 def isSpaceTabLine (s : String) : Bool := s.all isSpaceOrTab
@@ -123,6 +130,13 @@ def finalizeBlock (o : Open) (endLine : Nat) : Blk :=
     .mk (.html t) o.first endLine lit "" #[]
   | k => .mk k o.first endLine o.content "" o.children
 
+/-- Whether every character from `i` on satisfies `p` (stopping at the
+first that does not). -/
+def allFrom (a : Array Char) (i : Nat) (p : Char → Bool) : Bool := Id.run do
+  for j in [i:a.size] do
+    if !p a[j]! then return false
+  return true
+
 namespace P
 
 def tip (p : P) : Open := p.stack.back!
@@ -135,7 +149,9 @@ def finalize (p : P) (endLine : Nat) : P :=
   if p.stack.size ≤ 1 then p else
   let b := finalizeBlock p.tip endLine
   let stack := p.stack.pop
-  { p with stack := stack.modify (stack.size - 1) fun o => { o with children := o.children.push b } }
+  let (f, l) := p.blankRun
+  let blankRun := if l < stack.size then (f, l) else if stack.size - 1 > f then (f, stack.size - 1) else (0, 0)
+  { p with stack := stack.modify (stack.size - 1) (fun o => { o with children := o.children.push b }), blankRun }
 
 def findNextNonspace (p : P) : P := Id.run do
   let mut i := p.offset
@@ -201,17 +217,18 @@ def addChild (p : P) (k : Kind) : P := Id.run do
 returns the rest and whether any were found. -/
 def takeRefs (refs : RefMap) (content : String) : RefMap × String × Bool := Id.run do
   let mut refs := refs
-  let mut a := chars content
+  let a := chars content
+  let mut start := 0
   let mut found := false
   for _ in [0:a.size] do
-    if a[0]? != some '[' then break
-    match reference a with
+    if a[start]? != some '[' then break
+    match reference a start with
     | none => break
-    | some (n, label, r) =>
+    | some (e, label, r) =>
       if !refs.contains label then refs := refs.insert label r
-      a := a.extract n a.size
+      start := e
       found := true
-  return (refs, String.ofList a.toList, found)
+  return (refs, if found then slice a start a.size else content, found)
 
 end P
 
@@ -236,7 +253,7 @@ def continueBlock (p : P) (i : Nat) : Nat × P :=
   | .heading _ | .thematic => (1, p)
   | .code true fc fl off =>
     let run := countWhile p.ln p.nextNonspace p.ln.size (· == fc)
-    let restBlank := (p.ln.extract (p.nextNonspace + run) p.ln.size).all isSpaceOrTab
+    let restBlank := allFrom p.ln (p.nextNonspace + run) isSpaceOrTab
     if p.indent ≤ 3 && p.peekAt p.nextNonspace == some fc && run ≥ 3 && restBlank && run ≥ fl then
       (2, p.finalize p.lineNo)
     else Id.run do
@@ -284,7 +301,7 @@ def htmlBlockStart (a : Array Char) (i : Nat) (allow7 : Bool) : Option Nat :=
     if htmlBlockNames.any (fun n => hasAtCI a j n.toList && ends6 (j + n.length)) then some 6
     else if allow7 then
       match (openTag a i).orElse fun _ => closeTag a i with
-      | some e => if (a.extract e a.size).all isUnicodeSpace then some 7 else none
+      | some e => if allFrom a e isUnicodeSpace then some 7 else none
       | none => none
     else none
 
@@ -299,14 +316,18 @@ def htmlBlockEnds (a : Array Char) (i t : Nat) : Bool :=
   | 5 => (findSeq a i "]]>".toList).isSome
   | _ => false
 
-/-- `^(?:\*[ \t]*){3,}$` and its `_`, `-` variants. -/
-def isThematicBreak (a : Array Char) (i : Nat) : Bool :=
-  match a[i]? with
-  | some c =>
-    (c == '*' || c == '_' || c == '-') &&
-    (a.extract i a.size).all (fun d => d == c || isSpaceOrTab d) &&
-    ((a.extract i a.size).toList.filter (· == c)).length ≥ 3
-  | none => false
+/-- `^(?:\*[ \t]*){3,}$` and its `_`, `-` variants, and when it fails, the
+position that made it fail (a scan starting before it, on the same line,
+fails too: cmark's `thematic_break_kill_pos`). -/
+def thematicBreak (a : Array Char) (i : Nat) : Bool × Nat := Id.run do
+  let some c := a[i]? | return (false, i)
+  if !(c == '*' || c == '_' || c == '-') then return (false, i)
+  let mut n := 0
+  for j in [i:a.size] do
+    let d := a[j]!
+    if d == c then n := n + 1
+    else if !isSpaceOrTab d then return (false, j)
+  return (n ≥ 3, a.size)
 
 /-- A list marker (blocks.js `parseListMarker`). -/
 def listMarker (p : P) (containerIsPara : Bool) : Option (ListData × P) := Id.run do
@@ -335,7 +356,7 @@ def listMarker (p : P) (containerIsPara : Bool) : Option (ListData × P) := Id.r
   match a[i + len]? with
   | some ' ' | some '\t' | none => pure ()
   | _ => return none
-  if containerIsPara && (a.extract (i + len) a.size).all isAsciiSpace then return none
+  if containerIsPara && allFrom a (i + len) isAsciiSpace then return none
   let mut p := (p.advanceNextNonspace).advanceOffset len true
   let startCol := p.column
   let startOff := p.offset
@@ -403,7 +424,7 @@ def blockStart (p : P) (ci : Nat) : Nat × P := Id.run do
     if let some c := a[nn]? then
       if (c == '=' || c == '-') then
         let run := countWhile a nn a.size (· == c)
-        if (a.extract (nn + run) a.size).all isSpaceOrTab then
+        if allFrom a (nn + run) isSpaceOrTab then
           p := p.closeUnmatched
           let (refs, content, _) := P.takeRefs p.refs p.tip.content
           p := { p with refs }
@@ -412,7 +433,12 @@ def blockStart (p : P) (ci : Nat) : Nat × P := Id.run do
             p := p.modifyTip fun o => { o with kind := .heading (if c == '=' then 1 else 2) }
             return (2, p.advanceOffset (a.size - p.offset) false)
   -- thematic break
-  if !p.indented && isThematicBreak a nn then
+  let isBreak ← if !p.indented && nn ≥ p.breakKill then
+      let (ok, kill) := thematicBreak a nn
+      if !ok then p := { p with breakKill := kill }
+      pure ok
+    else pure false
+  if isBreak then
     p := p.closeUnmatched
     p := p.addChild .thematic
     return (2, p.advanceOffset (a.size - p.offset) false)
@@ -439,18 +465,38 @@ def maybeSpecial (c : Char) : Bool := "#`~*+_=<>0123456789-".toList.contains c
 def incorporateLine (p : P) (raw : Array Char) : P := Id.run do
   let ln := raw.map fun c => if c == '\x00' then '�' else c
   let mut p := { p with ln, offset := 0, column := 0, blank := false, partialTab := false,
-                        lineNo := p.lineNo + 1, oldtip := p.stack.size - 1 }
+                        lineNo := p.lineNo + 1, oldtip := p.stack.size - 1, breakKill := 0 }
   let mut container := 0
+  -- the current run of lists and items with content (0: none)
+  let mut runFirst := 0
   for _ in [0:p.stack.size] do
     if container + 1 ≥ p.stack.size then break
     container := container + 1
     p := p.findNextNonspace
+    let (f, l) := p.blankRun
+    if p.blank && f == container && l > f && l < p.stack.size then
+      -- every container from f to l continues on a blank line; together they
+      -- move to the end of the line's spaces
+      p := p.advanceNextNonspace
+      runFirst := f
+      container := l
+      continue
     let (r, p') := continueBlock p container
     p := p'
     if r == 2 then return p
     if r == 1 then
       container := container - 1
       break
+    let o := p.stack[container]!
+    let inRun := match o.kind with
+      | .list _ => true
+      | .item _ => !o.children.isEmpty || container + 1 < p.stack.size
+      | _ => false
+    if inRun then
+      if runFirst == 0 then runFirst := container
+      if container > runFirst && container - runFirst > p.blankRun.2 - p.blankRun.1 then
+        p := { p with blankRun := (runFirst, container) }
+    else runFirst := 0
   p := { p with allClosed := container == p.oldtip, lastMatched := container }
   let ck := p.stack[container]!.kind
   let mut matchedLeaf := !ck.isPara && ck.acceptsLines

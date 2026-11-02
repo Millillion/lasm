@@ -75,6 +75,15 @@ theorem itemsOk_append (o : Options) (a b : List Html) (ha : ItemsOk o a) (hb : 
   ⟨fun h => (NoRawList_append a b).2 ⟨ha.1 h, hb.1 h⟩, fun h => (SafeUrlsList_append a b).2 ⟨ha.2.1 h, hb.2.1 h⟩,
    ItemList_append a b ha.2.2 hb.2.2⟩
 
+theorem inlineOk_nil (o : Options) : InlineOk o (#[] : Array Html).toList := by
+  simp [InlineOk, Html.NoRawList, Html.SafeUrlsList, Html.PhrasingList]
+
+theorem blockOk_nil (o : Options) : BlockOk o (#[] : Array Html).toList := by
+  simp [BlockOk, Html.NoRawList, Html.SafeUrlsList, Html.FlowList]
+
+theorem itemsOk_nil (o : Options) : ItemsOk o (#[] : Array Html).toList := by
+  simp [ItemsOk, Html.NoRawList, Html.SafeUrlsList, Html.ItemList]
+
 theorem blockOk_text (o : Options) (s : String) : BlockOk o [.text s] := by
   simp [BlockOk, Html.NoRawList, Html.NoRaw, Html.SafeUrlsList, Html.SafeUrls, Html.FlowList, Html.Flow]
 
@@ -98,7 +107,7 @@ theorem safeUrl_safe (o : Options) (d : String) (h : o.anyUrl = false) : unsafeU
 
 theorem image_ok (o : Options) (d t : String) (cs : List Inline) : InlineOk o [image o d t cs] := by
   unfold image
-  by_cases hr : (o.rawHtml && (altParts false cs).1.any (·.1)) = true
+  by_cases hr : (o.rawHtml && (altParts false #[] cs).1.toList.any (·.1)) = true
   · rw [ite_eq_left hr]
     refine ⟨fun h' => ?_, fun _ => ?_, ?_⟩
     · simp_all
@@ -127,15 +136,15 @@ theorem inline_ok (o : Options) (nl : Bool) : (i : Inline) → InlineOk o (inlin
     simp only [inline, InlineOk, Html.NoRawList, Html.SafeUrlsList, Html.PhrasingList, and_true]
     exact ⟨this.1, fun _ => this.2.1, this.2.2.1⟩
   | .emph cs => by
-    have ih := inlines_ok o false cs
+    have ih := inlinesAux_ok o false #[] (inlineOk_nil o) cs
     simp only [inline, InlineOk, Html.NoRawList, Html.NoRaw, Html.SafeUrlsList, Html.SafeUrls, Html.PhrasingList, Html.Phrasing, Tag.isPhrasing, and_true]
     exact ⟨ih.1, fun h => ⟨by simp, ih.2.1 h⟩, by simp, ih.2.2⟩
   | .strong cs => by
-    have ih := inlines_ok o false cs
+    have ih := inlinesAux_ok o false #[] (inlineOk_nil o) cs
     simp only [inline, InlineOk, Html.NoRawList, Html.NoRaw, Html.SafeUrlsList, Html.SafeUrls, Html.PhrasingList, Html.Phrasing, Tag.isPhrasing, and_true]
     exact ⟨ih.1, fun h => ⟨by simp, ih.2.1 h⟩, by simp, ih.2.2⟩
   | .link d t cs => by
-    have ih := inlines_ok o false cs
+    have ih := inlinesAux_ok o false #[] (inlineOk_nil o) cs
     simp only [inline, InlineOk, Html.NoRawList, Html.NoRaw, Html.SafeUrlsList, Html.SafeUrls, Html.PhrasingList, Html.Phrasing, Tag.isPhrasing, and_true]
     refine ⟨ih.1, fun h => ⟨?_, ih.2.1 h⟩, by simp, ih.2.2⟩
     intro p hp
@@ -148,13 +157,17 @@ theorem inline_ok (o : Options) (nl : Bool) : (i : Inline) → InlineOk o (inlin
   | .image d t cs => by simpa [inline] using image_ok o d t cs
 termination_by structural i => i
 
-theorem inlines_ok (o : Options) (nl : Bool) : (is : List Inline) → InlineOk o (inlines o nl is).1
-  | [] => by simp [inlines, InlineOk, Html.NoRawList, Html.SafeUrlsList, Html.PhrasingList]
+theorem inlinesAux_ok (o : Options) (nl : Bool) (acc : Array Html) (hacc : InlineOk o acc.toList) :
+    (is : List Inline) → InlineOk o (inlinesAux o nl acc is).1.toList
+  | [] => by simpa [inlinesAux] using hacc
   | i :: is => by
-    simp only [inlines]
-    exact inlineOk_append o _ _ (inline_ok o nl i) (inlines_ok o _ is)
+    simp only [inlinesAux]
+    exact inlinesAux_ok o _ _ (by rw [Array.appendList_eq_append, Array.toList_appendList]; exact inlineOk_append o _ _ hacc (inline_ok o nl i)) is
 termination_by structural is => is
 end
+
+theorem inlines_ok (o : Options) (nl : Bool) (is : List Inline) : InlineOk o (inlines o nl is).1 :=
+  inlinesAux_ok o nl #[] (inlineOk_nil o) is
 
 theorem heading_isHeading (n : Nat) : (Tag.heading n).isHeading := by
   unfold Tag.heading; split <;> simp [Tag.isHeading]
@@ -205,44 +218,50 @@ theorem block_ok (o : Options) (tight nl : Bool) : (b : Block) → BlockOk o (bl
     have := rawOr_ok o lit
     exact ⟨fun h => ⟨this.1 h, trivial⟩, fun _ => ⟨this.2.1, trivial⟩, ⟨this.2.2.2, trivial⟩⟩
   | .quote bs => by
-    have ih := blocks_ok o false true bs
+    have ih := blocksAux_ok o false true #[] (blockOk_nil o) bs
     simp only [block]
     refine blockOk_append o _ _ (blockOk_cr o nl) (blockOk_cons_text o _ _ ?_)
-    have inner := blockOk_append o _ _ (blockOk_append o _ _ (blockOk_text o "\n") ih) (blockOk_cr o (blocks o false true bs).2)
+    have inner := blockOk_append o _ _ (blockOk_append o _ _ (blockOk_text o "\n") ih) (blockOk_cr o (blocksAux o false true #[] bs).2)
     simp only [List.cons_append] at inner
     exact elem_ok o _ _ _ (by simp) inner.1 inner.2.1 (Or.inr (Or.inl ⟨rfl, inner.2.2⟩))
   | .list ordered start tight' items => by
-    have ih := listItems_ok o tight' true items
+    have ih := itemsAux_ok o tight' true #[] (itemsOk_nil o) items
     simp only [block]
     refine blockOk_append o _ _ (blockOk_cr o nl) (blockOk_cons_text o _ _ ?_)
     have nl0 : ItemsOk o [Html.text "\n"] := by
       simp [ItemsOk, Html.NoRawList, Html.NoRaw, Html.SafeUrlsList, Html.SafeUrls, Html.ItemList]
-    have inner := itemsOk_append o _ _ (itemsOk_append o _ _ nl0 ih) (itemsOk_cr o (listItems o tight' true items).2)
+    have inner := itemsOk_append o _ _ (itemsOk_append o _ _ nl0 ih) (itemsOk_cr o (itemsAux o tight' true #[] items).2)
     simp only [List.cons_append] at inner
     refine elem_ok o _ _ _ ?_ inner.1 inner.2.1 (Or.inr (Or.inr (Or.inl ⟨?_, inner.2.2⟩)))
     · intro p hp; split at hp <;> simp_all [UrlAttrSafe]
     · split <;> simp
 termination_by structural b => b
 
-theorem blocks_ok (o : Options) (tight nl : Bool) : (bs : List Block) → BlockOk o (blocks o tight nl bs).1
-  | [] => by simp [blocks, BlockOk, Html.NoRawList, Html.SafeUrlsList, Html.FlowList]
+theorem blocksAux_ok (o : Options) (tight nl : Bool) (acc : Array Html) (hacc : BlockOk o acc.toList) :
+    (bs : List Block) → BlockOk o (blocksAux o tight nl acc bs).1.toList
+  | [] => by simpa [blocksAux] using hacc
   | b :: bs => by
-    simp only [blocks]
-    exact blockOk_append o _ _ (block_ok o tight nl b) (blocks_ok o tight _ bs)
+    simp only [blocksAux]
+    exact blocksAux_ok o tight _ _ (by rw [Array.appendList_eq_append, Array.toList_appendList]; exact blockOk_append o _ _ hacc (block_ok o tight nl b)) bs
 termination_by structural bs => bs
 
-theorem listItems_ok (o : Options) (tight nl : Bool) : (items : List (List Block)) → ItemsOk o (listItems o tight nl items).1
-  | [] => by simp [listItems, ItemsOk, Html.NoRawList, Html.SafeUrlsList, Html.ItemList]
+theorem itemsAux_ok (o : Options) (tight nl : Bool) (acc : Array Html) (hacc : ItemsOk o acc.toList) :
+    (items : List (List Block)) → ItemsOk o (itemsAux o tight nl acc items).1.toList
+  | [] => by simpa [itemsAux] using hacc
   | item :: items => by
-    have ih := blocks_ok o tight false item
-    have rest := listItems_ok o tight true items
-    simp only [listItems]
-    refine itemsOk_append o _ _ ?_ rest
+    have ih := blocksAux_ok o tight false #[] (blockOk_nil o) item
+    simp only [itemsAux]
+    refine itemsAux_ok o tight true _ ?_ items
+    rw [Array.appendList_eq_append, Array.toList_appendList]
+    refine itemsOk_append o _ _ hacc ?_
     simp only [ItemsOk, Html.NoRawList, Html.NoRaw, Html.SafeUrlsList, Html.SafeUrls, Html.ItemList, and_true]
     refine ⟨ih.1, fun h => ⟨by simp, ih.2.1 h⟩, ?_⟩
     simp_all [BlockOk]
 termination_by structural items => items
 end
+
+theorem blocks_ok (o : Options) (tight nl : Bool) (bs : List Block) : BlockOk o (blocks o tight nl bs).1 :=
+  blocksAux_ok o tight nl #[] (blockOk_nil o) bs
 
 /-- The renderer's tree for any Markdown text. -/
 theorem tree_ok (o : Options) (src : String) : BlockOk o (tree o src) :=

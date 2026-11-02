@@ -40,16 +40,17 @@ mutual
 options never produce, would be text too). -/
 def toUI : Folio.Html → Lasm.UI.Html Msg
   | .text s | .raw s => .text s
-  | .elem t as cs => .elem .html t.name none (as.map uiAttr) (toUIList cs)
+  | .elem t as cs => .elem .html t.name none (as.map uiAttr) (toUIList #[] cs).toList
   | .void t as => .elem .html t.name none (as.map uiAttr) []
 
-def toUIList : List Folio.Html → List (Lasm.UI.Html Msg)
-  | [] => []
-  | h :: hs => toUI h :: toUIList hs
+/-- A list of nodes, after `acc` (tail recursive). -/
+def toUIList (acc : Array (Lasm.UI.Html Msg)) : List Folio.Html → Array (Lasm.UI.Html Msg)
+  | [] => acc
+  | h :: hs => toUIList (acc.push (toUI h)) hs
 end
 
 /-- The preview pane's contents: the rendering of the source. -/
-def rendered (m : Model) : List (Lasm.UI.Html Msg) := toUIList (Folio.tree {} m.source)
+def rendered (m : Model) : List (Lasm.UI.Html Msg) := (toUIList #[] (Folio.tree {} m.source)).toList
 
 def view (m : Model) : Lasm.UI.Html Msg :=
   main_ [class_ "folio-preview"] [

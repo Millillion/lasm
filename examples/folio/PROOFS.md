@@ -26,7 +26,7 @@ read that one file and ignore the proofs: `npm run proofs` fails unless
   `Classical.choice`, `Quot.sound`): a `sorry` would show up as the axiom
   `sorryAx` and a `native_decide` as `Lean.ofReduceBool`, and CI also rejects
   both words in the sources;
-- every definition of Folio that `render` and `Site.build` use (about 550 of
+- every definition of Folio that `render` and `Site.build` use (about 580 of
   them, found by following the definitions from those two) is total: none is
   `partial`, `unsafe` or opaque, so Lean has checked that each one terminates
   on every input;
@@ -58,7 +58,7 @@ renderer did not put there itself.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from Proofs/Spec.lean by `npm run proofs -- --write`; do not edit by hand. -->
 
-**22 propositions**, each proved by the theorem of the same name in `Proofs/` (116 theorems in all: the 22 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
+**22 propositions**, each proved by the theorem of the same name in `Proofs/` (122 theorems in all: the 22 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
 
 ### A. Untrusted text never becomes markup
 

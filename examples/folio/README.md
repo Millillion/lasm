@@ -2,7 +2,7 @@
 
 **A CommonMark Markdown renderer and static-site generator, written in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm), with proofs that no Markdown can inject HTML.**
 It passes all 652 examples of the CommonMark 0.31.2 specification and agrees byte for byte with commonmark.js, the reference implementation, on random documents.
-116 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: unless raw HTML is enabled, text from the Markdown never becomes markup (an HTML tokenizer reads every output back as exactly the renderer's own tree), no link or image gets a `javascript:` URL, tags always nest, every function terminates on every input, slugs and output paths are unique and stay inside the output directory, every link in the page index resolves, and drafts are never published ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
+122 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: unless raw HTML is enabled, text from the Markdown never becomes markup (an HTML tokenizer reads every output back as exactly the renderer's own tree), no link or image gets a `javascript:` URL, tags always nest, every function terminates on every input, slugs and output paths are unique and stay inside the output directory, every link in the page index resolves, and drafts are never published ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
 
 ```sh
 npm install                  # Lasm (@lasm/cli) and commonmark.js (the differential test's reference)
@@ -119,6 +119,48 @@ edit, that the page and the server produce the same HTML, and that hostile Markd
 `onerror`, `<iframe src="javascript:…">`, `javascript:` links, `onload`) runs nothing: no dialog,
 no script or frame element, no handler attribute, every element one of Folio's.
 
+## Untrusted input can't crash it or stall it
+
+The proofs say every function terminates; tests check the other half of "untrusted input can't
+crash or subvert it" on the WebAssembly build itself (`npm run build:batch`):
+
+```sh
+npm run test:pathological   # CommonMark's pathological inputs, each in its own process, time-limited
+npm run fuzz -- --minutes 5 # the crash and timeout fuzzer (the seed is printed first; --seed N replays)
+```
+
+- **The pathological inputs** ([`test/pathological.mjs`](test/pathological.mjs)) are cmark 0.31.1's
+  list ([`test/cmark-pathological`](test/cmark-pathological), vendored with its license), with
+  cmark's expected-output patterns. It covers deep nesting (25,000 block quotes, 32,500 nested
+  emphases, 30,000 nested list items with blank lines) and runs of unmatched delimiters,
+  brackets, backticks and `<!--` up to 3 million characters. Each case runs in about a second
+  (backticks: 5 s for 3.1 million characters). commonmark.js takes 9 minutes on `![[]()`
+  repeated and almost 2 minutes on unclosed link destinations.
+- **The fuzzer** ([`test/fuzz.mjs`](test/fuzz.mjs)) generates three kinds of documents: syntax
+  fragments repeated up to tens of thousands of times, random characters (controls, NUL, astral,
+  `U+2028`), and specification examples spliced together and repeated. Each document is
+  rendered in both modes. It must finish within a time budget linear in its length, without a
+  trap or a stack overflow. Its safe output must pass a strict tokenizer: only Folio's tags and
+  attributes, nested, with no stray `<`, `>`, `"` or `&`. This is the proposition
+  `output_reads_back`, checked again at run time on the compiled program.
+
+What it found, all fixed:
+- a stack overflow on the WebAssembly build (rendering 300,000 inlines in one paragraph
+  recursed once per inline; the list functions are now tail recursive);
+- seven quadratic cases, where the parser rescanned to the end of the text. These are now
+  answered from facts computed once per paragraph, or skipped as cmark does:
+  - backtick runs;
+  - `<!--`, `<?` and `<![CDATA[`;
+  - link destinations (a parenthesis-balance table);
+  - bracket deactivation;
+  - openers of emphasis that were already removed;
+  - blank lines in deeply nested lists;
+  - thematic-break checks on long list-marker lines.
+
+The pathological inputs and three minutes of fuzzing run on every PR ([folio.yml](../../.github/workflows/folio.yml)).
+A nightly job ([folio-nightly.yml](../../.github/workflows/folio-nightly.yml)) runs 40 minutes of
+fuzzing and twenty differential seeds of larger documents.
+
 ## The site generator
 
 - **Front matter**: `---` lines around `key: value` lines at the top of a page: `title`, `date`
@@ -149,10 +191,10 @@ no script or frame element, no handler attribute, every element one of Folio's.
 | [`Cli.lean`](Cli.lean), [`site/`](site) | The `folio` command, and an example site |
 | [`Preview/Page.lean`](Preview/Page.lean), [`PreviewClient.lean`](PreviewClient.lean), [`PreviewServer.lean`](PreviewServer.lean) | The live preview and its server |
 | [`Batch.lean`](Batch.lean) | Renders many documents in one run, for the tests |
-| [`test/`](test) | The specification's examples, the differential test, the command's checks, the proof checks |
+| [`test/`](test) | The specification's examples, the differential test, the pathological inputs and the fuzzer, the command's checks, the proof checks |
 
 Every function is total, with no `partial`: loops run over bounded ranges, and recursion is
-structural or on a decreasing measure. `npm run proofs` checks that none of the 552 definitions
+structural or on a decreasing measure. `npm run proofs` checks that none of the 583 definitions
 behind `render` and `Site.build` is `partial`, `unsafe` or opaque.
 
 [NOTICE.md](NOTICE.md) has the licenses of commonmark.js, mdurl and the entity list, whose

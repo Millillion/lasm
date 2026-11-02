@@ -57,27 +57,26 @@ def cr (nl : Bool) : List Html := if nl then [] else [.text "\n"]
 /-- The `alt` text of an image: the plain text of its description, as
 commonmark.js writes it with tags turned off, in pieces; `true` marks raw
 HTML from the source. -/
-def altParts (nl : Bool) : List Inline → List (Bool × String) × Bool
-  | [] => ([], nl)
+def altParts (nl : Bool) (acc : Array (Bool × String)) : List Inline → Array (Bool × String) × Bool
+  | [] => (acc, nl)
   | i :: is =>
-    let (s, nl) := match i with
-      | .text t | .code t => ([(false, t)], t == "\n")
-      | .html t => ([(true, t)], t == "\n")
-      | .softbreak => ([(false, "\n")], true)
-      | .linebreak => ([(false, if nl then "" else "\n")], true)
-      | .emph cs | .strong cs | .link _ _ cs | .image _ _ cs => altParts nl cs
-    let (rest, nl) := altParts nl is
-    (s ++ rest, nl)
+    let (acc, nl) := match i with
+      | .text t | .code t => (acc.push (false, t), t == "\n")
+      | .html t => (acc.push (true, t), t == "\n")
+      | .softbreak => (acc.push (false, "\n"), true)
+      | .linebreak => (acc.push (false, if nl then "" else "\n"), true)
+      | .emph cs | .strong cs | .link _ _ cs | .image _ _ cs => altParts nl acc cs
+    altParts nl acc is
 
 /-- An image. Its description's text becomes the `alt` attribute. When raw
 HTML is enabled and the description holds some, commonmark.js writes that
 HTML into the attribute unescaped; the image is then raw HTML too. -/
 def image (o : Options) (d t : String) (cs : List Inline) : Html :=
-  if o.rawHtml && (altParts false cs).1.any (·.1) then
+  if o.rawHtml && (altParts false #[] cs).1.toList.any (·.1) then
     .raw ("<img src=\"" ++ escapeHtml (safeUrl o d) ++ "\" alt=\"" ++
-      String.join ((altParts false cs).1.map fun (r, s) => if r then s else escapeHtml s) ++ "\"" ++
+      String.join ((altParts false #[] cs).1.toList.map fun (r, s) => if r then s else escapeHtml s) ++ "\"" ++
       (if t.isEmpty then "" else " title=\"" ++ escapeHtml t ++ "\"") ++ " />")
-  else .void .img ([(Attr.src, safeUrl o d), (Attr.alt, String.join ((altParts false cs).1.map (·.2)))] ++
+  else .void .img ([(Attr.src, safeUrl o d), (Attr.alt, String.join ((altParts false #[] cs).1.toList.map (·.2)))] ++
     if t.isEmpty then [] else [(Attr.title, t)])
 
 mutual
@@ -88,21 +87,26 @@ def inline (o : Options) (_nl : Bool) : Inline → List Html × Bool
   | .linebreak => ([.void .br [], .text "\n"], true)
   | .code s => ([.elem .code [] [.text s]], false)
   | .html s => ([rawOr o s], s == "\n")
-  | .emph cs => ([.elem .em [] (inlines o false cs).1], false)
-  | .strong cs => ([.elem .strong [] (inlines o false cs).1], false)
+  | .emph cs => ([.elem .em [] (inlinesAux o false #[] cs).1.toList], false)
+  | .strong cs => ([.elem .strong [] (inlinesAux o false #[] cs).1.toList], false)
   | .link d t cs =>
     let href := if !o.anyUrl && unsafeUrl d then [] else [(Attr.href, d)]
     let title := if t.isEmpty then [] else [(Attr.title, t)]
-    ([.elem .a (href ++ title) (inlines o false cs).1], false)
+    ([.elem .a (href ++ title) (inlinesAux o false #[] cs).1.toList], false)
   | .image d t cs => ([image o d t cs], false)
 
-def inlines (o : Options) (nl : Bool) : List Inline → List Html × Bool
-  | [] => ([], nl)
+/-- A list of inlines, after the nodes `acc` (tail recursive: a paragraph
+can hold hundreds of thousands of inlines). -/
+def inlinesAux (o : Options) (nl : Bool) (acc : Array Html) : List Inline → Array Html × Bool
+  | [] => (acc, nl)
   | i :: is =>
     let (h, nl) := inline o nl i
-    let (hs, nl) := inlines o nl is
-    (h ++ hs, nl)
+    inlinesAux o nl (acc.appendList h) is
 end
+
+def inlines (o : Options) (nl : Bool) (is : List Inline) : List Html × Bool :=
+  let (a, nl) := inlinesAux o nl #[] is
+  (a.toList, nl)
 
 /-- The `class` of a code block: `language-` and the first word of its info
 string. -/
@@ -122,27 +126,31 @@ def block (o : Options) (tight nl : Bool) : Block → List Html × Bool
   | .code info lit => (cr nl ++ [.elem .pre [] [.elem .code (codeClass info) [.text lit]], .text "\n"], true)
   | .html lit => (cr nl ++ [rawOr o lit] ++ cr (lit == "\n"), true)
   | .quote bs =>
-    let (inner, nl') := blocks o false true bs
-    (cr nl ++ [.elem .blockquote [] (.text "\n" :: inner ++ cr nl'), .text "\n"], true)
+    let (inner, nl') := blocksAux o false true #[] bs
+    (cr nl ++ [.elem .blockquote [] (.text "\n" :: inner.toList ++ cr nl'), .text "\n"], true)
   | .list ordered start tight' items =>
     let tag := if ordered then Tag.ol else .ul
     let attrs := if ordered && start != 1 then [(Attr.start, toString start)] else []
-    let (inner, nl') := listItems o tight' true items
-    (cr nl ++ [.elem tag attrs (.text "\n" :: inner ++ cr nl'), .text "\n"], true)
+    let (inner, nl') := itemsAux o tight' true #[] items
+    (cr nl ++ [.elem tag attrs (.text "\n" :: inner.toList ++ cr nl'), .text "\n"], true)
 
-def blocks (o : Options) (tight nl : Bool) : List Block → List Html × Bool
-  | [] => ([], nl)
+/-- A list of blocks, after the nodes `acc` (tail recursive). -/
+def blocksAux (o : Options) (tight nl : Bool) (acc : Array Html) : List Block → Array Html × Bool
+  | [] => (acc, nl)
   | b :: bs =>
     let (h, nl) := block o tight nl b
-    let (hs, nl) := blocks o tight nl bs
-    (h ++ hs, nl)
+    blocksAux o tight nl (acc.appendList h) bs
 
-def listItems (o : Options) (tight nl : Bool) : List (List Block) → List Html × Bool
-  | [] => ([], nl)
+/-- A list's items, after the nodes `acc` (tail recursive). -/
+def itemsAux (o : Options) (tight nl : Bool) (acc : Array Html) : List (List Block) → Array Html × Bool
+  | [] => (acc, nl)
   | item :: items =>
-    let (hs, nl) := listItems o tight true items
-    ([.elem .li [] (blocks o tight false item).1, .text "\n"] ++ hs, nl)
+    itemsAux o tight true (acc.appendList [.elem .li [] (blocksAux o tight false #[] item).1.toList, .text "\n"]) items
 end
+
+def blocks (o : Options) (tight nl : Bool) (bs : List Block) : List Html × Bool :=
+  let (a, nl) := blocksAux o tight nl #[] bs
+  (a.toList, nl)
 
 /-- The HTML tree of a Markdown document. -/
 def toHtml (o : Options) (bs : List Block) : List Html := (blocks o false true bs).1
