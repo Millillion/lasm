@@ -2,14 +2,15 @@
 
 **A double-entry ledger and payments API in the style of [TigerBeetle](https://tigerbeetle.com), written in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm), with proofs.**
 Accounts and transfers follow TigerBeetle's data model, flags and result codes for the subset Ledger implements: two-phase (pending, post, void) transfers, linked chains that succeed or fail together, `debits_must_not_exceed_credits`, and client-chosen ids, so a retried request is never applied twice.
-187 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: money is neither created nor destroyed in any ledger, each transfer moves one amount between exactly two accounts, a retried transfer answers `exists` and changes nothing, a pending transfer is posted or voided at most once, a linked chain is all or nothing, and replaying the journal reproduces every balance ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
+191 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: money is neither created nor destroyed in any ledger, each transfer moves one amount between exactly two accounts, a retried transfer answers `exists` and changes nothing, a pending transfer is posted or voided at most once, a linked chain is all or nothing, and replaying the journal reproduces every balance ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
 
 ```sh
 npm install          # Lasm (@lasm/cli)
 npm run build        # the Node server (dist/server)
-npm start            # http://localhost:3000 (PORT, HOST, DATABASE_PATH)
+npm start            # http://localhost:3000: the page, and the API under /api (PORT, HOST, DATABASE_PATH)
 npm test             # the API test against a fresh server
 npm run test:bank    # the bank workload: concurrent transfers and reads, every read sees the same total
+npx playwright install chromium && npm run test:e2e   # the browser page's end-to-end tests (BROWSERS=chromium,firefox,webkit)
 npm run proofs       # check every theorem
 ```
 
@@ -124,9 +125,19 @@ like TigerBeetle's `create_transfer`.
 | [`Ledger/Json.lean`](Ledger/Json.lean), [`Ledger/Api.lean`](Ledger/Api.lean) | The wire format and the HTTP API, generic over the store |
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The model of the database and the proofs |
+| [`Frontend/Page.lean`](Frontend/Page.lean), [`Client.lean`](Client.lean) | The browser page (Lasm.UI) |
 | [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | The SQL, the HTTP glue and the `node:sqlite` binding; the Node program |
 | [`Verify.lean`](Verify.lean) | The journal auditor, `ledger verify journal.ndjson` |
 | [`test/`](test) | The API test, the bank workload, the TigerBeetle differential test, the proof checks |
+
+## The browser page
+
+`http://localhost:3000/` is a small `Lasm.UI` page ([`Frontend/Page.lean`](Frontend/Page.lean),
+started by [`Client.lean`](Client.lean)): every account with its four balances and its balance
+(credits posted − debits posted), the journal, a filter by ledger, and a refresh button. Its
+`update` and `view` are pure Lean, so four propositions are about them (section J of
+[PROOFS.md](PROOFS.md)); the end-to-end tests ([`test/e2e`](test/e2e)) drive it in Chromium,
+Firefox and WebKit in CI.
 
 ## The API
 

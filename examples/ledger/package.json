@@ -5,21 +5,23 @@
   "type": "module",
   "description": "Ledger, a double-entry ledger in the style of TigerBeetle, in Lean: an HTTP API and an account view compiled to WebAssembly by Lasm, with proofs",
   "scripts": {
-    "build": "lasm build ServerNode.lean --output dist/server",
+    "build": "npm run build:client && lasm build ServerNode.lean --output dist/server",
+    "build:client": "lasm build Client.lean --target browser --output dist/public",
     "start": "node dist/server/main.mjs",
     "test": "node test/api.mjs",
     "test:bank": "node test/bank.mjs",
     "test:tigerbeetle": "node test/tigerbeetle.mjs",
-    "build:bun": "bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
+    "test:e2e": "playwright test -c test/playwright.config.mjs",
+    "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
     "start:bun": "bun bun/main.mjs",
-    "build:deno": "lasm build ServerNode.lean --target deno --output dist/server",
+    "build:deno": "npm run build:client && lasm build ServerNode.lean --target deno --output dist/server",
     "start:deno": "deno run -A deno/main.mjs",
-    "build:workers": "lasm build ServerWorkers.lean --target workers --output dist/server",
+    "build:workers": "npm run build:client && lasm build ServerWorkers.lean --target workers --output dist/server",
     "build:docker": "npm run build && docker build -t ledger .",
     "build:lambda": "npm run build && lasm package dist/server --target lambda",
     "build:lambda-image": "npm run build && docker build -f deploy/lambda-image/Dockerfile -t ledger-lambda:local .",
     "build:vercel": "npm run build && lasm package dist/server --target vercel",
-    "build:netlify": "node -e \"require('fs').mkdirSync('dist/public',{recursive:true})\" && npm run build && lasm package dist/server --target netlify",
+    "build:netlify": "npm run build && lasm package dist/server --target netlify",
     "build:azure": "npm run build && node deploy/package-hosted.mjs azure",
     "build:gcf": "npm run build && node deploy/package-hosted.mjs gcf",
     "build:wasi": "lasm build Verify.lean --target wasi --output dist/verify",
@@ -32,6 +34,7 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.3.6"
+    "@lasm/cli": "0.3.6",
+    "@playwright/test": "1.63.0"
   }
 }
