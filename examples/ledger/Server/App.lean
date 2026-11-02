@@ -56,12 +56,15 @@ def runRequest (db : Sql) (r : Request) : Nat → Async Reply
 one create request at a time, since concurrent writers would otherwise keep
 invalidating each other's reads and retry. The version check still guards
 against writers in other processes or isolates. -/
-def exclusive {α : Type} (writers : Std.Semaphore) (act : Async α) : Async α := do
-  let _ ← await (← writers.acquire).result?
-  try act finally writers.release
+def exclusive {α : Type} (writers : Option Std.Semaphore) (act : Async α) : Async α := do
+  match writers with
+  | none => act
+  | some w =>
+    let _ ← await (← w.acquire).result?
+    try act finally w.release
 
 /-- `/api/…`: the API. -/
-def api (writers : Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) (path : List String) : Async Lasm.Fetch.Response := do
+def api (writers : Option Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) (path : List String) : Async Lasm.Fetch.Response := do
   if req.method == "OPTIONS" then return { status := 204, headers := cors }
   let r : Request := { method := if req.method == "HEAD" then "GET" else req.method, path,
                        query := req.queryParams, body := req.text }
@@ -69,15 +72,19 @@ def api (writers : Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) (path : 
   return response reply
 
 /-- The whole site: the API under `/api` (the page's files are served before this). -/
-def site (writers : Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
+def site (writers : Option Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
   match req.segments with
   | "api" :: path => api writers db req path
   | _ => return .notFound
 
 /-- Serves Ledger on a SQL database (whose binding module created the
 tables), with the browser page's files (`assets`: `embed_dir! "dist/public"`
-in the entry file). -/
-def run (db : Sql) (assets : Lasm.Fetch.Assets) : IO Unit := do
-  Lasm.Fetch.serve (assets.wrap (site (← Std.Semaphore.new 1) db))
+in the entry file). `serializeWriters`: take turns between create requests
+in this process (off on Cloudflare Workers, which does not let one request
+wait on another's promise; there the version check alone keeps commits
+consistent). -/
+def run (db : Sql) (assets : Lasm.Fetch.Assets) (serializeWriters := true) : IO Unit := do
+  let writers ← if serializeWriters then some <$> Std.Semaphore.new 1 else pure none
+  Lasm.Fetch.serve (assets.wrap (site writers db))
 
 end Ledger.Server

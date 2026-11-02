@@ -9,4 +9,4 @@ def assets : Lasm.Fetch.Assets := embed_dir! "dist/public"
 
 
 def main : IO Unit := do
-  Ledger.Server.run (← Ledger.Server.D1.open "DB") assets
+  Ledger.Server.run (← Ledger.Server.D1.open "DB") assets (serializeWriters := false)

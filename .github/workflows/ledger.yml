@@ -15,7 +15,7 @@ name: Ledger
 # - tigerbeetle: the differential test (test/tigerbeetle.mjs) against the
 #   official TigerBeetle 0.17.9 release binary (SHA-256 pinned) and its
 #   official Node client: random workloads, every result code and balance
-#   must agree. Several seeds per run, each printed.
+#   must agree. Five seeds of 1500 batches per run, each printed.
 # - e2e: the browser page's end-to-end tests (test/e2e, Playwright) against
 #   the Node build, on Chromium, Firefox and WebKit, no retries.
 # Local runtimes only: no account, nothing deployed, CI=1. Free runners only.
@@ -137,10 +137,10 @@ jobs:
       - name: npm run build
         working-directory: examples/ledger
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
-      - name: Random workloads, three seeds (each printed; replay with --seed)
+      - name: Random workloads, five seeds (each printed; replay with --seed)
         working-directory: examples/ledger
         run: |
-          for i in 1 2 3; do node test/tigerbeetle.mjs --batches 400; done
+          for i in 1 2 3 4 5; do node test/tigerbeetle.mjs --batches 1500; done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
