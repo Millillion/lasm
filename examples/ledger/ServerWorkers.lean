@@ -3,4 +3,4 @@ import Server.App
 import Server.D1
 
 def main : IO Unit := do
-  Ledger.Server.run (← Ledger.Server.D1.open "DB")
+  Ledger.Server.run (← Ledger.Server.D1.open "DB") (serializeWriters := false)
