@@ -6,6 +6,10 @@ It passes all 652 examples of the CommonMark 0.31.2 specification and agrees byt
 
 ```sh
 npm install                  # Lasm (@lasm/cli) and commonmark.js (the differential test's reference)
+npm run build                # the folio command for Node (dist/cli)
+node dist/cli/main.mjs build site      # the example site (site/) into site/public
+node dist/cli/main.mjs render README.md  # one Markdown file to HTML
+npm run test:cli             # build the example site and check it
 npm run build:batch          # the renderer as a Node program (dist/batch), for the tests
 npm test                     # the CommonMark specification's 652 examples
 npm run test:differential    # random documents, Folio against commonmark.js (the seed is printed first)
@@ -65,11 +69,30 @@ leaves room. Where commonmark.js works on UTF-16 code units, Folio works on char
 next to `*` counts as punctuation, as the specification says, so the differential test does not
 generate that case.
 
-## The site generator
+## The folio command
 
-`Folio.Site.build` turns a directory of Markdown pages into a site; it is pure (the files' text in,
-the files to write out), and the command-line program that reads and writes the directory comes in
-the next milestone.
+```sh
+folio build [SITE] [OUT]          # the site in SITE (default .) into OUT (default SITE/public)
+folio render [--raw-html] FILE    # one Markdown file to HTML on standard output
+```
+
+A site is `index.md` (the home page and the site's settings), the pages under `content/` (any
+depth) and, optionally, layouts in `layouts/`; [`site/`](site) is an example, with a draft and a
+page of hostile HTML. Exit status: 0 done, 1 done with warnings (a malformed date, an unknown
+layout), 2 a wrong command or an unreadable file. [`Cli.lean`](Cli.lean) does the reading and
+writing; everything else is `Folio.Site.build`, a pure function from the files' text to the files
+to write, which the propositions are about.
+
+| Platform | Build | Run | Checked in CI by |
+| --- | --- | --- | --- |
+| Node 24 and 26 | `npm run build` | `node dist/cli/main.mjs build site` | `npm run test:cli` |
+| WASI: wasmtime 49.0.4, wasmer 7.4.2, `node:wasi` | `npm run build:wasi` | `wasmtime run --dir . wasi/main.wasm build site` | `npm run test:wasi`: the same checks on each engine, and the same bytes as on Node |
+
+The tests build [`site/`](site) and check the result: exactly the expected files, the draft
+nowhere, no HTML or `javascript:` URL from the untrusted page, every link in the index resolving
+to a generated file, and a well-formed RSS 2.0 feed listing the index's pages in its order.
+
+## The site generator
 
 - **Front matter**: `---` lines around `key: value` lines at the top of a page: `title`, `date`
   (`YYYY-MM-DD`), `draft: true`, `slug`, `layout`, `summary`, and any other key for the layouts.
@@ -96,8 +119,9 @@ the next milestone.
 | [`Folio/Site.lean`](Folio/Site.lean) | Front matter, slugs, layouts, the index and the feed |
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The proofs, and the HTML tokenizer the propositions use |
+| [`Cli.lean`](Cli.lean), [`site/`](site) | The `folio` command, and an example site |
 | [`Batch.lean`](Batch.lean) | Renders many documents in one run, for the tests |
-| [`test/`](test) | The specification's examples, the differential test, the proof checks |
+| [`test/`](test) | The specification's examples, the differential test, the command's checks, the proof checks |
 
 Every function is total, with no `partial`: loops run over bounded ranges, and recursion is
 structural or on a decreasing measure. `npm run proofs` checks that none of the 552 definitions
