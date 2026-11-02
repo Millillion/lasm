@@ -47,6 +47,19 @@ theorem total_two (hn : (l.map (·.id)).Nodup) (hd : l.find? (·.id == dr.id) = 
   have h2 := total_upsert (nodup_upsert hn dr') hc1 L f
   omega
 
+theorem total_two_delta (hn : (l.map (·.id)).Nodup) (hd : l.find? (·.id == dr.id) = some dr)
+    (hc : l.find? (·.id == cr.id) = some cr) (hne : dr.id ≠ cr.id) (hi : dr'.id = dr.id) (hj : cr'.id = cr.id)
+    (hl1 : dr'.ledger = dr.ledger) (hl2 : cr'.ledger = cr.ledger) (hll : cr.ledger = dr.ledger)
+    (L : Nat) (f : Account → Nat) :
+    total (upsert (upsert l dr') cr') L f + (if dr.ledger = L then f dr + f cr else 0) =
+      total l L f + (if dr.ledger = L then f dr' + f cr' else 0) := by
+  have := total_two hn hd hc hne hi hj L f
+  unfold part at this
+  rw [hl1, hl2, hll] at this
+  by_cases h : dr.ledger = L
+  · simp [h] at this ⊢; omega
+  · simp [h] at this ⊢; omega
+
 end Two
 
 /-! ## The general step -/
@@ -314,18 +327,18 @@ theorem inv_new {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {dr cr : Acco
     cases hp : t.flags.pending
     all_goals
       simp only [hp, ite_true, ite_false, Bool.false_eq_true] at edr ecr
-      have h1 := total_two (dr' := dr') (cr' := cr') hI.accountIds (find_of_mem hI.accountIds hdm)
-        (find_of_mem hI.accountIds hcm) hdc (by rw [edr]) (by rw [ecr]) L
-      subst edr ecr
+      have h1 := total_two_delta (dr' := dr') (cr' := cr') hI.accountIds (find_of_mem hI.accountIds hdm)
+        (find_of_mem hI.accountIds hcm) hdc (by rw [edr]) (by rw [ecr]) (by rw [edr]) (by rw [ecr]) hl' L
       have e1 := h1 (·.debitsPosted)
       have e2 := h1 (·.creditsPosted)
       have e3 := h1 (·.debitsPending)
       have e4 := h1 (·.creditsPending)
       clear h1
+      subst edr ecr
+      dsimp only at e1 e2 e3 e4
       by_cases hl : dr.ledger = L
-      all_goals
-        simp [part, hl, hl'] at e1 e2 e3 e4
-        constructor <;> omega
+      · simp only [if_pos hl] at e1 e2 e3 e4; constructor <;> omega
+      · simp only [if_neg hl, Nat.add_zero] at e1 e2 e3 e4; constructor <;> omega
 
 /-! ## Posts and voids -/
 
@@ -432,20 +445,21 @@ theorem inv_resolve {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {p : Tran
       · have := dmC h; first | omega | (simp; omega)
       · have := cmC h; first | omega | (simp; omega)
   · intro L
-    have h1 := total_two (dr' := dr') (cr' := cr') hI.accountIds (find_of_mem hI.accountIds hdm)
-      (find_of_mem hI.accountIds hcm) hdc (by rw [edr]) (by rw [ecr]) L
-    subst edr ecr
+    have hl' : cr.ledger = dr.ledger := hyl.trans hxl.symm
+    have h1 := total_two_delta (dr' := dr') (cr' := cr') hI.accountIds (find_of_mem hI.accountIds hdm)
+      (find_of_mem hI.accountIds hcm) hdc (by rw [edr]) (by rw [ecr]) (by rw [edr]) (by rw [ecr]) hl' L
     have e1 := h1 (·.debitsPosted)
     have e2 := h1 (·.creditsPosted)
     have e3 := h1 (·.debitsPending)
     have e4 := h1 (·.creditsPending)
+    clear h1
     have := hI.posted L
     have := hI.pending L
-    have hl' : cr.ledger = dr.ledger := hyl.trans hxl.symm
+    subst edr ecr
+    dsimp only at e1 e2 e3 e4
     by_cases hl : dr.ledger = L
-    all_goals
-      simp [part, hl, hl'] at e1 e2 e3 e4
-      constructor <;> omega
+    · simp only [if_pos hl] at e1 e2 e3 e4; constructor <;> omega
+    · simp only [if_neg hl, Nat.add_zero] at e1 e2 e3 e4; constructor <;> omega
 
 /-- Every created transfer keeps the invariant. -/
 theorem inv_transfer {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {e : Effect}

@@ -69,6 +69,8 @@ structure Store (m : Type → Type) where
   transfers : (after : Nat) → (limit : Nat) → m (List Transfer)
   /-- The transfers that touch an account, in journal order. -/
   transfersOf : Nat → m (List Transfer)
+  /-- Every account and the whole journal, read in one transaction (the export). -/
+  snapshot : m (List Account × List Transfer)
 
 /-- The clock. -/
 structure Services (m : Type → Type) where

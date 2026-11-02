@@ -204,7 +204,7 @@ theorem inv_onFailure_transfer {E : DB} (h : Inv E) (t : NewTransfer) (s : Trans
 theorem inv_createTransfers {D : DB} (hI : Inv D) (ts : Nat) (batch : List NewTransfer) :
     Inv (D.apply (createTransfers D.reads ts batch).2) := by
   unfold createTransfers
-  apply runChains_keeps transferKind createTransfer Inv _ inv_onFailure_transfer D _ ts {}
+  apply runChains_keeps transferKind createTransfer Inv _ (fun E e s h => inv_onFailure_transfer h e s) D _ ts {}
   · rw [apply_empty]; exact hI
   · intro E ts t hE
     have := createTransfer_model E ts t
