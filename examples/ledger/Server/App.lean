@@ -10,6 +10,7 @@ start, so every committed request saw the database exactly as it was when
 it committed. Requests that only read never commit.
 -/
 import Lasm.Fetch
+import Lasm.Fetch.Assets
 import Lasm.JS
 import Ledger.Api
 import Server.Sql
@@ -55,27 +56,35 @@ def runRequest (db : Sql) (r : Request) : Nat → Async Reply
 one create request at a time, since concurrent writers would otherwise keep
 invalidating each other's reads and retry. The version check still guards
 against writers in other processes or isolates. -/
-def exclusive {α : Type} (writers : Std.Semaphore) (act : Async α) : Async α := do
-  let _ ← await (← writers.acquire).result?
-  try act finally writers.release
+def exclusive {α : Type} (writers : Option Std.Semaphore) (act : Async α) : Async α := do
+  match writers with
+  | none => act
+  | some w =>
+    let _ ← await (← w.acquire).result?
+    try act finally w.release
 
 /-- `/api/…`: the API. -/
-def api (writers : Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) (path : List String) : Async Lasm.Fetch.Response := do
+def api (writers : Option Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) (path : List String) : Async Lasm.Fetch.Response := do
   if req.method == "OPTIONS" then return { status := 204, headers := cors }
   let r : Request := { method := if req.method == "HEAD" then "GET" else req.method, path,
                        query := req.queryParams, body := req.text }
   let reply ← if r.method == "POST" then exclusive writers (runRequest db r 50) else runRequest db r 50
   return response reply
 
-/-- The whole site: the API under `/api`. -/
-def site (writers : Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
+/-- The whole site: the API under `/api` (the page's files are served before this). -/
+def site (writers : Option Std.Semaphore) (db : Sql) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
   match req.segments with
   | "api" :: path => api writers db req path
-  | [] => return Lasm.Fetch.Response.text "Ledger: see /api/accounts and /api/transfers\n"
   | _ => return .notFound
 
-/-- Serves Ledger on a SQL database (whose binding module created the tables). -/
-def run (db : Sql) : IO Unit := do
-  Lasm.Fetch.serve (site (← Std.Semaphore.new 1) db)
+/-- Serves Ledger on a SQL database (whose binding module created the
+tables), with the browser page's files (`assets`: `embed_dir! "dist/public"`
+in the entry file). `serializeWriters`: take turns between create requests
+in this process (off on Cloudflare Workers, which does not let one request
+wait on another's promise; there the version check alone keeps commits
+consistent). -/
+def run (db : Sql) (assets : Lasm.Fetch.Assets) (serializeWriters := true) : IO Unit := do
+  let writers ← if serializeWriters then some <$> Std.Semaphore.new 1 else pure none
+  Lasm.Fetch.serve (assets.wrap (site writers db))
 
 end Ledger.Server

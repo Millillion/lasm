@@ -2,19 +2,60 @@
 
 **A double-entry ledger and payments API in the style of [TigerBeetle](https://tigerbeetle.com), written in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm), with proofs.**
 Accounts and transfers follow TigerBeetle's data model, flags and result codes for the subset Ledger implements: two-phase (pending, post, void) transfers, linked chains that succeed or fail together, `debits_must_not_exceed_credits`, and client-chosen ids, so a retried request is never applied twice.
-187 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: money is neither created nor destroyed in any ledger, each transfer moves one amount between exactly two accounts, a retried transfer answers `exists` and changes nothing, a pending transfer is posted or voided at most once, a linked chain is all or nothing, and replaying the journal reproduces every balance ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
+191 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: money is neither created nor destroyed in any ledger, each transfer moves one amount between exactly two accounts, a retried transfer answers `exists` and changes nothing, a pending transfer is posted or voided at most once, a linked chain is all or nothing, and replaying the journal reproduces every balance ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
 
 ```sh
 npm install          # Lasm (@lasm/cli)
 npm run build        # the Node server (dist/server)
-npm start            # http://localhost:3000 (PORT, HOST, DATABASE_PATH)
+npm start            # http://localhost:3000: the page, and the API under /api (PORT, HOST, DATABASE_PATH)
 npm test             # the API test against a fresh server
 npm run test:bank    # the bank workload: concurrent transfers and reads, every read sees the same total
+npx playwright install chromium && npm run test:e2e   # the browser page's end-to-end tests (BROWSERS=chromium,firefox,webkit)
 npm run proofs       # check every theorem
 ```
 
 Requirements: Node.js 24 or newer and npm. Lasm downloads Lean 4.35.0 and its WebAssembly tools
 on the first build (cached); `node:sqlite` is part of Node.
+
+## Platforms
+
+The same Lean runs on each platform below; only the SQLite binding module differs
+([`Server/NodeSqlite.lean`](Server/NodeSqlite.lean), [`Server/BunSqlite.lean`](Server/BunSqlite.lean),
+[`Server/D1.lean`](Server/D1.lean)). Each row is a CI job
+([ledger.yml](../../.github/workflows/ledger.yml) for Node,
+[ledger-platforms.yml](../../.github/workflows/ledger-platforms.yml) for the rest) that builds
+Ledger, serves it with the platform's own local tooling ([`test/platforms.mjs`](test/platforms.mjs))
+and runs the API test and the bank workload against it. No account, nothing deployed.
+
+| Platform | Build | Served in CI by | Store |
+| --- | --- | --- | --- |
+| Node 24 and 26 | `npm run build` | `node dist/server/main.mjs` | `node:sqlite`, a file |
+| Bun 1.4.4 | `npm run build:bun` | `bun bun/main.mjs` | `bun:sqlite`, a file |
+| Deno 2.9.6 | `npm run build:deno` | `deno run -A deno/main.mjs` | `node:sqlite` in Deno, a file |
+| Cloudflare Workers | `npm run build:workers` | `wrangler dev` | D1 (local), whose `batch` is one transaction |
+| Docker | `npm run build:docker` | `docker run --read-only` | `node:sqlite` on the `/data` volume |
+| AWS Lambda (.zip and container image) | `npm run build:lambda`, `build:lambda-image` | `sam local start-api` | `node:sqlite` in `/tmp`, per instance |
+| Vercel Functions | `vercel build` | Vercel's Node launcher | `node:sqlite` in `/tmp`, per instance |
+| Netlify Functions | `netlify build` | Netlify's bootstrap in the Lambda image | `node:sqlite` in `/tmp`, per instance |
+| Azure Functions | `npm run build:azure` | `func start` | `node:sqlite` in the temporary directory, per instance |
+| Google Cloud Functions | `npm run build:gcf` | Functions Framework | `node:sqlite` in the temporary directory, per instance |
+| WASI (the auditor) | `npm run build:wasi` | wasmtime 49.0.4, wasmer 7.4.2, `node:wasi` | reads an exported journal |
+
+On the function platforms the database lives as long as the function's instance: that is
+enough to run and test Ledger there, but a real deployment needs a durable database the
+platform does not provide on its own (put Ledger in a container with a volume, or on Workers
+with D1).
+
+**Not offered: Fastly Compute.** Its KV store is eventually consistent: two requests can read
+the same balance and both commit, which would break conservation. The edge platforms whose only
+store is eventually consistent are left out for the same reason.
+
+**The auditor** (`ledger verify journal.ndjson`, [`Verify.lean`](Verify.lean)) is a WASI
+command: export the journal (`curl localhost:3000/api/journal > journal.ndjson`) and run
+`wasmtime run --dir . wasi/main.wasm verify journal.ndjson`. It replays every transfer from zero
+and checks every balance and rule; exit 0 means consistent, 1 problems found, 2 unreadable.
+CI runs it on all three engines against a journal from the bank workload and against tampered
+copies, which it must reject ([`test/verify.mjs`](test/verify.mjs)).
 
 ## The oracles
 
@@ -84,9 +125,19 @@ like TigerBeetle's `create_transfer`.
 | [`Ledger/Json.lean`](Ledger/Json.lean), [`Ledger/Api.lean`](Ledger/Api.lean) | The wire format and the HTTP API, generic over the store |
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The model of the database and the proofs |
+| [`Frontend/Page.lean`](Frontend/Page.lean), [`Client.lean`](Client.lean) | The browser page (Lasm.UI) |
 | [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | The SQL, the HTTP glue and the `node:sqlite` binding; the Node program |
 | [`Verify.lean`](Verify.lean) | The journal auditor, `ledger verify journal.ndjson` |
 | [`test/`](test) | The API test, the bank workload, the TigerBeetle differential test, the proof checks |
+
+## The browser page
+
+`http://localhost:3000/` is a small `Lasm.UI` page ([`Frontend/Page.lean`](Frontend/Page.lean),
+started by [`Client.lean`](Client.lean)): every account with its four balances and its balance
+(credits posted − debits posted), the journal, a filter by ledger, and a refresh button. Its
+`update` and `view` are pure Lean, so four propositions are about them (section J of
+[PROOFS.md](PROOFS.md)); the end-to-end tests ([`test/e2e`](test/e2e)) drive it in Chromium,
+Firefox and WebKit in CI.
 
 ## The API
 

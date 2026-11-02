@@ -55,7 +55,8 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread.
 - [ ] Replace the remaining tests that only read files as text, and port or retire the 29 Lean 4.32 test files.
 - [ ] Browser and Bun targets in differential testing.
-- [ ] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next).
+- [x] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next): seven modules, nightly and PR CI, host bridge 56→96 %, UI applier 55→93 %, build service 52→92 %, edge glue 15→79 %, notices 63→75 % (#53; bugs #49, #51).
+- [ ] Mutation scores to 80 % for the link driver (54 %) and the target links (6 %: unit tests of the link plans with a stand-in toolchain), notices and edge glue; then raise the targets.
 - [ ] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week).
 - [ ] Platform evidence levels L0–L3, generated from CI results, in the README's platform table.
 
@@ -65,11 +66,11 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced.
 
 ### Ledger ([examples/ledger](examples/ledger), the second flagship app)
-- [x] 1. Pure core in TigerBeetle's data model and result codes (0.17.9 subset), the model, and the proofs: 26 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean), a requirements map ([SPEC.md](examples/ledger/SPEC.md)), `proofs:paranoid`.
-- [ ] 2. Node server (`node:sqlite`), the differential test against a pinned TigerBeetle release, and the Jepsen-style bank workload.
-- [ ] 3. Bun, Deno, Workers (D1), the Node serverless targets, and the WASI auditor `ledger verify journal.ndjson`. No Fastly build (its KV is eventually consistent).
-- [ ] 4. The `Lasm.UI` page (accounts and journal) and its end-to-end tests.
-- [ ] (J) Review and hone the 26 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
+- [x] 1. Pure core in TigerBeetle's data model and result codes (0.17.9 subset), the model, and the proofs: 27 propositions (31 with the page) in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean), a requirements map ([SPEC.md](examples/ledger/SPEC.md)), `proofs:paranoid`.
+- [x] 2. Node server (`node:sqlite`), the differential test against a pinned TigerBeetle release, and the Jepsen-style bank workload.
+- [x] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms (Lambda .zip and image, Vercel, Netlify, Azure, GCF), and the WASI auditor `ledger verify journal.ndjson` on wasmtime, wasmer and `node:wasi`. No Fastly build (its KV is eventually consistent).
+- [x] 4. The `Lasm.UI` page (accounts and journal, a ledger filter), four propositions about it, and its end-to-end tests on Chromium, Firefox and WebKit.
+- [ ] (J) Review and hone the 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
 
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.

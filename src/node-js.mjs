@@ -277,7 +277,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
   function settle(promise, value, mode = 'data') {
     Promise.resolve(value).then(result => {
       let bytes, failed = false;
-      try { bytes = encode(result, mode); } catch (error) { failed = true; bytes = Buffer.from(jsFailure(error).message); }
+      try { bytes = encode(result, mode); } catch (error) { failed = true; bytes = Buffer.from((error?.leanUserError ? error : jsFailure(error)).message); }
       push({ kind: 1, promise, failed, bytes });
     }, error => push({ kind: 1, promise, failed: true, bytes: Buffer.from(jsFailure(error).message) }));
   }
@@ -365,7 +365,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
         const mode = modeOf(flags);
         if (into !== undefined) { settle(into, result, mode); return Buffer.alloc(0); }
         if (flags & 2 && result && typeof result.then === 'function')
-          return Promise.resolve(result).then(value => encode(value, mode), error => { throw jsFailure(error); });
+          return Promise.resolve(result).then(value => encode(value, mode), error => { throw error?.leanUserError ? error : jsFailure(error); });
         return encode(result, mode);
       }
       case 206: return Buffer.from(describe(lookup(id)));
@@ -425,7 +425,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
         const mode = modeOf(flags);
         if (into !== undefined) { settle(into, result, mode); return Buffer.alloc(0); }
         if (flags & 2 && result && typeof result.then === 'function')
-          return Promise.resolve(result).then(value => encode(value, mode), error => { throw jsFailure(error); });
+          return Promise.resolve(result).then(value => encode(value, mode), error => { throw error?.leanUserError ? error : jsFailure(error); });
         return encode(result, mode);
       }
       default: throw failure(`Unsupported Lasm.JS operation ${op}`);

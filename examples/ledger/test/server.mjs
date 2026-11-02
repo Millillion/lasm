@@ -26,9 +26,20 @@ export async function waitFor(url, child, timeoutMs = 60_000) {
   throw new Error(`no answer from ${url} within ${timeoutMs / 1000} s`);
 }
 
-/** Starts a server; `command` defaults to the Node build. Returns { base, stop }. */
-export async function startLedger({ command, url } = {}) {
+/** Starts a server: a running one (`url`), a platform of test/platforms.mjs
+(`platform`, served by its own tooling), or a command (default: the Node
+build). Returns { base, stop }. */
+export async function startLedger({ command, url, platform } = {}) {
   if (url) return { base: url, stop: async () => {} };
+  if (platform) {
+    const { baseUrl, startServer } = await import('./platforms.mjs');
+    const port = await freePort();
+    const server = startServer(platform, port);
+    const base = baseUrl(platform, port);
+    // Container images and function emulators can take minutes to pull and start.
+    try { await waitFor(`${base}/api/accounts`, server.child, 600_000); } catch (e) { server.stop(); throw e; }
+    return { base, stop: async () => server.stop() };
+  }
   const port = await freePort();
   const work = mkdtempSync(join(tmpdir(), 'ledger-test-'));
   const cmd = (command ?? `node ${JSON.stringify(join(root, 'dist/server/main.mjs'))}`).replaceAll('{port}', String(port));

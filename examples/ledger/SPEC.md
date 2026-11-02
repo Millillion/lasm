@@ -82,3 +82,13 @@ for the subset Ledger implements, and the proposal in
 | Reads change nothing | `Spec.reads_change_nothing` |
 | Only `POST /api/accounts` and `POST /api/transfers` write, each exactly one batch | `Spec.writes_are_batches` |
 | The same request gets the same result code from Ledger and from TigerBeetle | The differential test (milestone 2) |
+
+## 9. The browser page
+
+| Requirement | Covered by |
+| --- | --- |
+| The page shows the accounts and the journal of the chosen ledger, and only those | `Spec.page_filter` |
+| One row per account and per transfer, in order, keyed and marked by id | `Spec.page_rows` |
+| A failed load keeps the data shown and says what went wrong | `Spec.page_errors_keep_data` |
+| Refresh reloads both | `Spec.page_refresh` |
+| The page renders in Chromium, Firefox and WebKit, filters and refreshes | The end-to-end tests ([`test/e2e`](test/e2e), Playwright) |

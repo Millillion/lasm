@@ -1,6 +1,12 @@
 /- Ledger on Node and Deno with node:sqlite: `npm run build`, then `npm start` (DATABASE_PATH, PORT, HOST). -/
 import Server.App
 import Server.NodeSqlite
+import Lasm.Fetch.Embed
+
+/-- The browser page and its files (dist/public, from npm run build:client),
+embedded in the program so every target serves them. -/
+def assets : Lasm.Fetch.Assets := embed_dir! "dist/public"
+
 
 /-- `DATABASE_PATH`, else `ledger.db` in the working directory, else (where
 that directory is read-only, as on function platforms) `ledger.db` in the
@@ -14,4 +20,4 @@ def database : IO Ledger.Server.Sql := do
     Ledger.Server.NodeSqlite.open s!"{tmp}/ledger.db"
 
 def main : IO Unit := do
-  Ledger.Server.run (← database)
+  Ledger.Server.run (← database) assets

@@ -12,8 +12,8 @@ import { api, root, startLedger } from './server.mjs';
 
 const args = process.argv.slice(2);
 const option = name => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
-const name = option('--name') ?? 'node';
-const server = await startLedger({ url: option('--url'), command: option('--command') });
+const name = option('--name') ?? option('--platform') ?? 'node';
+const server = await startLedger({ url: option('--url'), command: option('--command'), platform: option('--platform') });
 const base = server.base;
 const results = [];
 async function test(title, fn) {
@@ -123,6 +123,12 @@ try {
     assert.equal((await api(base, 'GET', '/nope')).status, 404);
     assert.equal((await api(base, 'DELETE', '/accounts')).status, 405);
     assert.equal((await api(base, 'GET', '/accounts/77')).status, 404);
+  });
+  await test('the browser page and its files are served', async () => {
+    const page = await fetch(base + '/');
+    assert.equal(page.status, 200);
+    assert.match(await page.text(), /<html/i);
+    assert.equal((await fetch(base + '/app.js')).status, 200);
   });
   await test('big numbers stay exact', async () => {
     const a = (await api(base, 'GET', '/accounts/4')).body;
