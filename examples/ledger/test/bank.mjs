@@ -32,7 +32,7 @@ const customers = Number(option('--accounts', '10'));
 const startBalance = 1000n;
 console.log(`seed ${seed} (replay: node test/bank.mjs --seed ${seed})`);
 
-const ledger = await startLedger({ url: option('--url'), command: option('--command') });
+const ledger = await startLedger({ url: option('--url'), command: option('--command'), platform: option('--platform') });
 const base = ledger.base;
 const failures = [];
 const stats = { reads: 0, batches: 0, events: 0, statuses: {} };
