@@ -444,7 +444,10 @@ Each module of [`scripts/mutation/modules.json`](../scripts/mutation/modules.jso
 is mutated on its own, and only that module's `node:test` files run, through
 Stryker's tap runner: one process per test file, and per mutant only the files
 that executed it. None of these tests needs the managed Lean or the native
-helpers, so a fresh checkout after `npm ci` runs them.
+helpers, so a fresh checkout after `npm ci` runs them. Each test process gets
+a capped heap and a watchdog thread ([`watchdog.mjs`](../scripts/mutation/watchdog.mjs))
+that ends it above 1 GiB or once its runner is gone: a mutant that makes a loop
+endless otherwise left processes spinning until the machine ran out of memory.
 
 ```sh
 node scripts/mutation/run.mjs ui-dom                 # one module (all: no name)
@@ -468,14 +471,25 @@ measurement on Node 26 is the recorded floor).
 
 | Module | Files | Initial | Now | Target |
 | --- | --- | ---: | ---: | ---: |
-@@TABLE@@
+| `host-bridge` | `node-js.mjs` | 56.5 % | **96 %** | 80 % |
+| `ui-dom` | `lasm-modules/ui-dom.mjs` | 55.1 % | **92.6 %** | 80 % |
+| `build-service` | `dev-build-service.mjs`, `application-build-client.mjs`, `application-files.mjs`, `cache-lifecycle.mjs` | 52.4 % | **91.9 %** | 80 % |
+| `link-driver` | `link-driver/link.mjs`, `link-driver/glue.mjs`, `link-driver/wasm.mjs`, `link-driver/metadata.mjs`, `link-driver/settings.mjs`, `link-driver/compile.mjs` | 53.9 % | **53.9 %** | 80 % |
+| `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **5.9 %** | 80 % |
+| `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **78.8 %** | 80 % |
+| `notices` | `notices.mjs` | 62.5 % | **74.5 %** | 80 % |
 
-`target-link` and `edge-glue` are low because most of their code runs only
-while linking a real program or inside a built output (`workers.yml`, the
-platform workflows): no unit test reaches it, and every such mutant counts as
-not covered. Raising them means unit tests for `linkWasiProgram`'s and
-`linkEdgeProgram`'s plans (with a stand-in toolchain) and for
-`createEdgeRuntimeHost`.
+Four modules are above the 80 % target. `edge-glue` (78.8 %) and `notices`
+(74.5 %) are close; `link-driver` (53.9 %) has not been worked on yet; and
+`target-link` (5.9 %) is low because almost all of its code runs only while
+linking a real program (the platform workflows), so no unit test reaches it and
+every such mutant counts as not covered. Raising those two means unit tests of
+the link plans of `linkApplication`, `linkEdgeProgram` and `linkWasiProgram`
+with a stand-in toolchain, and of the link driver's glue and metadata.
+
+Mutants whose test file had to be stopped (more than 1 GiB, or alive after its
+runner) are *runtime errors*: Stryker leaves them out of the score
+(16 in `ui-dom`).
 
 ### Survivors that cannot be killed (equivalent mutants)
 
@@ -492,6 +506,9 @@ stay, with the reason; they are not chased with tests that look at the code.
 | ui-dom | `{ stop: () => {} }` → `{}` | An unknown subscription throws before the object is stored |
 | host bridge, edge | `'data'` → `''` as a conversion mode | Only `'reference'` is tested for; any other string is data |
 | host bridge | `Buffer.write(s, offset, 'utf8')` → `''` | Node's default encoding is UTF-8 |
+| host bridge | the doorbell and slot indices of the first reads and of the wait (`channel / 4 + 1` → `- 1`, `slot / 4` → `* 4` before posting) | The wait returns at once on a word that differs, so the loop spins instead of sleeping, and a stale sequence only causes one extra serve (the host serves each request once); only CPU use differs |
+| host bridge | `memory.buffer !== buffer` → `true`, `reserve`'s `<=` → `<` | The views are rebuilt every turn; the buffer grows one write early |
+| host bridge | `error?.code` → `error.code` and the `ERR_MODULE_NOT_FOUND` case for `lasm:` modules; `'reference'` → `''` for a Lean function | `require` of an existing builtin module never fails; a function is a reference in either mode |
 | build service | `replaceAll('\\', '/')` → `replaceAll('\\', '')` in the inventory | Paths contain no backslash on Linux and macOS (the Windows jobs of `unit.yml` cover it) |
 | build service | the staging and previous-output name prefixes (`.lasm-`, `.previous-`) | Any unique sibling name works |
 | notices | the descriptions in `leanRuntimeChanges` | Text, not logic: a change of wording is not a defect, and a test that repeats each sentence would only read the source |
