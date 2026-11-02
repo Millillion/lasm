@@ -64,6 +64,13 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [x] Conduit on all 18 platforms, each tested in CI with its own local tooling and both official RealWorld suites (PRs #24, #29, #39).
 - [ ] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced.
 
+### Ledger ([examples/ledger](examples/ledger), the second flagship app)
+- [x] 1. Pure core in TigerBeetle's data model and result codes (0.17.9 subset), the model, and the proofs: 26 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean), a requirements map ([SPEC.md](examples/ledger/SPEC.md)), `proofs:paranoid`.
+- [ ] 2. Node server (`node:sqlite`), the differential test against a pinned TigerBeetle release, and the Jepsen-style bank workload.
+- [ ] 3. Bun, Deno, Workers (D1), the Node serverless targets, and the WASI auditor `ledger verify journal.ndjson`. No Fastly build (its KV is eventually consistent).
+- [ ] 4. The `Lasm.UI` page (accounts and journal) and its end-to-end tests.
+- [ ] (J) Review and hone the 26 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
+
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.
 - [ ] Deterministic simulation testing of the example apps: simulated clock, network and storage, with faults.
