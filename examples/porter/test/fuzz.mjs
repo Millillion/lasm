@@ -23,7 +23,7 @@
 import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { request as httpRequest } from 'node:http';
+import { METHODS, request as httpRequest } from 'node:http';
 import { join } from 'node:path';
 import { Browser, root, serverArgs, startPorter } from './server.mjs';
 import { cb, clients, testConfig } from './config.mjs';
@@ -157,12 +157,15 @@ const ERRORS = new Set(['invalid_request', 'invalid_client', 'invalid_grant', 'u
 const registered = testConfig.clients.flatMap(c => [...c.redirect_uris, ...(c.post_logout_redirect_uris ?? [])]);
 
 /** Node's HTTP server refuses a request line and headers over 16 KiB itself
-(431, or a reset connection) before Porter sees it. */
+(431, or a reset connection) before Porter sees it, as it refuses methods
+it does not know. */
 const tooLargeForNode = req => req.path.length + Object.entries(req.headers).reduce((n, [k, v]) => n + k.length + v.length + 4, 0) > 16000;
 
 function problems(req, res) {
   const out = [];
   if (tooLargeForNode(req) && (res.status === 431 || res.error)) return [];
+  // Likewise a method Node's HTTP parser does not know: it closes the connection.
+  if (!METHODS.includes(req.method) && (res.error || res.status === 400)) return [];
   if (res.error) return [`no answer: ${res.error}`];
   if (!STATUSES.has(res.status)) out.push(`status ${res.status}`);
   if (res.ms > 5000) out.push(`slow: ${res.ms} ms`);
