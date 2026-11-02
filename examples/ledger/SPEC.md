@@ -3,7 +3,7 @@
 Each requirement of a double-entry ledger in the style of TigerBeetle, and
 what covers it: a proposition of [`Proofs/Spec.lean`](Proofs/Spec.lean)
 (proved; [PROOFS.md](PROOFS.md) explains each one), a test, or a reason it is
-out of scope. `npm run proofs` checks that every `Spec.x` named here is
+out of scope. `npm run proofs` checks that every proposition named here is
 proved and that every proved proposition is named here.
 
 The source of the requirements is TigerBeetle's reference
