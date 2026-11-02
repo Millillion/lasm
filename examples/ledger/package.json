@@ -5,6 +5,11 @@
   "type": "module",
   "description": "Ledger, a double-entry ledger in the style of TigerBeetle, in Lean: an HTTP API and an account view compiled to WebAssembly by Lasm, with proofs",
   "scripts": {
+    "build": "lasm build ServerNode.lean --output dist/server",
+    "start": "node dist/server/main.mjs",
+    "test": "node test/api.mjs",
+    "test:bank": "node test/bank.mjs",
+    "test:tigerbeetle": "node test/tigerbeetle.mjs",
     "proofs": "node test/proofs.mjs",
     "proofs:paranoid": "node test/paranoid.mjs"
   },

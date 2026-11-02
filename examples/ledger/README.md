@@ -2,17 +2,47 @@
 
 **A double-entry ledger and payments API in the style of [TigerBeetle](https://tigerbeetle.com), written in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm), with proofs.**
 Accounts and transfers follow TigerBeetle's data model, flags and result codes for the subset Ledger implements: two-phase (pending, post, void) transfers, linked chains that succeed or fail together, `debits_must_not_exceed_credits`, and client-chosen ids, so a retried request is never applied twice.
-181 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: money is neither created nor destroyed in any ledger, each transfer moves one amount between exactly two accounts, a retried transfer answers `exists` and changes nothing, a pending transfer is posted or voided at most once, a linked chain is all or nothing, and replaying the journal reproduces every balance ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
+187 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: money is neither created nor destroyed in any ledger, each transfer moves one amount between exactly two accounts, a retried transfer answers `exists` and changes nothing, a pending transfer is posted or voided at most once, a linked chain is all or nothing, and replaying the journal reproduces every balance ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
 
 ```sh
 npm install          # Lasm (@lasm/cli)
+npm run build        # the Node server (dist/server)
+npm start            # http://localhost:3000 (PORT, HOST, DATABASE_PATH)
+npm test             # the API test against a fresh server
+npm run test:bank    # the bank workload: concurrent transfers and reads, every read sees the same total
 npm run proofs       # check every theorem
 ```
 
-Requirements: Node.js 24 or newer and npm. Lasm downloads Lean 4.35.0 on first use (cached).
+Requirements: Node.js 24 or newer and npm. Lasm downloads Lean 4.35.0 and its WebAssembly tools
+on the first build (cached); `node:sqlite` is part of Node.
 
-The server on Node (`node:sqlite`) and the differential test against TigerBeetle come in the
-next milestone, then the other platforms and the browser page ([ROADMAP.md](../../ROADMAP.md), "Ledger").
+## The oracles
+
+There is no official test suite for ledgers, so Ledger is checked against two oracles
+([ledger.yml](../../.github/workflows/ledger.yml)):
+
+- **TigerBeetle itself** ([`test/tigerbeetle.mjs`](test/tigerbeetle.mjs), CI only): the
+  official 0.17.9 release binary, pinned by SHA-256, as a single-replica development cluster,
+  and the official `tigerbeetle-node` client. Seeded random workloads (unknown and repeated
+  ids, retries with one field changed, both limit flags, cross-ledger and same-account
+  transfers, posts and voids of every kind, linked chains that succeed, fail and stay open)
+  go to both; every status and every final balance must agree. The seed is printed first;
+  `--seed N` replays a run.
+- **A bank workload** in the manner of Jepsen's bank test ([`test/bank.mjs`](test/bank.mjs)):
+  concurrent writers move money between accounts that may not go below zero while readers
+  read every account at once; every read must show the same total, balanced ledgers and no
+  negative customer, and at the end the exported journal must replay to every balance.
+
+## Concurrency
+
+The proofs are about one request at a time; the server makes that true. A request reads,
+then commits its writes in one transaction that first checks the database's version (a
+`CHECK` constraint that rolls the transaction back if another commit came first, after
+which the request runs again), so a commit never rests on stale reads, on any store. Within
+one process, create requests also take turns (a semaphore), and every statement on the
+`node:sqlite` connection takes its lock, so a read never sees half a batch. The bank
+workload found both of those: without them, reads saw totals off by a partial batch, and
+concurrent writers retried until they gave up.
 
 ## The data model
 
@@ -54,12 +84,14 @@ like TigerBeetle's `create_transfer`.
 | [`Ledger/Json.lean`](Ledger/Json.lean), [`Ledger/Api.lean`](Ledger/Api.lean) | The wire format and the HTTP API, generic over the store |
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The model of the database and the proofs |
-| [`test/`](test) | The proof checks (`npm run proofs`, `npm run proofs:paranoid`) |
+| [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | The SQL, the HTTP glue and the `node:sqlite` binding; the Node program |
+| [`Verify.lean`](Verify.lean) | The journal auditor, `ledger verify journal.ndjson` |
+| [`test/`](test) | The API test, the bank workload, the TigerBeetle differential test, the proof checks |
 
 ## The API
 
-The API is written ([`Ledger/Api.lean`](Ledger/Api.lean)) and proved about; the server
-that serves it comes in the next milestone.
+The API ([`Ledger/Api.lean`](Ledger/Api.lean)) is what the proofs are about; the server
+([`Server/App.lean`](Server/App.lean)) serves it on SQLite ([`Server/Sql.lean`](Server/Sql.lean)).
 
 | Request | |
 | --- | --- |
