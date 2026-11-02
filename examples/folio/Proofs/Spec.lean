@@ -5,7 +5,7 @@ Every proposition proved about Folio, as a named `def … : Prop`, grouped by
 requirement, with no proofs in this file. Each proposition `Spec.x` is
 proved by a theorem `Folio.Proofs.x : Spec.x` (Proofs/Theorems.lean), and
 `npm run proofs` fails unless every proposition here has its theorem, every
-theorem uses only Lean's standard axioms (no `sorry`, no `native_decide`),
+theorem uses only Lean's standard axioms (no unfinished proof, no proof by compiled code),
 and no function of the renderer or the site generator is `partial` or
 `unsafe`. SPEC.md maps the requirements onto these names; PROOFS.md is
 generated from this file.
