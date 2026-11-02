@@ -22,11 +22,14 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 ## Decisions for Jordan (only user-facing ones)
 - [x] (J) Agree to this roadmap, and to keeping it as the single source of truth (2026-11-01).
 - [x] (J) Issue #27: resolve dot segments in `Request.path` on every platform, as browsers do (approved 2026-11-02; ships in 0.3.9).
-- [ ] (J) Apply to OSS-Fuzz as maintainer, once the fuzzers exist (around December). It needs a person's account.
+- [x] (J) OSS-Fuzz: not doing it (2026-11-02). Fuzzing is built in this repo and runs on our own CI.
 - [ ] (J) `Lasm.Fetch`: keep it, narrow it, or remove it, compared with JS bindings. Deferred by Jordan.
 - [ ] (J) Issue #44 (lean-html's shared HTML model with Lasm.UI): on hold, by Jordan.
-- [ ] (J) Conduit's headline count: "294 theorems" (current) or "50 proved propositions".
-- [ ] (J) Conduit's two recorded gaps: empty Markdown link labels, and the delete and remove icons that aren't reachable by keyboard. Fix them? Both change what pages show.
+- [x] (J) Conduit's headline count: "50 proved propositions (294 theorems)" (2026-11-02).
+- [x] (J) Conduit's two recorded gaps: fix them (2026-11-02).
+- [ ] (J) Where Lasm's educational content is published: the Lasm repo's `content/` directory as the source, the Millillion website as the place it's read (Claude's recommendation, 2026-11-02).
+
+Rule (Jordan, 2026-11-02): Claude never signs up for anything, and never creates a new repo, without Jordan's explicit permission.
 
 Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.md):
 - Evidence levels keep the names L0–L3, each with a one-line meaning. Jordan may reword them in the README.
@@ -76,6 +79,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] Bun gives no response to an encoded slash, `/hello/a%2Fb` (found by target equivalence; investigate).
 
 ### Example apps
+- [~] Conduit: fix the two recorded gaps (empty Markdown link labels; keyboard access to the delete and remove icons), and change the headline to "50 proved propositions (294 theorems)".
 - [x] Specification map, 50 reviewable propositions, frontend and layout proofs, five independent proof checkers.
 - [x] Conduit on all 18 platforms, each tested in CI with its own local tooling and both official RealWorld suites (PRs #24, #29, #39).
 - [~] Ledger (example app 2), following TigerBeetle's model: proofs of conservation, idempotency and two-phase transfers; TigerBeetle as a differential oracle; a bank workload; then every platform with a strongly consistent store.
@@ -92,7 +96,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 
 ## Later (first half of 2027)
 - [ ] Example apps 4 and 5: the identity provider (OpenID conformance) and the collaborative editor (CRDT convergence).
-- [ ] Continuous fuzzing on OSS-Fuzz, after Jordan applies.
+- [ ] Continuous fuzzing in our own CI: nightly and weekly campaigns on every boundary, corpora and crashes kept in the repo, coverage-guided (libFuzzer for the C host, Jazzer.js or fast-check for JavaScript, Plausible for Lean).
 - [ ] Move JavaScript glue code into Lean where it can be proved, starting with what mutation testing shows is riskiest (issue #21).
 - [ ] Translation validation for selected Binaryen passes. Assess verifying or replacing parts of the toolchain: Clang, LLVM, Emscripten, Binaryen (issue #21).
 - [ ] Simplify the codebase toward its irreducible state, once the tests are strong enough to allow it (issue #21).
