@@ -53,7 +53,7 @@ export function checkPage(file, source) {
   return problems;
 }
 
-const gitDate = file => execFileSync('git', ['log', '--diff-filter=A', '--follow', '--format=%cs', '--', relative(root, file)], { cwd: root, encoding: 'utf8' }).trim().split('\n').filter(Boolean).at(-1);
+const gitDate = file => execFileSync('git', ['log', '--diff-filter=A', '--format=%cs', '--', relative(root, file)], { cwd: root, encoding: 'utf8' }).trim().split('\n').filter(Boolean).at(-1);
 const versionKey = v => v.split('.').map(Number);
 const atLeast = (v, min) => { const [a, b] = [versionKey(v), versionKey(min)]; for (let i = 0; i < 3; i++) if (a[i] !== b[i]) return a[i] > b[i]; return true; };
 
