@@ -113,7 +113,7 @@ function transferEvent() {
       const field = R.pick(['amount', 'debit_account_id', 'credit_account_id', 'user_data_128', 'ledger', 'code', 'flags']);
       if (field === 'flags') e.flags ^= 1 << R.int(0, 1);
       else if (field === 'ledger' || field === 'code') e[field] = e[field] + 1;
-      else e[field] = e[field] + 1n;
+      else e[field] = e[field] === U128_MAX ? e[field] - 1n : e[field] + 1n;
     }
     return e;
   }
