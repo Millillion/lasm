@@ -1,0 +1,24 @@
+# Porter on AWS Lambda, container image (deploy/lambda-image/Dockerfile),
+# behind an API Gateway HTTP API.
+#   npm run build:lambda-image
+#   sam local start-api -t deploy/lambda-image/template.yaml --warm-containers EAGER
+# To deploy, push the image to Amazon ECR, set ImageUri to it, and run sam deploy.
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Porter, an OpenID Connect provider in Lean (container image)
+Resources:
+  Porter:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: porter-lambda:local
+      Architectures: [x86_64]
+      MemorySize: 1024
+      Timeout: 30
+      Environment:
+        Variables:
+          ISSUER: ''
+          PORTER_CONFIG: ''
+      Events:
+        Api:
+          Type: HttpApi
