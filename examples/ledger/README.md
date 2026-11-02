@@ -2,7 +2,7 @@
 
 **A double-entry ledger and payments API in the style of [TigerBeetle](https://tigerbeetle.com), written in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm), with proofs.**
 Accounts and transfers follow TigerBeetle's data model, flags and result codes for the subset Ledger implements: two-phase (pending, post, void) transfers, linked chains that succeed or fail together, `debits_must_not_exceed_credits`, and client-chosen ids, so a retried request is never applied twice.
-181 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: money is neither created nor destroyed in any ledger, each transfer moves one amount between exactly two accounts, a retried transfer answers `exists` and changes nothing, a pending transfer is posted or voided at most once, a linked chain is all or nothing, and replaying the journal reproduces every balance ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
+187 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: money is neither created nor destroyed in any ledger, each transfer moves one amount between exactly two accounts, a retried transfer answers `exists` and changes nothing, a pending transfer is posted or voided at most once, a linked chain is all or nothing, and replaying the journal reproduces every balance ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
 
 ```sh
 npm install          # Lasm (@lasm/cli)

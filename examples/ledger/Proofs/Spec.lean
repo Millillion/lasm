@@ -19,6 +19,7 @@ leads to `D`. `limit` is `2^63 - 1`, SQLite's largest integer; `u128Max` is
 `2^128 - 1`.
 -/
 import Proofs.Requests
+import Proofs.FastReplay
 
 namespace Ledger.Spec
 open Ledger Rules Proofs
@@ -220,6 +221,12 @@ every account starting at zero). `ledger verify` computes the same replay
 for all accounts in one pass (`Audit.replayAll`). -/
 def replay_balances : Prop :=
   ∀ D, Reachable D → ∀ a ∈ D.accounts, a.balances = Audit.replay D.transfers a.id
+
+/-- **The auditor's fast replay is the replay**: for every journal and every
+account, the one-pass replay `ledger verify` runs (`Audit.replayAll`, with
+hash maps) gives exactly `Audit.replay`'s balances. -/
+def fast_replay : Prop :=
+  ∀ (J : List Transfer) (id : Nat), (Audit.replayAll J).getD id {} = Audit.replay J id
 
 /-! ## H. Ledgers, ids and bounds -/
 
