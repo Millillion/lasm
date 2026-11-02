@@ -26,7 +26,7 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] (J) `Lasm.Fetch`: keep it, narrow it, or remove it, compared with JS bindings. Deferred by Jordan.
 - [ ] (J) Issue #44 (lean-html's shared HTML model with Lasm.UI): on hold, by Jordan.
 - [x] (J) Conduit's headline count: "50 proved propositions (294 theorems)" (2026-11-02).
-- [x] (J) Conduit's two recorded gaps: fix them (2026-11-02).
+- [x] (J) Conduit's two recorded gaps: fixed and proved (2026-11-02): an empty-text link shows its target (SPEC L6), and the delete and remove icons are buttons (SPEC L7).
 - [ ] (J) Where Lasm's educational content is published: the Lasm repo's `content/` directory as the source, the Millillion website as the place it's read (Claude's recommendation, 2026-11-02).
 
 Rule (Jordan, 2026-11-02): Claude never signs up for anything, and never creates a new repo, without Jordan's explicit permission.
@@ -36,10 +36,10 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - "Untrusted input can't crash or subvert a Lasm program" becomes the fifth claim of the testing strategy.
 - Claim 4, dependable tooling, gets the same priority as claim 1.
 - The exit bar for the robustness phase is in [TESTING_STRATEGY.md §8](docs/proposals/TESTING_STRATEGY.md#8-exit-bar-for-the-robustness-phase).
-- The next example apps: **Ledger** (building now), then the **Markdown site generator**, following [NEXT_EXAMPLE_APPS.md](docs/proposals/NEXT_EXAMPLE_APPS.md)'s build plan. Ledger follows TigerBeetle's data model and result codes, so TigerBeetle can serve as its differential oracle.
+- The next example apps: **Ledger** (landed 2026-11-02), then the **Markdown site generator** (building now), following [NEXT_EXAMPLE_APPS.md](docs/proposals/NEXT_EXAMPLE_APPS.md)'s build plan. Ledger follows TigerBeetle's data model and result codes, so TigerBeetle can serve as its differential oracle.
 
 ## Jordan's checklist (his words, 2026-11-02; from issue #21)
-- [ ] (J) Hone the Lean code of every example, especially the propositions and the theorem structure: Conduit first ([Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean)), then Ledger as it lands.
+- [ ] (J) Hone the Lean code of every example, especially the propositions and the theorem structure: Conduit first (52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean)), then Ledger (31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean)).
 - [ ] (J) Review the whole `lasm` CLI: its UX, and that it works.
 - [ ] (J) Hone the libraries Lasm added: Lasm.Fetch, Lasm.UI, Lasm.JS, Lasm.RPC, Lasm.Web, Lasm.KV.
 - [ ] (J) Work out the whole front-end UI story.
@@ -70,7 +70,8 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread.
 - [ ] Replace the remaining tests that only read files as text, and port or retire the 29 Lean 4.32 test files.
 - [ ] Browser and Bun targets in differential testing.
-- [~] Mutation testing (Stryker) on the critical JavaScript, with per-module baselines, 80% targets and a CI gate on drops.
+- [x] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next): seven modules, nightly and PR CI, host bridge 56→96 %, UI applier 55→93 %, build service 52→92 %, edge glue 15→79 %, notices 63→75 % (#53; bugs #49, #51).
+- [ ] Mutation scores to 80 % for the link driver (54 %) and the target links (6 %: unit tests of the link plans with a stand-in toolchain), notices and edge glue; then raise the targets.
 - [ ] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week).
 - [ ] Platform evidence levels L0–L3, generated from CI results, in the README's platform table.
 - [ ] Claim 4, dependable tooling: metamorphic tests of `lasm dev` (an incremental build equals a clean one; the same input gives the same bytes; a rename changes nothing else).
@@ -84,6 +85,13 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] Conduit on all 18 platforms, each tested in CI with its own local tooling and both official RealWorld suites (PRs #24, #29, #39).
 - [~] Ledger (example app 2), following TigerBeetle's model: proofs of conservation, idempotency and two-phase transfers; TigerBeetle as a differential oracle; a bank workload; then every platform with a strongly consistent store.
 - [ ] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced.
+
+### Ledger ([examples/ledger](examples/ledger), the second flagship app)
+- [x] 1. Pure core in TigerBeetle's data model and result codes (0.17.9 subset), the model, and the proofs: 27 propositions (31 with the page) in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean), a requirements map ([SPEC.md](examples/ledger/SPEC.md)), `proofs:paranoid`.
+- [x] 2. Node server (`node:sqlite`), the differential test against a pinned TigerBeetle release, and the Jepsen-style bank workload.
+- [x] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms (Lambda .zip and image, Vercel, Netlify, Azure, GCF), and the WASI auditor `ledger verify journal.ndjson` on wasmtime, wasmer and `node:wasi`. No Fastly build (its KV is eventually consistent).
+- [x] 4. The `Lasm.UI` page (accounts and journal, a ledger filter), four propositions about it, and its end-to-end tests on Chromium, Firefox and WebKit.
+- [ ] (J) Review and hone the 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
 
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.
