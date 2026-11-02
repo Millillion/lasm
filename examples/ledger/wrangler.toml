@@ -1,0 +1,20 @@
+# Cloudflare Workers: npm run build:workers writes workers/ (the server);
+# npx wrangler dev serves it locally with a local D1 database, and
+# npx wrangler deploy deploys it to your account (Lasm never runs wrangler).
+name = "ledger"
+main = "workers/worker.mjs"
+compatibility_date = "2026-10-01"
+
+# The database. wrangler dev keeps a local copy under .wrangler/ with any id;
+# to deploy, create one (npx wrangler d1 create ledger) and put its id here.
+# Ledger creates its tables on first use.
+[[d1_databases]]
+binding = "DB"
+database_name = "ledger"
+database_id = "00000000-0000-4000-8000-000000000000"
+
+# Lasm's program.wasm is imported as a precompiled module.
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false

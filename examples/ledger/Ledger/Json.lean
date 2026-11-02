@@ -140,6 +140,48 @@ def decodeNewTransfer (what : String) (j : Json) : Except String NewTransfer := 
            ledger := ← field kvs what "ledger" u32Max, code := ← field kvs what "code" u16Max,
            flags := ← flagsOf kvs what {} decodeTransferFlags }
 
+/-! ## The exported journal (`GET /api/journal`, read by `ledger verify`) -/
+
+def decodeAccount (what : String) (j : Json) : Except String Account := do
+  let kvs ← object what ["id", "debits_pending", "debits_posted", "credits_pending", "credits_posted",
+    "user_data_128", "user_data_64", "user_data_32", "ledger", "code", "flags", "timestamp"] j
+  return { id := ← field kvs what "id" u128Bound,
+           debitsPending := ← field kvs what "debits_pending" u128Bound,
+           debitsPosted := ← field kvs what "debits_posted" u128Bound,
+           creditsPending := ← field kvs what "credits_pending" u128Bound,
+           creditsPosted := ← field kvs what "credits_posted" u128Bound,
+           userData128 := ← field kvs what "user_data_128" u128Bound,
+           userData64 := ← field kvs what "user_data_64" u64Max, userData32 := ← field kvs what "user_data_32" u32Max,
+           ledger := ← field kvs what "ledger" u32Max, code := ← field kvs what "code" u16Max,
+           flags := ← flagsOf kvs what {} decodeAccountFlags, timestamp := ← field kvs what "timestamp" u64Max }
+
+def decodeTransfer (what : String) (j : Json) : Except String Transfer := do
+  let kvs ← object what ["id", "debit_account_id", "credit_account_id", "amount", "pending_id", "user_data_128",
+    "user_data_64", "user_data_32", "ledger", "code", "flags", "timestamp"] j
+  return { id := ← field kvs what "id" u128Bound, debitAccountId := ← field kvs what "debit_account_id" u128Bound,
+           creditAccountId := ← field kvs what "credit_account_id" u128Bound,
+           amount := ← field kvs what "amount" u128Bound, pendingId := ← field kvs what "pending_id" u128Bound,
+           userData128 := ← field kvs what "user_data_128" u128Bound,
+           userData64 := ← field kvs what "user_data_64" u64Max, userData32 := ← field kvs what "user_data_32" u32Max,
+           ledger := ← field kvs what "ledger" u32Max, code := ← field kvs what "code" u16Max,
+           flags := ← flagsOf kvs what {} decodeTransferFlags, timestamp := ← field kvs what "timestamp" u64Max }
+
+/-- An exported journal: its accounts and its transfers, in order. -/
+def journal (text : String) : Except String (List Account × List Transfer) := do
+  let mut accounts : Array Account := #[]
+  let mut transfers : Array Transfer := #[]
+  let mut n := 0
+  for line in text.splitOn "\n" do
+    n := n + 1
+    if line.trimAscii.isEmpty then continue
+    let j ← Json.parse line |>.mapError (fun _ => s!"line {n}: not JSON")
+    let kvs ← object s!"line {n}" ["type", "data"] j
+    match kvs.get? "type", kvs.get? "data" with
+    | some (.str "account"), some d => accounts := accounts.push (← decodeAccount s!"line {n}" d)
+    | some (.str "transfer"), some d => transfers := transfers.push (← decodeTransfer s!"line {n}" d)
+    | _, _ => throw s!"line {n}: expected a \"type\" (account or transfer) and its \"data\""
+  return (accounts.toList, transfers.toList)
+
 /-- The most events in one request (TigerBeetle's batch size). -/
 def maxBatch : Nat := 8189
 
