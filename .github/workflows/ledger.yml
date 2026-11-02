@@ -25,7 +25,7 @@ on:
       - '.github/workflows/ledger.yml'
       - 'examples/ledger/**'
   push:
-    branches: [main, ledger]
+    branches: [main]
     paths:
       - '.github/workflows/ledger.yml'
       - 'examples/ledger/**'
