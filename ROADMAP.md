@@ -35,7 +35,7 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] (J) Manual testing.
 - [ ] (J) Hone Ledger's 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
 - [ ] (J) Ledger's open API questions: `Lasm.Fetch` Brotli on Workers (`encodeBody: "manual"`); a cross-request async lock that works on Workers; the CLI's `--target wasi` failure when `dist/` already holds another build.
-- [ ] (J) Review Folio's 21 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean).
+- [ ] (J) Review Folio's 22 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean).
 
 ## Now (November 2026)
 
