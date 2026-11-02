@@ -1,0 +1,11 @@
+# Cloudflare Workers (Lasm edge build): npm run build:workers
+# writes workers/; test with npx wrangler dev, deploy with npx wrangler deploy.
+name = "hello-workers"
+main = "workers/worker.mjs"
+compatibility_date = "2026-10-01"
+
+# Lasm's program.wasm is imported as a precompiled module.
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false
