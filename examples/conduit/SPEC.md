@@ -11,7 +11,8 @@ requirement in Conduit:
   154 requests, `npm test`) or the end-to-end suite
   ([`test/realworld/specs/e2e`](test/realworld/specs/e2e), Playwright,
   `npm run test:e2e`), both vendored unmodified from
-  gothinkster/realworld@ebbcdeb8;
+  gothinkster/realworld@ebbcdeb8, or Conduit's own browser tests
+  ([`test/conduit`](test/conduit), `npm run test:conduit`);
 - **out of scope**: neither, and why.
 
 A requirement can be both: the proposition covers it for all inputs, the test
@@ -154,8 +155,8 @@ the proofs do not model.
 | L3 | Every form control is described (a non-empty `placeholder`, as the template's labels) | `Spec.view_controls_described` | proved |
 | L4 | Heading structure: an article body never adds an `h1`, so the title is the article page's only `h1` | `Spec.article_body_no_h1` | proved |
 | L5 | No unsafe links, no raw HTML (also S7) | `Spec.view_hrefs_safe`, `Spec.view_no_raw_html` | proved |
-| L6 | Links have visible text | not proved: a Markdown link with an empty label, `[](https://…)`, renders an empty link (found while writing L2; a fix is proposed, not applied, because it changes what pages show) | gap |
-| L7 | Every clickable element is keyboard-accessible | not true: the template's comment-delete and tag-remove icons are `<i>` elements with click handlers; the e2e selectors depend on that markup | gap (inherited from the template) |
+| L6 | Links have visible text | In article bodies: `Spec.article_links_visible` (a link with empty text, `[](https://…)`, shows its target; with an empty target too it stays text); test/conduit/accessibility.spec.ts. The app's own links: fixed words, or a username, title or tag from the API (the e2e suite checks them), or an avatar with `alt` (L2) | proved (article bodies) + tested |
+| L7 | Every clickable element is keyboard-accessible | `Spec.view_clickables_buttons`: every element with a click handler is a `button`. The comment-delete and tag-remove icons are `<button type="button" aria-label="…">` around the template's `<i>`, so the e2e selectors (`span.mod-options i.ion-trash-a`, `.tag-list .tag-pill i`) still match; test/conduit/accessibility.spec.ts reaches them with Tab and presses them with Enter and Space | proved + tested |
 | L8 | Visual layout, responsiveness, colour contrast, font loading, focus order as drawn | out of scope: they depend on the browser's layout engine and on `conduit.css` and the theme, which are not Lean; the e2e suite runs in Chromium, Firefox and WebKit | out of scope |
 
 ## Counts
@@ -166,7 +167,8 @@ the proofs do not model.
 - Implicit safety (section 2): 14 properties: 11 proved, 1 tested only, 2 out
   of scope.
 - Browser app (section 3): 16 requirements: 9 proved, 7 tested only.
-- Layout (section 4): 8 properties: 5 proved, 2 gaps, 1 out of scope.
+- Layout (section 4): 8 properties: 7 proved (L6 for article bodies; the app's
+  other links tested), 1 out of scope.
 
 ## Appendix: audit of the 117 theorems of the previous proof set
 
@@ -220,7 +222,7 @@ lifted from a helper to the endpoint or page that uses it); 6 were weak or
 trivial (the five `…_ok`, whose hypothesis was unused, and `nullable_empty`)
 and are replaced by exact characterisations; 4 were removed (three
 contentless `rfl` unfoldings of the model, `store_*`, and the redundant
-`window_consecutive`). The 50 propositions of `Proofs/Spec.lean` also add
+`window_consecutive`). The 52 propositions of `Proofs/Spec.lean` also add
 what the previous set did not cover: the write set of every endpoint
 (`Spec.handle_writes`), reads never writing, the token check first, data
 integrity across all requests, the browser app's state invariants, the

@@ -37,6 +37,11 @@ def formatDate (iso : String) : String :=
 
 def link (url : String) (attrs : List (Attr Msg)) (children : List H) : H := a (href url :: attrs) children
 
+/-- A button showing only an icon (the template's `<i>`), named by `aria-label`:
+a real `button`, so the keyboard reaches it (Tab) and presses it (Enter, Space). -/
+def iconButton (label : String) (msg : Msg) (icon : String) : H :=
+  button [class_ "icon-button", type_ "button", aria "label" label, onClick msg] [i [class_ icon, aria "hidden" "true"] []]
+
 def errorList (errors : List String) : List H :=
   if errors.isEmpty then [] else [ul [class_ "error-messages"] (errors.map fun e => li [] [text e])]
 
@@ -197,7 +202,8 @@ def editorPage (m : Model) : H :=
           input [class_ "form-control", type_ "text", placeholder "Enter tags", value m.form.tagInput, disabled off,
             onInput (.set .tagInput), onEnter .addTag],
           div [class_ "tag-list"] (m.form.tags.map fun t =>
-            keyed t <| span [class_ "tag-default tag-pill"] [i [class_ "ion-close-round", onClick (.removeTag t)] [], text s!" {t}"])],
+            keyed t <| span [class_ "tag-default tag-pill"] [iconButton s!"Remove tag {t}" (.removeTag t) "ion-close-round",
+              text s!" {t}"])],
         button [class_ "btn btn-lg pull-xs-right btn-primary", type_ "button", disabled off, onClick .publish]
           [text "Publish Article"]]]])]]]
 
@@ -208,7 +214,10 @@ def inlineView : Markdown.Inline → H
   | .strong cs => strong [] (cs.attach.map fun ⟨c, _⟩ => inlineView c)
   | .em cs => em [] (cs.attach.map fun ⟨c, _⟩ => inlineView c)
   | .code s => code [] [text s]
-  | .link h cs => a [href h, rel "nofollow noopener"] (cs.attach.map fun ⟨c, _⟩ => inlineView c)
+  -- A link with no text (`[](url)`) shows its target, so it can be seen and
+  -- has a name a screen reader reads.
+  | .link h cs => a [href h, rel "nofollow noopener"]
+      (if cs.isEmpty then [text h] else cs.attach.map fun ⟨c, _⟩ => inlineView c)
 
 def blockView : Markdown.Block → H
   | .para cs => p [] (cs.map inlineView)
@@ -255,7 +264,7 @@ def commentCard (m : Model) (c : Comment) : H :=
       text " ",
       link (Route.profile c.author.username false 1).href [class_ "comment-author"] [text c.author.username],
       span [class_ "date-posted"] [text (formatDate c.createdAt)]] ++
-      (if mine then [span [class_ "mod-options"] [i [class_ "ion-trash-a", onClick (.deleteComment c.id)] []]] else []))]
+      (if mine then [span [class_ "mod-options"] [iconButton "Delete comment" (.deleteComment c.id) "ion-trash-a"]] else []))]
 
 def commentSection (m : Model) (art : Article) : H :=
   div [class_ "row"] [div [class_ "col-xs-12 col-md-8 offset-md-2"] (
