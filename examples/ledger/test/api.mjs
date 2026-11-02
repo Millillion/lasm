@@ -124,6 +124,12 @@ try {
     assert.equal((await api(base, 'DELETE', '/accounts')).status, 405);
     assert.equal((await api(base, 'GET', '/accounts/77')).status, 404);
   });
+  await test('the browser page and its files are served', async () => {
+    const page = await fetch(base + '/');
+    assert.equal(page.status, 200);
+    assert.match(await page.text(), /<html/i);
+    assert.equal((await fetch(base + '/app.js')).status, 200);
+  });
   await test('big numbers stay exact', async () => {
     const a = (await api(base, 'GET', '/accounts/4')).body;
     assert.equal(a.user_data_128, '18446744073709551617');

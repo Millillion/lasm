@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }} · {{ site.title }}</title>
+<link rel="alternate" type="application/rss+xml" href="{{ root }}feed.xml">
+</head>
+<body>
+<header><a href="{{ root }}">{{ site.title }}</a></header>
+<main>
+<article>
+<h1>{{ title }}</h1>
+<p><time datetime="{{ date }}">{{ date }}</time></p>
+{{ content }}</article>
+</main>
+</body>
+</html>

@@ -8,6 +8,8 @@ name: Conduit
 #   and a local D1 database), against the same suite;
 # - api-bun: the Bun build (bun:sqlite), built by Lasm running on Bun,
 #   against the same suite;
+# - on Node and Bun also test/concurrency.mjs: overlapping writes and reads
+#   against one server never see a write half done;
 # - proofs: every proposition of Proofs/Spec.lean has its theorem, every
 #   theorem in Proofs/ compiles and uses only propext, Classical.choice and
 #   Quot.sound (no sorry), with Lasm's managed Lean; PROOFS.md, SPEC.md and
@@ -18,6 +20,7 @@ name: Conduit
 #   (specs/e2e, Playwright, unmodified, fullstack mode) against the
 #   server-rendered, hydrated Lasm.UI app: Node on Chromium, Firefox and
 #   WebKit; Workers (wrangler dev, local D1) and Bun on Chromium; no retries;
+#   on Node also Conduit's own browser tests (test/conduit);
 # - conduit-platforms.yml: every other platform, with its own local tooling;
 # - pinned: test/realworld is byte-identical to the upstream commit.
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
@@ -119,6 +122,9 @@ jobs:
       - name: npm test (the official RealWorld API suite)
         working-directory: examples/conduit
         run: node test/api.mjs --name "node-${{ matrix.node }}"
+      - name: Isolation between concurrent requests (test/concurrency.mjs)
+        working-directory: examples/conduit
+        run: node test/concurrency.mjs --seconds 15
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -195,6 +201,9 @@ jobs:
       - name: The official RealWorld API suite against Bun
         working-directory: examples/conduit
         run: node test/api.mjs --name bun --command "bun bun/main.mjs"
+      - name: Isolation between concurrent requests on Bun (test/concurrency.mjs)
+        working-directory: examples/conduit
+        run: node test/concurrency.mjs --seconds 15 --command "bun bun/main.mjs"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -242,6 +251,15 @@ jobs:
         run: |
           npm run test:e2e -- --retries=0 || status=$?
           node test/e2e-summary.mjs test-results/e2e-node-${{ matrix.browser }}.json
+          exit ${status:-0}
+      - name: Conduit's own browser tests (test/conduit)
+        working-directory: examples/conduit
+        env:
+          BROWSERS: ${{ matrix.browser }}
+          E2E_NAME: node-${{ matrix.browser }}
+        run: |
+          npm run test:conduit -- --retries=0 || status=$?
+          node test/e2e-summary.mjs test-results/conduit-node-${{ matrix.browser }}.json
           exit ${status:-0}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()

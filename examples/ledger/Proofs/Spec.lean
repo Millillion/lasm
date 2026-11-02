@@ -19,6 +19,7 @@ leads to `D`. `limit` is `2^63 - 1`, SQLite's largest integer; `u128Max` is
 `2^128 - 1`.
 -/
 import Proofs.Requests
+import Frontend.Page
 import Proofs.FastReplay
 
 namespace Ledger.Spec
@@ -278,5 +279,38 @@ one batch (`create_accounts` or `create_transfers`) writes. -/
 def writes_are_batches : Prop :=
   ∀ now r D, after now r D = D ∨ (∃ ts batch, after now r D = D.apply (createAccounts D.reads ts batch).2) ∨
     (∃ ts batch, after now r D = D.apply (createTransfers D.reads ts batch).2)
+
+/-! ## J. The browser page -/
+
+/-- **The page shows exactly the chosen ledger**: an account the page has
+loaded is shown exactly when no ledger is chosen or it is in the chosen
+ledger; likewise for transfers. -/
+def page_filter : Prop :=
+  ∀ (m : Page.Model), (∀ a ∈ m.accounts, a ∈ m.shownAccounts ↔ (m.ledger = none ∨ m.ledger = some a.ledger)) ∧
+    (∀ t ∈ m.transfers, t ∈ m.shownTransfers ↔ (m.ledger = none ∨ m.ledger = some t.ledger))
+
+/-- **One row per account and per transfer**: the tables' bodies are one row
+for each shown account and each shown transfer, in order, each row keyed by
+the id and marked with it (`data-account`, `data-transfer`). -/
+def page_rows : Prop :=
+  ∀ (m : Page.Model), Page.accountsBody m = Lasm.UI.tbody [] (m.shownAccounts.map Page.accountRow) ∧
+    Page.journalBody m = Lasm.UI.tbody [] (m.shownTransfers.map Page.transferRow) ∧
+    (∀ a, ∃ cells, Page.accountRow a =
+      Lasm.UI.keyed (toString a.id) (Lasm.UI.tr [Lasm.UI.data "account" (toString a.id)] cells)) ∧
+    (∀ t, ∃ cells, Page.transferRow t =
+      Lasm.UI.keyed (toString t.id) (Lasm.UI.tr [Lasm.UI.data "transfer" (toString t.id)] cells))
+
+/-- **A failed load keeps what is shown**: when loading the accounts or the
+journal fails, the page keeps the data it had and says what went wrong. -/
+def page_errors_keep_data : Prop :=
+  ∀ (m : Page.Model) e, let m₁ := (Page.update (.gotAccounts (.error e)) m).1
+    let m₂ := (Page.update (.gotTransfers (.error e)) m).1
+    m₁.accounts = m.accounts ∧ m₁.transfers = m.transfers ∧ m₁.status.isSome ∧
+    m₂.accounts = m.accounts ∧ m₂.transfers = m.transfers ∧ m₂.status.isSome
+
+/-- **Refresh reloads both**: the refresh button asks for the accounts and
+the journal again and changes nothing else but the status. -/
+def page_refresh : Prop :=
+  ∀ (m : Page.Model), Page.update .refresh m = ({ m with status := some "Loading…" }, Page.load)
 
 end Ledger.Spec
