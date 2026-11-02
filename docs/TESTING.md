@@ -473,19 +473,23 @@ measurement on Node 26 is the recorded floor).
 | --- | --- | ---: | ---: | ---: |
 | `host-bridge` | `node-js.mjs` | 56.5 % | **96 %** | 80 % |
 | `ui-dom` | `lasm-modules/ui-dom.mjs` | 55.1 % | **92.6 %** | 80 % |
-| `build-service` | `dev-build-service.mjs`, `application-build-client.mjs`, `application-files.mjs`, `cache-lifecycle.mjs` | 52.4 % | **91.9 %** | 80 % |
-| `link-driver` | `link-driver/link.mjs`, `link-driver/glue.mjs`, `link-driver/wasm.mjs`, `link-driver/metadata.mjs`, `link-driver/settings.mjs`, `link-driver/compile.mjs` | 53.9 % | **53.9 %** | 80 % |
-| `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **5.9 %** | 80 % |
-| `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **78.8 %** | 80 % |
-| `notices` | `notices.mjs` | 62.5 % | **74.5 %** | 80 % |
+| `build-service` | `dev-build-service.mjs`, `application-build-client.mjs`, `application-files.mjs`, `cache-lifecycle.mjs` | 52.4 % | **94.5 %** | 80 % |
+| `link-driver` | `link-driver/link.mjs`, `link-driver/glue.mjs`, `link-driver/wasm.mjs`, `link-driver/metadata.mjs`, `link-driver/settings.mjs`, `link-driver/compile.mjs` | 53.9 % | **93 %** | 80 % |
+| `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **86.8 %** | 80 % |
+| `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.2 %** | 80 % |
+| `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 80 % |
 
-Four modules are above the 80 % target. `edge-glue` (78.8 %) and `notices`
-(74.5 %) are close; `link-driver` (53.9 %) has not been worked on yet; and
-`target-link` (5.9 %) is low because almost all of its code runs only while
-linking a real program (the platform workflows), so no unit test reaches it and
-every such mutant counts as not covered. Raising those two means unit tests of
-the link plans of `linkApplication`, `linkEdgeProgram` and `linkWasiProgram`
-with a stand-in toolchain, and of the link driver's glue and metadata.
+Every module is above the 80 % target. The link driver and the target links
+are tested with stand-in toolchains: `test/link-driver-pipeline.test.mjs`
+drives `linkWithNode` through every recipe step with a stand-in `execute`, and
+`test/application-link-plan.test.mjs`, `test/application-link-node.test.mjs`,
+`test/edge-link-plan.test.mjs` and `test/wasi-link-plan.test.mjs` run
+`linkApplication`, `linkEdgeProgram` and `linkWasiProgram` against stand-in
+compilers, `llvm-nm`, linkers and Binaryen (`test/fixtures/link-stand-ins/`: a
+tiny C-to-relocatable-Wasm compiler, ar archives and a garbage-collecting linker
+with `--wrap`, `-Map` and `--why-extract`), run in-process so that a module's
+run takes minutes. The stand-ins need a POSIX shell, so those tests are skipped
+on Windows; the pure-function tests run everywhere.
 
 Mutants whose test file had to be stopped (more than 1 GiB, or alive after its
 runner) are *runtime errors*: Stryker leaves them out of the score
@@ -499,7 +503,7 @@ stay, with the reason; they are not chased with tests that look at the code.
 | Module | Mutant | Why it is equivalent |
 | --- | --- | --- |
 | ui-dom | `str()`'s ASCII fast path: `n < 24` → `true`/`false`/`<=`/`>=`, the block emptied, `c > 127` → `true`/`>=` | The fast path and `TextDecoder` return the same string; only speed differs |
-| ui-dom, host bridge | `new Array(n)` → `new Array()` (event fields, paths, decoded arrays) | Every slot is assigned before use; preallocation only |
+| ui-dom, host bridge, edge glue | `new Array(n)` → `new Array()` (event fields, paths, decoded arrays) | Every slot is assigned before use; preallocation only |
 | ui-dom | `if (n.firstChild) forgetLater(n)` → always | Forgetting a leaf again deletes an id already deleted |
 | ui-dom | `listening.has(type)` → `false`, `listening.add` removed | `addEventListener` ignores a second identical listener |
 | ui-dom | `n !== root`, `!chain.length` in `onEvent` | The listener is on the root, so every target is inside it; an empty chain reaches no handler either way |
@@ -512,10 +516,32 @@ stay, with the reason; they are not chased with tests that look at the code.
 | build service | `replaceAll('\\', '/')` → `replaceAll('\\', '')` in the inventory | Paths contain no backslash on Linux and macOS (the Windows jobs of `unit.yml` cover it) |
 | build service | the staging and previous-output name prefixes (`.lasm-`, `.previous-`) | Any unique sibling name works |
 | notices | the descriptions in `leanRuntimeChanges` | Text, not logic: a change of wording is not a defect, and a test that repeats each sentence would only read the source |
+| notices | `withEdgeChanges`' `start < 0` and `targetNotices`' `at < 0` → `<= 0` | Both texts start with the Node header, so neither marker is ever at offset 0 |
+| notices | the `^` of the patch-line pattern; `?? []` → `['Stryker was here']` for the libraries and the exclusions | Every line read starts with `  - `; the made-up name matches no library and no project directory |
+| notices | `isFile`'s `return false` → nothing, `'utf8'` → `''` before a regular expression or a template | `undefined` is as false; a Buffer converts to the same text |
+| notices | `.sort()` of a package's licence files removed; `customSections`' `at < bytes.length` → `<=` | libuv returns directory entries sorted on Linux and macOS (the Windows unit job runs the test too); a read at the end finds no section |
+| build service | `if (moved) rm(previous, …)` → always, `force: true` → `false` there | `rm` with `force` of a path that does not exist does nothing; when it exists, force does not matter |
+| link driver | the memo keys of `WasmModule` (`'sections'`, `'types'`, …) and `metadata.mjs`' `'passiveSegmentOffsets'` → `''` | A cache key only has to differ from the others, and one emptied key still does |
+| link driver | `wasm.mjs`: `bytes.length < 8` → `false`, `section.type !== CUSTOM` → `false`, the `target_features` name check | A short buffer fails the header comparison with the same error; a non-custom section has no name and reaches the same error; the section is found by that name |
+| link driver | `glue.mjs`: `close < 0` → `true`/`<= 0`, `body.length > 1` → `>= 1`/`true`, `'__em_lib_deps'` → `''` | `parenthesesMatch` is only called with `close = -1`; a one-character body cannot open and close with different brackets; the prefix test matches the name anyway |
+| link driver | `compile.mjs`' `?? ''` fallbacks → another string; the type preloads in `metadata.mjs` removed | The fallback fails the same validation; `extractMetadata` has already read the types |
+| link driver | `program === 'node'` in `linkWithNode`'s `run` | `scriptPrefix()` is empty under Node; it differs only under Deno |
+| link driver (not equivalent) | the JS-step and JS-symbol caches inside `linkWithNode`, the Windows temp-directory paths | They run only with the real tools (`execute === execFileSync`) or on Windows; `jsStepCache` itself is tested directly |
+| target links | cache-key inputs whose form does not change equality (`probeKey` labels and separators, `'hex'` digests, the link-driver source identity, store file suffixes) | The keys change only when Lasm's own sources change, which no test can do |
+| target links | `'utf8'` → `''` before `JSON.parse` or a regular expression; `timeout`, `windowsHide`, `maxBuffer` and stdio entries of tools with small output; `'inherit'` stdout of tools that write nothing there | A Buffer parses and matches the same; no observable effect on POSIX with small outputs |
+| target links | performance-only branches (serial or parallel compiles, concurrent probes, shared-store bookkeeping), the 64 MiB map bound, `force: true` on files that exist, the 512 and 16 entry bounds of in-memory caches | Same result, different speed or memory |
+| target links | conditions that hold whenever reached (`linkDriver === 'node'` under the dev profile, the seeded "delivered" checks, `imports` always readable, requirements of body probes never read, `'@'` argument forms) and guards inside `try`/`catch` | The other branch cannot be reached with valid options, or the catch takes it |
+| target links | anchors on names Lasm itself produces (`lib/lib*.a`, `initializers-N.o`, `*.c`); `relabelPreJs`' `$` | Those names always have that form; `.` never matches a newline |
+| target links (not equivalent) | full (not link-only) Node-driver builds, the edge dev fast link's acceptance, shared globals left after eight planning rounds, the WASI Windows response file on POSIX | They need Emscripten's complete glue pipeline, eight real planning rounds, or Windows (the platform workflows run them) |
+| edge glue | `encodeError`'s `err?.` → `err.`; `fileError`'s `{ errno }` → `{}`; `IO.Process.exit`'s `{ exit: n }` → `{}` | Every error that reaches it is an `Error`; the errno falls back to the same table; nothing reads `exit` after `request` encodes the error |
+| edge glue | timers: `t.promise && !t.done` → `true`/`\|\|`, `'finished'` → `''`, `delay > 2_147_483_647n` → `>=` | Resolving a settled or dropped promise does nothing; the phase is only compared with `'running'` and `'initial'`; the same delay |
+| edge glue | the random-bytes loops' `i < n` → `<=`; op 94's check flag read big-endian; its rejection handler; `result?.then`; the sort of `operationCounts` | An empty last chunk, a write past the end is ignored; the flag is only compared with zero; `request` never returns a rejecting promise; `dispatch` always returns a value; `Object.fromEntries` orders integer keys anyway |
+| edge glue | `Writer.reserve`'s `<=` → `<`; `error?.leanUserError` when encoding a settled value; `'reference'` → `''` for `globalThis` and for Lean functions | The buffer grows one write early; encoding only throws `Error`s; Node's global object is not a plain object, and a function is a reference in either mode |
+| edge glue | `'utf8'` → `''` before `JSON.parse`; `startLean`'s `if (disposed) return` → never | A Buffer parses the same; a second disposal finds no cleanups left |
 
-Survivors that are real but need fault injection to reach (a failing `rename`
-during delivery in `src/application-files.mjs`, the restore of the previous
-output) are listed in each module's `survivors.json` and are next in line.
+Delivery's failure paths in `src/application-files.mjs` (a failing copy,
+`rename` or `rm`, an output that cannot be inspected) are tested by fault
+injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 
 ## Bugs found
 

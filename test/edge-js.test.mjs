@@ -300,3 +300,104 @@ test('statistics: op 213 and the snapshot', () => {
   assert.deepEqual(JSON.parse(dec.decode(e.call(213, 0, 0))), { values: 1, pendingCalls: 0, queuedEvents: 0, functionsLive: 0, released: 0,
     callbacks: 0, syncCallbacks: 0, functionsCreated: 0, functionsCollected: 0 });
 });
+
+test('describe: objects whose prototype has no constructor, typed arrays without a name', () => {
+  assert.equal(describe(Object.create(Object.create(null))), 'object');
+  const bytes = new Uint8Array(2);
+  Object.setPrototypeOf(bytes, Object.create(Uint8Array.prototype, { constructor: { value: undefined } }));
+  assert.equal(describe(bytes), 'Uint8Array of length 2');
+});
+
+test('concat joins byte arrays in order', () => {
+  const { js } = edge();
+  assert.deepEqual([...js.concat([Uint8Array.of(1, 2), new Uint8Array(0), Uint8Array.of(3)])], [1, 2, 3]);
+  assert.equal(js.concat([]).length, 0);
+});
+
+test('requests: values after released handles, truncated replies, nested objects, paths through undefined', () => {
+  const lib = { nothing: undefined, a: () => 'a/bc' };
+  const e = edge({ modules: { lib, a: { bc: () => 'module a' }, ab: { c: () => 'module ab' } } });
+  const ref = e.value(201, 0, 1, enc.encode('lib')).ref;
+  // A request that releases a handle still carries its value.
+  assert.ok(e.value(201, 0, 1, enc.encode('lib'), [ref]).ref >= firstJsHandle);
+  assert.equal(e.js.snapshot().released, 1);
+  // A reply too short for its call id.
+  assert.throws(() => e.call(208, 0, 0, Uint8Array.of(1, 2, 3)), { message: 'TypeError: Malformed Lasm.JS value (truncated)' });
+  // Objects count towards the nesting limit like arrays.
+  let deep = 0; for (let i = 0; i < 70; i++) deep = { d: deep };
+  const later = { deep: () => deep };
+  const d = edge({ modules: { later } });
+  assert.throws(() => d.value(214, 0, 0, wire(['T', 'later', 'deep', []])), { message: 'TypeError: JavaScript value nests too deeply to convert to Lean data (more than 64 levels)' });
+  assert.throws(() => e.value(214, 0, 0, wire(['T', 'lib', 'nothing.x', []])), { message: 'TypeError: Cannot read "x" of undefined' });
+  // Bindings are cached per (module, path) pair, not per concatenation.
+  assert.equal(e.value(214, 0, 0, wire(['T', 'a', 'bc', []])), 'module a');
+  assert.equal(e.value(214, 0, 0, wire(['T', 'ab', 'c', []])), 'module ab');
+});
+
+test('get and set: fields of null through a key list, properties of functions, null targets', () => {
+  const lib = { nil: null, fn: function f() {} };
+  const e = edge({ modules: { lib } });
+  const ref = e.value(201, 0, 1, enc.encode('lib')).ref;
+  const nil = e.value(203, ref, 1, wire('nil')).ref;
+  assert.deepEqual(e.value(203, nil, 0, wire(['a'])), { a: undefined });
+  assert.throws(() => e.call(204, nil, 0, wire(['k', 1])), { message: 'TypeError: Cannot set "k" on null' });
+  const fn = e.value(203, ref, 1, wire('fn')).ref;
+  assert.equal(e.call(204, fn, 0, wire(['tag', 7])).length, 0);
+  assert.equal(lib.fn.tag, 7);
+});
+
+test('op 205: flag 16 settles into a promise; flag 2 returns plain results at once and wraps odd rejections', async () => {
+  const lib = { later: v => Promise.resolve(v), plain: () => 42, rejectsUndefined: () => Promise.reject(undefined) };
+  const e = edge({ modules: { lib } });
+  const ref = e.value(201, 0, 1, enc.encode('lib')).ref;
+  const later = e.value(203, ref, 1, wire('later')).ref;
+  assert.equal(e.call(205, 0, 16, cat(u64(0x21), wire([{ ref: later }, null, ['v']]))).length, 0);
+  await settled();
+  const [event] = events(e.call(209, 0, 0));
+  assert.deepEqual([event.promise, event.failed, unwire(event.bytes)], [0x21n, 0, 'v']);
+  const plain = e.value(203, ref, 1, wire('plain')).ref;
+  const direct = e.call(205, 0, 2, wire([{ ref: plain }, null, []]));
+  assert.equal(typeof direct.then, 'undefined', 'not a promise');
+  assert.equal(unwire(direct), 42);
+  const direct214 = e.call(214, 0, 2, wire(['T', 'lib', 'plain', []]));
+  assert.equal(typeof direct214.then, 'undefined');
+  const odd = e.value(203, ref, 1, wire('rejectsUndefined')).ref;
+  await assert.rejects(e.call(205, 0, 2, wire([{ ref: odd }, null, []])), { message: jsFailure(undefined).message });
+  await assert.rejects(e.call(214, 0, 2, wire(['T', 'lib', 'rejectsUndefined', []])), { message: jsFailure(undefined).message });
+});
+
+test('Lean function calls: unconvertible arguments reject without a pending call; a failing method reply rejects', async () => {
+  const e = edge();
+  const fn = unwire(e.call(210, 4, 1)).ref;
+  let deep = 0; for (let i = 0; i < 70; i++) deep = [deep];
+  const lib = { call: f => f(deep) };
+  const c = edge({ modules: { lib } });
+  const cfn = unwire(c.call(210, 4, 1)).ref;
+  await assert.rejects(c.call(214, 0, 2, wire(['T', 'lib', 'call', [{ ref: cfn }]])), /nests too deeply/);
+  assert.equal(c.js.snapshot().pendingCalls, 0);
+  // A Reply.callMethod whose method does not exist rejects the call.
+  const pending = e.call(205, 0, 2, wire([{ ref: fn }, null, []]));
+  const [call] = events(e.call(209, 0, 0));
+  const payload = wire([{ ref: fn }, 'missing', []]);
+  e.call(208, 0, 0, cat(u64(call.call), Uint8Array.of(2), u32(payload.length), payload));
+  await assert.rejects(pending, /has no method "missing"/);
+});
+
+test('collected Lean functions are announced (event kind 3) and counted', async () => {
+  const { setFlagsFromString } = await import('node:v8');
+  const { runInNewContext } = await import('node:vm');
+  setFlagsFromString('--expose-gc');
+  const gc = runInNewContext('gc');
+  const e = edge();
+  const handles = [unwire(e.call(210, 7, 1)).ref, unwire(e.call(210, 8, 2)).ref];
+  for (const handle of handles) e.js.release(handle);
+  let list = [];
+  for (let attempt = 0; attempt < 50 && list.length < 2; attempt++) {
+    gc();
+    await new Promise(resolve => setTimeout(resolve, 10));
+    if (e.js.pendingEvents()) list.push(...events(e.call(209, 0, 0)));
+  }
+  assert.deepEqual(list.map(x => [x.kind, x.fn]).sort(), [[3, 7], [3, 8]]);
+  const snapshot = e.js.snapshot();
+  assert.deepEqual([snapshot.functionsCreated, snapshot.functionsCollected, snapshot.functionsLive], [2, 2, 0]);
+});
