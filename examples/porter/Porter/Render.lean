@@ -59,6 +59,7 @@ def style : String :=
 def layout (title : String) (body : String) : String :=
   "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">" ++
   "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" ++
+  "<link rel=\"icon\" href=\"data:,\">" ++
   "<title>" ++ html title ++ "</title><style>" ++ style ++ "</style></head><body>" ++ body ++ "</body></html>"
 
 def scopeText : String → String
@@ -129,7 +130,7 @@ interaction id is in the URL), not cached. -/
 def htmlHeaders : List (String × String) :=
   [("content-type", "text/html; charset=utf-8"),
    ("content-security-policy", "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; " ++
-     "style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'"),
+     "style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'"),
    ("x-frame-options", "DENY"), ("referrer-policy", "no-referrer"), ("x-content-type-options", "nosniff"),
    ("cache-control", "no-store")]
 

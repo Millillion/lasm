@@ -27,10 +27,12 @@ async function catchCallback(page) {
   return page.waitForRequest(r => r.url().startsWith('http://127.0.0.1:59999/'), { timeout: 20_000 }).then(r => r.url());
 }
 
-/** Collects console errors and CSP violations. */
+/** Collects console errors and CSP violations (not the refused connection
+to the client's callback, which nothing serves). */
 function watch(page) {
   const problems = [];
-  page.on('console', m => { if (m.type() === 'error') problems.push(m.text()); });
+  const callback = /127\.0\.0\.1:59999|Could not connect to 127\.0\.0\.1|ERR_CONNECTION_REFUSED/;
+  page.on('console', m => { if (m.type() === 'error' && !callback.test(m.text())) problems.push(m.text()); });
   page.on('pageerror', e => problems.push(String(e)));
   return problems;
 }
