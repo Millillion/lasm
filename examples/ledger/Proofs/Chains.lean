@@ -112,4 +112,114 @@ theorem chains_closed : ∀ (b : List ε), ∀ c ∈ (chains linked b).dropLast,
 
 end Cut
 
+/-! ## Running chains on the model -/
+
+section Run
+variable {ε ρ : Type} [DecidableEq ρ] (k : Kind ε ρ) (step : Reads Id → Nat → ε → Id (ρ × Writes))
+
+/-- The status and writes of event `e` at time `ts` in a chain, after writes `w`. -/
+def chainStep (r : Reads Id) (e : ε) (last : Bool) (ts : Nat) (w : Writes) : ρ × Writes :=
+  if last && k.linked e then (k.linkedEventChainOpen, {}) else step (r.over w) ts e
+
+theorem applyChain_nil (r : Reads Id) (ts : Nat) (w : Writes) : applyChain k step r [] ts w = (0, none, w) := rfl
+
+theorem applyChain_cons (r : Reads Id) (e : ε) (es : List ε) (ts : Nat) (w : Writes) :
+    applyChain k step r (e :: es) ts w =
+      if (chainStep k step r e es.isEmpty ts w).1 = k.created then
+        ((applyChain k step r es (ts + 1) (w.merge (chainStep k step r e es.isEmpty ts w).2)).1 + 1,
+         (applyChain k step r es (ts + 1) (w.merge (chainStep k step r e es.isEmpty ts w).2)).2.1,
+         (applyChain k step r es (ts + 1) (w.merge (chainStep k step r e es.isEmpty ts w).2)).2.2)
+      else (0, some (e, (chainStep k step r e es.isEmpty ts w).1), w) := by
+  simp only [applyChain, chainStep]
+  split <;> rfl
+
+theorem runChain_eq (r : Reads Id) (c : List ε) (ts : Nat) (w : Writes) :
+    runChain k step r c ts w =
+      match applyChain k step r c ts w with
+      | (n, none, w') => (List.replicate n k.created, w')
+      | (n, some (e, s), _) =>
+        (List.replicate n k.linkedEventFailed ++ [s] ++
+          (if c.length - n - 1 = 0 then [] else List.replicate (c.length - n - 1 - 1) k.linkedEventFailed ++
+            [match c.getLast? with
+             | some l => if k.linked l then k.linkedEventChainOpen else k.linkedEventFailed
+             | none => k.linkedEventFailed]),
+         w.merge (k.onFailure e s)) := by
+  unfold runChain
+  rcases applyChain k step r c ts w with ⟨n, _ | ⟨e, s⟩, w'⟩ <;> rfl
+
+theorem runChains_nil (r : Reads Id) (ts : Nat) (w : Writes) : runChains k step r [] ts w = ([], w) := rfl
+
+theorem runChains_cons (r : Reads Id) (c : List ε) (cs : List (List ε)) (ts : Nat) (w : Writes) :
+    runChains k step r (c :: cs) ts w =
+      ((runChain k step r c ts w).1 ++ (runChains k step r cs (ts + c.length) (runChain k step r c ts w).2).1,
+       (runChains k step r cs (ts + c.length) (runChain k step r c ts w).2).2) := rfl
+
+/-! ### Every batch keeps a property every step keeps -/
+
+variable (P : DB → Prop)
+
+theorem applyChain_keeps (hstep : ∀ E ts e, P E → P (E.apply (step E.reads ts e).2)) (D : DB) :
+    ∀ (es : List ε) (ts : Nat) (w : Writes), P (D.apply w) → P (D.apply (applyChain k step D.reads es ts w).2.2)
+  | [], _, _, h => h
+  | e :: es, ts, w, h => by
+    rw [applyChain_cons]
+    split
+    · apply applyChain_keeps hstep D es (ts + 1)
+      rw [apply_merge]
+      unfold chainStep
+      split
+      · rw [apply_empty]; exact h
+      · rw [reads_over]; exact hstep _ _ _ h
+    · exact h
+
+theorem runChain_keeps (hstep : ∀ E ts e, P E → P (E.apply (step E.reads ts e).2))
+    (hfail : ∀ E e s, P E → P (E.apply (k.onFailure e s))) (D : DB) (c : List ε) (ts : Nat) (w : Writes)
+    (h : P (D.apply w)) : P (D.apply (runChain k step D.reads c ts w).2) := by
+  rw [runChain_eq]
+  have := applyChain_keeps k step P hstep D c ts w h
+  rcases ha : applyChain k step D.reads c ts w with ⟨n, _ | ⟨e, s⟩, w'⟩
+  · rw [ha] at this; exact this
+  · show P (D.apply (w.merge (k.onFailure e s)))
+    rw [apply_merge]; exact hfail _ _ _ h
+
+theorem runChains_keeps (hstep : ∀ E ts e, P E → P (E.apply (step E.reads ts e).2))
+    (hfail : ∀ E e s, P E → P (E.apply (k.onFailure e s))) (D : DB) :
+    ∀ (cs : List (List ε)) (ts : Nat) (w : Writes), P (D.apply w) → P (D.apply (runChains k step D.reads cs ts w).2)
+  | [], _, _, h => h
+  | c :: cs, ts, w, h => by
+    rw [runChains_cons]
+    exact runChains_keeps hstep hfail D cs _ _ (runChain_keeps k step P hstep hfail D c ts w h)
+
+end Run
+
+/-! ## Every batch keeps the invariant -/
+
+theorem inv_onFailure_transfer {E : DB} (h : Inv E) (t : NewTransfer) (s : TransferStatus) :
+    Inv (E.apply (transferKind.onFailure t s)) := by
+  unfold transferKind; simp only
+  split
+  · have := inv_failed h [t.id]; simpa [DB.apply] using this
+  · rw [apply_empty]; exact h
+
+theorem inv_createTransfers {D : DB} (hI : Inv D) (ts : Nat) (batch : List NewTransfer) :
+    Inv (D.apply (createTransfers D.reads ts batch).2) := by
+  unfold createTransfers
+  apply runChains_keeps transferKind createTransfer Inv _ inv_onFailure_transfer D _ ts {}
+  · rw [apply_empty]; exact hI
+  · intro E ts t hE
+    have := createTransfer_model E ts t
+    rw [Prod.mk.injEq] at this
+    rw [this.2]; exact inv_stepTransfer hE
+
+theorem inv_createAccounts {D : DB} (hI : Inv D) (ts : Nat) (batch : List NewAccount) :
+    Inv (D.apply (createAccounts D.reads ts batch).2) := by
+  unfold createAccounts
+  apply runChains_keeps accountKind createAccount Inv _ (fun E _ _ h => by
+    show Inv (E.apply {}); rw [apply_empty]; exact h) D _ ts {}
+  · rw [apply_empty]; exact hI
+  · intro E ts a hE
+    have := createAccount_model E ts a
+    rw [Prod.mk.injEq] at this
+    rw [this.2]; exact inv_stepAccount hE
+
 end Ledger.Proofs
