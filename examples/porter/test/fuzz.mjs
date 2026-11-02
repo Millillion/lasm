@@ -23,7 +23,7 @@
 import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { METHODS, request as httpRequest } from 'node:http';
+import { METHODS as NODE_METHODS, request as httpRequest } from 'node:http';
 import { join } from 'node:path';
 import { Browser, root, serverArgs, startPorter } from './server.mjs';
 import { cb, clients, testConfig } from './config.mjs';
@@ -165,7 +165,7 @@ function problems(req, res) {
   const out = [];
   if (tooLargeForNode(req) && (res.status === 431 || res.error)) return [];
   // Likewise a method Node's HTTP parser does not know: it closes the connection.
-  if (!METHODS.includes(req.method) && (res.error || res.status === 400)) return [];
+  if (!NODE_METHODS.includes(req.method) && (res.error || res.status === 400)) return [];
   if (res.error) return [`no answer: ${res.error}`];
   if (!STATUSES.has(res.status)) out.push(`status ${res.status}`);
   if (res.ms > 5000) out.push(`slow: ${res.ms} ms`);
