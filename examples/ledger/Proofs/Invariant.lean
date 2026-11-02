@@ -126,7 +126,8 @@ theorem inv_account {D : DB} (hI : Inv D) {ts : Nat} {a : NewAccount} {acc : Acc
   have hchk' := hchk
   simp [accountChecks] at hchk'
   constructor
-  · exact List.nodup_append.mpr ⟨hI.accountIds, by simp, by
+  · rw [List.map_append]
+    exact List.nodup_append.mpr ⟨hI.accountIds, by simp, by
       intro x hx y hy; simp at hy; subst hy; exact fun e => not_mem_ids_of_account?_none hex (e ▸ hx)⟩
   · exact hI.transferIds
   · intro b hb
@@ -144,6 +145,7 @@ theorem inv_account {D : DB} (hI : Inv D) {ts : Nat} {a : NewAccount} {acc : Acc
     rcases List.mem_append.mp hb with m | m
     · exact hI.replay b m
     · simp at m; subst m
+      show (newAccount ts a).balances = Audit.replay D.transfers a.id
       rw [replay_untouched _ _ untouched]; rfl
   · intro b hb
     rcases List.mem_append.mp hb with m | m
