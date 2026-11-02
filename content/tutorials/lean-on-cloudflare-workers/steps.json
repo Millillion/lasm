@@ -1,0 +1,70 @@
+{
+  "title": "From zero to Lean on Cloudflare Workers",
+  "project": "hello-workers",
+  "steps": [
+    {
+      "run": "npm create @lasm@latest hello-workers -- --template fetch --deploy workers",
+      "cwd": "."
+    },
+    {
+      "show": "Main.lean"
+    },
+    {
+      "show": "App.lean"
+    },
+    {
+      "run": "npm install"
+    },
+    {
+      "run": "npm run build",
+      "files": [
+        "dist/main.mjs"
+      ]
+    },
+    {
+      "serve": "npm start",
+      "platform": "node",
+      "requests": [
+        {
+          "curl": "curl http://localhost:3000/hello/Ada",
+          "path": "/hello/Ada",
+          "status": 200,
+          "body": "{\"message\":\"Hello, Ada, from Lean!\"}"
+        }
+      ]
+    },
+    {
+      "show": "wrangler.toml"
+    },
+    {
+      "run": "npm run build:workers",
+      "files": [
+        "workers/worker.mjs"
+      ]
+    },
+    {
+      "serve": "npx wrangler dev",
+      "platform": "wrangler",
+      "requests": [
+        {
+          "curl": "curl http://localhost:8787/",
+          "path": "/",
+          "status": 200,
+          "body": "{\"message\":\"Hello from Lean!\"}"
+        },
+        {
+          "curl": "curl http://localhost:8787/hello/Ada",
+          "path": "/hello/Ada",
+          "status": 200,
+          "body": "{\"message\":\"Hello, Ada, from Lean!\"}"
+        },
+        {
+          "curl": "curl http://localhost:8787/health",
+          "path": "/health",
+          "status": 200,
+          "body": "{\"ok\":true}"
+        }
+      ]
+    }
+  ]
+}
