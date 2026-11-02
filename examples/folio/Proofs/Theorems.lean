@@ -35,6 +35,8 @@ theorem site_pages_safe : Spec.site_pages_safe := by
   rw [e]
   exact ⟨this.1 h, this.2.1 rfl⟩
 
+theorem preview_safe : Spec.preview_safe := rendered_safe
+
 theorem render_total : Spec.render_total := fun _ _ => ⟨_, rfl⟩
 
 theorem build_total : Spec.build_total := fun _ => ⟨_, rfl⟩

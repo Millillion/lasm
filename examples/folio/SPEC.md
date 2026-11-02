@@ -23,6 +23,7 @@ proposal in [NEXT_EXAMPLE_APPS.md](../../docs/proposals/NEXT_EXAMPLE_APPS.md).
 | No `javascript:`, `vbscript:`, `file:` or non-image `data:` link or image | `Spec.safe_urls` |
 | Front-matter values in a layout are escaped | `Spec.template_values_escaped` |
 | A site's pages hold no raw HTML unless the site enables it | `Spec.site_pages_safe` |
+| The live preview creates only Folio's elements and attributes, never event handlers or unsafe URLs | `Spec.preview_safe`; the end-to-end tests (no dialog, no script element) |
 | Raw HTML, when enabled, is exactly CommonMark's | The specification's examples (`npm test`), the differential test |
 
 ## 2. Every input gets an answer

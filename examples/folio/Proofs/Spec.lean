@@ -22,6 +22,7 @@ specification's 652 examples and a differential test against commonmark.js
 (README.md).
 -/
 import Proofs.Site
+import Proofs.Preview
 
 namespace Folio.Spec
 open Folio Proofs Site
@@ -69,6 +70,14 @@ of every published page has no raw HTML and only allowed URLs. -/
 def site_pages_safe : Prop :=
   ∀ input : Input, (config (parseSource input.index)).options.rawHtml = false →
     ∀ p ∈ (build input).published, Html.NoRawList p.html ∧ Html.SafeUrlsList p.html
+
+/-- **The live preview builds only Folio's elements**: whatever Markdown is
+typed, every element the preview puts in the page is one of Folio's HTML
+elements (no `script`, no `iframe`), every attribute is one of Folio's, set
+as an attribute (never an event handler), and no `href` or `src` is an
+unsafe URL. The preview never gives the browser HTML text to parse. -/
+def preview_safe : Prop :=
+  ∀ m : Preview.Model, UiSafeList (Preview.rendered m)
 
 /-! ## B. Every input gets an answer -/
 

@@ -8,7 +8,8 @@ defaultTargets = ["Folio", "Proofs"]
 [[lean_lib]]
 name = "Folio"
 
-# The theorems about Folio (PROOFS.md).
+# The theorems about Folio (PROOFS.md); those about the live preview need
+# Lasm's library (Lasm.UI), which `npm run proofs` provides.
 [[lean_lib]]
 name = "Proofs"
 
@@ -24,3 +25,8 @@ root = "Batch"
 [[lean_exe]]
 name = "folio"
 root = "Cli"
+
+# The live preview's page (Lasm.UI): its model, update and view. Needs
+# Lasm's library (Lasm.UI), which `npm run proofs` provides.
+[[lean_lib]]
+name = "Preview"
