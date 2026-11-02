@@ -32,10 +32,10 @@ const customers = Number(option('--accounts', '10'));
 const startBalance = 1000n;
 console.log(`seed ${seed} (replay: node test/bank.mjs --seed ${seed})`);
 
-const ledger = await startLedger({ url: option('--url'), command: option('--command') });
+const ledger = await startLedger({ url: option('--url'), command: option('--command'), platform: option('--platform') });
 const base = ledger.base;
 const failures = [];
-const stats = { reads: 0, batches: 0, events: 0, statuses: {} };
+const stats = { reads: 0, batches: 0, events: 0, busy: 0, statuses: {} };
 const fail = msg => { if (failures.length < 20) failures.push(msg); };
 
 try {
@@ -102,6 +102,9 @@ try {
       for (let i = 0; i < events.length - 1; i++) if (R.chance(0.2)) events[i] = { ...events[i], flags: { ...events[i].flags, linked: true } };
       sent.push(...events.filter(e => !e.pending_id));
       const res = await api(base, 'POST', '/transfers', events);
+      // 503: too many concurrent writers (the server's retries ran out). The
+      // request wrote nothing; consistency is what is checked, not availability.
+      if (res.status === 503) { stats.busy++; continue; }
       if (res.status !== 200) { fail(`writer ${w}: HTTP ${res.status} ${res.text}`); continue; }
       stats.batches++;
       stats.events += events.length;
@@ -152,6 +155,7 @@ try {
     for (const k of Object.keys(r)) if (r[k] !== big(data[k])) fail(`replay: account ${data.id} ${k} is ${data[k]}, the journal gives ${r[k]}`);
     replayed++;
   }
+  if (stats.batches < 20 || stats.busy > stats.batches) fail(`too few batches committed: ${stats.batches} (${stats.busy} busy)`);
   const result = { seed, seconds, writers, readers, ...stats, journal: { accounts: replayed, transfers: byId.size },
     failures };
   mkdirSync(join(root, 'test-results'), { recursive: true });

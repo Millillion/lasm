@@ -12,8 +12,8 @@ import { api, root, startLedger } from './server.mjs';
 
 const args = process.argv.slice(2);
 const option = name => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
-const name = option('--name') ?? 'node';
-const server = await startLedger({ url: option('--url'), command: option('--command') });
+const name = option('--name') ?? option('--platform') ?? 'node';
+const server = await startLedger({ url: option('--url'), command: option('--command'), platform: option('--platform') });
 const base = server.base;
 const results = [];
 async function test(title, fn) {

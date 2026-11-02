@@ -1,0 +1,213 @@
+name: Ledger on every platform
+# examples/ledger on each platform beside Node (ledger.yml), served by the
+# platform's own local tooling (test/platforms.mjs), with the API test and the
+# bank workload against it; and the journal auditor on WASI (wasmtime,
+# wasmer, node:wasi). No Fastly build: its KV store is eventually consistent
+# (README.md, "Platforms"). Local tooling only: no account, nothing deployed.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/ledger-platforms.yml'
+      - 'examples/ledger/**'
+      - '!examples/ledger/Proofs/**'
+      - '!examples/ledger/Proofs.lean'
+      - '!examples/ledger/**/*.md'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ledger-platforms.yml'
+      - 'examples/ledger/**'
+      - '!examples/ledger/Proofs/**'
+      - '!examples/ledger/Proofs.lean'
+      - '!examples/ledger/**/*.md'
+permissions:
+  contents: read
+concurrency:
+  group: ledger-platforms-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CI: '1'
+  BROWSER: 'none'
+jobs:
+  platform:
+    name: ${{ matrix.title }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: bun
+            title: Bun 1.4.4 (bun:sqlite)
+            build: npm run build:bun
+          - platform: deno
+            title: Deno 2.9.6 (node:sqlite)
+            build: npm run build:deno
+          - platform: workers
+            title: Cloudflare Workers (wrangler dev, local D1)
+            build: npm run build:workers
+          - platform: docker
+            title: Docker (node:24-bookworm-slim, read-only, 512 MB)
+            build: npm run build:docker
+          - platform: lambda
+            title: AWS Lambda .zip (sam local start-api, nodejs24.x)
+            build: npm run build:lambda
+          - platform: lambda-image
+            title: AWS Lambda container image (sam local start-api, AWS base image)
+            build: npm run build:lambda-image
+          - platform: vercel
+            title: Vercel Functions (vercel build offline, Vercel's Node launcher)
+            build: vercel build --yes
+          - platform: netlify
+            title: Netlify Functions (netlify build offline; Netlify's bootstrap in the Lambda Node 24 image)
+            build: netlify build --offline
+          - platform: azure
+            title: Azure Functions (func start)
+            build: npm run build:azure
+          - platform: gcf
+            title: Google Cloud Functions (Functions Framework)
+            build: npm run build:gcf
+    env:
+      SAM_CLI_TELEMETRY: '0'
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ''
+      AWS_SECRET_ACCESS_KEY: ''
+      AWS_SESSION_TOKEN: ''
+      VERCEL_TELEMETRY_DISABLED: '1'
+      VERCEL_TOKEN: ''
+      NETLIFY_TELEMETRY_DISABLED: '1'
+      NETLIFY_AUTH_TOKEN: ''
+      FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT: '1'
+      WRANGLER_SEND_METRICS: 'false'
+      DO_NOT_TRACK: '1'
+      LEDGER: examples/ledger
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: ${{ env.LEDGER }}
+        run: npm ci --no-audit --no-fund
+      - name: The platform's pinned tools
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          case "$PLATFORM" in
+            bun) npm install --prefix "$T" --no-audit --no-fund bun@1.4.4 ;;
+            workers) npm install --prefix "$T" --no-audit --no-fund wrangler@4.152.0 ;;
+            deno|deno-deploy) npm install --prefix "$T" --no-audit --no-fund deno@2.9.6 ;;
+            lambda|lambda-image)
+              curl -fsSL --retry 3 -o "$RUNNER_TEMP/sam.zip" https://github.com/aws/aws-sam-cli/releases/download/v1.170.0/aws-sam-cli-linux-x86_64.zip
+              unzip -q "$RUNNER_TEMP/sam.zip" -d "$RUNNER_TEMP/sam-installer"
+              "$RUNNER_TEMP/sam-installer/install" --install-dir "$RUNNER_TEMP/sam" --bin-dir "$T/node_modules/.bin" ;;
+            vercel|vercel-edge)
+              npm install --prefix "$T" --no-audit --no-fund vercel@65.2.0 edge-runtime@4.0.1 esbuild@0.28.2
+              echo "VERCEL_NODE_MODULES=$T/node_modules" >> "$GITHUB_ENV"
+              echo "VERCEL_EDGE_TOOLS=$T" >> "$GITHUB_ENV"
+              # A local project link stands in for `vercel link` (no account).
+              mkdir -p "$LEDGER/.vercel"
+              echo '{"projectId":"prj_ledger_ci","orgId":"team_ledger_ci","settings":{}}' > "$LEDGER/.vercel/project.json"
+              # No credentials: a home of its own.
+              echo "XDG_DATA_HOME=$RUNNER_TEMP/vercel-home/data" >> "$GITHUB_ENV"
+              echo "XDG_CONFIG_HOME=$RUNNER_TEMP/vercel-home/config" >> "$GITHUB_ENV" ;;
+            # Deno from npm: Netlify's edge runtime is the Deno CLI on PATH (nothing downloaded).
+            supabase-edge) npm install --prefix "$T" --no-audit --no-fund supabase@2.122.0 ;;
+            fastly|wasi-http|spin)
+              get() { curl -fsSL --retry 3 -o "$RUNNER_TEMP/$2" "$1"; echo "$3  $RUNNER_TEMP/$2" | sha256sum -c; }
+              mkdir -p "$T/node_modules/.bin" "$RUNNER_TEMP/wasi-tools"
+              case "$PLATFORM" in
+                fastly)
+                  get https://github.com/fastly/Viceroy/releases/download/v0.21.1/viceroy_v0.21.1_linux-amd64.tar.gz viceroy.tgz 54a5b46ab05ce1492f4df136728b2eb81b350cb42da5d9f2eec66558ddc1e233
+                  tar -xzf "$RUNNER_TEMP/viceroy.tgz" -C "$T/node_modules/.bin" viceroy ;;
+                wasi-http)
+                  get https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.4/wasmtime-v49.0.4-x86_64-linux.tar.xz wasmtime.tar.xz 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
+                  tar -xJf "$RUNNER_TEMP/wasmtime.tar.xz" -C "$RUNNER_TEMP/wasi-tools" --strip-components=1
+                  ln -s "$RUNNER_TEMP/wasi-tools/wasmtime" "$T/node_modules/.bin/wasmtime" ;;
+                spin)
+                  get https://github.com/spinframework/spin/releases/download/v4.2.2/spin-v4.2.2-static-linux-amd64.tar.gz spin.tgz ff870e915b41216318e525198028fc1017e96f599f54bbfd4e983730d0a1fecd
+                  tar -xzf "$RUNNER_TEMP/spin.tgz" -C "$RUNNER_TEMP/wasi-tools"
+                  ln -s "$RUNNER_TEMP/wasi-tools/spin" "$T/node_modules/.bin/spin" ;;
+              esac ;;
+            netlify|netlify-edge) npm install --prefix "$T" --no-audit --no-fund netlify-cli@27.14.2 deno@2.9.6 ;;
+            azure)
+              # Azure Functions Core Tools 4.16.0, the archive its npm package downloads
+              # (npm 11 skips that package's install script), checked by SHA-256.
+              curl -fsSL --retry 3 -o "$RUNNER_TEMP/func.zip" https://cdn.functions.azure.com/public/4.0.308342/Azure.Functions.Cli.linux-x64.4.16.0.zip
+              echo "c68c7780d94c7583157f7a7d1a05e0ec3e34057c3d55e4c7be71fc4aa0c23667  $RUNNER_TEMP/func.zip" | sha256sum -c
+              unzip -q "$RUNNER_TEMP/func.zip" -d "$RUNNER_TEMP/func" && rm "$RUNNER_TEMP/func.zip"
+              chmod 755 "$RUNNER_TEMP/func/func" "$RUNNER_TEMP/func/in-proc8/func" "$RUNNER_TEMP/func/in-proc6/func"
+              mkdir -p "$T/node_modules/.bin" && ln -s "$RUNNER_TEMP/func/func" "$T/node_modules/.bin/func"
+              func() { "$RUNNER_TEMP/func/func" "$@"; }; func --version ;;
+          esac
+          mkdir -p "$T/node_modules/.bin"
+          echo "$T/node_modules/.bin" >> "$GITHUB_PATH"
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: matrix.platform == 'lambda' || matrix.platform == 'lambda-image' || matrix.platform == 'vercel' || matrix.platform == 'netlify'
+        id: images-lambda
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
+      - name: The pinned Lambda images (cache, else registry by digest)
+        if: matrix.platform == 'lambda' || matrix.platform == 'lambda-image' || matrix.platform == 'vercel' || matrix.platform == 'netlify'
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
+      - name: Build (${{ matrix.build }})
+        working-directory: ${{ env.LEDGER }}
+        run: node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- bash -c "${{ matrix.build }}"
+      - name: The API test
+        working-directory: ${{ env.LEDGER }}
+        run: node test/api.mjs --platform ${{ matrix.platform }}
+      - name: The bank workload (seeded; the seed is printed first)
+        working-directory: ${{ env.LEDGER }}
+        run: node test/bank.mjs --platform ${{ matrix.platform }} --seconds 20 --writers 4 --readers 2
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: ledger-${{ matrix.platform }}
+          path: ${{ env.LEDGER }}/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  wasi:
+    name: The journal auditor on WASI (wasmtime 49.0.4, wasmer 7.4.2, node:wasi)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: npm ci, and the pinned engines
+        working-directory: examples/ledger
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          W="$RUNNER_TEMP/wasi-tools"; mkdir -p "$W"
+          get() { curl -fsSL --retry 3 -o "$RUNNER_TEMP/$2" "$1"; echo "$3  $RUNNER_TEMP/$2" | sha256sum -c; }
+          get https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.4/wasmtime-v49.0.4-x86_64-linux.tar.xz wasmtime.tar.xz 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
+          tar -xJf "$RUNNER_TEMP/wasmtime.tar.xz" -C "$W" --strip-components=1
+          get https://github.com/wasmerio/wasmer/releases/download/v7.4.2/wasmer-linux-amd64.tar.gz wasmer.tar.gz 07271f7ecf449135bbd44cfe9f38a65e54ab25f1564a9c6bd2d0d5cca5743963
+          mkdir -p "$RUNNER_TEMP/wasmer" && tar -xzf "$RUNNER_TEMP/wasmer.tar.gz" -C "$RUNNER_TEMP/wasmer"
+          ln -s "$RUNNER_TEMP/wasmer/bin/wasmer" "$W/wasmer"
+          echo "$W" >> "$GITHUB_PATH"
+      - name: Build the Node server and the auditor
+        working-directory: examples/ledger
+        run: |
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:wasi
+      - name: ledger verify on each engine (an exported journal, and tampered copies)
+        working-directory: examples/ledger
+        run: node test/verify.mjs --engine wasmtime --engine wasmer --engine node
