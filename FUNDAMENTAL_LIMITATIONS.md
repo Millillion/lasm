@@ -41,10 +41,10 @@ def sumTo : List Nat → Nat
 | Target | Deepest `sumTo (List.range n)` that passes (Linux x64, measured 2026-11-02) | Raise it with |
 | --- | --- | --- |
 | Native Lean 4.35.0 (`ulimit -s` 8192) | 13,339,843 | — |
-| Node (`lasm build`, also `lambda`, `vercel`, `netlify`, `azure`, `gcf`) | **10,263,625** with the default 1 GiB stack per Lean thread (641,796 with the previous 64 MiB default, Lasm 0.3.8 and earlier) | `LASM_VM_STACK_MB` (MiB per Lean thread) |
+| Node (`lasm build`, also `lambda`, `vercel`, `netlify`, `azure`, `gcf`) | **10,263,625** with the default 1 GiB stack per Lean thread (641,796 with the previous 64 MiB default, Lasm 0.3.8 and earlier); CI: 11,092,250 on macOS 15 arm64, 2,563,312 on Windows (256 MiB default) | `LASM_VM_STACK_MB` (MiB per Lean thread) |
 | WASI on wasmtime (`--target wasi`) | 10,876 with wasmtime's default 512 KiB (wasmtime 30.0.2) | `wasmtime run -W max-wasm-stack=1073741824` (1 GiB): 22,203,125 |
 | WASI on `node:wasi` | 9,535 | — (Node's main thread stack) |
-| Edge output (`workers`, `vercel-edge`, `netlify-edge`, `deno-deploy`, `supabase-edge`, `bun`, `deno`) and the browser | 9,169 on Node's V8 (Deno, Bun, SpiderMonkey and workerd are similar: [EDGE.md](docs/EDGE.md#1-single-threaded-lean-runtime)) | — (the platform's stack) |
+| Edge output (`workers`, `vercel-edge`, `netlify-edge`, `deno-deploy`, `supabase-edge`, `bun`, `deno`) and the browser | 9,169 on Node's V8, 9,657 on Deno, 10,876 on SpiderMonkey 158 (Firefox's engine), 73,192 on Bun 1.4.4 (CI, Linux x64); workerd is V8 like Node ([EDGE.md](docs/EDGE.md#1-single-threaded-lean-runtime)) | — (the platform's stack) |
 | Fastly, `wasi-http` | the platform's stack | — |
 
 Other functions get more or fewer frames: under Node with the default stack, a
