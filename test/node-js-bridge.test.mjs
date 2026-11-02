@@ -236,6 +236,7 @@ test('op 205: calls, methods and construction; their errors; awaiting', async ()
   assert.equal(js.decode(js.dispatch(205, 0, 2n, wire([{ ref: hold(js, () => 0) }, null, []]))), 0, 'flag 2 on a falsy result');
   const failing = hold(js, () => Promise.reject(new TypeError('async no')));
   await assert.rejects(js.dispatch(205, 0, 2n, wire([{ ref: failing }, null, []])), { message: 'TypeError: async no', leanUserError: true });
+  await assert.rejects(js.dispatch(205, 0, 2n, wire([{ ref: hold(js, () => Promise.reject(undefined)) }, null, []])), { message: 'Uncaught JavaScript value: undefined' });
   // A reference result (flag 1) of an awaited promise.
   const refResult = await js.dispatch(205, 0, 3n, wire([{ ref: later }, null, ['r']]));
   assert.equal(refResult[0], 10);
