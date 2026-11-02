@@ -1,3 +1,3 @@
 import Ledger
 import Ledger.Audit
-import Proofs.Invariant
+import Proofs.Transfer

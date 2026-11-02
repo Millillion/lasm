@@ -197,4 +197,82 @@ theorem inv_two {D : DB} (hI : Inv D) {tr : Transfer} {dr cr dr' cr' : Account}
   · exact fun L => (htot L).1
   · exact fun L => (htot L).2
 
+/-! ## Single-phase and pending transfers -/
+
+theorem inv_new {D : DB} (hI : Inv D) {ts : Nat} {t : NewTransfer} {dr cr : Account}
+    (hr : t.flags.resolves = false) (hid : t.id ≠ 0 ∧ t.id ≠ u128Max) (hfresh : D.transfer? t.id = none)
+    (hnc : ∀ q ∈ newChecks t, q.1 = false) (hd : D.account? t.debitAccountId = some dr)
+    (hc : D.account? t.creditAccountId = some cr) (hbc : ∀ q ∈ balanceChecks t dr cr, q.1 = false) :
+    Inv (D.apply (Writes.ofTransfer (newEffect ts t dr cr).1 (newEffect ts t dr cr).2.1 (newEffect ts t dr cr).2.2)) := by
+  rw [apply_ofTransfer]
+  have hn := hnc; simp [newChecks] at hn
+  obtain ⟨-, -, -, -, n5, -, -, -⟩ := hn
+  have hb := hbc; simp [balanceChecks] at hb
+  obtain ⟨b1, b2, b3, b4, b5, b6, b7, b8, b9, b10⟩ := hb
+  obtain ⟨hdm, hdid⟩ := account?_mem hd
+  obtain ⟨hcm, hcid⟩ := account?_mem hc
+  have hne : t.debitAccountId ≠ t.creditAccountId := fun e => n5 e.symm
+  have hdc : dr.id ≠ cr.id := by rw [hdid, hcid]; exact hne
+  have hcd : cr.id ≠ dr.id := Ne.symm hdc
+  have hpost : t.flags.postPendingTransfer = false := by
+    unfold TransferFlags.resolves at hr; cases h : t.flags.postPendingTransfer <;> simp_all
+  have hvoid : t.flags.voidPendingTransfer = false := by
+    unfold TransferFlags.resolves at hr; cases h : t.flags.voidPendingTransfer <;> simp_all
+  have rfresh := resolvedIn_fresh hI hfresh
+  have pdD := hI.pendingD dr hdm
+  have pcD := hI.pendingC dr hdm
+  have pdC := hI.pendingD cr hcm
+  have pcC := hI.pendingC cr hcm
+  have bD := hI.bounds dr hdm
+  have bC := hI.bounds cr hcm
+  have dmD := hI.dmnec dr hdm
+  have cmD := hI.cmned dr hdm
+  have dmC := hI.dmnec cr hcm
+  have cmC := hI.cmned cr hcm
+  have hdr1 : (dr.id == t.debitAccountId) = true := by simp [hdid]
+  have hcr1 : (cr.id == t.creditAccountId) = true := by simp [hcid]
+  have hx1 : (t.debitAccountId == cr.id) = false := beq_eq_false_iff_ne.mpr (by rw [← hdid]; exact hdc)
+  have hx2 : (t.creditAccountId == dr.id) = false := beq_eq_false_iff_ne.mpr (by rw [← hcid]; exact hcd)
+  have hy1 : (t.debitAccountId == dr.id) = true := by simp [hdid]
+  have hy2 : (t.creditAccountId == cr.id) = true := by simp [hcid]
+  have hpoX (side : Transfer → Nat) (hs : side = (·.debitAccountId) ∨ side = (·.creditAccountId)) (i : Nat)
+      (h1 : i ≠ dr.id) (h2 : i ≠ cr.id) (tr : Transfer) (htr : tr.flags = t.flags) (hid' : tr.id = t.id)
+      (hsd : tr.debitAccountId = t.debitAccountId) (hsc : tr.creditAccountId = t.creditAccountId) :
+      pendingOn side (D.transfers ++ [tr]) i = pendingOn side D.transfers i := by
+    rw [pendingOn_append_new side _ tr i (by rw [htr]; exact hr) (by rw [hid']; exact rfresh)]
+    rcases hs with rfl | rfl
+    · have : (tr.debitAccountId == i) = false := beq_eq_false_iff_ne.mpr (by rw [hsd, ← hdid]; exact Ne.symm h1)
+      simp [this]
+    · have : (tr.creditAccountId == i) = false := beq_eq_false_iff_ne.mpr (by rw [hsc, ← hcid]; exact Ne.symm h2)
+      simp [this]
+  unfold newEffect
+  cases hp : t.flags.pending
+  all_goals
+    simp only [hp, Bool.false_eq_true, ite_false, ite_true]
+    apply inv_two hI (dr := dr) (cr := cr) hd hc hne b2.symm (b1.trans b2).symm hfresh hid
+      (by simp [hr]) (by simp [hr]) (by omega)
+    · simp [Account.withBalances, Audit.replayStep, Account.balances, hr, hp, hx2, hy1]
+    · simp [Account.withBalances, Audit.replayStep, Account.balances, hr, hp, hx1, hy2]
+    · exact fun i h1 h2 => hpoX _ (.inl rfl) i h1 h2 _ rfl rfl rfl rfl
+    · exact fun i h1 h2 => hpoX _ (.inr rfl) i h1 h2 _ rfl rfl rfl rfl
+    · intro x hx
+      rcases hx with rfl | rfl
+      all_goals
+        simp only [pendingOn_append_new _ _ _ _ hr rfresh]
+        simp [hp, hdid, hcid, hx1, hx2, hy1, hy2, ← pdD, ← pcD, ← pdC, ← pcC] at *
+        omega
+    · intro L
+      have h1 := total_two hI.accountIds (find_of_mem hI.accountIds hdm) (find_of_mem hI.accountIds hcm) hdc rfl rfl L
+      have e1 := h1 (·.debitsPosted)
+      have e2 := h1 (·.creditsPosted)
+      have e3 := h1 (·.debitsPending)
+      have e4 := h1 (·.creditsPending)
+      have := hI.posted L
+      have := hI.pending L
+      by_cases hl : dr.ledger = L
+      all_goals
+        have hl' : cr.ledger = dr.ledger := (b1).symm
+        simp [part, hl, hl'] at e1 e2 e3 e4
+        constructor <;> omega
+
 end Ledger.Proofs
