@@ -66,6 +66,7 @@ for the subset Ledger implements, and the proposal in
 | --- | --- |
 | Replaying the journal from zero reproduces every stored balance | `Spec.replay_balances` |
 | Nothing is deleted, and the journal is append-only | `Spec.history_kept` |
+| The auditor (`ledger verify`) replays exactly so | `Spec.fast_replay` |
 
 ## 7. Ledgers
 
