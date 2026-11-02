@@ -39,7 +39,7 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 ### Releases
 - [x] 0.3.6: two Vercel Edge fixes.
 - [x] 0.3.7: version bumped on main (PR #40), **not published**. Its release check failed on a timing-dependent stress fixture (fixed in PR #42), and the fixed commit doesn't change the version, so it can't release (as with 0.3.3).
-- [ ] 0.3.8, first thing Monday: everything in 0.3.7 (the WASI dev-build fix #34, and the fix for a hang when a synchronous JS callback makes the program's first async runtime request, #37), plus #26 if it's ready.
+- [ ] 0.3.8 (in progress, PR "Release 0.3.8"): everything in 0.3.7 (the WASI dev-build fix #34, the synchronous-callback hang fix #37), plus #26 (edge environment variables) and the #30 docs from PR #36.
 - [ ] Move the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7).
 - [ ] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms (a stalled thread, or a visibility bug?).
 
