@@ -1,0 +1,108 @@
+{
+  "title": "A Lean function with a proof, deployed",
+  "project": "verified-limit",
+  "steps": [
+    {
+      "run": "npm create @lasm@latest verified-limit -- --template fetch --deploy workers",
+      "cwd": "."
+    },
+    {
+      "edit": "App.lean"
+    },
+    {
+      "edit": "Main.lean"
+    },
+    {
+      "run": "npm install"
+    },
+    {
+      "run": "npm run build",
+      "files": [
+        "dist/main.mjs"
+      ]
+    },
+    {
+      "serve": "npm start",
+      "platform": "node",
+      "requests": [
+        {
+          "curl": "curl 'http://localhost:3000/items?limit=3'",
+          "path": "/items?limit=3",
+          "status": 200,
+          "body": "{\"items\":[1,2,3],\"size\":3}"
+        },
+        {
+          "curl": "curl 'http://localhost:3000/items?limit=0'",
+          "path": "/items?limit=0",
+          "status": 200,
+          "body": "{\"items\":[1],\"size\":1}"
+        },
+        {
+          "curl": "curl 'http://localhost:3000/items?limit=1000000'",
+          "path": "/items?limit=1000000",
+          "status": 200,
+          "bodyIncludes": [
+            "99,100],\"size\":100}"
+          ]
+        }
+      ]
+    },
+    {
+      "change": "App.lean",
+      "from": "def clampLimit (n : Nat) : Nat := min 100 (max 1 n)",
+      "to": "def clampLimit (n : Nat) : Nat := max 1 n"
+    },
+    {
+      "run": "npm run build",
+      "fails": true,
+      "outputIncludes": [
+        "App.lean:18:12: error: omega could not prove the goal:\n   18 |   split <;> omega\n      |             ^\na possible counterexample may satisfy the constraints\n  a ≥ 101\nwhere\n a := ↑n✝"
+      ]
+    },
+    {
+      "revert": "App.lean"
+    },
+    {
+      "change": "App.lean",
+      "from": "  split <;> omega",
+      "to": "  sorry"
+    },
+    {
+      "run": "npm run build",
+      "fails": true,
+      "outputIncludes": [
+        "App.lean:15:8: warning: declaration uses `sorry`",
+        "App.lean:27:15: error: 'App.pageSize_bounds' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]"
+      ]
+    },
+    {
+      "revert": "App.lean"
+    },
+    {
+      "run": "npm run build:workers",
+      "files": [
+        "workers/worker.mjs"
+      ]
+    },
+    {
+      "serve": "npx wrangler dev",
+      "platform": "wrangler",
+      "requests": [
+        {
+          "curl": "curl 'http://localhost:8787/items?limit=3'",
+          "path": "/items?limit=3",
+          "status": 200,
+          "body": "{\"items\":[1,2,3],\"size\":3}"
+        },
+        {
+          "curl": "curl 'http://localhost:8787/items?limit=1000000'",
+          "path": "/items?limit=1000000",
+          "status": 200,
+          "bodyIncludes": [
+            "99,100],\"size\":100}"
+          ]
+        }
+      ]
+    }
+  ]
+}
