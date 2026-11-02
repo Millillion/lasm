@@ -24,28 +24,28 @@
       }
     },
     "public.ecr.aws/lambda/nodejs:24": {
-      "index": "sha256:92b7cccd985332238af80ac8da42d6965d418552e88955e315da4e3c0c76ca79",
+      "index": "sha256:8466f17dcfbec19afcfefff53964fac7bc3f7975fa132d5fd74dce53004827d0",
       "platforms": {
         "arm64": {
-          "manifest": "sha256:e6b1d506504ce1a6d9d4a3e5a0a3c90aad030517cee74a05bdd5116c2b8326ba",
-          "config": "sha256:f2a781916374654a266fa7ff051fda7c0768278a7cf3f6e648e236faf75e8630"
+          "manifest": "sha256:a8b1898fb070ae2f43179aa9c3b259765efe239e8b974c7121447b22952dfcff",
+          "config": "sha256:c1f0c6702b9b2dc45f4ed35cf5e7a2db96db1daf040b6f1a84e7cb198350538d"
         },
         "amd64": {
-          "manifest": "sha256:b157a991e174a3696e77c991727001756bb4d4ea4bba426d3401e515b9285b0d",
-          "config": "sha256:2aab60b831fd8b9176b9bc5da122f473e573e4c6463695e4eb208034841cec04"
+          "manifest": "sha256:e368a1177691206ea84aad5baa295222ed17f629e2748bd61fe8896e3be0a5e5",
+          "config": "sha256:6b5a7347fcfc0b2ac71aba0c343d02a40686ab1062173c4ea779fc77141123de"
         }
       }
     },
     "ghcr.io/supabase/edge-runtime:v1.77.8": {
       "index": "sha256:178c041398a33ded8219344382d0672a90051d1babbf0af03425cafe20039a75",
       "platforms": {
-        "arm64": {
-          "manifest": "sha256:a119b856ef005197aca5f14165fa1a68e3ac4ab463083bba61c458cdaff7a496",
-          "config": "sha256:579ba74418194d156d5425609df02ed414fa7de42a791ef8a239345466632d1d"
-        },
         "amd64": {
           "manifest": "sha256:4cf4effe7ef7f105ef5dea28a9b61eafd10f824b0e5e2b24e1fb3b4335154d04",
           "config": "sha256:623f934294fa929e994af2678a8ddd0bb7cb1cb913dde8cf422d1a114397abc7"
+        },
+        "arm64": {
+          "manifest": "sha256:a119b856ef005197aca5f14165fa1a68e3ac4ab463083bba61c458cdaff7a496",
+          "config": "sha256:579ba74418194d156d5425609df02ed414fa7de42a791ef8a239345466632d1d"
         }
       }
     }
