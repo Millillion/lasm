@@ -1,0 +1,23 @@
+{
+  "name": "verified-limit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "an HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge, compiled to WebAssembly by Lasm",
+  "scripts": {
+    "dev": "lasm dev Main.lean",
+    "build": "lasm build Main.lean",
+    "start": "node dist/main.mjs",
+    "build:workers": "lasm build Main.lean --target workers",
+    "dev:bun": "bun x --bun lasm dev Main.lean",
+    "build:bun": "bun x --bun lasm build Main.lean --target bun",
+    "start:bun": "bun bun/main.mjs",
+    "build:deno": "lasm build Main.lean --target deno",
+    "start:deno": "deno run -A deno/main.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@lasm/cli": "0.3.6"
+  }
+}
