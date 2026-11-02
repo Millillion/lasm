@@ -72,7 +72,7 @@ pending transfer's), which are different and in the transfer's ledger, get
 new balances and nothing else; every other account, and every earlier
 transfer, is unchanged. -/
 def transfer_two_accounts : Prop :=
-  ∀ D ts t rs D', Reachable D → submitTransfer D ts t = (rs, D') → rs = [.created] →
+  ∀ D ts t D', Reachable D → t.flags.linked = false → submitTransfer D ts t = ([.created], D') →
     ∃ tr dr cr dr' cr', D' = { D with accounts := upsert (upsert D.accounts dr') cr', transfers := D.transfers ++ [tr] } ∧
       tr.id = t.id ∧ D.account? tr.debitAccountId = some dr ∧ D.account? tr.creditAccountId = some cr ∧
       dr.id ≠ cr.id ∧ dr.ledger = tr.ledger ∧ cr.ledger = tr.ledger ∧
@@ -84,7 +84,7 @@ debit account's debits equals what is added to the credit account's
 credits, for the posted and for the pending balances (a post or void
 removes the same pending amount from both). -/
 def transfer_equal_opposite : Prop :=
-  ∀ D ts t rs D', Reachable D → submitTransfer D ts t = (rs, D') → rs = [.created] →
+  ∀ D ts t D', Reachable D → t.flags.linked = false → submitTransfer D ts t = ([.created], D') →
     ∃ tr dr cr dr' cr', D' = { D with accounts := upsert (upsert D.accounts dr') cr', transfers := D.transfers ++ [tr] } ∧
       D.account? tr.debitAccountId = some dr ∧ D.account? tr.creditAccountId = some cr ∧
       dr'.creditsPending = dr.creditsPending ∧ dr'.creditsPosted = dr.creditsPosted ∧
@@ -251,6 +251,13 @@ two transfers share an id, and no id is 0 or `2^128 - 1`. -/
 def ids_unique : Prop :=
   ∀ D, Reachable D → (D.accounts.map (·.id)).Nodup ∧ (D.transfers.map (·.id)).Nodup ∧
     (∀ a ∈ D.accounts, a.id ≠ 0 ∧ a.id ≠ u128Max) ∧ (∀ t ∈ D.transfers, t.id ≠ 0 ∧ t.id ≠ u128Max)
+
+/-- **Nothing is ever deleted or rewritten**: whatever requests follow, the
+journal only grows at its end, and every account stays, with the same id,
+user data, ledger, code, flags and timestamp (only its balances change). -/
+def history_kept : Prop :=
+  ∀ D D', Reachable D → Later D D' → D.transfers <+: D'.transfers ∧
+    ∀ a ∈ D.accounts, ∃ a' ∈ D'.accounts, SameButBalances a a'
 
 /-! ## I. Requests -/
 

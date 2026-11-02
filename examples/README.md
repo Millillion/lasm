@@ -7,6 +7,7 @@ For a new project, use `npm create @lasm@latest` with a [template](../README.md#
 | Example | What it shows | Run |
 | --- | --- | --- |
 | **[conduit](conduit)** (flagship) | The RealWorld "Conduit" app entirely in Lean: REST API, server-rendered `Lasm.UI` frontend, and **294 proved theorems** ([PROOFS.md](conduit/PROOFS.md)). The official API and Playwright suites pass on every platform Lasm supports, each with its own local tooling ([platforms](conduit#platforms)) | `npm install && npm run build && npm start`; `npm run proofs`; `npm test` |
+| **[ledger](ledger)** (flagship, in progress) | A double-entry ledger in TigerBeetle's data model and result codes: two-phase transfers, linked chains, idempotent client-chosen ids. Proved: conservation in every ledger, two accounts per transfer, idempotency, chains all or nothing, and replay of the journal ([PROOFS.md](ledger/PROOFS.md), [SPEC.md](ledger/SPEC.md)). The server, the differential test against TigerBeetle and the platforms follow ([ROADMAP.md](../ROADMAP.md)) | `npm install && npm run proofs` |
 | [hello](hello) | The smallest program | `npx @lasm/cli Main.lean` |
 | [js-fetch](js-fetch) | A `@[js]` binding to Node's `fetch`, awaiting in `Async` | `npx @lasm/cli Main.lean -- https://example.com` |
 | [js-crud](js-crud) | A REST API with Postgres (`pg`) and JWT (`jose`), on Express and on Hono | `npm install && npx @lasm/cli Express.lean` |
