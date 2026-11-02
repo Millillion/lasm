@@ -20,6 +20,7 @@ name: Conduit
 #   (specs/e2e, Playwright, unmodified, fullstack mode) against the
 #   server-rendered, hydrated Lasm.UI app: Node on Chromium, Firefox and
 #   WebKit; Workers (wrangler dev, local D1) and Bun on Chromium; no retries;
+#   on Node also Conduit's own browser tests (test/conduit);
 # - conduit-platforms.yml: every other platform, with its own local tooling;
 # - pinned: test/realworld is byte-identical to the upstream commit.
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
@@ -250,6 +251,15 @@ jobs:
         run: |
           npm run test:e2e -- --retries=0 || status=$?
           node test/e2e-summary.mjs test-results/e2e-node-${{ matrix.browser }}.json
+          exit ${status:-0}
+      - name: Conduit's own browser tests (test/conduit)
+        working-directory: examples/conduit
+        env:
+          BROWSERS: ${{ matrix.browser }}
+          E2E_NAME: node-${{ matrix.browser }}
+        run: |
+          npm run test:conduit -- --retries=0 || status=$?
+          node test/e2e-summary.mjs test-results/conduit-node-${{ matrix.browser }}.json
           exit ${status:-0}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()

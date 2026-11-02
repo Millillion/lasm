@@ -35,7 +35,8 @@
     "test:platform": "node test/api.mjs --platform",
     "proofs": "node test/proofs.mjs",
     "proofs:paranoid": "node test/paranoid.mjs",
-    "test:e2e": "playwright test -c test/playwright.config.ts"
+    "test:e2e": "playwright test -c test/playwright.config.ts",
+    "test:conduit": "playwright test -c test/playwright.conduit.config.ts"
   },
   "engines": {
     "node": ">=24"
