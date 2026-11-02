@@ -11,7 +11,9 @@
 // 3. checks SPEC.md: every `Spec.x` it names is a proposition that was just
 //    proved, and every proposition is named there (as `Spec.x`, in backticks) (each one maps to a
 //    requirement);
-// 4. checks the theorem count stated in the READMEs, llms.txt and PROOFS.md.
+// 4. checks the counts stated in the READMEs, llms.txt and SPEC.md: "N proved
+//    propositions (M theorems)", N the propositions of Spec.lean and M every
+//    theorem in Proofs/ (docs/DECISIONS.md, 2026-10-31 and 2026-11-02).
 //
 //   npm run proofs              # check
 //   npm run proofs -- --write   # also rewrite PROOFS.md and the stated counts
@@ -72,9 +74,9 @@ function generated(data) {
   const secs = sections().filter(s => s.title !== 'Vocabulary');
   const props = [...data.propositions].sort((a, b) => a.line - b.line);
   let out = `<!-- Generated from Proofs/Spec.lean by \`npm run proofs -- --write\`; do not edit by hand. -->\n\n`;
-  out += `**${props.length} propositions**, each proved by the theorem of the same name in \`Proofs/\` `;
-  out += `(${data.theorems} theorems in all: the ${props.length} below and the lemmas their proofs are built from). `;
-  out += `Every one uses only Lean's standard axioms.\n`;
+  out += `**${props.length} proved propositions (${data.theorems} theorems)**: each proposition below is proved by the `;
+  out += `theorem of the same name in \`Proofs/\`, and the other ${data.theorems - props.length} theorems are the lemmas `;
+  out += `their proofs are built from. Every one uses only Lean's standard axioms.\n`;
   secs.forEach((sec, i) => {
     const next = secs[i + 1]?.line ?? Infinity;
     const inSec = props.filter(p => p.line > sec.line && p.line < next);
@@ -109,21 +111,30 @@ function checkSpecMd(data) {
   for (const n of names) if (!named.has(n)) problems.push(`Spec.${n} is proved but SPEC.md maps no requirement to it`);
 }
 
-/** The places that state how many theorems Conduit has. */
-const countFiles = ['README.md', 'examples/README.md', 'llms.txt', 'examples/conduit/README.md'];
+/** The places that state how many propositions and theorems Conduit has
+(PROOFS.md's count is generated with its tables). */
+const countFiles = ['README.md', 'examples/README.md', 'llms.txt', 'examples/conduit/README.md', 'examples/conduit/SPEC.md'];
 function syncCounts(data) {
-  const n = data.theorems;
+  const p = data.propositions.length, n = data.theorems;
   for (const file of countFiles) {
     const path = join(repo, file);
     if (!existsSync(path)) continue;
     const text = readFileSync(path, 'utf8');
     const updated = text
-      .replace(/\b\d+( proved)? theorems\b/g, (_, p) => `${n}${p ?? ''} theorems`)
-      .replace(/-with-\d+-proved-theorems\b/g, `-with-${n}-proved-theorems`)
-      .replace(/check all \d+ theorems/g, `check all ${n} theorems`);
+      // "50 proved propositions (294 theorems)", and its heading's anchor.
+      .replace(/\b\d+( proved)? propositions \(\d+ theorems\)/g, (_, pr) => `${p}${pr ?? ''} propositions (${n} theorems)`)
+      .replace(/-with-\d+-proved-propositions-\d+-theorems\b/g, `-with-${p}-proved-propositions-${n}-theorems`)
+      .replace(/\b\d+ propositions of `Proofs\/Spec\.lean`/g, `${p} propositions of \`Proofs/Spec.lean\``);
     if (updated !== text) {
       if (write) writeFileSync(path, updated);
-      else problems.push(`${file} states a theorem count other than ${n} (run \`npm run proofs -- --write\`)`);
+      else problems.push(`${file} states counts other than ${p} propositions and ${n} theorems (run \`npm run proofs -- --write\`)`);
+    }
+    // A count in the old form ("294 theorems", "294 proved theorems") is stale.
+    for (const m of updated.matchAll(/\b(\d+)( proved)? theorems\b/g)) {
+      const before = updated.slice(Math.max(0, m.index - 40), m.index);
+      if (!/propositions \($/.test(before) && file !== 'examples/conduit/SPEC.md') {
+        problems.push(`${file} states "${m[0]}", not "${p} proved propositions (${n} theorems)"`);
+      }
     }
   }
 }

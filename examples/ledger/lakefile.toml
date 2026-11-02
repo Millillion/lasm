@@ -1,0 +1,23 @@
+name = "ledger"
+version = "0.1.0"
+defaultTargets = ["Ledger", "Proofs"]
+
+# The pure ledger: accounts, transfers, result codes, the rules (generic
+# over the store), JSON, the API and the journal auditor. `lake build`
+# checks it with plain Lean 4.35.0: no Lasm, no JavaScript.
+[[lean_lib]]
+name = "Ledger"
+
+# The theorems about the ledger (PROOFS.md).
+[[lean_lib]]
+name = "Proofs"
+
+# The browser page (Lasm.UI): its model, update and view.
+[[lean_lib]]
+name = "Frontend"
+
+# The server's modules (Lasm.Fetch, Lasm.JS): the SQL layer, the HTTP glue,
+# and one SQLite binding module per target. ServerNode.lean is the program:
+# lasm builds it (npm run build); it is not a Lake target.
+[[lean_lib]]
+name = "Server"

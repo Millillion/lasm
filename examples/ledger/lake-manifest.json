@@ -1,0 +1,6 @@
+{"version": "1.3.0",
+ "packagesDir": ".lake/packages",
+ "packages": [],
+ "name": "ledger",
+ "lakeDir": ".lake",
+ "fixedToolchain": false}

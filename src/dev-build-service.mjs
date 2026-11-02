@@ -9,10 +9,11 @@ export function createBuildService({ workerUrl = new URL('./dev-build-worker.mjs
   let nextId = 0;
   const pending = new Map();
   const start = slot => {
-    const self = slot.worker = new Worker(workerUrl, { stdout: true, stderr: true });
-    if (unref) self.unref();
-    self.stdout.pipe(process.stdout, { end: false });
-    self.stderr.pipe(process.stderr, { end: false });
+    // The worker's stdout and stderr are left to Node, which forwards them to
+    // this process's own. Reading them here (stdout: true and a pipe) would keep
+    // the process alive while the worker lives, unref or not: a stream waiting
+    // for data refs the worker's port.
+    const self = slot.worker = new Worker(workerUrl);
     self.on('message', message => {
       const request = pending.get(message.id);
       if (!request) return;
@@ -31,6 +32,8 @@ export function createBuildService({ workerUrl = new URL('./dev-build-worker.mjs
     };
     self.once('error', fail);
     self.once('exit', code => fail(new Error(`The Lasm build worker stopped (exit ${code}).`)));
+    // After the listeners: adding a 'message' listener refs the worker again.
+    if (unref) self.unref();
   };
   return {
     workers: slots.length,

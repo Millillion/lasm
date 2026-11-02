@@ -22,13 +22,13 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] (J) `Lasm.Fetch`: keep it, narrow it, or remove it, compared with JS bindings. Deferred by Jordan.
 - [ ] (J) Issue #27: remove dot segments from `Request.path` on every platform (an API change).
 - [ ] (J) The next example apps: choose from [NEXT_EXAMPLE_APPS.md](docs/proposals/NEXT_EXAMPLE_APPS.md) (proposed: Ledger, Markdown site generator, OIDC provider, CRDT editor).
-- [ ] (J) Conduit's headline count: "294 theorems" (current) or "50 proved propositions".
-- [ ] (J) Conduit's two recorded gaps: empty Markdown link labels, and the delete and remove icons that aren't reachable by keyboard. Fix them? Both change what pages show.
+- [x] (J) Conduit's headline count: "N proved propositions (M theorems)", both checked by `npm run proofs` (Jordan, 2026-11-02).
+- [x] (J) Conduit's two recorded gaps: fixed and proved (Jordan, 2026-11-02): an empty-text link shows its target (SPEC L6), and the delete and remove icons are buttons (SPEC L7).
 
 ## Jordan's own work (from issue #21)
 - [ ] (J) Hone the README and every human-facing text.
 - [ ] (J) Review the public APIs: the Lean libraries and the CLI.
-- [ ] (J) Review Conduit's 50 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean).
+- [ ] (J) Review Conduit's 52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean).
 - [ ] (J) Hone [TRUST.md](docs/proposals/TRUST.md): what Lean, Lasm and the toolchain guarantee.
 - [ ] (J) Storytelling, about 80% of the effort per issue #21: posts, videos, launch follow-ups.
 - [ ] (J) GitHub Sponsors tiers and description (a manual edit; suggested text was given).
@@ -55,7 +55,8 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [ ] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread.
 - [ ] Replace the remaining tests that only read files as text, and port or retire the 29 Lean 4.32 test files.
 - [ ] Browser and Bun targets in differential testing.
-- [ ] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next).
+- [x] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next): seven modules, nightly and PR CI, host bridge 56→96 %, UI applier 55→93 %, build service 52→92 %, edge glue 15→79 %, notices 63→75 % (#53; bugs #49, #51).
+- [ ] Mutation scores to 80 % for the link driver (54 %) and the target links (6 %: unit tests of the link plans with a stand-in toolchain), notices and edge glue; then raise the targets.
 - [ ] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week).
 - [ ] Platform evidence levels L0–L3, generated from CI results, in the README's platform table.
 
@@ -63,6 +64,13 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [x] Specification map, 50 reviewable propositions, frontend and layout proofs, five independent proof checkers.
 - [x] Conduit on all 18 platforms, each tested in CI with its own local tooling and both official RealWorld suites (PRs #24, #29, #39).
 - [ ] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced.
+
+### Ledger ([examples/ledger](examples/ledger), the second flagship app)
+- [x] 1. Pure core in TigerBeetle's data model and result codes (0.17.9 subset), the model, and the proofs: 27 propositions (31 with the page) in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean), a requirements map ([SPEC.md](examples/ledger/SPEC.md)), `proofs:paranoid`.
+- [x] 2. Node server (`node:sqlite`), the differential test against a pinned TigerBeetle release, and the Jepsen-style bank workload.
+- [x] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms (Lambda .zip and image, Vercel, Netlify, Azure, GCF), and the WASI auditor `ledger verify journal.ndjson` on wasmtime, wasmer and `node:wasi`. No Fastly build (its KV is eventually consistent).
+- [x] 4. The `Lasm.UI` page (accounts and journal, a ledger filter), four propositions about it, and its end-to-end tests on Chromium, Firefox and WebKit.
+- [ ] (J) Review and hone the 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
 
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.
