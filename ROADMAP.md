@@ -66,7 +66,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] 0.3.7: version bumped on main (PR #40), **not published**. Its release check failed on a timing-dependent stress fixture (fixed in PR #42), and the fixed commit doesn't change the version, so it can't release (as with 0.3.3).
 - [x] 0.3.8 (published 2026-11-02): everything in 0.3.7 (the WASI dev-build fix #34, and the fix for a hang when a synchronous JS callback makes the program's first async runtime request, #37), plus #26 and the #30 docs (PR #36).
 - [x] 0.3.9 (published 2026-11-03, PR #81): #27, browser-style dot-segment resolution in `Request.path` on every platform, with a proof that `segments` never contains `.` or `..`; also #76 (a `://` in the query), #66 (Node recursion depth), #80 and #82 (cookies and redirects on function platforms), #49 (dev build service `unref`) and #51 (Lasm.JS errors wrapped twice).
-- [ ] Next release: retry downloads cut short before Content-Length arrives (PR #91), the macOS C-tier fix (#73, PR #85), the editor fix (#72, PR #86), and Lasm.UI handlers deciding `preventDefault`/`stopPropagation` per event, a breaking change (#71; [next-notes.md](docs/release/next-notes.md)).
+- [~] 0.4.0 (in progress, PR "Release 0.4.0"): retry downloads cut short before Content-Length arrives (PR #91), the macOS C-tier fix (#73, PR #85), the editor fix (#72, PR #86), and Lasm.UI handlers deciding `preventDefault`/`stopPropagation` per event, a breaking change (#71, PR #96; [0.4.0-notes.md](docs/release/0.4.0-notes.md)). A minor version because of the breaking change.
 - [ ] Move the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7).
 - [ ] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms (a stalled thread, or a visibility bug?).
 
@@ -135,7 +135,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] Consolidate the 63 CI workflows into PR, nightly, weekly and release tiers.
 - [ ] Example app 3: the Markdown site generator, held to CommonMark's 652 examples, on WASI, Fastly, the edge and the browser.
 - [ ] Organize the proofs of Lasm's own libraries (Lasm.UI, RPC, KV) like Conduit's Spec.lean, for human review (issue #21).
-- [ ] Lean 4.36: resume when 4.36.0 stable ships, around mid-November. It becomes Lasm 0.4.0.
+- [ ] Lean 4.36: resume when 4.36.0 stable ships, around mid-November. It becomes the next minor release after 0.4.0.
 
 ## Later (first half of 2027)
 - [~] Example apps 4 and 5: the identity provider (Porter, done) and the collaborative editor (Tandem, in progress).
