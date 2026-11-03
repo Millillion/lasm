@@ -7,7 +7,7 @@ import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 await ensureResourceGuard();
 const tests = ['managed-download', 'managed-network', 'network-git', 'installation-confidence', 'candidate-readme', 'candidate-retention', 'managed-artifacts', 'npm-artifacts', 'npm-dist-packages', 'system-git',
   'cache-lifecycle', 'managed-lean-tiers', 'managed-link-toolchain', 'installer-bundle', 'sdk-archives', 'sdk-repairs', 'windows-tool-paths', 'windows-installer-faults',
-  'application-lock', 'build-progress', 'cli-arguments', 'node-cache-controls',
+  'application-lock', 'build-progress', 'cli-arguments', 'cli-error-messages', 'node-cache-controls',
   'darwin-resources', 'darwin-monitor-recovery'].map(name => `test/${name}.test.mjs`);
 assert.equal(process.platform + '-' + process.arch, process.env.LASM_EXPECT_PLATFORM ?? process.platform + '-' + process.arch);
 const started = new Date().toISOString();

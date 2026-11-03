@@ -208,6 +208,28 @@ await t.check('errors after the redirect URI is trusted go to it, with iss and t
   assert.equal(new URL(res.location).searchParams.get('state'), 'st');
 });
 
+await t.check('state is bounded (2048 bytes): a longer one gets an error page, never a redirect carrying it back', async () => {
+  // The nightly fuzzer once sent a 16 KB state with a bad scope: the error
+  // redirect carried it back, and the client could not parse the headers.
+  const { challenge } = verifierPair();
+  const form = (state, extra = {}) => ({ ...Object.fromEntries(new URL(authUrl({ scope: 'profile', code_challenge: challenge,
+    ...extra })).searchParams), state });
+  const post = (path, f) => new Browser(base).request(`${base}${path}`, { method: 'POST', form: f });
+  const ok = await post('/authorize', form('x'.repeat(2048)));
+  assertErrorRedirect(ok, 'invalid_scope');
+  assert.equal(new URL(ok.location).searchParams.get('state'), 'x'.repeat(2048));
+  const bye = { client_id: clients.basic.client_id, post_logout_redirect_uri: 'http://127.0.0.1:59999/bye', confirm: 'yes' };
+  const out = await post('/logout', { ...bye, state: 'é'.repeat(1024) });
+  assert.equal(out.status, 303);
+  assert.equal(new URL(out.location).searchParams.get('state'), 'é'.repeat(1024));
+  for (const state of ['x'.repeat(2049), 'é'.repeat(1025), 'x'.repeat(16000)]) {
+    assertNoRedirect(await post('/authorize', form(state)));
+    assertNoRedirect(await post('/authorize', form(state, { scope: 'openid', prompt: 'none' })));
+    assertNoRedirect(await post('/authorize', form(state, { scope: 'openid' })));
+    assertNoRedirect(await post('/logout', { ...bye, state }));
+  }
+});
+
 // ---------------------------------------------------------------------------
 console.log('Mix-up and token substitution');
 

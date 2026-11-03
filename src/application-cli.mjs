@@ -53,8 +53,42 @@ export async function versionText() {
   return `lasm ${pkg.version} (${pkg.name}; Lean ${lean ?? 'unknown'}; ${jsRuntime === 'node' ? 'Node' : jsRuntime === 'bun' ? 'Bun' : 'Deno'} ${jsRuntimeVersion}; ${process.platform}-${process.arch})`;
 }
 
+const fileSystemActions = {
+  EACCES: 'Check that you can write there, or choose another directory.',
+  EPERM: 'Check that you can write there and that no other program holds the file, or choose another directory.',
+  EROFS: 'The file system is read-only; choose a writable directory.',
+  ENOSPC: 'The disk is full; free some space and run the command again.',
+  EDQUOT: 'Your disk quota is used up; free some space and run the command again.',
+  ENOTDIR: 'A file is where a directory is needed; move it or choose another path.',
+  EISDIR: 'A directory is where a file is needed; move it or choose another path.',
+  EEXIST: 'Something already exists there; move it or choose another path.',
+  ENAMETOOLONG: 'Choose a shorter path.',
+  ELOOP: 'The path has a symbolic link loop; fix the link or choose another path.',
+  EMFILE: 'Too many files are open; close other programs or raise the open-file limit, and run the command again.',
+};
+const syscallVerbs = { mkdir: 'create the directory', open: 'open', scandir: 'read the directory', opendir: 'read the directory', rename: 'move',
+  unlink: 'remove', rmdir: 'remove', rm: 'remove', copyfile: 'copy', cp: 'copy', write: 'write to', symlink: 'create a link at', link: 'create a link at',
+  chmod: 'change the permissions of', utime: 'change the times of', stat: 'inspect', lstat: 'inspect', access: 'access', mkdtemp: 'create a directory in', realpath: 'resolve' };
+
+/** A file-system error Lasm did not explain (Node's "EACCES: permission
+ * denied, mkdir '/x/.lake'", or a bare strerror text): what Lasm tried, on
+ * which path, why it failed and what to do. Other errors: undefined. */
+export function describeFileSystemError(error) {
+  const action = fileSystemActions[error?.code];
+  if (!action) return undefined;
+  const raw = /^E[A-Z]+: ([^,]+), (\w+) '([^']*)'/.exec(error.message ?? '');
+  const bare = /^[A-Z][a-z]+(?: [a-z-]+)*\.?$/.test(error.message ?? '') && error.message.length < 60;
+  if (!raw && !bare) return undefined;
+  const reason = (raw?.[1] ?? error.message).replace(/\.$/, '').toLowerCase();
+  const syscall = raw?.[2] ?? error.syscall, path = error.path ?? raw?.[3];
+  const what = path ? `Could not ${syscallVerbs[syscall] ?? 'use'} ${path}` : 'A file operation failed';
+  return `${what}: ${reason} (${error.code}). ${action}`;
+}
+
 export function reportCliError(error) {
   if (error.name === 'LeanIOError') { console.error('uncaught exception: ' + error.message); return; }
+  const fileSystem = !isInternalError(error) && describeFileSystemError(error);
+  if (fileSystem) { console.error(fileSystem); return; }
   if (isInternalError(error)) {
     console.error(`${error.stack ?? error.message}`.slice(-12000));
     console.error(bugReportLine);

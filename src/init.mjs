@@ -1,7 +1,7 @@
 // `lasm init`: scaffold a new Lean project from a template.
 // Writes files only: no network access, no Lean toolchain, no npm install.
 import { jsRuntime } from './js-runtime.mjs';
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fastlyToml } from './wasi/wasi-build.mjs';
@@ -631,6 +631,7 @@ export function initProject({ directory, template, deploy = [] }) {
   if (!templates[template]) throw new Error(`Unknown template "${template}"`);
   const target = resolve(directory);
   if (existsSync(target)) {
+    if (!statSync(target).isDirectory()) throw new Error(`${directory} is a file, not a directory. Choose a new or empty directory.`);
     const entries = readdirSync(target).filter(entry => entry !== '.git');
     if (entries.length) throw new Error(`${directory} is not empty. Choose a new or empty directory.`);
   }

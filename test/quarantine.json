@@ -1,0 +1,4 @@
+{
+  "policy": "docs/TESTING.md#flaky-tests: a flaky test is quarantined at once (an entry here, with its issue), then fixed or deleted within 7 days of `since`. Runs through scripts/test/node-test.mjs or scripts/ci/unit-tests.mjs skip it with a notice; an entry older than 7 days fails the unit suite.",
+  "tests": []
+}

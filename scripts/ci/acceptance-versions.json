@@ -1,13 +1,7 @@
 {
   "lean": "4.35.0",
-  "node": "26.12.1",
+  "node": "26.13.0",
   "npm": "11.20.0",
-  "node24": "24.22.1",
-  "minimumNode": "24.0.0",
-  "deferredLatest": {
-    "node": "26.13.0",
-    "node24": "24.22.2",
-    "decidedAt": "2026-10-31",
-    "reason": "Node 26.13.0 and 24.22.2 appeared during the 0.3.6 release checks; 0.3.6 is a Vercel Edge fix validated on the 26.12.1 and 24.22.1 pins. Moving the pins (CI, acceptance, runtimes) is its own change after 0.3.6 (docs/DECISIONS.md); 0.3.7, 0.3.8 and 0.3.9, bug-fix releases, and 0.4.0 (bug fixes and a Lasm.UI API change) keep the same deferral."
-  }
+  "node24": "24.22.2",
+  "minimumNode": "24.0.0"
 }

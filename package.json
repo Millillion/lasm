@@ -38,7 +38,7 @@
     "test:release": "node --test --test-concurrency=1 integration/release.test.mjs",
     "test:hosts": "node --test --test-concurrency=1 integration/hosts.test.mjs",
     "test:engines": "node --test --test-concurrency=1 integration/engines.test.mjs",
-    "test": "node --test --test-concurrency=1 test/*.test.mjs",
+    "test": "node scripts/test/node-test.mjs --test-concurrency=1 test/*.test.mjs",
     "test:jspi": "node --experimental-wasm-jspi test/io.test.mjs jspi",
     "build:lean-server": "node bin/lasm.mjs build examples/lean-server/Main.lean examples/lean-server/dist",
     "start:lean-server": "node lasm-node.js examples/lean-server/Main.lean",
