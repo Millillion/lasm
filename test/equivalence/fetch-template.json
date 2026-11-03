@@ -56,14 +56,27 @@
     {
       "name": "dot-segments",
       "method": "GET",
-      "path": "/hello/../hello/Ada",
-      "known": {
-        "targets": [
-          "bun",
-          "workers"
-        ],
-        "issue": "https://github.com/Millillion/lasm/issues/27"
-      }
+      "path": "/hello/../hello/Ada"
+    },
+    {
+      "name": "dot-segments-encoded",
+      "method": "GET",
+      "path": "/hello/%2e%2E/hello/Ada"
+    },
+    {
+      "name": "dot-segments-mixed",
+      "method": "GET",
+      "path": "/hello/.%2e/hello/./Ada"
+    },
+    {
+      "name": "dot-segments-above-root",
+      "method": "GET",
+      "path": "/../../hello/Ada"
+    },
+    {
+      "name": "backslash-separator",
+      "method": "GET",
+      "path": "/hello\\..\\hello\\Ada"
     },
     {
       "name": "echo-text",
