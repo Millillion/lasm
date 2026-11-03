@@ -8,6 +8,10 @@ on:
   schedule:
     - cron: '53 7 * * *'
   workflow_dispatch:
+  # A change to the report runs it (artifact only; the issue is updated from main).
+  pull_request:
+    branches: [main]
+    paths: [.github/workflows/flaky.yml, scripts/ci/flaky-report.mjs, scripts/test/quarantine.mjs]
 permissions:
   contents: read
 concurrency:
@@ -15,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   report:
-    if: github.event.repository.visibility == 'public'
+    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
