@@ -29,6 +29,16 @@
       "path": "/hello/a%2Fb"
     },
     {
+      "name": "keep-alive-encoded-slash",
+      "keepAlive": [
+        "/hello/Ada",
+        "/hello/a%2Fb",
+        "/hello/a%2Fb",
+        "/hello/Ada?x=1",
+        "/hello/a%2Fb"
+      ]
+    },
+    {
       "name": "hello-quote-backslash",
       "method": "GET",
       "path": "/hello/%22q%5C"
