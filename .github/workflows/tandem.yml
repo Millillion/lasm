@@ -17,7 +17,13 @@ name: Tandem
 #   simulation (the browser's replica logic in several processes over an
 #   unreliable network, the server killed and restarted mid-run);
 # - fuzz: the protocol fuzzer for three minutes against the Node build
-#   (HTTP and WebSockets; seeded; failing inputs uploaded).
+#   (HTTP and WebSockets; seeded; failing inputs uploaded);
+# - e2e: the editor (the Lasm.UI app) in Chromium, Firefox and WebKit
+#   (Playwright, no retries): typing, two browsers at once (live, and
+#   concurrently at one place), offline then reconnecting, a reload while
+#   offline, the caret kept beside its text, no script error or CSP
+#   violation; and in Chromium against Workers (wrangler dev), where the
+#   editor long-polls.
 # Local runtimes only: no account, nothing deployed, CI=1. Free runners only.
 on:
   workflow_dispatch:
@@ -136,3 +142,62 @@ jobs:
           path: examples/tandem/test-results/
           retention-days: 14
           if-no-files-found: ignore
+  e2e:
+    name: The editor on ${{ matrix.server }}, ${{ matrix.browser }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { browser: chromium, server: node }
+          - { browser: firefox, server: node }
+          - { browser: webkit, server: node }
+          - { browser: chromium, server: workers }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: examples/tandem
+        run: npm ci --no-audit --no-fund
+      - name: Wrangler 4.152.0 (Workers only)
+        if: matrix.server == 'workers'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund wrangler@4.152.0
+          echo "$RUNNER_TEMP/tools/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: npm run build (the browser app, then the server embedding it)
+        working-directory: examples/tandem
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run ${{ matrix.server == 'workers' && 'build:workers' || 'build' }}
+      - name: The pinned Playwright's ${{ matrix.browser }}, with its system packages
+        timeout-minutes: 30
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
+          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
+      - name: The end-to-end tests
+        working-directory: examples/tandem
+        env:
+          BROWSERS: ${{ matrix.browser }}
+          E2E_NAME: ${{ matrix.server }}-${{ matrix.browser }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          if [ "${{ matrix.server }}" = workers ]; then
+            export E2E_SERVER="wrangler dev --port 4400 --ip 127.0.0.1 --persist-to $RUNNER_TEMP/d1"
+          fi
+          npm run test:e2e -- --retries=0
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: tandem-e2e-${{ matrix.server }}-${{ matrix.browser }}
+          path: examples/tandem/test-results/
+          retention-days: 14
+          if-no-files-found: warn

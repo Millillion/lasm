@@ -16,6 +16,8 @@ HTTP:
   without WebSockets: answers as soon as the log is longer than `N`, or after
   `TANDEM_POLL_SECONDS` (default 20) with nothing new;
 - `GET /doc/<name>/text`: the document's text;
+- `GET /d/<name>`: the editor (the `Lasm.UI` app in `/ui/`, embedded by
+  each entry file); `GET /` opens the document `welcome`;
 - `GET /health`.
 -/
 import Lasm.Fetch
@@ -104,6 +106,35 @@ def textReply (status : UInt16) (body : String) : Lasm.Fetch.Response :=
 /-- The largest message body accepted (bytes). -/
 def maxBody : Nat := 1048576
 
+/-- Escapes text for HTML. -/
+def html (s : String) : String :=
+  s.foldl (fun acc c => acc ++ match c with
+    | '<' => "&lt;" | '>' => "&gt;" | '&' => "&amp;" | '"' => "&quot;" | '\'' => "&#39;" | c => c.toString) ""
+
+/-- The editor's page: the browser app mounted with the document's name. -/
+def page (name : String) : String :=
+  "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">" ++
+  "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" ++
+  s!"<title>{html name} · Tandem</title><style>" ++
+  "body{margin:0;font:16px/1.5 system-ui,sans-serif;background:#fafaf7;color:#222}" ++
+  ".tandem{max-width:52rem;margin:0 auto;padding:1rem;display:flex;flex-direction:column;height:100vh;box-sizing:border-box}" ++
+  ".tandem header{display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap}.tandem h1{font-size:1.2rem;margin:0}" ++
+  ".tandem .doc{margin:0;font-weight:600}#tandem-status{margin:0 0 0 auto;color:#666;font-size:.9rem}" ++
+  "#tandem-status[data-offline=true]{color:#a40}" ++
+  "#tandem-editor{flex:1;margin-top:.75rem;padding:.75rem;font:15px/1.5 ui-monospace,monospace;border:1px solid #ccc;border-radius:6px;resize:none}" ++
+  "</style></head><body>" ++
+  "<div data-lasm-app data-lasm-flags=\"" ++ html ("{\"doc\":\"" ++ name ++ "\"}") ++ "\"></div>" ++
+  "<noscript><p>The editor needs JavaScript. The text is at <a href=\"/doc/" ++ html name ++ "/text\">/doc/" ++
+  html name ++ "/text</a>.</p></noscript>" ++
+  "<script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+
+def pageReply (name : String) : Lasm.Fetch.Response :=
+  { status := 200, body := (page name).toUTF8,
+    headers := #[("content-type", "text/html; charset=utf-8"), ("cache-control", "no-store"),
+      ("content-security-policy", "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; " ++
+        "connect-src 'self' ws: wss:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'"),
+      ("x-content-type-options", "nosniff")] }
+
 /-- One HTTP request. -/
 def serveRequest (env : Env) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
   match req.method, req.segments with
@@ -122,7 +153,10 @@ def serveRequest (env : Env) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Respo
   | "GET", ["doc", name, "text"] =>
     if !validName name then return textReply 404 "no such document\n"
     return textReply 200 (← textOf env name)
-  | "GET", [] => return textReply 200 "Tandem sync server\n"
+  | "GET", ["d", name] =>
+    if !validName name then return textReply 404 "no such document\n"
+    return pageReply name
+  | "GET", [] => return { status := 303, headers := #[("location", "/d/welcome")] }
   | _, _ => return textReply 404 "not found\n"
 
 /-- The handler, with errors answered (and logged) instead of thrown. -/

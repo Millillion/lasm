@@ -1,0 +1,84 @@
+name: Tandem nightly
+# Long campaigns for examples/tandem (the nightly tier of TESTING_STRATEGY.md):
+# the protocol fuzzer (test/fuzz.mjs) for 40 minutes against the Node build,
+# in four seeded runs of ten minutes (each seed printed; replay with --seed),
+# failing inputs uploaded; then 20,000 differential histories against Yjs, ten
+# rounds of the live simulation, and the protocol tests on the same build.
+# Runs when main changed examples/tandem in the last day, or on demand. Not a
+# release gate.
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tandem-nightly
+  cancel-in-progress: false
+env:
+  CI: '1'
+  BROWSER: 'none'
+jobs:
+  changed:
+    runs-on: ubuntu-24.04
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 50
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -n "$(git log --since='26 hours ago' --format=%H -- examples/tandem | head -1)" ]; then
+            echo run=true >> "$GITHUB_OUTPUT"
+          else
+            echo run=false >> "$GITHUB_OUTPUT"
+          fi
+  fuzz:
+    needs: changed
+    if: needs.changed.outputs.run == 'true'
+    name: 40 minutes of fuzzing
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: examples/tandem
+        run: npm ci --no-audit --no-fund
+      - name: npm run build (the server, the batch driver, the simulated clients)
+        working-directory: examples/tandem
+        run: |
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:batch
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:clients
+      - name: The fuzzer, four seeds of ten minutes
+        working-directory: examples/tandem
+        run: |
+          status=0
+          for i in 1 2 3 4; do node test/fuzz.mjs --seconds 600 || status=1; done
+          exit $status
+      - name: The differential test, the simulation and the protocol tests, after the campaign
+        working-directory: examples/tandem
+        run: |
+          node test/differential.mjs --histories 20000
+          node test/simulate.mjs --rounds 10 --name nightly
+          node test/protocol.mjs --name nightly
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: tandem-nightly-fuzz
+          path: examples/tandem/test-results/
+          retention-days: 14
+          if-no-files-found: ignore

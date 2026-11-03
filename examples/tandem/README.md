@@ -10,21 +10,21 @@ operation forever.
 
 ```sh
 npm install                 # Lasm (@lasm/cli), ws, and Yjs for the differential test
-npm run build               # the Node sync server (dist/server)
-npm start                   # http://localhost:3000 (PORT, HOST, DATABASE_PATH, TANDEM_POLL_SECONDS)
+npm run build               # the editor (dist/public/ui), then the Node sync server embedding it (dist/server)
+npm start                   # open http://localhost:3000 (PORT, HOST, DATABASE_PATH, TANDEM_POLL_SECONDS)
 npm test                    # the protocol tests against a fresh server
 npm run build:batch && npm run test:differential     # against Yjs (--histories N, --seed N)
 npm run build:clients && npm run test:simulate       # many replicas, an unreliable network, a killed server
 npm run test:fuzz           # the protocol fuzzer (--seconds N, --seed N)
+npx playwright install chromium && npm run test:e2e   # the editor in a browser (BROWSERS=chromium,firefox,webkit)
 npm run proofs              # check every theorem
 ```
 
 Requirements: Node.js 24 or newer and npm. Lasm downloads Lean 4.35.0 and its
 WebAssembly tools on the first build (cached); `node:sqlite` is part of Node.
 
-This is milestone 3 of 4: the pure core, its proofs, the sync server and its
-tests, on Node, Bun, Deno, Cloudflare Workers and Docker. The browser editor
-follows.
+Open `/d/<name>` for the document `<name>` (`/` opens `welcome`); open the
+same address in a second browser, or a second device, and type in both.
 
 ## The proofs
 
@@ -73,6 +73,32 @@ commits, and answers `ops <from> <to>` with the log from the cursor on. An
 operation is `i <counter> <replica> R <code point>` (a child of the root),
 `i <counter> <replica> <parent counter> <parent replica> L|R <code point>`,
 or `d <counter> <replica>`.
+
+## The editor
+
+The editor ([`Frontend/Ui.lean`](Frontend/Ui.lean), started by
+[`Editor.lean`](Editor.lean)) is a `Lasm.UI` app around one
+`Tandem.Replica`: the same Lean as the server's, compiled for the browser.
+Each `input` event of the text area carries its new value, and `Doc.edit`
+turns the change into operations (`edit_yields_text`: the replica then shows
+exactly that value). It sends what the server has not acknowledged, one sync
+at a time, and retries every two seconds when the network is down: the
+editor keeps working offline, and merges when it is back. Other people's
+operations arrive over the WebSocket, or by long-poll where the server has
+none (Workers). The replica is saved in `localStorage`, so closing the page
+while offline loses nothing, and each page load takes a new random replica
+number, so two tabs never create the same id. When other people's text
+arrives, the caret stays beside the character it was beside.
+
+The end-to-end tests ([`test/e2e`](test/e2e), Playwright 1.63.0) run in
+Chromium, Firefox and WebKit against the Node server, and in Chromium
+against Workers (where the editor long-polls), with no retries: typing and
+editing, two browsers at once (each sees the other live; both typing at one
+place are never interleaved), one browser offline while the other edits,
+then reconnecting, edits made offline surviving a closed page, the caret
+kept beside its text, and no script error or Content Security Policy
+violation. The page allows only Tandem's own script and WebAssembly
+(`script-src 'self' 'wasm-unsafe-eval'`) and cannot be framed.
 
 ## The sync server
 
@@ -179,7 +205,9 @@ more, lines of 20,000 tokens, binary junk, and valid messages mutated. Every
 request must be answered in time with a well-formed reply, the server must
 stay up, and afterwards every operation in every log must be valid, every
 text must load and an ordinary sync must work. On pull requests it runs for
-three minutes.
+three minutes, and nightly for forty ([tandem-nightly.yml](../../.github/workflows/tandem-nightly.yml),
+when Tandem changed that day, with 20,000 differential histories and ten
+rounds of the simulation); the seed is printed first and `--seed` replays a run.
 
 ## Layout
 
@@ -194,7 +222,8 @@ three minutes.
 | [`Tandem/Bulk.lean`](Tandem/Bulk.lean) | Applying a long log at once, by sorting |
 | [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | The SQL store, the HTTP and WebSocket glue, the SQLite bindings; the Node program |
 | [`ServerBun.lean`](ServerBun.lean), [`ServerDeno.lean`](ServerDeno.lean), [`ServerWorkers.lean`](ServerWorkers.lean), `Dockerfile`, `wrangler.toml` | The other platforms |
+| [`Frontend/Ui.lean`](Frontend/Ui.lean), [`Editor.lean`](Editor.lean) | The editor's browser app (Lasm.UI) |
 | [`Batch.lean`](Batch.lean), [`Clients.lean`](Clients.lean) | The differential test's driver; the simulation's clients |
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The proofs |
-| [`test/`](test) | The protocol tests, the differential test, the simulation, the fuzzer, the proof checks |
+| [`test/`](test) | The protocol tests, the differential test, the simulation, the fuzzer, the end-to-end tests, the proof checks |

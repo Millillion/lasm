@@ -25,8 +25,8 @@ inductive Kind where
   | none
 
 /-- Publishes the handler of `env`, with WebSockets of kind `kind`. -/
-def serve (env : Env) (hub : Hub) (kind : Kind) : IO Unit := do
-  let base ← Lasm.Fetch.jsFetchHandler (handler env)
+def serve (env : Env) (hub : Hub) (handle : Lasm.Fetch.Handler) (kind : Kind) : IO Unit := do
+  let base ← Lasm.Fetch.jsFetchHandler handle
   let counter ← IO.mkRef 0
   -- Bun: the connections' handlers, keyed by an id carried in `ws.data`.
   let bunSockets ← IO.mkRef (Std.HashMap.emptyWithCapacity 8 : Std.HashMap Nat (String × Nat))
