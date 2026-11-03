@@ -157,6 +157,16 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
   }
   function decode(bytes) { const r = new Reader(bytes); const value = read(r); if (!r.done()) throw failure('Malformed Lasm.JS value (trailing bytes)'); return value; }
   const modeOf = arg => (Number(arg) & 1) ? 'reference' : 'data';
+  // Inside a synchronous Lean callback Node's main thread waits for the Lean
+  // thread, so a JavaScript promise cannot settle until the callback returns:
+  // waiting for one there could never finish. Such a request fails at once.
+  const syncAwaitFailure = what => failure(`${what} inside a synchronous Lean callback (Lasm.JS.Function.ofSyncFn): `
+    + 'JavaScript promises settle only after the callback returns, while Node waits for it. Use an asynchronous callback (Function.ofFn)');
+  function awaited(result, flags, mode, what) {
+    if (!(flags & 2) || !result || typeof result.then !== 'function') return encode(result, mode);
+    if (syncBusy) { Promise.resolve(result).catch(() => {}); throw syncAwaitFailure(`Cannot await the promise returned by ${what}`); }
+    return Promise.resolve(result).then(value => encode(value, mode), error => { throw error?.leanUserError ? error : jsFailure(error); });
+  }
 
   // ---- events delivered to Lean's interop poller (op 209 long poll) ----
   // Lean starts no poller for callbacks alone (library/c/lasm_js.c): the thread
@@ -336,6 +346,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
       // with the result, through the interop thread, instead of replying with it.
       let into;
       if ((op === 205 || op === 214) && Number(arg) & 16) {
+        if (syncBusy) throw syncAwaitFailure('Cannot wait for a JavaScript call (an Async call, method or binding)');
         if (bytes.length < 8) throw failure('Malformed Lasm.JS request');
         into = bytes.readBigUInt64LE(0); bytes = bytes.subarray(8);
       }
@@ -364,14 +375,13 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
         const result = invoke(target, receiver, args, flags);
         const mode = modeOf(flags);
         if (into !== undefined) { settle(into, result, mode); return Buffer.alloc(0); }
-        if (flags & 2 && result && typeof result.then === 'function')
-          return Promise.resolve(result).then(value => encode(value, mode), error => { throw error?.leanUserError ? error : jsFailure(error); });
-        return encode(result, mode);
+        return awaited(result, flags, mode, flags & 8 ? `method ${JSON.stringify(String(receiver))}` : 'a call');
       }
       case 206: return Buffer.from(describe(lookup(id)));
       case 207: {
         // Resolve the Lean promise at `arg` (an IO.Promise pointer owned by the
         // interop thread) when this value settles; a non-promise settles now.
+        if (syncBusy) throw syncAwaitFailure('Cannot await a JavaScript value (Value.await, Value.toTask)');
         settle(arg, decode(bytes));
         return Buffer.alloc(0);
       }
@@ -424,9 +434,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
         const result = invoke(target, undefined, args, flags & 4);
         const mode = modeOf(flags);
         if (into !== undefined) { settle(into, result, mode); return Buffer.alloc(0); }
-        if (flags & 2 && result && typeof result.then === 'function')
-          return Promise.resolve(result).then(value => encode(value, mode), error => { throw error?.leanUserError ? error : jsFailure(error); });
-        return encode(result, mode);
+        return awaited(result, flags, mode, `binding ${JSON.stringify(module + (path ? ' ' + path : ''))}`);
       }
       default: throw failure(`Unsupported Lasm.JS operation ${op}`);
       }

@@ -39,12 +39,19 @@ def syncCases : List Case := [
   -- Work proxied to Node's main thread (pthread_create) inside a callback is
   -- run when the wait times out.
   ⟨.ok, fun _ => check (system { name := "sync: proxied work then a host call, timeouts", calls := #[1, 1], proxied := #[true, false], timeouts := true, spurious := true })⟩,
+  -- A callback that waits for a JavaScript promise: the request fails at once.
+  ⟨.ok, fun _ => check (system { name := "sync: a callback waits for a promise (fails at once), then host calls, timeouts", calls := #[1, 1], awaits := #[true, false], timeouts := true, spurious := true })⟩,
+  -- Work proxied to the callback thread makes a host call (the next depth's
+  -- slot) while the thread waits in one: served inline when the wait times out.
+  ⟨.ok, fun _ => check (system { name := "sync: proxied work makes a nested host call in 2 callbacks, timeouts", calls := #[1, 2], nested := #[true, true], timeouts := true, spurious := true })⟩,
   -- A generic Lean thread's slot, served by the asynchronous server.
   ⟨.ok, fun _ => check (system { name := "slot: 3 host calls, replies now or in a later task", sync := false, calls := #[], freeCalls := 3, asyncReplies := true, spurious := true })⟩,
   -- Mutations.
   ⟨.deadlock, fun _ => check (system { name := "mutant 0.3.0 (read after posting): no timeouts", calls := #[1], readAfterPost := true })⟩,
   ⟨.livelock, fun _ => check (system { name := "mutant 0.3.0 as released (read after posting, timeouts serve nothing)", calls := #[1], readAfterPost := true, timeoutServes := false, timeouts := true, spurious := true })⟩,
   ⟨.livelock, fun _ => check (system { name := "mutant before this change: proxied work never run while waiting", calls := #[1], proxied := #[true], mailboxInWait := false, timeouts := true, spurious := true })⟩,
+  ⟨.livelock, fun _ => check (system { name := "mutant before this change: a callback waits for a promise only the event loop settles", calls := #[0], awaits := #[true], awaitFails := false, timeouts := true, spurious := true })⟩,
+  ⟨.livelock, fun _ => check (system { name := "mutant before this change: inline serving ignores the next-depth slot", calls := #[1], nested := #[true], serveNested := false, timeouts := true, spurious := true })⟩,
   ⟨.deadlock, fun _ => check (system { name := "mutant: host calls do not ring the doorbell", calls := #[1], doorbell := false })⟩,
   ⟨.invariant, fun _ => check (system { name := "mutant: the host forgets the sequence it served", calls := #[1, 1], forgetServed := true, timeouts := true })⟩
 ]
@@ -66,6 +73,7 @@ def largeCases : List Case := [
   ⟨.ok, fun _ => check (Sync.system { name := "sync (large): callbacks with 3, 0, 3, 2, 1, 3 host calls, spurious wake-ups, timeouts", calls := #[3, 0, 3, 2, 1, 3], spurious := true, timeouts := true })⟩,
   ⟨.ok, fun _ => check (Sync.system { name := "sync (large): 10 callbacks with 1 host call", calls := #[1, 1, 1, 1, 1, 1, 1, 1, 1, 1] })⟩,
   ⟨.ok, fun _ => check (Sync.system { name := "sync (large): proxied work in every callback, host calls 2, 1, 2, 0, 3", calls := #[2, 1, 2, 0, 3], proxied := #[true, true, true, true, true], spurious := true, timeouts := true })⟩,
+  ⟨.ok, fun _ => check (Sync.system { name := "sync (large): awaits and nested host calls in 5 callbacks with 2, 1, 2, 1, 3 host calls", calls := #[2, 1, 2, 1, 3], awaits := #[true, false, true, true, false], nested := #[true, true, false, true, true], proxied := #[false, true, false, false, true], spurious := true, timeouts := true })⟩,
   ⟨.ok, fun _ => check (Sync.system { name := "slot (large): 30 host calls, replies now or later", sync := false, calls := #[], freeCalls := 30, asyncReplies := true, spurious := true })⟩,
   ⟨.ok, fun _ => check (Poller.system { name := "poller (large): 4 calls, two awaits, two async requests, waitForever", script := #[.start, .mkFn, .await, .async, .async, .await, .park], jsCalls := 4, rearms := 3 })⟩,
   ⟨.ok, fun _ => check (Poller.system { name := "poller (large): 4 calls, two awaits, two async requests, no waitForever", script := #[.start, .mkFn, .await, .async, .await, .async, .waitCalls], jsCalls := 4, rearms := 3 })⟩
