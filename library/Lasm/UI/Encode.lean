@@ -22,7 +22,9 @@ order) followed by the ops.
     attr    0 name value                    setAttribute
             1 name value | 2 name | 3 name  property: a string, false, true
             4 name value                    style.setProperty
-            5 event decoderId flags         listener; flags: 1 preventDefault, 2 stopPropagation
+            5 event decoderId               listener (its handler decides
+                                            preventDefault and stopPropagation
+                                            for each event, in Lean)
     attrop  attr, or 8 name | 9 name | 10 name | 11 event
                                             remove an attribute, property, style, listener
 -/
@@ -101,8 +103,6 @@ def decoder (e : Enc) (paths : List Path) : Enc × Nat :=
     let d := paths.foldl (init := d) fun d p => p.foldl (init := pushVar d p.length) pushStr
     ({ e with tables := t, defs := d }, i)
 
-def flags (l : Listener) : Nat := (if l.preventDefault then 1 else 0) + (if l.stopPropagation then 2 else 0)
-
 /-- An attribute slot set to a value (`attr` above). -/
 def setAttr (e : Enc) (k : AttrKey) (v : AttrVal) : Enc :=
   match k, v with
@@ -113,7 +113,7 @@ def setAttr (e : Enc) (k : AttrKey) (v : AttrVal) : Enc :=
   | .style n, .str s => (e.byte 4).name n |>.value s
   | .on ev, .listener l =>
     let (e, d) := e.decoder l.paths
-    ((e.byte 5).name ev).var d |>.var (flags l)
+    ((e.byte 5).name ev).var d
   -- slots and values never mix otherwise (`Attr.key`/`Attr.val`); remove the slot
   | .attr n, _ => (e.byte 8).name n
   | .prop n, _ => (e.byte 9).name n
@@ -129,7 +129,7 @@ def attr (e : Enc) : Attr Msg → Enc
   | .style n s => (e.byte 4).name n |>.value s
   | .on l _ =>
     let (e, d) := e.decoder l.paths
-    ((e.byte 5).name l.event).var d |>.var (flags l)
+    ((e.byte 5).name l.event).var d
 
 def attrOp (e : Enc) : AttrOp → Enc
   | .set k v => e.setAttr k v

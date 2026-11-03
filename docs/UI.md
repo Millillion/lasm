@@ -179,15 +179,53 @@ def onCanvasClick : Attr Msg :=
 
 `Decoder` is an `Applicative`: `Decoder.field path convert`, `string`, `bool`,
 `float`, `int`, `value` read a path; `targetValue`, `targetChecked`, `key`,
-`ctrlKey`, `shiftKey`, `altKey`, `metaKey`, `clientX`, `clientY`, `offsetX`,
+`ctrlKey`, `shiftKey`, `altKey`, `metaKey`, `isComposing`, `clientX`, `clientY`, `offsetX`,
 `offsetY`, `button`, `deltaY`, `timeStamp`, `dataset name` are ready-made;
 `map`, `map2`, `filter`, `filterMap`, `succeed`, `fail` combine them. A path
 that starts with `currentTarget` reads the element whose handler runs.
 
-`preventDefaultOn` and `stopPropagationOn` (or `Attr.onWith … (preventDefault
-:= true)`) set the options; the browser applies them before Lean runs, since a
-decision made in Lean would come too late. `onSubmit` always prevents the
-page load.
+### Preventing the default and stopping propagation
+
+The applier calls Lean synchronously from its DOM listener, so a handler's
+decision reaches the browser while the event is still being dispatched. Each
+handler decides, for each event, whether to call `event.preventDefault()` and
+`event.stopPropagation()`:
+
+| Function | Decoder | Decides |
+| --- | --- | --- |
+| `on event d` | `Decoder Msg` | nothing: the default happens, the event propagates |
+| `preventDefaultOn event d` | `Decoder (Msg × Bool)` | `true` prevents the default |
+| `stopPropagationOn event d` | `Decoder (Msg × Bool)` | `true` stops propagation |
+| `custom event d` | `Decoder (Handled Msg)` | both (`{ message, preventDefault, stopPropagation }`, each `false` by default) |
+
+```lean
+-- A chat box: Enter sends and inserts no newline; Shift+Enter inserts one;
+-- Enter that confirms an IME composition (Japanese, Chinese, Korean input)
+-- and every other key type as usual.
+def onSend : Attr Msg :=
+  preventDefaultOn "keydown" (Decoder.map2 Prod.mk Decoder.key (Decoder.map2 Prod.mk Decoder.shiftKey Decoder.isComposing) |>.filterMap fun
+    | ("Enter", false, false) => some (.send, true)
+    | _ => none)
+
+-- A click on a row's delete button does not also select the row.
+def onDelete (id : Nat) : Attr Msg :=
+  stopPropagationOn "click" (.succeed (.delete id, true))
+```
+
+A handler whose decoder gives no message (`filterMap` returning `none`, a
+field of the wrong type) leaves the event alone: nothing is prevented or
+stopped. Lean runs the handlers on the event's path innermost first; every
+handler of one element runs, and after an element whose handler stops
+propagation the enclosing elements' handlers do not run. `onSubmit` always
+prevents the page load; the other shorthands (`onClick`, `onInput`, `onEnter`,
+`onEscape`, …) never prevent or stop anything. `Attr.onWith event d` is `on`;
+`Attr.custom` is `custom`.
+
+The four functions are modeled on Elm's `Html.Events` (`on`, `preventDefaultOn`,
+`stopPropagationOn`, `custom`; Elm is BSD-3-licensed, and only the idea is
+used, no code). Lasm extends the same pattern to window and document
+subscriptions (`Subs.preventDefaultOn .document "keydown" …`, below), which Elm
+does not offer.
 
 Several handlers for the same event on one element all run, in order, when
 they read the same fields (as `onEnter` and `onEscape` on one input do);
@@ -269,7 +307,8 @@ calls the latest handlers.
 | --- | --- |
 | `Subs.every ms f` | a timer; `f` gets `Date.now()` |
 | `Subs.onAnimationFrame f` | every frame, with its timestamp |
-| `Subs.onWindow event decoder`, `Subs.onDocument event decoder` | any window or document event |
+| `Subs.on .window event decoder`, `Subs.on .document event decoder` | any window or document event |
+| `Subs.preventDefaultOn target event d`, `Subs.stopPropagationOn target event d`, `Subs.custom target event d` | window or document events whose handler decides, per event, as for elements |
 | `Subs.onKeyDown d`, `onKeyUp`, `onMouseMove`, `onMouseUp`, `onClick` | document events |
 | `Subs.onResize f` | window size (`innerWidth`, `innerHeight`) |
 | `Subs.onVisibilityChange f` | `document.visibilityState` |
@@ -282,6 +321,21 @@ def subscriptions (m : Model) : Subs Msg :=
     if m.running then Subs.every 1000 .tick else .none,
     Subs.onKeyDown (Decoder.key.map .key) ]
 ```
+
+Window and document subscriptions decide like element handlers. Ctrl+S saves
+instead of opening the browser's dialog, while every other key, typing in an
+input included, is left alone:
+
+```lean
+def saveKey : Subs Msg :=
+  Subs.preventDefaultOn .document "keydown" (Decoder.map2 Prod.mk Decoder.key Decoder.ctrlKey |>.filterMap fun
+    | ("s", true) => some (.save, true)
+    | _ => none)
+```
+
+Subscriptions to the same event with the same decoder fields share one
+listener, and all of their handlers run; stopping propagation on `document`
+keeps the event from `window`, not from other listeners on `document`.
 
 ## URLs and routing
 
@@ -489,12 +543,12 @@ Modules (all in `import Lasm.UI` except the DOM model, `import Lasm.UI.Model`, a
 
 | Module | Contents |
 | --- | --- |
-| `Lasm.UI.Html` | `Html`, `Attr`, `AttrKey`, `AttrVal`, `Listener`, `Decoder`, `EvVal`, `PropVal`, `Ns`, `Html.keyed`, `Html.map` |
-| `Lasm.UI.Elements` | the function DSL: `text`, `node`, `nodeNS`, `keyed`, `empty`, every HTML element (`div`, `span`, `a`, `button`, `input`, `ul`, `li`, `table`, … ; `main_`, `section_`, `map_`, `var_`, `template_`, `slot_`, `object_`, `sub_`), attributes (`attr`, `prop`, `boolProp`, `stringProp`, `style`, `data`, `aria`, `class_`, `classList`, `id_`, `type_`, `for_`, `max_`, `min_`, `value`, `checked`, `selected`, `disabled`, `hidden`, `readonly`, `required`, `multiple`, `autofocus`, `tabindex`, `colspan`, `rowspan`, `width`, `height`, `title`, `placeholder`, `href`, `src`, `alt`, `name`, `target`, `rel`, …), events (`on`, `preventDefaultOn`, `stopPropagationOn`, `onClick`, `onDoubleClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseOver`, `onMouseOut`, `onFocus`, `onBlur`, `onInput`, `onChange`, `onCheck`, `onSubmit`, `onKeyDown`, `onKeyUp`, `onEnter`, `onEscape`), `Svg.*` (elements and `viewBox`, `d`, `fill`, `stroke`, `strokeWidth`, `cx`, `cy`, `r`, `x`, `y`, `points`, `transform`, …), `htmlTags`, `voidTags`, `Svg.tags` |
+| `Lasm.UI.Html` | `Html`, `Attr` (`Attr.onWith`, `Attr.custom`), `AttrKey`, `AttrVal`, `Listener`, `Handled`, `Decoder`, `EvVal`, `PropVal`, `Ns`, `Html.keyed`, `Html.map` |
+| `Lasm.UI.Elements` | the function DSL: `text`, `node`, `nodeNS`, `keyed`, `empty`, every HTML element (`div`, `span`, `a`, `button`, `input`, `ul`, `li`, `table`, … ; `main_`, `section_`, `map_`, `var_`, `template_`, `slot_`, `object_`, `sub_`), attributes (`attr`, `prop`, `boolProp`, `stringProp`, `style`, `data`, `aria`, `class_`, `classList`, `id_`, `type_`, `for_`, `max_`, `min_`, `value`, `checked`, `selected`, `disabled`, `hidden`, `readonly`, `required`, `multiple`, `autofocus`, `tabindex`, `colspan`, `rowspan`, `width`, `height`, `title`, `placeholder`, `href`, `src`, `alt`, `name`, `target`, `rel`, …), events (`on`, `preventDefaultOn`, `stopPropagationOn`, `custom`, `onClick`, `onDoubleClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseOver`, `onMouseOut`, `onFocus`, `onBlur`, `onInput`, `onChange`, `onCheck`, `onSubmit`, `onKeyDown`, `onKeyUp`, `onEnter`, `onEscape`), `Svg.*` (elements and `viewBox`, `d`, `fill`, `stroke`, `strokeWidth`, `cx`, `cy`, `r`, `x`, `y`, `points`, `transform`, …), `htmlTags`, `voidTags`, `Svg.tags` |
 | `Lasm.UI.Syntax` | `html!` |
 | `Lasm.UI.App` | `App`, `App.sandbox`, `App.element`, `App.run` |
 | `Lasm.UI.Cmd` | `Cmd`, `Effect`, `Http.Request`, `Http.Response`, `Http.Error`, `Http.get`, `Http.post`, `Http.request`, `Storage` |
-| `Lasm.UI.Subs` | `Subs`, `SubSpec`, `SubItem` |
+| `Lasm.UI.Subs` | `Subs`, `Subs.on`, `Subs.preventDefaultOn`, `Subs.stopPropagationOn`, `Subs.custom`, `Target`, `SubSpec`, `SubItem`, and the shorthands (`Subs.every`, `onAnimationFrame`, `onKeyDown`, `onKeyUp`, `onMouseMove`, `onMouseUp`, `onClick`, `onResize`, `onVisibilityChange`, `port`) |
 | `Lasm.UI.Url` | `Url`, `Url.parse`, `parseRelative`, `segments`, `params`, `param?`, `origin`, `pathAndQuery`, `Url.build`, `percentEncode`, `percentDecode` |
 | `Lasm.UI.Render` | `render`, `renderPage` |
 | `Lasm.UI.Diff` | `Live`, `Op`, `AttrOp`, `create`, `diff`, `diffNode`, `diffChildren`, `diffAttrs`, `mountOps` |
