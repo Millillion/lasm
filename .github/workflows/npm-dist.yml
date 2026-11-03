@@ -25,7 +25,7 @@ on:
     inputs:
       base-release: { required: true, type: string }
       base-sha256: { required: true, type: string }
-      node: { type: string, default: '26.12.1' }
+      node: { type: string, default: '26.13.0' }
       version: { type: string, default: '' }
       license: { type: string, default: '' }
       overlay-source: { type: boolean, default: false }
@@ -43,7 +43,7 @@ on:
       node:
         description: Node version for packing and the consumers
         type: string
-        default: 26.12.1
+        default: 26.13.0
       version:
         description: Version of the @lasm/cli package (default <candidate version>.npm.1)
         type: string

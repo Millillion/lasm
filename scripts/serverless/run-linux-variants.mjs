@@ -20,7 +20,7 @@ import { checkContract, waitFor } from './http-contract.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const args = process.argv.slice(2);
 const flag = name => { const i = args.indexOf(name); if (i < 0) return undefined; const [, value] = args.splice(i, 2); return value; };
-const images = (flag('--images') ?? 'node:24.22.1-alpine,node:26.12.1-alpine').split(',');
+const images = (flag('--images') ?? 'node:24.22.2-alpine,node:26.13.0-alpine').split(',');
 const runtime = flag('--runtime');
 const [appsArg, resultArg] = args;
 assert.ok(appsArg && resultArg, 'Usage: node run-linux-variants.mjs WORK/apps.json RESULT.json [--images a,b] [--runtime runsc]');

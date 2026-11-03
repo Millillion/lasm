@@ -21,16 +21,17 @@ jobs:
       version: ${{ steps.selected.outputs.version }}
       sha256: ${{ steps.selected.outputs.sha256 }}
       release: ${{ steps.selected.outputs.release }}
+      node: ${{ steps.selected.outputs.node }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.12.1
+          node-version: 26.13.0
           package-manager-cache: false
       - name: Select the reviewed immutable candidate
         id: selected
         run: |
-          node --input-type=module -e "import fs from 'node:fs';import assert from 'node:assert/strict';const c=JSON.parse(fs.readFileSync('scripts/ci/node-robustness-candidate.json'));assert.match(c.version,/^0\.1\.0-experimental\.\d+$/);assert.match(c.sha256,/^[a-f0-9]{64}$/);assert.match(c.release,/^node-(?:package|linux-candidate)-\d+$/);for(const k of ['active','version','sha256','release'])fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+c[k]+'\n');console.log(JSON.stringify(c,null,2));"
+          node --input-type=module -e "import fs from 'node:fs';import assert from 'node:assert/strict';const c=JSON.parse(fs.readFileSync('scripts/ci/node-robustness-candidate.json'));assert.match(c.version,/^0\.1\.0-experimental\.\d+$/);assert.match(c.sha256,/^[a-f0-9]{64}$/);assert.match(c.release,/^node-(?:package|linux-candidate)-\d+$/);assert.match(c.node,/^\d+\.\d+\.\d+$/);for(const k of ['active','version','sha256','release','node'])fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+c[k]+'\n');console.log(JSON.stringify(c,null,2));"
   faults:
     if: needs.select.outputs.active == 'true'
     needs: select
@@ -57,6 +58,7 @@ jobs:
       sha256: ${{ needs.select.outputs.sha256 }}
       candidate-release: ${{ needs.select.outputs.release }}
       candidate-version: ${{ needs.select.outputs.version }}
+      node-version: ${{ needs.select.outputs.node }}
   linux-arm64:
     if: needs.select.outputs.active == 'true'
     needs: [select, input, faults]
@@ -68,6 +70,7 @@ jobs:
       sha256: ${{ needs.select.outputs.sha256 }}
       candidate-release: ${{ needs.select.outputs.release }}
       candidate-version: ${{ needs.select.outputs.version }}
+      node-version: ${{ needs.select.outputs.node }}
   darwin-x64:
     if: needs.select.outputs.active == 'true'
     needs: [select, input, faults]
@@ -79,6 +82,7 @@ jobs:
       sha256: ${{ needs.select.outputs.sha256 }}
       candidate-release: ${{ needs.select.outputs.release }}
       candidate-version: ${{ needs.select.outputs.version }}
+      node-version: ${{ needs.select.outputs.node }}
   darwin-arm64:
     if: needs.select.outputs.active == 'true'
     needs: [select, input, faults]
@@ -90,6 +94,7 @@ jobs:
       sha256: ${{ needs.select.outputs.sha256 }}
       candidate-release: ${{ needs.select.outputs.release }}
       candidate-version: ${{ needs.select.outputs.version }}
+      node-version: ${{ needs.select.outputs.node }}
   windows-x64:
     if: needs.select.outputs.active == 'true'
     needs: [select, input, faults]
@@ -101,6 +106,7 @@ jobs:
       sha256: ${{ needs.select.outputs.sha256 }}
       candidate-release: ${{ needs.select.outputs.release }}
       candidate-version: ${{ needs.select.outputs.version }}
+      node-version: ${{ needs.select.outputs.node }}
   report:
     if: always() && needs.select.outputs.active == 'true'
     needs: [select, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64]
@@ -113,7 +119,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.12.1
+          node-version: 26.13.0
           package-manager-cache: false
       - name: Preserve all completed attempts and evaluate the multi-day gate
         env:
