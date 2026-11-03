@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { autoSetupEditor, editorToolchainName, findElan, setupEditor } from '../src/editor.mjs';
+import { autoSetupEditor, editorLean, editorToolchainName, findElan, setupEditor } from '../src/editor.mjs';
+import { lakeConfigurationKey } from '../src/application-sources.mjs';
 
 const scratch = () => mkdtempSync(join(tmpdir(), 'lasm-editor-'));
 
@@ -70,4 +71,72 @@ test('the cached-only mode (lasm init) never downloads or assembles tools', asyn
       error => error.code === 'ERR_LASM_NOT_CACHED');
     assert.equal(produced, false);
   } finally { rmSync(cache, { recursive: true, force: true }); }
+});
+
+// Issue #72: a project whose Lake packages have C code (UnicodeBasic's
+// precompileModules) needs the C tier in the editor, as `lasm build` uses.
+test('lasm editor picks the C tier exactly when the Lake packages have C code', async () => {
+  const plain = { distribution: 'tiers', tier: 'extended', executionPrefix: '/derived/plain', version: '4.35.0' };
+  const withC = { distribution: 'tiers', tier: 'native', cCompiler: { multiarch: null }, executionPrefix: '/derived/c', version: '4.35.0' };
+  const calls = [];
+  const provision = async (project, options) => { calls.push(options.native === true); return options.native ? withC : plain; };
+  const unicode = [{ package: 'UnicodeBasic', reasons: ['precompileModules'] }];
+  assert.deepEqual(await editorLean('/app', { provision, detect: () => unicode, note: () => {} }), { lean: withC, native: unicode });
+  assert.deepEqual(calls, [false, true]);
+  calls.length = 0;
+  assert.deepEqual(await editorLean('/app', { provision, detect: () => [], note: () => {} }), { lean: plain, native: [] });
+  assert.deepEqual(calls, [false]);
+  // A Lake failure keeps the previous behaviour (the plain toolchain), with a note.
+  const notes = [];
+  const failing = () => { throw new Error('could not load the Lake workspace\ndetails'); };
+  assert.deepEqual(await editorLean('/app', { provision, detect: failing, note: line => notes.push(line) }), { lean: plain, native: [] });
+  assert.match(notes[0], /could not check this project's Lake packages for C code \(could not load the Lake workspace\)/);
+  // A full Lean distribution already has its compiler and headers: no check.
+  const full = { distribution: 'full', executionPrefix: '/derived/full', version: '4.35.0' };
+  assert.deepEqual(await editorLean('/app', { provision: async () => full, detect: () => assert.fail('no check'), note: () => {} }), { lean: full, native: [] });
+});
+
+test('the C-tier toolchain has its own elan name, and reruns switch tiers both ways', () => {
+  const root = scratch();
+  try {
+    const elanHome = join(root, 'elan'), project = join(root, 'app');
+    const plain = join(root, 'derived', 'd891a3a74b5d0000'), withC = join(root, 'derived', 'f020ec8178870000');
+    mkdirSync(join(elanHome, 'bin'), { recursive: true }); mkdirSync(project);
+    writeFileSync(join(elanHome, 'bin', process.platform === 'win32' ? 'elan.exe' : 'elan'), '');
+    const env = { ELAN_HOME: elanHome, PATH: '' }, overrides = [], lines = [];
+    const run = (file, args) => {
+      if (args[0] === 'toolchain') mkdirSync(join(elanHome, 'toolchains', args[2]), { recursive: true });
+      else overrides.push(args[2]);
+    };
+    const native = [{ package: 'UnicodeBasic', reasons: ['precompileModules'] }, { package: 'leancurl', reasons: ['extern_lib'] }];
+    const setup = (prefix, packages) => setupEditor({ project, prefix, version: '4.35.0', native: packages, env, run, log: line => lines.push(line) });
+    assert.equal(setup(plain, []).status, 'linked');
+    assert.doesNotMatch(lines.at(-1), /C compiler/);
+    // The project gains C code: the C tier, under a distinct toolchain name.
+    assert.equal(setup(withC, native).status, 'linked');
+    assert.notEqual(overrides[1], overrides[0]);
+    assert.equal(overrides[1], editorToolchainName('4.35.0', withC));
+    assert.match(lines.at(-1), /Lean 4\.35\.0 with its C compiler and headers \(for the packages with C code: UnicodeBasic, leancurl\) as the elan toolchain lasm-4\.35\.0-f020ec817887 /);
+    assert.equal(setup(withC, native).status, 'current');
+    // It loses its C code: back to the plain toolchain.
+    assert.equal(setup(plain, []).status, 'linked');
+    assert.deepEqual(overrides, [editorToolchainName('4.35.0', plain), editorToolchainName('4.35.0', withC), editorToolchainName('4.35.0', plain)]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('the workspace-wide Lake key (no source) follows the packages\' configuration', () => {
+  const root = scratch();
+  try {
+    const lean = { identity: 'lean' };
+    mkdirSync(join(root, 'dep'));
+    writeFileSync(join(root, 'lakefile.toml'), 'name = "app"\n[[require]]\nname = "dep"\npath = "dep"\n');
+    writeFileSync(join(root, 'lake-manifest.json'), JSON.stringify({ packages: [{ type: 'path', name: 'dep', dir: 'dep' }] }));
+    writeFileSync(join(root, 'dep', 'lakefile.toml'), 'name = "dep"\n');
+    writeFileSync(join(root, 'Main.lean'), 'import Dep\n');
+    const before = lakeConfigurationKey(root, undefined, lean);
+    assert.equal(typeof before, 'string');
+    assert.notEqual(before, lakeConfigurationKey(root, join(root, 'Main.lean'), lean));
+    writeFileSync(join(root, 'dep', 'lakefile.toml'), 'name = "dep"\nprecompileModules = true\n');
+    assert.notEqual(lakeConfigurationKey(root, undefined, lean), before);
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });

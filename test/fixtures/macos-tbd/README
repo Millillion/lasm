@@ -1,0 +1,3 @@
+Synthetic text stubs (written by hand for test/macos-tbd.test.mjs; not Apple's
+files) in the TAPI formats of the macOS SDK's libSystem.tbd, each listing
+targets that Lean 4.35.0's ld64.lld does not know (issue #73).
