@@ -102,7 +102,11 @@ const TARGETS = {
   // Optimization differential: the same targets, unoptimized.
   'node-O0': { build: [], variant: 'O0', buildEnv: unoptimized, run: dir => [process.execPath, [join(dir, 'dist/main.mjs')]], fs: true },
   'wasi-O0': { build: ['--target', 'wasi'], variant: 'O0', buildEnv: unoptimized, run: dir => [wasmtime, ['run', '--dir', '.', ...wasmtimeEnv, join(dir, 'wasi/main.wasm')]], fs: true, out: 'wasi' },
-  'deno-O0': { build: ['--target', 'deno'], variant: 'O0', buildEnv: unoptimized, run: dir => [deno, ['run', '-A', '--no-lock', join(dir, 'deno/main.mjs')]], fs: false, out: 'deno' },
+  // The edge -O0 targets run the program with `deep` cases of at most 1,000
+  // frames (program 'shallow'): clang -O0 keeps every local on the 1 MiB C
+  // stack, which 3,000 frames overflow (the instance stops: "memory access out of
+  // bounds"), a capacity limit of unoptimized code, not an optimizer difference.
+  'deno-O0': { build: ['--target', 'deno'], variant: 'O0', buildEnv: unoptimized, program: 'shallow', run: dir => [deno, ['run', '-A', '--no-lock', join(dir, 'deno/main.mjs')]], fs: false, out: 'deno' },
   // Engine differential: one edge output (deno/main.mjs is portable) on V8 and JavaScriptCore.
   'edge-node': { build: ['--target', 'deno'], run: dir => [process.execPath, [...nodeJspi, '--no-warnings', join(dir, 'deno/main.mjs')]], fs: false, out: 'deno' },
   'edge-bun': { build: ['--target', 'deno'], run: dir => [bun, [join(dir, 'deno/main.mjs')]], fs: false, out: 'deno' },
@@ -111,17 +115,20 @@ const TARGETS = {
   'edge-sm': { build: ['--target', 'deno'], run: dir => [sm, ['-m', join(here, 'sm-runner.mjs')], { LASM_SM_RUN: JSON.stringify({ program: join(dir, 'deno/lasm'), env: { LEAN_BACKTRACE: '0' }, jspi: true, exitFile: 'exit-status' }) }], exitFile: 'exit-status', fs: false, out: 'deno' },
   // The Bun target as users build it: bun/main.mjs (the portable entry) on Bun.
   bun: { build: ['--target', 'bun'], run: dir => [bun, [join(dir, 'bun/main.mjs')]], fs: false, out: 'bun' },
-  'bun-O0': { build: ['--target', 'bun'], variant: 'O0', buildEnv: unoptimized, run: dir => [bun, [join(dir, 'bun/main.mjs')]], fs: false, out: 'bun' },
+  'bun-O0': { build: ['--target', 'bun'], variant: 'O0', buildEnv: unoptimized, program: 'shallow', run: dir => [bun, [join(dir, 'bun/main.mjs')]], fs: false, out: 'bun' },
   // The browser target, mounted with the public API in a headless browser
   // (browser-runner.mjs). Its own subdirectory: it writes dist/, as node does.
   // A page has no exit status (zeroOrNot); Firefox and WebKit run without JSPI
-  // (noSleep: they get the program without IO.sleep).
+  // (program 'nosleep': the core program without IO.sleep).
   ...Object.fromEntries(['chromium', 'firefox', 'webkit'].map(browser => [`browser-${browser}`, {
-    build: ['--target', 'browser', '--suspend', 'jspi'], variant: 'browser', out: 'browser', fs: false, zeroOrNot: true, noSleep: browser !== 'chromium',
+    build: ['--target', 'browser', '--suspend', 'jspi'], variant: 'browser', out: 'browser', fs: false, zeroOrNot: true, noEnv: true, ...(browser !== 'chromium' ? { program: 'nosleep' } : {}),
     run: dir => [process.execPath, [join(here, 'browser-runner.mjs'), '--browser', browser, ...(playwrightDir ? ['--playwright', playwrightDir] : []), '--dist', join(dir, 'dist'), '--result', 'browser-result.json']],
   }])),
 };
 for (const t of targets) if (!TARGETS[t]) { console.error(`unknown target ${t}`); process.exit(2); }
+// Variants of the core program for targets that name one (`program`): each is
+// built natively and compared on its own, from the same seed and indices.
+const PROGRAMS = { nosleep: g.withoutSleep, shallow: list => g.withDeepAtMost(list, 1000) };
 // A page's outcome: main returned 0, or it did not (browser-runner.mjs).
 const outcomeOf = code => code === 0 || code === 'timeout' ? code : 'non-zero';
 writeFileSync(join(work, 'node-wasi-run.mjs'), `const emit = process.emitWarning;
@@ -322,14 +329,14 @@ const save = () => writeFileSync(summaryFile, JSON.stringify(summary, null, 2) +
 const startedAt = Date.now();
 
 async function campaignProgram(seed, kind) {
-  // core: every target that has no sleep restriction; fs: the targets with a
-  // file system; sync: the core program without IO.sleep, for the noSleep targets.
+  // core: the targets without a `program`; fs: the targets with a file system;
+  // a PROGRAMS name: the core program transformed, for the targets that name it.
   const fsProgram = kind === 'fs';
-  const tlist = targets.filter(t => fsProgram ? TARGETS[t].fs : kind === 'sync' ? TARGETS[t].noSleep : !TARGETS[t].noSleep);
+  const tlist = targets.filter(t => fsProgram ? TARGETS[t].fs : (TARGETS[t].program ?? 'core') === kind);
   if (!tlist.length) return;
   const list = fsProgram
     ? g.genProgram(seed, { cases: nFsCases, kinds: ['fs', 'io'] })
-    : kind === 'sync' ? g.withoutSleep(g.genProgram(seed, { cases: nCases })) : g.genProgram(seed, { cases: nCases });
+    : (PROGRAMS[kind] ?? (x => x))(g.genProgram(seed, { cases: nCases }));
   const ending = g.ENDINGS[seed % g.ENDINGS.length];
   const dir = join(work, `s${seed}-${kind}`);
   const ev = await evaluate(dir, list, tlist, { ending });
@@ -404,12 +411,23 @@ async function regressionRun() {
   const dir = join(work, 'regressions');
   mkdirSync(dir, { recursive: true });
   const fsNames = regs.filter(r => /IO\.FS|System\.FilePath/.test(r.text)).map(r => r.name);
+  // Which regressions a target replays: the file-system ones only where there
+  // is a file system; none that sleep where IO.sleep cannot wait (program
+  // 'nosleep'), none that read the environment where there is none (noEnv).
+  // Targets that replay the same set share one program.
+  const fits = (t, r) => !(/IO\.sleep/.test(r.text) && TARGETS[t].program === 'nosleep') && !(/IO\.getEnv/.test(r.text) && TARGETS[t].noEnv);
+  const groups = [];
   for (const fsGroup of [false, true]) {
-    const group = regs.filter(r => fsNames.includes(r.name) === fsGroup);
-    if (!group.length) continue;
-    const sleeps = group.some(r => /IO\.sleep/.test(r.text));
-    const tlist = targets.filter(t => (!fsGroup || TARGETS[t].fs) && !(sleeps && TARGETS[t].noSleep));
-    const d = join(dir, fsGroup ? 'fs' : 'core');
+    const all = regs.filter(r => fsNames.includes(r.name) === fsGroup);
+    const sets = new Map();
+    for (const t of targets.filter(t => !fsGroup || TARGETS[t].fs)) {
+      const names = all.filter(r => fits(t, r)).map(r => r.name).join(',');
+      if (names) sets.set(names, [...(sets.get(names) ?? []), t]);
+    }
+    [...sets].forEach(([names, tlist], n) => groups.push({ name: (fsGroup ? 'fs' : 'core') + (n ? `-${n + 1}` : ''), group: all.filter(r => names.split(',').includes(r.name)), tlist }));
+  }
+  for (const { name, group, tlist } of groups) {
+    const d = join(dir, name);
     mkdirSync(d, { recursive: true });
     const src = `${g.PREAMBLE}\n${group.map(r => r.text).join('\n')}\ndef main : IO UInt32 := do\n${group.map(r => `  IO.eprintln "@${r.name}"\n  ${r.name}`).join('\n')}\n  IO.eprintln "done"\n  return 0\n`;
     writeFileSync(join(d, 'Main.lean'), src);
@@ -440,7 +458,7 @@ try {
     const seed = seed0 + i;
     await campaignProgram(seed, 'core');
     if (nFsCases > 0) await campaignProgram(seed, 'fs');
-    await campaignProgram(seed, 'sync');
+    for (const kind of Object.keys(PROGRAMS)) await campaignProgram(seed, kind);
   }
 } catch (e) {
   summary.harnessErrors.push({ error: String(e?.stack ?? e) });

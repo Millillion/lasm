@@ -681,6 +681,12 @@ export function withoutSleep(list) {
   const strip = ss => ss.filter(st => st.s !== 'sleep').map(st => ({ ...st, ...(st.b ? { b: strip(st.b) } : {}), ...(st.c ? { c: strip(st.c) } : {}) }));
   return list.map(item => item.c.s ? { ...item, c: { ...item.c, s: strip(item.c.s) } } : item);
 }
+// The same program with every `deep` case at most `n` frames deep, for targets
+// whose stack holds fewer frames than the generator's bound (unoptimized edge
+// builds: run.mjs).
+export function withDeepAtMost(list, n) {
+  return list.map(item => item.c.kind === 'deep' && item.c.n > n ? { ...item, c: { ...item.c, n } } : item);
+}
 // How main ends: an exit status, an uncaught IO error, or IO.Process.exit.
 export const ENDINGS = ['  return 0', '  return 0', '  return 1', '  return 255', '  throw (IO.userError "uncaught: the end ✓")', '  IO.Process.exit 7'];
 export function renderProgram(list, { exit, ending } = {}) {

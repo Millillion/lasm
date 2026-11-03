@@ -4,7 +4,7 @@
 // (differential.yml), which builds them with native Lean.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { genProgram, renderProgram, genCase, renderCase, caseSize, shrinkCandidates, leanString, rng, withoutSleep } from '../scripts/differential/generate.mjs';
+import { genProgram, renderProgram, genCase, renderCase, caseSize, shrinkCandidates, leanString, rng, withoutSleep, withDeepAtMost } from '../scripts/differential/generate.mjs';
 
 test('the same seed renders the same program; another seed a different one', () => {
   const a = renderProgram(genProgram(7, { cases: 40 })), b = renderProgram(genProgram(7, { cases: 40 }));
@@ -58,4 +58,14 @@ test('withoutSleep drops every IO.sleep (nested bodies too) and keeps everything
   assert.doesNotMatch(after, /IO\.sleep/);
   assert.equal(after, before.split('\n').filter(line => !/^\s*IO\.sleep \d+$/.test(line)).join('\n'));
   assert.deepEqual(withoutSleep(list).map(x => x.index), list.map(x => x.index));
+});
+
+test('withDeepAtMost caps deep cases and leaves every other case as it is', () => {
+  const list = genProgram(4, { cases: 400 });
+  const capped = withDeepAtMost(list, 1000);
+  assert.ok(list.some(x => x.c.kind === 'deep' && x.c.n > 1000));
+  for (const [i, x] of capped.entries()) {
+    if (x.c.kind === 'deep') assert.equal(x.c.n, Math.min(list[i].c.n, 1000));
+    else assert.equal(x, list[i]);
+  }
 });
