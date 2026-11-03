@@ -236,7 +236,11 @@ async function devRelation({ lasm, target, out, project, build, cleanEdited, cle
     await new Promise(r => { const t = setTimeout(() => { try { process.kill(-child.pid, 'SIGKILL'); } catch {} r(); }, 15_000); child.once('close', () => { clearTimeout(t); r(); }); });
   }
   const reused = await build(directory);
-  if (rebuildStage.test(reused.text)) problems.push(`lasm build after lasm dev linked again instead of reusing dev's build: ${tail(reused.text, 6)}`);
+  // lasm dev builds an edge target's Node program link-only (no Node glue, a
+  // separate cache entry), so lasm build may link that Node output; it must
+  // reuse dev's edge program rather than link it again.
+  const relink = target === 'node' ? rebuildStage : /Linking the single-threaded|Linking for the browser/;
+  if (relink.test(reused.text)) problems.push(`lasm build after lasm dev linked again instead of reusing dev's build: ${tail(reused.text, 6)}`);
   problems.push(...await equivalent('after lasm dev vs a clean build', cleanEdited, reused.hashes, cleanDirectory, join(directory, out)));
   return problems;
 }
