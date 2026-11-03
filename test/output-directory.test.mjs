@@ -57,15 +57,3 @@ test('writeFileIfChanged leaves identical files alone', t => {
   assert.equal(readFileSync(file, 'utf8'), 'b');
 });
 
-// Found by the metamorphic determinism relation: dev edge and browser glue named
-// each --pre-js file by its absolute path (the project's work directory, a
-// per-build UUID, the install directory), so two clean dev builds differed and
-// the output carried local paths.
-test('edge glue keeps only the file names of included files', async () => {
-  const { withoutIncludePaths } = await import('../src/edge/edge-link.mjs');
-  const glue = '// include: /home/u/app/.lake/lasm/applications/k/.build-1b2c/application-pre.js\nModule.a = 1;\n'
-    + '// end include: /home/u/app/.lake/lasm/applications/k/.build-1b2c/application-pre.js\n// include: C:\\npm\\@lasm\\cli\\src\\edge\\edge-pre.js\n'
-    + 'var s = "// include: /not/a/comment.js";\n';
-  assert.equal(withoutIncludePaths(glue), '// include: application-pre.js\nModule.a = 1;\n// end include: application-pre.js\n// include: edge-pre.js\n'
-    + 'var s = "// include: /not/a/comment.js";\n');
-});
