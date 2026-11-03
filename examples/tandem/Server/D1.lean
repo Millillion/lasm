@@ -34,7 +34,7 @@ def «open» (name : String := "DB") : IO Sql := do
   let ensure : Async Value := do
     let db ← database name
     unless ← ready.get do
-      let stmts ← schema.toArray.mapM fun sql => statement db sql #[]
+      let stmts ← (schema.toArray.mapM fun sql => statement db sql #[] : IO (Array Value))
       let _ ← db.callMethodAwait "batch" #[.array (stmts.map (.ref · ""))] Data
       ready.set true
     return db
@@ -48,7 +48,9 @@ def «open» (name : String := "DB") : IO Sql := do
       let _ ← (← statement (← ensure) sql params).callMethodAwait "run" #[] Data
     batch := fun stmts => do
       let db ← ensure
-      let prepared ← stmts.mapM fun (sql, params) => statement db sql params
+      -- In `IO`, where the loop compiles to a loop: an `Async` loop of a
+      -- commit's thousands of statements would grow the JavaScript stack (#90).
+      let prepared ← (stmts.mapM fun (sql, params) => statement db sql params : IO (Array Value))
       let _ ← db.callMethodAwait "batch" #[.array (prepared.map (.ref · ""))] Data }
 
 end Tandem.Server.D1
