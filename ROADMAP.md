@@ -61,8 +61,8 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 ### Releases
 - [x] 0.3.6: two Vercel Edge fixes.
 - [x] 0.3.7: version bumped on main (PR #40), **not published**. Its release check failed on a timing-dependent stress fixture (fixed in PR #42), and the fixed commit doesn't change the version, so it can't release (as with 0.3.3).
-- [~] 0.3.8 (PR #45 merged; release checks running): everything in 0.3.7 (the WASI dev-build fix #34, and the fix for a hang when a synchronous JS callback makes the program's first async runtime request, #37), plus #26 and the #30 docs (PR #36).
-- [~] 0.3.9: #27, browser-style dot-segment resolution in `Request.path` on every platform, with a proof that `segments` never contains `.` or `..`.
+- [x] 0.3.8 (published 2026-11-02): everything in 0.3.7 (the WASI dev-build fix #34, and the fix for a hang when a synchronous JS callback makes the program's first async runtime request, #37), plus #26 and the #30 docs (PR #36).
+- [~] 0.3.9 (in progress, PR "Release 0.3.9"): #27, browser-style dot-segment resolution in `Request.path` on every platform, with a proof that `segments` never contains `.` or `..`; also #76 (a `://` in the query), #49 (dev build service `unref`) and #51 (Lasm.JS errors wrapped twice).
 - [ ] Move the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7).
 - [ ] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms (a stalled thread, or a visibility bug?).
 
