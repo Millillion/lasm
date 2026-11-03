@@ -154,17 +154,27 @@ function install() {
   function writeTraces() {
     const { mkdirSync, writeFileSync } = require('node:fs');
     const { join } = require('node:path');
-    let sync = null, slots = [];
+    let sync = null, slots = [], next = new Map();
     try { sync = globalThis[Symbol.for('lasm.js.sync')]?.() ?? null; } catch {}
-    try { slots = globalThis[Symbol.for('lasm.full.slots')]?.().slots.map(s => s.pointer) ?? []; } catch {}
+    try {
+      const listed = globalThis[Symbol.for('lasm.full.slots')]?.().slots ?? [];
+      slots = listed.map(s => s.pointer);
+      next = new Map(listed.map(s => [s.pointer, s.next ?? 0]));
+    } catch {}
+    // The synchronous-callback thread's next-depth slot (a host call made by
+    // work proxied to it while it waits) belongs to the sync trace: the model
+    // has it as seq1/ready1.
+    const nested = sync ? next.get(sync.slot) || 0 : 0;
     const count = Math.min(A.load(trace, 1), capacity);
     const names = { [OP.load]: 'load', [OP.store]: 'store', [OP.add]: 'add', [OP.notify]: 'notify' };
     mkdirSync(traceDir, { recursive: true });
     const summary = { pid: process.pid, events: count, overflow: A.load(trace, 2) === 1, sync, slots: [] };
     for (const pointer of slots) {
+      if (nested && pointer === nested) continue;
       const isSync = sync?.slot === pointer;
       const words = new Map([[pointer, 'seq'], [pointer + 4, 'ready']]);
       if (isSync) { words.set(sync.channel, 'state'); words.set(sync.channel + 4, 'bell'); }
+      if (isSync && nested) { words.set(nested, 'seq1'); words.set(nested + 4, 'ready1'); }
       const lines = [isSync ? 'slot sync' : 'slot generic'];
       let started = false, lean = new Set();
       for (let i = 0; i < count; i++) {

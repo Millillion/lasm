@@ -266,7 +266,10 @@ step one access to a shared word:
   `slot.sequence`, `Atomics.waitAsync`), the synchronous-callback channel
   (`state`, the doorbell; `sync_main` and `post` in `library/c/lasm_js.c`), and
   Node's main thread inside a synchronous callback (`syncFunction`,
-  `lasmFullServeSync`, work other threads proxy to the main thread). Waits
+  `lasmFullServeSync`, work other threads proxy to the main thread), host
+  calls made by work proxied to the callback thread while it waits in one (its
+  next-depth slot, linked from the first and served inline too), and callbacks
+  that wait for a JavaScript promise (the request fails at once). Waits
   follow `Atomics.wait`/futex semantics; a blocked wait may also wake
   spuriously and a timed wait may time out (each optional per configuration).
 - `HostBridge/Poller.lean`: the interop poller (`claim_poller`'s
@@ -285,7 +288,7 @@ cycle of non-final states in which every continuously enabled thread or
 event-loop task keeps stepping: Tarjan's strongly connected components;
 spurious wake-ups are allowed only finitely often). Counterexamples are
 shortest paths, printed step by step. `lake exe host-bridge check --large`
-runs every configuration (CI: about 1 s):
+runs every configuration (CI: about 1.5 s; with `--large` about 15 s):
 
 | Configuration | Bound | States | Result |
 | --- | --- | ---: | --- |
@@ -293,6 +296,8 @@ runs every configuration (CI: about 1 s):
 | … with spurious wake-ups and timeouts | 2 callbacks × 2 host calls; (large) 3, 0, 3, 2, 1, 3 | 17,277; 103,208 | ok |
 | … 4 and (large) 10 callbacks | 1 host call each | 18,756; 98,890 | ok |
 | Work proxied to the main thread inside callbacks | 1 + 1; (large) 5 callbacks, 8 host calls | 8,796; 54,756 | ok (it runs when the wait's 10 ms timeout expires) |
+| A callback waits for a promise, then host calls | 1 + 1 | 11,949 | ok (the wait fails at once) |
+| Host calls made by work proxied to the callback thread | 2 callbacks; (large) 5 callbacks mixing awaits, nested calls and proxied work | 209,000; 3,837,965 | ok (served when the wait times out) |
 | A generic Lean thread's slot, replies now or in a later task | 3; (large) 30 host calls | 280; 3,196 | ok |
 | Poller and completion thread | 5 scripts (callbacks with and without `waitForever`, awaits, async requests, timer races); (large) 4 calls, 2 awaits, 2 async requests | 84–1,588; up to 34,678 | ok |
 
@@ -303,7 +308,10 @@ non-progress cycle), the wait before this change (proxied work never run: a
 non-progress cycle), host calls without the doorbell (deadlock), a host that
 forgets `slot.sequence` (a request served twice), `claim_poller` without
 compare-and-swap (two pollers), completions dropped before the first poll and
-no poller requested for queued events (deadlocks).
+no poller requested for queued events (deadlocks), a callback that waits for a
+promise only the event loop settles, and inline serving that ignores the
+next-depth slot (both fair non-progress cycles; both were the shipped code
+before 2026-11-03).
 
 **2. Schedule fuzzing of the real JavaScript**
 ([`scripts/bridge-fuzz/schedule.cjs`](../scripts/bridge-fuzz/schedule.cjs)).
@@ -327,8 +335,8 @@ node_modules/@lasm/cli/bin/lasm.mjs --only js-interop,js-callbacks --runs 20 --s
 **3. Model-to-code conformance.** With `LASM_BRIDGE_TRACE=DIR` the preload
 also records every such operation in one global order (a lock around each, the
 comparison of a wait included) and at exit writes one trace per host-call slot
-(`slot sync` for the synchronous-callback thread, `slot generic` for every
-other Lean thread and nesting depth; roles from the diagnostics globals
+(`slot sync` for the synchronous-callback thread, with its next-depth slot as
+`seq1`/`ready1`, `slot generic` for every other Lean thread and nesting depth; roles from the diagnostics globals
 `lasm.js.sync` and `lasm.full.slots`). `host-bridge trace FILE…` checks each
 against the model's transition relation: every event must be a visible step,
 with any number of hidden steps (the Lean thread's Wasm futex waits and its C
@@ -352,9 +360,11 @@ replies and events, deadlocks and livelocks in the modelled protocol at the
 bounds above; a change to the code's sequence of shared-memory operations that
 the model does not allow; hangs and wrong output under perturbed schedules.
 **What it cannot catch:** races outside the modelled protocol (Lean's own
-runtime, Emscripten's internals beyond the proxied call, a host call made by a
-task proxied to the synchronous-callback thread while it waits, which uses the
-next depth's slot and is not served inline); behaviour beyond the bounds;
+runtime, Emscripten's internals beyond the proxied call, nesting deeper than
+the callback thread's second slot; a wait inside a synchronous callback for a
+Lean task that uses the host, such as `Async.block`, or for a timer or socket
+it started, which never finishes and which the host cannot see); behaviour
+beyond the bounds;
 memory-model effects (the model is sequentially consistent, as JavaScript's
 `Atomics` are); the Lean thread's Wasm-side steps are checked only through
 their effects in a trace. The model assumes each slot is used by one thread at a
@@ -645,5 +655,7 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Nightly-style campaign 41241440598 (9,450 cases) | Two "divergences" on every Wasm target were the harness's own: it decoded each pipe chunk of the oracle's output separately, so a UTF-8 character split by native Lean's 4,096-byte writes became U+FFFD (the Wasm targets wrote it whole). `scripts/ci/lasm-js-stress.mjs` had the same pattern | Harness fix (#33) |
 | Test-quality audit | `candidate-readme.test.mjs` broke on `main` when the README's headings changed (PR #22), failing `installer-faults.yml` on every PR | Fixed in #25 |
 | Host bridge model (proxied work in a synchronous callback) | **A synchronous Lasm.JS callback that made the program's first asynchronous runtime request (a timer, socket, DNS lookup) hung for good.** The request starts the completion thread; `pthread_create` on a Lean thread is proxied synchronously to Node's main thread, which waited in `syncFunction` on the doorbell and never ran proxied work. Found while modelling the lazy completion thread, then reproduced (0.3.5) | Fixed: the wait runs the main thread's mailbox (`serveMailbox`, Emscripten's `_emscripten_check_mailbox`) whenever it times out, every 10 ms; regression in `test/node-js.test.mjs` and part 4 of `test/fixtures/js-callbacks`; the model's mutation keeps the old wait |
+| Host bridge model (host calls of work proxied to the synchronous-callback thread) | **A host call made by work proxied to the synchronous-callback thread while it waited in a host call hung the callback**: it uses the thread's next-depth slot, which Node's main thread (waiting in the callback) neither served nor knew, since that slot's registration message waits for the event loop. Found by extending the model; no real program is known to trigger it (the work is Emscripten's dynamic-library synchronization) | Fixed: each slot links the next depth's, and inline serving follows the links; regression in `test/full-host-rpc-channel.test.mjs`; the model's mutation keeps the old serving |
+| Host bridge (roadmap) | **Waiting for a JavaScript promise inside a synchronous callback hung for good** (`Value.await`, `callAwait` in `IO`): the promise settles only after the callback returns. `Async.block` there still hangs (the computation runs on another Lean thread, whose host calls wait for the event loop) | Fixed: the request fails at once with the reason; regressions in `test/node-js-bridge.test.mjs`, part 5 of `test/fixtures/js-callbacks`, and the edge profile's controller in `test/edge-js.test.mjs` |
 | Mutation testing (`build-service`, first run) | **`createBuildService({ unref: true })` did not let the process exit** (the Vite plugin's build worker): the worker's stdout and stderr were piped, and a worker stdio stream waiting for data refs the worker; `unref()` also came before the `'message'` listener, which refs it again | Fixed ([#49](https://github.com/Millillion/lasm/issues/49)): Node forwards the worker's output itself, and `unref()` comes last; regression in `test/dev-build-service.test.mjs` |
 | Mutation testing (`host-bridge`, `edge-glue`) | **Lasm.JS failures wrapped twice**: a settled value that could not be converted, or an awaited promise rejected with a Lasm.JS failure, reached Lean as `Error: TypeError: …`, on Node and the edge | Fixed ([#51](https://github.com/Millillion/lasm/issues/51)) in `src/node-js.mjs` and `src/edge/edge-js.mjs`; regressions in `test/node-js-bridge.test.mjs` and `test/edge-js.test.mjs` |

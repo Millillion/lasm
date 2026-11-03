@@ -68,7 +68,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] 0.3.9 (published 2026-11-03, PR #81): #27, browser-style dot-segment resolution in `Request.path` on every platform, with a proof that `segments` never contains `.` or `..`; also #76 (a `://` in the query), #66 (Node recursion depth), #80 and #82 (cookies and redirects on function platforms), #49 (dev build service `unref`) and #51 (Lasm.JS errors wrapped twice).
 - [ ] Next release: retry downloads cut short before Content-Length arrives (PR #91), the macOS C-tier fix (#73, PR #85), the editor fix (#72, PR #86), and Lasm.UI handlers deciding `preventDefault`/`stopPropagation` per event, a breaking change (#71; [next-notes.md](docs/release/next-notes.md)).
 - [x] Move the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7): every workflow, container image, acceptance pin and doc version list; the deferral is removed. Both are still the newest 26 and 24 releases (2026-11-03).
-- [ ] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms (a stalled thread, or a visibility bug?).
+- [x] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms: a stalled thread, not a visibility bug (the flag is a multi-threaded `IO.Ref`, accessed with sequentially consistent atomics; the printed time precedes a host call the thread waits for); the polling fixture already removed the timing assumption ([DECISIONS.md](docs/DECISIONS.md)).
 
 ### Testing ([TESTING.md](docs/TESTING.md), [TESTING_STRATEGY.md](docs/proposals/TESTING_STRATEGY.md))
 - [x] Differential testing against upstream Lean: generator, shrinker, PR and nightly CI.
@@ -78,8 +78,8 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] Three more oracles for differential testing: Lean's interpreter, `-O0` vs `-O2`, and three JS engines (PR #36).
 - [x] Fix #26 (edge environment variables) and #30 (two docs that overstate limits) (PR #36).
 - [x] Host bridge: a Lean model checked over every interleaving (8 reintroduced bugs, including the 0.3.0 hang, all caught), seeded schedule fuzzing, and checking traces from the real code against the model (#37).
-- [ ] Host bridge: awaiting an async operation inside a synchronous JS callback still hangs. Make it fail clearly, as `docs/JS_BINDINGS.md` says it does, or support it.
-- [ ] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread.
+- [x] Host bridge: awaiting a JavaScript promise inside a synchronous JS callback fails at once with the reason (it hung); in the model (its mutant is caught), with regressions on Node (unit, js-callbacks part 5) and the edge profile (already clear there). Support is impossible (a promise settles only after the callback returns). Remaining: waiting there for a Lean task that uses the host (including `Async.block`) or for a timer or socket started in the callback still never finishes (needs a runtime hook; options in PR #101).
+- [x] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread. The model found a hang (the next-depth slot was never served inline); fixed, in the model and the trace checking (`seq1`/`ready1`), with a regression test.
 - [ ] Replace the remaining tests that only read files as text, and port or retire the 29 Lean 4.32 test files.
 - [ ] Browser and Bun targets in differential testing.
 - [x] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next): seven modules, nightly and PR CI, host bridge 56→96 %, UI applier 55→93 %, build service 52→92 %, edge glue 15→79 %, notices 63→75 % (#53; bugs #49, #51).
