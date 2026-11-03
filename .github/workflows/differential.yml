@@ -312,8 +312,10 @@ jobs:
           npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
           node node_modules/@lasm/compiler/bin/lasm.mjs --version
       - name: Native Lake build linking against the SDK's libSystem.tbd
+        # Two native C-tier Lake builds peak near half of a 7 GB runner's RAM;
+        # --host-fraction 0.7 (CI runners only) keeps them clear of the stop.
         run: |
-          node scripts/full-lean/run-bounded.mjs --memory-mib 5120 -- \
+          node scripts/full-lean/run-bounded.mjs --memory-mib 5120 --host-fraction 0.7 -- \
             node scripts/ci/macos-c-tier.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
               --work "$RUNNER_TEMP/macos-c-tier" --out "$RUNNER_TEMP/macos-c-tier.json"
       - name: The stub filter's unit tests, with this C tier's ld64.lld
@@ -324,7 +326,9 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: macos-c-tier-${{ matrix.runner }}-${{ github.run_id }}
-          path: ${{ runner.temp }}/macos-c-tier.json
+          path: |
+            ${{ runner.temp }}/macos-c-tier.json
+            .work/resource-runs
           retention-days: 30
           if-no-files-found: ignore
   # Target equivalence (docs/TESTING.md#target-equivalence): the fetch template
