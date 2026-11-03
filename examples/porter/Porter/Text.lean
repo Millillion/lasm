@@ -64,12 +64,15 @@ def percentEncode (s : String) : String :=
 /-! ## Forms and query strings -/
 
 /-- Splits a list at the first `sep`: the part before it and, if there was
-one, the part after it. -/
-def splitFirst (sep : Char) : List Char → List Char × Option (List Char)
-  | [] => ([], none)
-  | c :: rest =>
-    if c = sep then ([], some rest)
-    else let (a, b) := splitFirst sep rest; (c :: a, b)
+one, the part after it. Tail-recursive: an input of any length takes no
+stack (a WebAssembly stack on Deno and Workers is small; the fuzzer found
+that a 20,000-character form value overflowed the first version). -/
+def splitFirst (sep : Char) (l : List Char) : List Char × Option (List Char) :=
+  go [] l
+where
+  go (acc : List Char) : List Char → List Char × Option (List Char)
+    | [] => (acc.reverse, none)
+    | c :: rest => if c = sep then (acc.reverse, some rest) else go (c :: acc) rest
 
 /-- Splits a list at every `sep`. -/
 def splitAll (sep : Char) (l : List Char) : List (List Char) :=

@@ -47,8 +47,15 @@ async function invoke(req, body) {
   const bytes = Buffer.from(await response.arrayBuffer());
   // A streamed reply: the JSON metadata, eight NUL bytes, then the body.
   const split = bytes.indexOf(Buffer.alloc(8));
-  if (split < 0) throw new Error('not a streamed reply: ' + bytes.toString().slice(0, 1000));
-  return { meta: JSON.parse(bytes.subarray(0, split).toString()), body: bytes.subarray(split + 8) };
+  if (split >= 0) return { meta: JSON.parse(bytes.subarray(0, split).toString()), body: bytes.subarray(split + 8) };
+  // A buffered reply (the bootstrap answers some responses without streaming).
+  try {
+    const meta = JSON.parse(bytes.toString());
+    if (typeof meta.statusCode === 'number')
+      return { meta, body: Buffer.from(meta.body ?? '', meta.isBase64Encoded ? 'base64' : 'utf8') };
+  } catch {}
+  throw new Error(`not a reply: emulator ${response.status} ${JSON.stringify([...response.headers])}, ${bytes.length} bytes: ` +
+    bytes.toString().slice(0, 1000) + ` (for ${req.method} ${req.url})`);
 }
 const server = http.createServer((req, res) => {
   const chunks = [];
