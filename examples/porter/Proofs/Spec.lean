@@ -150,6 +150,16 @@ client is the URI as registered, then `?` or `&`, then the parameters. -/
 def redirect_location_exact : Prop :=
   ∀ iss u ps, ∃ rest, (Location.client u ps).render iss = u ++ rest ∧ (rest.startsWith "?" ∨ rest.startsWith "&")
 
+/-- **Redirects reflect no unbounded input**: the `state` a redirect to a
+client carries back, the only part of its `Location` header taken from the
+request (`Spec.redirect_registered`, `Spec.redirect_params`), is at most
+`maxState` (2048) bytes; a longer `state` gets an error page. So no request
+can make Porter send a header section HTTP clients refuse (16 KiB in
+Node). -/
+def redirect_state_bounded : Prop :=
+  ∀ e ctx r D u ps, (reply e ctx r D).location = some (.client u ps) → ∀ p ∈ ps,
+    p.1 = "state" → p.2.utf8ByteSize ≤ maxState
+
 /-! ## D. A reused refresh token revokes its family -/
 
 /-- **Refresh tokens are bound**: tokens for a refresh token are issued only

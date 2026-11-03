@@ -160,7 +160,8 @@ def authorize (r : Request) : m (Reply × List Write) :=
 
 /-- The pending interaction `id`, if this browser started it (its cookie)
 and it has not expired, with its client, whose redirect URI must still be
-registered. -/
+registered (and its `state` short enough to send back, as `checkAuth`
+required). -/
 def interactionOf (r : Request) (id : String) : m (Option (Interaction × Client)) :=
   if r.cookie? interactionCookie ≠ some id then pure none
   else do
@@ -170,7 +171,10 @@ def interactionOf (r : Request) (id : String) : m (Option (Interaction × Client
       | some i =>
         if ctx.now < i.expires then
           match cfg.client? i.request.client with
-          | some c => if i.request.redirectUri ∈ c.redirectUris then some (i, c) else none
+          | some c =>
+            if i.request.redirectUri ∈ c.redirectUris then
+              if shortState i.request.state then some (i, c) else none
+            else none
           | none => none
         else none)
 
@@ -368,11 +372,12 @@ def userinfo (r : Request) : m (Reply × List Write) :=
 /-! ## RP-initiated logout -/
 
 /-- The parameters of a logout request: `client_id`, `post_logout_redirect_uri`
-(registered exactly for that client), `state`. -/
+(registered exactly for that client), `state` (at most `maxState` bytes: the
+redirect carries it back). -/
 def logoutParams (ps : List (String × String)) : Option (Option String × Option String × Option String) :=
   if ["client_id", "post_logout_redirect_uri", "state", "id_token_hint", "confirm"].any
       (fun k => param ps k = .repeated) then none
-  else
+  else if shortState (param ps "state").value? then
     let cid := (param ps "client_id").value?
     let uri := (param ps "post_logout_redirect_uri").value?
     let state := (param ps "state").value?
@@ -382,6 +387,7 @@ def logoutParams (ps : List (String × String)) : Option (Option String × Optio
       match cid.bind cfg.client? with
       | some c => if u ∈ c.postLogoutRedirectUris then some (cid, some u, state) else none
       | none => none
+  else none
 
 /-- `GET|POST /logout`: a confirmation page; the confirmed POST ends the
 session and returns to the client's registered post-logout URI, if given. -/

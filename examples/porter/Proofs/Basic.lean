@@ -82,13 +82,15 @@ theorem checkAuth_spec (cfg : Config) (ps) : AuthOk cfg (checkAuth cfg ps) := by
       split
       · split
         · rename_i ru _ hru
-          obtain ⟨hok, hred, hpage⟩ := checkRest_spec c ru ps
-          cases h : checkRest c ru ps with
-          | ok a =>
-            obtain ⟨h1, h2⟩ := hok a h
-            exact ⟨c, by rw [h1, (client?_some hc).2]; exact hc, by rw [h2]; exact hru⟩
-          | redirect uri st x => exact ⟨c, (client?_some hc).1, by rw [hred _ _ _ h]; exact hru⟩
-          | page x => exact (hpage x h).elim
+          split
+          · obtain ⟨hok, hred, hpage⟩ := checkRest_spec c ru ps
+            cases h : checkRest c ru ps with
+            | ok a =>
+              obtain ⟨h1, h2⟩ := hok a h
+              exact ⟨c, by rw [h1, (client?_some hc).2]; exact hc, by rw [h2]; exact hru⟩
+            | redirect uri st x => exact ⟨c, (client?_some hc).1, by rw [hred _ _ _ h]; exact hru⟩
+            | page x => exact (hpage x h).elim
+          · simp [AuthOk]
         · simp [AuthOk]
       · simp [AuthOk]
   · simp [AuthOk]
@@ -100,6 +102,39 @@ theorem checkAuth_ok {cfg : Config} {ps a} (h : checkAuth cfg ps = .ok a) :
 theorem checkAuth_redirect {cfg : Config} {ps uri st x} (h : checkAuth cfg ps = .redirect uri st x) :
     ∃ c ∈ cfg.clients, uri ∈ c.redirectUris := by
   have := checkAuth_spec cfg ps; rw [h] at this; exact this
+
+/-! ## `state` is bounded -/
+
+/-- A `state`, if any, of at most `maxState` bytes. -/
+def StateOk (st : Option String) : Prop := ∀ v, st = some v → v.utf8ByteSize ≤ maxState
+
+theorem stateOk_of {st : Option String} (h : shortState st = true) : StateOk st := by
+  intro v hv
+  subst hv
+  simpa [shortState] using h
+
+/-- What `checkRest` answers carries the request's `state` (as an
+eliminator, like `checkRest_elim`). -/
+theorem checkRest_elim_state (c : Client) (ru ps) (P : AuthCheck → Prop)
+    (hok : ∀ a : AuthRequest, a.state = (param ps "state").value? → P (.ok a))
+    (hred : ∀ x, P (.redirect ru (param ps "state").value? x)) : P (checkRest c ru ps) := by
+  simp only [checkRest]
+  repeat' split
+  all_goals first | exact hred _ | exact hok _ rfl
+
+/-- The `state` of what `checkAuth` answers is bounded. -/
+def AuthStateOk : AuthCheck → Prop
+  | .ok a => StateOk a.state
+  | .redirect _ st _ => StateOk st
+  | .page _ => True
+
+theorem checkAuth_state (cfg : Config) (ps) : AuthStateOk (checkAuth cfg ps) := by
+  unfold checkAuth
+  repeat' split
+  all_goals first
+    | (rename_i hs; exact checkRest_elim_state _ _ ps AuthStateOk
+         (fun a ha => show StateOk a.state from ha ▸ stateOk_of hs) (fun _ => stateOk_of hs))
+    | simp [AuthStateOk]
 
 /-- `authenticate` on the model: the client of credentials that check. -/
 theorem authenticate_some {e : Env} {ca : ClientAuth} {c : Client}
