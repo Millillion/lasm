@@ -38,6 +38,17 @@ for (const code of ['ECONNRESET', 'EAI_AGAIN', 'UND_ERR_SOCKET']) test(`recovers
   assert.equal(requests, 2);
 });
 
+test('recovers when the connection closes before Content-Length arrives', async t => {
+  const f = await fixture(t); let requests = 0;
+  await downloadArtifact(artifact, f.file, { ...f.options, fetch: async () => {
+    if (++requests > 1) return new Response(bytes);
+    return new Response(new ReadableStream({ pull(controller) {
+      controller.error(new TypeError('terminated', { cause: failed('UND_ERR_RES_CONTENT_LENGTH_MISMATCH') }));
+    } }));
+  } });
+  assert.equal(requests, 2); assert.deepEqual(await readFile(f.file), bytes);
+});
+
 for (const scenario of ['404', '400', '403', 'certificate', 'checksum', 'oversized', 'truncated', 'encoding']) test(`${scenario} is terminal`, async t => {
   const f = await fixture(t); let requests = 0;
   await assert.rejects(downloadArtifact(artifact, f.file, { ...f.options, fetch: async () => {

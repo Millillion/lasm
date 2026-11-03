@@ -194,10 +194,7 @@ def afterLogin (i : Interaction) (c : Client) (id : String) (l : Login) (pre : L
   let scope := grantScope c i.request.scope
   if !i.request.promptConsent && scope.all (· ∈ consented) then do
     let (reply, w) ← issueCode cfg cr ctx i.request l scope ctx.fresh.c ctx.fresh.d
-    -- One Set-Cookie only (the session): Azure Functions' adapter joins
-    -- several into one header (issue #80). The interaction ends in
-    -- the database; its cookie expires with it.
-    pure ({ reply with cookies := cookies }, pre ++ [.endInteraction i.hash] ++ w)
+    pure ({ reply with cookies := cookies ++ [interactionClear] }, pre ++ [.endInteraction i.hash] ++ w)
   else pure (Reply.redirect (.interaction id) cookies, pre ++ [.signIn i.hash l])
 
 /-- `POST /interaction/:id/login`. A failed sign-in answers the same page

@@ -125,7 +125,7 @@
     },
     {
       "slug": "segments-no-dot-segments",
-      "title": "Coming in 0.3.9: a theorem that request paths never contain . or ..",
+      "title": "New in 0.3.9: a theorem that request paths never contain . or ..",
       "description": "One Lean handler routed /hello/../hello/Ada differently on five platforms. The fix resolves dot segments in Lean, with a theorem about the result.",
       "date": "2026-11-02",
       "kind": "proof-spotlight",

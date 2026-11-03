@@ -1,5 +1,5 @@
 ---
-title: "Coming in 0.3.9: a theorem that request paths never contain . or .."
+title: "New in 0.3.9: a theorem that request paths never contain . or .."
 description: One Lean handler routed /hello/../hello/Ada differently on five platforms. The fix resolves dot segments in Lean, with a theorem about the result.
 date: 2026-11-02
 kind: proof-spotlight
@@ -11,11 +11,11 @@ sources:
 aiGenerated: true
 ---
 
-# Coming in 0.3.9: a theorem that request paths never contain `.` or `..`
+# New in 0.3.9: a theorem that request paths never contain `.` or `..`
 
-This change is in review in
-[PR #47](https://github.com/Millillion/lasm/pull/47), and ships in Lasm
-0.3.9. It isn't in a published release yet.
+This change shipped in Lasm 0.3.9
+([PR #47](https://github.com/Millillion/lasm/pull/47)). Upgrade with
+`npm install -D @lasm/cli@0.3.9`.
 
 ## Same handler, different routes
 
