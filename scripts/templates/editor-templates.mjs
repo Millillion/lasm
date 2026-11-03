@@ -3,6 +3,10 @@
 // for Lasm's Lean and the project's override), then the Lean language server,
 // started through elan's `lake` proxy exactly as the VS Code extension starts
 // it, opens every .lean file: no error (in particular no unknown `import Lasm.*`).
+// The `c-package` project (not a template) depends on a Lake package with C
+// code (`precompileModules`, like UnicodeBasic): `lasm editor` links the C tier
+// (Lean's C compiler and headers), so `lake setup-file` compiles that C (issue
+// #72); without the C code a rerun links the plain toolchain again.
 // Needs elan on PATH.
 //   node editor-templates.mjs CANDIDATE_TGZ WORK_DIR RESULT.json [--templates a,b]
 import assert from 'node:assert/strict';
@@ -17,7 +21,17 @@ const only = i >= 0 ? args.splice(i, 2)[1].split(',') : undefined;
 const [tgzArg, workArg, resultArg] = args;
 assert.ok(tgzArg && workArg && resultArg, 'Usage: node editor-templates.mjs CANDIDATE_TGZ WORK_DIR RESULT.json [--templates a,b]');
 const tgz = resolve(tgzArg), work = resolve(workArg), resultFile = resolve(resultArg);
-const templates = only ?? ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'fetch', 'fullstack'];
+const templates = only ?? ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'fetch', 'fullstack', 'c-package'];
+const depLakefile = precompile => `name = "dep"\n${precompile ? 'precompileModules = true\n' : ''}\n[[lean_lib]]\nname = "Dep"\n`;
+/** A Lake project whose dependency has C code: precompiled modules (as UnicodeBasic). */
+function writeCPackage(app) {
+  mkdirSync(join(app, 'dep'), { recursive: true });
+  for (const directory of [app, join(app, 'dep')]) writeFileSync(join(directory, 'lean-toolchain'), 'leanprover/lean4:v4.35.0\n');
+  writeFileSync(join(app, 'lakefile.toml'), 'name = "app"\n\n[[require]]\nname = "dep"\npath = "dep"\n\n[[lean_lib]]\nname = "App"\n');
+  writeFileSync(join(app, 'App.lean'), 'import Dep\n\ndef hello : String := Dep.greeting\n');
+  writeFileSync(join(app, 'dep', 'lakefile.toml'), depLakefile(true));
+  writeFileSync(join(app, 'dep', 'Dep.lean'), 'def Dep.greeting : String := "hello"\n');
+}
 const exe = name => process.platform === 'win32' ? `${name}.exe` : name;
 const lake = (process.env.PATH ?? '').split(delimiter).map(d => join(d, exe('lake'))).find(existsSync);
 assert.ok(lake, 'elan (its lake proxy) must be on PATH');
@@ -39,13 +53,25 @@ let failed = 0;
 for (const template of templates) {
   const app = join(work, `app-${template}`), entry = { template, steps: [] };
   result.templates.push(entry);
-  for (const [label, command, argv, cwd] of [
-    ['init', lasm[0], [lasm[1], 'init', app, '--template', template], work],
-    ['lasm editor', lasm[0], [lasm[1], 'editor'], app],
-    ['language server', process.execPath, [check, app, lake, '900'], app]]) {
+  const cPackage = template === 'c-package';
+  if (cPackage) writeCPackage(app);
+  const fixtureCheck = expectC => (label, r) => {
+    const linkedC = /with its C compiler and headers \(for the packages with C code: dep\)/.test(r.stderr ?? '');
+    return linkedC === expectC ? undefined : `${label}: expected the ${expectC ? 'C-tier' : 'plain'} toolchain`;
+  };
+  for (const [label, command, argv, cwd, verify] of [
+    ...(cPackage ? [] : [['init', lasm[0], [lasm[1], 'init', app, '--template', template], work]]),
+    ['lasm editor', lasm[0], [lasm[1], 'editor'], app, cPackage ? fixtureCheck(true) : undefined],
+    ...(cPackage ? [['lake setup-file', lake, ['setup-file', join(app, 'App.lean')], app]] : []),
+    ['language server', process.execPath, [check, app, lake, '900'], app],
+    // The project loses its C code: a rerun links the plain toolchain.
+    ...(cPackage ? [['drop C code', process.execPath, ['-e', `require('node:fs').writeFileSync(${JSON.stringify(join(app, 'dep', 'lakefile.toml'))}, ${JSON.stringify(depLakefile(false))})`], app],
+      ['lasm editor (no C code)', lasm[0], [lasm[1], 'editor'], app, fixtureCheck(false)]] : [])]) {
     const { r, step } = run(`${template}: ${label}`, command, argv, cwd ?? app);
+    const problem = r.status === 0 ? verify?.(label, r) : undefined;
+    if (problem) { step.problem = problem; console.log(problem); }
     entry.steps.push(step); save();
-    if (r.status !== 0) { failed++; entry.passed = false; break; }
+    if (r.status !== 0 || problem) { failed++; entry.passed = false; break; }
   }
   entry.passed ??= true; save();
 }
