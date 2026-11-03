@@ -76,7 +76,7 @@ const syscallVerbs = { mkdir: 'create the directory', open: 'open', scandir: 're
 export function describeFileSystemError(error) {
   const action = fileSystemActions[error?.code];
   if (!action) return undefined;
-  const raw = /^E[A-Z]+: ([^,]+), (\w+) '([^']*)'/.exec(error.message ?? '');
+  const raw = /^E[A-Z]+: ([^,]+), (\w+)(?: '([^']*)')?$/.exec(error.message ?? '');
   const bare = /^[A-Z][a-z]+(?: [a-z-]+)*\.?$/.test(error.message ?? '') && error.message.length < 60;
   if (!raw && !bare) return undefined;
   const reason = (raw?.[1] ?? error.message).replace(/\.$/, '').toLowerCase();

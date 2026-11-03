@@ -36,14 +36,25 @@ const renameDefinition = text => text.replace('unusedHelper', 'spareHelper');
 const rebuildStage = /\bLinking\b|Generating Lean C|Compiling application module/i;
 // Output metadata that records source hashes (build-info.json): the only bytes
 // a renamed, unused definition may change.
-const sourceHashKeys = new Set(['sourceSha256', 'cSha256', 'signature']);
+// Input fingerprints that output metadata records (build-info.json and the
+// manifests of the edge, WASI and browser outputs), plus receipt entries
+// (files.<name>) of metadata files that differ only in those.
+const sourceHashKeys = new Set(['sourceSha256', 'cSha256', 'signature', 'nodeBuildSignature', 'programKey']);
 
 /** Where the first differing file present in both trees differs (text: a window around it). */
 function explain(a, b, dirA, dirB) {
-  const names = Object.keys(a).filter(name => name in b && a[name] !== b[name]).sort((x, y) => Number(/\.(?:br|gz|wasm)$/.test(x)) - Number(/\.(?:br|gz|wasm)$/.test(y)));
+  // Content-hashed names (app.<12 hex>.js) are paired by their name without the hash.
+  const plain = name => name.replace(/\.[0-9a-f]{12}\./, '.#.');
+  const pairs = [];
+  for (const name of Object.keys(a)) {
+    if (name in b) { if (a[name] !== b[name]) pairs.push([name, name]); continue; }
+    const other = Object.keys(b).find(n => !(n in a) && plain(n) === plain(name));
+    if (other) pairs.push([name, other]);
+  }
+  pairs.sort(([x], [y]) => Number(/\.(?:br|gz|wasm)$/.test(x)) - Number(/\.(?:br|gz|wasm)$/.test(y)) || Number(!/\.[0-9a-f]{12}\./.test(x)) - Number(!/\.[0-9a-f]{12}\./.test(y)));
   const lines = [];
-  for (const name of names.slice(0, 3)) {
-    const x = readFileSync(join(dirA, name)), y = readFileSync(join(dirB, name));
+  for (const [name, other] of pairs.slice(0, 3)) {
+    const x = readFileSync(join(dirA, name)), y = readFileSync(join(dirB, other));
     let at = 0; while (at < x.length && at < y.length && x[at] === y[at]) at++;
     const text = /\.(?:m?js|json|html|css|txt|cjs)$/.test(name);
     const window = buffer => JSON.stringify(buffer.subarray(Math.max(0, at - 80), at + 120).toString(text ? 'utf8' : 'hex'));
@@ -135,11 +146,22 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
         writeFileSync(greeting, renameDefinition(text));
         const renamed = await build(a);
         const renameProblems = [];
-        for (const name of treeDifferences(original.hashes, renamed.hashes).map(line => line.split(':')[0])) {
-          if (!name.endsWith('.json') || !(name in original.hashes) || !(name in renamed.hashes)) { renameProblems.push(`${name} changed`); continue; }
+        const changed = treeDifferences(original.hashes, renamed.hashes).map(line => line.split(':')[0]);
+        const metadataOnly = new Set(), jsonPaths = new Map();
+        for (const name of changed) {
+          if (!name.endsWith('.json') || !(name in original.hashes) || !(name in renamed.hashes)) continue;
           const before = JSON.parse(readFileSync(join(ref, name), 'utf8')), after = JSON.parse(readFileSync(join(a, out, name), 'utf8'));
           const paths = jsonDifferences(withoutSourceHashes(before), withoutSourceHashes(after));
-          if (paths.length) renameProblems.push(`${name} changed beyond source hashes, at ${paths.slice(0, 6).join(', ')}`);
+          jsonPaths.set(name, paths);
+          if (!paths.length) metadataOnly.add(name);
+        }
+        for (const name of changed) {
+          if (metadataOnly.has(name)) continue;
+          const paths = jsonPaths.get(name);
+          // A receipt's entry for a metadata file that differs only in fingerprints.
+          const rest = paths?.filter(path => !(path.startsWith('$.files.') && metadataOnly.has(path.slice('$.files.'.length))));
+          if (paths && !rest.length) continue;
+          renameProblems.push(paths ? `${name} changed beyond source hashes, at ${rest.slice(0, 6).join(', ')}` : `${name} changed`);
         }
         // The dev profile keeps function names in the module (a name section) and
         // skips dead-code elimination, so a renamed definition shows there by design.

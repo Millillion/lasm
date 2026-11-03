@@ -262,9 +262,14 @@ project: two clean builds in different directories, and a build with a cold
 tool cache, give the same bytes; edit then build equals a clean build of the
 edited project, and reverting gives the original bytes; renaming a module
 nothing imports changes no byte; renaming an unused definition changes only
-the source hashes in JSON metadata; touching sources, or building again,
-links nothing and rewrites no output file; after `lasm dev` rebuilt an edit and
-ignored a touch, `lasm build --dev` reuses its build, which equals a clean one.
+the input fingerprints in JSON metadata (release profile); touching sources, or
+building again, links nothing and rewrites no output file; after `lasm dev`
+rebuilt an edit and ignored a touch, `lasm build --dev` reuses its build, which
+equals a clean one. Each target is judged on its own output directory (`dist/`
+for node and the browser, `wasi/`, `workers/`). Dev rebuilds plan
+initialization from the previous build's plan, so for the dev profile
+"incremental equals clean" means the same behaviour (on node: the same output
+when run), not the same bytes; clean dev builds must still be byte-identical.
 
 **Fault injection** ([`faults.mjs`](../scripts/tooling/faults.mjs)), node
 target: SIGKILL of the process tree at every build stage and while replacing an
