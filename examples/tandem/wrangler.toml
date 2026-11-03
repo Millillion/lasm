@@ -13,6 +13,12 @@ binding = "DB"
 database_name = "tandem"
 database_id = "00000000-0000-4000-8000-000000000000"
 
+# The editor's files (dist/public/ui), served by Workers before the Worker
+# runs, as Porter does: the Worker also embeds them, as every target does,
+# but its precompressed variants need `encodeBody: "manual"` on Workers.
+[assets]
+directory = "./dist/public"
+
 # Lasm's program.wasm is imported as a precompiled module.
 [[rules]]
 type = "CompiledWasm"
