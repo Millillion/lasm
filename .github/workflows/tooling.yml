@@ -1,0 +1,116 @@
+name: Dependable tooling
+# Claim 4 of docs/proposals/TESTING_STRATEGY.md, black box (docs/TESTING.md#dependable-tooling):
+#   - error corpus (scripts/tooling/error-corpus.mjs): every error a user can
+#     trigger prints a clear message, never a stack trace. Against a candidate
+#     packed from this commit and against the published @lasm/cli@latest;
+#     pull requests, pushes to main and nightly.
+# Each run installs the CLI with npm, as a user does, into a fresh directory.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tooling-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  pack:
+    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    # The retained runtime input is a draft release asset (needs contents: write to read).
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: tooling-packed-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+
+  error-corpus:
+    name: Error corpus (${{ matrix.cli }})
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        cli: [candidate, published]
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      # An old Node for the "wrong Node version" case, then the supported one.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22.12.0
+          package-manager-cache: false
+      - run: echo "OLD_NODE=$(command -v node)" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - if: matrix.cli == 'candidate'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: tooling-packed-candidate
+          path: .work/node-candidate
+      - name: Install the CLI as a user would
+        run: |
+          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
+          echo '{"private":true}' > package.json
+          if [ "${{ matrix.cli }}" = candidate ]; then
+            npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+            echo "LASM_BIN=$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" >> "$GITHUB_ENV"
+          else
+            npm install @lasm/cli@latest --no-audit --no-fund
+            echo "LASM_BIN=$RUNNER_TEMP/lasm/node_modules/@lasm/cli/bin/lasm.mjs" >> "$GITHUB_ENV"
+          fi
+      - name: Error corpus
+        run: |
+          node "$LASM_BIN" --version
+          node scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- /usr/bin/env CI=1 GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" \
+            node scripts/tooling/error-corpus.mjs --lasm "$LASM_BIN" --only network --old-node "$OLD_NODE" --work "$RUNNER_TEMP/corpus" --report "$RUNNER_TEMP/error-corpus.json"
+      - if: always()
+        run: cat "$RUNNER_TEMP/error-corpus.json" 2>/dev/null || true
