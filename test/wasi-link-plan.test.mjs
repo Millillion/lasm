@@ -54,7 +54,7 @@ test('the WASI link compiles the host, links the application objects with the ed
   const compiled = f.tools.calls('clang');
   assert.deepEqual(compiled.map(args => args[args.indexOf('-c') + 1]), ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c'].map(name => join(here, name)));
   assert.deepEqual(compiled[0], ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
-    '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', '-DLASM_WASI_MAXIMUM_MEMORY=2048',
+    '-O2', '-DNDEBUG', '-mtail-call', '-DLEAN_EMSCRIPTEN', '-DLASM_WASI_MAXIMUM_MEMORY=2048',
     '-ffunction-sections', '-fdata-sections', `-ffile-prefix-map=${here}=lasm/`, '-I', join(f.nodeRuntime.directory, 'include'), '-I', here,
     '-c', join(here, 'lasm_wasi.c'), '-o', join(f.out, 'lasm_wasi.o')]);
   for (const name of ['lasm_wasi', 'lasm_wasi_libc', 'lasm_fetch_wasi']) assert.ok(existsSync(join(f.out, `${name}.o`)));
@@ -74,7 +74,7 @@ test('the WASI link compiles the host, links the application objects with the ed
   // 3–4. Lowered, then optimized from the lowered module into the program.
   assert.deepEqual(f.tools.calls('wasm-opt'), [['--enable-bulk-memory', '--enable-bulk-memory-opt', '--enable-nontrapping-float-to-int', '--enable-sign-ext',
     '--enable-mutable-globals', '--enable-exception-handling', '--enable-memory64', '--enable-multivalue', '--enable-reference-types',
-    '--enable-call-indirect-overlong', '--strip-eh', '--memory64-lowering', '--table64-lowering', '-Oz',
+    '--enable-call-indirect-overlong', '--enable-tail-call', '--strip-eh', '--memory64-lowering', '--table64-lowering', '-Oz',
     '--strip-debug', '--strip-producers', '--strip-target-features', join(f.out, 'lowered.wasm'), '-o', program]]);
   // Every export of a plain WASI command stays; its imports are the host's.
   assert.deepEqual(exportNames(readFileSync(program)), ['_start', 'cabi_realloc', 'lasm_extra', 'memory', 'wasi:http/incoming-handler@0.2.12#handle']);
@@ -87,7 +87,7 @@ test('Fastly and wasi-http targets: their defines, sources, memory and allowed i
   linkWasiProgram({ toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, target: 'fastly' });
   const compiled = f.tools.calls('clang');
   assert.deepEqual(compiled.map(args => args.at(-3)), ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c'].map(name => join(here, name)));
-  for (const args of compiled) assert.deepEqual(args.slice(8, 10), ['-DLASM_WASI_MAXIMUM_MEMORY=2048', '-DLASM_WASI_FASTLY']);
+  for (const args of compiled) assert.deepEqual(args.slice(9, 11), ['-DLASM_WASI_MAXIMUM_MEMORY=2048', '-DLASM_WASI_FASTLY']);
   const [link] = f.tools.calls('wasm-ld');
   assert.deepEqual(link.slice(-6), ['--stack-first', '-z', 'stack-size=1048576', '--initial-memory=4194304', '--max-memory=2147483648', '--table-base=1']);
   // The same objects are rejected for plain WASI: no WASI host provides Fastly's calls.
@@ -100,7 +100,7 @@ test('Fastly and wasi-http targets: their defines, sources, memory and allowed i
   const result = linkWasiProgram({ toolchain: h.toolchain, nodeRuntime: h.nodeRuntime, edge: h.edge, linkWork: h.linkWork, out: h.out, target: 'wasi-http' });
   const compiledHttp = h.tools.calls('clang');
   assert.deepEqual(compiledHttp.map(args => args.at(-3)), ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_wasi_http.c'].map(name => join(here, name)));
-  assert.equal(compiledHttp[2][9], '-DLASM_WASI_HTTP');
+  assert.equal(compiledHttp[2][10], '-DLASM_WASI_HTTP');
   const core = join(h.out, 'core.wasm'), program = join(h.out, 'main.wasm');
   const component = readFileSync(program);
   assert.deepEqual(result, { program, core, bytes: component.length });
@@ -124,7 +124,7 @@ test('LASM_TEST_UNOPTIMIZED runs only the lowering passes', { skip: !posix }, ()
   try { linkWasiProgram({ toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out }); }
   finally { if (previous === undefined) delete process.env.LASM_TEST_UNOPTIMIZED; else process.env.LASM_TEST_UNOPTIMIZED = previous; }
   const [opt] = f.tools.calls('wasm-opt');
-  assert.equal(opt[13], '-O0');
+  assert.equal(opt[14], '-O0');
   assert.ok(!opt.includes('-Oz'));
 });
 

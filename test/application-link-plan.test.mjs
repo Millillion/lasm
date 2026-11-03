@@ -65,7 +65,7 @@ test('a release build: compiled modules, the initialization plan, the requiremen
   assert.deepEqual(compiles.slice(1, 4).map(call => basename(call.args.at(-3))), ['Helper.c', 'reachability.c', 'initialization.c']);
   assert.equal(readFileSync(join(p.work, 'reachability.c'), 'utf8'), 'void *lasm_lookup_lean_symbol(const char *name) { (void)name; return 0; }\n');
   assert.match(readFileSync(join(p.work, 'initialization.c'), 'utf8'), /__wrap_lean_initialize/);
-  for (const call of compiles) assert.deepEqual(call.args.slice(0, 11), compileFlags(p.runtime));
+  for (const call of compiles) assert.deepEqual(call.args.slice(0, 12), compileFlags(p.runtime));
   // Exports: the C entry points and the program's own C exports.
   assert.equal(readFileSync(join(p.work, 'exports.json'), 'utf8'), '["_free","_main","_malloc"]\n');
   assert.equal(readFileSync(join(p.work, 'initializers-exports.json'), 'utf8'), '["_main","_malloc","_free"]\n');
@@ -284,12 +284,18 @@ test('the project object cache and the shared store: reuse, damage, pruning', { 
   assert.deepEqual(second.links.map(link => link.map), [join(work, 'final.map')], 'only the delivered link runs');
   assert.equal(requirements.mode, 'static');
   assert.deepEqual(readFileSync(join(work, 'module-0.o')), readFileSync(join(p.work, 'module-0.o')));
-  // A damaged entry is detected and compiled again; an edited module compiles alone.
-  const [entry] = readdirSync(objectCache).filter(name => /^[0-9a-f]{64}\.o$/.test(name));
-  writeFileSync(join(objectCache, entry), 'damaged');
-  const third = emccSdk(p.base);
-  await build({ ...p, work: join(p.base, 'work-3') }, { sdk: third, objectCache, sharedCache, linkOnly: true }).catch(error => error);
-  assert.equal(third.calls.filter(call => call.tool === 'emcc').length, 1);
+  // A damaged entry is detected and compiled again; the others are reused.
+  // (Which entry is the main module's depends on the hashes, so each is damaged in turn.)
+  const entries = readdirSync(objectCache).filter(name => /^[0-9a-f]{64}\.o$/.test(name));
+  assert.ok(entries.length >= 2);
+  for (const [index, entry] of entries.entries()) {
+    writeFileSync(join(objectCache, entry), 'damaged');
+    const third = emccSdk(p.base), work3 = join(p.base, `work-3-${index}`);
+    mkdirSync(work3);
+    await build({ ...p, work: work3 }, { sdk: third, objectCache, sharedCache, linkOnly: true });
+    assert.equal(third.calls.filter(call => call.tool === 'emcc').length, 1);
+    assert.notDeepEqual(readFileSync(join(objectCache, entry)), Buffer.from('damaged'));
+  }
   // A different shared store compiles Lasm's generated C again.
   const fourth = emccSdk(p.base);
   mkdirSync(join(p.base, 'work-4'));
