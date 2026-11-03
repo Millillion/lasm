@@ -6,6 +6,7 @@ import { distTag, isVersion, atLeast, releasePackages, publicationOrder } from '
 import { decide } from '../scripts/release/detect.mjs';
 import { selectChecksRun, manifestProblems, releaseState } from '../scripts/release/plan.mjs';
 import { differences } from '../scripts/release/compare.mjs';
+import { checksJobs, releaseChecksManifest } from '../scripts/release/checks-manifest.mjs';
 import { publicationPlan } from '../scripts/release/publish.mjs';
 import { packageSteps, trustState, placeholderManifest } from '../scripts/release/bootstrap-npm.mjs';
 
@@ -111,23 +112,78 @@ test('bootstrap: placeholders, trust and deprecation only where missing', async 
   assert.deepEqual([manifest.version, manifest.license, manifest.repository.url, manifest.scripts], ['0.0.0', 'MIT', 'git+https://github.com/Millillion/lasm.git', undefined]);
 });
 
+// Workflow configuration has no runtime but GitHub's, and a release is the only
+// event that runs most of these paths, so the publisher's security properties
+// stay a lint (docs/TESTING.md#test-quality-audit): OIDC, no stored tokens, one
+// release at a time.
+const workflow = name => readFileSync(new URL(`../.github/workflows/${name}`, import.meta.url), 'utf8');
+/** The lines of one top-level job of a workflow (two-space indented key). */
+function jobBlock(text, job) {
+  const lines = text.split('\n'), start = lines.indexOf(`  ${job}:`);
+  assert.ok(start >= 0, `no job ${job}`);
+  const end = lines.findIndex((line, i) => i > start && /^  [A-Za-z0-9_-]+:/.test(line));
+  return lines.slice(start, end < 0 ? undefined : end).join('\n');
+}
+const jobNames = text => [...text.slice(text.indexOf('\njobs:\n')).matchAll(/^  ([A-Za-z0-9_-]+):$/gm)].map(match => match[1]);
+
 test('release.yml is the trusted publisher: OIDC, no tokens, serialized, never cancelled', () => {
-  const workflow = readFileSync(new URL('../.github/workflows/release.yml', import.meta.url), 'utf8');
-  assert.match(workflow, /id-token: write/);
-  assert.match(workflow, /group: npm-release\n\s+cancel-in-progress: false/);
-  assert.doesNotMatch(workflow, /\$\{\{\s*secrets\.|NODE_AUTH_TOKEN|NPM_TOKEN|^\s+environment:/m);
-  const checks = readFileSync(new URL('../.github/workflows/release-checks.yml', import.meta.url), 'utf8');
+  const release = workflow('release.yml');
+  assert.match(release, /id-token: write/);
+  assert.match(release, /group: npm-release\n\s+cancel-in-progress: false/);
+  assert.doesNotMatch(release, /\$\{\{\s*secrets\.|NODE_AUTH_TOKEN|NPM_TOKEN|^\s+environment:/m);
+});
+
+test('release-checks needs every gate the manifest records, and passes their results to it', () => {
+  const checks = workflow('release-checks.yml');
   assert.match(checks, /^name: release-checks$/m);
-  assert.match(checks, /\n  release-checks:\n    name: release-checks\n/);
-  // The edge targets and Bun/Deno gate a release (0.2.0), and the rehearsal runs Bun and Deno from the loopback registry.
-  assert.match(checks, /\n  edge:\n[\s\S]*?uses: \.\/\.github\/workflows\/workers\.yml\n/);
-  assert.match(checks, /needs: \[detect, candidate, rehearsal, edge, browser, wasi, ui, fullstack, unit, dx, stress\]/);
-  assert.match(checks, /uses: \.\/\.github\/workflows\/wasi\.yml/);
-  assert.match(checks, /uses: \.\/\.github\/workflows\/browser\.yml/);
-  assert.match(checks, /gates = \[e\.EDGE, e\.BROWSER, e\.WASI, e\.UI, e\.FULLSTACK, e\.UNIT, e\.DX, e\.STRESS\]/);
-  const dist = readFileSync(new URL('../.github/workflows/npm-dist.yml', import.meta.url), 'utf8');
+  const job = jobBlock(checks, 'release-checks');
+  assert.match(job, /\n    name: release-checks\n/);
+  assert.deepEqual(job.match(/\n    needs: \[([^\]]+)\]/)[1].split(/,\s*/), [...checksJobs]);
+  assert.deepEqual(jobNames(checks).filter(name => name !== 'release-checks').sort(), [...checksJobs].sort());
+  for (const name of checksJobs) assert.match(job, new RegExp(`\\n          ${name.toUpperCase()}: \\$\\{\\{ needs\\.${name}\\.result \\}\\}\\n`), name);
+  assert.match(job, /run: node scripts\/release\/checks-manifest\.mjs\n/);
+  // A called workflow without `workflow_call` fails only when a release runs it.
+  const called = [...checks.matchAll(/uses: \.\/\.github\/workflows\/([a-z0-9-]+\.yml)/g)].map(match => match[1]);
+  assert.ok(['workers.yml', 'wasi.yml', 'browser.yml', 'unit.yml'].every(name => called.includes(name)), called.join());
+  for (const name of new Set(called)) assert.match(workflow(name), /\n  workflow_call:/, name);
+  // The published-package CI (npm-dist.yml) requires the edge checks to run.
+  const dist = workflow('npm-dist.yml');
   assert.match(dist, /scripts\/edge\/published-ci\.mjs/);
   assert.match(dist, /LASM_PUBLISHED_REQUIRE: '1'/);
-  const workers = readFileSync(new URL('../.github/workflows/workers.yml', import.meta.url), 'utf8');
-  assert.match(workers, /\n  workflow_call:\n/);
+});
+
+test('the release-checks verdict: detect alone off a release; every gate, the candidate and the rehearsal on one', () => {
+  const ok = Object.fromEntries(checksJobs.map(job => [job.toUpperCase(), 'success']));
+  const base = { ...ok, RELEASE: 'true', VERSION: '0.4.0', PREVIOUS: '0.3.9', DIST_TAG: 'latest', GITHUB_SHA: sha, HEAD_SHA: sha,
+    GITHUB_EVENT_NAME: 'push', TESTED_RELEASE: 'node-linux-candidate-1', TESTED_SHA256: 'c'.repeat(64) };
+  const full = releaseChecksManifest(base);
+  assert.equal(full.passed, true);
+  assert.deepEqual(manifestProblems(full.manifest, { sha, version: '0.4.0', dryRun: false }), []);
+  assert.deepEqual(Object.keys(full.manifest.jobs), [...checksJobs]);
+  assert.deepEqual(full.manifest.candidate, { release: 'node-linux-candidate-1', sha256: 'c'.repeat(64) });
+  assert.match(full.summary, /passed\n\nRelease 0\.4\.0\n$/);
+  for (const job of checksJobs) for (const result of ['failure', 'cancelled', 'skipped', undefined]) {
+    const { passed, manifest } = releaseChecksManifest({ ...base, [job.toUpperCase()]: result });
+    assert.equal(passed, false, `${job} ${result}`);
+    assert.notDeepEqual(manifestProblems(manifest, { sha, version: '0.4.0', dryRun: false }), [], job);
+  }
+  // Not a release: only detect matters; the gates are skipped.
+  const skipped = Object.fromEntries(checksJobs.map(job => [job.toUpperCase(), 'skipped']));
+  const quiet = releaseChecksManifest({ ...skipped, DETECT: 'success', RELEASE: 'false' });
+  assert.equal(quiet.passed, true);
+  assert.equal(quiet.manifest.candidate, null);
+  assert.match(quiet.summary, /Not a release commit/);
+  assert.equal(releaseChecksManifest({ ...skipped, DETECT: 'failure', RELEASE: 'false' }).passed, false);
+  // A reused candidate: the candidate job is skipped, the run is partial, and only dry runs accept it.
+  const reused = releaseChecksManifest({ ...base, CANDIDATE: 'skipped', REUSE: 'node-linux-candidate-7', REUSE_SHA256: 'd'.repeat(64) });
+  assert.equal(reused.passed, true);
+  assert.equal(reused.manifest.full, false);
+  assert.equal(reused.manifest.candidate.release, 'node-linux-candidate-7');
+  assert.match(reused.summary, /partial: reused candidate node-linux-candidate-7/);
+  assert.deepEqual(manifestProblems(reused.manifest, { sha, version: '0.4.0', dryRun: true }), []);
+  assert.ok(manifestProblems(reused.manifest, { sha, version: '0.4.0', dryRun: false }).some(p => /partial/.test(p)));
+  assert.equal(releaseChecksManifest({ ...base, CANDIDATE: 'success', REUSE: 'node-linux-candidate-7' }).passed, false);
+  const overlay = releaseChecksManifest({ ...base, CANDIDATE: 'skipped', OVERLAY: 'true' });
+  assert.equal(overlay.passed, true);
+  assert.equal(overlay.manifest.rehearsal.overlaySource, true);
 });

@@ -221,14 +221,28 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       if (pending) { pending.then(() => lasmFullServe(slot)); return; }
     }
   };
-  // Serve one pending request of a slot now, on this thread, while the main
-  // thread waits inside a synchronous Lasm.JS callback for the Lean thread that
-  // owns the slot. Only synchronously completing operations can be answered:
-  // an operation that returns a promise is answered with a failure (its result,
-  // when it settles, is discarded), except writes, which are queued.
+  // Serve the pending requests of a Lean thread now, on this thread, while the
+  // main thread waits inside a synchronous Lasm.JS callback for that thread:
+  // the slot at `pointer` and the thread's slots for deeper nesting (a host call
+  // made by work proxied to the thread while it waits, such as dynamic-library
+  // synchronization), linked from each slot (offset 96, host-library.js). A
+  // deeper slot made during the callback is not registered yet (its message
+  // waits for the event loop): it is recorded here, and lasmFullHostSlot starts
+  // its asynchronous server later. Only synchronously completing operations can
+  // be answered: an operation that returns a promise is answered with a failure
+  // (its result, when it settles, is discarded), except writes, which are queued.
   var lasmFullServeSync = function (pointer) {
-    const slot = lasmFullSlots.get(pointer);
-    if (!slot || !lasmFullHostValue) return;
+    if (!lasmFullHostValue) return;
+    for (let depth = 0; pointer && depth < 64; depth++) {
+      let slot = lasmFullSlots.get(pointer);
+      if (!slot && depth) lasmFullSlots.set(pointer, slot = { pointer, sequence: 0, registered: false });
+      if (!slot) return;
+      lasmFullServeSyncSlot(slot);
+      pointer = Number(lasmFullViews().view.getBigUint64(pointer + 96, true));
+    }
+  };
+  var lasmFullServeSyncSlot = function (slot) {
+    const pointer = slot.pointer;
     const { i32, view } = lasmFullViews();
     const sequence = Atomics.load(i32, pointer / 4);
     if (sequence === slot.sequence) return;
@@ -259,11 +273,17 @@ if (!ENVIRONMENT_IS_PTHREAD) {
   // Diagnostics (scripts/ci/lasm-js-stress.mjs): every Lean thread's host slot
   // and the request it waits on, if any.
   globalThis[Symbol.for('lasm.full.slots')] = () => ({ served: lasmFullServed, completionsQueued: lasmFullCompletions.length,
-    completionWaiter: !!lasmFullCompletionWaiter, slots: [...lasmFullSlots.values()].map(s => ({ pointer: s.pointer, sequence: s.sequence, pending: s.pending ?? null })) });
-  // CMD_CALL_HANDLER from a Lean thread's first call at a nesting depth.
+    completionWaiter: !!lasmFullCompletionWaiter, slots: [...lasmFullSlots.values()].map(s => ({ pointer: s.pointer, sequence: s.sequence, pending: s.pending ?? null,
+      next: Number(lasmFullViews().view.getBigUint64(s.pointer + 96, true)) })) });
+  // CMD_CALL_HANDLER from a Lean thread's first call at a nesting depth. The
+  // slot may already be known: served inline during a synchronous callback,
+  // which keeps the sequence it served.
   Module.lasmFullHostSlot = function (pointer) {
-    const slot = { pointer, sequence: 0 };
-    lasmFullSlots.set(pointer, slot);
+    let slot = lasmFullSlots.get(pointer);
+    if (slot?.registered !== false) {
+      slot = { pointer, sequence: 0 };
+      lasmFullSlots.set(pointer, slot);
+    } else delete slot.registered;
     lasmFullServe(slot);
   };
 }

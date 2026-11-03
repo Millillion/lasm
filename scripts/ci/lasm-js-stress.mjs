@@ -112,7 +112,18 @@ async function stress(name, project, { expected, viaCli = 0, server = false }) {
   // Build first, untimed (a cold build downloads tools): every timed run then
   // reuses the cached build, as the acceptance's run does after its first build.
   if (!server) {
-    execFileSync(process.execPath, [lasm, 'Main.lean'], { cwd: project, stdio: ['ignore', 'ignore', 'inherit'], env: { ...process.env, CI: '1' }, timeout: 30 * 60_000 });
+    // A program that hangs here (before any timed run) leaves its state after a
+    // minute, if its event loop still runs (none: Node's main thread is blocked).
+    const firstDiag = join(work, 'hangs', `${name}-first-run`);
+    try {
+      execFileSync(process.execPath, [lasm, 'Main.lean'], { cwd: project, stdio: ['ignore', 'inherit', 'inherit'],
+        env: { ...diagEnv(firstDiag), LASM_STRESS_DIAG_MS: '60000' }, timeout: 10 * 60_000 });
+    } catch (error) {
+      const states = existsSync(firstDiag) ? readdirSync(firstDiag).filter(f => f.startsWith('state-')) : [];
+      console.log(`${name}: the first run failed; ${states.length ? 'state after 60 s:' : 'no state written after 60 s (Node\'s main thread blocked?)'}`);
+      for (const f of states) console.log(readFileSync(join(firstDiag, f), 'utf8'));
+      throw error;
+    }
   }
   const total = viaCli + runs;
   const run = async (i, diagDir, seed, trace) => {
