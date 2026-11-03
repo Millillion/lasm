@@ -17,7 +17,7 @@
 //     [--targets node,wasi,wasi-node,deno,edge-node,edge-bun,edge-sm]
 //     [--wasmtime PATH] [--deno PATH] [--bun PATH] [--sm PATH]
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
@@ -63,12 +63,22 @@ def mapMLoop (n : Nat) : Async Nat := do
   let xs ← (List.range n).mapM fun _ => (IO.monoNanosNow : IO Nat)
   return xs.length
 
+/-- A compute benchmark (code size and speed with and without tail calls): List
+and Array operations with closures, a for loop, Nat arithmetic. -/
+def benchWork (n : Nat) : Nat := Id.run do
+  let xs := (List.range n).map (· * 7919 % 100003)
+  let arr := xs.toArray.qsort (· < ·)
+  let mut s := 0
+  for x in arr do s := (s + x * x) % 1000000007
+  return s + (xs.filter (· % 3 == 0)).length
+
 def main (args : List String) : IO Unit := do
   let n := (args.getD 1 "1000").toNat!
   match args.headD "sum" with
   | "sum" => IO.println (sumTo (List.range n))
   | "await" => IO.println (← (awaitLoop n 0).block)
   | "mapM" => IO.println (← (mapMLoop n).block)
+  | "bench" => IO.println (benchWork n)
   | _ => IO.println (depth n)
 `);
 writeFileSync(join(work, 'node-wasi-run.mjs'), `const { WASI } = await import('node:wasi');
@@ -192,6 +202,17 @@ for (const target of targets) {
     (report.targets[target].asyncLoop ??= {})[mode] = { code: r.code, ms: r.ms };
     expect(target, `Async loop (${mode}) of ${asyncSteps.toLocaleString('en-US')} host calls (#90)`, r.code === 0 && r.stdout === `${asyncSteps}\n`,
       JSON.stringify({ code: r.code, signal: r.signal, timedOut: r.timedOut, ms: r.ms, stderr: r.stderr.slice(0, 600) }));
+  }
+  // Code size and a compute benchmark (informational): the program's .wasm bytes
+  // and the fastest of three runs of benchWork 300,000, startup included.
+  {
+    const output = join(work, { node: 'dist', wasi: 'wasi', 'wasi-node': 'wasi' }[target] ?? 'deno');
+    const wasmFiles = dir => readdirSync(dir, { withFileTypes: true }).flatMap(e => e.isDirectory() ? wasmFiles(join(dir, e.name))
+      : e.name.endsWith('.wasm') ? [join(dir, e.name)] : []);
+    const runs = [0, 1, 2].map(() => run(target, ['bench', '300000']));
+    report.targets[target].bench = { wasmBytes: wasmFiles(output).reduce((n, f) => n + statSync(f).size, 0),
+      ms: Math.min(...runs.map(r => r.ms)), runsMs: runs.map(r => r.ms), ok: runs.every(r => r.code === 0), stdout: runs[0].stdout.trim() };
+    console.log(`${target}: bench ${JSON.stringify(report.targets[target].bench)}`);
   }
   console.log(`${target}: deepest sumTo ${JSON.stringify(report.targets[target].limit)}`);
 }

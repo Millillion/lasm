@@ -7,7 +7,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { apps } from './checks.mjs';
+import { apps, checksFor } from './checks.mjs';
 
 const [dir, appName, resultFile, projectArg] = process.argv.slice(2);
 const workers = resolve(dir), app = apps[appName], project = projectArg ? resolve(projectArg) : join(workers, '..');
@@ -52,7 +52,8 @@ const verify = async check => {
   const ok = got.status === check.status && (check.body === undefined || got.body === check.body) && (!check.match || check.match.test(got.body));
   result.checks.push({ path: check.path, ok, ...(ok ? {} : { got }) });
 };
-for (const check of app.checks) await verify(check);
+// The Asyncify build has no tail calls (issue #90): its List.mapM loop runs the bounded depth.
+for (const check of checksFor(app, { tailCalls: result.suspend !== 'asyncify' })) await verify(check);
 if (app.fatal) {
   const got = await fetchOnce(app.fatal);
   result.checks.push({ path: app.fatal.path, ok: got.status === 'error' && !!current.lean.lasmEdge.stopped, stopped: !!current.lean.lasmEdge.stopped });

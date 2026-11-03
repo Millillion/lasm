@@ -53,6 +53,15 @@ limit. The Asyncify data buffer holding Lean's suspended stack is 1 MiB; a
 blocking wait under very deep recursion that needs more stops the instance (it
 is replaced on the next request).
 
+**No tail calls.** Asyncify does not support WebAssembly tail calls, which every
+other target uses (issue [#90](https://github.com/Millillion/lasm/issues/90)),
+so this link turns them into ordinary calls. A monadic loop over host calls that
+complete at once, such as `List.mapM` in `Async`, is then bounded by the stack
+(about a thousand steps are checked in CI; 100,000 overflow and stop the
+instance). Write such a loop in `IO` (a `for` loop, or `List.mapM` in `IO`, then
+one `Async` step) or as a tail-recursive function. See
+[FUNDAMENTAL_LIMITATIONS.md](../../FUNDAMENTAL_LIMITATIONS.md#tail-calls-between-functions-monadic-loops).
+
 ## Testing without an account
 
 CI ([`workers.yml`](../../.github/workflows/workers.yml), through

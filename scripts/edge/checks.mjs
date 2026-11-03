@@ -27,7 +27,8 @@ export const apps = {
       { path: '/deep/5000', status: 200, body: '{"depth":5000}' },
       // Issue #90: Async loops of 100,000 host calls, not bounded by the stack.
       { path: '/hostloop/await/100000', status: 200, body: '{"steps":100000}' },
-      { path: '/hostloop/mapM/100000', status: 200, body: '{"steps":100000}' },
+      // Bounded by the stack without tail calls (stackBound, checksFor below).
+      { path: '/hostloop/mapM/100000', status: 200, body: '{"steps":100000}', stackBound: true },
       { path: '/nope', status: 404, body: '{"error":"not found"}' },
     ],
     // Stops the instance; the next request must get a fresh one.
@@ -35,3 +36,15 @@ export const apps = {
     bench: { trivial: '/', json: '/primes/10000' },
   },
 };
+
+/** Steps of the List.mapM loop a build without tail calls runs instead (the
+ * Asyncify build, which lowers them for Binaryen; issue #90): its depth is
+ * bounded by the stack, the documented limit (FUNDAMENTAL_LIMITATIONS.md). */
+export const boundedLoopSteps = 1000;
+
+/** An app's checks for a build with or without Wasm tail calls. */
+export function checksFor(app, { tailCalls = true } = {}) {
+  if (tailCalls) return app.checks;
+  return app.checks.map(check => check.stackBound
+    ? { ...check, path: check.path.replace(/\d+$/, String(boundedLoopSteps)), body: `{"steps":${boundedLoopSteps}}` } : check);
+}

@@ -92,3 +92,27 @@ def sumToTR (xs : List Nat) (acc : Nat := 0) : Nat :=
 Linux, macOS and Windows; WASI on wasmtime and `node:wasi`; the edge output on
 Deno, Node, Bun and SpiderMonkey); the browser suite and the Workers checks
 recurse 5,000 frames.
+
+### Tail calls between functions (monadic loops)
+
+Lean's generated C relies on the C compiler turning a call in tail position
+into a jump (a sibling call), also between different functions. Monadic loops
+depend on it: `List.mapM` in `Async` over host calls that complete at once
+(issue [#90](https://github.com/Millillion/lasm/issues/90)) calls each step
+from a separate continuation function. Lasm compiles with WebAssembly tail calls
+(`return_call`, clang's `-mtail-call`), so such loops run in constant stack on
+every target, as natively. `scripts/ci/stack-depth.mjs` and the edge checks run
+`List.mapM` in `Async` over 100,000 host calls on every target.
+
+**Exception: Supabase Edge Functions (`--target supabase-edge`).** Supabase's
+edge runtime has no JSPI, so Lasm links it with Binaryen's Asyncify, which does
+not support tail calls; the Asyncify link turns them back into ordinary calls.
+There, a loop of host calls that complete at once is bounded by the stack like
+non-tail recursion: about a thousand steps of `List.mapM` in `Async` are checked,
+100,000 overflow. Rewrite such a loop in `IO` (a `for` loop, or `List.mapM` in
+`IO`, then one `Async` step), or as a tail-recursive function. When the CI probe
+(`scripts/edge/supabase-ci.mjs`) finds JSPI in Supabase's runtime, the target
+moves to the ordinary tail-call build.
+
+**Browsers** need WebAssembly tail calls: Chrome and Edge 112+, Firefox 121+,
+Safari 18.2+ ([BROWSER.md](docs/BROWSER.md)).

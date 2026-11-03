@@ -219,9 +219,16 @@ entry: see [BUN_DENO.md](BUN_DENO.md).
   compute-heavy one 1.8× the JSPI time; in the Supabase runtime a cold worker
   answers in 440–580 ms and later requests take about 2 ms over HTTP. Details:
   [deploy/supabase-edge.md](deploy/supabase-edge.md#measured-ci-run-40278642433-ubuntu-2404).
+- **No tail calls** (issue #90): Asyncify does not support WebAssembly tail
+  calls, so before the asyncify pass the link turns `return_call` into `call`
+  + `return` (`lowerTailCalls` in `src/wasi/lower-atomics.mjs`, run by
+  `src/link-driver/link.mjs`; for emcc recordings a `wasm-opt` wrapper,
+  `src/edge/wasm-opt-asyncify.mjs`, does the same). Monadic loops of host
+  calls that complete at once are bounded by the stack here only; the edge
+  checks run `List.mapM` over 1,000 host calls on this build instead of 100,000.
 - **When Supabase ships JSPI** (the probe reports `function`), switch the
   target's `suspend` to `jspi` in `src/edge/edge-build.mjs`: the standard
-  link, smaller and faster.
+  link, smaller and faster, with tail calls.
 
 ## Platform facts
 

@@ -28,7 +28,7 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { headlessEnvironment } from './headless.mjs';
-import { apps } from './checks.mjs';
+import { apps, checksFor } from './checks.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const work = resolve(process.argv[2]), resultsDir = resolve(process.argv[3] ?? process.argv[2]);
@@ -180,7 +180,8 @@ try {
     const first = await request(fn, spec.checks[0]);
     supabase.coldStartMs = first.ms;
     check(`cold ${spec.checks[0].path}`, first.status === spec.checks[0].status && (spec.checks[0].body === undefined || first.body === spec.checks[0].body), { got: first });
-    for (const c of spec.checks) {
+    // Supabase runs the Asyncify build, without tail calls (issue #90): the List.mapM loop runs the bounded depth.
+    for (const c of checksFor(spec, { tailCalls: false })) {
       const got = await request(fn, c);
       const ok = got.status === c.status && (c.body === undefined || got.body === c.body) && (!c.match || c.match.test(got.body));
       check(`${c.method ?? 'GET'} ${c.path}`, ok, ok ? { ms: got.ms } : { got });

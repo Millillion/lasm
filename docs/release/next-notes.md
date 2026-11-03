@@ -5,6 +5,7 @@ Notes for the next release, collected as changes land. They move to
 
 ## Breaking changes
 
+- **Browsers: Safari 18.2+ (and Chrome/Edge 112+, Firefox 121+) are required (#90).** Lasm now compiles with WebAssembly tail calls, so monadic loops such as `List.mapM` in `Async` over host calls run in constant stack on every target, as in native Lean; before, 100,000 steps overflowed the stack on WASI, Deno, Bun, Workers and the other edge targets. Older Safari versions cannot load a module with tail calls. Supabase Edge Functions keep their Asyncify build without tail calls (Asyncify does not support them): there such loops stay bounded by the stack; see [FUNDAMENTAL_LIMITATIONS.md](../../FUNDAMENTAL_LIMITATIONS.md#tail-calls-between-functions-monadic-loops). New runtime artifacts (Node runtime and edge runtime) are pinned, so every cached object is rebuilt once.
 - **Lasm.UI handlers decide `preventDefault` and `stopPropagation` for each event (#71).**
   - **Before:** `preventDefaultOn` and `stopPropagationOn` applied a fixed option to every event the handler received, even when its decoder produced no message. A chat box could not send on Enter without either blocking all typing or inserting a newline.
   - **Now:** the decoder returns the decision with the message, as in Elm's `Html.Events`. The applier already calls Lean synchronously from its DOM listener, so the decision is applied while the event is still being dispatched. A handler that produces no message (a `filterMap` returning `none`, a field of the wrong type) leaves the event alone.
