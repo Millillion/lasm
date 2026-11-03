@@ -12,13 +12,17 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
 assert.equal(process.platform, 'win32');
-const [outputArg, node, version = '4.34.0', ...extra] = process.argv.slice(2);
+const [outputArg, node, version = '4.35.0', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && node && !extra.length, 'Supply NEW_OUTPUT NODE [LEAN_VERSION]');
 assert.match(version, /^\d+\.\d+\.\d+$/);
 const output = resolve(outputArg), root = fileURLToPath(new URL('..', import.meta.url));
 assert.ok(!existsSync(output)); mkdirSync(output, { recursive: true });
 writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
-const lean = await provisionLean(output), env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '1' };
+// The native control needs leanc and Lean's bundled C toolchain. Lasm's tiered
+// distribution (Lean 4.35.0 on) leaves both out on every host, by design: users
+// never run leanc (packages with C code get the C tier's clang as `cc`). So
+// the control uses the complete upstream archive, as check-node-windows does.
+const lean = await provisionLean(output, { distribution: 'full' }), env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '1' };
 const inputs = ['integration/windows-timezone-host.mjs', 'integration/fixtures/WindowsTimezoneIcu.lean',
   'integration/fixtures/windows-timezone-native-host.mjs', 'src/native-windows-timezone.mjs'];
 const sourceHashes = Object.fromEntries(await Promise.all(inputs.map(async name => [name, await hashFile(join(root, name))])));
@@ -27,8 +31,8 @@ const report = { scope: 'Native Windows Lean interpreted/compiled versus the pro
   resourceReport: process.env.LASM_RESOURCE_REPORT, sourceHashes, commands: [], cases: [], passed: false,
   adaptations: ['The supplementary Lean fixture and host logger serialize API values, not console semantics. Only one terminal CRLF/LF is removed for the value comparison; every raw stdout/stderr/status is retained. Original upstream tests are not changed.'] };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
-function run(label, program, args, timeout = 120_000) {
-  const started = performance.now(), result = spawnSync(program, args, { cwd: output, env, encoding: 'utf8',
+function run(label, program, args, timeout = 120_000, extraEnv = {}) {
+  const started = performance.now(), result = spawnSync(program, args, { cwd: output, env: { ...env, ...extraEnv }, encoding: 'utf8',
     timeout, killSignal: 'SIGKILL', maxBuffer: 1024 * 1024 });
   const row = { label, program, args, seconds: (performance.now() - started) / 1000,
     code: result.status, signal: result.signal, error: result.error?.message, stdout: result.stdout, stderr: result.stderr };
@@ -46,7 +50,12 @@ try {
   const main = join(output, 'Main.lean'), native = join(output, 'native.exe');
   copyFileSync(join(root, 'integration/fixtures/WindowsTimezoneIcu.lean'), main);
   run('generate native fixture', lean.lean, ['-j1', '-Dlinter.all=false', '-Dcompiler.postponeCompile=false', '-c', main + '.c', main]);
-  run('compile native fixture', join(lean.prefix, 'bin/leanc.exe'), ['-O2', '-DNDEBUG', '-o', native, main + '.c']);
+  assert.equal(lean.distribution, 'full');
+  // leanc's bundled-compiler template is ROOT/bin/clang.exe; a namespaced ROOT
+  // (\\?\C:\...) gives mixed separators Windows cannot spawn, so leanc gets the
+  // ordinary prefix (as in check-node-windows).
+  run('compile native fixture', join(lean.prefix, 'bin/leanc.exe'), ['-O2', '-DNDEBUG', '-o', native, main + '.c'], 120_000,
+    { LEAN_SYSROOT: lean.executionPrefix ?? lean.prefix });
   report.nativeSha256 = await hashFile(native);
   const engines = [['node', node, []]];
   report.engines = engines.map(([name, program]) => ({ name, program, version: run(name + ' version', program, ['--version']).stdout.trim() }));

@@ -40,6 +40,7 @@ proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (subset), release |
+| [Flaky tests](#flaky-tests) | A flaky test is quarantined at once, then fixed or deleted within a week | `test/quarantine.json`, `scripts/test/`, `scripts/ci/flaky-report.mjs` (`flaky.yml`) | nightly report; quarantine on every unit run |
 | [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/`, `scripts/mutation/` (`mutation.yml`) | release (coverage); nightly and PR, changed modules only (mutation) |
 
 ### Differential testing
@@ -206,7 +207,8 @@ it for `node`, `deno`, `bun`, `wasi-http` (wasmtime serve) and, in CI, `workers`
 requests (Unicode and percent-encoded paths, `%2F`, dot segments, query
 encodings, text, binary, empty and 256 KiB bodies, streamed bodies, redirects,
 custom statuses, repeated headers, unknown routes and methods, `HEAD`, a thrown
-error, environment variables, timers and tasks) and the expected responses,
+error, environment variables, timers and tasks, and a run of requests over one
+keep-alive connection) and the expected responses,
 recorded from Node with `--record`. Lasm's own responses are therefore pinned
 too: a change on Node shows up as a diff in review.
 
@@ -386,6 +388,50 @@ says whether the tests would notice a change.
 | Nightly | 03:17, 04:41 UTC | host bridge: 200 schedule-fuzzed runs per stress program on four platforms, conformance of their traces; differential: 60-minute campaigns for the release and the dev profile (two jobs), every oracle including `wasi-O0` and `deno-O0`; the nightly upstream suite (`nightly.yml`) | about 1.5 h |
 | Release | release PR (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) | as today |
 
+## Flaky tests
+
+A flaky test is one that both passes and fails on the same code. It costs
+everyone time (re-runs, ignored red builds) and teaches people to distrust
+failures, so the policy is strict:
+
+1. **Quarantine at once.** When a test is seen to be flaky (a nightly report
+   entry, a re-run that passed, a local repeat), open an issue and add an entry
+   to [`test/quarantine.json`](../test/quarantine.json) in the same change:
+   ```json
+   { "file": "test/x.test.mjs", "name": "the test's own name", "issue": "https://github.com/Millillion/lasm/issues/N",
+     "since": "YYYY-MM-DD", "reason": "what fails, how often" }
+   ```
+   The unit suite (`scripts/ci/unit-tests.mjs`, `unit.yml`) and `npm test`
+   (through [`scripts/test/node-test.mjs`](../scripts/test/node-test.mjs), a
+   `node --test` wrapper usable for any test file) skip a quarantined test with
+   `--test-skip-pattern` (the name anchored and escaped) and print a notice
+   (`::notice` on GitHub Actions) for each one. Other suites run through
+   `node scripts/test/node-test.mjs …` in place of `node --test …` to get the
+   same.
+2. **Fix or delete within a week.** An entry older than 7 days fails the unit
+   suite (and `node-test.mjs`) with an error naming the test and its issue. The
+   way out is to fix the cause and remove the entry, or to delete the test. The
+   deadline is not extended: a test that can't be made deterministic in a week
+   is replaced by one that can.
+3. **No retries.** The runners never retry a test inside a job (`node --test`
+   has no retries; every Playwright config sets `retries: 0`), so a flake shows
+   up as a failure, never as a silent second try.
+
+**The nightly report** ([`flaky.yml`](../.github/workflows/flaky.yml), 07:53
+UTC, [`scripts/ci/flaky-report.mjs`](../scripts/ci/flaky-report.mjs)) reads
+every workflow run of the last 24 hours through the GitHub API and lists:
+- jobs that **passed only on retry**: failed in one attempt and passed in a
+  re-run, with the tests that failed first (from that attempt's log);
+- re-run workflow runs;
+- timed-out jobs, and cancelled jobs that a newer run did not supersede (the
+  usual `cancel-in-progress` cancellations are only counted);
+- the quarantine list with each entry's age, flagging those past the week.
+
+It uploads `flaky-report.json` and `.md` as an artifact and replaces the body
+of the one open issue labelled `flaky` (opening it, and the label, if needed).
+Entries in the report are triaged into quarantine entries or closed as
+infrastructure (a runner lost, a registry outage).
+
 ## Test-quality audit
 
 An HN commenter mocked "tests that assert certain strings exist in the
@@ -561,7 +607,7 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Differential testing, regression replay (`deno`) | **Edge profile:** the C runtime's `getenv` sees none of the host's variables, so `LEAN_BACKTRACE=0` and `LEAN_ABORT_ON_PANIC` have no effect on the edge targets, Bun, Deno and the browser | Fixed ([#26](https://github.com/Millillion/lasm/issues/26)): the embedder's string variables are copied into Emscripten's `ENV` before libc reads it (`src/edge/edge-library.js`, `src/edge/edge-start.mjs`); regression `r_edge_env_backtrace`; [EDGE.md](EDGE.md#environment-variables) |
 | Target equivalence (fetch template, `examples/fetch`) | `GET /hello/../hello/Ada`: Node, Deno and wasi-http route the raw dot segments (404); Bun and Workers remove them first (200). Same handler, different routing per platform, and `..` reaches handlers on Node | [#27](https://github.com/Millillion/lasm/issues/27) (proposal: `remove_dot_segments` in `Request.path`), listed as `known` |
 | Differential testing, `deep` and `ending` cases | wasmtime turns an exit status of 126–255 into exit 1 with an error (docs/WASI.md says modulo 256); edge and WASI recursion stops just below 10,000 frames of a small function (docs/EDGE.md says 10,000 pass) | Documented ([#30](https://github.com/Millillion/lasm/issues/30)): measured bounds in [WASI.md](WASI.md) and [EDGE.md](EDGE.md); wasmtime's status limit stays in `KNOWN` (a host limit); generator bound 5,000 |
-| Target equivalence, first CI run | Bun answered some requests with "socket hang up": the harness's pooled keep-alive sockets, not Lasm (fresh connections per request fixed it) | Harness fix |
+| Target equivalence, first CI run | Bun answered some requests with "socket hang up", among them `/hello/a%2Fb` (the only one in the template's run, 41233271298): the harness sent `Connection: close` through Node's pooled keep-alive agent, which then reused the socket Bun had closed as asked. Not Bun and not Lasm: every run since answers `Hello, a/b` on Bun (e.g. 41650866547) | Harness fix (fresh connections, b88e671); a `keepAlive` corpus case now sends `/hello/a%2Fb` three times among five requests on one persistent connection, on every target |
 | Dev-profile campaign 41241443151 | **`lasm build --dev` followed by `lasm build --target wasi --dev` in the same project failed** (also in 0.3.5): the WASI link took the seeded dev link's Node archive members (`*.lasm-member.o`) and `reachability.o` along with the edge runtime's archives, so every host symbol was defined twice. The edge link already dropped them | Fixed in `src/wasi/wasi-link.mjs` (#34); the PR tier now replays the regressions in the dev profile |
 | Dev-profile campaign 41241443151 | `Float.pow` differed in the 17th digit between native (glibc) and Wasm (musl's libm): expected, libm functions are not correctly rounded | Generator: libm results go through `approx` (9 significant digits) |
 | Nightly-style campaign 41241440598 (9,450 cases) | Two "divergences" on every Wasm target were the harness's own: it decoded each pipe chunk of the oracle's output separately, so a UTF-8 character split by native Lean's 4,096-byte writes became U+FFFD (the Wasm targets wrote it whole). `scripts/ci/lasm-js-stress.mjs` had the same pattern | Harness fix (#33) |

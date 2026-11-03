@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, realpathSync, readdirSync, statSync, renameSync, rmSync } from 'node:fs';
-import { dirname, join, resolve, relative, delimiter, toNamespacedPath } from 'node:path';
+import { basename, dirname, join, resolve, relative, delimiter, toNamespacedPath } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -423,4 +423,19 @@ export function applicationSources(source, lean, work, { log = console.error, af
   visit(source);
   return { project: null, sources, inputs, env, metadataRoots: [output],
     oleans: () => sources.map(file => file.slice(0, -2) + '.olean') };
+}
+
+/** A program needs `main`. Without one the link would fall back to Lean's own
+ * frontend `main` in libleancpp and fail the application policy with a
+ * misleading message about runtime compilation; say what is missing instead.
+ * `inputs[i]` is the Lean source of the C file `sources[i]`; Lean's C for a
+ * module that defines `main` contains `int main(int argc, char ** argv)`. */
+export function assertDefinesMain(inputs, sources, source) {
+  const canonical = path => { try { return realpathSync(path); } catch { return resolve(path); } };
+  const target = canonical(source);
+  const index = inputs.findIndex(input => canonical(input.source) === target);
+  if (index < 0 || !existsSync(sources[index])) return;
+  if (/^int main\(/m.test(readFileSync(sources[index], 'utf8'))) return;
+  throw new Error(`${basename(source)} has no \`main\` function, so there is no program to build. `
+    + 'Define one, for example: def main : IO Unit := IO.println "hello"');
 }
