@@ -1,0 +1,13 @@
+--- !tapi-tbd-v3
+archs:           [ x86_64, arm64, arm64e, arm64e.x1 ]
+uuids:           [ 'x86_64: 00000000-0000-0000-0000-000000000001', 'arm64: 00000000-0000-0000-0000-000000000002',
+                   'arm64e: 00000000-0000-0000-0000-000000000003', 'arm64e.x1: 00000000-0000-0000-0000-000000000004' ]
+platform:        macosx
+install-name:    '/usr/lib/libSystem.B.dylib'
+current-version: 1351
+exports:
+  - archs:           [ x86_64, arm64, arm64e, arm64e.x1 ]
+    symbols:         [ _printf, _puts, dyld_stub_binder ]
+  - archs:           [ arm64e.x1 ]
+    symbols:         [ _only_on_x1 ]
+...

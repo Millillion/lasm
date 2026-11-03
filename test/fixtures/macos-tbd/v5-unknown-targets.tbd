@@ -1,0 +1,41 @@
+{
+  "tapi_tbd_version": 5,
+  "main_library": {
+    "target_info": [
+      { "target": "x86_64-macos", "min_deployment": "10.13" },
+      { "target": "arm64-macos", "min_deployment": "11" },
+      { "target": "arm64e-macos", "min_deployment": "11" },
+      { "target": "arm64e.x1-macos", "min_deployment": "26" }
+    ],
+    "uuids": [
+      { "target": "arm64-macos", "value": "00000000-0000-0000-0000-000000000002" },
+      { "target": "arm64e.x1-macos", "value": "00000000-0000-0000-0000-000000000003" }
+    ],
+    "install_names": [ { "name": "/usr/lib/libSystem.B.dylib" } ],
+    "current_versions": [ { "version": "1351" } ],
+    "reexported_libraries": [
+      { "targets": [ "x86_64-macos", "arm64-macos", "arm64e-macos", "arm64e.x1-macos" ], "names": [ "/usr/lib/system/libsystem_c.dylib" ] }
+    ],
+    "exported_symbols": [
+      { "targets": [ "x86_64-macos", "arm64-macos", "arm64e-macos", "arm64e.x1-macos" ], "text": { "global": [ "R8289209$_close" ] } },
+      { "targets": [ "arm64e.x1-macos" ], "text": { "global": [ "_only_on_x1" ] } }
+    ]
+  },
+  "libraries": [
+    {
+      "target_info": [
+        { "target": "x86_64-macos", "min_deployment": "10.13" },
+        { "target": "arm64-macos", "min_deployment": "11" },
+        { "target": "arm64e.x1-macos", "min_deployment": "26" }
+      ],
+      "install_names": [ { "name": "/usr/lib/system/libsystem_c.dylib" } ],
+      "parent_umbrellas": [ { "umbrella": "System" } ],
+      "exported_symbols": [ { "text": { "global": [ "_printf", "_puts", "dyld_stub_binder" ] } } ]
+    },
+    {
+      "target_info": [ { "target": "arm64e.x1-macos", "min_deployment": "26" } ],
+      "install_names": [ { "name": "/usr/lib/system/libsystem_x1.dylib" } ],
+      "exported_symbols": [ { "text": { "global": [ "_x1_library" ] } } ]
+    }
+  ]
+}

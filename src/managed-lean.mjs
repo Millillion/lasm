@@ -1,4 +1,4 @@
-import { readFile, stat, copyFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, stat, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, dirname, resolve, toNamespacedPath } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -8,6 +8,7 @@ import { compileLibrary, libraryIdentity, libraryLeanVersions } from './lasm-lib
 import { verifyNativeProgram } from './native-program.mjs';
 import { windowsToolPrefix } from './windows-tool-paths.mjs';
 import { findApplicationProject, standaloneImportsModules, macosSdk, macosSdkMissing } from './application-sources.mjs';
+import { filterTapiStub, checkLibSystemStub } from './macos-tbd.mjs';
 
 export const toolchainCatalog = JSON.parse(await readFile(new URL('./toolchains.json', import.meta.url), 'utf8'));
 
@@ -68,13 +69,15 @@ export async function assembleLeanPrefix(version, release, components, options =
     // Lasm's own library (Lasm.JS), compiled into prefixes with Lean's elaborator.
     lasmLibrary: libraryIdentity() };
   // macOS C tier: Lean's archive links against Apple's lib/libc/libSystem.tbd, an SDK
-  // file Lasm does not redistribute. The prefix takes the user's own SDK copy instead.
-  let libSystem;
+  // file Lasm does not redistribute. The prefix takes the user's own SDK copy instead,
+  // without the targets Lean's ld64.lld does not know (src/macos-tbd.mjs, issue #73).
+  let libSystem, sdk;
   if ((options.platform ?? process.platform) === 'darwin' && components.some(({ artifact }) => /-c\.tar\.zst$/.test(artifact.name))) {
-    const sdk = macosSdk();
+    sdk = macosSdk();
     if (!sdk) throw new Error(macosSdkMissing);
     libSystem = join(sdk, 'usr', 'lib', 'libSystem.tbd');
     provenance.macosSdkLibSystemSha256 = await hashFile(libSystem);
+    provenance.macosSdkLibSystemFilter = 1;
   }
   options.progress?.({ stage: `Checking Lean ${version} installation` });
   return deriveArtifact(provenance, async tree => {
@@ -87,8 +90,21 @@ export async function assembleLeanPrefix(version, release, components, options =
     }
     // A C tier that still carries the file (lean-4.35.0-c-v1) keeps its own copy.
     if (libSystem && !existsSync(join(tree, 'lib', 'libc', 'libSystem.tbd'))) {
+      const stub = join(tree, 'lib', 'libc', 'libSystem.tbd');
+      const unreadable = detail => new Error(`The macOS SDK at ${sdk} has a libSystem.tbd that Lean ${version}'s linker (ld64.lld) cannot read`
+        + `${detail ? `: ${detail}` : ''}. Set SDKROOT to another macOS SDK (xcrun --show-sdk-path, or one under `
+        + '/Library/Developer/CommandLineTools/SDKs) and run again, or report this at https://github.com/Millillion/lasm/issues.');
+      let filtered;
+      try { filtered = filterTapiStub(await readFile(libSystem, 'utf8')); }
+      catch (error) { throw unreadable(error.message); }
       await mkdir(join(tree, 'lib', 'libc'), { recursive: true });
-      await copyFile(libSystem, join(tree, 'lib', 'libc', 'libSystem.tbd'));
+      await writeFile(stub, filtered.text);
+      // Fail here, naming the SDK, rather than mid-build with "malformed file".
+      const linker = join(tree, 'bin', 'ld64.lld');
+      if (existsSync(linker)) {
+        const problem = checkLibSystemStub(linker, stub, options.arch ?? process.arch);
+        if (problem) throw unreadable(problem);
+      }
     }
     if (libraryLeanVersions.includes(version)) options.progress?.({ stage: `Compiling Lasm's Lean library for Lean ${version}` });
     compileLibrary(tree, version, { platform: options.platform, commit: release.commit });
