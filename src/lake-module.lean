@@ -6,7 +6,9 @@
 --                                   inputs exactly as Lake would collect them for
 --                                   a native executable (Lake.Build.Module
 --                                   recComputeModuleLinkInfo, without the Lean
---                                   modules' own native objects).
+--                                   modules' own native objects);
+--   lake-module.lean --native        only the packages that carry native (C)
+--                                   code (`lasm editor`: which toolchain tier).
 import Lake
 import Lake.Load.Workspace
 
@@ -67,10 +69,11 @@ def linkInputs (ws : Workspace) (roots : Array Lake.Module) (exe? : Option LeanE
     return { objs := objPkgs.zip objs, libs, args }
 
 def main (args : List String) : IO UInt32 := do
-  let (link, source) ← match args with
-    | ["--link", source] => pure (true, source)
-    | [source] => pure (false, source)
-    | _ => throw <| IO.userError "expected [--link] and an absolute source path"
+  let (link, source?) ← match args with
+    | ["--native"] => pure (false, none)
+    | ["--link", source] => pure (true, some source)
+    | [source] => pure (false, some source)
+    | _ => throw <| IO.userError "expected --native, or [--link] and an absolute source path"
   let (_, some lean, some lake) ← findInstall?
     | throw <| IO.userError "managed Lean/Lake installation is missing"
   let .ok lakeEnv ← (Env.compute lake lean none (some true)).toBaseIO
@@ -78,14 +81,16 @@ def main (args : List String) : IO UInt32 := do
   let wsDir ← IO.FS.realPath (← IO.currentDir)
   let some ws ← (loadWorkspace {lakeEnv, wsDir, updateToolchain := false}).toBaseIO
     | throw <| IO.userError "could not load the Lake workspace"
+  let native := ws.packages.filterMap fun pkg =>
+    let reasons := nativeReasons pkg
+    if reasons.isEmpty then none else some <| Json.mkObj [("package", toJson pkg.baseName.toString), ("reasons", toJson reasons)]
+  let some source := source?
+    | do IO.println <| (Json.mkObj [("native", toJson native)]).compress; return 0
   -- Lake CLI file queries resolve symlinks before finding the module. A link
   -- may legitimately point outside srcDir, so first use its configured path.
   let path := FilePath.mk source |>.normalize
   let realPath ← IO.FS.realPath path
   let configured := ws.root.findModuleBySrc? path <|> ws.root.findModuleBySrc? realPath
-  let native := ws.packages.filterMap fun pkg =>
-    let reasons := nativeReasons pkg
-    if reasons.isEmpty then none else some <| Json.mkObj [("package", toJson pkg.baseName.toString), ("reasons", toJson reasons)]
   if link then
     let roots ← match configured with
       | some mod => pure #[mod]

@@ -80,7 +80,7 @@ in it unchanged.
 
 | Request | |
 | --- | --- |
-| `req.path` | The URL's path without the query (`/hello/Ada`); `/` when empty. Resolved as a browser resolves it, on every platform: `/hello/../hello/Ada` is `/hello/Ada`, escaped dots (`%2e`) count as dots, and `\` counts as `/` ([#27](https://github.com/Millillion/lasm/issues/27)). |
+| `req.path` | The URL's path without the query (`/hello/Ada`); `/` when empty. Resolved as a browser resolves it, on every platform: `/hello/../hello/Ada` is `/hello/Ada`, escaped dots (`%2e`) count as dots, and `\` counts as `/` ([#27](https://github.com/Millillion/lasm/issues/27)). A `://` in the query or fragment doesn't affect it ([#76](https://github.com/Millillion/lasm/issues/76)). |
 | `req.segments` | The path's decoded segments: `/hello/J%C3%BCrgen` → `["hello", "Jürgen"]`. Never contains `.` or `..` (proved: `Request.segments_no_dot_segments`), so mapping segments to files or keys can't reach a parent. |
 | `req.query`, `req.queryParams`, `req.queryParam? "q"` | The raw query, its decoded pairs (`+` is a space), one parameter. |
 | `req.header? "content-type"` | The first header with that name, ignoring case. A request's cookies are always one `cookie` header: repeated Cookie fields are joined with `; ` (RFC 6265 §5.4) on every target. |

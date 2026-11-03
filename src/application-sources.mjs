@@ -198,8 +198,37 @@ export function lakeConfigurationKey(project, source, lean) {
       hash.update(`${directory}\0${name}\0`).update(text).update('\0');
     }
   }
-  try { hash.update('header\0').update(leanHeader(readFileSync(source, 'utf8'))); } catch { return undefined; }
+  if (source !== undefined) try { hash.update('header\0').update(leanHeader(readFileSync(source, 'utf8'))); } catch { return undefined; }
   return hash.digest('hex');
+}
+
+/** Lake's initialized native library, which Lasm's Lake adapter loads (Lake's upstream install paths). */
+function lakePluginPath(lean) {
+  const platform = lean.platform?.split('-')[0] ?? process.platform;
+  return platform === 'win32' ? join(lean.executionPrefix ?? lean.prefix, 'bin', 'libLake_shared.dll')
+    : join(lean.prefix, 'lib/lean', `libLake_shared.${platform === 'darwin' ? 'dylib' : 'so'}`);
+}
+
+/** The workspace's Lake packages with C code ({ package, reasons }), from Lasm's
+ * Lake adapter, as `lasm build` finds them: `lasm editor` links the C tier
+ * (Lean's C compiler and headers) for them. Reused while the workspace's Lake
+ * configuration is unchanged (lakeConfigurationKey). */
+export function lakeNativePackages(project, lean) {
+  const key = lakeConfigurationKey(project, undefined, lean);
+  const record = key && join(project, '.lake', 'lasm', `lake-native-${key}.json`);
+  const saved = record && readJsonRecord(record);
+  if (Array.isArray(saved?.native)) return saved.native;
+  const result = spawnSync(lean.lean, ['-j1', '-s8192', '--plugin=' + lakePluginPath(lean), '--run',
+    fileURLToPath(new URL('./lake-module.lean', import.meta.url)), '--native'],
+  { cwd: project, env: nativeLeanEnvironment(lean), windowsHide: true, encoding: 'utf8', timeout: 900_000, maxBuffer: 32 * 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe'] });
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(`Lake could not load the workspace: ${(result.stderr || result.stdout || '').trim().split('\n').slice(-3).join(' ')}`);
+  const entry = JSON.parse(result.stdout.trim().split(/\r?\n/).filter(Boolean).pop());
+  if (!Array.isArray(entry?.native) || entry.native.some(item => typeof item?.package !== 'string'))
+    throw new Error('Unexpected Lake native-package inventory');
+  if (record) { mkdirSync(dirname(record), { recursive: true }); writeJsonRecord(record, entry, 'lake-native-'); }
+  return entry.native;
 }
 
 /** The workspace's Lake package directories: the project and its manifest's packages. */
@@ -263,9 +292,7 @@ export function applicationSources(source, lean, work, { log = console.error, af
     // without interpreter bodies. Match Lake's own initialized native library;
     // importing more Lean modules or loading symbols without the initializer
     // does not establish that state. These are Lake's upstream install paths.
-    const platform = lean.platform?.split('-')[0] ?? process.platform;
-    const lakePlugin = platform === 'win32' ? join(lean.executionPrefix ?? lean.prefix, 'bin', 'libLake_shared.dll')
-      : join(lean.prefix, 'lib/lean', `libLake_shared.${platform === 'darwin' ? 'dylib' : 'so'}`);
+    const lakePlugin = lakePluginPath(lean);
     const adapter = (...args) => JSON.parse(run(lean.lean, ['-j1', '-s8192', '--plugin=' + lakePlugin, '--run',
       fileURLToPath(new URL('./lake-module.lean', import.meta.url)), ...args], project).split(/\r?\n/).filter(Boolean).pop());
     // The adapter starts Lake and elaborates its script (about 1.3 s). Its answer
