@@ -104,6 +104,11 @@ patchInputs.push({ name: 'libuv-source', file: 'lean-4.34.0-libuv-source.patch' 
 // NODE_HOST_ENV), as `LEAN_ABORT_ON_PANIC` already does after thread-runtime.
 if (Number(version.split('.')[1]) >= 35)
   patchInputs.push({ name: 'nonlinear-environment', file: 'lean-4.35.0-nonlinear-environment.patch' });
+// Issue #90: lean_apply_* release the closure before calling its code, so the
+// call is in tail position (a Wasm tail call with -mtail-call) and chains of
+// closure applications (monadic continuations) run in constant stack.
+if (Number(version.split('.')[1]) >= 35)
+  patchInputs.push({ name: 'tail-apply', file: 'lean-4.35.0-tail-apply.patch' });
 if (edge) {
   if (version !== '4.35.0') throw new Error('The edge profile has a runtime patch for Lean 4.35.0 only');
   patchInputs.push({ name: 'edge', file: 'lean-4.35.0-edge.patch' });
@@ -115,7 +120,7 @@ if (edge) {
 }
 // Patches that change only Lean's C++ runtime (no header, no generated C), so a
 // build with or without them can share the standard-library archives.
-const runtimeOnlyPatches = new Set(['edge', 'node-threads']);
+const runtimeOnlyPatches = new Set(['edge', 'node-threads', 'tail-apply']);
 for (const { name, file } of patchInputs) {
   // These reviewed runtime changes still apply to 4.34 and, with the ports above,
   // to 4.35. Record the actual patch bytes and source commit; never treat older
