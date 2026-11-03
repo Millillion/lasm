@@ -401,3 +401,44 @@ test('collected Lean functions are announced (event kind 3) and counted', async 
   const snapshot = e.js.snapshot();
   assert.deepEqual([snapshot.functionsCreated, snapshot.functionsCollected, snapshot.functionsLive], [2, 2, 0]);
 });
+
+// Edge profile: a synchronous callback runs on Lean's one stack, which cannot
+// suspend inside it. Waiting there never hangs: a Lasm.JS await fails as a Lean
+// IO error, and any other wait stops the instance with the reason (the
+// embedder starts a fresh one). The real controller (src/edge/edge-pre.js),
+// with Lean played by the stubbed exports.
+test('edge: waiting inside a synchronous callback fails with the reason, never hangs', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { runInNewContext } = await import('node:vm');
+  const source = readFileSync(new URL('../src/edge/edge-pre.js', import.meta.url), 'utf8');
+  const memory = new ArrayBuffer(65536);
+  let next = 1024, lean = () => 0n;
+  // An engine with JSPI, allowed by the embedder: only the synchronous callback prevents suspending.
+  const engine = Object.assign(Object.create(WebAssembly), { Suspending: function Suspending() {}, promising: f => f });
+  const context = { Module: { lasmEdgeJspi: true }, globalThis: { WebAssembly: engine },
+    HEAPU8: new Uint8Array(memory), HEAPU32: new Uint32Array(memory), BigInt, Number, Error, TextEncoder, DataView, Object,
+    queueMicrotask, _malloc: n => { const p = next; next += Math.ceil(n / 8) * 8 + 8; return p; }, _free: () => {},
+    stackSave: () => 0, stackRestore: () => {}, _lasm_js_edge_sync: (...args) => lean(...args) };
+  runInNewContext(source, context);
+  const controller = context.Module.lasmEdge;
+  controller.attach({ request: op => (op === 205 || op === 72 ? new Promise(() => {}) : { error: false, bytes: new Uint8Array(0) }), pending: () => false });
+  // A Lasm.JS await (op 205 with a promise result) answers with a Lean IO error.
+  let answer;
+  lean = (_fn, _input, _length, size) => {
+    answer = controller.call(205, 0, 2n, 0, 0);
+    const bytes = new Uint8Array(-Number(answer) - 1);
+    controller.copy(4096, bytes.length);
+    context.HEAPU8.set([1], 2048); context.HEAPU32[Number(size) >> 2] = 1;
+    lean.message = new TextDecoder().decode(context.HEAPU8.slice(4096 + 16, 4096 + bytes.length));
+    return 2048n;
+  };
+  controller.syncCall(1, new Uint8Array([0]));
+  assert.ok(answer < 0n);
+  assert.match(lean.message, /completes asynchronously and cannot be waited for here \(inside a synchronous JavaScript callback\)/);
+  assert.equal(controller.stopped, null);
+  // Another wait (a timer) stops the instance with the reason; later calls fail with it.
+  lean = () => { controller.call(72, 0, 0n, 0, 0); return 2048n; };
+  assert.throws(() => controller.syncCall(1, new Uint8Array([0])), /Lean host operation 72 must wait, and this Lean code cannot suspend \(inside a synchronous JavaScript callback\)/);
+  assert.match(controller.stopped.message, /must wait/);
+  assert.throws(() => controller.syncCall(1, new Uint8Array([0])), /must wait/);
+});

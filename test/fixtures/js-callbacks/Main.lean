@@ -2,7 +2,8 @@
 before any promise is awaited and without `waitForever` (the host starts the
 interop poller), an IO-mode await, an Async await inside a callback, and a
 synchronous callback that makes the program's first asynchronous runtime request
-(Node's main thread then starts the completion thread for it). -/
+(Node's main thread then starts the completion thread for it), and a
+synchronous callback that waits for JavaScript promises (each wait fails at once). -/
 import Lasm.JS
 import Std.Internal.UV.Timer
 open Lasm.JS
@@ -51,4 +52,19 @@ def main : IO Unit := do
   IO.println "sync callback started a timer"
   if let some p := ← timer.get then discard <| IO.wait p.result?
   IO.println "timer fired"
+  -- 5. A synchronous callback that waits for a JavaScript promise: the promise could
+  -- settle only after the callback returns, so each wait fails at once with the
+  -- reason (it hung before). An IO await, an awaited call, and an Async call run
+  -- with `.block`.
+  let explain (what : String) (r : Except IO.Error String) : String := match r with
+    | .ok v => s!"{what}: returned {v}"
+    | .error e => s!"{what}: failed clearly {((toString e).splitOn "inside a synchronous Lean callback").length == 2}: {e}"
+  let waits ← Function.ofSyncFn fun _ => do
+    let p : Value ← timers.callMethod "setTimeout" #[toJS (1 : Nat), toJS "never"]
+    let a ← (p.await String).toBaseIO
+    let b ← (timers.callMethodAwait "setTimeout" #[toJS (1 : Nat), toJS "never"] String : IO String).toBaseIO
+    let c ← ((timers.callMethodAwait "setTimeout" #[toJS (1 : Nat), toJS "never"] String : Async String).block).toBaseIO
+    return toJS s!"{explain "await" a}\n{explain "awaited call" b}\n{explain "Async call" c}"
+  let answer : String ← reflect.callMethod "apply" #[toJS waits, .undefined, .array #[]] String
+  IO.println answer
   IO.println "done"

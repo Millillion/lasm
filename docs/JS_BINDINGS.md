@@ -290,8 +290,13 @@ Function.ofSyncFn2 (f : α → β → IO γ)
   function runs, about 20 µs per call plus the function, so the event loop is blocked.
   - What works inside: JavaScript calls (served inline while the main thread waits)
     and console output.
-  - What fails: host operations that complete asynchronously, such as Lean file IO,
-    `IO.sleep`, sockets and awaiting promises. They fail with an error that says so.
+  - What fails: waiting for a JavaScript promise (`Value.await`, `toTask`, the
+    `…Await` forms, `Async` calls and bindings), since a promise settles only
+    after the callback returns, and host operations the host completes
+    asynchronously (Lean file IO). They fail at once with an error that says so.
+  - What never finishes: waiting inside the callback for a runtime operation it
+    started (a timer, a DNS lookup, a socket read) or for a Lean task that makes
+    host calls. Starting one is fine: it completes after the callback returns.
   - A synchronous callback cannot call another synchronous callback.
 - **Replying with a method call (`ofFnReply`), for HTTP handlers.** A handler
   usually ends by calling `res.json(body)` (Express) or returning `c.json(body)`
