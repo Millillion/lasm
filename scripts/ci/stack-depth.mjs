@@ -9,7 +9,9 @@
 //              remedy; node:wasi's default;
 //   edge       the edge output (--target deno) on Deno, Node, Bun and SpiderMonkey
 //              (the engines of Workers, Deno Deploy, Bun and the browsers): a
-//              shallow run passes, an overflow fails without hanging.
+//              shallow run passes, an overflow fails without hanging;
+//   every      an Async loop of 100,000 steps that each await a host call, and
+//              List.mapM in Async over 100,000 host calls (issue #90), complete.
 // Every target's limit is measured by bisection and written to OUT (JSON).
 //   node scripts/ci/stack-depth.mjs --lasm PATH/bin/lasm.mjs --work DIR [--out FILE.json]
 //     [--targets node,wasi,wasi-node,deno,edge-node,edge-bun,edge-sm]
@@ -35,7 +37,10 @@ delete env.LASM_VM_STACK_MB;
 rmSync(work, { recursive: true, force: true });
 mkdirSync(work, { recursive: true });
 // The issue's program, and a smaller frame for a runaway recursion.
-writeFileSync(join(work, 'Main.lean'), `def sumTo : List Nat → Nat
+writeFileSync(join(work, 'Main.lean'), `import Std.Async.Basic
+open Std.Async
+
+def sumTo : List Nat → Nat
   | [] => 0
   | x :: xs => x + sumTo xs
 
@@ -43,10 +48,27 @@ def depth : Nat → Nat
   | 0 => 0
   | n + 1 => depth n + 1
 
+/-- Issue #90: n steps in Async, each awaiting a task that makes a host call
+(the clock) and making one more host call directly. -/
+def awaitLoop : Nat → Nat → Async Nat
+  | 0, acc => pure acc
+  | n + 1, acc => do
+    let t ← (IO.monoNanosNow : IO Nat)
+    let u ← await (← (IO.asTask (IO.monoNanosNow) : IO _))
+    let u ← IO.ofExcept u
+    awaitLoop n (acc + 1 + (u - u) + (t - t))
+
+/-- Issue #90: List.mapM in Async over n host calls that complete at once. -/
+def mapMLoop (n : Nat) : Async Nat := do
+  let xs ← (List.range n).mapM fun _ => (IO.monoNanosNow : IO Nat)
+  return xs.length
+
 def main (args : List String) : IO Unit := do
   let n := (args.getD 1 "1000").toNat!
   match args.headD "sum" with
   | "sum" => IO.println (sumTo (List.range n))
+  | "await" => IO.println (← (awaitLoop n 0).block)
+  | "mapM" => IO.println (← (mapMLoop n).block)
   | _ => IO.println (depth n)
 `);
 writeFileSync(join(work, 'node-wasi-run.mjs'), `const { WASI } = await import('node:wasi');
@@ -113,6 +135,7 @@ const advice = mib => new RegExp(`^Lasm: a Lean thread exhausted its ${mib} MiB 
   + 'Set LASM_VM_STACK_MB to a larger size in MiB, or make the recursion tail recursive \\(an accumulator\\)\\.\\n'
   + 'See https://github\\.com/Millillion/lasm/blob/main/FUNDAMENTAL_LIMITATIONS\\.md#recursion-depth\\n$');
 
+const asyncSteps = 100_000;
 const built = new Set();
 for (const target of targets) {
   report.targets[target] = {};
@@ -162,6 +185,13 @@ for (const target of targets) {
       expect(target, 'wasmtime -W max-wasm-stack=1073741824: sumTo of 5,000,000 elements', passes(target, 5_000_000, { flags }), '');
       report.targets.wasi.limit1GiB = limit(target, 1_000_000, 30_000_000, { flags });
     }
+  }
+  // Issue #90: an Async loop's depth is not bounded by the stack on any target.
+  for (const mode of ['await', 'mapM']) {
+    const r = run(target, [mode, String(asyncSteps)], { timeout: 300_000 });
+    (report.targets[target].asyncLoop ??= {})[mode] = { code: r.code, ms: r.ms };
+    expect(target, `Async loop (${mode}) of ${asyncSteps.toLocaleString('en-US')} host calls (#90)`, r.code === 0 && r.stdout === `${asyncSteps}\n`,
+      JSON.stringify({ code: r.code, signal: r.signal, timedOut: r.timedOut, ms: r.ms, stderr: r.stderr.slice(0, 600) }));
   }
   console.log(`${target}: deepest sumTo ${JSON.stringify(report.targets[target].limit)}`);
 }

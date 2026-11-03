@@ -39,6 +39,20 @@ def depth : Nat → Nat
   | 0 => 0
   | n + 1 => depth n + 1
 
+/-- `n` steps in `Async`, each awaiting one JavaScript call and making one
+synchronous call (issue #90): the loop's depth is not bounded by the stack. -/
+def awaitLoop (math : Value) : Nat → Nat → Async Nat
+  | 0, acc => pure acc
+  | n + 1, acc => do
+    let a ← math.callMethodAwait "abs" #[toJS (-1.0 : Float)] (α := Nat)
+    let b ← (math.callMethod "sign" #[toJS (1.0 : Float)] Nat : IO Nat)
+    awaitLoop math n (acc + a * b)
+
+/-- `List.mapM` in `Async` over `n` synchronous JavaScript calls (issue #90). -/
+def mapMLoop (math : Value) (n : Nat) : Async Nat := do
+  let xs ← (List.range n).mapM fun _ => (math.callMethod "abs" #[toJS (-1.0 : Float)] Nat : IO Nat)
+  return xs.foldl (· + ·) 0
+
 def route (method path body : String) : Async (Nat × String) := do
   match method, path.splitOn "/" with
   | "GET", ["", ""] => return (200, "{\"message\":\"Hello from pure Lean on the edge!\"}")
@@ -79,6 +93,11 @@ def route (method path body : String) : Async (Nat × String) := do
     let ts ← (List.range 8).mapM fun _ => (IO.asTask (m.atomically (modify (· + 1))) : IO _)
     for t in ts do discard <| (IO.wait t : IO _)
     return (200, s!"\{\"count\":{← m.atomically get}}")
+  | "GET", ["", "hostloop", kind, n] =>
+    let math ← (← (global : IO Value)).get "Math"
+    let n := n.toNat?.getD 1000 |>.min 1000000
+    let steps ← if kind == "mapM" then mapMLoop math n else awaitLoop math n 0
+    return (200, s!"\{\"steps\":{steps}}")
   | "GET", ["", "throw"] => throw (IO.userError "thrown from Lean")
   -- Std.Time's local zone: /etc/localtime from the edge's read-only file system (UTC).
   | "GET", ["", "date"] => return (200, s!"\{\"now\":\"{← Std.Time.PlainDateTime.now}\"}")

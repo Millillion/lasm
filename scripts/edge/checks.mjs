@@ -25,6 +25,9 @@ export const apps = {
       { path: '/mutex', status: 200, body: '{"count":8}' },
       { path: '/date', status: 200, match: /^\{"now":"20\d\d-\d\d-\d\dT/ },
       { path: '/deep/5000', status: 200, body: '{"depth":5000}' },
+      // Issue #90: Async loops of 100,000 host calls, not bounded by the stack.
+      { path: '/hostloop/await/100000', status: 200, body: '{"steps":100000}' },
+      { path: '/hostloop/mapM/100000', status: 200, body: '{"steps":100000}' },
       { path: '/nope', status: 404, body: '{"error":"not found"}' },
     ],
     // Stops the instance; the next request must get a fresh one.
