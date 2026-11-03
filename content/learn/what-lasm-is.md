@@ -99,7 +99,7 @@ One `Lasm.Fetch` server, built for Node, Deno, Bun, wasi-http and Workers,
 must answer a recorded set of requests the same way on every target: the same
 status, headers and body bytes. This found a request path that routed
 differently on different platforms. Its fix comes with a theorem
-([coming in 0.3.9](segments-no-dot-segments.md)).
+([new in 0.3.9](segments-no-dot-segments.md)).
 
 ### Model checking the host bridge
 
