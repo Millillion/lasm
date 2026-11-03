@@ -49,8 +49,11 @@ export async function startLean({ createProgram, wasmModule, env = {}, modules =
   Module.lasmEdgeHost = host;
   Module.lasmContext = instanceContext;
   Module.lasmDispose = dispose;
-  Module.lasmEdge.onStop(error => { host.js.stop(error); dispose(); (stderr ?? console.error)(`[lasm] the Lean instance stopped: ${error.message}`); });
-  Module.lasmExitCode = await Module.lasmEdge.main(args);
+  // IO.Process.exit where nothing can exit traps right after the host refused
+  // it: the refusal, not the trap ("unreachable"), is why the instance stopped.
+  const cause = error => host.exitRequested ?? error;
+  Module.lasmEdge.onStop(error => { host.js.stop(cause(error)); dispose(); (stderr ?? console.error)(`[lasm] the Lean instance stopped: ${cause(error).message}`); });
+  try { Module.lasmExitCode = await Module.lasmEdge.main(args); } catch (error) { throw cause(error); }
   host.flush();
   return Module;
 }

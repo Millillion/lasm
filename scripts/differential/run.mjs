@@ -187,9 +187,14 @@ const KNOWN = [
       ? { ...r, code: nat.code, stderr: r.stderr.replace(/Error: failed to run main module[\s\S]*$/, '') + (nat.stderr.endsWith('\n') && !r.stderr.endsWith('\n') ? '\n' : '') } : r },
   { issue: 'docs/EDGE.md#environment-variables (a page has no environment)', targets: ['browser-chromium', 'browser-firefox', 'browser-webkit'],
     what: 'a page has no environment, so LEAN_BACKTRACE=0 cannot be set and a panic prints a JavaScript/Wasm backtrace after its message (documented in docs/EDGE.md)',
-    // A stack frame as V8 ("    at …"), SpiderMonkey and JavaScriptCore ("name@url:line:column",
-    // "name@[wasm code]") write it.
-    apply: r => ({ ...r, stderr: r.stderr.replace(/^backtrace:\n(?:(?:[ \t]+\S[^\n]*|[^@\n]*@(?:\S+:\d+:\d+|\S+:0x[0-9a-f]+|\[(?:wasm|native) code\])|\(stack trace unavailable\))\n)*/gm, '') }) },
+    // A backtrace block: "backtrace:", then stack frames as V8 ("    at …"),
+    // SpiderMonkey ("name@http://…:1:2", "@http://…wasm:wasm-function[n]:0x…",
+    // "async*@debugger eval code …") and JavaScriptCore ("n@wasm-function[n]", "@") write them.
+    apply: r => ({ ...r, stderr: r.stderr.replace(/^backtrace:\n(?:(?:[ \t]+at [^\n]*|[^\n@]*@(?:http:\/\/127\.0\.0\.1:\d+\/[^\n]*|wasm-function\[\d+\][^\n]*|debugger eval code[^\n]*|\[(?:wasm|native) code\])?|\(stack trace unavailable\))\n)*/gm, '') }) },
+  { issue: 'docs/EDGE.md (IO.Process.exit fails: a page cannot exit)', targets: ['browser-chromium', 'browser-firefox', 'browser-webkit'],
+    what: 'IO.Process.exit n stops the instance with "Lean called IO.Process.exit n; an edge isolate cannot exit" where native Lean exits with n',
+    apply: (r, nat) => typeof nat?.code === 'number' && nat.code !== 0
+      ? { ...r, stderr: r.stderr.replace(new RegExp(`^\\[lasm\\] the Lean instance stopped: Lean called IO\\.Process\\.exit ${nat.code}; an edge isolate cannot exit\\n`, 'm'), '') } : r },
 ];
 const knownApplied = {};
 function applyKnown(target, r, nat) {

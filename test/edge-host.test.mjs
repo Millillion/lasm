@@ -139,7 +139,11 @@ test('exit: flushes and calls exit where the platform can; an isolate refuses', 
   failure(req(30, 0, 3));
   assert.deepEqual([codes, out], [[3], ['pending']]);
   const isolate = host();
+  assert.equal(isolate.h.exitRequested, null);
   assert.deepEqual(failure(isolate.req(30, 0, 2)), { kind: 4, errno: 22, message: 'Lean called IO.Process.exit 2; an edge isolate cannot exit' });
+  // The refusal is kept as the stop cause (the runtime traps next; edge-start.mjs reports it).
+  assert.equal(isolate.h.exitRequested.message, 'Lean called IO.Process.exit 2; an edge isolate cannot exit');
+  assert.equal(isolate.h.exitRequested.exit, 2);
 });
 
 test('unavailable operations name what is missing', () => {
