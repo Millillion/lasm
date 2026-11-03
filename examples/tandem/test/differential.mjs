@@ -62,7 +62,15 @@ function generate(seed, kind) {
   const applied = Array.from({ length: n }, () => new Set());   // ops each replica applied
   const delivered = Array.from({ length: n }, () => []);
   let nextChar = 1;
-  const effective = (r, k) => [...ops[k].deps].every(d => applied[r].has(d)) && applied[r].has(k);
+  // An operation takes effect at a replica once it and everything its
+  // creator had (recursively: in chaos histories the creator may itself have
+  // received operations before their dependencies) have arrived there.
+  const effective = (r, k, seen = new Set()) => {
+    if (!applied[r].has(k)) return false;
+    if (seen.has(k)) return true;
+    seen.add(k);
+    return [...ops[k].deps].every(d => d === k || effective(r, d, seen));
+  };
   const deletedAt = (r, ch) => ops.some((o, k) => o.kind === 'x' && o.ch === ch && applied[r].has(k));
   const visible = r => ops.map((o, k) => [o, k]).filter(([o, k]) => o.kind === 'i' && effective(r, k) && !deletedAt(r, o.ch))
     .map(([o]) => o.ch);
