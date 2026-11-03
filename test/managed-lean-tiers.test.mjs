@@ -117,6 +117,44 @@ test('damaged assembled prefixes fail closed, and repair rebuilds them offline f
   assert.equal(await readFile(join(rebuilt.directory, 'lib/lean/Init.olean'), 'utf8'), 'init data');
 });
 
+// Issue #73: the macOS C tier takes the SDK's libSystem.tbd without the targets
+// Lean's ld64.lld does not know, and asks that linker to read it before any build.
+test('a macOS C tier links against the SDK stub without unknown targets, checked by the linker', { skip: process.platform === 'win32' }, async t => {
+  const f = await fixture(t);
+  const sdk = join(f.base, 'MacOSX.sdk');
+  await mkdir(join(sdk, 'usr/include'), { recursive: true }); await mkdir(join(sdk, 'usr/lib'), { recursive: true });
+  await writeFile(join(sdk, 'usr/include/stdio.h'), '');
+  const raw = await readFile(new URL('./fixtures/macos-tbd/v4-unknown-targets.tbd', import.meta.url), 'utf8');
+  await writeFile(join(sdk, 'usr/lib/libSystem.tbd'), raw);
+  const saved = process.env.SDKROOT;
+  process.env.SDKROOT = sdk;
+  t.after(() => { if (saved === undefined) delete process.env.SDKROOT; else process.env.SDKROOT = saved; });
+  // A stand-in for Lean's ld64.lld that, like LLD 23.1, rejects the unknown targets.
+  const linker = verdict => `#!/usr/bin/env node
+const file = process.argv.at(-1);
+${verdict}
+if (require('fs').readFileSync(file, 'utf8').includes('arm64e.x1')) { console.error('ld64.lld: error: could not load TAPI file at ' + file + ': malformed file'); process.exit(1); }
+`;
+  const cTier = async (name, verdict = '') => {
+    const archive = await tierArchive(name, { 'bin/ld64.lld': linker(verdict), 'include/stdio.h': '' });
+    const fetch = f.fetch;
+    f.fetch = async url => url === archive.artifact.url ? new Response(archive.bytes) : fetch(url);
+    return component(archive.artifact);
+  };
+  const core = [component(f.archives.bin.artifact), component(f.archives.init.artifact)];
+  const good = await cTier('lean-9.9.9-test-c');
+  const prefix = await assembleLeanPrefix('9.9.9', f.release, [...core, good], { cache: f.cache, fetch: (...a) => f.fetch(...a), log() {}, platform: 'darwin', arch: 'arm64' });
+  const stub = await readFile(join(prefix.directory, 'lib/libc/libSystem.tbd'), 'utf8');
+  assert.doesNotMatch(stub, /arm64e\.x1/);
+  assert.match(stub, /^targets:\s+\[ x86_64-macos, x86_64-maccatalyst, arm64-macos, arm64-maccatalyst, arm64e-macos, arm64e-maccatalyst \]$/m);
+  assert.equal(await readFile(join(sdk, 'usr/lib/libSystem.tbd'), 'utf8'), raw, 'The SDK itself is not changed');
+  assert.equal(prefix.receipt.provenance.macosSdkLibSystemFilter, 1, 'Prefixes assembled with the unfiltered copy are not reused');
+  // A stub the linker still cannot read fails while assembling, naming the SDK.
+  const refusing = await cTier('lean-9.9.9-refusing-c', "console.error('ld64.lld: error: unknown target'); process.exit(1);");
+  await assert.rejects(assembleLeanPrefix('9.9.9', f.release, [...core, refusing], { cache: f.cache, fetch: (...a) => f.fetch(...a), log() {}, platform: 'darwin', arch: 'arm64' }),
+    error => error.message.includes(`The macOS SDK at ${sdk} has a libSystem.tbd`) && /unknown target/.test(error.message) && /SDKROOT/.test(error.message));
+});
+
 test('standalone imports of extended modules are found through local imports', { skip: process.platform === 'win32' }, async t => {
   const f = await fixture(t);
   const prefix = join(f.base, 'prefix');
