@@ -1,0 +1,17 @@
+{
+  "name": "tandem",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Tandem, a collaborative text editor in Lean: Fugue's sequence CRDT, a sync server and a Lasm.UI editor that works offline, compiled to WebAssembly by Lasm, with proofs",
+  "scripts": {
+    "proofs": "node test/proofs.mjs",
+    "proofs:paranoid": "node test/paranoid.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@lasm/cli": "0.3.8"
+  }
+}

@@ -54,6 +54,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] (J) Folio's API questions: a `Lasm.Markdown` library module from Folio's renderer (so Conduit can use it); consistent `--output` for the wasi, bun and deno targets; the name "Folio"; safe mode escaping raw HTML rather than dropping it.
 - [ ] (J) Review Porter's 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
 - [ ] (J) Porter's API proposals: a shared Web Crypto module (e.g. `Lasm.Web.Crypto`), since Conduit and Porter each hand-bind SHA-256, PBKDF2, random values, ECDSA, Ed25519 and JWK export; a documented way to read Workers environment variables; documentation of what `Lasm.UI` mount does with an element's existing children; Porter's `test/Axioms.lean` totality check (no `partial`, `unsafe`, `opaque` or panicking definition reachable) shipped as a reusable Lasm tool.
+- [ ] (J) Review the propositions: Tandem's 25 propositions (milestone 1: the CRDT, the edits, the wire format, the sync server) in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean).
 
 ## Now (November 2026)
 
@@ -116,6 +117,13 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] 4. The `Lasm.UI` sign-in and consent pages (a plain-form fallback without JavaScript) with Playwright tests on Chromium, Firefox and WebKit, and a nightly job (40 minutes of fuzzing).
 - [ ] (J) Review the 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
 
+### Tandem ([examples/tandem](examples/tandem), the fifth flagship app: a collaborative text editor on a CRDT)
+- [x] 1. Pure core: Fugue's sequence CRDT with the state as a canonical set of operations, local edits (insertion, deletion, typed runs, `edit` for a text area's change), the wire format and the sync server's logic, and the proofs: 25 propositions in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean) (strong eventual consistency, commutativity, idempotence, intent preservation, non-interleaving of concurrent typing, the explicit-stack traversal equals the paper's, the server never loses an acknowledged operation, bounded total parsers), a requirements map ([SPEC.md](examples/tandem/SPEC.md)), `proofs:paranoid`.
+- [ ] 2. Node sync server (WebSocket and HTTP long-poll, `node:sqlite`), the differential test against Yjs, the multi-replica simulation with partitions, reordering and duplication, and the protocol fuzzer.
+- [ ] 3. Bun, Deno, Workers (D1, long-poll), Docker.
+- [ ] 4. The `Lasm.UI` editor (offline, merges on reconnect), Playwright tests on Chromium, Firefox and WebKit (two browsers editing concurrently; offline then reconnect), and a nightly fuzz job.
+- [ ] (J) Review the propositions in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean).
+
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.
 - [ ] Deterministic simulation testing of the example apps: simulated clock, network and storage, with faults.
@@ -126,7 +134,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] Lean 4.36: resume when 4.36.0 stable ships, around mid-November. It becomes Lasm 0.4.0.
 
 ## Later (first half of 2027)
-- [ ] Example apps 4 and 5: the identity provider (OpenID conformance) and the collaborative editor (CRDT convergence).
+- [~] Example apps 4 and 5: the identity provider (Porter, done) and the collaborative editor (Tandem, in progress).
 - [ ] Continuous fuzzing in our own CI: nightly and weekly campaigns on every boundary, corpora and crashes kept in the repo, coverage-guided (libFuzzer for the C host, Jazzer.js or fast-check for JavaScript, Plausible for Lean).
 - [ ] Move JavaScript glue code into Lean where it can be proved, starting with what mutation testing shows is riskiest (issue #21).
 - [ ] Translation validation for selected Binaryen passes. Assess verifying or replacing parts of the toolchain: Clang, LLVM, Emscripten, Binaryen (issue #21).
