@@ -26,6 +26,13 @@ starts the Lean server while the worker loads the app.
   production `node_modules` built by Lasm (a remote `npm install` would
   reinstall the same pinned versions).
 - **Windows plans:** untested; Lasm deployments run on Linux.
+- **Cookies:** a reply can set several cookies. Azure's worker sends one
+  value per header name, so Lasm passes all but one `Set-Cookie` through
+  Azure's `cookies` list, whose host percent-encodes values outside
+  `A-Z a-z 0-9 - . _ ~` and cannot hold `Partitioned` or `Priority`. One
+  cookie per reply that needs either is sent unchanged; keep the others to
+  plain values (base64url, hex, or a JWT). Repeated `Cookie` request lines
+  reach the server as one header joined with `; `.
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Azure
 account): for every server template, Azure Functions Core Tools 4.16.0 (npm

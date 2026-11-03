@@ -233,7 +233,7 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
     process.exit(0);`, directory);
   assert.deepEqual([viaAzure.name, viaAzure.route, viaAzure.auth, viaAzure.status, viaAzure.body.url], ['lasm', '{*path}', 'anonymous', 200, '/echo?x=1']);
   // Several Set-Cookie headers travel in HttpResponseInit.cookies (#80).
-  assert.deepEqual(viaAzure.cookies, { list: [{ name: 'a', value: '1', path: '/' }, { name: 'b', value: '2', path: '/' }], setCookie: [], many: 'p, q' });
+  assert.deepEqual(viaAzure.cookies, { list: [{ name: 'b', value: '2', path: '/' }], setCookie: ['a=1; Path=/'], many: 'p, q' });
   assert.deepEqual(viaAzure.seeOther, { status: 303, location: '/there', body: null });
 
   const gcf = packageApplication({ input: app, target: 'gcf', output: join(directory, 'gcf') });
@@ -287,9 +287,12 @@ test('adapter helpers: one Cookie header, Set-Cookie as cookie objects, Azure re
   const reply = (headers, body = '') => ({ status: 200, statusText: 'OK', headers, body: Buffer.from(body) });
   const single = azureReply(reply([['set-cookie', 'a=1; Path=/'], ['content-type', 'text/plain']], 'hi'));
   assert.deepEqual([single.cookies, single.headers.getSetCookie(), String(single.body)], [undefined, ['a=1; Path=/'], 'hi'], 'one Set-Cookie stays a header');
-  const many = azureReply(reply([['set-cookie', 'a=1; Path=/; HttpOnly'], ['set-cookie', 'b=; Max-Age=0'], ['location', '/x']]));
+  // The first cookie stays a header unless another would change in cookies (its value percent-encoded, an attribute dropped).
+  const many = azureReply(reply([['set-cookie', 'a=1; Path=/; HttpOnly'], ['set-cookie', 'b=; Max-Age=0'], ['set-cookie', 'c=x+y=; Path=/'], ['location', '/x']]));
   assert.deepEqual(many.cookies, [{ name: 'a', value: '1', path: '/', httpOnly: true }, { name: 'b', value: '', maxAge: 0 }]);
-  assert.deepEqual([many.headers.getSetCookie(), many.headers.get('location'), many.body], [[], '/x', undefined]);
+  assert.deepEqual([many.headers.getSetCookie(), many.headers.get('location'), many.body], [['c=x+y=; Path=/'], '/x', undefined]);
+  const plain = azureReply(reply([['set-cookie', 'a=1'], ['set-cookie', 'b=2; Partitioned; Secure']]));
+  assert.deepEqual([plain.cookies, plain.headers.getSetCookie()], [[{ name: 'a', value: '1' }], ['b=2; Partitioned; Secure']]);
 });
 
 test('a program that does not listen fails clearly', () => {

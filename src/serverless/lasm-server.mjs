@@ -228,27 +228,38 @@ export async function fetchLean(request) {
   return new Response(empty ? null : reply.body, { status: reply.status, statusText: reply.statusText, headers });
 }
 
-let warnedDropped = false;
+let warnedAzure = false;
 /**
  * A forward() reply as Azure Functions' HttpResponseInit. Azure's worker
  * passes response headers to the host as one value per name, so of several
- * Set-Cookie headers only one would arrive (#80); they travel in `cookies`
- * instead, which the host turns back into one Set-Cookie each. A single
- * Set-Cookie stays a header, unchanged.
+ * Set-Cookie headers only the last would arrive (#80); the others travel in
+ * `cookies`, which the host turns back into one Set-Cookie each. The host
+ * percent-encodes a cookie's value (C#'s Uri.EscapeDataString: everything
+ * but A-Z a-z 0-9 - . _ ~), and the cookie object has no field for some
+ * attributes (Partitioned, Priority), so one Set-Cookie that would change
+ * that way stays a header, unchanged: with at most one such cookie per
+ * reply, every cookie arrives exactly as the server sent it.
  */
 export function azureReply(reply) {
   const headers = new Headers();
   const setCookies = reply.headers.filter(([name]) => name === 'set-cookie').map(([, value]) => value);
+  const parsed = setCookies.map(parseSetCookie);
+  const exact = cookie => cookie && /^[A-Za-z0-9\-._~]*$/.test(cookie.value) && !cookie.dropped.length;
+  // The Set-Cookie that stays a header: the first one `cookies` would change.
+  const verbatim = setCookies.length < 2 ? 0 : Math.max(0, parsed.findIndex(cookie => !exact(cookie)));
   const cookies = [];
+  let index = 0;
   for (const [name, value] of reply.headers) {
-    if (name !== 'set-cookie' || setCookies.length < 2) { headers.append(name, value); continue; }
-    const cookie = parseSetCookie(value);
-    if (!cookie) { headers.append(name, value); continue; }
-    const { dropped, ...fields } = cookie;
-    if (dropped.length && !warnedDropped) {
-      warnedDropped = true;
-      console.warn(`Lasm: Azure Functions' cookies have no field for ${dropped.join(', ')} (Set-Cookie ${cookie.name}); it is left out.`);
+    if (name !== 'set-cookie') { headers.append(name, value); continue; }
+    const i = index++;
+    if (i === verbatim) { headers.append(name, value); continue; }
+    const cookie = parsed[i];
+    if (!cookie) continue;
+    if (!exact(cookie) && !warnedAzure) {
+      warnedAzure = true;
+      console.warn(`Lasm: Azure Functions sends a single Set-Cookie per reply unchanged; cookie ${cookie.name} goes through its cookies list, which percent-encodes the value and has no field for ${cookie.dropped.join(', ') || 'other attributes'}.`);
     }
+    const { dropped, ...fields } = cookie;
     cookies.push(fields);
   }
   return { status: reply.status, headers, ...(cookies.length ? { cookies } : {}), body: reply.body.length ? reply.body : undefined };
