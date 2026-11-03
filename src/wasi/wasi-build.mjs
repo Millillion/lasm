@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { linkWasiProgram, wasiLinkSettings, wasiSources } from './wasi-link.mjs';
 import { noticesSectionName, targetNotices, withCustomSection } from '../notices.mjs';
+import { replaceOutputDirectory } from '../output-directory.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -131,9 +132,7 @@ export async function writeWasiOutput({ target, source, projectDirectory, result
   const info = { schema: 1, target, profile: 'wasi', abi: 'wasi_snapshot_preview1', nodeBuildSignature: result.signature, lean: result.lean,
     edgeRuntime: edge.manifest.files, link: wasiLinkSettings[target], programKey: program.meta.key, wasm: 'main.wasm', sha256: sha256(wasmBytes) };
   writeFileSync(join(staging, infoName), JSON.stringify(info, null, 2) + '\n');
-  rmSync(destination, { recursive: true, force: true });
-  mkdirSync(dirname(destination), { recursive: true });
-  renameSync(staging, destination);
+  replaceOutputDirectory(staging, destination);
   const wasm = join(destination, 'main.wasm');
   const bytes = statSync(wasm).size;
   let note = '';

@@ -16,7 +16,7 @@
 //
 //   node scripts/tooling/metamorphic.mjs --lasm PATH/bin/lasm.mjs \
 //     [--targets node,wasi,workers,browser] [--profiles release,dev] [--work DIR] [--report FILE]
-import { cpSync, readFileSync, renameSync, utimesSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, renameSync, utimesSync, writeFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join } from 'node:path';
 import { runLasm, baseEnvironment, temporaryDirectory, writeTree, removeTree, treeHashes, treeTimes, treeDifferences, options, summary, tail } from './lib.mjs';
@@ -52,6 +52,21 @@ function explain(a, b, dirA, dirB) {
   return lines.join('');
 }
 
+/** The JSON paths at which two values differ. */
+function jsonDifferences(a, b, path = '$') {
+  if (JSON.stringify(a) === JSON.stringify(b)) return [];
+  if (a && b && typeof a === 'object' && typeof b === 'object' && Array.isArray(a) === Array.isArray(b))
+    return [...new Set([...Object.keys(a), ...Object.keys(b)])].flatMap(key => jsonDifferences(a[key], b[key], `${path}.${key}`));
+  return [path];
+}
+
+/** What a Node build prints, and its exit status. */
+async function runProgram(directory) {
+  const { spawnSync } = await import('node:child_process');
+  const r = spawnSync(process.execPath, [join(directory, 'main.mjs')], { encoding: 'utf8', timeout: 60_000 });
+  return `${r.stdout}${r.stderr ? ' stderr:' + r.stderr : ''} (exit ${r.status})`;
+}
+
 function withoutSourceHashes(value) {
   if (Array.isArray(value)) return value.map(withoutSourceHashes);
   if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).filter(([k]) => !sourceHashKeys.has(k)).map(([k, v]) => [k, withoutSourceHashes(v)]));
@@ -67,13 +82,19 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
   const coldCache = temporaryDirectory('cold-cache', work);
   try {
     for (const target of targets) for (const profile of profiles) {
-      const flags = ['--target', target, ...(profile === 'dev' ? ['--dev'] : [])];
+      // Edge and WASI builds write their platform directory (workers/, wasi/);
+      // --output names the Node build they relink, so it is left at its default.
+      const out = { node: 'dist', browser: 'dist', wasi: 'wasi', workers: 'workers' }[target] ?? target;
+      const flags = ['--target', target, ...(out === 'dist' ? ['--output', 'dist'] : []), ...(profile === 'dev' ? ['--dev'] : []),
+        ...(profile === 'dev' && !['node', 'browser', 'wasi'].includes(target) ? ['--allow-dev'] : [])];
       const projects = [];
-      const project = () => { const d = temporaryDirectory(`mm-${target}-${profile}`, work); writeTree(d, fixture); projects.push(d); return d; };
+      // Every project is a directory named app (in its own parent): a browser
+      // build names the app after its directory, which is input like a source.
+      const project = () => { const parent = temporaryDirectory(`mm-${target}-${profile}`, work), d = join(parent, 'app'); mkdirSync(d); writeTree(d, fixture); projects.push(parent); return d; };
       const build = async (directory, env = {}) => {
-        const result = await runLasm(lasm, ['build', 'Main.lean', ...flags, '--output', 'dist'], { cwd: directory, env, timeoutMs: 1_200_000 });
+        const result = await runLasm(lasm, ['build', 'Main.lean', ...flags], { cwd: directory, env, timeoutMs: 1_200_000 });
         if (result.code !== 0) throw new Error(`lasm build ${flags.join(' ')} failed in ${directory} (exit ${result.code}${result.timedOut ? ', timed out' : ''}):\n${tail(result.stdout + result.stderr, 30)}`);
-        return { hashes: treeHashes(join(directory, 'dist')), times: treeTimes(join(directory, 'dist')), text: result.stdout + result.stderr, ms: result.ms };
+        return { hashes: treeHashes(join(directory, out)), times: treeTimes(join(directory, out)), text: result.stdout + result.stderr, ms: result.ms };
       };
       const same = (a, b, label, dirA, dirB) => {
         const d = treeDifferences(a, b);
@@ -83,15 +104,15 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
         const a = project();
         const original = await build(a);
         const reference = temporaryDirectory(`mm-reference-${target}-${profile}`, work); projects.push(reference);
-        cpSync(join(a, 'dist'), join(reference, 'dist'), { recursive: true, verbatimSymlinks: true });
-        const ref = join(reference, 'dist');
+        cpSync(join(a, out), join(reference, out), { recursive: true, verbatimSymlinks: true });
+        const ref = join(reference, out);
         log(`     ${target}/${profile}: clean build ${(original.ms / 1000).toFixed(1)} s, ${Object.keys(original.hashes).length} files`);
 
         const b = project();
-        record(target, profile, 'determinism', same(original.hashes, (await build(b)).hashes, 'two clean builds', ref, join(b, 'dist')));
+        record(target, profile, 'determinism', same(original.hashes, (await build(b)).hashes, 'two clean builds', ref, join(b, out)));
 
         const c = project();
-        record(target, profile, 'cache state', same(original.hashes, (await build(c, { LASM_TOOLCHAIN_CACHE: coldCache })).hashes, 'cold tool cache vs warm', ref, join(c, 'dist')));
+        record(target, profile, 'cache state', same(original.hashes, (await build(c, { LASM_TOOLCHAIN_CACHE: coldCache })).hashes, 'cold tool cache vs warm', ref, join(c, out)));
 
         // Nothing changed at all, then sources touched without a change.
         const again = await build(a);
@@ -101,13 +122,13 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
         for (const name of ['Main.lean', 'App.lean', 'App/Greeting.lean', 'lakefile.toml']) utimesSync(join(a, name), later, later);
         const touched = await build(a);
         if (rebuildStage.test(touched.text)) touchProblems.push(`touching the sources rebuilt: ${tail(touched.text, 6)}`);
-        touchProblems.push(...same(original.hashes, touched.hashes, 'after touch', ref, join(a, 'dist')));
+        touchProblems.push(...same(original.hashes, touched.hashes, 'after touch', ref, join(a, out)));
         const moved = Object.keys(original.times).filter(name => touched.times[name] !== original.times[name]);
         if (moved.length) touchProblems.push(`touch rewrote ${moved.length} output files: ${moved.slice(0, 6).join(', ')}`);
         record(target, profile, 'touch', touchProblems, `${(touched.ms / 1000).toFixed(1)} s`);
 
         renameSync(join(a, 'Notes.lean'), join(a, 'Scratch.lean'));
-        record(target, profile, 'rename file', same(original.hashes, (await build(a)).hashes, 'after renaming an unimported module', ref, join(a, 'dist')));
+        record(target, profile, 'rename file', same(original.hashes, (await build(a)).hashes, 'after renaming an unimported module', ref, join(a, out)));
         renameSync(join(a, 'Scratch.lean'), join(a, 'Notes.lean'));
 
         const greeting = join(a, 'App/Greeting.lean'), text = readFileSync(greeting, 'utf8');
@@ -116,24 +137,39 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
         const renameProblems = [];
         for (const name of treeDifferences(original.hashes, renamed.hashes).map(line => line.split(':')[0])) {
           if (!name.endsWith('.json') || !(name in original.hashes) || !(name in renamed.hashes)) { renameProblems.push(`${name} changed`); continue; }
-          const before = JSON.parse(readFileSync(join(ref, name), 'utf8')), after = JSON.parse(readFileSync(join(a, 'dist', name), 'utf8'));
-          if (JSON.stringify(withoutSourceHashes(before)) !== JSON.stringify(withoutSourceHashes(after))) renameProblems.push(`${name} changed beyond source hashes`);
+          const before = JSON.parse(readFileSync(join(ref, name), 'utf8')), after = JSON.parse(readFileSync(join(a, out, name), 'utf8'));
+          const paths = jsonDifferences(withoutSourceHashes(before), withoutSourceHashes(after));
+          if (paths.length) renameProblems.push(`${name} changed beyond source hashes, at ${paths.slice(0, 6).join(', ')}`);
         }
-        record(target, profile, 'rename def', renameProblems);
+        // The dev profile keeps function names in the module (a name section) and
+        // skips dead-code elimination, so a renamed definition shows there by design.
+        if (profile === 'release') record(target, profile, 'rename def', renameProblems);
+        else log(`     ${target}/${profile} rename def (informational, names are kept in dev builds): ${renameProblems.length ? renameProblems.join('; ') : 'no change'}`);
         writeFileSync(greeting, text);
 
         writeFileSync(greeting, edit(text));
         const incremental = await build(a);
         const d = project(); writeFileSync(join(d, 'App/Greeting.lean'), edit(text));
         const clean = await build(d);
-        const incrementalProblems = same(clean.hashes, incremental.hashes, 'incremental vs clean', join(d, 'dist'), join(a, 'dist'));
+        // Release builds plan initialization from the roots alone (byte-reproducible);
+        // dev rebuilds start from the previous build's plan (src/application-initialization.mjs),
+        // so a dev incremental build must behave like a clean one, not match its bytes.
+        const equivalent = async (label, hashesA, hashesB, dirA, dirB) => {
+          const bytes = same(hashesA, hashesB, label, dirA, dirB);
+          if (!bytes.length || profile === 'release') return bytes;
+          if (target !== 'node') { log(`     ${target}/${profile} ${label}: bytes differ (dev rebuilds are seeded by the previous build; not run on this target)`); return []; }
+          const [x, y] = [await runProgram(dirA), await runProgram(dirB)];
+          log(`     ${target}/${profile} ${label}: bytes differ (dev rebuilds are seeded by the previous build); both print ${JSON.stringify(x)}`);
+          return x === y ? [] : [`${label}: the programs behave differently: ${JSON.stringify(x)} vs ${JSON.stringify(y)}`];
+        };
+        const incrementalProblems = await equivalent('incremental vs clean', clean.hashes, incremental.hashes, join(d, out), join(a, out));
         if (!treeDifferences(original.hashes, incremental.hashes).length) incrementalProblems.push('the edit changed no output byte (the build reused a stale result)');
         writeFileSync(greeting, text);
-        incrementalProblems.push(...same(original.hashes, (await build(a)).hashes, 'after reverting the edit', ref, join(a, 'dist')));
+        incrementalProblems.push(...await equivalent('after reverting the edit', original.hashes, (await build(a)).hashes, ref, join(a, out)));
         record(target, profile, 'incremental', incrementalProblems);
 
         if (profile === 'dev' && ['node', 'workers'].includes(target))
-          record(target, profile, 'lasm dev', await devRelation({ lasm, target, project, build, cleanEdited: clean.hashes, text }));
+          record(target, profile, 'lasm dev', await devRelation({ lasm, target, out, project, build, cleanEdited: clean.hashes, cleanDirectory: join(d, out), equivalent, text }));
       } catch (error) {
         record(target, profile, 'run', [error.message]);
       } finally { for (const d of projects) removeTree(d); }
@@ -145,7 +181,7 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
 /** lasm dev --no-run: the first build, an edit (rebuilt), a touch (ignored);
  * then lasm build --dev in the same project reuses dev's build, which equals a
  * clean build of the edited project. */
-async function devRelation({ lasm, target, project, build, cleanEdited, text }) {
+async function devRelation({ lasm, target, out, project, build, cleanEdited, cleanDirectory, equivalent, text }) {
   const directory = project(), problems = [];
   const child = spawn(process.execPath, [lasm, 'dev', 'Main.lean', '--no-run', ...(target === 'node' ? [] : ['--target', target])],
     { cwd: directory, env: baseEnvironment(), stdio: ['pipe', 'pipe', 'pipe'], detached: process.platform !== 'win32' });
@@ -179,8 +215,7 @@ async function devRelation({ lasm, target, project, build, cleanEdited, text }) 
   }
   const reused = await build(directory);
   if (rebuildStage.test(reused.text)) problems.push(`lasm build after lasm dev linked again instead of reusing dev's build: ${tail(reused.text, 6)}`);
-  const differences = treeDifferences(cleanEdited, reused.hashes);
-  if (differences.length) problems.push(`after lasm dev: ${differences.length} files differ from a clean build: ${differences.slice(0, 12).join('; ')}`);
+  problems.push(...await equivalent('after lasm dev vs a clean build', cleanEdited, reused.hashes, cleanDirectory, join(directory, out)));
   return problems;
 }
 
