@@ -22,8 +22,10 @@ open Wire
 structure Reads (m : Type → Type) where
   /-- How many operations the log holds. -/
   count : m Nat
-  /-- Whether the log holds this operation. -/
-  contains : Op → m Bool
+  /-- Which of these operations the log holds (one query for many, so that
+  no loop of thousands of steps runs in the monad: on WebAssembly a long
+  monadic recursion can exhaust the stack). -/
+  known : List Op → m (List Op)
   /-- The log from position `start`, at most `n` operations. -/
   slice : (start n : Nat) → m (List Op)
 
@@ -34,19 +36,19 @@ def maxLog : Nat := 2000000
 full asks again. -/
 def chunk : Nat := maxOps
 
-/-- The operations of a batch the log lacks, each once, in order. -/
-def fresh {m : Type → Type} [Monad m] (rd : Reads m) : List Op → List Op → m (List Op)
-  | [], acc => pure acc.reverse
-  | o :: os, acc => do
-    if acc.contains o then fresh rd os acc
-    else if ← rd.contains o then fresh rd os acc
-    else fresh rd os (o :: acc)
+/-- The operations of a batch that are not `known` (in the log), each once,
+in order. Tail-recursive. -/
+def fresh (known : List Op) : List Op → List Op → List Op
+  | [], acc => acc.reverse
+  | o :: os, acc =>
+    if acc.contains o || known.contains o then fresh known os acc
+    else fresh known os (o :: acc)
 
 /-- Handles one request: the operations to append to the log, and the reply. -/
 def sync {m : Type → Type} [Monad m] (rd : Reads m) (req : Request) : m (List Op × Reply) := do
   if !req.ops.all okOp then return ([], .error "invalid operation")
   let n ← rd.count
-  let new ← fresh rd req.ops []
+  let new := fresh (← rd.known req.ops) req.ops []
   if n + new.length > maxLog then return ([], .error "document full")
   let start := min req.cursor (n + new.length)
   let old ← rd.slice start chunk

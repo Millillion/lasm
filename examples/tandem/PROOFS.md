@@ -75,7 +75,7 @@ cases.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from Proofs/Spec.lean by `npm run proofs -- --write`; do not edit by hand. -->
 
-**29 propositions**, each proved by the theorem of the same name in `Proofs/` (217 theorems in all: the 29 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
+**29 propositions**, each proved by the theorem of the same name in `Proofs/` (218 theorems in all: the 29 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
 
 Totality (checked by test/Axioms.lean, not a theorem): the code that handles untrusted input reaches 1060 definitions (160 of them Tandem's); none is `partial` or `unsafe`, none is a panic, and the only opaque ones are Lean's primitives (`System.Platform.getNumBits`, `mixHash`).
 
