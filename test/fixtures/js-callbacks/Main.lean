@@ -61,9 +61,9 @@ def main : IO Unit := do
     | .error e => s!"{what}: failed clearly {((toString e).splitOn "inside a synchronous Lean callback").length == 2}: {e}"
   let waits ← Function.ofSyncFn fun _ => do
     let p : Value ← timers.callMethod "setTimeout" #[toJS (1 : Nat), toJS "never"]
-    let a ← (p.await String).toBaseIO
-    let b ← (timers.callMethodAwait "setTimeout" #[toJS (1 : Nat), toJS "never"] String : IO String).toBaseIO
-    let c ← ((timers.callMethodAwait "setTimeout" #[toJS (1 : Nat), toJS "never"] String : Async String).block).toBaseIO
+    let a ← EIO.toBaseIO (p.await String : IO String)
+    let b ← EIO.toBaseIO (timers.callMethodAwait "setTimeout" #[toJS (1 : Nat), toJS "never"] String : IO String)
+    let c ← EIO.toBaseIO (Std.Async.Async.block (timers.callMethodAwait "setTimeout" #[toJS (1 : Nat), toJS "never"] String : Async String))
     return toJS s!"{explain "await" a}\n{explain "awaited call" b}\n{explain "Async call" c}"
   let answer : String ← reflect.callMethod "apply" #[toJS waits, .undefined, .array #[]] String
   IO.println answer
