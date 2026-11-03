@@ -11,4 +11,5 @@ def main : IO Unit := do
   let writers ← Std.Semaphore.new 1
   let hub ← Tandem.Server.Hub.new
   let pollSeconds := ((← IO.getEnv "TANDEM_POLL_SECONDS").bind String.toNat?).getD 20
-  Tandem.Server.EdgeWs.serve { db, writers := some writers, push := hub.push, pollSeconds } hub .bun
+  let env : Tandem.Server.Env := { db, writers := some writers, push := hub.push, pollSeconds }
+  Tandem.Server.EdgeWs.serve env hub (Tandem.Server.handler env) .bun

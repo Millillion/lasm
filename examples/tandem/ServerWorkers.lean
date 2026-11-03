@@ -10,4 +10,5 @@ def main : IO Unit := do
   let db ← Tandem.Server.D1.open "DB"
   -- Workers does not let one request wait on another's promise: no
   -- in-process turns; the store's keys keep racing commits apart.
-  Tandem.Server.EdgeWs.serve { db, writers := none, pollSeconds := 10 } (← Tandem.Server.Hub.new) .none
+  let env : Tandem.Server.Env := { db, writers := none, pollSeconds := 10 }
+  Tandem.Server.EdgeWs.serve env (← Tandem.Server.Hub.new) (Tandem.Server.handler env) .none
