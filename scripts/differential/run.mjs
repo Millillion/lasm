@@ -143,7 +143,11 @@ async function buildLasm(dir, target) {
 function normalize(r) {
   // LEAN_BACKTRACE=0 is set everywhere, so no backtrace is expected anywhere;
   // only native return addresses (never comparable) are dropped.
-  const stderr = r.stderr.replace(/\r\n/g, '\n').split('\n').filter(l => !/^\S+\(\+0x[0-9a-f]+\) \[0x[0-9a-f]+\]$/.test(l)).join('\n');
+  // Lasm's Node runtime follows native Lean's stack overflow diagnostic with
+  // three lines of advice (scripts/full-lean/emscripten-pre.js, issue #66).
+  const stderr = r.stderr.replace(/\r\n/g, '\n')
+    .replace(/(Stack overflow detected\. Aborting\.\n)Lasm: [^\n]*\n[^\n]*\nSee https:\/\/github\.com\/Millillion\/lasm\/blob\/main\/FUNDAMENTAL_LIMITATIONS\.md#recursion-depth\n/g, '$1')
+    .split('\n').filter(l => !/^\S+\(\+0x[0-9a-f]+\) \[0x[0-9a-f]+\]$/.test(l)).join('\n');
   return { stdout: r.stdout.replace(/\r\n/g, '\n'), stderr, code: r.timedOut ? 'timeout' : r.signal ? `signal ${r.signal}` : r.code };
 }
 // Known divergences: applied to a target's output before the comparison and

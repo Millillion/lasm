@@ -1,0 +1,123 @@
+name: Serverless adapters
+# The function-platform shims (src/serverless/) on each platform's own local
+# runtime, with a stand-in application instead of a Lean build (no toolchain,
+# no build: scripts/serverless/stand-in-app.mjs): several Set-Cookie headers
+# in one reply, two Cookie header lines in one request, and a 303 with no
+# body must reach the other side intact (#80, #82;
+# scripts/serverless/adapter-platforms.mjs). Linux x64 free runners, local
+# tooling only: no account, nothing deployed.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/serverless-adapters.yml'
+      - 'src/serverless/**'
+      - 'src/package.mjs'
+      - 'scripts/serverless/adapter-platforms.mjs'
+      - 'scripts/serverless/stand-in-app.mjs'
+      - 'test/serverless.test.mjs'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/serverless-adapters.yml'
+      - 'src/serverless/**'
+      - 'src/package.mjs'
+      - 'scripts/serverless/adapter-platforms.mjs'
+      - 'scripts/serverless/stand-in-app.mjs'
+      - 'test/serverless.test.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: serverless-adapters-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CI: '1'
+  BROWSER: 'none'
+  DO_NOT_TRACK: '1'
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.22.1
+          package-manager-cache: false
+      - run: node --test --test-concurrency=1 test/serverless.test.mjs
+  platform:
+    name: ${{ matrix.title }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: lambda, title: 'AWS Lambda (sam local start-api: HTTP API and REST API)' }
+          - { platform: vercel, title: "Vercel Functions (Vercel's Node launcher)" }
+          - { platform: netlify, title: "Netlify Functions (netlify build offline, Netlify's bootstrap)" }
+          - { platform: azure, title: 'Azure Functions (func start)' }
+          - { platform: gcf, title: 'Google Cloud Functions (Functions Framework)' }
+    env:
+      SAM_CLI_TELEMETRY: '0'
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ''
+      AWS_SECRET_ACCESS_KEY: ''
+      AWS_SESSION_TOKEN: ''
+      VERCEL_TELEMETRY_DISABLED: '1'
+      VERCEL_TOKEN: ''
+      NETLIFY_TELEMETRY_DISABLED: '1'
+      NETLIFY_AUTH_TOKEN: ''
+      FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.22.1
+          package-manager-cache: false
+      - name: The platform's pinned tools
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T/node_modules/.bin"
+          case "$PLATFORM" in
+            lambda)
+              curl -fsSL --retry 3 -o "$RUNNER_TEMP/sam.zip" https://github.com/aws/aws-sam-cli/releases/download/v1.170.0/aws-sam-cli-linux-x86_64.zip
+              unzip -q "$RUNNER_TEMP/sam.zip" -d "$RUNNER_TEMP/sam-installer"
+              "$RUNNER_TEMP/sam-installer/install" --install-dir "$RUNNER_TEMP/sam" --bin-dir "$T/node_modules/.bin" ;;
+            vercel)
+              npm install --prefix "$T" --no-audit --no-fund vercel@65.2.0
+              echo "VERCEL_NODE_MODULES=$T/node_modules" >> "$GITHUB_ENV" ;;
+            netlify) npm install --prefix "$T" --no-audit --no-fund netlify-cli@27.14.2 ;;
+            azure)
+              # Azure Functions Core Tools 4.16.0, checked by SHA-256 (as porter-platforms.yml).
+              curl -fsSL --retry 3 -o "$RUNNER_TEMP/func.zip" https://cdn.functions.azure.com/public/4.0.308342/Azure.Functions.Cli.linux-x64.4.16.0.zip
+              echo "c68c7780d94c7583157f7a7d1a05e0ec3e34057c3d55e4c7be71fc4aa0c23667  $RUNNER_TEMP/func.zip" | sha256sum -c
+              unzip -q "$RUNNER_TEMP/func.zip" -d "$RUNNER_TEMP/func" && rm "$RUNNER_TEMP/func.zip"
+              chmod 755 "$RUNNER_TEMP/func/func" "$RUNNER_TEMP/func/in-proc8/func" "$RUNNER_TEMP/func/in-proc6/func"
+              ln -s "$RUNNER_TEMP/func/func" "$T/node_modules/.bin/func" ;;
+            gcf) ;;
+          esac
+          echo "$T/node_modules/.bin" >> "$GITHUB_PATH"
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: matrix.platform == 'lambda' || matrix.platform == 'vercel' || matrix.platform == 'netlify'
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
+      - name: The pinned Lambda images (cache, else registry by digest)
+        if: matrix.platform == 'lambda' || matrix.platform == 'vercel' || matrix.platform == 'netlify'
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
+      - name: The adapters on ${{ matrix.platform }}
+        run: node scripts/serverless/adapter-platforms.mjs ${{ matrix.platform }} "$RUNNER_TEMP/work" "$RUNNER_TEMP/adapters-${{ matrix.platform }}.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: serverless-adapters-${{ matrix.platform }}
+          path: ${{ runner.temp }}/adapters-${{ matrix.platform }}.json
+          retention-days: 14
+          if-no-files-found: ignore
