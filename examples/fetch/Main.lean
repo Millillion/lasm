@@ -54,6 +54,12 @@ def handle (req : Request) : Async Response := do
     let agent := (req.header? "x-lasm-test").getD ""
     return Response.json s!"\{\"x-lasm-test\":{jsonString agent}}"
       |>.withHeader "x-lasm-reply" "from-lean" |>.withHeader "set-cookie" "a=1" |>.withHeader "set-cookie" "b=2"
+  -- The request's cookies: one header, whatever the client split them into.
+  | "GET", ["cookie"] =>
+    let count := (req.headers.filter fun (k, _) => k.toLower == "cookie").size
+    return .json s!"\{\"cookie\":{jsonString ((req.header? "cookie").getD "")},\"fields\":{count}}"
+  -- A redirect with no body, as a form post answers (303 See Other).
+  | "POST", ["see-other"] => return .redirect "/hello/redirected" 303
   | "GET", ["status", code] => return Response.text s!"status {code}\n" (code.toNat?.getD 200).toUInt16
   | "GET", ["redirect"] => return .redirect "/hello/redirected"
   | "GET", ["empty"] => return .empty

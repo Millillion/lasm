@@ -67,9 +67,11 @@ function send(port, req, timeoutMs = 30_000) {
     const body = req.bodyBase64 ? Buffer.from(req.bodyBase64, 'base64') : req.bodyRepeat ? Buffer.from(req.bodyRepeat.text.repeat(req.bodyRepeat.times)) : req.body !== undefined ? Buffer.from(req.body) : null;
     const headers = { ...(req.headers ?? {}), connection: 'close' };
     if (body) headers['content-length'] = String(body.length);
+    // rawHeaders: [[name, value], …] sent as separate lines (a header repeated).
+    const lines = req.rawHeaders ? [...Object.entries(headers), ['host', `127.0.0.1:${port}`], ...req.rawHeaders].flat() : headers;
     // A fresh connection per request (agent: false): a pooled keep-alive socket
     // that the server has just closed would fail with "socket hang up" on reuse.
-    const r = request({ host: '127.0.0.1', port, method: req.method, path: req.path, headers, timeout: timeoutMs, agent: false }, res => {
+    const r = request({ host: '127.0.0.1', port, method: req.method, path: req.path, headers: lines, timeout: timeoutMs, agent: false }, res => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
       res.on('end', () => ok({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks) }));
