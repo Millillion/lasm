@@ -110,7 +110,7 @@ async function timed(promise) {
 const wsOK = a.platform !== 'workers';
 const sockets = new Map();
 async function socket(doc) {
-  if (sockets.has(doc)) return sockets.get(doc);
+  if (sockets.has(doc)) { const s = sockets.get(doc); await s.open; return s; }
   const ws = new WebSocket(`${base.replace(/^http/, 'ws')}/doc/${doc}/ws`);
   const s = { ws, waiting: [], open: new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; }) };
   ws.onmessage = e => { const w = s.waiting.shift(); if (w) w(e.data); };
