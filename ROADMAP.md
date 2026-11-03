@@ -86,7 +86,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] Mutation scores to 80 % for every module: link driver 54→93 %, target links 6→87 % (unit tests of the link plans with a stand-in toolchain), edge glue 79→97 %, notices 75→92 %, build service 92→95 % (fault injection into output delivery); no new bugs found.
 - [ ] Raise the mutation targets above 80 % now that every module passes them.
 - [ ] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week).
-- [ ] Platform evidence levels L0–L3, generated from CI results, in the README's platform table.
+- [x] Platform evidence levels L0–L3, generated from CI results, in the README's platform table: `scripts/evidence/levels.mjs` and `platforms.json`, refreshed nightly by `evidence-levels.yml` (a PR when a level moves). First result: every server platform L2, the browser L1 (no browser differential yet); Node is one requirement short of L3 (a Porter nightly fuzz failure, 2026-11-03). Only Node has fuzzing and simulation in CI ([TESTING.md](docs/TESTING.md#evidence-levels)).
 - [ ] Claim 4, dependable tooling: metamorphic tests of `lasm dev` (an incremental build equals a clean one; the same input gives the same bytes; a rename changes nothing else).
 - [ ] Claim 4: fault injection in the installer and the build (a dropped network, a full disk, a killed process, a read-only cache).
 - [ ] Claim 4: every error a user can trigger prints a clear message, never a stack trace (an error corpus run against the published CLI).
