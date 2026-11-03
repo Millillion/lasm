@@ -68,7 +68,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] 0.3.9 (published 2026-11-03, PR #81): #27, browser-style dot-segment resolution in `Request.path` on every platform, with a proof that `segments` never contains `.` or `..`; also #76 (a `://` in the query), #66 (Node recursion depth), #80 and #82 (cookies and redirects on function platforms), #49 (dev build service `unref`) and #51 (Lasm.JS errors wrapped twice).
 - [ ] Next release: retry downloads cut short before Content-Length arrives (PR #91), the macOS C-tier fix (#73, PR #85), the editor fix (#72, PR #86), and Lasm.UI handlers deciding `preventDefault`/`stopPropagation` per event, a breaking change (#71; [next-notes.md](docs/release/next-notes.md)).
 - [x] Move the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7): every workflow, container image, acceptance pin and doc version list; the deferral is removed. Both are still the newest 26 and 24 releases (2026-11-03).
-- [ ] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms (a stalled thread, or a visibility bug?).
+- [x] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms: a stalled thread, not a visibility bug (the flag is a multi-threaded `IO.Ref`, accessed with sequentially consistent atomics; the printed time precedes a host call the thread waits for); the polling fixture already removed the timing assumption ([DECISIONS.md](docs/DECISIONS.md)).
 
 ### Testing ([TESTING.md](docs/TESTING.md), [TESTING_STRATEGY.md](docs/proposals/TESTING_STRATEGY.md))
 - [x] Differential testing against upstream Lean: generator, shrinker, PR and nightly CI.
@@ -81,10 +81,18 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] Host bridge: awaiting an async operation inside a synchronous JS callback still hangs. Make it fail clearly, as `docs/JS_BINDINGS.md` says it does, or support it.
 - [ ] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread.
 - [~] Replace the remaining tests that only read files as text, and port or retire the 29 Lean 4.32 test files.
+- [x] Host bridge: awaiting a JavaScript promise inside a synchronous JS callback fails at once with the reason (it hung); in the model (its mutant is caught), with regressions on Node (unit, js-callbacks part 5) and the edge profile (already clear there). Support is impossible (a promise settles only after the callback returns). Remaining: waiting there for a Lean task that uses the host (including `Async.block`) or for a timer or socket started in the callback still never finishes (needs a runtime hook; options in PR #101).
+- [x] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread. The model found a hang (the next-depth slot was never served inline); fixed, in the model and the trace checking (`seq1`/`ready1`), with a regression test.
+- [ ] Replace the remaining tests that only read files as text, and port or retire the 29 Lean 4.32 test files.
 - [ ] Browser and Bun targets in differential testing.
 - [x] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next): seven modules, nightly and PR CI, host bridge 56→96 %, UI applier 55→93 %, build service 52→92 %, edge glue 15→79 %, notices 63→75 % (#53; bugs #49, #51).
 - [x] Mutation scores to 80 % for every module: link driver 54→93 %, target links 6→87 % (unit tests of the link plans with a stand-in toolchain), edge glue 79→97 %, notices 75→92 %, build service 92→95 % (fault injection into output delivery); no new bugs found.
 - [ ] Raise the mutation targets above 80 % now that every module passes them.
+- [ ] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week).
+- [x] Platform evidence levels L0–L3, generated from CI results, in the README's platform table: `scripts/evidence/levels.mjs` and `platforms.json`, refreshed nightly by `evidence-levels.yml` (a PR when a level moves). First result: every server platform L2, the browser L1 (no browser differential yet); Node is one requirement short of L3 (a Porter nightly fuzz failure, 2026-11-03). Only Node has fuzzing and simulation in CI ([TESTING.md](docs/TESTING.md#evidence-levels)).
+- [ ] Claim 4, dependable tooling: metamorphic tests of `lasm dev` (an incremental build equals a clean one; the same input gives the same bytes; a rename changes nothing else).
+- [ ] Claim 4: fault injection in the installer and the build (a dropped network, a full disk, a killed process, a read-only cache).
+- [ ] Claim 4: every error a user can trigger prints a clear message, never a stack trace (an error corpus run against the published CLI).
 - [x] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week): `flaky.yml` (07:53 UTC) reports re-runs, jobs that passed only on retry with the tests that failed first, timed-out and unsuperseded cancelled jobs, as an artifact and in the one issue labelled `flaky`; `test/quarantine.json` is skipped with a notice by the unit suite and `npm test`, and an entry older than 7 days fails the suite ([TESTING.md](docs/TESTING.md#flaky-tests)).
 - [ ] Platform evidence levels L0–L3, generated from CI results, in the README's platform table.
 - [~] Claim 4, dependable tooling: metamorphic tests of `lasm dev` (an incremental build equals a clean one; the same input gives the same bytes; a rename changes nothing else).
@@ -118,7 +126,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms (Lambda .zip and image, Vercel, Netlify, Azure, GCF), each with the oracle tests and the adversarial suite in CI. No Fastly or WASI (no Web Crypto).
 - [x] 4. The `Lasm.UI` sign-in and consent pages (a plain-form fallback without JavaScript) with Playwright tests on Chromium, Firefox and WebKit, and a nightly job (40 minutes of fuzzing).
 - [x] 5. On `@lasm/cli` 0.3.9, without the workarounds for #76 (Porter's own path segments), #80 (joining `Cookie` headers, one `Set-Cookie` per reply) and #82 (a text body on redirects).
-- [~] 6. Bound `state` (2048 bytes; a longer one is a 400 page): the nightly fuzzer's `Header overflow` (run 41634567003), a ~16 KB `state` reflected into an error redirect's `Location`. New proposition `redirect_state_bounded`; the fuzzer replays a regression corpus (`test/fuzz-corpus/`) and flags any `Location` over 8 KiB.
+- [x] 6. Bound `state` (2048 bytes; a longer one is a 400 page): the nightly fuzzer's `Header overflow` (run 41634567003), a ~16 KB `state` reflected into an error redirect's `Location`. New proposition `redirect_state_bounded`; the fuzzer replays a regression corpus (`test/fuzz-corpus/`) and flags any `Location` over 8 KiB. Merged 2026-11-03 (PR #105); the 40-minute nightly fuzzer passed on the branch.
 - [ ] (J) Review the 27 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
 
 ### Tandem ([examples/tandem](examples/tandem), the fifth flagship app: a collaborative text editor on a CRDT)
