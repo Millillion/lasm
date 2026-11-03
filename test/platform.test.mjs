@@ -1,24 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { tmpdir } from 'node:os';
-import { bundledTools, executableName, insideDirectory, responseFile } from '../src/platform.mjs';
-
-test('tool discovery handles official macOS and Windows executable layouts', t => {
-  const root = mkdtempSync(path.join(tmpdir(), 'lasm tool layouts '));
-  t.after(() => rmSync(root, { recursive: true, force: true }));
-  for (const [platform, linker] of [['linux', 'ld.lld'], ['darwin', 'ld64.lld'], ['win32', 'ld.lld']]) {
-    const prefix = path.join(root, platform);
-    mkdirSync(path.join(prefix, 'bin'), { recursive: true });
-    for (const name of ['lean', 'lake', 'clang', linker]) writeFileSync(path.join(prefix, 'bin', executableName(name, platform)), 'layout fixture');
-    const tools = bundledTools(prefix, platform);
-    assert.equal(path.basename(tools.linker), executableName(linker, platform));
-    assert.equal(path.basename(tools.lean), executableName('lean', platform));
-    rmSync(tools.clang);
-    assert.throws(() => bundledTools(prefix, platform), /complete official Lean toolchain/);
-  }
-});
+import { insideDirectory, responseFile } from '../src/platform.mjs';
 
 test('Windows path containment handles drive case, sibling prefixes, and other drives', () => {
   assert.equal(insideDirectory('C:\\Work\\App', 'c:\\work\\app\\Module.lean', path.win32), true);

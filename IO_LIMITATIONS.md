@@ -901,7 +901,7 @@ and do not establish full-suite conformance. See
 
 Implementation: [IO runtime](runtime/node-io.cpp), [async runtime](runtime/node-async.cpp),
 [tasks](runtime/tasks.inc.cpp), [Node primitives](src/node-host.mjs),
-[network/timers](src/node-network.mjs), [scheduler](src/scheduler.mjs).
+[network/timers](src/node-network.mjs).
 
 Recent fixes (2026-09-18): real shared/exclusive locks, C-library buffered file
 handles and flush/truncate behavior, reads beyond 16 MiB, native line decoding,

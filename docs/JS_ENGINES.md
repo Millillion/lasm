@@ -17,8 +17,7 @@ A generated deployment also runs in Node:
 node dist/main.mjs argument1
 ```
 
-`npm run test:engines` runs the Node application integration cases in
-`integration/engines.test.mjs`. See [the full-suite result](FULL_SUITE_RESULTS.md)
+See [the full-suite result](FULL_SUITE_RESULTS.md)
 and the open [IO limitations](../IO_LIMITATIONS.md).
 
 **Deno and Bun support removed — 2026-10-16:** by the user's decision, Deno and

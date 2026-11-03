@@ -8,7 +8,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, chmodSync, rmSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { mkdir } from 'node:fs/promises';
-import { describeFileSystemError, reportCliError } from '../src/application-cli.mjs';
+import { describeFileSystemError, reportCliError, runApplicationCli } from '../src/application-cli.mjs';
 import { withApplicationLock } from '../src/application-lock.mjs';
 import { initProject } from '../src/init.mjs';
 import { deliverOutput } from '../src/application-files.mjs';
@@ -91,4 +91,11 @@ test('a program without main is refused with that reason', t => {
   assert.doesNotThrow(() => assertDefinesMain(inputs, [join(directory, 'Helper.c'), join(directory, 'Main.c')], source));
   // A source that is not among the inputs is not judged.
   assert.doesNotThrow(() => assertDefinesMain(inputs.slice(0, 1), [join(directory, 'Helper.c')], source));
+});
+
+// The lasm.json library pipeline was removed (docs/DECISIONS.md, 2026-11-03):
+// a source checkout now refuses it with the published CLI's message.
+test('lasm build <config>.json is refused with the published message, also from a source checkout', async () => {
+  await assert.rejects(runApplicationCli(['build', 'lasm.json']),
+    { message: 'This Lasm candidate builds ordinary .lean applications for Node. Use lasm Main.lean or lasm build Main.lean.' });
 });

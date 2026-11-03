@@ -19,6 +19,5 @@ For a new project, use `npm create @lasm@latest` with a [template](../README.md#
 | [ui](ui) | Browser apps with `Lasm.UI`: counter, TodoMVC with proofs, feature demo, benchmark | `npx @lasm/cli dev Main.lean --target browser` |
 
 Maintainer fixtures, kept as regression tests and not the way to start:
-[basic](basic), [io](io), [worker](worker), [express](express) (the earlier
-`lasm.json` interface), [lean-server](lean-server) and [lean-server-latest](lean-server-latest)
+[lean-server](lean-server) and [lean-server-latest](lean-server-latest)
 (Lean 4.32-era servers; for a pure-Lean server use `--template std-http` or `fetch`).
