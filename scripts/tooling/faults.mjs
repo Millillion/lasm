@@ -177,7 +177,11 @@ export async function runFaults({ lasm, pkg, only, work, log = console.log }) {
     if (first.code !== 0) throw new Error(`the reference build failed: ${tail(first.stdout + first.stderr, 30)}`);
     reference = output(clean);
     log(`     reference build: ${(first.ms / 1000).toFixed(1)} s, ${Object.keys(reference).length} files`);
-    const stages = [...new Set((first.stdout + first.stderr).match(/^\[lasm\] [A-Z][^\n—]*?(?= —|$)/gm) ?? [])].map(s => s.slice(7).trim()).filter(s => !/^Build ready/.test(s));
+    // The stages of a build with the tools installed (killed installs are separate scenarios).
+    const warm = await build(project('reference-warm'));
+    if (warm.code !== 0) throw new Error(`the second reference build failed: ${tail(warm.stdout + warm.stderr, 30)}`);
+    const stages = [...new Set(((warm.stdout + warm.stderr).match(/^\[lasm\] [A-Z][^\n—]*?(?= —|$)/gm) ?? []).map(s => s.slice(7).trim()))]
+      .filter(s => !/^Build ready|^Tools cache|\d B \/|\d [kMG]B \//.test(s));
     log(`     build stages: ${stages.join(' | ')}`);
 
     // Killed builds: SIGKILL at the start of every stage the reference printed.
@@ -207,7 +211,8 @@ export async function runFaults({ lasm, pkg, only, work, log = console.log }) {
 
     // A killed `npm install` of the CLI itself, rerun, then a build with what it installed.
     if (pkg) for (const delay of [1_000, 3_000, 8_000]) {
-      const install = join(root, `killed-npm-${delay}`), directory = project(`killed-npm-${delay}`);
+      try {
+      const install = join(root, `npm-install-${delay}`), directory = project(`killed-npm-${delay}`);
       mkdirSync(install); writeFileSync(join(install, 'package.json'), '{"private":true}\n');
       const npmCli = join(dirname(process.execPath), process.platform === 'win32' ? 'node_modules/npm/bin/npm-cli.js' : '../lib/node_modules/npm/bin/npm-cli.js');
       const npmInstall = extra => runLasm(npmCli, ['install', pkg, '--no-audit', '--no-fund'], { cwd: install, timeoutMs: 900_000, ...extra });
@@ -226,6 +231,10 @@ export async function runFaults({ lasm, pkg, only, work, log = console.log }) {
         log(`${problems.length ? 'FAIL ' : 'ok   '} killed npm install after ${delay / 1000} s (${killed.killed ? 'killed' : 'finished before the kill'})${problems.length ? ':\n      ' + problems.join('\n      ') : ''}`);
       }
       removeTree(install);
+      } catch (error) {
+        results.push({ name: `killed npm install after ${delay / 1000} s`, status: 'failed', outcome: '', problems: [error.stack ?? String(error)] });
+        log(`FAIL  killed npm install after ${delay / 1000} s: ${error.message}`);
+      }
     }
 
     // Network: tunnels cut part way through downloads.

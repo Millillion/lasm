@@ -16,7 +16,7 @@
 //
 //   node scripts/tooling/metamorphic.mjs --lasm PATH/bin/lasm.mjs \
 //     [--targets node,wasi,workers,browser] [--profiles release,dev] [--work DIR] [--report FILE]
-import { readFileSync, renameSync, utimesSync, writeFileSync } from 'node:fs';
+import { cpSync, readFileSync, renameSync, utimesSync, writeFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join } from 'node:path';
 import { runLasm, baseEnvironment, temporaryDirectory, writeTree, removeTree, treeHashes, treeTimes, treeDifferences, options, summary, tail } from './lib.mjs';
@@ -37,6 +37,20 @@ const rebuildStage = /\bLinking\b|Generating Lean C|Compiling application module
 // Output metadata that records source hashes (build-info.json): the only bytes
 // a renamed, unused definition may change.
 const sourceHashKeys = new Set(['sourceSha256', 'cSha256', 'signature']);
+
+/** Where the first differing file present in both trees differs (text: a window around it). */
+function explain(a, b, dirA, dirB) {
+  const names = Object.keys(a).filter(name => name in b && a[name] !== b[name]).sort((x, y) => Number(/\.(?:br|gz|wasm)$/.test(x)) - Number(/\.(?:br|gz|wasm)$/.test(y)));
+  const lines = [];
+  for (const name of names.slice(0, 3)) {
+    const x = readFileSync(join(dirA, name)), y = readFileSync(join(dirB, name));
+    let at = 0; while (at < x.length && at < y.length && x[at] === y[at]) at++;
+    const text = /\.(?:m?js|json|html|css|txt|cjs)$/.test(name);
+    const window = buffer => JSON.stringify(buffer.subarray(Math.max(0, at - 80), at + 120).toString(text ? 'utf8' : 'hex'));
+    lines.push(`\n        ${name}: ${x.length} vs ${y.length} bytes, first difference at byte ${at}\n          before: ${window(x)}\n          after:  ${window(y)}`);
+  }
+  return lines.join('');
+}
 
 function withoutSourceHashes(value) {
   if (Array.isArray(value)) return value.map(withoutSourceHashes);
@@ -61,17 +75,23 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
         if (result.code !== 0) throw new Error(`lasm build ${flags.join(' ')} failed in ${directory} (exit ${result.code}${result.timedOut ? ', timed out' : ''}):\n${tail(result.stdout + result.stderr, 30)}`);
         return { hashes: treeHashes(join(directory, 'dist')), times: treeTimes(join(directory, 'dist')), text: result.stdout + result.stderr, ms: result.ms };
       };
-      const same = (a, b, label) => { const d = treeDifferences(a, b); return d.length ? [`${label}: ${d.length} files differ: ${d.slice(0, 12).join('; ')}`] : []; };
+      const same = (a, b, label, dirA, dirB) => {
+        const d = treeDifferences(a, b);
+        return d.length ? [`${label}: ${d.length} files differ: ${d.slice(0, 12).join('; ')}${dirA && dirB ? explain(a, b, dirA, dirB) : ''}`] : [];
+      };
       try {
         const a = project();
         const original = await build(a);
+        const reference = temporaryDirectory(`mm-reference-${target}-${profile}`, work); projects.push(reference);
+        cpSync(join(a, 'dist'), join(reference, 'dist'), { recursive: true, verbatimSymlinks: true });
+        const ref = join(reference, 'dist');
         log(`     ${target}/${profile}: clean build ${(original.ms / 1000).toFixed(1)} s, ${Object.keys(original.hashes).length} files`);
 
         const b = project();
-        record(target, profile, 'determinism', same(original.hashes, (await build(b)).hashes, 'two clean builds'));
+        record(target, profile, 'determinism', same(original.hashes, (await build(b)).hashes, 'two clean builds', ref, join(b, 'dist')));
 
         const c = project();
-        record(target, profile, 'cache state', same(original.hashes, (await build(c, { LASM_TOOLCHAIN_CACHE: coldCache })).hashes, 'cold tool cache vs warm'));
+        record(target, profile, 'cache state', same(original.hashes, (await build(c, { LASM_TOOLCHAIN_CACHE: coldCache })).hashes, 'cold tool cache vs warm', ref, join(c, 'dist')));
 
         // Nothing changed at all, then sources touched without a change.
         const again = await build(a);
@@ -81,13 +101,13 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
         for (const name of ['Main.lean', 'App.lean', 'App/Greeting.lean', 'lakefile.toml']) utimesSync(join(a, name), later, later);
         const touched = await build(a);
         if (rebuildStage.test(touched.text)) touchProblems.push(`touching the sources rebuilt: ${tail(touched.text, 6)}`);
-        touchProblems.push(...same(original.hashes, touched.hashes, 'after touch'));
+        touchProblems.push(...same(original.hashes, touched.hashes, 'after touch', ref, join(a, 'dist')));
         const moved = Object.keys(original.times).filter(name => touched.times[name] !== original.times[name]);
         if (moved.length) touchProblems.push(`touch rewrote ${moved.length} output files: ${moved.slice(0, 6).join(', ')}`);
         record(target, profile, 'touch', touchProblems, `${(touched.ms / 1000).toFixed(1)} s`);
 
         renameSync(join(a, 'Notes.lean'), join(a, 'Scratch.lean'));
-        record(target, profile, 'rename file', same(original.hashes, (await build(a)).hashes, 'after renaming an unimported module'));
+        record(target, profile, 'rename file', same(original.hashes, (await build(a)).hashes, 'after renaming an unimported module', ref, join(a, 'dist')));
         renameSync(join(a, 'Scratch.lean'), join(a, 'Notes.lean'));
 
         const greeting = join(a, 'App/Greeting.lean'), text = readFileSync(greeting, 'utf8');
@@ -96,7 +116,7 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
         const renameProblems = [];
         for (const name of treeDifferences(original.hashes, renamed.hashes).map(line => line.split(':')[0])) {
           if (!name.endsWith('.json') || !(name in original.hashes) || !(name in renamed.hashes)) { renameProblems.push(`${name} changed`); continue; }
-          const before = JSON.parse(readFileSync(join(b, 'dist', name), 'utf8')), after = JSON.parse(readFileSync(join(a, 'dist', name), 'utf8'));
+          const before = JSON.parse(readFileSync(join(ref, name), 'utf8')), after = JSON.parse(readFileSync(join(a, 'dist', name), 'utf8'));
           if (JSON.stringify(withoutSourceHashes(before)) !== JSON.stringify(withoutSourceHashes(after))) renameProblems.push(`${name} changed beyond source hashes`);
         }
         record(target, profile, 'rename def', renameProblems);
@@ -106,10 +126,10 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
         const incremental = await build(a);
         const d = project(); writeFileSync(join(d, 'App/Greeting.lean'), edit(text));
         const clean = await build(d);
-        const incrementalProblems = same(clean.hashes, incremental.hashes, 'incremental vs clean');
+        const incrementalProblems = same(clean.hashes, incremental.hashes, 'incremental vs clean', join(d, 'dist'), join(a, 'dist'));
         if (!treeDifferences(original.hashes, incremental.hashes).length) incrementalProblems.push('the edit changed no output byte (the build reused a stale result)');
         writeFileSync(greeting, text);
-        incrementalProblems.push(...same(original.hashes, (await build(a)).hashes, 'after reverting the edit'));
+        incrementalProblems.push(...same(original.hashes, (await build(a)).hashes, 'after reverting the edit', ref, join(a, 'dist')));
         record(target, profile, 'incremental', incrementalProblems);
 
         if (profile === 'dev' && ['node', 'workers'].includes(target))

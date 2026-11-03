@@ -177,8 +177,9 @@ jobs:
           npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
       - name: Metamorphic build tests
         run: |
-          node scripts/full-lean/run-bounded.mjs --memory-mib 10240 -- /usr/bin/env CI=1 GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" LASM_TOOLCHAIN_CACHE="$RUNNER_TEMP/tool-cache" \
-            node scripts/tooling/metamorphic.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" --targets ${{ matrix.target }} --work "$RUNNER_TEMP/mm" --report "$RUNNER_TEMP/metamorphic.json"
+          # Not under run-bounded: it keeps 8 GiB of host headroom, which on a
+          # 16 GiB runner stops a browser or edge build (about 5 GiB) part way.
+          LASM_TOOLCHAIN_CACHE="$RUNNER_TEMP/tool-cache" node scripts/tooling/metamorphic.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" --targets ${{ matrix.target }} --work "$RUNNER_TEMP/mm" --report "$RUNNER_TEMP/metamorphic.json"
       - if: always()
         run: cat "$RUNNER_TEMP/metamorphic.json" 2>/dev/null || true
 
