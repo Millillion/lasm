@@ -351,6 +351,11 @@ is slower than native Lean (no GMP).
 - **Edge, Bun/Deno, browser, WASI:** single-threaded Lean; no sockets, processes or
   signals; no files except on WASI. In the browser, blocking waits stop the app
   unless it is built with `--suspend jspi` for a browser with JSPI; use `Async`.
+- **Recursion depth:** non-tail recursion reaches about 10 million frames of a small
+  function on Node (native Lean: about 13 million; `LASM_VM_STACK_MB` sets the
+  stack), but about 10,000 on the edge targets, in the browser and on WASI hosts'
+  default stacks. Make deep recursion tail recursive
+  ([limits per target](FUNDAMENTAL_LIMITATIONS.md#recursion-depth)).
 - **No premade bindings** for npm packages; `Lasm.Web` covers the core web platform.
 - **Editor:** `Lasm.*` imports resolve in the editor after `npx lasm editor` (above).
 - **Platforms:** no Windows ARM64 and no Alpine/musl build machines (built apps run
