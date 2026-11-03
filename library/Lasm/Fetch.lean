@@ -79,13 +79,99 @@ def percentDecode (s : String) (plus : Bool := false) : String := Id.run do
 
 namespace Request
 
-/-- The URL's path (`/a/b`), without the query; `/` when it is empty. -/
-def path (r : Request) : String :=
-  let afterScheme := match r.url.splitOn "://" with
+/-! ### The path, as WHATWG URLs resolve it
+
+Every platform hands the handler the same path: Bun and the edge isolates
+build `url` with a WHATWG URL parser, which removes dot segments, so Lasm
+resolves the raw path the same way on Node, Deno, WASI and Fastly (#27). -/
+
+/-- Splits a raw path at `/` and at `\`, which WHATWG URLs treat as `/` in
+http(s) URLs. -/
+private def splitPath (p : String) : List String :=
+  go p.toList [] []
+where
+  go : List Char → List Char → List String → List String
+    | [], cur, acc => (String.ofList cur.reverse :: acc).reverse
+    | c :: cs, cur, acc =>
+      if c == '/' || c == '\\' then go cs [] (String.ofList cur.reverse :: acc)
+      else go cs (c :: cur) acc
+
+/-- Whether a raw segment is a dot segment (`.`, `%2e`) or a double-dot
+segment (`..`, `.%2e`, `%2E%2e`, …): exactly WHATWG's sets, since `%2e` and
+`%2E` are the only escapes that decode to `.`. -/
+private def isDot (s : String) : Bool := percentDecode s == "."
+private def isDotDot (s : String) : Bool := percentDecode s == ".."
+
+/-- WHATWG URL path parsing for the segments after the leading `/`
+(`stack` reversed). A `..` removes the previous segment; a final `.` or `..`
+leaves an empty last segment (a trailing `/`). -/
+private def resolve : List String → List String → List String
+  | stack, [] => stack
+  | stack, [s] =>
+    if isDotDot s then "" :: stack.tail
+    else if isDot s then "" :: stack
+    else s :: stack
+  | stack, s :: rest =>
+    if isDotDot s then resolve stack.tail rest
+    else if isDot s then resolve stack rest
+    else resolve (s :: stack) rest
+
+/-- A segment `resolve` may keep: empty, or not a dot segment. -/
+private def Kept (s : String) : Prop := s = "" ∨ (percentDecode s ≠ "." ∧ percentDecode s ≠ "..")
+
+private theorem resolve_kept : ∀ (stack input : List String), (∀ x ∈ stack, Kept x) →
+    ∀ x ∈ resolve stack input, Kept x
+  | stack, [], h => by simpa [resolve] using h
+  | stack, [s], h => by
+    have ht : ∀ x ∈ stack.tail, Kept x := fun x hx => h x (List.mem_of_mem_tail hx)
+    simp only [resolve]
+    split
+    · intro x hx; cases hx with
+      | head => exact Or.inl rfl
+      | tail _ hx => exact ht x hx
+    split
+    · intro x hx; cases hx with
+      | head => exact Or.inl rfl
+      | tail _ hx => exact h x hx
+    · rename_i h1 h2
+      intro x hx; cases hx with
+      | head => exact Or.inr ⟨by simpa [isDot] using h2, by simpa [isDotDot] using h1⟩
+      | tail _ hx => exact h x hx
+  | stack, s :: t :: rest, h => by
+    have ht : ∀ x ∈ stack.tail, Kept x := fun x hx => h x (List.mem_of_mem_tail hx)
+    simp only [resolve]
+    split
+    · exact resolve_kept _ _ ht
+    split
+    · exact resolve_kept _ _ h
+    · rename_i h1 h2
+      apply resolve_kept
+      intro x hx; cases hx with
+      | head => exact Or.inr ⟨by simpa [isDot] using h2, by simpa [isDotDot] using h1⟩
+      | tail _ hx => exact h x hx
+
+/-- The raw path of `url`: from the `/` after the host, without the query. -/
+private def rawPath (url : String) : String :=
+  let afterScheme := match url.splitOn "://" with
     | [_, rest] => (rest.dropWhile (· != '/')).toString
-    | _ => r.url
-  let p := (afterScheme.takeWhile (fun c => c != '?' && c != '#')).toString
-  if p.isEmpty then "/" else p
+    | _ => url
+  (afterScheme.takeWhile (fun c => c != '?' && c != '#')).toString
+
+/-- The path's raw segments, resolved: `\\` counts as `/`, and `.`, `..`
+and their escaped forms (`%2e`, `.%2E`, …) are removed as a browser removes
+them. Empty segments stay (`/a//b`, a trailing `/`). -/
+private def pathSegments (r : Request) : List String :=
+  let raw := rawPath r.url
+  let rest := match raw.toList with
+    | c :: cs => if c == '/' || c == '\\' then String.ofList cs else raw
+    | [] => raw
+  (resolve [] (splitPath rest)).reverse
+
+/-- The URL's path (`/a/b`), without the query; `/` when it is empty. Dot
+segments are resolved as in a browser on every platform:
+`/hello/../hello/Ada` is `/hello/Ada`, and `\\` counts as `/`. -/
+def path (r : Request) : String :=
+  "/" ++ "/".intercalate r.pathSegments
 
 /-- The URL's query string, without `?` (empty when there is none). -/
 def query (r : Request) : String :=
@@ -106,9 +192,23 @@ def queryParams (r : Request) : List (String × String) :=
 def queryParam? (r : Request) (name : String) : Option String :=
   r.queryParams.lookup name
 
-/-- The path's segments: `/hello/Ada` → `["hello", "Ada"]` (decoded). -/
+/-- The path's segments: `/hello/Ada` → `["hello", "Ada"]` (decoded). Empty
+segments are dropped, and dot segments are already resolved, so no segment is
+ever `.` or `..` (`segments_no_dot_segments`). -/
 def segments (r : Request) : List String :=
-  (r.path.splitOn "/").filter (!·.isEmpty) |>.map (percentDecode ·)
+  r.pathSegments.filter (!·.isEmpty) |>.map (percentDecode ·)
+
+/-- No segment is `.` or `..`, whatever the request: a handler that maps
+segments to files or keys never sees a parent reference, on any platform. -/
+theorem segments_no_dot_segments (r : Request) :
+    ∀ s ∈ r.segments, s ≠ "." ∧ s ≠ ".." := by
+  intro s hs
+  simp only [segments, List.mem_map, List.mem_filter] at hs
+  obtain ⟨x, ⟨hx, hne⟩, rfl⟩ := hs
+  have hk := resolve_kept [] _ (by simp) x (by simpa [pathSegments] using hx)
+  rcases hk with h | h
+  · subst h; simp at hne
+  · exact h
 
 /-- The first header named `name`, ignoring case. -/
 def header? (r : Request) (name : String) : Option String :=
