@@ -101,20 +101,10 @@ def exclusive {α : Type} (writers : Option Std.Semaphore) (act : Async α) : As
 def toResponse (w : Wire) (head : Bool) : Lasm.Fetch.Response :=
   { status := w.status.toUInt16, headers := w.headers.toArray, body := if head then .empty else w.body.toUTF8 }
 
-/-- The path's segments, decoded. (`Lasm.Fetch.Request.segments` reads the
-whole URL as the path when the query contains `://`, as a `redirect_uri`
-not percent-encoded does; this strips the query first.) -/
-def segments (url : String) : List String :=
-  let beforeQuery := (url.takeWhile (fun c => c != '?' && c != '#')).toString
-  let path := match beforeQuery.splitOn "://" with
-    | [_, rest] => (rest.dropWhile (· != '/')).toString
-    | _ => beforeQuery
-  (path.splitOn "/").filter (!·.isEmpty) |>.map (Lasm.Fetch.percentDecode ·)
-
 /-- One HTTP request. -/
 def serveRequest (env : Env) (writers : Option Std.Semaphore) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
   let head := req.method == "HEAD"
-  let r : Porter.Request := { method := if head then "GET" else req.method, path := segments req.url,
+  let r : Porter.Request := { method := if head then "GET" else req.method, path := req.segments,
                               query := req.query, headers := req.headers.toList, body := req.text }
   let fresh : Fresh := { a := ← Crypto.fresh, b := ← Crypto.fresh, c := ← Crypto.fresh, d := ← Crypto.fresh }
   let ctx : Ctx := { now := ← nowSeconds, fresh }

@@ -25,12 +25,10 @@ def maxBody : Nat := 16384
 
 def Request.header? (r : Request) (name : String) : Option String := Text.header? r.headers name
 
-/-- A cookie of the request. Several `Cookie` headers (as HTTP/2 and some
-gateways send them) are one list, joined with `; ` (RFC 9113 §8.2.3). -/
+/-- A cookie of the request. Lasm.Fetch delivers the request's cookies as one
+`Cookie` header, joined with `; `, on every target. -/
 def Request.cookie? (r : Request) (name : String) : Option String :=
-  match (r.headers.filter fun h => lower h.1 = "cookie").map (·.2) with
-  | [] => none
-  | vs => Text.cookie? ("; ".intercalate vs) name
+  (r.header? "cookie").bind (Text.cookie? · name)
 
 /-- Whether the body is a form (`application/x-www-form-urlencoded`,
 parameters such as `charset` allowed). -/

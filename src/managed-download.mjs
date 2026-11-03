@@ -10,6 +10,8 @@ import { setTimeout as delay } from 'node:timers/promises';
 const retryStatus = status => status >= 500 && status <= 599 || status === 408 || status === 429;
 const retryCodes = new Set(['ECONNRESET', 'ECONNREFUSED', 'EPIPE', 'ETIMEDOUT', 'EAI_AGAIN',
   'UND_ERR_SOCKET', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_HEADERS_TIMEOUT', 'UND_ERR_BODY_TIMEOUT',
+  // The connection closed before the promised Content-Length arrived.
+  'UND_ERR_RES_CONTENT_LENGTH_MISMATCH',
   'LASM_CONNECT_TIMEOUT', 'LASM_IDLE_TIMEOUT', 'LASM_HTTP_RETRY']);
 const error = (message, code) => Object.assign(new Error(message), { code });
 
