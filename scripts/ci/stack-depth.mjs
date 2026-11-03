@@ -203,6 +203,16 @@ for (const target of targets) {
     expect(target, `Async loop (${mode}) of ${asyncSteps.toLocaleString('en-US')} host calls (#90)`, r.code === 0 && r.stdout === `${asyncSteps}\n`,
       JSON.stringify({ code: r.code, signal: r.signal, timedOut: r.timedOut, ms: r.ms, stderr: r.stderr.slice(0, 600) }));
   }
+  // The deepest List.mapM in Async over host calls that passes (to within 2 %, up to 2,000,000).
+  {
+    const ok = n => { const r = run(target, ['mapM', String(n)], { timeout: 300_000 }); return r.code === 0 && r.stdout === `${n}\n`; };
+    let lo = 100, hi = 2_000_000;
+    if (!ok(lo)) lo = 0;
+    else if (ok(hi)) lo = hi;
+    else while (hi - lo > lo / 50 + 1) { const mid = Math.floor((lo + hi) / 2); if (ok(mid)) lo = mid; else hi = mid; }
+    report.targets[target].mapMLimit = lo;
+    console.log(`${target}: deepest mapM ${lo}`);
+  }
   // Code size and a compute benchmark (informational): the program's .wasm bytes
   // and the fastest of three runs of benchWork 2,000,000, startup included.
   {
