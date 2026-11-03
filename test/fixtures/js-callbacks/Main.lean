@@ -54,8 +54,9 @@ def main : IO Unit := do
   IO.println "timer fired"
   -- 5. A synchronous callback that waits for a JavaScript promise: the promise could
   -- settle only after the callback returns, so each wait fails at once with the
-  -- reason (it hung before). An IO await, an awaited call, and an Async call run
-  -- with `.block`.
+  -- reason (it hung before): an IO await and an awaited call. (`Async.block` runs
+  -- the computation as a task on another Lean thread, whose host calls wait for
+  -- the event loop: that still never finishes, docs/JS_BINDINGS.md.)
   let explain (what : String) (r : Except IO.Error String) : String := match r with
     | .ok v => s!"{what}: returned {v}"
     | .error e => s!"{what}: failed clearly {((toString e).splitOn "inside a synchronous Lean callback").length == 2}: {e}"
@@ -63,8 +64,7 @@ def main : IO Unit := do
     let p : Value ← timers.callMethod "setTimeout" #[toJS (1 : Nat), toJS "never"]
     let a ← EIO.toBaseIO (p.await String : IO String)
     let b ← EIO.toBaseIO (timers.callMethodAwait "setTimeout" #[toJS (1 : Nat), toJS "never"] String : IO String)
-    let c ← EIO.toBaseIO (Std.Async.Async.block (timers.callMethodAwait "setTimeout" #[toJS (1 : Nat), toJS "never"] String : Async String))
-    return toJS s!"{explain "await" a}\n{explain "awaited call" b}\n{explain "Async call" c}"
+    return toJS s!"{explain "await" a}\n{explain "awaited call" b}"
   let answer : String ← reflect.callMethod "apply" #[toJS waits, .undefined, .array #[]] String
   IO.println answer
   IO.println "done"
