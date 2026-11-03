@@ -1,0 +1,28 @@
+# Porter on AWS Lambda, .zip package (nodejs24.x), behind an API Gateway HTTP API.
+#   npm run build:lambda          (npm run build, then lasm package: lambda.zip)
+#   sam local start-api -t deploy/lambda/template.yaml --warm-containers EAGER
+#   sam deploy --guided -t deploy/lambda/template.yaml
+# The database is /tmp/porter.db: it lasts as long as the function instance,
+# and so do the signing keys in it (see the README).
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Porter, an OpenID Connect provider in Lean (.zip package)
+Resources:
+  Porter:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../lambda.zip
+      Handler: lasm-lambda.handler
+      Runtime: nodejs24.x
+      Architectures: [x86_64]
+      MemorySize: 1024
+      Timeout: 30
+      Environment:
+        Variables:
+          DATABASE_PATH: /tmp/porter.db
+          # Your API's origin, and the clients and users (empty: the demo).
+          ISSUER: ''
+          PORTER_CONFIG: ''
+      Events:
+        Api:
+          Type: HttpApi
