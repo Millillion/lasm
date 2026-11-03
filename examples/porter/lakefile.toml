@@ -19,3 +19,8 @@ name = "Proofs"
 # a Lake target.
 [[lean_lib]]
 name = "Server"
+
+# The sign-in and consent pages' browser app (Lasm.UI). Client.lean starts
+# it: lasm builds it (npm run build:client); it is not a Lake target.
+[[lean_lib]]
+name = "Frontend"

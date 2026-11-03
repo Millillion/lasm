@@ -45,7 +45,7 @@ itself comes from the platform (Web Crypto) and is trusted, not proved.
 
 **26 propositions**, each proved by the theorem of the same name in `Proofs/` (175 theorems in all: the 26 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
 
-Totality (checked by test/Axioms.lean, not a theorem): the request handlers reach 1186 definitions (359 of them Porter's); none is `partial`, `unsafe` or opaque, and none is a panic.
+Totality (checked by test/Axioms.lean, not a theorem): the request handlers reach 1189 definitions (362 of them Porter's); none is `partial`, `unsafe` or opaque, and none is a panic.
 
 ### A. An authorization code is redeemed at most once
 

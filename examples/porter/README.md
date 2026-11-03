@@ -15,6 +15,7 @@ npm start            # http://localhost:3000 (PORT, HOST, ISSUER, DATABASE_PATH,
 npm test             # openid-client and oauth4webapi sign in, refresh and log out against a fresh server
 npm run test:attacks # the adversarial suite
 npm run test:fuzz    # the endpoint fuzzer (--seconds N, --seed N)
+npx playwright install chromium && npm run test:e2e   # the sign-in pages in a browser (BROWSERS=chromium,firefox,webkit)
 npm run proofs       # check every theorem
 ```
 
@@ -90,6 +91,24 @@ volume, or Workers with D1), or every instance would sign with its own keys.
 **Not offered: Fastly Compute and WASI.** Lasm's WASI targets have no Web Crypto, and Porter
 does not implement ECDSA or Ed25519 in Lean (docs/DECISIONS.md).
 
+## The sign-in and consent pages
+
+The pages a person sees ([`Frontend/Ui.lean`](Frontend/Ui.lean), started by
+[`Client.lean`](Client.lean)) are a `Lasm.UI` app: the server sends each page
+as a plain HTML form inside `<noscript>`, with the page's data as the app's
+flags, and the app mounts beside it and renders the same form, with a
+show-password switch and a busy label once pressed. The form still submits
+natively, so the server's answers, and every proposition about them, are the
+same with or without JavaScript. The pages allow only Porter's own script and
+WebAssembly (`script-src 'self' 'wasm-unsafe-eval'`) and cannot be framed.
+
+The end-to-end tests ([`test/e2e`](test/e2e), Playwright 1.63.0) run in
+Chromium, Firefox and WebKit in CI, with no retries: sign in and consent
+through the app (oauth4webapi then redeems the code the browser brought back
+and validates the ID token), a wrong password, denial (`access_denied`),
+the same flow with JavaScript disabled, and no script error or Content
+Security Policy violation on the way.
+
 ## The oracles
 
 There is no way to run the OpenID Foundation's conformance suite without an
@@ -140,7 +159,8 @@ within a time budget, JSON errors must have only a known `error` and
 `error_description`, no random marker may come back unescaped in HTML, and
 every redirect must go to Porter itself or a registered URI; afterwards a full
 sign-in must still work. On pull requests it runs for three minutes (about
-150,000 requests); the seed is printed first and `--seed` replays a run.
+150,000 requests), and nightly for forty ([porter-nightly.yml](../../.github/workflows/porter-nightly.yml),
+when Porter changed that day); the seed is printed first and `--seed` replays a run.
 
 ## Concurrency
 
@@ -181,6 +201,7 @@ ID tokens 10 minutes, refresh tokens 30 days (rotated on every use), sessions
 | [`Porter/Reply.lean`](Porter/Reply.lean), [`Porter/Render.lean`](Porter/Render.lean) | Replies as data, and on the wire (headers, pages, JSON) |
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The model of the database and the proofs |
+| [`Frontend/Ui.lean`](Frontend/Ui.lean), [`Client.lean`](Client.lean) | The sign-in and consent pages' browser app (Lasm.UI) |
 | [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | Web Crypto, the SQL, the configuration, the HTTP glue and one SQLite binding per target; the Node program |
 | [`ServerBun.lean`](ServerBun.lean), [`ServerWorkers.lean`](ServerWorkers.lean), [`deploy/`](deploy), `Dockerfile`, `wrangler.toml`, `vercel.json`, `netlify.toml` | The other platforms |
-| [`test/`](test) | The oracle tests, the adversarial suite, the fuzzer, the proof checks |
+| [`test/`](test) | The oracle tests, the adversarial suite, the fuzzer, the end-to-end tests, the proof checks |

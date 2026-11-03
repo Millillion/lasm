@@ -3,6 +3,11 @@
 Worker's variables, in wrangler.toml or .dev.vars). -/
 import Server.App
 import Server.D1
+import Lasm.Fetch.Embed
+
+/-- The sign-in and consent pages' browser app (dist/public/ui, from npm run
+build:client), embedded in the program so every target serves it. -/
+def assets : Lasm.Fetch.Assets := embed_dir! "dist/public"
 open Lasm.JS
 
 /-- A variable of the Worker's `env` (it arrives with each request). -/
@@ -16,4 +21,4 @@ def workerVar (name : String) : IO (Option String) := do
   | _ => return none
 
 def main : IO Unit := do
-  Porter.Server.run (← Porter.Server.D1.open "DB") workerVar (serializeWriters := false)
+  Porter.Server.run (← Porter.Server.D1.open "DB") assets workerVar (serializeWriters := false)

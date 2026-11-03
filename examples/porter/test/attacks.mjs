@@ -112,7 +112,7 @@ await t.check('a code for one redirect_uri, redeemed with another (RFC 6749 §4.
 
 await t.check('a redirect_uri with a query keeps it and adds the code with & (RFC 6749 §3.1.2)', async () => {
   const { location } = await getCode(clients.basic, { redirect_uri: cb + '?existing=1' });
-  assert.match(location, /^http:\/\/127\.0\.0\.1:9\/cb\?existing=1&code=/);
+  assert.match(location, /^http:\/\/127\.0\.0\.1:59999\/cb\?existing=1&code=/);
 });
 
 await t.check('made-up and malformed codes are refused', async () => {
@@ -156,11 +156,11 @@ console.log('Redirect URIs and open redirects');
 await t.check('redirect_uri tricks (RFC 6749 §10.6, RFC 9700 §4.1): only the exact registered URI; never a redirect', async () => {
   const { challenge } = verifierPair();
   const tricks = [
-    'http://127.0.0.1:9/cb/', 'http://127.0.0.1:9/CB', 'HTTP://127.0.0.1:9/cb', 'http://127.0.0.1:9/cb/../evil',
-    'http://127.0.0.1:9/cb#frag', 'http://127.0.0.1:9/cb?x=1', 'http://127.0.0.1:9/cb?existing=1&x=2',
-    'http://127.0.0.1:9@evil.example/cb', 'http://evil.example/cb', 'http://127.0.0.1:9/%63b', 'http://127.0.0.1:9/cb%20',
-    'http://127.0.0.1:9/cbx', 'http://127.0.0.1:90/cb', '//evil.example/cb', 'javascript:alert(1)', ' http://127.0.0.1:9/cb',
-    'http://127.0.0.1:9/other', // another client's URI
+    'http://127.0.0.1:59999/cb/', 'http://127.0.0.1:59999/CB', 'HTTP://127.0.0.1:59999/cb', 'http://127.0.0.1:59999/cb/../evil',
+    'http://127.0.0.1:59999/cb#frag', 'http://127.0.0.1:59999/cb?x=1', 'http://127.0.0.1:59999/cb?existing=1&x=2',
+    'http://127.0.0.1:59999@evil.example/cb', 'http://evil.example/cb', 'http://127.0.0.1:59999/%63b', 'http://127.0.0.1:59999/cb%20',
+    'http://127.0.0.1:59999/cbx', 'http://127.0.0.1:59990/cb', '//evil.example/cb', 'javascript:alert(1)', ' http://127.0.0.1:59999/cb',
+    'http://127.0.0.1:59999/other', // another client's URI
   ];
   for (const uri of tricks) {
     const res = await authorizeRaw(authUrl({ redirect_uri: uri, code_challenge: challenge }));
@@ -182,10 +182,10 @@ await t.check('an unknown client never redirects, even to a URI registered for a
 await t.check('open redirect via logout (OpenID RP-Initiated Logout §3): unregistered post_logout_redirect_uri is refused', async () => {
   for (const params of [
     { client_id: clients.basic.client_id, post_logout_redirect_uri: 'http://evil.example/' },
-    { client_id: clients.basic.client_id, post_logout_redirect_uri: 'http://127.0.0.1:9/bye/' },
-    { post_logout_redirect_uri: 'http://127.0.0.1:9/bye' },
-    { client_id: 'nobody', post_logout_redirect_uri: 'http://127.0.0.1:9/bye' },
-    { client_id: clients.post.client_id, post_logout_redirect_uri: 'http://127.0.0.1:9/bye' }, // not registered for it
+    { client_id: clients.basic.client_id, post_logout_redirect_uri: 'http://127.0.0.1:59999/bye/' },
+    { post_logout_redirect_uri: 'http://127.0.0.1:59999/bye' },
+    { client_id: 'nobody', post_logout_redirect_uri: 'http://127.0.0.1:59999/bye' },
+    { client_id: clients.post.client_id, post_logout_redirect_uri: 'http://127.0.0.1:59999/bye' }, // not registered for it
   ]) {
     const res = await new Browser(base).request(`${base}/logout`, { method: 'POST', form: { ...params, confirm: 'yes' } });
     assertNoRedirect(res);
@@ -361,7 +361,7 @@ await t.check('consent CSRF (RFC 6749 §10.12, RFC 6819 §4.4.1.8): consent need
   // The attacker's own browser can finish its own interaction.
   const own = await attacker.request(`${base}/interaction/${id}/consent`, { method: 'POST', form: { decision: 'allow' } });
   assert.equal(own.status, 303);
-  assert.match(own.location, /^http:\/\/127\.0\.0\.1:9\/cb\?code=/);
+  assert.match(own.location, /^http:\/\/127\.0\.0\.1:59999\/cb\?code=/);
 });
 
 await t.check('an interaction is single-use: replaying the consent post after it finished is refused', async () => {
