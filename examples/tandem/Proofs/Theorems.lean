@@ -39,6 +39,34 @@ theorem redelivery_ignored : Spec.redelivery_ignored := by
   apply state_of_set; intro x; simp
   rintro rfl; exact ho
 
+theorem apply_many : Spec.apply_many := applyMany_eq
+
+theorem replica_keeps_unacked : Spec.replica_keeps_unacked := by
+  intro rp sent reply h
+  simp [Replica.onReply, h]
+
+theorem replica_edit_doc (rp : Replica) (new : List Char) :
+    (rp.edit new).doc = rp.doc.applyAll (rp.doc.edit rp.replica new) := rfl
+
+theorem replica_edit_yields_text : Spec.replica_edit_yields_text := by
+  intro rp hd new
+  rw [replica_edit_doc]
+  exact ⟨(edit_text (wf_reachable hd) rp.replica new).2, applyAll_reach hd _⟩
+
+theorem many_reach {d : Doc} (h : Reachable d) (os : List Op) : Reachable (d.applyMany os) := by
+  obtain ⟨ops, rfl⟩ := h
+  rw [applyMany_eq]; exact ⟨_, rfl⟩
+
+theorem replica_reachable : Spec.replica_reachable := by
+  intro rp sent reply h
+  constructor
+  · unfold Replica.onReply; split
+    · exact many_reach h _
+    · exact h
+  · unfold Replica.onPush; split
+    · exact many_reach h _
+    · exact h
+
 theorem insert_lands_between : Spec.insert_lands_between :=
   fun _ hd r i c hi => insert_text (wf_reachable hd) r i c hi
 

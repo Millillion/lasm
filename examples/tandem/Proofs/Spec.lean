@@ -24,6 +24,8 @@ list of characters. `step log req` is what the server appends to its log
 -/
 import Proofs.Edits
 import Proofs.Sync
+import Proofs.Bulk
+import Tandem.Client
 
 namespace Tandem.Spec
 open Tandem Doc Proofs Wire Sync
@@ -55,6 +57,12 @@ def ops_idempotent : Prop :=
 changes nothing when it arrives again. -/
 def redelivery_ignored : Prop :=
   ∀ ops : List Op, ∀ o ∈ ops, (Doc.empty.applyAll ops).apply o = Doc.empty.applyAll ops
+
+/-- **Many operations at once, the same state**: applying a batch of
+operations by sorting (`applyMany`, what a replica does with a long log)
+gives the state of applying them one at a time. -/
+def apply_many : Prop :=
+  ∀ ops₀ ops : List Op, (Doc.empty.applyAll ops₀).applyMany ops = Doc.empty.applyAll (ops₀ ++ ops)
 
 /-! ## B. The local user's intent -/
 
@@ -169,6 +177,25 @@ def replica_matches_server : Prop :=
     (step log req).2 = .ops a b out → b = (log ++ (step log req).1).length → req.cursor ≤ log.length →
     (∀ o, o ∈ applied ↔ o ∈ log.take req.cursor ∨ o ∈ req.ops) →
     Doc.empty.applyAll (applied ++ out) = Doc.empty.applyAll (log ++ (step log req).1)
+
+/-- **A replica keeps what was not acknowledged**: a reply that is an
+error, or that does not continue the replica's log, changes nothing, so the
+replica's unacknowledged operations are sent again. -/
+def replica_keeps_unacked : Prop :=
+  ∀ (rp : Replica) (sent : Nat) (reply : Reply), Sync.accept rp.cursor reply = none → rp.onReply sent reply = rp
+
+/-- **A replica's edit yields the user's text**: in every state a replica
+reaches (its local edits, and the replies and pushes of the server, in any
+order), editing the text gives exactly the new text. -/
+def replica_edit_yields_text : Prop :=
+  ∀ (rp : Replica), Reachable rp.doc → ∀ new : List Char, (rp.edit new).doc.chars = new ∧ Reachable (rp.edit new).doc
+
+/-- **A replica stays a replica**: applying a reply or a push keeps the
+replica's state one that applying operations from empty reaches (so every
+proposition about `Reachable` states holds for it). -/
+def replica_reachable : Prop :=
+  ∀ (rp : Replica) (sent : Nat) (reply : Reply), Reachable rp.doc →
+    Reachable (rp.onReply sent reply).doc ∧ Reachable (rp.onPush reply).doc
 
 /-! ## F. Untrusted input -/
 

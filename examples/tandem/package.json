@@ -5,6 +5,14 @@
   "type": "module",
   "description": "Tandem, a collaborative text editor in Lean: Fugue's sequence CRDT, a sync server and a Lasm.UI editor that works offline, compiled to WebAssembly by Lasm, with proofs",
   "scripts": {
+    "build": "lasm build ServerNode.lean --output dist/server",
+    "start": "node dist/server/main.mjs",
+    "build:batch": "lasm build Batch.lean --output dist/batch",
+    "build:clients": "lasm build Clients.lean --output dist/clients",
+    "test": "node test/protocol.mjs",
+    "test:differential": "node test/differential.mjs",
+    "test:simulate": "node test/simulate.mjs",
+    "test:fuzz": "node test/fuzz.mjs",
     "proofs": "node test/proofs.mjs",
     "proofs:paranoid": "node test/paranoid.mjs"
   },
@@ -12,6 +20,10 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.3.8"
+    "@lasm/cli": "0.3.8",
+    "yjs": "13.6.33"
+  },
+  "dependencies": {
+    "ws": "8.22.0"
   }
 }

@@ -75,64 +75,68 @@ cases.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from Proofs/Spec.lean by `npm run proofs -- --write`; do not edit by hand. -->
 
-**25 propositions**, each proved by the theorem of the same name in `Proofs/` (198 theorems in all: the 25 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
+**29 propositions**, each proved by the theorem of the same name in `Proofs/` (217 theorems in all: the 29 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
 
-Totality (checked by test/Axioms.lean, not a theorem): the code that handles untrusted input reaches 973 definitions (139 of them Tandem's); none is `partial` or `unsafe`, none is a panic, and the only opaque ones are Lean's primitives (`System.Platform.getNumBits`, `mixHash`).
+Totality (checked by test/Axioms.lean, not a theorem): the code that handles untrusted input reaches 1060 definitions (160 of them Tandem's); none is `partial` or `unsafe`, none is a panic, and the only opaque ones are Lean's primitives (`System.Platform.getNumBits`, `mixHash`).
 
 ### A. Strong eventual consistency
 
 | Proposition | In plain English |
 | --- | --- |
-| [`converge`](Proofs/Spec.lean#L33) | **Same operations, same state**: two replicas that applied the same set of operations are in the same state, whatever the order each applied them in and however many times each operation arrived. The operations may be anything a network delivers, including insertions that are invalid or whose parent has not arrived yet. |
-| [`converge_text`](Proofs/Spec.lean#L41) | **Same operations, same text**: such replicas show the same text. |
-| [`ops_commute`](Proofs/Spec.lean#L45) | **Operations commute**: applying two operations, in either order, to any replica's state gives the same state. |
-| [`ops_idempotent`](Proofs/Spec.lean#L50) | **Operations are idempotent**: applying an operation twice is applying it once. |
-| [`redelivery_ignored`](Proofs/Spec.lean#L54) | **Redelivery is ignored**: an operation a replica already applied changes nothing when it arrives again. |
+| [`converge`](Proofs/Spec.lean#L35) | **Same operations, same state**: two replicas that applied the same set of operations are in the same state, whatever the order each applied them in and however many times each operation arrived. The operations may be anything a network delivers, including insertions that are invalid or whose parent has not arrived yet. |
+| [`converge_text`](Proofs/Spec.lean#L43) | **Same operations, same text**: such replicas show the same text. |
+| [`ops_commute`](Proofs/Spec.lean#L47) | **Operations commute**: applying two operations, in either order, to any replica's state gives the same state. |
+| [`ops_idempotent`](Proofs/Spec.lean#L52) | **Operations are idempotent**: applying an operation twice is applying it once. |
+| [`redelivery_ignored`](Proofs/Spec.lean#L56) | **Redelivery is ignored**: an operation a replica already applied changes nothing when it arrives again. |
+| [`apply_many`](Proofs/Spec.lean#L61) | **Many operations at once, the same state**: applying a batch of operations by sorting (`applyMany`, what a replica does with a long log) gives the state of applying them one at a time. |
 
 ### B. The local user's intent
 
 | Proposition | In plain English |
 | --- | --- |
-| [`insert_lands_between`](Proofs/Spec.lean#L61) | **An insertion lands between its neighbours**: inserting character `c` at position `i` of the text puts `c` between the characters that were at positions `i - 1` and `i`, and changes nothing else. |
-| [`delete_removes_one`](Proofs/Spec.lean#L68) | **A deletion removes exactly its character**: deleting the character at position `i` removes it and nothing else. |
-| [`delete_in_range`](Proofs/Spec.lean#L74) | **Deletion stays in range**: there is a character to delete at position `i` exactly when `i` is a position of the text. |
-| [`run_lands_together`](Proofs/Spec.lean#L79) | **A typed run lands as one block**: typing the characters `cs` one after another at position `i` inserts exactly `cs` there. |
-| [`edit_yields_text`](Proofs/Spec.lean#L85) | **The editor's edit yields the user's text**: the operations the editor creates for any change of the text area (`edit`, from the old and the new text) turn the replica's text into exactly the new text. |
-| [`local_ops_valid`](Proofs/Spec.lean#L91) | **Local operations are valid**: every insertion the editor creates is a node that every replica accepts. |
+| [`insert_lands_between`](Proofs/Spec.lean#L69) | **An insertion lands between its neighbours**: inserting character `c` at position `i` of the text puts `c` between the characters that were at positions `i - 1` and `i`, and changes nothing else. |
+| [`delete_removes_one`](Proofs/Spec.lean#L76) | **A deletion removes exactly its character**: deleting the character at position `i` removes it and nothing else. |
+| [`delete_in_range`](Proofs/Spec.lean#L82) | **Deletion stays in range**: there is a character to delete at position `i` exactly when `i` is a position of the text. |
+| [`run_lands_together`](Proofs/Spec.lean#L87) | **A typed run lands as one block**: typing the characters `cs` one after another at position `i` inserts exactly `cs` there. |
+| [`edit_yields_text`](Proofs/Spec.lean#L93) | **The editor's edit yields the user's text**: the operations the editor creates for any change of the text area (`edit`, from the old and the new text) turn the replica's text into exactly the new text. |
+| [`local_ops_valid`](Proofs/Spec.lean#L99) | **Local operations are valid**: every insertion the editor creates is a node that every replica accepts. |
 
 ### C. Non-interleaving
 
 | Proposition | In plain English |
 | --- | --- |
-| [`concurrent_runs_not_interleaved`](Proofs/Spec.lean#L98) | **Concurrent typing is not interleaved**: when two people (replicas `ra ≠ rb`) type `a` and `b` at the same position `i` of the same text, concurrently, every replica that has both runs shows `a` then `b`, or `b` then `a`, at position `i`: never a mix of the two. |
-| [`subtree_contiguous`](Proofs/Spec.lean#L107) | **Subtrees are blocks**: every character's subtree (itself and everything inserted below it) is one contiguous block of the document, deleted characters included. This is why runs never interleave. |
-| [`no_duplicates`](Proofs/Spec.lean#L113) | **No character twice**: no id occurs twice in a document. |
+| [`concurrent_runs_not_interleaved`](Proofs/Spec.lean#L106) | **Concurrent typing is not interleaved**: when two people (replicas `ra ≠ rb`) type `a` and `b` at the same position `i` of the same text, concurrently, every replica that has both runs shows `a` then `b`, or `b` then `a`, at position `i`: never a mix of the two. |
+| [`subtree_contiguous`](Proofs/Spec.lean#L115) | **Subtrees are blocks**: every character's subtree (itself and everything inserted below it) is one contiguous block of the document, deleted characters included. This is why runs never interleave. |
+| [`no_duplicates`](Proofs/Spec.lean#L121) | **No character twice**: no id occurs twice in a document. |
 
 ### D. What runs is Fugue
 
 | Proposition | In plain English |
 | --- | --- |
-| [`seq_is_fugue`](Proofs/Spec.lean#L119) | **The traversal that runs is the paper's**: the document order the code computes, with a children index and an explicit stack (so that a long line of text cannot overflow a WebAssembly stack), is Fugue's recursive in-order traversal (Weidner and Kleppmann, Algorithm 1). |
-| [`text_is_traversal`](Proofs/Spec.lean#L126) | **The text is the traversal's visible characters**: what a replica shows is the characters of the traversal that no deletion names, in order. |
+| [`seq_is_fugue`](Proofs/Spec.lean#L127) | **The traversal that runs is the paper's**: the document order the code computes, with a children index and an explicit stack (so that a long line of text cannot overflow a WebAssembly stack), is Fugue's recursive in-order traversal (Weidner and Kleppmann, Algorithm 1). |
+| [`text_is_traversal`](Proofs/Spec.lean#L134) | **The text is the traversal's visible characters**: what a replica shows is the characters of the traversal that no deletion names, in order. |
 
 ### E. The sync server
 
 | Proposition | In plain English |
 | --- | --- |
-| [`ack_stored`](Proofs/Spec.lean#L133) | **An acknowledged operation is stored**: every operation of a request the server answers with `ops` is in the log it commits. |
-| [`acked_never_lost`](Proofs/Spec.lean#L138) | **The server never loses an acknowledged operation**: serving any sequence of requests, every operation of every request answered with `ops` is in the final log, and the log only grows. |
-| [`log_no_duplicates`](Proofs/Spec.lean#L146) | **The log holds each operation once**. |
-| [`stored_ops_valid`](Proofs/Spec.lean#L150) | **The log holds only valid operations**: the server stores only operations in range whose insertions are valid nodes. |
-| [`reply_from_cursor`](Proofs/Spec.lean#L155) | **A reply is the log from the cursor**: the server answers with the log from the client's cursor on (at most `chunk` operations), so a client misses nothing. |
-| [`replica_matches_server`](Proofs/Spec.lean#L163) | **A replica that catches up has the server's document**: a replica that applied, in any order, the log up to its cursor and its own operations, then the server's reply to its sync (when the reply reaches the end of the log), is in the state of the server's whole log. |
+| [`ack_stored`](Proofs/Spec.lean#L141) | **An acknowledged operation is stored**: every operation of a request the server answers with `ops` is in the log it commits. |
+| [`acked_never_lost`](Proofs/Spec.lean#L146) | **The server never loses an acknowledged operation**: serving any sequence of requests, every operation of every request answered with `ops` is in the final log, and the log only grows. |
+| [`log_no_duplicates`](Proofs/Spec.lean#L154) | **The log holds each operation once**. |
+| [`stored_ops_valid`](Proofs/Spec.lean#L158) | **The log holds only valid operations**: the server stores only operations in range whose insertions are valid nodes. |
+| [`reply_from_cursor`](Proofs/Spec.lean#L163) | **A reply is the log from the cursor**: the server answers with the log from the client's cursor on (at most `chunk` operations), so a client misses nothing. |
+| [`replica_matches_server`](Proofs/Spec.lean#L171) | **A replica that catches up has the server's document**: a replica that applied, in any order, the log up to its cursor and its own operations, then the server's reply to its sync (when the reply reaches the end of the log), is in the state of the server's whole log. |
+| [`replica_keeps_unacked`](Proofs/Spec.lean#L181) | **A replica keeps what was not acknowledged**: a reply that is an error, or that does not continue the replica's log, changes nothing, so the replica's unacknowledged operations are sent again. |
+| [`replica_edit_yields_text`](Proofs/Spec.lean#L187) | **A replica's edit yields the user's text**: in every state a replica reaches (its local edits, and the replies and pushes of the server, in any order), editing the text gives exactly the new text. |
+| [`replica_reachable`](Proofs/Spec.lean#L193) | **A replica stays a replica**: applying a reply or a push keeps the replica's state one that applying operations from empty reaches (so every proposition about `Reachable` states holds for it). |
 
 ### F. Untrusted input
 
 | Proposition | In plain English |
 | --- | --- |
-| [`decode_request_bounded`](Proofs/Spec.lean#L175) | **A decoded request is bounded**: a client's message that decodes has a cursor below `maxNum`, at most `maxOps` operations, and only operations in range whose insertions are valid nodes. |
-| [`decode_reply_bounded`](Proofs/Spec.lean#L181) | **A decoded reply is bounded**: a server's message that decodes as `ops a b out` has `a ≤ b`, exactly `b - a` operations, at most `maxOps`, each in range. |
-| [`accepted_ops_valid`](Proofs/Spec.lean#L188) | **Accepted insertions are tree nodes**: an insertion the wire format accepts is valid (a right child of the root, or a child of a node with a smaller counter), so following parents always ends at the root. |
+| [`decode_request_bounded`](Proofs/Spec.lean#L202) | **A decoded request is bounded**: a client's message that decodes has a cursor below `maxNum`, at most `maxOps` operations, and only operations in range whose insertions are valid nodes. |
+| [`decode_reply_bounded`](Proofs/Spec.lean#L208) | **A decoded reply is bounded**: a server's message that decodes as `ops a b out` has `a ≤ b`, exactly `b - a` operations, at most `maxOps`, each in range. |
+| [`accepted_ops_valid`](Proofs/Spec.lean#L215) | **Accepted insertions are tree nodes**: an insertion the wire format accepts is valid (a right child of the root, or a child of a node with a smaller counter), so following parents always ends at the root. |
 <!-- END PROPOSITIONS -->
 
 ## What is trusted, not proved
