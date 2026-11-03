@@ -152,7 +152,13 @@ export function canSpecializeInitialization(runtime) {
     '79968781629d674bc8b506b3050c367ebc14503c869bc45436244c49ee5aee02',
     // Lean 4.35.0 (CI build 40518682274, source af51365, handoff 0646c068…): only
     // liblasmhost's node-async.cpp.o differs (UDP receives use the startup check).
-    '9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a'].includes(runtime.identity);
+    '9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a',
+    // Lean 4.35.0 (CI build 41666778914, source 66b2615, handoff 645d71f6…): the
+    // entry above rebuilt from the same Lean source, patches, headers and SDK with
+    // WebAssembly tail calls (-mtail-call, issue #90): every object differs in code
+    // generation only (sibling calls become return_call). No source, static
+    // constructor or initialization order changed; the smoke build matched native.
+    '9bcec4aa1cac94d288182d970e8670bbb46b20759f97c0a081a72c4c4b4fe695'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';
