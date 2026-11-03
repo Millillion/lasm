@@ -2,7 +2,7 @@
 
 **An OpenID Connect provider written in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm), with proofs.**
 Users sign in with a password and approve an application; the application gets an authorization code, then ID, access and refresh tokens: the authorization code flow with PKCE (S256 only), ID tokens signed with ES256 or EdDSA by the platform's Web Crypto, refresh-token rotation with reuse detection, sessions, consent and RP-initiated logout.
-175 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: a code is redeemed at most once and only by its client, for its exact redirect URI and with its PKCE verifier; Porter redirects only to registered URIs, compared exactly; a reused refresh token revokes its whole family; every ID token's claims are the session's and the client's; no error reveals a secret; and every request, however malformed, gets an answer ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement of OAuth 2.0, its security best current practice and OpenID Connect onto them).
+196 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: a code is redeemed at most once and only by its client, for its exact redirect URI and with its PKCE verifier; Porter redirects only to registered URIs, compared exactly; a reused refresh token revokes its whole family; every ID token's claims are the session's and the client's; no error reveals a secret; and every request, however malformed, gets an answer ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement of OAuth 2.0, its security best current practice and OpenID Connect onto them).
 
 Porter is an example of what Lasm can build, not a production identity
 provider: it has no rate limiting, no account management, no key rotation,
@@ -51,7 +51,7 @@ replays the proofs through Lean's kernel and the external checkers Lean ships.
 | --- | --- |
 | A code is redeemed at most once; a replayed code revokes its tokens | `code_redeemed_at_most_once`, `code_replay_revokes` |
 | A code is bound to its client, its redirect URI and its PKCE verifier | `code_bound`, `code_records_request` |
-| Redirects go only to registered URIs, exactly; never an open redirector | `redirect_registered`, `logout_redirect_registered`, `untrusted_redirect_uri_not_followed`, `redirect_params` |
+| Redirects go only to registered URIs, exactly; never an open redirector | `redirect_registered`, `logout_redirect_registered`, `untrusted_redirect_uri_not_followed`, `redirect_params`, `redirect_state_bounded` |
 | A reused refresh token revokes its family | `refresh_bound`, `refresh_reuse_revokes`, `refresh_rotated_at_most_once` |
 | Every token's claims match the session and the client | `id_token_for_code`, `id_token_for_refresh`, `code_requires_signin`, `code_requires_consent`, `userinfo_claims` |
 | No endpoint reveals secrets in errors | `errors_reveal_nothing`, `error_wire_fixed`, `failed_signin_uniform` |

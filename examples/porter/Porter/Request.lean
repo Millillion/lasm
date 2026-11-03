@@ -45,6 +45,18 @@ def Request.form? (r : Request) : Option (List (String × String)) :=
 def Request.params? (r : Request) : Option (List (String × String)) :=
   if r.method = "POST" then r.form? else if r.query.utf8ByteSize ≤ maxBody then parseForm r.query else none
 
+/-- The longest `state` Porter accepts, in bytes. Porter sends `state` back
+to the client in the redirect's `Location` header, percent-encoded (up to
+three times as long), so it bounds it: HTTP clients refuse a response whose
+header section is over 16 KiB (Node's limit), and a client's request should
+not be able to make Porter send one. -/
+def maxState : Nat := 2048
+
+/-- Whether a `state`, if there is one, is short enough to send back. -/
+def shortState : Option String → Bool
+  | some s => s.utf8ByteSize ≤ maxState
+  | none => true
+
 /-- The names of the cookies Porter sets. -/
 def sessionCookie : String := "porter_session"
 def interactionCookie : String := "porter_interaction"
@@ -128,7 +140,9 @@ def checkRest (c : Client) (ru : String) (ps : List (String × String)) : AuthCh
 
 /-- Validates an authorization request. The client and its redirect URI are
 checked first: until both are known good, errors are pages, never redirects
-(RFC 6749 §4.1.2.1), and the redirect URI must be registered exactly. -/
+(RFC 6749 §4.1.2.1), and the redirect URI must be registered exactly. Then
+`state`, which every redirect carries back, must be at most `maxState`
+bytes. -/
 def checkAuth (cfg : Config) (ps : List (String × String)) : AuthCheck :=
   match param ps "client_id" with
   | .one cid =>
@@ -136,7 +150,12 @@ def checkAuth (cfg : Config) (ps : List (String × String)) : AuthCheck :=
     | none => .page .unknownClient
     | some c =>
       match param ps "redirect_uri" with
-      | .one ru => if ru ∈ c.redirectUris then checkRest c ru ps else .page .badRedirectUri
+      | .one ru =>
+        if ru ∈ c.redirectUris then
+          -- A `state` too long to send back is an error page: the error
+          -- redirect would have to carry it (RFC 6749 §4.1.2.1).
+          if shortState (param ps "state").value? then checkRest c ru ps else .page .badRequest
+        else .page .badRedirectUri
       | _ => .page .badRedirectUri
   | _ => .page .badRequest
 

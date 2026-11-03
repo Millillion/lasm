@@ -43,7 +43,7 @@ itself comes from the platform (Web Crypto) and is trusted, not proved.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from Proofs/Spec.lean by `npm run proofs -- --write`; do not edit by hand. -->
 
-**26 propositions**, each proved by the theorem of the same name in `Proofs/` (175 theorems in all: the 26 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
+**27 propositions**, each proved by the theorem of the same name in `Proofs/` (196 theorems in all: the 27 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
 
 Totality (checked by test/Axioms.lean, not a theorem): the request handlers reach 1183 definitions (356 of them Porter's); none is `partial`, `unsafe` or opaque, and none is a panic.
 
@@ -72,46 +72,47 @@ Totality (checked by test/Axioms.lean, not a theorem): the request handlers reac
 | [`untrusted_redirect_uri_not_followed`](Proofs/Spec.lean#L131) | **No open redirector** (RFC 6749 §4.1.2.1): an authorization request whose `client_id` is not a configured client, or whose `redirect_uri` is not exactly registered for it, gets an error page (400) and no redirect. |
 | [`redirect_params`](Proofs/Spec.lean#L140) | **What a redirect to a client carries**: only `code`, `state`, `iss` and `error`; `iss` is the issuer (RFC 9207, against mix-up), and an error is one of the fixed error codes. |
 | [`redirect_location_exact`](Proofs/Spec.lean#L148) | **The Location header starts with the URI exactly**: a redirect to a client is the URI as registered, then `?` or `&`, then the parameters. |
+| [`redirect_state_bounded`](Proofs/Spec.lean#L153) | **Redirects reflect no unbounded input**: the `state` a redirect to a client carries back, the only part of its `Location` header taken from the request (`Spec.redirect_registered`, `Spec.redirect_params`), is at most `maxState` (2048) bytes; a longer `state` gets an error page. So no request can make Porter send a header section HTTP clients refuse (16 KiB in Node). |
 
 ### D. A reused refresh token revokes its family
 
 | Proposition | In plain English |
 | --- | --- |
-| [`refresh_bound`](Proofs/Spec.lean#L155) | **Refresh tokens are bound**: tokens for a refresh token are issued only if it is stored, not yet rotated, unexpired, its family not revoked, and it was issued to the client that authenticated; the reply rotates it; the new refresh token keeps the family and its grant, and the access token's scope is within the grant's (a refresh never widens the scope). |
-| [`refresh_reuse_revokes`](Proofs/Spec.lean#L170) | **Reuse revokes the family** (RFC 9700 §4.14.2): presenting a refresh token that was already rotated, from an authenticated client that may use refresh tokens, is `invalid_grant` and revokes the token's whole family, and changes nothing else. |
-| [`refresh_rotated_at_most_once`](Proofs/Spec.lean#L181) | **At most one rotation**: in any sequence of requests, at most one request rotates a given refresh token. |
-| [`revocation_permanent`](Proofs/Spec.lean#L186) | **Revocation is permanent**: a revoked family stays revoked after any request. |
+| [`refresh_bound`](Proofs/Spec.lean#L165) | **Refresh tokens are bound**: tokens for a refresh token are issued only if it is stored, not yet rotated, unexpired, its family not revoked, and it was issued to the client that authenticated; the reply rotates it; the new refresh token keeps the family and its grant, and the access token's scope is within the grant's (a refresh never widens the scope). |
+| [`refresh_reuse_revokes`](Proofs/Spec.lean#L180) | **Reuse revokes the family** (RFC 9700 §4.14.2): presenting a refresh token that was already rotated, from an authenticated client that may use refresh tokens, is `invalid_grant` and revokes the token's whole family, and changes nothing else. |
+| [`refresh_rotated_at_most_once`](Proofs/Spec.lean#L191) | **At most one rotation**: in any sequence of requests, at most one request rotates a given refresh token. |
+| [`revocation_permanent`](Proofs/Spec.lean#L196) | **Revocation is permanent**: a revoked family stays revoked after any request. |
 
 ### E. Every issued token's claims match the session and the client
 
 | Proposition | In plain English |
 | --- | --- |
-| [`id_token_for_code`](Proofs/Spec.lean#L192) | **ID tokens for a code**: the ID token issued for an authorization code is signed with the client's algorithm and key, and its claims are exactly the issuer, the client (`aud`), and the code's user, sign-in time, session id and nonce, issued now and expiring `idTokenTtl` seconds later. |
-| [`id_token_for_refresh`](Proofs/Spec.lean#L204) | **ID tokens for a refresh**: likewise from the refresh token's grant, without a nonce (OpenID Connect Core §12.2). |
-| [`code_requires_signin`](Proofs/Spec.lean#L214) | **A code needs a sign-in**: a code is issued only for the user, session id and sign-in time of either a live session whose id is the request's session cookie, or a sign-in in this very request (a password the check accepts for that user, now). |
-| [`code_requires_consent`](Proofs/Spec.lean#L226) | **A code needs consent**: every scope of an issued code has been consented to, by its user for its client, in the database after the request. |
-| [`userinfo_claims`](Proofs/Spec.lean#L232) | **Userinfo answers for a live token**: the claims `/userinfo` returns are those of the user of a stored, unexpired, unrevoked access token sent as `Authorization: Bearer`, for that token's scopes. |
+| [`id_token_for_code`](Proofs/Spec.lean#L202) | **ID tokens for a code**: the ID token issued for an authorization code is signed with the client's algorithm and key, and its claims are exactly the issuer, the client (`aud`), and the code's user, sign-in time, session id and nonce, issued now and expiring `idTokenTtl` seconds later. |
+| [`id_token_for_refresh`](Proofs/Spec.lean#L214) | **ID tokens for a refresh**: likewise from the refresh token's grant, without a nonce (OpenID Connect Core §12.2). |
+| [`code_requires_signin`](Proofs/Spec.lean#L224) | **A code needs a sign-in**: a code is issued only for the user, session id and sign-in time of either a live session whose id is the request's session cookie, or a sign-in in this very request (a password the check accepts for that user, now). |
+| [`code_requires_consent`](Proofs/Spec.lean#L236) | **A code needs consent**: every scope of an issued code has been consented to, by its user for its client, in the database after the request. |
+| [`userinfo_claims`](Proofs/Spec.lean#L242) | **Userinfo answers for a live token**: the claims `/userinfo` returns are those of the user of a stored, unexpired, unrevoked access token sent as `Authorization: Bearer`, for that token's scopes. |
 
 ### F. No endpoint reveals secrets in errors
 
 | Proposition | In plain English |
 | --- | --- |
-| [`errors_reveal_nothing`](Proofs/Spec.lean#L243) | **Errors are fixed replies**: every reply with an error status (400 and up) is `Reply.err x` for an error code `x`, so its status, headers and body are determined by `x` alone: no input, secret, token or password reaches an error. |
-| [`error_wire_fixed`](Proofs/Spec.lean#L250) | **An error's bytes depend on the error alone**: not even on the configuration (issuer, keys, clients). |
-| [`failed_signin_uniform`](Proofs/Spec.lean#L255) | **A failed sign-in tells nothing**: two sign-in attempts in the same interaction that differ only in their forms (username, password) and both fail get the same reply, and change nothing; so the reply does not tell whether the username exists. |
+| [`errors_reveal_nothing`](Proofs/Spec.lean#L253) | **Errors are fixed replies**: every reply with an error status (400 and up) is `Reply.err x` for an error code `x`, so its status, headers and body are determined by `x` alone: no input, secret, token or password reaches an error. |
+| [`error_wire_fixed`](Proofs/Spec.lean#L260) | **An error's bytes depend on the error alone**: not even on the configuration (issuer, keys, clients). |
+| [`failed_signin_uniform`](Proofs/Spec.lean#L265) | **A failed sign-in tells nothing**: two sign-in attempts in the same interaction that differ only in their forms (username, password) and both fail get the same reply, and change nothing; so the reply does not tell whether the username exists. |
 
 ### G. Request handlers are total
 
 | Proposition | In plain English |
 | --- | --- |
-| [`replies_well_formed`](Proofs/Spec.lean#L266) | **Every request gets an answer**: whatever the request (any method, path, headers and body, however malformed) and whatever the database, the reply's status is one of 200, 204, 303, 400, 401, 404 and 405. (That the handlers are total, with no `partial` definition and no panic on their path, is checked separately by test/Axioms.lean.) |
+| [`replies_well_formed`](Proofs/Spec.lean#L276) | **Every request gets an answer**: whatever the request (any method, path, headers and body, however malformed) and whatever the database, the reply's status is one of 200, 204, 303, 400, 401, 404 and 405. (That the handlers are total, with no `partial` definition and no panic on their path, is checked separately by test/Axioms.lean.) |
 
 ### H. Expiry, for every clock
 
 | Proposition | In plain English |
 | --- | --- |
-| [`expired_code_refused`](Proofs/Spec.lean#L276) | **Expired codes are refused** *(consequence)*: at any time at or after a code's expiry, it gets no tokens. |
-| [`dead_refresh_refused`](Proofs/Spec.lean#L283) | **Expired or revoked refresh tokens are refused** *(consequence)*. |
+| [`expired_code_refused`](Proofs/Spec.lean#L286) | **Expired codes are refused** *(consequence)*: at any time at or after a code's expiry, it gets no tokens. |
+| [`dead_refresh_refused`](Proofs/Spec.lean#L293) | **Expired or revoked refresh tokens are refused** *(consequence)*. |
 <!-- END PROPOSITIONS -->
 
 ## What is trusted, not proved

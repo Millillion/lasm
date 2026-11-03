@@ -159,6 +159,10 @@ theorem untrusted_redirect_uri_not_followed : Spec.untrusted_redirect_uri_not_fo
   unfold reply
   rcases hrun with h | h <;> rw [h] <;> cases x <;> simp_all [Reply.err, Err.status, PageError.status]
 
+theorem redirect_state_bounded : Spec.redirect_state_bounded := by
+  intro e ctx r D u ps hl
+  exact state_run e ctx r D u ps hl
+
 theorem redirect_location_exact : Spec.redirect_location_exact := by
   intro iss u ps
   by_cases h : '?' ∈ u.toList

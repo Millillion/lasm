@@ -13,16 +13,21 @@
 // - for a JSON error, only `error` and `error_description`, with a known code;
 // - for an HTML page, none of the request's random markers echoed unescaped;
 // - for a redirect, a Location that is Porter's own interaction page or starts
-//   with a URI registered in test/config.mjs.
+//   with a URI registered in test/config.mjs, and at most 8 KiB (`state`, the
+//   only input it carries back, is at most 2048 bytes, so at most 6 KiB
+//   percent-encoded).
 // At the end the server must still answer, and a full sign-in must still work.
 //
 //   node test/fuzz.mjs [--seed N] [--seconds S] [--url URL | --command CMD | --platform NAME]
 //
 // The seed is printed first; `--seed` replays a run. Failing requests are
-// written to test-results/fuzz-SEED.json.
+// written to test-results/fuzz-SEED.json. Every run first replays the
+// regression corpus, test/fuzz-corpus/*.json: requests that once failed (in
+// the same form as the failing requests written, except that a body may be a
+// list of parts, `[text, n]` standing for text repeated n times).
 import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { METHODS as NODE_METHODS, request as httpRequest } from 'node:http';
 import { join } from 'node:path';
 import { Browser, root, serverArgs, startPorter } from './server.mjs';
@@ -181,7 +186,8 @@ function problems(req, res) {
   if (res.status === 303) {
     const loc = res.headers.location ?? '';
     if (!(loc.startsWith(`${base}/interaction/`) || registered.some(u => loc.startsWith(u + '?') || loc.startsWith(u + '&'))))
-      out.push(`redirect to ${loc}`);
+      out.push(`redirect to ${loc.slice(0, 200)}`);
+    if (loc.length > 8192) out.push(`a Location of ${loc.length} bytes`);
   }
   return out;
 }
@@ -208,16 +214,27 @@ function makeRequest() {
   // The path's bytes as sent: everything outside printable ASCII (and #) escaped.
   path = [...Buffer.from(path, 'latin1')].map(b => b > 0x20 && b < 0x7f && b !== 0x23 ? String.fromCharCode(b)
     : '%' + b.toString(16).padStart(2, '0')).join('');
-  const markers = [...(path + (body ?? '') + Object.values(headers).join()).matchAll(/<zq\d+>/g)].map(m => m[0]);
-  return { method, path, headers, body: method === 'GET' || method === 'HEAD' ? undefined : body, markers };
+  const q = { method, path, headers, body: method === 'GET' || method === 'HEAD' ? undefined : body };
+  return { ...q, markers: markersOf(q) };
 }
+
+const markersOf = q => [...(q.path + (q.body ?? '') + Object.values(q.headers).join()).matchAll(/<zq\d+>/g)].map(m => m[0]);
+
+/** The regression corpus, each request as recorded (markers recomputed). */
+const corpusDir = join(root, 'test', 'fuzz-corpus');
+const corpus = readdirSync(corpusDir).filter(f => f.endsWith('.json')).sort().flatMap(f =>
+  JSON.parse(readFileSync(join(corpusDir, f), 'utf8')).map(({ request: q }) => {
+    const body = Array.isArray(q.body) ? q.body.map(p => Array.isArray(p) ? p[0].repeat(p[1]) : p).join('') : q.body;
+    const r = { method: q.method, path: q.path, headers: q.headers ?? {}, body };
+    return { ...r, markers: markersOf(r) };
+  }));
 
 const failures = [];
 const end = Date.now() + seconds * 1000;
 let n = 0;
 const statusCounts = {};
-while (Date.now() < end) {
-  const batch = Array.from({ length: 8 }, makeRequest);
+for (let first = true; first || Date.now() < end; first = false) {
+  const batch = first ? corpus : Array.from({ length: 8 }, makeRequest);
   const results = await Promise.all(batch.map(q => send(q.method, q.path, q.headers, q.body)));
   batch.forEach((q, i) => {
     const res = results[i];
