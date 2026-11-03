@@ -286,7 +286,7 @@ cycle of non-final states in which every continuously enabled thread or
 event-loop task keeps stepping: Tarjan's strongly connected components;
 spurious wake-ups are allowed only finitely often). Counterexamples are
 shortest paths, printed step by step. `lake exe host-bridge check --large`
-runs every configuration (CI: about 1 s):
+runs every configuration (CI: about 1.5 s; with `--large` about 15 s):
 
 | Configuration | Bound | States | Result |
 | --- | --- | ---: | --- |
@@ -294,8 +294,8 @@ runs every configuration (CI: about 1 s):
 | … with spurious wake-ups and timeouts | 2 callbacks × 2 host calls; (large) 3, 0, 3, 2, 1, 3 | 17,277; 103,208 | ok |
 | … 4 and (large) 10 callbacks | 1 host call each | 18,756; 98,890 | ok |
 | Work proxied to the main thread inside callbacks | 1 + 1; (large) 5 callbacks, 8 host calls | 8,796; 54,756 | ok (it runs when the wait's 10 ms timeout expires) |
-| A callback waits for a promise, then host calls | 1 + 1 | | ok (the wait fails at once) |
-| Host calls made by work proxied to the callback thread | 2 callbacks; (large) 5 callbacks mixing awaits, nested calls and proxied work | | ok (served when the wait times out) |
+| A callback waits for a promise, then host calls | 1 + 1 | 11,949 | ok (the wait fails at once) |
+| Host calls made by work proxied to the callback thread | 2 callbacks; (large) 5 callbacks mixing awaits, nested calls and proxied work | 209,000; 3,837,965 | ok (served when the wait times out) |
 | A generic Lean thread's slot, replies now or in a later task | 3; (large) 30 host calls | 280; 3,196 | ok |
 | Poller and completion thread | 5 scripts (callbacks with and without `waitForever`, awaits, async requests, timer races); (large) 4 calls, 2 awaits, 2 async requests | 84–1,588; up to 34,678 | ok |
 
