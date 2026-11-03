@@ -105,7 +105,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] Specification map, 50 reviewable propositions, frontend and layout proofs, five independent proof checkers.
 - [x] Conduit on all 18 platforms, each tested in CI with its own local tooling and both official RealWorld suites (PRs #24, #29, #39).
 - [x] Ledger (example app 2), following TigerBeetle's model: proofs of conservation, idempotency and two-phase transfers; TigerBeetle as a differential oracle; a bank workload; then every platform with a strongly consistent store.
-- [ ] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced.
+- [x] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced. Result: a Lasm.UI bug, not SAM. A link clicked while an HTTP response's frame was still waiting changed the address one animation frame before the page (run 41236311299, `articles.spec.ts` "should view article from home feed", strict `h1` matched the feed's 4). `lasm:ui-dom` now renders a waiting frame with discrete input; regression test in test/ui-dom-applier.test.mjs.
 
 ### Ledger ([examples/ledger](examples/ledger), the second flagship app)
 - [x] 1. Pure core in TigerBeetle's data model and result codes (0.17.9 subset), the model, and the proofs: 27 propositions (31 with the page) in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean), a requirements map ([SPEC.md](examples/ledger/SPEC.md)), `proofs:paranoid`.
