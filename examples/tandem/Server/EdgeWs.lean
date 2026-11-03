@@ -7,7 +7,10 @@ upgrades on `/doc/<name>/ws` where the platform can:
 - Deno: `Deno.upgradeWebSocket(request)` inside the handler;
 - Bun: `server.upgrade(request)`, which needs `websocket` handlers in the
   server's options. Lasm's Bun entry starts `Bun.serve` without them, so the
-  first upgrade installs them with `server.reload` (same `fetch`);
+  first request of any kind installs them with `server.reload` (with this
+  function as `fetch`). The new options apply from the next request on: an
+  upgrade that is the server's very first request is refused once, and the
+  client connects again;
 - Workers: none (a WebSocket that outlives its request needs a Durable
   Object, which `wrangler dev` does not run here); clients long-poll.
 -/
@@ -59,6 +62,13 @@ def serve (env : Env) (hub : Hub) (handle : Lasm.Fetch.Handler) (kind : Kind) : 
                ("maxPayloadLength", toJS maxBody)])
   let wrapper ← Function.ofFn fun args => do
     let .ref request _ := args[0]?.getD .undefined | return ← base.callAwait args Data
+    -- Bun passes (request, server) to a reloaded `fetch`, and Lasm's entry
+    -- (request, env, server): the server is the last argument.
+    if let .bun := kind then
+      unless ← reloaded.get do
+        if let (.ref server _, some w) := (args.back?.getD .undefined, ← wrapperRef.get) then
+          let _ : Data ← server.callMethod "reload" #[obj [("fetch", .ref w ""), ("websocket", bunHandlers)]] Data
+          reloaded.set true
     let url ← request.get "url" String
     let upgrade : Data ← (← request.get "headers").callMethod "get" #[toJS "upgrade"] Data
     let wantsWs := match upgrade with | .string s => s.toLower == "websocket" | _ => false
@@ -84,13 +94,7 @@ def serve (env : Env) (hub : Hub) (handle : Lasm.Fetch.Handler) (kind : Kind) : 
       let _ : Data ← socket.callMethod "addEventListener" #[toJS "close", .ref onClose ""] Data
       return (← pair.get "response" Data)
     | .bun, true, some doc =>
-      -- Bun passes (request, server) to a reloaded `fetch`, and Lasm's entry
-      -- (request, env, server): the server is the last argument.
       let .ref server _ := args.back?.getD .undefined | return ← base.callAwait args Data
-      unless ← reloaded.get do
-        if let some w ← wrapperRef.get then
-          let _ : Data ← server.callMethod "reload" #[obj [("fetch", .ref w ""), ("websocket", bunHandlers)]] Data
-        reloaded.set true
       let ok ← server.callMethod "upgrade" #[.ref request "", obj [("data", obj [("doc", toJS doc)])]] Bool
       if ok then return .undefined
       else return ← base.callAwait #[.ref request ""] Data
