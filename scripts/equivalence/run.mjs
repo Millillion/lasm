@@ -12,7 +12,7 @@
 // --record (from the node target), the expected responses.
 import { spawn, spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { request } from 'node:http';
+import { Agent, request } from 'node:http';
 import { createServer } from 'node:net';
 import { createHash } from 'node:crypto';
 import { join, resolve } from 'node:path';
@@ -62,19 +62,19 @@ function build(target) {
 }
 const freePort = () => new Promise((ok, fail) => { const s = createServer(); s.once('error', fail); s.listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => ok(port)); }); });
 
-function send(port, req, timeoutMs = 30_000) {
+function send(port, req, timeoutMs = 30_000, agent = false) {
   return new Promise((ok, fail) => {
     const body = req.bodyBase64 ? Buffer.from(req.bodyBase64, 'base64') : req.bodyRepeat ? Buffer.from(req.bodyRepeat.text.repeat(req.bodyRepeat.times)) : req.body !== undefined ? Buffer.from(req.body) : null;
-    const headers = { ...(req.headers ?? {}), connection: 'close' };
+    const headers = { ...(req.headers ?? {}), ...(agent ? {} : { connection: 'close' }) };
     if (body) headers['content-length'] = String(body.length);
     // rawHeaders: [[name, value], …] sent as separate lines (a header repeated).
     const lines = req.rawHeaders ? [...Object.entries(headers), ['host', `127.0.0.1:${port}`], ...req.rawHeaders].flat() : headers;
     // A fresh connection per request (agent: false): a pooled keep-alive socket
     // that the server has just closed would fail with "socket hang up" on reuse.
-    const r = request({ host: '127.0.0.1', port, method: req.method, path: req.path, headers: lines, timeout: timeoutMs, agent: false }, res => {
+    const r = request({ host: '127.0.0.1', port, method: req.method, path: req.path, headers: lines, timeout: timeoutMs, agent }, res => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
-      res.on('end', () => ok({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks) }));
+      res.on('end', () => ok({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks), reusedSocket: r.reusedSocket }));
       res.on('error', fail);
     });
     r.on('timeout', () => r.destroy(new Error('timeout')));
@@ -92,6 +92,23 @@ function observe(res) {
   const text = res.body.toString('utf8');
   const isText = Buffer.from(text, 'utf8').equals(res.body) && res.body.length <= 4096;
   return { status: res.status, headers, ...(isText ? { body: text } : { bodySha256: createHash('sha256').update(res.body).digest('hex'), bodyBytes: res.body.length }) };
+}
+// "keepAlive": [paths…] sends GETs one after another over a single persistent
+// connection, as browsers and proxies do; every target must answer each one and
+// keep the connection open (the 2026-10-31 "no response to /hello/a%2Fb" on Bun
+// was the harness reusing a pooled socket it had asked to close, not Bun).
+async function sendKeepAlive(port, req, timeoutMs = 30_000) {
+  const agent = new Agent({ keepAlive: true, maxSockets: 1 });
+  try {
+    const responses = [];
+    let reused = 0;
+    for (const path of req.keepAlive) {
+      const res = await send(port, { method: 'GET', path }, timeoutMs, agent);
+      if (res.reusedSocket) reused++;
+      responses.push(observe(res));
+    }
+    return { responses, reusedConnections: reused };
+  } finally { agent.destroy(); }
 }
 async function waitReady(port, child, logs, ms = 120_000) {
   const until = Date.now() + ms;
@@ -116,7 +133,7 @@ for (const target of targets) {
     await waitReady(port, child, logs);
     for (const req of corpus.requests) {
       if (req.skip?.includes(target)) continue;
-      try { observed[req.name] = observe(await send(port, req)); }
+      try { observed[req.name] = req.keepAlive ? await sendKeepAlive(port, req) : observe(await send(port, req)); }
       catch (e) { observed[req.name] = { error: String(e.message) }; console.log(`  ${req.name}: ${e.message}; server log: ${logs.join('').slice(-1500)}`); }
     }
   } catch (e) {

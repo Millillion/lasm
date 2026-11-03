@@ -10,7 +10,7 @@ import { checkSystemGit } from './system-git.mjs';
 import { hashFile, managedCacheDirectory, sessionTrusted, verificationRecords } from './managed-artifacts.mjs';
 import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
-import { applicationSources, findApplicationProject } from './application-sources.mjs';
+import { applicationSources, findApplicationProject, assertDefinesMain } from './application-sources.mjs';
 import { importsLibrary, librarySources } from './lasm-library.mjs';
 import { planNodeModules, copyNodeModulesAsync } from './application-npm.mjs';
 import { readBindingsAsync, checkBindingsAsync, requireValidBindings } from './application-binding-check.mjs';
@@ -105,6 +105,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   const { compilations: nativeCompilations, unavailable: nativeUnavailable } = generated.nativeLink
     ? planNativeInputs(generated.nativeLink, { leanPrefix: [lean.prefix, lean.executionPrefix], runtimeInclude: join(runtime.directory, 'include') })
     : { compilations: [], unavailable: [] };
+  assertDefinesMain(generated.inputs, generated.sources, source);
   // Licence files of the Lake dependencies whose code is compiled in (dist/licenses/).
   const dependencyLicenses = project ? lakeDependencyLicenses(project,
     [...generated.inputs.map(input => input.source), ...nativeCompilations.map(item => item.source)],
