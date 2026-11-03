@@ -1,0 +1,109 @@
+name: Tandem on every platform
+# examples/tandem on each platform beside Node (tandem.yml), served by the
+# platform's own local tooling (test/platforms.mjs): the protocol tests, the
+# live simulation (Lean replicas over an unreliable network) and a minute of
+# fuzzing against it. WebSockets on Bun, Deno and Docker; long-poll on
+# Workers (WebSockets there need a Durable Object). No function platforms,
+# Fastly or WASI: a sync server needs connections that outlive a request or
+# one store for every instance (README.md, "Platforms"). Local tooling only:
+# no account, nothing deployed.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/tandem-platforms.yml'
+      - 'examples/tandem/**'
+      - '!examples/tandem/Proofs/**'
+      - '!examples/tandem/Proofs.lean'
+      - '!examples/tandem/**/*.md'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/tandem-platforms.yml'
+      - 'examples/tandem/**'
+      - '!examples/tandem/Proofs/**'
+      - '!examples/tandem/Proofs.lean'
+      - '!examples/tandem/**/*.md'
+permissions:
+  contents: read
+concurrency:
+  group: tandem-platforms-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CI: '1'
+  BROWSER: 'none'
+jobs:
+  platform:
+    name: ${{ matrix.title }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: bun
+            title: Bun 1.4.4 (bun:sqlite, WebSockets)
+            build: npm run build:bun
+          - platform: deno
+            title: Deno 2.9.6 (node:sqlite, WebSockets)
+            build: npm run build:deno
+          - platform: workers
+            title: Cloudflare Workers (wrangler dev, local D1, long-poll)
+            build: npm run build:workers
+          - platform: docker
+            title: Docker (node:24-bookworm-slim, read-only, 512 MB, WebSockets)
+            build: npm run build:docker
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+      DO_NOT_TRACK: '1'
+      TANDEM: examples/tandem
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: ${{ env.TANDEM }}
+        run: npm ci --no-audit --no-fund
+      - name: The platform's pinned tools
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          case "$PLATFORM" in
+            bun) npm install --prefix "$T" --no-audit --no-fund bun@1.4.4 ;;
+            workers) npm install --prefix "$T" --no-audit --no-fund wrangler@4.152.0 ;;
+            deno) npm install --prefix "$T" --no-audit --no-fund deno@2.9.6 ;;
+          esac
+          mkdir -p "$T/node_modules/.bin"
+          echo "$T/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: Build (${{ matrix.build }}), and the simulation's clients
+        working-directory: ${{ env.TANDEM }}
+        run: |
+          node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- bash -c "${{ matrix.build }}"
+          node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- npm run build:clients
+      - name: The protocol tests
+        working-directory: ${{ env.TANDEM }}
+        run: node test/protocol.mjs --platform ${{ matrix.platform }} --name ${{ matrix.platform }}
+      - name: The live simulation (seeded; the seed is printed first)
+        working-directory: ${{ env.TANDEM }}
+        run: node test/simulate.mjs --platform ${{ matrix.platform }} --rounds 3 --name ${{ matrix.platform }}
+      - name: A minute of fuzzing (seeded; the seed is printed first)
+        working-directory: ${{ env.TANDEM }}
+        run: node test/fuzz.mjs --platform ${{ matrix.platform }} --seconds 60
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: tandem-${{ matrix.platform }}
+          path: ${{ env.TANDEM }}/test-results/
+          retention-days: 14
+          if-no-files-found: ignore

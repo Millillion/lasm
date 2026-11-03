@@ -13,6 +13,7 @@ too, so an operation is never stored twice.
 -/
 import Lasm.JS
 import Tandem.Sync
+import Std.Data.HashSet
 open Lasm.JS
 
 namespace Tandem.Server
@@ -46,24 +47,31 @@ def str (d : Data) (k : String) : String :=
   | .string s => s
   | _ => ""
 
-/-- A stored operation (stored by `commit`, so it decodes). -/
-def decodeStored (line : String) : Async Op :=
-  match Wire.decodeOp line.toList with
-  | some op => pure op
-  | none => throw (IO.userError s!"the store holds an invalid operation: {line}")
-
 /-- The queries of `Sync.sync`, for document `doc`. -/
 def reads (db : Sql) (doc : String) : Sync.Reads Async where
   count := do
     let rows ← db.all "SELECT COUNT(*) AS n FROM ops WHERE doc = ?" #[toJS doc]
     return (rows[0]?.map (nat · "n")).getD 0
-  contains op := do
-    let rows ← db.all "SELECT 1 AS hit FROM ops WHERE doc = ? AND op = ? LIMIT 1" #[toJS doc, toJS (Wire.encodeOp op)]
-    return !rows.isEmpty
+  known ops := do
+    -- At most 90 operations per query (D1 binds at most 100 values).
+    let lines := (ops.map Wire.encodeOp).toArray
+    let mut found : Array String := #[]
+    let mut i := 0
+    while i < lines.size do
+      let part := lines.extract i (i + 90)
+      let marks := ", ".intercalate (part.toList.map fun _ => "?")
+      let rows ← db.all s!"SELECT op FROM ops WHERE doc = ? AND op IN ({marks})" (#[toJS doc] ++ part.map toJS)
+      found := found ++ rows.map (str · "op")
+      i := i + 90
+    let set := Std.HashSet.ofArray found
+    return ops.filter fun op => set.contains (Wire.encodeOp op)
   slice start n := do
     let rows ← db.all "SELECT op FROM ops WHERE doc = ? AND seq >= ? ORDER BY seq LIMIT ?"
       #[toJS doc, toJS start, toJS n]
-    rows.toList.mapM fun r => decodeStored (str r "op")
+    -- Decoded without a monadic loop (see `Sync.Reads.known`).
+    let decoded := rows.toList.map fun r => Wire.decodeOp (str r "op").toList
+    if decoded.any Option.isNone then throw (IO.userError "the store holds an invalid operation")
+    return decoded.filterMap id
 
 /-- The statements that append `ops` to the log after position `n`. -/
 def commitStatements (doc : String) (n : Nat) (ops : List Op) : Array (String × Array Data) :=

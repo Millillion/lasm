@@ -62,7 +62,12 @@ def syncOnce (env : Env) (doc : String) (req : Wire.Request) : Nat → Async (Wi
     if added.isEmpty then return (reply, n, [])
     let committed ← try env.db.batch (commitStatements doc n added); pure true catch _ => pure false
     if committed then return (reply, n, added)
-    else syncOnce env doc req fuel
+    else
+      -- Another commit took the positions. Where writers do not take turns
+      -- (Workers), many racing writers could keep colliding: wait a random,
+      -- growing while before trying again.
+      Std.Async.sleep (.ofNat (← IO.rand 1 (5 * (41 - min fuel 40))))
+      syncOnce env doc req fuel
 
 /-- A client's message, as text: the reply, as text. New operations are
 pushed to the document's other connections. -/
@@ -70,7 +75,7 @@ def handleSync (env : Env) (doc : String) (body : String) : Async String := do
   match Wire.decodeRequest body with
   | .error e => return Wire.encodeReply (.error e)
   | .ok req =>
-    let (reply, n, added) ← exclusive env.writers (syncOnce env doc req 20)
+    let (reply, n, added) ← exclusive env.writers (syncOnce env doc req 40)
     unless added.isEmpty do
       env.push doc (Wire.encodeReply (.ops n (n + added.length) added))
     return Wire.encodeReply reply
@@ -78,12 +83,12 @@ def handleSync (env : Env) (doc : String) (body : String) : Async String := do
 /-- Long-poll: the log from `cursor` as soon as it is longer, or nothing new. -/
 def poll (env : Env) (doc : String) (cursor : Nat) : Async String := do
   let rd := reads env.db doc
-  let steps := env.pollSeconds * 5
-  let mut i := 0
-  while i < steps do
+  -- Bounded by the clock, not by a number of steps: under load each check
+  -- takes longer, and the poll must still answer in time.
+  let deadline := (← IO.monoMsNow) + env.pollSeconds * 1000
+  while (← IO.monoMsNow) < deadline do
     if (← rd.count) > cursor then break
     Std.Async.sleep 200
-    i := i + 1
   let (_, reply) ← Sync.sync rd { cursor, ops := [] }
   return Wire.encodeReply reply
 

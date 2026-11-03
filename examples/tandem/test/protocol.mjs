@@ -25,6 +25,7 @@ const ins = (c, r, parent, ch, side = 'R') => parent ? `i ${c} ${r} ${parent[0]}
 const run = (s, r, c0 = 1, parent = null) => [...s].map((ch, j) => ins(c0 + j, r, j === 0 ? parent : [c0 + j - 1, r], ch));
 const wsUrl = d => `${base.replace(/^http/, 'ws')}/doc/${d}/ws`;
 const supportsWs = a.platform !== 'workers';
+const pollSeconds = a.platform === 'workers' ? 10 : 2;
 
 await test('a sync stores operations and answers with the log', async () => {
   const d = fresh();
@@ -127,7 +128,7 @@ await test('long-poll answers when the log grows, and after the timeout when it 
   const t0 = Date.now();
   const idle = parseReply(await (await fetch(`${base}/doc/${d}/poll?cursor=1`)).text());
   assert.deepEqual([idle.from, idle.to], [1, 1]);
-  assert.ok(Date.now() - t0 >= 1500, 'returned before the timeout');
+  assert.ok(Date.now() - t0 >= pollSeconds * 1000 - 500, 'returned before the timeout');
   const waiting = fetch(`${base}/doc/${d}/poll?cursor=1`).then(r => r.text());
   await new Promise(r => setTimeout(r, 300));
   await sync(base, d, 1, [ins(2, 8, [1, 8], 'b')]);

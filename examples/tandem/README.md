@@ -2,7 +2,7 @@
 
 **A collaborative text editor written in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm), with a proof that everyone ends up with the same document.**
 Several people edit one plain-text document at once, and keep editing while offline; their replicas merge when they reconnect. The document is a sequence CRDT, Fugue (Weidner and Kleppmann, [arXiv:2305.00583](https://arxiv.org/abs/2305.00583)), and the same Lean runs in the browser and on the sync server.
-217 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: replicas that applied the same operations hold the same document, whatever the order and however often each arrived; every insertion lands where the user typed it, and every edit of the text area yields exactly the new text; two people typing at the same place concurrently never get their text interleaved; the server never loses an operation it acknowledged; and every message, however malformed, is parsed by total, bounded parsers ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
+218 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: replicas that applied the same operations hold the same document, whatever the order and however often each arrived; every insertion lands where the user typed it, and every edit of the text area yields exactly the new text; two people typing at the same place concurrently never get their text interleaved; the server never loses an operation it acknowledged; and every message, however malformed, is parsed by total, bounded parsers ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement onto them).
 
 Tandem is an example of what Lasm can build, not a production editor: it has
 no accounts, no access control and no rich text, and it keeps every
@@ -22,8 +22,9 @@ npm run proofs              # check every theorem
 Requirements: Node.js 24 or newer and npm. Lasm downloads Lean 4.35.0 and its
 WebAssembly tools on the first build (cached); `node:sqlite` is part of Node.
 
-This is milestone 2 of 4: the pure core, its proofs, and the Node sync
-server with its tests. The other platforms and the browser editor follow.
+This is milestone 3 of 4: the pure core, its proofs, the sync server and its
+tests, on Node, Bun, Deno, Cloudflare Workers and Docker. The browser editor
+follows.
 
 ## The proofs
 
@@ -102,6 +103,36 @@ go offline for as long as it likes, and send the same operations again: the
 server ignores what it has, and the propositions say nothing is lost or
 applied twice.
 
+## Platforms
+
+The same Lean runs on each platform below; only the SQLite binding module
+([`Server/NodeSqlite.lean`](Server/NodeSqlite.lean), [`Server/BunSqlite.lean`](Server/BunSqlite.lean),
+[`Server/D1.lean`](Server/D1.lean)) and the WebSocket glue
+([`Server/NodeWs.lean`](Server/NodeWs.lean), [`Server/EdgeWs.lean`](Server/EdgeWs.lean))
+differ. Each row is a CI job ([tandem.yml](../../.github/workflows/tandem.yml) for Node,
+[tandem-platforms.yml](../../.github/workflows/tandem-platforms.yml) for the rest) that builds
+Tandem, serves it with the platform's own local tooling ([`test/platforms.mjs`](test/platforms.mjs)),
+and runs the protocol tests, the live simulation and a minute of fuzzing against it. No account,
+nothing deployed.
+
+| Platform | Build | Served in CI by | Store | Live updates |
+| --- | --- | --- | --- | --- |
+| Node 24 and 26 | `npm run build` | `node dist/server/main.mjs` | `node:sqlite`, a file | WebSockets (`ws`) |
+| Bun 1.4.4 | `npm run build:bun` | `bun bun/main.mjs` | `bun:sqlite`, a file | WebSockets (Bun's) |
+| Deno 2.9.6 | `npm run build:deno` | `deno run -A deno/main.mjs` | `node:sqlite` in Deno, a file | WebSockets (`Deno.upgradeWebSocket`) |
+| Cloudflare Workers | `npm run build:workers` | `wrangler dev` | D1 (local) | Long-poll |
+| Docker | `npm run build:docker` | `docker run --read-only` | `node:sqlite` on the `/data` volume | WebSockets (`ws`) |
+
+On Bun, Lasm's generated entry starts `Bun.serve` without WebSocket
+handlers, so Tandem installs them on the first upgrade with `server.reload`.
+On Workers a WebSocket that outlives its request needs a Durable Object, and
+Lasm's Workers entry cannot export one, so clients long-poll.
+
+**Not offered: the function platforms (Lambda, Vercel, Netlify, Azure,
+GCF), Fastly Compute and WASI.** A sync server needs either connections that
+outlive a request or one store that every instance shares; those platforms
+give each instance its own temporary files (or none).
+
 ## The oracle: Yjs
 
 There is no conformance suite for CRDTs, so [Yjs](https://github.com/yjs/yjs)
@@ -162,6 +193,7 @@ three minutes.
 | [`Tandem/Client.lean`](Tandem/Client.lean) | A replica and its sync: pending operations, the cursor, replies and pushes |
 | [`Tandem/Bulk.lean`](Tandem/Bulk.lean) | Applying a long log at once, by sorting |
 | [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | The SQL store, the HTTP and WebSocket glue, the SQLite bindings; the Node program |
+| [`ServerBun.lean`](ServerBun.lean), [`ServerDeno.lean`](ServerDeno.lean), [`ServerWorkers.lean`](ServerWorkers.lean), `Dockerfile`, `wrangler.toml` | The other platforms |
 | [`Batch.lean`](Batch.lean), [`Clients.lean`](Clients.lean) | The differential test's driver; the simulation's clients |
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The proofs |
