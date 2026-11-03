@@ -165,7 +165,8 @@ function problems(req, res) {
   const out = [];
   if (tooLargeForNode(req) && (res.status === 431 || res.error)) return [];
   // Likewise a method Node's HTTP parser does not know: it closes the connection.
-  if (!NODE_METHODS.includes(req.method) && (res.error || res.status === 400)) return [];
+  // (workerd answers 501 for them.)
+  if (!NODE_METHODS.includes(req.method) && (res.error || res.status === 400 || res.status === 501)) return [];
   if (res.error) return [`no answer: ${res.error}`];
   if (!STATUSES.has(res.status)) out.push(`status ${res.status}`);
   if (res.ms > 5000) out.push(`slow: ${res.ms} ms`);
