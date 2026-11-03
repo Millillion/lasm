@@ -12,7 +12,7 @@ wasmtime run --dir . wasi/main.wasm check
 printf '1\n2\n3\n' | wasmtime run wasi/main.wasm sum   # sum: 6
 ```
 
-wasmer (`wasmer run --volume=.:/ wasi/main.wasm -- check`) and Node's `node:wasi`
+wasmer (`wasmer run --enable-tail-call --volume=.:/ wasi/main.wasm -- check`) and Node's `node:wasi`
 ([scripts/wasi/node-wasi-run.mjs](../../scripts/wasi/node-wasi-run.mjs)) run it too.
 CI compares every mode's output with native Lean's on each engine
 ([wasi.yml](../../.github/workflows/wasi.yml)). Guide: [docs/WASI.md](../../docs/WASI.md).

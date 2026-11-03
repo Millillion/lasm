@@ -32,9 +32,13 @@ npx lasm init my-tool                       # or any Lean program
 cd my-tool && npm install
 npx lasm build Main.lean --target wasi      # wasi/main.wasm
 wasmtime run --dir . wasi/main.wasm Ada     # Hello, Ada, from Lean!
-wasmer run --volume=.:/ wasi/main.wasm -- Ada   # the current directory as the guest's root
+wasmer run --enable-tail-call --volume=.:/ wasi/main.wasm -- Ada   # the current directory as the guest's root
 node --no-warnings -e "…"                   # node:wasi, see below
 ```
+
+The module uses WebAssembly tail calls (issue #90: monadic loops run in
+constant stack). wasmtime, Node's `node:wasi`, Spin and Viceroy enable them by
+default; wasmer needs `--enable-tail-call`.
 
 An HTTP handler for Fastly:
 

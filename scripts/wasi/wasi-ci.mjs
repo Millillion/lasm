@@ -88,7 +88,7 @@ const runners = {
   wasmtime: (wasm, args, { env = {} } = {}) => [toolPath.wasmtime, ['run', '--dir', '.', ...Object.entries(env).flatMap(([k, v]) => ['--env', `${k}=${v}`]), wasm, ...args]],
   // wasmer 7.4: --volume=.:/ makes the current directory the guest's root and "." (its --dir . maps "." to a
   // missing /home for preview 1 modules); it rejects empty --env values.
-  wasmer: (wasm, args, { env = {} } = {}) => [toolPath.wasmer, ['run', '--volume=.:/', ...Object.entries(env).filter(([, v]) => v !== '').map(([k, v]) => `--env=${k}=${v}`), wasm, '--', ...args]],
+  wasmer: (wasm, args, { env = {} } = {}) => [toolPath.wasmer, ['run', '--enable-tail-call', '--volume=.:/', ...Object.entries(env).filter(([, v]) => v !== '').map(([k, v]) => `--env=${k}=${v}`), wasm, '--', ...args]],
   node: (wasm, args) => [process.execPath, [join(root, 'scripts/wasi/node-wasi-run.mjs'), wasm, ...args]],
 };
 function run(engine, cwd, wasm, args, { env = {}, input } = {}) {

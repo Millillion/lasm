@@ -158,7 +158,12 @@ export function canSpecializeInitialization(runtime) {
     // WebAssembly tail calls (-mtail-call, issue #90): every object differs in code
     // generation only (sibling calls become return_call). No source, static
     // constructor or initialization order changed; the smoke build matched native.
-    '9bcec4aa1cac94d288182d970e8670bbb46b20759f97c0a081a72c4c4b4fe695'].includes(runtime.identity);
+    '9bcec4aa1cac94d288182d970e8670bbb46b20759f97c0a081a72c4c4b4fe695',
+    // Lean 4.35.0 (CI build 41697814743, source b62a4c3, handoff 4f9e99ba…, standard
+    // libraries reused from the entry above): only libleanrt's apply.cpp.o differs
+    // (the tail-apply patch: lean_apply_* release the closure, then tail-call its
+    // code). apply.cpp has no static constructor or initializer.
+    '2ecb4fba612b77ba68ca095b0976d21ffbe49f7858f242a53e6ae310dfdd72b1'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';

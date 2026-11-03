@@ -50,7 +50,7 @@ const wasm = join(root, 'wasi/main.wasm');
 const run = (engine, file) => {
   const cmd = {
     wasmtime: ['wasmtime', ['run', '--dir', `${dir}::/j`, wasm, 'verify', `/j/${file}`]],
-    wasmer: ['wasmer', ['run', `--volume=${dir}:/j`, wasm, '--', 'verify', `/j/${file}`]],
+    wasmer: ['wasmer', ['run', '--enable-tail-call', `--volume=${dir}:/j`, wasm, '--', 'verify', `/j/${file}`]],
     node: [process.execPath, ['--no-warnings', '--input-type=module', '-e', `
       import { WASI } from 'node:wasi'; import { readFile } from 'node:fs/promises';
       const wasi = new WASI({ version: 'preview1', args: ['ledger', 'verify', '/j/${file}'], env: {},

@@ -29,7 +29,7 @@ function folio(engine, dir, argv) {
     node: [process.execPath, [join(root, 'dist', 'cli', 'main.mjs'), ...argv.map(map)]],
     native: [join(root, '.lake', 'build', 'bin', 'folio'), argv.map(map)],
     wasmtime: ['wasmtime', ['run', '--dir', `${dir}::/w`, wasm, ...argv.map(map)]],
-    wasmer: ['wasmer', ['run', `--volume=${dir}:/w`, wasm, '--', ...argv.map(map)]],
+    wasmer: ['wasmer', ['run', '--enable-tail-call', `--volume=${dir}:/w`, wasm, '--', ...argv.map(map)]],
     'node-wasi': [process.execPath, ['--no-warnings', '--input-type=module', '-e', `
       import { WASI } from 'node:wasi'; import { readFile } from 'node:fs/promises';
       const wasi = new WASI({ version: 'preview1', args: ['folio', ...${JSON.stringify(argv.map(map))}], env: {},
