@@ -77,7 +77,7 @@ test('lasm init onto an existing file says so', t => {
 test('an output path that is a file is named', async t => {
   const directory = scratch(t), built = join(directory, 'built'), output = join(directory, 'dist');
   mkdirSync(built); writeFileSync(join(built, 'main.mjs'), ''); writeFileSync(output, 'mine\n');
-  await assert.rejects(deliverOutput(built, output, 'signature'), new RegExp(`The output ${output.replace(/[\\.]/g, '\\$&')} exists and is not a directory`));
+  await assert.rejects(deliverOutput(built, output, 'signature'), new RegExp(`The output ${output.replace(/[\\.]/g, '\\$&')} is not an ordinary directory`));
 });
 
 test('a program without main is refused with that reason', t => {
