@@ -82,7 +82,7 @@ invocation for six Linux temporary-directory byte cases. It compares unchanged
 ordinary Lean output and independently inspects raw and decoy directory entries,
 permissions and contents. Only random leaf names in those external observations
 are excluded from comparison. The shared fixture also drives
-`test/node-temporary-path-bytes.test.mjs`; original upstream tests are untouched.
+`integration/host-fixtures.mjs` (formerly `test/node-temporary-path-bytes.test.mjs`); original upstream tests are untouched.
 
 `probe-system-directories.py NEW_OUTPUT FROZEN_FACADE` compares fifteen Linux
 home/temporary-directory cases in the same guarded slot. `--startup` runs the
@@ -321,7 +321,7 @@ the exact fixture and records its hash. `FifoFinalizer.lean` covers a dropped fi
 handle; `FifoThreadFinalizer.lean` covers the last reference in task-local stdout.
 Both now pass natively and in stock Node on Linux x64. The packaged
 scheduler preserves its suspended C stack pointer and runs task-local cleanup as
-a resumable entry. `test/finalizers.test.mjs` keeps both as application regressions.
+a resumable entry. `integration/host-fixtures.mjs` (formerly `test/finalizers.test.mjs`) keeps both as application regressions.
 See [the evidence](../../docs/evidence/cooperative-finalizers-2026-09-21.json);
 these are additional fixtures, not upstream-suite passes.
 
@@ -484,14 +484,14 @@ a long partial line. Source copies, hashes, outputs, and resource reports remain
 separate from upstream-suite results. `test/getline-native-state.test.mjs` adds
 an independent C control for nonblocking partial errors, retained FILE errors,
 consumed bytes, and EOF/error ordering. Run it through the resource guard; it
-executes serially in each installed engine. `test/node-getline-state.test.mjs`
+executes serially in each installed engine. `integration/host-fixtures.mjs` (formerly `test/node-getline-state.test.mjs`)
 checks the packaged ordinary-Lean path.
 
 `probe-console-buffering.mjs NEW_OUTPUT FULL_TOOLCHAIN...` compares ordinary
 Lean stdout/stderr buffering, explicit flushes, inherited-child ordering, and
 normal shutdown against the pinned native compiler. It preserves the executed
 source and records hashes and complete output; it does not modify upstream
-tests. `test/node-console-buffering.test.mjs` checks the packaged path, while
+tests. `integration/host-fixtures.mjs` (formerly `test/node-console-buffering.test.mjs`) checks the packaged path, while
 `test/stdio-backpressure.test.mjs` fills a small Linux pipe and verifies that
 flush/disposal let a delayed JavaScript reader run. `test/worker-stdio.test.mjs`
 checks diagnostic forwarding and natural exit after `Worker.unref()` on Node.
@@ -682,7 +682,7 @@ process parity and are separate from the unchanged upstream suite.
 `probe-process-cwd.mjs NEW_OUTPUT TOOLCHAIN...` creates a directory and symlink
 fixture and compares ordinary child cwd resolution with native Lean before
 running the frozen full compilers. Both absolute and relative `symlink/..` paths
-must resolve in the OS. `test/node-process-cwd.test.mjs` runs the same comparison
+must resolve in the OS. `integration/host-fixtures.mjs` (formerly `test/node-process-cwd.test.mjs`) runs the same comparison
 in packaged engines, also using spaces and Unicode in the fixture directory.
 These additional POSIX controls do not validate concurrent directory renames or
 native child-side spawn failures.
@@ -691,7 +691,7 @@ native child-side spawn failures.
 supplementary ordinary Lean fixture in native Lean and each frozen full compiler.
 It compares child-side exec/chdir failures, real PIDs, literal environment values,
 PATH/executable-text handling, and an absolute child cwd after removal of the
-parent directory. `test/node-spawn.test.mjs` covers packaged applications.
+parent directory. `integration/host-fixtures.mjs` (formerly `test/node-spawn.test.mjs`) covers packaged applications.
 The fixture flushes parent stdout before failing spawns; native duplication of
 unflushed fork buffers is a separate, still-open behavior.
 
@@ -711,13 +711,13 @@ environment entries and lookup, and `setCurrentDir`. It separately checks that
 filesystem operations still reject embedded NULs and preserve file contents.
 Lean uses different behavior in these APIs: the process C interfaces truncate,
 `getEnv` returns `none`, and filesystem primitives return structured errors.
-`test/node-process-nul.test.mjs` exercises the packaged application path.
+`integration/host-fixtures.mjs` (formerly `test/node-process-nul.test.mjs`) exercises the packaged application path.
 
 `probe-cwd-permissions.mjs NEW_OUTPUT TOOLCHAIN...` compares the same supplementary
 Lean fixture with native Linux and each frozen full compiler. It revokes search
 permission after entering a directory, then checks cwd queries, relative files,
 inherited children, explicit relative/absolute child cwd, and search-only access.
-`test/node-cwd-permissions.test.mjs` covers generated mains and source launchers.
+`integration/host-fixtures.mjs` (formerly `test/node-cwd-permissions.test.mjs`) covers generated mains and source launchers.
 Standalone mains propagate cwd changes; embedded module instances retain their
 separate directory by default.
 
@@ -738,7 +738,7 @@ complete musl-host conformance.
 `probe-cwd-permissions.mjs --removed NEW_OUTPUT TOOLCHAIN...` adds a separate
 ordinary-Lean comparison for deleting a cwd after revoking search permission.
 It covers inherited/explicit child cwd, failed execution, PATH search, and a
-100,000-byte environment. `test/node-cwd-removed-permissions.test.mjs` checks the
+100,000-byte environment. `integration/host-fixtures.mjs` (formerly `test/node-cwd-removed-permissions.test.mjs`) checks the
 same source through generated mains and source launchers. It is a supplementary
 fixture, not an edited upstream test.
 
@@ -929,7 +929,7 @@ and each selected frozen full compiler. It compares normal return,
 stderr, and an open buffered file. The source and every frozen input are
 verified; upstream tests and expectations are unchanged. The resource guard
 applies automatically. Packaged runners and embedded host lifetime are covered
-separately by `test/node-process-exit.test.mjs`.
+separately by `integration/host-fixtures.mjs` (formerly `test/node-process-exit.test.mjs`).
 
 ### Shared memory address and zero-capacity control
 

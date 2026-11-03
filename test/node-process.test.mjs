@@ -1,10 +1,10 @@
+// The Node host's process requests. The ordinary Lean programs these tests once
+// built (process lifetimes, a dropped child) run in integration/host-fixtures.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { root, resolveLean } from '../src/toolchain.mjs';
-import { buildMain } from '../src/main.mjs';
+import { fileURLToPath } from 'node:url';
 import { createNodeRuntimeHost, numbers } from '../src/node-host.mjs';
 
 const string = value => { const bytes = Buffer.from(value); return Buffer.concat([numbers(bytes.length), bytes]); };
@@ -59,44 +59,10 @@ test('POSIX wait and tryWait both reap a child before a subsequent kill', { skip
 
 test('dropping a child permits host exit while the child is still alive in each engine',
   { skip: process.platform !== 'linux', timeout: 20_000 }, t => {
-    const fixture = join(root, 'test/fixtures/process-detach-host.mjs');
+    const fixture = fileURLToPath(new URL('fixtures/process-detach-host.mjs', import.meta.url));
     for (const [name, executable, prefix] of engines) {
       if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }
       droppedChild(executable, [...prefix, fixture], name);
       t.diagnostic(`${name}: host exited without terminating its dropped child`);
-    }
-  });
-
-test('ordinary Lean process lifetimes and errors match native Lean in every installed engine',
-  { skip: !['linux', 'darwin'].includes(process.platform), timeout: 650_000 }, async t => {
-    const source = join(root, 'test/fixtures/process-lifetime/Main.lean');
-    const native = spawnSync(resolveLean(root).lean, ['--run', source], {
-      encoding: 'utf8', timeout: 15_000, killSignal: 'SIGKILL',
-    });
-    assert.equal(native.status, 0, native.error?.message ?? native.stdout + native.stderr);
-    assert.equal(native.stderr, '');
-    assert.ok(native.stdout.endsWith('process lifetime comparison completed\n'));
-    const built = await buildMain(source);
-    for (const [name, executable, prefix] of engines) {
-      if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }
-      const result = spawnSync(executable, [...prefix, join(built.output, 'main.mjs')], {
-        encoding: 'utf8', timeout: 15_000, killSignal: 'SIGKILL',
-      });
-      assert.equal(result.status, 0, `${name}: ${result.error?.message ?? result.stdout + result.stderr}`);
-      assert.equal(result.stderr, '');
-      assert.equal(result.stdout, native.stdout, name);
-      t.diagnostic(`${name}: matched native process lifecycle and error constructors`);
-    }
-  });
-
-test('an ordinary Lean main can exit with a dropped, still-running child',
-  { skip: process.platform !== 'linux', timeout: 650_000 }, async t => {
-    const source = join(root, 'test/fixtures/process-lifetime/Drop.lean');
-    droppedChild(resolveLean(root).lean, ['--run', source], 'native Lean');
-    const built = await buildMain(source);
-    for (const [name, executable, prefix] of engines) {
-      if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }
-      droppedChild(executable, [...prefix, join(built.output, 'main.mjs')], name);
-      t.diagnostic(`${name}: ordinary main exits while its dropped child lives`);
     }
   });

@@ -95,7 +95,8 @@ def compare(output_arg, *, facade_arg=None, program=None):
         if config and row['snapshotSha256']!=verify(config):raise RuntimeError('Snapshot changed during comparison')
         row['passed']=all(x['passed'] for x in row['cases']);save()
     try:
-        run('native',[Path.home()/'.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean','--run',fixture])
+        # The oracle: LASM_NATIVE_LEAN (integration/host-fixtures.mjs), else the Lean 4.32 the fixture was written against.
+        run('native',[Path(os.environ.get('LASM_NATIVE_LEAN') or Path.home()/'.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean'),'--run',fixture])
         if facade_arg is not None:
             facade=Path(facade_arg).resolve();config=json.loads((facade/'toolchain.json').read_text())
             if config['leanCommit']!='8c9756b28d64dab099da31a4c09229a9e6a2ef35':raise RuntimeError('Wrong native comparison revision')
