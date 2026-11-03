@@ -11,47 +11,11 @@ import { fileURLToPath } from 'node:url';
 import { parseLasmArguments } from '../src/cli-arguments.mjs';
 import { packageApplication, packageTargets } from '../src/package.mjs';
 import { zip } from '../src/serverless/zip.mjs';
+import { standInApplication } from '../scripts/serverless/stand-in-app.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
-// Echoes each request as JSON; /binary, /cookies and /empty exercise encodings.
-const server = `import http from 'node:http';
-if (process.argv.length !== 2) throw new Error('unexpected arguments ' + process.argv);
-http.createServer((req, res) => {
-  const chunks = [];
-  req.on('data', c => chunks.push(c)).on('end', () => {
-    const url = new URL(req.url, 'http://x');
-    if (url.pathname === '/binary') { res.writeHead(200, { 'content-type': 'application/octet-stream' }); return res.end(Buffer.from([0, 255, 1, 254])); }
-    if (url.pathname === '/cookies') { res.setHeader('set-cookie', ['a=1; Path=/', 'b=2; Path=/']); res.setHeader('x-many', ['p', 'q']); return res.end('ok'); }
-    if (url.pathname === '/empty') { res.writeHead(204); return res.end(); }
-    res.writeHead(url.pathname === '/missing' ? 404 : 200, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ method: req.method, url: req.url, host: req.headers.host, type: req.headers['content-type'] ?? null,
-      cookie: req.headers.cookie ?? null, body: Buffer.concat(chunks).toString() }));
-  });
-}).listen(Number(process.env.PORT), process.env.HOST);
-`;
-
-function fakeApplication(directory, { packages = {} } = {}) {
-  const write = (name, text, mode = 0o644) => {
-    mkdirSync(join(directory, name, '..'), { recursive: true });
-    writeFileSync(join(directory, name), text, { mode });
-  };
-  write('main.mjs', server, 0o755);
-  write('package.json', JSON.stringify({ private: true, type: 'module' }));
-  write('program.cjs', '');
-  write('program.wasm', '');
-  write('build-info.json', '{}');
-  write('.lasm-application.json', '{}');
-  write('host/native/manifest.json', JSON.stringify({ deployment: { target: 'node', targets: ['linux-x64', 'linux-arm64'] } }));
-  // Built on Windows: no execute permission recorded.
-  write('host/native/process/linux-x64-gnu', 'ELF', 0o644);
-  write('host/native/process/manifest.json', '{}');
-  for (const [name, text] of Object.entries(packages)) {
-    write(`node_modules/${name}/package.json`, JSON.stringify({ name, version: '1.2.3', type: 'module', main: 'index.js' }));
-    write(`node_modules/${name}/index.js`, text);
-  }
-  return directory;
-}
+const fakeApplication = standInApplication;
 
 /** Runs `script` (ESM) in a fresh Node process: each process starts its server once. */
 function inProcess(script, cwd) {
@@ -132,7 +96,16 @@ test('Lambda zip: every event shape reaches the server and returns its response 
         binary: await call({ path: '/binary' }),
         cookies: await call({ path: '/cookies' }),
         missing: await call({ path: '/missing' }),
+        seeOther: await call({ path: '/see-other' }),
       };
+      // The request's cookies in every form the event can carry them, at once
+      // (sam local start-api fills both headers.cookie and cookies, #80).
+      const event = makeEvent(kind, { path: '/hello', headers: { cookie: 'a=1; b=2' } });
+      if (event.cookies) event.cookies = ['a=1', 'b=2'];
+      if (event.multiValueHeaders) event.multiValueHeaders.cookie = ['a=1', 'b=2'];
+      if (event.Records) event.Records[0].cf.request.headers.cookie = [{ key: 'Cookie', value: 'a=1' }, { key: 'Cookie', value: 'b=2' }];
+      const r = readReply(kind, await handler(event));
+      out[kind].requestCookies = { ...r, body: r.body.toString('base64') };
     }
     console.log(JSON.stringify(out));
     process.exit(0);`, directory);
@@ -151,6 +124,11 @@ test('Lambda zip: every event shape reaches the server and returns its response 
     assert.deepEqual(replies.cookies.headers['set-cookie'], kind === 'alb' ? ['b=2; Path=/'] : ['a=1; Path=/', 'b=2; Path=/'], kind);
     assert.deepEqual(replies.cookies.headers['x-many'], kind === 'alb' || kind.startsWith('apigw-v2') || kind === 'function-url' ? ['p, q'] : ['p', 'q'], kind);
     assert.equal(replies.missing.status, 404, kind);
+    // A redirect with no body keeps its status and Location (#82).
+    assert.deepEqual([replies.seeOther.status, replies.seeOther.headers.location, replies.seeOther.body], [303, ['/there'], ''], kind);
+    // One Cookie header reaches the server, whatever the event held (#80).
+    const cookies = json(replies.requestCookies);
+    assert.deepEqual([cookies.cookie, cookies.cookieFields], ['a=1; b=2', 1], kind);
   }
   assert.equal(JSON.parse(Buffer.from(output['apigw-v2-http'].get.body, 'base64')).cookie, 'cookie1; cookie2');
 });
@@ -202,10 +180,20 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
     const base = 'http://127.0.0.1:' + server.address().port;
     const post = await fetch(base + '/echo?x=1', { method: 'POST', body: 'hi', headers: { 'content-type': 'text/plain' } });
     const cookies = await fetch(base + '/cookies');
-    console.log(JSON.stringify({ post: await post.json(), cookies: cookies.headers.getSetCookie() }));
+    const raw = (base, path, headers = []) => new Promise((done, fail) => {
+      const u = new URL(base + path);
+      http.request({ host: u.hostname, port: u.port, path: u.pathname, headers: ['host', u.host, 'cookie', 'a=1', 'cookie', 'b=2', ...headers] }, res => {
+        const chunks = []; res.on('data', c => chunks.push(c)); res.on('end', () => done({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks).toString() }));
+      }).on('error', fail).end();
+    });
+    const seeOther = await raw(base, '/see-other');
+    const requestCookies = JSON.parse((await raw(base, '/hello')).body);
+    console.log(JSON.stringify({ post: await post.json(), cookies: cookies.headers.getSetCookie(), seeOther, requestCookies }));
     process.exit(0);`, directory);
   assert.deepEqual([viaNode.post.url, viaNode.post.body], ['/echo?x=1', 'hi']);
   assert.deepEqual(viaNode.cookies, ['a=1; Path=/', 'b=2; Path=/']);
+  assert.deepEqual([viaNode.seeOther.status, viaNode.seeOther.headers.location, viaNode.seeOther.body], [303, '/there', '']);
+  assert.deepEqual([viaNode.requestCookies.cookie, viaNode.requestCookies.cookieFields], ['a=1; b=2', 1]);
 
   const netlify = packageApplication({ input: app, target: 'netlify', output: join(directory, 'netlify/functions/lasm') });
   const viaFetch = inProcess(`
@@ -213,10 +201,19 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
     const post = await mod.default(new Request('https://site.netlify.app/echo?x=1', { method: 'POST', body: 'hi' }));
     const empty = await mod.default(new Request('https://site.netlify.app/empty'));
     const binary = await mod.default(new Request('https://site.netlify.app/binary'));
-    console.log(JSON.stringify({ config: mod.config, post: await post.json(), empty: empty.status, binary: [...new Uint8Array(await binary.arrayBuffer())] }));
+    const cookies = await mod.default(new Request('https://site.netlify.app/cookies'));
+    const seeOther = await mod.default(new Request('https://site.netlify.app/see-other'));
+    const request = new Request('https://site.netlify.app/hello', { headers: [['cookie', 'a=1'], ['cookie', 'b=2']] });
+    const requestCookies = await (await mod.default(request)).json();
+    console.log(JSON.stringify({ config: mod.config, post: await post.json(), empty: empty.status, binary: [...new Uint8Array(await binary.arrayBuffer())],
+      cookies: cookies.headers.getSetCookie(), seeOther: [seeOther.status, seeOther.headers.get('location'), seeOther.body], requestCookies }));
     process.exit(0);`, directory);
   assert.deepEqual(viaFetch.config, { path: '/*', preferStatic: true });
   assert.deepEqual([viaFetch.post.url, viaFetch.post.body, viaFetch.empty, viaFetch.binary], ['/echo?x=1', 'hi', 204, [0, 255, 1, 254]]);
+  assert.deepEqual(viaFetch.cookies, ['a=1; Path=/', 'b=2; Path=/']);
+  // No zero-length body stream: Netlify's streaming bootstrap sends nothing for one (#82).
+  assert.deepEqual(viaFetch.seeOther, [303, '/there', null]);
+  assert.deepEqual([viaFetch.requestCookies.cookie, viaFetch.requestCookies.cookieFields], ['a=1; b=2', 1]);
 
   const azure = packageApplication({ input: app, target: 'azure', output: join(directory, 'azure') });
   assert.equal(azure.dependency, '@azure/functions@1.2.3');
@@ -228,9 +225,16 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
     await import(${JSON.stringify(new URL('file://' + join(azure.output, 'lasm-azure.mjs')).href)});
     const { name, options } = globalThis.registered;
     const reply = await options.handler(new Request('http://localhost:7071/echo?x=1', { method: 'POST', body: 'hi' }));
-    console.log(JSON.stringify({ name, route: options.route, auth: options.authLevel, status: reply.status, body: JSON.parse(Buffer.from(reply.body).toString()) }));
+    const cookies = await options.handler(new Request('http://localhost:7071/cookies'));
+    const seeOther = await options.handler(new Request('http://localhost:7071/see-other'));
+    console.log(JSON.stringify({ name, route: options.route, auth: options.authLevel, status: reply.status, body: JSON.parse(Buffer.from(reply.body).toString()),
+      cookies: { list: cookies.cookies, setCookie: cookies.headers.getSetCookie(), many: cookies.headers.get('x-many') },
+      seeOther: { status: seeOther.status, location: seeOther.headers.get('location'), body: seeOther.body ?? null } }));
     process.exit(0);`, directory);
   assert.deepEqual([viaAzure.name, viaAzure.route, viaAzure.auth, viaAzure.status, viaAzure.body.url], ['lasm', '{*path}', 'anonymous', 200, '/echo?x=1']);
+  // Several Set-Cookie headers travel in HttpResponseInit.cookies (#80).
+  assert.deepEqual(viaAzure.cookies, { list: [{ name: 'b', value: '2', path: '/' }], setCookie: ['a=1; Path=/'], many: 'p, q' });
+  assert.deepEqual(viaAzure.seeOther, { status: 303, location: '/there', body: null });
 
   const gcf = packageApplication({ input: app, target: 'gcf', output: join(directory, 'gcf') });
   assert.equal(JSON.parse(readFileSync(join(gcf.output, 'package.json'), 'utf8')).main, 'lasm-gcf.mjs');
@@ -240,10 +244,55 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
     const { name, fn } = globalThis.registered;
     const server = http.createServer((req, res) => fn(Object.assign(req, { originalUrl: req.url }), res)).listen(0, '127.0.0.1');
     await new Promise(r => server.once('listening', r));
-    const reply = await fetch('http://127.0.0.1:' + server.address().port + '/echo?x=1', { method: 'PUT', body: 'hi' });
-    console.log(JSON.stringify({ name, body: await reply.json() }));
+    const base = 'http://127.0.0.1:' + server.address().port;
+    const reply = await fetch(base + '/echo?x=1', { method: 'PUT', body: 'hi' });
+    const cookies = await fetch(base + '/cookies');
+    const raw = (base, path, headers = []) => new Promise((done, fail) => {
+      const u = new URL(base + path);
+      http.request({ host: u.hostname, port: u.port, path: u.pathname, headers: ['host', u.host, 'cookie', 'a=1', 'cookie', 'b=2', ...headers] }, res => {
+        const chunks = []; res.on('data', c => chunks.push(c)); res.on('end', () => done({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks).toString() }));
+      }).on('error', fail).end();
+    });
+    const seeOther = await raw(base, '/see-other');
+    const requestCookies = JSON.parse((await raw(base, '/hello')).body);
+    console.log(JSON.stringify({ name, body: await reply.json(), cookies: cookies.headers.getSetCookie(), seeOther, requestCookies }));
     process.exit(0);`, directory);
   assert.deepEqual([viaGcf.name, viaGcf.body.method, viaGcf.body.url, viaGcf.body.body], ['lasm', 'PUT', '/echo?x=1', 'hi']);
+  assert.deepEqual(viaGcf.cookies, ['a=1; Path=/', 'b=2; Path=/']);
+  assert.deepEqual([viaGcf.seeOther.status, viaGcf.seeOther.headers.location, viaGcf.seeOther.body], [303, '/there', '']);
+  assert.deepEqual([viaGcf.requestCookies.cookie, viaGcf.requestCookies.cookieFields], ['a=1; b=2', 1]);
+});
+
+test('adapter helpers: one Cookie header, Set-Cookie as cookie objects, Azure replies', async () => {
+  const { joinCookies, parseSetCookie, azureReply } = await import('../src/serverless/lasm-server.mjs');
+  assert.deepEqual(joinCookies([['host', 'x'], ['Cookie', 'a=1'], ['accept', '*/*'], ['cookie', 'b=2; c=3']]),
+    [['host', 'x'], ['Cookie', 'a=1; b=2; c=3'], ['accept', '*/*']]);
+  assert.deepEqual(joinCookies([['cookie', 'a=1'], ['cookie', '']]), [['cookie', 'a=1']]);
+  assert.deepEqual(joinCookies([['cookie', 'a=1']]), [['cookie', 'a=1']]);
+  // Cookies a proxy joined with commas (Azure's host, SAM's gateway); a comma inside a value stays.
+  assert.deepEqual(joinCookies([['cookie', 'a=1,b=2']]), [['cookie', 'a=1; b=2']]);
+  assert.deepEqual(joinCookies([['cookie', 'a=1, b=2; c=3'], ['cookie', 'a=1,b=2']]), [['cookie', 'a=1; b=2; c=3; a=1; b=2']]);
+  assert.deepEqual(joinCookies([['cookie', 'last=Wed, 21 Oct 2026 07:28:00 GMT; x=1']]), [['cookie', 'last=Wed, 21 Oct 2026 07:28:00 GMT; x=1']]);
+  const none = [['host', 'x']];
+  assert.equal(joinCookies(none), none);
+  assert.deepEqual(joinCookies([['x', '1'], ['x', '2']]), [['x', '1'], ['x', '2']], 'other repeated headers stay repeated');
+
+  assert.deepEqual(parseSetCookie('sid=abc=; Path=/; Domain=example.com; Max-Age=3600; Expires=Wed, 21 Oct 2026 07:28:00 GMT; Secure; HttpOnly; SameSite=lax'),
+    { name: 'sid', value: 'abc=', path: '/', domain: 'example.com', maxAge: 3600, expires: new Date('Wed, 21 Oct 2026 07:28:00 GMT'),
+      secure: true, httpOnly: true, sameSite: 'Lax', dropped: [] });
+  assert.deepEqual(parseSetCookie('gone=; Max-Age=0; Partitioned; Priority=High'), { name: 'gone', value: '', maxAge: 0, dropped: ['Partitioned', 'Priority=High'] });
+  assert.equal(parseSetCookie('novalue'), null);
+  assert.equal(parseSetCookie('=x'), null);
+
+  const reply = (headers, body = '') => ({ status: 200, statusText: 'OK', headers, body: Buffer.from(body) });
+  const single = azureReply(reply([['set-cookie', 'a=1; Path=/'], ['content-type', 'text/plain']], 'hi'));
+  assert.deepEqual([single.cookies, single.headers.getSetCookie(), String(single.body)], [undefined, ['a=1; Path=/'], 'hi'], 'one Set-Cookie stays a header');
+  // The first cookie stays a header unless another would change in cookies (its value percent-encoded, an attribute dropped).
+  const many = azureReply(reply([['set-cookie', 'a=1; Path=/; HttpOnly'], ['set-cookie', 'b=; Max-Age=0'], ['set-cookie', 'c=x+y=; Path=/'], ['location', '/x']]));
+  assert.deepEqual(many.cookies, [{ name: 'a', value: '1', path: '/', httpOnly: true }, { name: 'b', value: '', maxAge: 0 }]);
+  assert.deepEqual([many.headers.getSetCookie(), many.headers.get('location'), many.body], [['c=x+y=; Path=/'], '/x', undefined]);
+  const plain = azureReply(reply([['set-cookie', 'a=1'], ['set-cookie', 'b=2; Partitioned; Secure']]));
+  assert.deepEqual([plain.cookies, plain.headers.getSetCookie()], [[{ name: 'a', value: '1' }], ['b=2; Partitioned; Secure']]);
 });
 
 test('a program that does not listen fails clearly', () => {

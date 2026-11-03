@@ -209,6 +209,48 @@
       "path": "/empty"
     },
     {
+      "name": "cookie-one",
+      "method": "GET",
+      "path": "/cookie",
+      "headers": {
+        "cookie": "a=1; b=2"
+      }
+    },
+    {
+      "name": "cookie-repeated",
+      "method": "GET",
+      "path": "/cookie",
+      "rawHeaders": [
+        [
+          "cookie",
+          "a=1"
+        ],
+        [
+          "cookie",
+          "b=2; c=3"
+        ]
+      ],
+      "note": "two Cookie lines reach the handler as one header joined with \"; \" (RFC 6265 §5.4, #80)"
+    },
+    {
+      "name": "cookie-commas",
+      "method": "GET",
+      "path": "/cookie",
+      "headers": {
+        "cookie": "a=1,b=2, c=3; last=Wed, 21 Oct 2026"
+      },
+      "note": "cookies a proxy joined with commas are separated with \"; \"; a comma inside a value stays"
+    },
+    {
+      "name": "see-other",
+      "method": "POST",
+      "path": "/see-other",
+      "body": "x=1",
+      "headers": {
+        "content-type": "application/x-www-form-urlencoded"
+      }
+    },
+    {
       "name": "asleep",
       "method": "GET",
       "path": "/asleep/20"
