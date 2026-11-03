@@ -204,12 +204,12 @@ for (const target of targets) {
       JSON.stringify({ code: r.code, signal: r.signal, timedOut: r.timedOut, ms: r.ms, stderr: r.stderr.slice(0, 600) }));
   }
   // Code size and a compute benchmark (informational): the program's .wasm bytes
-  // and the fastest of three runs of benchWork 300,000, startup included.
+  // and the fastest of three runs of benchWork 2,000,000, startup included.
   {
     const output = join(work, { node: 'dist', wasi: 'wasi', 'wasi-node': 'wasi' }[target] ?? 'deno');
     const wasmFiles = dir => readdirSync(dir, { withFileTypes: true }).flatMap(e => e.isDirectory() ? wasmFiles(join(dir, e.name))
       : e.name.endsWith('.wasm') ? [join(dir, e.name)] : []);
-    const runs = [0, 1, 2].map(() => run(target, ['bench', '300000']));
+    const runs = [0, 1, 2].map(() => run(target, ['bench', '2000000']));
     report.targets[target].bench = { wasmBytes: wasmFiles(output).reduce((n, f) => n + statSync(f).size, 0),
       ms: Math.min(...runs.map(r => r.ms)), runsMs: runs.map(r => r.ms), ok: runs.every(r => r.code === 0), stdout: runs[0].stdout.trim() };
     console.log(`${target}: bench ${JSON.stringify(report.targets[target].bench)}`);
