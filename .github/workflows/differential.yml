@@ -192,6 +192,15 @@ jobs:
             --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest-dev" \
             --programs 0 --targets "$DIFF_TARGETS_PR" --profile dev --regressions test/differential/regressions \
             --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js"
+      # Recursion depth (issue #66): Node's default stack against native Lean's
+      # depth, the overflow diagnostic, and the limit of every other target.
+      - name: Recursion depth
+        if: matrix.profile == 'release'
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/ci/stack-depth.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --work "$RUNNER_TEMP/stack-depth" --out "$RUNNER_TEMP/stack-depth.json" --targets node,wasi,wasi-node,deno,edge-node,edge-bun,edge-sm \
+            --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js"
       - name: Summary
         if: always()
         run: |
@@ -215,6 +224,54 @@ jobs:
             ${{ runner.temp }}/difftest.log
             ${{ runner.temp }}/difftest/summary.json
             ${{ runner.temp }}/difftest/repros
+            ${{ runner.temp }}/stack-depth.json
+          retention-days: 30
+          if-no-files-found: ignore
+  # Recursion depth under Node on macOS and Windows (issue #66,
+  # scripts/ci/stack-depth.mjs): the default stack differs there (Windows
+  # commits thread stacks), so it is checked on each.
+  stack-depth:
+    needs: pack
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15, windows-2025]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: differential-packed-candidate
+          path: .work/node-candidate
+      - name: Install the candidate as a user would
+        run: |
+          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
+          echo '{"private":true}' > package.json
+          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+          node node_modules/@lasm/compiler/bin/lasm.mjs --version
+      - name: Recursion depth
+        run: |
+          node scripts/ci/stack-depth.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --work "$RUNNER_TEMP/stack-depth" --out "$RUNNER_TEMP/stack-depth.json" --targets node
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: stack-depth-${{ matrix.runner }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/stack-depth.json
           retention-days: 30
           if-no-files-found: ignore
   # Target equivalence (docs/TESTING.md#target-equivalence): the fetch template

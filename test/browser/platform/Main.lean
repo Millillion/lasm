@@ -414,7 +414,16 @@ def canvasChecks (checks : Checks) (root : Element) : IO Unit := do
 
 /-! Lean itself in the browser -/
 
+/-- Not tail recursive: one engine stack frame per element (issue #66). -/
+def sumTo : List Nat → Nat
+  | [] => 0
+  | x :: xs => x + sumTo xs
+
 def leanChecks (checks : Checks) : IO Unit := do
+  -- The browser's own Wasm stack bounds recursion: about 9,000 frames of sumTo
+  -- (FUNDAMENTAL_LIMITATIONS.md#recursion-depth).
+  check checks "lean.recursion-depth" do
+    return expectEq (sumTo (List.range 5000)) 12497500
   check checks "lean.hashmap-bignum" do
     let m : Std.HashMap String Nat := (List.range 1000).foldl (fun m i => m.insert s!"k{i}" (i * i)) {}
     let big := (2 : Nat) ^ 200
