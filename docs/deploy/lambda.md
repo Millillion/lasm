@@ -41,7 +41,11 @@ Hono on `@hono/node-server` and pure-Lean `Std.Http` are tested.
   zipped and 5.4–6.5 MB unpacked.
 - **Memory:** at least 512 MB.
 - **ALB:** a single-value target group can return only one `Set-Cookie`; enable
-  multi-value headers on the target group for more.
+  multi-value headers on the target group for more. Every other event type
+  returns each `Set-Cookie` (payload 2.0 in `cookies`).
+- **Cookies:** the Lean server sees one `Cookie` header, joined with `; `,
+  however the event carried it (payload 2.0's `cookies` win over a
+  `headers.cookie`, as `sam local start-api` sends both).
 - **Not supported:** response streaming and WebSockets; a program that does not
   listen on `$PORT` fails the init phase with a message saying so.
 

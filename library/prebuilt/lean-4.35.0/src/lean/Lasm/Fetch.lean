@@ -272,9 +272,46 @@ end Response
 
 /-! Running handlers -/
 
+/-- Whether `s` starts with a cookie name (RFC 9110 token characters) and `=`. -/
+private def startsCookiePair (s : List Char) : Bool :=
+  let name := s.takeWhile fun c => c.isAlphanum || "!#$%&'*+-.^_`|~".toList.contains c
+  !name.isEmpty && (s.drop name.length).head? == some '='
+
+/-- Cookies a proxy combined with commas (RFC 9110 §5.3), separated with
+`"; "` again: a cookie-string never holds a comma (RFC 6265 §4.2.1), so a
+comma followed by `name=` separates two cookies. A comma inside a value that
+does not start a new pair (`last=Wed, 21 Oct 2026`) is kept. -/
+def splitCookieCommas (value : String) : String :=
+  let dropSpaces := fun (l : List Char) => l.dropWhile Char.isWhitespace
+  match value.splitOn "," with
+  | [] => value
+  | first :: rest => rest.foldl (init := first) fun acc part =>
+    let next := dropSpaces part.toList
+    if startsCookiePair next then String.ofList (dropSpaces acc.toList.reverse).reverse ++ "; " ++ String.ofList next
+    else acc ++ "," ++ part
+
+/-- One `cookie` header (RFC 6265 §5.4; HTTP/2 and HTTP/3 send it in
+crumbs, RFC 9113 §8.2.3): repeated Cookie fields are joined with `"; "` in the
+first one's place, and cookies joined with commas are separated with `"; "`
+(`splitCookieCommas`). Other headers keep every field. -/
+def joinCookies (headers : Array (String × String)) : Array (String × String) :=
+  let isCookie := fun (p : String × String) => lower p.1 == "cookie"
+  let values := (headers.filter isCookie).map (splitCookieCommas ·.2) |>.filter (!·.isEmpty)
+  if values.isEmpty then headers else Id.run do
+    let mut out := #[]
+    let mut placed := false
+    for p in headers do
+      if !isCookie p then out := out.push p
+      else if !placed then
+        out := out.push (p.1, "; ".intercalate values.toList)
+        placed := true
+    return out
+
 /-- Runs the handler; an error becomes a 500 response (and a line on stderr).
-A `HEAD` request runs the handler as `GET` (its body is not sent). -/
+A `HEAD` request runs the handler as `GET` (its body is not sent). The
+handler sees one `cookie` header, as on every target (`joinCookies`). -/
 def respond (handler : Handler) (req : Request) : Async Response := do
+  let req := { req with headers := joinCookies req.headers }
   try handler (if req.method == "HEAD" then { req with method := "GET" } else req)
   catch e =>
     IO.eprintln s!"Lasm.Fetch: the handler failed for {req.method} {req.path}: {e}"

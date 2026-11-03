@@ -53,6 +53,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] (J) Review Folio's 22 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean).
 - [ ] (J) Folio's API questions: a `Lasm.Markdown` library module from Folio's renderer (so Conduit can use it); consistent `--output` for the wasi, bun and deno targets; the name "Folio"; safe mode escaping raw HTML rather than dropping it.
 - [ ] (J) Review Porter's 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
+- [ ] (J) Porter's API proposals: a shared Web Crypto module (e.g. `Lasm.Web.Crypto`), since Conduit and Porter each hand-bind SHA-256, PBKDF2, random values, ECDSA, Ed25519 and JWK export; a documented way to read Workers environment variables; documentation of what `Lasm.UI` mount does with an element's existing children; Porter's `test/Axioms.lean` totality check (no `partial`, `unsafe`, `opaque` or panicking definition reachable) shipped as a reusable Lasm tool.
 - [ ] (J) Review the propositions: Tandem's 25 propositions (milestone 1: the CRDT, the edits, the wire format, the sync server) in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean).
 
 ## Now (November 2026)
