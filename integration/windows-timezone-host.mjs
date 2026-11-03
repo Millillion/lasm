@@ -12,7 +12,7 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
 assert.equal(process.platform, 'win32');
-const [outputArg, node, version = '4.34.0', ...extra] = process.argv.slice(2);
+const [outputArg, node, version = '4.35.0', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && node && !extra.length, 'Supply NEW_OUTPUT NODE [LEAN_VERSION]');
 assert.match(version, /^\d+\.\d+\.\d+$/);
 const output = resolve(outputArg), root = fileURLToPath(new URL('..', import.meta.url));
