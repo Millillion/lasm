@@ -437,6 +437,48 @@ says whether the tests would notice a change.
 | Nightly | 03:17, 04:41 UTC | host bridge: 200 schedule-fuzzed runs per stress program on four platforms, conformance of their traces; differential: 60-minute campaigns for the release and the dev profile (two jobs), every oracle including `wasi-O0` and `deno-O0`; the nightly upstream suite (`nightly.yml`) | about 1.5 h |
 | Release | release PR (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) | as today |
 
+## Evidence levels
+
+Each platform in the README's table has an evidence level. The levels are those
+of [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md#5-rules-of-the-process),
+and CI results decide them:
+
+| Level | Meaning |
+| --- | --- |
+| L0 | Builds |
+| L1 | Smoke tests pass |
+| L2 | Differential tests and conformance suites pass |
+| L3 | A flagship app passes its outside oracle, plus fuzzing and simulation |
+
+[`scripts/evidence/platforms.json`](../scripts/evidence/platforms.json) names
+the CI jobs that back each level of each platform, as a workflow file and a
+job-name pattern. [`scripts/evidence/levels.mjs`](../scripts/evidence/levels.mjs)
+reads the GitHub API. For each requirement it takes the newest completed run
+of that workflow on `main` (or on a `release-*` branch: release PRs merge into
+`main` and are where `release-checks.yml` runs its full set) that has a
+non-skipped matching job. The requirement holds when every such job succeeded
+and the run is at most 30 days old. A platform's level is the highest one
+whose requirements, and all lower levels', hold. `null` means no CI job gives
+that kind of evidence for the platform yet.
+- A platform counts the differential results of the build it runs (node, edge
+  or wasi), since differential tests compare the compiled program.
+- Conformance is the platform's own run of an outside suite: the official
+  RealWorld API suite, through Conduit.
+
+The script rewrites only the region of README.md between the
+`evidence-levels` markers: the table's Evidence column and the legend under it.
+Every other cell stays as written. [`evidence-levels.yml`](../.github/workflows/evidence-levels.yml)
+runs it every night (08:23 UTC). When a level moved, it opens a pull request
+with that change, as `image-pins.yml` does for image digests. Its artifact
+`evidence-levels.json` lists every requirement: the run behind it, and whether
+it failed, was missing or was stale.
+
+At the first run (2026-11-03) every server platform was at L2 and the browser
+at L1: the browser has no differential tests yet (a ROADMAP item). Node was one
+requirement short of L3: the Porter nightly fuzzer had found a failing request.
+No platform but Node has fuzzing or simulation in CI yet, so no other platform
+can reach L3.
+
 ## Flaky tests
 
 A flaky test is one that both passes and fails on the same code. It costs

@@ -1,0 +1,140 @@
+{
+  "about": "Evidence levels per platform (docs/TESTING.md#evidence-levels), derived by scripts/evidence/levels.mjs from the latest completed main-branch run of each workflow (release-* branches count: release PRs merge into main and are where release-checks runs its full set). Each requirement names a workflow file and a job-name pattern; it holds when every matching job of the newest run that has one succeeded, within maxAgeDays. A platform's level is the highest level whose requirements, and all lower levels', hold. null: no CI job gives this kind of evidence for the platform yet. Differential tests compare the compiled program, so a platform counts the differential results of the build it runs (node, edge or wasi); conformance is the platform's own run of an outside suite (the official RealWorld API suite through Conduit).",
+  "maxAgeDays": 30,
+  "levels": {
+    "L0": "Builds",
+    "L1": "Smoke tests pass",
+    "L2": "Differential tests and conformance suites pass",
+    "L3": "A flagship app passes its outside oracle, plus fuzzing and simulation"
+  },
+  "platforms": [
+    {
+      "id": "node",
+      "row": "Node.js 24+",
+      "L0": [{ "workflow": "release-checks.yml", "job": "^candidate / platform / build on " }],
+      "L1": [{ "workflow": "release-checks.yml", "job": "^candidate / templates / templates " },
+             { "workflow": "release-checks.yml", "job": "^candidate / (linux|darwin|windows)-[a-z0-9]+ / installed$" }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "differential.yml", "job": "^equivalence \\(" },
+             { "workflow": "conduit.yml", "job": "^API on Node " }],
+      "L3": [{ "workflow": "conduit.yml", "job": "^(API|E2E) on Node" },
+             { "workflow": "ledger.yml", "job": "^Differential test against TigerBeetle" },
+             { "workflow": "folio-nightly.yml", "job": "^fuzz$" },
+             { "workflow": "porter-nightly.yml", "job": "^40 minutes of fuzzing$" },
+             { "workflow": "bridge-verification.yml", "job": "^(model|fuzz / stress \\(ubuntu-24\\.04, linux-x64\\))$" }]
+    },
+    {
+      "id": "bun-deno",
+      "row": "Bun / Deno",
+      "L0": [{ "workflow": "release-checks.yml", "job": "^edge / Bun and Deno " }],
+      "L1": [{ "workflow": "bun-deno-published.yml", "job": "^Published packages with Bun and Deno " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "differential.yml", "job": "^equivalence \\(" },
+             { "workflow": "conduit.yml", "job": "^API on Bun " },
+             { "workflow": "conduit-platforms.yml", "job": "^Deno 2\\." }],
+      "L3": null
+    },
+    {
+      "id": "workers",
+      "row": "Cloudflare Workers",
+      "L0": [{ "workflow": "release-checks.yml", "job": "^edge / workers$" }],
+      "L1": [{ "workflow": "release-checks.yml", "job": "^fullstack / Workers " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "differential.yml", "job": "^equivalence \\(" },
+             { "workflow": "conduit.yml", "job": "^API on Cloudflare Workers " }],
+      "L3": null
+    },
+    {
+      "id": "vercel",
+      "row": "Vercel Functions / Vercel Edge",
+      "L0": [{ "workflow": "conduit-platforms.yml", "job": "^Vercel (Functions|Edge) " }],
+      "L1": [{ "workflow": "conduit-platforms.yml", "job": "^Vercel (Functions|Edge) " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "conduit-platforms.yml", "job": "^Vercel (Functions|Edge) " }],
+      "L3": null
+    },
+    {
+      "id": "netlify",
+      "row": "Netlify Functions / Netlify Edge",
+      "L0": [{ "workflow": "conduit-platforms.yml", "job": "^Netlify (Functions|Edge) " }],
+      "L1": [{ "workflow": "conduit-platforms.yml", "job": "^Netlify (Functions|Edge) " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "conduit-platforms.yml", "job": "^Netlify (Functions|Edge) " }],
+      "L3": null
+    },
+    {
+      "id": "deno-deploy",
+      "row": "Deno Deploy",
+      "L0": [{ "workflow": "conduit-platforms.yml", "job": "^Deno Deploy " }],
+      "L1": [{ "workflow": "conduit-platforms.yml", "job": "^Deno Deploy " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "conduit-platforms.yml", "job": "^Deno Deploy " }],
+      "L3": null
+    },
+    {
+      "id": "supabase",
+      "row": "Supabase Edge Functions",
+      "L0": [{ "workflow": "conduit-platforms.yml", "job": "^Supabase Edge Functions " }],
+      "L1": [{ "workflow": "conduit-platforms.yml", "job": "^Supabase Edge Functions " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "conduit-platforms.yml", "job": "^Supabase Edge Functions " }],
+      "L3": null
+    },
+    {
+      "id": "lambda",
+      "row": "AWS Lambda",
+      "L0": [{ "workflow": "release-checks.yml", "job": "^candidate / platform / lambda " }],
+      "L1": [{ "workflow": "release-checks.yml", "job": "^candidate / platform / lambda " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "conduit-platforms.yml", "job": "^AWS Lambda " }],
+      "L3": null
+    },
+    {
+      "id": "azure",
+      "row": "Azure Functions",
+      "L0": [{ "workflow": "conduit-platforms.yml", "job": "^Azure Functions " }],
+      "L1": [{ "workflow": "conduit-platforms.yml", "job": "^Azure Functions " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "conduit-platforms.yml", "job": "^Azure Functions " }],
+      "L3": null
+    },
+    {
+      "id": "gcf",
+      "row": "Google Cloud Functions",
+      "L0": [{ "workflow": "conduit-platforms.yml", "job": "^Google Cloud Functions " }],
+      "L1": [{ "workflow": "conduit-platforms.yml", "job": "^Google Cloud Functions " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "conduit-platforms.yml", "job": "^Google Cloud Functions " }],
+      "L3": null
+    },
+    {
+      "id": "fastly",
+      "row": "Fastly Compute",
+      "L0": [{ "workflow": "release-checks.yml", "job": "^fullstack / Fastly " }],
+      "L1": [{ "workflow": "release-checks.yml", "job": "^fullstack / Fastly " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "conduit-platforms.yml", "job": "^Fastly Compute " }],
+      "L3": null
+    },
+    {
+      "id": "wasi",
+      "row": "WASI / wasi-http / Spin",
+      "L0": [{ "workflow": "release-checks.yml", "job": "^wasi / wasi$" }],
+      "L1": [{ "workflow": "release-checks.yml", "job": "^wasi / wasi$" },
+             { "workflow": "folio.yml", "job": "^The folio command on WASI " }],
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
+             { "workflow": "differential.yml", "job": "^equivalence \\(" },
+             { "workflow": "conduit-platforms.yml", "job": "^(wasi-http|Spin) " }],
+      "L3": null
+    },
+    {
+      "id": "browser",
+      "row": "Browsers",
+      "L0": [{ "workflow": "release-checks.yml", "job": "^browser / build$" }],
+      "L1": [{ "workflow": "release-checks.yml", "job": "^browser / (chromium|firefox|webkit) on " },
+             { "workflow": "release-checks.yml", "job": "^ui / ui$" }],
+      "L2": null,
+      "L3": null
+    }
+  ]
+}

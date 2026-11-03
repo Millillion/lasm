@@ -1,0 +1,71 @@
+[
+ {
+  "note": "Porter nightly run 41634567003 (seed 1754333198): an invalid scope with a ~16 KB state; the invalid_scope redirect carried the state back and the Location header overflowed Node's 16 KiB limit (\"Parse Error: Header overflow\"). The body is filled to the 16 KiB Porter reads.",
+  "request": {
+   "method": "POST",
+   "path": "/authorize",
+   "headers": {
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "authorization": "Bearer d?V6%d8~??#\"?k m|=%c3`?wH)=%9c^l:to"
+   },
+   "body": [
+    "client_id=basic-es256&redirect_uri=http://127.0.0.1:59999/cb&response_type=code&scope=<zq41277140>&state=",
+    [
+     "x",
+     16279
+    ]
+   ]
+  }
+ },
+ {
+  "note": "The same through prompt=none (login_required redirect).",
+  "request": {
+   "method": "POST",
+   "path": "/authorize",
+   "headers": {
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+   },
+   "body": [
+    "client_id=basic-es256&redirect_uri=http://127.0.0.1:59999/cb&response_type=code&scope=openid&prompt=none&code_challenge=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&code_challenge_method=S256&state=",
+    [
+     "x",
+     16187
+    ]
+   ]
+  }
+ },
+ {
+  "note": "The same through a percent-encoded state (each escape decodes to one byte and is re-encoded as three).",
+  "request": {
+   "method": "POST",
+   "path": "/authorize",
+   "headers": {
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+   },
+   "body": [
+    "client_id=basic-es256&redirect_uri=http://127.0.0.1:59999/cb&response_type=code&scope=<zq41277140>&state=",
+    [
+     "%22",
+     5426
+    ]
+   ]
+  }
+ },
+ {
+  "note": "The same through the confirmed logout redirect.",
+  "request": {
+   "method": "POST",
+   "path": "/logout",
+   "headers": {
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+   },
+   "body": [
+    "client_id=basic-es256&post_logout_redirect_uri=http://127.0.0.1:59999/bye&confirm=yes&state=",
+    [
+     "x",
+     16292
+    ]
+   ]
+  }
+ }
+]
