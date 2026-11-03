@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { edgeArchives, edgeExtras } from '../src/edge/edge-runtime.mjs';
 import { applicationNotices, leanRuntimeChanges, runtimeLinksGmp } from '../src/notices.mjs';
 
 const read = path => readFileSync(new URL(path, import.meta.url), 'utf8');
@@ -112,11 +118,41 @@ test('Apache-2.0 4(b): Node outputs list the node-threads patch; outputs on the 
   for (const [, name] of build.matchAll(/name: '([a-z-]+)', file: 'lean-/g)) assert.ok(leanRuntimeChanges[name], name);
 });
 
-test('the edge runtime archive carries the Lasm MIT text and its own list of Lean changes', () => {
-  const script = read('../scripts/edge/package-edge-runtime.mjs');
-  assert.match(script, /=== Lasm ===\n\$\{noticeText\('LASM-LICENSE\.txt'\)\}/);
-  assert.match(script, /=== Changes to Lean \(Apache-2\.0 section 4\(b\)\) ===/);
-  assert.match(script, /edgeLeanPatches\(Object\.keys\(nodeManifest\.patches\)\)/);
+// Behavioural (docs/TESTING.md#test-quality-audit): the packager runs on a
+// stand-in edge runtime (byte-sized libraries with their recorded digests) and
+// its THIRD_PARTY_NOTICES.txt is read back.
+test('the edge runtime archive carries the Lasm MIT text and its own list of Lean changes', t => {
+  const base = mkdtempSync(join(tmpdir(), 'lasm-edge-notices-'));
+  t.after(() => rmSync(base, { recursive: true, force: true }));
+  const edge = join(base, 'edge'), node = join(base, 'node'), out = join(base, 'out');
+  const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+  mkdirSync(join(edge, 'lib'), { recursive: true });
+  mkdirSync(join(edge, 'sysroot/lib/wasm32-emscripten'), { recursive: true });
+  mkdirSync(node);
+  const files = {};
+  for (const name of [...edgeArchives, ...edgeExtras]) { writeFileSync(join(edge, 'lib', name), name); files[name] = digest(name); }
+  writeFileSync(join(edge, 'sysroot/lib/wasm32-emscripten/libc.a'), 'libc');
+  writeFileSync(join(edge, 'libraries.json'), JSON.stringify({ files, baseRuntimeManifestSha256: 'e'.repeat(64),
+    sysroot: { directory: 'wasm32-emscripten', files: { 'libc.a': digest('libc') } } }));
+  writeFileSync(join(node, 'target.json'), JSON.stringify({ name: 'lean-4.35.0-wasm64', lean: '4.35.0', leanCommit: 'f'.repeat(40),
+    emscripten: '6.0.9', patches: { 'wasm-build': '0'.repeat(64), 'node-threads': '0'.repeat(64), 'host-platform': '0'.repeat(64) } }));
+  writeFileSync(join(node, 'THIRD_PARTY_NOTICES.txt'), '=== The Node runtime notices ===\n');
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('../scripts/edge/package-edge-runtime.mjs', import.meta.url)), edge, node, out],
+    { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  const text = readFileSync(join(out, 'lean-4.35.0-wasm64-edge/THIRD_PARTY_NOTICES.txt'), 'utf8');
+  assert.ok(text.includes('\n=== Lasm ===\n' + read('../src/notices/LASM-LICENSE.txt') + '\n=== Changes to Lean (Apache-2.0 section 4(b)) ===\n'));
+  // The Node runtime's shared patches plus 'edge'; never node-threads.
+  const listed = [...text.matchAll(/^  - ([a-z-]+): /gm)].map(match => match[1]);
+  assert.deepEqual(listed, ['wasm-build', 'host-platform', 'edge']);
+  assert.ok(text.includes(`  - edge: ${leanRuntimeChanges.edge[0]} (${leanRuntimeChanges.edge[1]})`));
+  assert.ok(text.endsWith('\n=== The Node runtime notices ===\n'), 'the Node runtime notices follow');
+  // A patch with no notice text is refused rather than shipped unexplained.
+  writeFileSync(join(edge, 'build-inputs.json'), JSON.stringify({ patches: { 'wasm-build': '0', 'unexplained-patch': '0' } }));
+  const refused = spawnSync(process.execPath, [fileURLToPath(new URL('../scripts/edge/package-edge-runtime.mjs', import.meta.url)), edge, node, join(base, 'refused')],
+    { encoding: 'utf8' });
+  assert.notEqual(refused.status, 0);
+  assert.match(refused.stderr, /No notice text for Lean patch unexplained-patch/);
 });
 
 test('the Wasmtime licence copies are identical (component template, WIT files, notices)', () => {

@@ -49,11 +49,33 @@ test('regressions: passed in the baseline, not tonight; resource stops and missi
   assert.match(markdown(report), /2 regressions, 2 missing results/);
 });
 
+// Triggers and concurrency are workflow configuration, which only GitHub runs:
+// they stay a lint (docs/TESTING.md#test-quality-audit). "Never a release
+// dependency" is checked over every workflow a release runs, transitively.
+const workflowText = name => readFileSync(new URL(`../.github/workflows/${name}`, import.meta.url), 'utf8');
+/** release.yml, release-checks.yml and every workflow they call, transitively. */
+function releaseWorkflows() {
+  const seen = new Set(), pending = ['release.yml', 'release-checks.yml'];
+  while (pending.length) {
+    const name = pending.pop();
+    if (seen.has(name)) continue;
+    seen.add(name);
+    for (const [, called] of workflowText(name).matchAll(/uses: \.\/\.github\/workflows\/([a-z0-9-]+\.yml)/g)) pending.push(called);
+  }
+  return [...seen];
+}
+
 test('nightly.yml: scheduled, serialized without cancellation, behind release checks, never a release dependency', () => {
-  const workflow = readFileSync(new URL('../.github/workflows/nightly.yml', import.meta.url), 'utf8');
-  assert.match(workflow, /schedule:/);
-  assert.match(workflow, /group: nightly\n\s+cancel-in-progress: false/);
-  for (const file of ['release.yml', 'release-checks.yml']) assert.doesNotMatch(readFileSync(new URL(`../.github/workflows/${file}`, import.meta.url), 'utf8'), /nightly/);
+  const workflow = workflowText('nightly.yml');
+  assert.match(workflow, /\non:\n  schedule:\n    - cron: /);
+  assert.match(workflow, /\nconcurrency:\n  group: nightly\n  cancel-in-progress: false\n/);
+  const release = releaseWorkflows();
+  assert.ok(release.length > 10 && release.includes('unit.yml') && release.includes('workers.yml'), release.join());
+  for (const name of release) {
+    assert.notEqual(name, 'nightly.yml');
+    // Comments may mention the nightly; no step or job may call or dispatch it.
+    assert.doesNotMatch(workflowText(name).replace(/^\s*#.*$/gm, ''), /nightly\.yml|workflow run nightly|workflows\/nightly/, name);
+  }
 });
 
 test('draft cleanup: only nightly drafts, older than 7 days, never the newest, a running or a referenced one', () => {
