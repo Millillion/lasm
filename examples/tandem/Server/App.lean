@@ -83,12 +83,12 @@ def handleSync (env : Env) (doc : String) (body : String) : Async String := do
 /-- Long-poll: the log from `cursor` as soon as it is longer, or nothing new. -/
 def poll (env : Env) (doc : String) (cursor : Nat) : Async String := do
   let rd := reads env.db doc
-  let steps := env.pollSeconds * 5
-  let mut i := 0
-  while i < steps do
+  -- Bounded by the clock, not by a number of steps: under load each check
+  -- takes longer, and the poll must still answer in time.
+  let deadline := (← IO.monoMsNow) + env.pollSeconds * 1000
+  while (← IO.monoMsNow) < deadline do
     if (← rd.count) > cursor then break
     Std.Async.sleep 200
-    i := i + 1
   let (_, reply) ← Sync.sync rd { cursor, ops := [] }
   return Wire.encodeReply reply
 
