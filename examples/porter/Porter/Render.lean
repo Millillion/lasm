@@ -54,11 +54,12 @@ def style : String :=
   "input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}" ++
   "button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}" ++
   "button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}" ++
-  "p.note{color:#555;font-size:.9rem}"
+  "p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}"
 
 def layout (title : String) (body : String) : String :=
   "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">" ++
   "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" ++
+  "<link rel=\"icon\" href=\"data:,\">" ++
   "<title>" ++ html title ++ "</title><style>" ++ style ++ "</style></head><body>" ++ body ++ "</body></html>"
 
 def scopeText : String → String
@@ -71,25 +72,41 @@ def scopeText : String → String
 def hidden (name value : String) : String :=
   "<input type=\"hidden\" name=\"" ++ html name ++ "\" value=\"" ++ html value ++ "\">"
 
+/-- The page data the browser app (`Frontend/Ui.lean`) mounts with. -/
+def loginFlags (id client : String) (failed : Bool) : String :=
+  jsonObject [("kind", .str "login"), ("interaction", .str id), ("client", .str client), ("failed", .bool failed)]
+
+def consentFlags (id client : String) (scopes : List String) (user : String) : String :=
+  jsonObject [("kind", .str "consent"), ("interaction", .str id), ("client", .str client), ("user", .str user),
+    ("scopes", .raw ("[" ++ ",".intercalate (scopes.map fun s =>
+      jsonObject [("scope", .str s), ("text", .str (scopeText s))]) ++ "]"))]
+
+/-- A page of the browser app (`/ui/app.js`, a `Lasm.UI` app mounted with
+`flags`), with the same page as a plain form for browsers without scripts. -/
+def app (flags : String) (noscript : String) (title : String) : String :=
+  layout title ("<noscript>" ++ noscript ++ "</noscript>" ++
+    "<div data-lasm-app data-lasm-flags=\"" ++ html flags ++ "\"></div>" ++
+    "<script type=\"module\" src=\"/ui/app.js\"></script>")
+
 def Page.toHtml : Page → String
   | .home => layout "Porter" (
       "<h1>Porter</h1><p>An OpenID Connect provider written in Lean and compiled to WebAssembly by Lasm. " ++
       "Applications sign you in here; there is nothing to do on this page.</p>" ++
       "<p class=\"note\">Discovery: <a href=\"/.well-known/openid-configuration\">/.well-known/openid-configuration</a></p>")
-  | .login id client failed => layout "Sign in" (
+  | .login id client failed => app (loginFlags id client failed) (
       "<h1>Sign in</h1><p>to continue to <strong>" ++ html client ++ "</strong></p>" ++
       (if failed then "<p class=\"error\" role=\"alert\">The username or password is incorrect.</p>" else "") ++
       "<form method=\"post\" action=\"/interaction/" ++ html (percentEncode id) ++ "/login\">" ++
       "<label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label>" ++
       "<label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label>" ++
-      "<button type=\"submit\">Sign in</button></form>")
-  | .consent id client scopes user => layout "Allow access" (
+      "<button type=\"submit\">Sign in</button></form>") "Sign in"
+  | .consent id client scopes user => app (consentFlags id client scopes user) (
       "<h1>Allow " ++ html client ++ "?</h1><p>Signed in as <strong>" ++ html user ++ "</strong>. " ++
       html client ++ " asks to:</p><ul>" ++
       String.join (scopes.map fun s => "<li>" ++ html (scopeText s) ++ "</li>") ++ "</ul>" ++
       "<form method=\"post\" action=\"/interaction/" ++ html (percentEncode id) ++ "/consent\">" ++
       "<button type=\"submit\" name=\"decision\" value=\"allow\">Allow</button>" ++
-      "<button type=\"submit\" name=\"decision\" value=\"deny\" class=\"secondary\">Deny</button></form>")
+      "<button type=\"submit\" name=\"decision\" value=\"deny\" class=\"secondary\">Deny</button></form>") "Allow access"
   | .logout cid uri state => layout "Sign out" (
       "<h1>Sign out?</h1><p>You will be signed out of Porter.</p>" ++
       "<form method=\"post\" action=\"/logout\">" ++ hidden "confirm" "yes" ++
@@ -107,11 +124,13 @@ def cookieHeader (secure : Bool) (c : SetCookie) : String :=
   c.name ++ "=" ++ c.value ++ "; Path=" ++ c.path ++ "; Max-Age=" ++ toString c.maxAge ++
   "; HttpOnly; SameSite=Lax" ++ (if secure then "; Secure" else "")
 
-/-- Headers for HTML: no framing (clickjacking on the consent page), no
-scripts, no referrer (the interaction id is in the URL), not cached. -/
+/-- Headers for HTML: no framing (clickjacking on the consent page), only
+Porter's own script and WebAssembly (the browser app), no referrer (the
+interaction id is in the URL), not cached. -/
 def htmlHeaders : List (String × String) :=
   [("content-type", "text/html; charset=utf-8"),
-   ("content-security-policy", "default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'"),
+   ("content-security-policy", "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; " ++
+     "style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'"),
    ("x-frame-options", "DENY"), ("referrer-policy", "no-referrer"), ("x-content-type-options", "nosniff"),
    ("cache-control", "no-store")]
 
@@ -150,7 +169,12 @@ def Body.wire (cfg : Config) : Body → List (String × String) × String
 
 /-- The reply on the wire. -/
 def Reply.render (cfg : Config) (r : Reply) : Wire :=
-  let (hs, body) := r.body.wire cfg
+  -- A redirect says so in a short text body too (RFC 9110 §15.4.4); an
+  -- empty one never reaches the client through Netlify's function
+  -- bootstrap (issue #82).
+  let (hs, body) := match r.body, r.location with
+    | .empty, some _ => ([("content-type", "text/plain; charset=utf-8")], "See Other\n")
+    | b, _ => b.wire cfg
   let cors := if r.status = 204 then corsHeaders ++ [("access-control-max-age", "600")] else []
   { status := r.status, body,
     headers := hs ++ cors ++ ((r.location.map fun l => [("location", l.render cfg.issuer)]).getD []) ++

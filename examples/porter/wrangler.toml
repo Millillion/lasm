@@ -1,0 +1,31 @@
+# Cloudflare Workers: npm run build:workers writes workers/ (the server);
+# npx wrangler dev serves it locally with a local D1 database, and
+# npx wrangler deploy deploys it to your account (Lasm never runs wrangler).
+name = "porter"
+main = "workers/worker.mjs"
+compatibility_date = "2026-10-01"
+
+# The database: codes, tokens, sessions, consents and the signing keys.
+# wrangler dev keeps a local copy under .wrangler/ with any id; to deploy,
+# create one (npx wrangler d1 create porter) and put its id here. Porter
+# creates its tables on first use.
+[[d1_databases]]
+binding = "DB"
+database_name = "porter"
+database_id = "00000000-0000-4000-8000-000000000000"
+
+# ISSUER (your Worker's origin) and PORTER_CONFIG (the clients and users, see
+# Server/Config.lean) as variables; without them Porter runs the demo.
+# [vars]
+# ISSUER = "https://porter.example.workers.dev"
+
+# The browser app's files, served by Workers before the Worker runs (the
+# Worker also embeds them, as every target does).
+[assets]
+directory = "./dist/public"
+
+# Lasm's program.wasm is imported as a precompiled module.
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false

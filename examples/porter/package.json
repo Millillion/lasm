@@ -5,19 +5,34 @@
   "type": "module",
   "description": "Porter, an OpenID Connect provider in Lean: authorization code flow with PKCE, signed ID tokens, refresh-token rotation, compiled to WebAssembly by Lasm, with proofs",
   "scripts": {
-    "build": "lasm build ServerNode.lean --output dist/server",
+    "build": "npm run build:client && lasm build ServerNode.lean --output dist/server",
     "start": "node dist/server/main.mjs",
     "test": "node test/oracles.mjs",
     "test:attacks": "node test/attacks.mjs",
     "test:fuzz": "node test/fuzz.mjs",
+    "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
+    "start:bun": "bun bun/main.mjs",
+    "build:deno": "npm run build:client && lasm build ServerNode.lean --target deno --output dist/server",
+    "start:deno": "deno run -A deno/main.mjs",
+    "build:workers": "npm run build:client && lasm build ServerWorkers.lean --target workers --output dist/server",
+    "build:docker": "npm run build && docker build -t porter .",
+    "build:lambda": "npm run build && lasm package dist/server --target lambda",
+    "build:lambda-image": "npm run build && docker build -f deploy/lambda-image/Dockerfile -t porter-lambda:local .",
+    "build:vercel": "npm run build && lasm package dist/server --target vercel",
+    "build:netlify": "npm run build && lasm package dist/server --target netlify",
+    "build:azure": "npm run build && node deploy/package-hosted.mjs azure",
+    "build:gcf": "npm run build && node deploy/package-hosted.mjs gcf",
     "proofs": "node test/proofs.mjs",
-    "proofs:paranoid": "node test/paranoid.mjs"
+    "proofs:paranoid": "node test/paranoid.mjs",
+    "build:client": "lasm build Client.lean --target browser --output dist/public/ui",
+    "test:e2e": "playwright test -c test/playwright.config.mjs"
   },
   "engines": {
     "node": ">=24"
   },
   "devDependencies": {
     "@lasm/cli": "0.3.6",
+    "@playwright/test": "1.63.0",
     "jose": "6.2.12",
     "oauth4webapi": "3.8.8",
     "openid-client": "6.8.8"

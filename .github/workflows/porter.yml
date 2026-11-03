@@ -13,7 +13,11 @@ name: Porter
 #   validate everything Porter issues, every signature included), then the
 #   adversarial suite (RFC 6749/6819/9700, OpenID Connect Core);
 # - fuzz: the endpoint fuzzer for three minutes against the Node build
-#   (seeded; the seed is printed first; failing requests uploaded).
+#   (seeded; the seed is printed first; failing requests uploaded);
+# - e2e: the sign-in and consent pages (the Lasm.UI app) in Chromium,
+#   Firefox and WebKit (Playwright, no retries): sign in, consent, deny, a
+#   wrong password, the pages without JavaScript, no script error or CSP
+#   violation; the code the browser brings back is redeemed with oauth4webapi.
 # Local runtimes only: no account, nothing deployed, CI=1. Free runners only.
 on:
   workflow_dispatch:
@@ -126,3 +130,48 @@ jobs:
           path: examples/porter/test-results/
           retention-days: 14
           if-no-files-found: ignore
+  e2e:
+    name: The sign-in pages on Node, ${{ matrix.browser }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: npm ci
+        working-directory: examples/porter
+        run: npm ci --no-audit --no-fund
+      - name: npm run build (the browser app, then the Node server embedding it)
+        working-directory: examples/porter
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+      - name: The pinned Playwright's ${{ matrix.browser }}, with its system packages
+        timeout-minutes: 30
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
+          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
+      - name: The end-to-end tests
+        working-directory: examples/porter
+        env:
+          BROWSERS: ${{ matrix.browser }}
+          E2E_NAME: node-${{ matrix.browser }}
+        run: npm run test:e2e -- --retries=0
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: porter-e2e-${{ matrix.browser }}
+          path: examples/porter/test-results/
+          retention-days: 14
+          if-no-files-found: warn

@@ -11,6 +11,7 @@ the same random values), so every committed request saw the database exactly
 as it was when it committed.
 -/
 import Lasm.Fetch
+import Lasm.Fetch.Assets
 import Lasm.JS
 import Porter.Render
 import Server.Sql
@@ -50,7 +51,10 @@ def keys (db : Sql) : Async (Crypto.Key × Crypto.Key) := do
 /-- Reads the configuration (`PORTER_CONFIG`, else the demo), hashes the
 client secrets, and loads the keys. `issuer`: `ISSUER`, else the file's,
 else `http://localhost:<PORT>`. -/
-def setup (db : Sql) (getEnv : String → IO (Option String)) : Async Env := do
+def setup (db : Sql) (getEnv' : String → IO (Option String)) : Async Env := do
+  -- An empty variable counts as unset (a template may declare it empty).
+  let getEnv (k : String) : IO (Option String) := do
+    return (← getEnv' k).filter (· != "")
   let (fileIssuer, specs, users) ← match ← getEnv "PORTER_CONFIG" with
     | some text => IO.ofExcept ((Config.parse text).mapError (s!"PORTER_CONFIG: {·}"))
     | none => pure (none, Config.demoClients, Config.demoUsers)
@@ -124,12 +128,24 @@ def serveRequest (env : Env) (writers : Option Std.Semaphore) (req : Lasm.Fetch.
   return toResponse (reply.render env.cfg) head
 
 /-- Serves Porter on a SQL database (whose binding module created the
-tables). `serializeWriters`: off on Cloudflare Workers, which does not let
+tables), with the browser app's files (`assets`: `embed_dir! "dist/public"`
+in the entry file, served under `/ui/`). The configuration and the keys are read on the first request (on
+Workers, the environment and the database exist only during a request), then
+kept. `getEnv`: the environment variables (Workers passes them with each
+request). `serializeWriters`: off on Cloudflare Workers, which does not let
 one request wait on another's promise; the version check alone keeps commits
 consistent there. -/
-def run (db : Sql) (serializeWriters := true) : IO Unit := do
-  let env ← (setup db fun k => IO.getEnv k).block
+def run (db : Sql) (assets : Lasm.Fetch.Assets) (getEnv : String → IO (Option String) := fun k => IO.getEnv k)
+    (serializeWriters := true) : IO Unit := do
+  let ready ← IO.mkRef (none : Option Env)
   let writers ← if serializeWriters then some <$> Std.Semaphore.new 1 else pure none
-  Lasm.Fetch.serve (serveRequest env writers)
+  Lasm.Fetch.serve <| assets.wrap fun req => do
+    let env ← match ← ready.get with
+      | some env => pure env
+      | none => do
+        let env ← setup db getEnv
+        ready.set (some env)
+        pure env
+    serveRequest env writers req
 
 end Porter.Server

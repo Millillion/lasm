@@ -15,6 +15,7 @@ npm start            # http://localhost:3000 (PORT, HOST, ISSUER, DATABASE_PATH,
 npm test             # openid-client and oauth4webapi sign in, refresh and log out against a fresh server
 npm run test:attacks # the adversarial suite
 npm run test:fuzz    # the endpoint fuzzer (--seconds N, --seed N)
+npx playwright install chromium && npm run test:e2e   # the sign-in pages in a browser (BROWSERS=chromium,firefox,webkit)
 npm run proofs       # check every theorem
 ```
 
@@ -55,6 +56,58 @@ replays the proofs through Lean's kernel and the external checkers Lean ships.
 | Every token's claims match the session and the client | `id_token_for_code`, `id_token_for_refresh`, `code_requires_signin`, `code_requires_consent`, `userinfo_claims` |
 | No endpoint reveals secrets in errors | `errors_reveal_nothing`, `error_wire_fixed`, `failed_signin_uniform` |
 | Request handlers are total | `replies_well_formed`, and the totality check of [`test/Axioms.lean`](test/Axioms.lean) |
+
+## Platforms
+
+The same Lean runs on each platform below; only the SQLite binding module differs
+([`Server/NodeSqlite.lean`](Server/NodeSqlite.lean), [`Server/BunSqlite.lean`](Server/BunSqlite.lean),
+[`Server/D1.lean`](Server/D1.lean)), and every one signs with its own Web Crypto. Each row is a
+CI job ([porter.yml](../../.github/workflows/porter.yml) for Node,
+[porter-platforms.yml](../../.github/workflows/porter-platforms.yml) for the rest) that builds
+Porter, serves it with the platform's own local tooling ([`test/platforms.mjs`](test/platforms.mjs))
+and runs the oracle tests and the adversarial suite against it (and a minute of fuzzing where
+Porter's own server takes the HTTP requests). No account, nothing deployed.
+
+| Platform | Build | Served in CI by | Store |
+| --- | --- | --- | --- |
+| Node 24 and 26 | `npm run build` | `node dist/server/main.mjs` | `node:sqlite`, a file |
+| Bun 1.4.4 | `npm run build:bun` | `bun bun/main.mjs` | `bun:sqlite`, a file |
+| Deno 2.9.6 | `npm run build:deno` | `deno run -A deno/main.mjs` | `node:sqlite` in Deno, a file |
+| Cloudflare Workers | `npm run build:workers` | `wrangler dev` | D1 (local), whose `batch` is one transaction |
+| Docker | `npm run build:docker` | `docker run --read-only` | `node:sqlite` on the `/data` volume |
+| AWS Lambda (.zip and container image) | `npm run build:lambda`, `build:lambda-image` | `sam local start-api` | `node:sqlite` in `/tmp`, per instance |
+| Vercel Functions | `vercel build` | Vercel's Node launcher | `node:sqlite` in `/tmp`, per instance |
+| Netlify Functions | `netlify build` | Netlify's bootstrap in the Lambda image | `node:sqlite` in `/tmp`, per instance |
+| Azure Functions | `npm run build:azure` | `func start` | `node:sqlite` in the temporary directory, per instance |
+| Google Cloud Functions | `npm run build:gcf` | Functions Framework | `node:sqlite` in the temporary directory, per instance |
+
+Each platform takes `ISSUER` (the provider's origin) and `PORTER_CONFIG` (the clients and
+users) its own way: the environment, `docker run -e`, the Lambda template's variables, or the
+Worker's variables (`wrangler.toml` `[vars]`, `.dev.vars`). On the function platforms the
+database, and the signing keys in it, live as long as the function's instance: enough to run
+and test Porter there, but a real deployment needs a durable database (a container with a
+volume, or Workers with D1), or every instance would sign with its own keys.
+
+**Not offered: Fastly Compute and WASI.** Lasm's WASI targets have no Web Crypto, and Porter
+does not implement ECDSA or Ed25519 in Lean (docs/DECISIONS.md).
+
+## The sign-in and consent pages
+
+The pages a person sees ([`Frontend/Ui.lean`](Frontend/Ui.lean), started by
+[`Client.lean`](Client.lean)) are a `Lasm.UI` app: the server sends each page
+as a plain HTML form inside `<noscript>`, with the page's data as the app's
+flags, and the app mounts beside it and renders the same form, with a
+show-password switch and a busy label once pressed. The form still submits
+natively, so the server's answers, and every proposition about them, are the
+same with or without JavaScript. The pages allow only Porter's own script and
+WebAssembly (`script-src 'self' 'wasm-unsafe-eval'`) and cannot be framed.
+
+The end-to-end tests ([`test/e2e`](test/e2e), Playwright 1.63.0) run in
+Chromium, Firefox and WebKit in CI, with no retries: sign in and consent
+through the app (oauth4webapi then redeems the code the browser brought back
+and validates the ID token), a wrong password, denial (`access_denied`),
+the same flow with JavaScript disabled, and no script error or Content
+Security Policy violation on the way.
 
 ## The oracles
 
@@ -106,7 +159,8 @@ within a time budget, JSON errors must have only a known `error` and
 `error_description`, no random marker may come back unescaped in HTML, and
 every redirect must go to Porter itself or a registered URI; afterwards a full
 sign-in must still work. On pull requests it runs for three minutes (about
-150,000 requests); the seed is printed first and `--seed` replays a run.
+150,000 requests), and nightly for forty ([porter-nightly.yml](../../.github/workflows/porter-nightly.yml),
+when Porter changed that day); the seed is printed first and `--seed` replays a run.
 
 ## Concurrency
 
@@ -147,5 +201,7 @@ ID tokens 10 minutes, refresh tokens 30 days (rotated on every use), sessions
 | [`Porter/Reply.lean`](Porter/Reply.lean), [`Porter/Render.lean`](Porter/Render.lean) | Replies as data, and on the wire (headers, pages, JSON) |
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The model of the database and the proofs |
-| [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | Web Crypto, the SQL, the configuration, the HTTP glue and the `node:sqlite` binding; the Node program |
-| [`test/`](test) | The oracle tests, the adversarial suite, the fuzzer, the proof checks |
+| [`Frontend/Ui.lean`](Frontend/Ui.lean), [`Client.lean`](Client.lean) | The sign-in and consent pages' browser app (Lasm.UI) |
+| [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | Web Crypto, the SQL, the configuration, the HTTP glue and one SQLite binding per target; the Node program |
+| [`ServerBun.lean`](ServerBun.lean), [`ServerWorkers.lean`](ServerWorkers.lean), [`deploy/`](deploy), `Dockerfile`, `wrangler.toml`, `vercel.json`, `netlify.toml` | The other platforms |
+| [`test/`](test) | The oracle tests, the adversarial suite, the fuzzer, the end-to-end tests, the proof checks |
