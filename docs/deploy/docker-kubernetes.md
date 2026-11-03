@@ -36,7 +36,7 @@ the zone files, and prints once on stderr
 For local time zones, add `RUN apk add --no-cache tzdata` to the Alpine stage.
 
 **Tested in CI** (`.github/workflows/serverless.yml`, x64 and arm64):
-`node:24.22.1-alpine` and `node:26.12.1-alpine`, read-only with 512 MB, every
+`node:24.22.2-alpine` and `node:26.13.0-alpine`, read-only with 512 MB, every
 server template (HTTP checks, `docker stop` exit code 0; std-http on plain
 Alpine, where the UTC fallback warning must appear, and again with `tzdata`,
 where it must not), the probe program

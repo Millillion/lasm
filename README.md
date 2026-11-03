@@ -55,7 +55,7 @@ files, except on WASI); the rest of Lean works.
 | Install | `npm install -D @lasm/cli` (bin: `lasm`), or no install: `npx @lasm/cli …`; new project: `npm create @lasm@latest` |
 | Lean | exactly **4.35.0** (`lean-toolchain`: `leanprover/lean4:v4.35.0`); Lasm installs it, and you need no elan to build |
 | Develop on | Linux x64/arm64 (glibc 2.34+), macOS x64/arm64, Windows x64 |
-| Compiler runs on | Node ≥ 24 (tested 24.0.0, 24.22.1, 26.12.1); Bun 1.4.4 and Deno 2.9.6 (tested, as the only runtime) |
+| Compiler runs on | Node ≥ 24 (tested 24.0.0, 24.22.2, 26.13.0); Bun 1.4.4 and Deno 2.9.6 (tested, as the only runtime) |
 | Output | `dist/` with `program.wasm` + a JS launcher (Node); or a platform package (`--target …`) |
 | Node apps run on | Node ≥ 24, Linux x64/arm64 (glibc 2.28+ or musl) from any build machine, plus the build machine's own OS; ≥ 512 MB memory |
 | JS/npm interop | `import Lasm.JS`; one `@[js "pkg" "export"]` line per function you call; no premade bindings ([guide](docs/JS_BINDINGS.md)) |
@@ -430,7 +430,7 @@ npx lasm build Main.lean --target lambda    # dist/ and an AWS Lambda zip
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help`, `npx lasm init --help` | Show usage; `-h` is an alias. |
-| Version | `npx lasm --version` | Print `lasm 0.3.9 (@lasm/cli; Lean 4.35.0; Node 26.12.1; linux-x64)`; `-v` is an alias. |
+| Version | `npx lasm --version` | Print `lasm 0.3.9 (@lasm/cli; Lean 4.35.0; Node 26.13.0; linux-x64)`; `-v` is an alias. |
 | New project | `npm create @lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory (`Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `README.md`, `.gitignore`, and for servers a `Dockerfile` and `.dockerignore`). Templates: see [Start here](#start-here). `--deploy` (repeatable) adds a platform's files and `npm run build:<target>`: `lambda` (`Dockerfile.lambda`, a container image), `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf`; `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` (templates `hono`, `fetch`, `fullstack`), `supabase-edge` (`hono`); `fastly`, `wasi-http`, `spin` (`fetch`, `fullstack`), `wasi` (`fetch`, `plain`). The `fetch` and `fullstack` templates and their targets are 0.3.0. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` also works. |
 | Package an existing build | `npx lasm package --target lambda` | Package a built server (default `dist/`) for a function platform without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output. Checks the platform's size limit. Refuses a dev build unless `--allow-dev`. For a browser build, `npx lasm package dist --target browser` checks every file against `lasm-manifest.json` and writes `_headers`. |
 | Editor support (0.3.0) | `npx lasm editor` | Make the Lean editor (VS Code's Lean 4 extension, any Lean language server client) resolve `import Lasm.*` in this Lake project: links Lasm's Lean 4.35.0 with its library as the elan toolchain `lasm-4.35.0-…` and sets it as the directory's elan override (`elan override unset` undoes it). `lasm init` (when Lasm's Lean is already installed), `lasm dev` and `lasm build` do the same, printing one line per project, except on CI or with `LASM_EDITOR=0`. [Editor setup](docs/GETTING_STARTED.md#editor). |
@@ -501,7 +501,7 @@ Machines that **build** with Lasm (the compiler):
 | Windows ARM64 | ARM64 | **Not supported**: neither Lean nor Emscripten publishes Windows ARM64 prebuilts. |
 | Bun 1.4.4 and Deno 2.9.6 as the compiler's runtime (0.2.0) | all of the above | Tested in CI on all five platforms, also with no Node or npm on `PATH` ([BUN_DENO.md](docs/BUN_DENO.md)). |
 
-Node 24 or newer (tested: 24.0.0, 24.22.1, 26.12.1). No engine flags. Exact tested
+Node 24 or newer (tested: 24.0.0, 24.22.2, 26.13.0). No engine flags. Exact tested
 artifacts: [NODE_ACCEPTANCE.md](docs/NODE_ACCEPTANCE.md).
 
 ## Supported platforms
@@ -516,9 +516,9 @@ cloud account. Full matrix: [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 | Platform | Tested in CI with |
 | --- | --- |
-| Linux x64 and arm64 (glibc 2.28+), Node 24+ | Node 24.0.0, 24.22.1 and 26.12.1 on `ubuntu-24.04` and `ubuntu-24.04-arm` |
-| macOS (x64, arm64) | Node 24.0.0 and 24.22.1 on `macos-15-intel`; Node 24.22.1 on `macos-15`; installed acceptance with Node 26.12.1 |
-| Windows x64 | Node 24.0.0 and 24.22.1 on `windows-2025`; installed acceptance with Node 26.12.1 |
+| Linux x64 and arm64 (glibc 2.28+), Node 24+ | Node 24.0.0, 24.22.2 and 26.13.0 on `ubuntu-24.04` and `ubuntu-24.04-arm` |
+| macOS (x64, arm64) | Node 24.0.0 and 24.22.2 on `macos-15-intel`; Node 24.22.2 on `macos-15`; installed acceptance with Node 26.13.0 |
+| Windows x64 | Node 24.0.0 and 24.22.2 on `windows-2025`; installed acceptance with Node 26.13.0 |
 | Docker / Kubernetes | `node:24-bookworm-slim`, `node:26-bookworm-slim`, `node:24-bullseye-slim`, Ubuntu 22.04/24.04; read-only, 512 MB, x64 and arm64 (Kubernetes manifests are not applied in CI) |
 | Google Cloud Run, Fly.io, Railway, Render, Heroku | the same container images and Dockerfiles; the platforms themselves are never deployed to |
 | AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` + AWS Lambda Web Adapter through the Runtime Interface Emulator, x86_64 and arm64; `amazonlinux:2023` |

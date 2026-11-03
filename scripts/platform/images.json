@@ -1,16 +1,16 @@
 {
   "postgres": "postgres:17",
-  "recipeNodeImage": "node:24.22.1-bookworm-slim",
+  "recipeNodeImage": "node:24.22.2-bookworm-slim",
   "images": [
     {
       "name": "debian12-node24",
-      "image": "node:24.22.1-bookworm-slim",
+      "image": "node:24.22.2-bookworm-slim",
       "glibc": "2.36",
       "claim": "Docker/Kubernetes, Debian 12, Node 24"
     },
     {
       "name": "debian12-node26",
-      "image": "node:26.12.1-bookworm-slim",
+      "image": "node:26.13.0-bookworm-slim",
       "glibc": "2.36",
       "claim": "Docker/Kubernetes, Debian 12, Node 26"
     },
@@ -23,14 +23,14 @@
     {
       "name": "ubuntu2204-node24",
       "image": "ubuntu:22.04",
-      "node": "24.22.1",
+      "node": "24.22.2",
       "glibc": "2.35",
       "claim": "Ubuntu 22.04 with the official Node tarball"
     },
     {
       "name": "ubuntu2404-node26",
       "image": "ubuntu:24.04",
-      "node": "26.12.1",
+      "node": "26.13.0",
       "glibc": "2.39",
       "claim": "Ubuntu 24.04 (Heroku-24) with the official Node 26 tarball and libatomic1",
       "prepare": "apt-get update && apt-get install -y --no-install-recommends libatomic1 && rm -rf /var/lib/apt/lists/*"
@@ -38,7 +38,7 @@
     {
       "name": "al2023-node24",
       "image": "amazonlinux:2023",
-      "node": "24.22.1",
+      "node": "24.22.2",
       "glibc": "2.34",
       "claim": "Amazon Linux 2023 (Lambda's OS) with the official Node tarball"
     },

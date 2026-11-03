@@ -40,6 +40,7 @@ proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (subset), release |
+| [Flaky tests](#flaky-tests) | A flaky test is quarantined at once, then fixed or deleted within a week | `test/quarantine.json`, `scripts/test/`, `scripts/ci/flaky-report.mjs` (`flaky.yml`) | nightly report; quarantine on every unit run |
 | [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/`, `scripts/mutation/` (`mutation.yml`) | release (coverage); nightly and PR, changed modules only (mutation) |
 
 ### Differential testing
@@ -418,6 +419,50 @@ at L1: the browser has no differential tests yet (a ROADMAP item). Node was one
 requirement short of L3: the Porter nightly fuzzer had found a failing request.
 No platform but Node has fuzzing or simulation in CI yet, so no other platform
 can reach L3.
+
+## Flaky tests
+
+A flaky test is one that both passes and fails on the same code. It costs
+everyone time (re-runs, ignored red builds) and teaches people to distrust
+failures, so the policy is strict:
+
+1. **Quarantine at once.** When a test is seen to be flaky (a nightly report
+   entry, a re-run that passed, a local repeat), open an issue and add an entry
+   to [`test/quarantine.json`](../test/quarantine.json) in the same change:
+   ```json
+   { "file": "test/x.test.mjs", "name": "the test's own name", "issue": "https://github.com/Millillion/lasm/issues/N",
+     "since": "YYYY-MM-DD", "reason": "what fails, how often" }
+   ```
+   The unit suite (`scripts/ci/unit-tests.mjs`, `unit.yml`) and `npm test`
+   (through [`scripts/test/node-test.mjs`](../scripts/test/node-test.mjs), a
+   `node --test` wrapper usable for any test file) skip a quarantined test with
+   `--test-skip-pattern` (the name anchored and escaped) and print a notice
+   (`::notice` on GitHub Actions) for each one. Other suites run through
+   `node scripts/test/node-test.mjs …` in place of `node --test …` to get the
+   same.
+2. **Fix or delete within a week.** An entry older than 7 days fails the unit
+   suite (and `node-test.mjs`) with an error naming the test and its issue. The
+   way out is to fix the cause and remove the entry, or to delete the test. The
+   deadline is not extended: a test that can't be made deterministic in a week
+   is replaced by one that can.
+3. **No retries.** The runners never retry a test inside a job (`node --test`
+   has no retries; every Playwright config sets `retries: 0`), so a flake shows
+   up as a failure, never as a silent second try.
+
+**The nightly report** ([`flaky.yml`](../.github/workflows/flaky.yml), 07:53
+UTC, [`scripts/ci/flaky-report.mjs`](../scripts/ci/flaky-report.mjs)) reads
+every workflow run of the last 24 hours through the GitHub API and lists:
+- jobs that **passed only on retry**: failed in one attempt and passed in a
+  re-run, with the tests that failed first (from that attempt's log);
+- re-run workflow runs;
+- timed-out jobs, and cancelled jobs that a newer run did not supersede (the
+  usual `cancel-in-progress` cancellations are only counted);
+- the quarantine list with each entry's age, flagging those past the week.
+
+It uploads `flaky-report.json` and `.md` as an artifact and replaces the body
+of the one open issue labelled `flaky` (opening it, and the label, if needed).
+Entries in the report are triaged into quarantine entries or closed as
+infrastructure (a runner lost, a registry outage).
 
 ## Test-quality audit
 

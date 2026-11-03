@@ -67,7 +67,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] 0.3.8 (published 2026-11-02): everything in 0.3.7 (the WASI dev-build fix #34, and the fix for a hang when a synchronous JS callback makes the program's first async runtime request, #37), plus #26 and the #30 docs (PR #36).
 - [x] 0.3.9 (published 2026-11-03, PR #81): #27, browser-style dot-segment resolution in `Request.path` on every platform, with a proof that `segments` never contains `.` or `..`; also #76 (a `://` in the query), #66 (Node recursion depth), #80 and #82 (cookies and redirects on function platforms), #49 (dev build service `unref`) and #51 (Lasm.JS errors wrapped twice).
 - [ ] Next release: retry downloads cut short before Content-Length arrives (PR #91), the macOS C-tier fix (#73, PR #85), the editor fix (#72, PR #86), and Lasm.UI handlers deciding `preventDefault`/`stopPropagation` per event, a breaking change (#71; [next-notes.md](docs/release/next-notes.md)).
-- [ ] Move the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7).
+- [x] Move the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7): every workflow, container image, acceptance pin and doc version list; the deferral is removed. Both are still the newest 26 and 24 releases (2026-11-03).
 - [ ] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms (a stalled thread, or a visibility bug?).
 
 ### Testing ([TESTING.md](docs/TESTING.md), [TESTING_STRATEGY.md](docs/proposals/TESTING_STRATEGY.md))
@@ -90,10 +90,15 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] Claim 4, dependable tooling: metamorphic tests of `lasm dev` (an incremental build equals a clean one; the same input gives the same bytes; a rename changes nothing else).
 - [ ] Claim 4: fault injection in the installer and the build (a dropped network, a full disk, a killed process, a read-only cache).
 - [ ] Claim 4: every error a user can trigger prints a clear message, never a stack trace (an error corpus run against the published CLI).
+- [x] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week): `flaky.yml` (07:53 UTC) reports re-runs, jobs that passed only on retry with the tests that failed first, timed-out and unsuperseded cancelled jobs, as an artifact and in the one issue labelled `flaky`; `test/quarantine.json` is skipped with a notice by the unit suite and `npm test`, and an entry older than 7 days fails the suite ([TESTING.md](docs/TESTING.md#flaky-tests)).
+- [ ] Platform evidence levels L0–L3, generated from CI results, in the README's platform table.
+- [~] Claim 4, dependable tooling: metamorphic tests of `lasm dev` (an incremental build equals a clean one; the same input gives the same bytes; a rename changes nothing else).
+- [~] Claim 4: fault injection in the installer and the build (a dropped network, a full disk, a killed process, a read-only cache).
+- [~] Claim 4: every error a user can trigger prints a clear message, never a stack trace (an error corpus run against the published CLI).
 - [x] Bun gives no response to an encoded slash, `/hello/a%2Fb` (found by target equivalence; investigate): neither Bun nor Lasm. The harness's first run (2026-10-31) sent `Connection: close` through Node's pooled keep-alive agent and reused the socket Bun had closed; fixed that day, and Bun has answered `Hello, a/b` in every run since. A new `keepAlive` corpus case checks the encoded slash over one persistent connection on every target.
 
 ### Example apps
-- [~] Conduit: fix the two recorded gaps (empty Markdown link labels; keyboard access to the delete and remove icons), and change the headline to "50 proved propositions (294 theorems)".
+- [x] Conduit: fix the two recorded gaps (empty Markdown link labels; keyboard access to the delete and remove icons), and change the headline to "50 proved propositions (294 theorems)" (fixed and proved 2026-11-02, SPEC L6 and L7).
 - [x] Specification map, 50 reviewable propositions, frontend and layout proofs, five independent proof checkers.
 - [x] Conduit on all 18 platforms, each tested in CI with its own local tooling and both official RealWorld suites (PRs #24, #29, #39).
 - [x] Ledger (example app 2), following TigerBeetle's model: proofs of conservation, idempotency and two-phase transfers; TigerBeetle as a differential oracle; a bank workload; then every platform with a strongly consistent store.
