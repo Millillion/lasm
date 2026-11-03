@@ -241,7 +241,7 @@ async function devRelation({ lasm, target, out, project, build, cleanEdited, cle
   // there lasm build links again (a known cost, reported, not a failure).
   if (rebuildStage.test(reused.text)) {
     if (target === 'node') problems.push(`lasm build after lasm dev linked again instead of reusing dev's build: ${tail(reused.text, 6)}`);
-    else log(`     ${target}/dev lasm build after lasm dev linked again (lasm dev's link-only Node build is a separate cache entry)`);
+    else console.log(`     ${target}/dev lasm build after lasm dev linked again (lasm dev's link-only Node build is a separate cache entry)`);
   }
   problems.push(...await equivalent('after lasm dev vs a clean build', cleanEdited, reused.hashes, cleanDirectory, join(directory, out)));
   return problems;
