@@ -24,6 +24,7 @@ SPEC.md in sync.
 import Lean
 import Proofs
 import Tandem
+import Tandem.Client
 open Lean Elab Command
 
 /-- Every constant the definition of `root` refers to, transitively (through
@@ -82,7 +83,8 @@ elab "#check_tandem_proofs" : command => do
   let reach := reachable env [``Tandem.Doc.apply, ``Tandem.Doc.applyAll, ``Tandem.Doc.text, ``Tandem.Doc.chars,
     ``Tandem.Doc.edit, ``Tandem.Doc.insertNode, ``Tandem.Doc.deleteAt, ``Tandem.Wire.decodeRequest,
     ``Tandem.Wire.decodeReply, ``Tandem.Wire.encodeRequest, ``Tandem.Wire.encodeReply, ``Tandem.Sync.sync,
-    ``Tandem.Sync.accept]
+    ``Tandem.Sync.accept, ``Tandem.Doc.applyMany, ``Tandem.Replica.edit, ``Tandem.Replica.request,
+    ``Tandem.Replica.onReply, ``Tandem.Replica.onPush]
   let mut provider : Array Name := #[]
   let mut opaques : Array Name := #[]
   for n in reach.toList do

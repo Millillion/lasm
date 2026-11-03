@@ -17,4 +17,5 @@ import Proofs.Edits
 import Proofs.Wire
 import Proofs.Sync
 import Proofs.Spec
+import Proofs.Bulk
 import Proofs.Theorems

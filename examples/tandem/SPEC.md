@@ -25,6 +25,7 @@ untrusted input can't crash or subvert a Lasm program.
 | Concurrent operations commute | `Spec.ops_commute` |
 | Applying an operation twice is applying it once | `Spec.ops_idempotent` |
 | A re-delivered operation is ignored | `Spec.redelivery_ignored` |
+| A long log applied at once (sorted) gives the same state as one operation at a time | `Spec.apply_many` |
 | An operation whose dependencies have not arrived is neither applied early nor dropped | `Spec.converge` (the state is the set of operations: an insertion whose parent is missing stays in it, invisible, until the parent arrives) |
 | Convergence holds for invalid and malicious operations too | `Spec.converge` quantifies over every list of operations; `Spec.accepted_ops_valid` and the wire format keep the invalid ones out of the log |
 
@@ -66,6 +67,8 @@ untrusted input can't crash or subvert a Lasm program.
 | The server stores only valid operations | `Spec.stored_ops_valid` |
 | A client is sent everything it lacks | `Spec.reply_from_cursor` |
 | A replica that catches up has the server's document | `Spec.replica_matches_server` |
+| A replica re-sends what was not acknowledged (an error, a lost reply, a reply out of order) | `Spec.replica_keeps_unacked` |
+| A replica's edits yield the user's text in every state it reaches through the protocol | `Spec.replica_edit_yields_text`, `Spec.replica_reachable` |
 | The acknowledgement is sent only after the operations are durable | Trusted: the server commits before replying (PROOFS.md, "What is trusted") |
 
 ## 6. Untrusted input
