@@ -255,8 +255,9 @@ structure App (Flags Model Msg : Type) where
 changes, a submit) the view is rendered, diffed and patched in the same task,
 so the page shows the result as hand-written DOM code would; after anything
 else (pointer moves, scrolling, timers, HTTP responses, subscriptions) it is
-rendered on the next animation frame, however many messages arrived. Either
-way one patch is applied in one call.
+rendered on the next animation frame, however many messages arrived. When
+discrete input arrives while such a frame is still waiting, that frame is
+rendered with it, in the same task. Either way one patch is applied in one call.
 
 **Hot reload.** With [`@lasm/vite`](BROWSER.md) in development, editing a
 `.lean` file rebuilds the app and remounts it without a page reload. When the
