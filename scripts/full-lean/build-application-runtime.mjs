@@ -143,8 +143,9 @@ run(sdk.tool('emcmake'), ['cmake', '-S', join(source, 'src'), '-B', build,
   `-DLASM_MIMALLOC_INCLUDE=${join(sdk.driver, 'system/lib/mimalloc/include')}`,
   // -mtail-call (issue #90): lean_apply_* and the runtime's other sibling calls
   // become Wasm tail calls, as native Lean's C compiler makes them.
-  '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG -mtail-call', '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG -mtail-call',
-  '-DCMAKE_C_FLAGS=-sMEMORY64=1', '-DLASM_MEMORY64=1', '-DLASM_HOST_BRIDGE=ON',
+  // (Lean's CMakeLists sets CMAKE_CXX_FLAGS_RELEASE itself and appends to CMAKE_CXX_FLAGS.)
+  '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG', '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',
+  '-DCMAKE_C_FLAGS=-sMEMORY64=1 -mtail-call', '-DCMAKE_CXX_FLAGS=-mtail-call', '-DLASM_MEMORY64=1', '-DLASM_HOST_BRIDGE=ON',
   '-DLASM_LINK_LAKE=OFF', '-DLASM_LINK_TOOLS=OFF', '-DLEAN_EXTRA_OPTS=-j2 -s8192',
   ...(edge ? ['-DMULTI_THREAD=OFF', '-DLASM_EDGE=ON'] : []),
 ]);
