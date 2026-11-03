@@ -17,3 +17,8 @@ name = "Proofs"
 # program: lasm builds it (npm run build); it is not a Lake target.
 [[lean_lib]]
 name = "Server"
+
+# The editor's browser app (Lasm.UI). Editor.lean starts it: lasm builds it
+# (npm run build:client); it is not a Lake target.
+[[lean_lib]]
+name = "Frontend"

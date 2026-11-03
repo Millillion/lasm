@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Tandem, a collaborative text editor in Lean: Fugue's sequence CRDT, a sync server and a Lasm.UI editor that works offline, compiled to WebAssembly by Lasm, with proofs",
   "scripts": {
-    "build": "lasm build ServerNode.lean --output dist/server",
+    "build": "npm run build:client && lasm build ServerNode.lean --output dist/server",
     "start": "node dist/server/main.mjs",
     "build:batch": "lasm build Batch.lean --output dist/batch",
     "build:clients": "lasm build Clients.lean --output dist/clients",
@@ -15,19 +15,22 @@
     "test:fuzz": "node test/fuzz.mjs",
     "proofs": "node test/proofs.mjs",
     "proofs:paranoid": "node test/paranoid.mjs",
-    "build:bun": "bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
+    "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
     "start:bun": "bun bun/main.mjs",
-    "build:deno": "lasm build ServerDeno.lean --target deno --output dist/server",
+    "build:deno": "npm run build:client && lasm build ServerDeno.lean --target deno --output dist/server",
     "start:deno": "deno run -A deno/main.mjs",
-    "build:workers": "lasm build ServerWorkers.lean --target workers --output dist/server",
-    "build:docker": "npm run build && docker build -t tandem ."
+    "build:workers": "npm run build:client && lasm build ServerWorkers.lean --target workers --output dist/server",
+    "build:docker": "npm run build && docker build -t tandem .",
+    "build:client": "lasm build Editor.lean --target browser --output dist/public/ui",
+    "test:e2e": "playwright test -c test/playwright.config.mjs"
   },
   "engines": {
     "node": ">=24"
   },
   "devDependencies": {
     "@lasm/cli": "0.3.8",
-    "yjs": "13.6.33"
+    "yjs": "13.6.33",
+    "@playwright/test": "1.63.0"
   },
   "dependencies": {
     "ws": "8.22.0"

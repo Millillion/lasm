@@ -18,7 +18,7 @@ namespace Tandem.Server.NodeWs
 private def lower (s : String) : String := s.map Char.toLower
 
 /-- Serves `env`'s handler and its WebSockets on $HOST:$PORT. Does not return. -/
-def serve (env : Env) (hub : Hub) : IO Unit := do
+def serve (env : Env) (hub : Hub) (handle : Lasm.Fetch.Handler) : IO Unit := do
   let http ← require "node:http"
   let bufferClass ← (← global).get "Buffer"
   let host := (← IO.getEnv "HOST").getD "0.0.0.0"
@@ -43,7 +43,7 @@ def serve (env : Env) (hub : Hub) : IO Unit := do
     let url := if target.startsWith "/" then s!"http://{hostHeader}{target}" else target
     let chunks ← req.callMethodAwait "toArray" #[] Value
     let body ← bufferClass.callMethod "concat" #[.ref chunks ""] ByteArray
-    let r ← Lasm.Fetch.respond (handler env) { method, url, headers, body }
+    let r ← Lasm.Fetch.respond handle { method, url, headers, body }
     let flat : Array Data := r.headers.foldl (fun acc (k, v) => acc.push (toJS k) |>.push (toJS v)) #[]
     let _ : Value ← res.callMethod "writeHead" #[toJS r.status, .array flat]
     return .callMethod res "end" #[if Lasm.Fetch.bodyless method r.status then .undefined else .bytes r.body]
