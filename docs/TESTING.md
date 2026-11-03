@@ -438,7 +438,10 @@ and the run is at most 30 days old. A platform's level is the highest one
 whose requirements, and all lower levels', hold. `null` means no CI job gives
 that kind of evidence for the platform yet.
 - A platform counts the differential results of the build it runs (node, edge
-  or wasi), since differential tests compare the compiled program.
+  or wasi, or its own target: `bun` and the `browser-*` targets, see
+  [Bun and browser targets](#bun-and-browser-targets)), since differential
+  tests compare the compiled program. Browsers have no conformance suite, so
+  their L2 is the differential job alone.
 - Conformance is the platform's own run of an outside suite: the official
   RealWorld API suite, through Conduit.
 
