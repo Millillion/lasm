@@ -21,7 +21,7 @@ function prelude(execArgv, { searchable = true } = {}) {
     emit() { return true; }
   }
   const context = { ENVIRONMENT_IS_NODE: true, ENVIRONMENT_IS_PTHREAD: false, Module: {}, require: createRequire(import.meta.url),
-    URL, process: { env: { LASM_FULL_HOST_MODULE: 'file:///host/host.mjs' }, execArgv, platform: 'linux' }, Array, Error, Object, Number, String };
+    URL, process: { env: { LASM_FULL_HOST_MODULE: 'file:///host/host.mjs' }, execArgv, platform: 'linux', cwd: () => '/work' }, Array, Error, Object, Number, String };
   context.globalThis = context; context.Worker = FakeWorker;
   // worker-stdio.cjs is the host's; this test only checks the constructor's options.
   const realRequire = createRequire(import.meta.url);

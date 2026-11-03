@@ -67,10 +67,12 @@ if (ENVIRONMENT_IS_NODE) {
   // directory: Node first reads the cwd's package.json, and a cwd that exists
   // but cannot be searched makes that read fail with EACCES, which stops the
   // Worker (ERR_INVALID_PACKAGE_CONFIG) and with it every new Lean thread.
-  // native-worker-cwd.cjs is needed only for a removed cwd (whose package.json
-  // read fails with ENOENT, which Node ignores); an unsearchable cwd still has
-  // a working process.cwd(), so its workers start without the preload.
+  // native-worker-cwd.cjs is needed only for a removed cwd (process.cwd()
+  // fails; Node's package.json read there fails with ENOENT, which it
+  // ignores); an unsearchable cwd still has a working process.cwd(), so its
+  // workers start without the preload (as in src/native-file-worker-pool.mjs).
   var lasmCwdSearchable = function() {
+    try { process.cwd(); } catch { return true; }
     var fs = require('node:fs');
     try { fs.accessSync('.', fs.constants.X_OK); return true; }
     catch (error) { return error?.code !== 'EACCES' && error?.code !== 'EPERM'; }

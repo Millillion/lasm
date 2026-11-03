@@ -93,6 +93,7 @@ function matches(name, source, marker, options) {
   assert.equal(results.native.code, 0, 'native: ' + results.native.stdout + results.native.stderr);
   assert.ok(results.native.stdout.endsWith(marker), 'native: missing completion marker');
   same(results);
+  return results;
 }
 
 // ---------- the cases ----------
