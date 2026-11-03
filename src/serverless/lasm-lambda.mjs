@@ -54,8 +54,12 @@ export async function handler(event) {
   if (event?.Records?.[0]?.cf) return cloudFront(event.Records[0]);
   // API Gateway HTTP API (payload 2.0) and Lambda function URLs.
   if (event?.version === '2.0') {
-    const headers = Object.entries(event.headers ?? {});
-    if (event.cookies?.length) headers.push(['cookie', event.cookies.join('; ')]);
+    // The request's cookies are in `cookies`; a gateway that also leaves them
+    // in headers.cookie (sam local start-api does) must not send them twice
+    // (#80). forward() joins whatever Cookie fields remain into one.
+    const sent = event.cookies?.filter(Boolean) ?? [];
+    const headers = Object.entries(event.headers ?? {}).filter(([name]) => !sent.length || name.toLowerCase() !== 'cookie');
+    if (sent.length) headers.push(['cookie', sent.join('; ')]);
     const reply = await forward({ method: event.requestContext.http.method,
       path: (event.rawPath || '/') + (event.rawQueryString ? '?' + event.rawQueryString : ''),
       headers, body: decode(event.body, event.isBase64Encoded) });

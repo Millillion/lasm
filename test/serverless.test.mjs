@@ -267,9 +267,14 @@ test('adapter helpers: one Cookie header, Set-Cookie as cookie objects, Azure re
   const { joinCookies, parseSetCookie, azureReply } = await import('../src/serverless/lasm-server.mjs');
   assert.deepEqual(joinCookies([['host', 'x'], ['Cookie', 'a=1'], ['accept', '*/*'], ['cookie', 'b=2; c=3']]),
     [['host', 'x'], ['Cookie', 'a=1; b=2; c=3'], ['accept', '*/*']]);
-  assert.deepEqual(joinCookies([['cookie', 'a=1'], ['cookie', '']]), [['cookie', 'a=1'], ['cookie', '']], 'one non-empty value: unchanged');
-  const one = [['cookie', 'a=1']];
-  assert.equal(joinCookies(one), one);
+  assert.deepEqual(joinCookies([['cookie', 'a=1'], ['cookie', '']]), [['cookie', 'a=1']]);
+  assert.deepEqual(joinCookies([['cookie', 'a=1']]), [['cookie', 'a=1']]);
+  // Cookies a proxy joined with commas (Azure's host, SAM's gateway); a comma inside a value stays.
+  assert.deepEqual(joinCookies([['cookie', 'a=1,b=2']]), [['cookie', 'a=1; b=2']]);
+  assert.deepEqual(joinCookies([['cookie', 'a=1, b=2; c=3'], ['cookie', 'a=1,b=2']]), [['cookie', 'a=1; b=2; c=3; a=1; b=2']]);
+  assert.deepEqual(joinCookies([['cookie', 'last=Wed, 21 Oct 2026 07:28:00 GMT; x=1']]), [['cookie', 'last=Wed, 21 Oct 2026 07:28:00 GMT; x=1']]);
+  const none = [['host', 'x']];
+  assert.equal(joinCookies(none), none);
   assert.deepEqual(joinCookies([['x', '1'], ['x', '2']]), [['x', '1'], ['x', '2']], 'other repeated headers stay repeated');
 
   assert.deepEqual(parseSetCookie('sid=abc=; Path=/; Domain=example.com; Max-Age=3600; Expires=Wed, 21 Oct 2026 07:28:00 GMT; Secure; HttpOnly; SameSite=lax'),

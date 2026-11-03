@@ -81,6 +81,66 @@ export function startLeanServer({ main = new URL('./main.mjs', import.meta.url),
 // Hop-by-hop headers (RFC 9110 §7.6.1) are not forwarded in either direction.
 const hopByHop = new Set(['connection', 'keep-alive', 'proxy-connection', 'transfer-encoding', 'te', 'trailer', 'upgrade']);
 
+// A comma that separates cookies: a cookie-string never holds one (RFC 6265
+// §4.2.1, cookie-octet), so ", name=" can only come from a proxy that
+// combined repeated Cookie fields with commas, as RFC 9110 §5.3 does for
+// other headers (ASP.NET in Azure's host, SAM's local gateway). A comma
+// inside a value that does not start a new name=value pair (an unquoted
+// date, "Wed, 21 Oct 2026") is left alone.
+const cookieComma = /\s*,\s*(?=[!#$%&'*+\-.^_`|~0-9A-Za-z]+=)/g;
+
+/**
+ * One Cookie header (RFC 6265 §5.4; HTTP/2 and HTTP/3 split it into crumbs,
+ * RFC 9113 §8.2.3): repeated Cookie fields in [[name, value], …] are joined
+ * with "; " into the first one's place, and cookies a proxy joined with
+ * commas are separated with "; " again. Events can carry the cookies twice
+ * or in pieces (API Gateway payload 2.0 `cookies`, multi-value headers,
+ * CloudFront's header lists); the Lean server sees what a browser sends.
+ */
+export function joinCookies(pairs) {
+  const values = pairs.filter(([name]) => name.toLowerCase() === 'cookie').map(([, value]) => value.replace(cookieComma, '; ')).filter(value => value !== '');
+  if (!values.length) return pairs;
+  const out = [];
+  let placed = false;
+  for (const pair of pairs) {
+    if (pair[0].toLowerCase() !== 'cookie') out.push(pair);
+    else if (!placed) { out.push([pair[0], values.join('; ')]); placed = true; }
+  }
+  return out;
+}
+
+/**
+ * A Set-Cookie value as the cookie object of a platform API that takes
+ * cookies rather than Set-Cookie headers (Azure Functions' HttpResponseInit
+ * `cookies`): { name, value, domain?, path?, expires?, maxAge?, secure?,
+ * httpOnly?, sameSite? }, plus `dropped`, the attributes it has no field for
+ * (Partitioned, Priority, …). null when the value has no cookie name.
+ */
+export function parseSetCookie(header) {
+  const [pair, ...attributes] = header.split(';');
+  const equals = pair.indexOf('=');
+  if (equals <= 0) return null;
+  const cookie = { name: pair.slice(0, equals).trim(), value: pair.slice(equals + 1).trim() };
+  if (!cookie.name) return null;
+  const dropped = [];
+  for (const attribute of attributes) {
+    const at = attribute.indexOf('=');
+    const key = (at < 0 ? attribute : attribute.slice(0, at)).trim().toLowerCase();
+    const value = at < 0 ? '' : attribute.slice(at + 1).trim();
+    if (!key) continue;
+    if (key === 'domain' && value) cookie.domain = value;
+    else if (key === 'path' && value) cookie.path = value;
+    else if (key === 'expires' && !Number.isNaN(Date.parse(value))) cookie.expires = new Date(value);
+    else if (key === 'max-age' && /^-?\d+$/.test(value)) cookie.maxAge = Number(value);
+    else if (key === 'secure') cookie.secure = true;
+    else if (key === 'httponly') cookie.httpOnly = true;
+    else if (key === 'samesite' && ['strict', 'lax', 'none'].includes(value.toLowerCase()))
+      cookie.sameSite = value[0].toUpperCase() + value.slice(1).toLowerCase();
+    else dropped.push(attribute.trim());
+  }
+  return { ...cookie, dropped };
+}
+
 /**
  * Sends one request to the Lean server.
  * request: { method, path (with query string), headers: [[name, value], …], body: Buffer | undefined }
@@ -89,7 +149,7 @@ const hopByHop = new Set(['connection', 'keep-alive', 'proxy-connection', 'trans
 export async function forward({ method, path, headers, body }) {
   const port = await startLeanServer();
   const outgoing = [];
-  for (const [name, value] of headers) if (!hopByHop.has(name.toLowerCase()) && name.toLowerCase() !== 'content-length') outgoing.push(name, value);
+  for (const [name, value] of joinCookies(headers)) if (!hopByHop.has(name.toLowerCase()) && name.toLowerCase() !== 'content-length') outgoing.push(name, value);
   // HTTP/1.1 requires Host; events built by hand or by tests may omit it.
   if (!headers.some(([name]) => name.toLowerCase() === 'host')) outgoing.push('host', `${host}:${port}`);
   if (body?.length) outgoing.push('content-length', String(body.length));
@@ -131,11 +191,12 @@ function requestBody(req) {
 export async function pipe(req, res) {
   const port = await startLeanServer();
   const body = await requestBody(req);
-  const headers = [];
+  const pairs = [];
   for (let i = 0; i < req.rawHeaders.length; i += 2) {
     const name = req.rawHeaders[i].toLowerCase();
-    if (!hopByHop.has(name) && name !== 'content-length') headers.push(req.rawHeaders[i], req.rawHeaders[i + 1]);
+    if (!hopByHop.has(name) && name !== 'content-length') pairs.push([req.rawHeaders[i], req.rawHeaders[i + 1]]);
   }
+  const headers = joinCookies(pairs).flat();
   if (body.length) headers.push('content-length', String(body.length));
   await new Promise((resolve, reject) => {
     const request = http.request({ host, port, method: req.method, path: req.originalUrl ?? req.url, headers, agent }, response => {
@@ -159,9 +220,38 @@ export async function fetchLean(request) {
   const reply = await forward({ method: request.method, path: url.pathname + url.search, headers: [...request.headers], body });
   const headers = new Headers();
   for (const [name, value] of reply.headers) headers.append(name, value);
-  // A null-body status must not carry a body in a Response.
-  const empty = [101, 204, 205, 304].includes(reply.status) || request.method === 'HEAD';
+  // A null-body status must not carry a body in a Response. An empty body is
+  // no body at all: Netlify's streaming bootstrap answers a Response with a
+  // zero-length body stream (a 303 with only a Location) with nothing, not
+  // even the status (#82).
+  const empty = [101, 204, 205, 304].includes(reply.status) || request.method === 'HEAD' || reply.body.length === 0;
   return new Response(empty ? null : reply.body, { status: reply.status, statusText: reply.statusText, headers });
+}
+
+let warnedDropped = false;
+/**
+ * A forward() reply as Azure Functions' HttpResponseInit. Azure's worker
+ * passes response headers to the host as one value per name, so of several
+ * Set-Cookie headers only one would arrive (#80); they travel in `cookies`
+ * instead, which the host turns back into one Set-Cookie each. A single
+ * Set-Cookie stays a header, unchanged.
+ */
+export function azureReply(reply) {
+  const headers = new Headers();
+  const setCookies = reply.headers.filter(([name]) => name === 'set-cookie').map(([, value]) => value);
+  const cookies = [];
+  for (const [name, value] of reply.headers) {
+    if (name !== 'set-cookie' || setCookies.length < 2) { headers.append(name, value); continue; }
+    const cookie = parseSetCookie(value);
+    if (!cookie) { headers.append(name, value); continue; }
+    const { dropped, ...fields } = cookie;
+    if (dropped.length && !warnedDropped) {
+      warnedDropped = true;
+      console.warn(`Lasm: Azure Functions' cookies have no field for ${dropped.join(', ')} (Set-Cookie ${cookie.name}); it is left out.`);
+    }
+    cookies.push(fields);
+  }
+  return { status: reply.status, headers, ...(cookies.length ? { cookies } : {}), body: reply.body.length ? reply.body : undefined };
 }
 
 /** Whether a response body can travel as UTF-8 text rather than base64. */
