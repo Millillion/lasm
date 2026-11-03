@@ -164,6 +164,8 @@ const tooLargeForNode = req => req.path.length + Object.entries(req.headers).red
 function problems(req, res) {
   const out = [];
   if (tooLargeForNode(req) && (res.status === 431 || res.error)) return [];
+  // workerd refuses a URL over 16 KiB with 414.
+  if (res.status === 414 && req.path.length > 8000) return [];
   // Likewise a method Node's HTTP parser does not know: it closes the connection.
   // (workerd answers 501 for them.)
   if (!NODE_METHODS.includes(req.method) && (res.error || res.status === 400 || res.status === 501)) return [];

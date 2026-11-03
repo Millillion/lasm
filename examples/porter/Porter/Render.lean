@@ -169,7 +169,12 @@ def Body.wire (cfg : Config) : Body → List (String × String) × String
 
 /-- The reply on the wire. -/
 def Reply.render (cfg : Config) (r : Reply) : Wire :=
-  let (hs, body) := r.body.wire cfg
+  -- A redirect says so in a short text body too (RFC 9110 §15.4.4); an
+  -- empty one never reaches the client through Netlify's function
+  -- bootstrap (docs/DECISIONS.md).
+  let (hs, body) := match r.body, r.location with
+    | .empty, some _ => ([("content-type", "text/plain; charset=utf-8")], "See Other\n")
+    | b, _ => b.wire cfg
   let cors := if r.status = 204 then corsHeaders ++ [("access-control-max-age", "600")] else []
   { status := r.status, body,
     headers := hs ++ cors ++ ((r.location.map fun l => [("location", l.render cfg.issuer)]).getD []) ++
