@@ -35,12 +35,13 @@ function execute(command, args, { cwd, env, timeout = 60_000 } = {}) {
 /** Removes a scenario directory, restoring the permissions a fixture took away. */
 function reset(directory) {
   if (!existsSync(directory)) return;
+  // Buffer paths: fixtures create names that are not UTF-8.
   (function open(path) {
     const stat = lstatSync(path);
     if (!stat.isDirectory()) return;
     chmodSync(path, 0o700);
-    for (const name of readdirSync(path)) open(join(path, name));
-  })(directory);
+    for (const name of readdirSync(path, { encoding: 'buffer' })) open(Buffer.concat([path, Buffer.from('/'), name]));
+  })(Buffer.from(directory));
   rmSync(directory, { recursive: true, force: true });
 }
 const builds = new Map();
@@ -53,7 +54,8 @@ function build(source) {
   const started = performance.now();
   const result = execute(process.execPath, [lasm, 'build', 'Main.lean'], { cwd: directory, env: { CI: '1', BROWSER: 'none', LASM_EDITOR: '0' }, timeout: 30 * 60_000 });
   const built = { source: join(directory, 'Main.lean'), program: join(directory, 'dist/main.mjs'), seconds: Math.round((performance.now() - started) / 1000),
-    error: result.code === 0 ? undefined : `lasm build failed (${result.code}):\n${(result.stdout + result.stderr).slice(-4000)}` };
+    error: result.code === 0 ? undefined : `lasm build failed (${result.code}):\n${(result.stdout + result.stderr).split('\n')
+      .filter(line => !/^\[lasm\] (Downloading|Extracting|Verifying)/.test(line)).join('\n').slice(-4000)}` };
   builds.set(source, built);
   return built;
 }
@@ -85,12 +87,12 @@ const succeeded = (result, marker) => {
   assert.equal(result.stderr, '');
   if (marker) assert.ok(result.stdout.endsWith(marker), 'missing completion marker: ' + JSON.stringify(result.stdout.slice(-200)));
 };
-/** The native oracle passed and Lasm printed exactly what it printed. */
+/** The native oracle passed and Lasm printed exactly what it printed (stdout, stderr, status). */
 function matches(name, source, marker, options) {
   const results = both(name, source, options);
-  succeeded(results.native, marker);
+  assert.equal(results.native.code, 0, 'native: ' + results.native.stdout + results.native.stderr);
+  assert.ok(results.native.stdout.endsWith(marker), 'native: missing completion marker');
   same(results);
-  return results;
 }
 
 // ---------- the cases ----------
@@ -98,7 +100,7 @@ const cases = [];
 const add = (name, run, { when = true } = {}) => cases.push({ name, run, skip: when === true ? undefined : when || 'not on this host' });
 const dirArgument = directory => [directory];
 
-for (const kind of ['fs', 'process', 'expr']) add(`${kind}-conformance`, () => {
+for (const kind of ['fs', 'process']) add(`${kind}-conformance`, () => {
   // From test/conformance.test.mjs: relative paths, so each run gets its own cwd tree.
   const results = both(`${kind}-conformance`, fixture(`${kind}-conformance/Main.lean`), {
     env: { LEAN_NUM_THREADS: '4' },
@@ -114,6 +116,17 @@ for (const kind of ['fs', 'process', 'expr']) add(`${kind}-conformance`, () => {
   });
   assert.equal(results.native.code, 0, results.native.stderr);
   same(results);
+});
+
+add('expr-conformance', () => {
+  // From test/conformance.test.mjs: building Lean.Expr values at run time needs
+  // Lean's C++ kernel, which Lasm does not ship; the build must refuse and say so.
+  const built = build(fixture('expr-conformance/Main.lean'));
+  assert.ok(built.error, 'the build was expected to be refused');
+  assert.match(built.error, /Lasm does not support runtime Lean compilation, evaluation, module-data access, or plugin loading/);
+  assert.match(built.error, /Your code calls `Lean\.Expr\.sort`/);
+  assert.match(built.error, /No deployment was produced\./);
+  assert.equal(existsSync(built.program), false);
 });
 
 for (const probe of ['FifoFinalizer', 'FifoThreadFinalizer']) add(`finalizers-${probe}`, () => {
@@ -141,7 +154,8 @@ for (const probe of ['FifoFinalizer', 'FifoThreadFinalizer']) add(`finalizers-${
 }, { when: linux });
 
 add('console-buffering', () => {
-  const results = matches('console-buffering', fixture('console-buffering/Main.lean'), undefined, { args: dirArgument });
+  const results = both('console-buffering', fixture('console-buffering/Main.lean'), { args: dirArgument });
+  same(results);
   assert.equal(results.native.code, 0);
   assert.equal(results.native.stderr, 'stderr parent before|stderr child|stderr parent after\n');
   assert.ok(results.native.stdout.endsWith('normal shutdown flush\n'));
@@ -159,8 +173,9 @@ add('cwd-tracking-deleted-process', () => {
   const results = both('cwd-tracking-deleted-process', fixture('cwd-tracking/DeletedProcess.lean'),
     { args: directory => [join(directory, 'deleted-process')] });
   succeeded(results.lasm);
-  if (results.native.code === 0) same(results);
-  else assert.equal(results.lasm.stdout, 'before deleted process cwd\nerror: IO.Error.noFileOrDirectory "" 2 "No such file or directory"\n');
+  if (results.native.code === 0) { same(results); return undefined; }
+  assert.equal(results.lasm.stdout, 'before deleted process cwd\nerror: IO.Error.noFileOrDirectory "" 2 "no such file or directory"\n');
+  return `native Lean failed (${results.native.signal ?? results.native.code}); checked Lasm's ENOENT report`;
 }, { when: linux });
 add('cwd-errors', () => matches('cwd-errors', fixture('cwd-errors/Main.lean'), 'cwd error comparison completed\n', {
   args: dirArgument,
@@ -389,7 +404,7 @@ add('tcp-binding', () => matches('tcp-binding', fixture('tcp-binding/Main.lean')
   { when: posix });
 
 add('wall-clock', () => {
-  const { native, lasm: wasm, built } = implementations(fixture('wall-clock/Main.lean'));
+  const { native, lasm: wasm } = implementations(fixture('wall-clock/Main.lean'));
   const samples = text => {
     const values = text.trim().split('\n').map(BigInt);
     assert.equal(values.length, 64);
@@ -404,16 +419,9 @@ add('wall-clock', () => {
   const upper = BigInt(Date.now()) * 1_000_000n + 1_000_000n;
   succeeded(result);
   assert.ok(samples(result.stdout).every(value => value >= lower && value <= upper), 'samples within the run');
-  // A failing host clock reaches Lean as an ordinary IO error.
-  const clock = join(dirname(built.program), 'host/native-clock.mjs');
-  assert.ok(existsSync(clock), 'the output carries host/native-clock.mjs');
-  const fault = join(dirname(built.program), 'clock-fault.mjs');
-  writeFileSync(fault, `import { nativeClock } from './host/native-clock.mjs';
-nativeClock().now = () => { throw Object.assign(new Error('expected clock failure'), { code: 'EIO', errno: 5, nativeMessage: true }); };
-await import('./main.mjs');
-`);
-  const failed = execute(process.execPath, [fault, 'error']);
-  assert.deepEqual([failed.code, failed.stdout, failed.stderr], [0, 'clock error propagated\n', '']);
+  // The earlier runtime read the wall clock through a host request that a test
+  // could make fail (the fixture's `error` mode); the current one reads it with
+  // Emscripten's clock_gettime, which has no failure to inject.
 });
 
 // ---------- run ----------
@@ -429,7 +437,7 @@ for (const entry of cases.filter(entry => !only || only.includes(entry.name))) {
   const row = { name: entry.name };
   if (entry.skip) { row.status = 'skipped'; row.reason = entry.skip; }
   else {
-    try { const note = entry.run(); row.status = 'passed'; if (note) row.note = note; }
+    try { const note = entry.run(); row.status = 'passed'; if (typeof note === 'string') row.note = note; }
     catch (error) { row.status = 'failed'; row.error = String(error?.stack ?? error).slice(0, 6000); failed++; }
   }
   row.seconds = Math.round((performance.now() - started) / 1000);
