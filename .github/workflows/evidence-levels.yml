@@ -1,0 +1,61 @@
+name: Evidence levels
+# Nightly (docs/TESTING.md#evidence-levels): derives each platform's evidence
+# level L0–L3 from the latest main-branch CI results (scripts/evidence/levels.mjs,
+# scripts/evidence/platforms.json) and, when a level moved, opens a pull request
+# that changes only the generated region of README.md's platform table, as
+# image-pins.yml does for image digests. The PR is opened with the workflow
+# token, so its own checks do not start by themselves; it changes only README.md.
+# On pull requests that change the generator it runs without writing, and uploads
+# the result.
+on:
+  schedule:
+    - cron: '23 8 * * *'
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths: [.github/workflows/evidence-levels.yml, 'scripts/evidence/**']
+permissions:
+  contents: read
+concurrency:
+  group: evidence-levels-${{ github.event_name }}
+  cancel-in-progress: false
+jobs:
+  levels:
+    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: Derive the levels from CI results
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/evidence/levels.mjs --out .work/evidence-levels.json --write
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: evidence-levels-${{ github.run_id }}
+          path: .work/evidence-levels.json
+          retention-days: 30
+      - name: Open a pull request when a level moved
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- README.md; then echo "Levels unchanged"; exit 0; fi
+          git diff -- README.md
+          branch="evidence-levels-$(date -u +%Y-%m-%d)"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then echo "$branch already exists"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -m "Evidence levels from CI ($(date -u +%Y-%m-%d))" -- README.md
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" --title "Evidence levels from CI ($(date -u +%Y-%m-%d))" \
+            --body "The nightly evidence-levels workflow found that a platform's level moved (run ${{ github.run_id }}; the requirement behind each level is in its evidence-levels.json artifact and in scripts/evidence/platforms.json). Only the generated region of README.md's platform table changes."
