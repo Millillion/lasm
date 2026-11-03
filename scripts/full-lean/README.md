@@ -636,7 +636,8 @@ artifact during a run. New facades default to four Lean workers and 64 MiB appli
 stacks unless explicitly overridden. `build.mjs --stack-mb` controls the compiler's
 main pthread reservation (default 64 MiB); changing `LEAN_STACK_SIZE_KB` alone
 does not resize that main stack. Node's separate engine worker stacks
-reserve 64 MiB through `LASM_VM_STACK_MB`. These resource settings belong to the parallel
+reserve `LASM_VM_STACK_MB` (built applications default to 1 GiB, less on small
+hosts: FUNDAMENTAL_LIMITATIONS.md#recursion-depth). These resource settings belong to the parallel
 harness, not upstream tests. Run complete suites in sequence when their fixed-port
 network tests could otherwise collide, or pass the same `--network-lock` path to
 `prepare-suite.mjs` for each suite. That Linux harness option serializes the

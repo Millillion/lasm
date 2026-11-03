@@ -99,6 +99,7 @@ and [`test/fuzz.mjs`](test/fuzz.mjs) (the endpoint fuzzer).
 | Signing in makes a new session id (session fixation, RFC 6819 §4.4.1.13) | The adversarial suite |
 | Pages cannot be framed (clickjacking, RFC 6749 §10.13); cookies are `HttpOnly` and `SameSite=Lax` | The adversarial suite |
 | Token responses are not cached (RFC 6749 §5.1) | The adversarial suite |
+| The sign-in and consent pages work in Chromium, Firefox and WebKit, with and without JavaScript, with no script error or CSP violation | The end-to-end tests ([`test/e2e`](test/e2e)) |
 
 ## Out of scope
 

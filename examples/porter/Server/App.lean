@@ -11,6 +11,7 @@ the same random values), so every committed request saw the database exactly
 as it was when it committed.
 -/
 import Lasm.Fetch
+import Lasm.Fetch.Assets
 import Lasm.JS
 import Porter.Render
 import Server.Sql
@@ -127,16 +128,18 @@ def serveRequest (env : Env) (writers : Option Std.Semaphore) (req : Lasm.Fetch.
   return toResponse (reply.render env.cfg) head
 
 /-- Serves Porter on a SQL database (whose binding module created the
-tables). The configuration and the keys are read on the first request (on
+tables), with the browser app's files (`assets`: `embed_dir! "dist/public"`
+in the entry file, served under `/ui/`). The configuration and the keys are read on the first request (on
 Workers, the environment and the database exist only during a request), then
 kept. `getEnv`: the environment variables (Workers passes them with each
 request). `serializeWriters`: off on Cloudflare Workers, which does not let
 one request wait on another's promise; the version check alone keeps commits
 consistent there. -/
-def run (db : Sql) (getEnv : String → IO (Option String) := fun k => IO.getEnv k) (serializeWriters := true) : IO Unit := do
+def run (db : Sql) (assets : Lasm.Fetch.Assets) (getEnv : String → IO (Option String) := fun k => IO.getEnv k)
+    (serializeWriters := true) : IO Unit := do
   let ready ← IO.mkRef (none : Option Env)
   let writers ← if serializeWriters then some <$> Std.Semaphore.new 1 else pure none
-  Lasm.Fetch.serve fun req => do
+  Lasm.Fetch.serve <| assets.wrap fun req => do
     let env ← match ← ready.get with
       | some env => pure env
       | none => do
