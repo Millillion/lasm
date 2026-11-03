@@ -33,7 +33,7 @@ const env = { ...sdk.env, EMCC_CORES: '1', EM_CACHE: join(work, 'cache'), EM_POR
 
 // 1. Lasm.JS's edge glue, with the application compile flags (src/edge/edge-link.mjs).
 const glue = join(work, 'lasm_js_edge.o');
-sdk.execute('emcc', ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-fwasm-exceptions', '-sMEMORY64=1', '-ffp-contract=off',
+sdk.execute('emcc', ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-fwasm-exceptions', '-mtail-call', '-sMEMORY64=1', '-ffp-contract=off',
   '-fPIC', '-ffunction-sections', '-fdata-sections', '-I', join(node, 'include'), '-c', join(root, 'src/edge/lasm_js_edge.c'), '-o', glue],
   { env, stdio: 'inherit' });
 mkdirSync(join(edge, 'lib'), { recursive: true });

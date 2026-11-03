@@ -372,7 +372,9 @@ const workerName = directory => {
 // Inputs of the linked edge program besides the Node build: the edge link and
 // its glue. The host modules (edge-*.mjs) are copied at delivery, not linked.
 const linkSources = ['edge-link.mjs', 'edge-initializers.mjs', 'edge-pre.js', 'edge-library.js', 'lasm_js_edge.c',
-  ...['recipe-emscripten-6.0.9-edge.json', 'link.mjs', 'glue.mjs', 'settings.mjs', 'metadata.mjs', 'wasm.mjs', 'python.mjs'].map(file => '../link-driver/' + file)];
+  ...['recipe-emscripten-6.0.9-edge.json', 'link.mjs', 'glue.mjs', 'settings.mjs', 'metadata.mjs', 'wasm.mjs', 'python.mjs'].map(file => '../link-driver/' + file),
+  // The Asyncify link's tail-call lowering (link.mjs).
+  '../wasi/lower-atomics.mjs', 'wasm-opt-asyncify.mjs'];
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 
 /** The edge program's cache identity: the Node build's signature (its objects

@@ -100,6 +100,7 @@ async function inventory(directory) {
 await inventory(target);
 const manifest = { schema: 1, name, lean: input.lean, leanCommit: input.leanCommit,
   emscripten: input.emscripten, bignum: input.bignum, memoryLayout: 'wasm64', threading: 'pthreads', allocator: 'mimalloc',
+  ...(input.tailCalls ? { tailCalls: true } : {}),
   sourceArchiveSha256: input.sourceArchiveSha256, patches: input.patches,
   // A runtime-only rebuild (build-application-runtime.mjs --reuse-standard-libraries)
   // carries the reused archives' module count and names the bundle they came from.

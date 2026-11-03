@@ -31,7 +31,7 @@ const execute = (tool, args, settings = {}) => {
   try {
     const { spawnSync } = process.getBuiltinModule('node:child_process');
     const result = spawnSync(sdk.python.executable, ['-B', '-E', '-s', join(sdk.driver, tool + '.py'), ...args],
-      { ...settings, env, stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8', maxBuffer: 512 << 20 });
+      { ...settings, env: { ...settings.env, ...env }, stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8', maxBuffer: 512 << 20 });
     logs.push(result.stderr);
     if (result.status !== 0) throw new Error(`${tool} failed (${result.status}):\n${result.stderr.slice(-4000)}`);
     return result.stdout;

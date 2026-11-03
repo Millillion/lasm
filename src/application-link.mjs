@@ -232,7 +232,9 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   if (linkDriver === 'node' && memoryMode !== 1) throw new Error('The Node link driver has no recording for this memory mode');
   if (!Array.isArray(sources) || !sources.length) throw new Error('Application C sources are required');
   if (leanVersion !== runtime.manifest.lean) throw new Error('Application and runtime versions differ');
-  const compileFlags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN',
+  // -mtail-call (issue #90): Lean's generated C relies on sibling calls, as native
+  // Lean does, so monadic loops (List.mapM in Async) run in constant stack.
+  const compileFlags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-mtail-call', '-fPIC', '-DLEAN_EMSCRIPTEN',
     '-sMEMORY64=1', '-ffunction-sections', '-fdata-sections', '-I', join(runtime.directory, 'include')];
   // Ordinary CLI users need Lean diagnostics and build progress. Detailed
   // generated-C/SDK warnings remain available with --verbose; failures retain

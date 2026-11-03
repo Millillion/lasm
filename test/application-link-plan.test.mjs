@@ -20,7 +20,7 @@ import { expandResponseFiles } from './fixtures/link-stand-ins/toolchain.mjs';
 
 const posix = process.platform !== 'win32';
 const root = new URL('../', import.meta.url).pathname;
-const compileFlags = runtime => ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN',
+const compileFlags = runtime => ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-mtail-call', '-fPIC', '-DLEAN_EMSCRIPTEN',
   '-sMEMORY64=1', '-ffunction-sections', '-fdata-sections', '-I', join(runtime.directory, 'include')];
 const linkFlags = (p, { memoryMode = 1, exportsFile = join(p.work, 'exports.json'), output = join(p.dist, 'program.cjs') } = {}) => ['--output-eol=linux', '-pthread', '-fwasm-exceptions', `-sMEMORY64=${memoryMode}`, '-sMALLOC=mimalloc',
   '-sMAIN_MODULE=2', `-sEXPORTED_FUNCTIONS=@${exportsFile}`, '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=4',

@@ -141,14 +141,16 @@ run(sdk.tool('emcmake'), ['cmake', '-S', join(source, 'src'), '-B', build,
   '-DLEAN_PLATFORM_TARGET=wasm64-unknown-emscripten', '-DUSE_LAKE=OFF', '-DMMAP=OFF',
   '-DUSE_GMP=OFF', '-DUSE_MIMALLOC=ON', '-DLASM_SDK_MIMALLOC=ON',
   `-DLASM_MIMALLOC_INCLUDE=${join(sdk.driver, 'system/lib/mimalloc/include')}`,
-  '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG', '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',
+  // -mtail-call (issue #90): lean_apply_* and the runtime's other sibling calls
+  // become Wasm tail calls, as native Lean's C compiler makes them.
+  '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG -mtail-call', '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG -mtail-call',
   '-DCMAKE_C_FLAGS=-sMEMORY64=1', '-DLASM_MEMORY64=1', '-DLASM_HOST_BRIDGE=ON',
   '-DLASM_LINK_LAKE=OFF', '-DLASM_LINK_TOOLS=OFF', '-DLEAN_EXTRA_OPTS=-j2 -s8192',
   ...(edge ? ['-DMULTI_THREAD=OFF', '-DLASM_EDGE=ON'] : []),
 ]);
 const provenance = { schema: 1, lean: version, leanCommit: expectedCommit, sourceArchiveSha256: sourceHash,
   nativeArtifactIdentity: native.identity, patches, sdkPatchSha256: sdkPatch, emscripten: '6.0.9',
-  bignum: 'lean', memoryLayout: 'wasm64', threading: edge ? 'cooperative' : 'pthreads', allocator: 'mimalloc',
+  bignum: 'lean', memoryLayout: 'wasm64', threading: edge ? 'cooperative' : 'pthreads', allocator: 'mimalloc', tailCalls: true,
   ...(edge ? { profile: 'edge' } : {}),
   purpose: 'AOT application libraries; no Wasm compiler executable', sdk: sdk.directory,
   ...(sdk.mode === 'managed' ? { sdkMode: sdk.mode, sdkIdentity: sdk.identity,
@@ -156,10 +158,27 @@ const provenance = { schema: 1, lean: version, leanCommit: expectedCommit, sourc
   source, build, resourceReport: process.env.LASM_RESOURCE_REPORT };
 writeFileSync(join(output, 'build-inputs.json'), JSON.stringify(provenance, null, 2) + '\n');
 run('cmake', ['--build', build, '--target', 'leanrt', 'leancpp', 'lasmhost', '-j1']);
+// Every object of the C++ runtime and host bridge was compiled with tail calls
+// (their target_features section lists +tail-call): CMake applied the flags.
+const wasmObjectsWithout = (file, feature) => {
+  const bytes = readFileSync(file), marker = Buffer.concat([Buffer.from([0x2b, feature.length]), Buffer.from(feature)]), missing = [];
+  if (bytes.subarray(0, 8).toString() !== '!<arch>\n') throw new Error(`Unrecognized archive ${file}`);
+  for (let at = 8; at + 60 <= bytes.length;) {
+    const size = Number(bytes.subarray(at + 48, at + 58).toString().trim()), name = bytes.subarray(at, at + 16).toString().trim();
+    const member = bytes.subarray(at + 60, at + 60 + size);
+    if (member.subarray(0, 4).equals(Buffer.from([0, 0x61, 0x73, 0x6d])) && member.indexOf(marker) < 0) missing.push(name);
+    at += 60 + size + (size % 2);
+  }
+  return missing;
+};
+for (const name of ['leanrt', 'leancpp', 'lasmhost']) {
+  const missing = wasmObjectsWithout(join(build, `lib/lean/lib${name}.a`), 'tail-call');
+  if (missing.length) throw new Error(`lib${name}.a has objects compiled without tail calls: ${missing.slice(0, 5).join(', ')}`);
+}
 
 const headers = readdirSync(join(build, 'include/lean')).filter(name => name.endsWith('.h')).sort()
   .map(name => [name, hash(readFileSync(join(build, 'include/lean', name)))]);
-const compileFlags = ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-pthread', '-fwasm-exceptions',
+const compileFlags = ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-pthread', '-fwasm-exceptions', '-mtail-call',
   '-sMEMORY64=1', '-ffp-contract=off', '-fPIC', '-ffunction-sections', '-fdata-sections', '-I', join(build, 'include')];
 const compiler = sdk.tool('emcc');
 const compileIdentity = hash(JSON.stringify({ ...provenance, resourceReport: undefined, headers, compileFlags,
@@ -190,7 +209,7 @@ if (reuseBundle) {
   // C++ runtime's threading (lean.h has no LEAN_MULTI_THREAD conditional and the
   // compile flags below are unchanged), nor on the edge patch (C++ runtime only).
   const { manifest } = await verifyApplicationRuntime(bundle, { name, manifestSha256: reuseManifest });
-  for (const key of ['lean', 'leanCommit', 'sourceArchiveSha256', 'emscripten', 'memoryLayout', ...(edge ? [] : ['threading']), 'allocator'])
+  for (const key of ['lean', 'leanCommit', 'sourceArchiveSha256', 'emscripten', 'memoryLayout', ...(edge ? [] : ['threading']), 'allocator', 'tailCalls'])
     if (manifest[key] !== provenance[key]) throw new Error(`Reused runtime differs in ${key}`);
   const shared = all => JSON.stringify(Object.fromEntries(Object.entries(all).filter(([name]) => !runtimeOnlyPatches.has(name))));
   if (shared(manifest.patches) !== shared(patches)) throw new Error('Reused runtime has other Lean patches');

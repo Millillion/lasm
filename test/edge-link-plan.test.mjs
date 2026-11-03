@@ -74,7 +74,7 @@ test('the edge link relinks the application objects with the edge glue and compa
   assert.equal(readFileSync(compactSource, 'utf8'), compactInitializerWrappers(JSON.parse(readFileSync(join(f.linkWork, 'initialization-plan.json'), 'utf8'))));
   const [compile, link] = f.executed;
   assert.equal(f.executed.length, 2, 'the precompiled Lasm.JS glue is not compiled');
-  assert.deepEqual(compile, { tool: 'emcc', args: ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1',
+  assert.deepEqual(compile, { tool: 'emcc', args: ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-mtail-call', '-fPIC', '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1',
     '-ffunction-sections', '-fdata-sections', '-I', join(f.nodeRuntime.directory, 'include'), '-c', compactSource, '-o', compactObject],
   options: { stdio: ['ignore', 'pipe', 'pipe'], env: { SDK_ENV: 'yes', LASM_STAND_IN_SDK: '1', EMCC_CORES: '1' }, timeout: 600_000 } });
   const objects = [f.objects.main, '-Wl,--wrap=initialize_Main', compactObject, '-Wl,--wrap=initialize_Init', f.objects.second];
@@ -126,7 +126,7 @@ test('an edge runtime without precompiled Lasm.JS glue: emcc compiles it; the No
   const edge = { libraries: { 'libleanrt.a': f.edge.libraries['libleanrt.a'] } };
   linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge, linkWork: f.linkWork, out: f.out, verbose: true });
   const glue = join(f.out, 'lasm_js_edge.o');
-  assert.deepEqual(f.executed[0], { tool: 'emcc', args: ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-fwasm-exceptions', '-sMEMORY64=1', '-ffp-contract=off',
+  assert.deepEqual(f.executed[0], { tool: 'emcc', args: ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-fwasm-exceptions', '-mtail-call', '-sMEMORY64=1', '-ffp-contract=off',
     '-fPIC', '-ffunction-sections', '-fdata-sections', '-I', join(f.nodeRuntime.directory, 'include'), '-c', join(here, 'lasm_js_edge.c'), '-o', glue],
   options: { stdio: 'inherit', env: { SDK_ENV: 'yes', LASM_STAND_IN_SDK: '1', EMCC_CORES: '1' }, timeout: 600_000 } });
   assert.ok(f.executed[1].args.includes(glue));

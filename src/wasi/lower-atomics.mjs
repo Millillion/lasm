@@ -179,6 +179,60 @@ export function lowerAtomics(input) {
   return out.result();
 }
 
+/** Returns the module with every tail call (return_call, return_call_indirect,
+ * return_call_ref) replaced by the ordinary call followed by `return`, or the
+ * same bytes when it has none. The two are equivalent except for stack use;
+ * Binaryen's Asyncify pass does not support tail calls (issue #90), so the
+ * Asyncify edge link (Supabase) lowers them first. */
+export function lowerTailCalls(input) {
+  const bytes = input instanceof Uint8Array ? input : new Uint8Array(input);
+  if (bytes[0] !== 0 || bytes[1] !== 0x61 || bytes[2] !== 0x73 || bytes[3] !== 0x6d || bytes[4] !== 1) throw new Error('Not a WebAssembly module');
+  const sections = [];
+  for (const r = new Reader(bytes, 8); r.at < bytes.length;) {
+    const id = r.byte(), size = r.u32();
+    sections.push({ id, body: r.slice(size) });
+  }
+  const codeSection = sections.find(s => s.id === 10);
+  if (!codeSection) return bytes;
+  let changed = false;
+  const code = new Reader(codeSection.body);
+  const bodies = code.u32(), rewritten = [];
+  for (let f = 0; f < bodies; f++) {
+    const size = code.u32(), end = code.at + size, r = new Reader(code.bytes, code.at);
+    const body = new Bytes();
+    for (let groups = r.u32(); groups--;) { r.u32(); valueType(r); }
+    let copied = code.at;
+    while (r.at < end) {
+      const at = r.at, op = r.byte();
+      if (op === 0xfe) { const sub = r.u32(); if (sub === 0x03) r.byte(); else memarg(r); continue; }
+      skipInstruction(r, op);
+      // return_call 0x12 -> call 0x10; return_call_indirect 0x13 -> call_indirect 0x11; return_call_ref 0x15 -> call_ref 0x14.
+      if (op !== 0x12 && op !== 0x13 && op !== 0x15) continue;
+      body.append(code.bytes.subarray(copied, at));
+      body.push(op - 2);
+      body.append(code.bytes.subarray(at + 1, r.at));
+      body.push(0x0f);
+      copied = r.at;
+      changed = true;
+    }
+    body.append(code.bytes.subarray(copied, end));
+    rewritten.push(body.result());
+    code.at = end;
+  }
+  if (!changed) return bytes;
+  const codeBytes = new Bytes();
+  codeBytes.push(...u32(rewritten.length));
+  for (const b of rewritten) { codeBytes.push(...u32(b.length)); codeBytes.append(b); }
+  const out = new Bytes();
+  out.append(bytes.subarray(0, 8));
+  for (const s of sections) {
+    const body = s.id === 10 ? codeBytes.result() : s.body;
+    out.push(s.id, ...u32(body.length));
+    out.append(body);
+  }
+  return out.result();
+}
+
 function limits(r) { const flags = r.byte(); if (flags & 4) { r.u64(); if (flags & 1) r.u64(); } else { r.u32(); if (flags & 1) r.u32(); } }
 function heapType(r) { const b = r.bytes[r.at]; if (b >= 0x69 && b <= 0x74 || b === 0x40) { r.at++; return; } r.u64(); }
 function valueType(r) { const b = r.byte(); if (b === 0x63 || b === 0x64) heapType(r); }

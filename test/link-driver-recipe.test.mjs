@@ -138,7 +138,7 @@ test('emcc flag translation keeps unknown -s spellings it does not own', () => {
   assert.deepEqual(translateEmccFlags(recipe, ['-I', 'a', '-I', 'b']), ['-Ia', '-Ib']);
 });
 
-const flags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN',
+const flags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-mtail-call', '-fPIC', '-DLEAN_EMSCRIPTEN',
   '-sMEMORY64=1', '-ffunction-sections', '-fdata-sections', '-I', '/r/include'];
 const base = { flags, source: '/w/Main.c', object: '/b/m.o', sysroot: '/s/sysroot', platform: 'linux' };
 

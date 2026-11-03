@@ -10,7 +10,7 @@
 // the suspending import list limited to the host's one wait (lasm_edge_wait). The Node link driver replays it from its recording
 // (src/link-driver/recipe-emscripten-<version>-edge.json, byte-identical to
 // emcc's output: scripts/edge/compare-edge-link.mjs); emcc remains the fallback.
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, symlinkSync, rmSync, chmodSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -84,7 +84,7 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
     else if (driver === 'node') throw new Error('This edge runtime has no precompiled Lasm.JS glue (liblasmjsedge.a); the Node link driver cannot compile it');
     else {
       glue.push(join(out, 'lasm_js_edge.o'));
-      sdk.execute('emcc', ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-fwasm-exceptions', '-sMEMORY64=1', '-ffp-contract=off',
+      sdk.execute('emcc', ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-fwasm-exceptions', '-mtail-call', '-sMEMORY64=1', '-ffp-contract=off',
         '-fPIC', '-ffunction-sections', '-fdata-sections', '-I', join(nodeRuntime.directory, 'include'), '-c', join(here, 'lasm_js_edge.c'), '-o', glue[0]],
       { stdio, env, timeout: 600_000 });
     }
@@ -98,7 +98,7 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
     const source = join(out, 'initializers-compact.c'), object = join(out, 'initializers-compact.o');
     const text = compactInitializerWrappers(JSON.parse(readFileSync(planFile, 'utf8')));
     writeFileSync(source, text);
-    const flags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1',
+    const flags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-mtail-call', '-fPIC', '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1',
       '-ffunction-sections', '-fdata-sections', '-I', join(nodeRuntime.directory, 'include')];
     // Reused by content (the plan rarely changes between edits) with the tools and runtime.
     const key = createHash('sha256').update(JSON.stringify({ schema: 1, driver, tools: sdk.toolchain ?? sdk.driverIdentity ?? null, runtime: nodeRuntime.identity, flags: flags.slice(0, -1) })).update(text).digest('hex');
@@ -168,9 +168,25 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
     }
   } else {
     if (!optimize) throw new Error('The edge dev profile needs the Node link driver');
-    sdk.execute('em++', args, { stdio, env, timeout: 3_600_000, maxBuffer: 64 << 20 });
+    sdk.execute('em++', args, { stdio, env: suspend === 'asyncify' ? { ...env, EM_BINARYEN_ROOT: asyncifyBinaryen(sdk, out) } : env,
+      timeout: 3_600_000, maxBuffer: 64 << 20 });
   }
   return { program: join(out, 'program.mjs'), wasm: join(out, 'program.wasm'), usesJs, suspend, driver };
+}
+
+/** A Binaryen root for emcc's Asyncify link: the SDK's tools, with wasm-opt
+ * lowering tail calls before Asyncify (wasm-opt-asyncify.mjs; Asyncify does not
+ * support them), as the Node link driver does. POSIX hosts only (maintainer path). */
+function asyncifyBinaryen(sdk, out) {
+  if (process.platform === 'win32') throw new Error('The emcc Asyncify edge link with tail calls needs a POSIX host; use the Node link driver');
+  const root = join(out, 'binaryen-asyncify'), bin = join(root, 'bin'), real = join(sdk.prefix, 'bin');
+  rmSync(root, { recursive: true, force: true });
+  mkdirSync(bin, { recursive: true });
+  for (const name of readdirSync(real)) if (name !== 'wasm-opt') symlinkSync(join(real, name), join(bin, name));
+  const quote = text => `'${text.replaceAll("'", "'\\''")}'`;
+  writeFileSync(join(bin, 'wasm-opt'), `#!/bin/sh\nexec ${quote(process.execPath)} ${quote(join(here, 'wasm-opt-asyncify.mjs'))} ${quote(join(real, 'wasm-opt'))} "$@"\n`);
+  chmodSync(join(bin, 'wasm-opt'), 0o755);
+  return root;
 }
 
 /** The tools the edge link needs. With an edge runtime that carries the

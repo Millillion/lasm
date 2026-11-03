@@ -25,6 +25,7 @@
       "-DNDEBUG",
       "-pthread",
       "-fwasm-exceptions",
+      "-mtail-call",
       "-fPIC",
       "-DLEAN_EMSCRIPTEN",
       "-sMEMORY64=1",

@@ -6,7 +6,7 @@ import { selectedLinkDriver } from '../src/application-link.mjs';
 import { selectCacheFile, libraryDirectory, archiveRoot } from '../scripts/link-driver/build-sysroot.mjs';
 
 // Lasm's compile flags (src/application-link.mjs) for a runtime at /r.
-const flags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN',
+const flags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-mtail-call', '-fPIC', '-DLEAN_EMSCRIPTEN',
   '-sMEMORY64=1', '-ffunction-sections', '-fdata-sections', '-I', '/r/include'];
 
 // The clang driver command emcc ran for examples/hello (EMCC_DEBUG + -### recording,
@@ -15,7 +15,7 @@ const recordedHello = ['-target', 'wasm64-unknown-emscripten', '-fvisibility=def
   '-combiner-global-alias-analysis=false', '-mllvm', '-wasm-enable-sjlj', '-mllvm', '-wasm-use-legacy-eh', '-mllvm',
   '-disable-lsr', '--sysroot=/s/cache/sysroot', '-D__EMSCRIPTEN_SHARED_MEMORY__=1', '-Xclang',
   '-iwithsysroot/include/fakesdl', '-Xclang', '-iwithsysroot/include/compat', '-O2', '-DNDEBUG', '-pthread',
-  '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN', '-ffunction-sections', '-fdata-sections', '-I/r/include', '-c',
+  '-fwasm-exceptions', '-mtail-call', '-fPIC', '-DLEAN_EMSCRIPTEN', '-ffunction-sections', '-fdata-sections', '-I/r/include', '-c',
   '/w/lean/Main.c', '-o/b/module-0.o'];
 
 test('the bundled recipe parses and reproduces the recorded emcc clang command', () => {

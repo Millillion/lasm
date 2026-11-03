@@ -9,7 +9,7 @@
 // recipe's for the mode, and settings that select unported code paths throw.
 // With `intermediates`, every file emcc saves under EMCC_DEBUG=1 is written with
 // emcc's name (emcc-NN-name), so each step can be compared with a recording.
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
@@ -19,6 +19,7 @@ import { executableName } from '../platform.mjs';
 import { Settings, instantiateSettings } from './settings.mjs';
 import { extractMetadata, updateMetadata } from './metadata.mjs';
 import { WasmModule, getWeakImports } from './wasm.mjs';
+import { lowerTailCalls } from '../wasi/lower-atomics.mjs';
 import { addUnexpectedExports, asmjsMangle, assembleGlue, checkSupportedSettings, createAsmConsts, createEmJs,
   demangleCSymbolName, handleLicense, isCSymbol, isInternalSymbol, updateSettingsGlue } from './glue.mjs';
 import { dedupList, pythonJsonDumps, pythonStrip, truthy, universalNewlines } from './python.mjs';
@@ -327,6 +328,14 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
     if (!optimize && sizeOnly(entry) && !(devWasmOpt && entry.kind === 'wasm-opt')) { step++; continue; }
     if (entry.kind === 'wasm-opt') {
       step++;
+      // Binaryen's Asyncify does not support tail calls: the Asyncify link
+      // (Supabase) turns them into ordinary calls first, so its recursion depth
+      // stays bounded by the stack (issue #90, docs/EDGE.md). The same lowering
+      // runs in emcc's wasm-opt for maintainer recordings (src/edge/edge-link.mjs).
+      if (entry.args.includes('--asyncify') && existsSync(wasm)) {
+        writeFileSync(wasm, lowerTailCalls(readFileSync(wasm)));
+        values.features = values.features.filter(flag => flag !== '--enable-tail-call');
+      }
       run(entry.program, expandArguments(devWasmOpt ? entry.args.filter(arg => !/^-O[0-4sz]$/.test(arg)) : entry.args, values, platform));
       saveFile('wasm-opt.wasm', wasm);
       saveFile('byn.wasm', wasm);

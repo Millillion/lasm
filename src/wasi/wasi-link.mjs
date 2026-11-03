@@ -47,7 +47,7 @@ const systemLibraries = ['c_optz', 'stubs', 'noexit', 'c', 'mimalloc', 'clang_rt
 // wasm-opt input features: what the wasm64 objects use before lowering.
 const inputFeatures = ['--enable-bulk-memory', '--enable-bulk-memory-opt', '--enable-nontrapping-float-to-int', '--enable-sign-ext',
   '--enable-mutable-globals', '--enable-exception-handling', '--enable-memory64', '--enable-multivalue', '--enable-reference-types',
-  '--enable-call-indirect-overlong'];
+  '--enable-call-indirect-overlong', '--enable-tail-call'];
 /** Import modules each target's program may use. */
 export const allowedImportModules = Object.freeze({
   wasi: ['wasi_snapshot_preview1'],
@@ -77,7 +77,7 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
   for (const source of ['lasm_wasi.c', 'lasm_wasi_libc.c', ...targetSources[target]]) {
     const object = join(out, source.replace(/\.c$/, '.o'));
     run('clang', ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
-      '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', `-DLASM_WASI_MAXIMUM_MEMORY=${settings.maximumMiB}`, ...targetDefines[target],
+      '-O2', '-DNDEBUG', '-mtail-call', '-DLEAN_EMSCRIPTEN', `-DLASM_WASI_MAXIMUM_MEMORY=${settings.maximumMiB}`, ...targetDefines[target],
       '-ffunction-sections', '-fdata-sections', '-ffile-prefix-map=' + here + '=lasm/', '-I', join(nodeRuntime.directory, 'include'), '-I', here,
       '-c', join(here, source), '-o', object]);
     objects.push(object);
