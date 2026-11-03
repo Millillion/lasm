@@ -195,7 +195,8 @@ def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
     if !m.ready then (m, .none) else
     let rp := m.rp.edit value.toList
     let m := { m with rp, text := value.toList, sel := (start, stop), dirty := true }
-    let (m, c) := syncCmd m
+    -- Offline, the retry timer syncs (every two seconds), not every keystroke.
+    let (m, c) := if m.offline then (m, .none) else syncCmd m
     (m, c ++ Cmd.delay 400 .save)
   | .select start stop => ({ m with sel := (start, stop) }, .none)
   | .syncNow => kick m .none

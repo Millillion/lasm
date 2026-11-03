@@ -12,7 +12,7 @@ const editor = page => page.locator('#tandem-editor');
 function watch(page) {
   const problems = [];
   // An offline browser's failed requests are expected; anything else is a problem.
-  const offline = /ERR_INTERNET_DISCONNECTED|Failed to fetch|NetworkError|Load failed|WebSocket|ERR_CONNECTION/;
+  const offline = /ERR_INTERNET_DISCONNECTED|Failed to fetch|NetworkError|Load failed|WebSocket|ERR_CONNECTION|WebKit encountered an internal error/;
   page.on('console', m => { if (m.type() === 'error' && !offline.test(m.text())) problems.push(m.text()); });
   page.on('pageerror', e => problems.push(String(e)));
   return problems;
