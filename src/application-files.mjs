@@ -17,7 +17,7 @@ export async function fileInventory(directory, skip = new Set(), directories) {
       else throw new Error(`Unexpected link or special file in application build inputs: ${name}`);
     }
   }
-  if (!(await lstat(directory)).isDirectory()) throw new Error('Application output must be an ordinary directory');
+  if (!(await lstat(directory)).isDirectory()) throw new Error(`Application output must be an ordinary directory: ${directory}`);
   await walk(directory); return files;
 }
 
@@ -58,6 +58,7 @@ async function deliverLockedOutput(cached, output, signature) {
   const destinationExists = await exists(output);
   let extraFiles = [], extraDirectories = [];
   if (destinationExists) {
+    if (!(await lstat(output)).isDirectory()) throw new Error(`The output ${output} exists and is not a directory. Remove it or choose another --output.`);
     const directories = [];
     const current = await fileInventory(output, new Set([outputReceipt]), directories);
     if (!(await exists(join(output, outputReceipt)))) {

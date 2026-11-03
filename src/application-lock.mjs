@@ -15,7 +15,11 @@ export async function withApplicationLock(path, action, { onWait, exclusive = tr
     if (!(await lstat(path)).isFile()) throw new Error(`Build lock must be an ordinary file: ${path}`);
   } catch (error) { if (error.code !== 'ENOENT') throw error; }
   const files = nativeFiles({ synchronous: true });
-  const file = await files.open(path, 4, 0o600);
+  let file;
+  // The native open reports only the C library's text: attach the lock file
+  // (src/application-cli.mjs describeFileSystemError names it).
+  try { file = await files.open(path, 4, 0o600); }
+  catch (error) { throw Object.assign(error, { path: error.path ?? path, syscall: error.syscall ?? 'open' }); }
   let held = true;
   const release = () => { if (held) { held = false; files.close(file); } };
   try {
