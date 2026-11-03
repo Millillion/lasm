@@ -71,6 +71,7 @@ addToLibrary({
   //  24 u64 argument  32 u64 input pointer  40 u64 input length
   //  48 u64 reply buffer pointer  56 u64 reply buffer capacity  64 u64 reply length
   //  72 u64 calling pthread  80 u64 native thread id  88 i32 native thread id present
+  //  96 u64 this thread's slot for the next depth (0 until it exists)
   // Requests are read and replies written in place: nothing is cloned or
   // transferred. A reply that does not fit is kept by the host until this
   // thread has grown its buffer and asked for it (kind 3). The host registers
@@ -78,14 +79,18 @@ addToLibrary({
   // with Atomics.waitAsync. This thread waits through Emscripten's futex
   // implementation, which also services the pthread mailbox; a raw
   // Atomics.wait would starve dylink synchronization. A call nested in that
-  // wait (a serviced mailbox task) uses the next depth's slot.
+  // wait (a serviced mailbox task) uses the next depth's slot. Each slot
+  // records the next depth's (offset 96), written before that slot's first
+  // request: Node's main thread, waiting inside a synchronous Lasm.JS callback,
+  // serves every depth of the callback thread inline (lasmFullServeSync), as it
+  // cannot run the message that registers a new slot.
   $lasmFullRPC__deps: ['malloc', 'free', 'emscripten_futex_wait'],
   $lasmFullRPC: {
     response: null,
     slots: null,
     depth: 0,
     doorbell: 0,
-    slotBytes: 96,
+    slotBytes: 104,
     replyBytes: 65536,
     newSlot: function () {
       var slot = Number(_malloc(lasmFullRPC.slotBytes));
@@ -123,7 +128,11 @@ addToLibrary({
       var depth = lasmFullRPC.depth++;
       try {
         lasmFullRPC.slots ??= [];
-        var slot = lasmFullRPC.slots[depth] ??= lasmFullRPC.newSlot();
+        var slot = lasmFullRPC.slots[depth];
+        if (!slot) {
+          slot = lasmFullRPC.slots[depth] = lasmFullRPC.newSlot();
+          if (depth) HEAPU64[(lasmFullRPC.slots[depth - 1] + 96) / 8] = BigInt(slot);
+        }
         if (operation === 37) {
           var path = require('node:url').fileURLToPath(new URL('./thread-id.cjs', process.env.LASM_FULL_HOST_MODULE));
           HEAPU64[(slot + 80) / 8] = BigInt.asUintN(64, BigInt(require(path)()));
