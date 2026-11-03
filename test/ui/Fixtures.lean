@@ -40,7 +40,7 @@ def genAttrs : R (List (Attr Unit)) := do
       let c ← pick #["red", "blue"]
       let m ← pick #["4px", "8px"]
       l := (if (← rand 2) == 0 then .style "color" c else .style "margin-left" m) :: l
-    | 2 => l := .on { event := ← pick #["click", "input"], paths := [["target", "id"]], preventDefault := (← rand 2) == 0 } (fun _ => some ()) :: l
+    | 2 => l := .on { event := ← pick #["click", "input"], paths := [["target", ← pick #["id", "value"]]] } (fun _ => some { message := () }) :: l
     | 3 => l := .prop "hidden" (.bool ((← rand 2) == 0)) :: l
     | _ => l := .attr (← pick #["class", "id", "data-x"]) s!"a{← rand 3}" :: l
   return l
@@ -91,8 +91,9 @@ def hex (b : ByteArray) : String :=
 def nsName : Ns → String
   | .html => "html" | .svg => "svg" | .mathml => "mathml"
 
-/-- The canonical DOM form the JavaScript test computes from the real DOM. -/
-partial def canon : Html Unit → String
+/-- The canonical DOM form the JavaScript test computes from the real DOM; a
+listener is its decoder's id (`dec`, from the encoder's tables). -/
+partial def canon (dec : List Path → Nat) : Html Unit → String
   | .text s => "{\"t\":" ++ jsonStr s ++ "}"
   | .elem ns tag _ attrs cs =>
     let final := Render.finalAttrs attrs
@@ -101,9 +102,9 @@ partial def canon : Html Unit → String
     let as := final.filterMap fun | .attr n v => some (n, jsonStr v) | _ => none
     let ps := final.filterMap fun | .prop n (.str s) => some (n, jsonStr s) | .prop n (.bool b) => some (n, toString b) | _ => none
     let ss := final.filterMap fun | .style n v => some (n, jsonStr v) | _ => none
-    let ls := final.filterMap fun | .on l _ => some (l.event, jsonStr (toString l.preventDefault)) | _ => none
+    let ls := final.filterMap fun | .on l _ => some (l.event, jsonStr (toString (dec l.paths))) | _ => none
     "{\"tag\":" ++ jsonStr tag ++ ",\"ns\":" ++ jsonStr (nsName ns) ++ ",\"attrs\":" ++ kv as ++ ",\"props\":" ++ kv ps ++
-      ",\"styles\":" ++ kv ss ++ ",\"on\":" ++ kv ls ++ ",\"children\":[" ++ ",".intercalate (cs.map canon) ++ "]}"
+      ",\"styles\":" ++ kv ss ++ ",\"on\":" ++ kv ls ++ ",\"children\":[" ++ ",".intercalate (cs.map (canon dec)) ++ "]}"
 
 def main : IO Unit := do
   let mut g : Gen := ⟨0x2545F4914F6CDD1D⟩
@@ -126,7 +127,7 @@ def main : IO Unit := do
       tables := t
       live := r.live
       next := r.next
-      frames := frames.push ("{\"patch\":\"" ++ hex bytes ++ "\",\"dom\":" ++ canon v ++ "}")
+      frames := frames.push ("{\"patch\":\"" ++ hex bytes ++ "\",\"dom\":" ++ canon (fun p => t.decoders.getD p 0) v ++ "}")
     let ssr := render views.head!
     scenarios := scenarios.push ("{\"ssr\":" ++ jsonStr ssr ++ ",\"frames\":[" ++ ",".intercalate frames.toList ++ "]}")
   IO.println ("[" ++ ",\n".intercalate scenarios.toList ++ "]")

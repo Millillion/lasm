@@ -5,6 +5,7 @@
 | [counter](counter) | The Elm architecture in 30 lines: `Msg`, a pure `update`, an `html!` view | `npx @lasm/cli dev Main.lean --target browser` |
 | [todomvc](todomvc) | TodoMVC with storage and routing; `Todo.lean` **proves every reachable model is valid** | `npx @lasm/cli build Main.lean --target browser` |
 | [demo](demo) | Routing and the back button, HTTP, timers, key events, focus, SVG, keyed lists, ports, server-side rendering and hydration | `npx @lasm/cli build Main.lean --target browser` |
+| [events](events) | Handlers that decide per event whether to prevent the default and stop propagation: a chat box (Enter sends, Shift+Enter is a newline), Ctrl+S on the document | `npx @lasm/cli build Main.lean --target browser` |
 | [bench](bench) | The js-framework-benchmark app (create, update, swap, remove 1,000–10,000 rows) | `npx @lasm/cli build Main.lean --target browser` |
 
 ```sh

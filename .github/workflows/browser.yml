@@ -136,7 +136,8 @@ jobs:
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
         run: |
           node scripts/browser/build-apps.mjs .work/browser-work .work/browser-apps \
-            uicounter=examples/ui/counter todomvc=examples/ui/todomvc bench=examples/ui/bench demo=examples/ui/demo
+            uicounter=examples/ui/counter todomvc=examples/ui/todomvc bench=examples/ui/bench demo=examples/ui/demo \
+            uievents=examples/ui/events
           # The benchmark's baseline (vanilla JavaScript, no build).
           cp -r bench/ui/vanilla .work/browser-apps/vanilla
       - name: Licence check of every built output (notices file, loader banner, no copyleft code)

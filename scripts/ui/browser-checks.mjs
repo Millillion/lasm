@@ -1,7 +1,8 @@
 // Lasm.UI checks for the browser suite (scripts/browser/browser-ci.mjs; CI only,
 // headless): TodoMVC end to end, the js-framework-benchmark operations against
 // vanilla JavaScript, the counter, and the feature demo (routing, HTTP, timers,
-// ports, SVG, focus, SSR and hydration). Each check gets the suite's helpers:
+// ports, SVG, focus, SSR and hydration), and event decisions (examples/ui/events:
+// preventDefault and stopPropagation decided in Lean per event). Each check gets the suite's helpers:
 // { server, name, manifest, openPage, expect, report }.
 
 const median = xs => { const s = [...xs].sort((a, b) => a - b); return s.length ? s[Math.floor(s.length / 2)] : null; };
@@ -311,4 +312,95 @@ async function demo({ server, name, manifest, openPage, expect, report }) {
   } finally { report.apps[name].console = consoleLines.slice(-80); await context.close(); }
 }
 
-export const uiChecks = { uicounter: counter, todomvc, bench, demo };
+// Event decisions (examples/ui/events): each handler decides for each event,
+// in Lean, whether to prevent its default and stop its propagation.
+async function events({ server, name, openPage, expect, report }) {
+  const { context, page, consoleLines } = await openPage(server, `/${name}/`);
+  const text = s => page.textContent(s).catch(() => null);
+  const until = (fn, arg, timeout = 5000) => page.waitForFunction(fn, arg, { timeout }).then(() => true, () => false);
+  const sent = () => page.$$eval('#sent li', lis => lis.map(li => li.textContent));
+  try {
+    await page.waitForSelector('#events', { timeout: 30_000 });
+    // The chat box: Enter sends with no newline; other keys type; Shift+Enter inserts a newline.
+    await page.focus('#chat');
+    await page.keyboard.type('hello');
+    expect(name, 'events.chat-typing', (await page.inputValue('#chat')) === 'hello', JSON.stringify(await page.inputValue('#chat')));
+    await page.keyboard.press('Enter');
+    await until(() => document.querySelectorAll('#sent li').length === 1);
+    expect(name, 'events.chat-enter-sends', JSON.stringify(await sent()) === '["hello"]', JSON.stringify(await sent()));
+    expect(name, 'events.chat-enter-no-newline', (await page.inputValue('#chat')) === '', JSON.stringify(await page.inputValue('#chat')));
+    await page.keyboard.type('a');
+    await page.keyboard.press('Shift+Enter');
+    await page.keyboard.type('b');
+    expect(name, 'events.chat-shift-enter-newline', (await page.inputValue('#chat')) === 'a\nb', JSON.stringify(await page.inputValue('#chat')));
+    expect(name, 'events.chat-shift-enter-no-send', (await sent()).length === 1, JSON.stringify(await sent()));
+    // Enter confirming an IME composition (Japanese, Chinese, Korean input) is left to the input method.
+    const composing = await page.evaluate(() => {
+      const e = new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true, cancelable: true });
+      document.querySelector('#chat').dispatchEvent(e);
+      return e.defaultPrevented;
+    });
+    await page.waitForTimeout(100);
+    expect(name, 'events.chat-composing-enter-ignored', composing === false && (await sent()).length === 1 && (await page.inputValue('#chat')) === 'a\nb',
+      `prevented ${composing}, ${JSON.stringify(await sent())} ${JSON.stringify(await page.inputValue('#chat'))}`);
+    await page.keyboard.press('Enter');
+    await until(() => document.querySelectorAll('#sent li').length === 2);
+    expect(name, 'events.chat-multiline-sent', JSON.stringify(await sent()) === '["hello","a\\nb"]' && (await page.inputValue('#chat')) === '',
+      `${JSON.stringify(await sent())} ${JSON.stringify(await page.inputValue('#chat'))}`);
+    // stopPropagationOn: a plain click reaches the row; Shift+click stops at the button.
+    await page.click('#inner');
+    await until(() => document.querySelector('#outer-count')?.textContent === '1');
+    expect(name, 'events.stop-plain-propagates', (await text('#inner-count')) === '1' && (await text('#outer-count')) === '1',
+      `${await text('#inner-count')} ${await text('#outer-count')}`);
+    await page.click('#inner', { modifiers: ['Shift'] });
+    await until(() => document.querySelector('#inner-count')?.textContent === '2');
+    await page.waitForTimeout(100);
+    expect(name, 'events.stop-shift-stops', (await text('#inner-count')) === '2' && (await text('#outer-count')) === '1',
+      `${await text('#inner-count')} ${await text('#outer-count')}`);
+    // custom with both flags: the link does not navigate and the row does not see the click.
+    await page.click('#custom-link');
+    await until(() => document.querySelector('#custom-count')?.textContent === '1');
+    await page.waitForTimeout(100);
+    expect(name, 'events.custom-handled', (await text('#custom-count')) === '1', await text('#custom-count'));
+    expect(name, 'events.custom-prevents', !(await page.evaluate(() => location.hash)).includes('navigated'), await page.evaluate(() => location.hash));
+    expect(name, 'events.custom-stops', (await text('#custom-outer-count')) === '0', await text('#custom-outer-count'));
+    // A document subscription prevents Ctrl+S; typing in an input is untouched.
+    await page.evaluate(() => { window.__keys = []; window.addEventListener('keydown', e => window.__keys.push([e.key, e.defaultPrevented])); });
+    await page.focus('#field');
+    await page.keyboard.type('abs');
+    await until(() => document.querySelector('#field')?.value === 'abs');
+    expect(name, 'events.doc-typing', (await page.inputValue('#field')) === 'abs', JSON.stringify(await page.inputValue('#field')));
+    await page.keyboard.press('Control+s');
+    expect(name, 'events.doc-ctrl-s-saves', await until(() => document.querySelector('#saves')?.textContent === '1'), await text('#saves'));
+    await page.keyboard.type('x');
+    await until(() => document.querySelector('#field')?.value === 'absx');
+    const keys = await page.evaluate(() => window.__keys);
+    expect(name, 'events.doc-ctrl-s-prevented', JSON.stringify(keys.filter(([k]) => k === 's')) === '[["s",false],["s",true]]', JSON.stringify(keys));
+    expect(name, 'events.doc-other-keys-not-prevented', keys.filter(([k]) => k !== 's' && k !== 'Control').every(([, p]) => !p) && (await page.inputValue('#field')) === 'absx',
+      `${JSON.stringify(keys)} ${await page.inputValue('#field')}`);
+    // A failing decoder leaves the event untouched: the checkbox still toggles.
+    await page.evaluate(() => { window.__check = []; window.addEventListener('click', e => window.__check.push(e.defaultPrevented)); });
+    await page.click('#check');
+    expect(name, 'events.failing-decoder-untouched', (await page.isChecked('#check')) && JSON.stringify(await page.evaluate(() => window.__check)) === '[false]',
+      `${await page.isChecked('#check')} ${JSON.stringify(await page.evaluate(() => window.__check))}`);
+    expect(name, 'events.failing-decoder-no-message', (await text('#never')) === '0', await text('#never'));
+    // Recorded, not checked (issue #71 investigation): the applier listens on the
+    // root in the capture phase, so a stopPropagation decided by Lean happens
+    // before the event reaches the target. Which non-Lasm listeners still run?
+    report.apps[name].captureStop = await page.evaluate(async () => {
+      const seen = [];
+      const inner = document.querySelector('#inner'), row = document.querySelector('#row');
+      inner.addEventListener('click', () => seen.push('target'));
+      row.addEventListener('click', () => seen.push('ancestor-inside-app'));
+      document.addEventListener('click', () => seen.push('document'));
+      inner.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, shiftKey: true }));
+      const stopped = seen.slice();
+      seen.length = 0;
+      inner.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, shiftKey: false }));
+      return { stopped, plain: seen.slice() };
+    });
+    expect(name, 'events.no-errors', noErrors(consoleLines), errorLines(consoleLines));
+  } finally { report.apps[name].console = consoleLines.slice(-50); await context.close(); }
+}
+
+export const uiChecks = { uicounter: counter, todomvc, bench, demo, uievents: events };

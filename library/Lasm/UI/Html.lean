@@ -116,6 +116,9 @@ def ctrlKey : Decoder Bool := bool ["ctrlKey"]
 def shiftKey : Decoder Bool := bool ["shiftKey"]
 def altKey : Decoder Bool := bool ["altKey"]
 def metaKey : Decoder Bool := bool ["metaKey"]
+/-- `event.isComposing`: a key pressed while an input method (IME) composes a
+word, such as Enter confirming a Japanese, Chinese or Korean word. -/
+def isComposing : Decoder Bool := bool ["isComposing"]
 def clientX : Decoder Float := float ["clientX"]
 def clientY : Decoder Float := float ["clientY"]
 def offsetX : Decoder Float := float ["offsetX"]
@@ -128,13 +131,32 @@ def dataset (name : String) : Decoder String := string ["target", "dataset", nam
 
 end Decoder
 
-/-- What the DOM knows of an event handler: the event, the fields its decoder
-reads and its options. Diffing compares these (never the Lean function). -/
+/-- What a handler decided for one event: its message, and whether the
+applier calls `event.preventDefault()` and `event.stopPropagation()`. Lean
+decides while the browser is still dispatching the event (the applier calls
+Lean synchronously from its listener), so the decision can depend on the
+event: Enter sends a message and prevents the newline, Shift+Enter does
+neither. A handler that produces no message leaves the event alone. -/
+structure Handled (Msg : Type) where
+  message : Msg
+  preventDefault : Bool := false
+  stopPropagation : Bool := false
+
+namespace Handled
+
+/-- Maps the message, keeping both decisions. -/
+def map (f : α → β) (h : Handled α) : Handled β :=
+  { message := f h.message, preventDefault := h.preventDefault, stopPropagation := h.stopPropagation }
+
+end Handled
+
+/-- What the DOM knows of an event handler: the event and the fields its
+decoder reads. Diffing compares these (never the Lean function). Whether an
+event's default is prevented or its propagation stopped is decided by the
+handler for each event (`Handled`), not stored here. -/
 structure Listener where
   event : String
   paths : List Path
-  preventDefault : Bool := false
-  stopPropagation : Bool := false
   deriving DecidableEq, Repr, Inhabited, Hashable
 
 /-- An attribute of an element: an HTML attribute (`setAttribute`), a DOM
@@ -143,7 +165,7 @@ inductive Attr (Msg : Type) where
   | attr (name value : String)
   | prop (name : String) (value : PropVal)
   | style (name value : String)
-  | on (listener : Listener) (handle : List EvVal → Option Msg)
+  | on (listener : Listener) (handle : List EvVal → Option (Handled Msg))
 
 instance : Inhabited (Attr Msg) := ⟨.attr "" ""⟩
 
@@ -182,11 +204,17 @@ def map (f : α → β) : Attr α → Attr β
   | .attr n v => .attr n v
   | .prop n v => .prop n v
   | .style n v => .style n v
-  | .on l h => .on l fun vs => (h vs).map f
+  | .on l h => .on l fun vs => (h vs).map (Handled.map f)
 
-/-- An event handler from a decoder. -/
-def onWith (event : String) (d : Decoder Msg) (preventDefault stopPropagation : Bool := false) : Attr Msg :=
-  .on { event, paths := d.paths, preventDefault, stopPropagation } d.run
+/-- An event handler whose decoder also decides, for each event, whether to
+prevent its default and stop its propagation (`Lasm.UI.custom`). -/
+def custom (event : String) (d : Decoder (Handled Msg)) : Attr Msg :=
+  .on { event, paths := d.paths } d.run
+
+/-- An event handler from a decoder; it never prevents the default or stops
+propagation (`Lasm.UI.on`). -/
+def onWith (event : String) (d : Decoder Msg) : Attr Msg :=
+  custom event (d.map fun m => { message := m })
 
 end Attr
 

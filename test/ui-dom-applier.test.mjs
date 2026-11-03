@@ -44,7 +44,7 @@ class Frame {
   propFalse(a) { return this.byte(2).lit(a); }
   propTrue(a) { return this.byte(3).lit(a); }
   style(a, value) { return this.byte(4).lit(a).lit(value); }
-  on(event, decoder, flags = 0) { return this.byte(5).lit(event).v(decoder).v(flags); }
+  on(event, decoder) { return this.byte(5).lit(event).v(decoder); }
   removeAttr(a) { return this.byte(8).lit(a); }
   resetProp(a) { return this.byte(9).lit(a); }
   removeStyle(a) { return this.byte(10).lit(a); }
@@ -269,27 +269,28 @@ test('hydration: an empty first frame keeps the server-rendered DOM until the ap
   assert.equal(root.innerHTML, '<p>live</p>');
 });
 
-// A list with handlers: ul(1) > li#item(2) > b#bold(3) > "x"(4).
+// A list with handlers: ul(1) > li#item(2) > b#bold(3) > "x"(4). ul, li and b
+// are decoder ids (null: no handler). Lean's answer is `answer` (a number, or a
+// function of the call): bit 1 a frame, 2 preventDefault, 4 stopPropagation.
 function withList({ ul = 0, li = 0, b = null, decoders = [[['target', 'id'], ['currentTarget', 'id']]] } = {}) {
   const p = page();
   const ui = createUi({ root: p.root });
   const calls = [];
-  let answer = false, frames = 0;
-  ui.module.connect({ event: (path, type, cs) => { calls.push({ path, type, cs }); return answer; },
+  let answer = 0, frames = 0;
+  ui.module.connect({ event: (path, type, cs) => { calls.push({ path, type, cs }); return typeof answer === 'function' ? answer(cs) : answer; },
     frame: () => { frames++; return new Uint8Array(0); } });
   const f = frame();
   decoders.forEach((paths, d) => f.decoder(d, paths));
-  f.insert(0, 0, f => f.el(1, 'ul', f => ul === null ? 0 : (f.on('click', ul >> 2, ul & 3), 1), [
-    f => f.el(2, 'li', f => (f.attr('id', 'item'), li === null ? 1 : (f.on('click', li >> 2, li & 3), 2)), [
-      f => f.el(3, 'b', f => (f.attr('id', 'bold'), b === null ? 1 : (f.on('click', b >> 2, b & 3), 2)), [f => f.text(4, 'x')])])]));
+  f.insert(0, 0, f => f.el(1, 'ul', f => ul === null ? 0 : (f.on('click', ul), 1), [
+    f => f.el(2, 'li', f => (f.attr('id', 'item'), li === null ? 1 : (f.on('click', li), 2)), [
+      f => f.el(3, 'b', f => (f.attr('id', 'bold'), b === null ? 1 : (f.on('click', b), 2)), [f => f.text(4, 'x')])])]));
   ui.applyForTest(f.u8);
   return { ...p, ui, calls, setAnswer: x => { answer = x; }, frames: () => frames };
 }
 const click = (window, el, init = {}) => { const e = new window.MouseEvent('click', { bubbles: true, cancelable: true, ...init }); el.dispatchEvent(e); return e; };
 
 test('events: every handler on the path is called, innermost first, with its decoder', () => {
-  // The ul uses decoder 1 (encoded as 1 * 4 + flags), the li decoder 0.
-  const t = withList({ ul: 1 * 4, li: 0, decoders: [[['target', 'id']], [['type'], ['bubbles'], ['detail'], ['relatedTarget']]] });
+  const t = withList({ ul: 1, li: 0, decoders: [[['target', 'id']], [['type'], ['bubbles'], ['detail'], ['relatedTarget']]] });
   click(t.window, t.root.querySelector('#bold'));
   assert.deepEqual(t.calls, [{ path: [1, 2, 3], type: 'click', cs: [1, ['bold'], 0, ['click', true, 0, null]] }]);
 });
@@ -301,20 +302,40 @@ test('events: decoded fields are primitives; objects and missing fields become u
   assert.deepEqual(t.calls[0].cs, [1, [undefined, undefined, true, null, 4]]);
 });
 
-test('events: preventDefault and stopPropagation flags', () => {
-  const t = withList({ ul: 0, li: 1 });
+test('events: Lean decides preventDefault and stopPropagation for each event', () => {
   const outside = [];
+  const t = withList({ ul: 0, li: 0 });
   t.document.addEventListener('click', () => outside.push('document'));
-  const e = click(t.window, t.root.querySelector('#bold'));
-  assert.equal(e.defaultPrevented, true);
-  assert.deepEqual(t.calls[0].cs.filter((_, i) => i % 2 === 0), [1, 0], 'both handlers, inner first');
-  assert.deepEqual(outside, ['document']);
-  const s = withList({ ul: 0, li: 2 });
-  s.document.addEventListener('click', () => outside.push('stopped'));
-  const e2 = click(s.window, s.root.querySelector('#bold'));
-  assert.equal(e2.defaultPrevented, false);
-  assert.deepEqual(s.calls[0].cs.filter((_, i) => i % 2 === 0), [1]);
-  assert.deepEqual(outside, ['document'], 'propagation stopped before the document');
+  // Every handler on the path is sent: Lean, not the applier, decides where to stop.
+  for (const [answer, prevented, reached] of [[0, false, true], [2, true, true], [4, false, false], [6, true, false], [1, false, true], [3, true, true], [7, true, false]]) {
+    t.setAnswer(answer);
+    outside.length = 0;
+    const e = click(t.window, t.root.querySelector('#bold'));
+    assert.equal(e.defaultPrevented, prevented, `answer ${answer}: preventDefault`);
+    assert.deepEqual(outside, reached ? ['document'] : [], `answer ${answer}: propagation`);
+    assert.deepEqual(t.calls.at(-1).cs.filter((_, i) => i % 2 === 0), [1, 0], 'both handlers, inner first');
+  }
+  // The decision depends on the event: here only clicks with Ctrl held.
+  const s = withList({ ul: null, li: 0, decoders: [[['ctrlKey']]] });
+  s.setAnswer(cs => cs[1][0] ? 2 + 4 : 0);
+  const seen = [];
+  s.document.addEventListener('click', () => seen.push('document'));
+  assert.equal(click(s.window, s.root.querySelector('#bold'), { ctrlKey: true }).defaultPrevented, true);
+  assert.equal(click(s.window, s.root.querySelector('#bold'), { ctrlKey: false }).defaultPrevented, false);
+  assert.deepEqual(seen, ['document']);
+});
+
+test('events: decisions are applied before the dispatch goes on, and a frame only when Lean asks', async () => {
+  const t = withList({ ul: null, li: 0 });
+  const order = [];
+  t.setAnswer(() => { order.push('lean'); return 2; });
+  t.root.querySelector('#bold').addEventListener('click', event => order.push(`target ${event.defaultPrevented}`));
+  click(t.window, t.root.querySelector('#bold'));
+  assert.deepEqual(order, ['lean', 'target true']);
+  assert.equal(t.frames(), 0, 'no frame without bit 1');
+  t.setAnswer(3);
+  click(t.window, t.root.querySelector('#bold'));
+  assert.equal(t.frames(), 1, 'a click with bit 1 renders at once');
 });
 
 test('events: a non-bubbling event reaches only a handler on its own target', () => {
@@ -349,7 +370,7 @@ test('events: a handler still runs when a page listener stops the bubbling below
 test('events before connect and after unmount reach nothing and raise nothing', () => {
   const { root, window, errors } = page();
   const ui = createUi({ root });
-  ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'button', f => (f.on('click', 0, 0), 1))).u8);
+  ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'button', f => (f.on('click', 0), 1))).u8);
   click(window, root.firstChild);
   assert.deepEqual(errors, []);
 });
@@ -361,14 +382,14 @@ test('discrete events render in the same task; continuous ones on the next anima
   for (const type of [...discrete, 'mousemove']) {
     const { root, window } = page();
     const ui = createUi({ root });
-    let frames = 0, answer = true;
+    let frames = 0, answer = 1;
     ui.module.connect({ event: () => answer, frame: () => { frames++; return new Uint8Array(0); } });
-    ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'div', f => (f.on(type, 0, 0), 1))).u8);
+    ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'div', f => (f.on(type, 0), 1))).u8);
     root.firstChild.dispatchEvent(new window.Event(type, { bubbles: true }));
     assert.equal(frames, type === 'mousemove' ? 0 : 1, type);
     await nextFrame(window); await nextFrame(window);
     assert.equal(frames, 1, `${type}: one render in all`);
-    answer = false;
+    answer = 0;
     root.firstChild.dispatchEvent(new window.Event(type, { bubbles: true }));
     await nextFrame(window); await nextFrame(window);
     assert.equal(frames, 1, `${type}: no render without a change`);
@@ -384,8 +405,8 @@ test('an event raised while a patch is applied waits for the next frame (no re-e
   const ui = createUi({ root });
   let frames = 0;
   const patches = [frame().insert(1, 0, f => f.el(2, 'x-fire')).u8];
-  ui.module.connect({ event: () => true, frame: () => { frames++; return patches.shift() ?? new Uint8Array(0); } });
-  ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'div', f => (f.on('click', 0, 0), 1))).u8);
+  ui.module.connect({ event: () => 1, frame: () => { frames++; return patches.shift() ?? new Uint8Array(0); } });
+  ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'div', f => (f.on('click', 0), 1))).u8);
   ui.module.schedule();
   await nextFrame(window); await nextFrame(window);
   assert.deepEqual(errors, []);
@@ -549,7 +570,7 @@ test('subscriptions: every, frame, window and document events with their options
   const ui = createUi({ root });
   const fired = [];
   let frames = 0;
-  ui.module.connect({ frame: () => { frames++; return new Uint8Array(0); }, sub: (id, values) => { fired.push([id, values]); return id === 1; } });
+  ui.module.connect({ frame: () => { frames++; return new Uint8Array(0); }, sub: (id, values) => { fired.push([id, values]); return id === 1 ? 1 : 0; } });
   ui.module.sub(1, ['every', 5]);
   await tick(30);
   const ticks = fired.filter(([id]) => id === 1);
@@ -571,31 +592,52 @@ test('subscriptions: every, frame, window and document events with their options
   const stopped = fired.length;
   await nextFrame(window); await nextFrame(window);
   assert.equal(fired.length, stopped);
-  // document events, with preventDefault and stopPropagation.
-  ui.module.sub(3, ['document', 'keydown', [['key'], ['currentTarget', 'nodeType']], true, true]);
+  // document and window events: Lean's answer decides preventDefault and stopPropagation.
+  ui.module.sub(3, ['document', 'keydown', [['key'], ['currentTarget', 'nodeType']]]);
   const below = [];
   document.body.addEventListener('keydown', () => below.push('body'));
   const key = new window.KeyboardEvent('keydown', { key: 'Enter', cancelable: true, bubbles: true });
   document.dispatchEvent(key);
   assert.deepEqual(fired.at(-1), [3, ['Enter', 9]]);
-  assert.equal(key.defaultPrevented, true);
+  assert.equal(key.defaultPrevented, false, 'answer 0 prevents nothing');
   const window2 = page();
   const u2 = createUi({ root: window2.root });
   const seen = [];
-  u2.module.connect({ frame: () => new Uint8Array(0), sub: (id, values) => { seen.push(values); return false; } });
-  u2.module.sub(4, ['window', 'custom', [['detail']], false, false]);
+  let answer = 0, frames2 = 0;
+  u2.module.connect({ frame: () => { frames2++; return new Uint8Array(0); }, sub: (id, values) => { seen.push(values); return typeof answer === 'function' ? answer(values) : answer; } });
+  u2.module.sub(4, ['window', 'custom', [['detail']]]);
   window2.window.addEventListener('custom', () => seen.push('after'));
   const plain = new window2.window.CustomEvent('custom', { detail: 7, cancelable: true });
   window2.window.dispatchEvent(plain);
   assert.equal(plain.defaultPrevented, false);
-  assert.deepEqual(seen, [[7], 'after'], 'propagation continues without the option');
-  // A stopping subscription keeps later listeners on the same target from running.
-  u2.module.sub(5, ['document', 'ping', [], false, true]);
+  assert.deepEqual(seen, [[7], 'after'], 'propagation continues when Lean does not stop it');
+  // Ctrl+S prevented, other keys typed: the decision depends on the event.
+  answer = ([k, ctrl]) => k === 's' && ctrl ? 2 : 0;
+  u2.module.sub(7, ['document', 'keydown', [['key'], ['ctrlKey']]]);
+  const save = new window2.window.KeyboardEvent('keydown', { key: 's', ctrlKey: true, cancelable: true, bubbles: true });
+  window2.document.dispatchEvent(save);
+  const typed = new window2.window.KeyboardEvent('keydown', { key: 's', cancelable: true, bubbles: true });
+  window2.document.dispatchEvent(typed);
+  assert.deepEqual([save.defaultPrevented, typed.defaultPrevented], [true, false]);
+  u2.module.unsub(7);
+  // Stopping on document keeps the event from window; listeners on document still run.
+  answer = 4;
+  u2.module.sub(5, ['document', 'ping', []]);
   window2.document.addEventListener('ping', () => seen.push('later'));
-  window2.document.dispatchEvent(new window2.window.Event('ping', { bubbles: true }));
   window2.window.addEventListener('ping', () => seen.push('window'));
   window2.document.dispatchEvent(new window2.window.Event('ping', { bubbles: true }));
   assert.equal(seen.includes('window'), false, 'stopPropagation');
+  assert.equal(seen.includes('later'), true, 'not stopImmediatePropagation');
+  answer = 0;
+  window2.document.dispatchEvent(new window2.window.Event('ping', { bubbles: true }));
+  assert.equal(seen.includes('window'), true, 'answer 0 lets it propagate');
+  await nextFrame(window2.window); await nextFrame(window2.window);
+  assert.equal(frames2, 0, 'no frame without bit 1');
+  answer = 1;
+  window2.document.dispatchEvent(new window2.window.Event('ping', { bubbles: true }));
+  await nextFrame(window2.window); await nextFrame(window2.window);
+  assert.equal(frames2, 1, 'bit 1 schedules a frame');
+  answer = 0;
   u2.module.unsub(4);
   window2.window.dispatchEvent(new window2.window.CustomEvent('custom', { detail: 8 }));
   assert.equal(seen.filter(x => Array.isArray(x) && x[0] === 8).length, 0);
@@ -607,7 +649,7 @@ test('subscriptions: every, frame, window and document events with their options
 test('subscriptions before connect deliver nothing and raise nothing', () => {
   const { root, window, errors } = page();
   const ui = createUi({ root });
-  ui.module.sub(1, ['window', 'resize', [], false, false]);
+  ui.module.sub(1, ['window', 'resize', []]);
   window.dispatchEvent(new window.Event('resize'));
   assert.deepEqual(errors, []);
 });
@@ -714,8 +756,8 @@ test('unmount stops subscriptions and listeners, empties the root and the id tab
   const calls = [];
   ui.module.connect({ event: () => { calls.push('event'); return false; }, sub: () => { calls.push('sub'); return false; },
     frame: () => new Uint8Array(0) });
-  ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'button', f => (f.on('click', 0, 0), 1), [f => f.el(2, 'b', () => 0, [f => f.text(3, 'x')])])).u8);
-  ui.module.sub(1, ['window', 'resize', [], false, false]);
+  ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'button', f => (f.on('click', 0), 1), [f => f.el(2, 'b', () => 0, [f => f.text(3, 'x')])])).u8);
+  ui.module.sub(1, ['window', 'resize', []]);
   ui.module.sub(2, ['every', 5]);
   const button = root.firstChild;
   ui.unmount();
