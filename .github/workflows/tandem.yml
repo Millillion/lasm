@@ -1,0 +1,57 @@
+name: Tandem
+# examples/tandem, a collaborative text editor in Lean (Fugue's sequence CRDT),
+# built as a user builds it (npm ci with the published @lasm/cli pinned in its
+# package.json):
+# - proofs: every proposition of Proofs/Spec.lean has its theorem, every
+#   theorem in Proofs/ compiles and uses only propext, Classical.choice and
+#   Quot.sound (no sorry, no native_decide), and no definition reachable from
+#   the code that handles untrusted input is partial, unsafe or a panic, with
+#   Lasm's managed Lean; PROOFS.md, SPEC.md and the stated theorem count agree
+#   with what was checked; then the export of the proofs is replayed by Lean's
+#   kernel and every external checker Lean 4.35.0 ships (`lake check --paranoid`).
+# Local runtimes only: no account, nothing deployed, CI=1. Free runners only.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/tandem.yml'
+      - 'examples/tandem/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/tandem.yml'
+      - 'examples/tandem/**'
+permissions:
+  contents: read
+concurrency:
+  group: tandem-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CI: '1'
+  BROWSER: 'none'
+jobs:
+  proofs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - name: npm ci
+        working-directory: examples/tandem
+        run: npm ci --no-audit --no-fund
+      - name: npm run proofs (no sorry; only Lean's standard axioms; total input handlers)
+        working-directory: examples/tandem
+        run: |
+          if grep -rnw 'sorry\|native_decide' Tandem Proofs; then echo "::error::sorry or native_decide in the sources"; exit 1; fi
+          npm run proofs
+      - name: lake check --paranoid (Lean's kernel and the external checkers)
+        working-directory: examples/tandem
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          command -v bwrap || sudo apt-get install -y --no-install-recommends bubblewrap
+          npm run proofs:paranoid

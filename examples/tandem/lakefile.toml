@@ -1,0 +1,13 @@
+name = "tandem"
+version = "0.1.0"
+defaultTargets = ["Tandem", "Proofs"]
+
+# The pure core: the document (Fugue's tree, kept as a set of operations),
+# its text, local edits, the wire format and the sync server's logic.
+# `lake build` checks it with plain Lean 4.35.0: no Lasm, no JavaScript.
+[[lean_lib]]
+name = "Tandem"
+
+# The theorems about Tandem (PROOFS.md).
+[[lean_lib]]
+name = "Proofs"
