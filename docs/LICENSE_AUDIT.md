@@ -332,6 +332,8 @@ C tier leaves it out (`scripts/lean-dist/tiers.mjs` drops `*.tbd`), and Lasm's
 assembled prefix copies the user's own SDK file into `lib/libc/` (keyed by its
 SHA-256, so an SDK update rebuilds the prefix). The macOS C tier already required
 the Command Line Tools SDK for C headers; nothing new is needed from the user.
+The copy leaves out the targets Lean's `ld64.lld` does not know (`arm64e.x1-*` in
+newer SDKs; issue #73, `src/macos-tbd.mjs`); it stays on the user's machine.
 `scripts/lean-dist/check-c-tier.mjs` asserts the archive lacks the file and links
 with Lean's own flags against the SDK copy on the macOS runners.
 

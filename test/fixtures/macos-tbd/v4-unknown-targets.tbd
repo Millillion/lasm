@@ -1,0 +1,61 @@
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ x86_64-macos, x86_64-maccatalyst, arm64-macos, arm64-maccatalyst,
+                   arm64e-macos, arm64e-maccatalyst, arm64e.x1-macos, arm64e.x1-maccatalyst ]
+uuids:
+  - target:          x86_64-macos
+    value:           00000000-0000-0000-0000-000000000001
+  - target:          arm64e.x1-macos
+    value:           00000000-0000-0000-0000-000000000003
+  - target:          arm64-macos
+    value:           00000000-0000-0000-0000-000000000002
+install-name:    '/usr/lib/libSystem.B.dylib'
+current-version: 1351
+reexported-libraries:
+  - targets:         [ x86_64-macos, x86_64-maccatalyst, arm64-macos, arm64-maccatalyst,
+                       arm64e-macos, arm64e-maccatalyst, arm64e.x1-macos, arm64e.x1-maccatalyst ]
+    libraries:       [ '/usr/lib/system/libsystem_c.dylib', '/usr/lib/system/libdyld.dylib' ]
+exports:
+  - targets:         [ x86_64-maccatalyst, x86_64-macos, arm64e-macos, arm64e-maccatalyst,
+                       arm64-macos, arm64-maccatalyst, arm64e.x1-macos ]
+    symbols:         [ 'R8289209$_close', 'R8289209$_fork', '$ld$previous$/usr/lib/libSystem.B.dylib$$1$10.0$11.0$$' ]
+  - targets:         [ arm64e.x1-macos, arm64e.x1-maccatalyst ]
+    symbols:         [ _only_on_x1 ]
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ x86_64-macos, arm64-macos, arm64e-macos, arm64e.x1-macos ]
+install-name:    '/usr/lib/system/libsystem_c.dylib'
+current-version: 1698
+parent-umbrella:
+  - targets:         [ x86_64-macos, arm64-macos, arm64e-macos, arm64e.x1-macos ]
+    umbrella:        System
+allowable-clients:
+  - targets:         [ arm64e.x1-macos ]
+    clients:         [ x1-only-client ]
+exports:
+  - targets:         [ x86_64-macos, arm64-macos, arm64e-macos, arm64e.x1-macos ]
+    symbols:         [ _printf, _puts ]
+    weak-symbols:    [ _weak_c ]
+  - symbols:         [ _x1_c ]
+    targets:         [ arm64e.x1-macos ]
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ x86_64-macos, arm64-macos, arm64e-macos, arm64e.x1-macos ]
+install-name:    '/usr/lib/system/libdyld.dylib'
+parent-umbrella:
+  - targets:         [ x86_64-macos, arm64-macos, arm64e-macos, arm64e.x1-macos ]
+    umbrella:        System
+exports:
+  - targets:         [ x86_64-macos, arm64-macos, arm64e-macos, arm64e.x1-macos ]
+    symbols:         [ dyld_stub_binder ]
+--- !tapi-tbd
+tbd-version:     4
+targets:         [ arm64e.x1-macos, arm64e.x1-maccatalyst ]
+install-name:    '/usr/lib/system/libsystem_x1.dylib'
+parent-umbrella:
+  - targets:         [ arm64e.x1-macos ]
+    umbrella:        System
+exports:
+  - targets:         [ arm64e.x1-macos ]
+    symbols:         [ _x1_library ]
+...

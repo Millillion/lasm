@@ -104,7 +104,11 @@ it as this directory's elan override. The editor then resolves every
 `import Lasm.*`, with hovers, completion and go-to-definition, using exactly the
 Lean that `lasm build` uses. Your files are not changed (`lean-toolchain` stays
 `leanprover/lean4:v4.35.0`); the override is per machine and per directory, and
-`elan override unset` removes it. `lasm init` does it up front when Lasm's Lean is
+`elan override unset` removes it. When the project's Lake packages have C code
+(`extern_lib`, `precompileModules`, for example UnicodeBasic), it links Lean with
+its C compiler and headers, as `lasm build` uses for them, so `lake build` and the
+editor's `lake setup-file` can compile that C; run `lasm editor` again after the
+project gains or loses C code. `lasm init` does it up front when Lasm's Lean is
 already installed on the machine (it never downloads); otherwise the first build
 does. Each project gets one line saying what was done; later runs are silent. After it runs the first time, restart the Lean
 server in the editor (VS Code: *Lean 4: Restart Server*). elan comes with the
