@@ -20,6 +20,11 @@ on:
       candidate-version:
         type: string
         default: 0.1.0-experimental.46
+      # A retained candidate records the exact Node it was accepted on
+      # (application-support.json); installation-confidence passes it here.
+      node-version:
+        type: string
+        default: 26.13.0
 permissions:
   contents: read
 jobs:
@@ -39,7 +44,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.12.1
+          node-version: ${{ inputs.node-version }}
           architecture: ${{ inputs.architecture }}
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
