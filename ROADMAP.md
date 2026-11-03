@@ -55,7 +55,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] (J) Review Porter's 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
 - [ ] (J) Porter's API proposals: a shared Web Crypto module (e.g. `Lasm.Web.Crypto`), since Conduit and Porter each hand-bind SHA-256, PBKDF2, random values, ECDSA, Ed25519 and JWK export; a documented way to read Workers environment variables; documentation of what `Lasm.UI` mount does with an element's existing children; Porter's `test/Axioms.lean` totality check (no `partial`, `unsafe`, `opaque` or panicking definition reachable) shipped as a reusable Lasm tool.
 - [ ] (J) Review the propositions: Tandem's 29 propositions (the CRDT, the edits, the wire format, the sync server, the replica) in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean).
-- [ ] (J) Tandem's API proposals: an upgrade (WebSocket) hook in `Lasm.Fetch.serve`, so apps need not run their own `node:http` server; a server-side WebSocket type in `Lasm.Web` shared by Node, Bun and Deno.
+- [ ] (J) Tandem's API proposals: an upgrade (WebSocket) hook in `Lasm.Fetch.serve`, so apps need not run their own `node:http` server; a server-side WebSocket type in `Lasm.Web` shared by Node, Bun and Deno; Lasm's Bun entry passing `websocket` handlers to `Bun.serve` (Tandem uses `server.reload`); exporting a Durable Object class from a Workers build, so Workers can hold WebSockets.
 
 ## Now (November 2026)
 
@@ -121,7 +121,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 ### Tandem ([examples/tandem](examples/tandem), the fifth flagship app: a collaborative text editor on a CRDT)
 - [x] 1. Pure core: Fugue's sequence CRDT with the state as a canonical set of operations, local edits (insertion, deletion, typed runs, `edit` for a text area's change), the wire format and the sync server's logic, and the proofs: 25 propositions in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean) (strong eventual consistency, commutativity, idempotence, intent preservation, non-interleaving of concurrent typing, the explicit-stack traversal equals the paper's, the server never loses an acknowledged operation, bounded total parsers), a requirements map ([SPEC.md](examples/tandem/SPEC.md)), `proofs:paranoid`.
 - [x] 2. Node sync server (HTTP sync, WebSockets through `ws`, long-poll, `node:sqlite`), the differential test against Yjs 13.6.33 (partitions, reordering, duplication, out-of-causal-order delivery; Yjs interleaves in about 40 % of two-device backward sessions, Tandem in none), the live simulation (replicas in Lean over an unreliable network, the server SIGKILLed mid-run), and the protocol fuzzer (three minutes per PR). 29 propositions in all (bulk application, the replica's sync).
-- [ ] 3. Bun, Deno, Workers (D1, long-poll), Docker.
+- [x] 3. Bun (WebSockets through `server.reload`), Deno (`Deno.upgradeWebSocket`), Workers (D1, long-poll), Docker (read-only, 512 MB), each with the protocol tests, the live simulation and a minute of fuzzing in CI. No function platforms, Fastly or WASI (no shared store or long-lived connections).
 - [ ] 4. The `Lasm.UI` editor (offline, merges on reconnect), Playwright tests on Chromium, Firefox and WebKit (two browsers editing concurrently; offline then reconnect), and a nightly fuzz job.
 - [ ] (J) Review the propositions in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean).
 

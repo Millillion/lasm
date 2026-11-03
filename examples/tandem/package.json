@@ -14,7 +14,13 @@
     "test:simulate": "node test/simulate.mjs",
     "test:fuzz": "node test/fuzz.mjs",
     "proofs": "node test/proofs.mjs",
-    "proofs:paranoid": "node test/paranoid.mjs"
+    "proofs:paranoid": "node test/paranoid.mjs",
+    "build:bun": "bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
+    "start:bun": "bun bun/main.mjs",
+    "build:deno": "lasm build ServerDeno.lean --target deno --output dist/server",
+    "start:deno": "deno run -A deno/main.mjs",
+    "build:workers": "lasm build ServerWorkers.lean --target workers --output dist/server",
+    "build:docker": "npm run build && docker build -t tandem ."
   },
   "engines": {
     "node": ">=24"
