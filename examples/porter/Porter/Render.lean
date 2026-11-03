@@ -171,7 +171,7 @@ def Body.wire (cfg : Config) : Body → List (String × String) × String
 def Reply.render (cfg : Config) (r : Reply) : Wire :=
   -- A redirect says so in a short text body too (RFC 9110 §15.4.4); an
   -- empty one never reaches the client through Netlify's function
-  -- bootstrap (docs/DECISIONS.md).
+  -- bootstrap (issue #82).
   let (hs, body) := match r.body, r.location with
     | .empty, some _ => ([("content-type", "text/plain; charset=utf-8")], "See Other\n")
     | b, _ => b.wire cfg
