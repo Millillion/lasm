@@ -213,7 +213,11 @@ The browser runner serves `dist/` from `127.0.0.1` (the Wasm as
 `application/wasm`), opens a blank page, imports `app.js` and calls the public
 `mount(element, { stdout, stderr })` ([BROWSER.md](BROWSER.md#loader-and-mount-api-measured)),
 as an embedding page does. Lean's output arrives as lines and is compared line
-for line (every generated line ends with a newline). A page has no exit status:
+for line (every generated line ends with a newline). A page has no environment,
+so `LEAN_BACKTRACE=0` cannot reach the program and a panic prints a JavaScript
+backtrace after its message ([EDGE.md](EDGE.md#environment-variables)); a
+`KNOWN` entry removes that block before the comparison (it appeared on the
+first PR run, 41718617906, on two regressions and three generated cases). A page has no exit status:
 `mount` resolves when `main` returned 0 and rejects otherwise, so the harness
 compares zero against non-zero (`zeroOrNot` in `run.mjs`). Firefox and WebKit
 run without JSPI (Firefox's JSPI is disabled by the loader, WebKit has none), and

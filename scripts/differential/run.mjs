@@ -185,6 +185,11 @@ const KNOWN = [
     what: 'wasmtime turns exit statuses of 126 and above into exit 1 with an error (a wasmtime limit, documented in docs/WASI.md)',
     apply: (r, nat) => typeof nat?.code === 'number' && nat.code >= 126 && r.code === 1 && /invalid exit status outside of \[0\.\.126\)/.test(r.stderr)
       ? { ...r, code: nat.code, stderr: r.stderr.replace(/Error: failed to run main module[\s\S]*$/, '') + (nat.stderr.endsWith('\n') && !r.stderr.endsWith('\n') ? '\n' : '') } : r },
+  { issue: 'docs/EDGE.md#environment-variables (a page has no environment)', targets: ['browser-chromium', 'browser-firefox', 'browser-webkit'],
+    what: 'a page has no environment, so LEAN_BACKTRACE=0 cannot be set and a panic prints a JavaScript/Wasm backtrace after its message (documented in docs/EDGE.md)',
+    // A stack frame as V8 ("    at …"), SpiderMonkey and JavaScriptCore ("name@url:line:column",
+    // "name@[wasm code]") write it.
+    apply: r => ({ ...r, stderr: r.stderr.replace(/^backtrace:\n(?:(?:[ \t]+\S[^\n]*|[^@\n]*@(?:\S+:\d+:\d+|\S+:0x[0-9a-f]+|\[(?:wasm|native) code\])|\(stack trace unavailable\))\n)*/gm, '') }) },
 ];
 const knownApplied = {};
 function applyKnown(target, r, nat) {
