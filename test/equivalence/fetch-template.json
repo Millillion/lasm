@@ -74,6 +74,11 @@
       "path": "/../../hello/Ada"
     },
     {
+      "name": "query-with-scheme",
+      "method": "GET",
+      "path": "/hello/Ada?next=http://example.com/x#a://b"
+    },
+    {
       "name": "backslash-separator",
       "method": "GET",
       "path": "/hello\\..\\hello\\Ada"

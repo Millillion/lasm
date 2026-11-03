@@ -152,10 +152,11 @@ private theorem resolve_kept : ∀ (stack input : List String), (∀ x ∈ stack
 
 /-- The raw path of `url`: from the `/` after the host, without the query. -/
 private def rawPath (url : String) : String :=
-  let afterScheme := match url.splitOn "://" with
+  -- Drop the query and fragment first: they may contain `://` (#76).
+  let beforeQuery := (url.takeWhile (fun c => c != '?' && c != '#')).toString
+  match beforeQuery.splitOn "://" with
     | [_, rest] => (rest.dropWhile (· != '/')).toString
-    | _ => url
-  (afterScheme.takeWhile (fun c => c != '?' && c != '#')).toString
+    | _ => beforeQuery
 
 /-- The path's raw segments, resolved: `\\` counts as `/`, and `.`, `..`
 and their escaped forms (`%2e`, `.%2E`, …) are removed as a browser removes
@@ -209,6 +210,16 @@ theorem segments_no_dot_segments (r : Request) :
   rcases hk with h | h
   · subst h; simp at hne
   · exact h
+
+-- Checked when the library builds: a query or fragment containing `://`
+-- doesn't change the path (#76), and dot segments resolve (#27).
+private def pathOf (url : String) : String := ({ method := "GET", url } : Request).path
+#guard pathOf "http://h/hello/Ada?next=http://example.com/x#a://b" == "/hello/Ada"
+#guard pathOf "/hello/Ada?next=http://example.com/x" == "/hello/Ada"
+#guard pathOf "http://h:8080/x#frag://y" == "/x"
+#guard pathOf "http://h" == "/"
+#guard pathOf "http://h/hello/%2e%2E/hello/Ada" == "/hello/Ada"
+#guard ({ method := "GET", url := "http://h/a/b?u=http://c/d" } : Request).segments == ["a", "b"]
 
 /-- The first header named `name`, ignoring case. -/
 def header? (r : Request) (name : String) : Option String :=
