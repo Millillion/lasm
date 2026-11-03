@@ -120,6 +120,9 @@ def PageError.toHtml (e : PageError) : String :=
 
 /-! ## Headers -/
 
+/-- A `Set-Cookie` value. Porter's cookie values are base64url or empty:
+Azure's host percent-encodes values outside `A-Z a-z 0-9 - . _ ~` in all but
+one cookie per reply (docs/deploy/azure-functions.md). -/
 def cookieHeader (secure : Bool) (c : SetCookie) : String :=
   c.name ++ "=" ++ c.value ++ "; Path=" ++ c.path ++ "; Max-Age=" ++ toString c.maxAge ++
   "; HttpOnly; SameSite=Lax" ++ (if secure then "; Secure" else "")
@@ -169,12 +172,7 @@ def Body.wire (cfg : Config) : Body → List (String × String) × String
 
 /-- The reply on the wire. -/
 def Reply.render (cfg : Config) (r : Reply) : Wire :=
-  -- A redirect says so in a short text body too (RFC 9110 §15.4.4); an
-  -- empty one never reaches the client through Netlify's function
-  -- bootstrap (issue #82).
-  let (hs, body) := match r.body, r.location with
-    | .empty, some _ => ([("content-type", "text/plain; charset=utf-8")], "See Other\n")
-    | b, _ => b.wire cfg
+  let (hs, body) := r.body.wire cfg
   let cors := if r.status = 204 then corsHeaders ++ [("access-control-max-age", "600")] else []
   { status := r.status, body,
     headers := hs ++ cors ++ ((r.location.map fun l => [("location", l.render cfg.issuer)]).getD []) ++

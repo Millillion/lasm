@@ -116,6 +116,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] 2. Node server (Web Crypto, `node:sqlite`), openid-client 6.8.8, oauth4webapi 3.8.8 and jose 6.2.12 as oracles (13 checks), the adversarial suite (31 attacks from RFC 6749/6819/9700 and OpenID Connect Core), the endpoint fuzzer (three minutes per PR). Found #76 (`Lasm.Fetch` paths with `://` in the query).
 - [x] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms (Lambda .zip and image, Vercel, Netlify, Azure, GCF), each with the oracle tests and the adversarial suite in CI. No Fastly or WASI (no Web Crypto).
 - [x] 4. The `Lasm.UI` sign-in and consent pages (a plain-form fallback without JavaScript) with Playwright tests on Chromium, Firefox and WebKit, and a nightly job (40 minutes of fuzzing).
+- [x] 5. On `@lasm/cli` 0.3.9, without the workarounds for #76 (Porter's own path segments), #80 (joining `Cookie` headers, one `Set-Cookie` per reply) and #82 (a text body on redirects).
 - [ ] (J) Review the 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
 
 ### Tandem ([examples/tandem](examples/tandem), the fifth flagship app: a collaborative text editor on a CRDT)
