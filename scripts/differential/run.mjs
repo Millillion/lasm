@@ -21,11 +21,24 @@
 //                            Deno (V8).
 //   edge-sm                  the same edge output on SpiderMonkey's js shell
 //                            (sm-runner.mjs).
+//   bun, bun-O0              the Bun target (--target bun, bun/main.mjs) on Bun.
+//   browser-chromium         the browser target (--target browser --suspend jspi)
+//                            mounted in headless Chromium through Playwright
+//                            (browser-runner.mjs). A browser has no exit status:
+//                            zero is compared against non-zero.
+//   browser-firefox,         the same build in Firefox and WebKit, which run it
+//   browser-webkit           without JSPI (docs/BROWSER.md), so an `IO.sleep`
+//                            would stop the instance: they run a third program
+//                            per seed, the core program without `IO.sleep`
+//                            (generate.mjs withoutSleep), and the regressions
+//                            that do not sleep.
 //
 //   node scripts/differential/run.mjs --lasm PATH/bin/lasm.mjs --lean-bin DIR --work NEW_DIR
 //     [--seed N] [--programs N | --budget-min M] [--cases 120] [--fs-cases 25]
-//     [--targets node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm]
+//     [--targets node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm,
+//                bun,bun-O0,browser-chromium,browser-firefox,browser-webkit]
 //     [--profile release|dev] [--wasmtime PATH] [--deno PATH] [--bun PATH] [--sm PATH]
+//     [--playwright DIR (holds node_modules/playwright-core)]
 //     [--wrap "CMD ARGS --"] [--regressions DIR]
 //     [--shrink-rounds 12] [--summary FILE.json]
 //
@@ -55,6 +68,7 @@ const wasmtime = opt('--wasmtime', 'wasmtime');
 const deno = opt('--deno', 'deno');
 const bun = opt('--bun', 'bun');
 const sm = opt('--sm', 'js');
+const playwrightDir = opt('--playwright') && resolve(opt('--playwright'));
 const wrap = (opt('--wrap', '') || '').split(' ').filter(Boolean);
 const regressionsDir = opt('--regressions');
 const shrinkRounds = Number(opt('--shrink-rounds', '12'));
@@ -95,8 +109,21 @@ const TARGETS = {
   // SpiderMonkey's js shell (sm-runner.mjs): the shell's quit takes 0–127, so the
   // runner also writes the status to a file.
   'edge-sm': { build: ['--target', 'deno'], run: dir => [sm, ['-m', join(here, 'sm-runner.mjs')], { LASM_SM_RUN: JSON.stringify({ program: join(dir, 'deno/lasm'), env: { LEAN_BACKTRACE: '0' }, jspi: true, exitFile: 'exit-status' }) }], exitFile: 'exit-status', fs: false, out: 'deno' },
+  // The Bun target as users build it: bun/main.mjs (the portable entry) on Bun.
+  bun: { build: ['--target', 'bun'], run: dir => [bun, [join(dir, 'bun/main.mjs')]], fs: false, out: 'bun' },
+  'bun-O0': { build: ['--target', 'bun'], variant: 'O0', buildEnv: unoptimized, run: dir => [bun, [join(dir, 'bun/main.mjs')]], fs: false, out: 'bun' },
+  // The browser target, mounted with the public API in a headless browser
+  // (browser-runner.mjs). Its own subdirectory: it writes dist/, as node does.
+  // A page has no exit status (zeroOrNot); Firefox and WebKit run without JSPI
+  // (noSleep: they get the program without IO.sleep).
+  ...Object.fromEntries(['chromium', 'firefox', 'webkit'].map(browser => [`browser-${browser}`, {
+    build: ['--target', 'browser', '--suspend', 'jspi'], variant: 'browser', out: 'browser', fs: false, zeroOrNot: true, noSleep: browser !== 'chromium',
+    run: dir => [process.execPath, [join(here, 'browser-runner.mjs'), '--browser', browser, ...(playwrightDir ? ['--playwright', playwrightDir] : []), '--dist', join(dir, 'dist'), '--result', 'browser-result.json']],
+  }])),
 };
 for (const t of targets) if (!TARGETS[t]) { console.error(`unknown target ${t}`); process.exit(2); }
+// A page's outcome: main returned 0, or it did not (browser-runner.mjs).
+const outcomeOf = code => code === 0 || code === 'timeout' ? code : 'non-zero';
 writeFileSync(join(work, 'node-wasi-run.mjs'), `const emit = process.emitWarning;
 process.emitWarning = (w, ...r) => (r[0] === 'ExperimentalWarning' || r[0]?.type === 'ExperimentalWarning') ? undefined : emit.call(process, w, ...r);
 const { WASI } = await import('node:wasi');
@@ -191,7 +218,8 @@ function byCase(text, stderr = false) {
   return m;
 }
 // Case ids whose output differs, in program order; plus whole-run differences.
-function diverging(ids, nat, tgt) {
+function diverging(ids, nat, tgt, target) {
+  if (TARGETS[target]?.zeroOrNot) { nat = { ...nat, code: outcomeOf(nat.code) }; tgt = { ...tgt, code: outcomeOf(tgt.code) }; }
   const a = byCase(nat.stdout), b = byCase(tgt.stdout);
   const ae = byCase(nat.stderr, true), be = byCase(tgt.stderr, true);
   const bad = ids.filter(id => a.get(id) !== b.get(id) || ae.get(id) !== be.get(id));
@@ -211,7 +239,7 @@ async function evaluate(dir, list, tlist, { ending } = {}) {
   const built = new Map();
   for (const t of tlist) {
     const r = await buildAndRun(dir, t, nat, built);
-    results[t] = r.buildFailed ? r : { run: r.run, diff: diverging(ids, nat, r.run) };
+    results[t] = r.buildFailed ? r : { run: r.run, diff: diverging(ids, nat, r.run, t) };
   }
   return { nat, ids, results };
 }
@@ -284,12 +312,14 @@ const save = () => writeFileSync(summaryFile, JSON.stringify(summary, null, 2) +
 const startedAt = Date.now();
 
 async function campaignProgram(seed, kind) {
+  // core: every target that has no sleep restriction; fs: the targets with a
+  // file system; sync: the core program without IO.sleep, for the noSleep targets.
   const fsProgram = kind === 'fs';
-  const tlist = targets.filter(t => !fsProgram || TARGETS[t].fs);
+  const tlist = targets.filter(t => fsProgram ? TARGETS[t].fs : kind === 'sync' ? TARGETS[t].noSleep : !TARGETS[t].noSleep);
   if (!tlist.length) return;
   const list = fsProgram
     ? g.genProgram(seed, { cases: nFsCases, kinds: ['fs', 'io'] })
-    : g.genProgram(seed, { cases: nCases });
+    : kind === 'sync' ? g.withoutSleep(g.genProgram(seed, { cases: nCases })) : g.genProgram(seed, { cases: nCases });
   const ending = g.ENDINGS[seed % g.ENDINGS.length];
   const dir = join(work, `s${seed}-${kind}`);
   const ev = await evaluate(dir, list, tlist, { ending });
@@ -367,7 +397,8 @@ async function regressionRun() {
   for (const fsGroup of [false, true]) {
     const group = regs.filter(r => fsNames.includes(r.name) === fsGroup);
     if (!group.length) continue;
-    const tlist = targets.filter(t => !fsGroup || TARGETS[t].fs);
+    const sleeps = group.some(r => /IO\.sleep/.test(r.text));
+    const tlist = targets.filter(t => (!fsGroup || TARGETS[t].fs) && !(sleeps && TARGETS[t].noSleep));
     const d = join(dir, fsGroup ? 'fs' : 'core');
     mkdirSync(d, { recursive: true });
     const src = `${g.PREAMBLE}\n${group.map(r => r.text).join('\n')}\ndef main : IO UInt32 := do\n${group.map(r => `  IO.eprintln "@${r.name}"\n  ${r.name}`).join('\n')}\n  IO.eprintln "done"\n  return 0\n`;
@@ -381,7 +412,7 @@ async function regressionRun() {
       const res = await buildAndRun(d, t, nat, built);
       if (res.buildFailed) { summary.divergences.push({ regressions: true, target: t, what: 'lasm build failed', log: res.log }); console.log(`regressions ${t}: BUILD FAILED`); continue; }
       const r = res.run;
-      const diff = diverging(ids, nat, r);
+      const diff = diverging(ids, nat, r, t);
       if (diff.any) {
         const list = TARGETS[t].oracle ? summary.upstreamSuspects : summary.divergences;
         list.push({ regressions: true, target: t, cases: diff.bad, code: [nat.code, r.code], native: { stdout: nat.stdout.slice(0, 3000), stderr: nat.stderr.slice(0, 2000) }, [t]: { stdout: r.stdout.slice(0, 3000), stderr: r.stderr.slice(0, 2000) } });
@@ -399,6 +430,7 @@ try {
     const seed = seed0 + i;
     await campaignProgram(seed, 'core');
     if (nFsCases > 0) await campaignProgram(seed, 'fs');
+    await campaignProgram(seed, 'sync');
   }
 } catch (e) {
   summary.harnessErrors.push({ error: String(e?.stack ?? e) });

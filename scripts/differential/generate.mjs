@@ -672,6 +672,15 @@ export function genProgram(seed, { cases = 100, kinds, depth, indices } = {}) {
   const ids = indices ?? Array.from({ length: cases }, (_, i) => i);
   return ids.map(i => ({ index: i, c: genCase(seed, i, { kinds, depth }) }));
 }
+// The same program without `IO.sleep` (every statement list, nested bodies
+// included), for targets where a blocking wait on a host timer stops the
+// instance: browsers without JSPI (Firefox, WebKit), as documented in
+// docs/BROWSER.md. Indices and every other statement are kept, so a case stays
+// reproducible from (seed, index).
+export function withoutSleep(list) {
+  const strip = ss => ss.filter(st => st.s !== 'sleep').map(st => ({ ...st, ...(st.b ? { b: strip(st.b) } : {}), ...(st.c ? { c: strip(st.c) } : {}) }));
+  return list.map(item => item.c.s ? { ...item, c: { ...item.c, s: strip(item.c.s) } } : item);
+}
 // How main ends: an exit status, an uncaught IO error, or IO.Process.exit.
 export const ENDINGS = ['  return 0', '  return 0', '  return 1', '  return 255', '  throw (IO.userError "uncaught: the end ✓")', '  IO.Process.exit 7'];
 export function renderProgram(list, { exit, ending } = {}) {

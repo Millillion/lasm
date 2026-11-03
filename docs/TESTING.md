@@ -73,7 +73,9 @@ oracle is the untouched upstream toolchain.
 `wasi-node` (the same module under `node:wasi`) and `deno` (the edge runtime used
 by every edge platform, Bun, Deno and the browser, run by Deno 2.9.6), plus the
 targets of the [extra oracles](#more-oracles) (`interp`, `node-O0`, `wasi-O0`,
-`deno-O0`, `edge-node`, `edge-bun`, `edge-sm`). File-system cases run only where a
+`deno-O0`, `edge-node`, `edge-bun`, `edge-sm`) and the [Bun and browser
+targets](#bun-and-browser-targets) (`bun`, `bun-O0`, `browser-chromium`,
+`browser-firefox`, `browser-webkit`). File-system cases run only where a
 file system exists (node, WASI, the interpreter). The program's
 environment always contains several variables before the ones Lean reads (that
 is how the [WASI `getenv` bug](#bugs-found) was found), and `LEAN_BACKTRACE=0`
@@ -97,8 +99,9 @@ node scripts/differential/run.mjs --lasm node_modules/@lasm/cli/bin/lasm.mjs \
   --lean-bin ~/.elan/toolchains/leanprover--lean4---v4.35.0/bin --work /tmp/dt \
   --seed 1 --programs 1 --targets node,wasi,wasi-node,deno \
   --regressions test/differential/regressions
-# every oracle: --targets node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm
-#   --bun PATH/bun --sm PATH/js (SpiderMonkey's js shell)
+# every oracle: --targets node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm,
+#   bun,bun-O0,browser-chromium,browser-firefox,browser-webkit
+#   --bun PATH/bun --sm PATH/js (SpiderMonkey's js shell) --playwright DIR (holds node_modules/playwright-core)
 # a campaign: --budget-min 60; dev profile: --profile dev; on a shared host,
 # serialize builds: --wrap "flock LOCK node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --"
 ```
@@ -106,10 +109,11 @@ node scripts/differential/run.mjs --lasm node_modules/@lasm/cli/bin/lasm.mjs \
 **CI** ([differential.yml](../.github/workflows/differential.yml)): every pull
 request and push to `main` packs a candidate from the commit, installs it with
 npm, replays the regressions and runs three program pairs (3 × (150 + 25) cases) from a
-seed derived from the commit, on the base targets and the cheap extra oracles
-(`interp`, `node-O0`, `edge-node`, `edge-bun`, `edge-sm`); nightly runs a
-60-minute campaign from a fresh seed on every target (also `wasi-O0` and
-`deno-O0`). A divergence fails the job and the reproducers are in the run's
+seed derived from the commit, on the base targets, the cheap extra oracles
+(`interp`, `node-O0`, `edge-node`, `edge-bun`, `edge-sm`), `bun` and
+`browser-chromium`; nightly runs a 60-minute campaign from a fresh seed on every
+target (also `wasi-O0`, `deno-O0`, `bun-O0`, `browser-firefox` and
+`browser-webkit`). A divergence fails the job and the reproducers are in the run's
 artifact; upstream suspects are listed in the job summary and never fail it.
 Known divergences (an open issue or a documented host limit) are listed in
 `KNOWN` in `run.mjs`, applied before the comparison and counted in the summary.
@@ -129,8 +133,9 @@ bound of a small function is 8,177 frames (wasmtime 30) to 10,910 (wasmtime 49),
 about 8,500 on Bun and just under 9,700 on Deno and `node:wasi` (issue #30),
 while native Lean and Node's full profile go far deeper; large
 heaps); nondeterministic behaviour (output order across
-threads is never printed); performance; the browser (planned: the same programs
-under Playwright).
+threads is never printed); performance; in browsers, which exit status a failing
+`main` had (a page has none: only zero against non-zero is compared, see
+[below](#bun-and-browser-targets)).
 
 ### More oracles
 
@@ -192,6 +197,37 @@ differ per engine: [EDGE.md](EDGE.md)), and anything only browsers do.
 0.3.5 with this branch's sources): 175 cases, no divergence on any target; the
 interpreter matched native Lean on every case once its module name was fixed
 (without `--root`, `lean --run` names the module `_stdin` in panic messages).
+
+### Bun and browser targets
+
+Two user-facing targets through the same harness, built as users build them
+from the installed candidate (`scripts/differential/run.mjs`):
+
+| Target | Build | Run |
+| --- | --- | --- |
+| `bun`, `bun-O0` | `--target bun` (`bun-O0`: `LASM_TEST_UNOPTIMIZED=1`) | `bun bun/main.mjs`, Bun 1.4.4 |
+| `browser-chromium` | `--target browser --suspend jspi`, in its own subdirectory (it writes `dist/`, as `node` does) | mounted in headless Chromium (Playwright 1.63.0) by [`browser-runner.mjs`](../scripts/differential/browser-runner.mjs) |
+| `browser-firefox`, `browser-webkit` | the same build | headless Firefox and WebKit, on the program without `IO.sleep` |
+
+The browser runner serves `dist/` from `127.0.0.1` (the Wasm as
+`application/wasm`), opens a blank page, imports `app.js` and calls the public
+`mount(element, { stdout, stderr })` ([BROWSER.md](BROWSER.md#loader-and-mount-api-measured)),
+as an embedding page does. Lean's output arrives as lines and is compared line
+for line (every generated line ends with a newline). A page has no exit status:
+`mount` resolves when `main` returned 0 and rejects otherwise, so the harness
+compares zero against non-zero (`zeroOrNot` in `run.mjs`). Firefox and WebKit
+run without JSPI (Firefox's JSPI is disabled by the loader, WebKit has none), and
+there a blocking wait on a host timer (`IO.sleep`) stops the instance by design
+([BROWSER.md](BROWSER.md#decisions)). They therefore run a third program per
+seed: the core program with every `IO.sleep` removed (`withoutSleep` in
+`generate.mjs`; indices and all other statements kept), and the regressions that
+do not sleep. Pull requests run `bun` and `browser-chromium`; campaigns run all
+five. *Catches:* differences in the Bun entry (`bun/main.mjs`) and the browser
+loader, bundle and host (output streams, uncaught errors, panics), and engine
+behaviour of Chromium's V8, Firefox's SpiderMonkey and WebKit's JavaScriptCore
+with a real web host. *Cannot catch:* the exact non-zero exit status in a
+browser; `IO.sleep` in Firefox and WebKit; the DOM, events and `Lasm.Web`
+(browser.yml's suites cover those).
 
 ### Target equivalence
 
