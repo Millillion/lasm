@@ -112,7 +112,8 @@ async function stress(name, project, { expected, viaCli = 0, server = false }) {
   // Build first, untimed (a cold build downloads tools): every timed run then
   // reuses the cached build, as the acceptance's run does after its first build.
   if (!server) {
-    execFileSync(process.execPath, [lasm, 'Main.lean'], { cwd: project, stdio: ['ignore', 'ignore', 'inherit'], env: { ...process.env, CI: '1' }, timeout: 30 * 60_000 });
+    // Its output is shown: a program that hangs here (before any timed run) then shows how far it got.
+    execFileSync(process.execPath, [lasm, 'Main.lean'], { cwd: project, stdio: ['ignore', 'inherit', 'inherit'], env: { ...process.env, CI: '1' }, timeout: 10 * 60_000 });
   }
   const total = viaCli + runs;
   const run = async (i, diagDir, seed, trace) => {
