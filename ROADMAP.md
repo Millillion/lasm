@@ -123,7 +123,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms (Lambda .zip and image, Vercel, Netlify, Azure, GCF), each with the oracle tests and the adversarial suite in CI. No Fastly or WASI (no Web Crypto).
 - [x] 4. The `Lasm.UI` sign-in and consent pages (a plain-form fallback without JavaScript) with Playwright tests on Chromium, Firefox and WebKit, and a nightly job (40 minutes of fuzzing).
 - [x] 5. On `@lasm/cli` 0.3.9, without the workarounds for #76 (Porter's own path segments), #80 (joining `Cookie` headers, one `Set-Cookie` per reply) and #82 (a text body on redirects).
-- [~] 6. Bound `state` (2048 bytes; a longer one is a 400 page): the nightly fuzzer's `Header overflow` (run 41634567003), a ~16 KB `state` reflected into an error redirect's `Location`. New proposition `redirect_state_bounded`; the fuzzer replays a regression corpus (`test/fuzz-corpus/`) and flags any `Location` over 8 KiB.
+- [x] 6. Bound `state` (2048 bytes; a longer one is a 400 page): the nightly fuzzer's `Header overflow` (run 41634567003), a ~16 KB `state` reflected into an error redirect's `Location`. New proposition `redirect_state_bounded`; the fuzzer replays a regression corpus (`test/fuzz-corpus/`) and flags any `Location` over 8 KiB. Merged 2026-11-03 (PR #105); the 40-minute nightly fuzzer passed on the branch.
 - [ ] (J) Review the 27 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
 
 ### Tandem ([examples/tandem](examples/tandem), the fifth flagship app: a collaborative text editor on a CRDT)
