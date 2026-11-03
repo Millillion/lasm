@@ -38,7 +38,7 @@ def genAttrs : R (List (Attr Unit)) := do
     match ← rand 5 with
     | 0 => l := .prop "value" (.str s!"v{← rand 3}") :: l
     | 1 => l := .style "color" (← pick #["red", "blue"]) :: l
-    | 2 => l := .on { event := ← pick #["click", "input"], paths := [["target", "value"]], preventDefault := (← rand 2) == 0 } (fun _ => some ()) :: l
+    | 2 => l := .on { event := ← pick #["click", "input"], paths := [["target", ← pick #["value", "id"]]] } (fun _ => some { message := () }) :: l
     | _ => l := .attr (← pick attrNames) s!"a{← rand 3}" :: l
   return l
 

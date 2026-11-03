@@ -167,18 +167,22 @@ values). A frame is the new decoder shapes followed by the ops:
 A node is `0 id string` (text) or `ns id tag attrCount attr* childCount node*`
 (`ns`: 1 HTML, 2 SVG, 3 MathML). An attribute is `0 name value`
 (`setAttribute`), `1 name value` / `2 name` / `3 name` (property: a string,
-false, true), `4 name value` (`style.setProperty`) or `5 event decoderId
-flags` (a listener; flags 1 `preventDefault`, 2 `stopPropagation`); `8`–`11`
+false, true), `4 name value` (`style.setProperty`) or `5 event decoderId`
+(a listener); `8`–`11`
 followed by a name remove an attribute, property, style or listener.
 
 Events are delegated: the applier listens on the mount element (capture
 phase) for each event type in use, walks from the target to the root, and for
 each element with a listener for the type (only the target for non-bubbling
-events) applies the static options and reads the decoder's paths from the
-event (`currentTarget` is that element). It then makes **one** synchronous
-call into Lean with the ids from the root to the target and, per handler, its
-depth and values. Lean runs `update` (and commands) at once; if the model
-changed it asks for a frame: after discrete user input (click, keys, input,
+events) reads the decoder's paths from the event (`currentTarget` is that
+element). It then makes **one** synchronous call into Lean with the ids from
+the root to the target and, per handler, its depth and values. Lean runs the
+handlers innermost first (stopping after an element whose handler stops
+propagation), runs `update` (and commands) at once, and answers with a number:
+bit 1 asks for a frame, bit 2 for `preventDefault()`, bit 4 for
+`stopPropagation()`. The applier calls those before it returns, while the event
+is still being dispatched. Subscriptions to window and document events answer
+the same way. If the model changed Lean asks for a frame: after discrete user input (click, keys, input,
 focus, submit) the applier renders at once, otherwise on the next
 `requestAnimationFrame`; one call returns the patch. Hydration (`mount(el, { hydrate: true })`) applies the
 first frame by adopting the existing children in order (comment nodes are

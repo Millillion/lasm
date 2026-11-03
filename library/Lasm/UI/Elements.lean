@@ -221,12 +221,31 @@ def contenteditable (v : String) : Attr Msg := .attr "contenteditable" v
 
 /-! Events -/
 
-/-- A handler for any event, with a decoder. -/
+/-- A handler for any event, with a decoder. It never prevents the default or
+stops propagation. The four handler functions are modeled on Elm's
+`Html.Events` (`on`, `preventDefaultOn`, `stopPropagationOn`, `custom`). -/
 def on (event : String) (d : Decoder Msg) : Attr Msg := Attr.onWith event d
-/-- A handler that calls `preventDefault()` (always: the browser needs to know
-before Lean runs). -/
-def preventDefaultOn (event : String) (d : Decoder Msg) : Attr Msg := Attr.onWith event d (preventDefault := true)
-def stopPropagationOn (event : String) (d : Decoder Msg) : Attr Msg := Attr.onWith event d (stopPropagation := true)
+/-- A handler that decides for each event whether to call `preventDefault()`:
+the decoder gives the message and the decision (`true` prevents). Lean decides
+while the event is dispatched. Enter in a chat box can send and prevent the
+newline while Shift+Enter inserts one (and Enter confirming an IME
+composition is left to the input method):
+
+    preventDefaultOn "keydown" (Decoder.map2 Prod.mk Decoder.key (Decoder.map2 Prod.mk Decoder.shiftKey Decoder.isComposing) |>.filterMap fun
+      | ("Enter", false, false) => some (.send, true)
+      | _ => none)
+
+An event the decoder gives no message for (`none`, a missing field) keeps its
+default. -/
+def preventDefaultOn (event : String) (d : Decoder (Msg × Bool)) : Attr Msg :=
+  Attr.custom event (d.map fun (m, p) => { message := m, preventDefault := p })
+/-- A handler that decides for each event whether to call `stopPropagation()`
+(`true` stops): handlers of enclosing elements then do not run, and the event
+does not reach listeners outside the app. -/
+def stopPropagationOn (event : String) (d : Decoder (Msg × Bool)) : Attr Msg :=
+  Attr.custom event (d.map fun (m, s) => { message := m, stopPropagation := s })
+/-- A handler that decides both, for each event (`Handled`). -/
+def custom (event : String) (d : Decoder (Handled Msg)) : Attr Msg := Attr.custom event d
 
 def onClick (msg : Msg) : Attr Msg := on "click" (.succeed msg)
 def onDoubleClick (msg : Msg) : Attr Msg := on "dblclick" (.succeed msg)
@@ -245,7 +264,7 @@ def onChange (f : String → Msg) : Attr Msg := on "change" (Decoder.targetValue
 /-- Checkbox changes, with `checked`. -/
 def onCheck (f : Bool → Msg) : Attr Msg := on "change" (Decoder.targetChecked.map f)
 /-- Form submission (prevents the page load). -/
-def onSubmit (msg : Msg) : Attr Msg := preventDefaultOn "submit" (.succeed msg)
+def onSubmit (msg : Msg) : Attr Msg := preventDefaultOn "submit" (.succeed (msg, true))
 def onKeyDown (f : String → Msg) : Attr Msg := on "keydown" (Decoder.key.map f)
 def onKeyUp (f : String → Msg) : Attr Msg := on "keyup" (Decoder.key.map f)
 /-- Enter pressed in the element. -/

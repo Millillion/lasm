@@ -32,7 +32,7 @@ function canon(n, expected) {
   const styles = {};
   for (let i = 0; i < n.style.length; i++) styles[n.style[i]] = n.style.getPropertyValue(n.style[i]);
   const on = {};
-  for (const [e, l] of Object.entries(n.$l ?? {})) on[e] = String(Boolean(l & 1));
+  for (const [e, l] of Object.entries(n.$l ?? {})) on[e] = String(l);
   const children = [...n.childNodes].map((c, i) => canon(c, expected?.children?.[i]));
   return { tag: n.localName, ns, attrs, props, styles, on, children };
 }
@@ -89,24 +89,33 @@ function enc() {
   return { out, v, s, name, byte: b => out.push(b) };
 }
 
-test('events are delegated, with declared fields, bubbling and options', async () => {
+test('events are delegated, with declared fields and bubbling; Lean decides where propagation stops', async () => {
   const { root, window } = page();
   const ui = createUi({ root });
   const calls = [];
-  ui.module.connect({ event: (path, type, cs) => { calls.push({ path, type, cs }); return false; }, frame: () => new Uint8Array(0) });
+  let answer = 0;
+  ui.module.connect({ event: (path, type, cs) => { calls.push({ path, type, cs }); return answer; }, frame: () => new Uint8Array(0) });
   const e = enc();
   e.byte(7); e.v(0); e.v(2); e.v(2); e.s('target'); e.s('id'); e.v(2); e.s('currentTarget'); e.s('id'); // decoder 0
   e.byte(1); e.v(0); e.v(0);                                  // insert under root, append
-  e.byte(1); e.v(1); e.name('ul'); e.v(1); e.byte(5); e.name('click'); e.v(0); e.v(0); e.v(1);
-  e.byte(1); e.v(2); e.name('li'); e.v(2); e.byte(0); e.name('id'); e.v(1); e.s('item'); e.byte(5); e.name('click'); e.v(0); e.v(2); e.v(1);
+  e.byte(1); e.v(1); e.name('ul'); e.v(1); e.byte(5); e.name('click'); e.v(0); e.v(1);
+  e.byte(1); e.v(2); e.name('li'); e.v(2); e.byte(0); e.name('id'); e.v(1); e.s('item'); e.byte(5); e.name('click'); e.v(0); e.v(1);
   e.byte(1); e.v(3); e.name('b'); e.v(1); e.byte(0); e.name('id'); e.v(0); e.s('bold'); e.v(1);
   e.byte(0); e.v(4); e.s('x');
   ui.applyForTest(Uint8Array.from(e.out));
   assert.equal(root.innerHTML, '<ul><li id="item"><b id="bold">x</b></li></ul>');
   const b = root.querySelector('#bold');
+  const outside = [];
+  window.document.addEventListener('click', () => outside.push('document'));
   b.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
-  // The li stops propagation: the ul's handler is not called.
-  assert.deepEqual(calls, [{ path: [1, 2, 3], type: 'click', cs: [1, ['bold', 'item']] }]);
+  // Both handlers' fields go to Lean, innermost first; Lean decides where to stop.
+  assert.deepEqual(calls, [{ path: [1, 2, 3], type: 'click', cs: [1, ['bold', 'item'], 0, ['bold', '']] }]);
+  assert.deepEqual(outside, ['document']);
+  calls.length = 0;
+  answer = 4;
+  b.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  assert.deepEqual(outside, ['document'], 'Lean stopped propagation');
+  answer = 0;
   calls.length = 0;
   root.querySelector('ul').dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
   assert.deepEqual(calls, [{ path: [1], type: 'click', cs: [0, ['', '']] }]);
@@ -124,7 +133,7 @@ test('frames are batched on animation frames and subscriptions fire', async () =
   await new Promise(r => window.requestAnimationFrame(r));
   await new Promise(r => window.requestAnimationFrame(r));
   assert.equal(frames, 1);
-  ui.module.sub(7, ['window', 'resize', [['currentTarget', 'innerWidth']], false, false]);
+  ui.module.sub(7, ['window', 'resize', [['currentTarget', 'innerWidth']]]);
   window.dispatchEvent(new window.Event('resize'));
   assert.deepEqual(subs.at(-1), [7, [window.innerWidth]]);
   ui.module.unsub(7);

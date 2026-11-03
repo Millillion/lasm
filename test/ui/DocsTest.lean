@@ -61,6 +61,30 @@ def onCanvasClick : Attr Msg :=
   on "click" (Decoder.map2 Msg.clicked Decoder.offsetX Decoder.offsetY)
 end Events
 
+namespace Decisions
+inductive Msg where
+  | send
+  | delete (id : Nat)
+  | save
+
+-- A chat box: Enter sends and inserts no newline; Shift+Enter inserts one;
+-- Enter that confirms an IME composition (Japanese, Chinese, Korean input)
+-- and every other key type as usual.
+def onSend : Attr Msg :=
+  preventDefaultOn "keydown" (Decoder.map2 Prod.mk Decoder.key (Decoder.map2 Prod.mk Decoder.shiftKey Decoder.isComposing) |>.filterMap fun
+    | ("Enter", false, false) => some (.send, true)
+    | _ => none)
+
+-- A click on a row's delete button does not also select the row.
+def onDelete (id : Nat) : Attr Msg :=
+  stopPropagationOn "click" (.succeed (.delete id, true))
+
+def saveKey : Subs Msg :=
+  Subs.preventDefaultOn .document "keydown" (Decoder.map2 Prod.mk Decoder.key Decoder.ctrlKey |>.filterMap fun
+    | ("s", true) => some (.save, true)
+    | _ => none)
+end Decisions
+
 namespace Commands
 structure Model where
   loading : Bool := false

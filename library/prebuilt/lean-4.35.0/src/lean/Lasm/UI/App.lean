@@ -84,7 +84,7 @@ structure State (Model Msg : Type) where
   queue : Array Msg := #[]
   busy : Bool := false
   subs : Std.HashMap SubSpec Nat := {}
-  handlers : Std.HashMap Nat (List (Array Data → Option Msg)) := {}
+  handlers : Std.HashMap Nat (List (Array Data → Option (Handled Msg))) := {}
   nextSub : Nat := 1
   /-- Elements that received events since the last frame (paths of ids). -/
   touched : Array (List Nat) := #[]
@@ -124,7 +124,7 @@ def resync (live : List (Live Msg)) (touched : Array (List Nat)) : Array (Op Msg
 the last one's listener (its fields are what the applier sends); every handler
 for the event that reads the same fields runs, as with several
 `addEventListener` calls (`onEnter` and `onEscape` on one input both work). -/
-def handlersFor (event : String) (attrs : List (Attr Msg)) : List (List EvVal → Option Msg) :=
+def handlersFor (event : String) (attrs : List (Attr Msg)) : List (List EvVal → Option (Handled Msg)) :=
   match lastVal (.on event) attrs with
   | some (.listener l) => attrs.filterMap fun
     | .on l' h => if l'.event == event && l'.paths == l.paths then some h else none
@@ -134,9 +134,37 @@ def handlersFor (event : String) (attrs : List (Attr Msg)) : List (List EvVal �
 def specData : SubSpec → Data
   | .every ms => .array #[.string "every", toJS ms]
   | .frame => .array #[.string "frame"]
-  | .window ev paths pd sp => .array #[.string "window", .string ev, toJS (paths.map List.toArray).toArray, .bool pd, .bool sp]
-  | .document ev paths pd sp => .array #[.string "document", .string ev, toJS (paths.map List.toArray).toArray, .bool pd, .bool sp]
+  | .event t ev paths => .array #[.string (match t with | .window => "window" | .document => "document"),
+      .string ev, toJS (paths.map List.toArray).toArray]
   | .port name => .array #[.string "port", .string name]
+
+/-- What the handlers of one event decided: their messages, in order, and
+whether any of them prevents the default or stops propagation. -/
+structure Decision (Msg : Type) where
+  msgs : Array Msg := #[]
+  preventDefault : Bool := false
+  stopPropagation : Bool := false
+
+/-- Adds one handler's result (`none`: no message, and the event is left alone). -/
+def Decision.add (d : Decision Msg) : Option (Handled Msg) → Decision Msg
+  | none => d
+  | some h => { msgs := d.msgs.push h.message, preventDefault := d.preventDefault || h.preventDefault,
+                stopPropagation := d.stopPropagation || h.stopPropagation }
+
+/-- Runs the handlers of an event along its path, innermost element first:
+each level is an element's attributes and the values its decoder read. Every
+handler of an element runs (as listeners on one DOM node do); after an element
+whose handlers stop propagation, enclosing elements' handlers do not run. -/
+def decide (type : String) : List (List (Attr Msg) × List EvVal) → Decision Msg → Decision Msg
+  | [], d => d
+  | (attrs, vs) :: rest, d =>
+    let d := (handlersFor type attrs).foldl (fun d h => d.add (h vs)) d
+    if d.stopPropagation then d else decide type rest d
+
+/-- The applier's answer to an event or subscription call: bit 1 asks for a
+frame, bit 2 for `preventDefault()`, bit 4 for `stopPropagation()`. -/
+def answer (frame preventDefault stopPropagation : Bool) : Data :=
+  toJS ((if frame then 1 else 0) + (if preventDefault then 2 else 0) + (if stopPropagation then 4 else 0) : Nat)
 
 def storageName : Storage → String
   | .local => "local"
@@ -169,11 +197,11 @@ mutual
 partial def syncSubs (c : Ctx Flags Model Msg) : IO Unit := do
   let s ← c.ref.get
   let items := (c.app.subscriptions s.model).items
-  let mut wanted : Std.HashMap SubSpec (List (Array Data → Option Msg)) := {}
+  let mut wanted : Std.HashMap SubSpec (List (Array Data → Option (Handled Msg))) := {}
   for i in items do
     wanted := wanted.insert i.spec (i.handle :: (wanted.getD i.spec []))
   let mut subs := s.subs
-  let mut handlers : Std.HashMap Nat (List (Array Data → Option Msg)) := {}
+  let mut handlers : Std.HashMap Nat (List (Array Data → Option (Handled Msg))) := {}
   let mut nextSub := s.nextSub
   for (spec, sid) in s.subs do
     unless wanted.contains spec do
@@ -251,7 +279,7 @@ partial def listenPort (c : Ctx Flags Model Msg) (name : String) : IO Unit := do
     let s ← c.ref.get
     if let some sid := s.subs[SubSpec.port name]? then
       for h in s.handlers.getD sid [] do
-        if let some m := h #[v] then deliver c m
+        if let some r := h #[v] then deliver c r.message
       requestFrame c
 end
 
@@ -274,33 +302,37 @@ def frame (c : Ctx Flags Model Msg) : IO ByteArray := do
 
 /-- An event from the applier: the ids from the root to the target, the event
 type, and for each handler on the way (innermost first) its depth on that path
-and its decoder's values. -/
+and its decoder's values. Lean runs the handlers (`decide`), delivers their
+messages and answers with the frame bit and the handlers' decisions
+(`answer`); the applier calls `preventDefault()` and `stopPropagation()`
+before the event's dispatch goes on. -/
 def onEvent (c : Ctx Flags Model Msg) (args : Array Data) : IO Data := do
-  let #[path, .string type, .array calls] := args | return .bool false
+  let #[path, .string type, .array calls] := args | return answer false false false
   let path ← match (FromJS.fromJS path : Except String (Array Nat)) with
     | .ok p => pure p
-    | .error _ => return .bool false
+    | .error _ => return answer false false false
   let nodes := findPath (← c.ref.get).live path.toList #[]
   c.ref.modify fun s => { s with touched := s.touched.push path.toList }
-  let mut msgs := #[]
+  let mut levels := #[]
   let mut i := 0
   while i + 1 < calls.size do
     if let (.number depth, .array vals) := (calls[i]!, calls[i+1]!) then
       if let some (.elem _ _ _ _ attrs _) := nodes[depth.toUInt64.toNat]? then
-        let vs := vals.toList.map Subs.evVal
-        for h in handlersFor type attrs do
-          if let some m := h vs then msgs := msgs.push m
+        levels := levels.push (attrs, vals.toList.map Subs.evVal)
     i := i + 2
-  for m in msgs do deliver c m
-  return .bool (← takeFrame c)
+  let d := decide type levels.toList {}
+  for m in d.msgs do deliver c m
+  return answer (← takeFrame c) d.preventDefault d.stopPropagation
 
+/-- A subscription fired: every handler of its spec runs; for an event, the
+answer carries their decisions as for `onEvent`. -/
 def onSub (c : Ctx Flags Model Msg) (args : Array Data) : IO Data := do
-  let some (Data.number sid) := args[0]? | return .bool false
+  let some (Data.number sid) := args[0]? | return answer false false false
   let vals : Array Data := match args[1]? with | some (Data.array vs) => vs | _ => #[]
   let hs := (← c.ref.get).handlers.getD sid.toUInt64.toNat []
-  for h in hs do
-    if let some m := h vals then deliver c m
-  return .bool (← takeFrame c)
+  let d := hs.foldl (fun d h => d.add (h vals)) ({} : Decision Msg)
+  for m in d.msgs do deliver c m
+  return answer (← takeFrame c) d.preventDefault d.stopPropagation
 
 end Runtime
 

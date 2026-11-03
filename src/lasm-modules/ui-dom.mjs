@@ -73,7 +73,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     case 2: { const a = name(); if (n[a] !== false) n[a] = false; return; }
     case 3: { const a = name(); if (n[a] !== true) n[a] = true; return; }
     case 4: { const a = name(); n.style.setProperty(a, value()); return; }
-    case 5: { const e = name(), d = v(), f = v(); (n.$l ??= Object.create(null))[e] = d * 4 + f; listen(e); return; }
+    case 5: { const e = name(); (n.$l ??= Object.create(null))[e] = v(); listen(e); return; }
     case 8: n.removeAttribute(name()); return;
     case 9: { const a = name(), t = typeof n[a]; n[a] = t === 'boolean' ? false : t === 'number' ? 0 : ''; return; }
     case 10: n.style.removeProperty(name()); return;
@@ -215,11 +215,8 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     const type = event.type, calls = [];
     const limit = event.bubbles ? chain.length : chain[0] === event.target ? 1 : 0;
     for (let i = 0; i < limit; i++) {
-      const el = chain[i], l = el.$l && el.$l[type];
-      if (l === undefined) continue;
-      if (l & 1) event.preventDefault();
-      calls.push(chain.length - 1 - i, read(event, el, decoders[l >> 2]));
-      if (l & 2) { event.stopPropagation(); break; }
+      const el = chain[i], d = el.$l && el.$l[type];
+      if (d !== undefined) calls.push(chain.length - 1 - i, read(event, el, decoders[d]));
     }
     if (!calls.length) return;
     const path = new Array(chain.length);
@@ -229,11 +226,20 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     // (pointer moves, scrolling, timers) wait for the next animation frame, so
     // many of them cost one render.
     // (Events that applying a patch causes, such as a blur, wait for the frame.)
-    if (lean.event(path, type, calls)) { if (discrete.has(type) && bytes === null) render(); else schedule(); }
+    // Lean runs the handlers (innermost first, stopping where one stops
+    // propagation) and answers: bit 1 a frame, bit 2 preventDefault, bit 4
+    // stopPropagation, applied here while the event is still dispatched.
+    const answer = lean.event(path, type, calls);
+    decided(event, answer);
+    if (answer & 1) { if (discrete.has(type) && bytes === null) render(); else schedule(); }
   }
   const discrete = new Set(['click', 'dblclick', 'auxclick', 'contextmenu', 'mousedown', 'mouseup', 'pointerdown', 'pointerup',
     'touchstart', 'touchend', 'keydown', 'keyup', 'keypress', 'input', 'change', 'beforeinput', 'submit', 'reset', 'focus', 'blur',
     'focusin', 'focusout', 'compositionend', 'paste', 'cut', 'copy', 'drop']);
+  function decided(event, answer) {
+    if (answer & 2) event.preventDefault();
+    if (answer & 4) event.stopPropagation();
+  }
   function listen(type) {
     if (listening.has(type)) return;
     listening.add(type);
@@ -259,7 +265,13 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   }
 
   // ---- subscriptions ----
-  const fire = (id, values) => { if (!stopped && lean && subs.has(id)) after(lean.sub(id, values)); };
+  // Lean's answer as for events: bit 1 a frame, bits 2 and 4 the event's decisions.
+  const fire = (id, values) => {
+    if (stopped || !lean || !subs.has(id)) return 0;
+    const answer = lean.sub(id, values);
+    if (answer & 1) schedule();
+    return answer;
+  };
   function subscribe(id, spec) {
     const [kind] = spec;
     const sub = { stop: () => {} };
@@ -273,8 +285,8 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
       break;
     }
     case 'window': case 'document': {
-      const target = kind === 'window' ? win : doc, [, type, paths, pd, sp] = spec;
-      const handler = event => { if (pd) event.preventDefault(); if (sp) event.stopPropagation(); fire(id, read(event, target, paths)); };
+      const target = kind === 'window' ? win : doc, [, type, paths] = spec;
+      const handler = event => decided(event, fire(id, read(event, target, paths)));
       target.addEventListener(type, handler);
       sub.stop = () => target.removeEventListener(type, handler);
       break;
