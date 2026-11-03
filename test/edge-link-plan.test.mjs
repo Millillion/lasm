@@ -6,7 +6,8 @@
 // checked by the edge workflows and scripts/edge/compare-edge-link.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync, lstatSync, chmodSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -98,6 +99,10 @@ test('the edge link relinks the application objects with the edge glue and compa
 
 test('edge link without Lasm.JS, without a plan, and with Asyncify or no suspension', { skip: !posix }, () => {
   const f = fixture({ js: false, plan: false, exportsList: ['_main', '_main', '_lasm_js_x'] });
+  // A stand-in for the SDK's wasm-opt, which records its arguments.
+  const real = join(f.tools.prefix, 'bin', 'wasm-opt'), record = join(f.base, 'wasm-opt-args.json');
+  writeFileSync(real, `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} -e 'require("fs").writeFileSync(process.argv[1], JSON.stringify(process.argv.slice(2)))' ${JSON.stringify(record)} "$@"\n`);
+  chmodSync(real, 0o755);
   const result = linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, suspend: 'asyncify' });
   assert.equal(result.usesJs, false);
   assert.equal(result.suspend, 'asyncify');
@@ -109,6 +114,25 @@ test('edge link without Lasm.JS, without a plan, and with Asyncify or no suspens
     ...f.objects.wrapperObjects.slice(2), f.objects.second, '-Wl,--wrap=lean_io_mark_end_initialization', ...commonFlags(f, 'asyncify')]);
   assert.equal(existsSync(join(f.out, 'initializers-compact.c')), false);
   assert.equal(asyncifyStackBytes, 1048576);
+  // emcc's Asyncify link (issue #90) runs a Binaryen root whose wasm-opt lowers tail calls
+  // first: the SDK's other tools are linked in, and the SDK environment is kept.
+  const root = join(f.out, 'binaryen-asyncify');
+  assert.deepEqual(link.options.env, { SDK_ENV: 'yes', LASM_STAND_IN_SDK: '1', EMCC_CORES: '1', EM_BINARYEN_ROOT: root });
+  const tools = readdirSync(join(f.tools.prefix, 'bin')).filter(name => name !== 'wasm-opt').sort();
+  assert.ok(tools.length >= 4);
+  assert.deepEqual(readdirSync(join(root, 'bin')).sort(), [...tools, 'wasm-opt'].sort());
+  for (const name of tools) assert.ok(lstatSync(join(root, 'bin', name)).isSymbolicLink(), name);
+  assert.ok(!lstatSync(join(root, 'bin', 'wasm-opt')).isSymbolicLink());
+  const input = join(f.base, 'program.wasm'), tailCalling = Buffer.from('0061736d0100000001090260017f017f600000020d0103656e7605736c65657000010303020000040401700002070501016600010908010041000b0201020a200214001000200045047f410705200041016b12020b0b0900200041001300000b', 'hex');
+  writeFileSync(input, tailCalling);
+  execFileSync(join(root, 'bin', 'wasm-opt'), ['--enable-tail-call', '--asyncify', input, '-o', input, '--enable-memory64']);
+  assert.deepEqual(JSON.parse(readFileSync(record, 'utf8')), ['--asyncify', input, '-o', input, '--enable-memory64']);
+  const lowered = readFileSync(input);
+  assert.equal(lowered.length, tailCalling.length + 2);
+  assert.ok(WebAssembly.validate(lowered));
+  // Other wasm-opt runs pass through unchanged.
+  execFileSync(join(root, 'bin', 'wasm-opt'), ['--enable-tail-call', '-Oz', input, '-o', input]);
+  assert.deepEqual(JSON.parse(readFileSync(record, 'utf8')), ['--enable-tail-call', '-Oz', input, '-o', input]);
 
   const g = fixture({ wrappers: false });
   linkEdgeProgram({ sdk: g.sdk, nodeRuntime: g.nodeRuntime, edge: g.edge, linkWork: g.linkWork, out: g.out, suspend: 'none' });
