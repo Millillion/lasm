@@ -90,7 +90,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] Claim 4, dependable tooling: metamorphic tests of `lasm dev` (an incremental build equals a clean one; the same input gives the same bytes; a rename changes nothing else).
 - [ ] Claim 4: fault injection in the installer and the build (a dropped network, a full disk, a killed process, a read-only cache).
 - [ ] Claim 4: every error a user can trigger prints a clear message, never a stack trace (an error corpus run against the published CLI).
-- [ ] Bun gives no response to an encoded slash, `/hello/a%2Fb` (found by target equivalence; investigate).
+- [x] Bun gives no response to an encoded slash, `/hello/a%2Fb` (found by target equivalence; investigate): neither Bun nor Lasm. The harness's first run (2026-10-31) sent `Connection: close` through Node's pooled keep-alive agent and reused the socket Bun had closed; fixed that day, and Bun has answered `Hello, a/b` in every run since. A new `keepAlive` corpus case checks the encoded slash over one persistent connection on every target.
 
 ### Example apps
 - [x] Conduit: fix the two recorded gaps (empty Markdown link labels; keyboard access to the delete and remove icons), and change the headline to "50 proved propositions (294 theorems)" (fixed and proved 2026-11-02, SPEC L6 and L7).
