@@ -181,8 +181,8 @@ Two kinds of history count interleaving: two people typing at one place
 concurrently ("typists"), and one person's backwards typing continued on a
 second device while another types at the same place ("relay", the case of
 the paper's Table 1 where Yjs interleaves). In CI's 2,000 histories Tandem
-interleaves none; Yjs interleaves none of the typists and about four in ten
-of the relays.
+interleaves none; Yjs interleaves none of the typists and about half of the
+relays (840 of 1,666 in a run of 10,000 histories).
 
 ## The simulation
 
