@@ -661,7 +661,8 @@ test('synchronous callbacks without a mailbox hook still poll the host', () => {
 // outside a callback the same requests work.
 test('synchronous callbacks: requests that wait for a JavaScript promise fail at once', async () => {
   let calls = 0;
-  const root = project({ lib: `module.exports = { later: v => { globalThis.__laterCalls = (globalThis.__laterCalls ?? 0) + 1; return Promise.resolve(v); }, now: v => v };` });
+  const root = project({ lib: `module.exports = { later: v => { globalThis.__laterCalls = (globalThis.__laterCalls ?? 0) + 1; return Promise.resolve(v); }, now: v => v,
+    fails: () => Promise.reject(new RangeError('rejected later')) };` });
   const memory = new WebAssembly.Memory({ initial: 1, maximum: 1, shared: true });
   const view = new DataView(memory.buffer);
   const { channel, slot, buffer } = layout;
@@ -681,6 +682,7 @@ test('synchronous callbacks: requests that wait for a JavaScript promise fail at
   const lib = js.decode(js.dispatch(201, 0, 1n, Buffer.from('lib')));
   const id = hold(js, lib);
   const promise = hold(js, Promise.resolve(5));
+  const later = hold(js, lib.later);
   const tried = [];
   const attempt = (name, run) => { try { run(); tried.push([name, 'ok']); } catch (error) { tried.push([name, error.message]); } };
   onServe = () => {
@@ -689,11 +691,21 @@ test('synchronous callbacks: requests that wait for a JavaScript promise fail at
     attempt('async binding', () => js.dispatch(214, 0, 16n, Buffer.concat([u64(0x42), wire(['T.later', 'lib', 'later', [2]])])));
     attempt('awaited call', () => js.dispatch(205, 0, 2n | 8n, wire([{ ref: id }, 'later', [3]])));
     attempt('awaited binding', () => js.dispatch(214, 0, 2n, wire(['T.later', 'lib', 'later', [4]])));
+    attempt('awaited function', () => js.dispatch(205, 0, 2n, wire([{ ref: later }, undefined, [9]])));
+    // A promise that rejects after the callback is abandoned quietly (no unhandled rejection).
+    attempt('awaited rejection', () => js.dispatch(214, 0, 2n, wire(['T.fails', 'lib', 'fails', []])));
     // Calls whose results are not promises, and calls that do not await, still work.
     attempt('plain call', () => js.decode(js.dispatch(205, 0, 2n | 8n, wire([{ ref: id }, 'now', [5]]))));
     attempt('promise result', () => js.dispatch(214, 0, 1n, wire(['T.later', 'lib', 'later', [6]])));
   };
-  assert.equal(f(), true);
+  const unhandled = [];
+  const onUnhandled = reason => unhandled.push(reason);
+  process.on('unhandledRejection', onUnhandled);
+  try {
+    assert.equal(f(), true);
+    await new Promise(resolve => setTimeout(resolve, 20));
+  } finally { process.off('unhandledRejection', onUnhandled); }
+  assert.deepEqual(unhandled, []);
   const why = 'inside a synchronous Lean callback (Lasm.JS.Function.ofSyncFn): JavaScript promises settle only after the callback returns, while Node waits for it. Use an asynchronous callback (Function.ofFn)';
   assert.deepEqual(tried, [
     ['await', `TypeError: Cannot await a JavaScript value (Value.await, Value.toTask) ${why}`],
@@ -701,9 +713,12 @@ test('synchronous callbacks: requests that wait for a JavaScript promise fail at
     ['async binding', `TypeError: Cannot wait for a JavaScript call (an Async call, method or binding) ${why}`],
     ['awaited call', `TypeError: Cannot await the promise returned by method "later" ${why}`],
     ['awaited binding', `TypeError: Cannot await the promise returned by binding "lib later" ${why}`],
+    ['awaited function', `TypeError: Cannot await the promise returned by a call ${why}`],
+    ['awaited rejection', `TypeError: Cannot await the promise returned by binding "lib fails" ${why}`],
     ['plain call', 'ok'], ['promise result', 'ok']]);
-  // The waiting requests that fail before calling JavaScript call nothing (the Async ones); awaited calls ran once each.
-  assert.equal(globalThis.__laterCalls, 3);
+  // The waiting requests that fail before calling JavaScript call nothing (the Async ones); awaited calls ran once each
+  // (and the binding's result that is not awaited).
+  assert.equal(globalThis.__laterCalls, 4);
   // Outside a callback the same requests work.
   js.dispatch(207, 0, 0x50n, wire({ ref: promise }));
   await js.dispatch(214, 0, 16n, Buffer.concat([u64(0x51), wire(['T.later', 'lib', 'later', [7]])]));
