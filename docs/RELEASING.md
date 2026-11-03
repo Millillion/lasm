@@ -67,7 +67,7 @@ A release is a version bump: a pull request that changes the root `package.json`
    which never cancels. Then, on Linux x64:
    - it downloads the accepted candidate and rebuilds every package exactly as the
      rehearsal did (`scripts/npm-dist/build-all.mjs --version <version> --license MIT`,
-     Node 26.12.1 with npm 11.20.0), and checks every tarball's integrity against the
+     Node 26.13.0 with npm 11.20.0), and checks every tarball's integrity against the
      rehearsal's `npm-dist-linux-x64` record ([compare.mjs](../scripts/release/compare.mjs));
    - it publishes, in order, the tool packages whose version is not on npm yet
      (existing ones are skipped), then `@lasm/cli`, then `@lasm/create`, with
@@ -88,7 +88,7 @@ released, and never republishes, unpublishes or moves a tag.
 **Trust configuration.** Every package trusts exactly: GitHub Actions, owner
 `Millillion`, repository `lasm`, workflow file `release.yml`, no environment. The
 release job has `permissions: id-token: write, contents: write` (and `actions:
-read` for the artifacts); npm 11.20.0 and Node 26.12.1 meet trusted publishing's
+read` for the artifacts); npm 11.20.0 and Node 26.13.0 meet trusted publishing's
 npm 11.5.1+/Node 22.14+ and `npm trust`'s npm 11.15.0+. Every package's
 `repository` is `git+https://github.com/Millillion/lasm.git`, which npm checks
 against the provenance.
