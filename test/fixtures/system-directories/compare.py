@@ -30,7 +30,8 @@ def compare(output_arg, *, facade_arg=None, program=None, startup=False, package
         ('buffer-limit', {b'HOME': b'h'*4096, b'TMPDIR': b't'*4096}),
         ('buffer-limit-trailing-slash', {b'HOME': b'h'*4095+b'/', b'TMPDIR': b't'*4095+b'/'}),
     ]
-    native = Path.home() / '.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean'
+    # The oracle: LASM_NATIVE_LEAN (integration/host-fixtures.mjs), else the Lean 4.32 the fixture was written against.
+    native = Path(os.environ.get('LASM_NATIVE_LEAN') or Path.home() / '.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean')
     if not native.is_file():
         raise SystemExit('Pinned native toolchain unavailable')
     record = {
