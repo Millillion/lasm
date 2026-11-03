@@ -50,6 +50,7 @@ and [`test/fuzz.mjs`](test/fuzz.mjs) (the endpoint fuzzer).
 | An unknown client or an unregistered `redirect_uri` gets an error page, never a redirect (RFC 6749 §4.1.2.1: no open redirector) | `Spec.untrusted_redirect_uri_not_followed` |
 | After logout, redirects go only to a post-logout URI registered for the named client (RP-Initiated Logout §3) | `Spec.logout_redirect_registered`; the adversarial suite |
 | The authorization response names the issuer (`iss`, RFC 9207; mix-up, RFC 9700 §4.4) and carries only `code`, `state`, `iss` or `error` | `Spec.redirect_params`; oauth4webapi validates `iss` |
+| A redirect carries `state` back unchanged (RFC 6749 §4.1.2), so `state` is bounded (2048 bytes; a longer one is an error page, never a redirect) and no request can make a `Location` header clients refuse | `Spec.redirect_state_bounded`; the adversarial suite; the fuzzer's regression corpus |
 | A registered URI with a query keeps it (RFC 6749 §3.1.2) | `Spec.redirect_location_exact`; the adversarial suite |
 
 ## 4. Refresh tokens

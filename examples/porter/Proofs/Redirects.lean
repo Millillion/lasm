@@ -110,7 +110,8 @@ theorem redirects_authorize (e : Env) ctx r (D : DB) :
 theorem interactionOf_some {e : Env} {ctx r} {D : DB} {id i c}
     (h : Id.run (interactionOf e.cfg e.crypto D.reads ctx r id) = some (i, c)) :
     e.cfg.client? i.request.client = some c ∧ i.request.redirectUri ∈ c.redirectUris ∧
-    D.interaction? (e.H id) = some i ∧ ctx.now < i.expires ∧ r.cookie? interactionCookie = some id := by
+    D.interaction? (e.H id) = some i ∧ ctx.now < i.expires ∧ r.cookie? interactionCookie = some id ∧
+    shortState i.request.state = true := by
   unfold interactionOf at h
   split at h
   · cases h
@@ -123,7 +124,10 @@ theorem interactionOf_some {e : Env} {ctx r} {D : DB} {id i c}
       · split at h
         · rename_i c' hc
           split at h
-          · cases h; exact ⟨hc, ‹_›, hi, ‹_›, by simpa using hcookie⟩
+          · rename_i hru
+            split at h
+            · cases h; exact ⟨hc, hru, hi, ‹_›, by simpa using hcookie, ‹_›⟩
+            · cases h
           · cases h
         · cases h
       · cases h
@@ -192,22 +196,24 @@ theorem logoutParams_some {cfg : Config} {ps cid u st} (h : logoutParams cfg ps 
   unfold logoutParams at h
   split at h
   · cases h
-  · simp only at h
-    split at h
-    · cases h
-    · rename_i u' hu
+  · split at h
+    · simp only at h
       split at h
-      · rename_i c hc
-        split at h
-        · cases h
-          cases hcid : (param ps "client_id").value? with
-          | none => rw [hcid] at hc; cases hc
-          | some cid =>
-            rw [hcid] at hc
-            obtain ⟨hm, hid⟩ := client?_some hc
-            exact ⟨c, hm, by rw [hid], ‹_›⟩
-        · cases h
       · cases h
+      · rename_i u' hu
+        split at h
+        · rename_i c hc
+          split at h
+          · cases h
+            cases hcid : (param ps "client_id").value? with
+            | none => rw [hcid] at hc; cases hc
+            | some cid =>
+              rw [hcid] at hc
+              obtain ⟨hm, hid⟩ := client?_some hc
+              exact ⟨c, hm, by rw [hid], ‹_›⟩
+          · cases h
+        · cases h
+    · cases h
 
 theorem redirects_logout (e : Env) r : RedirectsTo e.cfg (LogoutOk e.cfg r) (Id.run (logout e.cfg e.crypto r)).1 := by
   simp only [logout, id_bind, id_pure, id_run, crypto_sha256]
@@ -249,5 +255,170 @@ theorem redirects_run (e : Env) ctx r D :
   · intro id hp; exact redirects_not_logout hp (by simp) (redirects_interactionPage e ctx r D id _)
   · intro id hp _; exact redirects_not_logout hp (by simp) (redirects_login e ctx r D id)
   · intro id hp _; exact redirects_not_logout hp (by simp) (redirects_consent e ctx r D id)
+
+/-! ## Redirects reflect no unbounded input
+
+A redirect's `Location` header is the registered URI (above), a fresh code,
+the issuer, a fixed error code and `state`; `state` is the only part taken
+from the request, and it is at most `maxState` bytes. -/
+
+/-- The `state` parameters of a redirect are at most `maxState` bytes. -/
+def StateIn (ps : List (String × String)) : Prop := ∀ p ∈ ps, p.1 = "state" → p.2.utf8ByteSize ≤ maxState
+
+/-- A reply's redirect to a client, if any, carries a bounded `state`. -/
+def StateBounded (x : Reply) : Prop := ∀ u ps, x.location = some (.client u ps) → StateIn ps
+
+theorem stateParams_state {st : Option String} (h : StateOk st) : StateIn ((st.map fun s => [("state", s)]).getD []) := by
+  intro p hp _
+  cases st with
+  | none => simp at hp
+  | some v =>
+    simp at hp
+    rw [hp]
+    exact h v rfl
+
+theorem codeParams_state (cfg : Config) code {st : Option String} (h : StateOk st) : StateIn (codeParams cfg code st) := by
+  intro p hp hs
+  simp only [codeParams, List.mem_append, List.mem_singleton] at hp
+  rcases hp with (rfl | hp) | rfl
+  · simp at hs
+  · exact stateParams_state h p hp hs
+  · simp at hs
+
+theorem errorParams_state (cfg : Config) x {st : Option String} (h : StateOk st) : StateIn (errorParams cfg x st) := by
+  intro p hp hs
+  simp only [errorParams, List.mem_append, List.mem_singleton] at hp
+  rcases hp with (rfl | hp) | rfl
+  · simp at hs
+  · exact stateParams_state h p hp hs
+  · simp at hs
+
+theorem state_none {x : Reply} (h : x.location = none) : StateBounded x := by
+  intro u ps hl; rw [h] at hl; cases hl
+
+@[simp] theorem state_err x : StateBounded (Reply.err x) := state_none rfl
+
+theorem state_issueCode (e : Env) ctx (a : AuthRequest) l sc code fam (h : StateOk a.state) :
+    StateBounded (Id.run (issueCode e.cfg e.crypto ctx a l sc code fam)).1 := by
+  intro u ps hl
+  simp [issueCode, Reply.redirect] at hl
+  obtain ⟨rfl, rfl⟩ := hl
+  exact codeParams_state _ _ h
+
+theorem state_errRedirect (cfg : Config) uri st x (h : StateOk st) : StateBounded (errRedirect cfg uri st x) := by
+  intro u ps hl
+  simp [errRedirect, Reply.redirect] at hl
+  obtain ⟨rfl, rfl⟩ := hl
+  exact errorParams_state _ _ h
+
+theorem state_startInteraction (e : Env) ctx a l : StateBounded (Id.run (startInteraction e.cfg e.crypto ctx a l)).1 := by
+  intro u ps hl; simp [startInteraction, Reply.redirect] at hl
+
+theorem state_authorizeValid (e : Env) ctx (D : DB) c a s (h : StateOk a.state) :
+    StateBounded (Id.run (authorizeValid e.cfg e.crypto D.reads ctx c a s)).1 := by
+  unfold authorizeValid
+  split
+  · split
+    · simp only [id_bind, reads_consent]
+      split
+      · exact state_issueCode e ctx a _ _ _ _ h
+      · split
+        · exact state_errRedirect _ _ _ _ h
+        · exact state_startInteraction e ctx a _
+    · split
+      · exact state_errRedirect _ _ _ _ h
+      · exact state_startInteraction e ctx a _
+  · split
+    · exact state_errRedirect _ _ _ _ h
+    · exact state_startInteraction e ctx a _
+
+theorem state_authorize (e : Env) ctx r (D : DB) : StateBounded (Id.run (authorize e.cfg e.crypto D.reads ctx r)).1 := by
+  unfold authorize
+  split
+  · simp
+  · rename_i ps _
+    split
+    · simp
+    · rename_i uri st x hck
+      have hs := checkAuth_state e.cfg ps
+      rw [hck] at hs
+      exact state_errRedirect _ uri st x hs
+    · rename_i a hck
+      have hs := checkAuth_state e.cfg ps
+      rw [hck] at hs
+      split
+      · simp
+      · simp only [id_bind]
+        exact state_authorizeValid e ctx D _ a _ hs
+
+theorem state_interactionPage (e : Env) ctx r (D : DB) id :
+    StateBounded (Id.run (interactionPage e.cfg e.crypto D.reads ctx r id)).1 := by
+  unfold interactionPage
+  simp only [id_bind]
+  split
+  · simp
+  · split <;> exact state_none rfl
+
+theorem state_login (e : Env) ctx r (D : DB) id : StateBounded (Id.run (login e.cfg e.crypto D.reads ctx r id)).1 := by
+  simp only [login, afterLogin, id_bind, id_pure, id_run, crypto_sha256, crypto_check, reads_consent]
+  repeat' split
+  all_goals intro u ps hl
+  all_goals simp [issueCode, Reply.redirect] at hl
+  all_goals obtain ⟨rfl, rfl⟩ := hl
+  all_goals obtain ⟨-, -, -, -, -, hs⟩ := interactionOf_some ‹_›
+  all_goals exact codeParams_state _ _ (stateOk_of hs)
+
+theorem state_consent (e : Env) ctx r (D : DB) id : StateBounded (Id.run (consent e.cfg e.crypto D.reads ctx r id)).1 := by
+  simp only [consent, currentSession, id_bind, id_pure, id_run, crypto_sha256, reads_session]
+  repeat' split
+  all_goals intro u ps hl
+  all_goals simp [issueCode, errRedirect, Reply.redirect] at hl
+  all_goals obtain ⟨rfl, rfl⟩ := hl
+  all_goals obtain ⟨-, -, -, -, -, hs⟩ := interactionOf_some ‹_›
+  all_goals first | exact codeParams_state _ _ (stateOk_of hs) | exact errorParams_state _ _ (stateOk_of hs)
+
+theorem state_userinfo (e : Env) ctx r (D : DB) : StateBounded (Id.run (userinfo e.cfg e.crypto D.reads ctx r)).1 := by
+  apply state_none
+  unfold userinfo; crush
+
+theorem logoutParams_state {cfg : Config} {ps cid uri st} (h : logoutParams cfg ps = some (cid, uri, st)) : StateOk st := by
+  unfold logoutParams at h
+  split at h
+  · cases h
+  · split at h
+    · rename_i hs
+      simp only at h
+      repeat' split at h
+      all_goals (cases h <;> exact stateOk_of hs)
+    · cases h
+
+theorem state_logout (e : Env) r : StateBounded (Id.run (logout e.cfg e.crypto r)).1 := by
+  simp only [logout, id_bind, id_pure, id_run, crypto_sha256]
+  split
+  · simp
+  · rename_i ps hps
+    split
+    · simp
+    · rename_i cid uri st hlp
+      repeat' split
+      all_goals intro u' ps' hl
+      all_goals simp [Reply.redirect, Reply.page] at hl
+      all_goals obtain ⟨rfl, rfl⟩ := hl
+      all_goals exact stateParams_state (logoutParams_state hlp)
+
+theorem state_run (e : Env) ctx r D : StateBounded (run e ctx r D).1 := by
+  apply run_elim e ctx r D (fun x => StateBounded x.1)
+  · intro x; simp
+  · exact state_none rfl
+  · exact state_none rfl
+  · exact state_none rfl
+  · exact state_none rfl
+  · intro _ _; exact state_authorize e ctx r D
+  · intro _ _; exact state_none (token_location e ctx r D)
+  · intro _; exact state_userinfo e ctx r D
+  · intro _; exact state_logout e r
+  · intro id _; exact state_interactionPage e ctx r D id
+  · intro id _ _; exact state_login e ctx r D id
+  · intro id _ _; exact state_consent e ctx r D id
 
 end Porter.Proofs
