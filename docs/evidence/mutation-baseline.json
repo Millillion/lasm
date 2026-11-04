@@ -1,50 +1,50 @@
 {
-  "comment": "Mutation scores per module (scripts/mutation/run.mjs, docs/TESTING.md#mutation-testing). initial: before the tests were improved (2026-11-02, Node 24.22.1, Linux x64); score: the floor CI checks (nightly, PRs), raised as tests improve; target: the goal.",
-  "measuredAt": "2026-11-02",
+  "comment": "Mutation scores per module (scripts/mutation/run.mjs, docs/TESTING.md#mutation-testing). initial: before the tests were improved (2026-11-02); score: the last recorded measurement; threshold: the floor CI checks (nightly, PRs), the score rounded down to a whole percent, at least 80 % and never lowered (the ratchet, docs/DECISIONS.md 2026-11-03).",
+  "measuredAt": "2026-11-03",
   "tool": "Stryker 10.0.0 with the tap runner over node:test (scripts/mutation/run.mjs)",
   "modules": {
     "host-bridge": {
       "initial": 56.5,
       "score": 96,
-      "mutants": 731,
-      "target": 80
+      "mutants": 743,
+      "threshold": 96
     },
     "ui-dom": {
       "initial": 55.1,
-      "score": 92.6,
+      "score": 92.8,
       "mutants": 684,
-      "target": 80
+      "threshold": 92
     },
     "build-service": {
       "initial": 52.4,
-      "score": 94.5,
-      "mutants": 460,
-      "target": 80
+      "score": 94.3,
+      "mutants": 464,
+      "threshold": 94
     },
     "link-driver": {
       "initial": 53.9,
       "score": 93,
       "mutants": 3260,
-      "target": 80
+      "threshold": 93
     },
     "target-link": {
       "initial": 5.9,
       "score": 86.8,
-      "mutants": 1934,
-      "target": 80
+      "mutants": 1950,
+      "threshold": 86
     },
     "edge-glue": {
       "initial": 15.2,
-      "score": 97.2,
-      "mutants": 1229,
-      "target": 80
+      "score": 97.3,
+      "mutants": 1235,
+      "threshold": 97
     },
     "notices": {
       "initial": 62.5,
       "score": 91.5,
       "mutants": 475,
-      "target": 80
+      "threshold": 91
     }
   },
-  "run": "host-bridge, ui-dom: mutation.yml run 41479365531 (Node 26.12.1) and a local run (Node 24.22.1), the lower of the two; build-service, link-driver, target-link, edge-glue, notices: a local run (Node 24.22.1, 2026-11-02) after the stand-in toolchain and fault-injection tests, checked by the pull request's mutation.yml run"
+  "run": "mutation.yml run 41749603692 (Node 26.13.0, main at the branch point)"
 }
