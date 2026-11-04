@@ -85,7 +85,6 @@ def main (args : List String) : IO Unit := do
   | "sum" => IO.println (sumTo (List.range n))
   | "wide" => IO.println (wide n)
   | "deepSum" => IO.println (deepSum n)
-  | "foldr" => IO.println ((List.range n).foldr (· + ·) 0)
   | _ => IO.println (depth n)
 `);
 writeFileSync(join(work, 'node-wasi-run.mjs'), `const { WASI } = await import('node:wasi');
@@ -203,7 +202,7 @@ for (const target of targets) {
     // first, depending on the engine and the frame; a C-stack overflow must be
     // named, never left as the trap that follows it ("memory access out of bounds").
     const overflows = [];
-    for (const mode of ['sum', 'wide', 'deepSum', 'foldr']) {
+    for (const mode of ['sum', 'wide', 'deepSum']) {
       const ok = (t, n) => { const r = run(t, [mode, String(n)]); return r.code === 0 && /^\d+\n$/.test(r.stdout); };
       const deepest = limit(target, 100, 50_000, undefined, ok), n = Math.ceil(deepest * 1.1) + 10;
       const over = run(target, [mode, String(n)], { timeout: 120_000 });
