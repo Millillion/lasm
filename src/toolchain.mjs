@@ -1,21 +1,19 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, statSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
-import { assertSupportedHost, bundledTools, executableName, insideDirectory, responseFile } from './platform.mjs';
-import { scriptCommand } from './js-runtime.mjs';
+import { assertSupportedHost, executableName, insideDirectory } from './platform.mjs';
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const lean = process.env.LEAN ?? executableName('lean');
 export const leanVersion = '4.32.0';
 export const leanCommit = '8c9756b28d64dab099da31a4c09229a9e6a2ef35';
 export const targetName = `lean-${leanVersion}-wasm32-v1`;
-export const env = { ...process.env };
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 export function run(executable, args, extra = {}) {
-  return execFileSync(executable, args, { cwd: root, env, encoding: 'utf8',
+  return execFileSync(executable, args, { cwd: root, env: { ...process.env }, encoding: 'utf8',
     windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'], timeout: 180_000, maxBuffer: 16 * 1024 * 1024, ...extra }).trim();
 }
 
@@ -65,68 +63,4 @@ export function resolveLean(cwd) {
   assertLeanCommit(hostCommit);
   const prefix = run(selectedLean, ['--print-prefix'], { cwd });
   return { prefix, hostCommit, lean: join(prefix, 'bin', executableName('lean')) };
-}
-
-export async function getToolchain(cwd, { log = console.log } = {}) {
-  const { prefix, hostCommit } = resolveLean(cwd);
-  const tools = bundledTools(prefix);
-  const target = resolve(process.env.LASM_TARGET_DIR ?? join(root, 'targets', targetName));
-  if (existsSync(join(target, 'target.json'))) {
-    const { manifest, identity } = readTargetManifest(target);
-    const cFlags = ['--target=wasm32-wasip1', '-O2', '-DNDEBUG', '-ffunction-sections', '-fdata-sections',
-      '-I', join(target, 'include'), '-I', join(prefix, 'include'),
-      '-isystem', join(target, 'sysroot/clang'), '-isystem', join(target, 'sysroot/include')];
-    return {
-      prefix, lean: tools.lean, hostCommit, identity, kind: 'packaged-clang',
-      standardDirectory: join(target, 'stdlib'), noticeFile: join(target, 'THIRD_PARTY_NOTICES.txt'),
-      compileC(source, object) { run(tools.clang, [...cFlags, '-c', source, '-o', object], { cwd }); },
-      link(objects, exports, output) {
-        const arguments_ = ['--entry=_initialize', '--export-memory', '--stack-first', '--strip-all',
-          '-z', 'stack-size=1048576', '--max-memory=1073741824', ...exports.map(e => `--export=${e}`), ...objects,
-          join(target, 'lib/libleanrt.a'), join(target, 'lib/libleanstd.a'),
-          ...manifest.linkLibraries.map(file => join(target, file)), '-o', output];
-        const response = output + '.link.rsp';
-        writeFileSync(response, responseFile(arguments_));
-        try { run(tools.linker, ['-flavor', 'wasm', '--rsp-quoting=posix', '@' + response], { cwd }); }
-        finally { rmSync(response, { force: true }); }
-      },
-    };
-  }
-  if (process.env.LASM_TARGET_DIR || !existsSync(join(root, 'scripts/build-runtime.mjs'))) {
-    throw new Error(`Missing Lasm target archive ${targetName}. Install the complete compiler package; no build-time downloads are performed.`);
-  }
-  if (process.platform !== 'linux' || process.arch !== 'x64') {
-    throw new Error('Maintainer runtime packaging requires Linux x64. Install the compiler tarball to build applications on this host.');
-  }
-  const reference = await import('../scripts/build-runtime.mjs');
-  const archive = reference.buildRuntime(log);
-  return {
-    prefix, lean: tools.lean, hostCommit, identity: readFileSync(join(reference.runtimeDir, 'build-identity.json'), 'utf8'), kind: 'reference-zig',
-    compileIdentity: sha256(JSON.stringify(reference.targetFlags) + hostCommit
-      + readFileSync(join(reference.runtimeDir, 'include/lean/lean.h'), 'utf8')
-      + readFileSync(join(reference.runtimeDir, 'include/lean/config.h'), 'utf8')),
-    standardCache: join(reference.runtimeDir, 'stdlib'), reference,
-    compileC(source, object) { reference.run(reference.zig, ['cc', ...reference.targetFlags, '-c', source, '-o', object]); },
-    link(objects, exports, output) {
-      reference.run(reference.zig, ['c++', ...reference.targetFlags, '-fno-exceptions', '-mexec-model=reactor', ...objects, archive,
-        ...exports.map(n => `-Wl,--export=${n}`), '-Wl,--strip-all', '-Wl,-z,stack-size=1048576', '-Wl,--max-memory=1073741824', '-o', output]);
-    },
-  };
-}
-
-export function optimizeWasm(input, output) {
-  // The portable Node optimizer can take several minutes on a full Std.Http
-  // application, particularly on shared CI machines and ARM64 hosts.
-  const options = { timeout: 600_000 };
-  const args = [input, '-O2', '--asyncify', '--pass-arg=asyncify-imports@lasm.request,lasm.task_wait,lasm.task_wait_any,lasm.node_call,lasm.node_release', '--enable-bulk-memory', '--enable-sign-ext', '--enable-nontrapping-float-to-int', '-o', output];
-  if (process.env.WASM_OPT) return run(process.env.WASM_OPT, args, options);
-  const bundled = join(root, 'tools/wasm-opt.cjs');
-  if (existsSync(bundled)) {
-    const metadata = JSON.parse(readFileSync(join(root, 'tools/tooling.json')));
-    if (metadata.binaryen !== '132.0.0' || metadata.sha256 !== sha256(readFileSync(bundled))) throw new Error('Packaged Binaryen checksum mismatch');
-    return run(...scriptCommand(bundled, args), options);
-  }
-  if (existsSync(join(root, 'targets'))) throw new Error('Packaged Binaryen optimizer is missing; reinstall the complete compiler package');
-  const binaryen = fileURLToPath(new URL('./bin/wasm-opt', import.meta.resolve('binaryen')));
-  return run(...scriptCommand(binaryen, args), options);
 }

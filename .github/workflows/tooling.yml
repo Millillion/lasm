@@ -4,6 +4,16 @@ name: Dependable tooling
 #     trigger prints a clear message, never a stack trace. Against a candidate
 #     packed from this commit and against the published @lasm/cli@latest;
 #     pull requests, pushes to main and nightly.
+#   - metamorphic build tests (scripts/tooling/metamorphic.mjs): incremental
+#     builds equal clean ones, the same input gives the same bytes (two
+#     directories, a cold tool cache), renaming an unrelated file or definition
+#     changes nothing else, touching sources rebuilds nothing; lasm build and
+#     lasm dev; node, wasi, workers and browser, release and dev profiles.
+#   - fault injection (scripts/tooling/faults.mjs): killed builds, installs and
+#     npm installs, cut downloads, full disks, read-only and corrupted caches;
+#     each must end in success on retry or a clear error.
+# Metamorphic and fault runs are slow: nightly, by hand, and on pull requests
+# that change scripts/tooling/ or this workflow.
 # Each run installs the CLI with npm, as a user does, into a fresh directory.
 on:
   pull_request:
@@ -19,6 +29,19 @@ concurrency:
   group: tooling-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      slow: ${{ steps.scope.outputs.slow }}
+    steps:
+      - id: scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" != pull_request ]; then echo "slow=${{ github.event_name != 'push' }}" >> "$GITHUB_OUTPUT"; exit 0; fi
+          files=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --jq '.[].filename')
+          if echo "$files" | grep -qE '^(scripts/tooling/|\.github/workflows/tooling\.yml$)'; then echo slow=true; else echo slow=false; fi >> "$GITHUB_OUTPUT"
   pack:
     if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     # The retained runtime input is a draft release asset (needs contents: write to read).
@@ -114,3 +137,85 @@ jobs:
             node scripts/tooling/error-corpus.mjs --lasm "$LASM_BIN" --only network --old-node "$OLD_NODE" --work "$RUNNER_TEMP/corpus" --report "$RUNNER_TEMP/error-corpus.json"
       - if: always()
         run: cat "$RUNNER_TEMP/error-corpus.json" 2>/dev/null || true
+
+  metamorphic:
+    name: Metamorphic (${{ matrix.target }})
+    needs: [scope, pack]
+    if: needs.scope.outputs.slow == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [node, wasi, workers, browser]
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: tooling-packed-candidate
+          path: .work/node-candidate
+      - name: Install the candidate as a user would
+        run: |
+          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
+          echo '{"private":true}' > package.json
+          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+      - name: Metamorphic build tests
+        run: |
+          # Not under run-bounded: it keeps 8 GiB of host headroom, which on a
+          # 16 GiB runner stops a browser or edge build (about 5 GiB) part way.
+          LASM_TOOLCHAIN_CACHE="$RUNNER_TEMP/tool-cache" node scripts/tooling/metamorphic.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" --targets ${{ matrix.target }} --work "$RUNNER_TEMP/mm" --report "$RUNNER_TEMP/metamorphic.json"
+      - if: always()
+        run: cat "$RUNNER_TEMP/metamorphic.json" 2>/dev/null || true
+
+  faults:
+    name: Fault injection
+    needs: [scope, pack]
+    if: needs.scope.outputs.slow == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.12.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: tooling-packed-candidate
+          path: .work/node-candidate
+      - name: Install the candidate as a user would
+        run: |
+          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
+          echo '{"private":true}' > package.json
+          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+      # Not under run-bounded: the full-disk scenarios mount small loop file
+      # systems with sudo, which a transient systemd scope would not see.
+      - name: Fault injection
+        run: |
+          node scripts/tooling/faults.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --package "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --work "$RUNNER_TEMP/faults" --report "$RUNNER_TEMP/faults.json"
+      - if: always()
+        run: cat "$RUNNER_TEMP/faults.json" 2>/dev/null || true

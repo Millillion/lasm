@@ -36,6 +36,7 @@ proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, after publish, daily |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
+| [Dependable tooling](#dependable-tooling) | Every user-triggerable error prints a clear message (error corpus); incremental, repeated, renamed and touched builds give the clean build's bytes (metamorphic); killed, offline, full-disk, read-only and corrupted runs end in success or a clear error (fault injection) | `scripts/tooling/`, `tooling.yml` | PR (corpus), nightly (all) |
 | [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage | planned | nightly |
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
@@ -279,6 +280,64 @@ rehearsal of the exact packages, installed by npm, Bun and Deno),
 `published-templates.yml` and `bun-deno-published.yml` (the public registry
 after each release and daily). **Cannot catch:** real cloud platforms (no
 accounts, by policy), OS versions and configurations outside the runners.
+
+### Dependable tooling
+
+Claim 4 of [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md), tested black
+box: each harness installs the CLI with npm (a candidate packed from the commit,
+and for the corpus also the published `@lasm/cli@latest`) and judges only what
+it prints, its exit status and the files it writes. The judge of a message,
+`messageProblems` in [`scripts/tooling/lib.mjs`](../scripts/tooling/lib.mjs),
+rejects JavaScript stack frames, raw JavaScript errors, Node's raw
+file-system text (`EACCES: …, mkdir '…'`), a bare C library message without a
+path, the internal-error line, unhandled rejections and empty output.
+
+**Error corpus** ([`error-corpus.mjs`](../scripts/tooling/error-corpus.mjs)):
+about 60 errors a user can cause: bad and conflicting flags, missing or
+misnamed sources, Lean type, syntax and UTF-8 errors (also in an imported
+module), missing imports, no `main`, broken `lakefile.toml`/`lakefile.lean`,
+a missing Lake path dependency, unsupported or garbage `lean-toolchain`,
+output paths that are files or not Lasm builds, read-only project, output and
+tool-cache directories, packaging a dev build, an unreachable download, an
+invalid download setting, Node 22. Each must exit non-zero within its limit,
+say what the case names, and pass the judge. A case fixed after the latest
+release carries `fixedIn`; against an older CLI it is reported as known.
+
+**Metamorphic build tests** ([`metamorphic.mjs`](../scripts/tooling/metamorphic.mjs)),
+for node, wasi, workers and browser, release and dev profiles, on a small Lake
+project: two clean builds in different directories, and a build with a cold
+tool cache, give the same bytes; edit then build equals a clean build of the
+edited project, and reverting gives the original bytes; renaming a module
+nothing imports changes no byte; renaming an unused definition changes only
+the input fingerprints in JSON metadata (release profile); touching sources, or
+building again, links nothing and rewrites no output file; after `lasm dev`
+rebuilt an edit and ignored a touch, `lasm build --dev` reuses its build, which
+equals a clean one. Each target is judged on its own output directory (`dist/`
+for node and the browser, `wasi/`, `workers/`). Dev rebuilds plan
+initialization from the previous build's plan, so for the dev profile
+"incremental equals clean" means the same behaviour (on node: the same output
+when run), not the same bytes; clean dev builds must still be byte-identical.
+
+**Fault injection** ([`faults.mjs`](../scripts/tooling/faults.mjs)), node
+target: SIGKILL of the process tree at every build stage and while replacing an
+existing output; SIGKILL while a cold tool cache is filled from the npm
+packages and over HTTPS; SIGKILL of `npm install` of the CLI; HTTPS downloads
+through a CONNECT proxy that cuts tunnels after 4 MiB (three times: must
+recover; always: must fail clearly); the tool cache on a 64 MiB and a 700 MiB
+ext4 loop file system, the project on one filled to 1, 4 and 12 MiB free; an
+empty read-only tool cache, a filled one made read-only, a read-only project
+build cache; a flipped byte and a removed file in the tool archives, derived
+tools, shared objects and the project build cache. Outcome: success with the
+clean build's bytes, or a clear failure followed, once the fault is gone (after
+`lasm cache repair` for corruption), by a rerun with the clean build's bytes.
+
+**CI** ([tooling.yml](../.github/workflows/tooling.yml)): the corpus against the
+candidate and the published package on every pull request, push to `main` and
+nightly; metamorphic (one job per target) and fault injection nightly, by hand,
+and on pull requests that change the harness.
+**What it cannot catch:** errors outside the corpus; nondeterminism that two
+runs on one machine share (same OS, CPU, locale); faults on macOS and Windows
+(Linux runners only, except the unit-level controls in `installer-faults.yml`).
 
 ### Fuzzing at the boundaries
 

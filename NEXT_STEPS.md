@@ -66,7 +66,7 @@ package installation and execution tests. No remote, publication, or live cloud
 deployment is part of this milestone.
 
 See [developer workflow](docs/DEVELOPER_WORKFLOW.md),
-[release packaging](docs/RELEASE.md), and [host adapters](docs/HOSTS.md).
+and [release packaging](docs/RELEASE.md).
 
 ## Cross-platform installation
 
