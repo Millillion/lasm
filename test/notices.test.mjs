@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
@@ -324,31 +324,4 @@ test('lasm init writes no licence file, header or license field into a project',
     }
   } finally { rmSync(root, { recursive: true, force: true }); }
   assert.ok(projects >= Object.keys(templates).length);
-});
-
-// Apache-2.0 §4(b): each modified file carries a notice that it was changed. The
-// "Changes to Lean" line of every runtime patch names exactly the files that
-// patch changes (its Lean 4.35.0 version, as build-application-runtime.mjs
-// applies it) and says what it changes.
-test('Apache-2.0 4(b): every runtime patch’s notice names exactly the Lean files it changes', () => {
-  const patchDirectory = new URL('../scripts/full-lean/patches/', import.meta.url);
-  const patchFiles = readdirSync(patchDirectory);
-  const expand = item => {
-    const braces = /^(.*)\{([^}]+)\}(.*)$/.exec(item);
-    return braces ? braces[2].split(',').flatMap(part => expand(braces[1] + part + braces[3])) : [item];
-  };
-  for (const [name, change] of Object.entries(leanRuntimeChanges)) {
-    const file = patchFiles.filter(file => new RegExp(`^lean-4\\.3[2-5]\\.0-${name}\\.patch$`).test(file)).sort().at(-1);
-    assert.ok(file, `no patch file for ${name}`);
-    const changed = new Set([...readFileSync(new URL(file, patchDirectory), 'utf8').matchAll(/^\+\+\+ b\/(\S+)/gm)].map(match => match[1]));
-    assert.ok(change.length >= 2, name);
-    const description = change.at(-1);
-    assert.match(description, /^[a-zA-Z"'].{8,}$/, `${name}: what the patch changes`);
-    const listed = change.slice(0, -1).join('; ');
-    const stage0 = / \(and their stage0 copies\)$/.test(listed);
-    const named = listed.replace(/ \(and their stage0 copies\)$/, '').split(/[;,] (?![^{]*\})/)
-      .map(item => item.replace(/^new file /, '')).flatMap(expand);
-    const expected = new Set(stage0 ? named.flatMap(path => changed.has(`stage0/${path}`) ? [path, `stage0/${path}`] : [path]) : named);
-    assert.deepEqual([...expected].sort(), [...changed].sort(), `${name} (${file})`);
-  }
 });

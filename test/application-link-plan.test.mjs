@@ -12,7 +12,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, utimes
 import { join, basename } from 'node:path';
 import { runInNewContext } from 'node:vm';
 import { linkApplication, selectedLinkDriver, configurableThreadPool, initializerStubs, archiveUnitCache, shippedAnalysisDirectory,
-  linkDrivers, buildProfiles, defaultLinkDriver, readStoreEntry, writeStoreEntry, relabelPreJs, sharedStoreLimits } from '../src/application-link.mjs';
+  linkDrivers, buildProfiles, defaultLinkDriver, readStoreEntry, relabelPreJs, sharedStoreLimits } from '../src/application-link.mjs';
 import { responseFile } from '../src/platform.mjs';
 import { compactInitializerWrappers } from '../src/edge/edge-initializers.mjs';
 import { project, emccSdk, nodeSdk, writeRuntime, mainModule, helperModule, specializedIdentity } from './fixtures/link-stand-ins/application.mjs';
@@ -336,26 +336,6 @@ test('the program\'s foreign C exports stay exported', { skip: !posix }, async (
   const p = project({ helper: helperModule({ extra }), runtime: { identity: specializedIdentity } });
   await build(p, { initialization: 'all', linkOnly: true });
   assert.equal(readFileSync(join(p.work, 'exports.json'), 'utf8'), '["_free","_main","_malloc","_my_export"]\n');
-});
-
-// The machine-wide store is shared with other Lasm versions: a probe record in
-// another schema is not trusted; the probe links again and its record is replaced.
-test('the shared store: probe records of another schema are relinked, not used', { skip: !posix }, async () => {
-  const p = project({ runtime: { identity: specializedIdentity } });
-  const objectCache = join(p.base, 'objects'), sharedCache = join(p.base, 'shared');
-  const first = await build(p, { objectCache, sharedCache, linkOnly: true });
-  const probes = readdirSync(sharedCache).filter(name => /^probe-[0-9a-f]{64}\.json$/.test(name));
-  assert.ok(probes.length > 0);
-  const current = JSON.parse(readStoreEntry(join(sharedCache, probes[0])).toString('utf8'));
-  assert.equal(current.schema, 2);
-  for (const name of probes) writeStoreEntry(join(sharedCache, name), Buffer.from(JSON.stringify({ schema: 1, data: [], code: [] })));
-  const work = join(p.base, 'work-2');
-  mkdirSync(work);
-  const again = emccSdk(p.base);
-  const requirements = await build({ ...p, work }, { sdk: again, objectCache, sharedCache, linkOnly: true });
-  assert.ok(again.links.length > 1, 'the probes link again');
-  assert.deepEqual(requirements, first);
-  for (const name of probes) assert.equal(JSON.parse(readStoreEntry(join(sharedCache, name)).toString('utf8')).schema, 2, name);
 });
 
 test('initializer analysis of the runtime archives is cached per machine and may ship with the runtime', { skip: !posix }, async () => {

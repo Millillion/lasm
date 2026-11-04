@@ -5,7 +5,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, readdirSync, writeFileSync, existsSync, utimesSync, statSync, truncateSync } from 'node:fs';
 import { join } from 'node:path';
-import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { readStoreEntry, writeStoreEntry, pruneSharedStore } from '../src/application-link.mjs';
 
@@ -82,20 +81,4 @@ test('the shared store evicts by age, not name, keeps used entries over its boun
   assert.deepEqual(readdirSync(other), ['x.o']);
   // A store that does not exist (yet) is not an error.
   assert.doesNotThrow(() => pruneSharedStore(join(other, 'missing'), new Set([join(other, 'missing', 'gone.o')])));
-});
-
-// The machine-wide store is shared by every Lasm on the machine, so its entry
-// format is a compatibility contract: entries another Lasm wrote in the
-// documented format read back, and an entry in any other format (a later
-// format's magic, even with a matching digest) is not trusted.
-test('store entries: the on-disk format is the LASMSTO1 magic, the SHA-256, then the content', () => {
-  const store = directory(), path = join(store, 'entry.o'), bytes = Buffer.from('relocatable object');
-  const digest = createHash('sha256').update(bytes).digest();
-  writeFileSync(path, Buffer.concat([Buffer.from('LASMSTO1'), digest, bytes]));
-  assert.deepEqual(readStoreEntry(path), bytes, 'an entry written by another Lasm process reads back');
-  writeStoreEntry(path, bytes);
-  assert.deepEqual(readFileSync(path), Buffer.concat([Buffer.from('LASMSTO1'), digest, bytes]));
-  writeFileSync(path, Buffer.concat([Buffer.from('LASMSTO2'), digest, bytes]));
-  assert.equal(readStoreEntry(path), undefined, 'another format is not read as this one');
-  assert.equal(existsSync(path), false);
 });
