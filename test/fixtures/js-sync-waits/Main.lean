@@ -33,7 +33,7 @@ def main (args : List String) : IO Unit := do
   part 1 "a task that finishes by itself" fun _ => do
     -- Computed at run time (not a closed term the compiler evaluates once at start-up).
     let t ← IO.asTask (do return sumTo (3000000 + (← IO.monoNanosNow) % 1))
-    return toJS (← IO.ofExcept (← IO.wait t))
+    return toJS (toString (← IO.ofExcept (← IO.wait t)))
   part 2 "a task that makes a JavaScript call" fun _ => do
     let t ← IO.asTask (g.callMethod "String" #[toJS (7 : Nat)] String)
     return toJS (← IO.ofExcept (← IO.wait t))
