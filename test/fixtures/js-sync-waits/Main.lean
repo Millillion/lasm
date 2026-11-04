@@ -2,7 +2,8 @@
 part per line (scripts/ci/lasm-js-stress.mjs runs every part, and each alone:
 `main.mjs 4`). Node's main thread waits for such a callback, so a wait there
 that needs it can't finish. Each one now fails at once with the reason
-(parts 2-8: before, parts 2-6 never finished); a wait for a task that finishes
+(parts 2-8: before, parts 2-6 never finished; part 8 is an error the callback
+catches); a wait for a task that finishes
 by itself still works (1); a promise kept for later settles after the callback
 returns (9); and callbacks still work after the failures (10). -/
 import Lasm.JS
@@ -65,9 +66,12 @@ def main (args : List String) : IO Unit := do
   part 7 "a JavaScript promise's task (Value.toTask)" fun _ => do
     let p : Value ← timers.callMethod "setTimeout" #[toJS (1 : Nat), toJS "never"]
     return toJS (← IO.ofExcept (← IO.wait (← p.toTask String)))
+  -- An error the callback catches (only task waits end the callback).
   part 8 "a JavaScript promise (Value.await)" fun _ => do
     let p : Value ← timers.callMethod "setTimeout" #[toJS (1 : Nat), toJS "never"]
-    return toJS (← p.await String)
+    match ← (p.await String : IO String).toBaseIO with
+    | .ok v => return toJS v
+    | .error e => return toJS s!"caught: {e}"
   if want 9 then
     let kept ← IO.mkRef (none : Option (Task (Except IO.Error String)))
     part 9 "a promise kept for later (Value.toTask)" fun _ => do

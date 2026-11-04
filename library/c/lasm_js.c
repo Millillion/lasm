@@ -33,6 +33,7 @@
 void *malloc(size_t size);
 void free(void *pointer);
 void *memcpy(void *destination, const void *source, size_t size);
+int memcmp(const void *a, const void *b, size_t size);
 
 #ifdef __EMSCRIPTEN__
 extern int64_t lasm_node_call(uint32_t operation, uint32_t handle, uint64_t argument, const uint8_t *input, size_t length);
@@ -228,8 +229,21 @@ LEAN_EXPORT lean_obj_res lasm_js_park(void) {
 }
 /* (p : @& IO.Promise (Except String ByteArray)) (value : @& ByteArray) : IO Unit
    The host resolves p when the JavaScript value (a promise or not) settles. */
+static _Thread_local int in_sync_callback; /* the synchronous-callback thread inside a callback */
+/* `Value.await` marks its value (Data.ref, constructor 9, described "Value.await"). */
+static int awaits(b_lean_obj_arg keep) {
+    if (lean_is_scalar(keep) || lean_obj_tag(keep) != 9) return 0;
+    lean_object *description = lean_ctor_get(keep, 1);
+    static const char mark[] = "Value.await";
+    return lean_string_size(description) == sizeof(mark) && memcmp(lean_string_cstr(description), mark, sizeof(mark)) == 0;
+}
 LEAN_EXPORT lean_obj_res lasm_js_await_into(b_lean_obj_arg promise, b_lean_obj_arg value, b_lean_obj_arg keep) {
-    (void)keep;
+    /* Inside a synchronous callback the promise can settle only after the callback
+       returns: `Value.await` fails at once, as an error the callback can catch.
+       `Value.toTask` registers it; waiting for its task is a task wait (sync_wait). */
+    if (in_sync_callback && awaits(keep)) return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string(
+        "Waiting for a JavaScript promise (Value.await) inside a synchronous callback can't finish, "
+        "because the JavaScript thread is waiting for the callback; use Function.ofFn")));
     if (!dispatcher) return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string("Lasm.JS is not started (internal error)")));
     start_poller(); /* the host resolves p through the poller */
     lean_inc(promise); lean_mark_mt(promise);
@@ -338,7 +352,6 @@ void lasm_js_host_wait(volatile int32_t *ready) {
 
 /* The synchronous-callback thread inside a callback: its task waits poll
    (sync_wait), so that Node's main thread can stop the callback. */
-static _Thread_local int in_sync_callback;
 static jmp_buf sync_stop;
 static uint32_t wait_generation;
 static int finished(lean_object *task) { return lean_to_task(task)->m_value != NULL; }

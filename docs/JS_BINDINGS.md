@@ -297,9 +297,10 @@ Function.ofSyncFn2 (f : α → β → IO γ)
     (`Value.await`, a `toTask`'s task, the `…Await` forms), Lean file IO, a Lean
     task that makes host calls (including `Async` run with `.block`), and a
     timer, DNS lookup or socket read started in the callback.
-  - A failed wait for a Lean task (`IO.wait`, `Task.get`, `.block`, `Value.await`)
-    ends the whole callback: JavaScript gets the error, and the Lean values the
-    callback held are not freed.
+  - A promise wait (`Value.await`, the `…Await` forms) and file IO fail as errors
+    the callback can catch. A failed wait for a Lean task (`IO.wait`, `Task.get`,
+    `.block`, a `toTask`'s task) ends the whole callback: JavaScript gets the
+    error, and the Lean values the callback held are not freed.
   - A synchronous callback cannot call another synchronous callback.
 - **Replying with a method call (`ofFnReply`), for HTTP handlers.** A handler
   usually ends by calling `res.json(body)` (Express) or returning `c.json(body)`
