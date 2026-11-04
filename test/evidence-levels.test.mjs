@@ -48,11 +48,11 @@ test('render rewrites only the Evidence column and the legend, and is stable', (
   assert.ok(once.startsWith(before) && once.endsWith(after));
   const rows = once.slice(once.indexOf(START), once.indexOf(END)).split('\n').filter(l => l.startsWith('| ') && !l.startsWith('| ---'));
   assert.equal(rows.length, config.platforms.length + 1);
-  assert.match(rows[0], /\| Since \| Evidence \|$/);
+  assert.match(rows[0], /\| Since \| How well tested \|$/);
   assert.match(rows[1], /^\| Node\.js 24\+ .* \| L0 \|$/);
   // The other cells are kept as written.
   const strip = text => text.slice(text.indexOf(START), text.indexOf(END)).split('\n').filter(l => l.startsWith('| ') && !l.startsWith('| ---'))
-    .map(l => l.replace(/ \| (L[0-3]|—|Evidence) \|$/, ' |'));
+    .map(l => l.replace(/ \| (L[0-3]|—|Evidence|How well tested) \|$/, ' |'));
   assert.deepEqual(strip(once), strip(readme));
   assert.throws(() => render(readme, results.slice(1), config), /no platform .* for the README row "Node\.js/);
   assert.throws(() => render('no markers', results, config), /markers/);
