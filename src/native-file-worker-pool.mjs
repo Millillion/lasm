@@ -1,4 +1,5 @@
 import { Worker } from 'node:worker_threads';
+import { accessSync, constants } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import forwardWorkerStdio from './worker-stdio.cjs';
 import { encodeFileMessage, decodeFileMessage } from './native-file-message.mjs';
@@ -31,10 +32,22 @@ function failed(state, error) {
   retire(state);
   job?.reject(error);
 }
+/** The execArgv that preloads `preload` (native-worker-cwd.cjs) into a new
+ * Worker, or none. Node resolves a `--require` preload from the working
+ * directory and first reads the cwd's package.json: an existing cwd without
+ * search permission fails that read (EACCES, ERR_INVALID_PACKAGE_CONFIG) and
+ * the Worker never starts. The preload is needed only for a removed cwd, where
+ * process.cwd() fails; an unsearchable one still reports its path. The same
+ * rule is in scripts/full-lean/emscripten-pre.js for Lean's threads. */
+export function workerCwdPreload(preload) {
+  try { process.cwd(); } catch { return ['--require', preload]; }
+  try { accessSync('.', constants.X_OK); } catch (error) { if (error?.code === 'EACCES' || error?.code === 'EPERM') return []; }
+  return ['--require', preload];
+}
 function create() {
   const worker = new Worker(new URL('./native-file-worker.mjs', import.meta.url), {
     name: 'lasm-file-io', stdout: true, stderr: true,
-    execArgv: ['--require', fileURLToPath(new URL('./native-worker-cwd.cjs', import.meta.url))],
+    execArgv: workerCwdPreload(fileURLToPath(new URL('./native-worker-cwd.cjs', import.meta.url))),
   });
   forwardWorkerStdio(worker);
   const state = { worker };

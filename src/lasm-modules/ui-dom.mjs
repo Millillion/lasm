@@ -229,9 +229,13 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     // Lean runs the handlers (innermost first, stopping where one stops
     // propagation) and answers: bit 1 a frame, bit 2 preventDefault, bit 4
     // stopPropagation, applied here while the event is still dispatched.
+    // Lean's frame bit is set only when it has not already asked for a frame:
+    // a frame that is still waiting (an HTTP response arrived this frame) holds
+    // the model this input changed, so discrete input renders it now too.
     const answer = lean.event(path, type, calls);
     decided(event, answer);
-    if (answer & 1) { if (discrete.has(type) && bytes === null) render(); else schedule(); }
+    if (discrete.has(type) && (answer & 1 || pending) && bytes === null) render();
+    else if (answer & 1) schedule();
   }
   const discrete = new Set(['click', 'dblclick', 'auxclick', 'contextmenu', 'mousedown', 'mouseup', 'pointerdown', 'pointerup',
     'touchstart', 'touchend', 'keydown', 'keyup', 'keypress', 'input', 'change', 'beforeinput', 'submit', 'reset', 'focus', 'blur',
@@ -250,9 +254,10 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   const urlChanged = () => { if (lean) after(lean.url(win.location.href)); };
   // A click on a link is discrete user input: like other clicks, its result
   // (the new page) is shown in the same task as the address changes.
+  // (As for events: a frame already waiting is rendered now as well.)
   const urlClicked = href => {
     if (!lean) return;
-    if (lean.url(href) && bytes === null) render(); else schedule();
+    if ((lean.url(href) || pending) && bytes === null) render(); else schedule();
   };
   function onLinkClick(event) {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;

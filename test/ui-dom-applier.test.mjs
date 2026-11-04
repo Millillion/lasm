@@ -397,6 +397,32 @@ test('discrete events render in the same task; continuous ones on the next anima
   }
 });
 
+// Conduit's e2e suite on the Lambda image (CI run 41236311299): a link clicked
+// while an HTTP response's frame was still waiting changed the address one frame
+// before the page. Lean answers "no new frame" then (it already asked for one).
+test('discrete input and link clicks while a frame is waiting render it in the same task', async () => {
+  for (const kind of ['click', 'link', 'mousemove']) {
+    const { root, window } = page();
+    const ui = createUi({ root });
+    let frames = 0;
+    ui.module.connect({ event: () => 0, url: () => false, frame: () => { frames++; return new Uint8Array(0); }, application: true });
+    ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'div', f => (f.on(kind === 'link' ? 'click' : kind, 0), 1))).u8);
+    // Nothing waiting, nothing changed: no render.
+    root.firstChild.dispatchEvent(new window.Event(kind === 'link' ? 'click' : kind, { bubbles: true }));
+    assert.equal(frames, 0, kind);
+    ui.module.schedule();
+    if (kind === 'link') {
+      root.innerHTML = '<a id="l" href="/article/a">x</a>';
+      click(window, root.querySelector('#l'));
+      assert.equal(window.location.href, 'https://app.test/article/a');
+    } else root.firstChild.dispatchEvent(new window.Event(kind, { bubbles: true }));
+    assert.equal(frames, kind === 'mousemove' ? 0 : 1, `${kind}: the waiting frame is rendered with the input`);
+    await nextFrame(window); await nextFrame(window);
+    assert.equal(frames, kind === 'mousemove' ? 1 : 2, `${kind}: the animation frame still runs`);
+    await window.happyDOM.close();
+  }
+});
+
 test('an event raised while a patch is applied waits for the next frame (no re-entrant render)', async () => {
   const { root, window, errors } = page();
   window.customElements.define('x-fire', class extends window.HTMLElement {

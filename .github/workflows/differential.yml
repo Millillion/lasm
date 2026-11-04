@@ -256,6 +256,66 @@ jobs:
             ${{ runner.temp }}/stack-depth.json
           retention-days: 30
           if-no-files-found: ignore
+  # Host behaviour of ordinary Lean programs (integration/host-fixtures.mjs): the
+  # fixtures of the unit files that built with the retired Lean 4.32 pipeline
+  # (cwd, permissions, processes, environment and path bytes, temporary files,
+  # finalizers, TCP, clocks), built with the installed candidate for Node and
+  # compared with upstream Lean 4.35.0's `lean --run`. Pull requests and main.
+  host-fixtures:
+    needs: pack
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: differential-packed-candidate
+          path: .work/node-candidate
+      - name: Install the candidate as a user would
+        run: |
+          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
+          echo '{"private":true}' > package.json
+          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+      - name: The oracle's pin (upstream Lean 4.35.0 release archive)
+        id: lean
+        run: |
+          node -e "const a=require('./scripts/lean-dist/lean-4.35.0-upstream.json').lean['4.35.0'].artifacts['linux-x64']; console.log('url='+a.url); console.log('sha256='+a.sha256); console.log('root='+a.root)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/lean-archive
+          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
+      - name: Native Lean (the oracle)
+        run: |
+          set -euo pipefail
+          A="$RUNNER_TEMP/lean-archive"; mkdir -p "$A"
+          [ -f "$A/lean.tar.zst" ] || curl -fsSL --retry 3 -o "$A/lean.tar.zst" "${{ steps.lean.outputs.url }}"
+          echo "${{ steps.lean.outputs.sha256 }}  $A/lean.tar.zst" | sha256sum -c
+          mkdir -p "$RUNNER_TEMP/lean" && tar --zstd -xf "$A/lean.tar.zst" -C "$RUNNER_TEMP/lean"
+          "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin/lean" --version
+      - name: Host fixtures
+        run: |
+          node integration/host-fixtures.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/host-fixtures" \
+            --out "$RUNNER_TEMP/host-fixtures.json"
+      - name: Preserve the report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: host-fixtures-${{ github.run_id }}
+          path: ${{ runner.temp }}/host-fixtures.json
+          retention-days: 30
+          if-no-files-found: ignore
   # Recursion depth under Node on macOS and Windows (issue #66,
   # scripts/ci/stack-depth.mjs): the default stack differs there (Windows
   # commits thread stacks), so it is checked on each.

@@ -13,7 +13,15 @@ callbacks, step for step as implemented:
   host calls, the result, the doorbell);
 * Node's main thread inside a synchronous callback: `syncFunction` in
   src/node-js.mjs, which serves the thread's host calls inline through
-  `lasmFullServeSync` (host-pre.js) and the work other threads proxy to it.
+  `lasmFullServeSync` (host-pre.js) and the work other threads proxy to it;
+* work proxied to the synchronous-callback thread (Emscripten's dynamic-library
+  synchronization, run when one of its futex waits wakes) that makes a host
+  call while the thread waits in one of its own: that call uses the thread's
+  next-depth slot (`seq1`, `ready1`), linked from the first slot, which the
+  main thread serves inline too;
+* a callback that waits for a JavaScript promise: the request fails at once
+  (src/node-js.mjs, `syncAwaitFailure`), as the promise could settle only in an
+  event-loop task, after the callback.
 
 Every step is one access to a shared word (or one decision of a thread on
 values it has already read). A waiting thread may also wake spuriously and,
@@ -21,7 +29,8 @@ for timed waits, time out (both optional, as configured): the code must not
 depend on either.
 
 Shared words: channel `state` (0 idle, 1 call posted, 2 result) and
-`bell` (the doorbell), slot `seq` (request sequence) and `ready`.
+`bell` (the doorbell), slot `seq` (request sequence) and `ready`, and the
+next-depth slot's `seq1` and `ready1`.
 -/
 import HostBridge.Checker
 
@@ -42,6 +51,12 @@ structure Config where
   sync : Bool := true
   timeouts : Bool := false
   spurious : Bool := false
+  /-- Callbacks that wait for a JavaScript promise (`Value.await`, an awaited or
+  `Async` call): one host call, which must fail at once. -/
+  awaits : Array Bool := #[]
+  /-- Callbacks during whose first host call work proxied to the Lean thread
+  (dynamic-library synchronization) makes a host call at the next depth. -/
+  nested : Array Bool := #[]
   /-- Conformance mode: an unbounded workload, chosen by the recorded trace. -/
   trace : Bool := false
   -- Mutations (the shipped code has the defaults).
@@ -55,6 +70,11 @@ structure Config where
   doorbell : Bool := true
   /-- The host does not remember the sequence it served (`slot.sequence`). -/
   forgetServed : Bool := false
+  /-- Before this change: a request that waits for a promise was accepted, and the
+  callback waited for the promise, which settles in a later event-loop task. -/
+  awaitFails : Bool := true
+  /-- Before this change: inline serving covered only the first slot. -/
+  serveNested : Bool := true
   deriving Repr
 
 inductive MPc where
@@ -62,13 +82,15 @@ inductive MPc where
   | pre (k : Nat)
   | loadState | loadSeq | wait | blocked
   | ss (k : Nat) (afterTimeout : Bool)
+  /-- `lasmFullServeSync` on the next-depth slot. -/
+  | sn (k : Nat) (afterTimeout : Bool)
   | mailbox | reread | finish
   deriving BEq, Hashable, Repr, Inhabited
 
 inductive SPc where
   | free | exch (k : Nat) | exBlocked
   | loop | stWait (v : Nat) | stBlocked (v : Nat)
-  | body | proxyWait | post (k : Nat) | stop
+  | body | proxyWait | promiseWait | post (k : Nat) | stop
   deriving BEq, Hashable, Repr, Inhabited
 
 /-- The host's asynchronous server of the slot (`lasmFullServe`). -/
@@ -114,6 +136,27 @@ structure St where
   sCalls : Nat := 0
   sProxied : Bool := false
   sWoken : Bool := false
+  -- The next-depth slot.
+  seq1 : Nat := 0
+  ready1 : Nat := 0
+  slotReq1 : Nat := 0
+  replyFor1 : Nat := 0
+  served1 : Nat := 0
+  servedReq1 : Nat := 0
+  asrv1 : As := .unreg
+  announced1 : Bool := false
+  /-- The first slot links the next-depth slot (offset 96). -/
+  chained : Bool := false
+  /-- The proxied work's step (0: none runs). -/
+  tpc : Nat := 0
+  tWoken : Bool := false
+  tReq : Nat := 0
+  sNested : Bool := false
+  sAwaited : Bool := false
+  /-- The host call in progress waits for a promise. -/
+  sAwaitCall : Bool := false
+  /-- 1: the callback waits for a promise an event-loop task settles; 2: settled. -/
+  promise : Nat := 0
   bad : String := ""
   deriving BEq, Hashable, Repr, Inhabited
 
@@ -144,6 +187,21 @@ def wakeReady (s : St) : St := match s.spc with
 def wakeBell (s : St) : St := if s.mpc == .blocked then { s with mainWoken := true } else s
 def wakeSeq (s : St) : St := match s.asrv with
   | .waiting v _ => { s with asrv := .waiting v true } | _ => s
+def wakeReady1 (s : St) : St := if s.tpc == 9 then { s with tWoken := true } else s
+def wakeSeq1 (s : St) : St := match s.asrv1 with
+  | .waiting v _ => { s with asrv1 := .waiting v true } | _ => s
+
+/-- The host serves the request in the next-depth slot. -/
+def serve1 (s : St) (v : Nat) : St :=
+  let s := if s.slotReq1 == s.servedReq1 && s.slotReq1 != 0 then { s with bad := s!"nested request {s.slotReq1} served twice" } else s
+  { s with servedReq1 := s.slotReq1, replyFor1 := s.slotReq1, served1 := v }
+
+/-- Where `serveSync` returns to. -/
+def retOf (c : Config) (afterTimeout : Bool) : MPc :=
+  if !afterTimeout then .loadState else if c.mailboxInWait then .mailbox else .reread
+/-- After the first slot, `serveSync` follows its link to the next depth's slot. -/
+def afterSs (c : Config) (s : St) (afterTimeout : Bool) : MPc :=
+  if c.serveNested && s.chained then .sn 0 afterTimeout else retOf c afterTimeout
 
 def beginCall (s : St) (phase : Nat) : St :=
   { s with spc := if s.announced then .exch 1 else .exch 0, phase }
@@ -159,7 +217,25 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
   -- ---- Node's main thread ----
   match s.mpc with
   | .idle =>
-    if s.asrv.quiescent then
+    if s.promise == 1 then
+      out := out.push (m "an event-loop task settles the promise (the poller resolves it)" "" { s with promise := 2 })
+    match s.asrv1 with
+    | .unreg =>
+      if s.announced1 then out := out.push (m "registers the next-depth slot (lasmFullHostSlot)" "" { s with asrv1 := .load })
+    | .load =>
+      let v := s.seq1
+      if v == s.served1 then
+        out := out.push (m s!"async server reads seq1 = {v}, already served" s!"main load seq1 {v}" { s with asrv1 := .waitCall v })
+      else
+        out := out.push (m s!"async server reads seq1 = {v}, serves nested request {s.slotReq1}" s!"main load seq1 {v}" { serve1 s v with asrv1 := .reply 0 })
+    | .waitCall v =>
+      if s.seq1 != v then out := out.push (m s!"waitAsync(seq1, {v}): not-equal" s!"main waitasync seq1 {v} not-equal" { s with asrv1 := .load })
+      else out := out.push (m s!"waitAsync(seq1, {v})" s!"main waitasync seq1 {v} async" { s with asrv1 := .waiting v false })
+    | .waiting _ true => out := out.push (m "async server resumes on seq1" "" { s with asrv1 := .load })
+    | .waiting _ false | .pending => pure ()
+    | .reply 0 => out := out.push (m "async server stores ready1 = 1" "main store ready1 1" { s with ready1 := 1, asrv1 := .reply 1 })
+    | .reply _ => out := out.push (m "async server notifies ready1" "main notify ready1" { wakeReady1 s with asrv1 := .load })
+    if s.asrv.quiescent && s.asrv1.quiescent then
       if s.registered && (c.trace || s.cbStarted < callbacks c) then
         out := out.push (m "JavaScript calls the synchronous Lean function" "" { s with mpc := .pre 0, cbStarted := s.cbStarted + 1 })
       if s.proxyPending then
@@ -211,21 +287,49 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
       let after := if c.timeoutServes then MPc.ss 0 true else if c.mailboxInWait then .mailbox else .reread
       out := out.push (m "wait times out" "main wake bell timed-out" { s with mpc := after })
   | .ss 0 afterTimeout =>
-    let ret := if !afterTimeout then MPc.loadState else if c.mailboxInWait then .mailbox else .reread
     let v := s.seq
-    if v == s.served then out := out.push (m s!"serveSync reads seq = {v}, already served" s!"main load seq {v}" { s with mpc := ret })
+    if v == s.served then out := out.push (m s!"serveSync reads seq = {v}, already served" s!"main load seq {v}" { s with mpc := afterSs c s afterTimeout })
     else
       let t := serve c { s with served := if c.forgetServed then s.served else v }
       out := out.push (m s!"serveSync reads seq = {v}, serves request {s.slotReq}" s!"main load seq {v}" { t with mpc := .ss 1 afterTimeout })
   | .ss 1 afterTimeout => out := out.push (m "serveSync stores ready = 1" "main store ready 1" { s with ready := 1, mpc := .ss 2 afterTimeout })
   | .ss _ afterTimeout =>
-    let ret := if !afterTimeout then MPc.loadState else if c.mailboxInWait then .mailbox else .reread
-    out := out.push (m "serveSync notifies ready" "main notify ready" { wakeReady s with mpc := ret })
+    out := out.push (m "serveSync notifies ready" "main notify ready" { wakeReady s with mpc := afterSs c s afterTimeout })
+  | .sn 0 afterTimeout =>
+    let v := s.seq1
+    if v == s.served1 then out := out.push (m s!"serveSync reads seq1 = {v}, already served" s!"main load seq1 {v}" { s with mpc := retOf c afterTimeout })
+    else out := out.push (m s!"serveSync reads seq1 = {v}, serves nested request {s.slotReq1}" s!"main load seq1 {v}" { serve1 s v with mpc := .sn 1 afterTimeout })
+  | .sn 1 afterTimeout => out := out.push (m "serveSync stores ready1 = 1" "main store ready1 1" { s with ready1 := 1, mpc := .sn 2 afterTimeout })
+  | .sn _ afterTimeout => out := out.push (m "serveSync notifies ready1" "main notify ready1" { wakeReady1 s with mpc := retOf c afterTimeout })
   | .mailbox =>
     out := out.push (m (if s.proxyPending then "runs proxied work" else "checks the mailbox") "" { s with proxyPending := false, mpc := .reread })
   | .reread => out := out.push (m s!"reads bell = {s.bell}" s!"main load bell {s.bell}" { s with bellL := s.bell, mpc := .loadState })
   | .finish => out := out.push (m "state = 0, returns the result" "main store state 0" { s with state := 0, cbDone := s.cbDone + 1, mpc := .idle })
   -- ---- the Lean thread ----
+  -- Work proxied to it runs when a futex wait inside a callback's host call wakes:
+  -- a host call at the next depth, then back to the wait's caller.
+  if s.tpc != 0 then
+    match s.tpc with
+    | 1 => out := out.push (l "the proxied work allocates the next-depth slot, links and announces it" "" { s with announced1 := true, chained := true, tpc := 2 })
+    | 2 =>
+      let r := s.tReq + 1
+      out := out.push (l s!"writes nested request {r}, ready1 = 0" "lean store ready1 0" { s with tReq := r, slotReq1 := r, ready1 := 0, tpc := 3 })
+    | 3 => out := out.push (l s!"seq1 += 1 (was {s.seq1})" s!"lean add seq1 {s.seq1}" { s with seq1 := s.seq1 + 1, tpc := 4 })
+    | 4 => out := out.push (l "notifies seq1" "lean notify seq1" { wakeSeq1 s with tpc := if ringing c s then 5 else 7 })
+    | 5 => out := out.push (l s!"bell += 1 (was {s.bell})" s!"lean add bell {s.bell}" { s with bell := s.bell + 1, tpc := 6 })
+    | 6 => out := out.push (l "notifies bell" "lean notify bell" { wakeBell s with tpc := 7 })
+    | 7 =>
+      if s.ready1 == 1 then
+        let t := if s.replyFor1 != s.tReq then { s with bad := s!"nested request {s.tReq} received the reply of request {s.replyFor1}" } else s
+        out := out.push (l "reads ready1 = 1: the reply; the proxied work is done" "lean load ready1 1" { t with tpc := 0, spc := .exch 6 })
+      else out := out.push (l "reads ready1 = 0" "lean load ready1 0" { s with tpc := 8 })
+    | 8 =>
+      if s.ready1 != 0 then out := out.push (l "futex_wait(ready1, 0): not-equal" "" { s with tpc := 7 })
+      else out := out.push (l "futex_wait(ready1, 0) blocks" "" { s with tpc := 9, tWoken := false })
+    | _ =>
+      if s.tWoken then out := out.push (l "wakes" "" { s with tpc := 7 })
+      else if c.spurious then out := out.push { l "wakes spuriously" "" { s with tpc := 7 } with rare := true }
+    return out
   match s.spc with
   | .free =>
     if s.freeLeft > 0 || (c.trace && !c.sync) then out := out.push (l "makes a host call" "" (beginCall s 0))
@@ -246,7 +350,10 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
       let t := match s.phase with
         | 0 => { t with freeLeft := s.freeLeft - 1, spc := .free }
         | 1 => { t with setupDone := true, spc := .loop }
-        | _ => { t with sCalls := s.sCalls + 1, spc := .body }
+        | _ =>
+          if !s.sAwaitCall then { t with sCalls := s.sCalls + 1, spc := .body }
+          else if c.awaitFails then { t with sAwaitCall := false, sAwaited := true, spc := .body }
+          else { t with sAwaitCall := false, sAwaited := true, promise := 1, spc := .promiseWait }
       out := out.push (l "reads ready = 1: the reply" "lean load ready 1" t)
     else out := out.push (l "reads ready = 0" "lean load ready 0" { s with spc := .exch 7 })
   | .exch _ =>
@@ -255,8 +362,10 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
   | .exBlocked =>
     if s.sWoken then out := out.push (l "wakes" "" { s with spc := .exch 6 })
     else if c.spurious then out := out.push { l "wakes spuriously" "" { s with spc := .exch 6 } with rare := true }
+    if s.phase == 2 && (c.trace || (c.nested.getD s.sCb false && !s.sNested)) then
+      out := out.push (l "wakes to run work proxied to it, which makes a host call" "" { s with tpc := 1, sNested := true })
   | .loop =>
-    if s.state == 1 then out := out.push (l "reads state = 1: runs the callback" "" { s with spc := .body, sCalls := 0, sProxied := false })
+    if s.state == 1 then out := out.push (l "reads state = 1: runs the callback" "" { s with spc := .body, sCalls := 0, sProxied := false, sNested := false, sAwaited := false })
     else out := out.push (l s!"reads state = {s.state}" "" { s with spc := .stWait s.state })
   | .stWait v =>
     if s.state != v then out := out.push (l s!"futex_wait(state, {v}): not-equal" "" { s with spc := .loop })
@@ -273,10 +382,14 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
       let k := s.sCb
       if c.proxied.getD k false && !s.sProxied then
         out := out.push (l "waits for work proxied to the main thread (pthread_create)" "" { s with proxyPending := true, sProxied := true, spc := .proxyWait })
+      else if c.awaits.getD k false && !s.sAwaited then
+        out := out.push (l "waits for a JavaScript promise: a host call" "" { beginCall s 2 with sAwaitCall := true })
       else if s.sCalls < c.calls.getD k 0 then out := out.push (l "makes a host call" "" (beginCall s 2))
       else out := out.push (l "posts the result" "" { s with spc := .post 0 })
   | .proxyWait =>
     if !s.proxyPending then out := out.push (l "the proxied work is done" "" { s with spc := .body })
+  | .promiseWait =>
+    if s.promise == 2 then out := out.push (l "the promise settled: continues" "" { s with promise := 0, spc := .body })
   | .post 0 => out := out.push (l "state = 2 (result)" "" { s with state := 2, resultFor := s.sCb + 1, spc := .post 1 })
   | .post 1 => out := out.push (l s!"bell += 1 (was {s.bell})" "" { s with bell := s.bell + 1, spc := .post 2 })
   | .post _ => out := out.push (l "wakes bell" "" { wakeBell s with sCb := s.sCb + 1, spc := .loop })
@@ -284,7 +397,7 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
   return out
 
 def goal (c : Config) (s : St) : Bool :=
-  s.mpc == .idle && s.freeLeft == 0 &&
+  s.mpc == .idle && s.freeLeft == 0 && s.tpc == 0 && s.asrv1.quiescent &&
   (if c.sync then
     s.setupDone && s.cbDone == callbacks c && s.sCb == callbacks c &&
     (match s.spc with | .loop | .stWait _ | .stBlocked _ => true | _ => false)

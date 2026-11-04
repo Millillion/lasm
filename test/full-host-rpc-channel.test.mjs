@@ -118,3 +118,60 @@ test('many sequential calls keep one slot per depth', async () => {
     [ok, lasmFullRPC.slots.length]`);
   assert.deepEqual(results, [2000, 1]);
 });
+
+// Regression (found by the host bridge model, docs/TESTING.md): inside a
+// synchronous Lasm.JS callback Node's main thread serves the callback thread's
+// host calls inline. A call made by work proxied to that thread while it waits
+// in a host call (Emscripten's dynamic-library synchronization) uses the next
+// depth's slot, which the main thread neither served nor knew (its registration
+// message waits for the event loop): the callback hung. The main thread now
+// follows each slot's link to the next depth's slot and serves it too.
+test('inside a synchronous callback, a host call nested in the callback thread’s wait is served inline', async () => {
+  const memory = new SharedArrayBuffer(4 * 1024 * 1024);
+  const Module = { lasmLeanVersion: '4.35.0' };
+  const host = { request: op => ({ error: false, bytes: Buffer.from(op === 2 ? 'inner' : 'outer') }) };
+  const context = { ENVIRONMENT_IS_PTHREAD: false, Module, wasmMemory: { buffer: memory }, Atomics, Int32Array, Uint8Array,
+    DataView, BigUint64Array, Buffer, process, lasmFullHost: Promise.resolve(host) };
+  runInNewContext(prelude, context);
+  // Words below the worker's allocator (1024): doorbell 512, ready 516, go 520, done 524.
+  const i32 = new Int32Array(memory);
+  const script = `
+    const read = r => new TextDecoder().decode(HEAPU8.slice(r.pointer, r.pointer + r.length));
+    const first = read(lasmFullRPC.call('request', 1, 0, 0n, 0, 0));   // registers depth 0 (event loop running)
+    lasmFullRPC.doorbell = 512;                                          // lasm_js_sync_setup
+    Atomics.store(HEAP32, 516 / 4, 1); Atomics.notify(HEAP32, 516 / 4);
+    while (Atomics.load(HEAP32, 520 / 4) === 0) Atomics.wait(HEAP32, 520 / 4, 0);
+    let inner;
+    nested = () => { inner = read(lasmFullRPC.call('request', 2, 0, 0n, 0, 0)); };
+    const outer = read(lasmFullRPC.call('request', 1, 0, 0n, 0, 0));
+    Atomics.store(HEAP32, 524 / 4, 1); Atomics.add(HEAP32, 512 / 4, 1); Atomics.notify(HEAP32, 512 / 4);
+    [first, outer, inner, lasmFullRPC.slots.length]`;
+  const worker = new Worker(workerSource, { eval: true, workerData: { memory, rpcSource, script } });
+  const result = new Promise((resolve, reject) => {
+    worker.on('message', message => { if (message.cmd === 9) Module[message.handler](...message.args); else resolve(message.done); });
+    worker.on('error', reject);
+  });
+  try {
+    while (Atomics.load(i32, 516 / 4) === 0) await new Promise(resolve => setTimeout(resolve, 5));
+    const [slot] = [...context.lasmFullSlots.keys()];
+    // The callback: this thread blocks (no event loop) and serves inline, as syncFunction does.
+    Atomics.store(i32, 520 / 4, 1); Atomics.notify(i32, 520 / 4);
+    const deadline = performance.now() + 3000;
+    let bell = Atomics.load(i32, 512 / 4);
+    while (Atomics.load(i32, 524 / 4) === 0) {
+      if (performance.now() > deadline) throw new Error('the nested host call was never served');
+      Atomics.wait(i32, 512 / 4, bell, 10);
+      bell = Atomics.load(i32, 512 / 4);
+      context.lasmFullServeSync(slot);
+    }
+    assert.deepEqual(await result, ['outer', 'outer', 'inner', 2]);
+    // The nested slot was recorded inline; its registration then starts its server without serving it again.
+    const nestedSlot = Number(new DataView(memory).getBigUint64(slot + 96, true));
+    assert.ok(context.lasmFullSlots.has(nestedSlot));
+    await new Promise(resolve => setTimeout(resolve, 20));
+    assert.equal(context.lasmFullSlots.get(nestedSlot).registered, undefined);
+    assert.equal(context.lasmFullSlots.get(nestedSlot).sequence, 1);
+    // Only the first request went through the asynchronous server: nothing was served twice.
+    assert.equal(context.lasmFullServed, 1);
+  } finally { await worker.terminate(); }
+});

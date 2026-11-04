@@ -313,7 +313,10 @@ step one access to a shared word:
   `slot.sequence`, `Atomics.waitAsync`), the synchronous-callback channel
   (`state`, the doorbell; `sync_main` and `post` in `library/c/lasm_js.c`), and
   Node's main thread inside a synchronous callback (`syncFunction`,
-  `lasmFullServeSync`, work other threads proxy to the main thread). Waits
+  `lasmFullServeSync`, work other threads proxy to the main thread), host
+  calls made by work proxied to the callback thread while it waits in one (its
+  next-depth slot, linked from the first and served inline too), and callbacks
+  that wait for a JavaScript promise (the request fails at once). Waits
   follow `Atomics.wait`/futex semantics; a blocked wait may also wake
   spuriously and a timed wait may time out (each optional per configuration).
 - `HostBridge/Poller.lean`: the interop poller (`claim_poller`'s
@@ -332,7 +335,7 @@ cycle of non-final states in which every continuously enabled thread or
 event-loop task keeps stepping: Tarjan's strongly connected components;
 spurious wake-ups are allowed only finitely often). Counterexamples are
 shortest paths, printed step by step. `lake exe host-bridge check --large`
-runs every configuration (CI: about 1 s):
+runs every configuration (CI: about 1.5 s; with `--large` about 15 s):
 
 | Configuration | Bound | States | Result |
 | --- | --- | ---: | --- |
@@ -340,6 +343,8 @@ runs every configuration (CI: about 1 s):
 | … with spurious wake-ups and timeouts | 2 callbacks × 2 host calls; (large) 3, 0, 3, 2, 1, 3 | 17,277; 103,208 | ok |
 | … 4 and (large) 10 callbacks | 1 host call each | 18,756; 98,890 | ok |
 | Work proxied to the main thread inside callbacks | 1 + 1; (large) 5 callbacks, 8 host calls | 8,796; 54,756 | ok (it runs when the wait's 10 ms timeout expires) |
+| A callback waits for a promise, then host calls | 1 + 1 | 11,949 | ok (the wait fails at once) |
+| Host calls made by work proxied to the callback thread | 2 callbacks; (large) 5 callbacks mixing awaits, nested calls and proxied work | 209,000; 3,837,965 | ok (served when the wait times out) |
 | A generic Lean thread's slot, replies now or in a later task | 3; (large) 30 host calls | 280; 3,196 | ok |
 | Poller and completion thread | 5 scripts (callbacks with and without `waitForever`, awaits, async requests, timer races); (large) 4 calls, 2 awaits, 2 async requests | 84–1,588; up to 34,678 | ok |
 
@@ -350,7 +355,10 @@ non-progress cycle), the wait before this change (proxied work never run: a
 non-progress cycle), host calls without the doorbell (deadlock), a host that
 forgets `slot.sequence` (a request served twice), `claim_poller` without
 compare-and-swap (two pollers), completions dropped before the first poll and
-no poller requested for queued events (deadlocks).
+no poller requested for queued events (deadlocks), a callback that waits for a
+promise only the event loop settles, and inline serving that ignores the
+next-depth slot (both fair non-progress cycles; both were the shipped code
+before 2026-11-03).
 
 **2. Schedule fuzzing of the real JavaScript**
 ([`scripts/bridge-fuzz/schedule.cjs`](../scripts/bridge-fuzz/schedule.cjs)).
@@ -374,8 +382,8 @@ node_modules/@lasm/cli/bin/lasm.mjs --only js-interop,js-callbacks --runs 20 --s
 **3. Model-to-code conformance.** With `LASM_BRIDGE_TRACE=DIR` the preload
 also records every such operation in one global order (a lock around each, the
 comparison of a wait included) and at exit writes one trace per host-call slot
-(`slot sync` for the synchronous-callback thread, `slot generic` for every
-other Lean thread and nesting depth; roles from the diagnostics globals
+(`slot sync` for the synchronous-callback thread, with its next-depth slot as
+`seq1`/`ready1`, `slot generic` for every other Lean thread and nesting depth; roles from the diagnostics globals
 `lasm.js.sync` and `lasm.full.slots`). `host-bridge trace FILE…` checks each
 against the model's transition relation: every event must be a visible step,
 with any number of hidden steps (the Lean thread's Wasm futex waits and its C
@@ -399,9 +407,11 @@ replies and events, deadlocks and livelocks in the modelled protocol at the
 bounds above; a change to the code's sequence of shared-memory operations that
 the model does not allow; hangs and wrong output under perturbed schedules.
 **What it cannot catch:** races outside the modelled protocol (Lean's own
-runtime, Emscripten's internals beyond the proxied call, a host call made by a
-task proxied to the synchronous-callback thread while it waits, which uses the
-next depth's slot and is not served inline); behaviour beyond the bounds;
+runtime, Emscripten's internals beyond the proxied call, nesting deeper than
+the callback thread's second slot; a wait inside a synchronous callback for a
+Lean task that uses the host, such as `Async.block`, or for a timer or socket
+it started, which never finishes and which the host cannot see); behaviour
+beyond the bounds;
 memory-model effects (the model is sequentially consistent, as JavaScript's
 `Atomics` are); the Lean thread's Wasm-side steps are checked only through
 their effects in a trace. The model assumes each slot is used by one thread at a
@@ -520,22 +530,23 @@ An HN commenter mocked "tests that assert certain strings exist in the
 codebase". An audit of `test/`, `integration/` and the CI check scripts on
 2026-10-31 found 13 tests whose assertions read repository files as text, and 29 test files that CI never runs. All
 `integration/` harnesses and `scripts/**/check*.mjs` check things they build or
-run. Verdicts:
+run, except the static mode of `check-tutorials.mjs` (below). Verdicts:
 
 | Test | What it read | Verdict |
 | --- | --- | --- |
 | `application-output.test.mjs`: host support files exist with their dependencies | regex import scan of `src/` | **Replaced**: the shipped host files are copied alone into an empty directory and imported by Node's loader in a fresh process (`test/helpers/isolated-import.mjs`); a missing dependency fails to resolve; the test also checks that removing one is noticed |
 | `wasmtime-artifact.test.mjs`: standalone deployment carries every local dependency | regex import scan | **Replaced** the same way (a `new URL('./x')` asset that is not imported is still not covered) |
 | `candidate-readme.test.mjs`: a packed README installs its own archive | the real README's headings (failed after the README was reworded, PR #22) | **Replaced**: the transformation is tested on a fixed README; the real README is only required to pack (one install line, no unpinned links) |
-| `application-output.test.mjs`: retained callable and frozen outputs include transitive dependencies | file lists regex-parsed out of `src/build.mjs`, `src/main.mjs`, two scripts | **To replace**: export the lists as data and import-test them like the host files |
+| `application-output.test.mjs`: retained callable and frozen outputs include transitive dependencies | file lists regex-parsed out of `src/build.mjs`, `src/main.mjs`, two scripts | **Retired** (2026-11-03): all four lists belong to the retired Lean 4.32 library pipeline (`src/build.mjs`, `src/main.mjs`, `scripts/full-lean/freeze-build.mjs`, `derive-host-files.mjs`), which the published CLI refuses and CI cannot run; the shipped list, `applicationHostFiles`, is import-tested above |
 | `browser.test.mjs`: builtin modules use web-standard JavaScript only | `node:`/`process`/`Buffer` in `src/lasm-modules/*.mjs` | **Keep as a lint**: a grep finds uses inside functions that loading never runs; the behaviour is covered by `workers.yml` (workerd), Deno and the browser |
-| `release.test.mjs`: release.yml is the trusted publisher | regexes over four workflow files | **Keep the no-secrets lint; to replace the rest**: parse the YAML and test the `needs` graph; move the inline gate list into a tested module |
-| `nightly.test.mjs`: nightly.yml is scheduled, serialized, never a release dependency | regexes over workflows | **To replace** with structural YAML checks (the deferral logic is already tested through `nextStep`) |
-| `notices.test.mjs`: the edge runtime archive carries the MIT text and its change list | the packager's source | **To replace**: call the notice builder on a manifest (built outputs are already checked by `scripts/license/check-outputs.mjs`) |
+| `release.test.mjs`: release.yml is the trusted publisher | regexes over four workflow files | **Replaced** (2026-11-03): the release-checks verdict and manifest moved from inline `node -e` into `scripts/release/checks-manifest.mjs`, tested on job results (every gate failing, cancelled or skipped, a reused candidate, an overlay) and through `manifestProblems`; the workflow check is now a cross-reference (the job's `needs`, its env and the workflow's jobs equal the module's `checksJobs`; every called workflow declares `workflow_call`). **Kept as a lint**: OIDC, no stored tokens, serialized publishing, and npm-dist's `LASM_PUBLISHED_REQUIRE`, since only a real release runs them |
+| `nightly.test.mjs`: nightly.yml is scheduled, serialized, never a release dependency | regexes over workflows | **Kept as a lint, widened** (2026-11-03): triggers and concurrency are configuration only GitHub runs (the deferral logic is tested through `nextStep`); "never a release dependency" now covers every workflow a release calls, transitively, ignoring comments |
+| `notices.test.mjs`: the edge runtime archive carries the MIT text and its change list | the packager's source | **Replaced** (2026-11-03): `scripts/edge/package-edge-runtime.mjs` runs on a stand-in edge runtime and its `THIRD_PARTY_NOTICES.txt` is read back (the Lasm MIT text, the shared patches plus `edge` and never `node-threads`, the Node notices appended); a patch without notice text is refused |
 | `notices.test.mjs` (3 lines of the Apache 4(b) test; the rest is behavioural) | patch names regex-parsed from `build-application-runtime.mjs` | **Keep as a cross-reference lint** until the patch table moves into an importable module (the build script runs when imported) |
-| `notices.test.mjs`: Lasm's licence copy, Wasmtime licence copies, MIT everywhere, MIT-0 texts | file equality and headers | **Keep**: consistency guards; licence text is what must be shipped |
-| 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never runs them (their failures are reported, not fatal) | **To port or retire**: the behaviours they cover (host IO, processes, cwd, signals) are partly covered by the installed-package acceptance and the differential tester's IO and file cases; each file should be ported to the current pipeline or deleted |
+| `notices.test.mjs`: Lasm's licence copy, Wasmtime licence copies, MIT everywhere, MIT-0 texts | file equality and headers; the MIT-0 test also checks eight phrases of the `LICENSE-MIT-0` grant | **Keep**: consistency guards; licence text is what must be shipped, and a change to the grant's scope should be deliberate |
+| 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never ran them (their failures were reported, not fatal) | **Ported or retired** (2026-11-03). **Ported**: the ordinary-Lean fixtures of 24 files (conformance, finalizers, console buffering, cwd, permissions, environment and path bytes, getLine, platform, process cwd/exit/NUL/lifetime/spawn, realPath, system directories, temporary files, truncate, runtime metadata, standard IO and the forms of `main`, TCP, wall clock) run as 31 cases of `integration/host-fixtures.mjs`, a `differential.yml` job on pull requests and main: built with the installed candidate for Node and compared with upstream Lean 4.35.0's `lean --run` (it found the unsearchable-cwd worker bug fixed with it). **Kept in the unit suite**, without their Lean parts: the Node-host tests in `node-process`, `node-temporary-files`, `node-platform`, `node-environment-bytes` and `platform`. **Retired**: `compiler`, `io`, `lake` and `runtime` test the `lasm.json` library pipeline (`src/build.mjs`), which the published CLI refuses; the earlier runtime's platform emulation, its embedded `index.mjs` API and its wall-clock fault hook; `expr-conformance` became a check that the build is refused with the runtime-kernel diagnostic; `needsTools` is empty |
 | `browser.test.mjs`: every `lasm:web`/`lasm:app` binding names an export | `@[js …]` attributes in `library/Lasm/Web` cross-checked against real exports | **Keep**: a cheap cross-reference lint; a full behavioural check would link a program using every binding |
+| `scripts/content/check-tutorials.mjs --static` (found 2026-11-03) | tutorial pages against their `steps.json` and project files | **Keep as a doc lint**: the page must show what the tutorial runs; the non-static mode runs those steps against a packed CLI |
 
 ## Coverage baseline
 
@@ -564,7 +575,7 @@ they are copied into `dist/` and executed there by the integration workflows, an
 this measurement only counts files at their `src/` path. The others are simply
 not unit-tested (`src/vite/index.mjs`, `src/application-binding-check.mjs`,
 `src/application-build.mjs`). The 29 legacy files of the [audit](#test-quality-audit)
-contribute nothing. `unit.yml` (a release gate) fails when the total line
+contributed nothing (they are now ported or retired). `unit.yml` (a release gate) fails when the total line
 coverage falls more than one point below this baseline; raise the baseline file
 when coverage improves.
 
@@ -698,5 +709,7 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Nightly campaigns since 2026-11-02 (`deno-O0`), the first `bun-O0` campaign (41729836793) | `deep` cases of 3,000 frames stopped the unoptimized edge builds with "memory access out of bounds" (Bun: "Out of bounds memory access"), cutting off every later case: clang `-O0` keeps every local on the edge link's 1 MiB C stack (`src/edge/edge-link.mjs`), which those frames overflow. A capacity limit of unoptimized code, not an optimizer difference. The optimized edge builds pass 5,000 | Harness: the edge `-O0` targets run the core program with `deep` cases of at most 1,000 frames (`withDeepAtMost`, program `shallow`). Reported: a C-stack overflow on the edge reads "memory access out of bounds", not native Lean's "Stack overflow detected" |
 | Test-quality audit | `candidate-readme.test.mjs` broke on `main` when the README's headings changed (PR #22), failing `installer-faults.yml` on every PR | Fixed in #25 |
 | Host bridge model (proxied work in a synchronous callback) | **A synchronous Lasm.JS callback that made the program's first asynchronous runtime request (a timer, socket, DNS lookup) hung for good.** The request starts the completion thread; `pthread_create` on a Lean thread is proxied synchronously to Node's main thread, which waited in `syncFunction` on the doorbell and never ran proxied work. Found while modelling the lazy completion thread, then reproduced (0.3.5) | Fixed: the wait runs the main thread's mailbox (`serveMailbox`, Emscripten's `_emscripten_check_mailbox`) whenever it times out, every 10 ms; regression in `test/node-js.test.mjs` and part 4 of `test/fixtures/js-callbacks`; the model's mutation keeps the old wait |
+| Host bridge model (host calls of work proxied to the synchronous-callback thread) | **A host call made by work proxied to the synchronous-callback thread while it waited in a host call hung the callback**: it uses the thread's next-depth slot, which Node's main thread (waiting in the callback) neither served nor knew, since that slot's registration message waits for the event loop. Found by extending the model; no real program is known to trigger it (the work is Emscripten's dynamic-library synchronization) | Fixed: each slot links the next depth's, and inline serving follows the links; regression in `test/full-host-rpc-channel.test.mjs`; the model's mutation keeps the old serving |
+| Host bridge (roadmap) | **Waiting for a JavaScript promise inside a synchronous callback hung for good** (`Value.await`, `callAwait` in `IO`): the promise settles only after the callback returns. `Async.block` there still hangs (the computation runs on another Lean thread, whose host calls wait for the event loop) | Fixed: the request fails at once with the reason; regressions in `test/node-js-bridge.test.mjs`, part 5 of `test/fixtures/js-callbacks`, and the edge profile's controller in `test/edge-js.test.mjs` |
 | Mutation testing (`build-service`, first run) | **`createBuildService({ unref: true })` did not let the process exit** (the Vite plugin's build worker): the worker's stdout and stderr were piped, and a worker stdio stream waiting for data refs the worker; `unref()` also came before the `'message'` listener, which refs it again | Fixed ([#49](https://github.com/Millillion/lasm/issues/49)): Node forwards the worker's output itself, and `unref()` comes last; regression in `test/dev-build-service.test.mjs` |
 | Mutation testing (`host-bridge`, `edge-glue`) | **Lasm.JS failures wrapped twice**: a settled value that could not be converted, or an awaited promise rejected with a Lasm.JS failure, reached Lean as `Error: TypeError: …`, on Node and the edge | Fixed ([#51](https://github.com/Millillion/lasm/issues/51)) in `src/node-js.mjs` and `src/edge/edge-js.mjs`; regressions in `test/node-js-bridge.test.mjs` and `test/edge-js.test.mjs` |
