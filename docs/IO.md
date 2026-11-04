@@ -22,8 +22,8 @@ the earlier callable backend's Lean 4.32.0 evidence. See the
 platforms. Compatibility launchers such as `lasm-node.js` use this managed CLI.
 
 The standard host adapters have ordinary process-level OS access. The older
-capability-limited filesystem/fetch adapter remains a separate compatibility
-path; its policies and tests are in [LEGACY_IO.md](LEGACY_IO.md). Browser work
+capability-limited filesystem/fetch adapter was removed on 2026-11-03 with the
+`lasm.json` library pipeline. Browser work
 is deferred. No new public Lean API was introduced for ordinary IO.
 
 Text validation, higher-level file operations, HTTP parsing and HTTP dispatch

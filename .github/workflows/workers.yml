@@ -22,7 +22,6 @@ on:
       - 'src/application-build.mjs'
       - 'src/application-cli.mjs'
       - 'src/js-runtime.mjs'
-      - 'src/lake.mjs'
       - 'src/application-binding-check.mjs'
       - 'src/application-build-worker.mjs'
       - 'src/link-driver/**'
