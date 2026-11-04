@@ -171,8 +171,10 @@ false, true), `4 name value` (`style.setProperty`) or `5 event decoderId`
 (a listener); `8`–`11`
 followed by a name remove an attribute, property, style or listener.
 
-Events are delegated: the applier listens on the mount element (capture
-phase) for each event type in use, walks from the target to the root, and for
+Events are delegated: the applier listens on the mount element for each event
+type in use, in the bubble phase (and in the capture phase for events whose
+`bubbles` is false, which never reach a bubble listener there; see
+[UI.md](UI.md#event-order)). It walks from the target to the root, and for
 each element with a listener for the type (only the target for non-bubbling
 events) reads the decoder's paths from the event (`currentTarget` is that
 element). It then makes **one** synchronous call into Lean with the ids from
@@ -181,7 +183,9 @@ handlers innermost first (stopping after an element whose handler stops
 propagation), runs `update` (and commands) at once, and answers with a number:
 bit 1 asks for a frame, bit 2 for `preventDefault()`, bit 4 for
 `stopPropagation()`. The applier calls those before it returns, while the event
-is still being dispatched. Subscriptions to window and document events answer
+is still being dispatched (`stopPropagation()` only for bubbling events).
+In an application the same click listener then routes same-origin links whose
+default was not prevented. Subscriptions to window and document events answer
 the same way. If the model changed Lean asks for a frame: after discrete user input (click, keys, input,
 focus, submit) the applier renders at once, otherwise on the next
 `requestAnimationFrame`; one call returns the patch. Hydration (`mount(el, { hydrate: true })`) applies the

@@ -236,6 +236,15 @@ async function demo({ server, name, manifest, openPage, expect, report }) {
     await page.goBack();
     await until(() => document.querySelector('#page')?.textContent === 'home');
     expect(name, 'demo.route-back', (await text('#page')) === 'home', await text('#page'));
+    // A link whose handler stops propagation is still routed (no page load).
+    await page.evaluate(() => { window.__sameDocument = true; });
+    await page.click('#stop-link');
+    await until(() => document.querySelector('#page')?.textContent === 'about');
+    const sameDocument = await page.evaluate(() => window.__sameDocument === true).catch(() => false);
+    expect(name, 'demo.route-link-stopped-propagation', (await text('#page')) === 'about' && page.url().endsWith('/demo/about') && sameDocument
+      && (await text('#link-clicks')) === '1', `${await text('#page')} ${page.url()} same document ${sameDocument} clicks ${await text('#link-clicks')}`);
+    await page.goBack();
+    await until(() => document.querySelector('#page')?.textContent === 'home');
     await page.click('#go-item');
     await until(() => document.querySelector('#page')?.textContent === 'item 7');
     expect(name, 'demo.route-push', (await text('#page')) === 'item 7' && page.url().endsWith('/demo/items/7?tab=info'), `${await text('#page')} ${page.url()}`);
@@ -384,21 +393,47 @@ async function events({ server, name, openPage, expect, report }) {
     expect(name, 'events.failing-decoder-untouched', (await page.isChecked('#check')) && JSON.stringify(await page.evaluate(() => window.__check)) === '[false]',
       `${await page.isChecked('#check')} ${JSON.stringify(await page.evaluate(() => window.__check))}`);
     expect(name, 'events.failing-decoder-no-message', (await text('#never')) === '0', await text('#never'));
-    // Recorded, not checked (issue #71 investigation): the applier listens on the
-    // root in the capture phase, so a stopPropagation decided by Lean happens
-    // before the event reaches the target. Which non-Lasm listeners still run?
-    report.apps[name].captureStop = await page.evaluate(async () => {
-      const seen = [];
-      const inner = document.querySelector('#inner'), row = document.querySelector('#row');
-      inner.addEventListener('click', () => seen.push('target'));
-      row.addEventListener('click', () => seen.push('ancestor-inside-app'));
-      document.addEventListener('click', () => seen.push('document'));
-      inner.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, shiftKey: true }));
-      const stopped = seen.slice();
-      seen.length = 0;
-      inner.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, shiftKey: false }));
-      return { stopped, plain: seen.slice() };
+    // Handlers are delegated to the mount root in the bubble phase. Shift+click
+    // stops at #inner: the target's own listeners (capture and bubble, as a web
+    // component's would be) still run; the row's Lasm handler and the
+    // document's bubble listener do not. A plain click reaches them all.
+    await page.evaluate(() => {
+      window.__stop = [];
+      const inner = document.querySelector('#inner');
+      inner.addEventListener('click', () => window.__stop.push('target-capture'), true);
+      inner.addEventListener('click', () => window.__stop.push('target'));
+      document.addEventListener('click', () => window.__stop.push('document'));
     });
+    const outerBefore = await text('#outer-count');
+    await page.click('#inner', { modifiers: ['Shift'] });
+    await until(() => document.querySelector('#inner-count')?.textContent === '3');
+    await page.waitForTimeout(100);
+    const stopSeen = await page.evaluate(() => window.__stop.splice(0));
+    expect(name, 'events.stop-target-listeners-run', JSON.stringify(stopSeen) === '["target-capture","target"]', JSON.stringify(stopSeen));
+    expect(name, 'events.stop-ancestor-handler-skipped', (await text('#outer-count')) === outerBefore, `${outerBefore} → ${await text('#outer-count')}`);
+    await page.click('#inner');
+    await until(() => document.querySelector('#outer-count')?.textContent === String(Number(outerBefore) + 1));
+    const plainSeen = await page.evaluate(() => window.__stop.splice(0));
+    expect(name, 'events.plain-reaches-document', JSON.stringify(plainSeen) === '["target-capture","target","document"]', JSON.stringify(plainSeen));
+    // Nested handlers run innermost first, after the target's own listener
+    // (which sees the log before Lean has handled the click).
+    await page.evaluate(() => {
+      window.__nest = [];
+      document.querySelector('#nest-inner').addEventListener('click', () => window.__nest.push(document.querySelector('#nest-log').textContent));
+    });
+    await page.click('#nest-inner');
+    await until(() => document.querySelector('#nest-log')?.textContent !== '');
+    expect(name, 'events.nested-innermost-first', (await text('#nest-log')) === 'inner mid outer', await text('#nest-log'));
+    const nestSeen = await page.evaluate(() => window.__nest);
+    expect(name, 'events.nested-after-target-listener', JSON.stringify(nestSeen) === '[""]', JSON.stringify(nestSeen));
+    // Focus does not bubble (a capture listener takes it): the handler runs, and
+    // its stopPropagation does not keep the input's own focus listener from running.
+    await page.evaluate(() => { window.__focus = []; document.querySelector('#focus-me').addEventListener('focus', () => window.__focus.push('target')); });
+    await page.focus('#focus-me');
+    await until(() => document.querySelector('#focused')?.textContent === '1');
+    expect(name, 'events.focus-handled', (await text('#focused')) === '1', await text('#focused'));
+    expect(name, 'events.focus-target-listener-runs', JSON.stringify(await page.evaluate(() => window.__focus)) === '["target"]',
+      JSON.stringify(await page.evaluate(() => window.__focus)));
     expect(name, 'events.no-errors', noErrors(consoleLines), errorLines(consoleLines));
   } finally { report.apps[name].console = consoleLines.slice(-50); await context.close(); }
 }

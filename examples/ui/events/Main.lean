@@ -13,6 +13,10 @@ its propagation.
   (`Subs.preventDefaultOn .document "keydown"`).
 - A checkbox whose handler's decoder fails: the click is left alone, so the
   box still toggles.
+- Three nested click handlers, which run innermost first, after the target's
+  own listeners (handlers are delegated to the mount root in the bubble phase).
+- A focus handler (focus does not bubble) that stops propagation: the input's
+  own focus listeners still run.
 -/
 import Lasm.UI
 open Lasm.UI
@@ -27,6 +31,8 @@ structure Model where
   saves : Nat := 0
   field : String := ""
   never : Nat := 0
+  nest : List String := []
+  focused : Nat := 0
 
 inductive Msg where
   | draft (s : String)
@@ -38,6 +44,8 @@ inductive Msg where
   | save
   | field (s : String)
   | never
+  | nest (s : String)
+  | focused
 
 /-- Enter sends (and prevents the newline); Shift+Enter, Enter confirming an
 IME composition and every other key give no message, so the browser handles
@@ -59,6 +67,10 @@ def onCustomClick : Attr Msg :=
 `true` is never used, and the click toggles the box. -/
 def onNever : Attr Msg :=
   preventDefaultOn "click" ((Decoder.string ["target", "dataset", "missing"]).map fun _ => (.never, true))
+
+/-- Focus does not bubble, so stopping it changes nothing beyond the input. -/
+def onFocusStop : Attr Msg :=
+  stopPropagationOn "focus" (.succeed (.focused, true))
 
 def view (m : Model) : Html Msg :=
   html! <main id="events">
@@ -84,6 +96,16 @@ def view (m : Model) : Html Msg :=
             <input id="check" type="checkbox" {[onNever]} />
             <span id="never">{m.never}</span>
           </section>
+          <section id="nest" onClick={Msg.nest "outer"}>
+            <div id="nest-mid" onClick={Msg.nest "mid"}>
+              <button id="nest-inner" onClick={Msg.nest "inner"}>Nested</button>
+            </div>
+            <span id="nest-log">{" ".intercalate m.nest.reverse}</span>
+          </section>
+          <section>
+            <input id="focus-me" {[onFocusStop]} />
+            <span id="focused">{m.focused}</span>
+          </section>
         </main>
 
 def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
@@ -97,6 +119,8 @@ def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
   | .save => ({ m with saves := m.saves + 1 }, .none)
   | .field s => ({ m with field := s }, .none)
   | .never => ({ m with never := m.never + 1 }, .none)
+  | .nest s => ({ m with nest := s :: m.nest }, .none)
+  | .focused => ({ m with focused := m.focused + 1 }, .none)
 
 /-- Ctrl+S (or Cmd+S) saves instead of opening the browser's dialog; other keys get no message. -/
 def subscriptions (_ : Model) : Subs Msg :=
