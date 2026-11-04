@@ -1,7 +1,8 @@
 # Local compiler release packaging
 
 > **Historical (superseded).** This page describes the retired `0.1.0-experimental.3`
-> packaging (Lean 4.32.0, a Zig-built target, `npm run package:release`). None of it
+> packaging (Lean 4.32.0, a Zig-built target, `npm run package:release`; that script,
+> `test:release` and `platform-acceptance.yml` were removed on 2026-11-03). None of it
 > applies to current Lasm: Lean 4.35.0, Lasm-managed tools, no Zig, and candidates
 > built and accepted by [`node-linux-acceptance.yml`](../.github/workflows/node-linux-acceptance.yml).
 > Its "`UNLICENSED`" statement is also obsolete: the repository is under the MIT

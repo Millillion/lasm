@@ -2,7 +2,8 @@
 
 > **Historical (Lean 4.32.0, superseded).** This page describes the 2026-09
 > research harness on Lean 4.32.0 (`scripts/upstream-tests.mjs`, its inventories
-> and API audits). Current Lasm pins **Lean 4.35.0** and tests the upstream suite
+> and API audits). `scripts/upstream-tests.mjs` was removed on 2026-11-03 with the
+> `lasm.json` library pipeline it built with. Current Lasm pins **Lean 4.35.0** and tests the upstream suite
 > through the application pipeline (the installed package, not the compiler in Wasm):
 > - the current baseline and harnesses: [UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)
 >   (4.35.0 inventory: 4,219 registrations) and [SERVER_MVP.md](SERVER_MVP.md);

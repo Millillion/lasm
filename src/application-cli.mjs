@@ -250,14 +250,9 @@ export async function runApplicationCli(argv) {
       return result.pending.length ? 1 : 0;
     } finally { progress.finish(); }
   }
-  if (support && options.input.endsWith('.json'))
+  // The retired lasm.json library pipeline (removed 2026-11-03, docs/DECISIONS.md).
+  if (options.input.endsWith('.json'))
     throw new Error('This Lasm candidate builds ordinary .lean applications for Node. Use lasm Main.lean or lasm build Main.lean.');
-  if (options.input.endsWith('.json')) {
-    const { build } = await import('./build.mjs');
-    const result = await build(options.input, options.output);
-    console.log(`Built ${result.module}: ${result.wasmBytes} bytes, ${result.modules.length} modules → ${result.output}`);
-    return 0;
-  }
   const { buildApplicationWithProgress } = await import('./application-build-client.mjs');
   // After a good build of a Lake project: the Lean editor resolves Lasm.* (src/editor.mjs).
   const editor = async () => (await import('./editor.mjs')).autoSetupEditor(options.input);

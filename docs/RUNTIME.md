@@ -163,7 +163,7 @@ It does not synchronously force the JS garbage collector. Further calls fail.
   Installed packages compile and link real Lean IO with Lean's Clang/LLD and the
   packaged sysroot; Zig is used only by the maintainer reference build.
 - Real Chrome and local workerd execute the Asyncify artifact using the portable
-  WASI adapter and explicit byte-storage/fetch capabilities; see [HOSTS.md](HOSTS.md).
+  WASI adapter and explicit byte-storage/fetch capabilities; HOSTS.md (removed 2026-11-03 with the `lasm.json` library pipeline).
 
 Other build platforms, arbitrary native Lean libraries, more browser engines,
 and live cloud deployment have not been validated.

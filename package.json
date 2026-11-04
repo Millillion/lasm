@@ -3,9 +3,6 @@
   "version": "0.4.0",
   "private": true,
   "license": "MIT",
-  "workspaces": [
-    "examples/express"
-  ],
   "type": "module",
   "description": "Lean 4 to WebAssembly compiler for Node, Bun, Deno, edge functions, WASI and the browser",
   "bin": {
@@ -26,22 +23,10 @@
     "setup": "node scripts/bootstrap.mjs",
     "probe": "node experiments/feasibility/run.mjs",
     "probe:runtime": "node experiments/feasibility/runtime-compile.mjs",
-    "probe:bundled-runtime": "node experiments/feasibility/full-bundled-tools.mjs",
-    "build:example": "node bin/lasm.mjs build examples/basic/lasm.json",
-    "build:io": "node bin/lasm.mjs build examples/io/lasm.json",
-    "build:express": "node bin/lasm.mjs build examples/express/lean/lasm.json examples/express/dist",
-    "start:express": "npm run start --workspace @lasm/example-express",
-    "test:express": "npm run build:express && vitest run --config examples/express/vitest.config.mjs",
-    "package:release": "node scripts/package-release.mjs",
     "test:platform": "node --test test/platform.test.mjs test/portable.test.mjs test/toolchain.test.mjs",
-    "test:release": "node --test --test-concurrency=1 integration/release.test.mjs",
-    "test:hosts": "node --test --test-concurrency=1 integration/hosts.test.mjs",
-    "test:engines": "node --test --test-concurrency=1 integration/engines.test.mjs",
     "test": "node scripts/test/node-test.mjs --test-concurrency=1 test/*.test.mjs",
     "build:lean-server": "node bin/lasm.mjs build examples/lean-server/Main.lean examples/lean-server/dist",
-    "start:lean-server": "node lasm-node.js examples/lean-server/Main.lean",
-    "test:lean-server": "vitest run --config examples/lean-server/vitest.config.mjs",
-    "test:upstream": "node scripts/upstream-tests.mjs --suite http"
+    "start:lean-server": "node lasm-node.js examples/lean-server/Main.lean"
   },
   "engines": {
     "node": ">=24"

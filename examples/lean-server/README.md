@@ -71,17 +71,8 @@ TLS, DNS, and a general outbound HTTP client are outside this milestone.
 
 ## Tests
 
-From the compiler root:
-
-```sh
-npm run test:lean-server
-```
-
-Vitest exercises the same application as Node/Wasm and as a native Lean executable:
-CRUD, Unicode, invalid input, revision conflicts, concurrent persistence, binary
-and chunked bodies, streaming, disconnects, body limits, malformed HTTP, pipelining,
-restart persistence, and graceful shutdown. Additional Wasm cases measure resource
-stability and cancellation of a running main. These require local loopback sockets.
+Its Vitest suite built the server with the retired Lean 4.32 library pipeline and
+was removed with it on 2026-11-03.
 
 The runtime is experimental. Repeated new connections currently retain accept-loop
 task continuations until shutdown, so long-running server memory stability remains
