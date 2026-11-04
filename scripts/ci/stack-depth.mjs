@@ -12,7 +12,7 @@
 //              shallow run passes, an overflow fails without hanging;
 //   edge-O0    the same edge output built unoptimized (LASM_TEST_UNOPTIMIZED=1:
 //              clang -O0 keeps every local on the 1 MiB C stack) on Deno, Node
-//              and Bun: 3,000 frames overflow the C stack, and the instance
+//              and Bun: the first depth past the limit overflows the C stack, and the instance
 //              stops with a stack overflow, not the trap that follows it.
 // Every target's limit is measured by bisection and written to OUT (JSON).
 //   node scripts/ci/stack-depth.mjs --lasm PATH/bin/lasm.mjs --work DIR [--out FILE.json]
@@ -164,12 +164,13 @@ for (const target of targets) {
     report.targets.node.limit64 = limit(target, 100_000, 2_000_000, { extra: { LASM_VM_STACK_MB: '64' } });
   } else if (target.startsWith('edge-O0')) {
     expect(target, 'sumTo of 500 elements', passes(target, 500), '');
-    const over = run(target, ['sum', '3000'], { timeout: 120_000 });
-    expect(target, 'sumTo of 3,000 elements overflows the C stack: a stack overflow, not the trap',
+    // The first depth that fails (just past the measured limit) runs out of the C stack.
+    const deepest = report.targets[target].limit = limit(target, 100, 50_000), n = Math.ceil(deepest * 1.1) + 10;
+    const over = run(target, ['sum', String(n)], { timeout: 120_000 });
+    expect(target, `sumTo of ${n} elements overflows the C stack: a stack overflow, not the trap`,
       !over.timedOut && over.code === 1 && over.stdout === '' && over.stderr.includes(`[lasm] the Lean instance stopped: ${edgeOverflow}\n`)
         && !/out of bounds/i.test(over.stderr),
       JSON.stringify({ code: over.code, signal: over.signal, stderr: over.stderr.slice(0, 600) }));
-    report.targets[target].limit = limit(target, 100, 3000);
   } else {
     expect(target, 'sumTo of 5,000 elements', passes(target, 5000), '');
     const over = run(target, ['sum', '1000000'], { timeout: 120_000 });
