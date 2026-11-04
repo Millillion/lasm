@@ -5,10 +5,10 @@
 //   node scripts/mutation/run.mjs [MODULE ...] [--concurrency 2] [--out .work/mutation]
 //     [--check docs/evidence/mutation-baseline.json] [--update docs/evidence/mutation-baseline.json]
 //     [--changed-since REF]
-// --check fails when a module's score is below its recorded baseline (less a
-// tolerance of 0.5 points, --tolerance, for timeouts on a loaded runner).
-// --update writes the measured scores as the new baseline (raise it as tests improve);
-// each module's `initial` score, from before its tests were improved, stays.
+// --check fails when a module's score is below its threshold in the baseline file.
+// --update records the measured scores and ratchets each threshold up to the
+// score rounded down to a whole percent (never below 80, never lowered); each
+// module's `initial` score, from before its tests were improved, stays.
 // --changed-since runs only the modules whose mutated or test files changed since REF.
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const args = process.argv.slice(2);
-const options = new Set(['--concurrency', '--out', '--check', '--update', '--tolerance', '--changed-since']);
+const options = new Set(['--concurrency', '--out', '--check', '--update', '--changed-since']);
 const opt = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
 const names = args.filter((arg, i) => !arg.startsWith('--') && !options.has(args[i - 1]));
 const { modules } = JSON.parse(readFileSync(join(root, 'scripts/mutation/modules.json'), 'utf8'));
@@ -35,7 +35,6 @@ if (since) {
 }
 const out = resolve(root, opt('--out', '.work/mutation'));
 const concurrency = Number(opt('--concurrency', '2'));
-const tolerance = Number(opt('--tolerance', '0.5'));
 // Large directories no test of these modules reads; the sandbox copies everything else.
 const ignorePatterns = ['/docs', '/library', '/lean', '/native', '/bench', '/experiments', '/verification',
   '/integration', '/deploy', '/.work', '/.cache', '/dist', '/.github'];
@@ -58,6 +57,14 @@ function summarize(report) {
   const valid = detected + (counts.Survived ?? 0) + (counts.NoCoverage ?? 0);
   return { score: valid ? Math.floor(1000 * detected / valid) / 10 : 100, mutants: valid, counts, survivors };
 }
+
+// The ratchet (docs/DECISIONS.md, 2026-11-03): a module's threshold is its score
+// rounded down to a whole percent, at least 80 %; it only ever rises.
+const minimumThreshold = 80;
+const ratchet = (score, previous = minimumThreshold) => Math.max(minimumThreshold, previous, Math.floor(score));
+const baselineFile = resolve(root, opt('--check') ?? opt('--update') ?? 'docs/evidence/mutation-baseline.json');
+const recorded = existsSync(baselineFile) ? JSON.parse(readFileSync(baselineFile, 'utf8')).modules : {};
+const thresholdOf = name => recorded[name]?.threshold ?? minimumThreshold;
 
 const results = {};
 let failed = false;
@@ -89,12 +96,12 @@ for (const module of selected) {
   const reportFile = join(directory, 'report.json');
   if (run.status !== 0 || !existsSync(reportFile)) { console.error(`${module.name}: Stryker failed (exit ${run.status})`); failed = true; continue; }
   const summary = summarize(JSON.parse(readFileSync(reportFile, 'utf8')));
-  results[module.name] = { ...summary, target: module.target, minutes: +((performance.now() - started) / 60000).toFixed(1) };
+  results[module.name] = { ...summary, threshold: thresholdOf(module.name), minutes: +((performance.now() - started) / 60000).toFixed(1) };
   writeFileSync(join(directory, 'survivors.json'), JSON.stringify(summary.survivors, null, 2) + '\n');
-  console.log(`${module.name}: ${summary.score} % of ${summary.mutants} mutants (target ${module.target} %) ${JSON.stringify(summary.counts)}`);
+  console.log(`${module.name}: ${summary.score} % of ${summary.mutants} mutants (threshold ${thresholdOf(module.name)} %) ${JSON.stringify(summary.counts)}`);
 }
 
-const table = Object.entries(results).map(([name, r]) => `${name.padEnd(14)} ${String(r.score).padStart(5)} %  ${String(r.mutants).padStart(4)} mutants  target ${r.target} %  ${r.minutes} min`);
+const table = Object.entries(results).map(([name, r]) => `${name.padEnd(14)} ${String(r.score).padStart(5)} %  ${String(r.mutants).padStart(4)} mutants  threshold ${r.threshold} %  ${r.minutes} min`);
 console.log('\n' + table.join('\n'));
 // No module may have run (a PR that changes none of them).
 mkdirSync(out, { recursive: true });
@@ -104,12 +111,10 @@ writeFileSync(join(out, 'summary.json'), JSON.stringify({ measuredAt: new Date()
 
 const check = opt('--check');
 if (check) {
-  const baseline = JSON.parse(readFileSync(resolve(root, check), 'utf8')).modules;
   for (const [name, r] of Object.entries(results)) {
-    const recorded = baseline[name]?.score;
-    if (recorded === undefined) { console.log(`${name}: no recorded baseline`); continue; }
-    if (r.score < recorded - tolerance) { console.error(`FAIL ${name}: ${r.score} % is below its baseline ${recorded} %`); failed = true; }
-    else console.log(`ok   ${name}: ${r.score} % (baseline ${recorded} %)`);
+    if (recorded[name]?.threshold === undefined) { console.error(`FAIL ${name}: no recorded threshold in ${check}`); failed = true; continue; }
+    if (r.score < r.threshold) { console.error(`FAIL ${name}: ${r.score} % is below its threshold ${r.threshold} %`); failed = true; }
+    else console.log(`ok   ${name}: ${r.score} % (threshold ${r.threshold} %${Math.floor(r.score) > r.threshold ? `; record ${Math.floor(r.score)} % with --update` : ''})`);
   }
 }
 const update = opt('--update');
@@ -118,7 +123,8 @@ if (update) {
   const previous = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : { modules: {} };
   // `initial` (the score before mutation testing started, 2026-11-02) is kept.
   for (const [name, r] of Object.entries(results))
-    previous.modules[name] = { ...previous.modules[name], score: r.score, mutants: r.mutants, target: r.target };
+    previous.modules[name] = { initial: previous.modules[name]?.initial, score: r.score, mutants: r.mutants,
+      threshold: ratchet(r.score, previous.modules[name]?.threshold) };
   previous.measuredAt = new Date().toISOString();
   previous.tool = 'Stryker 10.0.0 with the tap runner over node:test (scripts/mutation/run.mjs)';
   writeFileSync(file, JSON.stringify(previous, null, 2) + '\n');

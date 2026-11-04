@@ -665,29 +665,32 @@ node scripts/mutation/run.mjs ui-dom --update docs/evidence/mutation-baseline.js
 ```
 
 **CI** (`mutation.yml`): every module nightly and on demand, one job each; on a
-pull request, only the modules whose sources or tests changed. A module more
-than 0.5 points below its recorded score in
+pull request, only the modules whose sources or tests changed. A module whose
+score is below its **threshold** in
 [evidence/mutation-baseline.json](evidence/mutation-baseline.json) fails the
-job. Raise the recorded score whenever tests improve; the target starts at 80 %
-for every module and is raised once a module reaches it.
+job. The threshold is a ratchet: the module's recorded score rounded down to a
+whole percent, never below 80 % and never lowered. When tests improve, record
+the new score with `--update` (CI's run is the measurement), which raises the
+threshold with it; `--check` names a module whose score has passed its next
+whole percent.
 
 ### Scores
 
-Measured 2026-11-02 (Linux x64). *Initial*: with the tests that existed before
+Measured 2026-11-03 (mutation.yml run 41749603692, Node 26, Linux x64). *Initial*: with the tests that existed before
 mutation testing; *now*: with the tests written to kill survivors (CI's
 measurement on Node 26 is the recorded floor).
 
-| Module | Files | Initial | Now | Target |
+| Module | Files | Initial | Now | Threshold |
 | --- | --- | ---: | ---: | ---: |
-| `host-bridge` | `node-js.mjs` | 56.5 % | **96 %** | 80 % |
-| `ui-dom` | `lasm-modules/ui-dom.mjs` | 55.1 % | **92.6 %** | 80 % |
-| `build-service` | `dev-build-service.mjs`, `application-build-client.mjs`, `application-files.mjs`, `cache-lifecycle.mjs` | 52.4 % | **94.5 %** | 80 % |
-| `link-driver` | `link-driver/link.mjs`, `link-driver/glue.mjs`, `link-driver/wasm.mjs`, `link-driver/metadata.mjs`, `link-driver/settings.mjs`, `link-driver/compile.mjs` | 53.9 % | **93 %** | 80 % |
-| `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **86.8 %** | 80 % |
-| `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.2 %** | 80 % |
-| `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 80 % |
+| `host-bridge` | `node-js.mjs` | 56.5 % | **96 %** | 96 % |
+| `ui-dom` | `lasm-modules/ui-dom.mjs` | 55.1 % | **92.8 %** | 92 % |
+| `build-service` | `dev-build-service.mjs`, `application-build-client.mjs`, `application-files.mjs`, `cache-lifecycle.mjs` | 52.4 % | **94.3 %** | 94 % |
+| `link-driver` | `link-driver/link.mjs`, `link-driver/glue.mjs`, `link-driver/wasm.mjs`, `link-driver/metadata.mjs`, `link-driver/settings.mjs`, `link-driver/compile.mjs` | 53.9 % | **93 %** | 93 % |
+| `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **86.8 %** | 86 % |
+| `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.3 %** | 97 % |
+| `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 91 % |
 
-Every module is above the 80 % target. The link driver and the target links
+Every module is above 80 %; each threshold is its score rounded down. The link driver and the target links
 are tested with stand-in toolchains: `test/link-driver-pipeline.test.mjs`
 drives `linkWithNode` through every recipe step with a stand-in `execute`, and
 `test/application-link-plan.test.mjs`, `test/application-link-node.test.mjs`,
