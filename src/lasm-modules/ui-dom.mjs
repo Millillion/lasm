@@ -218,8 +218,10 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   // Lean runs the target's handler before the target's own listeners, and a
   // stop is not applied (it would only keep the event from the target itself;
   // a non-bubbling event goes no further than its target anyway).
+  // (A non-bubbling event reaches the root's bubble listener only when the
+  // root is its target, where onEvent finds no handler.)
   function onBubble(event) {
-    if (event.bubbles) onEvent(event);
+    onEvent(event);
     if (routing && event.type === 'click') onLinkClick(event);
   }
   function onCapture(event) { if (!event.bubbles) onEvent(event); }

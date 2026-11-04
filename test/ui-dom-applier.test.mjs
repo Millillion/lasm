@@ -807,7 +807,11 @@ test('links: routed after Lean\'s handlers; a prevented default is not routed, a
     const urls = [], order = [];
     ui.module.connect({ url: href => { urls.push(href); order.push('route'); return false; }, event: () => { order.push('lean'); return answer; },
       frame: () => new Uint8Array(0), application: true });
-    ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'a', f => (f.attr('href', '/about'), f.on('click', 0), 2), [f => f.text(2, 'x')])).u8);
+    ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'a', f => (f.attr('href', '/about'), f.on('click', 0), f.on('mousedown', 0), 3), [f => f.text(2, 'x')])).u8);
+    // Only clicks are routed (a mousedown with the main button is not).
+    root.querySelector('a').dispatchEvent(new window.MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0 }));
+    assert.deepEqual(urls, [], `answer ${answer}: mousedown`);
+    order.length = 0;
     document.addEventListener('click', event => event.preventDefault());
     const e = click(window, root.querySelector('a'));
     assert.deepEqual(urls, routed ? ['https://app.test/about'] : [], `answer ${answer}`);
