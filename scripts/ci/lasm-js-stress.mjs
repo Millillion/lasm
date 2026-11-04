@@ -199,9 +199,11 @@ const want = name => !only || only.split(',').includes(name);
 if (only.split(',').includes('js-sync-cost')) {
   const dir = join(work, 'js sync cost');
   cpSync(join(root, 'bench/fixtures/js-sync-cost'), dir, { recursive: true });
-  execFileSync(process.execPath, [lasm, 'build', 'Main.lean'], { cwd: dir, stdio: 'inherit', env: { ...process.env, CI: '1' } });
   const record = result.programs['js-sync-cost'] = { pass: 0, hang: 0, fail: 0, runs: [] };
-  for (let i = 0; i < 3; i++) {
+  let built = true;
+  try { execFileSync(process.execPath, [lasm, 'build', 'Main.lean'], { cwd: dir, stdio: 'inherit', env: { ...process.env, CI: '1' } }); }
+  catch (error) { built = false; record.fail++; console.log(`js-sync-cost: the build failed: ${error.message}`); }
+  for (let i = 0; built && i < 3; i++) {
     const r = await once(process.execPath, [join(dir, 'dist', 'main.mjs')], dir, join(work, 'hangs', `js-sync-cost-${i}`));
     record.runs.push(r.stdout);
     r.code === 0 && !r.hung ? record.pass++ : r.hung ? record.hang++ : record.fail++;
