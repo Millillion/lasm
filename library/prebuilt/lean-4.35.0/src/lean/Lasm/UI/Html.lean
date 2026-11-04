@@ -211,11 +211,6 @@ prevent its default and stop its propagation (`Lasm.UI.custom`). -/
 def custom (event : String) (d : Decoder (Handled Msg)) : Attr Msg :=
   .on { event, paths := d.paths } d.run
 
-/-- An event handler from a decoder; it never prevents the default or stops
-propagation (`Lasm.UI.on`). -/
-def onWith (event : String) (d : Decoder Msg) : Attr Msg :=
-  custom event (d.map fun m => { message := m })
-
 end Attr
 
 /-- A virtual DOM tree producing messages of type `Msg`. `key` identifies an

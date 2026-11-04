@@ -224,7 +224,7 @@ def contenteditable (v : String) : Attr Msg := .attr "contenteditable" v
 /-- A handler for any event, with a decoder. It never prevents the default or
 stops propagation. The four handler functions are modeled on Elm's
 `Html.Events` (`on`, `preventDefaultOn`, `stopPropagationOn`, `custom`). -/
-def on (event : String) (d : Decoder Msg) : Attr Msg := Attr.onWith event d
+def on (event : String) (d : Decoder Msg) : Attr Msg := Attr.custom event (d.map fun m => { message := m })
 /-- A handler that decides for each event whether to call `preventDefault()`:
 the decoder gives the message and the decision (`true` prevents). Lean decides
 while the event is dispatched. Enter in a chat box can send and prevent the
