@@ -44,6 +44,7 @@ export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => co
   const fileError = (code, path) => Object.assign(error(code, `${{ ENOENT: 'no such file or directory', EROFS: 'read-only file system', EISDIR: 'is a directory', ENOTDIR: 'not a directory' }[code]} (Lasm edge file system) (error code: ${errnos[code]}, ${path})`), { errno: errnos[code] });
   const resources = new Map(); let nextResource = 10;
   let initializing = true;
+  let exitRequested = null;
   const add = r => { const id = nextResource++; resources.set(id, r); return id; };
   const get = (id, type) => { const r = resources.get(id); if (!r || type && r.type !== type) throw error('EINVAL', 'Invalid or closed resource'); return r; };
   // Standard streams: complete lines go to the sinks; flush emits a partial line.
@@ -151,7 +152,11 @@ export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => co
     }
     case 30:
       if (exit) { flush(1); flush(2); exit(n); }
-      throw Object.assign(error('EINVAL', `Lean called IO.Process.exit ${n}; an edge isolate cannot exit`), { exit: n });
+      // The runtime traps after this call (runtime/node-io.cpp lean_io_exit), so
+      // the refusal is also kept as the cause the instance stopped with
+      // (exitRequested, read by edge-start.mjs); otherwise only "unreachable" is left.
+      exitRequested ??= Object.assign(error('EINVAL', `Lean called IO.Process.exit ${n}; an edge isolate cannot exit`), { exit: n });
+      throw exitRequested;
     case 31: return encoder.encode(args.map(value => value + '\0').join(''));
     case 35: return new Promise(resolve => setTimeout(() => resolve(empty), Math.min(n, 2_147_483_647)));
     case 36: throw error('ENOMEM', 'out of memory');
@@ -209,5 +214,5 @@ export function createEdgeRuntimeHost({ env = {}, args = [], stdout = line => co
     } catch (err) { return encodeError(err); }
   }
   return { request, release(id) { if (js.owns(id)) js.release(id); else { resources.get(id)?.close?.(); resources.delete(id); } },
-    flush() { flush(1); flush(2); }, js, operationCounts: () => Object.fromEntries([...counts].sort((a, b) => a[0] - b[0])), initialized() { initializing = false; }, pending: () => completions.length + js.pendingEvents() };
+    flush() { flush(1); flush(2); }, js, get exitRequested() { return exitRequested; }, operationCounts: () => Object.fromEntries([...counts].sort((a, b) => a[0] - b[0])), initialized() { initializing = false; }, pending: () => completions.length + js.pendingEvents() };
 }

@@ -1,5 +1,5 @@
 {
-  "about": "Evidence levels per platform (docs/TESTING.md#evidence-levels), derived by scripts/evidence/levels.mjs from the latest completed main-branch run of each workflow (release-* branches count: release PRs merge into main and are where release-checks runs its full set). Each requirement names a workflow file and a job-name pattern; it holds when every matching job of the newest run that has one succeeded, within maxAgeDays. A platform's level is the highest level whose requirements, and all lower levels', hold. null: no CI job gives this kind of evidence for the platform yet. Differential tests compare the compiled program, so a platform counts the differential results of the build it runs (node, edge or wasi); conformance is the platform's own run of an outside suite (the official RealWorld API suite through Conduit).",
+  "about": "Evidence levels per platform (docs/TESTING.md#evidence-levels), derived by scripts/evidence/levels.mjs from the latest completed main-branch run of each workflow (release-* branches count: release PRs merge into main and are where release-checks runs its full set). Each requirement names a workflow file and a job-name pattern; it holds when every matching job of the newest run that has one succeeded, within maxAgeDays. A platform's level is the highest level whose requirements, and all lower levels', hold. null: no CI job gives this kind of evidence for the platform yet. Differential tests compare the compiled program, so a platform counts the differential results of the build it runs (node, edge, wasi, or its own target: bun, browser-chromium on every run, browser-firefox and browser-webkit in campaigns); conformance is the platform's own run of an outside suite (the official RealWorld API suite through Conduit).",
   "maxAgeDays": 30,
   "levels": {
     "L0": "Builds",
@@ -133,7 +133,7 @@
       "L0": [{ "workflow": "release-checks.yml", "job": "^browser / build$" }],
       "L1": [{ "workflow": "release-checks.yml", "job": "^browser / (chromium|firefox|webkit) on " },
              { "workflow": "release-checks.yml", "job": "^ui / ui$" }],
-      "L2": null,
+      "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" }],
       "L3": null
     }
   ]
