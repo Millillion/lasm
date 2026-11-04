@@ -39,12 +39,15 @@ const targets = opt('--targets', 'node').split(',').filter(Boolean);
 const tools = { deno: opt('--deno', 'deno'), bun: opt('--bun', 'bun'), wrangler: opt('--wrangler', 'wrangler') };
 const env = headlessEnvironment(process.env, { LASM_EDITOR: '0', LEAN_BACKTRACE: '0' });
 
-// Floors: about half the deepest N measured in CI (ubuntu-24.04, Bun 1.4.4,
-// Deno 2.9.6, wrangler 4.152.0's workerd), so a regression fails the check.
+// Floors: about half the deepest N measured in CI (run 41846096224, ubuntu-24.04:
+// Deno 2.9.6 2,001, Bun 1.4.4 8,099, wrangler 4.152.0's workerd 1,855, the same
+// for sync, io and pure), so a regression fails the check. An await of a value
+// that is not a promise (awaitsync) resumes from a fresh stack, like a promise:
+// null means it must reach N = 100,000.
 const FLOORS = {
-  deno: { sync: 1000 },
-  bun: { sync: 4000 },
-  workers: { sync: 900 },
+  deno: { sync: 1000, io: 1000, pure: 1000, awaitsync: null },
+  bun: { sync: 4000, io: 4000, pure: 4000, awaitsync: null },
+  workers: { sync: 900, io: 900, pure: 900, awaitsync: null },
 };
 const BIG = 100_000, EVERY = 100;
 // Steps that complete at once (await of a promise is checked separately).
@@ -64,6 +67,14 @@ def loop (call : Async Nat) (pause : Async Unit) (k : Nat) : Nat → Nat → Asy
     let v ← call
     if k > 0 && (n + 1) % k == 0 then pause
     loop call pause k n (acc + v)
+
+-- The documentation's workaround (docs/EDGE.md, docs/BUN_DENO.md), built here so it keeps compiling.
+def runAll (db : Lasm.JS.Value) (i : Nat := 0) : List String → Async Unit
+  | [] => pure ()
+  | sql :: rest => do
+    let _ ← db.callMethod "run" #[.string sql] Lasm.JS.Data
+    if i % 100 == 99 then Std.Async.sleep 0   -- yield to the event loop
+    runAll db (i + 1) rest
 
 def handle (req : Request) : Async Response := do
   match req.method, req.segments with
@@ -181,6 +192,7 @@ for (const target of targets) {
       console.log(`${target}: ${mode}: deepest ${deepest}; past it: ${over.status} ${over.body.split('\n')[0]}`);
       const floor = FLOORS[target]?.[mode];
       if (floor === undefined) { console.log(`  ${mode}: no floor (measured only)`); continue; }
+      if (floor === null) { expect(target, `${mode}: ${BIG.toLocaleString('en-US')} steps without pausing`, deepest >= BIG, `deepest ${deepest}`); continue; }
       expect(target, `${mode}: the deepest loop (${deepest}) is above the floor ${floor}`, deepest > floor && deepest < BIG, `deepest ${deepest}`);
       expect(target, `${mode}: past it, the request fails with the stack overflow`,
         !over.ok && /Maximum call stack size exceeded|too much recursion/.test(over.body + logTail()), JSON.stringify(over));
