@@ -76,10 +76,10 @@ export async function mount(target, options = {}) {
   if (lean.lasmEdge.stopped || code !== 0) {
     lean.lasmDispose();
     apps.delete(element);
-    const reason = lean.lasmEdge.stopped?.message ?? (errors.at(-1) || `main returned ${code}`);
+    const reason = (lean.lasmEdge.stopped && lean.lasmStopCause(lean.lasmEdge.stopped).message) ?? (errors.at(-1) || `main returned ${code}`);
     throw new Error(`Lasm app ${name} failed to start: ${reason}`);
   }
-  lean.lasmEdge.onStop(error => onError?.(error));
+  lean.lasmEdge.onStop(error => onError?.(lean.lasmStopCause(error)));
   const embedder = lean.lasmContext.app;
   let unmounted = false;
   const app = Object.freeze({

@@ -442,3 +442,28 @@ test('edge: waiting inside a synchronous callback fails with the reason, never h
   assert.match(controller.stopped.message, /must wait/);
   assert.throws(() => controller.syncCall(1, new Uint8Array([0])), /must wait/);
 });
+
+// A C-stack overflow (docs/TESTING.md#bugs-found) surfaces as whatever trap
+// follows it. The real controller keeps where Lean's C stack pointer was when
+// the instance stopped, read before it restores the stack, and the stack's top
+// (the highest pointer seen entering Lean), for edge-start.mjs to name the overflow.
+test('edge: the controller keeps the C stack pointer at the stop, before restoring the stack', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { runInNewContext } = await import('node:vm');
+  const source = readFileSync(new URL('../src/edge/edge-pre.js', import.meta.url), 'utf8');
+  let sp = 3 << 20;
+  const restored = [];
+  const trap = new Error('memory access out of bounds');
+  const context = { Module: { lasmEdgeJspi: false }, globalThis: { WebAssembly }, BigInt, Number, Error, TextEncoder, DataView, Object, queueMicrotask,
+    stackSave: () => sp, stackRestore: value => { restored.push([value, sp]); sp = value; },
+    // Lean recursing past the 1 MiB stack: the pointer is left below its end (as a signed i32 here).
+    callMain: () => { sp = -64; throw trap; } };
+  runInNewContext(source, context);
+  const controller = context.Module.lasmEdge;
+  controller.attach({ request: () => ({ error: false, bytes: new Uint8Array(0) }), pending: () => false });
+  assert.equal(controller.stoppedStack, null);
+  assert.throws(() => controller.main([]), trap);
+  assert.deepEqual({ ...controller.stoppedStack }, { top: 3 << 20, pointer: 2 ** 32 - 64 });
+  assert.deepEqual(restored, [[3 << 20, -64]]);
+  assert.equal(controller.stopped, trap);
+});

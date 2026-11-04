@@ -9,10 +9,14 @@
 //              remedy; node:wasi's default;
 //   edge       the edge output (--target deno) on Deno, Node, Bun and SpiderMonkey
 //              (the engines of Workers, Deno Deploy, Bun and the browsers): a
-//              shallow run passes, an overflow fails without hanging.
+//              shallow run passes, an overflow fails without hanging;
+//   edge-O0    the same edge output built unoptimized (LASM_TEST_UNOPTIMIZED=1:
+//              clang -O0 keeps every local on the 1 MiB C stack) on Deno, Node
+//              and Bun: 3,000 frames overflow the C stack, and the instance
+//              stops with a stack overflow, not the trap that follows it.
 // Every target's limit is measured by bisection and written to OUT (JSON).
 //   node scripts/ci/stack-depth.mjs --lasm PATH/bin/lasm.mjs --work DIR [--out FILE.json]
-//     [--targets node,wasi,wasi-node,deno,edge-node,edge-bun,edge-sm]
+//     [--targets node,wasi,wasi-node,deno,edge-node,edge-bun,edge-sm,edge-O0,edge-O0-node,edge-O0-bun]
 //     [--wasmtime PATH] [--deno PATH] [--bun PATH] [--sm PATH]
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -67,6 +71,10 @@ const TARGETS = {
   'edge-node': { build: ['--target', 'deno'], run: (args, extra) => [process.execPath, [...nodeJspi, '--no-warnings', join(work, 'deno/main.mjs'), ...args], extra] },
   'edge-bun': { build: ['--target', 'deno'], tool: 'bun', run: (args, extra) => [tools.bun, [join(work, 'deno/main.mjs'), ...args], extra] },
   'edge-sm': { build: ['--target', 'deno'], tool: 'sm', run: smRun },
+  // Built in O0/ (its own deno/ output) with the test-only switch (docs/TESTING.md).
+  'edge-O0': { build: ['--target', 'deno'], dir: 'O0', buildEnv: { LASM_TEST_UNOPTIMIZED: '1' }, tool: 'deno', run: (args, extra) => [tools.deno, ['run', '-A', '--no-lock', join(work, 'O0/deno/main.mjs'), ...args], extra] },
+  'edge-O0-node': { build: ['--target', 'deno'], dir: 'O0', buildEnv: { LASM_TEST_UNOPTIMIZED: '1' }, run: (args, extra) => [process.execPath, [...nodeJspi, '--no-warnings', join(work, 'O0/deno/main.mjs'), ...args], extra] },
+  'edge-O0-bun': { build: ['--target', 'deno'], dir: 'O0', buildEnv: { LASM_TEST_UNOPTIMIZED: '1' }, tool: 'bun', run: (args, extra) => [tools.bun, [join(work, 'O0/deno/main.mjs'), ...args], extra] },
 };
 for (const t of targets) if (!TARGETS[t]) { console.error(`unknown target ${t}`); process.exit(2); }
 
@@ -113,6 +121,9 @@ const advice = mib => new RegExp(`^Lasm: a Lean thread exhausted its ${mib} MiB 
   + 'Set LASM_VM_STACK_MB to a larger size in MiB, or make the recursion tail recursive \\(an accumulator\\)\\.\\n'
   + 'See https://github\\.com/Millillion/lasm/blob/main/FUNDAMENTAL_LIMITATIONS\\.md#recursion-depth\\n$');
 
+// The edge's C-stack overflow (src/edge/edge-start.mjs stackOverflowCause).
+const edgeOverflow = "Stack overflow detected: Lean exhausted the edge profile's 1 MiB C stack (WebAssembly linear memory)";
+
 const built = new Set();
 for (const target of targets) {
   report.targets[target] = {};
@@ -120,9 +131,10 @@ for (const target of targets) {
   if (t.tool && !existsSync(tools[t.tool]) && spawnSync(tools[t.tool], ['--version']).status !== 0) {
     expect(target, `${tools[t.tool]} is installed`, false, 'missing'); continue;
   }
-  const key = t.build.join(' ');
+  const key = JSON.stringify([t.dir, t.build, t.buildEnv]), cwd = join(work, t.dir ?? '');
   if (!built.has(key)) {
-    const b = spawnSync(process.execPath, [lasm, 'build', 'Main.lean', ...t.build], { cwd: work, env, encoding: 'utf8', timeout: 30 * 60_000 });
+    if (t.dir) { mkdirSync(cwd, { recursive: true }); writeFileSync(join(cwd, 'Main.lean'), readFileSync(join(work, 'Main.lean'))); }
+    const b = spawnSync(process.execPath, [lasm, 'build', 'Main.lean', ...t.build], { cwd, env: { ...env, ...t.buildEnv }, encoding: 'utf8', timeout: 30 * 60_000 });
     if (b.status !== 0) { expect(target, 'builds', false, (b.stdout + b.stderr).slice(-3000)); continue; }
     built.add(key);
   }
@@ -150,6 +162,14 @@ for (const target of targets) {
     }
     report.targets.node.limit = limit(target, deep, 30_000_000);
     report.targets.node.limit64 = limit(target, 100_000, 2_000_000, { extra: { LASM_VM_STACK_MB: '64' } });
+  } else if (target.startsWith('edge-O0')) {
+    expect(target, 'sumTo of 500 elements', passes(target, 500), '');
+    const over = run(target, ['sum', '3000'], { timeout: 120_000 });
+    expect(target, 'sumTo of 3,000 elements overflows the C stack: a stack overflow, not the trap',
+      !over.timedOut && over.code === 1 && over.stdout === '' && over.stderr.includes(`[lasm] the Lean instance stopped: ${edgeOverflow}\n`)
+        && !/out of bounds/i.test(over.stderr),
+      JSON.stringify({ code: over.code, signal: over.signal, stderr: over.stderr.slice(0, 600) }));
+    report.targets[target].limit = limit(target, 100, 3000);
   } else {
     expect(target, 'sumTo of 5,000 elements', passes(target, 5000), '');
     const over = run(target, ['sum', '1000000'], { timeout: 120_000 });

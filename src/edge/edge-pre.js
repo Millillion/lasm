@@ -37,7 +37,15 @@ Module.lasmEdge = (() => {
   // mid-update. The instance is then stopped: pending and later calls fail
   // with the cause, and the embedder starts a fresh instance.
   const listeners = [];
+  // Lean's C stack (in linear memory, below its highest address): its top, the
+  // highest stack pointer seen entering Lean (an entry from idle starts there),
+  // and where the pointer was when the instance stopped, read before the stack
+  // is restored. edge-start.mjs tells a C-stack overflow from other traps with
+  // them. Read on entry and on failure only, never per call.
+  let stackTop, stoppedStack = null;
+  const entered = sp => { const at = sp >>> 0; if (stackTop === undefined || at > stackTop) stackTop = at; };
   function poison(failure, sp) {
+    if (!poisoned) { try { stoppedStack = { top: stackTop, pointer: stackSave() >>> 0 }; } catch { /* unknown */ } }
     if (sp !== undefined) { try { stackRestore(sp); } catch { /* best effort */ } }
     if (!poisoned) {
       poisoned = failure instanceof Error ? failure : new Error(String(failure));
@@ -60,6 +68,7 @@ Module.lasmEdge = (() => {
     if (poisoned) throw poisoned;
     state = 'running';
     const sp = stackSave();
+    entered(sp);
     const done = () => { state = 'idle'; if (!poisoned && host.pending()) controller.pump(); };
     let result;
     try { result = run(); } catch (failure) { throw poison(failure, sp); }
@@ -75,6 +84,8 @@ Module.lasmEdge = (() => {
     attach(h) { host = h; },
     onStop(listener) { listeners.push(listener); },
     get stopped() { return poisoned; },
+    /** { top, pointer } of Lean's C stack when the instance stopped (unsigned addresses), or null. */
+    get stoppedStack() { return stoppedStack; },
     // Ends the instance without reporting a failure (an unmounted browser app):
     // later events and calls fail with the reason.
     close(reason = 'The Lean instance was closed') {
@@ -137,6 +148,7 @@ Module.lasmEdge = (() => {
     syncCall(fn, payload) {
       if (poisoned) throw poisoned;
       const previous = state, sp = stackSave();
+      entered(sp);
       if (state === 'idle') state = 'running';
       syncDepth++;
       const input = _malloc(Math.max(1, payload.length)), size = _malloc(8);

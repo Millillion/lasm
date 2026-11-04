@@ -228,7 +228,7 @@ jobs:
         run: |
           T="$RUNNER_TEMP/tools"
           node scripts/ci/stack-depth.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
-            --work "$RUNNER_TEMP/stack-depth" --out "$RUNNER_TEMP/stack-depth.json" --targets node,wasi,wasi-node,deno,edge-node,edge-bun,edge-sm \
+            --work "$RUNNER_TEMP/stack-depth" --out "$RUNNER_TEMP/stack-depth.json" --targets node,wasi,wasi-node,deno,edge-node,edge-bun,edge-sm,edge-O0,edge-O0-node,edge-O0-bun \
             --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js"
       - name: Summary
         if: always()
