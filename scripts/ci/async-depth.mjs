@@ -1,22 +1,24 @@
 // Async loop depth on each server engine (issue #90; docs/BUN_DENO.md and
-// docs/EDGE.md, "Async loops of host calls"). On the portable single-threaded
-// runtime (Bun, Deno, the edge targets) an awaited host call that completes at
-// once continues the Lean continuation inside the same JavaScript call, so an
-// `Async` loop of N awaited calls nests about N frames on the JS stack. Node runs
-// Lean on its own threads and is not limited this way.
+// docs/EDGE.md, "Async loops"). On the portable single-threaded runtime (Bun,
+// Deno, the edge targets) a step of an `Async` loop that completes at once (a
+// synchronous host call, an await of a value that is not a promise, plain IO)
+// continues the loop inside the same JavaScript call, so N such steps nest
+// frames on the JS stack. An await of a real promise resumes on a later
+// microtask, from an empty stack. Node runs Lean on its own threads.
 //
 // One Lasm.Fetch app, built for each target with an installed Lasm CLI and served
 // locally (workerd through `wrangler dev`, offline; CI only), answers
-//   GET /loop?n=N&mode=await|sync&k=K&pause=sleep0|sleep1|iosleep0
-// by running N host calls one after another in `Async`: `await Promise.resolve(1)`
-// (mode=await, Lasm.JS callMethodAwait) or `Math.abs(1)` (mode=sync, callMethod),
-// pausing with `pause` after every K-th call (k=0: never). Checks:
-//   - the deepest passing N of each mode, measured by bisection (to within 2 %),
-//     stays above the floor below (about half the value measured in CI), and past
-//     it the request fails with the engine's RangeError;
-//   - Node completes N = 100,000 without pausing;
-//   - the documented workaround, `Std.Async.sleep 0` every 100 calls, completes
-//     N = 100,000 awaited calls on every target.
+//   GET /loop?n=N&mode=await|sync|awaitsync|io|pure&k=K&pause=sleep0|sleep1|iosleep0
+// by running N steps one after another in `Async`: `await Promise.resolve(1)`
+// (await), `Math.abs(1)` (sync), `await Math.abs(1)` (awaitsync), an IO action
+// (io) or `pure 1` (pure), with `pause` after every K-th step (k=0: never). Checks:
+//   - an await of a promise completes N = 100,000 on every target;
+//   - on the portable targets, the deepest passing N of each other mode, found by
+//     bisection (to within 2 %), stays above its floor below (about half the
+//     value measured in CI), and past it the request fails with the RangeError;
+//   - Node completes N = 100,000 in every mode without pausing;
+//   - the documented workaround, `Std.Async.sleep 0` every 100 steps, completes
+//     N = 100,000 in every mode on every target.
 // The results are written to OUT (JSON) and the job summary.
 //   node scripts/ci/async-depth.mjs --lasm PATH/bin/lasm.mjs --work DIR [--out FILE.json]
 //     [--targets node,deno,bun,workers] [--deno PATH] [--bun PATH] [--wrangler PATH]
@@ -40,11 +42,13 @@ const env = headlessEnvironment(process.env, { LASM_EDITOR: '0', LEAN_BACKTRACE:
 // Floors: about half the deepest N measured in CI (ubuntu-24.04, Bun 1.4.4,
 // Deno 2.9.6, wrangler 4.152.0's workerd), so a regression fails the check.
 const FLOORS = {
-  deno: { await: 0, sync: 0 },
-  bun: { await: 0, sync: 0 },
-  workers: { await: 0, sync: 0 },
+  deno: { sync: 1000 },
+  bun: { sync: 4000 },
+  workers: { sync: 900 },
 };
 const BIG = 100_000, EVERY = 100;
+// Steps that complete at once (await of a promise is checked separately).
+const MODES = ['sync', 'awaitsync', 'io', 'pure'];
 
 rmSync(work, { recursive: true, force: true });
 mkdirSync(work, { recursive: true });
@@ -70,10 +74,16 @@ def handle (req : Request) : Async Response := do
     let g ← Lasm.JS.global
     let promise ← g.get "Promise" Lasm.JS.Value
     let math ← g.get "Math" Lasm.JS.Value
-    -- await Promise.resolve(1), or the synchronous Math.abs(1).
-    let call : Async Nat := if q "mode" "await" == "sync"
-      then monadLift (math.callMethod "abs" #[.number 1] Nat : IO Nat)
-      else promise.callMethodAwait "resolve" #[.number 1] Nat
+    let call : Async Nat := match q "mode" "await" with
+      -- await Math.abs(1): an await of a value that is not a promise.
+      | "awaitsync" => math.callMethodAwait "abs" #[.number 1] Nat
+      -- Math.abs(1), synchronous.
+      | "sync" => monadLift (math.callMethod "abs" #[.number 1] Nat : IO Nat)
+      -- No host call: an IO action, or a pure value.
+      | "io" => monadLift (do let _ ← IO.monoNanosNow; pure 1 : IO Nat)
+      | "pure" => pure 1
+      -- await Promise.resolve(1).
+      | _ => promise.callMethodAwait "resolve" #[.number 1] Nat
     let pause : Async Unit := match q "pause" "sleep0" with
       | "sleep1" => Std.Async.sleep 1
       | "iosleep0" => monadLift (IO.sleep 0 : IO Unit)
@@ -153,30 +163,36 @@ for (const target of targets) {
       return lo;
     };
     const r = report.targets[target];
-    for (const mode of ['await', 'sync']) {
+    // await Promise.resolve(1) settles on a later microtask: no limit is expected.
+    const awaited = await probe(BIG, '&mode=await&k=0');
+    r.await = { [BIG]: awaited };
+    expect(target, `await of a promise: ${BIG.toLocaleString('en-US')} calls without pausing`, awaited.ok, JSON.stringify(awaited));
+    for (const mode of MODES) {
       const query = `&mode=${mode}&k=0`;
       if (target === 'node') {
         const big = await probe(BIG, query);
         r[mode] = { [BIG]: big };
-        expect(target, `${mode}: ${BIG.toLocaleString('en-US')} calls without pausing`, big.ok, JSON.stringify(big));
+        expect(target, `${mode}: ${BIG.toLocaleString('en-US')} steps without pausing`, big.ok, JSON.stringify(big));
         continue;
       }
       const deepest = await limit(100, BIG, query);
       const over = await probe(Math.ceil(deepest * 1.1) + 10, query);
       r[mode] = { deepest, over: { status: over.status, body: over.body } };
       console.log(`${target}: ${mode}: deepest ${deepest}; past it: ${over.status} ${over.body.split('\n')[0]}`);
-      const floor = FLOORS[target]?.[mode] ?? 0;
+      const floor = FLOORS[target]?.[mode];
+      if (floor === undefined) { console.log(`  ${mode}: no floor (measured only)`); continue; }
       expect(target, `${mode}: the deepest loop (${deepest}) is above the floor ${floor}`, deepest > floor && deepest < BIG, `deepest ${deepest}`);
       expect(target, `${mode}: past it, the request fails with the stack overflow`,
         !over.ok && /Maximum call stack size exceeded|too much recursion/.test(over.body + logTail()), JSON.stringify(over));
     }
-    // The workaround: yield to the event loop every EVERY calls.
-    for (const pause of ['sleep0', 'sleep1', 'iosleep0']) {
-      const w = await probe(BIG, `&mode=await&k=${EVERY}&pause=${pause}`);
-      (r.pause ??= {})[pause] = w;
-      console.log(`${target}: ${BIG} awaited calls, ${pause} every ${EVERY}: ${w.ok ? 'ok' : 'fails'} in ${w.ms} ms ${w.ok ? '' : w.body}`);
+    // The workaround: yield to the event loop every EVERY steps.
+    for (const mode of MODES) for (const pause of ['sleep0', 'sleep1', 'iosleep0']) {
+      const w = await probe(BIG, `&mode=${mode}&k=${EVERY}&pause=${pause}`);
+      ((r.pause ??= {})[mode] ??= {})[pause] = w;
+      console.log(`${target}: ${BIG} ${mode} steps, ${pause} every ${EVERY}: ${w.ok ? 'ok' : 'fails'} in ${w.ms} ms ${w.ok ? '' : w.body.split('\n')[0]}`);
     }
-    expect(target, `${BIG.toLocaleString('en-US')} awaited calls with Std.Async.sleep 0 every ${EVERY}`, r.pause.sleep0.ok, JSON.stringify(r.pause.sleep0));
+    for (const mode of MODES)
+      expect(target, `${mode}: ${BIG.toLocaleString('en-US')} steps with Std.Async.sleep 0 every ${EVERY}`, r.pause[mode].sleep0.ok, JSON.stringify(r.pause[mode].sleep0));
   } catch (e) {
     expect(target, 'serves', false, String(e.message).slice(0, 3000));
   } finally {
@@ -186,9 +202,10 @@ for (const target of targets) {
 report.failures = failures;
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, JSON.stringify(report, null, 2) + '\n');
-const cell = (r, mode) => r?.[mode]?.deepest !== undefined ? String(r[mode].deepest) : r?.[mode]?.[BIG]?.ok ? `≥ ${BIG}` : '—';
-const table = `| Target | Awaited calls (\`await Promise.resolve(1)\`) | Sync calls (\`Math.abs(1)\`) | ${BIG} awaited, \`Std.Async.sleep 0\` / \`sleep 1\` / \`IO.sleep 0\` every ${EVERY} |\n| --- | --- | --- | --- |\n`
-  + Object.entries(report.targets).map(([t, r]) => `| ${t} | ${cell(r, 'await')} | ${cell(r, 'sync')} | ${['sleep0', 'sleep1', 'iosleep0'].map(p => r.pause?.[p] ? (r.pause[p].ok ? `ok (${r.pause[p].ms} ms)` : 'fails') : '—').join(' / ')} |`).join('\n');
+const cell = (r, mode) => r?.[mode]?.deepest !== undefined ? (r[mode].deepest >= BIG ? `≥ ${BIG}` : String(r[mode].deepest)) : r?.[mode]?.[BIG]?.ok ? `≥ ${BIG}` : '—';
+const pauses = r => MODES.map(m => ['sleep0', 'sleep1', 'iosleep0'].map(p => r.pause?.[m]?.[p] ? (r.pause[m][p].ok ? 'ok' : 'fails') : '—').join('/')).join(', ');
+const table = `| Target | await Promise.resolve(1) | ${MODES.join(' | ')} | ${BIG} steps, sleep 0 / sleep 1 / IO.sleep 0 every ${EVERY} (${MODES.join(', ')}) |\n| --- | --- | ${MODES.map(() => '---').join(' | ')} | --- |\n`
+  + Object.entries(report.targets).map(([t, r]) => `| ${t} | ${cell(r, 'await')} | ${MODES.map(m => cell(r, m)).join(' | ')} | ${pauses(r)} |`).join('\n');
 console.log(`\n${table}\n\n${failures.length} failures.`);
-if (process.env.GITHUB_STEP_SUMMARY) writeFileSync(process.env.GITHUB_STEP_SUMMARY, `### Async loop depth (issue #90)\n\nDeepest passing N (Lasm.Fetch handler, N host calls in \`Async\`):\n\n${table}\n\n${failures.length} failures.\n`, { flag: 'a' });
+if (process.env.GITHUB_STEP_SUMMARY) writeFileSync(process.env.GITHUB_STEP_SUMMARY, `### Async loop depth (issue #90)\n\nDeepest passing N (a Lasm.Fetch handler running N steps one after another in \`Async\`):\n\n${table}\n\n${failures.length} failures.\n`, { flag: 'a' });
 process.exit(failures.length ? 1 : 0);
