@@ -12,6 +12,11 @@ Compute's host calls, in the layout `fastly compute serve|deploy` uses.
 | Output | `wasi/main.wasm` (+ `build-info.json`, `THIRD_PARTY_NOTICES.txt`, also embedded in the Wasm as its `lasm.notices` section) | `wasi-http/main.wasm`, a component | `bin/main.wasm`, `pkg/<name>.tar.gz`; `fastly.toml` when the project has none |
 | Runs on | wasmtime, wasmer, Node's `node:wasi`, any preview 1 host | `wasmtime serve`, Spin's HTTP trigger, any wasi:http/proxy@0.2 host | Fastly Compute; Viceroy (`fastly compute serve`) locally |
 | `main` | A command: arguments, environment, standard streams, exit status | Runs once per request | Runs once per request |
+
+`--output DIR` puts the target's directory (the one holding `main.wasm`) at
+`DIR` instead (from 0.5.0; Fastly's `pkg/<name>.tar.gz` stays in the project).
+The Node build that the WASI link reuses stays in the build cache
+(`.lake/lasm/applications/`); nothing is written to `dist/`.
 | HTTP served | [`Lasm.Fetch.serve`](FETCH.md): one CGI request per run | wasi:http/incoming-handler | Fastly's downstream request |
 | HTTP sent ([`fetch`](FETCH.md#outbound-requests)) | Not available (no sockets) | wasi:http/outgoing-handler | Backend requests |
 | Imports | `wasi_snapshot_preview1` | wasi:http, wasi:io, wasi:clocks, wasi:random, wasi:cli 0.2.12 | `wasi_snapshot_preview1` and Fastly's `fastly_*` modules |

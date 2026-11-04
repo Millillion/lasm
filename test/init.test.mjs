@@ -157,7 +157,8 @@ test('the fullstack template: shared, server and client modules; Node and Worker
     assert.equal(pkg.scripts.dev, 'lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client');
     assert.equal(pkg.scripts['build:client'], 'lasm build Client.lean --target browser --output dist/public/client');
     assert.equal(pkg.scripts.start, 'node dist/server/main.mjs');
-    assert.match(pkg.scripts["build:workers"], /lasm build Server\.lean --target workers --output dist\/server$/);
+    // A platform target writes its own directory (workers/); only the Node server goes to dist/server.
+    assert.match(pkg.scripts["build:workers"], /lasm build Server\.lean --target workers$/);
     assert.match(read('wrangler.toml'), /\[assets\]\ndirectory = "\.\/dist\/public"/);
     assert.match(read('Server.lean'), /^import Lasm\.RPC\.Server$/m);
     assert.match(read('Client.lean'), /^import Lasm\.RPC\.Client$/m);
@@ -167,7 +168,7 @@ test('the fullstack template: shared, server and client modules; Node and Worker
     assert.ok(['fastly.toml', 'spin.toml', 'vercel.json', 'netlify.toml'].every(f => all.files.includes(f)), all.files.join(' '));
     const scripts = JSON.parse(readFileSync(join(root, 'all', 'package.json'), 'utf8')).scripts;
     for (const t of ['workers', 'bun', 'deno', 'fastly', 'wasi-http', 'vercel-edge', 'netlify-edge', 'deno-deploy'])
-      assert.equal(scripts[`build:${t}`], `npm run build:client && lasm build Server.lean --target ${t} --output dist/server`, t);
+      assert.equal(scripts[`build:${t}`], `npm run build:client && lasm build Server.lean --target ${t}`, t);
     assert.match(readFileSync(join(root, 'all', 'fastly.toml'), 'utf8'), /\[local_server\.kv_stores\]\n  TODOS = \[\]/);
     assert.match(read('Server.lean'), /embed_dir! "dist\/public"/);
     assert.match(read('Server.lean'), /Lasm\.KV\.open "TODOS"/);

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { linkWasiProgram, wasiLinkSettings, wasiSources } from './wasi-link.mjs';
 import { noticesSectionName, targetNotices, withCustomSection } from '../notices.mjs';
-import { replaceOutputDirectory } from '../output-directory.mjs';
+import { foreignOutputError, replaceOutputDirectory } from '../output-directory.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -118,7 +118,7 @@ export async function writeWasiOutput({ target, source, projectDirectory, result
     let owned = false;
     try { owned = JSON.parse(readFileSync(join(destination, infoName), 'utf8')).profile === 'wasi'; } catch { /* not ours */ }
     if (!owned && target === 'fastly') owned = readdirSync(destination).every(entry => entry === 'main.wasm');
-    if (!owned) throw new Error(`${destination} exists and is not a Lasm WASI build; remove it or move it`);
+    if (!owned) throw foreignOutputError(destination, 'WASI');
   }
   const staging = destination + '.lasm-staging';
   rmSync(staging, { recursive: true, force: true });

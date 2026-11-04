@@ -42,3 +42,13 @@ export function writeFileIfChanged(path, data) {
   writeFileSync(path, bytes);
   return true;
 }
+
+/** The error for an existing `destination` that is not an earlier build of
+ * this kind, which Lasm does not replace. Until 0.5.0, --output with a
+ * platform target named the intermediate Node build: say so when it is one. */
+export function foreignOutputError(destination, kind) {
+  let node = false;
+  try { node = JSON.parse(readFileSync(join(destination, 'build-info.json'), 'utf8')).target === 'node'; } catch { /* not a Node build */ }
+  return new Error(`${destination} exists and is not a Lasm ${kind} build; remove it, or choose another --output`
+    + (node ? '. It holds a Lasm Node build: since Lasm 0.5.0, --output with this target names the deployable directory, and the Node build stays in the build cache' : ''));
+}

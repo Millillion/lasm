@@ -15,7 +15,7 @@ import { builtinModuleClosure, builtinModuleFile, builtinPrefix, isBuiltinModule
 import { supabaseFunctionNameOf } from '../init.mjs';
 import { noticeBanner, noticesSectionName, targetNotices, withCustomSection } from '../notices.mjs';
 import { copyNodeModules, planNodeModules } from '../application-npm.mjs';
-import { replaceOutputDirectory, writeFileIfChanged } from '../output-directory.mjs';
+import { foreignOutputError, replaceOutputDirectory, writeFileIfChanged } from '../output-directory.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 // Top-level files a target's write() adds to its output after it is in place.
@@ -36,7 +36,7 @@ export const edgeTargets = {
   // Vercel's edge runtime: a zero-config function api/lasm.mjs (Vercel bundles
   // it at deployment); its support files in api/_lasm/, which Vercel does not
   // treat as functions. vercel.json routes every path to it.
-  'vercel-edge': { label: 'Vercel Edge', supported: true, summary: 'Vercel Edge Function: api/lasm.mjs and api/_lasm/ (route every path to /api/lasm in vercel.json)', output: 'api/_lasm',
+  'vercel-edge': { label: 'Vercel Edge', supported: true, summary: 'Vercel Edge Function: api/lasm.mjs and api/_lasm/ (route every path to /api/lasm in vercel.json)', output: 'api/_lasm', fixedLayout: true,
     write({ projectDirectory, modules }) {
       writeGeneratedFile(join(projectDirectory, 'api/lasm.mjs'), vercelEdgeEntry(modules));
       writeVercelEdgeOutput(projectDirectory);
@@ -45,7 +45,7 @@ export const edgeTargets = {
   // Netlify Edge Functions (Deno): netlify/edge-functions/lasm.mjs serves every
   // path (inline config); the program and host in netlify/lasm/. The Wasm is a
   // JavaScript module, so Netlify's Deno bundler carries it.
-  'netlify-edge': { label: 'Netlify Edge', supported: true, summary: 'Netlify Edge Function: netlify/edge-functions/lasm.mjs and netlify/lasm/ (serves every path)', output: 'netlify/lasm', inlineWasm: true,
+  'netlify-edge': { label: 'Netlify Edge', supported: true, summary: 'Netlify Edge Function: netlify/edge-functions/lasm.mjs and netlify/lasm/ (serves every path)', output: 'netlify/lasm', inlineWasm: true, fixedLayout: true,
     write({ projectDirectory, modules }) {
       writeGeneratedFile(join(projectDirectory, 'netlify/edge-functions/lasm.mjs'), netlifyEdgeEntry(modules));
       return { note: () => 'the edge function is netlify/edge-functions/lasm.mjs' };
@@ -57,17 +57,17 @@ export const edgeTargets = {
   bun: { label: 'Bun', supported: true, summary: 'Bun: bun/ (main.mjs, the program and its host; bun bun/main.mjs)', output: 'bun',
     write({ staging, modules }) {
       writeFileIfChanged(join(staging, 'main.mjs'), portableEntry('bun', modules));
-      return { note: () => 'run it with bun bun/main.mjs' };
+      return { note: out => `run it with bun ${out}/main.mjs` };
     } },
   deno: { label: 'Deno', supported: true, summary: 'Deno: deno/ (main.mjs, the program and its host; deno run -A deno/main.mjs)', output: 'deno',
     write({ staging, modules }) {
       writeFileIfChanged(join(staging, 'main.mjs'), portableEntry('deno', modules));
-      return { note: () => 'run it with deno run -A deno/main.mjs' };
+      return { note: out => `run it with deno run -A ${out}/main.mjs` };
     } },
   'deno-deploy': { label: 'Deno Deploy', supported: true, summary: 'Deno Deploy: deno/ (main.mjs, the program and its host; entrypoint deno/main.mjs)', output: 'deno',
     write({ staging, modules }) {
       writeFileIfChanged(join(staging, 'main.mjs'), portableEntry('deno-deploy', modules));
-      return { note: () => 'the entrypoint is deno/main.mjs (deno run -A deno/main.mjs locally)' };
+      return { note: out => `the entrypoint is ${out}/main.mjs (deno run -A ${out}/main.mjs locally)` };
     } },
   // Supabase Edge Functions: supabase/functions/<name>/ (index.ts, a deno.json
   // import map of the npm modules pinned to the installed versions, the
@@ -459,6 +459,8 @@ export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, sus
 export function writeEdgeOutput({ target, source, projectDirectory, result, edge, program, log = console.error, output, cacheHit = false }) {
   if (!edgeTargets[target]) throw new Error(`Unknown edge target ${target}`);
   const owned = edgeTargets[target].output;
+  // --output names this directory, except where the platform fixes the layout.
+  if (output !== undefined && edgeTargets[target].fixedLayout) throw new Error(`--output does not apply to --target ${target}: the platform fixes its layout`);
   const destination = resolve(output ?? join(projectDirectory, typeof owned === 'function' ? owned(projectDirectory) : owned));
   if (destination === resolve(projectDirectory) || !relative(destination, source).startsWith('..'))
     throw new Error('The edge output directory must not contain the Lean sources');
@@ -466,7 +468,7 @@ export function writeEdgeOutput({ target, source, projectDirectory, result, edge
   if (existsSync(destination)) {
     let owned = false;
     try { owned = JSON.parse(readFileSync(join(destination, 'build-info.json'), 'utf8')).profile === 'edge'; } catch { /* not ours */ }
-    if (!owned) throw new Error(`${destination} exists and is not a Lasm edge build; remove it or move it`);
+    if (!owned) throw foreignOutputError(destination, 'edge');
   }
   const staging = destination + '.lasm-staging';
   rmSync(staging, { recursive: true, force: true });

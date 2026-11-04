@@ -15,6 +15,15 @@ export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun'
 export const wasiBuildTargets = ['wasi', 'fastly', 'wasi-http'];
 // The browser (docs/BROWSER.md): the edge program as a static web app.
 export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets, 'browser'];
+// Platform targets write a deployable directory of their own: --output names
+// it (default: the platform's directory in the project, such as workers/ or
+// wasi/), and the Node build they relink stays in the build cache
+// (.lake/lasm/applications/). node and the function platforms write the Node
+// build to --output (default dist/), which `lasm package` reads.
+export const platformBuildTargets = [...edgeBuildTargets, ...wasiBuildTargets, 'browser'];
+// Targets whose layout the platform fixes (api/ for Vercel, netlify/ for
+// Netlify): the entry module imports the program by a fixed relative path.
+export const fixedLayoutTargets = ['vercel-edge', 'netlify-edge'];
 // --suspend (browser): none (the default: blocking waits stop the instance) or
 // jspi (they suspend in browsers that have JSPI).
 export const suspendModes = ['none', 'jspi'];
@@ -29,7 +38,7 @@ export function targetHint(value) {
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
        lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [-- arguments…]
-       lasm build <Main.lean> [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]
+       lasm build <Main.lean> [--output DIR] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]
        lasm init <directory> [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy …]
        lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser
        lasm editor [project-directory]
@@ -153,10 +162,13 @@ export function parseLasmArguments(argv) {
   if (result.suspend !== undefined && result.target !== 'browser') throw new Error('--suspend applies to lasm build --target browser');
   if (result.bundler && result.target !== 'browser') throw new Error('--bundler applies to lasm build --target browser');
   if (result.command === 'build') {
-    result.output ??= 'dist';
     // The default target is the runtime the CLI runs on: node, bun or deno.
     result.target ??= jsRuntime === 'node' || result.input.endsWith('.json') ? 'node' : jsRuntime;
     if (result.target !== 'node' && result.input.endsWith('.json')) throw new Error('--target applies to Lean applications, not binding configurations');
+    if (fixedLayoutTargets.includes(result.target) && result.output !== undefined)
+      throw new Error(`--output does not apply to --target ${result.target}: the platform fixes its layout (${result.target === 'vercel-edge' ? 'api/lasm.mjs and api/_lasm/' : 'netlify/edge-functions/lasm.mjs and netlify/lasm/'})`);
+    // Platform targets default to their own directory (the target's writer knows it).
+    if (!platformBuildTargets.includes(result.target)) result.output ??= 'dist';
   }
   return result;
 }

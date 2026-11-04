@@ -36,8 +36,11 @@ for (const runtime of ['node', 'bun', 'deno']) {
   const project = join(work, `pure-${runtime}`);
   if (!existsSync(project)) cpSync(join(root, 'examples/edge-pure'), project, { recursive: true });
   const started = Date.now();
-  // Node: the Node build, then both portable targets; Bun and Deno: their default target.
-  const builds = runtime === 'node' ? [['build', 'Main.lean'], ['build', 'Main.lean', '--target', 'bun'], ['build', 'Main.lean', '--target', 'deno']] : [['build', 'Main.lean']];
+  // Node: the Node build, then both portable targets; Bun and Deno: their
+  // default target, then the Node build (a platform target leaves its Node
+  // build in the build cache, not in dist/).
+  const builds = runtime === 'node' ? [['build', 'Main.lean'], ['build', 'Main.lean', '--target', 'bun'], ['build', 'Main.lean', '--target', 'deno']]
+    : [['build', 'Main.lean'], ['build', 'Main.lean', '--target', 'node']];
   for (const args of builds) {
     const result = lasm(runtime, project, args, { stdio: 'inherit' });
     if (result.status !== 0) throw new Error(`lasm ${args.join(' ')} failed under ${runtime}`);

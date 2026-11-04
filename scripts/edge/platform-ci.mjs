@@ -81,7 +81,9 @@ const outputs = { workers: 'workers/lasm/program.wasm', 'vercel-edge': 'api/_las
 for (const runtime of ['node', 'bun', 'deno']) {
   const project = join(work, `pure-${runtime}`);
   cpSync(join(root, 'examples/edge-pure'), project, { recursive: true });
-  const targets = runtime === 'node' ? [null, 'workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'bun', 'deno'] : [null];
+  // Under Bun and Deno: their default target, then the Node build (a platform
+  // target leaves its Node build in the build cache, not in dist/).
+  const targets = runtime === 'node' ? [null, 'workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'bun', 'deno'] : [null, 'node'];
   const hashes = results.builds[runtime] = {};
   for (const target of targets) {
     const args = ['build', 'Main.lean', ...(target ? ['--target', target] : [])];
@@ -89,7 +91,6 @@ for (const runtime of ['node', 'bun', 'deno']) {
     if (r.status !== 0) { failed.push(`lasm ${args.join(' ')} under ${runtime}`); continue; }
     const built = target ?? (runtime === 'node' ? 'node' : runtime);
     hashes[built] = sha256(join(project, built === 'node' ? 'dist/program.wasm' : outputs[built]));
-    if (built !== 'node') hashes.node = sha256(join(project, 'dist/program.wasm'));
   }
   save();
 }
