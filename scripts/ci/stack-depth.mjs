@@ -47,10 +47,45 @@ def depth : Nat → Nat
   | 0 => 0
   | n + 1 => depth n + 1
 
+-- Many values live across the call: at -O0 each takes C stack (edge-O0).
+def wide : Nat → Nat
+  | 0 => 0
+  | n + 1 =>
+    let v0 := (n * 3 + 1) % 1000003
+    let v1 := (v0 * 3 + n) % 1000003
+    let v2 := (v1 * 4 + n) % 1000003
+    let v3 := (v2 * 5 + n) % 1000003
+    let v4 := (v3 * 6 + n) % 1000003
+    let v5 := (v4 * 7 + n) % 1000003
+    let v6 := (v5 * 8 + n) % 1000003
+    let v7 := (v6 * 9 + n) % 1000003
+    let v8 := (v7 * 10 + n) % 1000003
+    let v9 := (v8 * 11 + n) % 1000003
+    let v10 := (v9 * 12 + n) % 1000003
+    let v11 := (v10 * 13 + n) % 1000003
+    let v12 := (v11 * 14 + n) % 1000003
+    let v13 := (v12 * 15 + n) % 1000003
+    let v14 := (v13 * 16 + n) % 1000003
+    let v15 := (v14 * 17 + n) % 1000003
+    let v16 := (v15 * 18 + n) % 1000003
+    let v17 := (v16 * 19 + n) % 1000003
+    let v18 := (v17 * 20 + n) % 1000003
+    let v19 := (v18 * 21 + n) % 1000003
+    let v20 := (v19 * 22 + n) % 1000003
+    let v21 := (v20 * 23 + n) % 1000003
+    let v22 := (v21 * 24 + n) % 1000003
+    let v23 := (v22 * 25 + n) % 1000003
+    wide n + v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16 + v17 + v18 + v19 + v20 + v21 + v22 + v23
+
+def deepSum : Nat → Nat | 0 => 0 | n + 1 => (n + 1) + deepSum n
+
 def main (args : List String) : IO Unit := do
   let n := (args.getD 1 "1000").toNat!
   match args.headD "sum" with
   | "sum" => IO.println (sumTo (List.range n))
+  | "wide" => IO.println (wide n)
+  | "deepSum" => IO.println (deepSum n)
+  | "foldr" => IO.println ((List.range n).foldr (· + ·) 0)
   | _ => IO.println (depth n)
 `);
 writeFileSync(join(work, 'node-wasi-run.mjs'), `const { WASI } = await import('node:wasi');
@@ -102,9 +137,9 @@ function run(target, args, { extra = {}, flags, timeout = 180_000, measure = fal
 const sumOf = n => String(BigInt(n) * BigInt(n - 1) / 2n) + '\n';
 const passes = (target, n, options) => { const r = run(target, ['sum', String(n)], options); return r.code === 0 && r.stdout === sumOf(n); };
 // The deepest passing n (to within 2 %), between lo (passing) and hi (failing).
-function limit(target, lo, hi, options) {
-  if (!passes(target, lo, options)) return 0;
-  while (hi - lo > lo / 50 + 1) { const mid = Math.floor((lo + hi) / 2); if (passes(target, mid, options)) lo = mid; else hi = mid; }
+function limit(target, lo, hi, options, ok = passes) {
+  if (!ok(target, lo, options)) return 0;
+  while (hi - lo > lo / 50 + 1) { const mid = Math.floor((lo + hi) / 2); if (ok(target, mid, options)) lo = mid; else hi = mid; }
   return lo;
 }
 
@@ -164,13 +199,24 @@ for (const target of targets) {
     report.targets.node.limit64 = limit(target, 100_000, 2_000_000, { extra: { LASM_VM_STACK_MB: '64' } });
   } else if (target.startsWith('edge-O0')) {
     expect(target, 'sumTo of 500 elements', passes(target, 500), '');
-    // The first depth that fails (just past the measured limit) runs out of the C stack.
-    const deepest = report.targets[target].limit = limit(target, 100, 50_000), n = Math.ceil(deepest * 1.1) + 10;
-    const over = run(target, ['sum', String(n)], { timeout: 120_000 });
-    expect(target, `sumTo of ${n} elements overflows the C stack: a stack overflow, not the trap`,
-      !over.timedOut && over.code === 1 && over.stdout === '' && over.stderr.includes(`[lasm] the Lean instance stopped: ${edgeOverflow}\n`)
-        && !/out of bounds/i.test(over.stderr),
-      JSON.stringify({ code: over.code, signal: over.signal, stderr: over.stderr.slice(0, 600) }));
+    // Past each recursion's limit the engine's stack or the C stack runs out
+    // first, depending on the engine and the frame; a C-stack overflow must be
+    // named, never left as the trap that follows it ("memory access out of bounds").
+    const overflows = [];
+    for (const mode of ['sum', 'wide', 'deepSum', 'foldr']) {
+      const ok = (t, n) => { const r = run(t, [mode, String(n)]); return r.code === 0 && /^\d+\n$/.test(r.stdout); };
+      const deepest = limit(target, 100, 50_000, undefined, ok), n = Math.ceil(deepest * 1.1) + 10;
+      const over = run(target, [mode, String(n)], { timeout: 120_000 });
+      const named = over.stderr.includes(`[lasm] the Lean instance stopped: ${edgeOverflow}\n`);
+      if (named) overflows.push(mode);
+      (report.targets[target].limits ??= {})[mode] = { deepest, stop: named ? 'C stack' : over.stderr.split('\n')[0] };
+      expect(target, `${mode} ${n}: stops with a stack overflow, never the trap after it`,
+        !over.timedOut && over.code === 1 && over.stdout === '' && !/out of bounds/i.test(over.stderr)
+          && (named || /^\[lasm\] the Lean instance stopped: (Maximum call stack size exceeded|too much recursion)/.test(over.stderr)),
+        JSON.stringify({ code: over.code, signal: over.signal, deepest, stderr: over.stderr.slice(0, 400) }));
+    }
+    expect(target, 'a recursion exhausts the 1 MiB C stack and is named', overflows.length > 0, JSON.stringify(report.targets[target].limits));
+    report.targets[target].limit = report.targets[target].limits.sum.deepest;
   } else {
     expect(target, 'sumTo of 5,000 elements', passes(target, 5000), '');
     const over = run(target, ['sum', '1000000'], { timeout: 120_000 });
