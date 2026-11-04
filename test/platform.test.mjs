@@ -1,10 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { bundledTools, executableName, insideDirectory, responseFile } from '../src/platform.mjs';
-import { run, lean } from '../src/toolchain.mjs';
 
 test('tool discovery handles official macOS and Windows executable layouts', t => {
   const root = mkdtempSync(path.join(tmpdir(), 'lasm tool layouts '));
@@ -29,23 +28,12 @@ test('Windows path containment handles drive case, sibling prefixes, and other d
   assert.equal(insideDirectory('\\\\server\\share\\App', '\\\\server\\other\\App', path.win32), false);
 });
 
-test('LLD response files retain space and Unicode paths beyond Windows command limits', async t => {
-  const directory = mkdtempSync(path.join(tmpdir(), 'lasm link 日本語 spaces '));
-  t.after(() => rmSync(directory, { recursive: true, force: true }));
-  const tools = bundledTools(run(lean, ['--print-prefix']));
-  const source = path.join(directory, 'answer.c');
-  const object = path.join(directory, 'answer.o');
-  const output = path.join(directory, 'answer.wasm');
-  writeFileSync(source, 'int answer(void) { return 42; }\n');
-  run(tools.clang, ['--target=wasm32-wasip1', '-c', source, '-o', object]);
-  const args = ['--no-entry', '--export=answer', object, ...Array(4000).fill('--strip-all'), '-o', output];
-  const response = path.join(directory, 'link.rsp');
-  const contents = responseFile(args);
+test('LLD response files quote spaces, backslashes and Unicode, and refuse newlines', () => {
+  // Linking with them is exercised by every build (src/application-link.mjs).
+  const contents = responseFile(['C:\\Space Path\\file.o', '日本語 dir/a.o', 'quote"d', ...Array(4000).fill('--strip-all')]);
   assert.ok(contents.length > 32_768);
-  writeFileSync(response, contents);
-  run(tools.linker, ['-flavor', 'wasm', '--rsp-quoting=posix', '@' + response]);
-  const { instance } = await WebAssembly.instantiate(readFileSync(output));
-  assert.equal(instance.exports.answer(), 42);
+  assert.ok(contents.startsWith('"C:\\\\Space Path\\\\file.o"\n"日本語 dir/a.o"\n"quote\\"d"\n'));
   assert.throws(() => responseFile(['bad\nargument']), /newlines/);
+  assert.throws(() => responseFile(['bad\0argument']), /NUL/);
   assert.equal(responseFile(['C:\\Space Path\\file.o']), '"C:\\\\Space Path\\\\file.o"\n');
 });

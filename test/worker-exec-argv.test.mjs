@@ -9,7 +9,7 @@ import vm from 'node:vm';
 const source = readFileSync(new URL('../scripts/full-lean/emscripten-pre.js', import.meta.url), 'utf8');
 // A Worker that rejects per-process flags the way Node does.
 const perProcess = new Set(['--max-old-space-size=2048', '--expose-gc', '--stack-size=2000', '--title']);
-function prelude(execArgv) {
+function prelude(execArgv, { searchable = true } = {}) {
   const created = [];
   class FakeWorker {
     constructor(filename, options) {
@@ -21,10 +21,13 @@ function prelude(execArgv) {
     emit() { return true; }
   }
   const context = { ENVIRONMENT_IS_NODE: true, ENVIRONMENT_IS_PTHREAD: false, Module: {}, require: createRequire(import.meta.url),
-    URL, process: { env: { LASM_FULL_HOST_MODULE: 'file:///host/host.mjs' }, execArgv, platform: 'linux' }, Array, Error, Object, Number, String };
+    URL, process: { env: { LASM_FULL_HOST_MODULE: 'file:///host/host.mjs' }, execArgv, platform: 'linux', cwd: () => '/work' }, Array, Error, Object, Number, String };
   context.globalThis = context; context.Worker = FakeWorker;
   // worker-stdio.cjs is the host's; this test only checks the constructor's options.
-  context.require = Object.assign(name => name.endsWith('worker-stdio.cjs') ? () => {} : createRequire(import.meta.url)(name),
+  const realRequire = createRequire(import.meta.url);
+  // node:fs with a working directory that does (not) grant search permission.
+  const fs = { ...realRequire('node:fs'), accessSync: () => { if (!searchable) throw Object.assign(new Error('EACCES: permission denied'), { code: 'EACCES' }); } };
+  context.require = Object.assign(name => name.endsWith('worker-stdio.cjs') ? () => {} : name === 'node:fs' ? fs : realRequire(name),
     { resolve: createRequire(import.meta.url).resolve });
   vm.runInNewContext(source, context);
   return { Worker: context.Worker, created };
@@ -44,4 +47,17 @@ test('accepted flags pass unchanged and an unrelated error is not swallowed', ()
   assert.deepEqual(created[0].slice(0, 2), ['--trace-warnings', '--inspect=0']);
   const explicit = prelude([]);
   assert.throws(() => new explicit.Worker('a.js', { execArgv: ['--expose-gc'] }), { code: 'ERR_WORKER_INVALID_EXEC_ARGV' });
+});
+
+// Regression (integration/host-fixtures.mjs cwd-permissions): Node resolves a
+// --require preload from the cwd and fails on an unsearchable one, so no Lean
+// thread could start there.
+test('a cwd without search permission starts workers without the --require preload', () => {
+  const revoked = prelude(['--no-warnings'], { searchable: false });
+  new revoked.Worker('a.js', {});
+  assert.deepEqual(revoked.created[0], ['--no-warnings']);
+  const ordinary = prelude(['--no-warnings']);
+  new ordinary.Worker('a.js', {});
+  assert.deepEqual(ordinary.created[0].slice(0, 2), ['--no-warnings', '--require']);
+  assert.match(ordinary.created[0][2], /native-worker-cwd\.cjs$/);
 });

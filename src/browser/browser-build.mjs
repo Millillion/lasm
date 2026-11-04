@@ -19,6 +19,7 @@ import { bundleModules, compactModule, emscriptenModule } from './bundle.mjs';
 import { builtinModuleClosure, builtinModuleFile, builtinPrefix } from '../edge/builtin-modules.mjs';
 import { edgeModules } from '../edge/edge-build.mjs';
 import { noticeBanner, targetNotices } from '../notices.mjs';
+import { replaceOutputDirectory } from '../output-directory.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 const edge = fileURLToPath(new URL('../edge/', import.meta.url));
@@ -174,9 +175,7 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
     immutable: [entry, wasm, ...(precompress ? [entry, wasm].flatMap(file => [file + '.br', file + '.gz']) : [])],
     transfer, files, programKey: program.meta.key, nodeBuildSignature: result.signature };
   writeFileSync(join(staging, 'lasm-manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
-  rmSync(destination, { recursive: true, force: true });
-  mkdirSync(dirname(destination), { recursive: true });
-  renameSync(staging, destination);
+  replaceOutputDirectory(staging, destination);
   const kib = n => (n / 1024).toFixed(1) + ' KiB';
   log(`${cacheHit ? 'Reused' : 'Built'} ${relative(process.cwd(), source) || source} for the browser: ${relative(process.cwd(), destination) || destination}`
     + ` (${entry} + ${wasm}: ${precompress ? `${kib(transfer.brotli)} brotli, ${kib(transfer.gzip)} gzip, ` : 'dev build, not precompressed, '}${kib(transfer.uncompressed)} uncompressed)`);

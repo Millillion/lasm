@@ -36,6 +36,7 @@ proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, after publish, daily |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
+| [Dependable tooling](#dependable-tooling) | Every user-triggerable error prints a clear message (error corpus); incremental, repeated, renamed and touched builds give the clean build's bytes (metamorphic); killed, offline, full-disk, read-only and corrupted runs end in success or a clear error (fault injection) | `scripts/tooling/`, `tooling.yml` | PR (corpus), nightly (all) |
 | [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage | planned | nightly |
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
@@ -232,6 +233,64 @@ rehearsal of the exact packages, installed by npm, Bun and Deno),
 `published-templates.yml` and `bun-deno-published.yml` (the public registry
 after each release and daily). **Cannot catch:** real cloud platforms (no
 accounts, by policy), OS versions and configurations outside the runners.
+
+### Dependable tooling
+
+Claim 4 of [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md), tested black
+box: each harness installs the CLI with npm (a candidate packed from the commit,
+and for the corpus also the published `@lasm/cli@latest`) and judges only what
+it prints, its exit status and the files it writes. The judge of a message,
+`messageProblems` in [`scripts/tooling/lib.mjs`](../scripts/tooling/lib.mjs),
+rejects JavaScript stack frames, raw JavaScript errors, Node's raw
+file-system text (`EACCES: …, mkdir '…'`), a bare C library message without a
+path, the internal-error line, unhandled rejections and empty output.
+
+**Error corpus** ([`error-corpus.mjs`](../scripts/tooling/error-corpus.mjs)):
+about 60 errors a user can cause: bad and conflicting flags, missing or
+misnamed sources, Lean type, syntax and UTF-8 errors (also in an imported
+module), missing imports, no `main`, broken `lakefile.toml`/`lakefile.lean`,
+a missing Lake path dependency, unsupported or garbage `lean-toolchain`,
+output paths that are files or not Lasm builds, read-only project, output and
+tool-cache directories, packaging a dev build, an unreachable download, an
+invalid download setting, Node 22. Each must exit non-zero within its limit,
+say what the case names, and pass the judge. A case fixed after the latest
+release carries `fixedIn`; against an older CLI it is reported as known.
+
+**Metamorphic build tests** ([`metamorphic.mjs`](../scripts/tooling/metamorphic.mjs)),
+for node, wasi, workers and browser, release and dev profiles, on a small Lake
+project: two clean builds in different directories, and a build with a cold
+tool cache, give the same bytes; edit then build equals a clean build of the
+edited project, and reverting gives the original bytes; renaming a module
+nothing imports changes no byte; renaming an unused definition changes only
+the input fingerprints in JSON metadata (release profile); touching sources, or
+building again, links nothing and rewrites no output file; after `lasm dev`
+rebuilt an edit and ignored a touch, `lasm build --dev` reuses its build, which
+equals a clean one. Each target is judged on its own output directory (`dist/`
+for node and the browser, `wasi/`, `workers/`). Dev rebuilds plan
+initialization from the previous build's plan, so for the dev profile
+"incremental equals clean" means the same behaviour (on node: the same output
+when run), not the same bytes; clean dev builds must still be byte-identical.
+
+**Fault injection** ([`faults.mjs`](../scripts/tooling/faults.mjs)), node
+target: SIGKILL of the process tree at every build stage and while replacing an
+existing output; SIGKILL while a cold tool cache is filled from the npm
+packages and over HTTPS; SIGKILL of `npm install` of the CLI; HTTPS downloads
+through a CONNECT proxy that cuts tunnels after 4 MiB (three times: must
+recover; always: must fail clearly); the tool cache on a 64 MiB and a 700 MiB
+ext4 loop file system, the project on one filled to 1, 4 and 12 MiB free; an
+empty read-only tool cache, a filled one made read-only, a read-only project
+build cache; a flipped byte and a removed file in the tool archives, derived
+tools, shared objects and the project build cache. Outcome: success with the
+clean build's bytes, or a clear failure followed, once the fault is gone (after
+`lasm cache repair` for corruption), by a rerun with the clean build's bytes.
+
+**CI** ([tooling.yml](../.github/workflows/tooling.yml)): the corpus against the
+candidate and the published package on every pull request, push to `main` and
+nightly; metamorphic (one job per target) and fault injection nightly, by hand,
+and on pull requests that change the harness.
+**What it cannot catch:** errors outside the corpus; nondeterminism that two
+runs on one machine share (same OS, CPU, locale); faults on macOS and Windows
+(Linux runners only, except the unit-level controls in `installer-faults.yml`).
 
 ### Fuzzing at the boundaries
 
@@ -494,7 +553,7 @@ run, except the static mode of `check-tutorials.mjs` (below). Verdicts:
 | `notices.test.mjs`: the edge runtime archive carries the MIT text and its change list | the packager's source | **Replaced** (2026-11-03): `scripts/edge/package-edge-runtime.mjs` runs on a stand-in edge runtime and its `THIRD_PARTY_NOTICES.txt` is read back (the Lasm MIT text, the shared patches plus `edge` and never `node-threads`, the Node notices appended); a patch without notice text is refused |
 | `notices.test.mjs` (3 lines of the Apache 4(b) test; the rest is behavioural) | patch names regex-parsed from `build-application-runtime.mjs` | **Keep as a cross-reference lint** until the patch table moves into an importable module (the build script runs when imported) |
 | `notices.test.mjs`: Lasm's licence copy, Wasmtime licence copies, MIT everywhere, MIT-0 texts | file equality and headers; the MIT-0 test also checks eight phrases of the `LICENSE-MIT-0` grant | **Keep**: consistency guards; licence text is what must be shipped, and a change to the grant's scope should be deliberate |
-| 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never runs them (their failures are reported, not fatal) | **To port or retire**: the behaviours they cover (host IO, processes, cwd, signals) are partly covered by the installed-package acceptance and the differential tester's IO and file cases; each file should be ported to the current pipeline or deleted |
+| 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never ran them (their failures were reported, not fatal) | **Ported or retired** (2026-11-03). **Ported**: the ordinary-Lean fixtures of 24 files (conformance, finalizers, console buffering, cwd, permissions, environment and path bytes, getLine, platform, process cwd/exit/NUL/lifetime/spawn, realPath, system directories, temporary files, truncate, runtime metadata, standard IO and the forms of `main`, TCP, wall clock) run as 31 cases of `integration/host-fixtures.mjs`, a `differential.yml` job on pull requests and main: built with the installed candidate for Node and compared with upstream Lean 4.35.0's `lean --run` (it found the unsearchable-cwd worker bug fixed with it). **Kept in the unit suite**, without their Lean parts: the Node-host tests in `node-process`, `node-temporary-files`, `node-platform`, `node-environment-bytes` and `platform`. **Retired**: `compiler`, `io`, `lake` and `runtime` test the `lasm.json` library pipeline (`src/build.mjs`), which the published CLI refuses; the earlier runtime's platform emulation, its embedded `index.mjs` API and its wall-clock fault hook; `expr-conformance` became a check that the build is refused with the runtime-kernel diagnostic; `needsTools` is empty |
 | `browser.test.mjs`: every `lasm:web`/`lasm:app` binding names an export | `@[js …]` attributes in `library/Lasm/Web` cross-checked against real exports | **Keep**: a cheap cross-reference lint; a full behavioural check would link a program using every binding |
 | `scripts/content/check-tutorials.mjs --static` (found 2026-11-03) | tutorial pages against their `steps.json` and project files | **Keep as a doc lint**: the page must show what the tutorial runs; the non-static mode runs those steps against a packed CLI |
 
@@ -525,7 +584,7 @@ they are copied into `dist/` and executed there by the integration workflows, an
 this measurement only counts files at their `src/` path. The others are simply
 not unit-tested (`src/vite/index.mjs`, `src/application-binding-check.mjs`,
 `src/application-build.mjs`). The 29 legacy files of the [audit](#test-quality-audit)
-contribute nothing. `unit.yml` (a release gate) fails when the total line
+contributed nothing (they are now ported or retired). `unit.yml` (a release gate) fails when the total line
 coverage falls more than one point below this baseline; raise the baseline file
 when coverage improves.
 
