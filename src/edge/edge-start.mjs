@@ -5,6 +5,23 @@
 // and the browser loader (src/browser/).
 import { createEdgeRuntimeHost } from './edge-host.mjs';
 
+/** The C stack of every edge link (src/edge/edge-link.mjs edgeLinkSettings.stackMiB). */
+export const edgeStackBytes = 1 << 20;
+// How close to the end of the stack a stop still counts as its overflow.
+const stackMargin = 4096;
+/**
+ * A trap with Lean's C stack pointer at or beyond the end of its stack (stack:
+ * edge-pre.js stoppedStack) is a C-stack overflow. Nothing guards the stack in
+ * linear memory, so it surfaces as whatever trap follows (usually "memory access
+ * out of bounds"); this names it, as native Lean does. Otherwise undefined.
+ */
+export function stackOverflowCause(error, stack, size = edgeStackBytes) {
+  if (!stack || typeof stack.top !== 'number' || typeof stack.pointer !== 'number') return undefined;
+  // Unsigned: a pointer that went below address 0 wrapped to the top of memory.
+  if ((stack.top - stack.pointer) >>> 0 < size - stackMargin) return undefined;
+  return new Error(`Stack overflow detected: Lean exhausted the edge profile's ${size / 1048576} MiB C stack (WebAssembly linear memory)`, { cause: error });
+}
+
 /**
  * writers and exit: see createEdgeRuntimeHost. Module.lasmExitCode is main's result.
  * jspi: whether Lean's blocking waits may suspend (JSPI, where the engine has it);
@@ -51,7 +68,10 @@ export async function startLean({ createProgram, wasmModule, env = {}, modules =
   Module.lasmDispose = dispose;
   // IO.Process.exit where nothing can exit traps right after the host refused
   // it: the refusal, not the trap ("unreachable"), is why the instance stopped.
-  const cause = error => host.exitRequested ?? error;
+  // A C-stack overflow stops it with the trap that follows: the overflow is why.
+  let overflow;
+  const cause = error => host.exitRequested ?? (overflow ??= stackOverflowCause(error, Module.lasmEdge.stoppedStack)) ?? error;
+  Module.lasmStopCause = cause;
   Module.lasmEdge.onStop(error => { host.js.stop(cause(error)); dispose(); (stderr ?? console.error)(`[lasm] the Lean instance stopped: ${cause(error).message}`); });
   try { Module.lasmExitCode = await Module.lasmEdge.main(args); } catch (error) { throw cause(error); }
   host.flush();

@@ -13,7 +13,8 @@ import { fileURLToPath } from 'node:url';
 import { zstdCompressSync } from 'node:zlib';
 import { c as createTar } from 'tar';
 import { edgeRuntime, edgeRuntimeCatalog, edgeArchives, edgeExtras } from '../src/edge/edge-runtime.mjs';
-import { startLean } from '../src/edge/edge-start.mjs';
+import { startLean, stackOverflowCause, edgeStackBytes } from '../src/edge/edge-start.mjs';
+import { edgeLinkSettings } from '../src/edge/edge-link.mjs';
 
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const base = 'b'.repeat(64);
@@ -175,7 +176,7 @@ test('the catalog: supported versions, the base runtime, a verified download', a
 });
 
 /** A stand-in Emscripten module of an edge program. */
-function program({ exitCode = 0, mainFails, onMain } = {}) {
+function program({ exitCode = 0, mainFails, onMain, stoppedStack } = {}) {
   const seen = {};
   const createProgram = async options => {
     seen.options = options;
@@ -191,6 +192,7 @@ function program({ exitCode = 0, mainFails, onMain } = {}) {
         notify: () => { seen.notified = (seen.notified ?? 0) + 1; },
         syncCall: (fn, payload) => { seen.syncCall = [fn, payload]; return Uint8Array.of(0, 0); },
         onStop: fn => { stop = fn; },
+        get stoppedStack() { return stoppedStack ?? null; },
         main: async args => { seen.args = args; await onMain?.(Module, stop); if (mainFails) throw mainFails; return exitCode; },
       },
     };
@@ -265,6 +267,46 @@ test('startLean: IO.Process.exit where nothing can exit stops the instance with 
   const err2 = [];
   await assert.rejects(startLean({ createProgram: other.createProgram, wasmModule, stdout: () => {}, stderr: line => err2.push(line) }), { message: 'unreachable' });
   assert.deepEqual(err2, ['[lasm] the Lean instance stopped: unreachable']);
+});
+
+// Differential testing (docs/TESTING.md#bugs-found): 3,000 frames of -O0 code
+// overflow the edge's 1 MiB C stack, and the instance stopped with the trap that
+// followed ("memory access out of bounds") instead of a stack overflow.
+test('stackOverflowCause: a stop with the C stack pointer at or past the end of the stack is an overflow', () => {
+  assert.equal(edgeStackBytes, edgeLinkSettings.stackMiB << 20);
+  const trap = new Error('memory access out of bounds'), top = 5 << 20;
+  const message = "Stack overflow detected: Lean exhausted the edge profile's 1 MiB C stack (WebAssembly linear memory)";
+  // Past the end (into the data below the stack), within the margin, and wrapped below address 0.
+  for (const pointer of [top - edgeStackBytes - 200, top - edgeStackBytes + 100, 2 ** 32 - 64]) {
+    const cause = stackOverflowCause(trap, { top, pointer });
+    assert.equal(cause?.message, message, String(pointer));
+    assert.equal(cause.cause, trap);
+  }
+  // Any other trap keeps its own cause.
+  for (const stack of [{ top, pointer: top - 1000 }, { top, pointer: top - edgeStackBytes + 8192 }, { top: undefined, pointer: 10 }, null, undefined])
+    assert.equal(stackOverflowCause(trap, stack), undefined, JSON.stringify(stack));
+  assert.match(stackOverflowCause(trap, { top: 9 << 20, pointer: 1 << 20 }, 8 << 20).message, /the edge profile's 8 MiB C stack/);
+});
+
+test('startLean: a C-stack overflow stops the instance with a stack overflow, not the trap that followed', async () => {
+  const trap = new Error('memory access out of bounds');
+  const wasmModule = new WebAssembly.Module(Uint8Array.of(0, 0x61, 0x73, 0x6d, 1, 0, 0, 0));
+  const message = "Stack overflow detected: Lean exhausted the edge profile's 1 MiB C stack (WebAssembly linear memory)";
+  const overflowing = program({ mainFails: trap, stoppedStack: { top: 3 << 20, pointer: (2 << 20) - 512 }, onMain: (Module, stop) => stop(trap) });
+  const err = [];
+  let Module;
+  const started = startLean({ createProgram: async options => (Module = await overflowing.createProgram(options)), wasmModule, stdout: () => {}, stderr: line => err.push(line) });
+  const rejection = await started.catch(error => error);
+  assert.equal(rejection.message, message);
+  assert.equal(rejection.cause, trap);
+  assert.deepEqual(err, [`[lasm] the Lean instance stopped: ${message}`]);
+  // The browser loader reports later stops through the same cause.
+  assert.equal(Module.lasmStopCause(trap), rejection);
+  // A trap with the stack pointer inside the stack keeps its own message.
+  const other = program({ mainFails: trap, stoppedStack: { top: 3 << 20, pointer: (3 << 20) - 4096 }, onMain: (Module, stop) => stop(trap) });
+  const err2 = [];
+  await assert.rejects(startLean({ createProgram: other.createProgram, wasmModule, stdout: () => {}, stderr: line => err2.push(line) }), { message: 'memory access out of bounds' });
+  assert.deepEqual(err2, ['[lasm] the Lean instance stopped: memory access out of bounds']);
 });
 
 test('startLean: per-instance modules get the instance context; cleanups run once, in reverse, also when the instance stops', async () => {
