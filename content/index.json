@@ -167,6 +167,17 @@
       ]
     },
     {
+      "slug": "release-0-4-1",
+      "title": "Lasm 0.4.1",
+      "description": "A bug-fix release: a C-stack overflow on the edge is reported as one.",
+      "date": "2026-11-04",
+      "kind": "release",
+      "path": "docs/release/0.4.1-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.4.1"
+      ]
+    },
+    {
       "slug": "release-0-3-9",
       "title": "Lasm 0.3.9",
       "description": "A bug-fix release.",
