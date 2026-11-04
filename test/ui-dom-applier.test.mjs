@@ -34,7 +34,7 @@ class Frame {
   bytes = [];
   byte(b) { this.bytes.push(b); return this; }
   v(n) { while (n >= 128) { this.bytes.push(n % 128 + 128); n = Math.floor(n / 128); } this.bytes.push(n); return this; }
-  raw(t) { const b = new TextEncoder().encode(t); this.v(b.length); this.bytes.push(...b); return this; }
+  raw(t) { const b = new TextEncoder().encode(t); this.v(b.length); for (const x of b) this.bytes.push(x); return this; }
   // Names and values: 0 = literal, interned; 1 = literal, not interned; k > 1 = table entry k - 2.
   lit(t, intern = false) { return this.v(intern ? 0 : 1).raw(t); }
   ref(k) { return this.v(k + 2); }
@@ -54,7 +54,7 @@ class Frame {
   el(id, tag, attrs = () => 0, children = [], kind = 1) {
     this.byte(kind).v(id).lit(tag);
     const count = new Frame(); const n = attrs(count) || 0;
-    this.v(n); this.bytes.push(...count.bytes);
+    this.v(n); for (const x of count.bytes) this.bytes.push(x);
     this.v(children.length); for (const child of children) child(this);
     return this;
   }
@@ -89,6 +89,19 @@ test('strings: short and long, ASCII and not, including a short one that starts 
   texts.forEach((t, i) => ui.applyForTest(frame().insert(0, 0, f => f.el(10 + 2 * i, 'span', f => (f.attr('title', t), 1), [f => f.text(11 + 2 * i, t)])).u8));
   assert.deepEqual([...root.childNodes].map(n => n.textContent), texts);
   assert.deepEqual([...root.childNodes].map(n => n.getAttribute('title')), texts);
+});
+
+// A text of 16 KiB or more has a three-byte length (docs/BROWSER.md "Patch protocol").
+test('long texts: lengths of three varint bytes', () => {
+  const { root } = page();
+  const ui = createUi({ root });
+  const long = 'w'.repeat(20_000), longer = 'é'.repeat(70_000);
+  ui.applyForTest(frame().insert(0, 0, f => f.el(1, 'pre', f => (f.attr('title', long), 1), [f => f.text(2, long)])).u8);
+  assert.equal(root.firstChild.textContent, long);
+  assert.equal(root.firstChild.getAttribute('title'), long);
+  ui.applyForTest(frame().setText(2, longer).insert(0, 0, f => f.el(3, 'p', () => 0, [f => f.text(4, 'after')])).u8);
+  assert.equal(root.firstChild.textContent, longer);
+  assert.equal(root.lastChild.textContent, 'after', 'the frame continues after the long text');
 });
 
 test('names and values: interned literals enter the tables in order; plain literals do not', () => {
@@ -670,6 +683,22 @@ test('subscriptions: every, frame, window and document events with their options
   u2.module.unsub(99);
   assert.throws(() => u2.module.sub(6, ['comet']), /Lasm.UI: unknown subscription comet/);
   ui.unmount(); u2.unmount();
+});
+
+// Lean reuses a subscription's id when it changes what the subscription listens to.
+test('subscriptions: an id reused for another event no longer receives the first one', () => {
+  const { root, window } = page();
+  const ui = createUi({ root });
+  const fired = [];
+  ui.module.connect({ frame: () => new Uint8Array(0), sub: (id, values) => { fired.push([id, ...values]); return 0; } });
+  ui.module.sub(4, ['window', 'first', [['type']]]);
+  window.dispatchEvent(new window.Event('first'));
+  ui.module.unsub(4);
+  ui.module.sub(4, ['window', 'second', [['type']]]);
+  window.dispatchEvent(new window.Event('first'));
+  window.dispatchEvent(new window.Event('second'));
+  assert.deepEqual(fired, [[4, 'first'], [4, 'second']]);
+  ui.unmount();
 });
 
 test('subscriptions before connect deliver nothing and raise nothing', () => {
