@@ -102,7 +102,7 @@ class Reader {
 export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spawnPoller, progress, liveThreads, startedOperations } = {}) {
   const values = new HandleTable({ first: firstJsHandle });
   const moduleRequire = createRequire(appPath ? join(dirname(appPath), 'package.json') : join(process.cwd(), 'package.json'));
-  const stats = { released: 0, callbacks: 0, syncCallbacks: 0, syncWaitsStopped: 0, functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0 };
+  const stats = { released: 0, callbacks: 0, syncCallbacks: 0, syncWaitsStopped: 0, syncPromises: 0, functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0 };
   const bindings = new Map();
 
   function reference(value) { return values.allocate(value); }
@@ -237,7 +237,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
   //  48 u64 wait list (below)  56 u64 the Lean thread (pthread_self)
   // Wait list (library/c/lasm_js.c `waits`): 0 i32 epoch (changes at every wait's
   // start and end), 4 i32 size n, 8 n × u64 waiting threads (pthread_self; 0 free).
-  let syncChannel, syncBusy = false, syncSettles = 0;
+  let syncChannel, syncBusy = false;
   const syncPollMs = 10, stuckMs = 50;
   // Inside a callback, the Lean thread may wait for a Lean task (Task.get,
   // IO.wait, IO.waitAny: sync_wait in lasm_js.c). The wait can't finish if every
@@ -262,7 +262,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
     if (Atomics.compareExchange(i32, channel / 4 + 10, word, (word & ~3) | 2) !== word) return undefined;
     Atomics.notify(i32, channel / 4 + 10);
     return { stop: seen.started !== startedOperations?.() ? 'a timer, DNS lookup or socket operation'
-      : seen.settles !== syncSettles ? 'a JavaScript promise' : 'a Lean task' };
+      : stats.syncPromises > seen.settles ? 'a JavaScript promise' : 'a Lean task' };
   }
   function syncFunction(fn) {
     const f = function (...args) {
@@ -280,8 +280,8 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
       view.setUint32(channel + 8, fn, true);
       syncBusy = true; stats.syncCallbacks++;
       // What the callback starts that only the event loop can finish (for the reason of a stopped wait).
-      const started = startedOperations?.(), settles = syncSettles;
-      let seen, stopped = 'a Lean task';
+      const started = startedOperations?.(), settles = stats.syncPromises;
+      let seen, stopped;
       try {
         // Read the slot's sequence and the doorbell before posting the call: once
         // state is 1 the Lean thread runs and may make its first host call at
@@ -301,7 +301,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
             if (state === 3 && Atomics.load(i32, channel / 4 + 11)) {
               Atomics.store(i32, channel / 4 + 11, 0);
               stats.syncWaitsStopped++;
-              throw failure(syncWaitText(stopped));
+              throw failure(syncWaitText(stopped ?? 'a Lean task'));
             }
             if (state === 3) throw jsFailure(new Error(decoder.decode(result)));
             return decode(result);
@@ -317,9 +317,9 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
           if (Atomics.wait(i32, channel / 4 + 1, bell, syncPollMs) === 'timed-out') {
             serveSync(slot); serveMailbox?.();
             if (liveThreads) {
-              if (memory.buffer !== buffer) { buffer = memory.buffer; i32 = new Int32Array(buffer); view = new DataView(buffer); }
+              buffer = memory.buffer; i32 = new Int32Array(buffer); view = new DataView(buffer);
               const next = stuckWait(buffer, i32, view, seen);
-              if (next?.stop) stopped = next.stop;
+              if (next?.stop !== undefined) stopped = next.stop;
               seen = next?.mark && { started, settles, ...next };
             }
           }
@@ -429,7 +429,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
         // interop thread) when this value settles; a non-promise settles now.
         // Inside a synchronous callback it settles after the callback returns
         // (`Value.toTask` kept for later); waiting for it there is stopped (stuckWait).
-        if (syncBusy) syncSettles++;
+        if (syncBusy) stats.syncPromises++;
         settle(arg, decode(bytes));
         return Buffer.alloc(0);
       }

@@ -457,7 +457,7 @@ test('statistics: op 213, the global hooks, owns, release and close', () => {
   assert.equal(js.owns(firstJsHandle - 1), false);
   const stats = JSON.parse(js.dispatch(213, 0, 0n).toString());
   assert.deepEqual(stats, { values: 1, pendingCalls: 0, queuedEvents: 0, functionsLive: 0, released: 0, callbacks: 0, syncCallbacks: 0,
-    syncWaitsStopped: 0, functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0, poller: { polled: false, waiting: false, spawnTimer: false } });
+    syncWaitsStopped: 0, syncPromises: 0, functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0, poller: { polled: false, waiting: false, spawnTimer: false } });
   assert.deepEqual(globalThis[Symbol.for('lasm.js.stats')](), stats);
   assert.equal(globalThis[Symbol.for('lasm.js.sync')](), null);
   js.release(id);
@@ -919,4 +919,38 @@ for (;;) {
     const f = js.values.get(js.dispatch(210, 1, 2n).readUInt32LE(1));
     assert.throws(() => f(), { message: stopText('a Lean task') });
   } finally { await worker.terminate(); }
+});
+
+test('task waits: the whole wait list is read; a stopped flag alone, results, and hosts without the thread hook', () => {
+  // The other thread is listed in the last entry.
+  const last = waitingHost({ onTick: (lean, tick) => { if (tick === 1) { lean.wait(1); lean.list([0n, 0n, 0n, 0xa000n]); } lean.stopIfAsked(); } });
+  assert.throws(() => last.f(), { message: stopText('a Lean task') });
+  // A failure posted as stopped without a request (no reason recorded): a Lean task.
+  const flagged = waitingHost({ onTick: lean => lean.post(3, undefined, 1) });
+  assert.throws(() => flagged.f(), { message: stopText('a Lean task') });
+  assert.equal(flagged.js.snapshot().syncWaitsStopped, 1);
+  // A result is a result, whatever the stopped word says.
+  const result = waitingHost({ onTick: lean => lean.post(2, 'ok', 1) });
+  assert.equal(result.f(), 'ok');
+  // Without the live-threads hook nothing is checked: the callback returns when Lean answers.
+  const memory = new WebAssembly.Memory({ initial: 2, maximum: 2, shared: true });
+  const view = new DataView(memory.buffer), i32 = new Int32Array(memory.buffer);
+  const { channel, slot, buffer } = waitLayout;
+  view.setBigUint64(channel + 16, BigInt(buffer), true);
+  view.setBigUint64(channel + 24, 4096n, true);
+  Atomics.store(i32, channel / 4 + 10, 1 << 2 | 1);
+  let ticks = 0;
+  const js = host({ wasmMemory: () => memory, serveSync: () => {
+    if (++ticks < 8) return;
+    const out = wire(5);
+    new Uint8Array(memory.buffer).set(out, buffer);
+    view.setBigUint64(channel + 32, BigInt(out.length), true);
+    Atomics.store(i32, channel / 4, 2);
+  } });
+  js.dispatch(211, 0, 0n, Buffer.concat([u64(channel), u64(slot)]));
+  assert.equal(js.values.get(js.dispatch(210, 1, 2n).readUInt32LE(1))(), 5);
+  assert.equal(Atomics.load(i32, channel / 4 + 10) & 3, 1);
+  // A promise registered outside a callback is not counted as one the callback started.
+  js.dispatch(207, 0, 0x70n, wire(1));
+  assert.equal(js.snapshot().syncPromises, 0);
 });
