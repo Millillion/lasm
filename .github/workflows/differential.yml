@@ -12,6 +12,9 @@ name: Differential testing
 # reported, never failures), the same program built unoptimized
 # (LASM_TEST_UNOPTIMIZED: node-O0 on PRs; wasi-O0 and deno-O0 too in campaigns)
 # and the same edge .wasm on Node (V8), Bun (JavaScriptCore) and SpiderMonkey.
+# Two more targets: --target bun run by Bun, and --target browser mounted in
+# headless Playwright browsers (Chromium on PRs; Firefox and WebKit too in
+# campaigns, on the program without IO.sleep, since they run without JSPI).
 #   - pull requests and pushes to main: the regression corpus plus one seeded
 #     three program pairs (3 × (150 + 25) cases) from a seed derived from the commit (reproducible: the
 #     seed is in the log and the summary);
@@ -55,8 +58,9 @@ env:
   BUN_SHA256: bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c
   JSSHELL_VERSION: 158.0.1
   JSSHELL_SHA256: 6b9158af52a3e687eec10ccd600356a1cab7d6e45f91f3fec9efbbf0bd2c7494
-  DIFF_TARGETS_PR: node,wasi,wasi-node,deno,interp,node-O0,edge-node,edge-bun,edge-sm
-  DIFF_TARGETS_FULL: node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm
+  PLAYWRIGHT: 1.63.0
+  DIFF_TARGETS_PR: node,wasi,wasi-node,deno,interp,node-O0,edge-node,edge-bun,edge-sm,bun,browser-chromium
+  DIFF_TARGETS_FULL: node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm,bun,bun-O0,browser-chromium,browser-firefox,browser-webkit
 jobs:
   pack:
     if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
@@ -163,12 +167,37 @@ jobs:
         with:
           path: ${{ runner.temp }}/lean-archive
           key: upstream-lean-${{ steps.lean.outputs.sha256 }}
+      # One program pair (pull requests, pushes): Chromium only; a campaign: all three browsers.
+      - name: Plan
+        id: plan
+        run: |
+          BUDGET="${{ inputs.budget-min || '' }}"
+          if [ -z "$BUDGET" ]; then if [ "${{ github.event_name }}" = schedule ]; then BUDGET=60; else BUDGET=0; fi; fi
+          echo "budget=$BUDGET" >> "$GITHUB_OUTPUT"
+          if [ "$BUDGET" = 0 ]; then B="chromium"; else B="chromium firefox webkit"; fi
+          echo "browsers=$B" >> "$GITHUB_OUTPUT"; echo "browsers-key=${B// /-}" >> "$GITHUB_OUTPUT"
+      - name: Playwright's browser builds, cached per version
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ env.PLAYWRIGHT }}-differential-${{ steps.plan.outputs.browsers-key }}-ubuntu-24.04
+      - name: Pinned Playwright and its browsers
+        timeout-minutes: 30
+        run: |
+          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
+          for b in ${{ steps.plan.outputs.browsers }}; do bash scripts/ci/playwright-install.sh "$b"; done
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ env.PLAYWRIGHT }}-differential-${{ steps.plan.outputs.browsers-key }}-ubuntu-24.04
       - name: Differential run
         id: run
         run: |
           set -o pipefail
-          BUDGET="${{ inputs.budget-min || '' }}"
-          if [ -z "$BUDGET" ]; then if [ "${{ github.event_name }}" = schedule ]; then BUDGET=60; else BUDGET=0; fi; fi
+          BUDGET="${{ steps.plan.outputs.budget }}"
           SEED="${{ inputs.seed || '' }}"
           if [ -z "$SEED" ]; then
             if [ "$BUDGET" = 0 ]; then SEED=$(( 16#$(echo "${{ github.event.pull_request.head.sha || github.sha }}" | cut -c1-7) )); else SEED=$(( (${{ github.run_id }} + ${{ matrix.profile == 'dev' && '500000000' || '0' }}) % 1000000000 )); fi
@@ -181,7 +210,7 @@ jobs:
             --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest" \
             --seed "$SEED" $AMOUNT --cases 150 --fs-cases 25 --targets "$TARGETS" \
             --profile "${{ matrix.profile }}" --regressions test/differential/regressions \
-            --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
+            --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js" --playwright "$GITHUB_WORKSPACE/.work/pw" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
       # The regression corpus in the dev profile too (node, then the other targets,
       # in one project: how a Node dev build followed by a WASI dev build failed).
       - name: Regressions in the dev profile
@@ -191,7 +220,7 @@ jobs:
           node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
             --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest-dev" \
             --programs 0 --targets "$DIFF_TARGETS_PR" --profile dev --regressions test/differential/regressions \
-            --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js"
+            --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js" --playwright "$GITHUB_WORKSPACE/.work/pw"
       # Recursion depth (issue #66): Node's default stack against native Lean's
       # depth, the overflow diagnostic, and the limit of every other target.
       - name: Recursion depth

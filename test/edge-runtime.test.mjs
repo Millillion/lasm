@@ -246,6 +246,27 @@ test('startLean: instantiates the precompiled module, passes the environment, at
   assert.deepEqual([logged, errors], [['p'], ['e']]);
 });
 
+// Differential testing in browsers (docs/TESTING.md#bun-and-browser-targets):
+// IO.Process.exit in a page stopped the instance with "unreachable", the trap
+// after the host's refusal, instead of the refusal.
+test('startLean: IO.Process.exit where nothing can exit stops the instance with the refusal, not the trap', async () => {
+  const trap = new Error('unreachable');
+  const { createProgram } = program({ mainFails: trap, onMain: (Module, stop) => {
+    Module.lasmEdgeHost.request(30, 0, 7n, new Uint8Array(0));
+    stop(trap);
+  } });
+  const err = [];
+  const wasmModule = new WebAssembly.Module(Uint8Array.of(0, 0x61, 0x73, 0x6d, 1, 0, 0, 0));
+  await assert.rejects(startLean({ createProgram, wasmModule, stdout: () => {}, stderr: line => err.push(line) }),
+    { message: 'Lean called IO.Process.exit 7; an edge isolate cannot exit' });
+  assert.deepEqual(err, ['[lasm] the Lean instance stopped: Lean called IO.Process.exit 7; an edge isolate cannot exit']);
+  // Any other stop keeps its own cause.
+  const other = program({ mainFails: trap, onMain: (Module, stop) => stop(trap) });
+  const err2 = [];
+  await assert.rejects(startLean({ createProgram: other.createProgram, wasmModule, stdout: () => {}, stderr: line => err2.push(line) }), { message: 'unreachable' });
+  assert.deepEqual(err2, ['[lasm] the Lean instance stopped: unreachable']);
+});
+
 test('startLean: per-instance modules get the instance context; cleanups run once, in reverse, also when the instance stops', async () => {
   const order = [], reports = [];
   const instanced = { lasmInstance: context => ({ context }) };

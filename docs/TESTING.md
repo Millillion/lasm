@@ -74,7 +74,9 @@ oracle is the untouched upstream toolchain.
 `wasi-node` (the same module under `node:wasi`) and `deno` (the edge runtime used
 by every edge platform, Bun, Deno and the browser, run by Deno 2.9.6), plus the
 targets of the [extra oracles](#more-oracles) (`interp`, `node-O0`, `wasi-O0`,
-`deno-O0`, `edge-node`, `edge-bun`, `edge-sm`). File-system cases run only where a
+`deno-O0`, `edge-node`, `edge-bun`, `edge-sm`) and the [Bun and browser
+targets](#bun-and-browser-targets) (`bun`, `bun-O0`, `browser-chromium`,
+`browser-firefox`, `browser-webkit`). File-system cases run only where a
 file system exists (node, WASI, the interpreter). The program's
 environment always contains several variables before the ones Lean reads (that
 is how the [WASI `getenv` bug](#bugs-found) was found), and `LEAN_BACKTRACE=0`
@@ -98,8 +100,9 @@ node scripts/differential/run.mjs --lasm node_modules/@lasm/cli/bin/lasm.mjs \
   --lean-bin ~/.elan/toolchains/leanprover--lean4---v4.35.0/bin --work /tmp/dt \
   --seed 1 --programs 1 --targets node,wasi,wasi-node,deno \
   --regressions test/differential/regressions
-# every oracle: --targets node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm
-#   --bun PATH/bun --sm PATH/js (SpiderMonkey's js shell)
+# every oracle: --targets node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm,
+#   bun,bun-O0,browser-chromium,browser-firefox,browser-webkit
+#   --bun PATH/bun --sm PATH/js (SpiderMonkey's js shell) --playwright DIR (holds node_modules/playwright-core)
 # a campaign: --budget-min 60; dev profile: --profile dev; on a shared host,
 # serialize builds: --wrap "flock LOCK node scripts/full-lean/run-bounded.mjs --memory-mib 6144 --"
 ```
@@ -107,10 +110,11 @@ node scripts/differential/run.mjs --lasm node_modules/@lasm/cli/bin/lasm.mjs \
 **CI** ([differential.yml](../.github/workflows/differential.yml)): every pull
 request and push to `main` packs a candidate from the commit, installs it with
 npm, replays the regressions and runs three program pairs (3 × (150 + 25) cases) from a
-seed derived from the commit, on the base targets and the cheap extra oracles
-(`interp`, `node-O0`, `edge-node`, `edge-bun`, `edge-sm`); nightly runs a
-60-minute campaign from a fresh seed on every target (also `wasi-O0` and
-`deno-O0`). A divergence fails the job and the reproducers are in the run's
+seed derived from the commit, on the base targets, the cheap extra oracles
+(`interp`, `node-O0`, `edge-node`, `edge-bun`, `edge-sm`), `bun` and
+`browser-chromium`; nightly runs a 60-minute campaign from a fresh seed on every
+target (also `wasi-O0`, `deno-O0`, `bun-O0`, `browser-firefox` and
+`browser-webkit`). A divergence fails the job and the reproducers are in the run's
 artifact; upstream suspects are listed in the job summary and never fail it.
 Known divergences (an open issue or a documented host limit) are listed in
 `KNOWN` in `run.mjs`, applied before the comparison and counted in the summary.
@@ -130,8 +134,9 @@ bound of a small function is 8,177 frames (wasmtime 30) to 10,910 (wasmtime 49),
 about 8,500 on Bun and just under 9,700 on Deno and `node:wasi` (issue #30),
 while native Lean and Node's full profile go far deeper; large
 heaps); nondeterministic behaviour (output order across
-threads is never printed); performance; the browser (planned: the same programs
-under Playwright).
+threads is never printed); performance; in browsers, which exit status a failing
+`main` had (a page has none: only zero against non-zero is compared, see
+[below](#bun-and-browser-targets)).
 
 ### More oracles
 
@@ -149,13 +154,15 @@ between Lean's compiler (IR → C) and its IR interpreter, which would otherwise
 be inherited silently by the oracle. *Cannot catch:* bugs in the shared front
 end and runtime (both use them).
 
-**(b) Optimization differential** (targets `node-O0`, `wasi-O0`, `deno-O0`).
-The same program built through the same installed Lasm with optimization off,
+**(b) Optimization differential** (targets `node-O0`, `wasi-O0`, `deno-O0`,
+and `bun-O0`). The same program built through the same installed Lasm with optimization off,
 compared with native Lean like every target (the optimized builds are the base
 targets, so an `-O0`-only divergence points at clang or Binaryen optimizing
 something that changes behaviour, or at undefined behaviour in the generated or
-runtime C). The switch is a test-only environment variable of the build, not a
-CLI flag:
+runtime C). The edge targets (`deno-O0`, `bun-O0`) run it with `deep` cases
+capped at 1,000 frames, since unoptimized frames overflow the edge's 1 MiB C
+stack at 3,000 (see [Bugs found](#bugs-found)). The switch is a test-only
+environment variable of the build, not a CLI flag:
 
 | Variable | Effect | Used by |
 | --- | --- | --- |
@@ -193,6 +200,46 @@ differ per engine: [EDGE.md](EDGE.md)), and anything only browsers do.
 0.3.5 with this branch's sources): 175 cases, no divergence on any target; the
 interpreter matched native Lean on every case once its module name was fixed
 (without `--root`, `lean --run` names the module `_stdin` in panic messages).
+
+### Bun and browser targets
+
+Two user-facing targets through the same harness, built as users build them
+from the installed candidate (`scripts/differential/run.mjs`):
+
+| Target | Build | Run |
+| --- | --- | --- |
+| `bun`, `bun-O0` | `--target bun` (`bun-O0`: `LASM_TEST_UNOPTIMIZED=1`) | `bun bun/main.mjs`, Bun 1.4.4 |
+| `browser-chromium` | `--target browser --suspend jspi`, in its own subdirectory (it writes `dist/`, as `node` does) | mounted in headless Chromium (Playwright 1.63.0) by [`browser-runner.mjs`](../scripts/differential/browser-runner.mjs) |
+| `browser-firefox`, `browser-webkit` | the same build | headless Firefox and WebKit, on the program without `IO.sleep` |
+
+The browser runner serves `dist/` from `127.0.0.1` (the Wasm as
+`application/wasm`), opens a blank page, imports `app.js` and calls the public
+`mount(element, { stdout, stderr })` ([BROWSER.md](BROWSER.md#loader-and-mount-api-measured)),
+as an embedding page does. Lean's output arrives as lines and is compared line
+for line (every generated line ends with a newline). A page has no environment,
+so `LEAN_BACKTRACE=0` cannot reach the program and a panic prints a JavaScript
+backtrace after its message ([EDGE.md](EDGE.md#environment-variables)); a
+`KNOWN` entry removes that block before the comparison (it appeared on the
+first PR run, 41718617906, on two regressions and three generated cases).
+`IO.Process.exit` cannot end a page either: it stops the instance with
+"Lean called IO.Process.exit n; an edge isolate cannot exit", which another
+`KNOWN` entry removes when native Lean exited with that n (the first campaign
+found that the message was lost: see [Bugs found](#bugs-found)). A page has no exit status:
+`mount` resolves when `main` returned 0 and rejects otherwise, so the harness
+compares zero against non-zero (`zeroOrNot` in `run.mjs`). Firefox and WebKit
+run without JSPI (Firefox's JSPI is disabled by the loader, WebKit has none), and
+there a blocking wait on a host timer (`IO.sleep`) stops the instance by design
+([BROWSER.md](BROWSER.md#decisions)). They therefore run a third program per
+seed: the core program with every `IO.sleep` removed (`withoutSleep` in
+`generate.mjs`; indices and all other statements kept), and the regressions that
+do not sleep. Browsers skip the regressions that read the environment (a page
+has none). Pull requests run `bun` and `browser-chromium`; campaigns run all
+five. *Catches:* differences in the Bun entry (`bun/main.mjs`) and the browser
+loader, bundle and host (output streams, uncaught errors, panics), and engine
+behaviour of Chromium's V8, Firefox's SpiderMonkey and WebKit's JavaScriptCore
+with a real web host. *Cannot catch:* the exact non-zero exit status in a
+browser; `IO.sleep` in Firefox and WebKit; the DOM, events and `Lasm.Web`
+(browser.yml's suites cover those).
 
 ### Target equivalence
 
@@ -471,7 +518,10 @@ and the run is at most 30 days old. A platform's level is the highest one
 whose requirements, and all lower levels', hold. `null` means no CI job gives
 that kind of evidence for the platform yet.
 - A platform counts the differential results of the build it runs (node, edge
-  or wasi), since differential tests compare the compiled program.
+  or wasi, or its own target: `bun` and the `browser-*` targets, see
+  [Bun and browser targets](#bun-and-browser-targets)), since differential
+  tests compare the compiled program. Browsers have no conformance suite, so
+  their L2 is the differential job alone.
 - Conformance is the platform's own run of an outside suite: the official
   RealWorld API suite, through Conduit.
 
@@ -713,6 +763,9 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Dev-profile campaign 41241443151 | **`lasm build --dev` followed by `lasm build --target wasi --dev` in the same project failed** (also in 0.3.5): the WASI link took the seeded dev link's Node archive members (`*.lasm-member.o`) and `reachability.o` along with the edge runtime's archives, so every host symbol was defined twice. The edge link already dropped them | Fixed in `src/wasi/wasi-link.mjs` (#34); the PR tier now replays the regressions in the dev profile |
 | Dev-profile campaign 41241443151 | `Float.pow` differed in the 17th digit between native (glibc) and Wasm (musl's libm): expected, libm functions are not correctly rounded | Generator: libm results go through `approx` (9 significant digits) |
 | Nightly-style campaign 41241440598 (9,450 cases) | Two "divergences" on every Wasm target were the harness's own: it decoded each pipe chunk of the oracle's output separately, so a UTF-8 character split by native Lean's 4,096-byte writes became U+FFFD (the Wasm targets wrote it whole). `scripts/ci/lasm-js-stress.mjs` had the same pattern | Harness fix (#33) |
+| Browser differential, first campaign (41718626550, `IO.Process.exit 7` ending, all three browsers) | **`IO.Process.exit` in an isolate stopped the instance with "unreachable"** (Firefox: "unreachable executed", WebKit: "Unreachable code should not be executed") instead of the host's refusal: the runtime traps right after the exit call (`runtime/node-io.cpp`), and the trap, not the refusal, became the stop cause. Affects the browser and every edge isolate (Workers and the other edge platforms); Bun and Deno exit | Fixed in `src/edge/edge-host.mjs` (the refusal is kept as `exitRequested`) and `src/edge/edge-start.mjs` (it is the stop cause and the rejection); regressions in `test/edge-host.test.mjs` and `test/edge-runtime.test.mjs`. The page still cannot exit: a `KNOWN` entry in `run.mjs` (a documented host limit) |
+| Browser differential, first PR run (41718617906) | A panic in a page prints a JavaScript backtrace: a page has no environment, so `LEAN_BACKTRACE=0` cannot be set. Documented behaviour ([EDGE.md](EDGE.md#environment-variables)), not a bug | `KNOWN` entry in `run.mjs` |
+| Nightly campaigns since 2026-11-02 (`deno-O0`), the first `bun-O0` campaign (41729836793) | `deep` cases of 3,000 frames stopped the unoptimized edge builds with "memory access out of bounds" (Bun: "Out of bounds memory access"), cutting off every later case: clang `-O0` keeps every local on the edge link's 1 MiB C stack (`src/edge/edge-link.mjs`), which those frames overflow. A capacity limit of unoptimized code, not an optimizer difference. The optimized edge builds pass 5,000 | Harness: the edge `-O0` targets run the core program with `deep` cases of at most 1,000 frames (`withDeepAtMost`, program `shallow`). Reported: a C-stack overflow on the edge reads "memory access out of bounds", not native Lean's "Stack overflow detected" |
 | Test-quality audit | `candidate-readme.test.mjs` broke on `main` when the README's headings changed (PR #22), failing `installer-faults.yml` on every PR | Fixed in #25 |
 | Host bridge model (proxied work in a synchronous callback) | **A synchronous Lasm.JS callback that made the program's first asynchronous runtime request (a timer, socket, DNS lookup) hung for good.** The request starts the completion thread; `pthread_create` on a Lean thread is proxied synchronously to Node's main thread, which waited in `syncFunction` on the doorbell and never ran proxied work. Found while modelling the lazy completion thread, then reproduced (0.3.5) | Fixed: the wait runs the main thread's mailbox (`serveMailbox`, Emscripten's `_emscripten_check_mailbox`) whenever it times out, every 10 ms; regression in `test/node-js.test.mjs` and part 4 of `test/fixtures/js-callbacks`; the model's mutation keeps the old wait |
 | Host bridge model (host calls of work proxied to the synchronous-callback thread) | **A host call made by work proxied to the synchronous-callback thread while it waited in a host call hung the callback**: it uses the thread's next-depth slot, which Node's main thread (waiting in the callback) neither served nor knew, since that slot's registration message waits for the event loop. Found by extending the model; no real program is known to trigger it (the work is Emscripten's dynamic-library synchronization) | Fixed: each slot links the next depth's, and inline serving follows the links; regression in `test/full-host-rpc-channel.test.mjs`; the model's mutation keeps the old serving |
