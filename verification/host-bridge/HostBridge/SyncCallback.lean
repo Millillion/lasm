@@ -20,8 +20,15 @@ callbacks, step for step as implemented:
   next-depth slot (`seq1`, `ready1`), linked from the first slot, which the
   main thread serves inline too;
 * a callback that waits for a JavaScript promise: the request fails at once
-  (src/node-js.mjs, `syncAwaitFailure`), as the promise could settle only in an
-  event-loop task, after the callback.
+  (src/node-js.mjs, `syncWaitText`), as the promise could settle only in an
+  event-loop task, after the callback;
+* a callback that waits for a Lean task (`sync_wait` in lasm_js.c, which polls
+  the channel's `wait` word): the task runs on another Lean thread, which either
+  finishes by itself or makes a host call that only the asynchronous server (the
+  event loop) answers. When a wait times out, the main thread looks at the wait
+  list (`stuckWait` in src/node-js.mjs): if the callback waits and every other
+  Lean thread is listed as waiting, twice in a row, it asks the wait to stop
+  (`wait := 2`), and the callback ends with a failure.
 
 Every step is one access to a shared word (or one decision of a thread on
 values it has already read). A waiting thread may also wake spuriously and,
@@ -57,6 +64,12 @@ structure Config where
   /-- Callbacks during whose first host call work proxied to the Lean thread
   (dynamic-library synchronization) makes a host call at the next depth. -/
   nested : Array Bool := #[]
+  /-- Callbacks that wait for a Lean task whose thread makes a host call (which
+  only the event loop answers): the wait must be stopped. -/
+  taskWaits : Array Bool := #[]
+  /-- Callbacks that wait for a Lean task that finishes by itself: the wait must
+  not be stopped. -/
+  pureWaits : Array Bool := #[]
   /-- Conformance mode: an unbounded workload, chosen by the recorded trace. -/
   trace : Bool := false
   -- Mutations (the shipped code has the defaults).
@@ -75,6 +88,10 @@ structure Config where
   awaitFails : Bool := true
   /-- Before this change: inline serving covered only the first slot. -/
   serveNested : Bool := true
+  /-- Before this change: a task wait inside a callback was never stopped. -/
+  stopsStuckWaits : Bool := true
+  /-- A wait is stopped without checking that every other thread waits. -/
+  stopAnyWait : Bool := false
   deriving Repr
 
 inductive MPc where
@@ -84,13 +101,19 @@ inductive MPc where
   | ss (k : Nat) (afterTimeout : Bool)
   /-- `lasmFullServeSync` on the next-depth slot. -/
   | sn (k : Nat) (afterTimeout : Bool)
-  | mailbox | reread | finish
+  | mailbox
+  /-- `stuckWait`: looks at the callback's task wait and the wait list. -/
+  | check
+  | reread | finish
   deriving BEq, Hashable, Repr, Inhabited
 
 inductive SPc where
   | free | exch (k : Nat) | exBlocked
   | loop | stWait (v : Nat) | stBlocked (v : Nat)
-  | body | proxyWait | promiseWait | post (k : Nat) | stop
+  | body | proxyWait | promiseWait
+  /-- `sync_wait`: polls the task and the channel's `wait` word. -/
+  | taskWait
+  | post (k : Nat) | stop
   deriving BEq, Hashable, Repr, Inhabited
 
 /-- The host's asynchronous server of the slot (`lasmFullServe`). -/
@@ -157,6 +180,17 @@ structure St where
   sAwaitCall : Bool := false
   /-- 1: the callback waits for a promise an event-loop task settles; 2: settled. -/
   promise : Nat := 0
+  /-- The channel's `wait` word: 0 none, 1 the callback waits for a task, 2 stop asked. -/
+  wait : Nat := 0
+  /-- The thread running the task: 0 none, 1 runs, 2 waits in a host call
+  (listed), 3 the task is done. -/
+  wpc : Nat := 0
+  /-- The main thread's previous look found every other thread waiting. -/
+  seen : Bool := false
+  sTaskWaited : Bool := false
+  /-- The callback's result is a failure (a stopped wait). -/
+  sFail : Bool := false
+  stopped : Nat := 0
   bad : String := ""
   deriving BEq, Hashable, Repr, Inhabited
 
@@ -219,6 +253,8 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
   | .idle =>
     if s.promise == 1 then
       out := out.push (m "an event-loop task settles the promise (the poller resolves it)" "" { s with promise := 2 })
+    if s.wpc == 2 then
+      out := out.push (m "the asynchronous server answers the task's host call" "" { s with wpc := 1 })
     match s.asrv1 with
     | .unreg =>
       if s.announced1 then out := out.push (m "registers the next-depth slot (lasmFullHostSlot)" "" { s with asrv1 := .load })
@@ -268,9 +304,9 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
     | 2 => out := out.push (m "posts the call: state = 1" "main store state 1" { s with state := 1, mpc := after })
     | _ => out := out.push (m "notifies state" "main notify state" { wakeState s with mpc := after })
   | .loadState =>
-    if s.state == 2 then
+    if s.state == 2 || s.state == 3 then
       let t := if s.resultFor != s.cbStarted then { s with bad := s!"callback {s.cbStarted} returned the result of callback {s.resultFor}" } else s
-      out := out.push (m "reads state = 2: the result" "main load state 2" { t with mpc := .finish })
+      out := out.push (m s!"reads state = {s.state}: the result" s!"main load state {s.state}" { t with mpc := .finish })
     else out := out.push (m s!"reads state = {s.state}" s!"main load state {s.state}" { s with mpc := .loadSeq })
   | .loadSeq =>
     let v := s.seq
@@ -302,9 +338,21 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
   | .sn 1 afterTimeout => out := out.push (m "serveSync stores ready1 = 1" "main store ready1 1" { s with ready1 := 1, mpc := .sn 2 afterTimeout })
   | .sn _ afterTimeout => out := out.push (m "serveSync notifies ready1" "main notify ready1" { wakeReady1 s with mpc := retOf c afterTimeout })
   | .mailbox =>
-    out := out.push (m (if s.proxyPending then "runs proxied work" else "checks the mailbox") "" { s with proxyPending := false, mpc := .reread })
+    out := out.push (m (if s.proxyPending then "runs proxied work" else "checks the mailbox") "" { s with proxyPending := false, mpc := if c.stopsStuckWaits then .check else .reread })
+  | .check =>
+    -- Every other Lean thread waits: the task's thread in a host call (listed).
+    let stuck := s.wait == 1 && (c.stopAnyWait || s.wpc == 2)
+    if stuck && (s.seen || c.stopAnyWait) then
+      out := out.push (m "looks again: still every thread waits; wait := 2 (stop), notifies" "" { s with wait := 2, seen := false, mpc := .reread })
+    else out := out.push (m (if stuck then "looks: every thread waits" else "looks: the callback does not wait, or a thread runs") "" { s with seen := stuck, mpc := .reread })
   | .reread => out := out.push (m s!"reads bell = {s.bell}" s!"main load bell {s.bell}" { s with bellL := s.bell, mpc := .loadState })
   | .finish => out := out.push (m "state = 0, returns the result" "main store state 0" { s with state := 0, cbDone := s.cbDone + 1, mpc := .idle })
+  -- ---- the thread running a task the callback waits for ----
+  if s.wpc == 1 then
+    let k := s.sCb
+    if c.taskWaits.getD k false && !s.sTaskWaited then
+      out := out.push { label := "task thread: makes a host call and waits for the reply (listed)", group := 2, dst := { s with wpc := 2 } }
+    else out := out.push { label := "task thread: finishes the task", group := 2, dst := { s with wpc := 3 } }
   -- ---- the Lean thread ----
   -- Work proxied to it runs when a futex wait inside a callback's host call wakes:
   -- a host call at the next depth, then back to the wait's caller.
@@ -365,7 +413,7 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
     if s.phase == 2 && (c.trace || (c.nested.getD s.sCb false && !s.sNested)) then
       out := out.push (l "wakes to run work proxied to it, which makes a host call" "" { s with tpc := 1, sNested := true })
   | .loop =>
-    if s.state == 1 then out := out.push (l "reads state = 1: runs the callback" "" { s with spc := .body, sCalls := 0, sProxied := false, sNested := false, sAwaited := false })
+    if s.state == 1 then out := out.push (l "reads state = 1: runs the callback" "" { s with spc := .body, sCalls := 0, sProxied := false, sNested := false, sAwaited := false, sTaskWaited := false })
     else out := out.push (l s!"reads state = {s.state}" "" { s with spc := .stWait s.state })
   | .stWait v =>
     if s.state != v then out := out.push (l s!"futex_wait(state, {v}): not-equal" "" { s with spc := .loop })
@@ -384,20 +432,31 @@ def next (c : Config) (s : St) : Array (Edge St) := Id.run do
         out := out.push (l "waits for work proxied to the main thread (pthread_create)" "" { s with proxyPending := true, sProxied := true, spc := .proxyWait })
       else if c.awaits.getD k false && !s.sAwaited then
         out := out.push (l "waits for a JavaScript promise: a host call" "" { beginCall s 2 with sAwaitCall := true })
+      else if (c.taskWaits.getD k false || c.pureWaits.getD k false) && !s.sTaskWaited && s.wpc != 1 && s.wpc != 2 then
+        out := out.push (l "waits for a Lean task (sync_wait): wait := 1" "" { s with wpc := 1, wait := 1, spc := .taskWait })
       else if s.sCalls < c.calls.getD k 0 then out := out.push (l "makes a host call" "" (beginCall s 2))
       else out := out.push (l "posts the result" "" { s with spc := .post 0 })
   | .proxyWait =>
     if !s.proxyPending then out := out.push (l "the proxied work is done" "" { s with spc := .body })
   | .promiseWait =>
     if s.promise == 2 then out := out.push (l "the promise settled: continues" "" { s with promise := 0, spc := .body })
-  | .post 0 => out := out.push (l "state = 2 (result)" "" { s with state := 2, resultFor := s.sCb + 1, spc := .post 1 })
+  | .taskWait =>
+    if s.wpc == 3 then
+      out := out.push (l "the task finished: wait := 0, continues" "" { s with wait := 0, sTaskWaited := true, spc := .body })
+    else if s.wait == 2 then
+      let t := if c.pureWaits.getD s.sCb false then { s with bad := s!"callback {s.sCb + 1}: a wait for a task that finishes by itself was stopped" } else s
+      out := out.push (l "stop asked: wait := 0, the callback fails (stopped)" "" { t with wait := 0, sTaskWaited := true, sFail := true, stopped := s.stopped + 1, spc := .post 0 })
+  | .post 0 =>
+    out := out.push (l (if s.sFail then "state = 3 (failure)" else "state = 2 (result)") "" { s with state := if s.sFail then 3 else 2, sFail := false, resultFor := s.sCb + 1, spc := .post 1 })
+    -- Recorded traces: a callback may also fail (a Lean error or a stopped wait).
+    if c.trace && !s.sFail then out := out.push (l "state = 3 (failure)" "" { s with state := 3, resultFor := s.sCb + 1, spc := .post 1 })
   | .post 1 => out := out.push (l s!"bell += 1 (was {s.bell})" "" { s with bell := s.bell + 1, spc := .post 2 })
   | .post _ => out := out.push (l "wakes bell" "" { wakeBell s with sCb := s.sCb + 1, spc := .loop })
   | .stop => pure ()
   return out
 
 def goal (c : Config) (s : St) : Bool :=
-  s.mpc == .idle && s.freeLeft == 0 && s.tpc == 0 && s.asrv1.quiescent &&
+  s.mpc == .idle && s.freeLeft == 0 && s.tpc == 0 && s.asrv1.quiescent && (s.wpc == 0 || s.wpc == 3) &&
   (if c.sync then
     s.setupDone && s.cbDone == callbacks c && s.sCb == callbacks c &&
     (match s.spc with | .loop | .stWait _ | .stBlocked _ => true | _ => false)
@@ -408,6 +467,6 @@ def render (s : St) : String := reprStr s
 def system (c : Config) : System St :=
   { name := c.name, init := initial c, next := next c
     invariant := fun s => if s.bad.isEmpty then none else some s.bad
-    goal := goal c, groupNames := #["Node's main thread", "the Lean thread"], render }
+    goal := goal c, groupNames := #["Node's main thread", "the Lean thread", "the task's thread"], render }
 
 end HostBridge.Sync

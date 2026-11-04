@@ -15,11 +15,20 @@
  *     (lasm_js_spawn_poller, called by src/node-js.mjs);
  *   - the synchronous-callback thread runs Lean functions that JavaScript calls
  *     synchronously, while Node's main thread waits (op 211 channel).
+ *
+ * Waits inside synchronous callbacks: the link wraps Lean's task waits and
+ * Emscripten's futex wait in these programs (src/application-link.mjs
+ * lasmJsLinkFlags). A task wait on the callback's thread polls instead of
+ * blocking, and every other thread's indefinite wait is listed in `waits`, so
+ * Node's main thread can see when every Lean thread waits, which no thread can
+ * end while the main thread waits for the callback: it then stops the callback
+ * with an error (src/node-js.mjs syncFunction).
  */
 #include <lean/lean.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <pthread.h>
+#include <setjmp.h>
 
 void *malloc(size_t size);
 void free(void *pointer);
@@ -32,6 +41,10 @@ extern void lasm_node_release(uint32_t handle);
 extern void *lasm_js_sync_setup(void *doorbell);
 extern int emscripten_futex_wait(volatile void *address, uint32_t value, double maxWaitMilliseconds);
 extern int emscripten_futex_wake(volatile void *address, int count);
+extern int __real_emscripten_futex_wait(volatile void *address, uint32_t value, double maxWaitMilliseconds);
+extern int emscripten_is_main_browser_thread(void);
+extern lean_object *__real_lean_task_get(lean_object *task);
+extern lean_object *__real_lean_io_wait_any_core(lean_object *tasks);
 extern void lean_initialize_thread(void);
 extern lean_object *lean_io_promise_resolve(lean_object *value, lean_object *promise);
 /* Lasm's runtime (Lean's thread.cpp, patch node-threads): whether the calling
@@ -255,6 +268,11 @@ typedef struct {
     volatile int32_t doorbell;
     uint32_t fn, reserved;
     uint64_t buffer, capacity, length;
+    /* A task wait of the callback (generation << 2 | 0 none, 1 waiting, 2 stop
+       asked by the main thread); whether the failure posted is a stopped wait's;
+       the wait list; this thread (pthread_self). */
+    volatile int32_t wait, stopped;
+    uint64_t waits, thread;
 } channel_t;
 static channel_t *channel;
 static lean_object *sync_dispatcher; /* UInt32 -> ByteArray -> IO (ByteArray × Data) */
@@ -267,15 +285,101 @@ static void post(int32_t state, const uint8_t *data, size_t size) {
         static const char message[] = "The result of a synchronous Lean callback is too large";
         state = 3; data = (const uint8_t *)message; size = sizeof(message) - 1;
     }
-    memcpy((void *)(uintptr_t)channel->buffer, data, size);
+    if (size) memcpy((void *)(uintptr_t)channel->buffer, data, size);
     channel->length = size;
     __atomic_store_n(&channel->state, state, __ATOMIC_SEQ_CST);
     __atomic_add_fetch(&channel->doorbell, 1, __ATOMIC_SEQ_CST);
     emscripten_futex_wake((void *)&channel->doorbell, 1);
 }
+
+/* ---- waits ----
+   Every thread's indefinite futex wait, and every host call's wait for its
+   reply, is listed here while it lasts (pthread_self; 0 is a free entry).
+   `epoch` changes at each wait's start and end. Read by Node's main thread
+   inside a synchronous callback. */
+#define WAIT_SLOTS 256
+typedef struct {
+    volatile int32_t epoch, size;
+    volatile uint64_t threads[WAIT_SLOTS];
+} waits_t;
+static waits_t waits = { 0, WAIT_SLOTS, {0} };
+static int waits_enter(void) {
+    uint64_t thread = (uint64_t)(uintptr_t)pthread_self();
+    __atomic_add_fetch(&waits.epoch, 1, __ATOMIC_SEQ_CST);
+    for (int i = 0, start = (int)((thread >> 4) % WAIT_SLOTS); i < WAIT_SLOTS; i++) {
+        int k = (start + i) % WAIT_SLOTS;
+        uint64_t empty = 0;
+        if (__atomic_compare_exchange_n(&waits.threads[k], &empty, thread, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) return k;
+    }
+    return -1; /* not listed: the thread counts as running */
+}
+static void waits_leave(int k) {
+    if (k >= 0) __atomic_store_n(&waits.threads[k], 0, __ATOMIC_SEQ_CST);
+    __atomic_add_fetch(&waits.epoch, 1, __ATOMIC_SEQ_CST);
+}
+/* Emscripten's futex wait (--wrap): an indefinite wait off Node's main thread
+   is listed. Timed waits (sleeps, polls) end by themselves and are not. */
+int __wrap_emscripten_futex_wait(volatile void *address, uint32_t value, double maxWaitMilliseconds) {
+    if (maxWaitMilliseconds < 1e8 || emscripten_is_main_browser_thread())
+        return __real_emscripten_futex_wait(address, value, maxWaitMilliseconds);
+    int k = waits_enter();
+    int result = __real_emscripten_futex_wait(address, value, maxWaitMilliseconds);
+    waits_leave(k);
+    return result;
+}
+/* One wait of a host call for its reply (scripts/full-lean/host-library.js
+   exchange, which loops until `ready`, the slot's reply word at slot + 4, is set).
+   Exported to JavaScript. */
+void lasm_js_host_wait(volatile int32_t *ready) {
+    int k = waits_enter();
+    if (__atomic_load_n(ready, __ATOMIC_SEQ_CST) == 0) __real_emscripten_futex_wait(ready, 0, __builtin_inf());
+    waits_leave(k);
+}
+
+/* The synchronous-callback thread inside a callback: its task waits poll
+   (sync_wait), so that Node's main thread can stop the callback. */
+static _Thread_local int in_sync_callback;
+static jmp_buf sync_stop;
+static uint32_t wait_generation;
+static int finished(lean_object *task) { return lean_to_task(task)->m_value != NULL; }
+static int any_finished(lean_object *tasks) {
+    for (lean_object *l = tasks; !lean_is_scalar(l); l = lean_ctor_get(l, 1))
+        if (finished(lean_ctor_get(l, 0))) return 1;
+    return 0;
+}
+/* Waits until the task (or one task of the list) finishes, or the main thread,
+   having seen that every other Lean thread waits too, asks it to stop: then the
+   callback ends with a failure (sync_main). */
+static void sync_wait(lean_object *task, lean_object *list) {
+    uint32_t generation = (++wait_generation) << 2;
+    __atomic_store_n(&channel->wait, (int32_t)(generation | 1), __ATOMIC_SEQ_CST);
+    double ms = 0.05;
+    for (;;) {
+        if (task ? finished(task) : any_finished(list)) break;
+        if ((uint32_t)__atomic_load_n(&channel->wait, __ATOMIC_SEQ_CST) == (generation | 2)) {
+            __atomic_store_n(&channel->wait, (int32_t)generation, __ATOMIC_SEQ_CST);
+            longjmp(sync_stop, 1);
+        }
+        __real_emscripten_futex_wait(&channel->wait, generation | 1, ms);
+        if (ms < 2) ms *= 2;
+    }
+    __atomic_store_n(&channel->wait, (int32_t)generation, __ATOMIC_SEQ_CST);
+}
+/* Lean's task waits (--wrap): `Task.get`, `IO.wait` (lean_io_wait calls
+   lean_task_get), `IO.waitAny`. Elsewhere, and for a finished task, unchanged. */
+lean_object *__wrap_lean_task_get(lean_object *task) {
+    if (__builtin_expect(in_sync_callback, 0) && !finished(task)) sync_wait(task, NULL);
+    return __real_lean_task_get(task);
+}
+lean_object *__wrap_lean_io_wait_any_core(lean_object *tasks) {
+    if (__builtin_expect(in_sync_callback, 0) && !any_finished(tasks)) sync_wait(NULL, tasks);
+    return __real_lean_io_wait_any_core(tasks);
+}
+
 static void *sync_main(void *unused) {
     (void)unused;
     lean_initialize_thread();
+    channel->thread = (uint64_t)(uintptr_t)pthread_self();
     void *slot = lasm_js_sync_setup((void *)&channel->doorbell);
     uint64_t registration[2] = { (uint64_t)(uintptr_t)channel, (uint64_t)(uintptr_t)slot };
     reply_t r = host_call(211, 0, 0, (const uint8_t *)registration, sizeof(registration));
@@ -287,7 +391,17 @@ static void *sync_main(void *unused) {
         if (state != 1) { emscripten_futex_wait((void *)&channel->state, (uint32_t)state, 1e9); continue; }
         lean_object *args = bytes_of((const uint8_t *)(uintptr_t)channel->buffer, channel->length);
         lean_inc(sync_dispatcher);
+        if (setjmp(sync_stop)) {
+            /* A wait that cannot finish (sync_wait): the main thread has the
+               reason. What the callback held is leaked. */
+            in_sync_callback = 0;
+            channel->stopped = 1;
+            post(3, NULL, 0);
+            continue;
+        }
+        in_sync_callback = 1;
         lean_object *result = lean_apply_3(sync_dispatcher, lean_box_uint32(channel->fn), args, lean_io_mk_world());
+        in_sync_callback = 0;
         /* The dispatcher answers [0, wire result] or [1, UTF-8 message]. */
         /* (reply, data): `data` (released with `result`, after the main thread
            has read the reply) holds the values the reply's handles refer to. */
@@ -306,6 +420,8 @@ static void *sync_main(void *unused) {
 static void sync_start(void) {
     channel = (channel_t *)malloc(sizeof(channel_t));
     channel->state = 0; channel->doorbell = 0; channel->fn = 0; channel->reserved = 0;
+    channel->wait = 0; channel->stopped = 0; channel->thread = 0;
+    channel->waits = (uint64_t)(uintptr_t)&waits;
     channel->capacity = 1u << 20;
     channel->buffer = (uint64_t)(uintptr_t)malloc(channel->capacity);
     channel->length = 0;

@@ -60,6 +60,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 ## Now (November 2026)
 
 - [x] Conduit: requests isolated on node:sqlite and bun:sqlite (issue #59; reads saw other requests' writes half done).
+- [~] Lasm.JS synchronous callbacks (approved 2026-11-04, for 0.5.0): every wait there that needs Node fails at once instead of never finishing (a task making host calls, `.block`, a timer, DNS lookup or socket read started inside); `Value.toTask` without waiting works.
 
 ### Releases
 - [x] 0.3.6: two Vercel Edge fixes.

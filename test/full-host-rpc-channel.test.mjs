@@ -19,9 +19,12 @@ const rpcSource = library.slice(library.indexOf('  $lasmFullRPC: {') + '  $lasmF
 const workerSource = `
 const { parentPort, workerData } = require('node:worker_threads');
 const vm = require('node:vm');
-const { memory, rpcSource, script } = workerData;
+const { memory, rpcSource, script, listed } = workerData;
 let next = 1024, nestedOnce = false;
-const context = vm.createContext({ ENVIRONMENT_IS_PTHREAD: true, require, process, Atomics, BigInt, Number, Error, TextDecoder, TextEncoder,
+// Programs with Lasm.JS export lasm_js_host_wait (library/c/lasm_js.c): one listed wait for the reply word.
+const hostWaits = [];
+const Module = listed ? { _lasm_js_host_wait: ready => { hostWaits.push(ready); Atomics.wait(new Int32Array(memory), Number(ready) / 4, 0); } } : {};
+const context = vm.createContext({ ENVIRONMENT_IS_PTHREAD: true, require, process, Atomics, BigInt, Number, Error, TextDecoder, TextEncoder, Module, hostWaits,
   HEAP32: new Int32Array(memory), HEAPU32: new Uint32Array(memory), HEAPU64: new BigUint64Array(memory), HEAPU8: new Uint8Array(memory),
   _malloc: size => { const p = next; next += Math.ceil(Number(size) / 16) * 16; return p; },
   _free: () => {}, _pthread_self: () => 77,
@@ -34,14 +37,14 @@ const results = vm.runInContext(script, context);
 parentPort.postMessage({ done: results });
 `;
 
-function run(host, script) {
+function run(host, script, { listed = false } = {}) {
   const memory = new SharedArrayBuffer(4 * 1024 * 1024);
   const Module = { lasmLeanVersion: '4.35.0' };
   const context = { ENVIRONMENT_IS_PTHREAD: false, Module, wasmMemory: { buffer: memory }, Atomics, Int32Array, Uint8Array,
     DataView, BigUint64Array, Buffer, process, lasmFullHost: Promise.resolve(host) };
   runInNewContext(prelude, context);
   return new Promise((resolve, reject) => {
-    const worker = new Worker(workerSource, { eval: true, workerData: { memory, rpcSource, script } });
+    const worker = new Worker(workerSource, { eval: true, workerData: { memory, rpcSource, script, listed } });
     worker.on('message', message => {
       if (message.cmd === 9) Module[message.handler](...message.args);
       else { resolve(message.done); worker.terminate(); }
@@ -108,6 +111,16 @@ test('a call nested inside the wait uses the next depth slot and both get their 
     const outer = read(lasmFullRPC.call('request', 1, 0, 0n, 0, 0));
     [outer, inner, lasmFullRPC.slots.length, lasmFullRPC.depth]`);
   assert.deepEqual(results, ['outer', 'inner', 2, 0]);
+});
+
+test('with Lasm.JS, a call waits for its reply through lasm_js_host_wait (listed), rechecking the reply word', async () => {
+  const host = { request: op => (op === 1 ? { error: false, bytes: Buffer.from('now') }
+    : new Promise(resolve => setTimeout(() => resolve({ error: false, bytes: Buffer.from('later') }), 20))) };
+  const results = await run(host, `
+    const read = r => new TextDecoder().decode(HEAPU8.slice(r.pointer, r.pointer + r.length));
+    const a = read(lasmFullRPC.call('request', 1, 0, 0n, 0, 0)), b = read(lasmFullRPC.call('request', 2, 0, 0n, 0, 0));
+    [a, b, hostWaits.every(ready => typeof ready === 'bigint' && ready === BigInt(lasmFullRPC.slots[0] + 4)), hostWaits.length > 0]`, { listed: true });
+  assert.deepEqual(results, ['now', 'later', true, true]);
 });
 
 test('many sequential calls keep one slot per depth', async () => {
