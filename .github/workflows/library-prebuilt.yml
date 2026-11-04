@@ -1,0 +1,34 @@
+name: library-prebuilt
+# Regenerates library/prebuilt/lean-<version>/ (scripts/build-library-prebuilt.mjs)
+# on a CI runner and uploads it, so a library/ change never compiles Lasm.JS on a
+# maintainer's machine. Push a branch named prebuilt/<anything>, or dispatch, then
+# download the `library-prebuilt` artifact into library/prebuilt/ and commit it.
+on:
+  push:
+    branches: ['prebuilt/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      CI: '1'
+      BROWSER: 'none'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: node scripts/build-library-prebuilt.mjs
+      - run: node --test test/lasm-library-prebuilt.test.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: library-prebuilt
+          path: library/prebuilt
+          retention-days: 7

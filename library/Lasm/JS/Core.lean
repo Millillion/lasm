@@ -535,10 +535,13 @@ def ofFnReply (f : Array Data → Async Function.Reply) : IO Value := do
 
 /-- A JavaScript function that calls `f` synchronously and returns its result.
 Node's main thread waits while `f` runs (about 20 µs per call plus `f`), so the
-event loop is blocked meanwhile. Inside `f`, JavaScript calls and other host
-operations that complete synchronously work; operations that complete
-asynchronously in Lasm's host (Lean file and console IO, sleeping, sockets,
-awaiting promises) fail with an error. -/
+event loop is blocked meanwhile. Inside `f`, JavaScript calls and console output
+work. Waiting for a JavaScript promise, and host operations the host completes
+asynchronously (Lean file IO), fail at once with an error. Waiting for a Lean
+task that makes host calls (including `Async` run with `.block`), or for a
+timer, DNS lookup or socket read started inside `f`, never finishes; starting
+one is fine, since it completes after `f` returns. `f` cannot call another
+synchronous callback (docs/JS_BINDINGS.md). -/
 def ofSyncFn (f : Array Data → IO Data) : IO Value := do
   ensureStarted
   startSync syncDispatch

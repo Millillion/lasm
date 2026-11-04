@@ -270,6 +270,6 @@ def view (m : Model) : Html Msg :=
       on "click" (selection.map fun (a, b) => Msg.select a b)] []]
 
 def subscriptions (_ : Model) : Subs Msg :=
-  Subs.onWindow "online" (Decoder.succeed .online)
+  Subs.on .window "online" (Decoder.succeed .online)
 
 end Tandem.Ui
