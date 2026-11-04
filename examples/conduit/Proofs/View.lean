@@ -69,7 +69,7 @@ attribute [local simp] Good Lasm.UI.div Lasm.UI.nav Lasm.UI.ul Lasm.UI.li Lasm.U
   Lasm.UI.span Lasm.UI.h1 Lasm.UI.h4 Lasm.UI.p Lasm.UI.button Lasm.UI.text Lasm.UI.keyed Lasm.UI.fieldset Lasm.UI.input
   Lasm.UI.form Lasm.UI.textarea Lasm.UI.hr Lasm.UI.strong Lasm.UI.em Lasm.UI.code Lasm.UI.pre Lasm.UI.ol
   Lasm.UI.blockquote Lasm.UI.node Frontend.link Frontend.iconButton class_ href src alt rel rows type_ name placeholder
-  value disabled aria onClick onInput onSubmit onEnter on preventDefaultOn Attr.onWith
+  value disabled aria onClick onInput onSubmit onEnter on preventDefaultOn Attr.onWith Attr.custom
 
 theorem header_good (m : Model) : Every Good (Frontend.header m) := by
   unfold Frontend.header navItem
