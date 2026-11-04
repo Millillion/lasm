@@ -412,7 +412,7 @@ async function events({ server, name, openPage, expect, report }) {
     expect(name, 'events.stop-target-listeners-run', JSON.stringify(stopSeen) === '["target-capture","target"]', JSON.stringify(stopSeen));
     expect(name, 'events.stop-ancestor-handler-skipped', (await text('#outer-count')) === outerBefore, `${outerBefore} → ${await text('#outer-count')}`);
     await page.click('#inner');
-    await until(() => document.querySelector('#outer-count')?.textContent === String(Number(outerBefore) + 1));
+    await until(want => document.querySelector('#outer-count')?.textContent === want, String(Number(outerBefore) + 1));
     const plainSeen = await page.evaluate(() => window.__stop.splice(0));
     expect(name, 'events.plain-reaches-document', JSON.stringify(plainSeen) === '["target-capture","target","document"]', JSON.stringify(plainSeen));
     // Nested handlers run innermost first, after the target's own listener
