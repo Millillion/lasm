@@ -47,8 +47,9 @@ export function baseEnvironment() {
 // A JavaScript stack frame: "    at fn (file:///x.mjs:1:2)", "    at node:internal/…",
 // "    at async Promise.all (index 0)" and "    at /abs/path.js:3:4".
 const stackFrame = /^\s+at\s+(?:async\s+)?(?:\S+\s+)?\(?(?:file:\/\/|node:|\/|[A-Za-z]:\\|<anonymous>|index \d+)[^\n]*$/m;
-// Node's raw file-system message: "EACCES: permission denied, mkdir '/x/.lake'".
-const rawErrno = /^E[A-Z]{2,}: [a-z][^,\n]*, [a-z]+ '[^'\n]*'/m;
+// Node's raw file-system message: "EACCES: permission denied, mkdir '/x/.lake'",
+// or without a path: "ENOSPC: no space left on device, write".
+const rawErrno = /^E[A-Z]{2,}: [a-z][^,\n]*, [a-z]+(?: '[^'\n]*')?$/m;
 // A C library message with nothing to say where or what to do.
 const bareStrerror = /^(?:Permission denied|No such file or directory|Not a directory|Is a directory|No space left on device|Read-only file system|Operation not permitted|File exists|Disk quota exceeded)\.?$/m;
 const internal = /If this looks like a Lasm bug, please report it/;

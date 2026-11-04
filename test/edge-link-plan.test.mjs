@@ -10,7 +10,7 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { linkEdgeProgram, provisionEdgeLinker, edgeLinkSettings, edgeRecipe, edgeRecipeHas, edgeRecipeMode, asyncifyStackBytes } from '../src/edge/edge-link.mjs';
+import { linkEdgeProgram, withoutIncludePaths, provisionEdgeLinker, edgeLinkSettings, edgeRecipe, edgeRecipeHas, edgeRecipeMode, asyncifyStackBytes } from '../src/edge/edge-link.mjs';
 import { compactInitializerWrappers } from '../src/edge/edge-initializers.mjs';
 import { responseFile } from '../src/platform.mjs';
 import { installTools, wasmObject, archive, temporaryDirectory } from './fixtures/link-stand-ins/toolchain.mjs';
@@ -295,4 +295,25 @@ test('llvm-nm listings are kept for the 512 most recent objects', { skip: !posix
   writeFileSync(join(f.linkWork, 'link.rsp'), responseFile(many.slice(-500)));
   linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'c') });
   assert.equal(f.tools.calls('llvm-nm').length, 0, 'recently listed objects are not listed again');
+});
+
+// Found by the metamorphic determinism relation (scripts/tooling/metamorphic.mjs):
+// dev edge and browser glue named each --pre-js file by its absolute path (the
+// project's work directory, a per-build UUID, the install directory), so two
+// clean dev builds differed and the output carried local paths.
+test('edge glue keeps only the file names of included files', { skip: !posix }, () => {
+  const glue = '// include: /home/u/app/.lake/lasm/applications/k/.build-1b2c/application-pre.js\nModule.a = 1;\n'
+    + '// end include: /home/u/app/.lake/lasm/applications/k/.build-1b2c/application-pre.js\n// include: C:\\npm\\@lasm\\cli\\src\\edge\\edge-pre.js\n'
+    + 'var s = "// include: /not/a/comment.js";\n';
+  const portable = '// include: application-pre.js\nModule.a = 1;\n// end include: application-pre.js\n// include: edge-pre.js\n'
+    + 'var s = "// include: /not/a/comment.js";\n';
+  assert.equal(withoutIncludePaths(glue), portable);
+  // linkEdgeProgram applies it to the glue the link wrote, and leaves glue without paths as it is.
+  const f = fixture(), execute = f.sdk.execute;
+  const write = text => f.sdk.execute = (tool, args, options) => { execute(tool, args, options); if (tool === 'em++') writeFileSync(args[args.indexOf('-o') + 1], text); };
+  write(glue);
+  const result = linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out });
+  assert.equal(readFileSync(result.program, 'utf8'), portable);
+  write(portable);
+  assert.equal(readFileSync(linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'again') }).program, 'utf8'), portable);
 });

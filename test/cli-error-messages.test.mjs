@@ -33,6 +33,8 @@ test('the corpus judge: stack traces, raw errors and bare system messages are pr
   assert.ok(messageProblems("ENOTDIR: not a directory, scandir '/x/Main.lean'").some(p => /raw file-system/.test(p)));
   assert.ok(messageProblems('[lasm] Verifying\nPermission denied\n').some(p => /bare system error/.test(p)));
   assert.ok(messageProblems('').includes('printed nothing'));
+  // Found by fault injection (a full disk during the build): no path at all.
+  assert.ok(messageProblems('ENOSPC: no space left on device, write').some(p => /raw file-system/.test(p)));
   assert.ok(messageProblems('If this looks like a Lasm bug, please report it: https://x').length);
   assert.deepEqual(messageProblems('Main.lean:1:34: error: Unknown identifier `foo`\n[lasm] Build failed. Fix the error above and run the command again.'), []);
   assert.deepEqual(messageProblems('Could not create the directory /p/.lake: permission denied (EACCES). Check that you can write there, or choose another directory.'), []);
@@ -53,6 +55,8 @@ test('raw file-system errors become what, where, why and what to do', async t =>
   assert.equal(describeFileSystemError(Object.assign(new Error('Permission denied'), { code: 'EACCES', path: '/x/dist.lasm-output.lock', syscall: 'open' })),
     'Could not open /x/dist.lasm-output.lock: permission denied (EACCES). Check that you can write there, or choose another directory.');
   assert.match(describeFileSystemError(Object.assign(new Error('No space left on device'), { code: 'ENOSPC' })), /^A file operation failed: no space left on device \(ENOSPC\)\. The disk is full/);
+  assert.equal(describeFileSystemError(Object.assign(new Error('ENOSPC: no space left on device, write'), { code: 'ENOSPC', syscall: 'write' })),
+    'A file operation failed: no space left on device (ENOSPC). The disk is full; free some space and run the command again.');
   // Errors Lasm already explains, other codes and internal errors are left alone.
   assert.equal(describeFileSystemError(Object.assign(new Error('Insufficient free space for the 10-byte tool archive; 1 bytes available at /c.'), { code: 'ENOSPC' })), undefined);
   assert.equal(describeFileSystemError(Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' })), undefined);

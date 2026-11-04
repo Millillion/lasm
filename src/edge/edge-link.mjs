@@ -170,7 +170,21 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
     if (!optimize) throw new Error('The edge dev profile needs the Node link driver');
     sdk.execute('em++', args, { stdio, env, timeout: 3_600_000, maxBuffer: 64 << 20 });
   }
-  return { program: join(out, 'program.mjs'), wasm: join(out, 'program.wasm'), usesJs, suspend, driver };
+  // Unminified (dev) glue names each --pre-js file by its absolute path, which
+  // holds the per-build work directory and the user's home directory: keep the
+  // file name only, so dev builds are reproducible and carry no local paths.
+  const glueFile = join(out, 'program.mjs');
+  if (existsSync(glueFile)) {
+    const text = readFileSync(glueFile, 'utf8'), portable = withoutIncludePaths(text);
+    if (portable !== text) writeFileSync(glueFile, portable);
+  }
+  return { program: glueFile, wasm: join(out, 'program.wasm'), usesJs, suspend, driver };
+}
+
+/** Emscripten's "// include: /abs/dir/file.js" (and "// end include: …")
+ * comments, with the file name only. */
+export function withoutIncludePaths(text) {
+  return text.replace(/^(\/\/ (?:end )?include: )(.+)$/gm, (_, prefix, path) => prefix + path.split(/[\\/]/).pop());
 }
 
 /** The tools the edge link needs. With an edge runtime that carries the
