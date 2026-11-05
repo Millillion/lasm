@@ -526,7 +526,7 @@ that kind of evidence for the platform yet.
   RealWorld API suite, through Conduit.
 
 The script rewrites only the region of README.md between the
-`evidence-levels` markers: the table's Evidence column and the legend under it.
+`evidence-levels` markers: the table's How well tested column and the legend under it.
 Every other cell stays as written. [`evidence-levels.yml`](../.github/workflows/evidence-levels.yml)
 runs it every night (08:23 UTC). When a level moved, it opens a pull request
 with that change, as `image-pins.yml` does for image digests. Its artifact

@@ -9,6 +9,9 @@ import { createEdgeRuntimeHost } from './edge-host.mjs';
 export const edgeStackBytes = 1 << 20;
 // How close to the end of the stack a stop still counts as its overflow.
 const stackMargin = 4096;
+// Where the stack-overflow message points (docs/EDGE.md's C stack item).
+const stackDocs = 'https://github.com/Millillion/lasm/blob/main/docs/EDGE.md#stack';
+
 /**
  * A trap with Lean's C stack pointer at or beyond the end of its stack (stack:
  * edge-pre.js stoppedStack) is a C-stack overflow. Nothing guards the stack in
@@ -19,7 +22,7 @@ export function stackOverflowCause(error, stack, size = edgeStackBytes) {
   if (!stack || typeof stack.top !== 'number' || typeof stack.pointer !== 'number') return undefined;
   // Unsigned: a pointer that went below address 0 wrapped to the top of memory.
   if ((stack.top - stack.pointer) >>> 0 < size - stackMargin) return undefined;
-  return new Error(`Stack overflow detected: Lean exhausted the edge profile's ${size / 1048576} MiB C stack (WebAssembly linear memory)`, { cause: error });
+  return new Error(`Stack overflow: the program used all of its ${size / 1048576} MiB C stack (deep recursion?). See ${stackDocs}`, { cause: error });
 }
 
 /**
