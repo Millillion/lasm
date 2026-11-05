@@ -156,6 +156,17 @@
       ]
     },
     {
+      "slug": "release-0-5-0",
+      "title": "Lasm 0.5.0",
+      "description": "A breaking release.",
+      "date": "2026-11-05",
+      "kind": "release",
+      "path": "docs/release/0.5.0-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.5.0"
+      ]
+    },
+    {
       "slug": "release-0-4-1",
       "title": "Lasm 0.4.1",
       "description": "A bug-fix release.",
