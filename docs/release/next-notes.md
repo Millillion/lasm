@@ -12,6 +12,14 @@ Notes for the next release, collected as changes land. They move to
   - If you ran or packaged the `dist/` that a platform build wrote, build it explicitly: `lasm build Main.lean --target node` (or `lasm build Main.lean` under Node).
   - Delete a stale Node build left at a platform `--output`; Lasm refuses to replace it and says so.
 
-## Fixes
+## Changes
 
-- **Edge and browser: a C-stack overflow is reported as one.** When a program exhausts the edge build's 1 MiB C stack (for example deep recursion with large frames), the instance now stops with "Stack overflow detected: Lean exhausted the edge profile's 1 MiB C stack (WebAssembly linear memory)" instead of "memory access out of bounds". The original trap is the error's `cause`. Other traps are unchanged, and there is no cost per call (#115).
+- **Edge and browser: a shorter stack-overflow message.** A C-stack overflow on the edge (#115) now stops with "Stack overflow: the program used all of its 1 MiB C stack (deep recursion?). See https://github.com/Millillion/lasm/blob/main/docs/EDGE.md#stack". The original trap is still the error's `cause`.
+
+## Documentation
+
+- **Bun, Deno and the edge: long `Async` loops.** An `Async` loop (a recursion, `for`, `List.mapM`) of steps that complete at once overflows the JavaScript stack with `RangeError: Maximum call stack size exceeded`. Such steps are synchronous host calls, `IO` actions and `pure` values. The limit is about 2,000 steps on Deno and Workers and 8,000 on Bun; Node has no such limit. Awaited host calls are not affected. The limit and the workaround (`Std.Async.sleep 0` every 100 steps, or fewer host calls) are now documented in docs/BUN_DENO.md, docs/EDGE.md and FUNDAMENTAL_LIMITATIONS.md (#90).
+
+## Testing (no change to how programs build or run)
+
+- **Async loop depth in CI.** The new `async-depth` job (`differential.yml`, `scripts/ci/async-depth.mjs`) measures the deepest `Async` loop on Node, Deno, Bun and workerd for each kind of step. It fails if a limit drops below half its measured value, or if the `Std.Async.sleep 0` workaround stops completing 100,000 steps (#90).

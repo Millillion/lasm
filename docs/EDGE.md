@@ -339,10 +339,10 @@ empty.
 - **Recursion depth** is bounded by the engine's Wasm stack, not by Lean's 64 MiB
   stack: just under 10,000 frames of a small function (table above). Workers
   cannot raise it.
-- **The C stack is 1 MiB** (in linear memory, `src/edge/edge-link.mjs`). Code
+- <a id="stack"></a>**The C stack is 1 MiB** (in linear memory, `src/edge/edge-link.mjs`). Code
   with large frames (unoptimized code keeps every local there) can exhaust it
   before the engine's stack. The instance then stops with
-  `Stack overflow detected: Lean exhausted the edge profile's 1 MiB C stack (WebAssembly linear memory)`
+  `Stack overflow: the program used all of its 1 MiB C stack (deep recursion?). See …/docs/EDGE.md#stack`
   instead of the trap that follows the overflow (usually "memory access out of
   bounds"). It is recognised from the stack pointer after the trap, at no cost
   per call.
@@ -569,6 +569,68 @@ Free limit, and under Vercel Edge's 1 MB-gzip Hobby limit. The Node profile's
 | `IO.println`/`eprintln` (lines to `console`), `IO.getEnv` (string bindings; the C runtime's `getenv`, which reads `LEAN_BACKTRACE` and `LEAN_ABORT_ON_PANIC`, sees the same variables: see [Environment variables](#environment-variables)), clocks, `IO.getRandomBytes` | Random bytes during startup on Workers are not cryptographic, and only for initializers | `IO.Process.exit`, `IO.appPath`, `IO.currentDir` (fixed values) |
 | `Lasm.JS`: values, calls, `Async` callbacks (`ofFn`, `ofFnReply`), `callAwait` in `Async`, typed bindings, `globalThis` | `require` and bindings resolve only modules the build imported statically | Native C (`extern_lib`) needing threads or POSIX; `import Lean` elaboration at run time (as on Node) |
 | Errors: Lean errors reject JS promises; stack exhaustion stops the instance cleanly | Synchronous callbacks (`ofSyncFn`) cannot wait | |
+
+An `Async` loop of steps that complete at once (synchronous host calls, `IO`,
+`pure`) nests on the JavaScript stack: about 2,000 steps on Deno and Workers,
+8,000 on Bun. See [Async loops](#async-loops-of-steps-that-complete-at-once-issue-90).
+
+### Async loops of steps that complete at once (issue #90)
+
+**Symptom.** On Bun, Deno and the edge targets, a loop in `Async` (a recursion,
+`for`, `List.mapM`) of a few thousand steps fails with `RangeError: Maximum call
+stack size exceeded`. The same loop works on Node. A Lasm.Fetch handler answers
+it with status 500 unless it catches the error.
+
+**Cause.** When a step's value is already there, `Async`'s bind runs the next
+step at once on the same JavaScript stack. On the portable runtime Lean shares
+the engine's single stack, so N such steps nest about N levels of calls. A step
+that really waits resumes later from an empty stack, so it ends the nesting.
+That includes an awaited host call, even of a value that is not a promise, and
+`Std.Async.sleep`. Node runs each Lean thread on its own 1 GiB stack.
+
+**Measured** (`scripts/ci/async-depth.mjs`, the `async-depth` job of
+`differential.yml`, run 41846096224, Linux x64, 2026-11-04). This is the deepest
+loop of N steps in one Lasm.Fetch request:
+
+| Step | Node | Deno 2.9.6 | Bun 1.4.4 | Workers (workerd, `wrangler dev` 4.152.0) |
+| --- | --- | --- | --- | --- |
+| `o.callMethod …` (a synchronous host call) | ≥ 100,000 | 2,001 | 8,099 | 1,855 |
+| An `IO` action, or `pure` | ≥ 100,000 | 2,001 | 8,099 | 1,855 |
+| `o.callMethodAwait …` of a promise, or of a plain value | ≥ 100,000 | ≥ 100,000 | ≥ 100,000 | ≥ 100,000 |
+
+CI fails if a limit drops below about half these values, or if an awaited loop
+stops reaching 100,000. Tandem hit this with synchronous `bun:sqlite` and
+`node:sqlite` queries on Bun and Deno, and with D1's synchronous
+`prepare(…).bind(…)` on Workers.
+
+**Workaround.** Yield to the event loop every K steps with `Std.Async.sleep 0`,
+where K is well under the limit (100 in CI). With that, 100,000 steps of every
+kind above pass on all four engines. `IO.sleep 0` does not help: it waits on
+the same stack.
+
+```lean
+-- Fails past about 2,000 statements on Deno and Workers.
+def runAll (db : Lasm.JS.Value) : List String → Async Unit
+  | [] => pure ()
+  | sql :: rest => do
+    let _ ← db.callMethod "exec" #[.string sql] Lasm.JS.Data
+    runAll db rest
+
+-- Any length: every 100th step waits on a timer, from an empty stack.
+def runAll' (db : Lasm.JS.Value) (i : Nat := 0) : List String → Async Unit
+  | [] => pure ()
+  | sql :: rest => do
+    let _ ← db.callMethod "exec" #[.string sql] Lasm.JS.Data
+    if i % 100 == 99 then Std.Async.sleep 0
+    runAll' db (i + 1) rest
+```
+
+You can also take the loop out of `Async`. Batch the work into fewer host calls,
+and run pure work as pure, tail-recursive functions. Tandem does both
+(`examples/tandem`, commits 4a2dbad2 and 386b5016): one query per 90 operations,
+and rows decoded with `List.map` instead of `List.mapM`. A loop in `IO` does not
+nest like this.
+
 
 ## API plan: `Lasm.JS` stays source-compatible
 

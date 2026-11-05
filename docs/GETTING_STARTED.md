@@ -6,9 +6,6 @@ deploys the server in a container. Every command and every file below is complet
 copy them as they are. CI runs these exact steps on Linux, macOS and Windows
 ([`scripts/templates/run-templates.mjs`](../scripts/templates/run-templates.mjs)).
 
-**Status.** `@lasm/cli` and `@lasm/create` are on npm (0.1.0 and 0.2.0). Every
-command below works with the published release unless it is marked **0.3.0**:
-those parts are in the `launch` branch source and ship with the next release.
 This guide builds a Node server; for the other kinds of app, see
 [other starting points](#other-starting-points) at the end.
 
@@ -41,8 +38,7 @@ asks for one and for a template on an interactive terminal.
 `npm run dev` runs `lasm dev Main.lean`: it builds the program, starts it, and
 rebuilds and restarts the server about 2 s after each save
 ([lasm dev](DEVELOPER_WORKFLOW.md#lasm-dev)); a build error is printed with its file
-and line while the last good server keeps running. (Projects made by 0.1.0 run
-`lasm Main.lean`, which builds and starts once.) The first build on a new machine
+and line while the last good server keeps running. The first build on a new machine
 fetches Lean and Lasm's build tools (about 250–275 MB) and takes a minute or two;
 then it prints `Listening on http://0.0.0.0:3000 (Hono)`. In another terminal:
 

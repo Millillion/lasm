@@ -127,6 +127,44 @@ stop-and-restart):
 | Hono template | 169 ms, 0.62 ms | 160 ms, 0.72 ms | 1.50 MiB |
 | `examples/edge-pure` | 196 ms, 0.82 ms | 172 ms, 0.92 ms | 1.84 MiB |
 
+## Limit: Async loops of steps that complete at once
+
+**Symptom.** A loop in `Async` (a recursion, `for`, `List.mapM`) of a few
+thousand steps that complete at once fails on Bun and Deno with `RangeError:
+Maximum call stack size exceeded`. Node runs the same program. Such steps are
+synchronous host calls (`callMethod`, `bun:sqlite`, `node:sqlite`), `IO`
+actions and `pure` values.
+
+**Cause.** When a step's value is already there, `Async`'s bind runs the next
+step at once on the same stack. Here Lean shares the JavaScript engine's single
+stack, so N such steps nest about N levels of calls. Node gives each Lean
+thread its own 1 GiB stack.
+
+**Measured** (CI run 41846096224, Linux x64, `scripts/ci/async-depth.mjs`):
+
+| Deepest loop | Node | Deno 2.9.6 | Bun 1.4.4 |
+| --- | --- | --- | --- |
+| Synchronous host calls, `IO` or `pure` steps | ≥ 100,000 | 2,001 | 8,099 |
+| Awaited host calls (`callMethodAwait`, of a promise or a plain value) | ≥ 100,000 | ≥ 100,000 | ≥ 100,000 |
+
+**Workaround.** A step that really waits resumes from an empty stack. Call
+`Std.Async.sleep 0` every 100 steps; 100,000 steps then pass on every engine.
+`IO.sleep 0` does not work for this.
+
+```lean
+def runAll (db : Lasm.JS.Value) (i : Nat := 0) : List String → Async Unit
+  | [] => pure ()
+  | sql :: rest => do
+    let _ ← db.callMethod "run" #[.string sql] Lasm.JS.Data
+    if i % 100 == 99 then Std.Async.sleep 0   -- yield to the event loop
+    runAll db (i + 1) rest
+```
+
+Another fix is fewer steps. Batch the work into fewer host calls, and keep pure
+work out of `Async`. Tandem does this in `examples/tandem`, commit 4a2dbad2. The
+edge targets have the same limit. See
+[EDGE.md: Async loops](EDGE.md#async-loops-of-steps-that-complete-at-once-issue-90).
+
 ## Tested in CI
 
 Every push to `phase-7` that touches the compiler runs these on free GitHub
