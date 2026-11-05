@@ -475,3 +475,49 @@ jobs:
             ${{ runner.temp }}/equivalence/*.json
           retention-days: 30
           if-no-files-found: ignore
+  # Async loop depth (issue #90, scripts/ci/async-depth.mjs): the deepest Async
+  # loop of awaited (and synchronous) Lasm.JS host calls on Node, Deno, Bun and
+  # workerd (wrangler dev, offline), held above a floor, and the documented
+  # workaround (Std.Async.sleep 0 every 100 calls) completing 100,000 calls.
+  async-depth:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: differential-packed-candidate
+          path: .work/node-candidate
+      - name: Install the candidate, Deno, Bun and wrangler (local workerd only)
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
+          echo '{"private":true}' > package.json
+          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund deno@2.9.6 bun@1.4.4 wrangler@4.152.0
+      - name: Async loop depth
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          T="$RUNNER_TEMP/tools/node_modules/.bin"
+          node scripts/ci/async-depth.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --work "$RUNNER_TEMP/async-depth" --out "$RUNNER_TEMP/async-depth.json" --targets node,deno,bun,workers \
+            --deno "$T/deno" --bun "$T/bun" --wrangler "$T/wrangler"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: async-depth-${{ github.run_id }}
+          path: ${{ runner.temp }}/async-depth.json
+          retention-days: 30
+          if-no-files-found: ignore
