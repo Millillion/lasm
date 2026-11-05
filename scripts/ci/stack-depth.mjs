@@ -156,7 +156,7 @@ const advice = mib => new RegExp(`^Lasm: a Lean thread exhausted its ${mib} MiB 
   + 'See https://github\\.com/Millillion/lasm/blob/main/FUNDAMENTAL_LIMITATIONS\\.md#recursion-depth\\n$');
 
 // The edge's C-stack overflow (src/edge/edge-start.mjs stackOverflowCause).
-const edgeOverflow = "Stack overflow detected: Lean exhausted the edge profile's 1 MiB C stack (WebAssembly linear memory)";
+const edgeOverflow = "Stack overflow: the program used all of its 1 MiB C stack (deep recursion?). See https://github.com/Millillion/lasm/blob/main/docs/EDGE.md#stack";
 
 const built = new Set();
 for (const target of targets) {

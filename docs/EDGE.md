@@ -328,10 +328,10 @@ empty.
 - **Recursion depth** is bounded by the engine's Wasm stack, not by Lean's 64 MiB
   stack: just under 10,000 frames of a small function (table above). Workers
   cannot raise it.
-- **The C stack is 1 MiB** (in linear memory, `src/edge/edge-link.mjs`). Code
+- <a id="stack"></a>**The C stack is 1 MiB** (in linear memory, `src/edge/edge-link.mjs`). Code
   with large frames (unoptimized code keeps every local there) can exhaust it
   before the engine's stack. The instance then stops with
-  `Stack overflow detected: Lean exhausted the edge profile's 1 MiB C stack (WebAssembly linear memory)`
+  `Stack overflow: the program used all of its 1 MiB C stack (deep recursion?). See …/docs/EDGE.md#stack`
   instead of the trap that follows the overflow (usually "memory access out of
   bounds"). It is recognised from the stack pointer after the trap, at no cost
   per call.

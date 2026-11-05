@@ -275,7 +275,7 @@ test('startLean: IO.Process.exit where nothing can exit stops the instance with 
 test('stackOverflowCause: a stop with the C stack pointer at or past the end of the stack is an overflow', () => {
   assert.equal(edgeStackBytes, edgeLinkSettings.stackMiB << 20);
   const trap = new Error('memory access out of bounds'), top = 5 << 20;
-  const message = "Stack overflow detected: Lean exhausted the edge profile's 1 MiB C stack (WebAssembly linear memory)";
+  const message = "Stack overflow: the program used all of its 1 MiB C stack (deep recursion?). See https://github.com/Millillion/lasm/blob/main/docs/EDGE.md#stack";
   // Past the end (into the data below the stack), within the margin, and wrapped below address 0.
   for (const pointer of [top - edgeStackBytes - 200, top - edgeStackBytes + 100, 2 ** 32 - 64]) {
     const cause = stackOverflowCause(trap, { top, pointer });
@@ -285,13 +285,13 @@ test('stackOverflowCause: a stop with the C stack pointer at or past the end of 
   // Any other trap keeps its own cause.
   for (const stack of [{ top, pointer: top - 1000 }, { top, pointer: top - edgeStackBytes + 8192 }, { top: undefined, pointer: 10 }, null, undefined])
     assert.equal(stackOverflowCause(trap, stack), undefined, JSON.stringify(stack));
-  assert.match(stackOverflowCause(trap, { top: 9 << 20, pointer: 1 << 20 }, 8 << 20).message, /the edge profile's 8 MiB C stack/);
+  assert.match(stackOverflowCause(trap, { top: 9 << 20, pointer: 1 << 20 }, 8 << 20).message, /all of its 8 MiB C stack/);
 });
 
 test('startLean: a C-stack overflow stops the instance with a stack overflow, not the trap that followed', async () => {
   const trap = new Error('memory access out of bounds');
   const wasmModule = new WebAssembly.Module(Uint8Array.of(0, 0x61, 0x73, 0x6d, 1, 0, 0, 0));
-  const message = "Stack overflow detected: Lean exhausted the edge profile's 1 MiB C stack (WebAssembly linear memory)";
+  const message = "Stack overflow: the program used all of its 1 MiB C stack (deep recursion?). See https://github.com/Millillion/lasm/blob/main/docs/EDGE.md#stack";
   const overflowing = program({ mainFails: trap, stoppedStack: { top: 3 << 20, pointer: (2 << 20) - 512 }, onMain: (Module, stop) => stop(trap) });
   const err = [];
   let Module;
