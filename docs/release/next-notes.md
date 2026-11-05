@@ -3,6 +3,15 @@
 Notes for the next release, collected as changes land. They move to
 `docs/release/<version>-notes.md` when the version is cut.
 
+## Breaking changes
+
+- **`--output` names the deployable directory for edge, WASI and browser targets.** `lasm build Main.lean --target workers --output DIR` (likewise `bun`, `deno`, `deno-deploy`, `supabase-edge`, `wasi`, `wasi-http`, `fastly`, `browser`) now writes that target's directory to `DIR`. Without `--output` each target writes its usual directory in the project (`workers/`, `bun/`, `wasi/`, …), and no Node build is written to `dist/`: the Node build these targets relink stays in the build cache. `vercel-edge` and `netlify-edge` refuse `--output`, since the platform fixes their layout. `node` and the function platforms (`lambda`, `vercel`, …) are unchanged.
+
+  Migration:
+  - Drop `--output` from platform builds that used it to move the Node build out of the way (`lasm build Server.lean --target workers --output dist/server` → `lasm build Server.lean --target workers`), or keep it if you want the platform directory there and update your platform config (for example `main` in `wrangler.toml`).
+  - If you ran or packaged the `dist/` that a platform build wrote, build it explicitly: `lasm build Main.lean --target node` (or `lasm build Main.lean` under Node).
+  - Delete a stale Node build left at a platform `--output`; Lasm refuses to replace it and says so.
+
 ## Fixes
 
 - **Lasm.JS: waits inside synchronous callbacks fail at once instead of never finishing.** Inside a `Function.ofSyncFn` callback, waiting for a Lean task that makes host calls (including `Async` run with `.block`), or for a timer, DNS lookup or socket read started in the callback, used to hang the program. It now ends the callback with an error that says what it waited for, as soon as every other Lean thread waits too (JavaScript gets the error; a Lean `try` inside the callback cannot catch it). `Value.await` and the `…Await` forms still fail as errors the callback can catch. A wait for a task that needs nothing from Node still works, and `Value.toTask` without waiting no longer fails: the promise settles after the callback returns. Measured per-call costs (Lean→JS calls, synchronous callbacks, finished-task waits, promise awaits) show no slowdown.

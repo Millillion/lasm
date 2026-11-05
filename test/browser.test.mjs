@@ -127,7 +127,8 @@ test('CLI: --target browser and --suspend', () => {
   const options = parseLasmArguments(['build', 'Main.lean', '--target', 'browser', '--suspend', 'jspi']);
   assert.equal(options.target, 'browser');
   assert.equal(options.suspend, 'jspi');
-  assert.equal(options.output, 'dist');
+  // No default here: the browser writer's default is the project's dist/ (src/browser/browser-build.mjs).
+  assert.equal(options.output, undefined);
   assert.throws(() => parseLasmArguments(['build', 'Main.lean', '--suspend', 'jspi']), /--suspend applies to lasm build --target browser/);
   assert.throws(() => parseLasmArguments(['build', 'Main.lean', '--target', 'browser', '--suspend', 'asyncify']), /--suspend requires one of: none, jspi/);
 });

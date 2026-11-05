@@ -19,7 +19,7 @@ import { bundleModules, compactModule, emscriptenModule } from './bundle.mjs';
 import { builtinModuleClosure, builtinModuleFile, builtinPrefix } from '../edge/builtin-modules.mjs';
 import { edgeModules } from '../edge/edge-build.mjs';
 import { noticeBanner, targetNotices } from '../notices.mjs';
-import { replaceOutputDirectory } from '../output-directory.mjs';
+import { foreignOutputError, replaceOutputDirectory } from '../output-directory.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 const edge = fileURLToPath(new URL('../edge/', import.meta.url));
@@ -119,7 +119,7 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
   if (existsSync(destination) && readdirSync(destination).length) {
     let owned = false;
     try { owned = JSON.parse(readFileSync(join(destination, 'lasm-manifest.json'), 'utf8')).target === 'browser'; } catch { /* not ours */ }
-    if (!owned) throw new Error(`${destination} exists and is not a Lasm browser build; remove it, or choose another --output`);
+    if (!owned) throw foreignOutputError(destination, 'browser');
   }
   const name = browserAppName(projectDirectory);
   const wasmBytes = readFileSync(join(program.directory, 'program.wasm'));

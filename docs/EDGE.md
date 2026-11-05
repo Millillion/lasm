@@ -117,7 +117,18 @@ values through the `env` argument of the fetch handler.
   link sources. An unchanged edge build takes about 3 s instead of about 75 s,
   and a second target reuses the link.
 
-## Phase 7.3 status: Vercel Edge and Netlify Edge
+## Output directories (0.5.0)
+
+Each edge target writes the directory it deploys: `workers/`, `bun/`,
+`deno/` (`deno` and `deno-deploy`) and `supabase/functions/<name>/`.
+`--output DIR` writes it to `DIR` instead. `vercel-edge` (`api/lasm.mjs`,
+`api/_lasm/`) and `netlify-edge` (`netlify/edge-functions/lasm.mjs`,
+`netlify/lasm/`) refuse `--output`, because the platform fixes their layout:
+the entry imports the program by a fixed relative path. The Node build that
+the edge link reuses stays in its build cache entry
+(`.lake/lasm/applications/<source>/<signature>/dist`); nothing is written to
+`dist/`. Before 0.5.0, `--output` with an edge target named that Node build.
+
 
 **In current branch source.** Both use the same program and host as Workers.
 Only the generated entry differs.
