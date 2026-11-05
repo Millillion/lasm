@@ -218,8 +218,7 @@ stopped. Lean runs the handlers on the event's path innermost first; every
 handler of one element runs, and after an element whose handler stops
 propagation the enclosing elements' handlers do not run. `onSubmit` always
 prevents the page load; the other shorthands (`onClick`, `onInput`, `onEnter`,
-`onEscape`, …) never prevent or stop anything. `Attr.onWith event d` is `on`;
-`Attr.custom` is `custom`.
+`onEscape`, …) never prevent or stop anything. `Attr.custom` is `custom`.
 
 The four functions are modeled on Elm's `Html.Events` (`on`, `preventDefaultOn`,
 `stopPropagationOn`, `custom`; Elm is BSD-3-licensed, and only the idea is
@@ -232,6 +231,43 @@ they read the same fields (as `onEnter` and `onEscape` on one input do);
 otherwise the last one's fields are read. Events bubble as in the DOM: a click on a `<b>` inside a `<li onClick>` runs
 the `<li>`'s handler. Non-bubbling events (`focus`, `blur`, `mouseenter`, …)
 reach only their target.
+
+#### Event order
+
+The applier listens on the mount element in the **bubble phase**, as React
+does with its root. When an event reaches the mount element, Lean runs the
+handlers from the target up, innermost first, stopping after an element whose
+handler stops propagation; the applier then calls `stopPropagation()`, so
+listeners above the mount element (on `document`, `window`, the page around the
+app) do not see the event. So, for a click inside the app:
+
+1. capture listeners above and inside the app, then the target's own listeners
+   (capture and bubble), then bubble listeners on the elements between the
+   target and the mount element: all JavaScript listeners, such as a web
+   component's or a widget's;
+2. the Lasm handlers, innermost first;
+3. bubble listeners above the mount element, unless a handler stopped propagation.
+
+The trade-off: every Lasm handler runs after every JavaScript bubble listener
+inside the app, even one on an outer element, and a JavaScript listener
+inside the app that calls `stopPropagation()` keeps the event from every Lasm
+handler. A stop decided in Lean keeps the event from the outer Lasm handlers
+and from the page, but not from JavaScript listeners inside the app.
+
+Events that do not bubble (`event.bubbles` is false: `focus`, `blur`,
+`mouseenter`, `mouseleave`, `pointerenter`, `pointerleave`, `load` and `error`
+on images and scripts, `scroll` on an element, media events such as `play`
+and `ended`, `toggle`, `invalid`, and synthetic events made without
+`bubbles: true`) never reach a bubble listener on the mount element, so the
+applier takes them with a capture listener there: the target's handler runs
+before the target's own listeners. Its `preventDefault` applies; its
+`stopPropagation` is not applied, since a non-bubbling event goes no further
+than its target and stopping it in the capture phase would only keep it from
+the target's own listeners. (`focusin` and `focusout` bubble.)
+
+In an application, links are routed by the mount element's click listener after
+the Lasm handlers: a handler that prevents the default keeps its link from
+being routed; one that only stops propagation does not.
 
 ## Apps
 
@@ -544,7 +580,7 @@ Modules (all in `import Lasm.UI` except the DOM model, `import Lasm.UI.Model`, a
 
 | Module | Contents |
 | --- | --- |
-| `Lasm.UI.Html` | `Html`, `Attr` (`Attr.onWith`, `Attr.custom`), `AttrKey`, `AttrVal`, `Listener`, `Handled`, `Decoder`, `EvVal`, `PropVal`, `Ns`, `Html.keyed`, `Html.map` |
+| `Lasm.UI.Html` | `Html`, `Attr` (`Attr.custom`), `AttrKey`, `AttrVal`, `Listener`, `Handled`, `Decoder`, `EvVal`, `PropVal`, `Ns`, `Html.keyed`, `Html.map` |
 | `Lasm.UI.Elements` | the function DSL: `text`, `node`, `nodeNS`, `keyed`, `empty`, every HTML element (`div`, `span`, `a`, `button`, `input`, `ul`, `li`, `table`, … ; `main_`, `section_`, `map_`, `var_`, `template_`, `slot_`, `object_`, `sub_`), attributes (`attr`, `prop`, `boolProp`, `stringProp`, `style`, `data`, `aria`, `class_`, `classList`, `id_`, `type_`, `for_`, `max_`, `min_`, `value`, `checked`, `selected`, `disabled`, `hidden`, `readonly`, `required`, `multiple`, `autofocus`, `tabindex`, `colspan`, `rowspan`, `width`, `height`, `title`, `placeholder`, `href`, `src`, `alt`, `name`, `target`, `rel`, …), events (`on`, `preventDefaultOn`, `stopPropagationOn`, `custom`, `onClick`, `onDoubleClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseOver`, `onMouseOut`, `onFocus`, `onBlur`, `onInput`, `onChange`, `onCheck`, `onSubmit`, `onKeyDown`, `onKeyUp`, `onEnter`, `onEscape`), `Svg.*` (elements and `viewBox`, `d`, `fill`, `stroke`, `strokeWidth`, `cx`, `cy`, `r`, `x`, `y`, `points`, `transform`, …), `htmlTags`, `voidTags`, `Svg.tags` |
 | `Lasm.UI.Syntax` | `html!` |
 | `Lasm.UI.App` | `App`, `App.sandbox`, `App.element`, `App.run` |

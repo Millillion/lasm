@@ -81,7 +81,6 @@ def chatKeys : Attr Msg :=
 #guard outcome (stopPropagationOn "click" (Decoder.bool ["ctrlKey"] |>.map fun c => (Msg.inc, c))) [.bool false] == some ("inc", false, false)
 #guard outcome (custom "click" (.succeed { message := Msg.inc, preventDefault := true, stopPropagation := true })) [] == some ("inc", true, true)
 #guard outcome (on "click" (.succeed Msg.inc)) [] == some ("inc", false, false)
-#guard outcome (Attr.onWith "click" (.succeed Msg.inc)) [] == some ("inc", false, false)
 -- The shorthands keep their behaviour: onSubmit always prevents; the others never.
 #guard outcome (onSubmit Msg.inc) [] == some ("inc", true, false)
 #guard outcome (onEnter Msg.inc) [.str "Enter"] == some ("inc", false, false)

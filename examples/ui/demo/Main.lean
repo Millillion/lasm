@@ -36,6 +36,7 @@ structure Model where
   letters : List String := ["a", "b", "c", "d", "e"]
   received : String := ""
   count : Nat := 0
+  linkClicks : Nat := 0
   /-- Mounted only to hydrate the counter component. -/
   ssr : Bool := false
 
@@ -56,6 +57,12 @@ inductive Msg where
   | received (s : String)
   | renderSsr
   | inc
+  | linkClicked
+
+/-- A link whose handler stops the click's propagation: the app still routes it
+(only a prevented default keeps a link from being routed). -/
+def onStopLink : Attr Msg :=
+  stopPropagationOn "click" (.succeed (.linkClicked, true))
 
 def counterView (n : Nat) : Html Msg :=
   html! <div id="counter">
@@ -83,6 +90,8 @@ def view (m : Model) : Html Msg :=
   html! <div id="demo">
           <nav>
             <a href="/demo/">Home</a> <a href="/demo/about">About</a>
+            <a id="stop-link" href="/demo/about" {[onStopLink]}>About (stops propagation)</a>
+            <span id="link-clicks">{m.linkClicks}</span>
             <button id="go-item" onClick={Msg.goItem}>Item 7</button>
           </nav>
           <h2 id="page">{pageName m.page}</h2>
@@ -133,6 +142,7 @@ def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
   | .received s => ({ m with received := s }, .none)
   | .renderSsr => (m, Cmd.port "ssr" (.string (render (counterView 0))))
   | .inc => ({ m with count := m.count + 1 }, .none)
+  | .linkClicked => ({ m with linkClicks := m.linkClicks + 1 }, .none)
 
 def subscriptions (m : Model) : Subs Msg :=
   if m.ssr then .none else

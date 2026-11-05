@@ -325,13 +325,18 @@ test('events: Lean decides preventDefault and stopPropagation for each event', (
   assert.deepEqual(seen, ['document']);
 });
 
-test('events: decisions are applied before the dispatch goes on, and a frame only when Lean asks', async () => {
+test('events: Lean runs in the bubble phase at the root, after the listeners below it and before the page above it', async () => {
   const t = withList({ ul: null, li: 0 });
   const order = [];
   t.setAnswer(() => { order.push('lean'); return 2; });
-  t.root.querySelector('#bold').addEventListener('click', event => order.push(`target ${event.defaultPrevented}`));
-  click(t.window, t.root.querySelector('#bold'));
-  assert.deepEqual(order, ['lean', 'target true']);
+  const bold = t.root.querySelector('#bold');
+  bold.addEventListener('click', event => order.push(`target capture ${event.defaultPrevented}`), true);
+  bold.addEventListener('click', event => order.push(`target ${event.defaultPrevented}`));
+  t.root.querySelector('#item').addEventListener('click', () => order.push('ancestor'));
+  t.document.addEventListener('click', event => order.push(`document ${event.defaultPrevented}`));
+  click(t.window, bold);
+  assert.deepEqual(order, ['target capture false', 'target false', 'ancestor', 'lean', 'document true']);
+  order.length = 0;
   assert.equal(t.frames(), 0, 'no frame without bit 1');
   t.setAnswer(3);
   click(t.window, t.root.querySelector('#bold'));
@@ -360,11 +365,63 @@ test('events: nodes the applier did not create are not on the path', () => {
   assert.deepEqual(t.calls[0].path, [1, 2, 3]);
 });
 
-test('events: a handler still runs when a page listener stops the bubbling below the root', () => {
+test('events: a stop decided at the target lets the target\'s own listeners run, not the page above the root', () => {
+  const t = withList({ li: 0, b: 0 });
+  t.setAnswer(4);
+  const seen = [];
+  const bold = t.root.querySelector('#bold');
+  bold.addEventListener('click', () => seen.push('target capture'), true);
+  bold.addEventListener('click', () => seen.push('target'));
+  t.document.addEventListener('click', () => seen.push('document'));
+  t.window.addEventListener('click', () => seen.push('window'));
+  click(t.window, bold);
+  assert.deepEqual(seen, ['target capture', 'target']);
+  assert.equal(t.calls.length, 1);
+});
+
+test('events: a listener below the root that stops the bubbling keeps the event from Lean (as with any root delegation)', () => {
   const t = withList({ li: 0 });
   t.root.querySelector('#bold').addEventListener('click', event => event.stopPropagation());
   click(t.window, t.root.querySelector('#bold'));
+  assert.equal(t.calls.length, 0);
+  // stopPropagation in the root's own capture phase stops it too.
+  const u = withList({ li: 0 });
+  u.root.addEventListener('click', event => event.stopPropagation(), true);
+  click(u.window, u.root.querySelector('#bold'));
+  assert.equal(u.calls.length, 0);
+});
+
+test('events: a non-bubbling event is taken in the capture phase; Lean\'s stop is not applied, preventDefault is', () => {
+  const t = withList({ ul: 0, li: 0, b: 0 });
+  const seen = [];
+  const item = t.root.querySelector('#item');
+  item.addEventListener('click', event => seen.push(`target ${event.defaultPrevented}`));
+  for (const answer of [4, 6]) {
+    t.setAnswer(answer);
+    seen.length = 0;
+    const e = new t.window.MouseEvent('click', { bubbles: false, cancelable: true });
+    item.dispatchEvent(e);
+    assert.deepEqual(seen, [`target ${answer === 6}`], `answer ${answer}`);
+    assert.equal(e.defaultPrevented, answer === 6);
+  }
+  assert.deepEqual(t.calls.map(c => c.cs.filter((_, i) => i % 2 === 0)), [[1], [1]], 'only the target\'s handler');
+  // A bubbling event is taken once, in the bubble phase, not also in the capture phase.
+  t.calls.length = 0;
+  click(t.window, t.root.querySelector('#bold'));
   assert.equal(t.calls.length, 1);
+});
+
+test('events: focus (which does not bubble) reaches the handler on its target', () => {
+  const p = page();
+  const ui = createUi({ root: p.root });
+  const calls = [];
+  ui.module.connect({ event: (path, type) => { calls.push([path, type]); return 4; }, frame: () => new Uint8Array(0) });
+  ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'div', () => 0, [f => f.el(2, 'input', f => (f.on('focus', 0), 1))])).u8);
+  const input = p.root.querySelector('input'), seen = [];
+  input.addEventListener('focus', () => seen.push('target'));
+  input.focus();
+  assert.deepEqual(calls, [[[1, 2], 'focus']]);
+  assert.deepEqual(seen, ['target']);
 });
 
 test('events before connect and after unmount reach nothing and raise nothing', () => {
@@ -741,6 +798,26 @@ test('links: an already-handled click, a link around the root, a text target, an
   const e = click(window, inner.querySelector('#in'));
   assert.equal(e.defaultPrevented, false);
   assert.deepEqual(urls, []);
+});
+
+test('links: routed after Lean\'s handlers; a prevented default is not routed, a stopped propagation is', () => {
+  for (const [answer, routed] of [[0, true], [4, true], [2, false], [6, false]]) {
+    const { root, window, document } = page();
+    const ui = createUi({ root });
+    const urls = [], order = [];
+    ui.module.connect({ url: href => { urls.push(href); order.push('route'); return false; }, event: () => { order.push('lean'); return answer; },
+      frame: () => new Uint8Array(0), application: true });
+    ui.applyForTest(frame().decoder(0, []).insert(0, 0, f => f.el(1, 'a', f => (f.attr('href', '/about'), f.on('click', 0), f.on('mousedown', 0), 3), [f => f.text(2, 'x')])).u8);
+    // Only clicks are routed (a mousedown with the main button is not).
+    root.querySelector('a').dispatchEvent(new window.MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0 }));
+    assert.deepEqual(urls, [], `answer ${answer}: mousedown`);
+    order.length = 0;
+    document.addEventListener('click', event => event.preventDefault());
+    const e = click(window, root.querySelector('a'));
+    assert.deepEqual(urls, routed ? ['https://app.test/about'] : [], `answer ${answer}`);
+    assert.deepEqual(order, routed ? ['lean', 'route'] : ['lean'], `answer ${answer}`);
+    assert.equal(e.defaultPrevented, true);
+  }
 });
 
 test('links and popstate are handled only for applications', async () => {

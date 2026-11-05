@@ -1,8 +1,8 @@
 // lasm:ui-dom — the browser side of Lasm.UI (docs/UI.md, docs/BROWSER.md
 // "Patch protocol"). It applies the binary patches Lean's diff writes
 // (library/Lasm/UI/Encode.lean), keeps the id → node table, delegates events to
-// the mount root (one synchronous call into Lean per event, carrying only the
-// fields each handler's decoder declared), batches renders on animation
+// the mount root in the bubble phase (one synchronous call into Lean per event,
+// carrying only the fields each handler's decoder declared), batches renders on animation
 // frames, adopts server-rendered DOM (hydrate), and performs the commands and
 // subscriptions Lean asks for (library/Lasm/UI/App.lean binds these exports).
 // Each mounted app gets its own instance (lasmInstance); ports and app.send
@@ -16,7 +16,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   const names = [], values = [], decoders = [];
   const listening = new Set();
   const subs = new Map();
-  let lean = null, pending = false, stopped = false, hydrating = hydrate, focusQueue = [];
+  let lean = null, pending = false, stopped = false, hydrating = hydrate, focusQueue = [], routing = false;
   // History changes asked for by Cmd.pushUrl/replaceUrl, made by the next
   // frame: the address bar and the page it shows change in the same task.
   let historyQueue = [];
@@ -206,6 +206,25 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     }
     return out;
   }
+  // Events are delegated to the root in the bubble phase, as the DOM itself
+  // would run handlers on the elements: the target's own listeners and the
+  // app's other (non-Lasm) listeners below the root run first, then Lean runs
+  // every handler from the target up (innermost first, stopping where one
+  // stops propagation), and a stop then keeps the event from the page above
+  // the root. Events that do not bubble (focus, blur, mouseenter, mouseleave,
+  // load, error, scroll on elements, media events, …; `event.bubbles` is
+  // false, which also holds for synthetic events made without `bubbles`)
+  // never reach the root's bubble listener, so a capture listener takes them:
+  // Lean runs the target's handler before the target's own listeners, and a
+  // stop is not applied (it would only keep the event from the target itself;
+  // a non-bubbling event goes no further than its target anyway).
+  // (A non-bubbling event reaches the root's bubble listener only when the
+  // root is its target, where onEvent finds no handler.)
+  function onBubble(event) {
+    onEvent(event);
+    if (routing && event.type === 'click') onLinkClick(event);
+  }
+  function onCapture(event) { if (!event.bubbles) onEvent(event); }
   function onEvent(event) {
     if (stopped || !lean) return;
     const chain = [];
@@ -233,7 +252,8 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     // a frame that is still waiting (an HTTP response arrived this frame) holds
     // the model this input changed, so discrete input renders it now too.
     const answer = lean.event(path, type, calls);
-    decided(event, answer);
+    if (answer & 2) event.preventDefault();
+    if (answer & 4 && event.bubbles) event.stopPropagation();
     if (discrete.has(type) && (answer & 1 || pending) && bytes === null) render();
     else if (answer & 1) schedule();
   }
@@ -247,11 +267,16 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   function listen(type) {
     if (listening.has(type)) return;
     listening.add(type);
-    root.addEventListener(type, onEvent, true);
+    root.addEventListener(type, onBubble);
+    root.addEventListener(type, onCapture, true);
   }
 
   // ---- navigation ----
   const urlChanged = () => { if (lean) after(lean.url(win.location.href)); };
+  // Links are routed by the root's click listener (onBubble), after Lean's
+  // handlers: a handler that prevents the default keeps the link from being
+  // routed, one that only stops propagation does not (routing replaces the
+  // browser's default action, which stopPropagation does not cancel either).
   // A click on a link is discrete user input: like other clicks, its result
   // (the new page) is shown in the same task as the address changes.
   // (As for events: a frame already waiting is rendered now as well.)
@@ -307,7 +332,8 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     connect(callbacks) {
       lean = callbacks;
       if (callbacks.application) {
-        root.addEventListener('click', onLinkClick);
+        routing = true;
+        listen('click');
         win.addEventListener('popstate', urlChanged);
       }
     },
@@ -345,8 +371,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
       stopped = true;
       for (const s of subs.values()) s.stop();
       subs.clear();
-      for (const type of listening) root.removeEventListener(type, onEvent, true);
-      root.removeEventListener('click', onLinkClick);
+      for (const type of listening) { root.removeEventListener(type, onBubble); root.removeEventListener(type, onCapture, true); }
       win.removeEventListener('popstate', urlChanged);
       for (let c = root.firstChild; c; c = c.nextSibling) forget(c);
       doomed = [];
