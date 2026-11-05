@@ -125,46 +125,38 @@ export async function buildEdge(input, target, buildOptions, verbose, { build, l
   const source = resolve(input), projectDirectory = findApplicationProject(source) ?? dirname(source);
   const selection = await selectLeanVersion(source);
   const nodeRuntime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit });
-  // The browser output is --output (default dist/); the Node build it relinks
-  // then goes to a temporary directory.
-  let browserOutput, temporary;
-  if (browser) {
-    const { mkdtemp } = await import('node:fs/promises');
-    const { tmpdir } = await import('node:os');
-    browserOutput = buildOptions.output;
-    temporary = await mkdtemp(join(tmpdir(), 'lasm-browser-'));
-    buildOptions = { ...buildOptions, output: join(temporary, 'dist') };
+  // --output names the platform directory (src/cli-arguments.mjs
+  // platformBuildTargets); the Node build it relinks stays in its cache entry.
+  const { output, ...nodeOptions } = buildOptions;
+  buildOptions = nodeOptions;
+  // A dev build only links the Node program for its inputs: nobody runs its Node output.
+  const linkOnly = buildOptions.profile === 'dev';
+  let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built', linkOnly });
+  const found = await findEdgeProgram({ result, nodeRuntime, suspend });
+  let program = found.cached;
+  if (program && result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
+  if (!program) {
+    // A Node build reused from its cache kept no link inputs: link it again.
+    if (!result.linkWork) result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: true, linkOnly });
+    try {
+      log(browser ? '[lasm] Linking for the browser…'
+        : `[lasm] Linking the single-threaded (portable) program${suspend === 'asyncify' ? ' with Asyncify (this engine has no JSPI)' : ''}…`);
+      const { provisionEdgeLinker } = await import('./edge/edge-link.mjs');
+      const sdk = await provisionEdgeLinker(found.edge, { log: message => log('[lasm] ' + message) }, process.env, suspend);
+      const stopTicker = (await import('./elapsed-ticker.mjs')).startElapsedTicker(browser ? 'Linking for the browser' : 'Linking the single-threaded program');
+      try { program = linkCachedEdgeProgram({ result, nodeRuntime, edge: found.edge, key: found.key, sdk, suspend, verbose }); }
+      finally { stopTicker(); }
+    } finally {
+      if (result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
+    }
   }
-  try {
-    // A dev build whose Node output nobody runs (lasm dev, the browser) only links the Node program for its inputs.
-    const linkOnly = buildOptions.profile === 'dev' && (browser || buildOptions.output === undefined);
-    let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built', linkOnly });
-    const found = await findEdgeProgram({ result, nodeRuntime, suspend });
-    let program = found.cached;
-    if (program && result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
-    if (!program) {
-      // A Node build reused from its cache kept no link inputs: link it again.
-      if (!result.linkWork) result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: true, linkOnly });
-      try {
-        log(browser ? '[lasm] Linking for the browser…'
-          : `[lasm] Linking the single-threaded (portable) program${suspend === 'asyncify' ? ' with Asyncify (this engine has no JSPI)' : ''}…`);
-        const { provisionEdgeLinker } = await import('./edge/edge-link.mjs');
-        const sdk = await provisionEdgeLinker(found.edge, { log: message => log('[lasm] ' + message) }, process.env, suspend);
-        const stopTicker = (await import('./elapsed-ticker.mjs')).startElapsedTicker(browser ? 'Linking for the browser' : 'Linking the single-threaded program');
-        try { program = linkCachedEdgeProgram({ result, nodeRuntime, edge: found.edge, key: found.key, sdk, suspend, verbose }); }
-        finally { stopTicker(); }
-      } finally {
-        if (result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
-      }
-    }
-    if (browser) {
-      const { writeBrowserOutput } = await import('./browser/browser-build.mjs');
-      const { version } = JSON.parse(await (await import('node:fs/promises')).readFile(new URL('../package.json', import.meta.url), 'utf8'));
-      return writeBrowserOutput({ source, projectDirectory, result, program, output: browserOutput, suspend: browserSuspend, cacheHit: !!found.cached,
-        lasmVersion: version, externals: bundler ? 'keep' : 'error' }).output;
-    }
-    return writeEdgeOutput({ target, source, projectDirectory, result, edge: found.edge, program, cacheHit: !!found.cached, log }).output;
-  } finally { if (temporary) await rm(temporary, { recursive: true, force: true }); }
+  if (browser) {
+    const { writeBrowserOutput } = await import('./browser/browser-build.mjs');
+    const { version } = JSON.parse(await (await import('node:fs/promises')).readFile(new URL('../package.json', import.meta.url), 'utf8'));
+    return writeBrowserOutput({ source, projectDirectory, result, program, output, suspend: browserSuspend, cacheHit: !!found.cached,
+      lasmVersion: version, externals: bundler ? 'keep' : 'error' }).output;
+  }
+  return writeEdgeOutput({ target, source, projectDirectory, result, edge: found.edge, program, output, cacheHit: !!found.cached, log }).output;
 }
 
 /** WASI targets (docs/WASI.md): the program relinked as a standard WASI
@@ -183,6 +175,9 @@ async function buildWasi(input, target, buildOptions, verbose) {
   const source = resolve(input), projectDirectory = findApplicationProject(source) ?? dirname(source);
   const selection = await selectLeanVersion(source);
   const nodeRuntime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit });
+  // --output names the WASI directory; the Node build it relinks stays in its cache entry.
+  const { output, ...nodeOptions } = buildOptions;
+  buildOptions = nodeOptions;
   let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built' });
   const log = message => console.error('[lasm] ' + message);
   const edge = await edgeRuntime(nodeRuntime, { log });
@@ -203,7 +198,7 @@ async function buildWasi(input, target, buildOptions, verbose) {
       if (result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
     }
   }
-  return writeWasiOutput({ target, source, projectDirectory, result, edge, program, cacheHit: !!cached });
+  return writeWasiOutput({ target, source, projectDirectory, result, edge, program, output, cacheHit: !!cached });
 }
 
 /** A missing Lean source: say where Lasm looked and which sources are there. */
@@ -226,7 +221,7 @@ export async function runApplicationCli(argv) {
   const support = applicationSupport();
   if (options.command === 'version') { console.log(await versionText()); return 0; }
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [--release] [-- arguments…]\n       lasm build Main.lean [--output dist] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]\n       lasm init my-app [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser [--allow-dev]\n       lasm editor [project-directory]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help, --version\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nlasm editor makes the Lean editor resolve import Lasm.* (elan toolchain for this project).' : cliUsage);
+    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [--release] [-- arguments…]\n       lasm build Main.lean [--output DIR] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]\n       lasm init my-app [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser [--allow-dev]\n       lasm editor [project-directory]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help, --version\n--output: the Node build for node and function targets (default dist/); the\ndeployable directory for edge, WASI and browser targets (default workers/,\nwasi/, dist/, …).\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nlasm editor makes the Lean editor resolve import Lasm.* (elan toolchain for this project).' : cliUsage);
     return 0;
   }
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }

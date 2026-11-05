@@ -80,7 +80,9 @@ SHA-256 checks:
 ## Programs on Bun and Deno: `--target bun` and `--target deno`
 
 `lasm build Main.lean --target bun` writes `bun/`. `--target deno` writes
-`deno/`. `--target deno-deploy` writes the same `deno/`.
+`deno/`. `--target deno-deploy` writes the same `deno/`. `--output DIR` writes
+it to `DIR` instead (from 0.5.0). The Node build these targets relink stays in
+the build cache (`.lake/lasm/applications/`); nothing is written to `dist/`.
 
 | Path | Contents |
 | --- | --- |
