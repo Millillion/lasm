@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { applicationSymbolRegistry, parseDefinedSymbols, initializationFreeCppSymbols } from '../src/application-symbols.mjs';
 
 test('registry keeps package function addresses and initialized data distinct', () => {
-  const symbols = parseDefinedSymbols('module.o:\nlp_app_answer T 0 12\nlp_app_value D 0 8\nl_Other T 0 8\nforeign_export T 0 4\n__main_void T 0 1\nmissing U 0 0\n');
+  const symbols = parseDefinedSymbols('module.o:\nlp_app_answer T 0 12\nlp_app_value D 0 8\nl_Other T 0 8\nforeign_export T 0 4\n__main_void T 0 1\n__wrap_lean_task_get T 0 4\nmissing U 0 0\n');
   const result = applicationSymbolRegistry([`#include <lean/lean.h>
 LEAN_EXPORT lean_object* lp_app_answer(lean_object*);
 LEAN_EXPORT lean_object* lp_app_value;

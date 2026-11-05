@@ -37,6 +37,8 @@ if (!ENVIRONMENT_IS_PTHREAD) {
   var lasmFullCancelling = new Map();
   // Started operations (op 94) per handle whose results have not settled.
   var lasmFullWaiting = new Map();
+  // Operations started (op 94) by a synchronous callback's thread, served inline.
+  var lasmFullSyncStarted = 0;
   var lasmFullLoadHost = function () {
     if (!lasmFullHost) {
       const path = process.env.LASM_FULL_HOST_MODULE;
@@ -54,6 +56,10 @@ if (!ENVIRONMENT_IS_PTHREAD) {
         // Lasm.JS: start the interop poller thread (library/c/lasm_js.c) when an
         // event waits and Lean makes no progress (host calls served) meanwhile.
         spawnPoller: () => Module._lasm_js_spawn_poller?.(), progress: () => lasmFullServed,
+        // Lasm.JS: a task wait inside a synchronous callback that no Lean thread
+        // can end (src/node-js.mjs stuckWait): the program's running threads, and
+        // the asynchronous operations started inline inside callbacks so far.
+        liveThreads: () => Object.keys(PThread.pthreads), startedOperations: () => lasmFullSyncStarted,
         applicationCommand: process.env.LASM_FULL_APP_PATH ? {
           executable: process.execPath,
           arguments: [],
@@ -88,6 +94,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       if (input.readBigUInt64LE(24) !== 0n && !started.then && started.error) return started;
       const waiting = started.then !== undefined;
       if (waiting) lasmFullWaiting.set(handle, (lasmFullWaiting.get(handle) ?? 0) + 1);
+      if (waiting && context.synchronous) lasmFullSyncStarted++;
       const settled = () => {
         if (!waiting) return;
         const count = lasmFullWaiting.get(handle) - 1;

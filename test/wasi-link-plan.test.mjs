@@ -13,6 +13,7 @@ import { linkWasiProgram, wasiLinkSettings, wasiSources, allowedImportModules, c
 import { moduleImports } from '../src/wasi/lower-atomics.mjs';
 import { extractCore } from '../src/wasi/wasi-component.mjs';
 import { responseFile } from '../src/platform.mjs';
+import { glueLinkFlags } from '../src/lasm-library.mjs';
 import { installTools, wasmObject, archive, temporaryDirectory, programModule } from './fixtures/link-stand-ins/toolchain.mjs';
 
 const posix = process.platform !== 'win32';
@@ -36,7 +37,8 @@ function fixture({ objects: extra = [] } = {}) {
   const second = object(join('with "quote" and space', 'module-1.o'), { functions: [{ name: 'l_helper', refs: ['random_get'] }, { name: 'xlasm_js_available' },
     { name: 'lasm_fetch_platform_x' }], imports: { random_get: 'wasi_snapshot_preview1' } });
   const extras = extra.map(([name, spec]) => object(name, spec));
-  writeFileSync(join(linkWork, 'link.rsp'), responseFile([main, jsGlue, '-Wl,--wrap=initialize_Main', marker, fetchGlue, member, second, ...extras,
+  // Lasm.JS's Node glue comes with its wraps, which the WASI link drops with it.
+  writeFileSync(join(linkWork, 'link.rsp'), responseFile([main, jsGlue, ...glueLinkFlags, '-Wl,--wrap=initialize_Main', marker, fetchGlue, member, second, ...extras,
     '-Oz', '-Wl,-Map=' + join(linkWork, 'final.map'), '-sMEMORY64=1', '/runtime/lib/libInit.a', 'program.cjs']));
   const nodeRuntime = { directory: join(base, 'node-runtime'), manifest: { libraries: ['lib/libInit.a', 'lib/liblasmsymbols.a', 'lib/libleanrt.a', 'lib/libLake.a'] } };
   const edge = { sysroot: { cache: join(base, 'edge-cache'), directory: 'wasm64-emscripten' },

@@ -28,6 +28,7 @@ on:
       - scripts/ci/lasm-js-stress.mjs
       - test/fixtures/js-interop/**
       - test/fixtures/js-callbacks/**
+      - test/fixtures/js-sync-waits/**
       - .github/workflows/bridge-verification.yml
       - .github/workflows/lasm-js-stress.yml
   push:

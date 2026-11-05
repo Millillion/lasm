@@ -477,23 +477,29 @@ def callMethodAwait [MonadJS m] (o : Value) (name : String) (args : Array Data :
 def new (c : Value) (args : Array Data := #[]) (α : Type := Value) [FromJS α] : IO α := do
   receive α "new" (← invokeRaw (.ref c "") .undefined args (flags α false 4))
 
-/-- A Lean task that finishes when a JavaScript value settles: a promise (or any
-thenable) becomes its result, any other value is itself. Does not block a Lean
-thread. -/
-def toTask (v : Value) (α : Type := Data) [FromJS α] : IO (Task (Except IO.Error α)) := do
+/-- `toTask`; `keep` (the data kept alive with the request) also tells the C glue
+whether `Value.await` waits for it. -/
+private def toTaskKeeping (v : Value) (α : Type) [FromJS α] (keep : Data) : IO (Task (Except IO.Error α)) := do
   ensureStarted
   let p ← IO.Promise.new
-  awaitInto p (Wire.encode (.ref v "")) (.ref v "")
+  awaitInto p (Wire.encode (.ref v "")) keep
   IO.mapTask (t := p.result!) fun
     | .ok bytes => do decodeAs α "await" (← Wire.decode bytes)
     | .error message => throw (IO.userError message)
+
+/-- A Lean task that finishes when a JavaScript value settles: a promise (or any
+thenable) becomes its result, any other value is itself. Does not block a Lean
+thread. -/
+def toTask (v : Value) (α : Type := Data) [FromJS α] : IO (Task (Except IO.Error α)) :=
+  toTaskKeeping v α (.ref v "")
 
 /-- `await v`: a promise (or any thenable) becomes its result, any other value is
 itself. In `Async` the Lean computation continues when it settles, holding no
 Lean thread; in `IO` the calling thread waits. -/
 def await [MonadJS m] (v : Value) (α : Type := Data) [FromJS α] : m α :=
   MonadJS.awaitWith
-    (do IO.ofExcept (← IO.wait (← v.toTask (α := α))))
+    -- Marked for the C glue: inside a synchronous callback this fails at once.
+    (do IO.ofExcept (← IO.wait (← toTaskKeeping v α (.ref v "Value.await"))))
     (do
       ensureStarted
       let p : IO.Promise (Except String ByteArray) ← IO.Promise.new
@@ -535,12 +541,14 @@ def ofFnReply (f : Array Data → Async Function.Reply) : IO Value := do
 
 /-- A JavaScript function that calls `f` synchronously and returns its result.
 Node's main thread waits while `f` runs (about 20 µs per call plus `f`), so the
-event loop is blocked meanwhile. Inside `f`, JavaScript calls and console output
-work. Waiting for a JavaScript promise, and host operations the host completes
-asynchronously (Lean file IO), fail at once with an error. Waiting for a Lean
-task that makes host calls (including `Async` run with `.block`), or for a
-timer, DNS lookup or socket read started inside `f`, never finishes; starting
-one is fine, since it completes after `f` returns. `f` cannot call another
+event loop is blocked meanwhile. Inside `f`, JavaScript calls, console output and
+waiting for a Lean task that needs nothing from Node work, and a timer, DNS
+lookup, socket read or `Value.toTask` may be started (it finishes after `f`
+returns). Waiting for anything that needs Node fails at once with an error: a
+JavaScript promise, Lean file IO, a Lean task that makes host calls (including
+`Async` run with `.block`), or a timer, DNS lookup or socket read started in `f`.
+A promise wait (`Value.await`, the `…Await` forms) fails as an error `f` can
+catch; a failed wait for a Lean task ends `f` itself. `f` cannot call another
 synchronous callback (docs/JS_BINDINGS.md). -/
 def ofSyncFn (f : Array Data → IO Data) : IO Value := do
   ensureStarted

@@ -288,17 +288,19 @@ Function.ofSyncFn2 (f : α → β → IO γ)
 - **Synchronous (`ofSyncFn`), only where JavaScript needs the result immediately**
   (a sort comparator, a `map` function). Node's main thread waits while the Lean
   function runs, about 20 µs per call plus the function, so the event loop is blocked.
-  - What works inside: JavaScript calls (served inline while the main thread waits)
-    and console output.
-  - What fails: waiting for a JavaScript promise (`Value.await`, `toTask`, the
-    `…Await` forms), since a promise settles only after the callback returns,
-    and host operations the host completes asynchronously (Lean file IO). They
-    fail at once with an error that says so.
-  - What never finishes: waiting inside the callback for a Lean task that makes
-    host calls, including an `Async` computation run with `.block` (it runs as a
-    task), or for a runtime operation the callback started (a timer, a DNS
-    lookup, a socket read). Starting one is fine: it completes after the
-    callback returns.
+  - What works inside: JavaScript calls (served inline while the main thread waits),
+    console output, and waiting for a Lean task that needs nothing from Node (a
+    computation). Starting a timer, a DNS lookup, a socket read or `Value.toTask`
+    is fine too: it finishes after the callback returns.
+  - What fails at once with an error: waiting for anything that needs Node's main
+    thread, which is waiting for the callback. That is a JavaScript promise
+    (`Value.await`, a `toTask`'s task, the `…Await` forms), Lean file IO, a Lean
+    task that makes host calls (including `Async` run with `.block`), and a
+    timer, DNS lookup or socket read started in the callback.
+  - A promise wait (`Value.await`, the `…Await` forms) and file IO fail as errors
+    the callback can catch. A failed wait for a Lean task (`IO.wait`, `Task.get`,
+    `.block`, a `toTask`'s task) ends the whole callback: JavaScript gets the
+    error, and the Lean values the callback held are not freed.
   - A synchronous callback cannot call another synchronous callback.
 - **Replying with a method call (`ofFnReply`), for HTTP handlers.** A handler
   usually ends by calling `res.json(body)` (Express) or returning `c.json(body)`
@@ -402,8 +404,9 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   does not know `Lasm.JS`, so the editor marks `import Lasm.JS` as unknown. Lasm
   builds and runs these programs normally.
 - **Deriving** covers only structures without parameters and enumerations.
-- **Synchronous callbacks** block Node's event loop. Inside them, host operations
-  that complete asynchronously fail.
+- **Synchronous callbacks** block Node's event loop. Inside them, waiting for
+  anything that needs Node (a promise, file IO, a task that makes host calls, a
+  timer or socket started there) fails at once.
 - **Module loading.** Modules load with `require`: ES modules with top-level await
   cannot be loaded. pnpm/Yarn Plug'n'Play layouts are not supported.
 - **Cost per call.** Each call costs about 25–35 µs. An asynchronous callback round

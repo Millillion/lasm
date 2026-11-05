@@ -48,6 +48,10 @@ on:
         description: With a seed, record traces of every n-th run (0 = none)
         default: '0'
         type: string
+      programs:
+        description: Comma-separated programs (empty = the stress programs; js-sync-cost measures per-call costs)
+        default: ''
+        type: string
 permissions:
   contents: read
 jobs:
@@ -120,9 +124,11 @@ jobs:
         env:
           SEED: ${{ inputs.seed || '' }}
           TRACE_EVERY: ${{ inputs.trace-every || '0' }}
+          PROGRAMS: ${{ inputs.programs || '' }}
         run: |
           fuzz=()
           if [ -n "$SEED" ]; then fuzz=(--seed "$SEED" --trace-every "$TRACE_EVERY"); echo "Schedule fuzzing from seed $SEED"; fi
+          if [ -n "$PROGRAMS" ]; then fuzz+=(--only "$PROGRAMS"); fi
           node scripts/ci/lasm-js-stress.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm js stress λ" ".work/lasm-js-stress-${{ matrix.platform }}.json" --runs "${{ inputs.runs || '200' }}" --cli-runs "${{ inputs.cli-runs || '20' }}" --timeout-s "${{ inputs.timeout-s || '30' }}" "${fuzz[@]}"
       - name: Collect hang diagnostics and traces
         if: always()

@@ -99,10 +99,10 @@ class Reader {
   done() { return this.offset === this.bytes.length; }
 }
 
-export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spawnPoller, progress } = {}) {
+export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spawnPoller, progress, liveThreads, startedOperations } = {}) {
   const values = new HandleTable({ first: firstJsHandle });
   const moduleRequire = createRequire(appPath ? join(dirname(appPath), 'package.json') : join(process.cwd(), 'package.json'));
-  const stats = { released: 0, callbacks: 0, syncCallbacks: 0, functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0 };
+  const stats = { released: 0, callbacks: 0, syncCallbacks: 0, syncWaitsStopped: 0, syncPromises: 0, functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0 };
   const bindings = new Map();
 
   function reference(value) { return values.allocate(value); }
@@ -160,11 +160,11 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
   // Inside a synchronous Lean callback Node's main thread waits for the Lean
   // thread, so a JavaScript promise cannot settle until the callback returns:
   // waiting for one there could never finish. Such a request fails at once.
-  const syncAwaitFailure = what => failure(`${what} inside a synchronous Lean callback (Lasm.JS.Function.ofSyncFn): `
-    + 'JavaScript promises settle only after the callback returns, while Node waits for it. Use an asynchronous callback (Function.ofFn)');
+  const syncWaitText = what => `Waiting for ${what} inside a synchronous callback can't finish, `
+    + 'because the JavaScript thread is waiting for the callback; use Function.ofFn';
   function awaited(result, flags, mode, what) {
     if (!(flags & 2) || !result || typeof result.then !== 'function') return encode(result, mode);
-    if (syncBusy) { Promise.resolve(result).catch(() => {}); throw syncAwaitFailure(`Cannot await the promise returned by ${what}`); }
+    if (syncBusy) { Promise.resolve(result).catch(() => {}); throw failure(syncWaitText(`the promise returned by ${what}`)); }
     return Promise.resolve(result).then(value => encode(value, mode), error => { throw error?.leanUserError ? error : jsFailure(error); });
   }
 
@@ -232,8 +232,38 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
   //   4 i32 doorbell (incremented by the Lean thread on every host call and result)
   //   8 u32 function id   12 u32 reserved
   //  16 u64 buffer pointer  24 u64 buffer capacity  32 u64 payload length
+  //  40 i32 task wait of the callback (generation << 2 | 0 none, 1 waiting, 2 stop)
+  //  44 i32 stopped (1: the failure posted is a stopped wait's)
+  //  48 u64 wait list (below)  56 u64 the Lean thread (pthread_self)
+  // Wait list (library/c/lasm_js.c `waits`): 0 i32 epoch (changes at every wait's
+  // start and end), 4 i32 size n, 8 n × u64 waiting threads (pthread_self; 0 free).
   let syncChannel, syncBusy = false;
-  const syncPollMs = 10;
+  const syncPollMs = 10, stuckMs = 50;
+  // Inside a callback, the Lean thread may wait for a Lean task (Task.get,
+  // IO.wait, IO.waitAny: sync_wait in lasm_js.c). The wait can't finish if every
+  // other Lean thread waits indefinitely too, since none of them can go on
+  // before this thread answers it: a host call, or a futex that only such a
+  // thread would release. Seen so for stuckMs, with nothing changed in between
+  // (`seen`: a thread just woken may not have run yet), the wait is asked to
+  // stop, and the callback fails with the reason.
+  function stuckWait(buffer, i32, view, seen) {
+    const { channel } = syncChannel;
+    const word = Atomics.load(i32, channel / 4 + 10);
+    if ((word & 3) !== 1) return undefined;
+    const table = Number(view.getBigUint64(channel + 48, true)), self = view.getBigUint64(channel + 56, true);
+    const epoch = Atomics.load(i32, table / 4), size = Atomics.load(i32, table / 4 + 1);
+    const words = new BigInt64Array(buffer, table + 8, size);
+    const waiting = new Set();
+    for (let k = 0; k < size; k++) waiting.add(BigInt.asUintN(64, Atomics.load(words, k)));
+    for (const thread of liveThreads()) if (BigInt(thread) !== self && !waiting.has(BigInt(thread))) return undefined;
+    const mark = `${word} ${epoch}`, now = performance.now();
+    if (seen?.mark !== mark) return { mark, since: now };
+    if (now - seen.since < stuckMs) return seen;
+    if (Atomics.compareExchange(i32, channel / 4 + 10, word, (word & ~3) | 2) !== word) return undefined;
+    Atomics.notify(i32, channel / 4 + 10);
+    return { stop: seen.started !== startedOperations?.() ? 'a timer, DNS lookup or socket operation'
+      : stats.syncPromises > seen.settles ? 'a JavaScript promise' : 'a Lean task' };
+  }
   function syncFunction(fn) {
     const f = function (...args) {
       if (!syncChannel) throw failure('Lasm.JS synchronous callbacks are not started (internal error)');
@@ -249,6 +279,9 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
       view.setBigUint64(channel + 32, BigInt(payload.length), true);
       view.setUint32(channel + 8, fn, true);
       syncBusy = true; stats.syncCallbacks++;
+      // What the callback starts that only the event loop can finish (for the reason of a stopped wait).
+      const started = startedOperations?.(), settles = stats.syncPromises;
+      let seen, stopped;
       try {
         // Read the slot's sequence and the doorbell before posting the call: once
         // state is 1 the Lean thread runs and may make its first host call at
@@ -265,6 +298,11 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
             const start = Number(view.getBigUint64(channel + 16, true));
             const result = new Uint8Array(buffer).slice(start, start + length);
             Atomics.store(i32, channel / 4, 0);
+            if (state === 3 && Atomics.load(i32, channel / 4 + 11)) {
+              Atomics.store(i32, channel / 4 + 11, 0);
+              stats.syncWaitsStopped++;
+              throw failure(syncWaitText(stopped ?? 'a Lean task'));
+            }
             if (state === 3) throw jsFailure(new Error(decoder.decode(result)));
             return decode(result);
           }
@@ -276,7 +314,15 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
           // for it (pthread_create of a thread started on demand, such as the
           // completion thread), and the event loop that would run it is blocked
           // here. Such work rings no doorbell, hence the short wait.
-          if (Atomics.wait(i32, channel / 4 + 1, bell, syncPollMs) === 'timed-out') { serveSync(slot); serveMailbox?.(); }
+          if (Atomics.wait(i32, channel / 4 + 1, bell, syncPollMs) === 'timed-out') {
+            serveSync(slot); serveMailbox?.();
+            if (liveThreads) {
+              buffer = memory.buffer; i32 = new Int32Array(buffer); view = new DataView(buffer);
+              const next = stuckWait(buffer, i32, view, seen);
+              if (next?.stop !== undefined) stopped = next.stop;
+              seen = next?.mark && { started, settles, ...next };
+            }
+          }
           bell = Atomics.load(i32, channel / 4 + 1);
         }
       } finally { syncBusy = false; }
@@ -346,7 +392,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
       // with the result, through the interop thread, instead of replying with it.
       let into;
       if ((op === 205 || op === 214) && Number(arg) & 16) {
-        if (syncBusy) throw syncAwaitFailure('Cannot wait for a JavaScript call (an Async call, method or binding)');
+        if (syncBusy) throw failure(syncWaitText('a JavaScript call (an Async call, method or binding)'));
         if (bytes.length < 8) throw failure('Malformed Lasm.JS request');
         into = bytes.readBigUInt64LE(0); bytes = bytes.subarray(8);
       }
@@ -381,7 +427,9 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
       case 207: {
         // Resolve the Lean promise at `arg` (an IO.Promise pointer owned by the
         // interop thread) when this value settles; a non-promise settles now.
-        if (syncBusy) throw syncAwaitFailure('Cannot await a JavaScript value (Value.await, Value.toTask)');
+        // Inside a synchronous callback it settles after the callback returns
+        // (`Value.toTask` kept for later); waiting for it there is stopped (stuckWait).
+        if (syncBusy) stats.syncPromises++;
         settle(arg, decode(bytes));
         return Buffer.alloc(0);
       }
