@@ -10,11 +10,11 @@
     "test": "node test/oracles.mjs",
     "test:attacks": "node test/attacks.mjs",
     "test:fuzz": "node test/fuzz.mjs",
-    "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun --output dist/server",
+    "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun",
     "start:bun": "bun bun/main.mjs",
-    "build:deno": "npm run build:client && lasm build ServerNode.lean --target deno --output dist/server",
+    "build:deno": "npm run build:client && lasm build ServerNode.lean --target deno",
     "start:deno": "deno run -A deno/main.mjs",
-    "build:workers": "npm run build:client && lasm build ServerWorkers.lean --target workers --output dist/server",
+    "build:workers": "npm run build:client && lasm build ServerWorkers.lean --target workers",
     "build:docker": "npm run build && docker build -t porter .",
     "build:lambda": "npm run build && lasm package dist/server --target lambda",
     "build:lambda-image": "npm run build && docker build -f deploy/lambda-image/Dockerfile -t porter-lambda:local .",
@@ -31,7 +31,7 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.4.0",
+    "@lasm/cli": "0.5.0",
     "@playwright/test": "1.63.0",
     "jose": "6.2.12",
     "oauth4webapi": "3.8.8",
